@@ -1,0 +1,50 @@
+[OPTIONS]
+Compatibility=1.1
+Full-text search=Yes
+Contents file=index.hhc
+Default Window=main
+Default topic=index.html
+Index file=index.hhk
+Language=0x804 Chinese (PRC)
+Title=test_doc
+
+[WINDOWS]
+main="test_doc","index.hhc","index.hhk","index.html","index.html",,,,,0x23520,,0x10387e,,,,,,,,0
+
+[FILES]
+doc_8h_source.html
+test___stock_manager_8cpp_source.html
+config_8cpp_source.html
+config_8h_source.html
+test__all_8cpp_source.html
+doc_8h.html
+test___stock_manager_8cpp.html
+config_8cpp.html
+config_8h.html
+test__all_8cpp.html
+group__test__hikyuu__base__suit.html
+group__test__hikyuu___stock_manager.html
+group__test__all.html
+struct_g_config.html
+struct_g_config-members.html
+index.html
+modules.html
+annotated.html
+classes.html
+functions.html
+functions_func.html
+functions_vars.html
+files.html
+globals.html
+globals_func.html
+globals_defs.html
+tab_a.png
+tab_b.png
+tab_h.png
+tab_s.png
+nav_h.png
+nav_f.png
+bc_s.png
+doxygen.png
+closed.png
+open.png
