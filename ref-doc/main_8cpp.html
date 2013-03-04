@@ -1,0 +1,341 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.3.1"/>
+<title>Hikyuu: hikyuu_python/main.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.3.1 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_993c3b1432d246bf0c7d9274c7399654.html">hikyuu_python</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">main.cpp 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &lt;boost/python.hpp&gt;</code><br/>
+<code>#include &lt;<a class="el" href="hikyuu_8h_source.html">hikyuu/hikyuu.h</a>&gt;</code><br/>
+</div><div class="textblock"><div class="dynheader">
+main.cpp 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="main_8cpp__incl.png" border="0" usemap="#hikyuu__python_2main_8cpp" alt=""/></div>
+<map name="hikyuu__python_2main_8cpp" id="hikyuu__python_2main_8cpp">
+<area shape="rect" id="node3" href="hikyuu_8h.html" title="hikyuu/hikyuu.h" alt="" coords="621,83,757,112"/><area shape="rect" id="node4" href="_stock_manager_8h.html" title="StockManager.h" alt="" coords="455,160,589,189"/><area shape="rect" id="node27" href="util_8h.html" title="utilities/util.h" alt="" coords="799,160,913,189"/><area shape="rect" id="node5" href="_stock_8h.html" title="Stock.h" alt="" coords="404,237,479,267"/><area shape="rect" id="node22" href="_market_info_8h.html" title="MarketInfo.h" alt="" coords="565,392,677,421"/><area shape="rect" id="node23" href="_stock_type_info_8h.html" title="StockTypeInfo.h" alt="" coords="217,237,356,267"/><area shape="rect" id="node24" href="_log_8h.html" title="Log.h" alt="" coords="710,237,772,267"/><area shape="rect" id="node6" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="299,392,421,421"/><area shape="rect" id="node20" href="_k_query_8h.html" title="KQuery.h" alt="" coords="397,315,485,344"/><area shape="rect" id="node7" href="_data_type_8h.html" title="DataType.h" alt="" coords="442,469,544,499"/><area shape="rect" id="node14" href="_null_8h.html" title="utilities/Null.h" alt="" coords="372,547,492,576"/><area shape="rect" id="node17" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="517,547,683,576"/><area shape="rect" id="node21" href="_k_record_8h.html" title="KRecord.h" alt="" coords="446,392,540,421"/></map>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a5c9f761e6886acea67b30961fc79035c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a5c9f761e6886acea67b30961fc79035c">export_DataType</a> ()</td></tr>
+<tr class="separator:a5c9f761e6886acea67b30961fc79035c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e11b2a25db0897e38d13a1c8af6f9c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a7e11b2a25db0897e38d13a1c8af6f9c5">export_util</a> ()</td></tr>
+<tr class="separator:a7e11b2a25db0897e38d13a1c8af6f9c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f7a01b158517a244276b6d2df08ffd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a0f7a01b158517a244276b6d2df08ffd6">export_Datetime</a> ()</td></tr>
+<tr class="separator:a0f7a01b158517a244276b6d2df08ffd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9e6c56ac232df334eced2d0d88b2b63"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#af9e6c56ac232df334eced2d0d88b2b63">export_StockManager</a> ()</td></tr>
+<tr class="separator:af9e6c56ac232df334eced2d0d88b2b63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8b37279d4f44e56e21ca58cab39a560"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#ac8b37279d4f44e56e21ca58cab39a560">export_Stock</a> ()</td></tr>
+<tr class="separator:ac8b37279d4f44e56e21ca58cab39a560"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18ed8ad345b59d3980dcf4972e3ddc53"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a18ed8ad345b59d3980dcf4972e3ddc53">export_MarketInfo</a> ()</td></tr>
+<tr class="separator:a18ed8ad345b59d3980dcf4972e3ddc53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6aa4fa7d944d71429095ec877527f6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#af6aa4fa7d944d71429095ec877527f6f">export_StockTypeInfo</a> ()</td></tr>
+<tr class="separator:af6aa4fa7d944d71429095ec877527f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abcc35b1cc171800043ebd9ac5af2c245"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#abcc35b1cc171800043ebd9ac5af2c245">export_StockWeight</a> ()</td></tr>
+<tr class="separator:abcc35b1cc171800043ebd9ac5af2c245"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58657a2c9fb93aa3a4646bd0b8eab77e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a58657a2c9fb93aa3a4646bd0b8eab77e">export_KQuery</a> ()</td></tr>
+<tr class="separator:a58657a2c9fb93aa3a4646bd0b8eab77e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74531f61d7a64b4b8de9263436778089"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a74531f61d7a64b4b8de9263436778089">export_KReord</a> ()</td></tr>
+<tr class="separator:a74531f61d7a64b4b8de9263436778089"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addad1ccd0ced6b4cf5c623e6e003ac82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#addad1ccd0ced6b4cf5c623e6e003ac82">export_KData</a> ()</td></tr>
+<tr class="separator:addad1ccd0ced6b4cf5c623e6e003ac82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76b5087aacbaefc110524715ab3b7fb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a76b5087aacbaefc110524715ab3b7fb6">export_Parameter</a> ()</td></tr>
+<tr class="separator:a76b5087aacbaefc110524715ab3b7fb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3c1446586b2377fc8dafb7897b92e09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#ac3c1446586b2377fc8dafb7897b92e09">BOOST_PYTHON_MODULE</a> (_hikyuu)</td></tr>
+<tr class="separator:ac3c1446586b2377fc8dafb7897b92e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">函数说明</h2>
+<a class="anchor" id="ac3c1446586b2377fc8dafb7897b92e09"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">BOOST_PYTHON_MODULE </td>
+          <td>(</td>
+          <td class="paramtype">_hikyuu&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5c9f761e6886acea67b30961fc79035c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_DataType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0f7a01b158517a244276b6d2df08ffd6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_Datetime </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="addad1ccd0ced6b4cf5c623e6e003ac82"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_KData </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a58657a2c9fb93aa3a4646bd0b8eab77e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_KQuery </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a74531f61d7a64b4b8de9263436778089"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_KReord </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a18ed8ad345b59d3980dcf4972e3ddc53"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_MarketInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a76b5087aacbaefc110524715ab3b7fb6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_Parameter </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac8b37279d4f44e56e21ca58cab39a560"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_Stock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af9e6c56ac232df334eced2d0d88b2b63"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_StockManager </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af6aa4fa7d944d71429095ec877527f6f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_StockTypeInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="abcc35b1cc171800043ebd9ac5af2c245"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_StockWeight </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7e11b2a25db0897e38d13a1c8af6f9c5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void export_util </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.3.1
+</small></address>
+</body>
+</html>

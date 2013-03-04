@@ -1,0 +1,381 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.3.1"/>
+<title>Hikyuu: TradeManager 交易管理类</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.3.1 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div><!-- top -->
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#typedef-members">类型定义</a> &#124;
+<a href="#enum-members">枚举</a> &#124;
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">TradeManager 交易管理类<div class="ingroups"><a class="el" href="group___trade_manager.html">TradeManager 交易管理</a></div></div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="dynheader">
+TradeManager 交易管理类 的协作图:</div>
+<div class="dyncontent">
+<center><table><tr><td><img src="group___trade_manager_class.png" border="0" alt="" usemap="#group______trade__manager__class"/>
+<map name="group______trade__manager__class" id="group______trade__manager__class">
+<area shape="rect" id="node2" href="group___trade_manager.html" title="交易管理，负责记录每一笔交易记录及当前的持仓情况" alt="" coords="5,5,197,35"/></map>
+</td></tr></table></center>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html">hku::PositionRecord</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">持仓记录  <a href="classhku_1_1_position_record.html#details">更多...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager.html">hku::TradeManager</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">账户交易管理模块，管理帐户的交易记录及资金使用情况  <a href="classhku_1_1_trade_manager.html#details">更多...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_record.html">hku::TradeRecord</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">交易记录  <a href="classhku_1_1_trade_record.html#details">更多...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:ga4de9f9dfca1523af32f956c941509ff4"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; PositionRecord &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">hku::PositionRecordList</a></td></tr>
+<tr class="separator:ga4de9f9dfca1523af32f956c941509ff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga285ea5029f5f472a82a1d21128be7c2b"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; TradeManager &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">hku::TradeManagerPtr</a></td></tr>
+<tr class="memdesc:ga285ea5029f5f472a82a1d21128be7c2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序应使用此类型进行实际操作  <a href="#ga285ea5029f5f472a82a1d21128be7c2b">更多...</a><br/></td></tr>
+<tr class="separator:ga285ea5029f5f472a82a1d21128be7c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga331f8f4b810f375dac4596f337507d89"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; TradeRecord &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">hku::TradeRecordList</a></td></tr>
+<tr class="separator:ga331f8f4b810f375dac4596f337507d89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+枚举</h2></td></tr>
+<tr class="memitem:gaacb51fd999113b5bc5ba313b3397207a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#gaacb51fd999113b5bc5ba313b3397207a">hku::BUSINESS</a> { <br/>
+&#160;&#160;<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa4f441f8de20882718183fae13ea79dbe">hku::BUSINESS_INIT</a> = 0, 
+<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa51a75a709c2b65b1720d47351fdb2df6">hku::BUSINESS_BUY</a> = 1, 
+<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aaa94843e56f952848add73c965e540e64">hku::BUSINESS_SELL</a> = 2, 
+<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aadb1fae925f76b62e5d9c4e00d0e2c341">hku::BUSINESS_GIFT</a> = 3, 
+<br/>
+&#160;&#160;<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa9c824acfdc5a6b1b7512a1783e1978c9">hku::BUSINESS_BONUS</a> = 4, 
+<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa5d41a10da0fe1097854a56c157a9bae4">hku::BUSINESS_CHECKIN</a> = 5, 
+<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aaa86d831270ada66a8fc9d2e593f97b9b">hku::BUSINESS_CHECKOUT</a> = 6, 
+<a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa3ab7e0575affd32ce01e5aa942f8af63">hku::INVALID_BUSINESS</a> = 7
+<br/>
+ }</td></tr>
+<tr class="memdesc:gaacb51fd999113b5bc5ba313b3397207a"><td class="mdescLeft">&#160;</td><td class="mdescRight">业务类型  <a href="group___trade_manager_class.html#gaacb51fd999113b5bc5ba313b3397207a">更多...</a><br/></td></tr>
+<tr class="separator:gaacb51fd999113b5bc5ba313b3397207a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:ga343fe9501790eefb147a3e0d0890aee3"><td class="memItemLeft" align="right" valign="top">TradeManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga343fe9501790eefb147a3e0d0890aee3">hku::crtTM</a> (const Datetime &amp;datetime=Datetime(199001010000LL), price_t initcash=100000.0, const TradeCostPtr &amp;costfunc=crtZeroTC(), bool reinvest=true, int precision=2, const string &amp;name=&quot;SYS&quot;)</td></tr>
+<tr class="memdesc:ga343fe9501790eefb147a3e0d0890aee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">创建交易管理模块，管理帐户的交易记录及资金使用情况  <a href="#ga343fe9501790eefb147a3e0d0890aee3">更多...</a><br/></td></tr>
+<tr class="separator:ga343fe9501790eefb147a3e0d0890aee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga63f52561c9cccc0066025a45011ba556"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga63f52561c9cccc0066025a45011ba556">hku::operator&lt;&lt;</a> (std::ostream &amp;, const PositionRecord &amp;)</td></tr>
+<tr class="memdesc:ga63f52561c9cccc0066025a45011ba556"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出持仓记录信息  <a href="#ga63f52561c9cccc0066025a45011ba556">更多...</a><br/></td></tr>
+<tr class="separator:ga63f52561c9cccc0066025a45011ba556"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga50c703064fbd29aa3137c6b2e78af66e"><td class="memItemLeft" align="right" valign="top">string <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga50c703064fbd29aa3137c6b2e78af66e">hku::getBusinessName</a> (BUSINESS)</td></tr>
+<tr class="memdesc:ga50c703064fbd29aa3137c6b2e78af66e"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取业务名称，用于打印输出  <a href="#ga50c703064fbd29aa3137c6b2e78af66e">更多...</a><br/></td></tr>
+<tr class="separator:ga50c703064fbd29aa3137c6b2e78af66e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8bc385b8979289a7ea33cc6447294407"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga8bc385b8979289a7ea33cc6447294407">hku::operator&lt;&lt;</a> (std::ostream &amp;, const TradeRecord &amp;)</td></tr>
+<tr class="memdesc:ga8bc385b8979289a7ea33cc6447294407"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出TradeRecord信息  <a href="#ga8bc385b8979289a7ea33cc6447294407">更多...</a><br/></td></tr>
+<tr class="separator:ga8bc385b8979289a7ea33cc6447294407"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<h2 class="groupheader">类型定义说明</h2>
+<a class="anchor" id="ga4de9f9dfca1523af32f956c941509ff4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef vector&lt;PositionRecord&gt; <a class="el" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">hku::PositionRecordList</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ga285ea5029f5f472a82a1d21128be7c2b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef shared_ptr&lt;TradeManager&gt; <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">hku::TradeManagerPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>客户程序应使用此类型进行实际操作 </p>
+
+</div>
+</div>
+<a class="anchor" id="ga331f8f4b810f375dac4596f337507d89"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef vector&lt;TradeRecord&gt; <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">hku::TradeRecordList</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">枚举类型说明</h2>
+<a class="anchor" id="gaacb51fd999113b5bc5ba313b3397207a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group___trade_manager_class.html#gaacb51fd999113b5bc5ba313b3397207a">hku::BUSINESS</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>业务类型 </p>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aa4f441f8de20882718183fae13ea79dbe"></a>BUSINESS_INIT</em>&nbsp;</td><td class="fielddoc">
+<p>建立初始账户 </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aa51a75a709c2b65b1720d47351fdb2df6"></a>BUSINESS_BUY</em>&nbsp;</td><td class="fielddoc">
+<p>买入 </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aaa94843e56f952848add73c965e540e64"></a>BUSINESS_SELL</em>&nbsp;</td><td class="fielddoc">
+<p>卖出 </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aadb1fae925f76b62e5d9c4e00d0e2c341"></a>BUSINESS_GIFT</em>&nbsp;</td><td class="fielddoc">
+<p>送股 </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aa9c824acfdc5a6b1b7512a1783e1978c9"></a>BUSINESS_BONUS</em>&nbsp;</td><td class="fielddoc">
+<p>分红 </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aa5d41a10da0fe1097854a56c157a9bae4"></a>BUSINESS_CHECKIN</em>&nbsp;</td><td class="fielddoc">
+<p>存入现金 </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aaa86d831270ada66a8fc9d2e593f97b9b"></a>BUSINESS_CHECKOUT</em>&nbsp;</td><td class="fielddoc">
+<p>取出现金 </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ggaacb51fd999113b5bc5ba313b3397207aa3ab7e0575affd32ce01e5aa942f8af63"></a>INVALID_BUSINESS</em>&nbsp;</td><td class="fielddoc">
+<p>无效类型 </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">函数说明</h2>
+<a class="anchor" id="ga343fe9501790eefb147a3e0d0890aee3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TradeManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::crtTM </td>
+          <td>(</td>
+          <td class="paramtype">const Datetime &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em> = <code>Datetime(199001010000LL)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">price_t&#160;</td>
+          <td class="paramname"><em>initcash</em> = <code>100000.0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const TradeCostPtr &amp;&#160;</td>
+          <td class="paramname"><em>costfunc</em> = <code>crtZeroTC()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>reinvest</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>precision</em> = <code>2</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;SYS&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>创建交易管理模块，管理帐户的交易记录及资金使用情况 </p>
+<p>考虑的移滑价差需要使用当日的最高或最低价，所以不在该模块内进行处理</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>账户建立日期, 默认1990-1-1 </td></tr>
+    <tr><td class="paramname">initcash</td><td>初始现金，默认100000 </td></tr>
+    <tr><td class="paramname">costfunc</td><td>交易成本算法,默认零成本算法 </td></tr>
+    <tr><td class="paramname">reinvest</td><td>true 考虑权息信息（默认） | false 忽略权息信息 </td></tr>
+    <tr><td class="paramname">precision</td><td>计算精度, 默认2 </td></tr>
+    <tr><td class="paramname">name</td><td>账户名称，默认“SYS” </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga50c703064fbd29aa3137c6b2e78af66e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::getBusinessName </td>
+          <td>(</td>
+          <td class="paramtype">BUSINESS&#160;</td>
+          <td class="paramname"><em>business</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取业务名称，用于打印输出 </p>
+
+</div>
+</div>
+<a class="anchor" id="ga63f52561c9cccc0066025a45011ba556"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp; hku::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const PositionRecord &amp;&#160;</td>
+          <td class="paramname"><em>record</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>输出持仓记录信息 </p>
+
+</div>
+</div>
+<a class="anchor" id="ga8bc385b8979289a7ea33cc6447294407"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp; hku::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const TradeRecord &amp;&#160;</td>
+          <td class="paramname"><em>record</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>输出TradeRecord信息 </p>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.3.1
+</small></address>
+</body>
+</html>

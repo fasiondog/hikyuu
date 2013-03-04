@@ -1,0 +1,214 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.3.1"/>
+<title>Hikyuu: hikyuu/trade_manage/TradeManager.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.3.1 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">TradeManager.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_trade_manager_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * TradeManager.h</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-2-13</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef TRADEMANAGER_H_</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define TRADEMANAGER_H_</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_trade_cost_base_8h.html">TradeCostBase.h</a>&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_trade_record_8h.html">TradeRecord.h</a>&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_position_record_8h.html">PositionRecord.h</a>&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span>hku {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html">   22</a></span>&#160;<span class="keyword">class </span><a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="classhku_1_1_trade_manager.html" title="账户交易管理模块，管理帐户的交易记录及资金使用情况">TradeManager</a> {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classhku_1_1_trade_manager.html" title="账户交易管理模块，管理帐户的交易记录及资金使用情况">TradeManager</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> initcash,</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;            <span class="keyword">const</span> <a class="code" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad" title="交易成本算法指针">TradeCostPtr</a>&amp; costfunc, <span class="keywordtype">bool</span> reinvest, <span class="keywordtype">int</span> precision,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classhku_1_1_trade_manager.html" title="账户交易管理模块，管理帐户的交易记录及资金使用情况">TradeManager</a>();</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> reset();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#af63806c2c75734b819b066a0ec0df312">   33</a></span>&#160;    <span class="keywordtype">string</span> <a class="code" href="classhku_1_1_trade_manager.html#af63806c2c75734b819b066a0ec0df312" title="账户名称">name</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_name; }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a8f5b6c8b065dd291e149ddd55504811a">   36</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classhku_1_1_trade_manager.html#a8f5b6c8b065dd291e149ddd55504811a" title="设置账户名称">name</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name) { m_name = <a class="code" href="classhku_1_1_trade_manager.html#a8f5b6c8b065dd291e149ddd55504811a" title="设置账户名称">name</a>; }</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#acb227b63fe586f7473e5b1637a0e4405">   39</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_trade_manager.html#acb227b63fe586f7473e5b1637a0e4405" title="初始资金">initCash</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_init_cash; }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a295e3a46ea131d8a9052f9b43f8c1284">   42</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_trade_manager.html#a295e3a46ea131d8a9052f9b43f8c1284" title="当前现金">cash</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_cash; }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#ab33cd8705b54b2d0f510c63f54fb00a0">   45</a></span>&#160;    <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a> <a class="code" href="classhku_1_1_trade_manager.html#ab33cd8705b54b2d0f510c63f54fb00a0" title="账户建立日期">initDatetime</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_init_datetime; }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a> firstDatetime() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a0dc65c59dbf2014e072e7cd2a81e791b">   51</a></span>&#160;    <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a> <a class="code" href="classhku_1_1_trade_manager.html#a0dc65c59dbf2014e072e7cd2a81e791b" title="最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期">lastDatetime</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordflow">return</span> m_trade_list.empty()</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                ? m_init_datetime : m_trade_list.back().datetime;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a92c920a44e280c05a3021f87c4ad0a22">   61</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classhku_1_1_trade_manager.html#a92c920a44e280c05a3021f87c4ad0a22" title="当前是否持有指定的证券">have</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp; stock)<span class="keyword"> const</span>{</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordflow">return</span> m_position.count(stock.<a class="code" href="classhku_1_1_stock.html#a25e90e6e0d24d73ff461e52fa187a2e5" title="市场简称+证券代码，如: sh000001">market_code</a>()) ? <span class="keyword">true</span> : <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a4ae127ef380ea669f5a5cfbb05dfdae6">   66</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classhku_1_1_trade_manager.html#a4ae127ef380ea669f5a5cfbb05dfdae6" title="当前持有的证券种类数量">getStockNumber</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_position.size(); }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordtype">size_t</span> getHoldNumber(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp; stock);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a490d54d22a936d5a2a1e5f5a7a9dc03d">   72</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a>&amp; <a class="code" href="classhku_1_1_trade_manager.html#a490d54d22a936d5a2a1e5f5a7a9dc03d" title="获取全部交易记录">getAllTradeRecord</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_trade_list; }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <a class="code" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a> getAllPositionRecord() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <a class="code" href="classhku_1_1_position_record.html" title="持仓记录">PositionRecord</a> getPositionRecord(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp;) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a1c2d41e55986659aa730dd9c096cb042">   88</a></span>&#160;    <a class="code" href="classhku_1_1_cost_record.html" title="成本记录">CostRecord</a> getBuyCost(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp; stock,</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <span class="keywordtype">size_t</span> num)<span class="keyword"> const</span>{</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">return</span> m_costfunc-&gt;getBuyCost(datetime, stock, price, num);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="code" href="classhku_1_1_trade_manager.html#a17d5230a4e820b724937eb335313a67d">  101</a></span>&#160;    <a class="code" href="classhku_1_1_cost_record.html" title="成本记录">CostRecord</a> getSellCost(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp; stock,</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <span class="keywordtype">size_t</span> num)<span class="keyword"> const</span>{</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordflow">return</span> m_costfunc-&gt;getSellCost(datetime, stock, price, num);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordtype">void</span> checkin(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> cash);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> checkout(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> cash);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <a class="code" href="classhku_1_1_trade_record.html" title="交易记录">TradeRecord</a> buy(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp; stock,</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> realPrice, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> goalPrice,</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;            <span class="keywordtype">size_t</span> number, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> stoploss = 0.0);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <a class="code" href="classhku_1_1_trade_record.html" title="交易记录">TradeRecord</a> sell(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; datetime, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp; stock,</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> realPrice,</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            <span class="keywordtype">size_t</span> number = <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;price_t&gt;</a>());</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordtype">void</span> _update(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp;);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordtype">string</span>       m_name;            <span class="comment">//账户名称</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>     m_init_datetime;   <span class="comment">//账户建立日期</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>      m_init_cash;       <span class="comment">//初始资金</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>      m_cash;            <span class="comment">//当前现金</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <a class="code" href="group___trade_cost.html#ga1a3f61ad3141508e3c14ddfb326ee0ad" title="交易成本算法指针">TradeCostPtr</a> m_costfunc;        <span class="comment">//成本算法</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordtype">bool</span>         m_reinvest;        <span class="comment">//红利/股息/送股再投资标志，即是否忽略权息信息</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordtype">int</span>          m_precision;       <span class="comment">//计算精度</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <a class="code" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> m_trade_list;  <span class="comment">//交易记录</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keyword">typedef</span> map&lt;string, PositionRecord &gt; position_map_type;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    position_map_type m_position; <span class="comment">//当前持仓交易对象的持仓记录 [&quot;sh000001&quot;-&gt; ]</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="group___trade_manager_class.html#ga4de9f9dfca1523af32f956c941509ff4">PositionRecordList</a> m_position_history; <span class="comment">//持仓历史记录</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">//以下内部变量用于加快getFund速度</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    TradeRecordList::const_iterator m_get_funds_start;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> m_get_funds_cash;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">typedef</span> std::map&lt;string, size_t&gt; funds_num_map_type;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    funds_num_map_type m_get_funds_number;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;};</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno"><a class="code" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">  181</a></span>&#160;<span class="keyword">typedef</span> shared_ptr&lt;TradeManager&gt; <a class="code" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b" title="客户程序应使用此类型进行实际操作">TradeManagerPtr</a>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;} <span class="comment">/* namespace hku */</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* TRADEMANAGER_H_ */</span><span class="preprocessor"></span></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.3.1
+</small></address>
+</body>
+</html>

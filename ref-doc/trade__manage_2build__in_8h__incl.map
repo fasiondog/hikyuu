@@ -1,0 +1,19 @@
+<map id="hikyuu/trade_manage/build_in.h" name="hikyuu/trade_manage/build_in.h">
+<area shape="rect" id="node2" href="$_trade_manager_8h.html" title="TradeManager.h" alt="" coords="738,101,875,131"/>
+<area shape="rect" id="node30" href="$crt_zero_t_c_8h.html" title="crt/crtZeroTC.h" alt="" coords="583,101,714,131"/>
+<area shape="rect" id="node31" href="$crt_fixed_a_t_c_8h.html" title="crt/crtFixedATC.h" alt="" coords="412,101,559,131"/>
+<area shape="rect" id="node3" href="$_trade_cost_base_8h.html" title="TradeCostBase.h" alt="" coords="578,179,718,208"/>
+<area shape="rect" id="node28" href="$_trade_record_8h.html" title="TradeRecord.h" alt="" coords="744,179,870,208"/>
+<area shape="rect" id="node29" href="$_position_record_8h.html" title="PositionRecord.h" alt="" coords="895,179,1036,208"/>
+<area shape="rect" id="node4" href="$_stock_8h.html" title="../Stock.h" alt="" coords="844,256,935,285"/>
+<area shape="rect" id="node21" href="$util_8h.html" title="../utilities/util.h" alt="" coords="560,333,691,363"/>
+<area shape="rect" id="node22" href="$_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="300,411,479,440"/>
+<area shape="rect" id="node27" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="653,256,768,285"/>
+<area shape="rect" id="node5" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="956,333,1079,363"/>
+<area shape="rect" id="node19" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="844,333,932,363"/>
+<area shape="rect" id="node6" href="$_data_type_8h.html" title="DataType.h" alt="" coords="841,488,943,517"/>
+<area shape="rect" id="node13" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="916,565,1036,595"/>
+<area shape="rect" id="node16" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="725,565,891,595"/>
+<area shape="rect" id="node20" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="845,411,939,440"/>
+<area shape="rect" id="node24" href="$_log_8h.html" title="../Log.h" alt="" coords="278,488,356,517"/>
+</map>

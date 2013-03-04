@@ -1,0 +1,6 @@
+<map id="Base 基础设施" name="Base 基础设施">
+<area shape="rect" id="node1" href="$group___common-_utilities.html" title="独立的一些小函数、对象工具集合" alt="" coords="382,112,613,141"/>
+<area shape="rect" id="node2" href="$group___stock_manage.html" title="证券管理类、证券类等" alt="" coords="406,59,589,88"/>
+<area shape="rect" id="node3" href="$group___data_type.html" title="定义所需的基础数据类型" alt="" coords="386,5,609,35"/>
+<area shape="rect" id="node5" href="$group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等" alt="" coords="6,59,162,88"/>
+</map>

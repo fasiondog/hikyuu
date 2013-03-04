@@ -1,0 +1,237 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.3.1"/>
+<title>Hikyuu: hikyuu/KQuery.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.3.1 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">KQuery.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_k_query_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * KQuery.h</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2009-11-23</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef KQUERY_H_</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define KQUERY_H_</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_k_record_8h.html">KRecord.h</a>&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span>hku {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a> {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8">   22</a></span>&#160;    <span class="keyword">enum</span> <a class="code" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8" title="查询方式：索引或日期">QueryType</a> {</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8ac4a8d95680124cc04a83042f8ad1023c">   23</a></span>&#160;        INDEX = 0,  </div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8a92de22d5f02fa3d0abe3693eddcc370d">   24</a></span>&#160;        DATE  = 1,  </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    };</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">   28</a></span>&#160;    <span class="keyword">enum</span> <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5" title="查询K线类型：日线/周线等">KType</a> {</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a63a0fa71cb11fdb40f36efbe053c9b5c">   29</a></span>&#160;        MIN      = 0,  </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5ac9974eaa57629d69aabba151f63365c6">   30</a></span>&#160;        MIN5     = 1,  </div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a9149b56f7171743557fc701bf7226524">   31</a></span>&#160;        MIN15    = 2,  </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a1f4337c1afd29472ac88b32375771cf3">   32</a></span>&#160;        MIN30    = 3,  </div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5ae978079de8f0e71b07909ea95de40f5b">   33</a></span>&#160;        MIN60    = 4,  </div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a58c2095b55dc7968c423954663358cec">   34</a></span>&#160;        DAY      = 5,  </div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5ae583394abb9e4281c7e4179f901c89d8">   35</a></span>&#160;        WEEK     = 6,  </div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a171ebc0d77aa86ea7504e2ce2d77e2c4">   36</a></span>&#160;        MONTH    = 7,  </div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5afa346c0c1ee8c0e1137309f6ba3d63da">   37</a></span>&#160;        QUARTER  = 8,  </div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5aa6371894ce32cbca25f26e63ee7c8aa6">   38</a></span>&#160;        HALFYEAR = 9,  </div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5a9cae476e7df4cd16f974d8db487bced8">   39</a></span>&#160;        YEAR     = 10, </div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5acb65b4a7a27ba6e4182e0d72a6df2ea1">   40</a></span>&#160;        INVALID_KTYPE = 11</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    };</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e">   47</a></span>&#160;    <span class="keyword">enum</span> <a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e" title="复权类型">RecoverType</a> {</div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea84075bc9ff92d8259715f16f51b59e87">   48</a></span>&#160;        NO_RECOVER = 0,           </div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63eae4fcde174f86f1dbc2047cfdffa56d5e">   49</a></span>&#160;        FORWARD = 1,              </div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea2812eaf8eef125cacbf3d060072203d3">   50</a></span>&#160;        BACKWARD = 2,             </div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea60b42cd8cb0b63f89f1a2985da59a926">   51</a></span>&#160;        EQUAL_FORWARD = 3,        </div>
+<div class="line"><a name="l00052"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea79c5682ce5362e8a05c572026440ab1a">   52</a></span>&#160;        EQUAL_BACKWARD = 4,       </div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63ea884142b21c79179e63e461d48a76cba7">   53</a></span>&#160;        INVALID_RECOVER_TYPE = 5</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    };</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#ac01d2e55938fe6f62a9e9c1f4a71f189">   57</a></span>&#160;    <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a>()</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    : m_start(0),</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      m_end(<a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null</a>&lt;<a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>&gt;()),</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      m_queryType(INDEX),</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      m_dataType(DAY),</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      m_recoverType(NO_RECOVER) { };</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a7935404e827106985d6fa49c395e51df">   71</a></span>&#160;    <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a>(<a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> start,</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;           <a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> end = <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;hku_int64&gt;</a>(),</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;           <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5" title="查询K线类型：日线/周线等">KType</a> dataType = DAY,</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;           <a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e" title="复权类型">RecoverType</a> recoverType = NO_RECOVER)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    : m_start(start),</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      m_end(end),</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      m_queryType(INDEX),</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      m_dataType(dataType),</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      m_recoverType(recoverType) { }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a834b672af8bfaa4b53d3d1fbdbcef3e5">   84</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> <a class="code" href="classhku_1_1_k_query.html#a834b672af8bfaa4b53d3d1fbdbcef3e5" title="按索引方式查询时，返回指定的起始索引，否则返回Null&lt;hku_int64&gt;()">start</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordflow">return</span> m_queryType != INDEX ? <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;hku_int64&gt;</a>() : m_start;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    }</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a0a685849de87dfac215ecfeeced2ae4f">   91</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> <a class="code" href="classhku_1_1_k_query.html#a0a685849de87dfac215ecfeeced2ae4f" title="按索引方式查询时，返回指定的结束索引，否则返回Null&lt;hku_int64&gt;()">end</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordflow">return</span> m_queryType != INDEX ? <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;hku_int64&gt;</a>() : m_end;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a51e08d426a0ff9d2218b05bab5f825d2">   98</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a> <a class="code" href="classhku_1_1_k_query.html#a51e08d426a0ff9d2218b05bab5f825d2" title="按日期方式查询时，返回指定的起始日期，否则返回Null&lt;Datetime&gt;()">startDatetime</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keywordflow">return</span> m_queryType != DATE</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                ? <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;Datetime&gt;</a>()</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                : <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>((<a class="code" href="group___data_type.html#ga28ef2f6e6676d6396aec5e0832c92ca4">hku_uint64</a>)m_start);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#ac3c8702e867275099c6f298236c6e022">  107</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a> <a class="code" href="classhku_1_1_k_query.html#ac3c8702e867275099c6f298236c6e022" title="按日期方式查询时，返回指定的结束日期，否则返回Null&lt;Datetime&gt;()">endDatetime</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordflow">return</span> m_queryType != DATE</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                ? <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;Datetime&gt;</a>()</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                : <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>((<a class="code" href="group___data_type.html#ga28ef2f6e6676d6396aec5e0832c92ca4">hku_uint64</a>)m_end);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a3b41de6a0c2d4a5861a20f336cb67c9f">  114</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8" title="查询方式：索引或日期">QueryType</a> <a class="code" href="classhku_1_1_k_query.html#a3b41de6a0c2d4a5861a20f336cb67c9f" title="获取查询条件类型">queryType</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_queryType; }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a4501e778258744665f2ac46557e9d623">  117</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5" title="查询K线类型：日线/周线等">KType</a> <a class="code" href="classhku_1_1_k_query.html#a4501e778258744665f2ac46557e9d623" title="获取K线数据类型">kType</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_dataType; }</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00120"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a04619bf20616b86bbe6544b72f29e9d8">  120</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e" title="复权类型">RecoverType</a> <a class="code" href="classhku_1_1_k_query.html#a04619bf20616b86bbe6544b72f29e9d8" title="获取复权类型">recoverType</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_recoverType; }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> queryTypeName(QueryType);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> kTypeName(KType);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> recoverTypeName(RecoverType);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00132"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a73a4de5b2762cbdd557bc72795bb3af6">  132</a></span>&#160;    <a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> <a class="code" href="classhku_1_1_k_query.html#a73a4de5b2762cbdd557bc72795bb3af6">m_start</a>;</div>
+<div class="line"><a name="l00133"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#af6e120f391569da8cdfe3f01952a44cc">  133</a></span>&#160;    <a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a> <a class="code" href="classhku_1_1_k_query.html#af6e120f391569da8cdfe3f01952a44cc">m_end</a>;</div>
+<div class="line"><a name="l00134"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#adfc8882f451ded453c8cfa9a0b3beb60">  134</a></span>&#160;    <a class="code" href="classhku_1_1_k_query.html#af21343fecf35df0fbf19b15c993c33a8" title="查询方式：索引或日期">QueryType</a> <a class="code" href="classhku_1_1_k_query.html#adfc8882f451ded453c8cfa9a0b3beb60">m_queryType</a>;</div>
+<div class="line"><a name="l00135"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a0963ce9fb79c362c2c2d0c08cf984241">  135</a></span>&#160;    <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5" title="查询K线类型：日线/周线等">KType</a> <a class="code" href="classhku_1_1_k_query.html#a0963ce9fb79c362c2c2d0c08cf984241">m_dataType</a>;</div>
+<div class="line"><a name="l00136"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query.html#a2da792275f184650f4fd12c1082acc8e">  136</a></span>&#160;    <a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e" title="复权类型">RecoverType</a> <a class="code" href="classhku_1_1_k_query.html#a2da792275f184650f4fd12c1082acc8e">m_recoverType</a>;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;};</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;</div>
+<div class="line"><a name="l00144"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query_by_date.html">  144</a></span>&#160;<span class="keyword">class </span><a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="classhku_1_1_k_query_by_date.html" title="按日期查询K线数据条件">KQueryByDate</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a> {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00149"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query_by_date.html#ac0e25555e18ab1bc4ec1b9eda6bb5e54">  149</a></span>&#160;    <a class="code" href="classhku_1_1_k_query_by_date.html#ac0e25555e18ab1bc4ec1b9eda6bb5e54" title="默认构造按日期范围查询全部日线数据，不复权">KQueryByDate</a>(): <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a>() {</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        m_queryType = DATE;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        m_start = (<a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>)<a class="code" href="classhku_1_1_datetime.html#ab9810d1882aa78f3fce538fd21f8a5a7" title="返回所能表示的最小日期：1400-Jan-01 00:00:00">Datetime::minDatetime</a>().<a class="code" href="classhku_1_1_datetime.html#aeaa91f76b2994cb6a89520d581816341" title="返回如YYYYMMDDhhmmss格式的数字，方便比较操作， Null&lt;Datetime&gt;()对应的 number 为 Null&lt;unsigned long long&gt;">number</a>();</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a> d = <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;Datetime&gt;</a>();</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        m_end = (<a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>)d.<a class="code" href="classhku_1_1_datetime.html#aeaa91f76b2994cb6a89520d581816341" title="返回如YYYYMMDDhhmmss格式的数字，方便比较操作， Null&lt;Datetime&gt;()对应的 number 为 Null&lt;unsigned long long&gt;">number</a>();</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    }</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno"><a class="code" href="classhku_1_1_k_query_by_date.html#ad5f50af5a3c8e3a4d381878e6445a759">  163</a></span>&#160;    <a class="code" href="classhku_1_1_k_query_by_date.html" title="按日期查询K线数据条件">KQueryByDate</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; start,</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;                 <span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a> end = <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;Datetime&gt;</a>(),</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;                 <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5" title="查询K线类型：日线/周线等">KType</a> dataType = DAY,</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;                 <a class="code" href="classhku_1_1_k_query.html#a020ef9e50774f09215b7602a7181c63e" title="复权类型">RecoverType</a> recoverType = NO_RECOVER)</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    : <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a>() {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        m_queryType = DATE;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        m_start = (<a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>)start.<a class="code" href="classhku_1_1_datetime.html#aeaa91f76b2994cb6a89520d581816341" title="返回如YYYYMMDDhhmmss格式的数字，方便比较操作， Null&lt;Datetime&gt;()对应的 number 为 Null&lt;unsigned long long&gt;">number</a>();</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        m_end = (<a class="code" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku_int64</a>)end.number();</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        m_dataType = dataType;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        m_recoverType = recoverType;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;};</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno"><a class="code" href="group___stock_manage.html#ga6bccbbc48e7a2b0cf76941af166441a8">  181</a></span>&#160;<span class="keyword">typedef</span> <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a> <a class="code" href="group___stock_manage.html#ga6bccbbc48e7a2b0cf76941af166441a8" title="按索引方式查询K线数据，同KQuery">KQueryByIndex</a>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream&amp; <a class="code" href="namespacehku.html#a3cda7ecad3b562da9bdbbb9d5a854df3">operator &lt;&lt;</a>(std::ostream &amp;os, <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a>&amp; query);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream&amp; <a class="code" href="namespacehku.html#a3cda7ecad3b562da9bdbbb9d5a854df3">operator &lt;&lt;</a>(std::ostream &amp;os, <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query_by_date.html" title="按日期查询K线数据条件">KQueryByDate</a>&amp; query);</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;} <span class="comment">/* namespace */</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* KQUERY_H_ */</span><span class="preprocessor"></span></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.3.1
+</small></address>
+</body>
+</html>

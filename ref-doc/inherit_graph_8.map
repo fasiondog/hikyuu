@@ -1,0 +1,6 @@
+<map id="类继承关系图" name="类继承关系图">
+<area shape="rect" id="node1" href="$classhku_1_1_indicator_imp.html" title="指标实现类，定义新指标时，应从此类继承" alt="" coords="5,59,157,88"/>
+<area shape="rect" id="node2" href="$classhku_1_1_i_k_data.html" title="hku::IKData" alt="" coords="215,5,321,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_i_price_list.html" title="hku::IPriceList" alt="" coords="206,59,330,88"/>
+<area shape="rect" id="node4" href="$classhku_1_1_ma.html" title="hku::Ma" alt="" coords="228,112,308,141"/>
+</map>

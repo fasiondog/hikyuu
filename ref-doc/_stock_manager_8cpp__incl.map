@@ -1,0 +1,19 @@
+<map id="hikyuu/StockManager.cpp" name="hikyuu/StockManager.cpp">
+<area shape="rect" id="node5" href="$util_8h.html" title="utilities/util.h" alt="" coords="992,160,1107,189"/>
+<area shape="rect" id="node19" href="$_stock_manager_8h.html" title="StockManager.h" alt="" coords="549,315,683,344"/>
+<area shape="rect" id="node29" href="$_data_driver_factory_8h.html" title="data_driver/DataDriverFactory.h" alt="" coords="703,83,951,112"/>
+<area shape="rect" id="node6" href="$_data_type_8h.html" title="../DataType.h" alt="" coords="863,624,981,653"/>
+<area shape="rect" id="node13" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="1031,701,1151,731"/>
+<area shape="rect" id="node16" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="839,701,1005,731"/>
+<area shape="rect" id="node20" href="$_stock_8h.html" title="Stock.h" alt="" coords="847,392,921,421"/>
+<area shape="rect" id="node24" href="$_market_info_8h.html" title="MarketInfo.h" alt="" coords="711,392,823,421"/>
+<area shape="rect" id="node25" href="$_stock_type_info_8h.html" title="StockTypeInfo.h" alt="" coords="548,392,687,421"/>
+<area shape="rect" id="node26" href="$_log_8h.html" title="Log.h" alt="" coords="331,392,393,421"/>
+<area shape="rect" id="node21" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="795,547,917,576"/>
+<area shape="rect" id="node22" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="920,469,1008,499"/>
+<area shape="rect" id="node23" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="942,547,1036,576"/>
+<area shape="rect" id="node30" href="$_base_info_driver_8h.html" title="BaseInfoDriver.h" alt="" coords="707,315,847,344"/>
+<area shape="rect" id="node31" href="$_k_data_driver_8h.html" title="KDataDriver.h" alt="" coords="820,160,940,189"/>
+<area shape="rect" id="node32" href="$_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="839,237,932,267"/>
+<area shape="rect" id="node33" href="$_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="923,315,1029,344"/>
+</map>

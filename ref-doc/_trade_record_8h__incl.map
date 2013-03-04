@@ -1,0 +1,10 @@
+<map id="hikyuu/trade_manage/TradeRecord.h" name="hikyuu/trade_manage/TradeRecord.h">
+<area shape="rect" id="node2" href="$_data_type_8h.html" title="../DataType.h" alt="" coords="289,333,407,363"/>
+<area shape="rect" id="node15" href="$_stock_8h.html" title="../Stock.h" alt="" coords="268,101,359,131"/>
+<area shape="rect" id="node19" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="441,179,556,208"/>
+<area shape="rect" id="node9" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="641,411,761,440"/>
+<area shape="rect" id="node12" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,411,952,440"/>
+<area shape="rect" id="node16" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="220,256,343,285"/>
+<area shape="rect" id="node17" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="325,179,413,208"/>
+<area shape="rect" id="node18" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="367,256,461,285"/>
+</map>

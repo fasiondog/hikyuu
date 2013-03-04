@@ -1,0 +1,18 @@
+<map id="hikyuu/trade_manage/TradeManager.cpp" name="hikyuu/trade_manage/TradeManager.cpp">
+<area shape="rect" id="node4" href="$_trade_manager_8h.html" title="TradeManager.h" alt="" coords="275,101,412,131"/>
+<area shape="rect" id="node32" href="$crt_zero_t_c_8h.html" title="crt/crtZeroTC.h" alt="" coords="437,101,568,131"/>
+<area shape="rect" id="node26" href="$_log_8h.html" title="../Log.h" alt="" coords="813,333,891,363"/>
+<area shape="rect" id="node5" href="$_trade_cost_base_8h.html" title="TradeCostBase.h" alt="" coords="433,179,572,208"/>
+<area shape="rect" id="node30" href="$_trade_record_8h.html" title="TradeRecord.h" alt="" coords="114,179,240,208"/>
+<area shape="rect" id="node31" href="$_position_record_8h.html" title="PositionRecord.h" alt="" coords="267,179,408,208"/>
+<area shape="rect" id="node6" href="$_stock_8h.html" title="../Stock.h" alt="" coords="132,256,223,285"/>
+<area shape="rect" id="node23" href="$util_8h.html" title="../utilities/util.h" alt="" coords="439,333,569,363"/>
+<area shape="rect" id="node24" href="$_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="578,256,757,285"/>
+<area shape="rect" id="node29" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="247,256,363,285"/>
+<area shape="rect" id="node7" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="191,411,313,440"/>
+<area shape="rect" id="node21" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="88,333,176,363"/>
+<area shape="rect" id="node8" href="$_data_type_8h.html" title="DataType.h" alt="" coords="325,488,427,517"/>
+<area shape="rect" id="node15" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="627,565,747,595"/>
+<area shape="rect" id="node18" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="789,565,955,595"/>
+<area shape="rect" id="node22" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="71,411,165,440"/>
+</map>

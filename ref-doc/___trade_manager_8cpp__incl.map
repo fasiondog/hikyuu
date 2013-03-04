@@ -1,0 +1,19 @@
+<map id="hikyuu_python/trade_manage/_TradeManager.cpp" name="hikyuu_python/trade_manage/_TradeManager.cpp">
+<area shape="rect" id="node3" href="$crt_t_m_8h.html" title="hikyuu/trade_manage\l/crt/crtTM.h" alt="" coords="640,102,816,149"/>
+<area shape="rect" id="node4" href="$_trade_manager_8h.html" title="../TradeManager.h" alt="" coords="729,197,882,227"/>
+<area shape="rect" id="node32" href="$crt_zero_t_c_8h.html" title="crtZeroTC.h" alt="" coords="598,197,704,227"/>
+<area shape="rect" id="node5" href="$_trade_cost_base_8h.html" title="TradeCostBase.h" alt="" coords="580,275,719,304"/>
+<area shape="rect" id="node30" href="$_trade_record_8h.html" title="TradeRecord.h" alt="" coords="744,275,870,304"/>
+<area shape="rect" id="node31" href="$_position_record_8h.html" title="PositionRecord.h" alt="" coords="895,275,1036,304"/>
+<area shape="rect" id="node6" href="$_stock_8h.html" title="../Stock.h" alt="" coords="844,352,935,381"/>
+<area shape="rect" id="node23" href="$util_8h.html" title="../utilities/util.h" alt="" coords="560,429,691,459"/>
+<area shape="rect" id="node24" href="$_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="300,507,479,536"/>
+<area shape="rect" id="node29" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="653,352,768,381"/>
+<area shape="rect" id="node7" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="956,429,1079,459"/>
+<area shape="rect" id="node21" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="844,429,932,459"/>
+<area shape="rect" id="node8" href="$_data_type_8h.html" title="DataType.h" alt="" coords="841,584,943,613"/>
+<area shape="rect" id="node15" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="916,661,1036,691"/>
+<area shape="rect" id="node18" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="725,661,891,691"/>
+<area shape="rect" id="node22" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="845,507,939,536"/>
+<area shape="rect" id="node26" href="$_log_8h.html" title="../Log.h" alt="" coords="278,584,356,613"/>
+</map>

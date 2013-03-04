@@ -1,0 +1,6 @@
+<map id="hku::KDataBufferImp" name="hku::KDataBufferImp">
+<area shape="rect" id="node2" href="$classhku_1_1_k_data_imp.html" title="hku::KDataImp" alt="" coords="81,213,212,243"/>
+<area shape="rect" id="node3" href="$classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作" alt="" coords="17,117,116,147"/>
+<area shape="rect" id="node4" href="$classhku_1_1_datetime.html" title="日期类型" alt="" coords="5,5,128,35"/>
+<area shape="rect" id="node5" href="$classhku_1_1_k_query.html" title="按索引方式查询K线数据条件" alt="" coords="140,117,252,147"/>
+</map>

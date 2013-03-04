@@ -1,0 +1,17 @@
+<map id="hikyuu/trade_manage/TradeCost.h" name="hikyuu/trade_manage/TradeCost.h">
+<area shape="rect" id="node2" href="$_trade_manager_8h.html" title="hikyuu/trade_manage\l/TradeManager.h" alt="" coords="248,102,424,149"/>
+<area shape="rect" id="node9" href="$crt_zero_t_c_8h.html" title="hikyuu/trade_manage\l/crt/crtZeroTC.h" alt="" coords="448,102,624,149"/>
+<area shape="rect" id="node11" href="$crt_fixed_a_t_c_8h.html" title="hikyuu/trade_manage\l/crt/crtFixedATC.h" alt="" coords="48,102,224,149"/>
+<area shape="rect" id="node12" href="$_fixed_a_trade_cost_8h.html" title="hikyuu/trade_manage\l/imp/FixedATradeCost.h" alt="" coords="648,102,843,149"/>
+<area shape="rect" id="node15" href="$_trade_cost_8cpp.html" title="hikyuu/trade_manage\l/TradeCost.cpp" alt="" coords="867,102,1043,149"/>
+<area shape="rect" id="node16" href="$___trade_cost_8cpp.html" title="hikyuu_python/trade\l_manage/_TradeCost.cpp" alt="" coords="1067,102,1271,149"/>
+<area shape="rect" id="node3" href="$trade__manage_2build__in_8h.html" title="hikyuu/trade_manage\l/build_in.h" alt="" coords="48,198,224,245"/>
+<area shape="rect" id="node5" href="$crt_t_m_8h.html" title="hikyuu/trade_manage\l/crt/crtTM.h" alt="" coords="248,198,424,245"/>
+<area shape="rect" id="node8" href="$_trade_manager_8cpp.html" title="hikyuu/trade_manage\l/TradeManager.cpp" alt="" coords="448,198,624,245"/>
+<area shape="rect" id="node4" href="$trade__manage_2__build__in_8cpp.html" title="hikyuu_python/trade\l_manage/_build_in.cpp" alt="" coords="5,294,195,341"/>
+<area shape="rect" id="node6" href="$crt_t_m_8cpp.html" title="hikyuu/trade_manage\l/crt/crtTM.cpp" alt="" coords="477,294,653,341"/>
+<area shape="rect" id="node7" href="$___trade_manager_8cpp.html" title="hikyuu_python/trade\l_manage/_TradeManager.cpp" alt="" coords="219,294,452,341"/>
+<area shape="rect" id="node10" href="$crt_zero_t_c_8cpp.html" title="hikyuu/trade_manage\l/crt/crtZeroTC.cpp" alt="" coords="648,198,824,245"/>
+<area shape="rect" id="node13" href="$crt_fixed_a_t_c_8cpp.html" title="hikyuu/trade_manage\l/crt/crtFixedATC.cpp" alt="" coords="848,198,1024,245"/>
+<area shape="rect" id="node14" href="$_fixed_a_trade_cost_8cpp.html" title="hikyuu/trade_manage\l/imp/FixedATradeCost.cpp" alt="" coords="1048,198,1259,245"/>
+</map>

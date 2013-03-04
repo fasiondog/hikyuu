@@ -1,0 +1,161 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.3.1"/>
+<title>Hikyuu: hikyuu/KRecord.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.3.1 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">KRecord.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_k_record_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * KRecord.h</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2011-12-24</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef KRECORD_H_</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define KRECORD_H_</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_data_type_8h.html">DataType.h</a>&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span>hku {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_k_record.html" title="K线数据记录">KRecord</a> {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760">   21</a></span>&#160;    <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>   <a class="code" href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760" title="日期，格式：YYYYMMDDHHMM 如：200901010930">datetime</a>;       </div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a4a97c8ace55ac7c01a21785fa6141311">   22</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>    <a class="code" href="classhku_1_1_k_record.html#a4a97c8ace55ac7c01a21785fa6141311" title="开盘价">openPrice</a>;      </div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a0554012a7cd6ef03af704ab5df3be02d">   23</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>    <a class="code" href="classhku_1_1_k_record.html#a0554012a7cd6ef03af704ab5df3be02d" title="最高价">highPrice</a>;      </div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1">   24</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>    <a class="code" href="classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1" title="最低价">lowPrice</a>;       </div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c">   25</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>    <a class="code" href="classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c" title="最低价">closePrice</a>;     </div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a45e4fcab73a8e7829619dfd83096c7ba">   26</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>    <a class="code" href="classhku_1_1_k_record.html#a45e4fcab73a8e7829619dfd83096c7ba" title="成交金额">transAmount</a>;    </div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a115822ebcd8ad96483c0a271a385e0b1">   27</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>    <a class="code" href="classhku_1_1_k_record.html#a115822ebcd8ad96483c0a271a385e0b1" title="成交量">transCount</a>;     </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a39f1107aa128f0745cfc8879e0baa16b">   29</a></span>&#160;    <a class="code" href="classhku_1_1_k_record.html#a39f1107aa128f0745cfc8879e0baa16b">KRecord</a>()</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    : <a class="code" href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760" title="日期，格式：YYYYMMDDHHMM 如：200901010930">datetime</a>(<a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null</a>&lt;<a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&gt;()), <a class="code" href="classhku_1_1_k_record.html#a4a97c8ace55ac7c01a21785fa6141311" title="开盘价">openPrice</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a0554012a7cd6ef03af704ab5df3be02d" title="最高价">highPrice</a>(0.0),</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <a class="code" href="classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1" title="最低价">lowPrice</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c" title="最低价">closePrice</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a45e4fcab73a8e7829619dfd83096c7ba" title="成交金额">transAmount</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a115822ebcd8ad96483c0a271a385e0b1" title="成交量">transCount</a>(0.0){ }</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a120bf2e58621e75dab16b81703e2313b">   33</a></span>&#160;    <a class="code" href="classhku_1_1_k_record.html#a39f1107aa128f0745cfc8879e0baa16b">KRecord</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; indate)</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    : <a class="code" href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760" title="日期，格式：YYYYMMDDHHMM 如：200901010930">datetime</a>(indate),</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <a class="code" href="classhku_1_1_k_record.html#a4a97c8ace55ac7c01a21785fa6141311" title="开盘价">openPrice</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a0554012a7cd6ef03af704ab5df3be02d" title="最高价">highPrice</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1" title="最低价">lowPrice</a>(0.0),</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <a class="code" href="classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c" title="最低价">closePrice</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a45e4fcab73a8e7829619dfd83096c7ba" title="成交金额">transAmount</a>(0.0), <a class="code" href="classhku_1_1_k_record.html#a115822ebcd8ad96483c0a271a385e0b1" title="成交量">transCount</a>(0.0) { }</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#a362613db58df3247aa812da4eb88ec62">   38</a></span>&#160;    <a class="code" href="classhku_1_1_k_record.html#a39f1107aa128f0745cfc8879e0baa16b">KRecord</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html" title="日期类型">Datetime</a>&amp; date,</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;               <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_k_record.html#a4a97c8ace55ac7c01a21785fa6141311" title="开盘价">openPrice</a>, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_k_record.html#a0554012a7cd6ef03af704ab5df3be02d" title="最高价">highPrice</a>,</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;               <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_k_record.html#a6e11e1bf4ff005fb52126fbd68c94ac1" title="最低价">lowPrice</a>, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_k_record.html#a9db0904a2bbebbe5e63d7d6cace1303c" title="最低价">closePrice</a>,</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;               <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_k_record.html#a45e4fcab73a8e7829619dfd83096c7ba" title="成交金额">transAmount</a>, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_k_record.html#a115822ebcd8ad96483c0a271a385e0b1" title="成交量">transCount</a>)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    : <a class="code" href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760" title="日期，格式：YYYYMMDDHHMM 如：200901010930">datetime</a>(date),</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      openPrice(openPrice), highPrice(highPrice),</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      lowPrice(lowPrice), closePrice(closePrice),</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      transAmount(transAmount), transCount(transCount) { }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="code" href="classhku_1_1_k_record.html#ae5275ad3dbbc648d99659e1609aec6fd">   47</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classhku_1_1_k_record.html#ae5275ad3dbbc648d99659e1609aec6fd">isValid</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classhku_1_1_k_record.html#a3e27bc519420832a6ff96da692119760" title="日期，格式：YYYYMMDDHHMM 如：200901010930">datetime</a> == <a class="code" href="classhku_1_1_null.html" title="提供指定给定类型的Null值">Null&lt;Datetime&gt;</a>() ? <span class="keyword">false</span> : <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="code" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">   53</a></span>&#160;<span class="keyword">typedef</span> vector&lt;KRecord&gt; <a class="code" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp; <a class="code" href="namespacehku.html#a3cda7ecad3b562da9bdbbb9d5a854df3">operator&lt;&lt;</a>(std::ostream &amp;, <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_record.html" title="K线数据记录">KRecord</a>&amp;);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="namespacehku.html#a03a5b2668c94f28ba6c31edf3fd1a0c9">operator==</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_k_record.html" title="K线数据记录">KRecord</a>&amp; d1, <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_record.html" title="K线数据记录">KRecord</a>&amp;d2);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;} <span class="comment">/* namespace hikyuu */</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* KRECORD_H_ */</span><span class="preprocessor"></span></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.3.1
+</small></address>
+</body>
+</html>

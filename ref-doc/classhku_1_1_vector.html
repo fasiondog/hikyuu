@@ -1,0 +1,895 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.3.1"/>
+<title>Hikyuu: hku::Vector&lt; T &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.3.1 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li class="current"><a href="annotated.html"><span>类</span></a></li>
+      <li><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>类列表</span></a></li>
+      <li><a href="classes.html"><span>类索引</span></a></li>
+      <li><a href="inherits.html"><span>类继承关系</span></a></li>
+      <li><a href="functions.html"><span>类成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_vector.html">Vector</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="classhku_1_1_vector-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">hku::Vector&lt; T &gt; 模板类 参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="_vector_8h_source.html">Vector.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a6cb556cbbe612224f911c44b46489833"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; T &gt;::<a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a></td></tr>
+<tr class="separator:a6cb556cbbe612224f911c44b46489833"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ecab94ba93a44a2a7e620be06c96fd7"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; T &gt;::<a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a></td></tr>
+<tr class="separator:a2ecab94ba93a44a2a7e620be06c96fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ad8ed319bd1860e3d657b6d30e83008c4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#ad8ed319bd1860e3d657b6d30e83008c4">Vector</a> ()</td></tr>
+<tr class="separator:ad8ed319bd1860e3d657b6d30e83008c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d499607003ca062204d98b6348a225a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a4d499607003ca062204d98b6348a225a">Vector</a> (const <a class="el" href="classhku_1_1_vector.html">Vector</a>&lt; T &gt; &amp;x)</td></tr>
+<tr class="separator:a4d499607003ca062204d98b6348a225a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a073ba8cac499b28c0816cc6385aa2aa5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a073ba8cac499b28c0816cc6385aa2aa5">Vector</a> (const vector&lt; T &gt; &amp;x)</td></tr>
+<tr class="separator:a073ba8cac499b28c0816cc6385aa2aa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61c80f8d99ce915c1aeead386fc8f542"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a61c80f8d99ce915c1aeead386fc8f542">begin</a> ()</td></tr>
+<tr class="separator:a61c80f8d99ce915c1aeead386fc8f542"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4a93486ba28620cd16b8c15c6c5f5bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#ad4a93486ba28620cd16b8c15c6c5f5bf">begin</a> () const </td></tr>
+<tr class="separator:ad4a93486ba28620cd16b8c15c6c5f5bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd4d63774764c69990146167746d5ed5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#abd4d63774764c69990146167746d5ed5">end</a> ()</td></tr>
+<tr class="separator:abd4d63774764c69990146167746d5ed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99a690eb687017b863bc32b0bb6a589b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a99a690eb687017b863bc32b0bb6a589b">end</a> () const </td></tr>
+<tr class="separator:a99a690eb687017b863bc32b0bb6a589b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04151bce1774c8cda09a330ebd4dc23a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a04151bce1774c8cda09a330ebd4dc23a">rbegin</a> ()</td></tr>
+<tr class="separator:a04151bce1774c8cda09a330ebd4dc23a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af49b4c8d06d962015cde463e4ed5ea34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#af49b4c8d06d962015cde463e4ed5ea34">rbegin</a> () const </td></tr>
+<tr class="separator:af49b4c8d06d962015cde463e4ed5ea34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f2ec4979de4bcfc72808ab96b7b56d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a8f2ec4979de4bcfc72808ab96b7b56d6">rend</a> ()</td></tr>
+<tr class="separator:a8f2ec4979de4bcfc72808ab96b7b56d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7605ac8c1208a1d3399807cc53b8fffe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a7605ac8c1208a1d3399807cc53b8fffe">rend</a> () const </td></tr>
+<tr class="separator:a7605ac8c1208a1d3399807cc53b8fffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dac451a54f41324c5f17e537abf4cbc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html">Vector</a>&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a0dac451a54f41324c5f17e537abf4cbc">clone</a> () const </td></tr>
+<tr class="separator:a0dac451a54f41324c5f17e537abf4cbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5129bfd9e4d8820de176690f5348c7f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html">Vector</a>&lt; T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a5129bfd9e4d8820de176690f5348c7f7">operator=</a> (const vector&lt; T &gt; &amp;x)</td></tr>
+<tr class="separator:a5129bfd9e4d8820de176690f5348c7f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aced92dd84d877a6566f9a0ecf47af666"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_vector.html">Vector</a>&lt; T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#aced92dd84d877a6566f9a0ecf47af666">operator=</a> (const <a class="el" href="classhku_1_1_vector.html">Vector</a>&lt; T &gt; &amp;x)</td></tr>
+<tr class="separator:aced92dd84d877a6566f9a0ecf47af666"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56c19da01d78d23682d35277f1e38474"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a56c19da01d78d23682d35277f1e38474">size</a> () const </td></tr>
+<tr class="separator:a56c19da01d78d23682d35277f1e38474"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a16e1d2b66627aa36686cde1e85912a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a3a16e1d2b66627aa36686cde1e85912a">empty</a> () const </td></tr>
+<tr class="separator:a3a16e1d2b66627aa36686cde1e85912a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cccdcb7965fb9aacefb59e3176b534d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a2cccdcb7965fb9aacefb59e3176b534d">reserve</a> (size_t n)</td></tr>
+<tr class="separator:a2cccdcb7965fb9aacefb59e3176b534d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bcf9e58c45bbfa4c065240231c58787"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a9bcf9e58c45bbfa4c065240231c58787">operator[]</a> (size_t n)</td></tr>
+<tr class="separator:a9bcf9e58c45bbfa4c065240231c58787"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a91cc987e326e98aec47e24bf416e07"><td class="memItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a9a91cc987e326e98aec47e24bf416e07">operator[]</a> (size_t n) const </td></tr>
+<tr class="separator:a9a91cc987e326e98aec47e24bf416e07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65057bf02411c8864b330fa04dff748a"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a65057bf02411c8864b330fa04dff748a">at</a> (size_t n)</td></tr>
+<tr class="separator:a65057bf02411c8864b330fa04dff748a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3dcb741d3a28e8589ae3768194e5ec0"><td class="memItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#ae3dcb741d3a28e8589ae3768194e5ec0">at</a> (size_t n) const </td></tr>
+<tr class="separator:ae3dcb741d3a28e8589ae3768194e5ec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cdca5499c683bfd2428d76a14ef03fd"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a2cdca5499c683bfd2428d76a14ef03fd">front</a> ()</td></tr>
+<tr class="separator:a2cdca5499c683bfd2428d76a14ef03fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a257e5c68a91c3a8a3609c3a2454e3066"><td class="memItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a257e5c68a91c3a8a3609c3a2454e3066">front</a> () const </td></tr>
+<tr class="separator:a257e5c68a91c3a8a3609c3a2454e3066"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa997e867292e5cf059d6c00c80348284"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#aa997e867292e5cf059d6c00c80348284">back</a> ()</td></tr>
+<tr class="separator:aa997e867292e5cf059d6c00c80348284"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d02c0c88259f2bf16e17d1d43fe9aeb"><td class="memItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a0d02c0c88259f2bf16e17d1d43fe9aeb">back</a> () const </td></tr>
+<tr class="separator:a0d02c0c88259f2bf16e17d1d43fe9aeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a696c96f4a4ef0ad5debeef14a5eb5fce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#a696c96f4a4ef0ad5debeef14a5eb5fce">push_back</a> (const T &amp;x)</td></tr>
+<tr class="separator:a696c96f4a4ef0ad5debeef14a5eb5fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada5c763a21c1f2cbf9d00e99e40f1a5a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_vector.html#ada5c763a21c1f2cbf9d00e99e40f1a5a">clear</a> ()</td></tr>
+<tr class="separator:ada5c763a21c1f2cbf9d00e99e40f1a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">成员类型定义说明</h2>
+<a class="anchor" id="a2ecab94ba93a44a2a7e620be06c96fd7"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef vector&lt;T&gt;::<a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::<a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6cb556cbbe612224f911c44b46489833"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef vector&lt;T&gt;::<a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::<a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">构造及析构函数说明</h2>
+<a class="anchor" id="ad8ed319bd1860e3d657b6d30e83008c4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::<a class="el" href="classhku_1_1_vector.html">Vector</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4d499607003ca062204d98b6348a225a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::<a class="el" href="classhku_1_1_vector.html">Vector</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_vector.html">Vector</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a073ba8cac499b28c0816cc6385aa2aa5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::<a class="el" href="classhku_1_1_vector.html">Vector</a> </td>
+          <td>(</td>
+          <td class="paramtype">const vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a class="anchor" id="a65057bf02411c8864b330fa04dff748a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::at </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae3dcb741d3a28e8589ae3768194e5ec0"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::at </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa997e867292e5cf059d6c00c80348284"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::back </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0d02c0c88259f2bf16e17d1d43fe9aeb"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::back </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a61c80f8d99ce915c1aeead386fc8f542"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad4a93486ba28620cd16b8c15c6c5f5bf"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ada5c763a21c1f2cbf9d00e99e40f1a5a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0dac451a54f41324c5f17e537abf4cbc"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html">Vector</a>&lt;T&gt; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::clone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3a16e1d2b66627aa36686cde1e85912a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="abd4d63774764c69990146167746d5ed5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a99a690eb687017b863bc32b0bb6a589b"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2cdca5499c683bfd2428d76a14ef03fd"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::front </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a257e5c68a91c3a8a3609c3a2454e3066"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::front </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5129bfd9e4d8820de176690f5348c7f7"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html">Vector</a>&lt;T&gt;&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aced92dd84d877a6566f9a0ecf47af666"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html">Vector</a>&lt;T&gt;&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_vector.html">Vector</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a9bcf9e58c45bbfa4c065240231c58787"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a9a91cc987e326e98aec47e24bf416e07"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const T&amp; <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a696c96f4a4ef0ad5debeef14a5eb5fce"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::push_back </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a04151bce1774c8cda09a330ebd4dc23a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::rbegin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af49b4c8d06d962015cde463e4ed5ea34"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::rbegin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8f2ec4979de4bcfc72808ab96b7b56d6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a6cb556cbbe612224f911c44b46489833">iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::rend </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7605ac8c1208a1d3399807cc53b8fffe"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_vector.html#a2ecab94ba93a44a2a7e620be06c96fd7">const_iterator</a> <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::rend </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2cccdcb7965fb9aacefb59e3176b534d"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::reserve </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a56c19da01d78d23682d35277f1e38474"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classhku_1_1_vector.html">hku::Vector</a>&lt; T &gt;::size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/utilities/<a class="el" href="_vector_8h_source.html">Vector.h</a></li>
+</ul>
+</div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.3.1
+</small></address>
+</body>
+</html>
