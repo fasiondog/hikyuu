@@ -1,0 +1,90 @@
+/*
+ * StockTypeInfo.h
+ *
+ *  Created on: 2011-12-12
+ *      Author: fasiondog
+ */
+
+#ifndef STOCKTYPEINFO_H_
+#define STOCKTYPEINFO_H_
+
+#include "DataType.h"
+
+namespace hku {
+
+/**
+ * 证券类型信息
+ * @ingroup StockManage
+ */
+class HKU_API StockTypeInfo {
+public:
+    /** 默认构造函数，返回Null<StockTypeInfo>() */
+    StockTypeInfo();
+    StockTypeInfo(hku_uint32, const string&, price_t, price_t,
+                  int, size_t, size_t);
+
+    /** 获取证券类型 */
+    hku_uint32 type() const { return m_type; }
+
+    /** 获取证券类型描述信息 */
+    const string& description() const { return m_description; }
+
+    /** 获取最小跳动量 */
+    price_t tick() const { return m_tick; }
+
+    /** 每tick价格 */
+    price_t tickValue() const { return m_tickValue; }
+
+    /** 每单位价格 = tickValue / tick */
+    price_t unit() const { return m_unit;}
+
+    /** 获取价格精度 */
+    int precision() const { return m_precision; }
+
+    /** 获取每笔最小交易数量 */
+    size_t minTradeNumber() const { return m_minTradeNumber; }
+
+    /** 获取每笔最大交易数量 */
+    size_t maxTradeNumber() const { return m_maxTradeNumber; }
+
+private:
+    hku_uint32 m_type;          //证券类型
+    string m_description;       //描述信息
+    price_t m_tick;             //最小跳动量
+    price_t m_tickValue;        //每一个tick价格
+    price_t m_unit;             //每最小变动量价格，即单位价格 = tickValue/tick
+    int m_precision;            //价格精度
+    size_t m_minTradeNumber;    //每笔最小交易量
+    size_t m_maxTradeNumber;    //每笔最大交易量
+};
+
+
+/**
+ * 输出证券类型信息，如：StockTypeInfo(type, description, tick, precision,
+ * minTradeNumber, maxTradeNumber)
+ * @ingroup StockManage
+ */
+HKU_API std::ostream & operator<<(std::ostream &, const StockTypeInfo&);
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// 关系比较函数
+//
+///////////////////////////////////////////////////////////////////////////////
+bool operator==(const StockTypeInfo&, const StockTypeInfo&);
+bool operator!=(const StockTypeInfo&, const StockTypeInfo&);
+
+/** 相等比较 */
+inline bool operator==(const StockTypeInfo& m1, const StockTypeInfo& m2) {
+    return m1.type() == m2.type();
+}
+
+/** 不等比较 */
+inline bool operator!=(const StockTypeInfo& m1, const StockTypeInfo& m2) {
+    return m1.type() != m2.type();
+}
+
+
+} /* namespace hikyuu */
+#endif /* STOCKTYPEINFO_H_ */

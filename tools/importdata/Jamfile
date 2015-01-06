@@ -1,0 +1,56 @@
+# Copyright David Abrahams 2006. Distributed under the Boost
+# Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# Specify the path to the Boost project.  If you move this project,
+# adjust this path to refer to the Boost root directory.
+# use-project boost
+#  : /home/fasiondog/src/boost_1_43_0 ;
+
+#指定默认编译版本，否则每次都要在bjam后带release参数，暂时屏蔽
+# project : default-build release
+project : build-dir  ../../build/importdata
+        : usage-requirements <include>.
+        : requirements <library>/boost//filesystem
+                       <library>/boost//date_time
+                       <library>/boost//thread
+                       <library>/hikyuu_utils//hikyuu_utils
+                       <toolset>msvc:<library>/sqlite3//sqlite3
+                       <toolset>msvc:<include>../../extern-libs/hdf5/include
+                       <toolset>msvc:<define>HKU_API="__declspec(dllimport)"
+        ;
+
+exe importdata : [ glob-tree *.cpp ]
+                 /usr/lib/x86_64-linux-gnu/libsqlite3.so
+                 /usr/lib/x86_64-linux-gnu/libpthread.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
+               : <toolset>gcc
+                 <define>H5_USE_16_API
+               ;
+
+exe importdata : [ glob-tree *.cpp ]
+                 /usr/lib/x86_64-linux-gnu/libsqlite3.so
+                 /usr/lib/x86_64-linux-gnu/libpthread.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
+               : <toolset>clang
+                 <define>H5_USE_16_API
+               ;
+
+exe importdata : [ glob-tree *.cpp ]
+                 ../../extern-libs/hdf5/dll/hdf5dll.lib
+                 ../../extern-libs/hdf5/dll/hdf5_hldll.lib
+                 ../../extern-libs/hdf5/dll/hdf5_cppdll.lib
+                 ../../extern-libs/hdf5/dll/hdf5_hl_cppdll.lib
+               : <toolset>msvc
+                 #<define>__HDF5USEDLL_
+                 #<define>_HDF5USEHLDLL_
+                 #<define>HDF5USE_HLCPPDLL
+                 #<define>HDF5CPP_USEDLL
+                 <define>H5_USE_16_API
+               ;

@@ -1,0 +1,20 @@
+# USE_HKU_DLL_LIB、HKU_DLL_EXPORT只在Windows中生效
+# 在只用FSD DLL库的客户程序中，只需要定义USE_HKU_DLL_LIB
+project : build-dir  ../../build/hikyuu_utils
+        : usage-requirements <include>.
+        ;
+
+lib hikyuu_utils :  [ glob-tree *.cpp ] : <toolset>gcc ;
+
+lib hikyuu_utils :  [ glob-tree *.cpp ] : <toolset>clang ;
+
+lib hikyuu_utils :  [ glob-tree *.cpp ] 
+                  : <toolset>msvc
+                    <link>static
+                  ;
+
+lib hikyuu_utils : [ glob-tree *.cpp ] 
+                  : <toolset>msvc
+                    <link>shared
+                    <define>HKU_API="__declspec(dllexport)" 
+                  ; 

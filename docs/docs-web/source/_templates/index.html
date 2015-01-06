@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% set title = 'Overview' %}
+{% block body %}
+  <h1>Welcome</h1>
+
+  <p>
+  Hikyuu trys to investigate the securities and futures markets for systematic trading policies research. It mostly serves the stimulation and invaluation of trading policis,testing the performance metrics of all kinds of systematic trading policies and the exploration of the best one.Previously it was architected to use console commands like Linux shell scripts for interacting between inputs and outputs,which highly eased the research work.In the present C++ and Python are combined in.Probably a GUI operating interface will be added in some days,but GUI is not the main purpose because GUI maight not benefit more for the research work comparing the GUI and console commands.
+  </p>
+  <p>    “貔貅交易研究室”是研究试验证券及期货市场系统化交易策略的开源平台。主要用于交易策略的模拟和评估，检验各种系统化交易策略的性能，及最佳化交易策略的探索与研究。早期开发主要采用命令行交互方式，以便于探索和研究。目前的实现主要是采用C++/Python的结合方式。后期不排除提供GUI操作界面的可能，但提供GUI不是主要目的，因为GUI和命令行相比，界面相对固定不利于探索研究。
+  </p>
+
+  <h2>What is Hikyuu?</h2>
+  <p>
+  <b>貔貅</b> 又名天禄、辟邪，是中国古代神话传说中的一种神兽，龙头、马身、麟脚，形状似狮子，毛色灰白，会飞。貔貅凶猛威武，喜吸食魔怪的精血，并转化为财富，它在天上负责的巡视工作，阻止妖魔鬼怪、瘟疫 疾病扰乱天庭。也有一种说法它是龙的第九个儿子。
+  </p>
+
+  <p>
+  <a href="http://baike.baidu.com/view/4678.htm" target="_blank">百度百科释义</a>
+  </p>
+
+  <h2>Documentation</h2>
+
+  <table class="contentstable" align="center" style="margin-left: 30px"><tr>
+    <td width="50%">
+      <p class="biglink"><a class="biglink" href="{{ pathto("contents") }}">Contents 文档目录</a><br/>
+         <span class="linkdescr">for a complete overview</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("developer_guide") }}">Developer's Guide 开发指南</a><br/>
+         <span class="linkdescr">Guideline for developers</span></p>
+    </td><td width="50%">
+      <p class="biglink"><a class="biglink" href="{{ pathto("search") }}">Search page 搜索</a><br/>
+         <span class="linkdescr">search the documentation</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("genindex") }}">General Index 索引</a><br/>
+         <span class="linkdescr">all functions, classes, terms</span></p>
+    </td></tr>
+  </table>
+
+{% endblock %}

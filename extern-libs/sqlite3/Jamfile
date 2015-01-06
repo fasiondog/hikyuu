@@ -1,0 +1,15 @@
+# Copyright David Abrahams 2006. Distributed under the Boost
+# Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# Specify the path to the Boost project.  If you move this project,
+# adjust this path to refer to the Boost root directory.
+# use-project boost
+#  : /home/fasiondog/src/boost_1_43_0 ;
+
+project : build-dir  ../../build/extern-libs
+        : usage-requirements <include>.
+        ;
+
+lib sqlite3 : sqlite3.c : <link>static <toolset>msvc ;
+lib sqlite3 : sqlite3.c : <link>shared <define>SQLITE_API="__declspec(dllexport)" <toolset>msvc ;

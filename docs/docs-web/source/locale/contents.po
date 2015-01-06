@@ -1,0 +1,53 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2011, fasiondog
+# This file is distributed under the same license as the Hikyuu package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hikyuu 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-11-07 02:27\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../source/contents.rst:7
+# 2594497fa93c4137aae28b338e66a2e4
+msgid "Welcome to Hikyuu's documentation!"
+msgstr ""
+
+#: ../../source/contents.rst:9
+# 2008bfc16b0c429d8983df30eed07d78
+msgid "貔貅是一个开发源码项目."
+msgstr "Sorry! Documents not yet available in English! "
+
+#: ../../source/contents.rst:11
+# 6f5ebf0516f34085a503c6a512439241
+msgid "Contents:"
+msgstr ""
+
+#: ../../source/contents.rst:19
+# e2dee1104c1f4229850cab30be7372a8
+msgid "Indices and tables"
+msgstr ""
+
+#: ../../source/contents.rst:21
+# de032b43392045b19679141efae8b007
+msgid ":ref:`genindex`"
+msgstr ""
+
+#: ../../source/contents.rst:22
+# 6020d2192b4b4793996ec4f57fb7cd78
+msgid ":ref:`modindex`"
+msgstr ""
+
+#: ../../source/contents.rst:23
+# ad9b76d0da344428ad8540f76862a7d9
+msgid ":ref:`search`"
+msgstr ""
+

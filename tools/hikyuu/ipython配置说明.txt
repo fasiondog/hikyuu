@@ -1,0 +1,4 @@
+﻿1、创建hikyuu配置信息
+ipython profile create hikyuu
+
+2、在.ipython\profile_hikyuu\start 目录下，创建启动脚本（00_first.py文件），只要包含以下代码即可：from hikyuu.interactive.interactive import *

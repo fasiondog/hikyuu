@@ -1,0 +1,35 @@
+
+project : build-dir  ../../../build/test ;
+
+import testing ;
+
+project : requirements <library>/boost//filesystem
+                       <library>/boost//system
+                       <library>/boost//date_time
+                       <library>/boost//unit_test_framework
+                       <library>/boost//thread
+                       <library>/boost//chrono
+                       <library>/boost//serialization
+                       #<library>/hikyuu_utilities//hikyuu_utilities
+                       <library>/hikyuu//hikyuu
+                       <toolset>msvc:<library>/sqlite3//sqlite3
+                       <toolset>msvc:<include>../extern-libs/hdf5/include
+                       <toolset>msvc:<include>../extern-libs/log4cplus/include
+                       <toolset>msvc:<link>shared:<define>HKU_API="__declspec(dllimport)"
+                       <toolset>msvc:<define>__WIN32__
+                       #<toolset>msvc:<define>BOOST_ALL_DYN_LINK 
+                       #<toolset>msvc:<define>BOOST_SERIALIZATION_DYN_LINK                     
+                       #<toolset>msvc:<define>LOG4CPLUS_BUILD_DLL
+        ;
+
+unit-test test_datetime : [ glob datetime/*.cpp ../../test_all.cpp ] 
+                            ../../../extern-libs/log4cplus/dll/log4cplus.lib
+                          : <define>TEST_ALL_IN_ONE ;
+                          
+unit-test test_utilities : [ glob utilities/*.cpp ../../test_all.cpp ] 
+                            ../../../extern-libs/log4cplus/dll/log4cplus.lib
+                          : <define>TEST_ALL_IN_ONE ;    
+                          
+unit-test test_hikyuu : [ glob hikyuu/*.cpp ../../test_all.cpp ] 
+                            ../../../extern-libs/log4cplus/dll/log4cplus.lib
+                          : <define>TEST_ALL_IN_ONE ;                                                

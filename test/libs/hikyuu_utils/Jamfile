@@ -1,0 +1,16 @@
+
+project : build-dir  ../../../build/test ;
+
+import testing ;
+
+project : requirements <library>/boost//filesystem
+                       <library>/boost//unit_test_framework
+                       <library>/hikyuu_utils//hikyuu_utils
+                       <toolset>msvc:<link>shared:<define>HKU_API="__declspec(dllimport)"
+                       <toolset>msvc:<define>__WIN32__
+        ;
+                      
+test-suite test_all :  
+    [ run iniparser/test_iniparser.cpp ]
+    ;
+

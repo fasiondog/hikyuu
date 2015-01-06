@@ -1,0 +1,27 @@
+{% extends "!layout.html" %}
+
+{% block extrahead %}
+{{ super() }}
+{%- if not embedded %}
+<style type="text/css">
+  table.right { float: right; margin-left: 20px; }
+  table.right td { border: 1px solid #ccc; }
+</style>
+{%- endif %}
+{% endblock %}
+
+{% block rootrellink %}
+    <li><a href="{{ pathto('index') }}">Home 首页</a>&nbsp;|&nbsp;</li>
+    <li><a href="{{ english_contents }}">[English Documents]</a>&nbsp;|&nbsp;</li>
+    <li><a href="{{ zh_CN_contents }}">[中文文档]</a>&nbsp;|&nbsp;&raquo;</li>
+{% endblock %}
+
+{% block header %}
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+{% if html_theme == 'sphinxdoc' %}
+<img src="{{ pathto("_static/hikyuu_blue.png", 1) }}" alt="Hikyuu logo" />
+{% else %}
+<img src="{{ pathto("_static/hikyuu_red.png", 1) }}" alt="Hikyuu logo" />
+{% endif %}
+</div>
+{% endblock %}

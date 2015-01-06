@@ -1,0 +1,50 @@
+===== Information about the build process: =====
+Build was run at Wed 06/11/2014 on host 'TYR23'
+
+Build was done on  Windows-6.0 using x86
+Build was done using cmake 2.8.10 
+
+===== Compiler / generator used: =====
+Visual Studio 10 Win64
+
+Pointer size: 8
+
+===== Feature flags used: =====
+-- Cache values
+CANDLE_EXECUTABLE:FILEPATH=C:/Program Files (x86)/Windows Installer XML v3.5/bin/candle.exe
+CMAKE_INSTALL_PREFIX:PATH=C:/Program Files/LibMySQL
+COMMUNITY_BUILD:BOOL=ON
+DEBUG_EXTNAME:BOOL=ON
+ENABLED_PROFILING:BOOL=ON
+ENABLE_DEBUG_SYNC:BOOL=ON
+ENABLE_GCOV:BOOL=OFF
+ENABLE_GPROF:BOOL=OFF
+EXTRA_INSTALL:BOOL=G:\ade\build\sb_0-12370556-1402460779.43/mysql-connector-c-6.1.5-vs11-winx64/lib/mysqlclient.liblib/vs11DevelopmentG:\ade\build\sb_0-12370556-1402460779.43/mysql-connector-c-6.1.5-vs11-winx64/lib/mysqlclient.pdblib/vs11DevelopmentG:\ade\build\sb_0-12370556-1402460779.43/mysql-connector-c-6.1.5-vs11-winx64/lib/debug/mysqlclient.liblib/vs11/debugDebugBinariesG:\ade\build\sb_0-12370556-1402460779.43/mysql-connector-c-6.1.5-vs11-winx64/lib/debug/mysqlclient.pdblib/vs11/debugDebugBinaries
+FEATURE_SET:STRING=community
+HEAT_EXECUTABLE:FILEPATH=C:/Program Files (x86)/Windows Installer XML v3.5/bin/heat.exe
+INSTALL_LAYOUT:STRING=STANDALONE
+LIGHT_EXECUTABLE:FILEPATH=C:/Program Files (x86)/Windows Installer XML v3.5/bin/light.exe
+MYSQL_DATADIR:PATH=C:/Program Files/MySQL/MySQL Server 6.1/data
+MYSQL_MAINTAINER_MODE:BOOL=OFF
+PKG_INSTALL_PREFIX:PATH=C:/Program Files/LibMySQL
+TMPDIR:PATH=P_tmpdir
+WITH_ARCHIVE_STORAGE_ENGINE:BOOL=ON
+WITH_ASAN:BOOL=OFF
+WITH_BLACKHOLE_STORAGE_ENGINE:BOOL=ON
+WITH_CLIENT_PROTOCOL_TRACING:BOOL=ON
+WITH_DEBUG:BOOL=OFF
+WITH_DEFAULT_COMPILER_OPTIONS:BOOL=ON
+WITH_DEFAULT_FEATURE_SET:BOOL=ON
+WITH_EMBEDDED_SERVER:BOOL=ON
+WITH_EXTRA_CHARSETS:STRING=all
+WITH_FEDERATED_STORAGE_ENGINE:BOOL=ON
+WITH_INNOBASE_STORAGE_ENGINE:BOOL=ON
+WITH_MSAN:BOOL=OFF
+WITH_PARTITION_STORAGE_ENGINE:BOOL=ON
+WITH_SSL:STRING=bundled
+WITH_TEST_TRACE_PLUGIN:BOOL=OFF
+WITH_UNIT_TESTS:BOOL=OFF
+WITH_ZLIB:STRING=bundled
+WIX_DIR:PATH=C:/Program Files (x86)/Windows Installer XML v3.5/bin
+
+===== EOF =====

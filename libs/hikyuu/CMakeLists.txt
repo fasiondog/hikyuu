@@ -1,0 +1,41 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+PROJECT(hikyuu_core)
+
+SET(hikyuu_core_src 
+    hikyuu/DataAccessBase.h
+	hikyuu/DataQuery.h
+	hikyuu/DataRecord.h
+	hikyuu/DataType.h
+	hikyuu/H5DataConfig.h
+	hikyuu/hikyuu.h
+	hikyuu/Indicator.h
+	hikyuu/KData.h
+	hikyuu/MarketInfo.h
+	hikyuu/Stock.h
+	hikyuu/StockManager.h
+	hikyuu/StockTypeInfo.h
+	hikyuu/StockWeight.h
+	hikyuu/util.h
+	hikyuu/indicator/crtMA.h
+	hikyuu/indicator/IndicatorBase.h
+	base/DataAccessBase.cpp
+	base/DataQuery.cpp
+	base/DataRecord.cpp
+	base/H5DataAccess.cpp
+	base/H5DataAccess.h
+	base/H5DataConfig.cpp
+	base/H5DataStruct.h
+	base/hikyuu.cpp
+	base/KData.cpp
+	base/MarketInfo.cpp
+	base/Stock.cpp
+	base/StockManager.cpp
+	base/StockTypeInfo.cpp
+	base/StockWeight.cpp
+	base/util.cpp
+	indicator/IndicatorBase.cpp
+	indicator/Ma.cpp)
+#AUX_SOURCE_DIRECTORY(.hikyuu_core_src	
+INCLUDE_DIRECTORIES($ENV{BOOST_INCLUDE})
+#INCLUDE_DIRECTORIES(../../extern-libs/sqlite3)
+ADD_LIBRARY(hikyuu_core SHARED ${hikyuu_core_src})

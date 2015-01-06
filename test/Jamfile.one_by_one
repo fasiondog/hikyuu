@@ -1,0 +1,67 @@
+
+project : build-dir  ../build/test ;
+
+import testing ;
+
+project : requirements <library>/boost//filesystem
+                       <library>/boost//system
+                       <library>/boost//date_time
+                       <library>/boost//unit_test_framework
+                       <library>/boost//thread
+                       <library>/boost//chrono
+                       <library>/boost//serialization
+                       #<library>/hikyuu_utilities//hikyuu_utilities
+                       <library>/hikyuu//hikyuu
+                       <toolset>msvc:<library>/sqlite3//sqlite3
+                       <toolset>msvc:<include>../extern-libs/hdf5/include
+                       <toolset>msvc:<include>../extern-libs/log4cplus/include
+                       <toolset>msvc:<link>shared:<define>HKU_API="__declspec(dllimport)"
+                       <toolset>msvc:<define>__WIN32__
+                       #<toolset>msvc:<define>LOG4CPLUS_BUILD_DLL
+        ;
+
+    
+#unit-test test_all_in_one : [ glob-tree *.cpp ] 
+#                            ../extern-libs/log4cplus/dll/log4cplus.lib
+#                          : <define>TEST_ALL_IN_ONE ;
+                       
+test-suite test_all :  
+    [ run libs/hikyuu/datetime/test_datetime.cpp ]
+    
+    [ run libs/hikyuu/utilities/test_Parameter.cpp ]
+    [ run libs/hikyuu/utilities/test_util.cpp ]
+    [ run libs/hikyuu/utilities/test_Vector.cpp ]
+    
+    [ run libs/hikyuu/hikyuu/test_StockManager.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/hikyuu/test_Stock.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/hikyuu/test_KData.cpp libs/hikyuu/config.cpp ]
+    
+    [ run libs/hikyuu/indicator/test_AMA.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_DIFF.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_EMA.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_IKData.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_Indicator.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_MA.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_MACD.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_PRICELIST.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_SAFTYLOSS.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_STDEV.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/indicator/test_Vigor.cpp libs/hikyuu/config.cpp ]
+    
+    [ run libs/hikyuu/trade_manage/test_crtFixedATC.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_manage/test_crtZeroTC.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_manage/test_TradeManager.cpp libs/hikyuu/config.cpp ]
+    
+    [ run libs/hikyuu/trade_sys/condition/test_Condition.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/environment/test_Environment.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/moneymanager/test_MoneyManager.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/moneymanager/test_FixedCount_MM.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/profitgoal/test_ProfitGoal.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/signal/test_Signal.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/signal/test_AMA_SG.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/slippage/test_Slippage.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/stoploss/test_FixedPercent_SL.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/stoploss/test_Stoploss.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/system/test_Simple_SYS.cpp libs/hikyuu/config.cpp ]
+    ;
+

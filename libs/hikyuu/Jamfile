@@ -1,0 +1,69 @@
+# Copyright David Abrahams 2006. Distributed under the Boost
+# Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#指定默认编译版本，否则每次都要在bjam后带release参数，暂时屏蔽
+# project : default-build release
+project : build-dir  ../../build/hikyuu
+        : usage-requirements <include>.
+        ;
+
+project : requirements <library>/boost//date_time
+                       <library>/boost//thread
+		               <library>/boost//filesystem
+                       <library>/boost//serialization
+                       <library>/hikyuu_utils//hikyuu_utils
+                       <toolset>msvc:<library>/sqlite3//sqlite3
+                       <toolset>msvc:<include>../../extern-libs/mysql/include
+                       <toolset>msvc:<include>../../extern-libs/hdf5/include
+                       <toolset>msvc:<include>../../extern-libs/log4cplus/include 
+                       <define>PY_VERSION_HEX=0x03000000                      
+        ;
+
+lib hikyuu : [ glob-tree *.cpp ]
+                 /usr/lib/x86_64-linux-gnu/libsqlite3.so
+                 /usr/lib/x86_64-linux-gnu/libpthread.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
+                 /usr/lib/liblog4cplus.so
+               : <toolset>gcc
+                  ; 
+
+lib hikyuu : [ glob-tree *.cpp ]
+                 /usr/lib/x86_64-linux-gnu/libsqlite3.so
+                 /usr/lib/x86_64-linux-gnu/libpthread.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
+                 /usr/lib/liblog4cplus.so
+               : <toolset>clang
+                  ; 
+
+lib hikyuu : [ glob-tree *.cpp ] 
+                 ../../extern-libs/hdf5/dll/hdf5dll.lib
+                 ../../extern-libs/hdf5/dll/hdf5_hldll.lib
+                 ../../extern-libs/hdf5/dll/hdf5_cppdll.lib
+                 ../../extern-libs/hdf5/dll/hdf5_hl_cppdll.lib
+                 ../../extern-libs/log4cplus/dll/log4cplus.lib
+                 ../../extern-libs/mysql/lib/libmysql.lib
+              :  <toolset>msvc
+                 <link>shared
+                 <define>SQLITE_API="__declspec(dllimport)"
+                # <define>__HDF5USEDLL_
+                # <define>_HDF5USEHLDLL_
+                # <define>HDF5USE_HLCPPDLL
+                # <define>HDF5CPP_USEDLL
+                 <define>HKU_API="__declspec(dllexport)"
+               ; 
+
+lib hikyuu : [ glob-tree *.cpp ]
+                 ../../extern-libs/hdf5/lib/hdf5.lib
+                 ../../extern-libs/hdf5/lib/hdf5_hl.lib
+                 ../../extern-libs/hdf5/lib/hdf5_cpp.lib
+                 ../../extern-libs/hdf5/lib/hdf5_hl_cpp.lib
+             : <toolset>msvc
+               <link>static
+               ; 

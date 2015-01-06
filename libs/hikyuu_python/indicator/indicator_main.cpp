@@ -1,0 +1,22 @@
+/*
+ * indicator_main.cpp
+ *
+ *  Created on: 2012-10-18
+ *      Author: fasiondog
+ */
+
+#include <boost/python.hpp>
+#include <hikyuu/indicator/build_in.h>
+
+using namespace hku;
+using namespace boost::python;
+
+void export_Indicator();
+void export_IndicatorImp();
+void export_Indicator_build_in();
+
+BOOST_PYTHON_MODULE(_indicator) {
+    export_Indicator();
+    export_IndicatorImp();
+    export_Indicator_build_in();
+}

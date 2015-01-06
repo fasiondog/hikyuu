@@ -1,0 +1,53 @@
+# Copyright David Abrahams 2006. Distributed under the Boost
+# Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#  MSVC configuration
+#using gcc ;
+using msvc : 10.0 : : <compileflags>/wd4819 ;
+
+# Python configuration
+#using python : 2.6 : /usr ;
+#using python : 2.6 ;
+
+# Specify the path to the Boost project.  If you move this project,
+# adjust this path to refer to the Boost root directory.
+use-project boost
+#  : /home/fasiondog/src/boost ;
+  : d:\\src\\boost ;
+
+#指定boost头文件所在目录，根据需要进行修改
+#BOOST_INCLUDE_DIR = /home/fasiondog/src/boost ;
+BOOST_INCLUDE_DIR = d:\\src\\boost ;
+
+#工程所在目录，根据需要修改
+#HKU_DIR = /home/fasiondog/workspace/hikyuu ;
+HKU_DIR = d:\\workspace\\hikyuu ;
+
+#该变量不需要修改
+HKU_INCLUDE_DIR = $(HKU_DIR)/libs ;
+
+use-project /hikyuu : $(HKU_DIR)/libs/hikyuu ;
+#use-project /fsd_galaxy_instance : $(FSD_DIR)/libs/galaxy_instance ;
+use-project /hikyuu_utils : $(HKU_DIR)/libs/hikyuu_utils ;
+use-project /sqlite3 : $(HKU_DIR)/extern-libs/sqlite3 ;
+
+# project : default-build release ;
+project : default-build release
+        : requirements <include>$(BOOST_INCLUDE_DIR)
+                       <include>$(HKU_INCLUDE_DIR)
+                       <include>$(MYSQL_INCLUDE_DIR)
+#                       <toolset>gcc:<cxxflags>-std=c++0x
+#                       <toolset>gcc:<define>FSD_CPP_0X_SUPPORT
+                       <toolset>gcc:<linkflags>-s
+                       <toolset>msvc:<address-model>64
+					   <toolset>msvc:<define>BOOST_ALL_DYN_LINK
+                       <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE
+        ;
+
+build-project libs/hikyuu_utils ;
+build-project libs/hikyuu ;
+#build-project libs/galaxy_instance ;
+build-project libs/hikyuu_python ;
+#build-project test ;
+#build-project tools/importdata ;
