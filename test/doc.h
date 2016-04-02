@@ -30,13 +30,13 @@
  */
 
 /**
- * @defgroup test_hikyuu_base_suite
- * @defgroup test_hikyuu_serialize_suite
- * @defgroup test_hikyuu_utilities
- * @defgroup test_hikyuu_datetime_suite
- * @defgroup test_hikyuu_indicator_suite
- * @defgroup test_hikyuu_trade_manage_suite
- * @defgroup test_hikyuu_trade_sys_suite
+ * @defgroup test_hikyuu_base_suite test_hikyuu_base_suite
+ * @defgroup test_hikyuu_serialize_suite test_hikyuu_serialize_suite
+ * @defgroup test_hikyuu_utilities test_hikyuu_utilities
+ * @defgroup test_hikyuu_datetime_suite test_hikyuu_datetime_suite
+ * @defgroup test_hikyuu_indicator_suite test_hikyuu_indicator_suite
+ * @defgroup test_hikyuu_trade_manage_suite test_hikyuu_trade_manage_suite
+ * @defgroup test_hikyuu_trade_sys_suite test_hikyuu_trade_sys_suite
  *
  *
  */

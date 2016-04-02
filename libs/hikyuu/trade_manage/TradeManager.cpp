@@ -12,12 +12,14 @@
 #include "TradeManager.h"
 #include "crt/crtZeroTC.h"
 #include "../trade_sys/system/SystemPart.h"
+#include "../utilities/util.h"
+#include "../KData.h"
 
 namespace hku {
 
 HKU_API std::ostream & operator<<(std::ostream& os, const TradeManager& tm) {
     os << std::fixed;
-    os.precision(tm.precision());
+    os.precision(4);
 
     FundsRecord funds = tm.getFunds();
     string strip(",\n");
@@ -77,15 +79,81 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeManagerPtr& ptm) 
 }
 
 
+string TradeManager::toString() const {
+    std::stringstream os;
+    os << std::fixed;
+    os.precision(2);
+
+    FundsRecord funds = getFunds();
+    string strip(",\n");
+    os << "TradeManager {\n"
+       << "  params: " << getParameter() << strip
+       << "  name: " << name() << strip
+       << "  init_date: " << initDatetime() << strip
+       << "  init_cash: " << initCash() << strip
+       << "  firstDatetime: " << firstDatetime() << strip
+       << "  lastDatetime: " << lastDatetime() << strip
+       << "  TradeCostFunc: " << costFunc() << strip
+       << "  current cash: " << currentCash() << strip
+       << "  current market_value: " << funds.market_value << strip
+       << "  current short_market_value: " << funds.short_market_value << strip
+       << "  current base_cash: " << funds.base_cash << strip
+       << "  current base_asset: " << funds.base_asset << strip
+       << "  current borrow_cash: " << funds.borrow_cash << strip
+       << "  current borrow_asset: " << funds.borrow_asset << strip
+       << "  Position: \n";
+
+    StockManager& sm = StockManager::instance();
+    KQuery query(-1);
+    PositionRecordList position = getPositionList();
+    PositionRecordList::const_iterator iter = position.begin();
+    for (; iter != position.end(); ++iter) {
+        //os << "    " << iter->number << " " << iter->stock.toString() << "\n";
+        price_t invest = iter->buyMoney - iter->sellMoney + iter->totalCost;
+        KData k = iter->stock.getKData(query);
+        price_t cur_val = k[0].closePrice * iter->number;
+        price_t bonus = cur_val - invest;
+        DatetimeList date_list = sm.getTradingCalendar(
+                KQueryByDate(iter->takeDatetime.date()));
+        os << "    " << iter->stock.market_code() << " " << iter->stock.name()
+           << " " << iter->takeDatetime << " " << date_list.size()
+           << " " << iter->number<< " " << invest
+           << " " << cur_val << " " << bonus
+           << " " << 100 * bonus / invest
+           << "% " << 100 * bonus / m_init_cash << "%\n";
+    }
+
+    os << "  Short Position: \n";
+    position = getShortPositionList();
+    iter = position.begin();
+    for (; iter != position.end(); ++iter) {
+        os << "    " << iter->number << " " << iter->stock.toString() << "\n";
+    }
+
+    os << "  Borrow Stock: \n";
+    BorrowRecordList borrow = getBorrowStockList();
+    BorrowRecordList::const_iterator bor_iter = borrow.begin();
+    for (; bor_iter != borrow.end(); ++bor_iter) {
+        os << "    " << bor_iter->number << " " << bor_iter->value
+              << " " << bor_iter->stock.toString() << "\n";
+    }
+
+    os   << "}";
+
+    os.unsetf(std::ostream::floatfield);
+    os.precision();
+    return os.str();
+}
+
 TradeManager::TradeManager(const Datetime& datetime, price_t initcash,
         const TradeCostPtr& costfunc, const string& name)
 : m_name(name), m_init_datetime(datetime), m_costfunc(costfunc),
   m_checkout_cash(0.0), m_checkin_stock(0.0), m_checkout_stock(0.0),
   m_borrow_cash(0.0) {
-    addParam<bool>("reinvest", false);  //红利是否再投资
-    addParam<int>("precision", 2);      //计算精度
-    addParam<bool>("support_borrow_cash", false);   //是否自动融资
-    addParam<bool>("support_borrow_stock", false);  //是否自动融券
+    setParam<bool>("reinvest", false);  //红利是否再投资
+    setParam<int>("precision", 2);      //计算精度
+    setParam<bool>("support_borrow_cash", false);   //是否自动融资
+    setParam<bool>("support_borrow_stock", false);  //是否自动融券
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -481,7 +549,7 @@ bool TradeManager
         pos.number += number;
         //pos.stoploss 不变
         pos.totalNumber += number;
-        pos.totalMoney = roundEx(pos.totalMoney + market_value, precision);
+        pos.buyMoney = roundEx(pos.buyMoney + market_value, precision);
         //pos.totalCost 不变
         //pos.totalRisk 不变
         //pos.sellMoney 不变
@@ -954,8 +1022,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
         borrowCash(datetime, roundUp(money, precision));
     }
 
-    money = roundEx(money + cost.total, precision);
-    if (m_cash < money) {
+    if (m_cash < roundEx(money + cost.total, precision)) {
         HKU_ERROR(datetime << " " << stock.market_code()
                 << " Can't buy, need cash(" << money
                 << ") > current cash(" << m_cash
@@ -964,7 +1031,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
     }
 
     //更新现金
-    m_cash = roundEx(m_cash - money, precision);
+    m_cash = roundEx(m_cash - money - cost.total, precision);
 
     //加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice,
@@ -992,7 +1059,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
         position.stoploss = stoploss;
         position.goalPrice = goalPrice;
         position.totalNumber += number;
-        position.totalMoney = roundEx(money + position.totalMoney, precision);
+        position.buyMoney = roundEx(money + position.buyMoney, precision);
         position.totalCost = roundEx(cost.total + position.totalCost, precision);
         position.totalRisk = roundEx(position.totalRisk +
                 (realPrice - stoploss) * number * stock.unit(), precision);
@@ -1045,7 +1112,9 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock,
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     if (pos_iter == m_position.end()) {
         HKU_WARN(datetime << " " << stock.market_code()
-                << " This stock was not bought never! [TradeManager::sell]");
+                << " This stock was not bought never! ("
+                << datetime << realPrice << number << from
+                << ") [TradeManager::sell]");
         return result;
     }
 
@@ -1084,9 +1153,9 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock,
     position.number -= real_number;
     position.stoploss = stoploss;
     position.goalPrice = goalPrice;
-    position.totalMoney = roundEx(position.totalMoney + cost.total, precision);
+    //position.buyMoney = position.buyMoney;
     position.totalCost = roundEx(position.totalCost + cost.total, precision);
-    position.sellMoney = roundEx(position.sellMoney + money - cost.total, precision);
+    position.sellMoney = roundEx(position.sellMoney + money, precision);
 
     if (position.number == 0) {
         position.cleanDatetime = datetime;
@@ -1238,7 +1307,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         position.stoploss = stoploss;
         position.goalPrice = goalPrice;
         position.totalNumber += sell_num;
-        position.totalMoney = roundEx(position.totalMoney + cost.total);
+        position.buyMoney = roundEx(position.buyMoney + cost.total);
         position.totalCost = roundEx(cost.total + position.totalCost, precision);
         position.totalRisk = roundEx(position.totalRisk + risk, precision);
         position.sellMoney = roundEx(position.sellMoney + money, precision);
@@ -1319,7 +1388,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 
     //更新当前空头持仓情况
     position.number -= real_number;
-    position.totalMoney = roundEx(position.totalMoney + money + cost.total, precision);
+    position.buyMoney = roundEx(position.buyMoney + money + cost.total, precision);
     position.totalCost = roundEx(position.totalCost + cost.total, precision);
     //position.sellMoney = roundEx(position.sellMoney, precision);
 
@@ -1382,16 +1451,17 @@ FundsRecord TradeManager
 }
 
 FundsRecord TradeManager
-::getFunds(const Datetime& datetime, KQuery::KType ktype) {
+::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
     //datetime为Null时，直接返回当前账户中的现金和买入时占用的资金，以及累计存取资金
-    if (datetime == Null<Datetime>()
-            || datetime == lastDatetime()) {
+    if (indatetime == Null<Datetime>()
+            || indatetime == lastDatetime()) {
         return getFunds(ktype);
     }
 
+    Datetime datetime(indatetime.year(),indatetime.month(), indatetime.day(), 11, 59);
     price_t market_value = 0.0;
     price_t short_market_value = 0.0;
     if (datetime > lastDatetime()) {
@@ -1664,8 +1734,13 @@ PriceList TradeManager
 ::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
+    size_t i = 0;
+    while (dates[i] < m_init_datetime && i < total) {
+        result[i] = 0;
+        i++;
+    }
     int precision = getParam<int>("precision");
-    for (size_t i = 0; i < total; ++i) {
+    for (; i < total; ++i) {
         FundsRecord funds = getFunds(dates[i], ktype);
         result[i] = roundEx(funds.cash + funds.market_value - funds.borrow_cash
                   - funds.borrow_asset - funds.base_cash - funds.base_asset,
@@ -1726,6 +1801,7 @@ void TradeManager::_update(const Datetime& datetime){
                 position.sellMoney += bonus;
                 last_cash += bonus;
                 total_bonus += bonus;
+                m_cash += bonus;
 
                 TradeRecord record(stock,weight_iter->datetime(),
                         BUSINESS_BONUS, bonus, bonus, 0.0, 0,
@@ -1819,7 +1895,11 @@ void TradeManager::tocsv(const string& path) {
         }else{
             file << record.datetime << sep
                  << record.stock.market_code() << sep
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+                 << utf8_to_gb(record.stock.name()) << sep
+#else
                  << record.stock.name() << sep
+#endif
                  << getBusinessName(record.business) << sep
                  << record.planPrice << sep
                  << record.realPrice << sep
@@ -1867,12 +1947,16 @@ void TradeManager::tocsv(const string& path) {
         file << record.takeDatetime << sep
              << record.cleanDatetime << sep
              << record.stock.market_code() << sep
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+             << utf8_to_gb(record.stock.name()) << sep
+#else
              << record.stock.name() << sep
+#endif
              << record.totalNumber << sep
-             << record.totalMoney << sep
+             << record.buyMoney << sep
              << record.totalCost << sep
              << record.sellMoney << sep
-             << record.sellMoney - record.totalMoney << sep
+             << record.sellMoney - record.totalCost - record.buyMoney << sep
              << record.totalRisk << std::endl;
     }
     file.close();
@@ -1893,17 +1977,21 @@ void TradeManager::tocsv(const string& path) {
         file << record.takeDatetime << sep
              << record.cleanDatetime << sep
              << record.stock.market_code() << sep
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+             << utf8_to_gb(record.stock.name()) << sep
+#else
              << record.stock.name() << sep
+#endif
              << record.number << sep
              << record.totalNumber << sep
-             << record.totalMoney << sep
+             << record.buyMoney << sep
              << record.totalCost << sep
              << record.sellMoney << sep
              << record.totalRisk << sep;
         size_t pos = record.stock.getCount(KQuery::DAY);
         if (pos != 0) {
             KRecord krecord = record.stock.getKRecord(pos - 1, KQuery::DAY);
-            price_t bonus = record.totalMoney - record.sellMoney;
+            price_t bonus = record.buyMoney - record.sellMoney - record.totalCost;
             file << record.number * krecord.closePrice - bonus << sep
                  << bonus / record.number << std::endl;
         }

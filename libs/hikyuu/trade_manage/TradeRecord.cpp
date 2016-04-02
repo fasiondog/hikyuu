@@ -7,6 +7,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include "TradeRecord.h"
+#include "../utilities/util.h"
 
 namespace hku {
 
@@ -119,7 +120,11 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeRecord& record) {
     string market_code(""), name("");
     if(!stock.isNull()){
         market_code = stock.market();
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+        name = utf8_to_gb(stock.name());
+#else
         name = stock.name();
+#endif
     }
 
     string strip(", ");
@@ -137,6 +142,32 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeRecord& record) {
     os.unsetf(std::ostream::floatfield);
     os.precision();
     return os;
+}
+
+
+string TradeRecord::toString() const {
+    string market_code(""), name("");
+    if(!stock.isNull()){
+        market_code = stock.market();
+        name = stock.name();
+    }
+
+    string strip(", ");
+    std::stringstream os;
+    os << std::fixed;
+    os.precision(4);
+    os << "Trade(" << datetime << strip << market_code
+            << strip << name << strip << getBusinessName(business)
+            << strip << planPrice << strip << realPrice
+            << strip << goalPrice
+            << strip << number << strip << cost.commission
+            << strip << cost.stamptax << strip << cost.transferfee
+            << strip << cost.others << strip << cost.total
+            << strip << stoploss << strip << cash
+            << strip << getSystemPartName(from) << ")";
+    os.unsetf(std::ostream::floatfield);
+    os.precision();
+    return os.str();
 }
 
 

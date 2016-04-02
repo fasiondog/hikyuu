@@ -72,6 +72,9 @@ public:
             price_t cash,
             SystemPart from);
 
+    /** 仅用于python的__str__ */
+    string toString() const;
+
     Stock      stock;     ///< 交易对象
     Datetime   datetime;  ///< 交易日期
     BUSINESS   business;  ///< 业务类型

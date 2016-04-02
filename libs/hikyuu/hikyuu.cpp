@@ -16,4 +16,9 @@ void hikyuu_init(const string& config_file_name) {
     sm.init(config_file_name);
 }
 
+Stock getStock(const string& querystr) {
+    StockManager& sm = StockManager::instance();
+    return sm.getStock(querystr);
+}
+
 } /* namespace */

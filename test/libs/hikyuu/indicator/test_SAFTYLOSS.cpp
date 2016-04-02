@@ -19,7 +19,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_SAFTYLOSS
+ * @defgroup test_indicator_SAFTYLOSS test_indicator_SAFTYLOSS
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */

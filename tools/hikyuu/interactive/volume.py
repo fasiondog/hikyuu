@@ -10,20 +10,22 @@
 """
 绘制普通K线图 + 成交量（成交金额）
 """
-
 from hikyuu import Query, escapetime
-from hikyuu.indicator import Indicator, MA, CLOSE, VOL
+from hikyuu.indicator import Indicator, MA, CLOSE, VOL, OP
+from hikyuu.trade_sys.signal import Cross_SG
 from hikyuu.interactive.drawplot import (create_two_axes_figure, ax_set_locator_formatter, adjust_axes_show,
-                                         create_three_axes_figure, ax_draw_macd)
+                                         create_three_axes_figure, ax_draw_macd,
+                                         ax_draw_signal)
 
-def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60, ma5_n=100, vma1_n=5, vma2_n=10):
+def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60, 
+         ma5_n=100, ma_type="SMA", vma1_n=5, vma2_n=10):
     kdata = stock.getKData(query)
-    close = CLOSE(kdata)
-    ma1 = MA(close, ma1_n)
-    ma2 = MA(close, ma2_n)
-    ma3 = MA(close, ma3_n)
-    ma4 = MA(close, ma4_n)
-    ma5 = MA(close, ma5_n)
+    close = CLOSE(kdata,)
+    ma1 = MA(close, ma1_n, ma_type)
+    ma2 = MA(close, ma2_n, ma_type)
+    ma3 = MA(close, ma3_n, ma_type)
+    ma4 = MA(close, ma4_n, ma_type)
+    ma5 = MA(close, ma5_n, ma_type)
 
     ax1, ax2 = create_two_axes_figure()
     kdata.plot(axes=ax1)
@@ -32,6 +34,11 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60, ma5_n=
     ma3.plot(axes=ax1, legend_on=True)
     ma4.plot(axes=ax1, legend_on=True)
     ma5.plot(axes=ax1, legend_on=True)
+    
+    sg = Cross_SG(OP(MA(n=ma1_n, type=ma_type)), OP(MA(n=ma2_n, type=ma_type)))
+    sg.setTO(kdata)
+    ax_draw_signal(ax1, kdata, sg.getBuySignal(), 'BUY', 1)
+    ax_draw_signal(ax1, kdata, sg.getSellSignal(), 'SELL', 1)
     
     vol = VOL(kdata)
     total = len(kdata)

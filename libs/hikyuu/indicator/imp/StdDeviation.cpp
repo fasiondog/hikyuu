@@ -10,32 +10,27 @@
 
 namespace hku {
 
-StdDeviation::StdDeviation(): IndicatorImp() {
+StdDeviation::StdDeviation(): IndicatorImp("STD") {
+    setParam<int>("n", 22);
+}
+
+StdDeviation::~StdDeviation() {
 
 }
 
-StdDeviation::StdDeviation(int n)
-: IndicatorImp(n - 1, 1) {
-    addParam<int>("n", n);
-
-    if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) " << m_params
-                << " [StdDeviation::StdDeviation]");
-        return;
-    }
-}
-
-StdDeviation::StdDeviation(const Indicator& data, int n)
-: IndicatorImp(data, n - 1, 1) {
-    addParam<int>("n", n);
-
-    if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) " << m_params
-                << " [StdDeviation::StdDeviation]");
-        return;
-    }
-
+void StdDeviation::calculate(const Indicator& data) {
     size_t total = data.size();
+    _readyBuffer(total, 1);
+
+    int n = getParam<int>("n");
+    if (n < 2) {
+        HKU_ERROR("Invalid param[n] ! (n >= 2) " << m_params
+                << " [StdDeviation::calculate]");
+        return;
+    }
+
+    m_discard = data.discard() + n - 1;
+
     Indicator ma = MA(data, n);
     size_t N = n - 1;
     for (size_t i = discard(); i < total; ++i) {
@@ -48,24 +43,18 @@ StdDeviation::StdDeviation(const Indicator& data, int n)
     }
 }
 
-StdDeviation::~StdDeviation() {
-
-}
-
-string StdDeviation::name() const {
-    return "STD";
-}
-
-IndicatorImpPtr StdDeviation::operator()(const Indicator& ind) {
-    return IndicatorImpPtr(new StdDeviation(ind, getParam<int>("n")));
-}
 
 Indicator HKU_API STDEV(int n) {
-    return Indicator(IndicatorImpPtr(new StdDeviation(n)));
+    IndicatorImpPtr p(new StdDeviation());
+    p->setParam<int>("n", n);
+    return Indicator(p);
 }
 
 Indicator HKU_API STDEV(const Indicator& data, int n) {
-    return Indicator(IndicatorImpPtr(new StdDeviation(data, n)));
+    IndicatorImpPtr p(new StdDeviation());
+    p->setParam<int>("n", n);
+    p->calculate(data);
+    return Indicator(p);
 }
 
 } /* namespace hku */

@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_manage/crt/crtTM.h>
+#include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
@@ -62,7 +63,8 @@ void export_TradeManager() {
 
     class_<TradeManager>("TradeManager", init<const Datetime&, price_t,
             const TradeCostPtr&, const string&>())
-            .def(self_ns::str(self))
+            //.def(self_ns::str(self))
+            .def("__str__", &TradeManager::toString)
             .add_property("params",
                     make_function(&TradeManager::getParameter,
                             return_internal_reference<>()))
@@ -75,6 +77,9 @@ void export_TradeManager() {
             .add_property("reinvest", &TradeManager::reinvest)
             .add_property("precision", &TradeManager::precision)
             .add_property("costFunc", &TradeManager::costFunc)
+
+            .def("getParam", &TradeManager::getParam<boost::any>)
+            .def("setParam", &TradeManager::setParam<object>)
 
             .def("reset", &TradeManager::reset)
             .def("clone", &TradeManager::clone)

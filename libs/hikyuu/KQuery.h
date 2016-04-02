@@ -64,19 +64,21 @@ public:
       m_recoverType(NO_RECOVER) { };
 
     /**
-     * 构造按索引方式K线查询，范围[start, end)
+     * K线查询，范围[start, end)
      * @param start 起始索引，支持负数
      * @param end  结束索引（不包含本身），支持负数
      * @param dataType K线类型
      * @param recoverType 复权类型
+     * @param queryType 默认按索引方式查询
      */
     KQuery(hku_int64 start,
            hku_int64 end = Null<hku_int64>(),
            KType dataType = DAY,
-           RecoverType recoverType = NO_RECOVER)
+           RecoverType recoverType = NO_RECOVER,
+           QueryType queryType = INDEX)
     : m_start(start),
       m_end(end),
-      m_queryType(INDEX),
+      m_queryType(queryType),
       m_dataType(dataType),
       m_recoverType(recoverType) { }
 
@@ -139,7 +141,7 @@ public:
     /** 根据字符串名称，获取相应的枚举值 */
     static RecoverType getRecoverTypeEnum(const string&);
 
-protected:
+private:
     hku_int64 m_start;
     hku_int64 m_end;
     QueryType m_queryType;
@@ -149,60 +151,44 @@ protected:
 
 
 /**
- * 按日期查询K线数据条件
- * @ingroup StockManage
+ * 构造按索引方式K线查询，范围[start, end)
+ * @param start 起始索引，支持负数
+ * @param end  结束索引（不包含本身），支持负数
+ * @param dataType K线类型
+ * @param recoverType 复权类型
+ * @see KQuery
+ * @ingroup StockManage*
  */
-class HKU_API KQueryByDate: public KQuery {
-public:
-    /**
-     * 默认构造按日期范围查询全部日线数据，不复权
-     */
-    KQueryByDate(): KQuery() {
-        m_queryType = DATE;
-        m_start = (hku_int64)Datetime::minDatetime().number();
-        Datetime d = Null<Datetime>();
-        m_end = (hku_int64)d.number();
-    }
-
-    /**
-     * 构造按日期方式K线查询，范围[startDatetime, endDatetime)
-     * @param start 起始日期
-     * @param end  结束日期（不包含本身）
-     * @param dataType K线类型
-     * @param recoverType 复权类型
-     */
-    KQueryByDate(const Datetime& start,
-                 const Datetime end = Null<Datetime>(),
-                 KType dataType = DAY,
-                 RecoverType recoverType = NO_RECOVER)
-    : KQuery() {
-        m_queryType = DATE;
-        m_start = (hku_int64)start.number();
-        m_end = (hku_int64)end.number();
-        m_dataType = dataType;
-        m_recoverType = recoverType;
-    }
-};
+inline KQuery KQueryByIndex(hku_int64 start = 0,
+        hku_int64 end = Null<hku_int64>(),
+        KQuery::KType dataType = KQuery::DAY,
+        KQuery::RecoverType recoverType = KQuery::NO_RECOVER) {
+    return KQuery(start, end, dataType, recoverType, KQuery::INDEX);
+}
 
 /**
- * 按索引方式查询K线数据，同KQuery
+ * 构造按日期方式K线查询，范围[startDatetime, endDatetime)
+ * @param start 起始日期
+ * @param end  结束日期（不包含本身）
+ * @param dataType K线类型
+ * @param recoverType 复权类型
  * @see KQuery
  * @ingroup StockManage
  */
-typedef KQuery KQueryByIndex;
+inline KQuery KQueryByDate(
+        const Datetime& start = Datetime::minDatetime(),
+        const Datetime& end = Null<Datetime>(),
+        KQuery::KType dataType = KQuery::DAY,
+        KQuery::RecoverType recoverType = KQuery::NO_RECOVER) {
+    return KQuery((hku_int64)start.number(), (hku_int64)end.number(),
+                  dataType, recoverType, KQuery::DATE);
+}
 
 /**
  * 输出KQuery信息，如：KQuery(start, end, queryType, kType, recoverType)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator <<(std::ostream &os, const KQuery& query);
-
-/**
- * 输出KQueryByDate信息，如：KQueryByDate(startDatetime, endDatetime,
- * queryType, kType, recoverType)
- * @ingroup StockManage
- */
-HKU_API std::ostream& operator <<(std::ostream &os, const KQueryByDate& query);
 
 } /* namespace */
 

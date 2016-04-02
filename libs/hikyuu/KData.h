@@ -33,11 +33,19 @@ public:
     /** 获取指定位置的KRecord，未作越界检查 */
     KRecord getKRecord(size_t pos) const;
 
+    /** 按日期查询KRecord */
+    KRecord getKRecordByDate(const Datetime& datetime) const;
+
     /** 同getKRecord @see getKRecord */
     KRecord operator[](size_t pos) const { return getKRecord(pos); }
 
-    /** 按日期查询KRecord */
-    KRecord getKRecordByDate(const Datetime& datetime) const;
+    /** 同getKRecordByDate @see getKRecordByDate */
+    KRecord operator[](const Datetime& datetime) const {
+        return getKRecordByDate(datetime);
+    }
+
+    /** 按日期查询对应的索引位置  */
+    size_t getPos(const Datetime& datetime) const;
 
     /** 获取关联的KQuery */
     KQuery getQuery() const;
@@ -56,6 +64,8 @@ public:
 
     /** 输出数据到指定的文件中 */
     void tocsv(const string& filename);
+
+    string toString() const;
 
 private:
     KDataImpPtr m_imp;
@@ -107,9 +117,14 @@ inline KRecord KData::getKRecord(size_t pos) const {
 
 
 inline KRecord KData::getKRecordByDate(const Datetime& datetime) const {
-    return m_imp ? m_imp->getKRecordByDate(datetime) : Null<KRecord>();
+    size_t pos = getPos(datetime);
+    return pos != Null<size_t>() ? getKRecord(pos) : Null<KRecord>();
 }
 
+
+inline size_t KData::getPos(const Datetime& datetime) const {
+    return m_imp ? m_imp->getPos(datetime) : Null<size_t>();
+}
 
 inline size_t KData::size() const {
     return m_imp ? m_imp->size() : 0;

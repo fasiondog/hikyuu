@@ -7,6 +7,7 @@
 
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
+#include "utilities/util.h"
 
 namespace hku {
 
@@ -33,11 +34,29 @@ HKU_API std::ostream& operator <<(std::ostream &os, const Stock& stock) {
     StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(stock.type()));
     os << "Stock(" << stock.market() << strip << stock.code() << strip
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+       << utf8_to_gb(stock.name()) << strip
+       << utf8_to_gb(typeInfo.description()) << strip
+#else
        << stock.name() << strip
        << typeInfo.description() << strip
+#endif
        << stock.valid() << strip << stock.startDatetime() << strip
        << stock.lastDatetime() << ")";
     return os;
+}
+
+string Stock::toString() const {
+    std::stringstream os;
+    string strip(", ");
+    StockManager& sm = StockManager::instance();
+    StockTypeInfo typeInfo(sm.getStockTypeInfo(type()));
+    os << "Stock(" << market() << strip << code() << strip
+       << name() << strip
+       << typeInfo.description() << strip
+       << valid() << strip << startDatetime() << strip
+       << lastDatetime() << ")";
+    return os.str();
 }
 
 
@@ -351,7 +370,7 @@ price_t Stock
         }
     }
 
-    KQueryByDate query(datetime, Null<Datetime>(), ktype);
+    KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
     price_t price = 0.0;
     size_t out_start, out_end;
     KRecord k;
@@ -583,12 +602,27 @@ DatetimeList Stock
 KRecord Stock::
 getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
     size_t startix = 0, endix = 0;
-    KQueryByDate query(datetime, Datetime(datetime.number() + 1), ktype);
+    KQuery query = KQueryByDate(datetime, Datetime(datetime.number() + 1), ktype);
     if (getIndexRange(query, startix, endix)) {
         return getKRecord(startix, ktype);
     }
 
     return Null<KRecord>();
+}
+
+
+void Stock::realtimeUpdate(const KRecord& record) {
+    if (!m_data || !m_data->pKData[KQuery::DAY] ||
+            record.datetime == Null<Datetime>()) {
+        return;
+    }
+
+    KRecord &tmp = m_data->pKData[KQuery::DAY]->back();
+    if (tmp.datetime == record.datetime) {
+        tmp = record;
+    } else {
+        m_data->pKData[KQuery::DAY]->push_back(record);
+    }
 }
 
 } /* namespace */

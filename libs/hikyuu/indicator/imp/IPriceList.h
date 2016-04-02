@@ -12,18 +12,16 @@
 
 namespace hku {
 
+//找到数组最后一个Null<price_t>，并将之前的数据全部置为Null
 class IPriceList: public IndicatorImp {
+    INDICATOR_IMP(IPriceList)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IPriceList();
-    IPriceList(const PriceList&);
-    IPriceList(const PriceList&, size_t start, size_t end);
-    IPriceList(const Indicator&, size_t result_num, size_t start, size_t end);
+    IPriceList(const PriceList&, int discard);
     IPriceList(price_t *, size_t);
     virtual ~IPriceList();
-
-    virtual string name() const;
 };
 
 

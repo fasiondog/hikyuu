@@ -1,0 +1,1 @@
+python .\tools\hikyuu\test\test.py

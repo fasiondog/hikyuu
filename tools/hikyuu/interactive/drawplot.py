@@ -15,6 +15,15 @@ from hikyuu.indicator import Indicator, MACD, CLOSE
 from hikyuu.trade_manage import BUSINESS 
 from hikyuu.trade_sys.system import getSystemPartName
 
+def create_one_axes_figure(figsize=(10,8)):                                        
+    """生成一个含有1个坐标轴的figure，并返回坐标轴列表
+    返回：(ax1,ax2)
+    """
+    rect1  = [0.05, 0.35, 0.9, 0.60]
+    fg=figure(figsize=figsize)
+    ax1 = fg.add_axes(rect1)
+    return ax1
+
 def create_two_axes_figure(figsize=(10,8)):                                        
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
     返回：(ax1,ax2)
@@ -59,6 +68,26 @@ def create_four_axes_figure(figsize=(10,8)):
     ax4 = fg.add_axes(rect4, sharex=ax1)
     
     return ax1,ax2,ax3,ax4
+
+def create_axes_figure(n = 1, figsize = (10,8)):
+    """生成指定轴个数的窗口
+    参数：
+        n：坐标轴个数，只支持1~4个坐标轴，默认为1
+        figsize：窗口大小，默认(10,8)
+    返回：
+    (ax1, ax2, ...) 根据指定的坐标轴数量而定，超出[1,4]个坐标轴时，返回None
+    """
+    if n == 1:
+        return create_one_axes_figure(figsize)
+    elif n == 2:
+        return create_two_axes_figure(figsize)
+    elif n == 3:
+        return create_three_axes_figure(figsize)
+    elif n == 4:
+        return create_four_axes_figure(figsize)
+    else:
+        print("Max support axes number is 4!")
+        return None
 
 class StockFuncFormatter(object):
     """用于坐标轴显示日期
@@ -180,10 +209,13 @@ def get_draw_title(kdata):
     elif query.kType == KQuery.KType.MIN60:
         s1 = u' （60分钟线）'
 
-    if sys.platform == 'win32':
-        name = stock.name.decode('gb2312')
-    else:
-        name = stock.name.decode('utf8')
+    if IS_PY3:
+        name = stock.name
+    else:        
+        if sys.platform == 'win32':
+            name = stock.name.decode('gb2312')
+        else:
+            name = stock.name.decode('utf8')
 
     if stock.code == "":
         stitle = "Block(%s) %s" % (stock.id, name) + s1
@@ -227,11 +259,12 @@ def adjust_axes_show(axeslist):
         ylabels = ax.get_yticklabels()
         ylabels[0].set_visible(False)
         
+        
 def ax_draw_signal(axes, kdata, dates, direct="BUY", style = 1):
     """
     """
     refdates = kdata.getDatetimeList()
-    date_index = dict([(d.number,i) for i,d in enumerate(refdates)])
+    date_index = dict([(d,i) for i,d in enumerate(refdates)])
     ylim = axes.get_ylim()
     height = ylim[1]-ylim[0]
     
@@ -244,9 +277,9 @@ def ax_draw_signal(axes, kdata, dates, direct="BUY", style = 1):
             arrow = dict(facecolor='blue', frac=0.5)
     
     for d in dates:
-        if not date_index.has_key(d.number):
+        if d not in date_index:
             continue
-        pos = date_index[d.number]
+        pos = date_index[d]
         krecord = kdata[pos]
         if direct == "BUY":
             axes.annotate('B', 
@@ -377,11 +410,11 @@ def kplot(kdata, width=0.6, colorup='r', colordown='g', alpha=1.0, axes=None, ne
     axes.set_title(title)  
     last_record = kdata[-1]
     color = 'r' if last_record.closePrice>kdata[-2].closePrice else 'g'
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f' % (last_record.datetime.number/10000, 
-                                                last_record.openPrice, 
-                                                last_record.highPrice,
-                                                last_record.lowPrice, 
-                                                last_record.closePrice)
+    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
+        last_record.datetime.number/10000, 
+        last_record.openPrice, last_record.highPrice,
+        last_record.lowPrice,  last_record.closePrice,
+        100*(last_record.closePrice-kdata[-2].closePrice)/kdata[-2].closePrice)
     axes.text(0.99,0.97, text, horizontalalignment='right', verticalalignment='top', 
               transform=axes.transAxes, color=color)
         
@@ -445,10 +478,10 @@ def mkplot(kdata, ticksize=3, colorup='r', colordown='g', axes=None, new=True):
 def iplot(indicator, axes=None, new=True, legend_on=False, text_on=False, text_color='k',  
                    zero_on=False, label=None, *args, **kwargs):
     """绘制indicator曲线
-    kdata       : KData实例
-    axes        : 指定的坐标轴
-    new       : 是否在新窗口中显示，只在没有指定axes时生效
-    legend_on : 是否打开图例
+    indicator: indicator实例
+    axes: 指定的坐标轴
+    new: 是否在新窗口中显示，只在没有指定axes时生效
+    legend_on: 是否打开图例
     text_on: 是否在左上角显示指标名称及其参数
     text_color: 指标名称解释文字的颜色，默认为黑色
     marker：标记类型
@@ -493,7 +526,56 @@ def iplot(indicator, axes=None, new=True, legend_on=False, text_on=False, text_c
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator)+1)
     #draw()
+
+def ibar(indicator, axes=None, width=0.4, color='r', edgecolor='r',
+         new=True, legend_on=False, text_on=False, text_color='k',  
+                   zero_on=False, *args, **kwargs):
+    """绘制indicator曲线
+    indicator: Indicator实例
+    axes: 指定的坐标轴
+    new: 是否在新窗口中显示，只在没有指定axes时生效
+    legend_on : 是否打开图例
+    text_on: 是否在左上角显示指标名称及其参数
+    text_color: 指标名称解释文字的颜色，默认为黑色
+    zero_on: 是否需要在y=0轴上绘制一条直线
+    *args, **kwargs : pylab bar参数
+    """
+    if not indicator:
+        print("indicator is None")
+        return
     
+    if not axes:
+        if new:
+            fig = figure()
+        axes = gca()
+    
+    py_indicatr = [ None if x == constant.null_price else x for x in indicator]
+    x = [i-0.2 for i in range(len(indicator))]
+    y = py_indicatr
+    
+    axes.bar(x, py_indicatr, width=width, color=color, edgecolor=edgecolor, 
+             *args, **kwargs)
+        
+    if legend_on:
+        leg = axes.legend(loc='upper left')
+        leg.get_frame().set_alpha(0.5)
+        
+    if text_on:
+        if not axes.texts:
+            axes.text(0.01,0.97, label, horizontalalignment='left', verticalalignment='top', 
+                      transform=axes.transAxes, color=text_color)
+        else:
+            temp_str = axes.texts[0].get_text() + '  ' + label
+            axes.texts[0].set_text(temp_str)
+        
+    if zero_on:
+        ylim = axes.get_ylim()
+        if ylim[0]<0<ylim[1]:
+            axes.hlines(0,0,len(indicator))
+
+    axes.autoscale_view()
+    axes.set_xlim(-1, len(indicator)+1)
+    #draw()    
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
@@ -569,4 +651,72 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     smacd.plot(axes=axt, legend_on=False, text_on=False)
     
     for label in axt.get_xticklabels():
-        label.set_visible(False)      
+        label.set_visible(False)  
+        
+        
+def sgplot(sg, kdata = None, style = 1, axes = None, new = True):
+    """
+    绘制买入/卖出信号
+    参数：
+        sg：   信号发生器
+        kdata：指定的KData（即信号发生器的交易对象），如该值为None，则认为该信号
+               发生器已经指定了交易对象，否则，使用该参数作为交易对象
+        style: 1 | 2 信号箭头绘制样式
+        axes： 指定在那个轴对象中进行绘制
+        new：  仅在指定了axes的情况下生效，当为True时，创建新的窗口对象并在其中进行
+               绘制；否则，
+    
+    """
+    if kdata is None:
+        kdata = sg.getTO()
+    else:
+        sg.setTO(kdata)
+        
+    refdates = kdata.getDatetimeList()
+    date_index = dict([(d,i) for i,d in enumerate(refdates)])
+        
+    if axes is None:
+        if new:
+            fig = figure()
+            axes = gca()
+            kplot(kdata, axes=axes)
+        else:
+            axes = gca()        
+            
+    ylim = axes.get_ylim()
+    height = ylim[1]-ylim[0]
+    
+    if style == 1:
+        arrow_buy = dict(arrowstyle="->")
+        arrow_sell = arrow_buy
+    else:
+        arrow_buy = dict(facecolor='red', frac=0.5)
+        arrow_sell = dict(facecolor='blue', frac=0.5)  
+
+    dates = sg.getBuySignal()
+    for d in dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        axes.annotate('B', 
+                      (pos, krecord.lowPrice - height*0.01), 
+                      (pos, krecord.lowPrice - height*0.1), 
+                      arrowprops = arrow_buy,
+                      horizontalalignment = 'center', 
+                      verticalalignment = 'bottom',
+                      color='red')
+              
+    dates = sg.getSellSignal()
+    for d in dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        axes.annotate('S', 
+                      (pos, krecord.highPrice + height*0.01), 
+                      (pos, krecord.highPrice + height*0.1), 
+                      arrowprops = arrow_sell,
+                      horizontalalignment = 'center', 
+                      verticalalignment = 'top',
+                      color='blue')            

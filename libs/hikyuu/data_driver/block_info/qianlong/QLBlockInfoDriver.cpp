@@ -1,0 +1,206 @@
+/*
+ * QLBlockInfoDriver.cpp
+ *
+ *  Created on: 2015年2月10日
+ *      Author: Administrator
+ */
+
+#include <fstream>
+#include <boost/algorithm/string.hpp>
+#include "../../../utilities/util.h"
+#include "QLBlockInfoDriver.h"
+
+namespace hku {
+
+QLBlockInfoDriver::~QLBlockInfoDriver() {
+
+}
+
+Block QLBlockInfoDriver
+::getBlock(const string& category, const string& name) {
+    Block result(category, name);
+    if (!m_config
+            || !m_config->hasOption("block", "type")
+            || !m_config->hasOption("block", "dir")
+            || !m_config->hasOption("block", category)) {
+        HKU_ERROR("Can't find block configure! [QLBlockInfoDriver::getBlock]");
+        return result;
+    }
+
+    string filename = m_config->get("block", "dir") + "/"
+                    + m_config->get("block", category);
+
+    std::ifstream inifile(filename.c_str(), std::ifstream::in);
+    if (!inifile) {
+        HKU_ERROR("Can't open file(" << filename << ")! "
+                "[QLBlockInfoDriver::getBlock]");
+        return result;
+    }
+
+    string line_str;
+    string section, market, code;
+    bool is_find = false;
+    string gb_name = utf8_to_gb(name);
+    while (std::getline(inifile, line_str)) {
+        boost::trim(line_str);
+
+        //空行或注释行，跳过
+        if (line_str.empty() || line_str.at(0) == ';') {
+            continue;
+        }
+
+        //检查第一个出现的注释符，并将其及其之后的字符清除
+        size_t pos = line_str.find(';');
+        if (pos != std::string::npos) {
+            line_str.assign(line_str, 0, pos);
+            boost::trim(line_str);
+        }
+
+        //section行
+        if (line_str.at(0) == '[') {
+            if (is_find) {
+                break; //跳出循环
+            }
+            size_t len = line_str.size();
+            if(line_str[len-1] != ']') {
+                continue;
+            }
+
+            section.assign(line_str, 1, len-2);
+            boost::trim(section);
+            if(section.empty()) {
+                continue;
+            }
+
+            if (section == gb_name) {
+                is_find = true;
+            }
+        }
+
+        if (is_find) {
+            pos = line_str.find(',');
+            if (pos != std::string::npos) {
+                market.assign(line_str, 0, pos);
+                code.assign(line_str, pos+1, line_str.size());
+                boost::trim(market);
+                boost::trim(code);
+                if (market == "0") {
+                    result.add("SH" + code);
+                } else {
+                    result.add("SZ" + code);
+                }
+            }
+        }
+    }
+
+    inifile.close();
+    return result;
+}
+
+
+BlockList QLBlockInfoDriver::getBlockList(const string& category) {
+    BlockList result;
+    if (!m_config
+            || !m_config->hasOption("block", "type")
+            || !m_config->hasOption("block", "dir")) {
+        HKU_ERROR("Can't find block configure! [QLBlockInfoDriver::getBlockList]");
+        return result;
+    }
+
+    string filename = m_config->get("block", "dir") + "/"
+                    + m_config->get("block", category);
+    std::ifstream inifile(filename.c_str(), std::ifstream::in);
+    if (!inifile) {
+        HKU_ERROR("Can't open file(" << filename << ")! "
+                "[QLBlockInfoDriver::getBlockList]");
+        return result;
+    }
+
+    std::string section;
+    std::string key;
+    std::string value;
+    std::string line_str;
+    Block block;
+    while (std::getline(inifile, line_str)) {
+        boost::trim(line_str);
+
+        //空行或注释行，跳过
+        if (line_str.empty() || line_str.at(0) == ';')
+            continue;
+
+        //检查第一个出现的注释符，并将其及其之后的字符清除
+        size_t pos = line_str.find(';');
+        if (pos != std::string::npos) {
+            line_str.assign(line_str, 0, pos);
+            boost::trim(line_str);
+        }
+
+        //section行
+        if (line_str.at(0) == '[') {
+            size_t len = line_str.size();
+            if(line_str[len-1] != ']')
+                continue;
+
+            section.assign(line_str, 1, len-2);
+            boost::trim(section);
+            if(section.empty())
+                continue;
+
+            block = Block(category, gb_to_utf8(section));
+            result.push_back(block);
+
+        }else {
+            if (section.empty())
+                break;  //缺少section定义，后续无须处理，直接跳出循环
+
+            pos = line_str.find(',');
+            if(pos == std::string::npos || pos == line_str.size()-1)
+                continue;
+
+            key.assign(line_str, 0, pos);
+            boost::trim(key);
+            if (key.empty())
+                continue;
+
+            value.assign(line_str, pos+1, std::string::npos);
+            boost::trim(value);
+            if (value.empty())
+                continue;
+
+            if (key == "0") {
+                block.add("SH" + value);
+            } else {
+                block.add("SZ" + value);
+            }
+        }
+    }
+
+    inifile.close();
+    return result;
+}
+
+BlockList QLBlockInfoDriver::getBlockList() {
+    BlockList result;
+    if (!m_config
+            || !m_config->hasOption("block", "type")
+            || !m_config->hasOption("block", "dir")) {
+        HKU_ERROR("Can't find block configure! [QLBlockInfoDriver::getBlockList]");
+        return result;
+    }
+
+    string dir = m_config->get("block", "dir") + "/";
+    IniParser::StringListPtr category_list = m_config->getOptionList("block");
+    for (auto iter = category_list->begin(); iter != category_list->end(); ++iter) {
+        if (*iter == "dir" || *iter == "type")
+            continue;
+
+        BlockList tmp_blk_list = getBlockList(*iter);
+        for (auto b_it = tmp_blk_list.begin(); b_it != tmp_blk_list.end(); ++b_it) {
+            result.push_back(*b_it);
+        }
+    }
+
+    return result;
+}
+
+} /* namespace hku */

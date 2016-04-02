@@ -34,7 +34,7 @@ public:
 
     virtual KRecord getKRecord(size_t pos) const;
 
-    virtual KRecord getKRecordByDate(const Datetime& datetime) const;
+    virtual size_t getPos(const Datetime& datetime) const;
 
 protected:
     KQuery m_query;

@@ -104,14 +104,14 @@ double HKU_API roundDown(double number, int ndigits) {
 }
 
 
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX < 0x03000000)
+//#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX < 0x03000000)
 /**
  * 将UTF8编码的字符串转换为GB2312编码的字符串
  * @param szinput 待转换的原始UTF8编码的字符串
  * @return 以GB2312编码的字符串
  * @note 仅在Windows平台下生效
  */
-string HKU_API UTF8ToGB(const char* szinput) {
+string HKU_API utf8_to_gb(const char* szinput) {
     wchar_t *strSrc;
     char *szRes;
     string nullStr;
@@ -147,8 +147,8 @@ string HKU_API UTF8ToGB(const char* szinput) {
     return result;
 }
 
-string HKU_API UTF8ToGB(const string& szinput) {
-    return UTF8ToGB(szinput.c_str());
+string HKU_API utf8_to_gb(const string& szinput) {
+    return utf8_to_gb(szinput.c_str());
 }
 
 /**
@@ -157,7 +157,7 @@ string HKU_API UTF8ToGB(const string& szinput) {
  * @return 以UTF8编码的字符串
  * @note 仅在Windows平台下生效
  */
-string HKU_API GBToUTF8(const char * szinput) {
+string HKU_API gb_to_utf8(const char * szinput) {
     wchar_t *strSrc;
     char *szRes;
     string nullstr;
@@ -194,10 +194,10 @@ string HKU_API GBToUTF8(const char * szinput) {
     return result;
 }
 
-string HKU_API GBToUTF8(const string& szinput) {
-    return GBToUTF8(szinput.c_str());
+string HKU_API gb_to_utf8(const string& szinput) {
+    return gb_to_utf8(szinput.c_str());
 }
 
-#endif /* defined(BOOST_WINDOWS) */
+//#endif /* defined(BOOST_WINDOWS) */
 
 } /*namespace*/

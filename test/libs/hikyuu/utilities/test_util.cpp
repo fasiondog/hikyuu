@@ -18,7 +18,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_hikyuu_util
+ * @defgroup test_hikyuu_util test_hikyuu_util
  * @ingroup test_hikyuu_utilities
  * @{
  */

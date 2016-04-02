@@ -23,7 +23,7 @@ using namespace boost::filesystem;
 using namespace hku;
 
 /**
- * @defgroup test_utilities_iniparser_suite
+ * @defgroup test_utilities_iniparser_suite test_utilities_iniparser_suite
  * 测试IniParser
  * @{
  */

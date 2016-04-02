@@ -22,7 +22,7 @@
 
 namespace hku {
 
-#define MAX_RESULT_NUM 10
+#define MAX_RESULT_NUM 6
 
 class HKU_API Indicator;
 
@@ -34,31 +34,10 @@ class HKU_API IndicatorImp {
     PARAMETER_SUPPORT
 
 public:
-    /**
-     * 默认构造函数
-     * @note 未初始化内部结果集缓存，新指标不应该使用该构造函数，仅用于Indicator保护
-     */
+    /** 默认构造函数   */
     IndicatorImp();
+    IndicatorImp(const string& name);
 
-    /**
-     * 构造函数，仅指定抛弃的点数和结果集的个数
-     * @param discard
-     * @param result_num
-     * @note 一般用于未关联相关数据时，获取指标需抛弃的数据个数; 新指标对应的构造函数
-     * 中，不应该包含相应的指标计算。部分特殊指标如IPriceList实现时，使用该构造函数，
-     * 此时，放置结果数据时，应使用 append 函数
-     */
-    IndicatorImp(int discard, size_t result_num);
-
-    /**
-     * 构造函数，关联数据，并指定抛弃的点数和结果集个数
-     * @param indicator 带计算的数据，即输入
-     * @param discard 结果中抛弃的数据个数
-     * @param result_num 结果集的个数
-     * @note 新指标构造函数中如果调用该构造函数，内部结果集缓存已经准备好，此时计算结果
-     * 时，应使用 set 函数放置结果，勿使用 append
-     */
-    IndicatorImp(const Indicator&, int discard, size_t result_num);
     virtual ~IndicatorImp();
 
     size_t getResultNumber() const {
@@ -68,6 +47,8 @@ public:
     size_t discard() const {
         return m_discard;
     }
+
+    void setDiscard(size_t discard);
 
     size_t size() const {
         return m_pBuffer[0] ? m_pBuffer[0]->size() : 0;
@@ -84,18 +65,31 @@ public:
     Indicator getResult(size_t result_num);
 
     /**
-     * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数
+     * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
+     * 未做越界保护
      */
     void _set(price_t val, size_t pos, size_t num = 0) {
+#if CHECK_ACCESS_BOUND
+        if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+            throw(std::out_of_range("Try to access value out of bounds! "
+                        + name() + " [IndicatorImp::_set]"));
+        }
         (*m_pBuffer[num])[pos] = val;
+#else
+        (*m_pBuffer[num])[pos] = val;
+#endif
     }
 
     /**
-     * 未使用IndicatorImp(const Indicator&...)构造函数时，使用该函数放置结果
+     * 准备内存
+     * @param len 长度，如果长度大于MAX_RESULT_NUM将抛出异常std::invalid_argument
+     * @param result_num 结果集数量
+     * @return true 成功 | false 失败
      */
-    void _append(price_t val, size_t num = 0) {
-        m_pBuffer[num]->push_back(val);
-    }
+    void _readyBuffer(size_t len, size_t result_num);
+
+    string name() const { return m_name; }
+    void name(const string& name) { m_name = name; }
 
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
@@ -103,16 +97,16 @@ public:
     // ===================
     //  子类接口
     // ===================
-    virtual string name() const;
+    virtual bool check() { return false;}
+
+    virtual void calculate(const Indicator& data) {}
 
     typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
-    virtual IndicatorImpPtr operator()(const Indicator& ind) {
-        return IndicatorImpPtr(new IndicatorImp(ind, m_discard, m_result_num));
-    }
-
+    virtual IndicatorImpPtr operator()(const Indicator& ind);
 
 protected:
-    int m_discard;
+    string m_name;
+    size_t m_discard;
     size_t m_result_num;
     PriceList *m_pBuffer[MAX_RESULT_NUM];
 
@@ -122,8 +116,8 @@ private:
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const {
         namespace bs = boost::serialization;
-        string name_str(GBToUTF8(name()));
-        ar & bs::make_nvp<string>("name", name_str);
+        string name_str(GBToUTF8(m_name));
+        ar & bs::make_nvp<string>("m_name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
@@ -137,8 +131,7 @@ private:
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
         namespace bs = boost::serialization;
-        string name;
-        ar & bs::make_nvp<string>("name", name);
+        ar & BOOST_SERIALIZATION_NVP(m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
@@ -168,6 +161,16 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
 #else
 #define INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
+
+#define INDICATOR_IMP(classname) public: \
+    virtual void calculate(const Indicator& data); \
+    virtual IndicatorImpPtr operator()(const Indicator& ind) { \
+        IndicatorImpPtr p = make_shared<classname>(); \
+        p->setParameter(m_params); \
+        p->calculate(ind); \
+        return p; \
+    }
+
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 

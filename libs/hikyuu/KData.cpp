@@ -18,6 +18,16 @@ HKU_API std::ostream& operator <<(std::ostream &os, const KData& kdata) {
     return os;
 }
 
+
+string KData::toString() const {
+    std::stringstream os;
+    os << "KData{\n  size : " << size() << "\n  stock: "
+       << getStock().toString() << ",\n  query: "
+       << getQuery() << "\n }";
+    return os.str();
+}
+
+
 KData::KData(const Stock& stock, const KQuery& query) {
     if (stock.isNull() || query.kType() >= KQuery::INVALID_KTYPE) {
         return;
@@ -36,8 +46,8 @@ KData::KData(const Stock& stock, const KQuery& query) {
                     KQuery::NO_RECOVER);
             m_imp = KDataImpPtr(new KDataBufferImp(stock, new_query));
         } else {
-            KQueryByDate new_query(query.startDatetime(), query.endDatetime(),
-                    query.kType(), KQuery::NO_RECOVER);
+            KQuery new_query = KQueryByDate(query.startDatetime(),
+                    query.endDatetime(), query.kType(), KQuery::NO_RECOVER);
             m_imp = KDataImpPtr(new KDataBufferImp(stock, new_query));
         }
     }

@@ -25,8 +25,6 @@ public:
     Vigor();
     Vigor(const KData& kdata, int n);
     virtual ~Vigor();
-
-    virtual string name() const;
 };
 
 } /* namespace hku */

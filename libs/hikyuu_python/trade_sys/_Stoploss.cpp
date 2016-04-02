@@ -14,11 +14,33 @@ using namespace hku;
 
 class StoplossWrap : public StoplossBase, public wrapper<StoplossBase> {
 public:
-    StoplossWrap(const string& name): StoplossBase(name) {}
+    StoplossWrap(): StoplossBase() {}
     virtual ~StoplossWrap() {}
 
+    string name() const {
+        if (override name = this->get_override("name"))
+#if defined(BOOST_WINDOWS)
+            return call<char const*>(name.ptr());
+#else
+            return name();
+#endif
+        return StoplossBase::name();
+    }
+
+    string default_name() const {
+        return this->StoplossBase::name();
+    }
+
     void _reset() {
-        this->get_override("_reset")();
+        if (override func = this->get_override("_reset")) {
+            func();
+        } else {
+            StoplossBase::_reset();
+        }
+    }
+
+    void default_reset() {
+        this->StoplossBase::_reset();
     }
 
     StoplossPtr _clone() {
@@ -26,7 +48,7 @@ public:
     }
 
     void _calculate() {
-        this->get_override("_calculate");
+        this->get_override("_calculate")();
     }
 
     price_t getPrice(const Datetime& datetime, price_t price) {
@@ -48,15 +70,12 @@ public:
 BOOST_PYTHON_FUNCTION_OVERLOADS(SAFETYLOSS_ST_overload, Saftyloss_ST, 0, 3);
 
 void export_Stoploss() {
-    class_<StoplossWrap, boost::noncopyable>("StoplossBase", init<const string&>())
+    class_<StoplossWrap, boost::noncopyable>("StoplossBase", init<>())
             .def(self_ns::str(self))
-            .add_property("name",
-                    make_function(&StoplossBase::name,
-                            return_value_policy<copy_const_reference>()),
-                    &StoplossBase::setName)
             .add_property("params",
                     make_function(&StoplossBase::getParameter,
                             return_internal_reference<>()))
+            .def("name", &StoplossBase::name, &StoplossWrap::default_name)
             .def("setTM", &StoplossBase::setTM)
             .def("setTO", &StoplossBase::setTO)
             .def("getPrice", pure_virtual(&StoplossBase::getPrice))
@@ -65,7 +84,7 @@ void export_Stoploss() {
             .def("reset", &StoplossBase::reset)
             .def("clone", &StoplossBase::clone)
             .def("_calculate", pure_virtual(&StoplossBase::_calculate))
-            .def("_reset", pure_virtual(&StoplossBase::_reset))
+            .def("_reset", &StoplossBase::_reset, &StoplossWrap::default_reset)
             .def("_clone", pure_virtual(&StoplossBase::_clone))
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(name_init_pickle_suite<StoplossBase>())

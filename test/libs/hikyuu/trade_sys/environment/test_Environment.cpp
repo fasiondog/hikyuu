@@ -20,7 +20,7 @@ using namespace hku;
 class EnvironmentTest: public EnvironmentBase {
 public:
     EnvironmentTest(): EnvironmentBase("TEST") {
-        addParam<int>("n", 10);
+        setParam<int>("n", 10);
         m_market = "SH";
     }
 
@@ -53,7 +53,7 @@ private:
 };
 
 /**
- * @defgroup test_Environment
+ * @defgroup test_Environment test_Environment
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

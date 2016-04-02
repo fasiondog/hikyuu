@@ -10,21 +10,26 @@
 
 namespace hku {
 
-Macd::Macd(int n1, int n2, int n3)
-: IndicatorImp(0, 3) {
-    addParam<int>("n1", n1);
-    addParam<int>("n2", n2);
-    addParam<int>("n3", n3);
+Macd::Macd(): IndicatorImp("MACD") {
+    setParam<int>("n1", 12);
+    setParam<int>("n2", 26);
+    setParam<int>("n3", 9);
 }
 
-Macd::Macd(const Indicator& data, int n1, int n2, int n3)
-: IndicatorImp(data, 0, 3) {
-    addParam<int>("n1", n1);
-    addParam<int>("n2", n2);
-    addParam<int>("n3", n3);
+Macd::~Macd() {
 
+}
+
+void Macd::calculate(const Indicator& data) {
     size_t total = data.size();
-    if (total <= discard()) {
+    _readyBuffer(total, 3);
+
+    int n1 = getParam<int>("n1");
+    int n2 = getParam<int>("n2");
+    int n3 = getParam<int>("n3");
+
+    m_discard = data.discard();
+    if (total <= m_discard) {
         return;
     }
 
@@ -52,25 +57,22 @@ Macd::Macd(const Indicator& data, int n1, int n2, int n3)
     }
 }
 
-Macd::~Macd() {
-
-}
-
-string Macd::name() const {
-    return "MACD";
-}
-
-IndicatorImpPtr Macd::operator()(const Indicator& ind) {
-    return IndicatorImpPtr(new Macd(ind, getParam<int>("n1"),
-            getParam<int>("n2"), getParam<int>("n3")));
-}
 
 Indicator HKU_API MACD(int n1, int n2, int n3) {
-    return Indicator(IndicatorImpPtr(new Macd(n1, n2, n3)));
+    IndicatorImpPtr p(new Macd());
+    p->setParam<int>("n1", n1);
+    p->setParam<int>("n2", n2);
+    p->setParam<int>("n3", n3);
+    return Indicator(p);
 }
 
 Indicator HKU_API MACD(const Indicator& data, int n1, int n2, int n3) {
-    return Indicator(IndicatorImpPtr(new Macd(data, n1, n2, n3)));
+    IndicatorImpPtr p(new Macd());
+    p->setParam<int>("n1", n1);
+    p->setParam<int>("n2", n2);
+    p->setParam<int>("n3", n3);
+    p->calculate(data);
+    return Indicator(p);
 }
 
 } /* namespace hku */

@@ -24,7 +24,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_TradeManager
+ * @defgroup test_TradeManager test_TradeManager
  * @ingroup test_hikyuu_trade_manage_suite
  * @{
  */
@@ -272,10 +272,10 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_can_not_sell ) {
     tm->buy(Datetime(199911170000), stock, 27.18, 1000, 0);
     BOOST_CHECK(tm->cash(Datetime(199911170000)) == 972820);
     tm->sell(Datetime(200605150000), stock, 10.2, 100);
-    BOOST_CHECK(tm->cash(Datetime(200605150000)) == 973840);
+    BOOST_CHECK(tm->cash(Datetime(200605150000)) == 974685); //973840);
     BOOST_CHECK(tm->getHoldNumber(Datetime(200605160000), stock) == 1850);
     tm->sell(Datetime(200612010000), stock, 16.87, Null<size_t>());
-    BOOST_CHECK(tm->cash(Datetime(200612010000)) == 1005049.5);
+    BOOST_CHECK(tm->cash(Datetime(200612010000)) == 1006135.0); //1005049.5);
 }
 
 

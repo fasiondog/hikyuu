@@ -26,7 +26,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_hikyuu_Parameter
+ * @defgroup test_hikyuu_Parameter test_hikyuu_Parameter
  * @ingroup test_hikyuu_utilities
  * @{
  */
@@ -36,10 +36,10 @@ BOOST_AUTO_TEST_CASE( test_Parameter ) {
     Parameter param;
 
     /** @arg 正常添加、读取、修改参数 */
-    param.add<int>("n", 1);
-    param.add<bool>("bool", true);
-    param.add<double>("double", 10);
-    param.add<string>("string", "test");
+    param.set<int>("n", 1);
+    param.set<bool>("bool", true);
+    param.set<double>("double", 10);
+    param.set<string>("string", "test");
     BOOST_CHECK(param.get<int>("n") == 1);
     BOOST_CHECK(param.get<bool>("bool") == true);
     BOOST_CHECK(param.get<double>("double") == 10.0);
@@ -54,18 +54,13 @@ BOOST_AUTO_TEST_CASE( test_Parameter ) {
     BOOST_CHECK(param.get<string>("string") == "test2");
 
     /** @arg 添加不支持的参数类型 */
-    BOOST_CHECK_THROW(param.add<size_t>("n", 10), std::logic_error);
-    BOOST_CHECK_THROW(param.add<float>("n", 10.0), std::logic_error);
+    BOOST_CHECK_THROW(param.set<size_t>("n", 10), std::logic_error);
+    BOOST_CHECK_THROW(param.set<float>("n", 10.0), std::logic_error);
 
     /** @arg 修改参数时，指定的类型和原有类型不符 */
     BOOST_CHECK_THROW(param.set<float>("n", 10.0), std::logic_error);
     BOOST_CHECK_THROW(param.set<float>("bool", 10.0), std::logic_error);
     BOOST_CHECK_THROW(param.set<float>("double", 10.0), std::logic_error);
-
-    /** @arg 试图修改的参数不存在 */
-    BOOST_CHECK_THROW(param.set<int>("nnn", 10), std::logic_error);
-    BOOST_CHECK_THROW(param.set<bool>("bool-this", true), std::logic_error);
-    BOOST_CHECK_THROW(param.set<double>("double-not", 10.0), std::logic_error);
 }
 
 
@@ -76,10 +71,10 @@ BOOST_AUTO_TEST_CASE( test_Parameter_serialize ) {
     filename += "/Parameter.xml";
 
     Parameter p1;
-    p1.add<int>("n", 10);
-    p1.add<bool>("bool", true);
-    p1.add<double>("p", 0.101);
-    p1.add<string>("string", "This is string!");
+    p1.set<int>("n", 10);
+    p1.set<bool>("bool", true);
+    p1.set<double>("p", 0.101);
+    p1.set<string>("string", "This is string!");
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

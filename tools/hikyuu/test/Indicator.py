@@ -14,12 +14,10 @@ from hikyuu.indicator import *
 
 class AddIndicator(IndicatorImp):
     def __init__(self, indicator):
-        super(AddIndicator, self).__init__(indicator, 0, 1)
+        super(AddIndicator, self).__init__("AddIndicator")
+        self._readyBuffer(indicator.size(), 1)
         for i in range(len(indicator)):
             self._set(indicator[i] + 1, i)
-            
-    def name(self):
-        return "AddIndicator"
     
     def __call__(self, ind):
         return AddIndicator(ind)
@@ -42,6 +40,7 @@ class IndicatorTest(unittest.TestCase):
         a = toPriceList([0,1,2,3])
         x = PRICELIST(a)
         m = Indicator(AddIndicator(x))
+        self.assertEqual(m.name, "AddIndicator")
         self.assertEqual(m.size(), 4)
         self.assertEqual(m.empty(), False)
         self.assert_(abs(m[0] - 1) < 0.0001)
@@ -135,7 +134,8 @@ class IndicatorTest(unittest.TestCase):
         x = PRICELIST(a)
         m = MA(x,2)
         self.assertEqual(m.size(), 4)
-        self.assertEqual(m.discard, 1)
+        self.assertEqual(m.discard, 0)
+        self.assert_(abs(m[0] - 0.0) < 0.0001)
         self.assert_(abs(m[1] - 0.5) < 0.0001)
         self.assert_(abs(m[2] - 1.5) < 0.0001)
         self.assert_(abs(m[3] - 2.5) < 0.0001)

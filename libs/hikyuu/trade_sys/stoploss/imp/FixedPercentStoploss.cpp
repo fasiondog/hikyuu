@@ -9,13 +9,8 @@
 
 namespace hku {
 
-FixedPercentStoploss::FixedPercentStoploss(double p)
-: StoplossBase("FixedPercent") {
-    addParam<double>("p", p);
-    if (p < 0.0 || p > 1.0) {
-        HKU_ERROR("Invalid params! (0 <= p <= 1 " << m_params
-                << " [FixedPercentStoploss::FixedPercentStoploss]" );
-    }
+FixedPercentStoploss::FixedPercentStoploss() : StoplossBase() {
+    setParam<double>("p", 0.03);
 }
 
 FixedPercentStoploss::~FixedPercentStoploss() {
@@ -29,14 +24,6 @@ price_t FixedPercentStoploss
     return roundEx(price * (1 - getParam<double>("p")), precision);
 }
 
-StoplossPtr FixedPercentStoploss::_clone() {
-    double p = getParam<double>("p");
-    return StoplossPtr(new FixedPercentStoploss(p));
-}
-
-void FixedPercentStoploss::_reset() {
-
-}
 
 void FixedPercentStoploss::_calculate() {
 
@@ -44,7 +31,9 @@ void FixedPercentStoploss::_calculate() {
 
 
 StoplossPtr HKU_API FixedPercent_SL(double p) {
-    return StoplossPtr(new FixedPercentStoploss(p));
+    StoplossPtr result(new FixedPercentStoploss());
+    result->setParam<double>("p", p);
+    return result;
 }
 
 

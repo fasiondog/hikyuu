@@ -41,10 +41,11 @@ KRecord KDataImp::getKRecord(size_t pos) const {
             : m_stock.getKRecord(m_start + pos, m_query.kType());
 }
 
-KRecord KDataImp::getKRecordByDate(const Datetime& datetime) const {
+
+size_t KDataImp::getPos(const Datetime& datetime) const {
     KRecord null_record;
     if (empty()) {
-        return null_record;
+        return Null<size_t>();
     }
 
     size_t mid, low = 0, high = size() - 1;
@@ -68,11 +69,11 @@ KRecord KDataImp::getKRecordByDate(const Datetime& datetime) const {
     }
 
     if(mid >= size()) {
-        return null_record;
+        return Null<size_t>();
     }
 
     KRecord tmp = getKRecord(mid);
-    return tmp.datetime == datetime ? tmp : null_record;
+    return tmp.datetime == datetime ? mid : Null<size_t>();
 }
 
 

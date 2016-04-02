@@ -16,6 +16,14 @@ if "_%PROCESSOR_ARCHITECTURE%_" == "_AMD64_" (
 
 :Guess_compiler	
 REM GUESS COMPILER
+REM if NOT "_%VS140COMNTOOLS%_" == "__" (
+REM     set BUILD_OUTPUT_PATH=msvc-14.0\release\address-model-64\threading-multi
+REM   	set TOOLSET=toolset=msvc-14.0
+REM   	goto Start_build) 
+REM if NOT "_%VS120COMNTOOLS%_" == "__" (
+REM     set BUILD_OUTPUT_PATH=msvc-12.0\release\address-model-64\threading-multi
+REM 	set TOOLSET=toolset=msvc-12.0
+REM 	goto Start_build) 
 if NOT "_%VS100COMNTOOLS%_" == "__" (
     set BUILD_OUTPUT_PATH=msvc-10.0\release\address-model-64\threading-multi
 	set TOOLSET=toolset=msvc-10.0
@@ -28,7 +36,8 @@ goto Not_found_compiler
 
 :Start_build
 @echo on
-b2 -j 2 link=shared threading=multi %ADDRESS_MODEL% 
+b2 -j 4 link=shared threading=multi %ADDRESS_MODEL%
+REM %TOOLSET%  需要利用Jamroot消除告警
 
 @if NOT exist .\bin mkdir .\bin
 
@@ -42,9 +51,10 @@ copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\*.pyd .\tools\hikyuu
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\indicator\*.pyd .\tools\hikyuu\indicator
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\trade_manage\*.pyd .\tools\hikyuu\trade_manage
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\trade_sys\*.pyd .\tools\hikyuu\trade_sys
+copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\trade_instance\*.pyd .\tools\hikyuu\trade_instance
 
 cd ./test
-bjam -j 2 link=shared threading=multi %ADDRESS_MODEL% 
+bjam -j 4 link=shared threading=multi %ADDRESS_MODEL% 
 cd ..
 
 python .\tools\hikyuu\test\test.py

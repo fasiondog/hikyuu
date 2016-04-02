@@ -80,19 +80,32 @@ void Performance::reset() {
     }
 }
 
-void Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
+string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
+    std::stringstream buf;
     if (!tm) {
         HKU_INFO("TradeManagerPtr is Null! [Performance::report]");
-        return;
+        return buf.str();
     }
+
     statistics(tm, datetime);
+
+    buf << std::fixed;
+    buf.precision(2);
+
     list<string>::iterator iter;
-    std::cout.setf(std::ios_base::fixed);
-    std::cout.precision(tm->precision());
+    buf.setf(std::ios_base::fixed);
+    buf.precision(tm->precision());
     for(iter = m_name_list.begin(); iter != m_name_list.end(); iter++){
-        std::cout << (*iter) << ": " << m_result[*iter] << std::endl;
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+        buf << gb_to_utf8(*iter) << ": " << m_result[*iter] << std::endl;
+#else
+        buf << (*iter) << ": " << m_result[*iter] << std::endl;
+#endif
     }
-    std::cout.precision();
+
+    buf.unsetf(std::ostream::floatfield);
+    buf.precision();
+    return buf.str();
 }
 
 void Performance
@@ -159,7 +172,7 @@ void Performance
         const PositionRecord& pos = *his_iter;
         m_result["已平仓交易总成本"] += pos.totalCost;
 
-        price_t profit =  roundEx(pos.sellMoney - pos.totalMoney, precision);
+        price_t profit =  roundEx(pos.sellMoney - pos.totalCost - pos.buyMoney, precision);
         m_result["已平仓净利润总额"] = roundEx(m_result["已平仓净利润总额"] + profit, precision);
 
         price_t r = roundEx(profit / pos.totalRisk, precision);
@@ -265,7 +278,7 @@ void Performance
     }
 
     if (m_result["累计投入本金"] != 0.0) {
-        m_result["已平仓帐户收益率%"] = 100 * roundEx(m_result["已平仓净利润总额"] / m_result["累计存入金额"], precision);
+        m_result["已平仓帐户收益率%"] = 100 * m_result["已平仓净利润总额"] / m_result["累计投入本金"];
     }
 
     if (m_result["赢利交易数"] != 0.0) {
@@ -285,7 +298,7 @@ void Performance
     }
 
     if (m_result["已平仓交易总数"] != 0.0) {
-        m_result["赢利交易比例%"] = 100 * (m_result["赢利交易数"] / m_result["已平仓交易总数"]);
+        m_result["赢利交易比例%"] = 100 * m_result["赢利交易数"] / m_result["已平仓交易总数"];
         m_result["R乘数期望值"] = roundEx(total_r / m_result["已平仓交易总数"], precision);
     }
 

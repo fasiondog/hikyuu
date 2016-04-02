@@ -18,7 +18,16 @@ struct Constant {
         null_price(Null<price_t>()),
         null_int(Null<int>()),
         null_size(Null<size_t>()),
-        null_int64(Null<hku_int64>()){
+        null_int64(Null<hku_int64>()),
+        STOCKTYPE_BLOCK(0),
+        STOCKTYPE_A(1),
+        STOCKTYPE_INDEX(2),
+        STOCKTYPE_B(3),
+        STOCKTYPE_FUND(4),
+        STOCKTYPE_ETF(5),
+        STOCKTYPE_ND(6),
+        STOCKTYPE_BOND(7),
+        STOCKTYPE_GEM(8) {
 #if HKU_PYTHON_SUPPORT_PICKLE
         pickle_support = true;
 #else
@@ -32,6 +41,16 @@ struct Constant {
     size_t null_size;
     hku_int64 null_int64;
     bool pickle_support; //是否支持pickle
+
+    int STOCKTYPE_BLOCK;
+    int STOCKTYPE_A;
+    int STOCKTYPE_INDEX;
+    int STOCKTYPE_B;
+    int STOCKTYPE_FUND;
+    int STOCKTYPE_ETF;
+    int STOCKTYPE_ND;
+    int STOCKTYPE_BOND;
+    int STOCKTYPE_GEM;
 };
 
 void export_Constant() {
@@ -42,6 +61,16 @@ void export_Constant() {
             .def_readonly("null_size", &Constant::null_size)
             .def_readonly("null_int64", &Constant::null_int64)
             .def_readonly("pickle_support", &Constant::pickle_support)
+
+            .def_readonly("STOCKTYPE_BLOCK", &Constant::STOCKTYPE_BLOCK)
+            .def_readonly("STOCKTYPE_A", &Constant::STOCKTYPE_A)
+            .def_readonly("STOCKTYPE_INDEX", &Constant::STOCKTYPE_INDEX)
+            .def_readonly("STOCKTYPE_B", &Constant::STOCKTYPE_B)
+            .def_readonly("STOCKTYPE_FUND", &Constant::STOCKTYPE_FUND)
+            .def_readonly("STOCKTYPE_ETF", &Constant::STOCKTYPE_ETF)
+            .def_readonly("STOCKTYPE_ND", &Constant::STOCKTYPE_ND)
+            .def_readonly("STOCKTYPE_BOND", &Constant::STOCKTYPE_BOND)
+            .def_readonly("STOCKTYPE_GEM", &Constant::STOCKTYPE_GEM)
             ;
 }
 

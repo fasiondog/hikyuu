@@ -18,7 +18,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_hikyuu_Datetime
+ * @defgroup test_hikyuu_Datetime test_hikyuu_Datetime
  * @ingroup test_hikyuu_datetime_suite
  * @{
  */

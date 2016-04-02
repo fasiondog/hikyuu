@@ -6,16 +6,17 @@
  */
 
 #include "FixedATradeCost.h"
+#include "../../StockTypeInfo.h"
 #include "../../Log.h"
 
 namespace hku {
 
 FixedATradeCost::FixedATradeCost(): TradeCostBase("FixedATradeCost") {
-    addParam<price_t>("commission", 0.0018);
-    addParam<price_t>("lowest_commission", 5.0);
-    addParam<price_t>("stamptax", 0.001);
-    addParam<price_t>("transferfee", 0.001);
-    addParam<price_t>("lowest_transferfee", 1.0);
+    setParam<price_t>("commission", 0.0018);
+    setParam<price_t>("lowest_commission", 5.0);
+    setParam<price_t>("stamptax", 0.001);
+    setParam<price_t>("transferfee", 0.001);
+    setParam<price_t>("lowest_transferfee", 1.0);
 }
 
 
@@ -26,11 +27,11 @@ FixedATradeCost::FixedATradeCost(
         price_t transferfee,
         price_t lowestTransferfee)
 : TradeCostBase("FixedATradeCost") {
-    addParam<price_t>("commission", commission);
-    addParam<price_t>("lowest_commission", lowestCommission);
-    addParam<price_t>("stamptax", stamptax);
-    addParam<price_t>("transferfee", transferfee);
-    addParam<price_t>("lowest_transferfee", lowestTransferfee);
+    setParam<price_t>("commission", commission);
+    setParam<price_t>("lowest_commission", lowestCommission);
+    setParam<price_t>("stamptax", stamptax);
+    setParam<price_t>("transferfee", transferfee);
+    setParam<price_t>("lowest_transferfee", lowestTransferfee);
 }
 
 
@@ -83,8 +84,14 @@ CostRecord FixedATradeCost::getSellCost(const Datetime& datetime,
     if( result.commission < lowestCommission ){
         result.commission = lowestCommission;
     }
-    result.stamptax = roundEx(price * num * getParam<price_t>("stamptax"),
+
+    //A股和创业板有印花税，其他无
+    if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM) {
+        result.stamptax = roundEx(price * num * getParam<price_t>("stamptax"),
                               precision);
+    } else {
+        result.stamptax = 0.0;
+    }
     result.transferfee = 0.0;
     if(stock.market() == "SH"){
         result.transferfee = num > 1000

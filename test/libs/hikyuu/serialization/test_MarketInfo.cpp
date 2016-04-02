@@ -23,7 +23,7 @@ using namespace hku;
 #if HKU_SUPPORT_SERIALIZATION
 
 /**
- * @defgroup test_MarketInfo_serialize
+ * @defgroup test_MarketInfo_serialize test_MarketInfo_serialize
  * @ingroup test_hikyuu_serialize_suite
  * @{
  */

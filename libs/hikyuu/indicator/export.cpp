@@ -31,7 +31,7 @@
 #include "imp/Ema.h"
 #include "imp/IKData.h"
 #include "imp/IPriceList.h"
-#include "imp/Ma.h"
+#include <hikyuu/indicator/imp/Sma.h>
 #include "imp/Macd.h"
 #include "imp/SaftyLoss.h"
 #include "imp/StdDeviation.h"
@@ -42,7 +42,7 @@ BOOST_CLASS_EXPORT(hku::Diff)
 BOOST_CLASS_EXPORT(hku::Ema)
 BOOST_CLASS_EXPORT(hku::IKData)
 BOOST_CLASS_EXPORT(hku::IPriceList)
-BOOST_CLASS_EXPORT(hku::Ma)
+BOOST_CLASS_EXPORT(hku::Sma)
 BOOST_CLASS_EXPORT(hku::Macd)
 BOOST_CLASS_EXPORT(hku::SaftyLoss)
 BOOST_CLASS_EXPORT(hku::StdDeviation)

@@ -29,7 +29,7 @@ class HKU_API StoplossBase {
     PARAMETER_SUPPORT
 
 public:
-    StoplossBase(const string& name): m_name(name) { }
+    StoplossBase() { }
     virtual ~StoplossBase() { }
 
     /** 设置账户 */
@@ -37,12 +37,6 @@ public:
 
     /** 设置交易对象 */
     void setTO(const KData& kdata);
-
-    /** 获取名称  */
-    const string& name() const { return m_name; }
-
-    /** 设置名称 */
-    void setName(const string& name) { m_name = name; }
 
     /** 复位操作 */
     void reset();
@@ -74,8 +68,12 @@ public:
         return getPrice(datetime, price);
     }
 
+    virtual string name() const {
+        return "StoplossBase";
+    }
+
     /** 子类复位接口 */
-    virtual void _reset() = 0;
+    virtual void _reset() {}
 
     /** 子类克隆接口 */
     virtual StoplossPtr _clone() = 0;
@@ -85,7 +83,6 @@ public:
 
 
 protected:
-    string m_name;
     TradeManagerPtr m_tm;
     KData m_kdata;
 
@@ -97,8 +94,8 @@ private:
     friend class boost::serialization::access;
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const {
-        string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
+        string name_str(GBToUTF8(name()));
+        ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化
         //ar & BOOST_SERIALIZATION_NVP(m_kdata);
@@ -107,8 +104,7 @@ private:
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
-        m_name = UTF8ToGB(name);
+        ar & boost::serialization::make_nvp("name", name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化
         //ar & BOOST_SERIALIZATION_NVP(m_kdata);
@@ -145,6 +141,18 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(StoplossBase)
 #else
 #define STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
+
+
+#define STOPLOSS_IMP(classname, str_name) public:\
+    virtual string name() const { \
+        return(str_name);\
+    }\
+    \
+    virtual StoplossPtr _clone() {\
+        return StoplossPtr(new classname());\
+    }\
+    virtual void _calculate();\
+    virtual price_t getPrice(const Datetime&, price_t);
 
 
 /**

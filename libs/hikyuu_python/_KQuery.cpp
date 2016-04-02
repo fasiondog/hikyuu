@@ -12,21 +12,12 @@
 using namespace boost::python;
 using namespace hku;
 
+BOOST_PYTHON_FUNCTION_OVERLOADS(KQueryByDate_overload, KQueryByDate, 0, 4);
+BOOST_PYTHON_FUNCTION_OVERLOADS(KQueryByIndex_overload, KQueryByIndex, 0, 4);
+
 void export_KQuery() {
-    class_<KQueryByDate>("KQueryByDate", init<>())
-            .def(init<const Datetime&, optional<const Datetime&, KQuery::KType, KQuery::RecoverType> >())
-            .def(self_ns::str(self))
-            .add_property("start", &KQueryByDate::start)
-            .add_property("end", &KQueryByDate::end)
-            .add_property("startDatetime", &KQueryByDate::startDatetime)
-            .add_property("endDatetime", &KQueryByDate::endDatetime)
-            .add_property("queryType", &KQueryByDate::queryType)
-            .add_property("kType", &KQueryByDate::kType)
-            .add_property("recoverType", &KQueryByDate::recoverType)
-#if HKU_PYTHON_SUPPORT_PICKLE
-            .def_pickle(normal_pickle_suite<KQueryByDate>())
-#endif
-            ;
+    def("KQueryByDate", KQueryByDate, KQueryByDate_overload());
+    def("KQueryByIndex", KQueryByIndex, KQueryByIndex_overload());
 
     scope in_Query = class_<KQuery>("KQuery", init<>())
             .def(init<hku_int64, optional<hku_int64, KQuery::KType, KQuery::RecoverType> >())

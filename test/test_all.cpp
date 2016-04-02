@@ -6,7 +6,7 @@
  */
 
 /**
- * @defgroup test_all
+ * @defgroup test_all test_all
  * 该文件的主要目的是在集成IDE环境中，可以将所有测试用例集合在一起作为一个测试程序进行编译
  * 编译时，需要在编译选项中声明宏TEST_ALL_IN_ONE （一般为-DTEST_ALL_IN_ONE）
  * 原因：boost::unit_test框架的习惯用法是将一个CPP文件最为一个可运行的测试模块独立生成

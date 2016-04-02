@@ -12,6 +12,16 @@
 
 namespace hku {
 
+#define STOCKTYPE_BLOCK 0  ///板块
+#define STOCKTYPE_A     1  ///A股
+#define STOCKTYPE_INDEX 2  ///指数
+#define STOCKTYPE_B     3  ///B股
+#define STOCKTYPE_FUND  4  ///基金
+#define STOCKTYPE_ETF   5  ///ETF
+#define STOCKTYPE_ND    6  ///国债
+#define STOCKTYPE_BOND  7  ///债券
+#define STOCKTYPE_GEM   8  ///创业板
+
 /**
  * 证券类型信息
  * @ingroup StockManage
@@ -46,6 +56,9 @@ public:
 
     /** 获取每笔最大交易数量 */
     size_t maxTradeNumber() const { return m_maxTradeNumber; }
+
+    /** 仅用于python的__str__ */
+    string toString() const;
 
 private:
     hku_uint32 m_type;          //证券类型

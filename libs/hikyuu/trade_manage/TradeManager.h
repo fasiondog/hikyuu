@@ -445,6 +445,8 @@ public:
     PriceList getProfitCurve(const DatetimeList& dates,
             KQuery::KType ktype = KQuery::DAY);
 
+    string toString() const;
+
     /**
      * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
      * @param path 输出文件所在目录

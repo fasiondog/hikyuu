@@ -16,7 +16,8 @@ void export_KData() {
     class_<KData>("KData", init<>())
             .def(init<const KData&>())
             .def(init<const Stock&, const KQuery&>())
-            .def(self_ns::str(self))
+            //.def(self_ns::str(self))
+            .def("__str__", &KData::toString)
             .add_property("startPos", &KData::startPos)
             .add_property("endPos", &KData::endPos)
             .add_property("lastPos", &KData::lastPos)
@@ -24,6 +25,7 @@ void export_KData() {
             .def("getDatetimeList", &KData::getDatetimeList)
             .def("getKRecord", &KData::getKRecord)
             .def("getKRecordByDate", &KData::getKRecordByDate)
+            .def("_getPos", &KData::getPos) //python中需要将Null的情况改写为None
 
             .def("size", &KData::size)
             .def("empty", &KData::empty)

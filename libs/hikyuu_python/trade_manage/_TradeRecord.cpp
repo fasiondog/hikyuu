@@ -36,7 +36,8 @@ void export_TradeRecord() {
             .def(init<const Stock&, const Datetime&, BUSINESS, price_t,
                     price_t, price_t, size_t, const CostRecord&,
                     price_t, price_t, SystemPart>())
-            .def(self_ns::str(self))
+            //.def(self_ns::str(self))
+            .def("__str__", &TradeRecord::toString)
             .def_readwrite("stock", &TradeRecord::stock)
             .def_readwrite("datetime", &TradeRecord::datetime)
             .def_readwrite("business", &TradeRecord::business)

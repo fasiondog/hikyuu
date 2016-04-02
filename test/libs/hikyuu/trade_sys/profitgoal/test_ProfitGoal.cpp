@@ -46,7 +46,7 @@ private:
 };
 
 /**
- * @defgroup test_ProfitGoal
+ * @defgroup test_ProfitGoal test_ProfitGoal
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

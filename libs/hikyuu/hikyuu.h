@@ -20,6 +20,13 @@ namespace hku {
  */
 void HKU_API hikyuu_init(const string& config_file_name);
 
+/**
+ * 获取Stock，目的是封装StockManager，客户端不直接使用StockManager对象
+ * @param querystr 格式：“市场简称证券代码”，如"sh000001"
+ * @return 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
+ */
+Stock HKU_API getStock(const string& querystr);
+
 
 } /* namespace */
 

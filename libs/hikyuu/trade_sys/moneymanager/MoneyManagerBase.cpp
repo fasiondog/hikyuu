@@ -50,10 +50,109 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     return p;
 }
 
-
-size_t MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& stock,
+size_t MoneyManagerBase
+::getSellNumber(const Datetime& datetime, const Stock& stock,
             price_t price, price_t risk) {
-    return Null<size_t>();
+    if (!m_tm) {
+        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getSellNumber]");
+        return 0;
+    }
+
+    if (risk <= 0.0) {
+        HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getSellNumber]");
+        return 0;
+    }
+
+    return _getSellNumber(datetime, stock, price, risk);
+}
+
+size_t MoneyManagerBase
+::getBuyNumber(const Datetime& datetime, const Stock& stock,
+        price_t price, price_t risk) {
+    if (!m_tm) {
+        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getBuyNumber]");
+        return 0;
+    }
+
+    if (risk <= 0.0) {
+        HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getBuyNumber]");
+        return 0;
+    }
+
+    return _getBuyNumber(datetime, stock, price, risk);
+}
+
+size_t MoneyManagerBase
+::getSellShortNumber(const Datetime& datetime, const Stock& stock,
+        price_t price, price_t risk) {
+    if (!m_tm) {
+        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getSellShortNumber]");
+        return 0;
+    }
+
+    if (risk <= 0.0) {
+        HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getSellShortNumber]");
+        return 0;
+    }
+
+    return _getSellShortNumber(datetime, stock, price, risk);
+}
+
+size_t MoneyManagerBase
+::getBuyShortNumber(const Datetime& datetime, const Stock& stock,
+        price_t price, price_t risk) {
+    if (!m_tm) {
+        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getBuyShortNumber]");
+        return 0;
+    }
+
+    if (risk <= 0.0) {
+        HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
+                << stock.market_code() << ") price(" << price
+                << ") risk(" << risk
+                << ") [MoneyManagerBase::getBuyShortNumber]");
+        return 0;
+    }
+
+    return _getBuyShortNumber(datetime, stock, price, risk);
+}
+
+size_t MoneyManagerBase::_getSellNumber(const Datetime& datetime, const Stock& stock,
+            price_t price, price_t risk) {
+
+    //默认卖出全部
+    return m_tm->getHoldNumber(datetime, stock);
+}
+
+size_t MoneyManagerBase::_getSellShortNumber(const Datetime& datetime,
+        const Stock& stock, price_t price, price_t risk) {
+    return 0;
+}
+
+size_t MoneyManagerBase::_getBuyShortNumber(const Datetime& datetime,
+        const Stock& stock, price_t price, price_t risk) {
+    return 0;
 }
 
 } /* namespace hku */

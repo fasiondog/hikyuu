@@ -31,10 +31,13 @@ public:
             price_t stoploss,
             price_t goalPrice,
             size_t  totalNumber,
-            price_t totalMoney,
+            price_t buyMoney,
             price_t totalCost,
             price_t totalRisk,
             price_t sellMoney);
+
+    /** 仅用于python的__str__ */
+    string toString() const;
 
     Stock    stock;          ///< 交易对象
     Datetime takeDatetime;   ///< 初次建仓日期
@@ -43,12 +46,10 @@ public:
     price_t  stoploss;       ///< 当前止损价
     price_t  goalPrice;      ///< 当前的目标价格
     size_t   totalNumber;    ///< 累计持仓数量
-    price_t  totalMoney;     ///< 累计花费资金总额
+    price_t  buyMoney;     ///< 累计买入资金
     price_t  totalCost;      ///< 累计交易总成本
     price_t  totalRisk;      ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
-    price_t  sellMoney;      ///< 累计已卖出转化资金，记录各次卖出时转化的资金
-    //price_t  costPrice;      ///< 当前盈亏成本价 = （累计花费资金总额 - 累计已卖出转化资金） / 当前持仓数量
-    //price_t  totalBonus;     ///< 累计浮动盈亏 = 当前持仓数量 × 当前价格 - （累计花费资金总额 - 累计已卖出转化资金 ）
+    price_t  sellMoney;      ///< 累计卖出资金
 
 //===================
 //序列化支持
@@ -68,7 +69,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(stoploss);
         ar & BOOST_SERIALIZATION_NVP(goalPrice);
         ar & BOOST_SERIALIZATION_NVP(totalNumber);
-        ar & BOOST_SERIALIZATION_NVP(totalMoney);
+        ar & BOOST_SERIALIZATION_NVP(buyMoney);
         ar & BOOST_SERIALIZATION_NVP(totalCost);
         ar & BOOST_SERIALIZATION_NVP(totalRisk);
         ar & BOOST_SERIALIZATION_NVP(sellMoney);
@@ -87,7 +88,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(stoploss);
         ar & BOOST_SERIALIZATION_NVP(goalPrice);
         ar & BOOST_SERIALIZATION_NVP(totalNumber);
-        ar & BOOST_SERIALIZATION_NVP(totalMoney);
+        ar & BOOST_SERIALIZATION_NVP(buyMoney);
         ar & BOOST_SERIALIZATION_NVP(totalCost);
         ar & BOOST_SERIALIZATION_NVP(totalRisk);
         ar & BOOST_SERIALIZATION_NVP(sellMoney);

@@ -6,6 +6,7 @@
  */
 
 #include "StockTypeInfo.h"
+#include "utilities/util.h"
 
 namespace hku {
 
@@ -18,7 +19,11 @@ HKU_API std::ostream& operator <<(std::ostream &os,
 
     string split(", ");
     os << "StockTypeInfo(" << stockTypeInfo.type() << split
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+       << utf8_to_gb(stockTypeInfo.description()) << split
+#else
        << stockTypeInfo.description() << split
+#endif
        << stockTypeInfo.tick() << split
        << stockTypeInfo.tickValue() << split
        << stockTypeInfo.unit() << split
@@ -28,6 +33,24 @@ HKU_API std::ostream& operator <<(std::ostream &os,
     return os;
 }
 
+string StockTypeInfo::toString() const {
+    std::stringstream os;
+    if(Null<StockTypeInfo>() == *this) {
+        os << "StockTypeInfo()";
+        return os.str();
+    }
+
+    string split(", ");
+    os << "StockTypeInfo(" << m_type << split
+       << m_description << split
+       << m_tick << split
+       << m_tickValue << split
+       << m_unit << split
+       << m_precision << split
+       << m_minTradeNumber << split
+       << m_maxTradeNumber << ")";
+    return os.str();
+}
 
 StockTypeInfo::StockTypeInfo()
 : m_type(Null<hku_uint32>()),

@@ -20,7 +20,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_MA
+ * @defgroup test_indicator_MA test_indicator_MA
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
@@ -55,10 +55,16 @@ BOOST_AUTO_TEST_CASE( test_MA ) {
     ma = MA(open, 10);
     BOOST_CHECK(ma.empty() == false);
     BOOST_CHECK(ma.size() == kdata.size());
-    BOOST_CHECK(ma.discard() == 9);
-    for (size_t i = 0; i < kdata.size() - 1; ++i) {
-        BOOST_CHECK(ma[i] == Null<price_t>());
-    }
+    BOOST_CHECK(ma.discard() == 0);
+    BOOST_CHECK(std::fabs(ma[0] - 2415.197) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[1] - 2397.1715) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[2] - 2395.890) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[3] - 2392.89075) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[4] - 2394.1114) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[5] - 2396.14767) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[6] - 2395.62443) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[7] - 2393.03375) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[8] - 2389.709) < 0.00001);
     BOOST_CHECK(std::fabs(ma[9] - 2383.4041) < 0.00001);
 
     /** @arg n = 10 且数据大小刚好为9 时, 正常关联数据 */
@@ -67,10 +73,13 @@ BOOST_AUTO_TEST_CASE( test_MA ) {
     ma = MA(open, 10);
     BOOST_CHECK(ma.empty() == false);
     BOOST_CHECK(ma.size() == kdata.size());
-    BOOST_CHECK(ma.discard() == 9);
-    for (size_t i = 0; i < kdata.size(); ++i) {
-        BOOST_CHECK(ma[i] == Null<price_t>());
-    }
+    BOOST_CHECK(ma.discard() == 0);
+    BOOST_CHECK(std::fabs(ma[0] - 2379.146) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[1] - 2386.2365) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[2] - 2385.45533) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[3] - 2388.84) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[7] - 2386.523) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[8] - 2379.87156) < 0.00001);
 
     /** @arg n = 10 且数据大小为11 时, 正常关联数据 */
     kdata = stock.getKData(KQuery(-11));
@@ -78,10 +87,9 @@ BOOST_AUTO_TEST_CASE( test_MA ) {
     ma = MA(open, 10);
     BOOST_CHECK(ma.empty() == false);
     BOOST_CHECK(ma.size() == kdata.size());
-    BOOST_CHECK(ma.discard() == 9);
-    for (size_t i = 0; i < 9; ++i) {
-        BOOST_CHECK(ma[i] == Null<price_t>());
-    }
+    BOOST_CHECK(ma.discard() == 0);
+    BOOST_CHECK(std::fabs(ma[0] - 2400.984) < 0.00001);
+    BOOST_CHECK(std::fabs(ma[8] - 2393.91711) < 0.00001);
     BOOST_CHECK(std::fabs(ma[9] - 2390.8365) < 0.00001);
     BOOST_CHECK(std::fabs(ma[10] - 2383.4041) < 0.00001);
 
@@ -105,14 +113,14 @@ BOOST_AUTO_TEST_CASE( test_MA ) {
     Indicator d = PRICELIST(data);
     Indicator ma1 = MA(d, 2);
     Indicator ma2 = MA(ma1, 2);
-    BOOST_CHECK(ma1.discard() == 1);
-    BOOST_CHECK(ma2.discard() == 2);
-    BOOST_CHECK(ma1[0] == Null<price_t>());
-    BOOST_CHECK(ma1[1] == 0.5);
+    BOOST_CHECK(ma1.discard() == 0);
+    BOOST_CHECK(ma2.discard() == 0);
+    BOOST_CHECK(ma1[0] == data[0]);
+    BOOST_CHECK(ma1[1] == (data[0]+data[1])/2);
     BOOST_CHECK(ma1[2] == 1.5);
     BOOST_CHECK(ma1[3] == 2.5);
-    BOOST_CHECK(ma2[0] == Null<price_t>());
-    BOOST_CHECK(ma2[1] == Null<price_t>());
+    BOOST_CHECK(ma2[0] == ma1[0]);
+    BOOST_CHECK(ma2[1] == (ma1[0]+ma1[1])/2);
     BOOST_CHECK(ma2[2] == 1.0);
     BOOST_CHECK(ma2[3] == 2.0);
 

@@ -16,8 +16,9 @@ project : requirements <library>/boost//date_time
                        <toolset>msvc:<library>/sqlite3//sqlite3
                        <toolset>msvc:<include>../../extern-libs/mysql/include
                        <toolset>msvc:<include>../../extern-libs/hdf5/include
-                       <toolset>msvc:<include>../../extern-libs/log4cplus/include 
-                       <define>PY_VERSION_HEX=0x03000000                      
+                       <toolset>msvc:<include>../../extern-libs/log4cplus/include
+                       <toolset>msvc:<include>../../extern-libs/tbb/include  
+                       <define>PY_VERSION_HEX=0x03000000 
         ;
 
 lib hikyuu : [ glob-tree *.cpp ]
@@ -49,6 +50,7 @@ lib hikyuu : [ glob-tree *.cpp ]
                  ../../extern-libs/hdf5/dll/hdf5_hl_cppdll.lib
                  ../../extern-libs/log4cplus/dll/log4cplus.lib
                  ../../extern-libs/mysql/lib/libmysql.lib
+                 ../../extern-libs/tbb/dll/tbb.lib
               :  <toolset>msvc
                  <link>shared
                  <define>SQLITE_API="__declspec(dllimport)"

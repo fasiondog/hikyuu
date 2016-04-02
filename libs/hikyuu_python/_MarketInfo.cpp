@@ -15,7 +15,8 @@ using namespace hku;
 void export_MarketInfo() {
     class_<MarketInfo>("MarketInfo", init<>())
             .def(init<const string&, const string&, const string&, const string&, const Datetime&>())
-            .def(self_ns::str(self))
+            //.def(self_ns::str(self))
+            .def("__str__", &MarketInfo::toString)
             .add_property("market", make_function(&MarketInfo::market, return_value_policy<copy_const_reference>()))
             .add_property("name", make_function(&MarketInfo::name, return_value_policy<copy_const_reference>()))
             .add_property("description", make_function(&MarketInfo::description, return_value_policy<copy_const_reference>()))

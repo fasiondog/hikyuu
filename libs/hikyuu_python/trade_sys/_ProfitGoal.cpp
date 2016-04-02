@@ -25,7 +25,7 @@ public:
     }
 
     void _calculate() {
-        this->get_override("_calculate");
+        this->get_override("_calculate")();
     }
 
     price_t getGoal(const Datetime& datetime, price_t price) {

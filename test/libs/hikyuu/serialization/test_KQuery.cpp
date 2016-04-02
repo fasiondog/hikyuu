@@ -24,7 +24,7 @@ using namespace hku;
 #if HKU_SUPPORT_SERIALIZATION
 
 /**
- * @defgroup test_KQuery_serialize
+ * @defgroup test_KQuery_serialize test_KQuery_serialize
  * @ingroup test_hikyuu_serialize_suite
  * @{
  */
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE( test_KQueryByDate_serialize ) {
     filename += "/KQueryByDate.xml";
 
     /** KQueryByDate保存，KQuery读取 */
-    KQueryByDate q1(Datetime(200101010000), Datetime(200102100000));
+    KQuery q1 = KQueryByDate(Datetime(200101010000), Datetime(200102100000));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -83,14 +83,14 @@ BOOST_AUTO_TEST_CASE( test_KQueryByDate_serialize ) {
     BOOST_CHECK(q1.endDatetime() == q1.endDatetime());
 
     /* KQueryByDate读取 */
-    KQueryByDate q3(Datetime(200101010000), Datetime(200102100000));
+    KQuery q3 = KQueryByDate(Datetime(200101010000), Datetime(200102100000));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
         oa << BOOST_SERIALIZATION_NVP(q3);
     }
 
-    KQueryByDate q4;
+    KQuery q4;
     {
         std::ifstream ifs(filename);
         boost::archive::xml_iarchive ia(ifs);
@@ -103,7 +103,6 @@ BOOST_AUTO_TEST_CASE( test_KQueryByDate_serialize ) {
     BOOST_CHECK(q3.startDatetime() == q4.startDatetime());
     BOOST_CHECK(q3.endDatetime() == q4.endDatetime());
 }
-
 /** @} */
 
 #endif /* HKU_SUPPORT_SERIALIZATION */

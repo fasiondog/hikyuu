@@ -50,7 +50,7 @@ private:
 };
 
 /**
- * @defgroup test_Slippage
+ * @defgroup test_Slippage test_Slippage
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

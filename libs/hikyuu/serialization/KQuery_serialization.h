@@ -71,45 +71,9 @@ void load(Archive & ar, hku::KQuery& query, unsigned int version) {
     }
 }
 
-//===========================
-// KQueryByDate
-//===========================
-template<class Archive>
-void save(Archive & ar, const hku::KQueryByDate & query, unsigned int version) {
-    hku::string queryType, kType, recoverType;
-    queryType = hku::KQuery::getQueryTypeName(query.queryType());
-    kType = hku::KQuery::getKTypeName(query.kType());
-    recoverType = hku::KQuery::getRecoverTypeName(query.recoverType());
-    ar & BOOST_SERIALIZATION_NVP(queryType);
-    ar & BOOST_SERIALIZATION_NVP(kType);
-    ar & BOOST_SERIALIZATION_NVP(recoverType);
-
-    hku::hku_uint64 start = query.startDatetime().number();
-    hku::hku_uint64 end = query.endDatetime().number();
-    ar & BOOST_SERIALIZATION_NVP(start);
-    ar & BOOST_SERIALIZATION_NVP(end);
-}
-
-template<class Archive>
-void load(Archive & ar, hku::KQueryByDate& query, unsigned int version) {
-    hku::string queryType, kType, recoverType;
-    ar & BOOST_SERIALIZATION_NVP(queryType);
-    ar & BOOST_SERIALIZATION_NVP(kType);
-    ar & BOOST_SERIALIZATION_NVP(recoverType);
-
-    hku::KQuery::KType enmu_ktype = hku::KQuery::getKTypeEnum(kType);
-    hku::KQuery::RecoverType enum_recover = hku::KQuery::getRecoverTypeEnum(recoverType);
-    hku::hku_uint64 start, end;
-    ar & BOOST_SERIALIZATION_NVP(start);
-    ar & BOOST_SERIALIZATION_NVP(end);
-    query = hku::KQueryByDate(hku::Datetime(start), hku::Datetime(end),
-                              enmu_ktype, enum_recover);
-}
-
 }} /* namespace boost::serailization */
 
 BOOST_SERIALIZATION_SPLIT_FREE(hku::KQuery)
-BOOST_SERIALIZATION_SPLIT_FREE(hku::KQueryByDate)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

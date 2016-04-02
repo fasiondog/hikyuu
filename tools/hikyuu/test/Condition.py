@@ -15,7 +15,7 @@ from hikyuu.trade_sys.condition import *
 class ConditionPython(ConditionBase):
     def __init__(self):
         super(ConditionPython, self).__init__("ConditionPython")
-        self.params.add("n", 10)
+        self.params.set("n", 10)
         self._m_flag = False
         
     def isValid(self, datetime):

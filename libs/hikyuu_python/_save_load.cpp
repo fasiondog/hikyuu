@@ -15,6 +15,7 @@
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/trade_manage/TradeManager.h>
 #include <hikyuu/indicator/Indicator.h>
+#include <hikyuu/indicator/Operand.h>
 #include <hikyuu/trade_sys/all.h>
 
 #include <hikyuu/serialization/all.h>
@@ -37,11 +38,13 @@ void registerSupportClass() {
     g_support_class_dict[typeid(KRecordList).hash_code()] = "KRecordList";
     g_support_class_dict[typeid(MarketInfo).hash_code()] = "MarketInfo";
     g_support_class_dict[typeid(Stock).hash_code()] = "Stock";
+    g_support_class_dict[typeid(Block).hash_code()] = "Block";
     g_support_class_dict[typeid(StockTypeInfo).hash_code()] = "StockTypeInfo";
     g_support_class_dict[typeid(StockWeight).hash_code()] = "StockWeight";
     g_support_class_dict[typeid(StockWeightList).hash_code()] = "StockWeightList";
     g_support_class_dict[typeid(Parameter).hash_code()] = "Parameter";
     g_support_class_dict[typeid(Indicator).hash_code()] = "Indicator";
+    g_support_class_dict[typeid(Operand).hash_code()] = "Operand";
 
     g_support_class_dict[typeid(BorrowRecord).hash_code()] = "BorrowRecord";
     g_support_class_dict[typeid(CostRecord).hash_code()] = "CostRecord";
@@ -55,6 +58,7 @@ void registerSupportClass() {
 
     g_support_class_dict[typeid(TradeRequest).hash_code()] = "TradeRequest";
     g_support_class_dict[typeid(SystemPtr).hash_code()] = "SystemPtr";
+    g_support_class_dict[typeid(SignalPtr).hash_code()] = "SignalBase";
 }
 
 string supportClassName(const boost::any& arg) {
@@ -140,6 +144,9 @@ void export_save_load() {
     def("hku_save", xml_save<Stock>);
     def("hku_load", xml_load<Stock>);
 
+    def("hku_save", xml_save<Block>);
+    def("hku_load", xml_load<Block>);
+
     def("hku_save", xml_save<StockTypeInfo>);
     def("hku_load", xml_load<StockTypeInfo>);
 
@@ -154,6 +161,9 @@ void export_save_load() {
 
     def("hku_save", xml_save<Indicator>);
     def("hku_load", xml_load<Indicator>);
+
+    def("hku_save", xml_save<Operand>);
+    def("hku_load", xml_load<Operand>);
 
     def("hku_save", xml_save<BorrowRecord>);
     def("hku_load", xml_load<BorrowRecord>);
@@ -187,6 +197,10 @@ void export_save_load() {
 
     def("hku_save", xml_save<SystemPtr>);
     def("hku_load", xml_load<SystemPtr>);
+
+    def("hku_save", xml_save<SignalPtr>);
+    def("hku_load", xml_load<SignalPtr>);
+
 }
 
 #else /* HKU_SUPPORT_SERIALIZATION */

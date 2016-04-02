@@ -29,7 +29,7 @@ namespace hku {
  *     return Indicator(IndicatorImpPtr(new MA(n)));
  * }
  *
-*  Indicator HKU_API MA(const Indicator& indicator, size_t n = 30);
+ * Indicator HKU_API MA(const Indicator& indicator, size_t n = 30);
  * </pre>
  * @ingroup Indicator
  */
@@ -45,18 +45,20 @@ public:
     Indicator& operator=(const Indicator&);
 
     /** 使用已有参数计算新值，返回全新的Indicator */
-    Indicator operator()(const Indicator& ind) {
-        return Indicator((*m_imp)(ind));
-    }
+    Indicator operator()(const Indicator& ind);
 
     /** 指标名称 */
     string name() const;
+    void name(const string& name);
 
     /** 返回形如：Name(param1_val,param2_val,...) */
     string long_name() const;
 
     /** 结果中需抛弃的个数 */
     size_t discard() const;
+
+    /** 设置抛弃的个数，如果小于原有的discard则无效 */
+    void setDiscard(size_t discard);
 
     /** 返回有几个结果集输出 */
     size_t getResultNumber() const;
@@ -91,6 +93,21 @@ public:
 
     PriceList getResultAsPriceList(size_t num) const {
         return m_imp->getResultAsPriceList(num);
+    }
+
+    template <typename ValueType>
+    void setParam(const string& name, const ValueType& value) {
+        if (m_imp) {
+            m_imp->setParam<ValueType>(name, value);
+        }
+    }
+
+    template <typename ValueType>
+    ValueType getParam(const string& name) const {
+        if (!m_imp) {
+            throw std::out_of_range("out_of_range in Parameter::get : " + name);
+        }
+        return m_imp->getParam<ValueType>(name);
     }
 
 protected:

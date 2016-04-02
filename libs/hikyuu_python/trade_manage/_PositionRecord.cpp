@@ -16,7 +16,8 @@ void export_PositionRecord() {
     class_<PositionRecord>("PositionRecord", init<>())
             .def(init<const Stock&, const Datetime&, const Datetime&, size_t,
                     price_t, price_t, size_t, price_t, price_t, price_t, price_t>())
-            .def(self_ns::str(self))
+            //.def(self_ns::str(self))
+            .def("__str__", &PositionRecord::toString)
             .def_readwrite("stock", &PositionRecord::stock)
             .def_readwrite("takeDatetime", &PositionRecord::takeDatetime)
             .def_readwrite("cleanDatetime", &PositionRecord::cleanDatetime)
@@ -24,7 +25,7 @@ void export_PositionRecord() {
             .def_readwrite("stoploss", &PositionRecord::stoploss)
             .def_readwrite("goalPrice", &PositionRecord::goalPrice)
             .def_readwrite("totalNumber", &PositionRecord::totalNumber)
-            .def_readwrite("totalMoney", &PositionRecord::totalMoney)
+            .def_readwrite("buyMoney", &PositionRecord::buyMoney)
             .def_readwrite("totalCost", &PositionRecord::totalCost)
             .def_readwrite("totalRisk", &PositionRecord::totalRisk)
             .def_readwrite("sellMoney", &PositionRecord::sellMoney)

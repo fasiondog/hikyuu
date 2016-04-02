@@ -21,7 +21,7 @@ namespace hku {
  *       2) 该策略并不判断已有的持仓情况，如果在已有持仓情况下不能交易，则该判断应为System本身的责任
  * @ingroup MoneyManager
  */
-MoneyManagerPtr HKU_API FixedCount_MM(int n);
+MoneyManagerPtr HKU_API FixedCount_MM(int n = 100);
 
 } /* namespace */
 

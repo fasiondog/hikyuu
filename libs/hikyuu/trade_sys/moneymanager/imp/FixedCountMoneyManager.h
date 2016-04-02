@@ -21,18 +21,15 @@ namespace hku {
  *       2) 该策略并不判断已有的持仓情况，如果在已有持仓情况下不能交易，则该判断应为System本身的责任
  */
 class FixedCountMoneyManager: public MoneyManagerBase {
+    MONEY_MANAGER_IMP(FixedCountMoneyManager)
     MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    FixedCountMoneyManager(int n = 100);
+    FixedCountMoneyManager();
     virtual ~FixedCountMoneyManager();
 
-    virtual size_t getBuyNumber(const Datetime& datetime, const Stock& stock,
+    virtual size_t _getSellNumber(const Datetime& datetime, const Stock& stock,
             price_t price, price_t risk);
-    virtual size_t getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk);
-    virtual void _reset();
-    virtual MoneyManagerPtr _clone();
 };
 
 } /* namespace hku */

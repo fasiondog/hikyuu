@@ -15,7 +15,7 @@ from hikyuu.trade_sys.moneymanager import *
 class MoneyManagerPython(MoneyManagerBase):
     def __init__(self):
         super(MoneyManagerPython, self).__init__("MoneyManagerPython")
-        self.params.add("n", 10)
+        self.params.set("n", 10)
         self._m_flag = False
         
     def getBuyNumber(self, datetime, stock, price, risk):

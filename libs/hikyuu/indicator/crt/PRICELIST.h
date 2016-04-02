@@ -13,31 +13,20 @@
 namespace hku {
 
 /**
- * 包装PriceList成Indicator，用于计算其他指标
- * @param data 待包装的PriceList
+ * 包装PriceList成Indicator
+ * @param data 源数据
+ * @param discard 前端抛弃的数据点数，抛弃的值使用Null<price_t>()填充
  * @ingroup Indicator
  */
-Indicator HKU_API PRICELIST(const PriceList& data);
+Indicator HKU_API PRICELIST(const PriceList&, int discard = 0);
 
 /**
- * 包装PriceList成Indicator, 同时只获取指定范围[start, end)的数据
- * @param data 源数据
- * @param start 数据起始位置
- * @param end 数据结束位置
- * @ingroup Indicator
- */
-Indicator HKU_API PRICELIST(const PriceList& data, size_t start, size_t end);
-
-/**
- * 截取某indicator指定范围[start, end)的数据，并返回独立的Indicator
- * @param data 源数据
+ * 将某指标转化为PRICELIST
+ * @param ind 源数据
  * @param result_num 源数据中指定的结果集
- * @param start 起始位置
- * @param end 结束位置
  * @ingroup Indicator
  */
-Indicator HKU_API PRICELIST(const Indicator& data, size_t result_num,
-        size_t start, size_t end);
+Indicator HKU_API PRICELIST(const Indicator& ind, int result_num = 0);
 
 /**
  * 包装 price_t 数组成Indicator，用于计算其他指标

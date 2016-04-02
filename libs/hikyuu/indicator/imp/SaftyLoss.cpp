@@ -9,28 +9,24 @@
 
 namespace hku {
 
-SaftyLoss::SaftyLoss(int n1, int n2, double p)
-:IndicatorImp(n1 + n2 - 2, 1) {
-    addParam<int>("n1", n1);
-    addParam<int>("n2", n2);
-    addParam<double>("p", p);
-
-    if (n1 < 2) {
-        HKU_ERROR("Invalid param[n1] must >= 2 ! [SaftyLoss::SaftyLoss]");
-        return;
-    }
-
-    if (n2 < 1) {
-        HKU_ERROR("Invalid param[n2] must >= 1 ! [SaftyLoss::SaftyLoss]");
-        return;
-    }
+SaftyLoss::SaftyLoss():IndicatorImp("SAFTYLOSS") {
+    setParam<int>("n1", 10);
+    setParam<int>("n2", 3);
+    setParam<double>("p", 2.0);
 }
 
-SaftyLoss::SaftyLoss(const Indicator& data, int n1, int n2, double p)
-:IndicatorImp(data, n1 + n2 - 2, 1) {
-    addParam<int>("n1", n1);
-    addParam<int>("n2", n2);
-    addParam<double>("p", p);
+
+SaftyLoss::~SaftyLoss() {
+
+}
+
+void SaftyLoss::calculate(const Indicator& data) {
+    size_t total = data.size();
+    _readyBuffer(total, 1);
+
+    int n1 = getParam<int>("n1");
+    int n2 = getParam<int>("n2");
+    double p = getParam<double>("p");
 
     if (n1 < 2) {
         HKU_ERROR("Invalid param[n1] must >= 2 ! [SaftyLoss::SaftyLoss]");
@@ -42,7 +38,7 @@ SaftyLoss::SaftyLoss(const Indicator& data, int n1, int n2, double p)
         return;
     }
 
-    size_t total = data.size();
+    m_discard = data.discard() + n1 + n2 - 2;
     if (0 == total) {
         return;
     }
@@ -80,27 +76,23 @@ SaftyLoss::SaftyLoss(const Indicator& data, int n1, int n2, double p)
     }
 }
 
-SaftyLoss::~SaftyLoss() {
-
-}
-
-string SaftyLoss::name() const {
-    return "SaftyLoss";
-}
-
-IndicatorImpPtr SaftyLoss::operator()(const Indicator& ind) {
-    return IndicatorImpPtr(new SaftyLoss(ind, getParam<int>("n1"),
-            getParam<int>("n2"), getParam<double>("p")));
-}
-
 
 Indicator HKU_API SAFTYLOSS(int n1, int n2, double p) {
-    return Indicator(IndicatorImpPtr(new SaftyLoss(n1, n2, p)));
+    IndicatorImpPtr result(new SaftyLoss());
+    result->setParam<int>("n1", n1);
+    result->setParam<int>("n2", n2);
+    result->setParam<double>("p", p);
+    return Indicator(result);
 }
 
 
 Indicator HKU_API SAFTYLOSS(const Indicator& data, int n1, int n2, double p) {
-    return Indicator(IndicatorImpPtr(new SaftyLoss(data, n1, n2, p)));
+    IndicatorImpPtr result(new SaftyLoss());
+    result->setParam<int>("n1", n1);
+    result->setParam<int>("n2", n2);
+    result->setParam<double>("p", p);
+    result->calculate(data);
+    return Indicator(result);
 }
 
 } /* namespace hku */

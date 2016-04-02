@@ -68,7 +68,7 @@ public:
      * @param risk 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
      * @note 默认实现返回Null<size_t>() 卖出全部; 多次减仓才需要实现该接口
      */
-    virtual size_t getSellNumber(const Datetime& datetime, const Stock& stock,
+    size_t getSellNumber(const Datetime& datetime, const Stock& stock,
             price_t price, price_t risk);
 
     /**
@@ -78,10 +78,8 @@ public:
      * @param price 交易价格
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
-    virtual size_t getSellShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk) {
-        return 0;
-    }
+    size_t getSellShortNumber(const Datetime& datetime,
+            const Stock& stock, price_t price, price_t risk);
 
     /**
      * 获取指定交易对象空头回补的买入数量
@@ -90,10 +88,8 @@ public:
      * @param price 交易价格
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
-    virtual size_t getBuyShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk) {
-        return 0;
-    }
+    size_t getBuyShortNumber(const Datetime& datetime,
+            const Stock& stock, price_t price, price_t risk);
 
     /**
      * 获取指定交易对象可买入的数量
@@ -102,11 +98,24 @@ public:
      * @param price 交易价格
      * @param risk 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
      */
-    virtual size_t getBuyNumber(const Datetime& datetime, const Stock& stock,
+    size_t getBuyNumber(const Datetime& datetime, const Stock& stock,
+            price_t price, price_t risk);
+
+
+    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
             price_t price, price_t risk) = 0;
 
+    virtual size_t _getSellNumber(const Datetime& datetime, const Stock& stock,
+            price_t price, price_t risk);
+
+    virtual size_t _getSellShortNumber(const Datetime& datetime,
+            const Stock& stock, price_t price, price_t risk);
+
+    virtual size_t _getBuyShortNumber(const Datetime& datetime,
+            const Stock& stock, price_t price, price_t risk);
+
     /** 子类复位接口 */
-    virtual void _reset() = 0;
+    virtual void _reset() {}
 
     /** 子类克隆私有变量接口 */
     virtual MoneyManagerPtr _clone() = 0;
@@ -179,6 +188,14 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(MoneyManagerBase)
  * @ingroup MoneyManager
  */
 typedef shared_ptr<MoneyManagerBase> MoneyManagerPtr;
+
+
+#define MONEY_MANAGER_IMP(classname) public:\
+    virtual MoneyManagerPtr _clone() {\
+        return MoneyManagerPtr(new classname());\
+    }\
+    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,\
+                price_t price, price_t risk);
 
 
 HKU_API std::ostream & operator<<(std::ostream &, const MoneyManagerBase&);

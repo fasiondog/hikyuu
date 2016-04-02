@@ -109,6 +109,9 @@ public:
     void runMoment(const Datetime& datetime);
     void runMoment(const KRecord& record);
 
+    //清除已有的交易请求，供Portolio使用
+    void clearRequest();
+
     bool _environmentIsValid(const string& market, const Datetime& datetime);
 
     bool _conditionIsValid(const Datetime& datetime);
@@ -258,6 +261,7 @@ private:
  * @ingroup System
  */
 typedef shared_ptr<System> SystemPtr;
+typedef vector<SystemPtr> SystemList;
 
 HKU_API std::ostream& operator <<(std::ostream &os, const System& sys);
 HKU_API std::ostream& operator <<(std::ostream &os, const SystemPtr& sys);
@@ -299,7 +303,7 @@ inline size_t System
 
 inline size_t System
 ::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk) {
-    return m_mm ? m_mm->getBuyNumber(datetime, m_stock, price, risk) : 0;
+    return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk) : 0;
 }
 
 inline price_t System

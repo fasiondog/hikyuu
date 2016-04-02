@@ -20,7 +20,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_MACD
+ * @defgroup test_indicator_MACD test_indicator_MACD
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */

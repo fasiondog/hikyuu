@@ -18,7 +18,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_IKData
+ * @defgroup test_indicator_IKData test_indicator_IKData
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
@@ -55,11 +55,11 @@ BOOST_AUTO_TEST_CASE( test_IKData ) {
     BOOST_CHECK(close.size() == 0);
     BOOST_CHECK(close.empty() == true);
 
-    amount = TRANSAMOUNT(kdata);
+    amount = AMO(kdata);
     BOOST_CHECK(amount.size() == 0);
     BOOST_CHECK(amount.empty() == true);
 
-    count = TRANSCOUNT(kdata);
+    count = VOL(kdata);
     BOOST_CHECK(count.size() == 0);
     BOOST_CHECK(count.empty() == true);
 
@@ -104,13 +104,13 @@ BOOST_AUTO_TEST_CASE( test_IKData ) {
         BOOST_CHECK(close[i] == kdata[i].closePrice);
     }
 
-    amount = TRANSAMOUNT(kdata);
+    amount = AMO(kdata);
     BOOST_CHECK(amount.size() == kdata.size());
     for (size_t i = 0; i < total; ++i) {
         BOOST_CHECK(amount[i] == kdata[i].transAmount);
     }
 
-    count = TRANSCOUNT(kdata);
+    count = VOL(kdata);
     BOOST_CHECK(count.size() == kdata.size());
     for (size_t i = 0; i < total; ++i) {
         BOOST_CHECK(count[i] == kdata[i].transCount);

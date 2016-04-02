@@ -20,7 +20,7 @@ using namespace hku;
 
 class SignalTest: public SignalBase {
 public:
-    SignalTest(): SignalBase("SignalTest"), m_x(0) {}
+    SignalTest(): SignalBase(), m_x(0) {}
     virtual ~SignalTest() {}
 
     void setX(int x) { m_x = x; }
@@ -46,7 +46,7 @@ private:
 };
 
 /**
- * @defgroup test_Signal
+ * @defgroup test_Signal test_Signal
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */
@@ -60,13 +60,15 @@ BOOST_AUTO_TEST_CASE( test_Signal) {
     SignalPtr p(new SignalTest);
     SignalTest *p_src = (SignalTest *)p.get();
     BOOST_CHECK(p_src->getX() == 0);
+    BOOST_CHECK(p->name() == "SignalBase");
+    p->name("SignalTest");
     BOOST_CHECK(p->name() == "SignalTest");
     BOOST_CHECK(p->shouldBuy(Datetime(200101010000)) == false);
     p->_addBuySignal(Datetime(200101010000));
     BOOST_CHECK(p->shouldBuy(Datetime(200101010000)) == true);
-    BOOST_CHECK(p->shouldSell(Datetime(200101010000)) == false);
-    p->_addSellSignal(Datetime(200101010000));
-    BOOST_CHECK(p->shouldSell(Datetime(200101010000)) == true);
+    BOOST_CHECK(p->shouldSell(Datetime(200101030000)) == false);
+    p->_addSellSignal(Datetime(200101030000));
+    BOOST_CHECK(p->shouldSell(Datetime(200101030000)) == true);
 
     /** 克隆操作 */
     p_src->setX(10);
@@ -75,7 +77,7 @@ BOOST_AUTO_TEST_CASE( test_Signal) {
     p_src = (SignalTest *)p_clone.get();
     BOOST_CHECK(p_src->getX() == 10);
     BOOST_CHECK(p_clone->shouldBuy(Datetime(200101010000)) == true);
-    BOOST_CHECK(p_clone->shouldSell(Datetime(200101010000)) == true);
+    BOOST_CHECK(p_clone->shouldSell(Datetime(200101030000)) == true);
 }
 
 /** @} */

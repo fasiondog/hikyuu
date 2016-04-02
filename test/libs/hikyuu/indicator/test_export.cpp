@@ -25,7 +25,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_serialization
+ * @defgroup test_indicator_serialization test_indicator_serialization
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */

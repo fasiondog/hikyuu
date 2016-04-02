@@ -16,16 +16,12 @@ namespace hku {
  * 固定百分比止损策略，即当价格低于买入价格的某一百分比时止损
  */
 class FixedPercentStoploss: public StoplossBase {
+    STOPLOSS_IMP(FixedPercentStoploss, "FixedPercentSL")
     STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    FixedPercentStoploss(double p = 0.03);
+    FixedPercentStoploss();
     virtual ~FixedPercentStoploss();
-
-    virtual price_t getPrice(const Datetime& datetime, price_t price);
-    virtual void _reset();
-    virtual StoplossPtr _clone();
-    virtual void _calculate();
 };
 
 } /* namespace hku */

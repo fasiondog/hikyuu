@@ -12,9 +12,11 @@ project : requirements <library>/boost//filesystem
                        <library>/boost//serialization
                        #<library>/hikyuu_utilities//hikyuu_utilities
                        <library>/hikyuu//hikyuu
+                       <define>CHECK_ACCESS_BOUND=1
                        <toolset>msvc:<library>/sqlite3//sqlite3
                        <toolset>msvc:<include>../extern-libs/hdf5/include
                        <toolset>msvc:<include>../extern-libs/log4cplus/include
+                       <toolset>msvc:<include>../extern-libs/tbb/include
                        <toolset>msvc:<link>shared:<define>HKU_API="__declspec(dllimport)"
                        <toolset>msvc:<define>__WIN32__
                        #<toolset>msvc:<define>BOOST_ALL_DYN_LINK 
@@ -23,13 +25,10 @@ project : requirements <library>/boost//filesystem
         ;
 
 unit-test test_datetime : [ glob datetime/*.cpp ../../test_all.cpp ] 
-                            ../../../extern-libs/log4cplus/dll/log4cplus.lib
                           : <define>TEST_ALL_IN_ONE ;
                           
 unit-test test_utilities : [ glob utilities/*.cpp ../../test_all.cpp ] 
-                            ../../../extern-libs/log4cplus/dll/log4cplus.lib
                           : <define>TEST_ALL_IN_ONE ;    
                           
 unit-test test_hikyuu : [ glob hikyuu/*.cpp ../../test_all.cpp ] 
-                            ../../../extern-libs/log4cplus/dll/log4cplus.lib
                           : <define>TEST_ALL_IN_ONE ;                                                

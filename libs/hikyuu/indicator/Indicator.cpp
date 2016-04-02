@@ -29,6 +29,9 @@ Indicator::~Indicator() {
 
 }
 
+Indicator Indicator::operator()(const Indicator& ind) {
+    return m_imp ? Indicator((*m_imp)(ind)) : Indicator();
+}
 
 Indicator& Indicator::operator=(const Indicator& indicator) {
     if (this == &indicator)
@@ -45,12 +48,23 @@ string Indicator::name() const {
     return m_imp ? m_imp->name() : "IndicatorImp";
 }
 
+void Indicator::name(const string& name) {
+    if (m_imp) {
+        m_imp->name(name);
+    }
+}
+
 string Indicator::long_name() const {
     return m_imp ? m_imp->long_name() : "IndicatorImp()";
 }
 
 size_t Indicator::discard() const {
     return m_imp ? m_imp->discard() : 0 ;
+}
+
+void Indicator::setDiscard(size_t discard) {
+    if (m_imp)
+        m_imp->setDiscard(discard);
 }
 
 size_t Indicator::getResultNumber() const {
@@ -72,9 +86,10 @@ HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
 
     size_t result_number = std::min(ind1.getResultNumber(), ind2.getResultNumber());
     size_t total = ind1.size();
-    int discard = std::max(ind1.discard(), ind2.discard());
-    IndicatorImpPtr imp;
-    imp = IndicatorImpPtr(new IndicatorImp(ind1, discard, result_number));
+    size_t discard = std::max(ind1.discard(), ind2.discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
             imp->_set(ind1.get(i, r) + ind2.get(i, r), i, r);
@@ -92,9 +107,10 @@ HKU_API Indicator operator-(const Indicator& ind1, const Indicator& ind2) {
 
     size_t result_number = std::min(ind1.getResultNumber(), ind2.getResultNumber());
     size_t total = ind1.size();
-    int discard = std::max(ind1.discard(), ind2.discard());
-    IndicatorImpPtr imp;
-    imp = IndicatorImpPtr(new IndicatorImp(ind1, discard, result_number));
+    size_t discard = std::max(ind1.discard(), ind2.discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
             imp->_set(ind1.get(i, r) - ind2.get(i, r), i, r);
@@ -112,9 +128,10 @@ HKU_API Indicator operator*(const Indicator& ind1, const Indicator& ind2) {
 
     size_t result_number = std::min(ind1.getResultNumber(), ind2.getResultNumber());
     size_t total = ind1.size();
-    int discard = std::max(ind1.discard(), ind2.discard());
-    IndicatorImpPtr imp;
-    imp = IndicatorImpPtr(new IndicatorImp(ind1, discard, result_number));
+    size_t discard = std::max(ind1.discard(), ind2.discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
             imp->_set(ind1.get(i, r) * ind2.get(i, r), i, r);
@@ -132,9 +149,10 @@ HKU_API Indicator operator/(const Indicator& ind1, const Indicator& ind2) {
 
     size_t result_number = std::min(ind1.getResultNumber(), ind2.getResultNumber());
     size_t total = ind1.size();
-    int discard = std::max(ind1.discard(), ind2.discard());
-    IndicatorImpPtr imp;
-    imp = IndicatorImpPtr(new IndicatorImp(ind1, discard, result_number));
+    size_t discard = std::max(ind1.discard(), ind2.discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
             if (ind2.get(i, r) == 0.0) {

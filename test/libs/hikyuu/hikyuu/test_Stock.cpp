@@ -21,7 +21,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_hikyuu_Stock
+ * @defgroup test_hikyuu_Stock test_hikyuu_Stock
  * @ingroup test_hikyuu_base_suite
  * @{
  */

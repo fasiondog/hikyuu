@@ -9,6 +9,7 @@
 #define MONEYMANAGER_BUILD_IN_H_
 
 #include "crt/FixedCount_MM.h"
+#include "crt/PercentRisk_MM.h"
 
 
 #endif /* MONEYMANAGER_BUILD_IN_H_ */

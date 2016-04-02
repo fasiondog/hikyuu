@@ -18,7 +18,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_SystemPart
+ * @defgroup test_SystemPart test_SystemPart
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

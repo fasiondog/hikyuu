@@ -10,63 +10,74 @@
 
 namespace hku {
 
-Ama::Ama(int n, int fast_n, int slow_n)
-: IndicatorImp(n, 2) {
-    addParam<int>("n", n);
-    addParam<int>("fast_n", fast_n);
-    addParam<int>("slow_n", slow_n);
-
-    if (n < 1 || fast_n < 0 || slow_n < 0) {
-        HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) "
-                  << m_params << " [Ama::Ama]");
-        return;
-    }
+Ama::Ama() : IndicatorImp("AMA") {
+    setParam<int>("n", 10);
+    setParam<int>("fast_n", 2);
+    setParam<int>("slow_n", 30);
 }
 
-Ama::Ama(const Indicator& data, int n, int fast_n, int slow_n)
-: IndicatorImp(data, n, 2) {
-    addParam<int>("n", n);
-    addParam<int>("fast_n", fast_n);
-    addParam<int>("slow_n", slow_n);
 
+Ama::~Ama() {
+
+}
+
+
+bool Ama::check() {
+    int n = getParam<int>("n");
+    int fast_n = getParam<int>("fast_n");
+    int slow_n = getParam<int>("slow_n");
+    if (n < 1 || fast_n < 0 || slow_n < 0) {
+        HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) "
+                  << m_params << " [Ama::Ama]");
+        return false;
+    }
+
+    return true;
+}
+
+void Ama::calculate(const Indicator& data) {
+    size_t total = data.size();
+    _readyBuffer(total, 2);
+
+    int n = getParam<int>("n");
+    int fast_n = getParam<int>("fast_n");
+    int slow_n = getParam<int>("slow_n");
     if (n < 1 || fast_n < 0 || slow_n < 0) {
         HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) "
                   << m_params << " [Ama::Ama]");
         return;
     }
 
-    size_t total = data.size();
-    if (total <= discard()) {
-        return;
-    }
-
-    size_t start = discard();
-    if (start < (size_t)n) {
-        HKU_ERROR("Some error! [Ama::Ama]");
-        return;
-    }
+    m_discard = data.discard();
+    size_t start = m_discard;
 
     price_t fastest = 2.0 / (fast_n + 1);
     price_t slowest = 2.0 / (slow_n + 1);
     price_t delta = fastest - slowest;
 
-    price_t prevol = 0.0, vol = 0.0, er = 0.0, c = 0.0;
-    for (size_t i = start + 1 - n; i <= start; i++){
-        vol += std::abs(data[i] - data[i-1]);
-    }
-    er = (vol == 0.0) ? 0.0 : (data[start] - data[start-n]) / vol;
-    c = std::pow((std::abs(er) * delta + slowest), 2);
-    price_t ama = data[start - 1];
-    ama += c * (data[start] - ama);
-    prevol = vol;
+    price_t prevol = 0.0, vol = 0.0, er = 1.0, c = 0.0;
+    price_t ama = data[start];
+    size_t first_end = start+n+1 >= total ? total : start + n + 1;
     _set(ama, start, 0);
     _set(er, start, 1);
+    for (size_t i = start + 1; i < first_end; ++i) {
+        vol += std::fabs(data[i] - data[i-1]);
+        er = (vol == 0.0) ? 1.0 : (data[i] - data[start]) / vol;
+        if (er > 1.0) er = 1.0;
+        c = std::pow((std::fabs(er) * delta + slowest), 2);
+        ama += c * (data[i] - ama);
+        _set(ama, i, 0);
+        _set(er, i, 1);
+    }
 
-    for (size_t i = start + 1; i < total; ++i) {
-        vol = prevol + std::abs(data[i] - data[i-1])
-                     - std::abs(data[i-n] - data[i-n-1]);
-        er = (vol == 0.0) ? 0.0 : (data[i] - data[i-n]) / vol;
-        c = std::pow((std::abs(er) * delta + slowest), 2);
+    prevol = vol;
+    for (size_t i = first_end; i < total; ++i) {
+        vol = prevol + std::fabs(data[i] - data[i-1])
+                     - std::fabs(data[i+1-n] - data[i-n]);
+        er = (vol == 0.0) ? 1.0 : (data[i] - data[i-n]) / vol;
+        if (er > 1.0) er = 1.0;
+        if (er < -1.0) er = -1.0;
+        c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (data[i] - ama);
         prevol = vol;
         _set(ama, i, 0);
@@ -74,26 +85,23 @@ Ama::Ama(const Indicator& data, int n, int fast_n, int slow_n)
     }
 }
 
-Ama::~Ama() {
-
-}
-
-string Ama::name() const {
-    return "AMA";
-}
-
-IndicatorImpPtr Ama::operator()(const Indicator& ind) {
-    return IndicatorImpPtr(new Ama(ind, getParam<int>("n"),
-            getParam<int>("fast_n"), getParam<int>("slow_n")));
-}
 
 Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
-    return Indicator(IndicatorImpPtr(new Ama(n, fast_n, slow_n)));
+    IndicatorImpPtr p(new Ama());
+    p->setParam<int>("n", n);
+    p->setParam<int>("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    return Indicator(p);
 }
 
 Indicator HKU_API AMA(const Indicator& indicator,
         int n, int fast_n, int slow_n) {
-    return Indicator(IndicatorImpPtr(new Ama(indicator, n, fast_n, slow_n)));
+    IndicatorImpPtr p(new Ama());
+    p->setParam<int>("n", n);
+    p->setParam<int>("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    p->calculate(indicator);
+    return Indicator(p);
 }
 
 } /* namespace hku */

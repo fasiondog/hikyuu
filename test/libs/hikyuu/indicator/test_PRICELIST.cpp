@@ -20,7 +20,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_PRICELIST
+ * @defgroup test_indicator_PRICELIST test_indicator_PRICELIST
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
@@ -62,153 +62,45 @@ BOOST_AUTO_TEST_CASE( test_PRICELIST ) {
         BOOST_CHECK(result[i] == tmp[i]);
     }
 
-    /** @arg 截取PriceList全部 */
-    result = PRICELIST(tmp_list, 0, 10);
+    /** @arg 从PriceList构造 */
+    result = PRICELIST(tmp_list);
     BOOST_CHECK(result.size() == 10);
     for (size_t i = 0; i < 10; ++i) {
         BOOST_CHECK(result[i] == tmp_list[i]);
     }
 
-    /** @arg 截取PriceLIst， PriceList为空 */
-    result = PRICELIST(PriceList());
-    BOOST_CHECK(result.size() == 0);
-
-    /** @arg 截取PriceList, start == end */
-    result = PRICELIST(tmp_list, 1, 1);
-    BOOST_CHECK(result.size() == 0);
-
-    /** @arg 截取PriceList, start > end */
-    result = PRICELIST(tmp_list, 1, 0);
-    BOOST_CHECK(result.size() == 0);
-
-    /** @arg 截取PriceList, end > size() */
-    result = PRICELIST(tmp_list, 0, 100);
+    /** @arg 从PriceLIst， discard为1 */
+    result = PRICELIST(tmp_list, 1);
     BOOST_CHECK(result.size() == 10);
-    for (size_t i = 0; i < 10; ++i) {
+    BOOST_CHECK(result.discard() == 1);
+    BOOST_CHECK(result[0] == Null<price_t>());
+    for (size_t i = 1; i < 10; ++i) {
         BOOST_CHECK(result[i] == tmp_list[i]);
     }
 
-    /** @arg 截取PriceList，正常情况 */
-    result = PRICELIST(tmp_list, 1, 2);
-    BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == 1);
-
-    /** @arg 截取Indicator，Indicator为空 */
-    result = PRICELIST(Indicator(), 0, 0, 1);
+    /** @arg 待转化数据为Indicator，Indicator为空 */
+    result = PRICELIST(Indicator());
     BOOST_CHECK(result.size() == 0);
 
-    /** @arg 截取Indicator，start == end */
+    /** @arg 待转化数据为Indicator, result_num=0 */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
     KQuery query(0, 30);
     KData kdata = stock.getKData(query);
     Indicator ikdata = KDATA(kdata);
-    result = PRICELIST(ikdata, 0, 1, 1);
-    BOOST_CHECK(result.size() == 0);
-
-    /** @arg 截取Indicator, start > end */
-    result = PRICELIST(ikdata, 0, 1, 0);
-    BOOST_CHECK(result.size() == 0);
-
-    /** @arg 截取Indicator，end > size() */
-    result = PRICELIST(ikdata, 0, 0, 100);
-    BOOST_CHECK(result.size() == 30);
+    result = PRICELIST(ikdata);
+    BOOST_CHECK(result.size() == ikdata.size());
+    BOOST_CHECK(result.discard() == ikdata.discard());
     for (size_t i = 0; i < result.size(); ++i) {
-        BOOST_CHECK(result[i] == ikdata.get(i, 0));
+        BOOST_CHECK(result[i] == ikdata[i]);
     }
 
-    /** @arg 截取Indicator, 指定结果集大于等于结果集数量 */
-    result = PRICELIST(ikdata, 6, 0, 100);
-    BOOST_CHECK(result.size() == 0);
-    result = PRICELIST(ikdata, 7, 0, 100);
-    BOOST_CHECK(result.size() == 0);
-
-    /** @arg 截取Indicator全部，Indicator的抛弃数量不为零 */
-    Indicator close = CLOSE(kdata);
-    Indicator ma = MA(close, 10);
-    result = PRICELIST(ma, 0, 0, 30);
-    BOOST_CHECK(result.size() == 30);
-    BOOST_CHECK(result.discard() == ma.discard());
+    /** @arg 待转化数据为Indicator, result_num=1 */
+    result = PRICELIST(ikdata, 1);
+    BOOST_CHECK(result.size() == ikdata.size());
+    BOOST_CHECK(result.discard() == ikdata.discard());
     for (size_t i = 0; i < result.size(); ++i) {
-        BOOST_CHECK(result[i] == ma[i]);
-    }
-
-    /** @arg 截取Indicator，Indicator的抛弃数量不为零，start > discard */
-    result = PRICELIST(ma, 0, 10, 20);
-    BOOST_CHECK(result.size() == 10);
-    BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == ma[10]);
-    BOOST_CHECK(result[0] != Null<price_t>());
-    BOOST_CHECK(result[9] == ma[19]);
-
-    /** @arg 截取Indicator，Indicator的抛弃数量不为零，start == discard */
-    BOOST_CHECK(ma.discard() == 9);
-    result = PRICELIST(ma, 0, 9, 20);
-    BOOST_CHECK(result.size() == 11);
-    BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == ma[9]);
-    BOOST_CHECK(result[0] != Null<price_t>());
-    BOOST_CHECK(result[1] == ma[10]);
-
-    /** @arg 截取Indicator，Indicator的抛弃数量不为零，start < discard */
-    result = PRICELIST(ma, 0, 8, 20);
-    BOOST_CHECK(result.size() == 12);
-    BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == ma[8]);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == ma[9]);
-
-    /** @arg 传入的PriceList中有Null<price_t>() */
-    tmp_list.clear();
-    for (size_t i = 0; i < 3; ++i) {
-        tmp_list.push_back(Null<price_t>());
-    }
-    for (size_t i = 3; i < 10; ++i) {
-        tmp_list.push_back(i);
-    }
-    result = PRICELIST(tmp_list);
-    BOOST_CHECK(result.size() == 10);
-    BOOST_CHECK(result.discard() == 3);
-    for (size_t i = 0; i < result.size(); ++i) {
-        BOOST_CHECK(result[i] == tmp_list[i]);
-    }
-    for (size_t i = 0; i < result.discard(); ++i) {
-        BOOST_CHECK(result[i] == Null<price_t>());
-    }
-
-    tmp_list[6] = Null<price_t>();
-    result = PRICELIST(tmp_list);
-    BOOST_CHECK(result.size() == 10);
-    BOOST_CHECK(result.discard() == 7);
-    for (size_t i = 0; i < result.discard(); ++i) {
-        BOOST_CHECK(result[i] == Null<price_t>());
-    }
-    for (size_t i = result.discard(); i < result.size(); ++i) {
-        BOOST_CHECK(result[i] == tmp_list[i]);
-    }
-
-    result = PRICELIST(tmp_list, 4, tmp_list.size());
-    BOOST_CHECK(result.size() == 6);
-    BOOST_CHECK(result.discard() == 3);
-    for (size_t i = 0; i < result.discard(); ++i) {
-        BOOST_CHECK(result[i] == Null<price_t>());
-    }
-    for (size_t i = result.discard(); i < result.size(); ++i) {
-        BOOST_CHECK(result[i] == tmp_list[i + 4]);
-    }
-
-    for (size_t i = 0; i < 10; ++i) {
-        tmp[i] = i;
-    }
-    tmp[4] = Null<price_t>();
-    result = PRICELIST(tmp, 10);
-    BOOST_CHECK(result.size() == 10);
-    BOOST_CHECK(result.discard() == 5);
-    for (size_t i = 0; i < result.discard(); ++i) {
-        BOOST_CHECK(result[i] == Null<price_t>());
-    }
-    for (size_t i = result.discard(); i < result.size(); ++i) {
-        BOOST_CHECK(result[i] == tmp[i]);
+        BOOST_CHECK(result[i] == ikdata.get(i, 1));
     }
 }
 

@@ -18,15 +18,12 @@ namespace hku {
  * 抛弃数 = 0
  */
 class Ema: public IndicatorImp {
+    INDICATOR_IMP(Ema)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    Ema(int n = 22);
-    Ema(const Indicator&, int n = 22);
+    Ema();
     virtual ~Ema();
-
-    virtual string name() const;
-    virtual IndicatorImpPtr operator()(const Indicator& ind);
 };
 
 } /* namespace hku */

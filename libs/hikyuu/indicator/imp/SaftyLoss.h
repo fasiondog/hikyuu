@@ -25,15 +25,12 @@ namespace hku {
  *       p: 噪音系数，默认为2
  */
 class SaftyLoss: public hku::IndicatorImp {
+    INDICATOR_IMP(SaftyLoss)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    SaftyLoss(int n1 = 10, int n2 = 3, double p = 2.0);
-    SaftyLoss(const Indicator& data, int n1 = 10, int n2 = 3, double p = 2.0);
+    SaftyLoss();
     virtual ~SaftyLoss();
-
-    virtual string name() const;
-    virtual IndicatorImpPtr operator()(const Indicator& ind);
 };
 
 } /* namespace hku */

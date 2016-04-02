@@ -27,7 +27,6 @@ HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr& sl) {
 StoplossPtr StoplossBase::clone() {
     StoplossPtr p = _clone();
     p->m_params = m_params;
-    p->m_name = m_name;
     p->m_tm = m_tm;
     p->m_kdata = m_kdata;
     return p;

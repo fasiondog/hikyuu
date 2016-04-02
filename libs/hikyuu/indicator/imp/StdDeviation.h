@@ -20,16 +20,12 @@ namespace hku {
  *
  */
 class StdDeviation: public hku::IndicatorImp {
+    INDICATOR_IMP(StdDeviation)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     StdDeviation();
-    StdDeviation(int n);
-    StdDeviation(const Indicator& data, int n);
     virtual ~StdDeviation();
-
-    virtual string name() const;
-    virtual IndicatorImpPtr operator()(const Indicator& ind);
 };
 
 } /* namespace hku */

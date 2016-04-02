@@ -6,68 +6,79 @@
  */
 
 #include "IKData.h"
+#include "../crt/PRICELIST.h"
 #include <boost/algorithm/string.hpp>
 
 namespace hku {
 
-IKData::IKData(const KData& kdata, ValueType valueType)
-: IndicatorImp(0, 1), m_valueType(valueType) {
+IKData::IKData(): IndicatorImp("KDATA") {
+    setParam<string>("kpart", "KDATA");
+}
+
+IKData::IKData(const KData& kdata, const string& part)
+: IndicatorImp() {
+    string part_name(part);
+    boost::to_upper(part_name);
+    setParam<string>("kpart", part_name);
+
     size_t total = kdata.size();
-    switch (valueType) {
-    case KDATA:
-        m_result_num = 6;
-        for (size_t i = 1; i < 6; ++i) {
-            m_pBuffer[i] = new PriceList();
-        }
+    if ("KDATA" == part_name) {
+        m_name = "KDATA";
+        _readyBuffer(total, 6);
         for (size_t i = 0; i < total; ++i) {
-            _append(kdata[i].openPrice, 0);
-            _append(kdata[i].highPrice, 1);
-            _append(kdata[i].lowPrice, 2);
-            _append(kdata[i].closePrice, 3);
-            _append(kdata[i].transAmount, 4);
-            _append(kdata[i].transCount, 5);
+            _set(kdata[i].openPrice, i, 0);
+            _set(kdata[i].highPrice, i, 1);
+            _set(kdata[i].lowPrice, i, 2);
+            _set(kdata[i].closePrice, i, 3);
+            _set(kdata[i].transAmount, i, 4);
+            _set(kdata[i].transCount, i, 5);
         }
-        break;
 
-    case OPEN:
+    } else if ("OPEN" == part_name) {
+        m_name = "OPEN";
+        _readyBuffer(total, 1);
         for (size_t i = 0; i < total; ++i) {
-            _append(kdata[i].openPrice);
+            _set(kdata[i].openPrice, i);
         }
-        break;
 
-    case HIGH:
+    } else if ("HIGH" == part_name) {
+        m_name = "HIGH";
+        _readyBuffer(total, 1);
         for (size_t i = 0; i < total; ++i) {
-            _append(kdata[i].highPrice);
+            _set(kdata[i].highPrice, i);
         }
-        break;
-
-    case LOW:
+    } else if ("LOW" == part_name) {
+        m_name = "LOW";
+        _readyBuffer(total, 1);
         for (size_t i = 0; i < total; ++i) {
-            _append(kdata[i].lowPrice);
+            _set(kdata[i].lowPrice, i);
         }
-        break;
 
-    case CLOSE:
+    } else if ("CLOSE" == part_name) {
+        m_name = "CLOSE";
+        _readyBuffer(total, 1);
         for (size_t i = 0; i < total; ++i) {
-            _append(kdata[i].closePrice);
+            _set(kdata[i].closePrice, i);
         }
-        break;
 
-    case AMOUNT:
+    } else if ("AMO" == part_name) {
+        m_name = "AMO";
+        _readyBuffer(total, 1);
         for (size_t i = 0; i < total; ++i) {
-            _append(kdata[i].transAmount);
+            _set(kdata[i].transAmount, i);
         }
-        break;
 
-    case COUNT:
+    } else if ("VOL" == part_name) {
+        m_name = "VOL";
+        _readyBuffer(total, 1);
         for (size_t i = 0; i < total; ++i) {
-            _append(kdata[i].transCount);
+            _set(kdata[i].transCount, i);
         }
-        break;
 
-    default:
+    } else {
+        m_name = "Unknow";
+        m_discard = total;
         HKU_INFO("Unkown ValueType of KData [IKData::IKData]");
-        break;
     }
 }
 
@@ -76,82 +87,209 @@ IKData::~IKData() {
 
 }
 
-
-string IKData::name() const {
-    if (m_valueType == OPEN) {
-        return "OPEN";
-    } else if (m_valueType == HIGH) {
-        return "HIGH";
-    } else if (m_valueType == LOW) {
-        return "LOW";
-    } else if (m_valueType == CLOSE) {
-        return "CLOSE";
-    } else if (m_valueType == AMOUNT) {
-        return "AMO";
-    } else if (m_valueType == COUNT) {
-        return "VOL";
+//支持KDATA Indicator作为参数
+void IKData::calculate(const Indicator& ind) {
+    if (ind.getResultNumber() < 6) {
+        return;
     }
 
-    return "Unknow";
+    size_t total = ind.size();
+    if (total == 0) {
+        return;
+    }
+
+    string part = getParam<string>("kpart");
+    m_discard = ind.discard();
+
+    if ("KDATA" == part) {
+        _readyBuffer(total, 6);
+        for (size_t i = m_discard; i < total; ++i) {
+            _set(ind.get(i,0), i, 0);
+            _set(ind.get(i,1), i, 1);
+            _set(ind.get(i,2), i, 2);
+            _set(ind.get(i,3), i, 3);
+            _set(ind.get(i,4), i, 4);
+            _set(ind.get(i,5), i, 5);
+        }
+        return;
+    }
+
+    int result_num = 0;
+    if ("OPEN" == part) {
+        result_num = 0;
+    } else if ("HIGH" == part) {
+        result_num = 1;
+    } else if ("LOW" == part) {
+        result_num = 2;
+    } else if ("CLOSE" == part) {
+        result_num = 3;
+    } else if ("AMO" == part) {
+        result_num = 4;
+    } else if ("VOL" == part) {
+        result_num = 5;
+    } else {
+        //无效参数值，退出
+        return;
+    }
+
+    _readyBuffer(total, 1);
+    for (size_t i = m_discard; i < total; ++i) {
+        _set(ind.get(i, result_num), i);
+    }
 }
 
-
 Indicator HKU_API KDATA(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::KDATA)));
+    return Indicator(IndicatorImpPtr(new IKData(kdata, "KDATA")));
 }
 
 Indicator HKU_API OPEN(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::OPEN)));
+    return Indicator(IndicatorImpPtr(new IKData(kdata, "OPEN")));
 }
 
 Indicator HKU_API HIGH(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::HIGH)));
+    return Indicator(IndicatorImpPtr(new IKData(kdata, "HIGH")));
 }
 
 Indicator HKU_API LOW(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::LOW)));
+    return Indicator(IndicatorImpPtr(new IKData(kdata, "LOW")));
 }
 
 Indicator HKU_API CLOSE(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::CLOSE)));
-}
-
-Indicator HKU_API TRANSAMOUNT(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::AMOUNT)));
-}
-
-Indicator HKU_API TRANSCOUNT(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::COUNT)));
+    return Indicator(IndicatorImpPtr(new IKData(kdata, "CLOSE")));
 }
 
 Indicator HKU_API AMO(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::AMOUNT)));
+    return Indicator(IndicatorImpPtr(new IKData(kdata, "AMO")));
 }
 
 Indicator HKU_API VOL(const KData& kdata) {
-    return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::COUNT)));
+    return Indicator(IndicatorImpPtr(new IKData(kdata, "VOL")));
 }
 
 Indicator HKU_API KDATA_PART(const KData& kdata, const string& part) {
-    string part_name(part);
-    boost::to_upper(part_name);
-    if ("KDATA" == part_name) {
-        return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::KDATA)));
-    } else if ("OPEN" == part_name) {
-        return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::OPEN)));
-    } else if ("HIGH" == part_name) {
-        return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::HIGH)));
-    } else if ("LOW" == part_name) {
-        return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::LOW)));
-    } else if ("CLOSE" == part_name) {
-        return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::CLOSE)));
-    } else if ("TRANSAMOUNT" == part_name || "AMO" == part_name) {
-        return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::AMOUNT)));
-    } else if ("TRANSCOUNT" == part_name || "VOL" == part_name) {
-        return Indicator(IndicatorImpPtr(new IKData(kdata, IKData::COUNT)));
-    }
+    return Indicator(IndicatorImpPtr(new IKData(kdata, part)));
+}
 
-    return Indicator();
+//-----------------------------------------------------------
+Indicator HKU_API KDATA(const Indicator& kdata) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "KDATA");
+    p->name("KDATA");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+Indicator HKU_API OPEN(const Indicator& kdata) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "OPEN");
+    p->name("OPEN");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+Indicator HKU_API HIGH(const Indicator& kdata) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "HIGH");
+    p->name("HIGH");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+Indicator HKU_API LOW(const Indicator& kdata) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "LOW");
+    p->name("LOW");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+Indicator HKU_API CLOSE(const Indicator& kdata) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "CLOSE");
+    p->name("CLOSE");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMO(const Indicator& kdata) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "AMO");
+    p->name("AMO");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+Indicator HKU_API VOL(const Indicator& kdata) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "VOL");
+    p->name("VOL");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+Indicator HKU_API KDATA_PART(const Indicator& kdata, const string& part) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", part);
+    p->name("KDATA_PART");
+    p->calculate(kdata);
+    return Indicator(p);
+}
+
+//-----------------------------------------------------------
+Indicator HKU_API KDATA() {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "KDATA");
+    p->name("KDATA");
+    return Indicator(p);
+}
+
+Indicator HKU_API OPEN() {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "OPEN");
+    p->name("OPEN");
+    return Indicator(p);
+}
+
+Indicator HKU_API HIGH() {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "HIGH");
+    p->name("HIGH");
+    return Indicator(p);
+}
+
+Indicator HKU_API LOW() {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "LOW");
+    p->name("LOW");
+    return Indicator(p);
+}
+
+Indicator HKU_API CLOSE() {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "CLOSE");
+    p->name("CLOSE");
+    return Indicator(p);
+}
+
+Indicator HKU_API AMO() {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "AMO");
+    p->name("AMO");
+    return Indicator(p);
+}
+
+Indicator HKU_API VOL() {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", "VOL");
+    p->name("VOL");
+    return Indicator(p);
+}
+
+Indicator HKU_API KDATA_PART(const string& part) {
+    IndicatorImpPtr p(new IKData());
+    p->setParam<string>("kpart", part);
+    p->name("KDATA_PART");
+    return Indicator(p);
 }
 
 } /* namespace hku */

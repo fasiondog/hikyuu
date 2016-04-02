@@ -20,7 +20,7 @@ using namespace hku;
 class ConditionTest: public ConditionBase {
 public:
     ConditionTest(): ConditionBase("TEST") {
-        addParam<int>("n", 10);
+        setParam<int>("n", 10);
         m_flag = false;
     }
 
@@ -55,7 +55,7 @@ private:
 };
 
 /**
- * @defgroup test_Condition
+ * @defgroup test_Condition test_Condition
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

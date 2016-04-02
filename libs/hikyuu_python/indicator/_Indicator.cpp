@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/indicator/Indicator.h>
+#include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
@@ -19,14 +20,19 @@ Indicator (*indicator_sub)(const Indicator&, const Indicator&) = operator-;
 Indicator (*indicator_mul)(const Indicator&, const Indicator&) = operator*;
 Indicator (*indicator_div)(const Indicator&, const Indicator&) = operator/;
 
+string (Indicator::*read_name)() const = &Indicator::name;
+void (Indicator::*write_name)(const string&) = &Indicator::name;
+
 void export_Indicator() {
 
     class_<Indicator>("Indicator", init<>())
         .def(init<IndicatorImpPtr>())
         .def(self_ns::str(self))
-        .add_property("name", &Indicator::name)
+        .add_property("name", read_name, write_name)
         .add_property("long_name", &Indicator::long_name)
         .add_property("discard", &Indicator::discard)
+        .def("getParam", &Indicator::getParam<boost::any>)
+        .def("setParam", &Indicator::setParam<object>)
         .def("size", &Indicator::size)
         .def("empty", & Indicator::empty)
         .def("getResultNumber", &Indicator::getResultNumber)

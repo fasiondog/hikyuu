@@ -25,7 +25,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_stoploss_serialization
+ * @defgroup test_stoploss_serialization test_stoploss_serialization
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

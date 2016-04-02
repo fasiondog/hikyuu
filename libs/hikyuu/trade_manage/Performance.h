@@ -22,7 +22,7 @@ public:
 
     void reset();
 
-    void report(const TradeManagerPtr& tm,
+    string report(const TradeManagerPtr& tm,
             const Datetime& datetime = Datetime::now());
 
     /*

@@ -14,6 +14,7 @@ void export_util();
 void export_Datetime();
 void export_StockManager();
 void export_Stock();
+void export_Block();
 void export_MarketInfo();
 void export_StockTypeInfo();
 void export_StockWeight();
@@ -25,6 +26,7 @@ void export_save_load();
 
 BOOST_PYTHON_MODULE(_hikyuu){
     boost::python::def("hikyuu_init", hku::hikyuu_init);
+    boost::python::def("getStock", hku::getStock);
 
     export_DataType();
     export_Constant();
@@ -38,6 +40,7 @@ BOOST_PYTHON_MODULE(_hikyuu){
     export_KReord();
     export_KData();
     export_Stock();
+    export_Block();
     export_Parameter();
     export_save_load();
 }

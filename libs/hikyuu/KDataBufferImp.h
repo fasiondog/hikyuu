@@ -22,7 +22,7 @@ public:
         return m_buffer[pos];
     }
 
-    virtual KRecord getKRecordByDate(const Datetime& datetime) const;
+    virtual size_t getPos(const Datetime& datetime) const;
 
 private:
     void _recoverForward();

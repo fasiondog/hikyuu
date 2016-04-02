@@ -19,6 +19,7 @@
 #include <boost/config.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <stdio.h>
@@ -59,6 +60,7 @@ typedef std::string string;
 
 using boost::shared_ptr;
 using boost::make_shared;
+using boost::enable_shared_from_this;
 using boost::scoped_ptr;
 
 //using boost::container::vector;

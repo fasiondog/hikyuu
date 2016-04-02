@@ -66,13 +66,13 @@ class TradeCostTest(unittest.TestCase):
         cost = tc.getBuyCost(Datetime(200101010000), stock, 10.0, 2100)
         self.assertEqual(cost, CostRecord(37.8, 0, 2.1, 0, 39.9))
         cost = tc.getSellCost(Datetime(200101010000), stock, 10.0, 2100)
-        self.assertEqual(cost, CostRecord(37.8, 21, 2.1, 0, 60.9))
+        self.assertEqual(cost, CostRecord(37.8, 0, 2.1, 0, 39.9))
 
         clone_tc = tc.clone()
         cost = clone_tc.getBuyCost(Datetime(200101010000), stock, 10.0, 2100)
         self.assertEqual(cost, CostRecord(37.8, 0, 2.1, 0, 39.9))
         cost = clone_tc.getSellCost(Datetime(200101010000), stock, 10.0, 2100)
-        self.assertEqual(cost, CostRecord(37.8, 21, 2.1, 0, 60.9))
+        self.assertEqual(cost, CostRecord(37.8, 0, 2.1, 0, 39.9))
        
         
 def suite():

@@ -27,7 +27,7 @@ using namespace hku;
 #if HKU_SUPPORT_SERIALIZATION
 
 /**
- * @defgroup test_trade_manage_export
+ * @defgroup test_trade_manage_export test_trade_manage_export
  * @ingroup test_hikyuu_trade_manage_suite
  * @{
  */
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE( test_PositionRecord_export ) {
     record1.stoploss = 10.11;
     record1.goalPrice = 11.13;
     record1.totalNumber = 2000;
-    record1.totalMoney = 22000;
+    record1.buyMoney = 22000;
     record1.totalCost = 23.1;
     record1.totalRisk = 9.77;
     record1.sellMoney = 9180.1;

@@ -19,7 +19,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_Simple_SYS
+ * @defgroup test_Simple_SYS test_Simple_SYS
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

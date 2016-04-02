@@ -18,7 +18,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_FixedPercent_SL
+ * @defgroup test_FixedPercent_SL test_FixedPercent_SL
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

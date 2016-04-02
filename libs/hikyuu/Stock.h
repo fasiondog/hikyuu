@@ -175,6 +175,12 @@ public:
     /** 是否为Null */
     bool isNull() const;
 
+    /** （临时函数）只用于更新缓存中的日线数据 **/
+    void realtimeUpdate(const KRecord&);
+
+    /** 仅用于python的__str__ */
+    string toString() const;
+
 private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;

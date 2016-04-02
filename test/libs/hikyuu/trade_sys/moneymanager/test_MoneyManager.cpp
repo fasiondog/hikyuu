@@ -27,7 +27,7 @@ public:
     int getX() const { return m_x; }
     void setX(int x) { m_x = x; }
 
-    virtual size_t getBuyNumber(const Datetime& datetime, const Stock& stock,
+    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
                 price_t price, price_t risk) {
         return 0;
     }
@@ -53,7 +53,7 @@ private:
 
 
 /**
- * @defgroup test_MoneyManager
+ * @defgroup test_MoneyManager test_MoneyManager
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */
@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE( test_MoneyManager ) {
     BOOST_CHECK(p_src->getKType() == KQuery::DAY);
     p->setTM(tm);
     BOOST_CHECK(p_src->getTM() == tm);
-    BOOST_CHECK(p->getBuyNumber(Datetime(200001010000), stock, 10.0, 0.0) == 0.0);
-    BOOST_CHECK(p->getSellNumber(Datetime(200001010000), stock, 10.0, 0.0) == Null<size_t>());
+    BOOST_CHECK(p->getBuyNumber(Datetime(200001010000), stock, 10.0, 10.0) == 0);
+    BOOST_CHECK(p->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0) == 0);
     BOOST_CHECK(p_src->getX() == 0);
     p_src->setX(10);
     BOOST_CHECK(p_src->getX() == 10);

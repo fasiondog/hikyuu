@@ -38,7 +38,7 @@ void export_StockWeight() {
             ;
 
     StockWeightList::const_reference (StockWeightList::*weightList_at)(StockWeightList::size_type) const = &StockWeightList::at;
-    class_<StockWeightList>("DatetimeList")
+    class_<StockWeightList>("StockWeightList")
             .def("__iter__", iterator<StockWeightList>())
             .def("size", &StockWeightList::size)
             .def("__len__", &StockWeightList::size)

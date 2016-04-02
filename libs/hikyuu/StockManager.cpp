@@ -93,8 +93,7 @@ void StockManager::init(const string& filename) {
     bool preload_halfyear = m_iniconfig->getBool("preload", "halfyear", "false");
     bool preload_year = m_iniconfig->getBool("preload", "year", "false");
 
-    map<string, Stock>::iterator iter;
-    for(iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+    for(auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
         iter->second.setKDataDriver(kdata_driver);
 
         if (preload_day) iter->second.loadKDataToBuffer(KQuery::DAY);
@@ -103,10 +102,6 @@ void StockManager::init(const string& filename) {
         if (preload_quarter) iter->second.loadKDataToBuffer(KQuery::QUARTER);
         if (preload_halfyear) iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
         if (preload_year) iter->second.loadKDataToBuffer(KQuery::YEAR);
-    }
-
-    for(iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        m_stockList.push_back(iter->second);
     }
 
     boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start_time;
@@ -124,8 +119,7 @@ Stock StockManager::getStock(const string& querystr) const {
     Stock result;
     string query_str = querystr;
     boost::to_upper(query_str);
-    map<string, Stock>::const_iterator iter;
-    iter = m_stockDict.find(query_str);
+    auto iter = m_stockDict.find(query_str);
     if(iter != m_stockDict.end()) {
         return iter->second;
     }
@@ -136,8 +130,7 @@ Stock StockManager::getStock(const string& querystr) const {
 MarketInfo StockManager::getMarketInfo(const string& market) const {
     string market_tmp = market;
     boost::to_upper(market_tmp);
-    map<string, MarketInfo>::const_iterator iter;
-    iter = m_marketInfoDict.find(market_tmp);
+    auto iter = m_marketInfoDict.find(market_tmp);
     if(iter != m_marketInfoDict.end()) {
         return iter->second;
     }
@@ -146,8 +139,7 @@ MarketInfo StockManager::getMarketInfo(const string& market) const {
 
 
 StockTypeInfo StockManager::getStockTypeInfo(hku_uint32 type) const {
-    map<hku_uint32, StockTypeInfo>::const_iterator iter;
-    iter = m_stockTypeInfo.find(type);
+    auto iter = m_stockTypeInfo.find(type);
     if( iter != m_stockTypeInfo.end() ){
         return iter->second;
     }
@@ -156,26 +148,63 @@ StockTypeInfo StockManager::getStockTypeInfo(hku_uint32 type) const {
 
 
 bool StockManager::addStock(const Stock& stock) {
-    map<string, Stock>::iterator iter;
-    iter = m_stockDict.find(stock.market() + stock.code());
+    auto iter = m_stockDict.find(stock.market_code());
     if(iter != m_stockDict.end()) {
         HKU_ERROR("The stock had exist! [StockManager::addStock]");
         return false;
     }
 
-    m_stockDict[stock.market() + stock.code()] = stock;
+    m_stockDict[stock.market_code()] = stock;
     return true;
 }
 
 
 MarketList StockManager::getAllMarket() const {
     MarketList result;
-    map<string, MarketInfo>::const_iterator iter = m_marketInfoDict.begin();
+    auto iter = m_marketInfoDict.begin();
     for(; iter != m_marketInfoDict.end(); ++iter) {
         result.push_back(iter->first);
     }
     return result;
 }
 
+
+Block StockManager::getBlock(const string& category, const string& name) {
+    Block result;
+    auto block_driver = DataDriverFactory::getBlockDriver(m_iniconfig);
+    if (!block_driver) {
+        return result;
+    }
+    return block_driver->getBlock(category, name);
+}
+
+BlockList StockManager::getBlockList(const string& category) {
+    BlockList result;
+    auto block_driver = DataDriverFactory::getBlockDriver(m_iniconfig);
+    if (!block_driver) {
+        return result;
+    }
+    return block_driver->getBlockList(category);
+}
+
+BlockList StockManager::getBlockList() {
+    BlockList result;
+    auto block_driver = DataDriverFactory::getBlockDriver(m_iniconfig);
+    if (!block_driver) {
+        return result;
+    }
+    return block_driver->getBlockList();
+}
+
+DatetimeList StockManager::
+getTradingCalendar(const KQuery& query, const string& market) {
+    Stock stock = getStock("SH000001");
+    size_t start_ix = 0, end_ix = 0;
+    DatetimeList result;
+    if (stock.getIndexRange(query, start_ix, end_ix)) {
+        result = stock.getDatetimeList(start_ix, end_ix, KQuery::DAY);
+    }
+    return result;
+}
 
 } /* namespace */

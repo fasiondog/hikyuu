@@ -14,10 +14,19 @@ Copyright (c)  Fasiondog; mailto:fasiondog@gmail.com
     or contact the author. All Rights Reserved.
 """
 
+import sys
+if sys.version > '3':
+    IS_PY3 = True
+else:
+    IS_PY3 = False
+
 from ._hikyuu import *
 from hikyuu.util.mylog import escapetime
 
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
+from datetime import date, datetime
+import numpy as np
+import pandas as pd
 
 MarketInfo.__unicode__ = unicodeFunc
 MarketInfo.__repr__ = reprFunc
@@ -28,9 +37,6 @@ StockTypeInfo.__repr__ = reprFunc
 KQuery.__unicode__ = unicodeFunc
 KQuery.__repr__ = reprFunc
 
-KQueryByDate.__unicode__ = unicodeFunc
-KQueryByDate.__repr__ = reprFunc
-
 KRecord.__unicode__ = unicodeFunc
 KRecord.__repr__ = reprFunc
 
@@ -39,6 +45,9 @@ KData.__repr__ = reprFunc
 
 Stock.__unicode__ = unicodeFunc
 Stock.__repr__ = reprFunc
+
+Block.__unicode__ = unicodeFunc
+Block.__repr__ = reprFunc
 
 Datetime.__unicode__ = unicodeFunc
 Datetime.__repr__ = reprFunc
@@ -62,6 +71,27 @@ Stock.__hash__ = stock_hash
 
 
 #================================================================
+# Datetime支持直接从date, datetime变量初始化
+__old_Datetime_init__ = Datetime.__init__
+
+def __new_Datetime_init__(self, var = None):
+    if var is None:
+        __old_Datetime_init__(self)
+    elif isinstance(var, date):
+        __old_Datetime_init__(self, "{} 00".format(var))
+    elif isinstance(var, datetime):
+        __old_Datetime_init__(self, str(var))
+    elif isinstance(var, str):
+        if var.find(' ') == -1:
+            __old_Datetime_init__(self, "{} 00".format(var))
+        else:
+            __old_Datetime_init__(self, var)
+    else:
+        __old_Datetime_init__(self, var)
+        
+Datetime.__init__ =  __new_Datetime_init__       
+
+#================================================================ 
 #重定义KQuery
 class Query(KQuery):
     """重新定义KQuery，目的如下：
@@ -92,37 +122,8 @@ class Query(KQuery):
                  kType = KQuery.KType.DAY, recoverType = KQuery.RecoverType.NO_RECOVER):
         super(Query, self).__init__(start, end, kType, recoverType)
 
-QueryByIndex = Query        
-
-class QueryByDate(KQueryByDate):
-    """重新定义KQueryByDate，目的如下：
-    1、使用短类名
-    2、使用短枚举类型
-    3、利用Python命名参数优点
-    """
-    INDEX = KQuery.QueryType.INDEX
-    DATE = KQuery.QueryType.DATE
-    DAY = KQuery.KType.DAY
-    WEEK = KQuery.KType.WEEK
-    MONTH = KQuery.KType.MONTH
-    QUARTER = KQuery.KType.QUARTER
-    HALFYEAR = KQuery.KType.HALFYEAR
-    YEAR = KQuery.KType.YEAR
-    MIN = KQuery.KType.MIN
-    MIN5 = KQuery.KType.MIN5
-    MIN15 = KQuery.KType.MIN15
-    MIN30 = KQuery.KType.MIN30
-    MIN60 = KQuery.KType.MIN60
-    NO_RECOVER = KQuery.RecoverType.NO_RECOVER
-    FORWARD = KQuery.RecoverType.FORWARD
-    BACKWARD = KQuery.RecoverType.BACKWARD
-    EQUAL_FORWARD = KQuery.RecoverType.EQUAL_FORWARD
-    EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
-    
-    def __init__(self, start, end = constant.null_datetime, 
-                 kType = Query.DAY, recoverType = Query.NO_RECOVER):
-        super(Query, self).__init__(start, end, kType, recoverType)
-                
+QueryByIndex = KQueryByIndex
+QueryByDate = KQueryByDate
 
 KQuery.INDEX = KQuery.QueryType.INDEX
 KQuery.DATE = KQuery.QueryType.DATE
@@ -146,17 +147,66 @@ KQuery.EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
 #================================================================
 #封装KData
 def KData_getitem(kdata, i):
-    length = len(kdata)
-    index = length + i if i < 0 else i
-    if index < 0 or index >= length:
-        raise IndexError("index out of range: %d" % i)
-    return kdata.getKRecord(index)
+    if isinstance(i, int):
+        length = len(kdata)
+        index = length + i if i < 0 else i
+        if index < 0 or index >= length:
+            raise IndexError("index out of range: %d" % i)
+        return kdata.getKRecord(index)
+    
+    elif isinstance(i, Datetime):
+        return kdata.getKRecordByDate(i)
+    
+    elif isinstance(i, slice):
+        return [kdata.getKRecord(x) for x in range(*i.indices(len(kdata)))]
+        
+    else:
+        raise IndexError("Error index type")
+        return KRecord()
 
 def KData_iter(kdata):
     for i in range(len(kdata)):
         yield kdata[i]
         
+def KData_getPos(kdata, datetime):
+    pos = kdata._getPos(datetime)
+    return pos if pos != constant.null_size else None
+
+def KData_to_np(k):
+    """转化为numpy结构数组"""
+    k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 'amount', 'count'], 
+            'formats':['datetime64[D]','d','d','d','d','d','d']})
+    return np.array([(k[i].datetime, k[i].openPrice, k[i].highPrice, 
+                      k[i].lowPrice, k[i].closePrice, k[i].transAmount, 
+                      k[i].transCount) for i in range(len(k))], dtype=k_type)
     
+def KData_to_df(k):
+    """转化为pandas的DataFrame"""
+    return pd.DataFrame.from_records(KData_to_np(k), index='datetime')    
+    
+
 KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
+KData.getPos = KData_getPos
+KData.to_np = KData_to_np
+KData.to_df = KData_to_df
 
+#================================================================
+def list_getitem(data, i):
+    if isinstance(i, int):
+        length = len(data)
+        index = length + i if i < 0 else i
+        if index < 0 or index >= length:
+            raise IndexError("index out of range: %d" % i)
+        return data.get(index)
+    
+    elif isinstance(i, slice):
+        return [data.get(x) for x in range(*i.indices(len(data)))]
+    
+    else:
+        raise IndexError("Error index type")
+        
+PriceList.__getitem__ = list_getitem
+DatetimeList.__getitem__ = list_getitem
+StringList.__getitem__ = list_getitem
+BlockList.__getitem__ = list_getitem

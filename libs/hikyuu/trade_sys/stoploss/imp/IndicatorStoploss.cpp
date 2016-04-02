@@ -10,18 +10,23 @@
 
 namespace hku {
 
-IndicatorStoploss::IndicatorStoploss(): StoplossBase("IndicatorSL") {
+IndicatorStoploss::IndicatorStoploss(): StoplossBase() {
 
 }
 
 IndicatorStoploss::
-IndicatorStoploss(const Indicator& ind, const string& kdata_part)
-: StoplossBase("IndicatorSL"), m_ind(ind), m_kdata_part(kdata_part) {
+IndicatorStoploss(const string& name, const Indicator& ind,
+        const string& kdata_part)
+: StoplossBase(), m_name(name), m_ind(ind), m_kdata_part(kdata_part) {
 
 }
 
 IndicatorStoploss::~IndicatorStoploss() {
 
+}
+
+string IndicatorStoploss::name() const {
+    return m_name;
 }
 
 price_t IndicatorStoploss::getPrice(const Datetime& datetime, price_t price) {
@@ -33,7 +38,8 @@ void IndicatorStoploss::_reset() {
 }
 
 StoplossPtr IndicatorStoploss::_clone() {
-    IndicatorStoploss *p = new IndicatorStoploss(m_ind, m_kdata_part);
+    IndicatorStoploss *p = new IndicatorStoploss(m_name, m_ind, m_kdata_part);
+    p->m_name = m_name;
     p->m_result = m_result;
     return StoplossPtr(p);
 }

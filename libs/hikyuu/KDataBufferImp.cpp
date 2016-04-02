@@ -70,7 +70,7 @@ KDataBufferImp::~KDataBufferImp() {
 }
 
 
-KRecord KDataBufferImp::getKRecordByDate(const Datetime& datetime) const {
+size_t KDataBufferImp::getPos(const Datetime& datetime) const {
     KRecordList::const_iterator iter;
     KRecord comp_record;
     comp_record.datetime = datetime;
@@ -80,11 +80,12 @@ KRecord KDataBufferImp::getKRecordByDate(const Datetime& datetime) const {
 
     iter = lower_bound(m_buffer.begin(), m_buffer.end(), comp_record, f);
     if (iter == m_buffer.end() || iter->datetime != datetime) {
-        return Null<KRecord>();
+        return Null<size_t>();
     }
 
-    return *iter;
+    return (iter - m_buffer.begin());
 }
+
 
 /******************************************************************************
  * 前复权公式:复权后价格＝[(复权前价格-现金红利)＋配(新)股价格×流通股份变动比例]÷(1＋流通股份变动比例)

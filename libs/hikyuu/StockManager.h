@@ -11,8 +11,10 @@
 #include <hikyuu_utils/iniparser/IniParser.h>
 
 #include "Stock.h"
+#include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
+#include "StockMapIterator.h"
 
 namespace hku {
 
@@ -70,8 +72,30 @@ public:
     /** 获取市场简称列表 */
     MarketList getAllMarket() const;
 
-    /** 获取所有Stock列表 */
-    StockList getAllStock() const;
+    /**
+     * 获取预定义的板块
+     * @param category 板块分类
+     * @param name 板块名称
+     * @return 板块，如找不到返回空
+     */
+    Block getBlock(const string& category, const string& name);
+
+    /**
+     * 获取指定分类的板块列表
+     * @param category 板块分类
+     * @return 板块列表
+     */
+    BlockList getBlockList(const string&);
+
+    /**
+     * 获取所有板块
+     * @return 板块列表
+     */
+    BlockList getBlockList();
+
+    //目前支持"SH"
+    DatetimeList getTradingCalendar(const KQuery& query,
+            const string& market = "SH");
 
     /**
      * 初始化时，添加Stock，仅供BaseInfoDriver子类使用
@@ -81,21 +105,23 @@ public:
     bool addStock(const Stock& stock);
 
 public:
-    typedef vector<Stock>::const_iterator iterator;
-    iterator begin() { return m_stockList.begin(); }
-    iterator end() { return m_stockList.end(); }
+    typedef StockMapIterator const_iterator;
+    const_iterator begin() const { return m_stockDict.begin(); }
+    const_iterator end() const { return m_stockDict.end(); }
 
 private:
     StockManager() { }
 
 private:
     static shared_ptr<StockManager> m_sm;
-
     shared_ptr<IniParser> m_iniconfig;
-    vector<Stock> m_stockList;  //TODO:为了实现迭代器，以后可能自定义迭代器后便不再需要
-    map<string, Stock> m_stockDict;  // SH000001 -> stock
-    map<string, MarketInfo> m_marketInfoDict;
-    map<hku_uint32, StockTypeInfo> m_stockTypeInfo;
+    StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
+
+    typedef unordered_map<string, MarketInfo> MarketInfoMap;
+    MarketInfoMap m_marketInfoDict;
+
+    typedef unordered_map<hku_uint32, StockTypeInfo> StockTypeInfoMap;
+    StockTypeInfoMap m_stockTypeInfo;
 };
 
 
@@ -107,12 +133,6 @@ inline size_t StockManager::size() const {
 inline Stock StockManager::operator[](const string& query) const {
     return getStock(query);
 }
-
-
-inline StockList StockManager::getAllStock() const {
-    return m_stockList;
-}
-
 
 } /* namespace */
 

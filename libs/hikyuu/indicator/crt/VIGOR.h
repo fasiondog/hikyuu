@@ -24,7 +24,7 @@ namespace hku {
  * @param n EMA平滑窗口，必须大于等于1
  * @ingroup Indicator
  */
-Indicator HKU_API VIGOR(const KData& data, int n);
+Indicator HKU_API VIGOR(const KData& data, int n = 2);
 
 } /* namespace */
 

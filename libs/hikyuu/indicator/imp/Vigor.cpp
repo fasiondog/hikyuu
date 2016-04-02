@@ -7,46 +7,45 @@
 
 #include "Vigor.h"
 #include "../crt/EMA.h"
+#include "../crt/PRICELIST.h"
+#include "../crt/KDATA.h"
+#include "../crt/REF.h"
 
 namespace hku {
 
-Vigor::Vigor(): IndicatorImp() {
-
+Vigor::Vigor(): IndicatorImp("VIGOR") {
+    setParam<int>("n", 2);
 }
 
-Vigor::Vigor(const KData& kdata, int n): IndicatorImp(1, 1) {
-    addParam<int>("n", n);
+Vigor::Vigor(const KData& kdata, int n): IndicatorImp() {
+    size_t total = kdata.size();
+    _readyBuffer(total, 1);
+
+    setParam<int>("n", n);
     if (n < 1) {
         HKU_ERROR("Invalide param[n] must >= 1 ! [Vigor::Vigor]");
         return;
     }
 
-    size_t total = kdata.size();
+    m_discard = 1;
     if (0 == total) {
         return;
     }
 
-    IndicatorImpPtr tmp(new IndicatorImp(1, 1));
-    tmp->_append(Null<price_t>());
+    PriceList tmp(total, Null<price_t>());
     for (size_t i = 1; i < total; ++i) {
-        KRecord today = kdata[i];
-        tmp->_append((today.closePrice - kdata[i-1].closePrice) * today.transCount);
+        tmp[i] = (kdata[i].closePrice - kdata[i-1].closePrice) * kdata[i].transCount;
     }
 
-    Indicator ema = EMA(Indicator(tmp), n);
+    Indicator ema = EMA(PRICELIST(tmp, 1), n);
     for (size_t i = 0; i < total; ++i) {
-        _append(ema[i]);
+        _set(ema[i], i);
     }
 }
 
 
 Vigor::~Vigor() {
 
-}
-
-
-string Vigor::name() const {
-    return "VIGOR";
 }
 
 

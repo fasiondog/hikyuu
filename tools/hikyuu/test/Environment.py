@@ -15,7 +15,7 @@ from hikyuu.trade_sys.environment import *
 class EnvironmentPython(EnvironmentBase):
     def __init__(self):
         super(EnvironmentPython, self).__init__("EnvironmentPython")
-        self.params.add("n", 10)
+        self.params.set("n", 10)
         self._m_flag = False
         
     def isValid(self, market, datetime):

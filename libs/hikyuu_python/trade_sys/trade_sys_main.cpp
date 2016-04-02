@@ -17,6 +17,8 @@ void export_Stoploss();
 void export_ProfitGoal();
 void export_Slippage();
 void export_System();
+void export_Selector();
+void export_AllocateMoney();
 
 BOOST_PYTHON_MODULE(_trade_sys) {
     export_Environment();
@@ -27,6 +29,8 @@ BOOST_PYTHON_MODULE(_trade_sys) {
     export_ProfitGoal();
     export_Slippage();
     export_System();
+    export_Selector();
+    export_AllocateMoney();
 }
 
 

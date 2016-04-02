@@ -11,7 +11,7 @@
 namespace hku {
 
 PositionRecord::PositionRecord()
-: number(0), stoploss(0.0), goalPrice(0.0), totalNumber(0), totalMoney(0.0),
+: number(0), stoploss(0.0), goalPrice(0.0), totalNumber(0), buyMoney(0.0),
   totalCost(0.0), totalRisk(0.0), sellMoney(0.0) {
 }
 
@@ -30,7 +30,7 @@ PositionRecord::PositionRecord(
         price_t sellMoney)
 : stock(stock), takeDatetime(takeDatetime), cleanDatetime(cleanDatetime),
   number(number), stoploss(stoploss), goalPrice(goalPrice),
-  totalNumber(totalNumber), totalMoney(totalMoney),
+  totalNumber(totalNumber), buyMoney(totalMoney),
   totalCost(totalCost), totalRisk(totalRisk), sellMoney(sellMoney) {
 
 }
@@ -40,17 +40,21 @@ HKU_API std::ostream & operator<<(std::ostream& os, const PositionRecord& record
     Stock stock = record.stock;
     int precision = 2;
     std::string market(""), code(""), name("");
-    if(stock.isNull()){
+    if(!stock.isNull()){
         market = stock.market();
         code = stock.code();
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+        name = utf8_to_gb(stock.name());
+#else
         name = stock.name();
+#endif
     } else {
         precision = stock.precision();
     }
 
     price_t costPrice = 0.0;
     if (record.number != 0.0) {
-        costPrice = roundEx((record.totalMoney - record.sellMoney)
+        costPrice = roundEx((record.buyMoney - record.sellMoney)
                 / record.number, precision);
     }
 
@@ -67,7 +71,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const PositionRecord& record
             << strip << record.stoploss
             << strip << record.goalPrice
             << strip << record.totalNumber
-            << strip << record.totalMoney
+            << strip << record.buyMoney
             << strip << record.totalCost
             << strip << record.totalRisk
             << strip << record.sellMoney << ")";
@@ -76,6 +80,45 @@ HKU_API std::ostream & operator<<(std::ostream& os, const PositionRecord& record
     return os;
 }
 
+string PositionRecord::toString() const {
+    int precision = 2;
+    std::string market(""), code(""), name("");
+    if(!stock.isNull()){
+        market = stock.market();
+        code = stock.code();
+        name = stock.name();
+    } else {
+        precision = stock.precision();
+    }
+
+    price_t costPrice = 0.0;
+    if (number != 0.0) {
+        costPrice = roundEx((buyMoney - sellMoney)
+                / number, precision);
+    }
+
+    string strip(", ");
+    std::stringstream os;
+    os << std::fixed;
+    os.precision(precision);
+    os << "Position(" << market
+            << strip << code
+            << strip << name
+            << strip << takeDatetime
+            << strip << cleanDatetime
+            << strip << number
+            << strip << costPrice
+            << strip << stoploss
+            << strip << goalPrice
+            << strip << totalNumber
+            << strip << buyMoney
+            << strip << totalCost
+            << strip << totalRisk
+            << strip << sellMoney << ")";
+    os.unsetf(std::ostream::floatfield);
+    os.precision();
+    return os.str();
+}
 
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
     if (d1.stock == d2.stock
@@ -85,7 +128,7 @@ bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
             && fabs(d1.stoploss - d2.stoploss) < 0.0001
             && fabs(d1.goalPrice - d2.goalPrice) < 0.0001
             && d1.totalNumber == d2.totalNumber
-            && fabs(d1.totalMoney - d2.totalMoney) < 0.0001
+            && fabs(d1.buyMoney - d2.buyMoney) < 0.0001
             && fabs(d1.totalCost - d2.totalCost) < 0.0001
             && fabs(d1.sellMoney - d2.sellMoney) < 0.0001) {
         return true;

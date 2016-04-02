@@ -17,4 +17,7 @@
 #define HKU_SUPPORT_BINARY_ARCHIVE 1
 #endif /* HKU_SUPPORT_SERIALIZATION*/
 
+//检查下标越界
+#define CHECK_ACCESS_BOUND 1
+
 #endif /* CONFIG_H_ */

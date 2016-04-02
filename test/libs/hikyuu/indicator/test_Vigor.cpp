@@ -18,7 +18,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_VIGOR
+ * @defgroup test_indicator_VIGOR test_indicator_VIGOR
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */

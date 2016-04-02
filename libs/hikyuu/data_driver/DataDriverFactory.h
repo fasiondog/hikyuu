@@ -12,6 +12,7 @@
 
 #include "BaseInfoDriver.h"
 #include "KDataDriver.h"
+#include "BlockInfoDriver.h"
 
 namespace hku {
 
@@ -20,6 +21,7 @@ public:
 
     static BaseInfoDriverPtr getBaseInfoDriver(const shared_ptr<IniParser>&);
     static KDataDriverPtr getKDataDriver(const shared_ptr<IniParser>&);
+    static BlockInfoDriverPtr getBlockDriver(const shared_ptr<IniParser>&);
 };
 
 } /* namespace hku */

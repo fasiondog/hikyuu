@@ -5,10 +5,10 @@
  *      Author: fasiondog
  */
 
+#include "kdata/hdf5/H5KDataDriverImp.h"
+#include "kdata/mysql/MySQLKDataDriverImp.h"
 #include "../StockManager.h"
 #include "KDataDriver.h"
-#include "h5_kdata/H5KDataDriverImp.h"
-#include "mysql_kdata/MySQLKDataDriverImp.h"
 
 namespace hku {
 

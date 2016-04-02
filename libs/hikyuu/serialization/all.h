@@ -14,6 +14,7 @@
 #include "KRecord_serialization.h"
 #include "MarketInfo_serialization.h"
 #include "Stock_serialization.h"
+#include "Block_serialization.h"
 #include "StockTypeInfo_serialization.h"
 #include "StockWeight_serialization.h"
 

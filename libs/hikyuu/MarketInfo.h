@@ -47,6 +47,9 @@ public:
     /** 获取市场数据的最后更新日期 */
     Datetime lastDate() const { return m_lastDate; }
 
+    /** 仅用于python的__str__ */
+    string toString() const;
+
 private:
     string m_market;        //市场标识
     string m_name;          //市场名称

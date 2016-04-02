@@ -22,15 +22,12 @@ namespace hku {
  *      3)DEA: 慢线，即快线的n3周期EMA平滑
  */
 class Macd: public IndicatorImp {
+    INDICATOR_IMP(Macd)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    Macd(int n1 = 12, int n2 = 26, int n3 = 9);
-    Macd(const Indicator&, int n1 = 12, int n2 = 26, int n3 = 9);
+    Macd();
     virtual ~Macd();
-
-    virtual string name() const;
-    virtual IndicatorImpPtr operator()(const Indicator& ind);
 };
 
 } /* namespace hku */

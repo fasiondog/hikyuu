@@ -16,6 +16,7 @@ class SignalPython(SignalBase):
     def __init__(self):
         super(SignalPython, self).__init__("SignalPython")
         self._x = 0
+        self.setParam("test", 30)
     
     def _reset(self):
         self._x = 0
@@ -24,19 +25,50 @@ class SignalPython(SignalBase):
         p = SignalPython()
         p._x = self._x
         return p
-
+    
+    def _calculate(self):
+        self._addBuySignal(Datetime(201201210000))
+        self._addSellSignal(Datetime(201201300000))
+    
 class SignalTest(unittest.TestCase):
     def test_SignalBase(self):
         p = SignalPython()
         self.assertEqual(p.name, "SignalPython")
+        p.name = "SignalPythonTest"
+        self.assertEqual(p.name, "SignalPythonTest")
+        
+        self.assertEqual(p.shouldBuy(Datetime(201201210000)), False)
+        self.assertEqual(p.shouldSell(Datetime(201201300000)), False)
+        k = sm['sh000001'].getKData(Query(-100))
+        self.assertEqual(k.empty(), False)
+        p.setTO(k)
+        self.assertEqual(p.shouldBuy(Datetime(201201210000)), True)
+        self.assertEqual(p.shouldSell(Datetime(201201300000)), True)
         
         self.assertEqual(p.shouldBuy(Datetime(200101010000)), False)
         p._addBuySignal(Datetime(200101010000))
         self.assertEqual(p.shouldBuy(Datetime(200101010000)), True)
         
-        self.assertEqual(p.shouldSell(Datetime(200101010000)), False)
-        p._addSellSignal(Datetime(200101010000))
-        self.assertEqual(p.shouldSell(Datetime(200101010000)), True)
+        self.assertEqual(p.shouldSell(Datetime(200101030000)), False)
+        p._addSellSignal(Datetime(200101030000))
+        self.assertEqual(p.shouldSell(Datetime(200101030000)), True)
+        
+        d = p.getBuySignal()
+        for i in range(len(d)):
+            self.assertIn(d[i], [Datetime(201201210000), Datetime(200101010000)])
+            
+        d = p.getSellSignal()
+        for i in range(len(d)):
+            self.assertIn(d[i], [Datetime(201201300000), Datetime(200101030000)])
+            
+        p_clone = p.clone()
+        d = p_clone.getBuySignal()
+        for i in range(len(d)):
+            self.assertIn(d[i], [Datetime(201201210000), Datetime(200101010000)])
+            
+        d = p_clone.getSellSignal()
+        for i in range(len(d)):
+            self.assertIn(d[i], [Datetime(201201300000), Datetime(200101030000)])
         
         self.assertEqual(p._x, 0)
         p._x = 10
@@ -44,13 +76,19 @@ class SignalTest(unittest.TestCase):
         p.reset()
         self.assertEqual(p._x, 0)
         
-        p._x = 10
+        p._x = 20
         p_clone = p.clone()
-        self.assertEqual(p_clone._x, 10)
+        self.assertEqual(p_clone._x, 20)
         p.reset()
         self.assertEqual(p._x, 0)
-        self.assertEqual(p_clone._x, 10)
-
+        self.assertEqual(p_clone._x, 20)
+        
+        self.assertEqual(p.getParam("test"), 30)
+        self.assertEqual(p_clone.getParam("test"), 30)
+        p.setParam("test", 10)
+        self.assertEqual(p.getParam("test"), 10)
+        self.assertEqual(p_clone.getParam("test"), 30)
+        
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SignalTest)

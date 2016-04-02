@@ -25,7 +25,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_money_manager_serialization
+ * @defgroup test_money_manager_serialization test_money_manager_serialization
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

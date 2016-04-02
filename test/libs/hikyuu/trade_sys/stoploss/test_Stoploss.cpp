@@ -20,8 +20,10 @@ using namespace hku;
 
 class StoplossTest: public StoplossBase {
 public:
-    StoplossTest(): StoplossBase("StoplossTest"), m_x(0) {}
+    StoplossTest(): StoplossBase(), m_x(0) {}
     virtual ~StoplossTest() {}
+
+    virtual string name() const { return "StoplossTest"; }
 
     virtual price_t getPrice(const Datetime& datetime, price_t price) {
         return m_x < 10 ? 0.0 : 1.0;
@@ -47,7 +49,7 @@ private:
 };
 
 /**
- * @defgroup test_Stoploss
+ * @defgroup test_Stoploss test_Stoploss
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */

@@ -24,7 +24,8 @@ StockWeightList (Stock::*getWeight2)(const Datetime&, const Datetime&) const = &
 void export_Stock() {
     class_<Stock>("Stock", init<>())
             .def(init<const string&, const string&, const string&>())
-            .def(self_ns::str(self))
+            //.def(self_ns::str(self))
+            .def("__str__", &Stock::toString)
             .add_property("id", &Stock::id)
             .add_property("market", make_function(&Stock::market, return_value_policy<copy_const_reference>()))
             .add_property("code", make_function(&Stock::code, return_value_policy<copy_const_reference>()))
@@ -50,7 +51,7 @@ void export_Stock() {
             .def("getKRecordByDate", &Stock::getKRecordByDate, getRecordByDate_overloads())
             .def("getKRecordList", &Stock::getKRecordList)
             .def("getDatetimeList", &Stock::getDatetimeList)
-
+            .def("realtimeUpdate", &Stock::realtimeUpdate)
             .def("getWeight", getWeight1)
             .def("getWeight", getWeight2)
 

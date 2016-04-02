@@ -24,7 +24,8 @@ HKU_API std::ostream& operator <<(std::ostream &os, const System& sys) {
        << space << sys.getPG() << strip
        << space << sys.getSP() << strip
        << "\n"
-       << space << sys.getTM() << strip
+       << space << (sys.getTM() ? sys.getTM()->toString(): "TradeManager(NULL)")
+       << strip
        << "}";
     return os;
 }
@@ -33,7 +34,7 @@ HKU_API std::ostream& operator <<(std::ostream &os, const SystemPtr& sys) {
     if (sys) {
         os << *sys;
     } else {
-        os << "System(Null)";
+        os << "System(NULL)";
     }
     return os;
 }
@@ -85,21 +86,21 @@ System::~System() {
 
 void System::initParam() {
     //连续延迟交易请求的限制次数
-    addParam<int>("max_delay_count", 3);
+    setParam<int>("max_delay_count", 3);
 
-    addParam<bool>("delay", true);
+    setParam<bool>("delay", true);
 
     //延迟操作的情况下，是使用当前的价格计算止损价/止赢价/目标价还是使用上次计算的结果
-    addParam<bool>("delay_use_current_price", true);
-    addParam<bool>("tp_monotonic", true); //止赢单调递增
-    addParam<int>("tp_delay_n", 3);    //止赢延迟判断天数
-    addParam<bool>("ignore_sell_sg", false); //忽略卖出信号，只使用止损/止赢等其他方式卖出
+    setParam<bool>("delay_use_current_price", true);
+    setParam<bool>("tp_monotonic", true); //止赢单调递增
+    setParam<int>("tp_delay_n", 3);    //止赢延迟判断天数
+    setParam<bool>("ignore_sell_sg", false); //忽略卖出信号，只使用止损/止赢等其他方式卖出
 
     //在现金不足时，是否支持借入现金，融资
-    addParam<bool>("support_borrow_cash", false);
+    setParam<bool>("support_borrow_cash", false);
 
     //在没有持仓时，是否支持借入证券，融券
-    addParam<bool>("support_borrow_stock", false);
+    setParam<bool>("support_borrow_stock", false);
 }
 
 
@@ -119,6 +120,11 @@ void System::reset() {
     m_trade_list.clear();
     m_lastTakeProfit = 0.0;
     m_lastShortTakeProfit = 0.0;
+
+    m_buyRequest.clear();
+    m_sellRequest.clear();
+    m_sellShortRequest.clear();
+    m_buyShortRequest.clear();
 }
 
 
@@ -154,10 +160,17 @@ SystemPtr System::clone() {
     //p->m_name = m_name;
     p->m_stock = m_stock;
     p->m_kdata = m_kdata;
+
     p->m_buy_days = m_buy_days;
+    p->m_sell_short_days = m_sell_short_days;
     p->m_trade_list = m_trade_list;
     p->m_lastTakeProfit = m_lastTakeProfit;
     p->m_lastShortTakeProfit = m_lastShortTakeProfit;
+
+    p->m_buyRequest = m_buyRequest;
+    p->m_sellRequest = m_sellRequest;
+    p->m_sellShortRequest = m_sellShortRequest;
+    p->m_buyShortRequest = m_buyShortRequest;
 
     return SystemPtr(p);
 }
@@ -199,7 +212,7 @@ void System::run(const Stock& stock, const KQuery& query) {
     m_stock = stock;
     KData kdata = stock.getKData(query);
     if( kdata.empty() ){
-        HKU_INFO("KData is NULL or empty! [System::run]");
+        HKU_INFO("KData is empty! [System::run]");
         return;
     }
 
@@ -217,38 +230,44 @@ void System::run(const Stock& stock, const KQuery& query) {
     size_t total = kdata.size();
     for (size_t i = 0; i < total; ++i) {
         if (kdata[i].datetime >= m_tm->initDatetime()) {
-            m_buy_days++;
-            m_sell_short_days++;
             runMoment(kdata[i]);
         }
     }
 }
 
 
-void System::runMoment(const KRecord& record) {
-    //最高价等于最低价，无法进行交易操作，直接跳过
-    if (record.highPrice == record.lowPrice) {
-        return;
-    }
+void System::clearRequest() {
+    m_buyRequest.clear();
+    m_sellRequest.clear();
+    m_sellShortRequest.clear();
+    m_buyShortRequest.clear();
+}
 
+
+void System::runMoment(const KRecord& record) {
+    m_buy_days++;
+    m_sell_short_days++;
     _runMoment(record);
 }
 
 
 void System::runMoment(const Datetime& datetime) {
     KRecord today = m_kdata.getKRecordByDate(datetime);
-
-    //最高价等于最低价，无法进行交易操作，直接跳过
-    //该条件中包括了该日无交易数据的情况判定，直接跳过
-    if (today.highPrice == today.lowPrice) {
-        return;
+    if (today.isValid()) {
+        m_buy_days++;
+        m_sell_short_days++;
+        _runMoment(today);
     }
-
-    _runMoment(today);
 }
 
 
 void System::_runMoment(const KRecord& today) {
+    if (today.highPrice == today.lowPrice
+        || today.closePrice > today.highPrice
+        || today.closePrice < today.lowPrice) {
+        return;
+    }
+
     //处理当前已有的交易请求
     _processRequest(today);
 
@@ -271,12 +290,12 @@ void System::_runMoment(const KRecord& today) {
     if (!_conditionIsValid(today.datetime)) {
         //如果持有多头仓位，则立即卖出
         if (m_tm->have(m_stock)) {
-            _sell(today, PART_ENVIRONMENT);
+            _sell(today, PART_CONDITION);
         }
 
         //如果持有空头仓位，立即补进归还
         if (m_tm->haveShort(m_stock)) {
-            _buyShort(today, PART_ENVIRONMENT);
+            _buyShort(today, PART_CONDITION);
         }
         return;
     }
@@ -284,14 +303,14 @@ void System::_runMoment(const KRecord& today) {
     //如果有买入信号
     if (m_sg->shouldBuy(today.datetime)) {
         _buy(today);
-        _buyShort(today, PART_SIGNAL);
+        if (m_tm->haveShort(m_stock)) _sellShort(today);
         return;
     }
 
     //发出卖出信号
     if (m_sg->shouldSell(today.datetime)) {
-        _sell(today, PART_SIGNAL);
-        _sellShort(today);
+        if (m_tm->have(m_stock)) _sell(today, PART_SIGNAL);
+        _buyShort(today, PART_SIGNAL);
         return;
     }
 
@@ -302,12 +321,21 @@ void System::_runMoment(const KRecord& today) {
     if( position.number != 0) {
         if (current_price <= position.stoploss) {
             _sell(today, PART_STOPLOSS);
-
         } else if (position.goalPrice != 0.0
                 && current_price >= position.goalPrice) {
             _sell(today, PART_PROFITGOAL);
         } else {
-
+            price_t current_take_profile = _getTakeProfitPrice(today.datetime);
+            if (current_take_profile != 0.0) {
+                if (current_take_profile < m_lastTakeProfit) {
+                    current_take_profile = m_lastTakeProfit;
+                } else {
+                    m_lastTakeProfit = current_take_profile;
+                }
+                if (current_price <= current_take_profile) {
+                    _sell(today, PART_TAKEPROFIT);
+                }
+            }
         }
     }
 
@@ -315,14 +343,11 @@ void System::_runMoment(const KRecord& today) {
     if (short_position.number != 0) {
         if (current_price >= short_position.stoploss) {
             _buyShort(today, PART_STOPLOSS);
-
         } else if (position.goalPrice != 0.0
                 && current_price <= short_position.goalPrice) {
             _buyShort(today, PART_PROFITGOAL);
-
         }
     }
-
 }
 
 
@@ -336,28 +361,20 @@ void System::_buy(const KRecord& today) {
 
 
 void System::_buyNow(const KRecord& today) {
-    if (today.highPrice == today.lowPrice) {
-        //无法实际执行，延迟至下一时刻
-        _submitBuyRequest(m_buyRequest.datetime);
-        return;
-    }
-
     //以当前收盘价为计划价格
     price_t planPrice = today.closePrice;
 
     //计算止损价
-    price_t stoploss = _getStoplossPrice(m_buyRequest.datetime, planPrice);
+    price_t stoploss = _getStoplossPrice(today.datetime, planPrice);
 
     //如果计划的价格已经小于等于止损价，放弃交易
     if( planPrice <= stoploss){
-        m_buyRequest.clear();
         return;
     }
 
     //获取可买入数量
     size_t number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss);
     if (number == 0 || number > m_stock.maxTradeNumber()) {
-        m_buyRequest.clear();
         return;
     }
 
@@ -371,15 +388,12 @@ void System::_buyNow(const KRecord& today) {
     TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number,
             stoploss, goalPrice, planPrice, PART_SIGNAL);
     if( BUSINESS_BUY != record.business) {
-        m_buyRequest.clear();
         return;
     }
 
-    m_buy_days = 0;
-    m_lastTakeProfit = realPrice; //止赢赋值给买入价格
+    m_lastTakeProfit = _getTakeProfitPrice(record.datetime);
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
-    m_buyRequest.clear();
 }
 
 
@@ -447,7 +461,7 @@ void System::_submitBuyRequest(const KRecord& today) {
         m_buyRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
         m_buyRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
         m_buyRequest.number = _getBuyNumber(today.datetime, today.closePrice,
-                                              m_buyRequest.stoploss);
+                                  today.closePrice - m_buyRequest.stoploss);
 
     } else {
         m_buyRequest.valid = true;
@@ -456,7 +470,7 @@ void System::_submitBuyRequest(const KRecord& today) {
         m_buyRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
         m_buyRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
         m_buyRequest.number = _getBuyNumber(today.datetime, today.closePrice,
-                                              m_buyRequest.stoploss);
+                                  today.closePrice - m_buyRequest.stoploss);
         m_buyRequest.from = PART_SIGNAL;
         m_buyRequest.count = 1;
     }
@@ -473,12 +487,6 @@ void System::_sell(const KRecord& today, Part from) {
 
 
 void System::_sellNow(const KRecord& today, Part from) {
-    if (today.highPrice == today.lowPrice) {
-        //当前无法卖出，延迟至下一时刻卖出
-        _submitSellRequest(today.datetime, from);
-        return;
-    }
-
     price_t planPrice = today.closePrice;
 
     //计算新的止损价
@@ -486,7 +494,6 @@ void System::_sellNow(const KRecord& today, Part from) {
 
     size_t number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss);
     if (number == 0) {
-        m_sellRequest.clear();
         return;
     }
 
@@ -495,18 +502,18 @@ void System::_sellNow(const KRecord& today, Part from) {
     TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number,
             stoploss, goalPrice, planPrice, from);
     if( BUSINESS_SELL != record.business){
-        m_sellRequest.clear();
         return; //卖出操作失败
     }
 
     //如果已未持仓，最后的止赢价初始为0
     if (!m_tm->have(m_stock)) {
         m_lastTakeProfit = 0.0;
+    } else {
+        m_lastTakeProfit = _getTakeProfitPrice(today.datetime);
     }
 
     m_trade_list.push_back(record);
     _sellNotifyAll(record);
-    m_sellRequest.clear();
 }
 
 
@@ -569,7 +576,7 @@ void System::_submitSellRequest(const KRecord& today, Part from) {
         m_sellRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
         m_sellRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
         m_sellRequest.number = _getSellNumber(today.datetime, today.closePrice,
-                                  m_sellRequest.stoploss);
+                               today.closePrice - m_sellRequest.stoploss);
         m_sellRequest.from = from;
 
     } else {
@@ -579,7 +586,7 @@ void System::_submitSellRequest(const KRecord& today, Part from) {
         m_sellRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
         m_sellRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
         m_sellRequest.number = _getSellNumber(today.datetime, today.closePrice,
-                                 m_sellRequest.stoploss);
+                               today.closePrice - m_sellRequest.stoploss);
         m_sellRequest.from = from;
         m_sellRequest.count = 1;
     }
@@ -587,6 +594,9 @@ void System::_submitSellRequest(const KRecord& today, Part from) {
 
 
 void System::_buyShort(const KRecord& today, Part from) {
+    if (getParam<bool>("support_borrow_stock") == false)
+        return;
+
     if (getParam<bool>("delay")) {
         _submitBuyShortRequest(today, from);
     } else {
@@ -711,7 +721,7 @@ void System::_submitBuyShortRequest(const KRecord& today, Part from) {
         m_buyShortRequest.stoploss = _getShortStoplossPrice(today.datetime, today.closePrice);
         m_buyShortRequest.goal = _getShortGoalPrice(today.datetime, today.closePrice);
         m_buyShortRequest.number = _getBuyShortNumber(today.datetime, today.closePrice,
-                m_buyShortRequest.stoploss);
+                m_buyShortRequest.stoploss - today.closePrice);
 
     } else {
         m_buyShortRequest.valid = true;
@@ -720,7 +730,7 @@ void System::_submitBuyShortRequest(const KRecord& today, Part from) {
         m_buyShortRequest.stoploss = _getShortStoplossPrice(today.datetime, today.closePrice);
         m_buyShortRequest.goal = _getShortGoalPrice(today.datetime, today.closePrice);
         m_buyShortRequest.number = _getBuyShortNumber(today.datetime, today.closePrice,
-                m_buyShortRequest.stoploss);
+                m_buyShortRequest.stoploss - today.closePrice);
         m_buyShortRequest.from = PART_SIGNAL;
         m_buyShortRequest.count = 1;
     }
@@ -728,6 +738,9 @@ void System::_submitBuyShortRequest(const KRecord& today, Part from) {
 
 
 void System::_sellShort(const KRecord& today) {
+    if (getParam<bool>("support_borrow_stock") == false)
+        return;
+
     if (getParam<bool>("delay")) {
         _submitSellShortRequest(today);
     } else {
@@ -828,7 +841,7 @@ void System::_submitSellShortRequest(const KRecord& today) {
         m_sellShortRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
         m_sellShortRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
         m_sellShortRequest.number = _getSellNumber(today.datetime, today.closePrice,
-                m_sellShortRequest.stoploss);
+                                today.closePrice - m_sellShortRequest.stoploss);
         m_sellShortRequest.from = PART_SIGNAL;
 
     } else {
@@ -838,7 +851,7 @@ void System::_submitSellShortRequest(const KRecord& today) {
         m_sellShortRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
         m_sellShortRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
         m_sellShortRequest.number = _getSellNumber(today.datetime, today.closePrice,
-                m_sellShortRequest.stoploss);
+                today.closePrice - m_sellShortRequest.stoploss);
         m_sellShortRequest.from = PART_SIGNAL;
         m_sellShortRequest.count = 1;
     }

@@ -20,7 +20,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_Indicator
+ * @defgroup test_indicator_Indicator test_indicator_Indicator
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */

@@ -8,6 +8,7 @@
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/signal/build_in.h>
+#include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
@@ -15,10 +16,19 @@ using namespace hku;
 
 class SignalWrap : public SignalBase, public wrapper<SignalBase> {
 public:
-    SignalWrap(const string& name): SignalBase(name) {}
+    SignalWrap(): SignalBase() {}
+    SignalWrap(const string& name) : SignalBase(name) {}
 
     void _reset() {
-        this->get_override("_reset")();
+        if (override func = this->get_override("_reset")) {
+            func();
+        } else {
+            SignalBase::_reset();
+        }
+    }
+
+    void default_reset() {
+        this->SignalBase::_reset();
     }
 
     SignalPtr _clone() {
@@ -26,22 +36,28 @@ public:
     }
 
     void _calculate() {
-        this->get_override("_calculate");
+        this->get_override("_calculate")();
     }
 };
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(AMA_SG_overload, AMA_SG, 0, 6);
+
+string (SignalBase::*get_name)() const = &SignalBase::name;
+void (SignalBase::*set_name)(const string&) = &SignalBase::name;
 
 void export_Signal() {
-    class_<SignalWrap, boost::noncopyable>("SignalBase", init<const string&>())
+    class_<SignalWrap, boost::noncopyable>("SignalBase", init<>())
+            .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name",
-                    make_function(&SignalBase::name,
-                            return_value_policy<copy_const_reference>()))
-            .add_property("params",
-                    make_function(&SignalBase::getParameter,
-                            return_internal_reference<>()))
+            .add_property("name", get_name, set_name)
+            .add_property("kdata", &SignalBase::getTO)
+            //因为Indicator无法使用params['name']的形式，所以统一使用setParm/getParam
+            //.add_property("params",
+            //        make_function(&SignalBase::getParameter,
+            //                return_internal_reference<>()))
+            .def("getParam", &SignalBase::getParam<boost::any>)
+            .def("setParam", &SignalBase::setParam<object>)
             .def("setTO", &SignalBase::setTO)
+            .def("getTO", &SignalBase::getTO)
             .def("shouldBuy", &SignalBase::shouldBuy)
             .def("shouldSell", &SignalBase::shouldSell)
             .def("getBuySignal", &SignalBase::getBuySignal)
@@ -51,7 +67,7 @@ void export_Signal() {
             .def("reset", &SignalBase::reset)
             .def("clone", &SignalBase::clone)
             .def("_calculate", pure_virtual(&SignalBase::_calculate))
-            .def("_reset", pure_virtual(&SignalBase::_reset))
+            .def("_reset", &SignalBase::_reset, &SignalWrap::default_reset)
             .def("_clone", pure_virtual(&SignalBase::_clone))
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(name_init_pickle_suite<SignalBase>())
@@ -60,9 +76,10 @@ void export_Signal() {
 
     register_ptr_to_python<SignalPtr>();
 
-
-    def("AMA_SG", AMA_SG, AMA_SG_overload());
-
+    def("Single_SG", Single_SG, (arg("ind"), arg("filter_n")=20,
+            arg("filter_p")=0.1, arg("kpart")="CLOSE"));
+    def("Cross_SG", Cross_SG, args("fast", "slow"));
+    def("Flex_SG", Flex_SG, (arg("ind"), arg("p")=2.0, arg("kpart")="CLOSE"));
 }
 
 

@@ -5,9 +5,10 @@
  *      Author: fasiondog
  */
 
+#include "base_info/mysql/MySQLBaseInfoDriver.h"
+#include "base_info/sqlite/SQLiteBaseInfoDriver.h"
+#include "block_info/qianlong/QLBlockInfoDriver.h"
 #include "DataDriverFactory.h"
-#include "sqlite_info/SQLiteBaseInfoDriver.h"
-#include "mysql_info/MySQLBaseInfoDriver.h"
 #include "KDataDriver.h"
 
 namespace hku {
@@ -52,5 +53,24 @@ getKDataDriver(const shared_ptr<IniParser>& ini) {
     return result;
 }
 
+BlockInfoDriverPtr DataDriverFactory::
+getBlockDriver(const shared_ptr<IniParser>& ini) {
+    string func_name(" [DataDriverFactory::getBlockDriver]");
+    BlockInfoDriverPtr result;
+    if (!ini) {
+        HKU_ERROR("Null configure ini!" << func_name);
+        return result;
+    }
+
+    if (!ini->hasOption("block", "type")) {
+        return result;
+    }
+
+    string type = ini->get("block", "type");
+    if (type == "qianlong") {
+        result = make_shared<QLBlockInfoDriver>(ini);
+    }
+    return result;
+}
 
 } /* namespace hku */

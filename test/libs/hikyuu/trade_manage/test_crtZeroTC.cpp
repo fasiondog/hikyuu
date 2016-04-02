@@ -25,7 +25,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_crtZeroTC
+ * @defgroup test_crtZeroTC test_crtZeroTC
  * @ingroup test_hikyuu_trade_manage_suite
  * @{
  */

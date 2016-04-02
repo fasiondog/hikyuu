@@ -133,6 +133,7 @@ KQuery::RecoverType KQuery::getRecoverTypeEnum(const string& arg) {
     return result;
 }
 
+
 HKU_API std::ostream& operator <<(std::ostream &os, const KQuery& query){
     string strip(", ");
     if (query.queryType() == KQuery::INDEX) {
@@ -147,16 +148,6 @@ HKU_API std::ostream& operator <<(std::ostream &os, const KQuery& query){
            << KQuery::getKTypeName(query.kType()) << strip
            << KQuery::getRecoverTypeName(query.recoverType()) << ")";
     }
-    return os;
-}
-
-HKU_API std::ostream& operator <<(std::ostream &os, const KQueryByDate& query){
-    string strip(", ");
-    os << "KQueryByDate(" << query.startDatetime() << strip
-       << query.endDatetime() << strip
-       << KQuery::getQueryTypeName(query.queryType()) << strip
-       << KQuery::getKTypeName(query.kType()) << strip
-       << KQuery::getRecoverTypeName(query.recoverType()) << ")";
     return os;
 }
 

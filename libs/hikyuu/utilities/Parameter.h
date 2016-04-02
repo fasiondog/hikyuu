@@ -126,19 +126,10 @@ public:
     }
 
     /**
-     * 添加参数列表
-     * @note 使用Parameter的类，应在构造函数中使用add添加参数，后续修改使用set
+     * 设定指定的参数值
+     * @note 已经存在的参数修改其值，不存在的参数进行增加
      * @param name 参数名称
      * @param value 参数值
-     */
-    template <typename ValueType>
-    void add(const string& name, const ValueType& value);
-
-    /**
-     * 修改指定的参数值
-     * @note 修改的参数应该已经存在，即已经使用add添加过的参数
-     * @param name 参数名称
-     * @param value 修改后的参数值
      */
     template <typename ValueType>
     void set(const string& name, const ValueType& value);
@@ -246,13 +237,12 @@ private:
         return m_params; \
     } \
     \
-    bool haveParam(const string& name) const { \
-        return m_params.have(name); \
+    void setParameter(const Parameter& param) { \
+        m_params = param; \
     } \
     \
-    template <typename ValueType> \
-    void addParam(const string& name, const ValueType& value) { \
-        m_params.add<ValueType>(name, value); \
+    bool haveParam(const string& name) const { \
+        return m_params.have(name); \
     } \
     \
     template <typename ValueType> \
@@ -278,25 +268,13 @@ ValueType Parameter::get(const string& name) const {
 
 
 template <typename ValueType>
-void Parameter::add(const string& name, const ValueType& value) {
-    if( have(name)){
-        throw std::logic_error("Duplicate parameter! " + name);
-        return;
-    }
-
-    if (!support(value)){
-        throw std::logic_error("Unsuport Type! " + name);
-        return;
-    }
-
-    m_params[name] = value;
-}
-
-
-template <typename ValueType>
 void Parameter::set(const string& name, const ValueType& value) {
     if( !have(name)){
-        throw std::logic_error("The parameter not exists! " + name);
+        if (!support(value)){
+            throw std::logic_error("Unsuport Type! " + name);
+            return;
+        }
+        m_params[name] = value;
         return;
     }
 

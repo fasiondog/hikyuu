@@ -71,6 +71,10 @@
  * @details 选择交易对象
  * @ingroup Portfolio
  *
+ * @defgroup AllocateMoney AllocateMoney 资金分配算法模块
+ * @details 进行资金分配
+ * @ingroup Portfolio
+ *
  * @defgroup Environment Environment 外部环境判断
  * @details 外部环境判断模块，用于判断当前的市场环境是否有效，只有在市场
  *          处于有效状态中，才会发生买入操作。当市场进入失效状态下，系统

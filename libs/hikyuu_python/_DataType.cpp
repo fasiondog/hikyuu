@@ -26,11 +26,13 @@ PriceList toPriceList(object o) {
 
 void export_DataType() {
     DatetimeList::const_reference (DatetimeList::*datetimeList_at)(DatetimeList::size_type) const = &DatetimeList::at;
+    void (DatetimeList::*datetimelist_append)(const DatetimeList::value_type& val) = &DatetimeList::push_back;
     class_<DatetimeList>("DatetimeList")
             .def("__iter__", iterator<DatetimeList>())
             .def("size", &DatetimeList::size)
             .def("__len__", &DatetimeList::size)
-            .def("__getitem__", datetimeList_at, return_value_policy<copy_const_reference>())
+            .def("append", datetimelist_append)
+            .def("get", datetimeList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<DatetimeList>())
 #endif
@@ -41,7 +43,7 @@ void export_DataType() {
             .def("__iter__", iterator<PriceList>())
             .def("size", &PriceList::size)
             .def("__len__", &PriceList::size)
-            .def("__getitem__", PriceList_at, return_value_policy<copy_const_reference>())
+            .def("get", PriceList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<PriceList>())
 #endif
@@ -52,7 +54,7 @@ void export_DataType() {
             .def("__iter__", iterator<StringList>())
             .def("size", &StringList::size)
             .def("__len__", &StringList::size)
-            .def("__getitem__", StringList_at, return_value_policy<copy_const_reference>())
+            .def("get", StringList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<StringList>())
 #endif

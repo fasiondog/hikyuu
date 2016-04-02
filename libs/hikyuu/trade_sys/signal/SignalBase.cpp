@@ -25,7 +25,11 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SignalPtr& sg) {
 }
 
 
-SignalBase::SignalBase(const string& name): m_name(name) {
+SignalBase::SignalBase() : m_name("SignalBase"), m_hold(false) {
+
+}
+
+SignalBase::SignalBase(const string& name): m_name(name), m_hold(false) {
 
 }
 
@@ -36,9 +40,10 @@ SignalBase::~SignalBase() {
 
 SignalPtr SignalBase::clone() {
     SignalPtr p = _clone();
-    p->m_params = m_params;
     p->m_name = m_name;
+    p->m_params = m_params;
     p->m_kdata = m_kdata;
+    p->m_hold = m_hold;
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
     return p;
@@ -57,6 +62,7 @@ void SignalBase::setTO(const KData& kdata) {
 void SignalBase::reset() {
     m_buySig.clear();
     m_sellSig.clear();
+    m_hold = false;
     _reset();
 }
 
@@ -81,5 +87,20 @@ DatetimeList SignalBase::getSellSignal() const {
     }
     return result;
 }
+
+void SignalBase::_addBuySignal(const Datetime& datetime) {
+    if (!m_hold && m_sellSig.count(datetime) == 0) {
+        m_buySig.insert(datetime);
+        m_hold = true;
+    }
+}
+
+void SignalBase::_addSellSignal(const Datetime& datetime) {
+    if (m_hold && m_buySig.count(datetime) == 0) {
+        m_sellSig.insert(datetime);
+        m_hold = false;
+    }
+}
+
 
 } /* namespace hku */

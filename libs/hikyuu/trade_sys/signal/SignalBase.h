@@ -31,6 +31,7 @@ class HKU_API SignalBase {
     PARAMETER_SUPPORT
 
 public:
+    SignalBase();
     SignalBase(const string& name);
     virtual ~SignalBase();
 
@@ -72,8 +73,11 @@ public:
      */
     void setTO(const KData& kdata);
 
-    /** 获取名称 */
-    const string& name() const;
+    /**
+     * 获取交易对象
+     * @return 交易对象(KData)
+     */
+    KData getTO() const;
 
     /** 复位操作 */
     void reset();
@@ -82,8 +86,14 @@ public:
     /** 克隆操作 */
     SignalPtr clone();
 
+    /** 获取名称 */
+    string name() const;
+
+    /** 设置名称 */
+    void name(const string& name);
+
     /** 子类复位接口 */
-    virtual void _reset() = 0;
+    virtual void _reset() {}
 
     /** 子类克隆接口 */
     virtual SignalPtr _clone() = 0;
@@ -94,6 +104,7 @@ public:
 protected:
     string m_name;
     KData  m_kdata;
+    bool   m_hold;
     std::set<Datetime> m_buySig;
     std::set<Datetime> m_sellSig;
 
@@ -105,9 +116,10 @@ private:
     friend class boost::serialization::access;
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const {
-        string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
+        string name_str(GBToUTF8(m_name));
+        ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar & BOOST_SERIALIZATION_NVP(m_hold);
         ar & BOOST_SERIALIZATION_NVP(m_buySig);
         ar & BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化
@@ -116,10 +128,9 @@ private:
 
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
-        string name;
-        ar & boost::serialization::make_nvp("m_name", name);
-        m_name = UTF8ToGB(name);
+        ar & boost::serialization::make_nvp("name", m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar & BOOST_SERIALIZATION_NVP(m_hold);
         ar & BOOST_SERIALIZATION_NVP(m_buySig);
         ar & BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化
@@ -159,6 +170,14 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SignalBase)
 #endif
 
 
+#define SIGNAL_IMP(classname) public:\
+    virtual SignalPtr _clone() {\
+        return SignalPtr(new classname());\
+    }\
+    virtual void _calculate();
+
+
+
 /**
  * 客户程序都应使用该指针类型，操作信号指示器
  * @ingroup Signal
@@ -168,17 +187,16 @@ typedef shared_ptr<SignalBase> SignalPtr;
 HKU_API std::ostream & operator<<(std::ostream&, const SignalBase&);
 HKU_API std::ostream & operator<<(std::ostream&, const SignalPtr&);
 
+inline KData SignalBase::getTO() const {
+    return m_kdata;
+}
 
-inline const string& SignalBase::name() const {
+inline string SignalBase::name() const {
     return m_name;
 }
 
-inline void SignalBase::_addBuySignal(const Datetime& datetime) {
-    m_buySig.insert(datetime);
-}
-
-inline void SignalBase::_addSellSignal(const Datetime& datetime) {
-    m_sellSig.insert(datetime);
+inline void SignalBase::name(const string& name) {
+    m_name = name;
 }
 
 inline bool SignalBase::shouldBuy(const Datetime& datetime) const {

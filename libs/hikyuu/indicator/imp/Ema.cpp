@@ -9,23 +9,26 @@
 
 namespace hku {
 
-Ema::Ema(int n): IndicatorImp(0, 1) {
-    addParam<int>("n", n);
-    if (n <= 0) {
-        HKU_ERROR("Invalid param[n] must > 0 ! [Ema::Ema]");
-        return;
-    }
+Ema::Ema(): IndicatorImp("EMA") {
+    setParam<int>("n", 22);
 }
 
-Ema::Ema(const Indicator& indicator, int n): IndicatorImp(indicator, 0, 1) {
-    addParam<int>("n", n);
+Ema::~Ema() {
+
+}
+
+void Ema::calculate(const Indicator& indicator) {
+    size_t total = indicator.size();
+    _readyBuffer(total, 1);
+
+    int n = getParam<int>("n");
     if (n <= 0) {
         HKU_ERROR("Invalid param[n] must > 0 ! [Ema::Ema]");
         return;
     }
 
-    size_t total = indicator.size();
-    if (total <= discard()) {
+    m_discard = indicator.discard();
+    if (total <= m_discard) {
         return;
     }
 
@@ -40,24 +43,18 @@ Ema::Ema(const Indicator& indicator, int n): IndicatorImp(indicator, 0, 1) {
     }
 }
 
-Ema::~Ema() {
-
-}
-
-string Ema::name() const {
-    return "EMA";
-}
-
-IndicatorImpPtr Ema::operator()(const Indicator& ind) {
-    return IndicatorImpPtr(new Ema(ind, getParam<int>("n")));
-}
 
 Indicator HKU_API EMA(int n) {
-    return Indicator(IndicatorImpPtr(new Ema(n)));
+    IndicatorImpPtr p(new Ema());
+    p->setParam<int>("n", n);
+    return Indicator(p);
 }
 
 Indicator HKU_API EMA(const Indicator& data, int n) {
-    return Indicator(IndicatorImpPtr(new Ema(data, n)));
+    IndicatorImpPtr p(new Ema());
+    p->setParam<int>("n", n);
+    p->calculate(data);
+    return Indicator(p);
 }
 
 } /* namespace hku */

@@ -19,7 +19,7 @@
 using namespace hku;
 
 /**
- * @defgroup test_hikyuu_StockManager
+ * @defgroup test_hikyuu_StockManager test_hikyuu_StockManager
  * @ingroup test_hikyuu_base_suite
  * @{
  */
@@ -144,11 +144,18 @@ BOOST_AUTO_TEST_CASE( test_StockManager_getAllMarket ) {
 }
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_StockManager_getAllStock ) {
+BOOST_AUTO_TEST_CASE( test_StockManager_getBlock ) {
     StockManager& sm = StockManager::instance();
-    /** @arg 检测是否和测试数据相符 */
-    StockList result(sm.getAllStock());
-    BOOST_CHECK(result.size() == sm.size());
+
+    Block result = sm.getBlock("地域板块", "陕西");
+    BOOST_CHECK(result.size() != 0);
+
+    BlockList blk_list = sm.getBlockList("地域板块");
+    BOOST_CHECK(blk_list.size() != 0);
+
+    blk_list = sm.getBlockList();
+    BOOST_CHECK(blk_list.size() != 0);
+
 }
 
 /** @} */

@@ -18,7 +18,7 @@ if ! [ python.configured ]
   
 project : build-dir  ../../build/hikyuu_python ;
 
-project : requirements <library>/boost/python//boost_python 
+project : requirements <library>/boost/python//boost_python
                        <library>/hikyuu//hikyuu 
                        <library>/boost//thread
                        <library>/boost//date_time
@@ -42,5 +42,5 @@ python-extension _hikyuu : [ glob *.cpp ]
 python-extension indicator/_indicator : [ glob indicator/*.cpp ] ;
 python-extension trade_manage/_trade_manage : [ glob trade_manage/*.cpp ] ; 
 python-extension trade_sys/_trade_sys : [ glob trade_sys/*.cpp ] ;
-#python-extension instance/_AmaSystem : [ glob instance/*.cpp ] ;
+python-extension trade_instance/_trade_instance : [ glob trade_instance/*.cpp ] ;
 
