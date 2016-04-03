@@ -9,7 +9,7 @@
 
 namespace hku {
 
-Diff::Diff(): IndicatorImp("DIFF") {
+Diff::Diff(): IndicatorImp("DIFF", 1) {
 
 }
 
@@ -17,9 +17,12 @@ Diff::~Diff() {
 
 }
 
-void Diff::calculate(const Indicator& data) {
+bool Diff::check() {
+    return true;
+}
+
+void Diff::_calculate(const Indicator& data) {
     size_t total = data.size();
-    _readyBuffer(total, 1);
 
     m_discard = data.discard() + 1;
     if (total <= m_discard) {

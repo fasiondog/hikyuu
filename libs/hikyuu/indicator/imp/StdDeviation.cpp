@@ -10,7 +10,7 @@
 
 namespace hku {
 
-StdDeviation::StdDeviation(): IndicatorImp("STD") {
+StdDeviation::StdDeviation(): IndicatorImp("STD", 1) {
     setParam<int>("n", 22);
 }
 
@@ -18,16 +18,20 @@ StdDeviation::~StdDeviation() {
 
 }
 
-void StdDeviation::calculate(const Indicator& data) {
-    size_t total = data.size();
-    _readyBuffer(total, 1);
-
+bool StdDeviation::check() {
     int n = getParam<int>("n");
     if (n < 2) {
         HKU_ERROR("Invalid param[n] ! (n >= 2) " << m_params
                 << " [StdDeviation::calculate]");
-        return;
+        return false;
     }
+
+    return true;
+}
+
+void StdDeviation::_calculate(const Indicator& data) {
+    size_t total = data.size();
+    int n = getParam<int>("n");
 
     m_discard = data.discard() + n - 1;
 

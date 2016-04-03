@@ -9,7 +9,7 @@
 
 namespace hku {
 
-RightShift::RightShift(): IndicatorImp("REF") {
+RightShift::RightShift(): IndicatorImp("REF", 1) {
     setParam<int>("n", 1);
 }
 
@@ -17,16 +17,20 @@ RightShift::~RightShift() {
 
 }
 
-void RightShift::calculate(const Indicator& data)  {
-    size_t total = data.size();
-    _readyBuffer(total, 1);
-
+bool RightShift::check() {
     int n = getParam<int>("n");
     if (n < 0) {
         HKU_ERROR("Invalid param! (n>=0) "
                   << m_params << " [RightShift::RightShift]");
-        return;
+        return false;
     }
+
+    return true;
+}
+
+void RightShift::_calculate(const Indicator& data)  {
+    size_t total = data.size();
+    int n = getParam<int>("n");
 
     m_discard = data.discard() + n;
     for (size_t i = m_discard; i < total; ++i) {

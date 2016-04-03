@@ -22,8 +22,6 @@ class Ama: public IndicatorImp {
     INDICATOR_IMP(Ama)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
-    virtual bool check();
-
 public:
     Ama();
     virtual ~Ama();

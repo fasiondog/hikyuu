@@ -10,7 +10,7 @@
 
 namespace hku {
 
-Macd::Macd(): IndicatorImp("MACD") {
+Macd::Macd(): IndicatorImp("MACD", 3) {
     setParam<int>("n1", 12);
     setParam<int>("n2", 26);
     setParam<int>("n3", 9);
@@ -20,7 +20,17 @@ Macd::~Macd() {
 
 }
 
-void Macd::calculate(const Indicator& data) {
+bool Macd::check() {
+    int n1 = getParam<int>("n1");
+    int n2 = getParam<int>("n2");
+    int n3 = getParam<int>("n3");
+    if (n1 <= 0 || n2 <= 0 || n3 <= 0) {
+        return false;
+    }
+    return true;
+}
+
+void Macd::_calculate(const Indicator& data) {
     size_t total = data.size();
     _readyBuffer(total, 3);
 

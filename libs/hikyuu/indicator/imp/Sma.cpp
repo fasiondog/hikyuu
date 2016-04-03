@@ -9,7 +9,7 @@
 
 namespace hku {
 
-Sma::Sma(): IndicatorImp("SMA") {
+Sma::Sma(): IndicatorImp("SMA", 1) {
     setParam<int>("n", 22);
 }
 
@@ -17,15 +17,19 @@ Sma::~Sma() {
 
 }
 
-void Sma::calculate(const Indicator& indicator) {
-    size_t total = indicator.size();
-    _readyBuffer(total, 1);
-
+bool Sma::check() {
     int n = getParam<int>("n");
     if (n < 1) {
         HKU_ERROR("Invalid param! (n >= 1) [Ma::Ma]");
-        return;
+        return false;
     }
+
+    return true;
+}
+
+void Sma::_calculate(const Indicator& indicator) {
+    size_t total = indicator.size();
+    int n = getParam<int>("n");
 
     m_discard = indicator.discard();
     size_t startPos = m_discard;

@@ -9,7 +9,7 @@
 
 namespace hku {
 
-Ema::Ema(): IndicatorImp("EMA") {
+Ema::Ema(): IndicatorImp("EMA", 1) {
     setParam<int>("n", 22);
 }
 
@@ -17,15 +17,20 @@ Ema::~Ema() {
 
 }
 
-void Ema::calculate(const Indicator& indicator) {
-    size_t total = indicator.size();
-    _readyBuffer(total, 1);
-
+bool Ema::check() {
     int n = getParam<int>("n");
     if (n <= 0) {
-        HKU_ERROR("Invalid param[n] must > 0 ! [Ema::Ema]");
-        return;
+        HKU_ERROR("Invalid param[n] must > 0 ! [Ema::check]");
+        return false;
     }
+
+    return true;
+}
+
+void Ema::_calculate(const Indicator& indicator) {
+    size_t total = indicator.size();
+
+    int n = getParam<int>("n");
 
     m_discard = indicator.discard();
     if (total <= m_discard) {

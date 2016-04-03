@@ -65,8 +65,11 @@ IPriceList::~IPriceList() {
 
 }
 
+bool IPriceList::check() {
+    return true;
+}
 
-void IPriceList::calculate(const Indicator& data) {
+void IPriceList::_calculate(const Indicator& data) {
     int result_num = getParam<int>("result_num");
     if (result_num < 0 || result_num >= data.getResultNumber()) {
         HKU_ERROR("result_num out of range! [IPriceList::IPriceList]");

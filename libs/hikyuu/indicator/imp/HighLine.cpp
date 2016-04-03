@@ -9,7 +9,7 @@
 
 namespace hku {
 
-HighLine::HighLine() : IndicatorImp("HHV") {
+HighLine::HighLine() : IndicatorImp("HHV", 1) {
     setParam<int>("n", 20);
 }
 
@@ -17,16 +17,21 @@ HighLine::~HighLine() {
 
 }
 
-void HighLine::calculate(const Indicator& data) {
-    size_t total = data.size();
-    _readyBuffer(total, 1);
-
+bool HighLine::check() {
     int n = getParam<int>("n");
     if (n < 1) {
         HKU_ERROR("Invalid param[n] ! (n >= 1) " << m_params
                 << " [HighLine::calculate]");
-        return;
+        return false;
     }
+
+    return true;
+}
+
+void HighLine::_calculate(const Indicator& data) {
+    size_t total = data.size();
+
+    int n = getParam<int>("n");
 
     m_discard = data.discard() + n - 1;
 

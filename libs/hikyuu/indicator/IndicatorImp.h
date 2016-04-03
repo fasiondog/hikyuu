@@ -37,6 +37,7 @@ public:
     /** 默认构造函数   */
     IndicatorImp();
     IndicatorImp(const string& name);
+    IndicatorImp(const string& name, size_t result_num);
 
     virtual ~IndicatorImp();
 
@@ -94,12 +95,15 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
+    void calculate(const Indicator& data);
+
     // ===================
     //  子类接口
     // ===================
     virtual bool check() { return false;}
 
-    virtual void calculate(const Indicator& data) {}
+
+    virtual void _calculate(const Indicator& data) {}
 
     typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
     virtual IndicatorImpPtr operator()(const Indicator& ind);
@@ -163,7 +167,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
 #endif
 
 #define INDICATOR_IMP(classname) public: \
-    virtual void calculate(const Indicator& data); \
+    virtual bool check(); \
+    virtual void _calculate(const Indicator& data); \
     virtual IndicatorImpPtr operator()(const Indicator& ind) { \
         IndicatorImpPtr p = make_shared<classname>(); \
         p->setParameter(m_params); \

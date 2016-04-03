@@ -87,8 +87,18 @@ IKData::~IKData() {
 
 }
 
+bool IKData::check() {
+    string part = getParam<string>("kpart");
+    if ("KDATA" == part || "OPEN" == part || "HIGH" == part || "LOW" == part
+            || "CLOSE" == part || "AMO" == part || "VOL" == part) {
+        return true;
+    }
+
+    return false;
+}
+
 //支持KDATA Indicator作为参数
-void IKData::calculate(const Indicator& ind) {
+void IKData::_calculate(const Indicator& ind) {
     if (ind.getResultNumber() < 6) {
         return;
     }

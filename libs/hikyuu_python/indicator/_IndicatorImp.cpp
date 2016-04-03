@@ -45,7 +45,7 @@ void export_IndicatorImp() {
             .def("_readyBuffer", &IndicatorImp::_readyBuffer)
             .def("getResultNumber", &IndicatorImp::getResultNumber)
             .def("getResultAsPriceList", &IndicatorImp::getResultAsPriceList)
-            .def("__call__", &IndicatorImp::operator(), &IndicatorImpWrap::default_call)
+            .def("__call__", &IndicatorImp::operator())//, &IndicatorImpWrap::default_call)
             ;
 
     register_ptr_to_python<IndicatorImpPtr>();

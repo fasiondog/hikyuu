@@ -1,19 +1,5 @@
 <NotepadPlus>
     <Project name="hikyuu">
-        <Folder name="docs">
-            <Folder name="developer">
-                <File name="tools\hikyuu\docs\source\developer\FAQ.rst" />
-                <File name="tools\hikyuu\docs\source\developer\Hikyuu_core.rst" />
-                <File name="tools\hikyuu\docs\source\developer\Prerequisites.rst" />
-            </Folder>
-            <Folder name="user">
-                <File name="tools\hikyuu\docs\source\user\signal.rst" />
-            </Folder>
-            <File name="tools\hikyuu\docs\source\conf.py" />
-            <File name="tools\hikyuu\docs\source\developer_guide.rst" />
-            <File name="tools\hikyuu\docs\source\index.rst" />
-            <File name="tools\hikyuu\docs\source\user_guide.rst" />
-        </Folder>
         <Folder name="examples">
             <File name="tools\hikyuu\examples\Turtle_SG.py" />
             <File name="tools\hikyuu\examples\examples_init.py" />
@@ -75,5 +61,19 @@
         <File name="tools\hikyuu\ipython&#x914D;&#x7F6E;&#x8BF4;&#x660E;.txt" />
         <File name="tools\hikyuu\matplotlibrc" />
         <File name="tools\hikyuu\__init__.py" />
+    </Project>
+    <Project name="hikyuu_doc">
+        <Folder name="developer">
+            <File name="tools\hikyuu\docs\source\developer\FAQ.rst" />
+            <File name="tools\hikyuu\docs\source\developer\Hikyuu_core.rst" />
+            <File name="tools\hikyuu\docs\source\developer\Prerequisites.rst" />
+        </Folder>
+        <Folder name="user">
+            <File name="tools\hikyuu\docs\source\user\signal.rst" />
+        </Folder>
+        <File name="tools\hikyuu\docs\source\conf.py" />
+        <File name="tools\hikyuu\docs\source\developer_guide.rst" />
+        <File name="tools\hikyuu\docs\source\index.rst" />
+        <File name="tools\hikyuu\docs\source\user_guide.rst" />
     </Project>
 </NotepadPlus>

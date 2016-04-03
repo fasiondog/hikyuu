@@ -10,7 +10,7 @@
 
 namespace hku {
 
-Ama::Ama() : IndicatorImp("AMA") {
+Ama::Ama() : IndicatorImp("AMA", 2) {
     setParam<int>("n", 10);
     setParam<int>("fast_n", 2);
     setParam<int>("slow_n", 30);
@@ -28,25 +28,20 @@ bool Ama::check() {
     int slow_n = getParam<int>("slow_n");
     if (n < 1 || fast_n < 0 || slow_n < 0) {
         HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) "
-                  << m_params << " [Ama::Ama]");
+                  << m_params << " [Ama::check]");
         return false;
     }
 
     return true;
 }
 
-void Ama::calculate(const Indicator& data) {
+
+void Ama::_calculate(const Indicator& data) {
     size_t total = data.size();
-    _readyBuffer(total, 2);
 
     int n = getParam<int>("n");
     int fast_n = getParam<int>("fast_n");
     int slow_n = getParam<int>("slow_n");
-    if (n < 1 || fast_n < 0 || slow_n < 0) {
-        HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) "
-                  << m_params << " [Ama::Ama]");
-        return;
-    }
 
     m_discard = data.discard();
     size_t start = m_discard;

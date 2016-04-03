@@ -37,6 +37,15 @@ IndicatorImp::IndicatorImp(const string& name)
     memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
+IndicatorImp::IndicatorImp(const string& name, size_t result_num)
+: m_name(name), m_discard(0) {
+    memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
+    m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
+    for (size_t i = 0; i < m_result_num; ++i) {
+        m_pBuffer[i] = new PriceList();
+    }
+}
+
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     if (result_num > MAX_RESULT_NUM) {
         throw(std::invalid_argument("result_num oiverload MAX_RESULT_NUM! "
@@ -135,6 +144,15 @@ Indicator IndicatorImp::getResult(size_t result_num) {
         imp->_set(get(i, result_num), i);
     }
     return Indicator(imp);
+}
+
+void IndicatorImp::calculate(const Indicator& data) {
+    _readyBuffer(data.size(), m_result_num);
+    if (check()) {
+        _calculate(data);
+    } else {
+        HKU_WARN("Invalid param! " << long_name());
+    }
 }
 
 } /* namespace hku */
