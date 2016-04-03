@@ -80,7 +80,7 @@ size_t Indicator::size() const {
 }
 
 HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
-    /*if (ind1.size() != ind2.size() || ind1.size() == 0) {
+    if (ind1.size() != ind2.size() || ind1.size() == 0) {
         return Indicator();
     }
 
@@ -96,13 +96,12 @@ HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
         }
     }
 
-    return Indicator(imp);*/
-    return Indicator(ind1.getImp() + ind2.getImp());
+    return Indicator(imp);
 }
 
 
 HKU_API Indicator operator-(const Indicator& ind1, const Indicator& ind2) {
-    /*if (ind1.size() != ind2.size() || ind1.size() == 0) {
+    if (ind1.size() != ind2.size() || ind1.size() == 0) {
         return Indicator();
     }
 
@@ -118,13 +117,12 @@ HKU_API Indicator operator-(const Indicator& ind1, const Indicator& ind2) {
         }
     }
 
-    return Indicator(imp);*/
-    return Indicator(ind1.getImp() - ind2.getImp());
+    return Indicator(imp);
 }
 
 
 HKU_API Indicator operator*(const Indicator& ind1, const Indicator& ind2) {
-    /*if (ind1.size() != ind2.size() || ind1.size() == 0) {
+    if (ind1.size() != ind2.size() || ind1.size() == 0) {
         return Indicator();
     }
 
@@ -141,13 +139,11 @@ HKU_API Indicator operator*(const Indicator& ind1, const Indicator& ind2) {
     }
 
     return Indicator(imp);
-    */
-    return Indicator(ind1.getImp() * ind2.getImp());
 }
 
 
 HKU_API Indicator operator/(const Indicator& ind1, const Indicator& ind2) {
-    /*if (ind1.size() != ind2.size() || ind1.size() == 0) {
+    if (ind1.size() != ind2.size() || ind1.size() == 0) {
         return Indicator();
     }
 
@@ -167,8 +163,7 @@ HKU_API Indicator operator/(const Indicator& ind1, const Indicator& ind2) {
         }
     }
 
-    return Indicator(imp);*/
-    return Indicator(ind1.getImp() / ind2.getImp());
+    return Indicator(imp);
 }
 
 } /* namespace hku */

@@ -15,7 +15,6 @@ project : requirements <library>/boost//filesystem
                        <toolset>msvc:<library>/sqlite3//sqlite3
                        <toolset>msvc:<include>../extern-libs/hdf5/include
                        <toolset>msvc:<include>../extern-libs/log4cplus/include
-                       <toolset>msvc:<include>../extern-libs/tbb/include
                        <toolset>msvc:<link>shared:<define>HKU_API="__declspec(dllimport)"
                        <toolset>msvc:<define>__WIN32__
 					   #<toolset>msvc:<define>BOOST_ALL_DYN_LINK 

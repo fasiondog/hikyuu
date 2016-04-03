@@ -2,4 +2,3 @@
 sqlite-amalgamation-3071502
 log4cplus-1.1.1-rc3
 mysql-connector-c-6.1.5-winx64
-tbb43_20141204oss
