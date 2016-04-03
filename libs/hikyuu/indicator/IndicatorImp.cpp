@@ -28,17 +28,17 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
 
 
 IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0) {
+: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_optype(LEAF) {
     memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name)
-: m_name(name), m_discard(0), m_result_num(0) {
+: m_name(name), m_discard(0), m_result_num(0), m_optype(LEAF) {
     memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name, size_t result_num)
-: m_name(name), m_discard(0) {
+: m_name(name), m_discard(0), m_optype(LEAF) {
     memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
     for (size_t i = 0; i < m_result_num; ++i) {
@@ -153,6 +153,96 @@ void IndicatorImp::calculate(const Indicator& data) {
     } else {
         HKU_WARN("Invalid param! " << long_name());
     }
+}
+
+
+HKU_API IndicatorImpPtr operator+(const IndicatorImpPtr& ind1,
+        const IndicatorImpPtr& ind2){
+    if (!ind1 || !ind2 || ind1->size() ==0 || ind1->size() != ind2->size()) {
+        return IndicatorImpPtr();
+    }
+
+    size_t result_number = std::min(ind1->getResultNumber(), ind2->getResultNumber());
+    size_t total = ind1->size();
+    size_t discard = std::max(ind1->discard(), ind2->discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind1->get(i, r) + ind2->get(i, r), i, r);
+        }
+    }
+
+    return imp;
+}
+
+
+HKU_API IndicatorImpPtr operator-(const IndicatorImpPtr& ind1,
+        const IndicatorImpPtr& ind2) {
+    if (!ind1 || !ind2 || ind1->size() ==0 || ind1->size() != ind2->size()) {
+        return IndicatorImpPtr();
+    }
+
+    size_t result_number = std::min(ind1->getResultNumber(), ind2->getResultNumber());
+    size_t total = ind1->size();
+    size_t discard = std::max(ind1->discard(), ind2->discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind1->get(i, r) - ind2->get(i, r), i, r);
+        }
+    }
+
+    return imp;
+}
+
+HKU_API IndicatorImpPtr operator*(const IndicatorImpPtr& ind1,
+        const IndicatorImpPtr& ind2) {
+    if (!ind1 || !ind2 || ind1->size() ==0 || ind1->size() != ind2->size()) {
+        return IndicatorImpPtr();
+    }
+
+    size_t result_number = std::min(ind1->getResultNumber(), ind2->getResultNumber());
+    size_t total = ind1->size();
+    size_t discard = std::max(ind1->discard(), ind2->discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind1->get(i, r) * ind2->get(i, r), i, r);
+        }
+    }
+
+    return imp;
+}
+
+HKU_API IndicatorImpPtr operator/(const IndicatorImpPtr& ind1,
+        const IndicatorImpPtr& ind2) {
+    if (!ind1 || !ind2 || ind1->size() ==0 || ind1->size() != ind2->size()) {
+        return IndicatorImpPtr();
+    }
+
+    size_t result_number = std::min(ind1->getResultNumber(), ind2->getResultNumber());
+    size_t total = ind1->size();
+    size_t discard = std::max(ind1->discard(), ind2->discard());
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (ind2->get(i, r) == 0.0) {
+                imp->_set(Null<price_t>(), i, r);
+            } else {
+                imp->_set(ind1->get(i, r) / ind2->get(i, r), i, r);
+            }
+        }
+    }
+
+    return imp;
 }
 
 } /* namespace hku */
