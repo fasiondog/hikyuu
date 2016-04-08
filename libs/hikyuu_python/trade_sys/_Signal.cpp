@@ -49,7 +49,6 @@ void export_Signal() {
             .def(init<const string&>())
             .def(self_ns::str(self))
             .add_property("name", get_name, set_name)
-            .add_property("kdata", &SignalBase::getTO)
             //因为Indicator无法使用params['name']的形式，所以统一使用setParm/getParam
             //.add_property("params",
             //        make_function(&SignalBase::getParameter,

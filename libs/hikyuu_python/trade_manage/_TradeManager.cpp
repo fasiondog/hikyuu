@@ -13,23 +13,6 @@
 using namespace boost::python;
 using namespace hku;
 
-TradeManagerPtr (*crtTM1)(const Datetime&, price_t, const TradeCostPtr&, const string&) = crtTM;
-BOOST_PYTHON_FUNCTION_OVERLOADS(crtTM1_overloads, crtTM, 0, 4);
-
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cash_overload, cash, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFundsCurve_overload, getFundsCurve, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getProfitCurve_overload, getProfitCurve, 1, 2);
-
-FundsRecord (TradeManager::*getFunds_1)(KQuery::KType) const = &TradeManager::getFunds;
-FundsRecord (TradeManager::*getFunds_2)(const Datetime&, KQuery::KType) = &TradeManager::getFunds;
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFunds_1_overload, TradeManager::getFunds, 0, 1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFunds_2_overload, TradeManager::getFunds, 1, 2);
-
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(buy_overload, buy, 4, 8);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sell_overload, sell, 3, 8);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(buyShort_overload, buyShort, 3, 8);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sellShort_overload, sellShort, 4, 8);
-
 #if HKU_PYTHON_SUPPORT_PICKLE
 struct TradeManager_pickle_suite : bp::pickle_suite {
     static
@@ -59,6 +42,27 @@ struct TradeManager_pickle_suite : bp::pickle_suite {
 #endif /* HKU_PYTHON_SUPPORT_PICKLE */
 
 
+TradeManagerPtr (*crtTM1)(const Datetime&, price_t, const TradeCostPtr&, const string&) = crtTM;
+BOOST_PYTHON_FUNCTION_OVERLOADS(crtTM1_overloads, crtTM, 0, 4);
+
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cash_overload, cash, 1, 2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFundsCurve_overload, getFundsCurve, 1, 2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getProfitCurve_overload, getProfitCurve, 1, 2);
+
+FundsRecord (TradeManager::*getFunds_1)(KQuery::KType) const = &TradeManager::getFunds;
+FundsRecord (TradeManager::*getFunds_2)(const Datetime&, KQuery::KType) = &TradeManager::getFunds;
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFunds_1_overload, TradeManager::getFunds, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFunds_2_overload, TradeManager::getFunds, 1, 2);
+
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(buy_overload, buy, 4, 8);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sell_overload, sell, 3, 8);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(buyShort_overload, buyShort, 3, 8);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sellShort_overload, sellShort, 4, 8);
+
+TradeCostPtr (TradeManager::*get_costFunc)() const = &TradeManager::costFunc;
+void (TradeManager::*set_costFunc)(const TradeCostPtr&) = &TradeManager::costFunc;
+
+
 void export_TradeManager() {
 
     class_<TradeManager>("TradeManager", init<const Datetime&, price_t,
@@ -76,7 +80,7 @@ void export_TradeManager() {
             .add_property("lastDatetime", &TradeManager::lastDatetime)
             .add_property("reinvest", &TradeManager::reinvest)
             .add_property("precision", &TradeManager::precision)
-            .add_property("costFunc", &TradeManager::costFunc)
+            .add_property("costFunc", get_costFunc, set_costFunc)
 
             .def("getParam", &TradeManager::getParam<boost::any>)
             .def("setParam", &TradeManager::setParam<object>)

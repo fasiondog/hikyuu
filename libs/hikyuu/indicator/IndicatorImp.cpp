@@ -41,9 +41,6 @@ IndicatorImp::IndicatorImp(const string& name, size_t result_num)
 : m_name(name), m_discard(0) {
     memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
-    for (size_t i = 0; i < m_result_num; ++i) {
-        m_pBuffer[i] = new PriceList();
-    }
 }
 
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
@@ -55,33 +52,22 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
 
     price_t null_price = Null<price_t>();
 
-    if (m_result_num <= result_num) {
-        for (size_t i = 0; i < m_result_num; ++i) {
-            m_pBuffer[i]->clear();
-            m_pBuffer[i]->reserve(len);
-            for (size_t j = 0; j < len; ++j) {
-                m_pBuffer[i]->push_back(null_price);
-            }
-        }
-
-        for (size_t i = m_result_num; i < result_num; ++i) {
+    for (size_t i = 0; i < result_num; ++i) {
+        if (!m_pBuffer[i]) {
             m_pBuffer[i] = new PriceList(len, null_price);
-        }
 
-    } else {
-        //if (m_result_num > result_num)
-        for (size_t i = 0; i < result_num; ++i) {
+        } else {
             m_pBuffer[i]->clear();
             m_pBuffer[i]->reserve(len);
             for (size_t j = 0; j < len; ++j) {
                 m_pBuffer[i]->push_back(null_price);
             }
         }
+    }
 
-        for (size_t i = result_num; i < m_result_num; ++i) {
-            delete m_pBuffer[i];
-            m_pBuffer[i] = NULL;
-        }
+    for (size_t i = result_num; i < m_result_num; ++i) {
+        delete m_pBuffer[i];
+        m_pBuffer[i] = NULL;
     }
 
     m_result_num = result_num;

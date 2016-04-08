@@ -24,7 +24,9 @@ void export_KData() {
 
             .def("getDatetimeList", &KData::getDatetimeList)
             .def("getKRecord", &KData::getKRecord)
+            .def("get", &KData::getKRecord)
             .def("getKRecordByDate", &KData::getKRecordByDate)
+            .def("getByDate", &KData::getKRecordByDate)
             .def("_getPos", &KData::getPos) //python中需要将Null的情况改写为None
 
             .def("size", &KData::size)

@@ -11,11 +11,11 @@ Welcome to Hikyuu's documentation!
 
    user_guide
    developer_guide
+   
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
-
+* :ref:`search`   

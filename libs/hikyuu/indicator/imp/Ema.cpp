@@ -43,7 +43,7 @@ void Ema::_calculate(const Indicator& indicator) {
 
     price_t multiplier = 2.0 / (n + 1);
     for (size_t i = startPos + 1; i < total; ++i) {
-        ema = indicator[i] * multiplier + ema - ema * multiplier;
+        ema = (indicator[i] - ema) * multiplier + ema;
         _set(ema, i);
     }
 }

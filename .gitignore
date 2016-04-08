@@ -10,6 +10,7 @@
 .metadata
 .settings
 /build
+/tools/hikyuu/docs/build
 /docs/docs-web/build
 /docs/reference
 /docs/test-doc

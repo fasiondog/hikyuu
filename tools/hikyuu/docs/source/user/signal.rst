@@ -5,7 +5,8 @@
 信号指示器
 ==========
 
-信号指示器模块，包括各种信号指示器构造函数。信号指示器负责产生买入、卖出信号。
+信号指示器负责产生买入、卖出信号。
+
 
 通用信号指示器
 --------------
@@ -31,12 +32,20 @@
 自定义信号指示器
 ----------------
 
+自定义信号指示器，必须实现 :py:meth:`SignalBase._clone` 和 :py:meth:`SignalBase_calculate`  方法（如示例1）。如果含有私有属性，还需实现 :py:meth:`SignalBase._reset` 方法（如示例2）。
+
+示例1（不含私有变量，海龟交易策略）:
+
+.. literalinclude:: ../../../examples/Turtle_SG.py                
+                
+示例2（含私有属性）:
+
 ::
 
     class SignalPython(SignalBase):
         def __init__(self):
             super(SignalPython, self).__init__("SignalPython")
-            self._x = 0
+            self._x = 0 #私有属性
             self.setParam("test", 30)
         
         def _reset(self):
@@ -55,16 +64,16 @@
 信号指示器基类
 --------------
 
-自定义的信号指示器，应实现_clone, _reset, _calculate接口。
+自定义的信号指示器，应实现 :py:meth:`SignalBase._clone`, :py:meth:`SignalBase._reset`, :py:meth:`SignalBase._calculate` 接口。
 
-.. py:class:: SignalBase
+.. py:class:: SignalBase([name])
 
     信号指示器基类
     
     .. py:attribute:: name
     
         信号指示器名称
-    
+        
     .. py:method:: getParam(name)
 
         获取指定的参数
@@ -86,7 +95,7 @@
     
         :param KData k: 设置交易对象
         
-    .. py:method:: getTO
+    .. py:method:: getTO()
     
         :return: 交易对象
         :rtype: KData

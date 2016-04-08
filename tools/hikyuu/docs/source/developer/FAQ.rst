@@ -50,22 +50,3 @@
 ::
 
   > xelatex -interaction=nonstopmode Hikyuu.tex
-
-如何去除
-d:\workspace\fasiondog\trunk\libs\galaxy\galaxy\tradesys\cost\../TradeCostBase.h : warning C4819: 该文件包含
-不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-rule configure-version-specific ( toolset : version : conditions )
-{
-    toolset.push-checking-for-flags-module unchecked ;
-    # Starting with versions 7.0, the msvc compiler have the /Zc:forScope and
-    # /Zc:wchar_t options that improve C++ standard conformance, but those
-    # options are off by default. If we are sure that the msvc version is at
-    # 7.*, add those options explicitly. We can be sure either if user specified
-    # version 7.* explicitly or if we auto-detected the version ourselves.
-    if ! [ MATCH ^(6\\.) : $(version) ]
-    {
-        toolset.flags $(toolset).compile CFLAGS $(conditions) : /Zc:forScope /Zc:wchar_t ;
-        toolset.flags $(toolset).compile.c++ C++FLAGS $(conditions) : /wd4675 ;
-        toolset.flags $(toolset).compile.c++ C++FLAGS $(conditions) : /wd4819 ;
-
-b2 -j 4 release link=shared address-model=64

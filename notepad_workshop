@@ -72,8 +72,8 @@
             <File name="tools\hikyuu\docs\source\user\signal.rst" />
         </Folder>
         <File name="tools\hikyuu\docs\source\conf.py" />
-        <File name="tools\hikyuu\docs\source\developer_guide.rst" />
         <File name="tools\hikyuu\docs\source\index.rst" />
+        <File name="tools\hikyuu\docs\source\developer_guide.rst" />
         <File name="tools\hikyuu\docs\source\user_guide.rst" />
     </Project>
 </NotepadPlus>

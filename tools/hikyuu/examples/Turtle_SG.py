@@ -4,7 +4,7 @@
 
 #===============================================================================
 # Aothor: fasiondog
-# History: 20130128, Added by fasiondog
+# History: 20160407, Added by fasiondog
 #===============================================================================
 
 from hikyuu.trade_sys.signal import SignalBase
@@ -22,8 +22,8 @@ class TurtleSignal(SignalBase):
         n = self.getParam("n")
         k = self.getTO()
         c = CLOSE(k)
-        h = REF(HHV(c, n), 1)
-        L = REF(LLV(c, n), 1)
+        h = REF(HHV(c, n), 1) #前n日高点
+        L = REF(LLV(c, n), 1) #前n日低点
         for i in range(h.discard, len(k)):
             if (c[i] >= h[i]):
                 self._addBuySignal(k[i].datetime)
@@ -40,6 +40,6 @@ if __name__ == "__main__":
     dates = k.getDatetimeList()
     for d in dates:
         if (sg.shouldBuy(d)):
-            print("买入：%s" % str(d))
+            print("买入：%s" % d)
         elif (sg.shouldSell(d)):
-            print("卖出: %s" % str(d))
+            print("卖出: %s" % d)

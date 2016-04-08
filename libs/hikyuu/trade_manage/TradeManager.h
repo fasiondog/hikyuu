@@ -90,6 +90,9 @@ public:
     /** 获取交易算法指针 */
     TradeCostPtr costFunc() const { return m_costfunc; }
 
+    /** 设置交易算法指针 */
+    void costFunc(const TradeCostPtr& func) { m_costfunc = func; }
+
     /**
      * 返回当前现金
      * @note 仅返回当前信息，不会根据权息进行调整

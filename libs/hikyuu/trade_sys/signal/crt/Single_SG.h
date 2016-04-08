@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_SIGNAL_CRT_SINGLE_SG_H_
 #define TRADE_SYS_SIGNAL_CRT_SINGLE_SG_H_
 
-#include "../../../indicator/Indicator.h"
+#include "../../../indicator/Operand.h"
 #include "../SignalBase.h"
 
 namespace hku {
@@ -22,7 +22,7 @@ namespace hku {
  * @return
  * @ingroup Signal
  */
-SignalPtr HKU_API Single_SG(const Indicator& ind,
+SignalPtr HKU_API Single_SG(const Operand& ind,
         int filter_n = 20, double filter_p = 0.1,
         const string& kpart = "CLOSE");
 

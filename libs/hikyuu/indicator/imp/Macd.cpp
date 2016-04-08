@@ -56,8 +56,8 @@ void Macd::_calculate(const Indicator& data) {
     _set(dea, 0, 2);
 
     for (size_t  i = 1; i < total; ++i) {
-        ema1 = data[i] * m1 + ema1 - ema1 * m1;
-        ema2 = data[i] * m2 + ema2 - ema2 * m2;
+        ema1 = (data[i] - ema1) * m1 + ema1;
+        ema2 = (data[i] - ema2) * m2 + ema2;
         diff = ema1 - ema2;
         dea = diff * m3 + dea - dea * m3;
         bar = diff - dea;
