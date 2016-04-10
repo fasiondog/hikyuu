@@ -13,8 +13,7 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/crtFixedATC.h>
+#include <hikyuu/trade_manage/build_in.h>
 #include <hikyuu/trade_sys/moneymanager/crt/FixedCount_MM.h>
 
 using namespace hku;

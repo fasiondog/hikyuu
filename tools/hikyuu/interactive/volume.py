@@ -12,7 +12,7 @@
 """
 from hikyuu import Query, escapetime
 from hikyuu.indicator import Indicator, MA, CLOSE, VOL, OP
-from hikyuu.trade_sys.signal import SG_Cross
+from hikyuu.trade_sys.signal import Cross_SG
 from hikyuu.interactive.drawplot import (create_two_axes_figure, ax_set_locator_formatter, adjust_axes_show,
                                          create_three_axes_figure, ax_draw_macd,
                                          ax_draw_signal)
@@ -35,7 +35,7 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
     ma4.plot(axes=ax1, legend_on=True)
     ma5.plot(axes=ax1, legend_on=True)
     
-    sg = SG_Cross(OP(MA(n=ma1_n, type=ma_type)), OP(MA(n=ma2_n, type=ma_type)))
+    sg = Cross_SG(OP(MA(n=ma1_n, type=ma_type)), OP(MA(n=ma2_n, type=ma_type)))
     sg.setTO(kdata)
     ax_draw_signal(ax1, kdata, sg.getBuySignal(), 'BUY', 1)
     ax_draw_signal(ax1, kdata, sg.getSellSignal(), 'SELL', 1)

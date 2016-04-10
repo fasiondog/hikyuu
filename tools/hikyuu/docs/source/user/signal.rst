@@ -16,21 +16,21 @@
 单曲线拐点信号指示器
 ^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: SG_Single(ind[, filter_n = 20, filter_p = 0.1, kpart='CLOSE'])
+.. py:function:: Single_SG(ind[, filter_n = 20, filter_p = 0.1, kpart='CLOSE'])
     
     单线拐点信号指示器
 
 
-.. py:function:: SG_Cross(fast, slow)
+.. py:function:: Cross_SG(fast, slow)
 
     :param OP fast: 快线
     :param OP slow: 慢线
 
 ::
     
-    SG_Cross(OP(MA(n=10)), OP(MA(n=30)))
+    Cross_SG(OP(MA(n=10)), OP(MA(n=30)))
 
-.. py:function:: SG_Flex(ind[, p = 2.0, kpart = 'CLOSE'])
+.. py:function:: Flex_SG(ind[, p = 2.0, kpart = 'CLOSE'])
 
 
 

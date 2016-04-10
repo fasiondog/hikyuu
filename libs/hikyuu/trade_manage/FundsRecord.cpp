@@ -30,6 +30,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const FundsRecord& funds) {
 FundsRecord::FundsRecord()
 : cash(0.0),
   market_value(0.0),
+  short_market_value(0.0),
   base_cash(0.0),
   base_asset(0.0),
   borrow_cash(0.0),

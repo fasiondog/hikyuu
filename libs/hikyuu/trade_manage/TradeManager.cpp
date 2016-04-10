@@ -10,7 +10,6 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include "TradeManager.h"
-#include "crt/crtZeroTC.h"
 #include "../trade_sys/system/SystemPart.h"
 #include "../utilities/util.h"
 #include "../KData.h"

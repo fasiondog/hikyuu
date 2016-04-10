@@ -20,7 +20,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_sys/signal/sg_build_in.h>
+#include <hikyuu/trade_sys/signal/build_in.h>
 #include <hikyuu/indicator/crt/AMA.h>
 
 using namespace hku;
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE( test_AMA_SG_export ) {
     string filename(sm.tmpdir());
     filename += "/AMA_SG.xml";
 
-    SignalPtr sg1 = SG_Single(AMA());
+    SignalPtr sg1 = Single_SG(AMA());
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

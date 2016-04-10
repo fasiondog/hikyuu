@@ -8,8 +8,6 @@
 #ifndef BLOCK_H_
 #define BLOCK_H_
 
-#include "DataType.h"
-#include "Stock.h"
 #include "StockMapIterator.h"
 
 namespace hku {

@@ -6,7 +6,6 @@
  */
 
 #include <boost/algorithm/string.hpp>
-#include "Block.h"
 #include "StockManager.h"
 
 namespace hku {

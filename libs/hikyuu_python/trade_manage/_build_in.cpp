@@ -7,7 +7,6 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_manage/build_in.h>
-#include <hikyuu/trade_manage/crt/TestStub_TC.h>
 
 using namespace boost::python;
 using namespace hku;

@@ -20,10 +20,10 @@ namespace hku {
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Cross(const Operand& fast, const Operand& slow);
+SignalPtr HKU_API Cross_SG(const Operand& fast, const Operand& slow);
 
 /**
- * SG_Single
+ * Single_SG
  * @param ind
  * @param filter_n
  * @param filter_p
@@ -31,11 +31,11 @@ SignalPtr HKU_API SG_Cross(const Operand& fast, const Operand& slow);
  * @return
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Single(const Operand& ind,
+SignalPtr HKU_API Single_SG(const Operand& ind,
         int filter_n = 20, double filter_p = 0.1,
         const string& kpart = "CLOSE");
 
-SignalPtr HKU_API SG_Flex(const Indicator& ind,
+SignalPtr HKU_API Flex_SG(const Indicator& ind,
         double p = 2.0, const string& kpart = "CLOSE");
 
 } /* namespace hku */

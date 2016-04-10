@@ -8,8 +8,6 @@
 #ifndef DATADRIVERFACTORY_H_
 #define DATADRIVERFACTORY_H_
 
-#include <hikyuu_utils/iniparser/IniParser.h>
-
 #include "BaseInfoDriver.h"
 #include "KDataDriver.h"
 #include "BlockInfoDriver.h"

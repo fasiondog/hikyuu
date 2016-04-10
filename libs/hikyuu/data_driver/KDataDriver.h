@@ -8,8 +8,6 @@
 #ifndef KDATADRIVER_H_
 #define KDATADRIVER_H_
 
-#include <hikyuu_utils/iniparser/IniParser.h>
-#include "../KData.h"
 #include "KDataDriverImp.h"
 
 namespace hku {

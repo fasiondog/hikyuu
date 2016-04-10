@@ -8,7 +8,7 @@
 #ifndef ALL_TRADE_SYS_H_
 #define ALL_TRADE_SYS_H_
 
-#include <hikyuu/trade_sys/signal/sg_build_in.h>
+#include "signal/build_in.h"
 #include "condition/build_in.h"
 #include "environment/build_in.h"
 #include "moneymanager/build_in.h"

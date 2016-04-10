@@ -10,11 +10,9 @@
 
 #include <hikyuu_utils/iniparser/IniParser.h>
 
-#include "Stock.h"
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
-#include "StockMapIterator.h"
 
 namespace hku {
 
