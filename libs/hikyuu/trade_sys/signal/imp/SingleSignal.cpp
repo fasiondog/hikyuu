@@ -62,13 +62,4 @@ void SingleSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API Single_SG(const Operand& ind,
-        int filter_n, double filter_p, const string& kpart) {
-    SingleSignal *p = new SingleSignal(ind);
-    p->setParam<int>("filter_n", filter_n);
-    p->setParam<double>("filter_p", filter_p);
-    p->setParam<string>("kpart", kpart);
-    return SignalPtr(p);
-}
-
 } /* namespace hku */

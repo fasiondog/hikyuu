@@ -36,6 +36,8 @@ if __name__ == "__main__":
     sg = TurtleSignal()
     s = getStock("sh000001")
     k = s.getKData(Query(-500))
+    
+    #只有设置交易对象时，才会开始实际计算
     sg.setTO(k)
     dates = k.getDatetimeList()
     for d in dates:

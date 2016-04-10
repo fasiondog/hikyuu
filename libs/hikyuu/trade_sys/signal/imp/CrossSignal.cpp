@@ -55,17 +55,6 @@ void CrossSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API Cross_SG(const Indicator& fast, const Indicator& slow,
-        const string& kpart) {
-    CrossSignal *p = new CrossSignal(fast, slow);
-    //p->setParam<string>("kpart", kpart);
-    return SignalPtr(p);
-}
 
-SignalPtr HKU_API Cross_SG(const Operand& fast, const Operand& slow) {
-    CrossSignal *p = new CrossSignal(fast, slow);
-    //p->setParam<string>("kpart", kpart);
-    return SignalPtr(p);
-}
 
 } /* namespace hku */

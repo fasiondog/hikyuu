@@ -59,11 +59,5 @@ void FlexSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API Flex_SG(const Indicator& ind, double p, const string& kpart) {
-    FlexSignal *ptr = new FlexSignal(ind);
-    ptr->setParam<double>("p", p);
-    ptr->setParam<string>("kpart", kpart);
-    return SignalPtr(ptr);
-}
 
 } /* namespace hku */

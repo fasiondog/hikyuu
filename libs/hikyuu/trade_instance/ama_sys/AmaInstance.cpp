@@ -5,7 +5,7 @@
  *      Author: Administrator
  */
 
-#include "../../trade_sys/signal/crt/Single_SG.h"
+#include "../../trade_sys/signal/sg_build_in.h"
 #include "../../indicator/crt/PRICELIST.h"
 #include "AmaInstance.h"
 
@@ -43,7 +43,7 @@ Indicator HKU_API AmaSpecial(const Block& block, KQuery query,
         KData kdata = stk_iter->getKData(query);
         if (kdata.empty())
             continue;
-        SignalPtr sg(Single_SG(ama));
+        SignalPtr sg(SG_Single(ama));
         sg->setTO(kdata);
         bool isHold = false;
         size_t n_dis = 0;

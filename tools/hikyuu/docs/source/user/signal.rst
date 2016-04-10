@@ -11,21 +11,26 @@
 通用信号指示器
 --------------
 
-.. py:function:: Signal_SG(ind[, filter_n = 20, filter_p = 0.1, kpart='CLOSE'])
+通常使用技术指标判断买入、卖出时，依据的是快线和慢线的交叉、或是单曲线的拐点。下面的通用信号指示器足够应付大部分的情况。
+
+单曲线拐点信号指示器
+^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Single(ind[, filter_n = 20, filter_p = 0.1, kpart='CLOSE'])
     
     单线拐点信号指示器
 
 
-.. py:function:: Cross_SG(fast, slow)
+.. py:function:: SG_Cross(fast, slow)
 
     :param OP fast: 快线
     :param OP slow: 慢线
 
 ::
     
-    Cross_SG(OP(MA(n=10)), OP(MA(n=30)))
+    SG_Cross(OP(MA(n=10)), OP(MA(n=30)))
 
-.. py:function:: Flex_SG(ind[, p = 2.0, kpart = 'CLOSE'])
+.. py:function:: SG_Flex(ind[, p = 2.0, kpart = 'CLOSE'])
 
 
 

@@ -6,8 +6,8 @@
  */
 
 #include <boost/python.hpp>
+#include <hikyuu/trade_sys/signal/sg_build_in.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
-#include <hikyuu/trade_sys/signal/build_in.h>
 #include "../_Parameter.h"
 #include "../pickle_support.h"
 
@@ -75,10 +75,10 @@ void export_Signal() {
 
     register_ptr_to_python<SignalPtr>();
 
-    def("Single_SG", Single_SG, (arg("ind"), arg("filter_n")=20,
+    def("SG_Single", SG_Single, (arg("ind"), arg("filter_n")=20,
             arg("filter_p")=0.1, arg("kpart")="CLOSE"));
-    def("Cross_SG", Cross_SG, args("fast", "slow"));
-    def("Flex_SG", Flex_SG, (arg("ind"), arg("p")=2.0, arg("kpart")="CLOSE"));
+    def("SG_Cross", SG_Cross, args("fast", "slow"));
+    def("SG_Flex", SG_Flex, (arg("ind"), arg("p")=2.0, arg("kpart")="CLOSE"));
 }
 
 
