@@ -78,7 +78,7 @@ void export_Signal() {
     def("Single_SG", Single_SG, (arg("ind"), arg("filter_n")=20,
             arg("filter_p")=0.1, arg("kpart")="CLOSE"));
     def("Cross_SG", Cross_SG, args("fast", "slow"));
-    def("Flex_SG", Flex_SG, (arg("ind"), arg("p")=2.0, arg("kpart")="CLOSE"));
+    def("Flex_SG", Flex_SG, (arg("op"), arg("slow_n"), arg("kpart") = "CLOSE"));
 }
 
 

@@ -30,6 +30,16 @@ Operand::Operand(const Operand& op) {
     m_root = op.m_root;
 }
 
+Operand& Operand::operator=(const Operand& op) {
+    if (this == &op)
+        return *this;
+
+    if (m_root != op.m_root)
+        m_root = op.m_root;
+
+    return *this;
+}
+
 Operand::Operand(const Operand& left, const Operand& right) {
     m_root = make_shared<OperandNode>();
     m_root->add(OperandNode::OP, left.m_root, right.m_root);

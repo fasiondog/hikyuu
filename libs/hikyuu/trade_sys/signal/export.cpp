@@ -28,11 +28,9 @@
 
 #include "imp/CrossSignal.h"
 #include "imp/SingleSignal.h"
-#include "imp/FlexSignal.h"
 
 BOOST_CLASS_EXPORT(hku::CrossSignal)
 BOOST_CLASS_EXPORT(hku::SingleSignal)
-BOOST_CLASS_EXPORT(hku::FlexSignal)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

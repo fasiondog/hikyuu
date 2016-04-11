@@ -132,10 +132,10 @@ def draw2(block, query = Query(-130),
     else:
         print("sg_type only in ('CORSS', 'SINGLE')")
         
-    a = POS(block, query, Flex_SG(AMA(n=3)))
+    a = POS(block, query, Flex_SG(OP(OP(AMA(n = 3)), OP(CLOSE())), 6))
     a.name = "POS(3)"
     a.plot(axes=ax2, color='b', marker='.', legend_on=True)
-    a = POS(block, query, Flex_SG(AMA(n=30)))
+    a = POS(block, query, Flex_SG(OP(OP(AMA(n = 30)), OP(CLOSE())), 60))
     a.name = "POS(30)"
     a.plot(axes=ax2, color='g', marker='.', legend_on=True)
     ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    

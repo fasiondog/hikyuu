@@ -202,7 +202,7 @@ getTradingCalendar(const KQuery& query, const string& market) {
     size_t start_ix = 0, end_ix = 0;
     DatetimeList result;
     if (stock.getIndexRange(query, start_ix, end_ix)) {
-        result = stock.getDatetimeList(start_ix, end_ix, KQuery::DAY);
+        result = stock.getDatetimeList(start_ix, end_ix, query.kType());
     }
     return result;
 }

@@ -21,7 +21,7 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/signal/build_in.h>
-#include <hikyuu/indicator/crt/AMA.h>
+#include <hikyuu/indicator/build_in.h>
 
 using namespace hku;
 

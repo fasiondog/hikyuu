@@ -16,6 +16,5 @@ SignalBase.__repr__ = reprFunc
 Flex_SG.__doc__ = Flex_SG.__doc__ + """\n
 使用指标的EMA平滑值作为慢线，但指标上穿慢线时买入，指标下穿慢线时卖出。
 参数：
-    p：如果指标存在参数n，则EMA周期int(n*p)，否则EMA周期为int(p)
-    kpart："OPEN"|"HIGH"|"LOW"|"CLOSE"|"COUNT"|"AMOUNT" 
+    n：慢线EMA参数
 """

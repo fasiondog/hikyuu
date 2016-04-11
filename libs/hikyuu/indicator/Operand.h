@@ -22,6 +22,8 @@ public:
     Operand(const Operand&, const Operand&);
     virtual ~Operand();
 
+    Operand& operator=(const Operand&);
+
     Indicator calculate(const Indicator&);
     Indicator operator()(const Indicator& ind) {
         return calculate(ind);
