@@ -42,9 +42,6 @@ struct TradeManager_pickle_suite : bp::pickle_suite {
 #endif /* HKU_PYTHON_SUPPORT_PICKLE */
 
 
-TradeManagerPtr (*crtTM1)(const Datetime&, price_t, const TradeCostPtr&, const string&) = crtTM;
-BOOST_PYTHON_FUNCTION_OVERLOADS(crtTM1_overloads, crtTM, 0, 4);
-
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(cash_overload, cash, 1, 2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFundsCurve_overload, getFundsCurve, 1, 2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getProfitCurve_overload, getProfitCurve, 1, 2);
@@ -133,8 +130,6 @@ void export_TradeManager() {
             ;
 
     register_ptr_to_python<TradeManagerPtr>();
-
-    def("crtTM", crtTM1, crtTM1_overloads());
 }
 
 

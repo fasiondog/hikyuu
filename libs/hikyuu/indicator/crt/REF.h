@@ -2,7 +2,7 @@
  * REF.h
  *
  *  Created on: 2015年3月21日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_CRT_REF_H_

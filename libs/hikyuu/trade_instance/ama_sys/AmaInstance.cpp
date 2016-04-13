@@ -2,7 +2,7 @@
  * AmaInstance.cpp
  *
  *  Created on: 2015年3月12日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <hikyuu/trade_sys/signal/build_in.h>

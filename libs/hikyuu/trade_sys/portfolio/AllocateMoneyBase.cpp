@@ -2,7 +2,7 @@
  * AllocateMoneyBase.cpp
  *
  *  Created on: 2016年3月23日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <hikyuu/trade_sys/portfolio/AllocateMoneyBase.h>

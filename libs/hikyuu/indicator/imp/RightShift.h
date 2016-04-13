@@ -2,7 +2,7 @@
  * RightShift.h
  *
  *  Created on: 2015年3月21日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_IMP_RIGHTSHIFT_H_

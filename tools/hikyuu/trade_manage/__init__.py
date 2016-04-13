@@ -7,23 +7,11 @@
 # 历史：1）20130213, Added by fasiondog
 #===============================================================================
 
-from . import _trade_manage as ctm
-from hikyuu import Datetime
+from ._trade_manage import *
+from hikyuu import Datetime, list_getitem, Query, QueryByDate, StockManager
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
+from hikyuu.trade_sys.system import getSystemPartName
 
-TradeManager = ctm.TradeManager
-CostRecord = ctm.CostRecord
-PositionRecord = ctm.PositionRecord
-PositionRecordList = ctm.PositionRecordList
-TradeCostBase = ctm.TradeCostBase
-TradeRecord = ctm.TradeRecord
-TradeRecordList = ctm.TradeRecordList
-FundsRecord = ctm.FundsRecord
-BorrowRecord = ctm.BorrowRecord
-BorrowRecordList = ctm.BorrowRecordList
-Performance = ctm.Performance
-
-BUSINESS = ctm.BUSINESS
 BUSINESS.INIT = BUSINESS.BUSINESS_INIT
 BUSINESS.BUY = BUSINESS.BUSINESS_BUY
 BUSINESS.SELL = BUSINESS.BUSINESS_SELL
@@ -33,7 +21,6 @@ BUSINESS.CHECKIN = BUSINESS.BUSINESS_CHECKIN
 BUSINESS.CHECKOUT = BUSINESS.BUSINESS_CHECKOUT
 BUSINESS.INVALID = BUSINESS.INVALID_BUSINESS
 
-   
 TradeManager.__unicode__ = unicodeFunc
 TradeManager.__repr__ = reprFunc
 CostRecord.__unicode__ = unicodeFunc
@@ -49,13 +36,76 @@ FundsRecord.__repr__ = reprFunc
 BorrowRecord.__unicode__ = unicodeFunc
 BorrowRecord.__repr__ = reprFunc
 
-TestStub_TC = ctm.TestStub_TC
-crtZeroTC = ctm.crtZeroTC
-Zero_TC = ctm.crtZeroTC
+BorrowRecordList.__getitem__ = list_getitem
+PositionRecordList.__getitem__ = list_getitem
+TradeRecordList.__getitem__ = list_getitem
 
-def crtFixedATC(commission = 0.0018, lowest_commission = 5.0, stamptax = 0.001,
-                transferfee = 0.001, lowest_transferfee = 1.0):
-    """
+try:
+    import numpy as np
+    import pandas as pd
+
+    def TradeList_to_np(t_list):
+        """转化为numpy结构数组"""
+        t_type = np.dtype({'names':['交易日期','证券代码', '证券名称', '业务名称', 
+                                    '计划交易价格', '实际成交价格', '目标价格', 
+                                    '成交数量', '佣金', '印花税', '过户费', 
+                                    '其它成本', '交易总成本', '止损价', 
+                                    '现金余额', '信号来源'], 
+                'formats':['datetime64[D]','U10','U20', 'U10', 'd', 'd', 'd', 
+                           'i', 'd', 'd', 'd', 'd','d', 'd', 'd', 'U5']})
+        return np.array([(t.datetime, t.stock.market_code, t.stock.name,
+                          getBusinessName(t.business), t.planPrice,
+                          t.realPrice, t.goalPrice, t.number, 
+                          t.cost.commission, t.cost.stamptax,
+                          t.cost.transferfee, t.cost.others,
+                          t.cost.total, t.stoploss, t.cash,
+                          getSystemPartName(t.part)
+                          ) for t in t_list], dtype=t_type)
+        
+    def TradeList_to_df(t):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(TradeList_to_np(t), index='交易日期')
+
+    TradeRecordList.to_np = TradeList_to_np
+    TradeRecordList.to_df = TradeList_to_df
+    
+    def PositionList_to_np(pos_list):
+        """转化为numpy结构数组"""
+        t_type = np.dtype({'names':['证券代码', '证券名称', '买入日期', 
+                                    '已持仓天数', '持仓数量', '投入金额', 
+                                    '当前市值', '盈亏金额', '盈亏比例'], 
+                'formats':['U10','U20', 'datetime64[D]', 'i', 'i', 'd',
+                           'd', 'd', 'd']})
+        
+        sm = StockManager.instance()
+        query = Query(-1)
+        data = []
+        for pos in pos_list:
+            invest = pos.buyMoney - pos.sellMoney + pos.totalCost
+            k = pos.stock.getKData(query)
+            cur_val = k[0].closePrice * pos.number
+            bonus = cur_val - invest
+            date_list = sm.getTradingCalendar(QueryByDate(Datetime(pos.takeDatetime.date())))
+            data.append((pos.stock.market_code, pos.stock.name, 
+                         pos.takeDatetime, len(date_list), pos.number, 
+                         invest, cur_val, bonus,
+                         100 * bonus / invest))
+        
+        return np.array(data, dtype=t_type)
+    
+    def PositionList_to_df(pos_list):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(PositionList_to_np(pos_list), index='证券代码')
+
+        
+    PositionRecordList.to_np = PositionList_to_np
+    PositionRecordList.to_df = PositionList_to_df
+    
+except:
+    pass
+
+
+FixedA_TC.__doc__ = """
     沪深A股交易成本算法,计算每次买入或卖出的成本
     计算规则为：
        1）上证交易所
@@ -71,23 +121,16 @@ def crtFixedATC(commission = 0.0018, lowest_commission = 5.0, stamptax = 0.001,
         lowest_commission 最低佣金值，默认5元
         stamptax 印花税，默认千分之一，即0.001
         transferfee 过户费，默认每股千分之一，即0.001
-        lowestTransferfee 最低过户费，默认1元
+        lowest_transferfee 最低过户费，默认1元
     """
-    return ctm.crtFixedATC(commission, lowest_commission, stamptax, 
-                           transferfee, lowest_transferfee)
 
-FixedA_TC = crtFixedATC
 
-def crtTM(datetime = Datetime(199001010000), initcash = 100000, 
-          costfunc = crtZeroTC(), name = "SYS"):
-    """
+crtTM.__doc__ = """
     创建交易管理模块，管理帐户的交易记录及资金使用情况
     考虑的移滑价差需要使用当日的最高或最低价，所以不在该模块内进行处理
     参数:
        datetime 账户建立日期, 默认1990-1-1
        initcash 初始现金，默认100000
-       costfunc 交易成本算法,默认零成本算法
+       costfunc 交易成本算法,默认零成本算法Zero_TC()
        name 账户名称，默认“SYS”
-    """
-    return ctm.crtTM(datetime, initcash, costfunc, name)
-    
+    """   

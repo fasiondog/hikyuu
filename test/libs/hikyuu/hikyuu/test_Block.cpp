@@ -2,7 +2,7 @@
  * test_Block.cpp
  *
  *  Created on: 2015年2月8日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifdef TEST_ALL_IN_ONE

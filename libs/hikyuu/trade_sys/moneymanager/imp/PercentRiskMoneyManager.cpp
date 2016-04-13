@@ -2,7 +2,7 @@
  * PercentRiskMoneyManager.cpp
  *
  *  Created on: 2015年4月4日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <hikyuu/trade_sys/moneymanager/imp/PercentRiskMoneyManager.h>

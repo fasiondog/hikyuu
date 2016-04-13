@@ -2,7 +2,7 @@
  * _Portfolio.cpp
  *
  *  Created on: 2016年3月29日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <boost/python.hpp>

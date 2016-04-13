@@ -2,7 +2,7 @@
  * QLBlockInfoDriver.h
  *
  *  Created on: 2015年2月10日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef DATA_DRIVER_BLOCK_INFO_QIANLONG_QLBLOCKINFODRIVER_H_

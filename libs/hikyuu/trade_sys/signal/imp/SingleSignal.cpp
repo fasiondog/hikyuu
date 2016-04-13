@@ -2,7 +2,7 @@
  * SingleSignal.cpp
  *
  *  Created on: 2015年2月22日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include "../../../indicator/crt/KDATA.h"

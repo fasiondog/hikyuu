@@ -2,7 +2,7 @@
  * _AllocateMoney.cpp
  *
  *  Created on: 2016年3月28日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <boost/python.hpp>

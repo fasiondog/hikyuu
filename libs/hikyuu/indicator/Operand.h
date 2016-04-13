@@ -2,7 +2,7 @@
  * Operand.h
  *
  *  Created on: 2015年3月30日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_OPERAND_H_

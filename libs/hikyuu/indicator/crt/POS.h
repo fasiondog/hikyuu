@@ -2,7 +2,7 @@
  * POS.h
  *
  *  Created on: 2015年3月17日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_CRT_POS_H_

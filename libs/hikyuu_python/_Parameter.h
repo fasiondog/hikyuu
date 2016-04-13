@@ -2,7 +2,7 @@
  * _Parameter.h
  *
  *  Created on: 2015年3月11日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef PYTHON_PARAMETER_H_

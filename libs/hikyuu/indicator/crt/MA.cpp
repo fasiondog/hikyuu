@@ -2,7 +2,7 @@
  * MA.cpp
  *
  *  Created on: 2015年2月16日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <boost/algorithm/string.hpp>

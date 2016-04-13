@@ -2,7 +2,7 @@
  * PercentRiskMoneyManager.h
  *
  *  Created on: 2015年4月4日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef TRADE_SYS_MONEYMANAGER_IMP_PERCENTRISKMONEYMANAGER_H_

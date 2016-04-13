@@ -2,7 +2,7 @@
  * instance_main.cpp
  *
  *  Created on: 2015年3月14日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 

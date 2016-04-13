@@ -2,7 +2,7 @@
  * _Operand.cpp
  *
  *  Created on: 2015年3月31日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <boost/python.hpp>

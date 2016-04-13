@@ -16,7 +16,7 @@
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
 #include "LoanRecord.h"
-#include "crtZeroTC.h"
+#include "crt/crtZeroTC.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/map.hpp>

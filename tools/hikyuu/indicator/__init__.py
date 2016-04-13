@@ -8,8 +8,6 @@
 #===============================================================================
 
 #from ._indicator import *
-import numpy as np
-import pandas as pd
 from . import _indicator as clib
 from hikyuu.util.unicode import (IS_PY3, unicodeFunc, reprFunc)
 from hikyuu import constant, toPriceList, PriceList
@@ -32,21 +30,7 @@ def indicator_iter(indicator):
     for i in range(len(indicator)):
         yield indicator[i]
         
-def indicator_to_np(indicator):
-    """转化为np.array，如果indicator存在多个值，只返回第一个"""
-    return np.array(indicator, dtype='d')
 
-def indicator_to_df(indicator):
-    if indicator.getResultNumber() == 1:
-        return pd.DataFrame(indicator_to_np(indicator), columns=[indicator.name])
-
-    data = {}
-    name = indicator.name
-    columns = []
-    for i in range(indicator.getResultNumber()):
-        data[name + str(i)] = indicator.getResult(i)
-        columns.append(name + str(i+1))
-    return pd.DataFrame(data, columns=columns)
         
 Indicator = clib.Indicator   
 IndicatorImp = clib.IndicatorImp     
@@ -56,14 +40,39 @@ Indicator.__repr__ =  reprFunc
 
 Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
-Indicator.to_np = indicator_to_np
-Indicator.to_df = indicator_to_df
+
 
 Indicator.__add__ = clib.indicator_add
 Indicator.__sub__ = clib.indicator_sub
 Indicator.__mul__ = clib.indicator_mul
 Indicator.__div__ = clib.indicator_div
 Indicator.__truediv__ = clib.indicator_div #Python3 div
+
+try:
+    import numpy as np
+    import pandas as pd
+    
+    def indicator_to_np(indicator):
+        """转化为np.array，如果indicator存在多个值，只返回第一个"""
+        return np.array(indicator, dtype='d')
+    
+    def indicator_to_df(indicator):
+        if indicator.getResultNumber() == 1:
+            return pd.DataFrame(indicator_to_np(indicator), columns=[indicator.name])
+    
+        data = {}
+        name = indicator.name
+        columns = []
+        for i in range(indicator.getResultNumber()):
+            data[name + str(i)] = indicator.getResult(i)
+            columns.append(name + str(i+1))
+        return pd.DataFrame(data, columns=columns)
+    
+    Indicator.to_np = indicator_to_np
+    Indicator.to_df = indicator_to_df
+
+except:
+    pass
 
 OP = clib.Operand
 

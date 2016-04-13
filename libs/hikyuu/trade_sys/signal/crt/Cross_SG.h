@@ -2,7 +2,7 @@
  * CROSS_SG.h
  *
  *  Created on: 2015年2月20日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef TRADE_SYS_SIGNAL_CRT_CROSS_SG_H_

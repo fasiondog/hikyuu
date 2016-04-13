@@ -2,7 +2,7 @@
  * test_REF.cpp
  *
  *  Created on: 2015年3月21日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifdef TEST_ALL_IN_ONE

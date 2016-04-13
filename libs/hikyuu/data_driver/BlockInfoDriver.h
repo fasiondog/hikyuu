@@ -2,7 +2,7 @@
  * BlockInfoDriver.h
  *
  *  Created on: 2015年2月10日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef DATA_DRIVER_BLOCKINFODRIVER_H_

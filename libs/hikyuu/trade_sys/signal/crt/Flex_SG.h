@@ -2,7 +2,7 @@
  * FLEX._SG.h
  *
  *  Created on: 2015年3月21日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef TRADE_SYS_SIGNAL_CRT_FLEX_SG_H_

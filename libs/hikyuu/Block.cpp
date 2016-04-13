@@ -2,7 +2,7 @@
  * Block.cpp
  *
  *  Created on: 2015年2月8日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <boost/algorithm/string.hpp>

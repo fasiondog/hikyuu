@@ -25,8 +25,6 @@ from hikyuu.util.mylog import escapetime
 
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from datetime import date, datetime
-import numpy as np
-import pandas as pd
 
 MarketInfo.__unicode__ = unicodeFunc
 MarketInfo.__repr__ = reprFunc
@@ -88,8 +86,13 @@ def __new_Datetime_init__(self, var = None):
             __old_Datetime_init__(self, var)
     else:
         __old_Datetime_init__(self, var)
+
+def Datetime_date(self):
+    return date(self.year, self.month, self.day)
         
-Datetime.__init__ =  __new_Datetime_init__       
+Datetime.__init__ =  __new_Datetime_init__
+Datetime.date = Datetime_date
+
 
 #================================================================ 
 #重定义KQuery
@@ -172,24 +175,34 @@ def KData_getPos(kdata, datetime):
     pos = kdata._getPos(datetime)
     return pos if pos != constant.null_size else None
 
-def KData_to_np(k):
-    """转化为numpy结构数组"""
-    k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 'amount', 'count'], 
-            'formats':['datetime64[D]','d','d','d','d','d','d']})
-    return np.array([(k[i].datetime, k[i].openPrice, k[i].highPrice, 
-                      k[i].lowPrice, k[i].closePrice, k[i].transAmount, 
-                      k[i].transCount) for i in range(len(k))], dtype=k_type)
-    
-def KData_to_df(k):
-    """转化为pandas的DataFrame"""
-    return pd.DataFrame.from_records(KData_to_np(k), index='datetime')    
-    
 
 KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
 KData.getPos = KData_getPos
-KData.to_np = KData_to_np
-KData.to_df = KData_to_df
+
+try:
+    import numpy as np
+    import pandas as pd
+    
+    def KData_to_np(kdata):
+        """转化为numpy结构数组"""
+        k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 
+                                    'amount', 'count'], 
+                'formats':['datetime64[D]','d','d','d','d','d','d']})
+        return np.array([(k.datetime, k.openPrice, k.highPrice, 
+                          k.lowPrice, k.closePrice, k.transAmount, 
+                          k.transCount) for k in kdata], dtype=k_type)
+        
+    def KData_to_df(kdata):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')    
+
+    KData.to_np = KData_to_np
+    KData.to_df = KData_to_df
+    
+except:
+    pass
+    
 
 #================================================================
 def list_getitem(data, i):

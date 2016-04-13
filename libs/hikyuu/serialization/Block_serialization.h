@@ -2,7 +2,7 @@
  * Block_serialization.h
  *
  *  Created on: 2015年2月9日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef BLOCK_SERIALIZATION_H_

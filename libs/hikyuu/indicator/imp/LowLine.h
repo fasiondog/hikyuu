@@ -2,7 +2,7 @@
  * LowLine.h
  *
  *  Created on: 2016年4月2日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_IMP_LOWLINE_H_

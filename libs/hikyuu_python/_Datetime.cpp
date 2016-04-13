@@ -34,7 +34,8 @@ void export_Datetime() {
             .def("minDatetime", &Datetime::minDatetime).staticmethod("minDatetime")
             .def("maxDatetime", &Datetime::maxDatetime).staticmethod("maxDatetime")
             .def("now", &Datetime::now).staticmethod("now")
-            .def("date", &Datetime::date)
+            //不支持boost.date
+            //.def("date", &Datetime::date)
             .def("__eq__", eq)
             .def("__ne__", ne)
             .def("__gt__", gt)

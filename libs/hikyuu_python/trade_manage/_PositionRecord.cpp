@@ -39,7 +39,7 @@ void export_PositionRecord() {
             .def("__iter__", iterator<PositionRecordList>())
             .def("size", &PositionRecordList::size)
             .def("__len__", &PositionRecordList::size)
-            .def("__getitem__", PositionRecordList_at, return_value_policy<copy_const_reference>())
+            .def("get", PositionRecordList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<PositionRecordList>())
 #endif

@@ -2,7 +2,7 @@
  * Portfolio.cpp
  *
  *  Created on: 2016年2月21日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <hikyuu/trade_sys/portfolio/Portfolio.h>

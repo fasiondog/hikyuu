@@ -2,7 +2,7 @@
  * PercentRisk_MM.h
  *
  *  Created on: 2015年4月5日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef TRADE_SYS_MONEYMANAGER_CRT_PERCENTRISK_MM_H_

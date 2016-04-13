@@ -2,7 +2,7 @@
  * SingleSignal.h
  *
  *  Created on: 2015年2月22日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef TRADE_SYS_SIGNAL_IMP_SINGLESIGNAL_H_

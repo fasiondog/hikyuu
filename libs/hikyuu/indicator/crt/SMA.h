@@ -2,7 +2,7 @@
  * SMA.h
  *
  *  Created on: 2015年2月16日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_CRT_SMA_H_

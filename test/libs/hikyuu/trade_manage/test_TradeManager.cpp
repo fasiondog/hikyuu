@@ -13,7 +13,9 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/build_in.h>
+#include <hikyuu/trade_manage/crt/TestStub_TC.h>
+#include <hikyuu/trade_manage/crt/crtFixedATC.h>
+#include <hikyuu/trade_manage/crt/crtTM.h>
 
 #include <fstream>
 #include <boost/archive/xml_oarchive.hpp>

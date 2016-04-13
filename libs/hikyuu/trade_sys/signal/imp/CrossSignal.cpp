@@ -2,7 +2,7 @@
  * CrossSignal.cpp
  *
  *  Created on: 2015年2月20日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include "../../../indicator/crt/KDATA.h"

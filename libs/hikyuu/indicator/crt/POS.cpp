@@ -2,7 +2,7 @@
  * POS.cpp
  *
  *  Created on: 2015年3月17日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include "PRICELIST.h"

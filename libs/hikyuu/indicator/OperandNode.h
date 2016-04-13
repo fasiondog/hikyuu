@@ -2,7 +2,7 @@
  * OperandNode.h
  *
  *  Created on: 2015年3月30日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_OPERANDNODE_H_

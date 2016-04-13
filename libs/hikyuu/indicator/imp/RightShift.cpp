@@ -2,7 +2,7 @@
  * RightShift.cpp
  *
  *  Created on: 2015年3月21日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include "RightShift.h"

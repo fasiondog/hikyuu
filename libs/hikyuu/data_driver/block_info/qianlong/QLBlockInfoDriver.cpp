@@ -2,7 +2,7 @@
  * QLBlockInfoDriver.cpp
  *
  *  Created on: 2015年2月10日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <fstream>

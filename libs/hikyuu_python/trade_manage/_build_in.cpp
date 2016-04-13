@@ -11,13 +11,19 @@
 using namespace boost::python;
 using namespace hku;
 
-TradeCostPtr (*crtFixedATC1)(price_t, price_t, price_t, price_t, price_t) = crtFixedATC;
-BOOST_PYTHON_FUNCTION_OVERLOADS(crtFixedATC1_overloads, crtFixedATC, 0, 5);
-
 void export_build_in() {
+    def("crtTM", crtTM, (arg("datetime") = Datetime(199001010000LL),
+            arg("initcash") = 100000, arg("costfunc") = Zero_TC(),
+            arg("name")="SYS"));
+
     def("TestStub_TC", TestStub_TC);
 
-    def("crtZeroTC", crtZeroTC);
-    def("crtFixedATC", crtFixedATC1, crtFixedATC1_overloads());
+    def("FixedA_TC", crtFixedATC, (arg("commission") = 0.0018,
+            arg("lowest_commission") = 5.0,
+            arg("stamptax") = 0.001,
+            arg("transferfee") = 0.001,
+            arg("lowest_transferfee") = 1.0));
+
+    def("Zero_TC", Zero_TC);
 }
 

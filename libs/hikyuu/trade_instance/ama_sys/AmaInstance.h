@@ -2,7 +2,7 @@
  * AmaInstance.h
  *
  *  Created on: 2015年3月12日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef AMAINSTANCE_H

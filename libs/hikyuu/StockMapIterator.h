@@ -2,7 +2,7 @@
  * StockMapIterator.h
  *
  *  Created on: 2015年2月8日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef STOCKMAPITERATOR_H_

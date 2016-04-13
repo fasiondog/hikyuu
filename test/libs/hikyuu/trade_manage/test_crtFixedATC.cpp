@@ -13,7 +13,7 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/build_in.h>
+#include <hikyuu/trade_manage/crt/crtFixedATC.h>
 
 #include <hikyuu/config.h>
 #if HKU_SUPPORT_SERIALIZATION

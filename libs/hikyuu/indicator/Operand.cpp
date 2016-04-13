@@ -2,7 +2,7 @@
  * Operand.cpp
  *
  *  Created on: 2015年3月30日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include <hikyuu/indicator/Operand.h>

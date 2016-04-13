@@ -48,7 +48,7 @@ class TradeCostTest(unittest.TestCase):
 
     def test_ZeroTC(self):
         stock = sm['sh000001']
-        tc = crtZeroTC()
+        tc = Zero_TC()
         cost = tc.getBuyCost(Datetime(201001010000), stock, 10.0, 100)
         self.assertEqual(cost, CostRecord(0,0,0,0,0))
         cost = tc.getSellCost(Datetime(201001010000), stock, 10.0, 100)
@@ -62,7 +62,7 @@ class TradeCostTest(unittest.TestCase):
         
     def test_FixedATC(self):
         stock = sm['sh000001']
-        tc = crtFixedATC()
+        tc = FixedA_TC()
         cost = tc.getBuyCost(Datetime(200101010000), stock, 10.0, 2100)
         self.assertEqual(cost, CostRecord(37.8, 0, 2.1, 0, 39.9))
         cost = tc.getSellCost(Datetime(200101010000), stock, 10.0, 2100)

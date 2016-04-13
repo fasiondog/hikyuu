@@ -2,7 +2,7 @@
  * HighLine.h
  *
  *  Created on: 2016年4月1日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef INDICATOR_IMP_HIGHLINE_H_

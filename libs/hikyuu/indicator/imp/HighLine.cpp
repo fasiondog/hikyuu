@@ -2,7 +2,7 @@
  * HighLine.cpp
  *
  *  Created on: 2016年4月1日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include "HighLine.h"

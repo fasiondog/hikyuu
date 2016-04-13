@@ -2,7 +2,7 @@
  * AllocateMoneyBase.h
  *
  *  Created on: 2016年3月23日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef TRADE_SYS_PORTFOLIO_ALLOCATEMONEYBASE_H_
