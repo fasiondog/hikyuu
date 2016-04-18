@@ -30,7 +30,7 @@ void export_Portfolio() {
             .add_property("am", &Portfolio::getAM, &Portfolio::setAM)
             .add_property("tm", &Portfolio::getTM, &Portfolio::setTM)
             .add_property("sys", &Portfolio::getSYS, &Portfolio::setSYS)
-            .add_property("st", &Portfolio::getST, &Portfolio::setST)
+            .add_property("se", &Portfolio::getSE, &Portfolio::setSE)
             .def("addStock", &Portfolio::addStock)
             .def("addStockList", &Portfolio::addStockList)
             .def("run", &Portfolio::run)

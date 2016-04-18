@@ -34,9 +34,9 @@ Portfolio::Portfolio(const string& name) : m_name(name) {
 
 Portfolio::Portfolio(const TradeManagerPtr& tm,
         const SystemPtr& sys,
-        const SelectorPtr& st,
+        const SelectorPtr& se,
         const AllocateMoneyPtr& am)
-: m_st(st), m_tm(tm), m_sys(sys), m_am(am), m_name("Portfolio") {
+: m_se(se), m_tm(tm), m_sys(sys), m_am(am), m_name("Portfolio") {
     if (m_sys) {
         setParam<bool>("delay", m_sys->getParam<bool>("delay"));
     } else {
@@ -59,7 +59,7 @@ void Portfolio::setSYS(const SystemPtr& sys) {
 
 void Portfolio::reset() {
     if (m_tm) m_tm->reset();
-    if (m_st) m_st->reset();
+    if (m_se) m_se->reset();
     if (m_am) m_am->reset();
     if (m_sys) m_sys->reset();
 }
@@ -67,7 +67,7 @@ void Portfolio::reset() {
 PortfolioPtr Portfolio::clone() {
     Portfolio* p = new Portfolio();
     p->m_params = m_params;
-    p->m_st = m_st;
+    p->m_se = m_se;
     p->m_tm = m_tm;
     p->m_sys = m_sys;
     p->m_am = m_am;
@@ -75,25 +75,25 @@ PortfolioPtr Portfolio::clone() {
 }
 
 void Portfolio::addStock(const Stock& stock) {
-    if (m_st) {
-        m_st->addStock(stock);
+    if (m_se) {
+        m_se->addStock(stock);
     } else {
-        HKU_WARN("m_st is Null! [Portfolio::addStock]");
+        HKU_WARN("m_se is Null! [Portfolio::addStock]");
     }
 }
 
 void Portfolio::addStockList(const StockList& stock_list) {
-    if (m_st) {
-        m_st->addStockList(stock_list);
+    if (m_se) {
+        m_se->addStockList(stock_list);
     } else {
-        HKU_WARN("m_st is Null! [Portfolio::addStockList]");
+        HKU_WARN("m_se is Null! [Portfolio::addStockList]");
     }
 }
 
 
 void Portfolio::run(const KQuery& query) {
-    if (!m_st) {
-        HKU_WARN("m_st is null [Portfolio::run]");
+    if (!m_se) {
+        HKU_WARN("m_se is null [Portfolio::run]");
         return;
     }
 
@@ -147,7 +147,7 @@ void Portfolio::run(const KQuery& query) {
         }
 
         //根据选股规则，计算当前时刻选择的股票列表
-        StockList first_selected = m_st->getSelectedStock(*date_iter);
+        StockList first_selected = m_se->getSelectedStock(*date_iter);
 
         //过滤掉已经持仓的股票
         StockList stock_selected;

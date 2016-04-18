@@ -1,5 +1,5 @@
 /*
- * TestStub_TC.cpp
+ * TC_TestStub.cpp
  *
  *  Created on: 2013-5-9
  *      Author: fasiondog
@@ -9,7 +9,7 @@
 
 namespace hku {
 
-HKU_API TradeCostPtr TestStub_TC() {
+HKU_API TradeCostPtr TC_TestStub() {
     return TradeCostPtr(new TradeCostStub());
 }
 

@@ -8,9 +8,9 @@
 #ifndef SIGNAL_BUILD_IN_H_
 #define SIGNAL_BUILD_IN_H_
 
-#include "crt/Cross_SG.h"
-#include "crt/Flex_SG.h"
-#include "crt/Single_SG.h"
+#include "crt/SG_Cross.h"
+#include "crt/SG_Flex.h"
+#include "crt/SG_Single.h"
 
 
 #endif /* SIGNAL_BUILD_IN_H_ */

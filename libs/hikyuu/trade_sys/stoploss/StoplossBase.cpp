@@ -23,6 +23,18 @@ HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr& sl) {
     return os;
 }
 
+StoplossBase::StoplossBase(): m_name("StoplossBase") {
+
+}
+
+StoplossBase::StoplossBase(const string& name) : m_name(name) {
+
+}
+
+StoplossBase::~StoplossBase() {
+
+}
+
 
 StoplossPtr StoplossBase::clone() {
     StoplossPtr p = _clone();

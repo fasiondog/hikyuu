@@ -14,7 +14,7 @@
 
 from hikyuu import Query, StockManager
 from hikyuu.indicator import *
-from hikyuu.trade_sys.signal import Single_SG, Cross_SG, Flex_SG
+from hikyuu.trade_sys.signal import SG_Single, SG_Cross, SG_Flex
 from hikyuu.trade_manage import BUSINESS
 from .drawplot import (create_two_axes_figure, ax_set_locator_formatter,
                        create_three_axes_figure, adjust_axes_show, 
@@ -51,16 +51,16 @@ def draw(stock, query = Query(-130),
         lama.plot(axes = ax1, color = 'g', legend_on = True)
     
     if sg_type == 'CROSS':
-        fast_op = OP(OP(AMA(n = n)), OP(CLOSE()))
+        fast_op = OP(AMA(n = n))
         slow_op = OP(OP(EMA(n = 2*n)), fast_op)
-        sg = Cross_SG(fast_op, slow_op)
+        sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes = ax1, kdata = kdata)
         ind = slow_op(KDATA(kdata))
         ind.name = "EMA(CAMA)"
         ind.plot(axes = ax1, color = 'm', legend_on = True)
                  
     elif sg_type == 'SINGLE':
-        sg = Single_SG(cama, filter_n = filter_n, filter_p = filter_p)
+        sg = SG_Single(cama, filter_n = filter_n, filter_p = filter_p)
         sg.plot(axes = ax1, kdata = kdata)
 
     else:
@@ -117,25 +117,25 @@ def draw2(block, query = Query(-130),
         lama.plot(axes = ax1, color = 'g', legend_on = True)
     
     if sg_type == 'CROSS':
-        fast_op = OP(OP(AMA(n = n)), OP(CLOSE()))
+        fast_op = OP(OP(AMA(n = n)))
         slow_op = OP(OP(EMA(n = 2*n)), fast_op)
-        sg = Cross_SG(fast_op, slow_op)
+        sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes = ax1, kdata = kdata)
         ind = slow_op(KDATA(kdata))
         ind.name = "EMA(CAMA)"
         ind.plot(axes = ax1, color = 'm', legend_on = True)
                  
     elif sg_type == 'SINGLE':
-        sg = Single_SG(cama, filter_n = filter_n, filter_p = filter_p)
+        sg = SG_Single(cama, filter_n = filter_n, filter_p = filter_p)
         sg.plot(axes = ax1, kdata = kdata)
 
     else:
         print("sg_type only in ('CORSS', 'SINGLE')")
         
-    a = POS(block, query, Flex_SG(OP(OP(AMA(n = 3)), OP(CLOSE())), 6))
+    a = POS(block, query, SG_Flex(OP(AMA(n = 3)), 6))
     a.name = "POS(3)"
     a.plot(axes=ax2, color='b', marker='.', legend_on=True)
-    a = POS(block, query, Flex_SG(OP(OP(AMA(n = 30)), OP(CLOSE())), 60))
+    a = POS(block, query, SG_Flex(OP(AMA(n = 30)), 60))
     a.name = "POS(30)"
     a.plot(axes=ax2, color='g', marker='.', legend_on=True)
     ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    

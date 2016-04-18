@@ -31,12 +31,12 @@ using namespace hku;
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_FixedPercent_SL_export ) {
+BOOST_AUTO_TEST_CASE( test_ST_FixedPercent_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/FixedPercent_SL.xml";
+    filename += "/ST_FixedPercent.xml";
 
-    StoplossPtr sg1 = FixedPercent_SL(0.03);
+    StoplossPtr sg1 = ST_FixedPercent(0.03);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -55,12 +55,12 @@ BOOST_AUTO_TEST_CASE( test_FixedPercent_SL_export ) {
 
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_Saftyloss_ST_export ) {
+BOOST_AUTO_TEST_CASE( test_ST_Saftyloss_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/Saftyloss_ST.xml";
+    filename += "/ST_Saftyloss.xml";
 
-    StoplossPtr sg1 = Saftyloss_ST();
+    StoplossPtr sg1 = ST_Saftyloss();
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

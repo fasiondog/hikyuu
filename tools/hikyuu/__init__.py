@@ -180,29 +180,6 @@ KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
 KData.getPos = KData_getPos
 
-try:
-    import numpy as np
-    import pandas as pd
-    
-    def KData_to_np(kdata):
-        """转化为numpy结构数组"""
-        k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 
-                                    'amount', 'count'], 
-                'formats':['datetime64[D]','d','d','d','d','d','d']})
-        return np.array([(k.datetime, k.openPrice, k.highPrice, 
-                          k.lowPrice, k.closePrice, k.transAmount, 
-                          k.transCount) for k in kdata], dtype=k_type)
-        
-    def KData_to_df(kdata):
-        """转化为pandas的DataFrame"""
-        return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')    
-
-    KData.to_np = KData_to_np
-    KData.to_df = KData_to_df
-    
-except:
-    pass
-    
 
 #================================================================
 def list_getitem(data, i):
@@ -223,3 +200,46 @@ PriceList.__getitem__ = list_getitem
 DatetimeList.__getitem__ = list_getitem
 StringList.__getitem__ = list_getitem
 BlockList.__getitem__ = list_getitem
+
+
+#================================================================
+try:
+    import numpy as np
+    import pandas as pd
+    
+    def KData_to_np(kdata):
+        """转化为numpy结构数组"""
+        k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 
+                                    'amount', 'count'], 
+                'formats':['datetime64[D]','d','d','d','d','d','d']})
+        return np.array([(k.datetime, k.openPrice, k.highPrice, 
+                          k.lowPrice, k.closePrice, k.transAmount, 
+                          k.transCount) for k in kdata], dtype=k_type)
+        
+    def KData_to_df(kdata):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')    
+
+    KData.to_np = KData_to_np
+    KData.to_df = KData_to_df
+    
+    def PriceList_to_np(data):
+       return np.array(data, dtype='d')
+       
+    def PriceList_to_df(data):
+        return pd.DataFrame(data.to_np(), columns=('Value',))
+        
+    PriceList.to_np = PriceList_to_np
+    PriceList.to_df = PriceList_to_df
+    
+    def DatetimeList_to_np(data):
+        return np.array(data, dtype='datetime64[D]')
+        
+    def DatetimeList_to_df(data):
+        return pd.DataFrame(data.to_np(), columns=('Datetime',))
+        
+    DatetimeList.to_np = DatetimeList_to_np
+    DatetimeList.to_df = DatetimeList_to_df
+    
+except:
+    pass

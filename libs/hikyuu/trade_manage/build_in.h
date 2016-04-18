@@ -8,9 +8,8 @@
 #ifndef TRADE_MANAGE_BUILD_IN_H_
 #define TRADE_MANAGE_BUILD_IN_H_
 
-#include "TradeManager.h"
 #include "crt/crtTM.h"
-#include "crt/TestStub_TC.h"
+#include "crt/TC_TestStub.h"
 #include "crt/crtZeroTC.h"
 #include "crt/crtFixedATC.h"
 

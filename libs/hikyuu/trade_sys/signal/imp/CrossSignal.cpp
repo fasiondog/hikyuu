@@ -11,12 +11,14 @@
 namespace hku {
 
 CrossSignal::CrossSignal() : SignalBase("CROSS") {
-
+    setParam<string>("kpart", "CLOSE");
 }
 
-CrossSignal::CrossSignal(const Operand& fast, const Operand& slow)
+CrossSignal::CrossSignal(const Operand& fast,
+        const Operand& slow,
+        const string& kpart)
 : SignalBase("CROSS"), m_fast(fast), m_slow(slow) {
-
+    setParam<string>("kpart", kpart);
 }
 
 
@@ -32,7 +34,8 @@ SignalPtr CrossSignal::_clone() {
 }
 
 void CrossSignal::_calculate() {
-    Indicator kdata = KDATA(m_kdata);
+    string kpart = getParam<string>("kpart");
+    Indicator kdata = KDATA_PART(m_kdata, kpart);
     Indicator fast = m_fast(kdata);
     Indicator slow = m_slow(kdata);
     if (fast.size() != slow.size()) {
@@ -54,8 +57,9 @@ void CrossSignal::_calculate() {
 }
 
 
-SignalPtr HKU_API Cross_SG(const Operand& fast, const Operand& slow) {
-    CrossSignal *p = new CrossSignal(fast, slow);
+SignalPtr HKU_API SG_Cross(const Operand& fast,
+        const Operand& slow, const string& kpart) {
+    CrossSignal *p = new CrossSignal(fast, slow, kpart);
     return SignalPtr(p);
 }
 

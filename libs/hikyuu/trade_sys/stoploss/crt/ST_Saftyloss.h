@@ -29,7 +29,7 @@ namespace hku {
  * @param p 噪音系数，默认为2
  * @ingroup Stoploss
  */
-StoplossPtr HKU_API Saftyloss_ST(int n1 = 10, int n2 = 3, double p = 2.0);
+StoplossPtr HKU_API ST_Saftyloss(int n1 = 10, int n2 = 3, double p = 2.0);
 
 }  /* namespace */
 

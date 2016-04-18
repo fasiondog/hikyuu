@@ -32,12 +32,12 @@ using namespace hku;
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_AMA_SG_export ) {
+BOOST_AUTO_TEST_CASE( test_SG_AMA_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/AMA_SG.xml";
+    filename += "/SG_AMA.xml";
 
-    SignalPtr sg1 = Single_SG(AMA());
+    SignalPtr sg1 = SG_Single(AMA());
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

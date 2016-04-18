@@ -150,9 +150,9 @@ BOOST_AUTO_TEST_CASE( test_FixedATC_export ) {
     StockManager& sm = StockManager::instance();
 
     string filename(sm.tmpdir());
-    filename += "/FixedA_TC.xml";
+    filename += "/TC_FixedA.xml";
 
-    TradeCostPtr func1 = FixedA_TC();
+    TradeCostPtr func1 = TC_FixedA();
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

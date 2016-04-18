@@ -61,7 +61,7 @@ void export_System() {
             .add_property("ev", &System::getEV, &System::setEV)
             .add_property("cn", &System::getCN, &System::setCN)
             .add_property("sg", &System::getSG, &System::setSG)
-            .add_property("sl", &System::getSL, &System::setSL)
+            .add_property("st", &System::getST, &System::setST)
             .add_property("tp", &System::getTP, &System::setTP)
             .add_property("pg", &System::getPG, &System::setPG)
             .add_property("sp", &System::getSP, &System::setSP)

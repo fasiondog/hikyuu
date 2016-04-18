@@ -19,7 +19,7 @@ HKU_API std::ostream& operator <<(std::ostream &os, const System& sys) {
        << space << sys.getCN() << strip
        << space << sys.getMM() << strip
        << space << sys.getSG() << strip
-       << space << sys.getSL() << strip
+       << space << sys.getST() << strip
        << space << sys.getTP() << strip
        << space << sys.getPG() << strip
        << space << sys.getSP() << strip
@@ -56,7 +56,7 @@ System::System(const TradeManagerPtr& tm,
         const EnvironmentPtr& ev,
         const ConditionPtr& cn,
         const SignalPtr& sg,
-        const StoplossPtr& sl,
+        const StoplossPtr& st,
         const StoplossPtr& tp,
         const ProfitGoalPtr& pg,
         const SlippagePtr& sp,
@@ -66,7 +66,7 @@ System::System(const TradeManagerPtr& tm,
   m_ev(ev),
   m_cn(cn),
   m_sg(sg),
-  m_sl(sl),
+  m_st(st),
   m_tp(tp),
   m_pg(pg),
   m_sp(sp),
@@ -110,7 +110,7 @@ void System::reset() {
     if (m_cn) m_cn->reset();
     if (m_mm) m_mm->reset();
     if (m_sg) m_sg->reset();
-    if (m_sl) m_sl->reset();
+    if (m_st) m_st->reset();
     if (m_tp) m_tp->reset();
     if (m_pg) m_pg->reset();
     if (m_sp) m_sp->reset();
@@ -137,7 +137,7 @@ void System::setTO(const KData& kdata) {
     m_kdata = kdata;
     if (m_cn) m_cn->setTO(kdata);
     if (m_sg) m_sg->setTO(kdata);
-    if (m_sl) m_sl->setTO(kdata);
+    if (m_st) m_st->setTO(kdata);
     if (m_tp) m_tp->setTO(kdata);
     if (m_pg) m_pg->setTO(kdata);
     if (m_sp) m_sp->setTO(kdata);
@@ -152,7 +152,7 @@ SystemPtr System::clone() {
     if (m_ev) p->m_ev = m_ev->clone();
     if (m_cn) p->m_cn = m_cn->clone();
     if (m_sg) p->m_sg = m_sg->clone();
-    if (m_sl) p->m_sl = m_sl->clone();
+    if (m_st) p->m_st = m_st->clone();
     if (m_tp) p->m_tp = m_tp->clone();
     if (m_pg) p->m_pg = m_pg->clone();
     if (m_sp) p->m_sp = m_sp->clone();
@@ -218,7 +218,7 @@ void System::run(const Stock& stock, const KQuery& query) {
 
     if (m_mm) m_mm->setTM(m_tm);
     if (m_pg) m_pg->setTM(m_tm);
-    if (m_sl) m_sl->setTM(m_tm);
+    if (m_st) m_st->setTM(m_tm);
     if (m_tp) m_tp->setTM(m_tm);
 
     reset();

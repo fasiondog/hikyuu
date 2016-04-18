@@ -29,8 +29,15 @@ class HKU_API StoplossBase {
     PARAMETER_SUPPORT
 
 public:
-    StoplossBase() { }
-    virtual ~StoplossBase() { }
+    StoplossBase();
+    StoplossBase(const string& name);
+    virtual ~StoplossBase();
+
+    /** 获取名称 */
+    string name() const;
+
+    /** 设置名称 */
+    void name(const string& name);
 
     /** 设置账户 */
     void setTM(const TradeManagerPtr& tm);
@@ -68,10 +75,6 @@ public:
         return getPrice(datetime, price);
     }
 
-    virtual string name() const {
-        return "StoplossBase";
-    }
-
     /** 子类复位接口 */
     virtual void _reset() {}
 
@@ -83,6 +86,7 @@ public:
 
 
 protected:
+    string m_name;
     TradeManagerPtr m_tm;
     KData m_kdata;
 
@@ -94,7 +98,7 @@ private:
     friend class boost::serialization::access;
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const {
-        string name_str(GBToUTF8(name()));
+        string name_str(GBToUTF8(m_name));
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化
@@ -103,8 +107,7 @@ private:
 
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
-        string name;
-        ar & boost::serialization::make_nvp("name", name);
+        ar & boost::serialization::make_nvp("name", m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化
         //ar & BOOST_SERIALIZATION_NVP(m_kdata);
@@ -144,10 +147,6 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(StoplossBase)
 
 
 #define STOPLOSS_IMP(classname, str_name) public:\
-    virtual string name() const { \
-        return(str_name);\
-    }\
-    \
     virtual StoplossPtr _clone() {\
         return StoplossPtr(new classname());\
     }\
@@ -164,6 +163,13 @@ typedef boost::shared_ptr<StoplossBase> StoplossPtr;
 HKU_API std::ostream& operator <<(std::ostream& os, const StoplossBase&);
 HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr&);
 
+inline string StoplossBase::name() const {
+    return m_name;
+}
+
+inline void StoplossBase::name(const string& name) {
+    m_name = name;
+}
 
 inline void StoplossBase::setTM(const TradeManagerPtr& tm) {
     m_tm = tm;

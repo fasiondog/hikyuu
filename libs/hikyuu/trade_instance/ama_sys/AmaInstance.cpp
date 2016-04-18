@@ -43,7 +43,7 @@ Indicator HKU_API AmaSpecial(const Block& block, KQuery query,
         KData kdata = stk_iter->getKData(query);
         if (kdata.empty())
             continue;
-        SignalPtr sg(Single_SG(ama));
+        SignalPtr sg(SG_Single(ama));
         sg->setTO(kdata);
         bool isHold = false;
         size_t n_dis = 0;

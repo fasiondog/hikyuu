@@ -16,7 +16,7 @@ namespace hku {
 class CrossSignal: public SignalBase {
 public:
     CrossSignal();
-    CrossSignal(const Operand& fast, const Operand& slow);
+    CrossSignal(const Operand& fast, const Operand& slow, const string& kpart);
     virtual ~CrossSignal();
 
     virtual SignalPtr _clone();

@@ -39,7 +39,7 @@ public:
             const EnvironmentPtr& ev,
             const ConditionPtr& cn,
             const SignalPtr& sg,
-            const StoplossPtr& sl,
+            const StoplossPtr& st,
             const StoplossPtr& tp,
             const ProfitGoalPtr& pg,
             const SlippagePtr& sp,
@@ -56,7 +56,7 @@ public:
     EnvironmentPtr getEV() const { return m_ev; }
     ConditionPtr getCN() const { return m_cn; }
     SignalPtr getSG() const { return m_sg; }
-    StoplossPtr getSL() const { return m_sl; }
+    StoplossPtr getST() const { return m_st; }
     StoplossPtr getTP() const { return m_tp; }
     ProfitGoalPtr getPG() const { return m_pg; }
     SlippagePtr getSP() const { return m_sp; }
@@ -66,7 +66,7 @@ public:
     void setEV(const EnvironmentPtr& ev) { m_ev = ev; }
     void setCN(const ConditionPtr& cn) { m_cn = cn; }
     void setSG(const SignalPtr& sg) { m_sg = sg; }
-    void setSL(const StoplossPtr& sl) { m_sl = sl; }
+    void setST(const StoplossPtr& st) { m_st = st; }
     void setTP(const StoplossPtr& tp) { m_tp = tp; }
     void setPG(const ProfitGoalPtr& pg) { m_pg = pg; }
     void setSP(const SlippagePtr& sp) { m_sp = sp; }
@@ -171,7 +171,7 @@ protected:
     EnvironmentPtr  m_ev;
     ConditionPtr    m_cn;
     SignalPtr       m_sg;
-    StoplossPtr     m_sl;
+    StoplossPtr     m_st;
     StoplossPtr     m_tp;
     ProfitGoalPtr   m_pg;
     SlippagePtr     m_sp;
@@ -211,7 +211,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_cn);
         ar & BOOST_SERIALIZATION_NVP(m_mm);
         ar & BOOST_SERIALIZATION_NVP(m_sg);
-        ar & BOOST_SERIALIZATION_NVP(m_sl);
+        ar & BOOST_SERIALIZATION_NVP(m_st);
         ar & BOOST_SERIALIZATION_NVP(m_tp);
         ar & BOOST_SERIALIZATION_NVP(m_pg);
         ar & BOOST_SERIALIZATION_NVP(m_sp);
@@ -237,7 +237,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_cn);
         ar & BOOST_SERIALIZATION_NVP(m_mm);
         ar & BOOST_SERIALIZATION_NVP(m_sg);
-        ar & BOOST_SERIALIZATION_NVP(m_sl);
+        ar & BOOST_SERIALIZATION_NVP(m_st);
         ar & BOOST_SERIALIZATION_NVP(m_tp);
         ar & BOOST_SERIALIZATION_NVP(m_pg);
         ar & BOOST_SERIALIZATION_NVP(m_sp);
@@ -318,12 +318,12 @@ inline price_t System
 
 inline price_t System
 ::_getStoplossPrice(const Datetime& datetime, price_t price) {
-    return m_sl ? m_sl->getPrice(datetime, price) : 0.0;
+    return m_st ? m_st->getPrice(datetime, price) : 0.0;
 }
 
 inline price_t System
 ::_getShortStoplossPrice(const Datetime& datetime, price_t price) {
-    return m_sl ? m_sl->getShortPrice(datetime, price) : 0.0;
+    return m_st ? m_st->getShortPrice(datetime, price) : 0.0;
 }
 
 inline price_t System

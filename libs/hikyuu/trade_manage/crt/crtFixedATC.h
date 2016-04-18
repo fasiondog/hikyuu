@@ -10,7 +10,7 @@
 
 #include "../TradeCostBase.h"
 
-#define FixedA_TC crtFixedATC
+#define TC_FixedA crtFixedATC
 
 namespace hku {
 

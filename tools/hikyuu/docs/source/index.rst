@@ -9,9 +9,8 @@ Welcome to Hikyuu's documentation!
 .. toctree::
    :maxdepth: 2
 
-   user_guide
-   developer_guide
-   
+   trade_manage/trade_manage
+   trade_sys/trade_sys
 
 Indices and tables
 ==================

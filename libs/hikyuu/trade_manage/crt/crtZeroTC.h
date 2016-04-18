@@ -10,7 +10,7 @@
 
 #include "../TradeCostBase.h"
 
-#define Zero_TC crtZeroTC
+#define TC_Zero crtZeroTC
 
 namespace hku {
 

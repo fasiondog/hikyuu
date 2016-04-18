@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/stoploss/build_in.h>
+#include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
@@ -15,21 +16,8 @@ using namespace hku;
 class StoplossWrap : public StoplossBase, public wrapper<StoplossBase> {
 public:
     StoplossWrap(): StoplossBase() {}
+    StoplossWrap(const string& name): StoplossBase(name) {}
     virtual ~StoplossWrap() {}
-
-    string name() const {
-        if (override name = this->get_override("name"))
-#if defined(BOOST_WINDOWS)
-            return call<char const*>(name.ptr());
-#else
-            return name();
-#endif
-        return StoplossBase::name();
-    }
-
-    string default_name() const {
-        return this->StoplossBase::name();
-    }
 
     void _reset() {
         if (override func = this->get_override("_reset")) {
@@ -67,15 +55,18 @@ public:
     }
 };
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(SAFETYLOSS_ST_overload, Saftyloss_ST, 0, 3);
+BOOST_PYTHON_FUNCTION_OVERLOADS(SAFETYLOSS_ST_overload, ST_Saftyloss, 0, 3);
+
+string (StoplossBase::*get_name)() const = &StoplossBase::name;
+void (StoplossBase::*set_name)(const string&) = &StoplossBase::name;
 
 void export_Stoploss() {
     class_<StoplossWrap, boost::noncopyable>("StoplossBase", init<>())
+            .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("params",
-                    make_function(&StoplossBase::getParameter,
-                            return_internal_reference<>()))
-            .def("name", &StoplossBase::name, &StoplossWrap::default_name)
+            .add_property("name", get_name, set_name)
+            .def("getParam", &StoplossBase::getParam<boost::any>)
+            .def("setParam", &StoplossBase::setParam<object>)
             .def("setTM", &StoplossBase::setTM)
             .def("setTO", &StoplossBase::setTO)
             .def("getPrice", pure_virtual(&StoplossBase::getPrice))
@@ -93,8 +84,8 @@ void export_Stoploss() {
 
     register_ptr_to_python<StoplossPtr>();
 
-    def("FixedPercent_SL", FixedPercent_SL);
-    def("Saftyloss_ST", Saftyloss_ST, SAFETYLOSS_ST_overload());
+    def("ST_FixedPercent", ST_FixedPercent);
+    def("ST_Saftyloss", ST_Saftyloss, SAFETYLOSS_ST_overload());
 }
 
 

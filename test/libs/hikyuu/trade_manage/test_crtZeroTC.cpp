@@ -64,9 +64,9 @@ BOOST_AUTO_TEST_CASE( test_ZeroCost_export ) {
     StockManager& sm = StockManager::instance();
 
     string filename(sm.tmpdir());
-    filename += "/Zero_TC.xml";
+    filename += "/TC_Zero.xml";
 
-    TradeCostPtr zero = Zero_TC();
+    TradeCostPtr zero = TC_Zero();
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

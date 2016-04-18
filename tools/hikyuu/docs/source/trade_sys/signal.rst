@@ -1,5 +1,4 @@
-.. currentmodule:: hikyuu.trade_sys
-
+.. py:currentmodule:: trade_sys
 .. highlightlang:: python
 
 信号指示器
@@ -13,25 +12,64 @@
 
 通常使用技术指标判断买入、卖出时，依据的是快线和慢线的交叉、或是单曲线的拐点。下面的通用信号指示器足够应付大部分的情况。
 
-单曲线拐点信号指示器
-^^^^^^^^^^^^^^^^^^^^
+双线交叉信号指示器
+^^^^^^^^^^^^^^^^^^
 
-.. py:function:: Single_SG(ind[, filter_n = 20, filter_p = 0.1, kpart='CLOSE'])
+.. py:function:: SG_Cross(fast, slow[, kpart = "CLOSE"])
     
-    单线拐点信号指示器
+    双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。如：5日MA上穿10日MA时买入，5日MA线下穿MA10日线时卖出:: 
 
-
-.. py:function:: Cross_SG(fast, slow)
+        SG_Cross(OP(MA(n=10)), OP(MA(n=30)))
 
     :param OP fast: 快线
     :param OP slow: 慢线
+    :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
+        
 
-::
+单线拐点信号指示器
+^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
     
-    Cross_SG(OP(MA(n=10)), OP(MA(n=30)))
+    生成单线拐点信号指示器。使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式见下::
 
-.. py:function:: Flex_SG(ind[, p = 2.0, kpart = 'CLOSE'])
+        filter = percentage * STDEV((AMA-AMA[1], N)
 
+        Buy  When AMA - AMA[1] > filter
+        or Buy When AMA - AMA[2] > filter
+        or Buy When AMA - AMA[3] > filter 
+    
+    :param Indicator ind:
+    :param int filer_n: N日周期
+    :param double filter_p: 过滤器百分比
+    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+
+    
+.. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
+    
+    生成单线拐点信号指示器2::
+
+        filter = percentage * STDEV((AMA-AMA[1], N)
+
+        Buy  When AMA - @lowest(AMA,n) > filter
+        Sell When @highest(AMA, n) - AMA > filter
+    
+    :param Indicator ind:
+    :param int filer_n: N日周期
+    :param double filter_p: 过滤器百分比
+    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+    
+   
+自交叉单线拐点指示器
+^^^^^^^^^^^^^^^^^^^^
+
+.. py:function:: SG_Flex(ind, slow_n[, kpart = 'CLOSE'])
+
+    使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
+
+    :param Indicator ind:
+    :param int slow_n: 慢线EMA周期
+    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
 
 
 自定义信号指示器

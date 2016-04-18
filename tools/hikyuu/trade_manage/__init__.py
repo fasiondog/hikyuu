@@ -105,7 +105,7 @@ except:
     pass
 
 
-FixedA_TC.__doc__ = """
+TC_FixedA.__doc__ = """
     沪深A股交易成本算法,计算每次买入或卖出的成本
     计算规则为：
        1）上证交易所
@@ -131,6 +131,6 @@ crtTM.__doc__ = """
     参数:
        datetime 账户建立日期, 默认1990-1-1
        initcash 初始现金，默认100000
-       costfunc 交易成本算法,默认零成本算法Zero_TC()
+       costfunc 交易成本算法,默认零成本算法TC_Zero()
        name 账户名称，默认“SYS”
     """   

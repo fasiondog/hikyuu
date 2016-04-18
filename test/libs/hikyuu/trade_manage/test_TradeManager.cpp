@@ -13,7 +13,7 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/TestStub_TC.h>
+#include <hikyuu/trade_manage/crt/TC_TestStub.h>
 #include <hikyuu/trade_manage/crt/crtFixedATC.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 
@@ -452,7 +452,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_can_not_returnStock ) {
 /** @par 检测点, 多次借入、归还现金 */
 BOOST_AUTO_TEST_CASE( test_TradeManager_trade_multi_borrow_cash_by_day ) {
     FundsRecord funds;
-    TradeCostPtr tc = TestStub_TC();
+    TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
     tm->setParam<bool>("reinvest", false); //忽略权息
 
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_trade_multi_borrow_stock_by_day ) {
     CostRecord cost;
     TradeRecord trade;
     FundsRecord funds;
-    TradeCostPtr tc = TestStub_TC();
+    TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
     tm->setParam<bool>("reinvest", false); //忽略权息
     tm->setParam<bool>("support_borrow_cash", false);
@@ -740,7 +740,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_trade_no_rights_by_day ) {
     CostRecord cost;
     TradeRecord trade;
     FundsRecord funds;
-    TradeCostPtr tc = TestStub_TC();
+    TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
     tm->setParam<bool>("reinvest", false); //忽略权息
     tm->setParam<bool>("support_borrow_cash", false);
@@ -1220,7 +1220,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_trade_financing_securities_lending_no_ri
     CostRecord cost;
     TradeRecord trade;
     FundsRecord funds;
-    TradeCostPtr tc = TestStub_TC();
+    TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 10000, tc);
     tm->setParam<bool>("reinvest", false); //忽略权息
     tm->setParam<bool>("support_borrow_cash", true);

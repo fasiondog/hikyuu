@@ -47,7 +47,7 @@ struct AnyToPython{
 };
 
 template <>
-boost::any Parameter::get<boost::any>(const std::string& name) const {
+inline boost::any Parameter::get<boost::any>(const std::string& name) const {
     param_map_t::const_iterator iter;
     iter = m_params.find(name);
     if (iter == m_params.end()) {
@@ -58,7 +58,7 @@ boost::any Parameter::get<boost::any>(const std::string& name) const {
 
 
 template <>
-void Parameter::set<object>(const string& name, const object& o) {
+inline void Parameter::set<object>(const string& name, const object& o) {
     if( !have(name)){
         if (PyBool_Check(o.ptr())) {
             m_params[name] = bool(extract<bool>(o));

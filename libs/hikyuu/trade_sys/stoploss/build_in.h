@@ -8,8 +8,8 @@
 #ifndef STOPLOSS_BUILD_IN_H_
 #define STOPLOSS_BUILD_IN_H_
 
-#include "crt/FixedPercent_SL.h"
-#include "crt/Saftyloss_ST.h"
+#include "crt/ST_FixedPercent.h"
+#include "crt/ST_Saftyloss.h"
 
 
 #endif /* STOPLOSS_BUILD_IN_H_ */

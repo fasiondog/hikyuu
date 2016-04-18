@@ -60,7 +60,7 @@ test-suite test_all :
     [ run libs/hikyuu/trade_sys/signal/test_Signal.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/signal/test_AMA_SG.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/slippage/test_Slippage.cpp libs/hikyuu/config.cpp ]
-    [ run libs/hikyuu/trade_sys/stoploss/test_FixedPercent_SL.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/stoploss/test_ST_FixedPercent.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/stoploss/test_Stoploss.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/system/test_Simple_SYS.cpp libs/hikyuu/config.cpp ]
     ;
