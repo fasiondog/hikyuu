@@ -8,7 +8,7 @@
 #ifndef INDICATORSTOPLOSS_H_
 #define INDICATORSTOPLOSS_H_
 
-#include "../../../indicator/Indicator.h"
+#include "../../../indicator/Operand.h"
 #include "../StoplossBase.h"
 
 namespace hku {
@@ -16,7 +16,7 @@ namespace hku {
 class IndicatorStoploss: public StoplossBase {
 public:
     IndicatorStoploss(); //仅用于序列化默认构造函数
-    IndicatorStoploss(const Indicator& ind,
+    IndicatorStoploss(const Operand& op,
                       const string& kdata_part);
     virtual ~IndicatorStoploss();
 
@@ -26,8 +26,7 @@ public:
     virtual void _calculate();
 
 private:
-    Indicator m_ind;
-    string    m_kdata_part;
+    Operand m_op;
     map<Datetime, price_t> m_result;
 
 //========================================
@@ -39,8 +38,7 @@ private:
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
         ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(StoplossBase);
-        ar & BOOST_SERIALIZATION_NVP(m_ind);
-        ar & BOOST_SERIALIZATION_NVP(m_kdata_part);
+        ar & BOOST_SERIALIZATION_NVP(m_op);
         //m_result 每次系统运行时都要重新计算，不保存
         //ar & BOOST_SERIALIZATION_NVP(m_result);
     }

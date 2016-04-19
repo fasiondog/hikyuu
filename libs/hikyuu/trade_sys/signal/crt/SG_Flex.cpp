@@ -11,7 +11,7 @@
 namespace hku {
 
 SignalPtr HKU_API SG_Flex(const Operand& op, int slow_n, const string& kpart) {
-    SignalPtr sg = SG_Cross(op, OP(EMA(slow_n)), kpart);
+    SignalPtr sg = SG_Cross(op, OP(OP(EMA(slow_n)), op), kpart);
     sg->name("SG_Flex");
     return sg;
 }

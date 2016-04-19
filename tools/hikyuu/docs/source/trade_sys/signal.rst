@@ -21,13 +21,14 @@
 
         SG_Cross(OP(MA(n=10)), OP(MA(n=30)))
 
-    :param OP fast: 快线
-    :param OP slow: 慢线
+    :param Operand fast: 快线
+    :param Operand slow: 慢线
     :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
+    :return: 信号指示器
         
 
 单线拐点信号指示器
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
     
@@ -39,11 +40,11 @@
         or Buy When AMA - AMA[2] > filter
         or Buy When AMA - AMA[3] > filter 
     
-    :param Indicator ind:
+    :param Operand ind:
     :param int filer_n: N日周期
-    :param double filter_p: 过滤器百分比
+    :param float filter_p: 过滤器百分比
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
-
+    :return: 信号指示器
     
 .. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
     
@@ -54,11 +55,11 @@
         Buy  When AMA - @lowest(AMA,n) > filter
         Sell When @highest(AMA, n) - AMA > filter
     
-    :param Indicator ind:
+    :param Operand ind:
     :param int filer_n: N日周期
-    :param double filter_p: 过滤器百分比
+    :param float filter_p: 过滤器百分比
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
-    
+    :return: 信号指示器
    
 自交叉单线拐点指示器
 ^^^^^^^^^^^^^^^^^^^^
@@ -67,15 +68,15 @@
 
     使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
 
-    :param Indicator ind:
+    :param Operand ind:
     :param int slow_n: 慢线EMA周期
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
-
+    :return: 信号指示器
 
 自定义信号指示器
 ----------------
 
-自定义信号指示器，必须实现 :py:meth:`SignalBase._clone` 和 :py:meth:`SignalBase_calculate`  方法（如示例1）。如果含有私有属性，还需实现 :py:meth:`SignalBase._reset` 方法（如示例2）。
+自定义信号指示器，必须实现 :py:meth:`SignalBase._clone` 和 :py:meth:`SignalBase._calculate`  方法（如示例1）。如果含有私有属性，还需实现 :py:meth:`SignalBase._reset` 方法（如示例2）。
 
 示例1（不含私有变量，海龟交易策略）:
 
@@ -115,7 +116,7 @@
     
     .. py:attribute:: name
     
-        信号指示器名称
+        名称
         
     .. py:method:: getParam(name)
 
@@ -131,7 +132,7 @@
         
         :param str name: 参数名称
         :param value: 参数值
-        :type value: int | bool | double | string
+        :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
         
     .. py:method:: setTO(k)
@@ -142,7 +143,7 @@
     
         :return: 交易对象
         :rtype: KData
-    
+        
     .. py:method:: shouldBuy(datetime)
     
         指定时刻是否可以买入
@@ -187,19 +188,19 @@
         
     .. py:method:: reset()
     
-        复位内部私有变量
+        复位操作
     
     .. py:method:: clone()
     
-        克隆生成一个新的信号指示器
+        克隆操作
     
     .. py:method:: _calculate()
     
-        子类计算接口，在setTO中调用
+        子类计算接口
     
     .. py:method:: _reset()
     
-        子类复位接口
+        子类复位接口，复位内部私有变量
     
     .. py:method:: _clone()
     

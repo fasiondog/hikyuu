@@ -11,14 +11,14 @@
 namespace hku {
 
 IndicatorStoploss::IndicatorStoploss(): StoplossBase("IndicatorStoploss") {
-
+    setParam<string>("kpart", "CLOSE");
 }
 
 IndicatorStoploss::
-IndicatorStoploss(const Indicator& ind,
+IndicatorStoploss(const Operand& op,
         const string& kdata_part)
-: StoplossBase("IndicatorStoploss"), m_ind(ind), m_kdata_part(kdata_part) {
-
+: StoplossBase("IndicatorStoploss"), m_op(op) {
+    setParam<string>("kpart", "CLOSE");
 }
 
 IndicatorStoploss::~IndicatorStoploss() {
@@ -34,17 +34,21 @@ void IndicatorStoploss::_reset() {
 }
 
 StoplossPtr IndicatorStoploss::_clone() {
-    IndicatorStoploss *p = new IndicatorStoploss(m_ind, m_kdata_part);
+    IndicatorStoploss *p = new IndicatorStoploss(m_op, getParam<string>("kpart"));
     p->m_result = m_result;
     return StoplossPtr(p);
 }
 
 void IndicatorStoploss::_calculate() {
-    Indicator ind = m_ind(KDATA_PART(m_kdata, m_kdata_part));
+    Indicator ind = m_op(KDATA_PART(m_kdata, getParam<string>("kpart")));
     size_t total = ind.size();
     for (size_t i = ind.discard(); i < total; ++i) {
         m_result[m_kdata[i].datetime] = ind[i];
     }
+}
+
+StoplossPtr HKU_API ST_Indicator(const Operand& op, const string& kpart) {
+    return StoplossPtr(new IndicatorStoploss(op, kpart));
 }
 
 } /* namespace hku */

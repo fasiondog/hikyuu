@@ -74,6 +74,7 @@
             <File name="tools\hikyuu\docs\source\trade_sys\signal.rst" />
             <File name="tools\hikyuu\docs\source\trade_sys\trade_sys.rst" />
             <File name="tools\hikyuu\docs\source\trade_sys\stoploss.rst" />
+            <File name="tools\hikyuu\docs\source\trade_sys\money_manager.rst" />
         </Folder>
     </Project>
 </NotepadPlus>

@@ -17,7 +17,7 @@ namespace hku {
  * @param p 百分比(0,1]
  * @ingroup Stoploss
  */
-StoplossPtr HKU_API ST_FixedPercent(double p);
+StoplossPtr HKU_API ST_FixedPercent(double p = 0.03);
 
 } /* namespace */
 

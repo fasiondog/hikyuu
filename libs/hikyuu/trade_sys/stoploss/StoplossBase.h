@@ -39,11 +39,17 @@ public:
     /** 设置名称 */
     void name(const string& name);
 
-    /** 设置账户 */
+    /** 设置交易管理实例 */
     void setTM(const TradeManagerPtr& tm);
+
+    /** 获取交易管理实例 */
+    TradeManagerPtr getTM() const;
 
     /** 设置交易对象 */
     void setTO(const KData& kdata);
+
+    /** 获取交易对象  */
+    KData getTO() const;
 
     /** 复位操作 */
     void reset();
@@ -55,8 +61,8 @@ public:
     /**
      * 获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。
      * 用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
-     * @param datetime 交易日期
-     * @param price 计划交易的价格
+     * @param datetime 交易时间
+     * @param price 计划买入的价格
      * @note 一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的
      *       价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为
      *       price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价
@@ -171,8 +177,16 @@ inline void StoplossBase::name(const string& name) {
     m_name = name;
 }
 
+inline TradeManagerPtr StoplossBase::getTM() const {
+    return m_tm;
+}
+
 inline void StoplossBase::setTM(const TradeManagerPtr& tm) {
     m_tm = tm;
+}
+
+inline KData StoplossBase::getTO() const {
+    return m_kdata;
 }
 
 inline void StoplossBase::reset() {

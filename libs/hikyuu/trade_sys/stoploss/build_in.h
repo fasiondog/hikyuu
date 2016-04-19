@@ -9,7 +9,7 @@
 #define STOPLOSS_BUILD_IN_H_
 
 #include "crt/ST_FixedPercent.h"
+#include "crt/ST_Indicator.h"
 #include "crt/ST_Saftyloss.h"
-
 
 #endif /* STOPLOSS_BUILD_IN_H_ */

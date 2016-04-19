@@ -55,8 +55,6 @@ public:
     }
 };
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(SAFETYLOSS_ST_overload, ST_Saftyloss, 0, 3);
-
 string (StoplossBase::*get_name)() const = &StoplossBase::name;
 void (StoplossBase::*set_name)(const string&) = &StoplossBase::name;
 
@@ -68,7 +66,9 @@ void export_Stoploss() {
             .def("getParam", &StoplossBase::getParam<boost::any>)
             .def("setParam", &StoplossBase::setParam<object>)
             .def("setTM", &StoplossBase::setTM)
+            .def("getTM", &StoplossBase::getTM)
             .def("setTO", &StoplossBase::setTO)
+            .def("getTO", &StoplossBase::getTO)
             .def("getPrice", pure_virtual(&StoplossBase::getPrice))
             .def("getShortPrice", &StoplossBase::getShortPrice,
                     &StoplossWrap::default_getShortPrice)
@@ -84,8 +84,10 @@ void export_Stoploss() {
 
     register_ptr_to_python<StoplossPtr>();
 
-    def("ST_FixedPercent", ST_FixedPercent);
-    def("ST_Saftyloss", ST_Saftyloss, SAFETYLOSS_ST_overload());
+    def("ST_FixedPercent", ST_FixedPercent, (arg("p") = 0.03));
+    def("ST_Indicator", ST_Indicator, (arg("op"), arg("kpart") = "CLOSE"));
+    def("ST_Saftyloss", ST_Saftyloss,
+            (arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
 }
 
 

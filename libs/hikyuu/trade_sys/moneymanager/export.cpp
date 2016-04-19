@@ -27,8 +27,10 @@
 #include <boost/serialization/export.hpp>
 
 #include "imp/FixedCountMoneyManager.h"
+#include "imp/PercentRiskMoneyManager.h"
 
 BOOST_CLASS_EXPORT(hku::FixedCountMoneyManager)
+BOOST_CLASS_EXPORT(hku::PercentRiskMoneyManager)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

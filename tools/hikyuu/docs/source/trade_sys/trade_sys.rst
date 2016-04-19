@@ -7,3 +7,5 @@
 .. toctree::
 
    signal
+   stoploss
+   money_manager
