@@ -1,15 +1,15 @@
 /*
- * Simple_SYS.cpp
+ * SYS_Simple.cpp
  *
  *  Created on: 2013-5-7
  *      Author: fasiondog
  */
 
-#include "Simple_SYS.h"
+#include "SYS_Simple.h"
 
 namespace hku {
 
-SystemPtr HKU_API Simple_SYS(
+SystemPtr HKU_API SYS_Simple(
         const TradeManagerPtr& tm,
         const MoneyManagerPtr& mm,
         const EnvironmentPtr& ev,
@@ -20,7 +20,7 @@ SystemPtr HKU_API Simple_SYS(
         const ProfitGoalPtr& pg,
         const SlippagePtr& sp) {
     return SystemPtr(new System(tm, mm, ev, cn, sg, sl, tp, pg, sp,
-            "Simple_SYS"));
+            "SYS_Simple"));
 }
 
 } /* namespace hku */

@@ -11,7 +11,7 @@
 namespace hku {
 
 StdDeviation::StdDeviation(): IndicatorImp("STD", 1) {
-    setParam<int>("n", 22);
+    setParam<int>("n", 10);
 }
 
 StdDeviation::~StdDeviation() {

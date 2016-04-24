@@ -29,6 +29,6 @@ SystemPart = System.SystemPart
 getSystemPartName = csys.getSystemPartName
 getSystemPartEum = csys.getSystemPartEnum
 
-def Simple_SYS(tm = None, mm = None, ev = None, cn = None, 
+def SYS_Simple(tm = None, mm = None, ev = None, cn = None, 
                sg = None, sl = None, tp = None, pg = None, sp = None):
-    return csys.Simple_SYS(tm, mm, ev, cn, sg, sl, tp, pg, sp);
+    return csys.SYS_Simple(tm, mm, ev, cn, sg, sl, tp, pg, sp);

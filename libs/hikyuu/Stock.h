@@ -151,6 +151,9 @@ public:
     /** 获取日期列表 */
     DatetimeList getDatetimeList(size_t start, size_t end, KQuery::KType) const;
 
+    /** 获取日期列表 */
+    DatetimeList getDatetimeList(const KQuery& query) const;
+
     /** 设置权息信息 */
     void setWeightList(const StockWeightList&);
 

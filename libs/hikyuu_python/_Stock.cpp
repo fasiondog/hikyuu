@@ -21,6 +21,10 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRecordByDate_overloads, getKRecordByDa
 StockWeightList (Stock::*getWeight1)() const = &Stock::getWeight;
 StockWeightList (Stock::*getWeight2)(const Datetime&, const Datetime&) const = &Stock::getWeight;
 
+DatetimeList (Stock::*getDatetimeList1)(size_t, size_t, KQuery::KType) const = &Stock::getDatetimeList;
+DatetimeList (Stock::*getDatetimeList2)(const KQuery&) const = &Stock::getDatetimeList;
+
+
 void export_Stock() {
     class_<Stock>("Stock", init<>())
             .def(init<const string&, const string&, const string&>())
@@ -50,7 +54,8 @@ void export_Stock() {
             .def("getKRecord", &Stock::getKRecord, getRecord_overloads())
             .def("getKRecordByDate", &Stock::getKRecordByDate, getRecordByDate_overloads())
             .def("getKRecordList", &Stock::getKRecordList)
-            .def("getDatetimeList", &Stock::getDatetimeList)
+            .def("getDatetimeList", getDatetimeList1)
+            .def("getDatetimeList", getDatetimeList2)
             .def("realtimeUpdate", &Stock::realtimeUpdate)
             .def("getWeight", getWeight1)
             .def("getWeight", getWeight2)

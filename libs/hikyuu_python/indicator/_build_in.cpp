@@ -149,8 +149,8 @@ void export_Indicator_build_in() {
     def("REF", REF_1, (arg("n")));
     def("REF", REF_2, (arg("data"), arg("n")));
 
-    def("STDEV", STDEV_1, (arg("n")));
-    def("STDEV", STDEV_2, (arg("data"), arg("n")));
+    def("STDEV", STDEV_1, (arg("n")=10));
+    def("STDEV", STDEV_2, (arg("data"), arg("n")=10));
 
     def("POS", POS, (arg("block"), arg("query"), arg("sg")));
 

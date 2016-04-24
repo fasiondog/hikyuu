@@ -15,11 +15,11 @@ using namespace hku;
 void (System::*run_monent_1)(const Datetime&) = &System::runMoment;
 void (System::*run_monent_2)(const KRecord&) = &System::runMoment;
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(Simple_SYS_overload, Simple_SYS, 0, 9);
+BOOST_PYTHON_FUNCTION_OVERLOADS(SYS_Simple_overload, SYS_Simple, 0, 9);
 
 void export_System() {
 
-    def("Simple_SYS", Simple_SYS, Simple_SYS_overload());
+    def("SYS_Simple", SYS_Simple, SYS_Simple_overload());
 
     def("getSystemPartName", getSystemPartName);
     def("getSystemPartEnum", getSystemPartEnum);

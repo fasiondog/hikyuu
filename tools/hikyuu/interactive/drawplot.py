@@ -579,13 +579,15 @@ def ibar(indicator, axes=None, width=0.4, color='r', edgecolor='r',
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
-    参数：axes：指定的坐标轴
-         kdata：KData
-         n1: MACD参数1，参见MACD
-         n2: MACD参数2，参见MACD
-         n3: MACD参数3，参见MACD
+    参数：
+        axes：指定的坐标轴
+        kdata：KData
+        n1: MACD参数1，参见MACD
+        n2: MACD参数2，参见MACD
+        n3: MACD参数3，参见MACD
     """
-    bmacd, fmacd, smacd = MACD(CLOSE(kdata), n1, n2, n3)
+    macd = MACD(CLOSE(kdata), n1, n2, n3)
+    bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
     
     text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f'%(n1,n2,n3,fmacd[-1],smacd[-1],bmacd[-1])
     axes.text(0.01,0.97, text, horizontalalignment='left', verticalalignment='top', transform=axes.transAxes)
@@ -609,18 +611,20 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
         
         
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD，当BAR值变化与参考序列ref变化不一致时，显示为灰色，
-                当BAR和参考序列ref同时上涨，显示红色
-               当BAR和参考序列ref同时下跌，显示绿色
-              参考序列ref，EMA
-             参数：axes：指定的坐标轴
-          kdata：KData
-          valueType: Indicator.ValueType
-          n1: MACD参数1，参见MACD
-          n2: MACD参数2，参见MACD
-          n3: MACD参数3，参见MACD
     """
-    bmacd, fmacd, smacd = MACD(CLOSE(kdata), n1, n2, n3)
+    绘制MACD，当BAR值变化与参考序列ref变化不一致时，显示为灰色，
+    当BAR和参考序列ref同时上涨，显示红色
+    当BAR和参考序列ref同时下跌，显示绿色
+    参数:
+        axes：指定的坐标轴
+        ref: 参考序列，EMA
+        kdata：KData
+        n1: MACD参数1，参见MACD
+        n2: MACD参数2，参见MACD
+        n3: MACD参数3，参见MACD
+    """
+    macd = MACD(CLOSE(kdata), n1, n2, n3)
+    bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
 
     text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f'%(n1,n2,n3,fmacd[-1],smacd[-1],bmacd[-1])
     axes.text(0.01,0.97, text, horizontalalignment='left', verticalalignment='top', transform=axes.transAxes)

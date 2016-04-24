@@ -598,6 +598,15 @@ DatetimeList Stock
     return result;
 }
 
+DatetimeList Stock::getDatetimeList(const KQuery& query) const {
+    DatetimeList result;
+    size_t start = 0, end = 0;
+    if (getIndexRange(query, start, end)) {
+        result = getDatetimeList(start, end, query.kType());
+    }
+    return result;
+}
+
 
 KRecord Stock::
 getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {

@@ -68,12 +68,12 @@ BOOST_AUTO_TEST_CASE( test_TradeRequest_export ) {
 
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_Simple_SYS_export ) {
+BOOST_AUTO_TEST_CASE( test_SYS_Simple_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/Simple_SYS.xml";
+    filename += "/SYS_Simple.xml";
 
-    SystemPtr sg1 = Simple_SYS();
+    SystemPtr sg1 = SYS_Simple();
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

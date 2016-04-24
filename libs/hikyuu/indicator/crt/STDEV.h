@@ -17,7 +17,7 @@ namespace hku {
  * @param n N日时间窗口
  * @ingroup Indicator
  */
-Indicator HKU_API STDEV(int n);
+Indicator HKU_API STDEV(int n = 10);
 
 /**
  * 计算N周期内样本标准差
@@ -25,7 +25,7 @@ Indicator HKU_API STDEV(int n);
  * @param n N日时间窗口
  * @ingroup Indicator
  */
-Indicator HKU_API STDEV(const Indicator& data, int n);
+Indicator HKU_API STDEV(const Indicator& data, int n = 10);
 
 } /* namespace */
 

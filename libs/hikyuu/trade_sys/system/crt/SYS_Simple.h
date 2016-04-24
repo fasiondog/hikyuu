@@ -36,7 +36,7 @@ namespace hku {
  * @see SystemBase
  * @ingroup System
  */
-SystemPtr HKU_API Simple_SYS(
+SystemPtr HKU_API SYS_Simple(
         const TradeManagerPtr& tm = TradeManagerPtr(),
         const MoneyManagerPtr& mm = MoneyManagerPtr(),
         const EnvironmentPtr& ev = EnvironmentPtr(),

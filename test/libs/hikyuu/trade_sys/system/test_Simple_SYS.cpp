@@ -1,5 +1,5 @@
 /*
- * test_Simple_SYS.cpp
+ * test_SYS_Simple.cpp
  *
  *  Created on: 2013-4-20
  *      Author: fasiondog
@@ -14,20 +14,20 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_sys/system/crt/Simple_SYS.h>
+#include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_Simple_SYS test_Simple_SYS
+ * @defgroup test_SYS_Simple test_SYS_Simple
  * @ingroup test_hikyuu_trade_sys_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_Simple_SYS) {
-    //TODO test_Simple_SYS
-    //SystemPtr sys = Simple_SYS();
+BOOST_AUTO_TEST_CASE( test_SYS_Simple) {
+    //TODO test_SYS_Simple
+    //SystemPtr sys = SYS_Simple();
     //std::cout << sys << std::endl;
 }
 

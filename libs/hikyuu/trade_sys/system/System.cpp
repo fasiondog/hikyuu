@@ -40,7 +40,7 @@ HKU_API std::ostream& operator <<(std::ostream &os, const SystemPtr& sys) {
 }
 
 System::System()
-: m_name("Simple_SYS"), m_buy_days(0), m_sell_short_days(0),
+: m_name("SYS_Simple"), m_buy_days(0), m_sell_short_days(0),
   m_lastTakeProfit(0.0), m_lastShortTakeProfit(0.0) {
     initParam();
 }
