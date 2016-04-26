@@ -83,6 +83,11 @@ size_t MoneyManagerBase
         return 0;
     }
 
+    if (stock.isNull()) {
+        HKU_ERROR("stock is Null!" << " [MoneyManagerBase::getBuyNumber]");
+        return 0;
+    }
+
     if (risk <= 0.0) {
         HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
                 << stock.market_code() << ") price(" << price

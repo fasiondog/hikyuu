@@ -50,7 +50,7 @@ Indicator HKU_API CLOSE(const KData&);
 Indicator HKU_API CLOSE(const Indicator&);
 
 /**
- * 包装KData的成交金额成Indicator，用于其他指标计算, 同TRANSAMOUNT
+ * 包装KData的成交金额成Indicator，用于其他指标计算
  * @ingroup Indicator
  */
 Indicator HKU_API AMO();
@@ -58,7 +58,7 @@ Indicator HKU_API AMO(const KData&);
 Indicator HKU_API AMO(const Indicator&);
 
 /**
- * 包装KData的成交量成Indicator，用于其他指标计算，同TRANSCOUNT
+ * 包装KData的成交量成Indicator，用于其他指标计算
  * @ingroup Indicator
  */
 Indicator HKU_API VOL();
@@ -68,13 +68,13 @@ Indicator HKU_API VOL(const Indicator&);
 /**
  * 根据字符串选择返回KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL
  * @param kdata K线数据
- * @param part KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL|TRANSAMOUNT|TRANSCOUNT
+ * @param kpart KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
  * @see KDATA, OPEN, HIGH, LOW, CLOSE, AMO, VOL
  * @ingroup Indicator
  */
-Indicator HKU_API KDATA_PART(const string& part);
-Indicator HKU_API KDATA_PART(const KData& kdata, const string& part);
-Indicator HKU_API KDATA_PART(const Indicator& kdata, const string& part);
+Indicator HKU_API KDATA_PART(const string& kpart);
+Indicator HKU_API KDATA_PART(const KData& kdata, const string& kpart);
+Indicator HKU_API KDATA_PART(const Indicator& kdata, const string& kpart);
 
 } /* namespace */
 

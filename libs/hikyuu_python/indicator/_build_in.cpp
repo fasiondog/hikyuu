@@ -117,9 +117,9 @@ void export_Indicator_build_in() {
     def("VOL", VOL2);
     def("VOL", VOL3);
 
-    def("KDATA_PART", KDATA_PART1);
-    def("KDATA_PART", KDATA_PART2);
-    def("KDATA_PART", KDATA_PART3);
+    def("KDATA_PART", KDATA_PART1, (arg("data"), arg("kpart")));
+    def("KDATA_PART", KDATA_PART2, (arg("data"), arg("kpart")));
+    def("KDATA_PART", KDATA_PART3, (arg("kpart")));
 
     //无法直接使用Null<size_t>()，会导致异常退出
     size_t null_size = Null<size_t>();

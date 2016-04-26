@@ -24,12 +24,10 @@ size_t FixedCountMoneyManager
     size_t n = getParam<int>("n");
 
     price_t cash = m_tm->currentCash();
-    //FundsRecord funds = m_tm->getFunds(datetime);
-    //cash = funds.cash;
     CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
     price_t money = roundUp(price * n + cost.total, m_tm->precision());
     if (money > cash) {
-        m_tm->checkin(datetime, roundEx(money - cash, m_tm->precision()));
+        m_tm->checkin(datetime, roundUp(money - cash, m_tm->precision()));
     }
 
     return n;

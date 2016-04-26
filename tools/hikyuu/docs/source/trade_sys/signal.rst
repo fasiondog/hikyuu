@@ -32,7 +32,7 @@
 
 .. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
     
-    生成单线拐点信号指示器。使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式见下::
+    生成单线拐点信号指示器。使用《精明交易者》 [BOOK1]_ 中给出的曲线拐点算法判断曲线趋势，公式见下::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -48,7 +48,7 @@
     
 .. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1, kpart='CLOSE'])
     
-    生成单线拐点信号指示器2::
+    生成单线拐点信号指示器2 [BOOK1]_::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 

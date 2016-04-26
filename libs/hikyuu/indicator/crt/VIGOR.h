@@ -20,11 +20,11 @@ namespace hku {
  * 计算公式：（收盘价今－收盘价昨）＊成交量今
  * 一般可以再使用EMA或MA进行平滑
  * </pre>
- * @param data 待计算的K线数据
+ * @param kdata 待计算的K线数据
  * @param n EMA平滑窗口，必须大于等于1
  * @ingroup Indicator
  */
-Indicator HKU_API VIGOR(const KData& data, int n = 2);
+Indicator HKU_API VIGOR(const KData& kdata, int n = 2);
 
 } /* namespace */
 

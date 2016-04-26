@@ -65,6 +65,7 @@
     <Project name="hikyuu_doc">
         <File name="tools\hikyuu\docs\source\conf.py" />
         <File name="tools\hikyuu\docs\source\index.rst" />
+        <File name="tools\hikyuu\docs\source\reference.rst" />
         <Folder name="trade_manage">
             <File name="tools\hikyuu\docs\source\trade_manage\trade_manage.rst" />
             <File name="tools\hikyuu\docs\source\trade_manage\trade_cost.rst" />
@@ -75,6 +76,11 @@
             <File name="tools\hikyuu\docs\source\trade_sys\trade_sys.rst" />
             <File name="tools\hikyuu\docs\source\trade_sys\stoploss.rst" />
             <File name="tools\hikyuu\docs\source\trade_sys\money_manager.rst" />
+        </Folder>
+        <Folder name="indicator">
+            <File name="tools\hikyuu\docs\source\indicator\index.rst" />
+            <File name="tools\hikyuu\docs\source\indicator\indicator.rst" />
+            <File name="tools\hikyuu\docs\source\indicator\overview.rst" />
         </Folder>
     </Project>
 </NotepadPlus>
