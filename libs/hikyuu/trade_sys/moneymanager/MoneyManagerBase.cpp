@@ -24,6 +24,11 @@ HKU_API std::ostream & operator<<(std::ostream& os, const MoneyManagerPtr& mm) {
     return os;
 }
 
+MoneyManagerBase::MoneyManagerBase()
+: m_name("MoneyManagerBase"), m_ktype(KQuery::DAY){
+
+}
+
 MoneyManagerBase::MoneyManagerBase(const string& name)
 : m_name(name), m_ktype(KQuery::DAY) {
 

@@ -15,7 +15,7 @@ from hikyuu.trade_sys.moneymanager import *
 class MoneyManagerPython(MoneyManagerBase):
     def __init__(self):
         super(MoneyManagerPython, self).__init__("MoneyManagerPython")
-        self.params.set("n", 10)
+        self.setParam("n", 10)
         self._m_flag = False
         
     def getBuyNumber(self, datetime, stock, price, risk):
@@ -40,22 +40,22 @@ class MoneyManagerTest(unittest.TestCase):
         stock = sm['sh000001']
         p = MoneyManagerPython()
         self.assertEqual(p.name, "MoneyManagerPython")
-        self.assertEqual(p.params.get("n"), 10)
-        p.params.set("n",20)
-        self.assertEqual(p.params.get("n"), 20)
+        self.assertEqual(p.getParam("n"), 10)
+        p.setParam("n",20)
+        self.assertEqual(p.getParam("n"), 20)
         self.assertEqual(p.getBuyNumber(Datetime(200101010000), stock, 10.0, 0.0), 20)
         p.reset()
         self.assertEqual(p.getBuyNumber(Datetime(200101010000), stock, 10.0, 0.0), 10)
         
         p_clone = p.clone()
         self.assertEqual(p_clone.name, "MoneyManagerPython")
-        self.assertEqual(p_clone.params.get("n"), 20)
+        self.assertEqual(p_clone.getParam("n"), 20)
         self.assertEqual(p_clone.getBuyNumber(Datetime(200101010000), stock, 10, 0.0), 10)
 
-        p.params.set("n", 1)
-        p_clone.params.set("n", 3)
-        self.assertEqual(p.params.get("n"), 1)
-        self.assertEqual(p_clone.params.get("n"), 3)
+        p.setParam("n", 1)
+        p_clone.setParam("n", 3)
+        self.assertEqual(p.getParam("n"), 1)
+        self.assertEqual(p_clone.getParam("n"), 3)
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MoneyManagerTest)

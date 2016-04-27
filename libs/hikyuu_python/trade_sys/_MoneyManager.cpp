@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/moneymanager/build_in.h>
+#include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
@@ -14,6 +15,7 @@ using namespace hku;
 
 class MoneyManagerWrap : public MoneyManagerBase, public wrapper<MoneyManagerBase> {
 public:
+    MoneyManagerWrap() : MoneyManagerBase() {}
     MoneyManagerWrap(const string& name): MoneyManagerBase(name) {}
 
     void buyNotify(const TradeRecord& record) {
@@ -94,16 +96,19 @@ public:
 };
 
 
+string (MoneyManagerBase::*get_name)() const = &MoneyManagerBase::name;
+void (MoneyManagerBase::*set_name)(const string&) = &MoneyManagerBase::name;
+
+
 void export_MoneyManager() {
-    class_<MoneyManagerWrap, boost::noncopyable>("MoneyManagerBase", init<const string&>())
+    class_<MoneyManagerWrap, boost::noncopyable>("MoneyManagerBase", init<>())
+            .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name",
-                    make_function(&MoneyManagerBase::name,
-                            return_value_policy<copy_const_reference>()))
-            .add_property("params",
-                    make_function(&MoneyManagerBase::getParameter,
-                            return_internal_reference<>()))
+            .add_property("name", get_name, set_name)
+            .def("getParam", &MoneyManagerBase::getParam<boost::any>)
+            .def("setParam", &MoneyManagerBase::setParam<object>)
             .def("setTM", &MoneyManagerBase::setTM)
+            .def("setKType", &MoneyManagerBase::setKType)
             .def("reset", &MoneyManagerBase::reset)
             .def("clone", &MoneyManagerBase::clone)
             .def("buyNotify", &MoneyManagerBase::buyNotify,

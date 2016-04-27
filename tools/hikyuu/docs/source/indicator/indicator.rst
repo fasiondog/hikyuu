@@ -99,6 +99,22 @@
     包装KData的开盘价成Indicator
 
 
+.. py:function:: PRICELIST(data[, result_num = 0])
+
+    将某指标转化为PRICELIST
+    
+    :param Indicator data: 源数据
+    :param int result_num: 源数据中指定的结果集
+
+    
+.. py:function:: PRICELIST(data[, discard = 0])
+    
+    包装PriceList成Indicator
+    
+    :param PriceList data: 源数据
+    :param int discard: 前端抛弃的数据点数，抛弃的值使用 constant.null_price 填充
+ 
+ 
 .. py:function:: REF([data, n])
 
     向前引用 （即右移），引用若干周期前的数据。

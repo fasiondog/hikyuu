@@ -19,6 +19,7 @@
    
 **辅助类指标**
 
+* :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
 * :py:func:`HHV` - N日内最高价
 * :py:func:`LLV` - N日内最低价

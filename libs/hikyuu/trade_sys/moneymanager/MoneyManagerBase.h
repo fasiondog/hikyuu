@@ -27,12 +27,18 @@ class HKU_API MoneyManagerBase {
     PARAMETER_SUPPORT
 
 public:
+    MoneyManagerBase();
     MoneyManagerBase(const string& name);
     virtual ~MoneyManagerBase();
 
     /** 获取名称 */
-    const string& name() const {
+    string name() const {
         return m_name;
+    }
+
+    /** 设置名称 */
+    void name(const string& name) {
+        m_name = name;
     }
 
     /** 复位 */

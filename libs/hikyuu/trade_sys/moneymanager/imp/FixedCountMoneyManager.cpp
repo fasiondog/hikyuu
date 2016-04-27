@@ -25,7 +25,7 @@ size_t FixedCountMoneyManager
 
     price_t cash = m_tm->currentCash();
     CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
-    price_t money = roundUp(price * n + cost.total, m_tm->precision());
+    price_t money = price * n + cost.total;
     if (money > cash) {
         m_tm->checkin(datetime, roundUp(money - cash, m_tm->precision()));
     }
