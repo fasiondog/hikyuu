@@ -1,4 +1,4 @@
-.. py:currentmodule:: indicator
+.. py:currentmodule:: hikyuu.indicator
 .. highlightlang:: python
 
 技术指标总览

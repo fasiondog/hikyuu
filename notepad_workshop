@@ -82,5 +82,11 @@
             <File name="tools\hikyuu\docs\source\indicator\indicator.rst" />
             <File name="tools\hikyuu\docs\source\indicator\overview.rst" />
         </Folder>
+        <Folder name="base">
+            <File name="tools\hikyuu\docs\source\base\datatype.rst" />
+            <File name="tools\hikyuu\docs\source\base\index.rst" />
+            <File name="tools\hikyuu\docs\source\base\stock_manager.rst" />
+            <File name="tools\hikyuu\docs\source\base\utilities.rst" />
+        </Folder>
     </Project>
 </NotepadPlus>

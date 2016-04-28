@@ -1,7 +1,7 @@
 技术指标
 ========
 
-.. py:module:: indicator
+.. py:module:: hikyuu.indicator
     
 
 .. toctree::

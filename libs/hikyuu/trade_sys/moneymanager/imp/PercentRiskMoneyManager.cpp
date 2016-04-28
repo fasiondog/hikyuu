@@ -31,7 +31,7 @@ size_t PercentRiskMoneyManager
     return int(m_tm->currentCash() * p / risk);
 }
 
-MoneyManagerPtr HKU_API PercentRisk_MM(double p) {
+MoneyManagerPtr HKU_API MM_PercentRisk(double p) {
     PercentRiskMoneyManager *ptr = new PercentRiskMoneyManager();
     ptr->setParam<double>("p", p);
     return MoneyManagerPtr(ptr);

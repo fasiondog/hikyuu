@@ -52,6 +52,7 @@ public:
         m_tm = tm;
     }
 
+    /** 设置交易的K线类型 */
     void setKType(KQuery::KType ktype) {
         m_ktype = ktype;
     }

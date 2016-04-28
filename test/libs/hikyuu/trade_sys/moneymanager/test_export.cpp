@@ -31,12 +31,12 @@ using namespace hku;
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_FixedCount_MM_export ) {
+BOOST_AUTO_TEST_CASE( test_MM_FixedCount_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
     filename += "/Fixed_MM.xml";
 
-    MoneyManagerPtr mm1 = FixedCount_MM(100);
+    MoneyManagerPtr mm1 = MM_FixedCount(100);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

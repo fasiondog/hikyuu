@@ -13,12 +13,12 @@ from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 MoneyManagerBase.__unicode__ = unicodeFunc
 MoneyManagerBase.__repr__ = reprFunc
 
-FixedCount_MM.__doc__ = """
+MM_FixedCount.__doc__ = """
     固定交易数量资金管理策略 
     n: 固定交易的数量，为大于等于1的整数，如小于1,默认被置为0
     """
 
-PercentRisk_MM.__doc__ = """
+MM_PercentRisk.__doc__ = """
 百分比风险模型
 公式：P（头寸规模）＝ C（总风险）/ R（每股的风险） ［这里C现金为总风险］
 参数：

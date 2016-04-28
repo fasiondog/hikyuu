@@ -1,7 +1,7 @@
 交易系统
 ========
 
-.. py:module:: trade_sys
+.. py:module:: hikyuu.trade_sys
     
 
 .. toctree::

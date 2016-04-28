@@ -1,4 +1,4 @@
-.. py:currentmodule:: trade_sys
+.. py:currentmodule:: hikyuu.trade_sys
 .. highlightlang:: python
 
 止损/止赢策略
@@ -37,7 +37,11 @@
 自定义止损/止赢策略
 -------------------
 
-自定义止损/止赢策略，必须实现 :py:meth:`StoplossBase._clone` 、 :py:meth:`StoplossBase._calculate`   和 :py:meth:`StoplossBase.getPrice` 方法（如示例1）。如果含有私有属性，还需实现 :py:meth:`StoplossBase._reset` 方法（如示例2）。
+自定义止损/止赢策略接口：
+
+* :py:meth:`SignalBase._calculate` - 【必须】子类计算接口
+* :py:meth:`SignalBase._clone` - 【必须】克隆接口
+* :py:meth:`SignalBase._reset` - 【可选】重载私有变量
 
 止损/止赢策略基类
 -----------------
@@ -81,17 +85,7 @@
     
         :return: 交易对象
         :rtype: KData
-        
-    .. py:method:: getPrice(datetime, price)
-    
-        获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
-        
-        .. note::
-            一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价的30%作为止损，则不需要考虑price参数。
-        
-        :param Datetime datetime: 交易时间
-        :param float price: 计划买入的价格
-    
+   
     .. py:method:: reset()
     
         复位操作
@@ -99,15 +93,25 @@
     .. py:method:: clone()
     
         克隆操作
+
+    .. py:method:: getPrice(datetime, price)
     
+        【重载接口】获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
+        
+        .. note::
+            一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价的30%作为止损，则不需要考虑price参数。
+        
+        :param Datetime datetime: 交易时间
+        :param float price: 计划买入的价格
+        
     .. py:method:: _calculate()
     
-        子类计算接口
+        【重载接口】子类计算接口
     
     .. py:method:: _reset()
     
-        子类复位接口，复位内部私有变量
+        【重载接口】子类复位接口，复位内部私有变量
     
     .. py:method:: _clone()
     
-        子类克隆接口
+        【重载接口】子类克隆接口

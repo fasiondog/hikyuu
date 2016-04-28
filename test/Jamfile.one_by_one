@@ -55,7 +55,7 @@ test-suite test_all :
     [ run libs/hikyuu/trade_sys/condition/test_Condition.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/environment/test_Environment.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/moneymanager/test_MoneyManager.cpp libs/hikyuu/config.cpp ]
-    [ run libs/hikyuu/trade_sys/moneymanager/test_FixedCount_MM.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_sys/moneymanager/test_MM_FixedCount.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/profitgoal/test_ProfitGoal.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/signal/test_Signal.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_sys/signal/test_AMA_SG.cpp libs/hikyuu/config.cpp ]

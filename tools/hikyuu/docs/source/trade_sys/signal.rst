@@ -1,4 +1,4 @@
-.. py:currentmodule:: trade_sys
+.. py:currentmodule:: hikyuu.trade_sys
 .. highlightlang:: python
 
 信号指示器
@@ -76,7 +76,11 @@
 自定义信号指示器
 ----------------
 
-自定义信号指示器，必须实现 :py:meth:`SignalBase._clone` 和 :py:meth:`SignalBase._calculate`  方法（如示例1）。如果含有私有属性，还需实现 :py:meth:`SignalBase._reset` 方法（如示例2）。
+自定义的信号指示器接口：
+
+* :py:meth:`SignalBase._calculate` - 【必须】子类计算接口
+* :py:meth:`SignalBase._clone` - 【必须】克隆接口
+* :py:meth:`SignalBase._reset` - 【可选】重载私有变量
 
 示例1（不含私有变量，海龟交易策略）:
 
@@ -107,8 +111,6 @@
 
 信号指示器基类
 --------------
-
-自定义的信号指示器，应实现 :py:meth:`SignalBase._clone`, :py:meth:`SignalBase._reset`, :py:meth:`SignalBase._calculate` 接口。
 
 .. py:class:: SignalBase([name])
 
@@ -196,12 +198,12 @@
     
     .. py:method:: _calculate()
     
-        子类计算接口
+        【重载接口】子类计算接口
     
     .. py:method:: _reset()
     
-        子类复位接口，复位内部私有变量
+        【重载接口】子类复位接口，复位内部私有变量
     
     .. py:method:: _clone()
     
-        子类克隆接口
+        【重载接口】子类克隆接口

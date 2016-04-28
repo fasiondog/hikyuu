@@ -137,8 +137,8 @@ void export_MoneyManager() {
 
     register_ptr_to_python<MoneyManagerPtr>();
 
-    def("FixedCount_MM", FixedCount_MM, (arg("n")=100));
-    def("PercentRisk_MM", PercentRisk_MM, (arg("p")=0.03));
+    def("MM_FixedCount", MM_FixedCount, (arg("n")=100));
+    def("MM_PercentRisk", MM_PercentRisk, (arg("p")=0.03));
 }
 
 

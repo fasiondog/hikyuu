@@ -38,7 +38,7 @@ size_t FixedCountMoneyManager::_getSellNumber(const Datetime& datetime, const St
     return getParam<int>("n");
 }
 
-MoneyManagerPtr HKU_API FixedCount_MM(int n) {
+MoneyManagerPtr HKU_API MM_FixedCount(int n) {
     FixedCountMoneyManager *p = new FixedCountMoneyManager();
     p->setParam<int>("n", n);
     return MoneyManagerPtr(p);
