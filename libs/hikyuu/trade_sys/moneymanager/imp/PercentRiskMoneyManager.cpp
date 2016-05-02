@@ -10,7 +10,7 @@
 namespace hku {
 
 PercentRiskMoneyManager::PercentRiskMoneyManager()
-: MoneyManagerBase("PercentRisk"){
+: MoneyManagerBase("MM_PercentRisk"){
     setParam<double>("p", 0.02); //总资产百分比
 }
 
@@ -24,7 +24,12 @@ size_t PercentRiskMoneyManager
     double p = getParam<double>("p");
     if (p <= 0.0 || p > 1.0) {
         HKU_ERROR("Error param (p = " << p
-                << ") [PercentRiskMoneyManager::getBuyNumber]");
+                << ") [PercentRiskMoneyManager::_getBuyNumber]");
+        return 0;
+    }
+
+    if (risk == 0.0) {
+        HKU_ERROR("risk is zero! [PercentRiskMoneyManager::_getBuyNumber");
         return 0;
     }
 

@@ -28,9 +28,15 @@
 
 #include "imp/FixedCountMoneyManager.h"
 #include "imp/PercentRiskMoneyManager.h"
+#include "imp/FixedRiskMoneyManager.h"
+#include "imp/FixedCapitalMoneyManager.h"
+#include "imp/FixedRatioMoneyManager.h"
 
 BOOST_CLASS_EXPORT(hku::FixedCountMoneyManager)
 BOOST_CLASS_EXPORT(hku::PercentRiskMoneyManager)
+BOOST_CLASS_EXPORT(hku::FixedRiskMoneyManager)
+BOOST_CLASS_EXPORT(hku::FixedCapitalMoneyManager)
+BOOST_CLASS_EXPORT(hku::FixedRatioMoneyManager)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

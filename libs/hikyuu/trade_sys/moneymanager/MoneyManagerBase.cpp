@@ -26,12 +26,12 @@ HKU_API std::ostream & operator<<(std::ostream& os, const MoneyManagerPtr& mm) {
 
 MoneyManagerBase::MoneyManagerBase()
 : m_name("MoneyManagerBase"), m_ktype(KQuery::DAY){
-
+    setParam<bool>("auto-checkin", false);
 }
 
 MoneyManagerBase::MoneyManagerBase(const string& name)
 : m_name(name), m_ktype(KQuery::DAY) {
-
+    setParam<bool>("auto-checkin", false);
 }
 
 MoneyManagerBase::~MoneyManagerBase() {
@@ -74,7 +74,7 @@ size_t MoneyManagerBase
         return 0;
     }
 
-    return _getSellNumber(datetime, stock, price, risk);
+    return _getSellNumber(datetime, stock, price, risk);;
 }
 
 size_t MoneyManagerBase
@@ -101,7 +101,29 @@ size_t MoneyManagerBase
         return 0;
     }
 
-    return _getBuyNumber(datetime, stock, price, risk);
+    size_t n = _getBuyNumber(datetime, stock, price, risk);
+
+    if (n < stock.minTradeNumber()) {
+        HKU_INFO("Ignore! Is less than the minimum number of transactions("
+                << stock.minTradeNumber()
+                << ")! [MoneyManagerBase::getBuyNumber]");
+        return 0;
+    }
+
+    //转换为最小交易量的整数倍
+    n = (n / stock.minTradeNumber()) * stock.minTradeNumber();
+
+    //在现金不足时，自动补充存入现金
+    if (getParam<bool>("auto-checkin")) {
+        price_t cash = m_tm->currentCash();
+        CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
+        price_t money = price * n + cost.total;
+        if (money > cash) {
+            m_tm->checkin(datetime, roundUp(money - cash, stock.precision()));
+        }
+    }
+
+    return n;
 }
 
 size_t MoneyManagerBase

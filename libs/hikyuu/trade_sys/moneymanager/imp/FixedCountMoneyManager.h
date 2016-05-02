@@ -27,9 +27,6 @@ class FixedCountMoneyManager: public MoneyManagerBase {
 public:
     FixedCountMoneyManager();
     virtual ~FixedCountMoneyManager();
-
-    virtual size_t _getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk);
 };
 
 } /* namespace hku */
