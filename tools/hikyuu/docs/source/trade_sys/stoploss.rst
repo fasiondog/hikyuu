@@ -18,7 +18,7 @@
 
     固定百分比止损策略，即当价格低于买入价格的某一百分比时止损
     
-    :param float p: 百分比(0,1]
+    :param double p: 百分比(0,1]
     :return: 止损/止赢策略实例
 
 技术指标止损
@@ -50,9 +50,7 @@
 
     止损/止赢算法基类
     
-    .. py:attribute:: name
-    
-        名称
+    .. py:attribute:: name 名称
         
     .. py:method:: getParam(name)
 
@@ -68,7 +66,7 @@
         
         :param str name: 参数名称
         :param value: 参数值
-        :type value: int | bool | float | string
+        :type value: int | bool | double | string
         :raises logic_error: Unsupported type! 不支持的参数类型
 
     .. py:method:: setTM(tm)
@@ -102,7 +100,7 @@
             一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价的30%作为止损，则不需要考虑price参数。
         
         :param Datetime datetime: 交易时间
-        :param float price: 计划买入的价格
+        :param double price: 计划买入的价格
         
     .. py:method:: _calculate()
     

@@ -3,6 +3,7 @@
 
 .. toctree::
 
+   record_struct
    trade_cost
    TradeManager
 

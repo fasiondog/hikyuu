@@ -9,7 +9,7 @@
 #define CRTTM_H_
 
 #include "../TradeManager.h"
-#include "crtZeroTC.h"
+#include "TC_Zero.h"
 
 namespace hku {
 
@@ -26,7 +26,7 @@ namespace hku {
 TradeManagerPtr HKU_API crtTM(
         const Datetime& datetime = Datetime(199001010000LL),
         price_t initcash = 100000.0,
-        const TradeCostPtr& costfunc = crtZeroTC(),
+        const TradeCostPtr& costfunc = TC_Zero(),
         const string& name = "SYS");
 
 } /* namespace */

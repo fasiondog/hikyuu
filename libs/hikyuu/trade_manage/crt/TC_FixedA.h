@@ -1,5 +1,5 @@
 /*
- * crtFixedATC.h
+ * TC_FixedA.h
  *
  *  Created on: 2013-2-14
  *      Author: fasiondog
@@ -9,8 +9,6 @@
 #define CRTFIXEDATC_H_
 
 #include "../TradeCostBase.h"
-
-#define TC_FixedA crtFixedATC
 
 namespace hku {
 
@@ -37,7 +35,7 @@ namespace hku {
  * @see FixedATradeCost
  * @ingroup TradeCost
  */
-TradeCostPtr HKU_API crtFixedATC(
+TradeCostPtr HKU_API TC_FixedA(
         price_t commission = 0.0018,
         price_t lowestCommission = 5.0,
         price_t stamptax = 0.001,

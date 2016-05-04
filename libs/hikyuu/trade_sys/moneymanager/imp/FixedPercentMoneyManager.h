@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
-#ifndef TRADE_SYS_MONEYMANAGER_IMP_PERCENTRISKMONEYMANAGER_H_
-#define TRADE_SYS_MONEYMANAGER_IMP_PERCENTRISKMONEYMANAGER_H_
+#ifndef TRADE_SYS_MONEYMANAGER_IMP_FIXEDPERCENTMONEYMANAGER_H_
+#define TRADE_SYS_MONEYMANAGER_IMP_FIXEDPERCENTMONEYMANAGER_H_
 
 #include "../MoneyManagerBase.h"
 
@@ -18,15 +18,15 @@ namespace hku {
  * 公式：P（头寸规模）＝ C（总风险）/ R（每股的风险） ［这里C现金为总风险］
  * 参数：percent：每笔交易总风险占总资产的百分比，如0.02表示总资产的2%
  */
-class HKU_API PercentRiskMoneyManager: public MoneyManagerBase {
-    MONEY_MANAGER_IMP(PercentRiskMoneyManager)
+class HKU_API FixedPercentMoneyManager: public MoneyManagerBase {
+    MONEY_MANAGER_IMP(FixedPercentMoneyManager)
     MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    PercentRiskMoneyManager();
-    virtual ~PercentRiskMoneyManager();
+    FixedPercentMoneyManager();
+    virtual ~FixedPercentMoneyManager();
 };
 
 } /* namespace hku */
 
-#endif /* TRADE_SYS_MONEYMANAGER_IMP_PERCENTRISKMONEYMANAGER_H_ */
+#endif /* TRADE_SYS_MONEYMANAGER_IMP_FIXEDPERCENTMONEYMANAGER_H_ */

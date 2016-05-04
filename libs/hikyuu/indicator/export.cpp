@@ -27,24 +27,32 @@
 #include <boost/serialization/export.hpp>
 
 #include "imp/Ama.h"
+#include "imp/Atr.h"
 #include "imp/Diff.h"
 #include "imp/Ema.h"
+#include "imp/HighLine.h"
+#include "imp/LowLine.h"
 #include "imp/IKData.h"
 #include "imp/IPriceList.h"
-#include <hikyuu/indicator/imp/Sma.h>
+#include "imp/Sma.h"
 #include "imp/Macd.h"
+#include "imp/RightShift.h"
 #include "imp/SaftyLoss.h"
 #include "imp/StdDeviation.h"
 #include "imp/Vigor.h"
 
 BOOST_CLASS_EXPORT(hku::Ama)
+BOOST_CLASS_EXPORT(hku::Atr)
 BOOST_CLASS_EXPORT(hku::Diff)
 BOOST_CLASS_EXPORT(hku::Ema)
+BOOST_CLASS_EXPORT(hku::HighLine)
 BOOST_CLASS_EXPORT(hku::IKData)
 BOOST_CLASS_EXPORT(hku::IPriceList)
-BOOST_CLASS_EXPORT(hku::Sma)
+BOOST_CLASS_EXPORT(hku::LowLine)
 BOOST_CLASS_EXPORT(hku::Macd)
+BOOST_CLASS_EXPORT(hku::RightShift)
 BOOST_CLASS_EXPORT(hku::SaftyLoss)
+BOOST_CLASS_EXPORT(hku::Sma)
 BOOST_CLASS_EXPORT(hku::StdDeviation)
 BOOST_CLASS_EXPORT(hku::Vigor)
 

@@ -16,6 +16,7 @@
 #include "crt/SMA.h"
 #include "crt/EMA.h"
 #include "crt/AMA.h"
+#include "crt/ATR.h"
 #include "crt/POS.h"
 #include "crt/MACD.h"
 #include "crt/VIGOR.h"

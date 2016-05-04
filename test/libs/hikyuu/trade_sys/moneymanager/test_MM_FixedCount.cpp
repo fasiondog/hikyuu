@@ -14,7 +14,7 @@
 
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
-#include <hikyuu/trade_manage/crt/crtFixedATC.h>
+#include <hikyuu/trade_manage/crt/TC_FixedA.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 
 using namespace hku;
@@ -29,7 +29,7 @@ using namespace hku;
 BOOST_AUTO_TEST_CASE( test_MM_FixedCount ) {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
-    TradeManagerPtr tm = crtTM(Datetime(199001010000LL), 0.0, crtFixedATC());
+    TradeManagerPtr tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
 
     /** @arg n < 1 */
     MoneyManagerPtr mm = MM_FixedCount(0);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( test_MM_FixedCount ) {
     BOOST_CHECK(result == 0);
 
     /** @arg n = 100, 一个初始资金为0的交易账户，能够执行买入操作 */
-    tm = crtTM(Datetime(199001010000LL), 0.0, crtFixedATC());
+    tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
     BOOST_CHECK(tm->initCash() == 0.0);
     mm = MM_FixedCount(100);
     mm->setTM(tm);

@@ -42,7 +42,7 @@
     
     :param Operand ind:
     :param int filer_n: N日周期
-    :param float filter_p: 过滤器百分比
+    :param double filter_p: 过滤器百分比
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
     
@@ -57,7 +57,7 @@
     
     :param Operand ind:
     :param int filer_n: N日周期
-    :param float filter_p: 过滤器百分比
+    :param double filter_p: 过滤器百分比
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
    
@@ -116,9 +116,7 @@
 
     信号指示器基类
     
-    .. py:attribute:: name
-    
-        名称
+    .. py:attribute:: name 名称
         
     .. py:method:: getParam(name)
 
@@ -134,7 +132,7 @@
         
         :param str name: 参数名称
         :param value: 参数值
-        :type value: int | bool | float | string
+        :type value: int | bool | double | string
         :raises logic_error: Unsupported type! 不支持的参数类型
         
     .. py:method:: setTO(k)

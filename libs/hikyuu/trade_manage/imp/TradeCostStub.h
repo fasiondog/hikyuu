@@ -16,7 +16,7 @@ class HKU_API TradeCostStub: public TradeCostBase {
     TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    TradeCostStub(): TradeCostBase("TradeCostStub") {}
+    TradeCostStub(): TradeCostBase("TestStub") {}
 
     virtual ~TradeCostStub() {}
 

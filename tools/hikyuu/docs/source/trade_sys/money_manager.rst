@@ -28,7 +28,7 @@
 
 .. py:function:: MM_FixedRisk([risk = 1000.00])
 
-    :param float risk: 固定风险
+    :param double risk: 固定风险
     :return: 资金管理策略实例
     
 
@@ -37,28 +37,36 @@
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    :param float capital: 固定资本单位
+    :param double capital: 固定资本单位
     :return: 资金管理策略实例
 
 
 固定比例资金管理策略
 ^^^^^^^^^^^^^^^^^^^^
 
+
 固定单位资金管理策略
 ^^^^^^^^^^^^^^^^^^^^
 
+.. py:function:: MM_FixedUnits([n = 33])
+
+    :param int n: n个资金单位
+    :return: 资金管理策略实例
+    
+
 威廉斯固定风险资金管理策略
-^^^^^^^^^^^^^^^^^^^^^^^^^^    
+^^^^^^^^^^^^^^^^^^^^^^^^^^  
+
     
     
 固定百分比资金管理策略
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: MM_PercentRisk([p = 0.03])
+.. py:function:: MM_FixedPercent([p = 0.03])
 
     固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
     
-    :param float p: 百分比
+    :param double p: 百分比
     :return: 资金管理策略实例
     
 
@@ -87,9 +95,7 @@
 
     资金管理策略基类
     
-    .. py:attribute:: name
-    
-        名称
+    .. py:attribute:: name 名称
         
     .. py:method:: getParam(name)
 
@@ -109,7 +115,7 @@
         
         :param str name: 参数名称
         :param value: 参数值
-        :type value: int | bool | float | string
+        :type value: int | bool | double | string
         :raises logic_error: Unsupported type! 不支持的参数类型
 
     .. py:method:: setTM(tm)
@@ -136,8 +142,8 @@
         
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+        :param double price: 交易价格
+        :param double risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :return: 可买入数量
         :rtype: int
         
@@ -147,8 +153,8 @@
         
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+        :param double price: 交易价格
+        :param double risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :return: 可卖出数量
         :rtype: int
         
@@ -170,8 +176,8 @@
         
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+        :param double price: 交易价格
+        :param double risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :return: 可买入数量
         :rtype: int
 
@@ -181,8 +187,8 @@
         
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+        :param double price: 交易价格
+        :param double risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :return: 可卖出数量
         :rtype: int
         

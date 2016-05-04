@@ -1,5 +1,5 @@
 /*
- * test_crtZeroTC.cpp
+ * test_TC_Zero.cpp
  *
  *  Created on: 2013-2-14
  *      Author: fasiondog
@@ -13,7 +13,7 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtZeroTC.h>
+#include <hikyuu/trade_manage/crt/TC_Zero.h>
 
 #include <hikyuu/config.h>
 #if HKU_SUPPORT_SERIALIZATION
@@ -25,20 +25,20 @@
 using namespace hku;
 
 /**
- * @defgroup test_crtZeroTC test_crtZeroTC
+ * @defgroup test_TC_Zero test_TC_Zero
  * @ingroup test_hikyuu_trade_manage_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_crtZeroTC ) {
+BOOST_AUTO_TEST_CASE( test_TC_Zero ) {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600004");
-    TradeCostPtr cost_func = crtZeroTC();
+    TradeCostPtr cost_func = TC_Zero();
     CostRecord result;
 
     /** @arg 检查name */
-    BOOST_CHECK(cost_func->name() == "ZeroTradeCost");
+    BOOST_CHECK(cost_func->name() == "Zero");
 
     /** @arg 计算买入成本 */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( test_crtZeroTC ) {
 
     /** @arg 测试clone */
     TradeCostPtr cost_clone_func = cost_func->clone();
-    BOOST_CHECK(cost_clone_func->name() == "ZeroTradeCost");
+    BOOST_CHECK(cost_clone_func->name() == "Zero");
     result = cost_clone_func->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);
     BOOST_CHECK(result == Null<CostRecord>());
     result = cost_clone_func->getSellCost(Datetime(200101010000), stock, 9.01, 1000);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( test_ZeroCost_export ) {
     Stock stock = sm.getStock("sh600004");
 
     CostRecord result;
-    BOOST_CHECK(zero2->name() == "ZeroTradeCost");
+    BOOST_CHECK(zero2->name() == "Zero");
     result = zero2->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);
     BOOST_CHECK(result == Null<CostRecord>());
     result = zero2->getSellCost(Datetime(200101010000), stock, 9.01, 1000);

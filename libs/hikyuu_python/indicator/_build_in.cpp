@@ -48,8 +48,9 @@ Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
 Indicator (*AMA_1)(int, int, int) = AMA;
 Indicator (*AMA_2)(const Indicator&, int, int, int) = AMA;
-//BOOST_PYTHON_FUNCTION_OVERLOADS(AMA_1_overload, AMA, 0, 3);
-//BOOST_PYTHON_FUNCTION_OVERLOADS(AMA_2_overload, AMA, 1, 4);
+
+Indicator (*ATR_1)(int) = ATR;
+Indicator (*ATR_2)(const Indicator&, int) = ATR;
 
 Indicator (*DIFF_1)() = DIFF;
 Indicator (*DIFF_2)(const Indicator&) = DIFF;
@@ -138,6 +139,10 @@ void export_Indicator_build_in() {
 
     def("AMA", AMA_1, (arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));
     def("AMA", AMA_2, (arg("data"), arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));
+
+    def("ATR", ATR_1, (arg("n")=14));
+    def("ATR", ATR_2, (arg("data"), arg("n")=14));
+
     def("MACD", MACD_1, (arg("n1")=12, arg("n2")=26, arg("n3")=9));
     def("MACD", MACD_2, (arg("data"), arg("n1")=12, arg("n2")=26, arg("n3")=9));
     def("VIGOR", VIGOR, (arg("kdata"), arg("n")=2));

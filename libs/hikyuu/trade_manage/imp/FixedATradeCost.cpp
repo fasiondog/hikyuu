@@ -11,7 +11,7 @@
 
 namespace hku {
 
-FixedATradeCost::FixedATradeCost(): TradeCostBase("FixedATradeCost") {
+FixedATradeCost::FixedATradeCost(): TradeCostBase("FixedA") {
     setParam<price_t>("commission", 0.0018);
     setParam<price_t>("lowest_commission", 5.0);
     setParam<price_t>("stamptax", 0.001);
@@ -106,6 +106,16 @@ CostRecord FixedATradeCost::getSellCost(const Datetime& datetime,
 
 TradeCostPtr FixedATradeCost::_clone() {
     return TradeCostPtr(new FixedATradeCost());
+}
+
+TradeCostPtr HKU_API TC_FixedA(
+        price_t commission,
+        price_t lowestCommission,
+        price_t stamptax,
+        price_t transferfee,
+        price_t lowestTransferfee) {
+    return TradeCostPtr(new FixedATradeCost(commission, lowestCommission,
+            stamptax, transferfee, lowestTransferfee));
 }
 
 } /* namespace hku */

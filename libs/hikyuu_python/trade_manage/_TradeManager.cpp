@@ -66,9 +66,6 @@ void export_TradeManager() {
             const TradeCostPtr&, const string&>())
             //.def(self_ns::str(self))
             .def("__str__", &TradeManager::toString)
-            .add_property("params",
-                    make_function(&TradeManager::getParameter,
-                            return_internal_reference<>()))
             .add_property("name", &TradeManager::name, &TradeManager::setName)
             .add_property("initCash", &TradeManager::initCash)
             //.add_property("cash", &TradeManager::cash)

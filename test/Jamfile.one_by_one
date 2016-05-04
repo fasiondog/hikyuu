@@ -48,8 +48,8 @@ test-suite test_all :
     [ run libs/hikyuu/indicator/test_STDEV.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/indicator/test_Vigor.cpp libs/hikyuu/config.cpp ]
     
-    [ run libs/hikyuu/trade_manage/test_crtFixedATC.cpp libs/hikyuu/config.cpp ]
-    [ run libs/hikyuu/trade_manage/test_crtZeroTC.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_manage/test_TC_FixedA.cpp libs/hikyuu/config.cpp ]
+    [ run libs/hikyuu/trade_manage/test_TC_Zero.cpp libs/hikyuu/config.cpp ]
     [ run libs/hikyuu/trade_manage/test_TradeManager.cpp libs/hikyuu/config.cpp ]
     
     [ run libs/hikyuu/trade_sys/condition/test_Condition.cpp libs/hikyuu/config.cpp ]

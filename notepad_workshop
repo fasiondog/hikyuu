@@ -71,6 +71,7 @@
             <File name="tools\hikyuu\docs\source\trade_manage\trade_manage.rst" />
             <File name="tools\hikyuu\docs\source\trade_manage\trade_cost.rst" />
             <File name="tools\hikyuu\docs\source\trade_manage\TradeManager.rst" />
+            <File name="tools\hikyuu\docs\source\trade_manage\record_struct.rst" />
         </Folder>
         <Folder name="trade_sys">
             <File name="tools\hikyuu\docs\source\trade_sys\signal.rst" />

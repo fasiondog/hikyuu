@@ -140,7 +140,8 @@ void export_MoneyManager() {
     def("MM_FixedRisk", MM_FixedRisk, (arg("risk")=1000.00));
     def("MM_FixedCapital", MM_FixedCapital, (arg("capital") = 10000.00));
     def("MM_FixedCount", MM_FixedCount, (arg("n")=100));
-    def("MM_PercentRisk", MM_PercentRisk, (arg("p")=0.03));
+    def("MM_FixedPercent", MM_FixedPercent, (arg("p")=0.03));
+    def("MM_FixedUnits", MM_FixedUnits, (arg("n") = 33));
 }
 
 

@@ -27,16 +27,20 @@
 #include <boost/serialization/export.hpp>
 
 #include "imp/FixedCountMoneyManager.h"
-#include "imp/PercentRiskMoneyManager.h"
+#include "imp/FixedPercentMoneyManager.h"
 #include "imp/FixedRiskMoneyManager.h"
 #include "imp/FixedCapitalMoneyManager.h"
 #include "imp/FixedRatioMoneyManager.h"
+#include "imp/FixedUnitsMoneyManager.h"
+#include "imp/WilliamsFixedRiskMoneyManager.h"
 
 BOOST_CLASS_EXPORT(hku::FixedCountMoneyManager)
-BOOST_CLASS_EXPORT(hku::PercentRiskMoneyManager)
+BOOST_CLASS_EXPORT(hku::FixedPercentMoneyManager)
 BOOST_CLASS_EXPORT(hku::FixedRiskMoneyManager)
 BOOST_CLASS_EXPORT(hku::FixedCapitalMoneyManager)
 BOOST_CLASS_EXPORT(hku::FixedRatioMoneyManager)
+BOOST_CLASS_EXPORT(hku::FixedUnitsMoneyManager)
+BOOST_CLASS_EXPORT(hku::WilliamsFixedRiskMoneyManager)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

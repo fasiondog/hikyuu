@@ -1,5 +1,5 @@
 /*
- * crtZeroTC.h
+ * TC_Zero.h
  *
  *  Created on: 2013-2-14
  *      Author: fasiondog
@@ -10,8 +10,6 @@
 
 #include "../TradeCostBase.h"
 
-#define TC_Zero crtZeroTC
-
 namespace hku {
 
 /**
@@ -19,7 +17,7 @@ namespace hku {
  * @see ZeroTradeCost
  * @ingroup TradeCost
  */
-TradeCostPtr HKU_API crtZeroTC();
+TradeCostPtr HKU_API TC_Zero();
 
 } /* namespace */
 

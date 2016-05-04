@@ -18,7 +18,7 @@ MM_FixedCount.__doc__ = """
     n: 固定交易的数量，为大于等于1的整数，如小于1,默认被置为0
     """
 
-MM_PercentRisk.__doc__ = """
+MM_FixedPercent.__doc__ = """
 百分比风险模型
 公式：P（头寸规模）＝ C（总风险）/ R（每股的风险） ［这里C现金为总风险］
 参数：

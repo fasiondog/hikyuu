@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_manage/TradeCostBase.h>
+#include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
@@ -93,7 +94,9 @@ void export_TradeCost() {
     class_<TradeCostWrap, boost::noncopyable>("TradeCostBase", init<const string&>())
             .def(self_ns::str(self))
             .add_property("name", make_function(&TradeCostBase::name, return_value_policy<copy_const_reference>()))
-            .add_property("params", make_function(&TradeCostBase::getParameter, return_internal_reference<>()))
+            //.add_property("params", make_function(&TradeCostBase::getParameter, return_internal_reference<>()))
+            .def("getParam", &TradeCostBase::getParam<boost::any>)
+            .def("setParam", &TradeCostBase::setParam<object>)
             .def("clone", &TradeCostBase::clone)
             .def("getBuyCost", pure_virtual(&TradeCostBase::getBuyCost))
             .def("getSellCost", pure_virtual(&TradeCostBase::getSellCost))

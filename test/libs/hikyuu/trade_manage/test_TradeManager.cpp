@@ -14,7 +14,7 @@
 
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/crt/TC_TestStub.h>
-#include <hikyuu/trade_manage/crt/crtFixedATC.h>
+#include <hikyuu/trade_manage/crt/TC_FixedA.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 
 #include <fstream>
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_init ) {
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000,
-            crtFixedATC(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+            TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
 
     BOOST_CHECK(tm->name() == "TEST");
     BOOST_CHECK(tm->initCash() == 100000.0);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_getBuyCost ) {
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000,
-            crtFixedATC(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+            TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
 
     /** @arg 调用CostFunc是否正常 */
     result = tm->getBuyCost(Datetime(200101010000), stock, 10.0, 1000);
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_getSellCost ) {
     Stock stock = sm.getStock("sh600004");
     CostRecord result, expect;
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000,
-            crtFixedATC(0.0018, 5, 0.001, 0.001, 1.0));
+            TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0));
 
     /** @arg 调用CostFunc是否正常 */
     result = tm->getSellCost(Datetime(200101010000), stock, 10.0, 100);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_getSellCost ) {
 BOOST_AUTO_TEST_CASE( test_TradeManager_can_not_buy ) {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
-    TradeCostPtr costfunc = crtFixedATC(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr costfunc = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
     TradeManagerPtr tm;
     TradeRecord result;
     CostRecord cost;
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_can_not_buy ) {
 BOOST_AUTO_TEST_CASE( test_TradeManager_can_not_sell ) {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
-    TradeCostPtr costfunc = crtFixedATC(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr costfunc = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
     TradeManagerPtr tm;
     TradeRecord result;
     CostRecord cost;
@@ -267,7 +267,7 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_can_not_sell ) {
     BOOST_CHECK(tm->cash(Datetime(199911180000)) == 99903.36);
 
     /** @arg 不忽略权息信息，对股票进行买卖操作，忽略买卖成本 */
-    tm = crtTM(Datetime(199901010000), 1000000, crtZeroTC(), "SYS");
+    tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "SYS");
     tm->setParam<bool>("reinvest", true);
     tm->buy(Datetime(199911170000), stock, 27.18, 1000, 0);
     BOOST_CHECK(tm->cash(Datetime(199911170000)) == 972820);

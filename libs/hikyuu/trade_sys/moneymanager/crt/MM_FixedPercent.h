@@ -1,12 +1,12 @@
 /*
- * MM_PercentRisk.h
+ * MM_FixedPercent.h
  *
  *  Created on: 2015年4月5日
  *      Author: fasiondog
  */
 
-#ifndef TRADE_SYS_MONEYMANAGER_CRT_MM_PERCENTRISK_H_
-#define TRADE_SYS_MONEYMANAGER_CRT_MM_PERCENTRISK_H_
+#ifndef TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDPERCENT_H_
+#define TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDPERCENT_H_
 
 #include "../MoneyManagerBase.h"
 
@@ -19,8 +19,8 @@ namespace hku {
  * @param p 每笔交易总风险占总资产的百分比，如0.02表示总资产的2%
  * @ingroup MoneyManager
  */
-MoneyManagerPtr HKU_API MM_PercentRisk(double p);
+MoneyManagerPtr HKU_API MM_FixedPercent(double p);
 
 } /* namespace */
 
-#endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_PERCENTRISK_H_ */
+#endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDPERCENT_H_ */

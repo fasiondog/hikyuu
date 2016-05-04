@@ -5,20 +5,20 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/trade_sys/moneymanager/imp/PercentRiskMoneyManager.h>
+#include "FixedPercentMoneyManager.h"
 
 namespace hku {
 
-PercentRiskMoneyManager::PercentRiskMoneyManager()
-: MoneyManagerBase("MM_PercentRisk"){
+FixedPercentMoneyManager::FixedPercentMoneyManager()
+: MoneyManagerBase("MM_FixedPercent"){
     setParam<double>("p", 0.02); //总资产百分比
 }
 
-PercentRiskMoneyManager::~PercentRiskMoneyManager() {
+FixedPercentMoneyManager::~FixedPercentMoneyManager() {
 
 }
 
-size_t PercentRiskMoneyManager
+size_t FixedPercentMoneyManager
 ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
             price_t price, price_t risk) {
     double p = getParam<double>("p");
@@ -36,8 +36,8 @@ size_t PercentRiskMoneyManager
     return int(m_tm->currentCash() * p / risk);
 }
 
-MoneyManagerPtr HKU_API MM_PercentRisk(double p) {
-    PercentRiskMoneyManager *ptr = new PercentRiskMoneyManager();
+MoneyManagerPtr HKU_API MM_FixedPercent(double p) {
+    FixedPercentMoneyManager *ptr = new FixedPercentMoneyManager();
     ptr->setParam<double>("p", p);
     return MoneyManagerPtr(ptr);
 }

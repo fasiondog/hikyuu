@@ -1,5 +1,5 @@
 /*
- * test_crtFixedATC.cpp
+ * test_TC_FixedA.cpp
  *
  *  Created on: 2013-2-14
  *      Author: fasiondog
@@ -13,7 +13,7 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_manage/crt/crtFixedATC.h>
+#include <hikyuu/trade_manage/crt/TC_FixedA.h>
 
 #include <hikyuu/config.h>
 #if HKU_SUPPORT_SERIALIZATION
@@ -25,17 +25,17 @@
 using namespace hku;
 
 /**
- * @defgroup test_crtFixedATC test_crtFixedATC
+ * @defgroup test_TC_FixedA test_TC_FixedA
  * @ingroup test_hikyuu_trade_manage_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_crtFixedATC ) {
+BOOST_AUTO_TEST_CASE( test_TC_FixedA ) {
     StockManager& sm = StockManager::instance();
     Stock stock;
     CostRecord result, expect;
-    TradeCostPtr cost_func = crtFixedATC(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr cost_func = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
 
     /** @arg Stock is Null */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 100);

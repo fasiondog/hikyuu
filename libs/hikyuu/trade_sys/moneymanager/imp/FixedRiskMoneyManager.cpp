@@ -5,7 +5,7 @@
  *      Author: Administrator
  */
 
-#include <hikyuu/trade_sys/moneymanager/imp/FixedRiskMoneyManager.h>
+#include "FixedRiskMoneyManager.h"
 
 namespace hku {
 
@@ -21,9 +21,6 @@ FixedRiskMoneyManager::~FixedRiskMoneyManager() {
 size_t FixedRiskMoneyManager
 ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
             price_t price, price_t risk) {
-    if (risk <= 0.0)
-        return 0;
-
     return getParam<double>("risk") / risk;
 }
 

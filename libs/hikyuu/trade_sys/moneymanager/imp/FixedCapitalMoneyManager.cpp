@@ -5,7 +5,7 @@
  *      Author: Administrator
  */
 
-#include <hikyuu/trade_sys/moneymanager/imp/FixedCapitalMoneyManager.h>
+#include "FixedCapitalMoneyManager.h"
 
 namespace hku {
 

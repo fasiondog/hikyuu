@@ -9,7 +9,7 @@
 
 namespace hku {
 
-ZeroTradeCost::ZeroTradeCost(): TradeCostBase("ZeroTradeCost") {
+ZeroTradeCost::ZeroTradeCost(): TradeCostBase("Zero") {
 
 }
 
@@ -29,6 +29,10 @@ CostRecord ZeroTradeCost
 }
 
 TradeCostPtr ZeroTradeCost::_clone() {
+    return TradeCostPtr(new ZeroTradeCost());
+}
+
+TradeCostPtr HKU_API TC_Zero() {
     return TradeCostPtr(new ZeroTradeCost());
 }
 

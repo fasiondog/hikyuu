@@ -16,7 +16,7 @@
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
 #include "LoanRecord.h"
-#include "crt/crtZeroTC.h"
+#include "crt/TC_Zero.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/map.hpp>
@@ -44,7 +44,7 @@ class HKU_API TradeManager {
 public:
     TradeManager(const Datetime& datetime = Datetime(199001010000LL),
             price_t initcash = 100000.0,
-            const TradeCostPtr& costfunc = crtZeroTC(),
+            const TradeCostPtr& costfunc = TC_Zero(),
             const string& name = "SYS");
     virtual ~TradeManager();
 

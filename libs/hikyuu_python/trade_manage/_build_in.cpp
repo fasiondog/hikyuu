@@ -18,11 +18,16 @@ void export_build_in() {
 
     def("TC_TestStub", TC_TestStub);
 
-    def("TC_FixedA", crtFixedATC, (arg("commission") = 0.0018,
+    def("TC_FixedA", TC_FixedA, (arg("commission") = 0.0018,
             arg("lowest_commission") = 5.0,
             arg("stamptax") = 0.001,
             arg("transferfee") = 0.001,
             arg("lowest_transferfee") = 1.0));
+
+    def("TC_FixedA2015", TC_FixedA2015, (arg("commission") = 0.0018,
+            arg("lowest_commission") = 5.0,
+            arg("stamptax") = 0.001,
+            arg("transferfee") = 0.00002));
 
     def("TC_Zero", TC_Zero);
 }
