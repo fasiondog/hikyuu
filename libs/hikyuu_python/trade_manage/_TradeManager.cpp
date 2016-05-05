@@ -62,6 +62,8 @@ void (TradeManager::*set_costFunc)(const TradeCostPtr&) = &TradeManager::costFun
 
 void export_TradeManager() {
 
+    size_t null_size = Null<size_t>();
+
     class_<TradeManager>("TradeManager", init<const Datetime&, price_t,
             const TradeCostPtr&, const string&>())
             //.def(self_ns::str(self))
@@ -103,6 +105,8 @@ void export_TradeManager() {
             .def("cash", &TradeManager::cash, cash_overload())
             .def("getFunds", getFunds_1, getFunds_1_overload())
             .def("getFunds", getFunds_2, getFunds_2_overload())
+            //.def("getFunds", getFunds_1, (arg("ktype") = KQuery::DAY))
+            //.def("getFunds", getFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY))
             .def("getFundsCurve", &TradeManager::getFundsCurve)
             .def("getProfitCurve", &TradeManager::getProfitCurve)
 
@@ -114,8 +118,14 @@ void export_TradeManager() {
             .def("returnCash", &TradeManager::returnCash)
             .def("borrowStock", &TradeManager::borrowStock)
             .def("returnStock", &TradeManager::returnStock)
-            .def("buy", &TradeManager::buy, buy_overload())
-            .def("sell", &TradeManager::sell, sell_overload())
+            //.def("buy", &TradeManager::buy, buy_overload())
+            .def("buy", &TradeManager::buy,
+                    buy_overload(args("datetime", "stock", "realPrice",
+                            "num", "stoploss", "goalPrice", "planPrice","part")))
+            //.def("sell", &TradeManager::sell, sell_overload())
+            .def("sell", &TradeManager::sell,
+                    sell_overload(args("datetime", "stock", "realPrice",
+                            "num", "stoploss", "goalPrice", "planPrice", "part")))
             .def("buyShort", &TradeManager::buyShort, buyShort_overload())
             .def("sellShort", &TradeManager::sellShort, sellShort_overload())
 

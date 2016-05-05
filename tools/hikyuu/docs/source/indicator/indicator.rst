@@ -132,7 +132,7 @@
 
     :param int n1: 计算平均噪音的回溯时间窗口
     :param int n2: 对初步止损线去n2日内的最高值
-    :param double p: 噪音系数
+    :param float p: 噪音系数
     
     
 .. py:function:: SMA([data, int = 22])

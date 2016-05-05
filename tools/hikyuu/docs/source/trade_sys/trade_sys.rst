@@ -9,3 +9,5 @@
    signal
    stoploss
    money_manager
+   profitgoal
+   slippage

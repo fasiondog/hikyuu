@@ -59,8 +59,9 @@ void registerSupportClass() {
     g_support_class_dict[typeid(TradeRequest).hash_code()] = "TradeRequest";
     g_support_class_dict[typeid(SystemPtr).hash_code()] = "SystemPtr";
     g_support_class_dict[typeid(SignalPtr).hash_code()] = "SignalBase";
-    g_support_class_dict[typeid(SignalPtr).hash_code()] = "StoplossBase";
-    g_support_class_dict[typeid(SignalPtr).hash_code()] = "MoneyManagerBase";
+    g_support_class_dict[typeid(StoplossPtr).hash_code()] = "StoplossBase";
+    g_support_class_dict[typeid(MoneyManagerPtr).hash_code()] = "MoneyManagerBase";
+    g_support_class_dict[typeid(ProfitGoalPtr).hash_code()] = "ProfitGoalBase";
 }
 
 string supportClassName(const boost::any& arg) {
@@ -208,6 +209,9 @@ void export_save_load() {
 
     def("hku_save", xml_save<MoneyManagerPtr>);
     def("hku_load", xml_load<MoneyManagerPtr>);
+
+    def("hku_save", xml_save<ProfitGoalPtr>);
+    def("hku_load", xml_load<ProfitGoalPtr>);
 
 }
 

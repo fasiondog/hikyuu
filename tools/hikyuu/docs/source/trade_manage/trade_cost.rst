@@ -36,21 +36,21 @@
 
     2015年8月1日及之后的A股交易成本算法，上证过户费改为成交金额的千分之0.02
 
-    :param double commission: 佣金比例
-    :param double lowestCommission: 最低佣金值
-    :param double stamptax: 印花税
-    :param double transferfee: 过户费
+    :param float commission: 佣金比例
+    :param float lowestCommission: 最低佣金值
+    :param float stamptax: 印花税
+    :param float transferfee: 过户费
     :return: :py:class:`TradeCostBase` 子类实例
     
 .. py:function:: TC_FixedA([commission = 0.0018, lowestCommission = 5.0, stamptax = 0.001, transferfee = 0.001, lowestTransferfee = 1.0])
 
     2015年8月1日之前的A股交易成本算法
 
-    :param double commission: 佣金比例
-    :param double lowestCommission: 最低佣金值
-    :param double stamptax: 印花税
-    :param double transferfee: 过户费
-    :param double lowestTransferfee: 最低过户费
+    :param float commission: 佣金比例
+    :param float lowestCommission: 最低佣金值
+    :param float stamptax: 印花税
+    :param float transferfee: 过户费
+    :param float lowestTransferfee: 最低过户费
     :return: :py:class:`TradeCostBase` 子类实例
 
 
@@ -89,7 +89,7 @@
         
         :param str name: 参数名称
         :param value: 参数值
-        :type value: int | bool | double | string
+        :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
 
     .. py:method:: clone()
@@ -102,7 +102,7 @@
         
         :param Datetime datetime: 买入时刻
         :param Stock stock: 买入对象
-        :param double price: 买入价格
+        :param float price: 买入价格
         :param size_t num: 买入数量
         :return: 交易成本记录
         :rtype: CostRecord
@@ -113,7 +113,7 @@
         
         :param Datetime datetime: 卖出时刻
         :param Stock stock: 卖出对象
-        :param double price: 卖出价格
+        :param float price: 卖出价格
         :param size_t num: 卖出数量
         :return: 交易成本记录
         :rtype: CostRecord
