@@ -23,6 +23,10 @@ HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalPtr& pg) {
     return os;
 }
 
+ProfitGoalBase::ProfitGoalBase(): m_name("ProfitGoalBase") {
+
+}
+
 ProfitGoalBase::ProfitGoalBase(const string& name): m_name(name) {
 
 }

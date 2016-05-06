@@ -6,6 +6,8 @@
 
 .. toctree::
 
+   environment
+   condition
    signal
    stoploss
    money_manager

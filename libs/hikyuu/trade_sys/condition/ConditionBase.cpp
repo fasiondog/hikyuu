@@ -24,6 +24,10 @@ HKU_API std::ostream & operator<<(std::ostream& os, const ConditionPtr& cn) {
     return os;
 }
 
+ConditionBase::ConditionBase(): m_name("ConditionBase") {
+
+}
+
 ConditionBase::ConditionBase(const string& name): m_name(name) {
 
 }

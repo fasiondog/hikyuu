@@ -78,6 +78,10 @@
             <File name="tools\hikyuu\docs\source\trade_sys\trade_sys.rst" />
             <File name="tools\hikyuu\docs\source\trade_sys\stoploss.rst" />
             <File name="tools\hikyuu\docs\source\trade_sys\money_manager.rst" />
+            <File name="tools\hikyuu\docs\source\trade_sys\profitgoal.rst" />
+            <File name="tools\hikyuu\docs\source\trade_sys\slippage.rst" />
+            <File name="tools\hikyuu\docs\source\trade_sys\condition.rst" />
+            <File name="tools\hikyuu\docs\source\trade_sys\environment.rst" />
         </Folder>
         <Folder name="indicator">
             <File name="tools\hikyuu\docs\source\indicator\index.rst" />

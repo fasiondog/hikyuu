@@ -23,6 +23,14 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SlippagePtr& sp) {
     return os;
 }
 
+SlippageBase::SlippageBase(): m_name("SlippageBase") {
+
+}
+
+SlippageBase::SlippageBase(const string& name): m_name(name) {
+
+}
+
 SlippagePtr SlippageBase::clone() {
     SlippagePtr p = _clone();
     p->m_params = m_params;

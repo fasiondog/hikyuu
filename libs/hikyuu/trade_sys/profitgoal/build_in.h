@@ -9,6 +9,8 @@
 #define PROFITGOAL_BUILD_IN_H_
 
 
+#include "crt/PG_NoGoal.h"
+#include "crt/PG_FixedPercent.h"
 
 
 #endif /* PROFITGOAL_BUILD_IN_H_ */

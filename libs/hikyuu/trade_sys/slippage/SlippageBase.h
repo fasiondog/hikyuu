@@ -28,14 +28,21 @@ class HKU_API SlippageBase {
     PARAMETER_SUPPORT
 
 public:
-    SlippageBase(const string& name): m_name(name) {}
+    SlippageBase();
+    SlippageBase(const string& name);
     virtual ~SlippageBase() {}
 
     /** 设置交易对象 */
     void setTO(const KData& kdata);
 
+    /** 获取交易对象 */
+    KData getTO() const;
+
     /** 获取名称 */
-    const string& name() const;
+    string name() const;
+
+    /** 设置名称 */
+    void name(const string& name);
 
     /** 复位操作 */
     void reset();
@@ -66,7 +73,7 @@ public:
     virtual SlippagePtr _clone() = 0;
 
     /** 子类复位接口 */
-    virtual void _reset() = 0;
+    virtual void _reset() {}
 
     /** 子类计算接口，由setTO调用 */
     virtual void _calculate() = 0;
@@ -130,6 +137,15 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SlippageBase)
 #endif
 
 
+#define SLIPPAGE_IMP(classname) public:\
+    virtual SlippagePtr _clone() {\
+        return SlippagePtr(new classname());\
+    }\
+    virtual price_t getRealBuyPrice(const Datetime&, price_t); \
+    virtual price_t getRealSellPrice(const Datetime&, price_t); \
+    virtual void _calculate();
+
+
 /**
  * 客户程序都应使用该指针类型，操作移滑价差算法
  * @ingroup Slippage
@@ -140,8 +156,16 @@ HKU_API std::ostream & operator<<(std::ostream&, const SlippageBase&);
 HKU_API std::ostream & operator<<(std::ostream&, const SlippagePtr&);
 
 
-inline const string& SlippageBase::name() const {
+inline string SlippageBase::name() const {
     return m_name;
+}
+
+inline void SlippageBase::name(const string& name) {
+    m_name = name;
+}
+
+inline KData SlippageBase::getTO() const {
+    return m_kdata;
 }
 
 inline void SlippageBase::reset() {

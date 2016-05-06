@@ -29,17 +29,27 @@ class HKU_API ProfitGoalBase {
     PARAMETER_SUPPORT
 
 public:
+    ProfitGoalBase();
     ProfitGoalBase(const string& name);
     virtual ~ProfitGoalBase();
 
     /** 设置账户 */
     void setTM(const TradeManagerPtr& tm);
 
+    /** 获取账户 */
+    TradeManagerPtr getTM() const;
+
     /** 设置交易对象 */
     void setTO(const KData& kdata);
 
+    /** 获取交易对象 */
+    KData getTO() const;
+
     /** 获取名称 */
-    const string& name() const;
+    string name() const;
+
+    /** 设置名称 */
+    void name(const string& name);
 
     /** 复位操作 */
     void reset();
@@ -48,10 +58,13 @@ public:
     /** 克隆接口 */
     ProfitGoalPtr clone();
 
-    /** 返回0,表示未设目标 */
-    virtual price_t getGoal(const Datetime&, price_t) {
-        return 0.0;
-    }
+    /**
+     * 买入时计算目标价格
+     * @param datetime 买入时间
+     * @param price 买入价格
+     * @return 返回0时，表示未限定目标
+     */
+    virtual price_t getGoal(const Datetime& datetime, price_t price) = 0;
 
     /** 返回0,表示未设目标 */
     virtual price_t getShortGoal(const Datetime&, price_t) {
@@ -59,7 +72,7 @@ public:
     }
 
     /** 子类复位接口 */
-    virtual void _reset() = 0;
+    virtual void _reset() {}
 
     /** 子类克隆接口 */
     virtual ProfitGoalPtr _clone() = 0;
@@ -127,6 +140,15 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ProfitGoalBase)
 #endif
 
 
+#define PROFITGOAL_IMP(classname) public:\
+    virtual ProfitGoalPtr _clone() {\
+        return ProfitGoalPtr(new classname());\
+    }\
+    virtual price_t getGoal(const Datetime&, price_t); \
+    virtual void _calculate();
+
+
+
 /**
  * 客户程序都应使用该指针类型
  * @ingroup ProfitGoal
@@ -141,8 +163,20 @@ inline void ProfitGoalBase::setTM(const TradeManagerPtr& tm) {
     m_tm = tm;
 }
 
-inline const string& ProfitGoalBase::name() const {
+inline TradeManagerPtr ProfitGoalBase::getTM() const {
+    return m_tm;
+}
+
+inline KData ProfitGoalBase::getTO() const {
+    return m_kdata;
+}
+
+inline string ProfitGoalBase::name() const {
     return m_name;
+}
+
+inline void ProfitGoalBase::name(const string& name) {
+    m_name = name;
 }
 
 inline void ProfitGoalBase::reset() {

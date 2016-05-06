@@ -14,6 +14,7 @@ using namespace hku;
 
 class ConditionWrap : public ConditionBase, public wrapper<ConditionBase> {
 public:
+    ConditionWrap(): ConditionBase() {}
     ConditionWrap(const string& name): ConditionBase(name) {}
 
     bool isValid(const Datetime& datetime) {
@@ -35,7 +36,8 @@ public:
 
 
 void export_Condition() {
-    class_<ConditionWrap, boost::noncopyable>("ConditionBase", init<const string&>())
+    class_<ConditionWrap, boost::noncopyable>("ConditionBase", init<>())
+            .def(init<const string&>())
             .def(self_ns::str(self))
             .add_property("name",
                     make_function(&ConditionBase::name,

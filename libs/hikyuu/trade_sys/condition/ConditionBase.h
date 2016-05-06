@@ -29,6 +29,7 @@ class HKU_API ConditionBase {
     PARAMETER_SUPPORT
 
 public:
+    ConditionBase();
     ConditionBase(const string& name);
     virtual ~ConditionBase();
 

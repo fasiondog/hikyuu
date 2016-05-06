@@ -7,17 +7,26 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
+#include <hikyuu/trade_sys/slippage/build_in.h>
 
 using namespace boost::python;
 using namespace hku;
 
 class SlippageWrap : public SlippageBase, public wrapper<SlippageBase> {
 public:
+    SlippageWrap() : SlippageBase() {}
     SlippageWrap(const string& name): SlippageBase(name) {}
     virtual ~SlippageWrap() {}
 
     void _reset() {
-        this->get_override("_reset")();
+        if (override func = get_override("_reset")) {
+            func();
+        }
+        SlippageBase::_reset();
+    }
+
+    void default_reset() {
+        this->SlippageBase::_reset();
     }
 
     SlippagePtr _clone() {
@@ -38,25 +47,30 @@ public:
 };
 
 
+string (SlippageBase::*get_name)() const = &SlippageBase::name;
+void (SlippageBase::*set_name)(const string&) = &SlippageBase::name;
+
+
 void export_Slippage() {
-    class_<SlippageWrap, boost::noncopyable>("SlippageBase", init<const string&>())
+    class_<SlippageWrap, boost::noncopyable>("SlippageBase", init<>())
+            .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name",
-                    make_function(&SlippageBase::name,
-                            return_value_policy<copy_const_reference>()))
-            .add_property("params",
-                    make_function(&SlippageBase::getParameter,
-                            return_internal_reference<>()))
+            .add_property("name", get_name, set_name)
+            .def("getParam", &SlippageBase::getParam<boost::any>)
+            .def("setParam", &SlippageBase::setParam<object>)
             .def("setTO", &SlippageBase::setTO)
+            .def("getTO", &SlippageBase::getTO)
             .def("getRealBuyPrice", pure_virtual(&SlippageBase::getRealBuyPrice))
             .def("getRealSellPrice", pure_virtual(&SlippageBase::getRealSellPrice))
             .def("reset", &SlippageBase::reset)
             .def("clone", &SlippageBase::clone)
             .def("_calculate", pure_virtual(&SlippageBase::_calculate))
-            .def("_reset", pure_virtual(&SlippageBase::_reset))
+            .def("_reset", &SlippageBase::_reset, &SlippageWrap::default_reset)
             .def("_clone", pure_virtual(&SlippageBase::_clone))
             ;
     register_ptr_to_python<SlippagePtr>();
+
+    def("SL_FixedPercent", SL_FixedPercent, (arg("p") = 0.001));
 }
 
 
