@@ -570,6 +570,7 @@ private:
  * @ingroup TradeManagerClass
  */
 typedef shared_ptr<TradeManager> TradeManagerPtr;
+typedef shared_ptr<TradeManager> TMPtr;
 
 HKU_API std::ostream & operator<<(std::ostream &, const TradeManager&);
 HKU_API std::ostream & operator<<(std::ostream &, const TradeManagerPtr&);

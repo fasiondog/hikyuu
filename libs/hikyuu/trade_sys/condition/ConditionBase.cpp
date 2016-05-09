@@ -36,11 +36,19 @@ ConditionBase::~ConditionBase() {
 
 }
 
+void ConditionBase::reset() {
+    m_valid.clear();
+    m_invalid.clear();
+    _reset();
+}
+
 ConditionPtr ConditionBase::clone() {
     ConditionPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_kdata = m_kdata;
+    p->m_valid = m_valid;
+    p->m_invalid = m_invalid;
     return p;
 }
 
@@ -51,6 +59,14 @@ void ConditionBase::setTO(const KData& kdata) {
     if (!kdata.empty()) {
         _calculate();
     }
+}
+
+void ConditionBase::_addValid(const Datetime& datetime) {
+    m_valid.insert(datetime);
+}
+
+void ConditionBase::_addInvalid(const Datetime& datetime) {
+    m_invalid.insert(datetime);
 }
 
 } /* namespace hku */

@@ -17,12 +17,14 @@ FixedPercentSlippage::~FixedPercentSlippage() {
 
 }
 
-price_t FixedPercentSlippage::getRealBuyPrice(const Datetime&, price_t) {
-    return 0.0;
+price_t FixedPercentSlippage
+::getRealBuyPrice(const Datetime& datetime, price_t price) {
+    return price * (1 + getParam<double>("p"));
 }
 
-price_t FixedPercentSlippage::getRealSellPrice(const Datetime&, price_t) {
-    return 0.0;
+price_t FixedPercentSlippage
+::getRealSellPrice(const Datetime& datetime, price_t price) {
+    return price * (1 - getParam<double>("p"));
 }
 
 void FixedPercentSlippage::_calculate() {

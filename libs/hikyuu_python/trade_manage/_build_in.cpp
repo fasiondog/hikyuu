@@ -13,7 +13,7 @@ using namespace hku;
 
 void export_build_in() {
     def("crtTM", crtTM, (arg("datetime") = Datetime(199001010000LL),
-            arg("initcash") = 100000, arg("costfunc") = TC_Zero(),
+            arg("initCash") = 100000, arg("costFunc") = TC_Zero(),
             arg("name")="SYS"));
 
     def("TC_TestStub", TC_TestStub);

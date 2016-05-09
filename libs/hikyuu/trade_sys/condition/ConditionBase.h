@@ -8,14 +8,17 @@
 #ifndef CONDITIONBASE_H_
 #define CONDITIONBASE_H_
 
+#include <set>
 #include "../../utilities/Parameter.h"
 #include "../../utilities/util.h"
 #include "../../KData.h"
+#include "../../trade_manage/TradeManager.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/set.hpp>
 #endif
 
 namespace hku {
@@ -34,7 +37,10 @@ public:
     virtual ~ConditionBase();
 
     /** 获取名称 */
-    const string& name() const;
+    string name() const;
+
+    /** 设置名称 */
+    void name(const string& name);
 
     /** 复位操作 */
     void reset();
@@ -42,13 +48,34 @@ public:
     /** 设置交易对象 */
     void setTO(const KData& kdata);
 
+    /** 获取交易对象 */
+    KData getTO() const;
+
+    /** 设置交易管理实例 */
+    void setTM(const TradeManagerPtr& tm);
+
+    /** 获取交易管理实例 */
+    TradeManagerPtr getTM() const;
+
+    /**
+     * 加入有效时间，在_calculate中调用
+     * @param datetime 系统有效日期
+     */
+    void _addValid(const Datetime& datetime);
+
+    /**
+     * 加入无效时间，在_calculate中调用
+     * @param datetime 系统无效日期
+     */
+    void _addInvalid(const Datetime& datetime);
+
     typedef shared_ptr<ConditionBase> ConditionPtr;
     /** 克隆操作 */
     ConditionPtr clone();
 
     /**
-     * 指定日期系统是否有效
-     * @param datetime 指定日期
+     * 指定时间系统是否有效
+     * @param datetime 指定时间
      * @return true 有效 | false 失效
      */
     virtual bool isValid(const Datetime& datetime) = 0;
@@ -56,7 +83,7 @@ public:
     virtual void _calculate() = 0;
 
     /** 子类reset接口 */
-    virtual void _reset() = 0;
+    virtual void _reset() {}
 
     /** 子类克隆接口 */
     virtual ConditionPtr _clone() = 0;
@@ -64,6 +91,9 @@ public:
 protected:
     string m_name;
     KData  m_kdata;
+    TradeManagerPtr m_tm;
+    std::set<Datetime> m_valid;
+    std::set<Datetime> m_invalid;
 
 //============================================
 // 序列化支持
@@ -76,6 +106,8 @@ private:
         string name(GBToUTF8(m_name));
         ar & boost::serialization::make_nvp("m_name", name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar & BOOST_SERIALIZATION_NVP(m_valid);
+        ar & BOOST_SERIALIZATION_NVP(m_invalid);
         // m_kdata是系统运行时临时设置，不需要序列化
         //ar & BOOST_SERIALIZATION_NVP(m_ktype);
     }
@@ -86,6 +118,8 @@ private:
         ar & boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar & BOOST_SERIALIZATION_NVP(m_valid);
+        ar & BOOST_SERIALIZATION_NVP(m_invalid);
         // m_kdata是系统运行时临时设置，不需要序列化
         //ar & BOOST_SERIALIZATION_NVP(m_ktype);
     }
@@ -129,18 +163,40 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ConditionBase)
  * @ingroup Condition
  */
 typedef shared_ptr<ConditionBase> ConditionPtr;
+typedef shared_ptr<ConditionBase> CNPtr;
+
+
+#define CONDITION_IMP(classname) public:\
+    virtual ConditionPtr _clone() {\
+        return ConditionPtr(new classname());\
+    }\
+    virtual bool isValid(const Datetime& datetime); \
+    virtual void _calculate();
+
+
 
 HKU_API std::ostream & operator<<(std::ostream &, const ConditionPtr&);
 HKU_API std::ostream & operator<<(std::ostream &, const ConditionBase&);
 
 
-inline const string& ConditionBase::name() const {
+inline string ConditionBase::name() const {
     return m_name;
 }
 
+inline void ConditionBase::name(const string& name) {
+    m_name = name;
+}
 
-inline void ConditionBase::reset() {
-    _reset();
+inline KData ConditionBase::getTO() const {
+    return m_kdata;
+}
+
+inline void ConditionBase::setTM(const TradeManagerPtr& tm) {
+    m_tm = tm;
+}
+
+inline TradeManagerPtr ConditionBase::getTM() const {
+    return m_tm;
 }
 
 } /* namespace hku */

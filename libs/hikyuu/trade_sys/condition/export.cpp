@@ -26,11 +26,9 @@
 
 #include <boost/serialization/export.hpp>
 
-#include "imp/FixedPercentSlippage.h"
-#include "imp/FixedValueSlippage.h"
+#include "imp/OPLineCondition.h"
 
-BOOST_CLASS_EXPORT(hku::FixedPercentSlippage)
-BOOST_CLASS_EXPORT(hku::FixedValueSlippage)
+BOOST_CLASS_EXPORT(hku::OPLineCondition)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

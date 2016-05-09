@@ -15,7 +15,7 @@ from hikyuu.trade_sys.condition import *
 class ConditionPython(ConditionBase):
     def __init__(self):
         super(ConditionPython, self).__init__("ConditionPython")
-        self.params.set("n", 10)
+        self.setParam("n", 10)
         self._m_flag = False
         
     def isValid(self, datetime):
@@ -36,22 +36,22 @@ class ConditionTest(unittest.TestCase):
     def test_ConditionBase(self):
         p = ConditionPython()
         self.assertEqual(p.name, "ConditionPython")
-        self.assertEqual(p.params.get("n"), 10)
-        p.params.set("n",20)
-        self.assertEqual(p.params.get("n"), 20)
+        self.assertEqual(p.getParam("n"), 10)
+        p.setParam("n",20)
+        self.assertEqual(p.getParam("n"), 20)
         self.assertEqual(p.isValid(Datetime(200101010000)), False)
         p.reset()
         self.assertEqual(p.isValid(Datetime(200101010000)), True)
         
         p_clone = p.clone()
         self.assertEqual(p_clone.name, "ConditionPython")
-        self.assertEqual(p_clone.params.get("n"), 20)
+        self.assertEqual(p_clone.getParam("n"), 20)
         self.assertEqual(p_clone.isValid(Datetime(200101010000)), True)
 
-        p.params.set("n", 1)
-        p_clone.params.set("n", 3)
-        self.assertEqual(p.params.get("n"), 1)
-        self.assertEqual(p_clone.params.get("n"), 3)
+        p.setParam("n", 1)
+        p_clone.setParam("n", 3)
+        self.assertEqual(p.getParam("n"), 1)
+        self.assertEqual(p_clone.getParam("n"), 3)
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(ConditionTest)

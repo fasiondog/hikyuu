@@ -216,6 +216,7 @@ void System::run(const Stock& stock, const KQuery& query) {
         return;
     }
 
+    if (m_cn) m_cn->setTM(m_tm);
     if (m_mm) m_mm->setTM(m_tm);
     if (m_pg) m_pg->setTM(m_tm);
     if (m_st) m_st->setTM(m_tm);

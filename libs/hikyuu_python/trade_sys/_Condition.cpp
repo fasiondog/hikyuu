@@ -7,7 +7,9 @@
 
 
 #include <boost/python.hpp>
-#include <hikyuu/trade_sys/condition/ConditionBase.h>
+#include <hikyuu/trade_sys/condition/build_in.h>
+#include "../_Parameter.h"
+#include "../pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
@@ -17,6 +19,17 @@ public:
     ConditionWrap(): ConditionBase() {}
     ConditionWrap(const string& name): ConditionBase(name) {}
 
+    void _reset() {
+        if (override func = get_override("_reset")) {
+            func();
+        }
+        ConditionBase::_reset();
+    }
+
+    void default_reset() {
+        this->ConditionBase::_reset();
+    }
+
     bool isValid(const Datetime& datetime) {
         return this->get_override("isValid")(datetime);
     }
@@ -25,33 +38,35 @@ public:
         this->get_override("_calculate")();
     }
 
-    void _reset() {
-        this->get_override("_reset")();
-    }
-
     ConditionPtr _clone() {
         return this->get_override("_clone")();
     }
 };
 
 
+string (ConditionBase::*get_name)() const = &ConditionBase::name;
+void (ConditionBase::*set_name)(const string&) = &ConditionBase::name;
+
+
 void export_Condition() {
     class_<ConditionWrap, boost::noncopyable>("ConditionBase", init<>())
             .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name",
-                    make_function(&ConditionBase::name,
-                            return_value_policy<copy_const_reference>()))
-            .add_property("params",
-                    make_function(&ConditionBase::getParameter,
-                            return_internal_reference<>()))
+            .add_property("name", get_name, set_name)
+            .def("getParam", &ConditionBase::getParam<boost::any>)
+            .def("setParam", &ConditionBase::setParam<object>)
             .def("isValid", pure_virtual(&ConditionBase::isValid))
             .def("setTO", &ConditionBase::setTO)
+            .def("getTO", &ConditionBase::getTO)
+            .def("setTM", &ConditionBase::setTM)
+            .def("getTM", &ConditionBase::getTM)
             .def("reset", &ConditionBase::reset)
             .def("clone", &ConditionBase::clone)
             .def("_calculate", pure_virtual(&ConditionBase::_calculate))
-            .def("_reset", pure_virtual(&ConditionBase::_reset))
+            .def("_reset", &ConditionBase::_reset, &ConditionWrap::default_reset)
             .def("_clone", pure_virtual(&ConditionBase::_clone))
             ;
     register_ptr_to_python<ConditionPtr>();
+
+    def("CN_OPLine", CN_OPLine);
 }
