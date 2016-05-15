@@ -5,10 +5,12 @@
  *      Author: Administrator
  */
 
-#include <hikyuu/trade_sys/condition/imp/OPLineCondition.h>
+#include "OPLineCondition.h"
 #include "../../../trade_manage/crt/crtTM.h"
 #include "../../../trade_manage/crt/TC_Zero.h"
 #include "../../../indicator/crt/PRICELIST.h"
+#include "../../system/crt/SYS_Simple.h"
+#include "../../moneymanager/crt/MM_FixedCount.h"
 
 namespace hku {
 
@@ -39,44 +41,32 @@ void OPLineCondition::_calculate() {
     if (m_kdata.size() == 0)
         return;
 
-    TradeManagerPtr tm = crtTM(m_kdata[0].datetime, 0.0, TC_Zero());
-    KQuery::KType ktype = m_kdata.getQuery().kType();
+    Stock stock = m_kdata.getStock();
+    KQuery query = m_kdata.getQuery();
+    SYSPtr sys = SYS_Simple();
+
+    TMPtr tm = crtTM(m_kdata[0].datetime, 0.0, TC_Zero());
+    MMPtr mm = MM_FixedCount(stock.minTradeNumber());
+    mm->setParam<bool>("auto-checkin", true);
+
+    sys->setTM(tm);
+    sys->setMM(mm);
+    sys->setSG(m_sg);
+
+    sys->run(m_kdata.getStock(), m_kdata.getQuery());
+    KQuery::KType ktype = query.kType();
     DatetimeList dates = m_kdata.getDatetimeList();
     Indicator profit = PRICELIST(tm->getProfitCurve(dates, ktype));
     Indicator op = m_op(profit);
 
-    size_t discard = profit.discard() > op.discard()
-            ? profit.discard() : op.discard();
-
-    for (size_t i = 0; i < discard; i++) {
-        _addInvalid(dates[i]);
-    }
-
-    size_t total = dates.size();
-    bool hold = false;
-    for (size_t i = discard + 1; i < total; i++) {
-        if (profit[i-1] < op[i-1] && profit[i] >= op[i]) {
-            hold = true;
-        } else if (profit[i-1] > op[i-1] && profit[i] >= op[i]) {
-            hold = false;
-        }
-
-        if (hold) {
+    Indicator x = profit - op;
+    for (size_t i = 0; i < x.size(); i++) {
+        if (x[i] > 0) {
             _addValid(dates[i]);
-        } else {
-            _addInvalid(dates[i]);
         }
     }
 }
 
-bool OPLineCondition::isValid(const Datetime& datetime) {
-    if (m_valid.count(datetime) != 0) {
-        return true;
-    } else if (m_invalid.count(datetime) != 0) {
-        return false;
-    }
-    return false;
-}
 
 CNPtr HKU_API CN_OPLine(const Operand& op) {
     return CNPtr(new OPLineCondition(op));

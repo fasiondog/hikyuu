@@ -183,6 +183,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SignalBase)
  * @ingroup Signal
  */
 typedef shared_ptr<SignalBase> SignalPtr;
+typedef shared_ptr<SignalBase> SGPtr;
 
 HKU_API std::ostream & operator<<(std::ostream&, const SignalBase&);
 HKU_API std::ostream & operator<<(std::ostream&, const SignalPtr&);

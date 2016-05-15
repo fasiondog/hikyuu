@@ -195,6 +195,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(MoneyManagerBase)
  * @ingroup MoneyManager
  */
 typedef shared_ptr<MoneyManagerBase> MoneyManagerPtr;
+typedef shared_ptr<MoneyManagerBase> MMPtr;
 
 
 #define MONEY_MANAGER_IMP(classname) public:\

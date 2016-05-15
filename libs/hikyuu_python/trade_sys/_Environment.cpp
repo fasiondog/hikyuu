@@ -36,15 +36,15 @@ public:
 
 };
 
+string (EnvironmentBase::*get_name)() const = &EnvironmentBase::name;
+void (EnvironmentBase::*set_name)(const string&) = &EnvironmentBase::name;
+
 void export_Environment() {
     class_<EnvironmentWrap, boost::noncopyable>("EnvironmentBase", init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name",
-                    make_function(&EnvironmentBase::name,
-                            return_value_policy<copy_const_reference>()))
-            .add_property("params",
-                    make_function(&EnvironmentBase::getParameter,
-                            return_internal_reference<>()))
+            .add_property("name", get_name, set_name)
+            .def("getParam", &EnvironmentBase::getParam<boost::any>)
+            .def("setParam", &EnvironmentBase::setParam<object>)
             .def("reset", &EnvironmentBase::reset)
             .def("clone", &EnvironmentBase::clone)
             .def("isValid", pure_virtual(&EnvironmentBase::isValid))

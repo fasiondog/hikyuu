@@ -23,6 +23,11 @@ HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentPtr& en) {
     return os;
 }
 
+EnvironmentBase::EnvironmentBase()
+: m_name("EnvironmentBase"), m_ktype(KQuery::DAY) {
+
+}
+
 EnvironmentBase::EnvironmentBase(const string& name)
 : m_name(name), m_ktype(KQuery::DAY) {
 

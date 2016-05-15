@@ -165,6 +165,9 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(StoplossBase)
  * @ingroup StopLoss
  */
 typedef boost::shared_ptr<StoplossBase> StoplossPtr;
+typedef boost::shared_ptr<StoplossBase> SLPtr;
+typedef boost::shared_ptr<StoplossBase> TakeProfitPtr;
+typedef boost::shared_ptr<StoplossBase> TPPtr;
 
 HKU_API std::ostream& operator <<(std::ostream& os, const StoplossBase&);
 HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr&);

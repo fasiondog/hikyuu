@@ -29,11 +29,15 @@ class HKU_API EnvironmentBase {
     PARAMETER_SUPPORT
 
 public:
+    EnvironmentBase();
     EnvironmentBase(const string& name);
     virtual ~EnvironmentBase();
 
     /** 获取名称 */
-    const string& name() const;
+    string name() const;
+
+    /** 设置名称 */
+    void name(const string& name);
 
     /** 复位 */
     void reset();
@@ -123,6 +127,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(EnvironmentBase)
  * @ingroup Environment
  */
 typedef shared_ptr<EnvironmentBase> EnvironmentPtr;
+typedef shared_ptr<EnvironmentBase> EVPtr;
 
 
 /**
@@ -133,8 +138,12 @@ HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentPtr&);
 HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentBase&);
 
 
-inline const string& EnvironmentBase::name() const {
+inline string EnvironmentBase::name() const {
     return m_name;
+}
+
+inline void EnvironmentBase::name(const string& name) {
+    m_name = name;
 }
 
 inline void EnvironmentBase::reset() {

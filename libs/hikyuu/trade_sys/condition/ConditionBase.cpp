@@ -38,7 +38,6 @@ ConditionBase::~ConditionBase() {
 
 void ConditionBase::reset() {
     m_valid.clear();
-    m_invalid.clear();
     _reset();
 }
 
@@ -48,7 +47,6 @@ ConditionPtr ConditionBase::clone() {
     p->m_name = m_name;
     p->m_kdata = m_kdata;
     p->m_valid = m_valid;
-    p->m_invalid = m_invalid;
     return p;
 }
 
@@ -56,6 +54,10 @@ ConditionPtr ConditionBase::clone() {
 void ConditionBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
+    if (!m_sg) {
+        HKU_WARN("m_sg is NULL! [ConditionBase::setTO]");
+        return;
+    }
     if (!kdata.empty()) {
         _calculate();
     }
@@ -65,8 +67,11 @@ void ConditionBase::_addValid(const Datetime& datetime) {
     m_valid.insert(datetime);
 }
 
-void ConditionBase::_addInvalid(const Datetime& datetime) {
-    m_invalid.insert(datetime);
+bool ConditionBase::isValid(const Datetime& datetime) {
+    if (m_valid.count(datetime) != 0) {
+        return true;
+    }
+    return false;
 }
 
 } /* namespace hku */

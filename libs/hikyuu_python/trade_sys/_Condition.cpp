@@ -30,10 +30,6 @@ public:
         this->ConditionBase::_reset();
     }
 
-    bool isValid(const Datetime& datetime) {
-        return this->get_override("isValid")(datetime);
-    }
-
     void _calculate() {
         this->get_override("_calculate")();
     }
@@ -55,11 +51,13 @@ void export_Condition() {
             .add_property("name", get_name, set_name)
             .def("getParam", &ConditionBase::getParam<boost::any>)
             .def("setParam", &ConditionBase::setParam<object>)
-            .def("isValid", pure_virtual(&ConditionBase::isValid))
+            .def("isValid", &ConditionBase::isValid)
             .def("setTO", &ConditionBase::setTO)
             .def("getTO", &ConditionBase::getTO)
             .def("setTM", &ConditionBase::setTM)
             .def("getTM", &ConditionBase::getTM)
+            .def("setSG", &ConditionBase::setSG)
+            .def("getSG", &ConditionBase::getSG)
             .def("reset", &ConditionBase::reset)
             .def("clone", &ConditionBase::clone)
             .def("_calculate", pure_virtual(&ConditionBase::_calculate))

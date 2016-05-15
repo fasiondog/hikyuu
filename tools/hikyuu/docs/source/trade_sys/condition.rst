@@ -4,10 +4,15 @@
 系统有效条件
 ============
 
-内聚系统有效条件
+内建系统有效条件
 ----------------
 
+.. py:function:: CN_OPLine(op)
 
+    固定使用股票最小交易量进行交易，计算权益曲线的op值，当权益曲线高于op时，系统有效，否则无效。
+
+    :param Operand op:
+    :return: 系统有效条件实例
 
 
 自定义系统有效条件
@@ -15,7 +20,6 @@
 
 自定义系统有效条件接口：
 
-* :py:meth:`ConditionBase.isValid` - 【必须】获取目标价格
 * :py:meth:`ConditionBase._calculate` - 【必须】子类计算接口
 * :py:meth:`ConditionBase._clone` - 【必须】克隆接口
 * :py:meth:`ConditionBase._reset` - 【可选】重载私有变量
@@ -78,13 +82,7 @@
         加入有效时间，在_calculate中调用
         
         :param Datetime datetime: 有效时间
-
-    .. py:method:: _addInvald(datetime)
-    
-        加入无效时间，在_calculate中调用
-        
-        :param Datetime datetime: 无效时间
-        
+      
     .. py:method:: reset()
     
         复位操作

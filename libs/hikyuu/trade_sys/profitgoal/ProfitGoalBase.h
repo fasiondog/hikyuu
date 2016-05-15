@@ -154,6 +154,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ProfitGoalBase)
  * @ingroup ProfitGoal
  */
 typedef shared_ptr<ProfitGoalBase> ProfitGoalPtr;
+typedef shared_ptr<ProfitGoalBase> PGPtr;
 
 HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalBase& pg);
 HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalPtr& pg);

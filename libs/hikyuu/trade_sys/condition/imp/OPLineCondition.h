@@ -19,7 +19,6 @@ public:
     OPLineCondition(const Operand&);
     virtual ~OPLineCondition();
 
-    virtual bool isValid(const Datetime& datetime);
     virtual void _calculate();
     virtual void _reset();
     virtual ConditionPtr _clone();

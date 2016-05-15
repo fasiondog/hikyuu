@@ -13,6 +13,7 @@
 #include "../../utilities/util.h"
 #include "../../KData.h"
 #include "../../trade_manage/TradeManager.h"
+#include "../signal/SignalBase.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>
@@ -57,17 +58,17 @@ public:
     /** 获取交易管理实例 */
     TradeManagerPtr getTM() const;
 
+    /** 设置系统信号指示器 */
+    void setSG(const SGPtr& sg);
+
+    /** 获取系统信号指示器 */
+    SGPtr getSG() const;
+
     /**
      * 加入有效时间，在_calculate中调用
      * @param datetime 系统有效日期
      */
     void _addValid(const Datetime& datetime);
-
-    /**
-     * 加入无效时间，在_calculate中调用
-     * @param datetime 系统无效日期
-     */
-    void _addInvalid(const Datetime& datetime);
 
     typedef shared_ptr<ConditionBase> ConditionPtr;
     /** 克隆操作 */
@@ -78,7 +79,7 @@ public:
      * @param datetime 指定时间
      * @return true 有效 | false 失效
      */
-    virtual bool isValid(const Datetime& datetime) = 0;
+    bool isValid(const Datetime& datetime);
 
     virtual void _calculate() = 0;
 
@@ -91,9 +92,10 @@ public:
 protected:
     string m_name;
     KData  m_kdata;
-    TradeManagerPtr m_tm;
+    TMPtr m_tm;
+    SGPtr m_sg;
+
     std::set<Datetime> m_valid;
-    std::set<Datetime> m_invalid;
 
 //============================================
 // 序列化支持
@@ -107,7 +109,6 @@ private:
         ar & boost::serialization::make_nvp("m_name", name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_valid);
-        ar & BOOST_SERIALIZATION_NVP(m_invalid);
         // m_kdata是系统运行时临时设置，不需要序列化
         //ar & BOOST_SERIALIZATION_NVP(m_ktype);
     }
@@ -119,7 +120,6 @@ private:
         m_name = UTF8ToGB(name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_valid);
-        ar & BOOST_SERIALIZATION_NVP(m_invalid);
         // m_kdata是系统运行时临时设置，不需要序列化
         //ar & BOOST_SERIALIZATION_NVP(m_ktype);
     }
@@ -170,7 +170,6 @@ typedef shared_ptr<ConditionBase> CNPtr;
     virtual ConditionPtr _clone() {\
         return ConditionPtr(new classname());\
     }\
-    virtual bool isValid(const Datetime& datetime); \
     virtual void _calculate();
 
 
@@ -193,6 +192,14 @@ inline KData ConditionBase::getTO() const {
 
 inline void ConditionBase::setTM(const TradeManagerPtr& tm) {
     m_tm = tm;
+}
+
+inline SGPtr ConditionBase::getSG() const {
+    return m_sg;
+}
+
+inline void ConditionBase::setSG(const SGPtr& sg) {
+    m_sg = sg;
 }
 
 inline TradeManagerPtr ConditionBase::getTM() const {

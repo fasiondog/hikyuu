@@ -134,13 +134,23 @@ void System::setKType(KQuery::KType ktype) {
 }
 
 void System::setTO(const KData& kdata) {
+    if (kdata.empty()) {
+        return;
+    }
+
     m_kdata = kdata;
-    if (m_cn) m_cn->setTO(kdata);
+
+    //sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg) m_sg->setTO(kdata);
+    if (m_cn) m_cn->setTO(kdata);
     if (m_st) m_st->setTO(kdata);
     if (m_tp) m_tp->setTO(kdata);
     if (m_pg) m_pg->setTO(kdata);
     if (m_sp) m_sp->setTO(kdata);
+
+    KQuery::KType ktype = kdata.getQuery().kType();
+    if (m_ev) m_ev->setKType(ktype);
+    if (m_mm) m_mm->setKType(ktype);
 }
 
 
@@ -216,7 +226,10 @@ void System::run(const Stock& stock, const KQuery& query) {
         return;
     }
 
-    if (m_cn) m_cn->setTM(m_tm);
+    if (m_cn) {
+        m_cn->setTM(m_tm);
+        m_cn->setSG(m_sg);
+    }
     if (m_mm) m_mm->setTM(m_tm);
     if (m_pg) m_pg->setTM(m_tm);
     if (m_st) m_st->setTM(m_tm);

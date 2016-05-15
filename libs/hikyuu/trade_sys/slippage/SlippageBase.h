@@ -151,6 +151,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SlippageBase)
  * @ingroup Slippage
  */
 typedef shared_ptr<SlippageBase> SlippagePtr;
+typedef shared_ptr<SlippageBase> SPPtr;
 
 HKU_API std::ostream & operator<<(std::ostream&, const SlippageBase&);
 HKU_API std::ostream & operator<<(std::ostream&, const SlippagePtr&);

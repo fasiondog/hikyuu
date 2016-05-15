@@ -261,6 +261,7 @@ private:
  * @ingroup System
  */
 typedef shared_ptr<System> SystemPtr;
+typedef shared_ptr<System> SYSPtr;
 typedef vector<SystemPtr> SystemList;
 
 HKU_API std::ostream& operator <<(std::ostream &os, const System& sys);

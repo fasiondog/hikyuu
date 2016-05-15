@@ -85,21 +85,21 @@ public:
     /**
      * 按索引方式查询时，返回指定的起始索引，否则返回Null<hku_int64>()
      */
-    const hku_int64 start() const {
+    hku_int64 start() const {
         return m_queryType != INDEX ? Null<hku_int64>() : m_start;
     }
 
     /**
      * 按索引方式查询时，返回指定的结束索引，否则返回Null<hku_int64>()
      */
-    const hku_int64 end() const {
+    hku_int64 end() const {
         return m_queryType != INDEX ? Null<hku_int64>() : m_end;
     }
 
     /**
      * 按日期方式查询时，返回指定的起始日期，否则返回Null<Datetime>()
      */
-    const Datetime startDatetime() const {
+    Datetime startDatetime() const {
         return m_queryType != DATE
                 ? Null<Datetime>()
                 : Datetime((hku_uint64)m_start);
@@ -108,20 +108,20 @@ public:
     /**
      * 按日期方式查询时，返回指定的结束日期，否则返回Null<Datetime>()
      */
-    const Datetime endDatetime() const {
+    Datetime endDatetime() const {
         return m_queryType != DATE
                 ? Null<Datetime>()
                 : Datetime((hku_uint64)m_end);
     }
 
     /** 获取查询条件类型 */
-    const QueryType queryType() const { return m_queryType; }
+    QueryType queryType() const { return m_queryType; }
 
     /** 获取K线数据类型 */
-    const KType kType() const { return m_dataType; }
+    KType kType() const { return m_dataType; }
 
     /** 获取复权类型 */
-    const RecoverType recoverType() const { return m_recoverType; }
+    RecoverType recoverType() const { return m_recoverType; }
 
     /** 获取queryType名称，用于显示输出 */
     static string getQueryTypeName(QueryType);

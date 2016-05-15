@@ -113,6 +113,11 @@ size_t MoneyManagerBase
     //转换为最小交易量的整数倍
     n = (n / stock.minTradeNumber()) * stock.minTradeNumber();
 
+    if (n > stock.maxTradeNumber()) {
+        n = stock.maxTradeNumber();
+        HKU_INFO("Over stock.maxTradeNumber! MoneyManagerBase::getBuyNumber]");
+    }
+
     //在现金不足时，自动补充存入现金
     if (getParam<bool>("auto-checkin")) {
         price_t cash = m_tm->currentCash();
