@@ -25,12 +25,12 @@ HKU_API std::ostream & operator<<(std::ostream& os, const MoneyManagerPtr& mm) {
 }
 
 MoneyManagerBase::MoneyManagerBase()
-: m_name("MoneyManagerBase"), m_ktype(KQuery::DAY){
+: m_name("MoneyManagerBase") {
     setParam<bool>("auto-checkin", false);
 }
 
 MoneyManagerBase::MoneyManagerBase(const string& name)
-: m_name(name), m_ktype(KQuery::DAY) {
+: m_name(name) {
     setParam<bool>("auto-checkin", false);
 }
 
@@ -51,7 +51,7 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_tm = m_tm;
-    p->m_ktype = m_ktype;
+    p->m_query = m_query;
     return p;
 }
 

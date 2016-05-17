@@ -122,11 +122,18 @@
     
         :param TradeManager tm: 设置交易管理对象
 
-    .. py:method:: setKType(ktype)
+    .. py:method:: setQuery(query)
     
-        设置交易的K线类型
+        设置查询条件
     
-        :param KQuery.KType ktype: 
+        :param KQuery query:  查询条件
+        
+    .. py:method:: getQuery()
+    
+        获取查询条件
+        
+        :return: 查询条件
+        :rtype: KQuery 
         
     .. py:method:: reset()
     

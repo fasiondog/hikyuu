@@ -100,11 +100,6 @@ public:
      */
     void setTO(const KData& kdata);
 
-    /**
-     * 设置时刻类型
-     */
-    void setKType(KQuery::KType ktype);
-
     void run(const Stock& stock, const KQuery& query);
     void runMoment(const Datetime& datetime);
     void runMoment(const KRecord& record);
@@ -112,7 +107,7 @@ public:
     //清除已有的交易请求，供Portolio使用
     void clearRequest();
 
-    bool _environmentIsValid(const string& market, const Datetime& datetime);
+    bool _environmentIsValid(const Datetime& datetime);
 
     bool _conditionIsValid(const Datetime& datetime);
 
@@ -273,8 +268,8 @@ inline const string& System::name() const {
 }
 
 inline bool System::
-_environmentIsValid(const string& market, const Datetime& datetime) {
-    return m_ev ? m_ev->isValid(market, datetime) : true;
+_environmentIsValid(const Datetime& datetime) {
+    return m_ev ? m_ev->isValid(datetime) : true;
 }
 
 inline bool System::

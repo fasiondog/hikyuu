@@ -42,10 +42,6 @@ public:
         return MoneyManagerPtr(p);
     }
 
-    KQuery::KType getKType() const {
-        return m_ktype;
-    }
-
 private:
     int m_x;
 
@@ -69,7 +65,6 @@ BOOST_AUTO_TEST_CASE( test_MoneyManager ) {
     MoneyManagerTest *p_src = (MoneyManagerTest *)p.get();
     BOOST_CHECK(p->name() == "MoneyManagerTest");
     BOOST_CHECK(p_src->getTM() == TradeManagerPtr());
-    BOOST_CHECK(p_src->getKType() == KQuery::DAY);
     p->setTM(tm);
     BOOST_CHECK(p_src->getTM() == tm);
     BOOST_CHECK(p->getBuyNumber(Datetime(200001010000), stock, 10.0, 10.0) == 0);
@@ -82,14 +77,12 @@ BOOST_AUTO_TEST_CASE( test_MoneyManager ) {
 
     /** @arg 克隆操作 */
     p_src->setX(10);
-    p->setKType(KQuery::MIN);
     MoneyManagerPtr p_clone = p->clone();
     BOOST_CHECK(p != p_clone);
     p_src = (MoneyManagerTest *)p_clone.get();
     BOOST_CHECK(p->name() == "MoneyManagerTest");
     BOOST_CHECK(p_src->getTM() == tm);
     BOOST_CHECK(p_src->getX() == 10);
-    BOOST_CHECK(p_src->getKType() == KQuery::MIN);
 }
 
 /** @} */

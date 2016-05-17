@@ -190,6 +190,51 @@ inline KQuery KQueryByDate(
  */
 HKU_API std::ostream& operator <<(std::ostream &os, const KQuery& query);
 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// 关系比较函数, 不直接在类中定义是为了支持 Null<>() == d，Null可以放在左边
+//
+///////////////////////////////////////////////////////////////////////////////
+bool operator==(const KQuery&, const KQuery&);
+bool operator!=(const KQuery&, const KQuery&);
+
+inline bool operator!=(const KQuery& q1, const KQuery& q2) {
+    if (q1.start() != q2.start()
+            || q1.end() != q2.end()
+            || q1.queryType() != q2.queryType()
+            || q1.kType() != q2.kType()
+            || q1.recoverType() != q2.recoverType()) {
+        return true;
+    }
+    return false;
+}
+
+inline bool operator==(const KQuery& q1, const KQuery& q2) {
+    if (q1 != q2) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * 提供KQuery的Null值
+ * @ingroup StockManage
+ */
+template <>
+class Null<KQuery> {
+public:
+    Null() {}
+    operator KQuery() {
+        return KQuery(Null<hku_int64>(),
+                Null<hku_int64>(),
+                KQuery::INVALID_KTYPE,
+                KQuery::INVALID_RECOVER_TYPE,
+                KQuery::INVALID
+                );
+    }
+};
+
 } /* namespace */
 
 #endif /* KQUERY_H_ */

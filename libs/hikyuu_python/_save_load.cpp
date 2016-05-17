@@ -64,6 +64,7 @@ void registerSupportClass() {
     g_support_class_dict[typeid(ProfitGoalPtr).hash_code()] = "ProfitGoalBase";
     g_support_class_dict[typeid(SlippagePtr).hash_code()] = "SlippageBase";
     g_support_class_dict[typeid(ConditionPtr).hash_code()] = "ConditionBase";
+    g_support_class_dict[typeid(EnvironmentPtr).hash_code()] = "EnvironmentBase";
 }
 
 string supportClassName(const boost::any& arg) {
@@ -220,6 +221,9 @@ void export_save_load() {
 
     def("hku_save", xml_save<ConditionPtr>);
     def("hku_load", xml_load<ConditionPtr>);
+
+    def("hku_save", xml_save<EnvironmentPtr>);
+    def("hku_load", xml_load<EnvironmentPtr>);
 }
 
 #else /* HKU_SUPPORT_SERIALIZATION */

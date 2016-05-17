@@ -81,6 +81,7 @@ public:
      */
     bool isValid(const Datetime& datetime);
 
+    /** 子类计算接口 */
     virtual void _calculate() = 0;
 
     /** 子类reset接口 */
@@ -94,7 +95,6 @@ protected:
     KData  m_kdata;
     TMPtr m_tm;
     SGPtr m_sg;
-
     std::set<Datetime> m_valid;
 
 //============================================

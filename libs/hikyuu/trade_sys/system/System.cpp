@@ -127,12 +127,6 @@ void System::reset() {
     m_buyShortRequest.clear();
 }
 
-
-void System::setKType(KQuery::KType ktype) {
-    if (m_ev) m_ev->setKType(ktype);
-    if (m_mm) m_mm->setKType(ktype);
-}
-
 void System::setTO(const KData& kdata) {
     if (kdata.empty()) {
         return;
@@ -148,9 +142,9 @@ void System::setTO(const KData& kdata) {
     if (m_pg) m_pg->setTO(kdata);
     if (m_sp) m_sp->setTO(kdata);
 
-    KQuery::KType ktype = kdata.getQuery().kType();
-    if (m_ev) m_ev->setKType(ktype);
-    if (m_mm) m_mm->setKType(ktype);
+    KQuery query = kdata.getQuery();
+    if (m_ev) m_ev->setQuery(query);
+    if (m_mm) m_mm->setQuery(query);
 }
 
 
@@ -286,7 +280,7 @@ void System::_runMoment(const KRecord& today) {
     _processRequest(today);
 
     //如果系统环境失效，则立即清仓
-    if (!_environmentIsValid(m_stock.market(), today.datetime)) {
+    if (!_environmentIsValid(today.datetime)) {
         //如果持有多头仓位，则立即卖出
         if (m_tm->have(m_stock)) {
             _sell(today, PART_ENVIRONMENT);

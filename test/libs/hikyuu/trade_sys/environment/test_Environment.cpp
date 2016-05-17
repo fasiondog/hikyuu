@@ -17,6 +17,8 @@
 
 using namespace hku;
 
+#if 0
+
 class EnvironmentTest: public EnvironmentBase {
 public:
     EnvironmentTest(): EnvironmentBase("TEST") {
@@ -85,5 +87,7 @@ BOOST_AUTO_TEST_CASE( test_Environment ) {
     BOOST_CHECK(p_clone->isValid("SH", Datetime(200001010000)) == true);
     BOOST_CHECK(p_clone->isValid("SZ", Datetime(200001010000)) == false);
 }
+
+#endif //if 0
 
 /** @} */

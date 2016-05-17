@@ -42,7 +42,9 @@ public:
     }
 
     /** 复位 */
-    void reset();
+    void reset() {
+        _reset();
+    }
 
     /**
      * 设定交易账户
@@ -52,9 +54,14 @@ public:
         m_tm = tm;
     }
 
-    /** 设置交易的K线类型 */
-    void setKType(KQuery::KType ktype) {
-        m_ktype = ktype;
+    /** 设置查询条件 */
+    void setQuery(const KQuery& query) {
+        m_query = query;
+    }
+
+    /** 获取交易的K线类型 */
+    KQuery getQuery() const {
+        return m_query;
     }
 
     typedef shared_ptr<MoneyManagerBase> MoneyManagerPtr;
@@ -129,8 +136,8 @@ public:
 
 protected:
     string m_name;
+    KQuery m_query;
     TradeManagerPtr m_tm;
-    KQuery::KType m_ktype;
 
 //============================================
 // 序列化支持
@@ -143,8 +150,8 @@ private:
         string name(GBToUTF8(m_name));
         ar & boost::serialization::make_nvp("m_name", name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
-        // m_ktype、m_tm都是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_ktype);
+        // m_query、m_tm都是系统运行时临时设置，不需要序列化
+        //ar & BOOST_SERIALIZATION_NVP(m_query);
         //ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 
@@ -208,11 +215,6 @@ typedef shared_ptr<MoneyManagerBase> MMPtr;
 
 HKU_API std::ostream & operator<<(std::ostream &, const MoneyManagerBase&);
 HKU_API std::ostream & operator<<(std::ostream &, const MoneyManagerPtr&);
-
-
-inline void MoneyManagerBase::reset() {
-    _reset();
-}
 
 } /* namespace hku */
 #endif /* MONEYMANAGERBASE_H_ */
