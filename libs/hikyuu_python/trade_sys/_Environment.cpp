@@ -14,6 +14,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
+#include <hikyuu/trade_sys/environment/build_in.h>
 
 using namespace boost::python;
 using namespace hku;
@@ -62,6 +63,8 @@ void export_Environment() {
             .def("_calculate", pure_virtual(&EnvironmentBase::_calculate))
             ;
     register_ptr_to_python<EnvironmentPtr>();
+
+    def("EV_TwoLine", EV_TwoLine, (arg("fast"), arg("slow"), arg("market") = "SH"));
 }
 
 

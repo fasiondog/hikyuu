@@ -51,6 +51,11 @@ EnvironmentPtr EnvironmentBase::clone() {
     return p;
 }
 
+void EnvironmentBase::setQuery(const KQuery& query) {
+    m_query = query;
+    _calculate();
+}
+
 void EnvironmentBase::_addValid(const Datetime& datetime) {
     m_valid.insert(datetime);
 }

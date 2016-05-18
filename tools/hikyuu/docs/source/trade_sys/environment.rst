@@ -7,13 +7,13 @@
 内建市场环境判定策略
 --------------------
 
-.. py:function:: EV_TwoLine(market, fast, slow)
+.. py:function:: EV_TwoLine(fast, slow[, market = 'SH'])
 
     快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
 
-    :param string market: 市场名称
     :param Operand fast: 快线指标
     :param Operand slow: 慢线指标
+    :param string market: 市场名称
 
 
 自定义市场环境判定策略

@@ -55,8 +55,8 @@ void TwoLineEnvironment::_calculate() {
     }
 }
 
-EVPtr HKU_API EV_TwoLine(const string& market,
-        const Operand& fast, const Operand& slow) {
+EVPtr HKU_API EV_TwoLine(const Operand& fast, const Operand& slow,
+        const string& market) {
     TwoLineEnvironment *ptr = new TwoLineEnvironment(fast, slow);
     ptr->setParam<string>("market", market);
     return EVPtr(ptr);

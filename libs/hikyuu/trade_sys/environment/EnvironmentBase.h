@@ -51,9 +51,7 @@ public:
     void reset();
 
     /** 设置查询条件 */
-    void setQuery(const KQuery& query) {
-        m_query = query;
-    }
+    void setQuery(const KQuery& query);
 
     /** 获取查询条件 */
     KQuery getQuery() const {
