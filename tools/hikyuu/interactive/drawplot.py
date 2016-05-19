@@ -5,6 +5,7 @@
 """
 import sys
 import datetime
+import numpy as np
 import matplotlib
 from pylab import Rectangle, gca, figure, ylabel, axes, draw
 from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
@@ -667,9 +668,7 @@ def sgplot(sg, kdata = None, style = 1, axes = None, new = True):
                发生器已经指定了交易对象，否则，使用该参数作为交易对象
         style: 1 | 2 信号箭头绘制样式
         axes： 指定在那个轴对象中进行绘制
-        new：  仅在指定了axes的情况下生效，当为True时，创建新的窗口对象并在其中进行
-               绘制；否则，
-    
+        new：  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
     """
     if kdata is None:
         kdata = sg.getTO()
@@ -724,3 +723,36 @@ def sgplot(sg, kdata = None, style = 1, axes = None, new = True):
                       horizontalalignment = 'center', 
                       verticalalignment = 'top',
                       color='blue')            
+
+                      
+def cnplot(cn, kdata = None, axes = None, new = True):
+    """
+    绘制系统有效条件
+    参数：
+        cn：   系统有效条件
+        kdata：指定的KData，如该值为None，则认为该系统有效条件已经指定了交易对象，否则，使用该参数作为交易对象
+        axes： 指定在那个轴对象中进行绘制
+        new：  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    """
+    if kdata is None:
+        kdata = cn.getTO()
+    else:
+        cn.setTO(kdata)
+        
+    refdates = kdata.getDatetimeList()
+    date_index = dict([(d,i) for i,d in enumerate(refdates)])
+        
+    if axes is None:
+        if new:
+            fig = figure()
+            axes = gca()
+        else:
+            axes = gca()        
+
+    x = np.array([i for i in range(len(refdates))])
+    y1 = np.array([1 if cn.isValid(d) else -1 for d in refdates])
+    y2 = np.array([-1 if cn.isValid(d) else 1 for d in refdates])
+    axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
+    axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
+
+        

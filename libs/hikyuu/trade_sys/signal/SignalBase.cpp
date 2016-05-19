@@ -26,11 +26,11 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SignalPtr& sg) {
 
 
 SignalBase::SignalBase() : m_name("SignalBase"), m_hold(false) {
-
+    setParam<bool>("alternate", true); //买入卖出信号交替出现
 }
 
 SignalBase::SignalBase(const string& name): m_name(name), m_hold(false) {
-
+    setParam<bool>("alternate", true);
 }
 
 SignalBase::~SignalBase() {
@@ -89,16 +89,24 @@ DatetimeList SignalBase::getSellSignal() const {
 }
 
 void SignalBase::_addBuySignal(const Datetime& datetime) {
-    if (!m_hold && m_sellSig.count(datetime) == 0) {
+    if (!getParam<bool>("alternate")) {
         m_buySig.insert(datetime);
-        m_hold = true;
+    } else {
+        if (!m_hold) {
+            m_buySig.insert(datetime);
+            m_hold = true;
+        }
     }
 }
 
 void SignalBase::_addSellSignal(const Datetime& datetime) {
-    if (m_hold && m_buySig.count(datetime) == 0) {
+    if (!getParam<bool>("alternate")) {
         m_sellSig.insert(datetime);
-        m_hold = false;
+    } else {
+        if (m_hold) {
+            m_sellSig.insert(datetime);
+            m_hold = false;
+        }
     }
 }
 

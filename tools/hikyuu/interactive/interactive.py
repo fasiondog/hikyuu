@@ -71,6 +71,7 @@ Indicator.plot = iplot
 Indicator.bar = ibar
 
 SignalBase.plot = sgplot
+ConditionBase.plot = cnplot
 
 #================================================================
 #更新实时数据
