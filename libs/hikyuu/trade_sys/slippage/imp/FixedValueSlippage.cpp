@@ -31,7 +31,7 @@ void FixedValueSlippage::_calculate() {
 
 }
 
-SlippagePtr HKU_API SL_FixedValue(double value) {
+SlippagePtr HKU_API SP_FixedValue(double value) {
     FixedValueSlippage *ptr = new FixedValueSlippage;
     ptr->setParam("value", value);
     return SlippagePtr(ptr);

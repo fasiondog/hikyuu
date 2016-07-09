@@ -173,13 +173,16 @@ def realtimePartUpdate_from_qq(queryStr):
 def realtimeUpdate_from_sina_qq(source):
     if source == 'sina':
         queryStr = "http://hq.sinajs.cn/list=" 
+        update_func = realtimePartUpdate_from_sina
+        max_size = 140
     elif source == 'qq':
         queryStr = "http://qt.gtimg.cn/q="
+        update_func = realtimePartUpdate_from_qq
+        max_size = 60
     else:
         print('Not support!')
         return
         
-    max_size = 140
     count  = 0
     urls = []
     tmpstr = queryStr
@@ -191,37 +194,41 @@ def realtimeUpdate_from_sina_qq(source):
             tmpstr += ("%s,") % (stock.market_code.lower())
             count = count + 1
             if count >= max_size:
-                urls.append(tmpstr)
+                #urls.append(tmpstr)
+                update_func(tmpstr)
                 count = 0
                 tmpstr = queryStr
-    
-    from multiprocessing import Pool
-    from multiprocessing.dummy import Pool as ThreadPool
-    pool = ThreadPool()
-    if source == 'sina':
-        pool.map(realtimePartUpdate_from_sina, urls)
-    else:
-        pool.map(realtimePartUpdate_from_qq, urls)
-    pool.close()
-    pool.join()
+
+    if tmpstr != queryStr:
+        #urls.append(tmpstr)
+        update_func(tmpstr)
+   
+    #不用并行，防止过快，ip被网站屏蔽
+    #from multiprocessing import Pool
+    #from multiprocessing.dummy import Pool as ThreadPool
+    #pool = ThreadPool()
+    #if source == 'sina':
+    #    pool.map(realtimePartUpdate_from_sina, urls)
+    #else:
+    #    pool.map(realtimePartUpdate_from_qq, urls)
+    #pool.close()
+    #pool.join()
 
     
 def realtimeUpdate_from_tushare():
     #更新股票行情
     df = ts.get_today_all()
     for i in range(len(df)):
+        if df.ix[i, 'open'] == 0:
+            continue  #停牌
+        
         code = df.ix[i][0]
         stock = getStock('sh' + code)
+        
         if stock.isNull() == True or stock.type != constant.STOCKTYPE_A:
             stock = getStock('sz' + code)
         if stock.isNull() == True:
             continue
-        
-        total = stock.getCount(Query.DAY)
-        if total == 0:
-            continue
-            
-        last_record = stock.getKRecord(total - 1)
         
         record = KRecord()
         record.openPrice = df.ix[i, 'open']
@@ -230,15 +237,11 @@ def realtimeUpdate_from_tushare():
         record.closePrice = df.ix[i, 'trade']
         record.transCount = df.ix[i, 'volume']
         
-        if (last_record.closePrice != record.closePrice 
-                or last_record.highPrice != record.highPrice 
-                or last_record.lowPrice != record.lowPrice
-                or last_record.openPrice != record.openPrice):
-            from datetime import date
-            d = date.today()
-            record.datetime = Datetime(d)
-            stock.realtimeUpdate(record) 
-            
+        from datetime import date
+        d = date.today()
+        record.datetime = Datetime(d)
+        stock.realtimeUpdate(record)
+        
     #更新指数行情
     df = ts.get_index()
     for i in range(len(df)):

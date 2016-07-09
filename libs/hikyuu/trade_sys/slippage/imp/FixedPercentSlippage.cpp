@@ -31,7 +31,7 @@ void FixedPercentSlippage::_calculate() {
 
 }
 
-SlippagePtr HKU_API SL_FixedPercent(double p) {
+SlippagePtr HKU_API SP_FixedPercent(double p) {
     FixedPercentSlippage *ptr = new FixedPercentSlippage;
     ptr->setParam("p", p);
     return SlippagePtr(ptr);

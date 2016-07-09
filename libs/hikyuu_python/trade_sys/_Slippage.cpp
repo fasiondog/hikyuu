@@ -70,8 +70,8 @@ void export_Slippage() {
             ;
     register_ptr_to_python<SlippagePtr>();
 
-    def("SL_FixedPercent", SL_FixedPercent, (arg("p") = 0.001));
-    def("SL_FixedValue", SL_FixedValue, (arg("value") = 0.01));
+    def("SL_FixedPercent", SP_FixedPercent, (arg("p") = 0.001));
+    def("SL_FixedValue", SP_FixedValue, (arg("value") = 0.01));
 }
 
 

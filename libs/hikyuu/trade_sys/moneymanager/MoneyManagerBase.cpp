@@ -27,11 +27,13 @@ HKU_API std::ostream & operator<<(std::ostream& os, const MoneyManagerPtr& mm) {
 MoneyManagerBase::MoneyManagerBase()
 : m_name("MoneyManagerBase") {
     setParam<bool>("auto-checkin", false);
+    setParam<int>("max-stock", 200);
 }
 
 MoneyManagerBase::MoneyManagerBase(const string& name)
 : m_name(name) {
     setParam<bool>("auto-checkin", false);
+    setParam<int>("max-stock", 200);
 }
 
 MoneyManagerBase::~MoneyManagerBase() {
@@ -98,6 +100,10 @@ size_t MoneyManagerBase
                 << stock.market_code() << ") price(" << price
                 << ") risk(" << risk
                 << ") [MoneyManagerBase::getBuyNumber]");
+        return 0;
+    }
+
+    if (m_tm->getStockNumber() >= getParam<int>("max-stock")) {
         return 0;
     }
 

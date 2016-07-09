@@ -8,6 +8,7 @@
 #ifndef PERFORMANCE_H_
 #define PERFORMANCE_H_
 
+#include <boost/function.hpp>
 #include "TradeManager.h"
 
 namespace hku {
@@ -37,7 +38,6 @@ public:
 private:
     list<string> m_name_list; //保存指标顺序
     map_type m_result;
-
 };
 
 } /* namespace hku */

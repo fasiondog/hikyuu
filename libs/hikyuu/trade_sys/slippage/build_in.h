@@ -8,8 +8,8 @@
 #ifndef SLIPPAGE_BUILD_IN_H_
 #define SLIPPAGE_BUILD_IN_H_
 
-#include "crt/SL_FixedPercent.h"
-#include "crt/SL_FixedValue.h"
+#include "crt/SP_FixedPercent.h"
+#include "crt/SP_FixedValue.h"
 
 
 #endif /* SLIPPAGE_BUILD_IN_H_ */
