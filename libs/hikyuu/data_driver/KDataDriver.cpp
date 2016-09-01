@@ -7,6 +7,7 @@
 
 #include "kdata/hdf5/H5KDataDriverImp.h"
 #include "kdata/mysql/MySQLKDataDriverImp.h"
+#include "kdata/tdx/TdxKDataDriverImp.h"
 #include "../StockManager.h"
 #include "KDataDriver.h"
 
@@ -87,6 +88,17 @@ KDataDriver::KDataDriver(const shared_ptr<IniParser>& config) {
                         config, driver_name));
                 m_imp[driver_name] = mysql_driver;
 
+            } else if (dbtype == "tdx") {
+                if (!config->hasOption(driver_name, "file")) {
+                    HKU_WARN("Not found hdf file name in "
+                            << driver_name << func_name);
+                    continue;
+                }
+
+                KDataDriverImpPtr tdx_driver =
+                        make_shared<TdxKDataDriverImp>(TdxKDataDriverImp(
+                                config, config->get(driver_name, "file")));
+                m_imp[driver_name] = tdx_driver;
             }
         } /* for KQuery::KType */
     } /* for market_iter */

@@ -41,8 +41,15 @@ H5KDataDriverImp::H5KDataDriverImp(const shared_ptr<IniParser>& config,
     H5::Exception::dontPrint();
 
     try {
+
+        //H5::FileAccPropList acc_prop = H5::FileAccPropList(H5::FileAccPropList::DEFAULT);
+        //acc_prop.setCore(1, 0);
+        //m_h5file = H5FilePtr(new H5::H5File(filename,
+        //               H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, acc_prop),
+        //             Hdf5FileCloser());
+
         m_h5file = H5FilePtr(new H5::H5File(filename,
-                H5F_ACC_RDONLY), Hdf5FileCloser());
+                       H5F_ACC_RDONLY), Hdf5FileCloser());
     } catch(...) {
         HKU_ERROR("Can't open h5file: " << filename << func_name);
     }

@@ -45,7 +45,7 @@ copy .\build\extern-libs\%BUILD_OUTPUT_PATH%\*.dll .\bin
 copy .\build\hikyuu\%BUILD_OUTPUT_PATH%\*.dll .\bin
 copy .\build\hikyuu_utils\%BUILD_OUTPUT_PATH%\*.dll .\bin
 
-copy .\bin\*.dll C:\Windows\System32
+copy .\bin\*.dll .\tools\hikyuu
 
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\*.pyd .\tools\hikyuu
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\indicator\*.pyd .\tools\hikyuu\indicator

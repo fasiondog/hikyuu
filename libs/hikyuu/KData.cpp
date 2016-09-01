@@ -33,8 +33,8 @@ KData::KData(const Stock& stock, const KQuery& query) {
         return;
     }
     if (query.kType() < KQuery::DAY) {
-        m_imp = KDataImpPtr(new KDataImp(stock, query));
-    	//m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
+        //m_imp = KDataImpPtr(new KDataImp(stock, query));
+    	m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
 
     } else if (query.kType() == KQuery::DAY) {
         m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
