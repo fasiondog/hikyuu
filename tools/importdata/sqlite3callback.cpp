@@ -43,11 +43,11 @@ int callback_get_market_stock(void *code, int nCol, char **azVals, char **azCols
         (*(std::string *)code) = boost::lexical_cast<std::string>(azVals[0]);
         result = 0;
     }catch(boost::bad_lexical_cast& e){
-        std::cerr << "[callback_get_marketid] bad_lexical_cast!" << std::endl
+        std::cerr << "[callback_get_market_stock] bad_lexical_cast!" << std::endl
                   << e.what() << std::endl;
         result = 1;
     }catch(...){
-        std::cerr << "[callback_get_marketid] Some error!" << std::endl;
+        std::cerr << "[callback_get_market_stock] Some error!" << std::endl;
         result = 1;
     }
     return result;
@@ -86,6 +86,24 @@ int callback_get_stockid(void *stockid, int nCol, char **azVals, char **azCols) 
         result = 1;
     }catch(...){
         std::cerr << "[callback_get_stockid] Some error!" << std::endl;
+        result = 1;
+    }
+    return result;
+}
+
+//select type from stock where marketid=? and code='???'
+int callback_get_stock_type(void *stktype, int nCol, char **azVals, char **azCols) {
+    assert(nCol==1);
+    int result = 0;
+    try{
+        (*(unsigned int *)stktype) = boost::lexical_cast<unsigned int>(azVals[0]);
+        result = 0;
+    }catch(boost::bad_lexical_cast& e){
+        std::cerr << "[callback_get_stock_type] bad_lexical_cast!" << std::endl
+                  << e.what() << std::endl;
+        result = 1;
+    }catch(...){
+        std::cerr << "[callback_get_stock_type] Some error!" << std::endl;
         result = 1;
     }
     return result;
@@ -151,11 +169,11 @@ int callback_get_stock_info(void *output, int nCol, char **azVals, char **azCols
         (*(StockInfo *)output) = info;
         result = 0;
     }catch(boost::bad_lexical_cast& e){
-        std::cerr << "[callback_get_datemap_of_stockweight] bad_lexical_cast!" << std::endl
+        std::cerr << "[callback_get_stock_info] bad_lexical_cast!" << std::endl
                   << e.what() << std::endl;
         result = 1;
     }catch(...){
-        std::cerr << "[callback_get_datemap_of_stockweight] Some error!" << std::endl;
+        std::cerr << "[callback_get_stock_info] Some error!" << std::endl;
         result = 1;
     }
     return result;
@@ -173,11 +191,35 @@ int callback_get_stockcode_list(void *output, int nCol, char **azVals, char **az
         p->push_back(stock_code);
         result = 0;
     }catch(boost::bad_lexical_cast& e){
-        std::cerr << "[callback_get_stockid] bad_lexical_cast!" << std::endl
+        std::cerr << "[callback_get_stockcode_list] bad_lexical_cast!" << std::endl
                   << e.what() << std::endl;
         result = 1;
     }catch(...){
-        std::cerr << "[callback_get_stockid] Some error!" << std::endl;
+        std::cerr << "[callback_get_stockcode_list] Some error!" << std::endl;
+        result = 1;
+    }
+    return result;
+}
+
+//select stockid, code, name, valid from stock where marketid = ?"
+int callback_get_stock_info_by_market(void *output, int nCol, char **azVals, char **azCols) {
+    assert(nCol==3);
+    int result = 0;
+    StockInfoByMarket info;
+    try{
+        info.stockid = boost::lexical_cast<unsigned int>(azVals[0]);
+        info.code = std::string(azVals[1]);
+        info.name = std::string(azVals[2]);
+        info.valid = boost::lexical_cast<unsigned int>(azVals[3]);
+        std::list<StockInfoByMarket> *p = (std::list<StockInfoByMarket> *)output;
+        p->push_back(info);
+        result = 0;
+    }catch(boost::bad_lexical_cast& e){
+        std::cerr << "[callback_get_stock_info_by_market] bad_lexical_cast!" << std::endl
+                  << e.what() << std::endl;
+        result = 1;
+    }catch(...){
+        std::cerr << "[callback_get_stock_info_by_market] Some error!" << std::endl;
         result = 1;
     }
     return result;

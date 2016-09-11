@@ -13,7 +13,9 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <sys/stat.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -27,6 +29,12 @@
 #include <hdf5_hl.h>
 #include "sqlite3callback.h"
 #include "importdata.h"
+
+//是否使用二分法查找K线文件中第一个大于指定日期的记录，否在则顺序读入文件进行判断
+#define USE_FIND_POS 1
+
+//导入全部K线数据，否则只导入stock.db中存在的股票数据
+#define IMPORT_ALL 1
 
 namespace bg = boost::gregorian;
 
@@ -120,6 +128,34 @@ double mydifftime(MY_TIME_VALUE& end, MY_TIME_VALUE& start){
 #endif
 
 //-----------------------------------------------------------------------------
+// 获取当前日期
+//-----------------------------------------------------------------------------
+unsigned int get_today_date() {
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    boost::gregorian::date date= now.date();
+    return (date.year() * 10000 + date.month() * 100 + date.day());
+}
+
+//-----------------------------------------------------------------------------
+// 控制台进度条
+//-----------------------------------------------------------------------------
+void progress_bar(int cur, int total) {
+    int length = cur * 50 / total;
+    printf("\r[");
+    for (int i = 0; i < length; ++i) {
+        printf("=");
+    }
+    for (int i = length; i < 50; ++i) {
+        printf(" ");
+    }
+    printf("] %i%%", 100 * cur / total);
+    if (cur >= total)
+        printf("\n");
+    fflush(stdout);
+}
+
+
+//-----------------------------------------------------------------------------
 /**
  * 打开指定的sqlite3数据库，如果不存在，则创建新库
  * @param dbname 指定的数据库文件名
@@ -174,73 +210,113 @@ bool create_database(const SqlitePtr& db, const std::string& filename) {
     return true;
 }
 
-//-----------------------------------------------------------------------------
-/**
- * 根据日线数据文件名进行判断，导入符合CodeRuleType中配置的证券代码
- * @param db sqlite3数据库
- * @param market 所属市场
- * @param dir_path 日线数据所在目录
- * @note 只将证券代码和其类别导入，其他信息名称、是否有效、起始日期、介绍日期不在此导入
- */
-//-----------------------------------------------------------------------------
-void import_stock_info(const SqlitePtr& db, const std::string& market, const boost::filesystem::path& dir_path) {
-    assert(db);
+
+void dzh_import_stock_name_from_market(const SqlitePtr& db,
+        const std::string& market,
+        const std::map<std::string, std::string>& new_stock_dict) {
+
     unsigned int marketid = get_marketid(db, market);
-    if (marketid == 0) {
-        std::cerr << "[import_stock_info] Invalid market" << market << "!\n";
-        return;
-    }
 
-    CodeTreePtr codeTree = create_CodeTree(db, market);
-    if (!codeTree) {
-        std::cerr << "[import_stock_info] Create CodeTree Failure!\n";
-        return;
-    }
-
-    if (!fs::exists(dir_path)){
-        std::cerr << "[import_stock_info] dir_path(" << dir_path << ") not exist!\n";
-        return;
-    }
-
-    if (!fs::is_directory(dir_path)) {
-        std::cerr << "[import_stock_info] dir_path(" << dir_path << ") is not a directory!\n";
-        return;
-    }
-
-    std::string code;
-    unsigned int stocktype = 0;
+    std::list<StockInfoByMarket> old_stock_list;
+    char *zErrMsg=0;
     std::stringstream buf(std::stringstream::out);
-    char *zErrMsg = 0;
-
-    //大数据量插入需要启动事务处理，否则影响性能
-    int rc = sqlite3_exec(db.get(), "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+    buf << "select stockid, code, name, valid from stock where marketid = " << marketid;
+    int rc = sqlite3_exec(db.get(), buf.str().c_str(),
+            callback_get_stock_info_by_market,
+            &old_stock_list, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
         return;
     }
 
-    fs::directory_iterator end_iter;
-    fs::directory_iterator dir_itr(dir_path);
-    for (; dir_itr != end_iter; ++dir_itr) {
-        if (fs::is_directory( dir_itr->status() ) ) {
-            continue;
+    //启动SQL更新事务
+    rc = sqlite3_exec(db.get(), "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return;
+    }
+
+    std::map<std::string, unsigned int> old_stock_dict;
+
+    std::map<std::string, std::string>::const_iterator new_dict_iter;
+    std::list<StockInfoByMarket>::const_iterator old_iter = old_stock_list.begin();
+    for (; old_iter != old_stock_list.end(); ++old_iter) {
+        old_stock_dict[old_iter->code] = old_iter->stockid;
+
+        new_dict_iter = new_stock_dict.find(old_iter->code);
+        if (new_dict_iter == new_stock_dict.end()) {
+            //新的代码表中无此股票，则置为无效
+            if (old_iter->valid == 1) {
+                buf.str("");
+                buf << "update stock set valid=0 where stockid=" << old_iter->stockid;
+                rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+                if( rc != SQLITE_OK ){
+                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    sqlite3_free(zErrMsg);
+                    return;
+                }
+            }
+
+        } else {
+            //股票名称发生变化，更新股票名称;如果原无效，则置为有效
+            if (old_iter->name != new_dict_iter->second) {
+                buf.str("");
+                buf << "update stock set name='" << new_dict_iter->second << "'"
+                    << " where stockid=" << old_iter->stockid;
+                rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+                if( rc != SQLITE_OK ){
+                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    sqlite3_free(zErrMsg);
+                    return;
+                }
+            }
+
+            if (old_iter->valid == 0) {
+                buf.str("");
+                buf << "update stock set valid=1, endDate=99999999 where stockid="
+                    << old_iter->stockid;
+                rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+                if( rc != SQLITE_OK ){
+                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    sqlite3_free(zErrMsg);
+                    return;
+                }
+            }
         }
-        code = fs::basename(dir_itr->path());
-        stocktype = codeTree->getStockType(code);
-        if (stocktype == 0) {
-            continue;
-        }
-        unsigned int stockid = get_stockid(db, marketid, code);
-        if (stockid != 0) {
-            //已经在数据库中
+    }
+
+    CodeTreePtr codeTree = create_CodeTree(db, market);
+    if (!codeTree) {
+        std::cerr << "[tdx_import_stock_name_from_file] Create CodeTree Failure!\n";
+        return;
+    }
+
+    unsigned int today = get_today_date();
+
+    for (new_dict_iter = new_stock_dict.begin();
+            new_dict_iter != new_stock_dict.end(); ++new_dict_iter) {
+
+        if (old_stock_dict.find(new_dict_iter->first) != old_stock_dict.end()) {
             continue;
         }
 
+        unsigned int stocktype = codeTree->getStockType(new_dict_iter->first);
+        if (stocktype == 0)
+            continue;
+
         buf.str("");
-        buf << "INSERT INTO Stock(marketid, Code, Name, Type, Valid, StartDate, endDate) VALUES("
-                << marketid << ", \'" << code << "\', \'\', " << stocktype << ", 0, 0, 0)";
-        int rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+        buf << "insert into Stock(marketid, code, name, type, valid, startDate, endDate) "
+            << "values ("
+            << marketid << ","
+            << "'" << new_dict_iter->first << "',"
+            << "'" << new_dict_iter->second << "',"
+            << stocktype << ","
+            << "1,"
+            << today << ","
+            << "99999999)";
+        rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
         if( rc != SQLITE_OK ){
             fprintf(stderr, "SQL error: %s\n", zErrMsg);
             sqlite3_free(zErrMsg);
@@ -248,6 +324,7 @@ void import_stock_info(const SqlitePtr& db, const std::string& market, const boo
         }
     }
 
+    //事务提交
     rc = sqlite3_exec(db.get(), "COMMIT", NULL, NULL, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -255,17 +332,19 @@ void import_stock_info(const SqlitePtr& db, const std::string& market, const boo
     }
 }
 
+
 //-----------------------------------------------------------------------------
 /**
- * 更新每只股票的名称和当前是否有效的标志
+ * 从大智慧导入更新每只股票的名称和当前是否有效的标志
  * @detail 如果导入的代码表中不存在对应的代码，则认为该股已失效
  * @param db sqlite数据库
  * @param filename 大智慧的证券代码表文件名
- * @note 目前只能从大智慧5中导入
  */
 //-----------------------------------------------------------------------------
-void import_stock_name(const SqlitePtr& db, const std::string& filename) {
+void dzh_import_stock_name(const SqlitePtr& db, const std::string& dirname) {
     assert(db);
+
+    std::string filename = dirname + "/internet/tcpipdata/init.dat";
     std::ifstream file(filename.c_str(), std::ifstream::binary);
     if( !file ) {
         std::cerr << "[import_stock_name] Can't open file: " << filename << std::endl;
@@ -337,6 +416,10 @@ void import_stock_name(const SqlitePtr& db, const std::string& filename) {
     }
     file.close();
 
+    dzh_import_stock_name_from_market(db, "SH", sh_market_dict);
+    dzh_import_stock_name_from_market(db, "SZ", sz_market_dict);
+
+#if 0
     //下面的处理中没有包含在新的证劵代码表中存在而在数据库中不存在的情况，考虑到数据库中的股票是根据日线数据
     //生成的，在此种情况下意味着新增的股票还没有日线数据，所以可以暂时忽略不处理
     Output_callback_import_stock_name old_stock_list;
@@ -403,6 +486,7 @@ void import_stock_name(const SqlitePtr& db, const std::string& filename) {
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -513,7 +597,9 @@ bool invalid_date(unsigned int date) {
  * @param 对应的权息数据所在目录
  */
 //-----------------------------------------------------------------------------
-void import_stock_weight(const SqlitePtr& db, const std::string& market, const fs::path& dir_path) {
+void import_stock_weight(const SqlitePtr& db,
+                         const std::string& market,
+                         const std::string& dir_path) {
     assert(db);
     unsigned int marketid = get_marketid(db, market);
     if (marketid == 0) {
@@ -526,50 +612,46 @@ void import_stock_weight(const SqlitePtr& db, const std::string& market, const f
         return;
     }
 
-    if (!fs::is_directory(dir_path)) {
-        std::cerr << "[import_stock_weight] dir_path(" << dir_path << ") is not a directory!\n";
-        return;
-    }
-
-    std::string code;
-    std::stringstream buf(std::stringstream::out);
     char *zErrMsg = 0;
-
-    //大数据量插入需要启动事务处理，否则影响性能
-    int rc = sqlite3_exec(db.get(), "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+    int rc;
+    std::list<StockCode> stock_list;
+    std::stringstream buf(std::stringstream::out);
+    buf << "select stockid,code from stock where marketid=" << marketid;
+    rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_stockcode_list, &stock_list, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
         return;
     }
 
-    fs::directory_iterator end_iter;
-    fs::directory_iterator dir_itr(dir_path);
-    for (; dir_itr != end_iter; ++dir_itr) {
-        if (fs::is_directory( dir_itr->status() ) ) {
-            continue;
-        }
+    //大数据量插入需要启动事务处理，否则影响性能
+    rc = sqlite3_exec(db.get(), "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return;
+    }
 
-        code = fs::basename(dir_itr->path());
-        unsigned int stockid = get_stockid(db, marketid, code);
-        if (stockid == 0) {
-            //不在数据库中股票，不导入
-            continue;
-        }
+    int total = stock_list.size();
+    int count = 0, cur = 0;
+    std::list<StockCode>::const_iterator stk_iter = stock_list.begin();
+    for (; stk_iter != stock_list.end(); ++stk_iter) {
+        //progress_bar(++cur, total);
 
-        std::ifstream file(dir_itr->path().string().c_str(), std::ifstream::binary);
+        std::string filename = dir_path + "\\" + stk_iter->code + ".wgt";
+        std::ifstream file(filename, std::ifstream::binary);
         if (!file) {
             continue;
         }
 
         buf.str("");
-        buf << "select date from stkweight where stockid=" << stockid;
+        buf << "select date from stkweight where stockid=" << stk_iter->stockid;
         std::map<unsigned int, int> date_map;
         rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_datemap_of_stockweight, &date_map, &zErrMsg);
         if( rc != SQLITE_OK ){
             fprintf(stderr, "SQL error: %s\n", zErrMsg);
             sqlite3_free(zErrMsg);
-            return;
+            continue;
         }
 
         int buffer[9];
@@ -577,14 +659,14 @@ void import_stock_weight(const SqlitePtr& db, const std::string& market, const f
         while (file.read((char *)buffer, 36)) {
             unsigned int date = (buffer[0]>>20)*10000 + (((buffer[0]<<12)&4294967295)>>28)*100 + ((buffer[0]&0xffff)>>11);
             if (!invalid_date(date)){
-                std::cout << "ignore! " << code << " invalid date: " << date << std::endl;
+                std::cout << "ignore! " << stk_iter->code << " invalid date: " << date << std::endl;
                 continue;
             }
             if (date_map.count(date) == 0) {
                 buf.str("");
                 buf << "INSERT INTO StkWeight(stockid, date, countAsGift, countForSell, "
                     << "priceForSell, bonus, countOfIncreasement, totalCount, freeCount) VALUES ("
-                    << stockid << "," << date << "," << buffer[1] << "," << buffer[2] << "," << buffer[3] << ","
+                    << stk_iter->stockid << "," << date << "," << buffer[1] << "," << buffer[2] << "," << buffer[3] << ","
                     << buffer[4] << "," << buffer[5] << "," << buffer[6] << "," << buffer[7] << ")";
                 rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_datemap_of_stockweight, &date_map, &zErrMsg);
                 if( rc != SQLITE_OK ){
@@ -592,6 +674,8 @@ void import_stock_weight(const SqlitePtr& db, const std::string& market, const f
                     sqlite3_free(zErrMsg);
                     continue;
                 }
+
+                count++;
 
             }
             memset(buffer, 0 , 36);
@@ -605,6 +689,8 @@ void import_stock_weight(const SqlitePtr& db, const std::string& market, const f
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }
+
+    std::cout << "导入权息数据: " << count << std::endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -674,6 +760,31 @@ unsigned int get_stockid(const SqlitePtr& db, unsigned int marketid, const std::
     buf << "select stockid from stock where marketid=" << marketid << " and code=\'" << code << "\'";
     unsigned int result = 0;
     int rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_marketid, &result, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return 0;
+    }
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 根据marketid和证券代码获取相应的stock类型
+ * @param db slite3数据库指针
+ * @param marketid 市场标识
+ * @param code 证券代码
+ * @return 对应的stock类型
+ */
+//-----------------------------------------------------------------------------
+unsigned int get_stock_type(const SqlitePtr& db,
+        unsigned int marketid, const std::string& code) {
+    assert(db);
+    char *zErrMsg=0;
+    std::stringstream buf(std::stringstream::out);
+    buf << "select type from stock where marketid=" << marketid << " and code=\'" << code << "\'";
+    unsigned int result = 0;
+    int rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_stock_type, &result, &zErrMsg);
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
@@ -852,7 +963,7 @@ H5::DataSet h5_get_data_table(const H5::Group& group, const std::string& name) {
     if (dataset_id < 0) {
         herr_t err = H5TBmake_table(name.c_str(), loc_id, name.c_str(), 7, 0,
                 sizeof(H5Record), g_h5_data_fieldnames, g_h5_data_fieldoffset,
-                g_h5_data_fieldtype, 204, NULL, 9, NULL);
+                g_h5_data_fieldtype, 240, NULL, 9, NULL);
         if (err < 0) {
             std::cout << "[h5_get_table] Error!" << std::endl;
         } else {
@@ -880,7 +991,7 @@ H5::DataSet h5_get_index_table(const H5::Group& group, const std::string& name) 
     if (dataset_id < 0) {
         herr_t err = H5TBmake_table(name.c_str(), loc_id, name.c_str(), 2, 0,
                 sizeof(H5IndexRecord), g_h5_index_fieldnames, g_h5_index_fieldoffest,
-                g_h5_index_fieldtype, 204, NULL, 9, NULL);
+                g_h5_index_fieldtype, 160, NULL, 9, NULL);
         if (err < 0) {
             std::cout << "[h5_get_index_table] Error!" << std::endl;
         } else {
@@ -1246,6 +1357,63 @@ void update_h5_index(const H5FilePtr& h5file, const std::string& table_name, H5_
     delete [] index_buffer;
 }
 
+
+/*
+ * 获取大智慧日线文件记录数
+ */
+int dzh_get_day_data_count(const std::string& filename) {
+    struct stat statbuf;
+    stat(filename.c_str(), &statbuf);
+    int size = statbuf.st_size;
+    return size / sizeof(QianLongData);
+}
+
+/*
+ * 获取大智慧日线文件指定记录的日期
+ */
+unsigned int dzh_get_day_data_date(std::ifstream& file, int pos) {
+    file.seekg(pos * sizeof(QianLongData), file.beg);
+    unsigned int date = 0;
+    file.read((char *)&date, sizeof(date));
+    return date;
+}
+
+
+/*
+ * 选择大智慧日线文件中第一个大于等于lastdate的记录位置
+ */
+int dzh_day_data_find_pos(std::ifstream& file, unsigned int last_date) {
+    file.seekg(0, file.end);
+    int total = file.tellg() / sizeof(QianLongData);
+
+    int low = 0, high = total - 1;
+    int mid = high / 2;
+    while (mid <= high) {
+        unsigned int cur_date = dzh_get_day_data_date(file, low);
+        if (cur_date > last_date) {
+            mid = low;
+            break;
+        }
+
+        cur_date = dzh_get_day_data_date(file, high);
+        if (cur_date <= last_date) {
+            mid = high + 1;
+            break;
+        }
+
+        cur_date = dzh_get_day_data_date(file, mid);
+        if (cur_date <= last_date) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+
+        mid = (low + high) / 2;
+    }
+
+    return mid;
+}
+
 //-----------------------------------------------------------------------------
 /**
  * 从钱龙或大智慧数据文件中导入日线数据到目标HDF5文件
@@ -1255,12 +1423,20 @@ void update_h5_index(const H5FilePtr& h5file, const std::string& table_name, H5_
  * @return 成功导入的数据量
  */
 //-----------------------------------------------------------------------------
-int import_day_data_from_file(const std::string& file_name, const H5FilePtr& h5file,
-                               const std::string& table_name) {
+int dzh_import_day_data_from_file(const std::string& file_name,
+                                  const H5FilePtr& h5file,
+                                  const std::string& table_name) {
 	int count = 0;
+    int total = dzh_get_day_data_count(file_name);
+    if (total == 0) {
+        return count;
+    }
+
     std::ifstream file(file_name.c_str(), std::ifstream::binary);
     if (!file)
         return count;
+
+
 
     H5::Group h5_group = h5_get_group(h5file, "/data");
     H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
@@ -1274,15 +1450,29 @@ int import_day_data_from_file(const std::string& file_name, const H5FilePtr& h5f
         last_date = (unsigned int)(last_record.datetime / 10000);
     }
 
+#if USE_FIND_POS
+    //int total = dzh_get_day_data_count(file);
+    int pos = dzh_day_data_find_pos(file, last_date);
+    if (pos >= total) {
+        goto out;
+    }
+
+    file.seekg(pos * sizeof(QianLongData), file.beg);
+#endif
+
     QianLongData day_data;
     memset(&day_data, 0, sizeof(QianLongData));
     while (file.read((char *)&day_data, sizeof(QianLongData))){
+
+#if !USE_FIND_POS
         //如果日期小于或等于最后日期，则跳过
         if (day_data.date <= last_date) {
             //std::cout << "invalid date(date <= last_date): " << last_record.datetime << " "
             //		<< last_date << " " << day_data.date << " " << table_name << std::endl;
             continue;
         }
+#endif
+
         //如果日期无效，则跳过
         if (!invalid_date(day_data.date)) {
             //std::cout << "!invalid_date(date): " << day_data.date << " " << table_name << std::endl;
@@ -1291,15 +1481,6 @@ int import_day_data_from_file(const std::string& file_name, const H5FilePtr& h5f
         //日线数据无效，则跳过
         if (!invalid_QianLongData(day_data)) {
             //std::cout << "!invalid_QianLongData(day_data): " << table_name << " " << day_data.date << std::endl;
-            continue;
-        }
-
-        if (day_data.low > day_data.high
-                || day_data.open > day_data.high
-                || day_data.close > day_data.high
-                || day_data.open < day_data.low
-                || day_data.close < day_data.low
-                || day_data.high < day_data.low) {
             continue;
         }
 
@@ -1319,10 +1500,85 @@ int import_day_data_from_file(const std::string& file_name, const H5FilePtr& h5f
         count++;
     }
 
+out:
     file.close();
     h5_group.close();
     return count;
 }
+
+/*
+ * 获取大智慧5分钟线文件记录数
+ */
+int dzh_get_min_data_count(const std::string& filename) {
+    struct stat statbuf;
+    stat(filename.c_str(), &statbuf);
+    int size = statbuf.st_size;
+    return size / sizeof(QianLongData);
+}
+
+unsigned long long dzh_min_data_trans_date(unsigned int date)
+{
+    unsigned int tempval = 0xFFFFFFFF;
+    unsigned int year, month, day, hh, mm;
+    year = date >> 20;
+    month = ((date << 12) & tempval) >> 28;
+    day = ((date << 16) & tempval) >> 27;
+    hh = ((date << 21) & tempval) >> 27;
+    mm = ((date << 26) & tempval) >> 26;
+    return  (unsigned long long)year*100000000LL
+          + (unsigned long long)month*1000000LL
+          + (unsigned long long)day*10000LL
+          + (unsigned long long)hh*100LL
+          + (unsigned long long)mm;
+}
+
+/*
+ * 获取大智慧5分钟线文件指定记录的日期
+ */
+unsigned long long dzh_get_min_data_date(std::ifstream& file, int pos) {
+    file.seekg(pos * sizeof(QianLongData), file.beg);
+    unsigned int date = 0;
+    file.read((char *)&date, sizeof(date));
+    return dzh_min_data_trans_date(date);
+}
+
+
+/*
+ * 选择大智慧5分钟线文件中第一个大于等于lastdate的记录位置
+ */
+int dzh_min_data_find_pos(std::ifstream& file, unsigned long long last_date) {
+    file.seekg(0, file.end);
+    int pos = file.tellg();
+    int total = pos / sizeof(QianLongData);
+
+    int low = 0, high = total - 1;
+    int mid = high / 2;
+    while (mid <= high) {
+        unsigned long long cur_date = dzh_get_min_data_date(file, low);
+        if (cur_date > last_date) {
+            mid = low;
+            break;
+        }
+
+        cur_date = dzh_get_min_data_date(file, high);
+        if (cur_date <= last_date) {
+            mid = high + 1;
+            break;
+        }
+
+        cur_date = dzh_get_min_data_date(file, mid);
+        if (cur_date <= last_date) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+
+        mid = (low + high) / 2;
+    }
+
+    return mid;
+}
+
 
 //-----------------------------------------------------------------------------
 /**
@@ -1333,10 +1589,15 @@ int import_day_data_from_file(const std::string& file_name, const H5FilePtr& h5f
  * @return 返回成功导入的数据量
  */
 //-----------------------------------------------------------------------------
-int import_min5_data_from_file(const std::string& file_name, const H5FilePtr& h5file,
+int dzh_import_min5_data_from_file(const std::string& file_name, const H5FilePtr& h5file,
                                const std::string& table_name) {
     int count = 0;
-	std::ifstream file(file_name.c_str(), std::ifstream::binary);
+    int total = dzh_get_min_data_count(file_name);
+    if (total == 0) {
+        return count;
+    }
+
+    std::ifstream file(file_name.c_str(), std::ifstream::binary);
     if (!file)
         return count;
 
@@ -1352,11 +1613,20 @@ int import_min5_data_from_file(const std::string& file_name, const H5FilePtr& h5
         last_datetime = last_record.datetime;
     }
 
+#if USE_FIND_POS
+    //int total = dzh_get_min_data_count(file);
+    int pos = dzh_min_data_find_pos(file, last_datetime);
+    if (pos >= total)
+        goto out;
+
+    file.seekg(pos * sizeof(QianLongData), file.beg);
+#endif
+
     QianLongData data;
     unsigned int tempval = 0xFFFFFFFF;
     memset(&data, 0, sizeof(QianLongData));
     while (file.read((char *)&data, sizeof(QianLongData))){
-        unsigned int year, month, day, hh, mm;
+        /*unsigned int year, month, day, hh, mm;
         year = data.date >> 20;
         month = ((data.date << 12) & tempval) >> 28;
         day = ((data.date << 16) & tempval) >> 27;
@@ -1366,31 +1636,25 @@ int import_min5_data_from_file(const std::string& file_name, const H5FilePtr& h5
                                         + (unsigned long long)month*1000000LL
                                         + (unsigned long long)day*10000LL
                                         + (unsigned long long)hh*100LL
-                                        + (unsigned long long)mm;
+                                        + (unsigned long long)mm;*/
+        unsigned long long cur_datetime = dzh_min_data_trans_date(data.date);
 
+#if !USE_FIND_POS
         //如果日期小于或等于最后日期，则跳过
         if (cur_datetime <= last_datetime) {
             //std::cout << "invalid date(date <= last_date): " << day_data.date << " " << table_name << std::endl;
             continue;
         }
+#endif
         //如果日期无效，则跳过
         unsigned int cur_date = (unsigned int)(cur_datetime / 10000LL);
         if (!invalid_date(cur_date)) {
-            //std::cout << "!invalid_date(date): " << day_data.date << " " << table_name << std::endl;
+            std::cout << "!invalid_date(date): " << cur_datetime << " " << table_name << std::endl;
             continue;
         }
         //日线数据无效，则跳过
         if (!invalid_QianLongData(data)) {
             //std::cout << "!invalid_QianLongData(day_data): " << table_name << " " << day_data.date << std::endl;
-            continue;
-        }
-
-        if (data.low > data.high
-                || data.open > data.high
-                || data.close > data.high
-                || data.open < data.low
-                || data.close < data.low
-                || data.high < data.low) {
             continue;
         }
 
@@ -1410,6 +1674,7 @@ int import_min5_data_from_file(const std::string& file_name, const H5FilePtr& h5
         count++;
     }
 
+out:
     file.close();
     h5_group.close();
     return count;
@@ -1424,7 +1689,7 @@ int import_min5_data_from_file(const std::string& file_name, const H5FilePtr& h5
  * @param dir_path 源数据所在目录
  */
 //-----------------------------------------------------------------------------
-void import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
+void dzh_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
                      const std::string& market, const fs::path& dir_path) {
     assert(db);
     assert(h5);
@@ -1439,30 +1704,89 @@ void import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
         return;
     }
 
-    if (!fs::is_directory(dir_path)) {
-        std::cerr << "[import_day_data] dir_path(" << dir_path << ") is not a directory!\n";
+    char *zErrMsg = 0;
+    int rc;
+    std::list<StockCode> stock_list;
+    std::stringstream buf(std::stringstream::out);
+    buf << "select stockid,code from stock where marketid=" << marketid;
+    rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_stockcode_list, &stock_list, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
         return;
     }
 
-    int count = 0;
+    int total = stock_list.size();
+    int count = 0, cur = 0;
+    std::list<StockCode>::const_iterator stk_iter = stock_list.begin();
+    for (; stk_iter != stock_list.end(); ++stk_iter) {
+        progress_bar(++cur, total);
+        std::string filename = dir_path.string()
+                             + "\\" + stk_iter->code + ".day";
+        std::string table_name = market + stk_iter->code;
+
+        //std::cout << filename << std::endl;
+        count += dzh_import_day_data_from_file(filename, h5, table_name);
+
+        update_h5_index(h5, table_name, INDEX_WEEK);
+        update_h5_index(h5, table_name, INDEX_MONTH);
+        update_h5_index(h5, table_name, INDEX_QUARTER);
+        update_h5_index(h5, table_name, INDEX_HALFYEAR);
+        update_h5_index(h5, table_name, INDEX_YEAR);
+    }
+
+    std::cout << "导入数量：" << count << std::endl;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 导入大智慧所有日线数据，不论该股票是否在数据库中存在
+ * @param db sqlite3数据库
+ * @param h5 日线数据存放目的地HDF5文件指针
+ * @param market 市场标识
+ * @param dir_path 源数据所在目录
+ */
+//-----------------------------------------------------------------------------
+void dzh_import_all_day_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path) {
+    assert(db);
+    assert(h5);
+    unsigned int marketid = get_marketid(db, market);
+    if (marketid == 0) {
+        std::cerr << "[import_all_day_data] Invalid market" << market << "!\n";
+        return;
+    }
+
+    if (!fs::exists(dir_path)){
+        std::cerr << "[import_all_day_data] dir_path(" << dir_path << ") not exist!\n";
+        return;
+    }
+
+    if (!fs::is_directory(dir_path)) {
+        std::cerr << "[import_all_day_data] dir_path(" << dir_path << ") is not a directory!\n";
+        return;
+    }
+
     fs::directory_iterator end_iter;
+    fs::directory_iterator count_itr(dir_path);
+    int total = 0;
+    for (; count_itr != end_iter; ++count_itr) {
+        total++;
+    }
+
+    int count = 0, cur = 0;
     fs::directory_iterator dir_itr(dir_path);
     for (; dir_itr != end_iter; ++dir_itr) {
+        progress_bar(++cur, total);
         if (fs::is_directory( dir_itr->status() ) ) {
             continue;
         }
 
         std::string code = fs::basename(dir_itr->path());
-        /*
-        unsigned int stockid = get_stockid(db, marketid, code);
-        if (stockid == 0) {
-            //不在数据库中股票，不导入
-            continue;
-        }*/
-
         std::string table_name = market + code;
-        count += import_day_data_from_file(dir_itr->path().string(), h5, table_name);
-        //count++;
+
+        count += dzh_import_day_data_from_file(dir_itr->path().string(), h5, table_name);
+
         update_h5_index(h5, table_name, INDEX_WEEK);
         update_h5_index(h5, table_name, INDEX_MONTH);
         update_h5_index(h5, table_name, INDEX_QUARTER);
@@ -1482,7 +1806,62 @@ void import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
  * @param dir_path 源数据所在目录
  */
 //-----------------------------------------------------------------------------
-void import_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
+void dzh_import_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path) {
+    assert(db);
+    assert(h5);
+    unsigned int marketid = get_marketid(db, market);
+    if (marketid == 0) {
+        std::cerr << "[import_min5_data] Invalid market" << market << "!\n";
+        return;
+    }
+
+    if (!fs::exists(dir_path)){
+        std::cerr << "[import_min5_data] dir_path(" << dir_path << ") not exist!\n";
+        return;
+    }
+
+    char *zErrMsg = 0;
+    int rc;
+    std::list<StockCode> stock_list;
+    std::stringstream buf(std::stringstream::out);
+    buf << "select stockid,code from stock where marketid=" << marketid;
+    rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_stockcode_list, &stock_list, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return;
+    }
+
+    int total = stock_list.size();
+    int count = 0, cur = 0;
+    std::list<StockCode>::const_iterator stk_iter = stock_list.begin();
+    for (; stk_iter != stock_list.end(); ++stk_iter) {
+        progress_bar(++cur, total);
+        std::string filename = dir_path.string()
+                             + "\\" + stk_iter->code + ".NMN";
+        std::string table_name = market + stk_iter->code;
+
+        count += dzh_import_min5_data_from_file(filename, h5, table_name);
+
+        update_h5_index(h5, table_name, INDEX_MIN15);
+        update_h5_index(h5, table_name, INDEX_MIN30);
+        update_h5_index(h5, table_name, INDEX_MIN60);
+    }
+
+    std::cout << "导入数量：" << count << std::endl;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 导入大智慧所有5分钟线数据，不论股票是否在数据库中存在
+ * @param db sqlite3数据库
+ * @param h5 5分种线数据存放目的地HDF5文件指针
+ * @param market 市场标识
+ * @param dir_path 源数据所在目录
+ */
+//-----------------------------------------------------------------------------
+void dzh_import_all_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
                      const std::string& market, const fs::path& dir_path) {
     assert(db);
     assert(h5);
@@ -1502,25 +1881,26 @@ void import_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
         return;
     }
 
-    int count = 0;
     fs::directory_iterator end_iter;
+    fs::directory_iterator count_itr(dir_path);
+    int total = 0;
+    for (; count_itr != end_iter; ++count_itr) {
+        total++;
+    }
+
+    int count = 0, cur = 0;
     fs::directory_iterator dir_itr(dir_path);
     for (; dir_itr != end_iter; ++dir_itr) {
+        progress_bar(++cur, total);
         if (fs::is_directory( dir_itr->status() ) ) {
             continue;
         }
 
         std::string code = fs::basename(dir_itr->path());
-        /*
-        unsigned int stockid = get_stockid(db, marketid, code);
-        if (stockid == 0) {
-            //不在数据库中股票，不导入
-            continue;
-        }*/
-
         std::string table_name = market + code;
-        count += import_min5_data_from_file(dir_itr->path().string(), h5, table_name);
-        //count++;
+
+        count += dzh_import_min5_data_from_file(dir_itr->path().string(), h5, table_name);
+
         update_h5_index(h5, table_name, INDEX_MIN15);
         update_h5_index(h5, table_name, INDEX_MIN30);
         update_h5_index(h5, table_name, INDEX_MIN60);
@@ -1748,6 +2128,8 @@ void update_stock_date(const SqlitePtr& db, const H5FilePtr& h5file,
         return;
     }
 
+    unsigned int today = get_today_date();
+
     H5::Group h5_group = h5_get_group(h5file, "/data");
     H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
     H5CompTypePtr h5_type = h5_get_data_type();
@@ -1756,7 +2138,11 @@ void update_stock_date(const SqlitePtr& db, const H5FilePtr& h5file,
         //如果没有K线数据，但该股票有效，则将其置为无效
         if (stock_info.valid == 1) {
             buf.str("");
-            buf << "update stock set valid=0, startDate=0, endDate=0 where stockid=" << stockid;
+            //buf << "update stock set valid=0, startDate=0, endDate=0 where stockid=" << stockid;
+            buf << "update stock set valid=0,"
+                << "startDate=" << today << ","
+                << "endDate=" << today
+                << " where stockid=" << stockid;
             rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
             if( rc != SQLITE_OK ){
                 fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -1896,5 +2282,805 @@ void update_all_stock_date(const SqlitePtr& db, const H5FilePtr& h5file,
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
     }
+}
+
+/*****************************************************************************
+ *
+ * 以下为通达信数据导入
+ *
+ *****************************************************************************/
+
+//由tdx_import_stock_name调用
+void tdx_import_stock_name_from_file(const SqlitePtr& db,
+                                     const std::string& filename,
+                                     const std::string& market) {
+    std::map<std::string, std::string> new_stock_dict;
+
+    std::ifstream file(filename.c_str(), std::ifstream::binary);
+    if( !file ) {
+        std::cerr << "[tdx_import_stock_name_from_file] Can't open file: "
+                << filename << std::endl;
+        return;
+    }
+
+    char buffer[315];
+    char stockname[9];
+    char stockcode[7];
+    memset(buffer, 0 , 315);
+    memset(stockname, 0, 9);
+    memset(stockcode, 0, 7);
+
+    file.read(buffer, 50);
+    memset(buffer, 0 , 315);
+
+    while (file.read(buffer, 314)) {
+        memcpy(stockcode, buffer, 6);
+        memcpy(stockname, buffer + 23, 8);
+        memset(buffer, 0, 315);
+        new_stock_dict[stockcode] = GBToUTF8(stockname);
+        //std::cout << stockname  << " " << stockcode << std::endl;
+    }
+
+    file.close();
+
+    unsigned int marketid = get_marketid(db, market);
+
+    std::list<StockInfoByMarket> old_stock_list;
+    char *zErrMsg=0;
+    std::stringstream buf(std::stringstream::out);
+    buf << "select stockid, code, name, valid from stock where marketid = " << marketid;
+    int rc = sqlite3_exec(db.get(), buf.str().c_str(),
+            callback_get_stock_info_by_market,
+            &old_stock_list, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return;
+    }
+
+    //启动SQL更新事务
+    rc = sqlite3_exec(db.get(), "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return;
+    }
+
+    std::map<std::string, unsigned int> old_stock_dict;
+
+    std::map<std::string, std::string>::const_iterator new_dict_iter;
+    std::list<StockInfoByMarket>::const_iterator old_iter = old_stock_list.begin();
+    for (; old_iter != old_stock_list.end(); ++old_iter) {
+        old_stock_dict[old_iter->code] = old_iter->stockid;
+
+        new_dict_iter = new_stock_dict.find(old_iter->code);
+        if (new_dict_iter == new_stock_dict.end()) {
+            //新的代码表中无此股票，则置为无效
+            if (old_iter->valid == 1) {
+                buf.str("");
+                buf << "update stock set valid=0 where stockid=" << old_iter->stockid;
+                rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+                if( rc != SQLITE_OK ){
+                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    std::cout << buf.str() << std::endl;
+                    sqlite3_free(zErrMsg);
+                    return;
+                }
+            }
+
+        } else {
+            //股票名称发生变化，更新股票名称;如果原无效，则置为有效
+            if (old_iter->name != new_dict_iter->second) {
+                buf.str("");
+                buf << "update stock set name='" << new_dict_iter->second << "'"
+                    << " where stockid=" << old_iter->stockid;
+                rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+                if( rc != SQLITE_OK ){
+                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    std::cout << buf.str() << std::endl;
+                    sqlite3_free(zErrMsg);
+                    return;
+                }
+            }
+
+            if (old_iter->valid == 0) {
+                buf.str("");
+                buf << "update stock set valid=1, endDate=99999999 where stockid="
+                    << old_iter->stockid;
+                rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+                if( rc != SQLITE_OK ){
+                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    std::cout << buf.str() << std::endl;
+                    sqlite3_free(zErrMsg);
+                    return;
+                }
+            }
+        }
+    }
+
+    CodeTreePtr codeTree = create_CodeTree(db, market);
+    if (!codeTree) {
+        std::cerr << "[tdx_import_stock_name_from_file] Create CodeTree Failure!\n";
+        return;
+    }
+
+    unsigned int today = get_today_date();
+
+    for (new_dict_iter = new_stock_dict.begin();
+            new_dict_iter != new_stock_dict.end(); ++new_dict_iter) {
+
+        if (old_stock_dict.find(new_dict_iter->first) != old_stock_dict.end())
+            continue;
+
+        unsigned int stocktype = codeTree->getStockType(new_dict_iter->first);
+        if (stocktype == 0)
+            continue;
+
+        buf.str("");
+        buf << "insert into Stock(marketid, code, name, type, valid, startDate, endDate) "
+            << "values ("
+            << marketid << ","
+            << "'" << new_dict_iter->first << "',"
+            << "'" << new_dict_iter->second << "',"
+            << stocktype << ","
+            << "1,"
+            << today << ","
+            << "99999999)";
+        rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+        if( rc != SQLITE_OK ){
+            fprintf(stderr, "SQL error: %s\n", zErrMsg);
+            std::cout << buf.str() << std::endl;
+            sqlite3_free(zErrMsg);
+            return;
+        }
+    }
+
+    //事务提交
+    rc = sqlite3_exec(db.get(), "COMMIT", NULL, NULL, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 从通达信导入更新每只股票的名称和当前是否有效的标志
+ * @detail 如果导入的代码表中不存在对应的代码，则认为该股已失效
+ * @param db sqlite数据库
+ * @param filename 大智慧的证券代码表文件名
+ */
+//-----------------------------------------------------------------------------
+void tdx_import_stock_name(const SqlitePtr& db, const std::string& dirname) {
+    assert(db);
+    tdx_import_stock_name_from_file(db, dirname + "\\T0002\\hq_cache\\shm.tnf", "SH");
+    tdx_import_stock_name_from_file(db, dirname + "\\T0002\\hq_cache\\szm.tnf", "SZ");
+}
+
+
+/*
+ * 获取通达信日线文件记录数
+ */
+int tdx_get_day_data_count(const std::string& filename) {
+    struct stat statbuf;
+    stat(filename.c_str(), &statbuf);
+    int size = statbuf.st_size;
+    return size / sizeof(TdxDayData);
+}
+
+/*
+ * 获取通达信日线文件指定记录的日期
+ */
+unsigned int tdx_get_day_data_date(std::ifstream& file, int pos) {
+    file.seekg(pos * sizeof(TdxDayData), file.beg);
+    unsigned int date = 0;
+    file.read((char *)&date, sizeof(date));
+    return date;
+}
+
+
+/*
+ * 选择通达信日线文件中第一个大于等于lastdate的记录位置
+ */
+int tdx_day_data_find_pos(std::ifstream& file, unsigned int last_date) {
+    file.seekg(0, file.end);
+    int total = file.tellg() / sizeof(TdxDayData);
+
+    int low = 0, high = total - 1;
+    int mid = high / 2;
+    while (mid <= high) {
+        unsigned int cur_date = tdx_get_day_data_date(file, low);
+        if (cur_date > last_date) {
+            mid = low;
+            break;
+        }
+
+        cur_date = tdx_get_day_data_date(file, high);
+        if (cur_date <= last_date) {
+            mid = high + 1;
+            break;
+        }
+
+        cur_date = tdx_get_day_data_date(file, mid);
+        if (cur_date <= last_date) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+
+        mid = (low + high) / 2;
+    }
+
+    return mid;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 从通达信文件中导入日线数据到目标HDF5文件
+ * @param file_name 钱龙或大智慧数据文件名
+ * @param h5file 目标HDF5文件
+ * @param table_name 目标表名
+ * @return 成功导入的数据量
+ */
+//-----------------------------------------------------------------------------
+int tdx_import_day_data_from_file(const SqlitePtr& db,
+                               const std::string& file_name,
+                               const H5FilePtr& h5file,
+                               const std::string& market,
+                               const std::string& code) {
+    int count = 0;
+    int total = tdx_get_day_data_count(file_name);
+    if (total == 0) {
+        return count;
+    }
+
+    std::ifstream file(file_name.c_str(), std::ifstream::binary);
+    if (!file)
+        return count;
+
+    unsigned int marketid = get_marketid(db, market);
+    int stktype = get_stock_type(db, marketid, code);
+
+    std::string table_name = market + code;
+    H5::Group h5_group = h5_get_group(h5file, "/data");
+    H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
+    H5CompTypePtr h5_data_type = h5_get_data_type();
+    hssize_t nrecords = h5_get_nrecords(h5_table);
+
+    unsigned int last_date = 0;
+    H5Record last_record;
+    if (nrecords > 0) {
+        h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
+        last_date = (unsigned int)(last_record.datetime / 10000);
+    }
+
+#if USE_FIND_POS
+    //int total = tdx_get_day_data_count(file);
+    int pos = tdx_day_data_find_pos(file, last_date);
+    if (pos >= total) {
+        goto out;
+    }
+
+    file.seekg(pos * sizeof(TdxDayData), file.beg);
+#endif
+
+    TdxDayData day_data;
+    memset(&day_data, 0, sizeof(TdxDayData));
+    while (file.read((char *)&day_data, sizeof(TdxDayData))){
+
+#if !USE_FIND_POS
+        //如果日期小于或等于最后日期，则跳过
+        if (day_data.date <= last_date) {
+            //std::cout << "invalid date(date <= last_date): " << last_record.datetime << " "
+            //      << last_date << " " << day_data.date << " " << table_name << std::endl;
+            continue;
+        }
+#endif
+
+        //如果日期无效，则跳过
+        if (!invalid_date(day_data.date)) {
+            //std::cout << "!invalid_date(date): " << day_data.date << " " << table_name << std::endl;
+            continue;
+        }
+
+        if (day_data.low > day_data.high
+                || day_data.open > day_data.high
+                || day_data.close > day_data.high
+                || day_data.open < day_data.low
+                || day_data.close < day_data.low
+                || day_data.high < day_data.low) {
+            continue;
+        }
+
+        if (day_data.open == 0 || day_data.high == 0 || day_data.low == 0
+                || day_data.close == 0 || day_data.amount == 0
+                || day_data.count == 0) {
+            continue;
+        }
+
+        H5Record h5_record;
+        h5_record.datetime = (unsigned long long)day_data.date * 10000;
+        h5_record.openPrice = day_data.open * 10;
+        h5_record.highPrice = day_data.high * 10;
+        h5_record.lowPrice = day_data.low * 10;
+        h5_record.closePrice = day_data.close * 10;
+        h5_record.transAmount = (unsigned long long)(day_data.amount * 0.001);
+        if (stktype == 2) {
+            h5_record.transCount = day_data.count;
+        } else {
+            h5_record.transCount = (unsigned long long)(day_data.count * 0.01);
+        }
+
+        h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
+
+        memset(&day_data, 0 , sizeof(TdxDayData));
+        last_date = day_data.date;
+        count++;
+    }
+
+out:
+    file.close();
+    h5_group.close();
+    return count;
+}
+
+
+/*
+ * 获取通达信分钟线文件记录数
+ */
+int tdx_get_min_data_count(const std::string& filename) {
+    struct stat statbuf;
+    stat(filename.c_str(), &statbuf);
+    int size = statbuf.st_size;
+    return size / sizeof(TdxMinData);
+}
+
+unsigned long long tdx_min_data_trans_date(unsigned short yymm, unsigned short hhmm) {
+    int tmp_date = yymm >> 11;
+    int remainder = yymm & 0x7ff;
+    int year = tmp_date + 2004;
+    int month = remainder / 100;
+    int day = remainder % 100;
+    int hh = hhmm / 60;
+    int mm = hhmm % 60;
+    return ((unsigned long long)year*100000000LL
+          + (unsigned long long)month*1000000LL
+          + (unsigned long long)day*10000LL
+          + (unsigned long long)hh*100LL
+          + (unsigned long long)mm);
+}
+
+/*
+ * 获取通达信分钟线文件指定记录的日期
+ */
+unsigned long long tdx_get_min_data_date(std::ifstream& file, int pos) {
+    file.seekg(pos * sizeof(TdxMinData), file.beg);
+    unsigned short date[2];
+    date[0] = 0, date[1] = 0;
+    file.read((char *)&date, 4);
+    return tdx_min_data_trans_date(date[0], date[1]);
+}
+
+
+/*
+ * 选择通达信分钟线文件中第一个大于等于lastdate的记录位置
+ */
+int tdx_min_data_find_pos(std::ifstream& file, unsigned long long last_date) {
+    file.seekg(0, file.end);
+    int pos = file.tellg();
+    int total = pos / sizeof(TdxMinData);
+
+    int low = 0, high = total - 1;
+    int mid = high / 2;
+    while (mid <= high) {
+        unsigned long long cur_date = tdx_get_min_data_date(file, low);
+        if (cur_date > last_date) {
+            mid = low;
+            break;
+        }
+
+        cur_date = tdx_get_min_data_date(file, high);
+        if (cur_date <= last_date) {
+            mid = high + 1;
+            break;
+        }
+
+        cur_date = tdx_get_min_data_date(file, mid);
+        if (cur_date <= last_date) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+
+        mid = (low + high) / 2;
+    }
+
+    return mid;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 从通达信文件中导入1、5分钟线数据到目标HDF5文件
+ * @param file_name 钱龙或大智慧数据文件名
+ * @param h5file 目标HDF5文件
+ * @param table_name 目标表名
+ * @return 返回成功导入的数据量
+ */
+//-----------------------------------------------------------------------------
+int tdx_import_min_data_from_file(const SqlitePtr& db,
+                              const std::string& file_name,
+                              const H5FilePtr& h5file,
+                              const std::string& market,
+                              const std::string& code) {
+    int count = 0;
+    int total = tdx_get_min_data_count(file_name);
+    if (total == 0) {
+        return count;
+    }
+
+    std::ifstream file(file_name.c_str(), std::ifstream::binary);
+    if (!file)
+        return count;
+
+    unsigned int marketid = get_marketid(db, market);
+    int stktype = get_stock_type(db, marketid, code);
+    std::string table_name = market + code;
+
+    H5::Group h5_group = h5_get_group(h5file, "/data");
+    H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
+    H5CompTypePtr h5_data_type = h5_get_data_type();
+    hssize_t nrecords = h5_get_nrecords(h5_table);
+
+    unsigned long long last_datetime = 0;
+    H5Record last_record;
+    if (nrecords > 0) {
+        h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
+        last_datetime = last_record.datetime;
+    }
+
+#if USE_FIND_POS
+    //int total = tdx_get_min_data_count(file);
+    int pos = tdx_min_data_find_pos(file, last_datetime);
+    if (pos >= total)
+        goto out;
+
+    file.seekg(pos * sizeof(TdxMinData), file.beg);
+#endif
+
+    TdxMinData data;
+    unsigned int tempval = 0xFFFFFFFF;
+    memset(&data, 0, sizeof(TdxMinData));
+    while (file.read((char *)&data, sizeof(TdxMinData))){
+        /*int tmp_date = data.date >> 11;
+        int remainder = data.date & 0x7ff;
+        int year = tmp_date + 2004;
+        int month = remainder / 100;
+        int day = remainder % 100;
+        int hh = data.minute / 60;
+        int mm = data.minute % 60;
+        unsigned long long cur_datetime = (unsigned long long)year*100000000LL
+                                        + (unsigned long long)month*1000000LL
+                                        + (unsigned long long)day*10000LL
+                                        + (unsigned long long)hh*100LL
+                                        + (unsigned long long)mm;*/
+        unsigned long long cur_datetime = tdx_min_data_trans_date(data.date, data.minute);
+
+#if !USE_FIND_POS
+        //如果日期小于或等于最后日期，则跳过
+        if (cur_datetime <= last_datetime) {
+            //std::cout << "invalid date(date <= last_date): " << day_data.date << " " << table_name << std::endl;
+            continue;
+        }
+#endif
+
+        //如果日期无效，则跳过
+        unsigned int cur_date = (unsigned int)(cur_datetime / 10000LL);
+        if (!invalid_date(cur_date)) {
+            //std::cout << "!invalid_date(date): " << day_data.date << " " << table_name << std::endl;
+            continue;
+        }
+
+        if (data.low > data.high
+                || data.open > data.high
+                || data.close > data.high
+                || data.open < data.low
+                || data.close < data.low
+                || data.high < data.low) {
+            continue;
+        }
+
+        if (data.open == 0 || data.high == 0 || data.low == 0
+                || data.close == 0 || data.amount == 0
+                || data.count == 0) {
+            continue;
+        }
+
+        H5Record h5_record;
+        h5_record.datetime    = cur_datetime;
+        h5_record.openPrice   = (unsigned int)(data.open * 1000);
+        h5_record.highPrice   = (unsigned int)(data.high * 1000);
+        h5_record.lowPrice    = (unsigned int)(data.low * 1000);
+        h5_record.closePrice  = (unsigned int)(data.close * 1000);
+        h5_record.transAmount = (unsigned long long)(data.amount * 0.001);
+        if (stktype == 2) {
+            h5_record.transCount = data.count;
+        } else {
+            h5_record.transCount = (unsigned long long)(data.count * 0.01);
+        }
+
+        h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
+
+        memset(&data, 0 , sizeof(TdxMinData));
+        last_datetime = cur_datetime;
+        count++;
+    }
+
+out:
+    file.close();
+    h5_group.close();
+    return count;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 导入通达信日线数据
+ * @param db sqlite3数据库
+ * @param h5 日线数据存放目的地HDF5文件指针
+ * @param market 市场标识
+ * @param dir_path 源数据所在目录
+ */
+//-----------------------------------------------------------------------------
+void tdx_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path) {
+    assert(db);
+    assert(h5);
+    unsigned int marketid = get_marketid(db, market);
+    if (marketid == 0) {
+        std::cerr << "[tdx_import_day_data] Invalid market" << market << "!\n";
+        return;
+    }
+
+    if (!fs::exists(dir_path)){
+        std::cerr << "[tdx_import_day_data] dir_path(" << dir_path << ") not exist!\n";
+        return;
+    }
+
+    char *zErrMsg = 0;
+    int rc;
+    std::list<StockCode> stock_list;
+    std::stringstream buf(std::stringstream::out);
+    buf << "select stockid,code from stock where marketid=" << marketid;
+    rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_stockcode_list, &stock_list, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return;
+    }
+
+    int total = stock_list.size();
+    int count = 0, cur = 0;
+    std::list<StockCode>::const_iterator stk_iter = stock_list.begin();
+    for (; stk_iter != stock_list.end(); ++stk_iter) {
+        progress_bar(++cur, total);
+        std::string tmp_market = market;
+        boost::to_lower(tmp_market);
+        std::string filename = dir_path.string()
+                             + "\\" + tmp_market + stk_iter->code + ".day";
+        //std::cout << filename << std::endl;
+        count += tdx_import_day_data_from_file(db, filename, h5, market, stk_iter->code);
+
+        std::string table_name = market + stk_iter->code;
+        update_h5_index(h5, table_name, INDEX_WEEK);
+        update_h5_index(h5, table_name, INDEX_MONTH);
+        update_h5_index(h5, table_name, INDEX_QUARTER);
+        update_h5_index(h5, table_name, INDEX_HALFYEAR);
+        update_h5_index(h5, table_name, INDEX_YEAR);
+    }
+
+    std::cout << "导入数量：" << count << std::endl;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 导入通达信所有日线数据，不管数据库中是否存在该股票
+ * @param db sqlite3数据库
+ * @param h5 日线数据存放目的地HDF5文件指针
+ * @param market 市场标识
+ * @param dir_path 源数据所在目录
+ */
+//-----------------------------------------------------------------------------
+void tdx_import_all_day_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path) {
+    assert(db);
+    assert(h5);
+    unsigned int marketid = get_marketid(db, market);
+    if (marketid == 0) {
+        std::cerr << "[tdx_import_all_day_data] Invalid market" << market << "!\n";
+        return;
+    }
+
+    if (!fs::exists(dir_path)){
+        std::cerr << "[tdx_import_all_day_data] dir_path(" << dir_path << ") not exist!\n";
+        return;
+    }
+
+    if (!fs::is_directory(dir_path)) {
+        std::cerr << "[tdx_import_all_day_data] dir_path(" << dir_path << ") is not a directory!\n";
+        return;
+    }
+
+    fs::directory_iterator end_iter;
+    fs::directory_iterator count_itr(dir_path);
+    int total = 0;
+    for (; count_itr != end_iter; ++count_itr) {
+        total++;
+    }
+
+    int count = 0, cur = 0;
+    fs::directory_iterator dir_itr(dir_path);
+    for (; dir_itr != end_iter; ++dir_itr) {
+        progress_bar(++cur, total);
+        if (fs::is_directory( dir_itr->status() ) ) {
+            continue;
+        }
+
+        std::string table_name = fs::basename(dir_itr->path());
+        if (table_name.length() != 8) {
+            continue;
+        }
+
+        boost::to_upper(table_name);
+        if (table_name.substr(0, 2) != market) {
+            continue;
+        }
+
+        std::string code = table_name.substr(2);
+
+        count += tdx_import_day_data_from_file(db, dir_itr->path().string(),
+                                               h5, market, code);
+
+        update_h5_index(h5, table_name, INDEX_WEEK);
+        update_h5_index(h5, table_name, INDEX_MONTH);
+        update_h5_index(h5, table_name, INDEX_QUARTER);
+        update_h5_index(h5, table_name, INDEX_HALFYEAR);
+        update_h5_index(h5, table_name, INDEX_YEAR);
+    }
+
+    std::cout << "导入数量：" << count << std::endl;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 导入通达信1、5分钟线数据
+ * @param db sqlite3数据库
+ * @param h5 5分种线数据存放目的地HDF5文件指针
+ * @param market 市场标识
+ * @param dir_path 源数据所在目录
+ */
+//-----------------------------------------------------------------------------
+void tdx_import_min_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path) {
+    assert(db);
+    assert(h5);
+    unsigned int marketid = get_marketid(db, market);
+    if (marketid == 0) {
+        std::cerr << "[tdx_import_min_data] Invalid market" << market << "!\n";
+        return;
+    }
+
+    if (!fs::exists(dir_path)){
+        std::cerr << "[tdx_import_min_data] dir_path(" << dir_path << ") not exist!\n";
+        return;
+    }
+
+    bool is_5min = true;
+    std::string suffix;
+    if (dir_path.string().find("fzline") != std::string::npos) {
+        suffix = ".lc5";
+    } else {
+        suffix = ".lc1";
+        is_5min = false;
+    }
+
+    char *zErrMsg = 0;
+    int rc;
+    std::list<StockCode> stock_list;
+    std::stringstream buf(std::stringstream::out);
+    buf << "select stockid,code from stock where marketid=" << marketid;
+    rc = sqlite3_exec(db.get(), buf.str().c_str(), callback_get_stockcode_list, &stock_list, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return;
+    }
+
+    int total = stock_list.size();
+    int count = 0, cur = 0;
+    std::list<StockCode>::const_iterator stk_iter = stock_list.begin();
+    for (; stk_iter != stock_list.end(); ++stk_iter) {
+        progress_bar(++cur, total);
+        std::string tmp_market = market;
+        boost::to_lower(tmp_market);
+        std::string filename = dir_path.string()
+                             + "\\" + tmp_market + stk_iter->code + suffix;
+
+        std::string table_name = market + stk_iter->code;
+        count += tdx_import_min_data_from_file(db, filename, h5, market, stk_iter->code);
+
+        if (is_5min) {
+            update_h5_index(h5, table_name, INDEX_MIN15);
+            update_h5_index(h5, table_name, INDEX_MIN30);
+            update_h5_index(h5, table_name, INDEX_MIN60);
+        }
+    }
+
+    std::cout << "导入数量：" << count << std::endl;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * 导入通达信全部1、5分钟线数据，不过该股票是否在数据库中存在
+ * @param db sqlite3数据库
+ * @param h5 5分种线数据存放目的地HDF5文件指针
+ * @param market 市场标识
+ * @param dir_path 源数据所在目录
+ */
+//-----------------------------------------------------------------------------
+void tdx_import_all_min_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path) {
+    assert(db);
+    assert(h5);
+    unsigned int marketid = get_marketid(db, market);
+    if (marketid == 0) {
+        std::cerr << "[tdx_import_min_data] Invalid market" << market << "!\n";
+        return;
+    }
+
+    if (!fs::exists(dir_path)){
+        std::cerr << "[tdx_import_min_data] dir_path(" << dir_path << ") not exist!\n";
+        return;
+    }
+
+    if (!fs::is_directory(dir_path)) {
+        std::cerr << "[tdx_import_min_data] dir_path(" << dir_path << ") is not a directory!\n";
+        return;
+    }
+
+    fs::directory_iterator end_iter;
+    fs::directory_iterator count_itr(dir_path);
+    int total = 0;
+    for (; count_itr != end_iter; ++count_itr) {
+        total++;
+    }
+
+    int count = 0, cur = 0;
+    fs::directory_iterator dir_itr(dir_path);
+    for (; dir_itr != end_iter; ++dir_itr) {
+        progress_bar(++cur, total);
+        if (fs::is_directory( dir_itr->status() ) ) {
+            continue;
+        }
+
+        std::string table_name = fs::basename(dir_itr->path());
+        boost::to_upper(table_name);
+        if (table_name.length() != 8) {
+            continue;
+        }
+
+        if (table_name.substr(0,2) != market) {
+            continue;
+        }
+
+        std::string code = table_name.substr(2);
+
+        count += tdx_import_min_data_from_file(db, dir_itr->path().string(),
+                                               h5, market, code);
+
+        update_h5_index(h5, table_name, INDEX_MIN15);
+        update_h5_index(h5, table_name, INDEX_MIN30);
+        update_h5_index(h5, table_name, INDEX_MIN60);
+    }
+
+    std::cout << "导入数量：" << count << std::endl;
 }
 

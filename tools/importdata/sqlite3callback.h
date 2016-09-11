@@ -20,6 +20,8 @@ int callback_get_market_stock(void *code, int nCol, char **azVals, char **azCols
 int callback_get_codeprefix(void *codeTree, int nCol, char **azVals, char **azCols);
 int callback_get_stockid(void *stockid, int nCol, char **azVals, char **azCols);
 int callback_get_datemap_of_stockweight(void *output, int nCol, char **azVals, char **azCols);
+int callback_get_stock_type(void *stktype, int nCol, char **azVals, char **azCols);
+
 
 struct SimpleStockRecord {
     unsigned int stockid;
@@ -47,5 +49,14 @@ struct StockCode {
     std::string code;
 };
 int callback_get_stockcode_list(void *output, int nCol, char **azVals, char **azCols);
+
+struct StockInfoByMarket {
+    unsigned int stockid;
+    std::string code;
+    std::string name;
+    unsigned int valid;
+};
+int callback_get_stock_info_by_market(void *output, int nCol, char **azVals, char **azCols);
+
 
 #endif /* SQLITE3CALLBACK_H_ */

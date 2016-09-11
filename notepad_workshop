@@ -61,6 +61,11 @@
         <File name="tools\hikyuu\ipython&#x914D;&#x7F6E;&#x8BF4;&#x660E;.txt" />
         <File name="tools\hikyuu\matplotlibrc" />
         <File name="tools\hikyuu\__init__.py" />
+        <Folder name="tools">
+            <Folder name="importdata">
+                <File name="tools\hikyuu\tools\importdata\importdata.py" />
+            </Folder>
+        </Folder>
     </Project>
     <Project name="hikyuu_doc">
         <File name="tools\hikyuu\docs\source\conf.py" />

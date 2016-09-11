@@ -49,9 +49,12 @@ SqlitePtr open_db(const std::string& dbname);
 //根据指定的数据库创建脚本，在数据库中创建相关表格、索引及基础数据
 bool create_database(const SqlitePtr& db, const std::string& filename);
 
-void import_stock_info(const SqlitePtr& db, const std::string& market, const fs::path& path);
-void import_stock_name(const SqlitePtr& db, const std::string& filename);
-void import_stock_weight(const SqlitePtr& db, const std::string& market, const fs::path& path);
+void import_stock_weight(const SqlitePtr& db,
+                         const std::string& market,
+                         const std::string& path);
+
+void dzh_import_stock_name(const SqlitePtr& db, const std::string& filename);
+void tdx_import_stock_name(const SqlitePtr& db, const std::string& dirname);
 
 std::string GBToUTF8(char *src_str);
 bool invalid_date(unsigned int date);
@@ -89,11 +92,25 @@ struct H5IndexRecord{
 };
 
 H5FilePtr h5_open_file(const std::string& filename);
-void import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
+void dzh_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
                      const std::string& market, const fs::path& dir_path);
-void import_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
+void dzh_import_all_day_data(const SqlitePtr& db, const H5FilePtr& h5,
                      const std::string& market, const fs::path& dir_path);
+void dzh_import_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path);
+void dzh_import_all_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path);
+
 void import_min1_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path);
+
+void tdx_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path);
+void tdx_import_min_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path);
+void tdx_import_all_day_data(const SqlitePtr& db, const H5FilePtr& h5,
+                     const std::string& market, const fs::path& dir_path);
+void tdx_import_all_min_data(const SqlitePtr& db, const H5FilePtr& h5,
                      const std::string& market, const fs::path& dir_path);
 
 void update_all_stock_date(const SqlitePtr& db, const H5FilePtr& h5file,
@@ -114,6 +131,39 @@ struct QianLongData {
 };
 
 bool invalid_QianLongData(const QianLongData& data);
+
+/******************************************************************************
+ * 通达信K线数据结构
+ *****************************************************************************/
+struct TdxDayData {
+    unsigned int date;
+    unsigned int open;
+    unsigned int high;
+    unsigned int low;
+    unsigned int close;
+    float        amount;
+    unsigned int count;
+    unsigned int other;
+};
+
+struct TdxMinData {
+    unsigned short date;
+    unsigned short minute;
+    float open;
+    float high;
+    float low;
+    float close;
+    float amount;
+    unsigned int count;
+    unsigned int other;
+};
+
+struct TdxStockCodeTable {
+    char code[6];
+    char unknown[17];
+    char name[8];
+    char other[283];
+};
 
 enum H5_INDEX_TYPE {
     INDEX_WEEK,
