@@ -869,7 +869,7 @@ void h5_read_records(H5::DataSet& dataset, H5::CompType h5Type, hsize_t start, h
  *  @param H5::DataSet& dataset 指定的数据集
  *  @param H5::CompType& h5Type 数量类型
  *  @param hsize_t nrecords 欲写入的数据记录总数
- *  @param *data 带写入的数据记录集
+ *  @param *data 待写入的数据记录集
  */
 //-----------------------------------------------------------------------------
 void h5_append_records(H5::DataSet& dataset, H5::CompType h5Type, hsize_t nrecords, void *data){
@@ -948,6 +948,19 @@ H5::Group h5_get_group(const H5FilePtr& h5file, const std::string& name) {
 
 //-----------------------------------------------------------------------------
 /**
+ * 判断指定名称的数据表是否存在
+ * @param group 指定的HDF5 Group路径
+ * @param name 指定的股票表名（market+code，如 SH000001，SZ000001）
+ * @return 对应的K线数据集
+ */
+//-----------------------------------------------------------------------------
+bool h5_is_exist_data_table(const H5::Group& group, const std::string& name) {
+    hid_t dataset_id = H5Dopen(group.getId(), name.c_str());
+    return dataset_id < 0 ? false : true;
+}
+
+//-----------------------------------------------------------------------------
+/**
  * 打开指定股票的K线数据表，如果不存在，则创建新表并返回
  * @param group 指定的HDF5 Group路径
  * @param name 指定的股票表名（market+code，如 SH000001，SZ000001）
@@ -1016,9 +1029,10 @@ bool invalid_QianLongData(const QianLongData& data) {
         return false;
     }
 
-    //价格或成交量数据中存在为0的数据，认为无效
-    if (data.open == 0 || data.high == 0 || data.low == 0 || data.close == 0
-            || data.amount == 0 || data.count == 0) {
+    //价格数据中存在为0的数据 或 成交量与成交金额同时为零，认为无效
+    if ((data.amount == 0 && data.count == 0)
+            || data.open == 0 || data.high == 0
+            || data.low == 0 || data.close == 0) {
         return false;
     }
     return true;
@@ -1293,6 +1307,9 @@ std::string get_h5_index_table_name(H5_INDEX_TYPE ix_type) {
 //-----------------------------------------------------------------------------
 void update_h5_index(const H5FilePtr& h5file, const std::string& table_name, H5_INDEX_TYPE ix_type) {
     H5::Group h5_data_group = h5_get_group(h5file, "/data");
+    if (!h5_is_exist_data_table(h5_data_group, table_name))
+        return;
+
     H5::DataSet h5_data_table = h5_get_data_table(h5_data_group, table_name);
 
     H5::Group h5_index_group = h5_get_group(h5file, get_h5_index_table_name(ix_type));
@@ -1362,6 +1379,9 @@ void update_h5_index(const H5FilePtr& h5file, const std::string& table_name, H5_
  * 获取大智慧日线文件记录数
  */
 int dzh_get_day_data_count(const std::string& filename) {
+    if (!fs::exists(filename))
+        return 0;
+
     struct stat statbuf;
     stat(filename.c_str(), &statbuf);
     int size = statbuf.st_size;
@@ -1426,40 +1446,43 @@ int dzh_day_data_find_pos(std::ifstream& file, unsigned int last_date) {
 int dzh_import_day_data_from_file(const std::string& file_name,
                                   const H5FilePtr& h5file,
                                   const std::string& table_name) {
-	int count = 0;
     int total = dzh_get_day_data_count(file_name);
-    if (total == 0) {
-        return count;
-    }
+    if (total == 0)
+        return 0;
 
     std::ifstream file(file_name.c_str(), std::ifstream::binary);
     if (!file)
-        return count;
+        return 0;
 
-
+    H5::DataSet h5_table;
+    unsigned int last_date = 0;
+    H5CompTypePtr h5_data_type = h5_get_data_type();
 
     H5::Group h5_group = h5_get_group(h5file, "/data");
-    H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
-    H5CompTypePtr h5_data_type = h5_get_data_type();
-    hssize_t nrecords = h5_get_nrecords(h5_table);
-
-    unsigned int last_date = 0;
-    H5Record last_record;
-    if (nrecords > 0) {
-        h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
-        last_date = (unsigned int)(last_record.datetime / 10000);
+    bool is_exist_data_table = h5_is_exist_data_table(h5_group, table_name);
+    if (is_exist_data_table) {
+        h5_table = h5_get_data_table(h5_group, table_name);
+        hssize_t nrecords = h5_get_nrecords(h5_table);
+        if (nrecords > 0) {
+            H5Record last_record;
+            h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
+            last_date = (unsigned int)(last_record.datetime / 10000);
+        }
     }
 
 #if USE_FIND_POS
     //int total = dzh_get_day_data_count(file);
     int pos = dzh_day_data_find_pos(file, last_date);
     if (pos >= total) {
-        goto out;
+        file.close();
+        h5_group.close();
+        return 0;
     }
 
     file.seekg(pos * sizeof(QianLongData), file.beg);
 #endif
 
+    std::vector<H5Record> h5_buffer;
     QianLongData day_data;
     memset(&day_data, 0, sizeof(QianLongData));
     while (file.read((char *)&day_data, sizeof(QianLongData))){
@@ -1493,23 +1516,33 @@ int dzh_import_day_data_from_file(const std::string& file_name,
         h5_record.transAmount = day_data.amount;
         h5_record.transCount = day_data.count;
 
-        h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
+        h5_buffer.push_back(h5_record);
+        //h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
 
         memset(&day_data, 0 , sizeof(QianLongData));
         last_date = day_data.date;
-        count++;
     }
 
-out:
+    if (h5_buffer.size() > 0) {
+        if (!is_exist_data_table)
+            h5_table = h5_get_data_table(h5_group, table_name);
+
+        h5_append_records(h5_table, *h5_data_type,
+                h5_buffer.size(), h5_buffer.data());
+    }
+
     file.close();
     h5_group.close();
-    return count;
+    return h5_buffer.size();
 }
 
 /*
  * 获取大智慧5分钟线文件记录数
  */
 int dzh_get_min_data_count(const std::string& filename) {
+    if (!fs::exists(filename))
+        return 0;
+
     struct stat statbuf;
     stat(filename.c_str(), &statbuf);
     int size = statbuf.st_size;
@@ -1591,52 +1624,49 @@ int dzh_min_data_find_pos(std::ifstream& file, unsigned long long last_date) {
 //-----------------------------------------------------------------------------
 int dzh_import_min5_data_from_file(const std::string& file_name, const H5FilePtr& h5file,
                                const std::string& table_name) {
-    int count = 0;
     int total = dzh_get_min_data_count(file_name);
     if (total == 0) {
-        return count;
+        return 0;
     }
 
     std::ifstream file(file_name.c_str(), std::ifstream::binary);
     if (!file)
-        return count;
+        return 0;
+
+    H5::DataSet h5_table;
+    H5CompTypePtr h5_data_type = h5_get_data_type();
+    unsigned long long last_datetime = 0;
 
     H5::Group h5_group = h5_get_group(h5file, "/data");
-    H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
-    H5CompTypePtr h5_data_type = h5_get_data_type();
-    hssize_t nrecords = h5_get_nrecords(h5_table);
-
-    unsigned long long last_datetime = 0;
-    H5Record last_record;
-    if (nrecords > 0) {
-        h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
-        last_datetime = last_record.datetime;
+    bool is_exist_data_table = h5_is_exist_data_table(h5_group, table_name);
+    if (is_exist_data_table) {
+        h5_table = h5_get_data_table(h5_group, table_name);
+        hssize_t nrecords = h5_get_nrecords(h5_table);
+        H5Record last_record;
+        if (nrecords > 0) {
+            h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
+            last_datetime = last_record.datetime;
+        }
     }
 
 #if USE_FIND_POS
     //int total = dzh_get_min_data_count(file);
     int pos = dzh_min_data_find_pos(file, last_datetime);
-    if (pos >= total)
-        goto out;
+    if (pos >= total) {
+        file.close();
+        h5_group.close();
+        return 0;
+    }
 
     file.seekg(pos * sizeof(QianLongData), file.beg);
 #endif
 
+    std::vector<H5Record> h5_buffer;
     QianLongData data;
     unsigned int tempval = 0xFFFFFFFF;
     memset(&data, 0, sizeof(QianLongData));
     while (file.read((char *)&data, sizeof(QianLongData))){
-        /*unsigned int year, month, day, hh, mm;
-        year = data.date >> 20;
-        month = ((data.date << 12) & tempval) >> 28;
-        day = ((data.date << 16) & tempval) >> 27;
-        hh = ((data.date << 21) & tempval) >> 27;
-        mm = ((data.date << 26) & tempval) >> 26;
-        unsigned long long cur_datetime = (unsigned long long)year*100000000LL
-                                        + (unsigned long long)month*1000000LL
-                                        + (unsigned long long)day*10000LL
-                                        + (unsigned long long)hh*100LL
-                                        + (unsigned long long)mm;*/
+
         unsigned long long cur_datetime = dzh_min_data_trans_date(data.date);
 
 #if !USE_FIND_POS
@@ -1667,17 +1697,24 @@ int dzh_import_min5_data_from_file(const std::string& file_name, const H5FilePtr
         h5_record.transAmount = data.amount;
         h5_record.transCount = data.count;
 
-        h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
+        h5_buffer.push_back(h5_record);
+        //h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
 
         memset(&data, 0 , sizeof(QianLongData));
         last_datetime = cur_datetime;
-        count++;
     }
 
-out:
+    if (h5_buffer.size() > 0) {
+        if (!is_exist_data_table)
+            h5_table = h5_get_data_table(h5_group, table_name);
+
+        h5_append_records(h5_table, *h5_data_type,
+                          h5_buffer.size(), h5_buffer.data());
+    }
+
     file.close();
     h5_group.close();
-    return count;
+    return h5_buffer.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -2131,11 +2168,40 @@ void update_stock_date(const SqlitePtr& db, const H5FilePtr& h5file,
     unsigned int today = get_today_date();
 
     H5::Group h5_group = h5_get_group(h5file, "/data");
-    H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
+    //不能直接使用h5_get_data_table，会创建空数据集，造成脏数据
+    //H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
+    H5::DataSet h5_table;
+    hssize_t nrecords = 0;
+    if (h5_is_exist_data_table(h5_group, table_name)) {
+        h5_table = h5_get_data_table(h5_group, table_name);
+        nrecords = h5_get_nrecords(h5_table);
+    }
+
     H5CompTypePtr h5_type = h5_get_data_type();
-    hssize_t nrecords = h5_get_nrecords(h5_table);
+    //hssize_t nrecords = h5_get_nrecords(h5_table);
     if (nrecords == 0) {
-        //如果没有K线数据，但该股票有效，则将其置为无效
+        //如果没有历史K线数据，不管该股票是否有效，直接将其删除
+        buf.str("");
+        buf << "delete from stock where stockid=" << stockid;
+        rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+        if( rc != SQLITE_OK ){
+            fprintf(stderr, "SQL error: %s\n", zErrMsg);
+            sqlite3_free(zErrMsg);
+            return;
+        }
+
+        buf.str("");
+        buf << "delete from stkweight where stockid=" << stockid;
+        rc = sqlite3_exec(db.get(), buf.str().c_str(), NULL, NULL, &zErrMsg);
+        if( rc != SQLITE_OK ){
+            fprintf(stderr, "SQL error: %s\n", zErrMsg);
+            sqlite3_free(zErrMsg);
+            return;
+        }
+
+        return;
+
+        /*//如果没有K线数据，但该股票有效，则将其置为无效
         if (stock_info.valid == 1) {
             buf.str("");
             //buf << "update stock set valid=0, startDate=0, endDate=0 where stockid=" << stockid;
@@ -2150,7 +2216,7 @@ void update_stock_date(const SqlitePtr& db, const H5FilePtr& h5file,
                 return;
             }
         }
-        return;
+        return;*/
     }
 
     H5Record h5_record;
@@ -2462,6 +2528,9 @@ void tdx_import_stock_name(const SqlitePtr& db, const std::string& dirname) {
  * 获取通达信日线文件记录数
  */
 int tdx_get_day_data_count(const std::string& filename) {
+    if (!fs::exists(filename))
+        return 0;
+
     struct stat statbuf;
     stat(filename.c_str(), &statbuf);
     int size = statbuf.st_size;
@@ -2528,42 +2597,47 @@ int tdx_import_day_data_from_file(const SqlitePtr& db,
                                const H5FilePtr& h5file,
                                const std::string& market,
                                const std::string& code) {
-    int count = 0;
     int total = tdx_get_day_data_count(file_name);
     if (total == 0) {
-        return count;
+        return 0;
     }
 
     std::ifstream file(file_name.c_str(), std::ifstream::binary);
     if (!file)
-        return count;
+        return 0;
 
     unsigned int marketid = get_marketid(db, market);
     int stktype = get_stock_type(db, marketid, code);
 
     std::string table_name = market + code;
-    H5::Group h5_group = h5_get_group(h5file, "/data");
-    H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
     H5CompTypePtr h5_data_type = h5_get_data_type();
-    hssize_t nrecords = h5_get_nrecords(h5_table);
+    H5::Group h5_group = h5_get_group(h5file, "/data");
 
     unsigned int last_date = 0;
-    H5Record last_record;
-    if (nrecords > 0) {
-        h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
-        last_date = (unsigned int)(last_record.datetime / 10000);
+    H5::DataSet h5_table;
+    bool is_exist_data_table = h5_is_exist_data_table(h5_group, table_name);
+    if (is_exist_data_table) {
+        h5_table = h5_get_data_table(h5_group, table_name);
+        hssize_t nrecords = h5_get_nrecords(h5_table);
+        H5Record last_record;
+        if (nrecords > 0) {
+            h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
+            last_date = (unsigned int)(last_record.datetime / 10000);
+        }
     }
 
 #if USE_FIND_POS
-    //int total = tdx_get_day_data_count(file);
     int pos = tdx_day_data_find_pos(file, last_date);
     if (pos >= total) {
-        goto out;
+        file.close();
+        h5_group.close();
+        return 0;
     }
 
     file.seekg(pos * sizeof(TdxDayData), file.beg);
 #endif
 
+    std::vector<H5Record> h5_buffer;
     TdxDayData day_data;
     memset(&day_data, 0, sizeof(TdxDayData));
     while (file.read((char *)&day_data, sizeof(TdxDayData))){
@@ -2592,9 +2666,10 @@ int tdx_import_day_data_from_file(const SqlitePtr& db,
             continue;
         }
 
-        if (day_data.open == 0 || day_data.high == 0 || day_data.low == 0
-                || day_data.close == 0 || day_data.amount == 0
-                || day_data.count == 0) {
+        if ((day_data.amount == 0 && day_data.count == 0)
+                || day_data.open == 0 || day_data.high == 0
+                || day_data.low == 0
+                || day_data.close == 0) {
             continue;
         }
 
@@ -2611,17 +2686,24 @@ int tdx_import_day_data_from_file(const SqlitePtr& db,
             h5_record.transCount = (unsigned long long)(day_data.count * 0.01);
         }
 
-        h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
+        h5_buffer.push_back(h5_record);
+        //h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
 
         memset(&day_data, 0 , sizeof(TdxDayData));
         last_date = day_data.date;
-        count++;
     }
 
-out:
+    if (h5_buffer.size() > 0) {
+        if (!is_exist_data_table)
+            h5_table = h5_get_data_table(h5_group, table_name);
+
+        h5_append_records(h5_table, *h5_data_type,
+                          h5_buffer.size(), h5_buffer.data());
+    }
+
     file.close();
     h5_group.close();
-    return count;
+    return h5_buffer.size();
 }
 
 
@@ -2629,6 +2711,9 @@ out:
  * 获取通达信分钟线文件记录数
  */
 int tdx_get_min_data_count(const std::string& filename) {
+    if (!fs::exists(filename))
+        return 0;
+
     struct stat statbuf;
     stat(filename.c_str(), &statbuf);
     int size = statbuf.st_size;
@@ -2712,57 +2797,53 @@ int tdx_import_min_data_from_file(const SqlitePtr& db,
                               const H5FilePtr& h5file,
                               const std::string& market,
                               const std::string& code) {
-    int count = 0;
     int total = tdx_get_min_data_count(file_name);
     if (total == 0) {
-        return count;
+        return 0;
     }
 
     std::ifstream file(file_name.c_str(), std::ifstream::binary);
     if (!file)
-        return count;
+        return 0;
 
     unsigned int marketid = get_marketid(db, market);
     int stktype = get_stock_type(db, marketid, code);
     std::string table_name = market + code;
 
-    H5::Group h5_group = h5_get_group(h5file, "/data");
-    H5::DataSet h5_table = h5_get_data_table(h5_group, table_name);
     H5CompTypePtr h5_data_type = h5_get_data_type();
-    hssize_t nrecords = h5_get_nrecords(h5_table);
+    H5::Group h5_group = h5_get_group(h5file, "/data");
 
     unsigned long long last_datetime = 0;
-    H5Record last_record;
-    if (nrecords > 0) {
-        h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
-        last_datetime = last_record.datetime;
+    H5::DataSet h5_table;
+    bool is_exist_data_table = h5_is_exist_data_table(h5_group, table_name);
+    if (is_exist_data_table) {
+        h5_table = h5_get_data_table(h5_group, table_name);
+        hssize_t nrecords = h5_get_nrecords(h5_table);
+        H5Record last_record;
+        if (nrecords > 0) {
+            h5_read_records(h5_table, *h5_data_type, nrecords-1, 1, &last_record);
+            last_datetime = last_record.datetime;
+        }
     }
 
 #if USE_FIND_POS
     //int total = tdx_get_min_data_count(file);
     int pos = tdx_min_data_find_pos(file, last_datetime);
-    if (pos >= total)
-        goto out;
+    if (pos >= total) {
+        file.close();
+        h5_group.close();
+        return 0;
+    }
 
     file.seekg(pos * sizeof(TdxMinData), file.beg);
 #endif
 
+    std::vector<H5Record> h5_buffer;
     TdxMinData data;
     unsigned int tempval = 0xFFFFFFFF;
     memset(&data, 0, sizeof(TdxMinData));
     while (file.read((char *)&data, sizeof(TdxMinData))){
-        /*int tmp_date = data.date >> 11;
-        int remainder = data.date & 0x7ff;
-        int year = tmp_date + 2004;
-        int month = remainder / 100;
-        int day = remainder % 100;
-        int hh = data.minute / 60;
-        int mm = data.minute % 60;
-        unsigned long long cur_datetime = (unsigned long long)year*100000000LL
-                                        + (unsigned long long)month*1000000LL
-                                        + (unsigned long long)day*10000LL
-                                        + (unsigned long long)hh*100LL
-                                        + (unsigned long long)mm;*/
+
         unsigned long long cur_datetime = tdx_min_data_trans_date(data.date, data.minute);
 
 #if !USE_FIND_POS
@@ -2789,9 +2870,9 @@ int tdx_import_min_data_from_file(const SqlitePtr& db,
             continue;
         }
 
-        if (data.open == 0 || data.high == 0 || data.low == 0
-                || data.close == 0 || data.amount == 0
-                || data.count == 0) {
+        if ((data.amount == 0 && data.count == 0)
+                || data.open == 0 || data.high == 0
+                || data.low == 0 || data.close == 0) {
             continue;
         }
 
@@ -2808,17 +2889,24 @@ int tdx_import_min_data_from_file(const SqlitePtr& db,
             h5_record.transCount = (unsigned long long)(data.count * 0.01);
         }
 
-        h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
+        h5_buffer.push_back(h5_record);
+        //h5_append_records(h5_table, *h5_data_type, 1, &h5_record);
 
         memset(&data, 0 , sizeof(TdxMinData));
         last_datetime = cur_datetime;
-        count++;
     }
 
-out:
+    if (h5_buffer.size() > 0) {
+        if (!is_exist_data_table)
+            h5_table = h5_get_data_table(h5_group, table_name);
+
+        h5_append_records(h5_table, *h5_data_type,
+                          h5_buffer.size(), h5_buffer.data());
+    }
+
     file.close();
     h5_group.close();
-    return count;
+    return h5_buffer.size();
 }
 
 //-----------------------------------------------------------------------------

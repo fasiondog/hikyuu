@@ -195,32 +195,6 @@ int main() {
 
     ///////////////////////////////////////////////////////////////////////
     ///
-    /// 导入权息数据
-    ///
-    ///////////////////////////////////////////////////////////////////////
-
-    //导入上证权息信息
-    if (ini_parser.hasOption("weight", "sh")) {
-        std::string src_path = ini_parser.get("weight", "sh");
-        std::cout << "导入上证权息信息: " << src_path << std::endl;
-        gettimeofday(&start_time, NULL);
-        import_stock_weight(db, "SH", src_path);
-        gettimeofday(&end_time, NULL);
-        std::cout << mydifftime(end_time, start_time) << "s" << std::endl << std::endl;
-    }
-
-    //导入深证权息信息
-    if (ini_parser.hasOption("weight", "sz")) {
-        std::string src_path = ini_parser.get("weight", "sz");
-        std::cout << "导入深证权息信息: " << src_path << std::endl;
-        gettimeofday(&start_time, NULL);
-        import_stock_weight(db, "SZ", src_path);
-        gettimeofday(&end_time, NULL);
-        std::cout << mydifftime(end_time, start_time) << "s" << std::endl << std::endl;
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    ///
     /// 导入K线数据
     ///
     ///////////////////////////////////////////////////////////////////////
@@ -311,6 +285,52 @@ int main() {
                 std::cout << mydifftime(end_time, start_time) << "s" << std::endl << std::endl;
             }
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    ///
+    /// 更新股票日期信息
+    ///
+    ///////////////////////////////////////////////////////////////////////
+
+    std::cout << "更新股票日期信息..." << std::endl;
+    gettimeofday(&start_time, NULL);
+    if (h5file_dict.find("sh_day") != h5file_dict.end()) {
+        std::cout << "更新上证股票日期信息..." << std::endl;
+        update_all_stock_date(db, h5file_dict["sh_day"], "SH");
+    }
+    if (h5file_dict.find("sz_day") != h5file_dict.end()) {
+        std::cout << "更新深证股票日期信息..." << std::endl;
+        update_all_stock_date(db, h5file_dict["sz_day"], "SZ");
+    }
+    gettimeofday(&end_time, NULL);
+    std::cout << mydifftime(end_time, start_time) << "s" << std::endl << std::endl;
+
+    ///////////////////////////////////////////////////////////////////////
+    ///
+    /// 导入权息数据
+    /// （放在最后，因为在更新股票日期时，会将没有K线数据的无效股票删除，这样不用重复导入再删除
+    ///
+    ///////////////////////////////////////////////////////////////////////
+
+    //导入上证权息信息
+    if (ini_parser.hasOption("weight", "sh")) {
+        std::string src_path = ini_parser.get("weight", "sh");
+        std::cout << "导入上证权息信息: " << src_path << std::endl;
+        gettimeofday(&start_time, NULL);
+        import_stock_weight(db, "SH", src_path);
+        gettimeofday(&end_time, NULL);
+        std::cout << mydifftime(end_time, start_time) << "s" << std::endl << std::endl;
+    }
+
+    //导入深证权息信息
+    if (ini_parser.hasOption("weight", "sz")) {
+        std::string src_path = ini_parser.get("weight", "sz");
+        std::cout << "导入深证权息信息: " << src_path << std::endl;
+        gettimeofday(&start_time, NULL);
+        import_stock_weight(db, "SZ", src_path);
+        gettimeofday(&end_time, NULL);
+        std::cout << mydifftime(end_time, start_time) << "s" << std::endl << std::endl;
     }
 
     gettimeofday(&total_end_time, NULL);

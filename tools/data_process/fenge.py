@@ -123,7 +123,7 @@ if __name__ == "__main__":
     
     data_type = '5min' #only '5min' or '1min'
     market = 'sz'
-    year = 2015
+    year = 2016
     src_file_name = src_dir + '\\' + market + '_' + data_type + '.h5' #d:\\stock\\sh_5min.h5'
     dest_file_name = dst_dir + "\\" + market + "\\" + data_type + "\\" + str(year) + ".h5"
     #dest_file_name = u'D:\\快盘\\80.stock\\stock\\sh\\5min\\2013.h5'
@@ -132,6 +132,7 @@ if __name__ == "__main__":
     fenge(src_file_name, dest_file_name, start_date, end_date)
 	
     endtime = time.time()
+    print("\n")
     print("%.2fs" % (endtime-starttime))
     print("%.2fm" % ((endtime-starttime)/60))
     

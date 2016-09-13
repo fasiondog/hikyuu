@@ -6,7 +6,7 @@ import tables as tbl
 
 dirname = 'c:\stock'    
 
-connect = sqlite3.connect(dirname + '\hikyuu-stock.db')
+connect = sqlite3.connect(dirname + '\stock.db')
 cur = connect.cursor()
 a = cur.execute("select market.market, stock.code from stock join market on stock.marketid = market.marketid")
 stk_list = [ s[0]+s[1] for s in a]
@@ -17,8 +17,10 @@ def clear_empty_table(h5file, group_name):
     for node in group:
         if 0 == node.nrows:
             node_list.append(node.name)
+            print(node.name, " nrows = 0")
         elif node.name not in stk_list:
             node_list.append(node.name)
+            print(node.name, " is not in stk_list")
         else:
             pass
     for node in node_list:
