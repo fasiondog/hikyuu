@@ -17,10 +17,10 @@ def clear_empty_table(h5file, group_name):
     for node in group:
         if 0 == node.nrows:
             node_list.append(node.name)
-            print(node.name, " nrows = 0")
+            #print(node.name, " nrows = 0")
         elif node.name not in stk_list:
             node_list.append(node.name)
-            print(node.name, " is not in stk_list")
+            #print(node.name, " is not in stk_list")
         else:
             pass
     for node in node_list:
@@ -100,14 +100,14 @@ h5file = tbl.open_file(srcfilename, "a")
 print("清理5分钟线数据")
 clear_empty_table(h5file, '/data')
 
-print("\n清理15分钟线数据")
-clear_empty_table(h5file, '/min15')
+#print("\n清理15分钟线数据")
+#clear_empty_table(h5file, '/min15')
 
-print("\n清理30分钟线数据")
-clear_empty_table(h5file, '/min30')
+#print("\n清理30分钟线数据")
+#clear_empty_table(h5file, '/min30')
 
-print("\n清理60分钟线数据")
-clear_empty_table(h5file, '/min60')
+#print("\n清理60分钟线数据")
+#clear_empty_table(h5file, '/min60')
 
 h5file.close()
 
@@ -123,14 +123,14 @@ h5file = tbl.open_file(srcfilename, "a")
 print("清理5分钟线数据")
 clear_empty_table(h5file, '/data')
 
-print("\n清理15分钟线数据")
-clear_empty_table(h5file, '/min15')
+#print("\n清理15分钟线数据")
+#clear_empty_table(h5file, '/min15')
 
-print("\n清理30分钟线数据")
-clear_empty_table(h5file, '/min30')
+#print("\n清理30分钟线数据")
+#clear_empty_table(h5file, '/min30')
 
-print("\n清理60分钟线数据")
-clear_empty_table(h5file, '/min60')
+#print("\n清理60分钟线数据")
+#clear_empty_table(h5file, '/min60')
 
 h5file.close()
 

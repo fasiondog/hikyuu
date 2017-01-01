@@ -19,4 +19,8 @@
 /boost-build.jam
 /Jamroot
 /test/data/tmp
+/tools/hikyuu/build
+/tools/hikyuu/dist
+/tools/hikyuu/Hikyuu.egg-info
 *~
+

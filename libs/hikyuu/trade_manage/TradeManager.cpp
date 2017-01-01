@@ -1023,7 +1023,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
 
     if (m_cash < roundEx(money + cost.total, precision)) {
         HKU_WARN(datetime << " " << stock.market_code()
-                << " Can't buy, need cash(" << money
+                << " Can't buy, need cash(" << roundEx(money + cost.total, precision)
                 << ") > current cash(" << m_cash
                 << ")! [TradeManager::buy]");
         return result;

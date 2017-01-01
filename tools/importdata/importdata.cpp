@@ -1770,6 +1770,8 @@ void dzh_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
         update_h5_index(h5, table_name, INDEX_QUARTER);
         update_h5_index(h5, table_name, INDEX_HALFYEAR);
         update_h5_index(h5, table_name, INDEX_YEAR);
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
@@ -1829,6 +1831,8 @@ void dzh_import_all_day_data(const SqlitePtr& db, const H5FilePtr& h5,
         update_h5_index(h5, table_name, INDEX_QUARTER);
         update_h5_index(h5, table_name, INDEX_HALFYEAR);
         update_h5_index(h5, table_name, INDEX_YEAR);
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
@@ -1884,6 +1888,8 @@ void dzh_import_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
         update_h5_index(h5, table_name, INDEX_MIN15);
         update_h5_index(h5, table_name, INDEX_MIN30);
         update_h5_index(h5, table_name, INDEX_MIN60);
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
@@ -1941,6 +1947,8 @@ void dzh_import_all_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
         update_h5_index(h5, table_name, INDEX_MIN15);
         update_h5_index(h5, table_name, INDEX_MIN30);
         update_h5_index(h5, table_name, INDEX_MIN60);
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
@@ -2963,6 +2971,8 @@ void tdx_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
         update_h5_index(h5, table_name, INDEX_QUARTER);
         update_h5_index(h5, table_name, INDEX_HALFYEAR);
         update_h5_index(h5, table_name, INDEX_YEAR);
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
@@ -3032,6 +3042,8 @@ void tdx_import_all_day_data(const SqlitePtr& db, const H5FilePtr& h5,
         update_h5_index(h5, table_name, INDEX_QUARTER);
         update_h5_index(h5, table_name, INDEX_HALFYEAR);
         update_h5_index(h5, table_name, INDEX_YEAR);
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
@@ -3100,6 +3112,8 @@ void tdx_import_min_data(const SqlitePtr& db, const H5FilePtr& h5,
             update_h5_index(h5, table_name, INDEX_MIN30);
             update_h5_index(h5, table_name, INDEX_MIN60);
         }
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
@@ -3167,6 +3181,8 @@ void tdx_import_all_min_data(const SqlitePtr& db, const H5FilePtr& h5,
         update_h5_index(h5, table_name, INDEX_MIN15);
         update_h5_index(h5, table_name, INDEX_MIN30);
         update_h5_index(h5, table_name, INDEX_MIN60);
+
+        h5->flush(H5F_SCOPE_LOCAL);
     }
 
     std::cout << "导入数量：" << count << std::endl;
