@@ -31,11 +31,26 @@ int main() {
     getenv_s(&home_path_len, NULL, 0, "HOMEPATH");
     home_path = (char*) malloc(home_path_len * sizeof(char) + 1);
     getenv_s( &home_path_len, home_path, home_path_len, "HOMEPATH" );
-    std::string ini_file_name = "c:\\" + std::string(home_path) + "\\_hikyuu\\importdata.ini";
+    std::string data_config_file = "c:\\" + std::string(home_path) + "\\.hikyuu\\data_dir.ini";
 #else
     char *home_path = getenv("HOME");
-    std::string ini_file_name = std::string(home_path) + "/.hikyuu/importdata.ini";
+    std::string data_config_file = std::string(home_path) + "/.hikyuu/data_dir.ini";
 #endif
+
+    hku::IniParser data_config;
+    try {
+        data_config.read(data_config_file);
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return 0;
+    }
+
+    if (!data_config.hasOption("data_dir", "data_dir")) {
+        std::cerr << "Can't find option data_dir" << std::endl;
+        return 0;
+    }
+
+    std::string ini_file_name = data_config.get("data_dir", "data_dir") + "/importdata.ini";
 
     hku::IniParser ini_parser;
     try {

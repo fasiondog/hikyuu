@@ -66,6 +66,7 @@
                 <File name="tools\hikyuu\tools\importdata\importdata.py" />
             </Folder>
         </Folder>
+        <File name="tools\setup.py" />
     </Project>
     <Project name="hikyuu_doc">
         <File name="tools\hikyuu\docs\source\conf.py" />

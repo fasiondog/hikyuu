@@ -22,5 +22,8 @@
 /tools/hikyuu/build
 /tools/hikyuu/dist
 /tools/hikyuu/Hikyuu.egg-info
+/tools/build
+/tools/dist
+/tools/Hikyuu.egg-info
 *~
 

@@ -44,6 +44,7 @@ REM %TOOLSET%  需要利用Jamroot消除告警
 copy .\build\extern-libs\%BUILD_OUTPUT_PATH%\*.dll .\bin
 copy .\build\hikyuu\%BUILD_OUTPUT_PATH%\*.dll .\bin
 copy .\build\hikyuu_utils\%BUILD_OUTPUT_PATH%\*.dll .\bin
+copy .\build\importdata\%BUILD_OUTPUT_PATH%\*.exe .\bin
 
 copy .\bin\*.dll .\tools\hikyuu
 

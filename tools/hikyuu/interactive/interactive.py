@@ -31,12 +31,19 @@ import urllib
 import tushare as ts
 
 import sys
+import os
+import configparser
+
+data_config_file = os.path.expanduser('~') + "/.hikyuu/data_dir.ini"
+data_config = configparser.ConfigParser()
+data_config.read(data_config_file)
+data_dir = data_config['data_dir']['data_dir']
+
 if sys.platform == 'win32':
-    #config_file = "d:\\workspace\\hikyuu\\test\\data\\hikyuu_win.ini"
-    config_file = "c:\\stock\\hikyuu_win.ini"
+    config_file = data_dir + "\\hikyuu_win.ini"
 else:
-    config_file = "/home/fasiondog/stock/hikyuu_linux.ini"
-    
+    config_file = data_dir + "/hikyuu_linux.ini"
+
 #starttime = time.time()
 #print "Loading Day Data ..."
 hikyuu_init(config_file)
