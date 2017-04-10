@@ -47,7 +47,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Hikyuu'
+project = 'Hikyuu Quant Tool'
 copyright = '2016, fasiondog'
 author = 'fasiondog'
 

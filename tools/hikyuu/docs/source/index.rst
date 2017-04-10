@@ -9,6 +9,8 @@ Welcome to Hikyuu's documentation!
 .. toctree::
    :maxdepth: 2
 
+   overview
+   install
    quickstart
    base/index
    indicator/index

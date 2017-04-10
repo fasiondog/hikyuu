@@ -73,6 +73,8 @@
         <File name="tools\hikyuu\docs\source\index.rst" />
         <File name="tools\hikyuu\docs\source\reference.rst" />
         <File name="tools\hikyuu\docs\source\quickstart.rst" />
+        <File name="tools\hikyuu\docs\source\install.rst" />
+        <File name="tools\hikyuu\docs\source\overview.rst" />
         <Folder name="trade_manage">
             <File name="tools\hikyuu\docs\source\trade_manage\trade_manage.rst" />
             <File name="tools\hikyuu\docs\source\trade_manage\trade_cost.rst" />

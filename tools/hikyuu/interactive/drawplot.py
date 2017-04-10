@@ -377,11 +377,7 @@ def kplot(kdata, width=0.6, colorup='r', colordown='g', alpha=1.0, axes=None, ne
         return
     
     if not axes:
-        if new:
-            fig = figure()
-            axes = gca()
-        else:
-            axes = gca()
+        axes = create_one_axes_figure() if new else gca()
         
     OFFSET = width/2.0
     rfcolor = matplotlib.rcParams['axes.facecolor']
@@ -438,11 +434,7 @@ def mkplot(kdata, ticksize=3, colorup='r', colordown='g', axes=None, new=True):
         return
 
     if not axes:
-        if new:
-            fig = figure()
-            axes = gca()
-        else:
-            axes = gca()
+        axes = create_one_axes_figure() if new else gca()
         
     for t in range(len(kdata)):
         record = kdata[t]
@@ -497,9 +489,7 @@ def iplot(indicator, axes=None, new=True, legend_on=False, text_on=False, text_c
         return
     
     if not axes:
-        if new:
-            fig = figure()
-        axes = gca()
+        axes = create_one_axes_figure() if new else gca()
     
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
@@ -529,7 +519,7 @@ def iplot(indicator, axes=None, new=True, legend_on=False, text_on=False, text_c
     #draw()
 
 def ibar(indicator, axes=None, width=0.4, color='r', edgecolor='r',
-         new=True, legend_on=False, text_on=False, text_color='k',  
+         new=True, legend_on=False, text_on=False, text_color='k', label=None, 
                    zero_on=False, *args, **kwargs):
     """绘制indicator曲线
     indicator: Indicator实例
@@ -546,9 +536,10 @@ def ibar(indicator, axes=None, width=0.4, color='r', edgecolor='r',
         return
     
     if not axes:
-        if new:
-            fig = figure()
-        axes = gca()
+        axes = create_one_axes_figure() if new else gca()
+
+    if not label:
+        label = "%s %.2f" % (indicator.long_name, indicator[-1])
     
     py_indicatr = [ None if x == constant.null_price else x for x in indicator]
     x = [i-0.2 for i in range(len(indicator))]
@@ -680,8 +671,7 @@ def sgplot(sg, kdata = None, style = 1, axes = None, new = True):
         
     if axes is None:
         if new:
-            fig = figure()
-            axes = gca()
+            axes = create_one_axes_figure()
             kplot(kdata, axes=axes)
         else:
             axes = gca()        
@@ -744,8 +734,8 @@ def cnplot(cn, kdata = None, axes = None, new = True):
         
     if axes is None:
         if new:
-            fig = figure()
-            axes = gca()
+            axes = create_one_axes_figure()
+            kplot(kdata, axes=axes)
         else:
             axes = gca()        
 
