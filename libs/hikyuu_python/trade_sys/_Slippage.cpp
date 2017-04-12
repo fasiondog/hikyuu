@@ -21,8 +21,9 @@ public:
     void _reset() {
         if (override func = get_override("_reset")) {
             func();
+        } else {
+            SlippageBase::_reset();
         }
-        SlippageBase::_reset();
     }
 
     void default_reset() {

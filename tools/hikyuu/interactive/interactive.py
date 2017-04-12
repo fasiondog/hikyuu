@@ -81,6 +81,8 @@ Indicator.bar = ibar
 SignalBase.plot = sgplot
 ConditionBase.plot = cnplot
 
+System.plot = sysplot
+
 #================================================================
 #更新实时数据
 def UpdateOneRealtimeRecord_from_sina(tmpstr):

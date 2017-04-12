@@ -80,6 +80,7 @@ void export_System() {
             .def("reset", &System::reset)
             .def("clone", &System::clone)
 
+            .def("getTO", &System::getTO)
             .def("setTO", &System::setTO)
 
             .def("run", &System::run)

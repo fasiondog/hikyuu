@@ -7,11 +7,18 @@
 # 历史：1）20130419, Added by fasiondog
 #===============================================================================
 
-from ._trade_sys import *
+from . import _trade_sys as csys
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
+MoneyManagerBase = csys.MoneyManagerBase
 MoneyManagerBase.__unicode__ = unicodeFunc
 MoneyManagerBase.__repr__ = reprFunc
+
+MM_FixedRisk = csys.MM_FixedRisk
+MM_FixedCapital = csys.MM_FixedCapital
+MM_FixedCount = csys.MM_FixedCount
+MM_FixedPercent = csys.MM_FixedPercent
+MM_FixedUnits = csys.MM_FixedUnits
 
 MM_FixedCount.__doc__ = """
     固定交易数量资金管理策略 

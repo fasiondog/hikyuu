@@ -745,4 +745,72 @@ def cnplot(cn, kdata = None, axes = None, new = True):
     axes.fill_between(x, y1, y2, where=y2 > y1, facecolor='blue', alpha=0.6)
     axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
 
+
+def sysplot(sys, style = 1, axes = None, new = True):
+    """
+    绘制系统实际买入/卖出信号
+    参数：
+        sys：  系统实例
+        style: 1 | 2 信号箭头绘制样式
+        axes： 指定在那个轴对象中进行绘制
+        new：  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    """
+    kdata = sys.getTO()
+        
+    refdates = kdata.getDatetimeList()
+    date_index = dict([(d,i) for i,d in enumerate(refdates)])
+        
+    if axes is None:
+        if new:
+            axes = create_one_axes_figure()
+            kplot(kdata, axes=axes)
+        else:
+            axes = gca()        
+            
+    ylim = axes.get_ylim()
+    height = ylim[1]-ylim[0]
+    
+    if style == 1:
+        arrow_buy = dict(arrowstyle="->")
+        arrow_sell = arrow_buy
+    else:
+        arrow_buy = dict(facecolor='red', frac=0.5)
+        arrow_sell = dict(facecolor='blue', frac=0.5)  
+
+    tds = sys.tm.getTradeList()
+    buy_dates = []
+    sell_dates = []
+    for t in tds:
+        if t.business == BUSINESS.BUY:
+            buy_dates.append(t.datetime)
+        elif t.business == BUSINESS.SELL:
+            sell_dates.append(t.datetime)
+        else:
+            pass
+    
+    for d in buy_dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        axes.annotate('B', 
+                      (pos, krecord.lowPrice - height*0.01), 
+                      (pos, krecord.lowPrice - height*0.1), 
+                      arrowprops = arrow_buy,
+                      horizontalalignment = 'center', 
+                      verticalalignment = 'bottom',
+                      color='red')
+              
+    for d in sell_dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        axes.annotate('S', 
+                      (pos, krecord.highPrice + height*0.01), 
+                      (pos, krecord.highPrice + height*0.1), 
+                      arrowprops = arrow_sell,
+                      horizontalalignment = 'center', 
+                      verticalalignment = 'top',
+                      color='blue')            
         

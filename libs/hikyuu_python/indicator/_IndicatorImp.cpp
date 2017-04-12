@@ -15,6 +15,8 @@ class IndicatorImpWrap: public IndicatorImp, public wrapper<IndicatorImp> {
 public:
     IndicatorImpWrap(): IndicatorImp() {}
     IndicatorImpWrap(const string& name): IndicatorImp(name) {}
+    IndicatorImpWrap(const string& name, size_t result_num):
+        IndicatorImp(name, result_num) {}
 
     IndicatorImpPtr operator()(const Indicator& ind) {
         if (override call = get_override("__call__")) {
@@ -25,6 +27,18 @@ public:
 
     IndicatorImpPtr default_call(const Indicator& ind) {
         return this->IndicatorImp::operator()(ind);
+    }
+
+    void _calculate(const Indicator& ind) {
+        if (override call = get_override("_calculate")) {
+            call(ind);
+        } else {
+            IndicatorImp::_calculate(ind);
+        }
+    }
+
+    void default_calculate(const Indicator& ind) {
+        this->IndicatorImp::_calculate(ind);
     }
 };
 
@@ -37,6 +51,7 @@ void (IndicatorImp::*write_name)(const string&) = &IndicatorImp::name;
 void export_IndicatorImp() {
     class_<IndicatorImpWrap, boost::noncopyable>("IndicatorImp", init<>())
             .def(init<const string&>())
+            .def(init<const string&, size_t>())
             .def(self_ns::str(self))
             .add_property("name", read_name, write_name)
             .add_property("discard", &IndicatorImp::discard)
@@ -45,6 +60,8 @@ void export_IndicatorImp() {
             .def("_readyBuffer", &IndicatorImp::_readyBuffer)
             .def("getResultNumber", &IndicatorImp::getResultNumber)
             .def("getResultAsPriceList", &IndicatorImp::getResultAsPriceList)
+            .def("calculate", &IndicatorImp::calculate)
+            .def("_calculate", &IndicatorImp::_calculate, &IndicatorImpWrap::default_calculate)
             .def("__call__", &IndicatorImp::operator())//, &IndicatorImpWrap::default_call)
             ;
 

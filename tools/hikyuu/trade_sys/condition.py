@@ -13,3 +13,5 @@ from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 ConditionBase = csys.ConditionBase
 ConditionBase.__unicode__ = unicodeFunc
 ConditionBase.__repr__ = reprFunc
+
+CN_OPLine = csys.CN_OPLine

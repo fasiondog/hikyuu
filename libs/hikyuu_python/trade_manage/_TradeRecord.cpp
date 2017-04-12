@@ -59,7 +59,7 @@ void export_TradeRecord() {
             .def("__iter__", iterator<TradeRecordList>())
             .def("size", &TradeRecordList::size)
             .def("__len__", &TradeRecordList::size)
-            .def("__getitem__", TradeRecordList_at, return_value_policy<copy_const_reference>())
+            .def("get", TradeRecordList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<TradeRecordList>())
 #endif

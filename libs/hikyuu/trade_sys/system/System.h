@@ -51,6 +51,7 @@ public:
     /** 获取名称 */
     const string& name() const;
 
+    KData getTO() const { return m_kdata; }
     TradeManagerPtr getTM() const { return m_tm; }
     MoneyManagerPtr getMM() const { return m_mm; }
     EnvironmentPtr getEV() const { return m_ev; }

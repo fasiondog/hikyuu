@@ -80,6 +80,21 @@
 自定义信号指示器
 ----------------
 
+快速创建不带私有属性的自定义信号指示器
+
+.. py:function:: crtSG(func, params={}, name='crtSG')
+
+    快速创建自定义不带私有属性的信号指示器
+    
+    :param func: 信号策略函数
+    :param {} params: 参数字典
+    :param str name: 自定义名称
+    :return: 自定义信号指示器实例
+    
+示例：
+
+.. literalinclude:: ../../../examples/quick_crtsg.py      
+
 自定义的信号指示器接口：
 
 * :py:meth:`SignalBase._calculate` - 【必须】子类计算接口

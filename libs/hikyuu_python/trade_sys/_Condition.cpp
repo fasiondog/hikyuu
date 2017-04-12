@@ -22,8 +22,9 @@ public:
     void _reset() {
         if (override func = get_override("_reset")) {
             func();
+        } else {
+            ConditionBase::_reset();
         }
-        ConditionBase::_reset();
     }
 
     void default_reset() {
