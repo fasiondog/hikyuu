@@ -40,6 +40,18 @@ public:
     void default_calculate(const Indicator& ind) {
         this->IndicatorImp::_calculate(ind);
     }
+
+    bool check() {
+        if (override call = get_override("check")) {
+            return call();
+        } else {
+            return IndicatorImp::check();
+        }
+    }
+
+    bool default_check() {
+        return this->IndicatorImp::check();
+    }
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(_set_overloads, _set, 2, 3)
@@ -61,8 +73,9 @@ void export_IndicatorImp() {
             .def("getResultNumber", &IndicatorImp::getResultNumber)
             .def("getResultAsPriceList", &IndicatorImp::getResultAsPriceList)
             .def("calculate", &IndicatorImp::calculate)
+            .def("check", &IndicatorImp::check, &IndicatorImpWrap::default_check)
             .def("_calculate", &IndicatorImp::_calculate, &IndicatorImpWrap::default_calculate)
-            .def("__call__", &IndicatorImp::operator())//, &IndicatorImpWrap::default_call)
+            .def("__call__", &IndicatorImp::operator(), &IndicatorImpWrap::default_call)
             ;
 
     register_ptr_to_python<IndicatorImpPtr>();
