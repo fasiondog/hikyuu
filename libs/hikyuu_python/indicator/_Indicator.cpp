@@ -31,6 +31,7 @@ void export_Indicator() {
         .add_property("name", read_name, write_name)
         .add_property("long_name", &Indicator::long_name)
         .add_property("discard", &Indicator::discard)
+        .def("setDiscard", &Indicator::setDiscard)
         .def("getParam", &Indicator::getParam<boost::any>)
         .def("setParam", &Indicator::setParam<object>)
         .def("size", &Indicator::size)

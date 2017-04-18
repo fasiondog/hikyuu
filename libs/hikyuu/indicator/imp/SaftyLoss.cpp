@@ -86,7 +86,7 @@ void SaftyLoss::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API SAFTYLOSS(int n1, int n2, double p) {
-    IndicatorImpPtr result(new SaftyLoss());
+    IndicatorImpPtr result = make_shared<SaftyLoss>();
     result->setParam<int>("n1", n1);
     result->setParam<int>("n2", n2);
     result->setParam<double>("p", p);
@@ -95,7 +95,7 @@ Indicator HKU_API SAFTYLOSS(int n1, int n2, double p) {
 
 
 Indicator HKU_API SAFTYLOSS(const Indicator& data, int n1, int n2, double p) {
-    IndicatorImpPtr result(new SaftyLoss());
+    IndicatorImpPtr result = make_shared<SaftyLoss>();
     result->setParam<int>("n1", n1);
     result->setParam<int>("n2", n2);
     result->setParam<double>("p", p);

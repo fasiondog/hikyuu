@@ -49,13 +49,13 @@ void Sma::_calculate(const Indicator& indicator) {
 
 
 Indicator HKU_API SMA(int n) {
-    IndicatorImpPtr p(new Sma());
+    IndicatorImpPtr p = make_shared<Sma>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API SMA(const Indicator& indicator, int n){
-    IndicatorImpPtr p(new Sma());
+    IndicatorImpPtr p = make_shared<Sma>();
     p->setParam<int>("n", n);
     p->calculate(indicator);
     return Indicator(p);

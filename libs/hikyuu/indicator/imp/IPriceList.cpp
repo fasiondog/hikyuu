@@ -93,7 +93,7 @@ Indicator HKU_API PRICELIST(const PriceList& data, int discard) {
 }
 
 Indicator HKU_API PRICELIST(const Indicator& data, int result_num) {
-    IndicatorImpPtr p(new IPriceList());
+    IndicatorImpPtr p = make_shared<IPriceList>();
     p->setParam<int>("result_num", result_num);
     p->calculate(data);
     return Indicator(p);

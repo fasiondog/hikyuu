@@ -89,6 +89,13 @@ Indicator (*HHV_2)(const Indicator&, int) = HHV;
 Indicator (*LLV_1)(int) = LLV;
 Indicator (*LLV_2)(const Indicator&, int) = LLV;
 
+Indicator (*VIGOR_1)(const KData&, int) = VIGOR;
+Indicator (*VIGOR_2)(int) = VIGOR;
+Indicator (*VIGOR_3)(const Indicator&, int) = VIGOR;
+
+Indicator (*WEAVE_1)() = WEAVE;
+Indicator (*WEAVE_2)(const Indicator&) = WEAVE;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA2);
@@ -145,7 +152,11 @@ void export_Indicator_build_in() {
 
     def("MACD", MACD_1, (arg("n1")=12, arg("n2")=26, arg("n3")=9));
     def("MACD", MACD_2, (arg("data"), arg("n1")=12, arg("n2")=26, arg("n3")=9));
-    def("VIGOR", VIGOR, (arg("kdata"), arg("n")=2));
+
+    def("VIGOR", VIGOR_1, (arg("kdata"), arg("n")=2));
+    def("VIGOR", VIGOR_2, (arg("n")=2));
+    def("VIGOR", VIGOR_3, (arg("ind"), arg("n")=2));
+
     def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1")=10, arg("n2")=3, arg("p")=2.0));
     def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1")=10, arg("n2")=3, arg("p")=2.0));
     def("DIFF", DIFF_1);
@@ -164,6 +175,9 @@ void export_Indicator_build_in() {
 
     def("LLV", LLV_1, (arg("n")=20));
     def("LLV", LLV_2, (arg("data"), arg("n")=20));
+
+    def("WEAVE", WEAVE_1);
+    def("WEAVE", WEAVE_2);
 }
 
 

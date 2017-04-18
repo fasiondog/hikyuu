@@ -49,13 +49,13 @@ void StdDeviation::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API STDEV(int n) {
-    IndicatorImpPtr p(new StdDeviation());
+    IndicatorImpPtr p = make_shared<StdDeviation>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API STDEV(const Indicator& data, int n) {
-    IndicatorImpPtr p(new StdDeviation());
+    IndicatorImpPtr p = make_shared<StdDeviation>();
     p->setParam<int>("n", n);
     p->calculate(data);
     return Indicator(p);

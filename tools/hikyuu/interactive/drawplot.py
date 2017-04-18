@@ -16,11 +16,11 @@ from hikyuu.indicator import Indicator, MACD, CLOSE
 from hikyuu.trade_manage import BUSINESS 
 from hikyuu.trade_sys.system import getSystemPartName
 
-def create_one_axes_figure(figsize=(10,8)):                                        
+def create_one_axes_figure(figsize=(10,6)):                                        
     """生成一个含有1个坐标轴的figure，并返回坐标轴列表
     返回：(ax1,ax2)
     """
-    rect1  = [0.05, 0.35, 0.9, 0.60]
+    rect1  = [0.05, 0.05, 0.9, 0.90]
     fg=figure(figsize=figsize)
     ax1 = fg.add_axes(rect1)
     return ax1

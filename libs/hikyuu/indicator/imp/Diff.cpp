@@ -40,7 +40,7 @@ Indicator HKU_API DIFF() {
 }
 
 Indicator HKU_API DIFF(const Indicator& data) {
-    IndicatorImpPtr p(new Diff());
+    IndicatorImpPtr p = make_shared<Diff>();
     p->calculate(data);
     return Indicator(p);
 }

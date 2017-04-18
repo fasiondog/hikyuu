@@ -82,7 +82,7 @@ void Ama::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
-    IndicatorImpPtr p(new Ama());
+    IndicatorImpPtr p = make_shared<Ama>();
     p->setParam<int>("n", n);
     p->setParam<int>("fast_n", fast_n);
     p->setParam<int>("slow_n", slow_n);
@@ -91,7 +91,7 @@ Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
 
 Indicator HKU_API AMA(const Indicator& indicator,
         int n, int fast_n, int slow_n) {
-    IndicatorImpPtr p(new Ama());
+    IndicatorImpPtr p = make_shared<Ama>();
     p->setParam<int>("n", n);
     p->setParam<int>("fast_n", fast_n);
     p->setParam<int>("slow_n", slow_n);

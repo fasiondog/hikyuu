@@ -50,13 +50,13 @@ void Ema::_calculate(const Indicator& indicator) {
 
 
 Indicator HKU_API EMA(int n) {
-    IndicatorImpPtr p(new Ema());
+    IndicatorImpPtr p = make_shared<Ema>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API EMA(const Indicator& data, int n) {
-    IndicatorImpPtr p(new Ema());
+    IndicatorImpPtr p = make_shared<Ema>();
     p->setParam<int>("n", n);
     p->calculate(data);
     return Indicator(p);

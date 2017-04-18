@@ -69,7 +69,7 @@ void Macd::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API MACD(int n1, int n2, int n3) {
-    IndicatorImpPtr p(new Macd());
+    IndicatorImpPtr p = make_shared<Macd>();
     p->setParam<int>("n1", n1);
     p->setParam<int>("n2", n2);
     p->setParam<int>("n3", n3);
@@ -77,7 +77,7 @@ Indicator HKU_API MACD(int n1, int n2, int n3) {
 }
 
 Indicator HKU_API MACD(const Indicator& data, int n1, int n2, int n3) {
-    IndicatorImpPtr p(new Macd());
+    IndicatorImpPtr p = make_shared<Macd>();
     p->setParam<int>("n1", n1);
     p->setParam<int>("n2", n2);
     p->setParam<int>("n3", n3);

@@ -210,7 +210,7 @@ try:
     def KData_to_np(kdata):
         """转化为numpy结构数组"""
         k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 
-                                    'amount', 'count'], 
+                                    'amount', 'volume'], 
                 'formats':['datetime64[D]','d','d','d','d','d','d']})
         return np.array([(k.datetime, k.openPrice, k.highPrice, 
                           k.lowPrice, k.closePrice, k.transAmount, 

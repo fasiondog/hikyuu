@@ -57,13 +57,13 @@ void HighLine::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API HHV(int n =20) {
-    IndicatorImpPtr p(new HighLine);
+    IndicatorImpPtr p = make_shared<HighLine>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API HHV(const Indicator& ind, int n =20) {
-    IndicatorImpPtr p(new HighLine);
+    IndicatorImpPtr p = make_shared<HighLine>();
     p->setParam<int>("n", n);
     p->calculate(ind);
     return Indicator(p);

@@ -48,13 +48,13 @@ void Atr::_calculate(const Indicator& indicator) {
 }
 
 Indicator HKU_API ATR(int n) {
-    IndicatorImpPtr p(new Atr());
+    IndicatorImpPtr p = make_shared<Atr>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API ATR(const Indicator& data, int n) {
-    IndicatorImpPtr p(new Atr());
+    IndicatorImpPtr p = make_shared<Atr>();
     p->setParam<int>("n", n);
     p->calculate(data);
     return Indicator(p);

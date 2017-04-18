@@ -55,13 +55,13 @@ void LowLine::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API LLV(int n =20) {
-    IndicatorImpPtr p(new LowLine);
+    IndicatorImpPtr p = make_shared<LowLine>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API LLV(const Indicator& ind, int n =20) {
-    IndicatorImpPtr p(new LowLine);
+    IndicatorImpPtr p = make_shared<LowLine>();
     p->setParam<int>("n", n);
     p->calculate(ind);
     return Indicator(p);

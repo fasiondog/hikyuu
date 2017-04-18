@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include "Indicator.h"
 #include "../Log.h"
-#include "crt/PRICELIST.h"
 
 namespace hku {
 

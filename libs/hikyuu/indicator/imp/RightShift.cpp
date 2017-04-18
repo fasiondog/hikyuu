@@ -39,13 +39,13 @@ void RightShift::_calculate(const Indicator& data)  {
 }
 
 Indicator HKU_API REF(int n) {
-    IndicatorImpPtr p(new RightShift);
+    IndicatorImpPtr p = make_shared<RightShift>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API REF(const Indicator& ind, int n) {
-    IndicatorImpPtr p(new RightShift);
+    IndicatorImpPtr p = make_shared<RightShift>();
     p->setParam<int>("n", n);
     p->calculate(ind);
     return Indicator(p);
