@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>基础数据结构 &mdash; Hikyuu Quant Framework 1.0.0 文档</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Hikyuu Quant Framework 1.0.0 文档" href="../index.html"/>
+        <link rel="up" title="交易管理" href="trade_manage.html"/>
+        <link rel="next" title="交易成本算法" href="trade_cost.html"/>
+        <link rel="prev" title="交易管理" href="trade_manage.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Hikyuu Quant Framework
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">安装指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../base/index.html">基础设施</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../indicator/index.html">技术指标</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="trade_manage.html">交易管理</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">基础数据结构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">交易业务类型</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">交易成本记录</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">交易记录</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">持仓记录</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">资产情况记录</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="trade_cost.html">交易成本算法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="TradeManager.html">交易管理类</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../trade_sys/trade_sys.html">交易系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">参考资料</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Hikyuu Quant Framework</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="trade_manage.html">交易管理</a> &raquo;</li>
+      
+    <li>基础数据结构</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/trade_manage/record_struct.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>基础数据结构<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<div class="section" id="id2">
+<h2>交易业务类型<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<dl class="function">
+<dt id="hikyuu.trade_manage.getBusinessName">
+<code class="descclassname">hikyuu.trade_manage.</code><code class="descname">getBusinessName</code><span class="sig-paren">(</span><em>business</em><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.getBusinessName" title="永久链接至目标">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">参数:</th><td class="field-body"><strong>business</strong> (<em>BUSINESS</em>) &#8211; 交易业务类型</td>
+</tr>
+<tr class="field-even field"><th class="field-name">返回:</th><td class="field-body">交易业务类型名称(&#8220;INIT&#8221;|&#8221;BUY&#8221;|&#8221;SELL&#8221;|&#8221;GIFT&#8221;|&#8221;BONUS&#8221;|&#8221;CHECKIN&#8221;|&#8221;CHECKOUT&#8221;|&#8221;UNKNOWN&#8221;</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">返回类型:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.INIT">
+<code class="descclassname">BUSINESS.</code><code class="descname">INIT</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.INIT" title="永久链接至目标">¶</a></dt>
+<dd><p>建立初始账户</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.BUY">
+<code class="descclassname">BUSINESS.</code><code class="descname">BUY</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.BUY" title="永久链接至目标">¶</a></dt>
+<dd><p>买入</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.SELL">
+<code class="descclassname">BUSINESS.</code><code class="descname">SELL</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.SELL" title="永久链接至目标">¶</a></dt>
+<dd><p>卖出</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.GIFT">
+<code class="descclassname">BUSINESS.</code><code class="descname">GIFT</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.GIFT" title="永久链接至目标">¶</a></dt>
+<dd><p>送股</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.BONUS">
+<code class="descclassname">BUSINESS.</code><code class="descname">BONUS</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.BONUS" title="永久链接至目标">¶</a></dt>
+<dd><p>分红</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.CHECKIN">
+<code class="descclassname">BUSINESS.</code><code class="descname">CHECKIN</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.CHECKIN" title="永久链接至目标">¶</a></dt>
+<dd><p>存入现金</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.CHECKOUT">
+<code class="descclassname">BUSINESS.</code><code class="descname">CHECKOUT</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.CHECKOUT" title="永久链接至目标">¶</a></dt>
+<dd><p>取出现金</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hikyuu.trade_manage.BUSINESS.INVALID">
+<code class="descclassname">BUSINESS.</code><code class="descname">INVALID</code><a class="headerlink" href="#hikyuu.trade_manage.BUSINESS.INVALID" title="永久链接至目标">¶</a></dt>
+<dd><p>无效类型</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h2>交易成本记录<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h2>
+<p>交易成本计算的返回结果</p>
+<dl class="class">
+<dt id="hikyuu.trade_manage.CostRecord">
+<em class="property">class </em><code class="descclassname">hikyuu.trade_manage.</code><code class="descname">CostRecord</code><a class="headerlink" href="#hikyuu.trade_manage.CostRecord" title="永久链接至目标">¶</a></dt>
+<dd><p>交易成本记录</p>
+<dl class="attribute">
+<dt>
+<code class="descname">commission  佣金(float)</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">stamptax    印花税(float)</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">transferfee 过户费(float)</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">others      其它费用(float)</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">total       总成本(float)，= 佣金 + 印花税 + 过户费 + 其它费用</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h2>交易记录<a class="headerlink" href="#id4" title="永久链接至标题">¶</a></h2>
+<dl class="class">
+<dt id="hikyuu.trade_manage.TradeRecordList">
+<em class="property">class </em><code class="descclassname">hikyuu.trade_manage.</code><code class="descname">TradeRecordList</code><a class="headerlink" href="#hikyuu.trade_manage.TradeRecordList" title="永久链接至目标">¶</a></dt>
+<dd><p>交易记录列表</p>
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeRecordList.to_np">
+<code class="descname">to_np</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeRecordList.to_np" title="永久链接至目标">¶</a></dt>
+<dd><p>仅在安装了numpy模块时生效，转换为numpy.array</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeRecordList.to_df">
+<code class="descname">to_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeRecordList.to_df" title="永久链接至目标">¶</a></dt>
+<dd><p>仅在安装了pandas模块时生效，转换为pandas.DataFrame</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hikyuu.trade_manage.TradeRecord">
+<em class="property">class </em><code class="descclassname">hikyuu.trade_manage.</code><code class="descname">TradeRecord</code><span class="sig-paren">(</span><span class="optional">[</span><em>stock</em>, <em>datetime</em>, <em>business</em>, <em>planPrice</em>, <em>realPrice</em>, <em>goalPrice</em>, <em>number</em>, <em>cost</em>, <em>stoploss</em>, <em>cash</em>, <em>part</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeRecord" title="永久链接至目标">¶</a></dt>
+<dd><p>交易记录</p>
+<dl class="attribute">
+<dt>
+<code class="descname">stock     股票（Stock）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">datetime  交易时间（Datetime）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">business  交易类型</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">planPrice 计划交易价格（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">realPrice 实际交易价格（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">goalPrice 目标价格（float），如果为0表示未限定目标</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">number    成交数量（int）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">cost      交易成本</code></dt>
+<dd><p>类型：<a class="reference internal" href="#hikyuu.trade_manage.CostRecord" title="hikyuu.trade_manage.CostRecord"><code class="xref py py-class docutils literal"><span class="pre">CostRecord</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">stoploss 止损价（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">cash     现金余额（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">part     交易指示来源，区别是哪个部件发出的指示，constant.null_int表示无效</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h2>持仓记录<a class="headerlink" href="#id5" title="永久链接至标题">¶</a></h2>
+<dl class="class">
+<dt id="hikyuu.trade_manage.PositionRecordList">
+<em class="property">class </em><code class="descclassname">hikyuu.trade_manage.</code><code class="descname">PositionRecordList</code><a class="headerlink" href="#hikyuu.trade_manage.PositionRecordList" title="永久链接至目标">¶</a></dt>
+<dd><p>持仓记录列表</p>
+<dl class="method">
+<dt id="hikyuu.trade_manage.PositionRecordList.to_np">
+<code class="descname">to_np</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.PositionRecordList.to_np" title="永久链接至目标">¶</a></dt>
+<dd><p>仅在安装了numpy模块时生效，转换为numpy.array</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.PositionRecordList.to_df">
+<code class="descname">to_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.PositionRecordList.to_df" title="永久链接至目标">¶</a></dt>
+<dd><p>仅在安装了pandas模块时生效，转换为pandas.DataFrame</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hikyuu.trade_manage.PositionRecord">
+<em class="property">class </em><code class="descclassname">hikyuu.trade_manage.</code><code class="descname">PositionRecord</code><span class="sig-paren">(</span><span class="optional">[</span><em>stock</em>, <em>takeDatetime</em>, <em>cleanDatetime</em>, <em>number</em>, <em>stoploss</em>, <em>goalPrice</em>, <em>totalNumber</em>, <em>buyMoney</em>, <em>totalCost</em>, <em>totalRisk</em>, <em>sellMoney</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.PositionRecord" title="永久链接至目标">¶</a></dt>
+<dd><p>持仓记录</p>
+<dl class="attribute">
+<dt>
+<code class="descname">stock         交易对象</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">takeDatetime  初次建仓日期</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">cleanDatetime 平仓日期，当前持仓记录中为Null&lt;Datetime&gt;()</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">number      当前持仓数量</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">stoploss    当前止损价</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">goalPrice   当前的目标价格</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">totalNumber 累计持仓数量</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">buyMoney    累计买入资金</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">totalCost   累计交易总成本</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">totalRisk   累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">sellMoney   累计卖出资金</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id6">
+<h2>资产情况记录<a class="headerlink" href="#id6" title="永久链接至标题">¶</a></h2>
+<p>由TradeManager::getFunds返回</p>
+<dl class="class">
+<dt id="hikyuu.trade_manage.FundsRecord">
+<em class="property">class </em><code class="descclassname">hikyuu.trade_manage.</code><code class="descname">FundsRecord</code><span class="sig-paren">(</span><span class="optional">[</span><em>cash</em>, <em>market_value</em>, <em>short_market_value</em>, <em>base_cash</em>, <em>base_asset</em>, <em>borrow_cash</em>, <em>borrow_asset</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.FundsRecord" title="永久链接至目标">¶</a></dt>
+<dd><p>当前资产情况记录，由TradeManager::getFunds返回</p>
+<dl class="attribute">
+<dt>
+<code class="descname">cash               当前现金（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">market_value       当前多头市值（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">short_market_value 当前空头仓位市值 （float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">base_cash          当前投入本金（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">base_asset         当前投入的资产价值（float）</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">borrow_cash        当前借入的资金（float），即负债</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">borrow_asset       当前借入证券资产价值（float）</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="trade_cost.html" class="btn btn-neutral float-right" title="交易成本算法" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="trade_manage.html" class="btn btn-neutral" title="交易管理" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; 版权所有 2016, fasiondog.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/translations.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

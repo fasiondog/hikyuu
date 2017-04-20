@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>简介 &mdash; Hikyuu Quant Framework 1.0.0 文档</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Hikyuu Quant Framework 1.0.0 文档" href="index.html"/>
+        <link rel="next" title="安装指南" href="install.html"/>
+        <link rel="prev" title="Welcome to Hikyuu’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Hikyuu Quant Framework
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">简介</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hikyuu-quant-framework">什么是Hikyuu Quant Framework？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">为什么选择Hikyuu Quant Framework？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hikyuu">Hikyuu的优势与特点？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">欢迎加入开发</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">安装指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">新手入门</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base/index.html">基础设施</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indicator/index.html">技术指标</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trade_manage/trade_manage.html">交易管理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trade_sys/trade_sys.html">交易系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">参考资料</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Hikyuu Quant Framework</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>简介</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/overview.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>简介<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<div class="section" id="hikyuu-quant-framework">
+<h2>什么是Hikyuu Quant Framework？<a class="headerlink" href="#hikyuu-quant-framework" title="永久链接至标题">¶</a></h2>
+<p>Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，目前用于国内A股及基金的策略分析及回测。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。例如：</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#创建模拟交易账户进行回测，初始资金30万</span>
+<span class="n">my_tm</span> <span class="o">=</span> <span class="n">crtTM</span><span class="p">(</span><span class="n">initCash</span> <span class="o">=</span> <span class="mi">300000</span><span class="p">)</span>
+
+<span class="c1">#创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越慢线时买入，反之卖出）</span>
+<span class="n">my_sg</span> <span class="o">=</span> <span class="n">SG_Flex</span><span class="p">(</span><span class="n">OP</span><span class="p">(</span><span class="n">EMA</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">)),</span> <span class="n">slow_n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1">#固定每次买入1000股</span>
+<span class="n">my_mm</span> <span class="o">=</span> <span class="n">MM_FixedCount</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1">#创建交易系统并运行</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">SYS_Simple</span><span class="p">(</span><span class="n">tm</span> <span class="o">=</span> <span class="n">my_tm</span><span class="p">,</span> <span class="n">sg</span> <span class="o">=</span> <span class="n">my_sg</span><span class="p">,</span> <span class="n">mm</span> <span class="o">=</span> <span class="n">my_mm</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">sm</span><span class="p">[</span><span class="s1">&#39;sz000001&#39;</span><span class="p">],</span> <span class="n">Query</span><span class="p">(</span><span class="o">-</span><span class="mi">150</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="figure">
+<img alt="_images/10000-overview.png" src="_images/10000-overview.png" />
+</div>
+<p>完整示例参见：<a class="reference external" href="http://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/examples/001-overview.ipynb">http://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/examples/001-overview.ipynb</a></p>
+<p>Maybe，你已经注意到了，上面没有“选股策略”？！是的，选股策略是股票交易的重要方面，肯定不会少。事实上，之前所述的交易系统都是针对一个交易对象的，也就是经常听到的策略，但很多所谓的“策略”其实仅仅只是买入、卖出的指示信号而已，并非完整的交易策略。为了区别，在这里直接以系统指称，表示一个完整的系统化交易方法或策略。而在系统之上，称为Portfolio资产组合，选股策略则是Portfolio的组件，Portfolio的另一重要组成则是资金分配策略，比如选股策略选定了4个交易对象（股票或基金等），那么如何在它们之间进行合理的资金分配？</p>
+<p>所以，Hikyuu Quant Framework其实是在System和Portfolio基础之上、包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试，甚至可以更进一步，在选择交易对象的同时，选取与之匹配的最优系统交易策略（System）。</p>
+<p><em>注：Portfolio、选股策略、资金分配策略的组件及接口尚在实现中…… :(</em></p>
+</div>
+<div class="section" id="id2">
+<h2>为什么选择Hikyuu Quant Framework？<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+</div>
+<div class="section" id="hikyuu">
+<h2>Hikyuu的优势与特点？<a class="headerlink" href="#hikyuu" title="永久链接至标题">¶</a></h2>
+</div>
+<div class="section" id="id3">
+<h2>欢迎加入开发<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="安装指南" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Hikyuu’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; 版权所有 2016, fasiondog.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/translations.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

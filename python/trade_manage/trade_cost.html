@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>交易成本算法 &mdash; Hikyuu Quant Framework 1.0.0 文档</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Hikyuu Quant Framework 1.0.0 文档" href="../index.html"/>
+        <link rel="up" title="交易管理" href="trade_manage.html"/>
+        <link rel="next" title="交易管理类" href="TradeManager.html"/>
+        <link rel="prev" title="基础数据结构" href="record_struct.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Hikyuu Quant Framework
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">简介</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">安装指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../base/index.html">基础设施</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../indicator/index.html">技术指标</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="trade_manage.html">交易管理</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="record_struct.html">基础数据结构</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">交易成本算法</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">内建交易成本算法</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">零交易成本算法</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#a">沪深A股交易成本算法</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">自定义交易成本算法</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">交易算法成本基类</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="TradeManager.html">交易管理类</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../trade_sys/trade_sys.html">交易系统</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">参考资料</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Hikyuu Quant Framework</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="trade_manage.html">交易管理</a> &raquo;</li>
+      
+    <li>交易成本算法</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/trade_manage/trade_cost.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>交易成本算法<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<div class="section" id="id2">
+<h2>内建交易成本算法<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<div class="section" id="id3">
+<h3>零交易成本算法<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h3>
+<dl class="function">
+<dt id="hikyuu.trade_manage.TC_Zero">
+<code class="descclassname">hikyuu.trade_manage.</code><code class="descname">TC_Zero</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TC_Zero" title="永久链接至目标">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">返回:</th><td class="field-body"><a class="reference internal" href="#hikyuu.trade_manage.TradeCostBase" title="hikyuu.trade_manage.TradeCostBase"><code class="xref py py-class docutils literal"><span class="pre">TradeCostBase</span></code></a> 子类实例</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="a">
+<h3>沪深A股交易成本算法<a class="headerlink" href="#a" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li>2015年8月1日之前，上证过户费为交易数量的千分之一，不足1元，按1元计。</li>
+<li>2015年8月1日之后，上证过户费为成交金额的千分之0.02</li>
+</ul>
+<p>计算规则如下:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>1）上证交易所
+    买入：佣金＋过户费
+    卖出：佣金＋过户费＋印花税
+2）深证交易所：
+    买入：佣金
+    卖出：佣金＋印花税
+
+其中，佣金最低5元
+</pre></div>
+</div>
+<dl class="function">
+<dt id="hikyuu.trade_manage.TC_FixedA2015">
+<code class="descclassname">hikyuu.trade_manage.</code><code class="descname">TC_FixedA2015</code><span class="sig-paren">(</span><span class="optional">[</span><em>commission = 0.0018</em>, <em>lowestCommission = 5.0</em>, <em>stamptax = 0.001</em>, <em>transferfee = 0.00002</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TC_FixedA2015" title="永久链接至目标">¶</a></dt>
+<dd><p>2015年8月1日及之后的A股交易成本算法，上证过户费改为成交金额的千分之0.02</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">参数:</th><td class="field-body"><ul class="first simple">
+<li><strong>commission</strong> (<em>float</em>) &#8211; 佣金比例</li>
+<li><strong>lowestCommission</strong> (<em>float</em>) &#8211; 最低佣金值</li>
+<li><strong>stamptax</strong> (<em>float</em>) &#8211; 印花税</li>
+<li><strong>transferfee</strong> (<em>float</em>) &#8211; 过户费</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">返回:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#hikyuu.trade_manage.TradeCostBase" title="hikyuu.trade_manage.TradeCostBase"><code class="xref py py-class docutils literal"><span class="pre">TradeCostBase</span></code></a> 子类实例</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="hikyuu.trade_manage.TC_FixedA">
+<code class="descclassname">hikyuu.trade_manage.</code><code class="descname">TC_FixedA</code><span class="sig-paren">(</span><span class="optional">[</span><em>commission = 0.0018</em>, <em>lowestCommission = 5.0</em>, <em>stamptax = 0.001</em>, <em>transferfee = 0.001</em>, <em>lowestTransferfee = 1.0</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TC_FixedA" title="永久链接至目标">¶</a></dt>
+<dd><p>2015年8月1日之前的A股交易成本算法</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">参数:</th><td class="field-body"><ul class="first simple">
+<li><strong>commission</strong> (<em>float</em>) &#8211; 佣金比例</li>
+<li><strong>lowestCommission</strong> (<em>float</em>) &#8211; 最低佣金值</li>
+<li><strong>stamptax</strong> (<em>float</em>) &#8211; 印花税</li>
+<li><strong>transferfee</strong> (<em>float</em>) &#8211; 过户费</li>
+<li><strong>lowestTransferfee</strong> (<em>float</em>) &#8211; 最低过户费</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">返回:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#hikyuu.trade_manage.TradeCostBase" title="hikyuu.trade_manage.TradeCostBase"><code class="xref py py-class docutils literal"><span class="pre">TradeCostBase</span></code></a> 子类实例</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="id4">
+<h2>自定义交易成本算法<a class="headerlink" href="#id4" title="永久链接至标题">¶</a></h2>
+<p>自定义交易成本算法接口：</p>
+<ul class="simple">
+<li><a class="reference internal" href="#hikyuu.trade_manage.TradeCostBase.getBuyCost" title="hikyuu.trade_manage.TradeCostBase.getBuyCost"><code class="xref py py-meth docutils literal"><span class="pre">TradeCostBase.getBuyCost()</span></code></a> - 【必须】获取买入成本</li>
+<li><a class="reference internal" href="#hikyuu.trade_manage.TradeCostBase.getSellCost" title="hikyuu.trade_manage.TradeCostBase.getSellCost"><code class="xref py py-meth docutils literal"><span class="pre">TradeCostBase.getSellCost()</span></code></a> - 【必须】获取卖出成本</li>
+<li><a class="reference internal" href="#hikyuu.trade_manage.TradeCostBase._clone" title="hikyuu.trade_manage.TradeCostBase._clone"><code class="xref py py-meth docutils literal"><span class="pre">TradeCostBase._clone()</span></code></a> - 【必须】子类克隆接口</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h2>交易算法成本基类<a class="headerlink" href="#id5" title="永久链接至标题">¶</a></h2>
+<dl class="class">
+<dt id="hikyuu.trade_manage.TradeCostBase">
+<em class="property">class </em><code class="descclassname">hikyuu.trade_manage.</code><code class="descname">TradeCostBase</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeCostBase" title="永久链接至目标">¶</a></dt>
+<dd><p>交易成本算法基类</p>
+<dl class="attribute">
+<dt>
+<code class="descname">name 名称</code></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeCostBase.getParam">
+<code class="descname">getParam</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeCostBase.getParam" title="永久链接至目标">¶</a></dt>
+<dd><p>获取指定的参数</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">参数:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; 参数名称</td>
+</tr>
+<tr class="field-even field"><th class="field-name">返回:</th><td class="field-body">参数值</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">引发 out_of_range:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">无此参数</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeCostBase.setParam">
+<code class="descname">setParam</code><span class="sig-paren">(</span><em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeCostBase.setParam" title="永久链接至目标">¶</a></dt>
+<dd><p>设置参数</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">参数:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) &#8211; 参数名称</li>
+<li><strong>value</strong> (<em>int | bool | float | string</em>) &#8211; 参数值</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">引发 logic_error:</th><td class="field-body"><p class="first last">Unsupported type! 不支持的参数类型</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeCostBase.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeCostBase.clone" title="永久链接至目标">¶</a></dt>
+<dd><p>克隆操作</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeCostBase.getBuyCost">
+<code class="descname">getBuyCost</code><span class="sig-paren">(</span><em>datetime</em>, <em>stock</em>, <em>price</em>, <em>num</em><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeCostBase.getBuyCost" title="永久链接至目标">¶</a></dt>
+<dd><p>【重载接口】获取买入成本</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">参数:</th><td class="field-body"><ul class="first simple">
+<li><strong>datetime</strong> (<em>Datetime</em>) &#8211; 买入时刻</li>
+<li><strong>stock</strong> (<em>Stock</em>) &#8211; 买入对象</li>
+<li><strong>price</strong> (<em>float</em>) &#8211; 买入价格</li>
+<li><strong>num</strong> (<em>size_t</em>) &#8211; 买入数量</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">返回:</th><td class="field-body"><p class="first">交易成本记录</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">返回类型:</th><td class="field-body"><p class="first last"><a class="reference internal" href="record_struct.html#hikyuu.trade_manage.CostRecord" title="hikyuu.trade_manage.CostRecord">CostRecord</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeCostBase.getSellCost">
+<code class="descname">getSellCost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeCostBase.getSellCost" title="永久链接至目标">¶</a></dt>
+<dd><p>【重载接口】获取卖出成本</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">参数:</th><td class="field-body"><ul class="first simple">
+<li><strong>datetime</strong> (<em>Datetime</em>) &#8211; 卖出时刻</li>
+<li><strong>stock</strong> (<em>Stock</em>) &#8211; 卖出对象</li>
+<li><strong>price</strong> (<em>float</em>) &#8211; 卖出价格</li>
+<li><strong>num</strong> (<em>size_t</em>) &#8211; 卖出数量</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">返回:</th><td class="field-body"><p class="first">交易成本记录</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">返回类型:</th><td class="field-body"><p class="first last"><a class="reference internal" href="record_struct.html#hikyuu.trade_manage.CostRecord" title="hikyuu.trade_manage.CostRecord">CostRecord</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hikyuu.trade_manage.TradeCostBase._clone">
+<code class="descname">_clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hikyuu.trade_manage.TradeCostBase._clone" title="永久链接至目标">¶</a></dt>
+<dd><p>【重载接口】子类克隆接口</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="TradeManager.html" class="btn btn-neutral float-right" title="交易管理类" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="record_struct.html" class="btn btn-neutral" title="基础数据结构" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; 版权所有 2016, fasiondog.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/translations.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
