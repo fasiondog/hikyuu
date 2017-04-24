@@ -121,12 +121,36 @@ class Query(KQuery):
     EQUAL_FORWARD = KQuery.RecoverType.EQUAL_FORWARD
     EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
     
-    def __init__(self, start = 0, end = constant.null_int64, 
+    def __init__(self, start = 0, end = None, 
                  kType = KQuery.KType.DAY, recoverType = KQuery.RecoverType.NO_RECOVER):
-        super(Query, self).__init__(start, end, kType, recoverType)
+        """
+        构建按索引方式 [start, end) 查询K线数据条件，查询[start, end)的K线记录
+        start: int 起始位置（默认0）
+        end  : int 结束位置（默认为全部数量）
+        kType: KQuery.KType.DAY K线类型（默认为日线）
+        recoverType: KQuery.RecoverType.NO_RECOVER 复权类型（默认不复权）
+        """
+        end_pos = constant.null_int64 if end is None else end
+        super(Query, self).__init__(start, end_pos, kType, recoverType)
 
-QueryByIndex = KQueryByIndex
-QueryByDate = KQueryByDate
+QueryByIndex = Query
+
+def QueryByDate(start=None, end=None, kType=Query.DAY, 
+                recoverType=Query.NO_RECOVER):
+    """
+    构建按日期 [start, end) 查询K线数据条件
+    start: Datetime      起始日期（默认为支持的最小日期）
+    end  : Datetime      结束日期（默认为支持的最大日期）
+    kType: KQuery.KType  K线类型（默认为日线）
+    recoverType: KQuery.RecoverType 复权类型（默认不复权）
+    
+    return KQuery K线数据查询条件
+        
+    """
+    start_date = Datetime.minDatetime() if start is None else start
+    end_date = Datetime.maxDatetime() if end is None else end
+    return KQueryByDate(start_date, end_date, kType, recoverType)
+
 
 KQuery.INDEX = KQuery.QueryType.INDEX
 KQuery.DATE = KQuery.QueryType.DATE

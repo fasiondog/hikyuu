@@ -68,39 +68,4 @@
         </Folder>
         <File name="tools\setup.py" />
     </Project>
-    <Project name="hikyuu_doc">
-        <File name="tools\hikyuu\docs\source\conf.py" />
-        <File name="tools\hikyuu\docs\source\index.rst" />
-        <File name="tools\hikyuu\docs\source\reference.rst" />
-        <File name="tools\hikyuu\docs\source\quickstart.rst" />
-        <File name="tools\hikyuu\docs\source\install.rst" />
-        <File name="tools\hikyuu\docs\source\overview.rst" />
-        <Folder name="trade_manage">
-            <File name="tools\hikyuu\docs\source\trade_manage\trade_manage.rst" />
-            <File name="tools\hikyuu\docs\source\trade_manage\trade_cost.rst" />
-            <File name="tools\hikyuu\docs\source\trade_manage\TradeManager.rst" />
-            <File name="tools\hikyuu\docs\source\trade_manage\record_struct.rst" />
-        </Folder>
-        <Folder name="trade_sys">
-            <File name="tools\hikyuu\docs\source\trade_sys\signal.rst" />
-            <File name="tools\hikyuu\docs\source\trade_sys\trade_sys.rst" />
-            <File name="tools\hikyuu\docs\source\trade_sys\stoploss.rst" />
-            <File name="tools\hikyuu\docs\source\trade_sys\money_manager.rst" />
-            <File name="tools\hikyuu\docs\source\trade_sys\profitgoal.rst" />
-            <File name="tools\hikyuu\docs\source\trade_sys\slippage.rst" />
-            <File name="tools\hikyuu\docs\source\trade_sys\condition.rst" />
-            <File name="tools\hikyuu\docs\source\trade_sys\environment.rst" />
-        </Folder>
-        <Folder name="indicator">
-            <File name="tools\hikyuu\docs\source\indicator\index.rst" />
-            <File name="tools\hikyuu\docs\source\indicator\indicator.rst" />
-            <File name="tools\hikyuu\docs\source\indicator\overview.rst" />
-        </Folder>
-        <Folder name="base">
-            <File name="tools\hikyuu\docs\source\base\datatype.rst" />
-            <File name="tools\hikyuu\docs\source\base\index.rst" />
-            <File name="tools\hikyuu\docs\source\base\stock_manager.rst" />
-            <File name="tools\hikyuu\docs\source\base\utilities.rst" />
-        </Folder>
-    </Project>
 </NotepadPlus>

@@ -284,7 +284,7 @@ def realtimeUpdate_from_tushare():
             record.datetime = Datetime(d)
             stock.realtimeUpdate(record)
 
-def realtimeUpdate(source = 'sina'):
+def realtimeUpdate(source = 'tushare'):
     if source == 'sina' or source == 'qq':
         realtimeUpdate_from_sina_qq(source)
     elif source == 'tushare':

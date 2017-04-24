@@ -50,9 +50,6 @@ INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (13,1,'
 INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (18,2,'300',8,'创业板');
 INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (19,1,'603',1,'上证A股');
 INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (20,1,'519',4,'上证基金');
-CREATE INDEX "ix_stockid_stock" ON "stock" (stockid);
-CREATE INDEX "ix_marketid_stock" ON "stock" (marketid);
-CREATE INDEX "ix_marketid_code_stock" ON "stock" (marketid, code);
 CREATE INDEX "ix_stkWeight_stockid" ON "stkWeight" (stockid);
 CREATE INDEX "ix_stkWeight_date" ON "stkWeight" (date);
 CREATE INDEX "ix_stkWeight" ON "stkWeight" (stockid, date);
