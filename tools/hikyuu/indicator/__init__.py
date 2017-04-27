@@ -44,6 +44,22 @@ Indicator.__truediv__ = indicator_div #Python3 div
 
 OP = Operand
 
+
+def PRICELIST(data, result_num=0, discard=0):
+    """
+    将data转化为Indicator
+    参数：
+        data：待转化的数据
+        result_num：当data为Indicator实例时，指示Indicator的第几个结果集
+        discard：抛弃的数量，在 data 为 Indicator类型时无效
+    """
+    from . import _indicator as ind
+    if isinstance(data, ind.Indicator):
+        return ind.PRICELIST(data, result_num)
+    else:
+        return ind.PRICELIST(toPriceList(data), discard)
+    
+
 try:
     import numpy as np
     import pandas as pd
@@ -107,14 +123,6 @@ MACD平滑异同移动平均线
 返回：(MADC_BAR, DIFF, DEA)
 """
 
-PRICELIST.__doc__ += """\n
-将data转化为Indicator
-参数：
-    data：待转化的数据
-    result_num：当data为Indicator实例时，指示Indicator的第几个结果集
-    discard：抛弃的数量，在 data 为 Indicator类型时无效
-"""
-
 REF.__doc__ += """\n
 REF 向前引用 （即右移）
 引用若干周期前的数据。
@@ -167,12 +175,12 @@ try:
     import talib
     import talib.abstract as ta
     
-    def tawrap_init(self, tafunc, name, params, result_num = 1, prices = None):
+    def tawrap_init(self, tafunc, name, params, result_num=1, prices = None):
         super(self.__class__, self).__init__(name, result_num)
         for k,v in params.items():
             self.setParam(k, v) 
-        self.tafunc = tafunc
-        self.prices = prices
+        self._tafunc = tafunc
+        self._prices = prices
     
 
     def tawrap_calculate(self, ind):
@@ -182,8 +190,21 @@ try:
             print("error: result_num must be >= 1!")
             return
         
-        if not self.prices:
-            inputs = {'close': ind.to_np()}
+        if not self._prices:
+            if self.name == "TA_OBV":
+                if ind.getResultNumber() < 2:
+                    print("error: result_num must be >= 2!")
+                    return
+                inputs = {'close': ind.getResult(0).to_np(),
+                          'volume': ind.getResult(1).to_np()}
+            elif self.name in ("TA_BETA", "TA_CORREL"):
+                if ind.getResultNumber() < 2:
+                    print("error: result_num must be >= 2!")
+                    return
+                inputs = {'high': ind.getResult(0).to_np(),
+                          'low': ind.getResult(1).to_np()}
+            else:
+                inputs = {'close': ind.to_np()}
         else:
             if ind.name != 'KDATA':
                 print("error: ind must KDATA")
@@ -203,21 +224,22 @@ try:
         for name in param_names:
             func_params[name] = self.getParam(name)
             
-        self.tafunc.set_parameters(func_params)
-        outputs = self.tafunc(inputs, prices = self.prices) if self.prices else self.tafunc(inputs)
+        self._tafunc.set_parameters(func_params)
+
+        outputs = self._tafunc(inputs, prices = self._prices) if self._prices else self._tafunc(inputs)
     
         if result_num == 1:
             for i, val in enumerate(outputs):
                 if not np.isnan(val):
                     self._set(float(val), i)
-            self.setDiscard(self.tafunc.lookback)
+            self.setDiscard(self._tafunc.lookback)
             
         else:
             for i, out in enumerate(outputs):
                 for j, val in enumerate(out):
                     if not np.isnan(val):
                         self._set(float(val), j, i)
-            self.setDiscard(self.tafunc.lookback)
+            self.setDiscard(self._tafunc.lookback)
 
 
     def check_all_true(self):
@@ -555,6 +577,17 @@ try:
         return Indicator(imp)
     
     TA_MACDFIX.__doc__ = talib.MACDFIX.__doc__
+
+    def TA_MAMA(ind=None, fastlimit=0.5, slowlimit=0.05):
+        imp = crtTaIndicatorImp(ta.MAMA, 'TA_MAMA', 
+                                result_num = 2,
+                                params={'fastlimit': fastlimit,
+                                        'slowlimit': slowlimit})
+        if ind is not None:
+            imp.calculate(ind)
+        return Indicator(imp)
+    
+    TA_MAMA.__doc__ = talib.MAMA.__doc__
     
     def TA_MAX(ind=None, timeperiod=30):
         imp = crtTaIndicatorImp(ta.MAX, 'TA_MAX', 
@@ -1634,31 +1667,35 @@ try:
     
     TA_CDLXSIDEGAP3METHODS.__doc__ = talib.CDLXSIDEGAP3METHODS.__doc__
     
-    def TA_BETA(ind):
-        x = talib.BETA(ind.getResult(0).to_np(), ind.getResult(1).to_np())
-        y = PRICELIST(toPriceList(list(x)))
-        discard = 0
-        for val in y:
-            if not np.isnan(val):
-                break
-            discard += 1
-        y.setDiscard(discard)
-        return y    
+    def TA_BETA(ind=None, timeperiod=5):
+        imp = crtTaIndicatorImp(ta.BETA, 'TA_BETA', 
+                                result_num = 1,
+                                params={'timeperiod': timeperiod})
+        if ind is not None:
+            imp.calculate(ind)
+        return Indicator(imp)  
         
     TA_BETA.__doc__ = talib.BETA.__doc__
     
-    def TA_CORREL(ind, timeperiod=30):
-        x = talib.CORREL(ind.getResult(0).to_np(), ind.getResult(1).to_np())
-        y = PRICELIST(toPriceList(list(x)))
-        discard = 0
-        for val in y:
-            if not np.isnan(val):
-                break
-            discard += 1
-        y.setDiscard(discard)
-        return y 
+    def TA_CORREL(ind=None, timeperiod=30):
+        imp = crtTaIndicatorImp(ta.CORREL, 'TA_CORREL', 
+                                result_num = 1,
+                                params={'timeperiod': timeperiod})
+        if ind is not None:
+            imp.calculate(ind)
+        return Indicator(imp)  
+        
+    TA_CORREL.__doc__ = talib.CORREL.__doc__
     
-    TA_CORREL.__doc__ = talib.CORREL.__doc__       
+    def TA_OBV(ind=None):
+        imp = crtTaIndicatorImp(ta.OBV, 'TA_OBV', 
+                                result_num = 1)
+        if ind is not None:
+            imp.calculate(ind)
+        return Indicator(imp)
+    
+    TA_OBV.__doc__ = talib.OBV.__doc__    
+    
     
 except:
     print("warning: can't import talib, maybe loss some Indicator!")

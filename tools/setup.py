@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 import sys
 
 hku_name = "Hikyuu"
-hku_version = "0.1.0"
+hku_version = "1.0.0"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
