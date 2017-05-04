@@ -149,7 +149,7 @@ crtTM.__doc__ = """
     考虑的移滑价差需要使用当日的最高或最低价，所以不在该模块内进行处理
     参数:
        datetime 账户建立日期, 默认1990-1-1
-       initcash 初始现金，默认100000
-       costfunc 交易成本算法,默认零成本算法TC_Zero()
+       initCash 初始现金，默认100000
+       costFunc 交易成本算法,默认零成本算法TC_Zero()
        name 账户名称，默认“SYS”
     """   
