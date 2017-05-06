@@ -12,7 +12,7 @@
     <section class="page-header">
       <h1 class="project-name">Hikyuu - Quant Framework</h1>
       <h2 class="project-tagline"></h2>
-      <a href="http://hikyuu.org/download/Hikyuu-1.0.0.win-amd64.exe.zip" class="btn">下载安装包</a>
+      <a href="http://pan.baidu.com/s/1qYrvkM4" class="btn">下载安装包</a>
       <a href="http://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/examples/000-Index.ipynb?flush_cache=True" class="btn">入门与示例</a>
       <a href="http://hikyuu.readthedocs.io" class="btn">帮助手册</a>
       <a href="http://hikyuu.org/ref-doc/index.html" class="btn">C++库参考</a>
@@ -23,7 +23,7 @@
       <h3>
 <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hikyuu 简介</h3>
 
-<p>Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。例如：:</p>
+<p>Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（目前用于国内证券市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。例如：:</p>
 
 <pre><code>#创建模拟交易账户进行回测，初始资金30万
 my_tm = crtTM(initCash = 300000)
@@ -64,6 +64,36 @@ sys.run(sm['sz000001'], Query(-150))
 <p><b>3、多范式支持，探索更便捷、自由 </b>同时支持面向对象和命令行编程范式。其中，命令行在进行策略探索时，更加简单、便捷、自由。</p>
 <p><b>4、安全、自由、隐私，搭建自己的专属云量化平台</b> 结合 Python + Jupyter 的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如 numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。</p>
 <p><b>5、数据存储方式可扩展</b> 目前支持本地HDF5格式、MySQL存储。默认使用HDF5，数据文件体积小、速度更快、备份更便利。截止至2017年4月21日，沪市日线数据文件149M、深市日线数据文件184M、5分钟线数据各不到2G。</p>
+
+<h3>
+<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>想提供帮助？</h3>
+
+<p>Hikyuu非常需要社区提供帮助，具体包括：
+<ul>
+<li>测试：对Hikyuu项目中代码的测试和BUG反馈</li>
+<li>文档：包括代码注释、开发教程、学习经验等</li>
+<li>新功能：提供新的数据及财经数据接入、自动交易接口、上层应用开发等</li>
+<li>网站：对hikyuu.org的官方网站的外观设计和功能添加</li>
+</ul>
+<a href="https://git.oschina.net/fasiondog/hikyuu/issues">建议通过在码云上开issue的方式来贡献以上内容</a>
+</p>
+
+<h3>
+<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>联系方式</h3>
+
+<p>遇到了问题？想要更多了解Hikyuu？请使用以下方式联系：</p>
+<ul>
+<li>QQ交流群：114910869</li>
+<li>作者邮箱：fasiondog@sina.com</li>
+</ul>
+
+<p>QQ群扫码加入：</p>
+<img alt="QQ爱好者群扫码" src="images/10003-qq.png">
+
+<h3>
+<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h3>
+
+<a href="https://mit-license.org/">MIT协议</a>
 
 
       <footer class="site-footer">
