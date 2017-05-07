@@ -25,5 +25,6 @@
 /tools/build
 /tools/dist
 /tools/Hikyuu.egg-info
+.ipynb_checkpoints
 *~
 
