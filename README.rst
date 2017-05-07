@@ -4,8 +4,6 @@
     :align: center
     :alt: Hikyuu
 
-Hikyuu 简介
-============
 
 什么是 Hikyuu Quant Framework？
 -------------------------------
