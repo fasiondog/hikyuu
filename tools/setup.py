@@ -37,7 +37,9 @@ if sys.platform == 'win32':
                       ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/hdf5_cppdll.dll']),
                       ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/hdf5_hl_cppdll.dll']),
                       ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/szip.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/zlib.dll'])]
+                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/zlib.dll']),
+                      ('Lib/site-packages/hikyuu', ['../extern-libs/msvc/msvcp100.dll']),
+                      ('Lib/site-packages/hikyuu', ['../extern-libs/msvc/msvcr100.dll'])]
 else:
     hku_data_files = []
 

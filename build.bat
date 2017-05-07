@@ -18,8 +18,8 @@ if "_%PROCESSOR_ARCHITECTURE%_" == "_AMD64_" (
 REM GUESS COMPILER
 REM if NOT "_%VS140COMNTOOLS%_" == "__" (
 REM     set BUILD_OUTPUT_PATH=msvc-14.0\release\address-model-64\threading-multi
-REM   	set TOOLSET=toolset=msvc-14.0
-REM   	goto Start_build) 
+REM    	set TOOLSET=toolset=msvc-14.0
+REM    	goto Start_build) 
 REM if NOT "_%VS120COMNTOOLS%_" == "__" (
 REM     set BUILD_OUTPUT_PATH=msvc-12.0\release\address-model-64\threading-multi
 REM 	set TOOLSET=toolset=msvc-12.0

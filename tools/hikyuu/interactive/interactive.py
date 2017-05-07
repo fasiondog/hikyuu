@@ -28,7 +28,6 @@ from . import elder as el
 from . import kaufman as kf
 
 import urllib
-import tushare as ts
 
 import sys
 import os
@@ -225,6 +224,8 @@ def realtimeUpdate_from_sina_qq(source):
 
     
 def realtimeUpdate_from_tushare():
+    import tushare as ts
+    
     #更新股票行情
     df = ts.get_today_all()
     for i in range(len(df)):
