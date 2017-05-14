@@ -453,8 +453,21 @@ _getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) c
             endix = 0;
     }
 
-    size_t startpos = boost::numeric_cast<size_t>(startix);
-    size_t endpos = boost::numeric_cast<size_t>(endix);
+    size_t null_size_t = Null<size_t>();
+    size_t startpos = 0;
+    size_t endpos = null_size_t;
+
+    try {
+        startpos = boost::numeric_cast<size_t>(startix);
+    } catch(...) {
+        startpos = null_size_t;
+    }
+
+    try {
+        endpos = boost::numeric_cast<size_t>(endix);
+    } catch (...) {
+        endpos = null_size_t;
+    }
 
     if(endpos > total) {
         endpos = total;

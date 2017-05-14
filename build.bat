@@ -9,9 +9,11 @@ goto :eof
 if NOT exist boost-build.jam copy boost-build.jam.win boost-build.jam
 if NOT exist Jamroot copy Jamroot.win Jamroot
 
+set ADDRESS_MODEL_OUTPUT=
 REM GUESS PROCESSOR_ARCHITECTURE
 if "_%PROCESSOR_ARCHITECTURE%_" == "_AMD64_" (
     set ADDRESS_MODEL=address-model=64
+    set ADDRESS_MODEL_OUTPUT=address-model-64
     goto Guess_compiler)
 
 :Guess_compiler	
@@ -25,11 +27,11 @@ REM     set BUILD_OUTPUT_PATH=msvc-12.0\release\address-model-64\threading-multi
 REM 	set TOOLSET=toolset=msvc-12.0
 REM 	goto Start_build) 
 if NOT "_%VS100COMNTOOLS%_" == "__" (
-    set BUILD_OUTPUT_PATH=msvc-10.0\release\address-model-64\threading-multi
+    set BUILD_OUTPUT_PATH=msvc-10.0\release\%ADDRESS_MODEL_OUTPUT%\threading-multi
 	set TOOLSET=toolset=msvc-10.0
 	goto Start_build) 
 if NOT "_%VS90COMNTOOLS%_" == "__" (
-    set BUILD_OUTPUT_PATH="msvc-9.0\release\address-model-64\threading-multi"
+    set BUILD_OUTPUT_PATH="msvc-9.0\release\%ADDRESS_MODEL_OUTPUT%\threading-multi"
 	set TOOLSET=toolset=msvc-9.0
 	goto Start_build) 
 goto Not_found_compiler
@@ -59,9 +61,3 @@ bjam -j 4 link=shared threading=multi %ADDRESS_MODEL%
 cd ..
 
 python .\tools\hikyuu\test\test.py
-
-::copy \workspace\fasiondog\trunk\build\cstock\msvc-10.0\release\\address-model-64\threading-multi\indicator\*.pyd \workspace\fasiondog\trunk\tools\cstock\cstock\indicator
-::copy \workspace\fasiondog\trunk\build\cstock\msvc-10.0\release\\address-model-64\threading-multi\instance\*.pyd \workspace\fasiondog\trunk\tools\cstock\cstock\instance
-::copy \workspace\fasiondog\trunk\build\cstock\msvc-10.0\release\\address-model-64\threading-multi\tradesys\*.pyd \workspace\fasiondog\trunk\tools\cstock\cstock\tradesys
-
-::copy /Y \lib\*.dll c:\windows\system32

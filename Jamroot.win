@@ -8,7 +8,7 @@ using msvc : 10.0 : : <compileflags>/wd4819 ;
 
 # Python configuration
 #using python : 2.6 : /usr ;
-#using python : 2.6 ;
+using python : 3.5 ;
 
 # Specify the path to the Boost project.  If you move this project,
 # adjust this path to refer to the Boost root directory.
@@ -22,7 +22,8 @@ BOOST_INCLUDE_DIR = d:\\src\\boost ;
 
 #工程所在目录，根据需要修改
 #HKU_DIR = /home/fasiondog/workspace/hikyuu ;
-HKU_DIR = d:\\workspace\\hikyuu ;
+#HKU_DIR = d:\\workspace\\hikyuu ;
+HKU_DIR = . ;
 
 #该变量不需要修改
 HKU_INCLUDE_DIR = $(HKU_DIR)/libs ;
@@ -36,18 +37,17 @@ use-project /sqlite3 : $(HKU_DIR)/extern-libs/sqlite3 ;
 project : default-build release
         : requirements <include>$(BOOST_INCLUDE_DIR)
                        <include>$(HKU_INCLUDE_DIR)
-                       <include>$(MYSQL_INCLUDE_DIR)
 #                       <toolset>gcc:<cxxflags>-std=c++0x
 #                       <toolset>gcc:<define>FSD_CPP_0X_SUPPORT
                        <toolset>gcc:<linkflags>-s
-                       <toolset>msvc:<address-model>64
+                       <toolset>msvc:<cxxflags>-GS-
+                       #<toolset>msvc:<address-model>64
 					   <toolset>msvc:<define>BOOST_ALL_DYN_LINK
                        <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE
         ;
 
 build-project libs/hikyuu_utils ;
 build-project libs/hikyuu ;
-#build-project libs/galaxy_instance ;
 build-project libs/hikyuu_python ;
 #build-project test ;
-#build-project tools/importdata ;
+build-project tools/importdata ;
