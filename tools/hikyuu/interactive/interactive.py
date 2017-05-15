@@ -245,7 +245,8 @@ def realtimeUpdate_from_tushare():
         record.highPrice = df.ix[i, 'high']
         record.lowPrice = df.ix[i, 'low']
         record.closePrice = df.ix[i, 'trade']
-        record.transCount = df.ix[i, 'volume']
+        record.transAmount = float(df.ix[i, 'amount'])
+        record.transCount = float(df.ix[i, 'volume'])
         
         from datetime import date
         d = date.today()
@@ -274,7 +275,7 @@ def realtimeUpdate_from_tushare():
         record.lowPrice = df.ix[i, 'low']
         record.closePrice = df.ix[i, 'close']
         record.transCount = float(df.ix[i, 'volume'])
-        record.transAmount = df.ix[i, 'amount']
+        record.transAmount = float(df.ix[i, 'amount'])
         
         if (last_record.closePrice != record.closePrice 
                 or last_record.highPrice != record.highPrice 
@@ -285,10 +286,11 @@ def realtimeUpdate_from_tushare():
             record.datetime = Datetime(d)
             stock.realtimeUpdate(record)
 
-def realtimeUpdate(source = 'tushare'):
+def realtimeUpdate(source='tushare'):
     if source == 'sina' or source == 'qq':
         realtimeUpdate_from_sina_qq(source)
     elif source == 'tushare':
         realtimeUpdate_from_tushare()
     else:
         print('Not support!')
+            
