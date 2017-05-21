@@ -8,6 +8,7 @@
 #ifndef MONEYMANAGER_BUILD_IN_H_
 #define MONEYMANAGER_BUILD_IN_H_
 
+#include "crt/MM_Nothing.h"
 #include "crt/MM_FixedPercent.h"
 #include "crt/MM_FixedRisk.h"
 #include "crt/MM_FixedCapital.h"
