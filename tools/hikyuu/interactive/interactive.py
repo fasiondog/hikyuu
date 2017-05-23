@@ -286,11 +286,35 @@ def realtimeUpdate_from_tushare():
             record.datetime = Datetime(d)
             stock.realtimeUpdate(record)
 
-def realtimeUpdate(source='tushare'):
+def realtimeUpdate_inner(source='tushare'):
     if source == 'sina' or source == 'qq':
         realtimeUpdate_from_sina_qq(source)
     elif source == 'tushare':
         realtimeUpdate_from_tushare()
     else:
-        print('Not support!')
+        print(source, ' not support!')
+        
+        
+def realtimeUpdateWrap():
+    pre_update_time = None
+    def realtimeUpdate_closure(source='tushare', delta=60):
+        """
+        更新实时日线数据
+        参数：
+            source: 数据源（'sina' | 'qq' | 'tushare'）
+            delta: 更新间隔时间
+        """
+        from datetime import timedelta, datetime
+        nonlocal pre_update_time
+        now_update_time = datetime.now()
+        if (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
+            realtimeUpdate_inner(source)
+            pre_update_time = datetime.now()
+            print("更新完毕！", pre_update_time)
+        else:
+            print("更新间隔小于" + str(delta) + "秒，未更新")
+            print("上次更新时间: ", pre_update_time)  
+    return realtimeUpdate_closure
+
+realtimeUpdate = realtimeUpdateWrap()
             
