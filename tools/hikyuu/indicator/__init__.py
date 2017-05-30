@@ -1698,4 +1698,4 @@ try:
     
     
 except:
-    print("warning: can't import talib, maybe loss some Indicator!")
+    print("warning: can't import talib, maybe loss some Indicator from talib!")

@@ -236,18 +236,18 @@ if not os.path.lexists(data_directory):
 else:
     if os.path.lexists(data_directory + '/block'):
         pass
-        #x = ask_question("block目录已存在是否覆盖？(Y/[N])：")
-        #if x:
-        #    shutil.rmtree(data_directory + '/block')
-        #    shutil.copytree('config/block', data_directory + '/block')
-        #    os.remove(data_directory + '/block/__init__.py')
+        x = ask_question("block目录已存在是否覆盖？(Y/[N])：")
+        if x:
+            shutil.rmtree(data_directory + '/block')
+            shutil.copytree('config/block', data_directory + '/block')
+            os.remove(data_directory + '/block/__init__.py')
     
     if os.path.exists(data_directory + '/logger.properties'):
         pass
-        #x = ask_question("logger.properties文件已存在是否覆盖？(Y/[N])：")
-        #if x:
-        #    os.remove(data_directory + '/logger.properties')
-        #    shutil.copy('config/logger.properties', data_directory + '/logger.properties')
+        x = ask_question("logger.properties文件已存在是否覆盖？(Y/[N])：")
+        if x:
+            os.remove(data_directory + '/logger.properties')
+            shutil.copy('config/logger.properties', data_directory + '/logger.properties')
         
     if os.path.exists(data_directory + '/importdata.ini'):
         x = ask_question("importdata.ini文件已存在是否覆盖？(Y/[N])：")
@@ -258,7 +258,10 @@ else:
                 tdx_dir = 'c:\TdxW_HuaTai'
             with open(data_directory + '/importdata.ini', 'w') as f:
                 f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
-    else:      
+    else:
+        tdx_dir = input("请输入通达信安装路径（默认从c:\TdxW_HuaTai）：")
+        if tdx_dir == '':
+            tdx_dir = 'c:\TdxW_HuaTai'              
         with open(data_directory + '/importdata.ini', 'w') as f:
             f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
             

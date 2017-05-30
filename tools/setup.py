@@ -3,19 +3,26 @@
 
 from setuptools import setup, find_packages
 import sys
+import os
+
+if sys.argv[-1] == 'publish':
+    os.system("python setup.py bdist_wheel --python-tag cp35 -p win-amd64")
+    os.system("twine upload dist/*")
+    sys.exit()
 
 hku_name = "Hikyuu"
-hku_version = "1.0.0"
+hku_version = "1.0.1"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
-hku_license = "PSF"
+hku_license = "MIT"
 hku_keywords = ("hikyuu", "quant", "trade", "System Trading")
 hku_platforms = "Independant"
 hku_url = "http://hikyuu.org/"
 
 hku_description = "Hikyuu System Trading Analysis Tools"
-hku_long_description = ""
+with open("README.rst", encoding='utf-8') as f:
+    hku_long_description = f.read()
 
 if sys.platform == 'win32':
     hku_data_files = [('Lib/site-packages/hikyuu', ['../bin/hikyuu.dll']),
@@ -64,5 +71,27 @@ setup(
 
         },
         
-        data_files = hku_data_files
+        data_files = hku_data_files,
+        
+        classifiers=[
+            # How mature is this project? Common values are
+            #   3 - Alpha
+            #   4 - Beta
+            #   5 - Production/Stable
+            'Development Status :: 3 - Alpha',
+
+            # Indicate who your project is intended for
+            'Intended Audience :: Developers',
+            'Topic :: Software Development :: Build Tools',
+
+            # Pick your license as you wish (should match "license" above)
+             'License :: OSI Approved :: MIT License',
+
+            'Operating System :: Microsoft :: Windows',
+             
+            # Specify the Python versions you support here. In particular, ensure
+            # that you indicate whether you support Python 2, Python 3 or both.
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.5',
+        ] 
         )
