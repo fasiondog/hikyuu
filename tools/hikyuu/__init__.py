@@ -7,7 +7,7 @@
 # 历史：1）20100220, Added by fasiondog
 #===============================================================================
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __copyright__ = """\
 Copyright (c)  Fasiondog; mailto:fasiondog@gmail.com
     See the documentation for further information on copyrights,

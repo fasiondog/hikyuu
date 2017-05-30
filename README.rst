@@ -22,6 +22,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     sys.run(sm['sz000001'], Query(-150))
 
 .. figure:: http://hikyuu.org/images/10000-overview.png
+        :width: 600px
 
 完整示例参见：`<http://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/examples/001-overview.ipynb>`_
 
@@ -37,6 +38,7 @@ Maybe，你已经注意到了，上面没有“选股策略”？！是的，选
 - **组合灵活，分类构建策略资产库** Hikyuu对系统化交易方法进行了良好的抽象，将完整的系统交易分为不同的策略组件接口，在进行策略探索时，可以更加专注于某一方面的策略性能与影响，可以构建自己的策略库累计资产，并灵活组合。其主要功能模块如下：
 
   .. figure:: http://hikyuu.org/images/10002-function-arc.png
+        :width: 600px
 
 - **性能保障，打造自己的专属应用** 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
 
