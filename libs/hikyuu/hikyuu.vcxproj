@@ -1,0 +1,460 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{015A2AD6-9F94-431D-9E41-1761599A3063}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(HIKYUU)\libs;$(HIKYUU)\extern-libs\mysql\include;$(HIKYUU)\extern-libs\sqlite3;$(HIKYUU)\extern-libs\log4cplus\include;$(HIKYUU)\extern-libs\hdf5\include;$(BOOST_ROOT);$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)\build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\output\$(Platform)\$(Configuration)\</OutDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+    <ReferencePath>$(BOOST_LIB);$(ReferencePath)</ReferencePath>
+    <LibraryPath>$(BOOST_LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(HIKYUU)\libs;$(HIKYUU)\extern-libs\mysql\include;$(HIKYUU)\extern-libs\sqlite3;$(HIKYUU)\extern-libs\log4cplus\include;$(HIKYUU)\extern-libs\hdf5\include;$(BOOST_ROOT);$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)\build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\output\$(Platform)\$(Configuration)\</OutDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+    <ReferencePath>$(BOOST_LIB);$(ReferencePath)</ReferencePath>
+    <LibraryPath>$(BOOST_LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(HIKYUU)\libs;$(HIKYUU)\extern-libs\mysql\include;$(HIKYUU)\extern-libs\sqlite3;$(HIKYUU)\extern-libs\log4cplus\include;$(HIKYUU)\extern-libs\hdf5\include;$(BOOST_ROOT);$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)\build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\output\$(Platform)\$(Configuration)\</OutDir>
+    <TargetExt>.dll</TargetExt>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+    <ReferencePath>$(BOOST_LIB);$(ReferencePath)</ReferencePath>
+    <LibraryPath>$(BOOST_LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(HIKYUU)\libs;$(HIKYUU)\extern-libs\mysql\include;$(HIKYUU)\extern-libs\sqlite3;$(HIKYUU)\extern-libs\log4cplus\include;$(HIKYUU)\extern-libs\hdf5\include;$(BOOST_ROOT);$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)\build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\output\$(Platform)\$(Configuration)\</OutDir>
+    <TargetExt>.dll</TargetExt>
+    <LinkIncremental>true</LinkIncremental>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+    <ReferencePath>$(BOOST_LIB);$(ReferencePath)</ReferencePath>
+    <LibraryPath>$(BOOST_LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalOptions>/D HKU_API="__declspec(dllexport)" /D SQLITE_API="__declspec(dllimport)"  /D PY_VERSION_HEX=0x03000000 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\mysql\lib\libmysql.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hl_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hldll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <FullProgramDatabaseFile>false</FullProgramDatabaseFile>
+    </Link>
+    <CustomBuildStep>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(HIKYUU)\tools\hikyuu\" /Y</Command>
+      <Outputs>$(TargetName)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalOptions>/D HKU_API="__declspec(dllexport)" /D SQLITE_API="__declspec(dllimport)"  /D PY_VERSION_HEX=0x03000000 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <MinimalRebuild>true</MinimalRebuild>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\mysql\lib\libmysql.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hl_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hldll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(HIKYUU)\tools\hikyuu\" /Y</Command>
+      <Outputs>$(TargetName)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/D HKU_API="__declspec(dllexport)" /D SQLITE_API="__declspec(dllimport)"  /D PY_VERSION_HEX=0x03000000 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\mysql\lib\libmysql.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hl_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hldll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(HIKYUU)\tools\hikyuu\" /Y</Command>
+      <Outputs>$(TargetName)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>BOOST_ALL_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/D HKU_API="__declspec(dllexport)" /D SQLITE_API="__declspec(dllimport)"  /D PY_VERSION_HEX=0x03000000 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <MinimalRebuild>true</MinimalRebuild>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\mysql\lib\libmysql.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hl_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_hldll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(HIKYUU)\tools\hikyuu\" /Y</Command>
+      <Outputs>$(TargetName)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.cpp" />
+    <ClCompile Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.cpp" />
+    <ClCompile Include="data_driver\block_info\qianlong\QLBlockInfoDriver.cpp" />
+    <ClCompile Include="data_driver\DataDriverFactory.cpp" />
+    <ClCompile Include="data_driver\KDataDriver.cpp" />
+    <ClCompile Include="data_driver\kdata\hdf5\H5KDataDriverImp.cpp" />
+    <ClCompile Include="data_driver\kdata\mysql\MySQLKDataDriverImp.cpp" />
+    <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriverImp.cpp" />
+    <ClCompile Include="datetime\Datetime.cpp" />
+    <ClCompile Include="hikyuu.cpp" />
+    <ClCompile Include="indicator\crt\MA.cpp" />
+    <ClCompile Include="indicator\crt\POS.cpp" />
+    <ClCompile Include="indicator\export.cpp" />
+    <ClCompile Include="indicator\imp\Ama.cpp" />
+    <ClCompile Include="indicator\imp\Atr.cpp" />
+    <ClCompile Include="indicator\imp\Diff.cpp" />
+    <ClCompile Include="indicator\imp\Ema.cpp" />
+    <ClCompile Include="indicator\imp\HighLine.cpp" />
+    <ClCompile Include="indicator\imp\IKData.cpp" />
+    <ClCompile Include="indicator\imp\IPriceList.cpp" />
+    <ClCompile Include="indicator\imp\LowLine.cpp" />
+    <ClCompile Include="indicator\imp\Macd.cpp" />
+    <ClCompile Include="indicator\imp\RightShift.cpp" />
+    <ClCompile Include="indicator\imp\SaftyLoss.cpp" />
+    <ClCompile Include="indicator\imp\Sma.cpp" />
+    <ClCompile Include="indicator\imp\StdDeviation.cpp" />
+    <ClCompile Include="indicator\imp\Vigor.cpp" />
+    <ClCompile Include="indicator\imp\Weave.cpp" />
+    <ClCompile Include="indicator\Indicator.cpp" />
+    <ClCompile Include="indicator\IndicatorImp.cpp" />
+    <ClCompile Include="indicator\Operand.cpp" />
+    <ClCompile Include="indicator\OperandNode.cpp" />
+    <ClCompile Include="KData.cpp" />
+    <ClCompile Include="KDataBufferImp.cpp" />
+    <ClCompile Include="KDataImp.cpp" />
+    <ClCompile Include="KQuery.cpp" />
+    <ClCompile Include="KRecord.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="MarketInfo.cpp" />
+    <ClCompile Include="Stock.cpp" />
+    <ClCompile Include="StockManager.cpp" />
+    <ClCompile Include="StockTypeInfo.cpp" />
+    <ClCompile Include="StockWeight.cpp" />
+    <ClCompile Include="trade_instance\ama_sys\AmaInstance.cpp" />
+    <ClCompile Include="trade_manage\BorrowRecord.cpp" />
+    <ClCompile Include="trade_manage\CostRecord.cpp" />
+    <ClCompile Include="trade_manage\crt\crtTM.cpp" />
+    <ClCompile Include="trade_manage\crt\TC_TestStub.cpp" />
+    <ClCompile Include="trade_manage\export.cpp" />
+    <ClCompile Include="trade_manage\FundsRecord.cpp" />
+    <ClCompile Include="trade_manage\imp\FixedA2015TradeCost.cpp" />
+    <ClCompile Include="trade_manage\imp\FixedATradeCost.cpp" />
+    <ClCompile Include="trade_manage\imp\ZeroTradeCost.cpp" />
+    <ClCompile Include="trade_manage\LoanRecord.cpp" />
+    <ClCompile Include="trade_manage\Performance.cpp" />
+    <ClCompile Include="trade_manage\PositionRecord.cpp" />
+    <ClCompile Include="trade_manage\TradeCostBase.cpp" />
+    <ClCompile Include="trade_manage\TradeManager.cpp" />
+    <ClCompile Include="trade_manage\TradeRecord.cpp" />
+    <ClCompile Include="trade_sys\condition\ConditionBase.cpp" />
+    <ClCompile Include="trade_sys\condition\export.cpp" />
+    <ClCompile Include="trade_sys\condition\imp\OPLineCondition.cpp" />
+    <ClCompile Include="trade_sys\environment\EnvironmentBase.cpp" />
+    <ClCompile Include="trade_sys\environment\export.cpp" />
+    <ClCompile Include="trade_sys\environment\imp\TwoLineEnvironment.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\export.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedCapitalMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedCountMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedPercentMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedRatioMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedRiskMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedUnitsMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\NotMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.cpp" />
+    <ClCompile Include="trade_sys\moneymanager\MoneyManagerBase.cpp" />
+    <ClCompile Include="trade_sys\portfolio\AllocateMoneyBase.cpp" />
+    <ClCompile Include="trade_sys\portfolio\Portfolio.cpp" />
+    <ClCompile Include="trade_sys\profitgoal\export.cpp" />
+    <ClCompile Include="trade_sys\profitgoal\imp\FixedPercentProfitGoal.cpp" />
+    <ClCompile Include="trade_sys\profitgoal\imp\NoGoalProfitGoal.cpp" />
+    <ClCompile Include="trade_sys\profitgoal\ProfitGoalBase.cpp" />
+    <ClCompile Include="trade_sys\selector\SelectorBase.cpp" />
+    <ClCompile Include="trade_sys\signal\crt\SG_Flex.cpp" />
+    <ClCompile Include="trade_sys\signal\export.cpp" />
+    <ClCompile Include="trade_sys\signal\imp\CrossSignal.cpp" />
+    <ClCompile Include="trade_sys\signal\imp\SingleSignal.cpp" />
+    <ClCompile Include="trade_sys\signal\imp\SingleSignal2.cpp" />
+    <ClCompile Include="trade_sys\signal\SignalBase.cpp" />
+    <ClCompile Include="trade_sys\slippage\export.cpp" />
+    <ClCompile Include="trade_sys\slippage\imp\FixedPercentSlippage.cpp" />
+    <ClCompile Include="trade_sys\slippage\imp\FixedValueSlippage.cpp" />
+    <ClCompile Include="trade_sys\slippage\SlippageBase.cpp" />
+    <ClCompile Include="trade_sys\stoploss\crt\ST_Saftyloss.cpp" />
+    <ClCompile Include="trade_sys\stoploss\export.cpp" />
+    <ClCompile Include="trade_sys\stoploss\imp\FixedPercentStoploss.cpp" />
+    <ClCompile Include="trade_sys\stoploss\imp\IndicatorStoploss.cpp" />
+    <ClCompile Include="trade_sys\stoploss\StoplossBase.cpp" />
+    <ClCompile Include="trade_sys\system\crt\SYS_Simple.cpp" />
+    <ClCompile Include="trade_sys\system\System.cpp" />
+    <ClCompile Include="trade_sys\system\SystemPart.cpp" />
+    <ClCompile Include="trade_sys\system\TradeRequest.cpp" />
+    <ClCompile Include="utilities\Parameter.cpp" />
+    <ClCompile Include="utilities\util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Block.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="DataType.h" />
+    <ClInclude Include="data_driver\BaseInfoDriver.h" />
+    <ClInclude Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.h" />
+    <ClInclude Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.h" />
+    <ClInclude Include="data_driver\BlockInfoDriver.h" />
+    <ClInclude Include="data_driver\block_info\qianlong\QLBlockInfoDriver.h" />
+    <ClInclude Include="data_driver\DataDriverFactory.h" />
+    <ClInclude Include="data_driver\KDataDriver.h" />
+    <ClInclude Include="data_driver\KDataDriverImp.h" />
+    <ClInclude Include="data_driver\kdata\hdf5\H5KDataDriverImp.h" />
+    <ClInclude Include="data_driver\kdata\hdf5\H5Record.h" />
+    <ClInclude Include="data_driver\kdata\mysql\MySQLKDataDriverImp.h" />
+    <ClInclude Include="data_driver\kdata\tdx\TdxKDataDriverImp.h" />
+    <ClInclude Include="datetime\Datetime.h" />
+    <ClInclude Include="doc.h" />
+    <ClInclude Include="hikyuu.h" />
+    <ClInclude Include="indicator\build_in.h" />
+    <ClInclude Include="indicator\crt\AMA.h" />
+    <ClInclude Include="indicator\crt\ATR.h" />
+    <ClInclude Include="indicator\crt\DIFF.h" />
+    <ClInclude Include="indicator\crt\EMA.h" />
+    <ClInclude Include="indicator\crt\HHV.h" />
+    <ClInclude Include="indicator\crt\KDATA.h" />
+    <ClInclude Include="indicator\crt\LLV.h" />
+    <ClInclude Include="indicator\crt\MA.h" />
+    <ClInclude Include="indicator\crt\MACD.h" />
+    <ClInclude Include="indicator\crt\POS.h" />
+    <ClInclude Include="indicator\crt\PRICELIST.h" />
+    <ClInclude Include="indicator\crt\REF.h" />
+    <ClInclude Include="indicator\crt\SAFTYLOSS.h" />
+    <ClInclude Include="indicator\crt\SMA.h" />
+    <ClInclude Include="indicator\crt\STDEV.h" />
+    <ClInclude Include="indicator\crt\VIGOR.h" />
+    <ClInclude Include="indicator\crt\WEAVE.h" />
+    <ClInclude Include="indicator\imp\Ama.h" />
+    <ClInclude Include="indicator\imp\Atr.h" />
+    <ClInclude Include="indicator\imp\Diff.h" />
+    <ClInclude Include="indicator\imp\Ema.h" />
+    <ClInclude Include="indicator\imp\HighLine.h" />
+    <ClInclude Include="indicator\imp\IKData.h" />
+    <ClInclude Include="indicator\imp\IPriceList.h" />
+    <ClInclude Include="indicator\imp\LowLine.h" />
+    <ClInclude Include="indicator\imp\Macd.h" />
+    <ClInclude Include="indicator\imp\RightShift.h" />
+    <ClInclude Include="indicator\imp\SaftyLoss.h" />
+    <ClInclude Include="indicator\imp\Sma.h" />
+    <ClInclude Include="indicator\imp\StdDeviation.h" />
+    <ClInclude Include="indicator\imp\Vigor.h" />
+    <ClInclude Include="indicator\imp\Weave.h" />
+    <ClInclude Include="indicator\Indicator.h" />
+    <ClInclude Include="indicator\IndicatorImp.h" />
+    <ClInclude Include="indicator\Operand.h" />
+    <ClInclude Include="indicator\OperandNode.h" />
+    <ClInclude Include="KData.h" />
+    <ClInclude Include="KDataBufferImp.h" />
+    <ClInclude Include="KDataImp.h" />
+    <ClInclude Include="KQuery.h" />
+    <ClInclude Include="KRecord.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="MarketInfo.h" />
+    <ClInclude Include="serialization\all.h" />
+    <ClInclude Include="serialization\Block_serialization.h" />
+    <ClInclude Include="serialization\Datetime_serialization.h" />
+    <ClInclude Include="serialization\KData_serialization.h" />
+    <ClInclude Include="serialization\KQuery_serialization.h" />
+    <ClInclude Include="serialization\KRecord_serialization.h" />
+    <ClInclude Include="serialization\MarketInfo_serialization.h" />
+    <ClInclude Include="serialization\StockTypeInfo_serialization.h" />
+    <ClInclude Include="serialization\StockWeight_serialization.h" />
+    <ClInclude Include="serialization\Stock_serialization.h" />
+    <ClInclude Include="Stock.h" />
+    <ClInclude Include="StockManager.h" />
+    <ClInclude Include="StockMapIterator.h" />
+    <ClInclude Include="StockTypeInfo.h" />
+    <ClInclude Include="StockWeight.h" />
+    <ClInclude Include="trade_instance\ama_sys\AmaInstance.h" />
+    <ClInclude Include="trade_manage\BorrowRecord.h" />
+    <ClInclude Include="trade_manage\build_in.h" />
+    <ClInclude Include="trade_manage\CostRecord.h" />
+    <ClInclude Include="trade_manage\crt\crtTM.h" />
+    <ClInclude Include="trade_manage\crt\TC_FixedA.h" />
+    <ClInclude Include="trade_manage\crt\TC_FixedA2015.h" />
+    <ClInclude Include="trade_manage\crt\TC_TestStub.h" />
+    <ClInclude Include="trade_manage\crt\TC_Zero.h" />
+    <ClInclude Include="trade_manage\FundsRecord.h" />
+    <ClInclude Include="trade_manage\imp\FixedA2015TradeCost.h" />
+    <ClInclude Include="trade_manage\imp\FixedATradeCost.h" />
+    <ClInclude Include="trade_manage\imp\TradeCostStub.h" />
+    <ClInclude Include="trade_manage\imp\ZeroTradeCost.h" />
+    <ClInclude Include="trade_manage\LoanRecord.h" />
+    <ClInclude Include="trade_manage\Performance.h" />
+    <ClInclude Include="trade_manage\PositionRecord.h" />
+    <ClInclude Include="trade_manage\TradeCostBase.h" />
+    <ClInclude Include="trade_manage\TradeManager.h" />
+    <ClInclude Include="trade_manage\TradeRecord.h" />
+    <ClInclude Include="trade_sys\all.h" />
+    <ClInclude Include="trade_sys\condition\build_in.h" />
+    <ClInclude Include="trade_sys\condition\ConditionBase.h" />
+    <ClInclude Include="trade_sys\condition\crt\CN_OPLine.h" />
+    <ClInclude Include="trade_sys\condition\imp\OPLineCondition.h" />
+    <ClInclude Include="trade_sys\environment\build_in.h" />
+    <ClInclude Include="trade_sys\environment\crt\EV_TwoLine.h" />
+    <ClInclude Include="trade_sys\environment\EnvironmentBase.h" />
+    <ClInclude Include="trade_sys\environment\imp\TwoLineEnvironment.h" />
+    <ClInclude Include="trade_sys\moneymanager\build_in.h" />
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedCapital.h" />
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedCount.h" />
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedPercent.h" />
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedRisk.h" />
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedUnits.h" />
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_Nothing.h" />
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_WilliamsFixedRisk.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedCapitalMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedCountMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedPercentMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedRatioMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedRiskMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedUnitsMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\NotMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.h" />
+    <ClInclude Include="trade_sys\moneymanager\MoneyManagerBase.h" />
+    <ClInclude Include="trade_sys\portfolio\AllocateMoneyBase.h" />
+    <ClInclude Include="trade_sys\portfolio\build_in.h" />
+    <ClInclude Include="trade_sys\portfolio\Portfolio.h" />
+    <ClInclude Include="trade_sys\profitgoal\build_in.h" />
+    <ClInclude Include="trade_sys\profitgoal\crt\PG_FixedPercent.h" />
+    <ClInclude Include="trade_sys\profitgoal\crt\PG_NoGoal.h" />
+    <ClInclude Include="trade_sys\profitgoal\imp\FixedPercentProfitGoal.h" />
+    <ClInclude Include="trade_sys\profitgoal\imp\NoGoalProfitGoal.h" />
+    <ClInclude Include="trade_sys\profitgoal\ProfitGoalBase.h" />
+    <ClInclude Include="trade_sys\selector\build_in.h" />
+    <ClInclude Include="trade_sys\selector\SelectorBase.h" />
+    <ClInclude Include="trade_sys\signal\build_in.h" />
+    <ClInclude Include="trade_sys\signal\crt\SG_Cross.h" />
+    <ClInclude Include="trade_sys\signal\crt\SG_Flex.h" />
+    <ClInclude Include="trade_sys\signal\crt\SG_Single.h" />
+    <ClInclude Include="trade_sys\signal\imp\CrossSignal.h" />
+    <ClInclude Include="trade_sys\signal\imp\SingleSignal.h" />
+    <ClInclude Include="trade_sys\signal\imp\SingleSignal2.h" />
+    <ClInclude Include="trade_sys\signal\SignalBase.h" />
+    <ClInclude Include="trade_sys\slippage\build_in.h" />
+    <ClInclude Include="trade_sys\slippage\crt\SP_FixedPercent.h" />
+    <ClInclude Include="trade_sys\slippage\crt\SP_FixedValue.h" />
+    <ClInclude Include="trade_sys\slippage\imp\FixedPercentSlippage.h" />
+    <ClInclude Include="trade_sys\slippage\imp\FixedValueSlippage.h" />
+    <ClInclude Include="trade_sys\slippage\SlippageBase.h" />
+    <ClInclude Include="trade_sys\stoploss\build_in.h" />
+    <ClInclude Include="trade_sys\stoploss\crt\ST_FixedPercent.h" />
+    <ClInclude Include="trade_sys\stoploss\crt\ST_Indicator.h" />
+    <ClInclude Include="trade_sys\stoploss\crt\ST_Saftyloss.h" />
+    <ClInclude Include="trade_sys\stoploss\imp\FixedPercentStoploss.h" />
+    <ClInclude Include="trade_sys\stoploss\imp\IndicatorStoploss.h" />
+    <ClInclude Include="trade_sys\stoploss\StoplossBase.h" />
+    <ClInclude Include="trade_sys\system\build_in.h" />
+    <ClInclude Include="trade_sys\system\crt\SYS_Simple.h" />
+    <ClInclude Include="trade_sys\system\System.h" />
+    <ClInclude Include="trade_sys\system\SystemPart.h" />
+    <ClInclude Include="trade_sys\system\TradeRequest.h" />
+    <ClInclude Include="utilities\Null.h" />
+    <ClInclude Include="utilities\Parameter.h" />
+    <ClInclude Include="utilities\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\project\msvc\hikyuu-utils\hikyuu-utils.vcxproj">
+      <Project>{6f195c89-b5b2-41e8-a65d-2f58a6e7f52d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\project\msvc\sqlite3\sqlite3.vcxproj">
+      <Project>{3bd04543-7360-4520-a998-0c11a301c25f}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

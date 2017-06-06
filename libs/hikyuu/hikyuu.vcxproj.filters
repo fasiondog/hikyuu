@@ -1,0 +1,822 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hikyuu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KDataBufferImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KDataImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KQuery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MarketInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StockManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StockTypeInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StockWeight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\DataDriverFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\KDataDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\block_info\qianlong\QLBlockInfoDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\kdata\hdf5\H5KDataDriverImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\kdata\mysql\MySQLKDataDriverImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriverImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="datetime\Datetime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\Indicator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\IndicatorImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\Operand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\OperandNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\crt\MA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\crt\POS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Ama.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Atr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Diff.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Ema.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\HighLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\IKData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\IPriceList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\LowLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Macd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\RightShift.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\SaftyLoss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Sma.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\StdDeviation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Vigor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="indicator\imp\Weave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_instance\ama_sys\AmaInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\BorrowRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\CostRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\FundsRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\LoanRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\Performance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\PositionRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\TradeCostBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\TradeManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\TradeRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\crt\crtTM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\crt\TC_TestStub.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\imp\FixedA2015TradeCost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\imp\FixedATradeCost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_manage\imp\ZeroTradeCost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\condition\ConditionBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\condition\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\condition\imp\OPLineCondition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\environment\EnvironmentBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\environment\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\environment\imp\TwoLineEnvironment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\MoneyManagerBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedCapitalMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedCountMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedPercentMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedRatioMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedRiskMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\FixedUnitsMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\NotMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\portfolio\AllocateMoneyBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\portfolio\Portfolio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\profitgoal\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\profitgoal\ProfitGoalBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\profitgoal\imp\FixedPercentProfitGoal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\profitgoal\imp\NoGoalProfitGoal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\selector\SelectorBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\signal\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\signal\SignalBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\signal\crt\SG_Flex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\signal\imp\CrossSignal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\signal\imp\SingleSignal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\signal\imp\SingleSignal2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\slippage\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\slippage\SlippageBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\slippage\imp\FixedPercentSlippage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\slippage\imp\FixedValueSlippage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\stoploss\export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\stoploss\StoplossBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\stoploss\crt\ST_Saftyloss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\stoploss\imp\FixedPercentStoploss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\stoploss\imp\IndicatorStoploss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\system\System.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\system\SystemPart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\system\TradeRequest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\system\crt\SYS_Simple.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\Parameter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="doc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hikyuu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KDataBufferImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KDataImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KQuery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MarketInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StockManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StockMapIterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StockTypeInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StockWeight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\BaseInfoDriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\BlockInfoDriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\DataDriverFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\KDataDriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\KDataDriverImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\block_info\qianlong\QLBlockInfoDriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\kdata\hdf5\H5KDataDriverImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\kdata\hdf5\H5Record.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\kdata\mysql\MySQLKDataDriverImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\kdata\tdx\TdxKDataDriverImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="datetime\Datetime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\Indicator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\IndicatorImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\Operand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\OperandNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\AMA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\ATR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\DIFF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\EMA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\HHV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\KDATA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\LLV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\MA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\MACD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\POS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\PRICELIST.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\REF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\SAFTYLOSS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\SMA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\STDEV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\VIGOR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\crt\WEAVE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Ama.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Atr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Diff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Ema.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\HighLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\IKData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\IPriceList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\LowLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Macd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\RightShift.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\SaftyLoss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Sma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\StdDeviation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Vigor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator\imp\Weave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\Block_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\Datetime_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\KData_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\KQuery_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\KRecord_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\MarketInfo_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\StockTypeInfo_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\StockWeight_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialization\Stock_serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_instance\ama_sys\AmaInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\BorrowRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\CostRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\FundsRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\LoanRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\Performance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\PositionRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\TradeCostBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\TradeManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\TradeRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\crt\crtTM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\crt\TC_FixedA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\crt\TC_FixedA2015.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\crt\TC_TestStub.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\crt\TC_Zero.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\imp\FixedA2015TradeCost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\imp\FixedATradeCost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\imp\TradeCostStub.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_manage\imp\ZeroTradeCost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\condition\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\condition\ConditionBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\condition\crt\CN_OPLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\condition\imp\OPLineCondition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\environment\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\environment\EnvironmentBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\environment\crt\EV_TwoLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\environment\imp\TwoLineEnvironment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\MoneyManagerBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedCapital.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedCount.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedPercent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedRisk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_FixedUnits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_Nothing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\crt\MM_WilliamsFixedRisk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedCapitalMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedCountMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedPercentMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedRatioMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedRiskMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\FixedUnitsMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\NotMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\portfolio\AllocateMoneyBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\portfolio\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\portfolio\Portfolio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\profitgoal\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\profitgoal\ProfitGoalBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\profitgoal\crt\PG_FixedPercent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\profitgoal\crt\PG_NoGoal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\profitgoal\imp\FixedPercentProfitGoal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\profitgoal\imp\NoGoalProfitGoal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\selector\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\selector\SelectorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\SignalBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\crt\SG_Cross.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\crt\SG_Flex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\crt\SG_Single.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\imp\CrossSignal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\imp\SingleSignal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\signal\imp\SingleSignal2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\slippage\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\slippage\SlippageBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\slippage\crt\SP_FixedPercent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\slippage\crt\SP_FixedValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\slippage\imp\FixedPercentSlippage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\slippage\imp\FixedValueSlippage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\stoploss\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\stoploss\StoplossBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\stoploss\crt\ST_FixedPercent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\stoploss\crt\ST_Indicator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\stoploss\crt\ST_Saftyloss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\stoploss\imp\FixedPercentStoploss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\stoploss\imp\IndicatorStoploss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\system\build_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\system\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\system\SystemPart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\system\TradeRequest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\system\crt\SYS_Simple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\Null.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\Parameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

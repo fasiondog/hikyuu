@@ -7,10 +7,14 @@
 *.so
 *.log
 *.plk
+*.exe
+*.sdf
+*.suo
 .metadata
 .settings
 /build
 /tools/hikyuu/*.dll
+/tools/hikyuu/*.exe
 /tools/hikyuu/docs/build
 /docs/docs-web/build
 /docs/reference
@@ -27,5 +31,9 @@
 /tools/Hikyuu.egg-info
 /tools/.pypirc
 .ipynb_checkpoints
+/project/msvc10/build
+/project/msvc10/output
+/project/msvc10/ipch
+/project/msvc
 *~
 

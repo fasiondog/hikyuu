@@ -2,15 +2,6 @@
 # Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-import python ;
-
-if ! [ python.configured ]
-{
-    ECHO "notice: no Python configured in user-config.jam" ;
-    ECHO "notice: will use default configuration" ;
-    using python ;
-}
-  
 project : build-dir  ../../build/hikyuu_python ;
 
 project : requirements <library>/boost/python//boost_python
@@ -22,7 +13,7 @@ project : requirements <library>/boost/python//boost_python
                        <toolset>msvc:<include>../../extern-libs//log4cplus/include
                        <toolset>msvc:<define>__WIN32__
 					   #<toolset>msvc:<define>BOOST_SERIALIZATION_DYN_LINK 
-					   #<toolset>msvc:<define>BOOST_ALL_DYN_LINK
+					   <toolset>msvc:<define>BOOST_ALL_DYN_LINK
                        <toolset>msvc:<define>HKU_API="__declspec(dllimport)"
                        <toolset>msvc:<define>HKU_EXT_API="__declspec(dllimport)"
                        <toolset>gcc:<define>HKU_EXT_API=""
