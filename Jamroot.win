@@ -12,24 +12,19 @@ using python : 3.5 ;
 
 # Specify the path to the Boost project.  If you move this project,
 # adjust this path to refer to the Boost root directory.
-use-project boost
-#  : /home/fasiondog/src/boost ;
-  : d:\\src\\boost ;
+import os ; 
+path-constant BOOST_ROOT : [ os.environ BOOST_ROOT ] ; 
+use-project boost : $(BOOST_ROOT) ;
 
-#指定boost头文件所在目录，根据需要进行修改
-#BOOST_INCLUDE_DIR = /home/fasiondog/src/boost ;
-BOOST_INCLUDE_DIR = d:\\src\\boost ;
+#指定boost头文件所在目录
+BOOST_INCLUDE_DIR = $(BOOST_ROOT) ;
 
-#工程所在目录，根据需要修改
-#HKU_DIR = /home/fasiondog/workspace/hikyuu ;
-#HKU_DIR = d:\\workspace\\hikyuu ;
 HKU_DIR = . ;
 
 #该变量不需要修改
 HKU_INCLUDE_DIR = $(HKU_DIR)/libs ;
 
 use-project /hikyuu : $(HKU_DIR)/libs/hikyuu ;
-#use-project /fsd_galaxy_instance : $(FSD_DIR)/libs/galaxy_instance ;
 use-project /hikyuu_utils : $(HKU_DIR)/libs/hikyuu_utils ;
 use-project /sqlite3 : $(HKU_DIR)/extern-libs/sqlite3 ;
 
