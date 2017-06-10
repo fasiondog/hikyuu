@@ -68,7 +68,6 @@ setup(
         include_package_data=True,
         package_data = {
             '': ['*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml'],
-
         },
         
         data_files = hku_data_files,
