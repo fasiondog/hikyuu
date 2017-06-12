@@ -19,6 +19,7 @@ MM_FixedCapital = csys.MM_FixedCapital
 MM_FixedCount = csys.MM_FixedCount
 MM_FixedPercent = csys.MM_FixedPercent
 MM_FixedUnits = csys.MM_FixedUnits
+MM_Nothing = csys.MM_Nothing
 
 MM_FixedCount.__doc__ = """
     固定交易数量资金管理策略 

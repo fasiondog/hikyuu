@@ -80,6 +80,14 @@ void Performance::reset() {
     }
 }
 
+double Performance::get(const string& name) const {
+    auto iter = m_result.find(name);
+    if (iter != m_result.end()) {
+        return iter->second;
+    }
+    return Null<double>();
+}
+
 string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
     std::stringstream buf;
     if (!tm) {

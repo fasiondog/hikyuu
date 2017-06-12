@@ -23,6 +23,9 @@ public:
 
     void reset();
 
+    double get(const string& name) const;
+    double operator[](const string& name) const { return get(name); }
+
     string report(const TradeManagerPtr& tm,
             const Datetime& datetime = Datetime::now());
 

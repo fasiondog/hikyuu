@@ -61,6 +61,7 @@ void export_Condition() {
             .def("getSG", &ConditionBase::getSG)
             .def("reset", &ConditionBase::reset)
             .def("clone", &ConditionBase::clone)
+            .def("_addValid", &ConditionBase::_addValid)
             .def("_calculate", pure_virtual(&ConditionBase::_calculate))
             .def("_reset", &ConditionBase::_reset, &ConditionWrap::default_reset)
             .def("_clone", pure_virtual(&ConditionBase::_clone))

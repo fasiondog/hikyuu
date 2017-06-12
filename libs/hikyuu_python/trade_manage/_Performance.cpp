@@ -16,6 +16,8 @@ void export_Performance() {
             .def("reset", &Performance::reset)
             .def("report", &Performance::report)
             .def("statistics", &Performance::statistics)
+            .def("get", &Performance::get)
+            .def("__getitem__", &Performance::get)
             ;
 }
 

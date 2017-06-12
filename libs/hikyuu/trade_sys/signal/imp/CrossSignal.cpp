@@ -10,14 +10,14 @@
 
 namespace hku {
 
-CrossSignal::CrossSignal() : SignalBase("CROSS") {
+CrossSignal::CrossSignal() : SignalBase("SG_Cross") {
     setParam<string>("kpart", "CLOSE");
 }
 
 CrossSignal::CrossSignal(const Operand& fast,
         const Operand& slow,
         const string& kpart)
-: SignalBase("CROSS"), m_fast(fast), m_slow(slow) {
+: SignalBase("SG_Cross"), m_fast(fast), m_slow(slow) {
     setParam<string>("kpart", kpart);
 }
 
@@ -48,9 +48,9 @@ void CrossSignal::_calculate() {
 
     size_t total = fast.size();
     for (size_t i = discard + 1; i < total; ++i) {
-        if (fast[i-1] < slow[i-1] && fast[i] >= slow[i]) {
+        if (fast[i-1] < slow[i-1] && fast[i] > slow[i]) {
             _addBuySignal(m_kdata[i].datetime);
-        } else if (fast[i-1] > slow[i-1] && fast[i] <= slow[i]) {
+        } else if (fast[i-1] > slow[i-1] && fast[i] < slow[i]) {
             _addSellSignal(m_kdata[i].datetime);
         }
     }

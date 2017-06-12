@@ -540,6 +540,7 @@ void System::_sellDelay(const KRecord& today) {
     price_t goalPrice = 0.0;
     if (getParam<bool>("delay_use_current_price")) {
         stoploss = _getStoplossPrice(today.datetime, planPrice);
+        if (stoploss >= planPrice)
         number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss);
         goalPrice = _getGoalPrice(today.datetime, planPrice);
     } else {

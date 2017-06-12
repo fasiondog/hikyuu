@@ -15,14 +15,14 @@
 
 namespace hku {
 
-SingleSignal2::SingleSignal2(): SignalBase("SINGLE2") {
+SingleSignal2::SingleSignal2(): SignalBase("SG_Single2") {
     setParam<int>("filter_n", 10);
     setParam<double>("filter_p", 0.1);
     setParam<string>("kpart", "CLOSE");
 }
 
 SingleSignal2::SingleSignal2(const Operand& ind)
-: SignalBase("SINGLE2"), m_ind(ind) {
+: SignalBase("SG_Single2"), m_ind(ind) {
     setParam<int>("filter_n", 10);
     setParam<double>("filter_p", 0.1);
     setParam<string>("kpart", "CLOSE");

@@ -17,6 +17,7 @@ SignalBase.__repr__ = reprFunc
 SG_Single = csys.SG_Single
 SG_Single2 = csys.SG_Single2
 SG_Cross = csys.SG_Cross
+SG_CrossGold = csys.SG_CrossGold
 SG_Flex = csys.SG_Flex
 
 def sig_init(self, name, params):
