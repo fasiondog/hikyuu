@@ -90,7 +90,7 @@ void System::initParam() {
 
     setParam<bool>("delay", true);
 
-    //延迟操作的情况下，是使用当前的价格计算止损价/止赢价/目标价还是使用上次计算的结果
+    //延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);
     setParam<bool>("tp_monotonic", true); //止赢单调递增
     setParam<int>("tp_delay_n", 3);    //止赢延迟判断天数
@@ -496,13 +496,21 @@ void System::_sell(const KRecord& today, Part from) {
 
 void System::_sellNow(const KRecord& today, Part from) {
     price_t planPrice = today.closePrice;
+    size_t number = 0;
 
     //计算新的止损价
     price_t stoploss = _getStoplossPrice(today.datetime, planPrice);
 
-    size_t number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss);
-    if (number == 0) {
-        return;
+    //如果新的计划价格已经小于等于新的止损价，则认为需全部卖出
+    if (planPrice <= stoploss) {
+        number = m_tm->getHoldNumber(today.datetime, m_stock);
+
+    //否则，认为可能只是进行减仓操作
+    } else {
+        number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss);
+        if (number == 0) {
+            return;
+        }
     }
 
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
@@ -540,8 +548,11 @@ void System::_sellDelay(const KRecord& today) {
     price_t goalPrice = 0.0;
     if (getParam<bool>("delay_use_current_price")) {
         stoploss = _getStoplossPrice(today.datetime, planPrice);
-        if (stoploss >= planPrice)
-        number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss);
+        if (planPrice  < stoploss) {
+            number = m_tm->getHoldNumber(today.datetime, m_stock);
+        } else {
+            number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss);
+        }
         goalPrice = _getGoalPrice(today.datetime, planPrice);
     } else {
         stoploss = m_sellRequest.stoploss;
@@ -581,24 +592,24 @@ void System::_submitSellRequest(const KRecord& today, Part from) {
             return;
         }
         m_sellRequest.count++;
-        m_sellRequest.datetime = today.datetime;
-        m_sellRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
-        m_sellRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
-        m_sellRequest.number = _getSellNumber(today.datetime, today.closePrice,
-                               today.closePrice - m_sellRequest.stoploss);
-        m_sellRequest.from = from;
 
     } else {
         m_sellRequest.valid = true;
         m_sellRequest.business = BUSINESS_SELL;
-        m_sellRequest.datetime = today.datetime;
-        m_sellRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
-        m_sellRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
-        m_sellRequest.number = _getSellNumber(today.datetime, today.closePrice,
-                               today.closePrice - m_sellRequest.stoploss);
-        m_sellRequest.from = from;
         m_sellRequest.count = 1;
     }
+
+    m_sellRequest.from = from;
+    m_sellRequest.datetime = today.datetime;
+    m_sellRequest.stoploss = _getStoplossPrice(today.datetime, today.closePrice);
+    if (today.closePrice <= m_sellRequest.stoploss) {
+        m_sellRequest.number = m_tm->getHoldNumber(today.datetime, m_stock);
+    } else {
+        m_sellRequest.number = _getSellNumber(today.datetime, today.closePrice,
+                               today.closePrice - m_sellRequest.stoploss);
+    }
+
+    m_sellRequest.goal = _getGoalPrice(today.datetime, today.closePrice);
 }
 
 

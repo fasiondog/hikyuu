@@ -66,6 +66,7 @@ void export_System() {
             .add_property("pg", &System::getPG, &System::setPG)
             .add_property("sp", &System::getSP, &System::setSP)
 
+            .def("getStock", &System::getStock)
             .def("getTradeRecordList", &System::getTradeRecordList,
                     return_value_policy<copy_const_reference>())
             .def("getBuyTradeRequest", &System::getBuyTradeRequest,

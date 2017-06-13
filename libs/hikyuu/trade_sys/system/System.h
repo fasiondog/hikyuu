@@ -72,6 +72,8 @@ public:
     void setPG(const ProfitGoalPtr& pg) { m_pg = pg; }
     void setSP(const SlippagePtr& sp) { m_sp = sp; }
 
+    Stock getStock() const { return m_stock; }
+
     const TradeRecordList& getTradeRecordList() const { return m_trade_list;}
 
     const TradeRequest& getBuyTradeRequest() const { return m_buyRequest; }
