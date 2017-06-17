@@ -8,13 +8,13 @@
 #ifndef MYSQLKDATADRIVERIMP_H_
 #define MYSQLKDATADRIVERIMP_H_
 
+#include "../../KDataDriverImp.h"
+
 #if defined(BOOST_WINDOWS)
     #include <mysql.h>
 #else
     #include <mysql/mysql.h>
 #endif
-
-#include "../../KDataDriverImp.h"
 
 namespace hku {
 

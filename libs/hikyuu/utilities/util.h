@@ -29,10 +29,12 @@ using std::string;
  * @{
  */
 
+#if defined(BOOST_WINDOWS)
 string HKU_API utf8_to_gb(const char* szinput);
 string HKU_API utf8_to_gb(const string& szinput);
 string HKU_API gb_to_utf8(const char* szinput);
 string HKU_API gb_to_utf8(const string& szinput);
+#endif
 
 /**
  * Windows平台下将字符串由UTF8转换为GB2312编码，
