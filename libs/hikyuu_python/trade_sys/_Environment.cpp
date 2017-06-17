@@ -44,13 +44,13 @@ public:
     }
 };
 
-string (EnvironmentBase::*get_name)() const = &EnvironmentBase::name;
-void (EnvironmentBase::*set_name)(const string&) = &EnvironmentBase::name;
+string (EnvironmentBase::*ev_get_name)() const = &EnvironmentBase::name;
+void (EnvironmentBase::*ev_set_name)(const string&) = &EnvironmentBase::name;
 
 void export_Environment() {
     class_<EnvironmentWrap, boost::noncopyable>("EnvironmentBase", init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name", get_name, set_name)
+            .add_property("name", ev_get_name, ev_set_name)
             .def("getParam", &EnvironmentBase::getParam<boost::any>)
             .def("setParam", &EnvironmentBase::setParam<object>)
             .def("setQuery", &EnvironmentBase::setQuery)

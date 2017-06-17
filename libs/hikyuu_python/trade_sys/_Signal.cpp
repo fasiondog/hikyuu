@@ -40,14 +40,14 @@ public:
 };
 
 
-string (SignalBase::*get_name)() const = &SignalBase::name;
-void (SignalBase::*set_name)(const string&) = &SignalBase::name;
+string (SignalBase::*sg_get_name)() const = &SignalBase::name;
+void (SignalBase::*sg_set_name)(const string&) = &SignalBase::name;
 
 void export_Signal() {
     class_<SignalWrap, boost::noncopyable>("SignalBase", init<>())
             .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name", get_name, set_name)
+            .add_property("name", sg_get_name, sg_set_name)
             //因为Indicator无法使用params['name']的形式，所以统一使用setParm/getParam
             //.add_property("params",
             //        make_function(&SignalBase::getParameter,

@@ -48,15 +48,15 @@ public:
 };
 
 
-string (SlippageBase::*get_name)() const = &SlippageBase::name;
-void (SlippageBase::*set_name)(const string&) = &SlippageBase::name;
+string (SlippageBase::*sp_get_name)() const = &SlippageBase::name;
+void (SlippageBase::*sp_set_name)(const string&) = &SlippageBase::name;
 
 
 void export_Slippage() {
     class_<SlippageWrap, boost::noncopyable>("SlippageBase", init<>())
             .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name", get_name, set_name)
+            .add_property("name", sp_get_name, sp_set_name)
             .def("getParam", &SlippageBase::getParam<boost::any>)
             .def("setParam", &SlippageBase::setParam<object>)
             .def("setTO", &SlippageBase::setTO)
