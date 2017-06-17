@@ -41,15 +41,15 @@ public:
 };
 
 
-string (ConditionBase::*get_name)() const = &ConditionBase::name;
-void (ConditionBase::*set_name)(const string&) = &ConditionBase::name;
+string (ConditionBase::*cn_get_name)() const = &ConditionBase::name;
+void (ConditionBase::*cn_set_name)(const string&) = &ConditionBase::name;
 
 
 void export_Condition() {
     class_<ConditionWrap, boost::noncopyable>("ConditionBase", init<>())
             .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name", get_name, set_name)
+            .add_property("name", cn_get_name, cn_set_name)
             .def("getParam", &ConditionBase::getParam<boost::any>)
             .def("setParam", &ConditionBase::setParam<object>)
             .def("isValid", &ConditionBase::isValid)

@@ -8,7 +8,7 @@
 #ifndef INDICATOR_IMP_WEAVE_H_
 #define INDICATOR_IMP_WEAVE_H_
 
-#include "../indicator.h"
+#include "../Indicator.h"
 
 namespace hku {
 

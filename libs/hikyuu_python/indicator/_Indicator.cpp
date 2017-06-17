@@ -20,15 +20,15 @@ Indicator (*indicator_sub)(const Indicator&, const Indicator&) = operator-;
 Indicator (*indicator_mul)(const Indicator&, const Indicator&) = operator*;
 Indicator (*indicator_div)(const Indicator&, const Indicator&) = operator/;
 
-string (Indicator::*read_name)() const = &Indicator::name;
-void (Indicator::*write_name)(const string&) = &Indicator::name;
+string (Indicator::*ind_read_name)() const = &Indicator::name;
+void (Indicator::*ind_write_name)(const string&) = &Indicator::name;
 
 void export_Indicator() {
 
     class_<Indicator>("Indicator", init<>())
         .def(init<IndicatorImpPtr>())
         .def(self_ns::str(self))
-        .add_property("name", read_name, write_name)
+        .add_property("name", ind_read_name, ind_write_name)
         .add_property("long_name", &Indicator::long_name)
         .add_property("discard", &Indicator::discard)
         .def("setDiscard", &Indicator::setDiscard)

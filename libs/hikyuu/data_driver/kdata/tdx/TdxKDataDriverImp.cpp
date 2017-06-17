@@ -7,7 +7,7 @@
 
 #include <fstream>
 #include <cmath>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include "TdxKDataDriverImp.h"
 
 namespace hku {
@@ -554,8 +554,8 @@ _getBaseCount(const string& market, const string& code, KQuery::KType ktype) {
     }
 
     size_t count = 0;
-    struct _stat info;
-    if (0 == _stat(filename.c_str(), &info)) {
+    struct stat info;
+    if (0 == stat(filename.c_str(), &info)) {
         count = info.st_size / sizeof(TdxDayData);
     }
 

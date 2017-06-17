@@ -17,7 +17,7 @@
 #if defined(BOOST_MSVC)
 #include <cpp/H5Cpp.h>
 #else
-#include <H5Cpp.h>
+#include <hdf5/serial/H5Cpp.h>
 #endif
 
 #if !(defined(WIN32) && defined(_WIN32))

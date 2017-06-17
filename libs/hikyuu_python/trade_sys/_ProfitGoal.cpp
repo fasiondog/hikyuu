@@ -59,14 +59,14 @@ public:
     }
 };
 
-string (ProfitGoalBase::*get_name)() const = &ProfitGoalBase::name;
-void (ProfitGoalBase::*set_name)(const string&) = &ProfitGoalBase::name;
+string (ProfitGoalBase::*pg_get_name)() const = &ProfitGoalBase::name;
+void (ProfitGoalBase::*pg_set_name)(const string&) = &ProfitGoalBase::name;
 
 void export_ProfitGoal() {
     class_<ProfitGoalWrap, boost::noncopyable>("ProfitGoalBase", init<>())
             .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name", get_name, set_name)
+            .add_property("name", pg_get_name, pg_set_name)
             .def("getParam", &ProfitGoalBase::getParam<boost::any>)
             .def("setParam", &ProfitGoalBase::setParam<object>)
             .def("setTM", &ProfitGoalBase::setTM)

@@ -18,8 +18,10 @@ namespace boost {
 namespace serialization {
 template<class Archive>
 void save(Archive & ar, const hku::Block& blk, unsigned int version) {
-    ar & boost::serialization::make_nvp("category", blk.category());
-    ar & boost::serialization::make_nvp("name", blk.name());
+    hku::string category = blk.category();
+    hku::string name = blk.name();
+    ar & boost::serialization::make_nvp("category", category);
+    ar & boost::serialization::make_nvp("name", name);
     hku::StockList stock_list;
     stock_list.reserve(blk.size());
     for (auto iter = blk.begin(); iter != blk.end(); ++iter) {

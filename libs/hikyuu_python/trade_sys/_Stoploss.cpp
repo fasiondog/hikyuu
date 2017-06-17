@@ -55,14 +55,14 @@ public:
     }
 };
 
-string (StoplossBase::*get_name)() const = &StoplossBase::name;
-void (StoplossBase::*set_name)(const string&) = &StoplossBase::name;
+string (StoplossBase::*st_get_name)() const = &StoplossBase::name;
+void (StoplossBase::*st_set_name)(const string&) = &StoplossBase::name;
 
 void export_Stoploss() {
     class_<StoplossWrap, boost::noncopyable>("StoplossBase", init<>())
             .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name", get_name, set_name)
+            .add_property("name", st_get_name, st_set_name)
             .def("getParam", &StoplossBase::getParam<boost::any>)
             .def("setParam", &StoplossBase::setParam<object>)
             .def("setTM", &StoplossBase::setTM)

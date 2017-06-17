@@ -12,8 +12,8 @@
 using namespace boost::python;
 using namespace hku;
 
-void (Portfolio::*set_name)(const string&) = &Portfolio::name;
-string (Portfolio::*get_name)() const= &Portfolio::name;
+void (Portfolio::*pf_set_name)(const string&) = &Portfolio::name;
+string (Portfolio::*pf_get_name)() const= &Portfolio::name;
 
 void export_Portfolio() {
     class_<Portfolio>("Portfolio", init<>())
@@ -26,7 +26,7 @@ void export_Portfolio() {
             .add_property("params",
                     make_function(&Portfolio::getParameter,
                             return_internal_reference<>()))
-            .add_property("name", get_name, set_name)
+            .add_property("name", pf_get_name, pf_set_name)
             .add_property("am", &Portfolio::getAM, &Portfolio::setAM)
             .add_property("tm", &Portfolio::getTM, &Portfolio::setTM)
             .add_property("sys", &Portfolio::getSYS, &Portfolio::setSYS)

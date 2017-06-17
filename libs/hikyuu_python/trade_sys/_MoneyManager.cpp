@@ -96,15 +96,15 @@ public:
 };
 
 
-string (MoneyManagerBase::*get_name)() const = &MoneyManagerBase::name;
-void (MoneyManagerBase::*set_name)(const string&) = &MoneyManagerBase::name;
+string (MoneyManagerBase::*mm_get_name)() const = &MoneyManagerBase::name;
+void (MoneyManagerBase::*mm_set_name)(const string&) = &MoneyManagerBase::name;
 
 
 void export_MoneyManager() {
     class_<MoneyManagerWrap, boost::noncopyable>("MoneyManagerBase", init<>())
             .def(init<const string&>())
             .def(self_ns::str(self))
-            .add_property("name", get_name, set_name)
+            .add_property("name", mm_get_name, mm_set_name)
             .def("getParam", &MoneyManagerBase::getParam<boost::any>)
             .def("setParam", &MoneyManagerBase::setParam<object>)
             .def("setTM", &MoneyManagerBase::setTM)

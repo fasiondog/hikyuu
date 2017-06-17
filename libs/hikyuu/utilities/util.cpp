@@ -104,7 +104,7 @@ double HKU_API roundDown(double number, int ndigits) {
 }
 
 
-//#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX < 0x03000000)
+#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX < 0x03000000)
 /**
  * 将UTF8编码的字符串转换为GB2312编码的字符串
  * @param szinput 待转换的原始UTF8编码的字符串
@@ -198,6 +198,6 @@ string HKU_API gb_to_utf8(const string& szinput) {
     return gb_to_utf8(szinput.c_str());
 }
 
-//#endif /* defined(BOOST_WINDOWS) */
+#endif /* defined(BOOST_WINDOWS) */
 
 } /*namespace*/

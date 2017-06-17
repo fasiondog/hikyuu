@@ -1,13 +1,14 @@
 #!/bin/sh
 
-cp boost-build.jam.linux boost-build.jam
-cp Jamroot.linux Jamroot
+#cp boost-build.jam.linux boost-build.jam
+#cp Jamroot.linux Jamroot
 
 bjam -j 4 link=shared
 
 work_dir=/home/fasiondog/workspace/hikyuu
 build_dir=$work_dir/build
-toolset=clang-linux-3.3
+#toolset=clang-linux-3.8
+toolset = gcc-5.4.0
 
 #cd ./libs
 #doxygen

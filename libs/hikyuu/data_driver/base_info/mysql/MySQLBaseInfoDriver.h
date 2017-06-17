@@ -8,7 +8,12 @@
 #ifndef MYSQLBASEINFODRIVER_H_
 #define MYSQLBASEINFODRIVER_H_
 
-#include <mysql.h>
+#if defined(BOOST_WINDOWS)
+    #include <mysql.h>
+#else
+    #include <mysql/mysql.h>
+#endif
+
 #include "../../BaseInfoDriver.h"
 
 namespace hku {
