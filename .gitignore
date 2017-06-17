@@ -1,6 +1,5 @@
 
 /docs/build
-*.xml
 *.bak
 *.pyc
 *.pyd
