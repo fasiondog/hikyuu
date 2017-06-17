@@ -134,7 +134,7 @@ bool SQLiteBaseInfoDriver::loadStockTypeInfo(StockTypeInfoMap& out) {
 //from stockTypeInfo
 int SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack(
             void *out, int nCol, char **azVals, char **azCols){
-    assert(nCol == 6);
+    assert(nCol == 7);
     int result = 0;
     try{
         hku_uint32 type = boost::lexical_cast<hku_uint32>(azVals[0]);

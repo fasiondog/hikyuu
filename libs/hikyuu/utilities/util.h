@@ -34,6 +34,9 @@ string HKU_API utf8_to_gb(const char* szinput);
 string HKU_API utf8_to_gb(const string& szinput);
 string HKU_API gb_to_utf8(const char* szinput);
 string HKU_API gb_to_utf8(const string& szinput);
+#else
+string HKU_API utf8_to_gb(const string& szinput);
+string HKU_API gb_to_utf8(const string& szinput);
 #endif
 
 /**

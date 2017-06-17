@@ -45,7 +45,6 @@ project : default-build release
 
 build-project libs/hikyuu_utils ;
 build-project libs/hikyuu ;
-#build-project libs/galaxy_instance ;
 build-project libs/hikyuu_python ;
-build-project test ;
+#build-project test ;
 build-project tools/importdata ;

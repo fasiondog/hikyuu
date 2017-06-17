@@ -1,35 +1,37 @@
 #!/bin/sh
 
-#cp boost-build.jam.linux boost-build.jam
-#cp Jamroot.linux Jamroot
+cp boost-build.jam.linux boost-build.jam
+cp Jamroot.linux Jamroot
 
-bjam -j 4 link=shared
+b2 -j 4 link=shared
 
-work_dir=/home/fasiondog/workspace/hikyuu
-build_dir=$work_dir/build
 #toolset=clang-linux-3.8
-toolset = gcc-5.4.0
+toolset=gcc-5.4.0
 
 #cd ./libs
 #doxygen
 #cd ..
 
-cp -s -v -f $build_dir/hikyuu_python/$toolset/release/*.so $work_dir/tools/hikyuu
-cp -s -v -f $build_dir/hikyuu_python/$toolset/release/indicator/*.so $work_dir/tools/hikyuu/indicator
-cp -s -v -f $build_dir/hikyuu_python/$toolset/release/trade_manage/*.so $work_dir/tools/hikyuu/trade_manage
-cp -s -v -f $build_dir/hikyuu_python/$toolset/release/trade_sys/*.so $work_dir/tools/hikyuu/trade_sys
+rm -v -f ./tools/hikyuu/*.so
 
-cp -s -v -f $build_dir/hikyuu/$toolset/release/*.so $work_dir/bin
-cp -s -v -f $build_dir/hikyuu_utils/$toolset/release/*.so $work_dir/bin
+cp -v -f ./build/hikyuu_python/$toolset/release/_hikyuu.so ./tools/hikyuu
+cp -v -f ./build/hikyuu_python/$toolset/release/indicator/_indicator.so ./tools/hikyuu/indicator
+cp -v -f ./build/hikyuu_python/$toolset/release/trade_manage/_trade_manage.so ./tools/hikyuu/trade_manage
+cp -v -f ./build/hikyuu_python/$toolset/release/trade_sys/_trade_sys.so ./tools/hikyuu/trade_sys
+cp -v -f ./build/hikyuu_python/$toolset/release/trade_instance/_trade_instance.so ./tools/hikyuu/trade_instance
 
-cp -s -v -f $work_dir/bin/*.so /home/fasiondog/lib
 
-python $work_dir/tools/hikyuu/test/test.py
+cp -v -f ./build/hikyuu/$toolset/release/libhikyuu.so ./tools/hikyuu
+cp -v -f ./build/hikyuu_utils/$toolset/release/libhikyuu_utils.so ./tools/hikyuu
 
-#cp -s -v -f $build_dir/hikyuu/$toolset/release/*.so $work_dir/tools/cstock/cstock
-#cp -s -v -f $build_dir/cstock/$toolset/release/indicator/*.so $work_dir/tools/cstock/cstock/indicator
-#cp -s -v -f $build_dir/cstock/$toolset/release/tradesys/*.so $work_dir/tools/cstock/cstock/tradesys
-#cp -s -v -f $build_dir/cstock/$toolset/release/instance/*.so $work_dir/tools/cstock/cstock/instance
+cp -v -f ./hikyuu_extern_libs/linux64/*.so ./tools/hikyuu
+
+cd ./test
+b2 -j 4 link=shared
+cd ..
+
+#python $work_dir/tools/hikyuu/test/test.py
+
 
 
 

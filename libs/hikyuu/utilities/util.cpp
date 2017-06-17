@@ -9,6 +9,9 @@
 
 #if defined(BOOST_WINDOWS)
 #include <windows.h>
+#else
+#include <iconv.h>
+#include <string.h>
 #endif
 
 namespace hku {
@@ -196,6 +199,35 @@ string HKU_API gb_to_utf8(const char * szinput) {
 
 string HKU_API gb_to_utf8(const string& szinput) {
     return gb_to_utf8(szinput.c_str());
+}
+
+#else /* else for defined(BOOST_WINDOWS) */
+string HKU_API utf8_to_gb(const string& szinput) {
+    char *inbuf=const_cast<char*>(szinput.c_str());
+    size_t inlen = strlen(inbuf);
+    size_t outlen = inlen;
+    char *outbuf = (char *)malloc(outlen);
+    memset(outbuf, 0, outlen);
+    char *in = inbuf;
+    char *out = outbuf;
+    iconv_t cd=iconv_open("UTF8","GB2312");
+    iconv(cd, &in, &inlen, &out, &outlen);
+    iconv_close(cd);
+    return outbuf;
+}
+
+string HKU_API gb_to_utf8(const string& szinput) {
+    char *inbuf=const_cast<char*>(szinput.c_str());
+    size_t inlen = strlen(inbuf);
+    size_t outlen = (inlen + 1) * 4;
+    char *outbuf = (char *)malloc(outlen);
+    memset(outbuf, 0, outlen);
+    char *in = inbuf;
+    char *out = outbuf;
+    iconv_t cd=iconv_open("GB2312","UTF8");
+    iconv(cd, &in, &inlen, &out, &outlen);
+    iconv_close(cd);
+    return outbuf;
 }
 
 #endif /* defined(BOOST_WINDOWS) */

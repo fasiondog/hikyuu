@@ -35,11 +35,12 @@ lib hikyuu : [ glob-tree *.cpp ]
 lib hikyuu : [ glob-tree *.cpp ]
                  /usr/lib/x86_64-linux-gnu/libsqlite3.so
                  /usr/lib/x86_64-linux-gnu/libpthread.so
-                 /usr/lib/x86_64-linux-gnu/libhdf5.so
-                 /usr/lib/x86_64-linux-gnu/libhdf5_hl.so
-                 /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
-                 /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
-                 /usr/lib/liblog4cplus.so
+                 ../../hikyuu_extern_libs/linux64/libhdf5_serial.so
+                 ../../hikyuu_extern_libs/linux64/libhdf5_serial_hl.so
+                 ../../hikyuu_extern_libs/linux64/libhdf5_cpp.so
+                 ../../hikyuu_extern_libs/linux64/libhdf5_hl_cpp.so
+                 ../../hikyuu_extern_libs/linux64/liblog4cplus.so
+                 ../../hikyuu_extern_libs/linux64/libmysqlclient.so
                : <toolset>clang
                   ; 
 
