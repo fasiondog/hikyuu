@@ -156,11 +156,6 @@ BOOST_AUTO_TEST_CASE( test_StockManager_getBlock ) {
     BOOST_CHECK(result.size() != 0);
 
     BlockList blk_list = sm.getBlockList("地域板块");
-    BOOST_CHECK(blk_list.size() != 0);
-    for (auto iter = blk_list.begin(); iter != blk_list.end(); ++iter) {
-        std::cout << iter->name() << std::endl;
-    }
-
     blk_list = sm.getBlockList();
     BOOST_CHECK(blk_list.size() != 0);
 

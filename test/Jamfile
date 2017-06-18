@@ -27,15 +27,15 @@ project : requirements <library>/boost//filesystem
 unit-test test_all_in_one : [ glob-tree *.cpp ] 
                             ../extern-libs/log4cplus/dll/log4cplus.lib
                           : <toolset>msvc
-                          : <define>TEST_ALL_IN_ONE ;
+                            <define>TEST_ALL_IN_ONE ;
 
 unit-test test_all_in_one : [ glob-tree *.cpp ] 
                             ../hikyuu_extern_libs/linux64/liblog4cplus.so
                           : <toolset>gcc
-                          : <define>TEST_ALL_IN_ONE ;
+                            <define>TEST_ALL_IN_ONE ;
 
 unit-test test_all_in_one : [ glob-tree *.cpp ] 
                             ../hikyuu_extern_libs/linux64/liblog4cplus.so
                           : <toolset>clang
-                          : <define>TEST_ALL_IN_ONE ;
+                            <define>TEST_ALL_IN_ONE ;
 

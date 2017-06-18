@@ -35,7 +35,6 @@ class EnvironmentPython(EnvironmentBase):
 class EnvironmentTest(unittest.TestCase):
     def test_EnvironmentBase(self):
         p = EnvironmentPython()
-        print(p)
         self.assertEqual(p.name, "EnvironmentPython")
         self.assertEqual(p.getParam("n"), 10)
         p.setParam("n",20)

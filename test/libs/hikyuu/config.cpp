@@ -24,8 +24,8 @@ GConfig::GConfig() {
 #if defined(BOOST_WINDOWS)
     hikyuu_init(current.string() + "/hikyuu_win.ini");
 #else
-    std::cout << "褰撳墠璺緞: " << current_path() << std::endl;
-    std::cout << "閰嶇疆鏂囦欢: " << current.string() << "/hikyuu_linux.ini" << std::endl;
+    std::cout << "当前路径: " << current_path() << std::endl;
+    std::cout << "配置文件: " << current.string() << "/hikyuu_linux.ini" << std::endl;
     hikyuu_init(current.string() + "/hikyuu_linux.ini");
 #endif
 }
