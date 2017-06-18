@@ -44,18 +44,19 @@ REM %TOOLSET%  需要利用Jamroot消除告警
 @if NOT exist .\bin mkdir .\bin
 
 del .\tools\hikyuu\*.dll
+del .\tools\hikyuu\*.exe
 del .\tools\hikyuu\*.pyd /S
 
 copy .\extern-libs\boost\*.dll .\tools\hikyuu
 copy .\extern-libs\hdf5\dll\*.dll .\tools\hikyuu
 copy .\extern-libs\log4cplus\dll\*.dll .\tools\hikyuu
 copy .\extern-libs\mysql\lib\*.dll .\tools\hikyuu
+copy .\extern-libs\msvc\*.dll .\tools\hikyuu
 
-copy .\build\extern-libs\%BUILD_OUTPUT_PATH%\*.dll .\bin
-copy .\build\hikyuu\%BUILD_OUTPUT_PATH%\*.dll .\bin
-copy .\build\hikyuu_utils\%BUILD_OUTPUT_PATH%\*.dll .\bin
-copy .\build\importdata\%BUILD_OUTPUT_PATH%\*.exe .\bin
-copy .\bin\*.dll .\tools\hikyuu
+copy .\build\extern-libs\%BUILD_OUTPUT_PATH%\*.dll .\tools\hikyuu
+copy .\build\hikyuu\%BUILD_OUTPUT_PATH%\*.dll .\tools\hikyuu
+copy .\build\hikyuu_utils\%BUILD_OUTPUT_PATH%\*.dll .\tools\hikyuu
+copy .\build\importdata\%BUILD_OUTPUT_PATH%\*.exe .\tools\hikyuu
 
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\*.pyd .\tools\hikyuu
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\indicator\*.pyd .\tools\hikyuu\indicator

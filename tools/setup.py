@@ -11,7 +11,7 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 hku_name = "Hikyuu"
-hku_version = "1.0.1"
+hku_version = "1.0.2"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
@@ -25,28 +25,28 @@ with open("README.rst", encoding='utf-8') as f:
     hku_long_description = f.read()
 
 if sys.platform == 'win32':
-    hku_data_files = [('Lib/site-packages/hikyuu', ['../bin/hikyuu.dll']),
-                      ('Lib/site-packages/hikyuu', ['../bin/hikyuu_utils.dll']),
-                      ('Lib/site-packages/hikyuu', ['../bin/sqlite3.dll']),
-                      ('Lib/site-packages/hikyuu', ['../bin/importdata.exe']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_chrono-vc100-mt-1_56.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_date_time-vc100-mt-1_56.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_filesystem-vc100-mt-1_56.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_python-vc100-mt-1_56.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_serialization-vc100-mt-1_56.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_system-vc100-mt-1_56.dll']),
-                      #('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_thread-vc100-mt-1_56.dll']),
-                      #('Lib/site-packages/hikyuu', ['../extern-libs/boost/boost_unit_test_framework-vc100-mt-1_56.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/log4cplus/dll/log4cplus.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/mysql/lib/libmysql.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/hdf5dll.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/hdf5_hldll.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/hdf5_cppdll.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/hdf5_hl_cppdll.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/szip.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/hdf5/dll/zlib.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/msvc/msvcp100.dll']),
-                      ('Lib/site-packages/hikyuu', ['../extern-libs/msvc/msvcr100.dll'])]
+    hku_data_files = [('Lib/site-packages/hikyuu', ['hikyuu/hikyuu.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/hikyuu_utils.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/sqlite3.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/importdata.exe']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/boost_chrono-vc100-mt-1_56.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/boost_date_time-vc100-mt-1_56.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/boost_filesystem-vc100-mt-1_56.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/boost_python-vc100-mt-1_56.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/boost_serialization-vc100-mt-1_56.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/boost_system-vc100-mt-1_56.dll']),
+                      #('Lib/site-packages/hikyuu', ['hikyuu/boost_thread-vc100-mt-1_56.dll']),
+                      #('Lib/site-packages/hikyuu', ['hikyuu/boost_unit_test_framework-vc100-mt-1_56.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/log4cplus.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/libmysql.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/hdf5dll.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/hdf5_hldll.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/hdf5_cppdll.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/hdf5_hl_cppdll.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/szip.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/zlib.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/msvcp100.dll']),
+                      ('Lib/site-packages/hikyuu', ['hikyuu/msvcr100.dll'])]
 else:
     hku_data_files = []
 
