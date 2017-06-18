@@ -12,6 +12,7 @@
 #else
 #include <iconv.h>
 #include <string.h>
+#include <iostream>
 #endif
 
 namespace hku {
@@ -210,7 +211,7 @@ string HKU_API utf8_to_gb(const string& szinput) {
     memset(outbuf, 0, outlen);
     char *in = inbuf;
     char *out = outbuf;
-    iconv_t cd=iconv_open("UTF8","GB2312");
+    iconv_t cd=iconv_open("gb2312","utf-8");
     iconv(cd, &in, &inlen, &out, &outlen);
     iconv_close(cd);
     return outbuf;
@@ -219,12 +220,12 @@ string HKU_API utf8_to_gb(const string& szinput) {
 string HKU_API gb_to_utf8(const string& szinput) {
     char *inbuf=const_cast<char*>(szinput.c_str());
     size_t inlen = strlen(inbuf);
-    size_t outlen = (inlen + 1) * 4;
+    size_t outlen = inlen * 2;
     char *outbuf = (char *)malloc(outlen);
     memset(outbuf, 0, outlen);
     char *in = inbuf;
     char *out = outbuf;
-    iconv_t cd=iconv_open("GB2312","UTF8");
+    iconv_t cd=iconv_open("utf-8","gb2312");
     iconv(cd, &in, &inlen, &out, &outlen);
     iconv_close(cd);
     return outbuf;

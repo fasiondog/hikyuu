@@ -19,6 +19,7 @@ project : requirements <library>/boost/python//boost_python
                        <toolset>msvc:<define>HKU_API="__declspec(dllimport)"
                        <toolset>msvc:<define>HKU_EXT_API="__declspec(dllimport)"
                        <toolset>gcc:<define>HKU_EXT_API=""
+                       <toolset>gcc:<linkflags>-Wl,-rpath,./:../
                        <toolset>clang:<define>HKU_EXT_API=""
                        ;
 

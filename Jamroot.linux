@@ -10,7 +10,7 @@ using gcc ;
 
 # Python configuration
 #using python : 2.6 : /usr ;
-#using python : 2.6 ;
+using python : 2.7 ;
 
 # Specify the path to the Boost project.  If you move this project,
 # adjust this path to refer to the Boost root directory.
@@ -38,6 +38,7 @@ project : default-build release
                        <toolset>gcc:<cxxflags>-std=c++11
                        <toolset>clang:<cxxflags>-std=c++11
                        <toolset>gcc:<linkflags>-s
+                       <toolset>gcc:<linkflags>-Wl,-rpath,./:../
                        <toolset>gcc:<define>BOOST_ALL_DYN_LINK
                        <toolset>msvc:<address-model>64
                        <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE

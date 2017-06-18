@@ -19,6 +19,7 @@ if sys.platform == 'win32':
     config_file = os.path.join(head, "test/data/hikyuu_win.ini")
 else:
     config_file = os.path.join(head, "test/data/hikyuu_linux.ini")
+    print(config_file)
     
     
 #starttime = time.time()

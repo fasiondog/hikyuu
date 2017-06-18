@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <!DOCTYPE boost_serialization>
-<boost_serialization signature="serialization::archive" version="11">
+<boost_serialization signature="serialization::archive" version="15">
 <blk1 class_id="0" tracking_level="0" version="0">
 	<category>test</category>
 	<name>test_1</name>
@@ -8,12 +8,12 @@
 		<count>2</count>
 		<item_version>0</item_version>
 		<item class_id="2" tracking_level="0" version="0">
-			<market_code>SH000001</market_code>
-			<name>上证指数</name>
-		</item>
-		<item>
 			<market_code>SZ000001</market_code>
 			<name>深发展Ａ</name>
+		</item>
+		<item>
+			<market_code>SH000001</market_code>
+			<name>上证指数</name>
 		</item>
 	</stock_list>
 </blk1>
