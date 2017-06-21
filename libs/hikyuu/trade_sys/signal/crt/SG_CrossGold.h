@@ -14,7 +14,8 @@
 namespace hku {
 
 /**
- * 双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。
+ * 金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；
+ * 当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。
  * @param fast 快线
  * @param slow 慢线
  * @param kpart KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL

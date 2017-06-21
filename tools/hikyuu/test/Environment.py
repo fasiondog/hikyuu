@@ -52,7 +52,34 @@ class EnvironmentTest(unittest.TestCase):
         p_clone.setParam("n", 3)
         self.assertEqual(p.getParam("n"), 1)
         self.assertEqual(p_clone.getParam("n"), 3)
-       
+        
+        
+def test_crtEV_func(self):
+    self._addValid(Datetime(200101010000))
+        
+        
+class TestCrtEV(unittest.TestCase):
+    def test_crtEV(self):
+        p = crtEV(test_crtEV_func, params={'n':10}, name='EnvironmentPython')
+        self.assertEqual(p.name, "EnvironmentPython")
+        self.assertEqual(p.getParam("n"), 10)
+        p.setParam("n",20)
+        self.assertEqual(p.getParam("n"), 20)
+        p.setQuery(Query(-100))  #ev在设置查询对象时才会调用_caculate函数        
+        self.assertEqual(p.isValid(Datetime(200101010000)), True)
+        
+        p_clone = p.clone()
+        self.assertEqual(p_clone.name, "EnvironmentPython")
+        self.assertEqual(p_clone.getParam("n"), 20)
+        self.assertEqual(p_clone.isValid(Datetime(200101010000)), True)
+
+        p.setParam("n", 1)
+        p_clone.setParam("n", 3)
+        self.assertEqual(p.getParam("n"), 1)
+        self.assertEqual(p_clone.getParam("n"), 3)               
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(EnvironmentTest)
+
+def suiteTestCrtEV():
+    return unittest.TestLoader().loadTestsFromTestCase(TestCrtEV)

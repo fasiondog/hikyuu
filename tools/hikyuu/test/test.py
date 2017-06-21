@@ -41,9 +41,12 @@ if __name__ == "__main__":
     suite.addTest(TradeCost.suite())
     
     suite.addTest(Environment.suite())
+    suite.addTest(Environment.suiteTestCrtEV())
     suite.addTest(Condition.suite())
+    suite.addTest(Condition.suiteTestCrtCN())
     suite.addTest(MoneyManager.suite())
     suite.addTest(Signal.suite())
+    suite.addTest(Signal.suiteTestCrtSG())
     suite.addTest(Stoploss.suite())
     suite.addTest(ProfitGoal.suite())
     suite.addTest(Slippage.suite())
