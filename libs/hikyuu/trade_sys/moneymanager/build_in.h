@@ -14,6 +14,7 @@
 #include "crt/MM_FixedCapital.h"
 #include "crt/MM_FixedCount.h"
 #include "crt/MM_FixedUnits.h"
+#include "crt/MM_WilliamsFixedRisk.h"
 
 
 #endif /* MONEYMANAGER_BUILD_IN_H_ */

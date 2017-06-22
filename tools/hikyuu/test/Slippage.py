@@ -60,6 +60,26 @@ class SlippageTest(unittest.TestCase):
         self.assertEqual(p._x, 0)
         self.assertEqual(p_clone._x, 10)
 
+def test_crtSL_func(self):
+    pass
+
+def test_getRealBuyPrice_func(self, datetime, price):
+    return 10.0 if datetime == Datetime(200101010000) else 0.0
+
+class TestCrtSL(unittest.TestCase):
+    def test_crtSL(self):
+        p = crtSL(test_crtSL_func, params={'n':10}, name="TestSL")
+        p.getRealBuyPrice = test_getRealBuyPrice_func
+        self.assertEqual(p.name, "TestSL")
+        self.assertEqual(p.getRealBuyPrice(p, Datetime(200101010000), 1.0), 10.0)
+        self.assertEqual(p.getRealBuyPrice(p, Datetime(200101020000), 1.0), 0.0)
+       
+        p_clone = p.clone()
+        self.assertEqual(p_clone.name, "TestSL")
+                 
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(SlippageTest)
+
+def suiteTestCrtSL():
+    return unittest.TestLoader().loadTestsFromTestCase(TestCrtSL)

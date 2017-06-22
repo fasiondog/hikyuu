@@ -31,7 +31,7 @@ class ProfitGoalPython(ProfitGoalBase):
         return p
     
     def _calculate(self):
-        """ do nothin """
+        """ do nothing """
 
 class ProfitGoalTest(unittest.TestCase):
     def test_ProfitGoalBase(self):
@@ -53,6 +53,26 @@ class ProfitGoalTest(unittest.TestCase):
         self.assertEqual(p._x, 0)
         self.assertEqual(p_clone._x, 10)
 
+
+def testCrtPG(self):
+    pass
+
+def testGetGoal(self, datetime, price):
+    return 10.0 if datetime == Datetime(200101010000) else 0.0
+
+class TestCrtPG(unittest.TestCase):
+    def test_crt_pg(self):
+        p = crtPG(testCrtPG, params={'n':10}, name="ProfitGoalPython")
+        p.getGoal = testGetGoal
+        self.assertEqual(p.name, "ProfitGoalPython")
+        self.assertEqual(p.getGoal(p, Datetime(200101010000), 1.0), 10.0)
+        self.assertEqual(p.getGoal(p, Datetime(200101020000), 1.0), 0.0)
+       
+        p_clone = p.clone()
+        self.assertEqual(p_clone.name, "ProfitGoalPython")
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(ProfitGoalTest)
+
+def suiteTestCrtPG():
+    return unittest.TestLoader().loadTestsFromTestCase(TestCrtPG)

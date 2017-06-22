@@ -56,6 +56,26 @@ class StoplossTest(unittest.TestCase):
         self.assertEqual(p._x, 0)
         self.assertEqual(p_clone._x, 10)
 
+
+def test_crtST_func(self):
+    pass
+
+def test_getPrice_func(self, datetime, price):
+    return 10.0 if datetime == Datetime(200101010000) else 0.0
+
+class TestCrtST(unittest.TestCase):
+    def test_crtST(self):
+        p = crtST(test_crtST_func, params={'n':10}, name="StoplossPython")
+        p.getPrice = test_getPrice_func
+        self.assertEqual(p.name, "StoplossPython")
+        self.assertEqual(p.getPrice(p, Datetime(200101010000), 1.0), 10.0)
+        self.assertEqual(p.getPrice(p, Datetime(200101020000), 1.0), 0.0)
+       
+        p_clone = p.clone()
+        self.assertEqual(p_clone.name, "StoplossPython")
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(StoplossTest)
+
+def suiteTestCrtST():
+    return unittest.TestLoader().loadTestsFromTestCase(TestCrtST)

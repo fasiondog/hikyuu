@@ -56,6 +56,27 @@ class MoneyManagerTest(unittest.TestCase):
         p_clone.setParam("n", 3)
         self.assertEqual(p.getParam("n"), 1)
         self.assertEqual(p_clone.getParam("n"), 3)
+        
+def testCrtMM(self):
+    pass
+
+def testgetBuyNumber(self, datetime, stock, price, risk):
+    return 10.0 if datetime == Datetime(200101010000) else 0.0
+
+class TestCrtMM(unittest.TestCase):
+    def test_crt_mm(self):
+        p = crtMM(testCrtMM, params={'n':10}, name="TestMM")
+        p.getBuyNumber = testgetBuyNumber
+        self.assertEqual(p.name, "TestMM")
+        stock = sm['sh000001']
+        self.assertEqual(p.getBuyNumber(p, Datetime(200101010000), stock, 1.0, 1.0), 10.0)
+        self.assertEqual(p.getBuyNumber(p, Datetime(200101020000), stock, 1.0, 1.0), 0.0)
+       
+        p_clone = p.clone()
+        self.assertEqual(p_clone.name, "TestMM")        
                  
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(MoneyManagerTest)
+
+def suiteTestCrtMM():
+    return unittest.TestLoader().loadTestsFromTestCase(TestCrtMM)

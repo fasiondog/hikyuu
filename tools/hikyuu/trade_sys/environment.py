@@ -14,6 +14,8 @@ EnvironmentBase = csys.EnvironmentBase
 EnvironmentBase.__unicode__ = unicodeFunc
 EnvironmentBase.__repr__ = reprFunc
 
+EV_TwoLine = csys.EV_TwoLine
+
 def ev_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
@@ -34,3 +36,12 @@ def crtEV(func, params={}, name='crtEV'):
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
+
+
+EV_TwoLine.__doc__ += """\n
+    快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
+
+    :param Operand fast: 快线指标
+    :param Operand slow: 慢线指标
+    :param string market: 市场名称
+"""
