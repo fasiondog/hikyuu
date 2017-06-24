@@ -34,6 +34,12 @@ public:
     Operand operator-(const Operand&);
     Operand operator*(const Operand&);
     Operand operator/(const Operand&);
+    Operand operator>(const Operand&);
+    Operand operator<(const Operand&);
+    Operand operator>=(const Operand&);
+    Operand operator<=(const Operand&);
+    Operand operator==(const Operand&);
+    Operand operator!=(const Operand&);
 
     string name() const;
     void name(const string& name);

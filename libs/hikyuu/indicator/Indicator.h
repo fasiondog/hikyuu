@@ -159,5 +159,59 @@ HKU_API Indicator operator*(const Indicator&, const Indicator&);
  */
 HKU_API Indicator operator/(const Indicator&, const Indicator&);
 
+/**
+ * Indicator实例相等，两者的size必须相等，否在返回空
+ * @return 1) 两个实例的size必须相等，否在返回空实例
+ *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
+ *         3）如果相同位置的值相等为100，否则为-100
+ * @ingroup Indicator
+ */
+HKU_API Indicator operator==(const Indicator&, const Indicator&);
+
+/**
+ * Indicator实例不相等，两者的size必须相等，否在返回空
+ * @return 1) 两个实例的size必须相等，否在返回空实例
+ *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
+ *         3）如果相同位置的值不相等为100，否则为-100
+ * @ingroup Indicator
+ */
+HKU_API Indicator operator!=(const Indicator&, const Indicator&);
+
+/**
+ * Indicator实例大于操作，两者的size必须相等，否在返回空
+ * @return 1) 两个实例的size必须相等，否在返回空实例
+ *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
+ *         3）如果ind1相同位置的值大于ind2相同位置的值则为100，否则为-100
+ * @ingroup Indicator
+ */
+HKU_API Indicator operator>(const Indicator&, const Indicator&);
+
+/**
+ * Indicator实例小于操作，两者的size必须相等，否在返回空
+ * @return 1) 两个实例的size必须相等，否在返回空实例
+ *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
+ *         3）如果ind1相同位置的值小于ind2相同位置的值则为100，否则为-100
+ * @ingroup Indicator
+ */
+HKU_API Indicator operator<(const Indicator&, const Indicator&);
+
+/**
+ * Indicator实例大于操作，两者的size必须相等，否在返回空
+ * @return 1) 两个实例的size必须相等，否在返回空实例
+ *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
+ *         3）如果ind1相同位置的值大于等于ind2相同位置的值则为100，否则为-100
+ * @ingroup Indicator
+ */
+HKU_API Indicator operator>=(const Indicator&, const Indicator&);
+
+/**
+ * Indicator实例小于操作，两者的size必须相等，否在返回空
+ * @return 1) 两个实例的size必须相等，否在返回空实例
+ *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
+ *         3）如果ind1相同位置的值小于等于ind2相同位置的值则为100，否则为-100
+ * @ingroup Indicator
+ */
+HKU_API Indicator operator<=(const Indicator&, const Indicator&);
+
 } /* namespace hku */
 #endif /* INDICATOR_H_ */

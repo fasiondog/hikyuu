@@ -90,4 +90,46 @@ Operand Operand::operator/(const Operand& op) {
     return result;
 }
 
+Operand Operand::operator==(const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::EQ, m_root, op.m_root);
+    return result;
+}
+
+Operand Operand::operator!=(const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::NE, m_root, op.m_root);
+    return result;
+}
+
+Operand Operand::operator>(const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::GT, m_root, op.m_root);
+    return result;
+}
+
+Operand Operand::operator<(const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::LT, m_root, op.m_root);
+    return result;
+}
+
+Operand Operand::operator>=(const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::GE, m_root, op.m_root);
+    return result;
+}
+
+Operand Operand::operator<=(const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::LE, m_root, op.m_root);
+    return result;
+}
+
 } /* namespace hku */

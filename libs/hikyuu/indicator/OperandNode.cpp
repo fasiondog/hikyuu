@@ -94,6 +94,30 @@ Indicator OperandNode::calculate(const Indicator& ind) {
         result = m_left->calculate(ind) / m_right->calculate(ind);
         break;
 
+    case EQ:
+        result = m_left->calculate(ind) == m_right->calculate(ind);
+        break;
+
+    case NE:
+        result = m_left->calculate(ind) != m_right->calculate(ind);
+        break;
+
+    case GT:
+        result = m_left->calculate(ind) > m_right->calculate(ind);
+        break;
+
+    case LT:
+        result = m_left->calculate(ind) < m_right->calculate(ind);
+        break;
+
+    case GE:
+        result = m_left->calculate(ind) >= m_right->calculate(ind);
+        break;
+
+    case LE:
+        result = m_left->calculate(ind) <= m_right->calculate(ind);
+        break;
+
     }
 
     if (m_name != "")
