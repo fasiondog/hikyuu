@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/indicator/OperandNode.h>
+#include "OperandNode.h"
 
 namespace hku {
 

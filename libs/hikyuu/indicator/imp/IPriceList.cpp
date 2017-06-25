@@ -10,11 +10,11 @@
 namespace hku {
 
 IPriceList::IPriceList() : IndicatorImp("PRICELIST") {
-    setParam<int>("result_num", 0);
+    setParam<int>("result_index", 0);
 }
 
 IPriceList::IPriceList(const PriceList& data, int in_discard) {
-    setParam<int>("result_num", 0);
+    setParam<int>("result_index", 0);
     size_t discard = 0;
     if (in_discard > 0) {
         discard = in_discard;
@@ -33,7 +33,7 @@ IPriceList::IPriceList(const PriceList& data, int in_discard) {
 
 
 IPriceList::IPriceList(price_t *data, size_t size): IndicatorImp("PRICELIST") {
-    setParam<int>("result_num", 0);
+    setParam<int>("result_index", 0);
     if (!data) {
         HKU_WARN("data pointer is NULL! [IPriceList::IPriceList]");
         return;
@@ -70,9 +70,9 @@ bool IPriceList::check() {
 }
 
 void IPriceList::_calculate(const Indicator& data) {
-    int result_num = getParam<int>("result_num");
-    if (result_num < 0 || result_num >= data.getResultNumber()) {
-        HKU_ERROR("result_num out of range! [IPriceList::IPriceList]");
+    int result_index = getParam<int>("result_index");
+    if (result_index < 0 || result_index >= data.getResultNumber()) {
+        HKU_ERROR("result_index out of range! [IPriceList::IPriceList]");
         return;
     }
 
@@ -80,7 +80,7 @@ void IPriceList::_calculate(const Indicator& data) {
     _readyBuffer(total, 1);
 
     for (size_t i = data.discard(); i < total; ++i) {
-        _set(data.get(i, result_num), i);
+        _set(data.get(i, result_index), i);
     }
 
     //更新抛弃数量
@@ -92,12 +92,19 @@ Indicator HKU_API PRICELIST(const PriceList& data, int discard) {
     return Indicator(IndicatorImpPtr(new IPriceList(data, discard)));
 }
 
-Indicator HKU_API PRICELIST(const Indicator& data, int result_num) {
+Indicator HKU_API PRICELIST(const Indicator& data, int result_index) {
     IndicatorImpPtr p = make_shared<IPriceList>();
-    p->setParam<int>("result_num", result_num);
+    p->setParam<int>("result_index", result_index);
     p->calculate(data);
     return Indicator(p);
 }
+
+Indicator HKU_API PRICELIST(int result_index) {
+    IndicatorImpPtr p = make_shared<IPriceList>();
+    p->setParam<int>("result_index", result_index);
+    return Indicator(p);
+}
+
 
 Indicator HKU_API PRICELIST(price_t *data, size_t total) {
     return Indicator(IndicatorImpPtr(new IPriceList(data, total)));

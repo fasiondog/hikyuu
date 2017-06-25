@@ -14,6 +14,26 @@ namespace hku {
 
 class HKU_API Operand {
     HKU_API friend std::ostream & operator<<(std::ostream &, const Operand&);
+    HKU_API friend Operand operator+(const Operand&, price_t);
+    HKU_API friend Operand operator+(price_t, const Operand&);
+    HKU_API friend Operand operator-(const Operand&, price_t);
+    HKU_API friend Operand operator-(price_t, const Operand&);
+    HKU_API friend Operand operator*(const Operand&, price_t);
+    HKU_API friend Operand operator*(price_t, const Operand&);
+    HKU_API friend Operand operator/(const Operand&, price_t);
+    HKU_API friend Operand operator/(price_t, const Operand&);
+    HKU_API friend Operand operator>(const Operand&, price_t);
+    HKU_API friend Operand operator>(price_t, const Operand&);
+    HKU_API friend Operand operator<(const Operand&, price_t);
+    HKU_API friend Operand operator<(price_t, const Operand&);
+    HKU_API friend Operand operator>=(const Operand&, price_t);
+    HKU_API friend Operand operator>=(price_t, const Operand&);
+    HKU_API friend Operand operator<=(const Operand&, price_t);
+    HKU_API friend Operand operator<=(price_t, const Operand&);
+    HKU_API friend Operand operator==(const Operand&, price_t);
+    HKU_API friend Operand operator==(price_t, const Operand&);
+    HKU_API friend Operand operator!=(const Operand&, price_t);
+    HKU_API friend Operand operator!=(price_t, const Operand&);
 
 public:
     Operand();

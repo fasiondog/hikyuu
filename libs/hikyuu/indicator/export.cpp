@@ -40,6 +40,8 @@
 #include "imp/SaftyLoss.h"
 #include "imp/StdDeviation.h"
 #include "imp/Vigor.h"
+#include "imp/Weave.h"
+#include "imp/ConstantValue.h"
 
 BOOST_CLASS_EXPORT(hku::Ama)
 BOOST_CLASS_EXPORT(hku::Atr)
@@ -55,6 +57,8 @@ BOOST_CLASS_EXPORT(hku::SaftyLoss)
 BOOST_CLASS_EXPORT(hku::Sma)
 BOOST_CLASS_EXPORT(hku::StdDeviation)
 BOOST_CLASS_EXPORT(hku::Vigor)
+BOOST_CLASS_EXPORT(hku::Weave)
+BOOST_CLASS_EXPORT(hku::ConstantValue)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

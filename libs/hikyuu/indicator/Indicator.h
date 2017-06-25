@@ -133,6 +133,8 @@ private:
  * @ingroup Indicator
  */
 HKU_API Indicator operator+(const Indicator&, const Indicator&);
+HKU_API Indicator operator+(const Indicator&, price_t);
+HKU_API Indicator operator+(price_t, const Indicator&);
 
 /**
  * Indicator实例相减，两者的size必须相等，否在返回空
@@ -141,6 +143,8 @@ HKU_API Indicator operator+(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator-(const Indicator&, const Indicator&);
+HKU_API Indicator operator-(const Indicator&, price_t);
+HKU_API Indicator operator-(price_t, const Indicator&);
 
 /**
  * Indicator实例相乘，两者的size必须相等，否在返回空
@@ -149,6 +153,8 @@ HKU_API Indicator operator-(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator*(const Indicator&, const Indicator&);
+HKU_API Indicator operator*(const Indicator&, price_t);
+HKU_API Indicator operator*(price_t, const Indicator&);
 
 /**
  * Indicator实例相除，两者的size必须相等，否在返回空
@@ -158,6 +164,8 @@ HKU_API Indicator operator*(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator/(const Indicator&, const Indicator&);
+HKU_API Indicator operator/(const Indicator&, price_t);
+HKU_API Indicator operator/(price_t, const Indicator&);
 
 /**
  * Indicator实例相等，两者的size必须相等，否在返回空
@@ -167,6 +175,8 @@ HKU_API Indicator operator/(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator==(const Indicator&, const Indicator&);
+HKU_API Indicator operator==(const Indicator&, price_t);
+HKU_API Indicator operator==(price_t, const Indicator&);
 
 /**
  * Indicator实例不相等，两者的size必须相等，否在返回空
@@ -176,6 +186,8 @@ HKU_API Indicator operator==(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator!=(const Indicator&, const Indicator&);
+HKU_API Indicator operator!=(const Indicator&, price_t);
+HKU_API Indicator operator!=(price_t, const Indicator&);
 
 /**
  * Indicator实例大于操作，两者的size必须相等，否在返回空
@@ -185,6 +197,8 @@ HKU_API Indicator operator!=(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator>(const Indicator&, const Indicator&);
+HKU_API Indicator operator>(const Indicator&, price_t);
+HKU_API Indicator operator>(price_t, const Indicator&);
 
 /**
  * Indicator实例小于操作，两者的size必须相等，否在返回空
@@ -194,6 +208,8 @@ HKU_API Indicator operator>(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator<(const Indicator&, const Indicator&);
+HKU_API Indicator operator<(const Indicator&, price_t);
+HKU_API Indicator operator<(price_t, const Indicator&);
 
 /**
  * Indicator实例大于操作，两者的size必须相等，否在返回空
@@ -203,6 +219,8 @@ HKU_API Indicator operator<(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator>=(const Indicator&, const Indicator&);
+HKU_API Indicator operator>=(const Indicator&, price_t);
+HKU_API Indicator operator>=(price_t, const Indicator&);
 
 /**
  * Indicator实例小于操作，两者的size必须相等，否在返回空
@@ -212,6 +230,8 @@ HKU_API Indicator operator>=(const Indicator&, const Indicator&);
  * @ingroup Indicator
  */
 HKU_API Indicator operator<=(const Indicator&, const Indicator&);
+HKU_API Indicator operator<=(const Indicator&, price_t);
+HKU_API Indicator operator<=(price_t, const Indicator&);
 
 } /* namespace hku */
 #endif /* INDICATOR_H_ */

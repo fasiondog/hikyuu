@@ -5,7 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/indicator/Operand.h>
+#include "Operand.h"
+#include "crt/CVAL.h"
 
 namespace hku {
 
@@ -129,6 +130,146 @@ Operand Operand::operator<=(const Operand& op) {
     Operand result;
     result.m_root = make_shared<OperandNode>();
     result.m_root->add(OperandNode::LE, m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator+(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::ADD, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator+(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::ADD, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator-(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::SUB, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator-(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::SUB, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator*(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::MUL, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator*(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::MUL, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator/(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::DIV, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator/(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::DIV, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator>(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::GT, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator>(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::GT, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator<(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::LT, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator<(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::LT, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator>=(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::GE, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator>=(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::GE, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator<=(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::LE, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator<=(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::LE, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator==(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::EQ, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator==(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::EQ, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand operator!=(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::NE, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand operator!=(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::NE, Operand(CVAL(val)).m_root, op.m_root);
     return result;
 }
 

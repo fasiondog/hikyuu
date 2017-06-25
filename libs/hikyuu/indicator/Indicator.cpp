@@ -9,6 +9,8 @@
 
 namespace hku {
 
+#define IND_EQ_THRESHOLD 0.000001 ///<判断浮点数相等的阈值,两者差值小于此数
+
 HKU_API std::ostream & operator<<(std::ostream& os, const Indicator& indicator) {
     os << indicator.m_imp;
     return os;
@@ -80,7 +82,7 @@ size_t Indicator::size() const {
 }
 
 HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
-    if (ind1.size() != ind2.size() || ind1.size() == 0) {
+    if (ind1.size() == 0 || ind1.size() != ind2.size()) {
         return Indicator();
     }
 
@@ -99,6 +101,47 @@ HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
     return Indicator(imp);
 }
 
+
+HKU_API Indicator operator+(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind.get(i, r) + val, i, r);
+        }
+    }
+
+    return Indicator(imp);
+}
+
+
+HKU_API Indicator operator+(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind.get(i, r) + val, i, r);
+        }
+    }
+
+    return Indicator(imp);
+}
 
 HKU_API Indicator operator-(const Indicator& ind1, const Indicator& ind2) {
     if (ind1.size() != ind2.size() || ind1.size() == 0) {
@@ -120,6 +163,46 @@ HKU_API Indicator operator-(const Indicator& ind1, const Indicator& ind2) {
     return Indicator(imp);
 }
 
+HKU_API Indicator operator-(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind.get(i, r) - val, i, r);
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator-(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(val - ind.get(i, r), i, r);
+        }
+    }
+
+    return Indicator(imp);
+}
+
 
 HKU_API Indicator operator*(const Indicator& ind1, const Indicator& ind2) {
     if (ind1.size() != ind2.size() || ind1.size() == 0) {
@@ -135,6 +218,46 @@ HKU_API Indicator operator*(const Indicator& ind1, const Indicator& ind2) {
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
             imp->_set(ind1.get(i, r) * ind2.get(i, r), i, r);
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator*(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind.get(i, r) * val, i, r);
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator*(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            imp->_set(ind.get(i, r) * val, i, r);
         }
     }
 
@@ -166,6 +289,54 @@ HKU_API Indicator operator/(const Indicator& ind1, const Indicator& ind2) {
     return Indicator(imp);
 }
 
+HKU_API Indicator operator/(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (val == 0.0) {
+                imp->_set(Null<price_t>(), i, r);
+            } else {
+                imp->_set(ind.get(i, r) / val, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator/(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (ind.get(i, r) == 0.0) {
+                imp->_set(Null<price_t>(), i, r);
+            } else {
+                imp->_set(val / ind.get(i, r), i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
 HKU_API Indicator operator==(const Indicator& ind1, const Indicator& ind2) {
     if (ind1.size() != ind2.size() || ind1.size() == 0) {
         return Indicator();
@@ -179,7 +350,7 @@ HKU_API Indicator operator==(const Indicator& ind1, const Indicator& ind2) {
     imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (ind1.get(i, r) == ind2.get(i, r)) {
+            if (std::fabs(ind1.get(i, r) - ind2.get(i, r)) < IND_EQ_THRESHOLD) {
                 imp->_set(1, i, r);
             } else {
                 imp->_set(0, i, r);
@@ -189,6 +360,55 @@ HKU_API Indicator operator==(const Indicator& ind1, const Indicator& ind2) {
 
     return Indicator(imp);
 }
+
+HKU_API Indicator operator==(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (std::fabs(ind.get(i, r) - val) < IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator==(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (std::fabs(ind.get(i, r) - val) < IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
 
 HKU_API Indicator operator!=(const Indicator& ind1, const Indicator& ind2) {
     if (ind1.size() != ind2.size() || ind1.size() == 0) {
@@ -203,7 +423,7 @@ HKU_API Indicator operator!=(const Indicator& ind1, const Indicator& ind2) {
     imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (ind1.get(i, r) != ind2.get(i, r)) {
+            if (std::fabs(ind1.get(i, r) - ind2.get(i, r)) >= IND_EQ_THRESHOLD) {
                 imp->_set(1, i, r);
             } else {
                 imp->_set(0, i, r);
@@ -213,6 +433,55 @@ HKU_API Indicator operator!=(const Indicator& ind1, const Indicator& ind2) {
 
     return Indicator(imp);
 }
+
+HKU_API Indicator operator!=(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (std::fabs(ind.get(i, r) - val) >= IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator!=(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (std::fabs(ind.get(i, r) - val) >= IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
 
 HKU_API Indicator operator>(const Indicator& ind1, const Indicator& ind2) {
     if (ind1.size() != ind2.size() || ind1.size() == 0) {
@@ -227,7 +496,55 @@ HKU_API Indicator operator>(const Indicator& ind1, const Indicator& ind2) {
     imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (ind1.get(i, r) > ind2.get(i, r)) {
+            if ((ind1.get(i, r) - ind2.get(i, r)) >= IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator>(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if ((ind.get(i, r) - val) >= IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator>(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if ((val - ind.get(i, r)) >= IND_EQ_THRESHOLD) {
                 imp->_set(1, i, r);
             } else {
                 imp->_set(0, i, r);
@@ -251,7 +568,7 @@ HKU_API Indicator operator<(const Indicator& ind1, const Indicator& ind2) {
     imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (ind1.get(i, r) < ind2.get(i, r)) {
+            if ((ind2.get(i, r) - ind1.get(i, r)) >= IND_EQ_THRESHOLD) {
                 imp->_set(1, i, r);
             } else {
                 imp->_set(0, i, r);
@@ -261,6 +578,55 @@ HKU_API Indicator operator<(const Indicator& ind1, const Indicator& ind2) {
 
     return Indicator(imp);
 }
+
+HKU_API Indicator operator<(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if ((val - ind.get(i, r)) >= IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator<(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if ((ind.get(i, r) - val) >= IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
 
 HKU_API Indicator operator>=(const Indicator& ind1, const Indicator& ind2) {
     if (ind1.size() != ind2.size() || ind1.size() == 0) {
@@ -275,7 +641,55 @@ HKU_API Indicator operator>=(const Indicator& ind1, const Indicator& ind2) {
     imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (ind1.get(i, r) >= ind2.get(i, r)) {
+            if (ind1.get(i, r) > ind2.get(i,r) - IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator>=(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (ind.get(i, r) > val - IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator>=(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (val > ind.get(i,r) - IND_EQ_THRESHOLD) {
                 imp->_set(1, i, r);
             } else {
                 imp->_set(0, i, r);
@@ -299,7 +713,55 @@ HKU_API Indicator operator<=(const Indicator& ind1, const Indicator& ind2) {
     imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (ind1.get(i, r) <= ind2.get(i, r)) {
+            if (ind1.get(i, r) < ind2.get(i,r) + IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator<=(const Indicator& ind, price_t val) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (ind.get(i, r) < val + IND_EQ_THRESHOLD) {
+                imp->_set(1, i, r);
+            } else {
+                imp->_set(0, i, r);
+            }
+        }
+    }
+
+    return Indicator(imp);
+}
+
+HKU_API Indicator operator<=(price_t val, const Indicator& ind) {
+    if (ind.size() == 0) {
+        return Indicator();
+    }
+
+    size_t result_number = ind.getResultNumber();
+    size_t total = ind.size();
+    size_t discard = ind.discard();
+    IndicatorImpPtr imp(new IndicatorImp());
+    imp->_readyBuffer(total, result_number);
+    imp->setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (val < ind.get(i, r) + IND_EQ_THRESHOLD) {
                 imp->_set(1, i, r);
             } else {
                 imp->_set(0, i, r);

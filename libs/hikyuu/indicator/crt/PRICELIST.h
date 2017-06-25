@@ -23,10 +23,17 @@ Indicator HKU_API PRICELIST(const PriceList&, int discard = 0);
 /**
  * 将某指标转化为PRICELIST
  * @param ind 源数据
- * @param result_num 源数据中指定的结果集
+ * @param result_index 源数据中指定的结果集
  * @ingroup Indicator
  */
-Indicator HKU_API PRICELIST(const Indicator& ind, int result_num = 0);
+Indicator HKU_API PRICELIST(const Indicator& ind, int result_index = 0);
+
+/**
+ * 将某指标转化为PRICELIST
+ * @param result_index 源数据中指定的结果集
+ * @ingroup Indicator
+ */
+Indicator HKU_API PRICELIST(int result_index = 0);
 
 /**
  * 包装 price_t 数组成Indicator，用于计算其他指标

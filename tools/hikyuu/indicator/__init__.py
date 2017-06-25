@@ -41,6 +41,37 @@ Indicator.__sub__ = indicator_sub
 Indicator.__mul__ = indicator_mul
 Indicator.__div__ = indicator_div
 Indicator.__truediv__ = indicator_div #Python3 div
+Indicator.__eq__ = indicator_eq
+Indicator.__ne__ = indicator_ne
+Indicator.__ge__ = indicator_ge
+Indicator.__le__ = indicator_le
+Indicator.__gt__ = indicator_gt
+Indicator.__lt__ = indicator_lt
+
+Indicator.__radd__ = lambda self, other: self.__add__(other)
+Indicator.__rsub__ = lambda self, other: CVAL(self, other).__sub__(self)
+Indicator.__rmul__ = lambda self, other: self.__mul__(other)
+Indicator.__rdiv__ = lambda self, other: CVAL(self, other).__div__(self)
+Indicator.__rtruediv__ = lambda self, other: CVAL(self, other).__truediv__(self)
+Indicator.__req__ = lambda self, other: self.__eq__(other)
+Indicator.__rne__ = lambda self, other: self.__ne__(other)
+Indicator.__rge__ = lambda self, other: CVAL(self, other).__ge__(self)
+Indicator.__rle__ = lambda self, other: CVAL(self, other).__le__(self)
+Indicator.__rgt__ = lambda self, other: CVAL(self, other).__gt__(self)
+Indicator.__rlt__ = lambda self, other: CVAL(self, other).__lt__(self)
+
+
+Operand.__radd__ = lambda self, other: self.__add__(other)
+Operand.__rsub__ = lambda self, other: Operand(CVAL(other)).__sub__(self)
+Operand.__rmul__ = lambda self, other: self.__mul__(other)
+Operand.__rdiv__ = lambda self, other: Operand(CVAL(other)).__div__(self)
+Operand.__rtruediv__ = lambda self, other: Operand(CVAL(other)).__truediv__(self)
+Operand.__req__ = lambda self, other: self.__eq__(other)
+Operand.__rne__ = lambda self, other: self.__ne__(other)
+Operand.__rgt__ = lambda self, other: Operand(CVAL(other)).__gt__(self)
+Operand.__rlt__ = lambda self, other: Operand(CVAL(other)).__lt__(self)
+Operand.__rge__ = lambda self, other: Operand(CVAL(other)).__ge__(self)
+Operand.__rle__ = lambda self, other: Operand(CVAL(other)).__le__(self)
 
 OP = Operand
 

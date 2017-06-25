@@ -27,5 +27,6 @@
 #include "crt/HHV.h"
 #include "crt/LLV.h"
 #include "crt/WEAVE.h"
+#include "crt/CVAL.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

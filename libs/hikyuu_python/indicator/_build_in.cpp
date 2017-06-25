@@ -13,6 +13,7 @@ using namespace boost::python;
 
 Indicator (*PRICELIST2)(const PriceList&, int) = PRICELIST;
 Indicator (*PRICELIST3)(const Indicator&, int) = PRICELIST;
+Indicator (*PRICELIST4)(int) = PRICELIST;
 
 Indicator (*KDATA1)(const KData&) = KDATA;
 Indicator (*KDATA2)(const Indicator&) = KDATA;
@@ -96,6 +97,9 @@ Indicator (*VIGOR_3)(const Indicator&, int) = VIGOR;
 Indicator (*WEAVE_1)() = WEAVE;
 Indicator (*WEAVE_2)(const Indicator&) = WEAVE;
 
+Indicator (*CVAL_1)(double) = CVAL;
+Indicator (*CVAL_2)(const Indicator&, double) = CVAL;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA2);
@@ -131,10 +135,10 @@ void export_Indicator_build_in() {
 
     //无法直接使用Null<size_t>()，会导致异常退出
     size_t null_size = Null<size_t>();
-    def("PRICELIST", PRICELIST2,
-            (arg("data"), arg("discard")=0));
-    def("PRICELIST", PRICELIST3,
-            (arg("data"), arg("result_num")=0));
+    def("PRICELIST", PRICELIST2, (arg("data"), arg("discard")=0));
+    def("PRICELIST", PRICELIST3, (arg("data"), arg("result_index")=0));
+    def("PRICELIST", PRICELIST4, (arg("result_index")=0));
+
 
     def("SMA", SMA_1, (arg("n")=22));
     def("SMA", SMA_2, (arg("data"), arg("n")=22));
@@ -178,6 +182,9 @@ void export_Indicator_build_in() {
 
     def("WEAVE", WEAVE_1);
     def("WEAVE", WEAVE_2);
+
+    def("CVAL", CVAL_1);
+    def("CVAL", CVAL_2);
 }
 
 
