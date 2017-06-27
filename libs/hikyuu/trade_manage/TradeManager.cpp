@@ -207,10 +207,18 @@ TradeManagerPtr TradeManager::clone() {
     p->m_trade_list = m_trade_list;
     p->m_position = m_position;
     p->m_position_history = m_position_history;
+    p->m_broker_list = m_broker_list;
 
     return TradeManagerPtr(p);
 }
 
+void TradeManager::regBroker(const OrderBrokerPtr& broker) {
+    m_broker_list.push_back(broker);
+}
+
+void TradeManager::clearBroker() {
+    m_broker_list.clear();
+}
 
 double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock) {
     //TODO 获取保证金比率，默认固定取60%
@@ -1064,6 +1072,11 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
                 (realPrice - stoploss) * number * stock.unit(), precision);
     }
 
+    list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+    for(; broker_iter != m_broker_list.end(); ++broker_iter) {
+        (*broker_iter)->buy(stock.code(), planPrice, number);
+    }
+
     return result;
 }
 
@@ -1168,6 +1181,11 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock,
             && m_borrow_cash > 0.0
             && m_cash > 0.0) {
         returnCash(datetime, m_borrow_cash < m_cash ? m_borrow_cash : m_cash);
+    }
+
+    list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+    for(; broker_iter != m_broker_list.end(); ++broker_iter) {
+        (*broker_iter)->sell(stock.code(), planPrice, number);
     }
 
     return result;

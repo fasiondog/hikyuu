@@ -84,6 +84,8 @@ void export_TradeManager() {
             .def("reset", &TradeManager::reset)
             .def("clone", &TradeManager::clone)
 
+            .def("regBroker", &TradeManager::regBroker)
+            .def("clearBroker", &TradeManager::clearBroker)
             .def("getMarginRate", &TradeManager::getMarginRate)
             .def("have", &TradeManager::have)
             .def("getStockNumber", &TradeManager::getStockNumber)

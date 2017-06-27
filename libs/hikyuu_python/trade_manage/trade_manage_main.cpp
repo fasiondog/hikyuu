@@ -19,6 +19,7 @@ void export_BorrowRecord();
 void export_LoanRecord();
 void export_TradeManager();
 void export_Performance();
+void export_OrderBroker();
 
 BOOST_PYTHON_MODULE(_trade_manage) {
     export_CostRecord();
@@ -28,6 +29,7 @@ BOOST_PYTHON_MODULE(_trade_manage) {
     export_FundsRecord();
     export_BorrowRecord();
     export_LoanRecord();
+    export_OrderBroker();
     export_TradeManager();
     export_Performance();
     export_build_in();

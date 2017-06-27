@@ -16,6 +16,7 @@
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
 #include "LoanRecord.h"
+#include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -50,6 +51,17 @@ public:
 
     /** 复位，清空交易、持仓记录 */
     void reset();
+
+    /**
+     * 注册订单代理
+     * @param broker 订单代理实例
+     */
+    void regBroker(const OrderBrokerPtr& broker);
+
+    /**
+     * 清空已注册的订单代理
+     */
+    void clearBroker();
 
     shared_ptr<TradeManager> clone();
 
@@ -485,6 +497,8 @@ private:
     PositionRecordList m_position_history; //持仓历史记录
     position_map_type m_short_position; //空头仓位记录
     PositionRecordList m_short_position_history; //空头仓位历史记录
+
+    list<OrderBrokerPtr>  m_broker_list; //订单代理列表
 
 //==================================================
 // 支持序列化
