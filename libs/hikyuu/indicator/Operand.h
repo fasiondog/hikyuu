@@ -79,6 +79,27 @@ private:
 
 typedef Operand OP;
 
+HKU_API  Operand operator+(const Operand&, price_t);
+HKU_API  Operand operator+(price_t, const Operand&);
+HKU_API  Operand operator-(const Operand&, price_t);
+HKU_API  Operand operator-(price_t, const Operand&);
+HKU_API  Operand operator*(const Operand&, price_t);
+HKU_API  Operand operator*(price_t, const Operand&);
+HKU_API  Operand operator/(const Operand&, price_t);
+HKU_API  Operand operator/(price_t, const Operand&);
+HKU_API  Operand operator>(const Operand&, price_t);
+HKU_API  Operand operator>(price_t, const Operand&);
+HKU_API  Operand operator<(const Operand&, price_t);
+HKU_API  Operand operator<(price_t, const Operand&);
+HKU_API  Operand operator>=(const Operand&, price_t);
+HKU_API  Operand operator>=(price_t, const Operand&);
+HKU_API  Operand operator<=(const Operand&, price_t);
+HKU_API  Operand operator<=(price_t, const Operand&);
+HKU_API  Operand operator==(const Operand&, price_t);
+HKU_API  Operand operator==(price_t, const Operand&);
+HKU_API  Operand operator!=(const Operand&, price_t);
+HKU_API  Operand operator!=(price_t, const Operand&);
+
 } /* namespace hku */
 
 #endif /* INDICATOR_OPERAND_H_ */
