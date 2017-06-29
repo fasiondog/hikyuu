@@ -16,11 +16,11 @@ hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
 hku_license = "MIT"
-hku_keywords = ("hikyuu", "quant", "trade", "System Trading", "量化", "程序化交易", "量化交易", "系统交易")
+hku_keywords = ("hikyuu", "quant", "trade", "System Trading", "backtester", "量化", "程序化交易", "量化交易", "系统交易")
 hku_platforms = "Independant"
 hku_url = "http://hikyuu.org/"
 
-hku_description = "Hikyuu System Trading Analysis Tools"
+hku_description = "Hikyuu Quant Framework for System Trading Analysis and backtester"
 with open("README.rst", encoding='utf-8') as f:
     hku_long_description = f.read()
 
