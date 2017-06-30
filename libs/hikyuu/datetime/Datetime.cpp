@@ -82,7 +82,7 @@ Datetime Datetime::maxDatetime() {
 }
 
 Datetime Datetime::now() {
-    return Datetime(bt::second_clock::local_time());
+    return Datetime(bt::microsec_clock::local_time());
 }
 
 DatetimeList HKU_API dayRange(const Datetime& start, const Datetime& end) {

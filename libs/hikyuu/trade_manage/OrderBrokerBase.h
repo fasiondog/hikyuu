@@ -21,8 +21,8 @@ public:
     OrderBrokerBase();
     virtual ~OrderBrokerBase();
 
-    void buy(const string& code, price_t price, int num);
-    void sell(const string& code, price_t price, int num);
+    Datetime buy(const string& code, price_t price, int num);
+    Datetime sell(const string& code, price_t price, int num);
 
     virtual void _buy(const string& code, price_t price, int num) = 0;
     virtual void _sell(const string& code, price_t price, int num) = 0;

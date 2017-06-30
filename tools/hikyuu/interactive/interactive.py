@@ -341,7 +341,7 @@ class OrderBrokerWrap(OrderBrokerBase):
         if self._real:
             import tushare as ts
             df = ts.get_realtime_quotes(code)
-            new_price = df.ix[0]['ask']
+            new_price = float(df.ix[0]['ask'])
             if (abs(new_price - price) <= self._slip):
                 self._broker.buy(code, new_price, num)
             else:
@@ -353,7 +353,7 @@ class OrderBrokerWrap(OrderBrokerBase):
         if self._real:
             import tushare as ts
             df = ts.get_realtime_quotes(code)
-            new_price = df.ix[0]['bid']
+            new_price = float(df.ix[0]['bid'])
             self._broker.sell(code, new_price, num)
         else:
             self._broker.sell(code, price, num)
@@ -377,4 +377,4 @@ def crtRB(broker, real=True, slip=0.03):
     :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，
                         否则忽略; 对卖出操作无效，立即以当前价卖出
     """
-    return OrderBrokerWrap(broker)
+    return OrderBrokerWrap(broker, real, slip)

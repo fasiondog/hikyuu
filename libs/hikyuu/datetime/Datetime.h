@@ -48,7 +48,7 @@ public:
     /** 通过数字方式构造日期类型，数字格式：YYYYMMDDhhmmss，如 200101010000 */
     explicit Datetime(unsigned long long);
 
-    /** 通过字符串方式构造日期类型，如："2001-01-01 18:00:00" */
+    /** 通过字符串方式构造日期类型，如："2001-01-01 18:00:00.12345" */
     explicit Datetime(const std::string&);
 
     int year() const;
@@ -56,6 +56,7 @@ public:
     int day() const;
     int hour() const;
     int minute() const;
+    int second() const;
 
     /**
      * 返回如YYYYMMDDhhmmss格式的数字，方便比较操作，
@@ -193,6 +194,10 @@ inline int Datetime::hour() const {
 
 inline int Datetime::minute() const {
     return m_data.time_of_day().minutes();
+}
+
+inline int Datetime::second() const {
+    return m_data.time_of_day().seconds();
 }
 
 inline bt::ptime Datetime::ptime() const {

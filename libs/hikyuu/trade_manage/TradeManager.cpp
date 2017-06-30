@@ -159,6 +159,7 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash,
     m_trade_list.push_back(TradeRecord(Null<Stock>(), m_init_datetime,
             BUSINESS_INIT, m_init_cash, m_init_cash, 0.0, 0,
             CostRecord(), 0.0,  m_cash, PART_INVALID));
+    m_broker_last_datetime = Datetime::now();
 }
 
 
@@ -185,6 +186,9 @@ void TradeManager::reset() {
 
     m_position.clear();
     m_position_history.clear();
+    //m_broker_list
+    //m_broker_last_datetime = Datetime::now();
+    m_actions.clear();
 }
 
 
@@ -208,6 +212,7 @@ TradeManagerPtr TradeManager::clone() {
     p->m_position = m_position;
     p->m_position_history = m_position_history;
     p->m_broker_list = m_broker_list;
+    p->m_broker_last_datetime = m_broker_last_datetime;
 
     return TradeManagerPtr(p);
 }
@@ -1072,9 +1077,15 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
                 (realPrice - stoploss) * number * stock.unit(), precision);
     }
 
-    list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-    for(; broker_iter != m_broker_list.end(); ++broker_iter) {
-        (*broker_iter)->buy(stock.code(), planPrice, number);
+    if (result.datetime > m_broker_last_datetime) {
+        Datetime timestamp;
+        bd::date result_day = result.datetime.ptime().date();
+        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        for(; broker_iter != m_broker_list.end(); ++broker_iter) {
+            timestamp = (*broker_iter)->buy(stock.code(), planPrice, number);
+            bt::time_duration x = timestamp.ptime().time_of_day();
+            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
+        }
     }
 
     return result;
@@ -1183,9 +1194,15 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock,
         returnCash(datetime, m_borrow_cash < m_cash ? m_borrow_cash : m_cash);
     }
 
-    list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-    for(; broker_iter != m_broker_list.end(); ++broker_iter) {
-        (*broker_iter)->sell(stock.code(), planPrice, number);
+    if (result.datetime > m_broker_last_datetime) {
+        Datetime timestamp;
+        bd::date result_day = result.datetime.ptime().date();
+        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        for(; broker_iter != m_broker_list.end(); ++broker_iter) {
+            timestamp = (*broker_iter)->sell(stock.code(), planPrice, number);
+            bt::time_duration x = timestamp.ptime().time_of_day();
+            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
+        }
     }
 
     return result;
@@ -1857,6 +1874,11 @@ void TradeManager::_update(const Datetime& datetime){
     for (size_t i = 0; i < total; ++i) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
+}
+
+
+void TradeManager::_saveAction(const TradeRecord&) {
+
 }
 
 

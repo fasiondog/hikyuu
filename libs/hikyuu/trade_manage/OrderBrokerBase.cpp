@@ -17,20 +17,22 @@ OrderBrokerBase::~OrderBrokerBase() {
 
 }
 
-void OrderBrokerBase::buy(const string& code, price_t price, int num) {
+Datetime OrderBrokerBase::buy(const string& code, price_t price, int num) {
     try {
         _buy(code, price, num);
     } catch (...) {
         HKU_ERROR("Unknow error in BUY operation!!! [OrderBrokerBase::buy]");
     }
+    return Datetime::now();
 }
 
-void OrderBrokerBase::sell(const string& code, price_t price, int num) {
+Datetime OrderBrokerBase::sell(const string& code, price_t price, int num) {
     try {
         _sell(code, price, num);
     } catch (...) {
         HKU_ERROR("Unknow error in SELL operation!!! [OrderBrokerBase::sell]");
     }
+    return Datetime::now();
 }
 
 } /* namespace hku */

@@ -77,6 +77,9 @@ void export_TradeManager() {
             .add_property("reinvest", &TradeManager::reinvest)
             .add_property("precision", &TradeManager::precision)
             .add_property("costFunc", get_costFunc, set_costFunc)
+            .add_property("brokeLastDatetime",
+                    &TradeManager::getBrokerLastDatetime,
+                    &TradeManager::setBrokerLastDatetime)
 
             .def("getParam", &TradeManager::getParam<boost::any>)
             .def("setParam", &TradeManager::setParam<object>)

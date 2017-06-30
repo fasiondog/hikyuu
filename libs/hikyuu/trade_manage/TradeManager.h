@@ -63,6 +63,14 @@ public:
      */
     void clearBroker();
 
+    /** 从哪个时刻开始启动订单代理进行下单操作   */
+    Datetime getBrokerLastDatetime() const { return m_broker_last_datetime; }
+
+    /** 设置开始订单代理操作的时刻 */
+    void setBrokerLastDatetime(const Datetime& date) {
+        m_broker_last_datetime = date;
+    }
+
     shared_ptr<TradeManager> clone();
 
     /**
@@ -472,6 +480,9 @@ private:
     //根据权息信息，更新交易记录及持仓
     void _update(const Datetime&);
 
+    //以脚本的形式保存交易动作，便于修正和校准
+    void _saveAction(const TradeRecord&);
+
 private:
     string       m_name;            //账户名称
     Datetime     m_init_datetime;   //账户建立日期
@@ -499,6 +510,9 @@ private:
     PositionRecordList m_short_position_history; //空头仓位历史记录
 
     list<OrderBrokerPtr>  m_broker_list; //订单代理列表
+    Datetime m_broker_last_datetime; //订单代理最近一次执行操作的时刻
+
+    list<string> m_actions; //记录交易动作，便于修改或校准实盘时的交易
 
 //==================================================
 // 支持序列化

@@ -29,6 +29,7 @@ void export_Datetime() {
             .add_property("day", &Datetime::day)
             .add_property("hour", &Datetime::hour)
             .add_property("minute", &Datetime::minute)
+            .add_property("second", &Datetime::second)
             .add_property("number", &Datetime::number)
             .def("toString", &Datetime::toString)
             .def("minDatetime", &Datetime::minDatetime).staticmethod("minDatetime")
