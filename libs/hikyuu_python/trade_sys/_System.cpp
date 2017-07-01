@@ -15,6 +15,8 @@ using namespace hku;
 void (System::*run_monent_1)(const Datetime&) = &System::runMoment;
 void (System::*run_monent_2)(const KRecord&) = &System::runMoment;
 
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(run_overload, run, 2, 3);
+
 BOOST_PYTHON_FUNCTION_OVERLOADS(SYS_Simple_overload, SYS_Simple, 0, 9);
 
 void export_System() {
@@ -84,7 +86,7 @@ void export_System() {
             .def("getTO", &System::getTO)
             .def("setTO", &System::setTO)
 
-            .def("run", &System::run)
+            .def("run", &System::run, run_overload(args("stock", "query", "reset")))
             .def("runMoment", run_monent_1)
             .def("runMoment", run_monent_2)
             .def("_runMoment", &System::_runMoment)

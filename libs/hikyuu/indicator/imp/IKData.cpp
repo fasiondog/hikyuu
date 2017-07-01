@@ -98,10 +98,6 @@ bool IKData::check() {
 
 //支持KDATA Indicator作为参数
 void IKData::_calculate(const Indicator& ind) {
-    if (ind.getResultNumber() < 6) {
-        return;
-    }
-
     size_t total = ind.size();
     if (total == 0) {
         return;
@@ -111,6 +107,12 @@ void IKData::_calculate(const Indicator& ind) {
     m_discard = ind.discard();
 
     if ("KDATA" == part) {
+        if (ind.getResultNumber() < 6) {
+            HKU_ERROR("KDATA result_number must >= 6! input ind is "
+                    << ind.getResultNumber() << "IKData::_calculate");
+            return;
+        }
+
         _readyBuffer(total, 6);
         for (size_t i = m_discard; i < total; ++i) {
             _set(ind.get(i,0), i, 0);
@@ -123,19 +125,20 @@ void IKData::_calculate(const Indicator& ind) {
         return;
     }
 
+    int ind_num = ind.getResultNumber();
     int result_num = 0;
     if ("OPEN" == part) {
         result_num = 0;
     } else if ("HIGH" == part) {
-        result_num = 1;
+        result_num = ind_num >= 1 ? 1 : 0;
     } else if ("LOW" == part) {
-        result_num = 2;
+        result_num = ind_num >= 2 ? 2 : 0;
     } else if ("CLOSE" == part) {
-        result_num = 3;
+        result_num = ind_num >= 3 ? 3 : 0;
     } else if ("AMO" == part) {
-        result_num = 4;
+        result_num = ind_num >= 4 ? 4 : 0;
     } else if ("VOL" == part) {
-        result_num = 5;
+        result_num = ind_num >= 5 ? 5 : 0;
     } else {
         //无效参数值，退出
         return;

@@ -2,7 +2,7 @@
  * CrossGoldSignal.cpp
  *
  *  Created on: 2017年6月13日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #include "../../../indicator/crt/KDATA.h"

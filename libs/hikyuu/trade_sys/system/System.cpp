@@ -192,7 +192,7 @@ void System::_sellNotifyAll(const TradeRecord& record) {
 }
 
 
-void System::run(const Stock& stock, const KQuery& query) {
+void System::run(const Stock& stock, const KQuery& query, bool reset) {
     if (!m_tm) {
         HKU_ERROR("Not setTradeManager! [SystemBase::run]");
         return;
@@ -229,7 +229,7 @@ void System::run(const Stock& stock, const KQuery& query) {
     if (m_st) m_st->setTM(m_tm);
     if (m_tp) m_tp->setTM(m_tm);
 
-    reset();
+    if (reset)  this->reset();
 
     m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
     m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));

@@ -19,6 +19,7 @@ SG_Single2 = csys.SG_Single2
 SG_Cross = csys.SG_Cross
 SG_CrossGold = csys.SG_CrossGold
 SG_Flex = csys.SG_Flex
+SG_Bool = csys.SG_Bool
 
 def sig_init(self, name, params):
     super(self.__class__, self).__init__(name)
@@ -102,6 +103,15 @@ SG_Single2.__doc__ += """\n
     :param Operand ind:
     :param int filer_n: N日周期
     :param float filter_p: 过滤器百分比
+    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+    :return: 信号指示器
+"""
+
+SG_Bool.__doc__ += """\n
+    使用运算结果为类似bool数组的Operand分别作为买入、卖出指示。
+    
+    :param Operand buy: 买入指示（结果Indicator中相应位置>0则代表买入）
+    :param Operand sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
 """

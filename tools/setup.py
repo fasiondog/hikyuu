@@ -95,5 +95,12 @@ setup(
             # that you indicate whether you support Python 2, Python 3 or both.
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.5',
-        ] 
+        ],
+
+        install_requires=[
+            'numpy>=1.10.4',
+            'matplotlib>=1.5.0',
+            'pandas>=0.17.1',
+            'tushare>=0.8.2'
+        ],        
         )

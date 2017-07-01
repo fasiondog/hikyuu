@@ -12,6 +12,7 @@
 #include "crt/SG_CrossGold.h"
 #include "crt/SG_Flex.h"
 #include "crt/SG_Single.h"
+#include "crt/SG_Bool.h"
 
 
 #endif /* SIGNAL_BUILD_IN_H_ */

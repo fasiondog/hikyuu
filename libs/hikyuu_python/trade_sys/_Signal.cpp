@@ -74,6 +74,7 @@ void export_Signal() {
 
     register_ptr_to_python<SignalPtr>();
 
+    def("SG_Bool", SG_Bool, (arg("buy"), arg("sell"), arg("kpart")="CLOSE"));
     def("SG_Single", SG_Single, (arg("ind"), arg("filter_n")=10,
             arg("filter_p")=0.1, arg("kpart")="CLOSE"));
     def("SG_Single2", SG_Single2, (arg("ind"), arg("filter_n")=10,

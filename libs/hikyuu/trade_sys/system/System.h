@@ -103,7 +103,7 @@ public:
      */
     void setTO(const KData& kdata);
 
-    void run(const Stock& stock, const KQuery& query);
+    void run(const Stock& stock, const KQuery& query, bool reset=true);
     void runMoment(const Datetime& datetime);
     void runMoment(const KRecord& record);
 

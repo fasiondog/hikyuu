@@ -24,7 +24,7 @@ from .drawplot import *
 #import time
 
 #Puppet是一套以同花顺交易客户端为核心的完整的闭环实盘交易系统框架。
-#来自："睿瞳深邃(https://github.com/Raytone-D" 感谢睿瞳深邃的共享 :-)
+#来自："睿瞳深邃(https://github.com/Raytone-D" 感谢睿瞳深邃的大度共享 :-)
 #可以用：tm.regBroker(crtRB(Puppet())) 的方式注册进tm实例，实现实盘下单
 from .puppet import *
 

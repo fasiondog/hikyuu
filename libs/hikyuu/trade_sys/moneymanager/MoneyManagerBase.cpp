@@ -110,9 +110,9 @@ size_t MoneyManagerBase
     size_t n = _getBuyNumber(datetime, stock, price, risk);
 
     if (n < stock.minTradeNumber()) {
-        HKU_INFO("Ignore! Is less than the minimum number of transactions("
-                << stock.minTradeNumber()
-                << ")! [MoneyManagerBase::getBuyNumber]");
+        //HKU_INFO("Ignore! Is less than the minimum number of transactions("
+        //        << stock.minTradeNumber()
+        //        << ")! [MoneyManagerBase::getBuyNumber]");
         return 0;
     }
 

@@ -30,11 +30,13 @@
 #include "imp/CrossGoldSignal.h"
 #include "imp/SingleSignal.h"
 #include "imp/SingleSignal2.h"
+#include "imp/BoolSignal.h"
 
 BOOST_CLASS_EXPORT(hku::CrossSignal)
 BOOST_CLASS_EXPORT(hku::CrossGoldSignal)
 BOOST_CLASS_EXPORT(hku::SingleSignal)
 BOOST_CLASS_EXPORT(hku::SingleSignal2)
+BOOST_CLASS_EXPORT(hku::BoolSignal)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 
