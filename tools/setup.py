@@ -98,10 +98,10 @@ setup(
         ],
 
         install_requires=[
-            'numpy>=1.10.4',
-            'matplotlib>=1.5.0',
-            'pandas>=0.17.1',
-            'tushare>=0.8.2',
+            #'numpy>=1.10.4',
+            #'matplotlib>=1.5.0',
+            #'pandas>=0.17.1',
+            #'tushare>=0.8.2',
             'pyperclip>=1.5.27',
         ],        
         )
