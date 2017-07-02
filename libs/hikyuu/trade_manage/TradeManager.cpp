@@ -1886,7 +1886,7 @@ void TradeManager::_update(const Datetime& datetime){
 
 void TradeManager::_saveAction(const TradeRecord& record) {
     std::stringstream buf(std::stringstream::out);
-    string my_tm("tr = my_tm.");
+    string my_tm("td = my_tm.");
     string sep(", ");
     switch (record.business) {
     case BUSINESS_CHECKIN:

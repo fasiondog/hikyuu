@@ -11,7 +11,7 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 hku_name = "Hikyuu"
-hku_version = "1.0.2"
+hku_version = "1.0.3"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
@@ -101,6 +101,7 @@ setup(
             'numpy>=1.10.4',
             'matplotlib>=1.5.0',
             'pandas>=0.17.1',
-            'tushare>=0.8.2'
+            'tushare>=0.8.2',
+            'pyperclip>=1.5.27',
         ],        
         )

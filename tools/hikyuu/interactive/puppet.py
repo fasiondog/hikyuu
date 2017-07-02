@@ -1,24 +1,35 @@
 """
-Puppet是一套以同花顺交易客户端为核心的完整的闭环实盘交易系统框架。
+扯线木偶界面自动化应用编程接口(Puppet UIAutomation API)，是扯线木偶量化框架(Puppet Quant Framework)的一个组件。
+技术群：624585416
 """
-__author__ = "睿瞳深邃(https://github.com/Raytone-D"
+__author__ = "睿瞳深邃(https://github.com/Raytone-D)"
 __project__ = 'Puppet'
-__version__ = "0.4.11"
+__version__ = "0.4.12"
+__license__ = 'MIT'
 
 # coding: utf-8
-
 import ctypes
 from functools import reduce
 import time
 import pyperclip
 
-CONSOLE = 59648, 59649
-GRID = 1047, 200, 1047
-ACCOUNT = 59392, 0, 1711
-COMBO = 59392, 0, 2322
+MSG = {'WM_SETTEXT': 12,
+       'WM_GETTEXT': 13,
+       'WM_KEYDOWN': 256,
+       'WM_KEYUP': 257,
+       'WM_COMMAND': 273,
+       'BM_CLICK': 245,
+       'CB_GETCOUNT': 326,
+       'CB_SETCURSEL': 334,
+       'CBN_SELCHANGE': 1,
+       'COPY_DATA': 57634}
 
-NODE = {'买入': 161,
-        '卖出': 162,
+NODE = {'FRAME': (59648, 59649),
+        'FORM': (59648, 59649, 1047, 200, 1047),
+        'ACCOUNT': (59392, 0, 1711),
+        'COMBO': (59392, 0, 2322),
+        'BUY': (161, (1032, 1033, 1034), 1006),
+        'SELL':(162, (1032, 1033, 1034), 1006),
         '撤单': 163,
         '双向委托': 512,
         '新股申购': 554,
@@ -64,19 +75,7 @@ NEW = {'新股代码': 1032,
        '申购': 1006}
 
 RAFFLE = ['新股代码', '证券代码', '申购价格', '申购上限']
-
-MSG = {'WM_SETTEXT': 12,
-       'WM_GETTEXT': 13,
-       'WM_KEYDOWN': 256,
-       'WM_KEYUP': 257,
-       'WM_COMMAND': 273,
-       'BM_CLICK': 245,
-       'CB_GETCOUNT': 326,
-       'CB_SETCURSEL': 334,
-       'CBN_SELCHANGE': 1}
-
-CMD = {'COPY': 57634}
-
+#CMD = {'COPY': 57634}
 VKCODE = {'F1': 112,
           'F2': 113,
           'F3': 114,
@@ -97,28 +96,38 @@ def switch_combo(index, idCombo, hCombo):
     op.SendMessageW(hCombo, MSG['CB_SETCURSEL'], index, 0)
     op.SendMessageW(op.GetParent(hCombo), MSG['WM_COMMAND'], MSG['CBN_SELCHANGE']<<16|idCombo, hCombo)
         
-class Puppet():
+class Puppet:
     """
+    界面自动化操控包装类
     # 方法 # '委买': buy(), '委卖': sell(), '撤单': cancel(), '打新': raffle(),
     # 属性 # '帐号': account, '可用余额': balance, '持仓': position, '成交': deals, '可撤委托': cancelable, 
     #      # '新股': new, '中签': bingo, 
     """
-    def __init__(self, main=0):
+    def __init__(self, main=None, title='网上股票交易系统5.0'):
 
         print('我正在热身，稍等一下...')
-        self.main = main if main else op.FindWindowW(0, "网上股票交易系统5.0")
+        self.main = main or op.FindWindowW(0, title)
+        self.switch = lambda node: op.SendMessageW(self.main, MSG['WM_COMMAND'], node, 0)
+        self._order = []
+        for i in (NODE['BUY'],NODE['SELL']):
+            node, parts, button = i
+            self.switch(node)
+            time.sleep(0.3)
+            x = reduce(op.GetDlgItem, NODE['FRAME'], self.main)
+            self._order.append((tuple(op.GetDlgItem(x, v) for v in parts), button, x))
+        
         op.SendMessageW(self.main, MSG['WM_COMMAND'], NODE['双向委托'], 0)    # 切换到交易操作台
         self.wait_a_second = lambda sec=0.2: time.sleep(sec)
         self.wait_a_second()    # 可调整区间值(0.01~0.5)
         self.buff = ctypes.create_unicode_buffer(32)
-        self.two_way = reduce(op.GetDlgItem, CONSOLE, self.main)
+        self.two_way = reduce(op.GetDlgItem, NODE['FRAME'], self.main)
         self.members = {k: op.GetDlgItem(self.two_way, v) for k, v in TWO_WAY.items()}
         print('我准备好了，开干吧！人生巅峰在前面！') if self.main else print("没找到已登录的客户交易端，我先撤了！")
         # 获取登录账号
-        self.account = reduce(op.GetDlgItem, ACCOUNT, self.main)
+        self.account = reduce(op.GetDlgItem, NODE['ACCOUNT'], self.main)
         op.SendMessageW(self.account, MSG['WM_GETTEXT'], 32, self.buff)
         self.account = self.buff.value
-        self.combo = reduce(op.GetDlgItem, COMBO, self.main)
+        self.combo = reduce(op.GetDlgItem, NODE['COMBO'], self.main)
         self.count = op.SendMessageW(self.combo, MSG['CB_GETCOUNT'])
 
     def switch_tab(self, hCtrl, keyCode, param=0):   # 单击
@@ -131,25 +140,43 @@ class Puppet():
         if key:
             self.switch_tab(self.two_way, key)    # 切换到持仓('W')、成交('E')、委托('R')
         print("正在等待实时数据返回，请稍候...")
-        self.wait_a_second(1)    # 等待数据返回的秒数自行调整，一般sec>=1
-        op.SendMessageW(reduce(op.GetDlgItem, CONSOLE+GRID, self.main),
-                        MSG['WM_COMMAND'], CMD['COPY'], GRID[-1])
-
+        pyperclip.copy('')
+        # 查到只有列表头的空白数据等3秒...orz
+        for i in range(10):
+            time.sleep(0.3)
+            op.SendMessageW(reduce(op.GetDlgItem, NODE['FORM'], self.main),
+                            MSG['WM_COMMAND'], MSG['COPY_DATA'], NODE['FORM'][-1])
+            if len(pyperclip.paste().splitlines()) > 1:
+                break
         return pyperclip.paste()
 
-    def buy(self, symbol, price, qty):   # 买入(B)
+    def buy(self, symbol, price, qty):
+        self.switch(NODE['BUY'][0])
+        tuple(map(lambda hCtrl, arg: op.SendMessageW(
+            hCtrl, MSG['WM_SETTEXT'], 0, str(arg)), self._order[0][0], (symbol, price, qty)))
+        op.PostMessageW(self._order[0][-1], MSG['WM_COMMAND'], self._order[0][1], 0)
+        
+    def sell(self, symbol, price, qty):
+        self.switch(NODE['SELL'][0])
+        tuple(map(lambda hCtrl, arg: op.SendMessageW(
+            hCtrl, MSG['WM_SETTEXT'], 0, str(arg)), self._order[1][0], (symbol, price, qty)))
+        op.PostMessageW(self._order[1][-1], MSG['WM_COMMAND'], self._order[1][1], 0)
+    
+    def buy2(self, symbol, price, qty):   # 买入(B)
+        self.switch(NODE['双向委托'])
         op.SendMessageW(self.members['买入代码'], MSG['WM_SETTEXT'], 0, str(symbol))
         op.SendMessageW(self.members['买入价格'], MSG['WM_SETTEXT'], 0, str(price))
         op.SendMessageW(self.members['买入数量'], MSG['WM_SETTEXT'], 0, str(qty))
-        op.SendMessageW(self.members['买入'], MSG['BM_CLICK'], 0, 0)
-        #op.PostMessageW(self.two_way, MSG['WM_COMMAND'], TWO_WAY['买入'], self.members['买入'])
-
-    def sell(self, symbol, price, qty):    # 卖出(S)
+        #op.SendMessageW(self.members['买入'], MSG['BM_CLICK'], 0, 0)
+        op.PostMessageW(self.two_way, MSG['WM_COMMAND'], TWO_WAY['买入'], self.members['买入'])
+    
+    def sell2(self, symbol, price, qty):    # 卖出(S)
+        self.switch(NODE['双向委托'])
         op.SendMessageW(self.members['卖出代码'], MSG['WM_SETTEXT'], 0, str(symbol))
         op.SendMessageW(self.members['卖出价格'], MSG['WM_SETTEXT'], 0, str(price))
         op.SendMessageW(self.members['卖出数量'], MSG['WM_SETTEXT'], 0, str(qty))
-        op.SendMessageW(self.members['卖出'], MSG['BM_CLICK'], 0, 0)
-        #op.PostMessageW(self.two_way, MSG['WM_COMMAND'], TWO_WAY['卖出'], self.members['卖出'])
+        #op.SendMessageW(self.members['卖出'], MSG['BM_CLICK'], 0, 0)
+        op.PostMessageW(self.two_way, MSG['WM_COMMAND'], TWO_WAY['卖出'], self.members['卖出'])
 
     def refresh(self):    # 刷新(F5)
         op.PostMessageW(self.two_way, MSG['WM_COMMAND'], TWO_WAY['刷新'], self.members['刷新'])
@@ -159,7 +186,7 @@ class Puppet():
         op.SendMessageW(self.main, MSG['WM_COMMAND'], NODE['撤单'], 0)    # 切换到撤单操作台
         if way and str(symbol).isdecimal():
             #print(self.copy_data())
-            self.cancel_c = reduce(op.GetDlgItem, CONSOLE, self.main)
+            self.cancel_c = reduce(op.GetDlgItem, NODE['FRAME'], self.main)
             self.cancel_ctrl = {k: op.GetDlgItem(self.cancel_c, v) for k, v in CANCEL.items()}
             op.SendMessageW(self.cancel_ctrl['填单'], MSG['WM_SETTEXT'], 0, symbol)
             self.wait_a_second()
@@ -230,7 +257,7 @@ class Puppet():
         if way:
             print("开始打新股%s" % ('>'*68))
             print(schedule)
-            self.raffle_c = reduce(op.GetDlgItem, CONSOLE, self.main)
+            self.raffle_c = reduce(op.GetDlgItem, NODE['FRAME'], self.main)
             self.raffle_ctrl = {k: op.GetDlgItem(self.raffle_c, v) for k, v in NEW.items()}
             new = [x.split() for x in schedule.splitlines()]
             index = [new[0].index(x) for x in RAFFLE if x in new[0]]    # 索引映射：代码0, 价格1, 数量2
@@ -257,6 +284,7 @@ class Puppet():
 if __name__ == '__main__':
  
     trader = Puppet()
+    #trader = Puppet(title='广发证券核新网上交易系统7.60')
     if trader.account:
         print(trader.account)           # 帐号
         #print(trader.new)               # 查当天新股名单
