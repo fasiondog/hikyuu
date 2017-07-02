@@ -6,6 +6,7 @@
  */
 
 #include <fstream>
+#include <sstream>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
@@ -478,6 +479,7 @@ bool TradeManager::checkin(const Datetime& datetime, price_t cash) {
     m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime,
             BUSINESS_CHECKIN, in_cash, in_cash, 0.0, 0,
             CostRecord(), 0.0, m_cash, PART_INVALID));
+    _saveAction(m_trade_list.back());
     return true;
 }
 
@@ -512,6 +514,7 @@ bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
     m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime,
             BUSINESS_CHECKOUT, out_cash, out_cash, 0.0, 0,
             CostRecord(), 0.0, m_cash, PART_INVALID));
+    _saveAction(m_trade_list.back());
     return true;
 }
 
@@ -1088,6 +1091,8 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
         }
     }
 
+    _saveAction(result);
+
     return result;
 }
 
@@ -1204,6 +1209,8 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock,
             m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
         }
     }
+
+    _saveAction(result);
 
     return result;
 }
@@ -1877,24 +1884,74 @@ void TradeManager::_update(const Datetime& datetime){
 }
 
 
-void TradeManager::_saveAction(const TradeRecord&) {
+void TradeManager::_saveAction(const TradeRecord& record) {
+    std::stringstream buf(std::stringstream::out);
+    string my_tm("tr = my_tm.");
+    string sep(", ");
+    switch (record.business) {
+    case BUSINESS_CHECKIN:
+        buf << my_tm
+            << "checkin(Datetime('" << record.datetime.toString() << "'), "
+            << record.cash << sep
+            << ")";
+        break;
 
+    case BUSINESS_CHECKOUT:
+        buf << my_tm
+            << "checkout(Datetime('" << record.datetime.toString() << "'), "
+            << record.cash << sep
+            << ")";
+        break;
+
+    case BUSINESS_BUY:
+        buf << my_tm
+            << "buy(Datetime('" << record.datetime.toString() << "'), "
+            << "sm['" << record.stock.market_code() << "'], "
+            << record.realPrice << sep
+            << record.number << sep
+            << record.stoploss << sep
+            << record.goalPrice << sep
+            << record.planPrice << sep
+            << record.from
+            << ")";
+        break;
+
+    case BUSINESS_SELL:
+        buf << my_tm
+            << "sell(Datetime('" << record.datetime.toString() << "'),"
+            << "sm['" << record.stock.market_code() << "']"
+            << record.realPrice << sep
+            << record.number << sep
+            << record.stoploss << sep
+            << record.goalPrice << sep
+            << record.planPrice << sep
+            << record.from
+            << ")";
+        break;
+
+    default:
+        break;
+    }
+
+    m_actions.push_back(buf.str());
 }
 
 
 void TradeManager::tocsv(const string& path) {
-    string filename1, filename2, filename3, filename4;
+    string filename1, filename2, filename3, filename4, filename5;
     if( m_name.empty() ){
         string date = m_init_datetime.toString();
         filename1 = path + "/" + date + "_交易记录.csv";
         filename2 = path + "/" + date + "_已平仓记录.csv";
         filename3 = path + "/" + date + "_未平仓记录.csv";
         filename4 = path + "/" + date + "_资产净值.csv";
+        filename5 = path + "/" + date + "_actions.txt";
     }else{
         filename1 = path + "/" + m_name + "_交易记录.csv";
         filename2 = path + "/" + m_name + "_已平仓记录.csv";
         filename3 = path + "/" + m_name + "_未平仓记录.csv";
         filename4 = path + "/" + m_name + "_资产净值.csv";
+        filename5 = path + "/" + m_name + "_actions.txt";
     }
 
     string sep(",");
@@ -2037,7 +2094,19 @@ void TradeManager::tocsv(const string& path) {
     }
     file.close();
 
-    //TODO tocsv导出资产净值
+    //到处执行命令
+    //导出已平仓记录
+    file.open(filename5.c_str());
+    if (!file) {
+        HKU_ERROR("Can't create file! [TradeManager::tocvs");
+        return;
+    }
+
+    list<string>::const_iterator action_iter = m_actions.begin();
+    for (; action_iter != m_actions.end(); ++action_iter) {
+        file << *action_iter << std::endl;
+    }
+    file.close();
 }
 
 } /* namespace hku */

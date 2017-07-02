@@ -545,6 +545,7 @@ private:
         ar & bs::make_nvp<PositionRecordList>("m_short_position", position);
         ar & BOOST_SERIALIZATION_NVP(m_short_position_history);
         ar & BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar & BOOST_SERIALIZATION_NVP(m_actions);
     }
 
     template<class Archive>
@@ -586,6 +587,7 @@ private:
         }
         ar & BOOST_SERIALIZATION_NVP(m_short_position_history);
         ar & BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar & BOOST_SERIALIZATION_NVP(m_actions);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

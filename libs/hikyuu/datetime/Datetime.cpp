@@ -15,7 +15,7 @@ HKU_API std::ostream & operator<<(std::ostream &out, const Datetime& d) {
         out << "+infinity";
     } else {
         out << d.year() << "-" << d.month() << "-" << d.day() << " "
-            << d.hour() << ":" << d.minute();
+            << d.hour() << ":" << d.minute() << ":" << d.second();
     }
     return out;
 }

@@ -35,7 +35,7 @@ class DatetimeTest(unittest.TestCase):
         self.assert_(d < Datetime(201209272302))
         
         d = Datetime(200101010159)
-        self.assertEqual(str(d), "2001-1-1 1:59")
+        self.assertEqual(str(d), "2001-1-1 1:59:0")
         self.assertEqual(d, Datetime("2001-Jan-01 01:59:00"))
         
         self.assertEqual(Datetime(), constant.null_datetime)
