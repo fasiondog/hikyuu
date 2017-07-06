@@ -128,7 +128,7 @@ string Parameter::getNameValueList() const {
             os << iter->first << equal
                << boost::any_cast<double>(iter->second);
         } else if (iter->second.type() == typeid(string)) {
-            os << iter->first << equal
+            os << "\"" << iter->first << "\"" << equal
                << boost::any_cast<string>(iter->second);
         } else {
             os << "Unsupported";

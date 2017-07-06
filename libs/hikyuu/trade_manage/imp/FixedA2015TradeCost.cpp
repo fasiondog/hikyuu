@@ -10,7 +10,7 @@
 
 namespace hku {
 
-FixedA2015TradeCost::FixedA2015TradeCost() : TradeCostBase("FixedA2015") {
+FixedA2015TradeCost::FixedA2015TradeCost() : TradeCostBase("TC_FixedA2015") {
     setParam<price_t>("commission", 0.0018);
     setParam<price_t>("lowest_commission", 5.0);
     setParam<price_t>("stamptax", 0.001);

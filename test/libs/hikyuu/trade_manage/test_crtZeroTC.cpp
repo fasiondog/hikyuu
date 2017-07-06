@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( test_TC_Zero ) {
     CostRecord result;
 
     /** @arg 检查name */
-    BOOST_CHECK(cost_func->name() == "Zero");
+    BOOST_CHECK(cost_func->name() == "TC_Zero");
 
     /** @arg 计算买入成本 */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( test_TC_Zero ) {
 
     /** @arg 测试clone */
     TradeCostPtr cost_clone_func = cost_func->clone();
-    BOOST_CHECK(cost_clone_func->name() == "Zero");
+    BOOST_CHECK(cost_clone_func->name() == "TC_Zero");
     result = cost_clone_func->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);
     BOOST_CHECK(result == Null<CostRecord>());
     result = cost_clone_func->getSellCost(Datetime(200101010000), stock, 9.01, 1000);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( test_ZeroCost_export ) {
     Stock stock = sm.getStock("sh600004");
 
     CostRecord result;
-    BOOST_CHECK(zero2->name() == "Zero");
+    BOOST_CHECK(zero2->name() == "TC_Zero");
     result = zero2->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);
     BOOST_CHECK(result == Null<CostRecord>());
     result = zero2->getSellCost(Datetime(200101010000), stock, 9.01, 1000);

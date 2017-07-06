@@ -154,6 +154,7 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash,
     setParam<int>("precision", 2);      //计算精度
     setParam<bool>("support_borrow_cash", false);   //是否自动融资
     setParam<bool>("support_borrow_stock", false);  //是否自动融券
+    setParam<bool>("save_action", true); //是否保存命令
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -161,6 +162,7 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash,
             BUSINESS_INIT, m_init_cash, m_init_cash, 0.0, 0,
             CostRecord(), 0.0,  m_cash, PART_INVALID));
     m_broker_last_datetime = Datetime::now();
+    _saveAction(m_trade_list.back());
 }
 
 
@@ -1885,21 +1887,34 @@ void TradeManager::_update(const Datetime& datetime){
 
 
 void TradeManager::_saveAction(const TradeRecord& record) {
+    if (getParam<bool>("save_action") == false)
+        return;
+
     std::stringstream buf(std::stringstream::out);
     string my_tm("td = my_tm.");
     string sep(", ");
     switch (record.business) {
+    case BUSINESS_INIT:
+        buf << "my_tm = crtTM(datetime=Datetime('"
+            << record.datetime.toString() << "'), "
+            << "initCash=" << record.cash << sep
+            << "costFunc=" << m_costfunc->name() << "("
+            << m_costfunc->getParameter().getNameValueList() << "), "
+            << "name='" << m_name << "'"
+            << ")";
+        break;
+
     case BUSINESS_CHECKIN:
         buf << my_tm
             << "checkin(Datetime('" << record.datetime.toString() << "'), "
-            << record.cash << sep
+            << record.cash
             << ")";
         break;
 
     case BUSINESS_CHECKOUT:
         buf << my_tm
             << "checkout(Datetime('" << record.datetime.toString() << "'), "
-            << record.cash << sep
+            << record.cash
             << ")";
         break;
 
@@ -1919,7 +1934,7 @@ void TradeManager::_saveAction(const TradeRecord& record) {
     case BUSINESS_SELL:
         buf << my_tm
             << "sell(Datetime('" << record.datetime.toString() << "'),"
-            << "sm['" << record.stock.market_code() << "']"
+            << "sm['" << record.stock.market_code() << "'], "
             << record.realPrice << sep
             << record.number << sep
             << record.stoploss << sep

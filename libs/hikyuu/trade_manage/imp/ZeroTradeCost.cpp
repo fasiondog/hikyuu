@@ -9,7 +9,7 @@
 
 namespace hku {
 
-ZeroTradeCost::ZeroTradeCost(): TradeCostBase("Zero") {
+ZeroTradeCost::ZeroTradeCost(): TradeCostBase("TC_Zero") {
 
 }
 
