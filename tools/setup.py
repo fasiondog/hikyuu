@@ -67,7 +67,7 @@ setup(
         zip_safe = False,
         include_package_data=True,
         package_data = {
-            '': ['*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml'],
+            '': ['*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml', '*.txt],
         },
         
         data_files = hku_data_files,
