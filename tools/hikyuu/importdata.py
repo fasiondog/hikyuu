@@ -7,12 +7,12 @@ import subprocess
 import time
 import sys
 import os
+import shutil
+import configparser
  
 if __name__ == "__main__":
 
     starttime = time.time()
-    
-    net_filename = 'http://www.qianlong.com.cn/download/history/weight.rar'
 
     data_config_file = os.path.expanduser('~') + "/.hikyuu/data_dir.ini"
     data_config = configparser.ConfigParser()
@@ -22,20 +22,24 @@ if __name__ == "__main__":
     dest_filename = data_dir + "/weight/weight.rar"
     dest_dir = data_dir + "/weight"
 
-    if not os.path.lexists(dest_dir):
-        os.mkdir(dest_dir)
-    
-    if sys.platform == 'win32':
-        subprocess.call(['del', dest_filename], shell=True)
-    else:
-        subprocess.call(['rm', dest_filename])
+    if os.path.lexists(dest_dir):
+        shutil.rmtree(dest_dir)
+    os.mkdir(dest_dir)
 
+    print("下载权限信息...")
+    net_filename = 'http://www.qianlong.com.cn/download/history/weight.rar'
     urllib.request.urlretrieve(net_filename, dest_filename)
-    subprocess.call(['unrar', 'x', '-o+', dest_filename, dest_dir])
-    subprocess.call(['importdata'])
     
+    print("下载完毕，开始解压...")
+    
+    subprocess.call(['unrar', 'x', '-o+', dest_filename, dest_dir])
+
     endtime = time.time()
     print("%.2fs" % (endtime-starttime))
     print("%.2fm" % ((endtime-starttime)/60))
+    
+    print("\n")
+    subprocess.call(['importdata'])
+    
     
     

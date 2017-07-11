@@ -49,10 +49,10 @@ sql = {dir}\createdb.sql
 ; ☆☆☆ 注：权息信息目前指支持钱龙数据格式
 ;sh、sz分别指定上证、深圳的权息数据所在目录
 [weight]
-;sh = c:/stock/weight/WEIGHT_sh/WEIGHT
-;sz = c:/stock/weight/WEIGHT_sz/WEIGHT
-sh = D:\LON\QLDATA\history\SHASE\weight
-sz = D:\LON\QLDATA\history\SZNSE\weight
+sh = {dir}/weight/shase/weight
+sz = {dir}/weight/sznse/weight
+;sh = D:\LON\QLDATA\history\SHASE\weight
+;sz = D:\LON\QLDATA\history\SZNSE\weight
 
 ;指定K线数据源，格式为 “类型, 根目录”（类型仅能为 dzh 或 tdx，即大智慧、通达信）
 ;可多个数据源同时导入，防止信息遗漏
@@ -231,8 +231,8 @@ if not os.path.lexists(data_directory):
         f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
         
     os.mkdir(data_directory + '/tmp')
-        
-        
+
+    
 else:
     if os.path.lexists(data_directory + '/block'):
         pass
@@ -241,6 +241,9 @@ else:
             shutil.rmtree(data_directory + '/block')
             shutil.copytree('config/block', data_directory + '/block')
             os.remove(data_directory + '/block/__init__.py')
+    else:
+        shutil.copytree('config/block', data_directory + '/block')
+        os.remove(data_directory + '/block/__init__.py')
     
     if os.path.exists(data_directory + '/logger.properties'):
         pass
@@ -248,6 +251,8 @@ else:
         if x:
             os.remove(data_directory + '/logger.properties')
             shutil.copy('config/logger.properties', data_directory + '/logger.properties')
+    else:
+        shutil.copy('config/logger.properties', data_directory + '/logger.properties')
         
     if os.path.exists(data_directory + '/importdata.ini'):
         x = ask_question("importdata.ini文件已存在是否覆盖？(Y/[N])：")
@@ -267,7 +272,7 @@ else:
             
     if os.path.exists(data_directory + '/createdb.sql'):
         os.remove(data_directory + '/createdb.sql')
-        shutil.copy('config/createdb.sql', data_directory + '/createdb.sql')
+    shutil.copy('config/createdb.sql', data_directory + '/createdb.sql')
 
     if sys.platform == 'win32':
         hikyuu_ini = '/hikyuu_win.ini'
@@ -285,5 +290,8 @@ else:
     else:        
         with open(data_directory + hikyuu_ini, 'w') as f:
             f.write(hikyuu_config.format(dir=data_directory))
+
+    if not os.path.lexists(data_directory + '/tmp'):
+        os.mkdir(data_directory + '/tmp')
             
 #print(import_config.format(dir=data_directory))            
