@@ -10,6 +10,7 @@
 
 #include "Operand.h"
 #include "Indicator.h"
+#include "crt/IND_LOGIC.h"
 #include "crt/KDATA.h"
 #include "crt/PRICELIST.h"
 #include "crt/MA.h"

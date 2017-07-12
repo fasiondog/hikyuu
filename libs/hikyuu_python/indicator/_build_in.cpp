@@ -100,6 +100,14 @@ Indicator (*WEAVE_2)(const Indicator&) = WEAVE;
 Indicator (*CVAL_1)(double) = CVAL;
 Indicator (*CVAL_2)(const Indicator&, double) = CVAL;
 
+Indicator (*IND_AND1)(const Indicator&, const Indicator&) = IND_AND;
+Indicator (*IND_AND2)(const Indicator&, price_t) = IND_AND;
+Indicator (*IND_AND3)(price_t, const Indicator&) = IND_AND;
+
+Indicator (*IND_OR1)(const Indicator&, const Indicator&) = IND_OR;
+Indicator (*IND_OR2)(const Indicator&, price_t) = IND_OR;
+Indicator (*IND_OR3)(price_t, const Indicator&) = IND_OR;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA2);
@@ -185,6 +193,15 @@ void export_Indicator_build_in() {
 
     def("CVAL", CVAL_1);
     def("CVAL", CVAL_2);
+
+    def("IND_AND", IND_AND1);
+    def("IND_AND", IND_AND2);
+    def("IND_AND", IND_AND3);
+
+    def("IND_OR", IND_OR1);
+    def("IND_OR", IND_OR2);
+    def("IND_OR", IND_OR3);
+
 }
 
 

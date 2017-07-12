@@ -9,8 +9,6 @@
 
 namespace hku {
 
-#define IND_EQ_THRESHOLD 0.000001 ///<判断浮点数相等的阈值,两者差值小于此数
-
 HKU_API std::ostream & operator<<(std::ostream& os, const Indicator& indicator) {
     os << indicator.m_imp;
     return os;
