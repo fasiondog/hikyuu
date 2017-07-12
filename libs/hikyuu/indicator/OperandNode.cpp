@@ -6,6 +6,7 @@
  */
 
 #include "OperandNode.h"
+#include "crt/IND_LOGIC.h"
 
 namespace hku {
 
@@ -34,6 +35,10 @@ string OperandNode::getOPTypeName(OPType op) {
         return "GE";
     } else if (LE == op) {
         return "LE";
+    } else if (AND == op) {
+        return "AND";
+    } else if (OR == op) {
+        return "OR";
     } else {
         return "INVALID";
     }
@@ -118,6 +123,13 @@ Indicator OperandNode::calculate(const Indicator& ind) {
         result = m_left->calculate(ind) <= m_right->calculate(ind);
         break;
 
+    case AND:
+        result = IND_AND(m_left->calculate(ind), m_right->calculate(ind));
+        break;
+
+    case OR:
+        result = IND_OR(m_left->calculate(ind), m_right->calculate(ind));
+        break;
     }
 
     if (m_name != "")

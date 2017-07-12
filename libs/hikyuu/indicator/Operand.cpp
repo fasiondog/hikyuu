@@ -273,4 +273,46 @@ HKU_API Operand operator!=(price_t val, const Operand& op) {
     return result;
 }
 
+HKU_API Operand OP_AND(const Operand& op1, const Operand& op2) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::AND, op1.m_root, op2.m_root);
+    return result;
+}
+
+HKU_API Operand OP_AND(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::AND, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand OP_AND(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::AND, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
+HKU_API Operand OP_OR(const Operand& op1, const Operand& op2) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::OR, op1.m_root, op2.m_root);
+    return result;
+}
+
+HKU_API Operand OP_OR(const Operand& op, price_t val) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::OR, op.m_root, Operand(CVAL(val)).m_root);
+    return result;
+}
+
+HKU_API Operand OP_OR(price_t val, const Operand& op) {
+    Operand result;
+    result.m_root = make_shared<OperandNode>();
+    result.m_root->add(OperandNode::OR, Operand(CVAL(val)).m_root, op.m_root);
+    return result;
+}
+
 } /* namespace hku */

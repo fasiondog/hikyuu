@@ -34,6 +34,12 @@ class HKU_API Operand {
     HKU_API friend Operand operator==(price_t, const Operand&);
     HKU_API friend Operand operator!=(const Operand&, price_t);
     HKU_API friend Operand operator!=(price_t, const Operand&);
+    HKU_API friend Operand OP_AND(const Operand&, const Operand&);
+    HKU_API friend Operand OP_AND(const Operand&, price_t);
+    HKU_API friend Operand OP_AND(price_t, const Operand&);
+    HKU_API friend Operand OP_OR(const Operand&, const Operand&);
+    HKU_API friend Operand OP_OR(const Operand&, price_t);
+    HKU_API friend Operand OP_OR(price_t, const Operand&);
 
 public:
     Operand();

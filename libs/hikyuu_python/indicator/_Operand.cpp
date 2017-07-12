@@ -29,6 +29,14 @@ Operand (*Operand_lt2)(const Operand&, price_t) = operator<;
 Operand (*Operand_ge2)(const Operand&, price_t) = operator>=;
 Operand (*Operand_le2)(const Operand&, price_t) = operator<=;
 
+Operand (*OP_AND1)(const Operand&, const Operand&) = OP_AND;
+Operand (*OP_AND2)(const Operand&, price_t) = OP_AND;
+Operand (*OP_AND3)(price_t, const Operand&) = OP_AND;
+
+Operand (*OP_OR1)(const Operand&, const Operand&) = OP_OR;
+Operand (*OP_OR2)(const Operand&, price_t) = OP_OR;
+Operand (*OP_OR3)(price_t, const Operand&) = OP_OR;
+
 void export_Operand() {
 
     class_<Operand>("Operand", init<>())
@@ -65,6 +73,14 @@ void export_Operand() {
         .def_pickle(normal_pickle_suite<Operand>())
 #endif
         ;
+
+    def("OP_AND", OP_AND1);
+    def("OP_AND", OP_AND2);
+    def("OP_AND", OP_AND3);
+
+    def("OP_OR", OP_OR1);
+    def("OP_OR", OP_OR2);
+    def("OP_OR", OP_OR3);
 }
 
 
