@@ -1,3 +1,5 @@
 *.h linguist-language=C++
+*.cpp linguist-language=C++
 *.py linguist-language=C++
 *.html linguist-language=C++
+*.mod linguist-language=C++
