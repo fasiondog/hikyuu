@@ -1,5 +1,5 @@
-*.h linguist-language=Python
-*.cpp linguist-language=Python
-*.py linguist-language=Python
-*.html linguist-language=Python
-*.mod linguist-language=Python
+*.h linguist-language=C++
+*.cpp linguist-language=C++
+*.py linguist-language=C++
+*.html linguist-language=C++
+*.mod linguist-language=C++
