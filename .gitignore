@@ -12,6 +12,7 @@
 *.suo
 .metadata
 .settings
+/test/data/tmp
 /build
 /tools/hikyuu/*.dll
 /tools/hikyuu/*.exe

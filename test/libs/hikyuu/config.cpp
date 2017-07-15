@@ -28,6 +28,12 @@ GConfig::GConfig() {
     std::cout << "configure file: " << current.string() << "/hikyuu_linux.ini" << std::endl;
     hikyuu_init(current.string() + "/hikyuu_linux.ini");
 #endif
+
+    path tmp_dir = current;
+    tmp_dir /= "tmp";
+    if (!exists(tmp_dir)) {
+        create_directory(tmp_dir);
+    }
 }
 
 GConfig::~GConfig() {

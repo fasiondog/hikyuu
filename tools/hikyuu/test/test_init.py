@@ -21,6 +21,10 @@ else:
     config_file = os.path.join(head, "test/data/hikyuu_linux.ini")
     print(config_file)
     
+tmp_dir = os.path.join(head, "test/data/tmp")
+if not os.path.lexists(tmp_dir):
+    os.mkdir(tmp_dir)
+    
     
 #starttime = time.time()
 #print "Loading Day Data ..."
