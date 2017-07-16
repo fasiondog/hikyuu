@@ -23,12 +23,12 @@ project : requirements <library>/boost//date_time
 lib hikyuu : [ glob-tree *.cpp ]
                  /usr/lib/x86_64-linux-gnu/libsqlite3.so
                  /usr/lib/x86_64-linux-gnu/libpthread.so
-                 ../../hikyuu_extern_libs/linux64/libhdf5_serial.so
-                 ../../hikyuu_extern_libs/linux64/libhdf5_serial_hl.so
-                 ../../hikyuu_extern_libs/linux64/libhdf5_cpp.so
-                 ../../hikyuu_extern_libs/linux64/libhdf5_hl_cpp.so
-                 ../../hikyuu_extern_libs/linux64/liblog4cplus.so
-                 ../../hikyuu_extern_libs/linux64/libmysqlclient.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_serial.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_serial_hl.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
+                 /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
+                 /usr/local/lib/liblog4cplus.so
+                 /usr/lib/x86_64-linux-gnu/libmysqlclient.so
                : <toolset>gcc
                   ; 
 

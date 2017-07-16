@@ -6,7 +6,7 @@ import python ;
 
 project : build-dir  ../../build/hikyuu_python ;
 
-project : requirements <library>/boost/python//boost_python
+project : requirements <library>/boost/python//boost_python3
                        <library>/hikyuu//hikyuu 
                        <library>/boost//thread
                        <library>/boost//date_time
@@ -26,7 +26,7 @@ project : requirements <library>/boost/python//boost_python
 # Declare the three extension modules.  You can specify multiple
 # source files after the colon separated by spaces.
 python-extension _hikyuu : [ glob *.cpp ] 
-                  ../../extern-libs/log4cplus/dll/log4cplus.lib 
+                  /usr/local/lib/liblog4cplus.so 
                   ;
 python-extension indicator/_indicator : [ glob indicator/*.cpp ] ;
 python-extension trade_manage/_trade_manage : [ glob trade_manage/*.cpp ] ; 

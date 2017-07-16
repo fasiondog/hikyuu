@@ -10,7 +10,7 @@ using gcc ;
 
 # Python configuration
 #using python : 2.6 : /usr ;
-using python : 2.7 ;
+using python : 3.5 ;
 
 # Specify the path to the Boost project.  If you move this project,
 # adjust this path to refer to the Boost root directory.
@@ -35,8 +35,8 @@ project : default-build release
         : requirements <include>$(BOOST_INCLUDE_DIR)
                        <include>$(HKU_INCLUDE_DIR)
                        <toolset>gcc:<cxxflags>-ftemplate-depth-300
-                       <toolset>gcc:<cxxflags>-std=c++11
-                       <toolset>clang:<cxxflags>-std=c++11
+                       <toolset>gcc:<cxxflags>-std=c++0x
+                       <toolset>clang:<cxxflags>-std=c++0x
                        <toolset>gcc:<linkflags>-s
                        <toolset>gcc:<linkflags>-Wl,-rpath,./:../
                        <toolset>gcc:<define>BOOST_ALL_DYN_LINK

@@ -24,8 +24,6 @@ cp -v -f ./build/hikyuu_python/$toolset/release/trade_instance/_trade_instance.s
 cp -v -f ./build/hikyuu/$toolset/release/libhikyuu.so ./tools/hikyuu
 cp -v -f ./build/hikyuu_utils/$toolset/release/libhikyuu_utils.so ./tools/hikyuu
 
-cp -v -f ./hikyuu_extern_libs/linux64/*.* ./tools/hikyuu
-
 cd ./test
 b2 -j 4 link=shared
 

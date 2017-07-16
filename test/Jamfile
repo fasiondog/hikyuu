@@ -30,7 +30,7 @@ unit-test test_all_in_one : [ glob-tree *.cpp ]
                             <define>TEST_ALL_IN_ONE ;
 
 unit-test test_all_in_one : [ glob-tree *.cpp ] 
-                            ../hikyuu_extern_libs/linux64/liblog4cplus.so
+                            /usr/local/lib/liblog4cplus.so
                           : <toolset>gcc
                             <define>TEST_ALL_IN_ONE ;
 

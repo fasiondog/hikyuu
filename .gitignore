@@ -16,6 +16,8 @@
 /build
 /tools/hikyuu/*.dll
 /tools/hikyuu/*.exe
+/tools/hikyuu/*.so
+/tools/hikyuu/libboost*
 /tools/hikyuu/docs/build
 /docs/docs-web/build
 /docs/reference
