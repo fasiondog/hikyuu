@@ -105,6 +105,12 @@ HKU_API  Operand operator==(const Operand&, price_t);
 HKU_API  Operand operator==(price_t, const Operand&);
 HKU_API  Operand operator!=(const Operand&, price_t);
 HKU_API  Operand operator!=(price_t, const Operand&);
+HKU_API  Operand OP_AND(const Operand&, const Operand&);
+HKU_API  Operand OP_AND(const Operand&, price_t);
+HKU_API  Operand OP_AND(price_t, const Operand&);
+HKU_API  Operand OP_OR(const Operand&, const Operand&);
+HKU_API  Operand OP_OR(const Operand&, price_t);
+HKU_API  Operand OP_OR(price_t, const Operand&);
 
 } /* namespace hku */
 
