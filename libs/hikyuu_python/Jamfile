@@ -7,6 +7,7 @@ import python ;
 project : build-dir  ../../build/hikyuu_python ;
 
 project : requirements <toolset>gcc:<library>/boost/python//boost_python3
+                       <toolset>clang:<library>/boost/python//boost_python3
                        <toolset>msvc:<library>/boost/python//boost_python
                        <library>/hikyuu//hikyuu 
                        <library>/boost//thread
@@ -33,6 +34,10 @@ python-extension _hikyuu : [ glob *.cpp ]
 python-extension _hikyuu : [ glob *.cpp ] 
                   /usr/local/lib/liblog4cplus.so 
                   : <toolset>gcc
+                  ;
+python-extension _hikyuu : [ glob *.cpp ] 
+                  /usr/local/lib/liblog4cplus.so 
+                  : <toolset>clang
                   ;
 python-extension indicator/_indicator : [ glob indicator/*.cpp ] ;
 python-extension trade_manage/_trade_manage : [ glob trade_manage/*.cpp ] ; 

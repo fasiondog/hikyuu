@@ -43,8 +43,8 @@ import_config = """
 ;db - 指定基础信息数据库
 ;sql - 当指定的基础信息数据库不存在时，使用该指定的脚本创建数据库
 [database]
-db = {dir}\stock.db
-sql = {dir}\createdb.sql
+db = {dir}/stock.db
+sql = {dir}/createdb.sql
 
 ; ☆☆☆ 注：权息信息目前指支持钱龙数据格式
 ;sh、sz分别指定上证、深圳的权息数据所在目录
@@ -66,24 +66,24 @@ sz = {dir}/weight/sznse/weight
 ;all默认为false，如目前数据库仅配置导入A股、B股、基金，而不导入国债
 [dest]
 ;all = True
-sh_day = {dir}\sh_day.h5
-sz_day = {dir}\sz_day.h5
-sh_5min = {dir}\sh_5min.h5
-sz_5min = {dir}\sz_5min.h5
-sh_1min = {dir}\sh_1min.h5
-sz_1min = {dir}\sz_1min.h5
+sh_day = {dir}/sh_day.h5
+sz_day = {dir}/sz_day.h5
+sh_5min = {dir}/sh_5min.h5
+sz_5min = {dir}/sz_5min.h5
+sh_1min = {dir}/sh_1min.h5
+sz_1min = {dir}/sz_1min.h5
 """
 
 hikyuu_config = """
 [tmpdir]
-tmpdir = {dir}\\tmp
+tmpdir = {dir}/tmp
 
 [logger]
-properties = {dir}\\logger.properties
+properties = {dir}/logger.properties
 
 [block]
 type  = qianlong
-dir = {dir}\\block
+dir = {dir}/block
 指数板块 = zsbk.ini
 行业板块 = hybk.ini
 地域板块 = dybk.ini
@@ -100,7 +100,7 @@ year = 0
 
 [baseinfo]
 type = sqlite3
-db = {dir}\\stock.db
+db = {dir}/stock.db
 ;type = mysql
 ;host = 127.0.0.1
 ;port = 3306
@@ -111,7 +111,7 @@ db = {dir}\\stock.db
 ;type = tdx
 ;file = D:\\TdxW_HuaTai\\vipdoc
 type = hdf5
-file = c:\\stock\\sh_day.h5
+file = {dir}/sh_day.h5
 ;type = mysql
 ;host = 127.0.0.1
 ;port = 3306
@@ -120,49 +120,49 @@ file = c:\\stock\\sh_day.h5
 
 [sh_week]
 type = hdf5
-file = {dir}\\sh_day.h5
+file = {dir}/sh_day.h5
 
 [sh_month]
 type = hdf5
-file = {dir}\\sh_day.h5
+file = {dir}/sh_day.h5
 
 [sh_quarter]
 type = hdf5
-file = {dir}\\sh_day.h5
+file = {dir}/sh_day.h5
 
 [sh_halfyear]
 type = hdf5
-file = {dir}\\sh_day.h5
+file = {dir}/sh_day.h5
 
 [sh_year]
 type = hdf5
-file = {dir}\\sh_day.h5
+file = {dir}/sh_day.h5
 
 [sh_1min]
 type = hdf5
-file = {dir}\\sh_1min.h5
+file = {dir}/sh_1min.h5
 
 [sh_5min]
 type = hdf5
-file = {dir}\\sh_5min.h5
+file = {dir}/sh_5min.h5
 
 [sh_15min]
 type = hdf5
-file = {dir}\\sh_5min.h5
+file = {dir}/sh_5min.h5
 
 [sh_30min]
 type = hdf5
-file = {dir}\\sh_5min.h5
+file = {dir}/sh_5min.h5
 
 [sh_60min]
 type = hdf5
-file = {dir}\\sh_5min.h5
+file = {dir}/sh_5min.h5
 
 
 ;深圳证券
 [sz_day]
 type = hdf5
-file = {dir}\\sz_day.h5
+file = {dir}/sz_day.h5
 ;type = mysql
 ;host = 127.0.0.1
 ;port = 3306
@@ -171,43 +171,43 @@ file = {dir}\\sz_day.h5
 
 [sz_week]
 type = hdf5
-file = {dir}\\sz_day.h5
+file = {dir}/sz_day.h5
 
 [sz_month]
 type = hdf5
-file = {dir}\\sz_day.h5
+file = {dir}/sz_day.h5
 
 [sz_quarter]
 type = hdf5
-file = {dir}\\sz_day.h5
+file = {dir}/sz_day.h5
 
 [sz_halfyear]
 type = hdf5
-file = {dir}\\sz_day.h5
+file = {dir}/sz_day.h5
 
 [sz_year]
 type = hdf5
-file = {dir}\\sz_day.h5
+file = {dir}/sz_day.h5
 
 [sz_1min]
 type = hdf5
-file = {dir}\\sz_1min.h5
+file = {dir}/sz_1min.h5
 
 [sz_5min]
 type = hdf5
-file = {dir}\\sz_5min.h5
+file = {dir}/sz_5min.h5
 
 [sz_15min]
 type = hdf5
-file = {dir}\\sz_5min.h5
+file = {dir}/sz_5min.h5
 
 [sz_30min]
 type = hdf5
-file = {dir}\\sz_5min.h5
+file = {dir}/sz_5min.h5
 
 [sz_60min]
 type = hdf5
-file = {dir}\\sz_5min.h5
+file = {dir}/sz_5min.h5
 """
 
     
