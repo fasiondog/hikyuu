@@ -26,6 +26,7 @@ cp -v -f ${BOOST_ROOT}/stage/lib/libboost_serialization.so.* ./tools/hikyuu/
 cp -v -f ./build/hikyuu/$toolset/release/libhikyuu.so ./tools/hikyuu
 cp -v -f ./build/hikyuu_utils/$toolset/release/libhikyuu_utils.so ./tools/hikyuu
 
+cp -v -f ./build/importdata/$toolset/release/importdata ./tools/hikyuu
 
 cp -v -f ./build/hikyuu_python/$toolset/release/_hikyuu.so ./tools/hikyuu
 cp -v -f ./build/hikyuu_python/$toolset/release/indicator/_indicator.so ./tools/hikyuu/indicator

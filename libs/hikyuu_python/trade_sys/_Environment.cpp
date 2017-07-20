@@ -15,13 +15,16 @@
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include <hikyuu/trade_sys/environment/build_in.h>
+#include "../_Parameter.h"
+#include "../pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
 
 class EnvironmentWrap: public EnvironmentBase, public wrapper<EnvironmentBase>{
 public:
-    EnvironmentWrap(const string& name): EnvironmentBase(name) { }
+    EnvironmentWrap() : EnvironmentBase() {}
+    EnvironmentWrap(const string& name): EnvironmentBase(name) {}
 
     void _reset() {
         if (override func = get_override("_reset")) {
@@ -48,7 +51,8 @@ string (EnvironmentBase::*ev_get_name)() const = &EnvironmentBase::name;
 void (EnvironmentBase::*ev_set_name)(const string&) = &EnvironmentBase::name;
 
 void export_Environment() {
-    class_<EnvironmentWrap, boost::noncopyable>("EnvironmentBase", init<const string&>())
+    class_<EnvironmentWrap, boost::noncopyable>("EnvironmentBase", init<>())
+            .def(init<const string&>())
             .def(self_ns::str(self))
             .add_property("name", ev_get_name, ev_set_name)
             .def("getParam", &EnvironmentBase::getParam<boost::any>)

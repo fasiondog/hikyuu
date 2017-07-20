@@ -31,10 +31,11 @@ data_config_file = hku_dir + '/data_dir.ini'
 if os.path.exists(data_config_file):
     os.remove(data_config_file);
 
-data_directory = input("\n请输入股票数据存放路径（默认c:\stock）：")
+default_dir = "c:\stock" if sys.platform == "win32" else usr_dir + "/stock"
+data_directory = input("\n请输入股票数据存放路径（默认" + default_dir + "）：")
 if data_directory == '':
-    data_directory = 'c:\stock'
-    
+    data_directory = default_dir
+        
 with open(data_config_file, 'w') as conf:
     conf.writelines(['[data_dir]\n', 'data_dir=' + data_directory])
 
@@ -210,6 +211,8 @@ type = hdf5
 file = {dir}/sz_5min.h5
 """
 
+tdx_default_dir = "c:\TdxW_HuaTai" if sys.platform == "win32" else usr_dir + "/.wine/driver/c/Tdx_HuaTai"
+tdx_input_str = "请输入通达信安装路径（默认从" + tdx_default_dir + "）："
     
 if not os.path.lexists(data_directory):
     shutil.copytree('config', data_directory)
@@ -223,9 +226,9 @@ if not os.path.lexists(data_directory):
     with open(filename, 'w') as f:
         f.write(hikyuu_config.format(dir=data_directory))
     
-    tdx_dir = input("请输入通达信安装路径（默认从c:\TdxW_HuaTai）：")
+    tdx_dir = input(tdx_input_str)
     if tdx_dir == '':
-        tdx_dir = 'c:\TdxW_HuaTai'
+        tdx_dir = tdx_default_dir
 
     with open(data_directory + '/importdata.ini', 'w') as f:
         f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
@@ -258,15 +261,15 @@ else:
         x = ask_question("importdata.ini文件已存在是否覆盖？(Y/[N])：")
         if x:
             os.remove(data_directory + '/importdata.ini')
-            tdx_dir = input("请输入通达信安装路径（默认从c:\TdxW_HuaTai）：")
+            tdx_dir = input(tdx_input_str)
             if tdx_dir == '':
-                tdx_dir = 'c:\TdxW_HuaTai'
+                tdx_dir = tdx_default_dir
             with open(data_directory + '/importdata.ini', 'w') as f:
                 f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
     else:
-        tdx_dir = input("请输入通达信安装路径（默认从c:\TdxW_HuaTai）：")
+        tdx_dir = input(tdx_input_str)
         if tdx_dir == '':
-            tdx_dir = 'c:\TdxW_HuaTai'              
+            tdx_dir = tdx_default_dir
         with open(data_directory + '/importdata.ini', 'w') as f:
             f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
             

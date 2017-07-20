@@ -644,7 +644,7 @@ void import_stock_weight(const SqlitePtr& db,
     for (; stk_iter != stock_list.end(); ++stk_iter) {
         //progress_bar(++cur, total);
 
-        std::string filename = dir_path + "\\" + stk_iter->code + ".wgt";
+        std::string filename = dir_path + "/" + stk_iter->code + ".wgt";
         std::ifstream file(filename, std::ifstream::binary);
         if (!file) {
             continue;
@@ -1765,7 +1765,7 @@ void dzh_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
     for (; stk_iter != stock_list.end(); ++stk_iter) {
         progress_bar(++cur, total);
         std::string filename = dir_path.string()
-                             + "\\" + stk_iter->code + ".day";
+                             + "/" + stk_iter->code + ".day";
         std::string table_name = market + stk_iter->code;
 
         //std::cout << filename << std::endl;
@@ -1886,7 +1886,7 @@ void dzh_import_min5_data(const SqlitePtr& db, const H5FilePtr& h5,
     for (; stk_iter != stock_list.end(); ++stk_iter) {
         progress_bar(++cur, total);
         std::string filename = dir_path.string()
-                             + "\\" + stk_iter->code + ".NMN";
+                             + "/" + stk_iter->code + ".NMN";
         std::string table_name = market + stk_iter->code;
 
         count += dzh_import_min5_data_from_file(filename, h5, table_name);
@@ -2533,8 +2533,8 @@ void tdx_import_stock_name_from_file(const SqlitePtr& db,
 //-----------------------------------------------------------------------------
 void tdx_import_stock_name(const SqlitePtr& db, const std::string& dirname) {
     assert(db);
-    tdx_import_stock_name_from_file(db, dirname + "\\T0002\\hq_cache\\shm.tnf", "SH");
-    tdx_import_stock_name_from_file(db, dirname + "\\T0002\\hq_cache\\szm.tnf", "SZ");
+    tdx_import_stock_name_from_file(db, dirname + "/T0002/hq_cache/shm.tnf", "SH");
+    tdx_import_stock_name_from_file(db, dirname + "/T0002/hq_cache/szm.tnf", "SZ");
 }
 
 
@@ -2967,7 +2967,7 @@ void tdx_import_day_data(const SqlitePtr& db, const H5FilePtr& h5,
         std::string tmp_market = market;
         boost::to_lower(tmp_market);
         std::string filename = dir_path.string()
-                             + "\\" + tmp_market + stk_iter->code + ".day";
+                             + "/" + tmp_market + stk_iter->code + ".day";
         //std::cout << filename << std::endl;
         count += tdx_import_day_data_from_file(db, filename, h5, market, stk_iter->code);
 
@@ -3108,7 +3108,7 @@ void tdx_import_min_data(const SqlitePtr& db, const H5FilePtr& h5,
         std::string tmp_market = market;
         boost::to_lower(tmp_market);
         std::string filename = dir_path.string()
-                             + "\\" + tmp_market + stk_iter->code + suffix;
+                             + "/" + tmp_market + stk_iter->code + suffix;
 
         std::string table_name = market + stk_iter->code;
         count += tdx_import_min_data_from_file(db, filename, h5, market, stk_iter->code);
