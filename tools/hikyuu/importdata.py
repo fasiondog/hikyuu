@@ -39,7 +39,12 @@ if __name__ == "__main__":
     print("%.2fm" % ((endtime-starttime)/60))
     
     print("\n")
-    subprocess.call(['importdata'])
+
+    try:
+        subprocess.call(['importdata'])
+    except FileNotFoundError:
+        subprocess.call(['./importdata'])
+
     
     
     
