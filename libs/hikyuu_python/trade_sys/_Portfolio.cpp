@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/portfolio/build_in.h>
+#include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;

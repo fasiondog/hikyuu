@@ -211,9 +211,11 @@ string HKU_API utf8_to_gb(const string& szinput) {
     memset(outbuf, 0, outlen);
     char *in = inbuf;
     char *out = outbuf;
-    iconv_t cd=iconv_open("gb2312","utf-8");
+    iconv_t cd=iconv_open("gbk","utf-8");
     iconv(cd, &in, &inlen, &out, &outlen);
     iconv_close(cd);
+    string result(outbuf);
+    free(oufbuf);
     return outbuf;
 }
 
@@ -225,10 +227,12 @@ string HKU_API gb_to_utf8(const string& szinput) {
     memset(outbuf, 0, outlen);
     char *in = inbuf;
     char *out = outbuf;
-    iconv_t cd=iconv_open("utf-8","gb2312");
+    iconv_t cd=iconv_open("utf-8","gbk");
     iconv(cd, &in, &inlen, &out, &outlen);
     iconv_close(cd);
-    return outbuf;
+    string result(outbuf);
+    free(outbuf);
+    return result;
 }
 
 #endif /* defined(BOOST_WINDOWS) */

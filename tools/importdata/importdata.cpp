@@ -547,7 +547,7 @@ std::string GBToUTF8(char *src_str) {
     memset(buffer, 0, buffer_len);
     buffer_len--;
 
-    iconv_t handle = iconv_open("utf-8", "gb2312");
+    iconv_t handle = iconv_open("utf-8", "gbk");
     if (handle == (iconv_t) -1) {
         perror("ICONV:");
         return result;
@@ -2384,10 +2384,10 @@ void tdx_import_stock_name_from_file(const SqlitePtr& db,
     }
 
     char buffer[315];
-    char stockname[9];
+    char stockname[10];
     char stockcode[7];
     memset(buffer, 0 , 315);
-    memset(stockname, 0, 9);
+    memset(stockname, 0, 10);
     memset(stockcode, 0, 7);
 
     file.read(buffer, 50);
