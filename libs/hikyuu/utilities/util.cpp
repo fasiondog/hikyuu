@@ -215,8 +215,8 @@ string HKU_API utf8_to_gb(const string& szinput) {
     iconv(cd, &in, &inlen, &out, &outlen);
     iconv_close(cd);
     string result(outbuf);
-    free(oufbuf);
-    return outbuf;
+    free(outbuf);
+    return result;
 }
 
 string HKU_API gb_to_utf8(const string& szinput) {
