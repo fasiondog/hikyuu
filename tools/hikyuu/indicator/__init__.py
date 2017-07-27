@@ -47,6 +47,8 @@ Indicator.__ge__ = indicator_ge
 Indicator.__le__ = indicator_le
 Indicator.__gt__ = indicator_gt
 Indicator.__lt__ = indicator_lt
+Indicator.__and__ = IND_AND
+Indicator.__or__ = IND_OR
 
 Indicator.__radd__ = lambda self, other: self.__add__(other)
 Indicator.__rsub__ = lambda self, other: CVAL(self, other).__sub__(self)
@@ -59,6 +61,8 @@ Indicator.__rge__ = lambda self, other: CVAL(self, other).__ge__(self)
 Indicator.__rle__ = lambda self, other: CVAL(self, other).__le__(self)
 Indicator.__rgt__ = lambda self, other: CVAL(self, other).__gt__(self)
 Indicator.__rlt__ = lambda self, other: CVAL(self, other).__lt__(self)
+Indicator.__rand__ = lambda self, other: CVAL(self, other).__and__(self)
+Indicator.__ror__ = lambda self, other: CVAL(self, other).__or__(self)
 
 
 Operand.__radd__ = lambda self, other: self.__add__(other)
@@ -72,6 +76,11 @@ Operand.__rgt__ = lambda self, other: Operand(CVAL(other)).__gt__(self)
 Operand.__rlt__ = lambda self, other: Operand(CVAL(other)).__lt__(self)
 Operand.__rge__ = lambda self, other: Operand(CVAL(other)).__ge__(self)
 Operand.__rle__ = lambda self, other: Operand(CVAL(other)).__le__(self)
+
+Operand.__and__ = OP_AND
+Operand.__or__ = OP_OR
+Operand.__rand__ = lambda self, other: CVAL(self, other).__and__(self)
+Operand.__ror__ = lambda self, other: CVAL(self, other).__or__(self)
 
 OP = Operand
 

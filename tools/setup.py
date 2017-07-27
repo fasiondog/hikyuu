@@ -11,7 +11,7 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 hku_name = "Hikyuu"
-hku_version = "1.0.3"
+hku_version = "1.0.4"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
@@ -67,7 +67,7 @@ setup(
         zip_safe = False,
         include_package_data=True,
         package_data = {
-            '': ['*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml', '*.txt],
+            '': ['*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml', '*.txt'],
         },
         
         data_files = hku_data_files,
