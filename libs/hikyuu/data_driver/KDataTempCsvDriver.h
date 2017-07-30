@@ -1,25 +1,24 @@
 /*
- * KDataDriver.h
+ * KDataTempCsvDriver.h
  *
- *  Created on: 2012-9-8
+ *  Created on: 2017年7月30日
  *      Author: fasiondog
  */
 
-#ifndef KDATADRIVER_H_
-#define KDATADRIVER_H_
+#ifndef DATA_DRIVER_KDATATEMPCSVDRIVER_H_
+#define DATA_DRIVER_KDATATEMPCSVDRIVER_H_
 
-#include "KDataDriverImp.h"
+#include "KDataDriver.h"
 
 namespace hku {
 
 /**
- * K线数据驱动基类
+ * 获取临时载入的CSV文件
  */
-class KDataDriver {
+class KDataTempCsvDriver: public KDataDriver {
 public:
-    KDataDriver() {}
-    KDataDriver(const shared_ptr<IniParser>& config);
-    virtual ~KDataDriver() { }
+    KDataTempCsvDriver(const string& day_filename, const string& min_filename);
+    virtual ~KDataTempCsvDriver();
 
     /**
      * 将指定类型的K线数据加载至缓存
@@ -42,7 +41,9 @@ public:
      * @return
      */
     virtual size_t getCount(const string& market, const string& code,
-            KQuery::KType kType);
+            KQuery::KType kType) {
+        return 0;
+    }
 
     /**
      * 获取指定日期范围对应的K线记录索引
@@ -54,7 +55,9 @@ public:
      * @return
      */
     virtual bool getIndexRangeByDate(const string& market, const string& code,
-            const KQuery& query, size_t& out_start, size_t& out_end);
+            const KQuery& query, size_t& out_start, size_t& out_end) {
+        return false;
+    }
 
     /**
      * 获取指定的K线记录
@@ -65,18 +68,34 @@ public:
      * @return
      */
     virtual KRecord getKRecord(const string& market, const string& code,
-              size_t pos, KQuery::KType kType);
+              size_t pos, KQuery::KType kType) {
+        return KRecord();
+    }
 
 private:
-    KDataDriverImpPtr _getImpPtr(const string& market, KQuery::KType);
+    void _get_title_column(const string&);
+    void _get_token(const string&);
+    string _get_filename();
 
 private:
-    map<KQuery::KType, string> m_suffix;
-    map<string, KDataDriverImpPtr> m_imp; /* key: market + _day */
+    string m_day_filename;
+    string m_min_filename;
+
+    enum COLUMN {
+        DATE = 0,
+        OPEN = 1,
+        HIGH = 2,
+        LOW = 3,
+        CLOSE = 4,
+        VOLUME = 5,
+        AMOUNT = 6,
+        LAST = 7
+    };
+
+    size_t m_column[LAST];
+    vector<string> m_token_buf;
 };
 
-typedef shared_ptr<KDataDriver> KDataDriverPtr;
+} /* namespace hku */
 
-} /* namespace */
-
-#endif /* KDATADRIVER_H_ */
+#endif /* DATA_DRIVER_KDATATEMPCSVDRIVER_H_ */

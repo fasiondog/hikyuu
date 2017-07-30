@@ -12,6 +12,7 @@
 #include "utilities/util.h"
 #include "StockManager.h"
 #include "data_driver/DataDriverFactory.h"
+#include "data_driver/KDataTempCsvDriver.h"
 
 namespace hku {
 
@@ -103,6 +104,11 @@ void StockManager::init(const string& filename) {
         if (preload_halfyear) iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
         if (preload_year) iter->second.loadKDataToBuffer(KQuery::YEAR);
     }
+
+    //add special Market, for temp csv file
+    m_marketInfoDict["TMP"] = MarketInfo("TMP", "Temp Csv file",
+                                         "temp load from csv file",
+                                         "000001", Null<Datetime>());
 
     boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start_time;
     HKU_TRACE(sec << " Loaded Data.");
@@ -205,6 +211,29 @@ getTradingCalendar(const KQuery& query, const string& market) {
         result = stock.getDatetimeList(start_ix, end_ix, query.kType());
     }
     return result;
+}
+
+Stock StockManager::addTempCsvStock(
+        const string& code,
+        const string& day_filename,
+        const string& min_filename,
+        hku_uint32 stk_type) {
+    Stock result("TMP", code, day_filename, STOCKTYPE_INDEX, true,
+            Datetime(199901010000), Null<Datetime>());
+    KDataTempCsvDriver *p = new KDataTempCsvDriver(day_filename, min_filename);
+    result.setKDataDriver(KDataDriverPtr(p));
+    result.loadKDataToBuffer(KQuery::DAY);
+    result.loadKDataToBuffer(KQuery::MIN);
+    return result;
+}
+
+void StockManager::removeTempCsvStock(const string& code) {
+    string query_str = "TMP" + code;
+    boost::to_upper(query_str);
+    auto iter = m_stockDict.find(query_str);
+    if(iter != m_stockDict.end()) {
+        m_stockDict.erase(iter);
+    }
 }
 
 } /* namespace */

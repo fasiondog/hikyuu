@@ -150,7 +150,9 @@ _loadBaseData(const string& market, const string& code, KQuery::KType kType,
         }
 
     } catch(std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::_loadBaseData] Invalid date! " << e.what());
+        HKU_WARN("[H5KDataDriver::_loadBaseData] Invalid date! market_code("
+                << market << code << ") "
+                << e.what());
 
     } catch(...) {
 

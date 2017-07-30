@@ -102,6 +102,13 @@ public:
      */
     bool addStock(const Stock& stock);
 
+    Stock addTempCsvStock(const string& code,
+            const string& day_filename,
+            const string& min_filename,
+            hku_uint32 stk_type = STOCKTYPE_INDEX);
+
+    void removeTempCsvStock(const string& code);
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const { return m_stockDict.begin(); }

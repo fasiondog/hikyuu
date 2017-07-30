@@ -17,8 +17,9 @@ namespace hku {
 
 CsvKDataDriverImp::CsvKDataDriverImp (
         const shared_ptr<IniParser>& config,
-        const string& filename)
-: KDataDriverImp(config), m_filename(filename) {
+        const string& dirname,
+        bool is_filename)
+: KDataDriverImp(config), m_dirname(dirname), m_is_filename(is_filename) {
     for (int i = 0; i < LAST; ++i) {
         m_column[i] = Null<size_t>();
     }
@@ -28,6 +29,43 @@ CsvKDataDriverImp::CsvKDataDriverImp (
 
 CsvKDataDriverImp::~CsvKDataDriverImp() {
 
+}
+
+string CsvKDataDriverImp::
+_getFileName(const string& market, const string& code, KQuery::KType ktype) {
+    string filename;
+    if (m_is_filename) {
+        filename = m_dirname;
+
+    } else {
+
+        switch (ktype) {
+        case KQuery::MIN:
+            filename = m_dirname + "\\" + market + "\\minline\\" + market + code + ".csv";
+            break;
+
+        case KQuery::MIN5:
+        case KQuery::MIN15:
+        case KQuery::MIN30:
+        case KQuery::MIN60:
+            filename = m_dirname + "\\" + market + "\\fzline\\" + market + code + ".csv";
+            break;
+
+        case KQuery::DAY:
+        case KQuery::WEEK:
+        case KQuery::MONTH:
+        case KQuery::QUARTER:
+        case KQuery::HALFYEAR:
+        case KQuery::YEAR:
+            filename = m_dirname + "\\" + market + "\\lday\\" + market + code + ".csv";
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    return filename;
 }
 
 void CsvKDataDriverImp::_get_token(const string& line) {
@@ -87,9 +125,10 @@ void CsvKDataDriverImp::_get_title_column(const string& line) {
 void CsvKDataDriverImp::loadKData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
         KRecordList* out_buffer) {
-    std::ifstream infile(m_filename.c_str());
+    string filename = _getFileName(market, code, kType);
+    std::ifstream infile(filename.c_str());
     if (!infile) {
-        HKU_ERROR("Can't open this file: " << m_filename
+        HKU_ERROR("Can't open this file: " << filename
                 << " [CsvKDataDriverImp::loadKData]");
         return;
     }
@@ -160,10 +199,11 @@ void CsvKDataDriverImp::loadKData(const string& market, const string& code,
 size_t
 CsvKDataDriverImp::getCount(const string& market, const string& code,
          KQuery::KType kType) {
-    std::ifstream infile(m_filename.c_str());
+    string filename = _getFileName(market, code ,kType);
+    std::ifstream infile(filename.c_str());
     if (!infile) {
-        HKU_ERROR("Can't open this file: " << m_filename
-                << " [CsvKDataDriverImp::loadKData]");
+        HKU_ERROR("Can't open this file: " << filename
+                << " [CsvKDataDriverImp::getCount]");
         return 0;
     }
 
@@ -229,10 +269,11 @@ CsvKDataDriverImp::getCount(const string& market, const string& code,
 bool
 CsvKDataDriverImp::getIndexRangeByDate(const string& market, const string& code,
         const KQuery& query, size_t& out_start, size_t& out_end) {
-    std::ifstream infile(m_filename.c_str());
+    string filename = _getFileName(market, code, query.kType());
+    std::ifstream infile(filename.c_str());
     if (!infile) {
-        HKU_ERROR("Can't open this file: " << m_filename
-                << " [CsvKDataDriverImp::loadKData]");
+        HKU_ERROR("Can't open this file: " << filename
+                << " [CsvKDataDriverImp::getIndexRangeByDate]");
         return false;
     }
 
@@ -287,10 +328,11 @@ KRecord
 CsvKDataDriverImp::getKRecord(const string& market, const string& code,
           size_t pos, KQuery::KType kType) {
     KRecord record;
-    std::ifstream infile(m_filename.c_str());
+    string filename = _getFileName(market, code, kType);
+    std::ifstream infile(filename.c_str());
     if (!infile) {
-        HKU_ERROR("Can't open this file: " << m_filename
-                << " [CsvKDataDriverImp::loadKData]");
+        HKU_ERROR("Can't open this file: " << filename
+                << " [CsvKDataDriverImp::getKRecord]");
         return record;
     }
 

@@ -14,7 +14,8 @@ namespace hku {
 
 class CsvKDataDriverImp: public KDataDriverImp {
 public:
-    CsvKDataDriverImp(const shared_ptr<IniParser>&, const string& filename);
+    CsvKDataDriverImp(const shared_ptr<IniParser>&, const string& dirname,
+            bool is_filename = true);
     virtual ~CsvKDataDriverImp();
 
     virtual void loadKData(const string& market, const string& code,
@@ -36,9 +37,11 @@ public:
 private:
     void _get_title_column(const string&);
     void _get_token(const string&);
+    string _getFileName(const string& market, const string& code, KQuery::KType);
 
 private:
-    string m_filename;
+    string m_dirname;
+    bool m_is_filename;
 
     enum COLUMN {
         DATE = 0,

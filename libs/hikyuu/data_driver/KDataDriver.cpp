@@ -8,6 +8,7 @@
 #include "kdata/hdf5/H5KDataDriverImp.h"
 #include "kdata/mysql/MySQLKDataDriverImp.h"
 #include "kdata/tdx/TdxKDataDriverImp.h"
+#include "kdata/csv/CsvKDataDriverImp.h"
 #include "../StockManager.h"
 #include "KDataDriver.h"
 
@@ -89,16 +90,28 @@ KDataDriver::KDataDriver(const shared_ptr<IniParser>& config) {
                 m_imp[driver_name] = mysql_driver;
 
             } else if (dbtype == "tdx") {
-                if (!config->hasOption(driver_name, "file")) {
-                    HKU_WARN("Not found hdf file name in "
+                if (!config->hasOption(driver_name, "dir")) {
+                    HKU_WARN("Not found dir name in "
                             << driver_name << func_name);
                     continue;
                 }
 
                 KDataDriverImpPtr tdx_driver =
                         make_shared<TdxKDataDriverImp>(TdxKDataDriverImp(
-                                config, config->get(driver_name, "file")));
+                                config, config->get(driver_name, "dir")));
                 m_imp[driver_name] = tdx_driver;
+
+            } else if (dbtype == "csv") {
+                if (!config->hasOption(driver_name, "dir")) {
+                    HKU_WARN("Not found dir name in "
+                            << driver_name << func_name);
+                    continue;
+                }
+
+                KDataDriverImpPtr csv_driver =
+                        make_shared<CsvKDataDriverImp>(CsvKDataDriverImp(
+                                config, config->get(driver_name, "dir")));
+                m_imp[driver_name] = csv_driver;
             }
         } /* for KQuery::KType */
     } /* for market_iter */
