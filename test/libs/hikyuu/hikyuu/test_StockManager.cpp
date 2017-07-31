@@ -12,11 +12,13 @@
     #include <boost/test/unit_test.hpp>
 #endif
 
+#include <boost/filesystem.hpp>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/util.h>
 #include <hikyuu/Log.h>
 
 using namespace hku;
+using namespace boost::filesystem;
 
 /**
  * @defgroup test_hikyuu_StockManager test_hikyuu_StockManager
@@ -160,6 +162,34 @@ BOOST_AUTO_TEST_CASE( test_StockManager_getBlock ) {
     BlockList blk_list = sm.getBlockList("地域板块");
     blk_list = sm.getBlockList();
     BOOST_CHECK(blk_list.size() != 0);
+
+}
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_StockManager_TempCsvStock) {
+    StockManager& sm = StockManager::instance();
+
+    path tmp_dir(sm.tmpdir());
+    tmp_dir = tmp_dir.parent_path();
+
+    string day_filename(tmp_dir.string() + "/test_day_data.csv");
+    string min_filename(tmp_dir.string() + "/test_min_data.csv");
+
+    Stock stk = sm.addTempCsvStock("test", day_filename, min_filename);
+    BOOST_CHECK(stk.isNull() == false);
+    BOOST_CHECK(stk.market() == "TMP");
+    BOOST_CHECK(stk.code() == "TEST");
+    BOOST_CHECK(stk.market_code() == "TMPTEST");
+    BOOST_CHECK(stk.getCount(KQuery::DAY) == 100);
+    BOOST_CHECK(stk.getCount(KQuery::MIN) == 24000);
+
+    KRecord record;
+    record = stk.getKRecord(0);
+    //BOOST_CHECK(record.datetime == Datetime(201703070000));
+    std::cout << record << std::endl;
+
+    stk = sm.getStock("tmptest");
+    BOOST_CHECK(stk.isNull() == false);
 
 }
 

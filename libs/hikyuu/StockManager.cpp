@@ -160,7 +160,9 @@ bool StockManager::addStock(const Stock& stock) {
         return false;
     }
 
-    m_stockDict[stock.market_code()] = stock;
+    string market_code(stock.market_code());
+    boost::to_upper(market_code);
+    m_stockDict[market_code] = stock;
     return true;
 }
 
@@ -218,12 +220,15 @@ Stock StockManager::addTempCsvStock(
         const string& day_filename,
         const string& min_filename,
         hku_uint32 stk_type) {
-    Stock result("TMP", code, day_filename, STOCKTYPE_INDEX, true,
+    string new_code(code);
+    boost::to_upper(new_code);
+    Stock result("TMP", new_code, day_filename, STOCKTYPE_INDEX, true,
             Datetime(199901010000), Null<Datetime>());
     KDataTempCsvDriver *p = new KDataTempCsvDriver(day_filename, min_filename);
     result.setKDataDriver(KDataDriverPtr(p));
     result.loadKDataToBuffer(KQuery::DAY);
     result.loadKDataToBuffer(KQuery::MIN);
+    addStock(result);
     return result;
 }
 

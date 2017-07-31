@@ -14,6 +14,9 @@ using namespace hku;
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getTradingCalendar_overloads,
         getTradingCalendar, 1, 2)
 
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addTempCsvStock_overloads,
+        addTempCsvStock, 3, 4)
+
 BlockList (StockManager::*getBlockList_1)(const string&) = &StockManager::getBlockList;
 BlockList (StockManager::*getBlockList_2)() = &StockManager::getBlockList;
 
@@ -35,6 +38,9 @@ void export_StockManager(){
             //.def("getTradingCalendar", &StockManager::getTradingCalendar,
             //        (arg("market")="SH", arg("start")=Datetime::minDatetime(),
             //        arg=("end")=Datetime::maxDatetime()))
+            .def("addTempCsvStock", &StockManager::addTempCsvStock,
+                    addTempCsvStock_overloads())
+            .def("removeTempCsvStock", &StockManager::removeTempCsvStock)
 
             .def("__len__", &StockManager::size)
             .def("__getitem__", &StockManager::getStock)
