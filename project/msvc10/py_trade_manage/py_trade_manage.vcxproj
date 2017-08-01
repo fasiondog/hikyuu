@@ -206,6 +206,7 @@
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_manage\_CostRecord.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_manage\_FundsRecord.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_manage\_LoanRecord.cpp" />
+    <ClCompile Include="..\..\..\libs\hikyuu_python\trade_manage\_OrderBroker.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_manage\_Performance.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_manage\_PositionRecord.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_manage\_TradeCost.cpp" />
