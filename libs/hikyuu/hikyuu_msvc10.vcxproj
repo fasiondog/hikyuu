@@ -207,7 +207,6 @@
     <ClCompile Include="data_driver\DataDriverFactory.cpp" />
     <ClCompile Include="data_driver\KDataDriver.cpp" />
     <ClCompile Include="data_driver\KDataTempCsvDriver.cpp" />
-    <ClCompile Include="data_driver\kdata\csv\CsvKDataDriverImp.cpp" />
     <ClCompile Include="data_driver\kdata\hdf5\H5KDataDriverImp.cpp" />
     <ClCompile Include="data_driver\kdata\mysql\MySQLKDataDriverImp.cpp" />
     <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriverImp.cpp" />
@@ -325,7 +324,6 @@
     <ClInclude Include="data_driver\KDataDriver.h" />
     <ClInclude Include="data_driver\KDataDriverImp.h" />
     <ClInclude Include="data_driver\kdatatempcsvdriver.h" />
-    <ClInclude Include="data_driver\kdata\csv\csvkdatadriverimp.h" />
     <ClInclude Include="data_driver\kdata\hdf5\H5KDataDriverImp.h" />
     <ClInclude Include="data_driver\kdata\hdf5\H5Record.h" />
     <ClInclude Include="data_driver\kdata\mysql\MySQLKDataDriverImp.h" />

@@ -175,6 +175,7 @@ BOOST_AUTO_TEST_CASE( test_StockManager_TempCsvStock) {
     string day_filename(tmp_dir.string() + "/test_day_data.csv");
     string min_filename(tmp_dir.string() + "/test_min_data.csv");
 
+    /** @arg 增加临时增加返还的Stock的基本属性 */
     Stock stk = sm.addTempCsvStock("test", day_filename, min_filename);
     BOOST_CHECK(stk.isNull() == false);
     BOOST_CHECK(stk.market() == "TMP");
@@ -183,14 +184,60 @@ BOOST_AUTO_TEST_CASE( test_StockManager_TempCsvStock) {
     BOOST_CHECK(stk.getCount(KQuery::DAY) == 100);
     BOOST_CHECK(stk.getCount(KQuery::MIN) == 24000);
 
+    /** @arg 增加临时增加返还的Stock的KRecord[0]（第一个数据）读取*/
     KRecord record;
     record = stk.getKRecord(0);
-    //BOOST_CHECK(record.datetime == Datetime(201703070000));
-    std::cout << record << std::endl;
+    BOOST_CHECK(record.datetime == Datetime(201703070000));
+    BOOST_CHECK((record.openPrice-3233.09) < 0.00001);
+    BOOST_CHECK((record.highPrice-3242.66) < 0.00001);
+    BOOST_CHECK((record.lowPrice-3226.82) < 0.00001);
+    BOOST_CHECK((record.closePrice-3242.41) < 0.00001);
+    BOOST_CHECK((record.transAmount-20993120.6) < 0.00001);
+    BOOST_CHECK((record.transCount-164064235.0) < 0.00001);
 
+    /** @arg 增加临时增加返还的Stock的KRecord[10]（中间的数据）读取*/
+    record = stk.getKRecord(10);
+    BOOST_CHECK(record.datetime == Datetime(201703210000));
+    BOOST_CHECK((record.openPrice-3250.25) < 0.00001);
+    BOOST_CHECK((record.highPrice-3262.22) < 0.00001);
+    BOOST_CHECK((record.lowPrice-3246.70) < 0.00001);
+    BOOST_CHECK((record.closePrice-3261.61) < 0.00001);
+    BOOST_CHECK((record.transAmount-21912127.0) < 0.00001);
+    BOOST_CHECK((record.transCount-162719306.0) < 0.00001);
+
+    /** @arg 增加临时增加返还的Stock的KRecord[99]（最后一个数据）读取*/
+    record = stk.getKRecord(99);
+    BOOST_CHECK(record.datetime == Datetime(201707310000));
+    BOOST_CHECK((record.openPrice-3252.75) < 0.00001);
+    BOOST_CHECK((record.highPrice-3276.95) < 0.00001);
+    BOOST_CHECK((record.lowPrice-3251.19) < 0.00001);
+    BOOST_CHECK((record.closePrice-3273.03) < 0.00001);
+    BOOST_CHECK((record.transAmount-25352591.70) < 0.00001);
+    BOOST_CHECK((record.transCount-246039440.0) < 0.00001);
+
+    /** @arg 使用getStock获取临时加入的Stock */
     stk = sm.getStock("tmptest");
     BOOST_CHECK(stk.isNull() == false);
+    BOOST_CHECK(stk.market() == "TMP");
+    BOOST_CHECK(stk.code() == "TEST");
+    BOOST_CHECK(stk.market_code() == "TMPTEST");
+    BOOST_CHECK(stk.getCount(KQuery::DAY) == 100);
+    BOOST_CHECK(stk.getCount(KQuery::MIN) == 24000);
 
+    /** @arg 使用getStock获取临时加入的Stock的KRecord[10]读取*/
+    record = stk.getKRecord(10);
+    BOOST_CHECK(record.datetime == Datetime(201703210000));
+    BOOST_CHECK((record.openPrice-3250.25) < 0.00001);
+    BOOST_CHECK((record.highPrice-3262.22) < 0.00001);
+    BOOST_CHECK((record.lowPrice-3246.70) < 0.00001);
+    BOOST_CHECK((record.closePrice-3261.61) < 0.00001);
+    BOOST_CHECK((record.transAmount-21912127.0) < 0.00001);
+    BOOST_CHECK((record.transCount-162719306.0) < 0.00001);
+
+    /** @arg 删除临时加入的Stock */
+    sm.removeTempCsvStock("test");
+    stk = sm.getStock("tmptest");
+    BOOST_CHECK(stk.isNull() == true);
 }
 
 /** @} */

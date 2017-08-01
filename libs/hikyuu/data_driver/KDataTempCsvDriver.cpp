@@ -39,7 +39,7 @@ void KDataTempCsvDriver::_get_token(const string& line) {
     size_t pos = 0, prepos = 0;
     pos = line.find(',', prepos);
     while (pos != line.npos) {
-        token.assign(line, pos, pos - prepos);
+        token.assign(line, prepos, pos - prepos);
         boost::trim(token);
         m_token_buf.push_back(token);
         prepos = pos + 1;
@@ -47,6 +47,7 @@ void KDataTempCsvDriver::_get_token(const string& line) {
     }
 
     if (prepos != pos) {
+        token.assign(line, prepos, pos);
         boost::trim(token);
         m_token_buf.push_back(token);
     }
@@ -79,7 +80,7 @@ void KDataTempCsvDriver::_get_title_column(const string& line) {
             m_column[AMOUNT] = i;
 
         } else if ("VOLUME" == token || "COUNT" == token || "VOL" == token
-                || HKU_STR("成交") == token) {
+                || HKU_STR("成交量") == token) {
             m_column[VOLUME] = i;
         }
     }
@@ -94,11 +95,7 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
     } else if (kType == KQuery::MIN) {
         filename = m_min_filename;
     } else {
-        //只支持日线和分钟线
-        return;
-    }
-
-    if (filename.empty()) {
+        HKU_INFO("Only support DAY and MIN! [KDataTempCsvDriver::loadKData]");
         return;
     }
 
@@ -119,7 +116,7 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
 
     size_t line_no = 0;
     while (std::getline(infile, line)) {
-        if (line_no < start_ix)
+        if (line_no++ < start_ix)
             continue;
 
         if (line_no >= end_ix)
@@ -153,11 +150,11 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
 
             action = "VOLUME";
             if (token_count >= m_column[VOLUME])
-                record.transAmount = boost::lexical_cast<price_t>(m_token_buf[m_column[VOLUME]]);
+                record.transCount = boost::lexical_cast<price_t>(m_token_buf[m_column[VOLUME]]);
 
             action = "AMOUNT";
             if (token_count >= m_column[AMOUNT])
-                record.transCount = boost::lexical_cast<price_t>(m_token_buf[m_column[AMOUNT]]);
+                record.transAmount = boost::lexical_cast<price_t>(m_token_buf[m_column[AMOUNT]]);
 
             out_buffer->push_back(record);
 
