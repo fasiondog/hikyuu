@@ -102,11 +102,32 @@ public:
      */
     bool addStock(const Stock& stock);
 
+    /**
+     * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试
+     * @details 增加的临时Stock，其market为“TMP”
+     * @param code 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>
+     * @param day_filename 日线CSV文件名
+     * @param min_filename 分钟线CSV文件名
+     * @param tick 最小跳动量，默认0.01
+     * @param tickValue 最小跳动量价值，默认0.01
+     * @param precision 价格精度，默认2
+     * @param minTradeNumber 单笔最小交易量，默认1
+     * @param maxTradeNumber 单笔最大交易量，默认1000000
+     * @return
+     */
     Stock addTempCsvStock(const string& code,
             const string& day_filename,
             const string& min_filename,
-            hku_uint32 stk_type = STOCKTYPE_INDEX);
+            price_t tick = 0.01,
+            price_t tickValue = 0.01,
+            int precision = 2,
+            size_t minTradeNumber = 1,
+            size_t maxTradeNumber = 1000000);
 
+    /**
+     * 移除增加的临时Stock
+     * @param code
+     */
     void removeTempCsvStock(const string& code);
 
 public:

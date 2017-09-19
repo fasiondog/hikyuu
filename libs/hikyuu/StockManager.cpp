@@ -219,16 +219,27 @@ Stock StockManager::addTempCsvStock(
         const string& code,
         const string& day_filename,
         const string& min_filename,
-        hku_uint32 stk_type) {
+        price_t tick,
+        price_t tickValue,
+        int precision,
+        size_t minTradeNumber,
+        size_t maxTradeNumber) {
     string new_code(code);
     boost::to_upper(new_code);
-    Stock result("TMP", new_code, day_filename, STOCKTYPE_INDEX, true,
-            Datetime(199901010000), Null<Datetime>());
+    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true,
+            Datetime(199901010000), Null<Datetime>(),
+            tick, tickValue, precision, minTradeNumber, maxTradeNumber);
+
     KDataTempCsvDriver *p = new KDataTempCsvDriver(day_filename, min_filename);
     result.setKDataDriver(KDataDriverPtr(p));
     result.loadKDataToBuffer(KQuery::DAY);
     result.loadKDataToBuffer(KQuery::MIN);
-    addStock(result);
+
+    if (!addStock(result)){
+        //加入失败，返回Null<Stock>
+        return Null<Stock>();
+    }
+
     return result;
 }
 

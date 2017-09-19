@@ -15,7 +15,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getTradingCalendar_overloads,
         getTradingCalendar, 1, 2)
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addTempCsvStock_overloads,
-        addTempCsvStock, 3, 4)
+        addTempCsvStock, 3, 8)
 
 BlockList (StockManager::*getBlockList_1)(const string&) = &StockManager::getBlockList;
 BlockList (StockManager::*getBlockList_2)() = &StockManager::getBlockList;

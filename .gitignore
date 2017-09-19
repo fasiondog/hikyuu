@@ -20,6 +20,7 @@
 /tools/hikyuu/importdata
 /tools/hikyuu/libboost*
 /tools/hikyuu/docs/build
+/tools/hikyuu/.idea
 /docs/docs-web/build
 /docs/reference
 /docs/test-doc
