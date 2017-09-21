@@ -13,6 +13,20 @@ ConstantValue::ConstantValue() : IndicatorImp("CVAL", 1) {
     setParam<double>("value", 0.0);
 }
 
+ConstantValue::ConstantValue(double value, size_t len, size_t discard)
+:IndicatorImp("CVAL", 1) {
+    m_discard = discard > len ? len : discard;
+    setParam<double>("value", value);
+
+    if (len == 0)
+        return;
+
+    _readyBuffer(len, m_result_num);
+    for (size_t i = m_discard; i < len; ++i) {
+        _set(value, i);
+    }
+}
+
 ConstantValue::~ConstantValue() {
 
 }
@@ -32,9 +46,8 @@ void ConstantValue::_calculate(const Indicator& data) {
     }
 }
 
-Indicator HKU_API CVAL(double value) {
-    IndicatorImpPtr p = make_shared<ConstantValue>();
-    p->setParam<double>("value", value);
+Indicator HKU_API CVAL(double value, size_t len, size_t discard) {
+    IndicatorImpPtr p = make_shared<ConstantValue>(value, len, discard);
     return Indicator(p);
 }
 

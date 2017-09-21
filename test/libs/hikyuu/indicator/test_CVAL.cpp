@@ -70,6 +70,31 @@ BOOST_AUTO_TEST_CASE( test_CVAL ) {
     BOOST_CHECK(result.empty() == true);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result.getResultNumber() == 1);
+
+    /** @arg 生成指定长度的常量Indicator, discard=0 */
+    result = CVAL(100, 5);
+    BOOST_CHECK(result.getParam<double>("value") == 100);
+    BOOST_CHECK(result.size() == 5);
+    BOOST_CHECK(result.empty() == false);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    for (int i = 0; i < 5; i++) {
+        BOOST_CHECK(result[i] == 100);
+    }
+
+    /** @arg 生成指定长度的常量Indicator, discard=2 */
+    result = CVAL(100, 5, 2);
+    BOOST_CHECK(result.getParam<double>("value") == 100);
+    BOOST_CHECK(result.size() == 5);
+    BOOST_CHECK(result.empty() == false);
+    BOOST_CHECK(result.discard() == 2);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(result[1] == Null<price_t>());
+    for (int i = 2; i < 5; i++) {
+        BOOST_CHECK(result[i] == 100);
+    }
+
 }
 
 /** @} */

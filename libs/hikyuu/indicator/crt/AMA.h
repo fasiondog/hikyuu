@@ -17,7 +17,7 @@ namespace hku {
  * @param n 计算均值的周期窗口，必须为大于2的整数，默认为10天
  * @param fast_n 对应快速周期N，默认为2
  * @param slow_n 对应慢速EMA线的N值，默认为30，不过当超过60左右该指标会收敛不会有太大的影响
- * @ingroup Indicator
+ * @ingroup Indicator 具有2个结果集，result(0)为AMA，result(1)为ER
  */
 Indicator HKU_API AMA(int n = 10, int fast_n = 2, int slow_n = 30);
 
