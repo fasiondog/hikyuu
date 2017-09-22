@@ -73,10 +73,10 @@ public:
     bd::date date() const;
 
     /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
-    static Datetime minDatetime();
+    static Datetime min();
 
     /** 返回所能表示的最大日期：9999-Dec-31 00:00:00 */
-    static Datetime maxDatetime();
+    static Datetime max();
 
     /** 返回本地计算机当前时刻 */
     static Datetime now();

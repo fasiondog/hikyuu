@@ -20,8 +20,8 @@ class DatetimeTest(unittest.TestCase):
         self.assertEqual(d.hour, 23)
         self.assertEqual(d.minute, 1)
         self.assertEqual(d.number, 201209272301)
-        self.assertEqual(Datetime(140001010000), Datetime.minDatetime())
-        self.assertEqual(Datetime(999912310000), Datetime.maxDatetime())
+        self.assertEqual(Datetime(140001010000), Datetime.min())
+        self.assertEqual(Datetime(999912310000), Datetime.max())
 
         self.assert_(d == Datetime(201209272301))
         self.assert_(d != Datetime(200101010000))

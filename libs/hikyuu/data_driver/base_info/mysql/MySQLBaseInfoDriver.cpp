@@ -106,7 +106,7 @@ loadMarketInfo(MarketInfoMap& out) {
         string market(row[0]);
         boost::to_upper(market);
         Datetime last_date = Datetime(row[4]);
-        if (last_date >= Datetime::maxDatetime())
+        if (last_date >= (Datetime::max)())
             last_date = Null<Datetime>();
 
         try {
@@ -203,7 +203,7 @@ _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
     while(row = mysql_fetch_row(result)) {
         id = boost::lexical_cast<int>(row[0]);
         Datetime date = Datetime(row[1]);
-        if (date >= Datetime::maxDatetime()) {
+        if (date >= (Datetime::max)()) {
             HKU_WARN("Invalid date!" << id << func_name);
             continue;
         }
@@ -264,11 +264,11 @@ bool MySQLBaseInfoDriver::loadStock() {
         string market(row[1]);
         boost::to_upper(market);
         Datetime start_date = Datetime(row[6]);
-        if (start_date >= Datetime::maxDatetime())
+        if (start_date >= (Datetime::max)())
             start_date = Null<Datetime>();
 
         Datetime end_date = Datetime(row[7]);
-        if (end_date >= Datetime::maxDatetime())
+        if (end_date >= (Datetime::max)())
             end_date = Null<Datetime>();
 
         if (start_date >= end_date) {

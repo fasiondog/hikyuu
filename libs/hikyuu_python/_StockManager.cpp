@@ -36,8 +36,8 @@ void export_StockManager(){
             .def("getTradingCalendar", &StockManager::getTradingCalendar,
                     getTradingCalendar_overloads())
             //.def("getTradingCalendar", &StockManager::getTradingCalendar,
-            //        (arg("market")="SH", arg("start")=Datetime::minDatetime(),
-            //        arg=("end")=Datetime::maxDatetime()))
+            //        (arg("market")="SH", arg("start")=Datetime::min(),
+            //        arg=("end")=Datetime::max()))
             .def("addTempCsvStock", &StockManager::addTempCsvStock,
                     addTempCsvStock_overloads())
             .def("removeTempCsvStock", &StockManager::removeTempCsvStock)

@@ -1044,7 +1044,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_date ) {
     ///===================================
     /** @arg SH000001全部分钟线数据 */
     stock = sm.getStock("sh000001");
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::MIN);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 682823L);
     record = kdata[0];

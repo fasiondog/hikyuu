@@ -71,12 +71,12 @@ unsigned long long Datetime::number() const {
             + (unsigned long long)minute();
 }
 
-Datetime Datetime::minDatetime() {
+Datetime Datetime::min() {
     bd::date d(bd::min_date_time);
     return Datetime(d.year(), d.month(), d.day());
 }
 
-Datetime Datetime::maxDatetime() {
+Datetime Datetime::max() {
     bd::date d(bd::max_date_time);
     return Datetime(d.year(), d.month(), d.day());
 }

@@ -99,8 +99,8 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
 BOOST_AUTO_TEST_CASE( test_Datetime_related_operator ) {
     /** @arg 小于比较 */
     BOOST_CHECK(Datetime(200101010000) < Null<Datetime>());
-    BOOST_CHECK(Datetime(200101010000) < Datetime::maxDatetime());
-    BOOST_CHECK(Datetime::minDatetime() < Datetime(200101010000));
+    BOOST_CHECK(Datetime(200101010000) < Datetime::max());
+    BOOST_CHECK(Datetime::min() < Datetime(200101010000));
     BOOST_CHECK(Datetime(200101010000) < Datetime(200101020000));
 
 }

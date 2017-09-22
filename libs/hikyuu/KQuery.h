@@ -176,7 +176,7 @@ inline KQuery KQueryByIndex(hku_int64 start = 0,
  * @ingroup StockManage
  */
 inline KQuery KQueryByDate(
-        const Datetime& start = Datetime::minDatetime(),
+        const Datetime& start = Datetime::min(),
         const Datetime& end = Null<Datetime>(),
         KQuery::KType dataType = KQuery::DAY,
         KQuery::RecoverType recoverType = KQuery::NO_RECOVER) {

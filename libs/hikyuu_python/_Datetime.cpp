@@ -32,8 +32,8 @@ void export_Datetime() {
             .add_property("second", &Datetime::second)
             .add_property("number", &Datetime::number)
             .def("toString", &Datetime::toString)
-            .def("minDatetime", &Datetime::minDatetime).staticmethod("minDatetime")
-            .def("maxDatetime", &Datetime::maxDatetime).staticmethod("maxDatetime")
+            .def("min", &Datetime::min).staticmethod("min")
+            .def("max", &Datetime::max).staticmethod("max")
             .def("now", &Datetime::now).staticmethod("now")
             //不支持boost.date
             //.def("date", &Datetime::date)

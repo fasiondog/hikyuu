@@ -300,7 +300,7 @@ _getDayIndexRangeByDate(const string& market, const string& code,
     }
 
     if(query.startDatetime() >= query.endDatetime()
-    || query.startDatetime() > Datetime::maxDatetime()) {
+    || query.startDatetime() > Datetime::max()) {
         return false;
     }
 
@@ -407,7 +407,7 @@ _getMinIndexRangeByDate(const string& market, const string& code,
     }
 
     if(query.startDatetime() >= query.endDatetime()
-    || query.startDatetime() > Datetime::maxDatetime()) {
+    || query.startDatetime() > Datetime::max()) {
         return false;
     }
 

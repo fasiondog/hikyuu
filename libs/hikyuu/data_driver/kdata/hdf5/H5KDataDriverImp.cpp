@@ -505,7 +505,7 @@ _getBaseIndexRangeByDate(const string& market, const string& code,
     out_end = 0;
 
     if(query.startDatetime() >= query.endDatetime()
-    || query.startDatetime() > Datetime::maxDatetime()) {
+    || query.startDatetime() > Datetime::max()) {
         return false;
     }
 

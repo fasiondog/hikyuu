@@ -528,61 +528,61 @@ BOOST_AUTO_TEST_CASE( test_Stock_getIndexRange ) {
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 5121);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::WEEK);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::WEEK);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 1059);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::MONTH);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::MONTH);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 253);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::QUARTER);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::QUARTER);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 85);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::HALFYEAR);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::HALFYEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 43);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::YEAR);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::YEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 22);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::MIN);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::MIN);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 682823L);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::MIN5);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::MIN5);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 133980L);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::MIN15);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::MIN15);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 44750);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::MIN30);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::MIN30);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 22380L);
 
-    query = KQueryByDate(Datetime::minDatetime(), Null<Datetime>(), KQuery::MIN60);
+    query = KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::MIN60);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
