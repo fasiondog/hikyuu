@@ -93,13 +93,14 @@ HKU_API std::ostream & operator<<(std::ostream &, const Datetime&);
  */
 typedef std::vector<Datetime> DatetimeList;
 
+
 /**
- * 获取指定范围的日历日期列表[start, end)
+ * 获取指定范围的日历日期列表[start, end)，仅仅是日，不含时分秒
  * @param start 起始日期
  * @param end 结束日期
- * @return [start, end)范围内的日历日期列表
+ * @return [start, end)范围内的日历日期
  */
-DatetimeList HKU_API dayRange(const Datetime& start, const Datetime& end);
+DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end);
 
 
 ///////////////////////////////////////////////////////////////////////////////

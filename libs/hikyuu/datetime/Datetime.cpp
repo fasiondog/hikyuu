@@ -85,7 +85,7 @@ Datetime Datetime::now() {
     return Datetime(bt::microsec_clock::local_time());
 }
 
-DatetimeList HKU_API dayRange(const Datetime& start, const Datetime& end) {
+DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end) {
     DatetimeList result;
     bd::date start_day = start.date();
     bd::date end_day = end.date();

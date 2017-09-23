@@ -376,7 +376,7 @@ void Performance
             end_day = Datetime(datetime.date() + bd::days(1));
         }
 
-        DatetimeList day_range = dayRange(tm->firstDatetime(), end_day);
+        DatetimeList day_range = getDateRange(tm->firstDatetime(), end_day);
         DatetimeList::const_iterator day_iter = day_range.begin();
         for (; day_iter != day_range.end(); ++day_iter) {
             bool hold = false;
