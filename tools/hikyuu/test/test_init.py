@@ -7,6 +7,7 @@
 # 历史：1）20130128, Added by fasiondog
 #===============================================================================
 from hikyuu import *
+from hikyuu.util.unicode import unicodeFunc
 
 import os
 curdir = os.path.dirname(os.path.realpath(__file__))

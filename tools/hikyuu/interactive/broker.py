@@ -7,7 +7,7 @@
 # 历史：1）20170704, Added by fasiondog
 #===============================================================================
 
-from hikyuu.trade_manage import *
+from hikyuu.trade_manage import OrderBrokerBase
     
 class OrderBrokerWrap(OrderBrokerBase):
     """

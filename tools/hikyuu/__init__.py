@@ -52,3 +52,50 @@ __version__ = '1.0.5'
 
 from .hikyuu import *
 from .hikyuu_doc import *
+
+def getVersion():
+    return __version__
+
+__all__ = [#类
+           'Block', 
+           'BlockList', 
+           'Datetime', 
+           'DatetimeList', 
+           'KData',
+           'KQuery', 
+           'KQueryByDate', 
+           'KQueryByIndex', 
+           'KRecord', 
+           'KRecordList', 
+           'MarketInfo', 
+           'Parameter', 
+           'PriceList',
+           'Query', 
+           'QueryByDate', 
+           'QueryByIndex', 
+           'Stock', 
+           'StockManager', 
+           'StockTypeInfo', 
+           'StockWeight', 
+           'StockWeightList', 
+           'StringList',
+           
+           #变量
+           'constant', 
+           'IS_PY3',
+           
+           #函数
+           'getDateRange', 
+           'getStock',
+           'getVersion', 
+           'hikyuu_init', 
+           'hku_load', 
+           'hku_save', 
+           'roundDown',
+           'roundUp', 
+           'toPriceList', 
+           
+           #包
+           #'util'
+           ]
+

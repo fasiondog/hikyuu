@@ -38,6 +38,17 @@ from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from datetime import date, datetime
 
 
+#------------------------------------------------------------------
+# 常量定义，各种C++中Null值
+#------------------------------------------------------------------
+
+constant = Constant()
+
+
+#------------------------------------------------------------------
+# 支持Python的__unicode__、__repr
+#------------------------------------------------------------------
+
 MarketInfo.__unicode__ = unicodeFunc
 MarketInfo.__repr__ = reprFunc
 
@@ -66,34 +77,48 @@ Parameter.__unicode__ = unicodeFunc
 Parameter.__repr__ = reprFunc
 
 
-#常量定义，各种C++中Null值
-constant = Constant()
+#------------------------------------------------------------------
+# 增加Datetime、Stock的hash支持，以便可做为dict的key
+#------------------------------------------------------------------
 
-
-#定义hash
 def datetime_hash(self):
     return self.number
 
-
 def stock_hash(self):
     return self.id
-
 
 Datetime.__hash__ = datetime_hash
 Stock.__hash__ = stock_hash
 
 
-#================================================================
-# Datetime支持直接从date, datetime变量初始化
+#------------------------------------------------------------------
+# 增强 Datetime
+#------------------------------------------------------------------
+
 __old_Datetime_init__ = Datetime.__init__
 
 def __new_Datetime_init__(self, var = None):
+    """
+    日期时间类（精确到秒），通过以下方式构建：
+    
+    - 通过字符串：Datetime("2010-1-1 10:00:00")
+    - 通过 Python 的date：Datetime(date(2010,1,1))
+    - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
+    - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
+    
+    获取日期列表参见： :py:func:`getDateRange`
+    
+    获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
+    """    
     if var is None:
         __old_Datetime_init__(self)
-    elif isinstance(var, date):
-        __old_Datetime_init__(self, "{} 00".format(var))
+    
+    #datetime实例同时也是date的实例，判断必须放在date之前
     elif isinstance(var, datetime):
         __old_Datetime_init__(self, str(var))
+    elif isinstance(var, date):
+        __old_Datetime_init__(self, "{} 00".format(var))
+    
     elif isinstance(var, str):
         if var.find(' ') == -1:
             __old_Datetime_init__(self, "{} 00".format(var))
@@ -103,14 +128,27 @@ def __new_Datetime_init__(self, var = None):
         __old_Datetime_init__(self, var)
 
 def Datetime_date(self):
+    """转化生成 python 的 date"""
     return date(self.year, self.month, self.day)
+
+def Datetime_datetime(self):
+    """转化生成 python 的 datetime"""
+    return datetime(self.year, self.month, self.day, 
+                    self.hour, self.minute, self.second)
         
+def Datetime_isNull(self):
+    """是否是Null值, 即是否等于 constant.null_datetime"""
+    return True if self == constant.null_datetime else False
+
 Datetime.__init__ =  __new_Datetime_init__
 Datetime.date = Datetime_date
+Datetime.datetime = Datetime_datetime
+Datetime.isNull = Datetime_isNull 
 
 
-#================================================================ 
+#------------------------------------------------------------------
 #重定义KQuery
+#------------------------------------------------------------------
 class Query(KQuery):
     """重新定义KQuery，目的如下：
     1、使用短类名
@@ -139,11 +177,14 @@ class Query(KQuery):
     def __init__(self, start = 0, end = None, 
                  kType = KQuery.KType.DAY, recoverType = KQuery.RecoverType.NO_RECOVER):
         """
-        构建按索引方式 [start, end) 查询K线数据条件，查询[start, end)的K线记录
-        start: int 起始位置（默认0）
-        end  : int 结束位置（默认为全部数量）
-        kType: KQuery.KType.DAY K线类型（默认为日线）
-        recoverType: KQuery.RecoverType.NO_RECOVER 复权类型（默认不复权）
+        构建按索引 [start, end) 方式获取K线数据条件
+        
+        :param ind start: 起始日期
+        :param ind end: 结束日期
+        :param KQuery.KType kType: K线数据类型（如日线、分钟线等）
+        :param KQuery.RecoverType recoverType: 复权类型
+        :return: 查询条件
+        :rtype: KQuery
         """
         end_pos = constant.null_int64 if end is None else end
         super(Query, self).__init__(start, end_pos, kType, recoverType)
@@ -153,14 +194,14 @@ QueryByIndex = Query
 def QueryByDate(start=None, end=None, kType=Query.DAY, 
                 recoverType=Query.NO_RECOVER):
     """
-    构建按日期 [start, end) 查询K线数据条件
-    start: Datetime      起始日期（默认为支持的最小日期）
-    end  : Datetime      结束日期（默认为支持的最大日期）
-    kType: KQuery.KType  K线类型（默认为日线）
-    recoverType: KQuery.RecoverType 复权类型（默认不复权）
+    构建按日期 [start, end) 方式获取K线数据条件
     
-    return KQuery K线数据查询条件
-        
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期
+    :param KQuery.KType kType: K线数据类型（如日线、分钟线等）
+    :param KQuery.RecoverType recoverType: 复权类型
+    :return: 查询条件
+    :rtype: KQuery        
     """
     start_date = Datetime.min() if start is None else start
     end_date = Datetime.max() if end is None else end

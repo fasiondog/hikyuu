@@ -27,9 +27,19 @@
 
 from .hikyuu import *
 
-Datetime.__doc__ = """
-日期时间类，hikyuu中使用的日期时间类
+Datetime.__doc__ = """日期时间类，精确到秒"""
+Datetime.max.__doc__ = """获取支持的最大日期"""
+Datetime.min.__doc__ = """获取支持的最小日期"""
+Datetime.now.__doc__ = """获取当前日期时间"""
+
+DatetimeList.__doc__ = """日期序列，对应C++中的std::vector<Datetime>"""
+
+getDateRange.__doc__ = """
+获取指定 [start, end) 日期时间范围的自然日日历日期列表，仅支持到日
+
+:param Datetime start: 起始日期
+:param Datetime end: 结束日期
+:rtype: DatetimeList
 """
 
-Datetime.max.__doc__ += """\n
-获取支持的最大日期"""
+
