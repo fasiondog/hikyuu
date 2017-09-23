@@ -29,7 +29,7 @@
 # 历史：1）20170923, Added by fasiondog
 #===============================================================================
 
-from .indicator import *
+from .indicator import Indicator, IndicatorImp
 
 try:
     import talib

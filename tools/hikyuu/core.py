@@ -33,7 +33,7 @@ else:
 
 from ._hikyuu import *
 from hikyuu.util.mylog import escapetime
-
+from hikyuu.util.slice import list_getitem
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from datetime import date, datetime
 
@@ -262,19 +262,6 @@ KData.getPos = KData_getPos
 
 
 #================================================================
-def list_getitem(data, i):
-    if isinstance(i, int):
-        length = len(data)
-        index = length + i if i < 0 else i
-        if index < 0 or index >= length:
-            raise IndexError("index out of range: %d" % i)
-        return data.get(index)
-    
-    elif isinstance(i, slice):
-        return [data.get(x) for x in range(*i.indices(len(data)))]
-    
-    else:
-        raise IndexError("Error index type")
         
 PriceList.__getitem__ = list_getitem
 DatetimeList.__getitem__ = list_getitem
@@ -323,3 +310,50 @@ try:
     
 except:
     pass
+
+
+#------------------------------------------------------------------
+# 净化命名空间
+#------------------------------------------------------------------
+
+__all__ = [#类
+           'Block', 
+           'BlockList', 
+           'Datetime', 
+           'DatetimeList', 
+           'KData',
+           'KQuery', 
+           'KQueryByDate', 
+           'KQueryByIndex', 
+           'KRecord', 
+           'KRecordList', 
+           'MarketInfo', 
+           'Parameter', 
+           'PriceList',
+           'Query', 
+           'QueryByDate', 
+           'QueryByIndex', 
+           'Stock', 
+           'StockManager', 
+           'StockTypeInfo', 
+           'StockWeight', 
+           'StockWeightList', 
+           'StringList',
+           
+           #变量
+           'constant', 
+           'IS_PY3',
+           
+           #函数
+           'getDateRange', 
+           'getStock',
+           'hikyuu_init', 
+           'hku_load', 
+           'hku_save', 
+           'roundDown',
+           'roundUp', 
+           'toPriceList', 
+           
+           #包
+           #'util'
+           ]

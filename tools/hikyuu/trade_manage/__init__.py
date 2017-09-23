@@ -8,7 +8,8 @@
 #===============================================================================
 
 from ._trade_manage import *
-from hikyuu import Datetime, list_getitem, Query, QueryByDate, StockManager
+from hikyuu import Datetime, Query, QueryByDate, StockManager
+from hikyuu.util.slice import list_getitem
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from hikyuu.trade_sys.system import getSystemPartName
 

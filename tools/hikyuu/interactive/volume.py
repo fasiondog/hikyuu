@@ -10,7 +10,8 @@
 """
 绘制普通K线图 + 成交量（成交金额）
 """
-from hikyuu import Query, escapetime
+from hikyuu import Query
+from hikyuu.util.mylog import escapetime
 from hikyuu.indicator import Indicator, MA, CLOSE, VOL, OP
 from hikyuu.trade_sys.signal import SG_Cross
 from hikyuu.interactive.drawplot import (create_two_axes_figure, ax_set_locator_formatter, adjust_axes_show,

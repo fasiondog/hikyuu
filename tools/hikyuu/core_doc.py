@@ -25,7 +25,7 @@
 # SOFTWARE.
 
 
-from .hikyuu import *
+from .core import *
 
 Datetime.__doc__ = """日期时间类，精确到秒"""
 Datetime.max.__doc__ = """获取支持的最大日期"""

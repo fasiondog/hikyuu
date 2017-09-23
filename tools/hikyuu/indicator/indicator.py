@@ -25,33 +25,22 @@
 # SOFTWARE.
 
 from ._indicator import *
+from hikyuu.util.slice import list_getitem
 from hikyuu.util.unicode import (IS_PY3, unicodeFunc, reprFunc)
 from hikyuu import constant, toPriceList, PriceList
 
-def indicator_getitem(indicator, i):
-    if isinstance(i, int):
-        length = len(indicator)
-        index = length + i if i < 0 else i
-        if index >= length or index < 0:
-            raise IndexError("out of range")
-        return indicator.get(index, 0)
-    
-    elif isinstance(i, slice):
-        return [indicator.get(x, 0) for x in range(*i.indices(len(indicator)))]
-    
-    else:
-        raise IndexError("Error index type")
 
 def indicator_iter(indicator):
     for i in range(len(indicator)):
         yield indicator[i]
         
 
+Indicator.__getitem__ = list_getitem
+Indicator.__iter__ = indicator_iter
+
+
 Indicator.__unicode__ =  unicodeFunc
 Indicator.__repr__ =  reprFunc 
-
-Indicator.__getitem__ = indicator_getitem
-Indicator.__iter__ = indicator_iter
 
 Indicator.__add__ = indicator_add
 Indicator.__sub__ = indicator_sub

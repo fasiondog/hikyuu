@@ -17,17 +17,22 @@ from hikyuu.trade_manage import BUSINESS
 from hikyuu.trade_sys.system import getSystemPartName
 
 def create_one_axes_figure(figsize=(10,6)):                                        
-    """生成一个含有1个坐标轴的figure，并返回坐标轴列表
-    返回：(ax1,ax2)
+    """生成一个仅含有1个坐标轴的figure，并返回其坐标轴对象
+    
+    :param figsize: (宽, 高)
+    :return: ax
     """
     rect1  = [0.05, 0.05, 0.9, 0.90]
     fg=figure(figsize=figsize)
     ax1 = fg.add_axes(rect1)
     return ax1
 
+
 def create_two_axes_figure(figsize=(10,8)):                                        
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
-    返回：(ax1,ax2)
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2)    
     """
     rect1  = [0.05, 0.35, 0.9, 0.60]
     rect2  = [0.05, 0.05, 0.9, 0.30]
@@ -38,9 +43,12 @@ def create_two_axes_figure(figsize=(10,8)):
     
     return ax1,ax2
 
+
 def create_three_axes_figure(figsize=(10,8)):
     """生成一个含有3个坐标轴的figure，并返回坐标轴列表
-    返回：(ax1,ax2,ax3)
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2, ax3)
     """
     rect1  = [0.05, 0.45, 0.9, 0.50]
     rect2  = [0.05, 0.25, 0.9, 0.20]
@@ -53,9 +61,12 @@ def create_three_axes_figure(figsize=(10,8)):
     
     return ax1,ax2,ax3
 
+
 def create_four_axes_figure(figsize=(10,8)):
     """生成一个含有4个坐标轴的figure，并返回坐标轴列表
-    返回：(ax1,ax2,ax3, ax4)
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2, ax3, ax4)
     """
     rect1  = [0.05, 0.50, 0.9, 0.45]
     rect2  = [0.05, 0.35, 0.9, 0.15]
@@ -70,13 +81,18 @@ def create_four_axes_figure(figsize=(10,8)):
     
     return ax1,ax2,ax3,ax4
 
-def create_axes_figure(n = 1, figsize = (10,8)):
-    """生成指定轴个数的窗口
-    参数：
-        n：坐标轴个数，只支持1~4个坐标轴，默认为1
-        figsize：窗口大小，默认(10,8)
-    返回：
-    (ax1, ax2, ...) 根据指定的坐标轴数量而定，超出[1,4]个坐标轴时，返回None
+
+def create_figure(n = 1, figsize = (10,8)):
+    """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。是对下面4个函数的简单包装：
+    
+    - create_one_axes_figure
+    - create_two_axes_figure
+    - create_three_axes_figure
+    - create_four_axes_figure
+
+    :param int n: 坐标轴数量
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2, ...) 根据指定的坐标轴数量而定，超出[1,4]个坐标轴时，返回None
     """
     if n == 1:
         return create_one_axes_figure(figsize)
@@ -89,6 +105,7 @@ def create_axes_figure(n = 1, figsize = (10,8)):
     else:
         print("Max support axes number is 4!")
         return None
+
 
 class StockFuncFormatter(object):
     """用于坐标轴显示日期
