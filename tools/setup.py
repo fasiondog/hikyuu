@@ -11,7 +11,7 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 hku_name = "Hikyuu"
-hku_version = "1.0.4"
+hku_version = "1.0.5"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 

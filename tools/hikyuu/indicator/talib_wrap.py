@@ -1556,7 +1556,7 @@ try:
         return Indicator(imp)
     
     TA_OBV.__doc__ = talib.OBV.__doc__    
-    
+
     
 except:
     print("warning: can't import talib, maybe loss some Indicator from talib!")
