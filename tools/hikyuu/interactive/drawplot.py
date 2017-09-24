@@ -127,50 +127,37 @@ def getDayLocatorAndFormatter(dates):
     premonth, preyear = dates[0].month, dates[0].year
     month = []
     loc = []
-    for i,d in enumerate(dates):
-        curmonth, curyear = d.month, d.year
-        if curyear>preyear:
-            strloc = str(curmonth)
-            loc.append(i)
-            month.append((i, strloc))
-            preyear = curyear
-            premonth = curmonth
-        elif curmonth>premonth:
-            strloc = str(curmonth)
-            loc.append(i)
-            month.append((i,strloc[-2:]))
-            premonth = curmonth
-        else:
-            month.append((i, str(d.number)))
+    if (len(dates) <= 700):
+        for i,d in enumerate(dates):
+            curmonth, curyear = d.month, d.year
+            if curyear>preyear:
+                strloc = str(curmonth)
+                loc.append(i)
+                month.append((i, "{}-{}".format(str(curyear)[-2:], str(curmonth))))
+                preyear = curyear
+                premonth = curmonth
+            elif curmonth>premonth:
+                strloc = str(curmonth)
+                loc.append(i)
+                month.append((i,strloc[-2:]))
+                premonth = curmonth
+            else:
+                month.append((i, str(d.number)))
+                
+    else:
+        for i,d in enumerate(dates):
+            curyear = d.year
+            if curyear>preyear:
+                month.append((i, curyear))
+                loc.append(i)
+                preyear = curyear
+            else:
+                month.append((i, str(d.number)))
     
     month_loc = FixedLocator(loc)
     month_fm = FuncFormatter(StockFuncFormatter(dict(month)))
     return month_loc, month_fm
 
-def getWeekLocatorAndFormatter(dates):
-    """获取显示周线线时使用的Major Locator和Major Formatter"""
-    premonth, preyear = dates[0].month, dates[0].year
-    month = []
-    loc = []
-    for i,d in enumerate(dates):
-        curmonth, curyear = d.month, d.year
-        if curyear>preyear:
-            strloc = str(curmonth)
-            loc.append(i)
-            month.append((i, strloc))
-            preyear = curyear
-            premonth = curmonth
-        elif curmonth>premonth+2:
-            strloc = str(curmonth)
-            loc.append(i)
-            month.append((i,strloc[-2:]))
-            premonth = curmonth
-        else:
-            month.append((i, str(d.number)))    
-
-    month_loc = FixedLocator(loc)
-    month_fm = FuncFormatter(StockFuncFormatter(dict(month)))
-    return month_loc, month_fm
 
 def getMonthLocatorAndFormatter(dates):
     """获取显示月线时使用的Major Locator和Major Formatter"""
@@ -189,6 +176,33 @@ def getMonthLocatorAndFormatter(dates):
     month_loc = FixedLocator(loc)
     month_fm = FuncFormatter(StockFuncFormatter(dict(month)))
     return month_loc, month_fm
+
+
+def ax_set_locator_formatter(axes, dates, typ):
+    """ 设置指定坐标轴的日期显示，根据指定的K线类型优化X轴坐标显示
+    
+    :param axes: 指定的坐标轴
+    :param dates: Datetime构成可迭代序列
+    :param KQuery.KType typ: K线类型
+    """
+    major_loc, major_fm = None, None
+    if typ == KQuery.KType.DAY:
+        major_loc, major_fm = getDayLocatorAndFormatter(dates)
+    elif typ == KQuery.KType.WEEK:
+        major_loc, major_fm = getDayLocatorAndFormatter(dates)
+    elif typ == KQuery.KType.MONTH:
+        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+    elif typ == KQuery.KType.QUARTER:
+        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+    elif typ == KQuery.KType.HALFYEAR:
+        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+    elif typ == KQuery.KType.YEAR:
+        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+
+    if major_loc:
+        axes.xaxis.set_major_locator(major_loc)
+        axes.xaxis.set_major_formatter(major_fm)
+        
 
 def get_draw_title(kdata):
     """根据typ值，返回相应的标题，如 上证指数（日线）
@@ -242,29 +256,6 @@ def get_draw_title(kdata):
 
     return stitle
 
-def ax_set_locator_formatter(axes, dates, typ):
-    """设置指定坐标轴的日期显示
-    参数：axes：指定的坐标轴
-          dates: 日期序列[date1, date2, ...]
-          typ: 同Stock.DATA()中的参数typ
-    """
-    major_loc, major_fm = None, None
-    if typ == KQuery.KType.DAY:
-        major_loc, major_fm = getDayLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.WEEK:
-        major_loc, major_fm = getWeekLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.MONTH:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.QUARTER:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.HALFYEAR:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.YEAR:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-
-    if major_loc:
-        axes.xaxis.set_major_locator(major_loc)
-        axes.xaxis.set_major_formatter(major_fm)
     
 def adjust_axes_show(axeslist):
     """
@@ -378,16 +369,17 @@ def ax_draw_sys_signal(axes, kdata, sys, style = 2):
         #axes.plot([pos],[krecord.closePrice],'rh')           
             
 
-def kplot(kdata, width=0.6, colorup='r', colordown='g', alpha=1.0, axes=None, new=True):
-    """
-    绘制K线图，x轴使用数据的自然索引做下标，并不使用quotes中time作为x轴
-    kdata     : KData
-    width     : fraction of a day for the rectangle width
-    colorup   : the color of the rectangle where close >= open
-    colordown : the color of the rectangle where close <  open
-    alpha     : the rectangle alpha level, 透明度(0.0~1.0) 1.0为不透明
-    axes      : 指定的坐标轴
-    new       : 是否在新窗口中显示，只在没有指定axes时生效
+def kplot(kdata, new=True, axes=None, 
+          colorup='r', colordown='g', width=0.6, alpha=1.0):
+    """绘制K线图
+    
+    :param KData kdata: K线数据
+    :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
+    :param axes:        指定的坐标轴
+    :param colorup:     the color of the rectangle where close >= open
+    :param colordown:   the color of the rectangle where close < open
+    :param width:       fraction of a day for the rectangle width
+    :param alpha:       the rectangle alpha level, 透明度(0.0~1.0) 1.0为不透明
     """
     if not kdata:
         print("kdata is None")
@@ -437,14 +429,16 @@ def kplot(kdata, width=0.6, colorup='r', colordown='g', alpha=1.0, axes=None, ne
     ax_set_locator_formatter(axes, kdata.getDatetimeList(), kdata.getQuery().kType)
     #draw()
     
-def mkplot(kdata, ticksize=3, colorup='r', colordown='g', axes=None, new=True):
-    """绘制美式K线图，x轴使用数据的自然索引做下标，并不使用quotes中的time
-    kdata       : KData实例
-    ticksize    : open/close tick marker in points
-    colorup     : the color of the lines where close >= open
-    colordown   : the color of the lines where close <  open
-    axes        : 指定的坐标轴
-    new       : 是否在新窗口中显示，只在没有指定axes时生效
+    
+def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
+    """绘制美式K线图
+    
+    :param KData kdata: K线数据
+    :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
+    :param axes:        指定的坐标轴
+    :param colorup:     the color of the lines where close >= open
+    :param colordown:   the color of the lines where close < open
+    :param ticksize:    open/close tick marker in points
     """
     if not kdata:
         print("kdata is None")
@@ -485,21 +479,24 @@ def mkplot(kdata, ticksize=3, colorup='r', colordown='g', axes=None, new=True):
     ax_set_locator_formatter(axes, kdata.getDatetimeList(), kdata.getQuery().kType)
     #draw()
 
-def iplot(indicator, axes=None, new=True, legend_on=False, text_on=False, text_color='k',  
-                   zero_on=False, label=None, *args, **kwargs):
+
+def iplot(indicator, new=True, axes=None, 
+          legend_on=False, text_on=False, text_color='k',  
+          zero_on=False, label=None, *args, **kwargs):
     """绘制indicator曲线
-    indicator: indicator实例
-    axes: 指定的坐标轴
-    new: 是否在新窗口中显示，只在没有指定axes时生效
-    legend_on: 是否打开图例
-    text_on: 是否在左上角显示指标名称及其参数
-    text_color: 指标名称解释文字的颜色，默认为黑色
-    marker：标记类型
-    markerfacecolor：标记颜色
-    markeredgecolor: 标记的边缘颜色
-    zero_on: 是否需要在y=0轴上绘制一条直线
-    label  : label
-    *args, **kwargs : pylab plot参数
+    
+    :param Indicator indicator: indicator实例
+    :param axes:            指定的坐标轴
+    :param new:             是否在新窗口中显示，只在没有指定axes时生效
+    :param legend_on:       是否打开图例
+    :param text_on:         是否在左上角显示指标名称及其参数
+    :param text_color:      指标名称解释文字的颜色，默认为黑色
+    :param zero_on:         是否需要在y=0轴上绘制一条直线
+    :param str label:       label显示文字信息，text_on 及 legend_on 为 True 时生效
+    :param args:            pylab plot参数
+    :param kwargs:          pylab plot参数，如：marker（标记类型）、
+                             markerfacecolor（标记颜色）、
+                             markeredgecolor（标记的边缘颜色）
     """
     if not indicator:
         print("indicator is None")
@@ -535,18 +532,26 @@ def iplot(indicator, axes=None, new=True, legend_on=False, text_on=False, text_c
     axes.set_xlim(-1, len(indicator)+1)
     #draw()
 
-def ibar(indicator, axes=None, width=0.4, color='r', edgecolor='r',
-         new=True, legend_on=False, text_on=False, text_color='k', label=None, 
-                   zero_on=False, *args, **kwargs):
-    """绘制indicator曲线
-    indicator: Indicator实例
-    axes: 指定的坐标轴
-    new: 是否在新窗口中显示，只在没有指定axes时生效
-    legend_on : 是否打开图例
-    text_on: 是否在左上角显示指标名称及其参数
-    text_color: 指标名称解释文字的颜色，默认为黑色
-    zero_on: 是否需要在y=0轴上绘制一条直线
-    *args, **kwargs : pylab bar参数
+
+def ibar(indicator, new=True, axes=None, 
+         legend_on=False, text_on=False, text_color='k', label=None,
+         width=0.4, color='r', edgecolor='r', 
+         zero_on=False, *args, **kwargs):
+    """绘制indicator柱状图
+    
+    :param Indicator indicator: Indicator实例
+    :param axes:       指定的坐标轴
+    :param new:        是否在新窗口中显示，只在没有指定axes时生效
+    :param legend_on:  是否打开图例
+    :param text_on:    是否在左上角显示指标名称及其参数
+    :param text_color: 指标名称解释文字的颜色，默认为黑色
+    :param str label:  label显示文字信息，text_on 及 legend_on 为 True 时生效
+    :param zero_on:    是否需要在y=0轴上绘制一条直线
+    :param width:      Bar的宽度
+    :param color:      Bar的颜色
+    :param edgecolor:  Bar边缘颜色
+    :param args:       pylab plot参数
+    :param kwargs:     pylab plot参数
     """
     if not indicator:
         print("indicator is None")
@@ -585,6 +590,7 @@ def ibar(indicator, axes=None, width=0.4, color='r', edgecolor='r',
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator)+1)
     #draw()    
+
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
@@ -667,16 +673,17 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
         label.set_visible(False)  
         
         
-def sgplot(sg, kdata = None, style = 1, axes = None, new = True):
-    """
-    绘制买入/卖出信号
-    参数：
-        sg：   信号发生器
-        kdata：指定的KData（即信号发生器的交易对象），如该值为None，则认为该信号
-               发生器已经指定了交易对象，否则，使用该参数作为交易对象
-        style: 1 | 2 信号箭头绘制样式
-        axes： 指定在那个轴对象中进行绘制
-        new：  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+def sgplot(sg, new = True, axes = None,  style = 1, kdata = None):
+    """绘制买入/卖出信号
+
+    :param SignalBase sg: 信号指示器
+    :param new:   仅在未指定axes的情况下生效，当为True时，
+                   创建新的窗口对象并在其中进行绘制
+    :param axes:  指定在那个轴对象中进行绘制
+    :param style: 1 | 2 信号箭头绘制样式
+    :param KData kdata: 指定的KData（即信号发生器的交易对象），
+                         如该值为None，则认为该信号发生器已经指定了交易对象，
+                         否则，使用该参数作为交易对象
     """
     if kdata is None:
         kdata = sg.getTO()

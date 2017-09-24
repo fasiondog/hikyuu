@@ -34,6 +34,7 @@ from .indicator import Indicator, IndicatorImp
 try:
     import talib
     import talib.abstract as ta
+    import numpy as np
     
     def tawrap_init(self, tafunc, name, params, result_num=1, prices = None):
         super(self.__class__, self).__init__(name, result_num)
