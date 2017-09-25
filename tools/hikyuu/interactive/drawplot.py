@@ -82,13 +82,8 @@ def create_four_axes_figure(figsize=(10,8)):
     return ax1,ax2,ax3,ax4
 
 
-def create_figure(n = 1, figsize = (10,8)):
-    """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。是对下面4个函数的简单包装：
-    
-    - create_one_axes_figure
-    - create_two_axes_figure
-    - create_three_axes_figure
-    - create_four_axes_figure
+def create_figure(n=1, figsize=(10,8)):
+    """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
 
     :param int n: 坐标轴数量
     :param figsize: (宽, 高)
@@ -258,9 +253,10 @@ def get_draw_title(kdata):
 
     
 def adjust_axes_show(axeslist):
-    """
-    用于调整上下紧密相连的坐标轴显示时，其上一坐标轴最小值刻度和下一坐标轴最大值刻度显示重叠的问题
-    参数：axeslist：上下相连的坐标轴列表 (ax1,ax2,ax3)
+    """用于调整上下紧密相连的坐标轴显示时，其上一坐标轴最小值刻度和下一坐标轴最大值刻度
+    显示重叠的问题。
+    
+    :param axeslist: 上下相连的坐标轴列表 (ax1,ax2,...)
     """
     for ax in axeslist[:-1]:
         for label in ax.get_xticklabels():
@@ -269,106 +265,6 @@ def adjust_axes_show(axeslist):
         ylabels[0].set_visible(False)
         
         
-def ax_draw_signal(axes, kdata, dates, direct="BUY", style = 1):
-    """
-    """
-    refdates = kdata.getDatetimeList()
-    date_index = dict([(d,i) for i,d in enumerate(refdates)])
-    ylim = axes.get_ylim()
-    height = ylim[1]-ylim[0]
-    
-    if style == 1:
-        arrow = dict(arrowstyle="->")
-    else:
-        if direct == "BUY": 
-            arrow = dict(facecolor='red', frac=0.5)
-        else:
-            arrow = dict(facecolor='blue', frac=0.5)
-    
-    for d in dates:
-        if d not in date_index:
-            continue
-        pos = date_index[d]
-        krecord = kdata[pos]
-        if direct == "BUY":
-            axes.annotate('B', 
-                          (pos, krecord.lowPrice - height*0.01), 
-                          (pos, krecord.lowPrice - height*0.1), 
-                          arrowprops = arrow,
-                          horizontalalignment = 'center', 
-                          verticalalignment = 'bottom',
-                          color='red')
-        else:
-            axes.annotate('S', 
-                          (pos, krecord.highPrice + height*0.01), 
-                          (pos, krecord.highPrice + height*0.1), 
-                          arrowprops = arrow,
-                          horizontalalignment = 'center', 
-                          verticalalignment = 'top',
-                          color='blue')
-            
-        #axes.plot([pos],[krecord.closePrice],'rh')        
-        
-
-def ax_draw_sys_signal(axes, kdata, sys, style = 2):
-    """
-    """
-    refdates = kdata.getDatetimeList()
-    date_index = dict([(d, i) for i,d in enumerate(refdates)])
-    ylim = axes.get_ylim()
-    height = ylim[1]-ylim[0]
-    
-    if style == 1:
-        arrow_buy = dict(arrowstyle="->")
-        arrow_sell = arrow_buy
-    else:
-        arrow_buy = dict(facecolor='red', frac=0.5)
-        arrow_sell = dict(facecolor='blue', frac=0.5)
-    
-    buy_request = sys.getBuyTradeRequest()
-    sell_request = sys.getSellTradeRequest()
-    text_request = ''
-    if buy_request.valid:
-        text_request = u'建议买入  止损： %.2f' % (buy_request.stoploss)
-        color = 'r'
-    if sell_request.valid:
-        text_request = u'建议卖出  来源: %s' % (getSystemPartName(sell_request.part))
-        color = 'b'
-        
-    if buy_request.valid or sell_request.valid:
-        axes.text(0.99,0.03, text_request, horizontalalignment='right', 
-                  verticalalignment='bottom', 
-                  transform=axes.transAxes, color=color)
-    
-    dates = sys.getTradeRecordList()
-    for d in dates:
-        if not date_index.has_key(d.datetime):
-            continue
-        pos = date_index[d.datetime]
-        krecord = kdata[pos]
-        if d.business == BUSINESS.BUY:
-            axes.annotate('SG', 
-                          (pos, krecord.lowPrice - height*0.01), 
-                          (pos, krecord.lowPrice - height*0.1), 
-                          arrowprops = arrow_buy,
-                          horizontalalignment = 'center', 
-                          verticalalignment = 'bottom',
-                          color='red')
-        elif d.business == BUSINESS.SELL:
-            text = getSystemPartName(d.part)
-            axes.annotate(text, 
-                          (pos, krecord.highPrice + height*0.01), 
-                          (pos, krecord.highPrice + height*0.1), 
-                          arrowprops = arrow_sell,
-                          horizontalalignment = 'center', 
-                          verticalalignment = 'top',
-                          color='blue')
-        else:
-            None
-            
-        #axes.plot([pos],[krecord.closePrice],'rh')           
-            
-
 def kplot(kdata, new=True, axes=None, 
           colorup='r', colordown='g', width=0.6, alpha=1.0):
     """绘制K线图
@@ -386,7 +282,7 @@ def kplot(kdata, new=True, axes=None,
         return
     
     if not axes:
-        axes = create_one_axes_figure() if new else gca()
+        axes = create_figure() if new else gca()
         
     OFFSET = width/2.0
     rfcolor = matplotlib.rcParams['axes.facecolor']
@@ -445,7 +341,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
         return
 
     if not axes:
-        axes = create_one_axes_figure() if new else gca()
+        axes = create_figure() if new else gca()
         
     for t in range(len(kdata)):
         record = kdata[t]
@@ -503,7 +399,7 @@ def iplot(indicator, new=True, axes=None,
         return
     
     if not axes:
-        axes = create_one_axes_figure() if new else gca()
+        axes = create_figure() if new else gca()
     
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
@@ -558,7 +454,7 @@ def ibar(indicator, new=True, axes=None,
         return
     
     if not axes:
-        axes = create_one_axes_figure() if new else gca()
+        axes = create_figure() if new else gca()
 
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
@@ -594,12 +490,12 @@ def ibar(indicator, new=True, axes=None,
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
-    参数：
-        axes：指定的坐标轴
-        kdata：KData
-        n1: MACD参数1，参见MACD
-        n2: MACD参数2，参见MACD
-        n3: MACD参数3，参见MACD
+    
+    :param axes: 指定的坐标轴
+    :param KData kdata: KData
+    :param int n1: 指标 MACD 的参数1
+    :param int n2: 指标 MACD 的参数2
+    :param int n3: 指标 MACD 的参数3
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
@@ -626,17 +522,17 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
         
         
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
-    """
-    绘制MACD，当BAR值变化与参考序列ref变化不一致时，显示为灰色，
+    """绘制MACD。
+    当BAR值变化与参考序列ref变化不一致时，显示为灰色，
     当BAR和参考序列ref同时上涨，显示红色
     当BAR和参考序列ref同时下跌，显示绿色
-    参数:
-        axes：指定的坐标轴
-        ref: 参考序列，EMA
-        kdata：KData
-        n1: MACD参数1，参见MACD
-        n2: MACD参数2，参见MACD
-        n3: MACD参数3，参见MACD
+
+    :param axes: 指定的坐标轴
+    :param ref: 参考序列，EMA
+    :param KData kdata: KData
+    :param int n1: 指标 MACD 的参数1
+    :param int n2: 指标 MACD 的参数2
+    :param int n3: 指标 MACD 的参数3
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
@@ -673,17 +569,16 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
         label.set_visible(False)  
         
         
-def sgplot(sg, new = True, axes = None,  style = 1, kdata = None):
+def sgplot(sg, new=True, axes=None,  style=1, kdata=None):
     """绘制买入/卖出信号
 
     :param SignalBase sg: 信号指示器
-    :param new:   仅在未指定axes的情况下生效，当为True时，
-                   创建新的窗口对象并在其中进行绘制
-    :param axes:  指定在那个轴对象中进行绘制
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
     :param style: 1 | 2 信号箭头绘制样式
     :param KData kdata: 指定的KData（即信号发生器的交易对象），
-                         如该值为None，则认为该信号发生器已经指定了交易对象，
-                         否则，使用该参数作为交易对象
+                       如该值为None，则认为该信号发生器已经指定了交易对象，
+                       否则，使用该参数作为交易对象
     """
     if kdata is None:
         kdata = sg.getTO()
@@ -695,7 +590,7 @@ def sgplot(sg, new = True, axes = None,  style = 1, kdata = None):
         
     if axes is None:
         if new:
-            axes = create_one_axes_figure()
+            axes = create_figure()
             kplot(kdata, axes=axes)
         else:
             axes = gca()        
@@ -739,14 +634,14 @@ def sgplot(sg, new = True, axes = None,  style = 1, kdata = None):
                       color='blue')            
 
                       
-def cnplot(cn, kdata = None, axes = None, new = True):
-    """
-    绘制系统有效条件
-    参数：
-        cn：   系统有效条件
-        kdata：指定的KData，如该值为None，则认为该系统有效条件已经指定了交易对象，否则，使用该参数作为交易对象
-        axes： 指定在那个轴对象中进行绘制
-        new：  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+def cnplot(cn, new=True, axes=None, kdata=None):
+    """绘制系统有效条件
+
+    :param ConditionBase cn: 系统有效条件
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
+    :param KData kdata: 指定的KData，如该值为None，则认为该系统有效条件已经
+                        指定了交易对象，否则，使用该参数作为交易对象
     """
     if kdata is None:
         kdata = cn.getTO()
@@ -758,7 +653,7 @@ def cnplot(cn, kdata = None, axes = None, new = True):
         
     if axes is None:
         if new:
-            axes = create_one_axes_figure()
+            axes = create_figure()
             kplot(kdata, axes=axes)
         else:
             axes = gca()        
@@ -770,14 +665,14 @@ def cnplot(cn, kdata = None, axes = None, new = True):
     axes.fill_between(x, y1, y2, where=y2 < y1, facecolor='red', alpha=0.6)
 
 
-def sysplot(sys, style = 1, axes = None, new = True):
-    """
-    绘制系统实际买入/卖出信号
-    参数：
-        sys：  系统实例
-        style: 1 | 2 信号箭头绘制样式
-        axes： 指定在那个轴对象中进行绘制
-        new：  仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+def sysplot(sys, new=True, axes=None, style=1):
+    """绘制系统实际买入/卖出信号
+    
+    :param SystemBase sys: 系统实例
+    :param new:   仅在未指定axes的情况下生效，当为True时，
+                   创建新的窗口对象并在其中进行绘制
+    :param axes:  指定在那个轴对象中进行绘制
+    :param style: 1 | 2 信号箭头绘制样式
     """
     kdata = sys.getTO()
         
@@ -786,7 +681,7 @@ def sysplot(sys, style = 1, axes = None, new = True):
         
     if axes is None:
         if new:
-            axes = create_one_axes_figure()
+            axes = create_figure()
             kplot(kdata, axes=axes)
         else:
             axes = gca()        

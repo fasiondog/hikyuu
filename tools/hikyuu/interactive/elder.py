@@ -1,10 +1,32 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 # cp936
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 #===============================================================================
-# 作者：fasiondog
-# 历史：1）20100224, Added by fasiondog
+# History:
+# 1. 20100224, Added by fasiondog
 #===============================================================================
 
 """
@@ -59,6 +81,7 @@ def _draw_ema_pipe(axes, kdata, ema, n=22, w=0.10):
     axes.fill_between(range(emas_len),fy1,fy2,alpha=0.2, color='y' )
 
 def draw(stock, query=QueryByIndex(-130), ma_n=22, ma_w='auto', vigor_n=13):
+    """绘制亚历山大.艾尔德交易系统图形"""
     kdata = stock.getKData(query)
     close = CLOSE(kdata)
     ema = EMA(close, ma_n)

@@ -1,10 +1,32 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 # cp936
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 #===============================================================================
-# 作者：fasiondog
-# 历史：1）20100224, Added by fasiondog
+# History:
+# 1. 20100224, Added by fasiondog
 #===============================================================================
 
 """
@@ -16,20 +38,19 @@ from hikyuu import Query, StockManager
 from hikyuu.indicator import *
 from hikyuu.trade_sys.signal import SG_Single, SG_Cross, SG_Flex
 from hikyuu.trade_manage import BUSINESS
-from .drawplot import (create_two_axes_figure, ax_set_locator_formatter,
+from .drawplot import (create_figure, ax_set_locator_formatter,
                        create_three_axes_figure, adjust_axes_show, 
-                       ax_draw_signal, ax_draw_sys_signal, ax_draw_macd)
+                       ax_draw_macd)
 
 def draw(stock, query = Query(-130), 
          n = 10, filter_n = 20, filter_p = 0.1,
          sg_type = "CROSS",
          show_high_low = False,
          arrow_style = 1):
-    """
-    """
+    """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
     kdata = stock.getKData(query)
     
-    ax1, ax2 = create_two_axes_figure()
+    ax1, ax2 = create_figure(2)
     kdata.plot(axes = ax1)
 
     cama = AMA(CLOSE(kdata), n = n )
@@ -87,6 +108,7 @@ def draw2(block, query = Query(-130),
          sg_type = 'CROSS',
          show_high_low = True,
          arrow_style = 1):
+    """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
     sm = StockManager.instance()
     if block.name == 'SZ':
         kdata = sm['sz000001'].getKData(query)

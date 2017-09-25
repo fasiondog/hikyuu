@@ -1,11 +1,38 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 # cp936
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 #===============================================================================
-# 作者：fasiondog
-# 历史：1）20120926, Added by fasiondog
+# History:
+# 1. 20120926, Added by fasiondog
 #===============================================================================
+
+import urllib
+import sys
+import os
+import configparser
 
 from hikyuu import *
 from hikyuu.indicator import *
@@ -20,28 +47,28 @@ from hikyuu.trade_sys.stoploss import *
 from hikyuu.trade_sys.profitgoal import *
 from hikyuu.trade_sys.slippage import *
 
-from .drawplot import *
+from hikyuu.interactive import *
 #import time
 
+
+#==============================================================================
+# 引入扯线木偶
+#==============================================================================
 #Puppet是一套以同花顺交易客户端为核心的完整的闭环实盘交易系统框架。
 #来自："睿瞳深邃(https://github.com/Raytone-D" 感谢睿瞳深邃的大度共享 :-)
 #可以用：tm.regBroker(crtRB(Puppet())) 的方式注册进tm实例，实现实盘下单
 if sys.platform == 'win32':
     from .puppet import *
 
-from . import volume as vl
-from . import elder as el
-from . import kaufman as kf
-
 from .broker import *
 from .broker_mail import *
 
-import urllib
 
-import sys
-import os
-import configparser
-
+#==============================================================================
+#
+# 读取配置信息，并初始化
+#
+#==============================================================================
 data_config_file = os.path.expanduser('~') + "/.hikyuu/data_dir.ini"
 data_config = configparser.ConfigParser()
 data_config.read(data_config_file)
@@ -58,6 +85,13 @@ hikyuu_init(config_file)
 sm = StockManager.instance()
 #endtime = time.time()
 #print "%.2fs" % (endtime-starttime)
+
+
+#==============================================================================
+#
+# 引入blocka、blocksh、blocksz、blockg全局变量，便于交互式环境下使用
+#
+#==============================================================================
 
 blocka = Block("A", "ALL")
 for s in sm:
@@ -77,7 +111,14 @@ for s in blocka:
 blockg = Block("G", "GEM")
 for s in sm:
     if s.type == constant.STOCKTYPE_GEM:
-        blockg.add(s)        
+        blockg.add(s)
+ 
+        
+#==============================================================================
+#
+# 为 KData、Indicator 等添加 plot 方法
+#
+#==============================================================================            
 
 KData.plot = kplot
 KData.kplot = kplot
@@ -91,8 +132,13 @@ ConditionBase.plot = cnplot
 
 System.plot = sysplot
 
-#================================================================
-#更新实时数据
+
+#==============================================================================
+#
+# 增加临时的实时数据更新函数 realtimeUpdate
+#
+#==============================================================================
+
 def UpdateOneRealtimeRecord_from_sina(tmpstr):
     try:
         if len(tmpstr) > 3 and tmpstr[:3] == 'var':

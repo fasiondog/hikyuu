@@ -1,10 +1,32 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 # cp936
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 #===============================================================================
-# 作者：fasiondog
-# 历史：1）20100227, Added by fasiondog
+# History:
+# 1. 20100227, Added by fasiondog
 #===============================================================================
 
 """
@@ -14,12 +36,15 @@ from hikyuu import Query
 from hikyuu.util.mylog import escapetime
 from hikyuu.indicator import Indicator, MA, CLOSE, VOL, OP
 from hikyuu.trade_sys.signal import SG_Cross
-from hikyuu.interactive.drawplot import (create_two_axes_figure, ax_set_locator_formatter, adjust_axes_show,
-                                         create_three_axes_figure, ax_draw_macd,
-                                         ax_draw_signal)
+from hikyuu.interactive.drawplot import (create_figure, 
+                                         ax_set_locator_formatter, 
+                                         adjust_axes_show,
+                                         create_three_axes_figure, 
+                                         ax_draw_macd)
 
 def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60, 
          ma5_n=100, ma_type="SMA", vma1_n=5, vma2_n=10):
+    """绘制普通K线图 + 成交量（成交金额）"""
     kdata = stock.getKData(query)
     close = CLOSE(kdata,)
     ma1 = MA(close, ma1_n, ma_type)
@@ -28,7 +53,7 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
     ma4 = MA(close, ma4_n, ma_type)
     ma5 = MA(close, ma5_n, ma_type)
 
-    ax1, ax2 = create_two_axes_figure()
+    ax1, ax2 = create_figure(2)
     kdata.plot(axes=ax1)
     ma1.plot(axes=ax1, legend_on=True)
     ma2.plot(axes=ax1, legend_on=True)
@@ -38,8 +63,7 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
     
     sg = SG_Cross(OP(MA(n=ma1_n, type=ma_type)), OP(MA(n=ma2_n, type=ma_type)))
     sg.setTO(kdata)
-    ax_draw_signal(ax1, kdata, sg.getBuySignal(), 'BUY', 1)
-    ax_draw_signal(ax1, kdata, sg.getSellSignal(), 'SELL', 1)
+    sg.plot(axes=ax1, kdata=kdata)
     
     vol = VOL(kdata)
     total = len(kdata)
@@ -63,7 +87,9 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
     adjust_axes_show([ax1, ax2])
 
 
-def draw2(stock, query=Query(-130), ma1_n=7, ma2_n=20, ma3_n=30, ma4_n=42, ma5_n=100, vma1_n=5, vma2_n=10):
+def draw2(stock, query=Query(-130), ma1_n=7, ma2_n=20, ma3_n=30, 
+          ma4_n=42, ma5_n=100, vma1_n=5, vma2_n=10):
+    """绘制普通K线图 + 成交量（成交金额）+ MACD"""
     kdata = stock.getKData(query)
     close = CLOSE(kdata)
     ma1 = MA(close, ma1_n)
