@@ -291,18 +291,22 @@ try:
     KData.to_df = KData_to_df
     
     def PriceList_to_np(data):
-       return np.array(data, dtype='d')
+        """仅在安装了numpy模块时生效，转换为numpy.array"""
+        return np.array(data, dtype='d')
        
     def PriceList_to_df(data):
+        """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
         return pd.DataFrame(data.to_np(), columns=('Value',))
         
     PriceList.to_np = PriceList_to_np
     PriceList.to_df = PriceList_to_df
     
     def DatetimeList_to_np(data):
+        """仅在安装了numpy模块时生效，转换为numpy.array"""
         return np.array(data, dtype='datetime64[D]')
         
     def DatetimeList_to_df(data):
+        """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
         return pd.DataFrame(data.to_np(), columns=('Datetime',))
         
     DatetimeList.to_np = DatetimeList_to_np

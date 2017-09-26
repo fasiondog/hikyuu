@@ -25,6 +25,8 @@ PriceList toPriceList(object o) {
 }
 
 void export_DataType() {
+    docstring_options doc_options(false, true, false);
+
     DatetimeList::const_reference (DatetimeList::*datetimeList_at)(DatetimeList::size_type) const = &DatetimeList::at;
     void (DatetimeList::*datetimelist_append)(const DatetimeList::value_type& val) = &DatetimeList::push_back;
     class_<DatetimeList>("DatetimeList")

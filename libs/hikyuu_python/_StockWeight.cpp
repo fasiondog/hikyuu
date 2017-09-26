@@ -20,6 +20,8 @@ using namespace boost::python;
 using namespace hku;
 
 void export_StockWeight() {
+    docstring_options doc_options(false, true, false);
+
     class_<StockWeight>("StockWeight", init<>())
             .def(init<const Datetime&>())
             .def(init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t, price_t>())

@@ -42,15 +42,15 @@ struct Constant {
     hku_int64 null_int64;
     bool pickle_support; //是否支持pickle
 
-    int STOCKTYPE_BLOCK;
-    int STOCKTYPE_A;
-    int STOCKTYPE_INDEX;
-    int STOCKTYPE_B;
-    int STOCKTYPE_FUND;
-    int STOCKTYPE_ETF;
-    int STOCKTYPE_ND;
-    int STOCKTYPE_BOND;
-    int STOCKTYPE_GEM;
+    int STOCKTYPE_BLOCK;  ///板块
+    int STOCKTYPE_A;      ///A股
+    int STOCKTYPE_INDEX;  ///指数
+    int STOCKTYPE_B;      ///B股
+    int STOCKTYPE_FUND;   ///基金
+    int STOCKTYPE_ETF;    ///ETF
+    int STOCKTYPE_ND;     ///国债
+    int STOCKTYPE_BOND;   ///债券
+    int STOCKTYPE_GEM;    ///创业板
 };
 
 void export_Constant() {

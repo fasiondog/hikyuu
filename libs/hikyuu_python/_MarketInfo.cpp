@@ -13,6 +13,8 @@ using namespace boost::python;
 using namespace hku;
 
 void export_MarketInfo() {
+    docstring_options doc_options(false, true, false);
+
     class_<MarketInfo>("MarketInfo", init<>())
             .def(init<const string&, const string&, const string&, const string&, const Datetime&>())
             //.def(self_ns::str(self))
