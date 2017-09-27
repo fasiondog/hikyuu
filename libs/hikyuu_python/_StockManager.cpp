@@ -21,11 +21,14 @@ BlockList (StockManager::*getBlockList_1)(const string&) = &StockManager::getBlo
 BlockList (StockManager::*getBlockList_2)() = &StockManager::getBlockList;
 
 void export_StockManager(){
+    docstring_options doc_options(false);
+
     class_<StockManager>("StockManager", no_init)
             .def("instance", &StockManager::instance,
                  return_value_policy<reference_existing_object>())
             .staticmethod("instance")
             .def("tmpdir", &StockManager::tmpdir)
+            .def("getAllMarket", &StockManager::getAllMarket)
             .def("getMarketInfo", &StockManager::getMarketInfo)
             .def("getStockTypeInfo", &StockManager::getStockTypeInfo)
             .def("size", &StockManager::size)
@@ -33,18 +36,16 @@ void export_StockManager(){
             .def("getBlock", &StockManager::getBlock)
             .def("getBlockList", getBlockList_1)
             .def("getBlockList", getBlockList_2)
-            .def("getTradingCalendar", &StockManager::getTradingCalendar,
-                    getTradingCalendar_overloads())
             //.def("getTradingCalendar", &StockManager::getTradingCalendar,
-            //        (arg("market")="SH", arg("start")=Datetime::min(),
-            //        arg=("end")=Datetime::max()))
+            //        getTradingCalendar_overloads())
+            .def("getTradingCalendar", &StockManager::getTradingCalendar,
+                    (arg("query"), arg("market")="SH"))
             .def("addTempCsvStock", &StockManager::addTempCsvStock,
                     addTempCsvStock_overloads())
             .def("removeTempCsvStock", &StockManager::removeTempCsvStock)
 
             .def("__len__", &StockManager::size)
             .def("__getitem__", &StockManager::getStock)
-            //.def("__iter__", iterator<StockManager>())
             .def("__iter__", iterator<const StockManager>())
             ;
 }

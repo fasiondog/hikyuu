@@ -54,5 +54,4 @@ def getVersion():
     return __version__
 
 from .core import *
-from .core_doc import *
 

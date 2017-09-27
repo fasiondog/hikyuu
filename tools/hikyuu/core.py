@@ -31,7 +31,7 @@ if sys.version > '3':
 else:
     IS_PY3 = False
 
-from ._hikyuu import *
+from .core_doc import *
 from hikyuu.util.mylog import escapetime
 from hikyuu.util.slice import list_getitem
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
@@ -149,6 +149,7 @@ Datetime.isNull = Datetime_isNull
 #------------------------------------------------------------------
 #重定义KQuery
 #------------------------------------------------------------------
+
 class Query(KQuery):
     """重新定义KQuery，目的如下：
     1、使用短类名
@@ -227,8 +228,11 @@ KQuery.BACKWARD = KQuery.RecoverType.BACKWARD
 KQuery.EQUAL_FORWARD = KQuery.RecoverType.EQUAL_FORWARD
 KQuery.EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
 
-#================================================================
-#封装KData
+
+#------------------------------------------------------------------
+# 增强 KData 的遍历
+#------------------------------------------------------------------
+
 def KData_getitem(kdata, i):
     if isinstance(i, int):
         length = len(kdata)
@@ -252,6 +256,12 @@ def KData_iter(kdata):
         yield kdata[i]
         
 def KData_getPos(kdata, datetime):
+    """
+    获取指定时间对应的索引位置
+    
+    :param Datetime datetime: 指定的时间
+    :return: 对应的索引位置，如果不在数据范围内，则返回 None
+    """
     pos = kdata._getPos(datetime)
     return pos if pos != constant.null_size else None
 
@@ -261,7 +271,9 @@ KData.__iter__ = KData_iter
 KData.getPos = KData_getPos
 
 
-#================================================================
+#------------------------------------------------------------------
+# 封装增强其他C++ vector类型的遍历
+#------------------------------------------------------------------
         
 PriceList.__getitem__ = list_getitem
 DatetimeList.__getitem__ = list_getitem
@@ -269,7 +281,10 @@ StringList.__getitem__ = list_getitem
 BlockList.__getitem__ = list_getitem
 
 
-#================================================================
+#------------------------------------------------------------------
+# 增加转化为 np.array、pandas.DataFrame 的功能
+#------------------------------------------------------------------
+
 try:
     import numpy as np
     import pandas as pd
