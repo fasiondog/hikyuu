@@ -61,6 +61,8 @@ void export_Stock() {
             .def("realtimeUpdate", &Stock::realtimeUpdate)
             .def("getWeight", getWeight1)
             .def("getWeight", getWeight2)
+            .def("loadKDataToBuffer", &Stock::loadKDataToBuffer)
+            .def("releaseKDataBuffer", &Stock::releaseKDataBuffer)
 
             .def("__eq__", &Stock::operator==)
             .def("__ne__", &Stock::operator!=)

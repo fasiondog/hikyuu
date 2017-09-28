@@ -27,7 +27,8 @@ struct Constant {
         STOCKTYPE_ETF(5),
         STOCKTYPE_ND(6),
         STOCKTYPE_BOND(7),
-        STOCKTYPE_GEM(8) {
+        STOCKTYPE_GEM(8),
+        STOCKTYPE_TMP(999) {
 #if HKU_PYTHON_SUPPORT_PICKLE
         pickle_support = true;
 #else
@@ -51,6 +52,7 @@ struct Constant {
     int STOCKTYPE_ND;     ///国债
     int STOCKTYPE_BOND;   ///债券
     int STOCKTYPE_GEM;    ///创业板
+    int STOCKTYPE_TMP;    ///临时Stock
 };
 
 void export_Constant() {

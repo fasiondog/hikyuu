@@ -23,6 +23,8 @@ bool (Block::*remove_1)(const Stock&) = &Block::remove;
 bool (Block::*remove_2)(const string&) = &Block::remove;
 
 void export_Block() {
+    docstring_options doc_options(false);
+
     class_<Block>("Block", init<>())
             .def(init<const string&, const string&>())
             .def(init<const Block&>())

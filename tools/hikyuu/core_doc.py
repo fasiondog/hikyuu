@@ -553,3 +553,231 @@ tocsv(filename)
 #------------------------------------------------------------------
 # from _Stock.cpp
 #------------------------------------------------------------------
+
+Stock.market.__doc__ = """获取所属市场简称，市场简称是市场的唯一标识"""
+Stock.code.__doc__ = """获取证券代码"""
+Stock.market_code.__doc__ = """市场简称+证券代码，如: sh000001"""
+Stock.name.__doc__ = """获取证券名称"""
+Stock.type.__doc__ = """获取证券类型，参见：:py:data:`constant`"""
+Stock.valid.__doc__ = """该证券当前是否有效"""
+Stock.startDatetime.__doc__ = """证券起始日期"""
+Stock.lastDatetime.__doc__ = """证券最后日期"""
+Stock.tick.__doc__ = """最小跳动量"""
+Stock.tickValue.__doc__ = """最小跳动量价值"""
+Stock.unit.__doc__ = """每单位价值 = tickValue / tick"""
+Stock.precision.__doc__ = """价格精度"""
+Stock.atom.__doc__ = """最小交易数量，同minTradeNumber"""
+Stock.minTradeNumber.__doc__ = """最小交易数量"""
+Stock.maxTradeNumber.__doc__ = """最大交易数量"""
+
+Stock.isNull.__doc__ = """
+isNull()
+    
+    是否为Null
+    
+    :rtype: bool
+"""
+
+Stock.getKData.__doc__ = """
+getKData(query)
+    
+    获取K线数据
+        
+    :param Query query: 查询条件
+    :return: 满足查询条件的K线数据
+    :rtype: KData
+"""
+
+Stock.getCount.__doc__ = """
+getCount([ktype=Query.DAY])
+    
+    获取不同类型K线数据量
+        
+    :param KQuery.KType ktype: K线数据类别
+    :return: K线记录数
+    :rtype: int
+"""
+
+Stock.getMarketValue.__doc__ = """
+getMarketValue(datetime, ktype)
+    
+    获取指定时刻的市值，即小于等于指定时刻的最后一条记录的收盘价
+        
+    :param Datetime datetime: 指定时刻
+    :param KQuery.KType ktype: K线数据类别
+    :return: 指定时刻的市值
+    :rtype: float
+"""
+
+Stock.getKRecord.__doc__ = """
+getKRecord(pos[, ktype=Query.DAY])
+    
+    获取指定索引的K线数据记录，未作越界检查
+        
+    :param int pos: 指定的索引位置
+    :param KQuery.KType ktype: K线数据类别
+    :return: K线记录
+    :rtype: KRecord
+"""
+
+Stock.getKRecordByDate.__doc__ = """
+getKRecordByDate(datetime[, ktype=Query.DAY])
+    
+    根据数据类型（日线/周线等），获取指定时刻的KRecord
+        
+    :param Datetime datetime: 指定日期时刻
+    :param KQuery.KType ktype: K线数据类别
+    :return: K线记录
+    :rtype: KRecord
+"""
+
+Stock.getKRecordList.__doc__ = """
+getKRecordList(start, end, ktype)
+    
+    获取K线记录 [start, end)，一般不直接使用，用getKData替代
+        
+    :param int start: 起始位置
+    :param int end: 结束位置
+    :param KQuery.KType ktype: K线类别
+    :return: K线记录列表
+    :rtype: KRecordList
+"""
+
+Stock.getDatetimeList.__doc__ = """
+getDatetimeList(query)
+    
+    获取日期列表
+        
+    :param Query query: 查询条件
+    :rtype: DatetimeList
+        
+getDatetimeList(start, end, ktype)
+    
+    获取日期列表
+        
+    :param int start: 起始位置
+    :param ind end: 结束位置
+    :param KQuery.KType ktype: K线类型
+    :rtype: DatetimeList        
+"""
+
+Stock.getWeight.__doc__ = """
+getWeight([start, end])
+    
+    获取指定时间段[start,end)内的权息信息。未指定起始、结束时刻时，获取全部权息记录。
+        
+    :param Datetime start: 起始时刻
+    :param Datetime end: 结束时刻
+    :rtype: StockWeightList
+"""
+
+Stock.realtimeUpdate.__doc__ = """
+realtimeUpdate(krecord)
+    
+    （临时函数）只用于更新缓存中的日线数据
+        
+    :param KRecord krecord: 新增的实时K线记录
+"""
+
+Stock.loadKDataToBuffer.__doc__ = """
+loadKDataToBuffer(ktype)
+    
+    将指定类别的K线数据加载至内存缓存
+        
+    :param KQuery.KType ktype: K线类型
+"""
+
+Stock.releaseKDataBuffer.__doc__ = """
+releaseKDataBuffer(ktype)
+    
+    释放指定类别的内存K线数据
+        
+    :param KQuery.KType ktype: K线类型
+"""
+
+
+#------------------------------------------------------------------
+# from _Block.cpp
+#------------------------------------------------------------------
+
+BlockList.__doc__ = """C++ std::vector<Block>包装"""
+
+Block.__doc__ = """板块类，可视为证券的容器"""
+
+Block.category.__doc__ = """板块分类，可读写"""
+Block.name.__doc__ = """板块名称，可读写"""
+
+Block.size.__doc__ = """
+size()
+    
+    包含的证券数量
+"""
+
+Block.empty.__doc__ = """
+empty()
+    
+    是否为空
+"""
+
+Block.add.__doc__ = """
+add(stock)
+    
+    加入指定的证券
+        
+    :param Stock stock: 待加入的证券
+    :return: 是否成功加入
+    :rtype: bool
+    
+add(market_code)
+    
+    根据"市场简称证券代码"加入指定的证券
+        
+    :param str market_code: 市场简称证券代码
+    :return: 是否成功加入
+    :rtype: bool     
+"""
+
+Block.remove.__doc__ = """
+remove(stock)
+    
+    移除指定证券
+        
+    :param Stock stock: 指定的证券
+    :return: 是否成功
+    :rtype: bool
+    
+remove(market_code)
+    
+    移除指定证券
+        
+    :param str market_code: 市场简称证券代码
+    :return: 是否成功
+    :rtype: bool    
+"""
+
+Block.clear.__doc__ = """移除包含的所有证券"""
+
+Block.__len__.__doc__ = """包含的证券数量"""
+
+
+#------------------------------------------------------------------
+# from _save_load.cpp
+#------------------------------------------------------------------
+
+hku_save.__doc__ = """
+hku_save(var, filename)
+
+    序列化，将hikyuu内建类型的变量（如Stock、TradeManager等）保存在指定的文件中，格式为XML。
+    
+    :param var: hikyuu内建类型的变量
+    :param str filename: 指定的文件名
+"""
+
+hku_load.__doc__ = """
+hku_load(var, filename)
+
+    将通过 hku_save 保存的变量，读取到var中。
+    
+    :param var: 指定的变量
+    :param str filename: 待载入的序列化文件。
+"""

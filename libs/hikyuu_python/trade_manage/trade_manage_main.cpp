@@ -22,6 +22,7 @@ void export_Performance();
 void export_OrderBroker();
 
 BOOST_PYTHON_MODULE(_trade_manage) {
+    docstring_options doc_options(false);
     export_CostRecord();
     export_PositionRecord();
     export_TradeCost();

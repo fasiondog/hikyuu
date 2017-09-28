@@ -12,6 +12,10 @@
 
 namespace hku {
 
+/**
+ * 板块类，可视为证券的容器
+ * @ingroup StockManage
+ */
 class HKU_API Block {
 public:
     Block();
@@ -43,46 +47,67 @@ public:
         return m_data != blk.m_data;
     }
 
+    /** 获取板块类别 */
     string category() const {
         return m_data ? m_data->m_category : "";
     }
 
+    /** 获取板块名称 */
     string name() const {
         return m_data ? m_data->m_name : "";
     }
 
+    /** 设置板块类别 */
     void category(const string& category) {
         if (!m_data)
             m_data = shared_ptr<Data>(new Data);
         m_data->m_category = category;
     }
 
+    /** 设置名称 */
     void name(const string& name) {
         if (!m_data)
             m_data = shared_ptr<Data>(new Data);
         m_data->m_name = name;
     }
 
+    /** 是否包含指定的证券 */
     bool have(const string& market_code) const;
+
+    /** 是否包含指定的证券 */
     bool have(const Stock& stock) const;
 
-    Stock get(const string&) const;
+    /** 获取指定的证券 */
+    Stock get(const string& market_code) const;
+
+    /** 获取指定的证券 */
     Stock operator[](const string& market_code) const {
         return get(market_code);
     }
+
+    /** 加入指定证券 */
     bool add(const Stock& stock);
-    bool add(const string&);
-    bool remove(const string&);
+
+    /** 加入指定证券 */
+    bool add(const string& market_code);
+
+    /** 移除指定证券 */
+    bool remove(const string& market_code);
+
+    /** 移除指定证券 */
     bool remove(const Stock& stock);
 
+    /** 包含的证券数量 */
     size_t size() const {
         return m_data ? m_data->m_stockDict.size() : 0;
     }
 
+    /** 是否为空 */
     bool empty() const {
         return size() ? false : true;
     }
 
+    /** 清除包含的所有证券 */
     void clear() {
         if (m_data) m_data->m_stockDict.clear();
     }
@@ -96,6 +121,8 @@ private:
     shared_ptr<Data> m_data;
 };
 
+
+/** @ingroup StockManage */
 typedef vector<Block> BlockList;
 
 HKU_API std::ostream& operator <<(std::ostream &os, const Block&);

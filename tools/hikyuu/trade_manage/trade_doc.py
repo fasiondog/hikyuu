@@ -25,4 +25,28 @@
 # SOFTWARE.
 
 from .trade import *
-from .trade_doc import *
+from hikyuu.trade_manage._trade_manage import CostRecord, TradeCostBase,\
+    PositionRecord
+
+
+#------------------------------------------------------------------
+# CostRecord
+#------------------------------------------------------------------
+
+CostRecord.__doc__ = """交易成本记录"""
+CostRecord.commission.__doc__ = """佣金(float)"""
+CostRecord.stamptax.__doc__ = """印花税(float)"""
+CostRecord.transferfee.__doc__ = """过户费(float)"""
+CostRecord.others.__doc__ = """其它费用(float)"""
+CostRecord.total.__doc__ = """总成本(float)，= 佣金 + 印花税 + 过户费 + 其它费用"""
+
+
+#------------------------------------------------------------------
+# PositionRecord
+#------------------------------------------------------------------
+
+PositionRecord.__doc__ = """持仓记录"""
+PositionRecord.stock.__doc__ = """交易对象（Stock）"""
+PositionRecord.takeDatetime.__doc__ = """初次建仓时刻（Datetime）"""
+PositionRecord.cleanDatetime.__doc__ = """平仓日期，当前持仓记录中为 constant.null_datetime"""
+PositionRecord.number.__doc__ = """当前持仓数量（int）"""
