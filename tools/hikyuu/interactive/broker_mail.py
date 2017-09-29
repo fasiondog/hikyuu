@@ -36,6 +36,8 @@ from email.header import Header
 class MailOrderBroker:
     def __init__(self, host, sender, pwd, receivers):
         """
+        邮件订单代理，执行买入/卖出操作时发送 Email
+        
         :param str host: smtp服务器地址
         :param int port: smtp服务器端口
         :param str sender: 发件邮箱（既用户名）

@@ -34,6 +34,7 @@ from hikyuu.trade_manage import OrderBrokerBase
 class OrderBrokerWrap(OrderBrokerBase):
     """
     订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
+    
     :param bool real: 下单前是否重新实时获取实时分笔数据
     :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，
                         否则忽略; 对卖出操作无效，立即以当前价卖出
