@@ -1,5 +1,5 @@
 <map id="TradeManager 交易管理" name="TradeManager 交易管理">
-<area shape="rect" id="node1" href="$group___trade_manager_class.html" title="TradeManager 交易管理类" alt="" coords="451,59,659,88"/>
-<area shape="rect" id="node3" href="$group___trade_cost.html" title="交易成本算法，如A股成本计算（印花税/佣金等）" alt="" coords="457,5,652,35"/>
-<area shape="rect" id="node4" href="$group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等" alt="" coords="6,32,162,61"/>
+<area shape="rect" id="node1" href="$group___trade_manager_class.html" title="TradeManager 交易管理类" alt="" coords="464,5,683,35"/>
+<area shape="rect" id="node3" href="$group___trade_cost.html" title="交易成本算法，如A股成本计算（印花税/佣金等） " alt="" coords="472,59,675,88"/>
+<area shape="rect" id="node4" href="$group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等 " alt="" coords="5,32,165,61"/>
 </map>

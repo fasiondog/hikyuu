@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/data_driver/DataDriverFactory.h 文件参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,21 +95,43 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <div class="title">DataDriverFactory.h 文件参考</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="_base_info_driver_8h_source.html">BaseInfoDriver.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_k_data_driver_8h_source.html">KDataDriver.h</a>&quot;</code><br/>
+<div class="textblock"><code>#include &quot;<a class="el" href="_base_info_driver_8h_source.html">BaseInfoDriver.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_k_data_driver_8h_source.html">KDataDriver.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_block_info_driver_8h_source.html">BlockInfoDriver.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 DataDriverFactory.h 的引用(Include)关系图:</div>
 <div class="dyncontent">
 <div class="center"><img src="_data_driver_factory_8h__incl.png" border="0" usemap="#hikyuu_2data__driver_2_data_driver_factory_8h" alt=""/></div>
 <map name="hikyuu_2data__driver_2_data_driver_factory_8h" id="hikyuu_2data__driver_2_data_driver_factory_8h">
-<area shape="rect" id="node2" href="_base_info_driver_8h.html" title="BaseInfoDriver.h" alt="" coords="245,256,384,285"/><area shape="rect" id="node22" href="_k_data_driver_8h.html" title="KDataDriver.h" alt="" coords="360,101,480,131"/><area shape="rect" id="node3" href="_market_info_8h.html" title="../MarketInfo.h" alt="" coords="143,488,271,517"/><area shape="rect" id="node17" href="_stock_type_info_8h.html" title="../StockTypeInfo.h" alt="" coords="237,333,392,363"/><area shape="rect" id="node18" href="_stock_8h.html" title="../Stock.h" alt="" coords="416,333,507,363"/><area shape="rect" id="node4" href="_data_type_8h.html" title="DataType.h" alt="" coords="297,565,399,595"/><area shape="rect" id="node11" href="_null_8h.html" title="utilities/Null.h" alt="" coords="641,643,761,672"/><area shape="rect" id="node14" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,643,952,672"/><area shape="rect" id="node19" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="348,411,471,440"/><area shape="rect" id="node20" href="_k_query_8h.html" title="KQuery.h" alt="" coords="495,411,583,440"/><area shape="rect" id="node21" href="_k_record_8h.html" title="KRecord.h" alt="" coords="457,488,551,517"/><area shape="rect" id="node23" href="_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="376,179,469,208"/><area shape="rect" id="node24" href="_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="460,256,567,285"/></map>
+<area shape="rect" id="node2" href="_base_info_driver_8h.html" title="BaseInfoDriver.h" alt="" coords="1481,332,1634,361"/>
+<area shape="rect" id="node33" href="_k_data_driver_8h.html" title="KDataDriver.h" alt="" coords="1671,100,1801,129"/>
+<area shape="rect" id="node37" href="_block_info_driver_8h.html" title="BlockInfoDriver.h" alt="" coords="1855,177,2012,207"/>
+<area shape="rect" id="node3" href="_ini_parser_8h.html" title="hikyuu_utils/iniparser\l/IniParser.h" alt="" coords="1949,641,2133,688"/>
+<area shape="rect" id="node10" href="_market_info_8h.html" title="../MarketInfo.h" alt="" coords="1121,564,1257,593"/>
+<area shape="rect" id="node28" href="_stock_type_info_8h.html" title="../StockTypeInfo.h" alt="" coords="1301,487,1465,516"/>
+<area shape="rect" id="node29" href="_stock_8h.html" title="../Stock.h" alt="" coords="1667,409,1763,439"/>
+<area shape="rect" id="node11" href="_data_type_8h.html" title="DataType.h" alt="" coords="1239,650,1350,679"/>
+<area shape="rect" id="node19" href="_log_8h.html" title="Log.h" alt="" coords="1505,745,1572,774"/>
+<area shape="rect" id="node22" href="_null_8h.html" title="utilities/Null.h" alt="" coords="135,745,257,774"/>
+<area shape="rect" id="node25" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1596,745,1775,774"/>
+<area shape="rect" id="node30" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="1460,564,1596,593"/>
+<area shape="rect" id="node31" href="_k_query_8h.html" title="KQuery.h" alt="" coords="1626,487,1721,516"/>
+<area shape="rect" id="node32" href="_k_record_8h.html" title="KRecord.h" alt="" coords="1333,564,1435,593"/>
+<area shape="rect" id="node34" href="_k_data_driver_imp_8h.html" title="KDataDriverImp.h" alt="" coords="1656,177,1816,207"/>
+<area shape="rect" id="node35" href="_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="1669,255,1768,284"/>
+<area shape="rect" id="node36" href="_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="1658,332,1771,361"/>
+<area shape="rect" id="node38" href="_block_8h.html" title="../Block.h" alt="" coords="1886,255,1981,284"/>
+<area shape="rect" id="node39" href="_stock_map_iterator_8h.html" title="StockMapIterator.h" alt="" coords="1847,332,2019,361"/>
+</map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 此图展示该文件直接或间接的被哪些文件引用了:</div>
 <div class="dyncontent">
 <div class="center"><img src="_data_driver_factory_8h__dep__incl.png" border="0" usemap="#hikyuu_2data__driver_2_data_driver_factory_8hdep" alt=""/></div>
 <map name="hikyuu_2data__driver_2_data_driver_factory_8hdep" id="hikyuu_2data__driver_2_data_driver_factory_8hdep">
-<area shape="rect" id="node2" href="_data_driver_factory_8cpp.html" title="hikyuu/data_driver\l/DataDriverFactory.cpp" alt="" coords="5,102,189,149"/><area shape="rect" id="node3" href="_stock_manager_8cpp.html" title="hikyuu/StockManager.cpp" alt="" coords="213,111,416,140"/></map>
+<area shape="rect" id="node2" href="_data_driver_factory_8cpp.html" title="hikyuu/data_driver\l/DataDriverFactory.cpp" alt="" coords="5,100,208,147"/>
+<area shape="rect" id="node3" href="_stock_manager_8cpp.html" title="hikyuu/StockManager.cpp" alt="" coords="233,109,455,138"/>
+</map>
 </div>
 </div>
 <p><a href="_data_driver_factory_8h_source.html">浏览源代码.</a></p>
@@ -120,8 +143,8 @@ DataDriverFactory.h 的引用(Include)关系图:</div>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 命名空间</h2></td></tr>
-<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
-<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br/></td></tr>
+<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
@@ -130,7 +153,7 @@ DataDriverFactory.h 的引用(Include)关系图:</div>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

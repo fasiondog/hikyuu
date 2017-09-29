@@ -1,4 +1,6 @@
 <map id="hku::TradeCostBase" name="hku::TradeCostBase">
-<area shape="rect" id="node2" href="$classhku_1_1_fixed_a_trade_cost.html" title="沪深A股交易成本算法,计算每次买入或卖出的成本" alt="" coords="5,83,184,112"/>
-<area shape="rect" id="node3" href="$classhku_1_1_zero_trade_cost.html" title="hku::ZeroTradeCost" alt="" coords="209,83,372,112"/>
+<area shape="rect" id="node2" href="$classhku_1_1_fixed_a2015_trade_cost.html" title="hku::FixedA2015TradeCost" alt="" coords="5,83,239,112"/>
+<area shape="rect" id="node3" href="$classhku_1_1_fixed_a_trade_cost.html" title="沪深A股交易成本算法,计算每次买入或卖出的成本 " alt="" coords="263,83,456,112"/>
+<area shape="rect" id="node4" href="$classhku_1_1_trade_cost_stub.html" title="hku::TradeCostStub" alt="" coords="480,83,657,112"/>
+<area shape="rect" id="node5" href="$classhku_1_1_zero_trade_cost.html" title="hku::ZeroTradeCost" alt="" coords="682,83,861,112"/>
 </map>

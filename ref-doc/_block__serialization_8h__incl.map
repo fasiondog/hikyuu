@@ -1,0 +1,19 @@
+<map id="hikyuu/serialization/Block_serialization.h" name="hikyuu/serialization/Block_serialization.h">
+<area shape="rect" id="node2" href="$config_8h.html" title="../config.h" alt="" coords="1408,186,1508,215"/>
+<area shape="rect" id="node3" href="$_block_8h.html" title="../Block.h" alt="" coords="1315,272,1410,301"/>
+<area shape="rect" id="node31" href="$_stock__serialization_8h.html" title="Stock_serialization.h" alt="" coords="1652,100,1830,129"/>
+<area shape="rect" id="node4" href="$_stock_map_iterator_8h.html" title="StockMapIterator.h" alt="" coords="1238,349,1410,379"/>
+<area shape="rect" id="node6" href="$_stock_8h.html" title="Stock.h" alt="" coords="1288,427,1370,456"/>
+<area shape="rect" id="node7" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="1274,581,1410,611"/>
+<area shape="rect" id="node29" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="1175,504,1270,533"/>
+<area shape="rect" id="node8" href="$_data_type_8h.html" title="DataType.h" alt="" coords="1380,667,1491,697"/>
+<area shape="rect" id="node19" href="$_log_8h.html" title="Log.h" alt="" coords="1941,762,2008,791"/>
+<area shape="rect" id="node23" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="2032,762,2154,791"/>
+<area shape="rect" id="node26" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="693,762,872,791"/>
+<area shape="rect" id="node30" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="1147,581,1250,611"/>
+<area shape="rect" id="node32" href="$_stock_manager_8h.html" title="../StockManager.h" alt="" coords="1533,186,1696,215"/>
+<area shape="rect" id="node38" href="$util_8h.html" title="../utilities/util.h" alt="" coords="2190,667,2321,697"/>
+<area shape="rect" id="node33" href="$_ini_parser_8h.html" title="hikyuu_utils/iniparser\l/IniParser.h" alt="" coords="260,659,444,705"/>
+<area shape="rect" id="node36" href="$_market_info_8h.html" title="MarketInfo.h" alt="" coords="1582,349,1703,379"/>
+<area shape="rect" id="node37" href="$_stock_type_info_8h.html" title="StockTypeInfo.h" alt="" coords="1485,504,1634,533"/>
+</map>

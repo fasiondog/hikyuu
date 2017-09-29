@@ -1,5 +1,6 @@
-<map id="hikyuu/data_driver/h5_kdata/H5Record.h" name="hikyuu/data_driver/h5_kdata/H5Record.h">
-<area shape="rect" id="node3" href="$_data_type_8h.html" title="../../DataType.h" alt="" coords="282,101,416,131"/>
-<area shape="rect" id="node10" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="641,179,761,208"/>
-<area shape="rect" id="node13" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,179,952,208"/>
+<map id="hikyuu/data_driver/kdata/hdf5/H5Record.h" name="hikyuu/data_driver/kdata/hdf5/H5Record.h">
+<area shape="rect" id="node2" href="$_data_type_8h.html" title="../../../DataType.h" alt="" coords="1128,100,1283,129"/>
+<area shape="rect" id="node13" href="$_log_8h.html" title="Log.h" alt="" coords="1795,186,1861,215"/>
+<area shape="rect" id="node17" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="2203,186,2325,215"/>
+<area shape="rect" id="node20" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1592,186,1771,215"/>
 </map>

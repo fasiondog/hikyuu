@@ -1,0 +1,4 @@
+<map id="hku::SlippageBase" name="hku::SlippageBase">
+<area shape="rect" id="node2" href="$classhku_1_1_fixed_percent_slippage.html" title="hku::FixedPercentSlippage" alt="" coords="5,83,232,112"/>
+<area shape="rect" id="node3" href="$classhku_1_1_fixed_value_slippage.html" title="hku::FixedValueSlippage" alt="" coords="256,83,464,112"/>
+</map>

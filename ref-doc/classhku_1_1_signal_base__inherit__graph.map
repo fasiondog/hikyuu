@@ -1,0 +1,7 @@
+<map id="hku::SignalBase" name="hku::SignalBase">
+<area shape="rect" id="node2" href="$classhku_1_1_bool_signal.html" title="hku::BoolSignal" alt="" coords="221,5,361,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_cross_gold_signal.html" title="hku::CrossGoldSignal" alt="" coords="197,59,384,88"/>
+<area shape="rect" id="node4" href="$classhku_1_1_cross_signal.html" title="hku::CrossSignal" alt="" coords="215,112,367,141"/>
+<area shape="rect" id="node5" href="$classhku_1_1_single_signal.html" title="hku::SingleSignal" alt="" coords="215,165,366,195"/>
+<area shape="rect" id="node6" href="$classhku_1_1_single_signal2.html" title="hku::SingleSignal2" alt="" coords="210,219,371,248"/>
+</map>

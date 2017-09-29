@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: MoneyManager 资金管理策略</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,14 +33,14 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
+      <li class="current"><a href="modules.html"><span>模块</span></a></li>
       <li><a href="namespaces.html"><span>命名空间</span></a></li>
       <li><a href="annotated.html"><span>类</span></a></li>
       <li><a href="files.html"><span>文件</span></a></li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,8 +78,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#define-members">宏定义</a> &#124;
+<a href="#typedef-members">类型定义</a> &#124;
+<a href="#func-members">函数</a>  </div>
   <div class="headertitle">
-<div class="title">MoneyManager 资金管理策略<div class="ingroups"><a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
+<div class="title">MoneyManager 资金管理策略<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
@@ -86,17 +92,148 @@ MoneyManager 资金管理策略 的协作图:</div>
 <div class="dyncontent">
 <center><table><tr><td><img src="group___money_manager.png" border="0" alt="" usemap="#group______money__manager"/>
 <map name="group______money__manager" id="group______money__manager">
-<area shape="rect" id="node1" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="6,5,221,35"/></map>
+<area shape="rect" id="node1" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="5,5,231,35"/>
+</map>
 </td></tr></table></center>
 </div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_money_manager_base.html">hku::MoneyManagerBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">资金管理基类  <a href="classhku_1_1_money_manager_base.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+宏定义</h2></td></tr>
+<tr class="memitem:gafc3cba294ec42fd043f4cfa76f20f2ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___money_manager.html#gafc3cba294ec42fd043f4cfa76f20f2ca">MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
+<tr class="memdesc:gafc3cba294ec42fd043f4cfa76f20f2ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">对于没有私有变量的继承子类，可直接使用该宏定义序列化  <a href="#gafc3cba294ec42fd043f4cfa76f20f2ca">更多...</a><br /></td></tr>
+<tr class="separator:gafc3cba294ec42fd043f4cfa76f20f2ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:ga06c3ee7e1a13ef55493264d754b62db2"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; MoneyManagerBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">hku::MoneyManagerPtr</a></td></tr>
+<tr class="memdesc:ga06c3ee7e1a13ef55493264d754b62db2"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型  <a href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">更多...</a><br /></td></tr>
+<tr class="separator:ga06c3ee7e1a13ef55493264d754b62db2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:gafdc0469e0e8a613ac85ecd1113bdafc8"><td class="memItemLeft" align="right" valign="top">MoneyManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___money_manager.html#gafdc0469e0e8a613ac85ecd1113bdafc8">hku::MM_FixedCount</a> (int n=100)</td></tr>
+<tr class="memdesc:gafdc0469e0e8a613ac85ecd1113bdafc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">固定交易数量资金管理策略  <a href="group___money_manager.html#gafdc0469e0e8a613ac85ecd1113bdafc8">更多...</a><br /></td></tr>
+<tr class="separator:gafdc0469e0e8a613ac85ecd1113bdafc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga128232f4a729e32c88899db818c16305"><td class="memItemLeft" align="right" valign="top">MoneyManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___money_manager.html#ga128232f4a729e32c88899db818c16305">hku::MM_FixedPercent</a> (double p)</td></tr>
+<tr class="memdesc:ga128232f4a729e32c88899db818c16305"><td class="mdescLeft">&#160;</td><td class="mdescRight">百分比风险模型  <a href="group___money_manager.html#ga128232f4a729e32c88899db818c16305">更多...</a><br /></td></tr>
+<tr class="separator:ga128232f4a729e32c88899db818c16305"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac8a747598dea5c53d5a7b9ff628ef724"><td class="memItemLeft" align="right" valign="top">MoneyManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___money_manager.html#gac8a747598dea5c53d5a7b9ff628ef724">hku::MM_Nothing</a> ()</td></tr>
+<tr class="memdesc:gac8a747598dea5c53d5a7b9ff628ef724"><td class="mdescLeft">&#160;</td><td class="mdescRight">不做资金管理，有多少钱买多少  <a href="group___money_manager.html#gac8a747598dea5c53d5a7b9ff628ef724">更多...</a><br /></td></tr>
+<tr class="separator:gac8a747598dea5c53d5a7b9ff628ef724"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <p>资金管理策略，决定每次交易的数量 </p>
+<h2 class="groupheader">宏定义说明</h2>
+<a class="anchor" id="gafc3cba294ec42fd043f4cfa76f20f2ca"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:\</div><div class="line">    friend <span class="keyword">class </span>boost::serialization::access; \</div><div class="line">    template&lt;class Archive&gt; \</div><div class="line">    void serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) { \</div><div class="line">        ar &amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(MoneyManagerBase); \</div><div class="line">    }</div></div><!-- fragment -->
+<p>对于没有私有变量的继承子类，可直接使用该宏定义序列化 </p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;class Drived: public MoneyManagerBase {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;    MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;public:</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;    Drived();</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;    ...</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;};</div></div><!-- fragment --> 
+</div>
+</div>
+<h2 class="groupheader">类型定义说明</h2>
+<a class="anchor" id="ga06c3ee7e1a13ef55493264d754b62db2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef shared_ptr&lt;MoneyManagerBase&gt; <a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">hku::MoneyManagerPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>客户程序都应使用该指针类型 </p>
+
+</div>
+</div>
+<h2 class="groupheader">函数说明</h2>
+<a class="anchor" id="gafdc0469e0e8a613ac85ecd1113bdafc8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MoneyManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MM_FixedCount </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>100</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>固定交易数量资金管理策略 </p>
+<p>每次买入固定的数量。 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>1) 该策略主要用于测试和其他策略进行比较结果，本身不符合现实。<br />
+ 2) 该策略并不判断已有的持仓情况，如果在已有持仓情况下不能交易，则该判断应为System本身的责任 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga128232f4a729e32c88899db818c16305"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MoneyManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MM_FixedPercent </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>百分比风险模型 </p>
+<p>参见：《通往财务自由之路》2008年6月 机械工业出版社 范 K.撒普（Van K. Tharp.）P312 公式：P（头寸规模）＝ C（总风险）/ R（每股的风险） ［这里C现金为总风险］ </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">p</td><td>每笔交易总风险占总资产的百分比，如0.02表示总资产的2% </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gac8a747598dea5c53d5a7b9ff628ef724"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MoneyManagerPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MM_Nothing </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>不做资金管理，有多少钱买多少 </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

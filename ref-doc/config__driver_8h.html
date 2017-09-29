@@ -1,156 +1,0 @@
-<!-- HTML header for doxygen 1.8.3.1-->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Hikyuu: hikyuu/data_driver/config_driver.h 文件参考</title>
-<link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="dynsections.js"></script>
-<link href="search/search.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
-</script>
-<link href="doxygen.css" rel="stylesheet" type="text/css" />
-</head>
-<body>
-<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
-<div id="titlearea">
-<table cellspacing="0" cellpadding="0">
- <tbody>
- <tr style="height: 56px;">
-  <td style="padding-left: 0.5em;">
-   <div id="projectname">Hikyuu
-   &#160;<span id="projectnumber">0.1</span>
-   </div>
-  </td>
- </tr>
- </tbody>
-</table>
-</div>
-<!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
-<script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'搜索');
-</script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
-      <li><a href="namespaces.html"><span>命名空间</span></a></li>
-      <li><a href="annotated.html"><span>类</span></a></li>
-      <li class="current"><a href="files.html"><span>文件</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="搜索" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="files.html"><span>文件列表</span></a></li>
-      <li><a href="globals.html"><span>文件成员</span></a></li>
-    </ul>
-  </div>
-<!-- window showing the filter options -->
-<div id="MSearchSelectWindow"
-     onmouseover="return searchBox.OnSearchSelectShow()"
-     onmouseout="return searchBox.OnSearchSelectHide()"
-     onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
-
-<!-- iframe showing the search results (closed by default) -->
-<div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
-</div>
-
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li>  </ul>
-</div>
-</div><!-- top -->
-<div class="header">
-  <div class="summary">
-<a href="#define-members">宏定义</a>  </div>
-  <div class="headertitle">
-<div class="title">config_driver.h 文件参考</div>  </div>
-</div><!--header-->
-<div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="_h5_k_data_driver_8h_source.html">h5_kdata/H5KDataDriver.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_s_q_lite_base_info_driver_8h_source.html">sqlite_info/SQLiteBaseInfoDriver.h</a>&quot;</code><br/>
-</div><div class="textblock"><div class="dynheader">
-config_driver.h 的引用(Include)关系图:</div>
-<div class="dyncontent">
-<div class="center"><img src="config__driver_8h__incl.png" border="0" usemap="#hikyuu_2data__driver_2config__driver_8h" alt=""/></div>
-<map name="hikyuu_2data__driver_2config__driver_8h" id="hikyuu_2data__driver_2config__driver_8h">
-<area shape="rect" id="node2" href="_h5_k_data_driver_8h.html" title="h5_kdata/H5KDataDriver.h" alt="" coords="269,101,480,131"/><area shape="rect" id="node25" href="_s_q_lite_base_info_driver_8h.html" title="sqlite_info/SQLiteBaseInfo\lDriver.h" alt="" coords="499,257,707,303"/><area shape="rect" id="node3" href="_k_data_driver_8h.html" title="../KDataDriver.h" alt="" coords="307,179,443,208"/><area shape="rect" id="node23" href="_h5_record_8h.html" title="H5Record.h" alt="" coords="177,179,281,208"/><area shape="rect" id="node4" href="_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="316,265,409,295"/><area shape="rect" id="node5" href="_stock_8h.html" title="Stock.h" alt="" coords="321,429,396,459"/><area shape="rect" id="node22" href="_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="309,352,416,381"/><area shape="rect" id="node6" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="320,584,443,613"/><area shape="rect" id="node20" href="_k_query_8h.html" title="KQuery.h" alt="" coords="215,507,303,536"/><area shape="rect" id="node7" href="_data_type_8h.html" title="DataType.h" alt="" coords="330,661,432,691"/><area shape="rect" id="node14" href="_null_8h.html" title="utilities/Null.h" alt="" coords="547,739,667,768"/><area shape="rect" id="node17" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="691,739,857,768"/><area shape="rect" id="node21" href="_k_record_8h.html" title="KRecord.h" alt="" coords="201,584,295,613"/><area shape="rect" id="node27" href="_log_8h.html" title="../../Log.h" alt="" coords="621,352,715,381"/><area shape="rect" id="node30" href="_base_info_driver_8h.html" title="../BaseInfoDriver.h" alt="" coords="441,352,596,381"/><area shape="rect" id="node31" href="_market_info_8h.html" title="../MarketInfo.h" alt="" coords="575,507,703,536"/><area shape="rect" id="node32" href="_stock_type_info_8h.html" title="../StockTypeInfo.h" alt="" coords="396,507,551,536"/></map>
-</div>
-</div><div class="textblock"><div class="dynheader">
-此图展示该文件直接或间接的被哪些文件引用了:</div>
-<div class="dyncontent">
-<div class="center"><img src="config__driver_8h__dep__incl.png" border="0" usemap="#hikyuu_2data__driver_2config__driver_8hdep" alt=""/></div>
-<map name="hikyuu_2data__driver_2config__driver_8hdep" id="hikyuu_2data__driver_2config__driver_8hdep">
-<area shape="rect" id="node2" href="_data_driver_factory_8cpp.html" title="hikyuu/data_driver\l/DataDriverFactory.cpp" alt="" coords="5,102,189,149"/></map>
-</div>
-</div>
-<p><a href="config__driver_8h_source.html">浏览源代码.</a></p>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-宏定义</h2></td></tr>
-<tr class="memitem:a90d375d1b6abfa7f1c83be211ee47161"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="config__driver_8h.html#a90d375d1b6abfa7f1c83be211ee47161">USE_SQLITE_BASE_INFO_DRIVER</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:a90d375d1b6abfa7f1c83be211ee47161"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a191b40b8bd2615a1575ccdc4a67f50ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="config__driver_8h.html#a191b40b8bd2615a1575ccdc4a67f50ad">USE_H5KDATA_DRIVER</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:a191b40b8bd2615a1575ccdc4a67f50ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<h2 class="groupheader">宏定义说明</h2>
-<a class="anchor" id="a191b40b8bd2615a1575ccdc4a67f50ad"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define USE_H5KDATA_DRIVER&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a90d375d1b6abfa7f1c83be211ee47161"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define USE_SQLITE_BASE_INFO_DRIVER&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-</div><!-- contents -->
-<!-- HTML footer for doxygen 1.8.3.1-->
-<!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
- &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
-</small></address>
-</body>
-</html>

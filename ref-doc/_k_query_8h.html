@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/KQuery.h 文件参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,26 +91,79 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   <div class="summary">
 <a href="#nested-classes">类</a> &#124;
 <a href="#namespaces">命名空间</a> &#124;
-<a href="#typedef-members">类型定义</a> &#124;
 <a href="#func-members">函数</a>  </div>
   <div class="headertitle">
 <div class="title">KQuery.h 文件参考</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="_k_record_8h_source.html">KRecord.h</a>&quot;</code><br/>
+<div class="textblock"><code>#include &quot;<a class="el" href="_k_record_8h_source.html">KRecord.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 KQuery.h 的引用(Include)关系图:</div>
 <div class="dyncontent">
 <div class="center"><img src="_k_query_8h__incl.png" border="0" usemap="#hikyuu_2_k_query_8h" alt=""/></div>
 <map name="hikyuu_2_k_query_8h" id="hikyuu_2_k_query_8h">
-<area shape="rect" id="node2" href="_k_record_8h.html" title="KRecord.h" alt="" coords="301,83,395,112"/><area shape="rect" id="node3" href="_data_type_8h.html" title="DataType.h" alt="" coords="297,160,399,189"/><area shape="rect" id="node10" href="_null_8h.html" title="utilities/Null.h" alt="" coords="641,237,761,267"/><area shape="rect" id="node13" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,237,952,267"/></map>
+<area shape="rect" id="node2" href="_k_record_8h.html" title="KRecord.h" alt="" coords="1154,83,1257,112"/>
+<area shape="rect" id="node3" href="_data_type_8h.html" title="DataType.h" alt="" coords="1150,160,1261,189"/>
+<area shape="rect" id="node14" href="_log_8h.html" title="Log.h" alt="" coords="1795,246,1861,275"/>
+<area shape="rect" id="node18" href="_null_8h.html" title="utilities/Null.h" alt="" coords="2203,246,2325,275"/>
+<area shape="rect" id="node21" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1592,246,1771,275"/>
+</map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 此图展示该文件直接或间接的被哪些文件引用了:</div>
 <div class="dyncontent">
 <div class="center"><img src="_k_query_8h__dep__incl.png" border="0" usemap="#hikyuu_2_k_query_8hdep" alt=""/></div>
 <map name="hikyuu_2_k_query_8hdep" id="hikyuu_2_k_query_8hdep">
-<area shape="rect" id="node2" href="_stock_8h.html" title="hikyuu/Stock.h" alt="" coords="1338,83,1464,112"/><area shape="rect" id="node49" href="_k_query_8cpp.html" title="hikyuu/KQuery.cpp" alt="" coords="1489,83,1647,112"/><area shape="rect" id="node50" href="___k_query_8cpp.html" title="hikyuu_python/_KQuery.cpp" alt="" coords="1671,83,1895,112"/><area shape="rect" id="node3" href="_base_info_driver_8h.html" title="hikyuu/data_driver\l/BaseInfoDriver.h" alt="" coords="128,161,283,207"/><area shape="rect" id="node10" href="_k_d_a_t_a_8h.html" title="hikyuu/KData.h" alt="" coords="1336,273,1467,303"/><area shape="rect" id="node29" href="_k_data_imp_8h.html" title="hikyuu/KDataImp.h" alt="" coords="1167,169,1325,199"/><area shape="rect" id="node32" href="_stock_manager_8h.html" title="hikyuu/StockManager.h" alt="" coords="641,273,828,303"/><area shape="rect" id="node14" href="_stock_8cpp.html" title="hikyuu/Stock.cpp" alt="" coords="294,489,436,519"/><area shape="rect" id="node35" href="_trade_cost_base_8h.html" title="hikyuu/trade_manage\l/TradeCostBase.h" alt="" coords="2971,161,3147,207"/><area shape="rect" id="node43" href="_trade_record_8h.html" title="hikyuu/trade_manage\l/TradeRecord.h" alt="" coords="1653,161,1829,207"/><area shape="rect" id="node46" href="_position_record_8h.html" title="hikyuu/trade_manage\l/PositionRecord.h" alt="" coords="2136,161,2312,207"/><area shape="rect" id="node28" href="___stock_8cpp.html" title="hikyuu_python/_Stock.cpp" alt="" coords="2012,385,2223,415"/><area shape="rect" id="node4" href="_s_q_lite_base_info_driver_8h.html" title="hikyuu/data_driver\l/sqlite_info/SQLiteBaseInfo\lDriver.h" alt="" coords="98,256,312,320"/><area shape="rect" id="node8" href="_data_driver_factory_8h.html" title="hikyuu/data_driver\l/DataDriverFactory.h" alt="" coords="703,481,871,527"/><area shape="rect" id="node5" href="config__driver_8h.html" title="hikyuu/data_driver\l/config_driver.h" alt="" coords="164,577,319,623"/><area shape="rect" id="node7" href="_s_q_lite_base_info_driver_8cpp.html" title="hikyuu/data_driver\l/sqlite_info/SQLiteBaseInfo\lDriver.cpp" alt="" coords="98,368,312,432"/><area shape="rect" id="node6" href="_data_driver_factory_8cpp.html" title="hikyuu/data_driver\l/DataDriverFactory.cpp" alt="" coords="336,673,520,719"/><area shape="rect" id="node9" href="_stock_manager_8cpp.html" title="hikyuu/StockManager.cpp" alt="" coords="652,585,855,615"/><area shape="rect" id="node11" href="_k_data_driver_8h.html" title="hikyuu/data_driver\l/KDataDriver.h" alt="" coords="1316,377,1471,423"/><area shape="rect" id="node15" href="_indicator_8h.html" title="hikyuu/indicator/Indicator.h" alt="" coords="1539,489,1757,519"/><area shape="rect" id="node25" href="_indicator_imp_8h.html" title="hikyuu/indicator/Indicator\lImp.h" alt="" coords="1545,377,1751,423"/><area shape="rect" id="node26" href="_k_d_a_t_a_8cpp.html" title="hikyuu/KData.cpp" alt="" coords="1145,385,1292,415"/><area shape="rect" id="node27" href="___k_data_8cpp.html" title="hikyuu_python/_KData.cpp" alt="" coords="1775,385,1988,415"/><area shape="rect" id="node12" href="_h5_k_data_driver_8h.html" title="hikyuu/data_driver\l/h5_kdata/H5KDataDriver.h" alt="" coords="461,481,677,527"/><area shape="rect" id="node13" href="_h5_k_data_driver_8cpp.html" title="hikyuu/data_driver\l/h5_kdata/H5KDataDriver.cpp" alt="" coords="343,577,576,623"/><area shape="rect" id="node16" href="indicator_2build__in_8h.html" title="hikyuu/indicator/build_in.h" alt="" coords="1333,681,1547,711"/><area shape="rect" id="node17" href="indicator_2crt_2_k_d_a_t_a_8h.html" title="hikyuu/indicator/crt\l/KDATA.h" alt="" coords="879,577,1039,623"/><area shape="rect" id="node18" href="_p_r_i_c_e_l_i_s_t_8h.html" title="hikyuu/indicator/crt\l/PRICELIST.h" alt="" coords="1257,577,1417,623"/><area shape="rect" id="node19" href="crt_2_m_a_8h.html" title="hikyuu/indicator/crt/MA.h" alt="" coords="1441,585,1644,615"/><area shape="rect" id="node20" href="_i_k_data_8h.html" title="hikyuu/indicator/imp\l/IKData.h" alt="" coords="1719,577,1888,623"/><area shape="rect" id="node21" href="imp_2_m_a_8h.html" title="hikyuu/indicator/imp/Ma.h" alt="" coords="1965,585,2173,615"/><area shape="rect" id="node23" href="_i_price_list_8h.html" title="hikyuu/indicator/imp\l/IPriceList.h" alt="" coords="1063,577,1232,623"/><area shape="rect" id="node22" href="imp_2_m_a_8cpp.html" title="hikyuu/indicator/imp\l/Ma.cpp" alt="" coords="1913,673,2081,719"/><area shape="rect" id="node24" href="_indicator_8cpp.html" title="hikyuu/indicator/Indicator.cpp" alt="" coords="2199,585,2433,615"/><area shape="rect" id="node30" href="_k_data_buffer_imp_8h.html" title="hikyuu/KDataBufferImp.h" alt="" coords="1110,273,1311,303"/><area shape="rect" id="node31" href="_k_data_imp_8cpp.html" title="hikyuu/KDataImp.cpp" alt="" coords="946,385,1120,415"/><area shape="rect" id="node33" href="hikyuu_8h.html" title="hikyuu/hikyuu.h" alt="" coords="439,385,575,415"/><area shape="rect" id="node34" href="___stock_manager_8cpp.html" title="hikyuu_python/_StockManager.cpp" alt="" coords="599,385,869,415"/><area shape="rect" id="node36" href="_trade_manager_8h.html" title="hikyuu/trade_manage\l/TradeManager.h" alt="" coords="2251,265,2427,311"/><area shape="rect" id="node37" href="crt_zero_t_c_8h.html" title="hikyuu/trade_manage\l/crt/crtZeroTC.h" alt="" coords="3501,265,3677,311"/><area shape="rect" id="node38" href="crt_fixed_a_t_c_8h.html" title="hikyuu/trade_manage\l/crt/crtFixedATC.h" alt="" coords="3701,265,3877,311"/><area shape="rect" id="node39" href="_fixed_a_trade_cost_8h.html" title="hikyuu/trade_manage\l/imp/FixedATradeCost.h" alt="" coords="2651,265,2845,311"/><area shape="rect" id="node40" href="_zero_trade_cost_8h.html" title="hikyuu/trade_manage\l/imp/ZeroTradeCost.h" alt="" coords="2869,265,3048,311"/><area shape="rect" id="node41" href="_trade_cost_base_8cpp.html" title="hikyuu/trade_manage\l/TradeCostBase.cpp" alt="" coords="3072,265,3248,311"/><area shape="rect" id="node42" href="___trade_cost_8cpp.html" title="hikyuu_python/trade\l_manage/_TradeCost.cpp" alt="" coords="3273,265,3476,311"/><area shape="rect" id="node44" href="_trade_record_8cpp.html" title="hikyuu/trade_manage\l/TradeRecord.cpp" alt="" coords="1541,265,1717,311"/><area shape="rect" id="node45" href="___trade_record_8cpp.html" title="hikyuu_python/trade\l_manage/_TradeRecord.cpp" alt="" coords="1742,265,1964,311"/><area shape="rect" id="node47" href="_position_record_8cpp.html" title="hikyuu/trade_manage\l/PositionRecord.cpp" alt="" coords="2451,265,2627,311"/><area shape="rect" id="node48" href="___position_record_8cpp.html" title="hikyuu_python/trade\l_manage/_PositionRecord.cpp" alt="" coords="1989,265,2227,311"/></map>
+<area shape="rect" id="node2" href="_stock_8h.html" title="hikyuu/Stock.h" alt="" coords="1267,83,1404,112"/>
+<area shape="rect" id="node43" href="_k_query_8cpp.html" title="hikyuu/KQuery.cpp" alt="" coords="3525,83,3695,112"/>
+<area shape="rect" id="node44" href="_k_query__serialization_8h.html" title="hikyuu/serialization\l/KQuery_serialization.h" alt="" coords="3633,255,3832,301"/>
+<area shape="rect" id="node45" href="_environment_base_8h.html" title="hikyuu/trade_sys/environment\l/EnvironmentBase.h" alt="" coords="3599,349,3856,396"/>
+<area shape="rect" id="node3" href="_stock_map_iterator_8h.html" title="hikyuu/StockMapIterator.h" alt="" coords="891,169,1119,198"/>
+<area shape="rect" id="node18" href="_base_info_driver_8h.html" title="hikyuu/data_driver\l/BaseInfoDriver.h" alt="" coords="385,349,550,396"/>
+<area shape="rect" id="node21" href="_k_data_imp_8h.html" title="hikyuu/KDataImp.h" alt="" coords="1251,169,1420,198"/>
+<area shape="rect" id="node33" href="_trade_cost_base_8h.html" title="hikyuu/trade_manage\l/TradeCostBase.h" alt="" coords="2378,160,2567,207"/>
+<area shape="rect" id="node4" href="_block_8h.html" title="hikyuu/Block.h" alt="" coords="883,263,1017,293"/>
+<area shape="rect" id="node5" href="_stock_manager_8h.html" title="hikyuu/StockManager.h" alt="" coords="751,461,955,491"/>
+<area shape="rect" id="node11" href="_block_info_driver_8h.html" title="hikyuu/data_driver\l/BlockInfoDriver.h" alt="" coords="597,349,762,396"/>
+<area shape="rect" id="node14" href="_p_o_s_8h.html" title="hikyuu/indicator/crt\l/POS.h" alt="" coords="979,453,1151,499"/>
+<area shape="rect" id="node15" href="_block__serialization_8h.html" title="hikyuu/serialization\l/Block_serialization.h" alt="" coords="1277,349,1460,396"/>
+<area shape="rect" id="node17" href="_ama_instance_8h.html" title="hikyuu/trade_instance\l/ama_sys/AmaInstance.h" alt="" coords="933,349,1151,396"/>
+<area shape="rect" id="node6" href="_my_s_q_l_base_info_driver_8cpp.html" title="hikyuu/data_driver\l/base_info/mysql/MySQLBase\lInfoDriver.cpp" alt="" coords="256,556,505,620"/>
+<area shape="rect" id="node7" href="_s_q_lite_base_info_driver_8cpp.html" title="hikyuu/data_driver\l/base_info/sqlite/SQLiteBase\lInfoDriver.cpp" alt="" coords="529,556,768,620"/>
+<area shape="rect" id="node8" href="_k_data_imp_8cpp.html" title="hikyuu/KDataImp.cpp" alt="" coords="1067,573,1255,603"/>
+<area shape="rect" id="node9" href="_stock_manager_8cpp.html" title="hikyuu/StockManager.cpp" alt="" coords="792,573,1015,603"/>
+<area shape="rect" id="node10" href="_two_line_environment_8cpp.html" title="hikyuu/trade_sys/environment\l/imp/TwoLineEnvironment.cpp" alt="" coords="2828,565,3085,611"/>
+<area shape="rect" id="node12" href="_data_driver_factory_8h.html" title="hikyuu/data_driver\l/DataDriverFactory.h" alt="" coords="542,453,726,499"/>
+<area shape="rect" id="node13" href="_data_driver_factory_8cpp.html" title="hikyuu/data_driver\l/DataDriverFactory.cpp" alt="" coords="29,565,231,611"/>
+<area shape="rect" id="node16" href="serialization_2all_8h.html" title="hikyuu/serialization\l/all.h" alt="" coords="2194,453,2362,499"/>
+<area shape="rect" id="node19" href="_my_s_q_l_base_info_driver_8h.html" title="hikyuu/data_driver\l/base_info/mysql/MySQLBase\lInfoDriver.h" alt="" coords="5,444,255,508"/>
+<area shape="rect" id="node20" href="_s_q_lite_base_info_driver_8h.html" title="hikyuu/data_driver\l/base_info/sqlite/SQLiteBase\lInfoDriver.h" alt="" coords="279,444,517,508"/>
+<area shape="rect" id="node22" href="_k_d_a_t_a_8h.html" title="hikyuu/KData.h" alt="" coords="1469,263,1607,293"/>
+<area shape="rect" id="node32" href="_k_data_buffer_imp_8h.html" title="hikyuu/KDataBufferImp.h" alt="" coords="1226,263,1445,293"/>
+<area shape="rect" id="node23" href="_k_data_driver_imp_8h.html" title="hikyuu/data_driver\l/KDataDriverImp.h" alt="" coords="1485,349,1650,396"/>
+<area shape="rect" id="node24" href="_indicator_imp_8h.html" title="hikyuu/indicator/Indicator\lImp.h" alt="" coords="1674,349,1893,396"/>
+<area shape="rect" id="node25" href="_signal_base_8h.html" title="hikyuu/trade_sys/signal\l/SignalBase.h" alt="" coords="1917,349,2119,396"/>
+<area shape="rect" id="node28" href="_allocate_money_base_8h.html" title="hikyuu/trade_sys/portfolio\l/AllocateMoneyBase.h" alt="" coords="2049,565,2273,611"/>
+<area shape="rect" id="node29" href="_selector_base_8h.html" title="hikyuu/trade_sys/selector\l/SelectorBase.h" alt="" coords="1543,565,1765,611"/>
+<area shape="rect" id="node31" href="_k_data__serialization_8h.html" title="hikyuu/serialization\l/KData_serialization.h" alt="" coords="2379,349,2566,396"/>
+<area shape="rect" id="node26" href="_system_8h.html" title="hikyuu/trade_sys/system\l/System.h" alt="" coords="2386,453,2602,499"/>
+<area shape="rect" id="node27" href="_s_y_s___simple_8h.html" title="hikyuu/trade_sys/system\l/crt/SYS_Simple.h" alt="" coords="2570,565,2786,611"/>
+<area shape="rect" id="node30" href="_system_8cpp.html" title="hikyuu/trade_sys/system\l/System.cpp" alt="" coords="2330,565,2546,611"/>
+<area shape="rect" id="node34" href="_t_c___zero_8h.html" title="hikyuu/trade_manage\l/crt/TC_Zero.h" alt="" coords="1631,255,1821,301"/>
+<area shape="rect" id="node35" href="_t_c___test_stub_8h.html" title="hikyuu/trade_manage\l/crt/TC_TestStub.h" alt="" coords="1845,255,2034,301"/>
+<area shape="rect" id="node36" href="_t_c___fixed_a_8h.html" title="hikyuu/trade_manage\l/crt/TC_FixedA.h" alt="" coords="2058,255,2247,301"/>
+<area shape="rect" id="node37" href="_t_c___fixed_a2015_8h.html" title="hikyuu/trade_manage\l/crt/TC_FixedA2015.h" alt="" coords="2271,255,2461,301"/>
+<area shape="rect" id="node38" href="_trade_cost_stub_8h.html" title="hikyuu/trade_manage\l/imp/TradeCostStub.h" alt="" coords="2485,255,2676,301"/>
+<area shape="rect" id="node39" href="_fixed_a_trade_cost_8h.html" title="hikyuu/trade_manage\l/imp/FixedATradeCost.h" alt="" coords="2700,255,2907,301"/>
+<area shape="rect" id="node40" href="_zero_trade_cost_8h.html" title="hikyuu/trade_manage\l/imp/ZeroTradeCost.h" alt="" coords="2931,255,3124,301"/>
+<area shape="rect" id="node41" href="_fixed_a2015_trade_cost_8h.html" title="hikyuu/trade_manage\l/imp/FixedA2015TradeCost.h" alt="" coords="3148,255,3395,301"/>
+<area shape="rect" id="node42" href="_trade_cost_base_8cpp.html" title="hikyuu/trade_manage\l/TradeCostBase.cpp" alt="" coords="3419,255,3609,301"/>
+<area shape="rect" id="node46" href="_e_v___two_line_8h.html" title="hikyuu/trade_sys/environment\l/crt/EV_TwoLine.h" alt="" coords="3465,453,3723,499"/>
+<area shape="rect" id="node48" href="_environment_base_8cpp.html" title="hikyuu/trade_sys/environment\l/EnvironmentBase.cpp" alt="" coords="3747,453,4004,499"/>
+<area shape="rect" id="node49" href="_two_line_environment_8h.html" title="hikyuu/trade_sys/environment\l/imp/TwoLineEnvironment.h" alt="" coords="3117,453,3375,499"/>
+<area shape="rect" id="node47" href="trade__sys_2environment_2build__in_8h.html" title="hikyuu/trade_sys/environment\l/build_in.h" alt="" coords="3465,565,3723,611"/>
+<area shape="rect" id="node50" href="trade__sys_2environment_2export_8cpp.html" title="hikyuu/trade_sys/environment\l/export.cpp" alt="" coords="3117,565,3375,611"/>
+</map>
 </div>
 </div>
 <p><a href="_k_query_8h_source.html">浏览源代码.</a></p>
@@ -117,32 +171,33 @@ KQuery.h 的引用(Include)关系图:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 类</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query.html">hku::KQuery</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">按索引方式查询K线数据条件  <a href="classhku_1_1_k_query.html#details">更多...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">按索引方式查询K线数据条件  <a href="classhku_1_1_k_query.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_query_by_date.html">hku::KQueryByDate</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">按日期查询K线数据条件  <a href="classhku_1_1_k_query_by_date.html#details">更多...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_null_3_01_k_query_01_4.html">hku::Null&lt; KQuery &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">提供KQuery的Null值  <a href="classhku_1_1_null_3_01_k_query_01_4.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 命名空间</h2></td></tr>
-<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
-<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br/></td></tr>
+<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-类型定义</h2></td></tr>
-<tr class="memitem:ga6bccbbc48e7a2b0cf76941af166441a8"><td class="memItemLeft" align="right" valign="top">typedef KQuery&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___stock_manage.html#ga6bccbbc48e7a2b0cf76941af166441a8">hku::KQueryByIndex</a></td></tr>
-<tr class="memdesc:ga6bccbbc48e7a2b0cf76941af166441a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">按索引方式查询K线数据，同KQuery  <a href="group___stock_manage.html#ga6bccbbc48e7a2b0cf76941af166441a8">更多...</a><br/></td></tr>
-<tr class="separator:ga6bccbbc48e7a2b0cf76941af166441a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 函数</h2></td></tr>
+<tr class="memitem:ga793907aa9427b2c9402d276077691e33"><td class="memItemLeft" align="right" valign="top">KQuery&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___stock_manage.html#ga793907aa9427b2c9402d276077691e33">hku::KQueryByIndex</a> (hku_int64 start=0, hku_int64 end=Null&lt; hku_int64 &gt;(), KQuery::KType dataType=KQuery::DAY, KQuery::RecoverType recoverType=KQuery::NO_RECOVER)</td></tr>
+<tr class="memdesc:ga793907aa9427b2c9402d276077691e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">构造按索引方式K线查询，范围[start, end)  <a href="group___stock_manage.html#ga793907aa9427b2c9402d276077691e33">更多...</a><br /></td></tr>
+<tr class="separator:ga793907aa9427b2c9402d276077691e33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa79115b3df89a855e45d9b71147a04e6"><td class="memItemLeft" align="right" valign="top">KQuery&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___stock_manage.html#gaa79115b3df89a855e45d9b71147a04e6">hku::KQueryByDate</a> (const Datetime &amp;start=Datetime::min(), const Datetime &amp;end=Null&lt; Datetime &gt;(), KQuery::KType dataType=KQuery::DAY, KQuery::RecoverType recoverType=KQuery::NO_RECOVER)</td></tr>
+<tr class="memdesc:gaa79115b3df89a855e45d9b71147a04e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">构造按日期方式K线查询，范围[startDatetime, endDatetime)  <a href="group___stock_manage.html#gaa79115b3df89a855e45d9b71147a04e6">更多...</a><br /></td></tr>
+<tr class="separator:gaa79115b3df89a855e45d9b71147a04e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaabd0a05e5585119ef46a68dd889631da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___stock_manage.html#gaabd0a05e5585119ef46a68dd889631da">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const KQuery &amp;query)</td></tr>
-<tr class="memdesc:gaabd0a05e5585119ef46a68dd889631da"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出KQuery信息，如：KQuery(start, end, queryType, kType, recoverType)  <a href="group___stock_manage.html#gaabd0a05e5585119ef46a68dd889631da">更多...</a><br/></td></tr>
+<tr class="memdesc:gaabd0a05e5585119ef46a68dd889631da"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出KQuery信息，如：KQuery(start, end, queryType, kType, recoverType)  <a href="group___stock_manage.html#gaabd0a05e5585119ef46a68dd889631da">更多...</a><br /></td></tr>
 <tr class="separator:gaabd0a05e5585119ef46a68dd889631da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga559aabb9c8d6e18eefe3e318c90761bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___stock_manage.html#ga559aabb9c8d6e18eefe3e318c90761bb">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const KQueryByDate &amp;query)</td></tr>
-<tr class="memdesc:ga559aabb9c8d6e18eefe3e318c90761bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">输出KQueryByDate信息，如：KQueryByDate(startDatetime, endDatetime, queryType, kType, recoverType)  <a href="group___stock_manage.html#ga559aabb9c8d6e18eefe3e318c90761bb">更多...</a><br/></td></tr>
-<tr class="separator:ga559aabb9c8d6e18eefe3e318c90761bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae380bdb515f662773856e5db37aa759d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#ae380bdb515f662773856e5db37aa759d">hku::operator==</a> (const KQuery &amp;, const KQuery &amp;)</td></tr>
+<tr class="separator:ae380bdb515f662773856e5db37aa759d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fffcb2320c43ddde2295891a806e200"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a3fffcb2320c43ddde2295891a806e200">hku::operator!=</a> (const KQuery &amp;, const KQuery &amp;)</td></tr>
+<tr class="separator:a3fffcb2320c43ddde2295891a806e200"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
@@ -150,7 +205,7 @@ KQuery.h 的引用(Include)关系图:</div>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

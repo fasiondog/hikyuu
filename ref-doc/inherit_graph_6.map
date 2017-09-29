@@ -1,3 +1,4 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" href="$structhku_1_1_h5_record.html" title="hku::H5Record" alt="" coords="6,5,135,35"/>
+<area shape="rect" id="node1" href="$classhku_1_1_condition_base.html" title="系统有效条件基类 " alt="" coords="5,5,177,35"/>
+<area shape="rect" id="node2" href="$classhku_1_1_o_p_line_condition.html" title="hku::OPLineCondition" alt="" coords="225,5,413,35"/>
 </map>

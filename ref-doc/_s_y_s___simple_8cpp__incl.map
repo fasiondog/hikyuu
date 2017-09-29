@@ -1,0 +1,32 @@
+<map id="hikyuu/trade_sys/system/crt/SYS_Simple.cpp" name="hikyuu/trade_sys/system/crt/SYS_Simple.cpp">
+<area shape="rect" id="node2" href="$_s_y_s___simple_8h.html" title="SYS_Simple.h" alt="" coords="1480,100,1604,129"/>
+<area shape="rect" id="node3" href="$_system_8h.html" title="../System.h" alt="" coords="1487,177,1598,207"/>
+<area shape="rect" id="node4" href="$_environment_base_8h.html" title="../environment/Environment\lBase.h" alt="" coords="588,332,827,379"/>
+<area shape="rect" id="node32" href="$_condition_base_8h.html" title="../condition/ConditionBase.h" alt="" coords="1103,255,1342,284"/>
+<area shape="rect" id="node38" href="$_system_part_8h.html" title="../trade_sys/system\l/SystemPart.h" alt="" coords="1238,616,1412,663"/>
+<area shape="rect" id="node44" href="$_signal_base_8h.html" title="../signal/SignalBase.h" alt="" coords="1252,341,1436,370"/>
+<area shape="rect" id="node45" href="$_money_manager_base_8h.html" title="../moneymanager/MoneyManager\lBase.h" alt="" coords="1510,332,1793,379"/>
+<area shape="rect" id="node46" href="$_stoploss_base_8h.html" title="../stoploss/StoplossBase.h" alt="" coords="2034,341,2262,370"/>
+<area shape="rect" id="node47" href="$_profit_goal_base_8h.html" title="../profitgoal/ProfitGoal\lBase.h" alt="" coords="1817,332,2009,379"/>
+<area shape="rect" id="node48" href="$_slippage_base_8h.html" title="../slippage/SlippageBase.h" alt="" coords="954,341,1176,370"/>
+<area shape="rect" id="node49" href="$_trade_request_8h.html" title="TradeRequest.h" alt="" coords="2212,255,2358,284"/>
+<area shape="rect" id="node50" href="$_k_data__serialization_8h.html" title="../../serialization\l/KData_serialization.h" alt="" coords="2509,332,2696,379"/>
+<area shape="rect" id="node6" href="$_k_query_8h.html" title="../../KQuery.h" alt="" coords="332,530,457,559"/>
+<area shape="rect" id="node15" href="$_parameter_8h.html" title="../../utilities/Parameter.h" alt="" coords="854,530,1060,559"/>
+<area shape="rect" id="node24" href="$util_8h.html" title="../../utilities/util.h" alt="" coords="46,719,193,749"/>
+<area shape="rect" id="node29" href="$_datetime__serialization_8h.html" title="../../serialization\l/Datetime_serialization.h" alt="" coords="2403,616,2612,663"/>
+<area shape="rect" id="node31" href="$_k_query__serialization_8h.html" title="../../serialization\l/KQuery_serialization.h" alt="" coords="2046,427,2244,473"/>
+<area shape="rect" id="node7" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="158,625,260,654"/>
+<area shape="rect" id="node8" href="$_data_type_8h.html" title="DataType.h" alt="" coords="1268,719,1379,749"/>
+<area shape="rect" id="node12" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1234,805,1413,835"/>
+<area shape="rect" id="node19" href="$config_8h.html" title="../config.h" alt="" coords="2183,719,2283,749"/>
+<area shape="rect" id="node33" href="$_k_d_a_t_a_8h.html" title="../../KData.h" alt="" coords="2320,435,2434,465"/>
+<area shape="rect" id="node35" href="$_trade_manager_8h.html" title="../../trade_manage\l/TradeManager.h" alt="" coords="1858,427,2021,473"/>
+<area shape="rect" id="node34" href="$_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="2542,530,2655,559"/>
+<area shape="rect" id="node37" href="$_trade_record_8h.html" title="TradeRecord.h" alt="" coords="2224,530,2362,559"/>
+<area shape="rect" id="node40" href="$_position_record_8h.html" title="PositionRecord.h" alt="" coords="1994,530,2149,559"/>
+<area shape="rect" id="node41" href="$_borrow_record_8h.html" title="BorrowRecord.h" alt="" coords="1607,530,1758,559"/>
+<area shape="rect" id="node42" href="$_funds_record_8h.html" title="FundsRecord.h" alt="" coords="1589,625,1730,654"/>
+<area shape="rect" id="node43" href="$_loan_record_8h.html" title="LoanRecord.h" alt="" coords="2048,625,2178,654"/>
+<area shape="rect" id="node39" href="$_stock__serialization_8h.html" title="../serialization/Stock\l_serialization.h" alt="" coords="2202,616,2378,663"/>
+</map>

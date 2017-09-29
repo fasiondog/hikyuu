@@ -1,0 +1,4 @@
+<map id="hku::ProfitGoalBase" name="hku::ProfitGoalBase">
+<area shape="rect" id="node2" href="$classhku_1_1_fixed_percent_profit_goal.html" title="hku::FixedPercentProfitGoal" alt="" coords="5,83,244,112"/>
+<area shape="rect" id="node3" href="$classhku_1_1_no_goal_profit_goal.html" title="hku::NoGoalProfitGoal" alt="" coords="268,83,461,112"/>
+</map>

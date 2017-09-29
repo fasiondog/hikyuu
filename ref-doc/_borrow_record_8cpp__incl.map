@@ -1,0 +1,21 @@
+<map id="hikyuu/trade_manage/BorrowRecord.cpp" name="hikyuu/trade_manage/BorrowRecord.cpp">
+<area shape="rect" id="node2" href="$_borrow_record_8h.html" title="BorrowRecord.h" alt="" coords="1820,100,1971,129"/>
+<area shape="rect" id="node3" href="$_data_type_8h.html" title="../DataType.h" alt="" coords="1222,762,1347,791"/>
+<area shape="rect" id="node24" href="$_stock__serialization_8h.html" title="../serialization/Stock\l_serialization.h" alt="" coords="1701,177,1877,224"/>
+<area shape="rect" id="node43" href="$_datetime__serialization_8h.html" title="../serialization/Datetime\l_serialization.h" alt="" coords="1901,177,2103,224"/>
+<area shape="rect" id="node14" href="$_log_8h.html" title="Log.h" alt="" coords="714,857,781,886"/>
+<area shape="rect" id="node18" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="1615,857,1738,886"/>
+<area shape="rect" id="node21" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="2226,857,2405,886"/>
+<area shape="rect" id="node25" href="$config_8h.html" title="../config.h" alt="" coords="1796,281,1896,310"/>
+<area shape="rect" id="node26" href="$_stock_manager_8h.html" title="../StockManager.h" alt="" coords="1363,281,1526,310"/>
+<area shape="rect" id="node39" href="$util_8h.html" title="../utilities/util.h" alt="" coords="2009,762,2139,791"/>
+<area shape="rect" id="node27" href="$_ini_parser_8h.html" title="hikyuu_utils/iniparser\l/IniParser.h" alt="" coords="281,753,465,800"/>
+<area shape="rect" id="node30" href="$_block_8h.html" title="Block.h" alt="" coords="1405,367,1484,396"/>
+<area shape="rect" id="node37" href="$_market_info_8h.html" title="MarketInfo.h" alt="" coords="1213,444,1335,473"/>
+<area shape="rect" id="node38" href="$_stock_type_info_8h.html" title="StockTypeInfo.h" alt="" coords="1493,599,1642,628"/>
+<area shape="rect" id="node31" href="$_stock_map_iterator_8h.html" title="StockMapIterator.h" alt="" coords="1359,444,1531,473"/>
+<area shape="rect" id="node33" href="$_stock_8h.html" title="Stock.h" alt="" coords="1323,521,1404,551"/>
+<area shape="rect" id="node34" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="1391,676,1527,705"/>
+<area shape="rect" id="node35" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="1281,599,1376,628"/>
+<area shape="rect" id="node36" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="1264,676,1367,705"/>
+</map>

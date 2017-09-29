@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/indicator/Indicator.h 文件参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,26 +91,89 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   <div class="summary">
 <a href="#nested-classes">类</a> &#124;
 <a href="#namespaces">命名空间</a> &#124;
+<a href="#define-members">宏定义</a> &#124;
 <a href="#func-members">函数</a>  </div>
   <div class="headertitle">
 <div class="title">Indicator.h 文件参考</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="_k_d_a_t_a_8h_source.html">../KData.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_indicator_imp_8h_source.html">IndicatorImp.h</a>&quot;</code><br/>
+<div class="textblock"><code>#include &quot;<a class="el" href="_indicator_imp_8h_source.html">IndicatorImp.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Indicator.h 的引用(Include)关系图:</div>
 <div class="dyncontent">
 <div class="center"><img src="_indicator_8h__incl.png" border="0" usemap="#hikyuu_2indicator_2_indicator_8h" alt=""/></div>
 <map name="hikyuu_2indicator_2_indicator_8h" id="hikyuu_2indicator_2_indicator_8h">
-<area shape="rect" id="node2" href="_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="568,160,661,189"/><area shape="rect" id="node21" href="_indicator_imp_8h.html" title="IndicatorImp.h" alt="" coords="676,83,804,112"/><area shape="rect" id="node3" href="_stock_8h.html" title="Stock.h" alt="" coords="487,315,561,344"/><area shape="rect" id="node20" href="_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="561,237,668,267"/><area shape="rect" id="node4" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="329,469,452,499"/><area shape="rect" id="node18" href="_k_query_8h.html" title="KQuery.h" alt="" coords="480,392,568,421"/><area shape="rect" id="node5" href="_data_type_8h.html" title="DataType.h" alt="" coords="339,547,441,576"/><area shape="rect" id="node12" href="_null_8h.html" title="utilities/Null.h" alt="" coords="641,624,761,653"/><area shape="rect" id="node15" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="803,624,969,653"/><area shape="rect" id="node19" href="_k_record_8h.html" title="KRecord.h" alt="" coords="477,469,571,499"/><area shape="rect" id="node23" href="_log_8h.html" title="../Log.h" alt="" coords="1038,160,1116,189"/></map>
+<area shape="rect" id="node2" href="_indicator_imp_8h.html" title="IndicatorImp.h" alt="" coords="2932,83,3068,112"/>
+<area shape="rect" id="node3" href="_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="2252,169,2351,198"/>
+<area shape="rect" id="node30" href="_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="2713,564,2903,593"/>
+<area shape="rect" id="node39" href="util_8h.html" title="../utilities/util.h" alt="" coords="2105,564,2236,593"/>
+<area shape="rect" id="node4" href="_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="2147,255,2261,284"/>
+<area shape="rect" id="node5" href="_stock_8h.html" title="Stock.h" alt="" coords="1622,332,1703,361"/>
+<area shape="rect" id="node6" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="1451,487,1587,516"/>
+<area shape="rect" id="node28" href="_k_query_8h.html" title="KQuery.h" alt="" coords="1615,409,1710,439"/>
+<area shape="rect" id="node7" href="_data_type_8h.html" title="DataType.h" alt="" coords="1463,564,1574,593"/>
+<area shape="rect" id="node18" href="_log_8h.html" title="Log.h" alt="" coords="472,650,539,679"/>
+<area shape="rect" id="node22" href="_null_8h.html" title="utilities/Null.h" alt="" coords="209,650,332,679"/>
+<area shape="rect" id="node25" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1776,650,1955,679"/>
+<area shape="rect" id="node29" href="_k_record_8h.html" title="KRecord.h" alt="" coords="1611,487,1714,516"/>
+<area shape="rect" id="node34" href="config_8h.html" title="../config.h" alt="" coords="3034,650,3134,679"/>
+</map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 此图展示该文件直接或间接的被哪些文件引用了:</div>
 <div class="dyncontent">
 <div class="center"><img src="_indicator_8h__dep__incl.png" border="0" usemap="#hikyuu_2indicator_2_indicator_8hdep" alt=""/></div>
 <map name="hikyuu_2indicator_2_indicator_8hdep" id="hikyuu_2indicator_2_indicator_8hdep">
-<area shape="rect" id="node2" href="indicator_2build__in_8h.html" title="hikyuu/indicator/build_in.h" alt="" coords="105,188,319,217"/><area shape="rect" id="node5" href="indicator_2crt_2_k_d_a_t_a_8h.html" title="hikyuu/indicator/crt\l/KDATA.h" alt="" coords="44,83,204,130"/><area shape="rect" id="node6" href="_p_r_i_c_e_l_i_s_t_8h.html" title="hikyuu/indicator/crt\l/PRICELIST.h" alt="" coords="228,83,388,130"/><area shape="rect" id="node7" href="crt_2_m_a_8h.html" title="hikyuu/indicator/crt/MA.h" alt="" coords="412,92,615,121"/><area shape="rect" id="node8" href="_i_k_data_8h.html" title="hikyuu/indicator/imp\l/IKData.h" alt="" coords="639,83,808,130"/><area shape="rect" id="node11" href="imp_2_m_a_8h.html" title="hikyuu/indicator/imp/Ma.h" alt="" coords="833,92,1041,121"/><area shape="rect" id="node14" href="_i_price_list_8h.html" title="hikyuu/indicator/imp\l/IPriceList.h" alt="" coords="1118,83,1287,130"/><area shape="rect" id="node13" href="imp_2_m_a_8cpp.html" title="hikyuu/indicator/imp\l/Ma.cpp" alt="" coords="995,179,1164,226"/><area shape="rect" id="node17" href="_indicator_8cpp.html" title="hikyuu/indicator/Indicator.cpp" alt="" coords="1312,92,1547,121"/><area shape="rect" id="node18" href="_indicator_imp_8cpp.html" title="hikyuu/indicator/Indicator\lImp.cpp" alt="" coords="1571,83,1776,130"/><area shape="rect" id="node19" href="___indicator_8cpp.html" title="hikyuu_python/indicator\l/_Indicator.cpp" alt="" coords="1800,83,1995,130"/><area shape="rect" id="node20" href="___indicator_imp_8cpp.html" title="hikyuu_python/indicator\l/_IndicatorImp.cpp" alt="" coords="2019,83,2213,130"/><area shape="rect" id="node3" href="indicator_2__build__in_8cpp.html" title="hikyuu_python/indicator\l/_build_in.cpp" alt="" coords="5,275,200,322"/><area shape="rect" id="node4" href="indicator__main_8cpp.html" title="hikyuu_python/indicator\l/indicator_main.cpp" alt="" coords="224,275,419,322"/><area shape="rect" id="node9" href="indicator_2crt_2_k_d_a_t_a_8cpp.html" title="hikyuu/indicator/crt\l/KDATA.cpp" alt="" coords="432,179,592,226"/><area shape="rect" id="node10" href="_i_k_data_8cpp.html" title="hikyuu/indicator/imp\l/IKData.cpp" alt="" coords="617,179,785,226"/><area shape="rect" id="node12" href="crt_2_m_a_8cpp.html" title="hikyuu/indicator/crt\l/MA.cpp" alt="" coords="811,179,971,226"/><area shape="rect" id="node15" href="_p_r_i_c_e_l_i_s_t_8cpp.html" title="hikyuu/indicator/crt\l/PRICELIST.cpp" alt="" coords="1189,179,1349,226"/><area shape="rect" id="node16" href="_i_price_list_8cpp.html" title="hikyuu/indicator/imp\l/IPriceList.cpp" alt="" coords="1374,179,1543,226"/></map>
+<area shape="rect" id="node2" href="_operand_node_8h.html" title="hikyuu/indicator/Operand\lNode.h" alt="" coords="897,83,1115,129"/>
+<area shape="rect" id="node4" href="indicator_2build__in_8h.html" title="hikyuu/indicator/build_in.h" alt="" coords="2199,272,2421,301"/>
+<area shape="rect" id="node6" href="_i_n_d___l_o_g_i_c_8h.html" title="hikyuu/indicator/crt\l/IND_LOGIC.h" alt="" coords="559,83,731,129"/>
+<area shape="rect" id="node8" href="indicator_2crt_2_k_d_a_t_a_8h.html" title="hikyuu/indicator/crt\l/KDATA.h" alt="" coords="3601,83,3773,129"/>
+<area shape="rect" id="node14" href="_p_r_i_c_e_l_i_s_t_8h.html" title="hikyuu/indicator/crt\l/PRICELIST.h" alt="" coords="2903,83,3075,129"/>
+<area shape="rect" id="node15" href="_m_a_8h.html" title="hikyuu/indicator/crt/MA.h" alt="" coords="3317,186,3533,215"/>
+<area shape="rect" id="node16" href="crt_2_s_m_a_8h.html" title="hikyuu/indicator/crt\l/SMA.h" alt="" coords="3557,177,3729,224"/>
+<area shape="rect" id="node17" href="crt_2_e_m_a_8h.html" title="hikyuu/indicator/crt\l/EMA.h" alt="" coords="3303,83,3475,129"/>
+<area shape="rect" id="node18" href="crt_2_a_m_a_8h.html" title="hikyuu/indicator/crt\l/AMA.h" alt="" coords="5,177,177,224"/>
+<area shape="rect" id="node19" href="crt_2_a_t_r_8h.html" title="hikyuu/indicator/crt\l/ATR.h" alt="" coords="201,177,373,224"/>
+<area shape="rect" id="node20" href="crt_2_m_a_c_d_8h.html" title="hikyuu/indicator/crt\l/MACD.h" alt="" coords="1147,177,1319,224"/>
+<area shape="rect" id="node21" href="crt_2_v_i_g_o_r_8h.html" title="hikyuu/indicator/crt\l/VIGOR.h" alt="" coords="1343,177,1515,224"/>
+<area shape="rect" id="node22" href="crt_2_s_a_f_t_y_l_o_s_s_8h.html" title="hikyuu/indicator/crt\l/SAFTYLOSS.h" alt="" coords="1539,177,1711,224"/>
+<area shape="rect" id="node23" href="crt_2_d_i_f_f_8h.html" title="hikyuu/indicator/crt\l/DIFF.h" alt="" coords="1735,177,1907,224"/>
+<area shape="rect" id="node24" href="_s_t_d_e_v_8h.html" title="hikyuu/indicator/crt\l/STDEV.h" alt="" coords="1931,177,2103,224"/>
+<area shape="rect" id="node25" href="_r_e_f_8h.html" title="hikyuu/indicator/crt\l/REF.h" alt="" coords="2707,83,2879,129"/>
+<area shape="rect" id="node26" href="_h_h_v_8h.html" title="hikyuu/indicator/crt\l/HHV.h" alt="" coords="2127,177,2299,224"/>
+<area shape="rect" id="node27" href="_l_l_v_8h.html" title="hikyuu/indicator/crt\l/LLV.h" alt="" coords="2323,177,2495,224"/>
+<area shape="rect" id="node28" href="crt_2_w_e_a_v_e_8h.html" title="hikyuu/indicator/crt\l/WEAVE.h" alt="" coords="2519,177,2691,224"/>
+<area shape="rect" id="node29" href="_c_v_a_l_8h.html" title="hikyuu/indicator/crt\l/CVAL.h" alt="" coords="2715,177,2887,224"/>
+<area shape="rect" id="node30" href="imp_2_a_m_a_8h.html" title="hikyuu/indicator/imp\l/Ama.h" alt="" coords="3798,83,3977,129"/>
+<area shape="rect" id="node31" href="imp_2_a_t_r_8h.html" title="hikyuu/indicator/imp\l/Atr.h" alt="" coords="4001,83,4179,129"/>
+<area shape="rect" id="node32" href="imp_2_d_i_f_f_8h.html" title="hikyuu/indicator/imp\l/Diff.h" alt="" coords="4203,83,4382,129"/>
+<area shape="rect" id="node33" href="imp_2_e_m_a_8h.html" title="hikyuu/indicator/imp\l/Ema.h" alt="" coords="4406,83,4585,129"/>
+<area shape="rect" id="node34" href="_high_line_8h.html" title="hikyuu/indicator/imp\l/HighLine.h" alt="" coords="4609,83,4787,129"/>
+<area shape="rect" id="node35" href="_low_line_8h.html" title="hikyuu/indicator/imp\l/LowLine.h" alt="" coords="4811,83,4990,129"/>
+<area shape="rect" id="node36" href="_i_k_data_8h.html" title="hikyuu/indicator/imp\l/IKData.h" alt="" coords="5014,83,5193,129"/>
+<area shape="rect" id="node37" href="_i_price_list_8h.html" title="hikyuu/indicator/imp\l/IPriceList.h" alt="" coords="5217,83,5395,129"/>
+<area shape="rect" id="node38" href="imp_2_s_m_a_8h.html" title="hikyuu/indicator/imp\l/Sma.h" alt="" coords="5419,83,5598,129"/>
+<area shape="rect" id="node39" href="imp_2_m_a_c_d_8h.html" title="hikyuu/indicator/imp\l/Macd.h" alt="" coords="5622,83,5801,129"/>
+<area shape="rect" id="node40" href="_right_shift_8h.html" title="hikyuu/indicator/imp\l/RightShift.h" alt="" coords="5825,83,6003,129"/>
+<area shape="rect" id="node41" href="imp_2_s_a_f_t_y_l_o_s_s_8h.html" title="hikyuu/indicator/imp\l/SaftyLoss.h" alt="" coords="6027,83,6206,129"/>
+<area shape="rect" id="node42" href="_std_deviation_8h.html" title="hikyuu/indicator/imp\l/StdDeviation.h" alt="" coords="6230,83,6409,129"/>
+<area shape="rect" id="node43" href="imp_2_v_i_g_o_r_8h.html" title="hikyuu/indicator/imp\l/Vigor.h" alt="" coords="3099,83,3278,129"/>
+<area shape="rect" id="node44" href="imp_2_w_e_a_v_e_8h.html" title="hikyuu/indicator/imp\l/Weave.h" alt="" coords="6433,83,6611,129"/>
+<area shape="rect" id="node45" href="_constant_value_8h.html" title="hikyuu/indicator/imp\l/ConstantValue.h" alt="" coords="6635,83,6814,129"/>
+<area shape="rect" id="node46" href="_indicator_8cpp.html" title="hikyuu/indicator/Indicator.cpp" alt="" coords="6838,91,7091,121"/>
+<area shape="rect" id="node47" href="_indicator_imp_8cpp.html" title="hikyuu/indicator/Indicator\lImp.cpp" alt="" coords="7115,83,7334,129"/>
+<area shape="rect" id="node48" href="_s_g___flex_8h.html" title="hikyuu/trade_sys/signal\l/crt/SG_Flex.h" alt="" coords="7358,83,7561,129"/>
+<area shape="rect" id="node49" href="_s_g___single_8h.html" title="hikyuu/trade_sys/signal\l/crt/SG_Single.h" alt="" coords="7585,83,7787,129"/>
+<area shape="rect" id="node50" href="_ama_instance_8h.html" title="hikyuu/trade_instance\l/ama_sys/AmaInstance.h" alt="" coords="7812,83,8029,129"/>
+<area shape="rect" id="node3" href="_operand_8h.html" title="hikyuu/indicator/Operand.h" alt="" coords="889,186,1123,215"/>
+<area shape="rect" id="node5" href="_operand_node_8cpp.html" title="hikyuu/indicator/Operand\lNode.cpp" alt="" coords="646,177,865,224"/>
+<area shape="rect" id="node7" href="_i_n_d___l_o_g_i_c_8cpp.html" title="hikyuu/indicator/crt\l/IND_LOGIC.cpp" alt="" coords="449,177,621,224"/>
+<area shape="rect" id="node9" href="_vigor_8cpp.html" title="hikyuu/indicator/imp\l/Vigor.cpp" alt="" coords="3063,177,3242,224"/>
+<area shape="rect" id="node10" href="_two_line_environment_8cpp.html" title="hikyuu/trade_sys/environment\l/imp/TwoLineEnvironment.cpp" alt="" coords="4225,177,4483,224"/>
+<area shape="rect" id="node11" href="_bool_signal_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/BoolSignal.cpp" alt="" coords="4558,177,4761,224"/>
+<area shape="rect" id="node12" href="_cross_gold_signal_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/CrossGoldSignal.cpp" alt="" coords="3753,177,3973,224"/>
+<area shape="rect" id="node13" href="_cross_signal_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/CrossSignal.cpp" alt="" coords="3998,177,4201,224"/>
+</map>
 </div>
 </div>
 <p><a href="_indicator_8h_source.html">浏览源代码.</a></p>
@@ -117,27 +181,116 @@ Indicator.h 的引用(Include)关系图:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 类</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp  <a href="classhku_1_1_indicator.html#details">更多...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp  <a href="classhku_1_1_indicator.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 命名空间</h2></td></tr>
-<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
-<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br/></td></tr>
+<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+宏定义</h2></td></tr>
+<tr class="memitem:adfa9a2b97e907e7af7e4b54989b3c5ba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_indicator_8h.html#adfa9a2b97e907e7af7e4b54989b3c5ba">IND_EQ_THRESHOLD</a>&#160;&#160;&#160;0.000001</td></tr>
+<tr class="memdesc:adfa9a2b97e907e7af7e4b54989b3c5ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断浮点数相等的阈值,两者差值小于此数  <a href="#adfa9a2b97e907e7af7e4b54989b3c5ba">更多...</a><br /></td></tr>
+<tr class="separator:adfa9a2b97e907e7af7e4b54989b3c5ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 函数</h2></td></tr>
-<tr class="memitem:a1a89177a97b70290336afe61e5eff6f5"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a1a89177a97b70290336afe61e5eff6f5">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const Indicator &amp;indicator)</td></tr>
-<tr class="separator:a1a89177a97b70290336afe61e5eff6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga197d09c650708d79c1a6464727f515e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga197d09c650708d79c1a6464727f515e2">hku::operator+</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga197d09c650708d79c1a6464727f515e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相加，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga197d09c650708d79c1a6464727f515e2">更多...</a><br /></td></tr>
+<tr class="separator:ga197d09c650708d79c1a6464727f515e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed347e3f882ea7c9e0d0a9038c593b62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#aed347e3f882ea7c9e0d0a9038c593b62">hku::operator+</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:aed347e3f882ea7c9e0d0a9038c593b62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb8c810d0b74afbbab3279242663b484"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#abb8c810d0b74afbbab3279242663b484">hku::operator+</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:abb8c810d0b74afbbab3279242663b484"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf40b4dac3e9bd98b9ac49632d4d4b1f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaf40b4dac3e9bd98b9ac49632d4d4b1f1">hku::operator-</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaf40b4dac3e9bd98b9ac49632d4d4b1f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相减，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaf40b4dac3e9bd98b9ac49632d4d4b1f1">更多...</a><br /></td></tr>
+<tr class="separator:gaf40b4dac3e9bd98b9ac49632d4d4b1f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade0d63d4cc16289773fdbc874d69aba8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#ade0d63d4cc16289773fdbc874d69aba8">hku::operator-</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:ade0d63d4cc16289773fdbc874d69aba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba36674c139628a86fa04b6cd40f79de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#aba36674c139628a86fa04b6cd40f79de">hku::operator-</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:aba36674c139628a86fa04b6cd40f79de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf90cae0e2c922fd483e568026d37ff24"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaf90cae0e2c922fd483e568026d37ff24">hku::operator*</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaf90cae0e2c922fd483e568026d37ff24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相乘，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaf90cae0e2c922fd483e568026d37ff24">更多...</a><br /></td></tr>
+<tr class="separator:gaf90cae0e2c922fd483e568026d37ff24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70435c6397b695c23a4e1c096a31b53f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a70435c6397b695c23a4e1c096a31b53f">hku::operator*</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:a70435c6397b695c23a4e1c096a31b53f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad263c5c699df9937399eed4ed965eeab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#ad263c5c699df9937399eed4ed965eeab">hku::operator*</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:ad263c5c699df9937399eed4ed965eeab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3f0ea36cf3fdb980c212c08ba152a89c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga3f0ea36cf3fdb980c212c08ba152a89c">hku::operator/</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga3f0ea36cf3fdb980c212c08ba152a89c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相除，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga3f0ea36cf3fdb980c212c08ba152a89c">更多...</a><br /></td></tr>
+<tr class="separator:ga3f0ea36cf3fdb980c212c08ba152a89c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfa059d75c698516f404bd121553a867"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#adfa059d75c698516f404bd121553a867">hku::operator/</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:adfa059d75c698516f404bd121553a867"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf23c5a38292a169888d07d4aab9dbc5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#acf23c5a38292a169888d07d4aab9dbc5">hku::operator/</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:acf23c5a38292a169888d07d4aab9dbc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5c8f988e50bc4ff1a742bbc29de54119"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga5c8f988e50bc4ff1a742bbc29de54119">hku::operator==</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga5c8f988e50bc4ff1a742bbc29de54119"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相等，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga5c8f988e50bc4ff1a742bbc29de54119">更多...</a><br /></td></tr>
+<tr class="separator:ga5c8f988e50bc4ff1a742bbc29de54119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39533956c385520cc3c99ad8e6bd424c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a39533956c385520cc3c99ad8e6bd424c">hku::operator==</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:a39533956c385520cc3c99ad8e6bd424c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa33607f32b983f4c1b9b02dd117912f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#afa33607f32b983f4c1b9b02dd117912f">hku::operator==</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:afa33607f32b983f4c1b9b02dd117912f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5bd8194c0579cf9e5367715d927211ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga5bd8194c0579cf9e5367715d927211ae">hku::operator!=</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga5bd8194c0579cf9e5367715d927211ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例不相等，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga5bd8194c0579cf9e5367715d927211ae">更多...</a><br /></td></tr>
+<tr class="separator:ga5bd8194c0579cf9e5367715d927211ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fc33ed20cab1b9fd1917916e380faed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a2fc33ed20cab1b9fd1917916e380faed">hku::operator!=</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:a2fc33ed20cab1b9fd1917916e380faed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a071225444518a56447d3e0ff15e8d5a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a071225444518a56447d3e0ff15e8d5a5">hku::operator!=</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:a071225444518a56447d3e0ff15e8d5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga22aca36fce28b7b816a33cab2d8f95af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga22aca36fce28b7b816a33cab2d8f95af">hku::operator&gt;</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga22aca36fce28b7b816a33cab2d8f95af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例大于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga22aca36fce28b7b816a33cab2d8f95af">更多...</a><br /></td></tr>
+<tr class="separator:ga22aca36fce28b7b816a33cab2d8f95af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98fd13acf36d3e40ec4b7032ec1d9437"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a98fd13acf36d3e40ec4b7032ec1d9437">hku::operator&gt;</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:a98fd13acf36d3e40ec4b7032ec1d9437"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8cc1cd4645c59c95af0fc919abefbbc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#aa8cc1cd4645c59c95af0fc919abefbbc">hku::operator&gt;</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:aa8cc1cd4645c59c95af0fc919abefbbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga09f521fffcac8df259e53cc7e2a8e324"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga09f521fffcac8df259e53cc7e2a8e324">hku::operator&lt;</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga09f521fffcac8df259e53cc7e2a8e324"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例小于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga09f521fffcac8df259e53cc7e2a8e324">更多...</a><br /></td></tr>
+<tr class="separator:ga09f521fffcac8df259e53cc7e2a8e324"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab77a08b01d87169c147caee71a61ff6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#ab77a08b01d87169c147caee71a61ff6e">hku::operator&lt;</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:ab77a08b01d87169c147caee71a61ff6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab52a1c894050569e9c1ff24f65eba612"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#ab52a1c894050569e9c1ff24f65eba612">hku::operator&lt;</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:ab52a1c894050569e9c1ff24f65eba612"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa48185c3715bc6f1e0db31321f58d74f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaa48185c3715bc6f1e0db31321f58d74f">hku::operator&gt;=</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaa48185c3715bc6f1e0db31321f58d74f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例大于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaa48185c3715bc6f1e0db31321f58d74f">更多...</a><br /></td></tr>
+<tr class="separator:gaa48185c3715bc6f1e0db31321f58d74f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bc1f45b0138125c94c830c04c4dafe3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a7bc1f45b0138125c94c830c04c4dafe3">hku::operator&gt;=</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:a7bc1f45b0138125c94c830c04c4dafe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae7bdc34a8d188df8cd92bca747238ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#aae7bdc34a8d188df8cd92bca747238ba">hku::operator&gt;=</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:aae7bdc34a8d188df8cd92bca747238ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa74c97f1ed51afeb207a8a1f591423af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaa74c97f1ed51afeb207a8a1f591423af">hku::operator&lt;=</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaa74c97f1ed51afeb207a8a1f591423af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例小于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaa74c97f1ed51afeb207a8a1f591423af">更多...</a><br /></td></tr>
+<tr class="separator:gaa74c97f1ed51afeb207a8a1f591423af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d2c4f1150414dd6c290dbb258de8558"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a5d2c4f1150414dd6c290dbb258de8558">hku::operator&lt;=</a> (const Indicator &amp;ind, price_t val)</td></tr>
+<tr class="separator:a5d2c4f1150414dd6c290dbb258de8558"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26a65a27a4226818a0832764e5428d40"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a26a65a27a4226818a0832764e5428d40">hku::operator&lt;=</a> (price_t val, const Indicator &amp;ind)</td></tr>
+<tr class="separator:a26a65a27a4226818a0832764e5428d40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">宏定义说明</h2>
+<a class="anchor" id="adfa9a2b97e907e7af7e4b54989b3c5ba"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IND_EQ_THRESHOLD&#160;&#160;&#160;0.000001</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>判断浮点数相等的阈值,两者差值小于此数 </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

@@ -1,0 +1,117 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/data_driver/kdata/mysql/MySQLKDataDriverImp.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li><li class="navelem"><a class="el" href="dir_706bb32c583fde91b67e81aa3618785e.html">kdata</a></li><li class="navelem"><a class="el" href="dir_72bfbc89e6b3c540a66171eb0a60b62e.html">mysql</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">MySQLKDataDriverImp.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_my_s_q_l_k_data_driver_imp_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * MySQLKDataDriverImp.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2014年9月3日</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef MYSQLKDATADRIVERIMP_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define MYSQLKDATADRIVERIMP_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../../KDataDriverImp.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#if defined(BOOST_WINDOWS)</span></div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">    #include &lt;mysql.h&gt;</span></div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#else</span></div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">    #include &lt;mysql/mysql.h&gt;</span></div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div><div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html">   21</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html">MySQLKDataDriverImp</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_k_data_driver_imp.html">KDataDriverImp</a> {</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="code" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a48fe2b469bf4a93160c38c60b7ecb9b5">MySQLKDataDriverImp</a>(<span class="keyword">const</span> shared_ptr&lt;IniParser&gt;&amp;, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; section);</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a964287b1e76814600f2072f219581dec">~MySQLKDataDriverImp</a>();</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a86d34bce6566680e2a2b0ff23b8ae979">loadKData</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType, <span class="keywordtype">size_t</span> start_ix, <span class="keywordtype">size_t</span> end_ix,</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            <a class="code" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a>* out_buffer);</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#ad4f1da8ec96cf11c8429ab78ae5dd17a">getCount</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market,</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                            <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                            <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType);</div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span></div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a6c0dee99779a2a5a0ec72cc76e22b427">getIndexRangeByDate</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;            <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html">KQuery</a>&amp; query, <span class="keywordtype">size_t</span>&amp; out_start, <span class="keywordtype">size_t</span>&amp; out_end);</div><div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_k_record.html">KRecord</a></div><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#aa550cfe54785635cb81d5cf91f1251f2">getKRecord</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; market, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; code,</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;              <span class="keywordtype">size_t</span> pos, <a class="code" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType);</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    shared_ptr&lt;MYSQL&gt; m_mysql;</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* MYSQLKDATADRIVERIMP_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_my_s_q_l_k_data_driver_imp_html_a964287b1e76814600f2072f219581dec"><div class="ttname"><a href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a964287b1e76814600f2072f219581dec">hku::MySQLKDataDriverImp::~MySQLKDataDriverImp</a></div><div class="ttdeci">virtual ~MySQLKDataDriverImp()</div><div class="ttdef"><b>Definition:</b> MySQLKDataDriverImp.cpp:115</div></div>
+<div class="ttc" id="classhku_1_1_my_s_q_l_k_data_driver_imp_html_a86d34bce6566680e2a2b0ff23b8ae979"><div class="ttname"><a href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a86d34bce6566680e2a2b0ff23b8ae979">hku::MySQLKDataDriverImp::loadKData</a></div><div class="ttdeci">virtual void loadKData(const string &amp;market, const string &amp;code, KQuery::KType kType, size_t start_ix, size_t end_ix, KRecordList *out_buffer)</div><div class="ttdoc">将指定类型的K线数据加载至缓存 </div><div class="ttdef"><b>Definition:</b> MySQLKDataDriverImp.cpp:121</div></div>
+<div class="ttc" id="classhku_1_1_k_record_html"><div class="ttname"><a href="classhku_1_1_k_record.html">hku::KRecord</a></div><div class="ttdoc">K线数据记录 </div><div class="ttdef"><b>Definition:</b> KRecord.h:19</div></div>
+<div class="ttc" id="classhku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">按索引方式查询K线数据条件 </div><div class="ttdef"><b>Definition:</b> KQuery.h:19</div></div>
+<div class="ttc" id="classhku_1_1_my_s_q_l_k_data_driver_imp_html"><div class="ttname"><a href="classhku_1_1_my_s_q_l_k_data_driver_imp.html">hku::MySQLKDataDriverImp</a></div><div class="ttdef"><b>Definition:</b> MySQLKDataDriverImp.h:21</div></div>
+<div class="ttc" id="classhku_1_1_my_s_q_l_k_data_driver_imp_html_a6c0dee99779a2a5a0ec72cc76e22b427"><div class="ttname"><a href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a6c0dee99779a2a5a0ec72cc76e22b427">hku::MySQLKDataDriverImp::getIndexRangeByDate</a></div><div class="ttdeci">virtual bool getIndexRangeByDate(const string &amp;market, const string &amp;code, const KQuery &amp;query, size_t &amp;out_start, size_t &amp;out_end)</div><div class="ttdoc">获取指定日期范围对应的K线记录索引 </div><div class="ttdef"><b>Definition:</b> MySQLKDataDriverImp.cpp:232</div></div>
+<div class="ttc" id="group___stock_manage_html_ga7a898ea401d73f139c33ccb771cb62f0"><div class="ttname"><a href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">hku::KRecordList</a></div><div class="ttdeci">vector&lt; KRecord &gt; KRecordList</div><div class="ttdef"><b>Definition:</b> KRecord.h:53</div></div>
+<div class="ttc" id="classhku_1_1_my_s_q_l_k_data_driver_imp_html_aa550cfe54785635cb81d5cf91f1251f2"><div class="ttname"><a href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#aa550cfe54785635cb81d5cf91f1251f2">hku::MySQLKDataDriverImp::getKRecord</a></div><div class="ttdeci">virtual KRecord getKRecord(const string &amp;market, const string &amp;code, size_t pos, KQuery::KType kType)</div><div class="ttdoc">获取指定的K线记录 </div><div class="ttdef"><b>Definition:</b> MySQLKDataDriverImp.cpp:314</div></div>
+<div class="ttc" id="classhku_1_1_my_s_q_l_k_data_driver_imp_html_ad4f1da8ec96cf11c8429ab78ae5dd17a"><div class="ttname"><a href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#ad4f1da8ec96cf11c8429ab78ae5dd17a">hku::MySQLKDataDriverImp::getCount</a></div><div class="ttdeci">virtual size_t getCount(const string &amp;market, const string &amp;code, KQuery::KType kType)</div><div class="ttdoc">获取指定类型的K线数据量 </div><div class="ttdef"><b>Definition:</b> MySQLKDataDriverImp.cpp:184</div></div>
+<div class="ttc" id="classhku_1_1_k_query_html_a8d0f696de1803fbeb83db0b0a42d4ac5"><div class="ttname"><a href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">hku::KQuery::KType</a></div><div class="ttdeci">KType</div><div class="ttdoc">查询K线类型：日线/周线等 </div><div class="ttdef"><b>Definition:</b> KQuery.h:29</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="ttc" id="classhku_1_1_k_data_driver_imp_html"><div class="ttname"><a href="classhku_1_1_k_data_driver_imp.html">hku::KDataDriverImp</a></div><div class="ttdef"><b>Definition:</b> KDataDriverImp.h:16</div></div>
+<div class="ttc" id="classhku_1_1_my_s_q_l_k_data_driver_imp_html_a48fe2b469bf4a93160c38c60b7ecb9b5"><div class="ttname"><a href="classhku_1_1_my_s_q_l_k_data_driver_imp.html#a48fe2b469bf4a93160c38c60b7ecb9b5">hku::MySQLKDataDriverImp::MySQLKDataDriverImp</a></div><div class="ttdeci">MySQLKDataDriverImp(const shared_ptr&lt; IniParser &gt; &amp;, const string &amp;section)</div><div class="ttdef"><b>Definition:</b> MySQLKDataDriverImp.cpp:24</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

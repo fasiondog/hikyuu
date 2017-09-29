@@ -1,0 +1,5 @@
+<map id="类继承关系图" name="类继承关系图">
+<area shape="rect" id="node1" href="$classhku_1_1_stoploss_base.html" title="止损/止赢策略基类 " alt="" coords="5,32,172,61"/>
+<area shape="rect" id="node2" href="$classhku_1_1_fixed_percent_stoploss.html" title="固定百分比止损策略，即当价格低于买入价格的某一百分比时止损 " alt="" coords="220,5,449,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_indicator_stoploss.html" title="hku::IndicatorStoploss" alt="" coords="236,59,433,88"/>
+</map>

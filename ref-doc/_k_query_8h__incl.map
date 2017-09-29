@@ -1,6 +1,7 @@
 <map id="hikyuu/KQuery.h" name="hikyuu/KQuery.h">
-<area shape="rect" id="node2" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="301,83,395,112"/>
-<area shape="rect" id="node3" href="$_data_type_8h.html" title="DataType.h" alt="" coords="297,160,399,189"/>
-<area shape="rect" id="node10" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="641,237,761,267"/>
-<area shape="rect" id="node13" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,237,952,267"/>
+<area shape="rect" id="node2" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="1154,83,1257,112"/>
+<area shape="rect" id="node3" href="$_data_type_8h.html" title="DataType.h" alt="" coords="1150,160,1261,189"/>
+<area shape="rect" id="node14" href="$_log_8h.html" title="Log.h" alt="" coords="1795,246,1861,275"/>
+<area shape="rect" id="node18" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="2203,246,2325,275"/>
+<area shape="rect" id="node21" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1592,246,1771,275"/>
 </map>

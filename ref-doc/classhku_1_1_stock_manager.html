@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hku::StockManager类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -95,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
 <a href="classhku_1_1_stock_manager-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
-<div class="title">hku::StockManager类 参考<div class="ingroups"><a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
+<div class="title">hku::StockManager类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -106,61 +107,77 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a4147e490deda32fc039ee879f1ef7271"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; <a class="el" href="classhku_1_1_stock.html">Stock</a> &gt;<br class="typebreak"/>
-::const_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a4147e490deda32fc039ee879f1ef7271">iterator</a></td></tr>
-<tr class="separator:a4147e490deda32fc039ee879f1ef7271"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01c19430c21f30db36109c918042cae3"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">const_iterator</a></td></tr>
+<tr class="separator:a01c19430c21f30db36109c918042cae3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
 <tr class="memitem:ade4fecdaccfefc54a799276fb01ecb28"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#ade4fecdaccfefc54a799276fb01ecb28">~StockManager</a> ()</td></tr>
 <tr class="separator:ade4fecdaccfefc54a799276fb01ecb28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace18e18d31b199295a8e3c1ce18edd84"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#ace18e18d31b199295a8e3c1ce18edd84">init</a> (const hku::map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &gt; &amp;config)</td></tr>
-<tr class="memdesc:ace18e18d31b199295a8e3c1ce18edd84"><td class="mdescLeft">&#160;</td><td class="mdescRight">初始化函数，必须在程序入口调用  <a href="#ace18e18d31b199295a8e3c1ce18edd84">更多...</a><br/></td></tr>
-<tr class="separator:ace18e18d31b199295a8e3c1ce18edd84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04e80813a5554ac4b736fe294919e5d9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a04e80813a5554ac4b736fe294919e5d9">init</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;filename)</td></tr>
+<tr class="memdesc:a04e80813a5554ac4b736fe294919e5d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">初始化函数，必须在程序入口调用  <a href="#a04e80813a5554ac4b736fe294919e5d9">更多...</a><br /></td></tr>
+<tr class="separator:a04e80813a5554ac4b736fe294919e5d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71056d69bf42386dcc39d890031a6a81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a71056d69bf42386dcc39d890031a6a81">tmpdir</a> () const </td></tr>
+<tr class="memdesc:a71056d69bf42386dcc39d890031a6a81"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取用于保存零时变量等的临时目录，如为配置则为当前目录 由m_config中的“tmpdir”指定  <a href="#a71056d69bf42386dcc39d890031a6a81">更多...</a><br /></td></tr>
+<tr class="separator:a71056d69bf42386dcc39d890031a6a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2e55c6a4b2430559848b59f208c4789"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#ac2e55c6a4b2430559848b59f208c4789">size</a> () const </td></tr>
-<tr class="memdesc:ac2e55c6a4b2430559848b59f208c4789"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取证券数量  <a href="#ac2e55c6a4b2430559848b59f208c4789">更多...</a><br/></td></tr>
+<tr class="memdesc:ac2e55c6a4b2430559848b59f208c4789"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取证券数量  <a href="#ac2e55c6a4b2430559848b59f208c4789">更多...</a><br /></td></tr>
 <tr class="separator:ac2e55c6a4b2430559848b59f208c4789"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e06581e85ffb5ceb221bec357e0dacf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a6e06581e85ffb5ceb221bec357e0dacf">getStock</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;) const </td></tr>
-<tr class="memdesc:a6e06581e85ffb5ceb221bec357e0dacf"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据"市场简称证券代码"获取对应的证券实例  <a href="#a6e06581e85ffb5ceb221bec357e0dacf">更多...</a><br/></td></tr>
+<tr class="memdesc:a6e06581e85ffb5ceb221bec357e0dacf"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据"市场简称证券代码"获取对应的证券实例  <a href="#a6e06581e85ffb5ceb221bec357e0dacf">更多...</a><br /></td></tr>
 <tr class="separator:a6e06581e85ffb5ceb221bec357e0dacf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06d4cdf760f515cef32edd93ab2542b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a06d4cdf760f515cef32edd93ab2542b6">operator[]</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;) const </td></tr>
-<tr class="memdesc:a06d4cdf760f515cef32edd93ab2542b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">同 getStock  <a href="#a06d4cdf760f515cef32edd93ab2542b6">更多...</a><br/></td></tr>
+<tr class="memdesc:a06d4cdf760f515cef32edd93ab2542b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">同 getStock  <a href="#a06d4cdf760f515cef32edd93ab2542b6">更多...</a><br /></td></tr>
 <tr class="separator:a06d4cdf760f515cef32edd93ab2542b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a312741a4c8c2ff7eaa8e796d566e1ba2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_market_info.html">MarketInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a312741a4c8c2ff7eaa8e796d566e1ba2">getMarketInfo</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market) const </td></tr>
-<tr class="memdesc:a312741a4c8c2ff7eaa8e796d566e1ba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取相应的市场信息  <a href="#a312741a4c8c2ff7eaa8e796d566e1ba2">更多...</a><br/></td></tr>
+<tr class="memdesc:a312741a4c8c2ff7eaa8e796d566e1ba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取相应的市场信息  <a href="#a312741a4c8c2ff7eaa8e796d566e1ba2">更多...</a><br /></td></tr>
 <tr class="separator:a312741a4c8c2ff7eaa8e796d566e1ba2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af88a29f4fd3402c3c3c673b2068b31c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#af88a29f4fd3402c3c3c673b2068b31c3">getStockTypeInfo</a> (<a class="el" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a> type) const </td></tr>
-<tr class="memdesc:af88a29f4fd3402c3c3c673b2068b31c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取相应的证券类型详细信息  <a href="#af88a29f4fd3402c3c3c673b2068b31c3">更多...</a><br/></td></tr>
+<tr class="memdesc:af88a29f4fd3402c3c3c673b2068b31c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取相应的证券类型详细信息  <a href="#af88a29f4fd3402c3c3c673b2068b31c3">更多...</a><br /></td></tr>
 <tr class="separator:af88a29f4fd3402c3c3c673b2068b31c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d5893e9724436d9beb0823585a52ac8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#aaaa8ae2fca2c512d5051ff06110e6fdb">MarketList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a8d5893e9724436d9beb0823585a52ac8">getAllMarket</a> () const </td></tr>
-<tr class="memdesc:a8d5893e9724436d9beb0823585a52ac8"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取市场简称列表  <a href="#a8d5893e9724436d9beb0823585a52ac8">更多...</a><br/></td></tr>
+<tr class="memdesc:a8d5893e9724436d9beb0823585a52ac8"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取市场简称列表  <a href="#a8d5893e9724436d9beb0823585a52ac8">更多...</a><br /></td></tr>
 <tr class="separator:a8d5893e9724436d9beb0823585a52ac8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4151633c4417218e217657e800156a03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a4151633c4417218e217657e800156a03">getAllStock</a> () const </td></tr>
-<tr class="memdesc:a4151633c4417218e217657e800156a03"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有Stock列表  <a href="#a4151633c4417218e217657e800156a03">更多...</a><br/></td></tr>
-<tr class="separator:a4151633c4417218e217657e800156a03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a517477bcae39446ac7f51cfe1ef97ad3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a517477bcae39446ac7f51cfe1ef97ad3">init_addStock</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock)</td></tr>
-<tr class="memdesc:a517477bcae39446ac7f51cfe1ef97ad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">初始化时，添加Stock，仅供BaseInfoDriver子类使用  <a href="#a517477bcae39446ac7f51cfe1ef97ad3">更多...</a><br/></td></tr>
-<tr class="separator:a517477bcae39446ac7f51cfe1ef97ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2910504eb11ab08cfa7ca184d6f8e55a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_manager.html#a4147e490deda32fc039ee879f1ef7271">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a2910504eb11ab08cfa7ca184d6f8e55a">begin</a> ()</td></tr>
-<tr class="separator:a2910504eb11ab08cfa7ca184d6f8e55a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87ecbd5abfb98c80cea062a89d006f5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_manager.html#a4147e490deda32fc039ee879f1ef7271">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a87ecbd5abfb98c80cea062a89d006f5e">end</a> ()</td></tr>
-<tr class="separator:a87ecbd5abfb98c80cea062a89d006f5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ea5abe84687c43f8826a4074120bbff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_block.html">Block</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a6ea5abe84687c43f8826a4074120bbff">getBlock</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;category, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name)</td></tr>
+<tr class="memdesc:a6ea5abe84687c43f8826a4074120bbff"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取预定义的板块  <a href="#a6ea5abe84687c43f8826a4074120bbff">更多...</a><br /></td></tr>
+<tr class="separator:a6ea5abe84687c43f8826a4074120bbff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9c198efc2e754a920012bdbf5cb92dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___stock_manage.html#ga0cf7525722ab3b82d15c3891838c087e">BlockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#ab9c198efc2e754a920012bdbf5cb92dc">getBlockList</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;)</td></tr>
+<tr class="memdesc:ab9c198efc2e754a920012bdbf5cb92dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定分类的板块列表  <a href="#ab9c198efc2e754a920012bdbf5cb92dc">更多...</a><br /></td></tr>
+<tr class="separator:ab9c198efc2e754a920012bdbf5cb92dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7312f93d0566bb1617a606b34c22a09c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___stock_manage.html#ga0cf7525722ab3b82d15c3891838c087e">BlockList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a7312f93d0566bb1617a606b34c22a09c">getBlockList</a> ()</td></tr>
+<tr class="memdesc:a7312f93d0566bb1617a606b34c22a09c"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有板块  <a href="#a7312f93d0566bb1617a606b34c22a09c">更多...</a><br /></td></tr>
+<tr class="separator:a7312f93d0566bb1617a606b34c22a09c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7b19ecaf004f099ededec8e0947bd64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#ad7b19ecaf004f099ededec8e0947bd64">getTradingCalendar</a> (const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market=&quot;SH&quot;)</td></tr>
+<tr class="separator:ad7b19ecaf004f099ededec8e0947bd64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b2d3d6030dd4d952c59be9c39553f0c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a8b2d3d6030dd4d952c59be9c39553f0c">addStock</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock)</td></tr>
+<tr class="memdesc:a8b2d3d6030dd4d952c59be9c39553f0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">初始化时，添加Stock，仅供BaseInfoDriver子类使用  <a href="#a8b2d3d6030dd4d952c59be9c39553f0c">更多...</a><br /></td></tr>
+<tr class="separator:a8b2d3d6030dd4d952c59be9c39553f0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a250f0839de141365942be6de5d7818a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a250f0839de141365942be6de5d7818a8">addTempCsvStock</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;day_filename, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;min_filename, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> tick=0.01, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> tickValue=0.01, int precision=2, size_t minTradeNumber=1, size_t maxTradeNumber=1000000)</td></tr>
+<tr class="memdesc:a250f0839de141365942be6de5d7818a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试  <a href="#a250f0839de141365942be6de5d7818a8">更多...</a><br /></td></tr>
+<tr class="separator:a250f0839de141365942be6de5d7818a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c238e687c1d3690c9ebe71ed4dc3482"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a2c238e687c1d3690c9ebe71ed4dc3482">removeTempCsvStock</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code)</td></tr>
+<tr class="memdesc:a2c238e687c1d3690c9ebe71ed4dc3482"><td class="mdescLeft">&#160;</td><td class="mdescRight">移除增加的临时Stock  <a href="#a2c238e687c1d3690c9ebe71ed4dc3482">更多...</a><br /></td></tr>
+<tr class="separator:a2c238e687c1d3690c9ebe71ed4dc3482"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf428060543fe46773fd033c5c435f1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#abf428060543fe46773fd033c5c435f1f">begin</a> () const </td></tr>
+<tr class="separator:abf428060543fe46773fd033c5c435f1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a613aca57d7e260b741c0cf5833f2424f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a613aca57d7e260b741c0cf5833f2424f">end</a> () const </td></tr>
+<tr class="separator:a613aca57d7e260b741c0cf5833f2424f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 静态 Public 成员函数</h2></td></tr>
 <tr class="memitem:a07163104596a488b733edc3606b652a4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classhku_1_1_stock_manager.html">StockManager</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_manager.html#a07163104596a488b733edc3606b652a4">instance</a> ()</td></tr>
-<tr class="memdesc:a07163104596a488b733edc3606b652a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取StockManager单例实例  <a href="#a07163104596a488b733edc3606b652a4">更多...</a><br/></td></tr>
+<tr class="memdesc:a07163104596a488b733edc3606b652a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取StockManager单例实例  <a href="#a07163104596a488b733edc3606b652a4">更多...</a><br /></td></tr>
 <tr class="separator:a07163104596a488b733edc3606b652a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p>证券信息统一管理类 </p>
 </div><h2 class="groupheader">成员类型定义说明</h2>
-<a class="anchor" id="a4147e490deda32fc039ee879f1ef7271"></a>
+<a class="anchor" id="a01c19430c21f30db36109c918042cae3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef vector&lt;<a class="el" href="classhku_1_1_stock.html">Stock</a>&gt;::const_iterator <a class="el" href="classhku_1_1_stock_manager.html#a4147e490deda32fc039ee879f1ef7271">hku::StockManager::iterator</a></td>
+          <td class="memname">typedef <a class="el" href="classhku_1_1_stock_map_iterator.html">StockMapIterator</a> <a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">hku::StockManager::const_iterator</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -192,7 +209,110 @@ Public 成员函数</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a2910504eb11ab08cfa7ca184d6f8e55a"></a>
+<a class="anchor" id="a8b2d3d6030dd4d952c59be9c39553f0c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::StockManager::addStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
+          <td class="paramname"><em>stock</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>初始化时，添加Stock，仅供BaseInfoDriver子类使用 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stock</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true 成功 | false 失败 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a250f0839de141365942be6de5d7818a8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::StockManager::addTempCsvStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>day_filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>min_filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>tick</em> = <code>0.01</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>tickValue</em> = <code>0.01</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>precision</em> = <code>2</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>minTradeNumber</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>maxTradeNumber</em> = <code>1000000</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试 </p>
+<p>增加的临时Stock，其market为“TMP” </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">code</td><td>自行编号的证券代码，不能和已有的Stock相同，否则将返回Null&lt;Stock&gt; </td></tr>
+    <tr><td class="paramname">day_filename</td><td>日线CSV文件名 </td></tr>
+    <tr><td class="paramname">min_filename</td><td>分钟线CSV文件名 </td></tr>
+    <tr><td class="paramname">tick</td><td>最小跳动量，默认0.01 </td></tr>
+    <tr><td class="paramname">tickValue</td><td>最小跳动量价值，默认0.01 </td></tr>
+    <tr><td class="paramname">precision</td><td>价格精度，默认2 </td></tr>
+    <tr><td class="paramname">minTradeNumber</td><td>单笔最小交易量，默认1 </td></tr>
+    <tr><td class="paramname">maxTradeNumber</td><td>单笔最大交易量，默认1000000 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abf428060543fe46773fd033c5c435f1f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -200,10 +320,10 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_stock_manager.html#a4147e490deda32fc039ee879f1ef7271">iterator</a> hku::StockManager::begin </td>
+          <td class="memname"><a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">const_iterator</a> hku::StockManager::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -215,7 +335,7 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a87ecbd5abfb98c80cea062a89d006f5e"></a>
+<a class="anchor" id="a613aca57d7e260b741c0cf5833f2424f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -223,10 +343,10 @@ Public 成员函数</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_stock_manager.html#a4147e490deda32fc039ee879f1ef7271">iterator</a> hku::StockManager::end </td>
+          <td class="memname"><a class="el" href="classhku_1_1_stock_manager.html#a01c19430c21f30db36109c918042cae3">const_iterator</a> hku::StockManager::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -255,28 +375,82 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4151633c4417218e217657e800156a03"></a>
+<a class="anchor" id="a6ea5abe84687c43f8826a4074120bbff"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___stock_manage.html#ga4a4df6bef18cec4791cca9bd27a4e973">StockList</a> hku::StockManager::getAllStock </td>
+          <td class="memname"><a class="el" href="classhku_1_1_block.html">Block</a> hku::StockManager::getBlock </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>category</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>获取所有Stock列表 </p>
+<p>获取预定义的板块 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">category</td><td>板块分类 </td></tr>
+    <tr><td class="paramname">name</td><td>板块名称 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>板块，如找不到返回空 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab9c198efc2e754a920012bdbf5cb92dc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___stock_manage.html#ga0cf7525722ab3b82d15c3891838c087e">BlockList</a> hku::StockManager::getBlockList </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>category</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取指定分类的板块列表 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">category</td><td>板块分类 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>板块列表 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7312f93d0566bb1617a606b34c22a09c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___stock_manage.html#ga0cf7525722ab3b82d15c3891838c087e">BlockList</a> hku::StockManager::getBlockList </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取所有板块 </p>
+<dl class="section return"><dt>返回</dt><dd>板块列表 </dd></dl>
 
 </div>
 </div>
@@ -355,15 +529,41 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ace18e18d31b199295a8e3c1ce18edd84"></a>
+<a class="anchor" id="ad7b19ecaf004f099ededec8e0947bd64"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">DatetimeList</a> hku::StockManager::getTradingCalendar </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td>
+          <td class="paramname"><em>query</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>market</em> = <code>&quot;SH&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a04e80813a5554ac4b736fe294919e5d9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void hku::StockManager::init </td>
           <td>(</td>
-          <td class="paramtype">const hku::map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>config</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -372,39 +572,10 @@ Public 成员函数</h2></td></tr>
 <p>初始化函数，必须在程序入口调用 </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">config</td><td>配置信息 <pre>
-logger - 可选, 日志配置文件名称
-database - 必须，Stock基础信息所在数据库
-kdata - 必须，K线数据配置信息
-</pre> </td></tr>
+    <tr><td class="paramname">filename</td><td>配置ini文件名 </td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a class="anchor" id="a517477bcae39446ac7f51cfe1ef97ad3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool hku::StockManager::init_addStock </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
-          <td class="paramname"><em>stock</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>初始化时，添加Stock，仅供BaseInfoDriver子类使用 </p>
-<dl class="params"><dt>参数</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">stock</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>返回</dt><dd>true 成功 | false 失败 </dd></dl>
 
 </div>
 </div>
@@ -456,7 +627,31 @@ kdata - 必须，K线数据配置信息
 </div><div class="memdoc">
 
 <p>同 getStock </p>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="classhku_1_1_stock_manager.html#a6e06581e85ffb5ceb221bec357e0dacf" title="根据&quot;市场简称证券代码&quot;获取对应的证券实例">getStock</a> </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classhku_1_1_stock_manager.html#a6e06581e85ffb5ceb221bec357e0dacf" title="根据&quot;市场简称证券代码&quot;获取对应的证券实例 ">getStock</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2c238e687c1d3690c9ebe71ed4dc3482"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::StockManager::removeTempCsvStock </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>code</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>移除增加的临时Stock </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">code</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -485,6 +680,23 @@ kdata - 必须，K线数据配置信息
 
 </div>
 </div>
+<a class="anchor" id="a71056d69bf42386dcc39d890031a6a81"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::StockManager::tmpdir </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取用于保存零时变量等的临时目录，如为配置则为当前目录 由m_config中的“tmpdir”指定 </p>
+
+</div>
+</div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/<a class="el" href="_stock_manager_8h_source.html">StockManager.h</a></li>
 <li>hikyuu/<a class="el" href="_stock_manager_8cpp.html">StockManager.cpp</a></li>
@@ -495,7 +707,7 @@ kdata - 必须，K线数据配置信息
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

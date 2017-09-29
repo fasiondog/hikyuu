@@ -1,0 +1,28 @@
+<map id="hikyuu/trade_sys/stoploss/StoplossBase.h" name="hikyuu/trade_sys/stoploss/StoplossBase.h">
+<area shape="rect" id="node2" href="$_s_t___fixed_percent_8h.html" title="hikyuu/trade_sys/stoploss\l/crt/ST_FixedPercent.h" alt="" coords="5,100,231,147"/>
+<area shape="rect" id="node5" href="$_s_t___indicator_8h.html" title="hikyuu/trade_sys/stoploss\l/crt/ST_Indicator.h" alt="" coords="255,100,480,147"/>
+<area shape="rect" id="node6" href="$_indicator_stoploss_8h.html" title="hikyuu/trade_sys/stoploss\l/imp/IndicatorStoploss.h" alt="" coords="504,100,729,147"/>
+<area shape="rect" id="node11" href="$_system_8h.html" title="hikyuu/trade_sys/system\l/System.h" alt="" coords="1369,100,1585,147"/>
+<area shape="rect" id="node25" href="$_fixed_percent_stoploss_8h.html" title="hikyuu/trade_sys/stoploss\l/imp/FixedPercentStoploss.h" alt="" coords="754,100,997,147"/>
+<area shape="rect" id="node27" href="$_stoploss_base_8cpp.html" title="hikyuu/trade_sys/stoploss\l/StoplossBase.cpp" alt="" coords="1609,100,1835,147"/>
+<area shape="rect" id="node3" href="$trade__sys_2stoploss_2build__in_8h.html" title="hikyuu/trade_sys/stoploss\l/build_in.h" alt="" coords="56,289,281,336"/>
+<area shape="rect" id="node4" href="$trade__sys_2all_8h.html" title="hikyuu/trade_sys/all.h" alt="" coords="617,393,806,422"/>
+<area shape="rect" id="node7" href="$_s_t___saftyloss_8h.html" title="hikyuu/trade_sys/stoploss\l/crt/ST_Saftyloss.h" alt="" coords="207,195,432,241"/>
+<area shape="rect" id="node9" href="$trade__sys_2stoploss_2export_8cpp.html" title="hikyuu/trade_sys/stoploss\l/export.cpp" alt="" coords="711,195,936,241"/>
+<area shape="rect" id="node10" href="$_indicator_stoploss_8cpp.html" title="hikyuu/trade_sys/stoploss\l/imp/IndicatorStoploss.cpp" alt="" coords="456,195,687,241"/>
+<area shape="rect" id="node8" href="$_s_t___saftyloss_8cpp.html" title="hikyuu/trade_sys/stoploss\l/crt/ST_Saftyloss.cpp" alt="" coords="305,289,531,336"/>
+<area shape="rect" id="node12" href="$_s_y_s___simple_8h.html" title="hikyuu/trade_sys/system\l/crt/SYS_Simple.h" alt="" coords="1247,195,1463,241"/>
+<area shape="rect" id="node16" href="$_allocate_money_base_8h.html" title="hikyuu/trade_sys/portfolio\l/AllocateMoneyBase.h" alt="" coords="1487,195,1711,241"/>
+<area shape="rect" id="node21" href="$_selector_base_8h.html" title="hikyuu/trade_sys/selector\l/SelectorBase.h" alt="" coords="1735,195,1957,241"/>
+<area shape="rect" id="node24" href="$_system_8cpp.html" title="hikyuu/trade_sys/system\l/System.cpp" alt="" coords="1981,195,2197,241"/>
+<area shape="rect" id="node13" href="$trade__sys_2system_2build__in_8h.html" title="hikyuu/trade_sys/system\l/build_in.h" alt="" coords="1146,289,1362,336"/>
+<area shape="rect" id="node14" href="$_o_p_line_condition_8cpp.html" title="hikyuu/trade_sys/condition\l/imp/OPLineCondition.cpp" alt="" coords="651,289,881,336"/>
+<area shape="rect" id="node15" href="$_s_y_s___simple_8cpp.html" title="hikyuu/trade_sys/system\l/crt/SYS_Simple.cpp" alt="" coords="906,289,1122,336"/>
+<area shape="rect" id="node17" href="$_allocate_money_base_8cpp.html" title="hikyuu/trade_sys/portfolio\l/AllocateMoneyBase.cpp" alt="" coords="1386,289,1610,336"/>
+<area shape="rect" id="node18" href="$trade__sys_2portfolio_2build__in_8h.html" title="hikyuu/trade_sys/portfolio\l/build_in.h" alt="" coords="1535,384,1759,431"/>
+<area shape="rect" id="node19" href="$_portfolio_8h.html" title="hikyuu/trade_sys/portfolio\l/Portfolio.h" alt="" coords="1685,289,1909,336"/>
+<area shape="rect" id="node20" href="$_portfolio_8cpp.html" title="hikyuu/trade_sys/portfolio\l/Portfolio.cpp" alt="" coords="1783,384,2007,431"/>
+<area shape="rect" id="node22" href="$trade__sys_2selector_2build__in_8h.html" title="hikyuu/trade_sys/selector\l/build_in.h" alt="" coords="1933,289,2154,336"/>
+<area shape="rect" id="node23" href="$_selector_base_8cpp.html" title="hikyuu/trade_sys/selector\l/SelectorBase.cpp" alt="" coords="2178,289,2399,336"/>
+<area shape="rect" id="node26" href="$_fixed_percent_stoploss_8cpp.html" title="hikyuu/trade_sys/stoploss\l/imp/FixedPercentStoploss.cpp" alt="" coords="960,195,1223,241"/>
+</map>

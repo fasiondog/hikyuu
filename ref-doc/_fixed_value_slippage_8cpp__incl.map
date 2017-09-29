@@ -1,0 +1,17 @@
+<map id="hikyuu/trade_sys/slippage/imp/FixedValueSlippage.cpp" name="hikyuu/trade_sys/slippage/imp/FixedValueSlippage.cpp">
+<area shape="rect" id="node2" href="$_fixed_value_slippage_8h.html" title="hikyuu/trade_sys/slippage\l/imp/FixedValueSlippage.h" alt="" coords="1889,100,2111,147"/>
+<area shape="rect" id="node3" href="$_slippage_base_8h.html" title="../SlippageBase.h" alt="" coords="1923,195,2077,224"/>
+<area shape="rect" id="node4" href="$_k_d_a_t_a_8h.html" title="../../KData.h" alt="" coords="1641,281,1754,310"/>
+<area shape="rect" id="node31" href="$_parameter_8h.html" title="../../utilities/Parameter.h" alt="" coords="2456,676,2661,705"/>
+<area shape="rect" id="node40" href="$util_8h.html" title="../../utilities/util.h" alt="" coords="1817,676,1964,705"/>
+<area shape="rect" id="node5" href="$_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="1542,367,1655,396"/>
+<area shape="rect" id="node6" href="$_stock_8h.html" title="Stock.h" alt="" coords="1129,444,1210,473"/>
+<area shape="rect" id="node7" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="957,599,1093,628"/>
+<area shape="rect" id="node29" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="1122,521,1217,551"/>
+<area shape="rect" id="node8" href="$_data_type_8h.html" title="DataType.h" alt="" coords="970,676,1081,705"/>
+<area shape="rect" id="node19" href="$_log_8h.html" title="Log.h" alt="" coords="915,762,981,791"/>
+<area shape="rect" id="node23" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="768,762,891,791"/>
+<area shape="rect" id="node26" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1456,762,1635,791"/>
+<area shape="rect" id="node30" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="1118,599,1221,628"/>
+<area shape="rect" id="node35" href="$config_8h.html" title="../config.h" alt="" coords="2134,762,2234,791"/>
+</map>

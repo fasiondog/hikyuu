@@ -1,9 +1,19 @@
 <map id="hikyuu/trade_manage/PositionRecord.h" name="hikyuu/trade_manage/PositionRecord.h">
-<area shape="rect" id="node2" href="$_data_type_8h.html" title="../DataType.h" alt="" coords="289,333,407,363"/>
-<area shape="rect" id="node15" href="$_stock_8h.html" title="../Stock.h" alt="" coords="303,101,393,131"/>
-<area shape="rect" id="node9" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="641,411,761,440"/>
-<area shape="rect" id="node12" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,411,952,440"/>
-<area shape="rect" id="node16" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="287,256,409,285"/>
-<area shape="rect" id="node17" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="411,179,499,208"/>
-<area shape="rect" id="node18" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="434,256,528,285"/>
+<area shape="rect" id="node2" href="$_stock_manager_8h.html" title="../StockManager.h" alt="" coords="1379,203,1542,233"/>
+<area shape="rect" id="node36" href="$_stock__serialization_8h.html" title="../serialization/Stock\l_serialization.h" alt="" coords="1617,100,1793,147"/>
+<area shape="rect" id="node3" href="$_ini_parser_8h.html" title="hikyuu_utils/iniparser\l/IniParser.h" alt="" coords="281,676,465,723"/>
+<area shape="rect" id="node10" href="$_block_8h.html" title="Block.h" alt="" coords="1297,289,1376,319"/>
+<area shape="rect" id="node34" href="$_market_info_8h.html" title="MarketInfo.h" alt="" coords="1400,367,1521,396"/>
+<area shape="rect" id="node35" href="$_stock_type_info_8h.html" title="StockTypeInfo.h" alt="" coords="1494,521,1643,551"/>
+<area shape="rect" id="node11" href="$_stock_map_iterator_8h.html" title="StockMapIterator.h" alt="" coords="1204,367,1376,396"/>
+<area shape="rect" id="node13" href="$_stock_8h.html" title="Stock.h" alt="" coords="1273,444,1355,473"/>
+<area shape="rect" id="node14" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="1155,599,1291,628"/>
+<area shape="rect" id="node32" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="1291,521,1385,551"/>
+<area shape="rect" id="node15" href="$_data_type_8h.html" title="DataType.h" alt="" coords="1357,685,1468,714"/>
+<area shape="rect" id="node23" href="$_log_8h.html" title="Log.h" alt="" coords="1759,779,1826,809"/>
+<area shape="rect" id="node26" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="1850,779,1973,809"/>
+<area shape="rect" id="node29" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1997,779,2175,809"/>
+<area shape="rect" id="node33" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="1316,599,1419,628"/>
+<area shape="rect" id="node37" href="$config_8h.html" title="../config.h" alt="" coords="1567,203,1667,233"/>
+<area shape="rect" id="node38" href="$util_8h.html" title="../utilities/util.h" alt="" coords="2211,685,2342,714"/>
 </map>

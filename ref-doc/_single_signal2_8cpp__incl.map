@@ -1,0 +1,29 @@
+<map id="hikyuu/trade_sys/signal/imp/SingleSignal2.cpp" name="hikyuu/trade_sys/signal/imp/SingleSignal2.cpp">
+<area shape="rect" id="node2" href="$indicator_2crt_2_k_d_a_t_a_8h.html" title="../../../indicator\l/crt/KDATA.h" alt="" coords="255,195,389,241"/>
+<area shape="rect" id="node26" href="$crt_2_d_i_f_f_8h.html" title="../../../indicator\l/crt/DIFF.h" alt="" coords="357,289,492,336"/>
+<area shape="rect" id="node27" href="$_s_t_d_e_v_8h.html" title="../../../indicator\l/crt/STDEV.h" alt="" coords="465,195,600,241"/>
+<area shape="rect" id="node28" href="$_h_h_v_8h.html" title="../../../indicator\l/crt/HHV.h" alt="" coords="739,289,873,336"/>
+<area shape="rect" id="node29" href="$_l_l_v_8h.html" title="../../../indicator\l/crt/LLV.h" alt="" coords="45,100,180,147"/>
+<area shape="rect" id="node30" href="$_r_e_f_8h.html" title="../../../indicator\l/crt/REF.h" alt="" coords="204,100,339,147"/>
+<area shape="rect" id="node31" href="$_single_signal2_8h.html" title="SingleSignal2.h" alt="" coords="623,109,760,138"/>
+<area shape="rect" id="node3" href="$_indicator_8h.html" title="../Indicator.h" alt="" coords="391,384,512,413"/>
+<area shape="rect" id="node4" href="$_indicator_imp_8h.html" title="IndicatorImp.h" alt="" coords="489,470,625,499"/>
+<area shape="rect" id="node5" href="$_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="13,565,111,594"/>
+<area shape="rect" id="node7" href="$_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="936,565,1127,594"/>
+<area shape="rect" id="node20" href="$util_8h.html" title="../utilities/util.h" alt="" coords="781,565,911,594"/>
+<area shape="rect" id="node6" href="$_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="5,659,119,689"/>
+<area shape="rect" id="node15" href="$config_8h.html" title="../config.h" alt="" coords="1900,754,2000,783"/>
+<area shape="rect" id="node32" href="$_operand_8h.html" title="../../../indicator\l/Operand.h" alt="" coords="624,195,759,241"/>
+<area shape="rect" id="node34" href="$_signal_base_8h.html" title="../SignalBase.h" alt="" coords="817,384,952,413"/>
+<area shape="rect" id="node33" href="$_operand_node_8h.html" title="OperandNode.h" alt="" coords="567,298,714,327"/>
+<area shape="rect" id="node36" href="$_trade_manager_8h.html" title="../../trade_manage\l/TradeManager.h" alt="" coords="1625,461,1787,508"/>
+<area shape="rect" id="node39" href="$_datetime__serialization_8h.html" title="../serialization/Datetime\l_serialization.h" alt="" coords="2217,651,2419,697"/>
+<area shape="rect" id="node38" href="$_trade_record_8h.html" title="TradeRecord.h" alt="" coords="1723,565,1860,594"/>
+<area shape="rect" id="node42" href="$_position_record_8h.html" title="PositionRecord.h" alt="" coords="1543,565,1698,594"/>
+<area shape="rect" id="node43" href="$_borrow_record_8h.html" title="BorrowRecord.h" alt="" coords="2336,565,2487,594"/>
+<area shape="rect" id="node45" href="$_funds_record_8h.html" title="FundsRecord.h" alt="" coords="1705,659,1846,689"/>
+<area shape="rect" id="node46" href="$_loan_record_8h.html" title="LoanRecord.h" alt="" coords="2062,659,2193,689"/>
+<area shape="rect" id="node47" href="$_order_broker_base_8h.html" title="OrderBrokerBase.h" alt="" coords="2563,565,2737,594"/>
+<area shape="rect" id="node48" href="$_t_c___zero_8h.html" title="crt/TC_Zero.h" alt="" coords="1389,565,1519,594"/>
+<area shape="rect" id="node40" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="2229,754,2407,783"/>
+</map>

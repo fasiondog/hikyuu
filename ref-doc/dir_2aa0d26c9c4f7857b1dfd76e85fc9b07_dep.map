@@ -1,16 +1,29 @@
 <map id="hikyuu" name="hikyuu">
-<area shape="rect" id="node8" href="dir_699ca82e967419bb3b9d6415a2e15ac3.html" title="hikyuu_utils" alt="" coords="523,123,629,171"/>
-<area shape="rect" id="edge4-headlabel" href="dir_000000_000005.html" title="1" alt="" coords="534,96,543,113"/>
-<area shape="rect" id="node3" href="dir_fff272255cc4ac108b83fef2dd1e2700.html" title="datetime" alt="" coords="416,123,499,171"/>
-<area shape="rect" id="edge5-headlabel" href="dir_000000_000004.html" title="1" alt="" coords="462,96,472,113"/>
-<area shape="rect" id="node2" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html" title="data_driver" alt="" coords="289,123,391,171"/>
-<area shape="rect" id="node7" href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html" title="utilities" alt="" coords="235,219,307,267"/>
-<area shape="rect" id="edge2-headlabel" href="dir_000001_000014.html" title="1" alt="" coords="301,200,310,218"/>
-<area shape="rect" id="edge3-headlabel" href="dir_000004_000014.html" title="1" alt="" coords="322,214,332,231"/>
-<area shape="rect" id="node4" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html" title="indicator" alt="" coords="173,27,256,75"/>
-<area shape="rect" id="node5" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html" title="trade_manage" alt="" coords="141,123,264,171"/>
-<area shape="rect" id="edge6-headlabel" href="dir_000007_000014.html" title="3" alt="" coords="246,190,255,208"/>
-<area shape="rect" id="node6" href="dir_194593d72069437dd60c2304994b6f20.html" title="trade_sys" alt="" coords="27,123,116,171"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000012_000014.html" title="1" alt="" coords="217,200,226,218"/>
-<area shape="rect" id="clust1" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html" alt="" coords="16,16,509,277"/>
+<area shape="rect" id="node3" href="dir_fff272255cc4ac108b83fef2dd1e2700.html" title="datetime" alt="" coords="81,507,170,555"/>
+<area shape="rect" id="edge14-headlabel" href="dir_000000_000011.html" title="2" alt="" coords="125,479,136,496"/>
+<area shape="rect" id="node2" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html" title="data_driver" alt="" coords="248,507,357,555"/>
+<area shape="rect" id="node9" href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html" title="utilities" alt="" coords="123,603,197,651"/>
+<area shape="rect" id="edge7-headlabel" href="dir_000001_000048.html" title="4" alt="" coords="209,591,220,608"/>
+<area shape="rect" id="node10" href="dir_699ca82e967419bb3b9d6415a2e15ac3.html" title="hikyuu_utils" alt="" coords="379,603,491,651"/>
+<area shape="rect" id="edge8-headlabel" href="dir_000001_000012.html" title="3" alt="" coords="387,576,398,594"/>
+<area shape="rect" id="edge13-headlabel" href="dir_000011_000048.html" title="1" alt="" coords="148,574,158,591"/>
+<area shape="rect" id="node4" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html" title="indicator" alt="" coords="121,123,210,171"/>
+<area shape="rect" id="node8" href="dir_194593d72069437dd60c2304994b6f20.html" title="trade_sys" alt="" coords="93,219,192,267"/>
+<area shape="rect" id="edge9-headlabel" href="dir_000013_000015.html" title="1" alt="" coords="146,193,157,211"/>
+<area shape="rect" id="edge10-headlabel" href="dir_000013_000048.html" title="2" alt="" coords="186,583,197,600"/>
+<area shape="rect" id="node5" href="dir_3e155c5f2da30aa26fa83ad0482e6b65.html" title="serialization" alt="" coords="179,411,291,459"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000028_000011.html" title="1" alt="" coords="166,493,177,510"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000028_000048.html" title="3" alt="" coords="178,580,189,597"/>
+<area shape="rect" id="node6" href="dir_c50e64642bb925fb085f5f79b79fe61a.html" title="trade_instance" alt="" coords="51,27,187,75"/>
+<area shape="rect" id="edge12-headlabel" href="dir_000029_000013.html" title="2" alt="" coords="148,94,159,111"/>
+<area shape="rect" id="edge11-headlabel" href="dir_000029_000015.html" title="1" alt="" coords="121,190,132,207"/>
+<area shape="rect" id="node7" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html" title="trade_manage" alt="" coords="76,315,209,363"/>
+<area shape="rect" id="edge15-headlabel" href="dir_000014_000028.html" title="5" alt="" coords="200,383,211,400"/>
+<area shape="rect" id="edge16-headlabel" href="dir_000014_000015.html" title="2" alt="" coords="138,277,149,294"/>
+<area shape="rect" id="edge17-headlabel" href="dir_000014_000048.html" title="7" alt="" coords="106,582,117,599"/>
+<area shape="rect" id="edge5-headlabel" href="dir_000015_000013.html" title="33" alt="" coords="146,179,167,196"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000015_000028.html" title="6" alt="" coords="240,384,251,401"/>
+<area shape="rect" id="edge6-headlabel" href="dir_000015_000014.html" title="10" alt="" coords="131,287,153,305"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000015_000048.html" title="11" alt="" coords="98,590,120,607"/>
+<area shape="rect" id="clust1" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html" alt="" coords="16,16,368,661"/>
 </map>

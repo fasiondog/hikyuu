@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hku::StockWeight类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,11 +91,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">类</a> &#124;
 <a href="#pub-methods">Public 成员函数</a> &#124;
 <a href="classhku_1_1_stock_weight-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
-<div class="title">hku::StockWeight类 参考<div class="ingroups"><a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
+<div class="title">hku::StockWeight类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a> &raquo; <a class="el" href="group___stock_manage.html">StockManage 证券管理</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -103,47 +103,38 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <p><code>#include &lt;<a class="el" href="_stock_weight_8h_source.html">StockWeight.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-类</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhku_1_1_stock_weight_1_1_data.html">Data</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
 <tr class="memitem:ac0d52be6a298749421f9a98e783a97de"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#ac0d52be6a298749421f9a98e783a97de">StockWeight</a> ()</td></tr>
-<tr class="memdesc:ac0d52be6a298749421f9a98e783a97de"><td class="mdescLeft">&#160;</td><td class="mdescRight">默认构造函数，返回Null&lt;StockWeight&gt;()  <a href="#ac0d52be6a298749421f9a98e783a97de">更多...</a><br/></td></tr>
+<tr class="memdesc:ac0d52be6a298749421f9a98e783a97de"><td class="mdescLeft">&#160;</td><td class="mdescRight">默认构造函数，返回Null&lt;StockWeight&gt;()  <a href="#ac0d52be6a298749421f9a98e783a97de">更多...</a><br /></td></tr>
 <tr class="separator:ac0d52be6a298749421f9a98e783a97de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a419c778d7817f7f88875729f53eed050"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a419c778d7817f7f88875729f53eed050">StockWeight</a> (const <a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a> &amp;)</td></tr>
-<tr class="separator:a419c778d7817f7f88875729f53eed050"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ca65c575e97d3f53fea1173f18fea4b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a4ca65c575e97d3f53fea1173f18fea4b">StockWeight</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a>)</td></tr>
 <tr class="separator:a4ca65c575e97d3f53fea1173f18fea4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81b9141151895dae0cb6107adb16618d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a81b9141151895dae0cb6107adb16618d">StockWeight</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a7e6d5d8d002c913f1d08ae8f9b4cb955">countAsGift</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a2416b8c669c3d1924cd8edf1905988cd">countForSell</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a4e4bfbe7829ec580e12bc9ebc78f83f3">priceForSell</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a002618249590494252ea634e5e7a86f7">bonus</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a008a28578d46df354456de52d1a270dd">increasement</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#a726068ac395a663b931946039c2454ab">totalCount</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_stock_weight.html#ad3edbe7bf2c4e670c9bf17e0e66874db">freeCount</a>)</td></tr>
 <tr class="separator:a81b9141151895dae0cb6107adb16618d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d3648f29543cd21b7dce87ee7de7b8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a9d3648f29543cd21b7dce87ee7de7b8d">operator=</a> (const <a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a> &amp;)</td></tr>
-<tr class="separator:a9d3648f29543cd21b7dce87ee7de7b8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa64e52e93eb65fe2ef271dfdfb827cc2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a> () const </td></tr>
-<tr class="memdesc:aa64e52e93eb65fe2ef271dfdfb827cc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">权息日期  <a href="#aa64e52e93eb65fe2ef271dfdfb827cc2">更多...</a><br/></td></tr>
+<tr class="memdesc:aa64e52e93eb65fe2ef271dfdfb827cc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">权息日期  <a href="#aa64e52e93eb65fe2ef271dfdfb827cc2">更多...</a><br /></td></tr>
 <tr class="separator:aa64e52e93eb65fe2ef271dfdfb827cc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e6d5d8d002c913f1d08ae8f9b4cb955"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a7e6d5d8d002c913f1d08ae8f9b4cb955">countAsGift</a> () const </td></tr>
-<tr class="memdesc:a7e6d5d8d002c913f1d08ae8f9b4cb955"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股送X股  <a href="#a7e6d5d8d002c913f1d08ae8f9b4cb955">更多...</a><br/></td></tr>
+<tr class="memdesc:a7e6d5d8d002c913f1d08ae8f9b4cb955"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股送X股  <a href="#a7e6d5d8d002c913f1d08ae8f9b4cb955">更多...</a><br /></td></tr>
 <tr class="separator:a7e6d5d8d002c913f1d08ae8f9b4cb955"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2416b8c669c3d1924cd8edf1905988cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a2416b8c669c3d1924cd8edf1905988cd">countForSell</a> () const </td></tr>
-<tr class="memdesc:a2416b8c669c3d1924cd8edf1905988cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股配X股  <a href="#a2416b8c669c3d1924cd8edf1905988cd">更多...</a><br/></td></tr>
+<tr class="memdesc:a2416b8c669c3d1924cd8edf1905988cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股配X股  <a href="#a2416b8c669c3d1924cd8edf1905988cd">更多...</a><br /></td></tr>
 <tr class="separator:a2416b8c669c3d1924cd8edf1905988cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e4bfbe7829ec580e12bc9ebc78f83f3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a4e4bfbe7829ec580e12bc9ebc78f83f3">priceForSell</a> () const </td></tr>
-<tr class="memdesc:a4e4bfbe7829ec580e12bc9ebc78f83f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">配股价  <a href="#a4e4bfbe7829ec580e12bc9ebc78f83f3">更多...</a><br/></td></tr>
+<tr class="memdesc:a4e4bfbe7829ec580e12bc9ebc78f83f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">配股价  <a href="#a4e4bfbe7829ec580e12bc9ebc78f83f3">更多...</a><br /></td></tr>
 <tr class="separator:a4e4bfbe7829ec580e12bc9ebc78f83f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a002618249590494252ea634e5e7a86f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a002618249590494252ea634e5e7a86f7">bonus</a> () const </td></tr>
-<tr class="memdesc:a002618249590494252ea634e5e7a86f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股红利  <a href="#a002618249590494252ea634e5e7a86f7">更多...</a><br/></td></tr>
+<tr class="memdesc:a002618249590494252ea634e5e7a86f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股红利  <a href="#a002618249590494252ea634e5e7a86f7">更多...</a><br /></td></tr>
 <tr class="separator:a002618249590494252ea634e5e7a86f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a008a28578d46df354456de52d1a270dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a008a28578d46df354456de52d1a270dd">increasement</a> () const </td></tr>
-<tr class="memdesc:a008a28578d46df354456de52d1a270dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股转增X股  <a href="#a008a28578d46df354456de52d1a270dd">更多...</a><br/></td></tr>
+<tr class="memdesc:a008a28578d46df354456de52d1a270dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">每10股转增X股  <a href="#a008a28578d46df354456de52d1a270dd">更多...</a><br /></td></tr>
 <tr class="separator:a008a28578d46df354456de52d1a270dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a726068ac395a663b931946039c2454ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#a726068ac395a663b931946039c2454ab">totalCount</a> () const </td></tr>
-<tr class="memdesc:a726068ac395a663b931946039c2454ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">总股本（万股）  <a href="#a726068ac395a663b931946039c2454ab">更多...</a><br/></td></tr>
+<tr class="memdesc:a726068ac395a663b931946039c2454ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">总股本（万股）  <a href="#a726068ac395a663b931946039c2454ab">更多...</a><br /></td></tr>
 <tr class="separator:a726068ac395a663b931946039c2454ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3edbe7bf2c4e670c9bf17e0e66874db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_stock_weight.html#ad3edbe7bf2c4e670c9bf17e0e66874db">freeCount</a> () const </td></tr>
-<tr class="memdesc:ad3edbe7bf2c4e670c9bf17e0e66874db"><td class="mdescLeft">&#160;</td><td class="mdescRight">流通股（万股）  <a href="#ad3edbe7bf2c4e670c9bf17e0e66874db">更多...</a><br/></td></tr>
+<tr class="memdesc:ad3edbe7bf2c4e670c9bf17e0e66874db"><td class="mdescLeft">&#160;</td><td class="mdescRight">流通股（万股）  <a href="#ad3edbe7bf2c4e670c9bf17e0e66874db">更多...</a><br /></td></tr>
 <tr class="separator:ad3edbe7bf2c4e670c9bf17e0e66874db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
@@ -152,9 +143,6 @@ Public 成员函数</h2></td></tr>
 <a class="anchor" id="ac0d52be6a298749421f9a98e783a97de"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">hku::StockWeight::StockWeight </td>
@@ -163,38 +151,9 @@ Public 成员函数</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>默认构造函数，返回Null&lt;StockWeight&gt;() </p>
-
-</div>
-</div>
-<a class="anchor" id="a419c778d7817f7f88875729f53eed050"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">hku::StockWeight::StockWeight </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a> &amp;&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -427,30 +386,6 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9d3648f29543cd21b7dce87ee7de7b8d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a> &amp; hku::StockWeight::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhku_1_1_stock_weight.html">StockWeight</a> &amp;&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a4e4bfbe7829ec580e12bc9ebc78f83f3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -511,7 +446,7 @@ Public 成员函数</h2></td></tr>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

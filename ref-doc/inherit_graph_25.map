@@ -1,3 +1,11 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" href="$classhku_1_1_position_record.html" title="持仓记录" alt="" coords="5,5,171,35"/>
+<area shape="rect" id="node1" href="$classhku_1_1_money_manager_base.html" title="资金管理基类 " alt="" coords="5,192,223,221"/>
+<area shape="rect" id="node2" href="$classhku_1_1_fixed_capital_money_manager.html" title="hku::FixedCapitalMoneyManager" alt="" coords="275,5,546,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_fixed_count_money_manager.html" title="固定交易数量资金管理策略 " alt="" coords="277,59,544,88"/>
+<area shape="rect" id="node4" href="$classhku_1_1_fixed_percent_money_manager.html" title="hku::FixedPercentMoneyManager" alt="" coords="271,112,551,141"/>
+<area shape="rect" id="node5" href="$classhku_1_1_fixed_ratio_money_manager.html" title="hku::FixedRatioMoneyManager" alt="" coords="281,165,540,195"/>
+<area shape="rect" id="node6" href="$classhku_1_1_fixed_risk_money_manager.html" title="hku::FixedRiskMoneyManager" alt="" coords="285,219,537,248"/>
+<area shape="rect" id="node7" href="$classhku_1_1_fixed_units_money_manager.html" title="hku::FixedUnitsMoneyManager" alt="" coords="281,272,541,301"/>
+<area shape="rect" id="node8" href="$classhku_1_1_not_money_manager.html" title="hku::NotMoneyManager" alt="" coords="307,325,514,355"/>
+<area shape="rect" id="node9" href="$classhku_1_1_williams_fixed_risk_money_manager.html" title="hku::WilliamsFixedRiskMoney\lManager" alt="" coords="287,379,534,426"/>
 </map>

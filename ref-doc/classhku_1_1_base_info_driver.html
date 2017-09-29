@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hku::BaseInfoDriver类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,6 +91,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public 类型</a> &#124;
 <a href="#pub-methods">Public 成员函数</a> &#124;
 <a href="#pro-attribs">Protected 属性</a> &#124;
 <a href="classhku_1_1_base_info_driver-members.html">所有成员列表</a>  </div>
@@ -107,34 +109,68 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <div class="dyncontent">
 <div class="center"><img src="classhku_1_1_base_info_driver__inherit__graph.png" border="0" usemap="#hku_1_1_base_info_driver_inherit__map" alt="Inheritance graph"/></div>
 <map name="hku_1_1_base_info_driver_inherit__map" id="hku_1_1_base_info_driver_inherit__map">
-<area shape="rect" id="node2" href="classhku_1_1_s_q_lite_base_info_driver.html" title="hku::SQLiteBaseInfoDriver" alt="" coords="5,83,216,112"/></map>
+<area shape="rect" id="node2" href="classhku_1_1_my_s_q_l_base_info_driver.html" title="hku::MySQLBaseInfoDriver" alt="" coords="5,83,236,112"/>
+<area shape="rect" id="node3" href="classhku_1_1_s_q_lite_base_info_driver.html" title="hku::SQLiteBaseInfoDriver" alt="" coords="261,83,487,112"/>
+</map>
 <center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:ade9abc81f0a29002311633d810d087f8"><td class="memItemLeft" align="right" valign="top">typedef unordered_map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#ade9abc81f0a29002311633d810d087f8">MarketInfoMap</a></td></tr>
+<tr class="separator:ade9abc81f0a29002311633d810d087f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a625a4b538b460d2a796da414247441a6"><td class="memItemLeft" align="right" valign="top">typedef unordered_map&lt; <a class="el" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a>, <a class="el" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a625a4b538b460d2a796da414247441a6">StockTypeInfoMap</a></td></tr>
+<tr class="separator:a625a4b538b460d2a796da414247441a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:acc15a9521a67087e2dfd0afd53f515a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#acc15a9521a67087e2dfd0afd53f515a7">BaseInfoDriver</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;connection)</td></tr>
-<tr class="separator:acc15a9521a67087e2dfd0afd53f515a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dc07793938c44ee782d89aae6949afe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a3dc07793938c44ee782d89aae6949afe">BaseInfoDriver</a> (const shared_ptr&lt; <a class="el" href="classhku_1_1_ini_parser.html">IniParser</a> &gt; &amp;config)</td></tr>
+<tr class="separator:a3dc07793938c44ee782d89aae6949afe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3acc43e0f396568b2a0ebeb648ba0af6"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a3acc43e0f396568b2a0ebeb648ba0af6">~BaseInfoDriver</a> ()</td></tr>
 <tr class="separator:a3acc43e0f396568b2a0ebeb648ba0af6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99c61645cc9f7622ea5be3618616bbff"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a99c61645cc9f7622ea5be3618616bbff">loadMarketInfo</a> (map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &gt; &amp;out)=0</td></tr>
-<tr class="memdesc:a99c61645cc9f7622ea5be3618616bbff"><td class="mdescLeft">&#160;</td><td class="mdescRight">加载市场信息  <a href="#a99c61645cc9f7622ea5be3618616bbff">更多...</a><br/></td></tr>
-<tr class="separator:a99c61645cc9f7622ea5be3618616bbff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c62cb723fdb7fbe9f5763dfb2f6e88e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a1c62cb723fdb7fbe9f5763dfb2f6e88e">loadStockTypeInfo</a> (map&lt; <a class="el" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a>, <a class="el" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a> &gt; &amp;out)=0</td></tr>
-<tr class="memdesc:a1c62cb723fdb7fbe9f5763dfb2f6e88e"><td class="mdescLeft">&#160;</td><td class="mdescRight">加载证券类型信息  <a href="#a1c62cb723fdb7fbe9f5763dfb2f6e88e">更多...</a><br/></td></tr>
-<tr class="separator:a1c62cb723fdb7fbe9f5763dfb2f6e88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ca9a25cf89100281a06c3d0e18c9cfd"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a6ca9a25cf89100281a06c3d0e18c9cfd">loadStock</a> (map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_stock.html">Stock</a> &gt; &amp;out)=0</td></tr>
-<tr class="memdesc:a6ca9a25cf89100281a06c3d0e18c9cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">加载股票信息  <a href="#a6ca9a25cf89100281a06c3d0e18c9cfd">更多...</a><br/></td></tr>
-<tr class="separator:a6ca9a25cf89100281a06c3d0e18c9cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab9a6c861e44c0e0f06fe5b1a5830cea"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#aab9a6c861e44c0e0f06fe5b1a5830cea">loadMarketInfo</a> (<a class="el" href="classhku_1_1_base_info_driver.html#ade9abc81f0a29002311633d810d087f8">MarketInfoMap</a> &amp;out)=0</td></tr>
+<tr class="memdesc:aab9a6c861e44c0e0f06fe5b1a5830cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">加载市场信息  <a href="#aab9a6c861e44c0e0f06fe5b1a5830cea">更多...</a><br /></td></tr>
+<tr class="separator:aab9a6c861e44c0e0f06fe5b1a5830cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cd058826f35241c4df4219ab588b0d8"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a4cd058826f35241c4df4219ab588b0d8">loadStockTypeInfo</a> (<a class="el" href="classhku_1_1_base_info_driver.html#a625a4b538b460d2a796da414247441a6">StockTypeInfoMap</a> &amp;out)=0</td></tr>
+<tr class="memdesc:a4cd058826f35241c4df4219ab588b0d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">加载证券类型信息  <a href="#a4cd058826f35241c4df4219ab588b0d8">更多...</a><br /></td></tr>
+<tr class="separator:a4cd058826f35241c4df4219ab588b0d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e669bd55d09f53d5834f354b768acff"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a7e669bd55d09f53d5834f354b768acff">loadStock</a> ()=0</td></tr>
+<tr class="memdesc:a7e669bd55d09f53d5834f354b768acff"><td class="mdescLeft">&#160;</td><td class="mdescRight">加载股票信息  <a href="#a7e669bd55d09f53d5834f354b768acff">更多...</a><br /></td></tr>
+<tr class="separator:a7e669bd55d09f53d5834f354b768acff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected 属性</h2></td></tr>
-<tr class="memitem:afcafbd91bacd139a2780657e250cb028"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#afcafbd91bacd139a2780657e250cb028">m_connection</a></td></tr>
-<tr class="separator:afcafbd91bacd139a2780657e250cb028"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6249dbe8f3c4c9a85f4f24cd2829e81a"><td class="memItemLeft" align="right" valign="top">shared_ptr&lt; <a class="el" href="classhku_1_1_ini_parser.html">IniParser</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_base_info_driver.html#a6249dbe8f3c4c9a85f4f24cd2829e81a">m_config</a></td></tr>
+<tr class="separator:a6249dbe8f3c4c9a85f4f24cd2829e81a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p>基本信息数据获取驱动基类 </p>
-</div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="acc15a9521a67087e2dfd0afd53f515a7"></a>
+</div><h2 class="groupheader">成员类型定义说明</h2>
+<a class="anchor" id="ade9abc81f0a29002311633d810d087f8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef unordered_map&lt;<a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a>&gt; <a class="el" href="classhku_1_1_base_info_driver.html#ade9abc81f0a29002311633d810d087f8">hku::BaseInfoDriver::MarketInfoMap</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a625a4b538b460d2a796da414247441a6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef unordered_map&lt;<a class="el" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a>, <a class="el" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a>&gt; <a class="el" href="classhku_1_1_base_info_driver.html#a625a4b538b460d2a796da414247441a6">hku::BaseInfoDriver::StockTypeInfoMap</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">构造及析构函数说明</h2>
+<a class="anchor" id="a3dc07793938c44ee782d89aae6949afe"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -144,8 +180,8 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">hku::BaseInfoDriver::BaseInfoDriver </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>connection</em></td><td>)</td>
+          <td class="paramtype">const shared_ptr&lt; <a class="el" href="classhku_1_1_ini_parser.html">IniParser</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>config</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -182,7 +218,7 @@ Protected 属性</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a99c61645cc9f7622ea5be3618616bbff"></a>
+<a class="anchor" id="aab9a6c861e44c0e0f06fe5b1a5830cea"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -192,7 +228,7 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual bool hku::BaseInfoDriver::loadMarketInfo </td>
           <td>(</td>
-          <td class="paramtype">map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_market_info.html">MarketInfo</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_base_info_driver.html#ade9abc81f0a29002311633d810d087f8">MarketInfoMap</a> &amp;&#160;</td>
           <td class="paramname"><em>out</em></td><td>)</td>
           <td></td>
         </tr>
@@ -213,11 +249,11 @@ Protected 属性</h2></td></tr>
 </dl>
 <dl class="section return"><dt>返回</dt><dd>true 成功 | false 失败 </dd></dl>
 
-<p>在 <a class="el" href="classhku_1_1_s_q_lite_base_info_driver.html#abac1985d2230216eca279f7cee224e96">hku::SQLiteBaseInfoDriver</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_my_s_q_l_base_info_driver.html#aa0a16a8b37d535b87237aeda3c192e3b">hku::MySQLBaseInfoDriver</a> , 以及 <a class="el" href="classhku_1_1_s_q_lite_base_info_driver.html#abda50aa43292460f2984f2e0c1f50fba">hku::SQLiteBaseInfoDriver</a> 内被实现.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6ca9a25cf89100281a06c3d0e18c9cfd"></a>
+<a class="anchor" id="a7e669bd55d09f53d5834f354b768acff"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -227,8 +263,7 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual bool hku::BaseInfoDriver::loadStock </td>
           <td>(</td>
-          <td class="paramtype">map&lt; <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>, <a class="el" href="classhku_1_1_stock.html">Stock</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>out</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -240,19 +275,13 @@ Protected 属性</h2></td></tr>
 </div><div class="memdoc">
 
 <p>加载股票信息 </p>
-<dl class="params"><dt>参数</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">out</td><td>map&lt;市场标识+证券代码, 证券对象&gt; </td></tr>
-  </table>
-  </dd>
-</dl>
 <dl class="section return"><dt>返回</dt><dd>true 成功 | false 失败 </dd></dl>
 
-<p>在 <a class="el" href="classhku_1_1_s_q_lite_base_info_driver.html#a72ff4f201d61b81ae8861106aa148ab8">hku::SQLiteBaseInfoDriver</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_my_s_q_l_base_info_driver.html#abee4691d78e69717c2df8ef0c028b4cc">hku::MySQLBaseInfoDriver</a> , 以及 <a class="el" href="classhku_1_1_s_q_lite_base_info_driver.html#a2c1a1a5f38b6fcf40830651e26415b62">hku::SQLiteBaseInfoDriver</a> 内被实现.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1c62cb723fdb7fbe9f5763dfb2f6e88e"></a>
+<a class="anchor" id="a4cd058826f35241c4df4219ab588b0d8"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -262,7 +291,7 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">virtual bool hku::BaseInfoDriver::loadStockTypeInfo </td>
           <td>(</td>
-          <td class="paramtype">map&lt; <a class="el" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku_uint32</a>, <a class="el" href="classhku_1_1_stock_type_info.html">StockTypeInfo</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classhku_1_1_base_info_driver.html#a625a4b538b460d2a796da414247441a6">StockTypeInfoMap</a> &amp;&#160;</td>
           <td class="paramname"><em>out</em></td><td>)</td>
           <td></td>
         </tr>
@@ -283,12 +312,12 @@ Protected 属性</h2></td></tr>
 </dl>
 <dl class="section return"><dt>返回</dt><dd>true 成功 | false 失败 </dd></dl>
 
-<p>在 <a class="el" href="classhku_1_1_s_q_lite_base_info_driver.html#a558401b25fa85910287ba4e5bff67132">hku::SQLiteBaseInfoDriver</a> 内被实现.</p>
+<p>在 <a class="el" href="classhku_1_1_my_s_q_l_base_info_driver.html#a590637e9cd6009ee59ed8a10ba8df6fd">hku::MySQLBaseInfoDriver</a> , 以及 <a class="el" href="classhku_1_1_s_q_lite_base_info_driver.html#a70132e32cb80981c1020334b893cf35d">hku::SQLiteBaseInfoDriver</a> 内被实现.</p>
 
 </div>
 </div>
 <h2 class="groupheader">类成员变量说明</h2>
-<a class="anchor" id="afcafbd91bacd139a2780657e250cb028"></a>
+<a class="anchor" id="a6249dbe8f3c4c9a85f4f24cd2829e81a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -296,7 +325,7 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::BaseInfoDriver::m_connection</td>
+          <td class="memname">shared_ptr&lt;<a class="el" href="classhku_1_1_ini_parser.html">IniParser</a>&gt; hku::BaseInfoDriver::m_config</td>
         </tr>
       </table>
   </td>
@@ -317,7 +346,7 @@ Protected 属性</h2></td></tr>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

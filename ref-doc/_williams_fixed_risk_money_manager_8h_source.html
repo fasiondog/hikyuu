@@ -1,0 +1,111 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/trade_sys/moneymanager/imp/WilliamsFixedRiskMoneyManager.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a class="el" href="dir_15bc3ef00d53ef552fe2a855f2f51407.html">moneymanager</a></li><li class="navelem"><a class="el" href="dir_91137c95a23c3ce4ad8cc236088f98e7.html">imp</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">WilliamsFixedRiskMoneyManager.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_williams_fixed_risk_money_manager_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * WilliamsFixedRiskMoneyManager.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2016年5月3日</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: Administrator</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef TRADE_SYS_MONEYMANAGER_IMP_WILLIAMSFIXEDRISKMONEYMANAGER_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define TRADE_SYS_MONEYMANAGER_IMP_WILLIAMSFIXEDRISKMONEYMANAGER_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../MoneyManagerBase.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classhku_1_1_williams_fixed_risk_money_manager.html">   15</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_williams_fixed_risk_money_manager.html">WilliamsFixedRiskMoneyManager</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_money_manager_base.html">MoneyManagerBase</a> {</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <a class="code" href="_money_manager_base_8h.html#a4be51422ebbab4099ef317cde7d1833d">MONEY_MANAGER_IMP</a>(<a class="code" href="classhku_1_1_williams_fixed_risk_money_manager.html">WilliamsFixedRiskMoneyManager</a>)</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <a class="code" href="group___money_manager.html#gafc3cba294ec42fd043f4cfa76f20f2ca">MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <a class="code" href="classhku_1_1_williams_fixed_risk_money_manager.html#a68ef7a35e99d9ca2b086b7c42374c913">WilliamsFixedRiskMoneyManager</a>();</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_williams_fixed_risk_money_manager.html#adb1fc4caa4bdcac75c798c5987940cb4">~WilliamsFixedRiskMoneyManager</a>();</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;};</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* TRADE_SYS_MONEYMANAGER_IMP_WILLIAMSFIXEDRISKMONEYMANAGER_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_williams_fixed_risk_money_manager_html_a68ef7a35e99d9ca2b086b7c42374c913"><div class="ttname"><a href="classhku_1_1_williams_fixed_risk_money_manager.html#a68ef7a35e99d9ca2b086b7c42374c913">hku::WilliamsFixedRiskMoneyManager::WilliamsFixedRiskMoneyManager</a></div><div class="ttdeci">WilliamsFixedRiskMoneyManager()</div><div class="ttdef"><b>Definition:</b> WilliamsFixedRiskMoneyManager.cpp:12</div></div>
+<div class="ttc" id="_money_manager_base_8h_html_a4be51422ebbab4099ef317cde7d1833d"><div class="ttname"><a href="_money_manager_base_8h.html#a4be51422ebbab4099ef317cde7d1833d">MONEY_MANAGER_IMP</a></div><div class="ttdeci">#define MONEY_MANAGER_IMP(classname)</div><div class="ttdef"><b>Definition:</b> MoneyManagerBase.h:208</div></div>
+<div class="ttc" id="classhku_1_1_money_manager_base_html"><div class="ttname"><a href="classhku_1_1_money_manager_base.html">hku::MoneyManagerBase</a></div><div class="ttdoc">资金管理基类 </div><div class="ttdef"><b>Definition:</b> MoneyManagerBase.h:26</div></div>
+<div class="ttc" id="classhku_1_1_williams_fixed_risk_money_manager_html"><div class="ttname"><a href="classhku_1_1_williams_fixed_risk_money_manager.html">hku::WilliamsFixedRiskMoneyManager</a></div><div class="ttdef"><b>Definition:</b> WilliamsFixedRiskMoneyManager.h:15</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="ttc" id="group___money_manager_html_gafc3cba294ec42fd043f4cfa76f20f2ca"><div class="ttname"><a href="group___money_manager.html#gafc3cba294ec42fd043f4cfa76f20f2ca">MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION</a></div><div class="ttdeci">#define MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="ttdoc">对于没有私有变量的继承子类，可直接使用该宏定义序列化 </div><div class="ttdef"><b>Definition:</b> MoneyManagerBase.h:189</div></div>
+<div class="ttc" id="classhku_1_1_williams_fixed_risk_money_manager_html_adb1fc4caa4bdcac75c798c5987940cb4"><div class="ttname"><a href="classhku_1_1_williams_fixed_risk_money_manager.html#adb1fc4caa4bdcac75c798c5987940cb4">hku::WilliamsFixedRiskMoneyManager::~WilliamsFixedRiskMoneyManager</a></div><div class="ttdeci">virtual ~WilliamsFixedRiskMoneyManager()</div><div class="ttdef"><b>Definition:</b> WilliamsFixedRiskMoneyManager.cpp:18</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

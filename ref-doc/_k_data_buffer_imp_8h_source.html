@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/KDataBufferImp.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -91,49 +92,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <div class="title">KDataBufferImp.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="_k_data_buffer_imp_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * KDataBufferImp.h</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-2-4</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef KDATABUFFERIMP_H_</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define KDATABUFFERIMP_H_</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_k_data_imp_8h.html">KDataImp.h</a>&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span>hku {</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="code" href="classhku_1_1_k_data_buffer_imp.html">   15</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_k_data_buffer_imp.html">KDataBufferImp</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_k_data_imp.html">KDataImp</a> {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <a class="code" href="classhku_1_1_k_data_buffer_imp.html#ab96628c3aef71f97290504660325faae">KDataBufferImp</a>();</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="code" href="classhku_1_1_k_data_buffer_imp.html#ab96628c3aef71f97290504660325faae">KDataBufferImp</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作">Stock</a>&amp; stock, <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html" title="按索引方式查询K线数据条件">KQuery</a>&amp; query);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_k_data_buffer_imp.html#a77c7deeff50e06bd6e80cbb122763482">~KDataBufferImp</a>();</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="code" href="classhku_1_1_k_data_buffer_imp.html#aafcbd6a8fdbd57a944a8312f68d7438b">   21</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_k_record.html" title="K线数据记录">KRecord</a> <a class="code" href="classhku_1_1_k_data_buffer_imp.html#aafcbd6a8fdbd57a944a8312f68d7438b">getKRecord</a>(<span class="keywordtype">size_t</span> pos)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordflow">return</span> m_buffer[pos];</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    }</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordtype">void</span> _recoverForward();</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> _recoverBackward();</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> _recoverEqualForward();</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> _recoverEqualBackward();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> m_buffer;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;};</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;} <span class="comment">/* namespace hku */</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* KDATABUFFERIMP_H_ */</span><span class="preprocessor"></span></div>
+<a href="_k_data_buffer_imp_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * KDataBufferImp.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-2-4</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef KDATABUFFERIMP_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define KDATABUFFERIMP_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_k_data_imp_8h.html">KDataImp.h</a>&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_buffer_imp.html">   15</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_k_data_buffer_imp.html">KDataBufferImp</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_k_data_imp.html">KDataImp</a> {</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <a class="code" href="classhku_1_1_k_data_buffer_imp.html#ab96628c3aef71f97290504660325faae">KDataBufferImp</a>();</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="code" href="classhku_1_1_k_data_buffer_imp.html#ab96628c3aef71f97290504660325faae">KDataBufferImp</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_stock.html">Stock</a>&amp; stock, <span class="keyword">const</span> <a class="code" href="classhku_1_1_k_query.html">KQuery</a>&amp; query);</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_k_data_buffer_imp.html#a77c7deeff50e06bd6e80cbb122763482">~KDataBufferImp</a>();</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div><div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="classhku_1_1_k_data_buffer_imp.html#aafcbd6a8fdbd57a944a8312f68d7438b">   21</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_k_record.html">KRecord</a> <a class="code" href="classhku_1_1_k_data_buffer_imp.html#aafcbd6a8fdbd57a944a8312f68d7438b">getKRecord</a>(<span class="keywordtype">size_t</span> pos)<span class="keyword"> const </span>{</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <span class="keywordflow">return</span> m_buffer[pos];</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    }</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">size_t</span> <a class="code" href="classhku_1_1_k_data_buffer_imp.html#aa307ddcffec15f1eafea7d9517e000a4">getPos</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime) <span class="keyword">const</span>;</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> _recoverForward();</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> _recoverBackward();</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> _recoverEqualForward();</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">void</span> _recoverEqualBackward();</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <a class="code" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> m_buffer;</div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;};</div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div><div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* KDATABUFFERIMP_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_k_data_imp_html"><div class="ttname"><a href="classhku_1_1_k_data_imp.html">hku::KDataImp</a></div><div class="ttdef"><b>Definition:</b> KDataImp.h:15</div></div>
+<div class="ttc" id="classhku_1_1_k_data_buffer_imp_html_aa307ddcffec15f1eafea7d9517e000a4"><div class="ttname"><a href="classhku_1_1_k_data_buffer_imp.html#aa307ddcffec15f1eafea7d9517e000a4">hku::KDataBufferImp::getPos</a></div><div class="ttdeci">virtual size_t getPos(const Datetime &amp;datetime) const </div><div class="ttdef"><b>Definition:</b> KDataBufferImp.cpp:73</div></div>
+<div class="ttc" id="classhku_1_1_k_record_html"><div class="ttname"><a href="classhku_1_1_k_record.html">hku::KRecord</a></div><div class="ttdoc">K线数据记录 </div><div class="ttdef"><b>Definition:</b> KRecord.h:19</div></div>
+<div class="ttc" id="classhku_1_1_k_query_html"><div class="ttname"><a href="classhku_1_1_k_query.html">hku::KQuery</a></div><div class="ttdoc">按索引方式查询K线数据条件 </div><div class="ttdef"><b>Definition:</b> KQuery.h:19</div></div>
+<div class="ttc" id="_k_data_imp_8h_html"><div class="ttname"><a href="_k_data_imp_8h.html">KDataImp.h</a></div></div>
+<div class="ttc" id="classhku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">日期类型 </div><div class="ttdef"><b>Definition:</b> Datetime.h:33</div></div>
+<div class="ttc" id="classhku_1_1_stock_html"><div class="ttname"><a href="classhku_1_1_stock.html">hku::Stock</a></div><div class="ttdoc">Stock基类，Application中一般使用StockPtr进行操作 </div><div class="ttdef"><b>Definition:</b> Stock.h:25</div></div>
+<div class="ttc" id="group___stock_manage_html_ga7a898ea401d73f139c33ccb771cb62f0"><div class="ttname"><a href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">hku::KRecordList</a></div><div class="ttdeci">vector&lt; KRecord &gt; KRecordList</div><div class="ttdef"><b>Definition:</b> KRecord.h:53</div></div>
+<div class="ttc" id="classhku_1_1_k_data_buffer_imp_html"><div class="ttname"><a href="classhku_1_1_k_data_buffer_imp.html">hku::KDataBufferImp</a></div><div class="ttdef"><b>Definition:</b> KDataBufferImp.h:15</div></div>
+<div class="ttc" id="classhku_1_1_k_data_buffer_imp_html_ab96628c3aef71f97290504660325faae"><div class="ttname"><a href="classhku_1_1_k_data_buffer_imp.html#ab96628c3aef71f97290504660325faae">hku::KDataBufferImp::KDataBufferImp</a></div><div class="ttdeci">KDataBufferImp()</div><div class="ttdef"><b>Definition:</b> KDataBufferImp.cpp:16</div></div>
+<div class="ttc" id="classhku_1_1_k_data_buffer_imp_html_aafcbd6a8fdbd57a944a8312f68d7438b"><div class="ttname"><a href="classhku_1_1_k_data_buffer_imp.html#aafcbd6a8fdbd57a944a8312f68d7438b">hku::KDataBufferImp::getKRecord</a></div><div class="ttdeci">virtual KRecord getKRecord(size_t pos) const </div><div class="ttdef"><b>Definition:</b> KDataBufferImp.h:21</div></div>
+<div class="ttc" id="classhku_1_1_k_data_buffer_imp_html_a77c7deeff50e06bd6e80cbb122763482"><div class="ttname"><a href="classhku_1_1_k_data_buffer_imp.html#a77c7deeff50e06bd6e80cbb122763482">hku::KDataBufferImp::~KDataBufferImp</a></div><div class="ttdeci">virtual ~KDataBufferImp()</div><div class="ttdef"><b>Definition:</b> KDataBufferImp.cpp:68</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

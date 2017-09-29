@@ -1,0 +1,116 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/trade_sys/system/crt/SYS_Simple.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a class="el" href="dir_be1571b252e421c31ea0682d2947607c.html">system</a></li><li class="navelem"><a class="el" href="dir_14bad6a26e04203522bec1858c458730.html">crt</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">SYS_Simple.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_s_y_s___simple_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * crtSimpleSystem.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-3-22</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef CRTSIMPLESYSTEM_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define CRTSIMPLESYSTEM_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../System.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<a class="code" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> <a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="group___system.html#ga41d47100e54b4af948d55c99a5f25a44">SYS_Simple</a>(</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keyword">const</span> <a class="code" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>&amp; tm = <a class="code" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>(),</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keyword">const</span> <a class="code" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a>&amp; mm = <a class="code" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a>(),</div><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keyword">const</span> <a class="code" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&amp; ev = <a class="code" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>(),</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keyword">const</span> <a class="code" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a>&amp; cn = <a class="code" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a>(),</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keyword">const</span> <a class="code" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a>&amp; sg = <a class="code" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a>(),</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keyword">const</span> <a class="code" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>&amp; sl = <a class="code" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>(),</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keyword">const</span> <a class="code" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>&amp; tp = <a class="code" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>(),</div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">const</span> <a class="code" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a>&amp; pg = <a class="code" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a>(),</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">const</span> <a class="code" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>&amp; sp = <a class="code" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>());</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;} <span class="comment">/* namespace */</span></div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* CRTSIMPLESYSTEM_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="group___profit_goal_html_ga15de439d18b21a787ee746d8dd3a906a"><div class="ttname"><a href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">hku::ProfitGoalPtr</a></div><div class="ttdeci">shared_ptr&lt; ProfitGoalBase &gt; ProfitGoalPtr</div><div class="ttdoc">客户程序都应使用该指针类型 </div><div class="ttdef"><b>Definition:</b> ProfitGoalBase.h:156</div></div>
+<div class="ttc" id="namespacehku_html_ae50262ae3d1cfa56eaa77b01806d8a81"><div class="ttname"><a href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">hku::StoplossPtr</a></div><div class="ttdeci">boost::shared_ptr&lt; StoplossBase &gt; StoplossPtr</div><div class="ttdoc">客户程序都应使用该指针类型，操作止损策略实例 </div><div class="ttdef"><b>Definition:</b> StoplossBase.h:167</div></div>
+<div class="ttc" id="group___environment_html_gac1532edba0a5f3a254e0c2d12552ee7e"><div class="ttname"><a href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">hku::EnvironmentPtr</a></div><div class="ttdeci">shared_ptr&lt; EnvironmentBase &gt; EnvironmentPtr</div><div class="ttdoc">客户程序都应使用该指针类型 </div><div class="ttdef"><b>Definition:</b> EnvironmentBase.h:154</div></div>
+<div class="ttc" id="group___slippage_html_ga049e6ab56e4c995847c08232913198e1"><div class="ttname"><a href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">hku::SlippagePtr</a></div><div class="ttdeci">shared_ptr&lt; SlippageBase &gt; SlippagePtr</div><div class="ttdoc">客户程序都应使用该指针类型，操作移滑价差算法 </div><div class="ttdef"><b>Definition:</b> SlippageBase.h:153</div></div>
+<div class="ttc" id="group___money_manager_html_ga06c3ee7e1a13ef55493264d754b62db2"><div class="ttname"><a href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">hku::MoneyManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; MoneyManagerBase &gt; MoneyManagerPtr</div><div class="ttdoc">客户程序都应使用该指针类型 </div><div class="ttdef"><b>Definition:</b> MoneyManagerBase.h:204</div></div>
+<div class="ttc" id="group___trade_manager_class_html_ga285ea5029f5f472a82a1d21128be7c2b"><div class="ttname"><a href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">hku::TradeManagerPtr</a></div><div class="ttdeci">shared_ptr&lt; TradeManager &gt; TradeManagerPtr</div><div class="ttdoc">客户程序应使用此类型进行实际操作 </div><div class="ttdef"><b>Definition:</b> TradeManager.h:602</div></div>
+<div class="ttc" id="_data_type_8h_html_af59fd09cf4bfe9c265f61882e5f07d7a"><div class="ttname"><a href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a></div><div class="ttdeci">#define HKU_API</div><div class="ttdef"><b>Definition:</b> DataType.h:12</div></div>
+<div class="ttc" id="group___signal_html_gae20430025d05ba5de75549f287e4dcd9"><div class="ttname"><a href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">hku::SignalPtr</a></div><div class="ttdeci">shared_ptr&lt; SignalBase &gt; SignalPtr</div><div class="ttdoc">客户程序都应使用该指针类型，操作信号指示器 </div><div class="ttdef"><b>Definition:</b> SignalBase.h:185</div></div>
+<div class="ttc" id="group___system_html_ga41d47100e54b4af948d55c99a5f25a44"><div class="ttname"><a href="group___system.html#ga41d47100e54b4af948d55c99a5f25a44">hku::SYS_Simple</a></div><div class="ttdeci">SystemPtr HKU_API SYS_Simple(const TradeManagerPtr &amp;tm, const MoneyManagerPtr &amp;mm, const EnvironmentPtr &amp;ev, const ConditionPtr &amp;cn, const SignalPtr &amp;sg, const StoplossPtr &amp;sl, const StoplossPtr &amp;tp, const ProfitGoalPtr &amp;pg, const SlippagePtr &amp;sp)</div><div class="ttdoc">生成简单系统实例 </div><div class="ttdef"><b>Definition:</b> SYS_Simple.cpp:12</div></div>
+<div class="ttc" id="group___condition_html_gaf034db1c33808015884de277ff7d6155"><div class="ttname"><a href="group___condition.html#gaf034db1c33808015884de277ff7d6155">hku::ConditionPtr</a></div><div class="ttdeci">shared_ptr&lt; ConditionBase &gt; ConditionPtr</div><div class="ttdoc">客户程序都应使用该指针类型 </div><div class="ttdef"><b>Definition:</b> ConditionBase.h:165</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="ttc" id="group___system_html_gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"><div class="ttname"><a href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku::SystemPtr</a></div><div class="ttdeci">shared_ptr&lt; System &gt; SystemPtr</div><div class="ttdoc">客户程序应使用该指针进行操作 </div><div class="ttdef"><b>Definition:</b> System.h:261</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

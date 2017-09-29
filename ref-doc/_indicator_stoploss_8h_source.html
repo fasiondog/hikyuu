@@ -1,0 +1,118 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/trade_sys/stoploss/imp/IndicatorStoploss.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a class="el" href="dir_fbd79c0079a44d6e3b53cb807dd861b8.html">stoploss</a></li><li class="navelem"><a class="el" href="dir_2d3a2e41f7b30d2e5d1c376d05d49207.html">imp</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">IndicatorStoploss.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_indicator_stoploss_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * IndicatorStoploss.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-4-21</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef INDICATORSTOPLOSS_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define INDICATORSTOPLOSS_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../../../indicator/Operand.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;../StoplossBase.h&quot;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div><div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classhku_1_1_indicator_stoploss.html">   16</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_indicator_stoploss.html">IndicatorStoploss</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_stoploss_base.html">StoplossBase</a> {</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="code" href="classhku_1_1_indicator_stoploss.html#a2b0836228c042e3949a9ab048d044eb7">IndicatorStoploss</a>(); <span class="comment">//仅用于序列化默认构造函数</span></div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <a class="code" href="classhku_1_1_indicator_stoploss.html#a2b0836228c042e3949a9ab048d044eb7">IndicatorStoploss</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_operand.html">Operand</a>&amp; op,</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                      <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; kdata_part);</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_indicator_stoploss.html#af341251032b3d39f5bd571136dcf5115">~IndicatorStoploss</a>();</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_indicator_stoploss.html#a05bf5b26697bdd98881d326dbeffcafe">getPrice</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_datetime.html">Datetime</a>&amp; datetime, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price);</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classhku_1_1_indicator_stoploss.html#aab41cbbd2270cff26a62976f309259ef">_reset</a>();</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">StoplossPtr</a> <a class="code" href="classhku_1_1_indicator_stoploss.html#acfa00554632336dfd3ee1512793d964d">_clone</a>();</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classhku_1_1_indicator_stoploss.html#a8180ad5b474a01f7eff218c8ee6587c8">_calculate</a>();</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classhku_1_1_operand.html">Operand</a> m_op;</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    map&lt;Datetime, price_t&gt; m_result;</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">//========================================</span></div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">//序列化支持</span></div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">//========================================</span></div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classhku_1_1_indicator_stoploss.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">   37</a></span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classhku_1_1_indicator_stoploss.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a>;</div><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Archive&gt;</div><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">void</span> serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        ar &amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(<a class="code" href="classhku_1_1_stoploss_base.html">StoplossBase</a>);</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(m_op);</div><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="comment">//m_result 每次系统运行时都要重新计算，不保存</span></div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="comment">//ar &amp; BOOST_SERIALIZATION_NVP(m_result);</span></div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;};</div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* INDICATORSTOPLOSS_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_operand_html"><div class="ttname"><a href="classhku_1_1_operand.html">hku::Operand</a></div><div class="ttdef"><b>Definition:</b> Operand.h:15</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html_a2b0836228c042e3949a9ab048d044eb7"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html#a2b0836228c042e3949a9ab048d044eb7">hku::IndicatorStoploss::IndicatorStoploss</a></div><div class="ttdeci">IndicatorStoploss()</div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.cpp:13</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html_acfa00554632336dfd3ee1512793d964d"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html#acfa00554632336dfd3ee1512793d964d">hku::IndicatorStoploss::_clone</a></div><div class="ttdeci">virtual StoplossPtr _clone()</div><div class="ttdoc">子类克隆接口 </div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.cpp:36</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html">hku::IndicatorStoploss</a></div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.h:16</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html_aab41cbbd2270cff26a62976f309259ef"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html#aab41cbbd2270cff26a62976f309259ef">hku::IndicatorStoploss::_reset</a></div><div class="ttdeci">virtual void _reset()</div><div class="ttdoc">子类复位接口 </div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.cpp:32</div></div>
+<div class="ttc" id="classhku_1_1_datetime_html"><div class="ttname"><a href="classhku_1_1_datetime.html">hku::Datetime</a></div><div class="ttdoc">日期类型 </div><div class="ttdef"><b>Definition:</b> Datetime.h:33</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html_af341251032b3d39f5bd571136dcf5115"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html#af341251032b3d39f5bd571136dcf5115">hku::IndicatorStoploss::~IndicatorStoploss</a></div><div class="ttdeci">virtual ~IndicatorStoploss()</div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.cpp:24</div></div>
+<div class="ttc" id="classhku_1_1_stoploss_base_html_ad7841661b223abe039fb436eae1ba149"><div class="ttname"><a href="classhku_1_1_stoploss_base.html#ad7841661b223abe039fb436eae1ba149">hku::StoplossBase::StoplossPtr</a></div><div class="ttdeci">boost::shared_ptr&lt; StoplossBase &gt; StoplossPtr</div><div class="ttdef"><b>Definition:</b> StoplossBase.h:57</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html_ac98d07dd8f7b70e16ccb9a01abf56b9c"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">hku::IndicatorStoploss::access</a></div><div class="ttdeci">friend class boost::serialization::access</div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.h:37</div></div>
+<div class="ttc" id="group___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>Definition:</b> DataType.h:56</div></div>
+<div class="ttc" id="classhku_1_1_stoploss_base_html"><div class="ttname"><a href="classhku_1_1_stoploss_base.html">hku::StoplossBase</a></div><div class="ttdoc">止损/止赢策略基类 </div><div class="ttdef"><b>Definition:</b> StoplossBase.h:28</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html_a05bf5b26697bdd98881d326dbeffcafe"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html#a05bf5b26697bdd98881d326dbeffcafe">hku::IndicatorStoploss::getPrice</a></div><div class="ttdeci">virtual price_t getPrice(const Datetime &amp;datetime, price_t price)</div><div class="ttdoc">获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。 用于系统在交易执行前向止损策略�...</div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.cpp:28</div></div>
+<div class="ttc" id="classhku_1_1_indicator_stoploss_html_a8180ad5b474a01f7eff218c8ee6587c8"><div class="ttname"><a href="classhku_1_1_indicator_stoploss.html#a8180ad5b474a01f7eff218c8ee6587c8">hku::IndicatorStoploss::_calculate</a></div><div class="ttdeci">virtual void _calculate()</div><div class="ttdoc">子类计算接口，由setTO调用 </div><div class="ttdef"><b>Definition:</b> IndicatorStoploss.cpp:42</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

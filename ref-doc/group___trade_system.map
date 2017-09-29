@@ -1,12 +1,11 @@
 <map id="TradeSystem 系统交易框架" name="TradeSystem 系统交易框架">
-<area shape="rect" id="node1" href="$group___signal.html" title="Signal 信号指示器" alt="" coords="514,165,665,195"/>
-<area shape="rect" id="node2" href="$group___condition.html" title="Condition 系统有效条件判断" alt="" coords="478,59,701,88"/>
-<area shape="rect" id="node5" href="$group___environment.html" title="Environment 外部环境判断" alt="" coords="483,5,696,35"/>
-<area shape="rect" id="node9" href="$group___money_manager.html" title="MoneyManager 资金管理策略" alt="" coords="475,112,704,141"/>
-<area shape="rect" id="node4" href="$group___stop_loss.html" title="StopLoss 止损策略" alt="" coords="512,219,667,248"/>
-<area shape="rect" id="node10" href="$group___take_profit.html" title="TakeProfit 止赢策略" alt="" coords="508,272,671,301"/>
-<area shape="rect" id="node7" href="$group___profit_goal.html" title="ProfitGoal 盈利目标策略" alt="" coords="493,325,686,355"/>
-<area shape="rect" id="node6" href="$group___slippage.html" title="Slippage 移滑价差算法" alt="" coords="498,379,681,408"/>
-<area shape="rect" id="node8" href="$group___system.html" title="System 交易系统" alt="" coords="518,432,661,461"/>
-<area shape="rect" id="node11" href="$group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等" alt="" coords="6,219,162,248"/>
+<area shape="rect" id="node1" href="$group___signal.html" title="Signal 信号指示器" alt="" coords="531,5,683,35"/>
+<area shape="rect" id="node2" href="$group___condition.html" title="Condition 系统有效条件判断" alt="" coords="493,59,721,88"/>
+<area shape="rect" id="node4" href="$group___stoploss.html" title="Stoploss 止损、止赢策略" alt="" coords="504,112,711,141"/>
+<area shape="rect" id="node5" href="$group___environment.html" title="Environment 外部环境判断" alt="" coords="496,165,719,195"/>
+<area shape="rect" id="node6" href="$group___slippage.html" title="Slippage 移滑价差算法" alt="" coords="514,219,701,248"/>
+<area shape="rect" id="node7" href="$group___profit_goal.html" title="ProfitGoal 盈利目标策略" alt="" coords="508,272,707,301"/>
+<area shape="rect" id="node8" href="$group___system.html" title="System 交易系统" alt="" coords="533,325,682,355"/>
+<area shape="rect" id="node9" href="$group___money_manager.html" title="MoneyManager 资金管理策略" alt="" coords="487,379,728,408"/>
+<area shape="rect" id="node10" href="$group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等 " alt="" coords="5,192,165,221"/>
 </map>

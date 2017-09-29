@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hku::KDataDriver类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -91,7 +92,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public 成员函数</a> &#124;
-<a href="#pro-attribs">Protected 属性</a> &#124;
 <a href="classhku_1_1_k_data_driver-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
 <div class="title">hku::KDataDriver类 参考</div>  </div>
@@ -107,37 +107,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <div class="dyncontent">
 <div class="center"><img src="classhku_1_1_k_data_driver__inherit__graph.png" border="0" usemap="#hku_1_1_k_data_driver_inherit__map" alt="Inheritance graph"/></div>
 <map name="hku_1_1_k_data_driver_inherit__map" id="hku_1_1_k_data_driver_inherit__map">
-<area shape="rect" id="node2" href="classhku_1_1_h5_k_data_driver.html" title="hku::H5KDataDriver" alt="" coords="5,83,168,112"/></map>
+<area shape="rect" id="node2" href="classhku_1_1_k_data_temp_csv_driver.html" title="获取临时载入的CSV文件 " alt="" coords="5,83,232,112"/>
+</map>
 <center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a30c5002f18c0534e8bba412c30b8b69f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#a30c5002f18c0534e8bba412c30b8b69f">KDataDriver</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;connection)</td></tr>
-<tr class="separator:a30c5002f18c0534e8bba412c30b8b69f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72b29caede394bbc0c2d4df3aadcfe5b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#a72b29caede394bbc0c2d4df3aadcfe5b">KDataDriver</a> ()</td></tr>
+<tr class="separator:a72b29caede394bbc0c2d4df3aadcfe5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3824f6fe878d771ab54d9c55332a718"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#aa3824f6fe878d771ab54d9c55332a718">KDataDriver</a> (const shared_ptr&lt; <a class="el" href="classhku_1_1_ini_parser.html">IniParser</a> &gt; &amp;config)</td></tr>
+<tr class="separator:aa3824f6fe878d771ab54d9c55332a718"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9194f53dfef4655ce836f1a78ca65f4"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#aa9194f53dfef4655ce836f1a78ca65f4">~KDataDriver</a> ()</td></tr>
 <tr class="separator:aa9194f53dfef4655ce836f1a78ca65f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac73ac82cd654d56e915cd0c3c5b342d2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#ac73ac82cd654d56e915cd0c3c5b342d2">loadKData</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType, size_t start_ix, size_t end_ix, <a class="el" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> *out_buffer)</td></tr>
-<tr class="memdesc:ac73ac82cd654d56e915cd0c3c5b342d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">将指定类型的K线数据加载至缓存  <a href="#ac73ac82cd654d56e915cd0c3c5b342d2">更多...</a><br/></td></tr>
-<tr class="separator:ac73ac82cd654d56e915cd0c3c5b342d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3708894ec55e2c72d934153fb48f4857"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#a3708894ec55e2c72d934153fb48f4857">getCount</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType)</td></tr>
-<tr class="memdesc:a3708894ec55e2c72d934153fb48f4857"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定类型的K线数据量  <a href="#a3708894ec55e2c72d934153fb48f4857">更多...</a><br/></td></tr>
-<tr class="separator:a3708894ec55e2c72d934153fb48f4857"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adaacff90c2d61cce357ca47a2917c291"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#adaacff90c2d61cce357ca47a2917c291">getIndexRangeByDate</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query, size_t &amp;out_start, size_t &amp;out_end)</td></tr>
-<tr class="memdesc:adaacff90c2d61cce357ca47a2917c291"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定日期范围对应的K线记录索引  <a href="#adaacff90c2d61cce357ca47a2917c291">更多...</a><br/></td></tr>
-<tr class="separator:adaacff90c2d61cce357ca47a2917c291"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83b8cace051bef0b336f5be26b0a05d2"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_k_record.html">KRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#a83b8cace051bef0b336f5be26b0a05d2">getKRecord</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, size_t pos, <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType)</td></tr>
-<tr class="memdesc:a83b8cace051bef0b336f5be26b0a05d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的K线记录  <a href="#a83b8cace051bef0b336f5be26b0a05d2">更多...</a><br/></td></tr>
-<tr class="separator:a83b8cace051bef0b336f5be26b0a05d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected 属性</h2></td></tr>
-<tr class="memitem:ace2339c63621cc1ca56d63a3b2b2ff5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#ace2339c63621cc1ca56d63a3b2b2ff5a">m_connection</a></td></tr>
-<tr class="separator:ace2339c63621cc1ca56d63a3b2b2ff5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49f912e93333682623ab5294d9807953"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#a49f912e93333682623ab5294d9807953">loadKData</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType, size_t start_ix, size_t end_ix, <a class="el" href="group___stock_manage.html#ga7a898ea401d73f139c33ccb771cb62f0">KRecordList</a> *out_buffer)</td></tr>
+<tr class="memdesc:a49f912e93333682623ab5294d9807953"><td class="mdescLeft">&#160;</td><td class="mdescRight">将指定类型的K线数据加载至缓存  <a href="#a49f912e93333682623ab5294d9807953">更多...</a><br /></td></tr>
+<tr class="separator:a49f912e93333682623ab5294d9807953"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39191fbf368e474e7cec931269e534c2"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#a39191fbf368e474e7cec931269e534c2">getCount</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType)</td></tr>
+<tr class="memdesc:a39191fbf368e474e7cec931269e534c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定类型的K线数据量  <a href="#a39191fbf368e474e7cec931269e534c2">更多...</a><br /></td></tr>
+<tr class="separator:a39191fbf368e474e7cec931269e534c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a147fb87c198d8d12e3916b21c89ce980"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#a147fb87c198d8d12e3916b21c89ce980">getIndexRangeByDate</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query, size_t &amp;out_start, size_t &amp;out_end)</td></tr>
+<tr class="memdesc:a147fb87c198d8d12e3916b21c89ce980"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定日期范围对应的K线记录索引  <a href="#a147fb87c198d8d12e3916b21c89ce980">更多...</a><br /></td></tr>
+<tr class="separator:a147fb87c198d8d12e3916b21c89ce980"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3efb2bf1b96064a5b6318610ee163e5"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_k_record.html">KRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_k_data_driver.html#ae3efb2bf1b96064a5b6318610ee163e5">getKRecord</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;market, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;code, size_t pos, <a class="el" href="classhku_1_1_k_query.html#a8d0f696de1803fbeb83db0b0a42d4ac5">KQuery::KType</a> kType)</td></tr>
+<tr class="memdesc:ae3efb2bf1b96064a5b6318610ee163e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的K线记录  <a href="#ae3efb2bf1b96064a5b6318610ee163e5">更多...</a><br /></td></tr>
+<tr class="separator:ae3efb2bf1b96064a5b6318610ee163e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p>K线数据驱动基类 </p>
 </div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a30c5002f18c0534e8bba412c30b8b69f"></a>
+<a class="anchor" id="a72b29caede394bbc0c2d4df3aadcfe5b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -147,8 +145,7 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">hku::KDataDriver::KDataDriver </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
-          <td class="paramname"><em>connection</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -157,6 +154,22 @@ Protected 属性</h2></td></tr>
 <span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa3824f6fe878d771ab54d9c55332a718"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::KDataDriver::KDataDriver </td>
+          <td>(</td>
+          <td class="paramtype">const shared_ptr&lt; <a class="el" href="classhku_1_1_ini_parser.html">IniParser</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>config</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
 </div><div class="memdoc">
 
 </div>
@@ -185,7 +198,7 @@ Protected 属性</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a3708894ec55e2c72d934153fb48f4857"></a>
+<a class="anchor" id="a39191fbf368e474e7cec931269e534c2"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -193,7 +206,7 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual size_t hku::KDataDriver::getCount </td>
+          <td class="memname">size_t hku::KDataDriver::getCount </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
           <td class="paramname"><em>market</em>, </td>
@@ -218,7 +231,7 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -234,11 +247,11 @@ Protected 属性</h2></td></tr>
 </dl>
 <dl class="section return"><dt>返回</dt><dd></dd></dl>
 
-<p>被 <a class="el" href="classhku_1_1_h5_k_data_driver.html#a123f78c422a7a68d4a50d9642311af0c">hku::H5KDataDriver</a> 重载.</p>
+<p>被 <a class="el" href="classhku_1_1_k_data_temp_csv_driver.html#a2049ebfa40f4b70afec785984d2b96e7">hku::KDataTempCsvDriver</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="adaacff90c2d61cce357ca47a2917c291"></a>
+<a class="anchor" id="a147fb87c198d8d12e3916b21c89ce980"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -246,7 +259,7 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual bool hku::KDataDriver::getIndexRangeByDate </td>
+          <td class="memname">bool hku::KDataDriver::getIndexRangeByDate </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
           <td class="paramname"><em>market</em>, </td>
@@ -283,7 +296,7 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -301,11 +314,11 @@ Protected 属性</h2></td></tr>
 </dl>
 <dl class="section return"><dt>返回</dt><dd></dd></dl>
 
-<p>被 <a class="el" href="classhku_1_1_h5_k_data_driver.html#a295305955053178a2d9a2c069eda8e43">hku::H5KDataDriver</a> 重载.</p>
+<p>被 <a class="el" href="classhku_1_1_k_data_temp_csv_driver.html#a7fc049a391bb2c311428bcfa274d2a71">hku::KDataTempCsvDriver</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="a83b8cace051bef0b336f5be26b0a05d2"></a>
+<a class="anchor" id="ae3efb2bf1b96064a5b6318610ee163e5"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -313,7 +326,7 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classhku_1_1_k_record.html">KRecord</a> hku::KDataDriver::getKRecord </td>
+          <td class="memname"><a class="el" href="classhku_1_1_k_record.html">KRecord</a> hku::KDataDriver::getKRecord </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
           <td class="paramname"><em>market</em>, </td>
@@ -344,7 +357,7 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -361,11 +374,11 @@ Protected 属性</h2></td></tr>
 </dl>
 <dl class="section return"><dt>返回</dt><dd></dd></dl>
 
-<p>被 <a class="el" href="classhku_1_1_h5_k_data_driver.html#a7fe0caf0c7d984e37d8f3ece6392aeeb">hku::H5KDataDriver</a> 重载.</p>
+<p>被 <a class="el" href="classhku_1_1_k_data_temp_csv_driver.html#a4aa8cb1a94f15ff78066422fdf9e95ae">hku::KDataTempCsvDriver</a> 重载.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac73ac82cd654d56e915cd0c3c5b342d2"></a>
+<a class="anchor" id="a49f912e93333682623ab5294d9807953"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -373,7 +386,7 @@ Protected 属性</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void hku::KDataDriver::loadKData </td>
+          <td class="memname">void hku::KDataDriver::loadKData </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
           <td class="paramname"><em>market</em>, </td>
@@ -416,7 +429,7 @@ Protected 属性</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -434,33 +447,13 @@ Protected 属性</h2></td></tr>
   </dd>
 </dl>
 
-<p>被 <a class="el" href="classhku_1_1_h5_k_data_driver.html#a1cc34b6d1517d008ea8911d4d8b9a7ad">hku::H5KDataDriver</a> 重载.</p>
-
-</div>
-</div>
-<h2 class="groupheader">类成员变量说明</h2>
-<a class="anchor" id="ace2339c63621cc1ca56d63a3b2b2ff5a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::KDataDriver::m_connection</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>被 <a class="el" href="classhku_1_1_k_data_temp_csv_driver.html#ac5b1bdae71d8a6eb2bfc1bc718fe7d72">hku::KDataTempCsvDriver</a> 重载.</p>
 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
 <li>hikyuu/data_driver/<a class="el" href="_k_data_driver_8h_source.html">KDataDriver.h</a></li>
+<li>hikyuu/data_driver/<a class="el" href="_k_data_driver_8cpp.html">KDataDriver.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
@@ -468,7 +461,7 @@ Protected 属性</h2></td></tr>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

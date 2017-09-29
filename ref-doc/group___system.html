@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: System 交易系统</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,14 +33,14 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
+      <li class="current"><a href="modules.html"><span>模块</span></a></li>
       <li><a href="namespaces.html"><span>命名空间</span></a></li>
       <li><a href="annotated.html"><span>类</span></a></li>
       <li><a href="files.html"><span>文件</span></a></li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,8 +78,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#typedef-members">类型定义</a> &#124;
+<a href="#func-members">函数</a>  </div>
   <div class="headertitle">
-<div class="title">System 交易系统<div class="ingroups"><a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
+<div class="title">System 交易系统<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
@@ -86,17 +91,140 @@ System 交易系统 的协作图:</div>
 <div class="dyncontent">
 <center><table><tr><td><img src="group___system.png" border="0" alt="" usemap="#group______system"/>
 <map name="group______system" id="group______system">
-<area shape="rect" id="node1" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="6,5,221,35"/></map>
+<area shape="rect" id="node1" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="5,5,231,35"/>
+</map>
 </td></tr></table></center>
 </div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html">hku::System</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">交易系统基类  <a href="classhku_1_1_system.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; System &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku::SystemPtr</a></td></tr>
+<tr class="memdesc:gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序应使用该指针进行操作  <a href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">更多...</a><br /></td></tr>
+<tr class="separator:gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:ga41d47100e54b4af948d55c99a5f25a44"><td class="memItemLeft" align="right" valign="top">SystemPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___system.html#ga41d47100e54b4af948d55c99a5f25a44">hku::SYS_Simple</a> (const TradeManagerPtr &amp;tm=TradeManagerPtr(), const MoneyManagerPtr &amp;mm=MoneyManagerPtr(), const EnvironmentPtr &amp;ev=EnvironmentPtr(), const ConditionPtr &amp;cn=ConditionPtr(), const SignalPtr &amp;sg=SignalPtr(), const StoplossPtr &amp;sl=StoplossPtr(), const StoplossPtr &amp;tp=StoplossPtr(), const ProfitGoalPtr &amp;pg=ProfitGoalPtr(), const SlippagePtr &amp;sp=SlippagePtr())</td></tr>
+<tr class="memdesc:ga41d47100e54b4af948d55c99a5f25a44"><td class="mdescLeft">&#160;</td><td class="mdescRight">生成简单系统实例  <a href="group___system.html#ga41d47100e54b4af948d55c99a5f25a44">更多...</a><br /></td></tr>
+<tr class="separator:ga41d47100e54b4af948d55c99a5f25a44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <p>交易系统框架 </p>
+<h2 class="groupheader">类型定义说明</h2>
+<a class="anchor" id="gaa9a70c93bf975bb86ad0c5fd0dcc8ad9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef shared_ptr&lt;System&gt; <a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">hku::SystemPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>客户程序应使用该指针进行操作 </p>
+
+</div>
+</div>
+<h2 class="groupheader">函数说明</h2>
+<a class="anchor" id="ga41d47100e54b4af948d55c99a5f25a44"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SystemPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SYS_Simple </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>tm</em> = <code><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>mm</em> = <code><a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>ev</em> = <code><a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>cn</em> = <code><a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sg</em> = <code><a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sl</em> = <code><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>tp</em> = <code><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>pg</em> = <code><a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a>()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sp</em> = <code><a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>生成简单系统实例 </p>
+<pre>
+继承的系统参数：
+max_delay_count [int | 3]: 最大连续延迟交易请求的限制次数，如最高价=最低价时
+delay_use_plan_number [bool | true]: 延迟操作时使用上一时刻计算的数量，因为实际人工操作时，可能无法实时计算买入数量
+support_borrow_cash [bool | false]：在现金不足时，是否支持借入现金，融资
+support_borrow_stock [bool | fals]): 在没有持仓时，是否支持借入证券，融券</pre><pre>本系统参数：
+ev_dealy [bool | true]: 系统环境失效时，是否延迟在下一时刻开盘执行
+cn_delay [bool | true]: 系统条件失效时，是否延迟在下一时刻开盘执行
+sg_delay [bool | true]: 发出信号指示时，是否延迟在下一时刻开盘执行
+sl_delay [bool | true]: 发出止损指令时，是否延迟在下一时刻开盘执行
+tp_delay [bool | true]: 发出止赢指令时，是否延迟在下一时刻开盘执行
+pg_delay [bool | true]: 发出盈利目标达成信号时，是否延迟在下一时刻开盘执行
+tp_ascend [bool | true]: 止赢是否单调递增
+tp_delay_n [int | 3]: 止赢延迟判定生效时间，给市场足够的时间向预定方向移动
+ignore_sell_sg [bool | false ]: ignore_sell_sg 忽略卖出信号，只使用止损/止赢等其他方式卖出
+</pre> <dl class="section see"><dt>参见</dt><dd>SystemBase </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

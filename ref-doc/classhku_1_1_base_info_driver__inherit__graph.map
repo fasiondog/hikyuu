@@ -1,3 +1,4 @@
 <map id="hku::BaseInfoDriver" name="hku::BaseInfoDriver">
-<area shape="rect" id="node2" href="$classhku_1_1_s_q_lite_base_info_driver.html" title="hku::SQLiteBaseInfoDriver" alt="" coords="5,83,216,112"/>
+<area shape="rect" id="node2" href="$classhku_1_1_my_s_q_l_base_info_driver.html" title="hku::MySQLBaseInfoDriver" alt="" coords="5,83,236,112"/>
+<area shape="rect" id="node3" href="$classhku_1_1_s_q_lite_base_info_driver.html" title="hku::SQLiteBaseInfoDriver" alt="" coords="261,83,487,112"/>
 </map>

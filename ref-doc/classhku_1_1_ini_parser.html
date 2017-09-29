@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hku::IniParser类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,12 +95,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <a href="#pub-methods">Public 成员函数</a> &#124;
 <a href="classhku_1_1_ini_parser-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
-<div class="title">hku::IniParser类 参考<div class="ingroups"><a class="el" href="group___ini_parser.html">IniParser 简单ini文件读取</a></div></div>  </div>
+<div class="title">hku::IniParser类 参考<div class="ingroups"><a class="el" href="group___utilities.html">Utilities 常用独立工具集</a> &raquo; <a class="el" href="group___ini_parser.html">IniParser 简单ini文件读取</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>支持简单的ini格式文件的读取 <br/>
-  
+<p>支持简单的ini格式文件的读取 <br />
+ 
  <a href="classhku_1_1_ini_parser.html#details">更多...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_ini_parser_8h_source.html">IniParser.h</a>&gt;</code></p>
@@ -110,8 +111,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 Public 类型</h2></td></tr>
 <tr class="memitem:a990f71339ca1d7cb5c60a62c5044020f"><td class="memItemLeft" align="right" valign="top">typedef std::list&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a990f71339ca1d7cb5c60a62c5044020f">StringList</a></td></tr>
 <tr class="separator:a990f71339ca1d7cb5c60a62c5044020f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afebc7005a3db23f48ff8a46a45253dc9"><td class="memItemLeft" align="right" valign="top">typedef boost::shared_ptr<br class="typebreak"/>
-&lt; std::list&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">StringListPtr</a></td></tr>
+<tr class="memitem:afebc7005a3db23f48ff8a46a45253dc9"><td class="memItemLeft" align="right" valign="top">typedef boost::shared_ptr&lt; std::list&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">StringListPtr</a></td></tr>
 <tr class="separator:afebc7005a3db23f48ff8a46a45253dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -121,57 +121,56 @@ Public 成员函数</h2></td></tr>
 <tr class="memitem:a49314738a5b44d4fc223b013a5c3660a"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a49314738a5b44d4fc223b013a5c3660a">~IniParser</a> ()</td></tr>
 <tr class="separator:a49314738a5b44d4fc223b013a5c3660a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a440091ff037a936db01737c540fa9b78"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a440091ff037a936db01737c540fa9b78">read</a> (const std::string &amp;filename)  throw (std::invalid_argument,            std::logic_error)</td></tr>
-<tr class="memdesc:a440091ff037a936db01737c540fa9b78"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取并分析指定的ini文件  <a href="#a440091ff037a936db01737c540fa9b78">更多...</a><br/></td></tr>
+<tr class="memdesc:a440091ff037a936db01737c540fa9b78"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取并分析指定的ini文件  <a href="#a440091ff037a936db01737c540fa9b78">更多...</a><br /></td></tr>
 <tr class="separator:a440091ff037a936db01737c540fa9b78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5018c56a290c75a0b89b3e1473844e34"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a5018c56a290c75a0b89b3e1473844e34">clear</a> ()</td></tr>
-<tr class="memdesc:a5018c56a290c75a0b89b3e1473844e34"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除现有已读入的信息  <a href="#a5018c56a290c75a0b89b3e1473844e34">更多...</a><br/></td></tr>
+<tr class="memdesc:a5018c56a290c75a0b89b3e1473844e34"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除现有已读入的信息  <a href="#a5018c56a290c75a0b89b3e1473844e34">更多...</a><br /></td></tr>
 <tr class="separator:a5018c56a290c75a0b89b3e1473844e34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02319231868d7d9a7fe97c9b8238fe59"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a02319231868d7d9a7fe97c9b8238fe59">hasSection</a> (const std::string &amp;section) const </td></tr>
-<tr class="memdesc:a02319231868d7d9a7fe97c9b8238fe59"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断指定的section是否存在  <a href="#a02319231868d7d9a7fe97c9b8238fe59">更多...</a><br/></td></tr>
+<tr class="memdesc:a02319231868d7d9a7fe97c9b8238fe59"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断指定的section是否存在  <a href="#a02319231868d7d9a7fe97c9b8238fe59">更多...</a><br /></td></tr>
 <tr class="separator:a02319231868d7d9a7fe97c9b8238fe59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e4064cc50778a16ad9ae803117e29a7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a8e4064cc50778a16ad9ae803117e29a7">hasOption</a> (const std::string &amp;section, const std::string &amp;option) const </td></tr>
-<tr class="memdesc:a8e4064cc50778a16ad9ae803117e29a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断指定option是否存在  <a href="#a8e4064cc50778a16ad9ae803117e29a7">更多...</a><br/></td></tr>
+<tr class="memdesc:a8e4064cc50778a16ad9ae803117e29a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断指定option是否存在  <a href="#a8e4064cc50778a16ad9ae803117e29a7">更多...</a><br /></td></tr>
 <tr class="separator:a8e4064cc50778a16ad9ae803117e29a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae012a71b03d00e89036d797e214896b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">StringListPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#ae012a71b03d00e89036d797e214896b3">getSectionList</a> () const </td></tr>
-<tr class="memdesc:ae012a71b03d00e89036d797e214896b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有的secton  <a href="#ae012a71b03d00e89036d797e214896b3">更多...</a><br/></td></tr>
+<tr class="memdesc:ae012a71b03d00e89036d797e214896b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有的secton  <a href="#ae012a71b03d00e89036d797e214896b3">更多...</a><br /></td></tr>
 <tr class="separator:ae012a71b03d00e89036d797e214896b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad139c701160e9ca3654b9a086e0788ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_ini_parser.html#afebc7005a3db23f48ff8a46a45253dc9">StringListPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#ad139c701160e9ca3654b9a086e0788ff">getOptionList</a> (const std::string &amp;section) const </td></tr>
-<tr class="memdesc:ad139c701160e9ca3654b9a086e0788ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定Section下的所有option  <a href="#ad139c701160e9ca3654b9a086e0788ff">更多...</a><br/></td></tr>
+<tr class="memdesc:ad139c701160e9ca3654b9a086e0788ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定Section下的所有option  <a href="#ad139c701160e9ca3654b9a086e0788ff">更多...</a><br /></td></tr>
 <tr class="separator:ad139c701160e9ca3654b9a086e0788ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16c1c1e666270404e34cdc2ede7bbc0e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a16c1c1e666270404e34cdc2ede7bbc0e">get</a> (const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const   throw (std::invalid_argument)</td></tr>
-<tr class="memdesc:a16c1c1e666270404e34cdc2ede7bbc0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值  <a href="#a16c1c1e666270404e34cdc2ede7bbc0e">更多...</a><br/></td></tr>
+<tr class="memdesc:a16c1c1e666270404e34cdc2ede7bbc0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值  <a href="#a16c1c1e666270404e34cdc2ede7bbc0e">更多...</a><br /></td></tr>
 <tr class="separator:a16c1c1e666270404e34cdc2ede7bbc0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6150fda2212081ec677f11dd3a2d4c02"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a6150fda2212081ec677f11dd3a2d4c02">getInt</a> (const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const </td></tr>
-<tr class="memdesc:a6150fda2212081ec677f11dd3a2d4c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为int类型  <a href="#a6150fda2212081ec677f11dd3a2d4c02">更多...</a><br/></td></tr>
+<tr class="memdesc:a6150fda2212081ec677f11dd3a2d4c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为int类型  <a href="#a6150fda2212081ec677f11dd3a2d4c02">更多...</a><br /></td></tr>
 <tr class="separator:a6150fda2212081ec677f11dd3a2d4c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6287daca827d41f45a1f01f4051adce"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#ac6287daca827d41f45a1f01f4051adce">getFloat</a> (const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const </td></tr>
-<tr class="memdesc:ac6287daca827d41f45a1f01f4051adce"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为float类型  <a href="#ac6287daca827d41f45a1f01f4051adce">更多...</a><br/></td></tr>
+<tr class="memdesc:ac6287daca827d41f45a1f01f4051adce"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为float类型  <a href="#ac6287daca827d41f45a1f01f4051adce">更多...</a><br /></td></tr>
 <tr class="separator:ac6287daca827d41f45a1f01f4051adce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a842c758700c1628a7759fc4fe13be454"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#a842c758700c1628a7759fc4fe13be454">getDouble</a> (const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const </td></tr>
-<tr class="memdesc:a842c758700c1628a7759fc4fe13be454"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为double类型  <a href="#a842c758700c1628a7759fc4fe13be454">更多...</a><br/></td></tr>
+<tr class="memdesc:a842c758700c1628a7759fc4fe13be454"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为double类型  <a href="#a842c758700c1628a7759fc4fe13be454">更多...</a><br /></td></tr>
 <tr class="separator:a842c758700c1628a7759fc4fe13be454"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd7ebd334e3d24b27b0f08dd1d98c904"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_ini_parser.html#abd7ebd334e3d24b27b0f08dd1d98c904">getBool</a> (const std::string &amp;section, const std::string &amp;option, const std::string &amp;default_str=std::string()) const </td></tr>
-<tr class="memdesc:abd7ebd334e3d24b27b0f08dd1d98c904"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为bool类型  <a href="#abd7ebd334e3d24b27b0f08dd1d98c904">更多...</a><br/></td></tr>
+<tr class="memdesc:abd7ebd334e3d24b27b0f08dd1d98c904"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取指定的option值，并将其转换为bool类型  <a href="#abd7ebd334e3d24b27b0f08dd1d98c904">更多...</a><br /></td></tr>
 <tr class="separator:abd7ebd334e3d24b27b0f08dd1d98c904"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>支持简单的ini格式文件的读取 <br/>
- </p>
-<p>典型的ini文件格式如下, 其中";"为行注释符号：<br/>
- [section1] <br/>
- ;第一段 <br/>
- key1 = value1 <br/>
- key2 = value2 <br/>
- <br/>
- [section2] <br/>
- ;第二段 <br/>
- key1 = value1 ;注释1 <br/>
- key2 = value2 ;注释2 <br/>
+<div class="textblock"><p>支持简单的ini格式文件的读取 <br />
 </p>
-<dl class="section note"><dt>注解</dt><dd>同一个section可以在不同的位置定义，但如果不同位置的section中包含同名的option（key）， 则该option（key）的值为最后读入的值。这可能造成潜在的错误。建议不要将同一个section 在不同的位置定义。<br/>
- 对于配置信息分散在多个文件中的情况，可以通过多次调用read成员方法全部读入后，再统一处理。<br/>
- 该类目前不支持复制操作，暂时没有此需求 <br/>
-</dd></dl>
+<p>典型的ini文件格式如下, 其中";"为行注释符号：<br />
+ [section1] <br />
+ ;第一段 <br />
+ key1 = value1 <br />
+ key2 = value2 <br />
+ <br />
+ [section2] <br />
+ ;第二段 <br />
+ key1 = value1 ;注释1 <br />
+ key2 = value2 ;注释2 <br />
+ </p><dl class="section note"><dt>注解</dt><dd>同一个section可以在不同的位置定义，但如果不同位置的section中包含同名的option（key）， 则该option（key）的值为最后读入的值。这可能造成潜在的错误。建议不要将同一个section 在不同的位置定义。<br />
+ 对于配置信息分散在多个文件中的情况，可以通过多次调用read成员方法全部读入后，再统一处理。<br />
+ 该类目前不支持复制操作，暂时没有此需求 <br />
+ </dd></dl>
 <dl class="section author"><dt>作者</dt><dd>fasiondog </dd></dl>
 <dl class="section date"><dt>日期</dt><dd>20100519 </dd></dl>
 </div><h2 class="groupheader">成员类型定义说明</h2>
@@ -281,7 +280,13 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> const  throw (std::invalid_argument)</td>
+          <td></td><td> const</td>
+        </tr>
+        <tr>
+          <td align="right">throw </td><td>(</td><td colspan="2">std::invalid_argument</td>
+        </tr>
+        <tr>
+          <td align="right"></td><td>)</td><td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -335,9 +340,8 @@ Public 成员函数</h2></td></tr>
 </div><div class="memdoc">
 
 <p>获取指定的option值，并将其转换为bool类型 </p>
-<p>option表示为true时，可接受的值为：1|true|yes|on （不区分大小写） <br/>
- option表示为false时，可接受的值为：0|false|no|off （不区分大小写） </p>
-<dl class="exception"><dt>异常</dt><dd>
+<p>option表示为true时，可接受的值为：1|true|yes|on （不区分大小写） <br />
+ option表示为false时，可接受的值为：0|false|no|off （不区分大小写） </p><dl class="exception"><dt>异常</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::invalid_argument</td><td>当指定option不存在对应值，并且没有指定缺省值时，抛出该异常; 或者当指定的缺省值（非空）无法转换为bool类型时，无论指定的option值是否存在都将抛出该异常。 </td></tr>
     <tr><td class="paramname">std::domain_error</td><td>当指定的option值，无法转换为bool类型时，抛出该异常 </td></tr>
@@ -606,14 +610,22 @@ Public 成员函数</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>filename</em></td><td>)</td>
-          <td>  throw (std::invalid_argument,            std::logic_error)</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td align="right">throw </td><td>(</td><td colspan="2">std::invalid_argument,</td>
+        </tr>
+        <tr>
+          <td align="right"></td><td></td><td colspan="2">                     std::logic_error</td>
+        </tr>
+        <tr>
+          <td align="right"></td><td>)</td><td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>读取并分析指定的ini文件 </p>
-<p>可多次读取不同的ini文件后，再统一处理信息 </p>
-<dl class="exception"><dt>异常</dt><dd>
+<p>可多次读取不同的ini文件后，再统一处理信息 </p><dl class="exception"><dt>异常</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::invalid_argument</td><td>当指定的文件无法打开时，抛出该异常 </td></tr>
     <tr><td class="paramname">std::logic_error</td><td>当文件格式错误时，抛出该异常 </td></tr>
@@ -639,7 +651,7 @@ Public 成员函数</h2></td></tr>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

@@ -1,0 +1,2507 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hku::System类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li class="current"><a href="annotated.html"><span>类</span></a></li>
+      <li><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>类列表</span></a></li>
+      <li><a href="classes.html"><span>类索引</span></a></li>
+      <li><a href="inherits.html"><span>类继承关系</span></a></li>
+      <li><a href="functions.html"><span>类成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_system.html">System</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pro-attribs">Protected 属性</a> &#124;
+<a href="#friends">友元</a> &#124;
+<a href="classhku_1_1_system-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">hku::System类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a> &raquo; <a class="el" href="group___system.html">System 交易系统</a></div></div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>交易系统基类  
+ <a href="classhku_1_1_system.html#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_system_8h_source.html">System.h</a>&gt;</code></p>
+<div class="dynheader">
+hku::System 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_system__coll__graph.png" border="0" usemap="#hku_1_1_system_coll__map" alt="Collaboration graph"/></div>
+<map name="hku_1_1_system_coll__map" id="hku_1_1_system_coll__map">
+<area shape="rect" id="node2" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作 " alt="" coords="5,171,111,200"/>
+<area shape="rect" id="node3" href="classhku_1_1_datetime.html" title="日期类型 " alt="" coords="114,5,245,35"/>
+<area shape="rect" id="node4" href="classhku_1_1_trade_request.html" title="hku::TradeRequest" alt="" coords="155,224,324,253"/>
+<area shape="rect" id="node5" href="classhku_1_1_k_record.html" title="K线数据记录 " alt="" coords="277,117,404,147"/>
+<area shape="rect" id="node6" href="classhku_1_1_k_data.html" title="K线数据 " alt="" coords="362,224,469,253"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:adb3b73210759b54aee348f649eef55c9"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">SystemPart</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#adb3b73210759b54aee348f649eef55c9">Part</a></td></tr>
+<tr class="separator:adb3b73210759b54aee348f649eef55c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a6eecfad22acdfdc0974b4b6f9a6dbb63"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a6eecfad22acdfdc0974b4b6f9a6dbb63">System</a> ()</td></tr>
+<tr class="separator:a6eecfad22acdfdc0974b4b6f9a6dbb63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ec797aad891bb22618f497f22c1caa6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a6ec797aad891bb22618f497f22c1caa6">System</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_system.html#a7926c2ac53e60e498f4abb2131263046">name</a>)</td></tr>
+<tr class="separator:a6ec797aad891bb22618f497f22c1caa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae91ff8752bde7297ca566d6c123143a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aae91ff8752bde7297ca566d6c123143a">System</a> (const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;tm, const <a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a> &amp;mm, const <a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;ev, const <a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a> &amp;cn, const <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> &amp;sg, const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;st, const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;tp, const <a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> &amp;pg, const <a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> &amp;sp, const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_system.html#a7926c2ac53e60e498f4abb2131263046">name</a>)</td></tr>
+<tr class="separator:aae91ff8752bde7297ca566d6c123143a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab268e286499c203cff6183414cf3c178"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ab268e286499c203cff6183414cf3c178">~System</a> ()</td></tr>
+<tr class="separator:ab268e286499c203cff6183414cf3c178"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7926c2ac53e60e498f4abb2131263046"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a7926c2ac53e60e498f4abb2131263046">name</a> () const </td></tr>
+<tr class="memdesc:a7926c2ac53e60e498f4abb2131263046"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取名称  <a href="#a7926c2ac53e60e498f4abb2131263046">更多...</a><br /></td></tr>
+<tr class="separator:a7926c2ac53e60e498f4abb2131263046"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1235a1372eee66315e64488b9c186be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aa1235a1372eee66315e64488b9c186be">getTO</a> () const </td></tr>
+<tr class="separator:aa1235a1372eee66315e64488b9c186be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3b4bc230d8be2bc916c820e1acdb62b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#af3b4bc230d8be2bc916c820e1acdb62b">getTM</a> () const </td></tr>
+<tr class="separator:af3b4bc230d8be2bc916c820e1acdb62b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37f0f96770992b052c183e1b6eecafb5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a37f0f96770992b052c183e1b6eecafb5">getMM</a> () const </td></tr>
+<tr class="separator:a37f0f96770992b052c183e1b6eecafb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa07d194610587f0e0748d1cc9c4f0050"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aa07d194610587f0e0748d1cc9c4f0050">getEV</a> () const </td></tr>
+<tr class="separator:aa07d194610587f0e0748d1cc9c4f0050"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31fb1da97a1f28395c8c69ee040561c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a31fb1da97a1f28395c8c69ee040561c3">getCN</a> () const </td></tr>
+<tr class="separator:a31fb1da97a1f28395c8c69ee040561c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a361ba1e2e74b241e4df57985340357b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a361ba1e2e74b241e4df57985340357b9">getSG</a> () const </td></tr>
+<tr class="separator:a361ba1e2e74b241e4df57985340357b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92c9424d7194cea4b3ffa6073dd82b0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a92c9424d7194cea4b3ffa6073dd82b0b">getST</a> () const </td></tr>
+<tr class="separator:a92c9424d7194cea4b3ffa6073dd82b0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a560969731221549b959a6e54935fbb3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a560969731221549b959a6e54935fbb3a">getTP</a> () const </td></tr>
+<tr class="separator:a560969731221549b959a6e54935fbb3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2594dd0eab182821b86ca9430872677a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a2594dd0eab182821b86ca9430872677a">getPG</a> () const </td></tr>
+<tr class="separator:a2594dd0eab182821b86ca9430872677a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57ad5b0ee985aa23a18fb4efc486a746"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a57ad5b0ee985aa23a18fb4efc486a746">getSP</a> () const </td></tr>
+<tr class="separator:a57ad5b0ee985aa23a18fb4efc486a746"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3e8693d2800aa10f23f3d570f333b84"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ac3e8693d2800aa10f23f3d570f333b84">setTM</a> (const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;tm)</td></tr>
+<tr class="separator:ac3e8693d2800aa10f23f3d570f333b84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac923e83e07b11e6f35ccea495d6acd0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ac923e83e07b11e6f35ccea495d6acd0e">setMM</a> (const <a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a> &amp;mm)</td></tr>
+<tr class="separator:ac923e83e07b11e6f35ccea495d6acd0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2725584d19c59ecd99cfb905a6d7a216"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a2725584d19c59ecd99cfb905a6d7a216">setEV</a> (const <a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;ev)</td></tr>
+<tr class="separator:a2725584d19c59ecd99cfb905a6d7a216"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a540dea639ac817c3818ac191ff693456"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a540dea639ac817c3818ac191ff693456">setCN</a> (const <a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a> &amp;cn)</td></tr>
+<tr class="separator:a540dea639ac817c3818ac191ff693456"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af553d0e44bd466fb25c9226127e4627a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#af553d0e44bd466fb25c9226127e4627a">setSG</a> (const <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> &amp;sg)</td></tr>
+<tr class="separator:af553d0e44bd466fb25c9226127e4627a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0122310ff34062f9a785e451c82408a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a0122310ff34062f9a785e451c82408a4">setST</a> (const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;st)</td></tr>
+<tr class="separator:a0122310ff34062f9a785e451c82408a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a727fff4bcb24de9d64e71113cfaf469c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a727fff4bcb24de9d64e71113cfaf469c">setTP</a> (const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;tp)</td></tr>
+<tr class="separator:a727fff4bcb24de9d64e71113cfaf469c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeab3cc0ec1adb96968882e9f822ef192"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aeab3cc0ec1adb96968882e9f822ef192">setPG</a> (const <a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> &amp;pg)</td></tr>
+<tr class="separator:aeab3cc0ec1adb96968882e9f822ef192"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a953fbbd784d3668e4c005bee6a83d2b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a953fbbd784d3668e4c005bee6a83d2b3">setSP</a> (const <a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> &amp;sp)</td></tr>
+<tr class="separator:a953fbbd784d3668e4c005bee6a83d2b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc3ba1b877dbcf117aac3481ebc1c1b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#acc3ba1b877dbcf117aac3481ebc1c1b0">getStock</a> () const </td></tr>
+<tr class="separator:acc3ba1b877dbcf117aac3481ebc1c1b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afff694141fcd7b71ddbc02f9c79c0dc8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#afff694141fcd7b71ddbc02f9c79c0dc8">getTradeRecordList</a> () const </td></tr>
+<tr class="separator:afff694141fcd7b71ddbc02f9c79c0dc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a441499e2cf5b0e11454d3c5cbbbedd21"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a441499e2cf5b0e11454d3c5cbbbedd21">getBuyTradeRequest</a> () const </td></tr>
+<tr class="separator:a441499e2cf5b0e11454d3c5cbbbedd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37d2ae191626282f0181edc122781dbc"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a37d2ae191626282f0181edc122781dbc">getSellTradeRequest</a> () const </td></tr>
+<tr class="separator:a37d2ae191626282f0181edc122781dbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41b74f9cb58fe82ccbe31518cd4953c8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a41b74f9cb58fe82ccbe31518cd4953c8">getSellShortTradeRequest</a> () const </td></tr>
+<tr class="separator:a41b74f9cb58fe82ccbe31518cd4953c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78e6cb7be4e627b7a22d2d4d5fe73f1a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a78e6cb7be4e627b7a22d2d4d5fe73f1a">getBuyShortTradeRequest</a> () const </td></tr>
+<tr class="separator:a78e6cb7be4e627b7a22d2d4d5fe73f1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06beaf226a86de27ab84825692aea9a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a06beaf226a86de27ab84825692aea9a0">reset</a> ()</td></tr>
+<tr class="memdesc:a06beaf226a86de27ab84825692aea9a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">复位  <a href="#a06beaf226a86de27ab84825692aea9a0">更多...</a><br /></td></tr>
+<tr class="separator:a06beaf226a86de27ab84825692aea9a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12f41aaa668c0bfe19344d3d64775a53"><td class="memItemLeft" align="right" valign="top">shared_ptr&lt; <a class="el" href="classhku_1_1_system.html">System</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a12f41aaa668c0bfe19344d3d64775a53">clone</a> ()</td></tr>
+<tr class="memdesc:a12f41aaa668c0bfe19344d3d64775a53"><td class="mdescLeft">&#160;</td><td class="mdescRight">克隆操作，会依次调用所有部件的clone操作  <a href="#a12f41aaa668c0bfe19344d3d64775a53">更多...</a><br /></td></tr>
+<tr class="separator:a12f41aaa668c0bfe19344d3d64775a53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8c128fe26e9f2cff7506d095b41e1d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#af8c128fe26e9f2cff7506d095b41e1d4">setTO</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;kdata)</td></tr>
+<tr class="memdesc:af8c128fe26e9f2cff7506d095b41e1d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置交易对象  <a href="#af8c128fe26e9f2cff7506d095b41e1d4">更多...</a><br /></td></tr>
+<tr class="separator:af8c128fe26e9f2cff7506d095b41e1d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3afcda894aea1b07e69917a4f5534935"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a3afcda894aea1b07e69917a4f5534935">run</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;stock, const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;query, bool <a class="el" href="classhku_1_1_system.html#a06beaf226a86de27ab84825692aea9a0">reset</a>=true)</td></tr>
+<tr class="separator:a3afcda894aea1b07e69917a4f5534935"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1843eb5abf16dafea8a315efb1a1ac3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#af1843eb5abf16dafea8a315efb1a1ac3">runMoment</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
+<tr class="separator:af1843eb5abf16dafea8a315efb1a1ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9d9215072359bba14b5dfe24b0f6fe7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ad9d9215072359bba14b5dfe24b0f6fe7">runMoment</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;record)</td></tr>
+<tr class="separator:ad9d9215072359bba14b5dfe24b0f6fe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff560a350c65d646c5cc30ab4a1ccf03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aff560a350c65d646c5cc30ab4a1ccf03">clearRequest</a> ()</td></tr>
+<tr class="separator:aff560a350c65d646c5cc30ab4a1ccf03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80eedc9c321a79215374b37492dcbdb9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a80eedc9c321a79215374b37492dcbdb9">_environmentIsValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
+<tr class="separator:a80eedc9c321a79215374b37492dcbdb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae51109ad2d263a572a4059f85377ecb8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ae51109ad2d263a572a4059f85377ecb8">_conditionIsValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
+<tr class="separator:ae51109ad2d263a572a4059f85377ecb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7b0d371bc90dd16b4a39a52b92da483"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ae7b0d371bc90dd16b4a39a52b92da483">_shouldBuy</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
+<tr class="separator:ae7b0d371bc90dd16b4a39a52b92da483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1d7b1294727694ac6d9afdd328d5521"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ac1d7b1294727694ac6d9afdd328d5521">_buyNotifyAll</a> (const <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> &amp;)</td></tr>
+<tr class="separator:ac1d7b1294727694ac6d9afdd328d5521"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a738c0240ddf5471a192e08404c9d1194"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a738c0240ddf5471a192e08404c9d1194">_sellNotifyAll</a> (const <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> &amp;)</td></tr>
+<tr class="separator:a738c0240ddf5471a192e08404c9d1194"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8aecf97b71979076732daab470a5ecac"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a8aecf97b71979076732daab470a5ecac">_getBuyNumber</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> risk)</td></tr>
+<tr class="separator:a8aecf97b71979076732daab470a5ecac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a4550bcd23aa8cdc2795f7432b093bc"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a6a4550bcd23aa8cdc2795f7432b093bc">_getSellNumber</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> risk)</td></tr>
+<tr class="separator:a6a4550bcd23aa8cdc2795f7432b093bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24763bd8b94e55af55b7b8681ac30b58"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a24763bd8b94e55af55b7b8681ac30b58">_getSellShortNumber</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> risk)</td></tr>
+<tr class="separator:a24763bd8b94e55af55b7b8681ac30b58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a543d7be3474e3ba632ff7532ad8ed152"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a543d7be3474e3ba632ff7532ad8ed152">_getBuyShortNumber</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> risk)</td></tr>
+<tr class="separator:a543d7be3474e3ba632ff7532ad8ed152"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acad2e7f22400895d4fb97e4ef16615d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#acad2e7f22400895d4fb97e4ef16615d6">_getStoplossPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
+<tr class="separator:acad2e7f22400895d4fb97e4ef16615d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a8076d671023664d97d3f672126b1a2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a3a8076d671023664d97d3f672126b1a2">_getShortStoplossPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
+<tr class="separator:a3a8076d671023664d97d3f672126b1a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8408fa671e8106222f0a462716e5c72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ab8408fa671e8106222f0a462716e5c72">_getTakeProfitPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
+<tr class="separator:ab8408fa671e8106222f0a462716e5c72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade8b6cdf187a15fd65c1daec97aaebaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ade8b6cdf187a15fd65c1daec97aaebaa">_getGoalPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
+<tr class="separator:ade8b6cdf187a15fd65c1daec97aaebaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42c6db178919da912949f24615fa20e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a42c6db178919da912949f24615fa20e8">_getShortGoalPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> price)</td></tr>
+<tr class="separator:a42c6db178919da912949f24615fa20e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a902da49edda7cf77a66f89952c6a47da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a902da49edda7cf77a66f89952c6a47da">_getRealBuyPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice)</td></tr>
+<tr class="separator:a902da49edda7cf77a66f89952c6a47da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec46032c63425fcf5c70fd8fabb6ddba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aec46032c63425fcf5c70fd8fabb6ddba">_getRealSellPrice</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> planPrice)</td></tr>
+<tr class="separator:aec46032c63425fcf5c70fd8fabb6ddba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5524ea0a287d83045b7e4c92a9298633"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a5524ea0a287d83045b7e4c92a9298633">_buy</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:a5524ea0a287d83045b7e4c92a9298633"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea0b71d9b4df90b28ad286737f70ec37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aea0b71d9b4df90b28ad286737f70ec37">_buyNow</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:aea0b71d9b4df90b28ad286737f70ec37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae017fb3f50988cc5ddc158e8d5d52fac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ae017fb3f50988cc5ddc158e8d5d52fac">_buyDelay</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:ae017fb3f50988cc5ddc158e8d5d52fac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c28f19b504a0a16a8b01ce86ef1d1e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a6c28f19b504a0a16a8b01ce86ef1d1e7">_submitBuyRequest</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:a6c28f19b504a0a16a8b01ce86ef1d1e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a566a1ed3bd4edadbc948183fd1e8e6e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a566a1ed3bd4edadbc948183fd1e8e6e9">_sell</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today, <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a> from)</td></tr>
+<tr class="separator:a566a1ed3bd4edadbc948183fd1e8e6e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a145e198c9dfc7611eff1c43d56768908"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a145e198c9dfc7611eff1c43d56768908">_sellNow</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today, <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a> from)</td></tr>
+<tr class="separator:a145e198c9dfc7611eff1c43d56768908"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af869bab5d973cd09ce10fb91b310ba23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#af869bab5d973cd09ce10fb91b310ba23">_sellDelay</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:af869bab5d973cd09ce10fb91b310ba23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5a41fb553d514b82ad454c71e7af210"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aa5a41fb553d514b82ad454c71e7af210">_submitSellRequest</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today, <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a> from)</td></tr>
+<tr class="separator:aa5a41fb553d514b82ad454c71e7af210"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01febcd77b68b47b6c710fe88b722dd5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a01febcd77b68b47b6c710fe88b722dd5">_sellShort</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:a01febcd77b68b47b6c710fe88b722dd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60cafb371966cee0bda2bcb31f7132d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a60cafb371966cee0bda2bcb31f7132d8">_sellShortNow</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:a60cafb371966cee0bda2bcb31f7132d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6ff72ecc6a6cb309ff77376fd6f793d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aa6ff72ecc6a6cb309ff77376fd6f793d">_sellShortDelay</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:aa6ff72ecc6a6cb309ff77376fd6f793d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25ca687ac4813b453d4a5e0ad62fd97e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a25ca687ac4813b453d4a5e0ad62fd97e">_submitSellShortRequest</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:a25ca687ac4813b453d4a5e0ad62fd97e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb7a5486c5ffdfd23b01b12162ad5412"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#adb7a5486c5ffdfd23b01b12162ad5412">_buyShort</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today, <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a> from)</td></tr>
+<tr class="separator:adb7a5486c5ffdfd23b01b12162ad5412"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae14b7395df37b8c43653b621abd59fd7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ae14b7395df37b8c43653b621abd59fd7">_buyShortNow</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today, <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a> from)</td></tr>
+<tr class="separator:ae14b7395df37b8c43653b621abd59fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add555dc14a5eb8eea0ecbd9313146c38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#add555dc14a5eb8eea0ecbd9313146c38">_buyShortDelay</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:add555dc14a5eb8eea0ecbd9313146c38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8afc147cec14d16283a124355d6cd83a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a8afc147cec14d16283a124355d6cd83a">_submitBuyShortRequest</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today, <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a> from)</td></tr>
+<tr class="separator:a8afc147cec14d16283a124355d6cd83a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95d778f332cf2fb64e8baa1e8c5db4ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a95d778f332cf2fb64e8baa1e8c5db4ba">_processRequest</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;today)</td></tr>
+<tr class="separator:a95d778f332cf2fb64e8baa1e8c5db4ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad309e582c96fd3af0ad1fdca62be40f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ad309e582c96fd3af0ad1fdca62be40f5">_runMoment</a> (const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;record)</td></tr>
+<tr class="separator:ad309e582c96fd3af0ad1fdca62be40f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected 属性</h2></td></tr>
+<tr class="memitem:a1708e87228ce10c05aac26d0075c5102"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a1708e87228ce10c05aac26d0075c5102">m_tm</a></td></tr>
+<tr class="separator:a1708e87228ce10c05aac26d0075c5102"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ca3eb5acb664797dabb6edae5726de1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a3ca3eb5acb664797dabb6edae5726de1">m_mm</a></td></tr>
+<tr class="separator:a3ca3eb5acb664797dabb6edae5726de1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb21a179bd2c4a912add7f35a2d37ad9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#adb21a179bd2c4a912add7f35a2d37ad9">m_ev</a></td></tr>
+<tr class="separator:adb21a179bd2c4a912add7f35a2d37ad9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26e4091e44c22b4c5b6f7ac77d313080"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a26e4091e44c22b4c5b6f7ac77d313080">m_cn</a></td></tr>
+<tr class="separator:a26e4091e44c22b4c5b6f7ac77d313080"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e309587229f87301192effbde25f672"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a7e309587229f87301192effbde25f672">m_sg</a></td></tr>
+<tr class="separator:a7e309587229f87301192effbde25f672"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62a47794078e3b86d0ee9865dc915312"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a62a47794078e3b86d0ee9865dc915312">m_st</a></td></tr>
+<tr class="separator:a62a47794078e3b86d0ee9865dc915312"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4352d8c8e308eb00821d4ed7fcccf97"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ab4352d8c8e308eb00821d4ed7fcccf97">m_tp</a></td></tr>
+<tr class="separator:ab4352d8c8e308eb00821d4ed7fcccf97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94f8a1166e865537f3658b930976e9e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a94f8a1166e865537f3658b930976e9e3">m_pg</a></td></tr>
+<tr class="separator:a94f8a1166e865537f3658b930976e9e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa37987cbe706e52d22f4a679786eaa2f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aa37987cbe706e52d22f4a679786eaa2f">m_sp</a></td></tr>
+<tr class="separator:aa37987cbe706e52d22f4a679786eaa2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af745c78b4645685b6e76f8ed4053969b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#af745c78b4645685b6e76f8ed4053969b">m_name</a></td></tr>
+<tr class="separator:af745c78b4645685b6e76f8ed4053969b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a065d77a70fa698e75ca5778fbd414d0f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a065d77a70fa698e75ca5778fbd414d0f">m_stock</a></td></tr>
+<tr class="separator:a065d77a70fa698e75ca5778fbd414d0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cf24a622d23717ab496679f89f79222"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a3cf24a622d23717ab496679f89f79222">m_kdata</a></td></tr>
+<tr class="separator:a3cf24a622d23717ab496679f89f79222"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9268889e4b9a6b164d5de3505aa17da"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#af9268889e4b9a6b164d5de3505aa17da">m_buy_days</a></td></tr>
+<tr class="separator:af9268889e4b9a6b164d5de3505aa17da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa45ba6615d07a6e27e198eb2518a1219"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aa45ba6615d07a6e27e198eb2518a1219">m_sell_short_days</a></td></tr>
+<tr class="separator:aa45ba6615d07a6e27e198eb2518a1219"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefbed949e002f0ed9f2c0065f824030f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#aefbed949e002f0ed9f2c0065f824030f">m_trade_list</a></td></tr>
+<tr class="separator:aefbed949e002f0ed9f2c0065f824030f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96cc3e73889b0d6f1052ddf6a678caa1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a96cc3e73889b0d6f1052ddf6a678caa1">m_lastTakeProfit</a></td></tr>
+<tr class="separator:a96cc3e73889b0d6f1052ddf6a678caa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a738c762be4cb33de0441ebf65e3e2f21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a738c762be4cb33de0441ebf65e3e2f21">m_lastShortTakeProfit</a></td></tr>
+<tr class="separator:a738c762be4cb33de0441ebf65e3e2f21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c4e6e2b7bb16bd14968d790bab8b00d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a7c4e6e2b7bb16bd14968d790bab8b00d">m_buyRequest</a></td></tr>
+<tr class="separator:a7c4e6e2b7bb16bd14968d790bab8b00d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3113d91733c6cdd1299977c055a2c3c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a3113d91733c6cdd1299977c055a2c3c2">m_sellRequest</a></td></tr>
+<tr class="separator:a3113d91733c6cdd1299977c055a2c3c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a2fd7dba2a89f25693836076596d653"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a8a2fd7dba2a89f25693836076596d653">m_sellShortRequest</a></td></tr>
+<tr class="separator:a8a2fd7dba2a89f25693836076596d653"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84e5530ee12574b5d34431b76ab468df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#a84e5530ee12574b5d34431b76ab468df">m_buyShortRequest</a></td></tr>
+<tr class="separator:a84e5530ee12574b5d34431b76ab468df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_system.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
+<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>交易系统基类 </p>
+</div><h2 class="groupheader">成员类型定义说明</h2>
+<a class="anchor" id="adb3b73210759b54aee348f649eef55c9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">SystemPart</a> <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">hku::System::Part</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">构造及析构函数说明</h2>
+<a class="anchor" id="a6eecfad22acdfdc0974b4b6f9a6dbb63"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::System::System </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6ec797aad891bb22618f497f22c1caa6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::System::System </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aae91ff8752bde7297ca566d6c123143a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::System::System </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>tm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>mm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>ev</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>cn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>st</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>tp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>pg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab268e286499c203cff6183414cf3c178"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::System::~System </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a class="anchor" id="a5524ea0a287d83045b7e4c92a9298633"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_buy </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae017fb3f50988cc5ddc158e8d5d52fac"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_buyDelay </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac1d7b1294727694ac6d9afdd328d5521"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_buyNotifyAll </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>record</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aea0b71d9b4df90b28ad286737f70ec37"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_buyNow </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="adb7a5486c5ffdfd23b01b12162ad5412"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_buyShort </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a>&#160;</td>
+          <td class="paramname"><em>from</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="add555dc14a5eb8eea0ecbd9313146c38"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_buyShortDelay </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae14b7395df37b8c43653b621abd59fd7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_buyShortNow </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a>&#160;</td>
+          <td class="paramname"><em>from</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae51109ad2d263a572a4059f85377ecb8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::System::_conditionIsValid </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a80eedc9c321a79215374b37492dcbdb9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::System::_environmentIsValid </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8aecf97b71979076732daab470a5ecac"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::System::_getBuyNumber </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>risk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a543d7be3474e3ba632ff7532ad8ed152"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::System::_getBuyShortNumber </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>risk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ade8b6cdf187a15fd65c1daec97aaebaa"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::_getGoalPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a902da49edda7cf77a66f89952c6a47da"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::_getRealBuyPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>planPrice</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aec46032c63425fcf5c70fd8fabb6ddba"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::_getRealSellPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>planPrice</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6a4550bcd23aa8cdc2795f7432b093bc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::System::_getSellNumber </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>risk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a24763bd8b94e55af55b7b8681ac30b58"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t hku::System::_getSellShortNumber </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>risk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a42c6db178919da912949f24615fa20e8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::_getShortGoalPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3a8076d671023664d97d3f672126b1a2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::_getShortStoplossPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="acad2e7f22400895d4fb97e4ef16615d6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::_getStoplossPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>price</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab8408fa671e8106222f0a462716e5c72"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::_getTakeProfitPrice </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a95d778f332cf2fb64e8baa1e8c5db4ba"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_processRequest </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad309e582c96fd3af0ad1fdca62be40f5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_runMoment </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>record</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a566a1ed3bd4edadbc948183fd1e8e6e9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_sell </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a>&#160;</td>
+          <td class="paramname"><em>from</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af869bab5d973cd09ce10fb91b310ba23"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_sellDelay </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a738c0240ddf5471a192e08404c9d1194"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_sellNotifyAll </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_trade_record.html">TradeRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>record</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a145e198c9dfc7611eff1c43d56768908"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_sellNow </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a>&#160;</td>
+          <td class="paramname"><em>from</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a01febcd77b68b47b6c710fe88b722dd5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_sellShort </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa6ff72ecc6a6cb309ff77376fd6f793d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_sellShortDelay </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a60cafb371966cee0bda2bcb31f7132d8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_sellShortNow </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae7b0d371bc90dd16b4a39a52b92da483"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::System::_shouldBuy </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6c28f19b504a0a16a8b01ce86ef1d1e7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_submitBuyRequest </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8afc147cec14d16283a124355d6cd83a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_submitBuyShortRequest </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a>&#160;</td>
+          <td class="paramname"><em>from</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa5a41fb553d514b82ad454c71e7af210"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_submitSellRequest </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706">Part</a>&#160;</td>
+          <td class="paramname"><em>from</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a25ca687ac4813b453d4a5e0ad62fd97e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::_submitSellShortRequest </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>today</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aff560a350c65d646c5cc30ab4a1ccf03"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::clearRequest </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a12f41aaa668c0bfe19344d3d64775a53"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___system.html#gaa9a70c93bf975bb86ad0c5fd0dcc8ad9">SystemPtr</a> hku::System::clone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>克隆操作，会依次调用所有部件的clone操作 </p>
+
+</div>
+</div>
+<a class="anchor" id="a78e6cb7be4e627b7a22d2d4d5fe73f1a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&amp; hku::System::getBuyShortTradeRequest </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a441499e2cf5b0e11454d3c5cbbbedd21"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&amp; hku::System::getBuyTradeRequest </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a31fb1da97a1f28395c8c69ee040561c3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a> hku::System::getCN </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa07d194610587f0e0748d1cc9c4f0050"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> hku::System::getEV </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a37f0f96770992b052c183e1b6eecafb5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a> hku::System::getMM </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2594dd0eab182821b86ca9430872677a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> hku::System::getPG </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a41b74f9cb58fe82ccbe31518cd4953c8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&amp; hku::System::getSellShortTradeRequest </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a37d2ae191626282f0181edc122781dbc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a>&amp; hku::System::getSellTradeRequest </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a361ba1e2e74b241e4df57985340357b9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> hku::System::getSG </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a57ad5b0ee985aa23a18fb4efc486a746"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> hku::System::getSP </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a92c9424d7194cea4b3ffa6073dd82b0b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> hku::System::getST </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="acc3ba1b877dbcf117aac3481ebc1c1b0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::System::getStock </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af3b4bc230d8be2bc916c820e1acdb62b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> hku::System::getTM </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa1235a1372eee66315e64488b9c186be"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::System::getTO </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a560969731221549b959a6e54935fbb3a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> hku::System::getTP </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="afff694141fcd7b71ddbc02f9c79c0dc8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a>&amp; hku::System::getTradeRecordList </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7926c2ac53e60e498f4abb2131263046"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp; hku::System::name </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取名称 </p>
+
+</div>
+</div>
+<a class="anchor" id="a06beaf226a86de27ab84825692aea9a0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>复位 </p>
+<dl class="section note"><dt>注解</dt><dd>不包含TradeManager的复位 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a3afcda894aea1b07e69917a4f5534935"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::run </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;&#160;</td>
+          <td class="paramname"><em>stock</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_query.html">KQuery</a> &amp;&#160;</td>
+          <td class="paramname"><em>query</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>reset</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af1843eb5abf16dafea8a315efb1a1ac3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::runMoment </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad9d9215072359bba14b5dfe24b0f6fe7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::runMoment </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_record.html">KRecord</a> &amp;&#160;</td>
+          <td class="paramname"><em>record</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a540dea639ac817c3818ac191ff693456"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setCN </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>cn</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2725584d19c59ecd99cfb905a6d7a216"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setEV </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>ev</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac923e83e07b11e6f35ccea495d6acd0e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setMM </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>mm</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aeab3cc0ec1adb96968882e9f822ef192"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setPG </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>pg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af553d0e44bd466fb25c9226127e4627a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setSG </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a953fbbd784d3668e4c005bee6a83d2b3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setSP </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sp</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0122310ff34062f9a785e451c82408a4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setST </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>st</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac3e8693d2800aa10f23f3d570f333b84"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setTM </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>tm</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af8c128fe26e9f2cff7506d095b41e1d4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setTO </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td>
+          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置交易对象 </p>
+<dl class="section note"><dt>注解</dt><dd>其中tm, ev没有setTO接口 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a727fff4bcb24de9d64e71113cfaf469c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::System::setTP </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>tp</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">友元及相关函数文档</h2>
+<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class boost::serialization::access</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">类成员变量说明</h2>
+<a class="anchor" id="af9268889e4b9a6b164d5de3505aa17da"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int hku::System::m_buy_days</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7c4e6e2b7bb16bd14968d790bab8b00d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> hku::System::m_buyRequest</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a84e5530ee12574b5d34431b76ab468df"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> hku::System::m_buyShortRequest</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a26e4091e44c22b4c5b6f7ac77d313080"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___condition.html#gaf034db1c33808015884de277ff7d6155">ConditionPtr</a> hku::System::m_cn</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="adb21a179bd2c4a912add7f35a2d37ad9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___environment.html#gac1532edba0a5f3a254e0c2d12552ee7e">EnvironmentPtr</a> hku::System::m_ev</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3cf24a622d23717ab496679f89f79222"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::System::m_kdata</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a738c762be4cb33de0441ebf65e3e2f21"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::m_lastShortTakeProfit</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a96cc3e73889b0d6f1052ddf6a678caa1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::System::m_lastTakeProfit</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3ca3eb5acb664797dabb6edae5726de1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___money_manager.html#ga06c3ee7e1a13ef55493264d754b62db2">MoneyManagerPtr</a> hku::System::m_mm</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af745c78b4645685b6e76f8ed4053969b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::System::m_name</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a94f8a1166e865537f3658b930976e9e3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___profit_goal.html#ga15de439d18b21a787ee746d8dd3a906a">ProfitGoalPtr</a> hku::System::m_pg</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa45ba6615d07a6e27e198eb2518a1219"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int hku::System::m_sell_short_days</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3113d91733c6cdd1299977c055a2c3c2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> hku::System::m_sellRequest</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8a2fd7dba2a89f25693836076596d653"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_trade_request.html">TradeRequest</a> hku::System::m_sellShortRequest</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7e309587229f87301192effbde25f672"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">SignalPtr</a> hku::System::m_sg</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa37987cbe706e52d22f4a679786eaa2f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> hku::System::m_sp</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a62a47794078e3b86d0ee9865dc915312"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> hku::System::m_st</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a065d77a70fa698e75ca5778fbd414d0f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_stock.html">Stock</a> hku::System::m_stock</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1708e87228ce10c05aac26d0075c5102"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> hku::System::m_tm</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab4352d8c8e308eb00821d4ed7fcccf97"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ae50262ae3d1cfa56eaa77b01806d8a81">StoplossPtr</a> hku::System::m_tp</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aefbed949e002f0ed9f2c0065f824030f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga331f8f4b810f375dac4596f337507d89">TradeRecordList</a> hku::System::m_trade_list</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/trade_sys/system/<a class="el" href="_system_8h_source.html">System.h</a></li>
+<li>hikyuu/trade_sys/system/<a class="el" href="_system_8cpp.html">System.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

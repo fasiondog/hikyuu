@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: Indicator 指标库</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,14 +33,14 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
+      <li class="current"><a href="modules.html"><span>模块</span></a></li>
       <li><a href="namespaces.html"><span>命名空间</span></a></li>
       <li><a href="annotated.html"><span>类</span></a></li>
       <li><a href="files.html"><span>文件</span></a></li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,98 +93,344 @@ Indicator 指标库 的协作图:</div>
 <div class="dyncontent">
 <center><table><tr><td><img src="group___indicator.png" border="0" alt="" usemap="#group______indicator"/>
 <map name="group______indicator" id="group______indicator">
-<area shape="rect" id="node2" href="group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等" alt="" coords="6,5,162,35"/></map>
+<area shape="rect" id="node2" href="group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等 " alt="" coords="5,5,165,35"/>
+</map>
 </td></tr></table></center>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 类</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp  <a href="classhku_1_1_indicator.html#details">更多...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp  <a href="classhku_1_1_indicator.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_indicator_imp.html">hku::IndicatorImp</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">指标实现类，定义新指标时，应从此类继承  <a href="classhku_1_1_indicator_imp.html#details">更多...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">指标实现类，定义新指标时，应从此类继承  <a href="classhku_1_1_indicator_imp.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 函数</h2></td></tr>
-<tr class="memitem:gadb850a9500b3d3a19945926383a4fccb"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gadb850a9500b3d3a19945926383a4fccb">hku::KDATA</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:gadb850a9500b3d3a19945926383a4fccb"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData成Indicator，用于其他指标计算  <a href="#gadb850a9500b3d3a19945926383a4fccb">更多...</a><br/></td></tr>
-<tr class="separator:gadb850a9500b3d3a19945926383a4fccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga250b6ba8994d3ea51fc5d572b8f64cda"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga250b6ba8994d3ea51fc5d572b8f64cda">hku::OPEN</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:ga250b6ba8994d3ea51fc5d572b8f64cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的开盘价成Indicator，用于其他指标计算  <a href="#ga250b6ba8994d3ea51fc5d572b8f64cda">更多...</a><br/></td></tr>
-<tr class="separator:ga250b6ba8994d3ea51fc5d572b8f64cda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga32f8728c0fd4a24ab04cc60354233bf0"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga32f8728c0fd4a24ab04cc60354233bf0">hku::HIGH</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:ga32f8728c0fd4a24ab04cc60354233bf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的最高价成Indicator，用于其他指标计算  <a href="#ga32f8728c0fd4a24ab04cc60354233bf0">更多...</a><br/></td></tr>
-<tr class="separator:ga32f8728c0fd4a24ab04cc60354233bf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga367ea4d1cba233eb410735d0fcc7fbee"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga367ea4d1cba233eb410735d0fcc7fbee">hku::LOW</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:ga367ea4d1cba233eb410735d0fcc7fbee"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的最低价成Indicator，用于其他指标计算  <a href="#ga367ea4d1cba233eb410735d0fcc7fbee">更多...</a><br/></td></tr>
-<tr class="separator:ga367ea4d1cba233eb410735d0fcc7fbee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga67e1b746572435d2997b324498b0b286"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga67e1b746572435d2997b324498b0b286">hku::CLOSE</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:ga67e1b746572435d2997b324498b0b286"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的收盘价成Indicator，用于其他指标计算  <a href="#ga67e1b746572435d2997b324498b0b286">更多...</a><br/></td></tr>
-<tr class="separator:ga67e1b746572435d2997b324498b0b286"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6193b431125f3f0c728a9e6a8557bc4f"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga6193b431125f3f0c728a9e6a8557bc4f">hku::TRANSAMOUNT</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:ga6193b431125f3f0c728a9e6a8557bc4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的成交金额成Indicator，用于其他指标计算，同AMO  <a href="#ga6193b431125f3f0c728a9e6a8557bc4f">更多...</a><br/></td></tr>
-<tr class="separator:ga6193b431125f3f0c728a9e6a8557bc4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadc6c29549220c742c58b767dd64b4745"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gadc6c29549220c742c58b767dd64b4745">hku::TRANSCOUNT</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:gadc6c29549220c742c58b767dd64b4745"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的成交量成Indicator，用于其他指标计算，同VOL  <a href="#gadc6c29549220c742c58b767dd64b4745">更多...</a><br/></td></tr>
-<tr class="separator:gadc6c29549220c742c58b767dd64b4745"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga139283813493fcda74236606f065b65e"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga139283813493fcda74236606f065b65e">hku::AMO</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:ga139283813493fcda74236606f065b65e"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的成交金额成Indicator，用于其他指标计算, 同TRANSAMOUNT  <a href="#ga139283813493fcda74236606f065b65e">更多...</a><br/></td></tr>
-<tr class="separator:ga139283813493fcda74236606f065b65e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga554c041d497fa819447071ea127e7084"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga554c041d497fa819447071ea127e7084">hku::VOL</a> (const KData &amp;)</td></tr>
-<tr class="memdesc:ga554c041d497fa819447071ea127e7084"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的成交量成Indicator，用于其他指标计算，同TRANSCOUNT  <a href="#ga554c041d497fa819447071ea127e7084">更多...</a><br/></td></tr>
-<tr class="separator:ga554c041d497fa819447071ea127e7084"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3a56061fdf877e941414eee3e56777bd"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga3a56061fdf877e941414eee3e56777bd">hku::MA</a> (int n=22)</td></tr>
-<tr class="memdesc:ga3a56061fdf877e941414eee3e56777bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">简单移动平均  <a href="#ga3a56061fdf877e941414eee3e56777bd">更多...</a><br/></td></tr>
-<tr class="separator:ga3a56061fdf877e941414eee3e56777bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0733a95bbd333a8a8e999a4793f947f6"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga0733a95bbd333a8a8e999a4793f947f6">hku::MA</a> (const Indicator &amp;data, int n=22)</td></tr>
-<tr class="memdesc:ga0733a95bbd333a8a8e999a4793f947f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">简单移动平均  <a href="#ga0733a95bbd333a8a8e999a4793f947f6">更多...</a><br/></td></tr>
-<tr class="separator:ga0733a95bbd333a8a8e999a4793f947f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3c9206fbf9dbe92d6999bd7ac20a906e"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga3c9206fbf9dbe92d6999bd7ac20a906e">hku::PRICELIST</a> (const PriceList &amp;data)</td></tr>
-<tr class="memdesc:ga3c9206fbf9dbe92d6999bd7ac20a906e"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装PriceList成Indicator，用于计算其他指标  <a href="#ga3c9206fbf9dbe92d6999bd7ac20a906e">更多...</a><br/></td></tr>
-<tr class="separator:ga3c9206fbf9dbe92d6999bd7ac20a906e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1e24b2e6c7047b08d10644c116e725b3"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga1e24b2e6c7047b08d10644c116e725b3">hku::AMA</a> (int n=10, int fast_n=2, int slow_n=30)</td></tr>
+<tr class="memdesc:ga1e24b2e6c7047b08d10644c116e725b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均，参见《精明交易者》（2006年 广东经济出版社）  <a href="group___indicator.html#ga1e24b2e6c7047b08d10644c116e725b3">更多...</a><br /></td></tr>
+<tr class="separator:ga1e24b2e6c7047b08d10644c116e725b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadc124c884c2389e3e16561ff37267728"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gadc124c884c2389e3e16561ff37267728">hku::AMA</a> (const Indicator &amp;indicator, int n=10, int fast_n=2, int slow_n=30)</td></tr>
+<tr class="memdesc:gadc124c884c2389e3e16561ff37267728"><td class="mdescLeft">&#160;</td><td class="mdescRight">佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均，参见《精明交易者》（2006年 广东经济出版社）  <a href="group___indicator.html#gadc124c884c2389e3e16561ff37267728">更多...</a><br /></td></tr>
+<tr class="separator:gadc124c884c2389e3e16561ff37267728"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf301b547652472606d0f0ceecaf809a3"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaf301b547652472606d0f0ceecaf809a3">hku::ATR</a> (int n=14)</td></tr>
+<tr class="memdesc:gaf301b547652472606d0f0ceecaf809a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">平均真实波幅(Average True Range)  <a href="group___indicator.html#gaf301b547652472606d0f0ceecaf809a3">更多...</a><br /></td></tr>
+<tr class="separator:gaf301b547652472606d0f0ceecaf809a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae2cfdedd8532f2a0fb4c80966f26f2c4"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gae2cfdedd8532f2a0fb4c80966f26f2c4">hku::ATR</a> (const Indicator &amp;data, int n=14)</td></tr>
+<tr class="memdesc:gae2cfdedd8532f2a0fb4c80966f26f2c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">平均真实波幅(Average True Range)  <a href="group___indicator.html#gae2cfdedd8532f2a0fb4c80966f26f2c4">更多...</a><br /></td></tr>
+<tr class="separator:gae2cfdedd8532f2a0fb4c80966f26f2c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac49046515c9f4e3c9d3b526b8f33c3d5"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gac49046515c9f4e3c9d3b526b8f33c3d5">hku::CVAL</a> (double value=0.0, size_t len=0, size_t discard=0)</td></tr>
+<tr class="memdesc:gac49046515c9f4e3c9d3b526b8f33c3d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">创建一个指定长度的常数指标  <a href="group___indicator.html#gac49046515c9f4e3c9d3b526b8f33c3d5">更多...</a><br /></td></tr>
+<tr class="separator:gac49046515c9f4e3c9d3b526b8f33c3d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3b7d4ac25551d4e4a1c3a6b803cd07ec"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga3b7d4ac25551d4e4a1c3a6b803cd07ec">hku::CVAL</a> (const Indicator &amp;ind, double value=0.0)</td></tr>
+<tr class="memdesc:ga3b7d4ac25551d4e4a1c3a6b803cd07ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">创建一个常数指标，其长度和输入的ind相同，其值固定为指定value  <a href="group___indicator.html#ga3b7d4ac25551d4e4a1c3a6b803cd07ec">更多...</a><br /></td></tr>
+<tr class="separator:ga3b7d4ac25551d4e4a1c3a6b803cd07ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad564915cc2d998f3ba93044fa638abb0"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gad564915cc2d998f3ba93044fa638abb0">hku::DIFF</a> ()</td></tr>
+<tr class="memdesc:gad564915cc2d998f3ba93044fa638abb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">差分指标，即data[i] - data[i-1]  <a href="group___indicator.html#gad564915cc2d998f3ba93044fa638abb0">更多...</a><br /></td></tr>
+<tr class="separator:gad564915cc2d998f3ba93044fa638abb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga451476b8d1c0d77a785620264f4be64f"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga451476b8d1c0d77a785620264f4be64f">hku::DIFF</a> (const Indicator &amp;data)</td></tr>
+<tr class="memdesc:ga451476b8d1c0d77a785620264f4be64f"><td class="mdescLeft">&#160;</td><td class="mdescRight">差分指标，即data[i] - data[i-1]  <a href="group___indicator.html#ga451476b8d1c0d77a785620264f4be64f">更多...</a><br /></td></tr>
+<tr class="separator:ga451476b8d1c0d77a785620264f4be64f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab5a1c5a794a7fbd5e992ac23c8ab8293"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gab5a1c5a794a7fbd5e992ac23c8ab8293">hku::EMA</a> (int n=22)</td></tr>
+<tr class="memdesc:gab5a1c5a794a7fbd5e992ac23c8ab8293"><td class="mdescLeft">&#160;</td><td class="mdescRight">指数移动平均线(Exponential Moving Average)  <a href="group___indicator.html#gab5a1c5a794a7fbd5e992ac23c8ab8293">更多...</a><br /></td></tr>
+<tr class="separator:gab5a1c5a794a7fbd5e992ac23c8ab8293"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga279d1bdb8699b90c0045aa3eec2f86d4"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga279d1bdb8699b90c0045aa3eec2f86d4">hku::EMA</a> (const Indicator &amp;data, int n=22)</td></tr>
+<tr class="memdesc:ga279d1bdb8699b90c0045aa3eec2f86d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">指数移动平均线(Exponential Moving Average)  <a href="group___indicator.html#ga279d1bdb8699b90c0045aa3eec2f86d4">更多...</a><br /></td></tr>
+<tr class="separator:ga279d1bdb8699b90c0045aa3eec2f86d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf58bbdba6ee6b67e06281307928d5baa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaf58bbdba6ee6b67e06281307928d5baa">hku::IND_AND</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaf58bbdba6ee6b67e06281307928d5baa"><td class="mdescLeft">&#160;</td><td class="mdescRight">对两个Indicator执行与操作  <a href="group___indicator.html#gaf58bbdba6ee6b67e06281307928d5baa">更多...</a><br /></td></tr>
+<tr class="separator:gaf58bbdba6ee6b67e06281307928d5baa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafb66f639ee0690e6660b3da947c3115b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gafb66f639ee0690e6660b3da947c3115b">hku::IND_OR</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gafb66f639ee0690e6660b3da947c3115b"><td class="mdescLeft">&#160;</td><td class="mdescRight">对两个Indicator执行或操作  <a href="group___indicator.html#gafb66f639ee0690e6660b3da947c3115b">更多...</a><br /></td></tr>
+<tr class="separator:gafb66f639ee0690e6660b3da947c3115b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaadd8cc1ada5a1ba48ff20a166a384cb8"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaadd8cc1ada5a1ba48ff20a166a384cb8">hku::KDATA</a> ()</td></tr>
+<tr class="memdesc:gaadd8cc1ada5a1ba48ff20a166a384cb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData成Indicator，用于其他指标计算  <a href="group___indicator.html#gaadd8cc1ada5a1ba48ff20a166a384cb8">更多...</a><br /></td></tr>
+<tr class="separator:gaadd8cc1ada5a1ba48ff20a166a384cb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad903b870a1aebd1e8170224ea0ccf577"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gad903b870a1aebd1e8170224ea0ccf577">hku::OPEN</a> ()</td></tr>
+<tr class="memdesc:gad903b870a1aebd1e8170224ea0ccf577"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的开盘价成Indicator，用于其他指标计算  <a href="group___indicator.html#gad903b870a1aebd1e8170224ea0ccf577">更多...</a><br /></td></tr>
+<tr class="separator:gad903b870a1aebd1e8170224ea0ccf577"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6ea59fe65ab76f28a56b241fba5600d1"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga6ea59fe65ab76f28a56b241fba5600d1">hku::HIGH</a> ()</td></tr>
+<tr class="memdesc:ga6ea59fe65ab76f28a56b241fba5600d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的最高价成Indicator，用于其他指标计算  <a href="group___indicator.html#ga6ea59fe65ab76f28a56b241fba5600d1">更多...</a><br /></td></tr>
+<tr class="separator:ga6ea59fe65ab76f28a56b241fba5600d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaddb04b846308f58567a49264887bb0f1"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaddb04b846308f58567a49264887bb0f1">hku::LOW</a> ()</td></tr>
+<tr class="memdesc:gaddb04b846308f58567a49264887bb0f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的最低价成Indicator，用于其他指标计算  <a href="group___indicator.html#gaddb04b846308f58567a49264887bb0f1">更多...</a><br /></td></tr>
+<tr class="separator:gaddb04b846308f58567a49264887bb0f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0e5b90e3d7123d617df1059a193739e6"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga0e5b90e3d7123d617df1059a193739e6">hku::CLOSE</a> ()</td></tr>
+<tr class="memdesc:ga0e5b90e3d7123d617df1059a193739e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的收盘价成Indicator，用于其他指标计算  <a href="group___indicator.html#ga0e5b90e3d7123d617df1059a193739e6">更多...</a><br /></td></tr>
+<tr class="separator:ga0e5b90e3d7123d617df1059a193739e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5363868f760338ce145f2d69bfedffce"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga5363868f760338ce145f2d69bfedffce">hku::AMO</a> ()</td></tr>
+<tr class="memdesc:ga5363868f760338ce145f2d69bfedffce"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的成交金额成Indicator，用于其他指标计算  <a href="group___indicator.html#ga5363868f760338ce145f2d69bfedffce">更多...</a><br /></td></tr>
+<tr class="separator:ga5363868f760338ce145f2d69bfedffce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1740d24a66213fe68d165661d13ac275"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga1740d24a66213fe68d165661d13ac275">hku::VOL</a> ()</td></tr>
+<tr class="memdesc:ga1740d24a66213fe68d165661d13ac275"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装KData的成交量成Indicator，用于其他指标计算  <a href="group___indicator.html#ga1740d24a66213fe68d165661d13ac275">更多...</a><br /></td></tr>
+<tr class="separator:ga1740d24a66213fe68d165661d13ac275"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga13c28f9a1a728320aae54ec78fe0b58a"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga13c28f9a1a728320aae54ec78fe0b58a">hku::KDATA_PART</a> (const string &amp;kpart)</td></tr>
+<tr class="memdesc:ga13c28f9a1a728320aae54ec78fe0b58a"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据字符串选择返回KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL  <a href="group___indicator.html#ga13c28f9a1a728320aae54ec78fe0b58a">更多...</a><br /></td></tr>
+<tr class="separator:ga13c28f9a1a728320aae54ec78fe0b58a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4c4c55bf99b7eaa16f53a32fe6fea46a"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga4c4c55bf99b7eaa16f53a32fe6fea46a">hku::MA</a> (const Indicator &amp;data, int n=22, const string &amp;type=&quot;SMA&quot;)</td></tr>
+<tr class="memdesc:ga4c4c55bf99b7eaa16f53a32fe6fea46a"><td class="mdescLeft">&#160;</td><td class="mdescRight">移动平均  <a href="group___indicator.html#ga4c4c55bf99b7eaa16f53a32fe6fea46a">更多...</a><br /></td></tr>
+<tr class="separator:ga4c4c55bf99b7eaa16f53a32fe6fea46a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae90df9f90ae452a7d3446d887f26fdb3"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gae90df9f90ae452a7d3446d887f26fdb3">hku::MACD</a> (int n1=12, int n2=26, int n3=9)</td></tr>
+<tr class="memdesc:gae90df9f90ae452a7d3446d887f26fdb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">MACD平滑异同移动平均线  <a href="group___indicator.html#gae90df9f90ae452a7d3446d887f26fdb3">更多...</a><br /></td></tr>
+<tr class="separator:gae90df9f90ae452a7d3446d887f26fdb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3b023c696e3d4ab773279d8140214853"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga3b023c696e3d4ab773279d8140214853">hku::MACD</a> (const Indicator &amp;data, int n1=12, int n2=26, int n3=9)</td></tr>
+<tr class="memdesc:ga3b023c696e3d4ab773279d8140214853"><td class="mdescLeft">&#160;</td><td class="mdescRight">MACD平滑异同移动平均线  <a href="group___indicator.html#ga3b023c696e3d4ab773279d8140214853">更多...</a><br /></td></tr>
+<tr class="separator:ga3b023c696e3d4ab773279d8140214853"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa5a55415ed627194e80d41daf832fe5d"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaa5a55415ed627194e80d41daf832fe5d">hku::PRICELIST</a> (const PriceList &amp;, int discard=0)</td></tr>
+<tr class="memdesc:gaa5a55415ed627194e80d41daf832fe5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装PriceList成Indicator  <a href="group___indicator.html#gaa5a55415ed627194e80d41daf832fe5d">更多...</a><br /></td></tr>
+<tr class="separator:gaa5a55415ed627194e80d41daf832fe5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab605844111fd39ada0c7caf96afcd22c"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gab605844111fd39ada0c7caf96afcd22c">hku::PRICELIST</a> (const Indicator &amp;ind, int result_index=0)</td></tr>
+<tr class="memdesc:gab605844111fd39ada0c7caf96afcd22c"><td class="mdescLeft">&#160;</td><td class="mdescRight">将某指标转化为PRICELIST  <a href="group___indicator.html#gab605844111fd39ada0c7caf96afcd22c">更多...</a><br /></td></tr>
+<tr class="separator:gab605844111fd39ada0c7caf96afcd22c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab4ed8b6691a1ccdc3c21145ebd37976a"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gab4ed8b6691a1ccdc3c21145ebd37976a">hku::PRICELIST</a> (int result_index=0)</td></tr>
+<tr class="memdesc:gab4ed8b6691a1ccdc3c21145ebd37976a"><td class="mdescLeft">&#160;</td><td class="mdescRight">将某指标转化为PRICELIST  <a href="group___indicator.html#gab4ed8b6691a1ccdc3c21145ebd37976a">更多...</a><br /></td></tr>
+<tr class="separator:gab4ed8b6691a1ccdc3c21145ebd37976a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7532f5437ffb76719e86e05c85766fb9"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga7532f5437ffb76719e86e05c85766fb9">hku::PRICELIST</a> (price_t *data, size_t total)</td></tr>
-<tr class="memdesc:ga7532f5437ffb76719e86e05c85766fb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装 price_t 数组成Indicator，用于计算其他指标  <a href="#ga7532f5437ffb76719e86e05c85766fb9">更多...</a><br/></td></tr>
+<tr class="memdesc:ga7532f5437ffb76719e86e05c85766fb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装 price_t 数组成Indicator，用于计算其他指标  <a href="group___indicator.html#ga7532f5437ffb76719e86e05c85766fb9">更多...</a><br /></td></tr>
 <tr class="separator:ga7532f5437ffb76719e86e05c85766fb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga87e8fe4c7f25fb5416302907472e82cc"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga87e8fe4c7f25fb5416302907472e82cc">hku::REF</a> (int n)</td></tr>
+<tr class="memdesc:ga87e8fe4c7f25fb5416302907472e82cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">REF 向前引用 （即右移） 引用若干周期前的数据。 用法：　REF(X，A)　引用A周期前的X值。  <a href="group___indicator.html#ga87e8fe4c7f25fb5416302907472e82cc">更多...</a><br /></td></tr>
+<tr class="separator:ga87e8fe4c7f25fb5416302907472e82cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6e4acc308a1152817e5f58cab0f37948"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga6e4acc308a1152817e5f58cab0f37948">hku::REF</a> (const Indicator &amp;ind, int n)</td></tr>
+<tr class="memdesc:ga6e4acc308a1152817e5f58cab0f37948"><td class="mdescLeft">&#160;</td><td class="mdescRight">REF 向前引用 （即右移） 引用若干周期前的数据。 用法：　REF(X，A)　引用A周期前的X值。  <a href="group___indicator.html#ga6e4acc308a1152817e5f58cab0f37948">更多...</a><br /></td></tr>
+<tr class="separator:ga6e4acc308a1152817e5f58cab0f37948"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5b0f3de68507e786f1b942b7965a9d6a"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga5b0f3de68507e786f1b942b7965a9d6a">hku::SAFTYLOSS</a> (const Indicator &amp;data, int n1=10, int n2=3, double p=2.0)</td></tr>
+<tr class="memdesc:ga5b0f3de68507e786f1b942b7965a9d6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">亚历山大 艾尔德安全地带止损  <a href="group___indicator.html#ga5b0f3de68507e786f1b942b7965a9d6a">更多...</a><br /></td></tr>
+<tr class="separator:ga5b0f3de68507e786f1b942b7965a9d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga39c33f81116169903f0f2a092d9fc726"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga39c33f81116169903f0f2a092d9fc726">hku::SAFTYLOSS</a> (int n1=10, int n2=3, double p=2.0)</td></tr>
+<tr class="memdesc:ga39c33f81116169903f0f2a092d9fc726"><td class="mdescLeft">&#160;</td><td class="mdescRight">亚历山大 艾尔德安全地带止损  <a href="group___indicator.html#ga39c33f81116169903f0f2a092d9fc726">更多...</a><br /></td></tr>
+<tr class="separator:ga39c33f81116169903f0f2a092d9fc726"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga32d2f253e1346410baebeeb77d4a5ae1"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga32d2f253e1346410baebeeb77d4a5ae1">hku::SMA</a> (const Indicator &amp;data, int n=22)</td></tr>
+<tr class="memdesc:ga32d2f253e1346410baebeeb77d4a5ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">简单移动平均  <a href="group___indicator.html#ga32d2f253e1346410baebeeb77d4a5ae1">更多...</a><br /></td></tr>
+<tr class="separator:ga32d2f253e1346410baebeeb77d4a5ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabf364927458cbc97dac0e734868dfe90"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gabf364927458cbc97dac0e734868dfe90">hku::STDEV</a> (int n=10)</td></tr>
+<tr class="memdesc:gabf364927458cbc97dac0e734868dfe90"><td class="mdescLeft">&#160;</td><td class="mdescRight">计算N周期内样本标准差  <a href="group___indicator.html#gabf364927458cbc97dac0e734868dfe90">更多...</a><br /></td></tr>
+<tr class="separator:gabf364927458cbc97dac0e734868dfe90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab7c2354df4af84a2137455a2f732e3b1"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gab7c2354df4af84a2137455a2f732e3b1">hku::STDEV</a> (const Indicator &amp;data, int n=10)</td></tr>
+<tr class="memdesc:gab7c2354df4af84a2137455a2f732e3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">计算N周期内样本标准差  <a href="group___indicator.html#gab7c2354df4af84a2137455a2f732e3b1">更多...</a><br /></td></tr>
+<tr class="separator:gab7c2354df4af84a2137455a2f732e3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0fd9831d875f30152747c3fa2b14145e"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga0fd9831d875f30152747c3fa2b14145e">hku::VIGOR</a> (const KData &amp;kdata, int n=2)</td></tr>
+<tr class="memdesc:ga0fd9831d875f30152747c3fa2b14145e"><td class="mdescLeft">&#160;</td><td class="mdescRight">亚历山大 艾尔德力度指数  <a href="group___indicator.html#ga0fd9831d875f30152747c3fa2b14145e">更多...</a><br /></td></tr>
+<tr class="separator:ga0fd9831d875f30152747c3fa2b14145e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf2d6b58a2e72f2362b8c607d29aa432c"><td class="memItemLeft" align="right" valign="top">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaf2d6b58a2e72f2362b8c607d29aa432c">hku::WEAVE</a> (const Indicator &amp;ind)</td></tr>
+<tr class="memdesc:gaf2d6b58a2e72f2362b8c607d29aa432c"><td class="mdescLeft">&#160;</td><td class="mdescRight">将ind的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1); ind=ind(ind2)。 则此时ind包含两个结果，result1为ind1的数据,result2为ind2的数据  <a href="group___indicator.html#gaf2d6b58a2e72f2362b8c607d29aa432c">更多...</a><br /></td></tr>
+<tr class="separator:gaf2d6b58a2e72f2362b8c607d29aa432c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga197d09c650708d79c1a6464727f515e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga197d09c650708d79c1a6464727f515e2">hku::operator+</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga197d09c650708d79c1a6464727f515e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相加，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga197d09c650708d79c1a6464727f515e2">更多...</a><br /></td></tr>
+<tr class="separator:ga197d09c650708d79c1a6464727f515e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf40b4dac3e9bd98b9ac49632d4d4b1f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaf40b4dac3e9bd98b9ac49632d4d4b1f1">hku::operator-</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaf40b4dac3e9bd98b9ac49632d4d4b1f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相减，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaf40b4dac3e9bd98b9ac49632d4d4b1f1">更多...</a><br /></td></tr>
+<tr class="separator:gaf40b4dac3e9bd98b9ac49632d4d4b1f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf90cae0e2c922fd483e568026d37ff24"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaf90cae0e2c922fd483e568026d37ff24">hku::operator*</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaf90cae0e2c922fd483e568026d37ff24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相乘，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaf90cae0e2c922fd483e568026d37ff24">更多...</a><br /></td></tr>
+<tr class="separator:gaf90cae0e2c922fd483e568026d37ff24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3f0ea36cf3fdb980c212c08ba152a89c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga3f0ea36cf3fdb980c212c08ba152a89c">hku::operator/</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga3f0ea36cf3fdb980c212c08ba152a89c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相除，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga3f0ea36cf3fdb980c212c08ba152a89c">更多...</a><br /></td></tr>
+<tr class="separator:ga3f0ea36cf3fdb980c212c08ba152a89c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5c8f988e50bc4ff1a742bbc29de54119"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga5c8f988e50bc4ff1a742bbc29de54119">hku::operator==</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga5c8f988e50bc4ff1a742bbc29de54119"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例相等，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga5c8f988e50bc4ff1a742bbc29de54119">更多...</a><br /></td></tr>
+<tr class="separator:ga5c8f988e50bc4ff1a742bbc29de54119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5bd8194c0579cf9e5367715d927211ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga5bd8194c0579cf9e5367715d927211ae">hku::operator!=</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga5bd8194c0579cf9e5367715d927211ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例不相等，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga5bd8194c0579cf9e5367715d927211ae">更多...</a><br /></td></tr>
+<tr class="separator:ga5bd8194c0579cf9e5367715d927211ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga22aca36fce28b7b816a33cab2d8f95af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga22aca36fce28b7b816a33cab2d8f95af">hku::operator&gt;</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga22aca36fce28b7b816a33cab2d8f95af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例大于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga22aca36fce28b7b816a33cab2d8f95af">更多...</a><br /></td></tr>
+<tr class="separator:ga22aca36fce28b7b816a33cab2d8f95af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga09f521fffcac8df259e53cc7e2a8e324"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#ga09f521fffcac8df259e53cc7e2a8e324">hku::operator&lt;</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:ga09f521fffcac8df259e53cc7e2a8e324"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例小于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#ga09f521fffcac8df259e53cc7e2a8e324">更多...</a><br /></td></tr>
+<tr class="separator:ga09f521fffcac8df259e53cc7e2a8e324"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa48185c3715bc6f1e0db31321f58d74f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaa48185c3715bc6f1e0db31321f58d74f">hku::operator&gt;=</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaa48185c3715bc6f1e0db31321f58d74f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例大于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaa48185c3715bc6f1e0db31321f58d74f">更多...</a><br /></td></tr>
+<tr class="separator:gaa48185c3715bc6f1e0db31321f58d74f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa74c97f1ed51afeb207a8a1f591423af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___indicator.html#gaa74c97f1ed51afeb207a8a1f591423af">hku::operator&lt;=</a> (const Indicator &amp;, const Indicator &amp;)</td></tr>
+<tr class="memdesc:gaa74c97f1ed51afeb207a8a1f591423af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicator实例小于操作，两者的size必须相等，否在返回空  <a href="group___indicator.html#gaa74c97f1ed51afeb207a8a1f591423af">更多...</a><br /></td></tr>
+<tr class="separator:gaa74c97f1ed51afeb207a8a1f591423af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <p>内建常用指标，及新指标定义实现基础设施 </p>
-<p>包含指标基类定义、部分常用指标以及指标的生成函数 </p>
-<dl class="section note"><dt>注解</dt><dd>在客户端程序中，建议尽可能使用指标的生成函数，生成具体的指标进行调用，以避免错误的内存申请和释放 <br/>
- 示例： <br/>
- Indicator ma = <a class="el" href="group___indicator.html#ga3a56061fdf877e941414eee3e56777bd" title="简单移动平均">MA()</a>; <br/>
- std::cout &lt;&lt; ma.name() &lt;&lt; std::endl; <br/>
- </dd></dl>
+<p>包含指标基类定义、部分常用指标以及指标的生成函数 </p><dl class="section note"><dt>注解</dt><dd>在客户端程序中，建议尽可能使用指标的生成函数，生成具体的指标进行调用，以避免错误的内存申请和释放 <br />
+ 示例： <br />
+ Indicator ma = <a class="el" href="group___indicator.html#ga4c4c55bf99b7eaa16f53a32fe6fea46a" title="移动平均 ">MA()</a>; <br />
+ std::cout &lt;&lt; ma.name() &lt;&lt; std::endl; <br />
+</dd></dl>
 <h2 class="groupheader">函数说明</h2>
-<a class="anchor" id="ga139283813493fcda74236606f065b65e"></a>
+<a class="anchor" id="ga1e24b2e6c7047b08d10644c116e725b3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::AMA </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>10</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fast_n</em> = <code>2</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>slow_n</em> = <code>30</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均，参见《精明交易者》（2006年 广东经济出版社） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于2的整数，默认为10天 </td></tr>
+    <tr><td class="paramname">fast_n</td><td>对应快速周期N，默认为2 </td></tr>
+    <tr><td class="paramname">slow_n</td><td>对应慢速EMA线的N值，默认为30，不过当超过60左右该指标会收敛不会有太大的影响 (0)(1) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gadc124c884c2389e3e16561ff37267728"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::AMA </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>indicator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>10</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fast_n</em> = <code>2</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>slow_n</em> = <code>30</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均，参见《精明交易者》（2006年 广东经济出版社） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">indicator</td><td>待计算的数据 </td></tr>
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于2的整数，默认为10天 </td></tr>
+    <tr><td class="paramname">fast_n</td><td>对应快速周期N，默认为2 </td></tr>
+    <tr><td class="paramname">slow_n</td><td>对应慢速EMA线的N值，默认为30，不过当超过60左右该指标会收敛不会有太大的影响 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga5363868f760338ce145f2d69bfedffce"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::AMO </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>包装KData的成交金额成Indicator，用于其他指标计算, 同TRANSAMOUNT </p>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="group___indicator.html#ga6193b431125f3f0c728a9e6a8557bc4f" title="包装KData的成交金额成Indicator，用于其他指标计算，同AMO">TRANSAMOUNT</a> </dd></dl>
+<p>包装KData的成交金额成Indicator，用于其他指标计算 </p>
 
 </div>
 </div>
-<a class="anchor" id="ga67e1b746572435d2997b324498b0b286"></a>
+<a class="anchor" id="gaf301b547652472606d0f0ceecaf809a3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::ATR </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>14</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>平均真实波幅(Average True Range) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于1的整数 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gae2cfdedd8532f2a0fb4c80966f26f2c4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::ATR </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>14</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>平均真实波幅(Average True Range) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>待计算的源数据 </td></tr>
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于1的整数 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga0e5b90e3d7123d617df1059a193739e6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::CLOSE </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -193,66 +440,130 @@ Indicator 指标库 的协作图:</div>
 
 </div>
 </div>
-<a class="anchor" id="ga32f8728c0fd4a24ab04cc60354233bf0"></a>
+<a class="anchor" id="gac49046515c9f4e3c9d3b526b8f33c3d5"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::HIGH </td>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::CVAL </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>value</em> = <code>0.0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>len</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>discard</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>创建一个指定长度的常数指标 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>常量 </td></tr>
+    <tr><td class="paramname">len</td><td>长度 </td></tr>
+    <tr><td class="paramname">discard</td><td>抛弃数量，默认0 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga3b7d4ac25551d4e4a1c3a6b803cd07ec"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::CVAL </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>ind</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>value</em> = <code>0.0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>创建一个常数指标，其长度和输入的ind相同，其值固定为指定value </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ind</td><td>待计算的数据 </td></tr>
+    <tr><td class="paramname">value</td><td>常量 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gad564915cc2d998f3ba93044fa638abb0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::DIFF </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>包装KData的最高价成Indicator，用于其他指标计算 </p>
+<p>差分指标，即data[i] - data[i-1] </p>
 
 </div>
 </div>
-<a class="anchor" id="gadb850a9500b3d3a19945926383a4fccb"></a>
+<a class="anchor" id="ga451476b8d1c0d77a785620264f4be64f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::KDATA </td>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::DIFF </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>包装KData成Indicator，用于其他指标计算 </p>
+<p>差分指标，即data[i] - data[i-1] </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>待计算数据 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="ga367ea4d1cba233eb410735d0fcc7fbee"></a>
+<a class="anchor" id="gab5a1c5a794a7fbd5e992ac23c8ab8293"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::LOW </td>
-          <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>包装KData的最低价成Indicator，用于其他指标计算 </p>
-
-</div>
-</div>
-<a class="anchor" id="ga3a56061fdf877e941414eee3e56777bd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MA </td>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::EMA </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>n</em> = <code>22</code></td><td>)</td>
@@ -261,24 +572,24 @@ Indicator 指标库 的协作图:</div>
       </table>
 </div><div class="memdoc">
 
-<p>简单移动平均 </p>
+<p>指数移动平均线(Exponential Moving Average) </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于0的整数，默认22天 </td></tr>
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于0的整数 </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="ga0733a95bbd333a8a8e999a4793f947f6"></a>
+<a class="anchor" id="ga279d1bdb8699b90c0045aa3eec2f86d4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MA </td>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::EMA </td>
           <td>(</td>
-          <td class="paramtype">const Indicator &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -295,26 +606,303 @@ Indicator 指标库 的协作图:</div>
       </table>
 </div><div class="memdoc">
 
-<p>简单移动平均 </p>
+<p>指数移动平均线(Exponential Moving Average) </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">data</td><td>待计算的数据 </td></tr>
-    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于0的整数，默认22天 </td></tr>
+    <tr><td class="paramname">data</td><td>待计算的源数据 </td></tr>
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于0的整数 </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="ga250b6ba8994d3ea51fc5d572b8f64cda"></a>
+<a class="anchor" id="ga6ea59fe65ab76f28a56b241fba5600d1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::HIGH </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>包装KData的最高价成Indicator，用于其他指标计算 </p>
+
+</div>
+</div>
+<a class="anchor" id="gaf58bbdba6ee6b67e06281307928d5baa"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::IND_AND </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>对两个Indicator执行与操作 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果ind1相同位置的值和ind2相同位置的值都大于0则为1.0，否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gafb66f639ee0690e6660b3da947c3115b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::IND_OR </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>对两个Indicator执行或操作 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果ind1相同位置的值和ind2相同位置的值其中一个大于0则为1.0，否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaadd8cc1ada5a1ba48ff20a166a384cb8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::KDATA </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>包装KData成Indicator，用于其他指标计算 </p>
+
+</div>
+</div>
+<a class="anchor" id="ga13c28f9a1a728320aae54ec78fe0b58a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::KDATA_PART </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>kpart</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>根据字符串选择返回KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">kdata</td><td>K线数据 </td></tr>
+    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="group___indicator.html#gaadd8cc1ada5a1ba48ff20a166a384cb8" title="包装KData成Indicator，用于其他指标计算 ">KDATA</a>, <a class="el" href="group___indicator.html#gad903b870a1aebd1e8170224ea0ccf577" title="包装KData的开盘价成Indicator，用于其他指标计算 ">OPEN</a>, <a class="el" href="group___indicator.html#ga6ea59fe65ab76f28a56b241fba5600d1" title="包装KData的最高价成Indicator，用于其他指标计算 ">HIGH</a>, <a class="el" href="group___indicator.html#gaddb04b846308f58567a49264887bb0f1" title="包装KData的最低价成Indicator，用于其他指标计算 ">LOW</a>, <a class="el" href="group___indicator.html#ga0e5b90e3d7123d617df1059a193739e6" title="包装KData的收盘价成Indicator，用于其他指标计算 ">CLOSE</a>, <a class="el" href="group___indicator.html#ga5363868f760338ce145f2d69bfedffce" title="包装KData的成交金额成Indicator，用于其他指标计算 ">AMO</a>, <a class="el" href="group___indicator.html#ga1740d24a66213fe68d165661d13ac275" title="包装KData的成交量成Indicator，用于其他指标计算 ">VOL</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaddb04b846308f58567a49264887bb0f1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::LOW </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>包装KData的最低价成Indicator，用于其他指标计算 </p>
+
+</div>
+</div>
+<a class="anchor" id="ga4c4c55bf99b7eaa16f53a32fe6fea46a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MA </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>22</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>type</em> = <code>&quot;SMA&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>移动平均 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>待计算的数据 </td></tr>
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于0的整数 </td></tr>
+    <tr><td class="paramname">type</td><td>"EMA"|"SMA"|"AMA", 默认"SMA" </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gae90df9f90ae452a7d3446d887f26fdb3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MACD </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n1</em> = <code>12</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n2</em> = <code>26</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n3</em> = <code>9</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>MACD平滑异同移动平均线 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n1</td><td>短期EMA时间窗，默认12 </td></tr>
+    <tr><td class="paramname">n2</td><td>长期EMA时间窗，默认26 </td></tr>
+    <tr><td class="paramname">n3</td><td>（短期EMA-长期EMA）EMA平滑时间窗，默认9 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><pre>
+MACD BAR： MACD直柱，即MACD快线－MACD慢线
+DIFF: 快线,即（短期EMA-长期EMA）
+DEA: 慢线，即快线的n3周期EMA平滑
+</pre> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga3b023c696e3d4ab773279d8140214853"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::MACD </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n1</em> = <code>12</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n2</em> = <code>26</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n3</em> = <code>9</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>MACD平滑异同移动平均线 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>待计算数据 </td></tr>
+    <tr><td class="paramname">n1</td><td>短期EMA时间窗，默认12 </td></tr>
+    <tr><td class="paramname">n2</td><td>长期EMA时间窗，默认26 </td></tr>
+    <tr><td class="paramname">n3</td><td>（短期EMA-长期EMA）EMA平滑时间窗，默认9 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd><pre>
+MACD BAR： MACD直柱，即MACD快线－MACD慢线
+DIFF: 快线,即（短期EMA-长期EMA）
+DEA: 慢线，即快线的n3周期EMA平滑
+</pre> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gad903b870a1aebd1e8170224ea0ccf577"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::OPEN </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
-          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -324,24 +912,384 @@ Indicator 指标库 的协作图:</div>
 
 </div>
 </div>
-<a class="anchor" id="ga3c9206fbf9dbe92d6999bd7ac20a906e"></a>
+<a class="anchor" id="ga5bd8194c0579cf9e5367715d927211ae"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例不相等，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果相同位置的值不相等为1.0，否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaf90cae0e2c922fd483e568026d37ff24"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator* </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例相乘，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga197d09c650708d79c1a6464727f515e2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator+ </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例相加，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 相加的两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaf40b4dac3e9bd98b9ac49632d4d4b1f1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator- </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例相减，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga3f0ea36cf3fdb980c212c08ba152a89c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator/ </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例相除，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如被除中存在为零的数据，则对应位置结果为Null&lt;price_t&gt;() </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga09f521fffcac8df259e53cc7e2a8e324"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例小于操作，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果ind1相同位置的值小于ind2相同位置的值则为1.0，否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaa74c97f1ed51afeb207a8a1f591423af"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例小于操作，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果ind1相同位置的值小于等于ind2相同位置的值则为1.0，否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga5c8f988e50bc4ff1a742bbc29de54119"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator== </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例相等，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果相同位置的值相等为1.0, 否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga22aca36fce28b7b816a33cab2d8f95af"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例大于操作，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果ind1相同位置的值大于ind2相同位置的值则为1.0，否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaa48185c3715bc6f1e0db31321f58d74f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> Indicator hku::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicator实例大于操作，两者的size必须相等，否在返回空 </p>
+<dl class="section return"><dt>返回</dt><dd>1) 两个实例的size必须相等，否在返回空实例 2）如果两个实例的resultNumber不等，则取最小的resultNumber 3）如果ind1相同位置的值大于等于ind2相同位置的值则为1.0，否则为0.0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaa5a55415ed627194e80d41daf832fe5d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::PRICELIST </td>
           <td>(</td>
-          <td class="paramtype">const PriceList &amp;&#160;</td>
-          <td class="paramname"><em>data</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">PriceList</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>discard</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>包装PriceList成Indicator </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>源数据 </td></tr>
+    <tr><td class="paramname">discard</td><td>前端抛弃的数据点数，抛弃的值使用Null&lt;price_t&gt;()填充 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gab605844111fd39ada0c7caf96afcd22c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::PRICELIST </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>ind</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>result_index</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>将某指标转化为PRICELIST </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ind</td><td>源数据 </td></tr>
+    <tr><td class="paramname">result_index</td><td>源数据中指定的结果集 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gab4ed8b6691a1ccdc3c21145ebd37976a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::PRICELIST </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>result_index</em> = <code>0</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>包装PriceList成Indicator，用于计算其他指标 </p>
+<p>将某指标转化为PRICELIST </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramname">data</td><td>待包装的PriceList </td></tr>
+    <tr><td class="paramname">result_index</td><td>源数据中指定的结果集 </td></tr>
   </table>
   </dd>
 </dl>
@@ -355,7 +1303,7 @@ Indicator 指标库 的协作图:</div>
         <tr>
           <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::PRICELIST </td>
           <td>(</td>
-          <td class="paramtype">price_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -383,60 +1331,341 @@ Indicator 指标库 的协作图:</div>
 
 </div>
 </div>
-<a class="anchor" id="ga6193b431125f3f0c728a9e6a8557bc4f"></a>
+<a class="anchor" id="ga87e8fe4c7f25fb5416302907472e82cc"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::TRANSAMOUNT </td>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::REF </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>包装KData的成交金额成Indicator，用于其他指标计算，同AMO </p>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="group___indicator.html#ga139283813493fcda74236606f065b65e" title="包装KData的成交金额成Indicator，用于其他指标计算, 同TRANSAMOUNT">AMO</a> </dd></dl>
+<p>REF 向前引用 （即右移） 引用若干周期前的数据。 用法：　REF(X，A)　引用A周期前的X值。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>引用n周期前的值，即右移n位 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="gadc6c29549220c742c58b767dd64b4745"></a>
+<a class="anchor" id="ga6e4acc308a1152817e5f58cab0f37948"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::TRANSCOUNT </td>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::REF </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>ind</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>REF 向前引用 （即右移） 引用若干周期前的数据。 用法：　REF(X，A)　引用A周期前的X值。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ind</td><td>待计算的数据 </td></tr>
+    <tr><td class="paramname">n</td><td>引用n周期前的值，即右移n位 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga5b0f3de68507e786f1b942b7965a9d6a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SAFTYLOSS </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n1</em> = <code>10</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n2</em> = <code>3</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>p</em> = <code>2.0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>亚历山大 艾尔德安全地带止损 </p>
+<pre>
+参见《走进我的交易室》（2007年 地震出版社） 亚历山大.艾尔德(Alexander Elder) P202
+计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，
+        得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日
+        最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的
+        上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
+</pre> <dl class="section note"><dt>注解</dt><dd>：返回结果中前（回溯周期宽度＋去最高值的宽度）个点是无效的 </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>输入数据，单一输入 </td></tr>
+    <tr><td class="paramname">n1</td><td>计算平均噪音的回溯时间窗口，默认为10天 </td></tr>
+    <tr><td class="paramname">n2</td><td>对初步止损线去n2日内的最高值，默认为3 </td></tr>
+    <tr><td class="paramname">p</td><td>噪音系数，默认为2 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga39c33f81116169903f0f2a092d9fc726"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SAFTYLOSS </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n1</em> = <code>10</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n2</em> = <code>3</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>p</em> = <code>2.0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>亚历山大 艾尔德安全地带止损 </p>
+<pre>
+参见《走进我的交易室》（2007年 地震出版社） 亚历山大.艾尔德(Alexander Elder) P202
+计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，
+        得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日
+        最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的
+        上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
+</pre> <dl class="section note"><dt>注解</dt><dd>：返回结果中前（回溯周期宽度＋去最高值的宽度）个点是无效的 </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n1</td><td>计算平均噪音的回溯时间窗口，默认为10天 </td></tr>
+    <tr><td class="paramname">n2</td><td>对初步止损线去n2日内的最高值，默认为3 </td></tr>
+    <tr><td class="paramname">p</td><td>噪音系数，默认为2 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga32d2f253e1346410baebeeb77d4a5ae1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SMA </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>22</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>简单移动平均 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>待计算的数据 </td></tr>
+    <tr><td class="paramname">n</td><td>计算均值的周期窗口，必须为大于0的整数 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gabf364927458cbc97dac0e734868dfe90"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::STDEV </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>10</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>包装KData的成交量成Indicator，用于其他指标计算，同VOL </p>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="group___indicator.html#ga554c041d497fa819447071ea127e7084" title="包装KData的成交量成Indicator，用于其他指标计算，同TRANSCOUNT">VOL</a> </dd></dl>
+<p>计算N周期内样本标准差 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>N日时间窗口 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="ga554c041d497fa819447071ea127e7084"></a>
+<a class="anchor" id="gab7c2354df4af84a2137455a2f732e3b1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::STDEV </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>10</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>计算N周期内样本标准差 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>输入数据，单一输入 </td></tr>
+    <tr><td class="paramname">n</td><td>N日时间窗口 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga0fd9831d875f30152747c3fa2b14145e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::VIGOR </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td>
+          <td class="paramname"><em>kdata</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em> = <code>2</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>亚历山大 艾尔德力度指数 </p>
+<pre>
+参见《走进我的交易室》（2007年 地震出版社） (Alexander Elder) P131
+计算公式：（收盘价今－收盘价昨）＊成交量今
+一般可以再使用EMA或MA进行平滑
+</pre> <dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">kdata</td><td>待计算的K线数据 </td></tr>
+    <tr><td class="paramname">n</td><td>EMA平滑窗口，必须大于等于1 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga1740d24a66213fe68d165661d13ac275"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::VOL </td>
           <td>(</td>
-          <td class="paramtype">const KData &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>包装KData的成交量成Indicator，用于其他指标计算，同TRANSCOUNT </p>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="group___indicator.html#gadc6c29549220c742c58b767dd64b4745" title="包装KData的成交量成Indicator，用于其他指标计算，同VOL">TRANSCOUNT</a> </dd></dl>
+<p>包装KData的成交量成Indicator，用于其他指标计算 </p>
+
+</div>
+</div>
+<a class="anchor" id="gaf2d6b58a2e72f2362b8c607d29aa432c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Indicator <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::WEAVE </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_indicator.html">Indicator</a> &amp;&#160;</td>
+          <td class="paramname"><em>ind</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>将ind的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1); ind=ind(ind2)。 则此时ind包含两个结果，result1为ind1的数据,result2为ind2的数据 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>待计算的数据 </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -446,7 +1675,7 @@ Indicator 指标库 的协作图:</div>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

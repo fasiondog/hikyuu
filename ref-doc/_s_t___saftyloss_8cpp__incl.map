@@ -1,0 +1,31 @@
+<map id="hikyuu/trade_sys/stoploss/crt/ST_Saftyloss.cpp" name="hikyuu/trade_sys/stoploss/crt/ST_Saftyloss.cpp">
+<area shape="rect" id="node2" href="$_s_t___saftyloss_8h.html" title="hikyuu/trade_sys/stoploss\l/crt/ST_Saftyloss.h" alt="" coords="1896,100,2121,147"/>
+<area shape="rect" id="node50" href="$crt_2_s_a_f_t_y_l_o_s_s_8h.html" title="../../../indicator\l/crt/SAFTYLOSS.h" alt="" coords="2128,195,2287,241"/>
+<area shape="rect" id="node3" href="$_indicator_stoploss_8h.html" title="../imp/IndicatorStoploss.h" alt="" coords="1882,203,2103,233"/>
+<area shape="rect" id="node4" href="$_operand_8h.html" title="../../../indicator\l/Operand.h" alt="" coords="1925,289,2060,336"/>
+<area shape="rect" id="node30" href="$_stoploss_base_8h.html" title="../StoplossBase.h" alt="" coords="2175,298,2333,327"/>
+<area shape="rect" id="node5" href="$_operand_node_8h.html" title="OperandNode.h" alt="" coords="1919,393,2066,422"/>
+<area shape="rect" id="node6" href="$_indicator_8h.html" title="Indicator.h" alt="" coords="2010,487,2117,517"/>
+<area shape="rect" id="node7" href="$_indicator_imp_8h.html" title="IndicatorImp.h" alt="" coords="2107,582,2243,611"/>
+<area shape="rect" id="node8" href="$_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="2545,677,2643,706"/>
+<area shape="rect" id="node11" href="$_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="1633,677,1824,706"/>
+<area shape="rect" id="node24" href="$util_8h.html" title="../utilities/util.h" alt="" coords="1291,677,1422,706"/>
+<area shape="rect" id="node9" href="$_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="2500,771,2613,801"/>
+<area shape="rect" id="node10" href="$_stock_8h.html" title="Stock.h" alt="" coords="2451,857,2532,887"/>
+<area shape="rect" id="node19" href="$config_8h.html" title="../config.h" alt="" coords="635,771,735,801"/>
+<area shape="rect" id="node31" href="$_trade_manager_8h.html" title="../../trade_manage\l/TradeManager.h" alt="" coords="1210,384,1373,431"/>
+<area shape="rect" id="node33" href="$_trade_record_8h.html" title="TradeRecord.h" alt="" coords="509,487,647,517"/>
+<area shape="rect" id="node41" href="$_position_record_8h.html" title="PositionRecord.h" alt="" coords="725,487,879,517"/>
+<area shape="rect" id="node42" href="$_borrow_record_8h.html" title="BorrowRecord.h" alt="" coords="904,487,1055,517"/>
+<area shape="rect" id="node44" href="$_funds_record_8h.html" title="FundsRecord.h" alt="" coords="930,677,1071,706"/>
+<area shape="rect" id="node45" href="$_loan_record_8h.html" title="LoanRecord.h" alt="" coords="231,677,362,706"/>
+<area shape="rect" id="node46" href="$_order_broker_base_8h.html" title="OrderBrokerBase.h" alt="" coords="1253,582,1428,611"/>
+<area shape="rect" id="node47" href="$_t_c___zero_8h.html" title="crt/TC_Zero.h" alt="" coords="1855,487,1986,517"/>
+<area shape="rect" id="node34" href="$_stock_manager_8h.html" title="../StockManager.h" alt="" coords="437,677,599,706"/>
+<area shape="rect" id="node35" href="$_system_part_8h.html" title="../trade_sys/system\l/SystemPart.h" alt="" coords="312,573,487,620"/>
+<area shape="rect" id="node37" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="725,677,855,706"/>
+<area shape="rect" id="node38" href="$_datetime__serialization_8h.html" title="../serialization/Datetime\l_serialization.h" alt="" coords="5,668,207,715"/>
+<area shape="rect" id="node40" href="$_stock__serialization_8h.html" title="../serialization/Stock\l_serialization.h" alt="" coords="714,573,890,620"/>
+<area shape="rect" id="node36" href="$_data_type_8h.html" title="DataType.h" alt="" coords="947,771,1057,801"/>
+<area shape="rect" id="node48" href="$_trade_cost_base_8h.html" title="../TradeCostBase.h" alt="" coords="1855,582,2026,611"/>
+</map>

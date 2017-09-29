@@ -1,0 +1,5 @@
+<map id="类继承关系图" name="类继承关系图">
+<area shape="rect" id="node1" href="$classhku_1_1_profit_goal_base.html" title="盈利目标策略基类 " alt="" coords="5,32,180,61"/>
+<area shape="rect" id="node2" href="$classhku_1_1_fixed_percent_profit_goal.html" title="hku::FixedPercentProfitGoal" alt="" coords="228,5,467,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_no_goal_profit_goal.html" title="hku::NoGoalProfitGoal" alt="" coords="251,59,444,88"/>
+</map>

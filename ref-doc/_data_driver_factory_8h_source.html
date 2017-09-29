@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/data_driver/DataDriverFactory.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -91,40 +92,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <div class="title">DataDriverFactory.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="_data_driver_factory_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * DatabaseDriverFactory.h</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2012-8-14</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef DATADRIVERFACTORY_H_</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DATADRIVERFACTORY_H_</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_base_info_driver_8h.html">BaseInfoDriver.h</a>&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_k_data_driver_8h.html">KDataDriver.h</a>&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>hku {</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="code" href="classhku_1_1_data_driver_factory.html">   16</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_data_driver_factory.html">DataDriverFactory</a> {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="code" href="classhku_1_1_data_driver_factory.html#a557c8b97a0bb59258b6bb3142f04e707">DataDriverFactory</a>();</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_data_driver_factory.html#aade1f3cb97712cd21565002eea469bb0">~DataDriverFactory</a>();</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="namespacehku.html#a0621dde24e7e2b071691a83872ae9bae">BaseInfoDriverPtr</a> <a class="code" href="classhku_1_1_data_driver_factory.html#a5ad6e27e74427a7c6ab670d60c854d9f">createBaseInfoDriver</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; connection);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="namespacehku.html#a9b7b63046972bf3d488fc94a11ac198b">KDataDriverPtr</a> <a class="code" href="classhku_1_1_data_driver_factory.html#aa0a0c259a2a3975cc2c18e29045e7b33">createKDataDriver</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; connection);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;};</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;} <span class="comment">/* namespace hku */</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DATABASEDRIVERFACTORY_H_ */</span><span class="preprocessor"></span></div>
+<a href="_data_driver_factory_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * DatabaseDriverFactory.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2012-8-14</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef DATADRIVERFACTORY_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define DATADRIVERFACTORY_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_base_info_driver_8h.html">BaseInfoDriver.h</a>&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_k_data_driver_8h.html">KDataDriver.h</a>&quot;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_block_info_driver_8h.html">BlockInfoDriver.h</a>&quot;</span></div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div><div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_data_driver_factory.html">   17</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_data_driver_factory.html">DataDriverFactory</a> {</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">static</span> <a class="code" href="namespacehku.html#a0621dde24e7e2b071691a83872ae9bae">BaseInfoDriverPtr</a> <a class="code" href="classhku_1_1_data_driver_factory.html#ab6996e70641f5dd24a5e7dc95ec958c8">getBaseInfoDriver</a>(<span class="keyword">const</span> shared_ptr&lt;IniParser&gt;&amp;);</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">static</span> <a class="code" href="namespacehku.html#a9b7b63046972bf3d488fc94a11ac198b">KDataDriverPtr</a> <a class="code" href="classhku_1_1_data_driver_factory.html#ac5114b546a42b453bc018058e410d94c">getKDataDriver</a>(<span class="keyword">const</span> shared_ptr&lt;IniParser&gt;&amp;);</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">static</span> <a class="code" href="namespacehku.html#a4c9a42e065a529cba6fb22223ceff80c">BlockInfoDriverPtr</a> <a class="code" href="classhku_1_1_data_driver_factory.html#a895fe8837011f390c5d576064b838c94">getBlockDriver</a>(<span class="keyword">const</span> shared_ptr&lt;IniParser&gt;&amp;);</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;};</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DATABASEDRIVERFACTORY_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_data_driver_factory_html"><div class="ttname"><a href="classhku_1_1_data_driver_factory.html">hku::DataDriverFactory</a></div><div class="ttdef"><b>Definition:</b> DataDriverFactory.h:17</div></div>
+<div class="ttc" id="namespacehku_html_a9b7b63046972bf3d488fc94a11ac198b"><div class="ttname"><a href="namespacehku.html#a9b7b63046972bf3d488fc94a11ac198b">hku::KDataDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; KDataDriver &gt; KDataDriverPtr</div><div class="ttdef"><b>Definition:</b> KDataDriver.h:78</div></div>
+<div class="ttc" id="_block_info_driver_8h_html"><div class="ttname"><a href="_block_info_driver_8h.html">BlockInfoDriver.h</a></div></div>
+<div class="ttc" id="classhku_1_1_data_driver_factory_html_ac5114b546a42b453bc018058e410d94c"><div class="ttname"><a href="classhku_1_1_data_driver_factory.html#ac5114b546a42b453bc018058e410d94c">hku::DataDriverFactory::getKDataDriver</a></div><div class="ttdeci">static KDataDriverPtr getKDataDriver(const shared_ptr&lt; IniParser &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> DataDriverFactory.cpp:44</div></div>
+<div class="ttc" id="classhku_1_1_data_driver_factory_html_ab6996e70641f5dd24a5e7dc95ec958c8"><div class="ttname"><a href="classhku_1_1_data_driver_factory.html#ab6996e70641f5dd24a5e7dc95ec958c8">hku::DataDriverFactory::getBaseInfoDriver</a></div><div class="ttdeci">static BaseInfoDriverPtr getBaseInfoDriver(const shared_ptr&lt; IniParser &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> DataDriverFactory.cpp:17</div></div>
+<div class="ttc" id="namespacehku_html_a4c9a42e065a529cba6fb22223ceff80c"><div class="ttname"><a href="namespacehku.html#a4c9a42e065a529cba6fb22223ceff80c">hku::BlockInfoDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; BlockInfoDriver &gt; BlockInfoDriverPtr</div><div class="ttdef"><b>Definition:</b> BlockInfoDriver.h:46</div></div>
+<div class="ttc" id="_k_data_driver_8h_html"><div class="ttname"><a href="_k_data_driver_8h.html">KDataDriver.h</a></div></div>
+<div class="ttc" id="namespacehku_html_a0621dde24e7e2b071691a83872ae9bae"><div class="ttname"><a href="namespacehku.html#a0621dde24e7e2b071691a83872ae9bae">hku::BaseInfoDriverPtr</a></div><div class="ttdeci">shared_ptr&lt; BaseInfoDriver &gt; BaseInfoDriverPtr</div><div class="ttdef"><b>Definition:</b> BaseInfoDriver.h:54</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="ttc" id="classhku_1_1_data_driver_factory_html_a895fe8837011f390c5d576064b838c94"><div class="ttname"><a href="classhku_1_1_data_driver_factory.html#a895fe8837011f390c5d576064b838c94">hku::DataDriverFactory::getBlockDriver</a></div><div class="ttdeci">static BlockInfoDriverPtr getBlockDriver(const shared_ptr&lt; IniParser &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> DataDriverFactory.cpp:57</div></div>
+<div class="ttc" id="_base_info_driver_8h_html"><div class="ttname"><a href="_base_info_driver_8h.html">BaseInfoDriver.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

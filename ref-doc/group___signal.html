@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: Signal 信号指示器</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,14 +33,14 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
+      <li class="current"><a href="modules.html"><span>模块</span></a></li>
       <li><a href="namespaces.html"><span>命名空间</span></a></li>
       <li><a href="annotated.html"><span>类</span></a></li>
       <li><a href="files.html"><span>文件</span></a></li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -77,8 +78,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#define-members">宏定义</a> &#124;
+<a href="#typedef-members">类型定义</a> &#124;
+<a href="#func-members">函数</a>  </div>
   <div class="headertitle">
-<div class="title">Signal 信号指示器<div class="ingroups"><a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
+<div class="title">Signal 信号指示器<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
@@ -86,18 +92,372 @@ Signal 信号指示器 的协作图:</div>
 <div class="dyncontent">
 <center><table><tr><td><img src="group___signal.png" border="0" alt="" usemap="#group______signal"/>
 <map name="group______signal" id="group______signal">
-<area shape="rect" id="node2" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="6,5,221,35"/></map>
+<area shape="rect" id="node2" href="group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="5,5,231,35"/>
+</map>
 </td></tr></table></center>
 </div>
-<p>信号指示器模块，包括各种信号指示器构造函数。<br/>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_signal_base.html">hku::SignalBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">信号指示器基类  <a href="classhku_1_1_signal_base.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+宏定义</h2></td></tr>
+<tr class="memitem:ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#ga81f04b1cf418aac0a7e793e0f2502c4a">SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
+<tr class="memdesc:ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">对于没有私有变量的继承子类，可直接使用该宏定义序列化  <a href="#ga81f04b1cf418aac0a7e793e0f2502c4a">更多...</a><br /></td></tr>
+<tr class="separator:ga81f04b1cf418aac0a7e793e0f2502c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:gae20430025d05ba5de75549f287e4dcd9"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; SignalBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">hku::SignalPtr</a></td></tr>
+<tr class="memdesc:gae20430025d05ba5de75549f287e4dcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型，操作信号指示器  <a href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">更多...</a><br /></td></tr>
+<tr class="separator:gae20430025d05ba5de75549f287e4dcd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:gad2fd595c66ba1a3c67048f6696948a0b"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gad2fd595c66ba1a3c67048f6696948a0b">hku::SG_Bool</a> (const Operand &amp;buy, const Operand &amp;sell, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
+<tr class="memdesc:gad2fd595c66ba1a3c67048f6696948a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">布尔信号指示器  <a href="group___signal.html#gad2fd595c66ba1a3c67048f6696948a0b">更多...</a><br /></td></tr>
+<tr class="separator:gad2fd595c66ba1a3c67048f6696948a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa4f9c7cd592beb5bf82c3f7beca226e1"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gaa4f9c7cd592beb5bf82c3f7beca226e1">hku::SG_Cross</a> (const Operand &amp;fast, const Operand &amp;slow, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
+<tr class="memdesc:gaa4f9c7cd592beb5bf82c3f7beca226e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。  <a href="group___signal.html#gaa4f9c7cd592beb5bf82c3f7beca226e1">更多...</a><br /></td></tr>
+<tr class="separator:gaa4f9c7cd592beb5bf82c3f7beca226e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6f68f24bd209bae9bb753dde172a0ef8"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#ga6f68f24bd209bae9bb753dde172a0ef8">hku::SG_CrossGold</a> (const Operand &amp;fast, const Operand &amp;slow, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
+<tr class="memdesc:ga6f68f24bd209bae9bb753dde172a0ef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入； 当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。  <a href="group___signal.html#ga6f68f24bd209bae9bb753dde172a0ef8">更多...</a><br /></td></tr>
+<tr class="separator:ga6f68f24bd209bae9bb753dde172a0ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8edc2d64855239124c81f8a26d9da743"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#ga8edc2d64855239124c81f8a26d9da743">hku::SG_Flex</a> (const Operand &amp;op, int slow_n, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
+<tr class="memdesc:ga8edc2d64855239124c81f8a26d9da743"><td class="mdescLeft">&#160;</td><td class="mdescRight">自交叉单线拐点指示器。 使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。  <a href="group___signal.html#ga8edc2d64855239124c81f8a26d9da743">更多...</a><br /></td></tr>
+<tr class="separator:ga8edc2d64855239124c81f8a26d9da743"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac5d05e751350c029be71ff59c20d0af8"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gac5d05e751350c029be71ff59c20d0af8">hku::SG_Single</a> (const Operand &amp;ind, int filter_n=20, double filter_p=0.1, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
+<tr class="memdesc:gac5d05e751350c029be71ff59c20d0af8"><td class="mdescLeft">&#160;</td><td class="mdescRight">单线拐点信号指示器  <a href="group___signal.html#gac5d05e751350c029be71ff59c20d0af8">更多...</a><br /></td></tr>
+<tr class="separator:gac5d05e751350c029be71ff59c20d0af8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabba00831b85d2b9f65bf4d71c50bdb32"><td class="memItemLeft" align="right" valign="top">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___signal.html#gabba00831b85d2b9f65bf4d71c50bdb32">hku::SG_Single2</a> (const Operand &amp;ind, int filter_n=20, double filter_p=0.1, const string &amp;kpart=&quot;CLOSE&quot;)</td></tr>
+<tr class="memdesc:gabba00831b85d2b9f65bf4d71c50bdb32"><td class="mdescLeft">&#160;</td><td class="mdescRight">单线拐点信号指示器2  <a href="group___signal.html#gabba00831b85d2b9f65bf4d71c50bdb32">更多...</a><br /></td></tr>
+<tr class="separator:gabba00831b85d2b9f65bf4d71c50bdb32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<p>信号指示器模块，包括各种信号指示器构造函数。<br />
  信号指示器负责产生买入、卖出信号。 </p>
+<h2 class="groupheader">宏定义说明</h2>
+<a class="anchor" id="ga81f04b1cf418aac0a7e793e0f2502c4a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>值:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:\</div><div class="line">    friend <span class="keyword">class </span>boost::serialization::access; \</div><div class="line">    template&lt;class Archive&gt; \</div><div class="line">    void serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) { \</div><div class="line">        ar &amp; BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase); \</div><div class="line">    }</div></div><!-- fragment -->
+<p>对于没有私有变量的继承子类，可直接使用该宏定义序列化 </p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;class Drived: public SignalBase {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;    SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;public:</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;    Drived();</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;    ...</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;};</div></div><!-- fragment --> 
+</div>
+</div>
+<h2 class="groupheader">类型定义说明</h2>
+<a class="anchor" id="gae20430025d05ba5de75549f287e4dcd9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef shared_ptr&lt;SignalBase&gt; <a class="el" href="group___signal.html#gae20430025d05ba5de75549f287e4dcd9">hku::SignalPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>客户程序都应使用该指针类型，操作信号指示器 </p>
+
+</div>
+</div>
+<h2 class="groupheader">函数说明</h2>
+<a class="anchor" id="gad2fd595c66ba1a3c67048f6696948a0b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Bool </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>buy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>sell</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>布尔信号指示器 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buy</td><td>买入指示（结果Indicator中相应位置&gt;0则代表买入） </td></tr>
+    <tr><td class="paramname">sell</td><td>卖出指示（结果Indicator中相应位置&gt;0则代表卖出） </td></tr>
+    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaa4f9c7cd592beb5bf82c3f7beca226e1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Cross </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>fast</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>slow</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fast</td><td>快线 </td></tr>
+    <tr><td class="paramname">slow</td><td>慢线 </td></tr>
+    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga6f68f24bd209bae9bb753dde172a0ef8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_CrossGold </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>fast</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>slow</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入； 当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fast</td><td>快线 </td></tr>
+    <tr><td class="paramname">slow</td><td>慢线 </td></tr>
+    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga8edc2d64855239124c81f8a26d9da743"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Flex </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>op</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>slow_n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>自交叉单线拐点指示器。 使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">op</td><td></td></tr>
+    <tr><td class="paramname">slow_n</td><td>慢线EMA周期 </td></tr>
+    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>信号指示器 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac5d05e751350c029be71ff59c20d0af8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Single </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>ind</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>filter_n</em> = <code>20</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>filter_p</em> = <code>0.1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>单线拐点信号指示器 </p>
+<pre>
+使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式如下：</pre><pre>    filter = percentage * STDEV((AMA-AMA[1], N)
+    Buy  When AMA - AMA[1] &gt; filter
+    or Buy When AMA - AMA[2] &gt; filter
+    or Buy When AMA - AMA[3] &gt; filter
+</pre> <dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ind</td><td></td></tr>
+    <tr><td class="paramname">filter_n</td><td>N日周期 </td></tr>
+    <tr><td class="paramname">filter_p</td><td>过滤器百分比 </td></tr>
+    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gabba00831b85d2b9f65bf4d71c50bdb32"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SignalPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> hku::SG_Single2 </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_operand.html">Operand</a> &amp;&#160;</td>
+          <td class="paramname"><em>ind</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>filter_n</em> = <code>20</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>filter_p</em> = <code>0.1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>kpart</em> = <code>&quot;CLOSE&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>单线拐点信号指示器2 </p>
+<pre>
+使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式如下：</pre><pre>    filter = percentage * STDEV((AMA-AMA[1], N)
+    Buy  When AMA - (AMA,n) &gt; filter
+    Sell When (AMA, n) - AMA &gt; filter
+</pre> <dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ind</td><td></td></tr>
+    <tr><td class="paramname">filter_n</td><td>N日周期 </td></tr>
+    <tr><td class="paramname">filter_p</td><td>过滤器百分比 </td></tr>
+    <tr><td class="paramname">kpart</td><td>KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

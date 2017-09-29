@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/trade_manage/TradeManager.h 文件参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,27 +91,112 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   <div class="summary">
 <a href="#nested-classes">类</a> &#124;
 <a href="#namespaces">命名空间</a> &#124;
-<a href="#typedef-members">类型定义</a>  </div>
+<a href="#typedef-members">类型定义</a> &#124;
+<a href="#func-members">函数</a>  </div>
   <div class="headertitle">
 <div class="title">TradeManager.h 文件参考</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="_trade_cost_base_8h_source.html">TradeCostBase.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_trade_record_8h_source.html">TradeRecord.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_position_record_8h_source.html">PositionRecord.h</a>&quot;</code><br/>
+<div class="textblock"><code>#include &lt;boost/tuple/tuple.hpp&gt;</code><br />
+<code>#include &quot;<a class="el" href="_parameter_8h_source.html">../utilities/Parameter.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="util_8h_source.html">../utilities/util.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_trade_record_8h_source.html">TradeRecord.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_position_record_8h_source.html">PositionRecord.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_borrow_record_8h_source.html">BorrowRecord.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_funds_record_8h_source.html">FundsRecord.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_loan_record_8h_source.html">LoanRecord.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_order_broker_base_8h_source.html">OrderBrokerBase.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_t_c___zero_8h_source.html">crt/TC_Zero.h</a>&quot;</code><br />
+<code>#include &lt;boost/serialization/map.hpp&gt;</code><br />
+<code>#include &lt;boost/serialization/vector.hpp&gt;</code><br />
+<code>#include &lt;boost/serialization/list.hpp&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 TradeManager.h 的引用(Include)关系图:</div>
 <div class="dyncontent">
 <div class="center"><img src="_trade_manager_8h__incl.png" border="0" usemap="#hikyuu_2trade__manage_2_trade_manager_8h" alt=""/></div>
 <map name="hikyuu_2trade__manage_2_trade_manager_8h" id="hikyuu_2trade__manage_2_trade_manager_8h">
-<area shape="rect" id="node2" href="_trade_cost_base_8h.html" title="TradeCostBase.h" alt="" coords="559,101,699,131"/><area shape="rect" id="node27" href="_trade_record_8h.html" title="TradeRecord.h" alt="" coords="723,101,849,131"/><area shape="rect" id="node28" href="_position_record_8h.html" title="PositionRecord.h" alt="" coords="875,101,1016,131"/><area shape="rect" id="node3" href="_stock_8h.html" title="../Stock.h" alt="" coords="741,179,832,208"/><area shape="rect" id="node20" href="util_8h.html" title="../utilities/util.h" alt="" coords="476,256,607,285"/><area shape="rect" id="node21" href="_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="349,333,528,363"/><area shape="rect" id="node26" href="_cost_record_8h.html" title="CostRecord.h" alt="" coords="586,179,701,208"/><area shape="rect" id="node4" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="793,256,916,285"/><area shape="rect" id="node18" href="_k_query_8h.html" title="KQuery.h" alt="" coords="681,256,769,285"/><area shape="rect" id="node5" href="_data_type_8h.html" title="DataType.h" alt="" coords="711,411,813,440"/><area shape="rect" id="node12" href="_null_8h.html" title="utilities/Null.h" alt="" coords="1204,488,1324,517"/><area shape="rect" id="node15" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1013,488,1179,517"/><area shape="rect" id="node19" href="_k_record_8h.html" title="KRecord.h" alt="" coords="693,333,787,363"/><area shape="rect" id="node23" href="_log_8h.html" title="../Log.h" alt="" coords="262,411,340,440"/></map>
+<area shape="rect" id="node3" href="_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="702,298,893,327"/>
+<area shape="rect" id="node16" href="util_8h.html" title="../utilities/util.h" alt="" coords="547,298,678,327"/>
+<area shape="rect" id="node18" href="_trade_record_8h.html" title="TradeRecord.h" alt="" coords="1664,109,1801,138"/>
+<area shape="rect" id="node41" href="_position_record_8h.html" title="PositionRecord.h" alt="" coords="1106,109,1260,138"/>
+<area shape="rect" id="node42" href="_borrow_record_8h.html" title="BorrowRecord.h" alt="" coords="1314,109,1465,138"/>
+<area shape="rect" id="node44" href="_funds_record_8h.html" title="FundsRecord.h" alt="" coords="2134,298,2275,327"/>
+<area shape="rect" id="node45" href="_loan_record_8h.html" title="LoanRecord.h" alt="" coords="1979,298,2110,327"/>
+<area shape="rect" id="node46" href="_order_broker_base_8h.html" title="OrderBrokerBase.h" alt="" coords="2252,203,2426,233"/>
+<area shape="rect" id="node47" href="_t_c___zero_8h.html" title="crt/TC_Zero.h" alt="" coords="759,109,890,138"/>
+<area shape="rect" id="node11" href="config_8h.html" title="../config.h" alt="" coords="1917,393,2017,422"/>
+<area shape="rect" id="node19" href="_stock_manager_8h.html" title="../StockManager.h" alt="" coords="1263,298,1426,327"/>
+<area shape="rect" id="node35" href="_system_part_8h.html" title="../trade_sys/system\l/SystemPart.h" alt="" coords="1846,195,2021,241"/>
+<area shape="rect" id="node36" href="_cost_record_8h.html" title="CostRecord.h" alt="" coords="1548,298,1677,327"/>
+<area shape="rect" id="node37" href="_datetime__serialization_8h.html" title="../serialization/Datetime\l_serialization.h" alt="" coords="1753,289,1954,336"/>
+<area shape="rect" id="node39" href="_stock__serialization_8h.html" title="../serialization/Stock\l_serialization.h" alt="" coords="1256,195,1432,241"/>
+<area shape="rect" id="node20" href="_ini_parser_8h.html" title="hikyuu_utils/iniparser\l/IniParser.h" alt="" coords="963,479,1147,525"/>
+<area shape="rect" id="node23" href="_block_8h.html" title="Block.h" alt="" coords="1576,393,1654,422"/>
+<area shape="rect" id="node24" href="_market_info_8h.html" title="MarketInfo.h" alt="" coords="1430,393,1552,422"/>
+<area shape="rect" id="node34" href="_stock_type_info_8h.html" title="StockTypeInfo.h" alt="" coords="1256,393,1406,422"/>
+<area shape="rect" id="node25" href="_data_type_8h.html" title="DataType.h" alt="" coords="1468,487,1578,517"/>
+<area shape="rect" id="node31" href="_log_8h.html" title="Log.h" alt="" coords="1260,582,1327,611"/>
+<area shape="rect" id="node32" href="_null_8h.html" title="utilities/Null.h" alt="" coords="1620,582,1743,611"/>
+<area shape="rect" id="node33" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="2428,582,2607,611"/>
+<area shape="rect" id="node48" href="_trade_cost_base_8h.html" title="../TradeCostBase.h" alt="" coords="730,203,900,233"/>
+<area shape="rect" id="node49" href="_stock_8h.html" title="Stock.h" alt="" coords="441,298,522,327"/>
+</map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 此图展示该文件直接或间接的被哪些文件引用了:</div>
 <div class="dyncontent">
 <div class="center"><img src="_trade_manager_8h__dep__incl.png" border="0" usemap="#hikyuu_2trade__manage_2_trade_manager_8hdep" alt=""/></div>
 <map name="hikyuu_2trade__manage_2_trade_manager_8hdep" id="hikyuu_2trade__manage_2_trade_manager_8hdep">
-<area shape="rect" id="node2" href="trade__manage_2build__in_8h.html" title="hikyuu/trade_manage\l/build_in.h" alt="" coords="15,102,191,149"/><area shape="rect" id="node4" href="crt_t_m_8h.html" title="hikyuu/trade_manage\l/crt/crtTM.h" alt="" coords="219,102,395,149"/><area shape="rect" id="node7" href="_trade_manager_8cpp.html" title="hikyuu/trade_manage\l/TradeManager.cpp" alt="" coords="419,102,595,149"/><area shape="rect" id="node3" href="trade__manage_2__build__in_8cpp.html" title="hikyuu_python/trade\l_manage/_build_in.cpp" alt="" coords="5,198,195,245"/><area shape="rect" id="node5" href="crt_t_m_8cpp.html" title="hikyuu/trade_manage\l/crt/crtTM.cpp" alt="" coords="219,198,395,245"/><area shape="rect" id="node6" href="___trade_manager_8cpp.html" title="hikyuu_python/trade\l_manage/_TradeManager.cpp" alt="" coords="419,198,652,245"/></map>
+<area shape="rect" id="node2" href="_signal_base_8h.html" title="hikyuu/trade_sys/signal\l/SignalBase.h" alt="" coords="1636,100,1839,147"/>
+<area shape="rect" id="node9" href="_condition_base_8h.html" title="hikyuu/trade_sys/condition\l/ConditionBase.h" alt="" coords="50,195,281,241"/>
+<area shape="rect" id="node12" href="_allocate_money_base_8h.html" title="hikyuu/trade_sys/portfolio\l/AllocateMoneyBase.h" alt="" coords="1176,384,1400,431"/>
+<area shape="rect" id="node13" href="_selector_base_8h.html" title="hikyuu/trade_sys/selector\l/SelectorBase.h" alt="" coords="5332,384,5553,431"/>
+<area shape="rect" id="node23" href="crt_t_m_8h.html" title="hikyuu/trade_manage\l/crt/crtTM.h" alt="" coords="3361,100,3551,147"/>
+<area shape="rect" id="node26" href="_performance_8h.html" title="hikyuu/trade_manage\l/Performance.h" alt="" coords="7857,100,8047,147"/>
+<area shape="rect" id="node28" href="_trade_manager_8cpp.html" title="hikyuu/trade_manage\l/TradeManager.cpp" alt="" coords="8071,100,8260,147"/>
+<area shape="rect" id="node29" href="_money_manager_base_8h.html" title="hikyuu/trade_sys/moneymanager\l/MoneyManagerBase.h" alt="" coords="4887,195,5169,241"/>
+<area shape="rect" id="node46" href="_profit_goal_base_8h.html" title="hikyuu/trade_sys/profitgoal\l/ProfitGoalBase.h" alt="" coords="3626,100,3859,147"/>
+<area shape="rect" id="node50" href="_stoploss_base_8h.html" title="hikyuu/trade_sys/stoploss\l/StoplossBase.h" alt="" coords="3003,100,3229,147"/>
+<area shape="rect" id="node3" href="_p_o_s_8h.html" title="hikyuu/indicator/crt\l/POS.h" alt="" coords="1213,195,1385,241"/>
+<area shape="rect" id="node4" href="_s_g___cross_8h.html" title="hikyuu/trade_sys/signal\l/crt/SG_Cross.h" alt="" coords="2769,195,2972,241"/>
+<area shape="rect" id="node5" href="_s_g___cross_gold_8h.html" title="hikyuu/trade_sys/signal\l/crt/SG_CrossGold.h" alt="" coords="305,195,508,241"/>
+<area shape="rect" id="node6" href="_s_g___flex_8h.html" title="hikyuu/trade_sys/signal\l/crt/SG_Flex.h" alt="" coords="532,195,735,241"/>
+<area shape="rect" id="node7" href="_s_g___single_8h.html" title="hikyuu/trade_sys/signal\l/crt/SG_Single.h" alt="" coords="759,195,961,241"/>
+<area shape="rect" id="node8" href="_s_g___bool_8h.html" title="hikyuu/trade_sys/signal\l/crt/SG_Bool.h" alt="" coords="985,195,1188,241"/>
+<area shape="rect" id="node11" href="_system_8h.html" title="hikyuu/trade_sys/system\l/System.h" alt="" coords="2563,289,2779,336"/>
+<area shape="rect" id="node17" href="_cross_signal_8h.html" title="hikyuu/trade_sys/signal\l/imp/CrossSignal.h" alt="" coords="1409,195,1612,241"/>
+<area shape="rect" id="node18" href="_cross_gold_signal_8h.html" title="hikyuu/trade_sys/signal\l/imp/CrossGoldSignal.h" alt="" coords="1636,195,1839,241"/>
+<area shape="rect" id="node19" href="_single_signal_8h.html" title="hikyuu/trade_sys/signal\l/imp/SingleSignal.h" alt="" coords="1863,195,2065,241"/>
+<area shape="rect" id="node20" href="_single_signal2_8h.html" title="hikyuu/trade_sys/signal\l/imp/SingleSignal2.h" alt="" coords="2089,195,2292,241"/>
+<area shape="rect" id="node21" href="_bool_signal_8h.html" title="hikyuu/trade_sys/signal\l/imp/BoolSignal.h" alt="" coords="2316,195,2519,241"/>
+<area shape="rect" id="node22" href="_signal_base_8cpp.html" title="hikyuu/trade_sys/signal\l/SignalBase.cpp" alt="" coords="2543,195,2745,241"/>
+<area shape="rect" id="node10" href="_c_n___o_p_line_8h.html" title="hikyuu/trade_sys/condition\l/crt/CN_OPLine.h" alt="" coords="50,289,281,336"/>
+<area shape="rect" id="node14" href="_condition_base_8cpp.html" title="hikyuu/trade_sys/condition\l/ConditionBase.cpp" alt="" coords="305,289,535,336"/>
+<area shape="rect" id="node15" href="_o_p_line_condition_8h.html" title="hikyuu/trade_sys/condition\l/imp/OPLineCondition.h" alt="" coords="1434,289,1665,336"/>
+<area shape="rect" id="node16" href="_o_p_line_condition_8cpp.html" title="hikyuu/trade_sys/condition\l/imp/OPLineCondition.cpp" alt="" coords="2701,384,2931,431"/>
+<area shape="rect" id="node24" href="trade__manage_2build__in_8h.html" title="hikyuu/trade_manage\l/build_in.h" alt="" coords="3097,195,3287,241"/>
+<area shape="rect" id="node25" href="crt_t_m_8cpp.html" title="hikyuu/trade_manage\l/crt/crtTM.cpp" alt="" coords="3311,195,3500,241"/>
+<area shape="rect" id="node27" href="_performance_8cpp.html" title="hikyuu/trade_manage\l/Performance.cpp" alt="" coords="7857,195,8047,241"/>
+<area shape="rect" id="node30" href="_m_m___nothing_8h.html" title="hikyuu/trade_sys/moneymanager\l/crt/MM_Nothing.h" alt="" coords="4123,289,4405,336"/>
+<area shape="rect" id="node31" href="_m_m___fixed_percent_8h.html" title="hikyuu/trade_sys/moneymanager\l/crt/MM_FixedPercent.h" alt="" coords="4429,289,4710,336"/>
+<area shape="rect" id="node32" href="_m_m___fixed_risk_8h.html" title="hikyuu/trade_sys/moneymanager\l/crt/MM_FixedRisk.h" alt="" coords="4734,289,5015,336"/>
+<area shape="rect" id="node33" href="_m_m___fixed_capital_8h.html" title="hikyuu/trade_sys/moneymanager\l/crt/MM_FixedCapital.h" alt="" coords="5039,289,5321,336"/>
+<area shape="rect" id="node34" href="_m_m___fixed_count_8h.html" title="hikyuu/trade_sys/moneymanager\l/crt/MM_FixedCount.h" alt="" coords="2854,289,3135,336"/>
+<area shape="rect" id="node35" href="_m_m___fixed_units_8h.html" title="hikyuu/trade_sys/moneymanager\l/crt/MM_FixedUnits.h" alt="" coords="5345,289,5626,336"/>
+<area shape="rect" id="node36" href="_m_m___williams_fixed_risk_8h.html" title="hikyuu/trade_sys/moneymanager\l/crt/MM_WilliamsFixedRisk.h" alt="" coords="5650,289,5931,336"/>
+<area shape="rect" id="node37" href="_fixed_count_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/FixedCountMoneyManager.h" alt="" coords="5955,289,6237,336"/>
+<area shape="rect" id="node38" href="_fixed_percent_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/FixedPercentMoneyManager.h" alt="" coords="6261,289,6555,336"/>
+<area shape="rect" id="node39" href="_fixed_risk_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/FixedRiskMoneyManager.h" alt="" coords="6579,289,6861,336"/>
+<area shape="rect" id="node40" href="_fixed_capital_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/FixedCapitalMoneyManager.h" alt="" coords="6885,289,7171,336"/>
+<area shape="rect" id="node41" href="_fixed_ratio_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/FixedRatioMoneyManager.h" alt="" coords="7195,289,7477,336"/>
+<area shape="rect" id="node42" href="_fixed_units_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/FixedUnitsMoneyManager.h" alt="" coords="7501,289,7782,336"/>
+<area shape="rect" id="node43" href="_williams_fixed_risk_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/WilliamsFixedRiskMoneyManager.h" alt="" coords="3160,289,3488,336"/>
+<area shape="rect" id="node44" href="_not_money_manager_8h.html" title="hikyuu/trade_sys/moneymanager\l/imp/NotMoneyManager.h" alt="" coords="3513,289,3794,336"/>
+<area shape="rect" id="node45" href="_money_manager_base_8cpp.html" title="hikyuu/trade_sys/moneymanager\l/MoneyManagerBase.cpp" alt="" coords="3818,289,4099,336"/>
+<area shape="rect" id="node47" href="_p_g___no_goal_8h.html" title="hikyuu/trade_sys/profitgoal\l/crt/PG_NoGoal.h" alt="" coords="4141,195,4374,241"/>
+<area shape="rect" id="node48" href="_p_g___fixed_percent_8h.html" title="hikyuu/trade_sys/profitgoal\l/crt/PG_FixedPercent.h" alt="" coords="3626,195,3859,241"/>
+<area shape="rect" id="node49" href="_no_goal_profit_goal_8h.html" title="hikyuu/trade_sys/profitgoal\l/imp/NoGoalProfitGoal.h" alt="" coords="3883,195,4117,241"/>
+</map>
 </div>
 </div>
 <p><a href="_trade_manager_8h_source.html">浏览源代码.</a></p>
@@ -118,20 +204,29 @@ TradeManager.h 的引用(Include)关系图:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 类</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_trade_manager.html">hku::TradeManager</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">账户交易管理模块，管理帐户的交易记录及资金使用情况  <a href="classhku_1_1_trade_manager.html#details">更多...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">账户交易管理模块，管理帐户的交易记录及资金使用情况  <a href="classhku_1_1_trade_manager.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 命名空间</h2></td></tr>
-<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
-<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br/></td></tr>
+<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 类型定义</h2></td></tr>
 <tr class="memitem:ga285ea5029f5f472a82a1d21128be7c2b"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; TradeManager &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">hku::TradeManagerPtr</a></td></tr>
-<tr class="memdesc:ga285ea5029f5f472a82a1d21128be7c2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序应使用此类型进行实际操作  <a href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">更多...</a><br/></td></tr>
+<tr class="memdesc:ga285ea5029f5f472a82a1d21128be7c2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序应使用此类型进行实际操作  <a href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">更多...</a><br /></td></tr>
 <tr class="separator:ga285ea5029f5f472a82a1d21128be7c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af538d62e3c6c9e53aaaf2bccc3138f2c"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; TradeManager &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#af538d62e3c6c9e53aaaf2bccc3138f2c">hku::TMPtr</a></td></tr>
+<tr class="separator:af538d62e3c6c9e53aaaf2bccc3138f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a99a46d10daf17759474c2b583a42cfd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a99a46d10daf17759474c2b583a42cfd8">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const TradeManager &amp;tm)</td></tr>
+<tr class="separator:a99a46d10daf17759474c2b583a42cfd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a833804e0d2f79714d0c8953d2e864b46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a833804e0d2f79714d0c8953d2e864b46">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const TradeManagerPtr &amp;ptm)</td></tr>
+<tr class="separator:a833804e0d2f79714d0c8953d2e864b46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
@@ -139,7 +234,7 @@ TradeManager.h 的引用(Include)关系图:</div>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

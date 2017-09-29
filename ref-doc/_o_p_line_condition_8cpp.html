@@ -1,0 +1,167 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/trade_sys/condition/imp/OPLineCondition.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a class="el" href="dir_1a1bddf49a115f15ee5c5ab9be28700c.html">condition</a></li><li class="navelem"><a class="el" href="dir_85cdce73493f11267e49fd1701b15500.html">imp</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#namespaces">命名空间</a> &#124;
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">OPLineCondition.cpp 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="_o_p_line_condition_8h_source.html">OPLineCondition.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="crt_t_m_8h_source.html">../../../trade_manage/crt/crtTM.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_t_c___zero_8h_source.html">../../../trade_manage/crt/TC_Zero.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_p_r_i_c_e_l_i_s_t_8h_source.html">../../../indicator/crt/PRICELIST.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_s_y_s___simple_8h_source.html">../../system/crt/SYS_Simple.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_m_m___fixed_count_8h_source.html">../../moneymanager/crt/MM_FixedCount.h</a>&quot;</code><br />
+</div><div class="textblock"><div class="dynheader">
+OPLineCondition.cpp 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="_o_p_line_condition_8cpp__incl.png" border="0" usemap="#hikyuu_2trade__sys_2condition_2imp_2_o_p_line_condition_8cpp" alt=""/></div>
+<map name="hikyuu_2trade__sys_2condition_2imp_2_o_p_line_condition_8cpp" id="hikyuu_2trade__sys_2condition_2imp_2_o_p_line_condition_8cpp">
+<area shape="rect" id="node2" href="_o_p_line_condition_8h.html" title="OPLineCondition.h" alt="" coords="562,203,726,233"/>
+<area shape="rect" id="node25" href="_t_c___zero_8h.html" title="crt/TC_Zero.h" alt="" coords="69,582,200,611"/>
+<area shape="rect" id="node39" href="crt_t_m_8h.html" title="../../../trade_manage\l/crt/crtTM.h" alt="" coords="93,384,272,431"/>
+<area shape="rect" id="node40" href="_p_r_i_c_e_l_i_s_t_8h.html" title="../../../indicator\l/crt/PRICELIST.h" alt="" coords="245,100,395,147"/>
+<area shape="rect" id="node41" href="_s_y_s___simple_8h.html" title="../../system/crt/SYS\l_Simple.h" alt="" coords="1552,100,1723,147"/>
+<area shape="rect" id="node50" href="_m_m___fixed_count_8h.html" title="../../moneymanager\l/crt/MM_FixedCount.h" alt="" coords="347,195,538,241"/>
+<area shape="rect" id="node3" href="_condition_base_8h.html" title="../ConditionBase.h" alt="" coords="2624,298,2787,327"/>
+<area shape="rect" id="node35" href="_operand_8h.html" title="../../../indicator\l/Operand.h" alt="" coords="553,289,687,336"/>
+<area shape="rect" id="node5" href="_parameter_8h.html" title="../../utilities/Parameter.h" alt="" coords="543,771,748,801"/>
+<area shape="rect" id="node12" href="util_8h.html" title="../../utilities/util.h" alt="" coords="112,771,259,801"/>
+<area shape="rect" id="node13" href="_k_d_a_t_a_8h.html" title="../../KData.h" alt="" coords="3366,771,3479,801"/>
+<area shape="rect" id="node14" href="_trade_manager_8h.html" title="../../trade_manage\l/TradeManager.h" alt="" coords="1257,479,1420,525"/>
+<area shape="rect" id="node33" href="_signal_base_8h.html" title="../signal/SignalBase.h" alt="" coords="3072,393,3256,422"/>
+<area shape="rect" id="node16" href="_trade_record_8h.html" title="TradeRecord.h" alt="" coords="599,582,737,611"/>
+<area shape="rect" id="node19" href="_position_record_8h.html" title="PositionRecord.h" alt="" coords="1089,582,1244,611"/>
+<area shape="rect" id="node20" href="_borrow_record_8h.html" title="BorrowRecord.h" alt="" coords="863,582,1014,611"/>
+<area shape="rect" id="node22" href="_funds_record_8h.html" title="FundsRecord.h" alt="" coords="1268,582,1409,611"/>
+<area shape="rect" id="node23" href="_loan_record_8h.html" title="LoanRecord.h" alt="" coords="1433,582,1564,611"/>
+<area shape="rect" id="node24" href="_order_broker_base_8h.html" title="OrderBrokerBase.h" alt="" coords="1589,582,1763,611"/>
+<area shape="rect" id="node17" href="_system_part_8h.html" title="../trade_sys/system\l/SystemPart.h" alt="" coords="1853,668,2027,715"/>
+<area shape="rect" id="node18" href="_cost_record_8h.html" title="CostRecord.h" alt="" coords="283,771,413,801"/>
+<area shape="rect" id="node26" href="_trade_cost_base_8h.html" title="../TradeCostBase.h" alt="" coords="280,677,451,706"/>
+<area shape="rect" id="node27" href="_stock_8h.html" title="Stock.h" alt="" coords="437,771,518,801"/>
+<area shape="rect" id="node36" href="_operand_node_8h.html" title="OperandNode.h" alt="" coords="347,393,493,422"/>
+<area shape="rect" id="node37" href="_indicator_8h.html" title="Indicator.h" alt="" coords="164,487,271,517"/>
+<area shape="rect" id="node38" href="_indicator_imp_8h.html" title="IndicatorImp.h" alt="" coords="1692,677,1828,706"/>
+<area shape="rect" id="node42" href="_system_8h.html" title="../System.h" alt="" coords="2531,203,2642,233"/>
+<area shape="rect" id="node43" href="_environment_base_8h.html" title="../environment/Environment\lBase.h" alt="" coords="2695,384,2934,431"/>
+<area shape="rect" id="node44" href="_money_manager_base_8h.html" title="../moneymanager/MoneyManager\lBase.h" alt="" coords="1881,384,2164,431"/>
+<area shape="rect" id="node45" href="_stoploss_base_8h.html" title="../stoploss/StoplossBase.h" alt="" coords="3321,393,3549,422"/>
+<area shape="rect" id="node46" href="_profit_goal_base_8h.html" title="../profitgoal/ProfitGoal\lBase.h" alt="" coords="2359,384,2551,431"/>
+<area shape="rect" id="node47" href="_slippage_base_8h.html" title="../slippage/SlippageBase.h" alt="" coords="2543,677,2766,706"/>
+<area shape="rect" id="node48" href="_trade_request_8h.html" title="TradeRequest.h" alt="" coords="1311,298,1457,327"/>
+<area shape="rect" id="node49" href="_k_data__serialization_8h.html" title="../../serialization\l/KData_serialization.h" alt="" coords="3469,289,3656,336"/>
+</map>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+命名空间</h2></td></tr>
+<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:afa35b7e72aaf895f99558de1fdee0730"><td class="memItemLeft" align="right" valign="top">CNPtr <a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#afa35b7e72aaf895f99558de1fdee0730">hku::CN_OPLine</a> (const Operand &amp;op)</td></tr>
+<tr class="memdesc:afa35b7e72aaf895f99558de1fdee0730"><td class="mdescLeft">&#160;</td><td class="mdescRight">固定使用股票最小交易量进行交易，计算权益曲线的op值，当权益曲线高于op时，系统有效，否则无效。  <a href="namespacehku.html#afa35b7e72aaf895f99558de1fdee0730">更多...</a><br /></td></tr>
+<tr class="separator:afa35b7e72aaf895f99558de1fdee0730"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+</div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

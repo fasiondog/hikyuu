@@ -1,0 +1,5 @@
+<map id="类继承关系图" name="类继承关系图">
+<area shape="rect" id="node1" href="$classhku_1_1_slippage_base.html" title="移滑价差算法基类 " alt="" coords="5,32,168,61"/>
+<area shape="rect" id="node2" href="$classhku_1_1_fixed_percent_slippage.html" title="hku::FixedPercentSlippage" alt="" coords="216,5,443,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_fixed_value_slippage.html" title="hku::FixedValueSlippage" alt="" coords="225,59,433,88"/>
+</map>

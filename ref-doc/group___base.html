@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: Base 基础设施</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,14 +33,14 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
+      <li class="current"><a href="modules.html"><span>模块</span></a></li>
       <li><a href="namespaces.html"><span>命名空间</span></a></li>
       <li><a href="annotated.html"><span>类</span></a></li>
       <li><a href="files.html"><span>文件</span></a></li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -91,23 +92,28 @@ Base 基础设施 的协作图:</div>
 <div class="dyncontent">
 <center><table><tr><td><img src="group___base.png" border="0" alt="" usemap="#group______base"/>
 <map name="group______base" id="group______base">
-<area shape="rect" id="node1" href="group___common-_utilities.html" title="独立的一些小函数、对象工具集合" alt="" coords="382,112,613,141"/><area shape="rect" id="node2" href="group___stock_manage.html" title="证券管理类、证券类等" alt="" coords="406,59,589,88"/><area shape="rect" id="node3" href="group___data_type.html" title="定义所需的基础数据类型" alt="" coords="386,5,609,35"/><area shape="rect" id="node5" href="group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等" alt="" coords="6,59,162,88"/></map>
+<area shape="rect" id="node1" href="group___common-_utilities.html" title="独立的一些小函数、对象工具集合 " alt="" coords="391,5,629,35"/>
+<area shape="rect" id="node2" href="group___stock_manage.html" title="证券管理类、证券类等 " alt="" coords="413,59,607,88"/>
+<area shape="rect" id="node3" href="group___data_type.html" title="定义所需的基础数据类型 " alt="" coords="396,112,624,141"/>
+<area shape="rect" id="node5" href="group___hikyuu.html" title="核心库，包含股票数据的管理、指标实现、交易系统框架等 " alt="" coords="5,59,165,88"/>
+</map>
 </td></tr></table></center>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="groups"></a>
 模块</h2></td></tr>
 <tr class="memitem:group___data_type"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html">DataType 基础数据类型定义</a></td></tr>
-<tr class="memdesc:group___data_type"><td class="mdescLeft">&#160;</td><td class="mdescRight">定义所需的基础数据类型 <br/></td></tr>
+<tr class="memdesc:group___data_type"><td class="mdescLeft">&#160;</td><td class="mdescRight">定义所需的基础数据类型 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:group___stock_manage"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___stock_manage.html">StockManage 证券管理</a></td></tr>
-<tr class="memdesc:group___stock_manage"><td class="mdescLeft">&#160;</td><td class="mdescRight">证券管理类、证券类等 <br/></td></tr>
+<tr class="memdesc:group___stock_manage"><td class="mdescLeft">&#160;</td><td class="mdescRight">证券管理类、证券类等 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:group___common-_utilities"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___common-_utilities.html">Common-Utilities 公共小工具</a></td></tr>
-<tr class="memdesc:group___common-_utilities"><td class="mdescLeft">&#160;</td><td class="mdescRight">独立的一些小函数、对象工具集合 <br/></td></tr>
+<tr class="memdesc:group___common-_utilities"><td class="mdescLeft">&#160;</td><td class="mdescRight">独立的一些小函数、对象工具集合 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<p>基础库，负责Stock实例管理、K线数据读取、板块管理等 </p>
 <p>基础库，负责Stock实例管理、K线数据读取、板块管理等 </p>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
@@ -115,7 +121,7 @@ Base 基础设施 的协作图:</div>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

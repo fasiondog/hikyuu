@@ -1,0 +1,769 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hku::ConditionBase类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li class="current"><a href="annotated.html"><span>类</span></a></li>
+      <li><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>类列表</span></a></li>
+      <li><a href="classes.html"><span>类索引</span></a></li>
+      <li><a href="inherits.html"><span>类继承关系</span></a></li>
+      <li><a href="functions.html"><span>类成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespacehku.html">hku</a></li><li class="navelem"><a class="el" href="classhku_1_1_condition_base.html">ConditionBase</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pro-attribs">Protected 属性</a> &#124;
+<a href="#friends">友元</a> &#124;
+<a href="classhku_1_1_condition_base-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">hku::ConditionBase类 参考<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_system.html">TradeSystem 系统交易框架</a> &raquo; <a class="el" href="group___condition.html">Condition 系统有效条件判断</a></div></div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>系统有效条件基类  
+ <a href="classhku_1_1_condition_base.html#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_condition_base_8h_source.html">ConditionBase.h</a>&gt;</code></p>
+<div class="dynheader">
+类 hku::ConditionBase 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_condition_base__inherit__graph.png" border="0" usemap="#hku_1_1_condition_base_inherit__map" alt="Inheritance graph"/></div>
+<map name="hku_1_1_condition_base_inherit__map" id="hku_1_1_condition_base_inherit__map">
+<area shape="rect" id="node2" href="classhku_1_1_o_p_line_condition.html" title="hku::OPLineCondition" alt="" coords="5,83,193,112"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+hku::ConditionBase 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classhku_1_1_condition_base__coll__graph.png" border="0" usemap="#hku_1_1_condition_base_coll__map" alt="Collaboration graph"/></div>
+<map name="hku_1_1_condition_base_coll__map" id="hku_1_1_condition_base_coll__map">
+<area shape="rect" id="node2" href="classhku_1_1_k_data.html" title="K线数据 " alt="" coords="38,5,145,35"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:af105fecdcf6632d2f2062ac870221fa2"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; <a class="el" href="classhku_1_1_condition_base.html">ConditionBase</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">ConditionPtr</a></td></tr>
+<tr class="separator:af105fecdcf6632d2f2062ac870221fa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a27abdfe72bee77392ad10ce4b09a48a3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a27abdfe72bee77392ad10ce4b09a48a3">ConditionBase</a> ()</td></tr>
+<tr class="separator:a27abdfe72bee77392ad10ce4b09a48a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2ceb617ea59bb13f097ed07911d7b99"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#ab2ceb617ea59bb13f097ed07911d7b99">ConditionBase</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;<a class="el" href="classhku_1_1_condition_base.html#af08f57c535cfa6908d1e70565db2dc36">name</a>)</td></tr>
+<tr class="separator:ab2ceb617ea59bb13f097ed07911d7b99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49110c381bf037d7b37ae200317a2f24"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a49110c381bf037d7b37ae200317a2f24">~ConditionBase</a> ()</td></tr>
+<tr class="separator:a49110c381bf037d7b37ae200317a2f24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af08f57c535cfa6908d1e70565db2dc36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#af08f57c535cfa6908d1e70565db2dc36">name</a> () const </td></tr>
+<tr class="memdesc:af08f57c535cfa6908d1e70565db2dc36"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取名称  <a href="#af08f57c535cfa6908d1e70565db2dc36">更多...</a><br /></td></tr>
+<tr class="separator:af08f57c535cfa6908d1e70565db2dc36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e4f04dd4ad7e88c294a12aa45e01823"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a0e4f04dd4ad7e88c294a12aa45e01823">name</a> (const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;name)</td></tr>
+<tr class="memdesc:a0e4f04dd4ad7e88c294a12aa45e01823"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置名称  <a href="#a0e4f04dd4ad7e88c294a12aa45e01823">更多...</a><br /></td></tr>
+<tr class="separator:a0e4f04dd4ad7e88c294a12aa45e01823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae166742c35373f50b7fc3e4cd84595e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#aae166742c35373f50b7fc3e4cd84595e">reset</a> ()</td></tr>
+<tr class="memdesc:aae166742c35373f50b7fc3e4cd84595e"><td class="mdescLeft">&#160;</td><td class="mdescRight">复位操作  <a href="#aae166742c35373f50b7fc3e4cd84595e">更多...</a><br /></td></tr>
+<tr class="separator:aae166742c35373f50b7fc3e4cd84595e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c989886e92ee06c5820508f3e85504e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a7c989886e92ee06c5820508f3e85504e">setTO</a> (const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;kdata)</td></tr>
+<tr class="memdesc:a7c989886e92ee06c5820508f3e85504e"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置交易对象  <a href="#a7c989886e92ee06c5820508f3e85504e">更多...</a><br /></td></tr>
+<tr class="separator:a7c989886e92ee06c5820508f3e85504e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1ba7496b0fc1ee7f831af5653c4d84c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#ab1ba7496b0fc1ee7f831af5653c4d84c">getTO</a> () const </td></tr>
+<tr class="memdesc:ab1ba7496b0fc1ee7f831af5653c4d84c"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取交易对象  <a href="#ab1ba7496b0fc1ee7f831af5653c4d84c">更多...</a><br /></td></tr>
+<tr class="separator:ab1ba7496b0fc1ee7f831af5653c4d84c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b07fce681c4dc191d1886420b84c585"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a4b07fce681c4dc191d1886420b84c585">setTM</a> (const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;tm)</td></tr>
+<tr class="memdesc:a4b07fce681c4dc191d1886420b84c585"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置交易管理实例  <a href="#a4b07fce681c4dc191d1886420b84c585">更多...</a><br /></td></tr>
+<tr class="separator:a4b07fce681c4dc191d1886420b84c585"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4001fe624a1d08554a474ede16a68fb7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a4001fe624a1d08554a474ede16a68fb7">getTM</a> () const </td></tr>
+<tr class="memdesc:a4001fe624a1d08554a474ede16a68fb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取交易管理实例  <a href="#a4001fe624a1d08554a474ede16a68fb7">更多...</a><br /></td></tr>
+<tr class="separator:a4001fe624a1d08554a474ede16a68fb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec15858b157be3e088690cc3ac4b1793"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#aec15858b157be3e088690cc3ac4b1793">setSG</a> (const <a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">SGPtr</a> &amp;sg)</td></tr>
+<tr class="memdesc:aec15858b157be3e088690cc3ac4b1793"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置系统信号指示器  <a href="#aec15858b157be3e088690cc3ac4b1793">更多...</a><br /></td></tr>
+<tr class="separator:aec15858b157be3e088690cc3ac4b1793"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba9b19491012208ac7a82e8285530c3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">SGPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#aba9b19491012208ac7a82e8285530c3f">getSG</a> () const </td></tr>
+<tr class="memdesc:aba9b19491012208ac7a82e8285530c3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取系统信号指示器  <a href="#aba9b19491012208ac7a82e8285530c3f">更多...</a><br /></td></tr>
+<tr class="separator:aba9b19491012208ac7a82e8285530c3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac891bcfeffdd9e206c474ca7e5036b85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#ac891bcfeffdd9e206c474ca7e5036b85">_addValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
+<tr class="memdesc:ac891bcfeffdd9e206c474ca7e5036b85"><td class="mdescLeft">&#160;</td><td class="mdescRight">加入有效时间，在_calculate中调用  <a href="#ac891bcfeffdd9e206c474ca7e5036b85">更多...</a><br /></td></tr>
+<tr class="separator:ac891bcfeffdd9e206c474ca7e5036b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adac7c229071712f04ae943e28d9b7744"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">ConditionPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#adac7c229071712f04ae943e28d9b7744">clone</a> ()</td></tr>
+<tr class="memdesc:adac7c229071712f04ae943e28d9b7744"><td class="mdescLeft">&#160;</td><td class="mdescRight">克隆操作  <a href="#adac7c229071712f04ae943e28d9b7744">更多...</a><br /></td></tr>
+<tr class="separator:adac7c229071712f04ae943e28d9b7744"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87d2290a6da5d10e23a39244c244cdeb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a87d2290a6da5d10e23a39244c244cdeb">isValid</a> (const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;datetime)</td></tr>
+<tr class="memdesc:a87d2290a6da5d10e23a39244c244cdeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">指定时间系统是否有效  <a href="#a87d2290a6da5d10e23a39244c244cdeb">更多...</a><br /></td></tr>
+<tr class="separator:a87d2290a6da5d10e23a39244c244cdeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fd15d95c96a0bc8ae52b525aec37dce"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a9fd15d95c96a0bc8ae52b525aec37dce">_calculate</a> ()=0</td></tr>
+<tr class="memdesc:a9fd15d95c96a0bc8ae52b525aec37dce"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类计算接口  <a href="#a9fd15d95c96a0bc8ae52b525aec37dce">更多...</a><br /></td></tr>
+<tr class="separator:a9fd15d95c96a0bc8ae52b525aec37dce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94e01c50f31cc72a0183b124d7bccad4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a94e01c50f31cc72a0183b124d7bccad4">_reset</a> ()</td></tr>
+<tr class="memdesc:a94e01c50f31cc72a0183b124d7bccad4"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类reset接口  <a href="#a94e01c50f31cc72a0183b124d7bccad4">更多...</a><br /></td></tr>
+<tr class="separator:a94e01c50f31cc72a0183b124d7bccad4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad488b379807ce93992754f9a4d7a519b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">ConditionPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#ad488b379807ce93992754f9a4d7a519b">_clone</a> ()=0</td></tr>
+<tr class="memdesc:ad488b379807ce93992754f9a4d7a519b"><td class="mdescLeft">&#160;</td><td class="mdescRight">子类克隆接口  <a href="#ad488b379807ce93992754f9a4d7a519b">更多...</a><br /></td></tr>
+<tr class="separator:ad488b379807ce93992754f9a4d7a519b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected 属性</h2></td></tr>
+<tr class="memitem:a7136a9bf2d50d7649416e9c4c6ec89dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a7136a9bf2d50d7649416e9c4c6ec89dc">m_name</a></td></tr>
+<tr class="separator:a7136a9bf2d50d7649416e9c4c6ec89dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a855fa1415bce2a668b23811d221ab968"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_k_data.html">KData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a855fa1415bce2a668b23811d221ab968">m_kdata</a></td></tr>
+<tr class="separator:a855fa1415bce2a668b23811d221ab968"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a77f8f1d1b88dcd0c1297a36e8c5c96"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#af538d62e3c6c9e53aaaf2bccc3138f2c">TMPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a6a77f8f1d1b88dcd0c1297a36e8c5c96">m_tm</a></td></tr>
+<tr class="separator:a6a77f8f1d1b88dcd0c1297a36e8c5c96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bf8b3ca44a14f4de923c61fb0e33893"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">SGPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a7bf8b3ca44a14f4de923c61fb0e33893">m_sg</a></td></tr>
+<tr class="separator:a7bf8b3ca44a14f4de923c61fb0e33893"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6258a52efd49c9d4ba2d8fcf79cbb97e"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#a6258a52efd49c9d4ba2d8fcf79cbb97e">m_valid</a></td></tr>
+<tr class="separator:a6258a52efd49c9d4ba2d8fcf79cbb97e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_condition_base.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
+<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>系统有效条件基类 </p>
+<dl class="section note"><dt>注解</dt><dd>系统有效性和待交易的对象有关也可能没关，所以保留setTradeObj接口 </dd></dl>
+</div><h2 class="groupheader">成员类型定义说明</h2>
+<a class="anchor" id="af105fecdcf6632d2f2062ac870221fa2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef shared_ptr&lt;<a class="el" href="classhku_1_1_condition_base.html">ConditionBase</a>&gt; <a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">hku::ConditionBase::ConditionPtr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">构造及析构函数说明</h2>
+<a class="anchor" id="a27abdfe72bee77392ad10ce4b09a48a3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::ConditionBase::ConditionBase </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab2ceb617ea59bb13f097ed07911d7b99"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::ConditionBase::ConditionBase </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a49110c381bf037d7b37ae200317a2f24"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">hku::ConditionBase::~ConditionBase </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a class="anchor" id="ac891bcfeffdd9e206c474ca7e5036b85"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ConditionBase::_addValid </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>加入有效时间，在_calculate中调用 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>系统有效日期 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a9fd15d95c96a0bc8ae52b525aec37dce"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::ConditionBase::_calculate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>子类计算接口 </p>
+
+<p>在 <a class="el" href="classhku_1_1_o_p_line_condition.html#ac4db8d0852ac3cf16fd91fe147232f55">hku::OPLineCondition</a> 内被实现.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad488b379807ce93992754f9a4d7a519b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">ConditionPtr</a> hku::ConditionBase::_clone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>子类克隆接口 </p>
+
+<p>在 <a class="el" href="classhku_1_1_o_p_line_condition.html#a517c65873b191d26e44b7c32fdad1075">hku::OPLineCondition</a> 内被实现.</p>
+
+</div>
+</div>
+<a class="anchor" id="a94e01c50f31cc72a0183b124d7bccad4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void hku::ConditionBase::_reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>子类reset接口 </p>
+
+<p>被 <a class="el" href="classhku_1_1_o_p_line_condition.html#a68376331bfdf601a6fa80ef92ac30738">hku::OPLineCondition</a> 重载.</p>
+
+</div>
+</div>
+<a class="anchor" id="adac7c229071712f04ae943e28d9b7744"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_condition_base.html#af105fecdcf6632d2f2062ac870221fa2">ConditionPtr</a> hku::ConditionBase::clone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>克隆操作 </p>
+
+</div>
+</div>
+<a class="anchor" id="aba9b19491012208ac7a82e8285530c3f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">SGPtr</a> hku::ConditionBase::getSG </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取系统信号指示器 </p>
+
+</div>
+</div>
+<a class="anchor" id="a4001fe624a1d08554a474ede16a68fb7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> hku::ConditionBase::getTM </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取交易管理实例 </p>
+
+</div>
+</div>
+<a class="anchor" id="ab1ba7496b0fc1ee7f831af5653c4d84c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::ConditionBase::getTO </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取交易对象 </p>
+
+</div>
+</div>
+<a class="anchor" id="a87d2290a6da5d10e23a39244c244cdeb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool hku::ConditionBase::isValid </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;&#160;</td>
+          <td class="paramname"><em>datetime</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>指定时间系统是否有效 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">datetime</td><td>指定时间 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true 有效 | false 失效 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af08f57c535cfa6908d1e70565db2dc36"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::ConditionBase::name </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取名称 </p>
+
+</div>
+</div>
+<a class="anchor" id="a0e4f04dd4ad7e88c294a12aa45e01823"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ConditionBase::name </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>设置名称 </p>
+
+</div>
+</div>
+<a class="anchor" id="aae166742c35373f50b7fc3e4cd84595e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ConditionBase::reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>复位操作 </p>
+
+</div>
+</div>
+<a class="anchor" id="aec15858b157be3e088690cc3ac4b1793"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ConditionBase::setSG </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">SGPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>sg</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>设置系统信号指示器 </p>
+
+</div>
+</div>
+<a class="anchor" id="a4b07fce681c4dc191d1886420b84c585"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ConditionBase::setTM </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group___trade_manager_class.html#ga285ea5029f5f472a82a1d21128be7c2b">TradeManagerPtr</a> &amp;&#160;</td>
+          <td class="paramname"><em>tm</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>设置交易管理实例 </p>
+
+</div>
+</div>
+<a class="anchor" id="a7c989886e92ee06c5820508f3e85504e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hku::ConditionBase::setTO </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classhku_1_1_k_data.html">KData</a> &amp;&#160;</td>
+          <td class="paramname"><em>kdata</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置交易对象 </p>
+
+</div>
+</div>
+<h2 class="groupheader">友元及相关函数文档</h2>
+<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class boost::serialization::access</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">类成员变量说明</h2>
+<a class="anchor" id="a855fa1415bce2a668b23811d221ab968"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhku_1_1_k_data.html">KData</a> hku::ConditionBase::m_kdata</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7136a9bf2d50d7649416e9c4c6ec89dc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::ConditionBase::m_name</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7bf8b3ca44a14f4de923c61fb0e33893"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#ad7931b4985c9bf3314057b9573b512bd">SGPtr</a> hku::ConditionBase::m_sg</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6a77f8f1d1b88dcd0c1297a36e8c5c96"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacehku.html#af538d62e3c6c9e53aaaf2bccc3138f2c">TMPtr</a> hku::ConditionBase::m_tm</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6258a52efd49c9d4ba2d8fcf79cbb97e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::set&lt;<a class="el" href="classhku_1_1_datetime.html">Datetime</a>&gt; hku::ConditionBase::m_valid</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>hikyuu/trade_sys/condition/<a class="el" href="_condition_base_8h_source.html">ConditionBase.h</a></li>
+<li>hikyuu/trade_sys/condition/<a class="el" href="_condition_base_8cpp.html">ConditionBase.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

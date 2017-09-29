@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: DataType 基础数据类型定义</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,14 +33,14 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>首页</span></a></li>
-      <li><a href="modules.html"><span>模块</span></a></li>
+      <li class="current"><a href="modules.html"><span>模块</span></a></li>
       <li><a href="namespaces.html"><span>命名空间</span></a></li>
       <li><a href="annotated.html"><span>类</span></a></li>
       <li><a href="files.html"><span>文件</span></a></li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -78,9 +79,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">类</a>  </div>
+<a href="#nested-classes">类</a> &#124;
+<a href="#typedef-members">类型定义</a>  </div>
   <div class="headertitle">
-<div class="title">DataType 基础数据类型定义<div class="ingroups"><a class="el" href="group___base.html">Base 基础设施</a></div></div>  </div>
+<div class="title">DataType 基础数据类型定义<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___base.html">Base 基础设施</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -91,18 +93,26 @@ DataType 基础数据类型定义 的协作图:</div>
 <div class="dyncontent">
 <center><table><tr><td><img src="group___data_type.png" border="0" alt="" usemap="#group______data__type"/>
 <map name="group______data__type" id="group______data__type">
-<area shape="rect" id="node1" href="group___common-_utilities.html" title="独立的一些小函数、对象工具集合" alt="" coords="518,8,749,37"/><area shape="rect" id="node3" href="group___base.html" title="基础库，负责Stock实例管理、K线数据读取、板块管理等" alt="" coords="5,8,128,37"/></map>
+<area shape="rect" id="node1" href="group___common-_utilities.html" title="独立的一些小函数、对象工具集合 " alt="" coords="528,8,767,37"/>
+<area shape="rect" id="node3" href="group___base.html" title="基础库，负责Stock实例管理、K线数据读取、板块管理等 " alt="" coords="5,8,135,37"/>
+</map>
 </td></tr></table></center>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 类</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_datetime.html">hku::Datetime</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">日期类型  <a href="classhku_1_1_datetime.html#details">更多...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">日期类型  <a href="classhku_1_1_datetime.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_null.html">hku::Null&lt; T &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">提供指定给定类型的Null值  <a href="classhku_1_1_null.html#details">更多...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">提供指定给定类型的Null值  <a href="classhku_1_1_null.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:gaeb6c8c0a18561345f892e2c4be1f5ef2"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; Datetime &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">hku::DatetimeList</a></td></tr>
+<tr class="memdesc:gaeb6c8c0a18561345f892e2c4be1f5ef2"><td class="mdescLeft">&#160;</td><td class="mdescRight">日期列表  <a href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">更多...</a><br /></td></tr>
+<tr class="separator:gaeb6c8c0a18561345f892e2c4be1f5ef2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6c5d9172e86b869b66ac80be4e6d4f7f"><td class="memItemLeft" align="right" valign="top">typedef long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#ga6c5d9172e86b869b66ac80be4e6d4f7f">hku::hku_int64</a></td></tr>
 <tr class="separator:ga6c5d9172e86b869b66ac80be4e6d4f7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga28ef2f6e6676d6396aec5e0832c92ca4"><td class="memItemLeft" align="right" valign="top">typedef unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#ga28ef2f6e6676d6396aec5e0832c92ca4">hku::hku_uint64</a></td></tr>
@@ -115,25 +125,26 @@ DataType 基础数据类型定义 的协作图:</div>
 <tr class="separator:gae2b42deee135c163b58dfa3cc74d2563"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga409c63378ffa8adc12552ee86a7d49de"><td class="memItemLeft" align="right" valign="top">typedef std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">hku::string</a></td></tr>
 <tr class="separator:ga409c63378ffa8adc12552ee86a7d49de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga29eed694bad283653fd1010b3e769910"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; Datetime &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#ga29eed694bad283653fd1010b3e769910">hku::DatetimeList</a></td></tr>
-<tr class="separator:ga29eed694bad283653fd1010b3e769910"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae6bd4dd3668ad317763b0ca333e250bb"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; price_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#gae6bd4dd3668ad317763b0ca333e250bb">hku::PriceList</a></td></tr>
 <tr class="separator:gae6bd4dd3668ad317763b0ca333e250bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga65144b22778d6e7b88a375dbaeca2e97"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">hku::StringList</a></td></tr>
-<tr class="separator:ga65144b22778d6e7b88a375dbaeca2e97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga019b144477dcda33671dfa6a203db696"><td class="memItemLeft" align="right" valign="top">typedef vector&lt; string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___data_type.html#ga019b144477dcda33671dfa6a203db696">hku::StringList</a></td></tr>
+<tr class="separator:ga019b144477dcda33671dfa6a203db696"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <p>定义所需的基础数据类型 </p>
+<p>定义所需的基础数据类型 </p>
 <h2 class="groupheader">类型定义说明</h2>
-<a class="anchor" id="ga29eed694bad283653fd1010b3e769910"></a>
+<a class="anchor" id="gaeb6c8c0a18561345f892e2c4be1f5ef2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef vector&lt;Datetime&gt; <a class="el" href="group___data_type.html#ga29eed694bad283653fd1010b3e769910">hku::DatetimeList</a></td>
+          <td class="memname">typedef std::vector&lt;Datetime&gt; <a class="el" href="group___data_type.html#gaeb6c8c0a18561345f892e2c4be1f5ef2">hku::DatetimeList</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>日期列表 </p>
 
 </div>
 </div>
@@ -221,12 +232,12 @@ DataType 基础数据类型定义 的协作图:</div>
 
 </div>
 </div>
-<a class="anchor" id="ga65144b22778d6e7b88a375dbaeca2e97"></a>
+<a class="anchor" id="ga019b144477dcda33671dfa6a203db696"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef vector&lt;string&gt; <a class="el" href="group___data_type.html#ga65144b22778d6e7b88a375dbaeca2e97">hku::StringList</a></td>
+          <td class="memname">typedef vector&lt; string &gt; <a class="el" href="group___data_type.html#ga019b144477dcda33671dfa6a203db696">hku::StringList</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -239,7 +250,7 @@ DataType 基础数据类型定义 的协作图:</div>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

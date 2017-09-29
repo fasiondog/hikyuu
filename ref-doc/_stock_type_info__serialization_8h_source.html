@@ -1,0 +1,120 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/serialization/StockTypeInfo_serialization.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_3e155c5f2da30aa26fa83ad0482e6b65.html">serialization</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">StockTypeInfo_serialization.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_stock_type_info__serialization_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * StockTypeInfo.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-5-1</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef STOCKTYPEINFO_SERIALIZATION_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define STOCKTYPEINFO_SERIALIZATION_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../config.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;../StockTypeInfo.h&quot;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;../utilities/util.h&quot;</span></div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;boost/serialization/nvp.hpp&gt;</span></div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;boost/serialization/split_free.hpp&gt;</span></div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceboost.html">boost</a> {</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">namespace </span>serialization {</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">//防止boost::serialization某些情况不能在独立的命名空间中</span></div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#if defined(BOOST_WINDOWS) &amp;&amp; (PY_VERSION_HEX &lt; 0x03000000)</span></div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">    #ifndef HKU_GB_TO_UTF8</span></div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">    #define HKU_GB_TO_UTF8(s)  hku::GBToUTF8(s)</span></div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">    #endif</span></div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">    #ifndef HKU_UTF8_TO_GB</span></div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">    #define HKU_UTF8_TO_GB(s)  hku::UTF8ToGB(s)</span></div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">    #endif</span></div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#else</span></div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">    #ifndef HKU_GB_TO_UTF8</span></div><div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="_stock_type_info__serialization_8h.html#a0f8f3ec20828d01bb86db9e88e0ffafb">   33</a></span>&#160;<span class="preprocessor">    #define HKU_GB_TO_UTF8(s)  (s)</span></div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">    #endif</span></div><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">    #ifndef HKU_UTF8_TO_GB</span></div><div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="_stock_type_info__serialization_8h.html#a2ebf9701128f6d0b571e06251a00ee87">   37</a></span>&#160;<span class="preprocessor">    #define HKU_UTF8_TO_GB(s)  (s)</span></div><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">    #endif</span></div><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Archive&gt;</div><div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="namespaceboost_1_1serialization.html#a6cbe2bc388862aa86dd288da26dcad75">   42</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceboost_1_1serialization.html#a385c86ab96592633f8b87adeb213c8a5">save</a>(Archive &amp; ar, <span class="keyword">const</span> <a class="code" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a>&amp; record, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <a class="code" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku::hku_uint32</a> type = record.<a class="code" href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">type</a>();</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">hku::string</a> description = <a class="code" href="_stock_type_info__serialization_8h.html#a0f8f3ec20828d01bb86db9e88e0ffafb">HKU_GB_TO_UTF8</a>(record.<a class="code" href="classhku_1_1_stock_type_info.html#afbdd533a4b5be89ff0af76c1a92f4b20">description</a>());</div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a> tick = record.<a class="code" href="classhku_1_1_stock_type_info.html#a9c61eae8fd9716368316b9edfd3cacdd">tick</a>();</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a> tickValue = record.<a class="code" href="classhku_1_1_stock_type_info.html#ada08bf46cda8112ca01047c40556c52f">tickValue</a>();</div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">int</span> precision = record.<a class="code" href="classhku_1_1_stock_type_info.html#ab33c14108ae2ca82ffefb7ea8a9bd877">precision</a>();</div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">size_t</span> minTradeNumber = record.<a class="code" href="classhku_1_1_stock_type_info.html#ab12d2f514f342af5b6bae6a45311ee0b">minTradeNumber</a>();</div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">size_t</span> maxTradeNumber = record.<a class="code" href="classhku_1_1_stock_type_info.html#a6c8b6da0f01f55d31e22b3a9b7e0d764">maxTradeNumber</a>();</div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(type);</div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(description);</div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(tick);</div><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(tickValue);</div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(precision);</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(minTradeNumber);</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(maxTradeNumber);</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Archive&gt;</div><div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="namespaceboost_1_1serialization.html#afb2739fd5c885948555d91a867e27eaa">   60</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceboost_1_1serialization.html#adc1b0ff0ad31e38405d864d8b7aef32d">load</a>(Archive &amp; ar, <a class="code" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a>&amp; record, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku::hku_uint32</a> type;</div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">hku::string</a> description;</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a> tick, tickValue;</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">int</span> precision;</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">size_t</span> minTradeNumber, maxTradeNumber;</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(type);</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(description);</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(tick);</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(tickValue);</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(precision);</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(minTradeNumber);</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    ar &amp; BOOST_SERIALIZATION_NVP(maxTradeNumber);</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    record = <a class="code" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a>(type, <a class="code" href="_stock_type_info__serialization_8h.html#a2ebf9701128f6d0b571e06251a00ee87">HKU_UTF8_TO_GB</a>(description),</div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            tick, tickValue, precision, minTradeNumber, maxTradeNumber);</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}} <span class="comment">/* namespace boost::serailization */</span></div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;BOOST_SERIALIZATION_SPLIT_FREE(<a class="code" href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a>)</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* HKU_SUPPORT_SERIALIZATION */</span><span class="preprocessor"></span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* STOCKTYPEINFO_SERIALIZATION_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="group___data_type_html_gaa7e9bc4ead4537f39a91612a5b6ae563"><div class="ttname"><a href="group___data_type.html#gaa7e9bc4ead4537f39a91612a5b6ae563">hku::hku_uint32</a></div><div class="ttdeci">unsigned hku_uint32</div><div class="ttdef"><b>Definition:</b> DataType.h:54</div></div>
+<div class="ttc" id="_stock_type_info__serialization_8h_html_a0f8f3ec20828d01bb86db9e88e0ffafb"><div class="ttname"><a href="_stock_type_info__serialization_8h.html#a0f8f3ec20828d01bb86db9e88e0ffafb">HKU_GB_TO_UTF8</a></div><div class="ttdeci">#define HKU_GB_TO_UTF8(s)</div><div class="ttdef"><b>Definition:</b> StockTypeInfo_serialization.h:33</div></div>
+<div class="ttc" id="namespaceboost_html"><div class="ttname"><a href="namespaceboost.html">boost</a></div><div class="ttdef"><b>Definition:</b> Block_serialization.h:17</div></div>
+<div class="ttc" id="group___data_type_html_ga409c63378ffa8adc12552ee86a7d49de"><div class="ttname"><a href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">hku::string</a></div><div class="ttdeci">std::string string</div><div class="ttdef"><b>Definition:</b> DataType.h:59</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html"><div class="ttname"><a href="classhku_1_1_stock_type_info.html">hku::StockTypeInfo</a></div><div class="ttdoc">证券类型信息 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:31</div></div>
+<div class="ttc" id="_stock_type_info__serialization_8h_html_a2ebf9701128f6d0b571e06251a00ee87"><div class="ttname"><a href="_stock_type_info__serialization_8h.html#a2ebf9701128f6d0b571e06251a00ee87">HKU_UTF8_TO_GB</a></div><div class="ttdeci">#define HKU_UTF8_TO_GB(s)</div><div class="ttdef"><b>Definition:</b> StockTypeInfo_serialization.h:37</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html_ab33c14108ae2ca82ffefb7ea8a9bd877"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ab33c14108ae2ca82ffefb7ea8a9bd877">hku::StockTypeInfo::precision</a></div><div class="ttdeci">int precision() const </div><div class="ttdoc">获取价格精度 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:54</div></div>
+<div class="ttc" id="namespaceboost_1_1serialization_html_adc1b0ff0ad31e38405d864d8b7aef32d"><div class="ttname"><a href="namespaceboost_1_1serialization.html#adc1b0ff0ad31e38405d864d8b7aef32d">boost::serialization::load</a></div><div class="ttdeci">void load(Archive &amp;ar, hku::Block &amp;blk, unsigned int version)</div><div class="ttdef"><b>Definition:</b> Block_serialization.h:34</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html_a6c8b6da0f01f55d31e22b3a9b7e0d764"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a6c8b6da0f01f55d31e22b3a9b7e0d764">hku::StockTypeInfo::maxTradeNumber</a></div><div class="ttdeci">size_t maxTradeNumber() const </div><div class="ttdoc">获取每笔最大交易数量 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:60</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html_ab12d2f514f342af5b6bae6a45311ee0b"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ab12d2f514f342af5b6bae6a45311ee0b">hku::StockTypeInfo::minTradeNumber</a></div><div class="ttdeci">size_t minTradeNumber() const </div><div class="ttdoc">获取每笔最小交易数量 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:57</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html_a9c61eae8fd9716368316b9edfd3cacdd"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#a9c61eae8fd9716368316b9edfd3cacdd">hku::StockTypeInfo::tick</a></div><div class="ttdeci">price_t tick() const </div><div class="ttdoc">获取最小跳动量 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:45</div></div>
+<div class="ttc" id="namespaceboost_1_1serialization_html_a385c86ab96592633f8b87adeb213c8a5"><div class="ttname"><a href="namespaceboost_1_1serialization.html#a385c86ab96592633f8b87adeb213c8a5">boost::serialization::save</a></div><div class="ttdeci">void save(Archive &amp;ar, const hku::Block &amp;blk, unsigned int version)</div><div class="ttdef"><b>Definition:</b> Block_serialization.h:20</div></div>
+<div class="ttc" id="group___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>Definition:</b> DataType.h:56</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html_afbdd533a4b5be89ff0af76c1a92f4b20"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#afbdd533a4b5be89ff0af76c1a92f4b20">hku::StockTypeInfo::description</a></div><div class="ttdeci">const string &amp; description() const </div><div class="ttdoc">获取证券类型描述信息 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:42</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html_ada08bf46cda8112ca01047c40556c52f"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ada08bf46cda8112ca01047c40556c52f">hku::StockTypeInfo::tickValue</a></div><div class="ttdeci">price_t tickValue() const </div><div class="ttdoc">每tick价格 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:48</div></div>
+<div class="ttc" id="classhku_1_1_stock_type_info_html_ae2f59372ee923682512de57487214387"><div class="ttname"><a href="classhku_1_1_stock_type_info.html#ae2f59372ee923682512de57487214387">hku::StockTypeInfo::type</a></div><div class="ttdeci">hku_uint32 type() const </div><div class="ttdoc">获取证券类型 </div><div class="ttdef"><b>Definition:</b> StockTypeInfo.h:39</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

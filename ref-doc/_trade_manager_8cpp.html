@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/trade_manage/TradeManager.cpp 文件参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -88,29 +89,63 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#namespaces">命名空间</a>  </div>
+<a href="#namespaces">命名空间</a> &#124;
+<a href="#func-members">函数</a>  </div>
   <div class="headertitle">
 <div class="title">TradeManager.cpp 文件参考</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;boost/bind.hpp&gt;</code><br/>
-<code>#include &lt;algorithm&gt;</code><br/>
-<code>#include &quot;<a class="el" href="_trade_manager_8h_source.html">TradeManager.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="crt_zero_t_c_8h_source.html">crt/crtZeroTC.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_log_8h_source.html">../Log.h</a>&quot;</code><br/>
+<div class="textblock"><code>#include &lt;fstream&gt;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
+<code>#include &lt;boost/bind.hpp&gt;</code><br />
+<code>#include &lt;boost/lexical_cast.hpp&gt;</code><br />
+<code>#include &lt;algorithm&gt;</code><br />
+<code>#include &quot;<a class="el" href="_trade_manager_8h_source.html">TradeManager.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_system_part_8h_source.html">../trade_sys/system/SystemPart.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="util_8h_source.html">../utilities/util.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_k_d_a_t_a_8h_source.html">../KData.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 TradeManager.cpp 的引用(Include)关系图:</div>
 <div class="dyncontent">
 <div class="center"><img src="_trade_manager_8cpp__incl.png" border="0" usemap="#hikyuu_2trade__manage_2_trade_manager_8cpp" alt=""/></div>
 <map name="hikyuu_2trade__manage_2_trade_manager_8cpp" id="hikyuu_2trade__manage_2_trade_manager_8cpp">
-<area shape="rect" id="node4" href="_trade_manager_8h.html" title="TradeManager.h" alt="" coords="275,101,412,131"/><area shape="rect" id="node32" href="crt_zero_t_c_8h.html" title="crt/crtZeroTC.h" alt="" coords="437,101,568,131"/><area shape="rect" id="node26" href="_log_8h.html" title="../Log.h" alt="" coords="813,333,891,363"/><area shape="rect" id="node5" href="_trade_cost_base_8h.html" title="TradeCostBase.h" alt="" coords="433,179,572,208"/><area shape="rect" id="node30" href="_trade_record_8h.html" title="TradeRecord.h" alt="" coords="114,179,240,208"/><area shape="rect" id="node31" href="_position_record_8h.html" title="PositionRecord.h" alt="" coords="267,179,408,208"/><area shape="rect" id="node6" href="_stock_8h.html" title="../Stock.h" alt="" coords="132,256,223,285"/><area shape="rect" id="node23" href="util_8h.html" title="../utilities/util.h" alt="" coords="439,333,569,363"/><area shape="rect" id="node24" href="_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="578,256,757,285"/><area shape="rect" id="node29" href="_cost_record_8h.html" title="CostRecord.h" alt="" coords="247,256,363,285"/><area shape="rect" id="node7" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="191,411,313,440"/><area shape="rect" id="node21" href="_k_query_8h.html" title="KQuery.h" alt="" coords="88,333,176,363"/><area shape="rect" id="node8" href="_data_type_8h.html" title="DataType.h" alt="" coords="325,488,427,517"/><area shape="rect" id="node15" href="_null_8h.html" title="utilities/Null.h" alt="" coords="627,565,747,595"/><area shape="rect" id="node18" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="789,565,955,595"/><area shape="rect" id="node22" href="_k_record_8h.html" title="KRecord.h" alt="" coords="71,411,165,440"/></map>
+<area shape="rect" id="node7" href="_trade_manager_8h.html" title="TradeManager.h" alt="" coords="1587,100,1735,129"/>
+<area shape="rect" id="node20" href="util_8h.html" title="../utilities/util.h" alt="" coords="1247,453,1378,482"/>
+<area shape="rect" id="node24" href="_system_part_8h.html" title="../trade_sys/system\l/SystemPart.h" alt="" coords="2465,349,2640,396"/>
+<area shape="rect" id="node49" href="_k_d_a_t_a_8h.html" title="../KData.h" alt="" coords="2378,100,2477,129"/>
+<area shape="rect" id="node9" href="_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="753,358,944,387"/>
+<area shape="rect" id="node22" href="_trade_record_8h.html" title="TradeRecord.h" alt="" coords="1756,272,1893,301"/>
+<area shape="rect" id="node40" href="_position_record_8h.html" title="PositionRecord.h" alt="" coords="1385,272,1539,301"/>
+<area shape="rect" id="node41" href="_borrow_record_8h.html" title="BorrowRecord.h" alt="" coords="1581,272,1732,301"/>
+<area shape="rect" id="node43" href="_funds_record_8h.html" title="FundsRecord.h" alt="" coords="2094,358,2235,387"/>
+<area shape="rect" id="node44" href="_loan_record_8h.html" title="LoanRecord.h" alt="" coords="2259,358,2390,387"/>
+<area shape="rect" id="node45" href="_order_broker_base_8h.html" title="OrderBrokerBase.h" alt="" coords="2020,272,2195,301"/>
+<area shape="rect" id="node46" href="_t_c___zero_8h.html" title="crt/TC_Zero.h" alt="" coords="1101,186,1231,215"/>
+<area shape="rect" id="node16" href="config_8h.html" title="../config.h" alt="" coords="1776,453,1876,482"/>
+<area shape="rect" id="node23" href="_stock_manager_8h.html" title="../StockManager.h" alt="" coords="1589,453,1751,482"/>
+<area shape="rect" id="node35" href="_cost_record_8h.html" title="CostRecord.h" alt="" coords="1940,358,2069,387"/>
+<area shape="rect" id="node36" href="_datetime__serialization_8h.html" title="../serialization/Datetime\l_serialization.h" alt="" coords="1715,349,1916,396"/>
+<area shape="rect" id="node38" href="_stock__serialization_8h.html" title="../serialization/Stock\l_serialization.h" alt="" coords="1463,349,1639,396"/>
+<area shape="rect" id="node25" href="_data_type_8h.html" title="DataType.h" alt="" coords="2275,453,2385,482"/>
+<area shape="rect" id="node33" href="_log_8h.html" title="Log.h" alt="" coords="1627,547,1694,577"/>
+<area shape="rect" id="node34" href="_null_8h.html" title="utilities/Null.h" alt="" coords="2178,547,2301,577"/>
+<area shape="rect" id="node47" href="_trade_cost_base_8h.html" title="../TradeCostBase.h" alt="" coords="1070,272,1241,301"/>
+<area shape="rect" id="node50" href="_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="2371,186,2484,215"/>
+</map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 命名空间</h2></td></tr>
-<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
-<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br/></td></tr>
+<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a99a46d10daf17759474c2b583a42cfd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a99a46d10daf17759474c2b583a42cfd8">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const TradeManager &amp;tm)</td></tr>
+<tr class="separator:a99a46d10daf17759474c2b583a42cfd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a833804e0d2f79714d0c8953d2e864b46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a833804e0d2f79714d0c8953d2e864b46">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const TradeManagerPtr &amp;ptm)</td></tr>
+<tr class="separator:a833804e0d2f79714d0c8953d2e864b46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
@@ -118,7 +153,7 @@ TradeManager.cpp 的引用(Include)关系图:</div>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

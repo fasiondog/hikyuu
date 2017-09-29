@@ -1,0 +1,4 @@
+<map id="hku::TradeRequest" name="hku::TradeRequest">
+<area shape="rect" id="node2" href="$classhku_1_1_datetime.html" title="日期类型 " alt="" coords="54,5,185,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_k_record.html" title="K线数据记录 " alt="" coords="167,100,293,129"/>
+</map>

@@ -1,0 +1,117 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/trade_manage/FundsRecord.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_09d5cfaff4d2ae41cc48588927813e3d.html">trade_manage</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">FundsRecord.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_funds_record_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * FundsRecord.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2013-5-2</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef FUNDSRECORD_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define FUNDSRECORD_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../DataType.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;../config.h&quot;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;boost/serialization/nvp.hpp&gt;</span></div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div><div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html">   24</a></span>&#160;<span class="keyword">class </span><a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="classhku_1_1_funds_record.html">FundsRecord</a> {</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="classhku_1_1_funds_record.html">FundsRecord</a>();</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="classhku_1_1_funds_record.html">FundsRecord</a>(<a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> cash,</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> market_value, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> short_market_value,</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;            <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> base_cash, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> base_asset,</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;            <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> borrow_cash, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> borrow_asset);</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div><div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#a2da7ed1468aba9bcb41ab085091b5f90">   32</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_funds_record.html#a2da7ed1468aba9bcb41ab085091b5f90">cash</a>;            </div><div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#a34aeed88eee278824aecf1fcc82484c7">   33</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_funds_record.html#a34aeed88eee278824aecf1fcc82484c7">market_value</a>;    </div><div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#af3615a88ba2e256712c2659a188c539f">   34</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_funds_record.html#af3615a88ba2e256712c2659a188c539f">short_market_value</a>; </div><div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#ad4a66f383a3be1b99175cd44dcfb791e">   35</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_funds_record.html#ad4a66f383a3be1b99175cd44dcfb791e">base_cash</a>;       </div><div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#aa8ac855d18031a7c52d6507edf1a65dd">   36</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_funds_record.html#aa8ac855d18031a7c52d6507edf1a65dd">base_asset</a>;      </div><div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#a745aa056eec5d0dd937ffcfa172c498d">   37</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_funds_record.html#a745aa056eec5d0dd937ffcfa172c498d">borrow_cash</a>;     </div><div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#af0c0c9e84dab0477030251645df0b1ed">   38</a></span>&#160;    <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="code" href="classhku_1_1_funds_record.html#af0c0c9e84dab0477030251645df0b1ed">borrow_asset</a>;    </div><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">//当前总资产 = 现金 + 多头市值 + 空头数量×（借入价格 - 当前价格)</span></div><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="comment">//         = cash + market_value + borrow_asset - short_market_value</span></div><div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="comment">//当前负债 = 借入的资金 + 借入的资产价值</span></div><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="comment">//        = borrow_cash + borrow_asset</span></div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">//当前净资产 = 总资产 - 负债</span></div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="comment">//         = cash + market_value - short_market_value - borrow_cash</span></div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="comment">//当前投入本值资产 = 投入本金 + 投入资产价值</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="comment">//               = base_cash + base_asset</span></div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">//当前收益 = 当前净资产 - 当前投入本值资产</span></div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="comment">//        = cash + market_value - short_market_value - borrow_cash - base_cash - base_asset</span></div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">//序列化支持</span></div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#if HKU_SUPPORT_SERIALIZATION</span></div><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">private</span>:</div><div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classhku_1_1_funds_record.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">   54</a></span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span>boost::serialization::access;</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">class</span> Archive&gt;</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">void</span> serialize(Archive &amp; ar, <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> version) {</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(cash);</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(market_value);</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(short_market_value);</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(base_cash);</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(base_asset);</div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(borrow_cash);</div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        ar &amp; BOOST_SERIALIZATION_NVP(borrow_asset);</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp; <a class="code" href="namespacehku.html#afbc657216bc5d9e85c6c73f634449b7f">operator&lt;&lt;</a>(std::ostream &amp;, <span class="keyword">const</span> <a class="code" href="classhku_1_1_funds_record.html">FundsRecord</a>&amp;);</div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> <a class="code" href="namespacehku.html#a03a5b2668c94f28ba6c31edf3fd1a0c9">operator==</a>(<span class="keyword">const</span> <a class="code" href="classhku_1_1_funds_record.html">FundsRecord</a>&amp; d1, <span class="keyword">const</span> <a class="code" href="classhku_1_1_funds_record.html">FundsRecord</a>&amp; d2);</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* FUNDSRECORD_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_funds_record_html_af0c0c9e84dab0477030251645df0b1ed"><div class="ttname"><a href="classhku_1_1_funds_record.html#af0c0c9e84dab0477030251645df0b1ed">hku::FundsRecord::borrow_asset</a></div><div class="ttdeci">price_t borrow_asset</div><div class="ttdoc">当前借入证券资产价值 </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:38</div></div>
+<div class="ttc" id="classhku_1_1_funds_record_html_a2da7ed1468aba9bcb41ab085091b5f90"><div class="ttname"><a href="classhku_1_1_funds_record.html#a2da7ed1468aba9bcb41ab085091b5f90">hku::FundsRecord::cash</a></div><div class="ttdeci">price_t cash</div><div class="ttdoc">当前现金 </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:32</div></div>
+<div class="ttc" id="classhku_1_1_funds_record_html_aa8ac855d18031a7c52d6507edf1a65dd"><div class="ttname"><a href="classhku_1_1_funds_record.html#aa8ac855d18031a7c52d6507edf1a65dd">hku::FundsRecord::base_asset</a></div><div class="ttdeci">price_t base_asset</div><div class="ttdoc">当前投入的资产价值 </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:36</div></div>
+<div class="ttc" id="classhku_1_1_funds_record_html_a745aa056eec5d0dd937ffcfa172c498d"><div class="ttname"><a href="classhku_1_1_funds_record.html#a745aa056eec5d0dd937ffcfa172c498d">hku::FundsRecord::borrow_cash</a></div><div class="ttdeci">price_t borrow_cash</div><div class="ttdoc">当前借入的资金，即负债 </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:37</div></div>
+<div class="ttc" id="_data_type_8h_html_af59fd09cf4bfe9c265f61882e5f07d7a"><div class="ttname"><a href="_data_type_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a></div><div class="ttdeci">#define HKU_API</div><div class="ttdef"><b>Definition:</b> DataType.h:12</div></div>
+<div class="ttc" id="namespacehku_html_afbc657216bc5d9e85c6c73f634449b7f"><div class="ttname"><a href="namespacehku.html#afbc657216bc5d9e85c6c73f634449b7f">hku::operator&lt;&lt;</a></div><div class="ttdeci">HKU_API std::ostream &amp; operator&lt;&lt;(std::ostream &amp;os, const Block &amp;blk)</div><div class="ttdef"><b>Definition:</b> Block.cpp:13</div></div>
+<div class="ttc" id="classhku_1_1_funds_record_html_a34aeed88eee278824aecf1fcc82484c7"><div class="ttname"><a href="classhku_1_1_funds_record.html#a34aeed88eee278824aecf1fcc82484c7">hku::FundsRecord::market_value</a></div><div class="ttdeci">price_t market_value</div><div class="ttdoc">当前多头市值 </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:33</div></div>
+<div class="ttc" id="group___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>Definition:</b> DataType.h:56</div></div>
+<div class="ttc" id="namespacehku_html_a03a5b2668c94f28ba6c31edf3fd1a0c9"><div class="ttname"><a href="namespacehku.html#a03a5b2668c94f28ba6c31edf3fd1a0c9">hku::operator==</a></div><div class="ttdeci">bool operator==(const Datetime &amp;, const Datetime &amp;)</div><div class="ttdef"><b>Definition:</b> Datetime.h:118</div></div>
+<div class="ttc" id="classhku_1_1_funds_record_html"><div class="ttname"><a href="classhku_1_1_funds_record.html">hku::FundsRecord</a></div><div class="ttdoc">当前资产情况记录，由TradeManager::getFunds返回 </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:24</div></div>
+<div class="ttc" id="classhku_1_1_funds_record_html_ad4a66f383a3be1b99175cd44dcfb791e"><div class="ttname"><a href="classhku_1_1_funds_record.html#ad4a66f383a3be1b99175cd44dcfb791e">hku::FundsRecord::base_cash</a></div><div class="ttdeci">price_t base_cash</div><div class="ttdoc">当前投入本金principal </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:35</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="ttc" id="classhku_1_1_funds_record_html_af3615a88ba2e256712c2659a188c539f"><div class="ttname"><a href="classhku_1_1_funds_record.html#af3615a88ba2e256712c2659a188c539f">hku::FundsRecord::short_market_value</a></div><div class="ttdeci">price_t short_market_value</div><div class="ttdoc">当前空头仓位市值 </div><div class="ttdef"><b>Definition:</b> FundsRecord.h:34</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

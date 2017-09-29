@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -96,19 +97,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 
 <p>成员的完整列表，这些成员属于 <a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a>,包括所有继承而来的类成员</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a583bd294654c9aa5e190a742fb6563e6">discard</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a2ce15985d1e7a2d9e2761ec730c33d02">empty</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a5f4505811627bdcea6cbf8b906f470f5">get</a>(size_t pos, size_t num=0) const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#adc9c005cb61678b781d469755d4cc66e">getResultNumber</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a0b8863417f027705dd8ecf54d400ff90">Indicator</a>()</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a971eb2b7331774fc1077c4a252522f48">Indicator</a>(const IndicatorImpPtr &amp;imp)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a3f412564757ccb7df32d353cb02379bd">Indicator</a>(const Indicator &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a> class</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a583bd294654c9aa5e190a742fb6563e6">discard</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a2ce15985d1e7a2d9e2761ec730c33d02">empty</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a5f4505811627bdcea6cbf8b906f470f5">get</a>(size_t pos, size_t num=0) const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a1f91a8c4516d09ea94effd30b21c1078">getImp</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#acd24e481816cd55cde7fd3bcaa03faf1">getParam</a>(const string &amp;name) const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#ab9b6a46cbd748d3c4f15ec3c812e6955">getResult</a>(size_t num) const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a084eff9900b624727bb552ec0d4c52fc">getResultAsPriceList</a>(size_t num) const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#adc9c005cb61678b781d469755d4cc66e">getResultNumber</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a0b8863417f027705dd8ecf54d400ff90">Indicator</a>()</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a971eb2b7331774fc1077c4a252522f48">Indicator</a>(const IndicatorImpPtr &amp;imp)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a3f412564757ccb7df32d353cb02379bd">Indicator</a>(const Indicator &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a209fc0ac566b082dda6fd2e768fa21de">long_name</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a9c29ddcd253645df3682ba78b4ae6476">m_imp</a></td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a0a04ea1245f65303c6118df123317661">name</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a953cf2a18c1b214bffdb982bb2281bca">operator=</a>(const Indicator &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#acbe70a8b716893698ce8fee8871d9896">operator[]</a>(size_t pos) const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a13b8288fff9a13aeed375bb1ade53773">size</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a7cc6508f78ce20109dea20aa82cc2bc8">toString</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a0a04ea1245f65303c6118df123317661">name</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#ac7c4bcd75ba3e74fb8111af756a5d83f">name</a>(const string &amp;name)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#ac690ad93eedd570f8002a7775cca3145">operator()</a>(const Indicator &amp;ind)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#aaf77b54be1840ad73c4037abe5172215">operator&lt;&lt;</a>(std::ostream &amp;, const Indicator &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a953cf2a18c1b214bffdb982bb2281bca">operator=</a>(const Indicator &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#acbe70a8b716893698ce8fee8871d9896">operator[]</a>(size_t pos) const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a87130588c6c8ee6e8c5d72635dc02f99">setDiscard</a>(size_t discard)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a4fb3576d2768b976dbfef891f871f20e">setParam</a>(const string &amp;name, const ValueType &amp;value)</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a13b8288fff9a13aeed375bb1ade53773">size</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classhku_1_1_indicator.html#a570dfbfe7e49395a29ddb816da4e622f">~Indicator</a>()</td><td class="entry"><a class="el" href="classhku_1_1_indicator.html">hku::Indicator</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
 </table></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
@@ -116,7 +127,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

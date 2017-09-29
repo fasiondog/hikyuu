@@ -1,4 +1,4 @@
 <map id="Common&#45;Utilities 公共小工具" name="Common&#45;Utilities 公共小工具">
-<area shape="rect" id="node2" href="$group___data_type.html" title="定义所需的基础数据类型" alt="" coords="526,8,749,37"/>
-<area shape="rect" id="node3" href="$group___base.html" title="基础库，负责Stock实例管理、K线数据读取、板块管理等" alt="" coords="5,8,128,37"/>
+<area shape="rect" id="node2" href="$group___data_type.html" title="定义所需的基础数据类型 " alt="" coords="539,8,767,37"/>
+<area shape="rect" id="node3" href="$group___base.html" title="基础库，负责Stock实例管理、K线数据读取、板块管理等 " alt="" coords="5,8,135,37"/>
 </map>

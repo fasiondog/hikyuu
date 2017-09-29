@@ -1,6 +1,8 @@
 <map id="hikyuu/trade_manage/CostRecord.cpp" name="hikyuu/trade_manage/CostRecord.cpp">
-<area shape="rect" id="node2" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="290,101,405,131"/>
-<area shape="rect" id="node3" href="$_data_type_8h.html" title="../DataType.h" alt="" coords="289,179,407,208"/>
-<area shape="rect" id="node10" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="641,256,761,285"/>
-<area shape="rect" id="node13" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,256,952,285"/>
+<area shape="rect" id="node2" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="1278,100,1407,129"/>
+<area shape="rect" id="node3" href="$_data_type_8h.html" title="../DataType.h" alt="" coords="1143,186,1268,215"/>
+<area shape="rect" id="node24" href="$config_8h.html" title="../config.h" alt="" coords="1293,186,1393,215"/>
+<area shape="rect" id="node14" href="$_log_8h.html" title="Log.h" alt="" coords="1795,281,1861,310"/>
+<area shape="rect" id="node18" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="2203,281,2325,310"/>
+<area shape="rect" id="node21" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1592,281,1771,310"/>
 </map>

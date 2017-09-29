@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: 命名空间成员</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -83,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -97,14 +98,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <li>BUSINESS_BONUS
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa9c824acfdc5a6b1b7512a1783e1978c9">hku</a>
 </li>
+<li>BUSINESS_BORROW_CASH
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa00bee6db4e41f22423f82927d481d121">hku</a>
+</li>
+<li>BUSINESS_BORROW_STOCK
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aadb01f0564244b41754af71f153211f03">hku</a>
+</li>
 <li>BUSINESS_BUY
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa51a75a709c2b65b1720d47351fdb2df6">hku</a>
+</li>
+<li>BUSINESS_BUY_SHORT
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aaf10cc9e9c1ca2ce9e729c51952281d7a">hku</a>
 </li>
 <li>BUSINESS_CHECKIN
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa5d41a10da0fe1097854a56c157a9bae4">hku</a>
 </li>
+<li>BUSINESS_CHECKIN_STOCK
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa7eb4373fcf671d830f09ae8a353f4f11">hku</a>
+</li>
 <li>BUSINESS_CHECKOUT
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aaa86d831270ada66a8fc9d2e593f97b9b">hku</a>
+</li>
+<li>BUSINESS_CHECKOUT_STOCK
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa94abf151d09572bf1fda2ea284c812c6">hku</a>
 </li>
 <li>BUSINESS_GIFT
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aadb1fae925f76b62e5d9c4e00d0e2c341">hku</a>
@@ -112,11 +128,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <li>BUSINESS_INIT
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa4f441f8de20882718183fae13ea79dbe">hku</a>
 </li>
+<li>BUSINESS_RETURN_CASH
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa84c01798e93521a0c1c63081615e8211">hku</a>
+</li>
+<li>BUSINESS_RETURN_STOCK
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa31036fb6f195a2554cc811707819fb35">hku</a>
+</li>
 <li>BUSINESS_SELL
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aaa94843e56f952848add73c965e540e64">hku</a>
 </li>
+<li>BUSINESS_SELL_SHORT
+: <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aad4665ae946e48747b6f0502ddc6ffcf5">hku</a>
+</li>
 <li>INVALID_BUSINESS
 : <a class="el" href="group___trade_manager_class.html#ggaacb51fd999113b5bc5ba313b3397207aa3ab7e0575affd32ce01e5aa942f8af63">hku</a>
+</li>
+<li>PART_CONDITION
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706a80eaeec82546580bbc9117cb86eb8e60">hku</a>
+</li>
+<li>PART_ENVIRONMENT
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706aebd07b68816e45b7b767125e9c29aa97">hku</a>
+</li>
+<li>PART_INVALID
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706a03e5f3104bf15d19ba028c57aba2fc6f">hku</a>
+</li>
+<li>PART_MONEYMANAGER
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706a7fea3838da8b22e1f6917ab172dd6e63">hku</a>
+</li>
+<li>PART_PROFITGOAL
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706a7c25ffb554605cff5dd81424ef593373">hku</a>
+</li>
+<li>PART_SIGNAL
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706a5727afe4e851c81b4538ae8f93bc8e4b">hku</a>
+</li>
+<li>PART_SLIPPAGE
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706af08c6871d75ec18e0a2d066d3ea0e53c">hku</a>
+</li>
+<li>PART_STOPLOSS
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706ad2148f5923b65bf6599a3c515f357a07">hku</a>
+</li>
+<li>PART_TAKEPROFIT
+: <a class="el" href="namespacehku.html#a578a43d6f138141648ea4c76bad2d706aa67fd85abd103b508cc43a67d0389614">hku</a>
 </li>
 </ul>
 </div><!-- contents -->
@@ -125,7 +177,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

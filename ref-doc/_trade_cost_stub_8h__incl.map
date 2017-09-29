@@ -1,0 +1,15 @@
+<map id="hikyuu/trade_manage/imp/TradeCostStub.h" name="hikyuu/trade_manage/imp/TradeCostStub.h">
+<area shape="rect" id="node2" href="$_trade_cost_base_8h.html" title="../TradeCostBase.h" alt="" coords="2345,100,2516,129"/>
+<area shape="rect" id="node3" href="$_stock_8h.html" title="../Stock.h" alt="" coords="1580,186,1676,215"/>
+<area shape="rect" id="node28" href="$util_8h.html" title="../utilities/util.h" alt="" coords="2096,427,2227,456"/>
+<area shape="rect" id="node29" href="$_parameter_8h.html" title="../utilities/Parameter.h" alt="" coords="2373,427,2563,456"/>
+<area shape="rect" id="node38" href="$_cost_record_8h.html" title="CostRecord.h" alt="" coords="2497,349,2626,379"/>
+<area shape="rect" id="node4" href="$_stock_weight_8h.html" title="StockWeight.h" alt="" coords="1420,272,1556,301"/>
+<area shape="rect" id="node26" href="$_k_query_8h.html" title="KQuery.h" alt="" coords="1581,272,1675,301"/>
+<area shape="rect" id="node5" href="$_data_type_8h.html" title="DataType.h" alt="" coords="1433,427,1543,456"/>
+<area shape="rect" id="node16" href="$_log_8h.html" title="Log.h" alt="" coords="439,513,505,542"/>
+<area shape="rect" id="node20" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="251,513,373,542"/>
+<area shape="rect" id="node23" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="529,513,708,542"/>
+<area shape="rect" id="node27" href="$_k_record_8h.html" title="KRecord.h" alt="" coords="1551,349,1654,379"/>
+<area shape="rect" id="node33" href="$config_8h.html" title="../config.h" alt="" coords="3291,513,3391,542"/>
+</map>

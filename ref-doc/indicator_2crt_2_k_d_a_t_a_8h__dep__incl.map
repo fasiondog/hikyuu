@@ -1,5 +1,11 @@
 <map id="hikyuu/indicator/crt/KDATA.h" name="hikyuu/indicator/crt/KDATA.h">
-<area shape="rect" id="node2" href="$indicator_2build__in_8h.html" title="hikyuu/indicator/build_in.h" alt="" coords="105,101,319,131"/>
-<area shape="rect" id="node3" href="$indicator_2__build__in_8cpp.html" title="hikyuu_python/indicator\l/_build_in.cpp" alt="" coords="5,179,200,226"/>
-<area shape="rect" id="node4" href="$indicator__main_8cpp.html" title="hikyuu_python/indicator\l/indicator_main.cpp" alt="" coords="224,179,419,226"/>
+<area shape="rect" id="node2" href="$indicator_2build__in_8h.html" title="hikyuu/indicator/build_in.h" alt="" coords="5,109,228,138"/>
+<area shape="rect" id="node3" href="$_vigor_8cpp.html" title="hikyuu/indicator/imp\l/Vigor.cpp" alt="" coords="253,100,431,147"/>
+<area shape="rect" id="node4" href="$_two_line_environment_8cpp.html" title="hikyuu/trade_sys/environment\l/imp/TwoLineEnvironment.cpp" alt="" coords="456,100,713,147"/>
+<area shape="rect" id="node5" href="$_bool_signal_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/BoolSignal.cpp" alt="" coords="738,100,941,147"/>
+<area shape="rect" id="node6" href="$_cross_gold_signal_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/CrossGoldSignal.cpp" alt="" coords="965,100,1185,147"/>
+<area shape="rect" id="node7" href="$_cross_signal_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/CrossSignal.cpp" alt="" coords="1210,100,1413,147"/>
+<area shape="rect" id="node8" href="$_single_signal_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/SingleSignal.cpp" alt="" coords="1437,100,1639,147"/>
+<area shape="rect" id="node9" href="$_single_signal2_8cpp.html" title="hikyuu/trade_sys/signal\l/imp/SingleSignal2.cpp" alt="" coords="1663,100,1866,147"/>
+<area shape="rect" id="node10" href="$_indicator_stoploss_8cpp.html" title="hikyuu/trade_sys/stoploss\l/imp/IndicatorStoploss.cpp" alt="" coords="1891,100,2121,147"/>
 </map>

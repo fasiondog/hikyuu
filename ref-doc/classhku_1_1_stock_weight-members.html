@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -102,10 +103,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#aa64e52e93eb65fe2ef271dfdfb827cc2">datetime</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#ad3edbe7bf2c4e670c9bf17e0e66874db">freeCount</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a008a28578d46df354456de52d1a270dd">increasement</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a9d3648f29543cd21b7dce87ee7de7b8d">operator=</a>(const StockWeight &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a4e4bfbe7829ec580e12bc9ebc78f83f3">priceForSell</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#ac0d52be6a298749421f9a98e783a97de">StockWeight</a>()</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a419c778d7817f7f88875729f53eed050">StockWeight</a>(const StockWeight &amp;)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a4e4bfbe7829ec580e12bc9ebc78f83f3">priceForSell</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#ac0d52be6a298749421f9a98e783a97de">StockWeight</a>()</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a4ca65c575e97d3f53fea1173f18fea4b">StockWeight</a>(const Datetime &amp;datetime)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a81b9141151895dae0cb6107adb16618d">StockWeight</a>(const Datetime &amp;datetime, price_t countAsGift, price_t countForSell, price_t priceForSell, price_t bonus, price_t increasement, price_t totalCount, price_t freeCount)</td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html#a726068ac395a663b931946039c2454ab">totalCount</a>() const </td><td class="entry"><a class="el" href="classhku_1_1_stock_weight.html">hku::StockWeight</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
@@ -115,7 +114,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

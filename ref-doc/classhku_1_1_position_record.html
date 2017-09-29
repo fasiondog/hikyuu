@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hku::PositionRecord类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -74,7 +75,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,9 +93,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   <div class="summary">
 <a href="#pub-methods">Public 成员函数</a> &#124;
 <a href="#pub-attribs">Public 属性</a> &#124;
+<a href="#friends">友元</a> &#124;
 <a href="classhku_1_1_position_record-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
-<div class="title">hku::PositionRecord类 参考<div class="ingroups"><a class="el" href="group___trade_manager_class.html">TradeManager 交易管理类</a></div></div>  </div>
+<div class="title">hku::PositionRecord类 参考<div class="ingroups"><a class="el" href="group___hikyuu.html">Hikyuu 核心引擎库</a> &raquo; <a class="el" href="group___trade_manager.html">TradeManager 交易管理</a> &raquo; <a class="el" href="group___trade_manager_class.html">TradeManager 交易管理类</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -107,48 +109,61 @@ hku::PositionRecord 的协作图:</div>
 <div class="dyncontent">
 <div class="center"><img src="classhku_1_1_position_record__coll__graph.png" border="0" usemap="#hku_1_1_position_record_coll__map" alt="Collaboration graph"/></div>
 <map name="hku_1_1_position_record_coll__map" id="hku_1_1_position_record_coll__map">
-<area shape="rect" id="node2" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作" alt="" coords="5,120,104,149"/><area shape="rect" id="node3" href="classhku_1_1_datetime.html" title="日期类型" alt="" coords="43,5,165,35"/></map>
+<area shape="rect" id="node2" href="classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作 " alt="" coords="175,120,281,149"/>
+<area shape="rect" id="node3" href="classhku_1_1_datetime.html" title="日期类型 " alt="" coords="29,5,160,35"/>
+</map>
 <center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
 <tr class="memitem:a107fe0d25b6babfe438e72deee81413e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a107fe0d25b6babfe438e72deee81413e">PositionRecord</a> ()</td></tr>
 <tr class="separator:a107fe0d25b6babfe438e72deee81413e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a805e07d0c0a309bd94e792b31aaba642"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a805e07d0c0a309bd94e792b31aaba642">PositionRecord</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;<a class="el" href="classhku_1_1_position_record.html#a2d58c15b73c7dcde4f95f84804937c67">stock</a>, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_position_record.html#aadbf0667ea041eb5cec4b2dfd7d307dd">takeDatetime</a>, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_position_record.html#ab2b220125aa732e7e45872eebb15a407">cleanDatetime</a>, size_t <a class="el" href="classhku_1_1_position_record.html#a383a2e2656683197020a4c8a37c9d1e8">number</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a007be3fad5897e2a53e221d38840a860">stoploss</a>, size_t <a class="el" href="classhku_1_1_position_record.html#a486732fb505ffe19426ff71473e6c31b">totalNumber</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a7dd14b957dc2af2e7f41e4a1a1da1599">totalMoney</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a0cd91defcf042824fe36d47e359eaea3">totalCost</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a3b58633ba9cd89165533d58899fc07db">totalRisk</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a01265fa6e18cd7b019b8cc4a63881c02">sellMoney</a>)</td></tr>
-<tr class="separator:a805e07d0c0a309bd94e792b31aaba642"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a591c4f1af76c3b7641fa814c585ec1f2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a591c4f1af76c3b7641fa814c585ec1f2">PositionRecord</a> (const <a class="el" href="classhku_1_1_stock.html">Stock</a> &amp;<a class="el" href="classhku_1_1_position_record.html#a2d58c15b73c7dcde4f95f84804937c67">stock</a>, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_position_record.html#aadbf0667ea041eb5cec4b2dfd7d307dd">takeDatetime</a>, const <a class="el" href="classhku_1_1_datetime.html">Datetime</a> &amp;<a class="el" href="classhku_1_1_position_record.html#ab2b220125aa732e7e45872eebb15a407">cleanDatetime</a>, size_t <a class="el" href="classhku_1_1_position_record.html#a383a2e2656683197020a4c8a37c9d1e8">number</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a007be3fad5897e2a53e221d38840a860">stoploss</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#adf442d298ea70ed3397817c104367463">goalPrice</a>, size_t <a class="el" href="classhku_1_1_position_record.html#a486732fb505ffe19426ff71473e6c31b">totalNumber</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a904865374e0d688328bc511f640ba683">buyMoney</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a0cd91defcf042824fe36d47e359eaea3">totalCost</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a3b58633ba9cd89165533d58899fc07db">totalRisk</a>, <a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> <a class="el" href="classhku_1_1_position_record.html#a01265fa6e18cd7b019b8cc4a63881c02">sellMoney</a>)</td></tr>
+<tr class="separator:a591c4f1af76c3b7641fa814c585ec1f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a853ae94b1ab39b96f391911a881c9961"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a853ae94b1ab39b96f391911a881c9961">toString</a> () const </td></tr>
+<tr class="memdesc:a853ae94b1ab39b96f391911a881c9961"><td class="mdescLeft">&#160;</td><td class="mdescRight">仅用于python的__str__  <a href="#a853ae94b1ab39b96f391911a881c9961">更多...</a><br /></td></tr>
+<tr class="separator:a853ae94b1ab39b96f391911a881c9961"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public 属性</h2></td></tr>
 <tr class="memitem:a2d58c15b73c7dcde4f95f84804937c67"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_stock.html">Stock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a2d58c15b73c7dcde4f95f84804937c67">stock</a></td></tr>
-<tr class="memdesc:a2d58c15b73c7dcde4f95f84804937c67"><td class="mdescLeft">&#160;</td><td class="mdescRight">交易对象  <a href="#a2d58c15b73c7dcde4f95f84804937c67">更多...</a><br/></td></tr>
+<tr class="memdesc:a2d58c15b73c7dcde4f95f84804937c67"><td class="mdescLeft">&#160;</td><td class="mdescRight">交易对象  <a href="#a2d58c15b73c7dcde4f95f84804937c67">更多...</a><br /></td></tr>
 <tr class="separator:a2d58c15b73c7dcde4f95f84804937c67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadbf0667ea041eb5cec4b2dfd7d307dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#aadbf0667ea041eb5cec4b2dfd7d307dd">takeDatetime</a></td></tr>
-<tr class="memdesc:aadbf0667ea041eb5cec4b2dfd7d307dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">初次建仓日期  <a href="#aadbf0667ea041eb5cec4b2dfd7d307dd">更多...</a><br/></td></tr>
+<tr class="memdesc:aadbf0667ea041eb5cec4b2dfd7d307dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">初次建仓日期  <a href="#aadbf0667ea041eb5cec4b2dfd7d307dd">更多...</a><br /></td></tr>
 <tr class="separator:aadbf0667ea041eb5cec4b2dfd7d307dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2b220125aa732e7e45872eebb15a407"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhku_1_1_datetime.html">Datetime</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#ab2b220125aa732e7e45872eebb15a407">cleanDatetime</a></td></tr>
-<tr class="memdesc:ab2b220125aa732e7e45872eebb15a407"><td class="mdescLeft">&#160;</td><td class="mdescRight">平仓日期，当前持仓记录中为Null&lt;Datetime&gt;()  <a href="#ab2b220125aa732e7e45872eebb15a407">更多...</a><br/></td></tr>
+<tr class="memdesc:ab2b220125aa732e7e45872eebb15a407"><td class="mdescLeft">&#160;</td><td class="mdescRight">平仓日期，当前持仓记录中为Null&lt;Datetime&gt;()  <a href="#ab2b220125aa732e7e45872eebb15a407">更多...</a><br /></td></tr>
 <tr class="separator:ab2b220125aa732e7e45872eebb15a407"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a383a2e2656683197020a4c8a37c9d1e8"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a383a2e2656683197020a4c8a37c9d1e8">number</a></td></tr>
-<tr class="memdesc:a383a2e2656683197020a4c8a37c9d1e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前持仓数量  <a href="#a383a2e2656683197020a4c8a37c9d1e8">更多...</a><br/></td></tr>
+<tr class="memdesc:a383a2e2656683197020a4c8a37c9d1e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前持仓数量  <a href="#a383a2e2656683197020a4c8a37c9d1e8">更多...</a><br /></td></tr>
 <tr class="separator:a383a2e2656683197020a4c8a37c9d1e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a007be3fad5897e2a53e221d38840a860"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a007be3fad5897e2a53e221d38840a860">stoploss</a></td></tr>
-<tr class="memdesc:a007be3fad5897e2a53e221d38840a860"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前止损价  <a href="#a007be3fad5897e2a53e221d38840a860">更多...</a><br/></td></tr>
+<tr class="memdesc:a007be3fad5897e2a53e221d38840a860"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前止损价  <a href="#a007be3fad5897e2a53e221d38840a860">更多...</a><br /></td></tr>
 <tr class="separator:a007be3fad5897e2a53e221d38840a860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf442d298ea70ed3397817c104367463"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#adf442d298ea70ed3397817c104367463">goalPrice</a></td></tr>
+<tr class="memdesc:adf442d298ea70ed3397817c104367463"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前的目标价格  <a href="#adf442d298ea70ed3397817c104367463">更多...</a><br /></td></tr>
+<tr class="separator:adf442d298ea70ed3397817c104367463"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a486732fb505ffe19426ff71473e6c31b"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a486732fb505ffe19426ff71473e6c31b">totalNumber</a></td></tr>
-<tr class="memdesc:a486732fb505ffe19426ff71473e6c31b"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计持仓数量  <a href="#a486732fb505ffe19426ff71473e6c31b">更多...</a><br/></td></tr>
+<tr class="memdesc:a486732fb505ffe19426ff71473e6c31b"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计持仓数量  <a href="#a486732fb505ffe19426ff71473e6c31b">更多...</a><br /></td></tr>
 <tr class="separator:a486732fb505ffe19426ff71473e6c31b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7dd14b957dc2af2e7f41e4a1a1da1599"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a7dd14b957dc2af2e7f41e4a1a1da1599">totalMoney</a></td></tr>
-<tr class="memdesc:a7dd14b957dc2af2e7f41e4a1a1da1599"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计花费资金总额  <a href="#a7dd14b957dc2af2e7f41e4a1a1da1599">更多...</a><br/></td></tr>
-<tr class="separator:a7dd14b957dc2af2e7f41e4a1a1da1599"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a904865374e0d688328bc511f640ba683"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a904865374e0d688328bc511f640ba683">buyMoney</a></td></tr>
+<tr class="memdesc:a904865374e0d688328bc511f640ba683"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计买入资金  <a href="#a904865374e0d688328bc511f640ba683">更多...</a><br /></td></tr>
+<tr class="separator:a904865374e0d688328bc511f640ba683"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cd91defcf042824fe36d47e359eaea3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a0cd91defcf042824fe36d47e359eaea3">totalCost</a></td></tr>
-<tr class="memdesc:a0cd91defcf042824fe36d47e359eaea3"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计交易总成本  <a href="#a0cd91defcf042824fe36d47e359eaea3">更多...</a><br/></td></tr>
+<tr class="memdesc:a0cd91defcf042824fe36d47e359eaea3"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计交易总成本  <a href="#a0cd91defcf042824fe36d47e359eaea3">更多...</a><br /></td></tr>
 <tr class="separator:a0cd91defcf042824fe36d47e359eaea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b58633ba9cd89165533d58899fc07db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a3b58633ba9cd89165533d58899fc07db">totalRisk</a></td></tr>
-<tr class="memdesc:a3b58633ba9cd89165533d58899fc07db"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计交易风险 = 各次 （买入价格-止损)*买入数量  <a href="#a3b58633ba9cd89165533d58899fc07db">更多...</a><br/></td></tr>
+<tr class="memdesc:a3b58633ba9cd89165533d58899fc07db"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本  <a href="#a3b58633ba9cd89165533d58899fc07db">更多...</a><br /></td></tr>
 <tr class="separator:a3b58633ba9cd89165533d58899fc07db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01265fa6e18cd7b019b8cc4a63881c02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#a01265fa6e18cd7b019b8cc4a63881c02">sellMoney</a></td></tr>
-<tr class="memdesc:a01265fa6e18cd7b019b8cc4a63881c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计已卖出转化资金，记录各次卖出时转化的资金  <a href="#a01265fa6e18cd7b019b8cc4a63881c02">更多...</a><br/></td></tr>
+<tr class="memdesc:a01265fa6e18cd7b019b8cc4a63881c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">累计卖出资金  <a href="#a01265fa6e18cd7b019b8cc4a63881c02">更多...</a><br /></td></tr>
 <tr class="separator:a01265fa6e18cd7b019b8cc4a63881c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_position_record.html#ac98d07dd8f7b70e16ccb9a01abf56b9c">boost::serialization::access</a></td></tr>
+<tr class="separator:ac98d07dd8f7b70e16ccb9a01abf56b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p>持仓记录 </p>
@@ -168,7 +183,7 @@ Public 属性</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a805e07d0c0a309bd94e792b31aaba642"></a>
+<a class="anchor" id="a591c4f1af76c3b7641fa814c585ec1f2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -205,6 +220,12 @@ Public 属性</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
+          <td class="paramname"><em>goalPrice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>totalNumber</em>, </td>
         </tr>
@@ -212,7 +233,7 @@ Public 属性</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>&#160;</td>
-          <td class="paramname"><em>totalMoney</em>, </td>
+          <td class="paramname"><em>buyMoney</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -242,7 +263,60 @@ Public 属性</h2></td></tr>
 
 </div>
 </div>
+<h2 class="groupheader">成员函数说明</h2>
+<a class="anchor" id="a853ae94b1ab39b96f391911a881c9961"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#ga409c63378ffa8adc12552ee86a7d49de">string</a> hku::PositionRecord::toString </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>仅用于python的__str__ </p>
+
+</div>
+</div>
+<h2 class="groupheader">友元及相关函数文档</h2>
+<a class="anchor" id="ac98d07dd8f7b70e16ccb9a01abf56b9c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class boost::serialization::access</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">类成员变量说明</h2>
+<a class="anchor" id="a904865374e0d688328bc511f640ba683"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::PositionRecord::buyMoney</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>累计买入资金 </p>
+
+</div>
+</div>
 <a class="anchor" id="ab2b220125aa732e7e45872eebb15a407"></a>
 <div class="memitem">
 <div class="memproto">
@@ -254,6 +328,20 @@ Public 属性</h2></td></tr>
 </div><div class="memdoc">
 
 <p>平仓日期，当前持仓记录中为Null&lt;Datetime&gt;() </p>
+
+</div>
+</div>
+<a class="anchor" id="adf442d298ea70ed3397817c104367463"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::PositionRecord::goalPrice</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>当前的目标价格 </p>
 
 </div>
 </div>
@@ -281,7 +369,7 @@ Public 属性</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>累计已卖出转化资金，记录各次卖出时转化的资金 </p>
+<p>累计卖出资金 </p>
 
 </div>
 </div>
@@ -341,20 +429,6 @@ Public 属性</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a7dd14b957dc2af2e7f41e4a1a1da1599"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> hku::PositionRecord::totalMoney</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>累计花费资金总额 </p>
-
-</div>
-</div>
 <a class="anchor" id="a486732fb505ffe19426ff71473e6c31b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -379,7 +453,7 @@ Public 属性</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>累计交易风险 = 各次 （买入价格-止损)*买入数量 </p>
+<p>累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本 </p>
 
 </div>
 </div>
@@ -393,7 +467,7 @@ Public 属性</h2></td></tr>
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

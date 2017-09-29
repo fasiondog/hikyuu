@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: hikyuu/indicator/build_in.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -72,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -91,29 +92,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <div class="title">build_in.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="indicator_2build__in_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * build_in.h</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2012-10-15</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef BUILD_IN_H_</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BUILD_IN_H_</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_indicator_8h.html">Indicator.h</a>&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="indicator_2crt_2_k_d_a_t_a_8h.html">crt/KDATA.h</a>&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_p_r_i_c_e_l_i_s_t_8h.html">crt/PRICELIST.h</a>&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_m_a_8h.html">crt/MA.h</a>&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* BUILD_IN_H_ */</span><span class="preprocessor"></span></div>
+<a href="indicator_2build__in_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * build_in.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2012-10-15</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef INDICATOR_BUILD_IN_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define INDICATOR_BUILD_IN_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_operand_8h.html">Operand.h</a>&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_indicator_8h.html">Indicator.h</a>&quot;</span></div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_i_n_d___l_o_g_i_c_8h.html">crt/IND_LOGIC.h</a>&quot;</span></div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="indicator_2crt_2_k_d_a_t_a_8h.html">crt/KDATA.h</a>&quot;</span></div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_p_r_i_c_e_l_i_s_t_8h.html">crt/PRICELIST.h</a>&quot;</span></div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_m_a_8h.html">crt/MA.h</a>&quot;</span></div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_s_m_a_8h.html">crt/SMA.h</a>&quot;</span></div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_e_m_a_8h.html">crt/EMA.h</a>&quot;</span></div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_a_m_a_8h.html">crt/AMA.h</a>&quot;</span></div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_a_t_r_8h.html">crt/ATR.h</a>&quot;</span></div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_p_o_s_8h.html">crt/POS.h</a>&quot;</span></div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_m_a_c_d_8h.html">crt/MACD.h</a>&quot;</span></div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_v_i_g_o_r_8h.html">crt/VIGOR.h</a>&quot;</span></div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_s_a_f_t_y_l_o_s_s_8h.html">crt/SAFTYLOSS.h</a>&quot;</span></div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_d_i_f_f_8h.html">crt/DIFF.h</a>&quot;</span></div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_s_t_d_e_v_8h.html">crt/STDEV.h</a>&quot;</span></div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_r_e_f_8h.html">crt/REF.h</a>&quot;</span></div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_h_h_v_8h.html">crt/HHV.h</a>&quot;</span></div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_l_l_v_8h.html">crt/LLV.h</a>&quot;</span></div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="crt_2_w_e_a_v_e_8h.html">crt/WEAVE.h</a>&quot;</span></div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="_c_v_a_l_8h.html">crt/CVAL.h</a>&quot;</span></div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* INDICATOR_BUILD_IN_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="crt_2_e_m_a_8h_html"><div class="ttname"><a href="crt_2_e_m_a_8h.html">EMA.h</a></div></div>
+<div class="ttc" id="_p_r_i_c_e_l_i_s_t_8h_html"><div class="ttname"><a href="_p_r_i_c_e_l_i_s_t_8h.html">PRICELIST.h</a></div></div>
+<div class="ttc" id="_c_v_a_l_8h_html"><div class="ttname"><a href="_c_v_a_l_8h.html">CVAL.h</a></div></div>
+<div class="ttc" id="indicator_2crt_2_k_d_a_t_a_8h_html"><div class="ttname"><a href="indicator_2crt_2_k_d_a_t_a_8h.html">KDATA.h</a></div></div>
+<div class="ttc" id="_r_e_f_8h_html"><div class="ttname"><a href="_r_e_f_8h.html">REF.h</a></div></div>
+<div class="ttc" id="_s_t_d_e_v_8h_html"><div class="ttname"><a href="_s_t_d_e_v_8h.html">STDEV.h</a></div></div>
+<div class="ttc" id="crt_2_a_m_a_8h_html"><div class="ttname"><a href="crt_2_a_m_a_8h.html">AMA.h</a></div></div>
+<div class="ttc" id="crt_2_m_a_c_d_8h_html"><div class="ttname"><a href="crt_2_m_a_c_d_8h.html">MACD.h</a></div></div>
+<div class="ttc" id="_m_a_8h_html"><div class="ttname"><a href="_m_a_8h.html">MA.h</a></div></div>
+<div class="ttc" id="_p_o_s_8h_html"><div class="ttname"><a href="_p_o_s_8h.html">POS.h</a></div></div>
+<div class="ttc" id="_l_l_v_8h_html"><div class="ttname"><a href="_l_l_v_8h.html">LLV.h</a></div></div>
+<div class="ttc" id="crt_2_d_i_f_f_8h_html"><div class="ttname"><a href="crt_2_d_i_f_f_8h.html">DIFF.h</a></div></div>
+<div class="ttc" id="_indicator_8h_html"><div class="ttname"><a href="_indicator_8h.html">Indicator.h</a></div></div>
+<div class="ttc" id="_operand_8h_html"><div class="ttname"><a href="_operand_8h.html">Operand.h</a></div></div>
+<div class="ttc" id="crt_2_v_i_g_o_r_8h_html"><div class="ttname"><a href="crt_2_v_i_g_o_r_8h.html">VIGOR.h</a></div></div>
+<div class="ttc" id="_i_n_d___l_o_g_i_c_8h_html"><div class="ttname"><a href="_i_n_d___l_o_g_i_c_8h.html">IND_LOGIC.h</a></div></div>
+<div class="ttc" id="crt_2_s_a_f_t_y_l_o_s_s_8h_html"><div class="ttname"><a href="crt_2_s_a_f_t_y_l_o_s_s_8h.html">SAFTYLOSS.h</a></div></div>
+<div class="ttc" id="_h_h_v_8h_html"><div class="ttname"><a href="_h_h_v_8h.html">HHV.h</a></div></div>
+<div class="ttc" id="crt_2_a_t_r_8h_html"><div class="ttname"><a href="crt_2_a_t_r_8h.html">ATR.h</a></div></div>
+<div class="ttc" id="crt_2_s_m_a_8h_html"><div class="ttname"><a href="crt_2_s_m_a_8h.html">SMA.h</a></div></div>
+<div class="ttc" id="crt_2_w_e_a_v_e_8h_html"><div class="ttname"><a href="crt_2_w_e_a_v_e_8h.html">WEAVE.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.3.1-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>

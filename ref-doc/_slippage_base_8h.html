@@ -1,0 +1,224 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/trade_sys/slippage/SlippageBase.h 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_194593d72069437dd60c2304994b6f20.html">trade_sys</a></li><li class="navelem"><a class="el" href="dir_816692d71e2dcf15cc8b5644a9cbc964.html">slippage</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#namespaces">命名空间</a> &#124;
+<a href="#define-members">宏定义</a> &#124;
+<a href="#typedef-members">类型定义</a> &#124;
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">SlippageBase.h 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="_k_d_a_t_a_8h_source.html">../../KData.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_parameter_8h_source.html">../../utilities/Parameter.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="util_8h_source.html">../../utilities/util.h</a>&quot;</code><br />
+<code>#include &lt;boost/serialization/shared_ptr.hpp&gt;</code><br />
+<code>#include &lt;boost/serialization/assume_abstract.hpp&gt;</code><br />
+<code>#include &lt;boost/serialization/base_object.hpp&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+SlippageBase.h 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="_slippage_base_8h__incl.png" border="0" usemap="#hikyuu_2trade__sys_2slippage_2_slippage_base_8h" alt=""/></div>
+<map name="hikyuu_2trade__sys_2slippage_2_slippage_base_8h" id="hikyuu_2trade__sys_2slippage_2_slippage_base_8h">
+<area shape="rect" id="node2" href="_k_d_a_t_a_8h.html" title="../../KData.h" alt="" coords="1641,109,1754,138"/>
+<area shape="rect" id="node29" href="_parameter_8h.html" title="../../utilities/Parameter.h" alt="" coords="2456,504,2661,533"/>
+<area shape="rect" id="node38" href="util_8h.html" title="../../utilities/util.h" alt="" coords="1817,504,1964,533"/>
+<area shape="rect" id="node3" href="_k_data_imp_8h.html" title="KDataImp.h" alt="" coords="1542,195,1655,224"/>
+<area shape="rect" id="node4" href="_stock_8h.html" title="Stock.h" alt="" coords="1129,272,1210,301"/>
+<area shape="rect" id="node5" href="_stock_weight_8h.html" title="StockWeight.h" alt="" coords="957,427,1093,456"/>
+<area shape="rect" id="node27" href="_k_query_8h.html" title="KQuery.h" alt="" coords="1122,349,1217,379"/>
+<area shape="rect" id="node6" href="_data_type_8h.html" title="DataType.h" alt="" coords="970,504,1081,533"/>
+<area shape="rect" id="node17" href="_log_8h.html" title="Log.h" alt="" coords="915,590,981,619"/>
+<area shape="rect" id="node21" href="_null_8h.html" title="utilities/Null.h" alt="" coords="768,590,891,619"/>
+<area shape="rect" id="node24" href="_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1456,590,1635,619"/>
+<area shape="rect" id="node28" href="_k_record_8h.html" title="KRecord.h" alt="" coords="1118,427,1221,456"/>
+<area shape="rect" id="node33" href="config_8h.html" title="../config.h" alt="" coords="2134,590,2234,619"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+此图展示该文件直接或间接的被哪些文件引用了:</div>
+<div class="dyncontent">
+<div class="center"><img src="_slippage_base_8h__dep__incl.png" border="0" usemap="#hikyuu_2trade__sys_2slippage_2_slippage_base_8hdep" alt=""/></div>
+<map name="hikyuu_2trade__sys_2slippage_2_slippage_base_8hdep" id="hikyuu_2trade__sys_2slippage_2_slippage_base_8hdep">
+<area shape="rect" id="node2" href="_s_p___fixed_percent_8h.html" title="hikyuu/trade_sys/slippage\l/crt/SP_FixedPercent.h" alt="" coords="386,100,609,147"/>
+<area shape="rect" id="node5" href="_s_p___fixed_value_8h.html" title="hikyuu/trade_sys/slippage\l/crt/SP_FixedValue.h" alt="" coords="707,100,930,147"/>
+<area shape="rect" id="node6" href="_system_8h.html" title="hikyuu/trade_sys/system\l/System.h" alt="" coords="1103,100,1319,147"/>
+<area shape="rect" id="node20" href="_fixed_percent_slippage_8h.html" title="hikyuu/trade_sys/slippage\l/imp/FixedPercentSlippage.h" alt="" coords="1595,100,1835,147"/>
+<area shape="rect" id="node23" href="_fixed_value_slippage_8h.html" title="hikyuu/trade_sys/slippage\l/imp/FixedValueSlippage.h" alt="" coords="1863,100,2086,147"/>
+<area shape="rect" id="node25" href="_slippage_base_8cpp.html" title="hikyuu/trade_sys/slippage\l/SlippageBase.cpp" alt="" coords="2110,100,2333,147"/>
+<area shape="rect" id="node3" href="trade__sys_2slippage_2build__in_8h.html" title="hikyuu/trade_sys/slippage\l/build_in.h" alt="" coords="313,195,535,241"/>
+<area shape="rect" id="node4" href="trade__sys_2all_8h.html" title="hikyuu/trade_sys/all.h" alt="" coords="5,393,195,422"/>
+<area shape="rect" id="node7" href="_s_y_s___simple_8h.html" title="hikyuu/trade_sys/system\l/crt/SYS_Simple.h" alt="" coords="560,195,776,241"/>
+<area shape="rect" id="node11" href="_allocate_money_base_8h.html" title="hikyuu/trade_sys/portfolio\l/AllocateMoneyBase.h" alt="" coords="852,195,1076,241"/>
+<area shape="rect" id="node16" href="_selector_base_8h.html" title="hikyuu/trade_sys/selector\l/SelectorBase.h" alt="" coords="1100,195,1321,241"/>
+<area shape="rect" id="node19" href="_system_8cpp.html" title="hikyuu/trade_sys/system\l/System.cpp" alt="" coords="1345,195,1561,241"/>
+<area shape="rect" id="node8" href="trade__sys_2system_2build__in_8h.html" title="hikyuu/trade_sys/system\l/build_in.h" alt="" coords="64,289,280,336"/>
+<area shape="rect" id="node9" href="_o_p_line_condition_8cpp.html" title="hikyuu/trade_sys/condition\l/imp/OPLineCondition.cpp" alt="" coords="305,289,535,336"/>
+<area shape="rect" id="node10" href="_s_y_s___simple_8cpp.html" title="hikyuu/trade_sys/system\l/crt/SYS_Simple.cpp" alt="" coords="560,289,776,336"/>
+<area shape="rect" id="node12" href="_allocate_money_base_8cpp.html" title="hikyuu/trade_sys/portfolio\l/AllocateMoneyBase.cpp" alt="" coords="800,289,1024,336"/>
+<area shape="rect" id="node13" href="trade__sys_2portfolio_2build__in_8h.html" title="hikyuu/trade_sys/portfolio\l/build_in.h" alt="" coords="949,384,1173,431"/>
+<area shape="rect" id="node14" href="_portfolio_8h.html" title="hikyuu/trade_sys/portfolio\l/Portfolio.h" alt="" coords="1099,289,1323,336"/>
+<area shape="rect" id="node15" href="_portfolio_8cpp.html" title="hikyuu/trade_sys/portfolio\l/Portfolio.cpp" alt="" coords="1197,384,1421,431"/>
+<area shape="rect" id="node17" href="trade__sys_2selector_2build__in_8h.html" title="hikyuu/trade_sys/selector\l/build_in.h" alt="" coords="1347,289,1568,336"/>
+<area shape="rect" id="node18" href="_selector_base_8cpp.html" title="hikyuu/trade_sys/selector\l/SelectorBase.cpp" alt="" coords="1592,289,1813,336"/>
+<area shape="rect" id="node21" href="trade__sys_2slippage_2export_8cpp.html" title="hikyuu/trade_sys/slippage\l/export.cpp" alt="" coords="1869,195,2091,241"/>
+<area shape="rect" id="node22" href="_fixed_percent_slippage_8cpp.html" title="hikyuu/trade_sys/slippage\l/imp/FixedPercentSlippage.cpp" alt="" coords="1585,195,1844,241"/>
+<area shape="rect" id="node24" href="_fixed_value_slippage_8cpp.html" title="hikyuu/trade_sys/slippage\l/imp/FixedValueSlippage.cpp" alt="" coords="2115,195,2357,241"/>
+</map>
+</div>
+</div>
+<p><a href="_slippage_base_8h_source.html">浏览源代码.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhku_1_1_slippage_base.html">hku::SlippageBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">移滑价差算法基类  <a href="classhku_1_1_slippage_base.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+命名空间</h2></td></tr>
+<tr class="memitem:namespacehku"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html">hku</a></td></tr>
+<tr class="memdesc:namespacehku"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+宏定义</h2></td></tr>
+<tr class="memitem:ga54f3973ef6ca144a75c02b0b97d36649"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___slippage.html#ga54f3973ef6ca144a75c02b0b97d36649">SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION</a></td></tr>
+<tr class="memdesc:ga54f3973ef6ca144a75c02b0b97d36649"><td class="mdescLeft">&#160;</td><td class="mdescRight">对于没有私有变量的继承子类，可直接使用该宏定义序列化  <a href="group___slippage.html#ga54f3973ef6ca144a75c02b0b97d36649">更多...</a><br /></td></tr>
+<tr class="separator:ga54f3973ef6ca144a75c02b0b97d36649"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9246a9e06ec3c5eeee8e6a39090c25a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_slippage_base_8h.html#ab9246a9e06ec3c5eeee8e6a39090c25a">SLIPPAGE_IMP</a>(classname)</td></tr>
+<tr class="separator:ab9246a9e06ec3c5eeee8e6a39090c25a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:ga049e6ab56e4c995847c08232913198e1"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; SlippageBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">hku::SlippagePtr</a></td></tr>
+<tr class="memdesc:ga049e6ab56e4c995847c08232913198e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">客户程序都应使用该指针类型，操作移滑价差算法  <a href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">更多...</a><br /></td></tr>
+<tr class="separator:ga049e6ab56e4c995847c08232913198e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c358c2f451fb955748f23789783818b"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; SlippageBase &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a4c358c2f451fb955748f23789783818b">hku::SPPtr</a></td></tr>
+<tr class="separator:a4c358c2f451fb955748f23789783818b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a0db2485c03cfc5e54dc28c9b41a4e074"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a0db2485c03cfc5e54dc28c9b41a4e074">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const SlippageBase &amp;sp)</td></tr>
+<tr class="separator:a0db2485c03cfc5e54dc28c9b41a4e074"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88e1d2a9686fac78b3faae034cdd8893"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_ini_parser_8h.html#af59fd09cf4bfe9c265f61882e5f07d7a">HKU_API</a> std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehku.html#a88e1d2a9686fac78b3faae034cdd8893">hku::operator&lt;&lt;</a> (std::ostream &amp;os, const SlippagePtr &amp;sp)</td></tr>
+<tr class="separator:a88e1d2a9686fac78b3faae034cdd8893"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">宏定义说明</h2>
+<a class="anchor" id="ab9246a9e06ec3c5eeee8e6a39090c25a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SLIPPAGE_IMP</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">classname</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>值:</b><div class="fragment"><div class="line"><span class="keyword">public</span>:\</div><div class="line">    virtual <a class="code" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a> _clone() {\</div><div class="line">        return <a class="code" href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">SlippagePtr</a>(<span class="keyword">new</span> classname());\</div><div class="line">    }\</div><div class="line">    virtual <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> getRealBuyPrice(<span class="keyword">const</span> Datetime&amp;, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>); \</div><div class="line">    virtual <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a> getRealSellPrice(<span class="keyword">const</span> Datetime&amp;, <a class="code" href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">price_t</a>); \</div><div class="line">    virtual <span class="keywordtype">void</span> _calculate();</div><div class="ttc" id="group___slippage_html_ga049e6ab56e4c995847c08232913198e1"><div class="ttname"><a href="group___slippage.html#ga049e6ab56e4c995847c08232913198e1">hku::SlippagePtr</a></div><div class="ttdeci">shared_ptr&lt; SlippageBase &gt; SlippagePtr</div><div class="ttdoc">客户程序都应使用该指针类型，操作移滑价差算法 </div><div class="ttdef"><b>Definition:</b> SlippageBase.h:153</div></div>
+<div class="ttc" id="group___data_type_html_gae2b42deee135c163b58dfa3cc74d2563"><div class="ttname"><a href="group___data_type.html#gae2b42deee135c163b58dfa3cc74d2563">hku::price_t</a></div><div class="ttdeci">double price_t</div><div class="ttdef"><b>Definition:</b> DataType.h:56</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+</div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

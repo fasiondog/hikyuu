@@ -1,5 +1,5 @@
 <map id="hku::TradeRecord" name="hku::TradeRecord">
-<area shape="rect" id="node2" href="$classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作" alt="" coords="5,117,104,147"/>
-<area shape="rect" id="node3" href="$classhku_1_1_datetime.html" title="日期类型" alt="" coords="43,5,165,35"/>
-<area shape="rect" id="node4" href="$classhku_1_1_cost_record.html" title="成本记录" alt="" coords="251,117,391,147"/>
+<area shape="rect" id="node2" href="$classhku_1_1_stock.html" title="Stock基类，Application中一般使用StockPtr进行操作 " alt="" coords="121,117,226,147"/>
+<area shape="rect" id="node3" href="$classhku_1_1_datetime.html" title="日期类型 " alt="" coords="5,5,136,35"/>
+<area shape="rect" id="node4" href="$classhku_1_1_cost_record.html" title="成本记录 " alt="" coords="250,117,403,147"/>
 </map>

@@ -1,0 +1,113 @@
+<!-- HTML header for doxygen 1.8.3.1-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Hikyuu: hikyuu/data_driver/block_info/qianlong/QLBlockInfoDriver.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">Hikyuu
+   &#160;<span id="projectnumber">0.1</span>
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>首页</span></a></li>
+      <li><a href="modules.html"><span>模块</span></a></li>
+      <li><a href="namespaces.html"><span>命名空间</span></a></li>
+      <li><a href="annotated.html"><span>类</span></a></li>
+      <li class="current"><a href="files.html"><span>文件</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>文件列表</span></a></li>
+      <li><a href="globals.html"><span>文件成员</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html">hikyuu</a></li><li class="navelem"><a class="el" href="dir_5ea9e4f15e457a8fb5a25f4d835cdecd.html">data_driver</a></li><li class="navelem"><a class="el" href="dir_a616b1362191bc8d0b7b9bab3417d34e.html">block_info</a></li><li class="navelem"><a class="el" href="dir_bcde160e5aa90c2c11d3bc58e1bbddd1.html">qianlong</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="headertitle">
+<div class="title">QLBlockInfoDriver.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="_q_l_block_info_driver_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * QLBlockInfoDriver.h</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *  Created on: 2015年2月10日</span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> *      Author: fasiondog</span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> */</span></div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef DATA_DRIVER_BLOCK_INFO_QIANLONG_QLBLOCKINFODRIVER_H_</span></div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define DATA_DRIVER_BLOCK_INFO_QIANLONG_QLBLOCKINFODRIVER_H_</span></div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../../BlockInfoDriver.h&quot;</span></div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehku.html">hku</a> {</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div><div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classhku_1_1_q_l_block_info_driver.html">   15</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhku_1_1_q_l_block_info_driver.html">QLBlockInfoDriver</a>: <span class="keyword">public</span> <a class="code" href="classhku_1_1_block_info_driver.html">BlockInfoDriver</a> {</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">public</span>:</div><div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classhku_1_1_q_l_block_info_driver.html#a1a856f81c723edfe17869f6d8cc5b5bb">   17</a></span>&#160;    <a class="code" href="classhku_1_1_q_l_block_info_driver.html#a1a856f81c723edfe17869f6d8cc5b5bb">QLBlockInfoDriver</a>(<span class="keyword">const</span> shared_ptr&lt;IniParser&gt;&amp; config)</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        : <a class="code" href="classhku_1_1_block_info_driver.html">BlockInfoDriver</a>(config) {};</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_q_l_block_info_driver.html#aa3b869e44243914233372b25a60671d8">~QLBlockInfoDriver</a>();</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classhku_1_1_block.html">Block</a> <a class="code" href="classhku_1_1_q_l_block_info_driver.html#a5b0fbb617892ffd3bcbb5aa7d1a93eff">getBlock</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp;, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp;);</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="group___stock_manage.html#ga0cf7525722ab3b82d15c3891838c087e">BlockList</a> <a class="code" href="classhku_1_1_q_l_block_info_driver.html#af50f4b305db28d1b663caec14355d2d5">getBlockList</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; category);</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="group___stock_manage.html#ga0cf7525722ab3b82d15c3891838c087e">BlockList</a> <a class="code" href="classhku_1_1_q_l_block_info_driver.html#af50f4b305db28d1b663caec14355d2d5">getBlockList</a>();</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;};</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;} <span class="comment">/* namespace hku */</span></div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DATA_DRIVER_BLOCK_INFO_QIANLONG_QLBLOCKINFODRIVER_H_ */</span><span class="preprocessor"></span></div><div class="ttc" id="classhku_1_1_q_l_block_info_driver_html_aa3b869e44243914233372b25a60671d8"><div class="ttname"><a href="classhku_1_1_q_l_block_info_driver.html#aa3b869e44243914233372b25a60671d8">hku::QLBlockInfoDriver::~QLBlockInfoDriver</a></div><div class="ttdeci">virtual ~QLBlockInfoDriver()</div><div class="ttdef"><b>Definition:</b> QLBlockInfoDriver.cpp:15</div></div>
+<div class="ttc" id="classhku_1_1_block_info_driver_html"><div class="ttname"><a href="classhku_1_1_block_info_driver.html">hku::BlockInfoDriver</a></div><div class="ttdef"><b>Definition:</b> BlockInfoDriver.h:16</div></div>
+<div class="ttc" id="classhku_1_1_q_l_block_info_driver_html"><div class="ttname"><a href="classhku_1_1_q_l_block_info_driver.html">hku::QLBlockInfoDriver</a></div><div class="ttdef"><b>Definition:</b> QLBlockInfoDriver.h:15</div></div>
+<div class="ttc" id="classhku_1_1_q_l_block_info_driver_html_a5b0fbb617892ffd3bcbb5aa7d1a93eff"><div class="ttname"><a href="classhku_1_1_q_l_block_info_driver.html#a5b0fbb617892ffd3bcbb5aa7d1a93eff">hku::QLBlockInfoDriver::getBlock</a></div><div class="ttdeci">virtual Block getBlock(const string &amp;, const string &amp;)</div><div class="ttdoc">获取指定的板块 </div><div class="ttdef"><b>Definition:</b> QLBlockInfoDriver.cpp:20</div></div>
+<div class="ttc" id="group___stock_manage_html_ga0cf7525722ab3b82d15c3891838c087e"><div class="ttname"><a href="group___stock_manage.html#ga0cf7525722ab3b82d15c3891838c087e">hku::BlockList</a></div><div class="ttdeci">vector&lt; Block &gt; BlockList</div><div class="ttdef"><b>Definition:</b> Block.h:126</div></div>
+<div class="ttc" id="classhku_1_1_q_l_block_info_driver_html_a1a856f81c723edfe17869f6d8cc5b5bb"><div class="ttname"><a href="classhku_1_1_q_l_block_info_driver.html#a1a856f81c723edfe17869f6d8cc5b5bb">hku::QLBlockInfoDriver::QLBlockInfoDriver</a></div><div class="ttdeci">QLBlockInfoDriver(const shared_ptr&lt; IniParser &gt; &amp;config)</div><div class="ttdef"><b>Definition:</b> QLBlockInfoDriver.h:17</div></div>
+<div class="ttc" id="namespacehku_html"><div class="ttname"><a href="namespacehku.html">hku</a></div><div class="ttdoc">Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等 </div><div class="ttdef"><b>Definition:</b> Block.cpp:11</div></div>
+<div class="ttc" id="classhku_1_1_block_html"><div class="ttname"><a href="classhku_1_1_block.html">hku::Block</a></div><div class="ttdoc">板块类，可视为证券的容器 </div><div class="ttdef"><b>Definition:</b> Block.h:19</div></div>
+<div class="ttc" id="classhku_1_1_q_l_block_info_driver_html_af50f4b305db28d1b663caec14355d2d5"><div class="ttname"><a href="classhku_1_1_q_l_block_info_driver.html#af50f4b305db28d1b663caec14355d2d5">hku::QLBlockInfoDriver::getBlockList</a></div><div class="ttdeci">virtual BlockList getBlockList()</div><div class="ttdoc">获取所有板块 </div><div class="ttdef"><b>Definition:</b> QLBlockInfoDriver.cpp:182</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- HTML footer for doxygen 1.8.3.1-->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+ &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

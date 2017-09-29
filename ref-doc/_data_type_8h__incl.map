@@ -1,4 +1,5 @@
 <map id="hikyuu/DataType.h" name="hikyuu/DataType.h">
-<area shape="rect" id="node8" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="641,83,761,112"/>
-<area shape="rect" id="node11" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="786,83,952,112"/>
+<area shape="rect" id="node12" href="$_log_8h.html" title="Log.h" alt="" coords="1795,91,1861,121"/>
+<area shape="rect" id="node16" href="$_null_8h.html" title="utilities/Null.h" alt="" coords="2203,91,2325,121"/>
+<area shape="rect" id="node19" href="$_datetime_8h.html" title="datetime/Datetime.h" alt="" coords="1592,91,1771,121"/>
 </map>

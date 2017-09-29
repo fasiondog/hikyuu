@@ -1,8 +1,14 @@
 <map id="hikyuu/indicator" name="hikyuu/indicator">
-<area shape="rect" id="node2" href="dir_227aace2b9083971efd72ecfb3944455.html" title="crt" alt="" coords="43,161,115,209"/>
-<area shape="rect" id="edge2-headlabel" href="dir_000006_000008.html" title="3" alt="" coords="82,134,92,152"/>
-<area shape="rect" id="node3" href="dir_33c68ad0fcacd12a721ddcadbbc0c6ce.html" title="imp" alt="" coords="43,257,115,305"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000008_000009.html" title="3" alt="" coords="82,230,92,248"/>
-<area shape="rect" id="clust2" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html" alt="" coords="27,55,131,316"/>
-<area shape="rect" id="clust1" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html" title="hikyuu" alt="" coords="16,16,141,327"/>
+<area shape="rect" id="node3" href="dir_33c68ad0fcacd12a721ddcadbbc0c6ce.html" title="imp" alt="" coords="49,161,121,209"/>
+<area shape="rect" id="edge6-headlabel" href="dir_000013_000027.html" title="16" alt="" coords="82,134,103,152"/>
+<area shape="rect" id="node5" href="dir_8625b7d2da5c64ddcfb0723fda8075b2.html" title="utilities" alt="" coords="215,257,289,305"/>
+<area shape="rect" id="edge5-headlabel" href="dir_000013_000048.html" title="2" alt="" coords="274,235,285,253"/>
+<area shape="rect" id="node2" href="dir_227aace2b9083971efd72ecfb3944455.html" title="crt" alt="" coords="53,257,125,305"/>
+<area shape="rect" id="node4" href="dir_194593d72069437dd60c2304994b6f20.html" title="trade_sys" alt="" coords="160,161,259,209"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000026_000015.html" title="1" alt="" coords="147,205,157,222"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000027_000026.html" title="6" alt="" coords="91,230,101,247"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000015_000026.html" title="17" alt="" coords="135,245,156,263"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000015_000048.html" title="11" alt="" coords="231,229,252,246"/>
+<area shape="rect" id="clust2" href="dir_5d61c8df36118f58eb2ea847be75f1ac.html" alt="" coords="27,55,139,316"/>
+<area shape="rect" id="clust1" href="dir_2aa0d26c9c4f7857b1dfd76e85fc9b07.html" title="hikyuu" alt="" coords="16,16,149,327"/>
 </map>

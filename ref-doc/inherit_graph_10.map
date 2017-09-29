@@ -1,3 +1,4 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" href="$classhku_1_1_k_data.html" title="K线数据" alt="" coords="5,5,107,35"/>
+<area shape="rect" id="node1" href="$classhku_1_1_environment_base.html" title="环境判定策略基类 " alt="" coords="5,5,204,35"/>
+<area shape="rect" id="node2" href="$classhku_1_1_two_line_environment.html" title="hku::TwoLineEnvironment" alt="" coords="252,5,475,35"/>
 </map>

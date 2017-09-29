@@ -1,0 +1,4 @@
+<map id="hku::FixedPercentStoploss" name="hku::FixedPercentStoploss">
+<area shape="rect" id="node2" href="$classhku_1_1_stoploss_base.html" title="止损/止赢策略基类 " alt="" coords="37,100,203,129"/>
+<area shape="rect" id="node3" href="$classhku_1_1_k_data.html" title="K线数据 " alt="" coords="67,5,173,35"/>
+</map>

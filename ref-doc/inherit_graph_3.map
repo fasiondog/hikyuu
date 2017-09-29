@@ -1,3 +1,4 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" href="$classhku_1_1_datetime.html" title="日期类型" alt="" coords="5,5,128,35"/>
+<area shape="rect" id="node1" href="$classhku_1_1_block_info_driver.html" title="hku::BlockInfoDriver" alt="" coords="5,5,187,35"/>
+<area shape="rect" id="node2" href="$classhku_1_1_q_l_block_info_driver.html" title="hku::QLBlockInfoDriver" alt="" coords="235,5,437,35"/>
 </map>

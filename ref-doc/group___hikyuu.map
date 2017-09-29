@@ -1,8 +1,8 @@
 <map id="Hikyuu 核心引擎库" name="Hikyuu 核心引擎库">
-<area shape="rect" id="node1" href="$group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="211,165,426,195"/>
-<area shape="rect" id="node2" href="$group___indicator.html" title="内建常用指标，及新指标定义实现基础设施" alt="" coords="249,59,388,88"/>
-<area shape="rect" id="node3" href="$group___portfolio.html" title="Portfolio 投资组合管理" alt="" coords="227,219,410,248"/>
-<area shape="rect" id="node4" href="$group___base.html" title="基础库，负责Stock实例管理、K线数据读取、板块管理等" alt="" coords="257,5,380,35"/>
-<area shape="rect" id="node5" href="$group___trade_manager.html" title="交易管理，负责记录每一笔交易记录及当前的持仓情况" alt="" coords="223,112,415,141"/>
-<area shape="rect" id="node6" href="$group___system_instance.html" title="SystemInstance 系统实例" alt="" coords="218,272,419,301"/>
+<area shape="rect" id="node1" href="$group___trade_system.html" title="TradeSystem 系统交易框架" alt="" coords="213,5,439,35"/>
+<area shape="rect" id="node2" href="$group___indicator.html" title="内建常用指标，及新指标定义实现基础设施 " alt="" coords="254,59,398,88"/>
+<area shape="rect" id="node3" href="$group___portfolio.html" title="Portfolio 投资组合管理" alt="" coords="232,112,420,141"/>
+<area shape="rect" id="node4" href="$group___base.html" title="基础库，负责Stock实例管理、K线数据读取、板块管理等 " alt="" coords="261,165,391,195"/>
+<area shape="rect" id="node5" href="$group___trade_manager.html" title="交易管理，负责记录每一笔交易记录及当前的持仓情况 " alt="" coords="225,219,427,248"/>
+<area shape="rect" id="node6" href="$group___system_instance.html" title="SystemInstance 系统实例" alt="" coords="218,272,434,301"/>
 </map>

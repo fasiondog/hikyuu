@@ -1,5 +1,18 @@
 <map id="hku::IndicatorImp" name="hku::IndicatorImp">
-<area shape="rect" id="node2" href="$classhku_1_1_i_k_data.html" title="hku::IKData" alt="" coords="5,83,112,112"/>
-<area shape="rect" id="node3" href="$classhku_1_1_i_price_list.html" title="hku::IPriceList" alt="" coords="137,83,260,112"/>
-<area shape="rect" id="node4" href="$classhku_1_1_ma.html" title="hku::Ma" alt="" coords="285,83,365,112"/>
+<area shape="rect" id="node2" href="$classhku_1_1_ama.html" title="hku::Ama" alt="" coords="253,5,349,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_atr.html" title="hku::Atr" alt="" coords="258,59,343,88"/>
+<area shape="rect" id="node4" href="$classhku_1_1_constant_value.html" title="hku::ConstantValue" alt="" coords="213,112,388,141"/>
+<area shape="rect" id="node5" href="$classhku_1_1_diff.html" title="hku::Diff" alt="" coords="257,165,345,195"/>
+<area shape="rect" id="node6" href="$classhku_1_1_ema.html" title="hku::Ema" alt="" coords="253,219,348,248"/>
+<area shape="rect" id="node7" href="$classhku_1_1_high_line.html" title="hku::HighLine" alt="" coords="237,272,364,301"/>
+<area shape="rect" id="node8" href="$classhku_1_1_i_k_data.html" title="hku::IKData" alt="" coords="245,325,357,355"/>
+<area shape="rect" id="node9" href="$classhku_1_1_i_price_list.html" title="hku::IPriceList" alt="" coords="235,379,366,408"/>
+<area shape="rect" id="node10" href="$classhku_1_1_low_line.html" title="hku::LowLine" alt="" coords="239,432,363,461"/>
+<area shape="rect" id="node11" href="$classhku_1_1_macd.html" title="hku::Macd" alt="" coords="249,485,352,515"/>
+<area shape="rect" id="node12" href="$classhku_1_1_right_shift.html" title="hku::RightShift" alt="" coords="233,539,369,568"/>
+<area shape="rect" id="node13" href="$classhku_1_1_safty_loss.html" title="hku::SaftyLoss" alt="" coords="231,592,370,621"/>
+<area shape="rect" id="node14" href="$classhku_1_1_sma.html" title="hku::Sma" alt="" coords="253,645,348,675"/>
+<area shape="rect" id="node15" href="$classhku_1_1_std_deviation.html" title="hku::StdDeviation" alt="" coords="221,699,380,728"/>
+<area shape="rect" id="node16" href="$classhku_1_1_vigor.html" title="hku::Vigor" alt="" coords="249,752,352,781"/>
+<area shape="rect" id="node17" href="$classhku_1_1_weave.html" title="hku::Weave" alt="" coords="243,805,358,835"/>
 </map>

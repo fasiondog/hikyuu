@@ -1,3 +1,5 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" href="$classhku_1_1_cost_record.html" title="成本记录" alt="" coords="6,5,146,35"/>
+<area shape="rect" id="node1" href="$classhku_1_1_base_info_driver.html" title="基本信息数据获取驱动基类 " alt="" coords="5,32,183,61"/>
+<area shape="rect" id="node2" href="$classhku_1_1_my_s_q_l_base_info_driver.html" title="hku::MySQLBaseInfoDriver" alt="" coords="231,5,461,35"/>
+<area shape="rect" id="node3" href="$classhku_1_1_s_q_lite_base_info_driver.html" title="hku::SQLiteBaseInfoDriver" alt="" coords="233,59,459,88"/>
 </map>

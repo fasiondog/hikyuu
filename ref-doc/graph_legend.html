@@ -4,15 +4,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.3.1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>Hikyuu: 图例</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
@@ -32,7 +33,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.3.1 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,42 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div><!--header-->
 <div class="contents">
 <p>本页将向您解释如何理解由 doxygen 生成的图.</p>
-<p>考虑如下例子: </p>
-<div class="fragment"><div class="line"><span class="comment">/*! 由于截断而使 Invisible 不可见 */</span></div>
-<div class="line"><span class="keyword">class </span>Invisible { };</div>
-<div class="line"><span class="comment"></span></div>
-<div class="line"><span class="comment">/*! Truncated 的继承关系将被隐藏 */</span></div>
-<div class="line"><span class="keyword">class </span>Truncated : <span class="keyword">public</span> Invisible { };</div>
-<div class="line"></div>
-<div class="line"><span class="comment">/* 没有被doxygen文档化的类 */</span></div>
-<div class="line"><span class="keyword">class </span>Undocumented { };</div>
-<div class="line"><span class="comment"></span></div>
-<div class="line"><span class="comment">/*! public 继承关系的类 */</span></div>
-<div class="line"><span class="keyword">class </span>PublicBase : <span class="keyword">public</span> Truncated { };</div>
-<div class="line"><span class="comment"></span></div>
-<div class="line"><span class="comment">/*! 一个模板类 */</span></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="keyword">class </span>Templ { };</div>
-<div class="line"><span class="comment"></span></div>
-<div class="line"><span class="comment">/*! protected 继承关系的类 */</span></div>
-<div class="line"><span class="keyword">class </span>ProtectedBase { };</div>
-<div class="line"><span class="comment"></span></div>
-<div class="line"><span class="comment">/*! private 继承关系的类 */</span></div>
-<div class="line"><span class="keyword">class </span>PrivateBase { };</div>
-<div class="line"><span class="comment"></span></div>
-<div class="line"><span class="comment">/*! 被 Inherited 使用的类 */</span></div>
-<div class="line"><span class="keyword">class </span>Used { };</div>
-<div class="line"><span class="comment"></span></div>
-<div class="line"><span class="comment">/*! 继承自其它若干类的超级类 */</span></div>
-<div class="line"><span class="keyword">class </span>Inherited : <span class="keyword">public</span> PublicBase,</div>
-<div class="line">                  <span class="keyword">protected</span> ProtectedBase,</div>
-<div class="line">                  <span class="keyword">private</span> PrivateBase,</div>
-<div class="line">                  <span class="keyword">public</span> Undocumented,</div>
-<div class="line">                  <span class="keyword">public</span> Templ&lt;int&gt;</div>
-<div class="line">{</div>
-<div class="line">  <span class="keyword">private</span>:</div>
-<div class="line">    Used *m_usedClass;</div>
-<div class="line">};</div>
-</div><!-- fragment --><p> 结果将会生成以下图:</p>
+<p>考虑如下例子: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;/*! 由于截断而使 Invisible 不可见 */</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;class Invisible { };</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;/*! Truncated 的继承关系将被隐藏 */</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;class Truncated : public Invisible { };</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;/* 没有被doxygen文档化的类 */</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;class Undocumented { };</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;/*! public 继承关系的类 */</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;class PublicBase : public Truncated { };</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;/*! 一个模板类 */</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;template&lt;class T&gt; class Templ { };</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;/*! protected 继承关系的类 */</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;class ProtectedBase { };</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;/*! private 继承关系的类 */</div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;class PrivateBase { };</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;/*! 被 Inherited 使用的类 */</div><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;class Used { };</div><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div><div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;/*! 继承自其它若干类的超级类 */</div><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;class Inherited : public PublicBase,</div><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                  protected ProtectedBase,</div><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                  private PrivateBase,</div><div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                  public Undocumented,</div><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                  public Templ&lt;int&gt;</div><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;{</div><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  private:</div><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    Used *m_usedClass;</div><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;};</div></div><!-- fragment --><p> 结果将会生成以下图:</p>
 <center><div class="image">
 <img src="graph_legend.png" />
 </div>
@@ -151,7 +117,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 <hr class="footer"/><address class="footer"><small>
  &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.3.1
+</a> 1.8.11
 </small></address>
 </body>
 </html>
