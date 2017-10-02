@@ -26,3 +26,7 @@
 
 from .trade import *
 from .trade_doc import *
+from .broker import OrderBrokerBase, OrderBrokerWrap, TestOrderBroker, crtOB
+from .broker_mail import MailOrderBroker
+
+

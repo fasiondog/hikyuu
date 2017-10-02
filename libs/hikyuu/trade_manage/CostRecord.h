@@ -36,7 +36,7 @@ public:
     price_t others;        /**< 其他费用 */
     price_t total;         /**< 总成本   */
 
-    std::string toString() const;
+    string toString() const;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

@@ -60,9 +60,6 @@ from hikyuu.interactive import *
 if sys.platform == 'win32':
     from .puppet import *
 
-from .broker import *
-from .broker_mail import *
-
 
 #==============================================================================
 #

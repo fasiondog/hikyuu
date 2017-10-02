@@ -58,6 +58,8 @@ FundsRecord.__unicode__ = unicodeFunc
 FundsRecord.__repr__ = reprFunc
 BorrowRecord.__unicode__ = unicodeFunc
 BorrowRecord.__repr__ = reprFunc
+OrderBrokerBase.__unicode__ = unicodeFunc
+OrderBrokerBase.__repr__ = reprFunc
 
 BorrowRecordList.__getitem__ = list_getitem
 PositionRecordList.__getitem__ = list_getitem

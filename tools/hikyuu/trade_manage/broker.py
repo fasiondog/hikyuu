@@ -30,22 +30,27 @@
 #===============================================================================
 
 from hikyuu.trade_manage import OrderBrokerBase
+
     
 class OrderBrokerWrap(OrderBrokerBase):
+    """订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
     """
-    订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
     
-    :param bool real: 下单前是否重新实时获取实时分笔数据
-    :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，
-                        否则忽略; 对卖出操作无效，立即以当前价卖出
-    """
     def __init__(self, broker, real=True, slip=0.03):
+        """
+        订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
+    
+        :param bool real: 下单前是否重新实时获取实时分笔数据
+        :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，
+                            否则忽略; 对卖出操作无效，立即以当前价卖出
+        """
         super(OrderBrokerWrap, self).__init__()
         self._broker = broker
         self._real = real
         self._slip=slip
         
     def _buy(self, code, price, num):
+        """实现 OrderBrokerBase 的 _buy 接口"""
         if self._real:
             import tushare as ts
             df = ts.get_realtime_quotes(code)
@@ -58,6 +63,7 @@ class OrderBrokerWrap(OrderBrokerBase):
             self._broker.buy(code, price, num)
         
     def _sell(self, code, price, num):
+        """实现 OrderBrokerBase 的 _sell 接口"""
         if self._real:
             import tushare as ts
             df = ts.get_realtime_quotes(code)
@@ -65,8 +71,10 @@ class OrderBrokerWrap(OrderBrokerBase):
             self._broker.sell(code, new_price, num)
         else:
             self._broker.sell(code, price, num)
+
         
 class TestOrderBroker:
+    """用于测试的订单代理，仅在执行买入/卖出时打印信息"""
     def __init__(self):
         pass
     
@@ -77,9 +85,10 @@ class TestOrderBroker:
         print("卖出：%s  %.3f  %i" % (code, price, num))
     
         
-def crtRB(broker, real=True, slip=0.03):
+def crtOB(broker, real=True, slip=0.03):
     """
     快速生成订单代理包装对象
+    
     :param broker: 订单代理示例，必须拥有buy和sell方法，并且参数为 code, price, num
     :param bool real: 下单前是否重新实时获取实时分笔数据
     :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，
