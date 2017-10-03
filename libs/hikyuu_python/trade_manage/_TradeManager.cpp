@@ -89,12 +89,12 @@ void export_TradeManager() {
 
             .def("regBroker", &TradeManager::regBroker)
             .def("clearBroker", &TradeManager::clearBroker)
-            .def("getMarginRate", &TradeManager::getMarginRate)
+            //.def("getMarginRate", &TradeManager::getMarginRate)
             .def("have", &TradeManager::have)
             .def("getStockNumber", &TradeManager::getStockNumber)
-            .def("getShortStockNumber", &TradeManager::getShortStockNumber)
+            //.def("getShortStockNumber", &TradeManager::getShortStockNumber)
             .def("getHoldNumber", &TradeManager::getHoldNumber)
-            .def("getShortHoldNumber", &TradeManager::getShortHoldNumber)
+            //.def("getShortHoldNumber", &TradeManager::getShortHoldNumber)
             .def("getTradeList", &TradeManager::getTradeList,
                     return_value_policy<copy_const_reference>())
             .def("getPositionList", &TradeManager::getPositionList)
@@ -104,9 +104,9 @@ void export_TradeManager() {
             .def("getBuyCost", &TradeManager::getBuyCost)
             .def("getSellCost", &TradeManager::getSellCost)
             //.def("getBorrowCashCost", &TradeManager::getBorrowCashCost)
-            .def("getReturnCashCost", &TradeManager::getReturnCashCost)
-            .def("getBorrowStockCost", &TradeManager::getBorrowStockCost)
-            .def("getReturnStockCost", &TradeManager::getReturnStockCost)
+            //.def("getReturnCashCost", &TradeManager::getReturnCashCost)
+            //.def("getBorrowStockCost", &TradeManager::getBorrowStockCost)
+            //.def("getReturnStockCost", &TradeManager::getReturnStockCost)
             .def("cash", &TradeManager::cash, cash_overload())
             .def("getFunds", getFunds_1, getFunds_1_overload())
             .def("getFunds", getFunds_2, getFunds_2_overload())
@@ -117,12 +117,12 @@ void export_TradeManager() {
 
             .def("checkin", &TradeManager::checkin)
             .def("checkout", &TradeManager::checkout)
-            .def("checkinStock", &TradeManager::checkinStock)
-            .def("checkoutStock", &TradeManager::checkoutStock)
-            .def("borrowCash", &TradeManager::borrowCash)
-            .def("returnCash", &TradeManager::returnCash)
-            .def("borrowStock", &TradeManager::borrowStock)
-            .def("returnStock", &TradeManager::returnStock)
+            //.def("checkinStock", &TradeManager::checkinStock)
+            //.def("checkoutStock", &TradeManager::checkoutStock)
+            //.def("borrowCash", &TradeManager::borrowCash)
+            //.def("returnCash", &TradeManager::returnCash)
+            //.def("borrowStock", &TradeManager::borrowStock)
+            //.def("returnStock", &TradeManager::returnStock)
             //.def("buy", &TradeManager::buy, buy_overload())
             .def("buy", &TradeManager::buy,
                     buy_overload(args("datetime", "stock", "realPrice",
@@ -131,8 +131,8 @@ void export_TradeManager() {
             .def("sell", &TradeManager::sell,
                     sell_overload(args("datetime", "stock", "realPrice",
                             "num", "stoploss", "goalPrice", "planPrice", "part")))
-            .def("buyShort", &TradeManager::buyShort, buyShort_overload())
-            .def("sellShort", &TradeManager::sellShort, sellShort_overload())
+            //.def("buyShort", &TradeManager::buyShort, buyShort_overload())
+            //.def("sellShort", &TradeManager::sellShort, sellShort_overload())
 
             .def("tocsv", &TradeManager::tocsv)
 

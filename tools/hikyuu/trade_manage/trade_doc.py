@@ -305,4 +305,335 @@ clone(self)
     :rtype: TradeManager
 """
 
+TradeManager.regBroker.__doc__ = """
+regBroker(self, broker)
+    
+    注册订单代理。可执行多次该命令注册多个订单代理。
+        
+    :param OrderBrokerBase broker: 订单代理实例
+"""
 
+TradeManager.clearBroker.__doc__ = """
+clearBroker(self)
+
+    清空所有已注册订单代理
+"""
+
+TradeManager.have.__doc__ = """
+have(self, stock)
+    
+    当前是否持有指定的证券
+        
+    :param Stock stock: 指定证券
+    :rtype: bool
+"""
+
+TradeManager.getStockNumber.__doc__ = """
+getStockNumber(self)
+    
+    当前持有的证券种类数量，即当前持有几只股票（非各个股票的持仓数）
+        
+    :rtype: int
+"""
+
+TradeManager.getHoldNumber.__doc__ = """
+getHoldNumber(self, datetime, stock)
+
+    获取指定时刻指定证券的持有数量
+        
+    :param Datetime datetime: 指定时刻
+    :param Stock stock: 指定的证券
+    :rtype: int
+"""
+
+TradeManager.getTradeList.__doc__ = """
+getTradeList(self)
+    
+    获取全部交易记录
+        
+    :rtype: TradeRecordList
+"""
+
+TradeManager.getPositionList.__doc__ = """
+getPositionList(self)
+    
+    获取当前全部持仓记录
+        
+    :rtype: PositionRecordList
+"""
+
+TradeManager.getHistoryPositionList.__doc__ = """
+getHistoryPositionList(self)
+    
+    获取全部历史持仓记录，即已平仓记录
+        
+    :rtype: PositionRecordList
+"""
+
+TradeManager.getPosition.__doc__ = """
+getPosition(self, stock)
+
+    获取指定证券的当前持仓记录，如当前未持有该票，返回PositionRecord()
+        
+    :param Stock stock: 指定的证券
+    :rtype: PositionRecord
+"""
+
+TradeManager.getBuyCost.__doc__ = """
+getBuyCost(self, datetime, stock, price, num)
+    
+    计算买入成本
+        
+    :param Datetime datetime: 交易时间
+    :param Stock stock:       交易的证券
+    :param float price:      买入价格
+    :param int num:           买入数量
+    :rtype: CostRecord
+"""
+
+TradeManager.getSellCost.__doc__ = """
+getSellCost(self, datetime, stock, price, num)
+    
+    计算卖出成本
+
+    :param Datetime datetime: 交易时间
+    :param Stock stock:       交易的证券
+    :param float price:      卖出价格
+    :param int num:           卖出数量
+    :rtype: CostRecord        
+"""
+
+TradeManager.cash.__doc__ = """
+cash(self, datetime[, ktype=KQuery.KType.DAY])
+    
+    获取指定日期的现金。（注：如果不带日期参数，无法根据权息信息调整持仓。）
+        
+    :param Datetime datetime: 指定时刻
+    :param ktype: K线类型
+    :rtype: float
+"""
+
+TradeManager.getFunds.__doc__ = """
+getFunds(self[,ktype = KQuery.DAY])
+    
+    获取账户当前时刻的资产详情
+        
+    :param KQuery.KType ktype: K线类型
+    :rtype: FundsRecord
+    
+getFunds(self, datetime, [ktype = KQuery.DAY])
+    
+    获取指定时刻的资产市值详情
+        
+    :param Datetime datetime:  指定时刻
+    :param KQuery.KType ktype: K线类型
+    :rtype: FundsRecord    
+"""
+
+TradeManager.getFundsCurve.__doc__ = """
+getFundsCurve(self, dates[, ktype = KQuery.DAY])
+    
+    获取资产净值曲线
+        
+    :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的资产净值曲线
+    :param KQuery.KType ktype: K线类型，必须与日期列表匹配
+    :return: 资产净值列表
+    :rtype: PriceList
+"""
+
+TradeManager.getProfitCurve.__doc__ = """
+getProfitCurve(self, dates[, ktype = KQuery.DAY])
+    
+    获取收益曲线，即扣除历次存入资金后的资产净值曲线
+        
+    :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
+    :param KQuery.KType ktype: K线类型，必须与日期列表匹配
+    :return: 收益曲线
+    :rtype: PriceList
+"""
+
+TradeManager.checkin.__doc__ = """
+checkin(self, datetime, cash)
+    
+    向账户内存入现金
+    
+    :param Datetime datetime: 交易时间
+    :param float cash: 存入的现金量
+    :rtype: TradeRecord
+"""
+
+TradeManager.checkout.__doc__ = """
+checkout(self, datetime, cash)
+    
+    从账户内取出现金
+        
+    :param Datetime datetime: 交易时间
+    :param float cash: 取出的资金量
+    :rtype: TradeRecord
+"""
+
+TradeManager.buy.__doc__ = """
+buy(self, datetime, stock, realPrice, number[, stoploss=0.0, goalPrice=0.0, planPrice=0.0, part=System.INVALID])
+    
+    买入操作
+        
+    :param Datetime datetime: 买入时间
+    :param Stock stock:       买入的证券
+    :param float realPrice:  实际买入价格
+    :param int num:           买入数量
+    :param float stoploss:   止损价
+    :param float goalPrice:  目标价格
+    :param float planPrice:  计划买入价格
+    :param SystemPart part:   交易指示来源
+    :rtype: TradeRecord
+"""
+
+TradeManager.sell.__doc__ = """
+sell(self, datetime, stock, realPrice[, number=Constant.null_size, stoploss=0.0, goalPrice=0.0, planPrice=0.0, part=System.INVALID])
+    
+    卖出操作
+        
+    :param Datetime datetime: 卖出时间
+    :param Stock stock:       卖出的证券
+    :param float realPrice:  实际卖出价格
+    :param int num:           卖出数量，如果等于Constant.null_size，表示全部卖出
+    :param float stoploss:   新的止损价
+    :param float goalPrice:  新的目标价格
+    :param float planPrice:  原计划卖出价格
+    :param SystemPart part:   交易指示来源
+    :rtype: TradeRecord
+"""
+
+TradeManager.tocsv.__doc__ = """
+tocsv(self, path)
+    
+    以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
+        
+    :param string path: 输出文件所在目录
+"""
+
+
+#------------------------------------------------------------------
+# Performance
+#------------------------------------------------------------------
+
+Performance.__doc__ = """简单绩效统计"""
+
+Performance.reset.__doc__ = """
+reset(self)
+    
+    复位，清除已计算的结果
+"""
+
+Performance.report.__doc__ = """
+report(self, tm[, datetime=Datetime.now()])
+    
+    简单的文本统计报告，用于直接输出打印
+        
+    :param TradeManager tm: 指定的交易管理实例
+    :param Datetime datetime: 统计截止时刻
+    :rtype: str
+"""
+
+Performance.statistics.__doc__ = """
+statistics(self, tm[, datetime=Datetime.now()])
+    
+    根据交易记录，统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime
+
+    :param TradeManager tm: 指定的交易管理实例
+    :param Datetime datetime: 统计截止时刻
+"""
+
+Performance.get.__doc__ = """
+get(self, name)
+    
+    按指标名称获取指标值，必须在运行 statistics 或 report 之后生效
+        
+    :param str name: 指标名称
+    :rtype: float
+"""
+
+Performance.__getitem__.__doc__ = """
+__getitem__(self, name)
+    
+    同 get 方法。按指标名称获取指标值，必须在运行 statistics 或 report 之后生效
+        
+    :param str name: 指标名称
+    :rtype: float
+"""
+
+
+#------------------------------------------------------------------
+# build_in
+#------------------------------------------------------------------
+
+crtTM.__doc__ = """
+crtTM([datetime = Datetime(199001010000), initcash = 100000, costfunc = TC_Zero(), name = "SYS"])
+
+    创建交易管理模块，管理帐户的交易记录及资金使用情况
+    
+    :param Datetime datetime:  账户建立日期
+    :param float initcash:    初始资金
+    :param TradeCost costfunc: 交易成本算法
+    :param string name:        账户名称
+    :rtype: TradeManager
+"""
+
+TC_TestStub.__doc__ = """
+"""
+
+TC_FixedA.__doc__ = """
+TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
+
+    2015年8月1日之前的A股交易成本算法。上证过户费为交易数量的千分之一，不足1元，按1元计。
+    
+    计算规则如下::
+
+    1）上证交易所
+        买入：佣金＋过户费
+        卖出：佣金＋过户费＋印花税
+    2）深证交易所：
+        买入：佣金
+        卖出：佣金＋印花税
+
+    其中，佣金最低5元
+
+    :param float commission: 佣金比例
+    :param float lowestCommission: 最低佣金值
+    :param float stamptax: 印花税
+    :param float transferfee: 过户费
+    :param float lowestTransferfee: 最低过户费
+    :return: :py:class:`TradeCostBase` 子类实例
+"""
+
+    
+TC_FixedA2015.__doc__ = """
+TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
+
+    2015年8月1日及之后的A股交易成本算法，上证过户费改为成交金额的千分之0.02
+    
+    计算规则如下::
+
+    1）上证交易所
+        买入：佣金＋过户费
+        卖出：佣金＋过户费＋印花税
+    2）深证交易所：
+        买入：佣金
+        卖出：佣金＋印花税
+
+    其中，佣金最低5元
+
+    :param float commission: 佣金比例
+    :param float lowestCommission: 最低佣金值
+    :param float stamptax: 印花税
+    :param float transferfee: 过户费
+    :return: :py:class:`TradeCostBase` 子类实例
+"""
+
+TC_Zero.__doc__ = """
+TC_Zero()
+
+    创建零成本算法实例
+"""
+
+TC_TestStub.__doc__ = """仅用于测试"""

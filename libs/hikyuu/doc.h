@@ -60,8 +60,12 @@
  * 交易管理可理解为一个模拟账户进行模拟交易。一般使用 crtTM 创建交易管理实例。
  * @ingroup TradeManager
  *
- * @defgroup OrderBroker TradeManager 订单代理类
- * 订单代理类，实现实际的订单操作及程序化的订单
+ * @defgroup OrderBroker OrderBroker 订单代理
+ * 订单代理，实现实际的订单操作及程序化的订单
+ * @ingroup TradeManager
+ *
+ * @defgroup Performance Performance 绩效统计
+ * 对交易进行绩效统计
  * @ingroup TradeManager
  *
  * @defgroup TradeSystem TradeSystem 系统交易框架

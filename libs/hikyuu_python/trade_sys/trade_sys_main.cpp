@@ -21,6 +21,7 @@ void export_Selector();
 void export_AllocateMoney();
 
 BOOST_PYTHON_MODULE(_trade_sys) {
+    docstring_options doc_options(false);
     export_Environment();
     export_Condition();
     export_MoneyManager();

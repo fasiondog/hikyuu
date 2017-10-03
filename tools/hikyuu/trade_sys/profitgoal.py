@@ -1,11 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 # cp936
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-#===============================================================================
-# 作者：fasiondog
-# 历史：1）20130419, Added by fasiondog
-#===============================================================================
 
 from . import _trade_sys as csys
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
@@ -17,13 +35,13 @@ ProfitGoalBase.__repr__ = reprFunc
 PG_NoGoal = csys.PG_NoGoal
 PG_FixedPercent = csys.PG_FixedPercent
 
-PG_NoGoal.__doc__ += """\n
+PG_NoGoal.__doc__ = """\n
     无盈利目标策略，通常为了进行测试或对比。
     
     :return: 盈利目标策略实例
 """
 
-PG_FixedPercent.__doc__ += """\n
+PG_FixedPercent.__doc__ = """\n
     固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
     
     :param float p: 百分比

@@ -14,8 +14,10 @@ using namespace hku;
 void export_Performance() {
     class_<Performance>("Performance", init<>())
             .def("reset", &Performance::reset)
-            .def("report", &Performance::report)
-            .def("statistics", &Performance::statistics)
+            .def("report", &Performance::report,
+                    (arg("tm"), arg("datetime")=Datetime::now()))
+            .def("statistics", &Performance::statistics,
+                    (arg("tm"), arg("datetime")=Datetime::now()))
             .def("get", &Performance::get)
             .def("__getitem__", &Performance::get)
             ;

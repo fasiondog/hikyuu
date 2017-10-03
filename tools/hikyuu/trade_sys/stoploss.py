@@ -1,11 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 # cp936
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-#===============================================================================
-# 作者：fasiondog
-# 历史：1）20130419, Added by fasiondog
-#===============================================================================
 
 from . import _trade_sys as csys
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
@@ -39,23 +57,96 @@ def crtST(func, params={}, name='crtST'):
     meta_x._calculate = func
     return meta_x(name, params)
 
-ST_FixedPercent.__doc__ +=  """\n
+
+#------------------------------------------------------------------
+# add doc-string
+#------------------------------------------------------------------
+
+StoplossBase.__doc__ = """
+止损/止赢算法基类
+
+自定义止损/止赢策略接口：
+
+    SignalBase._calculate() - 【必须】子类计算接口
+    SignalBase._clone() - 【必须】克隆接口
+    SignalBase._reset() - 【可选】重载私有变量
+"""
+
+StoplossBase.name.__doc__ = """名称"""
+
+StoplossBase.__init__.__doc__ = """
+__init__(self[, name="StoplossBase"])
+    
+    :param str name: 名称
+"""
+
+StoplossBase.getParam.__doc__ = """
+getParam(self, name)
+
+    获取指定的参数
+    
+    :param str name: 参数名称
+    :return: 参数值
+    :raises out_of_range: 无此参数
+"""
+
+StoplossBase.setParam.__doc__ = """
+setParam(self, name, value)
+    
+    设置参数
+        
+    :param str name: 参数名称
+    :param value: 参数值
+    :type value: int | bool | float | string
+    :raises logic_error: Unsupported type! 不支持的参数类型
+"""
+
+StoplossBase.setTM.__doc__ = """
+setTM(self, tm)
+        
+    设置交易管理实例
+        
+    :param TradeManager tm: 交易管理实例
+"""
+
+StoplossBase.getTM.__doc__ = """
+getTM(self)
+    
+    获取交易管理实例
+        
+    :rtype: TradeManager
+"""
+
+
+
+#------------------------------------------------------------------
+# add doc-string for build_in func
+#------------------------------------------------------------------
+
+ST_FixedPercent.__doc__ =  """
+ST_FixedPercent([p=0.03])
+
     固定百分比止损策略，即当价格低于买入价格的某一百分比时止损
     
     :param float p: 百分比(0,1]
     :return: 止损/止赢策略实例
 """
 
-ST_Indicator.__doc__ += """\n
+ST_Indicator.__doc__ = """
+ST_Indicator(op[, kpart="CLOSE"])
+
     使用技术指标作为止损价。如使用10日EMA作为止损：::
     
         ST_Indicator(OP(EMA(n=10)))
 
     :param Operand op:
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+    :return: 止损/止赢策略实例
 """
 
-ST_Saftyloss.__doc__ += """\n
+ST_Saftyloss.__doc__ = """
+ST_Saftyloss([n1=10, n2=3, p=2.0])
+
     参见《走进我的交易室》（2007年 地震出版社） 亚历山大.艾尔德(Alexander Elder) P202
     计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，
     得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日
