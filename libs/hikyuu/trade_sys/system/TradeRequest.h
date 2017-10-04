@@ -12,6 +12,10 @@
 
 namespace hku {
 
+/**
+ * 交易请求记录
+ * @ingroup System
+ */
 class HKU_API TradeRequest {
 public:
     TradeRequest();

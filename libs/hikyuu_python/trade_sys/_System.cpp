@@ -20,9 +20,22 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(run_overload, run, 2, 3);
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(SYS_Simple_overload, SYS_Simple, 0, 9);
 
+string (System::*sys_get_name)() const = &System::name;
+void (System::*sys_set_name)(const string&) = &System::name;
+
+
 void export_System() {
 
     def("SYS_Simple", SYS_Simple, SYS_Simple_overload());
+    /*def("SYS_Simple", SYS_Simple, (arg("tm")=TradeManagerPtr(),
+            arg("mm")=MoneyManagerPtr(),
+            arg("ev")=EnvironmentPtr(),
+            arg("cn")=ConditionPtr(),
+            arg("sg")=SignalPtr(),
+            arg("sl")=StoplossPtr(),
+            arg("tp")=StoplossPtr(),
+            arg("pg")=ProfitGoalPtr(),
+            arg("sp")=SlippagePtr()));*/
 
     def("getSystemPartName", getSystemPartName);
     def("getSystemPartEnum", getSystemPartEnum);
@@ -53,12 +66,7 @@ void export_System() {
                     const SlippagePtr&,
                     const string&>())
             .def(self_ns::str(self))
-            .add_property("name",
-                    make_function(&System::name,
-                            return_value_policy<copy_const_reference>()))
-            .add_property("params",
-                    make_function(&System::getParameter,
-                            return_internal_reference<>()))
+            .add_property("name", sys_get_name, sys_set_name)
             .add_property("tm", &System::getTM, &System::setTM)
             .add_property("mm", &System::getMM, &System::setMM)
             .add_property("ev", &System::getEV, &System::setEV)
@@ -68,6 +76,9 @@ void export_System() {
             .add_property("tp", &System::getTP, &System::setTP)
             .add_property("pg", &System::getPG, &System::setPG)
             .add_property("sp", &System::getSP, &System::setSP)
+
+            .def("getParam", &System::getParam<boost::any>)
+            .def("setParam", &System::setParam<object>)
 
             .def("getStock", &System::getStock)
             .def("getTradeRecordList", &System::getTradeRecordList,
@@ -111,7 +122,7 @@ void export_System() {
 #endif
             ;
 
-    enum_<SystemPart>("SystemPart")
+    enum_<SystemPart>("Part")
             .value("ENVIRONMENT", PART_ENVIRONMENT)
             .value("CONDITION", PART_CONDITION)
             .value("SIGNAL", PART_SIGNAL)

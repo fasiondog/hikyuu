@@ -14,6 +14,7 @@ namespace hku {
 
 /**
  * 系统关联部件（各自策略）枚举定义，用于修改相关部件参数
+ * @ingroup System
  */
 enum SystemPart {
     PART_ENVIRONMENT  = 0,   /**< 外部环境 */
@@ -27,8 +28,20 @@ enum SystemPart {
     PART_INVALID      = 8,   /**< 无效值 */
 };
 
+/**
+ * 获取SystemPart枚举值的字符串名称
+ * @param part 系统部件枚举值
+ * @return
+ * @ingroup System
+ */
 string HKU_API getSystemPartName(int part);
 
+/**
+ * 通过字符串名称获取SystemPart枚举值
+ * @param name 字符串名称
+ * @return
+ * @ingroup System
+ */
 SystemPart HKU_API getSystemPartEnum(const string& name);
 
 } /* namespace */

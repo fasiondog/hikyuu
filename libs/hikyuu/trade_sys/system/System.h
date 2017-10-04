@@ -49,7 +49,10 @@ public:
     typedef SystemPart Part;
 
     /** 获取名称 */
-    const string& name() const;
+    string name() const;
+
+    /** 设置名称 */
+    void name(const string& name);
 
     KData getTO() const { return m_kdata; }
     TradeManagerPtr getTM() const { return m_tm; }
@@ -266,8 +269,12 @@ HKU_API std::ostream& operator <<(std::ostream &os, const System& sys);
 HKU_API std::ostream& operator <<(std::ostream &os, const SystemPtr& sys);
 
 
-inline const string& System::name() const {
+inline string System::name() const {
     return m_name;
+}
+
+inline void System::name(const string& name) {
+    m_name = name;
 }
 
 inline bool System::

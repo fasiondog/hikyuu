@@ -25,28 +25,13 @@
 # SOFTWARE.
 
 
-from . import _trade_sys as csys
+from ._trade_sys import ProfitGoalBase, PG_NoGoal, PG_FixedPercent
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
-ProfitGoalBase = csys.ProfitGoalBase
+
 ProfitGoalBase.__unicode__ = unicodeFunc
 ProfitGoalBase.__repr__ = reprFunc
 
-PG_NoGoal = csys.PG_NoGoal
-PG_FixedPercent = csys.PG_FixedPercent
-
-PG_NoGoal.__doc__ = """\n
-    无盈利目标策略，通常为了进行测试或对比。
-    
-    :return: 盈利目标策略实例
-"""
-
-PG_FixedPercent.__doc__ = """\n
-    固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
-    
-    :param float p: 百分比
-    :return: 盈利目标策略实例
-"""
 
 def pg_init(self, name, params):
     super(self.__class__, self).__init__(name)
@@ -68,3 +53,141 @@ def crtPG(func, params={}, name='crtPG'):
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
+
+
+#------------------------------------------------------------------
+# add doc-string
+#------------------------------------------------------------------
+
+ProfitGoalBase.__doc__ = """
+盈利目标策略基类
+
+自定义盈利目标策略接口：
+
+    ProfitGoalBase.getGoal() - 【必须】获取目标价格
+    ProfitGoalBase._calculate() - 【必须】子类计算接口
+    ProfitGoalBase._clone() - 【必须】克隆接口
+    ProfitGoalBase._reset() - 【可选】重载私有变量
+"""
+
+ProfitGoalBase.name.__doc__ = """名称"""
+
+ProfitGoalBase.__init__.__doc__ = """
+__init__(self[, name="ProfitGoalBase"])
+    
+    初始化构造函数
+        
+    :param str name: 名称
+"""
+
+ProfitGoalBase.getParam.__doc__ = """
+getParam(self, name)
+
+    获取指定的参数
+    
+    :param str name: 参数名称
+    :return: 参数值
+    :raises out_of_range: 无此参数
+"""
+
+ProfitGoalBase.setParam.__doc__ = """
+setParam(self, name, value)
+    
+    设置参数
+        
+    :param str name: 参数名称
+    :param value: 参数值
+    :type value: int | bool | float | string
+    :raises logic_error: Unsupported type! 不支持的参数类型
+"""
+
+ProfitGoalBase.setTO.__doc__ = """
+setTO(self, k)
+    
+    :param KData k: 设置交易对象
+"""
+
+ProfitGoalBase.getTO.__doc__ = """
+getTO(self)
+    
+    :return: 交易对象
+    :rtype: KData
+"""
+
+ProfitGoalBase.setTM.__doc__ = """
+setTM(self, tm)
+    
+    :param TradeManager tm: 设置交易管理账户
+"""
+
+ProfitGoalBase.getTM.__doc__ = """
+getTM(self)
+    
+    获取交易管理账户
+        
+    :rtype: TradeManager
+"""
+
+ProfitGoalBase.getGoal.__doc__ = """
+getGoal(self, datetime, price)
+    
+    【重载接口】获取盈利目标价格
+        
+    :param Datetime datetime: 买入时间
+    :param float price: 买入价格
+    :return: 目标价格
+    :rtype: float
+"""
+
+ProfitGoalBase.reset.__doc__ = """
+reset(self)
+    
+    复位操作
+"""
+
+ProfitGoalBase.clone.__doc__ = """
+clone(self)
+    
+    克隆操作
+"""
+
+ProfitGoalBase._calculate.__doc__ = """
+_calculate(self)
+    
+    【重载接口】子类计算接口
+"""
+
+ProfitGoalBase._reset.__doc__ = """
+_reset(self)
+    
+    【重载接口】子类复位接口，复位内部私有变量
+"""
+
+ProfitGoalBase._clone.__doc__ = """
+_clone(self)
+    
+    【重载接口】子类克隆接口
+"""
+
+
+#------------------------------------------------------------------
+# add doc-string for build_in func
+#------------------------------------------------------------------
+
+PG_NoGoal.__doc__ = """
+PG_NoGoal()
+
+    无盈利目标策略，通常为了进行测试或对比。
+    
+    :return: 盈利目标策略实例
+"""
+
+PG_FixedPercent.__doc__ = """
+PG_FixedPercent([p = 0.2])
+
+    固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
+    
+    :param float p: 百分比
+    :return: 盈利目标策略实例
+"""
+

@@ -117,6 +117,66 @@ getTM(self)
     :rtype: TradeManager
 """
 
+StoplossBase.setTO.__doc__ = """
+setTO(self, k)
+    
+    :param KData k: 设置交易对象
+"""
+
+StoplossBase.getTO.__doc__ = """
+getTO(self)
+    
+    :return: 交易对象
+    :rtype: KData
+"""
+
+StoplossBase.getPrice.__doc__ = """
+getPrice(self, datetime, price)
+    
+    【重载接口】获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。
+    用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
+        
+    .. note::
+        一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的
+        价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为
+        price 为 0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低
+        价的 30% 作为止损，则不需要考虑price参数。
+        
+    :param Datetime datetime: 交易时间
+    :param float price: 计划买入的价格
+    :return: 止损价格
+    :rtype: float
+"""
+
+StoplossBase.reset.__doc__ = """
+reset(self)
+    
+    复位操作
+"""
+
+StoplossBase.clone.__doc__ = """
+clone(self)
+    
+    克隆操作
+"""
+
+StoplossBase._calculate.__doc__ = """
+_calculate(self)
+    
+    【重载接口】子类计算接口
+"""
+
+StoplossBase._reset.__doc__ = """
+_reset(self)
+    
+    【重载接口】子类复位接口，复位内部私有变量
+"""
+
+StoplossBase._clone.__doc__ = """
+_clone(self)
+    
+    【重载接口】子类克隆接口
+"""
 
 
 #------------------------------------------------------------------
