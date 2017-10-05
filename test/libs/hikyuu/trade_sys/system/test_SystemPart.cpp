@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE( test_getSystemPartName) {
     BOOST_CHECK(getSystemPartName(part) == "SG");
 
     part = PART_STOPLOSS;
-    BOOST_CHECK(getSystemPartName(part) == "SL");
+    BOOST_CHECK(getSystemPartName(part) == "ST");
 
     part = PART_MONEYMANAGER;
     BOOST_CHECK(getSystemPartName(part) == "MM");
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( test_getSystemPartEnum) {
     part = "SG";
     BOOST_CHECK(getSystemPartEnum(part) == PART_SIGNAL);
 
-    part = "SL";
+    part = "ST";
     BOOST_CHECK(getSystemPartEnum(part) == PART_STOPLOSS);
 
     part = "TP";

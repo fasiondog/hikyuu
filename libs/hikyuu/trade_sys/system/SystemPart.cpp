@@ -19,7 +19,7 @@ string HKU_API getSystemPartName(int part) {
     case PART_SIGNAL:
         return "SG";
     case PART_STOPLOSS:
-        return "SL";
+        return "ST";
     case PART_TAKEPROFIT:
         return "TP";
     case PART_MONEYMANAGER:
@@ -46,7 +46,7 @@ SystemPart HKU_API getSystemPartEnum(const string& arg) {
     } else if ("SG" == name) {
         return PART_SIGNAL;
 
-    } else if ("SL" == name) {
+    } else if ("ST" == name) {
         return PART_STOPLOSS;
 
     } else if ("TP" == name) {

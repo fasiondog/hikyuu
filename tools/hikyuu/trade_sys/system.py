@@ -48,7 +48,7 @@ System.INVALID = System.Part.INVALID
 
 
 def SYS_Simple(tm = None, mm = None, ev = None, cn = None, 
-               sg = None, sl = None, tp = None, pg = None, sp = None):
+               sg = None, st = None, tp = None, pg = None, sp = None):
     """
     创建简单系统实例（每次交易不进行多次加仓或减仓，即每次买入后在卖出时全部卖出）， 
      系统实例在运行时(调用run方法），至少需要一个配套的交易管理实例、一个资金管理策略
@@ -74,7 +74,7 @@ def SYS_Simple(tm = None, mm = None, ev = None, cn = None,
     :param EnvironmentBase ev: 市场环境判断策略
     :param ConditionBase cn: 系统有效条件
     :param SignalBase sg: 信号指示器
-    :param StoplossBase sl: 止损策略
+    :param StoplossBase st: 止损策略
     :param StoplossBase tp: 止盈策略
     :param ProfitGoalBase pg: 盈利目标策略
     :param SlippageBase sp: 移滑价差算法
@@ -91,8 +91,8 @@ def SYS_Simple(tm = None, mm = None, ev = None, cn = None,
         sys_ins.cn = cn
     if sg:
         sys_ins.sg = sg
-    if sl:
-        sys_ins.sl = sl
+    if st:
+        sys_ins.st = st
     if tp:
         sys_ins.tp = tp
     if pg:
@@ -105,6 +105,25 @@ def SYS_Simple(tm = None, mm = None, ev = None, cn = None,
 #------------------------------------------------------------------
 # add doc-string
 #------------------------------------------------------------------
+
+TradeRequest.__doc__ = """
+交易请求记录。系统内部在实现延迟操作时登记的交易请求信息。暴露该结构的主要目的是用于
+在“delay”模式（延迟到下一个bar开盘时进行交易）的情况下，系统实际已知下一个Bar将要
+进行交易，此时可通过 System.getBuyTradeRequest() 、 System.getSellTradeRequest()
+来获知下一个BAR是否需要买入/卖出。主要用于提醒或打印下一个Bar需要进行操作。对于系统
+本身的运行没有影响。
+"""
+
+TradeRequest.valid.__doc__ = """该交易请求记录是否有效（True | False）"""
+TradeRequest.business.__doc__ = """
+交易业务类型，参见：:py:class:`hikyuu.trade_manage.BUSINESS`
+"""
+TradeRequest.datetime.__doc__ = """发出交易请求的时刻"""
+TradeRequest.stoploss.__doc__ = """发出交易请求时刻的止损价"""
+TradeRequest.part.__doc__ = """发出交易请求的来源，参见：:py:class:`System.Part`"""
+TradeRequest.count.__doc__ = """因操作失败，连续延迟的次数"""
+
+
 
 System.Part.__doc__ = """
 系统部件枚举值，系统的买入/卖出等操作可由这些部件触发，用于标识实际交易指令的来源，
@@ -145,6 +164,87 @@ System.__doc__ = """
     support_borrow_stock=False (bool) : 在没有持仓时，是否支持借入证券，融券
 """
 
+System.name.__doc__ = """系统名称""" 
+System.tm.__doc__ = """交易管理实例"""
+System.mm.__doc__ = """资金管理策略"""
+System.ev.__doc__ = """市场环境判断策略"""
+System.cn.__doc__ = """系统有效条件"""
+System.sg.__doc__ = """信号指示器"""
+System.st.__doc__ = """止损策略"""
+System.tp.__doc__ = """止盈策略"""
+System.pg.__doc__ = """盈利目标策略"""
+System.sp.__doc__ = """移滑价差算法"""
+
+
+System.getParam.__doc__ = """
+getParam(self, name)
+
+    获取指定的参数
+    
+    :param str name: 参数名称
+    :return: 参数值
+    :raises out_of_range: 无此参数
+"""
+
+System.setParam.__doc__ = """
+setParam(self, name, value)
+    
+    设置参数
+        
+    :param str name: 参数名称
+    :param value: 参数值
+    :type value: int | bool | float | string
+    :raises logic_error: Unsupported type! 不支持的参数类型
+"""
+
+System.getTO.__doc__ = """
+getTO(self)
+
+    获取交易对象，即运行 :py:meth:`System.run` 方法时，stock + query 获取到的 KData
+        
+    :rtype: KData
+"""
+
+System.setTO.__doc__ = """
+setTO(self, kdata)
+
+    设置交易对象，即运行 :py:meth:`System.run` 方法时，stock + query 获取到的 KData
+        
+    :param KData kdata: K线数据
+"""
+
+System.getStock.__doc__ = """
+getStock(self)
+    
+    获取关联的证券
+        
+    :rtype: Stock
+"""
+
+System.getTradeRecordList.__doc__ = """
+getTradeRecordList(self)
+    
+    获取交易记录
+        
+    :rtype: TradeRecordList
+"""
+
+System.getBuyTradeRequest.__doc__ = """
+getBuyTradeRequest(self)
+    
+    获取买入请求，“delay”模式下查看下一时刻是否存在买入操作
+        
+    :rtype: TradeRequest
+"""
+
+System.getSellTradeRequest.__doc__ = """
+getSellTradeRequest(self)
+    
+    获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作
+        
+    :rtype: TradeRequest
+"""
+
 System.run.__doc__ = """
 run(self, stock, query[, reset=True])
     
@@ -153,6 +253,18 @@ run(self, stock, query[, reset=True])
     :param Stock stock: 交易的证券
     :param Query query: K线数据查询条件
     :param bool reset: 是否同时复位所有组件，尤其是tm实例
+"""
+
+System.reset.__doc__ = """
+reset(self)
+    
+    复位操作
+"""
+
+System.clone.__doc__ = """
+clone(self)
+    
+    克隆操作
 """
 
 
@@ -168,7 +280,7 @@ getSystemPartName(part)
         - System.Part.ENVIRONMENT  - "EV"
         - System.Part.CONDITION    - "CN"
         - System.Part.SIGNAL       - "SG"
-        - System.Part.STOPLOSS     - "SL"
+        - System.Part.STOPLOSS     - "ST"
         - System.Part.TAKEPROFIT   - "TP"
         - System.Part.MONEYMANAGER - "MM"
         - System.Part.PROFITGOAL   - "PG"

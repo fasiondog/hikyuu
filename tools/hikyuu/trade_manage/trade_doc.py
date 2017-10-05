@@ -78,7 +78,7 @@ TradeCostBase.__doc__ = """
 TradeCostBase.name.__doc__ = """交易算法名称"""
 
 TradeCostBase.getParam.__doc__ = """
-getParam(name)
+getParam(self, name)
 
     获取指定的参数
     
@@ -88,7 +88,7 @@ getParam(name)
 """
 
 TradeCostBase.setParam.__doc__ = """
-setParam(name, value)
+setParam(self, name, value)
     
     设置参数
         
@@ -99,13 +99,13 @@ setParam(name, value)
 """
 
 TradeCostBase.clone.__doc__ = """
-clone()
+clone(self)
     
     克隆操作
 """
 
 TradeCostBase.getBuyCost.__doc__ = """
-getBuyCost(datetime, stock, price, num)
+getBuyCost(self, datetime, stock, price, num)
     
     【重载接口】获取买入成本
         
@@ -118,20 +118,20 @@ getBuyCost(datetime, stock, price, num)
 """
 
 TradeCostBase.getSellCost.__doc__ = """
-getSellCost()
+getSellCost(self, datetime, stock, price, num)
     
     【重载接口】获取卖出成本
         
     :param Datetime datetime: 卖出时刻
     :param Stock stock: 卖出对象
     :param float price: 卖出价格
-    :param size_t num: 卖出数量
+    :param int num: 卖出数量
     :return: 交易成本记录
     :rtype: CostRecord
 """
 
 TradeCostBase._clone.__doc__ = """
-_clone()
+_clone(self)
     
     【重载接口】子类克隆接口
 """
