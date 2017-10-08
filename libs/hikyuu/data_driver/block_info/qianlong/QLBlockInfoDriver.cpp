@@ -16,24 +16,35 @@ QLBlockInfoDriver::~QLBlockInfoDriver() {
 
 }
 
+bool QLBlockInfoDriver::_init() {
+    return true;
+}
+
 Block QLBlockInfoDriver
 ::getBlock(const string& category, const string& name) {
+    string func_name("[QLBlockInfoDriver::getBlock]");
     Block result(category, name);
-    if (!m_config
-            || !m_config->hasOption("block", "type")
-            || !m_config->hasOption("block", "dir")
-            || !m_config->hasOption("block", category)) {
-        HKU_ERROR("Can't find block configure! [QLBlockInfoDriver::getBlock]");
+    if (!haveParam("dir")) {
+        HKU_ERROR("Missing 'dir' param! " << func_name);
         return result;
     }
 
-    string filename = m_config->get("block", "dir") + "/"
-                    + m_config->get("block", category);
+    if (!haveParam(category)) {
+        HKU_INFO("No such category (" << category << ")!" << func_name);
+        return result;
+    }
+
+    string filename;
+    try {
+        filename = getParam<string>("dir") + "/" + getParam<string>(category);
+    } catch(...) {
+        HKU_ERROR("Maybe parameters errors! " << func_name);
+        return result;
+    }
 
     std::ifstream inifile(filename.c_str(), std::ifstream::in);
     if (!inifile) {
-        HKU_ERROR("Can't open file(" << filename << ")! "
-                "[QLBlockInfoDriver::getBlock]");
+        HKU_ERROR("Can't open file(" << filename << ")! " << func_name);
         return result;
     }
 
@@ -99,20 +110,29 @@ Block QLBlockInfoDriver
 
 
 BlockList QLBlockInfoDriver::getBlockList(const string& category) {
+    string func_name("[QLBlockInfoDriver::getBlockList]");
     BlockList result;
-    if (!m_config
-            || !m_config->hasOption("block", "type")
-            || !m_config->hasOption("block", "dir")) {
-        HKU_ERROR("Can't find block configure! [QLBlockInfoDriver::getBlockList]");
+    if (!haveParam("dir")) {
+        HKU_ERROR("Missing 'dir' param! " << func_name);
         return result;
     }
 
-    string filename = m_config->get("block", "dir") + "/"
-                    + m_config->get("block", category);
+    if (!haveParam(category)) {
+        HKU_INFO("No such category (" << category << ")!" << func_name);
+        return result;
+    }
+
+    string filename;
+    try {
+        filename = getParam<string>("dir") + "/" + getParam<string>(category);
+    } catch(...) {
+        HKU_ERROR("Maybe parameters errors! " << func_name);
+        return result;
+    }
+
     std::ifstream inifile(filename.c_str(), std::ifstream::in);
     if (!inifile) {
-        HKU_ERROR("Can't open file(" << filename << ")! "
-                "[QLBlockInfoDriver::getBlockList]");
+        HKU_ERROR("Can't open file(" << filename << ")! " << func_name);
         return result;
     }
 
@@ -181,16 +201,13 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
 
 BlockList QLBlockInfoDriver::getBlockList() {
     BlockList result;
-    if (!m_config
-            || !m_config->hasOption("block", "type")
-            || !m_config->hasOption("block", "dir")) {
-        HKU_ERROR("Can't find block configure! [QLBlockInfoDriver::getBlockList]");
+    if (!haveParam("dir")) {
+        HKU_ERROR("Missing 'dir' param! [QLBlockInfoDriver::getBlockList]");
         return result;
     }
 
-    string dir = m_config->get("block", "dir") + "/";
-    IniParser::StringListPtr category_list = m_config->getOptionList("block");
-    for (auto iter = category_list->begin(); iter != category_list->end(); ++iter) {
+    StringList category_list = m_params.getNameList();
+    for (auto iter = category_list.begin(); iter != category_list.end(); ++iter) {
         if (*iter == "dir" || *iter == "type")
             continue;
 

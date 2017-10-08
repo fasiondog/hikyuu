@@ -16,12 +16,13 @@ namespace hku {
 
 class SQLiteBaseInfoDriver: public BaseInfoDriver {
 public:
-    SQLiteBaseInfoDriver(const shared_ptr<IniParser>& config);
+    SQLiteBaseInfoDriver(): BaseInfoDriver("sqlite3") {}
     virtual ~SQLiteBaseInfoDriver() { }
 
-    virtual bool loadMarketInfo(MarketInfoMap& out);
-    virtual bool loadStockTypeInfo(StockTypeInfoMap& out);
-    virtual bool loadStock();
+    virtual bool _init();
+    virtual bool _loadMarketInfo();
+    virtual bool _loadStockTypeInfo();
+    virtual bool _loadStock();
 
 private:
     bool _getStockWeightList(hku_uint32, StockWeightList&);

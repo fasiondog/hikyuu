@@ -35,11 +35,13 @@ void export_KReord() {
             ;
 
     KRecordList::const_reference (KRecordList::*KRecordList_at)(KRecordList::size_type) const = &KRecordList::at;
+    void (KRecordList::*append)(const KRecord&) = &KRecordList::push_back;
     class_<KRecordList>("KRecordList")
             .def("__iter__", iterator<KRecordList>())
             .def("size", &KRecordList::size)
             .def("__len__", &KRecordList::size)
             .def("__getitem__", KRecordList_at, return_value_policy<copy_const_reference>())
+            .def("append", append)
             ;
 }
 

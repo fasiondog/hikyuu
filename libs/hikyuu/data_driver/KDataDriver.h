@@ -15,7 +15,7 @@ namespace hku {
 /**
  * K线数据驱动基类
  */
-class KDataDriver {
+class HKU_API KDataDriver {
 public:
     KDataDriver() {}
     KDataDriver(const shared_ptr<IniParser>& config);

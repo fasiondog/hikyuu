@@ -43,4 +43,5 @@ python-extension indicator/_indicator : [ glob indicator/*.cpp ] ;
 python-extension trade_manage/_trade_manage : [ glob trade_manage/*.cpp ] ; 
 python-extension trade_sys/_trade_sys : [ glob trade_sys/*.cpp ] ;
 python-extension trade_instance/_trade_instance : [ glob trade_instance/*.cpp ] ;
+python-extension data_driver/_data_driver : [ glob data_driver/*.cpp ] ;
 

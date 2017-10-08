@@ -63,24 +63,23 @@ void StockManager::init(const string& filename) {
         exit(1);
     }
 
-    BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(m_iniconfig);
-    HKU_TRACE("Loading market information...");
-    if (!base_info->loadMarketInfo(m_marketInfoDict)) {
-        HKU_FATAL("Can't load Market Information.");
-        exit(1);
+    IniParser::StringListPtr block_config = m_iniconfig->getOptionList("block");
+    for (auto iter = block_config->begin(); iter != block_config->end(); ++iter) {
+        string value = m_iniconfig->get("block", *iter);
+        m_blockDriver_params.set<string>(*iter, value);
     }
 
-    HKU_TRACE("Loading stock type information...");
-    if (!base_info->loadStockTypeInfo(m_stockTypeInfo)) {
-        HKU_FATAL("Can't load StockType Information.");
-        exit(1);
+    IniParser::StringListPtr baseinfo_config = m_iniconfig->getOptionList("baseinfo");
+    Parameter baseinfo_params;
+    for (auto iter = baseinfo_config->begin(); iter != baseinfo_config->end(); ++iter) {
+        string value = m_iniconfig->get("baseinfo", *iter);
+        baseinfo_params.set<string>(*iter, value);
     }
 
-    HKU_TRACE("Loading stock information...");
-    if (!base_info->loadStock()) {
-        HKU_FATAL("Can't load Stock");
-        exit(1);
-    }
+    //DataDriverFactory driver;
+    //m_data_driver.regBaseInfoDriver("mysql")
+    BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(baseinfo_params);
+    base_info->loadBaseInfo();
 
     HKU_TRACE("Loading KData...");
     boost::chrono::system_clock::time_point start_time = boost::chrono::system_clock::now();
@@ -153,20 +152,6 @@ StockTypeInfo StockManager::getStockTypeInfo(hku_uint32 type) const {
 }
 
 
-bool StockManager::addStock(const Stock& stock) {
-    auto iter = m_stockDict.find(stock.market_code());
-    if(iter != m_stockDict.end()) {
-        HKU_ERROR("The stock had exist! [StockManager::addStock]");
-        return false;
-    }
-
-    string market_code(stock.market_code());
-    boost::to_upper(market_code);
-    m_stockDict[market_code] = stock;
-    return true;
-}
-
-
 MarketList StockManager::getAllMarket() const {
     MarketList result;
     auto iter = m_marketInfoDict.begin();
@@ -179,7 +164,7 @@ MarketList StockManager::getAllMarket() const {
 
 Block StockManager::getBlock(const string& category, const string& name) {
     Block result;
-    auto block_driver = DataDriverFactory::getBlockDriver(m_iniconfig);
+    auto block_driver = DataDriverFactory::getBlockDriver(m_blockDriver_params);
     if (!block_driver) {
         return result;
     }
@@ -188,7 +173,7 @@ Block StockManager::getBlock(const string& category, const string& name) {
 
 BlockList StockManager::getBlockList(const string& category) {
     BlockList result;
-    auto block_driver = DataDriverFactory::getBlockDriver(m_iniconfig);
+    auto block_driver = DataDriverFactory::getBlockDriver(m_blockDriver_params);
     if (!block_driver) {
         return result;
     }
@@ -197,7 +182,7 @@ BlockList StockManager::getBlockList(const string& category) {
 
 BlockList StockManager::getBlockList() {
     BlockList result;
-    auto block_driver = DataDriverFactory::getBlockDriver(m_iniconfig);
+    auto block_driver = DataDriverFactory::getBlockDriver(m_blockDriver_params);
     if (!block_driver) {
         return result;
     }
@@ -250,6 +235,48 @@ void StockManager::removeTempCsvStock(const string& code) {
     if(iter != m_stockDict.end()) {
         m_stockDict.erase(iter);
     }
+}
+
+
+bool StockManager::addStock(const Stock& stock) {
+    string market_code(stock.market_code());
+    boost::to_upper(market_code);
+    if(m_stockDict.find(market_code) != m_stockDict.end()) {
+        HKU_ERROR("The stock had exist! "
+                << market_code
+                << " [StockManager::addStock]");
+        return false;
+    }
+
+    m_stockDict[market_code] = stock;
+    return true;
+}
+
+
+bool StockManager::addMarketInfo(const MarketInfo& marketInfo) {
+    string market = marketInfo.market();
+    boost::to_upper(market);
+    if (m_marketInfoDict.find(market) != m_marketInfoDict.end()) {
+        HKU_ERROR("The marketInfo had exist! "
+                << market
+                << " [StockManager::addMarketInfo]");
+        return false;
+    }
+
+    m_marketInfoDict[market] = marketInfo;
+    return true;
+}
+
+bool StockManager::addStockTypeInfo(const StockTypeInfo& stkTypeInfo) {
+    if (m_stockTypeInfo.find(stkTypeInfo.type()) != m_stockTypeInfo.end()) {
+        HKU_ERROR("The stockTypeInfo had exist! "
+                << stkTypeInfo.type()
+                << " [StockManager::addStockTypeInfo]");
+        return false;
+    }
+
+    m_stockTypeInfo[stkTypeInfo.type()] = stkTypeInfo;
+    return true;
 }
 
 } /* namespace */

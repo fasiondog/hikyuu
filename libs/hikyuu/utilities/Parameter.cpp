@@ -142,5 +142,9 @@ string Parameter::getNameValueList() const {
     return os.str();
 }
 
+HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
+    return p1.getNameValueList() == p2.getNameValueList();
+}
+
 
 } /* namespace hku */

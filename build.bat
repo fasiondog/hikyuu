@@ -63,6 +63,7 @@ copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\indicator\*.pyd .\tools\hikyuu\in
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\trade_manage\*.pyd .\tools\hikyuu\trade_manage
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\trade_sys\*.pyd .\tools\hikyuu\trade_sys
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\trade_instance\*.pyd .\tools\hikyuu\trade_instance
+copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\data_driver\*.pyd .\tools\hikyuu\data_driver
 
 cd ./test
 bjam -j 4 link=shared threading=multi %ADDRESS_MODEL% 

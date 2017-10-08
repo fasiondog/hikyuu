@@ -10,6 +10,7 @@
 
 #include <hikyuu_utils/iniparser/IniParser.h>
 
+#include "utilities/Parameter.h"
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
@@ -103,6 +104,20 @@ public:
     bool addStock(const Stock& stock);
 
     /**
+     * 初始化时，添加市场信息
+     * @param marketInfo
+     * @return
+     */
+    bool addMarketInfo(const MarketInfo& marketInfo);
+
+    /**
+     * 初始化时，添加证券类型信息
+     * @param stkTypeInfo
+     * @return
+     */
+    bool addStockTypeInfo(const StockTypeInfo& stkTypeInfo);
+
+    /**
      * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试
      * @details 增加的临时Stock，其market为“TMP”
      * @param code 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>
@@ -141,6 +156,8 @@ private:
 private:
     static shared_ptr<StockManager> m_sm;
     shared_ptr<IniParser> m_iniconfig;
+    Parameter m_blockDriver_params;
+
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
 
     typedef unordered_map<string, MarketInfo> MarketInfoMap;

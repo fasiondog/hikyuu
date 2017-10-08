@@ -20,12 +20,13 @@ namespace hku {
 
 class MySQLBaseInfoDriver: public BaseInfoDriver {
 public:
-    MySQLBaseInfoDriver(const shared_ptr<IniParser>& config);
+    MySQLBaseInfoDriver(): BaseInfoDriver("mysql") {}
     virtual ~MySQLBaseInfoDriver();
 
-    virtual bool loadMarketInfo(MarketInfoMap& out);
-    virtual bool loadStockTypeInfo(StockTypeInfoMap& out);
-    virtual bool loadStock();
+    virtual bool _init();
+    virtual bool _loadMarketInfo();
+    virtual bool _loadStockTypeInfo();
+    virtual bool _loadStock();
 
 private:
     bool _getStockWeightList(hku_uint64, StockWeightList&);

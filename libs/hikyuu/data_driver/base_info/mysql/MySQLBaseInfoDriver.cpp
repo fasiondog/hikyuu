@@ -25,30 +25,62 @@ public:
     }
 };
 
-MySQLBaseInfoDriver::MySQLBaseInfoDriver(const shared_ptr<IniParser>& config)
-: BaseInfoDriver(config) {
+
+MySQLBaseInfoDriver::~MySQLBaseInfoDriver() {
+
+}
+
+
+bool MySQLBaseInfoDriver::_init() {
     string func_name(" [MySQLBaseInfoDriver::MySQLBaseInfoDriver]");
-    if (!config) {
-        HKU_ERROR("Null configure!" << func_name);
-        return;
-    }
 
     shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
     if (!mysql){
         HKU_ERROR("Can't create MYSQL instance!" << func_name );
-        return;
+        return false;
     }
 
-    string host = config->get("baseinfo", "host", "127.0.0.1");
-    string usr = config->get("baseinfo", "usr", "roor");
-    string pwd;
-    try {
-        pwd = config->get("baseinfo", "pwd");
-    } catch(...) {
-        HKU_TRACE("PASSWORD is NULL");
+    string host("127.0.0.1");
+    if (haveParam("host")) {
+        host = getParam<string>("host");
+    } else {
+        setParam<string>("host", host);
     }
-    string database = config->get("baseinfo", "db", "stk_base");
-    unsigned int port = config->getInt("baseinfo", "port", "3306");
+
+    string usr("root");
+    if (haveParam("usr")) {
+        usr = getParam<string>("usr");
+    } else {
+        setParam<string>("usr", usr);
+    }
+
+    string pwd;
+    if (haveParam("pwd")) {
+        pwd = getParam<string>("pwd");
+    } else {
+        setParam<string>("pwd", pwd);
+    }
+
+    string database("stk_base");
+    if (haveParam("db")) {
+        database = getParam<string>("db");
+    } else {
+        setParam<string>("db", database);
+    }
+
+    string port_str("3306");
+    if (haveParam("port")) {
+        port_str = getParam<string>("port");
+    } else {
+        setParam<string>("port", port_str);
+    }
+
+    unsigned int port;
+    try {
+        port = boost::lexical_cast<unsigned int>(port_str);
+    } catch(...) {
+        port = 3306;
+    }
 
     HKU_TRACE("MYSQL host: " << host);
     HKU_TRACE("MYSQL port: " << port);
@@ -56,30 +88,26 @@ MySQLBaseInfoDriver::MySQLBaseInfoDriver(const shared_ptr<IniParser>& config)
 
     if (!mysql_init(mysql.get())) {
         HKU_FATAL("Initial MySQL handle error!" << func_name);
-        exit(1);
+        return false;
     }
 
     if (!mysql_real_connect(mysql.get(), host.c_str(), usr.c_str(),
             pwd.c_str(), database.c_str(), port, NULL, 0) ) {
         HKU_FATAL("Failed to connect to database!" << func_name);
-        exit(1);
+        return false;
     }
 
     if (mysql_set_character_set(mysql.get(), "utf8")) {
         HKU_ERROR("mysql_set_character_set error!" << func_name);
-        return;
+        return false;
     }
 
     m_mysql = mysql;
+    return true;
 }
 
 
-MySQLBaseInfoDriver::~MySQLBaseInfoDriver() {
-    // TODO Auto-generated destructor stub
-}
-
-bool MySQLBaseInfoDriver::
-loadMarketInfo(MarketInfoMap& out) {
+bool MySQLBaseInfoDriver::_loadMarketInfo() {
     string func_name(" [MySQLBaseInfoDriver::loadMarketInfo]");
     if (!m_mysql) {
         HKU_ERROR("Null m_mysql!" << func_name);
@@ -102,6 +130,7 @@ loadMarketInfo(MarketInfoMap& out) {
         return false;
     }
 
+    StockManager& sm = StockManager::instance();
     while(row = mysql_fetch_row(result)) {
         string market(row[0]);
         boost::to_upper(market);
@@ -110,8 +139,9 @@ loadMarketInfo(MarketInfoMap& out) {
             last_date = Null<Datetime>();
 
         try {
-            out[market] = MarketInfo(market, HKU_STR(row[1]), HKU_STR(row[2]),
+            MarketInfo marketInfo(market, HKU_STR(row[1]), HKU_STR(row[2]),
                                      row[3], last_date);
+            sm.addMarketInfo(marketInfo);
         } catch(...) {
             HKU_ERROR("Can't get MarketInfo " << market << func_name);
             continue;
@@ -123,8 +153,7 @@ loadMarketInfo(MarketInfoMap& out) {
 }
 
 
-bool MySQLBaseInfoDriver::
-loadStockTypeInfo(StockTypeInfoMap& out) {
+bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
     string func_name(" [MySQLBaseInfoDriver::loadStockTypeInfo]");
     if (!m_mysql) {
         HKU_ERROR("Null m_mysql!" << func_name);
@@ -148,15 +177,17 @@ loadStockTypeInfo(StockTypeInfoMap& out) {
         return false;
     }
 
+    StockManager& sm = StockManager::instance();
     while(row = mysql_fetch_row(result)) {
         hku_uint32 type = boost::lexical_cast<hku_uint32>(row[0]);
         try {
-            out[type] = StockTypeInfo(type, HKU_STR(row[1]),
+            StockTypeInfo stkTypeInfo(type, HKU_STR(row[1]),
                     boost::lexical_cast<price_t>(row[2]),
                     boost::lexical_cast<price_t>(row[3]),
                     boost::lexical_cast<int>(row[4]),
                     boost::lexical_cast<size_t>(row[5]),
                     boost::lexical_cast<size_t>(row[6]));
+            sm.addStockTypeInfo(stkTypeInfo);
         } catch(...) {
             HKU_ERROR("Can't get StockTypeInfo " << type << func_name);
             continue;
@@ -228,7 +259,7 @@ _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
 }
 
 
-bool MySQLBaseInfoDriver::loadStock() {
+bool MySQLBaseInfoDriver::_loadStock() {
     string func_name(" [MySQLBaseInfoDriver::loadStock]");
     if (!m_mysql) {
         HKU_ERROR("Null m_mysql!" << func_name);

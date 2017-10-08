@@ -6,9 +6,7 @@
  */
 
 #include <boost/python.hpp>
-#include <hikyuu/indicator/build_in.h>
 
-using namespace hku;
 using namespace boost::python;
 
 void export_Indicator();

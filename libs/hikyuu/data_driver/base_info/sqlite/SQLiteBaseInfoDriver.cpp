@@ -25,20 +25,15 @@ public:
 };
 
 
-SQLiteBaseInfoDriver::SQLiteBaseInfoDriver(const shared_ptr<IniParser>& config)
-: BaseInfoDriver(config){
-    if (!config) {
-        HKU_ERROR("Null config! [SQLiteBaseInfoDriver::SQLiteBaseInfoDriver]");
-        return;
-    }
-
+bool SQLiteBaseInfoDriver::_init() {
     string dbname;
     try {
-        dbname = config->get("baseinfo", "db");
+        dbname = getParam<string>("db");
         HKU_TRACE("SQLITE3: " << dbname);
     } catch(...) {
         HKU_ERROR("Can't get Sqlite3 filename!"
                 " [SQLiteBaseInfoDriver::SQLiteBaseInfoDriver]");
+        return false;
     }
 
     sqlite3 *db;
@@ -48,17 +43,21 @@ SQLiteBaseInfoDriver::SQLiteBaseInfoDriver(const shared_ptr<IniParser>& config)
         HKU_ERROR("Can't open database: " << sqlite3_errmsg(db) << "("
                 << dbname << ") [SQLiteBaseInfoDriver::SQLiteBaseInfoDriver]");
         sqlite3_close(db);
-    } else {
-        m_db = shared_ptr<sqlite3>(db, Sqlite3Closer());
+        return false;
     }
+
+    m_db = shared_ptr<sqlite3>(db, Sqlite3Closer());
+
+    return true;
 }
 
-bool SQLiteBaseInfoDriver::
-loadMarketInfo(MarketInfoMap& out) {
+
+bool SQLiteBaseInfoDriver::_loadMarketInfo() {
     if (!m_db) {
         return false;
     }
 
+    list<MarketInfo> out;
     char *zErrMsg=0;
     int rc = sqlite3_exec(m_db.get(), "select market,name,"
                             "description,code,lastdate from market",
@@ -68,6 +67,11 @@ loadMarketInfo(MarketInfoMap& out) {
                 << " [SQLiteBaseInfoDriver::loadMarketInfo]");
         sqlite3_free(zErrMsg);
         return false;
+    }
+
+    StockManager& sm = StockManager::instance();
+    for (auto iter = out.begin(); iter != out.end(); ++iter) {
+        sm.addMarketInfo(*iter);
     }
 
     return true;
@@ -95,7 +99,7 @@ int SQLiteBaseInfoDriver::_getMarketTableCallBack(void *out,
 
         MarketInfo marketInfo(market, HKU_STR(azVals[1]),
                 HKU_STR(azVals[2]), azVals[3], datetime);
-        (*(MarketInfoMap *)out)[market] = marketInfo;
+        ((list<MarketInfo> *)out)->push_back(marketInfo);
         result = 0;
 
     }catch(boost::bad_lexical_cast& e){
@@ -110,11 +114,12 @@ int SQLiteBaseInfoDriver::_getMarketTableCallBack(void *out,
     return result;
 }
 
-bool SQLiteBaseInfoDriver::loadStockTypeInfo(StockTypeInfoMap& out) {
+bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
     if (!m_db) {
         return false;
     }
 
+    list<StockTypeInfo> out;
     char *zErrMsg=0;
     int rc = sqlite3_exec(m_db.get(), "select type, description, tick, "
                           "tickValue, precision, minTradeNumber, "
@@ -125,6 +130,11 @@ bool SQLiteBaseInfoDriver::loadStockTypeInfo(StockTypeInfoMap& out) {
                 << " [SQLiteBaseInfoDriver::loadStockTypeInfo]");
         sqlite3_free(zErrMsg);
         return false;
+    }
+
+    StockManager& sm = StockManager::instance();
+    for (auto iter = out.begin(); iter != out.end(); ++iter) {
+        sm.addStockTypeInfo(*iter);
     }
 
     return true;
@@ -145,7 +155,7 @@ int SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack(
                 boost::lexical_cast<int>(azVals[4]),
                 boost::lexical_cast<size_t>(azVals[5]),
                 boost::lexical_cast<size_t>(azVals[6]));
-        (*((StockTypeInfoMap *)out))[type] = stockTypeInfo;
+        ((list<StockTypeInfo> *)out)->push_back(stockTypeInfo);
         result = 0;
     }catch(boost::bad_lexical_cast& e){
         HKU_ERROR("bad_lexical_cast! " << e.what()
@@ -232,7 +242,7 @@ struct StockTable {
     Datetime endDate;
 };
 
-bool SQLiteBaseInfoDriver::loadStock() {
+bool SQLiteBaseInfoDriver::_loadStock() {
     if (!m_db) {
         return false;
     }

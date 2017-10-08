@@ -8,15 +8,31 @@
 #ifndef DATA_DRIVER_BLOCKINFODRIVER_H_
 #define DATA_DRIVER_BLOCKINFODRIVER_H_
 
-#include <hikyuu_utils/iniparser/IniParser.h>
+#include "../utilities/Parameter.h"
 #include "../Block.h"
 
 namespace hku {
 
-class BlockInfoDriver {
+class HKU_API BlockInfoDriver {
+    PARAMETER_SUPPORT
+
 public:
-    BlockInfoDriver(const shared_ptr<IniParser>& config) : m_config(config) {};
+    BlockInfoDriver(const string& name);
     virtual ~BlockInfoDriver() {};
+
+    const string& name() const;
+
+    /**
+     * 驱动初始化
+     * @param params
+     * @return
+     */
+    bool init(const Parameter& params);
+
+    /**
+     * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
+     */
+    virtual bool _init() = 0;
 
     /**
      * 获取指定的板块
@@ -39,11 +55,19 @@ public:
      */
     virtual BlockList getBlockList() = 0;
 
+private:
+    bool checkType();
+
 protected:
-    shared_ptr<IniParser> m_config;
+    string m_name;
 };
 
 typedef shared_ptr<BlockInfoDriver> BlockInfoDriverPtr;
+
+
+inline const string& BlockInfoDriver::name() const {
+    return m_name;
+}
 
 } /* namespace hku */
 #endif /* DATA_DRIVER_BLOCKINFODRIVER_H_ */

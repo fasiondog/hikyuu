@@ -61,6 +61,20 @@ BOOST_AUTO_TEST_CASE( test_Parameter ) {
     BOOST_CHECK_THROW(param.set<float>("n", 10.0), std::logic_error);
     BOOST_CHECK_THROW(param.set<float>("bool", 10.0), std::logic_error);
     BOOST_CHECK_THROW(param.set<float>("double", 10.0), std::logic_error);
+
+    /** @arg 测试相等比较 */
+    Parameter p1, p2;
+    p1.set<string>("string", "test");
+    p1.set<bool>("bool", true);
+    p1.set<double>("double", 0.01);
+    p1.set<string>("test", "test2");
+
+    p2.set<double>("double", 0.01);
+    p2.set<string>("test", "test2");
+    p2.set<string>("string", "test");
+    p2.set<bool>("bool", true);
+
+    BOOST_CHECK(p1==p2);
 }
 
 
