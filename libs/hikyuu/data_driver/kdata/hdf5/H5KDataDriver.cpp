@@ -1,11 +1,12 @@
 /*
- * H5KDataDriverImp.cpp
+ * H5KDataDriver.cpp
  *
- *  Created on: 2014年9月2日
- *      Author: fasiondog
+ *  Created on: 2017年10月11日
+ *      Author: Administrator
  */
 
-#include "H5KDataDriverImp.h"
+#include <boost/algorithm/string.hpp>
+#include "H5KDataDriver.h"
 
 namespace hku {
 
@@ -20,10 +21,7 @@ public:
     }
 };
 
-
-H5KDataDriverImp::H5KDataDriverImp(const shared_ptr<IniParser>& config,
-        const string& filename): KDataDriverImp(config) {
-    string func_name(" [H5KDataDriverImp::H5KDataDriverImp]");
+H5KDataDriver::H5KDataDriver(): KDataDriver("hdf5") {
     m_h5DataType = H5::CompType(sizeof(H5Record));
     m_h5DataType.insertMember("datetime",HOFFSET(H5Record,datetime),H5::PredType::NATIVE_UINT64);
     m_h5DataType.insertMember("openPrice",HOFFSET(H5Record,openPrice),H5::PredType::NATIVE_UINT);
@@ -36,31 +34,68 @@ H5KDataDriverImp::H5KDataDriverImp(const shared_ptr<IniParser>& config,
     m_h5IndexType = H5::CompType(sizeof(H5IndexRecord));
     m_h5IndexType.insertMember("datetime",HOFFSET(H5IndexRecord,datetime),H5::PredType::NATIVE_UINT64);
     m_h5IndexType.insertMember("start",HOFFSET(H5IndexRecord,start),H5::PredType::NATIVE_UINT64);
+}
 
+H5KDataDriver::~H5KDataDriver() {
+
+}
+
+bool H5KDataDriver::_init() {
     //关闭HDF异常自动打印
     H5::Exception::dontPrint();
 
-    try {
+    StringList keys = m_params.getNameList();
+    string filename;
+    for (auto iter = keys.begin(); iter != keys.end(); ++iter) {
+        size_t pos = iter->find("_");
+        if (pos == string::npos || pos == 0 || pos == iter->size()-1)
+            continue;
 
-        //H5::FileAccPropList acc_prop = H5::FileAccPropList(H5::FileAccPropList::DEFAULT);
-        //acc_prop.setCore(1, 0);
-        //m_h5file = H5FilePtr(new H5::H5File(filename,
-        //               H5F_ACC_RDONLY, H5::FileCreatPropList::DEFAULT, acc_prop),
-        //             Hdf5FileCloser());
+        string market = iter->substr(0, pos);
+        string ktype = iter->substr(pos+1);
+        boost::to_upper(market);
+        boost::to_upper(ktype);
 
-        m_h5file = H5FilePtr(new H5::H5File(filename,
-                       H5F_ACC_RDONLY), Hdf5FileCloser());
-    } catch(...) {
-        HKU_ERROR("Can't open h5file: " << filename << func_name);
+        try {
+            if (ktype == KQuery::getKTypeName(KQuery::DAY)) {
+                filename = getParam<string>(*iter);
+                H5FilePtr h5file(new H5::H5File(filename,
+                                 H5F_ACC_RDONLY), Hdf5FileCloser());
+                m_h5file_map[market+"_DAY"] = h5file;
+                m_h5file_map[market+"_WEEK"] = h5file;
+                m_h5file_map[market+"_MONTH"] = h5file;
+                m_h5file_map[market+"_QUARTER"] = h5file;
+                m_h5file_map[market+"_HALFYEAR"] = h5file;
+                m_h5file_map[market+"_YEAR"] = h5file;
+
+            } else if (ktype == KQuery::getKTypeName(KQuery::MIN)) {
+                filename = getParam<string>(*iter);
+                H5FilePtr h5file(new H5::H5File(filename,
+                                 H5F_ACC_RDONLY), Hdf5FileCloser());
+                m_h5file_map[market+"_MIN"] = h5file;
+
+            } else if (ktype == KQuery::getKTypeName(KQuery::MIN5)) {
+                filename = getParam<string>(*iter);
+                H5FilePtr h5file(new H5::H5File(filename,
+                                 H5F_ACC_RDONLY), Hdf5FileCloser());
+                m_h5file_map[market+"_MIN5"] = h5file;
+                m_h5file_map[market+"_MIN15"] = h5file;
+                m_h5file_map[market+"_MIN30"] = h5file;
+                m_h5file_map[market+"_MIN60"] = h5file;
+            }
+
+        } catch(...) {
+            HKU_ERROR("Can't open h5file: "
+                      << filename
+                      << " [H5KDataDriver::_init]");
+        }
     }
+
+    return true;
 }
 
-H5KDataDriverImp::~H5KDataDriverImp() {
 
-}
-
-
-void H5KDataDriverImp
+void H5KDataDriver
 ::H5ReadRecords(H5::DataSet& dataset, hsize_t start,
                 hsize_t nrecords, void *data) {
     H5::DataSpace dataspace = dataset.getSpace();
@@ -76,8 +111,7 @@ void H5KDataDriverImp
     return;
 }
 
-
-void H5KDataDriverImp
+void H5KDataDriver
 ::H5ReadIndexRecords(H5::DataSet& dataset, hsize_t start,
                 hsize_t nrecords, void *data) {
     H5::DataSpace dataspace = dataset.getSpace();
@@ -93,8 +127,7 @@ void H5KDataDriverImp
     return;
 }
 
-
-void H5KDataDriverImp::loadKData(const string& market, const string& code,
+void H5KDataDriver::loadKData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
         KRecordList* out_buffer) {
     if (NULL == out_buffer || KQuery::INVALID_KTYPE <= kType
@@ -113,7 +146,7 @@ void H5KDataDriverImp::loadKData(const string& market, const string& code,
     return;
 }
 
-void H5KDataDriverImp::
+void H5KDataDriver::
 _loadBaseData(const string& market, const string& code, KQuery::KType kType,
         size_t start_ix, size_t end_ix, KRecordList* out_buffer) {
     H5FilePtr h5file;
@@ -163,7 +196,7 @@ _loadBaseData(const string& market, const string& code, KQuery::KType kType,
 }
 
 
-void H5KDataDriverImp::
+void H5KDataDriver::
 _loadIndexData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
         KRecordList *out_buffer) {
@@ -247,11 +280,14 @@ _loadIndexData(const string& market, const string& code,
     return;
 }
 
-bool H5KDataDriverImp::
+bool H5KDataDriver::
 _getH5FileAndGroup(const string& market, const string& code,
         KQuery::KType kType, H5FilePtr& out_file, H5::Group& out_group) {
     try {
-        out_file = m_h5file;
+        string key(market + "_" + KQuery::getKTypeName(kType));
+        boost::to_upper(key);
+
+        out_file = m_h5file_map[key];
 
         if (!out_file) {
             return false;
@@ -294,14 +330,14 @@ _getH5FileAndGroup(const string& market, const string& code,
             return false;
         }
     } catch(...) {
-        HKU_ERROR("[H5KDataDriver2::_getH5FileAndGroup] Exception of some HDF5 operator!");
+        HKU_ERROR("[H5KDataDriver::_getH5FileAndGroup] Exception of some HDF5 operator!");
         return false;
     }
 
     return true;
 }
 
-size_t H5KDataDriverImp
+size_t H5KDataDriver
 ::getCount(const string& market, const string& code, KQuery::KType kType) {
     H5FilePtr h5file;
     H5::Group group;
@@ -327,7 +363,7 @@ size_t H5KDataDriverImp
     return total;
 }
 
-KRecord H5KDataDriverImp
+KRecord H5KDataDriver
 ::getKRecord(const string& market, const string& code,
           size_t pos, KQuery::KType kType) {
     string tablename(market + code);
@@ -340,7 +376,7 @@ KRecord H5KDataDriverImp
 }
 
 
-KRecord H5KDataDriverImp::
+KRecord H5KDataDriver::
 _getBaseRecord(const string& market, const string& code,
         size_t pos, KQuery::KType kType) {
     assert( KQuery::DAY == kType
@@ -387,7 +423,7 @@ _getBaseRecord(const string& market, const string& code,
     return result;
 }
 
-KRecord H5KDataDriverImp
+KRecord H5KDataDriver
 ::_getOtherRecord(const string& market, const string& code,
         size_t pos, KQuery::KType kType) {
     assert(KQuery::MIN15 == kType
@@ -474,7 +510,7 @@ KRecord H5KDataDriverImp
 }
 
 
-bool H5KDataDriverImp::
+bool H5KDataDriver::
 getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
         size_t& out_start, size_t& out_end) {
     assert(KQuery::DATE == query.queryType());
@@ -493,7 +529,7 @@ getIndexRangeByDate(const string& market, const string& code, const KQuery& quer
 }
 
 
-bool H5KDataDriverImp::
+bool H5KDataDriver::
 _getBaseIndexRangeByDate(const string& market, const string& code,
         const KQuery& query, size_t& out_start, size_t& out_end) {
     assert( KQuery::DATE == query.queryType());
@@ -617,7 +653,7 @@ _getBaseIndexRangeByDate(const string& market, const string& code,
 }
 
 
-bool H5KDataDriverImp::
+bool H5KDataDriver::
 _getOtherIndexRangeByDate(const string& market, const string& code,
         const KQuery& query, size_t& out_start, size_t& out_end) {
     assert( KQuery::DATE == query.queryType() );

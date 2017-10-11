@@ -10,6 +10,9 @@
 using namespace boost::python;
 using namespace hku;
 
+bool (*parameter_eq)(const Parameter&, const Parameter&) = &operator==;
+bool (*parameter_lt)(const Parameter&, const Parameter&) = &operator<;
+
 void export_Parameter() {
 
     to_python_converter<boost::any, AnyToPython>();
@@ -29,5 +32,8 @@ void export_Parameter() {
             .def_pickle(normal_pickle_suite<Parameter>())
 #endif
             ;
+
+    def("parameter_eq", parameter_eq);
+    def("parameter_lt", parameter_lt);
 }
 

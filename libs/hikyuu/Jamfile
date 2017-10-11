@@ -28,7 +28,6 @@ lib hikyuu : [ glob-tree *.cpp ]
                  /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
                  /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
                  /usr/local/lib/liblog4cplus.so
-                 /usr/lib/x86_64-linux-gnu/libmysqlclient.so
                : <toolset>gcc
                   ; 
 
@@ -40,7 +39,6 @@ lib hikyuu : [ glob-tree *.cpp ]
                  /usr/lib/x86_64-linux-gnu/libhdf5_cpp.so
                  /usr/lib/x86_64-linux-gnu/libhdf5_hl_cpp.so
                  /usr/local/lib/liblog4cplus.so
-                 /usr/lib/x86_64-linux-gnu/libmysqlclient.so
                : <toolset>clang
                   ; 
 
@@ -50,7 +48,6 @@ lib hikyuu : [ glob-tree *.cpp ]
                  ../../extern-libs/hdf5/dll/hdf5_cppdll.lib
                  ../../extern-libs/hdf5/dll/hdf5_hl_cppdll.lib
                  ../../extern-libs/log4cplus/dll/log4cplus.lib
-                 ../../extern-libs/mysql/lib/libmysql.lib
               :  <toolset>msvc
                  <link>shared
                  <define>SQLITE_API="__declspec(dllimport)"
@@ -67,7 +64,6 @@ lib hikyuu : [ glob-tree *.cpp ]
                  ../../extern-libs/hdf5/dll/hdf5_cppdll.lib
                  ../../extern-libs/hdf5/dll/hdf5_hl_cppdll.lib
                  ../../extern-libs/log4cplus/dll/log4cplus.lib
-                 ../../extern-libs/mysql/lib/libmysql.lib
              : <toolset>msvc
                <link>static
                <define>BOOST_SYSTEM_STATIC_LINK

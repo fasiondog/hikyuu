@@ -9,12 +9,16 @@
 #define KDATADRIVERIMP_H_
 
 #include <hikyuu_utils/iniparser/IniParser.h>
+#include "../utilities/Parameter.h"
 #include "../KData.h"
 
 namespace hku {
 
-class KDataDriverImp {
+class HKU_API KDataDriverImp {
+    PARAMETER_SUPPORT
+
 public:
+    KDataDriverImp(const Parameter& params): m_params(params) {}
     KDataDriverImp(const shared_ptr<IniParser>& config): m_config(config) {}
     virtual ~KDataDriverImp(){}
 

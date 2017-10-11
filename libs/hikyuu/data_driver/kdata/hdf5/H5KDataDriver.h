@@ -1,37 +1,32 @@
 /*
- * H5KDataDriverImp.h
+ * H5KDataDriver.h
  *
- *  Created on: 2014年9月2日
- *      Author: fasiondog
+ *  Created on: 2017年10月11日
+ *      Author: Administrator
  */
 
-#ifndef H5KDATADRIVERIMP_H_
-#define H5KDATADRIVERIMP_H_
+#ifndef DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_
+#define DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_
 
+#include "../../KDataDriver.h"
 #include "H5Record.h"
-#include "../../KDataDriverImp.h"
 
 namespace hku {
 
-class H5KDataDriverImp: public KDataDriverImp {
+class H5KDataDriver: public KDataDriver {
 public:
-    H5KDataDriverImp(const shared_ptr<IniParser>&, const string& filename);
-    virtual ~H5KDataDriverImp();
+    H5KDataDriver();
+    virtual ~H5KDataDriver();
 
+    virtual bool _init();
     virtual void loadKData(const string& market, const string& code,
             KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer);
-
-    virtual size_t getCount(const string& market,
-                            const string& code,
-                            KQuery::KType kType);
-
-    virtual bool
-    getIndexRangeByDate(const string& market, const string& code,
+            KRecordList* out_buffer) ;
+    virtual size_t getCount(const string& market, const string& code,
+            KQuery::KType kType);
+    virtual bool getIndexRangeByDate(const string& market, const string& code,
             const KQuery& query, size_t& out_start, size_t& out_end);
-
-    virtual KRecord
-    getKRecord(const string& market, const string& code,
+    virtual KRecord getKRecord(const string& market, const string& code,
               size_t pos, KQuery::KType kType);
 
 private:
@@ -63,8 +58,9 @@ private:
     H5::CompType m_h5DataType;
     H5::CompType m_h5IndexType;
     H5FilePtr m_h5file;
+    map<string, H5FilePtr> m_h5file_map; // key: market+code
 };
 
 } /* namespace hku */
 
-#endif /* H5KDATADRIVERIMP_H_ */
+#endif /* DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_ */

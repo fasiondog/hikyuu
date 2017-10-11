@@ -13,6 +13,7 @@
 #include "StockManager.h"
 #include "data_driver/DataDriverFactory.h"
 #include "data_driver/KDataTempCsvDriver.h"
+#include "data_driver/kdata/hdf5/H5KDataDriver.h"
 
 namespace hku {
 
@@ -84,7 +85,15 @@ void StockManager::init(const string& filename) {
     HKU_TRACE("Loading KData...");
     boost::chrono::system_clock::time_point start_time = boost::chrono::system_clock::now();
 
-    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_iniconfig);
+    IniParser::StringListPtr option = m_iniconfig->getOptionList("kdata");
+    Parameter params;
+    for (auto iter = option->begin(); iter != option->end(); ++iter) {
+        params.set<string>(*iter, m_iniconfig->get("kdata", *iter));
+    }
+
+    DataDriverFactory::regKDataDriver(KDataDriverPtr(new H5KDataDriver));
+    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(params);
+    //KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_iniconfig);
 
     bool preload_day = m_iniconfig->getBool("preload", "day", "false");
     bool preload_week = m_iniconfig->getBool("preload", "week", "false");

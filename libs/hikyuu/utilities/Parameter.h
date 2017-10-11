@@ -288,6 +288,7 @@ void Parameter::set(const string& name, const ValueType& value) {
 
 
 HKU_API bool operator==(const Parameter&, const Parameter&);
+HKU_API bool operator<(const Parameter&, const Parameter&);
 
 } /* namespace hku */
 #endif /* PARAMETER_H_ */

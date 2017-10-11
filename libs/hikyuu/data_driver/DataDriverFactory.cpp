@@ -6,17 +6,12 @@
  */
 
 #include <boost/algorithm/string.hpp>
-#include "base_info/mysql/MySQLBaseInfoDriver.h"
 #include "base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "block_info/qianlong/QLBlockInfoDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
 namespace hku {
-
-//DataDriverFactory::DataDriverFactory() {
-//    m_baseInfoDrivers["SQLITE3"] = make_shared<SQLiteBaseInfoDriver>();
-//}
 
 map<string, BaseInfoDriverPtr> default_baseinfo_driver() {
     map<string, BaseInfoDriverPtr> result;
@@ -32,39 +27,9 @@ map<string, BlockInfoDriverPtr> default_block_driver() {
 
 map<string, BaseInfoDriverPtr> DataDriverFactory::m_baseInfoDrivers(default_baseinfo_driver());
 map<string, BlockInfoDriverPtr> DataDriverFactory::m_blockDrivers(default_block_driver());
+map<string, KDataDriverPtr> DataDriverFactory::m_kdataDrivers;
+map<Parameter, KDataDriverPtr> DataDriverFactory::m_param_kdataDrivers;
 
-KDataDriverPtr DataDriverFactory::
-getKDataDriver(const shared_ptr<IniParser>& ini) {
-    string func_name(" [DataDriverFactory::getKDataDriver]");
-    KDataDriverPtr  result;
-    if (!ini) {
-        HKU_ERROR("Null configure ini!" << func_name);
-        return result;
-    }
-
-    result = make_shared<KDataDriver>(ini);
-    return result;
-}
-
-/*BlockInfoDriverPtr DataDriverFactory::
-getBlockDriver(const shared_ptr<IniParser>& ini) {
-    string func_name(" [DataDriverFactory::getBlockDriver]");
-    BlockInfoDriverPtr result;
-    if (!ini) {
-        HKU_ERROR("Null configure ini!" << func_name);
-        return result;
-    }
-
-    if (!ini->hasOption("block", "type")) {
-        return result;
-    }
-
-    string type = ini->get("block", "type");
-    if (type == "qianlong") {
-        result = make_shared<QLBlockInfoDriver>(ini);
-    }
-    return result;
-}*/
 
 void DataDriverFactory
 ::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
@@ -141,6 +106,57 @@ BlockInfoDriverPtr DataDriverFactory::getBlockDriver(const Parameter& params) {
     }
 
     result->init(params);
+    return result;
+}
+
+
+void DataDriverFactory::regKDataDriver(const KDataDriverPtr& driver) {
+    string new_type(driver->name());
+    boost::to_upper(new_type);
+    m_kdataDrivers[new_type] = driver;
+}
+
+void DataDriverFactory::removeKDataDriver(const string& name) {
+    string new_name(name);
+    boost::to_upper(new_name);
+    m_kdataDrivers.erase(new_name);
+    auto iter = m_param_kdataDrivers.begin();
+    for (; iter != m_param_kdataDrivers.end(); ++iter) {
+        string new_type(iter->first.get<string>("type"));
+        boost::to_upper(new_type);
+        if (new_type == new_name) {
+            break;
+        }
+    }
+
+    if (iter != m_param_kdataDrivers.end()) {
+        m_param_kdataDrivers.erase(iter);
+    }
+}
+
+KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
+    KDataDriverPtr result;
+    auto param_iter = m_param_kdataDrivers.find(params);
+    if (param_iter != m_param_kdataDrivers.end()) {
+        result = param_iter->second;
+        return result;
+    }
+
+    string name;
+    try {
+        name = params.get<string>("type");
+    } catch (...) {
+        return result;
+    }
+
+    boost::to_upper(name);
+    auto iter = m_kdataDrivers.find(name);
+    if (iter != m_kdataDrivers.end()) {
+        result = iter->second;
+        result->init(params);
+        m_param_kdataDrivers[params] = result;
+    }
+
     return result;
 }
 

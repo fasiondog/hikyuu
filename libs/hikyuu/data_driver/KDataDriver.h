@@ -8,6 +8,7 @@
 #ifndef KDATADRIVER_H_
 #define KDATADRIVER_H_
 
+#include "../utilities/Parameter.h"
 #include "KDataDriverImp.h"
 
 namespace hku {
@@ -16,10 +17,20 @@ namespace hku {
  * K线数据驱动基类
  */
 class HKU_API KDataDriver {
+    PARAMETER_SUPPORT
+
 public:
     KDataDriver() {}
-    KDataDriver(const shared_ptr<IniParser>& config);
+    KDataDriver(const string& name);
     virtual ~KDataDriver() { }
+
+    const string& name() const;
+
+    bool init(const Parameter&);
+
+    virtual bool _init() {
+        return true;
+    }
 
     /**
      * 将指定类型的K线数据加载至缓存
@@ -68,14 +79,19 @@ public:
               size_t pos, KQuery::KType kType);
 
 private:
-    KDataDriverImpPtr _getImpPtr(const string& market, KQuery::KType);
+    bool checkType();
 
 private:
-    map<KQuery::KType, string> m_suffix;
-    map<string, KDataDriverImpPtr> m_imp; /* key: market + _day */
+    string m_name;
 };
 
+
 typedef shared_ptr<KDataDriver> KDataDriverPtr;
+
+
+inline const string& KDataDriver::name() const {
+    return m_name;
+}
 
 } /* namespace */
 
