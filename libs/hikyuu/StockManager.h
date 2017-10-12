@@ -19,6 +19,8 @@ namespace hku {
 
 typedef vector<string> MarketList;
 
+Parameter default_preload_param();
+
 /**
  * 证券信息统一管理类
  * @ingroup StockManage
@@ -34,6 +36,13 @@ public:
      * @param filename 配置ini文件名
      */
     void init(const string& filename);
+
+    void StockManager::init(
+            const Parameter& p1,
+            const Parameter& baseInfoParam,
+            const Parameter& blockParam,
+            const Parameter& kdataParam,
+            const Parameter& preloadParam = default_preload_param());
 
     /**
      * 获取用于保存零时变量等的临时目录，如为配置则为当前目录
@@ -155,6 +164,7 @@ private:
 
 private:
     static shared_ptr<StockManager> m_sm;
+    string m_tmpdir;
     shared_ptr<IniParser> m_iniconfig;
     Parameter m_blockDriver_params;
 

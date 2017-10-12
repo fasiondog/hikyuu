@@ -1,14 +1,14 @@
 /*
- * TdxKDataDriverImp.cpp
+ * TdxKDataDriver.cpp
  *
- *  Created on: 2016年8月15日
- *      Author: Administrator
+ *  Created on: 2017年10月12日
+ *      Author: fasiondog
  */
 
 #include <fstream>
 #include <cmath>
 #include <sys/stat.h>
-#include "TdxKDataDriverImp.h"
+#include "TdxKDataDriver.h"
 
 namespace hku {
 
@@ -71,19 +71,26 @@ struct TdxMinData {
     }
 };
 
-
-TdxKDataDriverImp::TdxKDataDriverImp(
-        const shared_ptr<IniParser>& config,
-        const string& dirname)
-: KDataDriverImp(config), m_dirname(dirname) {
+TdxKDataDriver::TdxKDataDriver(): KDataDriver("tdx") {
 
 }
 
-TdxKDataDriverImp::~TdxKDataDriverImp() {
-    // TODO Auto-generated destructor stub
+TdxKDataDriver::~TdxKDataDriver() {
+
 }
 
-void TdxKDataDriverImp::
+bool TdxKDataDriver::_init() {
+    try {
+        m_dirname = getParam<string>("dir");
+
+    } catch(...) {
+        return false;
+    }
+
+    return true;
+}
+
+void TdxKDataDriver::
 loadKData(const string& market, const string& code,
         KQuery::KType ktype, size_t start_ix, size_t end_ix,
         KRecordList* out_buffer) {
@@ -115,7 +122,7 @@ loadKData(const string& market, const string& code,
 }
 
 
-void TdxKDataDriverImp::
+void TdxKDataDriver::
 _loadDayKData(const string& market, const string& code,
         KQuery::KType ktype, size_t start_ix, size_t end_ix,
         KRecordList* out_buffer) {
@@ -149,7 +156,7 @@ _loadDayKData(const string& market, const string& code,
     return;
 }
 
-void TdxKDataDriverImp::
+void TdxKDataDriver::
 _loadMinKData(const string& market, const string& code,
         KQuery::KType ktype, size_t start_ix, size_t end_ix,
         KRecordList* out_buffer) {
@@ -184,7 +191,7 @@ _loadMinKData(const string& market, const string& code,
 }
 
 
-KRecord TdxKDataDriverImp::
+KRecord TdxKDataDriver::
 getKRecord(const string& market, const string& code,
           size_t pos, KQuery::KType ktype) {
     KRecord record;
@@ -216,7 +223,7 @@ getKRecord(const string& market, const string& code,
 }
 
 
-KRecord TdxKDataDriverImp::
+KRecord TdxKDataDriver::
 _getDayKRecord(const string& market, const string& code,
         size_t pos, KQuery::KType ktype) {
     assert(KQuery::DAY == ktype);
@@ -242,7 +249,7 @@ _getDayKRecord(const string& market, const string& code,
 }
 
 
-KRecord TdxKDataDriverImp::
+KRecord TdxKDataDriver::
 _getMinKRecord(const string& market, const string& code,
         size_t pos, KQuery::KType ktype) {
     assert(KQuery::MIN == ktype || KQuery::MIN5 == ktype);
@@ -269,7 +276,7 @@ _getMinKRecord(const string& market, const string& code,
 }
 
 
-bool TdxKDataDriverImp::
+bool TdxKDataDriver::
 getIndexRangeByDate(const string& market, const string& code,
         const KQuery& query, size_t& out_start, size_t& out_end) {
     assert(KQuery::DATE == query.queryType());
@@ -289,7 +296,7 @@ getIndexRangeByDate(const string& market, const string& code,
     return false;
 }
 
-bool TdxKDataDriverImp::
+bool TdxKDataDriver::
 _getDayIndexRangeByDate(const string& market, const string& code,
         const KQuery& query, size_t& out_start, size_t& out_end) {
     out_start = 0;
@@ -396,7 +403,7 @@ _getDayIndexRangeByDate(const string& market, const string& code,
 }
 
 
-bool TdxKDataDriverImp::
+bool TdxKDataDriver::
 _getMinIndexRangeByDate(const string& market, const string& code,
         const KQuery& query, size_t& out_start, size_t& out_end) {
     out_start = 0;
@@ -503,7 +510,7 @@ _getMinIndexRangeByDate(const string& market, const string& code,
 }
 
 
-string TdxKDataDriverImp::
+string TdxKDataDriver::
 _getFileName(const string& market, const string& code, KQuery::KType ktype) {
     string filename;
     switch (ktype) {
@@ -534,7 +541,7 @@ _getFileName(const string& market, const string& code, KQuery::KType ktype) {
     return filename;
 }
 
-size_t TdxKDataDriverImp::
+size_t TdxKDataDriver::
 getCount(const string& market, const string& code, KQuery::KType ktype) {
     size_t count = 0;
     if (KQuery::DAY == ktype || KQuery::MIN5 == ktype || KQuery::MIN == ktype) {
@@ -545,7 +552,7 @@ getCount(const string& market, const string& code, KQuery::KType ktype) {
 }
 
 
-size_t TdxKDataDriverImp::
+size_t TdxKDataDriver::
 _getBaseCount(const string& market, const string& code, KQuery::KType ktype) {
     assert(KQuery::DAY == ktype || KQuery::MIN5 == ktype || KQuery::MIN == ktype);
     string filename = _getFileName(market, code ,ktype);

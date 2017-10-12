@@ -1,39 +1,32 @@
 /*
- * TdxKDataDriverImp.h
+ * TdxKDataDriver.h
  *
- *  Created on: 2016年8月15日
- *      Author: Administrator
+ *  Created on: 2017年10月12日
+ *      Author: fasiondog
  */
 
-#ifndef DATA_DRIVER_KDATA_TDX_TDXKDATADRIVERIMP_H_
-#define DATA_DRIVER_KDATA_TDX_TDXKDATADRIVERIMP_H_
+#ifndef DATA_DRIVER_KDATA_TDX_TDXKDATADRIVER_H_
+#define DATA_DRIVER_KDATA_TDX_TDXKDATADRIVER_H_
 
-#include "../../KDataDriverImp.h"
+#include "../../KDataDriver.h"
 
 namespace hku {
 
-/*
- * 通达信K线数据读取实现
- */
-class TdxKDataDriverImp: public KDataDriverImp {
+class TdxKDataDriver: public KDataDriver {
 public:
-    TdxKDataDriverImp(const shared_ptr<IniParser>&, const string&);
-    virtual ~TdxKDataDriverImp();
+    TdxKDataDriver();
+    virtual ~TdxKDataDriver();
+
+    virtual bool _init();
 
     virtual void loadKData(const string& market, const string& code,
-            KQuery::KType kyype, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer);
-
-    virtual size_t
-    getCount(const string& market, const string& code,
-             KQuery::KType ktype);
-
-    virtual bool
-    getIndexRangeByDate(const string& market, const string& code,
+            KQuery::KType kType, size_t start_ix, size_t end_ix,
+            KRecordList* out_buffer) ;
+    virtual size_t getCount(const string& market, const string& code,
+            KQuery::KType kType);
+    virtual bool getIndexRangeByDate(const string& market, const string& code,
             const KQuery& query, size_t& out_start, size_t& out_end);
-
-    virtual KRecord
-    getKRecord(const string& market, const string& code,
+    virtual KRecord getKRecord(const string& market, const string& code,
               size_t pos, KQuery::KType kType);
 
 private:
@@ -63,4 +56,4 @@ private:
 
 } /* namespace hku */
 
-#endif /* DATA_DRIVER_KDATA_TDX_TDXKDATADRIVERIMP_H_ */
+#endif /* DATA_DRIVER_KDATA_TDX_TDXKDATADRIVER_H_ */

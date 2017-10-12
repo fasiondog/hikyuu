@@ -2,7 +2,7 @@
  * H5KDataDriver.h
  *
  *  Created on: 2017年10月11日
- *      Author: Administrator
+ *      Author: fasiondog
  */
 
 #ifndef DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_

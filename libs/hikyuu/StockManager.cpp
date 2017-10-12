@@ -13,7 +13,10 @@
 #include "StockManager.h"
 #include "data_driver/DataDriverFactory.h"
 #include "data_driver/KDataTempCsvDriver.h"
+#include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
+#include "data_driver/block_info/qianlong/QLBlockInfoDriver.h"
 #include "data_driver/kdata/hdf5/H5KDataDriver.h"
+#include "data_driver/kdata/tdx/TdxKDataDriver.h"
 
 namespace hku {
 
@@ -29,6 +32,55 @@ StockManager& StockManager::instance() {
         m_sm = shared_ptr<StockManager>(new StockManager());
     }
     return (*m_sm);
+}
+
+
+Parameter default_preload_param() {
+    Parameter param;
+    param.set<bool>("day", true);
+    param.set<bool>("week", false);
+    param.set<bool>("month", false);
+    param.set<bool>("quarter", false);
+    param.set<bool>("halfyear", false);
+    param.set<bool>("year", false);
+    param.set<bool>("min", false);
+    param.set<bool>("min5", false);
+    param.set<bool>("min15", false);
+    param.set<bool>("min30", false);
+    param.set<bool>("min60", false);
+    return param;
+}
+
+void StockManager::init(
+        const Parameter& hikyuuParam,
+        const Parameter& baseInfoParam,
+        const Parameter& blockParam,
+        const Parameter& kdataParam,
+        const Parameter& preloadParam) {
+
+    //初始化注册默认支持的数据驱动
+    DataDriverFactory::regBaseInfoDriver(BaseInfoDriverPtr(new SQLiteBaseInfoDriver));
+    DataDriverFactory::regBlockDriver(BlockInfoDriverPtr(new QLBlockInfoDriver));
+    DataDriverFactory::regKDataDriver(KDataDriverPtr(new TdxKDataDriver));
+    DataDriverFactory::regKDataDriver(KDataDriverPtr(new H5KDataDriver));
+
+    try {
+        m_tmpdir = hikyuuParam.get<string>("tmpdir");
+    } catch (...) {
+        m_tmpdir = "";
+    }
+
+    try {
+        string logger = hikyuuParam.get<string>("logger");
+        init_logger(logger);
+    } catch(...) {
+        init_logger("");
+    }
+
+    BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
+    base_info->loadBaseInfo();
+
+
 }
 
 
@@ -52,6 +104,8 @@ void StockManager::init(const string& filename) {
         HKU_WARN("Reading configure error! Don't know  error!");
         exit(1);
     }
+
+    m_tmpdir = m_iniconfig->get("tmpdir", "tmpdir", ".");
 
     if (m_iniconfig->hasSection("logger")) {
         init_logger(m_iniconfig->get("logger", "properties", ""));
@@ -91,9 +145,9 @@ void StockManager::init(const string& filename) {
         params.set<string>(*iter, m_iniconfig->get("kdata", *iter));
     }
 
+    DataDriverFactory::regKDataDriver(KDataDriverPtr(new TdxKDataDriver));
     DataDriverFactory::regKDataDriver(KDataDriverPtr(new H5KDataDriver));
     KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(params);
-    //KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_iniconfig);
 
     bool preload_day = m_iniconfig->getBool("preload", "day", "false");
     bool preload_week = m_iniconfig->getBool("preload", "week", "false");
@@ -123,9 +177,8 @@ void StockManager::init(const string& filename) {
 }
 
 
-
 string StockManager::tmpdir() const {
-    return m_iniconfig->get("tmpdir", "tmpdir", ".");
+    return m_tmpdir;
 }
 
 
