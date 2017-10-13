@@ -11,6 +11,7 @@
 #include <hikyuu_utils/iniparser/IniParser.h>
 
 #include "utilities/Parameter.h"
+#include "data_driver/BlockInfoDriver.h"
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
@@ -20,6 +21,7 @@ namespace hku {
 typedef vector<string> MarketList;
 
 Parameter default_preload_param();
+Parameter default_other_param();
 
 /**
  * 证券信息统一管理类
@@ -33,16 +35,17 @@ public:
 
     /**
      * 初始化函数，必须在程序入口调用
-     * @param filename 配置ini文件名
+     * @param baseInfoParam
+     * @param blockParam
+     * @param kdataParam
+     * @param preloadParam
+     * @param hikyuuParam
      */
-    void init(const string& filename);
-
-    void StockManager::init(
-            const Parameter& p1,
-            const Parameter& baseInfoParam,
-            const Parameter& blockParam,
-            const Parameter& kdataParam,
-            const Parameter& preloadParam = default_preload_param());
+    void init(const Parameter& baseInfoParam,
+              const Parameter& blockParam,
+              const Parameter& kdataParam,
+              const Parameter& preloadParam = default_preload_param(),
+              const Parameter& hikyuuParam = default_other_param());
 
     /**
      * 获取用于保存零时变量等的临时目录，如为配置则为当前目录
@@ -165,8 +168,7 @@ private:
 private:
     static shared_ptr<StockManager> m_sm;
     string m_tmpdir;
-    shared_ptr<IniParser> m_iniconfig;
-    Parameter m_blockDriver_params;
+    BlockInfoDriverPtr m_blockDriver;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
 

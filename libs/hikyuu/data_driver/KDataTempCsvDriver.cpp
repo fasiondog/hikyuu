@@ -169,4 +169,65 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
     infile.close();
 }
 
+size_t KDataTempCsvDriver::getCount(const string& market, const string& code,
+            KQuery::KType kType) {
+    KRecordList buffer;
+    loadKData(market, code, kType, 0, Null<size_t>(), &buffer);
+    return buffer.size();
+}
+
+KRecord KDataTempCsvDriver::getKRecord(const string& market, const string& code,
+              size_t pos, KQuery::KType kType) {
+    KRecordList buffer;
+    loadKData(market, code, kType, 0, Null<size_t>(), &buffer);
+    return pos < buffer.size() ? buffer[pos] : Null<KRecord>();
+}
+
+bool KDataTempCsvDriver::getIndexRangeByDate(
+            const string& market, const string& code,
+            const KQuery& query, size_t& out_start, size_t& out_end) {
+    out_start = 0;
+    out_end = 0;
+
+    Datetime start_date = query.startDatetime();
+    Datetime end_date = query.endDatetime();
+    if (start_date >= end_date) {
+        return false;
+    }
+
+    KRecordList buffer;
+    loadKData(market, code, query.kType(), 0, Null<size_t>(), &buffer);
+
+    size_t total = buffer.size();
+    if (total == 0) {
+        return false;
+    }
+
+    for (size_t i = total - 1; i == 0; --i) {
+        if (buffer[i].datetime < end_date) {
+            out_end = i + 1;
+            break;
+        }
+    }
+
+    if (out_end == 0) {
+        return false;
+    }
+
+    for (size_t i = out_end - 1; i == 0; --i) {
+        if (buffer[i].datetime <= start_date) {
+            out_start = i;
+            break;
+        }
+    }
+
+    if (out_start >= out_end) {
+        out_start = 0;
+        out_end = 0;
+        return false;
+    }
+
+    return true;
+}
+
 } /* namespace hku */

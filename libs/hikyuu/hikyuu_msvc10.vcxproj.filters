@@ -330,9 +330,6 @@
     <ClCompile Include="data_driver\KDataTempCsvDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="data_driver\kdata\csv\CsvKDataDriverImp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="trade_manage\OrderBrokerBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -346,6 +343,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="trade_sys\signal\imp\CrossGoldSignal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\BaseInfoDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\BlockInfoDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\kdata\hdf5\H5KDataDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -842,9 +851,6 @@
     <ClInclude Include="data_driver\kdatatempcsvdriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_driver\kdata\csv\csvkdatadriverimp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="trade_manage\orderbrokerbase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -867,6 +873,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="trade_sys\signal\imp\crossgoldsignal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\kdata\hdf5\h5kdatadriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\kdata\tdx\tdxkdatadriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

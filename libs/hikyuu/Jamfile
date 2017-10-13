@@ -14,7 +14,6 @@ project : requirements <library>/boost//date_time
                        <library>/boost//serialization
                        <library>/hikyuu_utils//hikyuu_utils
                        <toolset>msvc:<library>/sqlite3//sqlite3
-                       <toolset>msvc:<include>../../extern-libs/mysql/include
                        <toolset>msvc:<include>../../extern-libs/hdf5/include
                        <toolset>msvc:<include>../../extern-libs/log4cplus/include
                        <define>PY_VERSION_HEX=0x03000000 

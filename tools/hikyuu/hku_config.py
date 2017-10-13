@@ -76,11 +76,9 @@ sz_1min = {dir}/sz_1min.h5
 """
 
 hikyuu_config = """
-[tmpdir]
+[hikyuu]
 tmpdir = {dir}/tmp
-
-[logger]
-properties = {dir}/logger.properties
+logger = {dir}/logger.properties
 
 [block]
 type  = qianlong
@@ -102,113 +100,17 @@ year = 0
 [baseinfo]
 type = sqlite3
 db = {dir}/stock.db
-;type = mysql
-;host = 127.0.0.1
-;port = 3306
-;usr = root
-;db = stk_base
 
-[sh_day]
+[kdata]
 ;type = tdx
-;file = D:\\TdxW_HuaTai\\vipdoc
+;dir = D:\\TdxW_HuaTai\\vipdoc
 type = hdf5
-file = {dir}/sh_day.h5
-;type = mysql
-;host = 127.0.0.1
-;port = 3306
-;usr = root
-;database = stk_sh_day
-
-[sh_week]
-type = hdf5
-file = {dir}/sh_day.h5
-
-[sh_month]
-type = hdf5
-file = {dir}/sh_day.h5
-
-[sh_quarter]
-type = hdf5
-file = {dir}/sh_day.h5
-
-[sh_halfyear]
-type = hdf5
-file = {dir}/sh_day.h5
-
-[sh_year]
-type = hdf5
-file = {dir}/sh_day.h5
-
-[sh_1min]
-type = hdf5
-file = {dir}/sh_1min.h5
-
-[sh_5min]
-type = hdf5
-file = {dir}/sh_5min.h5
-
-[sh_15min]
-type = hdf5
-file = {dir}/sh_5min.h5
-
-[sh_30min]
-type = hdf5
-file = {dir}/sh_5min.h5
-
-[sh_60min]
-type = hdf5
-file = {dir}/sh_5min.h5
-
-
-;深圳证券
-[sz_day]
-type = hdf5
-file = {dir}/sz_day.h5
-;type = mysql
-;host = 127.0.0.1
-;port = 3306
-;usr = root
-;database = stk_sz_day
-
-[sz_week]
-type = hdf5
-file = {dir}/sz_day.h5
-
-[sz_month]
-type = hdf5
-file = {dir}/sz_day.h5
-
-[sz_quarter]
-type = hdf5
-file = {dir}/sz_day.h5
-
-[sz_halfyear]
-type = hdf5
-file = {dir}/sz_day.h5
-
-[sz_year]
-type = hdf5
-file = {dir}/sz_day.h5
-
-[sz_1min]
-type = hdf5
-file = {dir}/sz_1min.h5
-
-[sz_5min]
-type = hdf5
-file = {dir}/sz_5min.h5
-
-[sz_15min]
-type = hdf5
-file = {dir}/sz_5min.h5
-
-[sz_30min]
-type = hdf5
-file = {dir}/sz_5min.h5
-
-[sz_60min]
-type = hdf5
-file = {dir}/sz_5min.h5
+sh_day = {dir}/sh_day.h5
+sh_min = {dir}/sh_1min.h5
+sh_min5 = {dir}/sh_5min.h5
+sz_day = {dir}/sz_day.h5
+sz_min = {dir}/sz_1min.h5
+sz_min5 = {dir}/sz_5min.h5
 """
 
 tdx_default_dir = "c:\TdxW_HuaTai" if sys.platform == "win32" else usr_dir + "/.wine/driver/c/Tdx_HuaTai"

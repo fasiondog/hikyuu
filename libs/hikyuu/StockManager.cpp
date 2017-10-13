@@ -51,12 +51,19 @@ Parameter default_preload_param() {
     return param;
 }
 
+Parameter default_other_param() {
+    Parameter param;
+    param.set<string>("tmpdir", ".");
+    param.set<string>("logger","");
+    return param;
+}
+
 void StockManager::init(
-        const Parameter& hikyuuParam,
         const Parameter& baseInfoParam,
         const Parameter& blockParam,
         const Parameter& kdataParam,
-        const Parameter& preloadParam) {
+        const Parameter& preloadParam,
+        const Parameter& hikyuuParam) {
 
     //初始化注册默认支持的数据驱动
     DataDriverFactory::regBaseInfoDriver(BaseInfoDriverPtr(new SQLiteBaseInfoDriver));
@@ -64,12 +71,14 @@ void StockManager::init(
     DataDriverFactory::regKDataDriver(KDataDriverPtr(new TdxKDataDriver));
     DataDriverFactory::regKDataDriver(KDataDriverPtr(new H5KDataDriver));
 
+    //获取临时路径信息
     try {
         m_tmpdir = hikyuuParam.get<string>("tmpdir");
     } catch (...) {
         m_tmpdir = "";
     }
 
+    //获取log4cplus配置文件信息
     try {
         string logger = hikyuuParam.get<string>("logger");
         init_logger(logger);
@@ -77,94 +86,98 @@ void StockManager::init(
         init_logger("");
     }
 
+    //加载证券基本信息
     BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
     base_info->loadBaseInfo();
 
+    //获取板块驱动
+    m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
 
-}
-
-
-void StockManager::init(const string& filename) {
-    try {
-        m_iniconfig = shared_ptr<IniParser>(new IniParser);
-        if (!m_iniconfig) {
-            HKU_FATAL("Can't new IniParser! [StockManager::init]");
-            exit(1);
-        }
-
-        m_iniconfig->read(filename);
-
-    } catch (std::invalid_argument& e) {
-        HKU_FATAL("Reading configure error!\n" << e.what());
-        exit(1);
-    } catch (std::logic_error& e) {
-        HKU_FATAL("Reading configure error!\n" << e.what());
-        exit(1);
-    } catch(...) {
-        HKU_WARN("Reading configure error! Don't know  error!");
-        exit(1);
-    }
-
-    m_tmpdir = m_iniconfig->get("tmpdir", "tmpdir", ".");
-
-    if (m_iniconfig->hasSection("logger")) {
-        init_logger(m_iniconfig->get("logger", "properties", ""));
-    } else {
-        init_logger("");
-    }
-
-    if (!m_iniconfig->hasSection("baseinfo")) {
-        HKU_FATAL("Missing configure of baseinfo!");
-        exit(1);
-    }
-
-    IniParser::StringListPtr block_config = m_iniconfig->getOptionList("block");
-    for (auto iter = block_config->begin(); iter != block_config->end(); ++iter) {
-        string value = m_iniconfig->get("block", *iter);
-        m_blockDriver_params.set<string>(*iter, value);
-    }
-
-    IniParser::StringListPtr baseinfo_config = m_iniconfig->getOptionList("baseinfo");
-    Parameter baseinfo_params;
-    for (auto iter = baseinfo_config->begin(); iter != baseinfo_config->end(); ++iter) {
-        string value = m_iniconfig->get("baseinfo", *iter);
-        baseinfo_params.set<string>(*iter, value);
-    }
-
-    //DataDriverFactory driver;
-    //m_data_driver.regBaseInfoDriver("mysql")
-    BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(baseinfo_params);
-    base_info->loadBaseInfo();
-
+    //获取K线数据驱动并预加载指定的数据
     HKU_TRACE("Loading KData...");
     boost::chrono::system_clock::time_point start_time = boost::chrono::system_clock::now();
 
-    IniParser::StringListPtr option = m_iniconfig->getOptionList("kdata");
-    Parameter params;
-    for (auto iter = option->begin(); iter != option->end(); ++iter) {
-        params.set<string>(*iter, m_iniconfig->get("kdata", *iter));
-    }
-
-    DataDriverFactory::regKDataDriver(KDataDriverPtr(new TdxKDataDriver));
-    DataDriverFactory::regKDataDriver(KDataDriverPtr(new H5KDataDriver));
-    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(params);
-
-    bool preload_day = m_iniconfig->getBool("preload", "day", "false");
-    bool preload_week = m_iniconfig->getBool("preload", "week", "false");
-    bool preload_month = m_iniconfig->getBool("preload", "month", "false");
-    bool preload_quarter = m_iniconfig->getBool("preload", "quater", "false");
-    bool preload_halfyear = m_iniconfig->getBool("preload", "halfyear", "false");
-    bool preload_year = m_iniconfig->getBool("preload", "year", "false");
+    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(kdataParam);
 
     for(auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
         iter->second.setKDataDriver(kdata_driver);
 
-        if (preload_day) iter->second.loadKDataToBuffer(KQuery::DAY);
-        if (preload_week) iter->second.loadKDataToBuffer(KQuery::WEEK);
-        if (preload_month) iter->second.loadKDataToBuffer(KQuery::MONTH);
-        if (preload_quarter) iter->second.loadKDataToBuffer(KQuery::QUARTER);
-        if (preload_halfyear) iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
-        if (preload_year) iter->second.loadKDataToBuffer(KQuery::YEAR);
+        try {
+            if (preloadParam.get<bool>("day"))
+                iter->second.loadKDataToBuffer(KQuery::DAY);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("week"))
+                iter->second.loadKDataToBuffer(KQuery::WEEK);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("month"))
+                iter->second.loadKDataToBuffer(KQuery::MONTH);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("quarter"))
+                iter->second.loadKDataToBuffer(KQuery::QUARTER);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("halfyear"))
+                iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("year"))
+                iter->second.loadKDataToBuffer(KQuery::YEAR);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("min"))
+                iter->second.loadKDataToBuffer(KQuery::MIN);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("min5"))
+                iter->second.loadKDataToBuffer(KQuery::MIN5);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("min15"))
+                iter->second.loadKDataToBuffer(KQuery::MIN15);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("min30"))
+                iter->second.loadKDataToBuffer(KQuery::MIN30);
+        } catch(...) {
+
+        }
+
+        try {
+            if (preloadParam.get<bool>("min60"))
+                iter->second.loadKDataToBuffer(KQuery::MIN60);
+        } catch(...) {
+
+        }
     }
 
     //add special Market, for temp csv file
@@ -225,30 +238,15 @@ MarketList StockManager::getAllMarket() const {
 
 
 Block StockManager::getBlock(const string& category, const string& name) {
-    Block result;
-    auto block_driver = DataDriverFactory::getBlockDriver(m_blockDriver_params);
-    if (!block_driver) {
-        return result;
-    }
-    return block_driver->getBlock(category, name);
+    return m_blockDriver ? m_blockDriver->getBlock(category, name): Block();
 }
 
 BlockList StockManager::getBlockList(const string& category) {
-    BlockList result;
-    auto block_driver = DataDriverFactory::getBlockDriver(m_blockDriver_params);
-    if (!block_driver) {
-        return result;
-    }
-    return block_driver->getBlockList(category);
+    return m_blockDriver ? m_blockDriver->getBlockList(category) : BlockList();
 }
 
 BlockList StockManager::getBlockList() {
-    BlockList result;
-    auto block_driver = DataDriverFactory::getBlockDriver(m_blockDriver_params);
-    if (!block_driver) {
-        return result;
-    }
-    return block_driver->getBlockList();
+    return m_blockDriver ? m_blockDriver->getBlockList() : BlockList();
 }
 
 DatetimeList StockManager::
