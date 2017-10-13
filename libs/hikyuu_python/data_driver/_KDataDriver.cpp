@@ -14,6 +14,19 @@ using namespace boost::python;
 class KDataDriverWrap: public KDataDriver, public wrapper<KDataDriver> {
 public:
     KDataDriverWrap(): KDataDriver() {}
+    KDataDriverWrap(const string& name): KDataDriver(name) {}
+
+    bool _init() {
+        if (override call = get_override("_init")) {
+            return call();
+        } else {
+            return KDataDriver::_init();
+        }
+    }
+
+    bool default_init() {
+        return this->KDataDriver::_init();
+    }
 
     void loadKData(const string& market, const string& code,
                 KQuery::KType ktype, size_t start_ix, size_t end_ix,
@@ -82,6 +95,12 @@ public:
 void export_KDataDriver() {
 
     class_<KDataDriverWrap, boost::noncopyable>("KDataDriver", init<>())
+            .def(init<const string&>())
+            .add_property("name", make_function(&KDataDriver::name,
+                            return_value_policy<copy_const_reference>()))
+            .def("getParam", &KDataDriver::getParam<boost::any>)
+
+            .def("_init", &KDataDriver::_init, &KDataDriverWrap::default_init)
             .def("loadKData", &KDataDriver::loadKData,
                     &KDataDriverWrap::default_loadKData)
             .def("getCount", &KDataDriver::getCount,

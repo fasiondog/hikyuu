@@ -20,7 +20,7 @@ class HKU_API KDataDriver {
     PARAMETER_SUPPORT
 
 public:
-    KDataDriver() {}
+    KDataDriver();
     KDataDriver(const string& name);
     virtual ~KDataDriver() { }
 
@@ -28,9 +28,14 @@ public:
 
     bool init(const Parameter&);
 
+    /**
+     * 子类初始化私有变量接口
+     * @return
+     */
     virtual bool _init() {
         return true;
     }
+
 
     /**
      * 将指定类型的K线数据加载至缓存

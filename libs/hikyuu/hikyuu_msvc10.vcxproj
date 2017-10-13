@@ -201,15 +201,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
-    <ClCompile Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.cpp" />
+    <ClCompile Include="data_driver\BaseInfoDriver.cpp" />
     <ClCompile Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.cpp" />
+    <ClCompile Include="data_driver\BlockInfoDriver.cpp" />
     <ClCompile Include="data_driver\block_info\qianlong\QLBlockInfoDriver.cpp" />
     <ClCompile Include="data_driver\DataDriverFactory.cpp" />
     <ClCompile Include="data_driver\KDataDriver.cpp" />
     <ClCompile Include="data_driver\KDataTempCsvDriver.cpp" />
-    <ClCompile Include="data_driver\kdata\hdf5\H5KDataDriverImp.cpp" />
-    <ClCompile Include="data_driver\kdata\mysql\MySQLKDataDriverImp.cpp" />
-    <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriverImp.cpp" />
+    <ClCompile Include="data_driver\kdata\hdf5\H5KDataDriver.cpp" />
+    <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriver.cpp" />
     <ClCompile Include="datetime\Datetime.cpp" />
     <ClCompile Include="hikyuu.cpp" />
     <ClCompile Include="indicator\crt\IND_LOGIC.cpp" />
@@ -316,7 +316,6 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="DataType.h" />
     <ClInclude Include="data_driver\BaseInfoDriver.h" />
-    <ClInclude Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.h" />
     <ClInclude Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.h" />
     <ClInclude Include="data_driver\BlockInfoDriver.h" />
     <ClInclude Include="data_driver\block_info\qianlong\QLBlockInfoDriver.h" />
@@ -324,10 +323,9 @@
     <ClInclude Include="data_driver\KDataDriver.h" />
     <ClInclude Include="data_driver\KDataDriverImp.h" />
     <ClInclude Include="data_driver\kdatatempcsvdriver.h" />
-    <ClInclude Include="data_driver\kdata\hdf5\H5KDataDriverImp.h" />
+    <ClInclude Include="data_driver\kdata\hdf5\h5kdatadriver.h" />
     <ClInclude Include="data_driver\kdata\hdf5\H5Record.h" />
-    <ClInclude Include="data_driver\kdata\mysql\MySQLKDataDriverImp.h" />
-    <ClInclude Include="data_driver\kdata\tdx\TdxKDataDriverImp.h" />
+    <ClInclude Include="data_driver\kdata\tdx\tdxkdatadriver.h" />
     <ClInclude Include="datetime\Datetime.h" />
     <ClInclude Include="doc.h" />
     <ClInclude Include="hikyuu.h" />

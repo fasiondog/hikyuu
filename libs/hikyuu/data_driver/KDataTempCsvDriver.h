@@ -41,9 +41,7 @@ public:
      * @return
      */
     virtual size_t getCount(const string& market, const string& code,
-            KQuery::KType kType) {
-        return 0;
-    }
+            KQuery::KType kType);
 
     /**
      * 获取指定日期范围对应的K线记录索引
@@ -55,9 +53,7 @@ public:
      * @return
      */
     virtual bool getIndexRangeByDate(const string& market, const string& code,
-            const KQuery& query, size_t& out_start, size_t& out_end) {
-        return false;
-    }
+            const KQuery& query, size_t& out_start, size_t& out_end);
 
     /**
      * 获取指定的K线记录
@@ -68,9 +64,7 @@ public:
      * @return
      */
     virtual KRecord getKRecord(const string& market, const string& code,
-              size_t pos, KQuery::KType kType) {
-        return KRecord();
-    }
+              size_t pos, KQuery::KType kType);
 
 private:
     void _get_title_column(const string&);
