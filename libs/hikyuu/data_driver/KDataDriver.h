@@ -94,6 +94,9 @@ private:
 typedef shared_ptr<KDataDriver> KDataDriverPtr;
 
 
+HKU_API std::ostream & operator<<(std::ostream&, const KDataDriver&);
+HKU_API std::ostream & operator<<(std::ostream&, const KDataDriverPtr&);
+
 inline const string& KDataDriver::name() const {
     return m_name;
 }

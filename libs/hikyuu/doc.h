@@ -13,6 +13,17 @@
  *****************************************************************************/
 
 /**
+ * @mainpage 测试
+ * Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测 （目前
+ * 用于国内证券市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、
+ * 系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别
+ * 构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
+ *
+ * 更多信息，请访问：<a href="http://hikyuu.org">http://hikyuu.org</a>
+ */
+
+
+/**
  * 核心库，包含股票数据的管理、指标实现、交易系统框架等
  * @defgroup Hikyuu Hikyuu 核心引擎库
  * @note 这里把Boost库作为C++的基础库使用，可能严重依赖于Boost库，移植时需要注意
@@ -30,6 +41,11 @@
  * @defgroup StockManage StockManage 证券管理
  * 证券管理类、证券类等
  * @details 证券管理类、证券类等
+ * @ingroup Base
+ *
+ * @defgroup DataDriver Data-Driver 数据驱动引擎
+ * 读取市场信息、证券信息、板块数据、K线数据等
+ * @details 读取市场信息、证券信息、板块数据、K线数据等；可根据需要实现自定义的数据驱动引擎。
  * @ingroup Base
  *
  * @defgroup Common-Utilities Common-Utilities 公共小工具

@@ -46,7 +46,6 @@ public:
 
     /**
      * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
-     * @param params
      * @return
      */
     virtual bool _init() = 0;
@@ -77,6 +76,9 @@ protected:
 };
 
 typedef shared_ptr<BaseInfoDriver> BaseInfoDriverPtr;
+
+HKU_API std::ostream & operator<<(std::ostream&, const BaseInfoDriver&);
+HKU_API std::ostream & operator<<(std::ostream&, const BaseInfoDriverPtr&);
 
 
 inline const string& BaseInfoDriver::name() const {
