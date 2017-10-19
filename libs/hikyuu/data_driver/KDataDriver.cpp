@@ -10,6 +10,21 @@
 
 namespace hku {
 
+HKU_API std::ostream & operator<<(std::ostream& os, const KDataDriver& driver) {
+    os << "KDataDriver(" << driver.name() << ", " << driver.getParameter() << ")";
+    return os;
+}
+
+HKU_API std::ostream & operator<<(std::ostream& os, const KDataDriverPtr& driver) {
+    if (driver) {
+        os << *driver;
+    } else {
+        os << "KDataDriver(NULL)";
+    }
+
+    return os;
+}
+
 KDataDriver::KDataDriver(): m_name("") {
 
 }

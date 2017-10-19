@@ -27,6 +27,7 @@ void export_StockManager(){
             .def("instance", &StockManager::instance,
                  return_value_policy<reference_existing_object>())
             .staticmethod("instance")
+            .def("init", &StockManager::init)
             .def("tmpdir", &StockManager::tmpdir)
             .def("getAllMarket", &StockManager::getAllMarket)
             .def("getMarketInfo", &StockManager::getMarketInfo)

@@ -26,8 +26,18 @@
 
 
 
-from ._data_driver import (DataDriverFactory,BaseInfoDriver,KDataDriver)
+from ._data_driver import (DataDriverFactory,
+                           BaseInfoDriver,
+                           BlockInfoDriver,
+                           KDataDriver)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 
+BaseInfoDriver.__unicode__ = unicodeFunc
+BaseInfoDriver.__repr__ = reprFunc
 
+BlockInfoDriver.__unicode__ = unicodeFunc
+BlockInfoDriver.__repr__ = reprFunc
+
+KDataDriver.__unicode__ = unicodeFunc
+KDataDriver.__repr__ = reprFunc

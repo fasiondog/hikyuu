@@ -14,6 +14,10 @@
 
 namespace hku {
 
+/**
+ * 数据驱动工厂类
+ * @ingroup DataDriver
+ */
 class HKU_API DataDriverFactory {
 public:
     //DataDriverFactory();

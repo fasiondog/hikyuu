@@ -96,6 +96,7 @@ void export_KDataDriver() {
 
     class_<KDataDriverWrap, boost::noncopyable>("KDataDriver", init<>())
             .def(init<const string&>())
+            .def(self_ns::str(self))
             .add_property("name", make_function(&KDataDriver::name,
                             return_value_policy<copy_const_reference>()))
             .def("getParam", &KDataDriver::getParam<boost::any>)

@@ -37,6 +37,7 @@ void export_BaseInfoDriver() {
 
     class_<BaseInfoDriverWrap, boost::noncopyable>("BaseInfoDriver",
                 init<const string&>())
+            .def(self_ns::str(self))
             .add_property("name", make_function(&BaseInfoDriver::name,
                     return_value_policy<copy_const_reference>()))
             .def("getParam", &BaseInfoDriver::getParam<boost::any>)
