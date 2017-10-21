@@ -1777,6 +1777,9 @@ PriceList TradeManager
 ::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
+    if (total == 0)
+        return result;
+
     size_t i = 0;
     while (dates[i] < m_init_datetime && i < total) {
         result[i] = 0;
