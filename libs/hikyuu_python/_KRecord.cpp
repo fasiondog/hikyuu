@@ -43,5 +43,7 @@ void export_KReord() {
             .def("__getitem__", KRecordList_at, return_value_policy<copy_const_reference>())
             .def("append", append)
             ;
+
+    register_ptr_to_python<KRecordListPtr>();
 }
 

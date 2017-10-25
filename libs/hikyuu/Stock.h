@@ -213,7 +213,7 @@ struct HKU_API Stock::Data {
     size_t  m_minTradeNumber;
     size_t  m_maxTradeNumber;
 
-    KRecordList *pKData[KQuery::INVALID_KTYPE];
+    KRecordListPtr pKData[KQuery::INVALID_KTYPE];
 
     Data();
     Data(const string& market, const string& code,

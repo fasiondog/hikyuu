@@ -71,7 +71,7 @@ bool KDataDriver::init(const Parameter& params) {
 
 void KDataDriver::
 loadKData(const string& market, const string& code, KQuery::KType kType,
-        size_t start_ix, size_t end_ix, KRecordList* out_buffer) {
+        size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
 }
 
 size_t KDataDriver::

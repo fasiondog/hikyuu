@@ -129,8 +129,8 @@ void H5KDataDriver
 
 void H5KDataDriver::loadKData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
-        KRecordList* out_buffer) {
-    if (NULL == out_buffer || KQuery::INVALID_KTYPE <= kType
+        KRecordListPtr out_buffer) {
+    if (KQuery::INVALID_KTYPE <= kType
             || start_ix >= end_ix) {
         return;
     }
@@ -148,7 +148,7 @@ void H5KDataDriver::loadKData(const string& market, const string& code,
 
 void H5KDataDriver::
 _loadBaseData(const string& market, const string& code, KQuery::KType kType,
-        size_t start_ix, size_t end_ix, KRecordList* out_buffer) {
+        size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
     H5FilePtr h5file;
     H5::Group group;
     if (!_getH5FileAndGroup(market, code, kType, h5file, group)) {
@@ -199,7 +199,7 @@ _loadBaseData(const string& market, const string& code, KQuery::KType kType,
 void H5KDataDriver::
 _loadIndexData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
-        KRecordList *out_buffer) {
+        KRecordListPtr out_buffer) {
     string tablename(market + code);
     H5FilePtr h5file;
     H5::Group index_group;

@@ -11,6 +11,7 @@ using namespace boost::python;
 using namespace hku;
 
 bool (*parameter_eq)(const Parameter&, const Parameter&) = &operator==;
+bool (*parameter_ne)(const Parameter&, const Parameter&) = &operator!=;
 bool (*parameter_lt)(const Parameter&, const Parameter&) = &operator<;
 
 void export_Parameter() {
@@ -34,6 +35,7 @@ void export_Parameter() {
             ;
 
     def("parameter_eq", parameter_eq);
+    def("parameter_ne", parameter_ne);
     def("parameter_lt", parameter_lt);
 }
 

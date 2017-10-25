@@ -52,6 +52,9 @@ public:
 /** @ingroup StockManage */
 typedef vector<KRecord> KRecordList;
 
+/** @ingroup StockManage */
+typedef shared_ptr<KRecordList> KRecordListPtr;
+
 /**
  * 输出KRecord信息，如：KRecord(datetime, open, high, low, close, transAmount, count)
  * @ingroup StockManage
