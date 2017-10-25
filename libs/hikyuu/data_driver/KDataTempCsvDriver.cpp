@@ -88,7 +88,7 @@ void KDataTempCsvDriver::_get_title_column(const string& line) {
 
 void KDataTempCsvDriver::loadKData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
-        KRecordList* out_buffer) {
+        KRecordListPtr out_buffer) {
     string filename;
     if (kType == KQuery::DAY) {
         filename = m_day_filename;
@@ -171,16 +171,16 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
 
 size_t KDataTempCsvDriver::getCount(const string& market, const string& code,
             KQuery::KType kType) {
-    KRecordList buffer;
-    loadKData(market, code, kType, 0, Null<size_t>(), &buffer);
-    return buffer.size();
+    KRecordListPtr buffer(new KRecordList);
+    loadKData(market, code, kType, 0, Null<size_t>(), buffer);
+    return buffer->size();
 }
 
 KRecord KDataTempCsvDriver::getKRecord(const string& market, const string& code,
               size_t pos, KQuery::KType kType) {
-    KRecordList buffer;
-    loadKData(market, code, kType, 0, Null<size_t>(), &buffer);
-    return pos < buffer.size() ? buffer[pos] : Null<KRecord>();
+    KRecordListPtr buffer(new KRecordList);
+    loadKData(market, code, kType, 0, Null<size_t>(), buffer);
+    return pos < buffer->size() ? (*buffer)[pos] : Null<KRecord>();
 }
 
 bool KDataTempCsvDriver::getIndexRangeByDate(
@@ -195,16 +195,16 @@ bool KDataTempCsvDriver::getIndexRangeByDate(
         return false;
     }
 
-    KRecordList buffer;
-    loadKData(market, code, query.kType(), 0, Null<size_t>(), &buffer);
+    KRecordListPtr buffer(new KRecordList);
+    loadKData(market, code, query.kType(), 0, Null<size_t>(), buffer);
 
-    size_t total = buffer.size();
+    size_t total = buffer->size();
     if (total == 0) {
         return false;
     }
 
     for (size_t i = total - 1; i == 0; --i) {
-        if (buffer[i].datetime < end_date) {
+        if ((*buffer)[i].datetime < end_date) {
             out_end = i + 1;
             break;
         }
@@ -215,7 +215,7 @@ bool KDataTempCsvDriver::getIndexRangeByDate(
     }
 
     for (size_t i = out_end - 1; i == 0; --i) {
-        if (buffer[i].datetime <= start_date) {
+        if ((*buffer)[i].datetime <= start_date) {
             out_start = i;
             break;
         }

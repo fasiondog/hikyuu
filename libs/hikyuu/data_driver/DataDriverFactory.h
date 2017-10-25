@@ -20,7 +20,6 @@ namespace hku {
  */
 class HKU_API DataDriverFactory {
 public:
-    //DataDriverFactory();
 
     static void regBaseInfoDriver(const BaseInfoDriverPtr&);
     static void removeBaseInfoDriver(const string& name);

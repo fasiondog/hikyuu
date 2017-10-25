@@ -75,7 +75,7 @@ Stock::Data::Data()
   m_minTradeNumber(default_minTradeNumber),
   m_maxTradeNumber(default_maxTradeNumber) {
     for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
-        pKData[i] = NULL;
+        pKData[i] = KRecordListPtr();
     }
 }
 
@@ -107,14 +107,14 @@ Stock::Data::Data(const string& market, const string& code,
     boost::to_upper(m_market);
     m_market_code = m_market + m_code;
     for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
-        pKData[i] = NULL;
+        pKData[i] = KRecordListPtr();
     }
 }
 
 Stock::Data::~Data() {
-    for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
+    /*for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
         delete pKData[i];
-    }
+    }*/
 }
 
 
@@ -269,6 +269,10 @@ void Stock::setKDataDriver(const KDataDriverPtr& kdataDriver) {
         m_kdataDriver = g_kdataDefaultDriver;
     }
     m_kdataDriver = kdataDriver;
+
+    for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
+        releaseKDataBuffer((KQuery::KType)i);
+    }
 }
 
 void Stock::setWeightList(const StockWeightList& weightList) {
@@ -300,8 +304,8 @@ void Stock::releaseKDataBuffer(KQuery::KType kType) {
     if (!m_data || kType >= KQuery::INVALID_KTYPE)
         return;
 
-    delete[] m_data->pKData[kType];
-    m_data->pKData[kType] = NULL;
+    if (m_data->pKData[kType])
+        m_data->pKData[kType] = KRecordListPtr();
     return;
 }
 
@@ -311,7 +315,7 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) {
         return;
 
     releaseKDataBuffer(kType);
-    m_data->pKData[kType] = new KRecordList;
+    m_data->pKData[kType] = make_shared<KRecordList>();
     m_kdataDriver->loadKData(m_data->m_market, m_data->m_code,
             kType, 0, Null<size_t>(), m_data->pKData[kType]);
     return;
@@ -589,8 +593,14 @@ KRecordList Stock
         return result;
     }
 
+    KRecordListPtr plist(new KRecordList);
     m_kdataDriver->loadKData(m_data->m_market, m_data->m_code,
-            ktype, start_ix, end_ix, &result);
+            ktype, start_ix, end_ix, plist);
+    size_t total = plist->size();
+    result.reserve(total);
+    for (size_t i = 0; i < total; i++) {
+        result.push_back((*plist)[i]);
+    }
     return result;
 }
 

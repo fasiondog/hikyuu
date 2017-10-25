@@ -15,6 +15,7 @@ class KDataDriverWrap: public KDataDriver, public wrapper<KDataDriver> {
 public:
     KDataDriverWrap(): KDataDriver() {}
     KDataDriverWrap(const string& name): KDataDriver(name) {}
+    virtual ~KDataDriverWrap() {}
 
     bool _init() {
         if (override call = get_override("_init")) {
@@ -30,9 +31,9 @@ public:
 
     void loadKData(const string& market, const string& code,
                 KQuery::KType ktype, size_t start_ix, size_t end_ix,
-                KRecordList* out_buffer) {
+                KRecordListPtr out_buffer) {
         if (override call = get_override("loadKData")) {
-            call(market, code, ktype, ktype, start_ix, end_ix, out_buffer);
+            call(market, code, ktype, start_ix, end_ix, out_buffer);
         } else {
             KDataDriver::loadKData(market, code, ktype,
                                    start_ix, end_ix, out_buffer);
@@ -41,7 +42,7 @@ public:
 
     void default_loadKData(const string& market, const string& code,
                 KQuery::KType ktype, size_t start_ix, size_t end_ix,
-                KRecordList* out_buffer) {
+                KRecordListPtr out_buffer) {
         this->KDataDriver::loadKData(market, code, ktype,
                 start_ix, end_ix, out_buffer);
     }
@@ -60,6 +61,49 @@ public:
         return this->KDataDriver::getCount(market, code, ktype);
     }
 
+    virtual object _getIndexRangeByDate(const string& market,
+            const string& code, const KQuery& query) {
+        if (override call = get_override("_getIndexRangeByDate")) {
+            return call(market, code, query);
+        }
+
+        return make_tuple(0, 0);
+    }
+
+    object default_getIndexRangeByDate(const string& market,
+                const string& code, const KQuery& query) {
+        return make_tuple(0, 0);
+    }
+
+    bool getIndexRangeByDate(const string& market, const string& code,
+            const KQuery& query, size_t& out_start, size_t& out_end) {
+        out_start = 0;
+        out_end = 0;
+
+        object x = _getIndexRangeByDate(market, code, query);
+        if (x.is_none() || len(x) < 2) {
+            return false;
+        }
+
+        extract<size_t> start(x[0]);
+        if (start.check()) {
+            out_start = start();
+        } else {
+            return false;
+        }
+
+        extract<size_t> end(x[1]);
+        if (end.check()) {
+            out_end = end();
+        } else {
+            out_start = 0;
+            return false;
+        }
+
+        return true;
+    }
+
+    /* Python 无法 使用指针或引用作为输出参数
     bool getIndexRangeByDate(const string& market, const string& code,
                 const KQuery& query, size_t& out_start, size_t& out_end) {
         if (override call = get_override("getIndexRangeByDate")) {
@@ -68,13 +112,13 @@ public:
             return KDataDriver::getIndexRangeByDate(market, code,
                                          query, out_start, out_end);
         }
-    }
+    }*/
 
-    bool default_getIndexRangeByDate(const string& market, const string& code,
+    /*bool default_getIndexRangeByDate(const string& market, const string& code,
                     const KQuery& query, size_t& out_start, size_t& out_end) {
         return this->KDataDriver::getIndexRangeByDate(market, code,
                 query, out_start, out_end);
-    }
+    }*/
 
     KRecord getKRecord(const string& market, const string& code,
                   size_t pos, KQuery::KType ktype) {
@@ -106,10 +150,13 @@ void export_KDataDriver() {
                     &KDataDriverWrap::default_loadKData)
             .def("getCount", &KDataDriver::getCount,
                     &KDataDriverWrap::default_getCount)
-            .def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
-                    &KDataDriverWrap::default_getIndexRangeByDate)
+            //.def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
+            //        &KDataDriverWrap::default_getIndexRangeByDate)
             .def("getKRecord", &KDataDriver::getKRecord,
                     &KDataDriverWrap::default_getKRecord)
+            .def("_getIndexRangeByDate",
+                    &KDataDriverWrap::_getIndexRangeByDate,
+                    &KDataDriverWrap::default_getIndexRangeByDate)
             ;
 
     register_ptr_to_python<KDataDriverPtr>();

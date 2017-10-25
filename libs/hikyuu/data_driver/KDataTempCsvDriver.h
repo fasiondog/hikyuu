@@ -31,7 +31,7 @@ public:
      */
     virtual void loadKData(const string& market, const string& code,
             KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer) ;
+            KRecordListPtr out_buffer) ;
 
     /**
      * 获取指定类型的K线数据量
