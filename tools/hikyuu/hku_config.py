@@ -36,7 +36,7 @@ data_directory = input("\n请输入股票数据存放路径（默认" + default_
 if data_directory == '':
     data_directory = default_dir
         
-with open(data_config_file, 'w') as conf:
+with open(data_config_file, 'w', encoding = 'utf-8') as conf:
     conf.writelines(['[data_dir]\n', 'data_dir=' + data_directory])
 
 
@@ -125,14 +125,14 @@ if not os.path.lexists(data_directory):
     else:
         filename = data_directory + '/hikyuu_linux.ini'
 
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding = 'utf-8') as f:
         f.write(hikyuu_config.format(dir=data_directory))
     
     tdx_dir = input(tdx_input_str)
     if tdx_dir == '':
         tdx_dir = tdx_default_dir
 
-    with open(data_directory + '/importdata.ini', 'w') as f:
+    with open(data_directory + '/importdata.ini', 'w', encoding = 'utf-8') as f:
         f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
         
     os.mkdir(data_directory + '/tmp')
@@ -166,13 +166,13 @@ else:
             tdx_dir = input(tdx_input_str)
             if tdx_dir == '':
                 tdx_dir = tdx_default_dir
-            with open(data_directory + '/importdata.ini', 'w') as f:
+            with open(data_directory + '/importdata.ini', 'w', encoding = 'utf-8') as f:
                 f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
     else:
         tdx_dir = input(tdx_input_str)
         if tdx_dir == '':
             tdx_dir = tdx_default_dir
-        with open(data_directory + '/importdata.ini', 'w') as f:
+        with open(data_directory + '/importdata.ini', 'w', encoding = 'utf-8') as f:
             f.write(import_config.format(dir=data_directory, tdx=tdx_dir))
             
     if os.path.exists(data_directory + '/createdb.sql'):
@@ -190,10 +190,10 @@ else:
         x = ask_question(hikyuu_ini[1:] + "文件已存在是否覆盖？(Y/[N])：")
         if x:
             os.remove(filename)
-        with open(data_directory + hikyuu_ini, 'w') as f:
+        with open(data_directory + hikyuu_ini, 'w', encoding = 'utf-8') as f:
             f.write(hikyuu_config.format(dir=data_directory))
     else:        
-        with open(data_directory + hikyuu_ini, 'w') as f:
+        with open(data_directory + hikyuu_ini, 'w', encoding = 'utf-8') as f:
             f.write(hikyuu_config.format(dir=data_directory))
 
     if not os.path.lexists(data_directory + '/tmp'):
