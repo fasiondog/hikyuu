@@ -41,6 +41,7 @@ void export_BlockInfoDriver() {
 
     class_<BlockInfoDriverWrap, boost::noncopyable>("BlockInfoDriver",
                 init<const string&>())
+            .def(self_ns::str(self))
             .add_property("name", make_function(&BlockInfoDriver::name,
                     return_value_policy<copy_const_reference>()))
             .def("getParam", &BlockInfoDriver::getParam<boost::any>)

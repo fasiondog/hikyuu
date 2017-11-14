@@ -148,6 +148,11 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
     return p1.getNameValueList() == p2.getNameValueList();
 }
 
+HKU_API bool operator!=(const Parameter& p1, const Parameter& p2) {
+    //注意：参数大小写敏感
+    return p1.getNameValueList() != p2.getNameValueList();
+}
+
 HKU_API bool operator<(const Parameter& p1, const Parameter& p2) {
     return p1.getNameValueList() < p2.getNameValueList();
 }

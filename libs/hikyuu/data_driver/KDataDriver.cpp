@@ -10,6 +10,21 @@
 
 namespace hku {
 
+HKU_API std::ostream & operator<<(std::ostream& os, const KDataDriver& driver) {
+    os << "KDataDriver(" << driver.name() << ", " << driver.getParameter() << ")";
+    return os;
+}
+
+HKU_API std::ostream & operator<<(std::ostream& os, const KDataDriverPtr& driver) {
+    if (driver) {
+        os << *driver;
+    } else {
+        os << "KDataDriver(NULL)";
+    }
+
+    return os;
+}
+
 KDataDriver::KDataDriver(): m_name("") {
 
 }
@@ -56,7 +71,7 @@ bool KDataDriver::init(const Parameter& params) {
 
 void KDataDriver::
 loadKData(const string& market, const string& code, KQuery::KType kType,
-        size_t start_ix, size_t end_ix, KRecordList* out_buffer) {
+        size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
 }
 
 size_t KDataDriver::

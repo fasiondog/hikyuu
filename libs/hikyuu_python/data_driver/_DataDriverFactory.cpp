@@ -32,7 +32,6 @@ void export_DataDriverFactory() {
         .staticmethod("removeBlockDriver")
         ;
 
-    register_ptr_to_python<BlockInfoDriverPtr>();
 }
 
 

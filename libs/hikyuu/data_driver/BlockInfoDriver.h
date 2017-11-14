@@ -65,6 +65,10 @@ protected:
 typedef shared_ptr<BlockInfoDriver> BlockInfoDriverPtr;
 
 
+HKU_API std::ostream & operator<<(std::ostream&, const BlockInfoDriver&);
+HKU_API std::ostream & operator<<(std::ostream&, const BlockInfoDriverPtr&);
+
+
 inline const string& BlockInfoDriver::name() const {
     return m_name;
 }

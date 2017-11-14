@@ -10,6 +10,21 @@
 
 namespace hku {
 
+HKU_API std::ostream & operator<<(std::ostream& os, const BaseInfoDriver& driver) {
+    os << "BaseInfoDriver(" << driver.name() << ", " << driver.getParameter() << ")";
+    return os;
+}
+
+HKU_API std::ostream & operator<<(std::ostream& os, const BaseInfoDriverPtr& driver) {
+    if (driver) {
+        os << *driver;
+    } else {
+        os << "BaseInfoDriver(NULL)";
+    }
+
+    return os;
+}
+
 BaseInfoDriver::BaseInfoDriver(const string& name)
 : m_name(name) {
     boost::to_upper(m_name);

@@ -21,7 +21,7 @@ public:
 
     virtual void loadKData(const string& market, const string& code,
             KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer) ;
+            KRecordListPtr out_buffer) ;
     virtual size_t getCount(const string& market, const string& code,
             KQuery::KType kType);
     virtual bool getIndexRangeByDate(const string& market, const string& code,
@@ -39,10 +39,10 @@ private:
 
     void _loadDayKData(const string& market, const string& code,
             KQuery::KType ktype, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer);
+            KRecordListPtr out_buffer);
     void _loadMinKData(const string& market, const string& code,
             KQuery::KType ktype, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer);
+            KRecordListPtr out_buffer);
 
     bool _getDayIndexRangeByDate(const string& market, const string& code,
             const KQuery& query, size_t& out_start, size_t& out_end);

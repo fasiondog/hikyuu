@@ -21,7 +21,7 @@ public:
     virtual bool _init();
     virtual void loadKData(const string& market, const string& code,
             KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer) ;
+            KRecordListPtr out_buffer) ;
     virtual size_t getCount(const string& market, const string& code,
             KQuery::KType kType);
     virtual bool getIndexRangeByDate(const string& market, const string& code,
@@ -44,10 +44,10 @@ private:
 
     void _loadBaseData(const string& market, const string& code,
             KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer);
+            KRecordListPtr out_buffer);
     void _loadIndexData(const string& market, const string& code,
             KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer);
+            KRecordListPtr out_buffer);
 
     bool _getBaseIndexRangeByDate(const string&, const string&, const KQuery&,
             size_t& out_start, size_t& out_end);

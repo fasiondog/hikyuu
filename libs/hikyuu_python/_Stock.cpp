@@ -50,6 +50,7 @@ void export_Stock() {
             .add_property("maxTradeNumber", &Stock::maxTradeNumber)
 
             .def("isNull", &Stock::isNull)
+            .def("isBuffer", &Stock::isBuffer)
             .def("getKData", &Stock::getKData)
             .def("getCount", &Stock::getCount, getCount_overloads())
             .def("getMarketValue", &Stock::getMarketValue)

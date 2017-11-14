@@ -78,10 +78,41 @@ else:
 
 #starttime = time.time()
 #print "Loading Day Data ..."
-hikyuu_init(config_file)
-sm = StockManager.instance()
+#hikyuu_init(config_file)
+#sm = StockManager.instance()
 #endtime = time.time()
 #print "%.2fs" % (endtime-starttime)
+import configparser
+ini = configparser.ConfigParser()
+ini.read(config_file)
+hku_param = Parameter()
+hku_param.set("tmpdir", ini.get('hikyuu', 'tmpdir'))
+if ini.has_option('hikyuu', 'logger'):
+    hku_param.set("logger", ini['hikyuu']['logger'])
+    
+base_param = Parameter()
+base_info_config = ini.options('baseinfo')
+for p in base_info_config:
+    base_param.set(p, ini.get('baseinfo', p))
+    
+block_param = Parameter()
+block_config = ini.options('block')
+for p in block_config:
+    block_param.set(p, ini.get('block', p))
+    
+preload_param = Parameter()
+preload_config = ini.options('preload')
+for p in preload_config:
+    #注意：proload参数是布尔类型
+    preload_param.set(p, ini.getboolean('preload', p))
+    
+kdata_param = Parameter()
+kdata_config = ini.options('kdata')
+for p in kdata_config:
+    kdata_param.set(p, ini.get('kdata', p))
+
+sm = StockManager.instance()
+sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 
 
 #==============================================================================

@@ -93,7 +93,7 @@ bool TdxKDataDriver::_init() {
 void TdxKDataDriver::
 loadKData(const string& market, const string& code,
         KQuery::KType ktype, size_t start_ix, size_t end_ix,
-        KRecordList* out_buffer) {
+        KRecordListPtr out_buffer) {
     switch (ktype) {
     case KQuery::MIN:
     case KQuery::MIN5:
@@ -125,7 +125,7 @@ loadKData(const string& market, const string& code,
 void TdxKDataDriver::
 _loadDayKData(const string& market, const string& code,
         KQuery::KType ktype, size_t start_ix, size_t end_ix,
-        KRecordList* out_buffer) {
+        KRecordListPtr out_buffer) {
     assert(KQuery::DAY == ktype);
 
     size_t total = getCount(market, code ,ktype);
@@ -159,7 +159,7 @@ _loadDayKData(const string& market, const string& code,
 void TdxKDataDriver::
 _loadMinKData(const string& market, const string& code,
         KQuery::KType ktype, size_t start_ix, size_t end_ix,
-        KRecordList* out_buffer) {
+        KRecordListPtr out_buffer) {
     assert(KQuery::MIN == ktype || KQuery::MIN5 == ktype);
 
     size_t total = getCount(market, code ,ktype);

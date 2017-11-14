@@ -47,6 +47,14 @@ public:
               const Parameter& preloadParam = default_preload_param(),
               const Parameter& hikyuuParam = default_other_param());
 
+    Parameter getBaseInfoDriverParameter() const;
+    Parameter getBlockDriverParameter() const;
+    Parameter getKDataDriverParameter() const;
+    Parameter getPreloadParameter() const;
+    Parameter getHikyuuParameter() const;
+
+    void setKDataDriver(const KDataDriverPtr&);
+
     /**
      * 获取用于保存零时变量等的临时目录，如为配置则为当前目录
      * 由m_config中的“tmpdir”指定
@@ -177,6 +185,12 @@ private:
 
     typedef unordered_map<hku_uint32, StockTypeInfo> StockTypeInfoMap;
     StockTypeInfoMap m_stockTypeInfo;
+
+    Parameter m_baseInfoDriverParam;
+    Parameter m_blockDriverParam;
+    Parameter m_kdataDriverParam;
+    Parameter m_preloadParam;
+    Parameter m_hikyuuParam;
 };
 
 
@@ -187,6 +201,26 @@ inline size_t StockManager::size() const {
 
 inline Stock StockManager::operator[](const string& query) const {
     return getStock(query);
+}
+
+inline Parameter StockManager::getBaseInfoDriverParameter() const {
+    return m_baseInfoDriverParam;
+}
+
+inline Parameter StockManager::getBlockDriverParameter() const {
+    return m_blockDriverParam;
+}
+
+inline Parameter StockManager::getKDataDriverParameter() const {
+    return m_kdataDriverParam;
+}
+
+inline Parameter StockManager::getPreloadParameter() const {
+    return m_preloadParam;
+}
+
+inline Parameter StockManager::getHikyuuParameter() const {
+    return m_hikyuuParam;
 }
 
 } /* namespace */

@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include "base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "block_info/qianlong/QLBlockInfoDriver.h"
+#include "kdata/hdf5/H5KDataDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
@@ -25,9 +26,15 @@ map<string, BlockInfoDriverPtr> default_block_driver() {
     return result;
 }
 
+map<string, KDataDriverPtr> default_kdata_driver() {
+    map<string, KDataDriverPtr> result;
+    result["HDF5"] = make_shared<H5KDataDriver>();
+    return result;
+}
+
 map<string, BaseInfoDriverPtr> DataDriverFactory::m_baseInfoDrivers(default_baseinfo_driver());
 map<string, BlockInfoDriverPtr> DataDriverFactory::m_blockDrivers(default_block_driver());
-map<string, KDataDriverPtr> DataDriverFactory::m_kdataDrivers;
+map<string, KDataDriverPtr> DataDriverFactory::m_kdataDrivers(default_kdata_driver());
 map<Parameter, KDataDriverPtr> DataDriverFactory::m_param_kdataDrivers;
 
 
@@ -53,21 +60,9 @@ BaseInfoDriverPtr DataDriverFactory
     BaseInfoDriverPtr result;
     if (iter != m_baseInfoDrivers.end()) {
         result = iter->second;
-    } else {
-        HKU_INFO("Can't get the type(" << type
-                << ") of BaseInfoDriver! "
-                        "Will use default sqlite3 BaseInfoDriver! "
-                        "[DataDriverFactory::getBaseInfoDriver]");
-        iter = m_baseInfoDrivers.find("SQLITE3");
-        if (iter != m_baseInfoDrivers.end()) {
-            result = m_baseInfoDrivers["SQLITE3"];
-        } else {
-            result = make_shared<SQLiteBaseInfoDriver>();
-            m_baseInfoDrivers["SQLITE3"] = result;
-        }
+        result->init(params);
     }
 
-    result->init(params);
     return result;
 }
 
@@ -91,21 +86,9 @@ BlockInfoDriverPtr DataDriverFactory::getBlockDriver(const Parameter& params) {
     iter = m_blockDrivers.find(name);
     if (iter != m_blockDrivers.end()) {
         result = iter->second;
-    } else {
-        HKU_INFO("Can't get the type(" << name
-                << ") of BlockInfoDriver! "
-                        "Will use default qianlong BaseInfoDriver! "
-                        "[DataDriverFactory::getBlockDriver]");
-        iter = m_blockDrivers.find("QIANLONG");
-        if (iter != m_blockDrivers.end()) {
-            result = iter->second;
-        } else {
-            result = make_shared<QLBlockInfoDriver>();
-            m_blockDrivers["QIANLONG"] = result;
-        }
+        result->init(params);
     }
 
-    result->init(params);
     return result;
 }
 

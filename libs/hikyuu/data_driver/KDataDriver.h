@@ -9,7 +9,7 @@
 #define KDATADRIVER_H_
 
 #include "../utilities/Parameter.h"
-#include "KDataDriverImp.h"
+#include "../KData.h"
 
 namespace hku {
 
@@ -48,7 +48,7 @@ public:
      */
     virtual void loadKData(const string& market, const string& code,
             KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordList* out_buffer) ;
+            KRecordListPtr out_buffer) ;
 
     /**
      * 获取指定类型的K线数据量
@@ -93,6 +93,9 @@ private:
 
 typedef shared_ptr<KDataDriver> KDataDriverPtr;
 
+
+HKU_API std::ostream & operator<<(std::ostream&, const KDataDriver&);
+HKU_API std::ostream & operator<<(std::ostream&, const KDataDriverPtr&);
 
 inline const string& KDataDriver::name() const {
     return m_name;

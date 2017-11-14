@@ -65,6 +65,18 @@ void StockManager::init(
         const Parameter& preloadParam,
         const Parameter& hikyuuParam) {
 
+    m_baseInfoDriverParam = baseInfoParam;
+    m_blockDriverParam = blockParam;
+    m_kdataDriverParam = kdataParam;
+    m_preloadParam = preloadParam;
+    m_hikyuuParam = hikyuuParam;
+
+    m_stockDict.clear();
+    m_marketInfoDict.clear();
+    m_stockTypeInfo.clear();
+
+    string funcname(" [StockManager::init]");
+
     //初始化注册默认支持的数据驱动
     DataDriverFactory::regBaseInfoDriver(BaseInfoDriverPtr(new SQLiteBaseInfoDriver));
     DataDriverFactory::regBlockDriver(BlockInfoDriverPtr(new QLBlockInfoDriver));
@@ -99,86 +111,7 @@ void StockManager::init(
 
     KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(kdataParam);
 
-    for(auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        iter->second.setKDataDriver(kdata_driver);
-
-        try {
-            if (preloadParam.get<bool>("day"))
-                iter->second.loadKDataToBuffer(KQuery::DAY);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("week"))
-                iter->second.loadKDataToBuffer(KQuery::WEEK);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("month"))
-                iter->second.loadKDataToBuffer(KQuery::MONTH);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("quarter"))
-                iter->second.loadKDataToBuffer(KQuery::QUARTER);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("halfyear"))
-                iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("year"))
-                iter->second.loadKDataToBuffer(KQuery::YEAR);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("min"))
-                iter->second.loadKDataToBuffer(KQuery::MIN);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("min5"))
-                iter->second.loadKDataToBuffer(KQuery::MIN5);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("min15"))
-                iter->second.loadKDataToBuffer(KQuery::MIN15);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("min30"))
-                iter->second.loadKDataToBuffer(KQuery::MIN30);
-        } catch(...) {
-
-        }
-
-        try {
-            if (preloadParam.get<bool>("min60"))
-                iter->second.loadKDataToBuffer(KQuery::MIN60);
-        } catch(...) {
-
-        }
-    }
+    setKDataDriver(kdata_driver);
 
     //add special Market, for temp csv file
     m_marketInfoDict["TMP"] = MarketInfo("TMP", "Temp Csv file",
@@ -187,6 +120,160 @@ void StockManager::init(
 
     boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start_time;
     HKU_TRACE(sec << " Loaded Data.");
+}
+
+
+void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
+    string funcname(" [StockManager::setKDataDriver]");
+    if (!driver) {
+        HKU_ERROR("kdata driver is null!" << funcname);
+        return;
+    }
+
+    if (m_kdataDriverParam == driver->getParameter()) {
+
+    } else {
+        m_kdataDriverParam = driver->getParameter();
+    }
+
+    bool preload_day = false;
+    try {
+        preload_day = m_preloadParam.get<bool>("day");
+        if (preload_day)
+            HKU_TRACE("Preload all day kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_day = false;
+    }
+
+    bool preload_week = false;
+    try {
+        preload_week = m_preloadParam.get<bool>("week");
+        if (preload_week)
+            HKU_TRACE("Preload all week kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_week = false;
+    }
+
+    bool preload_month = false;
+    try {
+        preload_month = m_preloadParam.get<bool>("month");
+        if (preload_week)
+            HKU_TRACE("Preload all month kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_month = false;
+    }
+
+    bool preload_quarter = false;
+    try {
+        preload_quarter = m_preloadParam.get<bool>("quarter");
+        if (preload_quarter)
+            HKU_TRACE("Preload all quarter kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_quarter = false;
+    }
+
+    bool preload_halfyear = false;
+    try {
+        preload_halfyear = m_preloadParam.get<bool>("halfyear");
+        if (preload_halfyear)
+            HKU_TRACE("Preload all halfyear kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_halfyear = false;
+    }
+
+    bool preload_year = false;
+    try {
+        preload_year = m_preloadParam.get<bool>("year");
+        if (preload_year)
+            HKU_TRACE("Preload all year kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_year = false;
+    }
+
+    bool preload_min = false;
+    try {
+        preload_min = m_preloadParam.get<bool>("min");
+        if (preload_min)
+            HKU_TRACE("Preload all 1 min kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_min = false;
+    }
+
+    bool preload_min5 = false;
+    try {
+        preload_min5 = m_preloadParam.get<bool>("min5");
+        if (preload_min5)
+            HKU_TRACE("Preload all 5 min kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_min5 = false;
+    }
+
+    bool preload_min15 = false;
+    try {
+        preload_min15 = m_preloadParam.get<bool>("min15");
+        if (preload_min15)
+            HKU_TRACE("Preload all 15 min kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_min15 = false;
+    }
+
+    bool preload_min30 = false;
+    try {
+        preload_min30 = m_preloadParam.get<bool>("min30");
+        if (preload_min30)
+            HKU_TRACE("Preload all 30 min kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_min30 = false;
+    }
+
+    bool preload_min60 = false;
+    try {
+        preload_min60 = m_preloadParam.get<bool>("min60");
+        if (preload_min60)
+            HKU_TRACE("Preload all 60 min kdata to buffer!" << funcname);
+    } catch(...) {
+        preload_min60 = false;
+    }
+
+    for(auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+        if (iter->second.market() == "TMP")
+            continue;
+
+        iter->second.setKDataDriver(driver);
+
+        if (preload_day)
+            iter->second.loadKDataToBuffer(KQuery::DAY);
+
+        if (preload_week)
+            iter->second.loadKDataToBuffer(KQuery::WEEK);
+
+        if (preload_month)
+            iter->second.loadKDataToBuffer(KQuery::MONTH);
+
+        if (preload_quarter)
+            iter->second.loadKDataToBuffer(KQuery::QUARTER);
+
+        if (preload_halfyear)
+            iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
+
+        if (preload_year)
+            iter->second.loadKDataToBuffer(KQuery::YEAR);
+
+        if (preload_min)
+            iter->second.loadKDataToBuffer(KQuery::MIN);
+
+        if (preload_min5)
+            iter->second.loadKDataToBuffer(KQuery::MIN5);
+
+        if (preload_min15)
+            iter->second.loadKDataToBuffer(KQuery::MIN15);
+
+        if (preload_min30)
+            iter->second.loadKDataToBuffer(KQuery::MIN30);
+
+        if (preload_min60)
+            iter->second.loadKDataToBuffer(KQuery::MIN60);
+    }
 }
 
 
