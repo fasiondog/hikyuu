@@ -25,6 +25,16 @@
 # SOFTWARE.
 
 
+####################################################################
+#
+# 使用 pytdx 作为K线数据驱动示例，可自行实现自己的K线数据驱动
+# 
+# 注意：此处仅为示例，因 pytdx 使用的数据索引位置是倒序（即最近一天的
+#       位置为0，和 KDataDriver 使用第一个交易日位置为0 刚好相反。
+#       在读取时效率较低，需多次访问网络，不建设实际使用。仅作为示例！
+#
+#####################################################################
+
 from ._data_driver import KDataDriver, DataDriverFactory
 from hikyuu import KRecord, Query, Datetime, Parameter
 
@@ -38,6 +48,7 @@ class PytdxKDataDriver(KDataDriver):
         super(PytdxKDataDriver, self).__init__('pytdx')
         
     def _init(self):
+        """【重载接口】（可选）初始化子类私有变量"""
         self._max = {Query.DAY:10,
                      Query.WEEK:2,
                      Query.MONTH:1,
@@ -52,6 +63,17 @@ class PytdxKDataDriver(KDataDriver):
         return 
     
     def loadKData(self, market, code, ktype, start_ix, end_ix, out_buffer):
+        """
+        【重载接口】（必须）按指定的位置[start_ix, end_ix)读取K线数据至out_buffer
+        
+        :param str market: 市场标识
+        :param str code: 证券代码
+        :param KQuery.KType ktype: K线类型
+        :param int start_ix: 起始位置
+        :param int end_ix: 结束位置
+        :param KRecordListPtr out_buffer: 传入的数据缓存，读取数据后使用 
+                                           out_buffer.append(krecord) 加入数据        
+        """
         if start_ix >= end_ix or start_ix <0 or end_ix <0:
             return
         
@@ -74,10 +96,24 @@ class PytdxKDataDriver(KDataDriver):
         
     
     def getCount(self, market, code, ktype):
+        """
+        【重载接口】（必须）获取K线数量
+        
+        :param str market: 市场标识
+        :param str code: 证券代码
+        :param KQuery.KType ktype: K线类型        
+        """
         data = self._get_bars(market, code, ktype)
         return len(data) if data else 0
     
     def _getIndexRangeByDate(self, market, code, query):
+        """
+        【重载接口】（必须）按日期获取指定的K线数据
+        
+        :param str market: 市场标识
+        :param str code: 证券代码
+        :param KQuery query: 日期查询条件（QueryByDate）        
+        """
         print("getIndexRangeByDate")
 
         if query.queryType != Query.DATE:
@@ -147,6 +183,14 @@ class PytdxKDataDriver(KDataDriver):
         
     
     def getKRecord(self, market, code, pos, ktype):
+        """
+        【重载接口】（必须）获取指定位置的K线记录
+        
+        :param str market: 市场标识
+        :param str code: 证券代码
+        :param int pos: 指定位置（大于等于0）
+        :param KQuery.KType ktype: K线类型        
+        """
         record = KRecord()
         if pos < 0:
             return record
@@ -219,9 +263,19 @@ class PytdxKDataDriver(KDataDriver):
         return data
     
     
-DataDriverFactory.regKDataDriver(PytdxKDataDriver())
+#DataDriverFactory.regKDataDriver(PytdxKDataDriver())
 
-tdx_param = Parameter()
-tdx_param.set('type', 'pytdx')
-tdx_param.set('ip', '119.147.212.81')
-tdx_param.set('port', 7709)
+#tdx_param = Parameter()
+#tdx_param.set('type', 'pytdx')
+#tdx_param.set('ip', '119.147.212.81')
+#tdx_param.set('port', 7709)
+
+#base_param = sm.getBaseInfoDriverParameter()
+#block_param = sm.getBlockDriverParameter()
+#kdata_param = sm.getKDataDriverParameter()
+#preload_param = sm.getPreloadParameter()
+#hku_param = sm.getHikyuuParameter()
+
+#切换K线数据驱动，重新初始化
+#sm.init(base_param, block_param, tdx_param, preload_param, hku_param)
+

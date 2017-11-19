@@ -11,12 +11,12 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 hku_name = "Hikyuu"
-hku_version = "1.0.5"
+hku_version = "1.0.6"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
 hku_license = "MIT"
-hku_keywords = "quant", "trade", "System Trading", "backtester", "量化", "程序化交易", "量化交易", "系统交易")
+hku_keywords = ("quant", "trade", "System Trading", "backtester", "量化", "程序化交易", "量化交易", "系统交易")
 hku_platforms = "Independant"
 hku_url = "http://hikyuu.org/"
 
@@ -38,7 +38,6 @@ if sys.platform == 'win32':
                       #('Lib/site-packages/hikyuu', ['hikyuu/boost_thread-vc100-mt-1_56.dll']),
                       #('Lib/site-packages/hikyuu', ['hikyuu/boost_unit_test_framework-vc100-mt-1_56.dll']),
                       ('Lib/site-packages/hikyuu', ['hikyuu/log4cplus.dll']),
-                      ('Lib/site-packages/hikyuu', ['hikyuu/libmysql.dll']),
                       ('Lib/site-packages/hikyuu', ['hikyuu/hdf5dll.dll']),
                       ('Lib/site-packages/hikyuu', ['hikyuu/hdf5_hldll.dll']),
                       ('Lib/site-packages/hikyuu', ['hikyuu/hdf5_cppdll.dll']),
@@ -102,6 +101,6 @@ setup(
             #'matplotlib>=1.5.0',
             #'pandas>=0.17.1',
             #'tushare>=0.8.2',
-            'pyperclip>=1.5.27',
+            #'pyperclip>=1.5.27',
         ],        
         )
