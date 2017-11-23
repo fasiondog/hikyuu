@@ -38,26 +38,148 @@ from hikyuu.indicator import Indicator, MACD, CLOSE
 from hikyuu.trade_manage import BUSINESS 
 from hikyuu.trade_sys.system import getSystemPartName
 
-from pyecharts import Overlap, Line, Kline, Bar
+from pyecharts import Overlap, Line, Kline, Bar, Grid, Style
 from .common import get_draw_title
 
-g_overlap = None
+
+class HKUFigure(object):
+    def __init__(self, width, height, num=1):
+        if num < 1:
+            self._num = 1
+        elif num > 4:
+            self._num = 4
+        else:
+            self._num = num
+            
+        self._added_flag = [False, False, False, False]
+        self._grid = Grid(width=width, height=height)
+        self._axis_num = {}
+        self._axis_list = [None, None, None, None]
+        for i in range(self._num):
+            overlap = Overlap(width=width, height=height)
+            self._axis_num[overlap] = i
+            self._axis_list[i] = overlap
+        self._current_axis = 0
+        
+        self._style = {}
+        if self._num == 1:
+            style = Style()
+            self._style[self._axis_list[0]] = style.add(legend_text_size='11',
+                                                        legend_top='15%',
+                                                        legend_pos='10%')
+    
+        elif self._num == 2:
+            style = Style()
+            self._style[self._axis_list[0]] = style.add(legend_text_size='11',
+                                                        legend_top='15%',
+                                                        legend_pos='10%')
+            
+            style = Style()
+            self._style[self._axis_list[1]] = style.add(legend_text_size='11',
+                                                        legend_top='65%',
+                                                        legend_pos='10%')            
+            
+        else:
+            pass
+        
+    def get_current_axis(self):
+        return self._axis_list[self._current_axis]
+    
+    def get_axis(self, pos):
+        return self._axis_list[pos]
+    
+    def get_grid(self):
+        return self._grid
+    
+    def get_style(self, axis):
+        return self._style[axis]
+            
+    def add_axis(self, axis):
+        if axis not in self._axis_num:
+            return
+        
+        pos = self._axis_num[axis]
+        if self._added_flag[pos]:
+            return
+        
+        if self._num == 1:
+            self._grid.add(axis, grid_bottom="15%")
+        
+        elif self._num == 2:
+            if pos == 0:
+                self._grid.add(axis, grid_bottom="40%")
+            else:
+                self._grid.add(axis, grid_top="65%")
+            
+        elif self._num == 3:
+            pass
+        elif self._num == 4:
+            pass
+        else:
+            print("Max support axes number is 4!")
+            
+        self._added_flag[pos] = True
+        self._current_axis = pos
+        return axis
+
+
+g_figure = None
 
 def gca():
-    global g_overlap
-    if g_overlap is None:
-        g_overlap = Overlap(width=800, height=450)
-    return g_overlap
+    global g_figure
+    if g_figure is None:
+        g_figure = HKUFigure(width=800, height=450, num=1)
+    return g_figure.get_current_axis()
 
+def gcf():
+    global g_figure
+    if g_figure is None:
+        g_figure = HKUFigure(width=800, height=450, num=1)
+    return g_figure
+
+def get_style(axis):
+    return gcf().get_style(axis)
+
+    
 def create_one_axes_figure(figsize=(800,450)):
     """生成一个仅含有1个坐标轴的figure，并返回其坐标轴对象
     
     :param figsize: (宽, 高)
     :return: ax
     """
-    global g_overlap
-    g_overlap = Overlap(width=figsize[0], height=figsize[1])
-    return g_overlap
+    global g_figure
+    g_figure = HKUFigure(width=figsize[0], height=figsize[1])
+    return g_figure.get_current_axis()
+
+def create_two_axes_figure(figsize=(800,600)):                                        
+    """生成一个含有2个坐标轴的figure，并返回坐标轴列表
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2)    
+    """
+    global g_figure
+    g_figure = HKUFigure(width=figsize[0], height=figsize[1], num=2)
+    return g_figure.get_axis(0), g_figure.get_axis(1)
+
+def create_three_axes_figure(figsize=(800,600)):                                        
+    """生成一个含有3个坐标轴的figure，并返回坐标轴列表
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2)    
+    """
+    global g_figure
+    g_figure = HKUFigure(width=figsize[0], height=figsize[1], num=3)
+    return g_figure.get_axis(0), g_figure.get_axis(1), g_figure.get_axis(2)
+
+def create_four_axes_figure(figsize=(800,600)):                                        
+    """生成一个含有4个坐标轴的figure，并返回坐标轴列表
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2)    
+    """
+    global g_figure
+    g_figure = HKUFigure(width=figsize[0], height=figsize[1], num=4)
+    return g_figure.get_axis(0), g_figure.get_axis(1), g_figure.get_axis(2), g_figure.get_axis(3)
 
 def create_figure(n=1, figsize=(800,450)):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
@@ -69,16 +191,13 @@ def create_figure(n=1, figsize=(800,450)):
     if n == 1:
         return create_one_axes_figure(figsize)
     elif n == 2:
-        pass
-        #return create_two_axes_figure(figsize)
+        return create_two_axes_figure(figsize)
     elif n == 3:
-        pass
-        #return create_three_axes_figure(figsize)
+        return create_three_axes_figure(figsize)
     elif n == 4:
-        pass
-        #return create_four_axes_figure(figsize)
+        return create_four_axes_figure(figsize)
     else:
-        #print("Max support axes number is 4!")
+        print("Max support axes number is 4!")
         return None
     
 
@@ -113,15 +232,18 @@ def iplot(indicator, new=False, axes=None,
     x_list = [i for i in range(len(indicator))]
     y_list = [ '-' if x == constant.null_price else round(x,3) for x in indicator]
     line = Line()
-        
+    
+    style = gcf().get_style(axes)
+    style = dict(style, **kwargs)    
     line.add(label, x_list, y_list, 
              is_datazoom_show=True, yaxis_min=min(indicator),
              is_legend_show=legend_on,
-             *args, **kwargs)
+             *args, **style)
     
     axes.add(line)
-        
-    return axes  
+    
+    gcf().add_axis(axes)
+    return gcf().get_grid()
 
 
 def ibar(indicator, new=False, axes=None, 
@@ -163,7 +285,8 @@ def ibar(indicator, new=False, axes=None,
     
     axes.add(bar)
         
-    return axes  
+    gcf().add_axis(axes)
+    return gcf().get_grid()  
 
 
 def kplot(kdata, new=True, axes=None, 
@@ -221,3 +344,76 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     """
     print('Pyecharts暂不支持美式K线图')
     return None
+
+def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
+    """绘制MACD
+    
+    :param axes: 指定的坐标轴
+    :param KData kdata: KData
+    :param int n1: 指标 MACD 的参数1
+    :param int n2: 指标 MACD 的参数2
+    :param int n3: 指标 MACD 的参数3
+    """
+    macd = MACD(CLOSE(kdata), n1, n2, n3)
+    bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
+    
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f'%(n1,n2,n3,fmacd[-1],smacd[-1],bmacd[-1])
+    #axes.text(0.01,0.97, text, horizontalalignment='left', verticalalignment='top', transform=axes.transAxes)
+    total = len(kdata)
+    x_list = [i for i in range(total)]
+    y1_list = [round(x) if x > 0 else '-' for x in bmacd]
+    y2_list = [round(x) if x <= 0 else '-' for x in bmacd]
+    
+    bar = Bar(subtitle=text, title_pos='10%', title_top='8%')
+    bar.add('1', x_list, y1_list, is_stack=True, is_legend_show=False)
+    bar.add('2', x_list, y2_list, is_stack=True, is_legend_show=False)
+    
+    axes.add(bar)
+    iplot(fmacd, line_type='dotted')
+    iplot(smacd)
+    
+    return axes
+
+def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
+    """绘制MACD
+    
+    :param axes: 指定的坐标轴
+    :param KData kdata: KData
+    :param int n1: 指标 MACD 的参数1
+    :param int n2: 指标 MACD 的参数2
+    :param int n3: 指标 MACD 的参数3
+    """
+    macd = MACD(CLOSE(kdata), n1, n2, n3)
+    bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
+    
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f'%(n1,n2,n3,fmacd[-1],smacd[-1],bmacd[-1])
+    #axes.text(0.01,0.97, text, horizontalalignment='left', verticalalignment='top', transform=axes.transAxes)
+    total = len(kdata)
+    x = [i for i in range(total)]
+    y = bmacd
+    y1,y2,y3 = [y[0]],[y[0]],[y[0]]
+    for i in range(1, total):
+        if ref[i]-ref[i-1]>0 and y[i]-y[i-1]>0:
+            y2.append(y[i])
+            y1.append('-')
+            y3.append('-')
+        elif ref[i]-ref[i-1]<0 and y[i]-y[i-1]<0:
+            y3.append(y[i])
+            y1.append('-')
+            y2.append('-')
+        else:
+            y1.append(y[i])
+            y2.append('-')
+            y3.append('-')
+
+    
+    bar = Bar(subtitle=text, title_pos='10%', title_top='8%')
+    bar.add('1', x, y1, is_stack=True, is_legend_show=False)
+    bar.add('2', x, y2, is_stack=True, is_legend_show=False)
+    bar.add('3', x, y3, is_stack=True, is_legend_show=False)
+    
+    axes.add(bar)
+    iplot(fmacd, line_type='dotted')
+    iplot(smacd)
+    
+    return axes
