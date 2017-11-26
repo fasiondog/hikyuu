@@ -29,16 +29,11 @@
 # 1. 20171121, Added by fasiondog
 #===============================================================================
 
-import sys
-import datetime
-import numpy as np
-
-from hikyuu import *
-from hikyuu.indicator import Indicator, MACD, CLOSE
+from hikyuu import KQuery, constant
+from hikyuu.indicator import MACD, CLOSE, HIGH, LOW
 from hikyuu.trade_manage import BUSINESS 
-from hikyuu.trade_sys.system import getSystemPartName
 
-from pyecharts import Overlap, Line, Kline, Bar, Grid, Style
+from pyecharts import Overlap, Line, Kline, Bar, Grid, Style, EffectScatter
 from .common import get_draw_title
 
 
@@ -53,6 +48,8 @@ class HKUFigure(object):
             
         self._added_flag = [False, False, False, False]
         self._grid = Grid(width=width, height=height)
+        self._width = width
+        self._height = height
         self._axis_num = {}
         self._axis_list = [None, None, None, None]
         for i in range(self._num):
@@ -60,27 +57,7 @@ class HKUFigure(object):
             self._axis_num[overlap] = i
             self._axis_list[i] = overlap
         self._current_axis = 0
-        
-        self._style = {}
-        if self._num == 1:
-            style = Style()
-            self._style[self._axis_list[0]] = style.add(legend_text_size='11',
-                                                        legend_top='15%',
-                                                        legend_pos='10%')
-    
-        elif self._num == 2:
-            style = Style()
-            self._style[self._axis_list[0]] = style.add(legend_text_size='11',
-                                                        legend_top='15%',
-                                                        legend_pos='10%')
-            
-            style = Style()
-            self._style[self._axis_list[1]] = style.add(legend_text_size='11',
-                                                        legend_top='65%',
-                                                        legend_pos='10%')            
-            
-        else:
-            pass
+        self._xaxis = None
         
     def get_current_axis(self):
         return self._axis_list[self._current_axis]
@@ -91,37 +68,158 @@ class HKUFigure(object):
     def get_grid(self):
         return self._grid
     
-    def get_style(self, axis):
-        return self._style[axis]
-            
+    def set_xaxis(self, xaxis):
+        self._xaxis = xaxis
+        
+    def get_xaxis(self):
+        return self._xaxis
+    
     def add_axis(self, axis):
         if axis not in self._axis_num:
             return
         
         pos = self._axis_num[axis]
-        if self._added_flag[pos]:
-            return
-        
-        if self._num == 1:
-            self._grid.add(axis, grid_bottom="15%")
-        
-        elif self._num == 2:
-            if pos == 0:
-                self._grid.add(axis, grid_bottom="40%")
-            else:
-                self._grid.add(axis, grid_top="65%")
-            
-        elif self._num == 3:
-            pass
-        elif self._num == 4:
-            pass
-        else:
-            print("Max support axes number is 4!")
-            
-        self._added_flag[pos] = True
         self._current_axis = pos
+        self._added_flag[pos] = True
+        self._flush()
         return axis
 
+    def _flush(self):
+        self._grid = Grid(width=self._width, height=self._height)
+        for pos, axis in enumerate(self._axis_list):
+            if axis is None or axis.options is None \
+                or axis.options.get('yAxis') is None:
+                continue
+            
+            if self._num == 1:
+                self._grid.add(axis, grid_top="8%")
+            
+            elif self._num == 2:
+                if pos == 0:
+                    self._grid.add(axis, grid_top="8%", grid_height='52%')
+                else:
+                    self._grid.add(axis, grid_top="62%")
+                
+            elif self._num == 3:
+                if pos == 0:
+                    self._grid.add(axis, grid_top='8%', grid_height='40%')
+                elif pos == 1:
+                    self._grid.add(axis, grid_top='50%', grid_height='19%')
+                else:
+                    self._grid.add(axis, grid_bottom='10%', grid_height='19%')
+                
+            else:
+                if pos == 0:
+                    self._grid.add(axis, grid_top='8%', grid_height='30%')
+                elif pos == 1:
+                    self._grid.add(axis, grid_top='40%', grid_height='18%')
+                elif pos == 2:
+                    self._grid.add(axis, grid_top='60%', grid_height='15%')
+                else:
+                    self._grid.add(axis, grid_top='77%', grid_height='15%')        
+
+    def get_style(self, axis):
+        pos  = self._axis_num[axis]
+        num = self._num
+        style = Style()
+        default_datazoom_type = 'both'
+        result = None
+        if num == 1:
+            result = style.add(legend_text_size='10',
+                               legend_top='8%',
+                               legend_pos='10%',
+                               legend_orient='vertical',
+                               is_datazoom_show=True,
+                               datazoom_type=default_datazoom_type)
+    
+        elif num == 2:
+            if pos == 0:
+                result = style.add(legend_text_size='10',
+                                   legend_top='8%',
+                                   legend_pos='10%',
+                                   legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1],
+                                   is_xaxis_show=False)
+            else:
+                result = style.add(legend_text_size='10',
+                                   legend_top='62%',
+                                   legend_pos='10%',
+                                   #legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1],
+                                   is_xaxis_show=True)            
+        
+        elif num == 3:
+            if pos == 0:
+                result = style.add(legend_text_size='10',
+                                   legend_top='8%',
+                                   legend_pos='10%',
+                                   legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1,2],
+                                   is_xaxis_show=False)
+            elif pos == 1:
+                result = style.add(legend_text_size='10',
+                                   legend_top='50%',
+                                   legend_pos='10%',
+                                   #legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1,2],
+                                   is_xaxis_show=False)
+            else:
+                result = style.add(legend_text_size='10',
+                                   legend_top='71%',
+                                   legend_pos='10%',
+                                   #legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1,2],
+                                   is_xaxis_show=True)
+            
+        else:
+            if pos == 0:
+                result = style.add(legend_text_size='10',
+                                   legend_top='8%',
+                                   legend_pos='10%',
+                                   legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1,2,3],
+                                   is_xaxis_show=False)
+            elif pos == 1:
+                result = style.add(legend_text_size='10',
+                                   legend_top='40%',
+                                   legend_pos='10%',
+                                   #legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1,2,3],
+                                   is_xaxis_show=False)
+            elif pos == 2:
+                result = style.add(legend_text_size='10',
+                                   legend_top='60%',
+                                   legend_pos='10%',
+                                   #legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1,2,3],
+                                   is_xaxis_show=False)
+            else:
+                result = style.add(legend_text_size='10',
+                                   legend_top='77%',
+                                   legend_pos='10%',
+                                   #legend_orient='vertical',
+                                   is_datazoom_show=True,
+                                   datazoom_type=default_datazoom_type,
+                                   datazoom_xaxis_index=[0,1,2,3],
+                                   is_xaxis_show=True)                
+
+        return result
 
 g_figure = None
 
@@ -181,21 +279,22 @@ def create_four_axes_figure(figsize=(800,600)):
     g_figure = HKUFigure(width=figsize[0], height=figsize[1], num=4)
     return g_figure.get_axis(0), g_figure.get_axis(1), g_figure.get_axis(2), g_figure.get_axis(3)
 
-def create_figure(n=1, figsize=(800,450)):
+def create_figure(n=1, figsize=(10,8)):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
 
     :param int n: 坐标轴数量
     :param figsize: (宽, 高)
     :return: (ax1, ax2, ...) 根据指定的坐标轴数量而定，超出[1,4]个坐标轴时，返回None
     """
+    new_figsize = (figsize[0]*100, figsize[1]*100)
     if n == 1:
-        return create_one_axes_figure(figsize)
+        return create_one_axes_figure(new_figsize)
     elif n == 2:
-        return create_two_axes_figure(figsize)
+        return create_two_axes_figure(new_figsize)
     elif n == 3:
-        return create_three_axes_figure(figsize)
+        return create_three_axes_figure(new_figsize)
     elif n == 4:
-        return create_four_axes_figure(figsize)
+        return create_four_axes_figure(new_figsize)
     else:
         print("Max support axes number is 4!")
         return None
@@ -223,20 +322,23 @@ def iplot(indicator, new=False, axes=None,
         print("indicator is None")
         return
     
-    if not axes:
+    if axes is None:
         axes = gca()
     
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
-    x_list = [i for i in range(len(indicator))]
+    x_list = gcf().get_xaxis()
+    if x_list is None:
+        x_list = [i for i in range(len(indicator))]
+        
     y_list = [ '-' if x == constant.null_price else round(x,3) for x in indicator]
     line = Line()
     
     style = gcf().get_style(axes)
     style = dict(style, **kwargs)    
     line.add(label, x_list, y_list, 
-             is_datazoom_show=True, yaxis_min=min(indicator),
+             yaxis_min=min(indicator),
              is_legend_show=legend_on,
              *args, **style)
     
@@ -274,19 +376,24 @@ def ibar(indicator, new=False, axes=None,
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
-    x_list = [i for i in range(len(indicator))]
+    x_list = gcf().get_xaxis()
+    if x_list is None:
+        x_list = [i for i in range(len(indicator))]
+        
     y_list = [ '-' if x == constant.null_price else round(x,3) for x in indicator]
     bar = Bar()
         
+    style = gcf().get_style(axes)
+    style = dict(style, **kwargs)    
     bar.add(label, x_list, y_list, 
-             is_datazoom_show=True, yaxis_min=min(indicator),
+             yaxis_min=min(indicator),
              is_legend_show=legend_on,
-             *args, **kwargs)
+             *args, **style)
     
     axes.add(bar)
         
     gcf().add_axis(axes)
-    return gcf().get_grid()  
+    return gcf().get_grid()
 
 
 def kplot(kdata, new=True, axes=None, 
@@ -311,7 +418,7 @@ def kplot(kdata, new=True, axes=None,
     title = get_draw_title(kdata)
     last_record = kdata[-1]
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime.number/10000, 
+        last_record.datetime.date(), 
         last_record.openPrice, last_record.highPrice,
         last_record.lowPrice,  last_record.closePrice,
         100*(last_record.closePrice-kdata[-2].closePrice)/kdata[-2].closePrice)
@@ -324,13 +431,18 @@ def kplot(kdata, new=True, axes=None,
         
     y_list = [[k.openPrice, k.closePrice, k.lowPrice, k.highPrice] for k in kdata] 
 
+    style = gcf().get_style(axes)
     kline = Kline(title, text, title_pos='center', subtitle_color='#FF0000')
-    kline.add(None, x_axis=x_list, y_axis=y_list, is_datazoom_show=True,
+    kline.add(None, x_axis=x_list, y_axis=y_list,
               mark_line=["max"], mark_line_symbolsize=0, 
-              mark_line_valuedim='highest')
+              mark_line_valuedim='highest',
+              **style)
     axes.add(kline)
     
-    return axes  
+    gcf().set_xaxis(x_list)
+    gcf().add_axis(axes)
+    return gcf().get_grid()  
+
 
 def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     """绘制美式K线图
@@ -417,3 +529,229 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     iplot(smacd)
     
     return axes
+
+
+def sgplot(sg, new=True, axes=None,  style=1, kdata=None):
+    """绘制买入/卖出信号
+
+    :param SignalBase sg: 信号指示器
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
+    :param style: 1 | 2 信号箭头绘制样式
+    :param KData kdata: 指定的KData（即信号发生器的交易对象），
+                       如该值为None，则认为该信号发生器已经指定了交易对象，
+                       否则，使用该参数作为交易对象
+    """
+    if kdata is None:
+        kdata = sg.getTO()
+    else:
+        sg.setTO(kdata)
+        
+    refdates = kdata.getDatetimeList()
+    if kdata.getQuery().kType == KQuery.DAY:
+        x_list = [d.date() for d in refdates]
+    else:
+        x_list = [d.datetime() for d in refdates]
+
+    date_index = dict([(d,i) for i,d in enumerate(refdates)])
+    
+    if axes is None:
+        if new:
+            axes = create_figure()
+            kplot(kdata, axes=axes)
+        else:
+            axes = gca()        
+
+    es = EffectScatter()
+            
+    highest = round(max(HIGH(kdata)),2)
+    lowest = round(min(LOW(kdata)), 2)
+    height = highest - lowest
+    
+    dates = sg.getBuySignal()
+    buy_y_list = ['-' for i in range(len(refdates))]
+    for d in dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        buy_y_list[pos] = round(krecord.lowPrice - height*0.02, 2)
+        
+    es.add("", x_list, buy_y_list, 
+           symbol_size=12, effect_scale=2.5, effect_period=0,symbol="triangle",
+           is_label_show=True,
+           label_formatter='B',
+           label_pos = 'bottom',
+           label_text_color = '#CD0000',
+           label_color=['#CD0000', '#008B00'])
+              
+    dates = sg.getSellSignal()
+    sell_y_list = ['-' for i in range(len(refdates))]
+    for d in dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        sell_y_list[pos] = round(krecord.highPrice + height*0.015, 2)
+
+    es.add("", x_list, sell_y_list, 
+           symbol_size=20, effect_scale=2.5, effect_period=0,symbol="pin",
+           is_label_show=True,
+           label_formatter='S',
+           label_pos = 'top',
+           label_text_color = '#008B00',           
+           label_color=['#CD0000', '#008B00', '#008B00'])
+    
+    axes.add(es)
+    
+    gcf().set_xaxis(x_list)
+    gcf().add_axis(axes)
+    return gcf().get_grid()  
+
+
+def cnplot(cn, new=True, axes=None, kdata=None):
+    """绘制系统有效条件
+
+    :param ConditionBase cn: 系统有效条件
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
+    :param KData kdata: 指定的KData，如该值为None，则认为该系统有效条件已经
+                        指定了交易对象，否则，使用该参数作为交易对象
+    """
+    if kdata is None:
+        kdata = cn.getTO()
+    else:
+        cn.setTO(kdata)
+        
+    refdates = kdata.getDatetimeList()
+    if kdata.getQuery().kType == KQuery.DAY:
+        x_list = [d.date() for d in refdates]
+    else:
+        x_list = [d.datetime() for d in refdates]
+    
+    axes2 = None        
+    if axes is None:
+        if new:
+            axes, axes2 = create_figure(2)
+            kplot(kdata, axes=axes)
+        else:
+            axes = gca()
+
+    max_value = max(HIGH(kdata))
+    line = Line()
+    y1 = [max_value if cn.isValid(d) else 0 for d in refdates]
+    y2 = [0 if cn.isValid(d) else max_value for d in refdates]
+    line.add("", x_list, y1, 
+             is_step=True,
+             is_fill=True,
+             yaxis_max = max_value,
+             is_symbol_show=False,
+             line_opacity=0,
+             label_color='#CD0000',
+             area_color='#CD0000', 
+             area_opacity=0.2)
+    line.add("", x_list, y2, 
+             is_step=True, 
+             is_fill=True,
+             yaxis_max = max_value,
+             is_symbol_show=False,
+             line_opacity=0,
+             label_color='#0000FF',
+             area_color='#0000FF', 
+             area_opacity=0.2)
+    
+    gcf().set_xaxis(x_list)
+
+    if axes2 is not None:
+        axes2.add(line)
+        gcf().add_axis(axes2)
+    else:
+        axes.add(line)
+        gcf().add_axis(axes)
+    
+    return gcf().get_grid()  
+
+
+def sysplot(sys, new=True, axes=None, style=1):
+    """绘制系统实际买入/卖出信号
+    
+    :param SystemBase sys: 系统实例
+    :param new:   仅在未指定axes的情况下生效，当为True时，
+                   创建新的窗口对象并在其中进行绘制
+    :param axes:  指定在那个轴对象中进行绘制
+    :param style: 1 | 2 信号箭头绘制样式
+    """
+    kdata = sys.getTO()
+        
+    refdates = kdata.getDatetimeList()
+    if kdata.getQuery().kType == KQuery.DAY:
+        x_list = [d.date() for d in refdates]
+    else:
+        x_list = [d.datetime() for d in refdates]
+
+    date_index = dict([(d,i) for i,d in enumerate(refdates)])
+    
+    if axes is None:
+        if new:
+            axes = create_figure()
+            kplot(kdata, axes=axes)
+        else:
+            axes = gca()        
+
+    es = EffectScatter()
+            
+    highest = round(max(HIGH(kdata)),2)
+    lowest = round(min(LOW(kdata)), 2)
+    height = highest - lowest
+    
+    tds = sys.tm.getTradeList()
+    buy_dates = []
+    sell_dates = []
+    for t in tds:
+        if t.business == BUSINESS.BUY:
+            buy_dates.append(t.datetime)
+        elif t.business == BUSINESS.SELL:
+            sell_dates.append(t.datetime)
+        else:
+            pass
+    
+    dates = buy_dates
+    buy_y_list = ['-' for i in range(len(refdates))]
+    for d in dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        buy_y_list[pos] = round(krecord.lowPrice - height*0.02, 2)
+        
+    es.add("", x_list, buy_y_list, 
+           symbol_size=12, effect_scale=2.5, effect_period=0,symbol="triangle",
+           is_label_show=True,
+           label_formatter='B',
+           label_pos = 'bottom',
+           label_text_color = '#CD0000',
+           label_color=['#CD0000', '#008B00'])
+              
+    dates = sell_dates
+    sell_y_list = ['-' for i in range(len(refdates))]
+    for d in dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        sell_y_list[pos] = round(krecord.highPrice + height*0.015, 2)
+
+    es.add("", x_list, sell_y_list, 
+           symbol_size=20, effect_scale=2.5, effect_period=0,symbol="pin",
+           is_label_show=True,
+           label_formatter='S',
+           label_pos = 'top',
+           label_text_color = '#008B00',           
+           label_color=['#CD0000', '#008B00', '#008B00'])
+    
+    axes.add(es)
+    
+    gcf().set_xaxis(x_list)
+    gcf().add_axis(axes)
+    return gcf().get_grid()       
+   

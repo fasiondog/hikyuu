@@ -148,12 +148,14 @@ for s in sm:
 #
 #==============================================================================            
 
-KData.plot = kplot
-KData.kplot = kplot
-KData.mkplot = mkplot
+#KData.plot = kplot
+#KData.kplot = kplot
+#KData.mkplot = mkplot
 
-Indicator.plot = iplot
-Indicator.bar = ibar
+#Indicator.plot = iplot
+#Indicator.bar = ibar
+
+use_draw_engine('matplotlib')
 
 SignalBase.plot = sgplot
 ConditionBase.plot = cnplot

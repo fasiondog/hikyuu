@@ -29,7 +29,7 @@
 # 1. 20100220, Added by fasiondog
 #===============================================================================
 
-from .drawplot import (create_figure, 
+from .drawplot import (#create_figure, 
                        ax_set_locator_formatter,
                        adjust_axes_show,
                        ax_draw_macd,
@@ -45,10 +45,13 @@ from .drawplot import (create_figure,
 from . import volume as vl
 from . import elder as el
 from . import kaufman as kf
+
+from .draw import use_draw_engine, create_figure
     
 
 __all__ = [
     'vl', 'el', 'kf',
+    'use_draw_engine',
     'create_figure', 
     'ax_set_locator_formatter',
     'adjust_axes_show',

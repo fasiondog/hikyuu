@@ -654,6 +654,7 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     if axes is None:
         if new:
             axes = create_figure()
+            kplot(kdata, axes=axes)
         else:
             axes = gca()        
 
