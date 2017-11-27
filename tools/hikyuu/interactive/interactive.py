@@ -144,23 +144,11 @@ for s in sm:
         
 #==============================================================================
 #
-# 为 KData、Indicator 等添加 plot 方法
+# 设置默认绘图引擎
 #
 #==============================================================================            
 
-#KData.plot = kplot
-#KData.kplot = kplot
-#KData.mkplot = mkplot
-
-#Indicator.plot = iplot
-#Indicator.bar = ibar
-
 use_draw_engine('matplotlib')
-
-SignalBase.plot = sgplot
-ConditionBase.plot = cnplot
-
-System.plot = sysplot
 
 
 #==============================================================================

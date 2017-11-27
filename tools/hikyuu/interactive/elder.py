@@ -38,7 +38,7 @@ from numpy import mean
 
 from hikyuu import QueryByIndex, constant
 from hikyuu.indicator import Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS
-from hikyuu.interactive.drawplot import (create_three_axes_figure, 
+from hikyuu.interactive.drawplot import (create_figure, 
                                          ax_draw_macd2, 
                                          adjust_axes_show,
                                          ax_set_locator_formatter)
@@ -88,7 +88,7 @@ def draw(stock, query=QueryByIndex(-130), ma_n=22, ma_w='auto', vigor_n=13):
     sf = SAFTYLOSS(close, 10, 3, 2.0)
     vigor = VIGOR(kdata, vigor_n)
 
-    ax1, ax2, ax3 = create_three_axes_figure()
+    ax1, ax2, ax3 = create_figure(3)
     kdata.plot(axes=ax1)
     _draw_ema_pipe(ax1,kdata, ema, n=ma_n, w=ma_w)
     sf.plot(axes=ax1, color='y', legend_on=True)

@@ -38,8 +38,9 @@ from hikyuu import Query, StockManager
 from hikyuu.indicator import *
 from hikyuu.trade_sys.signal import SG_Single, SG_Cross, SG_Flex
 from hikyuu.trade_manage import BUSINESS
-from .drawplot import (create_figure, ax_set_locator_formatter,
-                       create_three_axes_figure, adjust_axes_show, 
+from .drawplot import (create_figure, 
+                       ax_set_locator_formatter,
+                       adjust_axes_show, 
                        ax_draw_macd)
 
 def draw(stock, query = Query(-130), 
@@ -91,7 +92,9 @@ def draw(stock, query = Query(-130),
     label = "ER(%s)" % cer[-1]
     cer.plot(axes=ax2, color='b', marker='o', label=label, 
              legend_on=False, text_on=True)
-    ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
+    
+    PRICELIST([0.8 for i in range(len(kdata))]).plot(axes=ax2,color='r',linestyle='--')
+    #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
     ax2.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
     ax2.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
     ax2.hlines(0,0,len(kdata))
@@ -117,7 +120,7 @@ def draw2(block, query = Query(-130),
     else:
         kdata = sm['sh000001'].getKData(query)
     
-    ax1, ax2, ax3 = create_three_axes_figure()
+    ax1, ax2, ax3 = create_figure(3)
     kdata.plot(axes = ax1)
 
     cama = AMA(CLOSE(kdata), n = n )

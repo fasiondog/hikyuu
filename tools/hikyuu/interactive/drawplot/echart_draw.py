@@ -30,11 +30,25 @@
 #===============================================================================
 
 from hikyuu import KQuery, constant
-from hikyuu.indicator import MACD, CLOSE, HIGH, LOW
+from hikyuu.indicator import MACD, CLOSE, HIGH, LOW, PRICELIST
 from hikyuu.trade_manage import BUSINESS 
 
 from pyecharts import Overlap, Line, Kline, Bar, Grid, Style, EffectScatter
 from .common import get_draw_title
+
+
+def ax_set_xlim(self, *args, **kwargs):
+    pass
+
+def ax_set_ylim(self, *args, **kwargs):
+    pass
+
+def ax_fill_between(self, *args, **kwargs):
+    pass
+
+Overlap.set_xlim = ax_set_xlim
+Overlap.set_ylim = ax_set_ylim
+Overlap.fill_between = ax_fill_between
 
 
 class HKUFigure(object):
@@ -300,7 +314,7 @@ def create_figure(n=1, figsize=(10,8)):
         return None
     
 
-def iplot(indicator, new=False, axes=None, 
+def iplot(indicator, new=True, axes=None, 
           legend_on=False, text_on=False, text_color='k',  
           zero_on=False, label=None, *args, **kwargs):
     """绘制indicator曲线
@@ -323,7 +337,7 @@ def iplot(indicator, new=False, axes=None,
         return
     
     if axes is None:
-        axes = gca()
+        axes = create_figure() if new else gca()
     
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
@@ -348,7 +362,7 @@ def iplot(indicator, new=False, axes=None,
     return gcf().get_grid()
 
 
-def ibar(indicator, new=False, axes=None, 
+def ibar(indicator, new=True, axes=None, 
           legend_on=False, text_on=False, text_color='k',  
           zero_on=False, label=None, *args, **kwargs):
     """绘制indicator曲线
@@ -371,7 +385,7 @@ def ibar(indicator, new=False, axes=None,
         return
     
     if not axes:
-        axes = gca()
+        axes = create_figure() if new else gca()
     
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
@@ -412,8 +426,8 @@ def kplot(kdata, new=True, axes=None,
         print("kdata is None")
         return
     
-    if not axes:
-        axes = gca()
+    if axes is None:
+        axes = create_figure() if new else gca()
         
     title = get_draw_title(kdata)
     last_record = kdata[-1]
