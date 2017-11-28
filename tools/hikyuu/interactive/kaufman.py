@@ -23,6 +23,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from docutils.nodes import legend
 
 #===============================================================================
 # History:
@@ -35,10 +36,12 @@
 """
 
 from hikyuu import Query, StockManager
-from hikyuu.indicator import *
+from hikyuu.indicator import (OP, AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE,
+                              HIGH, LOW, OPEN, KDATA, POS)
 from hikyuu.trade_sys.signal import SG_Single, SG_Cross, SG_Flex
 from hikyuu.trade_manage import BUSINESS
-from .drawplot import (create_figure, 
+from .drawplot import (show_gcf,
+                       create_figure, 
                        ax_set_locator_formatter,
                        adjust_axes_show, 
                        ax_draw_macd)
@@ -93,15 +96,20 @@ def draw(stock, query = Query(-130),
     cer.plot(axes=ax2, color='b', marker='o', label=label, 
              legend_on=False, text_on=True)
     
-    PRICELIST([0.8 for i in range(len(kdata))]).plot(axes=ax2,color='r',linestyle='--')
+    total = len(kdata)
+    CVAL(0.8, total).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(-0.6, total).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(-0.8, total).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(0, total).plot(axes=ax2,color='k',linestyle='-')
     #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
-    ax2.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
-    ax2.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
-    ax2.hlines(0,0,len(kdata))
+    #ax2.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
+    #ax2.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
+    #ax2.hlines(0,0,len(kdata))
     
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.getDatetimeList(), query.kType)
     adjust_axes_show([ax1, ax2])
+    return show_gcf()
  
 
 def draw2(block, query = Query(-130), 
@@ -163,23 +171,32 @@ def draw2(block, query = Query(-130),
     a = POS(block, query, SG_Flex(OP(AMA(n = 30)), 60))
     a.name = "POS(30)"
     a.plot(axes=ax2, color='g', marker='.', legend_on=True)
-    ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
-    ax2.hlines(0.2,0,len(kdata),color='r',linestyle='--')
+    
+    total = len(kdata)
+    CVAL(0.8, total).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(0.2, total).plot(axes=ax2,color='r',linestyle='--')
+    #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
+    #ax2.hlines(0.2,0,len(kdata),color='r',linestyle='--')
     
     if ama1.name == "AMA":
         cer = PRICELIST(cama, 1)
         label = "ER(%s)" % cer[-1]
         cer.plot(axes=ax3, color='b', marker='.', label=label, 
                  legend_on=False, text_on=True)
-        ax3.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
-        ax3.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
-        ax3.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
-        ax3.hlines(0,0,len(kdata))
+        CVAL(0.8, total).plot(axes=ax2,color='r',linestyle='--')
+        CVAL(-0.6, total).plot(axes=ax2,color='r',linestyle='--')
+        CVAL(-0.8, total).plot(axes=ax2,color='r',linestyle='--')
+        CVAL(0, total).plot(axes=ax2,color='k',linestyle='-')
+        #ax3.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
+        #ax3.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
+        #ax3.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
+        #ax3.hlines(0,0,len(kdata))
     else:
         ax_draw_macd(ax2, kdata)
     #ax2.set_ylim(-1, 1)
     
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.getDatetimeList(), query.kType)
-    adjust_axes_show([ax1, ax2])   
+    adjust_axes_show([ax1, ax2])
+    return show_gcf()
     

@@ -39,7 +39,8 @@ from hikyuu.trade_sys.signal import SG_Cross
 from hikyuu.interactive.drawplot import (create_figure, 
                                          ax_set_locator_formatter, 
                                          adjust_axes_show,
-                                         ax_draw_macd)
+                                         ax_draw_macd,
+                                         show_gcf)
 
 def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60, 
          ma5_n=100, ma_type="SMA", vma1_n=5, vma2_n=10):
@@ -84,6 +85,7 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
 
     ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
     adjust_axes_show([ax1, ax2])
+    return show_gcf()
 
 
 def draw2(stock, query=Query(-130), ma1_n=7, ma2_n=20, ma3_n=30, 
@@ -125,4 +127,5 @@ def draw2(stock, query=Query(-130), ma1_n=7, ma2_n=20, ma3_n=30,
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
     adjust_axes_show([ax1, ax2, ax3])
+    return show_gcf()
     

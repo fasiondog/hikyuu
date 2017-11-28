@@ -30,7 +30,7 @@
 #===============================================================================
 
 from hikyuu import KQuery, constant
-from hikyuu.indicator import MACD, CLOSE, HIGH, LOW, PRICELIST
+from hikyuu.indicator import MACD, CLOSE, HIGH, LOW
 from hikyuu.trade_manage import BUSINESS 
 
 from pyecharts import Overlap, Line, Kline, Bar, Grid, Style, EffectScatter
@@ -72,6 +72,9 @@ class HKUFigure(object):
             self._axis_list[i] = overlap
         self._current_axis = 0
         self._xaxis = None
+        
+    def _repr_html_(self):
+        return self.get_grid()._repr_html_()
         
     def get_current_axis(self):
         return self._axis_list[self._current_axis]
@@ -132,7 +135,7 @@ class HKUFigure(object):
                 else:
                     self._grid.add(axis, grid_top='77%', grid_height='15%')        
 
-    def get_style(self, axis):
+    def get_style(self, axis, **kwargs):
         pos  = self._axis_num[axis]
         num = self._num
         style = Style()
@@ -143,6 +146,7 @@ class HKUFigure(object):
                                legend_top='8%',
                                legend_pos='10%',
                                legend_orient='vertical',
+                               is_symbol_show=False,
                                is_datazoom_show=True,
                                datazoom_type=default_datazoom_type)
     
@@ -152,6 +156,7 @@ class HKUFigure(object):
                                    legend_top='8%',
                                    legend_pos='10%',
                                    legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1],
@@ -161,6 +166,7 @@ class HKUFigure(object):
                                    legend_top='62%',
                                    legend_pos='10%',
                                    #legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1],
@@ -172,6 +178,7 @@ class HKUFigure(object):
                                    legend_top='8%',
                                    legend_pos='10%',
                                    legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1,2],
@@ -181,6 +188,7 @@ class HKUFigure(object):
                                    legend_top='50%',
                                    legend_pos='10%',
                                    #legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1,2],
@@ -190,6 +198,7 @@ class HKUFigure(object):
                                    legend_top='71%',
                                    legend_pos='10%',
                                    #legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1,2],
@@ -201,6 +210,7 @@ class HKUFigure(object):
                                    legend_top='8%',
                                    legend_pos='10%',
                                    legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1,2,3],
@@ -210,6 +220,7 @@ class HKUFigure(object):
                                    legend_top='40%',
                                    legend_pos='10%',
                                    #legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1,2,3],
@@ -219,6 +230,7 @@ class HKUFigure(object):
                                    legend_top='60%',
                                    legend_pos='10%',
                                    #legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1,2,3],
@@ -228,12 +240,36 @@ class HKUFigure(object):
                                    legend_top='77%',
                                    legend_pos='10%',
                                    #legend_orient='vertical',
+                                   is_symbol_show=False,
                                    is_datazoom_show=True,
                                    datazoom_type=default_datazoom_type,
                                    datazoom_xaxis_index=[0,1,2,3],
                                    is_xaxis_show=True)                
 
+        for item in kwargs.items():
+            if 'color' == item[0]:
+                color_map = {'r': '#CD0000',
+                             'g': '#008B00',
+                             'b': '#0000EE',
+                             'c':'#40E0D0',
+                             'm': '#CD00CD',
+                             'y': '#EE9A00',
+                             'k': '#000000',
+                             'w': '#FFFFFF'
+                             }
+                result['line_color'] = color_map[item[1]] if item[1] in color_map else color_map['r']
+            
+            elif 'linestyle' == item[0]:
+                line_map = {'-' : 'solid',
+                            '--': 'dashed',
+                            ':' : 'dotted'}
+                result['line_type'] = line_map[item[1]] if item[1] in line_map else line_map['-']
+            
+            else:
+                result[item[0]] = item[1]
+        
         return result
+
 
 g_figure = None
 
@@ -349,8 +385,7 @@ def iplot(indicator, new=True, axes=None,
     y_list = [ '-' if x == constant.null_price else round(x,3) for x in indicator]
     line = Line()
     
-    style = gcf().get_style(axes)
-    style = dict(style, **kwargs)    
+    style = gcf().get_style(axes, **kwargs)
     line.add(label, x_list, y_list, 
              yaxis_min=min(indicator),
              is_legend_show=legend_on,
@@ -359,7 +394,7 @@ def iplot(indicator, new=True, axes=None,
     axes.add(line)
     
     gcf().add_axis(axes)
-    return gcf().get_grid()
+    return gcf()
 
 
 def ibar(indicator, new=True, axes=None, 
@@ -397,8 +432,7 @@ def ibar(indicator, new=True, axes=None,
     y_list = [ '-' if x == constant.null_price else round(x,3) for x in indicator]
     bar = Bar()
         
-    style = gcf().get_style(axes)
-    style = dict(style, **kwargs)    
+    style = gcf().get_style(axes, **kwargs)
     bar.add(label, x_list, y_list, 
              yaxis_min=min(indicator),
              is_legend_show=legend_on,
@@ -407,7 +441,7 @@ def ibar(indicator, new=True, axes=None,
     axes.add(bar)
         
     gcf().add_axis(axes)
-    return gcf().get_grid()
+    return gcf()
 
 
 def kplot(kdata, new=True, axes=None, 
@@ -455,7 +489,7 @@ def kplot(kdata, new=True, axes=None,
     
     gcf().set_xaxis(x_list)
     gcf().add_axis(axes)
-    return gcf().get_grid()  
+    return gcf()
 
 
 def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
@@ -620,7 +654,7 @@ def sgplot(sg, new=True, axes=None,  style=1, kdata=None):
     
     gcf().set_xaxis(x_list)
     gcf().add_axis(axes)
-    return gcf().get_grid()  
+    return gcf()
 
 
 def cnplot(cn, new=True, axes=None, kdata=None):
@@ -683,7 +717,7 @@ def cnplot(cn, new=True, axes=None, kdata=None):
         axes.add(line)
         gcf().add_axis(axes)
     
-    return gcf().get_grid()  
+    return gcf()
 
 
 def sysplot(sys, new=True, axes=None, style=1):
@@ -767,5 +801,5 @@ def sysplot(sys, new=True, axes=None, style=1):
     
     gcf().set_xaxis(x_list)
     gcf().add_axis(axes)
-    return gcf().get_grid()       
+    return gcf()     
    

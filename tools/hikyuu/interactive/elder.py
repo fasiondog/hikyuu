@@ -37,8 +37,9 @@ from pylab import plot
 from numpy import mean
 
 from hikyuu import QueryByIndex, constant
-from hikyuu.indicator import Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS
+from hikyuu.indicator import Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS, CVAL
 from hikyuu.interactive.drawplot import (create_figure, 
+                                         show_gcf,
                                          ax_draw_macd2, 
                                          adjust_axes_show,
                                          ax_set_locator_formatter)
@@ -117,4 +118,5 @@ def draw(stock, query=QueryByIndex(-130), ma_n=22, ma_w='auto', vigor_n=13):
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
     adjust_axes_show([ax1, ax2, ax3])
+    return show_gcf()
        

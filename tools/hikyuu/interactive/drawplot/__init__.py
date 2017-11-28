@@ -131,6 +131,15 @@ def gcf():
         return ect_gcf()   
 
 
+def show_gcf():
+    """显示当前figure"""
+    engine = get_current_draw_engine()
+    if engine == 'matplotlib':
+        return None
+    else:
+        return ect_gcf()   
+    
+
 def create_figure(n=1, figsize=(8,6)):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
 
@@ -212,6 +221,7 @@ __all__ = ['use_draw_engine',
            'get_current_draw_engine',
            'create_figure',
            'gcf',
+           'show_gcf',
            'gca',
            'ax_draw_macd',
            'ax_draw_macd2']
