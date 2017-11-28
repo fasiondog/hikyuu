@@ -1194,7 +1194,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     BOOST_CHECK(kdata[2709] == KRecord(Datetime(201106020000), 10.34, 10.38, 9.93, 10.04, 103909.3, 780543.0));
     BOOST_CHECK(kdata[2554] == KRecord(Datetime(201010140000), 11.04, 11.42, 10.91, 10.95, 322428.8, 2195006));
     BOOST_CHECK(kdata[2548] == KRecord(Datetime(201009290000), 9.26, 9.64, 9.20, 9.48, 99719.8, 799165));
-    BOOST_CHECK(kdata[2547] == KRecord(Datetime(201009280000), 8.80, 8.80, 8.55, 8.56, 81241.5, 639882));
+    BOOST_CHECK(kdata[2547] == KRecord(Datetime(201009280000), 9.82, 9.82, 9.55, 9.55, 81241.5, 639882));
 
     /** @arg 后向复权*/
     query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::BACKWARD);
@@ -1212,7 +1212,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     BOOST_CHECK(kdata[2709] == KRecord(Datetime(201106020000), 10.33, 10.37, 9.93, 10.04, 103909.3, 780543.0));
     BOOST_CHECK(kdata[2554] == KRecord(Datetime(201010140000), 11.03, 11.40, 10.90, 10.94, 322428.8, 2195006));
     BOOST_CHECK(kdata[2548] == KRecord(Datetime(201009290000), 9.27, 9.64, 9.21, 9.49, 99719.8, 799165));
-    BOOST_CHECK(kdata[2547] == KRecord(Datetime(201009280000), 8.81, 8.81, 8.57, 8.58, 81241.5, 639882));
+    BOOST_CHECK(kdata[2547] == KRecord(Datetime(201009280000), 9.82, 9.82, 9.55, 9.56, 81241.5, 639882));
 
     /** @arg 等比后向复权*/
     query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::EQUAL_BACKWARD);

@@ -114,10 +114,16 @@ void KDataBufferImp::_recoverForward() {
         }
         pre_pos = i;  //除权日
 
-        //计算流通股份变动比例
+        //计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
         price_t change = 0.0;
         bool flag = false;
-        if (weightIter != weightList.begin()) {
+        if (weightIter != weightList.begin()
+			&& !(weightIter->countAsGift() == 0.0
+			&& weightIter->countForSell() == 0.0
+			&& weightIter->priceForSell() == 0.0
+			&& weightIter->bonus() == 0.0 
+			&& weightIter->increasement() == 0.0 )) 
+		{
             pre_weightIter = weightIter - 1;
             if (pre_weightIter->freeCount() != 0.0) {
                 change = (weightIter->freeCount()
@@ -176,7 +182,13 @@ void KDataBufferImp::_recoverBackward() {
         bool flag = false;
         pre_weightIter = weightIter + 1;
         if (pre_weightIter != weightList.rend()
-                && pre_weightIter->freeCount() != 0.0) {
+                && pre_weightIter->freeCount() != 0.0
+				&& 	!(weightIter->countAsGift() == 0.0
+				&&	weightIter->countForSell() == 0.0
+				&&	weightIter->priceForSell() == 0.0
+				&&	weightIter->bonus() == 0.0 
+				&&	weightIter->increasement() == 0.0 )) 
+		{
             change = (weightIter->freeCount() - pre_weightIter->freeCount())
                     / pre_weightIter->freeCount();
             flag = true;
@@ -244,7 +256,13 @@ void KDataBufferImp::_recoverEqualForward() {
         //流通股份变动比例
         price_t change = 0.0;
         bool flag = false;
-        if (weightIter != weightList.begin()) {
+        if (weightIter != weightList.begin()
+			&& 	!(weightIter->countAsGift() == 0.0
+			&&	weightIter->countForSell() == 0.0
+			&&	weightIter->priceForSell() == 0.0
+			&&	weightIter->bonus() == 0.0 
+			&&	weightIter->increasement() == 0.0 )) 
+		{
             pre_weightIter = weightIter - 1;
             if (pre_weightIter->freeCount() != 0.0) {
                 change = (weightIter->freeCount() - pre_weightIter->freeCount())
@@ -311,7 +329,13 @@ void KDataBufferImp::_recoverEqualBackward() {
         bool flag = false;
         pre_weightIter = weightIter + 1;
         if (pre_weightIter != weightList.rend()
-                && pre_weightIter->freeCount() != 0.0) {
+                && pre_weightIter->freeCount() != 0.0
+				&& 	!(weightIter->countAsGift() == 0.0
+				&&	weightIter->countForSell() == 0.0
+				&&	weightIter->priceForSell() == 0.0
+				&&	weightIter->bonus() == 0.0 
+				&&	weightIter->increasement() == 0.0 )) 
+		{
             change = (weightIter->freeCount() - pre_weightIter->freeCount())
                     / pre_weightIter->freeCount();
             flag = true;
