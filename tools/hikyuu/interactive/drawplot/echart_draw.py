@@ -72,6 +72,7 @@ class HKUFigure(object):
             self._axis_list[i] = overlap
         self._current_axis = 0
         self._xaxis = None
+        self._label_color = []
         
     def _repr_html_(self):
         return self.get_grid()._repr_html_()
@@ -246,23 +247,28 @@ class HKUFigure(object):
                                    datazoom_xaxis_index=[0,1,2,3],
                                    is_xaxis_show=True)                
 
+        color_map = {'r': '#CD0000',
+                     'g': '#008B00',
+                     'b': '#0000EE',
+                     'c':'#40E0D0',
+                     'm': '#CD00CD',
+                     'y': '#EE9A00',
+                     'k': '#000000',
+                     'w': '#FFFFFF'
+                     }
+
+        line_map = {'-' : 'solid',
+                    '--': 'dashed',
+                    ':' : 'dotted'}
+        
         for item in kwargs.items():
             if 'color' == item[0]:
-                color_map = {'r': '#CD0000',
-                             'g': '#008B00',
-                             'b': '#0000EE',
-                             'c':'#40E0D0',
-                             'm': '#CD00CD',
-                             'y': '#EE9A00',
-                             'k': '#000000',
-                             'w': '#FFFFFF'
-                             }
-                result['line_color'] = color_map[item[1]] if item[1] in color_map else color_map['r']
+                color = color_map[item[1]] if item[1] in color_map else color_map['r']
+                result['line_color'] = color
+                self._label_color += [color]
+                result['label_color'] = self._label_color
             
             elif 'linestyle' == item[0]:
-                line_map = {'-' : 'solid',
-                            '--': 'dashed',
-                            ':' : 'dotted'}
                 result['line_type'] = line_map[item[1]] if item[1] in line_map else line_map['-']
             
             else:
@@ -529,10 +535,11 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     bar.add('2', x_list, y2_list, is_stack=True, is_legend_show=False)
     
     axes.add(bar)
-    iplot(fmacd, line_type='dotted')
-    iplot(smacd)
-    
-    return axes
+    fmacd.plot(axes=axes, line_type='dotted')
+    smacd.plot(axes=axes)
+
+    gcf().add_axis(axes)
+    return gcf()
 
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
@@ -573,10 +580,11 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     bar.add('3', x, y3, is_stack=True, is_legend_show=False)
     
     axes.add(bar)
-    iplot(fmacd, line_type='dotted')
-    iplot(smacd)
+    fmacd.plot(axes=axes, line_type='dotted')
+    smacd.plot(axes=axes)
     
-    return axes
+    gcf().add_axis(axes)
+    return gcf()
 
 
 def sgplot(sg, new=True, axes=None,  style=1, kdata=None):

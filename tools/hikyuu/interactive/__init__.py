@@ -30,6 +30,7 @@
 #===============================================================================
 
 from .drawplot import (use_draw_engine,
+                       get_current_draw_engine,
                        show_gcf,
                        create_figure, 
                        ax_set_locator_formatter,

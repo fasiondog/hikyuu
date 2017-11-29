@@ -34,9 +34,10 @@
 """
 from hikyuu import Query
 from hikyuu.util.mylog import escapetime
-from hikyuu.indicator import Indicator, MA, CLOSE, VOL, OP
+from hikyuu.indicator import Indicator, MA, CLOSE, VOL, OP, CVAL, PRICELIST
 from hikyuu.trade_sys.signal import SG_Cross
 from hikyuu.interactive.drawplot import (create_figure, 
+                                         get_current_draw_engine,
                                          ax_set_locator_formatter, 
                                          adjust_axes_show,
                                          ax_draw_macd,
@@ -67,21 +68,31 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
     
     vol = VOL(kdata)
     total = len(kdata)
-    rg = range(total)
-    x = [i-0.2 for i in rg]
-    x1 = [x[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-    y1 = [vol[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-    x2 = [x[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
-    y2 = [vol[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
-    ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
-    ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
+    
+    engine = get_current_draw_engine()
+    if engine == 'matplotlib':
+        rg = range(total)
+        x = [i-0.2 for i in rg]
+        x1 = [x[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
+        y1 = [vol[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
+        x2 = [x[i] for i in rg if kdata[i].closePrice <= kdata[i].openPrice]
+        y2 = [vol[i] for i in rg if kdata[i].closePrice <= kdata[i].openPrice]
+        ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
+        ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
+    
+    elif engine == 'echarts':
+        vol.bar(axes=ax2, color='r')
+    else:
+        pass
+    
     vma1 = MA(vol, vma1_n)
     vma2 = MA(vol, vma2_n)
     vma1.plot(axes=ax2, legend_on=True)
     vma2.plot(axes=ax2, legend_on=True)
     
     if query.kType == Query.WEEK and stock.market == 'SH' and stock.code=='000001':
-        ax2.hlines(0.16e+009,0,len(kdata),color='b',linestyle='--')
+        CVAL(0.16e+009, total, color='b',linestyle='--')
+        #ax2.hlines(0.16e+009,0,len(kdata),color='b',linestyle='--')
 
     ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
     adjust_axes_show([ax1, ax2])
@@ -109,14 +120,23 @@ def draw2(stock, query=Query(-130), ma1_n=7, ma2_n=20, ma3_n=30,
     
     vol = VOL(kdata)
     total = len(kdata)
-    rg = range(total)
-    x = [i-0.2 for i in rg]
-    x1 = [x[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-    y1 = [vol[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-    x2 = [x[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
-    y2 = [vol[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
-    ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
-    ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
+    
+    engine = get_current_draw_engine()
+    if engine == 'matplotlib':
+        rg = range(total)
+        x = [i-0.2 for i in rg]
+        x1 = [x[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
+        y1 = [vol[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
+        x2 = [x[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
+        y2 = [vol[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
+        ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
+        ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
+   
+    elif engine == 'echarts':
+        vol.bar(axes=ax2, color='r', legend_on=True)
+    else:
+        pass
+        
     vma1 = MA(vol, vma1_n)
     vma2 = MA(vol, vma2_n)
     vma1.plot(axes=ax2, legend_on=True)
