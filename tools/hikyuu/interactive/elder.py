@@ -37,7 +37,8 @@ from pylab import plot
 from numpy import mean
 
 from hikyuu import QueryByIndex, constant
-from hikyuu.indicator import Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS, CVAL
+from hikyuu.indicator import (Indicator, CLOSE, EMA, MACD, 
+                              VIGOR, SAFTYLOSS, CVAL, PRICELIST)
 from hikyuu.interactive.drawplot import (create_figure, 
                                          show_gcf,
                                          ax_draw_macd2, 
@@ -74,9 +75,12 @@ def _draw_ema_pipe(axes, kdata, ema, n=22, w=0.10):
     emas_low = [i-i*p for i in emas]
     emas_len = len(emas)
     
-    axes.plot(emas, '-b', label='%s(%s)  %.2f'%(ema.name, n, emas[-1]))
-    axes.plot(emas_high, ':b', label='U%s(%.2f%%) %.2f'%(ema.name, p*100, emas_high[-1]))
-    axes.plot(emas_low, ':b', label='L%s(%.2f%%) %.2f'%(ema.name, p*100, emas_low[-1]))
+    PRICELIST(emas).plot(axes=axes, color='b', linestyle='-', label='%s(%s)  %.2f'%(ema.name, n, emas[-1]))
+    PRICELIST(emas_high).plot(axes=axes, color='b', linestyle=':', label='U%s(%.2f%%) %.2f'%(ema.name, p*100, emas_high[-1]))
+    PRICELIST(emas_low).plot(axes=axes, color='b', linestyle=':', label='L%s(%.2f%%) %.2f'%(ema.name, p*100, emas_low[-1]))
+    #axes.plot(emas, '-b', label='%s(%s)  %.2f'%(ema.name, n, emas[-1]))
+    #axes.plot(emas_high, ':b', label='U%s(%.2f%%) %.2f'%(ema.name, p*100, emas_high[-1]))
+    #axes.plot(emas_low, ':b', label='L%s(%.2f%%) %.2f'%(ema.name, p*100, emas_low[-1]))
     fy1 = [ i for i in emas_low]
     fy2 = [ i for i in emas_high]
     axes.fill_between(range(emas_len),fy1,fy2,alpha=0.2, color='y' )
@@ -107,13 +111,13 @@ def draw(stock, query=QueryByIndex(-130), ma_n=22, ma_w='auto', vigor_n=13):
     lmin = min(l)
     up = int(umax / umean)
     lp = int(lmin / lmean)
-    #ax3.hlines(umean,0,len(kdata),color='r',linestyle='--')    
-    #ax3.hlines(lmean,0,len(kdata),color='r',linestyle='--')
     for i in range(up):
-        ax3.hlines(umean * (i + 1),0,len(kdata),color='r',linestyle='--')
+        CVAL(umean * (i + 1), len(kdata)).plot(axes=ax3, color='r', linestyle='--')
+        #ax3.hlines(umean * (i + 1),0,len(kdata),color='r',linestyle='--')
         
     for i in range(lp):
-        ax3.hlines(lmean * (i + 1),0,len(kdata),color='g',linestyle='--')    
+        CVAL(lmean * (i + 1), len(kdata)).plot(axes=ax3, color='g', linestyle='--')
+        #ax3.hlines(lmean * (i + 1),0,len(kdata),color='g',linestyle='--')    
     
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
