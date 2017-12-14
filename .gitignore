@@ -14,6 +14,8 @@
 .settings
 /test/data/tmp
 /build
+/build.*
+extern-libs.*
 /tools/hikyuu/*.dll
 /tools/hikyuu/*.exe
 /tools/hikyuu/*.so

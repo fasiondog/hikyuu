@@ -50,7 +50,6 @@ del .\tools\hikyuu\*.pyd /S
 copy .\extern-libs\boost\*.dll .\tools\hikyuu
 copy .\extern-libs\hdf5\dll\*.dll .\tools\hikyuu
 copy .\extern-libs\log4cplus\dll\*.dll .\tools\hikyuu
-copy .\extern-libs\mysql\lib\*.dll .\tools\hikyuu
 copy .\extern-libs\msvc\*.dll .\tools\hikyuu
 
 copy .\build\extern-libs\%BUILD_OUTPUT_PATH%\*.dll .\tools\hikyuu
