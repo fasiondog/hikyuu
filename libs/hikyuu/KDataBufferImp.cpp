@@ -120,9 +120,9 @@ void KDataBufferImp::_recoverForward() {
         if (weightIter != weightList.begin()
 			&& !(weightIter->countAsGift() == 0.0
 			&& weightIter->countForSell() == 0.0
-			&& weightIter->priceForSell() == 0.0
-			&& weightIter->bonus() == 0.0 
-			&& weightIter->increasement() == 0.0 )) 
+			&& weightIter->priceForSell() == 0.0))
+			//&& weightIter->bonus() == 0.0 
+			//&& weightIter->increasement() == 0.0 )) 
 		{
             pre_weightIter = weightIter - 1;
             if (pre_weightIter->freeCount() != 0.0) {
@@ -185,9 +185,9 @@ void KDataBufferImp::_recoverBackward() {
                 && pre_weightIter->freeCount() != 0.0
 				&& 	!(weightIter->countAsGift() == 0.0
 				&&	weightIter->countForSell() == 0.0
-				&&	weightIter->priceForSell() == 0.0
-				&&	weightIter->bonus() == 0.0 
-				&&	weightIter->increasement() == 0.0 )) 
+				&&	weightIter->priceForSell() == 0.0))
+				//&&	weightIter->bonus() == 0.0 
+				//&&	weightIter->increasement() == 0.0 )) 
 		{
             change = (weightIter->freeCount() - pre_weightIter->freeCount())
                     / pre_weightIter->freeCount();
@@ -259,9 +259,9 @@ void KDataBufferImp::_recoverEqualForward() {
         if (weightIter != weightList.begin()
 			&& 	!(weightIter->countAsGift() == 0.0
 			&&	weightIter->countForSell() == 0.0
-			&&	weightIter->priceForSell() == 0.0
-			&&	weightIter->bonus() == 0.0 
-			&&	weightIter->increasement() == 0.0 )) 
+			&&	weightIter->priceForSell() == 0.0))
+			//&&	weightIter->bonus() == 0.0 
+			//&&	weightIter->increasement() == 0.0 )) 
 		{
             pre_weightIter = weightIter - 1;
             if (pre_weightIter->freeCount() != 0.0) {
@@ -332,9 +332,9 @@ void KDataBufferImp::_recoverEqualBackward() {
                 && pre_weightIter->freeCount() != 0.0
 				&& 	!(weightIter->countAsGift() == 0.0
 				&&	weightIter->countForSell() == 0.0
-				&&	weightIter->priceForSell() == 0.0
-				&&	weightIter->bonus() == 0.0 
-				&&	weightIter->increasement() == 0.0 )) 
+				&&	weightIter->priceForSell() == 0.0)) 
+				//&&	weightIter->bonus() == 0.0 
+				//&&	weightIter->increasement() == 0.0 )) 
 		{
             change = (weightIter->freeCount() - pre_weightIter->freeCount())
                     / pre_weightIter->freeCount();
