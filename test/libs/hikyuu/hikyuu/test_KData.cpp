@@ -1201,9 +1201,9 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata[0] == KRecord(Datetime(199911100000), 29.5, 29.8, 27.0, 27.75, 485910.2, 1740850));
     BOOST_CHECK(kdata[151] == KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));
-    BOOST_CHECK(kdata[152] == KRecord(Datetime(200007060000), 29.09, 29.24, 28.91, 29.0, 3049.5, 13200));
-    BOOST_CHECK(kdata[657] == KRecord(Datetime(200208210000), 22.9, 23.4, 22.69, 23.15, 36409.8, 197640));
-    BOOST_CHECK(kdata[658] == KRecord(Datetime(200208220000), 23.43, 23.57, 23.24, 23.49, 13101.3, 106872));
+    BOOST_CHECK(kdata[152] == KRecord(Datetime(200007060000), 23.30, 23.42, 23.16, 23.23, 3049.5, 13200));
+    BOOST_CHECK(kdata[657] == KRecord(Datetime(200208210000), 18.35, 18.75, 18.18, 18.55, 36409.8, 197640));
+    BOOST_CHECK(kdata[658] == KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.82, 13101.3, 106872));
 
     /** @arg 前向等比复权*/
     query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::EQUAL_FORWARD);
@@ -1219,9 +1219,9 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata[0] == KRecord(Datetime(199911100000), 29.5, 29.8, 27.0, 27.75, 485910.2, 1740850));
     BOOST_CHECK(kdata[151] == KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));
-    BOOST_CHECK(kdata[152] == KRecord(Datetime(200007060000), 29.13, 29.28, 28.95, 29.04, 3049.5, 13200));
-    BOOST_CHECK(kdata[657] == KRecord(Datetime(200208210000), 22.9, 23.4, 22.68, 23.15, 36409.8, 197640));
-    BOOST_CHECK(kdata[658] == KRecord(Datetime(200208220000), 23.43, 23.58, 23.24, 23.49, 13101.3, 106872));
+    BOOST_CHECK(kdata[152] == KRecord(Datetime(200007060000), 23.30, 23.42, 23.16, 23.23, 3049.5, 13200));
+    BOOST_CHECK(kdata[657] == KRecord(Datetime(200208210000), 18.32, 18.72, 18.15, 18.52, 36409.8, 197640));
+    BOOST_CHECK(kdata[658] == KRecord(Datetime(200208220000), 18.74, 18.86, 18.59, 18.79, 13101.3, 106872));
 }
 
 
