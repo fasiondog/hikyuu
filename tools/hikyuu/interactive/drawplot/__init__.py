@@ -140,7 +140,7 @@ def show_gcf():
         return ect_gcf()   
     
 
-def create_figure(n=1, figsize=(8,6)):
+def create_figure(n=1, figsize=None):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
 
     :param int n: 坐标轴数量
@@ -149,9 +149,11 @@ def create_figure(n=1, figsize=(8,6)):
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
-        return mpl_create_figure(n, figsize)
+        fsize = (10,8) if figsize is None else figsize
+        return mpl_create_figure(n, fsize)
     else:
-        return ect_create_figure(n, figsize)
+        fsize = (8,6) if figsize is None else figsize
+        return ect_create_figure(n, fsize)
     
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
