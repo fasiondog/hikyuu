@@ -30,6 +30,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeManager& tm) {
        << "  init_cash: " << tm.initCash() << strip
        << "  firstDatetime: " << tm.firstDatetime() << strip
        << "  lastDatetime: " << tm.lastDatetime() << strip
+       << "  brokeLastDatetime: " << tm.getBrokerLastDatetime() << strip
        << "  TradeCostFunc: " << tm.costFunc() << strip
        << "  current cash: " << tm.currentCash() << strip
        << "  current market_value: " << funds.market_value << strip

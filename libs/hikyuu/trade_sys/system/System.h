@@ -181,6 +181,9 @@ protected:
     Stock m_stock;
     KData m_kdata;
 
+    bool m_pre_ev_valid;
+    bool m_pre_cn_valid;
+
     int m_buy_days; //每一次买入清零，计算一次加1，即买入后的天数
     int m_sell_short_days; //每一次卖空清零
     TradeRecordList m_trade_list; //保存实际执行的交易记录
@@ -220,10 +223,19 @@ private:
         //m_kdata中包含了stock和query的信息，不用保存m_stock
         ar & BOOST_SERIALIZATION_NVP(m_kdata);
 
+        ar & BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
+
         ar & BOOST_SERIALIZATION_NVP(m_buy_days);
+        ar & BOOST_SERIALIZATION_NVP(m_sell_short_days);
+        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
         ar & BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar & BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
-        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
+
+        ar & BOOST_SERIALIZATION_NVP(m_buyRequest);
+        ar & BOOST_SERIALIZATION_NVP(m_sellRequest);
+        ar & BOOST_SERIALIZATION_NVP(m_sellShortRequest);
+        ar & BOOST_SERIALIZATION_NVP(m_buyShortRequest);
     }
 
     template<class Archive>
@@ -247,10 +259,19 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_kdata);
         m_stock = m_kdata.getStock();
 
+        ar & BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
+
         ar & BOOST_SERIALIZATION_NVP(m_buy_days);
+        ar & BOOST_SERIALIZATION_NVP(m_sell_short_days);
+        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
         ar & BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar & BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
-        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
+
+        ar & BOOST_SERIALIZATION_NVP(m_buyRequest);
+        ar & BOOST_SERIALIZATION_NVP(m_sellRequest);
+        ar & BOOST_SERIALIZATION_NVP(m_sellShortRequest);
+        ar & BOOST_SERIALIZATION_NVP(m_buyShortRequest);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

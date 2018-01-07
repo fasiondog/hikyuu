@@ -9,6 +9,7 @@
 #define TRADEREQUEST_H_
 
 #include "../../trade_manage/TradeRecord.h"
+#include "../../serialization/KRecord_serialization.h"
 
 namespace hku {
 
@@ -53,6 +54,7 @@ private:
         string from_name(getSystemPartName(from));
         ar & bs::make_nvp<string>("from", from_name);
         ar & BOOST_SERIALIZATION_NVP(count);
+        ar & BOOST_SERIALIZATION_NVP(krecord);
     }
 
     template<class Archive>
@@ -72,6 +74,7 @@ private:
         ar & bs::make_nvp<string>("from", from_name);
         from = getSystemPartEnum(from_name);
         ar & BOOST_SERIALIZATION_NVP(count);
+        ar & BOOST_SERIALIZATION_NVP(krecord);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

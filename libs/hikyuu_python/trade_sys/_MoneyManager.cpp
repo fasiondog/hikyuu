@@ -108,6 +108,7 @@ void export_MoneyManager() {
             .def("getParam", &MoneyManagerBase::getParam<boost::any>)
             .def("setParam", &MoneyManagerBase::setParam<object>)
             .def("setTM", &MoneyManagerBase::setTM)
+            .def("getTM", &MoneyManagerBase::getTM)
             .def("setQuery", &MoneyManagerBase::setQuery)
             .def("getQuery", &MoneyManagerBase::getQuery)
             .def("reset", &MoneyManagerBase::reset)

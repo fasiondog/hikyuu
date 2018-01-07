@@ -40,14 +40,24 @@ HKU_API std::ostream& operator <<(std::ostream &os, const SystemPtr& sys) {
 }
 
 System::System()
-: m_name("SYS_Simple"), m_buy_days(0), m_sell_short_days(0),
-  m_lastTakeProfit(0.0), m_lastShortTakeProfit(0.0) {
+: m_name("SYS_Simple"),
+  m_pre_ev_valid(true), //must true
+  m_pre_cn_valid(true), //must true
+  m_buy_days(0),
+  m_sell_short_days(0),
+  m_lastTakeProfit(0.0),
+  m_lastShortTakeProfit(0.0) {
     initParam();
 }
 
 System::System(const string& name)
-: m_name(name), m_buy_days(0), m_sell_short_days(0),
-  m_lastTakeProfit(0.0), m_lastShortTakeProfit(0.0) {
+: m_name(name),
+  m_pre_ev_valid(true),
+  m_pre_cn_valid(true),
+  m_buy_days(0),
+  m_sell_short_days(0),
+  m_lastTakeProfit(0.0),
+  m_lastShortTakeProfit(0.0) {
     initParam();
 }
 
@@ -71,6 +81,8 @@ System::System(const TradeManagerPtr& tm,
   m_pg(pg),
   m_sp(sp),
   m_name(name),
+  m_pre_ev_valid(true),
+  m_pre_cn_valid(true),
   m_buy_days(0),
   m_sell_short_days(0),
   m_lastTakeProfit(0.0),
@@ -96,6 +108,12 @@ void System::initParam() {
     setParam<int>("tp_delay_n", 3);    //止赢延迟判断天数
     setParam<bool>("ignore_sell_sg", false); //忽略卖出信号，只使用止损/止赢等其他方式卖出
 
+    //是否使用市场环境判定进行初始建仓
+    setParam<bool>("ev_open_position", false);
+
+    //是否使用系统有效性条件进行初始建仓
+    setParam<bool>("cn_open_position", false);
+
     //在现金不足时，是否支持借入现金，融资
     setParam<bool>("support_borrow_cash", false);
 
@@ -114,6 +132,9 @@ void System::reset() {
     if (m_tp) m_tp->reset();
     if (m_pg) m_pg->reset();
     if (m_sp) m_sp->reset();
+
+    m_pre_ev_valid = false;
+    m_pre_cn_valid= false;
 
     m_buy_days = 0;
     m_sell_short_days = 0;
@@ -164,6 +185,10 @@ SystemPtr System::clone() {
     //p->m_name = m_name;
     p->m_stock = m_stock;
     p->m_kdata = m_kdata;
+
+    p->m_pre_ev_valid = m_pre_ev_valid;
+    p->m_pre_cn_valid = m_pre_cn_valid;
+
 
     p->m_buy_days = m_buy_days;
     p->m_sell_short_days = m_sell_short_days;
@@ -279,34 +304,89 @@ void System::_runMoment(const KRecord& today) {
     //处理当前已有的交易请求
     _processRequest(today);
 
-    //如果系统环境失效，则立即清仓
-    if (!_environmentIsValid(today.datetime)) {
-        //如果持有多头仓位，则立即卖出
+    //----------------------------------------------------------
+    // 处理市场环境策略
+    //----------------------------------------------------------
+
+    bool current_ev_valid = _environmentIsValid(today.datetime);
+
+    //如果环境从有效变为无效时
+    if (m_pre_ev_valid && !current_ev_valid) {
+        //如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             _sell(today, PART_ENVIRONMENT);
         }
 
-        //如果持有空头仓位，立即补进归还
-        if (m_tm->haveShort(m_stock)) {
+        //如果使用环境判定策略进行初始建仓（空仓）
+        if (getParam<bool>("ev_open_position")) {
             _buyShort(today, PART_ENVIRONMENT);
         }
 
+        m_pre_ev_valid = current_ev_valid;
         return;
     }
 
-    //如果系统自身条件失效，则立即清仓
-    if (!_conditionIsValid(today.datetime)) {
-        //如果持有多头仓位，则立即卖出
+    //环境从无效变为有效时
+    if (!m_pre_ev_valid && current_ev_valid) {
+        //如果持有空头仓位，立即补进归还
+        if (m_tm->haveShort(m_stock)) {
+            _sellShort(today);
+        }
+
+        //如果使用环境判定策略进行初始建仓
+        if (getParam<bool>("ev_open_position")) {
+            _buy(today);
+        }
+
+        m_pre_ev_valid = current_ev_valid;
+        return;
+    }
+
+    m_pre_ev_valid = current_ev_valid;
+
+    //----------------------------------------------------------
+    // 处理系统有效条件判断策略
+    //----------------------------------------------------------
+
+    bool current_cn_valid = _conditionIsValid(today.datetime);
+
+    //如果系统从有效变为无效
+    if (m_pre_cn_valid && !current_cn_valid) {
+        //如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             _sell(today, PART_CONDITION);
         }
 
-        //如果持有空头仓位，立即补进归还
-        if (m_tm->haveShort(m_stock)) {
+        //如果使用环境判定策略进行初始建仓（空仓）
+        if (getParam<bool>("cn_open_position")) {
             _buyShort(today, PART_CONDITION);
         }
+
+        m_pre_cn_valid = current_cn_valid;
         return;
     }
+
+    //如果系统从无效变为有效
+    if (!m_pre_cn_valid && current_cn_valid) {
+        //如果持有空头仓位，立即补进归还
+        if (m_tm->haveShort(m_stock)) {
+            _sellShort(today);
+        }
+
+        //如果使用环境判定策略进行初始建仓
+        if (getParam<bool>("cn_open_position")) {
+            _buy(today);
+        }
+
+        m_pre_cn_valid = current_cn_valid;
+        return;
+    }
+
+    m_pre_cn_valid = current_cn_valid;
+
+    //----------------------------------------------------------
+    // 处理买入、卖出信号
+    //----------------------------------------------------------
 
     //如果有买入信号
     if (m_sg->shouldBuy(today.datetime)) {

@@ -54,6 +54,14 @@ public:
         m_tm = tm;
     }
 
+    /**
+     * 获取交易账户
+     * @return
+     */
+    TradeManagerPtr getTM() const {
+        return m_tm;
+    }
+
     /** 设置查询条件 */
     void setQuery(const KQuery& query) {
         m_query = query;

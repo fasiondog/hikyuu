@@ -70,7 +70,7 @@ void export_TradeManager() {
             .def("__str__", &TradeManager::toString)
             .add_property("name", &TradeManager::name, &TradeManager::setName)
             .add_property("initCash", &TradeManager::initCash)
-            //.add_property("cash", &TradeManager::cash)
+            .add_property("currentCash", &TradeManager::currentCash)
             .add_property("initDatetime", &TradeManager::initDatetime)
             .add_property("firstDatetime", &TradeManager::firstDatetime)
             .add_property("lastDatetime", &TradeManager::lastDatetime)

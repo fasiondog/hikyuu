@@ -530,9 +530,10 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     y1_list = [round(x) if x > 0 else '-' for x in bmacd]
     y2_list = [round(x) if x <= 0 else '-' for x in bmacd]
     
+    style = gcf().get_style(axes)
     bar = Bar(subtitle=text, title_pos='10%', title_top='8%')
-    bar.add('1', x_list, y1_list, is_stack=True, is_legend_show=False)
-    bar.add('2', x_list, y2_list, is_stack=True, is_legend_show=False)
+    bar.add('1', x_list, y1_list, is_stack=True, is_legend_show=False, **style)
+    bar.add('2', x_list, y2_list, is_stack=True, is_legend_show=False, **style)
     
     axes.add(bar)
     fmacd.plot(axes=axes, line_type='dotted')
@@ -574,10 +575,11 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
             y3.append('-')
 
     
+    style = gcf().get_style(axes)
     bar = Bar(subtitle=text, title_pos='10%', title_top='8%')
-    bar.add('1', x, y1, is_stack=True, is_legend_show=False)
-    bar.add('2', x, y2, is_stack=True, is_legend_show=False)
-    bar.add('3', x, y3, is_stack=True, is_legend_show=False)
+    bar.add('1', x, y1, is_stack=True, is_legend_show=False, **style)
+    bar.add('2', x, y2, is_stack=True, is_legend_show=False, **style)
+    bar.add('3', x, y3, is_stack=True, is_legend_show=False, **style)
     
     axes.add(bar)
     fmacd.plot(axes=axes, line_type='dotted')
