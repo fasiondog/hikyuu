@@ -93,6 +93,18 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     /** @arg 测试 toString */
     d = Datetime("2001-Jan-01 06:30:00");
     BOOST_CHECK("2001-Jan-01 06:30:00" == d.toString());
+
+    /** @arg 测试 dayOfWeek*/
+    BOOST_CHECK(Datetime(201801010000L).dayOfWeek() == 1);
+    BOOST_CHECK(Datetime(201801060000L).dayOfWeek() == 6);
+    BOOST_CHECK(Datetime(201801070000L).dayOfWeek() == 0);
+
+    /** @arg 测试 dayOfYear*/
+    BOOST_CHECK(Datetime(201801010000L).dayOfYear() == 1);
+    BOOST_CHECK(Datetime(201812310000L).dayOfYear() == 365);
+
+    /** @arg 测试 endOfMonth*/
+    BOOST_CHECK(Datetime(201801010000L).endOfMonth() == Datetime(201801310000L));
 }
 
 /** @par 检测点 */

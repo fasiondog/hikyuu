@@ -72,6 +72,15 @@ public:
     /** 返回 boost::gregorian::date */
     bd::date date() const;
 
+    /** 返回一周中的第几天，周日为0，周一为1 */
+    int dayOfWeek() const;
+
+    /** 返回一年中的第几天，1月1日为1年中的第一天 */
+    int dayOfYear() const;
+
+    /** 返回月末日期，如12月31日 */
+    Datetime endOfMonth() const;
+
     /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
     static Datetime min();
 
@@ -208,6 +217,19 @@ inline bt::ptime Datetime::ptime() const {
 inline bd::date Datetime::date() const {
     return m_data.date();
 }
+
+inline int Datetime::dayOfWeek() const {
+    return date().day_of_week();
+}
+
+inline int Datetime::dayOfYear() const {
+    return date().day_of_year();
+}
+
+inline Datetime Datetime::endOfMonth() const {
+    return date().end_of_month();
+}
+
 
 } /* namespace hku */
 #endif /* DATETIME_H_ */
