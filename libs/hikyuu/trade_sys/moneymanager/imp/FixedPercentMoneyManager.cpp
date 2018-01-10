@@ -20,7 +20,7 @@ FixedPercentMoneyManager::~FixedPercentMoneyManager() {
 
 size_t FixedPercentMoneyManager
 ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
     double p = getParam<double>("p");
     if (p <= 0.0 || p > 1.0) {
         HKU_ERROR("Error param (p = " << p

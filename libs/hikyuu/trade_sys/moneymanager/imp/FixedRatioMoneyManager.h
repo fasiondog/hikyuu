@@ -20,7 +20,7 @@ public:
     virtual void _reset();
     virtual MoneyManagerPtr _clone();
     virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
-                    price_t price, price_t risk);
+                    price_t price, price_t risk, SystemPart from);
 
 private:
     int m_current_num;

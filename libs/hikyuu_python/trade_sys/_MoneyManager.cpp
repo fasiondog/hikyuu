@@ -43,47 +43,47 @@ public:
     }
 
     size_t _getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
         if (override _getSellNumber = this->get_override("_getSellNumber")) {
-            return _getSellNumber(datetime, stock, price, risk);
+            return _getSellNumber(datetime, stock, price, risk, from);
         }
-        return MoneyManagerBase::_getSellNumber(datetime, stock, price, risk);
+        return MoneyManagerBase::_getSellNumber(datetime, stock, price, risk, from);
     }
 
     size_t default_getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
-        return MoneyManagerBase::_getSellNumber(datetime, stock, price, risk);
+            price_t price, price_t risk, SystemPart from) {
+        return MoneyManagerBase::_getSellNumber(datetime, stock, price, risk, from);
     }
 
     size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
-        return this->get_override("_getBuyNumber")(datetime, stock, price, risk);
+            price_t price, price_t risk, SystemPart from) {
+        return this->get_override("_getBuyNumber")(datetime, stock, price, risk, from);
     }
 
     size_t _getSellShortNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
         if (override _getSellShortNumber = this->get_override("_getSellShortNumber")) {
-            return _getSellShortNumber(datetime, stock, price, risk);
+            return _getSellShortNumber(datetime, stock, price, risk, from);
         }
-        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk);
+        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
     }
 
     size_t default_getSellShortNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
-        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk);
+            price_t price, price_t risk, SystemPart from) {
+        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
     }
 
     size_t getBuyShortNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
         if (override _getBuyShortNumber = this->get_override("_getBuyShortNumber")) {
-            return _getBuyShortNumber(datetime, stock, price, risk);
+            return _getBuyShortNumber(datetime, stock, price, risk, from);
         }
-        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk);
+        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk, from);
     }
 
     size_t default_getBuyShortNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
-        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk);
+            price_t price, price_t risk, SystemPart from) {
+        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk, from);
     }
 
     void _reset() {

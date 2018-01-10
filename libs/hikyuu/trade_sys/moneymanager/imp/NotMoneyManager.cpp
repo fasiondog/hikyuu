@@ -21,7 +21,7 @@ NotMoneyManager::~NotMoneyManager() {
 
 size_t NotMoneyManager
 ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
     return size_t(m_tm->currentCash() / price);
 }
 

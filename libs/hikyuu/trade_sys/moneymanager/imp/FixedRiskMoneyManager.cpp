@@ -20,7 +20,7 @@ FixedRiskMoneyManager::~FixedRiskMoneyManager() {
 
 size_t FixedRiskMoneyManager
 ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
     return getParam<double>("risk") / risk;
 }
 

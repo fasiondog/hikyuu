@@ -21,7 +21,7 @@ WilliamsFixedRiskMoneyManager::~WilliamsFixedRiskMoneyManager() {
 
 size_t WilliamsFixedRiskMoneyManager
 ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
     price_t max_loss = getParam<price_t>("max_loss");
     if (max_loss <= 0.0) {
         HKU_WARN("max_loss is zero! "

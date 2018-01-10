@@ -28,7 +28,7 @@ public:
     void setX(int x) { m_x = x; }
 
     virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
-                price_t price, price_t risk) {
+                price_t price, price_t risk, SystemPart from) {
         return 0;
     }
 
@@ -67,8 +67,8 @@ BOOST_AUTO_TEST_CASE( test_MoneyManager ) {
     BOOST_CHECK(p_src->getTM() == TradeManagerPtr());
     p->setTM(tm);
     BOOST_CHECK(p_src->getTM() == tm);
-    BOOST_CHECK(p->getBuyNumber(Datetime(200001010000), stock, 10.0, 10.0) == 0);
-    BOOST_CHECK(p->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0) == 0);
+    BOOST_CHECK(p->getBuyNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL) == 0);
+    BOOST_CHECK(p->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL) == Null<size_t>());
     BOOST_CHECK(p_src->getX() == 0);
     p_src->setX(10);
     BOOST_CHECK(p_src->getX() == 10);

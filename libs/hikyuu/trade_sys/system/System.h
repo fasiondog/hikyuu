@@ -125,10 +125,10 @@ public:
     //通知所有需要接收实际卖出交易记录的部件
     void _sellNotifyAll(const TradeRecord&);
 
-    size_t _getBuyNumber(const Datetime&, price_t price, price_t risk);
-    size_t _getSellNumber(const Datetime&, price_t price, price_t risk);
-    size_t _getSellShortNumber(const Datetime&, price_t price, price_t risk);
-    size_t _getBuyShortNumber(const Datetime&, price_t price, price_t risk);
+    size_t _getBuyNumber(const Datetime&, price_t price, price_t risk, Part from);
+    size_t _getSellNumber(const Datetime&, price_t price, price_t risk, Part from);
+    size_t _getSellShortNumber(const Datetime&, price_t price, price_t risk, Part from);
+    size_t _getBuyShortNumber(const Datetime&, price_t price, price_t risk, Part from);
 
     price_t _getStoplossPrice(const Datetime& datetime, price_t price);
     price_t _getShortStoplossPrice(const Datetime& datetime, price_t price);
@@ -142,20 +142,20 @@ public:
     price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice);
 
 
-    void _buy(const KRecord& today);
-    void _buyNow(const KRecord& today);
+    void _buy(const KRecord& today, Part from);
+    void _buyNow(const KRecord& today, Part from);
     void _buyDelay(const KRecord& today);
-    void _submitBuyRequest(const KRecord& today);
+    void _submitBuyRequest(const KRecord& today, Part from);
 
     void _sell(const KRecord& today, Part from);
     void _sellNow(const KRecord& today, Part from);
     void _sellDelay(const KRecord& today);
     void _submitSellRequest(const KRecord& today, Part from);
 
-    void _sellShort(const KRecord& today);
-    void _sellShortNow(const KRecord& today);
+    void _sellShort(const KRecord& today, Part from);
+    void _sellShortNow(const KRecord& today, Part from);
     void _sellShortDelay(const KRecord& today);
-    void _submitSellShortRequest(const KRecord& today);
+    void _submitSellShortRequest(const KRecord& today, Part from);
 
     void _buyShort(const KRecord& today, Part from);
     void _buyShortNow(const KRecord& today, Part from);
@@ -314,23 +314,23 @@ _shouldBuy(const Datetime& datetime) {
 }
 
 inline size_t System
-::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk) {
-    return m_mm ? m_mm->getBuyNumber(datetime, m_stock, price, risk) : 0;
+::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+    return m_mm ? m_mm->getBuyNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
 inline size_t System
-::_getSellNumber(const Datetime& datetime, price_t price, price_t risk) {
-    return m_mm ? m_mm->getSellNumber(datetime, m_stock, price, risk) : 0;
+::_getSellNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+    return m_mm ? m_mm->getSellNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
 inline size_t System
-::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk) {
-    return m_mm ? m_mm->getSellShortNumber(datetime, m_stock, price, risk) : 0;
+::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+    return m_mm ? m_mm->getSellShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
 inline size_t System
-::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk) {
-    return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk) : 0;
+::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+    return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
 inline price_t System

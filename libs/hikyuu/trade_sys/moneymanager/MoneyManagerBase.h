@@ -9,6 +9,7 @@
 #define MONEYMANAGERBASE_H_
 
 #include "../../utilities/Parameter.h"
+#include "../system/SystemPart.h"
 #include "../../trade_manage/TradeManager.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -88,53 +89,57 @@ public:
      * @param stock 交易对象
      * @param price 交易价格
      * @param risk 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+     * @param from 信号来源
      * @note 默认实现返回Null<size_t>() 卖出全部; 多次减仓才需要实现该接口
      */
     size_t getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk);
+            price_t price, price_t risk, SystemPart from);
 
     /**
      * 获取指定交易对象可卖空的数量
      * @param datetime 交易日期
      * @param stock 交易对象
      * @param price 交易价格
+     * @param from 信号来源
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
     size_t getSellShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk);
+            const Stock& stock, price_t price, price_t risk, SystemPart from);
 
     /**
      * 获取指定交易对象空头回补的买入数量
      * @param datetime 交易日期
      * @param stock 交易对象
      * @param price 交易价格
+     * @param from 信号来源
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
     size_t getBuyShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk);
+            const Stock& stock, price_t price, price_t risk, SystemPart from);
 
     /**
      * 获取指定交易对象可买入的数量
      * @param datetime 交易日期
      * @param stock 交易对象
      * @param price 交易价格
+     * @param from 信号来源
      * @param risk 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
      */
     size_t getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk);
+            price_t price, price_t risk, SystemPart from);
 
 
     virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) = 0;
+            price_t price, price_t risk, SystemPart from) = 0;
 
     virtual size_t _getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk);
+            price_t price, price_t risk, SystemPart from);
 
     virtual size_t _getSellShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk);
+            const Stock& stock, price_t price, price_t risk, SystemPart from);
 
     virtual size_t _getBuyShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk);
+            const Stock& stock, price_t price, price_t risk, SystemPart from);
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -218,7 +223,7 @@ typedef shared_ptr<MoneyManagerBase> MMPtr;
         return MoneyManagerPtr(new classname());\
     }\
     virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,\
-                price_t price, price_t risk);
+                price_t price, price_t risk, SystemPart from);
 
 
 HKU_API std::ostream & operator<<(std::ostream &, const MoneyManagerBase&);

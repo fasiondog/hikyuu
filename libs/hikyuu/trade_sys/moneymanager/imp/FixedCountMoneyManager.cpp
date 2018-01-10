@@ -20,7 +20,7 @@ FixedCountMoneyManager::~FixedCountMoneyManager() {
 
 size_t FixedCountMoneyManager
 ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk) {
+            price_t price, price_t risk, SystemPart from) {
     return getParam<int>("n");
 }
 
