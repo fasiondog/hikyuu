@@ -21,14 +21,12 @@ void export_Portfolio() {
             .def(init<const string&>())
             .def(init<const TradeManagerPtr&,
                     const SystemPtr&,
-                    const SelectorPtr&,
-                    const AllocateMoneyPtr&>())
+                    const SelectorPtr&>())
             .def(self_ns::str(self))
-            .add_property("params",
-                    make_function(&Portfolio::getParameter,
-                            return_internal_reference<>()))
+            .def("getParam", &Portfolio::getParam<boost::any>)
+            .def("setParam", &Portfolio::setParam<object>)
+
             .add_property("name", pf_get_name, pf_set_name)
-            .add_property("am", &Portfolio::getAM, &Portfolio::setAM)
             .add_property("tm", &Portfolio::getTM, &Portfolio::setTM)
             .add_property("sys", &Portfolio::getSYS, &Portfolio::setSYS)
             .add_property("se", &Portfolio::getSE, &Portfolio::setSE)

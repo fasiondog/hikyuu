@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/trade_sys/selector/SelectorBase.h>
+#include "SelectorBase.h"
 
 namespace hku {
 
@@ -24,7 +24,11 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SelectorPtr& st) {
     return os;
 }
 
-SelectorBase::SelectorBase() {
+SelectorBase::SelectorBase(): m_name("SelectorBase") {
+
+}
+
+SelectorBase::SelectorBase(const string& name): m_name(name) {
 
 }
 
@@ -78,11 +82,6 @@ addStockList(const StockList& stk_list) {
     for (auto iter = stk_list.begin(); iter != stk_list.end(); ++iter) {
         addStock(*iter);
     }
-}
-
-
-StockList SelectorBase::getSelectedStock(Datetime date) {
-    return m_stock_list;
 }
 
 } /* namespace hku */

@@ -8,7 +8,6 @@
 #ifndef TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 #define TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 
-#include "AllocateMoneyBase.h"
 #include "../selector/SelectorBase.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -31,8 +30,7 @@ public:
     Portfolio(const string& name);
     Portfolio(const TradeManagerPtr& tm,
             const SystemPtr& sys,
-            const SelectorPtr& st,
-            const AllocateMoneyPtr& am);
+            const SelectorPtr& st);
     virtual ~Portfolio();
 
     string name() const { return m_name; }
@@ -46,12 +44,10 @@ public:
     TradeManagerPtr getTM() { return m_tm; }
     SelectorPtr getSE() { return m_se; }
     SystemPtr getSYS() { return m_sys; }
-    AllocateMoneyPtr getAM() { return m_am; }
 
     void setTM(const TradeManagerPtr& tm) { m_tm = tm; }
     void setSE(const SelectorPtr& se) { m_se = se; }
     void setSYS(const SystemPtr& sys);
-    void setAM(const AllocateMoneyPtr& am) { m_am = am; }
 
     void reset();
 
@@ -61,7 +57,6 @@ public:
 protected:
     string           m_name;
     SelectorPtr      m_se;
-    AllocateMoneyPtr m_am;
     SystemPtr        m_sys;
     TradeManagerPtr  m_tm;
 
@@ -77,7 +72,6 @@ private:
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_am);
         ar & BOOST_SERIALIZATION_NVP(m_sys);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
@@ -89,7 +83,6 @@ private:
         m_name = UTF8ToGB(name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_am);
         ar & BOOST_SERIALIZATION_NVP(m_sys);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }

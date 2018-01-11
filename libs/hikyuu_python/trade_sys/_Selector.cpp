@@ -18,20 +18,6 @@ public:
     SelectorWrap(): SelectorBase() {}
     virtual ~SelectorWrap() {}
 
-    string name() const {
-        if (override name = this->get_override("name"))
-#if defined(BOOST_WINDOWS)
-            return call<char const*>(name.ptr());
-#else
-            return name();
-#endif
-        return SelectorBase::name();
-    }
-
-    string default_name() const {
-        return this->SelectorBase::name();
-    }
-
     void _reset() {
         if (override func = this->get_override("_reset")) {
             func();
@@ -45,15 +31,7 @@ public:
     }
 
     StockList getSelectedStock(Datetime date) {
-        if (override func = this->get_override("getSelectedStock")) {
-            return func(date);
-        } else {
-            return SelectorBase::getSelectedStock(date);
-        }
-    }
-
-    StockList default_getSelectedStock(Datetime date) {
-        return this->SelectorBase::getSelectedStock(date);
+        return this->get_override("getSelectedStock")(date);
     }
 
     SelectorPtr _clone() {
@@ -61,17 +39,21 @@ public:
     }
 };
 
+string (SelectorBase::*sb_get_name)() const = &SelectorBase::name;
+void (SelectorBase::*sb_set_name)(const string&) = &SelectorBase::name;
+
 void export_Selector() {
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())
             .def(self_ns::str(self))
-            .add_property("params",
-                    make_function(&SelectorBase::getParameter,
-                            return_internal_reference<>()))
-            .def("name", &SelectorBase::name, &SelectorWrap::default_name)
+            .add_property("name", sb_get_name, sb_set_name)
+            .def("getParam", &SelectorBase::getParam<boost::any>)
+            .def("setParam", &SelectorBase::setParam<object>)
+
             .def("reset", &SelectorBase::reset)
             .def("clone", &SelectorBase::clone)
             .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
             .def("_clone", pure_virtual(&SelectorBase::_clone))
+            .def("getSelectedStock", pure_virtual(&SelectorBase::getSelectedStock))
             .def("addStock", &SelectorBase::addStock)
             .def("addStockList", &SelectorBase::addStockList)
             .def("getRawStockList", &SelectorBase::getRawStockList, &SelectorWrap::getRawStockList)

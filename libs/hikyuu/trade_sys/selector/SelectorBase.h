@@ -31,7 +31,11 @@ class HKU_API SelectorBase {
 
 public:
     SelectorBase();
+    SelectorBase(const string& name);
     virtual ~SelectorBase();
+
+    string name() const;
+    void name(const string& name);
 
     void addStock(const Stock& stock);
     void addStockList(const StockList&);
@@ -45,11 +49,7 @@ public:
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    virtual string name() const {
-        return "SelectorBase";
-    }
-
-    virtual StockList getSelectedStock(Datetime date);
+    virtual StockList getSelectedStock(Datetime date) = 0;
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -59,6 +59,7 @@ public:
 
 
 protected:
+    string m_name;
     StockList m_stock_list;
 
 //============================================
@@ -69,7 +70,7 @@ private:
     friend class boost::serialization::access;
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const {
-        string name_str(GBToUTF8(name()));
+        string name_str(GBToUTF8(m_name));
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_stock_list);
@@ -77,8 +78,7 @@ private:
 
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
-        string name;
-        ar & boost::serialization::make_nvp("name", name);
+        ar & boost::serialization::make_nvp("name", m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_stock_list);
     }
@@ -116,10 +116,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
 #endif
 
 
-#define SELECTOR_IMP(classname, str_name) public:\
-    virtual string name() const { \
-        return(str_name);\
-    }\
+#define SELECTOR_IMP(classname) public:\
     virtual SelectorPtr _clone() {\
         return SelectorPtr(new classname());\
     }
@@ -133,6 +130,17 @@ typedef shared_ptr<SelectorBase> SelectorPtr;
 
 HKU_API std::ostream & operator<<(std::ostream&, const SelectorBase&);
 HKU_API std::ostream & operator<<(std::ostream&, const SelectorPtr&);
+
+
+inline string SelectorBase::name() const {
+    return m_name;
+}
+
+inline void SelectorBase::name(const string& name) {
+    m_name = name;
+}
+
+
 
 } /* namespace hku */
 

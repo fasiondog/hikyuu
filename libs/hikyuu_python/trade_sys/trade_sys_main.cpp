@@ -18,7 +18,7 @@ void export_ProfitGoal();
 void export_Slippage();
 void export_System();
 void export_Selector();
-void export_AllocateMoney();
+void export_Portfolio();
 
 BOOST_PYTHON_MODULE(_trade_sys) {
     docstring_options doc_options(false);
@@ -31,7 +31,7 @@ BOOST_PYTHON_MODULE(_trade_sys) {
     export_Slippage();
     export_System();
     export_Selector();
-    export_AllocateMoney();
+    export_Portfolio();
 }
 
 

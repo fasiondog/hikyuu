@@ -34,9 +34,8 @@ Portfolio::Portfolio(const string& name) : m_name(name) {
 
 Portfolio::Portfolio(const TradeManagerPtr& tm,
         const SystemPtr& sys,
-        const SelectorPtr& se,
-        const AllocateMoneyPtr& am)
-: m_se(se), m_tm(tm), m_sys(sys), m_am(am), m_name("Portfolio") {
+        const SelectorPtr& se)
+: m_se(se), m_tm(tm), m_sys(sys), m_name("Portfolio") {
     if (m_sys) {
         setParam<bool>("delay", m_sys->getParam<bool>("delay"));
     } else {
@@ -60,7 +59,6 @@ void Portfolio::setSYS(const SystemPtr& sys) {
 void Portfolio::reset() {
     if (m_tm) m_tm->reset();
     if (m_se) m_se->reset();
-    if (m_am) m_am->reset();
     if (m_sys) m_sys->reset();
 }
 
@@ -70,7 +68,6 @@ PortfolioPtr Portfolio::clone() {
     p->m_se = m_se;
     p->m_tm = m_tm;
     p->m_sys = m_sys;
-    p->m_am = m_am;
     return PortfolioPtr(p);
 }
 
@@ -107,25 +104,47 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
-    if (!m_am) {
-        HKU_WARN("m_am is null [Portfolio::run]");
-        return;
-    }
-
-
     reset();
     m_sys->setTM(m_tm);
 
-    bool delay = getParam<bool>("delay");
-    m_sys->setParam<bool>("delay", delay);
+    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
+    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
 
-    map<hku_uint64, SystemPtr> stock_map_buffer; //缓存
-    map<hku_uint64, SystemPtr>::iterator stock_map_iter;
 
-    SystemList pre_selected_sys;
+    //bool delay = getParam<bool>("delay");
+    //m_sys->setParam<bool>("delay", delay);
+
+    map<string, SystemPtr> stock_map_buffer; //缓存
+    map<string, SystemPtr>::iterator stock_map_iter;
+
+    //SystemList pre_selected_sys;
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
     for(; date_iter != datelist.end(); ++date_iter) {
+
+        //根据选股规则，计算当前时刻选择的股票列表
+        StockList stk_list = m_se->getSelectedStock(*date_iter);
+
+        StockList::const_iterator stk_iter = stk_list.begin();
+        for (; stk_iter != stk_list.end(); ++stk_iter) {
+            SystemPtr sys;
+
+            //是否已经在缓存中
+            stock_map_iter = stock_map_buffer.find(stk_iter->market_code());
+            if (stock_map_iter != stock_map_buffer.end()) {
+                sys = stock_map_iter->second;
+                //sys->runMoment(*date_iter);
+            } else {
+                sys = m_sys->clone();
+                KData k = stk_iter->getKData(query);
+                sys->setTO(k);
+                stock_map_buffer[stk_iter->market_code()] = sys;
+            }
+
+            sys->runMoment(*date_iter);
+        }
+
+#if 0
         //处理当前持仓股
         PositionRecordList positions = m_tm->getPositionList();
         PositionRecordList::const_iterator pos_iter = positions.begin();
@@ -182,6 +201,7 @@ void Portfolio::run(const KQuery& query) {
                 pre_selected_sys.push_back(sys);
             }
         }
+#endif
     }
 }
 
