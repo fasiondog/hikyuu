@@ -46,6 +46,7 @@ from hikyuu.trade_sys.signal import *
 from hikyuu.trade_sys.stoploss import *
 from hikyuu.trade_sys.profitgoal import *
 from hikyuu.trade_sys.slippage import *
+from hikyuu.trade_sys.portfolio import *
 
 from hikyuu.interactive import *
 #import time

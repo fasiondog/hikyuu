@@ -269,7 +269,7 @@ void System::run(const Stock& stock, const KQuery& query, bool reset) {
 }
 
 
-void System::clearRequest() {
+void System::clearDelayRequest() {
     m_buyRequest.clear();
     m_sellRequest.clear();
     m_sellShortRequest.clear();
@@ -989,6 +989,18 @@ void System::_processRequest(const KRecord& today) {
     if (m_buyShortRequest.valid) {
         _buyShortDelay(today);
     }
+}
+
+
+bool System::haveDelayRequest() const {
+    if (m_buyRequest.valid
+            || m_sellRequest.valid
+            || m_sellShortRequest.valid
+            || m_buyShortRequest.valid) {
+        return true;
+    }
+
+    return false;
 }
 
 

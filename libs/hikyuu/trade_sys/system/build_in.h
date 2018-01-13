@@ -8,7 +8,7 @@
 #ifndef SYSTEM_BUILD_IN_H_
 #define SYSTEM_BUILD_IN_H_
 
-#include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include "crt/SYS_Simple.h"
 
 
 #endif /* BUILD_IN_H_ */

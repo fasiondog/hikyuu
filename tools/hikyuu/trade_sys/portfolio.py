@@ -25,6 +25,24 @@
 # SOFTWARE.
 
 
-__all__ = ['system', 'environment', 'condition', 'moneymanager', 'signal',
-           'stoploss', 'profitgoal', 'slippage', 'selector', 'portfolio']
+from ._trade_sys import Portfolio
+from hikyuu.util.unicode import (unicodeFunc, reprFunc)
+
+Portfolio.__unicode__ = unicodeFunc
+Portfolio.__repr__ = reprFunc
+
+
+
+
+
+#------------------------------------------------------------------
+# add doc-string
+#------------------------------------------------------------------
+
+
+
+
+#------------------------------------------------------------------
+# add doc-string for build_in func
+#------------------------------------------------------------------
 

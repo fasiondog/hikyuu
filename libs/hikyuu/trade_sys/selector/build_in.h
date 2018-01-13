@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_SELECTOR_BUILD_IN_H_
 #define TRADE_SYS_SELECTOR_BUILD_IN_H_
 
-#include "SelectorBase.h"
+#include "crt/SE_Fixed.h"
 
 
 #endif /* TRADE_SYS_SELECTOR_BUILD_IN_H_ */

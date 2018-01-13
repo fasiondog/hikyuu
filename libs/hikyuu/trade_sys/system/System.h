@@ -110,8 +110,11 @@ public:
     void runMoment(const Datetime& datetime);
     void runMoment(const KRecord& record);
 
-    //清除已有的交易请求，供Portolio使用
-    void clearRequest();
+    //清除已有的交易请求，供Portfolio使用
+    void clearDelayRequest();
+
+    //当前是否存在延迟的操作请求，供Portfolio
+    bool haveDelayRequest() const;
 
     bool _environmentIsValid(const Datetime& datetime);
 

@@ -36,24 +36,15 @@ Portfolio::Portfolio(const TradeManagerPtr& tm,
         const SystemPtr& sys,
         const SelectorPtr& se)
 : m_se(se), m_tm(tm), m_sys(sys), m_name("Portfolio") {
-    if (m_sys) {
-        setParam<bool>("delay", m_sys->getParam<bool>("delay"));
-    } else {
-        setParam<bool>("delay", true);
-    }
+
 }
 
 Portfolio::~Portfolio() {
-    // TODO Auto-generated destructor stub
+
 }
 
 void Portfolio::setSYS(const SystemPtr& sys) {
-    if (sys) {
-        m_sys = sys;
-        setParam<bool>("delay", m_sys->getParam<bool>("delay"));
-    } else {
-        HKU_INFO("sys is null,will discard [Portfolio::setSYS]");
-    }
+
 }
 
 void Portfolio::reset() {
@@ -110,10 +101,6 @@ void Portfolio::run(const KQuery& query) {
     m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
     m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
 
-
-    //bool delay = getParam<bool>("delay");
-    //m_sys->setParam<bool>("delay", delay);
-
     map<string, SystemPtr> stock_map_buffer; //缓存
     map<string, SystemPtr>::iterator stock_map_iter;
 
@@ -121,6 +108,14 @@ void Portfolio::run(const KQuery& query) {
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
     for(; date_iter != datelist.end(); ++date_iter) {
+
+        //优先处理处理有延迟操作请求的系统策略
+        stock_map_iter = stock_map_buffer.begin();
+        for (; stock_map_iter != stock_map_buffer.end(); ++stock_map_iter) {
+            if (stock_map_iter->second->haveDelayRequest()) {
+                stock_map_iter->second->runMoment(*date_iter);
+            }
+        }
 
         //根据选股规则，计算当前时刻选择的股票列表
         StockList stk_list = m_se->getSelectedStock(*date_iter);
@@ -143,65 +138,6 @@ void Portfolio::run(const KQuery& query) {
 
             sys->runMoment(*date_iter);
         }
-
-#if 0
-        //处理当前持仓股
-        PositionRecordList positions = m_tm->getPositionList();
-        PositionRecordList::const_iterator pos_iter = positions.begin();
-        for (; pos_iter != positions.end(); ++pos_iter) {
-            stock_map_iter = stock_map_buffer.find(pos_iter->stock.id());
-            //有可能TM中已经存在持仓的股票，而该股票并不在预定的股票范围内，则忽略
-            if (stock_map_iter != stock_map_buffer.end()) {
-                stock_map_iter->second->runMoment(*date_iter);
-            }
-        }
-
-        //如果滞后操作,处理上次选择的股票
-        if (delay) {
-            SystemList::iterator sys_iter = pre_selected_sys.begin();
-            for (; sys_iter != pre_selected_sys.end(); ++sys_iter) {
-                (*sys_iter)->runMoment(*date_iter);
-            }
-            pre_selected_sys.clear();
-        }
-
-        //根据选股规则，计算当前时刻选择的股票列表
-        StockList first_selected = m_se->getSelectedStock(*date_iter);
-
-        //过滤掉已经持仓的股票
-        StockList stock_selected;
-        StockList::const_iterator stk_iter = first_selected.begin();
-        for (; stk_iter != first_selected.end(); ++stk_iter) {
-            if (!m_tm->have(*stk_iter)) {
-                stock_selected.push_back(*stk_iter);
-            }
-        }
-
-        //根据资金分配策略，返回实际欲购买的股票列表
-        StockList act_selected = m_am->tryAllocate(*date_iter, stock_selected);
-        stk_iter = act_selected.begin();
-        for (; stk_iter != act_selected.end(); ++stk_iter) {
-            SystemPtr sys;
-            stock_map_iter = stock_map_buffer.find(stk_iter->id());
-            if (stock_map_iter != stock_map_buffer.end()) {
-                sys = stock_map_iter->second;
-                //清除延迟请求,因为是间断的运行，而延迟买入有一个可被延迟的次数，但被再一次延迟后，延迟请求被滞留
-                sys->clearRequest();
-                sys->runMoment(*date_iter);
-
-            } else {
-                sys = m_sys->clone();
-                KData k = stk_iter->getKData(query);
-                sys->setTO(k);
-                sys->runMoment(*date_iter);
-                stock_map_buffer[stk_iter->id()] = sys;
-            }
-
-            if (delay) {
-                pre_selected_sys.push_back(sys);
-            }
-        }
-#endif
     }
 }
 

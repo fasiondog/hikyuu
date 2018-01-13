@@ -10,16 +10,19 @@
 namespace hku {
 
 FixedSelector::FixedSelector() {
-    // TODO Auto-generated constructor stub
 
 }
 
 FixedSelector::~FixedSelector() {
-    // TODO Auto-generated destructor stub
+
 }
 
 StockList FixedSelector::getSelectedStock(Datetime date) {
     return m_stock_list;
+}
+
+SelectorPtr HKU_API SE_Fixed() {
+    return make_shared<FixedSelector>();
 }
 
 } /* namespace hku */
