@@ -25,7 +25,7 @@ namespace hku {
  * @details 交易前确定盈利目标，用于系统在价格达到盈利目标时执行卖出
  * @ingroup ProfitGoal
  */
-class HKU_API ProfitGoalBase {
+class HKU_API ProfitGoalBase: public enable_shared_from_this<ProfitGoalBase>  {
     PARAMETER_SUPPORT
 
 public:

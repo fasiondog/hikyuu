@@ -20,8 +20,6 @@ string (Portfolio::*pf_get_name)() const= &Portfolio::name;
 
 void export_Portfolio() {
 
-    def("PF_Simple", PF_Simple, PF_Simple_overload());
-
     class_<Portfolio>("Portfolio", init<>())
             .def(init<const string&>())
             .def(init<const TradeManagerPtr&,
@@ -44,6 +42,9 @@ void export_Portfolio() {
             ;
 
     register_ptr_to_python<PortfolioPtr>();
+
+    def("PF_Simple", PF_Simple, PF_Simple_overload());
+
 }
 
 

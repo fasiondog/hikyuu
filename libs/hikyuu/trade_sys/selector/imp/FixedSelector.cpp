@@ -25,4 +25,10 @@ SelectorPtr HKU_API SE_Fixed() {
     return make_shared<FixedSelector>();
 }
 
+SelectorPtr HKU_API SE_Fixed(const StockList& stock_list) {
+    SelectorPtr p = make_shared<FixedSelector>();
+    p->addStockList(stock_list);
+    return p;
+}
+
 } /* namespace hku */

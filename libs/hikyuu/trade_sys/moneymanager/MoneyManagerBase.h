@@ -24,7 +24,7 @@ namespace hku {
  * 资金管理基类
  * @ingroup MoneyManager
  */
-class HKU_API MoneyManagerBase {
+class HKU_API MoneyManagerBase: public enable_shared_from_this<MoneyManagerBase> {
     PARAMETER_SUPPORT
 
 public:

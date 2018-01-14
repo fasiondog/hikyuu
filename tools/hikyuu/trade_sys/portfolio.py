@@ -25,14 +25,11 @@
 # SOFTWARE.
 
 
-from ._trade_sys import Portfolio
+from ._trade_sys import (Portfolio, PF_Simple)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 Portfolio.__unicode__ = unicodeFunc
 Portfolio.__repr__ = reprFunc
-
-
-
 
 
 #------------------------------------------------------------------

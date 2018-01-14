@@ -42,11 +42,27 @@ void ConditionBase::reset() {
 }
 
 ConditionPtr ConditionBase::clone() {
-    ConditionPtr p = _clone();
+    ConditionPtr p;
+    try {
+        p = _clone();
+    } catch(...) {
+        HKU_ERROR("Subclass _clone failed! [ConditionBase::clone]");
+        p = ConditionPtr();
+    }
+
+    if (!p || p.get() == this) {
+        HKU_ERROR("Failed clone! Will use self-ptr! [ConditionBase::clone]" );
+        return shared_from_this();
+    }
+
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_kdata = m_kdata;
     p->m_valid = m_valid;
+
+    //tm、sg由系统运行时进行设定，不作clone
+    //p->m_tm = m_tm->clone();
+    //p->m_sg = m_sg->clone();
     return p;
 }
 

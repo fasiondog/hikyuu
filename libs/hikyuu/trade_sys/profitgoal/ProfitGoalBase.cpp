@@ -36,7 +36,19 @@ ProfitGoalBase::~ProfitGoalBase() {
 }
 
 ProfitGoalPtr ProfitGoalBase::clone() {
-    ProfitGoalPtr p = _clone();
+    ProfitGoalPtr p;
+    try {
+        p = _clone();
+    } catch(...) {
+        HKU_ERROR("Subclass _clone failed! [ProfitGoalBase::clone]");
+        p = ProfitGoalPtr();
+    }
+
+    if (!p || p.get() == this) {
+        HKU_ERROR("Failed clone! Will use self-ptr! [ProfitGoalBase::clone]" );
+        return shared_from_this();
+    }
+
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_tm = m_tm;

@@ -32,7 +32,19 @@ SlippageBase::SlippageBase(const string& name): m_name(name) {
 }
 
 SlippagePtr SlippageBase::clone() {
-    SlippagePtr p = _clone();
+    SlippagePtr p;
+    try {
+        p = _clone();
+    } catch(...) {
+        HKU_ERROR("Subclass _clone failed! [SlippageBase::clone]");
+        p = SlippagePtr();
+    }
+
+    if (!p || p.get() == this) {
+        HKU_ERROR("Failed clone! Will use self-ptr! [SlippageBase::clone]" );
+        return shared_from_this();
+    }
+
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_kdata = m_kdata;

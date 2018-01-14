@@ -122,16 +122,16 @@ void System::initParam() {
 }
 
 
-void System::reset() {
-    if (m_tm) m_tm->reset();
-    if (m_ev) m_ev->reset();
+void System::reset(bool with_tm, bool with_ev, bool with_mm, bool with_sp) {
+    if (with_tm && m_tm) m_tm->reset();
+    if (with_ev && m_ev) m_ev->reset();
     if (m_cn) m_cn->reset();
-    if (m_mm) m_mm->reset();
+    if (with_mm && m_mm) m_mm->reset();
     if (m_sg) m_sg->reset();
     if (m_st) m_st->reset();
     if (m_tp) m_tp->reset();
     if (m_pg) m_pg->reset();
-    if (m_sp) m_sp->reset();
+    if (with_sp && m_sp) m_sp->reset();
 
     m_pre_ev_valid = false;
     m_pre_cn_valid= false;
@@ -169,20 +169,22 @@ void System::setTO(const KData& kdata) {
 }
 
 
-SystemPtr System::clone() {
-    System *p = new System(m_name);
-    p->m_params = m_params;
-    if (m_tm) p->m_tm = m_tm->clone();
-    if (m_mm) p->m_mm = m_mm->clone();
-    if (m_ev) p->m_ev = m_ev->clone();
+SystemPtr System::clone(bool with_tm, bool with_ev, bool with_mm, bool with_sp) {
+    SystemPtr p = make_shared<System>();
+    p->m_tm = (with_mm && m_tm) ? m_tm->clone() : m_tm;
+    p->m_ev = (with_ev && m_ev) ? m_ev->clone() : m_ev;
+    p->m_mm = (with_mm && m_mm) ? m_mm->clone() : m_mm;
+
     if (m_cn) p->m_cn = m_cn->clone();
     if (m_sg) p->m_sg = m_sg->clone();
     if (m_st) p->m_st = m_st->clone();
     if (m_tp) p->m_tp = m_tp->clone();
     if (m_pg) p->m_pg = m_pg->clone();
-    if (m_sp) p->m_sp = m_sp->clone();
 
-    //p->m_name = m_name;
+    p->m_sp = (with_sp && m_sp) ? m_sp->clone() : m_sp;
+
+    p->m_params = m_params;
+    p->m_name = m_name;
     p->m_stock = m_stock;
     p->m_kdata = m_kdata;
 
@@ -201,7 +203,7 @@ SystemPtr System::clone() {
     p->m_sellShortRequest = m_sellShortRequest;
     p->m_buyShortRequest = m_buyShortRequest;
 
-    return SystemPtr(p);
+    return p;
 }
 
 
@@ -216,20 +218,39 @@ void System::_sellNotifyAll(const TradeRecord& record) {
     if (m_mm) m_mm->sellNotify(record);
 }
 
-
-void System::run(const Stock& stock, const KQuery& query, bool reset) {
+bool System::readyForRun() {
     if (!m_tm) {
-        HKU_ERROR("Not setTradeManager! [SystemBase::run]");
-        return;
+        HKU_ERROR("Not setTradeManager! [SystemBase::readyForRun]");
+        return false;
     }
 
     if( !m_mm ){
-        HKU_ERROR("Not setMoneyManager! [System::run]");
-        return;
+        HKU_ERROR("Not setMoneyManager! [System::readyForRun]");
+        return false;
     }
 
     if( !m_sg ){
-        HKU_ERROR("Not setSignal! [System::run] ");
+        HKU_ERROR("Not setSignal! [System::readyForRun] ");
+        return false;
+    }
+
+    if (m_cn) {
+        m_cn->setTM(m_tm);
+        m_cn->setSG(m_sg);
+    }
+    if (m_mm) m_mm->setTM(m_tm);
+    if (m_pg) m_pg->setTM(m_tm);
+    if (m_st) m_st->setTM(m_tm);
+    if (m_tp) m_tp->setTM(m_tm);
+
+    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
+    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
+
+    return true;
+}
+
+void System::run(const Stock& stock, const KQuery& query, bool reset) {
+    if (!readyForRun()) {
         return;
     }
 
@@ -245,19 +266,7 @@ void System::run(const Stock& stock, const KQuery& query, bool reset) {
         return;
     }
 
-    if (m_cn) {
-        m_cn->setTM(m_tm);
-        m_cn->setSG(m_sg);
-    }
-    if (m_mm) m_mm->setTM(m_tm);
-    if (m_pg) m_pg->setTM(m_tm);
-    if (m_st) m_st->setTM(m_tm);
-    if (m_tp) m_tp->setTM(m_tm);
-
-    if (reset)  this->reset();
-
-    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
-    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
+    if (reset)  this->reset(true, true, true, true);
 
     setTO(kdata);
     size_t total = kdata.size();

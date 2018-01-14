@@ -53,7 +53,19 @@ void MoneyManagerBase::sellNotify(const TradeRecord&) {
 }
 
 MoneyManagerPtr MoneyManagerBase::clone() {
-    MoneyManagerPtr p = _clone();
+    MoneyManagerPtr p;
+    try {
+        p = _clone();
+    } catch(...) {
+        HKU_ERROR("Subclass _clone failed! [MoneyManagerBase::clone]");
+        p = MoneyManagerPtr();
+    }
+
+    if (!p || p.get() == this) {
+        HKU_ERROR("Failed clone! Will use self-ptr! [MoneyManagerBase::clone]" );
+        return shared_from_this();
+    }
+
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_tm = m_tm;

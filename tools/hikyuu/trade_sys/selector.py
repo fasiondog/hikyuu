@@ -25,7 +25,7 @@
 # SOFTWARE.
 
 
-from ._trade_sys import SelectorBase
+from ._trade_sys import (SelectorBase, SE_Fixed)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 SelectorBase.__unicode__ = unicodeFunc

@@ -42,7 +42,11 @@ public:
 string (SelectorBase::*sb_get_name)() const = &SelectorBase::name;
 void (SelectorBase::*sb_set_name)(const string&) = &SelectorBase::name;
 
+SelectorPtr (*SE_Fixed_1)() = SE_Fixed;
+SelectorPtr (*SE_Fixed_2)(const StockList&) = SE_Fixed;
+
 void export_Selector() {
+
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())
             .def(self_ns::str(self))
             .add_property("name", sb_get_name, sb_set_name)
@@ -64,6 +68,10 @@ void export_Selector() {
             ;
 
     register_ptr_to_python<SelectorPtr>();
+
+    def("SE_Fixed", SE_Fixed_1);
+    def("SE_Fixed", SE_Fixed_2);
+
 }
 
 

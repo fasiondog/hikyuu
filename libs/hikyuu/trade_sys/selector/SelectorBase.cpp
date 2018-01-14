@@ -46,11 +46,21 @@ void SelectorBase::reset() {
 }
 
 SelectorPtr SelectorBase::clone() {
-    SelectorPtr p = _clone();
-    if (p) {
-        p->m_params = m_params;
-        p->m_stock_list = m_stock_list;
+    SelectorPtr p;
+    try {
+        p = _clone();
+    } catch(...) {
+        HKU_ERROR("Subclass _clone failed! [SelectorBase::clone]");
+        p = SelectorPtr();
     }
+
+    if (!p || p.get() == this) {
+        HKU_ERROR("Failed clone! Will use self-ptr! [SelectorBase::clone]" );
+        return shared_from_this();
+    }
+
+    p->m_params = m_params;
+    p->m_stock_list = m_stock_list;
     return p;
 }
 

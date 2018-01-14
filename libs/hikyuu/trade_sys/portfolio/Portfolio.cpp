@@ -25,11 +25,11 @@ HKU_API std::ostream & operator<<(std::ostream& os, const PortfolioPtr& pf) {
 }
 
 Portfolio::Portfolio(): m_name("Portfolio") {
-    setParam<bool>("delay", true);
+
 }
 
 Portfolio::Portfolio(const string& name) : m_name(name) {
-    setParam<bool>("delay", true);
+
 }
 
 Portfolio::Portfolio(const TradeManagerPtr& tm,
@@ -43,23 +43,20 @@ Portfolio::~Portfolio() {
 
 }
 
-void Portfolio::setSYS(const SystemPtr& sys) {
-
-}
-
 void Portfolio::reset() {
     if (m_tm) m_tm->reset();
     if (m_se) m_se->reset();
-    if (m_sys) m_sys->reset();
+    if (m_sys) m_sys->reset(false, true, true, true);
 }
 
 PortfolioPtr Portfolio::clone() {
-    Portfolio* p = new Portfolio();
+    PortfolioPtr p = make_shared<Portfolio>();
     p->m_params = m_params;
+    p->m_name = m_name;
     p->m_se = m_se;
     p->m_tm = m_tm;
     p->m_sys = m_sys;
-    return PortfolioPtr(p);
+    return p;
 }
 
 void Portfolio::addStock(const Stock& stock) {
@@ -95,25 +92,30 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
-    reset();
     m_sys->setTM(m_tm);
-
-    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
-    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
+    reset();
 
     map<string, SystemPtr> stock_map_buffer; //缓存
     map<string, SystemPtr>::iterator stock_map_iter;
 
-    //SystemList pre_selected_sys;
+    std::set<SystemPtr> processed_sys;
+
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
     for(; date_iter != datelist.end(); ++date_iter) {
+        //忽略小于账户初始建立日期的交易日
+        if (*date_iter < m_tm->initDatetime()) {
+            continue;
+        }
+
+        processed_sys.clear();
 
         //优先处理处理有延迟操作请求的系统策略
         stock_map_iter = stock_map_buffer.begin();
         for (; stock_map_iter != stock_map_buffer.end(); ++stock_map_iter) {
             if (stock_map_iter->second->haveDelayRequest()) {
                 stock_map_iter->second->runMoment(*date_iter);
+                processed_sys.insert(stock_map_iter->second);
             }
         }
 
@@ -128,12 +130,18 @@ void Portfolio::run(const KQuery& query) {
             stock_map_iter = stock_map_buffer.find(stk_iter->market_code());
             if (stock_map_iter != stock_map_buffer.end()) {
                 sys = stock_map_iter->second;
-                //sys->runMoment(*date_iter);
+
+                //如果已在之前处理过延迟请求时运行过，则忽略
+                if (processed_sys.count(sys))
+                    continue;
+
             } else {
-                sys = m_sys->clone();
-                KData k = stk_iter->getKData(query);
-                sys->setTO(k);
-                stock_map_buffer[stk_iter->market_code()] = sys;
+                sys = m_sys->clone(false, false, false, false);
+                if (sys->readyForRun()) {
+                    KData k = stk_iter->getKData(query);
+                    sys->setTO(k);
+                    stock_map_buffer[stk_iter->market_code()] = sys;
+                }
             }
 
             sys->runMoment(*date_iter);

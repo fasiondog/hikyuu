@@ -25,7 +25,7 @@ namespace hku {
  * @details 负责向系统提供当前计划交易的预期止损价
  * @ingroup Stoploss
  */
-class HKU_API StoplossBase {
+class HKU_API StoplossBase: public enable_shared_from_this<StoplossBase>  {
     PARAMETER_SUPPORT
 
 public:

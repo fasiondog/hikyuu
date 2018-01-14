@@ -26,7 +26,7 @@ namespace hku {
  * 交易对象选择模块
  * @ingroup Selector
  */
-class HKU_API SelectorBase {
+class HKU_API SelectorBase: public enable_shared_from_this<SelectorBase>  {
     PARAMETER_SUPPORT
 
 public:

@@ -105,7 +105,6 @@ void export_System() {
 
             .def("_environmentIsValid", &System::_environmentIsValid)
             .def("_conditionIsValid", &System::_conditionIsValid)
-            .def("_shouldBuy", &System::_shouldBuy)
             .def("_buyNotifyAll", &System::_buyNotifyAll)
             .def("_sellNotifyAll", &System::_sellNotifyAll)
             .def("_buy", &System::_buy)

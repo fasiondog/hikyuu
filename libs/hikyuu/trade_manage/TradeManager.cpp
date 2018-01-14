@@ -200,10 +200,13 @@ TradeManagerPtr TradeManager::clone() {
     TradeManager *p = new TradeManager(m_init_datetime, m_init_cash,
             m_costfunc, m_name);
     p->m_params = m_params;
-    //p->m_name = m_name;
-    //p->m_init_datetime = m_init_datetime;
-    //p->m_init_cash = m_init_cash;
-    //p->m_costfunc = m_costfunc;
+    p->m_name = m_name;
+    p->m_init_datetime = m_init_datetime;
+    p->m_init_cash = m_init_cash;
+
+    //costfunc是一个公共的函数对象，是共享实现，无须deepcopy
+    p->m_costfunc = m_costfunc;
+
     p->m_cash = m_cash;
     p->m_checkin_cash = m_checkin_cash;
     p->m_checkout_cash = m_checkout_cash;
@@ -217,6 +220,8 @@ TradeManagerPtr TradeManager::clone() {
     p->m_position_history = m_position_history;
     p->m_broker_list = m_broker_list;
     p->m_broker_last_datetime = m_broker_last_datetime;
+
+    p->m_actions = m_actions;
 
     return TradeManagerPtr(p);
 }

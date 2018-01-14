@@ -27,7 +27,7 @@ namespace hku {
  * 信号指示器基类
  * @ingroup Signal
  */
-class HKU_API SignalBase {
+class HKU_API SignalBase: public enable_shared_from_this<SignalBase>  {
     PARAMETER_SUPPORT
 
 public:

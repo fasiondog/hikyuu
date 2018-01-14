@@ -37,9 +37,21 @@ StoplossBase::~StoplossBase() {
 
 
 StoplossPtr StoplossBase::clone() {
-    StoplossPtr p = _clone();
+    StoplossPtr p;
+    try {
+        p = _clone();
+    } catch(...) {
+        HKU_ERROR("Subclass _clone failed! [StoplossBase::clone]");
+        p = StoplossPtr();
+    }
+
+    if (!p || p.get() == this) {
+        HKU_ERROR("Failed clone! Will use self-ptr! [StoplossBase::clone]" );
+        return shared_from_this();
+    }
+
     p->m_params = m_params;
-    p->m_tm = m_tm;
+    //p->m_tm = m_tm;
     p->m_kdata = m_kdata;
     return p;
 }

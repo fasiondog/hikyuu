@@ -95,10 +95,18 @@ public:
      * 复位
      * @note 不包含TradeManager的复位
      */
-    void reset();
+    void reset(bool with_tm, bool with_ev, bool with_mm, bool with_sp);
 
-    /** 克隆操作，会依次调用所有部件的clone操作 */
-    shared_ptr<System> clone();
+    typedef shared_ptr<System> SystemPtr;
+
+    /** 克隆操作，会依次调用所有部件的clone操作
+     * @param with_tm
+     * @param with_ev
+     * @param with_mm
+     * @param with_sp
+     * @note 不设默认值，强迫用户了解期间的区别，避免误用
+     */
+    SystemPtr clone(bool with_tm, bool with_ev, bool with_mm, bool with_sp);
 
     /**
      * 设置交易对象
@@ -116,11 +124,12 @@ public:
     //当前是否存在延迟的操作请求，供Portfolio
     bool haveDelayRequest() const;
 
+    //运行前准备工作
+    bool readyForRun();
+
     bool _environmentIsValid(const Datetime& datetime);
 
     bool _conditionIsValid(const Datetime& datetime);
-
-    bool _shouldBuy(const Datetime& datetime);
 
     //通知所有需要接收实际买入交易记录的部件
     void _buyNotifyAll(const TradeRecord&);
@@ -309,11 +318,6 @@ _environmentIsValid(const Datetime& datetime) {
 inline bool System::
 _conditionIsValid(const Datetime& datetime) {
     return m_cn ? m_cn->isValid(datetime) : true;
-}
-
-inline bool System::
-_shouldBuy(const Datetime& datetime) {
-    return m_sg ? m_sg->shouldBuy(datetime) : false;
 }
 
 inline size_t System

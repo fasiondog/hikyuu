@@ -29,7 +29,7 @@ namespace hku {
  * @note 系统有效性和待交易的对象有关也可能没关，所以保留setTradeObj接口
  * @ingroup Condition
  */
-class HKU_API ConditionBase {
+class HKU_API ConditionBase: public enable_shared_from_this<ConditionBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -109,8 +109,7 @@ private:
         ar & boost::serialization::make_nvp("m_name", name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_valid);
-        // m_kdata是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_ktype);
+        // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
     template<class Archive>
@@ -120,8 +119,7 @@ private:
         m_name = UTF8ToGB(name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_valid);
-        // m_kdata是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_ktype);
+        // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

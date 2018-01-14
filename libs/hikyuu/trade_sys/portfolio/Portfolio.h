@@ -47,7 +47,7 @@ public:
 
     void setTM(const TradeManagerPtr& tm) { m_tm = tm; }
     void setSE(const SelectorPtr& se) { m_se = se; }
-    void setSYS(const SystemPtr& sys);
+    void setSYS(const SystemPtr& sys) { m_sys = sys; }
 
     void reset();
 

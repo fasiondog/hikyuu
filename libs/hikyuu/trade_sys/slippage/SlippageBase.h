@@ -24,7 +24,7 @@ namespace hku {
  * 移滑价差算法基类
  * @ingroup Slippage
  */
-class HKU_API SlippageBase {
+class HKU_API SlippageBase: public enable_shared_from_this<SlippageBase>  {
     PARAMETER_SUPPORT
 
 public:

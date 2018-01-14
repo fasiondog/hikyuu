@@ -29,7 +29,7 @@ namespace hku {
  * @note 外部环境应该和具体的交易对象没有关系
  * @ingroup Environment
  */
-class HKU_API EnvironmentBase {
+class HKU_API EnvironmentBase: public enable_shared_from_this<EnvironmentBase>  {
     PARAMETER_SUPPORT
 
 public:
@@ -59,7 +59,13 @@ public:
     }
 
     typedef shared_ptr<EnvironmentBase> EnvironmentPtr;
-    /** 克隆操作 */
+    /**
+     * 克隆操作
+     * @note Environment不同于其他的系统策略组件，它是不和特定的交易对象绑定的，可以共享，本质是
+     *       上是不需要clone操作的，这里仅仅是为了整齐以及可能存在的特殊场景使用。
+     *
+     *
+     */
     EnvironmentPtr clone();
 
     /**
