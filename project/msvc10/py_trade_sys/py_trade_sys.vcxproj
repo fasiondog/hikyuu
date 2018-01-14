@@ -209,7 +209,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\trade_sys_main.cpp" />
-    <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\_AllocateMoney.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\_Condition.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\_Environment.cpp" />
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\_MoneyManager.cpp" />

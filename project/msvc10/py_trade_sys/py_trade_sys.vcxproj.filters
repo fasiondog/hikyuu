@@ -18,9 +18,6 @@
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\trade_sys_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\_AllocateMoney.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libs\hikyuu_python\trade_sys\_Condition.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

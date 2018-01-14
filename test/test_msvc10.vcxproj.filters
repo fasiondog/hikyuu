@@ -165,6 +165,9 @@
     <ClCompile Include="libs\hikyuu_utils\iniparser\test_iniparser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="libs\hikyuu\trade_sys\portfolio\test_Portfolio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="doc.h">

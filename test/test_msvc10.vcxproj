@@ -219,6 +219,7 @@ test</Command>
     <ClCompile Include="libs\hikyuu\trade_sys\moneymanager\test_export.cpp" />
     <ClCompile Include="libs\hikyuu\trade_sys\moneymanager\test_MM_FixedCount.cpp" />
     <ClCompile Include="libs\hikyuu\trade_sys\moneymanager\test_MoneyManager.cpp" />
+    <ClCompile Include="libs\hikyuu\trade_sys\portfolio\test_Portfolio.cpp" />
     <ClCompile Include="libs\hikyuu\trade_sys\profitgoal\test_ProfitGoal.cpp" />
     <ClCompile Include="libs\hikyuu\trade_sys\signal\test_export.cpp" />
     <ClCompile Include="libs\hikyuu\trade_sys\signal\test_Signal.cpp" />

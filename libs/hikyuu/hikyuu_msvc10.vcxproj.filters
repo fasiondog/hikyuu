@@ -60,22 +60,10 @@
     <ClCompile Include="data_driver\KDataDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="data_driver\block_info\qianlong\QLBlockInfoDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="data_driver\kdata\hdf5\H5KDataDriverImp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="data_driver\kdata\mysql\MySQLKDataDriverImp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriverImp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="datetime\Datetime.cpp">
@@ -243,9 +231,6 @@
     <ClCompile Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="trade_sys\portfolio\AllocateMoneyBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="trade_sys\portfolio\Portfolio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -318,9 +303,6 @@
     <ClCompile Include="trade_sys\system\TradeRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="trade_sys\system\crt\SYS_Simple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities\Parameter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -355,6 +337,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="data_driver\kdata\tdx\TdxKDataDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\portfolio\imp\PF_Simple.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\selector\imp\FixedSelector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trade_sys\system\imp\SYS_Simple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -425,25 +416,13 @@
     <ClInclude Include="data_driver\KDataDriverImp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_driver\base_info\mysql\MySQLBaseInfoDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="data_driver\base_info\sqlite\SQLiteBaseInfoDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="data_driver\block_info\qianlong\QLBlockInfoDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_driver\kdata\hdf5\H5KDataDriverImp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="data_driver\kdata\hdf5\H5Record.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="data_driver\kdata\mysql\MySQLKDataDriverImp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="data_driver\kdata\tdx\TdxKDataDriverImp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="datetime\Datetime.h">
@@ -728,9 +707,6 @@
     <ClInclude Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="trade_sys\portfolio\AllocateMoneyBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="trade_sys\portfolio\build_in.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -848,9 +824,6 @@
     <ClInclude Include="utilities\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_driver\kdatatempcsvdriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="trade_manage\orderbrokerbase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -879,6 +852,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="data_driver\kdata\tdx\tdxkdatadriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\portfolio\crt\PF_Simple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\selector\crt\se_fixed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trade_sys\selector\imp\FixedSelector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data_driver\KDataTempCsvDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

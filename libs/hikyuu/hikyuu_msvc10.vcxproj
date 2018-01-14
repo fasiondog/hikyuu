@@ -137,7 +137,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>NotSet</SubSystem>
-      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\mysql\lib\libmysql.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
     </Link>
     <CustomBuildStep>
@@ -189,7 +189,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\mysql\lib\libmysql.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(HIKYUU)\extern-libs\log4cplus\dll\log4cplus.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5_cppdll.lib;$(HIKYUU)\extern-libs\hdf5\dll\hdf5dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
     </Link>
     <CustomBuildStep>
@@ -280,12 +280,13 @@
     <ClCompile Include="trade_sys\moneymanager\imp\NotMoneyManager.cpp" />
     <ClCompile Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.cpp" />
     <ClCompile Include="trade_sys\moneymanager\MoneyManagerBase.cpp" />
-    <ClCompile Include="trade_sys\portfolio\AllocateMoneyBase.cpp" />
+    <ClCompile Include="trade_sys\portfolio\imp\PF_Simple.cpp" />
     <ClCompile Include="trade_sys\portfolio\Portfolio.cpp" />
     <ClCompile Include="trade_sys\profitgoal\export.cpp" />
     <ClCompile Include="trade_sys\profitgoal\imp\FixedPercentProfitGoal.cpp" />
     <ClCompile Include="trade_sys\profitgoal\imp\NoGoalProfitGoal.cpp" />
     <ClCompile Include="trade_sys\profitgoal\ProfitGoalBase.cpp" />
+    <ClCompile Include="trade_sys\selector\imp\FixedSelector.cpp" />
     <ClCompile Include="trade_sys\selector\SelectorBase.cpp" />
     <ClCompile Include="trade_sys\signal\crt\SG_Flex.cpp" />
     <ClCompile Include="trade_sys\signal\export.cpp" />
@@ -304,7 +305,7 @@
     <ClCompile Include="trade_sys\stoploss\imp\FixedPercentStoploss.cpp" />
     <ClCompile Include="trade_sys\stoploss\imp\IndicatorStoploss.cpp" />
     <ClCompile Include="trade_sys\stoploss\StoplossBase.cpp" />
-    <ClCompile Include="trade_sys\system\crt\SYS_Simple.cpp" />
+    <ClCompile Include="trade_sys\system\imp\SYS_Simple.cpp" />
     <ClCompile Include="trade_sys\system\System.cpp" />
     <ClCompile Include="trade_sys\system\SystemPart.cpp" />
     <ClCompile Include="trade_sys\system\TradeRequest.cpp" />
@@ -322,7 +323,7 @@
     <ClInclude Include="data_driver\DataDriverFactory.h" />
     <ClInclude Include="data_driver\KDataDriver.h" />
     <ClInclude Include="data_driver\KDataDriverImp.h" />
-    <ClInclude Include="data_driver\kdatatempcsvdriver.h" />
+    <ClInclude Include="data_driver\KDataTempCsvDriver.h" />
     <ClInclude Include="data_driver\kdata\hdf5\h5kdatadriver.h" />
     <ClInclude Include="data_driver\kdata\hdf5\H5Record.h" />
     <ClInclude Include="data_driver\kdata\tdx\tdxkdatadriver.h" />
@@ -438,8 +439,8 @@
     <ClInclude Include="trade_sys\moneymanager\imp\NotMoneyManager.h" />
     <ClInclude Include="trade_sys\moneymanager\imp\WilliamsFixedRiskMoneyManager.h" />
     <ClInclude Include="trade_sys\moneymanager\MoneyManagerBase.h" />
-    <ClInclude Include="trade_sys\portfolio\AllocateMoneyBase.h" />
     <ClInclude Include="trade_sys\portfolio\build_in.h" />
+    <ClInclude Include="trade_sys\portfolio\crt\PF_Simple.h" />
     <ClInclude Include="trade_sys\portfolio\Portfolio.h" />
     <ClInclude Include="trade_sys\profitgoal\build_in.h" />
     <ClInclude Include="trade_sys\profitgoal\crt\PG_FixedPercent.h" />
@@ -448,6 +449,8 @@
     <ClInclude Include="trade_sys\profitgoal\imp\NoGoalProfitGoal.h" />
     <ClInclude Include="trade_sys\profitgoal\ProfitGoalBase.h" />
     <ClInclude Include="trade_sys\selector\build_in.h" />
+    <ClInclude Include="trade_sys\selector\crt\se_fixed.h" />
+    <ClInclude Include="trade_sys\selector\imp\FixedSelector.h" />
     <ClInclude Include="trade_sys\selector\SelectorBase.h" />
     <ClInclude Include="trade_sys\signal\build_in.h" />
     <ClInclude Include="trade_sys\signal\crt\sg_bool.h" />
