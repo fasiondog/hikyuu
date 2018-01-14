@@ -149,11 +149,8 @@ void System::reset(bool with_tm, bool with_ev, bool with_mm, bool with_sp) {
 }
 
 void System::setTO(const KData& kdata) {
-    if (kdata.empty()) {
-        return;
-    }
-
     m_kdata = kdata;
+    m_stock = kdata.getStock();
 
     //sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg) m_sg->setTO(kdata);
@@ -259,7 +256,7 @@ void System::run(const Stock& stock, const KQuery& query, bool reset) {
         return;
     }
 
-    m_stock = stock;
+    //m_stock = stock; 在setTO里赋值
     KData kdata = stock.getKData(query);
     if( kdata.empty() ){
         HKU_INFO("KData is empty! [System::run]");
