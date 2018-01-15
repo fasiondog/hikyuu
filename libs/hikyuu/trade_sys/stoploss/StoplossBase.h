@@ -165,7 +165,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(StoplossBase)
  * @ingroup StopLoss
  */
 typedef boost::shared_ptr<StoplossBase> StoplossPtr;
-typedef boost::shared_ptr<StoplossBase> SLPtr;
+typedef boost::shared_ptr<StoplossBase> STPtr;
 typedef boost::shared_ptr<StoplossBase> TakeProfitPtr;
 typedef boost::shared_ptr<StoplossBase> TPPtr;
 
