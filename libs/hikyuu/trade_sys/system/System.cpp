@@ -100,7 +100,7 @@ void System::initParam() {
     //连续延迟交易请求的限制次数，需大于等于0，0表示只允许延迟1次
     setParam<int>("max_delay_count", 3);
 
-    setParam<bool>("delay", true);
+    setParam<bool>("delay", true); //延迟操作，取当前Bar的收盘价操作；非延迟取开盘价
 
     //延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);
@@ -392,17 +392,7 @@ void System::_runMoment(const KRecord& today) {
     // 处理止损、止盈、目标信号
     //----------------------------------------------------------
 
-    //注：理论上非延迟操作应该是在最高价和最低价之间的价格满足条件就需要触发，但是
-    //   这样做会存在以下问题：
-    //   1、信号指示器必须同样使用最高价和最低价之间的价格来触发，而自行编写信号指示器时，很容易被忽略
-    //     而导致错误的结果；
-    //   2、增加了程序的复杂性，同时还没办法约束问题1中提到的自定义信号指示器可能存在不匹配情况
-    //   3、大致做过一些测试，使用日线Bar很容易被甩出当前行情（无论是跌还是涨）
-    //考虑到以上问题，对日线Bar只有将最高价和最低价当做噪音，而分钟级别本身价格变化幅度不大，所以不考虑
-    //使用所谓的当前价格（最高价和最低价之间的价格）来触发非延迟操作的信号！
-
-    //如果延迟操作，当前价格取收盘价，否则取开盘价
-    price_t current_price = getParam<bool>("delay") ? today.closePrice : today.openPrice;
+    price_t current_price = today.closePrice;
 
     PositionRecord position = m_tm->getPosition(m_stock);
     if( position.number != 0) {
