@@ -40,18 +40,26 @@ public:
         }
     }
 
+    virtual void _calculate() {}
+
     virtual EnvironmentPtr _clone() {
         EnvironmentTest* p(new EnvironmentTest);
         p->m_market = m_market;
         return EnvironmentPtr(p);
     }
 
-    KQuery::KType getKType() {
+    KQuery::KType getKType() const {
         return m_ktype;
+    }
+
+    void settKType(KQuery::KType ktype) {
+        m_ktype = ktype;
+        _calculate();
     }
 
 private:
     string m_market;
+    KQuery::KType m_ktype;
 };
 
 /**

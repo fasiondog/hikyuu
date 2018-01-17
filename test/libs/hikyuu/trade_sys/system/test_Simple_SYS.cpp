@@ -21,8 +21,50 @@
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_sys/stoploss/crt/ST_FixedPercent.h>
 #include <hikyuu/trade_sys/stoploss/crt/ST_Indicator.h>
+#include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 
 using namespace hku;
+
+class TestEV1: public EnvironmentBase {
+public:
+    TestEV1(): EnvironmentBase("TEST_EV1") {};
+    virtual ~TestEV1() {}
+
+    virtual EnvironmentPtr _clone() {
+        return EnvironmentPtr(new TestEV1());
+    }
+
+    virtual void _calculate() {
+        _addValid(Datetime(200001040000LL));
+        _addValid(Datetime(200001050000LL));
+        _addValid(Datetime(200001060000LL));
+        _addValid(Datetime(200001070000LL));
+    };
+};
+
+class TestEV2: public EnvironmentBase {
+public:
+    TestEV2(): EnvironmentBase("TEST_EV2") {};
+    virtual ~TestEV2() {}
+
+    virtual EnvironmentPtr _clone() {
+        return EnvironmentPtr(new TestEV2());
+    }
+
+    virtual void _calculate() {
+        _addValid(Datetime(200001040000LL));
+        _addValid(Datetime(200001050000LL));
+        _addValid(Datetime(200001060000LL));
+        _addValid(Datetime(200001070000LL));
+        _addValid(Datetime(200001100000LL));
+        _addValid(Datetime(200001110000LL));
+        _addValid(Datetime(200001120000LL));
+        _addValid(Datetime(200001130000LL));
+        _addValid(Datetime(200001140000LL));
+        _addValid(Datetime(200001170000LL));
+    };
+};
+
 
 /**
  * @defgroup test_SYS_Simple test_SYS_Simple
@@ -54,6 +96,12 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_no_short) {
     STPtr st = ST_FixedPercent(0.01);
     TPPtr tp = ST_Indicator(OP(MA(5)), "CLOSE");
     SYSPtr sys;
+
+    EVPtr ev1 = make_shared<TestEV1>();
+    ev1->setQuery(query);
+
+    EVPtr ev2 = make_shared<TestEV1>();
+    ev2->setQuery(query);
 
     /** @arg 未指定账户运行    */
     sys = SYS_Simple();
@@ -425,6 +473,107 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_no_short) {
     current_cash += 2600;
     BOOST_CHECK(std::fabs(tr_list[4].cash - current_cash) < 0.00001);
     BOOST_CHECK(tr_list[4].from == PART_TAKEPROFIT);
+
+    /** @arg 指定了TM、SG、MM、ST、TP、EV（不触发建仓），但未指定其他策略组件，非延迟操作 */
+    sys = SYS_Simple();
+    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("ev_open_position", false);
+    sys->setTM(tm->clone());
+    sys->setSG(sg->clone());
+    sys->setMM(mm->clone());
+    sys->setST(st->clone());
+    sys->setTP(tp->clone());
+    sys->setEV(ev1);
+
+    BOOST_CHECK(sys->readyForRun() == true);
+    sys->run(stk, query);
+    BOOST_CHECK(sys->getTM()->currentCash() != init_cash);
+    tr_list = sys->getTM()->getTradeList();
+    BOOST_CHECK(tr_list.size() == 3);
+    BOOST_CHECK(tr_list[0].business == BUSINESS_INIT);
+
+    BOOST_CHECK(tr_list[1].stock == stk);
+    BOOST_CHECK(tr_list[1].datetime == Datetime(200001050000LL));
+    BOOST_CHECK(tr_list[1].business == BUSINESS_BUY);
+    BOOST_CHECK(std::fabs(tr_list[1].planPrice - 25.28) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[1].realPrice - 25.28) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[1].goalPrice - 0) < 0.00001);
+    BOOST_CHECK(tr_list[1].number == 100);
+    BOOST_CHECK(std::fabs(tr_list[1].cost.total - 0) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[1].stoploss - 25.03) < 0.00001);
+    current_cash = init_cash - 2528;
+    BOOST_CHECK(std::fabs(tr_list[1].cash - current_cash) < 0.00001);
+    BOOST_CHECK(tr_list[1].from == PART_SIGNAL);
+
+    BOOST_CHECK(tr_list[2].stock == stk);
+    BOOST_CHECK(tr_list[2].datetime == Datetime(200001100000LL));
+    BOOST_CHECK(tr_list[2].business == BUSINESS_SELL);
+    BOOST_CHECK(std::fabs(tr_list[2].planPrice - 27.25) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[2].realPrice - 27.25) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[2].goalPrice - 0) < 0.00001);
+    BOOST_CHECK(tr_list[2].number == 100);
+    BOOST_CHECK(std::fabs(tr_list[2].cost.total - 0) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[2].stoploss - 26.98) < 0.00001);
+    current_cash += 2725;
+    BOOST_CHECK(std::fabs(tr_list[2].cash - current_cash) < 0.00001);
+    BOOST_CHECK(tr_list[2].from == PART_ENVIRONMENT);
+
+    /** @arg 指定了TM、SG、MM、ST、TP、EV（触发建仓），但未指定其他策略组件，非延迟操作 */
+    sys = SYS_Simple();
+    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("ev_open_position", true);
+    sys->setTM(tm->clone());
+    sys->setSG(sg->clone());
+    sys->setMM(mm->clone());
+    sys->setST(st->clone());
+    sys->setTP(tp->clone());
+    sys->setEV(ev1);
+
+    BOOST_CHECK(sys->readyForRun() == true);
+    sys->run(stk, query);
+    BOOST_CHECK(sys->getTM()->currentCash() != init_cash);
+    tr_list = sys->getTM()->getTradeList();
+    BOOST_CHECK(tr_list.size() == 4);
+    BOOST_CHECK(tr_list[0].business == BUSINESS_INIT);
+
+    BOOST_CHECK(tr_list[1].stock == stk);
+    BOOST_CHECK(tr_list[1].datetime == Datetime(200001040000LL));
+    BOOST_CHECK(tr_list[1].business == BUSINESS_BUY);
+    BOOST_CHECK(std::fabs(tr_list[1].planPrice - 25.57) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[1].realPrice - 25.57) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[1].goalPrice - 0) < 0.00001);
+    BOOST_CHECK(tr_list[1].number == 100);
+    BOOST_CHECK(std::fabs(tr_list[1].cost.total - 0) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[1].stoploss - 25.31) < 0.00001);
+    current_cash = init_cash - 2557;
+    BOOST_CHECK(std::fabs(tr_list[1].cash - current_cash) < 0.00001);
+    BOOST_CHECK(tr_list[1].from == PART_ENVIRONMENT);
+
+    BOOST_CHECK(tr_list[2].stock == stk);
+    BOOST_CHECK(tr_list[2].datetime == Datetime(200001050000LL));
+    BOOST_CHECK(tr_list[2].business == BUSINESS_BUY);
+    BOOST_CHECK(std::fabs(tr_list[2].planPrice - 25.28) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[2].realPrice - 25.28) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[2].goalPrice - 0) < 0.00001);
+    BOOST_CHECK(tr_list[2].number == 100);
+    BOOST_CHECK(std::fabs(tr_list[2].cost.total - 0) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[2].stoploss - 25.03) < 0.00001);
+    current_cash -= 2528;
+    BOOST_CHECK(std::fabs(tr_list[2].cash - current_cash) < 0.00001);
+    BOOST_CHECK(tr_list[2].from == PART_SIGNAL);
+
+    BOOST_CHECK(tr_list[3].stock == stk);
+    BOOST_CHECK(tr_list[3].datetime == Datetime(200001100000LL));
+    BOOST_CHECK(tr_list[3].business == BUSINESS_SELL);
+    BOOST_CHECK(std::fabs(tr_list[3].planPrice - 27.25) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[3].realPrice - 27.25) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[3].goalPrice - 0) < 0.00001);
+    BOOST_CHECK(tr_list[3].number == 200);
+    BOOST_CHECK(std::fabs(tr_list[3].cost.total - 0) < 0.00001);
+    BOOST_CHECK(std::fabs(tr_list[3].stoploss - 26.98) < 0.00001);
+    current_cash += 2725*2;
+    BOOST_CHECK(std::fabs(tr_list[3].cash - current_cash) < 0.00001);
+    BOOST_CHECK(tr_list[3].from == PART_ENVIRONMENT);
 
     for (auto iter = tr_list.begin(); iter != tr_list.end(); ++iter) {
         std::cout << *iter << std::endl;

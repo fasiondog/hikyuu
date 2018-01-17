@@ -133,8 +133,8 @@ void System::reset(bool with_tm, bool with_ev, bool with_mm, bool with_sp) {
     if (m_pg) m_pg->reset();
     if (with_sp && m_sp) m_sp->reset();
 
-    m_pre_ev_valid = false;
-    m_pre_cn_valid= false;
+    m_pre_ev_valid = true;
+    m_pre_cn_valid= true;
 
     m_buy_days = 0;
     m_sell_short_days = 0;
@@ -231,10 +231,16 @@ bool System::readyForRun() {
         return false;
     }
 
+    //如果存在市场环境判断策略，则需要将默认的前一日市场有效标志置为false
+    //因为需要由市场环境判断策略全权判定市场是否有效
+    if (m_ev) m_pre_ev_valid = false;
+
     if (m_cn) {
         m_cn->setTM(m_tm);
         m_cn->setSG(m_sg);
+        m_pre_cn_valid= false; //默认的前一日市场有效标志置为false
     }
+
     if (m_mm) m_mm->setTM(m_tm);
     if (m_pg) m_pg->setTM(m_tm);
     if (m_st) m_st->setTM(m_tm);
@@ -316,8 +322,8 @@ void System::_runMoment(const KRecord& today) {
 
     bool current_ev_valid = _environmentIsValid(today.datetime);
 
-    //如果环境从有效变为无效时
-    if (m_pre_ev_valid && !current_ev_valid) {
+    //如果当前环境无效
+    if (!current_ev_valid) {
         //如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             _sell(today, PART_ENVIRONMENT);
@@ -327,15 +333,14 @@ void System::_runMoment(const KRecord& today) {
         return;
     }
 
-    //环境从无效变为有效时
-    if (!m_pre_ev_valid && current_ev_valid) {
+    //环境是从无效变为有效时
+    if (!m_pre_ev_valid) {
         //如果使用环境判定策略进行初始建仓
         if (getParam<bool>("ev_open_position")) {
             _buy(today, PART_ENVIRONMENT);
+            m_pre_ev_valid = current_ev_valid;
+            return;
         }
-
-        m_pre_ev_valid = current_ev_valid;
-        return;
     }
 
     m_pre_ev_valid = current_ev_valid;
@@ -346,8 +351,8 @@ void System::_runMoment(const KRecord& today) {
 
     bool current_cn_valid = _conditionIsValid(today.datetime);
 
-    //如果系统从有效变为无效
-    if (m_pre_cn_valid && !current_cn_valid) {
+    //如果系统当前无效
+    if (!current_cn_valid) {
         //如果持有多头仓位，则立即清仓卖出
         if (m_tm->have(m_stock)) {
             _sell(today, PART_CONDITION);
@@ -358,14 +363,13 @@ void System::_runMoment(const KRecord& today) {
     }
 
     //如果系统从无效变为有效
-    if (!m_pre_cn_valid && current_cn_valid) {
+    if (!m_pre_cn_valid) {
         //如果使用环境判定策略进行初始建仓
         if (getParam<bool>("cn_open_position")) {
             _buy(today, PART_CONDITION);
+            m_pre_cn_valid = current_cn_valid;
+            return;
         }
-
-        m_pre_cn_valid = current_cn_valid;
-        return;
     }
 
     m_pre_cn_valid = current_cn_valid;
