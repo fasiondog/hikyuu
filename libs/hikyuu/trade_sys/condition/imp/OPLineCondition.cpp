@@ -69,7 +69,7 @@ void OPLineCondition::_calculate() {
 
 
 CNPtr HKU_API CN_OPLine(const Operand& op) {
-    return CNPtr(new OPLineCondition(op));
+    return make_shared<OPLineCondition>(op);
 }
 
 } /* namespace hku */

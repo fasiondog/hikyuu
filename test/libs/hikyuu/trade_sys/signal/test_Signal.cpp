@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE( test_Signal) {
     p->_addSellSignal(Datetime(200101030000));
     BOOST_CHECK(p->shouldSell(Datetime(200101030000)) == true);
 
-    /** 克隆操作 */
+    /** @arg 克隆操作 */
     p_src->setX(10);
     SignalPtr p_clone = p->clone();
     BOOST_CHECK(p != p_clone);
