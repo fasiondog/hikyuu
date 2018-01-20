@@ -11,6 +11,7 @@
 
 #include "crt/PG_NoGoal.h"
 #include "crt/PG_FixedPercent.h"
+#include "crt/PG_FixedHoldDays.h"
 
 
 #endif /* PROFITGOAL_BUILD_IN_H_ */

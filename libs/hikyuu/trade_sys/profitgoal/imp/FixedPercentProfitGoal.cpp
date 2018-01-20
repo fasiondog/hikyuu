@@ -5,12 +5,12 @@
  *      Author: Administrator
  */
 
-#include <hikyuu/trade_sys/profitgoal/imp/FixedPercentProfitGoal.h>
+#include "FixedPercentProfitGoal.h"
 
 namespace hku {
 
 FixedPercentProfitGoal::FixedPercentProfitGoal()
-: ProfitGoalBase("FixedPercent") {
+: ProfitGoalBase("PG_FixedPercent") {
     setParam<double>("p", 0.2);
 }
 
@@ -27,9 +27,9 @@ price_t FixedPercentProfitGoal::getGoal(const Datetime& datetime, price_t price)
 }
 
 ProfitGoalPtr HKU_API PG_FixedPercent(double p) {
-    FixedPercentProfitGoal *ptr = new FixedPercentProfitGoal;
+    ProfitGoalPtr ptr = make_shared<FixedPercentProfitGoal>();
     ptr->setParam<double>("p", p);
-    return ProfitGoalPtr(ptr);
+    return ptr;
 }
 
 } /* namespace hku */

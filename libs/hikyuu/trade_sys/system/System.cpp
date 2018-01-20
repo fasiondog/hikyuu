@@ -253,15 +253,15 @@ bool System::readyForRun() {
 }
 
 void System::run(const Stock& stock, const KQuery& query, bool reset) {
+    if( stock.isNull() ){
+        HKU_ERROR("Stock is NULL! [System::run] ");
+        return;
+    }
+
     //reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
     if (reset)  this->reset(true, true, true, true);
 
     if (!readyForRun()) {
-        return;
-    }
-
-    if( stock.isNull() ){
-        HKU_ERROR("Stock is NULL! [System::run] ");
         return;
     }
 
@@ -403,8 +403,7 @@ void System::_runMoment(const KRecord& today) {
     if( position.number != 0) {
         if (current_price <= position.stoploss) {
             _sell(today, PART_STOPLOSS);
-        } else if (position.goalPrice != 0.0
-                && current_price >= position.goalPrice) {
+        } else if (current_price >= position.goalPrice) {
             _sell(today, PART_PROFITGOAL);
         } else {
             price_t current_take_profile = _getTakeProfitPrice(today.datetime);

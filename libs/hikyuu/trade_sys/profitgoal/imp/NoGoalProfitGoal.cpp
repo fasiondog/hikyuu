@@ -9,7 +9,7 @@
 
 namespace hku {
 
-NoGoalProfitGoal::NoGoalProfitGoal() : ProfitGoalBase("NoGoal"){
+NoGoalProfitGoal::NoGoalProfitGoal() : ProfitGoalBase("PG_NoGoal"){
 
 }
 
@@ -22,7 +22,7 @@ void NoGoalProfitGoal::_calculate() {
 }
 
 price_t NoGoalProfitGoal::getGoal(const Datetime& datetime, price_t price) {
-    return 0.0;
+    return Null<price_t>();
 }
 
 ProfitGoalPtr HKU_API PG_NoGoal() {

@@ -51,6 +51,12 @@ public:
     /** 设置名称 */
     void name(const string& name);
 
+    /** 接收实际交易变化情况 */
+    virtual void buyNotify(const TradeRecord&) {}
+
+    /** 接收实际交易变化情况 */
+    virtual void sellNotify(const TradeRecord&) {}
+
     /** 复位操作 */
     void reset();
 
@@ -62,7 +68,7 @@ public:
      * 买入时计算目标价格
      * @param datetime 买入时间
      * @param price 买入价格
-     * @return 返回0时，表示未限定目标
+     * @return 返回Null<price_t>时，表示未限定目标; 返回0，意味着需要卖出
      */
     virtual price_t getGoal(const Datetime& datetime, price_t price) = 0;
 

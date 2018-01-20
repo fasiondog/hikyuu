@@ -25,7 +25,10 @@
 # SOFTWARE.
 
 
-from ._trade_sys import ProfitGoalBase, PG_NoGoal, PG_FixedPercent
+from ._trade_sys import (ProfitGoalBase, 
+                         PG_NoGoal, 
+                         PG_FixedPercent,
+                         PG_FixedHoldDays)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 
@@ -131,7 +134,8 @@ getTM(self)
 ProfitGoalBase.getGoal.__doc__ = """
 getGoal(self, datetime, price)
     
-    【重载接口】获取盈利目标价格
+    【重载接口】获取盈利目标价格，返回constant.null_price时，表示未限定目标；
+    返回0意味着需要卖出。
         
     :param Datetime datetime: 买入时间
     :param float price: 买入价格
@@ -188,6 +192,15 @@ PG_FixedPercent([p = 0.2])
     固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
     
     :param float p: 百分比
+    :return: 盈利目标策略实例
+"""
+
+PG_FixedHoldDays.__doc__ = """
+PG_FixedHoldDays([days=5])
+
+    固定持仓天数盈利目标策略
+    
+    :param int days: 允许持仓天数（按交易日算）,默认5天
     :return: 盈利目标策略实例
 """
 

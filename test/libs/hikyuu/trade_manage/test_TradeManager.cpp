@@ -1234,10 +1234,6 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_trade_financing_securities_lending_no_ri
     next_date = Datetime(199911110000);
     trade = tm->buy(cur_date, stock, 27.75, 1000, 27.70, 28.0, 27.75);
     cost = tm->getBuyCost(cur_date, stock, 27.75, 1000);
-    std::cout << trade << std::endl;
-    std::cout << cost << std::endl;
-
-
 
 }
 

@@ -76,9 +76,9 @@ BOOST_AUTO_TEST_CASE( test_Block_2 ) {
     BOOST_CHECK(blk.get("sh000001") == sm["sh000001"]);
     BOOST_CHECK(blk.get("sz000002") == sm["sz000002"]);
 
-    for (auto iter = blk.begin(); iter != blk.end(); ++iter) {
+    /*for (auto iter = blk.begin(); iter != blk.end(); ++iter) {
         std::cout << *iter << std::endl;
-    }
+    }*/
 
     /** @arg 已Stock标识加入 */
     blk.add("sh000002");

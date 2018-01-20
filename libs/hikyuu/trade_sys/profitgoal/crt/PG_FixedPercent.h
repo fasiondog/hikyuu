@@ -13,6 +13,7 @@
 
 namespace hku {
 
+
 ProfitGoalPtr HKU_API PG_FixedPercent(double p = 0.2);
 
 } /* namespace hku */

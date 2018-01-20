@@ -132,13 +132,20 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeRecord& record) {
     os.precision(4);
     os << "Trade(" << record.datetime << strip << market_code
             << strip << name << strip << getBusinessName(record.business)
-            << strip << record.planPrice << strip << record.realPrice
-            << strip << record.goalPrice
-            << strip << record.number << strip << record.cost.commission
-            << strip << record.cost.stamptax << strip << record.cost.transferfee
-            << strip << record.cost.others << strip << record.cost.total
-            << strip << record.stoploss << strip << record.cash
-            << strip << getSystemPartName(record.from) << ")";
+            << strip << record.planPrice << strip << record.realPrice;
+
+    if (record.goalPrice == Null<price_t>()) {
+        os << strip << "NULL";
+    }  else {
+        os << strip << record.goalPrice;
+    }
+
+    os << strip << record.number << strip << record.cost.commission
+       << strip << record.cost.stamptax << strip << record.cost.transferfee
+       << strip << record.cost.others << strip << record.cost.total
+       << strip << record.stoploss << strip << record.cash
+       << strip << getSystemPartName(record.from) << ")";
+
     os.unsetf(std::ostream::floatfield);
     os.precision();
     return os;
@@ -158,13 +165,21 @@ string TradeRecord::toString() const {
     os.precision(4);
     os << "Trade(" << datetime << strip << market_code
             << strip << name << strip << getBusinessName(business)
-            << strip << planPrice << strip << realPrice
-            << strip << goalPrice
-            << strip << number << strip << cost.commission
-            << strip << cost.stamptax << strip << cost.transferfee
-            << strip << cost.others << strip << cost.total
-            << strip << stoploss << strip << cash
-            << strip << getSystemPartName(from) << ")";
+            << strip << planPrice << strip << realPrice;
+
+    if (goalPrice == Null<price_t>()) {
+        os << strip << "NULL";
+    }  else {
+        os << strip << goalPrice;
+    }
+
+    os << strip << goalPrice
+       << strip << number << strip << cost.commission
+       << strip << cost.stamptax << strip << cost.transferfee
+       << strip << cost.others << strip << cost.total
+       << strip << stoploss << strip << cash
+       << strip << getSystemPartName(from) << ")";
+
     os.unsetf(std::ostream::floatfield);
     os.precision();
     return os.str();

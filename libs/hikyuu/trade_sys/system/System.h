@@ -374,7 +374,7 @@ inline price_t System
 
 inline price_t System
 ::_getGoalPrice(const Datetime& datetime, price_t price) {
-    return m_pg ? m_pg->getGoal(datetime, price) : 0.0;
+    return m_pg ? m_pg->getGoal(datetime, price) : Null<price_t>();
 }
 
 inline price_t System

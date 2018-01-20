@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_PROFITGOAL_IMP_FIXEDPERCENTPROFITGOAL_H_
 #define TRADE_SYS_PROFITGOAL_IMP_FIXEDPERCENTPROFITGOAL_H_
 
-#include <hikyuu/trade_sys/profitgoal/ProfitGoalBase.h>
+#include "../ProfitGoalBase.h"
 
 namespace hku {
 

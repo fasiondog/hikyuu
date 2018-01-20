@@ -86,6 +86,7 @@ void export_ProfitGoal() {
 
     def("PG_NoGoal", PG_NoGoal);
     def("PG_FixedPercent", PG_FixedPercent, (arg("p") = 0.2));
+    def("PG_FixedHoldDays", PG_FixedHoldDays, (arg("days") = 5));
 }
 
 
