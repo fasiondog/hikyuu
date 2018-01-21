@@ -30,8 +30,8 @@ public:
         this->SelectorBase::_reset();
     }
 
-    StockList getSelectedStock(Datetime date) {
-        return this->get_override("getSelectedStock")(date);
+    StockList getSelectedStockList(Datetime date) {
+        return this->get_override("getSelectedStockList")(date);
     }
 
     SelectorPtr _clone() {
@@ -57,7 +57,7 @@ void export_Selector() {
             .def("clone", &SelectorBase::clone)
             .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
             .def("_clone", pure_virtual(&SelectorBase::_clone))
-            .def("getSelectedStock", pure_virtual(&SelectorBase::getSelectedStock))
+            .def("getSelectedStockList", pure_virtual(&SelectorBase::getSelectedStockList))
             .def("addStock", &SelectorBase::addStock)
             .def("addStockList", &SelectorBase::addStockList)
             .def("getRawStockList", &SelectorBase::getRawStockList, &SelectorWrap::getRawStockList)

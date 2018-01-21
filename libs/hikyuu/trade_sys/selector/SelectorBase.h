@@ -49,7 +49,7 @@ public:
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    virtual StockList getSelectedStock(Datetime date) = 0;
+    virtual StockList getSelectedStockList(Datetime date) = 0;
 
     /** 子类复位接口 */
     virtual void _reset() {}

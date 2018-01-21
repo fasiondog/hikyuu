@@ -19,7 +19,7 @@ public:
     FixedSelector();
     virtual ~FixedSelector();
 
-    virtual StockList getSelectedStock(Datetime date);
+    virtual StockList getSelectedStockList(Datetime date);
 };
 
 } /* namespace hku */

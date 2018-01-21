@@ -120,7 +120,7 @@ void Portfolio::run(const KQuery& query) {
         }
 
         //根据选股规则，计算当前时刻选择的股票列表
-        StockList stk_list = m_se->getSelectedStock(*date_iter);
+        StockList stk_list = m_se->getSelectedStockList(*date_iter);
 
         StockList::const_iterator stk_iter = stk_list.begin();
         for (; stk_iter != stk_list.end(); ++stk_iter) {

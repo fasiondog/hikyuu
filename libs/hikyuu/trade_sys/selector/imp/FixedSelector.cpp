@@ -17,7 +17,7 @@ FixedSelector::~FixedSelector() {
 
 }
 
-StockList FixedSelector::getSelectedStock(Datetime date) {
+StockList FixedSelector::getSelectedStockList(Datetime date) {
     return m_stock_list;
 }
 
