@@ -39,12 +39,34 @@ public:
         this->get_override("_calculate")();
     }
 
-    price_t getGoal(const Datetime& datetime, price_t price) {
-        return this->get_override("getGoal")(datetime, price);
+    void buyNotify(const TradeRecord& tr) {
+        if (override buy_notify = this->get_override("buyNotify")) {
+            buy_notify(tr);
+            return;
+        }
+
+        this->ProfitGoalBase::buyNotify(tr);
     }
 
-    price_t default_getGoal(const Datetime& datetime, price_t price) {
-        return this->ProfitGoalBase::getGoal(datetime, price);
+    void default_buyNotify(const TradeRecord& tr) {
+        this->ProfitGoalBase::buyNotify(tr);
+    }
+
+    void sellNotify(const TradeRecord& tr) {
+        if (override sell_notify = this->get_override("sellNotify")) {
+            sell_notify(tr);
+            return;
+        }
+
+        this->ProfitGoalBase::sellNotify(tr);
+    }
+
+    void default_sellNotify(const TradeRecord& tr) {
+        this->ProfitGoalBase::sellNotify(tr);
+    }
+
+    price_t getGoal(const Datetime& datetime, price_t price) {
+        return this->get_override("getGoal")(datetime, price);
     }
 
     price_t getShortGoal(const Datetime& datetime, price_t price) {
@@ -73,6 +95,10 @@ void export_ProfitGoal() {
             .def("setTO", &ProfitGoalBase::setTO)
             .def("getTM", &ProfitGoalBase::getTM)
             .def("getTO", &ProfitGoalBase::getTO)
+            .def("buyNotify", &ProfitGoalBase::buyNotify,
+                              &ProfitGoalWrap::default_buyNotify)
+            .def("sellNotify", &ProfitGoalBase::sellNotify,
+                               &ProfitGoalWrap::default_sellNotify)
             .def("getGoal", pure_virtual(&ProfitGoalBase::getGoal))
             .def("getShortGoal", &ProfitGoalBase::getShortGoal,
                     & ProfitGoalWrap::default_getShortGoal)

@@ -12,6 +12,10 @@
 
 namespace hku {
 
+/**
+ * 无盈利目标策略，通常为了进行测试或对比
+ * @return PGPtr
+ */
 ProfitGoalPtr HKU_API PG_NoGoal();
 
 } /* namespace hku */

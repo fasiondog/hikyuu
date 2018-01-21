@@ -173,6 +173,22 @@ _clone(self)
     【重载接口】子类克隆接口
 """
 
+ProfitGoalBase.buyNotify.__doc__ = """
+buyNotify(self, trade_record)
+    
+    【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
+        
+    :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
+"""
+
+ProfitGoalBase.sellNotify.__doc__ = """
+sellNotify(self, trade_record)
+    
+    【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
+        
+    :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录
+"""
+
 
 #------------------------------------------------------------------
 # add doc-string for build_in func

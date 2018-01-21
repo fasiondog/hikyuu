@@ -207,12 +207,14 @@ SystemPtr System::clone(bool with_tm, bool with_ev, bool with_mm, bool with_sp) 
 void System::_buyNotifyAll(const TradeRecord& record) {
     //TODO _buyNotifyAll
     if (m_mm) m_mm->buyNotify(record);
+    if (m_pg) m_pg->buyNotify(record);
 }
 
 
 void System::_sellNotifyAll(const TradeRecord& record) {
     //TODO _sellNotifyAll
     if (m_mm) m_mm->sellNotify(record);
+    if (m_pg) m_pg->sellNotify(record);
 }
 
 bool System::readyForRun() {

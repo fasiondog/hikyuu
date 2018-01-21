@@ -13,7 +13,11 @@
 
 namespace hku {
 
-
+/**
+ * 固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
+ * @param p 百分比
+ * @return PGPtr
+ */
 ProfitGoalPtr HKU_API PG_FixedPercent(double p = 0.2);
 
 } /* namespace hku */
