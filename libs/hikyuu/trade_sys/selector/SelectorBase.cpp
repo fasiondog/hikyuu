@@ -37,11 +37,15 @@ SelectorBase::~SelectorBase() {
 
 }
 
-void SelectorBase::clearStockList() {
-    m_stock_list.clear();
+void SelectorBase::clear() {
+    m_sys_list.clear();
 }
 
 void SelectorBase::reset() {
+    SystemList::const_iterator iter = m_sys_list.begin();
+    for (; iter != m_sys_list.end(); ++iter) {
+        (*iter)->reset(false, false, false, false);
+    }
     _reset();
 }
 
@@ -60,37 +64,53 @@ SelectorPtr SelectorBase::clone() {
     }
 
     p->m_params = m_params;
-    p->m_stock_list = m_stock_list;
+
+    SystemList::const_iterator iter = m_sys_list.begin();
+    for (; iter != m_sys_list.end(); ++iter) {
+        p->m_sys_list.push_back((*iter)->clone(false, false, false, false));
+    }
+
     return p;
 }
 
 
-void SelectorBase::addStock(const Stock& stock) {
+void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     if (stock.isNull()) {
         HKU_WARN("Try add Null stock, will be discard! "
                 "[SelectorBase::addStock]");
         return;
     }
 
-    bool find = false;
-    for (auto iter = m_stock_list.begin(); iter != m_stock_list.end(); ++iter) {
-        if (stock == *iter) {
-            find = true;
-            break;
-        }
+    if (!protoSys) {
+        HKU_WARN("Try add Null protoSys, will be discard! "
+                "[SelectorBase::addStock]");
+        return;
     }
 
-    if (!find) {
-        m_stock_list.push_back(stock);
-    }
+    SYSPtr sys = protoSys->clone(false, false, false, false);
+    sys->setStock(stock);
+    m_sys_list.push_back(sys);
 }
 
 
-void SelectorBase::
-addStockList(const StockList& stk_list) {
-    m_stock_list.reserve(m_stock_list.size() + stk_list.size());
-    for (auto iter = stk_list.begin(); iter != stk_list.end(); ++iter) {
-        addStock(*iter);
+void SelectorBase::addStockList(const StockList& stkList,
+                                const SystemPtr& protoSys) {
+    if (!protoSys) {
+        HKU_WARN("Try add Null protoSys, will be discard! "
+                "[SelectorBase::addStock]");
+        return;
+    }
+
+    StockList::const_iterator iter = stkList.begin();
+    for (; iter != stkList.end(); ++iter) {
+        if (iter->isNull()) {
+            HKU_WARN("Try add Null stock, will be discard! "
+                    "[SelectorBase::addStock]");
+            continue;
+        }
+
+        SYSPtr sys = protoSys->clone(false, false, false, false);
+        m_sys_list.push_back(sys);
     }
 }
 

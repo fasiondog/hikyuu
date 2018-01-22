@@ -98,11 +98,11 @@ size_t MoneyManagerBase
     }
 
     if (risk <= 0.0) {
-        HKU_WARN("risk is zero! Will not sell! "
-                << "Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ") [MoneyManagerBase::getSellNumber]");
+        //HKU_WARN("risk is zero! Will not sell! "
+        //        << "Datetime(" << datetime << ") Stock("
+        //        << stock.market_code() << ") price(" << price
+        //        << ") risk(" << risk
+        //        << ") [MoneyManagerBase::getSellNumber]");
         return 0;
     }
 

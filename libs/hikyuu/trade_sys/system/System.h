@@ -76,6 +76,7 @@ public:
     void setSP(const SlippagePtr& sp) { m_sp = sp; }
 
     Stock getStock() const { return m_stock; }
+    void setStock(const Stock& stk) { m_stock = stk; }
 
     const TradeRecordList& getTradeRecordList() const { return m_trade_list;}
 
@@ -121,7 +122,9 @@ public:
      */
     void setTO(const KData& kdata);
 
+    void run(const KQuery& query, bool reset=true);
     void run(const Stock& stock, const KQuery& query, bool reset=true);
+
     void runMoment(const Datetime& datetime);
     void runMoment(const KRecord& record);
 

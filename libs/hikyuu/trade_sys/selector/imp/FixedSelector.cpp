@@ -9,7 +9,7 @@
 
 namespace hku {
 
-FixedSelector::FixedSelector() {
+FixedSelector::FixedSelector(): SelectorBase("SE_Fixed") {
 
 }
 
@@ -17,17 +17,17 @@ FixedSelector::~FixedSelector() {
 
 }
 
-StockList FixedSelector::getSelectedStockList(Datetime date) {
-    return m_stock_list;
+SystemList FixedSelector::getSelectedSystemList(Datetime date) {
+    return m_sys_list;
 }
 
 SelectorPtr HKU_API SE_Fixed() {
     return make_shared<FixedSelector>();
 }
 
-SelectorPtr HKU_API SE_Fixed(const StockList& stock_list) {
+SelectorPtr HKU_API SE_Fixed(const StockList& stock_list, const SystemPtr& sys) {
     SelectorPtr p = make_shared<FixedSelector>();
-    p->addStockList(stock_list);
+    p->addStockList(stock_list, sys);
     return p;
 }
 

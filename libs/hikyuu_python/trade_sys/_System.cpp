@@ -23,6 +23,8 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(SYS_Simple_overload, SYS_Simple, 0, 9);
 string (System::*sys_get_name)() const = &System::name;
 void (System::*sys_set_name)(const string&) = &System::name;
 
+void (System::*run_1)(const KQuery&, bool) = &System::run;
+void (System::*run_2)(const Stock&, const KQuery&, bool reset) = &System::run;
 
 void export_System() {
 
@@ -98,7 +100,10 @@ void export_System() {
             .def("getTO", &System::getTO)
             .def("setTO", &System::setTO)
 
-            .def("run", &System::run, run_overload(args("stock", "query", "reset")))
+            //.def("run", &System::run, run_overload(args("stock", "query", "reset")))
+            .def("run", run_1, (arg("query"), arg("reset")=true))
+            .def("run", run_2, (arg("stock"), arg("query"), arg("reset")=true))
+
             .def("runMoment", run_monent_1)
             .def("runMoment", run_monent_2)
             .def("_runMoment", &System::_runMoment)

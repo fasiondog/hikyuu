@@ -31,10 +31,7 @@ void export_Portfolio() {
 
             .add_property("name", pf_get_name, pf_set_name)
             .add_property("tm", &Portfolio::getTM, &Portfolio::setTM)
-            .add_property("sys", &Portfolio::getSYS, &Portfolio::setSYS)
             .add_property("se", &Portfolio::getSE, &Portfolio::setSE)
-            .def("addStock", &Portfolio::addStock)
-            .def("addStockList", &Portfolio::addStockList)
             .def("run", &Portfolio::run)
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(name_init_pickle_suite<Portfolio>())

@@ -14,7 +14,7 @@ namespace hku {
 
 SelectorPtr HKU_API SE_Fixed();
 
-SelectorPtr HKU_API SE_Fixed(const StockList& stock_list);
+SelectorPtr HKU_API SE_Fixed(const StockList& stock_list, const SystemPtr& sys);
 
 } /* namespace hku */
 

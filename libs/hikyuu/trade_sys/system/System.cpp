@@ -133,6 +133,12 @@ void System::reset(bool with_tm, bool with_ev, bool with_mm, bool with_sp) {
     if (m_pg) m_pg->reset();
     if (with_sp && m_sp) m_sp->reset();
 
+    m_kdata = KData();
+
+    //不能复位m_stock，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
+    //一个sys实例绑定stock后，除非主动改变，否则不应该被reset
+    //m_stock
+
     m_pre_ev_valid = true;
     m_pre_cn_valid= true;
 
@@ -254,12 +260,40 @@ bool System::readyForRun() {
     return true;
 }
 
-void System::run(const Stock& stock, const KQuery& query, bool reset) {
-    if( stock.isNull() ){
-        HKU_ERROR("Stock is NULL! [System::run] ");
+void System::run(const KQuery& query, bool reset) {
+    if( m_stock.isNull() ){
+        HKU_ERROR("m_stock is NULL! [System::run] ");
         return;
     }
 
+    //reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
+    if (reset)  this->reset(true, true, true, true);
+
+    if (!readyForRun()) {
+        return;
+    }
+
+    //m_stock = stock; 在setTO里赋值
+    KData kdata = m_stock.getKData(query);
+    if( kdata.empty() ){
+        HKU_INFO("KData is empty! [System::run]");
+        return;
+    }
+
+    setTO(kdata);
+    size_t total = kdata.size();
+    for (size_t i = 0; i < total; ++i) {
+        if (kdata[i].datetime >= m_tm->initDatetime()) {
+            runMoment(kdata[i]);
+        }
+    }
+}
+
+void System::run(const Stock& stock, const KQuery& query, bool reset) {
+    m_stock = stock;
+    run(query, reset);
+
+/*
     //reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
     if (reset)  this->reset(true, true, true, true);
 
@@ -280,7 +314,7 @@ void System::run(const Stock& stock, const KQuery& query, bool reset) {
         if (kdata[i].datetime >= m_tm->initDatetime()) {
             runMoment(kdata[i]);
         }
-    }
+    }*/
 }
 
 

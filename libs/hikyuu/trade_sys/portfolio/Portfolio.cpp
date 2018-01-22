@@ -35,7 +35,7 @@ Portfolio::Portfolio(const string& name) : m_name(name) {
 Portfolio::Portfolio(const TradeManagerPtr& tm,
         const SystemPtr& sys,
         const SelectorPtr& se)
-: m_se(se), m_tm(tm), m_sys(sys), m_name("Portfolio") {
+: m_se(se), m_tm(tm), m_name("Portfolio") {
 
 }
 
@@ -46,7 +46,6 @@ Portfolio::~Portfolio() {
 void Portfolio::reset() {
     if (m_tm) m_tm->reset();
     if (m_se) m_se->reset();
-    if (m_sys) m_sys->reset(false, true, true, true);
 }
 
 PortfolioPtr Portfolio::clone() {
@@ -55,24 +54,7 @@ PortfolioPtr Portfolio::clone() {
     p->m_name = m_name;
     p->m_se = m_se;
     p->m_tm = m_tm;
-    p->m_sys = m_sys;
     return p;
-}
-
-void Portfolio::addStock(const Stock& stock) {
-    if (m_se) {
-        m_se->addStock(stock);
-    } else {
-        HKU_WARN("m_se is Null! [Portfolio::addStock]");
-    }
-}
-
-void Portfolio::addStockList(const StockList& stock_list) {
-    if (m_se) {
-        m_se->addStockList(stock_list);
-    } else {
-        HKU_WARN("m_se is Null! [Portfolio::addStockList]");
-    }
 }
 
 
@@ -87,18 +69,18 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
-    if (!m_sys) {
-        HKU_WARN("m_sys is null [Portfolio::run]");
-        return;
-    }
-
-    m_sys->setTM(m_tm);
     reset();
 
-    map<string, SystemPtr> stock_map_buffer; //缓存
-    map<string, SystemPtr>::iterator stock_map_iter;
-
-    std::set<SystemPtr> processed_sys;
+    SystemList all_sys_list = m_se->getAllSystemList();
+    auto sys_iter = all_sys_list.begin();
+    for (; sys_iter != all_sys_list.end(); ++sys_iter) {
+        SystemPtr sys = *sys_iter;
+        sys->setTM(m_tm);
+        if (sys->readyForRun()) {
+            KData k = sys->getStock().getKData(query);
+            sys->setTO(k);
+        }
+    }
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
@@ -108,43 +90,17 @@ void Portfolio::run(const KQuery& query) {
             continue;
         }
 
-        processed_sys.clear();
-
-        //优先处理处理有延迟操作请求的系统策略
-        stock_map_iter = stock_map_buffer.begin();
-        for (; stock_map_iter != stock_map_buffer.end(); ++stock_map_iter) {
-            if (stock_map_iter->second->haveDelayRequest()) {
-                stock_map_iter->second->runMoment(*date_iter);
-                processed_sys.insert(stock_map_iter->second);
-            }
+        //处理延迟操作请求
+        sys_iter = all_sys_list.begin();
+        for (; sys_iter != all_sys_list.end(); ++sys_iter) {
+            (*sys_iter)->_processRequest(*date_iter);
         }
 
-        //根据选股规则，计算当前时刻选择的股票列表
-        StockList stk_list = m_se->getSelectedStockList(*date_iter);
-
-        StockList::const_iterator stk_iter = stk_list.begin();
-        for (; stk_iter != stk_list.end(); ++stk_iter) {
-            SystemPtr sys;
-
-            //是否已经在缓存中
-            stock_map_iter = stock_map_buffer.find(stk_iter->market_code());
-            if (stock_map_iter != stock_map_buffer.end()) {
-                sys = stock_map_iter->second;
-
-                //如果已在之前处理过延迟请求时运行过，则忽略
-                if (processed_sys.count(sys))
-                    continue;
-
-            } else {
-                sys = m_sys->clone(false, false, false, false);
-                if (sys->readyForRun()) {
-                    KData k = stk_iter->getKData(query);
-                    sys->setTO(k);
-                    stock_map_buffer[stk_iter->market_code()] = sys;
-                }
-            }
-
-            sys->runMoment(*date_iter);
+        //计算当前时刻选择的股票列表
+        SystemList selected_sys_list = m_se->getSelectedSystemList(*date_iter);
+        sys_iter = selected_sys_list.begin();
+        for (; sys_iter != selected_sys_list.end(); ++sys_iter) {
+            (*sys_iter)->runMoment(*date_iter);
         }
     }
 }

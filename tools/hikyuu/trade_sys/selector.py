@@ -93,29 +93,21 @@ addStockList(self, stock_list)
     :param StockList stock: 加入的初始标的列表
 """
 
-SelectorBase.clearStockList.__doc__ = """
-clearStockList(self)
+SelectorBase.clear.__doc__ = """
+clear(self)
     
-    清除已加入的所有标的
+    清除已加入的所有交易系统实例
 """
 
-SelectorBase.getRawStockList.__doc__ = """
-getRawStockList(self)
 
-    获取加入的初始标的列表
-        
-    :return: 初始加入的标的列表
-    :rtype: StockList
-"""
-
-SelectorBase.getSelectedStockList.__doc__ = """
-getSelectedStockList(self, datetime)
+SelectorBase.getSelectedSystemList.__doc__ = """
+getSelectedSystemList(self, datetime)
     
     【重载接口】获取指定时刻选取的标的
         
     :param Datetime datetime: 指定时刻
-    :return: 选取的标的
-    :rtype: StockList
+    :return: 选取的系统交易实例
+    :rtype: SystemList
 """
 
 SelectorBase._reset.__doc__ = """

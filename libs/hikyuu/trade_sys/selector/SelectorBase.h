@@ -37,19 +37,19 @@ public:
     string name() const;
     void name(const string& name);
 
-    void addStock(const Stock& stock);
-    void addStockList(const StockList&);
+    void addStock(const Stock& stock, const SystemPtr& protoSys);
+    void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
-    StockList getRawStockList() const { return m_stock_list; }
+    SystemList getAllSystemList() const { return m_sys_list; }
 
     void reset();
 
-    void clearStockList();
+    void clear();
 
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    virtual StockList getSelectedStockList(Datetime date) = 0;
+    virtual SystemList getSelectedSystemList(Datetime date) = 0;
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -60,7 +60,7 @@ public:
 
 protected:
     string m_name;
-    StockList m_stock_list;
+    SystemList m_sys_list;
 
 //============================================
 // 序列化支持
@@ -73,14 +73,14 @@ private:
         string name_str(GBToUTF8(m_name));
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_stock_list);
+        ar & BOOST_SERIALIZATION_NVP(m_sys_list);
     }
 
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
         ar & boost::serialization::make_nvp("name", m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_stock_list);
+        ar & BOOST_SERIALIZATION_NVP(m_sys_list);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -119,7 +119,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
 #define SELECTOR_IMP(classname) public:\
     virtual SelectorPtr _clone() {\
         return SelectorPtr(new classname());\
-    }
+    }\
+    virtual SystemList getSelectedSystemList(Datetime date);\
 
 
 /**

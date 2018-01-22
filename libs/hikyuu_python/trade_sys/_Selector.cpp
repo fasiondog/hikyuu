@@ -30,8 +30,8 @@ public:
         this->SelectorBase::_reset();
     }
 
-    StockList getSelectedStockList(Datetime date) {
-        return this->get_override("getSelectedStockList")(date);
+    SystemList getSelectedSystemList(Datetime date) {
+        return this->get_override("getSelectedSystemList")(date);
     }
 
     SelectorPtr _clone() {
@@ -43,7 +43,7 @@ string (SelectorBase::*sb_get_name)() const = &SelectorBase::name;
 void (SelectorBase::*sb_set_name)(const string&) = &SelectorBase::name;
 
 SelectorPtr (*SE_Fixed_1)() = SE_Fixed;
-SelectorPtr (*SE_Fixed_2)(const StockList&) = SE_Fixed;
+SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
 
 void export_Selector() {
 
@@ -57,11 +57,10 @@ void export_Selector() {
             .def("clone", &SelectorBase::clone)
             .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
             .def("_clone", pure_virtual(&SelectorBase::_clone))
-            .def("getSelectedStockList", pure_virtual(&SelectorBase::getSelectedStockList))
+            .def("getSelectedSystemList", pure_virtual(&SelectorBase::getSelectedSystemList))
             .def("addStock", &SelectorBase::addStock)
             .def("addStockList", &SelectorBase::addStockList)
-            .def("getRawStockList", &SelectorBase::getRawStockList, &SelectorWrap::getRawStockList)
-            .def("clearStockList", &SelectorBase::clearStockList)
+            .def("clear", &SelectorBase::clear)
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(name_init_pickle_suite<SelectorBase>())
 #endif

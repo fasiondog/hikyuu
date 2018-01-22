@@ -36,18 +36,13 @@ public:
     string name() const { return m_name; }
     void name(const string& name) { m_name = name; }
 
-    void addStock(const Stock&);
-    void addStockList(const StockList&);
-
     void run(const KQuery& query);
 
     TradeManagerPtr getTM() { return m_tm; }
     SelectorPtr getSE() { return m_se; }
-    SystemPtr getSYS() { return m_sys; }
 
     void setTM(const TradeManagerPtr& tm) { m_tm = tm; }
     void setSE(const SelectorPtr& se) { m_se = se; }
-    void setSYS(const SystemPtr& sys) { m_sys = sys; }
 
     void reset();
 
@@ -57,7 +52,6 @@ public:
 protected:
     string           m_name;
     SelectorPtr      m_se;
-    SystemPtr        m_sys;
     TradeManagerPtr  m_tm;
 
 //============================================
@@ -72,7 +66,6 @@ private:
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_sys);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 
@@ -83,7 +76,6 @@ private:
         m_name = UTF8ToGB(name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_sys);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 

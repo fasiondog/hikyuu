@@ -18,8 +18,6 @@ class FixedSelector: public SelectorBase {
 public:
     FixedSelector();
     virtual ~FixedSelector();
-
-    virtual StockList getSelectedStockList(Datetime date);
 };
 
 } /* namespace hku */

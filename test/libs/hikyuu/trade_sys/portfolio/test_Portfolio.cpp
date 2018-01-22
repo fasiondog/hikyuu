@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( test_Portfolio) {
 
     StockManager& sm = StockManager::instance();
 
-    pf->addStock(sm["sh000001"]);
+    //pf->addStock(sm["sh000001"]);
     //std::cout << sys << std::endl;
 }
 
