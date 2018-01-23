@@ -34,7 +34,7 @@ use-project /hikyuu_utils : $(HKU_DIR)/libs/hikyuu_utils ;
 project : default-build release
         : requirements <include>$(BOOST_INCLUDE_DIR)
                        <include>$(HKU_INCLUDE_DIR)
-                       <toolset>gcc:<cxxflags>-ftemplate-depth-300
+                       <toolset>gcc:<cxxflags>-ftemplate-depth-500
                        <toolset>gcc:<cxxflags>-std=c++11
                        <toolset>clang:<cxxflags>-std=c++11
                        <toolset>gcc:<linkflags>-s

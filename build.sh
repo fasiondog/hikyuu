@@ -34,9 +34,7 @@ cp -v -f ./build/hikyuu_python/$toolset/release/trade_manage/_trade_manage.so ./
 cp -v -f ./build/hikyuu_python/$toolset/release/trade_sys/_trade_sys.so ./tools/hikyuu/trade_sys
 cp -v -f ./build/hikyuu_python/$toolset/release/trade_instance/_trade_instance.so ./tools/hikyuu/trade_instance
 
-
-
-cd ./test
+cd test
 b2 link=shared
 
 python ../tools/hikyuu/test/test.py

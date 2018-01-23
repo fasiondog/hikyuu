@@ -11,10 +11,8 @@
 #include "../system/System.h"
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
-#include "../../trade_manage/TradeManager.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-#include "../../serialization/Datetime_serialization.h"
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>

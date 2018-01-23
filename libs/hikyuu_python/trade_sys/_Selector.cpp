@@ -16,6 +16,7 @@ using namespace hku;
 class SelectorWrap : public SelectorBase, public wrapper<SelectorBase> {
 public:
     SelectorWrap(): SelectorBase() {}
+    SelectorWrap(const string& name): SelectorBase(name) {}
     virtual ~SelectorWrap() {}
 
     void _reset() {
@@ -48,6 +49,7 @@ SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
 void export_Selector() {
 
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())
+            .def(init<const string&>())
             .def(self_ns::str(self))
             .add_property("name", sb_get_name, sb_set_name)
             .def("getParam", &SelectorBase::getParam<boost::any>)

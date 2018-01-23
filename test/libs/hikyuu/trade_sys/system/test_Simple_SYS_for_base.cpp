@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_base) {
     //初始参数
     Datetime init_date(199001010000LL);  //账户初始日期
     price_t  init_cash = 100000;         //账户初始金额
-    TradeCostPtr& costfunc = TC_Zero();  //零成本函数
+    TradeCostPtr costfunc = TC_Zero();  //零成本函数
     Stock stk = sm["sh600000"];          //选定标的
     Datetime start_date(199911100000LL); //测试起始日期
     Datetime end_date(200002250000LL);   //测试结束日期
