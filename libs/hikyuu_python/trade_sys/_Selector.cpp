@@ -31,8 +31,8 @@ public:
         this->SelectorBase::_reset();
     }
 
-    SystemList getSelectedSystemList(Datetime date) {
-        return this->get_override("getSelectedSystemList")(date);
+    SystemWeightList getSelectedSystemWeightList(Datetime date) {
+        return this->get_override("getSelectedSystemWeightList")(date);
     }
 
     SelectorPtr _clone() {
@@ -47,6 +47,26 @@ SelectorPtr (*SE_Fixed_1)() = SE_Fixed;
 SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
 
 void export_Selector() {
+    class_<SystemWeight>("SystemWeight", init<>())
+            .def(init<const SystemPtr&, price_t>())
+            //.def(self_ns::str(self))
+            .add_property("sys", &SystemWeight::getSYS, &SystemWeight::setSYS)
+            .add_property("weight", &SystemWeight::getWeight, &SystemWeight::setWeight)
+#if HKU_PYTHON_SUPPORT_PICKLE
+            .def_pickle(normal_pickle_suite<SystemWeight>())
+#endif
+            ;
+
+    SystemWeightList::const_reference (SystemWeightList::*SystemWeightList_at)(SystemWeightList::size_type) const = &SystemWeightList::at;
+    void (SystemWeightList::*append)(const SystemWeight&) = &SystemWeightList::push_back;
+    class_<SystemWeightList>("SystemWeightList")
+            .def("__iter__", iterator<SystemWeightList>())
+            .def("size", &SystemWeightList::size)
+            .def("__len__", &SystemWeightList::size)
+            .def("__getitem__", SystemWeightList_at, return_value_policy<copy_const_reference>())
+            .def("append", append)
+            ;
+
 
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())
             .def(init<const string&>())
@@ -59,7 +79,7 @@ void export_Selector() {
             .def("clone", &SelectorBase::clone)
             .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
             .def("_clone", pure_virtual(&SelectorBase::_clone))
-            .def("getSelectedSystemList", pure_virtual(&SelectorBase::getSelectedSystemList))
+            .def("getSelectedSystemWeightList", pure_virtual(&SelectorBase::getSelectedSystemWeightList))
             .def("addStock", &SelectorBase::addStock)
             .def("addStockList", &SelectorBase::addStockList)
             .def("clear", &SelectorBase::clear)

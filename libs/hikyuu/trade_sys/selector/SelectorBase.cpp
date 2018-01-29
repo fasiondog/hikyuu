@@ -114,4 +114,5 @@ void SelectorBase::addStockList(const StockList& stkList,
     }
 }
 
+
 } /* namespace hku */

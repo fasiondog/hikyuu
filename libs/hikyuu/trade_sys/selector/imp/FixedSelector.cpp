@@ -17,8 +17,14 @@ FixedSelector::~FixedSelector() {
 
 }
 
-SystemList FixedSelector::getSelectedSystemList(Datetime date) {
-    return m_sys_list;
+
+SystemWeightList FixedSelector::getSelectedSystemWeightList(Datetime date) {
+    SystemWeightList result;
+    auto iter = m_sys_list.begin();
+    for(; iter != m_sys_list.end(); ++iter) {
+        result.push_back(SystemWeight(*iter, 100));
+    }
+    return result;
 }
 
 SelectorPtr HKU_API SE_Fixed() {

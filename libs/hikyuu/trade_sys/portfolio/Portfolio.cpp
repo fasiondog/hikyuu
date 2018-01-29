@@ -69,6 +69,11 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
+    if (!m_am) {
+        HKU_WARN("m_am is null [Portfolio::run]");
+        return;
+    }
+
     reset();
 
     SystemList all_sys_list = m_se->getAllSystemList();
@@ -97,11 +102,18 @@ void Portfolio::run(const KQuery& query) {
         }
 
         //计算当前时刻选择的股票列表
-        SystemList selected_sys_list = m_se->getSelectedSystemList(*date_iter);
+        SystemWeightList selected_list = m_se->getSelectedSystemWeightList(*date_iter);
+        PriceList money_list = m_am->getAllocateMoney(*date_iter, selected_list);
+        auto sw_iter = selected_list.begin();
+        for (; sw_iter != selected_list.end(); ++sw_iter) {
+            sw_iter->getSYS()->runMoment(*date_iter);
+        }
+
+        /*SystemList selected_sys_list = m_se->getSelectedSystemList(*date_iter);
         sys_iter = selected_sys_list.begin();
         for (; sys_iter != selected_sys_list.end(); ++sys_iter) {
             (*sys_iter)->runMoment(*date_iter);
-        }
+        }*/
     }
 }
 

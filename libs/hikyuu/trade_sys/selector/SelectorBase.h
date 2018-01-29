@@ -11,6 +11,7 @@
 #include "../system/System.h"
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
+#include "SystemWeight.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>
@@ -47,7 +48,7 @@ public:
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    virtual SystemList getSelectedSystemList(Datetime date) = 0;
+    virtual SystemWeightList getSelectedSystemWeightList(Datetime date) = 0;
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -118,7 +119,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
     virtual SelectorPtr _clone() {\
         return SelectorPtr(new classname());\
     }\
-    virtual SystemList getSelectedSystemList(Datetime date);\
+    virtual SystemWeightList getSelectedSystemWeightList(Datetime date);
 
 
 /**
@@ -126,6 +127,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
  * @ingroup Selector
  */
 typedef shared_ptr<SelectorBase> SelectorPtr;
+typedef shared_ptr<SelectorBase> SEPtr;
 
 HKU_API std::ostream & operator<<(std::ostream&, const SelectorBase&);
 HKU_API std::ostream & operator<<(std::ostream&, const SelectorPtr&);

@@ -8,6 +8,7 @@
 #ifndef TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 #define TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 
+#include "../allocatemoney/AllocateMoneyBase.h"
 #include "../selector/SelectorBase.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -50,9 +51,10 @@ public:
     PortfolioPtr clone();
 
 protected:
-    string           m_name;
-    SelectorPtr      m_se;
-    TradeManagerPtr  m_tm;
+    string m_name;
+    SEPtr  m_se;
+    AMPtr  m_am;
+    TMPtr  m_tm;
 
 //============================================
 // 序列化支持
@@ -66,6 +68,7 @@ private:
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
+        ar & BOOST_SERIALIZATION_NVP(m_am);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 
@@ -76,6 +79,7 @@ private:
         m_name = UTF8ToGB(name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
+        ar & BOOST_SERIALIZATION_NVP(m_am);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 
@@ -89,6 +93,7 @@ private:
  * @ingroup Selector
  */
 typedef shared_ptr<Portfolio> PortfolioPtr;
+typedef shared_ptr<Portfolio> PFPtr;
 
 HKU_API std::ostream & operator<<(std::ostream&, const Portfolio&);
 HKU_API std::ostream & operator<<(std::ostream&, const PortfolioPtr&);
