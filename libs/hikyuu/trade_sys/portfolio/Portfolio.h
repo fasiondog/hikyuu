@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 #define TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 
-#include "../allocatemoney/AllocateMoneyBase.h"
+#include "../allocatemoney/AllocateFundsBase.h"
 #include "../selector/SelectorBase.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -39,11 +39,13 @@ public:
 
     void run(const KQuery& query);
 
-    TradeManagerPtr getTM() { return m_tm; }
-    SelectorPtr getSE() { return m_se; }
+    TMPtr getTM() { return m_tm; }
+    SEPtr getSE() { return m_se; }
+    AFPtr getAF() { return m_af; }
 
-    void setTM(const TradeManagerPtr& tm) { m_tm = tm; }
-    void setSE(const SelectorPtr& se) { m_se = se; }
+    void setTM(const TMPtr& tm) { m_tm = tm; }
+    void setSE(const SEPtr& se) { m_se = se; }
+    void setAF(const AFPtr& af) { m_af = af; }
 
     void reset();
 
@@ -53,7 +55,7 @@ public:
 protected:
     string m_name;
     SEPtr  m_se;
-    AMPtr  m_am;
+    AFPtr  m_af;
     TMPtr  m_tm;
 
 //============================================
@@ -68,7 +70,7 @@ private:
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_am);
+        ar & BOOST_SERIALIZATION_NVP(m_af);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 
@@ -79,7 +81,7 @@ private:
         m_name = UTF8ToGB(name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_am);
+        ar & BOOST_SERIALIZATION_NVP(m_af);
         ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 

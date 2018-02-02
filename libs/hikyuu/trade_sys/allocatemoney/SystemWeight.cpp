@@ -5,11 +5,11 @@
  *      Author: fasiondog
  */
 
-#include "SystemWeight.h"
+#include "../allocatemoney/SystemWeight.h"
 
 namespace hku {
 
-SystemWeight::SystemWeight() {
+SystemWeight::SystemWeight(): m_weight(100) {
 
 }
 

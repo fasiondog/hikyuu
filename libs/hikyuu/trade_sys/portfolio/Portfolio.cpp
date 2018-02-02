@@ -46,6 +46,7 @@ Portfolio::~Portfolio() {
 void Portfolio::reset() {
     if (m_tm) m_tm->reset();
     if (m_se) m_se->reset();
+    if (m_af) m_af->reset();
 }
 
 PortfolioPtr Portfolio::clone() {
@@ -53,6 +54,7 @@ PortfolioPtr Portfolio::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_se = m_se;
+    p->m_af = m_af;
     p->m_tm = m_tm;
     return p;
 }
@@ -69,12 +71,14 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
-    if (!m_am) {
+    if (!m_af) {
         HKU_WARN("m_am is null [Portfolio::run]");
         return;
     }
 
     reset();
+
+    m_af->setTM(m_tm);
 
     SystemList all_sys_list = m_se->getAllSystemList();
     auto sys_iter = all_sys_list.begin();
@@ -102,11 +106,11 @@ void Portfolio::run(const KQuery& query) {
         }
 
         //计算当前时刻选择的股票列表
-        SystemWeightList selected_list = m_se->getSelectedSystemWeightList(*date_iter);
-        PriceList money_list = m_am->getAllocateMoney(*date_iter, selected_list);
+        SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
+        //selected_list = m_am->getAllocateMoney(selected_list);
         auto sw_iter = selected_list.begin();
         for (; sw_iter != selected_list.end(); ++sw_iter) {
-            sw_iter->getSYS()->runMoment(*date_iter);
+            (*sw_iter)->runMoment(*date_iter);
         }
 
         /*SystemList selected_sys_list = m_se->getSelectedSystemList(*date_iter);

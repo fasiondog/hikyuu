@@ -100,14 +100,14 @@ clear(self)
 """
 
 
-SelectorBase.getSelectedSystemWeightList.__doc__ = """
-getSelectedSystemWeightList(self, datetime)
+SelectorBase.getSelectedSystemList.__doc__ = """
+getSelectedSystemList(self, datetime)
     
     【重载接口】获取指定时刻选取的标的及其权重
         
     :param Datetime datetime: 指定时刻
-    :return: 选取的系统交易实例及其权重
-    :rtype: SystemWeightList
+    :return: 选取的系统交易实例列表
+    :rtype: SystemList
 """
 
 SelectorBase._reset.__doc__ = """

@@ -31,8 +31,8 @@ public:
         this->SelectorBase::_reset();
     }
 
-    SystemWeightList getSelectedSystemWeightList(Datetime date) {
-        return this->get_override("getSelectedSystemWeightList")(date);
+    SystemList getSelectedSystemList(Datetime date) {
+        return this->get_override("getSelectedSystemList")(date);
     }
 
     SelectorPtr _clone() {
@@ -47,7 +47,7 @@ SelectorPtr (*SE_Fixed_1)() = SE_Fixed;
 SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
 
 void export_Selector() {
-    class_<SystemWeight>("SystemWeight", init<>())
+/*    class_<SystemWeight>("SystemWeight", init<>())
             .def(init<const SystemPtr&, price_t>())
             //.def(self_ns::str(self))
             .add_property("sys", &SystemWeight::getSYS, &SystemWeight::setSYS)
@@ -66,7 +66,7 @@ void export_Selector() {
             .def("__getitem__", SystemWeightList_at, return_value_policy<copy_const_reference>())
             .def("append", append)
             ;
-
+*/
 
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())
             .def(init<const string&>())
@@ -79,7 +79,7 @@ void export_Selector() {
             .def("clone", &SelectorBase::clone)
             .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
             .def("_clone", pure_virtual(&SelectorBase::_clone))
-            .def("getSelectedSystemWeightList", pure_virtual(&SelectorBase::getSelectedSystemWeightList))
+            .def("getSelectedSystemList", pure_virtual(&SelectorBase::getSelectedSystemList))
             .def("addStock", &SelectorBase::addStock)
             .def("addStockList", &SelectorBase::addStockList)
             .def("clear", &SelectorBase::clear)
