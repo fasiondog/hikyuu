@@ -408,6 +408,41 @@ price_t TradeManager::getDebtCash(const Datetime& datetime) {
 }
 
 
+TradeRecordList TradeManager
+::getTradeList(const Datetime& start_date, const Datetime& end_date) const {
+    TradeRecordList result;
+    if (start_date >= end_date) {
+        return result;
+    }
+
+    size_t total = m_trade_list.size();
+    if (total == 0) {
+        return result;
+    }
+
+    TradeRecord temp_record;
+    temp_record.datetime = start_date;
+    auto low = lower_bound(m_trade_list.begin(),
+                           m_trade_list.end(),
+                           temp_record,
+                           boost::bind(std::less<Datetime>(),
+                                       boost::bind(&TradeRecord::datetime, _1),
+                                       boost::bind(&TradeRecord::datetime, _2)));
+
+    temp_record.datetime = end_date;
+    auto high = lower_bound(m_trade_list.begin(),
+                            m_trade_list.end(),
+                            temp_record,
+                            boost::bind(std::less<Datetime>(),
+                                       boost::bind(&TradeRecord::datetime, _1),
+                                       boost::bind(&TradeRecord::datetime, _2)));
+
+    std::copy(low, high, result.begin());
+
+    return result;
+}
+
+
 PositionRecordList TradeManager::getPositionList() const {
     PositionRecordList result;
     position_map_type::const_iterator iter = m_position.begin();

@@ -166,6 +166,14 @@ public:
     /** 获取全部交易记录 */
     const TradeRecordList& getTradeList() const { return m_trade_list; }
 
+    /**
+     * 获取指定日期范围内的交易记录[start, end)
+     * @param start 起始日期
+     * @param end 结束日期
+     * @return 交易记录列表
+     */
+    TradeRecordList getTradeList(const Datetime& start, const Datetime& end) const;
+
     /** 获取当前全部持仓记录 */
     PositionRecordList getPositionList() const;
 

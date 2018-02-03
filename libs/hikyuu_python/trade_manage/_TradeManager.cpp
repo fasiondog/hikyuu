@@ -59,6 +59,8 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sellShort_overload, sellShort, 4, 8);
 TradeCostPtr (TradeManager::*get_costFunc)() const = &TradeManager::costFunc;
 void (TradeManager::*set_costFunc)(const TradeCostPtr&) = &TradeManager::costFunc;
 
+const TradeRecordList& (TradeManager::*_getTradeList_1)() const = &TradeManager::getTradeList;
+TradeRecordList (TradeManager::*_getTradeList_2)(const Datetime&, const Datetime&) const = &TradeManager::getTradeList;
 
 void export_TradeManager() {
 
@@ -95,8 +97,11 @@ void export_TradeManager() {
             //.def("getShortStockNumber", &TradeManager::getShortStockNumber)
             .def("getHoldNumber", &TradeManager::getHoldNumber)
             //.def("getShortHoldNumber", &TradeManager::getShortHoldNumber)
-            .def("getTradeList", &TradeManager::getTradeList,
+
+            .def("getTradeList", _getTradeList_1,
                     return_value_policy<copy_const_reference>())
+            .def("getTradeList", _getTradeList_2)
+
             .def("getPositionList", &TradeManager::getPositionList)
             .def("getHistoryPositionList", &TradeManager::getHistoryPositionList,
                     return_value_policy<copy_const_reference>())
