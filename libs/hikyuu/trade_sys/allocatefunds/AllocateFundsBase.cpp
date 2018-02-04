@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "../allocatefunds/AllocateFundsBase.h"
+#include "AllocateFundsBase.h"
 
 namespace hku {
 

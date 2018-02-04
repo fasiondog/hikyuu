@@ -5,7 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu/trade_sys/portfolio/Portfolio.h>
+#include <boost/bind.hpp>
+#include "Portfolio.h"
 
 namespace hku {
 
@@ -60,36 +61,99 @@ PortfolioPtr Portfolio::clone() {
 }
 
 
-void Portfolio::run(const KQuery& query) {
+bool Portfolio::readyForRun() {
+    string func_name(" [Portfolio::readyForRun]");
     if (!m_se) {
-        HKU_WARN("m_se is null [Portfolio::run]");
-        return;
+        HKU_WARN("m_se is null!" << func_name);
+        return false;
     }
 
     if (!m_tm) {
-        HKU_WARN("m_tm is null [Portfolio::run]");
-        return;
+        HKU_WARN("m_tm is null!" << func_name);
+        return false;
     }
 
     if (!m_af) {
-        HKU_WARN("m_am is null [Portfolio::run]");
-        return;
+        HKU_WARN("m_am is null!" << func_name);
+        return false;
     }
 
     reset();
 
-    m_af->setTM(m_tm);
+    //--------------------------------------------
+    // 从系统策略子账户重建总账户
+    //--------------------------------------------
+    Datetime min_init_date = m_tm->initDatetime();
+    Datetime max_last_date = m_tm->lastDatetime();
+    price_t init_cash = 0.0;
+    TradeRecordList all_tr_list;
+
+    SystemList all_sys_list = m_se->getAllSystemList();
+    auto sys_iter = all_sys_list.begin();
+    for (; sys_iter != all_sys_list.end(); ++sys_iter) {
+        TMPtr tm = (*sys_iter)->getTM();
+        if (tm) {
+            if (tm->initDatetime() < min_init_date) {
+                min_init_date = tm->initDatetime();
+            }
+            if (tm->initDatetime() == min_init_date) {
+                init_cash += tm->initCash();
+            }
+            if (tm->lastDatetime() > max_last_date) {
+                max_last_date = tm->lastDatetime();
+            }
+
+            TradeRecordList tr_list = tm->getTradeList();
+            all_tr_list.insert(all_tr_list.end(), tr_list.begin(), tr_list.end());
+        }
+    }
+
+    sort(all_tr_list.begin(), all_tr_list.end(),
+         boost::bind(std::less<Datetime>(),
+                     boost::bind(&TradeRecord::datetime, _1),
+                     boost::bind(&TradeRecord::datetime, _2)));
+
+    m_tm->addTradeRecord(TradeRecord(Null<Stock>(), min_init_date,
+            BUSINESS_INIT, init_cash, init_cash, 0.0, 0,
+            CostRecord(), 0.0,  init_cash, PART_INVALID));
+    auto tr_iter = all_tr_list.begin();
+    for (; tr_iter != all_tr_list.end(); ++tr_iter) {
+        if (tr_iter->business == BUSINESS_INIT) {
+            if (tr_iter->datetime != min_init_date) {
+                TradeRecord new_tr(*tr_iter);
+                new_tr.business = BUSINESS_CHECKIN;
+                m_tm->addTradeRecord(new_tr);
+            }
+        } else {
+            m_tm->addTradeRecord(*tr_iter);
+        }
+    }
+
+    return true;
+}
+
+void Portfolio::run(const KQuery& query) {
+    if (!readyForRun()) {
+        return;
+    }
+
+    //reset();
+
+    //m_af->setTM(m_tm);
 
     SystemList all_sys_list = m_se->getAllSystemList();
     auto sys_iter = all_sys_list.begin();
     for (; sys_iter != all_sys_list.end(); ++sys_iter) {
         SystemPtr sys = *sys_iter;
+
         sys->setTM(m_tm);
         if (sys->readyForRun()) {
             KData k = sys->getStock().getKData(query);
             sys->setTO(k);
         }
     }
+
+    SystemList cur_hold_sys_list;
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
@@ -107,10 +171,10 @@ void Portfolio::run(const KQuery& query) {
 
         //计算当前时刻选择的股票列表
         SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
-        //selected_list = m_am->getAllocateMoney(selected_list);
-        auto sw_iter = selected_list.begin();
-        for (; sw_iter != selected_list.end(); ++sw_iter) {
-            (*sw_iter)->runMoment(*date_iter);
+        SystemWeightList sw_list = m_af->getAllocateMoney(selected_list);
+        auto sw_iter = sw_list.begin();
+        for (; sw_iter != sw_list.end(); ++sw_iter) {
+            sw_iter->getSYS()->runMoment(*date_iter);
         }
 
         /*SystemList selected_sys_list = m_se->getSelectedSystemList(*date_iter);
@@ -119,6 +183,14 @@ void Portfolio::run(const KQuery& query) {
             (*sys_iter)->runMoment(*date_iter);
         }*/
     }
+}
+
+
+void Portfolio::runOneMoment(Datetime date) {
+    if (date < m_tm->initDatetime()) {
+        return;
+    }
+
 }
 
 

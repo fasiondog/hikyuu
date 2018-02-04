@@ -97,4 +97,11 @@ DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end) {
     return result;
 }
 
+Datetime Datetime::nextDay() const {
+    bd::date today = date();
+    bd::date_duration dd(1);
+    bd::date next = today + dd;
+    return Datetime(next);
+}
+
 } /* namespace hku */

@@ -52,6 +52,10 @@ public:
     typedef shared_ptr<Portfolio> PortfolioPtr;
     PortfolioPtr clone();
 
+private:
+    bool readyForRun();
+    void runOneMoment(Datetime);
+
 protected:
     string m_name;
     SEPtr  m_se;

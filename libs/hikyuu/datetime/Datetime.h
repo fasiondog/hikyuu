@@ -81,6 +81,9 @@ public:
     /** 返回月末日期，如12月31日 */
     Datetime endOfMonth() const;
 
+    /** 下一自然日 */
+    Datetime nextDay() const;
+
     /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
     static Datetime min();
 
