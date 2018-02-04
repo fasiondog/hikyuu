@@ -193,6 +193,7 @@ void TradeManager::reset() {
     //m_broker_list
     //m_broker_last_datetime = Datetime::now();
     m_actions.clear();
+    _saveAction(m_trade_list.back());
 }
 
 
@@ -1163,6 +1164,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock,
         return result;
     }
 
+    //对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=Null<size_t>()的方式全仓卖出
     if (number < stock.minTradeNumber()) {
         HKU_ERROR(datetime << " " << stock.market_code()
                 << " Sell number(" << number <<
@@ -2167,5 +2169,359 @@ void TradeManager::tocsv(const string& path) {
     }
     file.close();
 }
+
+
+bool TradeManager::addTradeRecord(const TradeRecord& tr) {
+    string func_name = " [TradeManager::addTradeRecord]";
+
+    if (BUSINESS_INIT == tr.business) {
+        return _add_init_tr(tr);
+    }
+
+    if (tr.datetime < lastDatetime()) {
+        HKU_ERROR("tr.datetime must be >= lastDatetime("
+                << lastDatetime() << ")!" << func_name);
+        return false;
+    }
+
+    switch(tr.business) {
+    case BUSINESS_INIT:
+        return false;
+
+    case BUSINESS_BUY:
+        return _add_buy_tr(tr);
+
+    case BUSINESS_SELL:
+        return _add_sell_tr(tr);
+
+    case BUSINESS_GIFT:
+        return _add_gift_tr(tr);
+
+    case BUSINESS_BONUS:
+        return _add_bonus_tr(tr);
+
+    case BUSINESS_CHECKIN:
+        return _add_checkin_tr(tr);
+
+    case BUSINESS_CHECKOUT:
+        return _add_checkout_tr(tr);
+
+    case BUSINESS_CHECKIN_STOCK:
+        return _add_checkin_stock_tr(tr);
+
+    case BUSINESS_CHECKOUT_STOCK:
+        return _add_checkout_stock_tr(tr);
+
+    case BUSINESS_BORROW_CASH:
+        return _add_borrow_cash_tr(tr);
+
+    case BUSINESS_RETURN_CASH:
+        return _add_return_cash_tr(tr);
+
+    case BUSINESS_BORROW_STOCK:
+        return _add_borrow_stock_tr(tr);
+
+    case BUSINESS_RETURN_STOCK:
+        return _add_return_stock_tr(tr);
+
+    case BUSINESS_SELL_SHORT:
+        return _add_sell_short_tr(tr);
+
+    case BUSINESS_BUY_SHORT:
+        return _add_buy_short_tr(tr);
+
+    case INVALID_BUSINESS:
+    default:
+        HKU_ERROR("tr.business is invalid(" << tr.business << ")!" << func_name);
+        return false;
+    }
+
+    return false;
+}
+
+bool TradeManager::_add_init_tr(const TradeRecord& tr) {
+    assert(BUSINESS_INIT == tr.business);
+
+    m_init_datetime = tr.datetime;
+    m_init_cash = roundEx(tr.realPrice, getParam<int>("precision"));
+    reset();
+
+    return true;
+}
+
+bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
+    string func_name(" [TradeManager::_add_buy_tr]");
+
+    if (tr.stock.isNull()) {
+        HKU_ERROR("tr.stock is null!" << func_name);
+        return false;
+    }
+
+    if (tr.number == 0) {
+        HKU_ERROR("tr.number is zero!" << func_name);
+        return false;
+    }
+
+    if (tr.number < tr.stock.minTradeNumber()
+     || tr.number > tr.stock.maxTradeNumber()) {
+        HKU_ERROR("tr.number out of range!" << func_name);
+        return false;
+    }
+
+    int precision = getParam<int>("precision");
+    TradeRecord new_tr(tr);
+    price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
+
+    if (m_cash < roundEx(money + tr.cost.total, precision)) {
+        HKU_WARN("Don't have enough money!" << func_name);
+        return false;
+    }
+
+    m_cash = roundEx(m_cash - money - tr.cost.total, precision);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+
+    //更新当前持仓记录
+    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
+    if (pos_iter == m_position.end()) {
+        m_position[tr.stock.id()] = PositionRecord(
+                tr.stock,
+                tr.datetime,
+                Null<Datetime>(),
+                tr.number,
+                tr.stoploss,
+                tr.goalPrice,
+                tr.number,
+                money,
+                tr.cost.total,
+                roundEx((tr.realPrice - tr.stoploss) * tr.number * tr.stock.unit(), precision),
+                0.0);
+    } else {
+        PositionRecord& position = pos_iter->second;
+        position.number += tr.number;
+        position.stoploss = tr.stoploss;
+        position.goalPrice = tr.goalPrice;
+        position.totalNumber += tr.number;
+        position.buyMoney = roundEx(money + position.buyMoney, precision);
+        position.totalCost = roundEx(tr.cost.total + position.totalCost, precision);
+        position.totalRisk = roundEx(position.totalRisk +
+                (tr.realPrice - tr.stoploss) * tr.number * tr.stock.unit(), precision);
+    }
+
+    if (tr.datetime > m_broker_last_datetime) {
+        Datetime timestamp;
+        bd::date result_day = tr.datetime.ptime().date();
+        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        for(; broker_iter != m_broker_list.end(); ++broker_iter) {
+            timestamp = (*broker_iter)->buy(tr.stock.code(), tr.planPrice, tr.number);
+            bt::time_duration x = timestamp.ptime().time_of_day();
+            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
+        }
+    }
+
+    _saveAction(new_tr);
+
+    return true;
+}
+
+bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
+    string func_name(" [TradeManager::_add_sell_tr]");
+
+    if (tr.stock.isNull()) {
+        HKU_ERROR("tr.stock is Null!" << func_name);
+        return false;
+    }
+
+    if (tr.number == 0) {
+        HKU_ERROR("tr.number is zero!" << func_name);
+        return false;
+    }
+
+    //未持仓
+    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
+    if (pos_iter == m_position.end()) {
+        HKU_ERROR("No position!" << func_name);
+        return false;
+    }
+
+    PositionRecord& position = pos_iter->second;
+
+    if (position.number < tr.number) {
+        //欲卖出的数量大于当前持仓的数量
+        HKU_ERROR("Try sell number greater position!" << func_name);
+        return false;
+    }
+
+    int precision = getParam<int>("precision");
+    price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
+
+    //更新现金余额
+    m_cash = roundEx(m_cash + money - tr.cost.total, precision);
+
+
+    //更新交易记录
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+
+    //更新当前持仓情况
+    position.number -= tr.number;
+    position.stoploss = tr.stoploss;
+    position.goalPrice = tr.goalPrice;
+    //position.buyMoney = position.buyMoney;
+    position.totalCost = roundEx(position.totalCost + tr.cost.total, precision);
+    position.sellMoney = roundEx(position.sellMoney + money, precision);
+
+    if (position.number == 0) {
+        position.cleanDatetime = tr.datetime;
+        m_position_history.push_back(position);
+        //删除当前持仓
+        m_position.erase(tr.stock.id());
+    }
+
+    if (tr.datetime > m_broker_last_datetime) {
+        Datetime timestamp;
+        bd::date result_day = tr.datetime.ptime().date();
+        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        for(; broker_iter != m_broker_list.end(); ++broker_iter) {
+            timestamp = (*broker_iter)->sell(tr.stock.code(), tr.planPrice, tr.number);
+            bt::time_duration x = timestamp.ptime().time_of_day();
+            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
+        }
+    }
+
+    _saveAction(new_tr);
+
+    return true;
+}
+
+bool TradeManager::_add_gift_tr(const TradeRecord& tr) {
+    string func_name(" [TradeManager::_add_gift_tr]");
+
+    if (tr.stock.isNull()) {
+        HKU_ERROR("tr.stock is null!" << func_name);
+        return false;
+    }
+
+    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
+    if (pos_iter == m_position.end()) {
+        HKU_ERROR("No position!" << func_name);
+        return false;
+    }
+
+    PositionRecord& position = pos_iter->second;
+    position.number += tr.number;
+    position.totalNumber += tr.number;
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    return true;
+}
+
+bool TradeManager::_add_bonus_tr(const TradeRecord& tr) {
+    string func_name(" [TradeManager::_add_bonus_tr]");
+
+    if (tr.stock.isNull()) {
+        HKU_ERROR("tr.stock is null!" << func_name);
+        return false;
+    }
+
+    if (tr.realPrice <= 0.0) {
+        HKU_ERROR("tr.realPrice <= 0.0!" << func_name);
+        return false;
+    }
+
+    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
+    if (pos_iter == m_position.end()) {
+        HKU_ERROR("No position!" << func_name);
+        return false;
+    }
+
+    PositionRecord& position = pos_iter->second;
+    position.sellMoney += tr.realPrice;
+    m_cash += tr.realPrice;
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    return true;
+}
+
+bool TradeManager::_add_checkin_tr(const TradeRecord& tr) {
+    string func_name(" [TradeManager::_add_checkin_tr]");
+    if (tr.realPrice <= 0.0) {
+        HKU_ERROR("tr.realPrice <= 0.0!" << func_name);
+        return false;
+    }
+
+    int precision = getParam<int>("precision");
+    price_t in_cash = roundEx(tr.realPrice, precision);
+    m_cash = roundEx(m_cash + in_cash, precision);
+    m_checkin_cash = roundEx(m_checkin_cash + in_cash, precision);
+    m_trade_list.push_back(TradeRecord(Null<Stock>(), tr.datetime,
+            BUSINESS_CHECKIN, in_cash, in_cash, 0.0, 0,
+            CostRecord(), 0.0, m_cash, PART_INVALID));
+    _saveAction(m_trade_list.back());
+    return true;
+}
+
+bool TradeManager::_add_checkout_tr(const TradeRecord& tr) {
+    string func_name(" [TradeManager::_add_checkout_tr]");
+
+    if (tr.realPrice <= 0.0) {
+        HKU_ERROR("tr.realPrice <= 0.0!" << func_name);
+        return false;
+    }
+
+    int precision = getParam<int>("precision");
+    price_t out_cash = roundEx(tr.realPrice, precision);
+    if (out_cash > m_cash) {
+        HKU_ERROR("Checkout money > current cash!" << func_name);
+        return false;
+    }
+
+    m_cash = roundEx(m_cash - out_cash, precision);
+    m_checkout_cash = roundEx(m_checkout_cash + out_cash, precision);
+    m_trade_list.push_back(TradeRecord(Null<Stock>(), tr.datetime,
+            BUSINESS_CHECKOUT, out_cash, out_cash, 0.0, 0,
+            CostRecord(), 0.0, m_cash, PART_INVALID));
+    _saveAction(m_trade_list.back());
+    return true;
+}
+
+bool TradeManager::_add_checkin_stock_tr(const TradeRecord& tr) {
+    //TODO: TradeManager::_add_checkin_stock_tr
+    return false;
+}
+
+bool TradeManager::_add_checkout_stock_tr(const TradeRecord& tr) {
+    return false;
+}
+
+bool TradeManager::_add_borrow_cash_tr(const TradeRecord& tr) {
+    return false;
+}
+
+bool TradeManager::_add_return_cash_tr(const TradeRecord& tr) {
+    return false;
+}
+
+bool TradeManager::_add_borrow_stock_tr(const TradeRecord& tr) {
+    return false;
+}
+
+bool TradeManager::_add_return_stock_tr(const TradeRecord& tr) {
+    return false;
+}
+
+bool TradeManager::_add_sell_short_tr(const TradeRecord& tr) {
+    return false;
+}
+
+bool TradeManager::_add_buy_short_tr(const TradeRecord& tr) {
+    return false;
+}
+
 
 } /* namespace hku */

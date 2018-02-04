@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "../allocatemoney/SystemWeight.h"
+#include "../allocatefunds/SystemWeight.h"
 
 namespace hku {
 

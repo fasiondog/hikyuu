@@ -5,11 +5,11 @@
  *      Author: fasiondog
  */
 
-#ifndef TRADE_SYS_ALLOCATEMONEY_ALLOCATEFUNDSBASE_H_
-#define TRADE_SYS_ALLOCATEMONEY_ALLOCATEFUNDSBASE_H_
+#ifndef TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_
+#define TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_
 
 #include "../../utilities/Parameter.h"
-#include "SystemWeight.h"
+#include "../allocatefunds/SystemWeight.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>
@@ -94,4 +94,4 @@ inline void AllocateFundsBase::reset() {
 
 } /* namespace hku */
 
-#endif /* TRADE_SYS_ALLOCATEMONEY_ALLOCATEFUNDSBASE_H_ */
+#endif /* TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_ */

@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
-#ifndef TRADE_SYS_ALLOCATEMONEY_SYSTEMWEIGHT_H_
-#define TRADE_SYS_ALLOCATEMONEY_SYSTEMWEIGHT_H_
+#ifndef TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_
+#define TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_
 
 #include "../system/System.h"
 
@@ -71,4 +71,4 @@ inline price_t SystemWeight::getWeight() const {
 
 } /* namespace hku */
 
-#endif /* TRADE_SYS_ALLOCATEMONEY_SYSTEMWEIGHT_H_ */
+#endif /* TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_ */

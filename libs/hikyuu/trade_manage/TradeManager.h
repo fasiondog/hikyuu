@@ -476,6 +476,14 @@ public:
     PriceList getProfitCurve(const DatetimeList& dates,
             KQuery::KType ktype = KQuery::DAY);
 
+    /**
+     * 直接加入交易记录
+     * @param tr 待加入的交易记录
+     * @return bool true 成功 | false 失败
+     */
+    bool addTradeRecord(const TradeRecord& tr);
+
+    /** 字符串输出 */
     string toString() const;
 
     /**
@@ -490,6 +498,22 @@ private:
 
     //以脚本的形式保存交易动作，便于修正和校准
     void _saveAction(const TradeRecord&);
+
+    bool _add_init_tr(const TradeRecord&);
+    bool _add_buy_tr(const TradeRecord&);
+    bool _add_sell_tr(const TradeRecord&);
+    bool _add_gift_tr(const TradeRecord&);
+    bool _add_bonus_tr(const TradeRecord&);
+    bool _add_checkin_tr(const TradeRecord&);
+    bool _add_checkout_tr(const TradeRecord&);
+    bool _add_checkin_stock_tr(const TradeRecord&);
+    bool _add_checkout_stock_tr(const TradeRecord&);
+    bool _add_borrow_cash_tr(const TradeRecord&);
+    bool _add_return_cash_tr(const TradeRecord&);
+    bool _add_borrow_stock_tr(const TradeRecord&);
+    bool _add_return_stock_tr(const TradeRecord&);
+    bool _add_sell_short_tr(const TradeRecord&);
+    bool _add_buy_short_tr(const TradeRecord&);
 
 private:
     string       m_name;            //账户名称

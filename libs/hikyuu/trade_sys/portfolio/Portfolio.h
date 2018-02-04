@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 #define TRADE_SYS_PORTFOLIO_PORTFOLIO_H_
 
-#include "../allocatemoney/AllocateFundsBase.h"
+#include "../allocatefunds/AllocateFundsBase.h"
 #include "../selector/SelectorBase.h"
 
 #if HKU_SUPPORT_SERIALIZATION
