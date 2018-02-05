@@ -105,6 +105,11 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
 
     /** @arg 测试 endOfMonth*/
     BOOST_CHECK(Datetime(201801010000L).endOfMonth() == Datetime(201801310000L));
+
+    /** @arg 测试nextDay */
+    BOOST_CHECK(Datetime(201802060000L).nextDay() == Datetime(201802070000L));
+    BOOST_CHECK(Datetime(201802280000L).nextDay() == Datetime(201803010000L));
+    BOOST_CHECK(Datetime(201602280000L).nextDay() == Datetime(201602290000L));
 }
 
 /** @par 检测点 */

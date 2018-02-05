@@ -56,6 +56,34 @@ StringList.__doc__ = """字符串列表，对应C++中的std::vector<String>"""
 
 Datetime.__doc__ = """日期时间类，精确到秒"""
 
+Datetime.dayOfWeek.__doc__ = """
+dayOfWeek(self)
+    
+    返回是一周中的第几天，周日为0，周一为1
+        
+    :rtype: int
+"""
+
+Datetime.dayOfYear.__doc__ = """
+dayOfYear(self)
+    
+    返回一年中的第几天，1月1日为一年中的第1天
+        
+    :rtype: int
+"""
+
+Datetime.endOfMonth.__doc__ = """
+endOfMonth(self)
+    
+    返回月末最后一天日期
+"""
+
+Datetime.nextDay.__doc__ = """
+nextDay(self)
+    
+    返回下一自然日
+"""
+
 Datetime.max.__doc__ += """
 获取支持的最大日期
 """
@@ -64,7 +92,6 @@ Datetime.min.__doc__ += """
 
 Datetime.now.__doc__ += """
 获取当前日期时间"""
-
 
 getDateRange.__doc__ += """\n
 获取指定 [start, end) 日期时间范围的自然日日历日期列表，仅支持到日

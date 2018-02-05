@@ -33,7 +33,12 @@ void export_Datetime() {
             .add_property("minute", &Datetime::minute)
             .add_property("second", &Datetime::second)
             .add_property("number", &Datetime::number)
+
             .def("toString", &Datetime::toString)
+            .def("dayOfWeek", &Datetime::dayOfWeek)
+            .def("dayOfYear", &Datetime::dayOfYear)
+            .def("endOfMonth", &Datetime::endOfMonth)
+            .def("nextDay", &Datetime::nextDay)
             .def("min", &Datetime::min).staticmethod("min")
             .def("max", &Datetime::max).staticmethod("max")
             .def("now", &Datetime::now).staticmethod("now")

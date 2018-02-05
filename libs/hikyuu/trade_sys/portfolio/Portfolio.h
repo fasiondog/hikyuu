@@ -27,6 +27,16 @@ class HKU_API Portfolio {
     PARAMETER_SUPPORT
 
 public:
+    enum MODE {
+        ONLY_USE_TOTAL_TM                  = 0, /**< 以总账户为原型，自动设置所有系统实例的子账户，子账户初始资金为0 */
+        REBUILD_TM_AND_AUTO_CREATE_SUBTM   = 1, /**< 从各子账户重建总账户及其交易记录，未自行绑定子账户的系统实例以总账户为原型自动创建子账户 */
+        REBUILD_TM_AND_IGNORE_NO_SUBTM_SYS = 2, /**< 从各子账户重建总账户及其交易记录，忽略未自行绑定子账户的系统实例 */
+        ONLY_AUTO_CREATE_SUBTM             = 3,/**< 不重建总账户直接使用各系统绑定的子账户，未绑定子账户的系统实例以总账户为原型自动创建子账户 */
+        ONLY_IGNORE_NO_SUBTM_SYS           = 4, /**< 不重建总账户直接使用各系统绑定的子账户，忽略未自行绑定子账户的系统实例 */
+        INVLID_MODE                        = 5,
+    };
+
+public:
     Portfolio();
     Portfolio(const string& name);
     Portfolio(const TradeManagerPtr& tm,
@@ -53,7 +63,15 @@ public:
     PortfolioPtr clone();
 
 private:
+    void initParam();
     bool readyForRun();
+
+    void rebuildOnlyTotalTM();
+    void rebuildTMAndAutoCreateSubTM();
+    void rebuildTMAndIgnore();
+    void rebuildOnlyAutoCreateSubTM();
+    void rebuildOnlyIngore();
+
     void runOneMoment(Datetime);
 
 protected:
@@ -61,6 +79,8 @@ protected:
     SEPtr  m_se;
     AFPtr  m_af;
     TMPtr  m_tm;
+
+    SystemList m_sys_list; //临时变量，缓存从SE获取的全部系统实例，仅在调用readyForRun后有效
 
 //============================================
 // 序列化支持
