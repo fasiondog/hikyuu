@@ -25,7 +25,10 @@ enum SystemPart {
     PART_MONEYMANAGER = 5,   /**< 资金管理策略 */
     PART_PROFITGOAL   = 6,   /**< 盈利目标策略 */
     PART_SLIPPAGE     = 7,   /**< 移滑价差算法 */
-    PART_INVALID      = 8,   /**< 无效值 */
+
+    PART_ALLOCATEFUNDS = 8,  /**< 资产分配算法 */
+
+    PART_INVALID      = 9,   /**< 无效值 */
 };
 
 /**

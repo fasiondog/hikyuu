@@ -135,6 +135,7 @@ void export_System() {
             .value("MONEYMANAGER", PART_MONEYMANAGER)
             .value("PROFITGOAL", PART_PROFITGOAL)
             .value("SLIPPAGE", PART_SLIPPAGE)
+            .value("ALLOCATEFUNDS", PART_ALLOCATEFUNDS)
             .value("INVALID", PART_INVALID)
             ;
 

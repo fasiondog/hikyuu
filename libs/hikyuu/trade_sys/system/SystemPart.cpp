@@ -28,6 +28,8 @@ string HKU_API getSystemPartName(int part) {
         return "PG";
     case PART_SLIPPAGE:
         return "SP";
+    case PART_ALLOCATEFUNDS:
+        return "AF";
     default:
         return "--";
     }
@@ -60,6 +62,9 @@ SystemPart HKU_API getSystemPartEnum(const string& arg) {
 
     } else if ("MM" == name) {
         return PART_MONEYMANAGER;
+
+    } else if ("AF" == name) {
+        return PART_ALLOCATEFUNDS;
 
     } else {
         return PART_INVALID;

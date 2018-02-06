@@ -46,7 +46,7 @@ public:
     /** 子类克隆私有变量接口 */
     virtual AFPtr _clone() {return AFPtr(); }
 
-    SystemWeightList getAllocateMoney(const SystemList&);
+    SystemList getAllocateWeight(const SystemList&, const SystemList&);
 
 private:
     string m_name;

@@ -98,6 +98,8 @@ bool Portfolio::readyForRun() {
 
     reset();
 
+    m_af->setTM(m_tm);
+
     switch (mode) {
     case ONLY_USE_TOTAL_TM:
         rebuildOnlyTotalTM();
@@ -308,7 +310,7 @@ void Portfolio::run(const KQuery& query) {
         }
     }
 
-    SystemList cur_hold_sys_list;
+    std::set<SYSPtr> cur_hold_sys_sets;
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
@@ -322,21 +324,44 @@ void Portfolio::run(const KQuery& query) {
         sys_iter = m_sys_list.begin();
         for (; sys_iter != m_sys_list.end(); ++sys_iter) {
             (*sys_iter)->_processRequest(*date_iter);
+
+            if ((*sys_iter)->getTM()->have((*sys_iter)->getStock())) {
+                cur_hold_sys_sets.insert(*sys_iter);
+            } else {
+                cur_hold_sys_sets.erase(*sys_iter);
+            }
         }
 
-        //计算当前时刻选择的股票列表
+        SystemList cur_hold_sys_list;
+        auto hold_iter = cur_hold_sys_sets.begin();
+        for (; hold_iter != cur_hold_sys_sets.end(); ++hold_iter) {
+            cur_hold_sys_list.push_back(*hold_iter);
+        }
+
+        //计算当前时刻选择的系统实例
         SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
-        SystemWeightList sw_list = m_af->getAllocateMoney(selected_list);
+        SystemList sw_list = m_af->getAllocateWeight(selected_list, cur_hold_sys_list);
+
+        //资金分配都由AF自动处理好？ 需要调仓卖出的，都由AF处理？这里只处理调仓完的系统列表？
+        /*auto sw_iter = sw_map.begin();
+        for (; sw_iter != sw_map.end(); ++sw_iter) {
+            if (sw_iter->second == 0.0) {
+                SYSPtr sys = sw_iter->first;
+                TMPtr tm = sys->getTM();
+                PositionRecordList pos_list = tm->getPositionList();
+                auto pos_iter = pos_list.begin();
+                for (; pos_iter != pos_list.end(); ++pos_iter) {
+                    KRecord kr = pos_iter->stock.getKRecordByDate(*date_iter, query.kType());
+                    sys->_sell(kr, PART_ALLOCATEFUNDS);
+                }
+            }
+        }*/
+
         auto sw_iter = sw_list.begin();
         for (; sw_iter != sw_list.end(); ++sw_iter) {
-            sw_iter->getSYS()->runMoment(*date_iter);
+            (*sw_iter)->runMoment(*date_iter);
         }
 
-        /*SystemList selected_sys_list = m_se->getSelectedSystemList(*date_iter);
-        sys_iter = selected_sys_list.begin();
-        for (; sys_iter != selected_sys_list.end(); ++sys_iter) {
-            (*sys_iter)->runMoment(*date_iter);
-        }*/
     }
 }
 

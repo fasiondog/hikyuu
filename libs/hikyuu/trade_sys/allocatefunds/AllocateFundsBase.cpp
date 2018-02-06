@@ -42,10 +42,10 @@ AFPtr AllocateFundsBase::clone() {
     return p;
 }
 
-SystemWeightList AllocateFundsBase
-::getAllocateMoney(const SystemList& sw_list) {
-
-    return SystemWeightList();
+SystemList AllocateFundsBase
+::getAllocateWeight(const SystemList& se_list, const SystemList& hold_list) {
+    SystemList result;
+    return result;
 }
 
 } /* namespace hku */
