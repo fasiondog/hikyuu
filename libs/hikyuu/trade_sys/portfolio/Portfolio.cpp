@@ -37,8 +37,9 @@ Portfolio::Portfolio(const string& name) : m_name(name) {
 
 Portfolio::Portfolio(const TradeManagerPtr& tm,
         const SystemPtr& sys,
-        const SelectorPtr& se)
-: m_se(se), m_tm(tm), m_name("Portfolio") {
+        const SelectorPtr& se,
+        const AFPtr& af)
+: m_name("Portfolio"), m_se(se), m_tm(tm), m_af(af) {
     initParam();
 }
 
@@ -330,6 +331,13 @@ void Portfolio::run(const KQuery& query) {
             } else {
                 cur_hold_sys_sets.erase(*sys_iter);
             }
+
+            //同步交易记录
+            TradeRecordList tr_list = (*sys_iter)->getTM()->getTradeList(*date_iter, Null<Datetime>());
+            auto tr_iter = tr_list.begin();
+            for (; tr_iter != tr_list.end(); ++tr_iter) {
+                m_tm->addTradeRecord(*tr_iter);
+            }
         }
 
         SystemList cur_hold_sys_list;
@@ -340,22 +348,7 @@ void Portfolio::run(const KQuery& query) {
 
         //计算当前时刻选择的系统实例
         SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
-        SystemList sw_list = m_af->getAllocateWeight(selected_list, cur_hold_sys_list);
-
-        //资金分配都由AF自动处理好？ 需要调仓卖出的，都由AF处理？这里只处理调仓完的系统列表？
-        /*auto sw_iter = sw_map.begin();
-        for (; sw_iter != sw_map.end(); ++sw_iter) {
-            if (sw_iter->second == 0.0) {
-                SYSPtr sys = sw_iter->first;
-                TMPtr tm = sys->getTM();
-                PositionRecordList pos_list = tm->getPositionList();
-                auto pos_iter = pos_list.begin();
-                for (; pos_iter != pos_list.end(); ++pos_iter) {
-                    KRecord kr = pos_iter->stock.getKRecordByDate(*date_iter, query.kType());
-                    sys->_sell(kr, PART_ALLOCATEFUNDS);
-                }
-            }
-        }*/
+        SystemList sw_list = m_af->getAllocateSystem(*date_iter, selected_list, cur_hold_sys_list);
 
         auto sw_iter = sw_list.begin();
         for (; sw_iter != sw_list.end(); ++sw_iter) {

@@ -27,6 +27,31 @@ public:
     AllocateFundsBase(const string& name);
     virtual ~AllocateFundsBase();
 
+    string name() const;
+    void name(const string& name);
+
+    /**
+     * Portfolio获取实际获得资产分配的系统策略实例
+     * @param date 指定日期
+     * @param se_list 系统实例选择器选出的系统实例
+     * @param hold_list 当前持仓的系统实例
+     * @return
+     */
+    SystemList getAllocateSystem(const Datetime& date,
+                                 const SystemList& se_list,
+                                 const SystemList& hold_list);
+
+    /**
+     * 获取实际分配资产的系统实例及其权重
+     * @details 实际调用子类接口 _allocateWeight，并根据允许的最大持仓系统数参数对子类返回的
+     *          系统实例及权重列表进行了截断处理
+     * @param se_list
+     * @param hold_list
+     * @return
+     */
+    SystemWeightList allocateWeight(const SystemList& se_list,
+                                    const SystemList& hold_list);
+
     /** 获取交易账户 */
     TMPtr getTM();
 
@@ -44,9 +69,16 @@ public:
     virtual void _reset() {}
 
     /** 子类克隆私有变量接口 */
-    virtual AFPtr _clone() {return AFPtr(); }
+    virtual AFPtr _clone() = 0;
 
-    SystemList getAllocateWeight(const SystemList&, const SystemList&);
+    /**
+     * 子类分配权重接口
+     * @param se_list 选择器选出的系统 实例列表
+     * @param hold_list 当前持仓的系统实例列表
+     * @return
+     */
+    virtual SystemWeightList _allocateWeight(const SystemList& se_list,
+                                             const SystemList& hold_list) = 0;
 
 private:
     string m_name;
@@ -77,8 +109,57 @@ private:
     #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
+#endif
+
+#if HKU_SUPPORT_SERIALIZATION
+/**
+ * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * @code
+ * class Drived: public AllocateFundsBase {
+ *     ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
+ *
+ * public:
+ *     Drived();
+ *     ...
+ * };
+ * @endcode
+ * @ingroup Selector
+ */
+#define ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION private:\
+    friend class boost::serialization::access; \
+    template<class Archive> \
+    void serialize(Archive & ar, const unsigned int version) { \
+        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(AllocateFundsBase); \
+    }
+#else
+#define ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
+#endif
+
+#define ALLOCATEFUNDS_IMP(classname) public:\
+    virtual AFPtr _clone() {\
+        return AFPtr(new classname());\
+    }\
+    virtual SystemWeightList _allocateWeight(const SystemList&, const SystemList&);
+
+
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
 typedef shared_ptr<AllocateFundsBase> AFPtr;
+
+
+HKU_API std::ostream & operator<<(std::ostream&, const AllocateFundsBase&);
+HKU_API std::ostream & operator<<(std::ostream&, const AFPtr&);
+
+
+inline string AllocateFundsBase::name() const {
+    return m_name;
+}
+
+inline void AllocateFundsBase::name(const string& name) {
+    m_name = name;
+}
+
 
 inline TMPtr AllocateFundsBase::getTM() {
     return m_tm;

@@ -9,12 +9,30 @@
 
 namespace hku {
 
-SystemWeight::SystemWeight(): m_weight(100) {
+HKU_API std::ostream & operator<<(std::ostream & os, const SystemWeight& sw) {
+    os << std::fixed;
+    os.precision(4);
+
+    string name("NULL");
+    if (sw.sys) {
+       name = sw.sys->name();
+    }
+
+    os << "SystemWeight(sys: " << name
+       << ",  weight: " << sw.weight
+       << ")"<< std::endl;
+
+    os.unsetf(std::ostream::floatfield);
+    os.precision();
+    return os;
+}
+
+SystemWeight::SystemWeight(): weight(100) {
 
 }
 
 SystemWeight::SystemWeight(const SystemPtr& sys, price_t weight)
-: m_sys(sys), m_weight(weight) {
+: sys(sys), weight(weight) {
 
 }
 

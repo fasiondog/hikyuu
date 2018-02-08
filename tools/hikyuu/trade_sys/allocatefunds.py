@@ -25,7 +25,19 @@
 # SOFTWARE.
 
 
-__all__ = ['system', 'environment', 'condition', 'moneymanager', 'signal',
-           'stoploss', 'profitgoal', 'slippage', 'selector', 'portfolio',
-           'allocatefunds']
+from ._trade_sys import (AllocateFundsBase, AF_EqualWeight)
+from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
+AllocateFundsBase.__unicode__ = unicodeFunc
+AllocateFundsBase.__repr__ = reprFunc
+
+
+#------------------------------------------------------------------
+# add doc-string
+#------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------
+# add doc-string for build_in func
+#------------------------------------------------------------------

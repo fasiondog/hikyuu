@@ -41,7 +41,8 @@ public:
     Portfolio(const string& name);
     Portfolio(const TradeManagerPtr& tm,
             const SystemPtr& sys,
-            const SelectorPtr& st);
+            const SelectorPtr& st,
+            const AFPtr& af);
     virtual ~Portfolio();
 
     string name() const { return m_name; }

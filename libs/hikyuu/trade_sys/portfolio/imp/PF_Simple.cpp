@@ -10,10 +10,11 @@
 namespace hku {
 
 PortfolioPtr HKU_API PF_Simple(
-        const TradeManagerPtr& tm,
-        const SystemPtr& sys,
-        const SelectorPtr& st) {
-    return make_shared<Portfolio>(tm, sys, st);
+        const TMPtr& tm,
+        const SYSPtr& sys,
+        const SEPtr& st,
+        const AFPtr& af) {
+    return make_shared<Portfolio>(tm, sys, st, af);
 }
 
 } /* namespace hku */

@@ -13,7 +13,7 @@
 namespace hku {
 
 class FixedSelector: public SelectorBase {
-    SELECTOR_IMP(FixedSelector);
+    SELECTOR_IMP(FixedSelector)
     SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

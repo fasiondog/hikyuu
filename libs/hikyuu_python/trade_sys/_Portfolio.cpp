@@ -13,7 +13,7 @@
 using namespace boost::python;
 using namespace hku;
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(PF_Simple_overload, PF_Simple, 0, 3);
+BOOST_PYTHON_FUNCTION_OVERLOADS(PF_Simple_overload, PF_Simple, 0, 4);
 
 void (Portfolio::*pf_set_name)(const string&) = &Portfolio::name;
 string (Portfolio::*pf_get_name)() const= &Portfolio::name;
@@ -24,7 +24,8 @@ void export_Portfolio() {
             .def(init<const string&>())
             .def(init<const TradeManagerPtr&,
                     const SystemPtr&,
-                    const SelectorPtr&>())
+                    const SelectorPtr&,
+                    const AFPtr&>())
             .def(self_ns::str(self))
             .def("getParam", &Portfolio::getParam<boost::any>)
             .def("setParam", &Portfolio::setParam<object>)
