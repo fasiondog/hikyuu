@@ -438,7 +438,7 @@ TradeRecordList TradeManager
                                        boost::bind(&TradeRecord::datetime, _1),
                                        boost::bind(&TradeRecord::datetime, _2)));
 
-    std::copy(low, high, result.begin());
+    result.insert(result.end(), low, high);
 
     return result;
 }

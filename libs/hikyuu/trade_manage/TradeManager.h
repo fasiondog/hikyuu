@@ -478,6 +478,7 @@ public:
 
     /**
      * 直接加入交易记录
+     * @note 如果加入初始化账户记录，将清除全部已有交易及持仓记录
      * @param tr 待加入的交易记录
      * @return bool true 成功 | false 失败
      */

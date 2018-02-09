@@ -348,9 +348,12 @@ getHoldNumber(self, datetime, stock)
 
 TradeManager.getTradeList.__doc__ = """
 getTradeList(self)
+getTradeList(self, start, end)
     
-    获取全部交易记录
+    获取交易记录，未指定参数时，获取全部交易记录
         
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期
     :rtype: TradeRecordList
 """
 
@@ -510,6 +513,16 @@ tocsv(self, path)
     以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
         
     :param string path: 输出文件所在目录
+"""
+
+TradeManager.addTradeRecord.__doc__ = """
+addTradeRecord(self, tr)
+
+    直接加入交易记录，如果加入初始化账户记录，将清除全部已有交易及持仓记录。
+
+    :param TradeRecord tr: 交易记录
+    :return: True（成功） | False（失败）
+    :rtype: bool
 """
 
 

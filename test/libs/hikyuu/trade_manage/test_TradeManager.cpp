@@ -212,40 +212,40 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_can_not_sell ) {
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     BOOST_CHECK(tm->getHoldNumber(Datetime(199911170000), stock) == 100);
-    result = tm->sell(Datetime(199801010000), stock, 26.36, 26.36, 100);
+    result = tm->sell(Datetime(199801010000), stock, 26.36, 100);
     BOOST_CHECK(result == Null<TradeRecord>());
 
     /** @arg 卖出的数量等于0 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     BOOST_CHECK(tm->getHoldNumber(Datetime(199911170000), stock) == 100);
-    result = tm->sell(Datetime(199911180000), stock, 26.36, 26.36, 0);
+    result = tm->sell(Datetime(199911180000), stock, 26.36, 0);
     BOOST_CHECK(result == Null<TradeRecord>());
 
     /** @arg 卖出的数量小于最小交易数量 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     BOOST_CHECK(tm->getHoldNumber(Datetime(199911170000), stock) == 100);
-    result = tm->sell(Datetime(199911180000), stock, 26.36, 26.36, stock.minTradeNumber() - 1);
+    result = tm->sell(Datetime(199911180000), stock, 26.36, stock.minTradeNumber() - 1);
     BOOST_CHECK(result == Null<TradeRecord>());
 
     /** @arg 卖出的数量大于最大交易数量 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     BOOST_CHECK(tm->getHoldNumber(Datetime(199911170000), stock) == 100);
-    result = tm->sell(Datetime(199911180000), stock, 26.36, 26.36, stock.maxTradeNumber() + 1);
+    result = tm->sell(Datetime(199911180000), stock, 26.36, stock.maxTradeNumber() + 1);
     BOOST_CHECK(result == Null<TradeRecord>());
 
     /** @arg 卖出未持仓的股票 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
-    result = tm->sell(Datetime(199901020000), stock, 26.36, 26.36, 100);
+    result = tm->sell(Datetime(199901020000), stock, 26.36, 100);
     BOOST_CHECK(result == Null<TradeRecord>());
 
     /** @arg 卖出的数量大于当前持仓数量 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     BOOST_CHECK(tm->getHoldNumber(Datetime(199911170000), stock) == 100);
-    result = tm->sell(Datetime(199911180000), stock, 26.36, 26.36, 101);
+    result = tm->sell(Datetime(199911180000), stock, 26.36, 101);
     BOOST_CHECK(result == Null<TradeRecord>());
 
     /** @arg 忽略权息信息，将买入股票全部卖出 */
@@ -1234,6 +1234,157 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_trade_financing_securities_lending_no_ri
     next_date = Datetime(199911110000);
     trade = tm->buy(cur_date, stock, 27.75, 1000, 27.70, 28.0, 27.75);
     cost = tm->getBuyCost(cur_date, stock, 27.75, 1000);
+
+}
+
+
+/** @par 检测点，测试 getTradeList */
+BOOST_AUTO_TEST_CASE( test_getTradeList ) {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    CostRecord cost;
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+    tm->setParam<bool>("reinvest", true);
+
+    tm->buy(Datetime(199305200000L), stk, 55.7, 100);
+    tm->buy(Datetime(199305250000L), stk, 27.5, 100);
+    tm->buy(Datetime(199407110000L), stk, 8.55, 200);
+
+    /** @arg 获取全部交易记录 */
+    TradeRecordList tr_list = tm->getTradeList();
+    BOOST_CHECK(tr_list.size() == 8);
+    BOOST_CHECK(tr_list[0] == TradeRecord(Stock(), Datetime(199305010000L),
+                                          BUSINESS_INIT, 100000, 100000, 0, 0,
+                                          cost, 0, 100000, PART_INVALID));
+    BOOST_CHECK(tr_list[7] == TradeRecord(stk, Datetime(199407110000L),
+                                          BUSINESS_BUY, 0, 8.55, 0, 200,
+                                          cost, 0, 90142.50, PART_INVALID));
+
+    /** @arg 指定日期范围获取交易记录 start 等于账户建立日期，end 为  Null<Datetime>() */
+    tr_list = tm->getTradeList(Datetime(199305010000), Null<Datetime>());
+
+    BOOST_CHECK(tr_list.size() == 8);
+    BOOST_CHECK(tr_list[0] == TradeRecord(Stock(), Datetime(199305010000L),
+                                          BUSINESS_INIT, 100000, 100000, 0, 0,
+                                          cost, 0, 100000, PART_INVALID));
+    BOOST_CHECK(tr_list[7] == TradeRecord(stk, Datetime(199407110000L),
+                                          BUSINESS_BUY, 0, 8.55, 0, 200,
+                                          cost, 0, 90142.50, PART_INVALID));
+
+    /** @arg 指定日期范围获取交易记录 start 等于第一条买入记录日期，end为Null */
+    tr_list = tm->getTradeList(Datetime(199305200000L), Null<Datetime>());
+
+    BOOST_CHECK(tr_list.size() == 7);
+    BOOST_CHECK(tr_list[0] == TradeRecord(stk, Datetime(199305200000L),
+                                          BUSINESS_BUY, 0, 55.70, 0, 100,
+                                          cost, 0, 94430, PART_INVALID));
+    BOOST_CHECK(tr_list[6] == TradeRecord(stk, Datetime(199407110000L),
+                                          BUSINESS_BUY, 0, 8.55, 0, 200,
+                                          cost, 0, 90142.50, PART_INVALID));
+
+    /** @arg 指定日期范围获取交易记录 start 介于两个交易记录日期之间，end为Null */
+    tr_list = tm->getTradeList(Datetime(199305210000L), Null<Datetime>());
+
+    BOOST_CHECK(tr_list.size() == 6);
+    BOOST_CHECK(tr_list[0] == TradeRecord(stk, Datetime(199305240000L),
+                                          BUSINESS_BONUS, 30, 30, 0, 0,
+                                          cost, 0, 94490, PART_INVALID));
+    BOOST_CHECK(tr_list[5] == TradeRecord(stk, Datetime(199407110000L),
+                                          BUSINESS_BUY, 0, 8.55, 0, 200,
+                                          cost, 0, 90142.50, PART_INVALID));
+
+    /** @arg 指定日期范围获取交易记录 start 大于 end */
+    tr_list = tm->getTradeList(Null<Datetime>(), Datetime(199305210000L));
+    BOOST_CHECK(tr_list.size() == 0);
+
+    /** @arg 指定日期范围获取交易记录 start 等于 end */
+    tr_list = tm->getTradeList(Datetime(199305210000L), Datetime(199305210000L));
+    BOOST_CHECK(tr_list.size() == 0);
+
+    /** @arg 指定日期范围获取交易记录 start等于某交易记录日期，end大于最后一条交易记录日期 */
+    tr_list = tm->getTradeList(Datetime(199305200000L), Datetime(199407120000L));
+
+    BOOST_CHECK(tr_list.size() == 7);
+    BOOST_CHECK(tr_list[0] == TradeRecord(stk, Datetime(199305200000L),
+                                          BUSINESS_BUY, 0, 55.70, 0, 100,
+                                          cost, 0, 94430, PART_INVALID));
+    BOOST_CHECK(tr_list[6] == TradeRecord(stk, Datetime(199407110000L),
+                                          BUSINESS_BUY, 0, 8.55, 0, 200,
+                                          cost, 0, 90142.50, PART_INVALID));
+
+    /** @arg 指定日期范围获取交易记录 start等于某交易记录日期，end等于最后一条交易记录日期 */
+    tr_list = tm->getTradeList(Datetime(199305200000L), Datetime(199407110000L));
+
+    BOOST_CHECK(tr_list.size() == 4);
+    BOOST_CHECK(tr_list[0] == TradeRecord(stk, Datetime(199305200000L),
+                                          BUSINESS_BUY, 0, 55.70, 0, 100,
+                                          cost, 0, 94430, PART_INVALID));
+    BOOST_CHECK(tr_list[3] == TradeRecord(stk, Datetime(199305250000L),
+                                          BUSINESS_BUY, 0, 27.5, 0, 100,
+                                          cost, 0, 91710, PART_INVALID));
+}
+
+/** @par 检测点, 测试addTradeRecord */
+BOOST_AUTO_TEST_CASE( test_TradeManager_addTradeRecord ) {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    CostRecord cost;
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+    tm->setParam<bool>("reinvest", true);
+
+    tm->buy(Datetime(199305200000L), stk, 55.7, 100);
+    tm->buy(Datetime(199305250000L), stk, 27.5, 100);
+    tm->buy(Datetime(199407110000L), stk, 8.55, 200);
+
+    /** @arg 加入账户初始化交易记录 */
+    TradeRecordList tr_list = tm->getTradeList();
+    BOOST_CHECK(tr_list.size() == 8);
+    BOOST_CHECK(tr_list[0] == TradeRecord(Stock(), Datetime(199305010000L),
+                                          BUSINESS_INIT, 100000, 100000, 0, 0,
+                                          cost, 0, 100000, PART_INVALID));
+
+    TradeRecord tr(Stock(), Datetime(199201010000L),
+                   BUSINESS_INIT, 200000, 200000, 0, 0,
+                   cost, 0, 200000, PART_INVALID);
+    tm->addTradeRecord(tr);
+
+    tr_list = tm->getTradeList();
+    BOOST_CHECK(tr_list.size() == 1);
+    BOOST_CHECK(tr_list[0] == tr);
+
+    /** @arg 复制一个tm的交易记录至另一个tm */
+    tm = crtTM(Datetime(199305010000), 100000);
+    tm->setParam<bool>("reinvest", true);
+    tm->buy(Datetime(199305200000L), stk, 55.7, 100);
+    tm->buy(Datetime(199305250000L), stk, 27.5, 100);
+    tm->buy(Datetime(199407110000L), stk, 8.55, 200);
+    tr_list = tm->getTradeList();
+
+    TMPtr tm2 = crtTM(Datetime(199101010000), 100000, TC_Zero(), "TM2");
+    tm2->setParam<bool>("reinvest", false);
+    BOOST_CHECK(tm->initDatetime() != tm2->initDatetime());
+    for (auto iter = tr_list.begin(); iter != tr_list.end(); ++iter) {
+        tm2->addTradeRecord(*iter);
+    }
+
+    BOOST_CHECK(tm2->name() != tm->name());
+    BOOST_CHECK(tm2->getParam<bool>("reinvest") != tm->getParam<bool>("reinvest"));
+    BOOST_CHECK(tm2->initDatetime() == tm->initDatetime());
+    BOOST_CHECK(tm2->lastDatetime() == tm->lastDatetime());
+    BOOST_CHECK(tm2->currentCash() == tm->currentCash());
+
+    tr_list = tm2->getTradeList();
+    BOOST_CHECK(tr_list.size() == 8);
+    BOOST_CHECK(tr_list[0] == TradeRecord(Stock(), Datetime(199305010000L),
+                                          BUSINESS_INIT, 100000, 100000, 0, 0,
+                                          cost, 0, 100000, PART_INVALID));
+    BOOST_CHECK(tr_list[7] == TradeRecord(stk, Datetime(199407110000L),
+                                          BUSINESS_BUY, 0, 8.55, 0, 200,
+                                          cost, 0, 90142.50, PART_INVALID));
 
 }
 

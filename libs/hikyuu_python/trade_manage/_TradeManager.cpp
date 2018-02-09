@@ -139,6 +139,7 @@ void export_TradeManager() {
             //.def("buyShort", &TradeManager::buyShort, buyShort_overload())
             //.def("sellShort", &TradeManager::sellShort, sellShort_overload())
 
+            .def("addTradeRecord", &TradeManager::addTradeRecord)
             .def("tocsv", &TradeManager::tocsv)
 
 #if HKU_PYTHON_SUPPORT_PICKLE
