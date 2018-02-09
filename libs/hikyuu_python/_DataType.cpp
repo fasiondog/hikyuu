@@ -41,10 +41,12 @@ void export_DataType() {
             ;
 
     PriceList::const_reference (PriceList::*PriceList_at)(PriceList::size_type) const = &PriceList::at;
+    void (PriceList::*PriceList_append)(const PriceList::value_type& val) = &PriceList::push_back;
     class_<PriceList>("PriceList")
             .def("__iter__", iterator<PriceList>())
             .def("size", &PriceList::size)
             .def("__len__", &PriceList::size)
+            .def("append", PriceList_append)
             .def("get", PriceList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<PriceList>())
@@ -52,10 +54,12 @@ void export_DataType() {
             ;
 
     StringList::const_reference (StringList::*StringList_at)(StringList::size_type) const = &StringList::at;
+    void (StringList::*StringList_append)(const StringList::value_type& val) = &StringList::push_back;
     class_<StringList>("StringList")
             .def("__iter__", iterator<StringList>())
             .def("size", &StringList::size)
             .def("__len__", &StringList::size)
+            .def("append", StringList_append)
             .def("get", StringList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<StringList>())

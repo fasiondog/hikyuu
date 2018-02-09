@@ -56,6 +56,16 @@ void export_System() {
 #endif
             ;
 
+    SystemList::const_reference (SystemList::*SystemList_at)(SystemList::size_type) const = &SystemList::at;
+    void (SystemList::*append)(const SystemPtr&) = &SystemList::push_back;
+    class_<SystemList>("SystemList")
+            .def("__iter__", iterator<SystemList>())
+            .def("size", &SystemList::size)
+            .def("__len__", &SystemList::size)
+            .def("get", SystemList_at, return_value_policy<copy_const_reference>())
+            .def("append", append)
+            ;
+
     scope in_System = class_<System>("System", init<const string&>())
             .def(init<const TradeManagerPtr&,
                     const MoneyManagerPtr&,
@@ -140,4 +150,5 @@ void export_System() {
             ;
 
     register_ptr_to_python<SystemPtr>();
+
 }

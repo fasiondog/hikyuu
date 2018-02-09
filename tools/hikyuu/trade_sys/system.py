@@ -25,11 +25,13 @@
 # SOFTWARE.
 
 from ._trade_sys import (System,
+                         SystemList,
                          getSystemPartName,
                          getSystemPartEnum,
                          TradeRequest)
 from ._trade_sys import SYS_Simple as cpp_SYS_Simple
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
+from hikyuu.util.slice import list_getitem
     
 System.__unicode__ = unicodeFunc
 System.__repr__ = reprFunc
@@ -43,6 +45,8 @@ System.MONEYMANAGER = System.Part.MONEYMANAGER
 System.PROFITGOAL = System.Part.PROFITGOAL
 System.SLIPPAGE = System.Part.SLIPPAGE
 System.INVALID = System.Part.INVALID
+
+SystemList.__getitem__ = list_getitem
 
 #SystemPart = System.Part
 

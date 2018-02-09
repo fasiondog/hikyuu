@@ -25,12 +25,20 @@
 # SOFTWARE.
 
 
-from ._trade_sys import (AllocateFundsBase, AF_EqualWeight)
+from ._trade_sys import (AllocateFundsBase,
+                         SystemWeight,
+                         SystemWeightList, 
+                         AF_EqualWeight)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
+from hikyuu.util.slice import list_getitem
 
 AllocateFundsBase.__unicode__ = unicodeFunc
 AllocateFundsBase.__repr__ = reprFunc
 
+SystemWeight.__unicode__ = unicodeFunc
+SystemWeight.__repr = reprFunc
+
+SystemWeightList.__getitem__ = list_getitem
 
 #------------------------------------------------------------------
 # add doc-string

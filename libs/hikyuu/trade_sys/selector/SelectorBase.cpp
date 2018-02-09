@@ -97,7 +97,7 @@ void SelectorBase::addStockList(const StockList& stkList,
                                 const SystemPtr& protoSys) {
     if (!protoSys) {
         HKU_WARN("Try add Null protoSys, will be discard! "
-                "[SelectorBase::addStock]");
+                "[SelectorBase::addStockList]");
         return;
     }
 
@@ -105,7 +105,7 @@ void SelectorBase::addStockList(const StockList& stkList,
     for (; iter != stkList.end(); ++iter) {
         if (iter->isNull()) {
             HKU_WARN("Try add Null stock, will be discard! "
-                    "[SelectorBase::addStock]");
+                    "[SelectorBase::addStockList]");
             continue;
         }
 

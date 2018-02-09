@@ -41,7 +41,7 @@ SelectorBase.__doc__ = """
 
 自定义选择器策略接口：
 
-    SelectorBase.getSelectedStockList - 【必须】获取指定时刻选择的标的列表
+    SelectorBase.getSelectedSystemList - 【必须】获取指定时刻选择的系统实例列表
     SelectorBase._reset - 【可选】重置私有属性
     SelectorBase._clone - 【必须】克隆接口
 """
@@ -78,19 +78,21 @@ setParam(self, name, value)
 """
 
 SelectorBase.addStock.__doc__ = """
-addStock(self, stock)
+addStock(self, stock, sys)
 
-    加入初始标的
+    加入初始标的及其对应的系统策略原型
         
     :param Stock stock: 加入的初始标的
+    :param System sys: 系统策略原型
 """
 
 SelectorBase.addStockList.__doc__ = """
-addStockList(self, stock_list)
+addStockList(self, stk_list, sys)
     
-    加入初始标的列表
+    加入初始标的列表及其系统策略原型
         
-    :param StockList stock: 加入的初始标的列表
+    :param StockList stk_list: 加入的初始标的列表
+    :param System sys: 系统策略原型    
 """
 
 SelectorBase.clear.__doc__ = """
@@ -128,10 +130,11 @@ _clone(self)
 #------------------------------------------------------------------
 
 SE_Fixed.__doc__ = """
-SE_Fixed([stocklist])
+SE_Fixed([stocklist, sys])
 
-    固定选择器，即始终选择初始划定的标的范围
+    固定选择器，即始终选择初始划定的标的及其系统策略原型
     
     :param StockList stocklist: 初始划定的标的
+    :param System sys: 系统策略原型
     :return: SE选择器实例
 """

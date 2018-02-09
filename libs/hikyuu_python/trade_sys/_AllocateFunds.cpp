@@ -61,7 +61,7 @@ void export_AllocateFunds() {
             .def("__iter__", iterator<SystemWeightList>())
             .def("size", &SystemWeightList::size)
             .def("__len__", &SystemWeightList::size)
-            .def("__getitem__", SystemWeightList_at, return_value_policy<copy_const_reference>())
+            .def("get", SystemWeightList_at, return_value_policy<copy_const_reference>())
             .def("append", append)
             ;
 
