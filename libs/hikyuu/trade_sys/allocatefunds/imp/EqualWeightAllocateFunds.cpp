@@ -23,12 +23,8 @@ SystemWeightList EqualWeightAllocateFunds
     SystemWeightList result;
 
     SystemList temp_list;
-    if (getParam<bool>("adjust_hold_sys")) {
-        copy(se_list.begin(), se_list.end(), temp_list.begin());
-        copy(hold_list.begin(), hold_list.end(), temp_list.end());
-    } else {
-        copy(se_list.begin(), se_list.end(), temp_list.begin());
-    }
+    temp_list.insert(temp_list.end(), se_list.begin(), se_list.end());
+    temp_list.insert(temp_list.end(), hold_list.begin(), hold_list.end());
 
     size_t total = temp_list.size();
     if (total == 0) {

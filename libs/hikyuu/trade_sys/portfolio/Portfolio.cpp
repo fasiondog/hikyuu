@@ -348,7 +348,8 @@ void Portfolio::run(const KQuery& query) {
 
         //计算当前时刻选择的系统实例
         SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
-        SystemList sw_list = m_af->getAllocateSystem(*date_iter, selected_list, cur_hold_sys_list);
+        SystemList sw_list = m_af->getAllocatedSystemList(*date_iter,
+                                           selected_list, cur_hold_sys_list);
 
         auto sw_iter = sw_list.begin();
         for (; sw_iter != sw_list.end(); ++sw_iter) {

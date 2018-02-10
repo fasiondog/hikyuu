@@ -37,9 +37,9 @@ public:
      * @param hold_list 当前持仓的系统实例
      * @return
      */
-    SystemList getAllocateSystem(const Datetime& date,
-                                 const SystemList& se_list,
-                                 const SystemList& hold_list);
+    SystemList getAllocatedSystemList(const Datetime& date,
+                                      const SystemList& se_list,
+                                      const SystemList& hold_list);
 
     /**
      * 获取实际分配资产的系统实例及其权重

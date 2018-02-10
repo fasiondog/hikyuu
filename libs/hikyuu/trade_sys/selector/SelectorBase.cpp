@@ -44,7 +44,7 @@ void SelectorBase::clear() {
 void SelectorBase::reset() {
     SystemList::const_iterator iter = m_sys_list.begin();
     for (; iter != m_sys_list.end(); ++iter) {
-        (*iter)->reset(false, false, false, false);
+        (*iter)->reset(true, false, true, true);
     }
     _reset();
 }

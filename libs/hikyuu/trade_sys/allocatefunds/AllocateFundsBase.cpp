@@ -61,19 +61,16 @@ AFPtr AllocateFundsBase::clone() {
 }
 
 SystemList AllocateFundsBase
-::getAllocateSystem(const Datetime& date,
+::getAllocatedSystemList(const Datetime& date,
         const SystemList& se_list, const SystemList& hold_list) {
     SystemList result;
 
     SystemWeightList sw_list = allocateWeight(se_list, hold_list);
+    if (sw_list.size() == 0) {
+        return result;
+    }
 
-    /*sort(sw_list.begin(), sw_list.end(),
-         boost::bind(std::less<price_t>(),
-                     boost::bind(&SystemWeight::weight, _1),
-                     boost::bind(&SystemWeight::weight, _2)));
-    */
     price_t total_weight = 0.0;
-
     auto sw_iter = sw_list.begin();
     for (; sw_iter != sw_list.end(); ++sw_iter) {
         total_weight += sw_iter->weight;
@@ -84,22 +81,30 @@ SystemList AllocateFundsBase
     }
 
     int precision = m_tm->getParam<int>("precision");
-    price_t per_cash = roundDown(m_tm->currentCash() / total_weight, precision);
-
+    price_t per_cash = m_tm->currentCash() / total_weight;
     sw_iter = sw_list.begin();
     for (; sw_iter != sw_list.end(); ++sw_iter) {
-        price_t will_cash = roundDown(per_cash * sw_iter->weight, precision);
+        price_t will_cash = per_cash * sw_iter->weight;
         if (will_cash == 0.0) {
             continue;
         }
 
         TMPtr tm = sw_iter->sys->getTM();
-        precision = tm->getParam<int>("precision");
-        will_cash = roundDown(will_cash, precision);
-        if (tm->currentCash() < will_cash) {
-            price_t cash = will_cash - tm->currentCash();
-            tm->checkin(date, cash);
-            m_tm->checkout(date, cash);
+        assert(tm);
+
+        int real_precision = tm->getParam<int>("precision");
+        if (precision < real_precision) {
+            real_precision = precision;
+        }
+
+        will_cash = roundDown(will_cash - tm->currentCash(), real_precision);
+        if (will_cash > 0) {
+            if (!m_tm->checkout(date, will_cash)) {
+                HKU_ERROR("m_tm->checkout failed! "
+                        "[AllocateFundsBase::getAllocatedSystemList]");
+                continue;
+            }
+            tm->checkin(date, will_cash);
         }
 
         result.push_back(sw_iter->sys);
@@ -112,20 +117,38 @@ SystemWeightList AllocateFundsBase
 ::allocateWeight(const SystemList& se_list, const SystemList& hold_list) {
     SystemWeightList result;
 
-    result = _allocateWeight(se_list, hold_list);
-
-    size_t total = result.size();
-    if (total <= getParam<int>("max_sys_num")) {
+    int max_num = getParam<int>("max_sys_num");
+    if (max_num <= 0) {
+        HKU_ERROR("param(max_sys_num) need > 0! [AllocateFundsBase::allocateWeight]");
         return result;
     }
 
-    auto iter = result.begin() + total;
+    if (getParam<bool>("adjust_hold_sys")) {
+        if (se_list.size() == 0 && hold_list.size() == 0) {
+            return result;
+        }
+
+        result = _allocateWeight(se_list, hold_list);
+
+    } else {
+        if (se_list.size() == 0) {
+            return result;
+        }
+
+        result = _allocateWeight(se_list, SystemList());
+    }
+
+    size_t total = result.size();
+    if (total <= max_num) {
+        return result;
+    }
+
+    auto iter = result.begin() + max_num;
     SystemWeightList sw_list;
-    copy(result.begin(), iter, sw_list.begin());
-    swap(result, sw_list);
+    sw_list.insert(sw_list.end(), result.begin(), iter);
+    //swap(result, sw_list);
 
-    return result;
+    return sw_list;
 }
-
 
 } /* namespace hku */
