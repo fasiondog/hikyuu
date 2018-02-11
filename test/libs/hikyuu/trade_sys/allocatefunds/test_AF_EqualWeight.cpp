@@ -1,7 +1,7 @@
 /*
- * test_Signal.cpp
+ * test_AF_EqualWeight.cpp
  *
- *  Created on: 2013-3-11
+ *  Created on: 2018-2-10
  *      Author: fasiondog
  */
 
@@ -27,8 +27,8 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_AF_EqualWeight) {
+/** @par 检测点，不自动调仓 */
+BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_not_adjust_hold) {
     StockManager& sm = StockManager::instance();
 
     SEPtr se = SE_Fixed();
@@ -42,57 +42,10 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight) {
     SystemList ac_list;
     SystemWeightList sw_list;
 
-    /** @arg 测试setTM */
-    BOOST_CHECK(!af->getTM());
     af->setTM(tm);
-    BOOST_CHECK(af->getTM());
+    af->setParam<bool>("adjust_hold_sys", false);
 
-    /** @arg 测试clone */
-    AFPtr af2 = af->clone();
-    BOOST_CHECK(af2.get() != af.get());
-    BOOST_CHECK(af2->name() == af->name());
-    BOOST_CHECK(af2->getTM() == af->getTM());
-
-    /** @arg 出入的se_list、hold_list均为空  */
-    BOOST_CHECK(se_list.size() == 0);
-    BOOST_CHECK(hold_list.size() == 0);
-    sw_list = af->allocateWeight(se_list, hold_list);
-    ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
-    BOOST_CHECK(sw_list.size() == 0);
-    BOOST_CHECK(ac_list.size() == 0);
-
-    /** @arg 最大持仓系统数小于0 */
-    af->setParam<int>("max_sys_num", -1);
-    se->clear();
-    tm->reset();
-    sys->setTM(subtm->clone());
-    se->addStock(sm["sh600000"], sys);
-    se_list = se->getSelectedSystemList(Datetime(201802100000L));
-    BOOST_CHECK(se_list.size() == 1);
-
-    sw_list = af->allocateWeight(se_list, hold_list);
-    ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, se_list);
-    BOOST_CHECK(sw_list.size() == 0);
-    BOOST_CHECK(ac_list.size() == 0);
-    BOOST_CHECK(tm->currentCash() == 100000);
-
-
-    /** @arg 最大持仓系统数为0 */
-    af->setParam<int>("max_sys_num", 0);
-    tm->reset();
-    se->clear();
-    sys->setTM(subtm->clone());
-    se->addStock(sm["sh600000"], sys);
-    se_list = se->getSelectedSystemList(Datetime(201802100000L));
-    BOOST_CHECK(se_list.size() == 1);
-
-    sw_list = af->allocateWeight(se_list, hold_list);
-    ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
-    BOOST_CHECK(sw_list.size() == 0);
-    BOOST_CHECK(ac_list.size() == 0);
-    BOOST_CHECK(tm->currentCash() == 100000);
-
-    /** @arg 当前选中系统数等于最大持仓系统数，已持仓系统数为0，不调整已持仓系统 */
+    /** @arg 当前选中系统数等于最大持仓系统数，已持仓系统数为0 */
     af->setParam<bool>("adjust_hold_sys", false);
     af->setParam<int>("max_sys_num", 1);
     tm->reset();
@@ -104,19 +57,17 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight) {
     BOOST_CHECK(hold_list.size() == 0);
     BOOST_CHECK(se_list[0]->getTM()->currentCash() == 0);
 
-    sw_list = af->allocateWeight(se_list, hold_list);
+    sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
     BOOST_CHECK(sw_list.size() == 1);
     BOOST_CHECK(sw_list[0].sys->getStock() == sm["sh600000"]);
-    BOOST_CHECK(sw_list[0].weight == 100);
+    BOOST_CHECK(sw_list[0].weight == 1);
     BOOST_CHECK(se_list[0]->getTM()->currentCash() == 100000);
     BOOST_CHECK(tm->currentCash() == 0);
     BOOST_CHECK(ac_list.size() == 1);
     BOOST_CHECK(ac_list[0] == sw_list[0].sys);
 
-    /** @arg 当前选中系统数大于最大持仓系统数，已持仓系统数为0，不调整已持仓系统 */
-    std::cout << "***********************" <<std::endl;
-    af->setParam<bool>("adjust_hold_sys", false);
+    /** @arg 当前选中系统数大于最大持仓系统数，已持仓系统数为0 */
     af->setParam<int>("max_sys_num", 1);
     tm->reset();
     se->clear();
@@ -130,7 +81,34 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight) {
     BOOST_CHECK(se_list[1]->getTM()->currentCash() == 0);
     BOOST_CHECK(tm->currentCash() == 100000);
 
-    sw_list = af->allocateWeight(se_list, hold_list);
+    sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
+    ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
+    BOOST_CHECK(sw_list.size() == 2);
+    BOOST_CHECK(sw_list[0].sys->getStock() == sm["sh600000"]);
+    BOOST_CHECK(sw_list[0].weight == 1);
+    BOOST_CHECK(se_list[0]->getTM()->currentCash() == 100000);
+    BOOST_CHECK(tm->currentCash() == 0);
+    BOOST_CHECK(ac_list.size() == 1);
+    BOOST_CHECK(ac_list[0] == sw_list[1].sys);
+
+    /** @arg 当前选中系统数不为0，已持仓系统数等于最大持仓数 */
+    /*af->setParam<int>("max_sys_num", 2);
+    tm->reset();
+    se->clear();
+    sys->setTM(subtm->clone());
+    se->addStock(sm["sh600000"], sys);
+    se_list = se->getSelectedSystemList(Datetime(201802100000L));
+    se->clear();
+    se->addStock(sm["sh600004"], sys);
+    se->addStock(sm["sz000001"], sys);
+    hold_list = se->getSelectedSystemList(Datetime(201802100000L));
+    BOOST_CHECK(se_list.size() != 0);
+    BOOST_CHECK(hold_list.size() == af->getParam<int>("max_sys_num"));
+    BOOST_CHECK(hold_list[0]->getTM()->currentCash() == 0);
+    BOOST_CHECK(hold_list[1]->getTM()->currentCash() == 0);
+    BOOST_CHECK(tm->currentCash() == 100000);
+
+    sw_list = af->allocateWeight(Datetime(201802100000L), se_list, hold_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
     BOOST_CHECK(sw_list.size() == 1);
     BOOST_CHECK(sw_list[0].sys->getStock() == sm["sh600000"]);
@@ -138,7 +116,13 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight) {
     BOOST_CHECK(se_list[0]->getTM()->currentCash() == 100000);
     BOOST_CHECK(tm->currentCash() == 0);
     BOOST_CHECK(ac_list.size() == 1);
-    BOOST_CHECK(ac_list[0] == sw_list[0].sys);
+    BOOST_CHECK(ac_list[0] == sw_list[0].sys);*/
+
+
+    /** @arg 当前选中系统数不为0，已持仓系统数不为零且小于最大持仓数 */
+
+    /** @arg 当前选中系统数不为0，已持仓系统数大于最大持仓数 */
+
 
     BOOST_CHECK(tm == af->getTM());
     std::cout << tm->currentCash() << std::endl;
@@ -149,6 +133,7 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight) {
     std::cout << "ac_list:===============>" << std::endl;
     for (auto iter = ac_list.begin(); iter != ac_list.end(); ++iter) {
         std::cout << (*iter)->getTM()->currentCash() << std::endl;
+        std::cout << (*iter)->getStock() << std::endl;
     }
 
     /** @arg  */
@@ -160,6 +145,12 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight) {
     se_list.push_back(sm["sz000004"]);
     se_list.push_back(sm["sz000005"]);*/
 
+
+}
+
+
+/** @par 检测点，自动调仓 */
+BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_adjust_hold) {
 
 }
 

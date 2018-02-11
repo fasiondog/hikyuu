@@ -45,12 +45,13 @@ public:
      * 获取实际分配资产的系统实例及其权重
      * @details 实际调用子类接口 _allocateWeight，并根据允许的最大持仓系统数参数对子类返回的
      *          系统实例及权重列表进行了截断处理
-     * @param se_list
-     * @param hold_list
+     * @param date 指定日期
+     * @param se_list 系统实例选择器选出的系统实例
+     * @param hold_list 当前持仓的系统实例
      * @return
      */
-    SystemWeightList allocateWeight(const SystemList& se_list,
-                                    const SystemList& hold_list);
+    SystemWeightList allocateWeight(const Datetime& date,
+                                    const SystemList& se_list);
 
     /** 获取交易账户 */
     TMPtr getTM();
@@ -73,12 +74,25 @@ public:
 
     /**
      * 子类分配权重接口
-     * @param se_list 选择器选出的系统 实例列表
-     * @param hold_list 当前持仓的系统实例列表
+     * @param date 指定日期
+     * @param se_list 系统实例选择器选出的系统实例
+     * @param hold_list 当前持仓的系统实例
      * @return
      */
-    virtual SystemWeightList _allocateWeight(const SystemList& se_list,
-                                             const SystemList& hold_list) = 0;
+    virtual SystemWeightList _allocateWeight(const Datetime& date,
+                                             const SystemList& se_list) = 0;
+
+private:
+    void _getAllocatedSystemList_adjust_hold(
+            const Datetime& date,
+            const SystemList& se_list,
+            const SystemList& hold_list,
+            SystemList& out_sys_list);
+    void _getAllocatedSystemList_not_adjust_hold(
+            const Datetime& date,
+            const SystemList& se_list,
+            const SystemList& hold_list,
+            SystemList& out_sys_list);
 
 private:
     string m_name;
@@ -141,7 +155,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
     virtual AFPtr _clone() {\
         return AFPtr(new classname());\
     }\
-    virtual SystemWeightList _allocateWeight(const SystemList&, const SystemList&);
+    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemList&);
 
 
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;

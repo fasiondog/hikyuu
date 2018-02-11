@@ -65,9 +65,119 @@ SystemList AllocateFundsBase
         const SystemList& se_list, const SystemList& hold_list) {
     SystemList result;
 
-    SystemWeightList sw_list = allocateWeight(se_list, hold_list);
-    if (sw_list.size() == 0) {
+    int max_num = getParam<int>("max_sys_num");
+    if (max_num <= 0) {
+        HKU_ERROR("param(max_sys_num) need > 0! "
+                  "[AllocateFundsBase::getAllocatedSystemList]");
         return result;
+    }
+
+    //SystemWeightList sw_list = allocateWeight(date, se_list, hold_list);
+
+    if (getParam<bool>("adjust_hold_sys")) {
+        _getAllocatedSystemList_adjust_hold(date, se_list, hold_list, result);
+    } else {
+        _getAllocatedSystemList_not_adjust_hold(date, se_list, hold_list, result);
+    }
+
+    return result;
+}
+
+void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
+        const Datetime& date,
+        const SystemList& se_list,
+        const SystemList& hold_list,
+        SystemList& out_sys_list) {
+
+    //计算当前选中系统列表的权重
+
+
+    //将未在当前选中的系统列表中的持仓系统，自动清仓卖出
+    //将当前选中系统列表中权重为0的已持仓系统，自动清仓卖出
+    //如果持仓系统的总资产大于所分配权重的资产，则将其当前亏损最多的卖出到资产平衡位置
+    //按分配的权重调整资产现金
+
+    /*if (in_sw_list.size() == 0) {
+        return;
+    }
+
+    price_t total_weight = 0.0;
+    auto sw_iter = in_sw_list.begin();
+    for (; sw_iter != in_sw_list.end(); ++sw_iter) {
+        total_weight += sw_iter->weight;
+    }
+
+    if (total_weight == 0.0) {
+        return;
+    }
+
+    int precision = m_tm->getParam<int>("precision");
+    FundsRecord fr = m_tm->getFunds();
+    price_t total_funds = fr.cash + fr.market_value;
+    price_t per_cash = total_funds / total_weight;
+    sw_iter = in_sw_list.begin();
+    for (; sw_iter != in_sw_list.end(); ++sw_iter) {
+        TMPtr tm = sw_iter->sys->getTM();
+        fr = tm->getFunds();
+        price_t current_funds = fr.cash + fr.market_value;
+        price_t will_funds = per_cash * sw_iter->weight;
+        if (current_funds <= will_funds) {
+            continue;
+        }
+
+        if (fr.market_value <= will_funds) {
+            //取出多余的money
+        }
+
+        PositionRecordList pos_list = tm->getPositionList();
+    }*/
+}
+
+void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
+        const Datetime& date,
+        const SystemList& se_list,
+        const SystemList& hold_list,
+        SystemList& out_sys_list) {
+
+    if (se_list.size() == 0) {
+        return;
+    }
+
+    //不调整持仓，先将所有持仓系统加入到输出系统列表中
+    out_sys_list.insert(out_sys_list.end(), hold_list.begin(), hold_list.end());
+
+    //如果持仓的系统数已大于等于最大持仓系统数，直接输出已持仓系统列表，并返回
+    int max_num = getParam<int>("max_sys_num");
+    if (hold_list.size() >= max_num) {
+        return;
+    }
+
+    //从当前选中的系统列表中将持仓的系统排除
+    SystemList pure_se_list;
+    for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
+        if ((*iter)->getTM()->getStockNumber() == 0) {
+            pure_se_list.push_back(*iter);
+        }
+    }
+
+    //获取权重
+    SystemWeightList sw_list = _allocateWeight(date, pure_se_list);
+    if (sw_list.size() == 0) {
+        return;
+    }
+
+    //按权重倒序排序
+    stable_sort(sw_list.begin(), sw_list.end(),
+         boost::bind(std::less<price_t>(),
+                     boost::bind(&SystemWeight::weight, _1),
+                     boost::bind(&SystemWeight::weight, _2)));
+    reverse(sw_list.begin(), sw_list.end());
+
+    size_t remain = max_num - hold_list.size();
+    if (remain < sw_list.size()) {
+        SystemWeightList temp_list;
+        temp_list.insert(temp_list.end(), sw_list.begin(), sw_list.begin() + remain);
+        swap(sw_list, temp_list);
     }
 
     price_t total_weight = 0.0;
@@ -77,11 +187,13 @@ SystemList AllocateFundsBase
     }
 
     if (total_weight == 0.0) {
-        return result;
+        return;
     }
 
     int precision = m_tm->getParam<int>("precision");
-    price_t per_cash = m_tm->currentCash() / total_weight;
+    price_t per_cash = 0.0;
+
+    per_cash = m_tm->currentCash() / total_weight;
     sw_iter = sw_list.begin();
     for (; sw_iter != sw_list.end(); ++sw_iter) {
         price_t will_cash = per_cash * sw_iter->weight;
@@ -107,36 +219,25 @@ SystemList AllocateFundsBase
             tm->checkin(date, will_cash);
         }
 
-        result.push_back(sw_iter->sys);
+        out_sys_list.push_back(sw_iter->sys);
     }
-
-    return result;
 }
 
+
 SystemWeightList AllocateFundsBase
-::allocateWeight(const SystemList& se_list, const SystemList& hold_list) {
+::allocateWeight(const Datetime& date, const SystemList& se_list) {
+    //se_list是当前选中的系统实例、hold_list是当前有持仓的系统实例，两者可能是重复的
+
     SystemWeightList result;
 
     int max_num = getParam<int>("max_sys_num");
-    if (max_num <= 0) {
-        HKU_ERROR("param(max_sys_num) need > 0! [AllocateFundsBase::allocateWeight]");
-        return result;
-    }
 
-    if (getParam<bool>("adjust_hold_sys")) {
-        if (se_list.size() == 0 && hold_list.size() == 0) {
-            return result;
-        }
+    result = _allocateWeight(date, se_list);
 
-        result = _allocateWeight(se_list, hold_list);
-
-    } else {
-        if (se_list.size() == 0) {
-            return result;
-        }
-
-        result = _allocateWeight(se_list, SystemList());
-    }
+    stable_sort(result.begin(), result.end(),
+                boost::bind(std::less<price_t>(),
+                            boost::bind(&SystemWeight::weight, _1),
+                            boost::bind(&SystemWeight::weight, _2)));
 
     size_t total = result.size();
     if (total <= max_num) {
