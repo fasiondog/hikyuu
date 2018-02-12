@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE( test_AllocateFunds) {
     /** @arg 出入的se_list、hold_list均为空  */
     BOOST_CHECK(se_list.size() == 0);
     BOOST_CHECK(hold_list.size() == 0);
-    sw_list = af->allocateWeight(Datetime(201802100000L), se_list);
+    sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
     BOOST_CHECK(sw_list.size() == 0);
     BOOST_CHECK(ac_list.size() == 0);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE( test_AllocateFunds) {
     se_list = se->getSelectedSystemList(Datetime(201802100000L));
     BOOST_CHECK(se_list.size() == 1);
 
-    sw_list = af->allocateWeight(Datetime(201802100000L), se_list);
+    sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, se_list);
     BOOST_CHECK(sw_list.size() == 1);
     BOOST_CHECK(sw_list[0].sys == se_list[0]);
@@ -87,9 +87,9 @@ BOOST_AUTO_TEST_CASE( test_AllocateFunds) {
     se_list = se->getSelectedSystemList(Datetime(201802100000L));
     BOOST_CHECK(se_list.size() == 1);
 
-    sw_list = af->allocateWeight(Datetime(201802100000L), se_list);
+    sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
-    BOOST_CHECK(sw_list.size() == 0);
+    BOOST_CHECK(sw_list.size() == 1);
     BOOST_CHECK(ac_list.size() == 0);
     BOOST_CHECK(tm->currentCash() == 100000);
 }

@@ -260,15 +260,24 @@ run(self, stock, query[, reset=True])
 """
 
 System.reset.__doc__ = """
-reset(self)
+reset(self, with_tm, with_ev)
     
-    复位操作
+    复位操作。TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享，
+    复位将引起系统运行时被重新清空并计算。尤其是在共享TM时需要注意！
+        
+    :param bool with_tm: 是否复位TM组件
+    :param bool with_ev: 是否复位EV组件
 """
 
 System.clone.__doc__ = """
-clone(self)
+clone(self, with_tm, with_ev)
     
-    克隆操作
+    克隆操作。T
+    M、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享。clone将生成新的
+    独立实例，此时非共享状态。尤其需要注意TM是否共享的情况！
+        
+    :param bool with_tm: 是clone还是共享
+    :param bool with_ev: 是clone还是共享
 """
 
 

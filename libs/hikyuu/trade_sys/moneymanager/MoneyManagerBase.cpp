@@ -68,7 +68,7 @@ MoneyManagerPtr MoneyManagerBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
-    p->m_tm = m_tm;
+    //p->m_tm = m_tm;
     p->m_query = m_query;
     return p;
 }

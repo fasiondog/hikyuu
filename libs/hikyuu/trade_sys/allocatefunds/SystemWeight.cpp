@@ -14,13 +14,19 @@ HKU_API std::ostream & operator<<(std::ostream & os, const SystemWeight& sw) {
     os.precision(4);
 
     string name("NULL");
+    string stk_name("(Stock(NULL))");
     if (sw.sys) {
        name = sw.sys->name();
+
+       Stock stk = sw.sys->getStock();
+       if (!stk.isNull()) {
+           stk_name = "(Stock(" + stk.market_code() + "))";
+       }
     }
 
-    os << "SystemWeight(sys: " << name
+    os << "SystemWeight(sys: " << name << stk_name
        << ",  weight: " << sw.weight
-       << ")"<< std::endl;
+       << ")";
 
     os.unsetf(std::ostream::floatfield);
     os.precision();

@@ -96,25 +96,21 @@ public:
      * 复位
      * @param with_tm 是否复位TM组件
      * @param with_ev 是否复位EV组件
-     * @param with_mm 是否复位MM组件
-     * @param with_sp 是否复位SP组件
-     * @note TM、EV、MM、SP都是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统
+     * @note TM、EV都是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统
      * 运行时被重新清空并计算。尤其是在共享TM时需要注意！
      */
-    void reset(bool with_tm, bool with_ev, bool with_mm, bool with_sp);
+    void reset(bool with_tm, bool with_ev);
 
     typedef shared_ptr<System> SystemPtr;
 
     /** 克隆操作，会依次调用所有部件的clone操作
-     * @details TM、EV、MM、SP都是和具体系统无关的策略组件，可以在不同的系统中进行共享。clone将
+     * @details TM、EV都是和具体系统无关的策略组件，可以在不同的系统中进行共享。clone将
      * 生成新的独立实例，此时非共享状态。尤其需要注意TM是否共享的情况！
      * @param with_tm 是clone还是共享
      * @param with_ev 是clone还是共享
-     * @param with_mm 是clone还是共享
-     * @param with_sp 是clone还是共享
      * @note 不设默认值，强迫用户了解其间的区别，避免误用。
      */
-    SystemPtr clone(bool with_tm, bool with_ev, bool with_mm, bool with_sp);
+    SystemPtr clone(bool with_tm, bool with_ev);
 
     /**
      * 设置交易对象
@@ -122,6 +118,7 @@ public:
      */
     void setTO(const KData& kdata);
 
+    //不指定stock的方式下run，需要事先通过setStock设定stock
     void run(const KQuery& query, bool reset=true);
     void run(const Stock& stock, const KQuery& query, bool reset=true);
 

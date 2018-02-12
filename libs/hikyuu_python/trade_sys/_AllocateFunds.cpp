@@ -31,9 +31,9 @@ public:
         this->AllocateFundsBase::_reset();
     }
 
-    SystemWeightList _allocateWeight(const SystemList& se_list,
-                                    const SystemList& hold_list) {
-        return this->get_override("_allocateWeight")(se_list, hold_list);
+    SystemWeightList _allocateWeight(const Datetime& date,
+                                    const SystemList& se_list) {
+        return this->get_override("_allocateWeight")(date, se_list);
     }
 
     AFPtr _clone() {

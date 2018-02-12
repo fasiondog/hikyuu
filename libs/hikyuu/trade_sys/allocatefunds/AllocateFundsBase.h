@@ -41,18 +41,6 @@ public:
                                       const SystemList& se_list,
                                       const SystemList& hold_list);
 
-    /**
-     * 获取实际分配资产的系统实例及其权重
-     * @details 实际调用子类接口 _allocateWeight，并根据允许的最大持仓系统数参数对子类返回的
-     *          系统实例及权重列表进行了截断处理
-     * @param date 指定日期
-     * @param se_list 系统实例选择器选出的系统实例
-     * @param hold_list 当前持仓的系统实例
-     * @return
-     */
-    SystemWeightList allocateWeight(const Datetime& date,
-                                    const SystemList& se_list);
-
     /** 获取交易账户 */
     TMPtr getTM();
 
@@ -73,12 +61,15 @@ public:
     virtual AFPtr _clone() = 0;
 
     /**
-     * 子类分配权重接口
+     * 子类分配权重接口，获取实际分配资产的系统实例及其权重
+     * @details 实际调用子类接口 _allocateWeight，并根据允许的最大持仓系统数参数对子类返回的
+     *          系统实例及权重列表进行了截断处理
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
      * @param hold_list 当前持仓的系统实例
      * @return
      */
+
     virtual SystemWeightList _allocateWeight(const Datetime& date,
                                              const SystemList& se_list) = 0;
 

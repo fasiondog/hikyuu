@@ -122,16 +122,16 @@ void System::initParam() {
 }
 
 
-void System::reset(bool with_tm, bool with_ev, bool with_mm, bool with_sp) {
+void System::reset(bool with_tm, bool with_ev) {
     if (with_tm && m_tm) m_tm->reset();
     if (with_ev && m_ev) m_ev->reset();
     if (m_cn) m_cn->reset();
-    if (with_mm && m_mm) m_mm->reset();
+    if (m_mm) m_mm->reset();
     if (m_sg) m_sg->reset();
     if (m_st) m_st->reset();
     if (m_tp) m_tp->reset();
     if (m_pg) m_pg->reset();
-    if (with_sp && m_sp) m_sp->reset();
+    if (m_sp) m_sp->reset();
 
     m_kdata = KData();
 
@@ -172,19 +172,18 @@ void System::setTO(const KData& kdata) {
 }
 
 
-SystemPtr System::clone(bool with_tm, bool with_ev, bool with_mm, bool with_sp) {
+SystemPtr System::clone(bool with_tm, bool with_ev) {
     SystemPtr p = make_shared<System>();
-    p->m_tm = (with_mm && m_tm) ? m_tm->clone() : m_tm;
+    p->m_tm = (with_tm && m_tm) ? m_tm->clone() : m_tm;
     p->m_ev = (with_ev && m_ev) ? m_ev->clone() : m_ev;
-    p->m_mm = (with_mm && m_mm) ? m_mm->clone() : m_mm;
 
+    if (m_mm) p->m_mm = m_mm->clone();
     if (m_cn) p->m_cn = m_cn->clone();
     if (m_sg) p->m_sg = m_sg->clone();
     if (m_st) p->m_st = m_st->clone();
     if (m_tp) p->m_tp = m_tp->clone();
     if (m_pg) p->m_pg = m_pg->clone();
-
-    p->m_sp = (with_sp && m_sp) ? m_sp->clone() : m_sp;
+    if (m_sp) p->m_sp = m_sp->clone();
 
     p->m_params = m_params;
     p->m_name = m_name;
@@ -211,14 +210,12 @@ SystemPtr System::clone(bool with_tm, bool with_ev, bool with_mm, bool with_sp) 
 
 
 void System::_buyNotifyAll(const TradeRecord& record) {
-    //TODO _buyNotifyAll
     if (m_mm) m_mm->buyNotify(record);
     if (m_pg) m_pg->buyNotify(record);
 }
 
 
 void System::_sellNotifyAll(const TradeRecord& record) {
-    //TODO _sellNotifyAll
     if (m_mm) m_mm->sellNotify(record);
     if (m_pg) m_pg->sellNotify(record);
 }
@@ -267,7 +264,7 @@ void System::run(const KQuery& query, bool reset) {
     }
 
     //reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-    if (reset)  this->reset(true, true, true, true);
+    if (reset)  this->reset(true, true);
 
     if (!readyForRun()) {
         return;

@@ -97,40 +97,7 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
     //如果持仓系统的总资产大于所分配权重的资产，则将其当前亏损最多的卖出到资产平衡位置
     //按分配的权重调整资产现金
 
-    /*if (in_sw_list.size() == 0) {
-        return;
-    }
-
-    price_t total_weight = 0.0;
-    auto sw_iter = in_sw_list.begin();
-    for (; sw_iter != in_sw_list.end(); ++sw_iter) {
-        total_weight += sw_iter->weight;
-    }
-
-    if (total_weight == 0.0) {
-        return;
-    }
-
-    int precision = m_tm->getParam<int>("precision");
-    FundsRecord fr = m_tm->getFunds();
-    price_t total_funds = fr.cash + fr.market_value;
-    price_t per_cash = total_funds / total_weight;
-    sw_iter = in_sw_list.begin();
-    for (; sw_iter != in_sw_list.end(); ++sw_iter) {
-        TMPtr tm = sw_iter->sys->getTM();
-        fr = tm->getFunds();
-        price_t current_funds = fr.cash + fr.market_value;
-        price_t will_funds = per_cash * sw_iter->weight;
-        if (current_funds <= will_funds) {
-            continue;
-        }
-
-        if (fr.market_value <= will_funds) {
-            //取出多余的money
-        }
-
-        PositionRecordList pos_list = tm->getPositionList();
-    }*/
+    //TODO 待实现
 }
 
 void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
@@ -166,23 +133,19 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
         return;
     }
 
-    //按权重倒序排序
-    stable_sort(sw_list.begin(), sw_list.end(),
+    //按权重排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
+    std::sort(sw_list.begin(), sw_list.end(),
          boost::bind(std::less<price_t>(),
                      boost::bind(&SystemWeight::weight, _1),
                      boost::bind(&SystemWeight::weight, _2)));
-    reverse(sw_list.begin(), sw_list.end());
 
+    //倒序遍历，计算总权重，并在遇到权重为0或等于最大持仓时
     size_t remain = max_num - hold_list.size();
-    if (remain < sw_list.size()) {
-        SystemWeightList temp_list;
-        temp_list.insert(temp_list.end(), sw_list.begin(), sw_list.begin() + remain);
-        swap(sw_list, temp_list);
-    }
-
     price_t total_weight = 0.0;
-    auto sw_iter = sw_list.begin();
-    for (; sw_iter != sw_list.end(); ++sw_iter) {
+    auto sw_iter = sw_list.rbegin();
+    for (size_t count = 0; sw_iter != sw_list.rend(); ++sw_iter, count++) {
+        if (sw_iter->weight <= 0.0 || count >= remain)
+            break;
         total_weight += sw_iter->weight;
     }
 
@@ -190,12 +153,14 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
         return;
     }
 
+    auto end_iter = sw_iter;
+
     int precision = m_tm->getParam<int>("precision");
     price_t per_cash = 0.0;
 
     per_cash = m_tm->currentCash() / total_weight;
-    sw_iter = sw_list.begin();
-    for (; sw_iter != sw_list.end(); ++sw_iter) {
+    sw_iter = sw_list.rbegin();
+    for (; sw_iter != end_iter; ++sw_iter) {
         price_t will_cash = per_cash * sw_iter->weight;
         if (will_cash == 0.0) {
             continue;
@@ -223,33 +188,5 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
     }
 }
 
-
-SystemWeightList AllocateFundsBase
-::allocateWeight(const Datetime& date, const SystemList& se_list) {
-    //se_list是当前选中的系统实例、hold_list是当前有持仓的系统实例，两者可能是重复的
-
-    SystemWeightList result;
-
-    int max_num = getParam<int>("max_sys_num");
-
-    result = _allocateWeight(date, se_list);
-
-    stable_sort(result.begin(), result.end(),
-                boost::bind(std::less<price_t>(),
-                            boost::bind(&SystemWeight::weight, _1),
-                            boost::bind(&SystemWeight::weight, _2)));
-
-    size_t total = result.size();
-    if (total <= max_num) {
-        return result;
-    }
-
-    auto iter = result.begin() + max_num;
-    SystemWeightList sw_list;
-    sw_list.insert(sw_list.end(), result.begin(), iter);
-    //swap(result, sw_list);
-
-    return sw_list;
-}
 
 } /* namespace hku */
