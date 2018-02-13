@@ -211,9 +211,9 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_not_adjust_hold) {
 
 
 /** @par 检测点，自动调仓 */
-BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_adjust_hold) {
-
-}
+//BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_adjust_hold) {
+//TODO test_AF_EqualWeight_adjust_hold
+//}
 
 /** @} */
 

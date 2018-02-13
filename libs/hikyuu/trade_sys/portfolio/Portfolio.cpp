@@ -117,6 +117,13 @@ void Portfolio::run(const KQuery& query) {
         }
     }
 
+    SystemList delay_sys_list;
+    for (sys_iter = m_sys_list.begin(); sys_iter != m_sys_list.end(); ++sys_iter) {
+        if ((*sys_iter)->getParam<bool>("delay")) {
+            delay_sys_list.push_back(*sys_iter);
+        }
+    }
+
     std::set<SYSPtr> cur_hold_sys_sets;
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
@@ -128,11 +135,12 @@ void Portfolio::run(const KQuery& query) {
         }
 
         //处理延迟操作请求
-        sys_iter = m_sys_list.begin();
-        for (; sys_iter != m_sys_list.end(); ++sys_iter) {
+        sys_iter = delay_sys_list.begin();
+        for (; sys_iter != delay_sys_list.end(); ++sys_iter) {
             (*sys_iter)->_processRequest(*date_iter);
 
-            if ((*sys_iter)->getTM()->have((*sys_iter)->getStock())) {
+            //if ((*sys_iter)->getTM()->have((*sys_iter)->getStock())) {
+            if ((*sys_iter)->getTM()->getStockNumber() != 0) {
                 cur_hold_sys_sets.insert(*sys_iter);
             } else {
                 cur_hold_sys_sets.erase(*sys_iter);
@@ -142,7 +150,7 @@ void Portfolio::run(const KQuery& query) {
             TradeRecordList tr_list = (*sys_iter)->getTM()->getTradeList(*date_iter, Null<Datetime>());
             auto tr_iter = tr_list.begin();
             for (; tr_iter != tr_list.end(); ++tr_iter) {
-                m_tm->addTradeRecord(*tr_iter);
+                m_tm_shadow->addTradeRecord(*tr_iter);
             }
         }
 
@@ -154,14 +162,36 @@ void Portfolio::run(const KQuery& query) {
 
         //计算当前时刻选择的系统实例
         SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
-        SystemList sw_list = m_af->getAllocatedSystemList(*date_iter,
+        SystemList ac_list = m_af->getAllocatedSystemList(*date_iter,
                                            selected_list, cur_hold_sys_list);
 
-        auto sw_iter = sw_list.begin();
-        for (; sw_iter != sw_list.end(); ++sw_iter) {
-            (*sw_iter)->runMoment(*date_iter);
+        for (sys_iter = ac_list.begin(); sys_iter != ac_list.end(); ++sys_iter) {
+            (*sys_iter)->runMoment(*date_iter);
+
+            //同步交易记录
+            TradeRecordList tr_list = (*sys_iter)->getTM()->getTradeList(*date_iter, Null<Datetime>());
+            auto tr_iter = tr_list.begin();
+            for (; tr_iter != tr_list.end(); ++tr_iter) {
+                m_tm_shadow->addTradeRecord(*tr_iter);
+            }
         }
 
+        //同步总账户和影子账户交易记录
+        TradeRecordList tr_list = m_tm_shadow->getTradeList(*date_iter, Null<Datetime>());
+        auto tr_iter = tr_list.begin();
+        for (; tr_iter != tr_list.end(); ++tr_iter) {
+            if (tr_iter->business == BUSINESS_CHECKIN
+             || tr_iter->business == BUSINESS_CHECKOUT) {
+                continue;
+            }
+
+            m_tm->addTradeRecord(*tr_iter);
+        }
+
+        if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
+            HKU_INFO("m_tm->currentCash() != m_tm_shadow->currentCash()");
+            HKU_INFO(m_tm->currentCash() << " -- " << m_tm_shadow->currentCash());
+        }
     }
 }
 
