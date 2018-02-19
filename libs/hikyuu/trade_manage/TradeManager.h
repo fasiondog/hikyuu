@@ -84,7 +84,7 @@ public:
     string name() const { return m_name; }
 
     /** 设置账户名称 */
-    void setName(const string& name) { m_name = name; }
+    void name(const string& name) { m_name = name; }
 
     /** 初始资金 */
     price_t initCash() const { return m_init_cash; }

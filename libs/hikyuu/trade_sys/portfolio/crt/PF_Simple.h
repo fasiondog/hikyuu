@@ -9,7 +9,6 @@
 #define TRADE_SYS_PORTFOLIO_IMP_PF_SIMPLE_H_
 
 #include "../Portfolio.h"
-#include "../../system/crt/SYS_Simple.h"
 #include "../../selector/crt/SE_Fixed.h"
 #include "../../allocatefunds/crt/AF_EqualWeight.h"
 
@@ -17,7 +16,6 @@ namespace hku {
 
 PortfolioPtr HKU_API PF_Simple(
         const TMPtr& tm = TradeManagerPtr(),
-        const SYSPtr& sys = SYS_Simple(),
         const SEPtr& st = SE_Fixed(),
         const AFPtr& af = AF_EqualWeight());
 

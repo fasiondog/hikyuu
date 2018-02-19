@@ -122,7 +122,8 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
     //从当前选中的系统列表中将持仓的系统排除
     SystemList pure_se_list;
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        if ((*iter)->getTM()->getStockNumber() == 0) {
+        //if ((*iter)->getTM()->getStockNumber() == 0) {
+        if (!(*iter)->getTM()->have((*iter)->getStock())) {
             pure_se_list.push_back(*iter);
         }
     }

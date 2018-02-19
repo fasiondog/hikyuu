@@ -36,7 +36,6 @@ Portfolio::Portfolio(const string& name) : m_name(name) {
 }
 
 Portfolio::Portfolio(const TradeManagerPtr& tm,
-        const SystemPtr& sys,
         const SelectorPtr& se,
         const AFPtr& af)
 : m_name("Portfolio"), m_se(se), m_tm(tm), m_af(af) {
@@ -52,7 +51,6 @@ void Portfolio::reset() {
     if (m_se) m_se->reset();
     if (m_af) m_af->reset();
     if (m_tm_shadow) m_tm_shadow->reset();
-    m_sys_list.clear();
 }
 
 PortfolioPtr Portfolio::clone() {
@@ -63,7 +61,6 @@ PortfolioPtr Portfolio::clone() {
     if (m_af) p->m_af = m_af->clone();
     if (m_tm) p->m_tm = m_tm->clone();
     if (m_tm_shadow) p->m_tm_shadow = m_tm_shadow->clone();
-    p->m_sys_list = m_sys_list;
     return p;
 }
 
@@ -86,19 +83,9 @@ bool Portfolio::readyForRun() {
 
     reset();
 
-    m_tm_shadow = m_tm->clone();
-
     //将影子账户指定给资产分配器
+    m_tm_shadow = m_tm->clone();
     m_af->setTM(m_tm_shadow);
-
-    //为每一个圈定的系统实例设置一个初始为0的子账户，并缓存所有的系统实例
-    TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "SUB");
-    SystemList all_sys_list = m_se->getAllSystemList();
-    auto sysIter = all_sys_list.begin();
-    for (; sysIter != all_sys_list.end(); ++sysIter) {
-        (*sysIter)->setTM(pro_tm->clone());
-        m_sys_list.push_back(*sysIter);
-    }
 
     return true;
 }
@@ -108,19 +95,24 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
-    auto sys_iter = m_sys_list.begin();
-    for (; sys_iter != m_sys_list.end(); ++sys_iter) {
-        SystemPtr sys = *sys_iter;
+    SystemList delay_sys_list;  //存储延迟模式的系统列表
+
+    SystemList all_sys_list = m_se->getAllSystemList();
+    TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "SUB");
+    auto sys_iter = all_sys_list.begin();
+    for (; sys_iter != all_sys_list.end(); ++sys_iter) {
+
+        //为每一个系统实例分配子账户
+        SystemPtr& sys = *sys_iter;
+        sys->setTM(pro_tm->clone());
+
         if (sys->readyForRun()) {
+            if (sys->getParam<bool>("delay")) {
+                delay_sys_list.push_back(sys);
+            }
+
             KData k = sys->getStock().getKData(query);
             sys->setTO(k);
-        }
-    }
-
-    SystemList delay_sys_list;
-    for (sys_iter = m_sys_list.begin(); sys_iter != m_sys_list.end(); ++sys_iter) {
-        if ((*sys_iter)->getParam<bool>("delay")) {
-            delay_sys_list.push_back(*sys_iter);
         }
     }
 
@@ -137,17 +129,28 @@ void Portfolio::run(const KQuery& query) {
         //处理延迟操作请求
         sys_iter = delay_sys_list.begin();
         for (; sys_iter != delay_sys_list.end(); ++sys_iter) {
-            (*sys_iter)->_processRequest(*date_iter);
+            SYSPtr& sys = *sys_iter;
+            if (!sys->haveDelayRequest()) {
+                continue;
+            }
 
-            //if ((*sys_iter)->getTM()->have((*sys_iter)->getStock())) {
-            if ((*sys_iter)->getTM()->getStockNumber() != 0) {
-                cur_hold_sys_sets.insert(*sys_iter);
+            Stock stk = sys->getStock();
+            if (stk.isNull()) {
+                continue;
+            }
+
+            KRecord kr = stk.getKRecordByDate(*date_iter);
+            //sys->_processRequest(kr);
+
+            if (sys->getTM()->have(stk)) {
+            //if ((*sys_iter)->getTM()->getStockNumber() != 0) {
+                cur_hold_sys_sets.insert(sys);
             } else {
-                cur_hold_sys_sets.erase(*sys_iter);
+                cur_hold_sys_sets.erase(sys);
             }
 
             //同步交易记录
-            TradeRecordList tr_list = (*sys_iter)->getTM()->getTradeList(*date_iter, Null<Datetime>());
+            TradeRecordList tr_list = sys->getTM()->getTradeList(*date_iter, Null<Datetime>());
             auto tr_iter = tr_list.begin();
             for (; tr_iter != tr_list.end(); ++tr_iter) {
                 m_tm_shadow->addTradeRecord(*tr_iter);
@@ -165,11 +168,22 @@ void Portfolio::run(const KQuery& query) {
         SystemList ac_list = m_af->getAllocatedSystemList(*date_iter,
                                            selected_list, cur_hold_sys_list);
 
+
+        std::cout << "=====================" << std::endl;
         for (sys_iter = ac_list.begin(); sys_iter != ac_list.end(); ++sys_iter) {
-            (*sys_iter)->runMoment(*date_iter);
+            SYSPtr& sys = *sys_iter;
+            sys->runMoment(*date_iter);
+
+            std::cout << *date_iter << ": " << sys->getStock() << std::endl;
+
+            if (sys->getTM()->have(sys->getStock())) {
+                cur_hold_sys_sets.insert(sys);
+            } else {
+                cur_hold_sys_sets.erase(sys);
+            }
 
             //同步交易记录
-            TradeRecordList tr_list = (*sys_iter)->getTM()->getTradeList(*date_iter, Null<Datetime>());
+            TradeRecordList tr_list = sys->getTM()->getTradeList(*date_iter, Null<Datetime>());
             auto tr_iter = tr_list.begin();
             for (; tr_iter != tr_list.end(); ++tr_iter) {
                 m_tm_shadow->addTradeRecord(*tr_iter);
@@ -195,13 +209,6 @@ void Portfolio::run(const KQuery& query) {
     }
 }
 
-
-void Portfolio::runOneMoment(Datetime date) {
-    if (date < m_tm->initDatetime()) {
-        return;
-    }
-
-}
 
 
 } /* namespace hku */

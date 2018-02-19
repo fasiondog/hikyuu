@@ -129,6 +129,7 @@ size_t MoneyManagerBase
         HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
                 << stock.market_code() << ") price(" << price
                 << ") risk(" << risk
+                << ") Part(" << getSystemPartName(from)
                 << ") [MoneyManagerBase::getBuyNumber]");
         return 0;
     }

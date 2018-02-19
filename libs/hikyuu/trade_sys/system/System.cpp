@@ -100,7 +100,8 @@ void System::initParam() {
     //连续延迟交易请求的限制次数，需大于等于0，0表示只允许延迟1次
     setParam<int>("max_delay_count", 3);
 
-    setParam<bool>("delay", true); //延迟操作，取当前Bar的收盘价操作；非延迟取开盘价
+    //是否延迟到下一个bar开盘时进行交易
+    setParam<bool>("delay", true); //非延迟操作取当前Bar的收盘价操作；延迟取下一BAR开盘价
 
     //延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);

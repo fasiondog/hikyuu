@@ -30,7 +30,6 @@ public:
     Portfolio();
     Portfolio(const string& name);
     Portfolio(const TradeManagerPtr& tm,
-            const SystemPtr& sys,
             const SelectorPtr& st,
             const AFPtr& af);
     virtual ~Portfolio();
@@ -58,16 +57,14 @@ private:
 
     void rebuildOnlyTotalTM();
 
-    void runOneMoment(Datetime);
-
 protected:
     string m_name;
     SEPtr  m_se;
     AFPtr  m_af;
     TMPtr  m_tm;
 
-    TMPtr  m_tm_shadow;    //临时变量，影子账户，用于内部协调分配资金
-    SystemList m_sys_list; //临时变量，缓存从SE获取的全部系统实例，仅在调用readyForRun后有效
+    //以下为临时变量
+    TMPtr  m_tm_shadow;    //影子账户，用于内部协调分配资金
 
 //============================================
 // 序列化支持

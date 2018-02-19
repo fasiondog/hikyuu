@@ -14,7 +14,7 @@
 #endif
 
 #include <hikyuu/StockManager.h>
-#include <hikyuu/trade_sys/portfolio/Portfolio.h>
+#include <hikyuu/trade_sys/portfolio/crt/PF_Simple.h>
 
 using namespace hku;
 
@@ -24,16 +24,15 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_Portfolio) {
-    PortfolioPtr pf = make_shared<Portfolio>();
-
+/** @par 检测点 Portfolio基础操作 */
+BOOST_AUTO_TEST_CASE( test_PF_for_base) {
+    PortfolioPtr pf = PF_Simple();
     BOOST_CHECK(pf->name() == "Portfolio");
 
-    StockManager& sm = StockManager::instance();
-
-    //pf->addStock(sm["sh000001"]);
-    //std::cout << sys << std::endl;
+    /** @arg 克隆操作 */
+    PFPtr pf2 = pf->clone();
+    BOOST_CHECK(pf2.get() != pf.get());
+    BOOST_CHECK(pf2->name() == pf->name());
 }
 
 /** @} */
