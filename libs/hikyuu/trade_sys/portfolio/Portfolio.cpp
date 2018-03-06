@@ -116,7 +116,7 @@ void Portfolio::run(const KQuery& query) {
         }
     }
 
-    std::set<SYSPtr> cur_hold_sys_sets;
+    SystemList pre_ac_list; //上一轮实际获得分配资金的系统列表
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
@@ -126,61 +126,37 @@ void Portfolio::run(const KQuery& query) {
             continue;
         }
 
-        //处理延迟操作请求
-        sys_iter = delay_sys_list.begin();
-        for (; sys_iter != delay_sys_list.end(); ++sys_iter) {
-            SYSPtr& sys = *sys_iter;
-            if (!sys->haveDelayRequest()) {
-                continue;
-            }
+        //计算当前时刻选择的系统实例
+        SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
 
-            Stock stk = sys->getStock();
-            if (stk.isNull()) {
-                continue;
-            }
-
-            KRecord kr = stk.getKRecordByDate(*date_iter);
-            //sys->_processRequest(kr);
-
-            if (sys->getTM()->have(stk)) {
-            //if ((*sys_iter)->getTM()->getStockNumber() != 0) {
-                cur_hold_sys_sets.insert(sys);
-            } else {
-                cur_hold_sys_sets.erase(sys);
-            }
-
-            //同步交易记录
-            TradeRecordList tr_list = sys->getTM()->getTradeList(*date_iter, Null<Datetime>());
-            auto tr_iter = tr_list.begin();
-            for (; tr_iter != tr_list.end(); ++tr_iter) {
-                m_tm_shadow->addTradeRecord(*tr_iter);
-            }
+        //如果上一轮分配资金的系统不在本次选择的系统范围内，且已经不存在持仓和延迟交易请求，则回收子账户资金
+        std::set<SYSPtr> selected_sets;
+        for (sys_iter = selected_list.begin(); sys_iter != selected_list.end(); ++sys_iter) {
+            selected_sets.insert(*sys_iter);
         }
 
         SystemList cur_hold_sys_list;
-        auto hold_iter = cur_hold_sys_sets.begin();
-        for (; hold_iter != cur_hold_sys_sets.end(); ++hold_iter) {
-            cur_hold_sys_list.push_back(*hold_iter);
+        auto hold_iter = pre_ac_list.begin();
+        for (; hold_iter != pre_ac_list.end(); ++hold_iter) {
+            SYSPtr& sys = *hold_iter;
+            if (selected_sets.find(sys) != selected_sets.end()) {
+                TMPtr& tm = sys->getTM();
+                if (sys->haveDelayRequest() || tm->have(sys->getStock())) {
+                    cur_hold_sys_list.push_back(sys);
+                } else {
+                    price_t cash = tm->checkout(*date_iter, tm->currentCash());
+                    m_tm_shadow->checkin(*date_iter, cash);
+                }
+            }
         }
 
-        //计算当前时刻选择的系统实例
-        SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
+
         SystemList ac_list = m_af->getAllocatedSystemList(*date_iter,
                                            selected_list, cur_hold_sys_list);
 
-
-        std::cout << "=====================" << std::endl;
         for (sys_iter = ac_list.begin(); sys_iter != ac_list.end(); ++sys_iter) {
             SYSPtr& sys = *sys_iter;
             sys->runMoment(*date_iter);
-
-            std::cout << *date_iter << ": " << sys->getStock() << std::endl;
-
-            if (sys->getTM()->have(sys->getStock())) {
-                cur_hold_sys_sets.insert(sys);
-            } else {
-                cur_hold_sys_sets.erase(sys);
-            }
 
             //同步交易记录
             TradeRecordList tr_list = sys->getTM()->getTradeList(*date_iter, Null<Datetime>());
@@ -201,6 +177,8 @@ void Portfolio::run(const KQuery& query) {
 
             m_tm->addTradeRecord(*tr_iter);
         }
+
+        swap(pre_ac_list, ac_list);
 
         if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
             HKU_INFO("m_tm->currentCash() != m_tm_shadow->currentCash()");

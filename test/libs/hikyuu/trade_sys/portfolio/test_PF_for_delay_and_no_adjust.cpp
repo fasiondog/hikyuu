@@ -70,6 +70,9 @@ BOOST_AUTO_TEST_CASE( test_PF_for_delay_and_no_adjust) {
     std::cout << tr1.size() << std::endl;
     std::cout << tr2.size() << std::endl;
 
+    std::cout << sys->getTM()->currentCash() << std::endl;
+    std::cout << tm->currentCash() << std::endl;
+
 
 }
 
