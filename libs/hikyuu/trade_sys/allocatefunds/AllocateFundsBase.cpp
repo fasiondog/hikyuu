@@ -120,10 +120,14 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
     }
 
     //从当前选中的系统列表中将持仓的系统排除
+    std::set<SYSPtr> hold_sets;
+    for (auto iter = hold_list.begin(); iter != hold_list.end(); ++iter) {
+        hold_sets.insert(*iter);
+    }
+
     SystemList pure_se_list;
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        //if ((*iter)->getTM()->getStockNumber() == 0) {
-        if (!(*iter)->getTM()->have((*iter)->getStock())) {
+        if (hold_sets.find(*iter) == hold_sets.end()) {
             pure_se_list.push_back(*iter);
         }
     }

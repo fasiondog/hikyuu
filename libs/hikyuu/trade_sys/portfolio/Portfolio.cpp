@@ -95,8 +95,6 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
-    SystemList delay_sys_list;  //存储延迟模式的系统列表
-
     SystemList all_sys_list = m_se->getAllSystemList();
     TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "SUB");
     auto sys_iter = all_sys_list.begin();
@@ -107,10 +105,6 @@ void Portfolio::run(const KQuery& query) {
         sys->setTM(pro_tm->clone());
 
         if (sys->readyForRun()) {
-            if (sys->getParam<bool>("delay")) {
-                delay_sys_list.push_back(sys);
-            }
-
             KData k = sys->getStock().getKData(query);
             sys->setTO(k);
         }
@@ -129,7 +123,7 @@ void Portfolio::run(const KQuery& query) {
         //计算当前时刻选择的系统实例
         SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
 
-        //如果上一轮分配资金的系统不在本次选择的系统范围内，且已经不存在持仓和延迟交易请求，则回收子账户资金
+        //获取上一轮分配资金的系统中仍旧有持仓或存在延迟请求的系统
         std::set<SYSPtr> selected_sets;
         for (sys_iter = selected_list.begin(); sys_iter != selected_list.end(); ++sys_iter) {
             selected_sets.insert(*sys_iter);
@@ -143,13 +137,9 @@ void Portfolio::run(const KQuery& query) {
                 TMPtr& tm = sys->getTM();
                 if (sys->haveDelayRequest() || tm->have(sys->getStock())) {
                     cur_hold_sys_list.push_back(sys);
-                } else {
-                    price_t cash = tm->checkout(*date_iter, tm->currentCash());
-                    m_tm_shadow->checkin(*date_iter, cash);
                 }
             }
         }
-
 
         SystemList ac_list = m_af->getAllocatedSystemList(*date_iter,
                                            selected_list, cur_hold_sys_list);
@@ -182,7 +172,7 @@ void Portfolio::run(const KQuery& query) {
 
         if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
             HKU_INFO("m_tm->currentCash() != m_tm_shadow->currentCash()");
-            HKU_INFO(m_tm->currentCash() << " -- " << m_tm_shadow->currentCash());
+            HKU_INFO(m_tm->currentCash() << " == " << m_tm_shadow->currentCash());
         }
     }
 }

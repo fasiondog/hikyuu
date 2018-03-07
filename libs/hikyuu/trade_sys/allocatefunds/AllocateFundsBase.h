@@ -34,7 +34,7 @@ public:
      * Portfolio获取实际获得资产分配的系统策略实例
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
-     * @param hold_list 当前持仓的系统实例
+     * @param hold_list 当前分配过资金的系统实例
      * @return
      */
     SystemList getAllocatedSystemList(const Datetime& date,
