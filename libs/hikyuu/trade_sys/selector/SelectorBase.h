@@ -40,6 +40,8 @@ public:
 
     SystemList getAllSystemList() const { return m_sys_list; }
 
+    bool changed(Datetime date);
+
     void reset();
 
     void clear();
@@ -47,7 +49,9 @@ public:
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    virtual SystemList getSelectedSystemList(Datetime date) = 0;
+    SystemList getSelectedSystemList(Datetime date);
+
+    virtual SystemList _getSelectedSystemList(Datetime date) = 0;
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -59,6 +63,9 @@ public:
 protected:
     string m_name;
     SystemList m_sys_list;
+
+    Datetime m_pre_datetime;
+    SystemList m_pre_selected_list;
 
 //============================================
 // 序列化支持
@@ -72,6 +79,8 @@ private:
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_sys_list);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_datetime);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_selected_list);
     }
 
     template<class Archive>
@@ -79,6 +88,8 @@ private:
         ar & boost::serialization::make_nvp("name", m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_sys_list);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_datetime);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_selected_list);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -118,7 +129,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
     virtual SelectorPtr _clone() {\
         return SelectorPtr(new classname());\
     }\
-    virtual SystemList getSelectedSystemList(Datetime date);
+    virtual SystemList _getSelectedSystemList(Datetime date);
 
 
 /**

@@ -47,6 +47,7 @@ BOOST_AUTO_TEST_CASE( test_SE_Fixed) {
     se->addStock(sm["sz000001"], sys);
     se->addStock(sm["sz000002"], sys);
 
+    se->reset();
     result = se->getSelectedSystemList(Datetime(200001010000L));
     BOOST_CHECK(result.size() == 3);
     BOOST_CHECK(sm["sh600000"] == result[0]->getStock());

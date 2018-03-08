@@ -18,7 +18,7 @@ FixedSelector::~FixedSelector() {
 }
 
 
-SystemList FixedSelector::getSelectedSystemList(Datetime date) {
+SystemList FixedSelector::_getSelectedSystemList(Datetime date) {
     return m_sys_list;
 }
 

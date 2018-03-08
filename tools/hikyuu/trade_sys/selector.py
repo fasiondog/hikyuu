@@ -39,6 +39,10 @@ SelectorBase.__repr__ = reprFunc
 SelectorBase.__doc__ = """
 选择器策略基类，实现标的、系统策略的评估和选取算法
 
+公共参数：
+
+    freq (int | KQuery::DAY)  变化频度，选股的变化周期
+
 自定义选择器策略接口：
 
     SelectorBase.getSelectedSystemList - 【必须】获取指定时刻选择的系统实例列表
@@ -101,9 +105,14 @@ clear(self)
     清除已加入的所有交易系统实例
 """
 
-
 SelectorBase.getSelectedSystemList.__doc__ = """
 getSelectedSystemList(self, datetime)
+    
+    获取指定时刻选取的标的及其权重
+"""
+
+SelectorBase._getSelectedSystemList.__doc__ = """
+_getSelectedSystemList(self, datetime)
     
     【重载接口】获取指定时刻选取的标的及其权重
         
