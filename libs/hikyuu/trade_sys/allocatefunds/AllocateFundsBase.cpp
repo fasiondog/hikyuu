@@ -28,12 +28,14 @@ HKU_API std::ostream & operator<<(std::ostream& os, const AFPtr& af) {
 AllocateFundsBase::AllocateFundsBase(): m_name("AllocateMoneyBase") {
     setParam<bool>("adjust_hold_sys", false); //是否调整之前已经持仓策略的持仓
     setParam<int>("max_sys_num", 10); //最大系统实例数
+    setParam<int>("freq", KQuery::DAY); //调仓频率
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name)
 : m_name("AllocateMoneyBase") {
     setParam<bool>("adjust_hold_sys", false);
     setParam<int>("max_sys_num", 10); //最大系统实例数
+    setParam<int>("freq", KQuery::DAY); //调仓频率
 }
 
 AllocateFundsBase::~AllocateFundsBase() {

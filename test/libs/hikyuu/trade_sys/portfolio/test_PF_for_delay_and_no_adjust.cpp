@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE( test_PF_for_delay_and_no_adjust) {
     TradeRecordList tr2 = tm->getTradeList();
     BOOST_CHECK(tr1.size() == tr2.size());
 
-    /*std::cout << tr1.size() << std::endl;
+    std::cout << tr1.size() << std::endl;
     for (auto iter = tr1.begin(); iter != tr1.end(); ++iter) {
         std::cout << *iter << std::endl;
     }
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE( test_PF_for_delay_and_no_adjust) {
 
     std::cout << sys->getTM()->currentCash() << std::endl;
     std::cout << tm->currentCash() << std::endl;
-    */
+
 
 }
 

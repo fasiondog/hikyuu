@@ -60,8 +60,17 @@ public:
     virtual SelectorPtr _clone() = 0;
 
 
+    void setQuery(KQuery query) {
+        m_query = query;
+    }
+
+    KQuery getQuery() const {
+        return m_query;
+    }
+
 protected:
     string m_name;
+    KQuery m_query;
     SystemList m_sys_list;
 
     Datetime m_pre_datetime;
@@ -78,6 +87,7 @@ private:
         string name_str(GBToUTF8(m_name));
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar & BOOST_SERIALIZATION_NVP(m_query);
         ar & BOOST_SERIALIZATION_NVP(m_sys_list);
         ar & BOOST_SERIALIZATION_NVP(m_pre_datetime);
         ar & BOOST_SERIALIZATION_NVP(m_pre_selected_list);
@@ -87,6 +97,7 @@ private:
     void load(Archive & ar, const unsigned int version) {
         ar & boost::serialization::make_nvp("name", m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar & BOOST_SERIALIZATION_NVP(m_query);
         ar & BOOST_SERIALIZATION_NVP(m_sys_list);
         ar & BOOST_SERIALIZATION_NVP(m_pre_datetime);
         ar & BOOST_SERIALIZATION_NVP(m_pre_selected_list);

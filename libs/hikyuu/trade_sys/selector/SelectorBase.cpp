@@ -72,6 +72,7 @@ SelectorPtr SelectorBase::clone() {
     p->m_params = m_params;
 
     p->m_name = m_name;
+    p->m_query = m_query;
     p->m_pre_datetime = m_pre_datetime;
     p->m_pre_selected_list = m_pre_selected_list;
 
