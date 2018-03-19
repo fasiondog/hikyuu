@@ -62,6 +62,12 @@ AFPtr AllocateFundsBase::clone() {
     return p;
 }
 
+
+bool AllocateFundsBase::changed(Datetime date) {
+    return true;
+}
+
+
 SystemList AllocateFundsBase
 ::getAllocatedSystemList(const Datetime& date,
         const SystemList& se_list, const SystemList& hold_list) {
@@ -84,6 +90,7 @@ SystemList AllocateFundsBase
 
     return result;
 }
+
 
 void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
         const Datetime& date,

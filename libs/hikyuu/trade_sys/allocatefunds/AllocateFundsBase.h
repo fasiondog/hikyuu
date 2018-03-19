@@ -47,6 +47,8 @@ public:
     /** 设定交易账户 */
     void setTM(const TMPtr&);
 
+    bool changed(Datetime date);
+
     /** 复位 */
     void reset();
 
@@ -73,7 +75,6 @@ public:
     virtual SystemWeightList _allocateWeight(const Datetime& date,
                                              const SystemList& se_list) = 0;
 
-private:
     void _getAllocatedSystemList_adjust_hold(
             const Datetime& date,
             const SystemList& se_list,

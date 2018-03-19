@@ -110,16 +110,13 @@ void Portfolio::run(const KQuery& query) {
         }
     }
 
-    SystemList selected_list;
-    SystemList pre_selected_list; //上一次的选中标的列表
-    SystemList pre_ac_list; //上一轮实际获得分配资金的系统列表
+    m_se->setQuery(query);
+    //TODO: m_af->setQuery(query);
 
-    SystemList cur_hold_sys_list;
-
-    //上一次选中本次没有选中，但当前仍然持仓的系统列表
-    SystemList pre_selected_but_hold_list;
-
-    std::set<SYSPtr> cur_selected_list_sets;
+    SystemList       cur_selected_list;  //当前选中系统列表
+    std::set<SYSPtr> cur_selected_sets; //当前选中系统集合，方便计算使用
+    SystemList cur_allocated_list; //当前分配了资金的系统
+    SystemList cur_hold_sys_list;  //当前时刻有持仓的系统，每个时刻重新收集
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
@@ -131,164 +128,65 @@ void Portfolio::run(const KQuery& query) {
             continue;
         }
 
-        /*
-         * 资金分配频率应该小于等于选择频率
-         *
-         * （由于有些系统可能是延迟操作，所以有多种情况）
-         *
-         * 如果当前时刻选择标的发生变化（此时也一定是资金调整分配的时刻）
-         *    收集当前仍旧有持仓的系统
-         *    回收上一次选中的标的中已没有持仓系统的资金
-         *    记录上一次选中本次未选中且仍有持仓的系统
-         *    执行资金分配算法（其中非强制分配的，已有持仓系统如果有剩余现金被取出参与资金重新分配；
-         *                  而强制分配的，已有持仓的系统剩余资金被取出参与重分配同时被强制发出
-         *                  卖出信号，其中延迟操作的系统卖出操作将在下一时刻才会执行卖出操作）
-         *
-         * 如果当前时刻选择标的没有发生变化
-         *    如果上一次选中但本次没选中，原本持仓的系统现在已经空仓，则回收资金
-         *
-         *    收集当前仍旧有持仓的系统
-         *    如果是调仓时刻
-         *       如果非选中标的的已有持仓策略变成了空仓，则重新执行分配算法分配空仓后多余的资金
-         *       否则不执行调仓策略
-         *    如果不是调仓时刻
-         *       如果是强制调仓，则执行调仓操作
-         *
-         */
-
         cur_hold_sys_list.clear();
 
-#if 1
+        //----------------------------------------------------------
         //如果当前时刻选择标的发生变化（此时也一定是资金调整分配的时刻）
-        if (m_se->changed(cur_date)) {
+        //----------------------------------------------------------
+        bool selected_changed = m_se->changed(cur_date);
+        if (selected_changed) {
 
-            //计算当前时刻选择的系统实例
-            selected_list = m_se->_getSelectedSystemList(cur_date);
+            //重新计算当前时刻选择的系统实例
+            cur_selected_list = m_se->_getSelectedSystemList(cur_date);
 
-            cur_selected_list_sets.clear();
-            sys_iter = selected_list.begin();
-            for (; sys_iter != selected_list.end(); ++sys_iter) {
-                cur_selected_list_sets.insert(*sys_iter);
+            //构建当前时刻选择的系统实例集合，便于后续计算
+            cur_selected_sets.clear();
+            sys_iter = cur_selected_list.begin();
+            for (; sys_iter != cur_selected_list.end(); ++sys_iter) {
+                cur_selected_sets.insert(*sys_iter);
             }
-
-            //收集当前仍旧有持仓的系统,并回收上一次选中的标的中已没有持仓系统的资金
-            sys_iter = pre_ac_list.begin();
-            for (; sys_iter != pre_ac_list.end(); ++sys_iter) {
-                SYSPtr& sys = *sys_iter;
-                TMPtr& tm = sys->getTM();
-                if (tm->getStockNumber() != 0) {
-                    cur_hold_sys_list.push_back(sys);
-                    pre_selected_but_hold_list.push_back(sys);
-                } else {
-                    price_t cash = tm->currentCash();
-                    if (cash > 0) {
-                        m_tm_shadow->checkin(cur_date, cash);
-                        tm->checkout(cur_date, cash);
-                    }
-                }
-            }
-
-            SystemList ac_list = m_af->getAllocatedSystemList(cur_date,
-                                               selected_list, cur_hold_sys_list);
-
-            for (sys_iter = ac_list.begin(); sys_iter != ac_list.end(); ++sys_iter) {
-                SYSPtr& sys = *sys_iter;
-                sys->runMoment(cur_date);
-
-                //同步交易记录
-                TradeRecordList tr_list = sys->getTM()->getTradeList(cur_date, Null<Datetime>());
-                auto tr_iter = tr_list.begin();
-                for (; tr_iter != tr_list.end(); ++tr_iter) {
-                    m_tm_shadow->addTradeRecord(*tr_iter);
-                }
-            }
-
-            //同步总账户和影子账户交易记录
-            TradeRecordList tr_list = m_tm_shadow->getTradeList(cur_date, Null<Datetime>());
-            auto tr_iter = tr_list.begin();
-            for (; tr_iter != tr_list.end(); ++tr_iter) {
-                if (tr_iter->business == BUSINESS_CHECKIN
-                 || tr_iter->business == BUSINESS_CHECKOUT) {
-                    continue;
-                }
-
-                m_tm->addTradeRecord(*tr_iter);
-            }
-
-            swap(pre_ac_list, ac_list);
-            //swap(pre_selected_list, selected_list);
-
-            if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
-                HKU_INFO("m_tm->currentCash() != m_tm_shadow->currentCash()");
-                HKU_INFO(m_tm->currentCash() << " == " << m_tm_shadow->currentCash());
-            }
-
-        //如果当前时刻选择标的没有发生变化
-        } else {
-
-            SystemList tmp_list;
-            sys_iter = pre_selected_but_hold_list.begin();
-            for (; sys_iter != pre_selected_but_hold_list.end(); ++sys_iter) {
-                SYSPtr& sys = *sys_iter;
-                TMPtr& tm = sys->getTM();
-                if (tm->getStockNumber() != 0) {
-                    tmp_list.push_back(sys);
-                } else {
-                    price_t cash = tm->currentCash();
-                    if (cash > 0) {
-                        m_tm_shadow->checkin(cur_date, cash);
-                        tm->checkout(cur_date, cash);
-                    }
-                }
-            }
-
-            swap(pre_selected_but_hold_list, tmp_list);
-
-            SystemList ac_list = m_af->getAllocatedSystemList(cur_date,
-                                               selected_list, cur_hold_sys_list);
-
 
         }
-#endif
 
-#if 0
-        //计算当前时刻选择的系统实例
-        SystemList selected_list = m_se->getSelectedSystemList(*date_iter);
-        if (selected_list.empty()) {
-            continue;
-        }
-
-        //获取上一轮分配资金的系统中仍旧有持仓或存在延迟请求的系统
-        std::set<SYSPtr> selected_sets;
-        for (sys_iter = selected_list.begin(); sys_iter != selected_list.end(); ++sys_iter) {
-            selected_sets.insert(*sys_iter);
-        }
-
-        //SystemList cur_hold_sys_list;
-        auto hold_iter = pre_ac_list.begin();
-        for (; hold_iter != pre_ac_list.end(); ++hold_iter) {
-            SYSPtr& sys = *hold_iter;
-            if (selected_sets.find(sys) != selected_sets.end()) {
-                TMPtr& tm = sys->getTM();
-                if (tm->getStockNumber() != 0) {
-                //if (sys->haveDelayRequest() || tm->have(sys->getStock())) {
-                    cur_hold_sys_list.push_back(sys);
-                }
-            }
-        }
-
-        SystemList ac_list = m_af->getAllocatedSystemList(*date_iter,
-                                           selected_list, cur_hold_sys_list);
-        if (ac_list.empty()) {
-            continue;
-        }
-
-        for (sys_iter = ac_list.begin(); sys_iter != ac_list.end(); ++sys_iter) {
+        //查找当前已分配资金的系统，如果不在当前选中的系统范围内，则回收期没有持仓的系统资金
+        sys_iter = cur_allocated_list.begin();
+        for (; sys_iter != cur_allocated_list.end(); ++sys_iter) {
             SYSPtr& sys = *sys_iter;
-            sys->runMoment(*date_iter);
+            TMPtr& tm = sys->getTM();
+
+            if (tm->getStockNumber() != 0) {
+                //收集当前仍有持仓的系统
+                cur_hold_sys_list.push_back(sys);
+
+            } else {
+                //如果该系统已没有持仓，且不在当前的选中系统范围内，则回收分配的资金
+                if (cur_selected_sets.find(sys) == cur_selected_sets.end()) {
+                    price_t cash = tm->currentCash();
+                    if (cash > 0) {
+                        //要先存入影子账户再取出子账户资金，否则后续交易记录同步会错误
+                        m_tm_shadow->checkin(cur_date, cash);
+                        tm->checkout(cur_date, cash);
+                    }
+                }
+            }
+        }
+
+        //如果选择列表更新或调整资金时刻，则调整资金分配
+        if (selected_changed || m_af->changed(cur_date)) {
+            cur_allocated_list = m_af->getAllocatedSystemList(cur_date,
+                    cur_selected_list, cur_hold_sys_list);
+        }
+
+        //----------------------------------------------------------
+        // 运行当前分配了资金的系统
+        //----------------------------------------------------------
+        sys_iter = cur_allocated_list.begin();
+        for (; sys_iter != cur_allocated_list.end(); ++sys_iter) {
+            SYSPtr& sys = *sys_iter;
+            sys->runMoment(cur_date);
 
             //同步交易记录
-            TradeRecordList tr_list = sys->getTM()->getTradeList(*date_iter, Null<Datetime>());
+            TradeRecordList tr_list = sys->getTM()->getTradeList(cur_date, Null<Datetime>());
             auto tr_iter = tr_list.begin();
             for (; tr_iter != tr_list.end(); ++tr_iter) {
                 m_tm_shadow->addTradeRecord(*tr_iter);
@@ -296,7 +194,7 @@ void Portfolio::run(const KQuery& query) {
         }
 
         //同步总账户和影子账户交易记录
-        TradeRecordList tr_list = m_tm_shadow->getTradeList(*date_iter, Null<Datetime>());
+        TradeRecordList tr_list = m_tm_shadow->getTradeList(cur_date, Null<Datetime>());
         auto tr_iter = tr_list.begin();
         for (; tr_iter != tr_list.end(); ++tr_iter) {
             if (tr_iter->business == BUSINESS_CHECKIN
@@ -307,14 +205,12 @@ void Portfolio::run(const KQuery& query) {
             m_tm->addTradeRecord(*tr_iter);
         }
 
-        swap(pre_ac_list, ac_list);
-
-        /*if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
+        if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
             HKU_INFO("m_tm->currentCash() != m_tm_shadow->currentCash()");
             HKU_INFO(m_tm->currentCash() << " == " << m_tm_shadow->currentCash());
-        }*/
-#endif
-    }
+        }
+
+    } // for datelist
 }
 
 
