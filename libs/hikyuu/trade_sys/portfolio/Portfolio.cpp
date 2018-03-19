@@ -110,16 +110,24 @@ void Portfolio::run(const KQuery& query) {
         }
     }
 
+    SystemList selected_list;
     SystemList pre_selected_list; //上一次的选中标的列表
     SystemList pre_ac_list; //上一轮实际获得分配资金的系统列表
 
     SystemList cur_hold_sys_list;
 
+    //上一次选中本次没有选中，但当前仍然持仓的系统列表
+    SystemList pre_selected_but_hold_list;
+
+    std::set<SYSPtr> cur_selected_list_sets;
+
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
     for(; date_iter != datelist.end(); ++date_iter) {
+        const Datetime& cur_date = *date_iter;
+
         //忽略小于账户初始建立日期的交易日
-        if (*date_iter < m_tm->initDatetime()) {
+        if (cur_date < m_tm->initDatetime()) {
             continue;
         }
 
@@ -131,24 +139,37 @@ void Portfolio::run(const KQuery& query) {
          * 如果当前时刻选择标的发生变化（此时也一定是资金调整分配的时刻）
          *    收集当前仍旧有持仓的系统
          *    回收上一次选中的标的中已没有持仓系统的资金
+         *    记录上一次选中本次未选中且仍有持仓的系统
          *    执行资金分配算法（其中非强制分配的，已有持仓系统如果有剩余现金被取出参与资金重新分配；
          *                  而强制分配的，已有持仓的系统剩余资金被取出参与重分配同时被强制发出
          *                  卖出信号，其中延迟操作的系统卖出操作将在下一时刻才会执行卖出操作）
          *
          * 如果当前时刻选择标的没有发生变化
+         *    如果上一次选中但本次没选中，原本持仓的系统现在已经空仓，则回收资金
+         *
          *    收集当前仍旧有持仓的系统
          *    如果是调仓时刻
          *       如果非选中标的的已有持仓策略变成了空仓，则重新执行分配算法分配空仓后多余的资金
          *       否则不执行调仓策略
          *    如果不是调仓时刻
          *       如果是强制调仓，则执行调仓操作
+         *
          */
 
         cur_hold_sys_list.clear();
 
 #if 1
         //如果当前时刻选择标的发生变化（此时也一定是资金调整分配的时刻）
-        if (m_se->changed(*date_iter)) {
+        if (m_se->changed(cur_date)) {
+
+            //计算当前时刻选择的系统实例
+            selected_list = m_se->_getSelectedSystemList(cur_date);
+
+            cur_selected_list_sets.clear();
+            sys_iter = selected_list.begin();
+            for (; sys_iter != selected_list.end(); ++sys_iter) {
+                cur_selected_list_sets.insert(*sys_iter);
+            }
 
             //收集当前仍旧有持仓的系统,并回收上一次选中的标的中已没有持仓系统的资金
             sys_iter = pre_ac_list.begin();
@@ -157,24 +178,25 @@ void Portfolio::run(const KQuery& query) {
                 TMPtr& tm = sys->getTM();
                 if (tm->getStockNumber() != 0) {
                     cur_hold_sys_list.push_back(sys);
+                    pre_selected_but_hold_list.push_back(sys);
+                } else {
+                    price_t cash = tm->currentCash();
+                    if (cash > 0) {
+                        m_tm_shadow->checkin(cur_date, cash);
+                        tm->checkout(cur_date, cash);
+                    }
                 }
             }
 
-            std::cout << *date_iter << " " << m_tm_shadow->currentCash() << std::endl;
-
-            //计算当前时刻选择的系统实例
-            SystemList selected_list = m_se->_getSelectedSystemList(*date_iter);
-            SystemList ac_list = m_af->getAllocatedSystemList(*date_iter,
+            SystemList ac_list = m_af->getAllocatedSystemList(cur_date,
                                                selected_list, cur_hold_sys_list);
 
-            std::cout << selected_list.size() << " " << ac_list.size() << std::endl;
-            std::cout << m_se << std::endl;
             for (sys_iter = ac_list.begin(); sys_iter != ac_list.end(); ++sys_iter) {
                 SYSPtr& sys = *sys_iter;
-                sys->runMoment(*date_iter);
+                sys->runMoment(cur_date);
 
                 //同步交易记录
-                TradeRecordList tr_list = sys->getTM()->getTradeList(*date_iter, Null<Datetime>());
+                TradeRecordList tr_list = sys->getTM()->getTradeList(cur_date, Null<Datetime>());
                 auto tr_iter = tr_list.begin();
                 for (; tr_iter != tr_list.end(); ++tr_iter) {
                     m_tm_shadow->addTradeRecord(*tr_iter);
@@ -182,7 +204,7 @@ void Portfolio::run(const KQuery& query) {
             }
 
             //同步总账户和影子账户交易记录
-            TradeRecordList tr_list = m_tm_shadow->getTradeList(*date_iter, Null<Datetime>());
+            TradeRecordList tr_list = m_tm_shadow->getTradeList(cur_date, Null<Datetime>());
             auto tr_iter = tr_list.begin();
             for (; tr_iter != tr_list.end(); ++tr_iter) {
                 if (tr_iter->business == BUSINESS_CHECKIN
@@ -194,11 +216,37 @@ void Portfolio::run(const KQuery& query) {
             }
 
             swap(pre_ac_list, ac_list);
+            //swap(pre_selected_list, selected_list);
 
             if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
                 HKU_INFO("m_tm->currentCash() != m_tm_shadow->currentCash()");
                 HKU_INFO(m_tm->currentCash() << " == " << m_tm_shadow->currentCash());
             }
+
+        //如果当前时刻选择标的没有发生变化
+        } else {
+
+            SystemList tmp_list;
+            sys_iter = pre_selected_but_hold_list.begin();
+            for (; sys_iter != pre_selected_but_hold_list.end(); ++sys_iter) {
+                SYSPtr& sys = *sys_iter;
+                TMPtr& tm = sys->getTM();
+                if (tm->getStockNumber() != 0) {
+                    tmp_list.push_back(sys);
+                } else {
+                    price_t cash = tm->currentCash();
+                    if (cash > 0) {
+                        m_tm_shadow->checkin(cur_date, cash);
+                        tm->checkout(cur_date, cash);
+                    }
+                }
+            }
+
+            swap(pre_selected_but_hold_list, tmp_list);
+
+            SystemList ac_list = m_af->getAllocatedSystemList(cur_date,
+                                               selected_list, cur_hold_sys_list);
+
 
         }
 #endif
