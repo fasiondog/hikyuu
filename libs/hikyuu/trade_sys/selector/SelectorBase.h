@@ -49,9 +49,7 @@ public:
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    SystemList getSelectedSystemList(Datetime date);
-
-    virtual SystemList _getSelectedSystemList(Datetime date) = 0;
+    virtual SystemList getSelectedSystemList(Datetime date) = 0;
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -59,22 +57,11 @@ public:
     /** 子类克隆接口 */
     virtual SelectorPtr _clone() = 0;
 
-
-    void setQuery(KQuery query) {
-        m_query = query;
-    }
-
-    KQuery getQuery() const {
-        return m_query;
-    }
-
 protected:
     string m_name;
-    KQuery m_query;
+    int m_count;
+    Datetime m_pre_date;
     SystemList m_sys_list;
-
-    Datetime m_pre_datetime;
-    SystemList m_pre_selected_list;
 
 //============================================
 // 序列化支持
@@ -87,20 +74,18 @@ private:
         string name_str(GBToUTF8(m_name));
         ar & boost::serialization::make_nvp("name", name_str);
         ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_query);
+        ar & BOOST_SERIALIZATION_NVP(m_count);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_date);
         ar & BOOST_SERIALIZATION_NVP(m_sys_list);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_datetime);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_selected_list);
     }
 
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
         ar & boost::serialization::make_nvp("name", m_name);
         ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_query);
+        ar & BOOST_SERIALIZATION_NVP(m_count);
+        ar & BOOST_SERIALIZATION_NVP(m_pre_date);
         ar & BOOST_SERIALIZATION_NVP(m_sys_list);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_datetime);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_selected_list);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -140,7 +125,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
     virtual SelectorPtr _clone() {\
         return SelectorPtr(new classname());\
     }\
-    virtual SystemList _getSelectedSystemList(Datetime date);
+    virtual SystemList getSelectedSystemList(Datetime date);
 
 
 /**
@@ -161,7 +146,6 @@ inline string SelectorBase::name() const {
 inline void SelectorBase::name(const string& name) {
     m_name = name;
 }
-
 
 
 } /* namespace hku */

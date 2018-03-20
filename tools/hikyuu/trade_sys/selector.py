@@ -41,7 +41,7 @@ SelectorBase.__doc__ = """
 
 公共参数：
 
-    freq (int | KQuery::DAY)  变化频度，选股的变化周期
+    freq (int | 1)  变化频度，选股的变化周期，以Bar为单位
 
 自定义选择器策略接口：
 
@@ -105,14 +105,9 @@ clear(self)
     清除已加入的所有交易系统实例
 """
 
+
 SelectorBase.getSelectedSystemList.__doc__ = """
 getSelectedSystemList(self, datetime)
-    
-    获取指定时刻选取的标的及其权重
-"""
-
-SelectorBase._getSelectedSystemList.__doc__ = """
-_getSelectedSystemList(self, datetime)
     
     【重载接口】获取指定时刻选取的标的及其权重
         

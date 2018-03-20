@@ -24,12 +24,14 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SelectorPtr& st) {
     return os;
 }
 
-SelectorBase::SelectorBase(): m_name("SelectorBase") {
-    setParam<int>("freq", KQuery::DAY);
+SelectorBase::SelectorBase()
+: m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {
+    setParam<int>("freq", 1); //已Bar为单位
 }
 
-SelectorBase::SelectorBase(const string& name): m_name(name) {
-    setParam<int>("freq", KQuery::DAY);
+SelectorBase::SelectorBase(const string& name)
+: m_name(name), m_count(0), m_pre_date(Datetime::min()) {
+    setParam<int>("freq", 1);
 }
 
 
@@ -38,9 +40,9 @@ SelectorBase::~SelectorBase() {
 }
 
 void SelectorBase::clear() {
+    m_count = 0;
+    m_pre_date = Datetime::min();
     m_sys_list.clear();
-    m_pre_selected_list.clear();
-    m_pre_datetime = Null<Datetime>();
 }
 
 void SelectorBase::reset() {
@@ -49,8 +51,8 @@ void SelectorBase::reset() {
         (*iter)->reset(true, false);
     }
 
-    m_pre_datetime = Null<Datetime>();
-    m_pre_selected_list.clear();
+    m_count = 0;
+    m_pre_date = Datetime::min();
 
     _reset();
 }
@@ -72,9 +74,8 @@ SelectorPtr SelectorBase::clone() {
     p->m_params = m_params;
 
     p->m_name = m_name;
-    p->m_query = m_query;
-    p->m_pre_datetime = m_pre_datetime;
-    p->m_pre_selected_list = m_pre_selected_list;
+    p->m_count = m_count;
+    p->m_pre_date = m_pre_date;
 
     SystemList::const_iterator iter = m_sys_list.begin();
     for (; iter != m_sys_list.end(); ++iter) {
@@ -126,79 +127,21 @@ void SelectorBase::addStockList(const StockList& stkList,
 }
 
 bool SelectorBase::changed(Datetime date) {
-    if (date == Null<Datetime>())
+    if (date <= m_pre_date || date == Null<Datetime>())
         return false;
 
     int freq = getParam<int>("freq");
-    Datetime cur_date;
-    if (KQuery::DAY == freq) {
-        cur_date = Datetime(date.date());
-
-    } else if (KQuery::WEEK == freq) {
-        cur_date = Datetime(date.date() - bd::date_duration(date.dayOfWeek()));
-
-    } else if (KQuery::MONTH == freq) {
-        cur_date = Datetime(date.year(), date.month(), 1);
-
-    } else if (KQuery::QUARTER == freq) {
-        int year = date.year();
-        int month = date.month();
-        if (month == 1 || month == 2 || month == 3) {
-            cur_date = Datetime(year, 1, 1);
-        } else if (month == 4 || month == 5 || month == 6) {
-            cur_date = Datetime(year, 4, 1);
-        } else if (month == 7 || month == 8 || month == 9) {
-            cur_date = Datetime(year, 7, 1);
-        } else {
-            cur_date = Datetime(year, 10, 1);
-        }
-
-    } else if (KQuery::HALFYEAR == freq) {
-        cur_date = Datetime(date.year(), 7, 1);
-
-    } else if (KQuery::YEAR == freq) {
-        cur_date = Datetime(date.year(), 1, 1);
-
-    } else if (KQuery::MIN == freq) {
-        cur_date = Datetime(date.year(), date.month(), date.day(),
-                            date.hour(), date.minute());
-
-    } else if (KQuery::MIN5 == freq) {
-        cur_date = Datetime(date.year(), date.month(), date.day(),
-                            date.hour(), date.minute()/5);
-
-    } else if (KQuery::MIN15 == freq) {
-        cur_date = Datetime(date.year(), date.month(), date.day(),
-                            date.hour(), date.minute()/15);
-
-    } else if (KQuery::MIN30 == freq) {
-        cur_date = Datetime(date.year(), date.month(), date.day(),
-                            date.hour(), date.minute()/30);
-
-    } else if (KQuery::MIN60 == freq) {
-        cur_date = Datetime(date.year(), date.month(), date.day(), date.hour());
-
-    } else {
-        HKU_WARN("Invalie param freq " << freq << "! [SelectorBase::changed]");
-        return false;
+    if (freq <= 0) {
+        freq = 1;
     }
 
-    if (m_pre_datetime != cur_date) {
-        m_pre_datetime = cur_date;
+    m_count++;
+    if (m_count >= freq){
+        m_count = 0;
         return true;
     }
 
     return false;
-
-    //return true;
-}
-
-SystemList SelectorBase::getSelectedSystemList(Datetime date) {
-    if (changed(date)) {
-        m_pre_selected_list = _getSelectedSystemList(date);
-    }
-
-    return m_pre_selected_list;
 }
 
 

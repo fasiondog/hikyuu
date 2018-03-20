@@ -25,21 +25,28 @@ HKU_API std::ostream & operator<<(std::ostream& os, const AFPtr& af) {
     return os;
 }
 
-AllocateFundsBase::AllocateFundsBase(): m_name("AllocateMoneyBase") {
+AllocateFundsBase::AllocateFundsBase()
+: m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()) {
     setParam<bool>("adjust_hold_sys", false); //是否调整之前已经持仓策略的持仓
     setParam<int>("max_sys_num", 10); //最大系统实例数
-    setParam<int>("freq", KQuery::DAY); //调仓频率
+    setParam<int>("freq", 1); //调仓频率
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name)
-: m_name("AllocateMoneyBase") {
+: m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()) {
     setParam<bool>("adjust_hold_sys", false);
     setParam<int>("max_sys_num", 10); //最大系统实例数
-    setParam<int>("freq", KQuery::DAY); //调仓频率
+    setParam<int>("freq", 1); //调仓频率
 }
 
 AllocateFundsBase::~AllocateFundsBase() {
 
+}
+
+void AllocateFundsBase::reset() {
+    m_count = 0;
+    m_pre_date = Datetime::min();
+    _reset();
 }
 
 AFPtr AllocateFundsBase::clone() {
@@ -58,13 +65,29 @@ AFPtr AllocateFundsBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_count = m_count;
+    p->m_pre_date = m_pre_date;
     p->m_tm = m_tm;
     return p;
 }
 
 
 bool AllocateFundsBase::changed(Datetime date) {
-    return true;
+    if (date <= m_pre_date || date == Null<Datetime>())
+        return false;
+
+    int freq = getParam<int>("freq");
+    if (freq <= 0) {
+        freq = 1;
+    }
+
+    m_count++;
+    if (m_count >= freq){
+        m_count = 0;
+        return true;
+    }
+
+    return false;
 }
 
 

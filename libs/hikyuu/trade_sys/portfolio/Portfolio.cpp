@@ -110,11 +110,8 @@ void Portfolio::run(const KQuery& query) {
         }
     }
 
-    m_se->setQuery(query);
-    //TODO: m_af->setQuery(query);
-
     SystemList       cur_selected_list;  //当前选中系统列表
-    std::set<SYSPtr> cur_selected_sets; //当前选中系统集合，方便计算使用
+    std::set<SYSPtr> cur_selected_sets;  //当前选中系统集合，方便计算使用
     SystemList cur_allocated_list; //当前分配了资金的系统
     SystemList cur_hold_sys_list;  //当前时刻有持仓的系统，每个时刻重新收集
 
@@ -137,7 +134,7 @@ void Portfolio::run(const KQuery& query) {
         if (selected_changed) {
 
             //重新计算当前时刻选择的系统实例
-            cur_selected_list = m_se->_getSelectedSystemList(cur_date);
+            cur_selected_list = m_se->getSelectedSystemList(cur_date);
 
             //构建当前时刻选择的系统实例集合，便于后续计算
             cur_selected_sets.clear();
@@ -148,7 +145,9 @@ void Portfolio::run(const KQuery& query) {
 
         }
 
+        //----------------------------------------------------------
         //查找当前已分配资金的系统，如果不在当前选中的系统范围内，则回收期没有持仓的系统资金
+        //----------------------------------------------------------
         sys_iter = cur_allocated_list.begin();
         for (; sys_iter != cur_allocated_list.end(); ++sys_iter) {
             SYSPtr& sys = *sys_iter;
@@ -171,7 +170,9 @@ void Portfolio::run(const KQuery& query) {
             }
         }
 
+        //----------------------------------------------------------
         //如果选择列表更新或调整资金时刻，则调整资金分配
+        //----------------------------------------------------------
         if (selected_changed || m_af->changed(cur_date)) {
             cur_allocated_list = m_af->getAllocatedSystemList(cur_date,
                     cur_selected_list, cur_hold_sys_list);

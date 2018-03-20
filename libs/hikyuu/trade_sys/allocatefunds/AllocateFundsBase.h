@@ -88,6 +88,8 @@ public:
 
 private:
     string m_name;
+    int    m_count;
+    Datetime m_pre_date;
     TMPtr  m_tm;
 
     //============================================
@@ -101,6 +103,8 @@ private:
             string name_str(GBToUTF8(m_name));
             ar & boost::serialization::make_nvp("name", name_str);
             ar & BOOST_SERIALIZATION_NVP(m_params);
+            ar & BOOST_SERIALIZATION_NVP(m_count);
+            ar & BOOST_SERIALIZATION_NVP(m_pre_date);
             ar & BOOST_SERIALIZATION_NVP(m_tm);
         }
 
@@ -108,6 +112,8 @@ private:
         void load(Archive & ar, const unsigned int version) {
             ar & boost::serialization::make_nvp("name", m_name);
             ar & BOOST_SERIALIZATION_NVP(m_params);
+            ar & BOOST_SERIALIZATION_NVP(m_count);
+            ar & BOOST_SERIALIZATION_NVP(m_pre_date);
             ar & BOOST_SERIALIZATION_NVP(m_tm);
         }
 
@@ -175,9 +181,6 @@ inline void AllocateFundsBase::setTM(const TMPtr& tm) {
     m_tm = tm;
 }
 
-inline void AllocateFundsBase::reset() {
-    _reset();
-}
 
 } /* namespace hku */
 
