@@ -47,6 +47,18 @@ public:
     /** 设定交易账户 */
     void setTM(const TMPtr&);
 
+    KQuery getQuery();
+    void setQuery(KQuery query);
+
+    /** 获取不参与资产分配的保留比例 */
+    double getReservePercent();
+
+    /**
+     * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为0
+     * @param percent 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
+     */
+    void setReserverPercent(double p);
+
     bool changed(Datetime date);
 
     /** 复位 */
@@ -88,9 +100,12 @@ public:
 
 private:
     string m_name;
+    KQuery m_query;
     int    m_count;
     Datetime m_pre_date;
     TMPtr  m_tm;
+
+    double m_reserve_percent; //保留资产比例，不参与资产分配
 
     //============================================
     // 序列化支持
@@ -103,8 +118,10 @@ private:
             string name_str(GBToUTF8(m_name));
             ar & boost::serialization::make_nvp("name", name_str);
             ar & BOOST_SERIALIZATION_NVP(m_params);
+            ar & BOOST_SERIALIZATION_NVP(m_query);
             ar & BOOST_SERIALIZATION_NVP(m_count);
             ar & BOOST_SERIALIZATION_NVP(m_pre_date);
+            ar & BOOST_SERIALIZATION_NVP(m_reserve_percent);
             ar & BOOST_SERIALIZATION_NVP(m_tm);
         }
 
@@ -112,8 +129,10 @@ private:
         void load(Archive & ar, const unsigned int version) {
             ar & boost::serialization::make_nvp("name", m_name);
             ar & BOOST_SERIALIZATION_NVP(m_params);
+            ar & BOOST_SERIALIZATION_NVP(m_query);
             ar & BOOST_SERIALIZATION_NVP(m_count);
             ar & BOOST_SERIALIZATION_NVP(m_pre_date);
+            ar & BOOST_SERIALIZATION_NVP(m_reserve_percent);
             ar & BOOST_SERIALIZATION_NVP(m_tm);
         }
 
@@ -179,6 +198,18 @@ inline TMPtr AllocateFundsBase::getTM() {
 
 inline void AllocateFundsBase::setTM(const TMPtr& tm) {
     m_tm = tm;
+}
+
+inline KQuery AllocateFundsBase::getQuery() {
+    return m_query;
+}
+
+inline void AllocateFundsBase::setQuery(KQuery query) {
+    m_query = query;
+}
+
+inline double AllocateFundsBase::getReservePercent() {
+    return m_reserve_percent;
 }
 
 

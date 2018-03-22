@@ -24,8 +24,8 @@ SystemWeightList EqualWeightAllocateFunds
     SystemWeightList result;
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
         SystemWeight sw;
-        sw.sys = *iter;
-        sw.weight = 1;
+        sw.setSYS(*iter);
+        sw.setWeight(1);
         result.push_back(sw);
     }
 

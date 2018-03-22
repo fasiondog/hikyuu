@@ -95,6 +95,8 @@ void Portfolio::run(const KQuery& query) {
         return;
     }
 
+    m_af->setQuery(query);
+
     SystemList all_sys_list = m_se->getAllSystemList();
     TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "SUB");
     auto sys_iter = all_sys_list.begin();
@@ -151,7 +153,7 @@ void Portfolio::run(const KQuery& query) {
         sys_iter = cur_allocated_list.begin();
         for (; sys_iter != cur_allocated_list.end(); ++sys_iter) {
             SYSPtr& sys = *sys_iter;
-            TMPtr& tm = sys->getTM();
+            TMPtr tm = sys->getTM();
 
             if (tm->getStockNumber() != 0) {
                 //收集当前仍有持仓的系统

@@ -15,17 +15,17 @@ HKU_API std::ostream & operator<<(std::ostream & os, const SystemWeight& sw) {
 
     string name("NULL");
     string stk_name("(Stock(NULL))");
-    if (sw.sys) {
-       name = sw.sys->name();
+    if (sw.getSYS()) {
+       name = sw.getSYS()->name();
 
-       Stock stk = sw.sys->getStock();
+       Stock stk = sw.getSYS()->getStock();
        if (!stk.isNull()) {
            stk_name = "(Stock(" + stk.market_code() + "))";
        }
     }
 
     os << "SystemWeight(sys: " << name << stk_name
-       << ",  weight: " << sw.weight
+       << ",  weight: " << sw.getWeight()
        << ")";
 
     os.unsetf(std::ostream::floatfield);
@@ -33,12 +33,12 @@ HKU_API std::ostream & operator<<(std::ostream & os, const SystemWeight& sw) {
     return os;
 }
 
-SystemWeight::SystemWeight(): weight(100) {
+SystemWeight::SystemWeight(): m_weight(100) {
 
 }
 
 SystemWeight::SystemWeight(const SystemPtr& sys, price_t weight)
-: sys(sys), weight(weight) {
+: m_sys(sys), m_weight(weight) {
 
 }
 

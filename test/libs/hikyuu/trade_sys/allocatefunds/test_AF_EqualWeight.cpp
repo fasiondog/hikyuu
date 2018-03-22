@@ -60,12 +60,12 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_not_adjust_hold) {
     sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
     BOOST_CHECK(sw_list.size() == 1);
-    BOOST_CHECK(sw_list[0].sys->getStock() == sm["sh600000"]);
-    BOOST_CHECK(sw_list[0].weight == 1);
+    BOOST_CHECK(sw_list[0].getSYS()->getStock() == sm["sh600000"]);
+    BOOST_CHECK(sw_list[0].getWeight() == 1);
     BOOST_CHECK(se_list[0]->getTM()->currentCash() == 100000);
     BOOST_CHECK(tm->currentCash() == 0);
     BOOST_CHECK(ac_list.size() == 1);
-    BOOST_CHECK(ac_list[0] == sw_list[0].sys);
+    BOOST_CHECK(ac_list[0] == sw_list[0].getSYS());
 
     /** @arg 当前选中系统数大于最大持仓系统数，已持仓系统数为0 */
     af->setParam<int>("max_sys_num", 1);
@@ -84,12 +84,12 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_not_adjust_hold) {
     sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
     BOOST_CHECK(sw_list.size() == 2);
-    BOOST_CHECK(sw_list[0].sys->getStock() == sm["sh600000"]);
-    BOOST_CHECK(sw_list[0].weight == 1);
+    BOOST_CHECK(sw_list[0].getSYS()->getStock() == sm["sh600000"]);
+    BOOST_CHECK(sw_list[0].getWeight() == 1);
     BOOST_CHECK(se_list[0]->getTM()->currentCash() == 0);
     BOOST_CHECK(tm->currentCash() == 0);
     BOOST_CHECK(ac_list.size() == 1);
-    BOOST_CHECK(ac_list[0] == sw_list[1].sys);
+    BOOST_CHECK(ac_list[0] == sw_list[1].getSYS());
     BOOST_CHECK(ac_list[0]->getTM()->currentCash() == 100000);
 
     /** @arg 当前选中系统数不为0，已持仓系统数等于最大持仓数 */
@@ -110,8 +110,8 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_not_adjust_hold) {
     sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
     BOOST_CHECK(sw_list.size() == 1);
-    BOOST_CHECK(sw_list[0].sys->getStock() == sm["sh600000"]);
-    BOOST_CHECK(sw_list[0].weight == 1);
+    BOOST_CHECK(sw_list[0].getSYS()->getStock() == sm["sh600000"]);
+    BOOST_CHECK(sw_list[0].getWeight() == 1);
     BOOST_CHECK(se_list[0]->getTM()->currentCash() == 0);
     BOOST_CHECK(tm->currentCash() == 100000);
     BOOST_CHECK(ac_list.size() == 2);
@@ -140,8 +140,8 @@ BOOST_AUTO_TEST_CASE( test_AF_EqualWeight_not_adjust_hold) {
     sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, hold_list);
     BOOST_CHECK(sw_list.size() == 1);
-    BOOST_CHECK(sw_list[0].sys->getStock() == sm["sh600000"]);
-    BOOST_CHECK(sw_list[0].weight == 1);
+    BOOST_CHECK(sw_list[0].getSYS()->getStock() == sm["sh600000"]);
+    BOOST_CHECK(sw_list[0].getWeight() == 1);
     BOOST_CHECK(se_list[0]->getTM()->currentCash() == 0);
     BOOST_CHECK(tm->currentCash() == 100000);
     BOOST_CHECK(ac_list.size() == 2);

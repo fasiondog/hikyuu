@@ -48,8 +48,8 @@ void export_AllocateFunds() {
     class_<SystemWeight>("SystemWeight", init<>())
             .def(init<const SystemPtr&, price_t>())
             .def(self_ns::str(self))
-            .def_readwrite("sys", &SystemWeight::sys)
-            .def_readwrite("weight", &SystemWeight::weight)
+            .def_readwrite("sys", &SystemWeight::m_sys)
+            .def_readwrite("weight", &SystemWeight::m_weight)
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<SystemWeight>())
 #endif

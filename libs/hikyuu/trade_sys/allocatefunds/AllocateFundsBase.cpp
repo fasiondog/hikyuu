@@ -26,14 +26,20 @@ HKU_API std::ostream & operator<<(std::ostream& os, const AFPtr& af) {
 }
 
 AllocateFundsBase::AllocateFundsBase()
-: m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()) {
+: m_name("AllocateMoneyBase"),
+  m_count(0),
+  m_pre_date(Datetime::min()),
+  m_reserve_percent(0) {
     setParam<bool>("adjust_hold_sys", false); //是否调整之前已经持仓策略的持仓
     setParam<int>("max_sys_num", 10); //最大系统实例数
     setParam<int>("freq", 1); //调仓频率
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name)
-: m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()) {
+: m_name("AllocateMoneyBase"),
+  m_count(0),
+  m_pre_date(Datetime::min()),
+  m_reserve_percent(0) {
     setParam<bool>("adjust_hold_sys", false);
     setParam<int>("max_sys_num", 10); //最大系统实例数
     setParam<int>("freq", 1); //调仓频率
@@ -46,6 +52,7 @@ AllocateFundsBase::~AllocateFundsBase() {
 void AllocateFundsBase::reset() {
     m_count = 0;
     m_pre_date = Datetime::min();
+    m_reserve_percent = 0;
     _reset();
 }
 
@@ -65,12 +72,23 @@ AFPtr AllocateFundsBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_query = m_query;
     p->m_count = m_count;
     p->m_pre_date = m_pre_date;
+    p->m_reserve_percent = m_reserve_percent;
     p->m_tm = m_tm;
     return p;
 }
 
+void AllocateFundsBase::setReserverPercent(double percent) {
+    if (percent < 0) {
+        m_reserve_percent = 0;
+    } else if (m_reserve_percent > 1) {
+        m_reserve_percent = 1;
+    } else {
+        m_reserve_percent = percent;
+    }
+}
 
 bool AllocateFundsBase::changed(Datetime date) {
     if (date <= m_pre_date || date == Null<Datetime>())
@@ -122,12 +140,43 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
         SystemList& out_sys_list) {
 
     //计算当前选中系统列表的权重
+    SystemWeightList sw_list = _allocateWeight(date, se_list);
 
+    //构建实际分配权重大于零的的系统集合，同时计算总权重
+    std::set<SYSPtr> selected_sets;
+    price_t total_weight = 0.0;
+    for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
+        if (iter->getWeight() > 0) {
+            selected_sets.insert(iter->getSYS());
+            total_weight += iter->getWeight();
+        }
+    }
 
-    //将未在当前选中的系统列表中的持仓系统，自动清仓卖出
-    //将当前选中系统列表中权重为0的已持仓系统，自动清仓卖出
-    //如果持仓系统的总资产大于所分配权重的资产，则将其当前亏损最多的卖出到资产平衡位置
-    //按分配的权重调整资产现金
+    //如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，并回收现金
+    for (auto iter = hold_list.begin(); iter != hold_list.end(); ++iter) {
+        const SYSPtr& sys = *iter;
+        if (selected_sets.find(sys) == selected_sets.end()) {
+            KRecord record = sys->getTO().getKRecordByDate(date);
+            sys->_sell(record, PART_ALLOCATEFUNDS);
+            TMPtr tm = sys->getTM();
+            price_t cash = tm->currentCash();
+            if (cash > 0) {
+                m_tm->checkin(date, cash);
+                tm->checkout(date, cash);
+            }
+        }
+    }
+
+    //获取当前总账户资产，计算可参与分配的现金
+    FundsRecord funds = m_tm->getFunds(m_query.kType());
+    price_t total_funds = funds.cash + funds.market_value
+            + funds.borrow_asset - funds.short_market_value;
+    price_t can_allocate_cash = funds.cash - total_funds * (1-getReservePercent());
+    if (can_allocate_cash <= 0) {
+        return;
+    }
+
+    //按分配的权重调整资产
 
     //TODO 待实现
 }
@@ -151,6 +200,41 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
         return;
     }
 
+/*
+    //获取分配的资产权重
+    SystemWeightList sw_list = _allocateWeight(date, se_list);
+    if (sw_list.size() == 0) {
+        return;
+    }
+
+    //计算总权重和
+    price_t total_weight = 0.0;
+    auto sw_iter = sw_list.rbegin();
+    for (size_t count = 0; sw_iter != sw_list.rend(); ++sw_iter, count++) {
+        total_weight += sw_iter->weight;
+    }
+
+    if (total_weight == 0.0) {
+        return;
+    }
+
+    //计算每份权重的资金
+    int precision = m_tm->getParam<int>("precision");
+    price_t per_cash = m_tm->currentCash() / total_weight;
+
+    for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
+        SYSPtr& sys = *iter;
+        TMPtr& tm = sys->getTM();
+    }
+
+    //
+    std::set<SYSPtr> selected_sets;
+    for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
+        selected_sets.insert(*iter);
+    }
+
+*/
+
     //从当前选中的系统列表中将持仓的系统排除
     std::set<SYSPtr> hold_sets;
     for (auto iter = hold_list.begin(); iter != hold_list.end(); ++iter) {
@@ -173,17 +257,17 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
     //按权重排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
     std::sort(sw_list.begin(), sw_list.end(),
          boost::bind(std::less<price_t>(),
-                     boost::bind(&SystemWeight::weight, _1),
-                     boost::bind(&SystemWeight::weight, _2)));
+                     boost::bind(&SystemWeight::m_weight, _1),
+                     boost::bind(&SystemWeight::m_weight, _2)));
 
     //倒序遍历，计算总权重，并在遇到权重为0或等于最大持仓时
     size_t remain = max_num - hold_list.size();
     price_t total_weight = 0.0;
     auto sw_iter = sw_list.rbegin();
     for (size_t count = 0; sw_iter != sw_list.rend(); ++sw_iter, count++) {
-        if (sw_iter->weight <= 0.0 || count >= remain)
+        if (sw_iter->getWeight() <= 0.0 || count >= remain)
             break;
-        total_weight += sw_iter->weight;
+        total_weight += sw_iter->getWeight();
     }
 
     if (total_weight == 0.0) {
@@ -198,12 +282,12 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
     per_cash = m_tm->currentCash() / total_weight;
     sw_iter = sw_list.rbegin();
     for (; sw_iter != end_iter; ++sw_iter) {
-        price_t will_cash = per_cash * sw_iter->weight;
+        price_t will_cash = per_cash * sw_iter->getWeight();
         if (will_cash == 0.0) {
             continue;
         }
 
-        TMPtr tm = sw_iter->sys->getTM();
+        TMPtr tm = sw_iter->getSYS()->getTM();
         assert(tm);
 
         int real_precision = tm->getParam<int>("precision");
@@ -221,7 +305,7 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
             tm->checkin(date, will_cash);
         }
 
-        out_sys_list.push_back(sw_iter->sys);
+        out_sys_list.push_back(sw_iter->getSYS());
     }
 }
 

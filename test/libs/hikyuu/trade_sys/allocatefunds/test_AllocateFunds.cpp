@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( test_AllocateFunds) {
     sw_list = af->_allocateWeight(Datetime(201802100000L), se_list);
     ac_list = af->getAllocatedSystemList(Datetime(201802100000L), se_list, se_list);
     BOOST_CHECK(sw_list.size() == 1);
-    BOOST_CHECK(sw_list[0].sys == se_list[0]);
+    BOOST_CHECK(sw_list[0].getSYS() == se_list[0]);
     BOOST_CHECK(ac_list.size() == 0);
     BOOST_CHECK(tm->currentCash() == 100000);
 
