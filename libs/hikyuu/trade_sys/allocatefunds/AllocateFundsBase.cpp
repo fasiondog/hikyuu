@@ -102,6 +102,7 @@ bool AllocateFundsBase::changed(Datetime date) {
     m_count++;
     if (m_count >= freq){
         m_count = 0;
+        m_pre_date = date;
         return true;
     }
 
@@ -120,8 +121,6 @@ SystemList AllocateFundsBase
                   "[AllocateFundsBase::getAllocatedSystemList]");
         return result;
     }
-
-    //SystemWeightList sw_list = allocateWeight(date, se_list, hold_list);
 
     if (getParam<bool>("adjust_hold_sys")) {
         _getAllocatedSystemList_adjust_hold(date, se_list, hold_list, result);
@@ -152,7 +151,7 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
         }
     }
 
-    //如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，并回收现金
+    //如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，如果账户有现金则同时回收现金
     for (auto iter = hold_list.begin(); iter != hold_list.end(); ++iter) {
         const SYSPtr& sys = *iter;
         if (selected_sets.find(sys) == selected_sets.end()) {
@@ -167,16 +166,68 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
         }
     }
 
-    //获取当前总账户资产，计算可参与分配的现金
+    //获取当前总账户资产，计算每单位权重代表的资金，当前能分配的现金
     FundsRecord funds = m_tm->getFunds(m_query.kType());
     price_t total_funds = funds.cash + funds.market_value
             + funds.borrow_asset - funds.short_market_value;
-    price_t can_allocate_cash = funds.cash - total_funds * (1-getReservePercent());
-    if (can_allocate_cash <= 0) {
-        return;
-    }
+    price_t per_weight_funds = total_funds / total_weight;
+    price_t can_allocate_cash = funds.cash;
 
     //按分配的权重调整资产
+    int precision = m_tm->getParam<int>("precision");
+
+    for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
+        if (can_allocate_cash <= 0 || iter->getWeight() <= 0) {
+            continue;
+        }
+
+        SYSPtr sys = iter->getSYS();
+        TMPtr tm = sys->getTM();
+        funds = tm->getFunds(m_query.kType());
+        price_t funds_value = funds.cash + funds.market_value
+                + funds.borrow_asset - funds.short_market_value;
+
+        price_t will_funds_value = iter->getWeight() * per_weight_funds;
+        if (funds_value == will_funds_value) {
+            //如果当前资产已经等于期望分配的资产，则忽略
+            continue;
+
+        } else if (funds_value < will_funds_value) {
+            //如果当前资产小于期望分配的资产，则补充现金
+            price_t will_cash = will_funds_value - funds_value;
+            if (will_cash <= can_allocate_cash) {
+                m_tm->checkout(date, will_cash);
+                tm->checkin(date, will_cash);
+                can_allocate_cash -= will_cash;
+            } else {
+                iter->setWeight(iter->getWeight() / total_weight);
+                m_wait_for_allocate_list.push_back(*iter);
+            }
+
+        } else {
+            //如果当前资产大于期望分配的资产，则子账户是否有现金可以取出抵扣，否则卖掉部分股票
+            price_t will_return_cash = funds_value - will_funds_value;
+            price_t cash = tm->currentCash();
+            if (cash >= will_return_cash) {
+                m_tm->checkin(date, cash);
+                tm->checkout(date, cash);
+            } else {
+                Stock stock = sys->getStock();
+                KRecord k = sys->getTO().getKRecordByDate(date);
+                PositionRecord position = tm->getPosition(stock);
+                if (position.number > 0) {
+                    price_t value = position.number * k.closePrice;
+                    size_t min_num = stock.minTradeNumber();
+                    if (position.number <= min_num) {
+                        //tm->sell(date, stock, position.number, real)
+                        //sys->_sell(record, PART_ALLOCATEFUNDS);
+                    }
+                }
+            }
+
+        }
+    }
+
 
     //TODO 待实现
 }

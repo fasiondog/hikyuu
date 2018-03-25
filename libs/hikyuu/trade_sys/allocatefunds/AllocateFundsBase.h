@@ -107,6 +107,8 @@ private:
 
     double m_reserve_percent; //保留资产比例，不参与资产分配
 
+    list<SystemWeight> m_wait_for_allocate_list;
+
     //============================================
     // 序列化支持
     //============================================

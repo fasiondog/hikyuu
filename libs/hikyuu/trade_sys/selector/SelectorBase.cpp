@@ -138,6 +138,7 @@ bool SelectorBase::changed(Datetime date) {
     m_count++;
     if (m_count >= freq){
         m_count = 0;
+        m_pre_date = date;
         return true;
     }
 
