@@ -23,6 +23,7 @@ extern-libs.*
 /tools/hikyuu/libboost*
 /tools/hikyuu/docs/build
 /tools/hikyuu/.idea
+/tools/hikyuu/.spyproject
 /docs/docs-web/build
 /docs/reference
 /docs/test-doc
