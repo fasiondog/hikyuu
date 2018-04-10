@@ -13,5 +13,6 @@
 #include "crt/TC_Zero.h"
 #include "crt/TC_FixedA.h"
 #include "crt/TC_FixedA2015.h"
+#include "crt/TC_FixedA2017.h"
 
 #endif /* TRADE_MANAGE_BUILD_IN_H_ */

@@ -29,6 +29,12 @@ void export_build_in() {
             arg("stamptax") = 0.001,
             arg("transferfee") = 0.00002));
 
+    def("TC_FixedA2017", TC_FixedA2017, (arg("commission") = 0.0018,
+            arg("lowest_commission") = 5.0,
+            arg("stamptax") = 0.001,
+            arg("transferfee") = 0.00002));
+
+
     def("TC_Zero", TC_Zero);
 }
 
