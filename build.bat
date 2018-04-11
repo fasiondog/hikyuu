@@ -1,3 +1,5 @@
+@call set_env
+
 @echo off
 goto Start
 
@@ -26,6 +28,10 @@ REM if NOT "_%VS120COMNTOOLS%_" == "__" (
 REM     set BUILD_OUTPUT_PATH=msvc-12.0\release\address-model-64\threading-multi
 REM 	set TOOLSET=toolset=msvc-12.0
 REM 	goto Start_build) 
+REM if NOT "_%VS150COMNTOOLS%_" == "__" (
+REM     set BUILD_OUTPUT_PATH=msvc-14.1\release\address-model-64\threading-multi
+REM    	set TOOLSET=toolset=msvc-14.1
+REM    	goto Start_build) 
 if NOT "_%VS100COMNTOOLS%_" == "__" (
     set BUILD_OUTPUT_PATH=msvc-10.0\release\%ADDRESS_MODEL_OUTPUT%\threading-multi
 	set TOOLSET=toolset=msvc-10.0
