@@ -14,9 +14,11 @@
 #include "data_driver/DataDriverFactory.h"
 #include "data_driver/KDataTempCsvDriver.h"
 #include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
+#include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
 #include "data_driver/block_info/qianlong/QLBlockInfoDriver.h"
 #include "data_driver/kdata/hdf5/H5KDataDriver.h"
 #include "data_driver/kdata/tdx/TdxKDataDriver.h"
+#include "data_driver/kdata/mysql/MySQLKDataDriver.h"
 
 namespace hku {
 
@@ -79,9 +81,13 @@ void StockManager::init(
 
     //初始化注册默认支持的数据驱动
     DataDriverFactory::regBaseInfoDriver(BaseInfoDriverPtr(new SQLiteBaseInfoDriver));
+    DataDriverFactory::regBaseInfoDriver(BaseInfoDriverPtr(new MySQLBaseInfoDriver));
+
     DataDriverFactory::regBlockDriver(BlockInfoDriverPtr(new QLBlockInfoDriver));
     DataDriverFactory::regKDataDriver(KDataDriverPtr(new TdxKDataDriver));
     DataDriverFactory::regKDataDriver(KDataDriverPtr(new H5KDataDriver));
+    DataDriverFactory::regKDataDriver(KDataDriverPtr(new H5KDataDriver));
+    DataDriverFactory::regKDataDriver(KDataDriverPtr(new MySQLKDataDriver));
 
     //获取临时路径信息
     try {

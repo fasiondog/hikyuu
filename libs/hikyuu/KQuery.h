@@ -39,7 +39,14 @@ public:
         QUARTER  = 8,  ///<季线
         HALFYEAR = 9,  ///<半年线
         YEAR     = 10, ///<年线
-        INVALID_KTYPE = 11
+
+        //BTC扩展
+        MIN3     = 11,  ///<3分钟线
+        HOUR2    = 12,  ///<2小时线
+        HOUR4    = 13,  ///<4小时线
+        HOUR6    = 14,  ///<6小时线
+        HOUR12   = 15,  ///<12小时线
+        INVALID_KTYPE = 16
     };
 
     /**

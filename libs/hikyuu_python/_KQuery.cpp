@@ -59,6 +59,14 @@ void export_KQuery() {
             .value("QUARTER", KQuery::QUARTER)
             .value("HALFYEAR", KQuery::HALFYEAR)
             .value("YEAR", KQuery::YEAR)
+
+            //BTCÀ©Õ¹
+            .value("MIN3", KQuery::MIN3)
+            .value("HOUR2", KQuery::HOUR2)
+            .value("HOUR4", KQuery::HOUR4)
+            .value("HOUR6", KQuery::HOUR6)
+            .value("HOUR12", KQuery::HOUR12)
+
             .value("INVALID_KTYPE", KQuery::INVALID_KTYPE)
             ;
 

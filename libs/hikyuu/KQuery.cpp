@@ -59,6 +59,19 @@ string KQuery::getKTypeName(KType dataType) {
         return "HALFYEAR";
     case YEAR:
         return "YEAR";
+
+    //BTCÀ©Õ¹
+    case MIN3:
+        return "MIN3";
+    case HOUR2:
+        return "HOUR2";
+    case HOUR4:
+        return "HOUR4";
+    case HOUR6:
+        return "HOUR6";
+    case HOUR12:
+        return "HOUR12";
+
     default:
         return "INVALID_DATA_TYPE";
     }
@@ -90,6 +103,18 @@ KQuery::KType KQuery::getKTypeEnum(const string& arg) {
         result = HALFYEAR;
     } else if ("YEAR" == name) {
         result = YEAR;
+
+    //BTCÀ©Õ¹
+    } else if ("MIN3" == name) {
+        result = MIN3;
+    } else if ("HOUR2" == name) {
+        result = HOUR2;
+    } else if ("HOUR4" == name) {
+        result = HOUR4;
+    } else if ("HOUR6" == name) {
+        result = HOUR6;
+    } else if ("HOUR12" == name) {
+        result = HOUR12;
     } else {
         result = INVALID_KTYPE;
     }

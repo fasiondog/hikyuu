@@ -14,6 +14,7 @@ project : requirements <library>/boost//date_time
                        <library>/boost//serialization
                        <library>/hikyuu_utils//hikyuu_utils
                        <toolset>msvc:<library>/sqlite3//sqlite3
+                       <toolset>msvc:<include>../../extern-libs/mysql/include
                        <toolset>msvc:<include>../../extern-libs/hdf5/include
                        <toolset>msvc:<include>../../extern-libs/log4cplus/include
                        <toolset>gcc:<linkflags>-Wl,-rpath,./
@@ -48,6 +49,7 @@ lib hikyuu : [ glob-tree *.cpp ]
                  ../../extern-libs/hdf5/dll/hdf5_cppdll.lib
                  ../../extern-libs/hdf5/dll/hdf5_hl_cppdll.lib
                  ../../extern-libs/log4cplus/dll/log4cplus.lib
+                 ../../extern-libs/mysql/lib/libmysql.lib
               :  <toolset>msvc
                  <link>shared
                  <define>SQLITE_API="__declspec(dllimport)"
@@ -64,6 +66,7 @@ lib hikyuu : [ glob-tree *.cpp ]
                  ../../extern-libs/hdf5/dll/hdf5_cppdll.lib
                  ../../extern-libs/hdf5/dll/hdf5_hl_cppdll.lib
                  ../../extern-libs/log4cplus/dll/log4cplus.lib
+                 ../../extern-libs/mysql/lib/libmysql.lib
              : <toolset>msvc
                <link>static
                <define>BOOST_SYSTEM_STATIC_LINK
