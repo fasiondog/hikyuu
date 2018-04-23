@@ -165,10 +165,15 @@ class Query(KQuery):
     HALFYEAR = KQuery.KType.HALFYEAR
     YEAR = KQuery.KType.YEAR
     MIN = KQuery.KType.MIN
+    MIN3 = KQuery.KType.MIN3
     MIN5 = KQuery.KType.MIN5
     MIN15 = KQuery.KType.MIN15
     MIN30 = KQuery.KType.MIN30
     MIN60 = KQuery.KType.MIN60
+    HOUR2 = KQuery.KType.HOUR2
+    HOUR4 = KQuery.KType.HOUR4
+    HOUR6 = KQuery.KType.HOUR6
+    HOUR12 = KQuery.KType.HOUR12
     NO_RECOVER = KQuery.RecoverType.NO_RECOVER
     FORWARD = KQuery.RecoverType.FORWARD
     BACKWARD = KQuery.RecoverType.BACKWARD

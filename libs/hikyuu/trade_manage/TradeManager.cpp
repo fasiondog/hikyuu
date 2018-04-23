@@ -1777,7 +1777,7 @@ FundsRecord TradeManager
         }
 
         price_t price = stock_iter->second.stock.getMarketValue(datetime, ktype);
-        market_value = roundEx(market_value + price * number,
+        market_value = roundEx(market_value + price * number * stock_iter->second.stock.unit(),
                                precision);
     }
 
@@ -1789,7 +1789,7 @@ FundsRecord TradeManager
         }
 
         price_t price = short_stock_iter->second.stock.getMarketValue(datetime, ktype);
-        short_market_value = roundEx(short_market_value + price * number,
+        short_market_value = roundEx(short_market_value + price * number * stock_iter->second.stock.unit(),
                                precision);
     }
 

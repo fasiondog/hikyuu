@@ -109,6 +109,9 @@ void System::initParam() {
     setParam<int>("tp_delay_n", 3);    //止赢延迟判断天数
     setParam<bool>("ignore_sell_sg", false); //忽略卖出信号，只使用止损/止赢等其他方式卖出
 
+    //最高价等于最低价时，是否可进行交易
+    setParam<bool>("can_trade_when_high_eq_low", false);
+
     //是否使用市场环境判定进行初始建仓
     setParam<bool>("ev_open_position", false);
 
@@ -342,9 +345,10 @@ void System::runMoment(const Datetime& datetime) {
 
 
 void System::_runMoment(const KRecord& today) {
-    if (today.highPrice == today.lowPrice
-        || today.closePrice > today.highPrice
-        || today.closePrice < today.lowPrice) {
+    if ((today.highPrice == today.lowPrice
+            || today.closePrice > today.highPrice
+            || today.closePrice < today.lowPrice)
+         && !getParam<bool>("can_trade_when_high_eq_low")) {
         return;
     }
 
@@ -516,7 +520,8 @@ void System::_buyNow(const KRecord& today, Part from) {
 
 
 void System::_buyDelay(const KRecord& today) {
-    if (today.highPrice == today.lowPrice) {
+    if (today.highPrice == today.lowPrice
+            && !getParam<bool>("can_trade_when_high_eq_low")) {
         //无法实际执行，延迟至下一时刻
         _submitBuyRequest(m_buyRequest.datetime, m_buyRequest.from);
         return;
@@ -654,7 +659,8 @@ void System::_sellNow(const KRecord& today, Part from) {
 
 
 void System::_sellDelay(const KRecord& today) {
-    if (today.highPrice == today.lowPrice) {
+    if (today.highPrice == today.lowPrice
+            && !getParam<bool>("can_trade_when_high_eq_low")) {
         //无法执行，保留卖出请求，继续延迟至下一时刻
         _submitSellRequest(m_sellRequest.datetime, m_sellRequest.from);
         return;

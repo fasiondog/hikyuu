@@ -21,6 +21,7 @@ namespace hku {
 #define STOCKTYPE_ND    6  ///国债
 #define STOCKTYPE_BOND  7  ///债券
 #define STOCKTYPE_GEM   8  ///创业板
+#define STOCKTYPE_BTC   9  ///比特币
 
 #define STOCKTYPE_TMP 999  ///用于临时Stock
 

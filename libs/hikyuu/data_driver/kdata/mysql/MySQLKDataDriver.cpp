@@ -227,12 +227,11 @@ getIndexRangeByDate(const string& market, const string& code,
 
     string table(getTableName(market, code, query.kType()));
     std::stringstream buf (std::stringstream::out);
-    buf << "select (select count(1) from " << table
-        << " where date<\"" << query.startDatetime().toString()
-        << "\") as rownum from " << table;
+    buf << "select count(1) from " << table
+        << " where date<" << query.startDatetime().number();
     int res = mysql_query(m_mysql.get(), buf.str().c_str());
     if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res
+        HKU_ERROR("mysql_query get start_ix error! error no: " << res
                 << " " << buf.str() << func_name);
         return false;
     }
@@ -256,13 +255,12 @@ getIndexRangeByDate(const string& market, const string& code,
 
     mysql_free_result(mysql_result);
 
-    buf.clear();
-    buf << "select (select count(1) from " << table
-        << " where date<=\"" << query.endDatetime().toString()
-        << "\") as rownum from " << table;
+    buf.str("");
+    buf << "select count(1) from " << table
+        << " where date<=" << query.endDatetime().number();
     res = mysql_query(m_mysql.get(), buf.str().c_str());
     if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res
+        HKU_ERROR("mysql_query get end_ix error! error no: " << res
                 << " " << buf.str() << func_name);
         return false;
     }
@@ -309,10 +307,11 @@ getKRecord(const string& market, const string& code,
     string table(getTableName(market, code, kType));
     std::stringstream buf (std::stringstream::out);
     buf << "select date, open, high, low, close, amount, count from "
-            << table << " limit" << pos << ", 1";
+            << table << " order by date limit " << pos << ", 1";
     int res = mysql_query(m_mysql.get(), buf.str().c_str());
     if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res << func_name);
+        HKU_ERROR("mysql_query error! error no: " << res
+                << " " << buf.str() << func_name);
         return result;
     }
 
@@ -324,7 +323,8 @@ getKRecord(const string& market, const string& code,
 
     while(row = mysql_fetch_row(mysql_result)) {
         try {
-            result.datetime = Datetime(row[0]);
+            hku_uint64 d = boost::lexical_cast<hku_uint64>(row[0]);
+            result.datetime = Datetime(d);
             result.openPrice = boost::lexical_cast<price_t>(row[1]);
             result.highPrice = boost::lexical_cast<price_t>(row[2]);
             result.lowPrice = boost::lexical_cast<price_t>(row[3]);
