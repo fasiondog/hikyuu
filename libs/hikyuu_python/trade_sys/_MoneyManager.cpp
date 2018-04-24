@@ -87,7 +87,15 @@ public:
     }
 
     void _reset() {
-        this->get_override("_reset")();
+        if (override func = get_override("_reset")) {
+            func();
+        } else {
+            MoneyManagerBase::_reset();
+        }
+    }
+
+    void default_reset()  {
+        this->MoneyManagerBase::_reset();
     }
 
     MoneyManagerPtr _clone() {
@@ -130,7 +138,7 @@ void export_MoneyManager() {
                                   &MoneyManagerWrap::default_getSellShortNumber)
             .def("_getBuyShortNumber", &MoneyManagerBase::_getBuyShortNumber,
                                   &MoneyManagerWrap::default_getBuyShortNumber)
-            .def("_reset", pure_virtual(&MoneyManagerBase::_reset))
+            .def("_reset", &MoneyManagerBase::_reset, &MoneyManagerWrap::default_reset)
             .def("_clone", pure_virtual(&MoneyManagerBase::_clone))
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(name_init_pickle_suite<MoneyManagerBase>())

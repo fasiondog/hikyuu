@@ -441,7 +441,8 @@ void System::_runMoment(const KRecord& today) {
     if( position.number != 0) {
         if (current_price <= position.stoploss) {
             _sell(today, PART_STOPLOSS);
-        } else if (current_price >= position.goalPrice) {
+        //} else if (current_price >= position.goalPrice) {
+        } else if (current_price >= _getGoalPrice(today.datetime, current_price)) {
             _sell(today, PART_PROFITGOAL);
         } else {
             price_t current_take_profile = _getTakeProfitPrice(today.datetime);

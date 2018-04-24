@@ -159,9 +159,10 @@ size_t MoneyManagerBase
     if (getParam<bool>("auto-checkin")) {
         price_t cash = m_tm->currentCash();
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
-        price_t money = price * n * stock.unit() + cost.total;
+        int precision = m_tm->precision();
+        price_t money = roundUp(price * n * stock.unit() + cost.total, precision);
         if (money > cash) {
-            m_tm->checkin(datetime, roundUp(money - cash, stock.precision()));
+            m_tm->checkin(datetime, roundUp(money - cash, precision));
         }
     }
 

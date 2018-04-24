@@ -46,7 +46,7 @@ public:
     price_t  stoploss;       ///< 当前止损价
     price_t  goalPrice;      ///< 当前的目标价格
     size_t   totalNumber;    ///< 累计持仓数量
-    price_t  buyMoney;     ///< 累计买入资金
+    price_t  buyMoney;       ///< 累计买入资金
     price_t  totalCost;      ///< 累计交易总成本
     price_t  totalRisk;      ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     price_t  sellMoney;      ///< 累计卖出资金
