@@ -12,8 +12,10 @@
 
 #if defined(BOOST_WINDOWS)
     #include <mysql.h>
+    #include <errmsg.h>
 #else
     #include <mysql/mysql.h>
+    #include <mysql/errmsg.h>
 #endif
 
 namespace hku {
@@ -42,12 +44,17 @@ public:
               size_t pos, KQuery::KType kType);
 
 private:
-    string getTableName(const string& market,
+    string _getTableName(const string& market,
                         const string& code,
                         KQuery::KType ktype);
+    bool _query(const string& sql_str);
 
 private:
     shared_ptr<MYSQL> m_mysql;
+    string m_host;
+    unsigned int m_port;
+    string m_usr;
+    string m_pwd;
 };
 
 } /* namespace hku */

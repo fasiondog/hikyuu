@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( test_MM_FixedCount ) {
     mm->setTM(tm);
     mm->setParam<bool>("auto-checkin", true);
     mm->getBuyNumber(Datetime(200001200000), stock, 24.11, 24.11, PART_SIGNAL);
-    BOOST_CHECK(tm->cash(Datetime(200001200000)) == 2417.01);
+    BOOST_CHECK(tm->cash(Datetime(200001200000)) == 2417.02);
 }
 
 /** @} */

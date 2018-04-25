@@ -21,7 +21,7 @@ public:
     }
 };
 
-MySQLKDataDriver::MySQLKDataDriver(): KDataDriver("mysql") {
+MySQLKDataDriver::MySQLKDataDriver(): KDataDriver("mysql"), m_port(3306) {
 
 }
 
@@ -33,32 +33,29 @@ bool MySQLKDataDriver::_init() {
     string default_pwd("");
     unsigned int default_port = 3306;
 
-    string host, usr, pwd;
-    unsigned int port;
-
     try {
-        host = m_params.get<string>("host");
+        m_host = m_params.get<string>("host");
     } catch(...) {
-        host = default_host;
+        m_host = default_host;
         HKU_WARN("Can't get mysql host! " << func_name);
     }
 
     try {
-        port = m_params.get<int>("port");
+        m_port = m_params.get<int>("port");
     } catch(...) {
-        port = 3306;
+        m_port = 3306;
     }
 
     try {
-        usr = m_params.get<string>("usr");
+        m_usr = m_params.get<string>("usr");
     } catch(...) {
-        usr = default_usr;
+        m_usr = default_usr;
     }
 
     try {
-        pwd = m_params.get<string>("pwd");
+        m_pwd = m_params.get<string>("pwd");
     } catch(...) {
-        pwd = default_pwd;
+        m_pwd = default_pwd;
     }
 
     shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
@@ -67,8 +64,8 @@ bool MySQLKDataDriver::_init() {
         return false;
     }
 
-    if (!mysql_real_connect(mysql.get(), host.c_str(), usr.c_str(),
-            pwd.c_str(), NULL, port, NULL, 0) ) {
+    if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
+            m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
         HKU_ERROR(" Failed to connect to database!" << func_name);
         return false;
     }
@@ -83,8 +80,48 @@ bool MySQLKDataDriver::_init() {
     return true;
 }
 
+bool MySQLKDataDriver::_query(const string& sql_str) {
+    string func_name(" [MySQLKDataDriver::query]");
+    int res = mysql_query(m_mysql.get(), sql_str.c_str());
+    if (!res) {
+        return true;
+    }
+
+    if(CR_SERVER_LOST == res || CR_SERVER_GONE_ERROR == res) {
+        //重新连接数据库
+        shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
+        if (!mysql_init(mysql.get())) {
+            HKU_ERROR(" Initial MySQL handle error!" << func_name);
+            return false;
+        }
+
+        if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
+                m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
+            HKU_ERROR(" Failed to connect to database!" << func_name);
+            return false;
+        }
+
+        if (mysql_set_character_set(mysql.get(), "utf8")) {
+            HKU_ERROR(" mysql_set_character_set error!" << func_name);
+            return false;
+        }
+
+        m_mysql = mysql;
+
+        int res = mysql_query(m_mysql.get(), sql_str.c_str());
+        if(!res) {
+            return true;
+        }
+
+    }
+
+    HKU_ERROR("mysql_query error! error no: " << res
+                << " " << sql_str << func_name);
+    return false;
+}
+
 string MySQLKDataDriver
-::getTableName(const string& market, const string& code, KQuery::KType ktype) {
+::_getTableName(const string& market, const string& code, KQuery::KType ktype) {
     return market + "_" + KQuery::getKTypeName(ktype) + "." + code;
 }
 
@@ -112,16 +149,13 @@ loadKData(const string& market, const string& code,
     MYSQL_RES *result;
     MYSQL_ROW row;
 
-    string table(getTableName(market, code, kType));
+    string table(_getTableName(market, code, kType));
     std::stringstream buf (std::stringstream::out);
     buf << "select date, open, high, low, close, amount, count from "
             << table << " order by date limit " << start_ix
             << ", " << (end_ix - start_ix);
-    int res = mysql_query(m_mysql.get(), buf.str().c_str());
-    if(res) {
-        //mysql表不存在也会报错
-        //HKU_ERROR("mysql_query error! error no: " << res
-        //        << " " << buf.str() << func_name);
+    if (!_query(buf.str())) {
+        //HKU_ERROR("mysql_query error!" << func_name);
         return;
     }
 
@@ -177,13 +211,11 @@ getCount(const string& market,
     MYSQL_RES *mysql_result;
     MYSQL_ROW row;
 
-    string table(getTableName(market, code, kType));
+    string table(_getTableName(market, code, kType));
     std::stringstream buf (std::stringstream::out);
     buf << "select count(1) from " << table;
-    int res = mysql_query(m_mysql.get(), buf.str().c_str());
-    if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res
-                << " " << buf.str() << func_name);
+    if (!_query(buf.str())) {
+        HKU_ERROR("mysql_query error! " << func_name);
         return result;
     }
 
@@ -225,14 +257,13 @@ getIndexRangeByDate(const string& market, const string& code,
     MYSQL_RES *mysql_result;
     MYSQL_ROW row;
 
-    string table(getTableName(market, code, query.kType()));
+    string table(_getTableName(market, code, query.kType()));
     std::stringstream buf (std::stringstream::out);
     buf << "select count(1) from " << table
         << " where date<" << query.startDatetime().number();
-    int res = mysql_query(m_mysql.get(), buf.str().c_str());
-    if(res) {
-        HKU_ERROR("mysql_query get start_ix error! error no: " << res
-                << " " << buf.str() << func_name);
+
+    if (!_query(buf.str())) {
+        HKU_ERROR("mysql_query error! " << func_name);
         return false;
     }
 
@@ -258,10 +289,8 @@ getIndexRangeByDate(const string& market, const string& code,
     buf.str("");
     buf << "select count(1) from " << table
         << " where date<=" << query.endDatetime().number();
-    res = mysql_query(m_mysql.get(), buf.str().c_str());
-    if(res) {
-        HKU_ERROR("mysql_query get end_ix error! error no: " << res
-                << " " << buf.str() << func_name);
+    if (!_query(buf.str())) {
+        HKU_ERROR("mysql_query error! " << func_name);
         return false;
     }
 
@@ -304,14 +333,12 @@ getKRecord(const string& market, const string& code,
     MYSQL_RES *mysql_result;
     MYSQL_ROW row;
 
-    string table(getTableName(market, code, kType));
+    string table(_getTableName(market, code, kType));
     std::stringstream buf (std::stringstream::out);
     buf << "select date, open, high, low, close, amount, count from "
             << table << " order by date limit " << pos << ", 1";
-    int res = mysql_query(m_mysql.get(), buf.str().c_str());
-    if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res
-                << " " << buf.str() << func_name);
+    if (!_query(buf.str())) {
+        HKU_ERROR("mysql_query error! " << func_name);
         return result;
     }
 
