@@ -12,10 +12,8 @@
 
 #if defined(BOOST_WINDOWS)
     #include <mysql.h>
-    #include <errmsg.h>
 #else
     #include <mysql/mysql.h>
-    #include <mysql/errmsg.h>
 #endif
 
 namespace hku {

@@ -87,32 +87,32 @@ bool MySQLKDataDriver::_query(const string& sql_str) {
         return true;
     }
 
-    if(CR_SERVER_LOST == res || CR_SERVER_GONE_ERROR == res) {
-        //重新连接数据库
-        shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
-        if (!mysql_init(mysql.get())) {
-            HKU_ERROR(" Initial MySQL handle error!" << func_name);
-            return false;
-        }
+    //重新连接数据库
+    HKU_INFO("MySQL connect invalid, will retry connect!" << func_name);
+    m_mysql = NULL;
 
-        if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
-                m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
-            HKU_ERROR(" Failed to connect to database!" << func_name);
-            return false;
-        }
+    shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
+    if (!mysql_init(mysql.get())) {
+        HKU_ERROR(" Initial MySQL handle error!" << func_name);
+        return false;
+    }
 
-        if (mysql_set_character_set(mysql.get(), "utf8")) {
-            HKU_ERROR(" mysql_set_character_set error!" << func_name);
-            return false;
-        }
+    if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
+        m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
+        HKU_ERROR(" Failed to connect to database!" << func_name);
+        return false;
+    }
 
-        m_mysql = mysql;
+    if (mysql_set_character_set(mysql.get(), "utf8")) {
+        HKU_ERROR(" mysql_set_character_set error!" << func_name);
+        return false;
+    }
 
-        int res = mysql_query(m_mysql.get(), sql_str.c_str());
-        if(!res) {
-            return true;
-        }
+    m_mysql = mysql;
 
+    res = mysql_query(m_mysql.get(), sql_str.c_str());
+    if(!res) {
+        return true;
     }
 
     HKU_ERROR("mysql_query error! error no: " << res
