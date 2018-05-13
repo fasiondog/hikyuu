@@ -30,10 +30,12 @@
 #===============================================================================
 
 from hikyuu.trade_manage import OrderBrokerBase
+from hikyuu import Datetime
 
     
 class OrderBrokerWrap(OrderBrokerBase):
     """订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
+       包装只有买卖操作参数只有(code, price, num)的交易接口类
     """
     
     def __init__(self, broker, real=True, slip=0.03):
@@ -49,7 +51,7 @@ class OrderBrokerWrap(OrderBrokerBase):
         self._real = real
         self._slip=slip
         
-    def _buy(self, code, price, num):
+    def _buy(self, datetime, market, code, price, num):
         """实现 OrderBrokerBase 的 _buy 接口"""
         if self._real:
             import tushare as ts
@@ -59,18 +61,22 @@ class OrderBrokerWrap(OrderBrokerBase):
                 self._broker.buy(code, new_price, num)
             else:
                 print("out of slip, not buy!!!!!!!!!!")
+            return Datetime.now()
         else:
             self._broker.buy(code, price, num)
+            return datetime
         
-    def _sell(self, code, price, num):
+    def _sell(self, datetime, market, code, price, num):
         """实现 OrderBrokerBase 的 _sell 接口"""
         if self._real:
             import tushare as ts
             df = ts.get_realtime_quotes(code)
             new_price = float(df.ix[0]['bid'])
             self._broker.sell(code, new_price, num)
+            return Datetime.now()
         else:
             self._broker.sell(code, price, num)
+            return datetime
 
         
 class TestOrderBroker:

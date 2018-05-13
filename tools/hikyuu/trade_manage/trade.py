@@ -29,6 +29,9 @@
 # 1. 20130213, Added by fasiondog
 #===============================================================================
 
+#TradeManager.buy等方法默认参数使用了Part，这里必须先导入，否则报初始化错误
+from hikyuu.trade_sys import system 
+
 from ._trade_manage import *
 from hikyuu import Datetime, Query, QueryByDate, StockManager
 from hikyuu.util.slice import list_getitem

@@ -131,14 +131,23 @@ void export_TradeManager() {
             //.def("returnCash", &TradeManager::returnCash)
             //.def("borrowStock", &TradeManager::borrowStock)
             //.def("returnStock", &TradeManager::returnStock)
-            //.def("buy", &TradeManager::buy, buy_overload())
+
             .def("buy", &TradeManager::buy,
-                    buy_overload(args("datetime", "stock", "realPrice",
-                            "num", "stoploss", "goalPrice", "planPrice","part")))
-            //.def("sell", &TradeManager::sell, sell_overload())
+                    (arg("datetime"), arg("stock"),
+                           arg("realPrice"), arg("num"), arg("stoploss")=0.0,
+                           arg("goalPrice")=0.0, arg("planPrice")=0.0,
+                           arg("part")=PART_INVALID))
+
+                    //buy_overload(args("datetime", "stock", "realPrice",
+                            //"num", "stoploss", "goalPrice", "planPrice","part")))
+
             .def("sell", &TradeManager::sell,
-                    sell_overload(args("datetime", "stock", "realPrice",
-                            "num", "stoploss", "goalPrice", "planPrice", "part")))
+                          (arg("datetime"), arg("stock"),
+                           arg("realPrice"), arg("num"), arg("stoploss")=0.0,
+                           arg("goalPrice")=0.0, arg("planPrice")=0.0,
+                           arg("part")=PART_INVALID))
+                    //sell_overload(args("datetime", "stock", "realPrice",
+                            //"num", "stoploss", "goalPrice", "planPrice", "part")))
             //.def("buyShort", &TradeManager::buyShort, buyShort_overload())
             //.def("sellShort", &TradeManager::sellShort, sellShort_overload())
 

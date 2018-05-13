@@ -1125,13 +1125,13 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
     }
 
     if (result.datetime > m_broker_last_datetime) {
-        Datetime timestamp;
-        bd::date result_day = result.datetime.ptime().date();
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
         for(; broker_iter != m_broker_list.end(); ++broker_iter) {
-            timestamp = (*broker_iter)->buy(stock.code(), planPrice, number);
-            bt::time_duration x = timestamp.ptime().time_of_day();
-            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
+            Datetime realtime = (*broker_iter)->buy(datetime,
+                                                    stock.market(),
+                                                    stock.code(),
+                                                    planPrice, number);
+            m_broker_last_datetime = realtime;
         }
     }
 
@@ -1245,13 +1245,13 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock,
     }
 
     if (result.datetime > m_broker_last_datetime) {
-        Datetime timestamp;
-        bd::date result_day = result.datetime.ptime().date();
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
         for(; broker_iter != m_broker_list.end(); ++broker_iter) {
-            timestamp = (*broker_iter)->sell(stock.code(), planPrice, number);
-            bt::time_duration x = timestamp.ptime().time_of_day();
-            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
+            Datetime realtime = (*broker_iter)->sell(datetime,
+                                                     stock.market(),
+                                                     stock.code(),
+                                                     planPrice, number);
+            m_broker_last_datetime = realtime;
         }
     }
 
@@ -2308,17 +2308,6 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
                 (tr.realPrice - tr.stoploss) * tr.number * tr.stock.unit(), precision);
     }
 
-    if (tr.datetime > m_broker_last_datetime) {
-        Datetime timestamp;
-        bd::date result_day = tr.datetime.ptime().date();
-        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        for(; broker_iter != m_broker_list.end(); ++broker_iter) {
-            timestamp = (*broker_iter)->buy(tr.stock.code(), tr.planPrice, tr.number);
-            bt::time_duration x = timestamp.ptime().time_of_day();
-            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
-        }
-    }
-
     _saveAction(new_tr);
 
     return true;
@@ -2377,17 +2366,6 @@ bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
         m_position_history.push_back(position);
         //删除当前持仓
         m_position.erase(tr.stock.id());
-    }
-
-    if (tr.datetime > m_broker_last_datetime) {
-        Datetime timestamp;
-        bd::date result_day = tr.datetime.ptime().date();
-        list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
-        for(; broker_iter != m_broker_list.end(); ++broker_iter) {
-            timestamp = (*broker_iter)->sell(tr.stock.code(), tr.planPrice, tr.number);
-            bt::time_duration x = timestamp.ptime().time_of_day();
-            m_broker_last_datetime = Datetime(bt::ptime(result_day, x));
-        }
     }
 
     _saveAction(new_tr);
