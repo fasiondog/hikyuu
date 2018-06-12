@@ -1131,7 +1131,8 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock,
                                                     stock.market(),
                                                     stock.code(),
                                                     planPrice, number);
-            m_broker_last_datetime = realtime;
+            if (realtime != Null<Datetime>())
+                m_broker_last_datetime = realtime;
         }
     }
 

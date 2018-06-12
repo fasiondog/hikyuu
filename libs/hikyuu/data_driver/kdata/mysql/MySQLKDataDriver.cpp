@@ -122,7 +122,9 @@ bool MySQLKDataDriver::_query(const string& sql_str) {
 
 string MySQLKDataDriver
 ::_getTableName(const string& market, const string& code, KQuery::KType ktype) {
-    return market + "_" + KQuery::getKTypeName(ktype) + "." + code;
+    string table(market + "_" + KQuery::getKTypeName(ktype) + "." + code);
+    boost::to_lower(table);
+    return table;
 }
 
 MySQLKDataDriver::~MySQLKDataDriver() {

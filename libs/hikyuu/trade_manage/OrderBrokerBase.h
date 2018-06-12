@@ -9,6 +9,7 @@
 #define TRADE_MANAGE_ORDERBROKERBASE_H_
 
 #include "../DataType.h"
+#include "../utilities/Parameter.h"
 
 namespace hku {
 
@@ -27,6 +28,8 @@ namespace hku {
  * @ingroup OrderBroker
  */
 class HKU_API OrderBrokerBase {
+    PARAMETER_SUPPORT
+
 public:
     OrderBrokerBase();
     OrderBrokerBase(const string& name);
