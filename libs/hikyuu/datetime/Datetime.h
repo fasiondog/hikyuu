@@ -10,7 +10,7 @@
 
 #include <string>
 #include <vector>
-#include "boost/date_time/posix_time/posix_time.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(disable: 4251)
@@ -202,15 +202,15 @@ inline int Datetime::day() const {
 }
 
 inline int Datetime::hour() const {
-    return m_data.time_of_day().hours();
+    return int(m_data.time_of_day().hours());
 }
 
 inline int Datetime::minute() const {
-    return m_data.time_of_day().minutes();
+    return int(m_data.time_of_day().minutes());
 }
 
 inline int Datetime::second() const {
-    return m_data.time_of_day().seconds();
+    return int(m_data.time_of_day().seconds());
 }
 
 inline bt::ptime Datetime::ptime() const {

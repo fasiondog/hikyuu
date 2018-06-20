@@ -44,7 +44,7 @@ goto Not_found_compiler
 
 :Start_build
 @echo on
-b2 -j 4 link=shared threading=multi %ADDRESS_MODEL%
+%BOOST_ROOT%\b2 -j 4 link=shared threading=multi %ADDRESS_MODEL%
 REM %TOOLSET%  需要利用Jamroot消除告警
 
 @if NOT exist .\bin mkdir .\bin
@@ -72,7 +72,7 @@ copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\trade_instance\*.pyd .\tools\hiky
 copy .\build\hikyuu_python\%BUILD_OUTPUT_PATH%\data_driver\*.pyd .\tools\hikyuu\data_driver
 
 cd ./test
-bjam -j 4 link=shared threading=multi %ADDRESS_MODEL% 
+%BOOST_ROOT%\b2 -j 4 link=shared threading=multi %ADDRESS_MODEL% 
 cd ..
 
 python .\tools\hikyuu\test\test.py

@@ -8,7 +8,7 @@
 #ifndef SQLITEBASEINFODRIVER_H_
 #define SQLITEBASEINFODRIVER_H_
 
-#include <sqlite3.h>
+#include "../../../../../extern-libs/sqlite3/sqlite3.h"
 #include "../../../Log.h"
 #include "../../BaseInfoDriver.h"
 

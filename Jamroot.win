@@ -4,7 +4,9 @@
 
 #  MSVC configuration
 #using gcc ;
-using msvc : 10.0 : : <compileflags>/wd4819 ;
+using msvc : 10.0 : : <compileflags>/wd4819 
+                      <compileflags>/wd4251
+                    ;
 
 # Python configuration
 #using python : 2.6 : /usr ;
