@@ -1,0 +1,3 @@
+[submodule "hikyuu_extern_libs"]
+	path = hikyuu_extern_libs
+	url = https://gitee.com/fasiondog/hikyuu_extern_libs.git

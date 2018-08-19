@@ -42,6 +42,5 @@ extern-libs.*
 /project/msvc10/output
 /project/msvc10/ipch
 /project/msvc
-/hikyuu_extern_libs
 *~
 
