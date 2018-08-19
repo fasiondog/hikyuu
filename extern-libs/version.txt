@@ -1,6 +1,0 @@
-﻿HDF5-1.8.10-patch1
-sqlite-amalgamation-3071502
-log4cplus-1.1.1-rc3
-mysql-connector-c-6.1.5-winx64
-
-此目录下默认为64位DLL库，如需32位库请从https://git.oschina.net/fasiondog/hikyuu_extern_libs.git下载

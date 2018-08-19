@@ -1,1 +1,0 @@
-ipython --pylab --profile=hikyuu
