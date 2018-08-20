@@ -13,5 +13,5 @@ target("demo")
     -- add files
     add_files("./*.cpp")
 
-    add_deps("hikyuu_utils")
+    add_deps("hikyuu")
 

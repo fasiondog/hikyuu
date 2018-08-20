@@ -3,6 +3,7 @@ target("test")
 
     if is_plat("windows") then
         add_cxflags("-wd4267")
+        add_cxflags("-wd4251")
     end
     
     if is_plat("windows") then
@@ -18,5 +19,7 @@ target("test")
     add_files("**.cpp")
 
     before_run(function(target)
+        print("copying test_data ...")
+        os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
         os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end)

@@ -10,10 +10,12 @@
 
 #include <string>
 
-#define USE_BOOST_LOG_FOR_LOGGING 1
+#define USE_SPDLOG_FOR_LOGGING 1
+//#define USE_BOOST_LOG_FOR_LOGGING 1
 //#define USE_LOG4CPLUS_FOR_LOGGING 1
 //#define USE_STDOUT_FOR_LOGGING 1
 
+//deprecated
 #ifdef USE_LOG4CPLUS_FOR_LOGGING
 #include <log4cplus/configurator.h>
 #include <log4cplus/consoleappender.h>
@@ -25,6 +27,11 @@
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
+#endif
+
+#ifdef USE_SPDLOG_FOR_LOGGING
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #endif
 
 #ifdef USE_STDOUT_FOR_LOGGING
@@ -72,6 +79,32 @@ typedef log4cplus::Logger Logger;
 #define HKU_ERROR(msg)  BOOST_LOG_TRIVIAL(error) << msg
 #define HKU_FATAL(msg)  BOOST_LOG_TRIVIAL(fatal) << msg
 #endif /* for USE_BOOST_LOG_FOR_LOGGING */
+
+
+/**********************************************
+ * Use SPDLOG for logging
+ *
+ *********************************************/
+#ifdef USE_SPDLOG_FOR_LOGGING
+#define HKU_DEBUG(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << msg;\
+                          spdlog::get("console")->debug(buf.str().c_str());}
+#define HKU_TRACE(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << msg;\
+                          spdlog::get("console")->trace(buf.str().c_str());}
+#define HKU_INFO(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << msg;\
+                          spdlog::get("console")->info(buf.str().c_str());}
+#define HKU_WARN(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << msg;\
+                          spdlog::get("console")->warn(buf.str().c_str());}
+#define HKU_ERROR(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << msg;\
+                          spdlog::get("console")->error(buf.str().c_str());}
+#define HKU_FATAL(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << msg;\
+                          spdlog::get("console")->critical(buf.str().c_str());}
+#endif
 
 
 /**********************************************

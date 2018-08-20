@@ -63,6 +63,19 @@ void init_logger(const std::string& configure_name) {
 }
 #endif /* for USE_BOOST_LOG_FOR_LOGGING */
 
+
+/**********************************************
+ * Use SPDLOG for logging
+ *
+ *********************************************/
+#ifdef USE_SPDLOG_FOR_LOGGING
+void init_logger(const std::string& configure_name) {
+    auto console = spdlog::stdout_color_mt("console");
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+}
+#endif
+
+
 /**********************************************
  * Use STDOUT for logging, not threadsafe
  *

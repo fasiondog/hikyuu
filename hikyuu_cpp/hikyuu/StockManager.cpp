@@ -25,7 +25,9 @@ namespace hku {
 shared_ptr<StockManager> StockManager::m_sm;
 
 StockManager::~StockManager() {
-    HKU_TRACE("Quit Hikyuu system!\n");
+    std::cout << "Quit Hikyuu system!" << std::endl;
+    //Cannot use log output when exiting!
+    //HKU_TRACE("Quit Hikyuu system!\n");
 }
 
 

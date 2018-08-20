@@ -19,7 +19,9 @@ public:
     void operator()(sqlite3 *db){
         if(db){
             sqlite3_close(db);
-            HKU_TRACE("Closed Sqlite3 database!");
+            //std::cout << "Closed Sqlite3 database!" << std::endl;
+            //Cannot use log output when exiting!
+            //HKU_TRACE("Closed Sqlite3 database!");
         }
     }
 };
