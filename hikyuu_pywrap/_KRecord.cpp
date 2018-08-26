@@ -15,8 +15,6 @@ using namespace hku;
 bool (*krecord_eq)(const KRecord&, const KRecord&) = operator==;
 
 void export_KReord() {
-    docstring_options doc_options(false);
-
     class_<KRecord>("KRecord", init<>())
             .def(init<const Datetime&>())
             .def(init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t>())

@@ -1,4 +1,5 @@
 .xmake
+.idea
 *.xml
 *.bak
 *.pyc

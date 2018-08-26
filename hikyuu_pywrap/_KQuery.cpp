@@ -16,8 +16,6 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(KQueryByDate_overload, KQueryByDate, 0, 4);
 BOOST_PYTHON_FUNCTION_OVERLOADS(KQueryByIndex_overload, KQueryByIndex, 0, 4);
 
 void export_KQuery() {
-    docstring_options doc_options(false);
-
     def("KQueryByDate", KQueryByDate, KQueryByDate_overload());
     def("KQueryByIndex", KQueryByIndex, KQueryByIndex_overload());
 
@@ -60,7 +58,7 @@ void export_KQuery() {
             .value("HALFYEAR", KQuery::HALFYEAR)
             .value("YEAR", KQuery::YEAR)
 
-            //BTCÀ©Õ¹
+            //BTCï¿½ï¿½Õ¹
             .value("MIN3", KQuery::MIN3)
             .value("HOUR2", KQuery::HOUR2)
             .value("HOUR4", KQuery::HOUR4)

@@ -13,7 +13,6 @@ using namespace boost::python;
 using namespace hku;
 
 void export_KData() {
-    docstring_options doc_options(false);
 
     class_<KData>("KData", init<>())
             .def(init<const KData&>())

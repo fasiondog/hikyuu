@@ -21,8 +21,6 @@ BlockList (StockManager::*getBlockList_1)(const string&) = &StockManager::getBlo
 BlockList (StockManager::*getBlockList_2)() = &StockManager::getBlockList;
 
 void export_StockManager(){
-    docstring_options doc_options(false);
-
     class_<StockManager>("StockManager", no_init)
             .def("instance", &StockManager::instance,
                  return_value_policy<reference_existing_object>())

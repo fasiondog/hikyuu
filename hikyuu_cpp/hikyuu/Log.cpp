@@ -17,6 +17,16 @@ namespace logging = boost::log;
 
 namespace hku {
 
+/**********************************************
+ * Use Python stdout for logging
+ *
+ *********************************************/
+#ifdef USE_PYTHON_STDOUT_FOR_LOGGING
+void init_logger(const std::string& configure_name) {
+
+}
+#endif /* for USE_PYTHON_STDOUT_FOR_LOGGING */
+
 
 /**********************************************
  * Use log4cplus for logging
@@ -70,6 +80,7 @@ void init_logger(const std::string& configure_name) {
  *********************************************/
 #ifdef USE_SPDLOG_FOR_LOGGING
 void init_logger(const std::string& configure_name) {
+    spdlog::set_level(spdlog::level::trace);
     auto console = spdlog::stdout_color_mt("console");
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 }

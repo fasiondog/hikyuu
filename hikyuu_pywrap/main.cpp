@@ -25,6 +25,8 @@ void export_Parameter();
 void export_save_load();
 
 BOOST_PYTHON_MODULE(_hikyuu){
+    boost::python::docstring_options doc_options(false);
+
     boost::python::def("hikyuu_init", hku::hikyuu_init);
     boost::python::def("getStock", hku::getStock);
 

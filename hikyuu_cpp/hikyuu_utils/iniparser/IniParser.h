@@ -59,8 +59,7 @@ public:
     IniParser();
     virtual ~IniParser();
 
-    void read(const std::string& filename) throw (std::invalid_argument,
-            std::logic_error);
+    void read(const std::string& filename);
     void clear();
 
     bool hasSection(const std::string& section) const;
@@ -70,8 +69,7 @@ public:
     StringListPtr getOptionList(const std::string& section) const;
 
     std::string get(const std::string& section, const std::string& option,
-            const std::string& default_str = std::string()) const
-            throw (std::invalid_argument);
+            const std::string& default_str = std::string()) const;
 
     //以下默认值类型使用string的原因是因为int/float/double/bool类型没有空对象
     int getInt(const std::string& section, const std::string& option,

@@ -38,7 +38,7 @@ DatetimeList.__doc__ = """日期序列，对应C++中的std::vector<Datetime>"""
 PriceList.__doc__ ="""价格序列，其中价格使用double表示，对应C++中的std::vector<double>。"""
 
 
-toPriceList.__doc__ += """\n
+toPriceList.__doc__ = """
 将Python的可迭代对象如 list、tuple 转化为 PriceList
     
     :param arg: 待转化的Python序列
@@ -84,16 +84,24 @@ nextDay(self)
     返回下一自然日
 """
 
-Datetime.max.__doc__ += """
-获取支持的最大日期
+Datetime.max.__doc__ = """
+max()
+    
+    获取支持的最大日期
 """
-Datetime.min.__doc__ += """
-获取支持的最小日期"""
+Datetime.min.__doc__ = """
+min()
 
-Datetime.now.__doc__ += """
-获取当前日期时间"""
+    获取支持的最小日期
+"""
 
-getDateRange.__doc__ += """\n
+Datetime.now.__doc__ = """
+now()
+    
+    获取当前日期时间
+"""
+
+getDateRange.__doc__ = """\n
 获取指定 [start, end) 日期时间范围的自然日日历日期列表，仅支持到日
 
 :param Datetime start: 起始日期

@@ -203,7 +203,7 @@ int callback_get_stockcode_list(void *output, int nCol, char **azVals, char **az
 
 //select stockid, code, name, valid from stock where marketid = ?"
 int callback_get_stock_info_by_market(void *output, int nCol, char **azVals, char **azCols) {
-    assert(nCol==3);
+    assert(nCol==4);
     int result = 0;
     StockInfoByMarket info;
     try{

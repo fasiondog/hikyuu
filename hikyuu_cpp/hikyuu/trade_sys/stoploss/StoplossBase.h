@@ -54,7 +54,7 @@ public:
     /** 复位操作 */
     void reset();
 
-    typedef boost::shared_ptr<StoplossBase> StoplossPtr;
+    typedef shared_ptr<StoplossBase> StoplossPtr;
     /** 克隆操作 */
     StoplossPtr clone();
 
@@ -164,10 +164,10 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(StoplossBase)
  * 客户程序都应使用该指针类型，操作止损策略实例
  * @ingroup StopLoss
  */
-typedef boost::shared_ptr<StoplossBase> StoplossPtr;
-typedef boost::shared_ptr<StoplossBase> STPtr;
-typedef boost::shared_ptr<StoplossBase> TakeProfitPtr;
-typedef boost::shared_ptr<StoplossBase> TPPtr;
+typedef shared_ptr<StoplossBase> StoplossPtr;
+typedef shared_ptr<StoplossBase> STPtr;
+typedef shared_ptr<StoplossBase> TakeProfitPtr;
+typedef shared_ptr<StoplossBase> TPPtr;
 
 HKU_API std::ostream& operator <<(std::ostream& os, const StoplossBase&);
 HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr&);

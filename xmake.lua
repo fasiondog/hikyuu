@@ -9,7 +9,7 @@ set_warnings("all", "error")
 --set_warnings("all")
 
 -- set language: C99, c++ standard
-set_languages("C99", "cxx11")
+set_languages("C99", "cxx17")
 
 add_plugindirs("./xmake_plugins")
 
@@ -35,7 +35,8 @@ end
 -- is release now
 if is_mode("release") then
     if is_plat("windows") then
-        set_symbols("hidden")
+        --Unix-like systems hidden symbols will cause the link dynamic libraries to failed!
+        set_symbols("hidden") 
     end
     set_optimize("fastest")
     set_strip("all")
@@ -74,4 +75,4 @@ add_subdirs("./hikyuu_cpp/importdata")
 add_subdirs("./hikyuu_cpp/hikyuu")
 add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")
-add_subdirs("./hikyuu_cpp/demo")
+add_subdirs("./hikyuu_cpp/demo")  

@@ -53,7 +53,7 @@ IniParser::~IniParser() {
  * @throw std::logic_error 当文件格式错误时，抛出该异常
  * @param filename 指定文件名
  */
-void IniParser::read(const std::string& filename) throw(std::invalid_argument, std::logic_error) {
+void IniParser::read(const std::string& filename) {
     std::ifstream inifile(filename.c_str(), std::ifstream::in);
     if (!inifile) {
         throw(std::invalid_argument("Can't read file(" + filename + ")!"));
@@ -212,8 +212,7 @@ IniParser::StringListPtr IniParser::getOptionList(const std::string& section) co
  *                    将抛出std::invalid_argument异常。默认为空，没有指定缺省值。
  */
 std::string IniParser::get(const std::string& section, const std::string& option,
-                           const std::string& default_str) const
-                          throw(std::invalid_argument) {
+                           const std::string& default_str) const {
     std::string result;
     if (m_sections.count(section) == 0) {
         throw(std::invalid_argument("No section: " + section));

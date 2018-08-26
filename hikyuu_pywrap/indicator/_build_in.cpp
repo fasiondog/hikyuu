@@ -109,8 +109,6 @@ Indicator (*IND_OR2)(const Indicator&, price_t) = IND_OR;
 Indicator (*IND_OR3)(price_t, const Indicator&) = IND_OR;
 
 void export_Indicator_build_in() {
-    docstring_options doc_options(false);
-
     def("KDATA", KDATA1);
     def("KDATA", KDATA2);
     def("KDATA", KDATA3);

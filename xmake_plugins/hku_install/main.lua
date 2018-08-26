@@ -32,16 +32,18 @@ import("install")
 
 function _cp_hikyuu(installdir)
     cprint("copying python file ...")
-    --local hikyuudir = installdir .. "/hikyuu"
     local hikyuudir = installdir
-    --os.cp("hikyuu_python", installdir)
-
     local build_dir = "build/release/" .. os.host() .. "/" .. os.arch() .. "/lib"
-    if os.host() == "windows" then    
+    if os.host() == "windows" then
         os.exec("xcopy /S /Q /Y /I hikyuu_python " .. installdir)
+        os.exec("xcopy /S /Q /Y /I hikyuu_extern_libs\\inc " .. installdir .. "\\include")
         os.cp(build_dir .. "/*.lib", installdir .. "/lib/")
-        os.cp(build_dir .. "/*.dll", installdir .. "/lib/")
+        os.cp(build_dir .. "/*.dll", installdir .. "/")
+        os.cp(installdir .. "/bin/importdata.exe", installdir .. "/")
         os.rm(installdir .. "/lib/_*.lib")
+        os.rm(installdir .. "/lib/*.dll")
+        os.rm(installdir .. "/bin")
+        os.rm(installdir .. "/boost_unit_test*.dll")
         
         os.mv(installdir.."/lib/_hikyuu.pyd", hikyuudir)
         os.mv(installdir.."/lib/_data_driver.pyd", hikyuudir .. "/data_driver")
@@ -49,7 +51,6 @@ function _cp_hikyuu(installdir)
         os.mv(installdir.."/lib/_trade_instance.pyd", hikyuudir .. "/trade_instance")
         os.mv(installdir.."/lib/_trade_manage.pyd", hikyuudir .. "/trade_manage")
         os.mv(installdir.."/lib/_trade_sys.pyd", hikyuudir .. "/trade_sys")
-        os.mv(installdir.."/bin/importdata.exe", hikyuudir)
     end
     
 end

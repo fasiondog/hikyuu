@@ -13,8 +13,6 @@ using namespace boost::python;
 using namespace hku;
 
 void export_StockTypeInfo() {
-    docstring_options doc_options(false, true, false);
-
     class_<StockTypeInfo>("StockTypeInfo", init<>())
             .def(init<hku_uint32, const string&, price_t, price_t, int, size_t, size_t>())
             //.def(self_ns::str(self))

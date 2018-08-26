@@ -13,6 +13,7 @@ using namespace boost::python;
 void export_AmaInstance();
 
 BOOST_PYTHON_MODULE(_trade_instance) {
+    docstring_options doc_options(false);
     export_AmaInstance();
 }
 

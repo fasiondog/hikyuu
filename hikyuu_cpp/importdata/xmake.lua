@@ -3,6 +3,7 @@ target("importdata")
     
     if is_plat("windows") then
         add_cxflags("-wd4267")
+        add_cxflags("-wd4244")
         add_defines("HKU_API=__declspec(dllimport)")
         add_defines("SQLITE_API=__declspec(dllimport)")
     end

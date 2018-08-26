@@ -10,10 +10,17 @@
 
 #include <string>
 
+//#define USE_PYTHON_STDOUT_FOR_LOGGING 1
 #define USE_SPDLOG_FOR_LOGGING 1
 //#define USE_BOOST_LOG_FOR_LOGGING 1
 //#define USE_LOG4CPLUS_FOR_LOGGING 1
 //#define USE_STDOUT_FOR_LOGGING 1
+
+#ifdef USE_PYTHON_STDOUT_FOR_LOGGING
+#include <boost/python/detail/wrap_python.hpp>
+#include "datetime/Datetime.h"
+#endif
+
 
 //deprecated
 #ifdef USE_LOG4CPLUS_FOR_LOGGING
@@ -46,6 +53,31 @@ namespace hku {
 
 void HKU_API init_logger(const std::string& configue_name);
 
+
+/**********************************************
+ * Use Python stdout for logging
+ *
+ *********************************************/
+#ifdef USE_PYTHON_STDOUT_FOR_LOGGING
+#define HKU_DEBUG(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << Datetime::now() << " [DEBUG] " << msg;\
+                          PySys_WriteStdout(buf.str().c_str());}
+#define HKU_TRACE(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << Datetime::now() << " [TRACE] " << msg;\
+                          PySys_WriteStdout(buf.str().c_str());}
+#define HKU_INFO(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << Datetime::now() << " [INFO] " << msg;\
+                          PySys_WriteStdout(buf.str().c_str());}
+#define HKU_WARN(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << Datetime::now() << " [WARN] " << msg;\
+                          PySys_WriteStdout(buf.str().c_str());}
+#define HKU_ERROR(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << Datetime::now() << " [ERROR] " << msg;\
+                          PySys_WriteStdout(buf.str().c_str());}
+#define HKU_FATAL(msg)  { std::stringstream buf (std::stringstream::out); \
+                          buf << Datetime::now() << " [FATAL] " << msg;\
+                          PySys_WriteStdout(buf.str().c_str());}
+#endif
 
 /**********************************************
  * Use log4cplus for logging

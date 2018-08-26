@@ -20,7 +20,6 @@ bool (*ge)(const Datetime&, const Datetime&) = operator>=;
 bool (*le)(const Datetime&, const Datetime&) = operator<=;
 
 void export_Datetime() {
-    docstring_options doc_options(false, true, false);
 
     class_<Datetime>("Datetime")
             .def(init<unsigned long long>())

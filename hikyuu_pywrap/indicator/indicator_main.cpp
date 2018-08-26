@@ -15,6 +15,7 @@ void export_Indicator_build_in();
 void export_Operand();
 
 BOOST_PYTHON_MODULE(_indicator) {
+    docstring_options doc_options(false);
     export_Indicator();
     export_IndicatorImp();
     export_Indicator_build_in();

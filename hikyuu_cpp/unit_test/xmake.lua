@@ -4,6 +4,8 @@ target("test")
     if is_plat("windows") then
         add_cxflags("-wd4267")
         add_cxflags("-wd4251")
+        add_cxflags("-wd4244")
+        add_cxflags("-wd4805")
     end
     
     if is_plat("windows") then

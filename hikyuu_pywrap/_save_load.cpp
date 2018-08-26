@@ -120,8 +120,6 @@ void xml_load(T& arg, const string& filename) {
 
 
 void export_save_load() {
-    docstring_options doc_options(false);
-
     //初始化注册支持的类型
     registerSupportClass();
 
