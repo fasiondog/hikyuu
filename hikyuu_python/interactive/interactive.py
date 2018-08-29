@@ -53,6 +53,9 @@ from hikyuu.trade_sys.portfolio import *
 from hikyuu.interactive import *
 #import time
 
+#重定向C++ stdout/stderr输出至python
+iodog = ostream_redirect()
+
 
 #==============================================================================
 # 引入扯线木偶

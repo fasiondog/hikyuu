@@ -12,6 +12,9 @@
 *.suo
 .metadata
 .settings
+.cproject
+.project
+.pyproject
 /build
 *~
 

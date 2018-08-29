@@ -68,19 +68,19 @@ bool BaseInfoDriver::loadBaseInfo() {
         return false;
     }
 
-    HKU_TRACE("Loading market information...");
+    HKU_INFO("Loading market information...");
     if (!_loadMarketInfo()) {
         HKU_FATAL("Can't load Market Information.");
         return false;
     }
 
-    HKU_TRACE("Loading stock type information...");
+    HKU_INFO("Loading stock type information...");
     if (!_loadStockTypeInfo()) {
         HKU_FATAL("Can't load StockType Information.");
         return false;
     }
 
-    HKU_TRACE("Loading stock information...");
+    HKU_INFO("Loading stock information...");
     if (!_loadStock()) {
         HKU_FATAL("Can't load Stock");
         return false;
