@@ -15,6 +15,7 @@
 .cproject
 .project
 .pyproject
+.vscode
 /build
 *~
 

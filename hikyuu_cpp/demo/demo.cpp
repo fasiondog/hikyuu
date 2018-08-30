@@ -1,4 +1,4 @@
-// demo.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// demo.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include <hikyuu/hikyuu.h>
@@ -7,13 +7,20 @@ using namespace hku;
 
 int main(int argc, char* argv[])
 {
-    //ÅäÖÃÎÄ¼şµÄÎ»ÖÃ×ÔĞĞĞŞ¸Ä
+    //é…ç½®æ–‡ä»¶çš„ä½ç½®è‡ªè¡Œä¿®æ”¹
     hikyuu_init("c:\\stock\\hikyuu_win.ini");
 
     StockManager& sm = StockManager::instance();
 
     Stock stk = sm.getStock("sh000001");
     std::cout << stk << std::endl;
+    
+    auto k = stk.getKData(KQuery(-10));
+    std::cout << k << std::endl;
+
+    for (auto i=0; i < k.size(); i++) {
+        std::cout << k[i] << std::endl;
+    }
 
 	return 0;
 }

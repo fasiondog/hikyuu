@@ -8,6 +8,7 @@
 #ifndef HIKYUU_H_
 #define HIKYUU_H_
 
+#include "KData.h"
 #include "StockManager.h"
 #include "utilities/util.h"
 
