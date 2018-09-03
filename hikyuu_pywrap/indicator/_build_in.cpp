@@ -141,12 +141,9 @@ void export_Indicator_build_in() {
     def("KDATA_PART", KDATA_PART2, (arg("data"), arg("kpart")));
     def("KDATA_PART", KDATA_PART3, (arg("kpart")));
 
-    //无法直接使用Null<size_t>()，会导致异常退出
-    size_t null_size = Null<size_t>();
     def("PRICELIST", PRICELIST2, (arg("data"), arg("discard")=0));
     def("PRICELIST", PRICELIST3, (arg("data"), arg("result_index")=0));
     def("PRICELIST", PRICELIST4, (arg("result_index")=0));
-
 
     def("SMA", SMA_1, (arg("n")=22));
     def("SMA", SMA_2, (arg("data"), arg("n")=22));

@@ -21,11 +21,12 @@ set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 set_headerdir("$(buildir)/$(mode)/$(plat)/$(arch)/inc")
 
+add_includedirs("hikyuu_extern_libs/inc")
+
 add_includedirs("$(env BOOST_ROOT)")
 add_linkdirs("$(env BOOST_LIB)")
-add_defines("BOOST_ALL_DYN_LINK")
 
-add_includedirs("hikyuu_extern_libs/inc")
+add_defines("BOOST_ALL_DYN_LINK")
 
 if is_mode("debug") then
     set_symbols("debug")
@@ -59,10 +60,6 @@ if is_plat("windows") then
         add_cxflags("-Gs", "-RTC1") 
         add_cxflags("-MDd") 
     end
-end
-
-if is_plat("linux") then
-    add_ldflags("-Wl,-rpath=./")
 end
 
 add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "neon", "avx", "avx2")

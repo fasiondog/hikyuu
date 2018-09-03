@@ -638,8 +638,7 @@ void import_stock_weight(const SqlitePtr& db,
         return;
     }
 
-    int total = stock_list.size();
-    int count = 0, cur = 0;
+    int count = 0;
     std::list<StockCode>::const_iterator stk_iter = stock_list.begin();
     for (; stk_iter != stock_list.end(); ++stk_iter) {
         //progress_bar(++cur, total);
@@ -1669,7 +1668,6 @@ int dzh_import_min5_data_from_file(const std::string& file_name, const H5FilePtr
 
     std::vector<H5Record> h5_buffer;
     QianLongData data;
-    unsigned int tempval = 0xFFFFFFFF;
     memset(&data, 0, sizeof(QianLongData));
     while (file.read((char *)&data, sizeof(QianLongData))){
 
@@ -2179,7 +2177,7 @@ void update_stock_date(const SqlitePtr& db, const H5FilePtr& h5file,
         return;
     }
 
-    unsigned int today = get_today_date();
+    //unsigned int today = get_today_date();
 
     H5::Group h5_group = h5_get_group(h5file, "/data");
     //不能直接使用h5_get_data_table，会创建空数据集，造成脏数据
@@ -2854,7 +2852,6 @@ int tdx_import_min_data_from_file(const SqlitePtr& db,
 
     std::vector<H5Record> h5_buffer;
     TdxMinData data;
-    unsigned int tempval = 0xFFFFFFFF;
     memset(&data, 0, sizeof(TdxMinData));
     while (file.read((char *)&data, sizeof(TdxMinData))){
 

@@ -51,6 +51,16 @@ function _cp_hikyuu(installdir)
         os.mv(installdir.."/lib/_trade_instance.pyd", hikyuudir .. "/trade_instance")
         os.mv(installdir.."/lib/_trade_manage.pyd", hikyuudir .. "/trade_manage")
         os.mv(installdir.."/lib/_trade_sys.pyd", hikyuudir .. "/trade_sys")
+    
+    else
+        os.exec("cp -f -r -T hikyuu_python " .. installdir)
+        os.cp(build_dir .. "/*.so.*", installdir .. "/lib")
+        os.mv(installdir.."/lib/_hikyuu.so", hikyuudir)
+        os.mv(installdir.."/lib/_data_driver.so", hikyuudir.."/data_driver")
+        os.mv(installdir.."/lib/_indicator.so", hikyuudir .. "/indicator")
+        os.mv(installdir.."/lib/_trade_instance.so", hikyuudir .. "/trade_instance")
+        os.mv(installdir.."/lib/_trade_manage.so", hikyuudir .. "/trade_manage")
+        os.mv(installdir.."/lib/_trade_sys.so", hikyuudir .. "/trade_sys")
     end
     
 end

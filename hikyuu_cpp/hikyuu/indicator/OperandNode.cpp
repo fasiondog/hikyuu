@@ -130,6 +130,9 @@ Indicator OperandNode::calculate(const Indicator& ind) {
     case OR:
         result = IND_OR(m_left->calculate(ind), m_right->calculate(ind));
         break;
+
+    case INVALID:
+        break;
     }
 
     if (m_name != "")

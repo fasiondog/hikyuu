@@ -38,7 +38,7 @@ Portfolio::Portfolio(const string& name) : m_name(name) {
 Portfolio::Portfolio(const TradeManagerPtr& tm,
         const SelectorPtr& se,
         const AFPtr& af)
-: m_name("Portfolio"), m_se(se), m_tm(tm), m_af(af) {
+: m_name("Portfolio"), m_tm(tm), m_se(se), m_af(af) {
 
 }
 

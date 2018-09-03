@@ -44,7 +44,6 @@ Indicator HKU_API POS(const Block& block, KQuery query,
             continue;
         sg->setTO(kdata);
         bool isHold = false;
-        size_t n_dis = 0;
         for (size_t i = 0; i < dayTotal; ++i) {
             if (isHold) {
                 if (sg->shouldSell(dateList[i])) {

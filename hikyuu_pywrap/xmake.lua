@@ -1,22 +1,34 @@
+
+add_deps("hikyuu")
+
 if is_plat("windows") then
     add_defines("HKU_API=__declspec(dllimport)")
 end
-add_deps("hikyuu")
 
 target("_hikyuu")
     set_kind("shared")
+    --add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_hikyuu.pyd")
     else
         set_filename("_hikyuu.so")
+        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=./lib")
+        add_links("boost_python3")
     end
+
     add_files("./*.cpp")
-    add_options(python)
     on_load(function(target)
-        local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-        pydir = path.directory(pydir)
-        target:add("includedirs", pydir .. "/include")
-        target:add("linkdirs", pydir .. "/libs")
+        if is_plat("windows") then
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+        else
+            local pydir = os.iorun("python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\"")
+            local lcPos = string.find(pydir,"\n")
+            pydir = (string.sub(pydir,1,lcPos-1))
+            target:add("includedirs", pydir)
+        end
     end)
 
 target("_indicator")
@@ -25,13 +37,21 @@ target("_indicator")
         set_filename("_indicator.pyd")
     else
         set_filename("_indicator.so")
+        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
     end
     add_files("./indicator/*.cpp")
     on_load(function(target)
-        local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-        pydir = path.directory(pydir)
-        target:add("includedirs", pydir .. "/include")
-        target:add("linkdirs", pydir .. "/libs")
+        if is_plat("windows") then
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+        else
+            local pydir = os.iorun("python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\"")
+            local lcPos = string.find(pydir,"\n")
+            pydir = (string.sub(pydir,1,lcPos-1))
+            target:add("includedirs", pydir)
+        end
     end)
     
 target("_trade_manage")
@@ -40,13 +60,21 @@ target("_trade_manage")
         set_filename("_trade_manage.pyd")
     else
         set_filename("_trade_manage.so")
+        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
     end
     add_files("./trade_manage/*.cpp")
     on_load(function(target)
-        local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-        pydir = path.directory(pydir)
-        target:add("includedirs", pydir .. "/include")
-        target:add("linkdirs", pydir .. "/libs")
+        if is_plat("windows") then
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+        else
+            local pydir = os.iorun("python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\"")
+            local lcPos = string.find(pydir,"\n")
+            pydir = (string.sub(pydir,1,lcPos-1))
+            target:add("includedirs", pydir)
+        end
     end)
 
 target("_trade_sys")
@@ -55,13 +83,21 @@ target("_trade_sys")
         set_filename("_trade_sys.pyd")
     else
         set_filename("_trade_sys.so")
+        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
     end
     add_files("./trade_sys/*.cpp")
     on_load(function(target)
-        local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-        pydir = path.directory(pydir)
-        target:add("includedirs", pydir .. "/include")
-        target:add("linkdirs", pydir .. "/libs")
+        if is_plat("windows") then
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+        else
+            local pydir = os.iorun("python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\"")
+            local lcPos = string.find(pydir,"\n")
+            pydir = (string.sub(pydir,1,lcPos-1))
+            target:add("includedirs", pydir)
+        end
     end)
     
 target("_trade_instance")
@@ -70,13 +106,21 @@ target("_trade_instance")
         set_filename("_trade_instance.pyd")
     else
         set_filename("_trade_instance.so")
+        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
     end
     add_files("./trade_instance/*.cpp")
     on_load(function(target)
-        local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-        pydir = path.directory(pydir)
-        target:add("includedirs", pydir .. "/include")
-        target:add("linkdirs", pydir .. "/libs")
+        if is_plat("windows") then
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+        else
+            local pydir = os.iorun("python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\"")
+            local lcPos = string.find(pydir,"\n")
+            pydir = (string.sub(pydir,1,lcPos-1))
+            target:add("includedirs", pydir)
+        end
     end)
     
 target("_data_driver")
@@ -85,12 +129,20 @@ target("_data_driver")
         set_filename("_data_driver.pyd")
     else
         set_filename("_data_driver.so")
+        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
     end
     add_files("./data_driver/*.cpp")
     on_load(function(target)
-        local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-        pydir = path.directory(pydir)
-        target:add("includedirs", pydir .. "/include")
-        target:add("linkdirs", pydir .. "/libs")
+        if is_plat("windows") then
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+        else
+            local pydir = os.iorun("python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\"")
+            local lcPos = string.find(pydir,"\n")
+            pydir = (string.sub(pydir,1,lcPos-1))
+            target:add("includedirs", pydir)
+        end
     end)
     

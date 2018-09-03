@@ -45,7 +45,7 @@ bool MySQLKDataDriver::_init() {
     try {
         m_port = m_params.get<int>("port");
     } catch(...) {
-        m_port = 3306;
+        m_port = default_port;
     }
 
     try {
@@ -170,7 +170,7 @@ loadKData(const string& market, const string& code,
     }
 
     int i = 0;
-    while(row = mysql_fetch_row(result)) {
+    while ((row = mysql_fetch_row(result))) {
         try {
             KRecord k;
             hku_uint64 d = boost::lexical_cast<hku_uint64>(row[0]);
@@ -229,7 +229,7 @@ getCount(const string& market,
         return result;
     }
 
-    while(row = mysql_fetch_row(mysql_result)) {
+    while ((row = mysql_fetch_row(mysql_result))) {
         try {
             result = boost::lexical_cast<size_t>(row[0]);
         } catch (...) {
@@ -277,7 +277,7 @@ getIndexRangeByDate(const string& market, const string& code,
         return false;
     }
 
-    while(row = mysql_fetch_row(mysql_result)) {
+    while ((row = mysql_fetch_row(mysql_result))) {
         try {
             out_start = boost::lexical_cast<size_t>(row[0]);
         } catch (...) {
@@ -304,7 +304,7 @@ getIndexRangeByDate(const string& market, const string& code,
         return false;
     }
 
-    while(row = mysql_fetch_row(mysql_result)) {
+    while ((row = mysql_fetch_row(mysql_result))) {
         try {
             out_end = boost::lexical_cast<size_t>(row[0]) - 1;
         } catch (...) {
@@ -352,7 +352,7 @@ getKRecord(const string& market, const string& code,
         return result;
     }
 
-    while(row = mysql_fetch_row(mysql_result)) {
+    while ((row = mysql_fetch_row(mysql_result))) {
         try {
             hku_uint64 d = boost::lexical_cast<hku_uint64>(row[0]);
             result.datetime = Datetime(d);

@@ -67,7 +67,7 @@ TradeRecordList (TradeManager::*_getTradeList_2)(const Datetime&, const Datetime
 
 void export_TradeManager() {
 
-    size_t null_size = Null<size_t>();
+    //size_t null_size = Null<size_t>();
 
     class_<TradeManager>("TradeManager", init<const Datetime&, price_t,
             const TradeCostPtr&, const string&>())

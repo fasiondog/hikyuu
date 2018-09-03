@@ -1,4 +1,4 @@
-target("test")
+target("unit-test")
     set_kind("binary")
 
     if is_plat("windows") then
@@ -6,6 +6,9 @@ target("test")
         add_cxflags("-wd4251")
         add_cxflags("-wd4244")
         add_cxflags("-wd4805")
+    else
+        add_cxflags("-Wno-unused-variable")
+        add_cxflags("-Wno-sign-compare")
     end
     
     if is_plat("windows") then
@@ -16,6 +19,12 @@ target("test")
     add_defines("TEST_ALL_IN_ONE")
 
     add_deps("hikyuu")
+
+    if is_plat("linux") then
+        add_linkdirs("/usr/lib/x86_64-linux-gnu")
+        add_links("boost_unit_test_framework")
+        --add_rpathdirs("@loader_path")
+    end
 
     -- add files
     add_files("**.cpp")

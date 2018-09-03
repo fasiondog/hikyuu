@@ -174,7 +174,7 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
     price_t can_allocate_cash = funds.cash;
 
     //按分配的权重调整资产
-    int precision = m_tm->getParam<int>("precision");
+    //int precision = m_tm->getParam<int>("precision");
 
     for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
         if (can_allocate_cash <= 0 || iter->getWeight() <= 0) {
@@ -212,7 +212,7 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
                 m_tm->checkin(date, cash);
                 tm->checkout(date, cash);
             } else {
-                Stock stock = sys->getStock();
+                /*Stock stock = sys->getStock();
                 KRecord k = sys->getTO().getKRecordByDate(date);
                 PositionRecord position = tm->getPosition(stock);
                 if (position.number > 0) {
@@ -222,7 +222,7 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(
                         //tm->sell(date, stock, position.number, real)
                         //sys->_sell(record, PART_ALLOCATEFUNDS);
                     }
-                }
+                }*/
             }
 
         }

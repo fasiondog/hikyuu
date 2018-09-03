@@ -59,9 +59,9 @@ private:
 
 protected:
     string m_name;
+    TMPtr  m_tm;
     SEPtr  m_se;
     AFPtr  m_af;
-    TMPtr  m_tm;
 
     //以下为临时变量
     TMPtr  m_tm_shadow;    //影子账户，用于内部协调分配资金

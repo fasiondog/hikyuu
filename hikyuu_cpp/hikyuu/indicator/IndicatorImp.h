@@ -124,7 +124,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
-        int act_result_num = 0;
+        size_t act_result_num = 0;
         size_t i = 0;
         while (i < m_result_num) {
             if (m_pBuffer[i++])
@@ -146,7 +146,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
-        int act_result_num = 0;
+        size_t act_result_num = 0;
         ar & BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
             m_pBuffer[i] = new PriceList();

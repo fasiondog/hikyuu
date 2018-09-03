@@ -28,17 +28,17 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
 
 IndicatorImp::IndicatorImp()
 : m_name("IndicatorImp"), m_discard(0), m_result_num(0) {
-    memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name)
 : m_name(name), m_discard(0), m_result_num(0) {
-    memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name, size_t result_num)
 : m_name(name), m_discard(0) {
-    memset(m_pBuffer, NULL, sizeof(PriceList*) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 

@@ -23,7 +23,6 @@ SaftyLoss::~SaftyLoss() {
 bool SaftyLoss::check() {
     int n1 = getParam<int>("n1");
     int n2 = getParam<int>("n2");
-    double p = getParam<double>("p");
 
     if (n1 < 2) {
         HKU_ERROR("Invalid param[n1] must >= 2 ! [SaftyLoss::SaftyLoss]");
