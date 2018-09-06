@@ -97,3 +97,4 @@ target("hikyuu")
             os.cp("$(env BOOST_LIB)/libboost_unit_test_framework*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         end
     end)
+target_end()

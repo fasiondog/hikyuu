@@ -21,9 +21,9 @@ target("unit-test")
     add_deps("hikyuu")
 
     if is_plat("linux") then
-        add_linkdirs("/usr/lib/x86_64-linux-gnu")
         add_links("boost_unit_test_framework")
-        --add_rpathdirs("@loader_path")
+        --add_links("boost_system")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
     -- add files
@@ -34,3 +34,5 @@ target("unit-test")
         os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
         os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end)
+
+target_end()

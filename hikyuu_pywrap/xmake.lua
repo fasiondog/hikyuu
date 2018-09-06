@@ -12,7 +12,7 @@ target("_hikyuu")
         set_filename("_hikyuu.pyd")
     else
         set_filename("_hikyuu.so")
-        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=./lib")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/lib")
         add_links("boost_python3")
     end
 
@@ -24,10 +24,14 @@ target("_hikyuu")
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
         else
-            local pydir = os.iorun("python3 -c \"import sysconfig; print(sysconfig.get_path('include'))\"")
+            local pydir = os.iorun("python3-config --includes")
             local lcPos = string.find(pydir,"\n")
             pydir = (string.sub(pydir,1,lcPos-1))
             target:add("includedirs", pydir)
+            local libs = os.iorun("python3-config --libs")
+            local lcPos = string.find(libs,"\n")
+            libs = (string.sub(libs,1,lcPos-1))
+            target:add("shflags", libs)
         end
     end)
 
@@ -37,7 +41,8 @@ target("_indicator")
         set_filename("_indicator.pyd")
     else
         set_filename("_indicator.so")
-        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
+        add_links("boost_python3")
     end
     add_files("./indicator/*.cpp")
     on_load(function(target)
@@ -60,7 +65,8 @@ target("_trade_manage")
         set_filename("_trade_manage.pyd")
     else
         set_filename("_trade_manage.so")
-        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
+        add_links("boost_python3")
     end
     add_files("./trade_manage/*.cpp")
     on_load(function(target)
@@ -83,7 +89,8 @@ target("_trade_sys")
         set_filename("_trade_sys.pyd")
     else
         set_filename("_trade_sys.so")
-        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
+        add_links("boost_python3")
     end
     add_files("./trade_sys/*.cpp")
     on_load(function(target)
@@ -106,7 +113,8 @@ target("_trade_instance")
         set_filename("_trade_instance.pyd")
     else
         set_filename("_trade_instance.so")
-        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
+        add_links("boost_python3")
     end
     add_files("./trade_instance/*.cpp")
     on_load(function(target)
@@ -129,7 +137,8 @@ target("_data_driver")
         set_filename("_data_driver.pyd")
     else
         set_filename("_data_driver.so")
-        add_shflags("-Wl,-rpath=./", "-Wl,-rpath=../lib")
+        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
+        add_links("boost_python3")
     end
     add_files("./data_driver/*.cpp")
     on_load(function(target)

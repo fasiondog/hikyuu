@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     auto k = stk.getKData(KQuery(-10));
     std::cout << k << std::endl;
 
-    for (auto i=0; i < k.size(); i++) {
+    for (size_t i=0; i < k.size(); i++) {
         std::cout << k[i] << std::endl;
     }
 
