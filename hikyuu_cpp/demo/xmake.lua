@@ -6,7 +6,7 @@ option("with-demo")
 option_end()
 
 target("demo")
-    if has_config("with-demo") then
+    if is_option("with-demo") then
         set_kind("binary")
     else
         set_kind("phony")
@@ -25,5 +25,13 @@ target("demo")
     add_files("./*.cpp")
 
     add_deps("hikyuu")
+    
+    before_run(function(target)
+        import("core.project.config")
+        local with_demo = config.get("with-demo")
+        if not with_demo then
+            raise("You need to config first: xmake f --with-demo=y")
+        end
+    end)
 target_end()
 

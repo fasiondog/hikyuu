@@ -1,4 +1,4 @@
-option("with-test")
+option("with-unit-test")
     set_default(false)
     set_showmenu(true)
     set_category("hikyuu")
@@ -6,7 +6,7 @@ option("with-test")
 option_end()
 
 target("unit-test")
-    if has_config("with-test") then
+    if is_option("with-unit-test") then
         set_kind("binary")
     else
         set_kind("phony")
@@ -41,9 +41,15 @@ target("unit-test")
     add_files("**.cpp")
 
     before_run(function(target)
-        print("copying test_data ...")
-        os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
-        os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        import("core.project.config")
+        local with_test = config.get("with-unit-test")
+        if with_test then
+            print("copying test_data ...")
+            os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
+            os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        else
+            raise("You need to config first: xmake f --with-unit-test=y")
+        end
     end)
 
 target_end()

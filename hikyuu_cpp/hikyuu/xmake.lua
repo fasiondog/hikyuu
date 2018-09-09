@@ -26,11 +26,11 @@ target("hikyuu")
     
     set_config_header("hku_config.h", {prefix = "HKU"})
     add_options("serialization")
-    if has_config("support_serialization") then
+    if is_option("support_serialization") then
         add_defines_h("HKU_SUPPORT_SERIALIZATION")
     end
     add_defines_h("HKU_SUPPORT_".."$(serialization)".."_ARCHIVE")
-    if has_config("check_bound") then
+    if is_option("check_bound") then
         add_defines_h("CHECK_ACCESS_BOUND")
     end
     
