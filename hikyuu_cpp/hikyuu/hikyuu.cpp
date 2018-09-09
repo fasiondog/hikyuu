@@ -7,6 +7,7 @@
 
 #include <hikyuu_utils/iniparser/IniParser.h>
 #include "hikyuu.h"
+#include "version.h"
 
 namespace hku {
 
@@ -65,6 +66,10 @@ void hikyuu_init(const string& config_file_name) {
 Stock getStock(const string& querystr) {
     StockManager& sm = StockManager::instance();
     return sm.getStock(querystr);
+}
+
+string getVersion() {
+    return HKU_VERSION;
 }
 
 } /* namespace */

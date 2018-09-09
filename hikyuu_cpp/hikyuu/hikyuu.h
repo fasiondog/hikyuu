@@ -28,6 +28,12 @@ void HKU_API hikyuu_init(const string& config_file_name);
  */
 Stock HKU_API getStock(const string& querystr);
 
+/**
+ * 获取Hikyuu当前版本号
+ * @return 版本号
+ */
+string HKU_API getVersion();
+
 
 } /* namespace */
 

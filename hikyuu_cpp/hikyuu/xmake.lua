@@ -1,38 +1,8 @@
-option("check_bound")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Set indicator check bound")
-
-option("support_serialization")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Set support boost serialization")
-
-option("serialization")
-    set_default("XML")
-    set_values("XML", "BINARY", "TEXT")
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Set the mode of serialization, before support_serialization is y",
-                    "    - XML",
-                    "    - BINARAY",
-                    "    - TEXT")
-
-
 target("hikyuu")
     set_kind("shared")
     
-    set_config_header("hku_config.h", {prefix = "HKU"})
-    add_options("serialization")
-    if is_option("support_serialization") then
-        add_defines_h("HKU_SUPPORT_SERIALIZATION")
-    end
-    add_defines_h("HKU_SUPPORT_".."$(serialization)".."_ARCHIVE")
-    if is_option("check_bound") then
-        add_defines_h("CHECK_ACCESS_BOUND")
-    end
+    -- set version for release
+    set_config_header("version.h", {prefix = "HKU"})
     
     if is_plat("windows") then
         add_cxflags("-wd4819")  

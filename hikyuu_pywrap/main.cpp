@@ -30,6 +30,7 @@ BOOST_PYTHON_MODULE(_hikyuu){
 
     boost::python::def("hikyuu_init", hku::hikyuu_init);
     boost::python::def("getStock", hku::getStock);
+    boost::python::def("getVersion", hku::getVersion);
 
     export_DataType();
     export_Constant();

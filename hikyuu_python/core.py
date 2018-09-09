@@ -370,6 +370,7 @@ __all__ = [#类
            'IS_PY3',
            
            #函数
+           'getVersion',
            'getDateRange', 
            'getStock',
            'hikyuu_init', 
