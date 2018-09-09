@@ -66,7 +66,6 @@ target("hikyuu")
         add_links("hdf5_serial_hl")
         add_links("hdf5_cpp")
         add_links("mysqlclient")
-        add_links("boost_chrono")
         add_links("boost_date_time")
         add_links("boost_filesystem")
         add_links("boost_serialization")
@@ -95,13 +94,12 @@ target("hikyuu")
     
     after_build(function(target)
         if is_plat("windows") then
-            os.cp("$(env BOOST_LIB)/boost_chrono*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             os.cp("$(env BOOST_LIB)/boost_date_time*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             os.cp("$(env BOOST_LIB)/boost_filesystem*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             os.cp("$(env BOOST_LIB)/boost_python3*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             os.cp("$(env BOOST_LIB)/boost_serialization*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             os.cp("$(env BOOST_LIB)/boost_system*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/boost_thread*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+            --os.cp("$(env BOOST_LIB)/boost_thread*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             os.cp("$(env BOOST_LIB)/boost_unit_test_framework*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             
             os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/release/$(plat)/$(arch)/*.dll","$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
@@ -110,13 +108,12 @@ target("hikyuu")
         else
             local boostlib = val("env BOOST_LIB")
             if boostlib ~= "" then
-                os.cp("$(env BOOST_LIB)/libboost_chrono*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
                 os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
                 os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
                 os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
                 os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
                 os.cp("$(env BOOST_LIB)/libboost_system*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-                os.cp("$(env BOOST_LIB)/libboost_thread*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                --os.cp("$(env BOOST_LIB)/libboost_thread*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
                 os.cp("$(env BOOST_LIB)/libboost_unit_test_framework*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
             end
         end

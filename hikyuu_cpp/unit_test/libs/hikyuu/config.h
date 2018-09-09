@@ -6,8 +6,8 @@
  */
 
 #include <iostream>
+#include <chrono>
 #include <boost/test/unit_test.hpp>
-#include <boost/chrono.hpp>
 #include <hikyuu/hikyuu.h>
 
 #ifdef __WIN32__
@@ -24,7 +24,7 @@ struct GConfig {
 
     ~GConfig();
 
-    boost::chrono::system_clock::time_point start_time;
+    std::chrono::system_clock::time_point start_time;
 };
 
 

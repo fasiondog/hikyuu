@@ -12,7 +12,7 @@
 using namespace boost::filesystem;
 
 GConfig::GConfig() {
-    start_time = boost::chrono::system_clock::now();
+    start_time = std::chrono::system_clock::now();
 
     path current = current_path();
     if ( current.stem() == path("test") )  {
@@ -38,7 +38,7 @@ GConfig::GConfig() {
 }
 
 GConfig::~GConfig() {
-    boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start_time;
+    std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     std::cout << "All test spend time: " << sec.count() << "s" << std::endl;
 }
 

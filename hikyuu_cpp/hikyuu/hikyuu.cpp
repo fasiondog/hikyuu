@@ -5,7 +5,6 @@
  *      Author: fasiondog
  */
 
-#include <boost/filesystem.hpp>
 #include <hikyuu_utils/iniparser/IniParser.h>
 #include "hikyuu.h"
 

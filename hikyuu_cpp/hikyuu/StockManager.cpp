@@ -5,9 +5,9 @@
  *      Author: fasiondog
  */
 
+#include <chrono>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/chrono.hpp>
 
 #include "utilities/util.h"
 #include "StockManager.h"
@@ -115,7 +115,7 @@ void StockManager::init(
 
     //获取K线数据驱动并预加载指定的数据
     HKU_INFO("Loading KData...");
-    boost::chrono::system_clock::time_point start_time = boost::chrono::system_clock::now();
+    std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
     KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(kdataParam);
 
@@ -126,8 +126,8 @@ void StockManager::init(
                                          "temp load from csv file",
                                          "000001", Null<Datetime>());
 
-    boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start_time;
-    HKU_INFO(sec << " Loaded Data.");
+    std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
+    HKU_INFO(sec.count() << "s Loaded Data.");
 }
 
 
