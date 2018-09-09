@@ -168,11 +168,9 @@ BOOST_AUTO_TEST_CASE( test_TradeManager_export ) {
     const TradeRecordList& trade_list_1 = tm1->getTradeList();
     const TradeRecordList& trade_list_2 = tm2->getTradeList();
     BOOST_CHECK(trade_list_1.size() == trade_list_2.size());
-    std::cout << trade_list_1.size() << " " << trade_list_2.size() << std::endl;
     size_t total = trade_list_1.size();
     for (size_t i = 0; i < total; i++) {
         BOOST_CHECK(trade_list_1[i] == trade_list_2[i]);
-        std::cout << trade_list_1[i] << " " << trade_list_2[i] << std::endl;
     }
 
     PositionRecordList position1 = tm1->getPositionList();

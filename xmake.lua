@@ -28,6 +28,12 @@ add_linkdirs("$(env BOOST_LIB)")
 
 add_defines("BOOST_ALL_DYN_LINK")
 
+if is_host("linux") then
+    if is_arch("x86_64") then
+        add_linkdirs("/usr/lib/x86_64-linux-gnu")
+    end
+end
+
 if is_mode("debug") then
     set_symbols("debug")
     set_optimize("none")
@@ -62,7 +68,7 @@ if is_plat("windows") then
     end
 end
 
-add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "neon", "avx", "avx2")
+--add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "neon", "avx", "avx2")
 
 if is_plat("windows") then
     add_subdirs("./hikyuu_extern_libs/src/sqlite3")
@@ -73,3 +79,4 @@ add_subdirs("./hikyuu_cpp/hikyuu")
 add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")
 add_subdirs("./hikyuu_cpp/demo")  
+

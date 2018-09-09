@@ -1,5 +1,16 @@
+option("with-test")
+    set_default(false)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Complie with unit-test")
+option_end()
+
 target("unit-test")
-    set_kind("binary")
+    if has_config("with-test") then
+        set_kind("binary")
+    else
+        set_kind("phony")
+    end
 
     if is_plat("windows") then
         add_cxflags("-wd4267")

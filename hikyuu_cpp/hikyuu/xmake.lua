@@ -1,18 +1,24 @@
 option("check_bound")
     set_default(true)
     set_showmenu(true)
-    set_category("hikyuu_options")
+    set_category("hikyuu")
+    set_description("Set indicator check bound")
 
 option("support_serialization")
     set_default(true)
     set_showmenu(true)
-    set_category("hikyuu_options")
+    set_category("hikyuu")
+    set_description("Set support boost serialization")
 
 option("serialization")
     set_default("XML")
     set_values("XML", "BINARY", "TEXT")
     set_showmenu(true)
-    set_category("hikyuu_options")
+    set_category("hikyuu")
+    set_description("Set the mode of serialization, before support_serialization is y",
+                    "    - XML",
+                    "    - BINARAY",
+                    "    - TEXT")
 
 
 target("hikyuu")
@@ -20,11 +26,11 @@ target("hikyuu")
     
     set_config_header("hku_config.h", {prefix = "HKU"})
     add_options("serialization")
-    if is_option("support_serialization") then
+    if has_config("support_serialization") then
         add_defines_h("HKU_SUPPORT_SERIALIZATION")
     end
     add_defines_h("HKU_SUPPORT_".."$(serialization)".."_ARCHIVE")
-    if is_option("check_bound") then
+    if has_config("check_bound") then
         add_defines_h("CHECK_ACCESS_BOUND")
     end
     
@@ -71,6 +77,21 @@ target("hikyuu")
     add_files("./**.cpp")
     
     add_headers("../(hikyuu/**.h)|**doc.h")
+
+    on_load(function(target)
+        local boostroot = val("env BOOST_ROOT")
+        if boostroot == "" then
+            local info = "Missing environment variable: BOOST_ROOT\n"
+            local desc = "You need to specify where the boost headers is via the BOOST_ROOT variable!"
+            raise(info..desc)
+        end
+        local boostlib = val("env BOOST_LIB")
+        if boostlib == "" then
+            local info = "Missing environment variable: BOOST_LIB\n"
+            local desc = "You need to specify where the boost library is via the BOOST_LIB variable!"
+            raise(info..desc)
+        end
+    end)
     
     after_build(function(target)
         if is_plat("windows") then
@@ -87,14 +108,17 @@ target("hikyuu")
             os.cp("$(projectdir)/hikyuu_extern_libs/pkg/mysql.pkg/lib/release/$(plat)/$(arch)/*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
 
         else
-            os.cp("$(env BOOST_LIB)/libboost_chrono*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/libboost_system*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/libboost_thread*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-            os.cp("$(env BOOST_LIB)/libboost_unit_test_framework*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+            local boostlib = val("env BOOST_LIB")
+            if boostlib ~= "" then
+                os.cp("$(env BOOST_LIB)/libboost_chrono*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                os.cp("$(env BOOST_LIB)/libboost_system*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                os.cp("$(env BOOST_LIB)/libboost_thread*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+                os.cp("$(env BOOST_LIB)/libboost_unit_test_framework*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+            end
         end
     end)
 target_end()

@@ -54,7 +54,7 @@ function _cp_hikyuu(installdir)
     
     else
         os.exec("cp -f -r -T hikyuu_python " .. installdir)
-        os.cp(build_dir .. "/*.so.*", installdir .. "/lib")
+        os.trycp(build_dir .. "/*.so.*", installdir .. "/lib")
         os.mv(installdir.."/lib/_hikyuu.so", hikyuudir)
         os.mv(installdir.."/lib/_data_driver.so", hikyuudir.."/data_driver")
         os.mv(installdir.."/lib/_indicator.so", hikyuudir .. "/indicator")
