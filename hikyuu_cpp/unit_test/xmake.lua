@@ -6,7 +6,7 @@ option("with-unit-test")
 option_end()
 
 target("unit-test")
-    if is_option("with-unit-test") then
+    if has_config("with-unit-test") then
         set_kind("binary")
     else
         set_kind("phony")
@@ -39,17 +39,5 @@ target("unit-test")
 
     -- add files
     add_files("**.cpp")
-
-    before_run(function(target)
-        import("core.project.config")
-        local with_test = config.get("with-unit-test")
-        if with_test then
-            print("copying test_data ...")
-            os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
-            os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        else
-            raise("You need to config first: xmake f --with-unit-test=y")
-        end
-    end)
-
+    
 target_end()

@@ -17,6 +17,7 @@
 .pyproject
 .vscode
 /hikyuu
+/install
 /build
 *~
 
