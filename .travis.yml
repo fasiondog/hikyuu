@@ -15,9 +15,7 @@ install:
   - tar -jxf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
   - ./bootstrap.sh --with-python=python3.5
-  - ./b2 release link=shared
-  - ./b2 release link=shared --with-python
-  - cd ~/fasiondog/hikyuu
+  - ./b2 release link=shared --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
 
 env:
   global:
