@@ -10,7 +10,7 @@ install:
   - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
   - cd ./tboox/xmake
   - ./scripts/get.sh __local__
-  - cd -
+  - cd
   - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
   - tar -jxvf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
