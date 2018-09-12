@@ -19,11 +19,9 @@ before_install:
   - cd ..
 
 script:
-  - ls
   - cd ./build/fasiondog/hikyuu
   - export BOOST_ROOT=/home/travis/boost_1_67_0
   - export BOOST_LIB=/home/travis/boost_1_67_0/stage/lib
   - xmake f --with-unit-test=y --with-demo=y
-  - xmake hikyuu
   - xmake r demo
   
