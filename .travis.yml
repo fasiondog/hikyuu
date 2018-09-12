@@ -3,7 +3,7 @@ language: C++
 os:
   - linux
  
- compiler:
+compiler:
   - gcc
 
 install:
@@ -27,5 +27,4 @@ script:
   - xmake f --with-unit-test=y --with-demo=y
   - xmake hikyuu
   - xmake r demo
-
   
