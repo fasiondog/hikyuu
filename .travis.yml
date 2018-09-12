@@ -25,7 +25,7 @@ env:
   
 script:
   - ls
-  - cd ./fasiondog/hikyuu
+  - cd ./build/fasiondog/hikyuu
   - xmake f --with-unit-test=y --with-demo=y
   - xmake hikyuu
   - xmake r demo
