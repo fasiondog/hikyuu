@@ -12,11 +12,12 @@ install:
   - ./scripts/get.sh __local__
   - cd
   - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
-  - tar -jxvf boost_1_67_0.tar.bz2
+  - tar -jxf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
   - ./bootstrap.sh --with-python=python3.5
   - ./b2 release link=shared
   - ./b2 release link=shared --with-python
+  - cd ~/fasiondog/hikyuu
 
 env:
   global:
