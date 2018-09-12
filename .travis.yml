@@ -23,6 +23,7 @@ env:
   - BOOST_LIB = boost_1_67_0/stage/lib
   
 script:
+  - cd ~/build/fasiondog/hikyuu
   - xmake f --with-unit-test=y --with-demo=y
   - xmake hikyuu
   - xmake r demo
