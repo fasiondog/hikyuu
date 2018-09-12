@@ -1,0 +1,31 @@
+sudo: false
+language: C++
+os:
+  - linux
+ 
+ compiler:
+  - gcc
+
+install:
+  - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
+  - cd ./tboox/xmake
+  - ./scripts/get.sh __local__
+  - cd -
+  - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
+  - tar -jxvf boost_1_67_0.tar.bz2
+  - cd boost_1_67_0
+  - ./bootstrap.sh --with-python=python3.5
+  - ./b2 release link=shared
+  - ./b2 release link=shared --with-python
+
+env:
+  global:
+  - BOOST_ROOT = boost_1_67_0
+  - BOOST_LIB = boost_1_67_0/stage/lib
+  
+script:
+  - xmake f --with-unit-test=y --with-demo=y
+  - xmake hikyuu
+  - xmake r demo
+
+  
