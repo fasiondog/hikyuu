@@ -6,7 +6,7 @@ os:
 compiler:
   - gcc
 
-install:
+before_install:
   - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
   - cd ./tboox/xmake
   - ./scripts/get.sh __local__
@@ -15,7 +15,7 @@ install:
   - tar -jxf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
   - ./bootstrap.sh --with-python=python3.5
-  - ./b2 release link=shared --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
+  - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
 
 env:
   global:
