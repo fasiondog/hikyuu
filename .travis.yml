@@ -18,14 +18,11 @@ before_install:
   - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
   - cd ..
 
-env:
-  global:
-  - BOOST_ROOT = boost_1_67_0
-  - BOOST_LIB = boost_1_67_0/stage/lib
-  
 script:
   - ls
   - cd ./build/fasiondog/hikyuu
+  - export BOOST_ROOT=/home/travis/boost_1_67_0
+  - export BOOST_LIB=/home/travis/boost_1_67_0/stage/lib
   - xmake f --with-unit-test=y --with-demo=y
   - xmake hikyuu
   - xmake r demo
