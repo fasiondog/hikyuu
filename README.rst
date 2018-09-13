@@ -3,8 +3,6 @@
     :align: center
     :alt: Hikyuu
 
------------- 
-
 .. image:: https://travis-ci.org/fasiondog/hikyuu.svg?branch=master
     :target: https://travis-ci.org/fasiondog/hikyuu    
 
