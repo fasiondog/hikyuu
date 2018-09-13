@@ -16,7 +16,7 @@ before_install:
   - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
   - tar -jxf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
-  - ./bootstrap.sh --with-python=python3.5
+  - ./bootstrap.sh --with-python=python3
   - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
   - cd ..
 
