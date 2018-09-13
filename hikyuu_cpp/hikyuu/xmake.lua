@@ -30,7 +30,11 @@ target("hikyuu")
         add_packages("hdf5")
         add_packages("mysql")
     else
-        add_linkdirs("/usr/lib/x86_64-linux-gnu")
+        if is_arch("x86_64") then
+            add_linkdirs("/usr/lib/x86_64-linux-gnu")
+        end
+        add_includedirs("/usr/include/hdf5")
+        add_includedirs("/usr/include/hdf5/serial")
         add_links("sqlite3")
         add_links("hdf5_serial")
         add_links("hdf5_serial_hl")

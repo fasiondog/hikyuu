@@ -8,13 +8,9 @@
 #ifndef H5RECORD_H_
 #define H5RECORD_H_
 
-#include "../../../DataType.h"
-
-#if defined(BOOST_MSVC)
 #include <H5Cpp.h>
-#else
-#include <hdf5/serial/H5Cpp.h>
-#endif
+
+#include "../../../DataType.h"
 
 namespace hku {
 
