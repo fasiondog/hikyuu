@@ -16,8 +16,10 @@
 .project
 .pyproject
 .vscode
+.vs
 release.x64.version.h
 release.x86.version.h
+hikyuu.code-workspace
 /hikyuu
 /install
 /build
