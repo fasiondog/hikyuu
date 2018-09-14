@@ -12,9 +12,8 @@ target("hikyuu")
         add_cxflags("-wd4996")
         add_cxflags("-wd4244")  --discable double to int
     else
-        add_shflags("-Wl,-rpath=./", {force = true})
-        --add_rpathdirs("@loader_path")
-        add_cxxflags("-Wno-sign-compare")
+        add_rpathdirs("$ORIGIN")
+        add_cxflags("-Wno-sign-compare")
     end
 
     add_deps("hikyuu_utils")
