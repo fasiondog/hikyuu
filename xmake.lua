@@ -15,7 +15,7 @@ add_plugindirs("./xmake_plugins")
 
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
-add_mxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
+add_cxflags("-ftemplate-depth-500")
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")

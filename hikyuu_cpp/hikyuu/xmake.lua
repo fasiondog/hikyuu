@@ -14,7 +14,7 @@ target("hikyuu")
     else
         add_shflags("-Wl,-rpath=./", {force = true})
         --add_rpathdirs("@loader_path")
-        add_cxflags("-Wno-sign-compare")
+        add_cxxflags("-Wno-sign-compare")
     end
 
     add_deps("hikyuu_utils")
@@ -32,6 +32,7 @@ target("hikyuu")
     else
         if is_arch("x86_64") then
             add_linkdirs("/usr/lib/x86_64-linux-gnu")
+            add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
         end
         add_includedirs("/usr/include/hdf5")
         add_includedirs("/usr/include/hdf5/serial")

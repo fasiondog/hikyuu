@@ -12,6 +12,14 @@ if is_plat("windows") then
     add_defines("HKU_API=__declspec(dllimport)")
 end
 
+local cc = get_config("cc")
+local cxx = get_config("cxx")
+if (cc and string.find(cc, "clang")) or (cxx and string.find(cxx, "clang")) then
+    add_cxflags("-Wno-error=parentheses-equality")
+end
+
+on_load("xmake_on_load")
+
 target("_hikyuu")
     set_kind("shared")
     add_deps("hikyuu")
@@ -19,42 +27,9 @@ target("_hikyuu")
         set_filename("_hikyuu.pyd")
     else
         set_filename("_hikyuu.so")
-        --add_rpathdirs("$ORIGIN/lib")
-        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/lib")
     end
 
     add_files("./*.cpp")
-
-    on_load(function(target)
-        if is_plat("windows") then
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-            pydir = path.directory(pydir)
-            target:add("includedirs", pydir .. "/include")
-            target:add("linkdirs", pydir .. "/libs")
-        else
-            -- get python include directory.
-            local pydir = os.iorun("python3-config --includes")
-            local lcPos = string.find(pydir,"\n")
-            pydir = (string.sub(pydir,1,lcPos-1))
-            target:add("cxflags", pydir)
-
-            -- get suffix configure for link libboost_pythonX.so
-            import("core.project.config")
-            local suffix = config.get("boost_python_suffix")
-            suffix = string.upper(suffix)
-            if suffix == "3X" then
-                local ver = os.iorun("python3 --version")
-                local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-                target:add("links", boost_python_lib)
-            else
-                local boost_python_lib = "libboost_python"..suffix..".so"
-                local errinfo = "Can't find "..boost_python_lib
-                errinfo = errinfo .. "\nYou need to use --boost_python_suffix specify libboost_python suffix"
-                errinfo = errinfo .. '\nmore see "xmake f --help"'
-                raise(errinfo)
-            end
-        end
-    end)
 
 target("_indicator")
     set_kind("shared")
@@ -63,39 +38,8 @@ target("_indicator")
         set_filename("_indicator.pyd")
     else
         set_filename("_indicator.so")
-        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
     add_files("./indicator/*.cpp")
-    on_load(function(target)
-        if is_plat("windows") then
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-            pydir = path.directory(pydir)
-            target:add("includedirs", pydir .. "/include")
-            target:add("linkdirs", pydir .. "/libs")
-        else
-            -- get python include directory.
-            local pydir = os.iorun("python3-config --includes")
-            local lcPos = string.find(pydir,"\n")
-            pydir = (string.sub(pydir,1,lcPos-1))
-            target:add("cxflags", pydir)
-
-            -- get suffix configure for link libboost_pythonX.so
-            import("core.project.config")
-            local suffix = config.get("boost_python_suffix")
-            suffix = string.upper(suffix)
-            if suffix == "3X" then
-                local ver = os.iorun("python3 --version")
-                local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-                target:add("links", boost_python_lib)
-            else
-                local boost_python_lib = "libboost_python"..suffix..".so"
-                local errinfo = "Can't find "..boost_python_lib
-                errinfo = errinfo .. "\nYou need to use --boost_python_suffix specify libboost_python suffix"
-                errinfo = errinfo .. '\nmore see "xmake f --help"'
-                raise(errinfo)
-            end
-        end
-    end)
     
 target("_trade_manage")
     set_kind("shared")
@@ -104,39 +48,8 @@ target("_trade_manage")
         set_filename("_trade_manage.pyd")
     else
         set_filename("_trade_manage.so")
-        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
     add_files("./trade_manage/*.cpp")
-    on_load(function(target)
-        if is_plat("windows") then
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-            pydir = path.directory(pydir)
-            target:add("includedirs", pydir .. "/include")
-            target:add("linkdirs", pydir .. "/libs")
-        else
-            -- get python include directory.
-            local pydir = os.iorun("python3-config --includes")
-            local lcPos = string.find(pydir,"\n")
-            pydir = (string.sub(pydir,1,lcPos-1))
-            target:add("cxflags", pydir)
-
-            -- get suffix configure for link libboost_pythonX.so
-            import("core.project.config")
-            local suffix = config.get("boost_python_suffix")
-            suffix = string.upper(suffix)
-            if suffix == "3X" then
-                local ver = os.iorun("python3 --version")
-                local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-                target:add("links", boost_python_lib)
-            else
-                local boost_python_lib = "libboost_python"..suffix..".so"
-                local errinfo = "Can't find "..boost_python_lib
-                errinfo = errinfo .. "\nYou need to use --boost_python_suffix specify libboost_python suffix"
-                errinfo = errinfo .. '\nmore see "xmake f --help"'
-                raise(errinfo)
-            end
-        end
-    end)
 
 target("_trade_sys")
     set_kind("shared")
@@ -145,55 +58,8 @@ target("_trade_sys")
         set_filename("_trade_sys.pyd")
     else
         set_filename("_trade_sys.so")
-        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
     add_files("./trade_sys/*.cpp")
-    on_load(function(target)
-        if is_plat("windows") then
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-            pydir = path.directory(pydir)
-            target:add("includedirs", pydir .. "/include")
-            target:add("linkdirs", pydir .. "/libs")
-        else
-            -- get python include directory.
-            local pydir = os.iorun("python3-config --includes")
-            local lcPos = string.find(pydir,"\n")
-            pydir = (string.sub(pydir,1,lcPos-1))
-            target:add("cxflags", pydir)
-
-            -- get suffix configure for link libboost_pythonX.so
-            import("core.project.config")
-            local suffix = config.get("boost_python_suffix")
-            suffix = string.upper(suffix)
-            if suffix == "3X" then
-                local ver = os.iorun("python3 --version")
-                local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-                target:add("links", boost_python_lib)
-            else
-            -- get python include directory.
-            local pydir = os.iorun("python3-config --includes")
-            local lcPos = string.find(pydir,"\n")
-            pydir = (string.sub(pydir,1,lcPos-1))
-            target:add("cxflags", pydir)
-
-            -- get suffix configure for link libboost_pythonX.so
-            import("core.project.config")
-            local suffix = config.get("boost_python_suffix")
-            suffix = string.upper(suffix)
-            if suffix == "3X" then
-                local ver = os.iorun("python3 --version")
-                local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-                target:add("links", boost_python_lib)
-            else
-                local boost_python_lib = "libboost_python"..suffix..".so"
-                local errinfo = "Can't find "..boost_python_lib
-                errinfo = errinfo .. "\nYou need to use --boost_python_suffix specify libboost_python suffix"
-                errinfo = errinfo .. '\nmore see "xmake f --help"'
-                raise(errinfo)
-            end
-            end
-        end
-    end)
     
 target("_trade_instance")
     set_kind("shared")
@@ -202,39 +68,8 @@ target("_trade_instance")
         set_filename("_trade_instance.pyd")
     else
         set_filename("_trade_instance.so")
-        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
     add_files("./trade_instance/*.cpp")
-    on_load(function(target)
-        if is_plat("windows") then
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-            pydir = path.directory(pydir)
-            target:add("includedirs", pydir .. "/include")
-            target:add("linkdirs", pydir .. "/libs")
-        else
-            -- get python include directory.
-            local pydir = os.iorun("python3-config --includes")
-            local lcPos = string.find(pydir,"\n")
-            pydir = (string.sub(pydir,1,lcPos-1))
-            target:add("cxflags", pydir)
-
-            -- get suffix configure for link libboost_pythonX.so
-            import("core.project.config")
-            local suffix = config.get("boost_python_suffix")
-            suffix = string.upper(suffix)
-            if suffix == "3X" then
-                local ver = os.iorun("python3 --version")
-                local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-                target:add("links", boost_python_lib)
-            else
-                local boost_python_lib = "libboost_python"..suffix..".so"
-                local errinfo = "Can't find "..boost_python_lib
-                errinfo = errinfo .. "\nYou need to use --boost_python_suffix specify libboost_python suffix"
-                errinfo = errinfo .. '\nmore see "xmake f --help"'
-                raise(errinfo)
-            end
-        end
-    end)
     
 target("_data_driver")
     set_kind("shared")
@@ -243,37 +78,6 @@ target("_data_driver")
         set_filename("_data_driver.pyd")
     else
         set_filename("_data_driver.so")
-        add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
     add_files("./data_driver/*.cpp")
-    on_load(function(target)
-        if is_plat("windows") then
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
-            pydir = path.directory(pydir)
-            target:add("includedirs", pydir .. "/include")
-            target:add("linkdirs", pydir .. "/libs")
-        else
-            -- get python include directory.
-            local pydir = os.iorun("python3-config --includes")
-            local lcPos = string.find(pydir,"\n")
-            pydir = (string.sub(pydir,1,lcPos-1))
-            target:add("cxflags", pydir)
 
-            -- get suffix configure for link libboost_pythonX.so
-            import("core.project.config")
-            local suffix = config.get("boost_python_suffix")
-            suffix = string.upper(suffix)
-            if suffix == "3X" then
-                local ver = os.iorun("python3 --version")
-                local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-                target:add("links", boost_python_lib)
-            else
-                local boost_python_lib = "libboost_python"..suffix..".so"
-                local errinfo = "Can't find "..boost_python_lib
-                errinfo = errinfo .. "\nYou need to use --boost_python_suffix specify libboost_python suffix"
-                errinfo = errinfo .. '\nmore see "xmake f --help"'
-                raise(errinfo)
-            end
-        end
-    end)
-    

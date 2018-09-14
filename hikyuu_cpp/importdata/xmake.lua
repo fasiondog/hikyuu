@@ -6,7 +6,11 @@ target("importdata")
         add_cxflags("-wd4244")
         add_defines("HKU_API=__declspec(dllimport)")
         add_defines("SQLITE_API=__declspec(dllimport)")
-    else
+    end
+
+    local cc = get_config("cc")
+    local cxx = get_config("cxx")
+    if (cc and string.find(cc, "gcc")) or (cxx and not string.find(cxx, "clang++")) then
         add_cxflags("-Wno-maybe-uninitialized")
     end
     
