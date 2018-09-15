@@ -22,10 +22,15 @@ target("importdata")
     end
     
     if is_plat("linux") then
-        add_linkdirs("/usr/lib/x86_64-linux-gnu")
+        if is_arch("x86_64") then
+            add_linkdirs("/usr/lib/x86_64-linux-gnu")
+            add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
+        end
+        add_includedirs("/usr/include/hdf5")
+        add_includedirs("/usr/include/hdf5/serial")
         add_links("sqlite3")
-        add_links("hdf5_serial")
-        add_links("hdf5_serial_hl")
+        add_links("hdf5")
+        add_links("hdf5_hl")
         add_links("hdf5_cpp")
         add_links("boost_system")
         add_links("boost_filesystem")
