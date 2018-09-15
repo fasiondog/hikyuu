@@ -52,18 +52,11 @@ target("hikyuu")
     add_headers("../(hikyuu/**.h)|**doc.h")
 
     on_load(function(target)
-        local boostroot = val("env BOOST_ROOT")
-        if boostroot == "" then
-            local info = "Missing environment variable: BOOST_ROOT\n"
-            local desc = "You need to specify where the boost headers is via the BOOST_ROOT variable!"
-            raise(info..desc)
-        end
-        local boostlib = val("env BOOST_LIB")
-        if boostlib == "" then
-            local info = "Missing environment variable: BOOST_LIB\n"
-            local desc = "You need to specify where the boost library is via the BOOST_LIB variable!"
-            raise(info..desc)
-        end
+        assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_ROOT
+You need to specify where the boost headers is via the BOOST_ROOT variable!]])
+
+        assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_LIB
+You need to specify where the boost library is via the BOOST_LIB variable!]])
     end)
     
 target_end()
