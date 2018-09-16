@@ -222,7 +222,7 @@ int main() {
         h5file_dict[dest_iter->first] = h5_open_file(dest_iter->second);
     }
 
-    void (*import_func)(const SqlitePtr&, const H5FilePtr&, const std::string&, const fs::path&);
+    void (*import_func)(const SqlitePtr&, const H5FilePtr&, const std::string&, const fs::path&)=NULL;
 
     for (from_iter = from_list.begin(); from_iter != from_list.end(); ++from_iter) {
         for (dest_iter = dest_dict.begin(); dest_iter != dest_dict.end(); ++dest_iter) {
@@ -293,7 +293,7 @@ int main() {
                 }
             }
 
-            if (need_import) {
+            if (need_import && import_func) {
                 std::cout << "导入数据[" << dest_iter->first << "]: " << path << std::endl;
                 import_func(db, h5file_dict[dest_iter->first], market, path);
                 gettimeofday(&end_time, NULL);

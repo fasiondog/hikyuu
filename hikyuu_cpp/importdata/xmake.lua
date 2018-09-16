@@ -8,12 +8,6 @@ target("importdata")
         add_defines("SQLITE_API=__declspec(dllimport)")
     end
 
-    local cc = get_config("cc")
-    local cxx = get_config("cxx")
-    if (cc and string.find(cc, "gcc")) or (cxx and not string.find(cxx, "clang++")) then
-        add_cxflags("-Wno-maybe-uninitialized")
-    end
-    
     add_deps("hikyuu_utils")
 
     if is_plat("windows") then
