@@ -25,13 +25,8 @@
 #include <iconv.h>
 #endif
 
-#if defined(BOOST_MSVC)
 #include <hdf5.h>
 #include <hdf5_hl.h>
-#else
-#include <hdf5/serial/hdf5.h>
-#include <hdf5/serial/hdf5_hl.h>
-#endif
 
 #include "sqlite3callback.h"
 #include "importdata.h"

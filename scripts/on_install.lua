@@ -49,16 +49,25 @@ function main(target)
             os.cp("$(env BOOST_LIB)/boost_system*.dll", installdir .. "/")
             os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/release/$(plat)/$(arch)/*.dll", installdir .. "/")
             os.cp("$(projectdir)/hikyuu_extern_libs/pkg/mysql.pkg/lib/release/$(plat)/$(arch)/*.dll", installdir .. "/")
+            return
+        end
 
-        else
-            local boostlib = val("env BOOST_LIB")
-            if boostlib ~= "" then
-                os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", installdir .. "/")
-                os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", installdir .. "/")
-                os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", installdir .. "/")
-                os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", installdir .. "/")
-                os.cp("$(env BOOST_LIB)/libboost_system*.so.*", installdir .. "/")
-            end
+        if is_plat("linux") then
+            os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_system*.so.*", installdir .. "/")
+            return
+        end
+
+        if is_plat("macosx") then
+            os.cp("$(env BOOST_LIB)/libboost_date_time*.dylib", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_filesystem*.dylib", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_python3*.dylib", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", installdir .. "/")
+            os.cp("$(env BOOST_LIB)/libboost_system*.dylib", installdir .. "/")
+            return
         end
     end
 end

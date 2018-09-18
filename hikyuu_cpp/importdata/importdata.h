@@ -16,10 +16,9 @@
 
 #if defined(BOOST_MSVC)
 #pragma warning(disable:4251)
-#include <H5Cpp.h>
-#else
-#include <hdf5/serial/H5Cpp.h>
 #endif
+
+#include <H5Cpp.h>
 
 #if !(defined(WIN32) && defined(_WIN32))
 #include <sys/time.h>

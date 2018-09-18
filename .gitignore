@@ -25,3 +25,5 @@ hikyuu.code-workspace
 /build
 *~
 
+.DS_Store
+hikyuu_cpp/hikyuu/version.h

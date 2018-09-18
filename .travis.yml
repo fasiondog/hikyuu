@@ -4,8 +4,8 @@ os:
   - linux
  
 compiler:
-  - gcc
-  - clang
+  - g++
+  - clang++
 
 before_install:
   - sudo apt-get install -y libhdf5-dev libhdf5-serial-dev

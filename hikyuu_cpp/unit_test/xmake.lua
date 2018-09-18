@@ -31,7 +31,7 @@ target("unit-test")
 
     add_deps("hikyuu")
 
-    if is_plat("linux") then
+    if is_plat("linux") or is_plat("macosx") then
         add_links("boost_unit_test_framework")
         --add_links("boost_system")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")

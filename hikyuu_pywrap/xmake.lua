@@ -25,10 +25,13 @@ target("_hikyuu")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_hikyuu.pyd")
-    else
+    end
+    if is_plat("linux") then
         set_filename("_hikyuu.so")
     end
-
+    if is_plat("macosx") then 
+        set_filename("_hikyuu.dylib")
+    end
     add_files("./*.cpp")
 
 target("_indicator")
@@ -36,8 +39,12 @@ target("_indicator")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_indicator.pyd")
-    else
+    end
+    if is_plat("linux") then
         set_filename("_indicator.so")
+    end
+    if is_plat("macosx") then
+        set_filename("_indicator.dylib")
     end
     add_files("./indicator/*.cpp")
     
@@ -46,8 +53,12 @@ target("_trade_manage")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_trade_manage.pyd")
-    else
-        set_filename("_trade_manage.so")
+    end
+    if is_plat("linux") then 
+        set_filename("_trade_manage.os")
+    end
+    if is_plat("macosx") then
+        set_filename("_trade_manage.dylib")
     end
     add_files("./trade_manage/*.cpp")
 
@@ -56,8 +67,12 @@ target("_trade_sys")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_trade_sys.pyd")
-    else
+    end
+    if is_plat("linux") then
         set_filename("_trade_sys.so")
+    end 
+    if is_plat("macosx") then
+        set_filename("_trade_sys.dylib")
     end
     add_files("./trade_sys/*.cpp")
     
@@ -66,8 +81,12 @@ target("_trade_instance")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_trade_instance.pyd")
-    else
+    end
+    if is_plat("linux") then
         set_filename("_trade_instance.so")
+    end 
+    if is_plat("macosx") then
+        set_filename("_trade_instance.dylib")
     end
     add_files("./trade_instance/*.cpp")
     
@@ -76,8 +95,12 @@ target("_data_driver")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_data_driver.pyd")
-    else
+    end
+    if is_plat("linux") then
         set_filename("_data_driver.so")
+    end
+    if is_plat("macosx") then
+        set_filename("_data_driver.dylib")
     end
     add_files("./data_driver/*.cpp")
 

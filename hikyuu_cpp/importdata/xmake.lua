@@ -20,8 +20,18 @@ target("importdata")
             add_linkdirs("/usr/lib/x86_64-linux-gnu")
             add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
         end
-        add_includedirs("/usr/include/hdf5")
-        add_includedirs("/usr/include/hdf5/serial")
+        add_includedirs("/usr/include/hdf5")        -- for ubuntu 14.04
+        add_includedirs("/usr/include/hdf5/serial") -- for ubuntu 16.04
+    end 
+
+    if is_plat("macosx") then
+        add_includedirs("/usr/local/opt/hdf5/include")
+        add_linkdirs("/usr/local/opt/hdf5/lib")
+        add_linkdirs("/usr/local/opt/iconv/lib")
+        add_links("iconv")
+    end
+
+    if is_plat("linux") or is_plat("macosx") then
         add_links("sqlite3")
         add_links("hdf5")
         add_links("hdf5_hl")

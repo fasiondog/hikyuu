@@ -3,7 +3,9 @@ target("hikyuu")
     
     -- set version for release
     set_config_header("version.h", {prefix = "HKU"})
-    
+
+    add_deps("hikyuu_utils")
+
     if is_plat("windows") then
         add_cxflags("-wd4819")  
         add_cxflags("-wd4251")  --template dll export warning
@@ -15,26 +17,35 @@ target("hikyuu")
         add_rpathdirs("$ORIGIN")
         add_cxflags("-Wno-sign-compare")
     end
-
-    add_deps("hikyuu_utils")
     
     if is_plat("windows") then 
         add_defines("SQLITE_API=__declspec(dllimport)")
         add_defines("HKU_API=__declspec(dllexport)")
         add_defines("PY_VERSION_HEX=0x03000000")
-    end
-                
-    if is_plat("windows") then
         add_deps("sqlite3")
         add_packages("hdf5")
         add_packages("mysql")
-    else
-        if is_arch("x86_64") then
+    end
+    
+    if is_plat("linux") then
+        add_includedirs("/usr/include/hdf5")
+        add_includedirs("/usr/include/hdf5/serial")
+        if is_arch("x86_64")  then
             add_linkdirs("/usr/lib/x86_64-linux-gnu")
             add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
         end
-        add_includedirs("/usr/include/hdf5")
-        add_includedirs("/usr/include/hdf5/serial")
+    end
+    
+    if is_plat("macosx") then
+        add_linkdirs("/usr/local/opt/iconv/lib")
+        add_links("iconv")
+        add_includedirs("/usr/local/opt/hdf5/include")
+        add_linkdirs("/usr/local/opt/hdf5/lib")
+        add_includedirs("/usr/local/opt/mysql-client/include")
+        add_linkdirs("/usr/local/opt/mysql-client/lib")
+    end
+
+    if is_plat("linuxe") or is_plat("macosx") then
         add_links("sqlite3")
         add_links("hdf5")
         add_links("hdf5_hl")
