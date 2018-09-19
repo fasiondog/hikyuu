@@ -9,8 +9,6 @@ compiler:
   - clang++
 
 before_install:
-  - sudo apt-get install -y libhdf5-dev libhdf5-serial-dev
-  - sudo apt-get install -y libmysqlclient-dev
   - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
   - cd ./tboox/xmake
   - ./scripts/get.sh __local__
@@ -21,6 +19,10 @@ before_install:
   - ./bootstrap.sh --with-python=python3
   - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
   - cd ..
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev;
+    fi
+
 
 script:
   - cd ./build/fasiondog/hikyuu
