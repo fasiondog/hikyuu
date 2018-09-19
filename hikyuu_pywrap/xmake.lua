@@ -1,4 +1,11 @@
-option("boost_python_suffix")
+option("python")
+    set_default("3.6")
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Specify the python version.",
+                    "Only for linux or MacOSX, but innvalid on Windows!")
+
+option("boost-python-suffix")
     set_default("3X")
     set_showmenu(true)
     set_category("hikyuu")

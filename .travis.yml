@@ -23,8 +23,14 @@ before_install:
 
 script:
   - cd ./build/fasiondog/hikyuu
-  - export BOOST_ROOT=/home/travis/boost_1_67_0
-  - export BOOST_LIB=/home/travis/boost_1_67_0/stage/lib
-  - xmake f --with-unit-test=y
-  - xmake r unit-test
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      export BOOST_ROOT=/home/travis/boost_1_67_0;
+      export BOOST_LIB=/home/travis/boost_1_67_0/stage/lib;
+      xmake f --with-unit-test=y;
+      xmake r unit-test;
+    fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      ehco $HOME;
+      python3 --version;
+    fi
   

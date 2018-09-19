@@ -27,7 +27,7 @@ target("importdata")
     if is_plat("macosx") then
         add_includedirs("/usr/local/opt/hdf5/include")
         add_linkdirs("/usr/local/opt/hdf5/lib")
-        add_linkdirs("/usr/local/opt/iconv/lib")
+        --add_linkdirs("/usr/local/opt/libiconv/lib")
         add_links("iconv")
     end
 
