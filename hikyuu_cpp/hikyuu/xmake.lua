@@ -45,7 +45,7 @@ target("hikyuu")
         add_linkdirs("/usr/local/opt/mysql-client/lib")
     end
 
-    if is_plat("linuxe") or is_plat("macosx") then
+    if is_plat("linux") or is_plat("macosx") then
         add_links("sqlite3")
         add_links("hdf5")
         add_links("hdf5_hl")
