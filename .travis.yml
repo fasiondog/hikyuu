@@ -10,7 +10,7 @@ compiler:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then  sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install libiconv hdf5 mysql-client; fi  
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install libiconv hdf5 mysql-client; brew link --force gcc; fi  
   - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
   - cd ./tboox/xmake
   - ./scripts/get.sh __local__
