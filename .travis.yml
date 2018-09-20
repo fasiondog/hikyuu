@@ -22,7 +22,7 @@ before_install:
   - cd ..
 
 install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install libiconv hdf5 mysql-client; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update & brew install libiconv hdf5 mysql-client; fi
 
 script:
   - cd ./build/fasiondog/hikyuu

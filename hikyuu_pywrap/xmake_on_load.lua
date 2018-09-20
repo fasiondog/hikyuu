@@ -7,6 +7,8 @@ function main(target)
         target:add("linkdirs", pydir .. "/libs")
         return
     end
+
+    target:add("rpathdirs", "$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
     
     if is_plat("macosx") then
         local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
@@ -16,8 +18,6 @@ function main(target)
         local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
         target:add("links", python_lib)
     end
-
-    target:add("rpathdirs", "$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 
     -- get python include directory.
     local pydir = os.iorun("python3-config --includes"):trim()
