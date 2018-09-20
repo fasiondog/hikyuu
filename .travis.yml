@@ -22,18 +22,15 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev;
     fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      sudo brew install libiconv hdf5 mysql-client
+    fi
 
 
 script:
   - cd ./build/fasiondog/hikyuu
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      export BOOST_ROOT=/home/travis/boost_1_67_0;
-      export BOOST_LIB=/home/travis/boost_1_67_0/stage/lib;
-      xmake f --with-unit-test=y;
-      xmake r unit-test;
-    fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      ehco $HOME;
-      python3 --version;
-    fi
+  - export BOOST_ROOT=$HOME/boost_1_67_0;
+  - export BOOST_LIB=$HOME/boost_1_67_0/stage/lib;
+  - xmake f --with-unit-test=y;
+  - xmake r unit-test;
   
