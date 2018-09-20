@@ -10,7 +10,7 @@ compiler:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then  sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install libiconv hdf5 mysql-client; brew link --force gcc; fi  
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install libiconv mysql-client hdf5; brew link --overwrite gcc; fi  
   - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
   - cd ./tboox/xmake
   - ./scripts/get.sh __local__
@@ -26,6 +26,6 @@ script:
   - cd ./build/fasiondog/hikyuu
   - export BOOST_ROOT=$HOME/boost_1_67_0;
   - export BOOST_LIB=$HOME/boost_1_67_0/stage/lib;
-  - xmake f --with-unit-test=y;
+  - xmake f --with-unit-test=y --cxx=$CXX;
   - xmake r unit-test;
   
