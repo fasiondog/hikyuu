@@ -54,7 +54,9 @@ from hikyuu.interactive import *
 #import time
 
 #重定向C++ stdout/stderr输出至python
-iodog = ostream_redirect()
+#iodog = ostream_redirect()
+iodog = OstreamRedirect()
+iodog.open()
 
 
 #==============================================================================

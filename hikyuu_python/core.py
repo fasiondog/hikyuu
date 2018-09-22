@@ -363,7 +363,7 @@ __all__ = [#类
            'StockWeight', 
            'StockWeightList', 
            'StringList',
-           'ostream_redirect',
+           'OstreamRedirect',
            
            #变量
            'constant', 

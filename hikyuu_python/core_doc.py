@@ -816,3 +816,32 @@ hku_load(var, filename)
     :param var: 指定的变量
     :param str filename: 待载入的序列化文件。
 """
+
+#------------------------------------------------------------------
+# from iostream.cpp
+#------------------------------------------------------------------
+
+OstreamRedirect.__doc__ ="""
+OstreamRedirect([stdout=True, stderr=True])
+
+    重定向C++ std::cout、std::cerr至python。在非命令行方式下，某些App无法显示C++ iostream的输出信息，如Jupyter notebook。默认构造时，只是指定是否需要重定向std::cout或std::cerr，必须使用open方法或with语法才会启用重定向。
+    
+    使用with示例：
+    with OstreamRedirect():
+        your_function() #被封装的C++函数，其中使用了std::iostream输出
+    
+    :param bool stdout: 是否重定向C++ std::cout
+    :param bool stderr: 是否重定向C++ std::cerr
+"""
+
+OstreamRedirect.open.__doc__ = """
+open()
+
+    启用重定向
+"""
+
+OstreamRedirect.close.__doc__ = """
+close()
+
+    关闭重定向
+"""
