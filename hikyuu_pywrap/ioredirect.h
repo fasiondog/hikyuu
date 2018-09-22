@@ -21,6 +21,7 @@ using namespace boost::python;
 // Buffer that writes to Python instead of C++
 class pythonbuf : public std::streambuf {
 private:
+    pythonbuf(const std::streambuf&) {}
     using traits_type = std::streambuf::traits_type;
 
     char d_buffer[1024];
@@ -85,7 +86,6 @@ public:
         stdout_ostream.rdbuf(stdout_old);
         stderr_ostream.rdbuf(stderr_old);
     }
-
 };
 
 #endif /** IOREDIRECT_H_ **/
