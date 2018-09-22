@@ -21,7 +21,6 @@ using namespace boost::python;
 // Buffer that writes to Python instead of C++
 class pythonbuf : public std::streambuf {
 private:
-    pythonbuf(const std::streambuf&) {}
     using traits_type = std::streambuf::traits_type;
 
     char d_buffer[1024];
@@ -50,6 +49,8 @@ private:
     }
 
 public:
+    pythonbuf() {}
+
     pythonbuf(object pyostream)
         : pywrite(pyostream.attr("write")),
           pyflush(pyostream.attr("flush")) {
