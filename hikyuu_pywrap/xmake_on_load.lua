@@ -14,15 +14,13 @@ function main(target)
         return
     end
 
-    -- detect installed python3
-    local python3 = assert(find_tool("python3", {version = true}), "python3 not found, please install it first!")
-
     target:add("rpathdirs", "$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
     
     if is_plat("macosx") then
         local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
         target:add("linkdirs", libdir)
-        local ver = python.version
+        local out, err = os.iorun("python3 --version")
+        local ver = (out .. err):trim()
         local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
         target:add("links", python_lib)
     end
@@ -39,7 +37,8 @@ function main(target)
 
     suffix = string.upper(suffix)
     if suffix == "3X" then
-        local ver = python.version
+        local out, err = os.iorun("python3 --version")
+        local ver = (out .. err):trim()
         local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
         target:add("links", boost_python_lib)
     else
