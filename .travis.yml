@@ -18,9 +18,10 @@ before_install:
   - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
   - tar -jxf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH="$(python3-config --prefix)/bin:$PATH"; fi
-  - echo $PATH
-  - python3-config --prefix
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then 
+      python3-config --prefix;
+      ln -s /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6m /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
+    fi
   - ./bootstrap.sh --with-python=python3
   - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
   - ls ./stage/lib
