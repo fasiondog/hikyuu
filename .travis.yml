@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 language: C++
 os:
   - linux
@@ -23,7 +23,7 @@ before_install:
       ln -s /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6m /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
     fi
   - ./bootstrap.sh --with-python=python3
-  - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
+  - ./b2 release link=shared --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
   - ls ./stage/lib
   - cd ..
 
