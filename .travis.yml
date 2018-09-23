@@ -14,15 +14,15 @@ before_install:
       python3-config --prefix;
       ln -s /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6m /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
       ls /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
-      #brew install libiconv mysql-client hdf5; 
-      #brew link --overwrite gcc; 
+      # brew install libiconv mysql-client hdf5; 
+      # brew link --overwrite gcc; 
     fi  
   - wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2
   - tar -jxf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
   - ./bootstrap.sh --with-python=python3
   - cat project-config.jam
-  - ./b2 release link=shared --with-python -n #--with-date_time --with-filesystem --with-system --with-serialization --with-test
+  - ./b2 release link=shared --with-python -n # --with-date_time --with-filesystem --with-system --with-serialization --with-test
   - ls ./stage/lib
   - cd
   - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
