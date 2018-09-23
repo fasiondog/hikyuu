@@ -23,6 +23,7 @@ before_install:
   - python3-config --prefix
   - ./bootstrap.sh --with-python=python3
   - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
+  - ls ./stage/lib
   - cd ..
 
 script:
