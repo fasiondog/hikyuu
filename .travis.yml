@@ -13,11 +13,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then 
       python3-config --prefix;
       ln -s /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6m /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
-      ls /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6m;
-      echo "========================"
       ls /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
-      echo "^^^^^^^^^^^^^^^^^^^^^^^^"
-      ls /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include;
       brew install libiconv mysql-client hdf5; 
       brew link --overwrite gcc; 
     fi  
