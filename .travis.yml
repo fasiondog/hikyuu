@@ -19,6 +19,8 @@ before_install:
   - tar -jxf boost_1_67_0.tar.bz2
   - cd boost_1_67_0
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH="$(python3-config --prefix)/bin:$PATH"; fi
+  - echo $PATH
+  - python3-config --prefix
   - ./bootstrap.sh --with-python=python3
   - ./b2 release link=shared -d0 --with-date_time --with-filesystem --with-system --with-serialization --with-python --with-test
   - cd ..
