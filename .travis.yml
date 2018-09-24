@@ -12,7 +12,11 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then  sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then 
       python3-config --prefix;
-      ln -s /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6m /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
+      ls /usr/local/opt;
+      ls /usr/local/local/Cellar/;
+      #rm /usr/local/opt/python
+      #ln -s /usr/local/opt/python /usr/local/Cellar/python
+      # ln -s /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6m /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
       ls /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/include/python3.6;
       # brew install libiconv mysql-client hdf5; 
       # brew link --overwrite gcc; 
