@@ -155,7 +155,7 @@ int main() {
             dest_dict["sz_day"] = ini_parser.get("dest", "sz_day");
             std::cout << "sz_day  目标文件: " << dest_dict["sz_day"] << std::endl;
         }
-        if (ini_parser.hasOption("dest", "sz_day")) {
+        if (ini_parser.hasOption("dest", "sh_5min")) {
             dest_dict["sh_5min"] = ini_parser.get("dest", "sh_5min");
             std::cout << "sh_5min 目标文件: " << dest_dict["sh_5min"] << std::endl;
         }
