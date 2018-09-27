@@ -422,30 +422,35 @@ def UpdateIndex(filename, data_type):
         m = olddate//1000000 - y*100
         d = olddate//10000 - (y*10000+m*100)
         tempdate = datetime.date(y,m,d)
-        tempweekdate = tempdate - datetime.timedelta(tempdate.weekday())
+        #python中周一是第0天，周五的第4天
+        tempweekdate = tempdate + datetime.timedelta(tempdate.weekday()+4)
         newdate = tempweekdate.year*100000000 + tempweekdate.month*1000000 + tempweekdate.day*10000
         return newdate
 
     def getMonthDate(olddate):
         y = olddate//100000000
         m = olddate//1000000 - y*100
-        return(y*100000000 + m*1000000 + 10000)
+        import calendar
+        _, d = calendar.month(y, m)
+        return(y*100000000 + m*1000000 + d*10000)
 
     def getQuarterDate(olddate):
-        quarterDict={1:1,2:1,3:1,4:4,5:4,6:4,7:7,8:7,9:7,10:10,11:10,12:10}
+        quarterDict={1:3,2:3,3:3,4:6,5:6,6:6,7:9,8:9,9:9,10:12,11:12,12:12}
+        d_dict = {3:310000, 6:300000, 9:300000, 12:310000}
         y = olddate//100000000
         m = olddate//1000000 - y*100
-        return( y*100000000 + quarterDict[m]*1000000 + 10000 )
+        return( y*100000000 + quarterDict[m]*1000000 + d_dict[m])
     
     def getHalfyearDate(olddate):
-        halfyearDict={1:1,2:1,3:1,4:1,5:1,6:1,7:7,8:7,9:7,10:7,11:7,12:7}
+        halfyearDict={1:6,2:6,3:6,4:6,5:6,6:6,7:12,8:12,9:12,10:12,11:12,12:12}
+        d_dict = {6:300000, 12:310000}
         y = olddate//100000000
         m = olddate//1000000 - y*100
         return( y*100000000 + halfyearDict[m]*1000000 + 10000 )
     
     def getYearDate(olddate):
         y = olddate//100000000
-        return(y*100000000 + 1010000)
+        return(y*100000000 + 310000)
 
     def getMin60Date(olddate):
         mint = olddate-olddate//10000*10000

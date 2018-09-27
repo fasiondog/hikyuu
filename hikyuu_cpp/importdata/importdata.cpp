@@ -1040,9 +1040,8 @@ bool invalid_QianLongData(const QianLongData& data) {
 
 //-----------------------------------------------------------------------------
 /**
- * 获取所属周一的日期
+ * 固定获取所属周五的日期，无论周五是不是交易日
  * @param olddate YYYYMMDDhhmm 标识的日期
- * @note 认为周一是一周中的第一天，周日是一周中的最后一天
  */
 //-----------------------------------------------------------------------------
 unsigned long long get_week_date(unsigned long long olddate) {
@@ -1050,9 +1049,8 @@ unsigned long long get_week_date(unsigned long long olddate) {
     unsigned long long m = olddate/1000000LL - y*100LL;
     unsigned long long d = olddate/10000LL - (y*10000+m*100LL);
     bg::date tempdate(y, m, d);
-    long day = tempdate.day_of_week();
-    day = day ? day - 1 : 6;
-    bg::date tempweekdate = tempdate - boost::gregorian::date_duration(day);
+    long day = 5 - tempdate.day_of_week();
+    bg::date tempweekdate = tempdate + boost::gregorian::date_duration(day);
     return (unsigned long long)tempweekdate.year() * 100000000LL +
             (unsigned long long)tempweekdate.month() * 1000000LL +
             (unsigned long long)tempweekdate.day() * 10000LL;
@@ -1060,19 +1058,24 @@ unsigned long long get_week_date(unsigned long long olddate) {
 
 //-----------------------------------------------------------------------------
 /**
- * 获取所属月份的起始日期
+ * 固定获取获取所属月份的结束日期，无论该日是否是交易日
  * @param olddate YYYYMMDDhhmm 标识的日期
  */
 //-----------------------------------------------------------------------------
 unsigned long long get_month_date(unsigned long long olddate) {
     unsigned long long y = olddate/100000000LL;
     unsigned long long m = olddate/1000000LL - y*100LL;
-    return y * 100000000LL + m * 1000000LL + 10000LL;
+    unsigned long long d = olddate/10000LL - (y*10000+m*100LL);
+    bg::date tempdate(y, m, d);
+    bg::date month_date = tempdate.end_of_month();
+    return (unsigned long long)month_date.year() * 100000000LL +
+            (unsigned long long)month_date.month() * 1000000LL +
+            (unsigned long long)month_date.day() * 10000LL;
 }
 
 //-----------------------------------------------------------------------------
 /**
- * 获取所属季度的起始日期
+ * 获取所属季度的结束日期
  * @param olddate YYYYMMDDhhmm 标识的日期
  */
 //-----------------------------------------------------------------------------
@@ -1081,39 +1084,39 @@ unsigned long long get_quarter_date(unsigned long long olddate) {
     unsigned long long m = olddate/1000000LL - y*100LL;
     unsigned long long new_m;
     if (m >= 1 && m < 4) {
-        new_m = 1;
+        new_m = 3310000LL;
     } else if (m >=4 && m < 7) {
-        new_m = 2;
+        new_m = 6300000LL;
     } else if (m >= 7 && m < 10) {
-        new_m = 3;
+        new_m = 9300000LL;
     } else {
-        new_m = 4;
+        new_m = 12310000LL;
     }
-    return y * 100000000LL + new_m * 1000000LL + 10000LL;
+    return y * 100000000LL + new_m;
 }
 
 //-----------------------------------------------------------------------------
 /**
- * 获取所属半年的起始日期
+ * 获取所属半年的结束日期，无论是否为交易日
  * @param olddate YYYYMMDDhhmm 标识的日期
  */
 //-----------------------------------------------------------------------------
 unsigned long long get_halfyear_date(unsigned long long olddate) {
     unsigned long long y = olddate/100000000LL;
     unsigned long long m = olddate/1000000LL - y*100LL;
-    unsigned long long new_m = m > 6 ? 7 : 1;
-    return y * 100000000LL + new_m * 1000000LL + 10000LL;
+    unsigned long long new_m = m > 6 ? 12310000LL : 6300000LL;
+    return y * 100000000LL + new_m;
 }
 
 //-----------------------------------------------------------------------------
 /**
- * 获取所属年的起始日期
+ * 获取所属年的结束日期，无论是否为交易日
  * @param olddate YYYYMMDDhhmm 标识的日期
  */
 //-----------------------------------------------------------------------------
 unsigned long long get_year_date(unsigned long long olddate) {
     unsigned long long y = olddate/100000000LL;
-    return y * 100000000LL + 1010000LL;
+    return y * 100000000LL + 12310000LL;
 }
 
 //-----------------------------------------------------------------------------
