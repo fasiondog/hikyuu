@@ -2,7 +2,6 @@ sudo: true
 language: C++
 os:
   - linux
-  - osx
  
 compiler:
   - g++
