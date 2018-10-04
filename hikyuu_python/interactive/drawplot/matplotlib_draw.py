@@ -183,17 +183,17 @@ def ax_set_locator_formatter(axes, dates, typ):
     :param KQuery.KType typ: K线类型
     """
     major_loc, major_fm = None, None
-    if typ == KQuery.KType.DAY:
+    if typ == KQuery.DAY:
         major_loc, major_fm = getDayLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.WEEK:
+    elif typ == KQuery.WEEK:
         major_loc, major_fm = getDayLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.MONTH:
+    elif typ == KQuery.MONTH:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.QUARTER:
+    elif typ == KQuery.QUARTER:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.HALFYEAR:
+    elif typ == KQuery.HALFYEAR:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.KType.YEAR:
+    elif typ == KQuery.YEAR:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
 
     if major_loc:

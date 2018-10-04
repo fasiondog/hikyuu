@@ -20,6 +20,20 @@
 
 using namespace hku;
 
+#define MEMORY_CHECK {Stock mem_stock = sm["sh000001"]; \
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::DAY) == true);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::WEEK) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::MONTH) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::QUARTER) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::HALFYEAR) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::YEAR) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::MIN) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::MIN5) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::MIN15) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::MIN30) == false);\
+                      BOOST_CHECK(mem_stock.isBuffer(KQuery::MIN60) == false);\
+                      }
+
 /**
  * @defgroup test_hikyuu_Stock test_hikyuu_Stock
  * @ingroup test_hikyuu_base_suite
@@ -45,6 +59,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_Relational_comparison ) {
     /** @arg 不等比较 */
     s2 = sm.getStock("sz000001");
     BOOST_CHECK(s1 != s2);
+
+    MEMORY_CHECK;
 }
 
 /** @par 检测点 */
@@ -164,6 +180,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getWeight ) {
     BOOST_CHECK(weight.increasement() == 0.0);
     BOOST_CHECK(weight.totalCount() == 512335);
     BOOST_CHECK(weight.freeCount() == 310536);
+    
+    MEMORY_CHECK;
 }
 
 
@@ -258,6 +276,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getCount ) {
     /** @arg 查询sz000001的60分钟线数量 */
     stock = sm.getStock("Sz000001");
     BOOST_CHECK(stock.getCount(KQuery::MIN60) == 10553L);
+
+    MEMORY_CHECK;
 }
 
 
@@ -442,6 +462,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecord ) {
     record = stock.getKRecord(total - 1, KQuery::MIN60);
     expect = KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356);
     BOOST_CHECK(record == expect);
+
+    MEMORY_CHECK;
 }
 
 
@@ -1093,6 +1115,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getIndexRange ) {
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 1);
     BOOST_CHECK(out_end == 5120);
+
+    MEMORY_CHECK;
 }
 
 
@@ -1103,6 +1127,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     KRecordList result;
     KRecord record, expect;
     size_t total;
+
+    MEMORY_CHECK;
 
     ///=====================
     /// 测试日线
@@ -1692,6 +1718,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MIN60);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result[0] == KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356));
+
+    MEMORY_CHECK;
 }
 
 
@@ -1811,6 +1839,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordByDate ) {
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112061501), KQuery::MIN15);
     BOOST_CHECK(record == Null<KRecord>());
+
+    MEMORY_CHECK;
 }
 
 
@@ -1862,6 +1892,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_getMarketValue ) {
 
     result = stock.getMarketValue(Datetime(201111211350), KQuery::MIN5);
     BOOST_CHECK(std::fabs(result - 8.70) < 0.001);
+
+    MEMORY_CHECK;
 }
 
 
@@ -1892,6 +1924,8 @@ BOOST_AUTO_TEST_CASE( test_Stock_id_map ) {
     BOOST_CHECK(dict[Stock()] == 0);
     BOOST_CHECK(dict[x3] == 3);
     BOOST_CHECK(dict[x4] == 1);
+
+    MEMORY_CHECK;
 }
 
 /** @} */

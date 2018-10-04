@@ -29,9 +29,9 @@ class StockTest(unittest.TestCase):
         self.assertEqual(stock.minTradeNumber, 1)
         self.assertEqual(stock.maxTradeNumber, 1000000)
         self.assertEqual(stock.getCount(), 5121)
-        self.assertEqual(stock.getCount(KQuery.KType.MIN), 682823)
+        self.assertEqual(stock.getCount(KQuery.MIN), 682823)
         self.assertEqual(stock.getKRecord(0).datetime, Datetime(199012190000))
-        self.assertEqual(stock.getKRecord(1, KQuery.KType.MIN).datetime, Datetime(200001040932))
+        self.assertEqual(stock.getKRecord(1, KQuery.MIN).datetime, Datetime(200001040932))
         
         s1 = sm['sh000001']
         s2 = sm['sh000001']

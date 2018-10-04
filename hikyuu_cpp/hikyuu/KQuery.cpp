@@ -10,6 +10,24 @@
 
 namespace hku {
 
+const string KQuery::MIN("MIN");
+const string KQuery::MIN5("MIN5");
+const string KQuery::MIN15("MIN15");
+const string KQuery::MIN30("MIN30");
+const string KQuery::MIN60("MIN60");
+const string KQuery::DAY("DAY");
+const string KQuery::WEEK("WEEK");
+const string KQuery::MONTH("MONTH");
+const string KQuery::QUARTER("QUARTER");
+const string KQuery::HALFYEAR("HALFYEAR");
+const string KQuery::YEAR("YEAR");
+const string KQuery::MIN3("MIN3");
+const string KQuery::HOUR2("HOUR2");
+const string KQuery::HOUR4("HOUR4");
+const string KQuery::HOUR6("HOUR5");
+const string KQuery::HOUR12("HOUR12");
+const string KQuery::INVALID_KTYPE("Z");
+
 string KQuery::getQueryTypeName(QueryType queryType) {
     switch(queryType){
     case INDEX:
@@ -36,7 +54,8 @@ KQuery::QueryType KQuery::getQueryTypeEnum(const string& arg) {
 }
 
 string KQuery::getKTypeName(KType dataType) {
-    switch(dataType) {
+    return dataType;
+    /*switch(dataType) {
     case MIN:
         return "MIN";
     case MIN5:
@@ -60,7 +79,7 @@ string KQuery::getKTypeName(KType dataType) {
     case YEAR:
         return "YEAR";
 
-    //BTCÀ©Õ¹
+    //BTCæ‰©å±•
     case MIN3:
         return "MIN3";
     case HOUR2:
@@ -74,13 +93,14 @@ string KQuery::getKTypeName(KType dataType) {
 
     default:
         return "INVALID_DATA_TYPE";
-    }
+    }*/
 }
 
 KQuery::KType KQuery::getKTypeEnum(const string& arg) {
     string name(arg);
     boost::to_upper(name);
-    KType result;
+    return name;
+   /* KType result;
     if ("MIN" == name) {
         result = MIN;
     } else if ("MIN5" == name) {
@@ -104,7 +124,7 @@ KQuery::KType KQuery::getKTypeEnum(const string& arg) {
     } else if ("YEAR" == name) {
         result = YEAR;
 
-    //BTCÀ©Õ¹
+    //BTCæ‰©å±•
     } else if ("MIN3" == name) {
         result = MIN3;
     } else if ("HOUR2" == name) {
@@ -118,7 +138,7 @@ KQuery::KType KQuery::getKTypeEnum(const string& arg) {
     } else {
         result = INVALID_KTYPE;
     }
-    return result;
+    return result;*/
 }
 
 string KQuery::getRecoverTypeName(RecoverType recoverType) {

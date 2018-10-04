@@ -94,7 +94,13 @@ void TdxKDataDriver::
 loadKData(const string& market, const string& code,
         KQuery::KType ktype, size_t start_ix, size_t end_ix,
         KRecordListPtr out_buffer) {
-    switch (ktype) {
+
+    if (ktype == KQuery::MIN || ktype == KQuery::MIN5) {
+        _loadMinKData(market, code, ktype, start_ix, end_ix, out_buffer);
+    } else if (ktype == KQuery::DAY) {
+        _loadDayKData(market, code, ktype, start_ix, end_ix, out_buffer);
+    }
+    /*switch (ktype) {
     case KQuery::MIN:
     case KQuery::MIN5:
         _loadMinKData(market, code, ktype, start_ix, end_ix, out_buffer);
@@ -118,7 +124,7 @@ loadKData(const string& market, const string& code,
 
     default:
         break;
-    }
+    }*/
 }
 
 
@@ -195,7 +201,15 @@ KRecord TdxKDataDriver::
 getKRecord(const string& market, const string& code,
           size_t pos, KQuery::KType ktype) {
     KRecord record;
-    switch (ktype) {
+    if (ktype == KQuery::MIN || ktype == KQuery::MIN5) {
+        record = _getMinKRecord(market, code, pos, ktype);
+    } else if (ktype == KQuery::DAY) {
+        record = _getDayKRecord(market, code, pos, ktype);
+    }
+
+    return record;
+
+    /*switch (ktype) {
     case KQuery::MIN:
     case KQuery::MIN5:
         record = _getMinKRecord(market, code, pos, ktype);
@@ -219,7 +233,7 @@ getKRecord(const string& market, const string& code,
         break;
     }
 
-    return record;
+    return record;*/
 }
 
 
@@ -513,6 +527,17 @@ _getMinIndexRangeByDate(const string& market, const string& code,
 string TdxKDataDriver::
 _getFileName(const string& market, const string& code, KQuery::KType ktype) {
     string filename;
+    if (ktype == KQuery::MIN) {
+        filename = m_dirname + "\\" + market + "\\minline\\" + market + code + ".lc1";
+    } else if (ktype == KQuery::MIN5 || ktype == KQuery::MIN15 || ktype == KQuery::MIN30 || ktype == KQuery::MIN60) {
+        filename = m_dirname + "\\" + market + "\\fzline\\" + market + code + ".lc5";
+    } else if (ktype == KQuery::DAY || ktype == KQuery::WEEK || ktype == KQuery::MONTH || ktype == KQuery::QUARTER || ktype == KQuery::HALFYEAR || ktype == KQuery::YEAR) {
+        filename = m_dirname + "\\" + market + "\\lday\\" + market + code + ".day";
+    }
+
+    return filename;
+
+/*
     switch (ktype) {
     case KQuery::MIN:
         filename = m_dirname + "\\" + market + "\\minline\\" + market + code + ".lc1";
@@ -538,7 +563,7 @@ _getFileName(const string& market, const string& code, KQuery::KType ktype) {
         break;
     }
 
-    return filename;
+    return filename;*/
 }
 
 size_t TdxKDataDriver::

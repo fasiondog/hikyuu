@@ -149,6 +149,28 @@ Datetime.isNull = Datetime_isNull
 #------------------------------------------------------------------
 #重定义KQuery
 #------------------------------------------------------------------
+KQuery.INDEX = KQuery.QueryType.INDEX
+KQuery.DATE = KQuery.QueryType.DATE
+KQuery.DAY = "DAY"
+KQuery.WEEK = "WEEK"
+KQuery.MONTH = "MONTH"
+KQuery.QUARTER = "QUARTER"
+KQuery.HALFYEAR = "HALFYEAR"
+KQuery.YEAR = "YEAR"
+KQuery.MIN = "MIN"
+KQuery.MIN5 = "MIN5"
+KQuery.MIN15 = "MIN15"
+KQuery.MIN30 = "MIN30"
+KQuery.MIN60 = "MIN60"
+KQuery.HOUR2 = "HOUR2"
+KQuery.HOUR4 = "HOUR4"
+KQuery.HOUR6 = "HOUR6"
+KQuery.HOUR12 = "HOUR12"
+KQuery.NO_RECOVER = KQuery.RecoverType.NO_RECOVER
+KQuery.FORWARD = KQuery.RecoverType.FORWARD
+KQuery.BACKWARD = KQuery.RecoverType.BACKWARD
+KQuery.EQUAL_FORWARD = KQuery.RecoverType.EQUAL_FORWARD
+KQuery.EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
 
 class Query(KQuery):
     """重新定义KQuery，目的如下：
@@ -158,22 +180,22 @@ class Query(KQuery):
     """
     INDEX = KQuery.QueryType.INDEX
     DATE = KQuery.QueryType.DATE
-    DAY = KQuery.KType.DAY
-    WEEK = KQuery.KType.WEEK
-    MONTH = KQuery.KType.MONTH
-    QUARTER = KQuery.KType.QUARTER
-    HALFYEAR = KQuery.KType.HALFYEAR
-    YEAR = KQuery.KType.YEAR
-    MIN = KQuery.KType.MIN
-    MIN3 = KQuery.KType.MIN3
-    MIN5 = KQuery.KType.MIN5
-    MIN15 = KQuery.KType.MIN15
-    MIN30 = KQuery.KType.MIN30
-    MIN60 = KQuery.KType.MIN60
-    HOUR2 = KQuery.KType.HOUR2
-    HOUR4 = KQuery.KType.HOUR4
-    HOUR6 = KQuery.KType.HOUR6
-    HOUR12 = KQuery.KType.HOUR12
+    #DAY = KQuery.KType.DAY
+    #WEEK = KQuery.KType.WEEK
+    #MONTH = KQuery.KType.MONTH
+    #QUARTER = KQuery.KType.QUARTER
+    #HALFYEAR = KQuery.KType.HALFYEAR
+    #YEAR = KQuery.KType.YEAR
+    #MIN = KQuery.KType.MIN
+    #MIN3 = KQuery.KType.MIN3
+    #MIN5 = KQuery.KType.MIN5
+    #MIN15 = KQuery.KType.MIN15
+    #MIN30 = KQuery.KType.MIN30
+    #MIN60 = KQuery.KType.MIN60
+    #HOUR2 = KQuery.KType.HOUR2
+    #HOUR4 = KQuery.KType.HOUR4
+    #HOUR6 = KQuery.KType.HOUR6
+    #HOUR12 = KQuery.KType.HOUR12
     NO_RECOVER = KQuery.RecoverType.NO_RECOVER
     FORWARD = KQuery.RecoverType.FORWARD
     BACKWARD = KQuery.RecoverType.BACKWARD
@@ -181,7 +203,7 @@ class Query(KQuery):
     EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
     
     def __init__(self, start = 0, end = None, 
-                 kType = KQuery.KType.DAY, recoverType = KQuery.RecoverType.NO_RECOVER):
+                 kType = KQuery.DAY, recoverType = KQuery.RecoverType.NO_RECOVER):
         """
         构建按索引 [start, end) 方式获取K线数据条件
         
@@ -212,26 +234,6 @@ def QueryByDate(start=None, end=None, kType=Query.DAY,
     start_date = Datetime.min() if start is None else start
     end_date = Datetime.max() if end is None else end
     return KQueryByDate(start_date, end_date, kType, recoverType)
-
-
-KQuery.INDEX = KQuery.QueryType.INDEX
-KQuery.DATE = KQuery.QueryType.DATE
-KQuery.DAY = KQuery.KType.DAY
-KQuery.WEEK = KQuery.KType.WEEK
-KQuery.MONTH = KQuery.KType.MONTH
-KQuery.QUARTER = KQuery.KType.QUARTER
-KQuery.HALFYEAR = KQuery.KType.HALFYEAR
-KQuery.YEAR = KQuery.KType.YEAR
-KQuery.MIN = KQuery.KType.MIN
-KQuery.MIN5 = KQuery.KType.MIN5
-KQuery.MIN15 = KQuery.KType.MIN15
-KQuery.MIN30 = KQuery.KType.MIN30
-KQuery.MIN60 = KQuery.KType.MIN60
-KQuery.NO_RECOVER = KQuery.RecoverType.NO_RECOVER
-KQuery.FORWARD = KQuery.RecoverType.FORWARD
-KQuery.BACKWARD = KQuery.RecoverType.BACKWARD
-KQuery.EQUAL_FORWARD = KQuery.RecoverType.EQUAL_FORWARD
-KQuery.EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
 
 
 #------------------------------------------------------------------

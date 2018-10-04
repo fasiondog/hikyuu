@@ -26,7 +26,7 @@ public:
     };
 
     ///查询K线类型：日线/周线等
-    enum KType {
+    /*enum KType {
         //notes: 如添加新类型，请注意按大小顺序添加，否则可能出错
         MIN      = 0,  ///<1分钟线
         MIN5     = 1,  ///<5分钟线
@@ -47,7 +47,26 @@ public:
         HOUR6    = 14,  ///<6小时线
         HOUR12   = 15,  ///<12小时线
         INVALID_KTYPE = 16
-    };
+    };*/
+    typedef string KType;
+
+    static const string MIN;
+    static const string MIN5;
+    static const string MIN15;
+    static const string MIN30;
+    static const string MIN60;
+    static const string DAY;
+    static const string WEEK;
+    static const string MONTH;
+    static const string QUARTER;
+    static const string HALFYEAR;
+    static const string YEAR;
+    static const string MIN3;
+    static const string HOUR2;
+    static const string HOUR4;
+    static const string HOUR6;
+    static const string HOUR12;
+    static const string INVALID_KTYPE;
 
     /**
      * 复权类型
@@ -125,7 +144,8 @@ public:
     QueryType queryType() const { return m_queryType; }
 
     /** 获取K线数据类型 */
-    KType kType() const { return m_dataType; }
+    //KType kType() const { return m_dataType; }
+    string kType() const { return m_dataType; }
 
     /** 获取复权类型 */
     RecoverType recoverType() const { return m_recoverType; }

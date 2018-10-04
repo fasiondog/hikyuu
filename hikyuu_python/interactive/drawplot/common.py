@@ -45,27 +45,27 @@ def get_draw_title(kdata):
         return ""
     
     s1 = ''
-    if query.kType == KQuery.KType.DAY:
+    if query.kType == KQuery.DAY:
         s1 = u' （日线）'
-    elif query.kType == KQuery.KType.WEEK:
+    elif query.kType == KQuery.WEEK:
         s1 = u' （周线）'
-    elif query.kType == KQuery.KType.MONTH:
+    elif query.kType == KQuery.MONTH:
         s1 = u' （月线）'
-    elif query.kType == KQuery.KType.QUARTER:
+    elif query.kType == KQuery.QUARTER:
         s1 = u' （季线）'
-    elif query.kType == KQuery.KType.HALFYEAR:
+    elif query.kType == KQuery.HALFYEAR:
         s1 = u' （半年线）'
-    elif query.kType == KQuery.KType.YEAR:
+    elif query.kType == KQuery.YEAR:
         s1 = u' （年线）'
-    elif query.kType == KQuery.KType.MIN:
+    elif query.kType == KQuery.MIN:
         s1 = u' （1分钟线）'
-    elif query.kType == KQuery.KType.MIN5:
+    elif query.kType == KQuery.MIN5:
         s1 = u' （5分钟线）'
-    elif query.kType == KQuery.KType.MIN15:
+    elif query.kType == KQuery.MIN15:
         s1 = u' （15分钟线）'
-    elif query.kType == KQuery.KType.MIN30:
+    elif query.kType == KQuery.MIN30:
         s1 = u' （30分钟线）'
-    elif query.kType == KQuery.KType.MIN60:
+    elif query.kType == KQuery.MIN60:
         s1 = u' （60分钟线）'
 
     name = stock.name

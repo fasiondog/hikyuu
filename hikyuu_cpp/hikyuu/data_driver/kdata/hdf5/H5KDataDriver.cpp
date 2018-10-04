@@ -284,7 +284,7 @@ bool H5KDataDriver::
 _getH5FileAndGroup(const string& market, const string& code,
         KQuery::KType kType, H5FilePtr& out_file, H5::Group& out_group) {
     try {
-        string key(market + "_" + KQuery::getKTypeName(kType));
+        string key(market + "_" + kType); //KQuery::getKTypeName(kType));
         boost::to_upper(key);
 
         out_file = m_h5file_map[key];
@@ -292,7 +292,33 @@ _getH5FileAndGroup(const string& market, const string& code,
         if (!out_file) {
             return false;
         }
-        switch(kType) {
+
+        if (kType == KQuery::MIN) {
+            out_group = out_file->openGroup("data");
+        } else if (kType == KQuery::MIN5) {
+            out_group = out_file->openGroup("data");
+        } else if (kType == KQuery::MIN15) {
+            out_group = out_file->openGroup("min15");
+        } else if (kType == KQuery::MIN30) {
+            out_group = out_file->openGroup("min30");
+        } else if (kType == KQuery::MIN60) {
+            out_group = out_file->openGroup("min60");
+        } else if (kType == KQuery::DAY) {
+            out_group = out_file->openGroup("data");
+        } else if (kType == KQuery::WEEK) {
+            out_group = out_file->openGroup("week");
+        } else if (kType == KQuery::MONTH) {
+            out_group = out_file->openGroup("month");
+        } else if (kType == KQuery::QUARTER) {
+            out_group = out_file->openGroup("quarter");
+        } else if (kType == KQuery::HALFYEAR) {
+            out_group = out_file->openGroup("halfyear");
+        } else if (kType == KQuery::YEAR) {
+            out_group = out_file->openGroup("year");
+        } else {
+            return false;
+        }
+        /*switch(kType) {
         case KQuery::MIN:
             out_group = out_file->openGroup("data");
             break;
@@ -328,7 +354,7 @@ _getH5FileAndGroup(const string& market, const string& code,
             break;
         default:
             return false;
-        }
+        }*/
     } catch(...) {
         HKU_ERROR("[H5KDataDriver::_getH5FileAndGroup] Exception of some HDF5 operator!");
         return false;
@@ -665,13 +691,11 @@ _getOtherIndexRangeByDate(const string& market, const string& code,
          || KQuery::MIN15    == query.kType()
          || KQuery::MIN30    == query.kType()
          || KQuery::MIN60    == query.kType());
-
     out_start = 0;
     out_end = 0;
     if( query.startDatetime() >= query.endDatetime() ){
         return false;
     }
-
 
     H5FilePtr h5file;
     H5::Group group;

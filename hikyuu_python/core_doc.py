@@ -409,22 +409,6 @@ KQuery.QueryType.__doc__ = """
 - INDEX - 按索引方式查询
 """
 
-KQuery.KType.__doc__ = """
-K线类型枚举定义
-
-- DAY      - 日线类型
-- WEEK     - 周线类型
-- MONTH    - 月线类型
-- QUARTER  - 季线类型 
-- HALFYEAR - 半年线类型 
-- YEAR     - 年线类型 
-- MIN      - 1分钟线类型
-- MIN5     - 5分钟线类型
-- MIN15    - 15分钟线类型
-- MIN30    - 30分钟线类型
-- MIN60    - 60分钟线类型 
-"""
-
 KQuery.RecoverType.__doc__ = """
 K线复权类别枚举定义
 

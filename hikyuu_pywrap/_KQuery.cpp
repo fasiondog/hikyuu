@@ -45,7 +45,7 @@ void export_KQuery() {
             .value("DATE", KQuery::DATE)
             ;
 
-    enum_<KQuery::KType>("KType")
+    /*enum_<KQuery::KType>("KType")
             .value("MIN", KQuery::MIN)
             .value("MIN5", KQuery::MIN5)
             .value("MIN15", KQuery::MIN15)
@@ -58,7 +58,7 @@ void export_KQuery() {
             .value("HALFYEAR", KQuery::HALFYEAR)
             .value("YEAR", KQuery::YEAR)
 
-            //BTC��չ
+            //BTC扩展
             .value("MIN3", KQuery::MIN3)
             .value("HOUR2", KQuery::HOUR2)
             .value("HOUR4", KQuery::HOUR4)
@@ -67,6 +67,7 @@ void export_KQuery() {
 
             .value("INVALID_KTYPE", KQuery::INVALID_KTYPE)
             ;
+        */
 
     enum_<KQuery::RecoverType>("RecoverType")
             .value("NO_RECOVER", KQuery::NO_RECOVER)
