@@ -26,7 +26,7 @@ const string KQuery::HOUR2("HOUR2");
 const string KQuery::HOUR4("HOUR4");
 const string KQuery::HOUR6("HOUR5");
 const string KQuery::HOUR12("HOUR12");
-const string KQuery::INVALID_KTYPE("Z");
+//const string KQuery::INVALID_KTYPE("Z");
 
 string KQuery::getQueryTypeName(QueryType queryType) {
     switch(queryType){

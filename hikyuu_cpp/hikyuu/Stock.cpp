@@ -304,7 +304,8 @@ bool Stock::isNull() const {
 
 
 void Stock::releaseKDataBuffer(KQuery::KType kType) {
-    if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    //if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    if (!m_data)
         return;
 
     //if (m_data->pKData[kType])
@@ -316,7 +317,8 @@ void Stock::releaseKDataBuffer(KQuery::KType kType) {
 
 
 void Stock::loadKDataToBuffer(KQuery::KType kType) {
-    if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    //if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    if (!m_data)
         return;
 
     releaseKDataBuffer(kType);
@@ -357,7 +359,8 @@ KData Stock::getKData(const KQuery& query) const {
 
 
 size_t Stock::getCount(KQuery::KType kType) const {
-    if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    //if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    if (!m_data)
         return 0;
 
     if (m_data->pKData.find(kType) != m_data->pKData.end())
@@ -418,7 +421,7 @@ Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end)  c
         return _getIndexRangeByIndex(query, out_start, out_end);
 
     if ((KQuery::DATE != query.queryType())
-            || (query.kType() >= KQuery::INVALID_KTYPE)
+            //|| (query.kType() >= KQuery::INVALID_KTYPE)
             || query.startDatetime() >= query.endDatetime())
         return false;
 

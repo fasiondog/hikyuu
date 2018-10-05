@@ -144,7 +144,8 @@ loadKData(const string& market, const string& code,
         return;
     }
 
-    if (kType >= KQuery::INVALID_KTYPE || start_ix >= end_ix) {
+    //if (kType >= KQuery::INVALID_KTYPE || start_ix >= end_ix) {
+    if (start_ix >= end_ix) {        
         HKU_WARN("ktype(" << kType << ") is invalid or start_ix("
                 << start_ix << ") >= endix(" << end_ix << ")" << func_name);
         return;
@@ -207,10 +208,10 @@ getCount(const string& market,
         return result;
     }
 
-    if (kType >= KQuery::INVALID_KTYPE ) {
+    /*if (kType >= KQuery::INVALID_KTYPE ) {
         HKU_WARN("ktype(" << kType << ") is invalid" << func_name);
         return result;
-    }
+    }*/
 
     MYSQL_RES *mysql_result;
     MYSQL_ROW row;
@@ -329,10 +330,10 @@ getKRecord(const string& market, const string& code,
         return result;
     }
 
-    if (kType >= KQuery::INVALID_KTYPE ) {
+    /*if (kType >= KQuery::INVALID_KTYPE ) {
         HKU_WARN("ktype(" << kType << ") is invalid" << func_name);
         return result;
-    }
+    }*/
 
     MYSQL_RES *mysql_result;
     MYSQL_ROW row;

@@ -66,7 +66,7 @@ public:
     static const string HOUR4;
     static const string HOUR6;
     static const string HOUR12;
-    static const string INVALID_KTYPE;
+    //static const string INVALID_KTYPE;
 
     /**
      * 复权类型
@@ -255,7 +255,7 @@ public:
     operator KQuery() {
         return KQuery(Null<hku_int64>(),
                 Null<hku_int64>(),
-                KQuery::INVALID_KTYPE,
+                "", //KQuery::INVALID_KTYPE,
                 KQuery::INVALID_RECOVER_TYPE,
                 KQuery::INVALID
                 );

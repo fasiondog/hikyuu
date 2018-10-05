@@ -29,7 +29,8 @@ string KData::toString() const {
 
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    if (stock.isNull() || query.kType() >= KQuery::INVALID_KTYPE) {
+    //if (stock.isNull() || query.kType() >= KQuery::INVALID_KTYPE) {
+    if (stock.isNull()) {        
         return;
     }
     if (query.kType() < KQuery::DAY) {

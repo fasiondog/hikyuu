@@ -130,8 +130,9 @@ void H5KDataDriver
 void H5KDataDriver::loadKData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
         KRecordListPtr out_buffer) {
-    if (KQuery::INVALID_KTYPE <= kType
-            || start_ix >= end_ix) {
+    //if (KQuery::INVALID_KTYPE <= kType
+    //        || start_ix >= end_ix) {
+    if (start_ix >= end_ix) {
         return;
     }
 
