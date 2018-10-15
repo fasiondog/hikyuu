@@ -23,12 +23,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
 
     def closeEvent(self, event):
-        pass
+        event.accept()
 
     def initUI(self):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
         self.setFixedSize(self.width(), self.height())
 
+        #从用户目录下子目录.hikyuu下"data_dir.ini"文件中获取目标数据存放路径
         usr_dir = os.path.expanduser('~')
         hku_dir = usr_dir + '/.hikyuu'
 
@@ -37,19 +38,30 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         data_dir_config = ConfigParser()
         data_config_file = hku_dir + '/data_dir.ini'
-        if os.path.exists(data_config_file):
+        try:
             data_dir_config.read(data_config_file)
-        else:
+        except:
             data_dir_config['data_dir'] = {}
+
+        if 'data_dir' not in data_dir_config['data_dir']:
             data_dir_config['data_dir']['data_dir'] = "c:\stock" if sys.platform == "win32" else usr_dir + "/stock"
 
         data_dir = data_dir_config['data_dir']['data_dir']
 
+        #读取importdata.ini配置信息
         import_config_file = data_dir + '/importdata.ini'
-        if os.path.exists(import_config_file):
+        try:
             import_config = self.load_import_config(import_config_file)
-        else:
+        except:
             import_config = self.get_default_hku_config(data_dir)
+
+        from_list = []
+        option_list = import_config.options('from')
+        for option in option_list:
+            tmp = option.split(',')
+            if tmp[0] == "tdx":
+                break
+
 
 
         if sys.platform == 'win32':
@@ -57,9 +69,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         else:
             hku_config_file = data_dir + '/hikyuu_linux.ini'
 
-        if os.path.exists(hku_config_file):
+        try:
             hku_config = self.load_hku_config(hku_config_file)
-        else:
+        except:
             hku_config = self.get_default_hku_config(data_dir)
 
         self.dataDirLineEdit.setText(data_dir)
