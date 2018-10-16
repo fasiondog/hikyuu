@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>798</width>
+    <width>1028</width>
     <height>573</height>
    </rect>
   </property>
@@ -19,281 +19,152 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>801</width>
-      <height>571</height>
+      <width>1031</width>
+      <height>581</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab_2">
+    <widget class="QWidget" name="tab">
      <attribute name="title">
-      <string>数据引擎设置</string>
+      <string>数据导入</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QPushButton" name="pushButton_6">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>90</y>
-        <width>561</width>
-        <height>121</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>数据预加载设置</string>
-      </property>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>40</y>
-         <width>473</width>
-         <height>66</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="3">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="0">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="5">
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="1">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="checkBox">
-          <property name="text">
-           <string>日线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QCheckBox" name="checkBox_2">
-          <property name="text">
-           <string>周线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="8">
-         <widget class="QCheckBox" name="checkBox_10">
-          <property name="text">
-           <string>年线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QCheckBox" name="checkBox_4">
-          <property name="text">
-           <string>1分钟线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QCheckBox" name="checkBox_5">
-          <property name="text">
-           <string>5分钟线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4">
-         <widget class="QCheckBox" name="checkBox_3">
-          <property name="text">
-           <string>月线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="4">
-         <widget class="QCheckBox" name="checkBox_6">
-          <property name="text">
-           <string>15分钟线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="6">
-         <widget class="QCheckBox" name="checkBox_9">
-          <property name="text">
-           <string>半年线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="8">
-         <widget class="QCheckBox" name="checkBox_8">
-          <property name="text">
-           <string>60分钟线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="6">
-         <widget class="QCheckBox" name="checkBox_7">
-          <property name="text">
-           <string>30分钟线</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="7">
-         <spacer name="verticalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>30</y>
-        <width>201</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>使用数据库引擎：</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBox">
-         <item>
-          <property name="text">
-           <string>HDF5</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>MYSQL</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tabConfig">
-     <attribute name="title">
-      <string>数据导入配置</string>
-     </attribute>
-     <widget class="QPushButton" name="pushButton_3">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>440</y>
+        <x>20</x>
+        <y>20</y>
         <width>75</width>
         <height>23</height>
        </rect>
       </property>
       <property name="text">
-       <string>保存设置</string>
+       <string>执行导入</string>
       </property>
      </widget>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>20</y>
-        <width>721</width>
-        <height>101</height>
+        <x>10</x>
+        <y>60</y>
+        <width>481</width>
+        <height>91</height>
        </rect>
       </property>
       <property name="title">
-       <string>盘后数据源（至少需配置一个，也可两个同时配置）：</string>
+       <string>K线数据源</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>561</width>
-         <height>54</height>
+         <x>20</x>
+         <y>20</y>
+         <width>441</width>
+         <height>61</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_2">
+        <item row="1" column="3">
+         <widget class="QPushButton" name="pushButton_4">
           <property name="text">
-           <string>通达信盘后数据目录：</string>
+           <string>选择</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>大智慧安装目录：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="dzh_dir_lineEdit"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="tdx_enable_checkBox">
+          <property name="text">
+           <string>使用</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="dzh_checkBox">
+          <property name="text">
+           <string>使用</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="tdxDirLineEdit"/>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>通达信安装目录：</string>
+          </property>
+         </widget>
         </item>
         <item row="0" column="2">
+         <widget class="QLineEdit" name="tdx_dir_lineEdit"/>
+        </item>
+        <item row="0" column="3">
          <widget class="QPushButton" name="pushButton_2">
           <property name="text">
            <string>选择</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_3">
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>170</y>
+        <width>481</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Pytdx配置（权息、财务数据源）</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>441</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,1">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_10">
           <property name="text">
-           <string>大智慧盘后数据目录：</string>
+           <string>行情服务器：</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="tdxDirLineEdit_2"/>
+        <item>
+         <widget class="QComboBox" name="tdx_servers_comboBox"/>
         </item>
-        <item row="1" column="2">
-         <widget class="QPushButton" name="pushButton_4">
+        <item>
+         <widget class="QLabel" name="label_11">
           <property name="text">
-           <string>选择</string>
+           <string>端口：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="tdx_port_lineEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>7709</string>
           </property>
          </widget>
         </item>
@@ -303,34 +174,27 @@
      <widget class="QGroupBox" name="groupBox_3">
       <property name="geometry">
        <rect>
-        <x>29</x>
-        <y>150</y>
-        <width>711</width>
+        <x>10</x>
+        <y>260</y>
+        <width>481</width>
         <height>101</height>
        </rect>
       </property>
       <property name="title">
        <string>HDF5保存数据设置</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>60</y>
-         <width>561</width>
+         <width>441</width>
          <height>25</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>目标数据（HDF5）存放目录：</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="dataDirLineEdit"/>
+         <widget class="QLineEdit" name="hdf5_dir_lineEdit"/>
         </item>
         <item row="0" column="2">
          <widget class="QPushButton" name="pushButton">
@@ -339,52 +203,59 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>目标数据（HDF5）存放目录：</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
-      <widget class="QCheckBox" name="checkBox_11">
+      <widget class="QCheckBox" name="hdf5_enable_checkBox">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>30</y>
          <width>121</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>使用HDF5保存数据</string>
+        <string>保存至HDF5文件</string>
        </property>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>280</y>
-        <width>711</width>
-        <height>141</height>
+        <x>10</x>
+        <y>380</y>
+        <width>481</width>
+        <height>151</height>
        </rect>
       </property>
       <property name="title">
        <string>MYSQL保存数据设置</string>
       </property>
-      <widget class="QCheckBox" name="checkBox_12">
+      <widget class="QCheckBox" name="mysql_enable_checkBox">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>30</y>
          <width>141</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>使用MYSQL保存数据</string>
+        <string>保存至MYSQL数据库</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_5">
        <property name="geometry">
         <rect>
-         <x>560</x>
-         <y>70</y>
+         <x>20</x>
+         <y>120</y>
          <width>101</width>
          <height>23</height>
         </rect>
@@ -393,21 +264,21 @@
         <string>测试数据库连接</string>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>60</y>
-         <width>501</width>
+         <width>441</width>
          <height>48</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="1" column="4">
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="mysql_pwd_lineEdit"/>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_3"/>
+         <widget class="QLineEdit" name="mysql_usr_lineEdit"/>
         </item>
         <item row="1" column="3">
          <widget class="QLabel" name="label_7">
@@ -417,10 +288,10 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="mysql_host_lineEdit"/>
         </item>
         <item row="0" column="4">
-         <widget class="QLineEdit" name="lineEdit_2"/>
+         <widget class="QLineEdit" name="mysql_port_lineEdit"/>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
@@ -462,6 +333,120 @@
        </layout>
       </widget>
      </widget>
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>60</y>
+        <width>501</width>
+        <height>241</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>HDF5导入进展</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>471</width>
+         <height>152</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="2" column="1">
+         <widget class="QProgressBar" name="progressBar_3">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>上证分钟线：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QProgressBar" name="progressBar_2">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>深证日线：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>上证日线：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>上证5分钟线：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>深证分钟线：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>深证5分钟线：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QProgressBar" name="progressBar_4">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QProgressBar" name="progressBar_5">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QProgressBar" name="progressBar_6">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Tab 2</string>
+     </attribute>
     </widget>
    </widget>
   </widget>
