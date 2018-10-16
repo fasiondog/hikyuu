@@ -24,7 +24,7 @@ before_install:
   - cd boost_1_67_0
   - ./bootstrap.sh --with-python=python3
   - cat project-config.jam
-  - ./b2 release link=shared --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
+  - ./b2 release link=shared -d0 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
   - ls ./stage/lib
   - cd
   - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
