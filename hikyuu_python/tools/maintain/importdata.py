@@ -11,7 +11,6 @@ import sys
 
 import tables as tb
 
-from hikyuu.util.mylog import escapetime
 from io import SEEK_END, SEEK_SET
 #import code
 
@@ -35,7 +34,6 @@ class H5Index(tb.IsDescription):
     datetime = tb.UInt64Col()        #IGNORE:E1101
     start    = tb.UInt64Col()        #IGNORE:E1101
     
-@escapetime
 def ImportStockName(connect, filename, market):
     """更新每只股票的名称、当前是否有效性、起始日期及结束日期
         如果导入的代码表中不存在对应的代码，则认为该股已失效"""
@@ -115,7 +113,6 @@ def ImportStockName(connect, filename, market):
     cur.close()    
 
 
-@escapetime
 def ImportDayData(connect, src_dir, dest_dir):
     """
     导入通达信日线数据，只导入基础信息数据库中存在的股票
@@ -253,7 +250,6 @@ def ImportDayData(connect, src_dir, dest_dir):
     print("共导入日线数:", record_count)
 
 
-@escapetime
 def ImportMinData(connect, src_dir, dest_dir, data_type):
     """
     导入通达信分钟线、5分钟线数据，只导入基础信息数据库中存在的股票
@@ -414,7 +410,6 @@ def ImportMinData(connect, src_dir, dest_dir, data_type):
     
 
             
-@escapetime
 def UpdateIndex(filename, data_type):
     
     def getWeekDate(olddate):

@@ -23,11 +23,14 @@
       <height>581</height>
      </rect>
     </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
       <string>数据导入</string>
      </attribute>
-     <widget class="QPushButton" name="pushButton_6">
+     <widget class="QPushButton" name="start_import_pushButton">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -63,7 +66,7 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="1" column="3">
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="select_dzh_dir_pushButton">
           <property name="text">
            <string>选择</string>
           </property>
@@ -104,7 +107,7 @@
          <widget class="QLineEdit" name="tdx_dir_lineEdit"/>
         </item>
         <item row="0" column="3">
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="select_tdx_dir_pushButton">
           <property name="text">
            <string>选择</string>
           </property>
@@ -125,7 +128,7 @@
       <property name="title">
        <string>Pytdx配置（权息、财务数据源）</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -197,7 +200,7 @@
          <widget class="QLineEdit" name="hdf5_dir_lineEdit"/>
         </item>
         <item row="0" column="2">
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="hdf5_dir_pushButton">
           <property name="text">
            <string>选择</string>
           </property>
@@ -345,7 +348,7 @@
       <property name="title">
        <string>HDF5导入进展</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
