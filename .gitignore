@@ -27,3 +27,4 @@ hikyuu.code-workspace
 
 .DS_Store
 hikyuu_cpp/hikyuu/version.h
+hikyuu_python/tools/maintain/importdata.ini

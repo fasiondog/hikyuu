@@ -27,14 +27,14 @@ before_install:
   - ./b2 release link=shared -d0 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
   - ls ./stage/lib
   - cd
-  - git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
+  - git clone https://github.com/tboox/xmake.git tboox/xmake --depth 1
   - cd ./tboox/xmake
   - ./scripts/get.sh __local__
   - cd
 
 script:
   - cd ./build/fasiondog/hikyuu
-  - export BOOST_ROOT=$HOME/boost_1_67_0;
+  - export BOOST_ROOT=$HOME/boost_1_67_0
   - export BOOST_LIB=$HOME/boost_1_67_0/stage/lib
   - xmake f --with-unit-test=y --cxx=$CXX
   - xmake

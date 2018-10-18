@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1028</width>
-    <height>573</height>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>1031</width>
-      <height>581</height>
+      <height>601</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -33,8 +33,8 @@
      <widget class="QPushButton" name="start_import_pushButton">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>20</y>
+        <x>540</x>
+        <y>30</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -47,8 +47,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
-        <width>481</width>
+        <y>90</y>
+        <width>491</width>
         <height>91</height>
        </rect>
       </property>
@@ -60,7 +60,7 @@
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>441</width>
+         <width>451</width>
          <height>61</height>
         </rect>
        </property>
@@ -120,8 +120,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>170</y>
-        <width>481</width>
+        <y>200</y>
+        <width>491</width>
         <height>71</height>
        </rect>
       </property>
@@ -133,7 +133,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>441</width>
+         <width>451</width>
          <height>22</height>
         </rect>
        </property>
@@ -178,8 +178,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>260</y>
-        <width>481</width>
+        <y>290</y>
+        <width>491</width>
         <height>101</height>
        </rect>
       </property>
@@ -191,7 +191,7 @@
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>441</width>
+         <width>451</width>
          <height>25</height>
         </rect>
        </property>
@@ -233,8 +233,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>380</y>
-        <width>481</width>
+        <y>410</y>
+        <width>491</width>
         <height>151</height>
        </rect>
       </property>
@@ -272,7 +272,7 @@
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>441</width>
+         <width>451</width>
          <height>48</height>
         </rect>
        </property>
@@ -339,8 +339,8 @@
      <widget class="QGroupBox" name="groupBox_5">
       <property name="geometry">
        <rect>
-        <x>510</x>
-        <y>60</y>
+        <x>520</x>
+        <y>90</y>
         <width>501</width>
         <height>241</height>
        </rect>
@@ -439,6 +439,118 @@
          <widget class="QProgressBar" name="progressBar_6">
           <property name="value">
            <number>0</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_6">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>20</y>
+        <width>261</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>导入数据</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>20</y>
+         <width>231</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QCheckBox" name="import_day_checkBox">
+          <property name="text">
+           <string>日线</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="import_min_checkBox">
+          <property name="text">
+           <string>分钟线</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="import_min5_checkBox">
+          <property name="text">
+           <string>5分钟线</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="import_tick_checkBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>分笔</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_7">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>221</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>导入行情</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>20</y>
+         <width>191</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QCheckBox" name="import_stock_checkBox">
+          <property name="text">
+           <string>股票</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="import_bond_checkBox">
+          <property name="text">
+           <string>债券</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="import_fund_checkBox">
+          <property name="text">
+           <string>基金</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="import_future_checkBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>期货</string>
           </property>
          </widget>
         </item>

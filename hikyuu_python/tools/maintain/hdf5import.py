@@ -33,6 +33,22 @@ class H5Record(tb.IsDescription):
 class H5Index(tb.IsDescription):
     datetime = tb.UInt64Col()        #IGNORE:E1101
     start    = tb.UInt64Col()        #IGNORE:E1101
+
+
+def create_database(connect):
+    """创建数据库表"""
+    try:
+        cur = connect.cursor()
+        filename = os.getcwd() + '/sqlite_createdb.sql'
+        with open(filename, 'r', encoding='utf8') as sqlfile:
+            cur.executescript(sqlfile.read())
+        connect.commit()
+        cur.close()
+    except sqlite3.OperationalError:
+        pass
+    except Exception as e:
+        raise(e)
+
     
 def ImportStockName(connect, filename, market):
     """更新每只股票的名称、当前是否有效性、起始日期及结束日期
@@ -97,6 +113,7 @@ def ImportStockName(connect, filename, market):
     count = 0
     for code in newStockDict:
         if code not in oldStockDict:
+            print(code)
             for length in lenlist:
                 codepre = code[:length]
                 if codepre in lenDict[length]:
@@ -615,21 +632,21 @@ if __name__ == '__main__':
     dest_dir = "c:\\stock"
     
     connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
+    create_database(connect)
     
+    #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH')
+    #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ')
     
-    ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH')
-    ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ')
-    
-    ImportDayData(connect, src_dir, dest_dir)
-    ImportMinData(connect, src_dir, dest_dir, '5min')
-    ImportMinData(connect, src_dir, dest_dir, '1min')
+    #ImportDayData(connect, src_dir, dest_dir)
+    #ImportMinData(connect, src_dir, dest_dir, '5min')
+    #ImportMinData(connect, src_dir, dest_dir, '1min')
 
-    UpdateIndex(dest_dir + "\\sh_day.h5", "day")
-    UpdateIndex(dest_dir + "\\sz_day.h5", "day")
-    UpdateIndex(dest_dir + "\\sh_5min.h5", 'min')
-    UpdateIndex(dest_dir + "\\sz_5min.h5", 'min')
-    UpdateIndex(dest_dir + "\\sh_1min.h5", 'min')
-    UpdateIndex(dest_dir + "\\sz_1min.h5", 'min')
+    #UpdateIndex(dest_dir + "\\sh_day.h5", "day")
+    #UpdateIndex(dest_dir + "\\sz_day.h5", "day")
+    #UpdateIndex(dest_dir + "\\sh_5min.h5", 'min')
+    #UpdateIndex(dest_dir + "\\sz_5min.h5", 'min')
+    #UpdateIndex(dest_dir + "\\sh_1min.h5", 'min')
+    #UpdateIndex(dest_dir + "\\sz_1min.h5", 'min')
 
     connect.close()
     

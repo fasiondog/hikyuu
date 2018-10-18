@@ -8,12 +8,13 @@ from PyQt5.QtGui import QTextCursor, QIcon, QBrush, QColor
 
 import os
 import sys
-import shutil
 import logging
 
 from configparser import ConfigParser
 
 from pytdx.config.hosts import hq_hosts
+
+from hdf5import import ImportStockName
 
 from MainWindow import *
 
@@ -36,6 +37,18 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         import_config = ConfigParser()
         if os.path.exists(this_dir + '/importdata.ini'):
             import_config.read(this_dir + '/importdata.ini')
+
+        #初始化导入行情数据类型配置
+        self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
+        self.import_bond_checkBox.setChecked(import_config.getboolean('quotation', 'bond', fallback=False))
+        self.import_fund_checkBox.setChecked(import_config.getboolean('quotation', 'fund', fallback=True))
+        self.import_future_checkBox.setChecked(import_config.getboolean('quotation', 'future', fallback=False))
+
+        #初始化导入K线类型配置
+        self.import_day_checkBox.setChecked(import_config.getboolean('ktype', 'day', fallback=True))
+        self.import_min_checkBox.setChecked(import_config.getboolean('ktype', 'min', fallback=True))
+        self.import_min5_checkBox.setChecked(import_config.getboolean('ktype', 'min5', fallback=True))
+        self.import_tick_checkBox.setChecked(import_config.getboolean('ktype', 'tick', fallback=False))
 
         #初始化通道信目录配置
         tdx_enable = import_config.getboolean('tdx', 'enable', fallback=True)
@@ -69,7 +82,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #初始化MYSQL设置
         mysql_enable = import_config.getboolean('mysql', 'enable', fallback=False)
         mysql_host = import_config.get('mysql', 'host', fallback='127.0.0.1')
-        mysql_port = import_config.get('mysql', 'port', fallback='8809')
+        mysql_port = import_config.get('mysql', 'port', fallback='3306')
         mysql_usr = import_config.get('mysql', 'usr', fallback='root')
         mysql_pwd = import_config.get('mysql', 'pwd', fallback='')
         self.mysql_enable_checkBox.setChecked(mysql_enable)
@@ -80,6 +93,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
+        import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
+                                      'bond': self.import_bond_checkBox.isChecked(),
+                                      'fund': self.import_fund_checkBox.isChecked(),
+                                      'future': self.import_future_checkBox.isChecked()}
+        import_config['ktype'] = {'day': self.import_day_checkBox.isChecked(),
+                                  'min': self.import_min_checkBox.isChecked(),
+                                  'min5': self.import_min5_checkBox.isChecked(),
+                                  'tick': self.import_tick_checkBox.isChecked()}
         import_config['tdx'] = {'enable': self.tdx_enable_checkBox.isChecked(),
                                 'dir': self.tdx_dir_lineEdit.text()}
         import_config['dzh'] = {'enable': self.dzh_checkBox.isChecked(),
@@ -134,7 +155,17 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
         config = self.getCurrentConfig()
+        src_dir = "D:\\TdxW_HuaTai"
+        dest_dir = "c:\\stock"
 
+        try:
+            import sqlite3
+            connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
+
+            #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH')
+            #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ')
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":
