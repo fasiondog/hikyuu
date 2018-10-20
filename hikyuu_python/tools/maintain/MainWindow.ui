@@ -457,12 +457,12 @@
       <property name="title">
        <string>导入数据</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>231</width>
+         <width>238</width>
          <height>18</height>
         </rect>
        </property>
@@ -513,12 +513,12 @@
       <property name="title">
        <string>导入行情</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>191</width>
+         <width>208</width>
          <height>18</height>
         </rect>
        </property>
@@ -531,16 +531,16 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="import_bond_checkBox">
+         <widget class="QCheckBox" name="import_fund_checkBox">
           <property name="text">
-           <string>债券</string>
+           <string>基金</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="import_fund_checkBox">
+         <widget class="QCheckBox" name="import_bond_checkBox">
           <property name="text">
-           <string>基金</string>
+           <string>债券</string>
           </property>
          </widget>
         </item>

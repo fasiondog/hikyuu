@@ -50,6 +50,18 @@ INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (13,1,'
 INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (18,2,'300',8,'创业板');
 INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (19,1,'603',1,'上证A股');
 INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (20,1,'519',4,'上证基金');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (21,1,'009',6,'国债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (22,1,'010',6,'国债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (23,1,'10',7,'可转债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (24,1,'11',7,'可转债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (25,1,'12',7,'其他债券');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (26,1,'13',7,'地方政府债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (27,2,'100',6,'国债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (28,2,'101',6,'国债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (29,2,'108',7,'贴债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (30,2,'109',7,'地方政府债');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (31,2,'11',7,'其他债券');
+INSERT INTO `CodeRuleType` (id,marketid,codepre,type,description) VALUES (32,2,'12',7,'其他债券');
 CREATE INDEX "ix_stkWeight_stockid" ON "stkWeight" (stockid);
 CREATE INDEX "ix_stkWeight_date" ON "stkWeight" (date);
 CREATE INDEX "ix_stkWeight" ON "stkWeight" (stockid, date);

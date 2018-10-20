@@ -6,13 +6,13 @@ import os.path
 import struct
 import sqlite3
 import datetime
-import math
 import sys
 
 import tables as tb
 
 from io import SEEK_END, SEEK_SET
-#import code
+
+from common import *
 
 def ProgressBar(cur, total):
     percent = '{:.2%}'.format(cur / total)
@@ -36,7 +36,7 @@ class H5Index(tb.IsDescription):
 
 
 def create_database(connect):
-    """创建数据库表"""
+    """创建SQLITE3数据库表"""
     try:
         cur = connect.cursor()
         filename = os.getcwd() + '/sqlite_createdb.sql'
@@ -45,11 +45,86 @@ def create_database(connect):
         connect.commit()
         cur.close()
     except sqlite3.OperationalError:
-        pass
+        print("相关数据表可能已经存在，放弃创建。如需重建，请手工删除相关数据表。")
     except Exception as e:
         raise(e)
 
-    
+
+def get_codepre_list(connect, marketid, quotation):
+    stktype_list = get_stktype_list(quotation)
+    sql = "select codepre, type from coderuletype " \
+          "where marketid={marketid} and type in {type_list}"\
+        .format(marketid=marketid, type_list=stktype_list)
+    cur = connect.cursor()
+    a = cur.execute(sql)
+    a = a.fetchall()
+    cur.close()
+    return sorted(a, key=lambda k: len(k[0]), reverse=True)
+
+
+def tdx_import_stock_name_from_file(connect, filename, market, quotation=None):
+    cur = connect.cursor()
+
+    newStockDict = {}
+    with open(filename, 'rb') as f:
+        data = f.read(50)
+        data = f.read(314)
+        while data:
+            a = struct.unpack('6s 17s 8s 283s', data)
+            stockcode = a[0].decode()
+            stockname = a[2].decode(encoding='gbk').encode('utf8')
+            pos = stockname.find(0x00)
+            if pos >= 0:
+                stockname = stockname[:pos]
+            newStockDict[stockcode] = stockname.decode(encoding='utf8').strip()
+            data = f.read(314)
+
+    a = cur.execute("select marketid from market where market = '%s'" % market.upper())
+    marketid = [i for i in a]
+    marketid = marketid[0][0]
+
+    a = cur.execute("select stockid, code, name, valid from stock where marketid = %i" % marketid)
+    a = a.fetchall()
+    oldStockDict = {}
+    for oldstock in a:
+        oldstockid, oldcode, oldname, oldvalid = oldstock[0], oldstock[1], oldstock[2], int(oldstock[3])
+        oldStockDict[oldcode] = oldstockid
+
+        # 新的代码表中无此股票，则置为无效
+        if (oldvalid == 1) and (oldcode not in newStockDict):
+            cur.execute("update stock set valid=0 where stockid=%i" % oldstockid)
+
+        # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
+        if oldcode in newStockDict:
+            if oldname != newStockDict[oldcode]:
+                cur.execute("update stock set name='%s' where stockid=%i" %
+                            (newStockDict[oldcode], oldstockid))
+            if oldvalid == 0:
+                cur.execute("update stock set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
+
+    # 处理新出现的股票
+    codepre_list = get_codepre_list(connect, marketid, quotation)
+
+    today = datetime.date.today()
+    today = today.year * 10000 + today.month * 100 + today.day
+    count = 0
+    for code in newStockDict:
+        if code not in oldStockDict:
+            for codepre in codepre_list:
+                length = len(codepre[0])
+                if code[:length] == codepre[0]:
+                    count += 1
+                    #print(market, code, newStockDict[code], codepre)
+                    sql = "insert into Stock(marketid, code, name, type, valid, startDate, endDate) \
+                           values (%s, '%s', '%s', %s, %s, %s, %s)" \
+                          % (marketid, code, newStockDict[code], codepre[1], 1, today, 99999999)
+                    cur.execute(sql)
+                    break
+
+    print('%s新增股票数：%i' % (market.upper(), count))
+    connect.commit()
+    cur.close()
+
 def ImportStockName(connect, filename, market):
     """更新每只股票的名称、当前是否有效性、起始日期及结束日期
         如果导入的代码表中不存在对应的代码，则认为该股已失效"""
@@ -633,7 +708,9 @@ if __name__ == '__main__':
     
     connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
     create_database(connect)
-    
+
+    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', 'stock')
+
     #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH')
     #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ')
     
