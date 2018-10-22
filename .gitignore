@@ -24,7 +24,7 @@ hikyuu.code-workspace
 /install
 /build
 *~
-
+install
 .DS_Store
 hikyuu_cpp/hikyuu/version.h
 hikyuu_python/tools/maintain/importdata.ini
