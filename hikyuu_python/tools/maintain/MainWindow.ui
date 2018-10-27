@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1028</width>
+    <width>1038</width>
     <height>598</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1031</width>
+      <width>1041</width>
       <height>601</height>
      </rect>
     </property>
@@ -48,7 +48,7 @@
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>491</width>
+        <width>501</width>
         <height>91</height>
        </rect>
       </property>
@@ -60,7 +60,7 @@
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>451</width>
+         <width>461</width>
          <height>61</height>
         </rect>
        </property>
@@ -121,7 +121,7 @@
        <rect>
         <x>10</x>
         <y>200</y>
-        <width>491</width>
+        <width>501</width>
         <height>71</height>
        </rect>
       </property>
@@ -133,7 +133,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>451</width>
+         <width>461</width>
          <height>22</height>
         </rect>
        </property>
@@ -179,7 +179,7 @@
        <rect>
         <x>10</x>
         <y>290</y>
-        <width>491</width>
+        <width>501</width>
         <height>101</height>
        </rect>
       </property>
@@ -191,7 +191,7 @@
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>451</width>
+         <width>461</width>
          <height>25</height>
         </rect>
        </property>
@@ -234,7 +234,7 @@
        <rect>
         <x>10</x>
         <y>410</y>
-        <width>491</width>
+        <width>501</width>
         <height>151</height>
        </rect>
       </property>
@@ -242,6 +242,9 @@
        <string>MYSQL保存数据设置</string>
       </property>
       <widget class="QCheckBox" name="mysql_enable_checkBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -255,6 +258,9 @@
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_5">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -272,16 +278,24 @@
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>451</width>
+         <width>461</width>
          <height>48</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="1" column="4">
-         <widget class="QLineEdit" name="mysql_pwd_lineEdit"/>
+         <widget class="QLineEdit" name="mysql_pwd_lineEdit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="mysql_usr_lineEdit"/>
+         <widget class="QLineEdit" name="mysql_usr_lineEdit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="1" column="3">
          <widget class="QLabel" name="label_7">
@@ -291,10 +305,18 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="mysql_host_lineEdit"/>
+         <widget class="QLineEdit" name="mysql_host_lineEdit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="0" column="4">
-         <widget class="QLineEdit" name="mysql_port_lineEdit"/>
+         <widget class="QLineEdit" name="mysql_port_lineEdit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
@@ -339,9 +361,9 @@
      <widget class="QGroupBox" name="groupBox_5">
       <property name="geometry">
        <rect>
-        <x>520</x>
+        <x>530</x>
         <y>90</y>
-        <width>501</width>
+        <width>491</width>
         <height>241</height>
        </rect>
       </property>
@@ -359,7 +381,7 @@
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="2" column="1">
-         <widget class="QProgressBar" name="progressBar_3">
+         <widget class="QProgressBar" name="sh_min_progressBar">
           <property name="value">
            <number>0</number>
           </property>
@@ -373,14 +395,14 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QProgressBar" name="progressBar_2">
+         <widget class="QProgressBar" name="sz_day_progressBar">
           <property name="value">
            <number>0</number>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QProgressBar" name="progressBar">
+         <widget class="QProgressBar" name="sh_day_progressBar">
           <property name="value">
            <number>0</number>
           </property>
@@ -422,21 +444,21 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QProgressBar" name="progressBar_4">
+         <widget class="QProgressBar" name="sz_min_progressBar">
           <property name="value">
            <number>0</number>
           </property>
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QProgressBar" name="progressBar_5">
+         <widget class="QProgressBar" name="sh_5min_progressBar">
           <property name="value">
            <number>0</number>
           </property>
          </widget>
         </item>
         <item row="5" column="1">
-         <widget class="QProgressBar" name="progressBar_6">
+         <widget class="QProgressBar" name="sz_5min_progressBar">
           <property name="value">
            <number>0</number>
           </property>
@@ -448,7 +470,7 @@
      <widget class="QGroupBox" name="groupBox_6">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>250</x>
         <y>20</y>
         <width>261</width>
         <height>51</height>
@@ -506,7 +528,7 @@
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>221</width>
+        <width>231</width>
         <height>51</height>
        </rect>
       </property>
@@ -556,6 +578,19 @@
         </item>
        </layout>
       </widget>
+     </widget>
+     <widget class="QLabel" name="import_status_label">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>30</y>
+        <width>361</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>import_status_label</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">

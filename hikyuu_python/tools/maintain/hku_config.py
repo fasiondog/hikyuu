@@ -1,28 +1,41 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, \
-                            QAbstractItemView, QHeaderView, QTableWidgetItem
-from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal, QObject, QDate
-from PyQt5.QtGui import QTextCursor, QIcon, QBrush, QColor
-
 import os
-import sys
+import time
 import logging
-
 from configparser import ConfigParser
-
+from multiprocessing import Process, Queue
 from pytdx.config.hosts import hq_hosts
 
-from hdf5import import ImportStockName
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, \
+                            QAbstractItemView, QHeaderView, QTableWidgetItem
+from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal, QObject, QDate, QThreadPool
+from PyQt5.QtGui import QTextCursor, QIcon, QBrush, QColor
+
+from hdf5import import *
+from TdxImportTask import TdxImportTask
 
 from MainWindow import *
+
+class ProgressBar:
+    def __init__(self, queue):
+        self.queue = queue
+
+    def __call__(self, cur, total):
+        self.queue.put([cur, total])
+
+def tdx_import_day_data_func(sqlitefile, market, quotation, src_dir, dest_dir, progress=None):
+    connect = sqlite3.connect(sqlitefile)
+    count = tdx_import_day_data(connect, market, quotation, src_dir, dest_dir, progress)
+    print(count)
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MyMainWindow, self).__init__(parent)
         self.setupUi(self)
         self.initUI()
+        self.initThreads()
 
     def closeEvent(self, event):
         self.saveConfig()
@@ -31,6 +44,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def initUI(self):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
         self.setFixedSize(self.width(), self.height())
+        self.import_status_label.setText('')
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = os.getcwd()
@@ -122,6 +136,25 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         with open(filename, 'w') as f:
             self.getCurrentConfig().write(f)
 
+
+    def initThreads(self):
+        config = self.getCurrentConfig()
+        tdx_src_dir = config['tdx']['dir']
+        dest_dir = config['hdf5']['dir']
+        sqlite_file_name = dest_dir + "/hikyuu-stock.db"
+
+        from multiprocessing import Queue
+        self.queue = Queue()
+
+        self.tasks = {}
+        self.tasks['SH_DAY'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', 'DAY','stock', tdx_src_dir, dest_dir)
+        self.tasks['SZ_DAY'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', 'DAY','stock', tdx_src_dir, dest_dir)
+        self.tasks['SH_5MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', '5MIN','stock', tdx_src_dir, dest_dir)
+        self.tasks['SZ_5MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '5MIN', 'stock', tdx_src_dir, dest_dir)
+        self.tasks['SH_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', '1MIN','stock', tdx_src_dir, dest_dir)
+        self.tasks['SZ_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '1MIN', 'stock', tdx_src_dir, dest_dir)
+        #self.tdx_import_day_data_task = TdxImportTask(dest_dir + "\\hikyuu-stock.db", 'SH', 'stock', tdx_src_dir, dest_dir)
+
     @pyqtSlot()
     def on_select_tdx_dir_pushButton_clicked(self):
         dlg = QFileDialog()
@@ -154,6 +187,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
+        self.start_import_pushButton.setEnabled(False)
         config = self.getCurrentConfig()
         src_dir = "D:\\TdxW_HuaTai"
         dest_dir = "c:\\stock"
@@ -161,11 +195,57 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         try:
             import sqlite3
             connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
+            create_database(connect)
+            tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', 'stock')
+            tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', 'stock')
 
-            #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH')
-            #ImportStockName(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ')
+            tasks = []
+            if self.import_day_checkBox.isChecked():
+                tasks.append(self.tasks['SH_DAY'])
+                tasks.append(self.tasks['SZ_DAY'])
+            if self.import_min5_checkBox.isChecked():
+                tasks.append(self.tasks['SH_5MIN'])
+                tasks.append(self.tasks['SZ_5MIN'])
+            if self.import_min_checkBox.isChecked():
+                tasks.append(self.tasks['SH_1MIN'])
+                tasks.append(self.tasks['SZ_1MIN'])
+
+            for task in tasks:
+                p = Process(target=task)
+                p.start()
+
+            start_time = time.time()
+            finished_count = len(tasks)
+            while finished_count > 0:
+                current_time = time.time()
+                self.import_status_label.setText("耗时：{:>.2f} 秒".format(current_time - start_time))
+                QApplication.processEvents()
+                progress = self.queue.get()
+                if progress[2] is None:
+                    finished_count -= 1
+                    continue
+
+                if progress[0] == 'SH':
+                    if progress[1] == 'DAY':
+                        self.sh_day_progressBar.setValue(progress[2])
+                    elif progress[1] == '1MIN':
+                        self.sh_min_progressBar.setValue(progress[2])
+                    elif progress[1] == '5MIN':
+                        self.sh_5min_progressBar.setValue(progress[2])
+                elif progress[0] == 'SZ':
+                    if progress[1] == 'DAY':
+                        self.sz_day_progressBar.setValue(progress[2])
+                    elif progress[1] == '1MIN':
+                        self.sz_min_progressBar.setValue(progress[2])
+                    elif progress[1] == '5MIN':
+                        self.sz_5min_progressBar.setValue(progress[2])
+
         except Exception as e:
             print(e)
+
+        current_time = time.time()
+        self.import_status_label.setText("耗时：{:>.2f} 秒".format(current_time - start_time))
+        self.start_import_pushButton.setEnabled(True)
 
 
 if __name__ == "__main__":
