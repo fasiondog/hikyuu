@@ -14,21 +14,9 @@ from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal, QObject, QDate, QThreadPool
 from PyQt5.QtGui import QTextCursor, QIcon, QBrush, QColor
 
 from hdf5import import *
-from TdxImportTask import TdxImportTask, TdxUpdateExternTask
+from TdxImportTask import TdxImportTask
 
 from MainWindow import *
-
-class ProgressBar:
-    def __init__(self, queue):
-        self.queue = queue
-
-    def __call__(self, cur, total):
-        self.queue.put([cur, total])
-
-def tdx_import_day_data_func(sqlitefile, market, quotation, src_dir, dest_dir, progress=None):
-    connect = sqlite3.connect(sqlitefile)
-    count = tdx_import_day_data(connect, market, quotation, src_dir, dest_dir, progress)
-    print(count)
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -154,10 +142,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.tasks['HDF5_IMPORT_SZ_5MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '5MIN', 'stock', tdx_src_dir, dest_dir)
         self.tasks['HDF5_IMPORT_SH_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', '1MIN','stock', tdx_src_dir, dest_dir)
         self.tasks['HDF5_IMPORT_SZ_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '1MIN', 'stock', tdx_src_dir, dest_dir)
-        self.tasks['HDF5_UPDATE_EXTERN_SH_DAY'] = TdxUpdateExternTask(self.queue, 'SH', 'DAY', dest_dir)
-        self.tasks['HDF5_UPDATE_EXTERN_SZ_DAY'] = TdxUpdateExternTask(self.queue, 'SZ', 'DAY', dest_dir)
-        self.tasks['HDF5_UPDATE_EXTERN_SH_5MIN'] = TdxUpdateExternTask(self.queue, 'SH', '5MIN', dest_dir)
-        self.tasks['HDF5_UPDATE_EXTERN_SZ_5MIN'] = TdxUpdateExternTask(self.queue, 'SZ', '5MIN', dest_dir)
         #self.tdx_import_day_data_task = TdxImportTask(dest_dir + "\\hikyuu-stock.db", 'SH', 'stock', tdx_src_dir, dest_dir)
 
     @pyqtSlot()
@@ -194,8 +178,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_day_progressBar.setValue(0)
         self.hdf5_min_progressBar.setValue(0)
         self.hdf5_5min_progressBar.setValue(0)
-        self.hdf5_day_extern_progressBar.setValue(0)
-        self.hdf5_min_extern_progressBar.setValue(0)
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
@@ -210,10 +192,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         hdf5_import_progress_bar = {'DAY': self.hdf5_day_progressBar,
                                     '1MIN': self.hdf5_min_progressBar,
                                     '5MIN': self.hdf5_5min_progressBar}
-        hdf5_extern_progress = {'SH': {'DAY': 0, '5MIN': 0},
-                                'SZ': {'DAY': 0, '5MIN': 0}}
-        hdf5_extern_progress_bar = {'DAY': self.hdf5_day_extern_progressBar,
-                                    '5MIN': self.hdf5_min_extern_progressBar}
 
         try:
             self.import_status_label.setText('正在导入代码表...')
@@ -245,21 +223,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 message = self.queue.get()
                 taskname, market, ktype, progress, total = message
                 if progress is None:
-                    if taskname == 'TdxImportTask' and ktype in ('DAY', '5MIN'):
-                         p = Process(target=self.tasks['HDF5_UPDATE_EXTERN_{}_{}'.format(market, ktype)])
-                         p.start()
-                    else:
-                        finished_count -= 1
+                    finished_count -= 1
                     continue
 
                 if taskname == 'TdxImportTask':
                     hdf5_import_progress[market][ktype] = progress
                     current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
                     hdf5_import_progress_bar[ktype].setValue(current_progress)
-                elif taskname == 'TdxUpdateExternTask':
-                    hdf5_extern_progress[market][ktype] = progress
-                    current_progress = (hdf5_extern_progress['SH'][ktype] + hdf5_extern_progress['SZ'][ktype]) // 2
-                    hdf5_extern_progress_bar[ktype].setValue(current_progress)
                 else:
                     print("Unknow task: ", taskname)
 

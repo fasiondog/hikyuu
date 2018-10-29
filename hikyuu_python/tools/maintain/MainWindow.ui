@@ -376,17 +376,10 @@
          <x>10</x>
          <y>20</y>
          <width>501</width>
-         <height>126</height>
+         <height>81</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_18">
-          <property name="text">
-           <string>生成分钟线扩展：</string>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_14">
           <property name="text">
@@ -398,13 +391,6 @@
          <widget class="QLabel" name="label_8">
           <property name="text">
            <string>导入日线：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>生成日线扩展：</string>
           </property>
          </widget>
         </item>
@@ -422,13 +408,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QProgressBar" name="hdf5_5min_progressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="1">
          <widget class="QProgressBar" name="hdf5_min_progressBar">
           <property name="value">
@@ -436,15 +415,8 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QProgressBar" name="hdf5_day_extern_progressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QProgressBar" name="hdf5_min_extern_progressBar">
+        <item row="1" column="1">
+         <widget class="QProgressBar" name="hdf5_5min_progressBar">
           <property name="value">
            <number>0</number>
           </property>

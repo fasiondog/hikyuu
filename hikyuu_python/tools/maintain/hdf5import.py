@@ -15,6 +15,8 @@ from io import SEEK_END, SEEK_SET
 
 from common import *
 
+HDF5_COMPRESS_LEVEL = 9
+
 def ProgressBar(cur, total):
     percent = '{:.0%}'.format(cur / total)
     sys.stdout.write('\r')
@@ -139,7 +141,7 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotation=None):
                     cur.execute(sql)
                     break
 
-    print('%s新增股票数：%i' % (market.upper(), count))
+    #print('%s新增股票数：%i' % (market.upper(), count))
     connect.commit()
     cur.close()
 
@@ -222,40 +224,6 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
     return add_record_count
 
 
-def tdx_import_day_data(connect, market, quotation, src_dir, dest_dir, progress=ProgressBar):
-    """
-    导入通达信日线数据，只导入基础信息数据库中存在的股票
-    """
-    add_record_count = 0
-    market = market.upper()
-    if market == 'SH':
-        h5file = tb.open_file(dest_dir + "/sh_day.h5", "a", filters=tb.Filters(complevel=9, complib='zlib', shuffle=True))
-    elif market == 'SZ':
-        h5file = tb.open_file(dest_dir + "/sz_day.h5", "a", filters=tb.Filters(complevel=9, complib='zlib', shuffle=True))
-    else:
-        print('Invalid market:', market)
-        return add_record_count
-
-    marketid = get_marketid(connect, market)
-    stktype_list = get_stktype_list(quotation)
-    sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type in {}".format(marketid, stktype_list)
-
-    cur = connect.cursor()
-    a = cur.execute(sql)
-    a = a.fetchall()
-    total = len(a)
-    for i, stock in enumerate(a):
-        filename = src_dir + "\\" + market.lower() + stock[2]+ ".day"
-        #print(i,filename)
-        add_record_count += tdx_import_day_data_from_file(connect, filename, h5file, market, stock)
-        if progress:
-            progress(i, total)
-
-    connect.commit()
-    h5file.close()
-    return add_record_count
-
-
 def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_record):
     add_record_count = 0
     if not os.path.exists(filename):
@@ -275,7 +243,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
         table = h5file.create_table(group, tablename, H5Record)
 
     if table.nrows > 0:
-        lastdatetime = table[-1]['datetime']/10000
+        lastdatetime = table[-1]['datetime']
     else:
         lastdatetime = None
 
@@ -371,7 +339,7 @@ def tdx_import_data(connect, market, ktype, quotation, src_dir, dest_dir, progre
     market = market.upper()
     filename = "{}_{}.h5".format(market, ktype)
     filename = "{}/{}".format(dest_dir, filename.lower())
-    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=9, complib='zlib', shuffle=True))
+    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
 
     if ktype.upper() == "DAY":
         suffix = ".day"
@@ -395,7 +363,13 @@ def tdx_import_data(connect, market, ktype, quotation, src_dir, dest_dir, progre
     for i, stock in enumerate(a):
         filename = src_dir + "\\" + market.lower() + stock[2]+ suffix
         #print(i,filename)
-        add_record_count += func_import_from_file(connect, filename, h5file, market, stock)
+        this_count = func_import_from_file(connect, filename, h5file, market, stock)
+        add_record_count += this_count
+        if this_count > 0:
+            if ktype == 'DAY':
+                update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+            elif ktype == '5MIN':
+                update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
         if progress:
             progress(i, total)
 
@@ -404,7 +378,7 @@ def tdx_import_data(connect, market, ktype, quotation, src_dir, dest_dir, progre
     return add_record_count
 
 
-def update_hdf5_extern_data(filename, data_type, progress=ProgressBar):
+def update_hdf5_extern_data(h5file, tablename, data_type):
     
     def getWeekDate(olddate):
         y = olddate//100000000
@@ -412,7 +386,7 @@ def update_hdf5_extern_data(filename, data_type, progress=ProgressBar):
         d = olddate//10000 - (y*10000+m*100)
         tempdate = datetime.date(y,m,d)
         #python中周一是第0天，周五的第4天
-        tempweekdate = tempdate + datetime.timedelta(tempdate.weekday()+4)
+        tempweekdate = tempdate + datetime.timedelta(4-tempdate.weekday())
         newdate = tempweekdate.year*100000000 + tempweekdate.month*1000000 + tempweekdate.day*10000
         return newdate
 
@@ -432,15 +406,13 @@ def update_hdf5_extern_data(filename, data_type, progress=ProgressBar):
         return( y*100000000 + new_m*1000000 + d_dict[new_m])
     
     def getHalfyearDate(olddate):
-        halfyearDict={1:6,2:6,3:6,4:6,5:6,6:6,7:12,8:12,9:12,10:12,11:12,12:12}
-        d_dict = {6:300000, 12:310000}
         y = olddate//100000000
         m = olddate//1000000 - y*100
-        return( y*100000000 + halfyearDict[m]*1000000 + 10000 )
+        return y*100000000 + (6300000 if m < 7 else 12310000)
     
     def getYearDate(olddate):
         y = olddate//100000000
-        return(y*100000000 + 310000)
+        return(y*100000000 + 12310000)
 
     def getMin60Date(olddate):
         mint = olddate-olddate//10000*10000
@@ -530,14 +502,6 @@ def update_hdf5_extern_data(filename, data_type, progress=ProgressBar):
         else:
             return None
     
-    
-    if data_type not in ('DAY', '5MIN', 'MIN', '1MIN'):
-        print("非法参数值data_type:", data_type)
-        return
-    
-    print('更新 %s 扩展线索引' % filename)
-    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=9,complib='zlib', shuffle=True))
-    
     if data_type == 'DAY':
         index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
     else:
@@ -549,57 +513,52 @@ def update_hdf5_extern_data(filename, data_type, progress=ProgressBar):
             groupDict[index_type] = h5file.get_node("/", index_type)
         except:
             groupDict[index_type] = h5file.create_group("/", index_type)
-        
-    
-    root_group = h5file.get_node("/data")
-    table_total = root_group._v_nchildren
-    table_count = 0
-    for table in root_group._f_walknodes():
-        table_count += 1
-        if progress:
-            progress(table_count, table_total)
-        
-        for index_type in index_list:
-            try:
-                index_table = h5file.get_node(groupDict[index_type],table.name)
-            except:
-                index_table = h5file.create_table(groupDict[index_type],table.name, H5Index)
-    
-            total = table.nrows
-            if 0 == total:
+
+    try:
+        table = h5file.get_node("/data", tablename)
+    except:
+        return
+
+    for index_type in index_list:
+        try:
+            index_table = h5file.get_node(groupDict[index_type],tablename)
+        except:
+            index_table = h5file.create_table(groupDict[index_type],tablename, H5Index)
+
+        total = table.nrows
+        if 0 == total:
+            continue
+
+        index_total = index_table.nrows
+        index_row = index_table.row
+        if index_total:
+            index_last_date = int(index_table[-1]['datetime'])
+            last_date = getNewDate(index_type, int(table[-1]['datetime']))
+            if index_last_date == last_date:
                 continue
-    
-            index_total = index_table.nrows
-            index_row = index_table.row
-            if index_total:
-                index_last_date = int(index_table[-1]['datetime'])
-                last_date = getNewDate(index_type, int(table[-1]['datetime']))
-                if index_last_date == last_date:
-                    continue
-                startix = int(index_table[-1]['start'])
-                pre_index_date = int(index_table[-1]['datetime'])
-            else:
-                startix = 0
-                date = int(table[0]['datetime'])
-                pre_index_date = getNewDate(index_type,date)
-                index_row['datetime'] = pre_index_date
-                index_row['start'] = 0
+            startix = int(index_table[-1]['start'])
+            pre_index_date = int(index_table[-1]['datetime'])
+        else:
+            startix = 0
+            date = int(table[0]['datetime'])
+            pre_index_date = getNewDate(index_type,date)
+            index_row['datetime'] = pre_index_date
+            index_row['start'] = 0
+            index_row.append()
+
+        index = startix
+        for row in table[startix:]:
+            date = int(row['datetime'])
+            cur_index_date = getNewDate(index_type, date)
+            if cur_index_date != pre_index_date:
+                index_row['datetime'] = cur_index_date
+                index_row['start'] = index
                 index_row.append()
-                #week_table.flush()
-                
-            index = startix
-            for row in table[startix:]:
-                date = int(row['datetime'])
-                cur_index_date = getNewDate(index_type, date)
-                if cur_index_date != pre_index_date:
-                    index_row['datetime'] = cur_index_date
-                    index_row['start'] = index
-                    index_row.append()
-                    pre_index_date = cur_index_date
-                index += 1
-            index_table.flush()
+                pre_index_date = cur_index_date
+            index += 1
+        index_table.flush()
             
-    h5file.close()
+    #h5file.close()
     #print('\n')
 
 if __name__ == '__main__':   
@@ -613,17 +572,20 @@ if __name__ == '__main__':
     connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
     create_database(connect)
 
-    #tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', 'stock')
-    #tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', 'stock')
+    print("导入股票代码表")
+    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', 'stock')
+    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', 'stock')
 
+    add_count = 0
     #add_count = tdx_import_data(connect, 'SH', 'DAY', 'stock', src_dir + "\\vipdoc\\sh\\lday", dest_dir)
-    #add_count = tdx_import_data(connect, 'SH', '1MIN', 'stock', src_dir + "\\vipdoc\\sh\\minline", dest_dir)
-    #print("\n",add_count)
+    #add_count = tdx_import_data(connect, 'SZ', 'DAY', 'stock', src_dir + "\\vipdoc\\sz\\lday", dest_dir)
+    print("\n导入上证5分钟数据")
+    #add_count = tdx_import_data(connect, 'SH', '5MIN', 'stock', src_dir + "\\vipdoc\\sh\\fzline", dest_dir)
+    print("\n导入数量：", add_count)
 
-    update_hdf5_extern_data(dest_dir + "\\sh_day.h5", "DAY")
-    #update_hdf5_extern_data(dest_dir + "\\sz_day.h5", "DAY")
-    update_hdf5_extern_data(dest_dir + "\\sh_5min.h5", '5MIN')
-    #update_hdf5_extern_data(dest_dir + "\\sz_5min.h5", '5MIN')
+    print("\n导入上证1分钟数据")
+    add_count = tdx_import_data(connect, 'SH', '1MIN', 'stock', src_dir + "\\vipdoc\\sh\\minline", dest_dir)
+    print("\n导入数量：", add_count)
 
     connect.close()
     
