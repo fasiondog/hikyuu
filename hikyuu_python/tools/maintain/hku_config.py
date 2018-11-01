@@ -14,7 +14,7 @@ from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal, QObject, QDate, QThreadPool
 from PyQt5.QtGui import QTextCursor, QIcon, QBrush, QColor
 
 from hdf5import import *
-from TdxImportTask import TdxImportTask
+from TdxImportTask import TdxImportTask, WeightImportTask
 
 from MainWindow import *
 
@@ -142,6 +142,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.tasks['HDF5_IMPORT_SZ_5MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '5MIN', 'stock', tdx_src_dir, dest_dir)
         self.tasks['HDF5_IMPORT_SH_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', '1MIN','stock', tdx_src_dir, dest_dir)
         self.tasks['HDF5_IMPORT_SZ_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '1MIN', 'stock', tdx_src_dir, dest_dir)
+        self.tasks['HDF5_IMPORT_WEIGHT'] = WeightImportTask(self.queue, sqlite_file_name, dest_dir)
         #self.tdx_import_day_data_task = TdxImportTask(dest_dir + "\\hikyuu-stock.db", 'SH', 'stock', tdx_src_dir, dest_dir)
 
     @pyqtSlot()
@@ -175,6 +176,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.hdf5_dir_lineEdit.setText(dirname[0])
 
     def reset_progress_bar(self):
+        self.hdf5_weight_label.setText('')
         self.hdf5_day_progressBar.setValue(0)
         self.hdf5_min_progressBar.setValue(0)
         self.hdf5_5min_progressBar.setValue(0)
@@ -202,6 +204,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', 'stock')
 
             tasks = []
+            tasks.append(self.tasks['HDF5_IMPORT_WEIGHT'])
             if self.import_day_checkBox.isChecked():
                 tasks.append(self.tasks['HDF5_IMPORT_SH_DAY'])
                 tasks.append(self.tasks['HDF5_IMPORT_SZ_DAY'])
@@ -226,7 +229,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     finished_count -= 1
                     continue
 
-                if taskname == 'TdxImportTask':
+                if taskname == 'WeightImportTask':
+                    self.hdf5_weight_label.setText(market)
+                elif taskname == 'TdxImportTask':
                     hdf5_import_progress[market][ktype] = progress
                     current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
                     hdf5_import_progress_bar[ktype].setValue(current_progress)

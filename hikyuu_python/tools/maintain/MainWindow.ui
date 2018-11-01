@@ -48,7 +48,7 @@
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>501</width>
+        <width>511</width>
         <height>91</height>
        </rect>
       </property>
@@ -60,7 +60,7 @@
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>461</width>
+         <width>481</width>
          <height>61</height>
         </rect>
        </property>
@@ -121,7 +121,7 @@
        <rect>
         <x>10</x>
         <y>200</y>
-        <width>501</width>
+        <width>511</width>
         <height>71</height>
        </rect>
       </property>
@@ -133,7 +133,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>461</width>
+         <width>481</width>
          <height>22</height>
         </rect>
        </property>
@@ -179,7 +179,7 @@
        <rect>
         <x>10</x>
         <y>290</y>
-        <width>501</width>
+        <width>511</width>
         <height>101</height>
        </rect>
       </property>
@@ -191,7 +191,7 @@
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>461</width>
+         <width>481</width>
          <height>25</height>
         </rect>
        </property>
@@ -234,7 +234,7 @@
        <rect>
         <x>10</x>
         <y>410</y>
-        <width>501</width>
+        <width>511</width>
         <height>151</height>
        </rect>
       </property>
@@ -278,32 +278,11 @@
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>461</width>
+         <width>481</width>
          <height>48</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="1" column="4">
-         <widget class="QLineEdit" name="mysql_pwd_lineEdit">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="mysql_usr_lineEdit">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>密码：</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <widget class="QLineEdit" name="mysql_host_lineEdit">
           <property name="enabled">
@@ -325,6 +304,13 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>端口：</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
@@ -332,10 +318,24 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="label_5">
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>端口：</string>
+           <string>密码：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="mysql_usr_lineEdit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLineEdit" name="mysql_pwd_lineEdit">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -376,17 +376,10 @@
          <x>10</x>
          <y>20</y>
          <width>501</width>
-         <height>81</height>
+         <height>101</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>导入1分钟线：</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
@@ -401,13 +394,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QProgressBar" name="hdf5_day_progressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="1">
          <widget class="QProgressBar" name="hdf5_min_progressBar">
           <property name="value">
@@ -415,10 +401,38 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>导入1分钟线：</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
          <widget class="QProgressBar" name="hdf5_5min_progressBar">
           <property name="value">
            <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QProgressBar" name="hdf5_day_progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>导入权息数据：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="hdf5_weight_label">
+          <property name="text">
+           <string>TextLabel</string>
           </property>
          </widget>
         </item>
@@ -430,7 +444,7 @@
        <rect>
         <x>250</x>
         <y>20</y>
-        <width>261</width>
+        <width>271</width>
         <height>51</height>
        </rect>
       </property>
@@ -442,7 +456,7 @@
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>238</width>
+         <width>244</width>
          <height>18</height>
         </rect>
        </property>
@@ -457,7 +471,7 @@
         <item>
          <widget class="QCheckBox" name="import_min_checkBox">
           <property name="text">
-           <string>分钟线</string>
+           <string>1分钟线</string>
           </property>
          </widget>
         </item>

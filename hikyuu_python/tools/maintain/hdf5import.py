@@ -3,6 +3,7 @@
 # cp936
 
 import os.path
+import pathlib
 import struct
 import sqlite3
 import datetime
@@ -557,11 +558,54 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
                 pre_index_date = cur_index_date
             index += 1
         index_table.flush()
-            
-    #h5file.close()
-    #print('\n')
 
-if __name__ == '__main__':   
+
+def qianlong_import_weight(connect, src_dir, market):
+    """导入钱龙格式的权息数据"""
+    cur = connect.cursor()
+    marketid = cur.execute("select marketid from Market where market='%s'" % market)
+    marketid = [id[0] for id in marketid]
+    marketid = marketid[0]
+
+    src_path = pathlib.Path(src_dir + '/shase/weight') if market == 'SH' else pathlib.Path(src_dir + '/sznse/weight')
+    wgt_file_list = list(src_path.glob('*.wgt'))
+
+    total_count = 0
+    for wgt_file in wgt_file_list:
+        code = wgt_file.stem
+        stockid = cur.execute("select stockid from Stock where marketid=%s and code='%s'" % (marketid, code))
+        stockid = [id[0] for id in stockid]
+        if not stockid:
+            continue
+
+        with wgt_file.open('rb') as sourcefile:
+            stockid = stockid[0]
+            a = cur.execute("select date from stkweight where stockid=%s" % stockid)
+            dateDict = dict([(i[0], None) for i in a])
+
+            records = []
+            data = sourcefile.read(36)
+            while data:
+                a = struct.unpack('iiiiiiiii', data)
+                date = (a[0] >> 20) * 10000 + (((a[0] << 12) & 4294967295) >> 28) * 100 + ((a[0] & 0xffff) >> 11)
+                if date not in dateDict:
+                    records.append((stockid, date, a[1], a[2], a[3], a[4], a[5], a[6], a[7]))
+                data = sourcefile.read(36)
+            sourcefile.close()
+
+            if records:
+                cur.executemany("INSERT INTO StkWeight(stockid, date, countAsGift, \
+                                 countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
+                                 VALUES (?,?,?,?,?,?,?,?,?)",
+                                records)
+                total_count += len(records)
+
+    connect.commit()
+    cur.close()
+    return total_count
+
+
+if __name__ == '__main__':
     
     import time
     starttime = time.time()
@@ -584,8 +628,13 @@ if __name__ == '__main__':
     print("\n导入数量：", add_count)
 
     print("\n导入上证1分钟数据")
-    add_count = tdx_import_data(connect, 'SH', '1MIN', 'stock', src_dir + "\\vipdoc\\sh\\minline", dest_dir)
+    #add_count = tdx_import_data(connect, 'SH', '1MIN', 'stock', src_dir + "\\vipdoc\\sh\\minline", dest_dir)
     print("\n导入数量：", add_count)
+
+    print("\n导入权息数据")
+    total_count = qianlong_import_weight(connect, r'C:\stock\weight', 'SH')
+    total_count += qianlong_import_weight(connect, r'C:\stock\weight', 'SZ')
+    print(total_count)
 
     connect.close()
     
