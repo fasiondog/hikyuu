@@ -71,12 +71,12 @@ class WeightImportTask:
             self.queue.put([self.__class__.__name__, '下载完成，正在解压...', 0, 0, 0])
             os.system('unrar x -o+ -inul {} {}'.format(dest_filename, self.dest_dir))
 
-            self.queue.put([self.__class__.__name__, '解压完毕，导入权息数据...', 0, 0, 0])
+            self.queue.put([self.__class__.__name__, '解压完毕，正在导入权息数据...', 0, 0, 0])
             total_count = qianlong_import_weight(connect, self.dest_dir + '/weight', 'SH')
             total_count += qianlong_import_weight(connect, self.dest_dir + '/weight', 'SZ')
-            self.queue.put([self.__class__.__name__, '导入完成', 0, 0, total_count])
+            self.queue.put([self.__class__.__name__, '导入完成!', 0, 0, total_count])
 
         except Exception as e:
-            print(e)
+            self.queue.put([self.__class__.__name__, str(e), -1, 0, total_count])
 
-        self.queue.put([self.__class__.__name__, '导入完成', 0, None, total_count])
+        self.queue.put([self.__class__.__name__, '', 0, None, total_count])

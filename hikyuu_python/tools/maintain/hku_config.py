@@ -17,6 +17,8 @@ from hdf5import import *
 from TdxImportTask import TdxImportTask, WeightImportTask
 
 from MainWindow import *
+from EscapetimeThread import EscapetimeThread
+from HDF5ImportThread import HDF5ImportThread
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -27,6 +29,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event):
         self.saveConfig()
+        if self.hdf5_import_thread:
+            self.hdf5_import_thread.terminate()
+        if self.escape_time_thread:
+            self.escape_time_thread.stop()
         event.accept()
 
     def initUI(self):
@@ -127,23 +133,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
 
     def initThreads(self):
-        config = self.getCurrentConfig()
-        tdx_src_dir = config['tdx']['dir']
-        dest_dir = config['hdf5']['dir']
-        sqlite_file_name = dest_dir + "/hikyuu-stock.db"
+        self.escape_time_thread = None
+        self.hdf5_import_thread = None
+        self.mysql_import_thread = None
 
-        from multiprocessing import Queue
-        self.queue = Queue()
+        self.hdf5_import_progress_bar = {'DAY': self.hdf5_day_progressBar,
+                                         '1MIN': self.hdf5_min_progressBar,
+                                         '5MIN': self.hdf5_5min_progressBar}
 
-        self.tasks = {}
-        self.tasks['HDF5_IMPORT_SH_DAY'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', 'DAY','stock', tdx_src_dir, dest_dir)
-        self.tasks['HDF5_IMPORT_SZ_DAY'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', 'DAY','stock', tdx_src_dir, dest_dir)
-        self.tasks['HDF5_IMPORT_SH_5MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', '5MIN','stock', tdx_src_dir, dest_dir)
-        self.tasks['HDF5_IMPORT_SZ_5MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '5MIN', 'stock', tdx_src_dir, dest_dir)
-        self.tasks['HDF5_IMPORT_SH_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SH', '1MIN','stock', tdx_src_dir, dest_dir)
-        self.tasks['HDF5_IMPORT_SZ_1MIN'] = TdxImportTask(self.queue, sqlite_file_name, 'SZ', '1MIN', 'stock', tdx_src_dir, dest_dir)
-        self.tasks['HDF5_IMPORT_WEIGHT'] = WeightImportTask(self.queue, sqlite_file_name, dest_dir)
-        #self.tdx_import_day_data_task = TdxImportTask(dest_dir + "\\hikyuu-stock.db", 'SH', 'stock', tdx_src_dir, dest_dir)
 
     @pyqtSlot()
     def on_select_tdx_dir_pushButton_clicked(self):
@@ -181,10 +178,59 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_min_progressBar.setValue(0)
         self.hdf5_5min_progressBar.setValue(0)
 
+
+    def on_escapte_time(self, escape):
+        self.import_status_label.setText("耗时：{:>.2f} 秒".format(escape))
+
+    def on_message_from_thread(self, msg):
+        if not msg or len(msg) < 2:
+            print("msg is empty!")
+            return
+
+        msg_name, msg_task_name = msg[:2]
+        if msg_name == 'ESCAPE_TIME':
+            self.escape_time = msg_task_name
+            self.import_status_label.setText("耗时：{:>.2f} 秒".format(self.escape_time))
+
+        elif msg_name == 'HDF5_IMPORT':
+            #self.import_status_label.setText("耗时：{:>.2f} 秒 {}".format(self.escape_time, msg_task_name))
+            if msg_task_name == 'THREAD':
+                status = msg[2]
+                if status == 'FAILURE':
+                    self.import_status_label.setText("耗时：{:>.2f} 秒 导入异常！{}".format(self.escape_time, msg[3]))
+                self.hdf5_import_thread.terminate()
+                self.hdf5_import_thread = None
+                self.escape_time_thread.stop()
+                self.escape_time_thread = None
+
+            elif msg_task_name == 'IMPORT_KDATA':
+                ktype, progress = msg[2:4]
+                if ktype != 'FINISHED':
+                    self.hdf5_import_progress_bar[ktype].setValue(progress)
+                #else:
+                #    print('导入记录数：', ktype, progress)
+
+            elif msg_task_name == 'IMPORT_WEIGHT':
+                self.hdf5_weight_label.setText(msg[2])
+
+
+
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
+
+        self.escape_time = 0.0
+        self.escape_time_thread = EscapetimeThread()
+        self.escape_time_thread.message.connect(self.on_message_from_thread)
+        self.escape_time_thread.start()
+
+        config = self.getCurrentConfig()
+        self.hdf5_import_thread = HDF5ImportThread(config, ['stock'], ['DAY', '1MIN', '5MIN'])
+        self.hdf5_import_thread.message.connect(self.on_message_from_thread)
+        self.hdf5_import_thread.start()
+
+        """
         config = self.getCurrentConfig()
         src_dir = "D:\\TdxW_HuaTai"
         dest_dir = "c:\\stock"
@@ -195,6 +241,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                     '1MIN': self.hdf5_min_progressBar,
                                     '5MIN': self.hdf5_5min_progressBar}
 
+
         try:
             self.import_status_label.setText('正在导入代码表...')
             import sqlite3
@@ -203,8 +250,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', 'stock')
             tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', 'stock')
 
+            self.import_status_label.setText('正在创建导入任务...')
             tasks = []
-            tasks.append(self.tasks['HDF5_IMPORT_WEIGHT'])
+            tasks.append(self.tasks['DOWNLOAD_WEIGHT'])
             if self.import_day_checkBox.isChecked():
                 tasks.append(self.tasks['HDF5_IMPORT_SH_DAY'])
                 tasks.append(self.tasks['HDF5_IMPORT_SZ_DAY'])
@@ -229,7 +277,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     finished_count -= 1
                     continue
 
-                if taskname == 'WeightImportTask':
+                if taskname == 'WeightDownloadTask':
                     self.hdf5_weight_label.setText(market)
                 elif taskname == 'TdxImportTask':
                     hdf5_import_progress[market][ktype] = progress
@@ -247,6 +295,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         current_time = time.time()
         self.import_status_label.setText("耗时：{:>.2f} 秒 导入完毕！".format(current_time - start_time))
         self.start_import_pushButton.setEnabled(True)
+
+        escape_thread.stop()
+
+        #self.start_unrar_process()
+        #print("self.unrar_future.result:", self.unrar_future.result())
+        """
 
 
 if __name__ == "__main__":
