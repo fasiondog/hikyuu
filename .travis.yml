@@ -34,8 +34,8 @@ before_install:
 
 script:
   - cd ./build/fasiondog/hikyuu
-  - export BOOST_ROOT=$HOME/boost_1_67_0
-  - export BOOST_LIB=$HOME/boost_1_67_0/stage/lib
+  - export BOOST_ROOT=./boost_1_67_0
+  - export BOOST_LIB=./boost_1_67_0/stage/lib
   - ls .
   - xmake f --with-unit-test=y --cxx=$CXX
   - xmake
