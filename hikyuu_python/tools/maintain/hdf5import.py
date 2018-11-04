@@ -615,7 +615,7 @@ if __name__ == '__main__':
     src_dir = "D:\\TdxW_HuaTai"
     dest_dir = "c:\\stock"
     
-    connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
+    connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
 
     print("导入股票代码表")

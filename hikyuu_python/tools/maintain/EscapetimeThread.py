@@ -16,7 +16,7 @@ class EscapetimeThread(QThread):
 
     def __del__(self):
         self.working = False
-        print("EscapetimeThread", "__del__", self.escape_time/1000)
+        #print("EscapetimeThread", "__del__", self.escape_time/1000)
         self.wait()
 
     def send_message(self, msg):

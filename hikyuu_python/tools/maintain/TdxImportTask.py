@@ -40,7 +40,8 @@ class TdxImportTask:
         self.dest_dir = dest_dir
 
     def __del__(self):
-        print(self.__class__.__name__, self.market, self.ktype, "__del__")
+        #print(self.__class__.__name__, self.market, self.ktype, "__del__")
+        pass
 
     def __call__(self):
         count = 0

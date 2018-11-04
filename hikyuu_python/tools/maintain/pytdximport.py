@@ -38,6 +38,8 @@ if __name__ == '__main__':
     api = TdxHq_API()
     api.connect('119.147.212.81', 7709)
 
-    x = api.get_xdxr_info(TDXParams.MARKET_SH, '600030')
-    print(x)
+    x = api.get_history_transaction_data(TDXParams.MARKET_SZ, '000001', 4000, 2000, 20181102)
+    for i in x:
+        print(i)
+    print(len(x))
     api.disconnect()

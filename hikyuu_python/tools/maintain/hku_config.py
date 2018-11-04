@@ -28,9 +28,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.initThreads()
 
     def closeEvent(self, event):
+        if self.import_running:
+            QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
+            event.ignore()
+            return
         self.saveConfig()
         if self.hdf5_import_thread:
-            self.hdf5_import_thread.terminate()
+            self.hdf5_import_thread.stop()
         if self.escape_time_thread:
             self.escape_time_thread.stop()
         event.accept()
@@ -39,6 +43,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
         self.setFixedSize(self.width(), self.height())
         self.import_status_label.setText('')
+        self.import_detail_textEdit.clear()
         self.reset_progress_bar()
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
@@ -58,28 +63,32 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.import_min5_checkBox.setChecked(import_config.getboolean('ktype', 'min5', fallback=True))
         self.import_tick_checkBox.setChecked(import_config.getboolean('ktype', 'tick', fallback=False))
 
+        #初始化权息数据设置
+        self.import_weight_checkBox.setChecked(import_config.getboolean('weight', 'enable', fallback=True))
+
         #初始化通道信目录配置
         tdx_enable = import_config.getboolean('tdx', 'enable', fallback=True)
         tdx_dir = import_config.get('tdx', 'dir', fallback='d:\TdxW_HuaTai')
-        self.tdx_enable_checkBox.setChecked(tdx_enable)
+        self.tdx_radioButton.setChecked(tdx_enable)
+        self.tdx_dir_lineEdit.setEnabled(tdx_enable)
+        self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
         self.tdx_dir_lineEdit.setText(tdx_dir)
-
-        #初始化大智慧目录配置
-        dzh_enable = import_config.getboolean('dzh', 'enable', fallback=False)
-        dzh_dir = import_config.get('dzh', 'dir', fallback='')
-        self.dzh_checkBox.setChecked(dzh_enable)
-        self.dzh_dir_lineEdit.setText(dzh_dir)
+        self.tdx_radioButton.toggled.connect(self.on_tdx_or_pytdx_toggled)
 
         #初始化pytdx配置及显示
-        tdx_server = import_config.get('pytdx', 'server', fallback='招商证券深圳行情')
+        pytdx_enable = import_config.getboolean('pytdx', 'enable', fallback=False)
+        pytdx_server = import_config.get('pytdx', 'server', fallback='招商证券深圳行情')
+        self.pytdx_radioButton.setChecked(pytdx_enable)
         self.tdx_servers_comboBox.setDuplicatesEnabled(True)
         default_tdx_index = 0
         for i, host in enumerate(hq_hosts):
             self.tdx_servers_comboBox.addItem(host[0], host[1])
-            if host[0] == tdx_server:
+            if host[0] == pytdx_server:
                 default_tdx_index = i
         self.tdx_servers_comboBox.setCurrentIndex(default_tdx_index)
         self.tdx_port_lineEdit.setText(str(hq_hosts[default_tdx_index][2]))
+        self.tdx_servers_comboBox.setEnabled(pytdx_enable)
+        self.tdx_port_lineEdit.setEnabled(pytdx_enable)
 
         #初始化hdf5设置
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
@@ -108,11 +117,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                   'min': self.import_min_checkBox.isChecked(),
                                   'min5': self.import_min5_checkBox.isChecked(),
                                   'tick': self.import_tick_checkBox.isChecked()}
-        import_config['tdx'] = {'enable': self.tdx_enable_checkBox.isChecked(),
+        import_config['weight'] = {'enable': self.import_weight_checkBox.isChecked()}
+        import_config['tdx'] = {'enable': self.tdx_radioButton.isChecked(),
                                 'dir': self.tdx_dir_lineEdit.text()}
-        import_config['dzh'] = {'enable': self.dzh_checkBox.isChecked(),
-                                'dir': self.dzh_dir_lineEdit.text()}
-        import_config['pytdx'] = {'server': self.tdx_servers_comboBox.currentText(),
+        import_config['pytdx'] = {'enable': self.pytdx_radioButton.isChecked(),
+                                  'server': self.tdx_servers_comboBox.currentText(),
                                   'ip': hq_hosts[self.tdx_servers_comboBox.currentIndex()][1],
                                   'port': hq_hosts[self.tdx_servers_comboBox.currentIndex()][2]}
         import_config['hdf5'] = {'enable': self.hdf5_enable_checkBox.isChecked(),
@@ -135,9 +144,17 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_import_thread = None
         self.mysql_import_thread = None
 
+        self.import_running = False
         self.hdf5_import_progress_bar = {'DAY': self.hdf5_day_progressBar,
                                          '1MIN': self.hdf5_min_progressBar,
                                          '5MIN': self.hdf5_5min_progressBar}
+
+    def on_tdx_or_pytdx_toggled(self):
+        tdx_enable = self.tdx_radioButton.isChecked()
+        self.tdx_dir_lineEdit.setEnabled(tdx_enable)
+        self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
+        self.tdx_servers_comboBox.setEnabled(not tdx_enable)
+        self.tdx_port_lineEdit.setEnabled(not tdx_enable)
 
 
     @pyqtSlot()
@@ -175,9 +192,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_day_progressBar.setValue(0)
         self.hdf5_min_progressBar.setValue(0)
         self.hdf5_5min_progressBar.setValue(0)
-
-        self.import_count = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0},
-                             'SZ': {'DAY': 0, '1MIN': 0, '5MIN': 0}}
+        self.import_detail_textEdit.clear()
 
     def on_escapte_time(self, escape):
         self.import_status_label.setText("耗时：{:>.2f} 秒".format(escape))
@@ -196,28 +211,33 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             if msg_task_name == 'THREAD':
                 status = msg[2]
                 if status == 'FAILURE':
-                    self.import_status_label.setText("耗时：{:>.2f} 秒 导入异常！{}".format(self.escape_time, msg[3]))
+                    self.import_status_label.setText("耗时：{:>.2f} 秒 导入异常！".format(self.escape_time))
+                    self.import_detail_textEdit.append(msg[3])
                 self.hdf5_import_thread.terminate()
                 self.hdf5_import_thread = None
                 self.escape_time_thread.stop()
                 self.escape_time_thread = None
                 self.start_import_pushButton.setEnabled(True)
+                self.import_detail_textEdit.append("导入完毕！")
+                self.import_running = False
 
             elif msg_task_name == 'IMPORT_KDATA':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.hdf5_import_progress_bar[ktype].setValue(progress)
                 else:
-                    print('导入记录数：', msg[3:])
-                    #self.import_count[msg[3]][msg[4]] = msg[5]
+                    self.import_detail_textEdit.append('导入 {} {} 记录数：{}'
+                                                       .format(msg[3], msg[4], msg[5]))
 
             elif msg_task_name == 'IMPORT_WEIGHT':
                 self.hdf5_weight_label.setText(msg[2])
-
+                if msg[2] == '导入完成!':
+                    self.import_detail_textEdit.append('导入权息记录数：{}'.format(msg[3]))
 
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
+        self.import_running = True
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
 

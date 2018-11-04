@@ -20,11 +20,14 @@ class HDF5ImportThread(QThread):
         self.msg_task_name = ''
 
         if not self.check():
+            self.working = False
             return
+
+        self.process_list = []
 
         src_dir = config['tdx']['dir']
         dest_dir = config['hdf5']['dir']
-        sqlite_file_name = dest_dir + "/hikyuu-stock.db"
+        sqlite_file_name = dest_dir + "/stock.db"
 
         self.quotations = []
         if self.config['quotation']['stock']:
@@ -34,20 +37,24 @@ class HDF5ImportThread(QThread):
 
         self.queue = Queue()
         self.tasks = []
-        self.tasks.append(WeightImportTask(self.queue, sqlite_file_name, dest_dir))
-        if self.config['ktype']['day']:
+        if self.config.getboolean('weight', 'enable', fallback=False):
+            self.tasks.append(WeightImportTask(self.queue, sqlite_file_name, dest_dir))
+        if self.config.getboolean('ktype', 'day', fallback=False):
             self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SH', 'DAY', self.quotations, src_dir, dest_dir))
             self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SZ', 'DAY', self.quotations, src_dir, dest_dir))
-        if self.config['ktype']['min5']:
+        if self.config.getboolean('ktype', 'min5', fallback=False):
             self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SH', '5MIN', self.quotations, src_dir, dest_dir))
             self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SZ', '5MIN', self.quotations, src_dir, dest_dir))
-        if self.config['ktype']['min']:
+        if self.config.getboolean('ktype', 'min', fallback=False):
             self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SH', '1MIN', self.quotations, src_dir, dest_dir))
             self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SZ', '1MIN', self.quotations, src_dir, dest_dir))
 
 
     def __del__(self):
-        print("HDF5ImportThread.__del__")
+        #print("HDF5ImportThread.__del__")
+        for p in self.process_list:
+            if p.is_alive():
+                p.terminate()
 
     def check(self):
         return True
@@ -76,14 +83,16 @@ class HDF5ImportThread(QThread):
         #正在导入代码表
         self.send_message(['START_IMPORT_CODE'])
 
-        connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
+        connect = sqlite3.connect(dest_dir + "\\stock.db")
         create_database(connect)
 
         tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', self.quotations)
         tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', self.quotations)
 
+        self.process_list.clear()
         for task in self.tasks:
             p = Process(target=task)
+            self.process_list.append(p)
             p.start()
 
         finished_count = len(self.tasks)
@@ -99,7 +108,7 @@ class HDF5ImportThread(QThread):
                 continue
 
             if taskname == 'WeightImportTask':
-                self.send_message(['IMPORT_WEIGHT', market])
+                self.send_message(['IMPORT_WEIGHT', market, total])
             elif taskname == 'TdxImportTask':
                 hdf5_import_progress[market][ktype] = progress
                 current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
