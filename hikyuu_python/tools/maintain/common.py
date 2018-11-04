@@ -15,17 +15,20 @@ STOCKTYPE_BOND  = 7  #其他债券
 STOCKTYPE_GEM   = 8  #创业板
 STOCKTYPE_BTC   = 9  #数字币
 
-def get_stktype_list(quotation=None):
-    if not quotation:
+def get_stktype_list(quotations=None):
+    if not quotations:
         return (1, 2, 3, 4, 5, 6, 7, 8, 9)
 
-    new_quotation = quotation.lower()
-    if new_quotation == 'stock':
-        return (STOCKTYPE_A, STOCKTYPE_INDEX, STOCKTYPE_B, STOCKTYPE_GEM)
-    elif new_quotation == 'fund':
-        return (STOCKTYPE_FUND, STOCKTYPE_ETF)
-    elif new_quotation == 'bond':
-        return (STOCKTYPE_ND, STOCKTYPE_BOND)
-    else:
-        print('Unknow quotation: {}'.format(quotation))
-        return ()
+    result = []
+    for quotation in quotations:
+        new_quotation = quotation.lower()
+        if new_quotation == 'stock':
+            result += [STOCKTYPE_A, STOCKTYPE_INDEX, STOCKTYPE_B, STOCKTYPE_GEM]
+        elif new_quotation == 'fund':
+            result += [STOCKTYPE_FUND, STOCKTYPE_ETF]
+        elif new_quotation == 'bond':
+            result += [STOCKTYPE_ND, STOCKTYPE_BOND]
+        else:
+            print('Unknow quotation: {}'.format(quotation))
+
+    return tuple(result)

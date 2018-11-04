@@ -49,7 +49,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         #初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
-        self.import_bond_checkBox.setChecked(import_config.getboolean('quotation', 'bond', fallback=False))
         self.import_fund_checkBox.setChecked(import_config.getboolean('quotation', 'fund', fallback=True))
         self.import_future_checkBox.setChecked(import_config.getboolean('quotation', 'future', fallback=False))
 
@@ -103,7 +102,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def getCurrentConfig(self):
         import_config = ConfigParser()
         import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
-                                      'bond': self.import_bond_checkBox.isChecked(),
                                       'fund': self.import_fund_checkBox.isChecked(),
                                       'future': self.import_future_checkBox.isChecked()}
         import_config['ktype'] = {'day': self.import_day_checkBox.isChecked(),
@@ -178,6 +176,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_min_progressBar.setValue(0)
         self.hdf5_5min_progressBar.setValue(0)
 
+        self.import_count = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0},
+                             'SZ': {'DAY': 0, '1MIN': 0, '5MIN': 0}}
 
     def on_escapte_time(self, escape):
         self.import_status_label.setText("耗时：{:>.2f} 秒".format(escape))
@@ -190,10 +190,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         msg_name, msg_task_name = msg[:2]
         if msg_name == 'ESCAPE_TIME':
             self.escape_time = msg_task_name
-            self.import_status_label.setText("耗时：{:>.2f} 秒".format(self.escape_time))
+            self.import_status_label.setText("耗时：{:>.2f} 秒 （{:>.2f}分钟）".format(self.escape_time, self.escape_time/60))
 
         elif msg_name == 'HDF5_IMPORT':
-            #self.import_status_label.setText("耗时：{:>.2f} 秒 {}".format(self.escape_time, msg_task_name))
             if msg_task_name == 'THREAD':
                 status = msg[2]
                 if status == 'FAILURE':
@@ -202,13 +201,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 self.hdf5_import_thread = None
                 self.escape_time_thread.stop()
                 self.escape_time_thread = None
+                self.start_import_pushButton.setEnabled(True)
 
             elif msg_task_name == 'IMPORT_KDATA':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.hdf5_import_progress_bar[ktype].setValue(progress)
-                #else:
-                #    print('导入记录数：', ktype, progress)
+                else:
+                    print('导入记录数：', msg[3:])
+                    #self.import_count[msg[3]][msg[4]] = msg[5]
 
             elif msg_task_name == 'IMPORT_WEIGHT':
                 self.hdf5_weight_label.setText(msg[2])
@@ -226,81 +227,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
         config = self.getCurrentConfig()
-        self.hdf5_import_thread = HDF5ImportThread(config, ['stock'], ['DAY', '1MIN', '5MIN'])
+        self.hdf5_import_thread = HDF5ImportThread(config)
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
-
-        """
-        config = self.getCurrentConfig()
-        src_dir = "D:\\TdxW_HuaTai"
-        dest_dir = "c:\\stock"
-
-        hdf5_import_progress = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0},
-                                'SZ': {'DAY': 0, '1MIN': 0, '5MIN': 0}}
-        hdf5_import_progress_bar = {'DAY': self.hdf5_day_progressBar,
-                                    '1MIN': self.hdf5_min_progressBar,
-                                    '5MIN': self.hdf5_5min_progressBar}
-
-
-        try:
-            self.import_status_label.setText('正在导入代码表...')
-            import sqlite3
-            connect = sqlite3.connect(dest_dir + "\\hikyuu-stock.db")
-            create_database(connect)
-            tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', 'stock')
-            tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', 'stock')
-
-            self.import_status_label.setText('正在创建导入任务...')
-            tasks = []
-            tasks.append(self.tasks['DOWNLOAD_WEIGHT'])
-            if self.import_day_checkBox.isChecked():
-                tasks.append(self.tasks['HDF5_IMPORT_SH_DAY'])
-                tasks.append(self.tasks['HDF5_IMPORT_SZ_DAY'])
-            if self.import_min5_checkBox.isChecked():
-                tasks.append(self.tasks['HDF5_IMPORT_SH_5MIN'])
-                tasks.append(self.tasks['HDF5_IMPORT_SZ_5MIN'])
-            if self.import_min_checkBox.isChecked():
-                tasks.append(self.tasks['HDF5_IMPORT_SH_1MIN'])
-                tasks.append(self.tasks['HDF5_IMPORT_SZ_1MIN'])
-
-            for task in tasks:
-                p = Process(target=task)
-                p.start()
-
-            start_time = time.time()
-            finished_count = len(tasks)
-            while finished_count > 0:
-                QApplication.processEvents()
-                message = self.queue.get()
-                taskname, market, ktype, progress, total = message
-                if progress is None:
-                    finished_count -= 1
-                    continue
-
-                if taskname == 'WeightDownloadTask':
-                    self.hdf5_weight_label.setText(market)
-                elif taskname == 'TdxImportTask':
-                    hdf5_import_progress[market][ktype] = progress
-                    current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
-                    hdf5_import_progress_bar[ktype].setValue(current_progress)
-                else:
-                    print("Unknow task: ", taskname)
-
-                current_time = time.time()
-                self.import_status_label.setText("耗时：{:>.2f} 秒".format(current_time - start_time))
-
-        except Exception as e:
-            print(e)
-
-        current_time = time.time()
-        self.import_status_label.setText("耗时：{:>.2f} 秒 导入完毕！".format(current_time - start_time))
-        self.start_import_pushButton.setEnabled(True)
-
-        escape_thread.stop()
-
-        #self.start_unrar_process()
-        #print("self.unrar_future.result:", self.unrar_future.result())
-        """
 
 
 if __name__ == "__main__":

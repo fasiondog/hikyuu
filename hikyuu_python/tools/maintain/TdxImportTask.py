@@ -16,13 +16,13 @@ class ProgressBar:
         self.src.queue.put([self.src.__class__.__name__, self.src.market, self.src.ktype, (cur+1) * 100 // total, 0])
 
 class TdxImportTask:
-    def __init__(self, queue, sqlitefile, market, ktype, quotation, src_dir, dest_dir):
+    def __init__(self, queue, sqlitefile, market, ktype, quotations, src_dir, dest_dir):
         super(self.__class__, self).__init__()
         self.queue = queue
         self.sqlitefile = sqlitefile
         self.market = market.upper()
         self.ktype = ktype.upper()
-        self.quotation = quotation
+        self.quotations = quotations
         if self.market == 'SH':
             if self.ktype == 'DAY':
                 self.src_dir = src_dir + "/vipdoc/sh/lday"
@@ -47,7 +47,7 @@ class TdxImportTask:
         try:
             connect = sqlite3.connect(self.sqlitefile)
             progress = ProgressBar(self)
-            count = tdx_import_data(connect, self.market, self.ktype, self.quotation, self.src_dir, self.dest_dir, progress)
+            count = tdx_import_data(connect, self.market, self.ktype, self.quotations, self.src_dir, self.dest_dir, progress)
         except Exception as e:
             print(e)
         self.queue.put([self.__class__.__name__, self.market, self.ktype, None, count])

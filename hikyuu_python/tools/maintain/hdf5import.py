@@ -63,8 +63,8 @@ def get_marketid(connect, market):
     return marketid
 
 
-def get_codepre_list(connect, marketid, quotation):
-    stktype_list = get_stktype_list(quotation)
+def get_codepre_list(connect, marketid, quotations):
+    stktype_list = get_stktype_list(quotations)
     sql = "select codepre, type from coderuletype " \
           "where marketid={marketid} and type in {type_list}"\
         .format(marketid=marketid, type_list=stktype_list)
@@ -75,7 +75,7 @@ def get_codepre_list(connect, marketid, quotation):
     return sorted(a, key=lambda k: len(k[0]), reverse=True)
 
 
-def tdx_import_stock_name_from_file(connect, filename, market, quotation=None):
+def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
     """更新每只股票的名称、当前是否有效性、起始日期及结束日期
         如果导入的代码表中不存在对应的代码，则认为该股已失效
 
@@ -104,7 +104,9 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotation=None):
     marketid = [i for i in a]
     marketid = marketid[0][0]
 
-    a = cur.execute("select stockid, code, name, valid from stock where marketid = %i" % marketid)
+    stktype_list = get_stktype_list(quotations)
+    a = cur.execute("select stockid, code, name, valid from stock where marketid={} and type in {}"
+                    .format(marketid, stktype_list))
     a = a.fetchall()
     oldStockDict = {}
     for oldstock in a:
@@ -124,7 +126,7 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotation=None):
                 cur.execute("update stock set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
 
     # 处理新出现的股票
-    codepre_list = get_codepre_list(connect, marketid, quotation)
+    codepre_list = get_codepre_list(connect, marketid, quotations)
 
     today = datetime.date.today()
     today = today.year * 10000 + today.month * 100 + today.day
@@ -331,7 +333,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
     return add_record_count
 
-def tdx_import_data(connect, market, ktype, quotation, src_dir, dest_dir, progress=ProgressBar):
+def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progress=ProgressBar):
     """
     导入通达信日线数据，只导入基础信息数据库中存在的股票
     """
@@ -353,7 +355,7 @@ def tdx_import_data(connect, market, ktype, quotation, src_dir, dest_dir, progre
         func_import_from_file = tdx_import_min_data_from_file
 
     marketid = get_marketid(connect, market)
-    stktype_list = get_stktype_list(quotation)
+    stktype_list = get_stktype_list(quotations)
     sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type in {}".format(marketid, stktype_list)
 
     cur = connect.cursor()
@@ -617,12 +619,15 @@ if __name__ == '__main__':
     create_database(connect)
 
     print("导入股票代码表")
-    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', 'stock')
-    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', 'stock')
+    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', ['stock', 'fund'])
+    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', ['stock', 'fund'])
 
+    print("\n导入上证日线数据")
     add_count = 0
-    #add_count = tdx_import_data(connect, 'SH', 'DAY', 'stock', src_dir + "\\vipdoc\\sh\\lday", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', 'DAY', ['stock', 'fund'], src_dir + "\\vipdoc\\sh\\lday", dest_dir)
     #add_count = tdx_import_data(connect, 'SZ', 'DAY', 'stock', src_dir + "\\vipdoc\\sz\\lday", dest_dir)
+    print("\n导入数量：", add_count)
+
     print("\n导入上证5分钟数据")
     #add_count = tdx_import_data(connect, 'SH', '5MIN', 'stock', src_dir + "\\vipdoc\\sh\\fzline", dest_dir)
     print("\n导入数量：", add_count)
@@ -632,8 +637,9 @@ if __name__ == '__main__':
     print("\n导入数量：", add_count)
 
     print("\n导入权息数据")
-    total_count = qianlong_import_weight(connect, r'C:\stock\weight', 'SH')
-    total_count += qianlong_import_weight(connect, r'C:\stock\weight', 'SZ')
+    total_count = 0
+    #total_count = qianlong_import_weight(connect, r'C:\stock\weight', 'SH')
+    #total_count += qianlong_import_weight(connect, r'C:\stock\weight', 'SZ')
     print(total_count)
 
     connect.close()
