@@ -5,6 +5,11 @@
 import datetime
 from pytdx.hq import TDXParams
 
+def to_pytdx_market(market):
+    """转换为pytdx的market"""
+    pytdx_market = {'SH': TDXParams.MARKET_SH, 'SZ': TDXParams.MARKET_SZ}
+    return pytdx_market[market.upper()]
+
 pytdx_market = {'SH': TDXParams.MARKET_SH, 'SZ': TDXParams.MARKET_SZ}
 
 def pytdx_get_weights(connect, market, code, lastdatetime=None):
@@ -38,8 +43,12 @@ if __name__ == '__main__':
     api = TdxHq_API()
     api.connect('119.147.212.81', 7709)
 
-    x = api.get_history_transaction_data(TDXParams.MARKET_SZ, '000001', 4000, 2000, 20181102)
-    for i in x:
-        print(i)
+    market = to_pytdx_market('SZ')
+    stk_count = api.get_security_count(market)
+    print(stk_count, int(stk_count/1000))
+    x = []
+    for i in range(int(stk_count/1000)+1):
+        x += api.get_security_list(market, i * 1000)
+
     print(len(x))
     api.disconnect()

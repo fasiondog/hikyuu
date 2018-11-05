@@ -14,7 +14,9 @@ import tables as tb
 
 from io import SEEK_END, SEEK_SET
 
-from common import *
+from common import get_stktype_list, MARKETID
+from sqlite3_baseinfo import (create_database, get_marketid,
+                              get_codepre_list, update_last_date)
 
 HDF5_COMPRESS_LEVEL = 9
 
@@ -26,6 +28,7 @@ def ProgressBar(cur, total):
 
 
 class H5Record(tb.IsDescription):
+    """HDF5基础K线数据格式（日线、分钟线、5分钟线"""
     datetime = tb.UInt64Col()        #IGNORE:E1101
     openPrice = tb.UInt32Col()       #IGNORE:E1101
     highPrice = tb.UInt32Col()       #IGNORE:E1101
@@ -33,46 +36,12 @@ class H5Record(tb.IsDescription):
     closePrice = tb.UInt32Col()      #IGNORE:E1101
     transAmount = tb.UInt64Col()     #IGNORE:E1101
     transCount = tb.UInt64Col()      #IGNORE:E1101
-    
+
+
 class H5Index(tb.IsDescription):
+    """HDF5扩展K线数据格式（周线、月线、季线、半年线、年线、15分钟线、30分钟线、60分钟线"""
     datetime = tb.UInt64Col()        #IGNORE:E1101
     start    = tb.UInt64Col()        #IGNORE:E1101
-
-
-def create_database(connect):
-    """创建SQLITE3数据库表"""
-    try:
-        cur = connect.cursor()
-        filename = os.getcwd() + '/sqlite_createdb.sql'
-        with open(filename, 'r', encoding='utf8') as sqlfile:
-            cur.executescript(sqlfile.read())
-        connect.commit()
-        cur.close()
-    except sqlite3.OperationalError:
-        print("相关数据表可能已经存在，放弃创建。如需重建，请手工删除相关数据表。")
-    except Exception as e:
-        raise(e)
-
-
-def get_marketid(connect, market):
-    cur = connect.cursor()
-    a = cur.execute("select marketid, market from market where market='{}'".format(market))
-    marketid = [i for i in a]
-    marketid = marketid[0][0]
-    cur.close()
-    return marketid
-
-
-def get_codepre_list(connect, marketid, quotations):
-    stktype_list = get_stktype_list(quotations)
-    sql = "select codepre, type from coderuletype " \
-          "where marketid={marketid} and type in {type_list}"\
-        .format(marketid=marketid, type_list=stktype_list)
-    cur = connect.cursor()
-    a = cur.execute(sql)
-    a = a.fetchall()
-    cur.close()
-    return sorted(a, key=lambda k: len(k[0]), reverse=True)
 
 
 def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
@@ -150,13 +119,13 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
 
 
 def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_record):
-    """
+    """从通达信盘后数据导入日K线
 
-    :param connect:
-    :param filename:
-    :param h5file:
-    :param stock_record: (stockid, marketid, code, valid, type)
-    :return:
+    :param connect : sqlite3连接实例
+    :param filename: 通达信日线数据文件名
+    :param h5file  : HDF5 file
+    :param stock_record: 股票的相关数据 (stockid, marketid, code, valid, type)
+    :return: 导入的记录数
     """
     add_record_count = 0
     if not os.path.exists(filename):
@@ -182,7 +151,6 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
         startdate = None
         lastdatetime = None
 
-    update_flag = False
     row = table.row
     with open(filename, 'rb') as src_file:
         data = src_file.read(32)
@@ -209,25 +177,37 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
 
                     row.append()
                     add_record_count += 1
-                    if not update_flag:
-                        update_flag = True
 
             data = src_file.read(32)
 
-    if update_flag:
+    if add_record_count > 0:
         table.flush()
 
-    if startdate is not None and valid == 0:
-        cur = connect.cursor()
-        cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
-                    (startdate, 99999999, stockid))
-        connect.commit()
-        cur.close()
+        #更新基础信息数据库中股票对应的起止日期及其有效标志
+        if startdate is not None and valid == 0:
+            cur = connect.cursor()
+            cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
+                        (startdate, 99999999, stockid))
+            connect.commit()
+            cur.close()
+
+        #记录最新更新日期
+        if (code == '000001' and marketid == MARKETID.SH) \
+                or (code == '399001' and marketid == MARKETID.SZ)  :
+            update_last_date(connect, marketid, table[-1]['datetime'] / 10000)
 
     return add_record_count
 
 
 def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_record):
+    """从通达信盘后数据导入1分钟或5分钟K线
+
+    :param connect : sqlite3连接实例
+    :param filename: 通达信K线数据文件名
+    :param h5file  : HDF5 file
+    :param stock_record: 股票的相关数据 (stockid, marketid, code, valid, type)
+    :return: 导入的记录数
+    """
     add_record_count = 0
     if not os.path.exists(filename):
         return add_record_count
@@ -250,7 +230,6 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
     else:
         lastdatetime = None
 
-    update_flag = False
     row = table.row
     with open(filename, 'rb') as src_file:
         def trans_date(yymm, hhmm):
@@ -323,21 +302,27 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
                         row.append()
                         add_record_count += 1
-                        if not update_flag:
-                            update_flag = True
 
                 data = src_file.read(32)
 
-    if update_flag:
+    if add_record_count > 0:
         table.flush()
 
     return add_record_count
 
-def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progress=ProgressBar):
-    """
-    导入通达信日线数据，只导入基础信息数据库中存在的股票
-    """
 
+def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progress=ProgressBar):
+    """导入通达信指定盘后数据路径中的K线数据。注：只导入基础信息数据库中存在的股票。
+
+    :param connect   : sqlit3链接
+    :param market    : 'SH' | 'SZ'
+    :param ktype     : 'DAY' | '1MIN' | '5MIN'
+    :param quotations: 'stock' | 'fund' | 'bond'
+    :param src_dir   : 盘后K线数据路径，如上证5分钟线：D:\\Tdx\\vipdoc\\sh\\fzline
+    :param dest_dir  : HDF5数据文件所在目录
+    :param progress  : 进度显示函数
+    :return: 导入记录数
+    """
     add_record_count = 0
     market = market.upper()
     filename = "{}_{}.h5".format(market, ktype)
@@ -365,7 +350,6 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
     total = len(a)
     for i, stock in enumerate(a):
         filename = src_dir + "\\" + market.lower() + stock[2]+ suffix
-        #print(i,filename)
         this_count = func_import_from_file(connect, filename, h5file, market, stock)
         add_record_count += this_count
         if this_count > 0:
