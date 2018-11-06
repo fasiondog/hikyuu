@@ -363,8 +363,9 @@ size_t Stock::getCount(KQuery::KType kType) const {
     if (!m_data)
         return 0;
 
-    if (m_data->pKData.find(kType) != m_data->pKData.end())
+    if (m_data->pKData.find(kType) != m_data->pKData.end()) {
         return m_data->pKData[kType]->size();
+    }
 
     return m_kdataDriver->getCount(market(), code(), kType);
 }
@@ -570,11 +571,12 @@ _getIndexRangeByDateFromBuffer(const KQuery& query,
 
 KRecord Stock
 ::getKRecord(size_t pos, KQuery::KType kType) const {
-    //if (!m_data)
-    //    return KRecord();
-    if (m_data->pKData.find(kType) != m_data->pKData.end()) {
+    if (!m_data)
+        return KRecord();
+
+    if (m_data->pKData.find(kType) != m_data->pKData.end())
         return m_data->pKData[kType]->at(pos);
-    }
+
     return m_kdataDriver->getKRecord(market(), code(), pos, kType);
 }
 
@@ -586,7 +588,7 @@ KRecordList Stock
         return result;
 
     //if (m_data->pKData[ktype]) {
-    if (isBuffer(ktype)) {
+    if (m_data->pKData.find(ktype) != m_data->pKData.end()) {
         size_t total = m_data->pKData[ktype]->size();
         if (start_ix >= end_ix || start_ix > total) {
             HKU_WARN("Invalid param! (" << start_ix << ", "
@@ -653,16 +655,24 @@ getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
 
 
 void Stock::realtimeUpdate(const KRecord& record) {
-    if (!m_data || !m_data->pKData[KQuery::DAY] ||
+    //if (!m_data || !m_data->pKData[KQuery::DAY] ||
+    if (!isBuffer(KQuery::DAY) ||
             record.datetime == Null<Datetime>()) {
+        return;
+    }
+
+    if (m_data->pKData[KQuery::DAY]->empty()) {
+        m_data->pKData[KQuery::DAY]->push_back(record);
         return;
     }
 
     KRecord &tmp = m_data->pKData[KQuery::DAY]->back();
     if (tmp.datetime == record.datetime) {
         tmp = record;
-    } else {
+    } else if (tmp.datetime < record.datetime) {
         m_data->pKData[KQuery::DAY]->push_back(record);
+    } else {
+        HKU_INFO("Ignore record, datetime < last record.datetime! [Stock::realtimeUpdate]");
     }
 }
 
