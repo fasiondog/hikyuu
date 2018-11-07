@@ -15,33 +15,17 @@ import tables as tb
 from io import SEEK_END, SEEK_SET
 
 from common import get_stktype_list, MARKETID
-from sqlite3_baseinfo import (create_database, get_marketid,
-                              get_codepre_list, update_last_date)
+from sqlite3_common import (create_database, get_marketid,
+                            get_codepre_list, update_last_date)
+from hdf5_common import (H5Record, H5Index,
+                         open_h5file, get_h5table)
 
-HDF5_COMPRESS_LEVEL = 9
 
 def ProgressBar(cur, total):
     percent = '{:.0%}'.format(cur / total)
     sys.stdout.write('\r')
     sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)),percent))
     sys.stdout.flush()
-
-
-class H5Record(tb.IsDescription):
-    """HDF5基础K线数据格式（日线、分钟线、5分钟线"""
-    datetime = tb.UInt64Col()        #IGNORE:E1101
-    openPrice = tb.UInt32Col()       #IGNORE:E1101
-    highPrice = tb.UInt32Col()       #IGNORE:E1101
-    lowPrice = tb.UInt32Col()        #IGNORE:E1101
-    closePrice = tb.UInt32Col()      #IGNORE:E1101
-    transAmount = tb.UInt64Col()     #IGNORE:E1101
-    transCount = tb.UInt64Col()      #IGNORE:E1101
-
-
-class H5Index(tb.IsDescription):
-    """HDF5扩展K线数据格式（周线、月线、季线、半年线、年线、15分钟线、30分钟线、60分钟线"""
-    datetime = tb.UInt64Col()        #IGNORE:E1101
-    start    = tb.UInt64Col()        #IGNORE:E1101
 
 
 def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
@@ -51,7 +35,7 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
         :param connect: sqlite3实例
         :param filename: 代码表文件名
         :param market: 'SH' | 'SZ'
-        :param quotation: 待导入的行情类别，空为导入全部 'stock' | 'fund' | 'bond' | None
+        :param quotations: 待导入的行情类别列表，空为导入全部 'stock' | 'fund' | 'bond' | None
     """
     cur = connect.cursor()
 
@@ -133,17 +117,7 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3],stock_record[4]
 
-    try:
-        group = h5file.get_node("/", "data")
-    except:
-        group = h5file.create_group("/", "data")
-
-    tablename = market.upper() + code
-    try:
-        table = h5file.get_node(group, tablename)
-    except:
-        table = h5file.create_table(group, tablename, H5Record)
-
+    table = get_h5table(h5file, market, code)
     if table.nrows > 0:
         startdate = table[0]['datetime']/10000
         lastdatetime = table[-1]['datetime']/10000
@@ -214,17 +188,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3],stock_record[4]
 
-    try:
-        group = h5file.get_node("/", "data")
-    except:
-        group = h5file.create_group("/", "data")
-
-    tablename = market.upper() + code
-    try:
-        table = h5file.get_node(group, tablename)
-    except:
-        table = h5file.create_table(group, tablename, H5Record)
-
+    table = get_h5table(h5file, market, code)
     if table.nrows > 0:
         lastdatetime = table[-1]['datetime']
     else:
@@ -325,9 +289,7 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
     """
     add_record_count = 0
     market = market.upper()
-    filename = "{}_{}.h5".format(market, ktype)
-    filename = "{}/{}".format(dest_dir, filename.lower())
-    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
+    h5file = open_h5file(dest_dir, market, ktype)
 
     if ktype.upper() == "DAY":
         suffix = ".day"
@@ -349,6 +311,9 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
 
     total = len(a)
     for i, stock in enumerate(a):
+        if stock[3] == 0:
+            continue
+
         filename = src_dir + "\\" + market.lower() + stock[2]+ suffix
         this_count = func_import_from_file(connect, filename, h5file, market, stock)
         add_record_count += this_count
@@ -598,13 +563,14 @@ if __name__ == '__main__':
     
     src_dir = "D:\\TdxW_HuaTai"
     dest_dir = "c:\\stock"
+    quotations = ['stock', 'fund'] #通达信盘后数据没有债券
     
     connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
 
     print("导入股票代码表")
-    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', ['stock', 'fund'])
-    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', ['stock', 'fund'])
+    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', quotations)
+    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', quotations)
 
     print("\n导入上证日线数据")
     add_count = 0

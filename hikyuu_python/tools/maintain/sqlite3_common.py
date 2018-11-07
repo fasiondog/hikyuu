@@ -27,6 +27,7 @@ import sqlite3
 
 from common import MARKETID, get_stktype_list
 
+
 def create_database(connect):
     """创建SQLITE3数据库表"""
     try:
@@ -44,7 +45,7 @@ def create_database(connect):
 
 def get_marketid(connect, market):
     cur = connect.cursor()
-    a = cur.execute("select marketid, market from market where market='{}'".format(market))
+    a = cur.execute("select marketid, market from market where market='{}'".format(market.upper()))
     marketid = [i for i in a]
     marketid = marketid[0][0]
     cur.close()
@@ -71,3 +72,24 @@ def update_last_date(connect, marketid, lastdate):
         cur.execute("update LastDate set date={}".format(lastdate))
     connect.commit()
     cur.close()
+
+
+def get_last_date(connect, marketid):
+    cur = connect.cursor()
+    a = cur.execute("select lastDate from market where marketid='{}'".format(marketid))
+    last_date = [x[0] for x in a][0]
+    connect.commit()
+    cur.close()
+    return last_date
+
+
+def get_stock_list(connect, market, quotations):
+    marketid = get_marketid(connect, market)
+    stktype_list = get_stktype_list(quotations)
+    sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type in {}"\
+        .format(marketid, stktype_list)
+    cur = connect.cursor()
+    a = cur.execute(sql).fetchall()
+    connect.commit()
+    cur.close()
+    return a
