@@ -2,23 +2,21 @@
 
 import sys
 import os
-import time
 import logging
 from configparser import ConfigParser
-from multiprocessing import Process, Queue
 from pytdx.config.hosts import hq_hosts
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, \
-                            QAbstractItemView, QHeaderView, QTableWidgetItem
-from PyQt5.QtCore import Qt, pyqtSlot, pyqtSignal, QObject, QDate, QThreadPool
-from PyQt5.QtGui import QTextCursor, QIcon, QBrush, QColor
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import  QIcon
 
-from hdf5import import *
-from TdxImportTask import TdxImportTask, WeightImportTask
+from tdx_to_h5 import *
+
 
 from MainWindow import *
 from EscapetimeThread import EscapetimeThread
-from HDF5ImportThread import HDF5ImportThread
+from UseTdxImportToH5Thread import UseTdxImportToH5Thread
+from UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -55,6 +53,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
         self.import_fund_checkBox.setChecked(import_config.getboolean('quotation', 'fund', fallback=True))
+        self.import_bond_checkBox.setChecked(import_config.getboolean('quotation', 'bond', fallback=False))
         self.import_future_checkBox.setChecked(import_config.getboolean('quotation', 'future', fallback=False))
 
         #初始化导入K线类型配置
@@ -112,6 +111,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         import_config = ConfigParser()
         import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
                                       'fund': self.import_fund_checkBox.isChecked(),
+                                      'bond': self.import_bond_checkBox.isChecked(),
                                       'future': self.import_future_checkBox.isChecked()}
         import_config['ktype'] = {'day': self.import_day_checkBox.isChecked(),
                                   'min': self.import_min_checkBox.isChecked(),
@@ -247,7 +247,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
         config = self.getCurrentConfig()
-        self.hdf5_import_thread = HDF5ImportThread(config)
+
+        if self.tdx_radioButton.isChecked():
+            self.hdf5_import_thread = UseTdxImportToH5Thread(config)
+        else:
+            self.hdf5_import_thread = UsePytdxImportToH5Thread(config)
+
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
 

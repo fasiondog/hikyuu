@@ -75,7 +75,7 @@
         <item>
          <widget class="QRadioButton" name="pytdx_radioButton">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>使用Pytdx</string>
@@ -490,7 +490,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>191</width>
+         <width>208</width>
          <height>18</height>
         </rect>
        </property>
@@ -536,7 +536,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>291</width>
+         <width>297</width>
          <height>18</height>
         </rect>
        </property>

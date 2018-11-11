@@ -1,6 +1,26 @@
-#!/usr/bin/python
-# -*- coding: utf8 -*-
-# cp936
+# coding:utf-8
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog/hikyuu
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 import os.path
 import pathlib
@@ -17,8 +37,9 @@ from io import SEEK_END, SEEK_SET
 from common import get_stktype_list, MARKETID
 from sqlite3_common import (create_database, get_marketid,
                             get_codepre_list, update_last_date)
-from hdf5_common import (H5Record, H5Index,
-                         open_h5file, get_h5table)
+from h5_common import (H5Record, H5Index,
+                       open_h5file, get_h5table,
+                       update_hdf5_extern_data)
 
 
 def ProgressBar(cur, total):
@@ -119,10 +140,8 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
 
     table = get_h5table(h5file, market, code)
     if table.nrows > 0:
-        startdate = table[0]['datetime']/10000
         lastdatetime = table[-1]['datetime']/10000
     else:
-        startdate = None
         lastdatetime = None
 
     row = table.row
@@ -158,10 +177,10 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
         table.flush()
 
         #更新基础信息数据库中股票对应的起止日期及其有效标志
-        if startdate is not None and valid == 0:
+        if valid == 0:
             cur = connect.cursor()
             cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
-                        (startdate, 99999999, stockid))
+                        (table[0]['datetime'], 99999999, stockid))
             connect.commit()
             cur.close()
 
@@ -330,186 +349,6 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
     return add_record_count
 
 
-def update_hdf5_extern_data(h5file, tablename, data_type):
-    
-    def getWeekDate(olddate):
-        y = olddate//100000000
-        m = olddate//1000000 - y*100
-        d = olddate//10000 - (y*10000+m*100)
-        tempdate = datetime.date(y,m,d)
-        #python中周一是第0天，周五的第4天
-        tempweekdate = tempdate + datetime.timedelta(4-tempdate.weekday())
-        newdate = tempweekdate.year*100000000 + tempweekdate.month*1000000 + tempweekdate.day*10000
-        return newdate
-
-    def getMonthDate(olddate):
-        y = olddate//100000000
-        m = olddate//1000000 - y*100
-        import calendar
-        _, d = calendar.monthrange(y, m)
-        return(y*100000000 + m*1000000 + d*10000)
-
-    def getQuarterDate(olddate):
-        quarterDict={1:3,2:3,3:3,4:6,5:6,6:6,7:9,8:9,9:9,10:12,11:12,12:12}
-        d_dict = {3:310000, 6:300000, 9:300000, 12:310000}
-        y = olddate//100000000
-        m = olddate//1000000 - y*100
-        new_m = quarterDict[m]
-        return( y*100000000 + new_m*1000000 + d_dict[new_m])
-    
-    def getHalfyearDate(olddate):
-        y = olddate//100000000
-        m = olddate//1000000 - y*100
-        return y*100000000 + (6300000 if m < 7 else 12310000)
-    
-    def getYearDate(olddate):
-        y = olddate//100000000
-        return(y*100000000 + 12310000)
-
-    def getMin60Date(olddate):
-        mint = olddate-olddate//10000*10000
-        if mint<=1030:
-            newdate = olddate//10000*10000 + 1030
-        elif mint<=1130:
-            newdate = olddate//10000*10000 + 1130
-        elif mint<=1400:
-            newdate = olddate//10000*10000 + 1400
-        else:
-            newdate = olddate//10000*10000 + 1500
-        return newdate
-    
-    def getMin15Date(olddate):
-        mint = olddate-olddate//10000*10000
-        if mint<=945:
-            newdate = olddate//10000*10000 + 945
-        elif mint<=1000:
-            newdate = olddate//10000*10000 + 1000
-        elif mint<=1015:
-            newdate = olddate//10000*10000 + 1015
-        elif mint<=1030:
-            newdate = olddate//10000*10000 + 1030
-        elif mint<=1045:
-            newdate = olddate//10000*10000 + 1045
-        elif mint<=1100:
-            newdate = olddate//10000*10000 + 1100
-        elif mint<=1115:
-            newdate = olddate//10000*10000 + 1115
-        elif mint<=1130:
-            newdate = olddate//10000*10000 + 1130
-        elif mint<=1315:
-            newdate = olddate//10000*10000 + 1315
-        elif mint<=1330:
-            newdate = olddate//10000*10000 + 1330
-        elif mint<=1345:
-            newdate = olddate//10000*10000 + 1345
-        elif mint<=1400:
-            newdate = olddate//10000*10000 + 1400
-        elif mint<=1415:
-            newdate = olddate//10000*10000 + 1415
-        elif mint<=1430:
-            newdate = olddate//10000*10000 + 1430
-        elif mint<=1445:
-            newdate = olddate//10000*10000 + 1445
-        else:
-            newdate = olddate//10000*10000 + 1500
-        return newdate    
-    
-    def getMin30Date(olddate):
-        mint = olddate-olddate//10000*10000
-        if mint<=1000:
-            newdate = olddate//10000*10000 + 1000
-        elif mint<=1030:
-            newdate = olddate//10000*10000 + 1030
-        elif mint<=1100:
-            newdate = olddate//10000*10000 + 1100
-        elif mint<=1130:
-            newdate = olddate//10000*10000 + 1130
-        elif mint<=1330:
-            newdate = olddate//10000*10000 + 1330
-        elif mint<=1400:
-            newdate = olddate//10000*10000 + 1400
-        elif mint<=1430:
-            newdate = olddate//10000*10000 + 1430
-        else:
-            newdate = olddate//10000*10000 + 1500
-        return newdate    
-    
-    def getNewDate(index_type, olddate):
-        if index_type == 'week':
-            return getWeekDate(olddate)
-        elif index_type == 'month':
-            return getMonthDate(olddate)
-        elif index_type == 'quarter':
-            return getQuarterDate(olddate)
-        elif index_type == 'halfyear':
-            return getHalfyearDate(olddate)
-        elif index_type == 'year':
-            return getYearDate(olddate)
-        elif index_type == 'min15':
-            return getMin15Date(olddate)
-        elif index_type == 'min30':
-            return getMin30Date(olddate)
-        elif index_type == 'min60':
-            return getMin60Date(olddate)
-        else:
-            return None
-    
-    if data_type == 'DAY':
-        index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
-    else:
-        index_list = ('min15', 'min30', 'min60')
-
-    groupDict = {}
-    for index_type in index_list:
-        try:
-            groupDict[index_type] = h5file.get_node("/", index_type)
-        except:
-            groupDict[index_type] = h5file.create_group("/", index_type)
-
-    try:
-        table = h5file.get_node("/data", tablename)
-    except:
-        return
-
-    for index_type in index_list:
-        try:
-            index_table = h5file.get_node(groupDict[index_type],tablename)
-        except:
-            index_table = h5file.create_table(groupDict[index_type],tablename, H5Index)
-
-        total = table.nrows
-        if 0 == total:
-            continue
-
-        index_total = index_table.nrows
-        index_row = index_table.row
-        if index_total:
-            index_last_date = int(index_table[-1]['datetime'])
-            last_date = getNewDate(index_type, int(table[-1]['datetime']))
-            if index_last_date == last_date:
-                continue
-            startix = int(index_table[-1]['start'])
-            pre_index_date = int(index_table[-1]['datetime'])
-        else:
-            startix = 0
-            date = int(table[0]['datetime'])
-            pre_index_date = getNewDate(index_type,date)
-            index_row['datetime'] = pre_index_date
-            index_row['start'] = 0
-            index_row.append()
-
-        index = startix
-        for row in table[startix:]:
-            date = int(row['datetime'])
-            cur_index_date = getNewDate(index_type, date)
-            if cur_index_date != pre_index_date:
-                index_row['datetime'] = cur_index_date
-                index_row['start'] = index
-                index_row.append()
-                pre_index_date = cur_index_date
-            index += 1
-        index_table.flush()
-
 
 def qianlong_import_weight(connect, src_dir, market):
     """导入钱龙格式的权息数据"""
@@ -563,7 +402,7 @@ if __name__ == '__main__':
     
     src_dir = "D:\\TdxW_HuaTai"
     dest_dir = "c:\\stock"
-    quotations = ['stock', 'fund'] #通达信盘后数据没有债券
+    quotations = ['stock', 'fund', 'bond'] #通达信盘后数据没有债券
     
     connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
@@ -574,7 +413,7 @@ if __name__ == '__main__':
 
     print("\n导入上证日线数据")
     add_count = 0
-    add_count = tdx_import_data(connect, 'SH', 'DAY', ['stock', 'fund'], src_dir + "\\vipdoc\\sh\\lday", dest_dir)
+    #add_count = tdx_import_data(connect, 'SH', 'DAY', ['stock', 'fund'], src_dir + "\\vipdoc\\sh\\lday", dest_dir)
     #add_count = tdx_import_data(connect, 'SZ', 'DAY', 'stock', src_dir + "\\vipdoc\\sz\\lday", dest_dir)
     print("\n导入数量：", add_count)
 

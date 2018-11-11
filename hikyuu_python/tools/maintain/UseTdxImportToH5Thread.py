@@ -1,26 +1,46 @@
-#!/usr/bin/python
-# -*- coding: utf8 -*-
-# cp936
+# coding:utf-8
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2010-2017 fasiondog/hikyuu
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 import sqlite3
-
 from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
-from TdxImportTask import TdxImportTask, WeightImportTask
+from ImportTdxToH5Task import ImportTdxToH5Task
+from ImportWeightToSqliteTask import ImportWeightToSqliteTask
 
-from hdf5import import *
+from sqlite3_common import create_database
+from tdx_to_h5 import tdx_import_stock_name_from_file
 
-class HDF5ImportThread(QThread):
+
+class UseTdxImportToH5Thread(QThread):
     message = pyqtSignal(list)
 
     def __init__(self, config):
         super(self.__class__, self).__init__()
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
-        self.msg_task_name = ''
 
         if not self.check():
-            self.working = False
             return
 
         self.process_list = []
@@ -34,24 +54,30 @@ class HDF5ImportThread(QThread):
             self.quotations.append('stock')
         if self.config['quotation']['fund']:
             self.quotations.append('fund')
+        #if self.config['quotation']['future']:
+        #    self.quotations.append('future')
+
+        #通达信盘后没有债券数据。另外，如果用Pytdx下载债券数据，
+        #每个债券本身的数据很少但债券种类太多占用空间和时间太多，用途较少不再考虑导入
+        #if self.config['quotation']['bond']:
+        #    self.quotations.append('bond')
 
         self.queue = Queue()
         self.tasks = []
         if self.config.getboolean('weight', 'enable', fallback=False):
-            self.tasks.append(WeightImportTask(self.queue, sqlite_file_name, dest_dir))
+            self.tasks.append(ImportWeightToSqliteTask(self.queue, sqlite_file_name, dest_dir))
         if self.config.getboolean('ktype', 'day', fallback=False):
-            self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SH', 'DAY', self.quotations, src_dir, dest_dir))
-            self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SZ', 'DAY', self.quotations, src_dir, dest_dir))
+            self.tasks.append(ImportTdxToH5Task(self.queue, sqlite_file_name, 'SH', 'DAY', self.quotations, src_dir, dest_dir))
+            self.tasks.append(ImportTdxToH5Task(self.queue, sqlite_file_name, 'SZ', 'DAY', self.quotations, src_dir, dest_dir))
         if self.config.getboolean('ktype', 'min5', fallback=False):
-            self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SH', '5MIN', self.quotations, src_dir, dest_dir))
-            self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SZ', '5MIN', self.quotations, src_dir, dest_dir))
+            self.tasks.append(ImportTdxToH5Task(self.queue, sqlite_file_name, 'SH', '5MIN', self.quotations, src_dir, dest_dir))
+            self.tasks.append(ImportTdxToH5Task(self.queue, sqlite_file_name, 'SZ', '5MIN', self.quotations, src_dir, dest_dir))
         if self.config.getboolean('ktype', 'min', fallback=False):
-            self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SH', '1MIN', self.quotations, src_dir, dest_dir))
-            self.tasks.append(TdxImportTask(self.queue, sqlite_file_name, 'SZ', '1MIN', self.quotations, src_dir, dest_dir))
+            self.tasks.append(ImportTdxToH5Task(self.queue, sqlite_file_name, 'SH', '1MIN', self.quotations, src_dir, dest_dir))
+            self.tasks.append(ImportTdxToH5Task(self.queue, sqlite_file_name, 'SZ', '1MIN', self.quotations, src_dir, dest_dir))
 
 
     def __del__(self):
-        #print("HDF5ImportThread.__del__")
         for p in self.process_list:
             if p.is_alive():
                 p.terminate()
@@ -83,11 +109,13 @@ class HDF5ImportThread(QThread):
         #正在导入代码表
         self.send_message(['START_IMPORT_CODE'])
 
-        connect = sqlite3.connect(dest_dir + "\\stock.db")
+        connect = sqlite3.connect(dest_dir + "/stock.db")
         create_database(connect)
 
         tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', self.quotations)
         tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', self.quotations)
+
+        self.send_message(['FINISHED_IMPORT_CODE'])
 
         self.process_list.clear()
         for task in self.tasks:
@@ -101,15 +129,15 @@ class HDF5ImportThread(QThread):
             taskname, market, ktype, progress, total = message
             if progress is None:
                 finished_count -= 1
-                if taskname == 'TdxImportTask':
+                if taskname == 'IMPORT_KDATA':
                     self.send_message(['IMPORT_KDATA', 'FINISHED', market, ktype, total])
                 else:
                     self.send_message([taskname, 'FINISHED'])
                 continue
 
-            if taskname == 'WeightImportTask':
+            if taskname == 'IMPORT_WEIGHT':
                 self.send_message(['IMPORT_WEIGHT', market, total])
-            elif taskname == 'TdxImportTask':
+            elif taskname == 'IMPORT_KDATA':
                 hdf5_import_progress[market][ktype] = progress
                 current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
                 self.send_message(['IMPORT_KDATA', ktype, current_progress])
