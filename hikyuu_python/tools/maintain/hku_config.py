@@ -45,7 +45,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.reset_progress_bar()
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
-        this_dir = os.getcwd()
+        this_dir = os.path.dirname(__file__)
         import_config = ConfigParser()
         if os.path.exists(this_dir + '/importdata.ini'):
             import_config.read(this_dir + '/importdata.ini')
@@ -53,7 +53,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
         self.import_fund_checkBox.setChecked(import_config.getboolean('quotation', 'fund', fallback=True))
-        self.import_bond_checkBox.setChecked(import_config.getboolean('quotation', 'bond', fallback=False))
         self.import_future_checkBox.setChecked(import_config.getboolean('quotation', 'future', fallback=False))
 
         #初始化导入K线类型配置
@@ -111,7 +110,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         import_config = ConfigParser()
         import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
                                       'fund': self.import_fund_checkBox.isChecked(),
-                                      'bond': self.import_bond_checkBox.isChecked(),
                                       'future': self.import_future_checkBox.isChecked()}
         import_config['ktype'] = {'day': self.import_day_checkBox.isChecked(),
                                   'min': self.import_min_checkBox.isChecked(),
@@ -134,7 +132,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         return import_config
 
     def saveConfig(self):
-        filename = os.getcwd() + '/importdata.ini'
+        filename = os.path.dirname(__file__) + '/importdata.ini'
         with open(filename, 'w') as f:
             self.getCurrentConfig().write(f)
 

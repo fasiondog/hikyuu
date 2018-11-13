@@ -32,7 +32,7 @@ def create_database(connect):
     """创建SQLITE3数据库表"""
     try:
         cur = connect.cursor()
-        filename = os.getcwd() + '/sqlite_createdb.sql'
+        filename = os.path.dirname(__file__) + '/sqlite_createdb.sql'
         with open(filename, 'r', encoding='utf8') as sqlfile:
             cur.executescript(sqlfile.read())
         connect.commit()

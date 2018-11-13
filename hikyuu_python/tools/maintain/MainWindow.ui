@@ -490,7 +490,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>208</width>
+         <width>141</width>
          <height>18</height>
         </rect>
        </property>
@@ -506,16 +506,6 @@ p, li { white-space: pre-wrap; }
          <widget class="QCheckBox" name="import_fund_checkBox">
           <property name="text">
            <string>基金</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="import_bond_checkBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>债券</string>
           </property>
          </widget>
         </item>
@@ -587,7 +577,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="import_weight_checkBox">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>200</x>
          <y>30</y>
          <width>151</width>
          <height>16</height>

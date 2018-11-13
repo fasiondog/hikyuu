@@ -309,18 +309,24 @@ if __name__ == '__main__':
     api.connect(tdx_server, tdx_port)
 
     print("导入股票代码表")
-    import_stock_name(connect, api, 'SH', quotations)
-    import_stock_name(connect, api, 'SZ', quotations)
+    #import_stock_name(connect, api, 'SH', quotations)
+    #import_stock_name(connect, api, 'SZ', quotations)
 
     add_count = 0
 
     print("\n导入上证日线数据")
-    add_count = import_data(connect, 'SH', 'DAY', ['bond'], api, dest_dir, progress=ProgressBar)
+    #add_count = import_data(connect, 'SH', 'DAY', ['bond'], api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
 
     print("\n导入深证日线数据")
     #add_count = import_data(connect, 'SZ', 'DAY', ['stock'], api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
+
+    for i in range(10):
+        x = api.get_history_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*2000, 2000, 20181112)
+        #x = api.get_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*800, 800)
+        if x is not None and len(x) > 0:
+            print(i, len(x), x[0], x[-1])
 
 
     api.disconnect()
