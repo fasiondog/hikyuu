@@ -20,6 +20,6 @@ function main(target)
         os.exec("cp -f -r -T hikyuu_python " .. installdir)
     end
     if is_plat("macosx") then
-        os.exec("cp -f -r hikyuu_python " .. installdir)
+        os.exec("cp -f -r hikyuu_python/* " .. installdir)
     end
 end
