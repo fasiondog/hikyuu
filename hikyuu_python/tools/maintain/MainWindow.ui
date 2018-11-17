@@ -60,7 +60,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>300</width>
+         <width>348</width>
          <height>18</height>
         </rect>
        </property>
@@ -78,7 +78,7 @@
            <bool>true</bool>
           </property>
           <property name="text">
-           <string>使用Pytdx</string>
+           <string>使用Pytdx（推荐）</string>
           </property>
          </widget>
         </item>
@@ -232,6 +232,22 @@
         <string>保存至HDF5文件</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>30</y>
+         <width>191</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>使用HDF5作为Hikyuu默认数据库</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
@@ -360,6 +376,22 @@
          </spacer>
         </item>
        </layout>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>30</y>
+         <width>211</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>使用MySQL作为Hikyuu默认数据库</string>
+       </property>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_5">
@@ -490,7 +522,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>141</width>
+         <width>155</width>
          <height>18</height>
         </rect>
        </property>

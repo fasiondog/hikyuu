@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import os
 import logging
 from configparser import ConfigParser
@@ -18,6 +17,45 @@ from EscapetimeThread import EscapetimeThread
 from UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
+hikyuu_hdf5_config_template = """
+[hikyuu]
+tmpdir = {dir}/tmp
+logger = {dir}/logger.properties
+
+[block]
+type  = qianlong
+dir = {dir}/block
+指数板块 = zsbk.ini
+行业板块 = hybk.ini
+地域板块 = dybk.ini
+概念板块 = gnbk.ini
+self = self.ini
+
+[preload]
+day = 1
+week = 0
+month = 0
+quarter = 0
+halfyear = 0
+year = 0
+
+[baseinfo]
+type = sqlite3
+db = {dir}/stock.db
+
+[kdata]
+;type = tdx
+;dir = D:\\TdxW_HuaTai\\vipdoc
+type = hdf5
+sh_day = {dir}/sh_day.h5
+sh_min = {dir}/sh_1min.h5
+sh_min5 = {dir}/sh_5min.h5
+sz_day = {dir}/sz_day.h5
+sz_min = {dir}/sz_1min.h5
+sz_min5 = {dir}/sz_5min.h5
+"""
+
+
 class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MyMainWindow, self).__init__(parent)
@@ -25,17 +63,37 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
         self.initThreads()
 
+
     def closeEvent(self, event):
         if self.import_running:
             QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
             event.ignore()
             return
+
         self.saveConfig()
+
         if self.hdf5_import_thread:
             self.hdf5_import_thread.stop()
         if self.escape_time_thread:
             self.escape_time_thread.stop()
         event.accept()
+
+
+    def getUserConfigDir(self):
+        return os.path.expanduser('~') + '/.hikyuu'
+
+
+    def saveConfig(self):
+        current_config = self.getCurrentConfig()
+        filename = self.getUserConfigDir() + '/importdata-gui.ini'
+        with open(filename, 'w', encoding='utf-8') as f:
+            current_config.write(f)
+
+        data_dir = current_config['hdf5']['dir']
+        filename = self.getUserConfigDir() + '/hikyuu.ini'
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(hikyuu_hdf5_config_template.format(dir=data_dir))
+
 
     def initUI(self):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
@@ -47,8 +105,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = os.path.dirname(__file__)
         import_config = ConfigParser()
-        if os.path.exists(this_dir + '/importdata.ini'):
-            import_config.read(this_dir + '/importdata.ini')
+        if os.path.exists(this_dir + '/importdata-gui.ini'):
+            import_config.read(this_dir + '/importdata-gui.ini', encoding = 'utf-8')
 
         #初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
@@ -106,6 +164,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_usr_lineEdit.setText(mysql_usr)
         self.mysql_pwd_lineEdit.setText(mysql_pwd)
 
+
     def getCurrentConfig(self):
         import_config = ConfigParser()
         import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
@@ -130,11 +189,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                   'usr': self.mysql_usr_lineEdit.text(),
                                   'pwd': self.mysql_pwd_lineEdit.text()}
         return import_config
-
-    def saveConfig(self):
-        filename = os.path.dirname(__file__) + '/importdata.ini'
-        with open(filename, 'w') as f:
-            self.getCurrentConfig().write(f)
 
 
     def initThreads(self):
@@ -256,7 +310,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-
+    import sys
     app = QApplication(sys.argv)
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s %(levelname)s: %(message)s [%(name)s::%(funcName)s]'
