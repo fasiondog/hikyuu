@@ -101,6 +101,8 @@ public:
 class OstreamRedirect {
     bool do_stdout_;
     bool do_stderr_;
+    bool had_stdout_;  // prevent the reentrant
+    bool had_stderr_;  // prevent the reentrant
     std::unique_ptr<scoped_ostream_redirect> redirect_stdout;
     std::unique_ptr<scoped_estream_redirect> redirect_stderr;
 
@@ -108,7 +110,8 @@ public:
     //OstreamRedirect() 
     //    : do_stdout_(false), do_stderr_(false) {}
     OstreamRedirect(bool do_stdout=true, bool do_stderr=true)
-        : do_stdout_(do_stdout), do_stderr_(do_stderr) {}
+        : do_stdout_(do_stdout), do_stderr_(do_stderr),
+          had_stdout_(false), had_stderr_(false) {}
 
     OstreamRedirect(const OstreamRedirect& src) {
         do_stdout_ = src.do_stdout_;
@@ -116,34 +119,40 @@ public:
     }
 
     ~OstreamRedirect() {
-        redirect_stdout.reset();
-        redirect_stderr.reset();
-        if (do_stdout_) {
+        if (had_stdout_ && do_stdout_) {
+            redirect_stdout.reset();
+            had_stdout_ = false;
             std::cout << "redirected std::cout has been returned" << std::endl;
         }
-        if (do_stderr_) {
+        if (had_stderr_ && do_stderr_) {
+            redirect_stderr.reset();
+            had_stderr_ = false;
             std::cout << "redirected std::cerr has been returned" << std::endl;
         }
     }
 
     void enter() {
-        if (do_stdout_) {
+        if (!had_stdout_ && do_stdout_) {
             redirect_stdout.reset(new scoped_ostream_redirect());
+            had_stdout_ = true;
             std::cout << "std::cout are redirected to python::stdout" << std::endl;
         }
-        if (do_stderr_) {
+        if (!had_stderr_ && do_stderr_) {
             redirect_stderr.reset(new scoped_estream_redirect());
+            had_stderr_ = true;
             std::cout << "std::cerr are redirected to python::stderr" << std::endl;
         }
     }
 
     void exit() {
-        redirect_stdout.reset();
-        redirect_stderr.reset();
-        if (do_stdout_) {
+        if (had_stdout_ && do_stdout_) {
+            redirect_stdout.reset();
+            had_stdout_ = false;
             std::cout << "redirected std::cout has been returned" << std::endl;
         }
-        if (do_stderr_) {
+        if (had_stderr_ && do_stderr_) {
+            redirect_stderr.reset();
+            had_stderr_ = false;
             std::cout << "redirected std::cerr has been returned" << std::endl;
         }
     }
