@@ -69,8 +69,8 @@ def get_codepre_list(connect, marketid, quotations):
 def update_last_date(connect, marketid, lastdate):
     cur = connect.cursor()
     cur.execute("update Market set lastDate={} where marketid='{}'".format(lastdate, marketid))
-    if marketid == MARKETID.SH:
-        cur.execute("update LastDate set date={}".format(lastdate))
+    #if marketid == MARKETID.SH:
+    #    cur.execute("update LastDate set date={}".format(lastdate))
     connect.commit()
     cur.close()
 
