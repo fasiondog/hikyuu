@@ -26,7 +26,7 @@ import os
 import sqlite3
 import urllib.request
 
-from tdx_to_h5 import qianlong_import_weight
+from weight_to_sqlite import qianlong_import_weight
 
 class ImportWeightToSqliteTask:
     def __init__(self, queue, sqlitefile, dest_dir):

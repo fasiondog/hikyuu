@@ -23,7 +23,6 @@
 # SOFTWARE.
 
 import os.path
-import pathlib
 import struct
 import sqlite3
 import datetime
@@ -40,6 +39,7 @@ from sqlite3_common import (create_database, get_marketid,
 from h5_common import (H5Record, H5Index,
                        open_h5file, get_h5table,
                        update_hdf5_extern_data)
+from weight_to_sqlite import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
@@ -121,6 +121,7 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
     #print('%s新增股票数：%i' % (market.upper(), count))
     connect.commit()
     cur.close()
+    return count
 
 
 def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_record):
@@ -331,6 +332,8 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
     total = len(a)
     for i, stock in enumerate(a):
         if stock[3] == 0:
+            if progress:
+                progress(i, total)
             continue
 
         filename = src_dir + "\\" + market.lower() + stock[2]+ suffix
@@ -349,52 +352,6 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
     return add_record_count
 
 
-
-def qianlong_import_weight(connect, src_dir, market):
-    """导入钱龙格式的权息数据"""
-    cur = connect.cursor()
-    marketid = cur.execute("select marketid from Market where market='%s'" % market)
-    marketid = [id[0] for id in marketid]
-    marketid = marketid[0]
-
-    src_path = pathlib.Path(src_dir + '/shase/weight') if market == 'SH' else pathlib.Path(src_dir + '/sznse/weight')
-    wgt_file_list = list(src_path.glob('*.wgt'))
-
-    total_count = 0
-    for wgt_file in wgt_file_list:
-        code = wgt_file.stem
-        stockid = cur.execute("select stockid from Stock where marketid=%s and code='%s'" % (marketid, code))
-        stockid = [id[0] for id in stockid]
-        if not stockid:
-            continue
-
-        with wgt_file.open('rb') as sourcefile:
-            stockid = stockid[0]
-            a = cur.execute("select date from stkweight where stockid=%s" % stockid)
-            dateDict = dict([(i[0], None) for i in a])
-
-            records = []
-            data = sourcefile.read(36)
-            while data:
-                a = struct.unpack('iiiiiiiii', data)
-                date = (a[0] >> 20) * 10000 + (((a[0] << 12) & 4294967295) >> 28) * 100 + ((a[0] & 0xffff) >> 11)
-                if date not in dateDict:
-                    records.append((stockid, date, a[1], a[2], a[3], a[4], a[5], a[6], a[7]))
-                data = sourcefile.read(36)
-            sourcefile.close()
-
-            if records:
-                cur.executemany("INSERT INTO StkWeight(stockid, date, countAsGift, \
-                                 countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
-                                 VALUES (?,?,?,?,?,?,?,?,?)",
-                                records)
-                total_count += len(records)
-
-    connect.commit()
-    cur.close()
-    return total_count
-
-
 if __name__ == '__main__':
     
     import time
@@ -402,34 +359,57 @@ if __name__ == '__main__':
     
     src_dir = "D:\\TdxW_HuaTai"
     dest_dir = "c:\\stock"
-    quotations = ['stock', 'fund', 'bond'] #通达信盘后数据没有债券
+    quotations = ['stock', 'fund'] #通达信盘后数据没有债券
     
     connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
 
+    add_count = 0
+
     print("导入股票代码表")
-    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', quotations)
-    tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', quotations)
+    add_count = tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', quotations)
+    add_count += tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', quotations)
+    print("新增股票数：", add_count)
 
     print("\n导入上证日线数据")
-    add_count = 0
-    #add_count = tdx_import_data(connect, 'SH', 'DAY', ['stock', 'fund'], src_dir + "\\vipdoc\\sh\\lday", dest_dir)
-    #add_count = tdx_import_data(connect, 'SZ', 'DAY', 'stock', src_dir + "\\vipdoc\\sz\\lday", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', 'DAY', quotations, src_dir + "\\vipdoc\\sh\\lday", dest_dir)
+    print("\n导入数量：", add_count)
+
+    print("\n导入深证日线数据")
+    add_count = tdx_import_data(connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday", dest_dir)
     print("\n导入数量：", add_count)
 
     print("\n导入上证5分钟数据")
-    #add_count = tdx_import_data(connect, 'SH', '5MIN', 'stock', src_dir + "\\vipdoc\\sh\\fzline", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', '5MIN', quotations, src_dir + "\\vipdoc\\sh\\fzline", dest_dir)
+    print("\n导入数量：", add_count)
+
+    print("\n导入深证5分钟数据")
+    add_count = tdx_import_data(connect, 'SZ', '5MIN', quotations, src_dir + "\\vipdoc\\sz\\fzline", dest_dir)
     print("\n导入数量：", add_count)
 
     print("\n导入上证1分钟数据")
-    #add_count = tdx_import_data(connect, 'SH', '1MIN', 'stock', src_dir + "\\vipdoc\\sh\\minline", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', '1MIN', quotations, src_dir + "\\vipdoc\\sh\\minline", dest_dir)
+    print("\n导入数量：", add_count)
+
+    print("\n导入深证1分钟数据")
+    add_count = tdx_import_data(connect, 'SZ', '1MIN', quotations, src_dir + "\\vipdoc\\sz\\minline", dest_dir)
     print("\n导入数量：", add_count)
 
     print("\n导入权息数据")
-    total_count = 0
-    #total_count = qianlong_import_weight(connect, r'C:\stock\weight', 'SH')
-    #total_count += qianlong_import_weight(connect, r'C:\stock\weight', 'SZ')
-    print(total_count)
+    print("正在下载权息数据...")
+    import urllib.request
+    net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+    dest_filename = dest_dir + '/weight.rar'
+    with open(dest_filename, 'wb') as file:
+        file.write(net_file.read())
+
+    print("下载完成，正在解压...")
+    os.system('unrar x -o+ -inul {} {}'.format(dest_filename, dest_dir))
+
+    print("解压完成，正在导入...")
+    add_count = qianlong_import_weight(connect, dest_dir + '/weight', 'SH')
+    add_count += qianlong_import_weight(connect, dest_dir + '/weight', 'SZ')
+    print("导入数量：", add_count)
 
     connect.close()
     

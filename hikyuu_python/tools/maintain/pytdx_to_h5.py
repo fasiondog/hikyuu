@@ -35,6 +35,7 @@ from sqlite3_common import (get_codepre_list, create_database,
 from h5_common import (H5Record, H5Index,
                        open_h5file, get_h5table,
                        update_hdf5_extern_data)
+from weight_to_sqlite import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
@@ -115,6 +116,7 @@ def import_stock_name(connect, api, market, quotations=None):
     #print('%s新增股票数：%i' % (market.upper(), count))
     connect.commit()
     cur.close()
+    return count
 
 
 def guess_day_n_step(last_datetime):
@@ -275,6 +277,8 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, progress=Prog
     total = len(stock_list)
     for i, stock in enumerate(stock_list):
         if stock[3] == 0:
+            if progress:
+                progress(i, total)
             continue
 
         this_count = import_one_stock_data(connect, api, h5file, market, ktype, stock)
@@ -293,13 +297,14 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, progress=Prog
 
 
 if __name__ == '__main__':
+    import os
     import time
     starttime = time.time()
 
     dest_dir = "c:\\stock"
     tdx_server = '119.147.212.81'
     tdx_port = 7709
-    quotations = ['stock', 'fund', 'bond']
+    quotations = ['stock', 'fund']
 
     connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
@@ -308,19 +313,54 @@ if __name__ == '__main__':
     api = TdxHq_API()
     api.connect(tdx_server, tdx_port)
 
-    print("导入股票代码表")
-    #import_stock_name(connect, api, 'SH', quotations)
-    #import_stock_name(connect, api, 'SZ', quotations)
-
     add_count = 0
 
+    """
+    print("导入股票代码表")
+    add_count = import_stock_name(connect, api, 'SH', quotations)
+    add_count += import_stock_name(connect, api, 'SZ', quotations)
+    print("新增股票数：", add_count)
+
     print("\n导入上证日线数据")
-    #add_count = import_data(connect, 'SH', 'DAY', ['bond'], api, dest_dir, progress=ProgressBar)
+    add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
 
     print("\n导入深证日线数据")
-    #add_count = import_data(connect, 'SZ', 'DAY', ['stock'], api, dest_dir, progress=ProgressBar)
+    add_count = import_data(connect, 'SZ', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
+
+    print("\n导入上证5分钟线数据")
+    add_count = import_data(connect, 'SH', '5MIN', quotations, api, dest_dir, progress=ProgressBar)
+    print("\n导入数量：", add_count)
+
+    print("\n导入深证5分钟线数据")
+    add_count = import_data(connect, 'SZ', '5MIN', quotations, api, dest_dir, progress=ProgressBar)
+    print("\n导入数量：", add_count)
+
+    print("\n导入上证分钟线数据")
+    add_count = import_data(connect, 'SH', '1MIN', quotations, api, dest_dir, progress=ProgressBar)
+    print("\n导入数量：", add_count)
+
+    print("\n导入深证分钟线数据")
+    add_count = import_data(connect, 'SZ', '1MIN', quotations, api, dest_dir, progress=ProgressBar)
+    print("\n导入数量：", add_count)
+
+    print("\n导入权息数据")
+    print("正在下载权息数据...")
+    import urllib.request
+    net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+    dest_filename = dest_dir + '/weight.rar'
+    with open(dest_filename, 'wb') as file:
+        file.write(net_file.read())
+
+    print("下载完成，正在解压...")
+    os.system('unrar x -o+ -inul {} {}'.format(dest_filename, dest_dir))
+
+    print("解压完成，正在导入...")
+    add_count = qianlong_import_weight(connect, dest_dir + '/weight', 'SH')
+    add_count += qianlong_import_weight(connect, dest_dir + '/weight', 'SZ')
+    print("导入数量：", add_count)
+    """
 
     for i in range(10):
         x = api.get_history_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*2000, 2000, 20181112)
@@ -330,11 +370,9 @@ if __name__ == '__main__':
 
 
     api.disconnect()
-
     connect.close()
 
     endtime = time.time()
     print("\nTotal time:")
     print("%.2fs" % (endtime - starttime))
     print("%.2fm" % ((endtime - starttime) / 60))
-

@@ -32,13 +32,14 @@ def create_database(connect):
     """创建SQLITE3数据库表"""
     try:
         cur = connect.cursor()
-        filename = os.path.dirname(__file__) + '/sqlite_createdb.sql'
+        filename = os.path.dirname(__file__) + '/sqlite_upgrade/createdb.sql'
         with open(filename, 'r', encoding='utf8') as sqlfile:
             cur.executescript(sqlfile.read())
         connect.commit()
         cur.close()
     except sqlite3.OperationalError:
-        print("相关数据表可能已经存在，放弃创建。如需重建，请手工删除相关数据表。")
+        print("相关数据表可能已经存在，忽略创建。如需重建，请手工删除相关数据表。")
+        pass
     except Exception as e:
         raise(e)
 

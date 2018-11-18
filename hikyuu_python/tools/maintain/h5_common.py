@@ -25,7 +25,7 @@
 import datetime
 import tables as tb
 
-HDF5_COMPRESS_LEVEL = 9
+HDF5_COMPRESS_LEVEL = 6
 
 class H5Record(tb.IsDescription):
     """HDF5基础K线数据格式（日线、分钟线、5分钟线"""

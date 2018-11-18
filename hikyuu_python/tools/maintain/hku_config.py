@@ -63,7 +63,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
         self.initThreads()
 
-
     def closeEvent(self, event):
         if self.import_running:
             QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
@@ -78,10 +77,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.escape_time_thread.stop()
         event.accept()
 
-
     def getUserConfigDir(self):
         return os.path.expanduser('~') + '/.hikyuu'
-
 
     def saveConfig(self):
         current_config = self.getCurrentConfig()
@@ -94,7 +91,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(hikyuu_hdf5_config_template.format(dir=data_dir))
 
-
     def initUI(self):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
         self.setFixedSize(self.width(), self.height())
@@ -103,7 +99,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.reset_progress_bar()
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
-        this_dir = os.path.dirname(__file__)
+        this_dir = self.getUserConfigDir()
         import_config = ConfigParser()
         if os.path.exists(this_dir + '/importdata-gui.ini'):
             import_config.read(this_dir + '/importdata-gui.ini', encoding = 'utf-8')
@@ -164,7 +160,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_usr_lineEdit.setText(mysql_usr)
         self.mysql_pwd_lineEdit.setText(mysql_pwd)
 
-
     def getCurrentConfig(self):
         import_config = ConfigParser()
         import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
@@ -190,7 +185,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                   'pwd': self.mysql_pwd_lineEdit.text()}
         return import_config
 
-
     def initThreads(self):
         self.escape_time_thread = None
         self.hdf5_import_thread = None
@@ -207,7 +201,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
         self.tdx_servers_comboBox.setEnabled(not tdx_enable)
         self.tdx_port_lineEdit.setEnabled(not tdx_enable)
-
 
     @pyqtSlot()
     def on_select_tdx_dir_pushButton_clicked(self):
