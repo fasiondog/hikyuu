@@ -61,7 +61,7 @@ bool MySQLBaseInfoDriver::_init() {
         setParam<string>("pwd", pwd);
     }
 
-    string database("stk_base");
+    string database("hku_base");
     if (haveParam("db")) {
         database = getParam<string>("db");
     } else {

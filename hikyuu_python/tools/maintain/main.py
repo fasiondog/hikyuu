@@ -9,51 +9,12 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import  QIcon
 
-from tdx_to_h5 import *
-
-
 from MainWindow import *
 from EscapetimeThread import EscapetimeThread
 from UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
-hikyuu_hdf5_config_template = """
-[hikyuu]
-tmpdir = {dir}/tmp
-logger = {dir}/logger.properties
-
-[block]
-type  = qianlong
-dir = {dir}/block
-指数板块 = zsbk.ini
-行业板块 = hybk.ini
-地域板块 = dybk.ini
-概念板块 = gnbk.ini
-self = self.ini
-
-[preload]
-day = 1
-week = 0
-month = 0
-quarter = 0
-halfyear = 0
-year = 0
-
-[baseinfo]
-type = sqlite3
-db = {dir}/stock.db
-
-[kdata]
-;type = tdx
-;dir = D:\\TdxW_HuaTai\\vipdoc
-type = hdf5
-sh_day = {dir}/sh_day.h5
-sh_min = {dir}/sh_1min.h5
-sh_min5 = {dir}/sh_5min.h5
-sz_day = {dir}/sz_day.h5
-sz_min = {dir}/sz_1min.h5
-sz_min5 = {dir}/sz_5min.h5
-"""
+import hku_config_template
 
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
@@ -86,10 +47,25 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         with open(filename, 'w', encoding='utf-8') as f:
             current_config.write(f)
 
-        data_dir = current_config['hdf5']['dir']
         filename = self.getUserConfigDir() + '/hikyuu.ini'
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(hikyuu_hdf5_config_template.format(dir=data_dir))
+        use_engine = current_config['default_engine']['engine']
+        if use_engine == 'HDF5':
+            data_dir = current_config['hdf5']['dir']
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(hku_config_template.hdf5_template.format(dir=data_dir))
+        else:
+            data_dir = self.getUserConfigDir()
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(
+                    hku_config_template.mysql_template.format(
+                        dir = data_dir,
+                        host = current_config['mysql']['host'],
+                        port = current_config['mysql']['port'],
+                        usr = current_config['mysql']['usr'],
+                        pwd = current_config['mysql']['pwd']
+                    )
+                )
+
 
     def initUI(self):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
@@ -160,6 +136,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_usr_lineEdit.setText(mysql_usr)
         self.mysql_pwd_lineEdit.setText(mysql_pwd)
 
+        #初始化hikyuu交互式工具使用的默认数据库
+        default_engine = import_config.get('default_engine', 'engine', fallback='HDF5')
+        if default_engine == 'HDF5':
+            self.use_hdf5_radioButton.setChecked(True)
+        else:
+            self.use_mysql_radioButton.setChecked(True)
+
+
     def getCurrentConfig(self):
         import_config = ConfigParser()
         import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
@@ -183,6 +167,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                   'port': self.mysql_port_lineEdit.text(),
                                   'usr': self.mysql_usr_lineEdit.text(),
                                   'pwd': self.mysql_pwd_lineEdit.text()}
+        import_config['default_engine'] = {'engine': "HDF5" if self.use_hdf5_radioButton.isChecked() else "MYSQL"}
         return import_config
 
     def initThreads(self):

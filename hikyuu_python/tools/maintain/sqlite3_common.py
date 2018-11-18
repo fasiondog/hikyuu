@@ -24,24 +24,51 @@
 
 import os
 import sqlite3
+from pathlib import Path
 
 from common import MARKETID, get_stktype_list
 
 
-def create_database(connect):
-    """创建SQLITE3数据库表"""
+def is_exist_db(connect):
+    """数据库是否已存在"""
     try:
         cur = connect.cursor()
-        filename = os.path.dirname(__file__) + '/sqlite_upgrade/createdb.sql'
-        with open(filename, 'r', encoding='utf8') as sqlfile:
-            cur.executescript(sqlfile.read())
-        connect.commit()
+        cur.execute("SELECT id FROM StockTypeInfo limit 1")
+        a = cur.fetchone()
         cur.close()
-    except sqlite3.OperationalError:
-        print("相关数据表可能已经存在，忽略创建。如需重建，请手工删除相关数据表。")
-        pass
-    except Exception as e:
-        raise(e)
+        return True if a else False
+    except:
+        return False
+
+
+def get_db_version(connect):
+    try:
+        cur = connect.cursor()
+        cur.execute("select version from version")
+        a = cur.fetchone()
+        cur.close()
+        return a[0] if a else 0
+    except:
+        return 0
+
+
+def create_database(connect):
+    """创建SQLITE3数据库表"""
+    sql_dir = os.path.dirname(__file__) + '/sqlite_upgrade'
+    cur = connect.cursor()
+    if not is_exist_db(connect):
+        filename = sql_dir + "/createdb.sql"
+        with open(filename, 'r', encoding='utf8') as f:
+            cur.executescript(f.read())
+
+    db_version = get_db_version(connect)
+    files = [x for x in Path(sql_dir).iterdir() if x.name != 'createdb.sql' and int(x.stem) > db_version and not x.is_dir()]
+    files.sort()
+    for file in files:
+        cur.executescript(file.read_text(encoding='utf8'))
+
+    connect.commit()
+    cur.close()
 
 
 def get_marketid(connect, market):

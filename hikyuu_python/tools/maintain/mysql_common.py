@@ -26,7 +26,7 @@ import os
 from pathlib import Path
 
 import mysql.connector
-from mysql.connector import errorcode
+
 
 from common import MARKETID, get_stktype_list
 
@@ -39,6 +39,7 @@ def is_exist_db(connect):
     cur.close()
     return True if a else False
 
+
 def get_db_version(connect):
     try:
         cur = connect.cursor()
@@ -48,6 +49,7 @@ def get_db_version(connect):
         return a[0] if a else 0
     except:
         return 0
+
 
 def create_database(connect):
     """创建数据库"""
@@ -67,23 +69,79 @@ def create_database(connect):
     for file in files:
         sql = file.read_text(encoding='utf8')
         for x in cur.execute(sql, multi=True):
-            print(x.statement)
+            #print(x.statement)
             pass
 
     connect.commit()
     cur.close()
 
 
+def get_marketid(connect, market):
+    cur = connect.cursor()
+    cur.execute("select marketid, market from `hku_base`.`market` where market='{}'".format(market.upper()))
+    marketid = cur.fetchone()
+    marketid = marketid[0]
+    cur.close()
+    return marketid
+
+
+def get_codepre_list(connect, marketid, quotations):
+    """获取前缀代码表"""
+    stktype_list = get_stktype_list(quotations)
+    sql = "select codepre, type from `hku_base`.`coderuletype` " \
+          "where marketid={marketid} and type in {type_list}"\
+        .format(marketid=marketid, type_list=stktype_list)
+    cur = connect.cursor()
+    cur.execute(sql)
+    a = cur.fetchall()
+    cur.close()
+    return sorted(a, key=lambda k: len(k[0]), reverse=True)
+
+
+def update_last_date(connect, marketid, lastdate):
+    cur = connect.cursor()
+    cur.execute("update `hku_base`.`market` set lastDate={} where marketid='{}'".format(lastdate, marketid))
+    connect.commit()
+    cur.close()
+
+
+def get_last_date(connect, marketid):
+    cur = connect.cursor()
+    cur.execute("select lastDate from `hku_base`.`market` where marketid='{}'".format(marketid))
+    a = cur.fetchall()
+    last_date = [x[0] for x in a][0]
+    connect.commit()
+    cur.close()
+    return last_date
+
+
+def get_stock_list(connect, market, quotations):
+    marketid = get_marketid(connect, market)
+    stktype_list = get_stktype_list(quotations)
+    sql = "select stockid, marketid, code, valid, type from `hku_base`.`stock` where marketid={} and type in {}"\
+        .format(marketid, stktype_list)
+    cur = connect.cursor()
+    cur.execute(sql)
+    a = cur.fetchall()
+    connect.commit()
+    cur.close()
+    return a
+
+
 if __name__ == '__main__':
     host = '127.0.0.1'
     port = 3306
     usr = 'root'
-    pwd = '*Btc_2018_?&'
+    pwd = ''
 
     cnx = mysql.connector.connect(user=usr, password=pwd, host=host, port=port)
-    print(get_db_version(cnx))
 
     create_database(cnx)
+    #print(get_codepre_list(cnx, 2, ['stock']))
+    #update_last_date(cnx, 1, 20180101)
+    #print(get_last_date(cnx, 1))
+    print(get_stock_list(cnx, 'sh', ['stock']))
+
 
     from pathlib import Path
     #x = list(Path("./mysql_upgrade").glob("*.sql"))
