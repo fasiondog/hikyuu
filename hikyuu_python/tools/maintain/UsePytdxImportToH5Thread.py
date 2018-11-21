@@ -112,7 +112,7 @@ class UsePytdxImportToH5Thread(QThread):
         #正在导入代码表
         self.send_message(['START_IMPORT_CODE'])
 
-        connect = sqlite3.connect(dest_dir + "/hikyuu-stock.db")
+        connect = sqlite3.connect(dest_dir + "/stock.db")
         create_database(connect)
 
         pytdx_api = TdxHq_API()

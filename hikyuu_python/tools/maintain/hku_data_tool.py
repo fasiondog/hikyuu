@@ -48,24 +48,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             current_config.write(f)
 
         filename = self.getUserConfigDir() + '/hikyuu.ini'
-        use_engine = current_config['default_engine']['engine']
-        if use_engine == 'HDF5':
-            data_dir = current_config['hdf5']['dir']
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(hku_config_template.hdf5_template.format(dir=data_dir))
-        else:
-            data_dir = self.getUserConfigDir()
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(
-                    hku_config_template.mysql_template.format(
-                        dir = data_dir,
-                        host = current_config['mysql']['host'],
-                        port = current_config['mysql']['port'],
-                        usr = current_config['mysql']['usr'],
-                        pwd = current_config['mysql']['pwd']
-                    )
-                )
-
+        data_dir = current_config['hdf5']['dir']
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(hku_config_template.hdf5_template.format(dir=data_dir))
 
     def initUI(self):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
@@ -121,28 +106,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #初始化hdf5设置
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
         hdf5_dir = import_config.get('hdf5', 'dir', fallback="c:\stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock")
-        self.hdf5_enable_checkBox.setChecked(hdf5_enable)
         self.hdf5_dir_lineEdit.setText(hdf5_dir)
-
-        #初始化MYSQL设置
-        mysql_enable = import_config.getboolean('mysql', 'enable', fallback=False)
-        mysql_host = import_config.get('mysql', 'host', fallback='127.0.0.1')
-        mysql_port = import_config.get('mysql', 'port', fallback='3306')
-        mysql_usr = import_config.get('mysql', 'usr', fallback='root')
-        mysql_pwd = import_config.get('mysql', 'pwd', fallback='')
-        self.mysql_enable_checkBox.setChecked(mysql_enable)
-        self.mysql_host_lineEdit.setText(mysql_host)
-        self.mysql_port_lineEdit.setText(mysql_port)
-        self.mysql_usr_lineEdit.setText(mysql_usr)
-        self.mysql_pwd_lineEdit.setText(mysql_pwd)
-
-        #初始化hikyuu交互式工具使用的默认数据库
-        default_engine = import_config.get('default_engine', 'engine', fallback='HDF5')
-        if default_engine == 'HDF5':
-            self.use_hdf5_radioButton.setChecked(True)
-        else:
-            self.use_mysql_radioButton.setChecked(True)
-
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
@@ -160,14 +124,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                   'server': self.tdx_servers_comboBox.currentText(),
                                   'ip': hq_hosts[self.tdx_servers_comboBox.currentIndex()][1],
                                   'port': hq_hosts[self.tdx_servers_comboBox.currentIndex()][2]}
-        import_config['hdf5'] = {'enable': self.hdf5_enable_checkBox.isChecked(),
+        import_config['hdf5'] = {'enable': True,
                                  'dir': self.hdf5_dir_lineEdit.text()}
-        import_config['mysql'] = {'enable': self.mysql_enable_checkBox.isChecked(),
-                                  'host': self.mysql_host_lineEdit.text(),
-                                  'port': self.mysql_port_lineEdit.text(),
-                                  'usr': self.mysql_usr_lineEdit.text(),
-                                  'pwd': self.mysql_pwd_lineEdit.text()}
-        import_config['default_engine'] = {'engine': "HDF5" if self.use_hdf5_radioButton.isChecked() else "MYSQL"}
         return import_config
 
     def initThreads(self):

@@ -282,7 +282,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
                             # 指数
                             row['transCount'] = record[7]
                         else:
-                            row['transCount'] = round(record[6] * 0.01)
+                            row['transCount'] = round(record[7] * 0.01)
 
                         row.append()
                         add_record_count += 1

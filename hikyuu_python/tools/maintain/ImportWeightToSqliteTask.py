@@ -37,9 +37,9 @@ class ImportWeightToSqliteTask:
 
     def __call__(self):
         total_count = 0
+        connect = sqlite3.connect(self.sqlitefile)
         try:
             self.queue.put([self.msg_name, '正在下载...', 0, 0, 0])
-            connect = sqlite3.connect(self.sqlitefile)
             net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
             dest_filename = self.dest_dir+'/weight.rar'
             with open(dest_filename, 'wb') as file:
@@ -55,5 +55,8 @@ class ImportWeightToSqliteTask:
 
         except Exception as e:
             self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+        finally:
+            connect.commit()
+            connect.close()
 
         self.queue.put([self.msg_name, '', 0, None, total_count])

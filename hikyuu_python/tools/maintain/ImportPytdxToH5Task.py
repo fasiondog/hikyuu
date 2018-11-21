@@ -50,14 +50,18 @@ class ImportPytdxToH5:
 
     def __call__(self):
         count = 0
+        connect = sqlite3.connect(self.sqlitefile)
         try:
-            connect = sqlite3.connect(self.sqlitefile)
-            progress = ProgressBar(self)
 
+            progress = ProgressBar(self)
             api = TdxHq_API()
             api.connect(self.ip, self.port)
             count = import_data(connect, self.market, self.ktype, self.quotations,
                                 api, self.dest_dir, progress)
         except Exception as e:
             print(e)
+        finally:
+            connect.commit()
+            connect.close()
+
         self.queue.put([self.task_name, self.market, self.ktype, None, count])

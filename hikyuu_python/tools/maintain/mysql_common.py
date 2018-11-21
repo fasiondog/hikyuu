@@ -98,13 +98,6 @@ def get_codepre_list(connect, marketid, quotations):
     return sorted(a, key=lambda k: len(k[0]), reverse=True)
 
 
-def update_last_date(connect, marketid, lastdate):
-    cur = connect.cursor()
-    cur.execute("update `hku_base`.`market` set lastDate={} where marketid='{}'".format(lastdate, marketid))
-    connect.commit()
-    cur.close()
-
-
 def get_last_date(connect, marketid):
     cur = connect.cursor()
     cur.execute("select lastDate from `hku_base`.`market` where marketid='{}'".format(marketid))
@@ -128,6 +121,53 @@ def get_stock_list(connect, market, quotations):
     return a
 
 
+def get_table(connect, market, code, ktype):
+    """note: market: 'DAY' | 'MIN' | 'MIN5' """
+    cur = connect.cursor()
+    schema = "{market}_{ktype}".format(market=market, ktype=ktype).lower()
+    cur.execute("SELECT 1 FROM information_schema.SCHEMATA where SCHEMA_NAME='{}'".format(schema))
+    a = cur.fetchone()
+    if not a:
+        cur.execute("CREATE SCHEMA `{}`".format(schema))
+        connect.commit()
+
+    tablename = code.lower()
+    cur.execute("SELECT 1 FROM information_schema.tables "
+                "where table_schema='{schema}' and table_name='{name}'"
+                .format(schema=schema, name=tablename))
+    a = cur.fetchone()
+    if not a:
+        sql = """
+                CREATE TABLE `{schema}`.`{name}` (
+                    `date` BIGINT(20) UNSIGNED NOT NULL,
+                    `open` DOUBLE UNSIGNED NOT NULL,
+                    `high` DOUBLE UNSIGNED NOT NULL,
+                    `low` DOUBLE UNSIGNED NOT NULL,
+                    `close` DOUBLE UNSIGNED NOT NULL,
+                    `amount` DOUBLE UNSIGNED NOT NULL,
+                    `count` DOUBLE UNSIGNED NOT NULL,
+                    PRIMARY KEY (`date`)
+                )
+                COLLATE='utf8_general_ci'
+                ENGINE=MyISAM
+                ;
+              """.format(schema=schema, name=tablename)
+        cur.execute(sql)
+        connect.commit()
+
+    cur.close()
+    return "`{schema}`.`{name}`".format(schema=schema, name=tablename)
+
+
+def get_lastdatetime(connect, tablename):
+    cur = connect.cursor()
+    cur.execute("select max(date) from {}".format(tablename))
+    a = cur.fetchone()
+    return a[0]
+
+
+
+
 if __name__ == '__main__':
     host = '127.0.0.1'
     port = 3306
@@ -140,7 +180,9 @@ if __name__ == '__main__':
     #print(get_codepre_list(cnx, 2, ['stock']))
     #update_last_date(cnx, 1, 20180101)
     #print(get_last_date(cnx, 1))
-    print(get_stock_list(cnx, 'sh', ['stock']))
+    #print(get_stock_list(cnx, 'sh', ['stock']))
+    #print(get_lastdatetime(cnx, "`hb__min`.`bch_usd`"))
+    print(get_table(cnx, 'sh', '000001', 'MIN'))
 
 
     from pathlib import Path
