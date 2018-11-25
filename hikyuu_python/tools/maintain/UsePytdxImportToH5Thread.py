@@ -27,6 +27,8 @@ from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
 from ImportWeightToSqliteTask import ImportWeightToSqliteTask
 from ImportPytdxToH5Task import ImportPytdxToH5
+from ImportPytdxTransToH5Task import ImportPytdxTransToH5
+from ImportPytdxTimeToH5Task import ImportPytdxTimeToH5
 from pytdx.hq import TdxHq_API
 from sqlite3_common import create_database
 from pytdx_to_h5 import import_stock_name
@@ -38,9 +40,6 @@ class UsePytdxImportToH5Thread(QThread):
         super(self.__class__, self).__init__()
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
-
-        if not self.check():
-            return
 
         self.process_list = []
 
@@ -77,10 +76,20 @@ class UsePytdxImportToH5Thread(QThread):
                                               self.quotations, self.ip, self.port, dest_dir))
             self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SZ', '1MIN',
                                               self.quotations, self.ip, self.port, dest_dir))
-
-
-    def check(self):
-        return True
+        if self.config.getboolean('ktype', 'trans', fallback=False):
+            self.tasks.append(ImportPytdxTransToH5(self.queue, sqlite_file_name, 'SH',
+                                                   self.quotations, self.ip, self.port, dest_dir,
+                                                   config['ktype']['trans_max_days']))
+            self.tasks.append(ImportPytdxTransToH5(self.queue, sqlite_file_name, 'SZ',
+                                                   self.quotations, self.ip, self.port, dest_dir,
+                                                   config['ktype']['trans_max_days']))
+        if self.config.getboolean('ktype', 'time', fallback=False):
+            self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SH',
+                                                  self.quotations, self.ip, self.port, dest_dir,
+                                                  config['ktype']['time_max_days']))
+            self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SZ',
+                                                  self.quotations, self.ip, self.port, dest_dir,
+                                                  config['ktype']['time_max_days']))
 
 
     def __del__(self):
@@ -100,14 +109,12 @@ class UsePytdxImportToH5Thread(QThread):
             self.send_message(['THREAD', 'FINISHED'])
 
     def _run(self):
-        if not self.check():
-            print("存在错误！")
-            return
-
         src_dir = self.config['tdx']['dir']
         dest_dir = self.config['hdf5']['dir']
         hdf5_import_progress = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0},
                                 'SZ': {'DAY': 0, '1MIN': 0, '5MIN': 0}}
+        trans_progress = {'SH': 0, 'SZ': 0}
+        time_progress = {'SH': 0, 'SZ': 0}
 
         #正在导入代码表
         self.send_message(['START_IMPORT_CODE'])
@@ -135,17 +142,25 @@ class UsePytdxImportToH5Thread(QThread):
             taskname, market, ktype, progress, total = message
             if progress is None:
                 finished_count -= 1
-                if taskname == 'IMPORT_KDATA':
-                    self.send_message(['IMPORT_KDATA', 'FINISHED', market, ktype, total])
+                if taskname in ('IMPORT_KDATA', 'IMPORT_TRANS', 'IMPORT_TIME'):
+                    self.send_message([taskname, 'FINISHED', market, ktype, total])
                 else:
                     self.send_message([taskname, 'FINISHED'])
                 continue
 
             if taskname == 'IMPORT_WEIGHT':
-                self.send_message(['IMPORT_WEIGHT', market, total])
+                self.send_message([taskname, market, total])
             elif taskname == 'IMPORT_KDATA':
                 hdf5_import_progress[market][ktype] = progress
                 current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
-                self.send_message(['IMPORT_KDATA', ktype, current_progress])
+                self.send_message([taskname, ktype, current_progress])
+            elif taskname == 'IMPORT_TRANS':
+                trans_progress[market] = progress
+                current_progress = (trans_progress['SH'] + trans_progress['SZ']) // 2
+                self.send_message([taskname, ktype, current_progress])
+            elif taskname == 'IMPORT_TIME':
+                time_progress[market] = progress
+                current_progress = (time_progress['SH'] + time_progress['SZ']) // 2
+                self.send_message([taskname, ktype, current_progress])
             else:
                 print("Unknow task: ", taskname)

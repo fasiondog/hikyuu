@@ -37,11 +37,8 @@ from common import get_stktype_list, MARKETID
 from mysql_common import (create_database, get_marketid,
                           get_codepre_list,
                           get_table, get_lastdatetime)
-from h5_common import (H5Record, H5Index,
-                       open_h5file, get_h5table,
-                       update_hdf5_extern_data)
 
-from weight_to_sqlite import qianlong_import_weight
+from weight_to_mysql import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
@@ -153,6 +150,7 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
     if lastdatetime is not None:
         lastdatetime = lastdatetime / 10000
 
+    buf = []
     cur = connect.cursor()
     with open(filename, 'rb') as src_file:
         data = src_file.read(32)
@@ -166,16 +164,17 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
                      and record[2] >= record[4] >= record[3] > 0 \
                      and record[5] >= 0 \
                      and record[6] >= 0:
-                sql = "INSERT INTO {tablename} (date, open, high, low, close, amount, count) " \
-                      "VALUES (%s, %s, %s, %s, %s, %s, %s)".format(tablename=table)
-                cur.execute(sql, (record[0]*10000, record[1]*0.01, record[2]*0.01,
-                                  record[3]*0.01, record[4]*0.01, round(record[5] * 0.001),
-                                  record[6] if stktype == 2 else round(record[6] * 0.01)))
+                buf.append((record[0]*10000, record[1]*0.01, record[2]*0.01,
+                            record[3]*0.01, record[4]*0.01, round(record[5] * 0.001),
+                            record[6] if stktype == 2 else round(record[6] * 0.01)))
                 add_record_count += 1
 
             data = src_file.read(32)
 
     if add_record_count > 0:
+        sql = "INSERT INTO {tablename} (date, open, high, low, close, amount, count) " \
+              "VALUES (%s, %s, %s, %s, %s, %s, %s)".format(tablename=table)
+        cur.executemany(sql, buf)
         connect.commit()
 
         #更新基础信息数据库中股票对应的起止日期及其有效标志
@@ -196,9 +195,9 @@ def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record
                 cur.execute(sql)
             except:
                 print(sql)
-            #connect.commit()
+            connect.commit()
 
-        connect.commit()
+        #connect.commit()
 
     cur.close()
     return add_record_count
@@ -374,12 +373,9 @@ if __name__ == '__main__':
 
     add_count = 0
 
-    #tdx_import_day_data_from_file(connect, "D:\\TdxW_HuaTai\\vipdoc\\sz\\lday\\sz000001.day",
-    #                              'DAY', 'SZ', (3795,2,'000001',1,1))
-
     print("导入股票代码表")
-    #add_count = tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', quotations)
-    #add_count += tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', quotations)
+    add_count = tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', quotations)
+    add_count += tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', quotations)
     print("新增股票数：", add_count)
 
     print("\n导入上证日线数据")
@@ -387,7 +383,7 @@ if __name__ == '__main__':
     print("\n导入数量：", add_count)
 
     print("\n导入深证日线数据")
-    #add_count = tdx_import_data(connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday")
+    add_count = tdx_import_data(connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday")
     print("\n导入数量：", add_count)
 
     print("\n导入上证5分钟数据")
@@ -395,22 +391,22 @@ if __name__ == '__main__':
     print("\n导入数量：", add_count)
 
     print("\n导入深证5分钟数据")
-    #add_count = tdx_import_data(connect, 'SZ', '5MIN', quotations, src_dir + "\\vipdoc\\sz\\fzline", dest_dir)
+    add_count = tdx_import_data(connect, 'SZ', '5MIN', quotations, src_dir + "\\vipdoc\\sz\\fzline")
     print("\n导入数量：", add_count)
 
     print("\n导入上证1分钟数据")
-    #add_count = tdx_import_data(connect, 'SH', '1MIN', quotations, src_dir + "\\vipdoc\\sh\\minline", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', '1MIN', quotations, src_dir + "\\vipdoc\\sh\\minline", dest_dir)
     print("\n导入数量：", add_count)
 
     print("\n导入深证1分钟数据")
-    #add_count = tdx_import_data(connect, 'SZ', '1MIN', quotations, src_dir + "\\vipdoc\\sz\\minline", dest_dir)
+    add_count = tdx_import_data(connect, 'SZ', '1MIN', quotations, src_dir + "\\vipdoc\\sz\\minline", dest_dir)
     print("\n导入数量：", add_count)
 
-    """
     print("\n导入权息数据")
     print("正在下载权息数据...")
     import urllib.request
     net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+    dest_dir = os.path.expanduser('~/.hikyuu')
     dest_filename = dest_dir + '/weight.rar'
     with open(dest_filename, 'wb') as file:
         file.write(net_file.read())
@@ -422,7 +418,6 @@ if __name__ == '__main__':
     add_count = qianlong_import_weight(connect, dest_dir + '/weight', 'SH')
     add_count += qianlong_import_weight(connect, dest_dir + '/weight', 'SZ')
     print("导入数量：", add_count)
-    """
     connect.commit()
     connect.close()
     

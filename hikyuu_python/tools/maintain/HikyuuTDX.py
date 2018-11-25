@@ -74,7 +74,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.import_day_checkBox.setChecked(import_config.getboolean('ktype', 'day', fallback=True))
         self.import_min_checkBox.setChecked(import_config.getboolean('ktype', 'min', fallback=True))
         self.import_min5_checkBox.setChecked(import_config.getboolean('ktype', 'min5', fallback=True))
-        self.import_tick_checkBox.setChecked(import_config.getboolean('ktype', 'tick', fallback=False))
+        self.import_trans_checkBox.setChecked(import_config.getboolean('ktype', 'trans', fallback=False))
+        self.import_time_checkBox.setChecked(import_config.getboolean('ktype', 'time', fallback=False))
+        self.trans_max_days_spinBox.setValue(import_config.getint('ktype', 'trans_max_days', fallback=70))
+        self.time_max_days_spinBox.setValue(import_config.getint('ktype', 'time_max_days', fallback=70))
 
         #初始化权息数据设置
         self.import_weight_checkBox.setChecked(import_config.getboolean('weight', 'enable', fallback=True))
@@ -95,7 +98,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.tdx_servers_comboBox.setDuplicatesEnabled(True)
         default_tdx_index = 0
         for i, host in enumerate(hq_hosts):
-            self.tdx_servers_comboBox.addItem(host[0], host[1])
+            self.tdx_servers_comboBox.addItem("{}({})".format(host[0], host[1]), host[1])
             if host[0] == pytdx_server:
                 default_tdx_index = i
         self.tdx_servers_comboBox.setCurrentIndex(default_tdx_index)
@@ -108,6 +111,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         hdf5_dir = import_config.get('hdf5', 'dir', fallback="c:\stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock")
         self.hdf5_dir_lineEdit.setText(hdf5_dir)
 
+        self.on_tdx_or_pytdx_toggled()
+
     def getCurrentConfig(self):
         import_config = ConfigParser()
         import_config['quotation'] = {'stock': self.import_stock_checkBox.isChecked(),
@@ -116,8 +121,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         import_config['ktype'] = {'day': self.import_day_checkBox.isChecked(),
                                   'min': self.import_min_checkBox.isChecked(),
                                   'min5': self.import_min5_checkBox.isChecked(),
-                                  'tick': self.import_tick_checkBox.isChecked()}
-        import_config['weight'] = {'enable': self.import_weight_checkBox.isChecked()}
+                                  'trans': self.import_trans_checkBox.isChecked(),
+                                  'time': self.import_time_checkBox.isChecked(),
+                                  'trans_max_days': self.trans_max_days_spinBox.value(),
+                                  'time_max_days': self.time_max_days_spinBox.value()}
+        import_config['weight'] = {'enable': self.import_weight_checkBox.isChecked(),}
         import_config['tdx'] = {'enable': self.tdx_radioButton.isChecked(),
                                 'dir': self.tdx_dir_lineEdit.text()}
         import_config['pytdx'] = {'enable': self.pytdx_radioButton.isChecked(),
@@ -144,6 +152,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
         self.tdx_servers_comboBox.setEnabled(not tdx_enable)
         self.tdx_port_lineEdit.setEnabled(not tdx_enable)
+        self.import_trans_checkBox.setChecked(not tdx_enable)
+        self.import_trans_checkBox.setEnabled(not tdx_enable)
+        self.import_time_checkBox.setChecked(not tdx_enable)
+        self.import_time_checkBox.setEnabled(not tdx_enable)
+        self.trans_max_days_spinBox.setEnabled(not tdx_enable)
+        self.time_max_days_spinBox.setEnabled(not tdx_enable)
+        self.ping_tdx_pushButton.setEnabled(not tdx_enable)
+        self.search_tdx_pushButton.setEnabled(not tdx_enable)
+
 
     @pyqtSlot()
     def on_select_tdx_dir_pushButton_clicked(self):
@@ -180,6 +197,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_day_progressBar.setValue(0)
         self.hdf5_min_progressBar.setValue(0)
         self.hdf5_5min_progressBar.setValue(0)
+        self.hdf5_trans_progressBar.setValue(0)
         self.import_detail_textEdit.clear()
 
     def on_escapte_time(self, escape):
@@ -217,6 +235,22 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     self.import_detail_textEdit.append('导入 {} {} 记录数：{}'
                                                        .format(msg[3], msg[4], msg[5]))
 
+            elif msg_task_name == 'IMPORT_TRANS':
+                ktype, progress = msg[2:4]
+                if ktype != 'FINISHED':
+                    self.hdf5_trans_progressBar.setValue(progress)
+                else:
+                    self.import_detail_textEdit.append('导入 {} 分笔记录数：{}'
+                                                       .format(msg[3], msg[5]))
+
+            elif msg_task_name == 'IMPORT_TIME':
+                ktype, progress = msg[2:4]
+                if ktype != 'FINISHED':
+                    self.hdf5_time_progressBar.setValue(progress)
+                else:
+                    self.import_detail_textEdit.append('导入 {} 分时记录数：{}'
+                                                       .format(msg[3], msg[5]))
+
             elif msg_task_name == 'IMPORT_WEIGHT':
                 self.hdf5_weight_label.setText(msg[2])
                 if msg[2] == '导入完成!':
@@ -225,6 +259,19 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
+        config = self.getCurrentConfig()
+        dest_dir = config['hdf5']['dir']
+        if not os.path.exists(dest_dir) or not os.path.isdir(dest_dir):
+            QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
+            return
+
+        if config['tdx']['enable'] \
+            and (not os.path.exists(config['tdx']['dir']
+                 or os.path.isdir(config['tdx']['dir']))):
+            QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
+            return
+
+
         self.import_running = True
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
@@ -234,8 +281,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.message.connect(self.on_message_from_thread)
         self.escape_time_thread.start()
 
-        config = self.getCurrentConfig()
-
         if self.tdx_radioButton.isChecked():
             self.hdf5_import_thread = UseTdxImportToH5Thread(config)
         else:
@@ -243,6 +288,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
+
+
+    @pyqtSlot()
+    def on_ping_tdx_pushButton_clicked(self):
+        pass
+
+    @pyqtSlot()
+    def on_search_tdx_pushButton_clicked(self):
+        pass
 
 
 if __name__ == "__main__":

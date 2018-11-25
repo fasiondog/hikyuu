@@ -1,13 +1,5 @@
 CREATE SCHEMA `hku_base`;
 
-CREATE TABLE `hku_base`.`lastdate` (
-	`id` INT(10) UNSIGNED NOT NULL,
-	`date` BIGINT(20) UNSIGNED NULL DEFAULT NULL,
-	PRIMARY KEY (`id`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-;
 CREATE TABLE `hku_base`.`market` (
 	`marketid` INT(10) UNSIGNED NOT NULL,
 	`market` VARCHAR(10) NULL DEFAULT NULL,

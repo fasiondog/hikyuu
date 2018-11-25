@@ -190,6 +190,10 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
                 or (code == '399001' and marketid == MARKETID.SZ)  :
             update_last_date(connect, marketid, table[-1]['datetime'] / 10000)
 
+    elif table.nrows == 0:
+        #print(market, stock_record)
+        table.remove()
+
     return add_record_count
 
 
@@ -291,6 +295,9 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
     if add_record_count > 0:
         table.flush()
+    elif table.nrows == 0:
+        #print(market, stock_record)
+        table.remove()
 
     return add_record_count
 

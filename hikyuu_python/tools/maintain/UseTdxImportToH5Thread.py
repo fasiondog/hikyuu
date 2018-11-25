@@ -40,9 +40,6 @@ class UseTdxImportToH5Thread(QThread):
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
 
-        if not self.check():
-            return
-
         self.process_list = []
 
         src_dir = config['tdx']['dir']
@@ -82,9 +79,6 @@ class UseTdxImportToH5Thread(QThread):
             if p.is_alive():
                 p.terminate()
 
-    def check(self):
-        return True
-
     def send_message(self, msg):
         self.message.emit([self.msg_name] + msg)
 
@@ -97,10 +91,6 @@ class UseTdxImportToH5Thread(QThread):
             self.send_message(['THREAD', 'FINISHED'])
 
     def _run(self):
-        if not self.check():
-            print("存在错误！")
-            return
-
         src_dir = self.config['tdx']['dir']
         dest_dir = self.config['hdf5']['dir']
         hdf5_import_progress = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0},

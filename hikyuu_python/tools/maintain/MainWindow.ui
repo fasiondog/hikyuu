@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>965</width>
-    <height>493</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@
       <property name="geometry">
        <rect>
         <x>510</x>
-        <y>40</y>
+        <y>30</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -47,7 +47,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>160</y>
+        <y>310</y>
         <width>481</width>
         <height>191</height>
        </rect>
@@ -201,9 +201,9 @@
         <string>使用通达信盘后数据（不支持分笔、分时数据）</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="ping_tdx_pushButton">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -217,9 +217,9 @@
         <string>测试连接</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="search_tdx_pushButton">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
@@ -238,13 +238,13 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>370</y>
+        <y>20</y>
         <width>481</width>
         <height>71</height>
        </rect>
       </property>
       <property name="title">
-       <string>HDF5保存数据设置</string>
+       <string>数据保存设置</string>
       </property>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
@@ -252,7 +252,7 @@
          <x>20</x>
          <y>30</y>
          <width>451</width>
-         <height>25</height>
+         <height>21</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
@@ -280,9 +280,9 @@
       <property name="geometry">
        <rect>
         <x>510</x>
-        <y>90</y>
+        <y>70</y>
         <width>431</width>
-        <height>351</height>
+        <height>431</height>
        </rect>
       </property>
       <property name="title">
@@ -294,28 +294,21 @@
          <x>10</x>
          <y>20</y>
          <width>401</width>
-         <height>101</height>
+         <height>151</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>导入日线：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>导入5分钟线：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QProgressBar" name="hdf5_min_progressBar">
+        <item row="3" column="1">
+         <widget class="QProgressBar" name="hdf5_trans_progressBar">
           <property name="value">
            <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>导入分笔数据：</string>
           </property>
          </widget>
         </item>
@@ -333,6 +326,34 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="1">
+         <widget class="QProgressBar" name="hdf5_min_progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLabel" name="hdf5_weight_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>导入日线：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>导入5分钟线：</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="1">
          <widget class="QProgressBar" name="hdf5_day_progressBar">
           <property name="value">
@@ -340,17 +361,24 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string>导入权息数据：</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="hdf5_weight_label">
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>TextLabel</string>
+           <string>导入分时数据：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QProgressBar" name="hdf5_time_progressBar">
+          <property name="value">
+           <number>0</number>
           </property>
          </widget>
         </item>
@@ -360,9 +388,9 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>140</y>
+         <y>180</y>
          <width>401</width>
-         <height>121</height>
+         <height>241</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -382,6 +410,10 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证5分钟线记录：&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证1分钟线记录：&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证1分钟线记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证分笔记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证分笔记录：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入上证分时数据：&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入深证分时数据：&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入权息数据数：&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;导入完毕！&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -391,9 +423,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>110</y>
         <width>481</width>
-        <height>121</height>
+        <height>181</height>
        </rect>
       </property>
       <property name="title">
@@ -467,9 +499,9 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="import_tick_checkBox">
+         <widget class="QCheckBox" name="import_trans_checkBox">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>分笔</string>
@@ -477,9 +509,9 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="import_min_time_checkBox">
+         <widget class="QCheckBox" name="import_time_checkBox">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>分时</string>
@@ -501,12 +533,78 @@ p, li { white-space: pre-wrap; }
         <string>下载并导入钱龙权息数据</string>
        </property>
       </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>120</y>
+         <width>411</width>
+         <height>48</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="trans_max_days_spinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>300</number>
+          </property>
+          <property name="value">
+           <number>70</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>初次导入分时最大导入天数（自然日）：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="time_max_days_spinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>2000</number>
+          </property>
+          <property name="value">
+           <number>70</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>初次导入分笔最大导入天数（自然日）：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>（最大300天）</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>（最大2000天，慢）</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QLabel" name="import_status_label">
       <property name="geometry">
        <rect>
         <x>620</x>
-        <y>40</y>
+        <y>30</y>
         <width>361</width>
         <height>21</height>
        </rect>

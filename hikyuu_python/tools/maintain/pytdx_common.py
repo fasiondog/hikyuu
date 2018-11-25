@@ -22,47 +22,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-class MARKET:
-    SH = 'SH'
-    SZ = 'SZ'
+import time
+from pytdx.hq import TdxHq_API
 
-class MARKETID:
-    SH = 1
-    SZ = 2
+def ping(ip, port=7709):
+    api = TdxHq_API()
+    success = False
+    starttime = time.time()
+    with api.connect(ip, port, time_out=1):
+        x = api.get_security_count(0)
+        if x:
+            success = True
+    endtime = time.time()
+    return (success, endtime - starttime)
 
-class STOCKTYPE:
-    BLOCK = 0  #板块
-    A     = 1  #A股
-    INDEX = 2  #指数
-    B     = 3  #B股
-    FUND  = 4  #基金（非ETF）
-    ETF   = 5  #ETF
-    ND    = 6  #国债
-    BOND  = 7  #其他债券
-    GEM   = 8  #创业板
-    BTC   = 9  #数字币
 
-def get_stktype_list(quotations=None):
-    """
-    根据行情类别获取股票类别元组
+def search_best_tdx():
+    pass
 
-    :param quotations: 'stock'（股票） | 'fund'（基金） | 'bond'（债券）
-    :rtype: tuple
-    :return: 股票类别元组
-    """
-    if not quotations:
-        return (1, 2, 3, 4, 5, 6, 7, 8, 9)
 
-    result = []
-    for quotation in quotations:
-        new_quotation = quotation.lower()
-        if new_quotation == 'stock':
-            result += [STOCKTYPE.A, STOCKTYPE.INDEX, STOCKTYPE.B, STOCKTYPE.GEM]
-        elif new_quotation == 'fund':
-            result += [STOCKTYPE.FUND, STOCKTYPE.ETF]
-        elif new_quotation == 'bond':
-            result += [STOCKTYPE.ND, STOCKTYPE.BOND]
-        else:
-            print('Unknow quotation: {}'.format(quotation))
+if __name__ == '__main__':
+    import os
+    import time
+    starttime = time.time()
 
-    return tuple(result)
+    x = ping('119.147.212.81', 7709)
+    print(x)
+
+    endtime = time.time()
+    print("\nTotal time:")
+    print("%.2fs" % (endtime - starttime))
+    print("%.2fm" % ((endtime - starttime) / 60))

@@ -98,16 +98,6 @@ def get_codepre_list(connect, marketid, quotations):
     return sorted(a, key=lambda k: len(k[0]), reverse=True)
 
 
-def get_last_date(connect, marketid):
-    cur = connect.cursor()
-    cur.execute("select lastDate from `hku_base`.`market` where marketid='{}'".format(marketid))
-    a = cur.fetchall()
-    last_date = [x[0] for x in a][0]
-    connect.commit()
-    cur.close()
-    return last_date
-
-
 def get_stock_list(connect, market, quotations):
     marketid = get_marketid(connect, market)
     stktype_list = get_stktype_list(quotations)

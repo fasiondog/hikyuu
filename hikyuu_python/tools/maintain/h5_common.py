@@ -44,10 +44,32 @@ class H5Index(tb.IsDescription):
     start    = tb.UInt64Col()        #IGNORE:E1101
 
 
+class H5Transaction(tb.IsDescription):
+    """分笔数据"""
+    datetime = tb.UInt64Col()
+    price = tb.UInt64Col()
+    vol = tb.UInt64Col()
+    buyorsell = tb.UInt8Col()
+
+
+class H5TransactionIndex(tb.IsDescription):
+    """分笔数据按天索引"""
+    datetime = tb.UInt64Col()
+    start = tb.UInt64Col()
+
+
+class H5MinuteTime(tb.IsDescription):
+    """分时线"""
+    datetime = tb.UInt64Col()
+    price = tb.UInt64Col()
+    vol = tb.UInt64Col()
+
+
 def open_h5file(dest_dir, market, ktype):
     filename = "{}/{}_{}.h5".format(dest_dir, market.lower(), ktype.lower())
     h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
     return h5file
+
 
 def get_h5table(h5file, market, code):
     try:
@@ -243,3 +265,99 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
             index += 1
         index_table.flush()
 
+
+#------------------------------------------------------------------------------
+# 分笔
+#------------------------------------------------------------------------------
+
+def open_trans_file(dest_dir, market):
+    filename = "{}/{}_trans.h5".format(dest_dir, market.lower())
+    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
+    return h5file
+
+def get_trans_table(h5file, market, code):
+    try:
+        group = h5file.get_node("/", "data")
+    except:
+        group = h5file.create_group("/", "data")
+
+    tablename = market.upper() + code
+    try:
+        table = h5file.get_node(group, tablename)
+    except:
+        table = h5file.create_table(group, tablename, H5Transaction)
+
+    return table
+
+
+def update_hdf5_trans_index(h5file, tablename):
+    try:
+        table = h5file.get_node("/data", tablename)
+    except:
+        return
+
+    total = table.nrows
+    if 0 == total:
+        return
+
+    try:
+        group = h5file.get_node("/", 'index')
+    except:
+        group = h5file.create_group("/", 'index')
+
+    try:
+        index_table = h5file.get_node(group, tablename)
+    except:
+        index_table = h5file.create_table(group, tablename, H5Index)
+
+    index_total = index_table.nrows
+    index_row = index_table.row
+    if index_total:
+        index_last_date = int(index_table[-1]['datetime'])
+        last_date = int(table[-1]['datetime']//10000 * 10000)
+        if index_last_date == last_date:
+            return
+        startix = int(index_table[-1]['start'])
+        pre_index_date = int(index_table[-1]['datetime'])
+    else:
+        startix = 0
+        date = int(table[0]['datetime'] // 10000 * 10000)
+        pre_index_date = date
+        index_row['datetime'] = pre_index_date
+        index_row['start'] = 0
+        index_row.append()
+
+    index = startix
+    for row in table[startix:]:
+        date = int(row['datetime'] // 10000 * 10000)
+        cur_index_date = date
+        if cur_index_date != pre_index_date:
+            index_row['datetime'] = cur_index_date
+            index_row['start'] = index
+            index_row.append()
+            pre_index_date = cur_index_date
+        index += 1
+    index_table.flush()
+
+
+#------------------------------------------------------------------------------
+# 分时
+#------------------------------------------------------------------------------
+def open_time_file(dest_dir, market):
+    filename = "{}/{}_time.h5".format(dest_dir, market.lower())
+    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
+    return h5file
+
+def get_time_table(h5file, market, code):
+    try:
+        group = h5file.get_node("/", "data")
+    except:
+        group = h5file.create_group("/", "data")
+
+    tablename = market.upper() + code
+    try:
+        table = h5file.get_node(group, tablename)
+    except:
+        table = h5file.create_table(group, tablename, H5MinuteTime)
+
+    return table

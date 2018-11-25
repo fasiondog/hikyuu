@@ -4,5 +4,3 @@ CREATE TABLE `hku_base`.`version` (
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB;
 INSERT INTO `hku_base`.`version` (version) VALUES (1);
-
-DROP TABLE `hku_base`.`lastdate`;
