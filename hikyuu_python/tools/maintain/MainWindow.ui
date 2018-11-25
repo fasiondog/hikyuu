@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>965</width>
+    <width>1011</width>
     <height>544</height>
    </rect>
   </property>
@@ -252,7 +252,7 @@
          <x>20</x>
          <y>30</y>
          <width>451</width>
-         <height>21</height>
+         <height>25</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
@@ -281,19 +281,19 @@
        <rect>
         <x>510</x>
         <y>70</y>
-        <width>431</width>
+        <width>481</width>
         <height>431</height>
        </rect>
       </property>
       <property name="title">
-       <string>HDF5导入进展</string>
+       <string>导入进展</string>
       </property>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>20</y>
-         <width>401</width>
+         <width>461</width>
          <height>151</height>
         </rect>
        </property>
@@ -389,7 +389,7 @@
         <rect>
          <x>10</x>
          <y>180</y>
-         <width>401</width>
+         <width>461</width>
          <height>241</height>
         </rect>
        </property>
@@ -533,7 +533,7 @@ p, li { white-space: pre-wrap; }
         <string>下载并导入钱龙权息数据</string>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>20</x>

@@ -36,9 +36,10 @@ from pytdx_to_h5 import import_stock_name
 class UsePytdxImportToH5Thread(QThread):
     message = pyqtSignal(list)
 
-    def __init__(self, config):
+    def __init__(self, config, hosts):
         super(self.__class__, self).__init__()
         self.config = config
+        self.hosts = hosts
         self.msg_name = 'HDF5_IMPORT'
 
         self.process_list = []
@@ -54,42 +55,119 @@ class UsePytdxImportToH5Thread(QThread):
         #if self.config['quotation']['future']:
         #    self.quotations.append('future')
 
-        self.ip = self.config['pytdx']['ip']
-        self.port = int(self.config['pytdx']['port'])
+        #self.ip = self.config['pytdx']['ip']
+        #self.port = int(self.config['pytdx']['port'])
+
+        task_count = 0
+        if self.config.getboolean('ktype', 'day', fallback=False):
+            task_count += 2
+        if self.config.getboolean('ktype', 'min5', fallback=False):
+            task_count += 2
+        if self.config.getboolean('ktype', 'min', fallback=False):
+            task_count += 2
+        if self.config.getboolean('ktype', 'trans', fallback=False):
+            task_count += 2
+        if self.config.getboolean('ktype', 'time', fallback=False):
+            task_count += 2
+
+        #task_count = task_count // 2
+        limit_time = 3 * self.hosts[0][1]
+        use_hosts = [(host[2],host[3]) for i, host in enumerate(self.hosts) if host[1] <= limit_time and i < task_count]
+        #use_hosts = [(self.hosts[0][2], self.hosts[0][3])]
+        #for i, h in enumerate(use_hosts):
+        #    print(i,h)
+        len_use_hosts = len(use_hosts)
+        if len_use_hosts < task_count:
+            for i in range(len_use_hosts, task_count):
+                use_hosts.append(use_hosts[i-len_use_hosts])
+        for i, h in enumerate(use_hosts):
+            print(i,h)
 
         self.queue = Queue()
         self.tasks = []
         if self.config.getboolean('weight', 'enable', fallback=False):
             self.tasks.append(ImportWeightToSqliteTask(self.queue, sqlite_file_name, dest_dir))
-        if self.config.getboolean('ktype', 'day', fallback=False):
-            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SH', 'DAY',
-                                              self.quotations, self.ip, self.port, dest_dir))
-            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SZ', 'DAY',
-                                              self.quotations, self.ip, self.port, dest_dir))
-        if self.config.getboolean('ktype', 'min5', fallback=False):
-            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SH', '5MIN',
-                                              self.quotations, self.ip, self.port, dest_dir))
-            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SZ', '5MIN',
-                                              self.quotations, self.ip, self.port, dest_dir))
+
+        cur_host = 0
+
         if self.config.getboolean('ktype', 'min', fallback=False):
-            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SH', '1MIN',
-                                              self.quotations, self.ip, self.port, dest_dir))
-            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SZ', '1MIN',
-                                              self.quotations, self.ip, self.port, dest_dir))
+            print('min', use_hosts[cur_host])
+            self.tasks.append(
+                ImportPytdxToH5(
+                    self.queue, sqlite_file_name, 'SH', '1MIN', self.quotations,
+                    use_hosts[cur_host][0], use_hosts[cur_host][1],
+                    dest_dir
+                )
+            )
+            cur_host += 1
+            self.tasks.append(
+                ImportPytdxToH5(
+                    self.queue, sqlite_file_name,
+                    'SZ', '1MIN', self.quotations,
+                    use_hosts[cur_host][0], use_hosts[cur_host][1],
+                    dest_dir
+                )
+            )
+            cur_host += 1
+
+        if self.config.getboolean('ktype', 'min5', fallback=False):
+            print('min5', use_hosts[cur_host])
+            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SH', '5MIN',
+                                              self.quotations,
+                                              use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                              dest_dir))
+            cur_host += 1
+            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SZ', '5MIN',
+                                              self.quotations,
+                                              use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                              dest_dir))
+            cur_host += 1
+
         if self.config.getboolean('ktype', 'trans', fallback=False):
-            self.tasks.append(ImportPytdxTransToH5(self.queue, sqlite_file_name, 'SH',
-                                                   self.quotations, self.ip, self.port, dest_dir,
-                                                   config['ktype']['trans_max_days']))
-            self.tasks.append(ImportPytdxTransToH5(self.queue, sqlite_file_name, 'SZ',
-                                                   self.quotations, self.ip, self.port, dest_dir,
-                                                   config['ktype']['trans_max_days']))
+            print('trans', use_hosts[cur_host])
+            self.tasks.append(
+                ImportPytdxTransToH5(
+                    self.queue, sqlite_file_name, 'SH', self.quotations,
+                    use_hosts[cur_host][0], use_hosts[cur_host][1],
+                    dest_dir, config['ktype']['trans_max_days']
+                )
+            )
+            cur_host += 1
+            self.tasks.append(
+                ImportPytdxTransToH5(
+                    self.queue, sqlite_file_name, 'SZ', self.quotations,
+                    use_hosts[cur_host][0], use_hosts[cur_host][1],
+                    dest_dir, config['ktype']['trans_max_days']
+                )
+            )
+            cur_host += 1
+
         if self.config.getboolean('ktype', 'time', fallback=False):
+            print('time', use_hosts[cur_host])
             self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SH',
-                                                  self.quotations, self.ip, self.port, dest_dir,
+                                                  self.quotations,
+                                                  use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                                  dest_dir,
                                                   config['ktype']['time_max_days']))
+            cur_host += 1
             self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SZ',
-                                                  self.quotations, self.ip, self.port, dest_dir,
+                                                  self.quotations,
+                                                  use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                                  dest_dir,
                                                   config['ktype']['time_max_days']))
+            cur_host += 1
+        if self.config.getboolean('ktype', 'day', fallback=False):
+            print('day', use_hosts[cur_host])
+            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SH', 'DAY',
+                                              self.quotations,
+                                              use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                              dest_dir))
+            cur_host += 1
+            self.tasks.append(ImportPytdxToH5(self.queue, sqlite_file_name, 'SZ', 'DAY',
+                                              self.quotations,
+                                              use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                              dest_dir))
+            cur_host += 1
 
 
     def __del__(self):
@@ -123,7 +201,7 @@ class UsePytdxImportToH5Thread(QThread):
         create_database(connect)
 
         pytdx_api = TdxHq_API()
-        pytdx_api.connect(self.ip, self.port)
+        pytdx_api.connect(self.hosts[0][2], self.hosts[0][3])
 
         import_stock_name(connect, pytdx_api, 'SH', self.quotations)
         import_stock_name(connect, pytdx_api, 'SZ', self.quotations)

@@ -338,6 +338,8 @@ def update_hdf5_trans_index(h5file, tablename):
             pre_index_date = cur_index_date
         index += 1
     index_table.flush()
+    table.close()
+    index_table.close()
 
 
 #------------------------------------------------------------------------------

@@ -259,6 +259,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record):
         #print(market, stock_record)
         table.remove()
 
+    table.close()
     return add_record_count
 
 

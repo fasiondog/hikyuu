@@ -23,22 +23,44 @@
 # SOFTWARE.
 
 import time
+from concurrent import futures
 from pytdx.hq import TdxHq_API
+from pytdx.config.hosts import hq_hosts
 
-def ping(ip, port=7709):
-    api = TdxHq_API()
+def ping(ip, port=7709, multithread=False):
+    #print(ip, port, multithread)
+    api = TdxHq_API(multithread=multithread)
     success = False
     starttime = time.time()
-    with api.connect(ip, port, time_out=1):
-        x = api.get_security_count(0)
-        if x:
-            success = True
+    try:
+        with api.connect(ip, port, time_out=1):
+            #x = api.get_security_count(0)
+            x = api.get_index_bars(7, 1, '000001', 1, 800)
+            if x:
+                success = True
+            y = api.get_security_bars(7, 0, '000001', 800, 800)
+            if x and y:
+                success = True
+
+    except Exception as e:
+        success = False
+        #print(e)
+
     endtime = time.time()
-    return (success, endtime - starttime)
+    #print(success, endtime - starttime)
+    return (success, endtime - starttime, ip, port)
 
 
 def search_best_tdx():
-    pass
+    def ping2(host):
+        return ping(host[0], host[1], host[2])
+
+    hosts = [(host[1], host[2], True) for host in hq_hosts]
+    with futures.ThreadPoolExecutor() as executor:
+        res = executor.map(ping2, hosts, timeout=2)
+    x = [i for i in res if i[0] == True]
+    x.sort(key=lambda item: item[1])
+    return x
 
 
 if __name__ == '__main__':
@@ -46,8 +68,15 @@ if __name__ == '__main__':
     import time
     starttime = time.time()
 
-    x = ping('119.147.212.81', 7709)
-    print(x)
+    #x = ping('119.147.212.81', 7709)
+    x = search_best_tdx()
+    #x = [i for i in x if i[0] == True]
+    #x.sort(key=lambda item: item[1])
+    #print(x)
+    for i in x:
+        print(i)
+    print(len(x))
+    print(len(hq_hosts))
 
     endtime = time.time()
     print("\nTotal time:")

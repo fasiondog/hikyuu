@@ -13,6 +13,7 @@ from MainWindow import *
 from EscapetimeThread import EscapetimeThread
 from UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
+from pytdx_common import search_best_tdx
 
 import hku_config_template
 
@@ -198,6 +199,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_min_progressBar.setValue(0)
         self.hdf5_5min_progressBar.setValue(0)
         self.hdf5_trans_progressBar.setValue(0)
+        self.hdf5_time_progressBar.setValue(0)
         self.import_detail_textEdit.clear()
 
     def on_escapte_time(self, escape):
@@ -271,7 +273,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
             return
 
-
         self.import_running = True
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
@@ -284,7 +285,16 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if self.tdx_radioButton.isChecked():
             self.hdf5_import_thread = UseTdxImportToH5Thread(config)
         else:
-            self.hdf5_import_thread = UsePytdxImportToH5Thread(config)
+            self.import_status_label.setText("正在搜索通达信行情服务器....")
+            QApplication.processEvents()
+            hosts = search_best_tdx()
+            if not hosts:
+                self.import_status_label.setText("无法连接通达信行情服务器！请检查网络设置！")
+                QMessageBox.about(self, "提示", "无法连接的通达信行情服务器！请检查网络设置！")
+                self.import_running = False
+                self.start_import_pushButton.setEnabled(True)
+                return
+            self.hdf5_import_thread = UsePytdxImportToH5Thread(config, hosts)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
