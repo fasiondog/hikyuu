@@ -232,7 +232,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record):
                 row['highPrice'] = bar['high'] * 1000
                 row['lowPrice'] = bar['low'] * 1000
                 row['closePrice'] = bar['close'] * 1000
-                row['transAmount'] = bar['amount'] * 0.001
+                row['transAmount'] = int(bar['amount'] * 0.001)
                 row['transCount'] = bar['vol']
                 row.append()
                 add_record_count += 1
@@ -258,8 +258,9 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record):
     elif table.nrows == 0:
         #print(market, stock_record)
         table.remove()
+        pass
 
-    table.close()
+    #table.close()
     return add_record_count
 
 
@@ -403,8 +404,6 @@ def import_on_stock_time(connect, api, h5file, market, stock_record, max_days):
         need_days = (today - last_date).days
     else:
         need_days = max_days
-        #last_date = datetime.date(1990,1,1)
-        #need_days = (today - last_date).days
 
     date_list = []
     for i in range(need_days):
@@ -456,9 +455,7 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
 
     total = len(stock_list)
     for i, stock in enumerate(stock_list):
-        if stock[3] == 0 or stock[4] not in (STOCKTYPE.A, STOCKTYPE.B,
-                                             STOCKTYPE.GEM, STOCKTYPE.INDEX,
-                                             STOCKTYPE.ETF, STOCKTYPE.FUND):
+        if stock[3] == 0:
             if progress:
                 progress(i, total)
             continue

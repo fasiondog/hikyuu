@@ -28,26 +28,21 @@ from pytdx.hq import TdxHq_API
 from pytdx.config.hosts import hq_hosts
 
 def ping(ip, port=7709, multithread=False):
-    #print(ip, port, multithread)
     api = TdxHq_API(multithread=multithread)
     success = False
     starttime = time.time()
     try:
         with api.connect(ip, port, time_out=1):
             #x = api.get_security_count(0)
-            x = api.get_index_bars(7, 1, '000001', 1, 800)
+            #x = api.get_index_bars(7, 1, '000001', 800, 100)
+            x = api.get_security_bars(7, 0, '000001', 800, 100)
             if x:
-                success = True
-            y = api.get_security_bars(7, 0, '000001', 800, 800)
-            if x and y:
                 success = True
 
     except Exception as e:
         success = False
-        #print(e)
 
     endtime = time.time()
-    #print(success, endtime - starttime)
     return (success, endtime - starttime, ip, port)
 
 
@@ -64,15 +59,10 @@ def search_best_tdx():
 
 
 if __name__ == '__main__':
-    import os
     import time
     starttime = time.time()
 
-    #x = ping('119.147.212.81', 7709)
     x = search_best_tdx()
-    #x = [i for i in x if i[0] == True]
-    #x.sort(key=lambda item: item[1])
-    #print(x)
     for i in x:
         print(i)
     print(len(x))

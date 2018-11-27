@@ -549,10 +549,13 @@ p, li { white-space: pre-wrap; }
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>300</number>
+           <number>30</number>
           </property>
           <property name="value">
-           <number>70</number>
+           <number>3</number>
+          </property>
+          <property name="displayIntegerBase">
+           <number>7</number>
           </property>
          </widget>
         </item>
@@ -569,10 +572,10 @@ p, li { white-space: pre-wrap; }
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>2000</number>
+           <number>100</number>
           </property>
           <property name="value">
-           <number>70</number>
+           <number>3</number>
           </property>
          </widget>
         </item>
@@ -586,14 +589,14 @@ p, li { white-space: pre-wrap; }
         <item row="0" column="2">
          <widget class="QLabel" name="label_11">
           <property name="text">
-           <string>（最大300天）</string>
+           <string>（最大30天）</string>
           </property>
          </widget>
         </item>
         <item row="1" column="2">
          <widget class="QLabel" name="label_13">
           <property name="text">
-           <string>（最大2000天，慢）</string>
+           <string>（最大100天）</string>
           </property>
          </widget>
         </item>

@@ -2,7 +2,6 @@
 # -*- coding: utf8 -*-
 # cp936
 
-import time
 from PyQt5.QtCore import QThread, pyqtSignal
 
 class EscapetimeThread(QThread):

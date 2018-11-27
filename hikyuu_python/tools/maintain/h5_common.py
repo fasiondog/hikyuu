@@ -25,7 +25,7 @@
 import datetime
 import tables as tb
 
-HDF5_COMPRESS_LEVEL = 6
+HDF5_COMPRESS_LEVEL = 9
 
 class H5Record(tb.IsDescription):
     """HDF5基础K线数据格式（日线、分钟线、5分钟线"""
@@ -65,6 +65,10 @@ class H5MinuteTime(tb.IsDescription):
     vol = tb.UInt64Col()
 
 
+#------------------------------------------------------------------------------
+# K线数据
+#------------------------------------------------------------------------------
+
 def open_h5file(dest_dir, market, ktype):
     filename = "{}/{}_{}.h5".format(dest_dir, market.lower(), ktype.lower())
     h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
@@ -87,6 +91,7 @@ def get_h5table(h5file, market, code):
 
 
 def update_hdf5_extern_data(h5file, tablename, data_type):
+    """更新周线、月线、15分钟线等扩展数据索引"""
     def getWeekDate(olddate):
         y = olddate // 100000000
         m = olddate // 1000000 - y * 100
@@ -267,7 +272,7 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
 
 
 #------------------------------------------------------------------------------
-# 分笔
+# 分笔数据
 #------------------------------------------------------------------------------
 
 def open_trans_file(dest_dir, market):
@@ -291,6 +296,7 @@ def get_trans_table(h5file, market, code):
 
 
 def update_hdf5_trans_index(h5file, tablename):
+    """更新分笔数据按日索引"""
     try:
         table = h5file.get_node("/data", tablename)
     except:
@@ -338,12 +344,9 @@ def update_hdf5_trans_index(h5file, tablename):
             pre_index_date = cur_index_date
         index += 1
     index_table.flush()
-    table.close()
-    index_table.close()
-
 
 #------------------------------------------------------------------------------
-# 分时
+# 分时数据
 #------------------------------------------------------------------------------
 def open_time_file(dest_dir, market):
     filename = "{}/{}_time.h5".format(dest_dir, market.lower())

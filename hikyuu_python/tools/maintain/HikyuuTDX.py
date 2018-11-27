@@ -277,10 +277,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
 
-        self.escape_time = 0.0
-        self.escape_time_thread = EscapetimeThread()
-        self.escape_time_thread.message.connect(self.on_message_from_thread)
-        self.escape_time_thread.start()
+        self.import_status_label.setText("正在启动任务....")
+        QApplication.processEvents()
 
         if self.tdx_radioButton.isChecked():
             self.hdf5_import_thread = UseTdxImportToH5Thread(config)
@@ -298,6 +296,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
+
+        self.escape_time = 0.0
+        self.escape_time_thread = EscapetimeThread()
+        self.escape_time_thread.message.connect(self.on_message_from_thread)
+        self.escape_time_thread.start()
 
 
     @pyqtSlot()

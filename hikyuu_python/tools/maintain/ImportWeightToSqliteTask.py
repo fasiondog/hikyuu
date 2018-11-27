@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 import os
+import hashlib
 import sqlite3
 import urllib.request
 
@@ -37,21 +38,36 @@ class ImportWeightToSqliteTask:
 
     def __call__(self):
         total_count = 0
-        connect = sqlite3.connect(self.sqlitefile)
+        try:
+            connect = sqlite3.connect(self.sqlitefile)
+        except Exception as e:
+            self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+            self.queue.put([self.msg_name, '', 0, None, total_count])
+            return
+
         try:
             self.queue.put([self.msg_name, '正在下载...', 0, 0, 0])
             net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+            buffer = net_file.read()
+
+            self.queue.put([self.msg_name, '下载完成，正在校验是否存在更新...', 0, 0, 0])
+            new_md5 = old_md5 = hashlib.md5(buffer).hexdigest()
             dest_filename = self.dest_dir+'/weight.rar'
-            with open(dest_filename, 'wb') as file:
-                file.write(net_file.read())
+            if os.path.exists(dest_filename):
+                with open(dest_filename, 'rb') as oldfile:
+                    old_md5 = hashlib.md5(oldfile.read()).hexdigest()
 
-            self.queue.put([self.msg_name, '下载完成，正在解压...', 0, 0, 0])
-            os.system('unrar x -o+ -inul {} {}'.format(dest_filename, self.dest_dir))
+            if new_md5 != old_md5:
+                with open(dest_filename, 'wb') as file:
+                    file.write(net_file.read())
 
-            self.queue.put([self.msg_name, '解压完毕，正在导入权息数据...', 0, 0, 0])
-            total_count = qianlong_import_weight(connect, self.dest_dir + '/weight', 'SH')
-            total_count += qianlong_import_weight(connect, self.dest_dir + '/weight', 'SZ')
-            self.queue.put([self.msg_name, '导入完成!', 0, 0, total_count])
+                self.queue.put([self.msg_name, '下载完成，正在解压...', 0, 0, 0])
+                os.system('unrar x -o+ -inul {} {}'.format(dest_filename, self.dest_dir))
+
+                self.queue.put([self.msg_name, '解压完毕，正在导入权息数据...', 0, 0, 0])
+                total_count = qianlong_import_weight(connect, self.dest_dir + '/weight', 'SH')
+                total_count += qianlong_import_weight(connect, self.dest_dir + '/weight', 'SZ')
+                self.queue.put([self.msg_name, '导入完成!', 0, 0, total_count])
 
         except Exception as e:
             self.queue.put([self.msg_name, str(e), -1, 0, total_count])
