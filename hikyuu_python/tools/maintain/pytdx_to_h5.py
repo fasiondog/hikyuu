@@ -546,13 +546,6 @@ if __name__ == '__main__':
     print("\n导入数量：", add_count)
 
 
-    #x = api.get_history_minute_time_data(TDXParams.MARKET_SH, '000001', 20181123)
-    #print(len(x))
-    #print(x[0])
-    #print(x[-2])
-    #print(x[-1])
-
-
     api.disconnect()
     connect.close()
 

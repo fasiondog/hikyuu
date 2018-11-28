@@ -27,7 +27,6 @@ from pathlib import Path
 
 import mysql.connector
 
-
 from common import MARKETID, get_stktype_list
 
 
@@ -154,8 +153,6 @@ def get_lastdatetime(connect, tablename):
     cur.execute("select max(date) from {}".format(tablename))
     a = cur.fetchone()
     return a[0]
-
-
 
 
 if __name__ == '__main__':

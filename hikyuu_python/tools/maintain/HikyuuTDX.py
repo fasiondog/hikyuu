@@ -94,18 +94,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         #初始化pytdx配置及显示
         pytdx_enable = import_config.getboolean('pytdx', 'enable', fallback=False)
-        pytdx_server = import_config.get('pytdx', 'server', fallback='招商证券深圳行情')
         self.pytdx_radioButton.setChecked(pytdx_enable)
-        self.tdx_servers_comboBox.setDuplicatesEnabled(True)
-        default_tdx_index = 0
-        for i, host in enumerate(hq_hosts):
-            self.tdx_servers_comboBox.addItem("{}({})".format(host[0], host[1]), host[1])
-            if host[0] == pytdx_server:
-                default_tdx_index = i
-        self.tdx_servers_comboBox.setCurrentIndex(default_tdx_index)
-        self.tdx_port_lineEdit.setText(str(hq_hosts[default_tdx_index][2]))
-        self.tdx_servers_comboBox.setEnabled(pytdx_enable)
-        self.tdx_port_lineEdit.setEnabled(pytdx_enable)
 
         #初始化hdf5设置
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
@@ -129,10 +118,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         import_config['weight'] = {'enable': self.import_weight_checkBox.isChecked(),}
         import_config['tdx'] = {'enable': self.tdx_radioButton.isChecked(),
                                 'dir': self.tdx_dir_lineEdit.text()}
-        import_config['pytdx'] = {'enable': self.pytdx_radioButton.isChecked(),
-                                  'server': self.tdx_servers_comboBox.currentText(),
-                                  'ip': hq_hosts[self.tdx_servers_comboBox.currentIndex()][1],
-                                  'port': hq_hosts[self.tdx_servers_comboBox.currentIndex()][2]}
+        import_config['pytdx'] = {'enable': self.pytdx_radioButton.isChecked()}
         import_config['hdf5'] = {'enable': True,
                                  'dir': self.hdf5_dir_lineEdit.text()}
         return import_config
@@ -151,17 +137,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         tdx_enable = self.tdx_radioButton.isChecked()
         self.tdx_dir_lineEdit.setEnabled(tdx_enable)
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
-        self.tdx_servers_comboBox.setEnabled(not tdx_enable)
-        self.tdx_port_lineEdit.setEnabled(not tdx_enable)
         self.import_trans_checkBox.setChecked(not tdx_enable)
         self.import_trans_checkBox.setEnabled(not tdx_enable)
         self.import_time_checkBox.setChecked(not tdx_enable)
         self.import_time_checkBox.setEnabled(not tdx_enable)
         self.trans_max_days_spinBox.setEnabled(not tdx_enable)
         self.time_max_days_spinBox.setEnabled(not tdx_enable)
-        self.ping_tdx_pushButton.setEnabled(not tdx_enable)
-        self.search_tdx_pushButton.setEnabled(not tdx_enable)
-
 
     @pyqtSlot()
     def on_select_tdx_dir_pushButton_clicked(self):

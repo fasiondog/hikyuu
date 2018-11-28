@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1011</width>
-    <height>544</height>
+    <height>488</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,7 +49,7 @@
         <x>10</x>
         <y>310</y>
         <width>481</width>
-        <height>191</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="title">
@@ -59,7 +59,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>50</y>
+         <y>90</y>
          <width>451</width>
          <height>25</height>
         </rect>
@@ -90,88 +90,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QLabel" name="label_10">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>120</y>
-         <width>108</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>通达信行情服务器：</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="tdx_servers_comboBox">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>120</y>
-         <width>221</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_3">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>120</y>
-         <width>31</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>端口：</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="tdx_port_lineEdit">
-       <property name="geometry">
-        <rect>
-         <x>400</x>
-         <y>120</y>
-         <width>71</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>10</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>7709</string>
-       </property>
-       <property name="maxLength">
-        <number>6</number>
-       </property>
-      </widget>
       <widget class="QRadioButton" name="pytdx_radioButton">
        <property name="enabled">
         <bool>true</bool>
@@ -179,7 +97,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>100</y>
+         <y>30</y>
          <width>125</width>
          <height>16</height>
         </rect>
@@ -192,45 +110,13 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>30</y>
+         <y>70</y>
          <width>481</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>使用通达信盘后数据（不支持分笔、分时数据）</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="ping_tdx_pushButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>150</y>
-         <width>75</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>测试连接</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="search_tdx_pushButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>110</x>
-         <y>150</y>
-         <width>151</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>查找速度最快的服务器</string>
+        <string>使用通达信盘后数据（不支持分笔、分时数据，需要配置安装路径）</string>
        </property>
       </widget>
      </widget>
@@ -282,7 +168,7 @@
         <x>510</x>
         <y>70</y>
         <width>481</width>
-        <height>431</height>
+        <height>381</height>
        </rect>
       </property>
       <property name="title">
@@ -390,7 +276,7 @@
          <x>10</x>
          <y>180</y>
          <width>461</width>
-         <height>241</height>
+         <height>191</height>
         </rect>
        </property>
        <property name="frameShape">

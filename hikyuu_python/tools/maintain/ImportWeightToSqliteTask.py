@@ -57,6 +57,7 @@ class ImportWeightToSqliteTask:
                 with open(dest_filename, 'rb') as oldfile:
                     old_md5 = hashlib.md5(oldfile.read()).hexdigest()
 
+            #如果没变化不需要解压导入
             if new_md5 != old_md5:
                 with open(dest_filename, 'wb') as file:
                     file.write(net_file.read())
