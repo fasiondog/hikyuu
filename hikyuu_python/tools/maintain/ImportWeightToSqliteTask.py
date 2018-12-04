@@ -53,7 +53,7 @@ class ImportWeightToSqliteTask:
             self.queue.put([self.msg_name, '下载完成，正在校验是否存在更新...', 0, 0, 0])
             new_md5 = old_md5 = hashlib.md5(buffer).hexdigest()
             dest_filename = self.dest_dir+'/weight.rar'
-            old_md5 = new_md5
+            old_md5 = None
             if os.path.exists(dest_filename):
                 with open(dest_filename, 'rb') as oldfile:
                     old_md5 = hashlib.md5(oldfile.read()).hexdigest()
@@ -64,7 +64,9 @@ class ImportWeightToSqliteTask:
                     file.write(net_file.read())
 
                 self.queue.put([self.msg_name, '下载完成，正在解压...', 0, 0, 0])
-                os.system('unrar x -o+ -inul {} {}'.format(dest_filename, self.dest_dir))
+                x = os.system('unrar x -o+ -inul {} {}'.format(dest_filename, self.dest_dir))
+                if x != 0:
+                    raise Exception("无法找到unrar命令！")
 
                 self.queue.put([self.msg_name, '解压完毕，正在导入权息数据...', 0, 0, 0])
                 total_count = qianlong_import_weight(connect, self.dest_dir + '/weight', 'SH')
