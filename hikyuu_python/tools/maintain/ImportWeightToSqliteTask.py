@@ -53,6 +53,7 @@ class ImportWeightToSqliteTask:
             self.queue.put([self.msg_name, '下载完成，正在校验是否存在更新...', 0, 0, 0])
             new_md5 = old_md5 = hashlib.md5(buffer).hexdigest()
             dest_filename = self.dest_dir+'/weight.rar'
+            old_md5 = new_md5
             if os.path.exists(dest_filename):
                 with open(dest_filename, 'rb') as oldfile:
                     old_md5 = hashlib.md5(oldfile.read()).hexdigest()

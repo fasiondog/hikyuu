@@ -79,6 +79,7 @@ class UsePytdxImportToH5Thread(QThread):
 
         cur_host = 0
 
+        #以下按数据量从大到小依次使用速度从高到低的TDX服务器
         if self.config.getboolean('ktype', 'trans', fallback=False):
             self.tasks.append(
                 ImportPytdxTransToH5(
@@ -95,20 +96,6 @@ class UsePytdxImportToH5Thread(QThread):
                     dest_dir, config['ktype']['trans_max_days']
                 )
             )
-            cur_host += 1
-
-        if self.config.getboolean('ktype', 'time', fallback=False):
-            self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SH',
-                                                  self.quotations,
-                                                  use_hosts[cur_host][0], use_hosts[cur_host][1],
-                                                  dest_dir,
-                                                  config['ktype']['time_max_days']))
-            cur_host += 1
-            self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SZ',
-                                                  self.quotations,
-                                                  use_hosts[cur_host][0], use_hosts[cur_host][1],
-                                                  dest_dir,
-                                                  config['ktype']['time_max_days']))
             cur_host += 1
 
         if self.config.getboolean('ktype', 'min', fallback=False):
@@ -128,6 +115,20 @@ class UsePytdxImportToH5Thread(QThread):
                     dest_dir
                 )
             )
+            cur_host += 1
+
+        if self.config.getboolean('ktype', 'time', fallback=False):
+            self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SH',
+                                                  self.quotations,
+                                                  use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                                  dest_dir,
+                                                  config['ktype']['time_max_days']))
+            cur_host += 1
+            self.tasks.append(ImportPytdxTimeToH5(self.queue, sqlite_file_name, 'SZ',
+                                                  self.quotations,
+                                                  use_hosts[cur_host][0], use_hosts[cur_host][1],
+                                                  dest_dir,
+                                                  config['ktype']['time_max_days']))
             cur_host += 1
 
         if self.config.getboolean('ktype', 'min5', fallback=False):

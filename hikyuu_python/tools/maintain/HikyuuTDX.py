@@ -137,9 +137,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         tdx_enable = self.tdx_radioButton.isChecked()
         self.tdx_dir_lineEdit.setEnabled(tdx_enable)
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
-        self.import_trans_checkBox.setChecked(not tdx_enable)
         self.import_trans_checkBox.setEnabled(not tdx_enable)
-        self.import_time_checkBox.setChecked(not tdx_enable)
         self.import_time_checkBox.setEnabled(not tdx_enable)
         self.trans_max_days_spinBox.setEnabled(not tdx_enable)
         self.time_max_days_spinBox.setEnabled(not tdx_enable)
@@ -263,6 +261,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         if self.tdx_radioButton.isChecked():
             self.hdf5_import_thread = UseTdxImportToH5Thread(config)
+
         else:
             self.import_status_label.setText("正在搜索通达信行情服务器....")
             QApplication.processEvents()
