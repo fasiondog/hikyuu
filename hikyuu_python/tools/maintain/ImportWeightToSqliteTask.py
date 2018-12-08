@@ -51,7 +51,8 @@ class ImportWeightToSqliteTask:
             buffer = net_file.read()
 
             self.queue.put([self.msg_name, '下载完成，正在校验是否存在更新...', 0, 0, 0])
-            new_md5 = old_md5 = hashlib.md5(buffer).hexdigest()
+            new_md5 = hashlib.md5(buffer).hexdigest()
+
             dest_filename = self.dest_dir+'/weight.rar'
             old_md5 = None
             if os.path.exists(dest_filename):
@@ -61,7 +62,7 @@ class ImportWeightToSqliteTask:
             #如果没变化不需要解压导入
             if new_md5 != old_md5:
                 with open(dest_filename, 'wb') as file:
-                    file.write(net_file.read())
+                    file.write(buffer)
 
                 self.queue.put([self.msg_name, '下载完成，正在解压...', 0, 0, 0])
                 x = os.system('unrar x -o+ -inul {} {}'.format(dest_filename, self.dest_dir))
