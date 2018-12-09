@@ -126,6 +126,8 @@ class UseTdxImportToH5Thread(QThread):
                 continue
 
             if taskname == 'IMPORT_WEIGHT':
+                if market == 'INFO':
+                    self.send_message(['INFO', ktype])
                 self.send_message(['IMPORT_WEIGHT', market, total])
             elif taskname == 'IMPORT_KDATA':
                 hdf5_import_progress[market][ktype] = progress

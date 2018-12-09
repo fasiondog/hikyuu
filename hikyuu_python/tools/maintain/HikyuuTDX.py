@@ -2,6 +2,7 @@
 
 import os
 import logging
+import datetime
 from configparser import ConfigParser
 from pytdx.config.hosts import hq_hosts
 
@@ -59,6 +60,17 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.import_status_label.setText('')
         self.import_detail_textEdit.clear()
         self.reset_progress_bar()
+        self.day_start_dateEdit.setMinimumDate(datetime.date(1990,12,19))
+        self.day_start_dateEdit.setDate(datetime.date(1990,12,19))
+        today = datetime.date.today()
+        self.min_start_dateEdit.setDate(today - datetime.timedelta(90))
+        self.min5_start_dateEdit.setDate(today - datetime.timedelta(90))
+        self.min_start_dateEdit.setMinimumDate(datetime.date(1990,12,19))
+        self.min5_start_dateEdit.setMinimumDate(datetime.date(1990,12,19))
+        self.trans_start_dateEdit.setDate(today - datetime.timedelta(7))
+        self.time_start_dateEdit.setDate(today - datetime.timedelta(7))
+        self.trans_start_dateEdit.setMinimumDate(today - datetime.timedelta(90))
+        self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
@@ -77,24 +89,23 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.import_min5_checkBox.setChecked(import_config.getboolean('ktype', 'min5', fallback=True))
         self.import_trans_checkBox.setChecked(import_config.getboolean('ktype', 'trans', fallback=False))
         self.import_time_checkBox.setChecked(import_config.getboolean('ktype', 'time', fallback=False))
-        self.trans_max_days_spinBox.setValue(import_config.getint('ktype', 'trans_max_days', fallback=70))
-        self.time_max_days_spinBox.setValue(import_config.getint('ktype', 'time_max_days', fallback=70))
+        #self.trans_max_days_spinBox.setValue(import_config.getint('ktype', 'trans_max_days', fallback=70))
+        #self.time_max_days_spinBox.setValue(import_config.getint('ktype', 'time_max_days', fallback=70))
 
         #初始化权息数据设置
         self.import_weight_checkBox.setChecked(import_config.getboolean('weight', 'enable', fallback=True))
 
         #初始化通道信目录配置
-        tdx_enable = import_config.getboolean('tdx', 'enable', fallback=True)
+        tdx_enable = import_config.getboolean('tdx', 'enable', fallback=False)
         tdx_dir = import_config.get('tdx', 'dir', fallback='d:\TdxW_HuaTai')
         self.tdx_radioButton.setChecked(tdx_enable)
         self.tdx_dir_lineEdit.setEnabled(tdx_enable)
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
         self.tdx_dir_lineEdit.setText(tdx_dir)
-        self.tdx_radioButton.toggled.connect(self.on_tdx_or_pytdx_toggled)
 
         #初始化pytdx配置及显示
-        pytdx_enable = import_config.getboolean('pytdx', 'enable', fallback=False)
-        self.pytdx_radioButton.setChecked(pytdx_enable)
+        self.pytdx_radioButton.setChecked(import_config.getboolean('pytdx', 'enable', fallback=True))
+        self.use_tdx_number_spinBox.setValue(import_config.getint('pytdx','use_tdx_number', fallback=10))
 
         #初始化hdf5设置
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
@@ -113,12 +124,16 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                   'min5': self.import_min5_checkBox.isChecked(),
                                   'trans': self.import_trans_checkBox.isChecked(),
                                   'time': self.import_time_checkBox.isChecked(),
-                                  'trans_max_days': self.trans_max_days_spinBox.value(),
-                                  'time_max_days': self.time_max_days_spinBox.value()}
+                                  'day_start_date': self.day_start_dateEdit.date().toString('yyyy-MM-dd'),
+                                  'min_start_date': self.min_start_dateEdit.date().toString('yyyy-MM-dd'),
+                                  'min5_start_date': self.min5_start_dateEdit.date().toString('yyyy-MM-dd'),
+                                  'trans_start_date': self.trans_start_dateEdit.date().toString('yyyy-MM-dd'),
+                                  'time_start_date': self.time_start_dateEdit.date().toString('yyyy-MM-dd')}
         import_config['weight'] = {'enable': self.import_weight_checkBox.isChecked(),}
         import_config['tdx'] = {'enable': self.tdx_radioButton.isChecked(),
                                 'dir': self.tdx_dir_lineEdit.text()}
-        import_config['pytdx'] = {'enable': self.pytdx_radioButton.isChecked()}
+        import_config['pytdx'] = {'enable': self.pytdx_radioButton.isChecked(),
+                                  'use_tdx_number': self.use_tdx_number_spinBox.value()}
         import_config['hdf5'] = {'enable': True,
                                  'dir': self.hdf5_dir_lineEdit.text()}
         return import_config
@@ -133,14 +148,27 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                          '1MIN': self.hdf5_min_progressBar,
                                          '5MIN': self.hdf5_5min_progressBar}
 
+    @pyqtSlot()
+    def on_pytdx_radioButton_clicked(self):
+        if self.pytdx_radioButton.isChecked():
+            self.tdx_radioButton.setChecked(False)
+        self.on_tdx_or_pytdx_toggled()
+
+    @pyqtSlot()
+    def on_tdx_radioButton_clicked(self):
+        if self.tdx_radioButton.isChecked():
+            self.pytdx_radioButton.setChecked(False)
+        self.on_tdx_or_pytdx_toggled()
+
     def on_tdx_or_pytdx_toggled(self):
         tdx_enable = self.tdx_radioButton.isChecked()
         self.tdx_dir_lineEdit.setEnabled(tdx_enable)
         self.select_tdx_dir_pushButton.setEnabled(tdx_enable)
         self.import_trans_checkBox.setEnabled(not tdx_enable)
         self.import_time_checkBox.setEnabled(not tdx_enable)
-        self.trans_max_days_spinBox.setEnabled(not tdx_enable)
-        self.time_max_days_spinBox.setEnabled(not tdx_enable)
+        self.trans_start_dateEdit.setEnabled(not tdx_enable)
+        self.time_start_dateEdit.setEnabled(not tdx_enable)
+        self.use_tdx_number_spinBox.setEnabled(not tdx_enable)
 
     @pyqtSlot()
     def on_select_tdx_dir_pushButton_clicked(self):
@@ -151,16 +179,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if dlg.exec_():
             dirname = dlg.selectedFiles()
             self.tdx_dir_lineEdit.setText(dirname[0])
-
-    @pyqtSlot()
-    def on_select_dzh_dir_pushButton_clicked(self):
-        dlg = QFileDialog()
-        dlg.setFileMode(QFileDialog.Directory)
-        config = self.getCurrentConfig()
-        dlg.setDirectory(config['dzh']['dir'])
-        if dlg.exec_():
-            dirname = dlg.selectedFiles()
-            self.dzh_dir_lineEdit.setText(dirname[0])
 
     @pyqtSlot()
     def on_hdf5_dir_pushButton_clicked(self):
@@ -195,7 +213,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.import_status_label.setText("耗时：{:>.2f} 秒 （{:>.2f}分钟）".format(self.escape_time, self.escape_time/60))
 
         elif msg_name == 'HDF5_IMPORT':
-            if msg_task_name == 'THREAD':
+            if msg_task_name == 'INFO':
+                self.import_detail_textEdit.append(msg[2])
+
+            elif msg_task_name == 'THREAD':
                 status = msg[2]
                 if status == 'FAILURE':
                     self.import_status_label.setText("耗时：{:>.2f} 秒 导入异常！".format(self.escape_time))
@@ -261,18 +282,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         if self.tdx_radioButton.isChecked():
             self.hdf5_import_thread = UseTdxImportToH5Thread(config)
-
         else:
-            self.import_status_label.setText("正在搜索通达信行情服务器....")
-            QApplication.processEvents()
-            hosts = search_best_tdx()
-            if not hosts:
-                self.import_status_label.setText("无法连接通达信行情服务器！请检查网络设置！")
-                QMessageBox.about(self, "提示", "无法连接的通达信行情服务器！请检查网络设置！")
-                self.import_running = False
-                self.start_import_pushButton.setEnabled(True)
-                return
-            self.hdf5_import_thread = UsePytdxImportToH5Thread(config, hosts)
+            self.hdf5_import_thread = UsePytdxImportToH5Thread(config)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
@@ -282,14 +293,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.message.connect(self.on_message_from_thread)
         self.escape_time_thread.start()
 
-
-    @pyqtSlot()
-    def on_ping_tdx_pushButton_clicked(self):
-        pass
-
-    @pyqtSlot()
-    def on_search_tdx_pushButton_clicked(self):
-        pass
 
 
 if __name__ == "__main__":

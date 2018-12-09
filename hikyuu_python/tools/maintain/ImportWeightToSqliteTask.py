@@ -41,7 +41,8 @@ class ImportWeightToSqliteTask:
         try:
             connect = sqlite3.connect(self.sqlitefile)
         except Exception as e:
-            self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+            #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+            self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
             self.queue.put([self.msg_name, '', 0, None, total_count])
             return
 
@@ -74,8 +75,12 @@ class ImportWeightToSqliteTask:
                 total_count += qianlong_import_weight(connect, self.dest_dir + '/weight', 'SZ')
                 self.queue.put([self.msg_name, '导入完成!', 0, 0, total_count])
 
+            else:
+                self.queue.put([self.msg_name, 'INFO', '权息数据无变化', 0, 0])
+
         except Exception as e:
-            self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+            #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
+            self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
         finally:
             connect.commit()
             connect.close()

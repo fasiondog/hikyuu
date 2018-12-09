@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1011</width>
-    <height>488</height>
+    <height>559</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,9 +47,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>310</y>
+        <y>390</y>
         <width>481</width>
-        <height>141</height>
+        <height>131</height>
        </rect>
       </property>
       <property name="title">
@@ -90,22 +90,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QRadioButton" name="pytdx_radioButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>30</y>
-         <width>125</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>使用Pytdx（推荐）</string>
-       </property>
-      </widget>
       <widget class="QRadioButton" name="tdx_radioButton">
        <property name="geometry">
         <rect>
@@ -118,6 +102,55 @@
        <property name="text">
         <string>使用通达信盘后数据（不支持分笔、分时数据，需要配置安装路径）</string>
        </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>371</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="pytdx_radioButton">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>使用Pytdx（推荐）</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>同时使用</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="use_tdx_number_spinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+          <property name="value">
+           <number>10</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>个通达信服务器进行下载</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_3">
@@ -168,7 +201,7 @@
         <x>510</x>
         <y>70</y>
         <width>481</width>
-        <height>381</height>
+        <height>451</height>
        </rect>
       </property>
       <property name="title">
@@ -276,7 +309,7 @@
          <x>10</x>
          <y>180</y>
          <width>461</width>
-         <height>191</height>
+         <height>261</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -311,7 +344,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>110</y>
         <width>481</width>
-        <height>181</height>
+        <height>261</height>
        </rect>
       </property>
       <property name="title">
@@ -371,16 +404,16 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="import_min_checkBox">
+         <widget class="QCheckBox" name="import_min5_checkBox">
           <property name="text">
-           <string>1分钟线</string>
+           <string>5分钟线</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="import_min5_checkBox">
+         <widget class="QCheckBox" name="import_min_checkBox">
           <property name="text">
-           <string>5分钟线</string>
+           <string>1分钟线</string>
           </property>
          </widget>
         </item>
@@ -424,65 +457,98 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>120</y>
-         <width>411</width>
-         <height>48</height>
+         <width>271</width>
+         <height>126</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="1">
-         <widget class="QSpinBox" name="trans_max_days_spinBox">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>30</number>
-          </property>
-          <property name="value">
-           <number>3</number>
-          </property>
-          <property name="displayIntegerBase">
-           <number>7</number>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>初次导入1分钟线起始日期：</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_7">
+         <widget class="QLabel" name="label_10">
           <property name="text">
-           <string>初次导入分时最大导入天数（自然日）：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QSpinBox" name="time_max_days_spinBox">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>3</number>
+           <string>初次导入5分钟线起始日期：</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>初次导入日线起始日期：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QDateEdit" name="min_start_dateEdit">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDateEdit" name="min5_start_dateEdit">
+          <property name="minimumDateTime">
+           <datetime>
+            <hour>0</hour>
+            <minute>0</minute>
+            <second>0</second>
+            <year>1990</year>
+            <month>1</month>
+            <day>1</day>
+           </datetime>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>初次导入分时起始日期：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>初次导入分笔最大导入天数（自然日）：</string>
+           <string>初次导入分笔起始日期：</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>（最大30天）</string>
+        <item row="0" column="1">
+         <widget class="QDateEdit" name="day_start_dateEdit">
+          <property name="minimumDateTime">
+           <datetime>
+            <hour>0</hour>
+            <minute>0</minute>
+            <second>0</second>
+            <year>1990</year>
+            <month>1</month>
+            <day>1</day>
+           </datetime>
+          </property>
+          <property name="calendarPopup">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>（最大100天）</string>
+        <item row="3" column="1">
+         <widget class="QDateEdit" name="trans_start_dateEdit">
+          <property name="calendarPopup">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QDateEdit" name="time_start_dateEdit">
+          <property name="calendarPopup">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
