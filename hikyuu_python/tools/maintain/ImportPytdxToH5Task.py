@@ -36,7 +36,7 @@ class ProgressBar:
 
 
 class ImportPytdxToH5:
-    def __init__(self, queue, sqlitefile, market, ktype, quotations, ip, port, dest_dir):
+    def __init__(self, queue, sqlitefile, market, ktype, quotations, ip, port, dest_dir, start_datetime):
         self.task_name = 'IMPORT_KDATA'
         self.queue = queue
         self.sqlitefile = sqlitefile
@@ -46,7 +46,7 @@ class ImportPytdxToH5:
         self.ip = ip
         self.port = port
         self.dest_dir = dest_dir
-
+        self.startDatetime = start_datetime
 
     def __call__(self):
         count = 0
@@ -57,7 +57,7 @@ class ImportPytdxToH5:
             api = TdxHq_API()
             api.connect(self.ip, self.port)
             count = import_data(connect, self.market, self.ktype, self.quotations,
-                                api, self.dest_dir, progress)
+                                api, self.dest_dir, self.startDatetime, progress)
         except Exception as e:
             print(e)
         finally:

@@ -171,7 +171,7 @@ def guess_5min_n_step(last_datetime):
     return (n, step)
 
 
-def import_one_stock_data(connect, api, h5file, market, ktype, stock_record):
+def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, startDate=199012191500):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
 
@@ -179,7 +179,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record):
                                               stock_record[4]
 
     table = get_h5table(h5file, market, code)
-    last_datetime = table[-1]['datetime'] if table.nrows > 0 else 199012191500
+    last_datetime = table[-1]['datetime'] if table.nrows > 0 else startDate
 
     today = datetime.date.today()
     if ktype == 'DAY':
@@ -264,7 +264,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record):
     return add_record_count
 
 
-def import_data(connect, market, ktype, quotations, api, dest_dir, progress=ProgressBar):
+def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199012190000, progress=ProgressBar):
     """导入通达信指定盘后数据路径中的K线数据。注：只导入基础信息数据库中存在的股票。
 
     :param connect   : sqlit3链接
@@ -289,7 +289,7 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, progress=Prog
                 progress(i, total)
             continue
 
-        this_count = import_one_stock_data(connect, api, h5file, market, ktype, stock)
+        this_count = import_one_stock_data(connect, api, h5file, market, ktype, stock, startDate)
         add_record_count += this_count
         if this_count > 0:
             if ktype == 'DAY':
