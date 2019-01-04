@@ -78,8 +78,28 @@ public:
     /** 返回一年中的第几天，1月1日为1年中的第一天 */
     int dayOfYear() const;
 
+    /** 返回月度起始日期 */
+    Datetime startOfMonth() const;
+
     /** 返回月末日期，如12月31日 */
     Datetime endOfMonth() const;
+
+    /** 返回周起始日期 */
+    //Datetime startOfWeek() const;
+
+    //Datetime endOfWeek() const;
+
+    /** 返回年度起始日期 */
+    Datetime startOfYear() const;
+
+    /** 返回年度结束日期 */
+    Datetime endOfYear() const;
+
+    /** 返回季度起始日期 */
+    Datetime startOfQuarter() const;
+
+    /** 返回季度结束日期 */
+    Datetime endOfQuarter() const;
 
     /** 下一自然日 */
     Datetime nextDay() const;
@@ -233,6 +253,17 @@ inline Datetime Datetime::endOfMonth() const {
     return date().end_of_month();
 }
 
+inline Datetime Datetime::startOfMonth() const {
+    return Datetime(year(), month(), 1);
+}
+
+inline Datetime Datetime::startOfYear() const {
+    return Datetime(year(), 1, 1);
+}
+
+inline Datetime Datetime::endOfYear() const {
+    return Datetime(year(), 12, 31);
+}
 
 } /* namespace hku */
 #endif /* DATETIME_H_ */

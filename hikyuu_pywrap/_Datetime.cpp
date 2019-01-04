@@ -36,6 +36,7 @@ void export_Datetime() {
             .def("toString", &Datetime::toString)
             .def("dayOfWeek", &Datetime::dayOfWeek)
             .def("dayOfYear", &Datetime::dayOfYear)
+            .def("startOfMonth", &Datetime::startOfMonth)
             .def("endOfMonth", &Datetime::endOfMonth)
             .def("nextDay", &Datetime::nextDay)
             .def("min", &Datetime::min).staticmethod("min")

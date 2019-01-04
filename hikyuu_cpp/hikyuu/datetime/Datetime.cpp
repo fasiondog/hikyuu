@@ -104,4 +104,39 @@ Datetime Datetime::nextDay() const {
     return Datetime(next);
 }
 
+Datetime Datetime::startOfQuarter() const {
+    int m = month();
+    int y = year();
+    Datetime result;
+    if (m <= 3) {
+        result = Datetime(y, 1, 1);
+    } else if (m <= 6) {
+        result =  Datetime(y, 4, 1);
+    } else if (m <= 9) {
+        result = Datetime(y, 7, 1);
+    } else if (m <= 12) {
+        result = Datetime(y, 10, 1);
+    }
+
+    return result;
+}
+
+Datetime Datetime::endOfQuarter() const {
+    int m = month();
+    int y = year();
+    Datetime result;
+    if (m <= 3) {
+        result = Datetime(y, 1, 31);
+    } else if (m <= 6) {
+        result =  Datetime(y, 4, 30);
+    } else if (m <= 9) {
+        result = Datetime(y, 7, 31);
+    } else if (m <= 12) {
+        result = Datetime(y, 10, 31);
+    }
+
+    return result;
+}
+
+
 } /* namespace hku */
