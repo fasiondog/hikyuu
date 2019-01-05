@@ -84,10 +84,17 @@ public:
     /** 返回月末日期，如12月31日 */
     Datetime endOfMonth() const;
 
-    /** 返回周起始日期 */
-    //Datetime startOfWeek() const;
+    /**
+     * 返回指定的本周中第几天的日期，周日为0天，周六为第6天
+     * @param day 指明本周的第几天，如不在0~6之间，将返回Null
+     */
+    Datetime dateOfWeek(int day) const;
 
-    //Datetime endOfWeek() const;
+    /** 返回周起始日期，即周日日期 */
+    Datetime startOfWeek() const;
+
+    /** 返回周结束日期，即周六日期 */
+    Datetime endOfWeek() const;
 
     /** 返回年度起始日期 */
     Datetime startOfYear() const;
@@ -112,6 +119,9 @@ public:
 
     /** 返回本地计算机当前时刻 */
     static Datetime now();
+
+    /** 返回本地计算机今日日期 */
+    static Datetime today();
 
 private:
     bt::ptime m_data;
@@ -264,6 +274,15 @@ inline Datetime Datetime::startOfYear() const {
 inline Datetime Datetime::endOfYear() const {
     return Datetime(year(), 12, 31);
 }
+
+inline Datetime Datetime::startOfWeek() const {
+    return dateOfWeek(0);
+}
+
+inline Datetime Datetime::endOfWeek() const {
+    return dateOfWeek(6);
+}
+
 
 } /* namespace hku */
 #endif /* DATETIME_H_ */

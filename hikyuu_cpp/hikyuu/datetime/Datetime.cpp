@@ -85,6 +85,11 @@ Datetime Datetime::now() {
     return Datetime(bt::microsec_clock::local_time());
 }
 
+Datetime Datetime::today() {
+    Datetime x = Datetime::now();
+    return Datetime(x.year(), x.month(), x.day());
+}
+
 DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end) {
     DatetimeList result;
     bd::date start_day = start.date();
@@ -102,6 +107,15 @@ Datetime Datetime::nextDay() const {
     bd::date_duration dd(1);
     bd::date next = today + dd;
     return Datetime(next);
+}
+
+Datetime Datetime::dateOfWeek(int day) const {
+    if (day < 0 || day > 6)
+        return Null<Datetime>();
+
+    int today = dayOfWeek();
+    bd::date_duration dd(day - today);
+    return date() + dd;
 }
 
 Datetime Datetime::startOfQuarter() const {
@@ -126,13 +140,13 @@ Datetime Datetime::endOfQuarter() const {
     int y = year();
     Datetime result;
     if (m <= 3) {
-        result = Datetime(y, 1, 31);
+        result = Datetime(y, 3, 31);
     } else if (m <= 6) {
-        result =  Datetime(y, 4, 30);
+        result =  Datetime(y, 6, 30);
     } else if (m <= 9) {
-        result = Datetime(y, 7, 31);
+        result = Datetime(y, 9, 30);
     } else if (m <= 12) {
-        result = Datetime(y, 10, 31);
+        result = Datetime(y, 12, 31);
     }
 
     return result;

@@ -64,6 +64,15 @@ dayOfWeek(self)
     :rtype: int
 """
 
+Datetime.dateOfWeek.__doc__ = """
+dateOfWeek(self, day)
+    
+    返回指定的本周中第几天的日期，周日为0天，周六为第6天
+        
+    :param int day: 指明本周的第几天，如不在0~6之间，将返回constant.null_datetime
+    :rtype: Datetime
+"""
+
 Datetime.dayOfYear.__doc__ = """
 dayOfYear(self)
     
@@ -72,10 +81,66 @@ dayOfYear(self)
     :rtype: int
 """
 
+Datetime.startOfWeek.__doc__ = """
+startOfWeek(self)
+    
+    返回周起始日期，即周日日期
+        
+    :rtype: Datetime
+"""
+
+Datetime.endOfWeek.__doc__ = """
+endOfWeek(self)
+    
+    返回周结束日期，即周六日期
+        
+    :rtype: Datetime
+"""
+
+Datetime.startOfMonth.__doc__ = """
+startOfMonth(self)
+    
+    返回月度起始日期
+        
+    :rtype: Datetime
+"""
+
 Datetime.endOfMonth.__doc__ = """
 endOfMonth(self)
     
     返回月末最后一天日期
+"""
+
+Datetime.startOfQuarter.__doc__ = """
+startOfQuarter(self)
+    
+    返回季度起始日期
+        
+    :rtype: Datetime
+"""
+
+Datetime.endOfQuarter.__doc__ = """
+endOfQuarter(self)
+    
+    返回季度结束日期
+        
+    :rtype: Datetime
+"""
+
+Datetime.startOfYear.__doc__ = """
+startOfYear(self)
+    
+    返回年度起始日期
+        
+    :rtype: Datetime
+"""
+
+Datetime.endOfYear.__doc__ = """
+endOfYear(self)
+    
+    返回年度结束日期
+        
+    :rtype: Datetime
 """
 
 Datetime.nextDay.__doc__ = """
@@ -99,6 +164,12 @@ Datetime.now.__doc__ = """
 now()
     
     获取当前日期时间
+"""
+
+Datetime.today.__doc__ = """
+today()
+    
+    获取当前的日期
 """
 
 getDateRange.__doc__ = """\n

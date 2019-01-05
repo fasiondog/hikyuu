@@ -42,7 +42,6 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     d = d.date();
     BOOST_CHECK(Datetime(200101010000) == d);
 
-
     /** @arg 非法年份 */
     BOOST_CHECK_THROW(Datetime(99999,1,1), std::out_of_range);
     BOOST_CHECK_THROW(Datetime(000001010000L), std::out_of_range);
@@ -103,8 +102,83 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     BOOST_CHECK(Datetime(201801010000L).dayOfYear() == 1);
     BOOST_CHECK(Datetime(201812310000L).dayOfYear() == 365);
 
+    /** @arg 测试 startOfMonth */
+    BOOST_CHECK(Datetime(201901050000).startOfMonth() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201902050000).startOfMonth() == Datetime(201902010000));
+    BOOST_CHECK(Datetime(201902010000).startOfMonth() == Datetime(201902010000));
+    BOOST_CHECK(Datetime(201903030000).startOfMonth() == Datetime(201903010000));
+    BOOST_CHECK(Datetime(201904030000).startOfMonth() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201912030000).startOfMonth() == Datetime(201912010000));
+
     /** @arg 测试 endOfMonth*/
     BOOST_CHECK(Datetime(201801010000L).endOfMonth() == Datetime(201801310000L));
+    BOOST_CHECK(Datetime(201802010000L).endOfMonth() == Datetime(201802280000L));
+    BOOST_CHECK(Datetime(201803010000L).endOfMonth() == Datetime(201803310000L));
+    BOOST_CHECK(Datetime(201804010000L).endOfMonth() == Datetime(201804300000L));
+    BOOST_CHECK(Datetime(201805010000L).endOfMonth() == Datetime(201805310000L));
+    BOOST_CHECK(Datetime(201806010000L).endOfMonth() == Datetime(201806300000L));
+    BOOST_CHECK(Datetime(201807010000L).endOfMonth() == Datetime(201807310000L));
+    BOOST_CHECK(Datetime(201808010000L).endOfMonth() == Datetime(201808310000L));
+    BOOST_CHECK(Datetime(201809010000L).endOfMonth() == Datetime(201809300000L));
+    BOOST_CHECK(Datetime(201810010000L).endOfMonth() == Datetime(201810310000L));
+    BOOST_CHECK(Datetime(201811010000L).endOfMonth() == Datetime(201811300000L));
+    BOOST_CHECK(Datetime(201812010000L).endOfMonth() == Datetime(201812310000L));
+
+
+    /** @arg 测试 startOfYear */
+    BOOST_CHECK(Datetime(201901050000).startOfYear() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201911050000).startOfYear() == Datetime(201901010000));
+    
+    /** @arg 测试 endOfYear */
+    BOOST_CHECK(Datetime(201902050000).endOfYear() == Datetime(201912310000));
+    BOOST_CHECK(Datetime(201912310000).endOfYear() == Datetime(201912310000));
+
+    /** @arg 测试 startOfQuarter */
+    BOOST_CHECK(Datetime(201902050000).startOfQuarter() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201901010000).startOfQuarter() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201903310000).startOfQuarter() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201904010000).startOfQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201905010000).startOfQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201906300000).startOfQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201907010000).startOfQuarter() == Datetime(201907010000));
+    BOOST_CHECK(Datetime(201907060000).startOfQuarter() == Datetime(201907010000));
+    BOOST_CHECK(Datetime(201909300000).startOfQuarter() == Datetime(201907010000));
+    BOOST_CHECK(Datetime(201910010000).startOfQuarter() == Datetime(201910010000));
+    BOOST_CHECK(Datetime(201911010000).startOfQuarter() == Datetime(201910010000));
+    BOOST_CHECK(Datetime(201912310000).startOfQuarter() == Datetime(201910010000));
+
+    /** @arg 测试 endOfQuarter */
+    BOOST_CHECK(Datetime(201902050000).endOfQuarter() == Datetime(201903310000));
+    BOOST_CHECK(Datetime(201901010000).endOfQuarter() == Datetime(201903310000));
+    BOOST_CHECK(Datetime(201903310000).endOfQuarter() == Datetime(201903310000));
+    BOOST_CHECK(Datetime(201904010000).endOfQuarter() == Datetime(201906300000));
+    BOOST_CHECK(Datetime(201905010000).endOfQuarter() == Datetime(201906300000));
+    BOOST_CHECK(Datetime(201906300000).endOfQuarter() == Datetime(201906300000));
+    BOOST_CHECK(Datetime(201907010000).endOfQuarter() == Datetime(201909300000));
+    BOOST_CHECK(Datetime(201907060000).endOfQuarter() == Datetime(201909300000));
+    BOOST_CHECK(Datetime(201909300000).endOfQuarter() == Datetime(201909300000));
+    BOOST_CHECK(Datetime(201910010000).endOfQuarter() == Datetime(201912310000));
+    BOOST_CHECK(Datetime(201911010000).endOfQuarter() == Datetime(201912310000));
+    BOOST_CHECK(Datetime(201912310000).endOfQuarter() == Datetime(201912310000));
+
+    /** @arg 测试 startOfWeek */
+    BOOST_CHECK(Datetime(201901050000).startOfWeek() == Datetime(201812300000));
+    BOOST_CHECK(Datetime(201901090000).startOfWeek() == Datetime(201901060000));
+
+    /** @arg 测试 endOfWeek */
+    BOOST_CHECK(Datetime(201901050000).endOfWeek() == Datetime(201901050000));
+    BOOST_CHECK(Datetime(201901090000).endOfWeek() == Datetime(201901120000));
+
+    /** @arg 测试 dateOfWeek */
+    BOOST_CHECK(Datetime(201901090000).dateOfWeek(-1) == Null<Datetime>());
+    BOOST_CHECK(Datetime(201901090000).dateOfWeek(7) == Null<Datetime>());
+    BOOST_CHECK(Datetime(201901010000).dateOfWeek(0) == Datetime(201812300000));
+    BOOST_CHECK(Datetime(201901010000).dateOfWeek(1) == Datetime(201812310000));
+    BOOST_CHECK(Datetime(201901010000).dateOfWeek(2) == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201901010000).dateOfWeek(3) == Datetime(201901020000));
+    BOOST_CHECK(Datetime(201901010000).dateOfWeek(4) == Datetime(201901030000));
+    BOOST_CHECK(Datetime(201901010000).dateOfWeek(5) == Datetime(201901040000));
+    BOOST_CHECK(Datetime(201901010000).dateOfWeek(6) == Datetime(201901050000));
 
     /** @arg 测试nextDay */
     BOOST_CHECK(Datetime(201802060000L).nextDay() == Datetime(201802070000L));
