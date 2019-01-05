@@ -84,25 +84,19 @@ dayOfYear(self)
 Datetime.startOfWeek.__doc__ = """
 startOfWeek(self)
     
-    返回周起始日期，即周日日期
-        
-    :rtype: Datetime
+    返回周起始日期（周一）
 """
 
 Datetime.endOfWeek.__doc__ = """
 endOfWeek(self)
     
-    返回周结束日期，即周六日期
-        
-    :rtype: Datetime
+    返回周结束日期（周日）
 """
 
 Datetime.startOfMonth.__doc__ = """
 startOfMonth(self)
     
     返回月度起始日期
-        
-    :rtype: Datetime
 """
 
 Datetime.endOfMonth.__doc__ = """
@@ -115,38 +109,84 @@ Datetime.startOfQuarter.__doc__ = """
 startOfQuarter(self)
     
     返回季度起始日期
-        
-    :rtype: Datetime
 """
 
 Datetime.endOfQuarter.__doc__ = """
 endOfQuarter(self)
     
     返回季度结束日期
-        
-    :rtype: Datetime
 """
 
 Datetime.startOfYear.__doc__ = """
 startOfYear(self)
     
     返回年度起始日期
-        
-    :rtype: Datetime
 """
 
 Datetime.endOfYear.__doc__ = """
 endOfYear(self)
     
     返回年度结束日期
-        
-    :rtype: Datetime
 """
 
 Datetime.nextDay.__doc__ = """
 nextDay(self)
     
     返回下一自然日
+"""
+
+Datetime.nextWeek.__doc__ = """
+nextWeek(self)
+    
+    返回下周周一日期
+"""
+
+Datetime.nextMonth.__doc__ = """
+nextMonth(self)
+    
+    返回下月首日日期
+"""
+
+Datetime.nextQuarter.__doc__ = """
+nextQuarter(self)
+    
+    返回下一季度首日日期
+"""
+
+Datetime.nextYear.__doc__ = """
+nextYear(self)
+    
+    返回下一年度首日日期
+"""
+
+Datetime.preDay.__doc__ = """
+preDay(self)
+    
+    返回前一自然日日期
+"""
+
+Datetime.preWeek.__doc__ = """
+preWeek(self)
+    
+    返回上周周一日期
+"""
+
+Datetime.preMonth.__doc__ = """
+preMonth(self)
+    
+    返回上月首日日期
+"""
+
+Datetime.preQuarter.__doc__ = """
+preQuarter(self)
+    
+    返回上一季度首日日期
+"""
+
+Datetime.preYear.__doc__ = """
+preYear(self)
+    
+    返回上一年度首日日期
 """
 
 Datetime.max.__doc__ = """

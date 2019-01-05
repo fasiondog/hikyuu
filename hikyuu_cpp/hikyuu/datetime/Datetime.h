@@ -78,29 +78,23 @@ public:
     /** 返回一年中的第几天，1月1日为1年中的第一天 */
     int dayOfYear() const;
 
-    /** 返回月度起始日期 */
-    Datetime startOfMonth() const;
-
-    /** 返回月末日期，如12月31日 */
-    Datetime endOfMonth() const;
-
     /**
      * 返回指定的本周中第几天的日期，周日为0天，周六为第6天
      * @param day 指明本周的第几天，如不在0~6之间，将返回Null
      */
     Datetime dateOfWeek(int day) const;
 
-    /** 返回周起始日期，即周日日期 */
+    /** 返回周起始日期（周一） */
     Datetime startOfWeek() const;
 
-    /** 返回周结束日期，即周六日期 */
+    /** 返回周结束日期（周日） */
     Datetime endOfWeek() const;
 
-    /** 返回年度起始日期 */
-    Datetime startOfYear() const;
+    /** 返回月度起始日期 */
+    Datetime startOfMonth() const;
 
-    /** 返回年度结束日期 */
-    Datetime endOfYear() const;
+    /** 返回月末日期，如12月31日 */
+    Datetime endOfMonth() const;
 
     /** 返回季度起始日期 */
     Datetime startOfQuarter() const;
@@ -108,8 +102,41 @@ public:
     /** 返回季度结束日期 */
     Datetime endOfQuarter() const;
 
+    /** 返回年度起始日期 */
+    Datetime startOfYear() const;
+
+    /** 返回年度结束日期 */
+    Datetime endOfYear() const;
+
     /** 下一自然日 */
     Datetime nextDay() const;
+
+    /** 下周起始日期（周一） */
+    Datetime nextWeek() const;
+
+    /** 下月起始日期 */
+    Datetime nextMonth() const;
+
+    /** 下一季度起始日期 */
+    Datetime nextQuarter() const;
+
+    /** 下一年度起始日期 */
+    Datetime nextYear() const;
+
+    /** 上一自然日 */
+    Datetime preDay() const;
+
+    /** 上一周周一日期 */
+    Datetime preWeek() const;
+
+    /** 上一月起始日期 */
+    Datetime preMonth() const;
+
+    /** 上一季度起始日期 */
+    Datetime preQuarter() const;
+
+    /** 上一年度起始日期 */
+    Datetime preYear() const;
 
     /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
     static Datetime min();
@@ -261,26 +288,6 @@ inline int Datetime::dayOfYear() const {
 
 inline Datetime Datetime::endOfMonth() const {
     return date().end_of_month();
-}
-
-inline Datetime Datetime::startOfMonth() const {
-    return Datetime(year(), month(), 1);
-}
-
-inline Datetime Datetime::startOfYear() const {
-    return Datetime(year(), 1, 1);
-}
-
-inline Datetime Datetime::endOfYear() const {
-    return Datetime(year(), 12, 31);
-}
-
-inline Datetime Datetime::startOfWeek() const {
-    return dateOfWeek(0);
-}
-
-inline Datetime Datetime::endOfWeek() const {
-    return dateOfWeek(6);
 }
 
 

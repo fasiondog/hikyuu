@@ -162,12 +162,16 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     BOOST_CHECK(Datetime(201912310000).endOfQuarter() == Datetime(201912310000));
 
     /** @arg 测试 startOfWeek */
-    BOOST_CHECK(Datetime(201901050000).startOfWeek() == Datetime(201812300000));
-    BOOST_CHECK(Datetime(201901090000).startOfWeek() == Datetime(201901060000));
+    BOOST_CHECK(Datetime(201812310000).startOfWeek() == Datetime(201812310000));
+    BOOST_CHECK(Datetime(201901050000).startOfWeek() == Datetime(201812310000));
+    BOOST_CHECK(Datetime(201901060000).startOfWeek() == Datetime(201812310000));
+    BOOST_CHECK(Datetime(201901090000).startOfWeek() == Datetime(201901070000));
 
     /** @arg 测试 endOfWeek */
-    BOOST_CHECK(Datetime(201901050000).endOfWeek() == Datetime(201901050000));
-    BOOST_CHECK(Datetime(201901090000).endOfWeek() == Datetime(201901120000));
+    BOOST_CHECK(Datetime(201812310000).endOfWeek() == Datetime(201901060000));
+    BOOST_CHECK(Datetime(201901050000).endOfWeek() == Datetime(201901060000));
+    BOOST_CHECK(Datetime(201901060000).endOfWeek() == Datetime(201901060000));
+    BOOST_CHECK(Datetime(201901090000).endOfWeek() == Datetime(201901130000));
 
     /** @arg 测试 dateOfWeek */
     BOOST_CHECK(Datetime(201901090000).dateOfWeek(-1) == Null<Datetime>());
@@ -180,10 +184,94 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     BOOST_CHECK(Datetime(201901010000).dateOfWeek(5) == Datetime(201901040000));
     BOOST_CHECK(Datetime(201901010000).dateOfWeek(6) == Datetime(201901050000));
 
-    /** @arg 测试nextDay */
+    /** @arg 测试 nextDay */
     BOOST_CHECK(Datetime(201802060000L).nextDay() == Datetime(201802070000L));
     BOOST_CHECK(Datetime(201802280000L).nextDay() == Datetime(201803010000L));
     BOOST_CHECK(Datetime(201602280000L).nextDay() == Datetime(201602290000L));
+
+    /** @arg 测试 nextWeek */
+    BOOST_CHECK(Datetime(201812300000).nextWeek() == Datetime(201812310000));
+    BOOST_CHECK(Datetime(201812310000).nextWeek() == Datetime(201901070000));
+    BOOST_CHECK(Datetime(201901010000).nextWeek() == Datetime(201901070000));
+    BOOST_CHECK(Datetime(201901020000).nextWeek() == Datetime(201901070000));
+    BOOST_CHECK(Datetime(201901030000).nextWeek() == Datetime(201901070000));
+    BOOST_CHECK(Datetime(201901040000).nextWeek() == Datetime(201901070000));
+    BOOST_CHECK(Datetime(201901050000).nextWeek() == Datetime(201901070000));
+    BOOST_CHECK(Datetime(201901060000).nextWeek() == Datetime(201901070000));
+    BOOST_CHECK(Datetime(201901070000).nextWeek() == Datetime(201901140000));
+
+    /** @arg 测试 nextMonth */
+    BOOST_CHECK(Datetime(201812310000).nextMonth() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201901010000).nextMonth() == Datetime(201902010000));
+    BOOST_CHECK(Datetime(201901310000).nextMonth() == Datetime(201902010000));
+
+    /** @arg 测试 nextQuarter */
+    BOOST_CHECK(Datetime(201901010000).nextQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201902010000).nextQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201903310000).nextQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201904010000).nextQuarter() == Datetime(201907010000));
+    BOOST_CHECK(Datetime(201905010000).nextQuarter() == Datetime(201907010000));
+    BOOST_CHECK(Datetime(201906300000).nextQuarter() == Datetime(201907010000));
+    BOOST_CHECK(Datetime(201907010000).nextQuarter() == Datetime(201910010000));
+    BOOST_CHECK(Datetime(201907020000).nextQuarter() == Datetime(201910010000));
+    BOOST_CHECK(Datetime(201908010000).nextQuarter() == Datetime(201910010000));
+    BOOST_CHECK(Datetime(201909300000).nextQuarter() == Datetime(201910010000));
+    BOOST_CHECK(Datetime(201910010000).nextQuarter() == Datetime(202001010000));
+    BOOST_CHECK(Datetime(201911010000).nextQuarter() == Datetime(202001010000));
+    BOOST_CHECK(Datetime(201912310000).nextQuarter() == Datetime(202001010000));
+
+    /** @arg 测试 nextYear */
+    BOOST_CHECK(Datetime(201812310000).nextYear() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201901010000).nextYear() == Datetime(202001010000));
+    BOOST_CHECK(Datetime(201901020000).nextYear() == Datetime(202001010000));
+    BOOST_CHECK(Datetime(201907310000).nextYear() == Datetime(202001010000));
+    BOOST_CHECK(Datetime(201912310000).nextYear() == Datetime(202001010000));
+
+    /** @arg 测试 preDay */
+    BOOST_CHECK(Datetime(201812310000).preDay() == Datetime(201812300000));
+    BOOST_CHECK(Datetime(201901010000).preDay() == Datetime(201812310000));
+    BOOST_CHECK(Datetime(201901020000).preDay() == Datetime(201901010000));
+
+    /** @arg 测试 preWeek */
+    BOOST_CHECK(Datetime(201812310000).preWeek() == Datetime(201812240000));
+    BOOST_CHECK(Datetime(201901010000).preWeek() == Datetime(201812240000));
+    BOOST_CHECK(Datetime(201901020000).preWeek() == Datetime(201812240000));
+    BOOST_CHECK(Datetime(201901030000).preWeek() == Datetime(201812240000));
+    BOOST_CHECK(Datetime(201901040000).preWeek() == Datetime(201812240000));
+    BOOST_CHECK(Datetime(201901050000).preWeek() == Datetime(201812240000));
+    BOOST_CHECK(Datetime(201901060000).preWeek() == Datetime(201812240000));
+    BOOST_CHECK(Datetime(201901070000).preWeek() == Datetime(201812310000));
+
+    /** @arg 测试 preMonth */
+    BOOST_CHECK(Datetime(201602290000).preMonth() == Datetime(201601010000));
+    BOOST_CHECK(Datetime(201901010000).preMonth() == Datetime(201812010000));
+    BOOST_CHECK(Datetime(201901020000).preMonth() == Datetime(201812010000));
+    BOOST_CHECK(Datetime(201901310000).preMonth() == Datetime(201812010000));
+    BOOST_CHECK(Datetime(201902010000).preMonth() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201902280000).preMonth() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201903010000).preMonth() == Datetime(201902010000));
+    BOOST_CHECK(Datetime(201903310000).preMonth() == Datetime(201902010000));
+    BOOST_CHECK(Datetime(201904010000).preMonth() == Datetime(201903010000));
+    BOOST_CHECK(Datetime(201904300000).preMonth() == Datetime(201903010000));
+    BOOST_CHECK(Datetime(201905300000).preMonth() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201912310000).preMonth() == Datetime(201911010000));
+    BOOST_CHECK(Datetime(201912300000).preMonth() == Datetime(201911010000));
+
+    /** @arg 测试 preQuarter */
+    BOOST_CHECK(Datetime(201901010000).preQuarter() == Datetime(201810010000));
+    BOOST_CHECK(Datetime(201903310000).preQuarter() == Datetime(201810010000));
+    BOOST_CHECK(Datetime(201904010000).preQuarter() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201906300000).preQuarter() == Datetime(201901010000));
+    BOOST_CHECK(Datetime(201907010000).preQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201909300000).preQuarter() == Datetime(201904010000));
+    BOOST_CHECK(Datetime(201910010000).preQuarter() == Datetime(201907010000));
+    BOOST_CHECK(Datetime(201912310000).preQuarter() == Datetime(201907010000));
+
+    /** @arg 测试 preYear */
+    BOOST_CHECK(Datetime(201901010000).preYear() == Datetime(201801010000));
+    BOOST_CHECK(Datetime(201912310000).preYear() == Datetime(201801010000));
+    BOOST_CHECK(Datetime(201601010000).preYear() == Datetime(201501010000));
+    BOOST_CHECK(Datetime(201612310000).preYear() == Datetime(201501010000));
 }
 
 /** @par 检测点 */

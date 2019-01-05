@@ -102,14 +102,10 @@ DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end) {
     return result;
 }
 
-Datetime Datetime::nextDay() const {
-    bd::date today = date();
-    bd::date_duration dd(1);
-    bd::date next = today + dd;
-    return Datetime(next);
-}
-
 Datetime Datetime::dateOfWeek(int day) const {
+    if (*this == Null<Datetime>())
+        return Null<Datetime>();
+
     if (day < 0 || day > 6)
         return Null<Datetime>();
 
@@ -118,39 +114,222 @@ Datetime Datetime::dateOfWeek(int day) const {
     return date() + dd;
 }
 
-Datetime Datetime::startOfQuarter() const {
-    int m = month();
-    int y = year();
+Datetime Datetime::startOfMonth() const {
+    return *this == Null<Datetime>() ? Null<Datetime>() : Datetime(year(), month(), 1);
+}
+
+Datetime Datetime::startOfYear() const {
+    return *this == Null<Datetime>() ? Null<Datetime>() : Datetime(year(), 1, 1);
+}
+
+Datetime Datetime::endOfYear() const {
+    return *this == Null<Datetime>() ? Null<Datetime>() : Datetime(year(), 12, 31);
+}
+
+Datetime Datetime::startOfWeek() const {
+    if (*this == Null<Datetime>()) 
+        return *this;
+
     Datetime result;
-    if (m <= 3) {
-        result = Datetime(y, 1, 1);
-    } else if (m <= 6) {
-        result =  Datetime(y, 4, 1);
-    } else if (m <= 9) {
-        result = Datetime(y, 7, 1);
-    } else if (m <= 12) {
-        result = Datetime(y, 10, 1);
+    try {
+        int today = dayOfWeek();
+        if (today == 0) {
+            result = date() + bd::date_duration(-6);
+        } else {
+            result = date() + bd::date_duration(1 - today);;
+        }
+    } catch(...) {
+        result = Datetime::min();
+    }
+
+    return result;
+}
+
+Datetime Datetime::endOfWeek() const {
+    if (*this == Null<Datetime>())
+        return *this;
+
+    Datetime result;
+    try {
+        int today = dayOfWeek();
+        if (today == 0) {
+            result = date();
+        } else {
+            result = date() + bd::date_duration(7 - today);
+        }
+    } catch(...) {
+        result = Datetime::max();
+    }
+
+    return result;
+}
+
+Datetime Datetime::startOfQuarter() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {    
+        int m = month();
+        int y = year();
+        if (m <= 3) {
+            result = Datetime(y, 1, 1);
+        } else if (m <= 6) {
+            result =  Datetime(y, 4, 1);
+        } else if (m <= 9) {
+            result = Datetime(y, 7, 1);
+        } else if (m <= 12) {
+            result = Datetime(y, 10, 1);
+        }
+    } catch(...) {
+        result = Datetime::min();
     }
 
     return result;
 }
 
 Datetime Datetime::endOfQuarter() const {
-    int m = month();
-    int y = year();
     Datetime result;
-    if (m <= 3) {
-        result = Datetime(y, 3, 31);
-    } else if (m <= 6) {
-        result =  Datetime(y, 6, 30);
-    } else if (m <= 9) {
-        result = Datetime(y, 9, 30);
-    } else if (m <= 12) {
-        result = Datetime(y, 12, 31);
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        int m = month();
+        int y = year();
+        if (m <= 3) {
+            result = Datetime(y, 3, 31);
+        } else if (m <= 6) {
+            result =  Datetime(y, 6, 30);
+        } else if (m <= 9) {
+            result = Datetime(y, 9, 30);
+        } else if (m <= 12) {
+            result = Datetime(y, 12, 31);
+        }
+    } catch(...) {
+        result = Datetime::max();
     }
 
     return result;
 }
 
+Datetime Datetime::nextDay() const {
+    if (*this == Null<Datetime>() || *this == Datetime::max())
+        return *this;
+    return date() + bd::date_duration(1);
+}
+
+Datetime Datetime::nextWeek() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        result = endOfWeek().date() + bd::date_duration(1);
+    } catch(...) {
+        result = Datetime::max();
+    }
+    return result;
+}
+
+Datetime Datetime::nextMonth() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        result = endOfMonth().date() + bd::date_duration(1);
+    } catch(...) {
+        result = Datetime::max();
+    }
+    return result;
+}
+
+Datetime Datetime::nextQuarter() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        result = endOfQuarter().date() + bd::date_duration(1);
+    } catch(...) {
+        result = Datetime::max();
+    }
+    return result;
+}
+
+Datetime Datetime::nextYear() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        result = endOfYear().date() + bd::date_duration(1);
+    } catch(...) {
+        return Datetime::max();
+    }
+    return result;
+}
+
+Datetime Datetime::preDay() const {
+    if (*this == Null<Datetime>() || *this == Datetime::min())
+        return *this;
+    return date() - bd::date_duration(1);
+}
+
+Datetime Datetime::preWeek() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+    
+    try {
+        result = Datetime(date() - bd::date_duration(7)).startOfWeek();
+    } catch(...) {
+        result = Datetime::min();
+    }
+    return result;
+}
+
+Datetime Datetime::preMonth() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        int m = month();
+        result = (m == 1) ? Datetime(year()-1, 12, 1) : Datetime(year(), m-1, 1);
+    } catch(...) {
+        result = Datetime::min();
+    }
+    return result;
+}
+
+Datetime Datetime::preQuarter() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        int m = startOfQuarter().month();
+        result = (m == 1) ? Datetime(year()-1, 10, 1) : Datetime(year(), m-3, 1);
+    } catch(...) {
+        result = Datetime::min();
+    }
+
+    return result;
+}
+
+Datetime Datetime::preYear() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        result = Datetime(year()-1, 1, 1);
+    } catch(...) {
+        result = Datetime::min();
+    }
+    
+    return result;
+}
 
 } /* namespace hku */
