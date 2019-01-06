@@ -51,6 +51,8 @@ public:
     /** 通过字符串方式构造日期类型，如："2001-01-01 18:00:00.12345" */
     explicit Datetime(const std::string&);
 
+    Datetime& operator=(const Datetime&);
+
     int year() const;
     int month() const;
     int day() const;
@@ -285,11 +287,6 @@ inline int Datetime::dayOfWeek() const {
 inline int Datetime::dayOfYear() const {
     return date().day_of_year();
 }
-
-inline Datetime Datetime::endOfMonth() const {
-    return date().end_of_month();
-}
-
 
 } /* namespace hku */
 #endif /* DATETIME_H_ */

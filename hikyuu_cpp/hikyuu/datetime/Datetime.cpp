@@ -46,6 +46,15 @@ Datetime::Datetime(unsigned long long datetime) {
                                             (unsigned short)mm, 0));
 }
 
+Datetime& Datetime::operator=(const Datetime& d) {
+    if (this == &d)
+        return *this;
+
+    if (m_data != d.m_data)
+        m_data = d.m_data;
+    return *this;
+}
+
 
 std::string Datetime::toString() const {
     bd::date d(bd::pos_infin);
@@ -104,22 +113,34 @@ DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end) {
 
 Datetime Datetime::dateOfWeek(int day) const {
     if (*this == Null<Datetime>())
-        return Null<Datetime>();
+        return *this;
 
-    if (day < 0 || day > 6)
-        return Null<Datetime>();
-
+    int dd = day;
+    if (dd < 0) {
+        dd = 0;
+    } else if (dd > 6) {
+        dd = 6;
+    }
     int today = dayOfWeek();
-    bd::date_duration dd(day - today);
-    return date() + dd;
+    Datetime result = date() + bd::date_duration(dd - today);
+    if (result > Datetime::max()) {
+        result = Datetime::max();
+    } else if (result < Datetime::min()) {
+        result = Datetime::min();
+    }
+    return result;
 }
 
 Datetime Datetime::startOfMonth() const {
-    return *this == Null<Datetime>() ? Null<Datetime>() : Datetime(year(), month(), 1);
+    return *this == Null<Datetime>() ? *this : Datetime(year(), month(), 1);
+}
+
+Datetime Datetime::endOfMonth() const {
+    return *this == Null<Datetime>() ? *this : date().end_of_month();
 }
 
 Datetime Datetime::startOfYear() const {
-    return *this == Null<Datetime>() ? Null<Datetime>() : Datetime(year(), 1, 1);
+    return *this == Null<Datetime>() ? *this : Datetime(year(), 1, 1);
 }
 
 Datetime Datetime::endOfYear() const {
@@ -131,16 +152,15 @@ Datetime Datetime::startOfWeek() const {
         return *this;
 
     Datetime result;
-    try {
-        int today = dayOfWeek();
-        if (today == 0) {
-            result = date() + bd::date_duration(-6);
-        } else {
-            result = date() + bd::date_duration(1 - today);;
-        }
-    } catch(...) {
-        result = Datetime::min();
+    int today = dayOfWeek();
+    if (today == 0) {
+        result = date() + bd::date_duration(-6);
+    } else {
+        result = date() + bd::date_duration(1 - today);;
     }
+
+    if (result < Datetime::min())
+        result = Datetime::min();
 
     return result;
 }
@@ -150,17 +170,15 @@ Datetime Datetime::endOfWeek() const {
         return *this;
 
     Datetime result;
-    try {
-        int today = dayOfWeek();
-        if (today == 0) {
-            result = date();
-        } else {
-            result = date() + bd::date_duration(7 - today);
-        }
-    } catch(...) {
-        result = Datetime::max();
+    int today = dayOfWeek();
+    if (today == 0) {
+        result = date();
+    } else {
+        result = date() + bd::date_duration(7 - today);
     }
 
+    if (result > Datetime::max())
+        result = Datetime::max();
     return result;
 }
 
@@ -169,20 +187,16 @@ Datetime Datetime::startOfQuarter() const {
     if (*this == Null<Datetime>())
         return result;
 
-    try {    
-        int m = month();
-        int y = year();
-        if (m <= 3) {
-            result = Datetime(y, 1, 1);
-        } else if (m <= 6) {
-            result =  Datetime(y, 4, 1);
-        } else if (m <= 9) {
-            result = Datetime(y, 7, 1);
-        } else if (m <= 12) {
-            result = Datetime(y, 10, 1);
-        }
-    } catch(...) {
-        result = Datetime::min();
+    int m = month();
+    int y = year();
+    if (m <= 3) {
+        result = Datetime(y, 1, 1);
+    } else if (m <= 6) {
+        result =  Datetime(y, 4, 1);
+    } else if (m <= 9) {
+        result = Datetime(y, 7, 1);
+    } else if (m <= 12) {
+        result = Datetime(y, 10, 1);
     }
 
     return result;
@@ -193,20 +207,16 @@ Datetime Datetime::endOfQuarter() const {
     if (*this == Null<Datetime>())
         return result;
 
-    try {
-        int m = month();
-        int y = year();
-        if (m <= 3) {
-            result = Datetime(y, 3, 31);
-        } else if (m <= 6) {
-            result =  Datetime(y, 6, 30);
-        } else if (m <= 9) {
-            result = Datetime(y, 9, 30);
-        } else if (m <= 12) {
-            result = Datetime(y, 12, 31);
-        }
-    } catch(...) {
-        result = Datetime::max();
+    int m = month();
+    int y = year();
+    if (m <= 3) {
+        result = Datetime(y, 3, 31);
+    } else if (m <= 6) {
+        result =  Datetime(y, 6, 30);
+    } else if (m <= 9) {
+        result = Datetime(y, 9, 30);
+    } else if (m <= 12) {
+        result = Datetime(y, 12, 31);
     }
 
     return result;
@@ -223,11 +233,10 @@ Datetime Datetime::nextWeek() const {
     if (*this == Null<Datetime>())
         return result;
 
-    try {
-        result = endOfWeek().date() + bd::date_duration(1);
-    } catch(...) {
+    result = endOfWeek().date() + bd::date_duration(1);
+    if (result > Datetime::max())
         result = Datetime::max();
-    }
+
     return result;
 }
 
@@ -236,11 +245,10 @@ Datetime Datetime::nextMonth() const {
     if (*this == Null<Datetime>())
         return result;
 
-    try {
-        result = endOfMonth().date() + bd::date_duration(1);
-    } catch(...) {
+    result = endOfMonth().date() + bd::date_duration(1);
+    if (result > Datetime::max())
         result = Datetime::max();
-    }
+    
     return result;
 }
 
@@ -249,11 +257,10 @@ Datetime Datetime::nextQuarter() const {
     if (*this == Null<Datetime>())
         return result;
 
-    try {
-        result = endOfQuarter().date() + bd::date_duration(1);
-    } catch(...) {
+    result = endOfQuarter().date() + bd::date_duration(1);
+    if (result > Datetime::max())
         result = Datetime::max();
-    }
+
     return result;
 }
 
@@ -262,11 +269,9 @@ Datetime Datetime::nextYear() const {
     if (*this == Null<Datetime>())
         return result;
 
-    try {
-        result = endOfYear().date() + bd::date_duration(1);
-    } catch(...) {
-        return Datetime::max();
-    }
+    result = endOfYear().date() + bd::date_duration(1);
+    if (result > Datetime::max())
+        result = Datetime::max();
     return result;
 }
 

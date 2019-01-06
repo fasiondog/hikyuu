@@ -69,7 +69,7 @@ dateOfWeek(self, day)
     
     返回指定的本周中第几天的日期，周日为0天，周六为第6天
         
-    :param int day: 指明本周的第几天，如不在0~6之间，将返回constant.null_datetime
+    :param int day: 指明本周的第几天，如小于则认为为第0天，如大于6则认为为第6天
     :rtype: Datetime
 """
 
