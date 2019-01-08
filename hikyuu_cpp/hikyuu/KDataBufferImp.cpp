@@ -87,6 +87,52 @@ size_t KDataBufferImp::getPos(const Datetime& datetime) const {
 }
 
 
+void KDataBufferImp::_reoverForUpDay() {
+    if (empty())
+        return;
+
+    Datetime startDate = m_buffer.front().datetime;
+    Datetime endDate = m_buffer.back().datetime.nextDay();
+    KQuery query = KQueryByDate(startDate, endDate, KQuery::DAY, m_query.recoverType());
+    size_t start = 0, end = 0;
+    if (!m_stock.getIndexRange(query, start, end))
+        return;
+    
+    KRecordList day_list = m_stock.getKRecordList(start, end, KQuery::DAY);
+    if (day_list.empty())
+        return;
+
+    size_t day_pos = 0;
+    size_t day_total = day_list.size();
+    size_t length = size();
+    for (size_t i = 0; i < length; i++) {
+        Datetime phase_start_date = m_buffer[i].datetime.startOfWeek();
+        Datetime phase_end_date = m_buffer[i].datetime;
+        if (day_pos >= day_total)
+            break;
+
+        while (day_list[day_pos].datetime < phase_start_date) {
+            day_pos++;
+        }
+        KRecord record = day_list[day_pos];
+        record.datetime = m_buffer[i].datetime;
+        day_pos++;
+        while (day_list[day_pos].datetime <= phase_end_date) {
+            if (day_list[day_pos].lowPrice < record.lowPrice) {
+                record.lowPrice = day_list[day_pos].lowPrice;
+            } else if (day_list[day_pos].highPrice > record.highPrice) {
+                record.highPrice = day_list[day_pos].highPrice;
+            }
+            day_pos++;
+        }
+        record.closePrice = day_list[day_pos].closePrice;
+        m_buffer[i] = record;
+    }
+
+    return;
+}
+
+
 /******************************************************************************
  * 前复权公式:复权后价格＝[(复权前价格-现金红利)＋配(新)股价格×流通股份变动比例]÷(1＋流通股份变动比例)
  * 向前复权指以除权后的股价为基准（即除权后的股价不变），将除权前的股价降下来。
