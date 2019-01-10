@@ -10,6 +10,7 @@
 #include <boost/lambda/lambda.hpp>
 #include "KDataBufferImp.h"
 #include "utilities/util.h"
+#include "KData.h"
 
 namespace hku {
 
@@ -29,11 +30,16 @@ KDataBufferImp(const Stock& stock, const KQuery& query)
 
     //日线以上不支持复权
     if (query.recoverType() == KQuery::NO_RECOVER
-            || query.kType() == KQuery::WEEK
+            //|| query.kType() == KQuery::WEEK
             || query.kType() == KQuery::MONTH
             || query.kType() == KQuery::QUARTER
             || query.kType() == KQuery::HALFYEAR
             || query.kType() == KQuery::YEAR) {
+        return;
+    }
+
+    if (query.kType() == KQuery::WEEK) {
+        _recoverForUpDay();
         return;
     }
 
@@ -87,18 +93,14 @@ size_t KDataBufferImp::getPos(const Datetime& datetime) const {
 }
 
 
-void KDataBufferImp::_reoverForUpDay() {
+void KDataBufferImp::_recoverForUpDay() {
     if (empty())
         return;
 
-    Datetime startDate = m_buffer.front().datetime;
+    Datetime startDate = m_buffer.front().datetime.startOfWeek();
     Datetime endDate = m_buffer.back().datetime.nextDay();
     KQuery query = KQueryByDate(startDate, endDate, KQuery::DAY, m_query.recoverType());
-    size_t start = 0, end = 0;
-    if (!m_stock.getIndexRange(query, start, end))
-        return;
-    
-    KRecordList day_list = m_stock.getKRecordList(start, end, KQuery::DAY);
+    KData day_list = m_stock.getKData(query);
     if (day_list.empty())
         return;
 
@@ -115,18 +117,22 @@ void KDataBufferImp::_reoverForUpDay() {
             day_pos++;
         }
         KRecord record = day_list[day_pos];
-        record.datetime = m_buffer[i].datetime;
-        day_pos++;
-        while (day_list[day_pos].datetime <= phase_end_date) {
+        int pre_day_pos = day_pos;
+        while (day_list[day_pos].datetime <= phase_end_date && day_pos < day_total) {
             if (day_list[day_pos].lowPrice < record.lowPrice) {
                 record.lowPrice = day_list[day_pos].lowPrice;
             } else if (day_list[day_pos].highPrice > record.highPrice) {
                 record.highPrice = day_list[day_pos].highPrice;
             }
+            record.closePrice = day_list[day_pos].closePrice;
             day_pos++;
         }
-        record.closePrice = day_list[day_pos].closePrice;
-        m_buffer[i] = record;
+        if (pre_day_pos != day_pos) {
+            m_buffer[i].openPrice = record.openPrice;
+            m_buffer[i].highPrice = record.highPrice;
+            m_buffer[i].lowPrice = record.lowPrice;
+            m_buffer[i].closePrice = record.closePrice;
+        }
     }
 
     return;

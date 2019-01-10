@@ -29,7 +29,7 @@ private:
     void _recoverBackward();
     void _recoverEqualForward();
     void _recoverEqualBackward();
-    void _reoverForUpDay();
+    void _recoverForUpDay();
 
 private:
     KRecordList m_buffer;

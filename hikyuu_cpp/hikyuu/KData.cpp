@@ -29,29 +29,12 @@ string KData::toString() const {
 
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    //if (stock.isNull() || query.kType() >= KQuery::INVALID_KTYPE) {
     if (stock.isNull()) {        
         return;
     }
-    if (query.kType() < KQuery::DAY) {
-        //m_imp = KDataImpPtr(new KDataImp(stock, query));
-    	m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
 
-    } else if (query.kType() == KQuery::DAY) {
-        m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
-
-    } else {
-        //日线以上不支持复权
-        if (query.queryType() == KQuery::INDEX) {
-            KQuery new_query(query.start(), query.end(), query.kType(),
-                    KQuery::NO_RECOVER);
-            m_imp = KDataImpPtr(new KDataBufferImp(stock, new_query));
-        } else {
-            KQuery new_query = KQueryByDate(query.startDatetime(),
-                    query.endDatetime(), query.kType(), KQuery::NO_RECOVER);
-            m_imp = KDataImpPtr(new KDataBufferImp(stock, new_query));
-        }
-    }
+    m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
+    return;
 #if 0
     if (stock.isBuffer(query.kType())
             && query.recoverType() == KQuery::NO_RECOVER) {
