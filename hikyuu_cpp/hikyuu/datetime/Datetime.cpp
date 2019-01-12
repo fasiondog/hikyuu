@@ -222,6 +222,20 @@ Datetime Datetime::endOfQuarter() const {
     return result;
 }
 
+Datetime Datetime::startOfHalfyear() const {
+    if (*this == Null<Datetime>())
+        return *this;
+
+    return month() <= 6 ? Datetime(year(), 1, 1) : Datetime(year(), 7, 1);
+}
+
+Datetime Datetime::endOfHalfyear() const {
+    if (*this == Null<Datetime>())
+        return *this;
+
+    return month() <= 6 ? Datetime(year(), 6, 30) : Datetime(year(), 12, 31);
+}
+
 Datetime Datetime::nextDay() const {
     if (*this == Null<Datetime>() || *this == Datetime::max())
         return *this;
@@ -258,6 +272,18 @@ Datetime Datetime::nextQuarter() const {
         return result;
 
     result = endOfQuarter().date() + bd::date_duration(1);
+    if (result > Datetime::max())
+        result = Datetime::max();
+
+    return result;
+}
+
+Datetime Datetime::nextHalfyear() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    result = endOfHalfyear().date() + bd::date_duration(1);
     if (result > Datetime::max())
         result = Datetime::max();
 
@@ -316,6 +342,21 @@ Datetime Datetime::preQuarter() const {
     try {
         int m = startOfQuarter().month();
         result = (m == 1) ? Datetime(year()-1, 10, 1) : Datetime(year(), m-3, 1);
+    } catch(...) {
+        result = Datetime::min();
+    }
+
+    return result;
+}
+
+Datetime Datetime::preHalfyear() const {
+    Datetime result;
+    if (*this == Null<Datetime>())
+        return result;
+
+    try {
+        int m = startOfHalfyear().month();
+        result = (m <= 6) ? Datetime(year()-1, 7, 1) : Datetime(year(), 1, 1);
     } catch(...) {
         result = Datetime::min();
     }

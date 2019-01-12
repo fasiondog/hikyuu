@@ -104,6 +104,12 @@ public:
     /** 返回季度结束日期 */
     Datetime endOfQuarter() const;
 
+    /** 返回半年起始日期 */
+    Datetime startOfHalfyear() const;
+
+    /** 返回半年结束日期 */
+    Datetime endOfHalfyear() const;
+
     /** 返回年度起始日期 */
     Datetime startOfYear() const;
 
@@ -122,6 +128,9 @@ public:
     /** 下一季度起始日期 */
     Datetime nextQuarter() const;
 
+    /** 下一半年度起始日期 */
+    Datetime nextHalfyear() const;
+
     /** 下一年度起始日期 */
     Datetime nextYear() const;
 
@@ -136,6 +145,9 @@ public:
 
     /** 上一季度起始日期 */
     Datetime preQuarter() const;
+
+    /** 上一半年度起始日期 */
+    Datetime preHalfyear() const;
 
     /** 上一年度起始日期 */
     Datetime preYear() const;

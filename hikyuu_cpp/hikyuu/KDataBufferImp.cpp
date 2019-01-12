@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <functional>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -28,17 +29,16 @@ KDataBufferImp(const Stock& stock, const KQuery& query)
 
     m_buffer = m_stock.getKRecordList(startPos(), endPos(), query.kType());
 
-    //日线以上不支持复权
-    if (query.recoverType() == KQuery::NO_RECOVER
-            //|| query.kType() == KQuery::WEEK
+    //不支持复权时，直接返回
+    if (query.recoverType() == KQuery::NO_RECOVER)
+        return;
+
+    //日线以上复权处理
+    if (query.kType() == KQuery::WEEK
             || query.kType() == KQuery::MONTH
             || query.kType() == KQuery::QUARTER
             || query.kType() == KQuery::HALFYEAR
             || query.kType() == KQuery::YEAR) {
-        return;
-    }
-
-    if (query.kType() == KQuery::WEEK) {
         _recoverForUpDay();
         return;
     }
@@ -97,7 +97,20 @@ void KDataBufferImp::_recoverForUpDay() {
     if (empty())
         return;
 
-    Datetime startDate = m_buffer.front().datetime.startOfWeek();
+    std::function<Datetime(const Datetime&)> startOfPhase;
+    if (m_query.kType() == KQuery::WEEK) {
+        startOfPhase = &Datetime::startOfWeek;
+    } else if (m_query.kType() == KQuery::MONTH) {
+        startOfPhase = &Datetime::startOfMonth;
+    } else if (m_query.kType() == KQuery::QUARTER) {
+        startOfPhase = &Datetime::startOfQuarter;
+    } else if (m_query.kType() == KQuery::HALFYEAR) {
+        startOfPhase = &Datetime::startOfHalfyear;
+    } else if (m_query.kType() == KQuery::YEAR) {
+        startOfPhase = &Datetime::startOfYear;
+    }
+
+    Datetime startDate = startOfPhase(m_buffer.front().datetime);
     Datetime endDate = m_buffer.back().datetime.nextDay();
     KQuery query = KQueryByDate(startDate, endDate, KQuery::DAY, m_query.recoverType());
     KData day_list = m_stock.getKData(query);
@@ -108,7 +121,7 @@ void KDataBufferImp::_recoverForUpDay() {
     size_t day_total = day_list.size();
     size_t length = size();
     for (size_t i = 0; i < length; i++) {
-        Datetime phase_start_date = m_buffer[i].datetime.startOfWeek();
+        Datetime phase_start_date = startOfPhase(m_buffer[i].datetime);
         Datetime phase_end_date = m_buffer[i].datetime;
         if (day_pos >= day_total)
             break;
