@@ -117,6 +117,18 @@ endOfQuarter(self)
     返回季度结束日期
 """
 
+Datetime.startOfHalfyear.__doc__ = """
+startOfHalfyear(self)
+    
+    返回半年度起始日期
+"""
+
+Datetime.endOfHalfyear.__doc__ = """
+endOfHalfyear(self)
+    
+    返回半年度结束日期
+"""
+
 Datetime.startOfYear.__doc__ = """
 startOfYear(self)
     
@@ -153,6 +165,12 @@ nextQuarter(self)
     返回下一季度首日日期
 """
 
+Datetime.nextHalfyear.__doc__ = """
+nextHalfyear(self)
+    
+    返回下一半年度首日日期
+"""
+
 Datetime.nextYear.__doc__ = """
 nextYear(self)
     
@@ -181,6 +199,12 @@ Datetime.preQuarter.__doc__ = """
 preQuarter(self)
     
     返回上一季度首日日期
+"""
+
+Datetime.preHalfyear.__doc__ = """
+preHalfyear(self)
+    
+    返回上一半年度首日日期
 """
 
 Datetime.preYear.__doc__ = """
