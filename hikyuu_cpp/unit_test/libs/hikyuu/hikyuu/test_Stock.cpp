@@ -305,82 +305,82 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecord ) {
 
     /** @arg 获取第一条周线记录 */
     record = stock.getKRecord(0, KQuery::WEEK);
-    expect = KRecord(Datetime(199012170000), 96.05, 109.130, 95.790, 109.130, 59.4, 1485);
+    expect = KRecord(Datetime(199012210000), 96.05, 109.130, 95.790, 109.130, 59.4, 1485);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取中间随机一条周线记录 */
     record = stock.getKRecord(10, KQuery::WEEK);
-    expect = KRecord(Datetime(199102250000), 134.37, 134.87, 132.47, 132.53, 827.1, 11500);
+    expect = KRecord(Datetime(199103010000), 134.37, 134.87, 132.47, 132.53, 827.1, 11500);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取最后一条周线记录 */
     total = stock.getCount(KQuery::WEEK);
     record = stock.getKRecord(total - 1, KQuery::WEEK);
-    expect = KRecord(Datetime(201112050000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048);
+    expect = KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取第一条月线记录 */
     record = stock.getKRecord(0, KQuery::MONTH);
-    expect = KRecord(Datetime(199012010000), 96.05, 127.610, 95.790, 127.610, 93.6, 1884);
+    expect = KRecord(Datetime(199012310000), 96.05, 127.610, 95.790, 127.610, 93.6, 1884);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取中间随机一条月线记录 */
     record = stock.getKRecord(10, KQuery::MONTH);
-    expect = KRecord(Datetime(199110010000), 181.550, 218.600, 179.800, 218.600, 14953.6, 223443);
+    expect = KRecord(Datetime(199110310000), 181.550, 218.600, 179.800, 218.600, 14953.6, 223443);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取最后一条月线记录 */
     total = stock.getCount(KQuery::MONTH);
     record = stock.getKRecord(total - 1, KQuery::MONTH);
-    expect = KRecord(Datetime(201112010000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941);
+    expect = KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取第一条季线记录 */
     record = stock.getKRecord(0, KQuery::QUARTER);
-    expect = KRecord(Datetime(199010010000), 96.05, 127.610, 95.790, 127.610, 93.6, 1884);
+    expect = KRecord(Datetime(199012310000), 96.05, 127.610, 95.790, 127.610, 93.6, 1884);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取中间随机一条季线记录 */
     record = stock.getKRecord(10, KQuery::QUARTER);
-    expect = KRecord(Datetime(199304010000), 921.590, 1392.620, 859.48, 1007.050, 5181883.5, 27631999);
+    expect = KRecord(Datetime(199306300000), 921.590, 1392.620, 859.48, 1007.050, 5181883.5, 27631999);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取最后一条季线记录 */
     total = stock.getCount(KQuery::QUARTER);
     record = stock.getKRecord(total - 1, KQuery::QUARTER);
-    expect = KRecord(Datetime(201110010000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936);
+    expect = KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取第一条半年线记录 */
     record = stock.getKRecord(0, KQuery::HALFYEAR);
-    expect = KRecord(Datetime(199007010000), 96.05, 127.610, 95.790, 127.610, 93.6, 1884);
+    expect = KRecord(Datetime(199012310000), 96.05, 127.610, 95.790, 127.610, 93.6, 1884);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取中间随机一条半年线记录 */
     record = stock.getKRecord(10, KQuery::HALFYEAR);
-    expect = KRecord(Datetime(199507010000), 623.140, 792.540, 552.840, 555.290, 18764625.6, 351276329);
+    expect = KRecord(Datetime(199512310000), 623.140, 792.540, 552.840, 555.290, 18764625.6, 351276329);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取最后一条半年线记录 */
     total = stock.getCount(KQuery::HALFYEAR);
     record = stock.getKRecord(total - 1, KQuery::HALFYEAR);
-    expect = KRecord(Datetime(201107010000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694);
+    expect = KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取第一条年线记录 */
     record = stock.getKRecord(0, KQuery::YEAR);
-    expect = KRecord(Datetime(199001010000), 96.05, 127.61, 95.79, 127.61, 93.6, 1884);
+    expect = KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.61, 93.6, 1884);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取中间随机一条年线记录 */
     record = stock.getKRecord(10, KQuery::YEAR);
-    expect = KRecord(Datetime(200001010000), 1368.693, 2125.724, 1361.214, 2073.476, 326945832.5, 3433225623);
+    expect = KRecord(Datetime(200012310000), 1368.693, 2125.724, 1361.214, 2073.476, 326945832.5, 3433225623);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取最后一条年线记录 */
     total = stock.getCount(KQuery::YEAR);
     record = stock.getKRecord(total - 1, KQuery::YEAR);
-    expect = KRecord(Datetime(201101010000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512);
+    expect = KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512);
     BOOST_CHECK(record == expect);
 
     /** @arg 获取第一条分钟线记录 */
@@ -1022,32 +1022,32 @@ BOOST_AUTO_TEST_CASE( test_Stock_getIndexRange ) {
     query = KQueryByDate(Datetime(199102200000), Datetime(199104230000), KQuery::WEEK);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
-    BOOST_CHECK(out_start == 10);
-    BOOST_CHECK(out_end == 19);
+    BOOST_CHECK(out_start == 9);
+    BOOST_CHECK(out_end == 18);
 
     query = KQueryByDate(Datetime(199107020000), Datetime(199112300000), KQuery::MONTH);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
-    BOOST_CHECK(out_start == 8);
-    BOOST_CHECK(out_end == 13);
+    BOOST_CHECK(out_start == 7);
+    BOOST_CHECK(out_end == 12);
 
     query = KQueryByDate(Datetime(199112210000), Datetime(199308010000), KQuery::QUARTER);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
-    BOOST_CHECK(out_start == 5);
-    BOOST_CHECK(out_end == 12);
+    BOOST_CHECK(out_start == 4);
+    BOOST_CHECK(out_end == 11);
 
     query = KQueryByDate(Datetime(199311010000), Datetime(199711010000), KQuery::HALFYEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
-    BOOST_CHECK(out_start == 7);
-    BOOST_CHECK(out_end == 15);
+    BOOST_CHECK(out_start == 6);
+    BOOST_CHECK(out_end == 14);
 
     query = KQueryByDate(Datetime(199502010000), Datetime(199912010000), KQuery::YEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
-    BOOST_CHECK(out_start == 6);
-    BOOST_CHECK(out_end == 10);
+    BOOST_CHECK(out_start == 5);
+    BOOST_CHECK(out_end == 9);
 
     query = KQueryByDate(Datetime(200602171016), Datetime(200602171026), KQuery::MIN);
     success = stock.getIndexRange(query, out_start, out_end);
@@ -1189,24 +1189,24 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     total = stock.getCount(KQuery::WEEK);
     result = stock.getKRecordList(0, total, KQuery::WEEK);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199012170000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199012240000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
-    BOOST_CHECK(result[1058] == KRecord(Datetime(201112050000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012210000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
+    BOOST_CHECK(result[1058] == KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
 
 
     /** @arg 周线 start == 0, end == total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::WEEK);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199012170000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199012240000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
-    BOOST_CHECK(result[1058] == KRecord(Datetime(201112050000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012210000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
+    BOOST_CHECK(result[1058] == KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
 
     /** @arg 周线 start == 1, end == 10 */
     result = stock.getKRecordList(1, 10, KQuery::WEEK);
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199012240000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199012310000), 126.56, 131.44, 126.48, 131.440, 47.3, 730));
-    BOOST_CHECK(result[8] == KRecord(Datetime(199102180000), 133.12, 134.87, 133.08, 134.870, 551, 9271));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199101040000), 126.56, 131.44, 126.48, 131.440, 47.3, 730));
+    BOOST_CHECK(result[8] == KRecord(Datetime(199102220000), 133.12, 134.87, 133.08, 134.870, 551, 9271));
 
     /** @arg 周线 start == end == 0 */
     result = stock.getKRecordList(0,0, KQuery::WEEK);
@@ -1223,17 +1223,17 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     /** @arg 周线 start == 0, end == 1 */
     result = stock.getKRecordList(0, 1, KQuery::WEEK);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199012170000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012210000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
 
     /** @arg 周线 start == total - 1, end == total */
     result = stock.getKRecordList(total - 1, total, KQuery::WEEK);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201112050000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
 
     /** @arg 周线 start == total - 1, end == total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::WEEK);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201112050000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
 
 
     ///=====================
@@ -1243,24 +1243,24 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     total = stock.getCount(KQuery::MONTH);
     result = stock.getKRecordList(0, total, KQuery::MONTH);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199012010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
-    BOOST_CHECK(result[252] == KRecord(Datetime(201112010000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
+    BOOST_CHECK(result[252] == KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
 
 
     /** @arg 月线 start == 0, end == total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::MONTH);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199012010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
-    BOOST_CHECK(result[252] == KRecord(Datetime(201112010000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
+    BOOST_CHECK(result[252] == KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
 
     /** @arg 月线 start == 1, end == 10 */
     result = stock.getKRecordList(1, 10, KQuery::MONTH);
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199101010000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199102010000), 129.5, 134.87, 128.06, 133.010, 3027.3, 50982));
-    BOOST_CHECK(result[8] == KRecord(Datetime(199109010000), 180.08, 191.18, 178.43, 180.920, 19410.4, 286133));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199102280000), 129.5, 134.87, 128.06, 133.010, 3027.3, 50982));
+    BOOST_CHECK(result[8] == KRecord(Datetime(199109300000), 180.08, 191.18, 178.43, 180.920, 19410.4, 286133));
 
     /** @arg 月线 start == end == 0 */
     result = stock.getKRecordList(0,0, KQuery::MONTH);
@@ -1277,17 +1277,17 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     /** @arg 月线 start == 0, end == 1 */
     result = stock.getKRecordList(0, 1, KQuery::MONTH);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199012010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
 
     /** @arg 月线 start == total - 1, end == total */
     result = stock.getKRecordList(total - 1, total, KQuery::MONTH);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201112010000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
 
     /** @arg 月线 start == total - 1, end == total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MONTH);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201112010000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
 
 
     ///=====================
@@ -1297,24 +1297,24 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     total = stock.getCount(KQuery::QUARTER);
     result = stock.getKRecordList(0, total, KQuery::QUARTER);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199010010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
-    BOOST_CHECK(result[84] == KRecord(Datetime(201110010000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
+    BOOST_CHECK(result[84] == KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
 
 
     /** @arg 季线 start == 0, end == total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::QUARTER);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199010010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
-    BOOST_CHECK(result[84] == KRecord(Datetime(201110010000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
+    BOOST_CHECK(result[84] == KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
 
     /** @arg 季线 start == 1, end == 10 */
     result = stock.getKRecordList(1, 10, KQuery::QUARTER);
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199101010000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199104010000), 120.69, 137.56, 104.96, 137.560, 12095.6, 222753));
-    BOOST_CHECK(result[8] == KRecord(Datetime(199301010000), 784.13, 1558.95, 777.16, 925.910, 5003866.3, 26182794));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199106300000), 120.69, 137.56, 104.96, 137.560, 12095.6, 222753));
+    BOOST_CHECK(result[8] == KRecord(Datetime(199303310000), 784.13, 1558.95, 777.16, 925.910, 5003866.3, 26182794));
 
     /** @arg 季线 start == end == 0 */
     result = stock.getKRecordList(0,0, KQuery::QUARTER);
@@ -1331,17 +1331,17 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     /** @arg 季线 start == 0, end == 1 */
     result = stock.getKRecordList(0, 1, KQuery::QUARTER);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199010010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
 
     /** @arg 季线 start == total - 1, end == total */
     result = stock.getKRecordList(total - 1, total, KQuery::QUARTER);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201110010000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
 
     /** @arg 季线 start == total - 1, end == total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::QUARTER);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201110010000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
 
     ///=====================
     /// 测试半年线
@@ -1350,24 +1350,24 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     total = stock.getCount(KQuery::HALFYEAR);
     result = stock.getKRecordList(0, total, KQuery::HALFYEAR);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199007010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
-    BOOST_CHECK(result[42] == KRecord(Datetime(201107010000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
+    BOOST_CHECK(result[42] == KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
 
 
     /** @arg 半年线 start == 0, end == total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::HALFYEAR);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199007010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
-    BOOST_CHECK(result[42] == KRecord(Datetime(201107010000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
+    BOOST_CHECK(result[42] == KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
 
     /** @arg 半年线 start == 1, end == 10 */
     result = stock.getKRecordList(1, 10, KQuery::HALFYEAR);
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199101010000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199107010000), 136.64, 292.75, 131.87, 292.750, 60078.8, 890458));
-    BOOST_CHECK(result[8] == KRecord(Datetime(199501010000), 637.72, 926.41, 524.43, 630.580, 12294596.7, 164388191));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199112310000), 136.64, 292.75, 131.87, 292.750, 60078.8, 890458));
+    BOOST_CHECK(result[8] == KRecord(Datetime(199506300000), 637.72, 926.41, 524.43, 630.580, 12294596.7, 164388191));
 
     /** @arg 半年线 start == end == 0 */
     result = stock.getKRecordList(0,0, KQuery::HALFYEAR);
@@ -1384,17 +1384,17 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     /** @arg 半年线 start == 0, end == 1 */
     result = stock.getKRecordList(0, 1, KQuery::HALFYEAR);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199007010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
 
     /** @arg 半年线 start == total - 1, end == total */
     result = stock.getKRecordList(total - 1, total, KQuery::HALFYEAR);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201107010000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
 
     /** @arg 半年线 start == total - 1, end == total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::HALFYEAR);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201107010000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
 
 
     ///=====================
@@ -1404,24 +1404,24 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     total = stock.getCount(KQuery::YEAR);
     result = stock.getKRecordList(0, total, KQuery::YEAR);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199001010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
-    BOOST_CHECK(result[21] == KRecord(Datetime(201101010000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
+    BOOST_CHECK(result[21] == KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
 
 
     /** @arg 年线 start == 0, end == total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::YEAR);
     BOOST_CHECK(result.size() == total);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199001010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199101010000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
-    BOOST_CHECK(result[21] == KRecord(Datetime(201101010000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
+    BOOST_CHECK(result[21] == KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
 
     /** @arg 年线 start == 1, end == 10 */
     result = stock.getKRecordList(1, 10, KQuery::YEAR);
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199101010000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
-    BOOST_CHECK(result[1] == KRecord(Datetime(199201010000), 293.74, 1429.01, 292.76, 780.390, 2497452.9, 18170898));
-    BOOST_CHECK(result[8] == KRecord(Datetime(199901010000), 1144.888, 1756.184, 1047.833, 1366.580, 181932093.8, 2287638100));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
+    BOOST_CHECK(result[1] == KRecord(Datetime(199212310000), 293.74, 1429.01, 292.76, 780.390, 2497452.9, 18170898));
+    BOOST_CHECK(result[8] == KRecord(Datetime(199912310000), 1144.888, 1756.184, 1047.833, 1366.580, 181932093.8, 2287638100));
 
     /** @arg 年线 start == end == 0 */
     result = stock.getKRecordList(0,0, KQuery::YEAR);
@@ -1438,17 +1438,17 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordList ) {
     /** @arg 年线 start == 0, end == 1 */
     result = stock.getKRecordList(0, 1, KQuery::YEAR);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(199001010000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
+    BOOST_CHECK(result[0] == KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
 
     /** @arg 年线 start == total - 1, end == total */
     result = stock.getKRecordList(total - 1, total, KQuery::YEAR);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201101010000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
 
     /** @arg 年线 start == total - 1, end == total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::YEAR);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == KRecord(Datetime(201101010000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    BOOST_CHECK(result[0] == KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
 
 
     ///=====================
@@ -1765,23 +1765,23 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordByDate ) {
     BOOST_CHECK(record == Null<KRecord>());
 
     /** @arg 日期等于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199012170000), KQuery::WEEK);
-    BOOST_CHECK(record == KRecord(Datetime(199012170000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    record = stock.getKRecordByDate(Datetime(199012210000), KQuery::WEEK);
+    BOOST_CHECK(record == KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199103250000), KQuery::WEEK);
-    BOOST_CHECK(record == KRecord(Datetime(199103250000), 122.1200, 122.6200, 120.1100, 120.1900, 409.0000, 5421.0000));
+    record = stock.getKRecordByDate(Datetime(199103290000), KQuery::WEEK);
+    BOOST_CHECK(record == KRecord(Datetime(199103290000), 122.1200, 122.6200, 120.1100, 120.1900, 409.0000, 5421.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199103120000), KQuery::WEEK);
     BOOST_CHECK(record == Null<KRecord>());
 
     /** @arg 日期等于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112050000), KQuery::WEEK);
-    BOOST_CHECK(record == KRecord(Datetime(201112050000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
+    record = stock.getKRecordByDate(Datetime(201112090000), KQuery::WEEK);
+    BOOST_CHECK(record == KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
 
     /** @arg 日期大于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112060000), KQuery::WEEK);
+    record = stock.getKRecordByDate(Datetime(201112100000), KQuery::WEEK);
     BOOST_CHECK(record == Null<KRecord>());
 
     ///===================================
@@ -1793,23 +1793,23 @@ BOOST_AUTO_TEST_CASE( test_Stock_getKRecordByDate ) {
     BOOST_CHECK(record == Null<KRecord>());
 
     /** @arg 日期等于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199012010000), KQuery::MONTH);
-    BOOST_CHECK(record == KRecord(Datetime(199012010000), 96.0500, 127.6100, 95.7900, 127.6100, 93.6000, 1884.0000));
+    record = stock.getKRecordByDate(Datetime(199012310000), KQuery::MONTH);
+    BOOST_CHECK(record == KRecord(Datetime(199012310000), 96.0500, 127.6100, 95.7900, 127.6100, 93.6000, 1884.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199208010000), KQuery::MONTH);
-    BOOST_CHECK(record == KRecord(Datetime(199208010000), 1034.7000, 1060.3600, 627.3600, 823.2700, 286256.7000, 2040679.0000));
+    record = stock.getKRecordByDate(Datetime(199208310000), KQuery::MONTH);
+    BOOST_CHECK(record == KRecord(Datetime(199208310000), 1034.7000, 1060.3600, 627.3600, 823.2700, 286256.7000, 2040679.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199103120000), KQuery::MONTH);
     BOOST_CHECK(record == Null<KRecord>());
 
     /** @arg 日期等于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112010000), KQuery::MONTH);
-    BOOST_CHECK(record == KRecord(Datetime(201112010000), 2392.4850, 2423.5590, 2310.1550, 2325.9050, 24378748.5000, 256650941.0000));
+    record = stock.getKRecordByDate(Datetime(201112310000), KQuery::MONTH);
+    BOOST_CHECK(record == KRecord(Datetime(201112310000), 2392.4850, 2423.5590, 2310.1550, 2325.9050, 24378748.5000, 256650941.0000));
 
     /** @arg 日期大于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112020000), KQuery::MONTH);
+    record = stock.getKRecordByDate(Datetime(201201010000), KQuery::MONTH);
     BOOST_CHECK(record == Null<KRecord>());
 
     ///===================================

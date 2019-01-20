@@ -58,41 +58,41 @@ BOOST_AUTO_TEST_CASE( test_getDatetimeList ) {
     kdata = stock.getKData(query);
     result = kdata.getDatetimeList();
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == Datetime(199911150000));
-    BOOST_CHECK(result[1] == Datetime(199911220000));
-    BOOST_CHECK(result[8] == Datetime(200001100000));
+    BOOST_CHECK(result[0] == Datetime(199911190000));
+    BOOST_CHECK(result[1] == Datetime(199911260000));
+    BOOST_CHECK(result[8] == Datetime(200001140000));
 
     query = KQuery(1, 10, KQuery::MONTH);
     kdata = stock.getKData(query);
     result = kdata.getDatetimeList();
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == Datetime(199912010000));
-    BOOST_CHECK(result[1] == Datetime(200001010000));
-    BOOST_CHECK(result[8] == Datetime(200008010000));
+    BOOST_CHECK(result[0] == Datetime(199912310000));
+    BOOST_CHECK(result[1] == Datetime(200001310000));
+    BOOST_CHECK(result[8] == Datetime(200008310000));
 
     query = KQuery(1, 10, KQuery::QUARTER);
     kdata = stock.getKData(query);
     result = kdata.getDatetimeList();
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == Datetime(200001010000));
-    BOOST_CHECK(result[1] == Datetime(200004010000));
-    BOOST_CHECK(result[8] == Datetime(200201010000));
+    BOOST_CHECK(result[0] == Datetime(200003310000));
+    BOOST_CHECK(result[1] == Datetime(200006300000));
+    BOOST_CHECK(result[8] == Datetime(200203310000));
 
     query = KQuery(1, 10, KQuery::HALFYEAR);
     kdata = stock.getKData(query);
     result = kdata.getDatetimeList();
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == Datetime(200001010000));
-    BOOST_CHECK(result[1] == Datetime(200007010000));
-    BOOST_CHECK(result[8] == Datetime(200401010000));
+    BOOST_CHECK(result[0] == Datetime(200006300000));
+    BOOST_CHECK(result[1] == Datetime(200012310000));
+    BOOST_CHECK(result[8] == Datetime(200406300000));
 
     query = KQuery(1, 10, KQuery::YEAR);
     kdata = stock.getKData(query);
     result = kdata.getDatetimeList();
     BOOST_CHECK(result.size() == 9);
-    BOOST_CHECK(result[0] == Datetime(200001010000));
-    BOOST_CHECK(result[1] == Datetime(200101010000));
-    BOOST_CHECK(result[8] == Datetime(200801010000));
+    BOOST_CHECK(result[0] == Datetime(200012310000));
+    BOOST_CHECK(result[1] == Datetime(200112310000));
+    BOOST_CHECK(result[8] == Datetime(200812310000));
 
     query = KQuery(1, 10, KQuery::MIN);
     kdata = stock.getKData(query);
@@ -618,8 +618,8 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(kdata.startPos() == 1);
     BOOST_CHECK(kdata.endPos() == 3);
     BOOST_CHECK(kdata.lastPos() == 2);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012240000), 113.57, 126.45, 109.13, 126.45, 28.2, 321));
-    BOOST_CHECK(kdata[1] == KRecord(Datetime(199012310000), 126.56, 131.44, 126.48, 131.44, 47.3, 730));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.45, 28.2, 321));
+    BOOST_CHECK(kdata[1] == KRecord(Datetime(199101040000), 126.56, 131.44, 126.48, 131.44, 47.3, 730));
 
     /** @arg 测试月线 */
     query = KQuery(1,4, KQuery::MONTH);
@@ -629,9 +629,9 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(kdata.startPos() == 1);
     BOOST_CHECK(kdata.endPos() == 4);
     BOOST_CHECK(kdata.lastPos() == 3);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199101010000), 127.61, 135.19, 127.61, 129.97, 3637.1, 67197));
-    BOOST_CHECK(kdata[1] == KRecord(Datetime(199102010000), 129.5, 134.87, 128.06, 133.01, 3027.3, 50982));
-    BOOST_CHECK(kdata[2] == KRecord(Datetime(199103010000), 132.53, 132.53, 120.11, 120.19, 1725.3, 24528));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.97, 3637.1, 67197));
+    BOOST_CHECK(kdata[1] == KRecord(Datetime(199102280000), 129.5, 134.87, 128.06, 133.01, 3027.3, 50982));
+    BOOST_CHECK(kdata[2] == KRecord(Datetime(199103310000), 132.53, 132.53, 120.11, 120.19, 1725.3, 24528));
 
     /** @arg 测试季线 */
     query = KQuery(1,4, KQuery::QUARTER);
@@ -641,9 +641,9 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(kdata.startPos() == 1);
     BOOST_CHECK(kdata.endPos() == 4);
     BOOST_CHECK(kdata.lastPos() == 3);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199101010000), 127.61, 135.19, 120.11, 120.19, 8389.7, 142707));
-    BOOST_CHECK(kdata[1] == KRecord(Datetime(199104010000), 120.69, 137.56, 104.96, 137.56, 12095.6, 222753));
-    BOOST_CHECK(kdata[2] == KRecord(Datetime(199107010000), 136.64, 191.18, 131.87, 180.92, 32436.9, 527079));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.19, 8389.7, 142707));
+    BOOST_CHECK(kdata[1] == KRecord(Datetime(199106300000), 120.69, 137.56, 104.96, 137.56, 12095.6, 222753));
+    BOOST_CHECK(kdata[2] == KRecord(Datetime(199109300000), 136.64, 191.18, 131.87, 180.92, 32436.9, 527079));
 
     /** @arg 测试5分钟线 */
     query = KQuery(1,4, KQuery::MIN5);
@@ -892,76 +892,76 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_date ) {
     ///===================================
     /** @arg 起始时间为第一条记录日期的前一天 */
     total = stock.getCount(KQuery::WEEK);
-    query = KQueryByDate(Datetime(199012160000), Null<Datetime>(), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199012200000), Null<Datetime>(), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == total);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 0);
     BOOST_CHECK(kdata.endPos() == total);
     BOOST_CHECK(kdata.lastPos() == total - 1);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012170000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
-    BOOST_CHECK(kdata[1] == KRecord(Datetime(199012240000), 113.5700, 126.4500, 109.1300, 126.4500, 28.2000, 321.0000));
-    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112050000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    BOOST_CHECK(kdata[1] == KRecord(Datetime(199012280000), 113.5700, 126.4500, 109.1300, 126.4500, 28.2000, 321.0000));
+    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
 
     /** @arg 起始时间等于第一条记录日期 */
     stock = sm.getStock("sh000001");
-    query = KQueryByDate(Datetime(199012170000), Null<Datetime>(), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199012210000), Null<Datetime>(), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == total);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 0);
     BOOST_CHECK(kdata.endPos() == total);
     BOOST_CHECK(kdata.lastPos() == total - 1);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012170000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
-    BOOST_CHECK(kdata[10] == KRecord(Datetime(199102250000), 134.3700, 134.8700, 132.4700, 132.5300, 827.1000, 11500.0000));
-    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112050000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    BOOST_CHECK(kdata[10] == KRecord(Datetime(199103010000), 134.3700, 134.8700, 132.4700, 132.5300, 827.1000, 11500.0000));
+    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
 
     /** @arg 起始时间等于第一条记录日期的后一天 */
     stock = sm.getStock("sh000001");
-    query = KQueryByDate(Datetime(199012180000), Null<Datetime>(), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199012220000), Null<Datetime>(), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == total - 1);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 1);
     BOOST_CHECK(kdata.endPos() == total);
     BOOST_CHECK(kdata.lastPos() == total - 1);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012240000), 113.5700, 126.4500, 109.1300, 126.4500, 28.2000, 321.0000));
-    BOOST_CHECK(kdata[1] == KRecord(Datetime(199012310000), 126.5600, 131.4400, 126.4800, 131.4400, 47.3000, 730.0000));
-    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112050000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012280000), 113.5700, 126.4500, 109.1300, 126.4500, 28.2000, 321.0000));
+    BOOST_CHECK(kdata[1] == KRecord(Datetime(199101040000), 126.5600, 131.4400, 126.4800, 131.4400, 47.3000, 730.0000));
+    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
 
     /** @arg 指定起始时间为第一条记录，截至日期为最后一条记录的前一天且不等于前一条记录的日期 */
     stock = sm.getStock("sh000001");
-    query = KQueryByDate(Datetime(199012170000), Datetime(201112040000), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199012210000), Datetime(201112080000), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == total - 1);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 0);
     BOOST_CHECK(kdata.endPos() == total - 1);
     BOOST_CHECK(kdata.lastPos() == total - 2);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012170000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
-    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201111280000), 2383.8930, 2423.5590, 2319.4400, 2360.6640, 32821965.5000, 336317856.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112020000), 2383.8930, 2423.5590, 2319.4400, 2360.6640, 32821965.5000, 336317856.0000));
 
     /** @arg 指定起始时间为第一条记录，截至日期为最后一条记录 */
-    query = KQueryByDate(Datetime(199012170000), Datetime(201112050000), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199012210000), Datetime(201112090000), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == total - 1);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 0);
     BOOST_CHECK(kdata.endPos() == total - 1);
     BOOST_CHECK(kdata.lastPos() == total - 2);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012170000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
-    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201111280000), 2383.8930, 2423.5590, 2319.4400, 2360.6640, 32821965.5000, 336317856.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112020000), 2383.8930, 2423.5590, 2319.4400, 2360.6640, 32821965.5000, 336317856.0000));
 
     /** @arg 指定起始时间为第一条记录，截至日期为最后一条记录的后一天 */
-    query = KQueryByDate(Datetime(199012170000), Datetime(201112060000), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199012210000), Datetime(201112100000), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == total);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 0);
     BOOST_CHECK(kdata.endPos() == total);
     BOOST_CHECK(kdata.lastPos() == total - 1);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012170000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
-    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112050000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
 
     /** @arg 中间任意一段日期 */
     stock = sm.getStock("sh000001");
@@ -972,8 +972,8 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_date ) {
     BOOST_CHECK(kdata.startPos() == 1043);
     BOOST_CHECK(kdata.endPos() == 1054);
     BOOST_CHECK(kdata.lastPos() == 1053);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(201108150000), 2598.1380, 2636.3600, 2513.7540, 2534.3580, 40330572.2000, 385608932.0000));
-    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201110310000), 2470.2540, 2536.7790, 2433.7150, 2528.2940, 50520578.9000, 516983184.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(201108190000), 2598.1380, 2636.3600, 2513.7540, 2534.3580, 40330572.2000, 385608932.0000));
+    BOOST_CHECK(kdata[kdata.size()-1] == KRecord(Datetime(201111040000), 2470.2540, 2536.7790, 2433.7150, 2528.2940, 50520578.9000, 516983184.0000));
 
     /** @arg 起始日期等于结束日期 */
     stock = sm.getStock("sh000001");
@@ -1011,32 +1011,32 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_date ) {
 
     /** @arg 结束日期等于起始日期之后的第一条记录 */
     stock = sm.getStock("sh000001");
-    query = KQueryByDate(Datetime(199012170000), Datetime(199012240000), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199012210000), Datetime(199012280000), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 1);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 0);
     BOOST_CHECK(kdata.endPos() == 1);
     BOOST_CHECK(kdata.lastPos() == 0);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012170000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
 
-    query = KQueryByDate(Datetime(199707210000), Datetime(199707280000), KQuery::WEEK);
+    query = KQueryByDate(Datetime(199707250000), Datetime(199708010000), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 1);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 338);
     BOOST_CHECK(kdata.endPos() == 339);
     BOOST_CHECK(kdata.lastPos() == 338);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(199707210000), 1215.8390, 1223.8230, 1158.1360, 1170.8620, 2433586.7000, 20739544.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(199707250000), 1215.8390, 1223.8230, 1158.1360, 1170.8620, 2433586.7000, 20739544.0000));
 
-    query = KQueryByDate(Datetime(201112050000), Datetime(201112060000), KQuery::WEEK);
+    query = KQueryByDate(Datetime(201112090000), Datetime(201112100000), KQuery::WEEK);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 1);
     BOOST_CHECK(kdata.empty() == false);
     BOOST_CHECK(kdata.startPos() == 1058);
     BOOST_CHECK(kdata.endPos() == 1059);
     BOOST_CHECK(kdata.lastPos() == 1058);
-    BOOST_CHECK(kdata[0] == KRecord(Datetime(201112050000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
+    BOOST_CHECK(kdata[0] == KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
 
 
     ///===================================
@@ -1337,7 +1337,7 @@ BOOST_AUTO_TEST_CASE( test_getKRecordByDate ) {
     result = kdata.getKRecordByDate(kdata[1].datetime);
     BOOST_CHECK(result == kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200012310000));
+    result = kdata.getKRecordByDate(Datetime(200012010000));
     BOOST_CHECK(result == Null<KRecord>());
 
     result = kdata.getKRecordByDate(kdata[7].datetime);
