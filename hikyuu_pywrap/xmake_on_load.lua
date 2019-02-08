@@ -27,6 +27,7 @@ function main(target)
 
     -- get python include directory.
     local pydir = os.iorun("python3-config --includes"):trim()
+    assert(pydir, "python3-config not found!")
     target:add("cxflags", pydir)
 
     -- get suffix configure for link libboost_pythonX.so
