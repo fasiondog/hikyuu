@@ -26,7 +26,7 @@ function main(target)
     end
 
     -- get python include directory.
-    local pydir = os.iorun("python3-config --includes"):trim()
+    local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
     assert(pydir, "python3-config not found!")
     target:add("cxflags", pydir)
 
