@@ -8,6 +8,7 @@
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
 #include "utilities/util.h"
+#include "KData.h"
 
 namespace hku {
 
@@ -642,6 +643,14 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
 }
 
 
+TimeLine Stock::getTimeLine(const Datetime& start, const Datetime& end) {
+    if (isNull()) {
+        return TimeLine();
+    }
+    return m_kdataDriver->getTimeLine(market(), code(), start, end);
+}
+
+
 KRecord Stock::
 getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
     size_t startix = 0, endix = 0;
@@ -675,5 +684,6 @@ void Stock::realtimeUpdate(const KRecord& record) {
         HKU_INFO("Ignore record, datetime < last record.datetime! [Stock::realtimeUpdate]");
     }
 }
+
 
 } /* namespace */

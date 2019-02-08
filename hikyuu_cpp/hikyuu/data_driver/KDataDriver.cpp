@@ -91,6 +91,12 @@ getKRecord(const string& market, const string& code,
     return Null<KRecord>();
 }
 
+TimeLine KDataDriver::getTimeLine(const string& market, const string& code,
+        const Datetime& start, const Datetime& end) {
+    return TimeLine();
+}
+
+
 } /* namespace hku */
 
 

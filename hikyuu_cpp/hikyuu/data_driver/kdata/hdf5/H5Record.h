@@ -26,9 +26,15 @@ struct H5Record {
     hku_uint64 transCount;
 };
 
-struct H5IndexRecord{
+struct H5IndexRecord {
     hku_uint64 datetime;
     hku_uint64 start;
+};
+
+struct H5TimeLineRecord {
+    hku_uint64 datetime;
+    hku_uint64 price;
+    hku_uint64 vol;
 };
 
 } /* namespae */

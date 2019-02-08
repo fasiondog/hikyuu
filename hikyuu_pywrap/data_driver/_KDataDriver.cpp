@@ -134,6 +134,19 @@ public:
         return this->KDataDriver::getKRecord(market, code, pos, ktype);
     }
 
+    TimeLine getTimeLine(const string& market, const string& code,
+                const Datetime& start, const Datetime& end) {
+        if (override call = get_override("getTimeLine")) {
+            return call(market, code, start, end);
+        } else {
+            return KDataDriver::getTimeLine(market, code, start, end);
+        }
+    }
+
+    TimeLine default_getTimeLine(const string& market, const string& code,
+                const Datetime& start, const Datetime& end) {
+        return this->KDataDriver::getTimeLine(market, code, start, end);
+    }
 };
 
 void export_KDataDriver() {
@@ -157,7 +170,10 @@ void export_KDataDriver() {
             .def("_getIndexRangeByDate",
                     &KDataDriverWrap::_getIndexRangeByDate,
                     &KDataDriverWrap::default_getIndexRangeByDate)
-            ;
+            .def("getTimeLine",
+                    &KDataDriverWrap::getTimeLine,
+                    &KDataDriverWrap::default_getTimeLine)
+             ;
 
     register_ptr_to_python<KDataDriverPtr>();
 }

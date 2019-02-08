@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Stock.h
  *
  *  Created on: 2011-11-9
@@ -10,6 +10,7 @@
 
 #include "StockWeight.h"
 #include "KQuery.h"
+#include "TimeLineRecord.h"
 
 namespace hku {
 
@@ -154,6 +155,9 @@ public:
     /** 获取日期列表 */
     DatetimeList getDatetimeList(const KQuery& query) const;
 
+    /** 获取分时线 */
+    TimeLine getTimeLine(const Datetime& start, const Datetime& end);
+
     /** 设置权息信息 */
     void setWeightList(const StockWeightList&);
 
@@ -165,7 +169,7 @@ public:
 
     /**
      * 将K线数据做自身缓存
-     * @note 一般不主动调用，谨慎
+     *  @note 一般不主动调用，谨慎
      */
     void loadKDataToBuffer(KQuery::KType);
 
@@ -197,7 +201,7 @@ private:
 struct HKU_API Stock::Data {
     string        m_market;      //所属的市场简称
     string        m_code;        //证券代码
-    string        m_market_code;//市场简称证券代码
+    string        m_market_code; //市场简称证券代码
     string        m_name;        //证券名称
     hku_uint32    m_type;        //证券类型
     bool          m_valid;       //当前证券是否有效

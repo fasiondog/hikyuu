@@ -9,7 +9,8 @@
 #define KDATADRIVER_H_
 
 #include "../utilities/Parameter.h"
-#include "../KData.h"
+#include "../KQuery.h"
+#include "../TimeLineRecord.h"
 
 namespace hku {
 
@@ -82,6 +83,9 @@ public:
      */
     virtual KRecord getKRecord(const string& market, const string& code,
               size_t pos, KQuery::KType kType);
+
+    virtual TimeLine getTimeLine(const string& market, const string& code,
+            const Datetime& start, const Datetime& end);
 
 private:
     bool checkType();

@@ -34,6 +34,11 @@ H5KDataDriver::H5KDataDriver(): KDataDriver("hdf5") {
     m_h5IndexType = H5::CompType(sizeof(H5IndexRecord));
     m_h5IndexType.insertMember("datetime",HOFFSET(H5IndexRecord,datetime),H5::PredType::NATIVE_UINT64);
     m_h5IndexType.insertMember("start",HOFFSET(H5IndexRecord,start),H5::PredType::NATIVE_UINT64);
+
+    m_h5TimeLineType = H5::CompType(sizeof(H5TimeLineRecord));
+    m_h5TimeLineType.insertMember("datetime", HOFFSET(H5TimeLineRecord, datetime), H5::PredType::NATIVE_UINT64);
+    m_h5TimeLineType.insertMember("price", HOFFSET(H5TimeLineRecord,price),H5::PredType::NATIVE_UINT64);
+    m_h5TimeLineType.insertMember("vol", HOFFSET(H5TimeLineRecord,vol),H5::PredType::NATIVE_UINT64);
 }
 
 H5KDataDriver::~H5KDataDriver() {
@@ -82,6 +87,12 @@ bool H5KDataDriver::_init() {
                 m_h5file_map[market+"_MIN15"] = h5file;
                 m_h5file_map[market+"_MIN30"] = h5file;
                 m_h5file_map[market+"_MIN60"] = h5file;
+
+            } else if (ktype == "time") {
+                filename = getParam<string>(*iter);
+                H5FilePtr h5file(new H5::H5File(filename,
+                                 H5F_ACC_RDONLY), Hdf5FileCloser());
+                m_h5file_map[market+"time"] = h5file;
             }
 
         } catch(...) {
@@ -122,6 +133,22 @@ void H5KDataDriver
     H5::DataSpace memspace(1, count);
     dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
     dataset.read(data, m_h5IndexType, memspace, dataspace);
+    memspace.close();
+    dataspace.close();
+    return;
+}
+
+void H5KDataDriver
+::H5ReadTimeLineRecords(H5::DataSet& dataset, hsize_t start,
+        hsize_t nrecords, void *data) {
+    H5::DataSpace dataspace = dataset.getSpace();
+    hsize_t offset[1];
+    hsize_t count[1];
+    offset[0] = start;
+    count[0] = nrecords;
+    H5::DataSpace memspace(1, count);
+    dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
+    dataset.read(data, m_h5TimeLineType, memspace, dataspace);
     memspace.close();
     dataspace.close();
     return;
@@ -316,6 +343,8 @@ _getH5FileAndGroup(const string& market, const string& code,
             out_group = out_file->openGroup("halfyear");
         } else if (kType == KQuery::YEAR) {
             out_group = out_file->openGroup("year");
+        } else if (kType == "time") {
+            out_group = out_file->openGroup("data");
         } else {
             return false;
         }
@@ -381,7 +410,7 @@ size_t H5KDataDriver
         dataspace.close();
         dataset.close();
     }catch(...){
-        HKU_WARN("[H5KDataDriver2::getCount] "
+        HKU_WARN("[H5KDataDriver::getCount] "
               << "Exception of some HDF5 operator! stock: "
               << market << code << " " << KQuery::getKTypeName(kType));
         total = 0;
@@ -436,13 +465,13 @@ _getBaseRecord(const string& market, const string& code,
         result.transCount = price_t(h5record.transCount);
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver2::_getBaseRecord] Invalid date!"
+        HKU_WARN("[H5KDataDriver::_getBaseRecord] Invalid date!"
                << market << code << "(pos: " << pos << ") datetime: "
                << h5record.datetime);
         result = Null<KRecord>();
 
     } catch(...) {
-        HKU_WARN("[H5KDataDriver2::_getBaseRecord] HDF5(" << market << code
+        HKU_WARN("[H5KDataDriver::_getBaseRecord] HDF5(" << market << code
                 << "h5) read error!");
         result = Null<KRecord>();
     }
@@ -519,13 +548,13 @@ KRecord H5KDataDriver
         }
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver2::_getOtherRecord] Invalid date!"
+        HKU_WARN("[H5KDataDriver::_getOtherRecord] Invalid date!"
                  " stock: " << market << code << " "
                  << KQuery::getKTypeName(kType) << pos);
         result = Null<KRecord>();
 
     }catch(...){
-        HKU_WARN("[H5KDataDriver2::_getOtherRecord] "
+        HKU_WARN("[H5KDataDriver::_getOtherRecord] "
                 "Exception of some HDF5 operator! stock: "
                 << market << code << " "
                 << KQuery::getKTypeName(kType) << " " << pos);
@@ -660,14 +689,14 @@ _getBaseIndexRangeByDate(const string& market, const string& code,
         dataset.close();
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver2::_getBaseIndexRangeByDate] "
+        HKU_WARN("[H5KDataDriver::_getBaseIndexRangeByDate] "
                     "Invalid datetime!");
         dataspace.close();
         dataset.close();
         return false;
 
     } catch(...) {
-        HKU_INFO("[H5KDataDriver2::_getBaseIndexRangeByDate] error in "
+        HKU_INFO("[H5KDataDriver::_getBaseIndexRangeByDate] error in "
                 << market << code);
         dataspace.close();
         dataset.close();
@@ -787,5 +816,153 @@ _getOtherIndexRangeByDate(const string& market, const string& code,
 
     return true;
 }
+
+
+TimeLine H5KDataDriver
+::getTimeLine(const string& market, const string& code,
+        const Datetime& start, const Datetime& end) {
+    TimeLine result;
+    if (start >= end || start > Datetime::max()) {
+        return result;
+    }
+
+    H5FilePtr h5file;
+    H5::Group group;
+    bool success;
+    success = _getH5FileAndGroup(market,code, "time", h5file, group);
+    if(!success) {
+        return result;
+    }
+
+    H5::DataSet dataset;
+    H5::DataSpace dataspace;
+    hku_uint64 start_number = start.number();
+    hku_uint64 end_number = end.number();
+    hsize_t startpos = 0, endpos = 0;
+    try {
+        dataset = group.openDataSet(market + code);
+        dataspace = dataset.getSpace();
+        hsize_t total = dataspace.getSelectNpoints();
+        if (0 == total) {
+            return result;
+        }
+
+        hsize_t mid, low = 0, high = total - 1;
+        H5TimeLineRecord h5record;
+        while(low <= high) {
+            H5ReadTimeLineRecords(dataset, high, 1, &h5record);
+            if(start_number > h5record.datetime) {
+                mid = high + 1;
+                break;
+            }
+
+            H5ReadTimeLineRecords(dataset, low, 1, &h5record);
+            if(h5record.datetime >= start_number) {
+                mid = low;
+                break;
+            }
+
+            mid = (low + high) / 2;
+            H5ReadTimeLineRecords(dataset, mid, 1, &h5record);
+            if(start_number > h5record.datetime) {
+                low = mid + 1;
+            }else {
+                high = mid - 1;
+            }
+        }
+
+        if(mid >= total) {
+            dataspace.close();
+            dataset.close();
+            return result;
+        }
+
+        startpos = mid;
+
+        low = mid;
+        high = total - 1;
+        while(low <= high){
+            H5ReadTimeLineRecords(dataset, high, 1, &h5record);
+            if( end_number > h5record.datetime ){
+                mid = high + 1;
+                break;
+            }
+
+            H5ReadTimeLineRecords(dataset, low, 1, &h5record);
+            if( h5record.datetime >= end_number ){
+                mid = low;
+                break;
+            }
+
+            mid = (low + high)/2;
+            H5ReadTimeLineRecords(dataset, mid, 1, &h5record);
+            if( end_number > h5record.datetime){
+                low = mid + 1;
+            }else{
+                high = mid - 1;
+            }
+        }
+
+        endpos = mid >= total ? total : mid;
+        if(startpos >= endpos) {
+            dataspace.close();
+            dataset.close();
+            return result;
+        }
+
+        dataspace.close();
+        dataset.close();
+
+    } catch(std::out_of_range&) {
+        HKU_WARN("[H5KDataDriver::getTimeLine] "
+                    "Invalid datetime!");
+        dataspace.close();
+        dataset.close();
+        return result;
+
+    } catch(...) {
+        HKU_INFO("[H5KDataDriver::getTimeLine] error in "
+                << market << code);
+        dataspace.close();
+        dataset.close();
+        return result;
+    }
+
+    if (startpos == endpos) {
+        return result;
+    }
+
+    H5TimeLineRecord *pBuf=NULL;
+    try{
+        string tablename(market + code);
+        H5::DataSet dataset(group.openDataSet(tablename));
+
+        size_t total = endpos - startpos + 1;
+        pBuf = new H5TimeLineRecord[total];
+        H5ReadTimeLineRecords(dataset, startpos, total, pBuf);
+
+        TimeLineRecord record;
+        result.reserve(total + 2);
+        for(hsize_t i=0; i<total; i++){
+            record.datetime = Datetime(pBuf[i].datetime);
+            record.price = price_t(pBuf[i].price)*0.001;
+            record.vol = price_t(pBuf[i].vol);
+            result.push_back(record);
+        }
+
+    } catch(std::out_of_range& e) {
+        HKU_WARN("[H5KDataDriver::getTimeLine] Invalid date! market_code("
+                << market << code << ") "
+                << e.what());
+
+    } catch(...) {
+
+    }
+
+    delete [] pBuf;
+
+    return result;
+}
+
 
 } /* namespace hku */
