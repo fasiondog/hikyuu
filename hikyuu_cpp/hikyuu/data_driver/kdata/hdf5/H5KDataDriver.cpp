@@ -88,11 +88,11 @@ bool H5KDataDriver::_init() {
                 m_h5file_map[market+"_MIN30"] = h5file;
                 m_h5file_map[market+"_MIN60"] = h5file;
 
-            } else if (ktype == "time") {
+            } else if (ktype == "TIME") {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename,
                                  H5F_ACC_RDONLY), Hdf5FileCloser());
-                m_h5file_map[market+"time"] = h5file;
+                m_h5file_map[market+"_TIME"] = h5file;
             }
 
         } catch(...) {
@@ -343,48 +343,11 @@ _getH5FileAndGroup(const string& market, const string& code,
             out_group = out_file->openGroup("halfyear");
         } else if (kType == KQuery::YEAR) {
             out_group = out_file->openGroup("year");
-        } else if (kType == "time") {
+        } else if (kType == "TIME") {
             out_group = out_file->openGroup("data");
         } else {
             return false;
         }
-        /*switch(kType) {
-        case KQuery::MIN:
-            out_group = out_file->openGroup("data");
-            break;
-        case KQuery::MIN5:
-            out_group = out_file->openGroup("data");
-            break;
-        case KQuery::MIN15:
-            out_group = out_file->openGroup("min15");
-            break;
-        case KQuery::MIN30:
-            out_group = out_file->openGroup("min30");
-            break;
-        case KQuery::MIN60:
-            out_group = out_file->openGroup("min60");
-            break;
-        case KQuery::DAY:
-            out_group = out_file->openGroup("data");
-            break;
-        case KQuery::WEEK:
-            out_group = out_file->openGroup("week");
-            break;
-        case KQuery::MONTH:
-            out_group = out_file->openGroup("month");
-            break;
-        case KQuery::QUARTER:
-            out_group = out_file->openGroup("quarter");
-            break;
-        case KQuery::HALFYEAR:
-            out_group = out_file->openGroup("halfyear");
-            break;
-        case KQuery::YEAR:
-            out_group = out_file->openGroup("year");
-            break;
-        default:
-            return false;
-        }*/
     } catch(...) {
         HKU_ERROR("[H5KDataDriver::_getH5FileAndGroup] Exception of some HDF5 operator!");
         return false;
@@ -829,7 +792,7 @@ TimeLine H5KDataDriver
     H5FilePtr h5file;
     H5::Group group;
     bool success;
-    success = _getH5FileAndGroup(market,code, "time", h5file, group);
+    success = _getH5FileAndGroup(market,code, "TIME", h5file, group);
     if(!success) {
         return result;
     }
@@ -937,7 +900,7 @@ TimeLine H5KDataDriver
         string tablename(market + code);
         H5::DataSet dataset(group.openDataSet(tablename));
 
-        size_t total = endpos - startpos + 1;
+        size_t total = endpos - startpos;
         pBuf = new H5TimeLineRecord[total];
         H5ReadTimeLineRecords(dataset, startpos, total, pBuf);
 

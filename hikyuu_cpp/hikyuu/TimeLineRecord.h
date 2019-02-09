@@ -30,7 +30,10 @@ public:
     bool isValid() const;
 };
 
-/** @ingroup StockManage */
+/**
+ * 分时线
+ * @ingroup StockManage
+ */
 typedef vector<TimeLineRecord> TimeLine;
 
 
@@ -39,14 +42,28 @@ typedef shared_ptr<TimeLineRecord> TimeLinePtr;
 
 
 /**
- * 输出TimeSharingRecord信息，如：TimeSharingRecord(datetime, price, vol)
+ * 输出TimeLineRecord信息，如：TimeSharingRecord(datetime, price, vol)
  * @ingroup StockManage
  */
 HKU_API std::ostream & operator<<(std::ostream &, const TimeLineRecord&);
 
+/**
+ * 输出TimeLine信息
+ * @details
+ * <pre>
+ * TimeLine{
+ *   size : 738501
+ *   start: YYYY-MM-DD hh:mm:ss
+ *   last : YYYY-MM-DD hh:mm:ss
+ *  }
+ * </pre>
+ * @ingroup StockManage
+ */
+HKU_API std::ostream& operator <<(std::ostream &os, const TimeLine&);
+
 
 /**
- * 比较两个TimeSharingRecord是否相等，一般仅测试时使用
+ * 比较两个TimeLineRecord是否相等，一般仅测试时使用
  * @ingroup StockManage
  */
 bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord&d2);

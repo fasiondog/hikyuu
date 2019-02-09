@@ -64,6 +64,12 @@ KRecord.__repr__ = reprFunc
 KData.__unicode__ = unicodeFunc
 KData.__repr__ = reprFunc
 
+TimeLineRecord.__unicode__ = unicodeFunc
+TimeLineRecord.__repr__ = reprFunc
+
+TimeLine.__unicode__ = unicodeFunc
+TimeLine.__repr__ = reprFunc
+
 Stock.__unicode__ = unicodeFunc
 Stock.__repr__ = reprFunc
 
@@ -286,6 +292,7 @@ PriceList.__getitem__ = list_getitem
 DatetimeList.__getitem__ = list_getitem
 StringList.__getitem__ = list_getitem
 BlockList.__getitem__ = list_getitem
+TimeLine.__getitem__ = list_getitem
 
 
 #------------------------------------------------------------------
@@ -339,6 +346,19 @@ try:
     DatetimeList.to_np = DatetimeList_to_np
     DatetimeList.to_df = DatetimeList_to_df
     
+    def TimeLine_to_np(data):
+        """转化为numpy结构数组"""
+        t_type = np.dtype({'names':['datetime','price', 'vol'], 
+                    'formats':['datetime64[ms]','d','d']})
+        return np.array([(t.datetime.datetime(), t.price, t.vol) for t in data], dtype=t_type)
+
+    def TimeLine_to_df(kdata):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')    
+
+    TimeLine.to_np = TimeLine_to_np
+    TimeLine.to_df = TimeLine_to_df
+
 except:
     pass
 
