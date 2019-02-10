@@ -320,14 +320,14 @@ def update_hdf5_trans_index(h5file, tablename):
     index_row = index_table.row
     if index_total:
         index_last_date = int(index_table[-1]['datetime'])
-        last_date = int(table[-1]['datetime']//10000 * 10000)
+        last_date = int(table[-1]['datetime']//1000000 * 10000)
         if index_last_date == last_date:
             return
         startix = int(index_table[-1]['start'])
-        pre_index_date = int(index_table[-1]['datetime'])
+        pre_index_date = index_last_date
     else:
         startix = 0
-        date = int(table[0]['datetime'] // 10000 * 10000)
+        date = int(table[0]['datetime'] // 1000000 * 10000)
         pre_index_date = date
         index_row['datetime'] = pre_index_date
         index_row['start'] = 0
@@ -335,7 +335,7 @@ def update_hdf5_trans_index(h5file, tablename):
 
     index = startix
     for row in table[startix:]:
-        date = int(row['datetime'] // 10000 * 10000)
+        date = int(row['datetime'] // 1000000 * 10000)
         cur_index_date = date
         if cur_index_date != pre_index_date:
             index_row['datetime'] = cur_index_date

@@ -345,8 +345,22 @@ def import_on_stock_trans(connect, api, h5file, market, stock_record, max_days):
     row = table.row
     for cur_date in date_list:
         buf = pytdx_get_day_trans(api, pytdx_market, stock_record[2], cur_date)
+        if not buf:
+            continue
+
+        second = 2
+        pre_minute = 900
+
         for record in buf:
-            row['datetime'] = cur_date*10000 + int(record['time'][0:2])*100 + int(record['time'][3:])
+            minute = int(record['time'][0:2])*100 + int(record['time'][3:])
+            if minute != pre_minute:
+                second = 0 if minute == 1500 else 2
+                pre_minute = minute
+            else:
+                second += 3
+            if second > 59:
+                continue
+            row['datetime'] = cur_date*1000000 + minute * 100 + second
             row['price'] = int(record['price'] * 1000)
             row['vol'] = record['vol']
             row['buyorsell'] = record['buyorsell']
