@@ -643,11 +643,9 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
 }
 
 
-TimeLine Stock::getTimeLine(const Datetime& start, const Datetime& end) {
-    if (isNull()) {
-        return TimeLine();
-    }
-    return m_kdataDriver->getTimeLine(market(), code(), start, end);
+TimeLine Stock::getTimeLine(const KQuery& query) const {
+    return isNull() ? TimeLine()
+                    :m_kdataDriver->getTimeLine(market(), code(), query);
 }
 
 

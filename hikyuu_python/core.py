@@ -378,6 +378,8 @@ __all__ = [#类
            'KQueryByIndex', 
            'KRecord', 
            'KRecordList', 
+           'TimeLineRecord',
+           'TimeLine',
            'MarketInfo', 
            'Parameter', 
            'PriceList',

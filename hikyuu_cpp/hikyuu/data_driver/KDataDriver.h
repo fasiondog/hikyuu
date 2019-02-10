@@ -84,8 +84,15 @@ public:
     virtual KRecord getKRecord(const string& market, const string& code,
               size_t pos, KQuery::KType kType);
 
+    /**
+     * 获取分时线
+     * @param market 市场简称
+     * @param code   证券代码
+     * @param query  查询条件
+     * @return
+     */
     virtual TimeLine getTimeLine(const string& market, const string& code,
-            const Datetime& start, const Datetime& end);
+            const KQuery& query);
 
 private:
     bool checkType();

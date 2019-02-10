@@ -29,7 +29,7 @@ public:
     virtual KRecord getKRecord(const string& market, const string& code,
               size_t pos, KQuery::KType kType);
     virtual TimeLine getTimeLine(const string& market, const string& code,
-            const Datetime& start, const Datetime& end);
+            const KQuery& query);
 
 private:
     void H5ReadRecords(H5::DataSet&, hsize_t, hsize_t, void *);
@@ -56,6 +56,12 @@ private:
             size_t& out_start, size_t& out_end);
     bool _getOtherIndexRangeByDate(const string&, const string&, const KQuery&,
             size_t& out_start, size_t& out_end);
+
+    TimeLine _getTimeLine(const string& market, const string& code,
+            hku_int64 start, hku_int64 end);
+    TimeLine _getTimeLine(const string& market, const string& code,
+            const Datetime& start, const Datetime& end);
+
 
 private:
     H5::CompType m_h5DataType;

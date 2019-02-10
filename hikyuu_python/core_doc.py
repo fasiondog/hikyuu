@@ -708,6 +708,21 @@ tocsv(filename)
 # from _Stock.cpp
 #------------------------------------------------------------------
 
+TimeLineRecord.__doc__ = """分时线记录，属性可读写。"""
+
+TimeLineRecord.datetime.__doc__ = """时间"""
+TimeLineRecord.price.__doc__ = """价格"""
+TimeLineRecord.vol.__doc__ = """成交量"""
+
+TimeLine.__doc__ = """
+通过 Stock.getTimeLine 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
+"""
+
+
+#------------------------------------------------------------------
+# from _Stock.cpp
+#------------------------------------------------------------------
+
 Stock.market.__doc__ = """获取所属市场简称，市场简称是市场的唯一标识"""
 Stock.code.__doc__ = """获取证券代码"""
 Stock.market_code.__doc__ = """市场简称+证券代码，如: sh000001"""
@@ -813,6 +828,15 @@ getDatetimeList(start, end, ktype)
     :param ind end: 结束位置
     :param KQuery.KType ktype: K线类型
     :rtype: DatetimeList        
+"""
+
+Stock.getTimeLine.__doc__ = """
+getTimeLine(self, query)
+    
+    获取分时线
+        
+    :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
+    :rtype: TimeLine
 """
 
 Stock.getWeight.__doc__ = """

@@ -135,17 +135,17 @@ public:
     }
 
     TimeLine getTimeLine(const string& market, const string& code,
-                const Datetime& start, const Datetime& end) {
+                const KQuery& query) {
         if (override call = get_override("getTimeLine")) {
-            return call(market, code, start, end);
+            return call(market, code, query);
         } else {
-            return KDataDriver::getTimeLine(market, code, start, end);
+            return KDataDriver::getTimeLine(market, code, query);
         }
     }
 
     TimeLine default_getTimeLine(const string& market, const string& code,
-                const Datetime& start, const Datetime& end) {
-        return this->KDataDriver::getTimeLine(market, code, start, end);
+                const KQuery& query) {
+        return this->KDataDriver::getTimeLine(market, code, query);
     }
 };
 

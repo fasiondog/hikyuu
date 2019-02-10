@@ -13,7 +13,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TimeLineRecord& record
     string strip(", ");
     os << std::fixed;
     os.precision(4);
-    os << "TimeSharingRecord(Datetime(" << record.datetime.number() << ")"<< strip
+    os << "TimeLineRecord(Datetime(" << record.datetime.number() << ")"<< strip
             << record.price << strip
             << record.vol << ")";
     os.unsetf(std::ostream::floatfield);

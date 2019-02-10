@@ -92,10 +92,10 @@ getKRecord(const string& market, const string& code,
 }
 
 TimeLine KDataDriver::getTimeLine(const string& market, const string& code,
-        const Datetime& start, const Datetime& end) {
+        const KQuery& query) {
+    HKU_INFO("This driver not support time-line!");
     return TimeLine();
 }
-
 
 } /* namespace hku */
 

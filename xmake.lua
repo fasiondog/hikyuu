@@ -4,7 +4,7 @@ set_xmakever("2.2.2")
 set_project("hikyuu")
 
 -- version
-set_version("1.0.9")
+set_version("1.1.0")
 
 -- set warning all as error
 set_warnings("all", "error")

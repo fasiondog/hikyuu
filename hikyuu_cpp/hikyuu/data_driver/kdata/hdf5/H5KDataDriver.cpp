@@ -781,8 +781,86 @@ _getOtherIndexRangeByDate(const string& market, const string& code,
 }
 
 
+TimeLine H5KDataDriver::getTimeLine(const string& market, const string& code,
+        const KQuery& query) {
+    return query.queryType() == KQuery::INDEX
+            ? _getTimeLine(market, code, query.start(), query.end())
+            : _getTimeLine(market, code,
+                    query.startDatetime(), query.endDatetime());
+}
+
+
+TimeLine H5KDataDriver::_getTimeLine(const string& market, const string& code,
+        hku_int64 start_ix, hku_int64 end_ix) {
+    TimeLine result;
+    H5FilePtr h5file;
+    H5::Group group;
+    if (!_getH5FileAndGroup(market, code, "TIME", h5file, group)) {
+        return result;
+    }
+
+    H5TimeLineRecord *pBuf=NULL;
+    try{
+        string tablename(market + code);
+        H5::DataSet dataset(group.openDataSet(tablename));
+        H5::DataSpace dataspace = dataset.getSpace();
+        size_t all_total = dataspace.getSelectNpoints();
+        if (0 == all_total) {
+            return result;
+        }
+
+        if(start_ix < 0) {
+            start_ix += all_total;
+            if(start_ix < 0)
+                start_ix = 0;
+        }
+
+        if(end_ix < 0) {
+            end_ix += all_total;
+            if(end_ix < 0)
+                end_ix = 0;
+        }
+
+        if (start_ix >= end_ix) {
+            return result;
+        }
+
+        size_t startpos = boost::numeric_cast<size_t>(start_ix);
+        size_t endpos = boost::numeric_cast<size_t>(end_ix);
+
+        size_t total = endpos > all_total ? all_total - startpos : endpos - startpos;
+        pBuf = new H5TimeLineRecord[total];
+        H5ReadTimeLineRecords(dataset, start_ix, total, pBuf);
+
+        TimeLineRecord record;
+        result.reserve(total + 2);
+        for(hsize_t i=0; i<total; i++){
+            record.datetime = Datetime(pBuf[i].datetime);
+            record.price = price_t(pBuf[i].price)*0.001;
+            record.vol = price_t(pBuf[i].vol);
+            result.push_back(record);
+        }
+
+    } catch (std::out_of_range& e) {
+        HKU_WARN("[H5KDataDriver::_getTimeLine] Invalid date! market_code("
+                << market << code << ") "
+                << e.what());
+
+    } catch (boost::bad_numeric_cast&) {
+        HKU_WARN("You may be use 32bit system, but data is to larger! "
+                "[H5KDataDriver::_getTimeLine]");
+
+    } catch (...) {
+
+    }
+
+    delete [] pBuf;
+    return result;
+}
+
+
 TimeLine H5KDataDriver
-::getTimeLine(const string& market, const string& code,
+::_getTimeLine(const string& market, const string& code,
         const Datetime& start, const Datetime& end) {
     TimeLine result;
     if (start >= end || start > Datetime::max()) {
