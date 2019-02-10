@@ -25,8 +25,6 @@ public:
     TimeLineRecord();
     TimeLineRecord(const Datetime& datetime, price_t price, price_t vol);
 
-    virtual ~TimeLineRecord();
-
     bool isValid() const;
 };
 
@@ -38,7 +36,7 @@ typedef vector<TimeLineRecord> TimeLine;
 
 
 /** @ingroup StockManage */
-typedef shared_ptr<TimeLineRecord> TimeLinePtr;
+typedef shared_ptr<TimeLine> TimeLinePtr;
 
 
 /**

@@ -13,7 +13,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TimeLineRecord& record
     string strip(", ");
     os << std::fixed;
     os.precision(4);
-    os << "TimeLineRecord(Datetime(" << record.datetime.number() << ")"<< strip
+    os << "TimeLineRecord(Datetime(" << record.datetime.number() << ")" << strip
             << record.price << strip
             << record.vol << ")";
     os.unsetf(std::ostream::floatfield);
@@ -30,7 +30,7 @@ HKU_API std::ostream& operator <<(std::ostream &os, const TimeLine& data) {
 }
 
 
-bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord&d2) {
+bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord& d2) {
     if (d1.datetime == d2.datetime
             &&  (std::fabs(d1.price - d2.price) < 0.0001)
             &&  (std::fabs(d1.vol - d2.vol) < 0.0001)) {
@@ -49,10 +49,6 @@ TimeLineRecord::TimeLineRecord()
 TimeLineRecord::TimeLineRecord(const Datetime& datetime,
         price_t price, price_t vol)
 : datetime(datetime), price(price), vol(vol) {
-
-}
-
-TimeLineRecord::~TimeLineRecord() {
 
 }
 
