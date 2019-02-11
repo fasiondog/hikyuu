@@ -741,7 +741,7 @@ TimeLineList.__doc__ = """
 # from _TransRecord.cpp
 #------------------------------------------------------------------
 
-TransRecord.__doc__ = """分时线记录，属性可读写。"""
+TransRecord.__doc__ = """历史分笔成交记录，属性可读写。"""
 
 TransRecord.datetime.__doc__ = """时间"""
 TransRecord.price.__doc__ = """价格"""
@@ -749,7 +749,7 @@ TransRecord.vol.__doc__ = """成交量"""
 TransRecord.direct.__doc__ = """买卖盘方向"""
 
 TransList.__doc__ = """
-分时线数据列表
+历史分笔成交记录列表
 """
 
 
