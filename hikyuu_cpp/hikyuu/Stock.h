@@ -156,7 +156,7 @@ public:
     DatetimeList getDatetimeList(const KQuery& query) const;
 
     /** 获取分时线 */
-    TimeLine getTimeLine(const KQuery& query) const;
+    TimeLineList getTimeLineList(const KQuery& query) const;
 
     /** 设置权息信息 */
     void setWeightList(const StockWeightList&);

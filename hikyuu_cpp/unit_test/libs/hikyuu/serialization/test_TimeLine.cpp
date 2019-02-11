@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( test_TimeLine_serialize ) {
     string filename(StockManager::instance().tmpdir());
     filename += "/TimeLine.xml";
 
-    TimeLine line1;
+    TimeLineList line1;
     line1.push_back(TimeLineRecord(Datetime(201101010000), 10.0, 80));
     line1.push_back(TimeLineRecord(Datetime(201101020000), 20.0, 90));
     line1.push_back(TimeLineRecord(Datetime(201101030000), 20.0, 100));
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE( test_TimeLine_serialize ) {
         oa << BOOST_SERIALIZATION_NVP(line1);
     }
 
-    TimeLine line2;
+    TimeLineList line2;
     {
         std::ifstream ifs(filename);
         boost::archive::xml_iarchive ia(ifs);

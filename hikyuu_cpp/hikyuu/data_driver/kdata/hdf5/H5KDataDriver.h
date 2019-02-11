@@ -28,7 +28,7 @@ public:
             const KQuery& query, size_t& out_start, size_t& out_end);
     virtual KRecord getKRecord(const string& market, const string& code,
               size_t pos, KQuery::KType kType);
-    virtual TimeLine getTimeLine(const string& market, const string& code,
+    virtual TimeLineList getTimeLineList(const string& market, const string& code,
             const KQuery& query);
 
 private:
@@ -57,9 +57,9 @@ private:
     bool _getOtherIndexRangeByDate(const string&, const string&, const KQuery&,
             size_t& out_start, size_t& out_end);
 
-    TimeLine _getTimeLine(const string& market, const string& code,
+    TimeLineList _getTimeLine(const string& market, const string& code,
             hku_int64 start, hku_int64 end);
-    TimeLine _getTimeLine(const string& market, const string& code,
+    TimeLineList _getTimeLine(const string& market, const string& code,
             const Datetime& start, const Datetime& end);
 
 

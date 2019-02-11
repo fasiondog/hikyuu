@@ -643,9 +643,9 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
 }
 
 
-TimeLine Stock::getTimeLine(const KQuery& query) const {
-    return isNull() ? TimeLine()
-                    :m_kdataDriver->getTimeLine(market(), code(), query);
+TimeLineList Stock::getTimeLineList(const KQuery& query) const {
+    return isNull() ? TimeLineList()
+                    :m_kdataDriver->getTimeLineList(market(), code(), query);
 }
 
 

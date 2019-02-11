@@ -32,11 +32,11 @@ public:
  * 分时线
  * @ingroup StockManage
  */
-typedef vector<TimeLineRecord> TimeLine;
+typedef vector<TimeLineRecord> TimeLineList;
 
 
 /** @ingroup StockManage */
-typedef shared_ptr<TimeLine> TimeLinePtr;
+typedef shared_ptr<TimeLineList> TimeLineListPtr;
 
 
 /**
@@ -57,7 +57,7 @@ HKU_API std::ostream & operator<<(std::ostream &, const TimeLineRecord&);
  * </pre>
  * @ingroup StockManage
  */
-HKU_API std::ostream& operator <<(std::ostream &os, const TimeLine&);
+HKU_API std::ostream& operator <<(std::ostream &os, const TimeLineList&);
 
 
 /**

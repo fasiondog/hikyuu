@@ -25,10 +25,10 @@ public:
         AUCTION = 2   /**< 集合竞价 */
     };
 
-    Datetime datetime;   //时间
-    price_t price;       //成交均价
-    price_t vol;         //成交量
-    DIRECT direct; //买卖盘性质：1--sell 0--buy 2--集合竞价
+    Datetime datetime;  //时间
+    price_t price;      //成交均价
+    price_t vol;        //成交量
+    DIRECT direct;      //买卖盘性质：1--sell 0--buy 2--集合竞价
 
     TransRecord();
     TransRecord(const Datetime& datetime, price_t price, price_t vol, DIRECT);

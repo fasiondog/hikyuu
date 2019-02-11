@@ -781,8 +781,8 @@ _getOtherIndexRangeByDate(const string& market, const string& code,
 }
 
 
-TimeLine H5KDataDriver::getTimeLine(const string& market, const string& code,
-        const KQuery& query) {
+TimeLineList H5KDataDriver
+::getTimeLineList(const string& market, const string& code, const KQuery& query) {
     return query.queryType() == KQuery::INDEX
             ? _getTimeLine(market, code, query.start(), query.end())
             : _getTimeLine(market, code,
@@ -790,9 +790,10 @@ TimeLine H5KDataDriver::getTimeLine(const string& market, const string& code,
 }
 
 
-TimeLine H5KDataDriver::_getTimeLine(const string& market, const string& code,
+TimeLineList H5KDataDriver
+::_getTimeLine(const string& market, const string& code,
         hku_int64 start_ix, hku_int64 end_ix) {
-    TimeLine result;
+    TimeLineList result;
     H5FilePtr h5file;
     H5::Group group;
     if (!_getH5FileAndGroup(market, code, "TIME", h5file, group)) {
@@ -859,10 +860,10 @@ TimeLine H5KDataDriver::_getTimeLine(const string& market, const string& code,
 }
 
 
-TimeLine H5KDataDriver
+TimeLineList H5KDataDriver
 ::_getTimeLine(const string& market, const string& code,
         const Datetime& start, const Datetime& end) {
-    TimeLine result;
+    TimeLineList result;
     if (start >= end || start > Datetime::max()) {
         return result;
     }

@@ -13,6 +13,7 @@
 #include "KQuery_serialization.h"
 #include "KRecord_serialization.h"
 #include "TimeLineRecord_serialization.h"
+#include "TransRecord_serialization.h"
 #include "MarketInfo_serialization.h"
 #include "Stock_serialization.h"
 #include "Block_serialization.h"

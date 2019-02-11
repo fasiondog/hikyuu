@@ -733,8 +733,8 @@ TimeLineRecord.datetime.__doc__ = """时间"""
 TimeLineRecord.price.__doc__ = """价格"""
 TimeLineRecord.vol.__doc__ = """成交量"""
 
-TimeLine.__doc__ = """
-通过 Stock.getTimeLine 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
+TimeLineList.__doc__ = """
+通过 Stock.getTimeLineList 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
 """
 
 
@@ -849,13 +849,13 @@ getDatetimeList(start, end, ktype)
     :rtype: DatetimeList        
 """
 
-Stock.getTimeLine.__doc__ = """
-getTimeLine(self, query)
+Stock.getTimeLineList.__doc__ = """
+getTimeLineList(self, query)
     
     获取分时线
         
     :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
-    :rtype: TimeLine
+    :rtype: TimeLineList
 """
 
 Stock.getWeight.__doc__ = """

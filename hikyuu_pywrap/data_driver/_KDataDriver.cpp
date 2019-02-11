@@ -134,18 +134,18 @@ public:
         return this->KDataDriver::getKRecord(market, code, pos, ktype);
     }
 
-    TimeLine getTimeLine(const string& market, const string& code,
+    TimeLineList getTimeLineList(const string& market, const string& code,
                 const KQuery& query) {
-        if (override call = get_override("getTimeLine")) {
+        if (override call = get_override("getTimeLineList")) {
             return call(market, code, query);
         } else {
-            return KDataDriver::getTimeLine(market, code, query);
+            return KDataDriver::getTimeLineList(market, code, query);
         }
     }
 
-    TimeLine default_getTimeLine(const string& market, const string& code,
+    TimeLineList default_getTimeLineList(const string& market, const string& code,
                 const KQuery& query) {
-        return this->KDataDriver::getTimeLine(market, code, query);
+        return this->KDataDriver::getTimeLineList(market, code, query);
     }
 };
 
@@ -171,8 +171,8 @@ void export_KDataDriver() {
                     &KDataDriverWrap::_getIndexRangeByDate,
                     &KDataDriverWrap::default_getIndexRangeByDate)
             .def("getTimeLine",
-                    &KDataDriverWrap::getTimeLine,
-                    &KDataDriverWrap::default_getTimeLine)
+                    &KDataDriverWrap::getTimeLineList,
+                    &KDataDriverWrap::default_getTimeLineList)
              ;
 
     register_ptr_to_python<KDataDriverPtr>();

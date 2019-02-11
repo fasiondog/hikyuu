@@ -27,20 +27,20 @@ void export_TimeLineReord() {
 #endif
             ;
 
-    TimeLine::const_reference (TimeLine::*TimeLine_at)(TimeLine::size_type) const = &TimeLine::at;
-    void (TimeLine::*append)(const TimeLineRecord&) = &TimeLine::push_back;
-    class_<TimeLine>("TimeLine")
+    TimeLineList::const_reference (TimeLineList::*TimeLine_at)(TimeLineList::size_type) const = &TimeLineList::at;
+    void (TimeLineList::*append)(const TimeLineRecord&) = &TimeLineList::push_back;
+    class_<TimeLineList>("TimeLineList")
             .def(self_ns::str(self))
-            .def("__iter__", iterator<TimeLine>())
-            .def("size", &TimeLine::size)
-            .def("__len__", &TimeLine::size)
+            .def("__iter__", iterator<TimeLineList>())
+            .def("size", &TimeLineList::size)
+            .def("__len__", &TimeLineList::size)
             .def("get", TimeLine_at, return_value_policy<copy_const_reference>())
             .def("append", append)
 #if HKU_PYTHON_SUPPORT_PICKLE
-            .def_pickle(normal_pickle_suite<TimeLine>())
+            .def_pickle(normal_pickle_suite<TimeLineList>())
 #endif
             ;
 
-    register_ptr_to_python<TimeLinePtr>();
+    register_ptr_to_python<TimeLineListPtr>();
 }
 

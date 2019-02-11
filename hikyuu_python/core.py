@@ -67,8 +67,8 @@ KData.__repr__ = reprFunc
 TimeLineRecord.__unicode__ = unicodeFunc
 TimeLineRecord.__repr__ = reprFunc
 
-TimeLine.__unicode__ = unicodeFunc
-TimeLine.__repr__ = reprFunc
+TimeLineList.__unicode__ = unicodeFunc
+TimeLineList.__repr__ = reprFunc
 
 Stock.__unicode__ = unicodeFunc
 Stock.__repr__ = reprFunc
@@ -292,7 +292,7 @@ PriceList.__getitem__ = list_getitem
 DatetimeList.__getitem__ = list_getitem
 StringList.__getitem__ = list_getitem
 BlockList.__getitem__ = list_getitem
-TimeLine.__getitem__ = list_getitem
+TimeLineList.__getitem__ = list_getitem
 
 
 #------------------------------------------------------------------
@@ -356,8 +356,8 @@ try:
         """转化为pandas的DataFrame"""
         return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')    
 
-    TimeLine.to_np = TimeLine_to_np
-    TimeLine.to_df = TimeLine_to_df
+    TimeLineList.to_np = TimeLine_to_np
+    TimeLineList.to_df = TimeLine_to_df
 
 except:
     pass
@@ -393,7 +393,7 @@ __all__ = [#类
            'StockWeightList', 
            'StringList',
            'TimeLineRecord',
-           'TimeLine',
+           'TimeLineList',
            
            #变量
            'constant', 

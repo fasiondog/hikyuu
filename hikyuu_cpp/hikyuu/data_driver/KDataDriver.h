@@ -91,7 +91,7 @@ public:
      * @param query  查询条件
      * @return
      */
-    virtual TimeLine getTimeLine(const string& market, const string& code,
+    virtual TimeLineList getTimeLineList(const string& market, const string& code,
             const KQuery& query);
 
 private:
