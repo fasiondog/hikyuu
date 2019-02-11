@@ -36,6 +36,10 @@ void registerSupportClass() {
     g_support_class_dict[typeid(KQuery).hash_code()] = "KQuery";
     g_support_class_dict[typeid(KRecord).hash_code()] = "KRecord";
     g_support_class_dict[typeid(KRecordList).hash_code()] = "KRecordList";
+    g_support_class_dict[typeid(TimeLineRecord).hash_code()] = "TimeLineRecord";
+    g_support_class_dict[typeid(TimeLineList).hash_code()] = "TimeLineList";
+    g_support_class_dict[typeid(TransRecord).hash_code()] = "TransRecord";
+    g_support_class_dict[typeid(TransList).hash_code()] = "TransList";
     g_support_class_dict[typeid(MarketInfo).hash_code()] = "MarketInfo";
     g_support_class_dict[typeid(Stock).hash_code()] = "Stock";
     g_support_class_dict[typeid(Block).hash_code()] = "Block";
@@ -143,6 +147,18 @@ void export_save_load() {
 
     def("hku_save", xml_save<KRecordList>);
     def("hku_load", xml_load<KRecordList>);
+
+    def("hku_save", xml_save<TimeLineRecord>);
+    def("hku_load", xml_load<TimeLineRecord>);
+
+    def("hku_save", xml_save<TimeLineList>);
+    def("hku_load", xml_load<TimeLineList>);
+
+    def("hku_save", xml_save<TransRecord>);
+    def("hku_load", xml_load<TransRecord>);
+
+    def("hku_save", xml_save<TransList>);
+    def("hku_load", xml_load<TransList>);
 
     def("hku_save", xml_save<MarketInfo>);
     def("hku_load", xml_load<MarketInfo>);

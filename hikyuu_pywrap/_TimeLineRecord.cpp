@@ -12,7 +12,7 @@
 using namespace boost::python;
 using namespace hku;
 
-bool (*record_eq)(const TimeLineRecord&, const TimeLineRecord&) = operator==;
+bool (*timelinerecord_eq)(const TimeLineRecord&, const TimeLineRecord&) = operator==;
 
 void export_TimeLineReord() {
     class_<TimeLineRecord>("TimeLineRecord", init<>())
@@ -21,7 +21,7 @@ void export_TimeLineReord() {
             .def_readwrite("datetime", &TimeLineRecord::datetime)
             .def_readwrite("price", &TimeLineRecord::price)
             .def_readwrite("vol", &TimeLineRecord::vol)
-            .def("__eq__", record_eq)
+            .def("__eq__", timelinerecord_eq)
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<TimeLineRecord>())
 #endif

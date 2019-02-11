@@ -12,7 +12,7 @@
 using namespace boost::python;
 using namespace hku;
 
-bool (*record_eq)(const TransRecord&, const TransRecord&) = operator==;
+bool (*transrecord_eq)(const TransRecord&, const TransRecord&) = operator==;
 
 void export_TransRecord() {
     class_<TransRecord>("TransRecord", init<>())
@@ -22,7 +22,7 @@ void export_TransRecord() {
             .def_readwrite("price", &TransRecord::price)
             .def_readwrite("vol", &TransRecord::vol)
             .def_readwrite("direct", &TransRecord::direct)
-            .def("__eq__", record_eq)
+            .def("__eq__", transrecord_eq)
 #if HKU_PYTHON_SUPPORT_PICKLE
             .def_pickle(normal_pickle_suite<TransRecord>())
 #endif
