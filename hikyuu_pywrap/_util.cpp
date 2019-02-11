@@ -11,8 +11,6 @@
 using namespace boost::python;
 using namespace hku;
 
-#include <hikyuu/utilities/util.h>
-
 BOOST_PYTHON_FUNCTION_OVERLOADS(roundUp_overload, roundUp, 1, 2);
 BOOST_PYTHON_FUNCTION_OVERLOADS(roundDown_overload, roundDown, 1, 2);
 

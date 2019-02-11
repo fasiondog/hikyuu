@@ -20,6 +20,16 @@ namespace logging = boost::log;
 
 namespace hku {
 
+static LOG_LEVEL g_log_level = TRACE;
+
+LOG_LEVEL get_log_level() {
+    return g_log_level;
+}
+
+void set_log_level(LOG_LEVEL level) {
+    g_log_level = level;
+}
+
 /**********************************************
  * Use Boost.log for logging
  *

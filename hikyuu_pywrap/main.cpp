@@ -11,6 +11,7 @@
 void export_DataType();
 void export_Constant();
 void export_util();
+void export_log();
 void export_Datetime();
 void export_StockManager();
 void export_Stock();
@@ -36,6 +37,7 @@ BOOST_PYTHON_MODULE(_hikyuu){
     export_DataType();
     export_Constant();
     export_util();
+    export_log();
     export_Datetime();
     export_MarketInfo();
     export_StockTypeInfo();

@@ -378,9 +378,9 @@ __all__ = [#类
            'KQueryByIndex', 
            'KRecord', 
            'KRecordList', 
-           'TimeLineRecord',
-           'TimeLine',
+           'LOG_LEVEL',
            'MarketInfo', 
+           'OstreamRedirect',
            'Parameter', 
            'PriceList',
            'Query', 
@@ -392,7 +392,8 @@ __all__ = [#类
            'StockWeight', 
            'StockWeightList', 
            'StringList',
-           'OstreamRedirect',
+           'TimeLineRecord',
+           'TimeLine',
            
            #变量
            'constant', 
@@ -407,6 +408,8 @@ __all__ = [#类
            'hku_save', 
            'roundDown',
            'roundUp', 
+           'get_log_level',
+           'set_log_level',
            'toPriceList', 
            
            #包
