@@ -619,7 +619,6 @@ KRecord.transCount.__doc__ = """成交量"""
 KRecordList.__doc__ = """C++ std::vector<KRecord>包装"""
 
 
-
 #------------------------------------------------------------------
 # from _KData.cpp
 #------------------------------------------------------------------
@@ -724,7 +723,7 @@ tocsv(filename)
 
 
 #------------------------------------------------------------------
-# from _Stock.cpp
+# from _TimeLineRecord.cpp
 #------------------------------------------------------------------
 
 TimeLineRecord.__doc__ = """分时线记录，属性可读写。"""
@@ -735,6 +734,22 @@ TimeLineRecord.vol.__doc__ = """成交量"""
 
 TimeLineList.__doc__ = """
 通过 Stock.getTimeLineList 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
+"""
+
+
+#------------------------------------------------------------------
+# from _TransRecord.cpp
+#------------------------------------------------------------------
+
+TransRecord.__doc__ = """分时线记录，属性可读写。"""
+
+TransRecord.datetime.__doc__ = """时间"""
+TransRecord.price.__doc__ = """价格"""
+TransRecord.vol.__doc__ = """成交量"""
+TransRecord.direct.__doc__ = """买卖盘方向"""
+
+TransList.__doc__ = """
+分时线数据列表
 """
 
 
@@ -856,6 +871,15 @@ getTimeLineList(self, query)
         
     :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
     :rtype: TimeLineList
+"""
+
+Stock.getTransList.__doc__ = """
+getTransList(self, query)
+    
+    获取历史分笔数据
+        
+    :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
+    :rtype: TransList
 """
 
 Stock.getWeight.__doc__ = """

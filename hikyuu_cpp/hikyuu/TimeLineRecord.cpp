@@ -22,10 +22,14 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TimeLineRecord& record
 }
 
 HKU_API std::ostream& operator <<(std::ostream &os, const TimeLineList& data) {
-    os << "TimeLineList{\n  size : " << data.size()
-       << "\n  start: " << data.front().datetime
-       << "\n  last : " << data.back().datetime
-       << "\n }";
+    if (data.size() > 0) {
+        os << "TimeLineList{\n  size : " << data.size()
+           << "\n  start: " << data.front().datetime
+           << "\n  last : " << data.back().datetime
+           << "\n }";
+    } else {
+        os << "TimeLineList{\n  size : " << data.size() << "\n }";
+    }
     return os;
 }
 

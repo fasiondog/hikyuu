@@ -39,6 +39,12 @@ H5KDataDriver::H5KDataDriver(): KDataDriver("hdf5") {
     m_h5TimeLineType.insertMember("datetime", HOFFSET(H5TimeLineRecord, datetime), H5::PredType::NATIVE_UINT64);
     m_h5TimeLineType.insertMember("price", HOFFSET(H5TimeLineRecord,price),H5::PredType::NATIVE_UINT64);
     m_h5TimeLineType.insertMember("vol", HOFFSET(H5TimeLineRecord,vol),H5::PredType::NATIVE_UINT64);
+
+    m_h5TransType = H5::CompType(sizeof(H5TransRecord));
+    m_h5TransType.insertMember("datetime", HOFFSET(H5TransRecord, datetime), H5::PredType::NATIVE_UINT64);
+    m_h5TransType.insertMember("price", HOFFSET(H5TransRecord,price),H5::PredType::NATIVE_UINT64);
+    m_h5TransType.insertMember("vol", HOFFSET(H5TransRecord,vol),H5::PredType::NATIVE_UINT64);
+    m_h5TransType.insertMember("buyorsell", HOFFSET(H5TransRecord,buyorsell),H5::PredType::NATIVE_UINT8);
 }
 
 H5KDataDriver::~H5KDataDriver() {
@@ -93,6 +99,12 @@ bool H5KDataDriver::_init() {
                 H5FilePtr h5file(new H5::H5File(filename,
                                  H5F_ACC_RDONLY), Hdf5FileCloser());
                 m_h5file_map[market+"_TIME"] = h5file;
+
+            } else if (ktype == "TRANS") {
+                filename = getParam<string>(*iter);
+                H5FilePtr h5file(new H5::H5File(filename,
+                                 H5F_ACC_RDONLY), Hdf5FileCloser());
+                m_h5file_map[market+"_TRANS"] = h5file;
             }
 
         } catch(...) {
@@ -149,6 +161,22 @@ void H5KDataDriver
     H5::DataSpace memspace(1, count);
     dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
     dataset.read(data, m_h5TimeLineType, memspace, dataspace);
+    memspace.close();
+    dataspace.close();
+    return;
+}
+
+void H5KDataDriver
+::H5ReadTransRecords(H5::DataSet& dataset, hsize_t start,
+        hsize_t nrecords, void *data) {
+    H5::DataSpace dataspace = dataset.getSpace();
+    hsize_t offset[1];
+    hsize_t count[1];
+    offset[0] = start;
+    count[0] = nrecords;
+    H5::DataSpace memspace(1, count);
+    dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
+    dataset.read(data, m_h5TransType, memspace, dataspace);
     memspace.close();
     dataspace.close();
     return;
@@ -344,6 +372,8 @@ _getH5FileAndGroup(const string& market, const string& code,
         } else if (kType == KQuery::YEAR) {
             out_group = out_file->openGroup("year");
         } else if (kType == "TIME") {
+            out_group = out_file->openGroup("data");
+        } else if (kType == "TRANS") {
             out_group = out_file->openGroup("data");
         } else {
             return false;
@@ -956,14 +986,14 @@ TimeLineList H5KDataDriver
         dataset.close();
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver::getTimeLine] "
+        HKU_WARN("[H5KDataDriver::_getTimeLine] "
                     "Invalid datetime!");
         dataspace.close();
         dataset.close();
         return result;
 
     } catch(...) {
-        HKU_INFO("[H5KDataDriver::getTimeLine] error in "
+        HKU_INFO("[H5KDataDriver::_getTimeLine] error in "
                 << market << code);
         dataspace.close();
         dataset.close();
@@ -993,7 +1023,246 @@ TimeLineList H5KDataDriver
         }
 
     } catch(std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::getTimeLine] Invalid date! market_code("
+        HKU_WARN("[H5KDataDriver::_getTimeLine] Invalid date! market_code("
+                << market << code << ") "
+                << e.what());
+
+    } catch(...) {
+
+    }
+
+    delete [] pBuf;
+
+    return result;
+}
+
+
+TransList H5KDataDriver
+::getTransList(const string& market, const string& code, const KQuery& query) {
+    return query.queryType() == KQuery::INDEX
+            ? _getTransList(market, code, query.start(), query.end())
+            : _getTransList(market, code,
+                    query.startDatetime(), query.endDatetime());
+}
+
+
+TransList H5KDataDriver
+::_getTransList(const string& market, const string& code,
+        hku_int64 start_ix, hku_int64 end_ix) {
+    TransList result;
+    H5FilePtr h5file;
+    H5::Group group;
+    if (!_getH5FileAndGroup(market, code, "TRANS", h5file, group)) {
+        return result;
+    }
+
+    H5TransRecord *pBuf=NULL;
+    try{
+        string tablename(market + code);
+        H5::DataSet dataset(group.openDataSet(tablename));
+        H5::DataSpace dataspace = dataset.getSpace();
+        size_t all_total = dataspace.getSelectNpoints();
+        if (0 == all_total) {
+            return result;
+        }
+
+        if(start_ix < 0) {
+            start_ix += all_total;
+            if(start_ix < 0)
+                start_ix = 0;
+        }
+
+        if(end_ix < 0) {
+            end_ix += all_total;
+            if(end_ix < 0)
+                end_ix = 0;
+        }
+
+        if (start_ix >= end_ix) {
+            return result;
+        }
+
+        size_t startpos = boost::numeric_cast<size_t>(start_ix);
+        size_t endpos = boost::numeric_cast<size_t>(end_ix);
+
+        size_t total = endpos > all_total ? all_total - startpos : endpos - startpos;
+        pBuf = new H5TransRecord[total];
+        H5ReadTransRecords(dataset, start_ix, total, pBuf);
+
+        TransRecord record;
+        result.reserve(total + 2);
+        hku_uint64 number = 0, second = 0;
+        for(hsize_t i=0; i<total; i++){
+            number = pBuf[i].datetime / 100;
+            second = pBuf[i].datetime - number * 100;
+            Datetime d(number);
+            record.datetime = Datetime(d.year(), d.month(), d.day(),
+                                       d.hour(), d.minute(), second);
+            record.price = price_t(pBuf[i].price)*0.001;
+            record.vol = price_t(pBuf[i].vol);
+            record.direct = TransRecord::DIRECT(pBuf[i].buyorsell);
+            result.push_back(record);
+        }
+
+    } catch (std::out_of_range& e) {
+        HKU_WARN("[H5KDataDriver::_getTransList] Invalid date! market_code("
+                << market << code << ") "
+                << e.what());
+
+    } catch (boost::bad_numeric_cast&) {
+        HKU_WARN("You may be use 32bit system, but data is to larger! "
+                "[H5KDataDriver::_getTransList]");
+
+    } catch (...) {
+        HKU_ERROR("Unknow error! [H5KDataDriver::_getTransList]");
+
+    }
+
+    delete [] pBuf;
+    return result;
+}
+
+
+TransList H5KDataDriver
+::_getTransList(const string& market, const string& code,
+        const Datetime& start, const Datetime& end) {
+    TransList result;
+    if (start >= end || start > Datetime::max()) {
+        return result;
+    }
+
+    H5FilePtr h5file;
+    H5::Group group;
+    bool success;
+    success = _getH5FileAndGroup(market,code, "TRANS", h5file, group);
+    if(!success) {
+        return result;
+    }
+
+    H5::DataSet dataset;
+    H5::DataSpace dataspace;
+    hku_uint64 start_number = start.number() * 100 + start.second();
+    hku_uint64 end_number = end.number() * 100 + end.second();
+    hsize_t startpos = 0, endpos = 0;
+    try {
+        dataset = group.openDataSet(market + code);
+        dataspace = dataset.getSpace();
+        hsize_t total = dataspace.getSelectNpoints();
+        if (0 == total) {
+            return result;
+        }
+
+        hsize_t mid, low = 0, high = total - 1;
+        H5TransRecord h5record;
+        while(low <= high) {
+            H5ReadTransRecords(dataset, high, 1, &h5record);
+            if(start_number > h5record.datetime) {
+                mid = high + 1;
+                break;
+            }
+
+            H5ReadTransRecords(dataset, low, 1, &h5record);
+            if(h5record.datetime >= start_number) {
+                mid = low;
+                break;
+            }
+
+            mid = (low + high) / 2;
+            H5ReadTransRecords(dataset, mid, 1, &h5record);
+            if(start_number > h5record.datetime) {
+                low = mid + 1;
+            }else {
+                high = mid - 1;
+            }
+        }
+
+        if(mid >= total) {
+            dataspace.close();
+            dataset.close();
+            return result;
+        }
+
+        startpos = mid;
+
+        low = mid;
+        high = total - 1;
+        while(low <= high){
+            H5ReadTransRecords(dataset, high, 1, &h5record);
+            if( end_number > h5record.datetime ){
+                mid = high + 1;
+                break;
+            }
+
+            H5ReadTransRecords(dataset, low, 1, &h5record);
+            if( h5record.datetime >= end_number ){
+                mid = low;
+                break;
+            }
+
+            mid = (low + high)/2;
+            H5ReadTransRecords(dataset, mid, 1, &h5record);
+            if( end_number > h5record.datetime){
+                low = mid + 1;
+            }else{
+                high = mid - 1;
+            }
+        }
+
+        endpos = mid >= total ? total : mid;
+        if(startpos >= endpos) {
+            dataspace.close();
+            dataset.close();
+            return result;
+        }
+
+        dataspace.close();
+        dataset.close();
+
+    } catch(std::out_of_range&) {
+        HKU_WARN("[H5KDataDriver::_getTransList] "
+                    "Invalid datetime!");
+        dataspace.close();
+        dataset.close();
+        return result;
+
+    } catch(...) {
+        HKU_INFO("[H5KDataDriver::_getTransList] error in "
+                << market << code);
+        dataspace.close();
+        dataset.close();
+        return result;
+    }
+
+    if (startpos == endpos) {
+        return result;
+    }
+
+    H5TransRecord *pBuf=NULL;
+    try{
+        string tablename(market + code);
+        H5::DataSet dataset(group.openDataSet(tablename));
+
+        size_t total = endpos - startpos;
+        pBuf = new H5TransRecord[total];
+        H5ReadTransRecords(dataset, startpos, total, pBuf);
+
+        TransRecord record;
+        result.reserve(total + 2);
+        hku_uint64 number = 0, second = 0;
+        for(hsize_t i=0; i<total; i++){
+            number = pBuf[i].datetime / 100;
+            second = pBuf[i].datetime - number * 100;
+            Datetime d(number);
+            record.datetime = Datetime(d.year(), d.month(), d.day(),
+                                       d.hour(), d.minute(), second);
+            record.price = price_t(pBuf[i].price)*0.001;
+            record.vol = price_t(pBuf[i].vol);
+            record.direct = TransRecord::DIRECT(pBuf[i].buyorsell);
+            result.push_back(record);
+        }
+
+    } catch(std::out_of_range& e) {
+        HKU_WARN("[H5KDataDriver::_getTransList] Invalid date! market_code("
                 << market << code << ") "
                 << e.what());
 

@@ -52,7 +52,6 @@ class ImportPytdxTimeToH5:
         count = 0
         connect = sqlite3.connect(self.sqlitefile)
         try:
-
             progress = ProgressBar(self)
             api = TdxHq_API()
             api.connect(self.ip, self.port)

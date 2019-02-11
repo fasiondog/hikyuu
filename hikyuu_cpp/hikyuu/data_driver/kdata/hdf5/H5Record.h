@@ -37,6 +37,13 @@ struct H5TimeLineRecord {
     hku_uint64 vol;
 };
 
+struct H5TransRecord {
+    hku_uint64 datetime;
+    hku_uint64 price;
+    hku_uint64 vol;
+    hku_uint8  buyorsell;
+};
+
 } /* namespae */
 
 #endif /* H5RECORD_H_ */

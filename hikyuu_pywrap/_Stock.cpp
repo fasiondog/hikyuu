@@ -51,6 +51,7 @@ void export_Stock() {
             .def("isBuffer", &Stock::isBuffer)
             .def("getKData", &Stock::getKData)
             .def("getTimeLineList", &Stock::getTimeLineList)
+            .def("getTransList", &Stock::getTransList)
             .def("getCount", &Stock::getCount, getCount_overloads())
             .def("getMarketValue", &Stock::getMarketValue)
             .def("getKRecord", &Stock::getKRecord, getRecord_overloads())

@@ -125,20 +125,12 @@ public:
     /**
      * 按日期方式查询时，返回指定的起始日期，否则返回Null<Datetime>()
      */
-    Datetime startDatetime() const {
-        return m_queryType != DATE
-                ? Null<Datetime>()
-                : Datetime((hku_uint64)m_start);
-    }
+    Datetime startDatetime() const;
 
     /**
      * 按日期方式查询时，返回指定的结束日期，否则返回Null<Datetime>()
      */
-    Datetime endDatetime() const {
-        return m_queryType != DATE
-                ? Null<Datetime>()
-                : Datetime((hku_uint64)m_end);
-    }
+    Datetime endDatetime() const;
 
     /** 获取查询条件类型 */
     QueryType queryType() const { return m_queryType; }
@@ -186,12 +178,10 @@ private:
  * @see KQuery
  * @ingroup StockManage*
  */
-inline KQuery KQueryByIndex(hku_int64 start = 0,
+KQuery HKU_API KQueryByIndex(hku_int64 start = 0,
         hku_int64 end = Null<hku_int64>(),
         KQuery::KType dataType = KQuery::DAY,
-        KQuery::RecoverType recoverType = KQuery::NO_RECOVER) {
-    return KQuery(start, end, dataType, recoverType, KQuery::INDEX);
-}
+        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
 /**
  * 构造按日期方式K线查询，范围[startDatetime, endDatetime)
@@ -202,14 +192,11 @@ inline KQuery KQueryByIndex(hku_int64 start = 0,
  * @see KQuery
  * @ingroup StockManage
  */
-inline KQuery KQueryByDate(
+KQuery HKU_API KQueryByDate(
         const Datetime& start = Datetime::min(),
         const Datetime& end = Null<Datetime>(),
         KQuery::KType dataType = KQuery::DAY,
-        KQuery::RecoverType recoverType = KQuery::NO_RECOVER) {
-    return KQuery((hku_int64)start.number(), (hku_int64)end.number(),
-                  dataType, recoverType, KQuery::DATE);
-}
+        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
 /**
  * 输出KQuery信息，如：KQuery(start, end, queryType, kType, recoverType)

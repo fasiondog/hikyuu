@@ -649,6 +649,12 @@ TimeLineList Stock::getTimeLineList(const KQuery& query) const {
 }
 
 
+TransList Stock::getTransList(const KQuery& query) const {
+    return isNull() ? TransList()
+                    :m_kdataDriver->getTransList(market(), code(), query);
+}
+
+
 KRecord Stock::
 getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
     size_t startix = 0, endix = 0;

@@ -391,8 +391,8 @@ def import_trans(connect, market, quotations, api, dest_dir, max_days=30, progre
 
         this_count = import_on_stock_trans(connect, api, h5file, market, stock, max_days)
         add_record_count += this_count
-        if add_record_count > 0:
-            update_hdf5_trans_index(h5file, market.upper() + stock[2])
+        #if add_record_count > 0:
+        #    update_hdf5_trans_index(h5file, market.upper() + stock[2])
         if progress:
             progress(i, total)
 

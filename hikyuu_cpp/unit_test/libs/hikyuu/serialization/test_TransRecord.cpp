@@ -1,7 +1,7 @@
 /*
- * test_TimeLine.cpp
+ * test_TransRecord.cpp
  *
- *  Created on: 2019年2月10日
+ *  Created on: 2019-2-11
  *      Author: fasiondog
  */
 
@@ -17,59 +17,57 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/serialization/TimeLineRecord_serialization.h>
+#include <hikyuu/serialization/TransRecord_serialization.h>
 
 using namespace hku;
 
 #if HKU_SUPPORT_SERIALIZATION
 
 /**
- * @defgroup test_TimeLine_serialize test_TimeLine_serialize
+ * @defgroup test_Trans_serialize test_Trans_serialize
  * @ingroup test_hikyuu_serialize_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_TimeLineRecord_serialize ) {
+BOOST_AUTO_TEST_CASE( test_TransRecord_serialize ) {
     string filename(StockManager::instance().tmpdir());
-    filename += "/TimeLineRecord.xml";
+    filename += "/TransRecord.xml";
 
-    TimeLineRecord t1(Datetime(201101010000), 10.0, 80);
+    TransRecord t1(Datetime(201101010000), 10.0, 80, TransRecord::SELL);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
         oa << BOOST_SERIALIZATION_NVP(t1);
     }
 
-    TimeLineRecord t2;
+    TransRecord t2;
     {
         std::ifstream ifs(filename);
         boost::archive::xml_iarchive ia(ifs);
         ia >> BOOST_SERIALIZATION_NVP(t2);
     }
 
-    BOOST_CHECK(t1.datetime == t2.datetime);
-    BOOST_CHECK(t1.price == t2.price);
-    BOOST_CHECK(t1.vol == t2.vol);
+    BOOST_CHECK(t1 == t2);
 }
 
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_TimeLineList_serialize ) {
+BOOST_AUTO_TEST_CASE( test_TransList_serialize ) {
     string filename(StockManager::instance().tmpdir());
-    filename += "/TimeLineList.xml";
+    filename += "/TransList.xml";
 
-    TimeLineList line1;
-    line1.push_back(TimeLineRecord(Datetime(201101010000), 10.0, 80));
-    line1.push_back(TimeLineRecord(Datetime(201101020000), 20.0, 90));
-    line1.push_back(TimeLineRecord(Datetime(201101030000), 20.0, 100));
+    TransList line1;
+    line1.push_back(TransRecord(Datetime(201101010000), 10.0, 80, TransRecord::BUY));
+    line1.push_back(TransRecord(Datetime(201101020000), 20.0, 90, TransRecord::SELL));
+    line1.push_back(TransRecord(Datetime(201101030000), 20.0, 100, TransRecord::AUCTION));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
         oa << BOOST_SERIALIZATION_NVP(line1);
     }
 
-    TimeLineList line2;
+    TransList line2;
     {
         std::ifstream ifs(filename);
         boost::archive::xml_iarchive ia(ifs);

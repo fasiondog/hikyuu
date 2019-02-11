@@ -59,6 +59,8 @@ sz_min = {dir}/sz_1min.h5
 sz_min5 = {dir}/sz_5min.h5
 sh_time = {dir}/sh_time.h5
 sz_time = {dir}/sz_time.h5
+sh_trans = {dir}/sh_trans.h5
+sz_trans = {dir}/sz_trans.h5
 """
 
 

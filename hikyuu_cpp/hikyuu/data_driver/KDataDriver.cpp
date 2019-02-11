@@ -98,6 +98,13 @@ TimeLineList KDataDriver
     return TimeLineList();
 }
 
+TransList KDataDriver
+::getTransList(const string& market, const string& code, const KQuery& query) {
+    HKU_INFO("This driver not support transaction record!")
+    return TransList();
+}
+
+
 } /* namespace hku */
 
 

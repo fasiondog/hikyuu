@@ -11,6 +11,7 @@
 #include "StockWeight.h"
 #include "KQuery.h"
 #include "TimeLineRecord.h"
+#include "TransRecord.h"
 
 namespace hku {
 
@@ -157,6 +158,9 @@ public:
 
     /** 获取分时线 */
     TimeLineList getTimeLineList(const KQuery& query) const;
+
+    /** 获取历史分笔数据 */
+    TransList getTransList(const KQuery& query) const;
 
     /** 设置权息信息 */
     void setWeightList(const StockWeightList&);

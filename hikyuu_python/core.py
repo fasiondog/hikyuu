@@ -52,7 +52,7 @@ constant = Constant()
 MarketInfo.__unicode__ = unicodeFunc
 MarketInfo.__repr__ = reprFunc
 
-StockTypeInfo.__unicode = unicodeFunc
+StockTypeInfo.__unicode__ = unicodeFunc
 StockTypeInfo.__repr__ = reprFunc
 
 KQuery.__unicode__ = unicodeFunc
@@ -69,6 +69,12 @@ TimeLineRecord.__repr__ = reprFunc
 
 TimeLineList.__unicode__ = unicodeFunc
 TimeLineList.__repr__ = reprFunc
+
+TransRecord.__unicode__ = unicodeFunc
+TransRecord.__repr__ = reprFunc
+
+TransList.__unicode__ = unicodeFunc
+TransList.__repr__ = reprFunc
 
 Stock.__unicode__ = unicodeFunc
 Stock.__repr__ = reprFunc
@@ -293,6 +299,7 @@ DatetimeList.__getitem__ = list_getitem
 StringList.__getitem__ = list_getitem
 BlockList.__getitem__ = list_getitem
 TimeLineList.__getitem__ = list_getitem
+TransList.__getitem__ = list_getitem
 
 
 #------------------------------------------------------------------
@@ -359,6 +366,19 @@ try:
     TimeLineList.to_np = TimeLine_to_np
     TimeLineList.to_df = TimeLine_to_df
 
+    def TransList_to_np(data):
+        """转化为numpy结构数组"""
+        t_type = np.dtype({'names':['datetime','price', 'vol', 'direct'], 
+                    'formats':['datetime64[ms]','d','d', 'd']})
+        return np.array([(t.datetime.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type)
+
+    def TransList_to_df(kdata):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(TransList_to_np(kdata), index='datetime')    
+
+    TransList.to_np = TransList_to_np
+    TransList.to_df = TransList_to_df
+
 except:
     pass
 
@@ -394,6 +414,8 @@ __all__ = [#类
            'StringList',
            'TimeLineRecord',
            'TimeLineList',
+           'TransRecord',
+           'TransList',
            
            #变量
            'constant', 

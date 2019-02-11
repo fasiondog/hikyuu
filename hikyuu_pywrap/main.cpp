@@ -22,6 +22,7 @@ void export_StockWeight();
 void export_KQuery();
 void export_KReord();
 void export_TimeLineReord();
+void export_TransRecord();
 void export_KData();
 void export_Parameter();
 void export_save_load();
@@ -46,6 +47,7 @@ BOOST_PYTHON_MODULE(_hikyuu){
     export_KQuery();
     export_KReord();
     export_TimeLineReord();
+    export_TransRecord();
     export_KData();
     export_Stock();
     export_Block();

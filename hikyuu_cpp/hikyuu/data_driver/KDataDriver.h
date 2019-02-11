@@ -11,6 +11,7 @@
 #include "../utilities/Parameter.h"
 #include "../KQuery.h"
 #include "../TimeLineRecord.h"
+#include "../TransRecord.h"
 
 namespace hku {
 
@@ -92,6 +93,16 @@ public:
      * @return
      */
     virtual TimeLineList getTimeLineList(const string& market, const string& code,
+            const KQuery& query);
+
+    /**
+     * 获取历史分笔数据
+     * @param market 市场简称
+     * @param code   证券代码
+     * @param query  查询条件
+     * @return
+     */
+    virtual TransList getTransList(const string& market, const string& code,
             const KQuery& query);
 
 private:

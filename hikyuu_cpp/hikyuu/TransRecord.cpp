@@ -23,10 +23,14 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TransRecord& record) {
 }
 
 HKU_API std::ostream& operator <<(std::ostream &os, const TransList& data) {
-    os << "Transaction{\n  size : " << data.size()
-       << "\n  start: " << data.front().datetime
-       << "\n  last : " << data.back().datetime
-       << "\n }";
+    if (data.size() > 0) {
+        os << "TransList{\n  size : " << data.size()
+           << "\n  start: " << data.front().datetime
+           << "\n  last : " << data.back().datetime
+           << "\n }";
+    } else {
+        os << "TransList{\n  size : " << data.size() << "\n }";
+    }
     return os;
 }
 
@@ -50,7 +54,7 @@ TransRecord::TransRecord()
 
 TransRecord::TransRecord(const Datetime& datetime, 
         price_t price, price_t vol, DIRECT direct)
-: datetime(datetime), price(price), direct(direct) {
+: datetime(datetime), price(price), vol(vol), direct(direct) {
 
 }
 

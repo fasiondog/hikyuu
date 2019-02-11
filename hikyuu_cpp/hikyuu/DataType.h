@@ -46,6 +46,9 @@ typedef long long hku_int64;
 typedef unsigned long long hku_uint64;
 typedef int hku_int32;
 typedef unsigned hku_uint32;
+typedef char hku_int8;
+typedef unsigned char hku_uint8;
+
 
 typedef double price_t;
 

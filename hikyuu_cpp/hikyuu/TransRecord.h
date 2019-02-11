@@ -16,7 +16,7 @@ namespace hku {
  * 分笔成交记录
  * @ingroup StockManage
  */
-class TransRecord {
+class HKU_API TransRecord {
 public:
 
     enum DIRECT {
