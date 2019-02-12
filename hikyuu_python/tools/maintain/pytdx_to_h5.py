@@ -324,7 +324,7 @@ def import_on_stock_trans(connect, api, h5file, market, stock_record, max_days):
     table = get_trans_table(h5file, market, code)
     today = datetime.date.today()
     if table.nrows > 0:
-        last_datetime = int(table[-1]['datetime']//10000)
+        last_datetime = int(table[-1]['datetime']//1000000)
         last_y = int(last_datetime // 10000)
         last_m = int(last_datetime // 100 - last_y * 100)
         last_d = int(last_datetime - (last_y * 10000 + last_m * 100))
