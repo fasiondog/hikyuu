@@ -13,26 +13,58 @@ xmake = os.system("xmake --version")
 if xmake != 0 or 'BOOST_ROOT' not in os.environ or 'BOOST_LIB' not in os.environ:
     print("Please read https://hikyuu.readthedocs.io/en/latest/developer.html")
 
+py_version = platform.python_version_tuple() 
+py_version = int(py_version[0])*10 + int(py_version[1])
+if py_version < 31:
+    print("Python version must >= 3.1 !")
+    sys.exit(0)
+
+py_version_changed = True
+if os.path.exists('py_version'):
+    with open('py_version', 'r+') as f:
+        old_py_version = f.read()
+        if old_py_version == str(py_version):
+            py_version_changed = False
+        else:
+            f.write(str(py_version))
+else:
+    with open('py_version', 'w') as f:
+        f.write(str(py_version))
+
+print('py_version_changed', py_version_changed)
+if py_version_changed:
+    os.system("xmake f -c")
+    os.system("xmake f --with-unit-test=y")
+    
+    if os.path.lexists('build'):
+        shutil.rmtree('build')
+    
+    current_dir = os.getcwd()
+    os.chdir(os.environ['BOOST_ROOT'])
+    if os.path.lexists('bin.v2'):
+        shutil.rmtree('bin.v2')
+    if not os.path.exists('b2.exe'):
+        os.system('bootstrap.bat')
+    os.system('b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test')
+    
+    os.chdir(current_dir)
+    
+
 if len(sys.argv) == 1:
     os.system("xmake")
     install_dir = sys.base_prefix + "\\lib\\site-packages\\hikyuu"
     os.system("xmake install -o " + install_dir)
     sys.exit(0)
-    
+
 os.system("xmake")
 os.system("xmake install -o hikyuu")
-
-py_version = platform.python_version_tuple() 
-py_version = int(py_version[0])*10 + int(py_version[1])
-if py_version < 35:
-    print("Python version must > 3.5 !")
-    sys.exit(0)
 
 if sys.argv[-1] == 'bdist_wheel':
     sys.argv.append("--python-tag")
     sys.argv.append("cp{}".format(py_version))
     sys.argv.append("-p")
     sys.argv.append("win-amd64")
+    
     
 shutil.rmtree('build/lib')
 shutil.rmtree('build/bdist.win-amd64')
