@@ -10,14 +10,35 @@ import platform
 print("checking xmake ...")
 xmake = os.system("xmake --version")
 
-if xmake != 0 or 'BOOST_ROOT' not in os.environ or 'BOOST_LIB' not in os.environ:
+if xmake != 0: # or 'BOOST_ROOT' not in os.environ or 'BOOST_LIB' not in os.environ:
     print("Please read https://hikyuu.readthedocs.io/en/latest/developer.html")
+    exit(0)
+    
+current_boost_root = None
+current_boost_lib = None
+if 'BOOST_ROOT' not in os.environ or 'BOOST_LIB' not in os.environ:
+    for dir in os.listdir():
+        if len(dir) >= 5 and dir[:5] == 'boost' and os.path.isdir(dir):
+            current_boost_root = dir
+            current_boost_lib = dir + '/stage/lib'
+            os.environ['BOOST_ROOT'] = current_boost_root
+            os.environ['BOOST_LIB'] = current_boost_lib
+else:
+    current_boost_root = os.environ['BOOST_ROOT']
+    current_boost_lib = os.environ['BOOST_LIB']
+    
+if current_boost_root is None or current_boost_lib is None:
+    print("Please read https://hikyuu.readthedocs.io/en/latest/developer.html")
+    exit(0)
 
 py_version = platform.python_version_tuple() 
 py_version = int(py_version[0])*10 + int(py_version[1])
 if py_version < 31:
     print("Python version must >= 3.1 !")
     sys.exit(0)
+
+current_plat = sys.platform
+current_bits = 64 if sys.maxsize > 2**32 else 32
 
 py_version_changed = True
 if os.path.exists('py_version'):
@@ -26,6 +47,7 @@ if os.path.exists('py_version'):
         if old_py_version == str(py_version):
             py_version_changed = False
         else:
+            f.seek(0)
             f.write(str(py_version))
 else:
     with open('py_version', 'w') as f:
@@ -33,16 +55,23 @@ else:
 
 print('py_version_changed', py_version_changed)
 if py_version_changed:
-    os.system("xmake f -c")
-    os.system("xmake f --with-unit-test=y")
-    
-    if os.path.lexists('build'):
-        shutil.rmtree('build')
+    if current_plat == 'win32' and current_bits == 64:
+        build_hikyuu_pywrap_dir = 'build\\release\\windows\\x64\\.objs\\windows\\x64\\release\\hikyuu_pywrap'
+    elif current_plat == 'win32' and current_bits == 32:
+        build_hikyuu_pywrap_dir = 'build\\release\\windows\\x64\\.objs\\windows\\x64\\release\\hikyuu_pywrap'
+    elif current_plat == 'linux' and current_bits == 64:
+        build_hikyuu_pywrap_dir = 'build/release/linux/x64/.objs/windows/x64/release/hikyuu_pywrap'
+    else:
+        print("************不支持的平台打包**************")
+        exit(0)
+        
+    if os.path.lexists(build_hikyuu_pywrap_dir):
+        shutil.rmtree(build_hikyuu_pywrap_dir)
     
     current_dir = os.getcwd()
-    os.chdir(os.environ['BOOST_ROOT'])
-    if os.path.lexists('bin.v2'):
-        shutil.rmtree('bin.v2')
+    os.chdir(current_boost_root)
+    if os.path.lexists('bin.v2/libs/python'):
+        shutil.rmtree('bin.v2/libs/python')
     if not os.path.exists('b2.exe'):
         os.system('bootstrap.bat')
     os.system('b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test')
@@ -51,21 +80,29 @@ if py_version_changed:
     
 
 if len(sys.argv) == 1:
-    os.system("xmake")
-    install_dir = sys.base_prefix + "\\lib\\site-packages\\hikyuu"
+    os.system("xmake f -c")
+    #os.system("xmake f --with-unit-test=y")
+    install_dir = sys.base_prefix + "/lib/site-packages/hikyuu"
     os.system("xmake install -o " + install_dir)
     sys.exit(0)
 
-os.system("xmake")
-os.system("xmake install -o hikyuu")
-
 if sys.argv[-1] == 'bdist_wheel':
+    os.system("xmake f -c")
+    os.system("xmake install -o hikyuu")
     sys.argv.append("--python-tag")
     sys.argv.append("cp{}".format(py_version))
     sys.argv.append("-p")
-    sys.argv.append("win-amd64")
-    
-    
+    if current_plat == 'win32' and current_bits == 64:
+        sys.argv.append("win-amd64")
+    elif current_plat == 'win32' and current_bits == 32:
+        sys.argv.append("win32")
+    elif current_plat == 'linux' and current_bits == 64:
+        sys.argv.append("manylinux1_x86_64")
+    elif current_plat == 'linux' and current_bits == 32:
+        sys.argv.append("manylinux1_i386")
+    else:
+        print("*********尚未实现*******")
+        
 shutil.rmtree('build/lib')
 shutil.rmtree('build/bdist.win-amd64')
 #shutil.rmtree('dist')
@@ -162,3 +199,6 @@ setup(
             'pyecharts_snapshot'
         ],        
         )
+
+if os.path.exists('hikyuu'):
+    shutil.rmtree('hikyuu')

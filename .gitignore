@@ -30,3 +30,5 @@ hikyuu_cpp/hikyuu/version.h
 hikyuu_python/tools/maintain/importdata.ini
 Hikyuu.egg-info
 dist
+boost_*
+py_version
