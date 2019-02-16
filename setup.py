@@ -7,21 +7,22 @@ import os
 import shutil
 import platform
 
-if len(sys.argv) < 1 or (len(sys.argv) > 1 and sys.argv[1] not in ('bdist_wheel', 'uninstall', 'clear')):
-    print("参数错误，仅支持以下命令：")
-    print("python setup.py 直接安装")
-    print("python setup.py uninstall 删除已安装的Hikyuu")
-    print("python setup.py bdist_wheel 生成wheel安装包")
-    print("python setup.py clear 清除本地编译结果")
+def print_help():
+    print("python setup.py help        -- 查看帮助")
+    print("python setup.py             -- 执行编译")
+    print("python setup.py build       -- 执行编译")
+    print("python setup.py install     -- 执行安装")
+    print("python setup.py uninstall   -- 删除已安装的Hikyuu")
+    print("python setup.py clear       -- 清除本地编译结果")
+    print("python setup.py bdist_wheel -- 生成wheel安装包")
+
+
+if len(sys.argv) < 1 or (len(sys.argv) > 1 and sys.argv[1] not in ('bdist_wheel', 'build', 'install', 'uninstall', 'clear')):
+    print("参数错误，请参考以下命令执行：")
+    print_help()
     exit(0)
 
 if sys.argv[-1] == 'uninstall':
-    install_dir = sys.base_prefix + "/lib/site-packages/hikyuu"
-    #if os.path.lexists(install_dir):
-    #    print('delete', install_dir)
-    #    shutil.rmtree(install_dir)
-    #else:
-    #    print('未安装 Hikyuu')
     site_lib_dir = sys.base_prefix + "/lib/site-packages"
     for dir in os.listdir(site_lib_dir):
         if dir == 'hikyuu' or (len(dir) > 6 and dir[:6] == 'Hikyuu'):
@@ -35,6 +36,8 @@ if sys.argv[-1] == 'clear':
         shutil.rmtree('.xmake')
     if os.path.lexists('build'):
         shutil.rmtree('build')
+    if os.path.exists('py_version'):
+        os.remove('py_version')
     print('clear finished!')
     exit(0)
 
@@ -117,12 +120,18 @@ if not os.path.exists('b2.exe'):
 os.system('b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test')
 
 os.chdir(current_dir)
-    
 
-if len(sys.argv) == 1:
+if len(sys.argv) == 1 or sys.argv[-1] == 'build':
     if py_version_changed:
         os.system("xmake f -c")
         os.system("xmake f --with-unit-test=y")
+    os.system("xmake")
+    os.system("xmake r unit-test")
+    sys.exit(0)
+
+if sys.argv[-1] == 'install':
+    if py_version_changed:
+        os.system("xmake f -c")
     install_dir = sys.base_prefix + "/lib/site-packages/hikyuu"
     os.system("xmake install -o " + install_dir)
     sys.exit(0)
