@@ -16,6 +16,8 @@ def print_help():
     print("python setup.py clear       -- 清除本地编译结果")
     print("python setup.py bdist_wheel -- 生成wheel安装包")
 
+current_plat = sys.platform
+current_bits = 64 if sys.maxsize > 2**32 else 32
 
 if len(sys.argv) < 1 or (len(sys.argv) > 1 and sys.argv[1] not in ('bdist_wheel', 'build', 'install', 'uninstall', 'clear')):
     print("参数错误，请参考以下命令执行：")
@@ -91,9 +93,6 @@ if py_version < 31:
     print("Python version must >= 3.1 !")
     sys.exit(0)
 
-current_plat = sys.platform
-current_bits = 64 if sys.maxsize > 2**32 else 32
-
 py_version_changed = True
 if os.path.exists('py_version'):
     with open('py_version', 'r+') as f:
@@ -125,14 +124,20 @@ if py_version_changed:
         shutil.rmtree(build_hikyuu_pywrap_dir)
     
 print('compile boost ...')
-os.chdir(current_boost_root)
 if py_version_changed and os.path.lexists('bin.v2/libs/python'):
     shutil.rmtree('bin.v2/libs/python')
-if not os.path.exists('b2.exe'):
-    os.system('bootstrap.bat')
-os.system('b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test')
+if current_plat == 'win32':
+    os.chdir(current_boost_root)
+    if not os.path.exists('b2.exe'):
+        os.system('bootstrap.bat')
+    os.system('b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test')
+    os.chdir(current_dir)
+else:
+    
+    cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; ./b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test; cd {current}'.format(boost=current_boost_root, current=current_dir)
+    #print(cmd)
+    os.system(cmd)
 
-os.chdir(current_dir)
 
 if len(sys.argv) == 1 or sys.argv[-1] == 'build':
     if py_version_changed:
