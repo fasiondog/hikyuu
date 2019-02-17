@@ -10,6 +10,9 @@
 *.exe
 *.sdf
 *.suo
+*.dll
+*.so
+*.dylib
 .metadata
 .settings
 .cproject
@@ -20,7 +23,6 @@
 release.x64.version.h
 release.x86.version.h
 hikyuu.code-workspace
-/hikyuu
 /install
 /build
 /docs/build
@@ -28,7 +30,7 @@ hikyuu.code-workspace
 install
 .DS_Store
 hikyuu_cpp/hikyuu/version.h
-hikyuu_python/tools/maintain/importdata.ini
+hikyuu/tools/maintain/importdata.ini
 Hikyuu.egg-info
 dist
 boost_*

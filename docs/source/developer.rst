@@ -7,7 +7,7 @@ C++ 开发者指南
 
     为了顺利编译代码，请使用 git clone 下载代码（需要将git配置为checkout时自动转换为Windows换行符，具体做法请百度），原因是 git 上传时部分文件的换行符被置换为Linux式的换行符，将导致直接下载的部分代码在Windows下无法顺利编译。
 
-详细的C++ API参考，参见：`<https://hikyuu.org/ref-doc/index.html>`_。或者使用doxygen打开源码目录下的 "libs\\hikyuu\\Doxyfile" 工程文件，自行生成。
+详细的C++ API参考，参见：`<http://fasiondog.cn/hikyuu/cpp_ref/index.html>`_。或者使用doxygen打开源码目录下的 "libs\\hikyuu\\Doxyfile" 工程文件，自行生成。
 
 C++测试工程及要求参见：`<https://hikyuu.org/test-doc/index.html>`_
 

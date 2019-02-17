@@ -33,11 +33,24 @@ if sys.argv[-1] == 'uninstall':
     
 if sys.argv[-1] == 'clear':
     if os.path.lexists('.xmake'):
+        print('delete .xmake')
         shutil.rmtree('.xmake')
     if os.path.lexists('build'):
+        print('delete build')
         shutil.rmtree('build')
+    if os.path.lexists('Hikyuu.egg-info'):
+        print('delete Hikyuu.egg-info')
+        shutil.rmtree('Hikyuu.egg-info')
     if os.path.exists('py_version'):
+        print('delete py_version')
         os.remove('py_version')
+    for r, d, f_list in os.walk('hikyuu'):
+        for name in f_list:
+            if (len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
+                   or (len(name) > 3 and name[-3:] == '.so')  \
+                   or (len(name) > 6 and name[-6:] == '.dylib'):
+                print('delete', r + '/' + name)
+                os.remove(os.path.join(r, name))
     print('clear finished!')
     exit(0)
 

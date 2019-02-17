@@ -14,12 +14,12 @@ function main(target)
     local installdir = option.get("installdir") or os.getenv("INSTALLDIR") or os.getenv("DESTDIR") or platform.get("installdir")
     
     if is_plat("windows") then
-        os.exec("xcopy /S /Q /Y /I hikyuu_python " .. installdir)
+        os.exec("xcopy /S /Q /Y /I hikyuu " .. installdir)
     end
     if is_plat("linux") then
-        os.exec("cp -f -r -T hikyuu_python " .. installdir)
+        os.exec("cp -f -r -T hikyuu " .. installdir)
     end
     if is_plat("macosx") then
-        os.exec("cp -f -r hikyuu_python/* " .. installdir)
+        os.exec("cp -f -r hikyuu/* " .. installdir)
     end
 end
