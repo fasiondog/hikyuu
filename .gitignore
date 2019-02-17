@@ -23,6 +23,7 @@ hikyuu.code-workspace
 /hikyuu
 /install
 /build
+/docs/build
 *~
 install
 .DS_Store
