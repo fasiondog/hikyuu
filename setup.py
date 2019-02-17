@@ -133,7 +133,6 @@ if current_plat == 'win32':
     os.system('b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test')
     os.chdir(current_dir)
 else:
-    
     cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; ./b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test; cd {current}'.format(boost=current_boost_root, current=current_dir)
     #print(cmd)
     os.system(cmd)
