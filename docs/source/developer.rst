@@ -9,7 +9,7 @@ C++ 开发者指南
 
 详细的C++ API参考，参见：`<http://fasiondog.cn/hikyuu/cpp_ref/index.html>`_。或者使用doxygen打开源码目录下的 "libs\\hikyuu\\Doxyfile" 工程文件，自行生成。
 
-C++测试工程及要求参见：`<https://hikyuu.org/test-doc/index.html>`_
+C++测试工程及要求参见：`<http://fasiondog.cn/hikyuu/test_doc/index.html>`_
 
 
 源码编译与安装
