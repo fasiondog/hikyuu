@@ -299,7 +299,4 @@ setup(
             'pyecharts_snapshot',
             'PyQt5',
         ],        
-        )
-
-if os.path.exists('hikyuu'):
-    shutil.rmtree('hikyuu')
+)
