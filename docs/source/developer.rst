@@ -1,124 +1,81 @@
 C++ 开发者指南
 ===============
 
-此部分为C++核心库部分感兴趣的开发者或需要将Python的指标、策略等翻写为C++代码以追求更高速度的用户提供参考。**普通用户直接使用Python客户端即可，并不需要使用到C++核心库，Python同样能够实现指标和策略的开发。**
-
 .. note::
 
-    为了顺利编译代码，请使用 git clone 下载代码（需要将git配置为checkout时自动转换为Windows换行符，具体做法请百度），原因是 git 上传时部分文件的换行符被置换为Linux式的换行符，将导致直接下载的部分代码在Windows下无法顺利编译。
+    为了顺利编译代码， 请勿使用从 github 直接下载源码包的方式编译。 原因是 git 上传时部分文件的换行符被置换为Linux式的换行符，将导致直接下载的部分代码在Windows下无法顺利编译。
 
-详细的C++ API参考，参见：`<http://fasiondog.cn/hikyuu/cpp_ref/index.html>`_。或者使用doxygen打开源码目录下的 "libs\\hikyuu\\Doxyfile" 工程文件，自行生成。
+C++ API参考：`<http://fasiondog.cn/hikyuu/cpp_ref/index.html>`_。
 
-C++测试工程及要求参见：`<http://fasiondog.cn/hikyuu/test_doc/index.html>`_
+C++测试工程参考：`<http://fasiondog.cn/hikyuu/test_doc/index.html>`_
 
 
-源码编译与安装
+编译前准备
 ----------------
 
-STEP1 安装编译工具
-^^^^^^^^^^^^^^^^^^^^^^^
+1、安装C++编译器
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-安装编译工具 xmake（须为2.2.2版本及其之上版本），具体可参见：`<https://github.com/tboox/xmake>`_
+- Windows 平台：Visual C++ 2017 (或以上）
+- Linux 平台: g++ > = 5.4.0 、 clang++ >= 3.8.0
 
 
-Linux、macOSX可从github clone dev分支进行编译安装，具体如下：
+2、安装构建工具 xmake
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+xmake >= 2.2.2，网址：`<https://github.com/xmake-io/xmake>`_
+
+Windows下，从 xmake github 页面中的“release”进入，直接下载相应的 exe 安装包安装即可：
+
+.. figure:: _static/dev-001.jpg
+
+
+Linux、macOSX 执行以下指令安装：
 
 .. code-block:: lua
 
     git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
     cd ./tboox/xmake
     ./scripts/get.sh __local__
-    
 
 
-STEP2 确认编译器是否支持C++11
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3、克隆 Hikyuu 源码
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+执行以下命令克隆 hikyuu 源码：（请勿在中文目录下克隆代码）
+
+.. code-block:: shell
+
+    git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1    
 
 
-STEP3 下载 Boost 源码并编译
+4、下载 Boost 源码
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1、下载 Boost 源码 `<http://www.boost.org>`_ ， 并解压至希望保存的目录。
+1. 下载 Boost 源码 `<http://www.boost.org>`_ 
+2. 将下载的 boost 源码包解压至上一步中克隆的 hikyuu目录下，如下图所示：
 
+.. figure:: _static/dev-002.jpg
+    
 .. note::
 
-    由于boost目前跨平台不是很稳定，linux、macOSX下请使用 boost 1.67 版本，而Windows下请使用 boost.1.68 版本。
-
-2、命令行下进入 Boost 源码路径，执行编译:
-
-Windows下编译示例:
-
-.. code-block:: shell
-
-    bootstrap.bat
-    b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
-
-Linux、macOSX下编译示例：
+    以下版本的 boost 无法顺利编译，请注意注意不要使用：
     
-.. code-block:: shell
-
-    ./bootstrap.sh --with-python=python3
-    ./b2 release link=shared -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
+    - Windows：1.67
+    - linux、macOS：1.68
     
 
-3、检查在boost源码目录下的stage/lib子目录下是否生成了python3相应的boost.python动态库。如Windows下boost_python35-vc141-mt-x64-1_68.dll，linux下libboost_python35.so.1.67.0。注：boost 1.67之前，boost_python库的后缀不带小版本即boost_python3，而1.67及其之后的版本为boost_python3.x
+编译与安装
+------------
 
-    
-STEP3 设置环境变量
-^^^^^^^^^^^^^^^^^^^
+直接在克隆的 hikyuu 目录下执行 python setup.py 即可：
 
-编译Hikyuu前，需设置相应的系统环境变量：
+- python setup.py help        -- 查看帮助
+- python setup.py             -- 执行编译（同build参数）
+- python setup.py build       -- 执行编译（编译后，可在本地 hikyuu 目录下引用 hikyuu 包。如希望在其他目录下可使用，需执行安装）
+- python setup.py install     -- 执行安装（安装到 python 的 site-packages 目录下）
+- python setup.py uninstall   -- 删除已安装的Hikyuu
+- python setup.py clear       -- 清除本地编译结果
+- python setup.py bdist_wheel -- 生成wheel安装包
 
-- BOOST_ROOT 指明boost源码所在路径，如: D:\\src\\boost
-- BOOST_LIB  指明boost动态库所在路径，如：D:\\src\\boost\\stage\\lib
-
-STEP4 编译及安装Hikyuu
-^^^^^^^^^^^^^^^^^^^^^^
-
-获取源码：
-
-.. code-block:: shell
-
-    git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-
-
-进行源码目录后，执行编译。
-
-Windows下编译：
-
-.. code-block:: shell
-
-    xmake f --with-unit-test=y  #此步配置xmake编译单元测试代码，可跳过
-    xmake
-    xmake r unit-test #此步执行单元测试，可跳过
-    xmake install -o C:\Anaconda3\Lib\site-packages  #可自行指定安装目录
-
-Linux下编译于Windows相同。
-
-.. note::
-
-    Linux下需安装依赖的软件包：sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev
-
-MacOSX下编译必须实现配置xmake指定使用C++编译器：g++或clang++，不能是gcc或clang
-
-.. code-block:: shell
-
-    xmake f --cxx=g++ #macOSX下必须指定使用C++编译器
-
-喜欢使用Visual Studio的同学，可使用xmake生成VS工程：
-
-.. code-block:: shell
-    
-    xmake project --kind=vs2017
-
-更多xmake使用，请参考 `<https://xmake.io>`_
-
-
-代码结构与开发工程
--------------------
-
-代码结构
-^^^^^^^^^^
-
-.. figure:: _static/dev_002.png
 
