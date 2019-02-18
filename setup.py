@@ -156,7 +156,6 @@ if sys.argv[-1] == 'install':
 if sys.argv[-1] == 'bdist_wheel':
     if py_version_changed:
         os.system("xmake f -c")
-    os.system("xmake install -o hikyuu")
     sys.argv.append("--python-tag")
     sys.argv.append("cp{}".format(py_version))
     sys.argv.append("-p")

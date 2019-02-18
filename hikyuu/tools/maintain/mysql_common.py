@@ -63,7 +63,10 @@ def create_database(connect):
             pass
 
     db_version = get_db_version(connect)
-    files = [x for x in Path(sql_dir).iterdir() if x.name != 'createdb.sql' and int(x.stem) > db_version and not x.is_dir()]
+    files = [x for x in Path(sql_dir).iterdir() \
+             if x.name != 'createdb.sql' \
+                and x.name != '__init__.py' \
+                and int(x.stem) > db_version and not x.is_dir()]
     files.sort()
     for file in files:
         sql = file.read_text(encoding='utf8')
