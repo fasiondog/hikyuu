@@ -24,8 +24,36 @@ if len(sys.argv) < 1 or (len(sys.argv) > 1 and sys.argv[1] not in ('bdist_wheel'
     print_help()
     exit(0)
 
+print("\nchecking python version ...")
+
+py_version = platform.python_version_tuple() 
+py_version = int(py_version[0])*10 + int(py_version[1])
+if py_version < 31:
+    print("Python version must >= 3.1 !")
+    sys.exit(0)
+
+py_version_changed = True
+if os.path.exists('py_version'):
+    with open('py_version', 'r+') as f:
+        old_py_version = f.read()
+        if old_py_version == str(py_version):
+            py_version_changed = False
+        else:
+            f.seek(0)
+            f.write(str(py_version))
+            print('old python version:', int(old_py_version)*0.1)
+else:
+    with open('py_version', 'w') as f:
+        f.write(str(py_version))
+
+print('current python version:', int(py_version)*0.1, '\n')
+
 if sys.argv[-1] == 'uninstall':
-    site_lib_dir = sys.base_prefix + "/lib/site-packages"
+    if current_plat == 'win32':
+        site_lib_dir = sys.base_prefix + "/lib/site-packages"
+    else:
+        usr_dir = os.path.expanduser('~')
+        site_lib_dir = '{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1)
     for dir in os.listdir(site_lib_dir):
         if dir == 'hikyuu' or (len(dir) > 6 and dir[:6] == 'Hikyuu'):
             print('delete', site_lib_dir + '/' + dir)
@@ -85,29 +113,6 @@ if current_boost_root is None or current_boost_lib is None:
 print('BOOST_ROOT:', current_boost_root)
 print('BOOST_LIB:', current_boost_lib)
 
-print("\nchecking python version ...")
-
-py_version = platform.python_version_tuple() 
-py_version = int(py_version[0])*10 + int(py_version[1])
-if py_version < 31:
-    print("Python version must >= 3.1 !")
-    sys.exit(0)
-
-py_version_changed = True
-if os.path.exists('py_version'):
-    with open('py_version', 'r+') as f:
-        old_py_version = f.read()
-        if old_py_version == str(py_version):
-            py_version_changed = False
-        else:
-            f.seek(0)
-            f.write(str(py_version))
-            print('old python version:', int(old_py_version)*0.1)
-else:
-    with open('py_version', 'w') as f:
-        f.write(str(py_version))
-
-print('current python version:', int(py_version)*0.1, '\n')
 
 if py_version_changed:
     if current_plat == 'win32' and current_bits == 64:
@@ -115,7 +120,7 @@ if py_version_changed:
     elif current_plat == 'win32' and current_bits == 32:
         build_hikyuu_pywrap_dir = 'build\\release\\windows\\x64\\.objs\\windows\\x64\\release\\hikyuu_pywrap'
     elif current_plat == 'linux' and current_bits == 64:
-        build_hikyuu_pywrap_dir = 'build/release/linux/x64/.objs/windows/x64/release/hikyuu_pywrap'
+        build_hikyuu_pywrap_dir = 'build/release/linux/x86_64/.objs/linux/x86_64/release/hikyuu_pywrap'
     else:
         print("************不支持的平台打包**************")
         exit(0)
@@ -123,7 +128,7 @@ if py_version_changed:
     if os.path.lexists(build_hikyuu_pywrap_dir):
         shutil.rmtree(build_hikyuu_pywrap_dir)
     
-print('compile boost ...')
+print('\ncompile boost ...')
 if py_version_changed and os.path.lexists('bin.v2/libs/python'):
     shutil.rmtree('bin.v2/libs/python')
 if current_plat == 'win32':
@@ -149,7 +154,20 @@ if len(sys.argv) == 1 or sys.argv[-1] == 'build':
 if sys.argv[-1] == 'install':
     if py_version_changed:
         os.system("xmake f -c")
-    install_dir = sys.base_prefix + "/lib/site-packages/hikyuu"
+    if current_plat == 'win32':
+        install_dir = sys.base_prefix + "/lib/site-packages/hikyuu"
+    else:
+        usr_dir = os.path.expanduser('~')
+        if not os.path.lexists(usr_dir + '/.local'):
+            os.mkdir(usr_dir + '/.local')
+        if not os.path.lexists('{}/.local/lib'.format(usr_dir)):
+            os.mkdir('{}/.local/lib'.format(usr_dir))
+        if not os.path.lexists('{}/.local/lib/python{:>.1f}'.format(usr_dir, py_version*0.1)):
+            os.mkdir('{}/.local/lib/python{:>.1f}'.format(usr_dir, py_version*0.1))
+            os.mkdir('{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1))
+        if not os.path.lexists('{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1)):
+            os.mkdir('{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1))
+        install_dir = '{}/.local/lib/python{:>.1f}/site-packages/hikyuu'.format(usr_dir, py_version*0.1)
     os.system("xmake install -o " + install_dir)
     sys.exit(0)
 
