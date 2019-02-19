@@ -174,6 +174,7 @@ if sys.argv[-1] == 'install':
 if sys.argv[-1] == 'bdist_wheel':
     if py_version_changed:
         os.system("xmake f -c")
+        os.system("xmake")
     sys.argv.append("--python-tag")
     sys.argv.append("cp{}".format(py_version))
     sys.argv.append("-p")
@@ -203,7 +204,6 @@ for x in os.listdir('hikyuu'):
     if x[:12] == 'boost_python':
         if x[12:14] != str(py_version):
             os.remove('hikyuu/{}'.format(x))
-
 
 hku_version = ''
 with open('xmake.lua', 'r') as f:
