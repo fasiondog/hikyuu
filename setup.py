@@ -129,8 +129,8 @@ if py_version_changed:
         shutil.rmtree(build_hikyuu_pywrap_dir)
     
 print('\ncompile boost ...')
-if py_version_changed and os.path.lexists('bin.v2/libs/python'):
-    shutil.rmtree('bin.v2/libs/python')
+if py_version_changed and os.path.lexists('{}/bin.v2/libs/python'.format(current_boost_root)):
+    shutil.rmtree('{}/bin.v2/libs/python'.format(current_boost_root))
 if current_plat == 'win32':
     os.chdir(current_boost_root)
     if not os.path.exists('b2.exe'):
@@ -155,7 +155,7 @@ if sys.argv[-1] == 'install':
     if py_version_changed:
         os.system("xmake f -c")
     if current_plat == 'win32':
-        install_dir = sys.base_prefix + "/lib/site-packages/hikyuu"
+        install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
     else:
         usr_dir = os.path.expanduser('~')
         if not os.path.lexists(usr_dir + '/.local'):
