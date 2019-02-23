@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shutil
 import logging
 import datetime
 from configparser import ConfigParser
-from pytdx.config.hosts import hq_hosts
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot
@@ -14,7 +14,6 @@ from MainWindow import *
 from EscapetimeThread import EscapetimeThread
 from UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
-from pytdx_common import search_best_tdx
 
 import hku_config_template
 
@@ -53,6 +52,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         data_dir = current_config['hdf5']['dir']
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(hku_config_template.hdf5_template.format(dir=data_dir))
+
+        if not os.path.lexists(data_dir + '/block'):
+            shutil.copytree('../../config/block', data_dir + '/block')
+            os.remove(data_dir + '/block/__init__.py')
 
     def initUI(self):
         self.setWindowIcon(QIcon("./hikyuu.ico"))
