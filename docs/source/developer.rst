@@ -32,7 +32,7 @@ Windows下，从 xmake github 页面中的“release”进入，直接下载相�
 
 Linux、macOSX 执行以下指令安装：
 
-.. code-block:: lua
+.. code-block:: shell
 
     git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
     cd ./tboox/xmake
@@ -63,6 +63,15 @@ Linux、macOSX 执行以下指令安装：
     
     - Windows：1.67
     - linux、macOS：1.68
+    
+5、Linux下安装依赖软件包
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Linux下需安装依赖的开发软件包：hdf-dev、mysqlclient。如 Ubuntu 下，执行以下命令：
+
+.. code-block:: shell
+    
+    sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev    
     
 
 编译与安装
