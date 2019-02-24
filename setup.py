@@ -238,6 +238,9 @@ hku_data_files = []
 
 packages = ['hikyuu',
             'hikyuu/config',
+            'hikyuu/data',
+            'hikyuu/data/mysql_upgrade',
+            'hikyuu/data/sqlite_upgrade',
             'hikyuu/data_driver',
             'hikyuu/examples',
             'hikyuu/indicator',
@@ -246,8 +249,6 @@ packages = ['hikyuu',
             #'hikyuu/test',
             'hikyuu/tools',
             'hikyuu/tools/maintain',
-            'hikyuu/tools/maintain/mysql_upgrade',
-            'hikyuu/tools/maintain/sqlite_upgrade',
             'hikyuu/trade_instance',
             'hikyuu/trade_manage',
             'hikyuu/trade_sys',
@@ -301,10 +302,10 @@ setup(
             'Programming Language :: Python :: 3.5',
         ],
 
-        #entry_points={
-        #'console_scripts': [
-        #    'hku_gui=hikyuu.tools.maintain.HikyuuTDX:start',
-        #]},
+        entry_points={
+        'gui_scripts': [
+            'HikyuuTDX=hikyuu.tools.maintain.HikyuuTDX:start',
+        ]},
 
         install_requires=[
             'matplotlib>=1.5.0',

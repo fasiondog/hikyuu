@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import shutil
 import logging
 import datetime
@@ -10,10 +11,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import  QIcon
 
-from MainWindow import *
-from EscapetimeThread import EscapetimeThread
-from UseTdxImportToH5Thread import UseTdxImportToH5Thread
-from UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
+from hikyuu.tools.maintain.MainWindow import *
+from hikyuu.tools.maintain.EscapetimeThread import EscapetimeThread
+from hikyuu.tools.maintain.UseTdxImportToH5Thread import UseTdxImportToH5Thread
+from hikyuu.tools.maintain.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
 from hikyuu.data import hku_config_template
 
@@ -61,7 +62,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             os.remove(data_dir + '/block/__init__.py')
 
     def initUI(self):
-        self.setWindowIcon(QIcon("./hikyuu.ico"))
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
         self.setFixedSize(self.width(), self.height())
         self.import_status_label.setText('')
         self.import_detail_textEdit.clear()
@@ -300,9 +302,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
 
+def start():
+    app = QApplication(sys.argv)
+    myWin = MyMainWindow(None)
+    myWin.show()
+    sys.exit(app.exec())
+
 
 if __name__ == "__main__":
-    import sys
     app = QApplication(sys.argv)
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s %(levelname)s: %(message)s [%(name)s::%(funcName)s]'

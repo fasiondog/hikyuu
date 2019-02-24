@@ -26,10 +26,10 @@ import sqlite3
 import datetime
 from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
-from ImportWeightToSqliteTask import ImportWeightToSqliteTask
-from ImportPytdxToH5Task import ImportPytdxToH5
-from ImportPytdxTransToH5Task import ImportPytdxTransToH5
-from ImportPytdxTimeToH5Task import ImportPytdxTimeToH5
+from hikyuu.tools.maintain.ImportWeightToSqliteTask import ImportWeightToSqliteTask
+from hikyuu.tools.maintain.ImportPytdxToH5Task import ImportPytdxToH5
+from hikyuu.tools.maintain.ImportPytdxTransToH5Task import ImportPytdxTransToH5
+from hikyuu.tools.maintain.ImportPytdxTimeToH5Task import ImportPytdxTimeToH5
 from pytdx.hq import TdxHq_API
 from hikyuu.data.common_sqlite3 import create_database
 from hikyuu.data.pytdx_to_h5 import import_stock_name
