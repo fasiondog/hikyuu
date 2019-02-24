@@ -50,7 +50,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         filename = self.getUserConfigDir() + '/hikyuu.ini'
         data_dir = current_config['hdf5']['dir']
-        with open(filename, 'w', encoding='utf-8') as f:
+        
+        # 此处不能使用 utf-8 参数，否则导致Windows下getBlock无法找到板块分类
+        # with open(filename, 'w', encoding='utf-8') as f:
+        with open(filename, 'w') as f:
             f.write(hku_config_template.hdf5_template.format(dir=data_dir))
 
         if not os.path.lexists(data_dir + '/block'):
