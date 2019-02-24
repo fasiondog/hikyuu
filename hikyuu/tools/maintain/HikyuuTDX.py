@@ -62,7 +62,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             os.remove(data_dir + '/block/__init__.py')
 
     def initUI(self):
-        current_dir = os.path.dirname(os.path.realpath(__file__))
+        current_dir = os.path.dirname(__file__)
         self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
         self.setFixedSize(self.width(), self.height())
         self.import_status_label.setText('')
