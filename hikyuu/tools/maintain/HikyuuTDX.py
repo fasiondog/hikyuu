@@ -15,7 +15,7 @@ from EscapetimeThread import EscapetimeThread
 from UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
-import hku_config_template
+from hikyuu.data import hku_config_template
 
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):

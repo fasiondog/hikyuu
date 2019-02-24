@@ -30,12 +30,13 @@ def transPyFile(filename):
 
 # 调用系统命令把ui转换成py
 def runMain():
-	list = listUiFile()
-	for uifile in list :
-		pyfile = transPyFile(uifile)
-		cmd = 'pyuic5 -o {pyfile} {uifile}'.format(pyfile=pyfile,uifile=uifile)  
+    list = listUiFile()
+    for uifile in list :
+        pyfile = transPyFile(uifile)
+        cmd = 'pyuic5 -o {pyfile} {uifile}'.format(pyfile=pyfile,uifile=uifile)
+        #cmd = 'pyside2-uic -o {pyfile} {uifile}'.format(pyfile=pyfile, uifile=uifile)
 		#print(cmd)
-		os.system(cmd)
+        os.system(cmd)
 
 ###### 程序的主入口		
 if __name__ == "__main__":  	

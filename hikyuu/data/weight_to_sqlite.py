@@ -2,7 +2,7 @@
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2010-2017 fasiondog/hikyuu
+# Copyright (c) 2010-2019 fasiondog/hikyuu
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,48 +25,46 @@
 import struct
 import pathlib
 
-from mysql_common import get_marketid
-
 def qianlong_import_weight(connect, src_dir, market):
     """导入钱龙格式的权息数据"""
     cur = connect.cursor()
-
-    marketid = get_marketid(connect, market)
+    marketid = cur.execute("select marketid from Market where market='%s'" % market)
+    marketid = [id[0] for id in marketid]
+    marketid = marketid[0]
 
     src_path = pathlib.Path(src_dir + '/shase/weight') if market == 'SH' else pathlib.Path(src_dir + '/sznse/weight')
     wgt_file_list = list(src_path.glob('*.wgt'))
 
-    records = []
+    total_count = 0
     for wgt_file in wgt_file_list:
         code = wgt_file.stem
-        cur.execute("select stockid from `hku_base`.`stock` where marketid=%s and code='%s'" % (marketid, code))
-        stockid = [id[0] for id in cur.fetchall()]
+        stockid = cur.execute("select stockid from Stock where marketid=%s and code='%s'" % (marketid, code))
+        stockid = [id[0] for id in stockid]
         if not stockid:
             continue
 
         with wgt_file.open('rb') as sourcefile:
             stockid = stockid[0]
-            cur.execute("select date from `hku_base`.`stkweight` where stockid=%s" % stockid)
-            dateDict = dict([(i[0], None) for i in cur.fetchall()])
+            a = cur.execute("select date from stkweight where stockid=%s" % stockid)
+            dateDict = dict([(i[0], None) for i in a])
 
-            #records = []
+            records = []
             data = sourcefile.read(36)
             while data:
                 a = struct.unpack('iiiiiiiii', data)
                 date = (a[0] >> 20) * 10000 + (((a[0] << 12) & 4294967295) >> 28) * 100 + ((a[0] & 0xffff) >> 11)
-                if date not in dateDict\
-                        and a[0] >= 0 and a[1] >= 0 and a[2] >= 0 and a[3] >= 0 and a[4] >= 0\
-                        and a[5] >= 0 and a[6] >= 0 and a[7] >= 0:
+                if date not in dateDict:
                     records.append((stockid, date, a[1], a[2], a[3], a[4], a[5], a[6], a[7]))
                 data = sourcefile.read(36)
             sourcefile.close()
 
-    if records:
-        cur.executemany("INSERT INTO `hku_base`.`StkWeight` (stockid, date, countAsGift, \
-                         countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
-                         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                        records)
+            if records:
+                cur.executemany("INSERT INTO StkWeight(stockid, date, countAsGift, \
+                                 countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
+                                 VALUES (?,?,?,?,?,?,?,?,?)",
+                                records)
+                total_count += len(records)
 
     connect.commit()
     cur.close()
-    return len(records)
+    return total_count

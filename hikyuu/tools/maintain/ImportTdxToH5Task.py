@@ -24,7 +24,7 @@
 
 import sqlite3
 
-from tdx_to_h5 import tdx_import_data
+from hikyuu.data.tdx_to_h5 import tdx_import_data
 
 class ProgressBar:
     def __init__(self, src):

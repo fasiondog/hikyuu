@@ -24,7 +24,7 @@
 
 import sqlite3
 from pytdx.hq import TdxHq_API
-from pytdx_to_h5 import import_data, import_trans
+from hikyuu.data.pytdx_to_h5 import import_data, import_trans
 
 
 class ProgressBar:

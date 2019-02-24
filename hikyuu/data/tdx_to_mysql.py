@@ -2,7 +2,7 @@
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2010-2017 fasiondog/hikyuu
+# Copyright (c) 2010-2019 fasiondog/hikyuu
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,21 @@
 
 import os.path
 import struct
-import sqlite3
 import datetime
 import math
 import sys
 
+import mysql.connector
 import tables as tb
 
 from io import SEEK_END, SEEK_SET
 
-from common import get_stktype_list, MARKETID
-from sqlite3_common import (create_database, get_marketid,
-                            get_codepre_list, update_last_date)
-from h5_common import (H5Record, H5Index,
-                       open_h5file, get_h5table,
-                       update_hdf5_extern_data)
-from weight_to_sqlite import qianlong_import_weight
+from .common import get_stktype_list, MARKETID
+from .common_mysql import (create_database, get_marketid,
+                          get_codepre_list,
+                          get_table, get_lastdatetime)
+
+from .weight_to_mysql import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
@@ -53,7 +52,7 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
     """更新每只股票的名称、当前是否有效性、起始日期及结束日期
         如果导入的代码表中不存在对应的代码，则认为该股已失效
 
-        :param connect: sqlite3实例
+        :param connect: mysql实例
         :param filename: 代码表文件名
         :param market: 'SH' | 'SZ'
         :param quotations: 待导入的行情类别列表，空为导入全部 'stock' | 'fund' | 'bond' | None
@@ -74,14 +73,12 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
             newStockDict[stockcode] = stockname.decode(encoding='utf8').strip()
             data = f.read(314)
 
-    a = cur.execute("select marketid from market where market = '%s'" % market.upper())
-    marketid = [i for i in a]
-    marketid = marketid[0][0]
+    marketid = get_marketid(connect, market)
 
     stktype_list = get_stktype_list(quotations)
-    a = cur.execute("select stockid, code, name, valid from stock where marketid={} and type in {}"
+    cur.execute("select stockid, code, name, valid from `hku_base`.`stock` where marketid={} and type in {}"
                     .format(marketid, stktype_list))
-    a = a.fetchall()
+    a = cur.fetchall()
     oldStockDict = {}
     for oldstock in a:
         oldstockid, oldcode, oldname, oldvalid = oldstock[0], oldstock[1], oldstock[2], int(oldstock[3])
@@ -89,15 +86,15 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
 
         # 新的代码表中无此股票，则置为无效
         if (oldvalid == 1) and (oldcode not in newStockDict):
-            cur.execute("update stock set valid=0 where stockid=%i" % oldstockid)
+            cur.execute("update `hku_base`.`stock` set valid=0 where stockid=%i" % oldstockid)
 
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode]:
-                cur.execute("update stock set name='%s' where stockid=%i" %
+                cur.execute("update `hku_base`.`stock` set name='%s' where stockid=%i" %
                             (newStockDict[oldcode], oldstockid))
             if oldvalid == 0:
-                cur.execute("update stock set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
+                cur.execute("update `hku_base`.`stock` set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
 
     # 处理新出现的股票
     codepre_list = get_codepre_list(connect, marketid, quotations)
@@ -112,7 +109,7 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
                 if code[:length] == codepre[0]:
                     count += 1
                     #print(market, code, newStockDict[code], codepre)
-                    sql = "insert into Stock(marketid, code, name, type, valid, startDate, endDate) \
+                    sql = "insert into `hku_base`.`stock` (marketid, code, name, type, valid, startDate, endDate) \
                            values (%s, '%s', '%s', %s, %s, %s, %s)" \
                           % (marketid, code, newStockDict[code], codepre[1], 1, today, 99999999)
                     cur.execute(sql)
@@ -124,12 +121,21 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
     return count
 
 
-def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_record):
+def to_mysql_ktype(ktype):
+    n_ktype = ktype.upper()
+    if n_ktype == 'DAY':
+        return n_ktype
+    if n_ktype == '1MIN':
+        return 'MIN'
+    if n_ktype == '5MIN':
+        return 'MIN5'
+
+def tdx_import_day_data_from_file(connect, filename, ktype, market, stock_record):
     """从通达信盘后数据导入日K线
 
-    :param connect : sqlite3连接实例
+    :param connect : 数据库连接实例
     :param filename: 通达信日线数据文件名
-    :param h5file  : HDF5 file
+    :param ktype  :  'DAY' | '1MIN' | '5MIN'
     :param stock_record: 股票的相关数据 (stockid, marketid, code, valid, type)
     :return: 导入的记录数
     """
@@ -139,13 +145,13 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3],stock_record[4]
 
-    table = get_h5table(h5file, market, code)
-    if table.nrows > 0:
-        lastdatetime = table[-1]['datetime']/10000
-    else:
-        lastdatetime = None
+    table = get_table(connect, market, code, to_mysql_ktype(ktype))
+    lastdatetime = get_lastdatetime(connect, table)
+    if lastdatetime is not None:
+        lastdatetime = lastdatetime / 10000
 
-    row = table.row
+    buf = []
+    cur = connect.cursor()
     with open(filename, 'rb') as src_file:
         data = src_file.read(32)
         while data:
@@ -154,55 +160,55 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
                 data = src_file.read(32)
                 continue
 
-            if 0 not in record[1:5]:
-                if record[2] >= record[1] >= record[3] \
-                        and record[2] >= record[4] >= record[3]:
-                    row['datetime'] = record[0] * 10000
-                    row['openPrice'] = record[1] * 10
-                    row['highPrice'] = record[2] * 10
-                    row['lowPrice'] = record[3] * 10
-                    row['closePrice'] = record[4] * 10
-                    row['transAmount'] = round(record[5] * 0.001)
-                    if stktype == 2:
-                        # 指数
-                        row['transCount'] = record[6]
-                    else:
-                        row['transCount'] = round(record[6] * 0.01)
-
-                    row.append()
-                    add_record_count += 1
+            if record[2] >= record[1] >= record[3] > 0 \
+                     and record[2] >= record[4] >= record[3] > 0 \
+                     and record[5] >= 0 \
+                     and record[6] >= 0:
+                buf.append((record[0]*10000, record[1]*0.01, record[2]*0.01,
+                            record[3]*0.01, record[4]*0.01, round(record[5] * 0.001),
+                            record[6] if stktype == 2 else round(record[6] * 0.01)))
+                add_record_count += 1
 
             data = src_file.read(32)
 
     if add_record_count > 0:
-        table.flush()
+        sql = "INSERT INTO {tablename} (date, open, high, low, close, amount, count) " \
+              "VALUES (%s, %s, %s, %s, %s, %s, %s)".format(tablename=table)
+        cur.executemany(sql, buf)
+        connect.commit()
 
         #更新基础信息数据库中股票对应的起止日期及其有效标志
         if valid == 0:
-            cur = connect.cursor()
-            cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
-                        (table[0]['datetime'], 99999999, stockid))
+            sql = "update `hku_base`.`stock` set valid=1, " \
+                  "startdate=(select min(date)/10000 from {table}), " \
+                  "enddate=(select max(date)/10000 from {table}) " \
+                  "where stockid={stockid}".format(table=table, stockid=stockid)
+            cur.execute("sql")
             connect.commit()
-            cur.close()
 
         #记录最新更新日期
         if (code == '000001' and marketid == MARKETID.SH) \
-                or (code == '399001' and marketid == MARKETID.SZ)  :
-            update_last_date(connect, marketid, table[-1]['datetime'] / 10000)
+                or (code == '399001' and marketid == MARKETID.SZ):
+            sql = "update `hku_base`.`market` set lastdate=(select max(date)/10000 from {table}) " \
+                  "where marketid={marketid}".format(table=table, marketid=marketid)
+            try:
+                cur.execute(sql)
+            except:
+                print(sql)
+            connect.commit()
 
-    elif table.nrows == 0:
-        #print(market, stock_record)
-        table.remove()
+        #connect.commit()
 
+    cur.close()
     return add_record_count
 
 
-def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_record):
+def tdx_import_min_data_from_file(connect, filename, ktype, market, stock_record):
     """从通达信盘后数据导入1分钟或5分钟K线
 
     :param connect : sqlite3连接实例
     :param filename: 通达信K线数据文件名
-    :param h5file  : HDF5 file
+    :param ktype: 'DAY' | '1MIN' | '5MIN'
     :param stock_record: 股票的相关数据 (stockid, marketid, code, valid, type)
     :return: 导入的记录数
     """
@@ -212,13 +218,10 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3],stock_record[4]
 
-    table = get_h5table(h5file, market, code)
-    if table.nrows > 0:
-        lastdatetime = table[-1]['datetime']
-    else:
-        lastdatetime = None
+    table = get_table(connect, market, code, to_mysql_ktype(ktype))
+    lastdatetime = get_lastdatetime(connect, table)
 
-    row = table.row
+    cur = connect.cursor()
     with open(filename, 'rb') as src_file:
         def trans_date(yymm, hhmm):
             tmp_date = yymm >> 11
@@ -273,36 +276,29 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
             data = src_file.read(32)
             while data:
                 record = struct.unpack('hhfffffii', data)
-                if 0 not in record[2:6]:
-                    if record[3] >= record[2] >= record[4] \
-                            and record[3] >= record[5] >= record[4]:
-                        row['datetime'] = trans_date(record[0], record[1])
-                        row['openPrice'] = record[2] * 1000
-                        row['highPrice'] = record[3] * 1000
-                        row['lowPrice'] = record[4] * 1000
-                        row['closePrice'] = record[5] * 1000
-                        row['transAmount'] = round(record[6] * 0.001)
-                        if stktype == 2:
-                            # 指数
-                            row['transCount'] = record[7]
-                        else:
-                            row['transCount'] = round(record[7] * 0.01)
-
-                        row.append()
-                        add_record_count += 1
+                if record[3] >= record[2] >= record[4] > 0\
+                        and record[3] >= record[5] >= record[4] >0\
+                        and record[5] >=0 \
+                        and record[6] >=0:
+                    sql = "INSERT INTO {tablename} (date, open, high, low, close, amount, count) " \
+                          "VALUES (%s, %s, %s, %s, %s, %s, %s)".format(tablename=table)
+                    cur.execute(sql, (trans_date(record[0], record[1]),
+                                      round(record[2],2), round(record[3],2),
+                                      round(record[4],2), round(record[5],2),
+                                      record[6]*0.001,
+                                      record[7] if stktype == 2 else round(record[7] * 0.01)))
+                    add_record_count += 1
 
                 data = src_file.read(32)
 
     if add_record_count > 0:
-        table.flush()
-    elif table.nrows == 0:
-        #print(market, stock_record)
-        table.remove()
+        connect.commit()
 
+    cur.close()
     return add_record_count
 
 
-def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progress=ProgressBar):
+def tdx_import_data(connect, market, ktype, quotations, src_dir, progress=ProgressBar):
     """导入通达信指定盘后数据路径中的K线数据。注：只导入基础信息数据库中存在的股票。
 
     :param connect   : sqlit3链接
@@ -310,13 +306,11 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
     :param ktype     : 'DAY' | '1MIN' | '5MIN'
     :param quotations: 'stock' | 'fund' | 'bond'
     :param src_dir   : 盘后K线数据路径，如上证5分钟线：D:\\Tdx\\vipdoc\\sh\\fzline
-    :param dest_dir  : HDF5数据文件所在目录
     :param progress  : 进度显示函数
     :return: 导入记录数
     """
     add_record_count = 0
     market = market.upper()
-    h5file = open_h5file(dest_dir, market, ktype)
 
     if ktype.upper() == "DAY":
         suffix = ".day"
@@ -330,11 +324,12 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
 
     marketid = get_marketid(connect, market)
     stktype_list = get_stktype_list(quotations)
-    sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type in {}".format(marketid, stktype_list)
+    sql = "select stockid, marketid, code, valid, type from `hku_base`.`stock` " \
+          "where marketid={} and type in {}".format(marketid, stktype_list)
 
     cur = connect.cursor()
-    a = cur.execute(sql)
-    a = a.fetchall()
+    cur.execute(sql)
+    a = cur.fetchall()
 
     total = len(a)
     for i, stock in enumerate(a):
@@ -344,18 +339,19 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
             continue
 
         filename = src_dir + "\\" + market.lower() + stock[2]+ suffix
-        this_count = func_import_from_file(connect, filename, h5file, market, stock)
+        this_count = func_import_from_file(connect, filename, ktype, market, stock)
         add_record_count += this_count
         if this_count > 0:
             if ktype == 'DAY':
-                update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+                #update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+                pass
             elif ktype == '5MIN':
-                update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
+                #update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
+                pass
         if progress:
             progress(i, total)
 
     connect.commit()
-    h5file.close()
     return add_record_count
 
 
@@ -364,11 +360,15 @@ if __name__ == '__main__':
     import time
     starttime = time.time()
     
+    host = '127.0.0.1'
+    port = 3306
+    usr = 'root'
+    pwd = ''
+
     src_dir = "D:\\TdxW_HuaTai"
-    dest_dir = "c:\\stock"
     quotations = ['stock', 'fund'] #通达信盘后数据没有债券
     
-    connect = sqlite3.connect(dest_dir + "\\stock.db")
+    connect = mysql.connector.connect(user=usr, password=pwd, host=host, port=port)
     create_database(connect)
 
     add_count = 0
@@ -379,33 +379,34 @@ if __name__ == '__main__':
     print("新增股票数：", add_count)
 
     print("\n导入上证日线数据")
-    add_count = tdx_import_data(connect, 'SH', 'DAY', quotations, src_dir + "\\vipdoc\\sh\\lday", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', 'DAY', quotations, src_dir + "\\vipdoc\\sh\\lday")
     print("\n导入数量：", add_count)
 
     print("\n导入深证日线数据")
-    add_count = tdx_import_data(connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday", dest_dir)
+    add_count = tdx_import_data(connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday")
     print("\n导入数量：", add_count)
 
     print("\n导入上证5分钟数据")
-    add_count = tdx_import_data(connect, 'SH', '5MIN', quotations, src_dir + "\\vipdoc\\sh\\fzline", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', '5MIN', quotations, src_dir + "\\vipdoc\\sh\\fzline")
     print("\n导入数量：", add_count)
 
     print("\n导入深证5分钟数据")
-    add_count = tdx_import_data(connect, 'SZ', '5MIN', quotations, src_dir + "\\vipdoc\\sz\\fzline", dest_dir)
+    add_count = tdx_import_data(connect, 'SZ', '5MIN', quotations, src_dir + "\\vipdoc\\sz\\fzline")
     print("\n导入数量：", add_count)
 
     print("\n导入上证1分钟数据")
-    add_count = tdx_import_data(connect, 'SH', '1MIN', quotations, src_dir + "\\vipdoc\\sh\\minline", dest_dir)
+    add_count = tdx_import_data(connect, 'SH', '1MIN', quotations, src_dir + "\\vipdoc\\sh\\minline")
     print("\n导入数量：", add_count)
 
     print("\n导入深证1分钟数据")
-    add_count = tdx_import_data(connect, 'SZ', '1MIN', quotations, src_dir + "\\vipdoc\\sz\\minline", dest_dir)
+    add_count = tdx_import_data(connect, 'SZ', '1MIN', quotations, src_dir + "\\vipdoc\\sz\\minline")
     print("\n导入数量：", add_count)
 
     print("\n导入权息数据")
     print("正在下载权息数据...")
     import urllib.request
     net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+    dest_dir = os.path.expanduser('~/.hikyuu')
     dest_filename = dest_dir + '/weight.rar'
     with open(dest_filename, 'wb') as file:
         file.write(net_file.read())
@@ -417,7 +418,7 @@ if __name__ == '__main__':
     add_count = qianlong_import_weight(connect, dest_dir + '/weight', 'SH')
     add_count += qianlong_import_weight(connect, dest_dir + '/weight', 'SZ')
     print("导入数量：", add_count)
-
+    connect.commit()
     connect.close()
     
     endtime = time.time()

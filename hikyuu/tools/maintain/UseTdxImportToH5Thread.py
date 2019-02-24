@@ -28,8 +28,8 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from ImportTdxToH5Task import ImportTdxToH5Task
 from ImportWeightToSqliteTask import ImportWeightToSqliteTask
 
-from sqlite3_common import create_database
-from tdx_to_h5 import tdx_import_stock_name_from_file
+from hikyuu.data.common_sqlite3 import create_database
+from hikyuu.data.tdx_to_h5 import tdx_import_stock_name_from_file
 
 
 class UseTdxImportToH5Thread(QThread):

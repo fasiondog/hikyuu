@@ -2,7 +2,7 @@
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2010-2017 fasiondog/hikyuu
+# Copyright (c) 2010-2019 fasiondog/hikyuu
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ import os
 import sqlite3
 from pathlib import Path
 
-from common import MARKETID, get_stktype_list
+from .common import MARKETID, get_stktype_list
 
 
 def is_exist_db(connect):

@@ -31,9 +31,9 @@ from ImportPytdxToH5Task import ImportPytdxToH5
 from ImportPytdxTransToH5Task import ImportPytdxTransToH5
 from ImportPytdxTimeToH5Task import ImportPytdxTimeToH5
 from pytdx.hq import TdxHq_API
-from sqlite3_common import create_database
-from pytdx_to_h5 import import_stock_name
-from pytdx_common import search_best_tdx
+from hikyuu.data.common_sqlite3 import create_database
+from hikyuu.data.pytdx_to_h5 import import_stock_name
+from hikyuu.data.common_pytdx import search_best_tdx
 
 class UsePytdxImportToH5Thread(QThread):
     message = pyqtSignal(list)
