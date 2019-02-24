@@ -112,16 +112,17 @@ size_t MoneyManagerBase
 size_t MoneyManagerBase
 ::getBuyNumber(const Datetime& datetime, const Stock& stock,
         price_t price, price_t risk, SystemPart from) {
+    string funcname(" [MoneyManagerBase::getBuyNumber]");
     if (!m_tm) {
         HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
                 << stock.market_code() << ") price(" << price
                 << ") risk(" << risk
-                << ") [MoneyManagerBase::getBuyNumber]");
+                << ")" << funcname);
         return 0;
     }
 
     if (stock.isNull()) {
-        HKU_ERROR("stock is Null!" << " [MoneyManagerBase::getBuyNumber]");
+        HKU_ERROR("stock is Null!" << funcname);
         return 0;
     }
 
@@ -130,29 +131,31 @@ size_t MoneyManagerBase
                 << stock.market_code() << ") price(" << price
                 << ") risk(" << risk
                 << ") Part(" << getSystemPartName(from)
-                << ") [MoneyManagerBase::getBuyNumber]");
+                << ")" << funcname);
         return 0;
     }
 
     if (m_tm->getStockNumber() >= getParam<int>("max-stock")) {
+        HKU_TRACE("Ignore! TM had max-stock number!" << funcname);
         return 0;
     }
 
     size_t n = _getBuyNumber(datetime, stock, price, risk, from);
-
-    if (n < stock.minTradeNumber()) {
-        //HKU_INFO("Ignore! Is less than the minimum number of transactions("
-        //        << stock.minTradeNumber()
-        //        << ")! [MoneyManagerBase::getBuyNumber]");
+    size_t min_trade = stock.minTradeNumber();
+    
+    if (n < min_trade) {
+        HKU_TRACE("Ignore! Is less than the minimum number of transactions("
+                << min_trade << ")!" << funcname);
         return 0;
     }
 
     //转换为最小交易量的整数倍
-    n = (n / stock.minTradeNumber()) * stock.minTradeNumber();
+    n = (n / min_trade) * min_trade;
+    size_t max_trade = stock.maxTradeNumber();
 
-    if (n > stock.maxTradeNumber()) {
-        n = stock.maxTradeNumber();
-        HKU_INFO("Over stock.maxTradeNumber! MoneyManagerBase::getBuyNumber]");
+    if (n > max_trade) {
+        n = max_trade;
+        HKU_INFO("Over stock.maxTradeNumber(" << max_trade << ")!" << funcname);
     }
 
     //在现金不足时，自动补充存入现金
@@ -164,6 +167,16 @@ size_t MoneyManagerBase
         if (money > cash) {
             m_tm->checkin(datetime, roundUp(money - cash, precision));
         }
+    } else {
+        CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
+        price_t need_cash = n * price + cost.total;
+        price_t current_cash = m_tm->currentCash();
+        while (n > min_trade && need_cash > current_cash) {
+            n = n - min_trade;
+            cost = m_tm->getBuyCost(datetime, stock, price, n);
+            need_cash = n * price + cost.total;
+        }
+        n = need_cash > current_cash ? 0 : n;
     }
 
     return n;
