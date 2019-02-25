@@ -134,6 +134,10 @@ matplotlib显示图形时中文字体乱码的问题
 
 3. 检查 “c:\\windows\\fons” 目录下，是否存在 simhei.ttf 文件，如果没有可从网上搜索下载或加入Hikyuu QQ群下载字体文件，将该字体文件拷贝至 “c:\\windows\\fons” 目录下。
 
+4. 经历以上步骤还是无法正常显示，请检查用户目录下是否也存在 matplotlib 的配置，如 Windows 中用户目录下的 .matplotlib（见下图示例）。此时可删除用户目录下的 .matplotlib 下的 matplotlibrc 文件，或者整个目录的内容删除。
+
+.. figure:: _static/quickstart_matplotlib_config2.jpg
+
 
 matplotlib无法自动绘制图像的问题
 -----------------------------------
