@@ -243,12 +243,13 @@ packages = ['hikyuu',
             'hikyuu/data/sqlite_upgrade',
             'hikyuu/data_driver',
             'hikyuu/examples',
+            'hikyuu/gui',
+            'hikyuu/gui/data',
             'hikyuu/indicator',
             'hikyuu/interactive',
             'hikyuu/interactive/drawplot',
             #'hikyuu/test',
             'hikyuu/tools',
-            'hikyuu/tools/maintain',
             'hikyuu/trade_instance',
             'hikyuu/trade_manage',
             'hikyuu/trade_sys',
@@ -304,7 +305,7 @@ setup(
 
         entry_points={
         'gui_scripts': [
-            'HikyuuTDX=hikyuu.tools.maintain.HikyuuTDX:start',
+            'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
         ]},
 
         install_requires=[

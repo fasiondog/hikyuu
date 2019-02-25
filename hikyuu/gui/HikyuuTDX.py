@@ -11,10 +11,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import  QIcon
 
-from hikyuu.tools.maintain.MainWindow import *
-from hikyuu.tools.maintain.EscapetimeThread import EscapetimeThread
-from hikyuu.tools.maintain.UseTdxImportToH5Thread import UseTdxImportToH5Thread
-from hikyuu.tools.maintain.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
+from hikyuu.gui.data.MainWindow import *
+from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
+from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
+from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 
 from hikyuu.data import hku_config_template
 

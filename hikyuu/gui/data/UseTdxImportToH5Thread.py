@@ -25,8 +25,8 @@
 import sqlite3
 from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
-from hikyuu.tools.maintain.ImportTdxToH5Task import ImportTdxToH5Task
-from hikyuu.tools.maintain.ImportWeightToSqliteTask import ImportWeightToSqliteTask
+from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
+from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
 
 from hikyuu.data.common_sqlite3 import create_database
 from hikyuu.data.tdx_to_h5 import tdx_import_stock_name_from_file
