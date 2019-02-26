@@ -304,9 +304,9 @@ setup(
         ],
 
         entry_points={
-        'gui_scripts': [
-            'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
-        ]},
+            'gui_scripts': ['HikyuuTDX=hikyuu.gui.HikyuuTDX:start',],
+            'console_scripts': ['importdata=hikyuu.gui.importdata:main',]
+        },
 
         install_requires=[
             'matplotlib>=1.5.0',
