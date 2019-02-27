@@ -1,6 +1,31 @@
 新手入门
 ===========
 
+开始请先下载数据
+----------------
+
+.. note::
+
+    数据下载工具需要使用到 unrar 命令，Linux 下请自行安装 unrar。
+
+pip 安装 Hikyuu 后，可在命令行终端中执行 hikyuutdx 命令，启动数据下载工具，并按界面提示下载数据：
+
+.. figure:: _static/install-20190228.png
+
+.. note::
+
+    如在命令行终端中无法执行 hikyuutdx 命令，请到 python 安装目录下的 Scripts 子目录中选择该执行文件（HikyuuTDX.exe）。
+
+如不希望使用 GUI 图形界面下载，可在命令行终端中执行 importdata 命令，如下图所示：
+
+.. figure:: _static/install-2019022802.png
+
+.. note::
+
+    由于 importdata 命令使用的是 HikyuuTDX 生成的配置文件，所以在第一次执行 importdata 之前需要至少运行过一次 HikyuuTDX。
+
+
+
 通过代码示例学习
 -----------------
 
