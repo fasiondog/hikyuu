@@ -317,5 +317,6 @@ setup(
             'pyecharts>=0.2.7',
             'pyecharts_snapshot',
             'PyQt5',
+            'tables',
         ],        
 )
