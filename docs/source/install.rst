@@ -4,7 +4,7 @@
 安装前准备
 ----------
 
-支持的操作系统：Windows7及以上版本、Linux
+支持的操作系统：64位 Windows7及以上版本、64位 Linux python3.5。其他系统请使用源码编译方式自行安装。
 
 Python环境：>= Python3.5
 
@@ -17,8 +17,6 @@ Python环境：>= Python3.5
 
 pip 安装
 ----------
-
-pip 安装仅支持 64位系统，如需安装 32位版本，请参考源码编译方式自行安装。
 
 安装：pip install hikyuu
 
