@@ -76,7 +76,7 @@ if sys.argv[-1] == 'clear':
         os.remove('py_version')
     for r, d, f_list in os.walk('hikyuu'):
         for name in f_list:
-            if (len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
+            if (name != 'UnRAR.exe' and len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
                    or (len(name) > 3 and name[-3:] == '.so')  \
                    or (len(name) > 6 and name[-6:] == '.dylib'):
                 print('delete', r + '/' + name)
