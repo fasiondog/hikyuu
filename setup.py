@@ -77,7 +77,7 @@ if sys.argv[-1] == 'clear':
     for r, d, f_list in os.walk('hikyuu'):
         for name in f_list:
             if (name != 'UnRAR.exe' and len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
-                   or (len(name) > 3 and name[-3:] == '.so')  \
+                   or (len(name) > 8 and name[:9] == 'libboost_')  \
                    or (len(name) > 6 and name[-6:] == '.dylib'):
                 print('delete', r + '/' + name)
                 os.remove(os.path.join(r, name))
@@ -196,9 +196,10 @@ if os.path.lexists('Hikyuu.egg-info'):
 if os.path.lexists('build/lib'):
     shutil.rmtree('build/lib')
     
-for bdist in os.listdir('build'):
-    if len(bdist) >= 5 and bdist[:5] == 'bdist' and os.path.lexists(bdist):
-        shutil.rmtree(bdist)
+if os.path.lexists('build'):
+    for bdist in os.listdir('build'):
+        if len(bdist) >= 5 and bdist[:5] == 'bdist' and os.path.lexists(bdist):
+            shutil.rmtree(bdist)
 
 for x in os.listdir('hikyuu'):
     if x[:12] == 'boost_python':
