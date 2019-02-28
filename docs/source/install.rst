@@ -18,6 +18,8 @@ Python环境：>= Python3.5
 pip 安装
 ----------
 
+pip 安装仅支持 64位系统，如需安装 32位版本，请参考源码编译方式自行安装。
+
 安装：pip install hikyuu
 
 版本升级：pip install hikyuu --upgrade
@@ -27,6 +29,10 @@ pip 安装
 .. note::
     
     由于依赖的 talib 包，无法在 Windows 下通过 pip 安装，请从 `<http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_ 上下载相应的 wheel 包，手工安装。
+    
+.. note::
+
+    Linux 需要安装依赖的库：libhdf5、libmysqlclient、libsqlite3
 
 
 源码编译安装

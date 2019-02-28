@@ -1,6 +1,23 @@
 版本发布说明
 ===============
 
+1.1.10 - 2019年3月1日
+-------------------------
+
+1. 复权增加周线及其以上支持
+2. 支持历史分笔、分时数据
+3. 添加日志打印的等级控制
+4. MoneyManagerBase增加对成本计算
+5. Datetime增加 dateOfWeek,startOfWeek,endOfWeek,nextWeek,preWeek等系列便捷方法
+6. fix：Stock.realtimeUpdate中未判断缓存未空的情况
+7. fix：io重定向中未进行重复open的判定
+8. fix：Block分类显示乱码
+9. 简化源码安装方式，支持 python setup.py
+10. 全新的快速数据下载工具（支持GUI及命令行，如下图所示），下载当日权息、日线、分钟线、分笔、分时数据耗时2~4分钟（视个人网络有所不同），同时不再需要通过证券客户端下载盘后数据。具体参见：`<https://hikyuu.readthedocs.io/zh_CN/latest/quickstart.html>`_
+
+.. figure:: _static/install-20190228.png
+
+
 1.0.9 - 2018年10月23日
 -------------------------
 
