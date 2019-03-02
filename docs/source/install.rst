@@ -11,8 +11,6 @@ Python环境：>= Python3.5
 .. note:: 
 
     - 推荐安装集成了常用数据科学软件包的Python发布版本： `Anaconda <https://www.anaconda.com/>`_ 。国内用户建议从 `清华镜像网站 <https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/>`_ 下载，速度快。
-    
-    - Linux安装建议使用pchaos提供的docker解决方案：https://github.com/pchaos/Docker-hikyuu
 
 
 pip 安装
