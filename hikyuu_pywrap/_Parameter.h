@@ -41,27 +41,28 @@ struct AnyToPython{
             return Py_BuildValue("s", s.c_str());
 
         } else if (x.type() == typeid(Stock)) {
-            Stock& stk = boost::any_cast<Stock>(x);
+            const Stock& stk = boost::any_cast<Stock>(x);
             string cmd("getStock('" + stk.market_code() + "')");
             object* o = new object(eval(cmd.c_str()));
             return o->ptr();
 
-        /*} else if (x.type() == typeid(KQuery)) {
+        } else if (x.type() == typeid(KQuery)) {
             const KQuery& query = boost::any_cast<KQuery>(x);
-            string cmd;
+            std::stringstream cmd (std::stringstream::out);
             if (query.queryType() == KQuery::INDEX) {
-                cmd = "QueryByIndex(" + query.start() + "," + query.end() + ","\
-                        + query.kType() + "," + query.recoverType() + ")";
+                cmd << "QueryByIndex(" << query.start() << "," << query.end() 
+                    << ", Query." << KQuery::getKTypeName(query.kType()) 
+                    << ", Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             } else {
-                cmd = "QueryByDate(" + query.startDatetime() + ","
-                        + query.endDatetime() + ","
-                        + query.kType() + "," + query.recoverType() + ")";
+                cmd << "QueryByDate(Datetime("  << query.startDatetime() 
+                    << "), Datetime(" << query.endDatetime() << "), " 
+                    << "Query." << KQuery::getKTypeName(query.kType()) 
+                    << "Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             }
-            std::cout << cmd << std::endl;
-            object* o = new object(eval(cmd.c_str()));
+            //std::cout << cmd.str() << std::endl;
+            object* o = new object(eval(cmd.str().c_str()));
             return o->ptr();
-            */
-
+        
         } else {
             HKU_ERROR("convert failed! Unkown type! Will return None!"
                     " [AnyToPython::convert]");
@@ -165,7 +166,7 @@ inline void Parameter::set<object>(const string& name, const object& o) {
     }
 
     if (m_params[name].type() == typeid(Stock)) {
-        extract<string> x5(o);
+        extract<Stock> x5(o);
         if (x5.check()) {
             m_params[name] = x5();
             return;
@@ -175,7 +176,7 @@ inline void Parameter::set<object>(const string& name, const object& o) {
     }
 
     if (m_params[name].type() == typeid(KQuery)) {
-        extract<string> x6(o);
+        extract<KQuery> x6(o);
         if (x6.check()) {
             m_params[name] = x6();
             return;
