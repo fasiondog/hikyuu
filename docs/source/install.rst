@@ -24,7 +24,7 @@ pip 安装
 
 .. note::
     
-    由于依赖的 talib 包，无法在 Windows 下通过 pip 安装，请从 `<http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_ 上下载相应的 wheel 包，手工安装。
+    由于依赖的 talib 包，无法在 Windows 下通过 pip 安装，请从 `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib/>`_ 上下载相应的 wheel 包，手工安装。
     
 .. note::
 
