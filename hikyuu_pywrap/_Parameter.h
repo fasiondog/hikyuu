@@ -12,6 +12,7 @@
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/Log.h>
 #include <hikyuu/Stock.h>
+#include <hikyuu/KQuery.h>
 #include "pickle_support.h"
 
 namespace hku {
@@ -44,6 +45,22 @@ struct AnyToPython{
             string cmd("getStock('" + stk.market_code() + "')");
             object* o = new object(eval(cmd.c_str()));
             return o->ptr();
+
+        /*} else if (x.type() == typeid(KQuery)) {
+            const KQuery& query = boost::any_cast<KQuery>(x);
+            string cmd;
+            if (query.queryType() == KQuery::INDEX) {
+                cmd = "QueryByIndex(" + query.start() + "," + query.end() + ","\
+                        + query.kType() + "," + query.recoverType() + ")";
+            } else {
+                cmd = "QueryByDate(" + query.startDatetime() + ","
+                        + query.endDatetime() + ","
+                        + query.kType() + "," + query.recoverType() + ")";
+            }
+            std::cout << cmd << std::endl;
+            object* o = new object(eval(cmd.c_str()));
+            return o->ptr();
+            */
 
         } else {
             HKU_ERROR("convert failed! Unkown type! Will return None!"
@@ -96,6 +113,12 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
 
+        extract<KQuery> x6(o);
+        if (x6.check()) {
+            m_params[name] = x6();
+            return;
+        }
+
         throw std::logic_error("Unsuport Type! " + name);
         return;
     }
@@ -145,6 +168,16 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         extract<string> x5(o);
         if (x5.check()) {
             m_params[name] = x5();
+            return;
+        }
+        throw std::logic_error(mismatch);
+        return;
+    }
+
+    if (m_params[name].type() == typeid(KQuery)) {
+        extract<string> x6(o);
+        if (x6.check()) {
+            m_params[name] = x6();
             return;
         }
         throw std::logic_error(mismatch);

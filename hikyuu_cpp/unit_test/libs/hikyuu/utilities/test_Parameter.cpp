@@ -82,6 +82,15 @@ BOOST_AUTO_TEST_CASE( test_Parameter ) {
     p.set<Stock>("stk", stk);
     Stock stk2 = p.get<Stock>("stk");
     BOOST_CHECK(stk == stk2);
+
+    /** @arg 测试使用 KQuery 做为参数 */
+    KQuery query(10, 20);
+    p = Parameter();
+    p.set<KQuery>("query", query);
+    KQuery q2;
+    q2 = p.get<KQuery>("query");
+    BOOST_CHECK(query == q2);
+
 }
 
 
@@ -97,6 +106,7 @@ BOOST_AUTO_TEST_CASE( test_Parameter_serialize ) {
     p1.set<double>("p", 0.101);
     p1.set<string>("string", "This is string!");
     p1.set<Stock>("stk", getStock("sh600000"));
+    p1.set<KQuery>("query", KQueryByDate(Datetime(200001041025), Datetime(200001041100), KQuery::MIN5));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -115,6 +125,7 @@ BOOST_AUTO_TEST_CASE( test_Parameter_serialize ) {
     BOOST_CHECK(p2.get<double>("p") == 0.101);
     BOOST_CHECK(p2.get<string>("string") == "This is string!");
     BOOST_CHECK(p2.get<Stock>("stk") == getStock("sh600000"));
+    BOOST_CHECK(p2.get<KQuery>("query") == KQueryByDate(Datetime(200001041025), Datetime(200001041100), KQuery::MIN5));
 }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

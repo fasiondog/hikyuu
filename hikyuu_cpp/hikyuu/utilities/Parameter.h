@@ -24,6 +24,7 @@
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/nvp.hpp>
 #include "../serialization/Stock_serialization.h"
+#include "../serialization/KQuery_serialization.h"
 #endif
 
 
@@ -178,6 +179,10 @@ private:
                 type = "stock";
                 value = "stock";
                 stock = boost::any_cast<Stock>(arg);
+            } else if (arg.type() == typeid(KQuery)) {
+                type = "query";
+                value = "query";
+                query = boost::any_cast<KQuery>(arg);
             } else {
                 type = "Unknown";
                 value = "Unknown";
@@ -188,6 +193,7 @@ private:
         string type;
         string value;
         Stock stock;
+        KQuery query;
 
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version) {
@@ -195,6 +201,7 @@ private:
             ar & BOOST_SERIALIZATION_NVP(type);
             ar & BOOST_SERIALIZATION_NVP(value);
             ar & BOOST_SERIALIZATION_NVP(stock);
+            ar & BOOST_SERIALIZATION_NVP(query);
         }
     };
 
@@ -229,6 +236,8 @@ private:
                 m_params[record.name] = record.value;
             } else if (record.type == "stock") {
                 m_params[record.name] = record.stock;
+            } else if (record.type == "query") {
+                m_params[record.name] = record.query;
             } else {
                 std::cout << "Unknown type! [Parameter::load]" << std::endl;
             }
