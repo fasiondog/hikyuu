@@ -20,6 +20,7 @@
 .pyproject
 .vscode
 .vs
+temp.txt
 release.x64.version.h
 release.x86.version.h
 hikyuu.code-workspace

@@ -244,6 +244,16 @@ HKU_API std::ostream& operator <<(std::ostream &os, const Stock& stock);
 typedef vector<Stock> StockList;
 
 
+/**
+ * 获取Stock，目的是封装StockManager，客户端不直接使用StockManager对象
+ * @param querystr 格式：“市场简称证券代码”，如"sh000001"
+ * @return 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
+ * @ingroup StockManage
+ */
+Stock HKU_API getStock(const string& querystr);
+
+
+
 /* 用于将Stock实例作为map的key，一般建议使用stock.id做键值，
  * 否则map还要利用拷贝构造函数，创建新对象，效率低 */
 bool operator < (const Stock& s1, const Stock& s2);

@@ -9,8 +9,9 @@
 #define STOCK_SERIALIZATION_H_
 
 #include "../config.h"
-#include "../StockManager.h"
+#include "../Stock.h"
 #include "../utilities/util.h"
+
 
 //===========================================================================
 // 以下为Stock的序列化，目前仅实现了在StockManager中管理的Stock的序列化
@@ -57,8 +58,7 @@ void load(Archive & ar, hku::Stock& stock, unsigned int version) {
     hku::string market_code, name;
     ar & BOOST_SERIALIZATION_NVP(market_code);
     ar & BOOST_SERIALIZATION_NVP(name);
-    hku::StockManager& sm = hku::StockManager::instance();
-    stock = sm.getStock(market_code);
+    stock = hku::getStock(market_code);
 }
 }} /* namespace boost::serailization */
 

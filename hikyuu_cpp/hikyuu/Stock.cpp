@@ -690,4 +690,10 @@ void Stock::realtimeUpdate(const KRecord& record) {
 }
 
 
+Stock HKU_API getStock(const string& querystr) {
+    StockManager& sm = StockManager::instance();
+    return sm.getStock(querystr);
+}
+
+
 } /* namespace */

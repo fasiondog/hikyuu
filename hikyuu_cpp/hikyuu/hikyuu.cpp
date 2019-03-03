@@ -63,10 +63,6 @@ void hikyuu_init(const string& config_file_name) {
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam);
 }
 
-Stock getStock(const string& querystr) {
-    StockManager& sm = StockManager::instance();
-    return sm.getStock(querystr);
-}
 
 string getVersion() {
     return HKU_VERSION;

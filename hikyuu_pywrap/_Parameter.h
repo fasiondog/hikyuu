@@ -11,6 +11,7 @@
 #include <boost/python.hpp>
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/Log.h>
+#include <hikyuu/Stock.h>
 #include "pickle_support.h"
 
 namespace hku {
@@ -37,6 +38,12 @@ struct AnyToPython{
         } else if (x.type() == typeid(string)) {
             string s(boost::any_cast<string>(x));
             return Py_BuildValue("s", s.c_str());
+
+        } else if (x.type() == typeid(Stock)) {
+            Stock& stk = boost::any_cast<Stock>(x);
+            string cmd("getStock('" + stk.market_code() + "')");
+            object* o = new object(eval(cmd.c_str()));
+            return o->ptr();
 
         } else {
             HKU_ERROR("convert failed! Unkown type! Will return None!"
@@ -83,6 +90,12 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
 
+        extract<Stock> x5(o);
+        if (x5.check()) {
+            m_params[name] = x5();
+            return;
+        }
+
         throw std::logic_error("Unsuport Type! " + name);
         return;
     }
@@ -122,6 +135,16 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         extract<string> x4(o);
         if (x4.check()) {
             m_params[name] = x4();
+            return;
+        }
+        throw std::logic_error(mismatch);
+        return;
+    }
+
+    if (m_params[name].type() == typeid(Stock)) {
+        extract<string> x5(o);
+        if (x5.check()) {
+            m_params[name] = x5();
             return;
         }
         throw std::logic_error(mismatch);

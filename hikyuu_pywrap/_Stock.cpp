@@ -28,6 +28,7 @@ DatetimeList (Stock::*getDatetimeList2)(const KQuery&) const = &Stock::getDateti
 void export_Stock() {
     class_<Stock>("Stock", init<>())
             .def(init<const string&, const string&, const string&>())
+            .def(init<const Stock&>())
             //.def(self_ns::str(self))
             .def("__str__", &Stock::toString)
             .add_property("id", &Stock::id)
