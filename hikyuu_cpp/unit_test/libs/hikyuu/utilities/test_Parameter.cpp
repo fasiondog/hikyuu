@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( test_Parameter_serialize ) {
     KData k = stk.getKData(q);
     p1.set<Stock>("stk", stk);
     p1.set<KQuery>("query", q);
-    //p1.set<KData>("kdata", k);
+    p1.set<KData>("kdata", k);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -146,10 +146,10 @@ BOOST_AUTO_TEST_CASE( test_Parameter_serialize ) {
     BOOST_CHECK(p2.get<string>("string") == "This is string!");
     BOOST_CHECK(p2.get<Stock>("stk") == stk);
     BOOST_CHECK(p2.get<KQuery>("query") == q);
-    /*KData k2 = p2.get<KData>("kdata");
+    KData k2 = p2.get<KData>("kdata");
     BOOST_CHECK(k.size() == k2.size());
     BOOST_CHECK(k.getStock() == k2.getStock());
-    BOOST_CHECK(k.getQuery() == k2.getQuery());*/
+    BOOST_CHECK(k.getQuery() == k2.getQuery());
 }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

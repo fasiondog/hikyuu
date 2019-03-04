@@ -185,7 +185,7 @@ private:
             } else if (arg.type() == typeid(KData)) {
                 type = "kdata";
                 value = "kdata";
-                query = boost::any_cast<KQuery>(arg);
+                kdata = boost::any_cast<KData>(arg);
             } else {
                 type = "Unknown";
                 value = "Unknown";
