@@ -63,7 +63,6 @@ struct AnyToPython{
                     << "Query." << KQuery::getKTypeName(query.kType()) 
                     << "Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             }
-            //std::cout << cmd.str() << std::endl;
             object* o = new object(eval(cmd.str().c_str()));
             return o->ptr();
 
@@ -86,7 +85,6 @@ struct AnyToPython{
                         << "Query." << KQuery::getKTypeName(query.kType())
                         << "Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
                 }
-                cmd << ")";
             }
             std::cout << cmd.str() << std::endl;
             object* o = new object(eval(cmd.str().c_str()));
