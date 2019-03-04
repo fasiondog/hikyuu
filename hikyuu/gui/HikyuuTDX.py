@@ -49,6 +49,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         with open(filename, 'w', encoding='utf-8') as f:
             current_config.write(f)
 
+        if not os.path.lexists(self.getUserConfigDir()):
+            os.mkdir(self.getUserConfigDir())
+            
         filename = self.getUserConfigDir() + '/hikyuu.ini'
         data_dir = current_config['hdf5']['dir']
         
