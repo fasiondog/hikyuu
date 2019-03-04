@@ -31,7 +31,7 @@ void load(Archive & ar, hku::KData& kdata, unsigned int version) {
     hku::KQuery query;
     ar & BOOST_SERIALIZATION_NVP(stock);
     ar & BOOST_SERIALIZATION_NVP(query);
-    kdata = hku::KData(stock, query);
+    kdata = stock.isNull() ? hku::KData() : hku::KData(stock, query);
 }
 }} /* namespace boost::serailization */
 

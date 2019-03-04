@@ -11,8 +11,7 @@
 #include <boost/python.hpp>
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/Log.h>
-#include <hikyuu/Stock.h>
-#include <hikyuu/KQuery.h>
+#include <hikyuu/KData.h>
 #include "pickle_support.h"
 
 namespace hku {
@@ -42,7 +41,12 @@ struct AnyToPython{
 
         } else if (x.type() == typeid(Stock)) {
             const Stock& stk = boost::any_cast<Stock>(x);
-            string cmd("getStock('" + stk.market_code() + "')");
+            string cmd;
+            if (stk.isNull()) {
+                cmd = "Stock()";
+            } else {
+                cmd = "getStock('" + stk.market_code() + "')";
+            }
             object* o = new object(eval(cmd.c_str()));
             return o->ptr();
 
@@ -62,7 +66,32 @@ struct AnyToPython{
             //std::cout << cmd.str() << std::endl;
             object* o = new object(eval(cmd.str().c_str()));
             return o->ptr();
-        
+
+        } else if (x.type() == typeid(KData)) {
+            KData kdata = boost::any_cast<KData>(x);
+            Stock stock = kdata.getStock();
+            KQuery query = kdata.getQuery();
+            std::stringstream cmd;
+            if (stock.isNull()) {
+                cmd << "KData()";
+            } else {
+                cmd << "getStock('" << stock.market_code() << "').getKData(";
+                if (query.queryType() == KQuery::INDEX) {
+                    cmd << "QueryByIndex(" << query.start() << "," << query.end()
+                        << ", Query." << KQuery::getKTypeName(query.kType())
+                        << ", Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                } else {
+                    cmd << "QueryByDate(Datetime("  << query.startDatetime()
+                        << "), Datetime(" << query.endDatetime() << "), "
+                        << "Query." << KQuery::getKTypeName(query.kType())
+                        << "Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                }
+                cmd << ")";
+            }
+            std::cout << cmd.str() << std::endl;
+            object* o = new object(eval(cmd.str().c_str()));
+            return o->ptr();
+
         } else {
             HKU_ERROR("convert failed! Unkown type! Will return None!"
                     " [AnyToPython::convert]");
@@ -117,6 +146,12 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         extract<KQuery> x6(o);
         if (x6.check()) {
             m_params[name] = x6();
+            return;
+        }
+
+        extract<KData> x7(o);
+        if (x7.check()) {
+            m_params[name] = x7();
             return;
         }
 
@@ -177,6 +212,16 @@ inline void Parameter::set<object>(const string& name, const object& o) {
 
     if (m_params[name].type() == typeid(KQuery)) {
         extract<KQuery> x6(o);
+        if (x6.check()) {
+            m_params[name] = x6();
+            return;
+        }
+        throw std::logic_error(mismatch);
+        return;
+    }
+
+    if (m_params[name].type() == typeid(KData)) {
+        extract<KData> x6(o);
         if (x6.check()) {
             m_params[name] = x6();
             return;
