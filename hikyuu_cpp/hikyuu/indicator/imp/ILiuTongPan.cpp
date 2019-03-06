@@ -62,7 +62,7 @@ void ILiuTongPan::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API LIUTONGPAN(const KData& k) {
-    return make_shared<ILiuTongPan>(k);
+    return Indicator(make_shared<ILiuTongPan>(k));
 }
 
 
