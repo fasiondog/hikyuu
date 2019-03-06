@@ -156,10 +156,21 @@ void IndicatorImp::calculate(const Indicator& data) {
             m_discard = std::max(m_right->discard(), m_left->discard());
             for (size_t i = m_discard; i < total; ++i) {
                 for (size_t r = 0; r < m_result_num; ++r) {
-                    _set(m_right->get(i, r) + m_right->get(i, r), i, r);
+                    _set(m_left->get(i, r) + m_right->get(i, r), i, r);
                 }
             }
             break;    
+
+        case SUB:
+            m_right->calculate(data);
+            m_left->calculate(data);
+            m_discard = std::max(m_right->discard(), m_left->discard());
+            for (size_t i = m_discard; i < total; ++i) {
+                for (size_t r = 0; r < m_result_num; ++r) {
+                    _set(m_left->get(i, r) - m_right->get(i, r), i, r);
+                }
+            }
+            break;
 
         default:
             break;
