@@ -199,6 +199,9 @@ void export_Indicator_build_in() {
     def("IND_OR", IND_OR2);
     def("IND_OR", IND_OR3);
 
+    def("LIUTONGPAN", LIUTONGPAN);
+    def("HSL", HSL);
+
 }
 
 

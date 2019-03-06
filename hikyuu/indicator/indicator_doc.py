@@ -122,6 +122,16 @@ HIGH([data])
 """
 
 
+HSL.__doc__ = """
+HSL(kdata)
+
+    获取换手率，等于 VOL(k) / CAPITAL(k)
+    
+    :param KData kdata: k线数据
+    :rtype: Indicator
+"""
+
+
 KDATA.__doc__ = """
 KDATA([data])
 
@@ -140,6 +150,17 @@ KDATA_PART([data, kpart])
     :param data: 输入数据（KData 或 Indicator） 
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: Indicator
+"""
+
+CAPITAL = LIUTONGPAN
+
+LIUTONGPAN.__doc__ = """
+LIUTONGPAN(kdata)
+
+   获取流通盘
+   
+   :param KData kdata: k线数据
+   :rtype: Indicator
 """
 
 

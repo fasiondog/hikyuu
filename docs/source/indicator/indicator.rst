@@ -34,6 +34,14 @@
     :rtype: Indicator
     
     
+.. py:function:: CAPITAL(kdata)
+
+   获取流通盘（单位：万股），同 LIUTONGPAN
+   
+   :param KData kdata: k线数据
+   :rtype: Indicator
+
+    
 .. py:function:: CVAL([data, value=0.0, len=0, discard=0])
 
     CVAL(data[, value=0.0])
@@ -85,6 +93,14 @@
     :rtype: Indicator
     
     
+.. py:function:: HSL(kdata)
+
+    获取换手率，等于 VOL(k) / CAPITAL(k)
+    
+    :param KData kdata: k线数据
+    :rtype: Indicator
+    
+    
 .. py:function:: KDATA([data])
 
     包装KData成Indicator，用于其他指标计算
@@ -100,6 +116,14 @@
     :param data: 输入数据（KData 或 Indicator） 
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :rtype: Indicator
+
+
+.. py:function:: LIUTONGPAN(kdata)
+
+   获取流通盘（单位：万股），同 CAPITAL
+   
+   :param KData kdata: k线数据
+   :rtype: Indicator
 
     
 .. py:function:: LLV([data, n=20])
