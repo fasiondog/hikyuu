@@ -112,8 +112,6 @@ public:
         return m_imp->getParam<ValueType>(name);
     }
 
-    IndicatorImpPtr getImp() const { return m_imp; }
-
 protected:
     IndicatorImpPtr m_imp;
 

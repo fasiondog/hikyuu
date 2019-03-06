@@ -27,17 +27,17 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
 
 
 IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0) {
+: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_optype(LEAF) {
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name)
-: m_name(name), m_discard(0), m_result_num(0) {
+: m_name(name), m_discard(0), m_result_num(0), m_optype(LEAF) {
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name, size_t result_num)
-: m_name(name), m_discard(0) {
+: m_name(name), m_discard(0), m_optype(LEAF) {
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
@@ -133,11 +133,42 @@ Indicator IndicatorImp::getResult(size_t result_num) {
 
 void IndicatorImp::calculate(const Indicator& data) {
     _readyBuffer(data.size(), m_result_num);
-    if (check()) {
+
+    if (!check()) {
+        HKU_WARN("Invalid param! " << long_name());
+        return;
+    }
+
+    size_t total = data.size();
+    switch (m_optype) {
+        case LEAF:
+            _calculate(data);
+            break;
+
+        case OP:
+            m_right->calculate(data);
+            this->_calculate(Indicator(m_right));
+            break;
+
+        case ADD:
+            m_right->calculate(data);
+            m_left->calculate(data);
+            m_discard = std::max(m_right->discard(), m_left->discard());
+            for (size_t i = m_discard; i < total; ++i) {
+                for (size_t r = 0; r < m_result_num; ++r) {
+                    _set(m_right->get(i, r) + m_right->get(i, r), i, r);
+                }
+            }
+            break;    
+
+        default:
+            break;
+    }
+    /*if (check()) {
         _calculate(data);
     } else {
         HKU_WARN("Invalid param! " << long_name());
-    }
+    }*/
 }
 
 } /* namespace hku */

@@ -34,6 +34,25 @@ class HKU_API IndicatorImp {
     PARAMETER_SUPPORT
 
 public:
+    enum OPType {
+        LEAF, ///<叶子节点
+        OP,  /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
+        ADD, ///<加
+        SUB, ///<减
+        MUL, ///<乘
+        DIV, ///<除
+        EQ,  ///<等于
+        GT,  ///<大于
+        LT,  ///<小于
+        NE,  ///<不等于
+        GE,  ///<大于等于
+        LE,  ///<小于等于
+        AND, ///<与
+        OR,  ///<或
+        INVALID
+    };
+
+public:
     /** 默认构造函数   */
     IndicatorImp();
     IndicatorImp(const string& name);
@@ -112,6 +131,10 @@ protected:
     size_t m_discard;
     size_t m_result_num;
     PriceList *m_pBuffer[MAX_RESULT_NUM];
+
+    OPType m_optype;
+    IndicatorImpPtr m_left;
+    IndicatorImpPtr m_right;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
