@@ -114,17 +114,25 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
-    void calculate(const Indicator& data);
+    void calculate();
 
     // ===================
     //  子类接口
     // ===================
     virtual bool check() { return false;}
 
-    virtual void _calculate(const Indicator& data) {}
+    virtual void _calculate() {}
 
     typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
     virtual IndicatorImpPtr operator()(const Indicator& ind);
+
+    void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
+
+    void setContext(const Stock&, const KQuery&);
+
+private:
+    void initContext();
+    KData getCurrentKData();
 
 protected:
     string m_name;
@@ -133,6 +141,7 @@ protected:
     PriceList *m_pBuffer[MAX_RESULT_NUM];
 
     OPType m_optype;
+    IndicatorImp* m_parent;
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
 

@@ -6,9 +6,12 @@
  */
 #include <stdexcept>
 #include "Indicator.h"
+#include "../Stock.h"
+#include "../Context.h"
 #include "../Log.h"
 
 namespace hku {
+
 
 HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImp& imp) {
     os << "Indicator(" << imp.name() << ", " << imp.getParameter() << ")";
@@ -25,21 +28,44 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
     return os;
 }
 
-
 IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_optype(LEAF) {
+: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_optype(LEAF), m_parent(NULL) {
+    initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name)
-: m_name(name), m_discard(0), m_result_num(0), m_optype(LEAF) {
+: m_name(name), m_discard(0), m_result_num(0), m_optype(LEAF), m_parent(NULL) {
+    initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name, size_t result_num)
-: m_name(name), m_discard(0), m_optype(LEAF) {
+: m_name(name), m_discard(0), m_optype(LEAF), m_parent(NULL) {
+    initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
+}
+
+void IndicatorImp::initContext() {
+    setParam<KData>("kdata", KData());
+}
+
+void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
+    setParam<KData>("kdata", stock.getKData(query));
+}
+
+KData IndicatorImp::getCurrentKData() {
+    KData kdata;
+    if (m_parent) {
+        kdata = m_parent->getCurrentKData();
+    }
+
+    if (kdata.getStock().isNull()) {
+        kdata = getGlobalContextKData();
+    }
+
+    return kdata;
 }
 
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
@@ -131,45 +157,38 @@ Indicator IndicatorImp::getResult(size_t result_num) {
     return Indicator(imp);
 }
 
-void IndicatorImp::calculate(const Indicator& data) {
-    _readyBuffer(data.size(), m_result_num);
+void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
+    if (op == LEAF || op >= INVALID || !left || !right) {
+        HKU_ERROR("Wrong used [OperandNode::add]");
+        return;
+    }
 
+    m_optype = op;
+    m_left = left;
+    m_right = right;
+    m_left->m_parent = this;
+    m_right->m_parent = this;
+}
+
+void IndicatorImp::calculate() {
     if (!check()) {
         HKU_WARN("Invalid param! " << long_name());
         return;
     }
 
-    size_t total = data.size();
     switch (m_optype) {
         case LEAF:
-            _calculate(data);
+            _calculate();
             break;
 
         case OP:
-            m_right->calculate(data);
-            this->_calculate(Indicator(m_right));
             break;
 
-        case ADD:
-            m_right->calculate(data);
-            m_left->calculate(data);
-            m_discard = std::max(m_right->discard(), m_left->discard());
-            for (size_t i = m_discard; i < total; ++i) {
-                for (size_t r = 0; r < m_result_num; ++r) {
-                    _set(m_left->get(i, r) + m_right->get(i, r), i, r);
-                }
-            }
-            break;    
+        case ADD: {
+            break; 
+        }   
 
         case SUB:
-            m_right->calculate(data);
-            m_left->calculate(data);
-            m_discard = std::max(m_right->discard(), m_left->discard());
-            for (size_t i = m_discard; i < total; ++i) {
-                for (size_t r = 0; r < m_result_num; ++r) {
-                    _set(m_left->get(i, r) - m_right->get(i, r), i, r);
-                }
-            }
             break;
 
         default:
