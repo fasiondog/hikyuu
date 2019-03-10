@@ -30,7 +30,21 @@ Indicator::~Indicator() {
 }
 
 Indicator Indicator::operator()(const Indicator& ind) {
-    return m_imp ? Indicator((*m_imp)(ind)) : Indicator();
+    std::cout << "Indicator Indicator::operator()(const Indicator& ind)" << std::endl;
+    //return m_imp ? Indicator((*m_imp)(ind)) : Indicator();
+    IndicatorImpPtr p;
+    if (!m_imp) {
+        return Indicator(p);
+    }
+    
+    p = m_imp->clone();
+    if (!ind.getImp()) {
+        return Indicator(p);
+    }
+
+    p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp()->clone());
+    //p->calculate();
+    return Indicator(p);
 }
 
 Indicator& Indicator::operator=(const Indicator& indicator) {
@@ -79,6 +93,7 @@ size_t Indicator::size() const {
     return m_imp ? m_imp->size() : 0;
 }
 
+/*
 HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
     if (ind1.size() == 0 || ind1.size() != ind2.size()) {
         return Indicator();
@@ -769,6 +784,6 @@ HKU_API Indicator operator<=(price_t val, const Indicator& ind) {
 
     return Indicator(imp);
 }
-
+*/
 
 } /* namespace hku */

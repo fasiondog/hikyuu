@@ -60,6 +60,9 @@ public:
 
     virtual ~IndicatorImp();
 
+    typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
+    virtual IndicatorImpPtr operator()(const Indicator& ind);
+
     size_t getResultNumber() const {
         return m_result_num;
     }
@@ -82,7 +85,7 @@ public:
     PriceList getResultAsPriceList(size_t result_num);
 
     /** 以Indicator的方式获取指定的输出集，该方式包含了discard的信息 */
-    Indicator getResult(size_t result_num);
+    IndicatorImpPtr getResult(size_t result_num);
 
     /**
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
@@ -116,6 +119,12 @@ public:
 
     void calculate();
 
+    void setContext(const Stock&, const KQuery&);
+
+    void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
+
+    IndicatorImpPtr clone();
+
     // ===================
     //  子类接口
     // ===================
@@ -123,12 +132,7 @@ public:
 
     virtual void _calculate() {}
 
-    typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
-    virtual IndicatorImpPtr operator()(const Indicator& ind);
-
-    void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
-
-    void setContext(const Stock&, const KQuery&);
+    virtual IndicatorImpPtr _clone() { return make_shared<IndicatorImp>(); }
 
 private:
     void initContext();
@@ -213,10 +217,16 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
     virtual IndicatorImpPtr operator()(const Indicator& ind) { \
         IndicatorImpPtr p = make_shared<classname>(); \
         p->setParameter(m_params); \
-        p->calculate(ind); \
+        p->calculate(); \
         return p; \
+    } \
+    virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } \
+private:\
+    friend class boost::serialization::access; \
+    template<class Archive> \
+    void serialize(Archive & ar, const unsigned int version) { \
+        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp); \
     }
-
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 

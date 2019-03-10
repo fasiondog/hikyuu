@@ -104,6 +104,18 @@ IndicatorImp::~IndicatorImp() {
     }
 }
 
+IndicatorImpPtr IndicatorImp::clone() {
+    IndicatorImpPtr p = _clone();
+    m_name = p->m_name;
+    m_discard = p->m_discard;
+    m_result_num = p->m_result_num;
+    m_optype = p->m_optype;
+    m_parent = p->m_parent;
+    m_left = p->m_left;
+    m_right = p->m_right;
+    return p;
+}
+
 
 IndicatorImpPtr IndicatorImp::operator()(const Indicator& ind) {
     HKU_INFO("This indicator not support operator()! " << *this
@@ -142,9 +154,9 @@ PriceList IndicatorImp::getResultAsPriceList(size_t result_num) {
 }
 
 
-Indicator IndicatorImp::getResult(size_t result_num) {
+IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     if (result_num >= m_result_num || m_pBuffer[result_num] == NULL) {
-        return Indicator();
+        return IndicatorImpPtr();
     }
 
     IndicatorImpPtr imp = make_shared<IndicatorImp>();
@@ -154,11 +166,11 @@ Indicator IndicatorImp::getResult(size_t result_num) {
     for (size_t i = discard(); i < total; ++i) {
         imp->_set(get(i, result_num), i);
     }
-    return Indicator(imp);
+    return imp;
 }
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
-    if (op == LEAF || op >= INVALID || !left || !right) {
+    if (op == LEAF || op >= INVALID || !right) {
         HKU_ERROR("Wrong used [OperandNode::add]");
         return;
     }
@@ -166,8 +178,10 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     m_optype = op;
     m_left = left;
     m_right = right;
-    m_left->m_parent = this;
+    if (m_left) m_left->m_parent = this;
     m_right->m_parent = this;
+    
+    calculate();
 }
 
 void IndicatorImp::calculate() {
@@ -182,6 +196,8 @@ void IndicatorImp::calculate() {
             break;
 
         case OP:
+            m_right->calculate();
+            //m_left->calculate();
             break;
 
         case ADD: {

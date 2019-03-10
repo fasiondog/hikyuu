@@ -112,6 +112,8 @@ public:
         return m_imp->getParam<ValueType>(name);
     }
 
+    IndicatorImpPtr getImp() const { return m_imp; }
+
 protected:
     IndicatorImpPtr m_imp;
 
@@ -125,7 +127,7 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-
+#if 0
 /**
  * Indicator实例相加，两者的size必须相等，否在返回空
  * @return 1) 相加的两个实例的size必须相等，否在返回空实例
@@ -232,6 +234,7 @@ HKU_API Indicator operator>=(price_t, const Indicator&);
 HKU_API Indicator operator<=(const Indicator&, const Indicator&);
 HKU_API Indicator operator<=(const Indicator&, price_t);
 HKU_API Indicator operator<=(price_t, const Indicator&);
+#endif
 
 } /* namespace hku */
 #endif /* INDICATOR_H_ */
