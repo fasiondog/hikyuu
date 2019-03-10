@@ -117,7 +117,7 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
-    void calculate();
+    void calculate(const Indicator&);
 
     void setContext(const Stock&, const KQuery&);
 
@@ -130,7 +130,7 @@ public:
     // ===================
     virtual bool check() { return false;}
 
-    virtual void _calculate() {}
+    virtual void _calculate(const Indicator&) {}
 
     virtual IndicatorImpPtr _clone() { return make_shared<IndicatorImp>(); }
 
@@ -217,7 +217,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
     virtual IndicatorImpPtr operator()(const Indicator& ind) { \
         IndicatorImpPtr p = make_shared<classname>(); \
         p->setParameter(m_params); \
-        p->calculate(); \
+        p->calculate(ind); \
         return p; \
     } \
     virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } \

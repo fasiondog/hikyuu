@@ -180,11 +180,9 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     m_right = right;
     if (m_left) m_left->m_parent = this;
     m_right->m_parent = this;
-    
-    calculate();
 }
 
-void IndicatorImp::calculate() {
+void IndicatorImp::calculate(const Indicator& ind) {
     if (!check()) {
         HKU_WARN("Invalid param! " << long_name());
         return;
@@ -192,15 +190,18 @@ void IndicatorImp::calculate() {
 
     switch (m_optype) {
         case LEAF:
-            _calculate();
+            _calculate(Indicator());
             break;
 
         case OP:
-            m_right->calculate();
+            m_right->calculate(ind);
+            this->calculate(Indicator(m_right));
             //m_left->calculate();
             break;
 
         case ADD: {
+            m_right->calculate(Indicator());
+            m_left->calculate(Indicator());
             break; 
         }   
 

@@ -32,18 +32,14 @@ Indicator::~Indicator() {
 Indicator Indicator::operator()(const Indicator& ind) {
     std::cout << "Indicator Indicator::operator()(const Indicator& ind)" << std::endl;
     //return m_imp ? Indicator((*m_imp)(ind)) : Indicator();
-    IndicatorImpPtr p;
-    if (!m_imp) {
-        return Indicator(p);
+    if (!m_imp || !ind.getImp()) {
+        return Indicator();
     }
     
-    p = m_imp->clone();
-    if (!ind.getImp()) {
-        return Indicator(p);
-    }
-
+    IndicatorImpPtr p = m_imp->clone();
+    p->calculate(ind);
     p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp()->clone());
-    //p->calculate();
+    //p->calculate(ind);
     return Indicator(p);
 }
 
@@ -93,16 +89,21 @@ size_t Indicator::size() const {
     return m_imp ? m_imp->size() : 0;
 }
 
-/*
+
 HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
-    if (ind1.size() == 0 || ind1.size() != ind2.size()) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
+    IndicatorImpPtr imp = make_shared<IndicatorImp>();
+    imp->add(IndicatorImp::ADD, ind1.getImp()->clone(), ind2.getImp()->clone());
+
     size_t result_number = std::min(ind1.getResultNumber(), ind2.getResultNumber());
-    size_t total = ind1.size();
+    size_t total = std::min(ind1.size(), ind2.size());
     size_t discard = std::max(ind1.discard(), ind2.discard());
-    IndicatorImpPtr imp(new IndicatorImp());
+    if (discard > total) 
+        discard = total;
+
     imp->_readyBuffer(total, result_number);
     imp->setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
@@ -114,7 +115,7 @@ HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
     return Indicator(imp);
 }
 
-
+/*
 HKU_API Indicator operator+(const Indicator& ind, price_t val) {
     if (ind.size() == 0) {
         return Indicator();
