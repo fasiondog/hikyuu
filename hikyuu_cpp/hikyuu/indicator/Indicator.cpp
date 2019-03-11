@@ -95,6 +95,8 @@ HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
         return Indicator();
     }
 
+    ind1.getImp()->calculate(Indicator());
+    ind2.getImp()->calculate(Indicator());
     IndicatorImpPtr imp = make_shared<IndicatorImp>();
     imp->add(IndicatorImp::ADD, ind1.getImp()->clone(), ind2.getImp()->clone());
 

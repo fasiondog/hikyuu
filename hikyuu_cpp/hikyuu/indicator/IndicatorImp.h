@@ -212,6 +212,7 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
 #endif
 
 #define INDICATOR_IMP(classname) public: \
+    virtual bool isLeaf(); \
     virtual bool check(); \
     virtual void _calculate(const Indicator& data); \
     virtual IndicatorImpPtr operator()(const Indicator& ind) { \

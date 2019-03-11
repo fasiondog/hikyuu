@@ -190,7 +190,7 @@ void IndicatorImp::calculate(const Indicator& ind) {
 
     switch (m_optype) {
         case LEAF:
-            _calculate(Indicator());
+            _calculate(ind);
             break;
 
         case OP:
