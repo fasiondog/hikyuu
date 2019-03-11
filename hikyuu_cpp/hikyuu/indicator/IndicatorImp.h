@@ -128,7 +128,8 @@ public:
     // ===================
     //  子类接口
     // ===================
-    virtual bool check() { return false;}
+    virtual bool check() { return false; }
+    virtual bool isLeaf() { return false; }
 
     virtual void _calculate(const Indicator&) {}
 

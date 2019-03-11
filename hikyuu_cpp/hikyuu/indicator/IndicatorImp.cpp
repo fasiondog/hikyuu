@@ -171,8 +171,19 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (op == LEAF || op >= INVALID || !right) {
-        HKU_ERROR("Wrong used [OperandNode::add]");
+        HKU_ERROR("Wrong used [IndicatorImp::add]");
         return;
+    }
+
+    if (IndicatorImp::OP == op) {
+        if (left && right->isLeaf()) {
+            if (left->m_right && !left->m_right->isLeaf()) {
+                left->m_right->add(OP, IndicatorImpPtr(), right->clone());
+            }
+            if (left->m_left && !left->m_left->isLeaf()) {
+                left->m_left->add(OP, IndicatorImpPtr(), left->clone());
+            }
+        }
     }
 
     m_optype = op;
