@@ -143,7 +143,7 @@ void export_TradeManager() {
 
             .def("sell", &TradeManager::sell,
                           (arg("datetime"), arg("stock"),
-                           arg("realPrice"), arg("num"), arg("stoploss")=0.0,
+                           arg("realPrice"), arg("num")=Null<size_t>(), arg("stoploss")=0.0,
                            arg("goalPrice")=0.0, arg("planPrice")=0.0,
                            arg("part")=PART_INVALID))
                     //sell_overload(args("datetime", "stock", "realPrice",
