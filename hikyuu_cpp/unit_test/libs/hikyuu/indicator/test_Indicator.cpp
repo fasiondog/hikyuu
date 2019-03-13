@@ -32,6 +32,7 @@ BOOST_AUTO_TEST_CASE( test_operator_add ) {
     std::cout << ind2 << std::endl;
     Indicator ind3 = ind1(ind2);
     std::cout << ind3 << std::endl;
+    std::cout << ind3.formula() << std::endl;
 }
 
 /** @} */

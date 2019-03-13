@@ -29,6 +29,12 @@ Indicator::~Indicator() {
 
 }
 
+
+string Indicator::formula() const {
+    return m_imp ? m_imp->formula() : "Indicator";
+}
+
+
 Indicator Indicator::operator()(const Indicator& ind) {
     std::cout << "Indicator Indicator::operator()(const Indicator& ind)" << std::endl;
     //return m_imp ? Indicator((*m_imp)(ind)) : Indicator();
@@ -36,11 +42,10 @@ Indicator Indicator::operator()(const Indicator& ind) {
         return Indicator();
     }
     
-    IndicatorImpPtr p = m_imp->clone();
-    p->calculate(ind);
-    p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp()->clone());
-    //p->calculate(ind);
-    return Indicator(p);
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::OP, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate(ind);
+    //return Indicator(p);
 }
 
 Indicator& Indicator::operator=(const Indicator& indicator) {

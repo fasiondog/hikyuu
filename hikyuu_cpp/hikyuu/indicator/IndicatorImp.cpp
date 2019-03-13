@@ -169,6 +169,77 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     return imp;
 }
 
+
+string IndicatorImp::formula() const {
+    std::stringstream buf;
+
+    switch (m_optype) {
+        case LEAF:
+            buf << m_name;
+            break;
+
+        case OP:
+            buf << m_left->formula() << "("  << m_right->formula() << ")";
+            break;
+
+        case ADD:
+            buf << m_left->formula() << " + " << m_right->formula();
+            break;
+
+        case SUB:
+            buf << m_left->formula() << " + " << m_right->formula();
+            break;
+
+        case MUL:
+            buf << m_left->formula() << " * " << m_right->formula();
+            break;
+
+        case DIV:
+            buf << m_left->formula() << " / " << m_right->formula();
+            break;
+
+        case EQ:
+            buf << m_left->formula() << " == " << m_right->formula();
+            break;
+
+        case GT:
+            buf << m_left->formula() << " > " << m_right->formula();
+            break;
+
+        case LT:
+            buf << m_left->formula() << " < " << m_right->formula();
+            break;
+
+        case NE:
+            buf << m_left->formula() << " != " << m_right->formula();
+            break;
+
+        case GE:
+            buf << m_left->formula() << " >= " << m_right->formula();
+            break;
+
+        case LE:
+            buf << m_left->formula() << " <= " << m_right->formula();
+            break;
+
+        case AND:
+            buf << m_left->formula() << " & " << m_right->formula();
+            break;
+
+        case OR:
+            buf << m_left->formula() << " | " << m_right->formula();
+            break;
+
+        default:
+            HKU_ERROR("Wrong optype!" << m_optype << " [IndicatorImp::formula]");
+            break;
+    
+    }
+
+    return buf.str();
+}
+
+
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (op == LEAF || op >= INVALID || !right) {
         HKU_ERROR("Wrong used [IndicatorImp::add]");
@@ -193,10 +264,10 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     m_right->m_parent = this;
 }
 
-void IndicatorImp::calculate(const Indicator& ind) {
+Indicator IndicatorImp::calculate(const Indicator& ind) {
     if (!check()) {
         HKU_WARN("Invalid param! " << long_name());
-        return;
+        return Indicator();
     }
 
     switch (m_optype) {
@@ -227,6 +298,7 @@ void IndicatorImp::calculate(const Indicator& ind) {
     } else {
         HKU_WARN("Invalid param! " << long_name());
     }*/
+    return shared_from_this();
 }
 
 } /* namespace hku */

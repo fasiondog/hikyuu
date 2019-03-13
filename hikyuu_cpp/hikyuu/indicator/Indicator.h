@@ -56,6 +56,8 @@ public:
     /** 返回形如：Name(param1_val,param2_val,...) */
     string long_name() const;
 
+    string formula() const;
+
     /** 结果中需抛弃的个数 */
     size_t discard() const;
 

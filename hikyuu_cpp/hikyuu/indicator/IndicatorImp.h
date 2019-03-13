@@ -30,7 +30,7 @@ class HKU_API Indicator;
  * 指标实现类，定义新指标时，应从此类继承
  * @ingroup Indicator
  */
-class HKU_API IndicatorImp {
+class HKU_API IndicatorImp: public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT
 
 public:
@@ -117,7 +117,9 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
-    void calculate(const Indicator&);
+    string formula() const;
+
+    Indicator calculate(const Indicator&);
 
     void setContext(const Stock&, const KQuery&);
 
