@@ -241,30 +241,19 @@ string IndicatorImp::formula() const {
 
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
-    if (op == LEAF || op >= INVALID || !right) {
+    if (op == LEAF || op >= INVALID || !left || !right) {
         HKU_ERROR("Wrong used [IndicatorImp::add]");
         return;
-    }
-
-    if (IndicatorImp::OP == op) {
-        if (left && right->isLeaf()) {
-            if (left->m_right && !left->m_right->isLeaf()) {
-                left->m_right->add(OP, IndicatorImpPtr(), right->clone());
-            }
-            if (left->m_left && !left->m_left->isLeaf()) {
-                left->m_left->add(OP, IndicatorImpPtr(), left->clone());
-            }
-        }
     }
 
     m_optype = op;
     m_left = left;
     m_right = right;
-    if (m_left) m_left->m_parent = this;
+    m_left->m_parent = this;
     m_right->m_parent = this;
 }
 
-Indicator IndicatorImp::calculate(const Indicator& ind) {
+Indicator IndicatorImp::calculate() {
     if (!check()) {
         HKU_WARN("Invalid param! " << long_name());
         return Indicator();
@@ -272,18 +261,29 @@ Indicator IndicatorImp::calculate(const Indicator& ind) {
 
     switch (m_optype) {
         case LEAF:
-            _calculate(ind);
+            _calculate(Indicator());
             break;
 
         case OP:
-            m_right->calculate(ind);
-            this->calculate(Indicator(m_right));
-            //m_left->calculate();
+            m_right->calculate();
+            _readyBuffer(m_right->size(), m_result_num);
+            _calculate(Indicator(m_right));
             break;
 
         case ADD: {
-            m_right->calculate(Indicator());
-            m_left->calculate(Indicator());
+            m_right->calculate();
+            m_left->calculate();
+
+            size_t result_number = std::min(m_left->getResultNumber(), m_right->getResultNumber());
+            size_t total = m_left->size();
+            size_t discard = std::max(m_left->discard(), m_right->discard());
+            _readyBuffer(total, result_number);
+            setDiscard(discard);
+            for (size_t i = discard; i < total; ++i) {
+                for (size_t r = 0; r < result_number; ++r) {
+                    _set(m_left->get(i, r) - m_right->get(i, r), i, r);
+                }
+            }
             break; 
         }   
 

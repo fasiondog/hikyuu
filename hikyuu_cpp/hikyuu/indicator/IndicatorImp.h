@@ -119,7 +119,7 @@ public:
 
     string formula() const;
 
-    Indicator calculate(const Indicator&);
+    Indicator calculate();
 
     void setContext(const Stock&, const KQuery&);
 
@@ -131,7 +131,6 @@ public:
     //  子类接口
     // ===================
     virtual bool check() { return false; }
-    virtual bool isLeaf() { return false; }
 
     virtual void _calculate(const Indicator&) {}
 
@@ -163,7 +162,10 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
-        size_t act_result_num = 0;
+        ar & BOOST_SERIALIZATION_NVP(m_optype);
+        ar & BOOST_SERIALIZATION_NVP(m_left);
+        ar & BOOST_SERIALIZATION_NVP(m_right);
+        /*size_t act_result_num = 0;
         size_t i = 0;
         while (i < m_result_num) {
             if (m_pBuffer[i++])
@@ -175,7 +177,7 @@ private:
             std::stringstream buf;
             buf << "result_" << i;
             ar & bs::make_nvp<PriceList>(buf.str().c_str(), *m_pBuffer[i]);
-        }
+        }*/
     }
 
     template<class Archive>
@@ -185,14 +187,19 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
-        size_t act_result_num = 0;
+        ar & BOOST_SERIALIZATION_NVP(m_optype);
+        ar & BOOST_SERIALIZATION_NVP(m_left);
+        ar & BOOST_SERIALIZATION_NVP(m_right);
+        if (m_left) m_left->m_parent = this;
+        if (m_right) m_right->m_parent = this;
+        /*size_t act_result_num = 0;
         ar & BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
             m_pBuffer[i] = new PriceList();
             std::stringstream buf;
             buf << "result_" << i;
             ar & bs::make_nvp<PriceList>(buf.str().c_str(), *m_pBuffer[i]);
-        }
+        }*/
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -215,22 +222,9 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
 #endif
 
 #define INDICATOR_IMP(classname) public: \
-    virtual bool isLeaf(); \
     virtual bool check(); \
     virtual void _calculate(const Indicator& data); \
-    virtual IndicatorImpPtr operator()(const Indicator& ind) { \
-        IndicatorImpPtr p = make_shared<classname>(); \
-        p->setParameter(m_params); \
-        p->calculate(ind); \
-        return p; \
-    } \
-    virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } \
-private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(IndicatorImp); \
-    }
+    virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } 
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 
