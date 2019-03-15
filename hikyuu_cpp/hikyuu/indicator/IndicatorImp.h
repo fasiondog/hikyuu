@@ -136,8 +136,13 @@ public:
 
     virtual IndicatorImpPtr _clone() { return make_shared<IndicatorImp>(); }
 
+    virtual bool isLeaf() { return false; }
+
 private:
     void initContext();
+    IndicatorImpPtr getSameNameLeaf(const string& name);
+
+protected:
     KData getCurrentKData();
 
 protected:
@@ -225,6 +230,9 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
     virtual bool check(); \
     virtual void _calculate(const Indicator& data); \
     virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } 
+
+#define INDICATOR_IMP_IS_LEAF(classname) public: \
+    virtual bool isLeaf() { return true; }
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 

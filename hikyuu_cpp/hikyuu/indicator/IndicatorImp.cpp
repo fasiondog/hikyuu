@@ -52,15 +52,27 @@ void IndicatorImp::initContext() {
 }
 
 void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
+    if (stock.isNull()) {
+        setParam<KData>("kdata", KData());
+        calculate();
+        return;
+    }
+
+    KData kdata = getCurrentKData();
+    if (kdata.getStock() == stock && kdata.getQuery() == query) {
+        return;
+    }
+
     setParam<KData>("kdata", stock.getKData(query));
+    calculate();
 }
 
 KData IndicatorImp::getCurrentKData() {
-    KData kdata;
     if (m_parent) {
-        kdata = m_parent->getCurrentKData();
+        return m_parent->getCurrentKData();
     }
 
+    KData kdata = getParam<KData>("kdata");
     if (kdata.getStock().isNull()) {
         kdata = getGlobalContextKData();
     }
@@ -233,12 +245,31 @@ string IndicatorImp::formula() const {
         default:
             HKU_ERROR("Wrong optype!" << m_optype << " [IndicatorImp::formula]");
             break;
-    
     }
 
     return buf.str();
 }
 
+
+IndicatorImpPtr IndicatorImp::getSameNameLeaf(const string& name) {
+    if (isLeaf() && m_name == name) {
+        return shared_from_this();
+    }
+
+    IndicatorImpPtr p;
+    if (m_left) {
+        p = m_left->getSameNameLeaf(name);
+        if (p) {
+            return p;
+        }
+    }
+
+    if (m_right) {
+        p = m_right->getSameNameLeaf(name);
+    }
+
+    return p;
+}
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (op == LEAF || op >= INVALID || !left || !right) {
@@ -246,9 +277,19 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         return;
     }
 
+    if (left->isLeaf()) {
+        HKU_ERROR("Syntax error! [IndicatorImp::add]");
+        return;
+    }
+
+    IndicatorImpPtr new_right;
+    if (right->isLeaf()) {
+        new_right = right->getSameNameLeaf(right->name());
+    }
+
     m_optype = op;
     m_left = left;
-    m_right = right;
+    m_right = new_right ? new_right : right;
     m_left->m_parent = this;
     m_right->m_parent = this;
 }
@@ -274,6 +315,7 @@ Indicator IndicatorImp::calculate() {
             m_right->calculate();
             m_left->calculate();
 
+            assert(m_left->size() != m_right->size());
             size_t result_number = std::min(m_left->getResultNumber(), m_right->getResultNumber());
             size_t total = m_left->size();
             size_t discard = std::max(m_left->discard(), m_right->discard());

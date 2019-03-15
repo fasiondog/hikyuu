@@ -35,6 +35,11 @@ string Indicator::formula() const {
 }
 
 
+void Indicator::setContext(const Stock& stock, const KQuery& query) {
+    if (m_imp) m_imp->setContext(stock, query);
+}
+
+
 Indicator Indicator::operator()(const Indicator& ind) {
     if (!m_imp || !ind.getImp()) {
         return Indicator();

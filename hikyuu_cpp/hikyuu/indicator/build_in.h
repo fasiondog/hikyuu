@@ -10,5 +10,9 @@
 
 #include "Operand.h"
 #include "Indicator.h"
+#include "crt/KDATA.h"
+#include "crt/PRICELIST.h"
+#include "crt/SMA.h"
+#include "crt/EMA.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */
