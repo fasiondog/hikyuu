@@ -43,15 +43,16 @@ IPriceList::~IPriceList() {
 }
 
 bool IPriceList::check() {
-    if (getParam<int>("discard") < 0) {
+    if (getParam<int>("discard") < 0 || getParam<int>("result_index") < 0) {
         return false;
     }
+
     return true;
 }
 
 void IPriceList::_calculate(const Indicator& data) {
 
-    //如果本身是叶子节点且不存在父节点，即单独的节点，直接取自身的data参数
+    //如果在叶子节点且不存在父节点，即单独的节点，直接取自身的data参数
     if (m_optype == IndicatorImp::LEAF && !m_parent) {
         PriceList x = getParam<PriceList>("data");
         int discard = getParam<int>("discard");
@@ -69,34 +70,39 @@ void IPriceList::_calculate(const Indicator& data) {
         return;
     }
 
+    //如果在叶子节点且存在父节点，则取当前上下文中的KData，总长须等于kdata的长度
     if (m_optype == IndicatorImp::LEAF && m_parent) {
         PriceList x = getParam<PriceList>("data");
         int discard = getParam<int>("discard");
 
         KData kdata = getCurrentKData();
     
-        size_t total = std::min(x.size(), kdata.size());
+        size_t total = kdata.size();
         _readyBuffer(total, 1);
 
-        if (kdata.size() > x.size()) {
-            discard = discard + kdata.size() - x.size();
+        if (discard >= total) {
+            m_discard = total;
+            return;
+        }
+
+        size_t x_len = x.size();
+        if (total > x_len) {
+            m_discard = discard + total - x_len;
+        } else if (total + discard > x_len) {
+            m_discard = discard + total - x_len;
         } else {
-            if (kdata.size() + discard <= x.size()) {
-                discard = x.size() - kdata.size();
-            } else {
-                discard = 0;
-            }
+            m_discard = 0;
         }
 
-        for (size_t i = discard; i < total; ++i) {
-            _set(x[i], i);
+        int diff = x_len - total;
+        for (size_t i = m_discard; i < total; ++i) {
+            _set(x[i+diff], i);
         }
 
-        //更新抛弃数量
-        m_discard = discard;
         return;
     }
 
+    //不在叶子节点上，则忽略本身的data参数，认为其输入实际为函数入参中的data
     int result_index = getParam<int>("result_index");
     if (result_index < 0 || result_index >= data.getResultNumber()) {
         HKU_ERROR("result_index out of range! [IPriceList::IPriceList]");
@@ -116,14 +122,13 @@ void IPriceList::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API PRICELIST(const PriceList& data, int discard) {
-    return Indicator(make_shared<IPriceList>(data, discard));
+    return make_shared<IPriceList>(data, discard)->calculate();
 }
 
 Indicator HKU_API PRICELIST(const Indicator& data, int result_index) {
     IndicatorImpPtr p = make_shared<IPriceList>();
     p->setParam<int>("result_index", result_index);
-    //p->calculate(data);
-    return Indicator(p);
+    return Indicator(p)(data);
 }
 
 Indicator HKU_API PRICELIST(int result_index) {
@@ -133,8 +138,9 @@ Indicator HKU_API PRICELIST(int result_index) {
 }
 
 
-/*Indicator HKU_API PRICELIST(price_t *data, size_t total) {
-    return Indicator(make_shared<IPriceList>(data, total));
-}*/
+Indicator HKU_API PRICELIST(price_t *data, size_t total) {
+    PriceList x(data, data+total);
+    return PRICELIST(x, 0);
+}
 
 } /* namespace hku */
