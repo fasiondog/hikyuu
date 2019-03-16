@@ -335,11 +335,7 @@ Indicator IndicatorImp::calculate() {
         default:
             break;
     }
-    /*if (check()) {
-        _calculate(data);
-    } else {
-        HKU_WARN("Invalid param! " << long_name());
-    }*/
+
     return shared_from_this();
 }
 

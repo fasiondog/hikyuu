@@ -20,7 +20,6 @@ class IPriceList: public IndicatorImp {
 public:
     IPriceList();
     IPriceList(const PriceList&, int discard);
-    IPriceList(price_t *, size_t);
     virtual ~IPriceList();
 };
 

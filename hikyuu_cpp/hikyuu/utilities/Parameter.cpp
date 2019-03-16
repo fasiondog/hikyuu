@@ -45,6 +45,9 @@ HKU_API std::ostream& operator <<(std::ostream &os, const Parameter& param) {
             } else {
                 os << stk.market_code() << strip;
             }
+        } else if (iter->second.type() == typeid(PriceList)) {
+            os << "(PriceList): "
+               << boost::any_cast<PriceList>(iter->second).size() << strip;
         } else {
             os << "Unsupported" << strip;
         }
@@ -86,7 +89,8 @@ bool Parameter::support(const boost::any& value) {
             || value.type() == typeid(string)
             || value.type() == typeid(Stock)
             || value.type() == typeid(KQuery)
-            || value.type() == typeid(KData)) {
+            || value.type() == typeid(KData)
+            || value.type() == typeid(PriceList)) {
         return true;
     }
 
@@ -123,6 +127,8 @@ string Parameter::getValueList() const {
             os << boost::any_cast<KQuery>(iter->second);
         } else if (iter->second.type() == typeid(KData)) {
             os << boost::any_cast<KData>(iter->second);
+        } else if (iter->second.type() == typeid(PriceList)) {
+            os << "PriceList(...)";
         } else {
             os << "Unsupported";
         }
@@ -163,6 +169,9 @@ string Parameter::getNameValueList() const {
         } else if (iter->second.type() == typeid(KData)) {
             os << "\"" << iter->first << "\"" << equal
                << boost::any_cast<KData>(iter->second);
+        } else if (iter->second.type() == typeid(PriceList)) {
+            os << "\"" << iter->first << "\"" << equal
+               << "PriceList(...)";
         } else {
             os << "Unsupported";
         }
