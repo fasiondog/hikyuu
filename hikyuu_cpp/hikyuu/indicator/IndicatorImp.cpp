@@ -357,9 +357,11 @@ Indicator IndicatorImp::calculate() {
             break;
 
         case AND:
+            execute_and();
             break;
 
         case OR:
+            execute_or();
             break;
 
         default:
@@ -720,6 +722,119 @@ void IndicatorImp::execute_ge() {
 }
 
 void IndicatorImp::execute_le() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_left->size() > m_right->size()) {
+        maxp = m_left.get();
+        minp = m_right.get();
+    } else {
+        maxp = m_right.get();
+        minp = m_left.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    if (m_left->size() > m_right->size()) {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_left->get(i, r) < m_right->get(i-diff, r) + IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        }
+    } else {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_left->get(i-diff, r) < m_right->get(i, r) + IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        } 
+    }
+}
+
+void IndicatorImp::execute_and() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (maxp->get(i, r) >= IND_EQ_THRESHOLD
+                    && minp->get(i-diff, r) >= IND_EQ_THRESHOLD) {
+                _set(1, i, r);
+            } else {
+                _set(0, i, r);
+            }
+        }
+    }
+}
+
+void IndicatorImp::execute_or() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (maxp->get(i, r) >= IND_EQ_THRESHOLD
+                    || minp->get(i-diff, r) >= IND_EQ_THRESHOLD) {
+                _set(1, i, r);
+            } else {
+                _set(0, i, r);
+            }
+        }
+    }
 }
 
 } /* namespace hku */

@@ -59,6 +59,8 @@ public:
     Indicator operator<(const Indicator&);
     Indicator operator>=(const Indicator&);
     Indicator operator<=(const Indicator&);
+    Indicator operator&(const Indicator&);
+    Indicator operator|(const Indicator&);
 
     /** 指标名称 */
     string name() const;

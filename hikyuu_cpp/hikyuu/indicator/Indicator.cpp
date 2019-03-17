@@ -233,6 +233,34 @@ Indicator Indicator::operator<=(const Indicator& ind) {
     return p->calculate();
 }
 
+Indicator Indicator::operator&(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::AND, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator|(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::OR, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
 /*
 HKU_API Indicator operator+(const Indicator& ind, price_t val) {
     if (ind.size() == 0) {

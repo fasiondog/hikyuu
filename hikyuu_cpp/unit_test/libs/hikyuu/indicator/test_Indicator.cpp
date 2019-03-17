@@ -451,4 +451,207 @@ BOOST_AUTO_TEST_CASE( test_operator_lt ) {
         BOOST_CHECK(result[i] == 0.0);
     }
 }
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_operator_le ) {
+    PriceList d1, d2, d3;
+    for (size_t i = 0; i < 10; ++i) {
+        d1.push_back(i);
+        d2.push_back(i);
+        d3.push_back(i+1);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+    Indicator data3 = PRICELIST(d3);
+
+    /** @arg ind1 > ind2*/
+    Indicator result = (data3 <= data1);
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }
+
+    /** @arg ind1 < ind2 */
+    result = (data1 <= data3);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg ind1 == ind2 */
+    result = (data1 <= data2);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg 两个ind的size不同 */
+    Indicator data4;
+    result = data1 <= data4;
+    BOOST_CHECK(result.empty());
+    BOOST_CHECK(result.size() == 0);
+
+    /** @arg 两个ind的size相同，但result_number不同 */
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KQuery query(0, 10);
+    KData kdata = stock.getKData(query);
+    Indicator k = KDATA(kdata);
+    BOOST_CHECK(k.size() == data1.size());
+    result = (k <= data1);
+    BOOST_CHECK(result.size() == k.size());
+    for (size_t i = 0; i < result.size(); ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }
+}
+
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_getResult_getResultAsPriceList ) {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KQuery query;
+    KData kdata;
+    Indicator ikdata, result1;
+    PriceList result2;
+
+    /** @arg 源数据为空 */
+    ikdata = KDATA(kdata);
+    result1 = ikdata.getResult(0);
+    result2 = ikdata.getResultAsPriceList(0);
+    BOOST_CHECK(result1.size() == 0);
+    BOOST_CHECK(result2.size() == 0);
+
+    /** @arg result_num参数非法 */
+    query = KQuery(0, 10);
+    kdata = stock.getKData(query);
+    ikdata = KDATA(kdata);
+    BOOST_CHECK(ikdata.size() == 10);
+    result1 = ikdata.getResult(6);
+    result2 = ikdata.getResultAsPriceList(6);
+    BOOST_CHECK(result1.size() == 0);
+    BOOST_CHECK(result2.size() == 0);
+
+    /** @arg 正常获取 */
+    result1 = ikdata.getResult(0);
+    result2 = ikdata.getResultAsPriceList(1);
+    BOOST_CHECK(result1.size() == 10);
+    BOOST_CHECK(result2.size() == 10);
+    BOOST_CHECK(result1[0] == 29.5);
+    BOOST_CHECK(std::fabs(result1[1] - 27.58) < 0.0001);
+    BOOST_CHECK(result1[9] == 26.45);
+
+    BOOST_CHECK(result2[0] == 29.8);
+    BOOST_CHECK(result2[1] == 28.38);
+    BOOST_CHECK(result2[9] == 26.55);
+}
+
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_LOGIC_AND ) {
+    PriceList d1, d2, d3;
+    for (size_t i = 0; i < 10; ++i) {
+        d1.push_back(0);
+        d2.push_back(1);
+        d3.push_back(i);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+    Indicator data3 = PRICELIST(d3);
+
+    /** @arg ind1为全0， ind2为全1 */
+    Indicator result = data1 & data2;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }
+
+    /** @arg ind为全0， val为1 */
+    /*result = IND_AND(data1, 1.0);
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }*/
+
+    /** @arg ind1为全0， ind2为从0开始的整数 */
+    result = data1 & data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }
+
+    /** @arg ind1为全1， ind2为从0开始的整数 */
+    result = data2 & data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0.0);
+    for (size_t i = 1; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg 两个ind的size不同 */
+    Indicator data4;
+    result = data1 & data4;
+    BOOST_CHECK(result.empty());
+    BOOST_CHECK(result.size() == 0);
+}
+
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_LOGIC_OR ) {
+    PriceList d1, d2, d3;
+    for (size_t i = 0; i < 10; ++i) {
+        d1.push_back(0);
+        d2.push_back(1);
+        d3.push_back(i);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+    Indicator data3 = PRICELIST(d3);
+
+    /** @arg ind1为全0， ind2为全1 */
+    Indicator result = data1 | data2;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg ind1为全0， ind2为从0开始的整数 */
+    result = data1 | data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0.0);
+    for (size_t i = 1; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg ind1为全1， ind2为从0开始的整数 */
+    result = data2 | data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg 两个ind的size不同 */
+    Indicator data4;
+    result = data1 | data4;
+    BOOST_CHECK(result.empty());
+    BOOST_CHECK(result.size() == 0);
+}
+
 /** @} */

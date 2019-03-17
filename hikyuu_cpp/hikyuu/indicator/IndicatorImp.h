@@ -154,6 +154,8 @@ private:
     void execute_lt();
     void execute_ge();
     void execute_le();
+    void execute_and();
+    void execute_or();
 
 protected:
     string m_name;
