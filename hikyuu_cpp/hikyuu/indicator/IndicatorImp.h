@@ -130,20 +130,30 @@ public:
     // ===================
     //  子类接口
     // ===================
-    virtual bool check() { return false; }
+    virtual bool check() { return true; }
 
     virtual void _calculate(const Indicator&) {}
 
     virtual IndicatorImpPtr _clone() { return make_shared<IndicatorImp>(); }
 
-    virtual bool isLeaf() { return false; }
-
-private:
-    void initContext();
-    IndicatorImpPtr getSameNameLeaf(const string& name);
+    virtual bool isNeedContext() { return false; }
 
 protected:
     KData getCurrentKData();
+
+private:
+    void initContext();
+    IndicatorImpPtr getSameNameNeedContextLeaf(const string& name);
+    void execute_add();
+    void execute_sub();
+    void execute_mul();
+    void execute_div();
+    void execute_eq();
+    void execute_ne();
+    void execute_gt();
+    void execute_lt();
+    void execute_ge();
+    void execute_le();
 
 protected:
     string m_name;
@@ -231,8 +241,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
     virtual void _calculate(const Indicator& data); \
     virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } 
 
-#define INDICATOR_IMP_IS_LEAF(classname) public: \
-    virtual bool isLeaf() { return true; }
+#define INDICATOR_IMP_NEED_CONTEXT(classname) public: \
+    virtual bool isNeedContext() { return true; }
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 

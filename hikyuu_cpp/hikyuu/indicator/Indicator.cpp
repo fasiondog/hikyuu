@@ -14,40 +14,24 @@ HKU_API std::ostream & operator<<(std::ostream& os, const Indicator& indicator) 
     return os;
 }
 
-
 Indicator::Indicator(const IndicatorImpPtr& imp): m_imp(imp) {
 
 }
-
 
 Indicator::Indicator(const Indicator& indicator) {
     m_imp = indicator.m_imp;
 }
 
-
 Indicator::~Indicator() {
 
 }
-
 
 string Indicator::formula() const {
     return m_imp ? m_imp->formula() : "Indicator";
 }
 
-
 void Indicator::setContext(const Stock& stock, const KQuery& query) {
     if (m_imp) m_imp->setContext(stock, query);
-}
-
-
-Indicator Indicator::operator()(const Indicator& ind) {
-    if (!m_imp || !ind.getImp()) {
-        return Indicator();
-    }
-    
-    IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::OP, m_imp->clone(), ind.getImp()->clone());
-    return p->calculate();
 }
 
 Indicator& Indicator::operator=(const Indicator& indicator) {
@@ -59,7 +43,6 @@ Indicator& Indicator::operator=(const Indicator& indicator) {
 
     return *this;
 }
-
 
 string Indicator::name() const {
     return m_imp ? m_imp->name() : "IndicatorImp";
@@ -96,14 +79,157 @@ size_t Indicator::size() const {
     return m_imp ? m_imp->size() : 0;
 }
 
+Indicator Indicator::operator()(const Indicator& ind) {
+    if (!m_imp)
+        return Indicator();
 
-HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
-    if (!ind1.getImp() || !ind2.getImp()) {
+    if (!ind.getImp())
+        return Indicator(m_imp);
+    
+    IndicatorImpPtr p = m_imp->clone();
+    p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp()->clone());
+    return p->calculate();
+    //m_imp->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp());
+    //return m_imp->calculate();
+}
+
+Indicator Indicator::operator+(const Indicator& ind) {
+    if (!m_imp) {
         return Indicator();
     }
 
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::ADD, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::ADD, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator-(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::SUB, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator*(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::MUL, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator/(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::DIV, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator==(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::EQ, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator!=(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::NE, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator>(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::GT, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator<(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::LT, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator>=(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::GE, m_imp->clone(), ind.getImp()->clone());
+    return p->calculate();
+}
+
+Indicator Indicator::operator<=(const Indicator& ind) {
+    if (!m_imp) {
+        return Indicator();
+    }
+
+    if (!ind.getImp()) {
+        return Indicator(m_imp->clone());
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::LE, m_imp->clone(), ind.getImp()->clone());
     return p->calculate();
 }
 

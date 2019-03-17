@@ -52,26 +52,24 @@ void IndicatorImp::initContext() {
 }
 
 void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
-    if (stock.isNull()) {
-        setParam<KData>("kdata", KData());
-        calculate();
-        return;
+    //子节点设置上下文
+    if (m_left) m_left->setContext(stock, query);
+    if (m_right) m_right->setContext(stock, query);
+
+    //如果该节点依赖上下文
+    if (isNeedContext()) {
+        //如果上下文有变化则重设上下文
+        KData kdata = getCurrentKData();
+        if (kdata.getStock() != stock || kdata.getQuery() != query) {
+            setParam<KData>("kdata", stock.getKData(query));        
+        }
     }
 
-    KData kdata = getCurrentKData();
-    if (kdata.getStock() == stock && kdata.getQuery() == query) {
-        return;
-    }
-
-    setParam<KData>("kdata", stock.getKData(query));
-    calculate();
+    //如果是根节点，启动重新计算
+    if (!m_parent) calculate();
 }
 
 KData IndicatorImp::getCurrentKData() {
-    if (m_parent) {
-        return m_parent->getCurrentKData();
-    }
-
     KData kdata = getParam<KData>("kdata");
     if (kdata.getStock().isNull()) {
         kdata = getGlobalContextKData();
@@ -118,13 +116,20 @@ IndicatorImp::~IndicatorImp() {
 
 IndicatorImpPtr IndicatorImp::clone() {
     IndicatorImpPtr p = _clone();
-    m_name = p->m_name;
-    m_discard = p->m_discard;
-    m_result_num = p->m_result_num;
-    m_optype = p->m_optype;
-    m_parent = p->m_parent;
-    m_left = p->m_left;
-    m_right = p->m_right;
+    p->m_params = m_params;
+    p->m_name = m_name;
+    p->m_discard = m_discard;
+    p->m_result_num = m_result_num;
+    p->m_optype = m_optype;
+    p->m_parent = m_parent;
+    if (m_left) {
+        p->m_left = m_left->clone();
+        p->m_left->m_parent = p.get();
+    }
+    if (m_right) {
+        p->m_right = m_right->clone();
+        p->m_right->m_parent = p.get();
+    }
     return p;
 }
 
@@ -191,7 +196,7 @@ string IndicatorImp::formula() const {
             break;
 
         case OP:
-            buf << m_left->formula() << "("  << m_right->formula() << ")";
+            buf << m_name << "("  << m_right->formula() << ")";
             break;
 
         case ADD:
@@ -251,46 +256,46 @@ string IndicatorImp::formula() const {
 }
 
 
-IndicatorImpPtr IndicatorImp::getSameNameLeaf(const string& name) {
-    if (isLeaf() && m_name == name) {
+IndicatorImpPtr IndicatorImp::getSameNameNeedContextLeaf(const string& name) {
+    if (isNeedContext() && m_name == name) {
         return shared_from_this();
     }
 
     IndicatorImpPtr p;
     if (m_left) {
-        p = m_left->getSameNameLeaf(name);
+        p = m_left->getSameNameNeedContextLeaf(name);
         if (p) {
             return p;
         }
     }
 
     if (m_right) {
-        p = m_right->getSameNameLeaf(name);
+        p = m_right->getSameNameNeedContextLeaf(name);
     }
 
     return p;
 }
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
-    if (op == LEAF || op >= INVALID || !left || !right) {
+    if (op == LEAF || op >= INVALID || !right) {
         HKU_ERROR("Wrong used [IndicatorImp::add]");
         return;
     }
 
-    if (left->isLeaf()) {
+    if (op == LEAF && left && left->isNeedContext()) {
         HKU_ERROR("Syntax error! [IndicatorImp::add]");
         return;
     }
 
     IndicatorImpPtr new_right;
-    if (right->isLeaf()) {
-        new_right = right->getSameNameLeaf(right->name());
+    if (right->isNeedContext()) {
+        new_right = right->getSameNameNeedContextLeaf(right->name());
     }
 
     m_optype = op;
     m_left = left;
     m_right = new_right ? new_right : right;
-    m_left->m_parent = this;
+    if (m_left) m_left->m_parent = this;
     m_right->m_parent = this;
 }
 
@@ -311,25 +316,50 @@ Indicator IndicatorImp::calculate() {
             _calculate(Indicator(m_right));
             break;
 
-        case ADD: {
-            m_right->calculate();
-            m_left->calculate();
-
-            assert(m_left->size() != m_right->size());
-            size_t result_number = std::min(m_left->getResultNumber(), m_right->getResultNumber());
-            size_t total = m_left->size();
-            size_t discard = std::max(m_left->discard(), m_right->discard());
-            _readyBuffer(total, result_number);
-            setDiscard(discard);
-            for (size_t i = discard; i < total; ++i) {
-                for (size_t r = 0; r < result_number; ++r) {
-                    _set(m_left->get(i, r) - m_right->get(i, r), i, r);
-                }
-            }
+        case ADD:
+            execute_add();
             break; 
-        }   
 
         case SUB:
+            execute_sub();
+            break;
+
+        case MUL:
+            execute_mul();
+            break;
+
+        case DIV:
+            execute_div();
+            break;
+
+        case EQ:
+            execute_eq();
+            break;
+
+        case NE:
+            execute_ne();
+            break;
+
+        case GT:
+            execute_gt();
+            break;
+
+        case LT:
+            execute_lt();
+            break;
+
+        case GE:
+            execute_ge();
+            break;
+
+        case LE:
+            execute_le();
+            break;
+
+        case AND:
+            break;
+
+        case OR:
             break;
 
         default:
@@ -337,6 +367,359 @@ Indicator IndicatorImp::calculate() {
     }
 
     return shared_from_this();
+}
+
+void IndicatorImp::execute_add() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            _set(maxp->get(i, r) + minp->get(i-diff, r), i, r);
+        }
+    }
+}
+
+void IndicatorImp::execute_sub() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_left->size() > m_right->size()) {
+        maxp = m_left.get();
+        minp = m_right.get();
+    } else {
+        maxp = m_right.get();
+        minp = m_left.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    if (m_left->size() > m_right->size()) {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                _set(m_left->get(i, r) - m_right->get(i-diff, r), i, r);
+            }
+        }
+    } else {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                _set(m_left->get(i-diff, r) - m_right->get(i, r), i, r);
+            }
+        } 
+    }
+}
+
+void IndicatorImp::execute_mul() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            _set(maxp->get(i, r) * minp->get(i-diff, r), i, r);
+        }
+    }
+}
+
+void IndicatorImp::execute_div() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_left->size() > m_right->size()) {
+        maxp = m_left.get();
+        minp = m_right.get();
+    } else {
+        maxp = m_right.get();
+        minp = m_left.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    if (m_left->size() > m_right->size()) {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_right->get(i-diff, r) == 0.0) {
+                    _set(Null<price_t>(), i, r);    
+                } else {
+                    _set(m_left->get(i, r) / m_right->get(i-diff, r), i, r);
+                }
+            }
+        }
+    } else {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_right->get(i, r) == 0.0) {
+                    _set(Null<price_t>(), i, r); 
+                } else {
+                    _set(m_left->get(i-diff, r) / m_right->get(i, r), i, r);
+                }
+            }
+        } 
+    }
+}
+
+void IndicatorImp::execute_eq() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (std::fabs(maxp->get(i, r) - minp->get(i, r)) < IND_EQ_THRESHOLD) {
+                _set(1, i, r);
+            } else {
+                _set(0, i, r);
+            }
+        }
+    }
+}
+
+void IndicatorImp::execute_ne() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    for (size_t i = discard; i < total; ++i) {
+        for (size_t r = 0; r < result_number; ++r) {
+            if (std::fabs(maxp->get(i, r) - minp->get(i, r)) < IND_EQ_THRESHOLD) {
+                _set(0, i, r);
+            } else {
+                _set(1, i, r);
+            }
+        }
+    }
+}
+
+void IndicatorImp::execute_gt() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_left->size() > m_right->size()) {
+        maxp = m_left.get();
+        minp = m_right.get();
+    } else {
+        maxp = m_right.get();
+        minp = m_left.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    if (m_left->size() > m_right->size()) {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_left->get(i, r) - m_right->get(i-diff, r) >= IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        }
+    } else {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_left->get(i-diff, r) - m_right->get(i, r) >= IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        } 
+    }
+}
+
+void IndicatorImp::execute_lt() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_left->size() > m_right->size()) {
+        maxp = m_left.get();
+        minp = m_right.get();
+    } else {
+        maxp = m_right.get();
+        minp = m_left.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    if (m_left->size() > m_right->size()) {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_right->get(i-diff, r) - m_left->get(i, r) >= IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        }
+    } else {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_right->get(i, r) - m_left->get(i-diff, r)>= IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        } 
+    }
+}
+
+void IndicatorImp::execute_ge() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_left->size() > m_right->size()) {
+        maxp = m_left.get();
+        minp = m_right.get();
+    } else {
+        maxp = m_right.get();
+        minp = m_left.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    if (m_left->size() > m_right->size()) {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_left->get(i, r) > m_right->get(i-diff, r) - IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        }
+    } else {
+        for (size_t i = discard; i < total; ++i) {
+            for (size_t r = 0; r < result_number; ++r) {
+                if (m_left->get(i-diff, r) > m_right->get(i, r) - IND_EQ_THRESHOLD) {
+                    _set(1, i, r);
+                } else {
+                    _set(0, i, r);
+                }
+            }
+        } 
+    }
+}
+
+void IndicatorImp::execute_le() {
 }
 
 } /* namespace hku */

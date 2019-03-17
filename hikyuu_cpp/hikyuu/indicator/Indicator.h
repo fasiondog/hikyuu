@@ -49,6 +49,17 @@ public:
     /** 使用已有参数计算新值，返回全新的Indicator */
     Indicator operator()(const Indicator& ind);
 
+    Indicator operator+(const Indicator&);
+    Indicator operator-(const Indicator&);
+    Indicator operator*(const Indicator&);
+    Indicator operator/(const Indicator&);
+    Indicator operator==(const Indicator&);
+    Indicator operator!=(const Indicator&);
+    Indicator operator>(const Indicator&);
+    Indicator operator<(const Indicator&);
+    Indicator operator>=(const Indicator&);
+    Indicator operator<=(const Indicator&);
+
     /** 指标名称 */
     string name() const;
     void name(const string& name);
@@ -138,10 +149,9 @@ private:
  *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
  * @ingroup Indicator
  */
-HKU_API Indicator operator+(const Indicator&, const Indicator&);
-#if 0
-HKU_API Indicator operator+(const Indicator&, price_t);
-HKU_API Indicator operator+(price_t, const Indicator&);
+//HKU_API Indicator operator+(const Indicator&, const Indicator&);
+//HKU_API Indicator operator+(const Indicator&, price_t);
+//HKU_API Indicator operator+(price_t, const Indicator&);
 
 /**
  * Indicator实例相减，两者的size必须相等，否在返回空
@@ -149,10 +159,11 @@ HKU_API Indicator operator+(price_t, const Indicator&);
  *         2）如果两个实例的resultNumber不等，则取最小的resultNumber
  * @ingroup Indicator
  */
-HKU_API Indicator operator-(const Indicator&, const Indicator&);
-HKU_API Indicator operator-(const Indicator&, price_t);
-HKU_API Indicator operator-(price_t, const Indicator&);
+//HKU_API Indicator operator-(const Indicator&, const Indicator&);
+//HKU_API Indicator operator-(const Indicator&, price_t);
+//HKU_API Indicator operator-(price_t, const Indicator&);
 
+#if 0
 /**
  * Indicator实例相乘，两者的size必须相等，否在返回空
  * @return 1) 两个实例的size必须相等，否在返回空实例
