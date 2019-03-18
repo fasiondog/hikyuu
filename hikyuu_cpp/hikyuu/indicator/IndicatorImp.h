@@ -119,6 +119,10 @@ public:
 
     string formula() const;
 
+    bool isLeaf() const { 
+        return m_optype == LEAF ? true : false; 
+    }
+
     Indicator calculate();
 
     void setContext(const Stock&, const KQuery&);
@@ -182,19 +186,6 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_optype);
         ar & BOOST_SERIALIZATION_NVP(m_left);
         ar & BOOST_SERIALIZATION_NVP(m_right);
-        /*size_t act_result_num = 0;
-        size_t i = 0;
-        while (i < m_result_num) {
-            if (m_pBuffer[i++])
-                act_result_num++;
-        }
-        ar & BOOST_SERIALIZATION_NVP(act_result_num);
-
-        for (size_t i = 0; i < act_result_num; ++i) {
-            std::stringstream buf;
-            buf << "result_" << i;
-            ar & bs::make_nvp<PriceList>(buf.str().c_str(), *m_pBuffer[i]);
-        }*/
     }
 
     template<class Archive>
@@ -209,14 +200,6 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_right);
         if (m_left) m_left->m_parent = this;
         if (m_right) m_right->m_parent = this;
-        /*size_t act_result_num = 0;
-        ar & BOOST_SERIALIZATION_NVP(act_result_num);
-        for (size_t i = 0; i < act_result_num; ++i) {
-            m_pBuffer[i] = new PriceList();
-            std::stringstream buf;
-            buf << "result_" << i;
-            ar & bs::make_nvp<PriceList>(buf.str().c_str(), *m_pBuffer[i]);
-        }*/
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

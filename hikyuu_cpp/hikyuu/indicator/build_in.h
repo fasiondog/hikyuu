@@ -14,5 +14,6 @@
 #include "crt/PRICELIST.h"
 #include "crt/SMA.h"
 #include "crt/EMA.h"
+#include "crt/CVAL.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

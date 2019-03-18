@@ -276,6 +276,7 @@ IndicatorImpPtr IndicatorImp::getSameNameNeedContextLeaf(const string& name) {
     return p;
 }
 
+
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (op == LEAF || op >= INVALID || !right) {
         HKU_ERROR("Wrong used [IndicatorImp::add]");
