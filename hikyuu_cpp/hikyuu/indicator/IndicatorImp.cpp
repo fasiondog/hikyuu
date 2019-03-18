@@ -541,7 +541,7 @@ void IndicatorImp::execute_eq() {
     setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (std::fabs(maxp->get(i, r) - minp->get(i, r)) < IND_EQ_THRESHOLD) {
+            if (std::fabs(maxp->get(i, r) - minp->get(i-diff, r)) < IND_EQ_THRESHOLD) {
                 _set(1, i, r);
             } else {
                 _set(0, i, r);
@@ -575,7 +575,7 @@ void IndicatorImp::execute_ne() {
     setDiscard(discard);
     for (size_t i = discard; i < total; ++i) {
         for (size_t r = 0; r < result_number; ++r) {
-            if (std::fabs(maxp->get(i, r) - minp->get(i, r)) < IND_EQ_THRESHOLD) {
+            if (std::fabs(maxp->get(i, r) - minp->get(i-diff, r)) < IND_EQ_THRESHOLD) {
                 _set(0, i, r);
             } else {
                 _set(1, i, r);
