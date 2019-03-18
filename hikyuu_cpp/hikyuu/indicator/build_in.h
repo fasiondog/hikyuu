@@ -8,7 +8,6 @@
 #ifndef INDICATOR_BUILD_IN_H_
 #define INDICATOR_BUILD_IN_H_
 
-#include "Operand.h"
 #include "Indicator.h"
 #include "crt/KDATA.h"
 #include "crt/PRICELIST.h"

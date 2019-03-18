@@ -8,6 +8,7 @@
 #include "KData.h"
 #include "StockManager.h"
 #include "KDataBufferImp.h"
+#include "indicator/crt/KDATA.h"
 #include <fstream>
 
 namespace hku {
@@ -68,6 +69,11 @@ void KData::tocsv(const string& filename) {
     }
 
     file.close();
+}
+
+
+Indicator KData::close() const {
+    return CLOSE(*this);
 }
 
 
