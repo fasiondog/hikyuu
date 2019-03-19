@@ -29,19 +29,19 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
 }
 
 IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_optype(LEAF), m_parent(NULL) {
+: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_optype(LEAF) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name)
-: m_name(name), m_discard(0), m_result_num(0), m_optype(LEAF), m_parent(NULL) {
+: m_name(name), m_discard(0), m_result_num(0), m_optype(LEAF) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name, size_t result_num)
-: m_name(name), m_discard(0), m_optype(LEAF), m_parent(NULL) {
+: m_name(name), m_discard(0), m_optype(LEAF) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
@@ -65,8 +65,8 @@ void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
         }
     }
 
-    //如果是根节点，启动重新计算
-    if (!m_parent) calculate();
+    //启动重新计算
+    calculate();
 }
 
 KData IndicatorImp::getCurrentKData() {
@@ -121,14 +121,11 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_discard = m_discard;
     p->m_result_num = m_result_num;
     p->m_optype = m_optype;
-    p->m_parent = m_parent;
     if (m_left) {
         p->m_left = m_left->clone();
-        p->m_left->m_parent = p.get();
     }
     if (m_right) {
         p->m_right = m_right->clone();
-        p->m_right->m_parent = p.get();
     }
     return p;
 }
@@ -296,14 +293,19 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     m_optype = op;
     m_left = left;
     m_right = new_right ? new_right : right;
-    if (m_left) m_left->m_parent = this;
-    m_right->m_parent = this;
 }
 
 Indicator IndicatorImp::calculate() {
     if (!check()) {
-        HKU_WARN("Invalid param! " << long_name());
-        return Indicator();
+        HKU_WARN("Invalid param! " << formula() << " : " << long_name());
+        if (m_right) {
+            m_right->calculate();
+            _readyBuffer(m_right->size(), m_result_num);
+            m_discard = m_right->size();
+            return shared_from_this();
+        } else {
+            return Indicator();
+        }
     }
 
     switch (m_optype) {

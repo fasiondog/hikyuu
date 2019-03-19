@@ -20,7 +20,7 @@ Sma::~Sma() {
 bool Sma::check() {
     int n = getParam<int>("n");
     if (n < 1) {
-        HKU_ERROR("Invalid param! (n >= 1) [Ma::Ma]");
+        HKU_ERROR("Invalid param! (n >= 1) [Sma::check]");
         return false;
     }
 
@@ -55,8 +55,7 @@ Indicator HKU_API SMA(int n) {
 }
 
 Indicator HKU_API SMA(const Indicator& ind, int n){
-    Indicator sma(SMA(n));
-    return sma(ind);
+    return SMA(n)(ind);
 }
 
 } /* namespace hku */

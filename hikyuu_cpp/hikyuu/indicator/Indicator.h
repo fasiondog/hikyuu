@@ -71,6 +71,10 @@ public:
 
     void setContext(const Stock&, const KQuery&);
 
+    KData getCurrentKData() const {
+        return m_imp ? m_imp->getCurrentKData() : KData();
+    }
+
     string formula() const;
 
     /** 结果中需抛弃的个数 */

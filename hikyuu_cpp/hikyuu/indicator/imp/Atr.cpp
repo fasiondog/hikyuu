@@ -1,33 +1,32 @@
 /*
- * Ema.cpp
+ * Atr.cpp
  *
- *  Created on: 2013-4-10
- *      Author: fasiondog
+ *  Created on: 2016年5月4日
+ *      Author: Administrator
  */
 
-#include "Ema.h"
+#include "Atr.h"
 
 namespace hku {
 
-Ema::Ema(): IndicatorImp("EMA", 1) {
-    setParam<int>("n", 22);
+Atr::Atr() : IndicatorImp("ATR", 1){
+    setParam<int>("n", 14);
 }
 
-Ema::~Ema() {
+Atr::~Atr() {
 
 }
 
-bool Ema::check() {
-    int n = getParam<int>("n");
-    if (n <= 0) {
-        HKU_ERROR("Invalid param[n] must > 0 ! [Ema::check]");
+bool Atr::check() {
+    if (getParam<int>("n") < 1) {
+        HKU_ERROR("Invalid param! (n>=1) "
+                  << m_params << " [Atr::check]");
         return false;
     }
-
     return true;
 }
 
-void Ema::_calculate(const Indicator& indicator) {
+void Atr::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
 
     int n = getParam<int>("n");
@@ -48,15 +47,14 @@ void Ema::_calculate(const Indicator& indicator) {
     }
 }
 
-
-Indicator HKU_API EMA(int n) {
-    IndicatorImpPtr p = make_shared<Ema>();
+Indicator HKU_API ATR(int n) {
+    IndicatorImpPtr p = make_shared<Atr>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API EMA(const Indicator& data, int n) {
-    return EMA(n)(data);
+Indicator HKU_API ATR(const Indicator& data, int n) {
+    return ATR(n)(data);
 }
 
 } /* namespace hku */
