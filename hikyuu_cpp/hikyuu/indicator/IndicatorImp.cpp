@@ -313,6 +313,12 @@ Indicator IndicatorImp::calculate() {
             _calculate(Indicator());
             break;
 
+        case TWO:
+            m_right->calculate();
+            m_left->calculate();
+            _calculate(Indicator());
+            break;
+
         case OP:
             m_right->calculate();
             _readyBuffer(m_right->size(), m_result_num);
