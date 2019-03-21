@@ -61,7 +61,7 @@ void Vigor::_calculate(const Indicator& ind) {
 
 
 Indicator HKU_API VIGOR(int n) {
-    return make_shared<Vigor>(n);
+    return Indicator(make_shared<Vigor>(n));
 }
 
 Indicator HKU_API VIGOR(const KData& data, int n) {

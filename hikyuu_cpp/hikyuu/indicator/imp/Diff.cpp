@@ -36,7 +36,7 @@ void Diff::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API DIFF() {
-    return make_shared<Diff>();
+    return Indicator(make_shared<Diff>());
 }
 
 Indicator HKU_API DIFF(const Indicator& data) {

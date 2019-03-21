@@ -158,16 +158,12 @@ if sys.argv[-1] == 'install':
         install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
     else:
         usr_dir = os.path.expanduser('~')
-        if not os.path.lexists(usr_dir + '/.local'):
-            os.mkdir(usr_dir + '/.local')
-        if not os.path.lexists('{}/.local/lib'.format(usr_dir)):
-            os.mkdir('{}/.local/lib'.format(usr_dir))
-        if not os.path.lexists('{}/.local/lib/python{:>.1f}'.format(usr_dir, py_version*0.1)):
-            os.mkdir('{}/.local/lib/python{:>.1f}'.format(usr_dir, py_version*0.1))
-            os.mkdir('{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1))
-        if not os.path.lexists('{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1)):
-            os.mkdir('{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1))
         install_dir = '{}/.local/lib/python{:>.1f}/site-packages/hikyuu'.format(usr_dir, py_version*0.1)
+        try:
+            shutil.rmtree(install_dir)
+        except:
+            pass
+        os.makedirs(install_dir)
     os.system("xmake install -o " + install_dir)
     sys.exit(0)
 

@@ -92,8 +92,7 @@ struct AnyToPython{
 
         } else if (x.type() == typeid(PriceList)) {
             const PriceList& price_list = boost::any_cast<PriceList>(x);
-            string cmd("PriceList()");
-            list* o = new list();
+            boost::python::list* o = new boost::python::list();
             for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
                 o->append(*iter);
             }

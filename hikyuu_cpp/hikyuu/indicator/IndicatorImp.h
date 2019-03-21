@@ -148,6 +148,7 @@ public:
 private:
     void initContext();
     IndicatorImpPtr getSameNameNeedContextLeaf(const string& name);
+    void execute_two();
     void execute_add();
     void execute_sub();
     void execute_mul();

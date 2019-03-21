@@ -142,12 +142,13 @@ void export_TradeManager() {
                             //"num", "stoploss", "goalPrice", "planPrice","part")))
 
             .def("sell", &TradeManager::sell,
-                          (arg("datetime"), arg("stock"),
-                           arg("realPrice"), arg("num"), arg("stoploss")=0.0,
-                           arg("goalPrice")=0.0, arg("planPrice")=0.0,
-                           arg("part")=PART_INVALID))
-                    //sell_overload(args("datetime", "stock", "realPrice",
-                            //"num", "stoploss", "goalPrice", "planPrice", "part")))
+                          // arg("num") 无法支持默认参数为 null_size
+                          //(arg("datetime"), arg("stock"),
+                           //arg("realPrice"), arg("num"), arg("stoploss")=0.0,
+                           //arg("goalPrice")=0.0, arg("planPrice")=0.0,
+                           //arg("part")=PART_INVALID))
+                    sell_overload(args("datetime", "stock", "realPrice",
+                            "num", "stoploss", "goalPrice", "planPrice", "part")))
             //.def("buyShort", &TradeManager::buyShort, buyShort_overload())
             //.def("sellShort", &TradeManager::sellShort, sellShort_overload())
 

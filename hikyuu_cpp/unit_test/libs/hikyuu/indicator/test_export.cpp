@@ -350,6 +350,42 @@ BOOST_AUTO_TEST_CASE( test_VIGOR_export ) {
     }
 }
 
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_WAEVE_export ) {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/WEAVE.xml";
+
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-20));
+    Indicator c = CLOSE(kdata);
+    Indicator o = OPEN(kdata);
+    Indicator w1 = WEAVE(c, o);
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(w1);
+    }
+
+    Indicator w2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(w2);
+    }
+
+    BOOST_CHECK(w1.size() == w2.size());
+    BOOST_CHECK(w1.discard() == w2.discard());
+    BOOST_CHECK(w1.getResultNumber() == 2);
+    BOOST_CHECK(w2.getResultNumber() == 2);
+    size_t total = w1.size();
+    for (size_t i = 0; i < total; ++i) {
+        BOOST_CHECK_CLOSE(w1[i], w2[i], 0.00001);
+    }
+    for (size_t i = 0; i < total; ++i) {
+        BOOST_CHECK_CLOSE(w1.get(i,1), w2.get(i,1), 0.00001);
+    }
+}
 
 /** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_CVAL_export ) {

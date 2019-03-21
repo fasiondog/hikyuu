@@ -13,14 +13,12 @@
 namespace hku {
 
 /**
- * 将ind的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1); ind=ind(ind2)。
- * 则此时ind包含两个结果，result1为ind1的数据,result2为ind2的数据
+ * 将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2)
+ * 则此时ind包含多个结果，按ind1、ind2的顺序存放
  * @param data 待计算的数据
  * @ingroup Indicator
  */
-Indicator HKU_API WEAVE(const Indicator& ind);
-
-Indicator HKU_API WEAVE();
+Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2);
 
 } /* namespace */
 

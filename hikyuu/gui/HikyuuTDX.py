@@ -63,6 +63,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if not os.path.lexists(data_dir + '/block'):
             shutil.copytree('../../config/block', data_dir + '/block')
             os.remove(data_dir + '/block/__init__.py')
+            
+        if not os.path.lexists(data_dir + '/tmp'):
+            os.mkdir(data_dir + '/tmp')
 
     def initUI(self):
         current_dir = os.path.dirname(__file__)

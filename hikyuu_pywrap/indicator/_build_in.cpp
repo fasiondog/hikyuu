@@ -16,35 +16,27 @@ Indicator (*PRICELIST3)(const Indicator&, int) = PRICELIST;
 Indicator (*PRICELIST4)(int) = PRICELIST;
 
 Indicator (*KDATA1)(const KData&) = KDATA;
-Indicator (*KDATA2)(const Indicator&) = KDATA;
 Indicator (*KDATA3)() = KDATA;
 
 Indicator (*OPEN1)(const KData&) = OPEN;
-Indicator (*OPEN2)(const Indicator&) = OPEN;
 Indicator (*OPEN3)() = OPEN;
 
 Indicator (*HIGH1)(const KData&) = HIGH;
-Indicator (*HIGH2)(const Indicator&) = HIGH;
 Indicator (*HIGH3)() = HIGH;
 
 Indicator (*LOW1)(const KData&) = LOW;
-Indicator (*LOW2)(const Indicator&) = LOW;
 Indicator (*LOW3)() = LOW;
 
 Indicator (*CLOSE1)(const KData&) = CLOSE;
-Indicator (*CLOSE2)(const Indicator&) = CLOSE;
 Indicator (*CLOSE3)() = CLOSE;
 
 Indicator (*AMO1)(const KData&) = AMO;
-Indicator (*AMO2)(const Indicator&) = AMO;
 Indicator (*AMO3)() = AMO;
 
 Indicator (*VOL1)(const KData&) = VOL;
-Indicator (*VOL2)(const Indicator&) = VOL;
 Indicator (*VOL3)() = VOL;
 
 Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
-Indicator (*KDATA_PART2)(const Indicator& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
 Indicator (*AMA_1)(int, int, int) = AMA;
@@ -94,51 +86,47 @@ Indicator (*VIGOR_1)(const KData&, int) = VIGOR;
 Indicator (*VIGOR_2)(int) = VIGOR;
 Indicator (*VIGOR_3)(const Indicator&, int) = VIGOR;
 
-Indicator (*WEAVE_1)() = WEAVE;
-Indicator (*WEAVE_2)(const Indicator&) = WEAVE;
+Indicator (*CVAL_1)(double, size_t) = CVAL;
+Indicator (*CVAL_2)(const Indicator&, double, int) = CVAL;
 
-Indicator (*CVAL_1)(double, size_t, size_t) = CVAL;
-Indicator (*CVAL_2)(const Indicator&, double) = CVAL;
+Indicator (*LIUTONGPAN_1)() = LIUTONGPAN;
+Indicator (*LIUTONGPAN_2)(const KData&) = LIUTONGPAN;
 
-Indicator (*IND_AND1)(const Indicator&, const Indicator&) = IND_AND;
+Indicator (*HSL_1)() = HSL;
+Indicator (*HSL_2)(const KData&) = HSL;
+
+/*Indicator (*IND_AND1)(const Indicator&, const Indicator&) = IND_AND;
 Indicator (*IND_AND2)(const Indicator&, price_t) = IND_AND;
 Indicator (*IND_AND3)(price_t, const Indicator&) = IND_AND;
 
 Indicator (*IND_OR1)(const Indicator&, const Indicator&) = IND_OR;
 Indicator (*IND_OR2)(const Indicator&, price_t) = IND_OR;
 Indicator (*IND_OR3)(price_t, const Indicator&) = IND_OR;
+*/
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
-    def("KDATA", KDATA2);
     def("KDATA", KDATA3);
 
     def("CLOSE", CLOSE1);
-    def("CLOSE", CLOSE2);
     def("CLOSE", CLOSE3);
 
     def("OPEN", OPEN1);
-    def("OPEN", OPEN2);
     def("OPEN", OPEN3);
 
     def("HIGH", HIGH1);
-    def("HIGH", HIGH2);
     def("HIGH", HIGH3);
 
     def("LOW", LOW1);
-    def("LOW", LOW2);
     def("LOW", LOW3);
 
     def("AMO", AMO1);
-    def("AMO", AMO2);
     def("AMO", AMO3);
 
     def("VOL", VOL1);
-    def("VOL", VOL2);
     def("VOL", VOL3);
 
     def("KDATA_PART", KDATA_PART1, (arg("data"), arg("kpart")));
-    def("KDATA_PART", KDATA_PART2, (arg("data"), arg("kpart")));
     def("KDATA_PART", KDATA_PART3, (arg("kpart")));
 
     def("PRICELIST", PRICELIST2, (arg("data"), arg("discard")=0));
@@ -185,22 +173,23 @@ void export_Indicator_build_in() {
     def("LLV", LLV_1, (arg("n")=20));
     def("LLV", LLV_2, (arg("data"), arg("n")=20));
 
-    def("WEAVE", WEAVE_1);
-    def("WEAVE", WEAVE_2);
+    def("WEAVE", WEAVE);
 
-    def("CVAL", CVAL_1, (arg("value")=0.0, arg("len")=0, arg("discard")=0));
-    def("CVAL", CVAL_2, (arg("data"), arg("value")=0.0));
+    def("CVAL", CVAL_1, (arg("value")=0.0, arg("discard")=0));
+    def("CVAL", CVAL_2, (arg("data"), arg("value")=0.0, arg("discard")=0));
 
-    def("IND_AND", IND_AND1);
+/*    def("IND_AND", IND_AND1);
     def("IND_AND", IND_AND2);
     def("IND_AND", IND_AND3);
 
     def("IND_OR", IND_OR1);
     def("IND_OR", IND_OR2);
     def("IND_OR", IND_OR3);
-
-    def("LIUTONGPAN", LIUTONGPAN);
-    def("HSL", HSL);
+*/
+    def("LIUTONGPAN", LIUTONGPAN_1);
+    def("LIUTONGPAN", LIUTONGPAN_2);
+    def("HSL", HSL_1);
+    def("HSL", HSL_2);
 
 }
 
