@@ -178,5 +178,11 @@ HKU_API Indicator operator>=(price_t, const Indicator&);
 HKU_API Indicator operator<=(const Indicator&, price_t);
 HKU_API Indicator operator<=(price_t, const Indicator&);
 
+HKU_API Indicator operator&(const Indicator&, price_t);
+HKU_API Indicator operator&(price_t, const Indicator&);
+
+HKU_API Indicator operator|(const Indicator&, price_t);
+HKU_API Indicator operator|(price_t, const Indicator&);
+
 } /* namespace hku */
 #endif /* INDICATOR_H_ */

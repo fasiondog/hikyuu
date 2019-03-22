@@ -293,4 +293,21 @@ HKU_API Indicator operator<=(price_t val, const Indicator& ind) {
     return CVAL(ind, val) <= ind;
 }
 
+HKU_API Indicator operator&(const Indicator& ind, price_t val) {
+    return ind & CVAL(ind, val);
+}
+
+HKU_API Indicator operator&(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) & ind;
+}
+
+HKU_API Indicator operator|(const Indicator& ind, price_t val) {
+    return ind | CVAL(ind, val);
+}
+
+HKU_API Indicator operator|(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) | ind;
+}
+
+
 } /* namespace hku */

@@ -78,7 +78,7 @@ end
 add_subdirs("./hikyuu_cpp/hikyuu_utils")
 -- add_subdirs("./hikyuu_cpp/importdata")
 add_subdirs("./hikyuu_cpp/hikyuu")
---add_subdirs("./hikyuu_pywrap")
+add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")
 add_subdirs("./hikyuu_cpp/demo")
 

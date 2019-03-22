@@ -112,11 +112,11 @@ def draw(stock, query=QueryByIndex(-130), ma_n=22, ma_w='auto', vigor_n=13):
     up = int(umax / umean)
     lp = int(lmin / lmean)
     for i in range(up):
-        CVAL(umean * (i + 1), len(kdata)).plot(axes=ax3, color='r', linestyle='--')
+        CVAL(close, umean * (i + 1)).plot(axes=ax3, color='r', linestyle='--')
         #ax3.hlines(umean * (i + 1),0,len(kdata),color='r',linestyle='--')
         
     for i in range(lp):
-        CVAL(lmean * (i + 1), len(kdata)).plot(axes=ax3, color='g', linestyle='--')
+        CVAL(close, lmean * (i + 1)).plot(axes=ax3, color='g', linestyle='--')
         #ax3.hlines(lmean * (i + 1),0,len(kdata),color='g',linestyle='--')    
     
     ax1.set_xlim((0, len(kdata)))

@@ -34,7 +34,7 @@
 """
 from hikyuu import Query
 from hikyuu.util.mylog import escapetime
-from hikyuu.indicator import Indicator, MA, CLOSE, VOL, OP, CVAL, PRICELIST
+from hikyuu.indicator import Indicator, MA, CLOSE, VOL, CVAL, PRICELIST
 from hikyuu.trade_sys.signal import SG_Cross
 from hikyuu.interactive.drawplot import (create_figure, 
                                          get_current_draw_engine,
@@ -62,7 +62,7 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
     ma4.plot(axes=ax1, legend_on=True)
     ma5.plot(axes=ax1, legend_on=True)
     
-    sg = SG_Cross(OP(MA(n=ma1_n, type=ma_type)), OP(MA(n=ma2_n, type=ma_type)))
+    sg = SG_Cross(MA(n=ma1_n, type=ma_type), MA(n=ma2_n, type=ma_type))
     sg.setTO(kdata)
     sg.plot(axes=ax1, kdata=kdata)
     

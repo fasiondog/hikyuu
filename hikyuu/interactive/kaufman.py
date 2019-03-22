@@ -35,7 +35,7 @@
 """
 
 from hikyuu import Query, StockManager
-from hikyuu.indicator import (OP, AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE,
+from hikyuu.indicator import (AMA, STDEV, CVAL, PRICELIST, EMA, CLOSE,
                               HIGH, LOW, OPEN, KDATA, POS)
 from hikyuu.trade_sys.signal import SG_Single, SG_Cross, SG_Flex
 from hikyuu.trade_manage import BUSINESS
@@ -75,8 +75,8 @@ def draw(stock, query = Query(-130),
         lama.plot(axes = ax1, color = 'g', legend_on = True)
     
     if sg_type == 'CROSS':
-        fast_op = OP(AMA(n = n))
-        slow_op = OP(OP(EMA(n = 2*n)), fast_op)
+        fast_op = AMA(n = n)
+        slow_op = EMA(n = 2*n)(fast_op)
         sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes = ax1, kdata = kdata)
         ind = slow_op(KDATA(kdata))
@@ -149,8 +149,8 @@ def draw2(block, query = Query(-130),
         lama.plot(axes = ax1, color = 'g', legend_on = True)
     
     if sg_type == 'CROSS':
-        fast_op = OP(OP(AMA(n = n)))
-        slow_op = OP(OP(EMA(n = 2*n)), fast_op)
+        fast_op = AMA(n = n)
+        slow_op = EMA(n = 2*n)(fast_op)
         sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes = ax1, kdata = kdata)
         ind = slow_op(KDATA(kdata))
@@ -164,10 +164,10 @@ def draw2(block, query = Query(-130),
     else:
         print("sg_type only in ('CORSS', 'SINGLE')")
         
-    a = POS(block, query, SG_Flex(OP(AMA(n = 3)), 6))
+    a = POS(block, query, SG_Flex(AMA(n = 3), 6))
     a.name = "POS(3)"
     a.plot(axes=ax2, color='b', marker='.', legend_on=True)
-    a = POS(block, query, SG_Flex(OP(AMA(n = 30)), 60))
+    a = POS(block, query, SG_Flex(AMA(n = 30), 60))
     a.name = "POS(30)"
     a.plot(axes=ax2, color='g', marker='.', legend_on=True)
     
