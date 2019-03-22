@@ -102,18 +102,6 @@ BOOST_AUTO_TEST_CASE( test_PRICELIST ) {
     for (size_t i = 0; i < result.size(); ++i) {
         BOOST_CHECK(result[i] == ikdata.get(i, 1));
     }
-
-    /*Indicator price_list = PRICELIST();
-    Indicator close = CLOSE();
-    result = price_list(close);
-    std::cout << result << std::endl;
-    std::cout << result.formula() << std::endl;
-    std::cout << result.size() << std::endl;
-
-    result.setContext(stock, query);
-    std::cout << result << std::endl;
-    std::cout << result.formula() << std::endl;
-    std::cout << result.size() << std::endl;*/
 }
 
 /** @} */

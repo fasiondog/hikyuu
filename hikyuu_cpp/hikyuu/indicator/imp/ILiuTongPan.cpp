@@ -67,7 +67,7 @@ Indicator HKU_API LIUTONGPAN() {
 }
 
 Indicator HKU_API LIUTONGPAN(const KData& k) {
-    return make_shared<ILiuTongPan>(k);
+    return Indicator(make_shared<ILiuTongPan>(k));
 }
 
 

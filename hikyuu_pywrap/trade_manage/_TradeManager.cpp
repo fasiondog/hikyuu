@@ -142,7 +142,7 @@ void export_TradeManager() {
                             //"num", "stoploss", "goalPrice", "planPrice","part")))
 
             .def("sell", &TradeManager::sell,
-                          // arg("num") ÎŞ·¨Ö§³ÖÄ¬ÈÏ²ÎÊıÎª null_size
+                          // arg("num") æ— æ³•æ”¯æŒé»˜è®¤å‚æ•°ä¸º null_size
                           //(arg("datetime"), arg("stock"),
                            //arg("realPrice"), arg("num"), arg("stoploss")=0.0,
                            //arg("goalPrice")=0.0, arg("planPrice")=0.0,

@@ -60,6 +60,19 @@ void export_Indicator() {
         .def("getResultAsPriceList", &Indicator::getResultAsPriceList)
         .def("__len__", &Indicator::size)
         .def("__call__", &Indicator::operator())
+
+       /* .def("__add__", &Indicator::operator+)
+        .def("__sub__", &Indicator::operator-)
+        .def("__mul__", &Indicator::operator*)
+        .def("__div__", &Indicator::operator/)
+        .def("__truediv__", &Indicator::operator/)
+        .def("__eq__", &Indicator::operator==)
+        .def("__ne__", &Indicator::operator!=)
+        .def("__gt__", &Indicator::operator>)
+        .def("__lt__", &Indicator::operator<)
+        .def("__ge__", &Indicator::operator>=)
+        .def("__le__", &Indicator::operator<=)*/
+
 #if HKU_PYTHON_SUPPORT_PICKLE
         .def_pickle(normal_pickle_suite<Indicator>())
 #endif

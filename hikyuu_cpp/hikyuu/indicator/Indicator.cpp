@@ -6,6 +6,7 @@
  */
 
 #include "Indicator.h"
+#include "crt/CVAL.h"
 
 namespace hku {
 
@@ -89,176 +90,207 @@ Indicator Indicator::operator()(const Indicator& ind) {
     IndicatorImpPtr p = m_imp->clone();
     p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp()->clone());
     return p->calculate();
-    //m_imp->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp());
-    //return m_imp->calculate();
 }
 
-Indicator Indicator::operator+(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::ADD, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::ADD, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator-(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator-(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::SUB, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::SUB, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator*(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator*(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::MUL, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::MUL, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator/(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator/(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::DIV, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::DIV, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator==(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator==(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::EQ, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::EQ, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator!=(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator!=(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::NE, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::NE, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator>(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator>(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::GT, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::GT, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator<(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator<(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::LT, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::LT, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator>=(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator>=(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::GE, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::GE, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator<=(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator<=(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::LE, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::LE, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator&(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator&(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::AND, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::AND, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
 }
 
-Indicator Indicator::operator|(const Indicator& ind) {
-    if (!m_imp) {
+HKU_API Indicator operator|(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
     }
 
-    if (!ind.getImp()) {
-        return Indicator(m_imp->clone());
-    }
-
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::OR, m_imp->clone(), ind.getImp()->clone());
+    p->add(IndicatorImp::OR, ind1.getImp()->clone(), ind2.getImp()->clone());
     return p->calculate();
+}
+
+
+HKU_API Indicator operator+(const Indicator& ind, price_t val) {
+    return ind + CVAL(ind, val);
+}
+
+HKU_API Indicator operator+(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) + ind;
+}
+
+HKU_API Indicator operator-(const Indicator& ind, price_t val) {
+    return ind - CVAL(ind, val);
+}
+
+HKU_API Indicator operator-(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) - ind;
+}
+
+HKU_API Indicator operator*(const Indicator& ind, price_t val) {
+    return ind * CVAL(ind, val);
+}
+
+HKU_API Indicator operator*(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) * ind;
+}
+
+HKU_API Indicator operator/(const Indicator& ind, price_t val) {
+    return ind / CVAL(ind, val);
+}
+
+HKU_API Indicator operator/(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) / ind;
+}
+
+HKU_API Indicator operator==(const Indicator& ind, price_t val) {
+    return ind == CVAL(ind, val);
+}
+
+HKU_API Indicator operator==(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) == ind;
+}
+
+HKU_API Indicator operator!=(const Indicator& ind, price_t val) {
+    return ind != CVAL(ind, val);
+}
+
+HKU_API Indicator operator!=(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) != ind;
+}
+
+HKU_API Indicator operator>(const Indicator& ind, price_t val) {
+    return ind > CVAL(ind, val);
+}
+
+HKU_API Indicator operator>(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) > ind;
+}
+
+HKU_API Indicator operator<(const Indicator& ind, price_t val) {
+    return ind < CVAL(ind, val);
+}
+
+HKU_API Indicator operator<(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) < ind;
+}
+
+HKU_API Indicator operator>=(const Indicator& ind, price_t val) {
+    return ind >= CVAL(ind, val);
+}
+
+HKU_API Indicator operator>=(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) >= ind;
+}
+
+HKU_API Indicator operator<=(const Indicator& ind, price_t val) {
+    return ind <= CVAL(ind, val);
+}
+
+HKU_API Indicator operator<=(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) <= ind;
 }
 
 } /* namespace hku */
