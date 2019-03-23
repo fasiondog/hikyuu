@@ -18,7 +18,7 @@ Vigor::Vigor(): IndicatorImp("VIGOR", 1) {
 }
 
 Vigor::Vigor(int n): IndicatorImp() {
-    setParam<int>("n", 2);
+    setParam<int>("n", n);
 }
 
 
