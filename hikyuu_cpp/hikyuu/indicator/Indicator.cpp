@@ -84,6 +84,22 @@ Indicator Indicator::clone() const {
     return m_imp ? Indicator(m_imp->clone()) : Indicator();
 }
 
+PriceList Indicator::getResultAsPriceList(size_t num) const {
+    if (!m_imp) {
+        HKU_WARN("indicator imptr is null! [Indicator::getResultAsPriceList]");
+        return PriceList();
+    }
+    return m_imp->getResultAsPriceList(num);
+}
+
+Indicator Indicator::getResult(size_t num) const {
+    if (!m_imp) {
+        HKU_WARN("indicator imptr is null! [Indicator::getResult]");
+        return Indicator();
+    }
+    return m_imp->getResult(num);
+}
+
 Indicator Indicator::operator()(const Indicator& ind) {
     if (!m_imp)
         return Indicator();
@@ -92,7 +108,7 @@ Indicator Indicator::operator()(const Indicator& ind) {
         return Indicator(m_imp);
     
     IndicatorImpPtr p = m_imp->clone();
-    p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp()->clone());
+    p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp());
     return p->calculate();
 }
 
@@ -102,7 +118,7 @@ HKU_API Indicator operator+(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::ADD, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::ADD, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -112,7 +128,7 @@ HKU_API Indicator operator-(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::SUB, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::SUB, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -122,7 +138,7 @@ HKU_API Indicator operator*(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::MUL, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::MUL, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -132,7 +148,7 @@ HKU_API Indicator operator/(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::DIV, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::DIV, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -142,7 +158,7 @@ HKU_API Indicator operator==(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::EQ, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::EQ, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -152,7 +168,7 @@ HKU_API Indicator operator!=(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::NE, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::NE, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -162,7 +178,7 @@ HKU_API Indicator operator>(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::GT, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::GT, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -172,7 +188,7 @@ HKU_API Indicator operator<(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::LT, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::LT, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -182,7 +198,7 @@ HKU_API Indicator operator>=(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::GE, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::GE, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -192,7 +208,7 @@ HKU_API Indicator operator<=(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::LE, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::LE, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -202,7 +218,7 @@ HKU_API Indicator operator&(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::AND, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::AND, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
@@ -212,7 +228,7 @@ HKU_API Indicator operator|(const Indicator& ind1, const Indicator& ind2) {
     }
 
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::OR, ind1.getImp()->clone(), ind2.getImp()->clone());
+    p->add(IndicatorImp::OR, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 

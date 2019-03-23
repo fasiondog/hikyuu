@@ -8,6 +8,7 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
+#include "../config.h"
 #include "../KData.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/util.h"
@@ -79,6 +80,13 @@ public:
     }
 
     price_t get(size_t pos, size_t num = 0) {
+#if CHECK_ACCESS_BOUND
+        if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+            throw(std::out_of_range("Try to access value out of bounds! "
+                        + name() + " [IndicatorImp::get]"));
+            return Null<price_t>();
+        }
+#endif
         return (*m_pBuffer[num])[pos];
     }
 
@@ -95,11 +103,8 @@ public:
     void _set(price_t val, size_t pos, size_t num = 0) {
 #if CHECK_ACCESS_BOUND
         if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
-            std::stringstream err_info;
-            err_info << "Try to access value out of bounds! "
-                     << name() << " [IndicatorImp::_set]";
-            HKU_FATAL(err_info.str());
-            throw(std::out_of_range(err_info.str()));
+            throw(std::out_of_range("Try to access value out of bounds! "
+                        + name() + " [IndicatorImp::_set]"));
             return;
         }
         (*m_pBuffer[num])[pos] = val;

@@ -42,6 +42,10 @@ bool IKData::check() {
 void IKData::_calculate(const Indicator& ind) {
     KData kdata = getCurrentKData();
     size_t total = kdata.size();
+    if (total == 0) {
+        return;
+    }
+    
     string part_name = getParam<string>("kpart");
     
     if ("KDATA" == part_name) {

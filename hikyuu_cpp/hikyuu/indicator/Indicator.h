@@ -86,6 +86,13 @@ public:
      * @note 不做下标越界检查，也不抛出异常
      */
     price_t operator[](size_t pos) const {
+#if CHECK_ACCESS_BOUND
+        if (!m_imp) {
+            throw(std::out_of_range(
+                "Try to access empty indicator! [Indicator::get]"));
+            return Null<price_t>();
+        }
+#endif        
         return m_imp->get(pos, 0);
     }
 
@@ -96,16 +103,19 @@ public:
      * @note 不做下标越界检查，不会抛出异常
      */
     price_t get(size_t pos, size_t num = 0) const {
+#if CHECK_ACCESS_BOUND
+        if (!m_imp) {
+            throw(std::out_of_range(
+                "Try to access empty indicator! [Indicator::get]"));
+            return Null<price_t>();
+        }
+#endif        
         return m_imp->get(pos, num);
     }
 
-    Indicator getResult(size_t num) const {
-        return m_imp->getResult(num);
-    }
+    Indicator getResult(size_t num) const;
 
-    PriceList getResultAsPriceList(size_t num) const {
-        return m_imp->getResultAsPriceList(num);
-    }
+    PriceList getResultAsPriceList(size_t num) const;
 
     template <typename ValueType>
     void setParam(const string& name, const ValueType& value) {

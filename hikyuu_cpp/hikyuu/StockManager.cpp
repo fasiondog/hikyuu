@@ -133,9 +133,8 @@ void StockManager::init(
 
 
 void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
-    string funcname(" [StockManager::setKDataDriver]");
     if (!driver) {
-        HKU_ERROR("kdata driver is null!" << funcname);
+        HKU_ERROR("kdata driver is null! [StockManager::setKDataDriver]");
         return;
     }
 
@@ -149,7 +148,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_day = m_preloadParam.get<bool>("day");
         if (preload_day)
-            HKU_INFO("Preloading all day kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all day kdata to buffer!");
     } catch(...) {
         preload_day = false;
     }
@@ -158,7 +157,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_week = m_preloadParam.get<bool>("week");
         if (preload_week)
-            HKU_INFO("Preloading all week kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all week kdata to buffer!");
     } catch(...) {
         preload_week = false;
     }
@@ -167,7 +166,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_month = m_preloadParam.get<bool>("month");
         if (preload_week)
-            HKU_INFO("Preloading all month kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all month kdata to buffer!");
     } catch(...) {
         preload_month = false;
     }
@@ -176,7 +175,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_quarter = m_preloadParam.get<bool>("quarter");
         if (preload_quarter)
-            HKU_INFO("Preloading all quarter kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all quarter kdata to buffer!");
     } catch(...) {
         preload_quarter = false;
     }
@@ -185,7 +184,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_halfyear = m_preloadParam.get<bool>("halfyear");
         if (preload_halfyear)
-            HKU_INFO("Preloading all halfyear kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all halfyear kdata to buffer!");
     } catch(...) {
         preload_halfyear = false;
     }
@@ -194,7 +193,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_year = m_preloadParam.get<bool>("year");
         if (preload_year)
-            HKU_INFO("Preloading all year kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all year kdata to buffer!");
     } catch(...) {
         preload_year = false;
     }
@@ -203,7 +202,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_min = m_preloadParam.get<bool>("min");
         if (preload_min)
-            HKU_INFO("Preloading all 1 min kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all 1 min kdata to buffer!");
     } catch(...) {
         preload_min = false;
     }
@@ -212,7 +211,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_min5 = m_preloadParam.get<bool>("min5");
         if (preload_min5)
-            HKU_INFO("Preloading all 5 min kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all 5 min kdata to buffer!");
     } catch(...) {
         preload_min5 = false;
     }
@@ -221,7 +220,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_min15 = m_preloadParam.get<bool>("min15");
         if (preload_min15)
-            HKU_INFO("Preloading all 15 min kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all 15 min kdata to buffer!");
     } catch(...) {
         preload_min15 = false;
     }
@@ -230,7 +229,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_min30 = m_preloadParam.get<bool>("min30");
         if (preload_min30)
-            HKU_INFO("Preloading all 30 min kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all 30 min kdata to buffer!");
     } catch(...) {
         preload_min30 = false;
     }
@@ -239,7 +238,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     try {
         preload_min60 = m_preloadParam.get<bool>("min60");
         if (preload_min60)
-            HKU_INFO("Preloading all 60 min kdata to buffer!" << funcname);
+            HKU_INFO("Preloading all 60 min kdata to buffer!");
     } catch(...) {
         preload_min60 = false;
     }

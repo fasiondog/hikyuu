@@ -29,6 +29,10 @@ bool ILiuTongPan::check() {
 void ILiuTongPan::_calculate(const Indicator& data) {
     KData k = getCurrentKData();
     size_t total = k.size();
+    if (total == 0) {
+        return;
+    }
+    
     _readyBuffer(total, 1);
 
     if (total == 0) {

@@ -296,8 +296,8 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     }
 
     m_optype = op;
-    m_left = left;
-    m_right = new_right ? new_right : right;
+    m_left = left ? left->clone() : left;
+    m_right = new_right ? new_right : right->clone();
 }
 
 Indicator IndicatorImp::calculate() {
