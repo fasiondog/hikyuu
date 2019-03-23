@@ -33,6 +33,10 @@ void RightShift::_calculate(const Indicator& data)  {
     int n = getParam<int>("n");
 
     m_discard = data.discard() + n;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
     for (size_t i = m_discard; i < total; ++i) {
         _set(data[i-n], i);
     }

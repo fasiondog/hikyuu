@@ -26,6 +26,7 @@ void Diff::_calculate(const Indicator& data) {
 
     m_discard = data.discard() + 1;
     if (total <= m_discard) {
+        m_discard = total;
         return;
     }
 

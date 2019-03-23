@@ -39,6 +39,9 @@ bool SaftyLoss::check() {
 
 void SaftyLoss::_calculate(const Indicator& data) {
     size_t total = data.size();
+    if (total == 0) {
+        return;
+    }
     _readyBuffer(total, 1);
 
     int n1 = getParam<int>("n1");
@@ -46,7 +49,8 @@ void SaftyLoss::_calculate(const Indicator& data) {
     double p = getParam<double>("p");
 
     m_discard = data.discard() + n1 + n2 - 2;
-    if (0 == total) {
+    if (m_discard >= total) {
+        m_discard = total;
         return;
     }
 

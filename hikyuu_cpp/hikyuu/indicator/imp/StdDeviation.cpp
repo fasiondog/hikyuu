@@ -34,6 +34,10 @@ void StdDeviation::_calculate(const Indicator& data) {
     int n = getParam<int>("n");
 
     m_discard = data.discard() + n - 1;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     Indicator ma = MA(data, n);
     size_t N = n - 1;

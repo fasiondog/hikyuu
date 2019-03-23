@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     result = SAFTYLOSS(CLOSE(kdata), 2, 1);
     BOOST_CHECK(result.empty() == true);
     BOOST_CHECK(result.size() == 0);
-    BOOST_CHECK(result.discard() == 1);
+    BOOST_CHECK(result.discard() == 0);
 
     /** @arg 参数n1、n2非法 */
     query = KQuery(0, 20);

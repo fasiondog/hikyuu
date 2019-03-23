@@ -56,6 +56,8 @@ public:
     /** 返回形如：Name(param1_val,param2_val,...) */
     string long_name() const;
 
+    Indicator clone() const;
+
     void setContext(const Stock&, const KQuery&);
 
     KData getCurrentKData() const {

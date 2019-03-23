@@ -38,12 +38,16 @@ bool Ama::check() {
 
 void Ama::_calculate(const Indicator& data) {
     size_t total = data.size();
+    m_discard = data.discard();
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     int n = getParam<int>("n");
     int fast_n = getParam<int>("fast_n");
     int slow_n = getParam<int>("slow_n");
 
-    m_discard = data.discard();
     size_t start = m_discard;
 
     price_t fastest = 2.0 / (fast_n + 1);

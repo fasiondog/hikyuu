@@ -79,7 +79,7 @@ def draw(stock, query = Query(-130),
         slow_op = EMA(n = 2*n)(fast_op)
         sg = SG_Cross(fast_op, slow_op)
         sg.plot(axes = ax1, kdata = kdata)
-        ind = slow_op(kdata)
+        ind = slow_op(KDATA(kdata))
         ind.name = "EMA(CAMA)"
         ind.plot(axes = ax1, color = 'm', legend_on = True)
                  

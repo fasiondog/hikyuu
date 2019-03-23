@@ -29,14 +29,13 @@ bool Ema::check() {
 
 void Ema::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
-
-    int n = getParam<int>("n");
-
     m_discard = indicator.discard();
     if (total <= m_discard) {
+        m_discard = total;
         return;
     }
 
+    int n = getParam<int>("n");
     size_t startPos = discard();
     price_t ema = indicator[startPos];
     _set(ema, startPos);

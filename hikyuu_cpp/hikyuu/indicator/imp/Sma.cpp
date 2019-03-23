@@ -29,9 +29,13 @@ bool Sma::check() {
 
 void Sma::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
-    int n = getParam<int>("n");
-
     m_discard = indicator.discard();
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
+    int n = getParam<int>("n");
     size_t startPos = m_discard;
     price_t sum = 0.0;
     size_t count = 1;

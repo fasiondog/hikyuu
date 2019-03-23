@@ -32,6 +32,10 @@ bool Macd::check() {
 
 void Macd::_calculate(const Indicator& data) {
     size_t total = data.size();
+    if (total == 0) {
+        return;
+    }
+    
     _readyBuffer(total, 3);
 
     int n1 = getParam<int>("n1");
@@ -40,6 +44,7 @@ void Macd::_calculate(const Indicator& data) {
 
     m_discard = data.discard();
     if (total <= m_discard) {
+        m_discard = total;
         return;
     }
 

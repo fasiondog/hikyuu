@@ -95,8 +95,12 @@ public:
     void _set(price_t val, size_t pos, size_t num = 0) {
 #if CHECK_ACCESS_BOUND
         if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
-            throw(std::out_of_range("Try to access value out of bounds! "
-                        + name() + " [IndicatorImp::_set]"));
+            std::stringstream err_info;
+            err_info << "Try to access value out of bounds! "
+                     << name() << " [IndicatorImp::_set]";
+            HKU_FATAL(err_info.str());
+            throw(std::out_of_range(err_info.str()));
+            return;
         }
         (*m_pBuffer[num])[pos] = val;
 #else

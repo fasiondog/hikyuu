@@ -80,6 +80,10 @@ size_t Indicator::size() const {
     return m_imp ? m_imp->size() : 0;
 }
 
+Indicator Indicator::clone() const {
+    return m_imp ? Indicator(m_imp->clone()) : Indicator();
+}
+
 Indicator Indicator::operator()(const Indicator& ind) {
     if (!m_imp)
         return Indicator();
