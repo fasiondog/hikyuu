@@ -85,6 +85,11 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
         return;
     }
 
+    if (result_num == 0) {
+        HKU_ERROR("result_num is zeror! [IndicatorImp::_readyBuffer]")
+        return;
+    }
+
     price_t null_price = Null<price_t>();
 
     for (size_t i = 0; i < result_num; ++i) {
