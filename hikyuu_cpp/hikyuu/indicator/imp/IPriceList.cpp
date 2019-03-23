@@ -9,14 +9,14 @@
 
 namespace hku {
 
-IPriceList::IPriceList() : IndicatorImp("PRICELIST") {
+IPriceList::IPriceList() : IndicatorImp("PRICELIST", 1) {
     setParam<int>("result_index", 0);
     setParam<PriceList>("data", PriceList());
     setParam<int>("discard", 0);
 }
 
 IPriceList::IPriceList(const PriceList& data, int in_discard) 
-: IndicatorImp("PRICELIST") {
+: IndicatorImp("PRICELIST", 1) {
     setParam<int>("result_index", 0);
     setParam<PriceList>("data", data);
     setParam<int>("discard", in_discard);

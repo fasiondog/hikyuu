@@ -29,19 +29,22 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
 }
 
 IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_optype(LEAF) {
+: m_name("IndicatorImp"), m_discard(0), m_result_num(0), 
+  m_optype(LEAF), m_need_calculate(true) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name)
-: m_name(name), m_discard(0), m_result_num(0), m_optype(LEAF) {
+: m_name(name), m_discard(0), m_result_num(0), 
+  m_optype(LEAF), m_need_calculate(true) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name, size_t result_num)
-: m_name(name), m_discard(0), m_optype(LEAF) {
+: m_name(name), m_discard(0), m_optype(LEAF),
+  m_need_calculate(true) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
@@ -52,6 +55,8 @@ void IndicatorImp::initContext() {
 }
 
 void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
+    m_need_calculate = true;
+
     //子节点设置上下文
     if (m_left) m_left->setContext(stock, query);
     if (m_right) m_right->setContext(stock, query);
@@ -86,7 +91,7 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     }
 
     if (result_num == 0) {
-        HKU_ERROR("result_num is zeror! [IndicatorImp::_readyBuffer]")
+        HKU_WARN("result_num is zeror! (" << name() << ") [IndicatorImp::_readyBuffer]")
         return;
     }
 
@@ -125,7 +130,15 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_name = m_name;
     p->m_discard = m_discard;
     p->m_result_num = m_result_num;
+    p->m_need_calculate = m_need_calculate;
     p->m_optype = m_optype;
+
+    for (size_t i = 0; i < m_result_num; ++i) {
+        if (m_pBuffer[i]) {
+            p->m_pBuffer[i] = new PriceList(m_pBuffer[i]->begin(), m_pBuffer[i]->end());
+        }
+    }
+
     if (m_left) {
         p->m_left = m_left->clone();
     }
@@ -295,6 +308,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         new_right = right->getSameNameNeedContextLeaf(right->name());
     }
 
+    m_need_calculate = true;
     m_optype = op;
     m_left = left ? left->clone() : left;
     m_right = new_right ? new_right : right->clone();
@@ -311,6 +325,10 @@ Indicator IndicatorImp::calculate() {
         } else {
             return Indicator();
         }
+    }
+
+    if (!m_need_calculate) {
+        return shared_from_this();
     }
 
     switch (m_optype) {
@@ -380,6 +398,7 @@ Indicator IndicatorImp::calculate() {
             break;
     }
 
+    m_need_calculate = false;
     return shared_from_this();
 }
 

@@ -95,11 +95,11 @@ def draw(stock, query = Query(-130),
     cer.plot(axes=ax2, color='b', marker='o', label=label, 
              legend_on=False, text_on=True)
     
-    total = len(kdata)
-    CVAL(0.8, total).plot(axes=ax2,color='r',linestyle='--')
-    CVAL(-0.6, total).plot(axes=ax2,color='r',linestyle='--')
-    CVAL(-0.8, total).plot(axes=ax2,color='r',linestyle='--')
-    CVAL(0, total).plot(axes=ax2,color='k',linestyle='-')
+    c = CLOSE(kdata)
+    CVAL(c, 0.8).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(c, -0.6).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(c, -0.8).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(c, 0).plot(axes=ax2,color='k',linestyle='-')
     #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
     #ax2.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
     #ax2.hlines(-0.8,0,len(kdata),color='r',linestyle='--')

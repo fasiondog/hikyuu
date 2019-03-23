@@ -177,6 +177,7 @@ protected:
     size_t m_result_num;
     PriceList *m_pBuffer[MAX_RESULT_NUM];
 
+    bool m_need_calculate;
     OPType m_optype;
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
