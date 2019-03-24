@@ -43,8 +43,8 @@ IndicatorImp::IndicatorImp(const string& name)
 }
 
 IndicatorImp::IndicatorImp(const string& name, size_t result_num)
-: m_name(name), m_discard(0), m_optype(LEAF),
-  m_need_calculate(true) {
+: m_name(name), m_discard(0), 
+  m_need_calculate(true), m_optype(LEAF) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
