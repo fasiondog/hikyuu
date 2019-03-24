@@ -50,7 +50,7 @@ public:
         LE,  ///<小于等于
         AND, ///<与
         OR,  ///<或
-        TWO, ///<特殊的，需要两个指标作为参数的指标
+        WEAVE, ///<特殊的，需要两个指标作为参数的指标
         INVALID
     };
 
@@ -157,7 +157,6 @@ public:
 private:
     void initContext();
     IndicatorImpPtr getSameNameNeedContextLeaf(const string& name);
-    void execute_two();
     void execute_add();
     void execute_sub();
     void execute_mul();
@@ -170,6 +169,7 @@ private:
     void execute_le();
     void execute_and();
     void execute_or();
+    void execute_weave();
 
 protected:
     string m_name;

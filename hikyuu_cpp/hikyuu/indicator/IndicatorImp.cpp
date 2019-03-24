@@ -30,14 +30,14 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
 
 IndicatorImp::IndicatorImp()
 : m_name("IndicatorImp"), m_discard(0), m_result_num(0), 
-  m_optype(LEAF), m_need_calculate(true) {
+  m_need_calculate(true), m_optype(LEAF)  {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
 
 IndicatorImp::IndicatorImp(const string& name)
 : m_name(name), m_discard(0), m_result_num(0), 
-  m_optype(LEAF), m_need_calculate(true) {
+  m_need_calculate(true), m_optype(LEAF) {
     initContext();
     memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
 }
@@ -262,6 +262,9 @@ string IndicatorImp::formula() const {
             buf << m_left->formula() << " | " << m_right->formula();
             break;
 
+        case WEAVE:
+            buf << "WEAVE(" << m_left->formula() << ", " << m_right->formula() << ")";
+
         default:
             HKU_ERROR("Wrong optype!" << m_optype << " [IndicatorImp::formula]");
             break;
@@ -336,10 +339,6 @@ Indicator IndicatorImp::calculate() {
             _calculate(Indicator());
             break;
 
-        case TWO:
-            execute_two();
-            break;
-
         case OP:
             m_right->calculate();
             _readyBuffer(m_right->size(), m_result_num);
@@ -394,6 +393,10 @@ Indicator IndicatorImp::calculate() {
             execute_or();
             break;
 
+        case WEAVE:
+            execute_weave();
+            break;
+
         default:
             break;
     }
@@ -402,7 +405,7 @@ Indicator IndicatorImp::calculate() {
     return shared_from_this();
 }
 
-void IndicatorImp::execute_two() {
+void IndicatorImp::execute_weave() {
     m_right->calculate();
     m_left->calculate();
 

@@ -15,7 +15,7 @@ Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2) {
         return Indicator();
     }
     IndicatorImpPtr p = make_shared<IndicatorImp>();
-    p->add(IndicatorImp::TWO, ind1.getImp(), ind2.getImp());
+    p->add(IndicatorImp::WEAVE, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }
 
