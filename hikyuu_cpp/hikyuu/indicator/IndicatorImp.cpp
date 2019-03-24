@@ -306,15 +306,19 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         return;
     }
 
-    IndicatorImpPtr new_right;
-    if (right->isNeedContext()) {
-        new_right = right->getSameNameNeedContextLeaf(right->name());
-    }
-
     m_need_calculate = true;
     m_optype = op;
     m_left = left ? left->clone() : left;
-    m_right = new_right ? new_right : right->clone();
+    m_right = right->clone();
+}
+
+void IndicatorImp::
+add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
+    m_need_calculate = true;
+    m_optype = IndicatorImp::IF;
+    m_three = cond->clone();
+    m_left = left->clone();
+    m_right = right->clone();
 }
 
 Indicator IndicatorImp::calculate() {
@@ -397,7 +401,13 @@ Indicator IndicatorImp::calculate() {
             execute_weave();
             break;
 
+        case IF:
+            execute_if();
+            break;
+
         default:
+            HKU_ERROR("Unkown Indicator::OPType! " 
+                      << m_optype << " [IndicatorImp::calculate]");
             break;
     }
 
@@ -910,6 +920,48 @@ void IndicatorImp::execute_or() {
 
     size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
     size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    for (size_t r = 0; r < result_number; ++r) {
+        for (size_t i = discard; i < total; ++i) {
+            if (maxp->get(i, r) >= IND_EQ_THRESHOLD
+                    || minp->get(i-diff, r) >= IND_EQ_THRESHOLD) {
+                _set(1, i, r);
+            } else {
+                _set(0, i, r);
+            }
+        }
+    }
+}
+
+void IndicatorImp::execute_if() {
+    m_three->calculate();
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t diff = maxp->size() - minp->size();
+    if (m_three->size() >= maxp->size()) {
+        total = m_three->size();
+        discard = total + discard - maxp->size();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    //size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {

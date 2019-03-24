@@ -329,5 +329,20 @@ HKU_API Indicator operator|(price_t val, const Indicator& ind) {
     return CVAL(ind, val) | ind;
 }
 
+Indicator HKU_API IF(const Indicator& ind1, 
+        const Indicator& ind2, const Indicator& ind3) {
+    if (!ind1.getImp()) {
+        HKU_ERROR("condition indicator is None! [IF]");
+        return Indicator();
+    }
+
+    Indicator new_ind2 = ind2.getImp() ? ind2: CVAL(Null<price_t>());
+    Indicator new_ind3 = ind3.getImp() ? ind3: CVAL(Null<price_t>());
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add_if(ind1.getImp(), new_ind2.getImp(), new_ind3.getImp());
+    return p->calculate();
+}
+    
 
 } /* namespace hku */

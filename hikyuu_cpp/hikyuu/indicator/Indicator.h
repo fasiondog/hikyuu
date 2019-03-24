@@ -196,5 +196,12 @@ HKU_API Indicator operator&(price_t, const Indicator&);
 HKU_API Indicator operator|(const Indicator&, price_t);
 HKU_API Indicator operator|(price_t, const Indicator&);
 
+/**
+ * IF 操作
+ * @param 
+ * @ingroup Indicator
+ */
+Indicator HKU_API IF(const Indicator&, const Indicator&, const Indicator&);
+
 } /* namespace hku */
 #endif /* INDICATOR_H_ */

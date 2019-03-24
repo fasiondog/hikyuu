@@ -51,6 +51,7 @@ public:
         AND, ///<与
         OR,  ///<或
         WEAVE, ///<特殊的，需要两个指标作为参数的指标
+        IF,  ///if操作
         INVALID
     };
 
@@ -141,6 +142,8 @@ public:
 
     void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
 
+    void add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right);
+
     IndicatorImpPtr clone();
 
     // ===================
@@ -170,6 +173,7 @@ private:
     void execute_and();
     void execute_or();
     void execute_weave();
+    void execute_if();
 
 protected:
     string m_name;
@@ -181,6 +185,7 @@ protected:
     OPType m_optype;
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
+    IndicatorImpPtr m_three;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -197,6 +202,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_optype);
         ar & BOOST_SERIALIZATION_NVP(m_left);
         ar & BOOST_SERIALIZATION_NVP(m_right);
+        ar & BOOST_SERIALIZATION_NVP(m_three);
         size_t act_result_num = 0;
         size_t i = 0;
         while (i < m_result_num) {
@@ -223,6 +229,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_optype);
         ar & BOOST_SERIALIZATION_NVP(m_left);
         ar & BOOST_SERIALIZATION_NVP(m_right);
+        ar & BOOST_SERIALIZATION_NVP(m_three);
         size_t act_result_num = 0;
         ar & BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
