@@ -145,6 +145,9 @@ IndicatorImpPtr IndicatorImp::clone() {
     if (m_right) {
         p->m_right = m_right->clone();
     }
+    if (m_three) {
+        p->m_three = m_three->clone();
+    }
     return p;
 }
 
@@ -314,6 +317,11 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
 
 void IndicatorImp::
 add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
+    if (!cond || !left || !right) {
+        HKU_ERROR("Wrong used [IndicatorImp::add_if]");
+        return;
+    }
+
     m_need_calculate = true;
     m_optype = IndicatorImp::IF;
     m_three = cond->clone();
@@ -960,17 +968,19 @@ void IndicatorImp::execute_if() {
         discard = total + discard - maxp->size();
     }
 
+    size_t diff_right = total - m_right->size();
+    size_t diff_left = total - m_left->size();
+    size_t diff_cond = total - m_three->size();
+
     size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-    //size_t diff = maxp->size() - minp->size();
     _readyBuffer(total, result_number);
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            if (maxp->get(i, r) >= IND_EQ_THRESHOLD
-                    || minp->get(i-diff, r) >= IND_EQ_THRESHOLD) {
-                _set(1, i, r);
+            if (m_three->get(i-diff_cond) > 0.0) {
+                _set(m_left->get(i-diff_left), i, r);
             } else {
-                _set(0, i, r);
+                _set(m_right->get(i-diff_right), i ,r);
             }
         }
     }
