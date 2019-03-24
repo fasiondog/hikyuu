@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( test_PF_for_delay_and_no_adjust) {
 
 
     SYSPtr sys = SYS_Simple();
-    sys->setSG(SG_CrossGold(OP(EMA(12)), OP(EMA(26))));
+    sys->setSG(SG_CrossGold(EMA(12), EMA(26)));
     sys->setMM(MM_FixedCount(100));
     SYSPtr pro_sys = sys->clone(false, false);
 

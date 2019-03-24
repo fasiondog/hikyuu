@@ -8,6 +8,7 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
+#include "../config.h"
 #include "../KData.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/util.h"
@@ -30,8 +31,28 @@ class HKU_API Indicator;
  * 指标实现类，定义新指标时，应从此类继承
  * @ingroup Indicator
  */
-class HKU_API IndicatorImp {
+class HKU_API IndicatorImp: public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT
+
+public:
+    enum OPType {
+        LEAF, ///<叶子节点
+        OP,  /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
+        ADD, ///<加
+        SUB, ///<减
+        MUL, ///<乘
+        DIV, ///<除
+        EQ,  ///<等于
+        GT,  ///<大于
+        LT,  ///<小于
+        NE,  ///<不等于
+        GE,  ///<大于等于
+        LE,  ///<小于等于
+        AND, ///<与
+        OR,  ///<或
+        TWO, ///<特殊的，需要两个指标作为参数的指标
+        INVALID
+    };
 
 public:
     /** 默认构造函数   */
@@ -40,6 +61,9 @@ public:
     IndicatorImp(const string& name, size_t result_num);
 
     virtual ~IndicatorImp();
+
+    typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
+    virtual IndicatorImpPtr operator()(const Indicator& ind);
 
     size_t getResultNumber() const {
         return m_result_num;
@@ -56,6 +80,13 @@ public:
     }
 
     price_t get(size_t pos, size_t num = 0) {
+#if CHECK_ACCESS_BOUND
+        if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+            throw(std::out_of_range("Try to access value out of bounds! "
+                        + name() + " [IndicatorImp::get]"));
+            return Null<price_t>();
+        }
+#endif
         return (*m_pBuffer[num])[pos];
     }
 
@@ -63,7 +94,7 @@ public:
     PriceList getResultAsPriceList(size_t result_num);
 
     /** 以Indicator的方式获取指定的输出集，该方式包含了discard的信息 */
-    Indicator getResult(size_t result_num);
+    IndicatorImpPtr getResult(size_t result_num);
 
     /**
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
@@ -74,6 +105,7 @@ public:
         if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
             throw(std::out_of_range("Try to access value out of bounds! "
                         + name() + " [IndicatorImp::_set]"));
+            return;
         }
         (*m_pBuffer[num])[pos] = val;
 #else
@@ -95,23 +127,60 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
-    void calculate(const Indicator& data);
+    string formula() const;
+
+    bool isLeaf() const { 
+        return m_optype == LEAF ? true : false; 
+    }
+
+    Indicator calculate();
+
+    void setContext(const Stock&, const KQuery&);
+
+    KData getCurrentKData();
+
+    void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
+
+    IndicatorImpPtr clone();
 
     // ===================
     //  子类接口
     // ===================
-    virtual bool check() { return false;}
+    virtual bool check() { return true; }
 
-    virtual void _calculate(const Indicator& data) {}
+    virtual void _calculate(const Indicator&) {}
 
-    typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
-    virtual IndicatorImpPtr operator()(const Indicator& ind);
+    virtual IndicatorImpPtr _clone() { return make_shared<IndicatorImp>(); }
+
+    virtual bool isNeedContext() const { return false; }
+
+private:
+    void initContext();
+    IndicatorImpPtr getSameNameNeedContextLeaf(const string& name);
+    void execute_two();
+    void execute_add();
+    void execute_sub();
+    void execute_mul();
+    void execute_div();
+    void execute_eq();
+    void execute_ne();
+    void execute_gt();
+    void execute_lt();
+    void execute_ge();
+    void execute_le();
+    void execute_and();
+    void execute_or();
 
 protected:
     string m_name;
     size_t m_discard;
     size_t m_result_num;
     PriceList *m_pBuffer[MAX_RESULT_NUM];
+
+    bool m_need_calculate;
+    OPType m_optype;
+    IndicatorImpPtr m_left;
+    IndicatorImpPtr m_right;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -124,6 +193,10 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
+        ar & BOOST_SERIALIZATION_NVP(m_need_calculate);
+        ar & BOOST_SERIALIZATION_NVP(m_optype);
+        ar & BOOST_SERIALIZATION_NVP(m_left);
+        ar & BOOST_SERIALIZATION_NVP(m_right);
         size_t act_result_num = 0;
         size_t i = 0;
         while (i < m_result_num) {
@@ -136,7 +209,7 @@ private:
             std::stringstream buf;
             buf << "result_" << i;
             ar & bs::make_nvp<PriceList>(buf.str().c_str(), *m_pBuffer[i]);
-        }
+        }        
     }
 
     template<class Archive>
@@ -146,6 +219,10 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
+        ar & BOOST_SERIALIZATION_NVP(m_need_calculate);
+        ar & BOOST_SERIALIZATION_NVP(m_optype);
+        ar & BOOST_SERIALIZATION_NVP(m_left);
+        ar & BOOST_SERIALIZATION_NVP(m_right);
         size_t act_result_num = 0;
         ar & BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
@@ -178,13 +255,10 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
 #define INDICATOR_IMP(classname) public: \
     virtual bool check(); \
     virtual void _calculate(const Indicator& data); \
-    virtual IndicatorImpPtr operator()(const Indicator& ind) { \
-        IndicatorImpPtr p = make_shared<classname>(); \
-        p->setParameter(m_params); \
-        p->calculate(ind); \
-        return p; \
-    }
+    virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } 
 
+#define INDICATOR_IMP_NEED_CONTEXT(classname) public: \
+    virtual bool isNeedContext() const { return true; }
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 

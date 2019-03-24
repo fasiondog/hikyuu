@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     result = SAFTYLOSS(CLOSE(kdata), 2, 1);
     BOOST_CHECK(result.empty() == true);
     BOOST_CHECK(result.size() == 0);
-    BOOST_CHECK(result.discard() == 1);
+    BOOST_CHECK(result.discard() == 0);
 
     /** @arg 参数n1、n2非法 */
     query = KQuery(0, 20);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     result = SAFTYLOSS(close, 1, 1);
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
-    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result.discard() == close.size());
     for (size_t i = 0; i < result.size(); ++i) {
         BOOST_CHECK(result[i] == Null<price_t>());
     }
@@ -53,12 +53,12 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     result = SAFTYLOSS(close, 0, 0);
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
-    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result.discard() == close.size());
 
     result = SAFTYLOSS(close, 2, 0);
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
-    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result.discard() == close.size());
 
     /** @arg 正常参数 */
     result = SAFTYLOSS(close, 2, 1, 1.0);

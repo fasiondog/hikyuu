@@ -23,7 +23,7 @@ namespace hku {
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Flex(const Operand& op, int slow_n,
+SignalPtr HKU_API SG_Flex(const Indicator& op, int slow_n,
         const string& kpart="CLOSE");
 
 } /* namespace hku */

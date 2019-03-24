@@ -15,7 +15,6 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/indicator/crt/MA.h>
 
 using namespace hku;
 
@@ -88,6 +87,7 @@ BOOST_AUTO_TEST_CASE( test_PRICELIST ) {
     KQuery query(0, 30);
     KData kdata = stock.getKData(query);
     Indicator ikdata = KDATA(kdata);
+    BOOST_CHECK(ikdata.size() == 30);
     result = PRICELIST(ikdata);
     BOOST_CHECK(result.size() == ikdata.size());
     BOOST_CHECK(result.discard() == ikdata.discard());

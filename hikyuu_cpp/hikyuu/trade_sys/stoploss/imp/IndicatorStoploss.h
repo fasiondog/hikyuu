@@ -8,7 +8,7 @@
 #ifndef INDICATORSTOPLOSS_H_
 #define INDICATORSTOPLOSS_H_
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../StoplossBase.h"
 
 namespace hku {
@@ -16,7 +16,7 @@ namespace hku {
 class IndicatorStoploss: public StoplossBase {
 public:
     IndicatorStoploss(); //仅用于序列化默认构造函数
-    IndicatorStoploss(const Operand& op,
+    IndicatorStoploss(const Indicator& op,
                       const string& kdata_part);
     virtual ~IndicatorStoploss();
 
@@ -26,7 +26,7 @@ public:
     virtual void _calculate();
 
 private:
-    Operand m_op;
+    Indicator m_op;
     map<Datetime, price_t> m_result;
 
 //========================================

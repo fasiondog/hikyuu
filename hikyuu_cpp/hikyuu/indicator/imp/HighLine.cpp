@@ -34,6 +34,10 @@ void HighLine::_calculate(const Indicator& data) {
     int n = getParam<int>("n");
 
     m_discard = data.discard() + n - 1;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     size_t pos = m_discard + 1 - n;
     price_t max = 0;
@@ -63,10 +67,7 @@ Indicator HKU_API HHV(int n =20) {
 }
 
 Indicator HKU_API HHV(const Indicator& ind, int n =20) {
-    IndicatorImpPtr p = make_shared<HighLine>();
-    p->setParam<int>("n", n);
-    p->calculate(ind);
-    return Indicator(p);
+    return HHV(n)(ind);
 }
 
 } /* namespace hku */

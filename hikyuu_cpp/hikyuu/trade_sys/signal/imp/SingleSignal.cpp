@@ -18,7 +18,7 @@ SingleSignal::SingleSignal(): SignalBase("SG_Single") {
     setParam<string>("kpart", "CLOSE");
 }
 
-SingleSignal::SingleSignal(const Operand& ind)
+SingleSignal::SingleSignal(const Indicator& ind)
 : SignalBase("SG_Single"), m_ind(ind) {
     setParam<int>("filter_n", 10);
     setParam<double>("filter_p", 0.1);
@@ -62,7 +62,7 @@ void SingleSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Single(const Operand& ind,
+SignalPtr HKU_API SG_Single(const Indicator& ind,
         int filter_n, double filter_p, const string& kpart) {
     SingleSignal *p = new SingleSignal(ind);
     p->setParam<int>("filter_n", filter_n);

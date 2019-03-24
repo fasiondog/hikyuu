@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_SIGNAL_CRT_SG_CROSS_H_
 #define TRADE_SYS_SIGNAL_CRT_SG_CROSS_H_
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../SignalBase.h"
 
 namespace hku {
@@ -21,8 +21,8 @@ namespace hku {
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Cross(const Operand& fast,
-        const Operand& slow, const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Cross(const Indicator& fast,
+        const Indicator& slow, const string& kpart = "CLOSE");
 
 } /* namespace hku */
 

@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_ENVIRONMENT_CRT_EV_TWOLINE_H_
 #define TRADE_SYS_ENVIRONMENT_CRT_EV_TWOLINE_H_
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../EnvironmentBase.h"
 
 namespace hku {
@@ -20,7 +20,7 @@ namespace hku {
  * @param market 市场名称，默认为"SH"
  * @return
  */
-EVPtr HKU_API EV_TwoLine(const Operand& fast, const Operand& slow,
+EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow,
         const string& market);
 
 } /* namespace hku */

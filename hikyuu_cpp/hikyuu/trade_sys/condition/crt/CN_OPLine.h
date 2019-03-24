@@ -9,7 +9,7 @@
 #define TRADE_SYS_CONDITION_CRT_CN_OPLINE_H_
 
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../ConditionBase.h"
 
 namespace hku {
@@ -19,7 +19,7 @@ namespace hku {
  * @param op
  * @return
  */
-CNPtr HKU_API CN_OPLine(const Operand& op);
+CNPtr HKU_API CN_OPLine(const Indicator& op);
 
 } /* namespace hku */
 

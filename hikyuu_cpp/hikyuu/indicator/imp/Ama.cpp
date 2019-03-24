@@ -38,12 +38,16 @@ bool Ama::check() {
 
 void Ama::_calculate(const Indicator& data) {
     size_t total = data.size();
+    m_discard = data.discard();
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     int n = getParam<int>("n");
     int fast_n = getParam<int>("fast_n");
     int slow_n = getParam<int>("slow_n");
 
-    m_discard = data.discard();
     size_t start = m_discard;
 
     price_t fastest = 2.0 / (fast_n + 1);
@@ -89,14 +93,9 @@ Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
     return Indicator(p);
 }
 
-Indicator HKU_API AMA(const Indicator& indicator,
+Indicator HKU_API AMA(const Indicator& ind,
         int n, int fast_n, int slow_n) {
-    IndicatorImpPtr p = make_shared<Ama>();
-    p->setParam<int>("n", n);
-    p->setParam<int>("fast_n", fast_n);
-    p->setParam<int>("slow_n", slow_n);
-    p->calculate(indicator);
-    return Indicator(p);
+    return AMA(n, fast_n, slow_n)(ind);
 }
 
 } /* namespace hku */

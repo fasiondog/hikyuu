@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_SIGNAL_IMP_SINGLESIGNAL_H_
 #define TRADE_SYS_SIGNAL_IMP_SINGLESIGNAL_H_
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../SignalBase.h"
 
 namespace hku {
@@ -16,14 +16,14 @@ namespace hku {
 class SingleSignal: public SignalBase {
 public:
     SingleSignal();
-    SingleSignal(const Operand& ind);
+    SingleSignal(const Indicator& ind);
     virtual ~SingleSignal();
 
     virtual SignalPtr _clone();
     virtual void _calculate();
 
 private:
-    Operand m_ind;
+    Indicator m_ind;
 
     //============================================
     // 序列化支持

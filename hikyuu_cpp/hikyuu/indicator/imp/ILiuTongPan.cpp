@@ -18,7 +18,21 @@ ILiuTongPan::~ILiuTongPan() {
 }
 
 ILiuTongPan::ILiuTongPan(const KData& k) : IndicatorImp("LIUTONGPAN", 1) {
+    setParam<KData>("kdata", k);
+    _calculate(Indicator());
+}
+
+bool ILiuTongPan::check() {
+    return true;
+}
+
+void ILiuTongPan::_calculate(const Indicator& data) {
+    KData k = getCurrentKData();
     size_t total = k.size();
+    if (total == 0) {
+        return;
+    }
+    
     _readyBuffer(total, 1);
 
     if (total == 0) {
@@ -52,14 +66,9 @@ ILiuTongPan::ILiuTongPan(const KData& k) : IndicatorImp("LIUTONGPAN", 1) {
     }
 }
 
-bool ILiuTongPan::check() {
-    return true;
+Indicator HKU_API LIUTONGPAN() {
+    return Indicator(make_shared<ILiuTongPan>());
 }
-
-void ILiuTongPan::_calculate(const Indicator& data) {
-    _readyBuffer(data.size(), 1);
-}
-
 
 Indicator HKU_API LIUTONGPAN(const KData& k) {
     return Indicator(make_shared<ILiuTongPan>(k));

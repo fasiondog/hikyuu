@@ -28,14 +28,13 @@ bool Atr::check() {
 
 void Atr::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
-
-    int n = getParam<int>("n");
-
     m_discard = indicator.discard();
-    if (total <= m_discard) {
+    if (m_discard >= total) {
+        m_discard = total;
         return;
     }
 
+    int n = getParam<int>("n");
     size_t startPos = discard();
     price_t ema = indicator[startPos];
     _set(ema, startPos);
@@ -54,10 +53,7 @@ Indicator HKU_API ATR(int n) {
 }
 
 Indicator HKU_API ATR(const Indicator& data, int n) {
-    IndicatorImpPtr p = make_shared<Atr>();
-    p->setParam<int>("n", n);
-    p->calculate(data);
-    return Indicator(p);
+    return ATR(n)(data);
 }
 
 } /* namespace hku */

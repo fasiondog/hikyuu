@@ -14,8 +14,8 @@ BoolSignal::BoolSignal() : SignalBase("SG_Bool") {
     setParam<string>("kpart", "CLOSE");
 }
 
-BoolSignal::BoolSignal(const Operand& buy,
-        const Operand& sell,
+BoolSignal::BoolSignal(const Indicator& buy,
+        const Indicator& sell,
         const string& kpart)
 : SignalBase("SG_Bool"), m_bool_buy(buy), m_bool_sell(sell) {
     setParam<string>("kpart", "CLOSE");
@@ -52,8 +52,8 @@ void BoolSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Bool(const Operand& buy,
-        const Operand& sell, const string& kpart = "CLOSE") {
+SignalPtr HKU_API SG_Bool(const Indicator& buy,
+        const Indicator& sell, const string& kpart = "CLOSE") {
     return SignalPtr(new BoolSignal(buy, sell, kpart));
 }
 

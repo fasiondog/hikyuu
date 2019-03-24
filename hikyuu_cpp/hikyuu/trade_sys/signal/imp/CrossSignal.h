@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_SIGNAL_IMP_CROSSSIGNAL_H_
 #define TRADE_SYS_SIGNAL_IMP_CROSSSIGNAL_H_
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../SignalBase.h"
 
 namespace hku {
@@ -16,15 +16,15 @@ namespace hku {
 class CrossSignal: public SignalBase {
 public:
     CrossSignal();
-    CrossSignal(const Operand& fast, const Operand& slow, const string& kpart);
+    CrossSignal(const Indicator& fast, const Indicator& slow, const string& kpart);
     virtual ~CrossSignal();
 
     virtual SignalPtr _clone();
     virtual void _calculate();
 
 private:
-    Operand m_fast;
-    Operand m_slow;
+    Indicator m_fast;
+    Indicator m_slow;
 
 //============================================
 // 序列化支持

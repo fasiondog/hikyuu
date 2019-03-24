@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_base) {
 
     //构建系统部件
     TMPtr tm = crtTM(init_date, init_cash, costfunc, "TEST_TM");
-    SGPtr sg = SG_Cross(OP(MA(5)), OP(MA(10)), "CLOSE");
+    SGPtr sg = SG_Cross(MA(5), MA(10), "CLOSE");
     MMPtr mm = MM_FixedCount(100);
     SYSPtr sys;
 

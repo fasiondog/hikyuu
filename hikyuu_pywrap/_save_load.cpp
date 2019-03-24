@@ -15,7 +15,6 @@
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/trade_manage/TradeManager.h>
 #include <hikyuu/indicator/Indicator.h>
-#include <hikyuu/indicator/Operand.h>
 #include <hikyuu/trade_sys/all.h>
 
 #include <hikyuu/serialization/all.h>
@@ -48,7 +47,6 @@ void registerSupportClass() {
     g_support_class_dict[typeid(StockWeightList).hash_code()] = "StockWeightList";
     g_support_class_dict[typeid(Parameter).hash_code()] = "Parameter";
     g_support_class_dict[typeid(Indicator).hash_code()] = "Indicator";
-    g_support_class_dict[typeid(Operand).hash_code()] = "Operand";
 
     g_support_class_dict[typeid(BorrowRecord).hash_code()] = "BorrowRecord";
     g_support_class_dict[typeid(CostRecord).hash_code()] = "CostRecord";
@@ -183,9 +181,6 @@ void export_save_load() {
 
     def("hku_save", xml_save<Indicator>);
     def("hku_load", xml_load<Indicator>);
-
-    def("hku_save", xml_save<Operand>);
-    def("hku_load", xml_load<Operand>);
 
     def("hku_save", xml_save<BorrowRecord>);
     def("hku_load", xml_load<BorrowRecord>);

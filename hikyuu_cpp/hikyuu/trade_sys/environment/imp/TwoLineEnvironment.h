@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_ENVIRONMENT_IMP_TWOLINEENVIRONMENT_H_
 #define TRADE_SYS_ENVIRONMENT_IMP_TWOLINEENVIRONMENT_H_
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../EnvironmentBase.h"
 
 namespace hku {
@@ -16,15 +16,15 @@ namespace hku {
 class TwoLineEnvironment: public EnvironmentBase {
 public:
     TwoLineEnvironment();
-    TwoLineEnvironment(const Operand& fast, const Operand& slow);
+    TwoLineEnvironment(const Indicator& fast, const Indicator& slow);
     virtual ~TwoLineEnvironment();
 
     virtual void _calculate();
     virtual EnvironmentPtr _clone();
 
 private:
-    Operand m_fast;
-    Operand m_slow;
+    Indicator m_fast;
+    Indicator m_slow;
 
 //============================================
 // 序列化支持

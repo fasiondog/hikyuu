@@ -9,14 +9,14 @@
 #define TRADE_SYS_CONDITION_IMP_OPLINECONDITION_H_
 
 #include "../ConditionBase.h"
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 
 namespace hku {
 
 class OPLineCondition: public ConditionBase {
 public:
     OPLineCondition();
-    OPLineCondition(const Operand&);
+    OPLineCondition(const Indicator&);
     virtual ~OPLineCondition();
 
     virtual void _calculate();
@@ -24,7 +24,7 @@ public:
     virtual ConditionPtr _clone();
 
 private:
-    Operand m_op;
+    Indicator m_op;
 
 //============================================
 // 序列化支持

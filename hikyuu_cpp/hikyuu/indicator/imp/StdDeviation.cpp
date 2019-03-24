@@ -34,6 +34,10 @@ void StdDeviation::_calculate(const Indicator& data) {
     int n = getParam<int>("n");
 
     m_discard = data.discard() + n - 1;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     Indicator ma = MA(data, n);
     size_t N = n - 1;
@@ -55,10 +59,7 @@ Indicator HKU_API STDEV(int n) {
 }
 
 Indicator HKU_API STDEV(const Indicator& data, int n) {
-    IndicatorImpPtr p = make_shared<StdDeviation>();
-    p->setParam<int>("n", n);
-    p->calculate(data);
-    return Indicator(p);
+    return STDEV(n)(data);
 }
 
 } /* namespace hku */

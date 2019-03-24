@@ -20,11 +20,12 @@ namespace hku {
  */
 class Vigor: public IndicatorImp {
     INDICATOR_IMP(Vigor)
+    INDICATOR_IMP_NEED_CONTEXT(Vigor)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     Vigor();
-    Vigor(const KData& kdata, int n);
+    Vigor(int n);
     virtual ~Vigor();
 };
 

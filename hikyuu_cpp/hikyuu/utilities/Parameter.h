@@ -186,6 +186,10 @@ private:
                 type = "kdata";
                 value = "kdata";
                 kdata = boost::any_cast<KData>(arg);
+            } else if (arg.type() == typeid(PriceList)) {
+                type = "PriceList";
+                value = "price_list";
+                price_list = boost::any_cast<PriceList>(arg);
             } else {
                 type = "Unknown";
                 value = "Unknown";
@@ -198,6 +202,7 @@ private:
         Stock  stock;
         KQuery query;
         KData  kdata;
+        PriceList price_list;
 
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version) {
@@ -207,6 +212,7 @@ private:
             ar & BOOST_SERIALIZATION_NVP(stock);
             ar & BOOST_SERIALIZATION_NVP(query);
             ar & BOOST_SERIALIZATION_NVP(kdata);
+            ar & BOOST_SERIALIZATION_NVP(price_list);
         }
     };
 
@@ -245,6 +251,8 @@ private:
                 m_params[record.name] = record.query;
             } else if (record.type == "kdata") {
                 m_params[record.name] = record.kdata;
+            } else if (record.type == "PriceList") {
+                m_params[record.name] = record.price_list;
             } else {
                 std::cout << "Unknown type! [Parameter::load]" << std::endl;
             }

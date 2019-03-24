@@ -14,8 +14,8 @@ CrossSignal::CrossSignal() : SignalBase("SG_Cross") {
     setParam<string>("kpart", "CLOSE");
 }
 
-CrossSignal::CrossSignal(const Operand& fast,
-        const Operand& slow,
+CrossSignal::CrossSignal(const Indicator& fast,
+        const Indicator& slow,
         const string& kpart)
 : SignalBase("SG_Cross"), m_fast(fast), m_slow(slow) {
     setParam<string>("kpart", kpart);
@@ -57,8 +57,8 @@ void CrossSignal::_calculate() {
 }
 
 
-SignalPtr HKU_API SG_Cross(const Operand& fast,
-        const Operand& slow, const string& kpart) {
+SignalPtr HKU_API SG_Cross(const Indicator& fast,
+        const Indicator& slow, const string& kpart) {
     return SignalPtr(new CrossSignal(fast, slow, kpart));
 }
 

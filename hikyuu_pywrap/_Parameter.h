@@ -90,6 +90,15 @@ struct AnyToPython{
             object* o = new object(eval(cmd.str().c_str()));
             return o->ptr();
 
+        } else if (x.type() == typeid(PriceList)) {
+            const PriceList& price_list = boost::any_cast<PriceList>(x);
+            boost::python::list* o = new boost::python::list();
+            for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
+                o->append(*iter);
+            }
+            //object* o = new object(eval(cmd.c_str()));
+            return o->ptr();
+
         } else {
             HKU_ERROR("convert failed! Unkown type! Will return None!"
                     " [AnyToPython::convert]");
@@ -150,6 +159,12 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         extract<KData> x7(o);
         if (x7.check()) {
             m_params[name] = x7();
+            return;
+        }
+
+        extract<PriceList> x8(o);
+        if (x8.check()) {
+            m_params[name] = x8();
             return;
         }
 
@@ -219,9 +234,19 @@ inline void Parameter::set<object>(const string& name, const object& o) {
     }
 
     if (m_params[name].type() == typeid(KData)) {
-        extract<KData> x6(o);
-        if (x6.check()) {
-            m_params[name] = x6();
+        extract<KData> x7(o);
+        if (x7.check()) {
+            m_params[name] = x7();
+            return;
+        }
+        throw std::logic_error(mismatch);
+        return;
+    }
+
+    if (m_params[name].type() == typeid(PriceList)) {
+        extract<KData> x8(o);
+        if (x8.check()) {
+            m_params[name] = x8();
             return;
         }
         throw std::logic_error(mismatch);

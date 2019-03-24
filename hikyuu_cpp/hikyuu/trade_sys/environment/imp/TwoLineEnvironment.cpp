@@ -16,7 +16,7 @@ TwoLineEnvironment::TwoLineEnvironment()
     setParam<string>("market", "SH");
 }
 
-TwoLineEnvironment::TwoLineEnvironment(const Operand& fast, const Operand& slow)
+TwoLineEnvironment::TwoLineEnvironment(const Indicator& fast, const Indicator& slow)
 : EnvironmentBase("TwoLine"), m_fast(fast), m_slow(slow) {
     setParam<string>("market", "SH");
 }
@@ -55,7 +55,7 @@ void TwoLineEnvironment::_calculate() {
     }
 }
 
-EVPtr HKU_API EV_TwoLine(const Operand& fast, const Operand& slow,
+EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow,
         const string& market) {
     TwoLineEnvironment *ptr = new TwoLineEnvironment(fast, slow);
     ptr->setParam<string>("market", market);

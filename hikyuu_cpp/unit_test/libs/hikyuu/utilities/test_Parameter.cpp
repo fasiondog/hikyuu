@@ -107,6 +107,19 @@ BOOST_AUTO_TEST_CASE( test_Parameter ) {
     BOOST_CHECK(k.size() == k2.size());
     BOOST_CHECK(k.getStock() == k2.getStock());
     BOOST_CHECK(k.getQuery() == k2.getQuery());
+
+    /** @arg 测试使用 PriceList 做为参数 */
+    PriceList x;
+    for (int i = 0; i < 10; i++) {
+        x.push_back(i);
+    }
+    p = Parameter();
+    p.set<PriceList>("x", x);
+    PriceList x2 = p.get<PriceList>("x");
+    BOOST_CHECK(x.size() == x2.size());
+    for (int i = 0; i < 10; i++) {
+        BOOST_CHECK(x[i] == x2[i]);
+    }
 }
 
 
@@ -127,6 +140,13 @@ BOOST_AUTO_TEST_CASE( test_Parameter_serialize ) {
     p1.set<Stock>("stk", stk);
     p1.set<KQuery>("query", q);
     p1.set<KData>("kdata", k);
+
+    PriceList x;
+    for (int i = 0; i < 10; i++) {
+        x.push_back(i);
+    }
+    p1.set<PriceList>("x", x);
+
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -150,6 +170,11 @@ BOOST_AUTO_TEST_CASE( test_Parameter_serialize ) {
     BOOST_CHECK(k.size() == k2.size());
     BOOST_CHECK(k.getStock() == k2.getStock());
     BOOST_CHECK(k.getQuery() == k2.getQuery());
+    PriceList x2 = p2.get<PriceList>("x");
+    BOOST_CHECK(x.size() == x2.size());
+    for (int i = 0; i < 10; i++) {
+        BOOST_CHECK(x[i] == x2[i]);
+    }
 }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 

@@ -19,7 +19,7 @@ OPLineCondition::OPLineCondition()
 
 }
 
-OPLineCondition::OPLineCondition(const Operand& op)
+OPLineCondition::OPLineCondition(const Indicator& op)
 : ConditionBase("OPLine"), m_op(op) {
 
 }
@@ -68,7 +68,7 @@ void OPLineCondition::_calculate() {
 }
 
 
-CNPtr HKU_API CN_OPLine(const Operand& op) {
+CNPtr HKU_API CN_OPLine(const Indicator& op) {
     return make_shared<OPLineCondition>(op);
 }
 

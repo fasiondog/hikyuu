@@ -15,7 +15,7 @@ IndicatorStoploss::IndicatorStoploss(): StoplossBase("IndicatorStoploss") {
 }
 
 IndicatorStoploss::
-IndicatorStoploss(const Operand& op,
+IndicatorStoploss(const Indicator& op,
         const string& kdata_part)
 : StoplossBase("IndicatorStoploss"), m_op(op) {
     setParam<string>("kpart", "CLOSE");
@@ -47,7 +47,7 @@ void IndicatorStoploss::_calculate() {
     }
 }
 
-StoplossPtr HKU_API ST_Indicator(const Operand& op, const string& kpart) {
+StoplossPtr HKU_API ST_Indicator(const Indicator& op, const string& kpart) {
     return StoplossPtr(new IndicatorStoploss(op, kpart));
 }
 

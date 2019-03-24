@@ -18,7 +18,7 @@ class ConstantValue: public IndicatorImp {
 
 public:
     ConstantValue();
-    ConstantValue(double value, size_t len, size_t discard);
+    ConstantValue(double value, size_t discard);
     virtual ~ConstantValue();
 };
 

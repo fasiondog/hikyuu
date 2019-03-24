@@ -15,8 +15,8 @@ CrossGoldSignal::CrossGoldSignal(): SignalBase("SG_CrossGold") {
 }
 
 
-CrossGoldSignal::CrossGoldSignal(const Operand& fast,
-        const Operand& slow,
+CrossGoldSignal::CrossGoldSignal(const Indicator& fast,
+        const Indicator& slow,
         const string& kpart)
 : SignalBase("SG_CrossGold"), m_fast(fast), m_slow(slow) {
     setParam<string>("kpart", kpart);
@@ -64,8 +64,8 @@ void CrossGoldSignal::_calculate() {
 }
 
 
-SignalPtr HKU_API SG_CrossGold(const Operand& fast,
-        const Operand& slow, const string& kpart) {
+SignalPtr HKU_API SG_CrossGold(const Indicator& fast,
+        const Indicator& slow, const string& kpart) {
     return SignalPtr(new CrossGoldSignal(fast, slow, kpart));
 }
 

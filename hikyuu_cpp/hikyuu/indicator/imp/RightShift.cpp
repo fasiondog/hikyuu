@@ -33,6 +33,10 @@ void RightShift::_calculate(const Indicator& data)  {
     int n = getParam<int>("n");
 
     m_discard = data.discard() + n;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
     for (size_t i = m_discard; i < total; ++i) {
         _set(data[i-n], i);
     }
@@ -45,10 +49,7 @@ Indicator HKU_API REF(int n) {
 }
 
 Indicator HKU_API REF(const Indicator& ind, int n) {
-    IndicatorImpPtr p = make_shared<RightShift>();
-    p->setParam<int>("n", n);
-    p->calculate(ind);
-    return Indicator(p);
+    return REF(n)(ind);
 }
 
 } /* namespace hku */

@@ -37,6 +37,7 @@ BOOST_AUTO_TEST_CASE( test_operator_add ) {
     Indicator data1 = PRICELIST(d1);
     Indicator data2 = PRICELIST(d2);
     Indicator result = data1 + data2;
+
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.getResultNumber() == 1);
     BOOST_CHECK(result.discard() == 0);
@@ -44,11 +45,30 @@ BOOST_AUTO_TEST_CASE( test_operator_add ) {
         BOOST_CHECK(result[i] == i + i + 1);
     }
 
-    /** @arg 两个待加的ind的size不同 */
+    /** @arg 两个待加的ind的size不同，其中一个为0 */
     Indicator data3;
     result = data1 + data3;
     BOOST_CHECK(result.empty());
     BOOST_CHECK(result.size() == 0);
+
+    /** @arg 两个待加的ind的size不同，其中一个为0 */
+    PriceList d3;
+    for (size_t i = 0; i < 20; ++i) {
+        d3.push_back(i);
+    }
+    data3 = PRICELIST(d3);
+    result = data1 + data3;
+    BOOST_CHECK(data1.size() == 10);
+    BOOST_CHECK(data3.size() == 20);
+    BOOST_CHECK(result.empty() == false);
+    BOOST_CHECK(result.size() == 20);
+    BOOST_CHECK(result.discard() == 10);
+    for (size_t i = 0; i < result.discard(); ++i) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+    }
+    for (size_t i = result.discard(); i < 20; ++i) {
+        BOOST_CHECK(result[i] == i + i - 10);
+    }
 
     /** @arg 两个待加的ind的size相同，但result_number不同 */
     StockManager& sm = StockManager::instance();
@@ -525,6 +545,113 @@ BOOST_AUTO_TEST_CASE( test_getResult_getResultAsPriceList ) {
     BOOST_CHECK(result2[0] == 29.8);
     BOOST_CHECK(result2[1] == 28.38);
     BOOST_CHECK(result2[9] == 26.55);
+}
+
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_LOGIC_AND ) {
+    PriceList d1, d2, d3;
+    for (size_t i = 0; i < 10; ++i) {
+        d1.push_back(0);
+        d2.push_back(1);
+        d3.push_back(i);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+    Indicator data3 = PRICELIST(d3);
+
+    /** @arg ind1为全0， ind2为全1 */
+    Indicator result = data1 & data2;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }
+
+    /** @arg ind为全0， val为1 */
+    /*result = IND_AND(data1, 1.0);
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }*/
+
+    /** @arg ind1为全0， ind2为从0开始的整数 */
+    result = data1 & data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
+    }
+
+    /** @arg ind1为全1， ind2为从0开始的整数 */
+    result = data2 & data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0.0);
+    for (size_t i = 1; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg 两个ind的size不同 */
+    Indicator data4;
+    result = data1 & data4;
+    BOOST_CHECK(result.empty());
+    BOOST_CHECK(result.size() == 0);
+}
+
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_LOGIC_OR ) {
+    PriceList d1, d2, d3;
+    for (size_t i = 0; i < 10; ++i) {
+        d1.push_back(0);
+        d2.push_back(1);
+        d3.push_back(i);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+    Indicator data3 = PRICELIST(d3);
+
+    /** @arg ind1为全0， ind2为全1 */
+    Indicator result = data1 | data2;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg ind1为全0， ind2为从0开始的整数 */
+    result = data1 | data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0.0);
+    for (size_t i = 1; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg ind1为全1， ind2为从0开始的整数 */
+    result = data2 | data3;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == 1.0);
+    }
+
+    /** @arg 两个ind的size不同 */
+    Indicator data4;
+    result = data1 | data4;
+    BOOST_CHECK(result.empty());
+    BOOST_CHECK(result.size() == 0);
 }
 
 /** @} */

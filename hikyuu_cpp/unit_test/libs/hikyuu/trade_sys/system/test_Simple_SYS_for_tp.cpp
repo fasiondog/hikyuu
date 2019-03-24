@@ -51,10 +51,10 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_tp) {
 
     //构建系统部件
     TMPtr tm = crtTM(init_date, init_cash, costfunc, "TEST_TM");
-    SGPtr sg = SG_Cross(OP(MA(5)), OP(MA(10)), "CLOSE");
+    SGPtr sg = SG_Cross(MA(5), MA(10), "CLOSE");
     MMPtr mm = MM_FixedCount(100);
     STPtr st = ST_FixedPercent(0.01);
-    TPPtr tp = ST_Indicator(OP(MA(5)), "CLOSE");
+    TPPtr tp = ST_Indicator(MA(5), "CLOSE");
     SYSPtr sys;
 
     /** @arg 指定了TM、SG、MM、ST、TP，但未指定其他策略组件，非延迟操作 */

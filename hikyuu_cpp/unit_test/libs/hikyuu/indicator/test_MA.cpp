@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( test_MA ) {
     ma = MA(open, 0);
     BOOST_CHECK(ma.empty() == false);
     BOOST_CHECK(ma.size() == kdata.size());
-    BOOST_CHECK(ma.discard() == 0);
+    BOOST_CHECK(ma.discard() == kdata.size());
     for (size_t i = 0; i < kdata.size(); ++i) {
         BOOST_CHECK(ma[i] == Null<price_t>());
     }

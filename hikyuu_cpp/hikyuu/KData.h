@@ -12,6 +12,8 @@
 
 namespace hku {
 
+class HKU_API Indicator;
+
 /**
  * K线数据
  * @ingroup StockManage
@@ -66,6 +68,8 @@ public:
     void tocsv(const string& filename);
 
     string toString() const;
+
+    Indicator close() const;
 
 private:
     KDataImpPtr m_imp;

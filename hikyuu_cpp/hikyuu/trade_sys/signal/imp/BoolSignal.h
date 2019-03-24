@@ -8,7 +8,7 @@
 #ifndef TRADE_SYS_SIGNAL_IMP_BOOLSIGNAL_H_
 #define TRADE_SYS_SIGNAL_IMP_BOOLSIGNAL_H_
 
-#include "../../../indicator/Operand.h"
+#include "../../../indicator/Indicator.h"
 #include "../SignalBase.h"
 
 namespace hku {
@@ -16,15 +16,15 @@ namespace hku {
 class BoolSignal: public SignalBase {
 public:
     BoolSignal();
-    BoolSignal(const Operand& buy, const Operand& sell, const string& kpart);
+    BoolSignal(const Indicator& buy, const Indicator& sell, const string& kpart);
     virtual ~BoolSignal();
 
     virtual SignalPtr _clone();
     virtual void _calculate();
 
 private:
-    Operand m_bool_buy;
-    Operand m_bool_sell;
+    Indicator m_bool_buy;
+    Indicator m_bool_sell;
 
 //============================================
 // 序列化支持

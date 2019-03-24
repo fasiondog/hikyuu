@@ -12,6 +12,10 @@
 
 namespace hku {
 
+Indicator HKU_API HSL() {
+    return VOL() / LIUTONGPAN();
+}
+
 Indicator HKU_API HSL(const KData& k) {
     return VOL(k) / LIUTONGPAN(k);
 }

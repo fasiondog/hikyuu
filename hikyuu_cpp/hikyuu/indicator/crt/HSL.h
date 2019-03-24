@@ -12,6 +12,7 @@
 
 namespace hku {
 
+Indicator HKU_API HSL();
 Indicator HKU_API HSL(const KData&);
 
 }

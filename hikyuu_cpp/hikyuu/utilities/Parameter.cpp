@@ -45,6 +45,9 @@ HKU_API std::ostream& operator <<(std::ostream &os, const Parameter& param) {
             } else {
                 os << stk.market_code() << strip;
             }
+        } else if (iter->second.type() == typeid(PriceList)) {
+            os << "(PriceList): "
+               << boost::any_cast<PriceList>(iter->second).size() << strip;
         } else {
             os << "Unsupported" << strip;
         }
@@ -86,7 +89,8 @@ bool Parameter::support(const boost::any& value) {
             || value.type() == typeid(string)
             || value.type() == typeid(Stock)
             || value.type() == typeid(KQuery)
-            || value.type() == typeid(KData)) {
+            || value.type() == typeid(KData)
+            || value.type() == typeid(PriceList)) {
         return true;
     }
 
@@ -122,13 +126,15 @@ string Parameter::getValueList() const {
         } else if (iter->second.type() == typeid(KQuery)) {
             os << boost::any_cast<KQuery>(iter->second);
         } else if (iter->second.type() == typeid(KData)) {
-            os << boost::any_cast<KData>(iter->second);
+        //    os << boost::any_cast<KData>(iter->second);
+        } else if (iter->second.type() == typeid(PriceList)) {
+            os << "PriceList(...)";
         } else {
             os << "Unsupported";
         }
 
         next_iter++;
-        if (next_iter != m_params.end()) {
+        if (next_iter != m_params.end() && iter->second.type() != typeid(KData)) {
             os << ",";
         }
     }
@@ -155,20 +161,23 @@ string Parameter::getNameValueList() const {
             os << "\"" << iter->first << "\"" << equal
                << boost::any_cast<string>(iter->second);
         } else if (iter->second.type() == typeid(Stock)) {
-            os << "\"" << iter->first << "\"" << equal
+            os << iter->first << equal
                << boost::any_cast<Stock>(iter->second);
         } else if (iter->second.type() == typeid(KQuery)) {
-            os << "\"" << iter->first << "\"" << equal
+            os << iter->first << equal
                << boost::any_cast<KQuery>(iter->second);
         } else if (iter->second.type() == typeid(KData)) {
-            os << "\"" << iter->first << "\"" << equal
-               << boost::any_cast<KData>(iter->second);
+        //    os << iter->first << equal
+        //       << boost::any_cast<KData>(iter->second);
+        } else if (iter->second.type() == typeid(PriceList)) {
+            os << iter->first << equal
+               << "PriceList(...)";
         } else {
             os << "Unsupported";
         }
 
         next_iter++;
-        if (next_iter != m_params.end()) {
+        if (next_iter != m_params.end() && iter->second.type() != typeid(KData)) {
             os << ",";
         }
     }

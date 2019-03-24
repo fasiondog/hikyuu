@@ -26,6 +26,7 @@ void Diff::_calculate(const Indicator& data) {
 
     m_discard = data.discard() + 1;
     if (total <= m_discard) {
+        m_discard = total;
         return;
     }
 
@@ -36,13 +37,11 @@ void Diff::_calculate(const Indicator& data) {
 
 
 Indicator HKU_API DIFF() {
-    return Indicator(IndicatorImpPtr(new Diff()));
+    return Indicator(make_shared<Diff>());
 }
 
 Indicator HKU_API DIFF(const Indicator& data) {
-    IndicatorImpPtr p = make_shared<Diff>();
-    p->calculate(data);
-    return Indicator(p);
+    return DIFF()(data);
 }
 
 } /* namespace hku */

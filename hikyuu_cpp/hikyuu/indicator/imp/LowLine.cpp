@@ -34,6 +34,10 @@ void LowLine::_calculate(const Indicator& data) {
     int n = getParam<int>("n");
 
     m_discard = data.discard() + n - 1;
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
 
     size_t pos = m_discard + 1 - n;
     price_t min = 0;
@@ -61,10 +65,7 @@ Indicator HKU_API LLV(int n =20) {
 }
 
 Indicator HKU_API LLV(const Indicator& ind, int n =20) {
-    IndicatorImpPtr p = make_shared<LowLine>();
-    p->setParam<int>("n", n);
-    p->calculate(ind);
-    return Indicator(p);
+    return LLV(n)(ind);
 }
 
 } /* namespace hku */
