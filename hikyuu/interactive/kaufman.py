@@ -171,9 +171,9 @@ def draw2(block, query = Query(-130),
     a.name = "POS(30)"
     a.plot(axes=ax2, color='g', marker='.', legend_on=True)
     
-    total = len(kdata)
-    CVAL(0.8, total).plot(axes=ax2,color='r',linestyle='--')
-    CVAL(0.2, total).plot(axes=ax2,color='r',linestyle='--')
+    c = CLOSE(kdata)
+    CVAL(c, 0.8).plot(axes=ax2,color='r',linestyle='--')
+    CVAL(c, 0.2).plot(axes=ax2,color='r',linestyle='--')
     #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
     #ax2.hlines(0.2,0,len(kdata),color='r',linestyle='--')
     
@@ -182,10 +182,10 @@ def draw2(block, query = Query(-130),
         label = "ER(%s)" % cer[-1]
         cer.plot(axes=ax3, color='b', marker='.', label=label, 
                  legend_on=False, text_on=True)
-        CVAL(0.8, total).plot(axes=ax2,color='r',linestyle='--')
-        CVAL(-0.6, total).plot(axes=ax2,color='r',linestyle='--')
-        CVAL(-0.8, total).plot(axes=ax2,color='r',linestyle='--')
-        CVAL(0, total).plot(axes=ax2,color='k',linestyle='-')
+        CVAL(c, 0.8).plot(axes=ax2,color='r',linestyle='--')
+        CVAL(c, -0.6).plot(axes=ax2,color='r',linestyle='--')
+        CVAL(c, -0.8).plot(axes=ax2,color='r',linestyle='--')
+        CVAL(c, 0).plot(axes=ax2,color='k',linestyle='-')
         #ax3.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
         #ax3.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
         #ax3.hlines(-0.8,0,len(kdata),color='r',linestyle='--')

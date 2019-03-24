@@ -193,6 +193,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
+        ar & BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar & BOOST_SERIALIZATION_NVP(m_optype);
         ar & BOOST_SERIALIZATION_NVP(m_left);
         ar & BOOST_SERIALIZATION_NVP(m_right);
@@ -218,6 +219,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(m_params);
         ar & BOOST_SERIALIZATION_NVP(m_discard);
         ar & BOOST_SERIALIZATION_NVP(m_result_num);
+        ar & BOOST_SERIALIZATION_NVP(m_need_calculate);
         ar & BOOST_SERIALIZATION_NVP(m_optype);
         ar & BOOST_SERIALIZATION_NVP(m_left);
         ar & BOOST_SERIALIZATION_NVP(m_right);
