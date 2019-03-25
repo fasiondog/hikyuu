@@ -38,7 +38,6 @@ void ICount::_calculate(const Indicator& data) {
         return;
     }
 
-    size_t pos = m_discard + 1 - n;
     for (size_t i = m_discard; i < total; ++i) {
         int count = 0;
         for (size_t j = i + 1 - n; j <= i; ++j) {
