@@ -22,10 +22,13 @@
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
 * :py:func:`HHV` - N日内最高价
+* :py:func:`IF` - 根据条件求不同的值
 * :py:func:`LLV` - N日内最低价
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
+* :py:func:`COUNT` - 统计满足条件的周期数
+* :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 
 
 

@@ -15,8 +15,8 @@ namespace hku {
 
 /**
  * 快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
- * @param 快线指标
- * @param 慢线指标
+ * @param fast 快线指标
+ * @param slow 慢线指标
  * @param market 市场名称，默认为"SH"
  * @return
  */

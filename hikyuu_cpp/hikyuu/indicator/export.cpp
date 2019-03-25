@@ -28,6 +28,7 @@
 
 #include "imp/Ama.h"
 #include "imp/Atr.h"
+#include "imp/ICount.h"
 #include "imp/Diff.h"
 #include "imp/Ema.h"
 #include "imp/HighLine.h"
@@ -44,6 +45,7 @@
 
 BOOST_CLASS_EXPORT(hku::Ama)
 BOOST_CLASS_EXPORT(hku::Atr)
+BOOST_CLASS_EXPORT(hku::ICount)
 BOOST_CLASS_EXPORT(hku::Diff)
 BOOST_CLASS_EXPORT(hku::Ema)
 BOOST_CLASS_EXPORT(hku::HighLine)

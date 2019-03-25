@@ -58,9 +58,9 @@ LOG_LEVEL HKU_API get_log_level();
 
 /**
  * 设置日志级别
- * @param 指定的日志级别
+ * @param level 指定的日志级别
  */
-void HKU_API set_log_level(LOG_LEVEL);
+void HKU_API set_log_level(LOG_LEVEL level);
 
 
 

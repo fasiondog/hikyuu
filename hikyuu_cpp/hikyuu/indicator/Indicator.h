@@ -197,11 +197,27 @@ HKU_API Indicator operator|(const Indicator&, price_t);
 HKU_API Indicator operator|(price_t, const Indicator&);
 
 /**
- * IF 操作
- * @param 
+ * 将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2)
+ * 则此时ind包含多个结果，按ind1、ind2的顺序存放
+ * @param ind1 指标1
+ * @param ind2 指标2
  * @ingroup Indicator
  */
-Indicator HKU_API IF(const Indicator&, const Indicator&, const Indicator&);
+Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2);
+
+/**
+ * 条件函数, 根据条件求不同的值。
+ * @details
+ * <pre>
+ * 用法：IF(X,A,B)若X不为0则返回A,否则返回B
+ * 例如：IF(CLOSE>OPEN,HIGH,LOW)表示该周期收阳则返回最高值,否则返回最低值
+ * </pre>
+ * @param x 条件指标
+ * @param a 待选指标 a
+ * @param b 待选指标 b
+ * @ingroup Indicator
+ */
+Indicator HKU_API IF(const Indicator& x, const Indicator& a, const Indicator& b);
 
 } /* namespace hku */
 #endif /* INDICATOR_H_ */

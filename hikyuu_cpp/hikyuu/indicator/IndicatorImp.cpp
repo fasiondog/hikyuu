@@ -60,6 +60,7 @@ void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
     //子节点设置上下文
     if (m_left) m_left->setContext(stock, query);
     if (m_right) m_right->setContext(stock, query);
+    if (m_three) m_three->setContext(stock, query);
 
     //如果该节点依赖上下文
     if (isNeedContext()) {
@@ -267,6 +268,12 @@ string IndicatorImp::formula() const {
 
         case WEAVE:
             buf << "WEAVE(" << m_left->formula() << ", " << m_right->formula() << ")";
+
+        case IF:
+            buf << "IF(" << m_three->formula() << ", " 
+                << m_left->formula() << ", "
+                << m_right->formula() << ")";
+            break;
 
         default:
             HKU_ERROR("Wrong optype!" << m_optype << " [IndicatorImp::formula]");
@@ -962,7 +969,6 @@ void IndicatorImp::execute_if() {
         discard = maxp->discard();
     }
 
-    size_t diff = maxp->size() - minp->size();
     if (m_three->size() >= maxp->size()) {
         total = m_three->size();
         discard = total + discard - maxp->size();

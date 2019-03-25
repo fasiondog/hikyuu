@@ -27,6 +27,7 @@ hikyuu.code-workspace
 /install
 /build
 /docs/build
+/docs/notepad-workspace
 *~
 install
 .DS_Store

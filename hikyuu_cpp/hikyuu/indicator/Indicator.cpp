@@ -329,9 +329,19 @@ HKU_API Indicator operator|(price_t val, const Indicator& ind) {
     return CVAL(ind, val) | ind;
 }
 
+Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
+        HKU_ERROR("ind1 or ind2 is Null Indicator! [WEAVE]");
+        return Indicator();
+    }
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::WEAVE, ind1.getImp(), ind2.getImp());
+    return p->calculate();
+}
+
 Indicator HKU_API IF(const Indicator& ind1, 
         const Indicator& ind2, const Indicator& ind3) {
-    if (!ind1.getImp() || ind2.getImp() || ind3.getImp()) {
+    if (!ind1.getImp() || !ind2.getImp() || !ind3.getImp()) {
         HKU_ERROR("Exists null indicator! [IF]");
         return Indicator();
     }

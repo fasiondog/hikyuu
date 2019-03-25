@@ -42,19 +42,25 @@
    :rtype: Indicator
 
     
-.. py:function:: CVAL([data, value=0.0, len=0, discard=0])
+.. py:function:: COUNT([data, n=20])
 
-    CVAL(data[, value=0.0])
+    统计满足条件的周期数。
     
-        data 为 Indicator 实例，创建和 data 等长的常量指标，其值和为value，抛弃长度discard和data一样
+    用法：COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
     
-    CVAL([value=0.0, len=0, discard=0])
+    例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
     
-        按指定的长度、抛弃数量创建常量指标
+    :param Indicator data: 条件
+    :param int n: 周期
+    :rtype: Indicator
+    
+    
+.. py:function:: CVAL([data, value=0.0, discard=0])
+
+    data 为 Indicator 实例，创建和 data 等长的常量指标，其值和为value，抛弃长度discard和data一样
     
     :param Indicator data: Indicator实例
     :param float value: 常数值
-    :param int len: 长度
     :param int discard: 抛弃数量
     :rtype: Indicator
     
@@ -98,6 +104,20 @@
     获取换手率，等于 VOL(k) / CAPITAL(k)
     
     :param KData kdata: k线数据
+    :rtype: Indicator
+    
+    
+.. py:function:: IF(x, a, b)
+
+    条件函数, 根据条件求不同的值。
+    
+    用法：IF(X,A,B)若X不为0则返回A,否则返回B
+    
+    例如：IF(CLOSE>OPEN,HIGH,LOW)表示该周期收阳则返回最高值,否则返回最低值
+    
+    :param Indicator x: 条件指标
+    :param Indicator a: 待选指标 a
+    :param Indicator b: 待选指标 b
     :rtype: Indicator
     
     
@@ -246,4 +266,12 @@
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator
 
+
+.. py:function:: WEAVE(ind1, ind2)
+
+    将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
+    
+    :param Indicator ind1: 指标1
+    :param Indicator ind2: 指标2
+    :rtype: Indicator
 

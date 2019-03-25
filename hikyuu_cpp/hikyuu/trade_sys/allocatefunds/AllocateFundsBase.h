@@ -55,7 +55,7 @@ public:
 
     /**
      * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为0
-     * @param percent 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
+     * @param p 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
      */
     void setReserverPercent(double p);
 
@@ -80,7 +80,6 @@ public:
      *          系统实例及权重列表进行了截断处理
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
-     * @param hold_list 当前持仓的系统实例
      * @return
      */
 

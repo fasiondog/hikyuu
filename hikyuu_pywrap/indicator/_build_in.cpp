@@ -95,14 +95,8 @@ Indicator (*LIUTONGPAN_2)(const KData&) = LIUTONGPAN;
 Indicator (*HSL_1)() = HSL;
 Indicator (*HSL_2)(const KData&) = HSL;
 
-/*Indicator (*IND_AND1)(const Indicator&, const Indicator&) = IND_AND;
-Indicator (*IND_AND2)(const Indicator&, price_t) = IND_AND;
-Indicator (*IND_AND3)(price_t, const Indicator&) = IND_AND;
-
-Indicator (*IND_OR1)(const Indicator&, const Indicator&) = IND_OR;
-Indicator (*IND_OR2)(const Indicator&, price_t) = IND_OR;
-Indicator (*IND_OR3)(price_t, const Indicator&) = IND_OR;
-*/
+Indicator (*COUNT_1)(int) = COUNT;
+Indicator (*COUNT_2)(const Indicator&, int) = COUNT;
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -152,7 +146,7 @@ void export_Indicator_build_in() {
 
     def("VIGOR", VIGOR_1, (arg("kdata"), arg("n")=2));
     def("VIGOR", VIGOR_2, (arg("n")=2));
-    def("VIGOR", VIGOR_3, (arg("ind"), arg("n")=2));
+    def("VIGOR", VIGOR_3, (arg("data"), arg("n")=2));
 
     def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1")=10, arg("n2")=3, arg("p")=2.0));
     def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1")=10, arg("n2")=3, arg("p")=2.0));
@@ -173,23 +167,19 @@ void export_Indicator_build_in() {
     def("LLV", LLV_1, (arg("n")=20));
     def("LLV", LLV_2, (arg("data"), arg("n")=20));
 
-    def("WEAVE", WEAVE);
-
     def("CVAL", CVAL_1, (arg("value")=0.0, arg("discard")=0));
     def("CVAL", CVAL_2, (arg("data"), arg("value")=0.0, arg("discard")=0));
 
-/*    def("IND_AND", IND_AND1);
-    def("IND_AND", IND_AND2);
-    def("IND_AND", IND_AND3);
-
-    def("IND_OR", IND_OR1);
-    def("IND_OR", IND_OR2);
-    def("IND_OR", IND_OR3);
-*/
     def("LIUTONGPAN", LIUTONGPAN_1);
     def("LIUTONGPAN", LIUTONGPAN_2);
     def("HSL", HSL_1);
     def("HSL", HSL_2);
+
+    def("WEAVE", WEAVE);
+    def("IF", IF);
+
+    def("COUNT", COUNT_1, (arg("n")=20));
+    def("COUNT", COUNT_2, (arg("data"), arg("n")=20));
 
 }
 

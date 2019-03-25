@@ -39,7 +39,6 @@ public:
 
     /**
      * 加载基础信息
-     * @param params
      * @return
      */
     bool loadBaseInfo();
