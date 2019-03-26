@@ -337,20 +337,33 @@ add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
 }
 
 Indicator IndicatorImp::calculate() {
+    IndicatorImpPtr result;
     if (!check()) {
         HKU_WARN("Invalid param! " << formula() << " : " << long_name());
         if (m_right) {
             m_right->calculate();
             _readyBuffer(m_right->size(), m_result_num);
             m_discard = m_right->size();
-            return shared_from_this();
+            try {
+                result = shared_from_this();
+            } catch (...) {
+                //Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
+                result = clone();
+            }
+            return Indicator(result);
+
         } else {
             return Indicator();
         }
     }
 
     if (!m_need_calculate) {
-        return shared_from_this();
+        try {
+            result = shared_from_this();
+        } catch (...) {
+            result = clone();
+        }
+        return Indicator(result);
     }
 
     switch (m_optype) {
@@ -427,7 +440,12 @@ Indicator IndicatorImp::calculate() {
     }
 
     m_need_calculate = false;
-    return shared_from_this();
+    try {
+        result = shared_from_this();
+    } catch (...) {
+        result = clone();
+    }
+    return Indicator(result);
 }
 
 void IndicatorImp::execute_weave() {

@@ -104,6 +104,7 @@ void export_IndicatorImp() {
             .def("getResultAsPriceList", &IndicatorImp::getResultAsPriceList)
             .def("calculate", &IndicatorImp::calculate)
             .def("check", &IndicatorImp::check, &IndicatorImpWrap::default_check)
+            .def("clone", &IndicatorImp::clone)
             .def("_calculate", &IndicatorImp::_calculate, &IndicatorImpWrap::default_calculate)
             .def("__call__", &IndicatorImp::operator(), &IndicatorImpWrap::default_call)
             .def("_clone", &IndicatorImp::_clone, &IndicatorImpWrap::default_clone)

@@ -42,8 +42,9 @@ try:
             self.setParam(k, v) 
         self._tafunc = tafunc
         self._prices = prices
+        self._params = params
+        self._result_num = result_num
     
-
     def tawrap_calculate(self, ind):
         result_num = self.getResultNumber()
        
@@ -83,12 +84,12 @@ try:
         param_names = params.getNameList()
         func_params = {}
         for name in param_names:
-            func_params[name] = self.getParam(name)
+            if name != "kdata":
+                func_params[name] = self.getParam(name)
             
         self._tafunc.set_parameters(func_params)
 
         outputs = self._tafunc(inputs, prices = self._prices) if self._prices else self._tafunc(inputs)
-    
         if result_num == 1:
             for i, val in enumerate(outputs):
                 if not np.isnan(val):
@@ -102,24 +103,30 @@ try:
                         self._set(float(val), j, i)
             self.setDiscard(self._tafunc.lookback)
 
-
     def check_all_true(self):
         return True
-    
+
+    def tawrap_clone(self):
+        #x = crtTaIndicatorImp(self._tafunc, self.name, self._params, self._result_num,
+        #           self._prices, check = self.check)
+        return self
+
     def crtTaIndicatorImp(tafunc, name, params={}, result_num = 1, 
                           prices = None, check = check_all_true):
         meta_x = type(name, (IndicatorImp,), {'__init__': tawrap_init, 
                                               'check': check,
+                                              '_clone': tawrap_clone,
                                               '_calculate': tawrap_calculate
                                              })
         return meta_x(tafunc, name, params, result_num, prices)
-    
+
+
     def TA_AD(ind=None):
         imp = crtTaIndicatorImp(ta.AD, 'TA_AD', 
                                 prices = ['high', 'low', 'close', 'volume'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        #if ind is not None:
+        #    imp.calculate(ind)
+        return Indicator(imp)(ind) if ind else Indicator()
     
     TA_AD.__doc__ = talib.AD.__doc__
 
@@ -709,9 +716,9 @@ try:
         imp = crtTaIndicatorImp(ta.SMA, 'TA_SMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        #if ind is not None:
+        #    imp.calculate(ind)
+        return Indicator(imp)(ind) if ind is not None else Indicator(imp)
     
     TA_SMA.__doc__ = talib.SMA.__doc__
     
@@ -720,9 +727,9 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod,
                                         'nbdev': nbdev})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        #if ind is not None:
+        #    imp.calculate(ind)
+        return Indicator(imp)(ind) if ind is not None else Indicator()
     
     TA_STDDEV.__doc__ = talib.STDDEV.__doc__
     

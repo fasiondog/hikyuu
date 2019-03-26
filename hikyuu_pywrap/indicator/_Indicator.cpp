@@ -65,6 +65,7 @@ void export_Indicator() {
         .def("getResult", &Indicator::getResult)
         .def("getResultAsPriceList", &Indicator::getResultAsPriceList)
         .def("getCurrentKData", &Indicator::getCurrentKData)
+        .def("getImp", &Indicator::getImp)
         .def("__len__", &Indicator::size)
         .def("__call__", &Indicator::operator())
 #if HKU_PYTHON_SUPPORT_PICKLE
