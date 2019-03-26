@@ -1825,7 +1825,7 @@ PriceList TradeManager
         return result;
 
     size_t i = 0;
-    while (dates[i] < m_init_datetime && i < total) {
+    while (i < total && dates[i] < m_init_datetime) {
         result[i] = 0;
         i++;
     }

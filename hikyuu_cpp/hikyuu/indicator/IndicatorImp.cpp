@@ -350,11 +350,9 @@ Indicator IndicatorImp::calculate() {
                 //Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
                 result = clone();
             }
-            return Indicator(result);
-
-        } else {
-            return Indicator();
         }
+            
+        return Indicator(result);
     }
 
     if (!m_need_calculate) {
@@ -443,8 +441,10 @@ Indicator IndicatorImp::calculate() {
     try {
         result = shared_from_this();
     } catch (...) {
+        //Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
         result = clone();
     }
+
     return Indicator(result);
 }
 

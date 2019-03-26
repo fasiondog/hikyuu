@@ -131,7 +131,7 @@ void KDataBufferImp::_recoverForUpDay() {
         }
         KRecord record = day_list[day_pos];
         int pre_day_pos = day_pos;
-        while (day_list[day_pos].datetime <= phase_end_date && day_pos < day_total) {
+        while (day_pos < day_total && day_list[day_pos].datetime <= phase_end_date) {
             if (day_list[day_pos].lowPrice < record.lowPrice) {
                 record.lowPrice = day_list[day_pos].lowPrice;
             } else if (day_list[day_pos].highPrice > record.highPrice) {
