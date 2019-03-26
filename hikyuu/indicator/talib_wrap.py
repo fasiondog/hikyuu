@@ -107,9 +107,8 @@ try:
         return True
 
     def tawrap_clone(self):
-        #x = crtTaIndicatorImp(self._tafunc, self.name, self._params, self._result_num,
-        #           self._prices, check = self.check)
-        return self
+        return crtTaIndicatorImp(self._tafunc, self.name, self._params, self._result_num,
+                   self._prices, check = self.check)
 
     def crtTaIndicatorImp(tafunc, name, params={}, result_num = 1, 
                           prices = None, check = check_all_true):
@@ -124,9 +123,7 @@ try:
     def TA_AD(ind=None):
         imp = crtTaIndicatorImp(ta.AD, 'TA_AD', 
                                 prices = ['high', 'low', 'close', 'volume'])
-        #if ind is not None:
-        #    imp.calculate(ind)
-        return Indicator(imp)(ind) if ind else Indicator()
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_AD.__doc__ = talib.AD.__doc__
 
@@ -135,10 +132,7 @@ try:
                                 params={'fastperiod': fastperiod, 
                                         'slowperiod': slowperiod},
                                 prices = ['high', 'low', 'close', 'volume'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
-
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ADOSC.__doc__ = talib.ADOSC.__doc__
         
@@ -146,9 +140,7 @@ try:
         imp = crtTaIndicatorImp(ta.ADX, 'TA_ADX', 
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ADX.__doc__ = talib.ADX.__doc__
 
@@ -156,9 +148,7 @@ try:
         imp = crtTaIndicatorImp(ta.ADXR, 'TA_ADXR', 
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ADXR.__doc__ = talib.ADXR.__doc__
     
@@ -167,9 +157,7 @@ try:
                                 params={'fastperiod': fastperiod,
                                         'slowperiod': slowperiod,
                                         'matype': matype})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_APO.__doc__ = talib.APO.__doc__
     
@@ -178,9 +166,7 @@ try:
                                 result_num = 2,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_AROON.__doc__ = talib.AROON.__doc__
     
@@ -189,9 +175,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_AROONOSC.__doc__ = talib.AROONOSC.__doc__
     
@@ -200,9 +184,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ATR.__doc__ = talib.ATR.__doc__
     
@@ -211,9 +193,7 @@ try:
                                 result_num = 1,
                                 #params={'timeperiod': timeperiod},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_AVGPRICE.__doc__ = talib.AVGPRICE.__doc__
     
@@ -224,9 +204,7 @@ try:
                                        'nbdevup': nbdevup,
                                        'nbdevdn': nbdevdn,
                                        'matype': matype})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_BBANDS.__doc__ = talib.BBANDS.__doc__
     
@@ -234,9 +212,7 @@ try:
         imp = crtTaIndicatorImp(ta.BOP, 'TA_BOP', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_BOP.__doc__ = talib.BOP.__doc__ 
     
@@ -245,9 +221,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CCI.__doc__ = talib.CCI.__doc__
     
@@ -255,9 +229,7 @@ try:
         imp = crtTaIndicatorImp(ta.CMO, 'TA_CMO', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CMO.__doc__ = talib.CMO.__doc__
     
@@ -265,9 +237,7 @@ try:
         imp = crtTaIndicatorImp(ta.DEMA, 'TA_DEMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_DEMA.__doc__ = talib.DEMA.__doc__
     
@@ -276,9 +246,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_DX.__doc__ = talib.DX.__doc__
     
@@ -286,63 +254,49 @@ try:
         imp = crtTaIndicatorImp(ta.EMA, 'TA_EMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_EMA.__doc__ = talib.EMA.__doc__
     
     def TA_HT_DCPERIOD(ind=None):
         imp = crtTaIndicatorImp(ta.HT_DCPERIOD, 'TA_HT_DCPERIOD', 
                                 result_num = 1)
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_HT_DCPERIOD.__doc__ = talib.HT_DCPERIOD.__doc__ 
     
     def TA_HT_DCPHASE(ind=None):
         imp = crtTaIndicatorImp(ta.HT_DCPHASE, 'TA_HT_DCPHASE', 
                                 result_num = 1)
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_HT_DCPHASE.__doc__ = talib.HT_DCPHASE.__doc__
     
     def TA_HT_PHASOR(ind=None):
         imp = crtTaIndicatorImp(ta.HT_PHASOR, 'TA_HT_PHASOR', 
                                 result_num = 2)
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_HT_PHASOR.__doc__ = talib.HT_PHASOR.__doc__
     
     def TA_HT_SINE(ind=None):
         imp = crtTaIndicatorImp(ta.HT_SINE, 'TA_HT_SINE', 
                                 result_num = 2)
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_HT_SINE.__doc__ = talib.HT_SINE.__doc__
     
     def TA_HT_TRENDLINE(ind=None):
         imp = crtTaIndicatorImp(ta.HT_TRENDLINE, 'TA_HT_TRENDLINE', 
                                 result_num = 1)
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_HT_TRENDLINE.__doc__ = talib.HT_TRENDLINE.__doc__
     
     def TA_HT_TRENDMODE(ind=None):
         imp = crtTaIndicatorImp(ta.HT_TRENDMODE, 'TA_HT_TRENDMODE', 
                                 result_num = 1)
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_HT_TRENDMODE.__doc__ = talib.HT_TRENDMODE.__doc__
     
@@ -350,9 +304,7 @@ try:
         imp = crtTaIndicatorImp(ta.KAMA, 'TA_KAMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_KAMA.__doc__ = talib.KAMA.__doc__
     
@@ -360,9 +312,7 @@ try:
         imp = crtTaIndicatorImp(ta.LINEARREG, 'TA_LINEARREG', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_LINEARREG.__doc__ = talib.LINEARREG.__doc__
     
@@ -370,9 +320,7 @@ try:
         imp = crtTaIndicatorImp(ta.LINEARREG_ANGLE, 'TA_LINEARREG_ANGLE', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_LINEARREG_ANGLE.__doc__ = talib.LINEARREG_ANGLE.__doc__
     
@@ -380,9 +328,7 @@ try:
         imp = crtTaIndicatorImp(ta.LINEARREG_INTERCEPT, 'TA_LINEARREG_INTERCEPT', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_LINEARREG_INTERCEPT.__doc__ = talib.LINEARREG_INTERCEPT.__doc__ 
     
@@ -390,9 +336,7 @@ try:
         imp = crtTaIndicatorImp(ta.LINEARREG_SLOPE, 'TA_LINEARREG_SLOPE', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_LINEARREG_SLOPE.__doc__ = talib.LINEARREG_SLOPE.__doc__
     
@@ -401,9 +345,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod,
                                         'matype': matype})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MA.__doc__ = talib.MA.__doc__
     
@@ -413,9 +355,7 @@ try:
                                 params={'fastperiod': fastperiod,
                                         'slowperiod': slowperiod,
                                         'signalperiod': signalperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MACD.__doc__ = talib.MACD.__doc__
     
@@ -430,9 +370,7 @@ try:
                                         'slowmatype': slowmatype,
                                         'signalperiod': signalperiod,
                                         'signalmatype': signalmatype})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MACDEXT.__doc__ = talib.MACDEXT.__doc__
     
@@ -440,9 +378,7 @@ try:
         imp = crtTaIndicatorImp(ta.MACDFIX, 'TA_MACDFIX', 
                                 result_num = 3,
                                 params={'signalperiod': signalperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MACDFIX.__doc__ = talib.MACDFIX.__doc__
 
@@ -451,9 +387,7 @@ try:
                                 result_num = 2,
                                 params={'fastlimit': fastlimit,
                                         'slowlimit': slowlimit})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MAMA.__doc__ = talib.MAMA.__doc__
     
@@ -461,9 +395,7 @@ try:
         imp = crtTaIndicatorImp(ta.MAX, 'TA_MAX', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MAX.__doc__ = talib.MAX.__doc__               
     
@@ -471,9 +403,7 @@ try:
         imp = crtTaIndicatorImp(ta.MAXINDEX, 'TA_MAXINDEX', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MAXINDEX.__doc__ = talib.MAXINDEX.__doc__
         
@@ -481,9 +411,7 @@ try:
         imp = crtTaIndicatorImp(ta.MEDPRICE, 'TA_MEDPRICE', 
                                 result_num = 1,
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MEDPRICE.__doc__ = talib.MEDPRICE.__doc__
     
@@ -491,9 +419,7 @@ try:
         imp = crtTaIndicatorImp(ta.MIDPOINT, 'TA_MIDPOINT', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MIDPOINT.__doc__ = talib.MIDPRICE.__doc__
     
@@ -502,9 +428,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MIDPRICE.__doc__ = talib.MIDPRICE.__doc__  
     
@@ -512,9 +436,7 @@ try:
         imp = crtTaIndicatorImp(ta.MIN, 'TA_MIN', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MIN.__doc__ = talib.MIN.__doc__
     
@@ -522,9 +444,7 @@ try:
         imp = crtTaIndicatorImp(ta.MININDEX, 'TA_MININDEX', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MININDEX.__doc__ = talib.MININDEX.__doc__ 
     
@@ -532,9 +452,7 @@ try:
         imp = crtTaIndicatorImp(ta.MINMAX, 'TA_MINMAX', 
                                 result_num = 2,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MINMAX.__doc__ = talib.MINMAX.__doc__
     
@@ -542,9 +460,7 @@ try:
         imp = crtTaIndicatorImp(ta.MINMAXINDEX, 'TA_MINMAXINDEX', 
                                 result_num = 2,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MINMAXINDEX.__doc__ = talib.MINMAXINDEX.__doc__
     
@@ -553,9 +469,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MINUS_DI.__doc__ = talib.MINUS_DI.__doc__
     
@@ -564,9 +478,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MINUS_DM.__doc__ = talib.MINUS_DM.__doc__
     
@@ -574,9 +486,7 @@ try:
         imp = crtTaIndicatorImp(ta.MOM, 'TA_MOM', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_MOM.__doc__ = talib.MOM.__doc__                  
 
@@ -585,9 +495,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_NATR.__doc__ = talib.NATR.__doc__
     
@@ -596,9 +504,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_PLUS_DI.__doc__ = talib.PLUS_DI.__doc__
     
@@ -607,9 +513,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_PLUS_DM.__doc__ = talib.PLUS_DM.__doc__
     
@@ -619,9 +523,7 @@ try:
                                 params={'fastperiod': fastperiod,
                                         'slowperiod': slowperiod,
                                         'matype': matype})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_PPO.__doc__ = talib.PPO.__doc__
     
@@ -629,9 +531,7 @@ try:
         imp = crtTaIndicatorImp(ta.ROC, 'TA_ROC', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ROC.__doc__ = talib.ROC.__doc__
     
@@ -639,9 +539,7 @@ try:
         imp = crtTaIndicatorImp(ta.ROCP, 'TA_ROCP', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ROCP.__doc__ = talib.ROCP.__doc__
     
@@ -649,9 +547,7 @@ try:
         imp = crtTaIndicatorImp(ta.ROCR, 'TA_ROCR', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ROCR.__doc__ = talib.ROCR.__doc__
     
@@ -659,9 +555,7 @@ try:
         imp = crtTaIndicatorImp(ta.ROCR100, 'TA_ROCR100', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ROCR100.__doc__ = talib.ROCR100.__doc__
     
@@ -669,9 +563,7 @@ try:
         imp = crtTaIndicatorImp(ta.RSI, 'TA_RSI', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_RSI.__doc__ = talib.RSI.__doc__
     
@@ -681,9 +573,7 @@ try:
                                 params={'acceleration': acceleration,
                                         'maximum': maximum},
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_SAR.__doc__ = talib.SAR.__doc__
     
@@ -706,9 +596,7 @@ try:
                                         'accelerationshort': accelerationshort,
                                         'accelerationmaxshort': accelerationmaxshort},
                                 prices = ['high', 'low'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_SAREXT.__doc__ = talib.SAREXT.__doc__
     
@@ -716,9 +604,7 @@ try:
         imp = crtTaIndicatorImp(ta.SMA, 'TA_SMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        #if ind is not None:
-        #    imp.calculate(ind)
-        return Indicator(imp)(ind) if ind is not None else Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_SMA.__doc__ = talib.SMA.__doc__
     
@@ -727,9 +613,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod,
                                         'nbdev': nbdev})
-        #if ind is not None:
-        #    imp.calculate(ind)
-        return Indicator(imp)(ind) if ind is not None else Indicator()
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_STDDEV.__doc__ = talib.STDDEV.__doc__
     
@@ -744,9 +628,7 @@ try:
                                         'slowd_period': slowd_period,
                                         'slowd_matype': slowd_matype},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_STOCH.__doc__ = talib.STOCH.__doc__
     
@@ -758,9 +640,7 @@ try:
                                         'fastd_matype': fastd_matype
                                        },
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_STOCHF.__doc__ = talib.STOCHF.__doc__
     
@@ -772,9 +652,7 @@ try:
                                         'fastd_period': fastd_period,
                                         'fastd_matype': fastd_matype
                                        })
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_STOCHRSI.__doc__ = talib.STOCHRSI.__doc__
     
@@ -782,9 +660,7 @@ try:
         imp = crtTaIndicatorImp(ta.SUM, 'TA_SUM', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_SUM.__doc__ = talib.SUM.__doc__
     
@@ -794,9 +670,7 @@ try:
                                 params={'timeperiod': timeperiod,
                                         'vfactor': vfactor
                                        })
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_T3.__doc__ = talib.T3.__doc__
     
@@ -804,9 +678,7 @@ try:
         imp = crtTaIndicatorImp(ta.TEMA, 'TA_TEMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_TEMA.__doc__ = talib.TEMA.__doc__
     
@@ -814,9 +686,7 @@ try:
         imp = crtTaIndicatorImp(ta.TRANGE, 'TA_TRANGE', 
                                 result_num = 1,
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_TRANGE.__doc__ = talib.TRANGE.__doc__
     
@@ -824,9 +694,7 @@ try:
         imp = crtTaIndicatorImp(ta.TRIMA, 'TA_TRIMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
                             
     TA_TRIMA.__doc__ = talib.TRIMA.__doc__
     
@@ -834,9 +702,7 @@ try:
         imp = crtTaIndicatorImp(ta.TRIX, 'TA_TRIX', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_TRIX.__doc__ = talib.TRIX.__doc__
     
@@ -844,9 +710,7 @@ try:
         imp = crtTaIndicatorImp(ta.TSF, 'TA_TSF', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_TSF.__doc__ = talib.TSF.__doc__
     
@@ -854,9 +718,7 @@ try:
         imp = crtTaIndicatorImp(ta.TYPPRICE, 'TA_TYPPRICE', 
                                 result_num = 1,
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_TYPPRICE.__doc__ = talib.TYPPRICE.__doc__
     
@@ -868,9 +730,7 @@ try:
                                         'timeperiod3': timeperiod3,
                                        },
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_ULTOSC.__doc__ = talib.ULTOSC.__doc__
     
@@ -880,9 +740,7 @@ try:
                                 params={'timeperiod': timeperiod,
                                         'nbdev': nbdev
                                        })
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_VAR.__doc__ = talib.VAR.__doc__ 
     
@@ -890,9 +748,7 @@ try:
         imp = crtTaIndicatorImp(ta.WCLPRICE, 'TA_WCLPRICE', 
                                 result_num = 1,
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_WCLPRICE.__doc__ = talib.WCLPRICE.__doc__
     
@@ -901,9 +757,7 @@ try:
                                 result_num = 1,
                                 params={'timeperiod': timeperiod},
                                 prices = ['high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_WILLR.__doc__ = talib.WILLR.__doc__
     
@@ -911,9 +765,7 @@ try:
         imp = crtTaIndicatorImp(ta.WMA, 'TA_WMA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)          
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_WMA.__doc__ = talib.WMA.__doc__
     
@@ -921,9 +773,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDL2CROWS, 'TA_CDL2CROWS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDL2CROWS.__doc__ = talib.CDL2CROWS.__doc__
     
@@ -931,9 +781,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDL3BLACKCROWS, 'TA_CDL3BLACKCROWS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDL3BLACKCROWS.__doc__ = talib.CDL3BLACKCROWS.__doc__
     
@@ -941,9 +789,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDL3INSIDE, 'TA_CDL3INSIDE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDL3INSIDE.__doc__ = talib.CDL3INSIDE.__doc__ 
     
@@ -951,9 +797,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDL3LINESTRIKE, 'TA_CDL3LINESTRIKE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDL3LINESTRIKE.__doc__ = talib.CDL3LINESTRIKE.__doc__
     
@@ -961,9 +805,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDL3OUTSIDE, 'TA_CDL3OUTSIDE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDL3OUTSIDE.__doc__ = talib.CDL3OUTSIDE.__doc__
     
@@ -971,9 +813,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDL3STARSINSOUTH, 'TA_CDL3STARSINSOUTH', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDL3STARSINSOUTH.__doc__ = talib.CDL3STARSINSOUTH.__doc__   
     
@@ -981,9 +821,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDL3WHITESOLDIERS, 'TA_CDL3WHITESOLDIERS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDL3WHITESOLDIERS.__doc__ = talib.CDL3WHITESOLDIERS.__doc__  
     
@@ -992,9 +830,7 @@ try:
                                 result_num = 1,
                                 params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLABANDONEDBABY.__doc__ = talib.CDLABANDONEDBABY.__doc__
     
@@ -1002,9 +838,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLADVANCEBLOCK, 'TA_CDLADVANCEBLOCK', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLADVANCEBLOCK = talib.CDLADVANCEBLOCK.__doc__
     
@@ -1012,9 +846,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLBELTHOLD, 'TA_CDLBELTHOLD', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLBELTHOLD.__doc__ = talib.CDLBELTHOLD.__doc__
     
@@ -1022,9 +854,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLBREAKAWAY, 'TA_CDLBREAKAWAY', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)   
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLBREAKAWAY.__doc__ = talib.CDLBREAKAWAY.__doc__
     
@@ -1032,9 +862,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLCLOSINGMARUBOZU, 'TA_CDLCLOSINGMARUBOZU', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLCLOSINGMARUBOZU.__doc__ = talib.CDLCLOSINGMARUBOZU.__doc__ 
     
@@ -1042,9 +870,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLCONCEALBABYSWALL, 'TA_CDLCONCEALBABYSWALL', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLCONCEALBABYSWALL.__doc__ = talib.CDLCONCEALBABYSWALL.__doc__ 
     
@@ -1052,9 +878,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLCOUNTERATTACK, 'TA_CDLCOUNTERATTACK', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLCOUNTERATTACK.__doc__ = talib.CDLCOUNTERATTACK.__doc__    
     
@@ -1063,9 +887,7 @@ try:
                                 result_num = 1,
                                 params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)       
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLDARKCLOUDCOVER.__doc__ = talib.CDLDARKCLOUDCOVER.__doc__
     
@@ -1073,9 +895,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLDOJI, 'TA_CDLDOJI', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)    
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLDOJI.__doc__ = talib.CDLDOJI.__doc__
     
@@ -1083,9 +903,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLDOJISTAR, 'TA_CDLDOJISTAR', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLDOJISTAR.__doc__ = talib.CDLDOJISTAR.__doc__  
     
@@ -1093,9 +911,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLDRAGONFLYDOJI, 'TA_CDLDRAGONFLYDOJI', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLDRAGONFLYDOJI.__doc__ = talib.CDLDRAGONFLYDOJI.__doc__   
     
@@ -1103,9 +919,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLENGULFING, 'TA_CDLENGULFING', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)   
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLENGULFING.__doc__ = talib.CDLENGULFING.__doc__ 
     
@@ -1114,9 +928,7 @@ try:
                                 result_num = 1,
                                 params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLEVENINGDOJISTAR.__doc__ = talib.CDLEVENINGDOJISTAR.__doc__ 
     
@@ -1125,9 +937,7 @@ try:
                                 result_num = 1,
                                 params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLEVENINGSTAR.__doc__ = talib.CDLEVENINGSTAR.__doc__    
     
@@ -1135,9 +945,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLGAPSIDESIDEWHITE, 'TA_CDLGAPSIDESIDEWHITE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLGAPSIDESIDEWHITE.__doc__ = talib.CDLGAPSIDESIDEWHITE.__doc__   
     
@@ -1145,9 +953,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLGRAVESTONEDOJI, 'TA_CDLGRAVESTONEDOJI', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLGRAVESTONEDOJI.__doc__ = talib.CDLGRAVESTONEDOJI.__doc__   
     
@@ -1155,9 +961,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLHAMMER, 'TA_CDLHAMMER', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)    
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHAMMER.__doc__ = talib.CDLHAMMER.__doc__
     
@@ -1165,9 +969,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLHANGINGMAN, 'TA_CDLHANGINGMAN', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHANGINGMAN.__doc__ = talib.CDLHANGINGMAN.__doc__  
     
@@ -1176,9 +978,7 @@ try:
                                 result_num = 1,
                                 #params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHARAMI.__doc__ = talib.CDLHARAMI.__doc__
     
@@ -1186,9 +986,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLHARAMICROSS, 'TA_CDLHARAMICROSS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHARAMICROSS.__doc__ = talib.CDLHARAMICROSS.__doc__
     
@@ -1196,9 +994,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLHIGHWAVE, 'TA_CDLHIGHWAVE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)   
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHIGHWAVE.__doc__ = talib.CDLHIGHWAVE.__doc__ 
     
@@ -1206,9 +1002,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLHIKKAKE, 'TA_CDLHIKKAKE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)   
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHIKKAKE.__doc__ = talib.CDLHIKKAKE.__doc__ 
     
@@ -1216,9 +1010,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLHIKKAKEMOD, 'TA_CDLHIKKAKEMOD', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHIKKAKEMOD.__doc__ = talib.CDLHIKKAKEMOD.__doc__
     
@@ -1226,9 +1018,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLHOMINGPIGEON, 'TA_CDLHOMINGPIGEON', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)   
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLHOMINGPIGEON.__doc__ = talib.CDLHOMINGPIGEON.__doc__ 
     
@@ -1236,9 +1026,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLIDENTICAL3CROWS, 'TA_CDLIDENTICAL3CROWS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLIDENTICAL3CROWS.__doc__ = talib.CDLIDENTICAL3CROWS.__doc__
     
@@ -1246,9 +1034,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLINNECK, 'TA_CDLINNECK', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLINNECK.__doc__ = talib.CDLINNECK.__doc__
     
@@ -1256,9 +1042,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLINVERTEDHAMMER, 'TA_CDLINVERTEDHAMMER', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLINVERTEDHAMMER.__doc__ = talib.CDLINVERTEDHAMMER.__doc__
     
@@ -1266,9 +1050,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLKICKING, 'TA_CDLKICKING', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLKICKING.__doc__ = talib.CDLKICKING.__doc__
     
@@ -1276,9 +1058,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLKICKINGBYLENGTH, 'TA_CDLKICKINGBYLENGTH', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLKICKINGBYLENGTH.__doc__ = talib.CDLKICKINGBYLENGTH.__doc__
     
@@ -1286,9 +1066,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLLADDERBOTTOM, 'TA_CDLLADDERBOTTOM', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLLADDERBOTTOM.__doc__ = talib.CDLLADDERBOTTOM.__doc__   
     
@@ -1296,9 +1074,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLLONGLEGGEDDOJI, 'TA_CDLLONGLEGGEDDOJI', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLLONGLEGGEDDOJI.__doc__ = talib.CDLLONGLEGGEDDOJI.__doc__
     
@@ -1306,9 +1082,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLLONGLINE, 'TA_CDLLONGLINE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLLONGLINE.__doc__ = talib.CDLLONGLINE.__doc__ 
     
@@ -1316,9 +1090,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLMARUBOZU, 'TA_CDLMARUBOZU', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLMARUBOZU.__doc__ = talib.CDLMARUBOZU.__doc__ 
     
@@ -1326,9 +1098,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLMATCHINGLOW, 'TA_CDLMATCHINGLOW', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLMATCHINGLOW.__doc__ = talib.CDLMATCHINGLOW.__doc__
     
@@ -1337,9 +1107,7 @@ try:
                                 result_num = 1,
                                 params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLMATHOLD.__doc__ = talib.CDLMATHOLD.__doc__
     
@@ -1348,9 +1116,7 @@ try:
                                 result_num = 1,
                                 params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLMORNINGDOJISTAR.__doc__ = talib.CDLMORNINGDOJISTAR.__doc__
     
@@ -1359,9 +1125,7 @@ try:
                                 result_num = 1,
                                 params={'penetration': penetration},
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)    
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLMORNINGSTAR.__doc__ = talib.CDLMORNINGSTAR.__doc__
     
@@ -1369,9 +1133,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLONNECK, 'TA_CDLONNECK', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLONNECK.__doc__ = talib.CDLONNECK.__doc__
     
@@ -1379,9 +1141,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLPIERCING, 'TA_CDLPIERCING', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLPIERCING.__doc__ = talib.CDLPIERCING.__doc__
     
@@ -1389,9 +1149,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLRICKSHAWMAN, 'TA_CDLRICKSHAWMAN', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLRICKSHAWMAN.__doc__ = talib.CDLRICKSHAWMAN.__doc__
     
@@ -1399,9 +1157,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLRISEFALL3METHODS, 'TA_CDLRISEFALL3METHODS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLRISEFALL3METHODS.__doc__ = talib.CDLRISEFALL3METHODS.__doc__
     
@@ -1409,9 +1165,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLSEPARATINGLINES, 'TA_CDLSEPARATINGLINES', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLSEPARATINGLINES.__doc__ = talib.CDLSEPARATINGLINES.__doc__
     
@@ -1419,9 +1173,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLSHOOTINGSTAR, 'TA_CDLSHOOTINGSTAR', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLSHOOTINGSTAR.__doc__ = talib.CDLSHOOTINGSTAR.__doc__
     
@@ -1429,9 +1181,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLSHORTLINE, 'TA_CDLSHORTLINE', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLSHORTLINE.__doc__ = talib.CDLSHORTLINE.__doc__
     
@@ -1439,9 +1189,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLSPINNINGTOP, 'TA_CDLSPINNINGTOP', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLSPINNINGTOP.__doc__ = talib.CDLSPINNINGTOP.__doc__
     
@@ -1449,9 +1197,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLSTALLEDPATTERN, 'TA_CDLSTALLEDPATTERN', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLSTALLEDPATTERN.__doc__ = talib.CDLSTALLEDPATTERN.__doc__
     
@@ -1459,9 +1205,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLSTICKSANDWICH, 'TA_CDLSTICKSANDWICH', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLSTICKSANDWICH.__doc__ = talib.CDLSTICKSANDWICH.__doc__ 
     
@@ -1469,9 +1213,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLTAKURI, 'TA_CDLTAKURI', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLTAKURI.__doc__ = talib.CDLTAKURI.__doc__ 
     
@@ -1479,9 +1221,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLTASUKIGAP, 'TA_CDLTASUKIGAP', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLTASUKIGAP.__doc__ = talib.CDLTASUKIGAP.__doc__ 
     
@@ -1489,9 +1229,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLTHRUSTING, 'TA_CDLTHRUSTING', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLTHRUSTING.__doc__ = talib.CDLTHRUSTING.__doc__
     
@@ -1499,9 +1237,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLTRISTAR, 'TA_CDLTRISTAR', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp) 
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLTRISTAR.__doc__ = talib.CDLTRISTAR.__doc__
     
@@ -1509,9 +1245,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLUNIQUE3RIVER, 'TA_CDLUNIQUE3RIVER', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLUNIQUE3RIVER.__doc__ = talib.CDLUNIQUE3RIVER.__doc__
     
@@ -1519,9 +1253,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLUPSIDEGAP2CROWS, 'TA_CDLUPSIDEGAP2CROWS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLUPSIDEGAP2CROWS.__doc__ = talib.CDLUPSIDEGAP2CROWS.__doc__
     
@@ -1529,9 +1261,7 @@ try:
         imp = crtTaIndicatorImp(ta.CDLXSIDEGAP3METHODS, 'TA_CDLXSIDEGAP3METHODS', 
                                 result_num = 1,
                                 prices = ['open', 'high', 'low', 'close'])
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_CDLXSIDEGAP3METHODS.__doc__ = talib.CDLXSIDEGAP3METHODS.__doc__
     
@@ -1539,9 +1269,7 @@ try:
         imp = crtTaIndicatorImp(ta.BETA, 'TA_BETA', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
         
     TA_BETA.__doc__ = talib.BETA.__doc__
     
@@ -1549,18 +1277,14 @@ try:
         imp = crtTaIndicatorImp(ta.CORREL, 'TA_CORREL', 
                                 result_num = 1,
                                 params={'timeperiod': timeperiod})
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)  
+        return Indicator(imp)(ind) if ind else Indicator(imp)
         
     TA_CORREL.__doc__ = talib.CORREL.__doc__
     
     def TA_OBV(ind=None):
         imp = crtTaIndicatorImp(ta.OBV, 'TA_OBV', 
                                 result_num = 1)
-        if ind is not None:
-            imp.calculate(ind)
-        return Indicator(imp)
+        return Indicator(imp)(ind) if ind else Indicator(imp)
     
     TA_OBV.__doc__ = talib.OBV.__doc__    
 
