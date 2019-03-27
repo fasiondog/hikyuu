@@ -33,7 +33,6 @@ bool MySQLKDataDriver::_init() {
     string default_host("127.0.0.1");
     string default_usr("root");
     string default_pwd("");
-    unsigned int default_port = 3306;
 
     try {
         m_host = m_params.get<string>("host");
@@ -45,7 +44,7 @@ bool MySQLKDataDriver::_init() {
     try {
         m_port = m_params.get<int>("port");
     } catch(...) {
-        m_port = default_port;
+        m_port = 3306;
     }
 
     try {

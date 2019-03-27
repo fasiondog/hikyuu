@@ -69,7 +69,6 @@ void init_logger(const std::string& configure_name) {
     logger->flush_on(spdlog::level::trace);
     logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
     spdlog::details::registry::instance().register_logger(logger);
-
 }
 #endif
 
@@ -83,7 +82,5 @@ void init_logger(const std::string& configure_name) {
 
 }
 #endif /* for USE_STDOUT_FOR_LOGGING */
-
-
 
 } /* namespace hku */

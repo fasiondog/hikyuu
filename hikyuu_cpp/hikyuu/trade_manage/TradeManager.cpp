@@ -244,7 +244,7 @@ double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock)
 Datetime TradeManager::firstDatetime() const {
     Datetime result;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for(; iter != m_trade_list.end(); iter++){
+    for(; iter != m_trade_list.end(); ++iter){
         if( iter->business == BUSINESS_BUY ){
             result = iter->datetime;
             break;
@@ -276,7 +276,7 @@ size_t TradeManager
     //在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
     size_t number = 0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for(; iter != m_trade_list.end(); iter++){
+    for(; iter != m_trade_list.end(); ++iter){
         //交易记录中的交易日期已经大于查询日期，则跳出循环
         if( iter->datetime > datetime ){
             break;
@@ -323,7 +323,7 @@ size_t TradeManager
     //在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
     size_t number = 0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for(; iter != m_trade_list.end(); iter++){
+    for(; iter != m_trade_list.end(); ++iter){
         //交易记录中的交易日期已经大于查询日期，则跳出循环
         if( iter->datetime > datetime ){
             break;
@@ -447,7 +447,7 @@ TradeRecordList TradeManager
 PositionRecordList TradeManager::getPositionList() const {
     PositionRecordList result;
     position_map_type::const_iterator iter = m_position.begin();
-    for (; iter != m_position.end(); iter++){
+    for (; iter != m_position.end(); ++iter){
         result.push_back(iter->second);
     }
     return result;
@@ -457,7 +457,7 @@ PositionRecordList TradeManager::getPositionList() const {
 PositionRecordList TradeManager::getShortPositionList() const {
     PositionRecordList result;
     position_map_type::const_iterator iter = m_short_position.begin();
-    for (; iter != m_short_position.end(); iter++){
+    for (; iter != m_short_position.end(); ++iter){
         result.push_back(iter->second);
     }
     return result;

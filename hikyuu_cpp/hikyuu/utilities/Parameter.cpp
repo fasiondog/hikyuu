@@ -133,7 +133,7 @@ string Parameter::getValueList() const {
             os << "Unsupported";
         }
 
-        next_iter++;
+        ++next_iter;
         if (next_iter != m_params.end() && iter->second.type() != typeid(KData)) {
             os << ",";
         }
@@ -176,7 +176,7 @@ string Parameter::getNameValueList() const {
             os << "Unsupported";
         }
 
-        next_iter++;
+        ++next_iter;
         if (next_iter != m_params.end() && iter->second.type() != typeid(KData)) {
             os << ",";
         }

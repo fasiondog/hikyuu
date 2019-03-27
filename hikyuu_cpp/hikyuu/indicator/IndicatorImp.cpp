@@ -88,11 +88,10 @@ void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     if (result_num > MAX_RESULT_NUM) {
         throw(std::invalid_argument("result_num oiverload MAX_RESULT_NUM! "
                 "[IndicatorImp::_readyBuffer]" + name()));
-        return;
     }
 
     if (result_num == 0) {
-        HKU_WARN("result_num is zeror! (" << name() << ") [IndicatorImp::_readyBuffer]")
+        //HKU_TRACE("result_num is zeror! (" << name() << ") [IndicatorImp::_readyBuffer]")
         return;
     }
 

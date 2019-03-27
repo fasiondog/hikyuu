@@ -305,7 +305,6 @@ void Parameter::set(const string& name, const ValueType& value) {
     if( !have(name)){
         if (!support(value)){
             throw std::logic_error("Unsuport Type! " + name);
-            return;
         }
         m_params[name] = value;
         return;
@@ -313,7 +312,6 @@ void Parameter::set(const string& name, const ValueType& value) {
 
     if (m_params[name].type() != typeid(ValueType)) {
         throw std::logic_error("Mismatching type! " + name);
-        return;
     }
 
     m_params[name] = value;

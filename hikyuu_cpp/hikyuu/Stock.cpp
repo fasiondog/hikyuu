@@ -16,7 +16,7 @@ namespace hku {
 static KDataDriverPtr g_kdataDefaultDriver(new KDataDriver);
 
 const string Stock::default_market;
-const string Stock::default_code ;
+const string Stock::default_code;
 const string Stock::default_market_code;
 const string Stock::default_name;
 const hku_uint32 Stock::default_type = Null<hku_uint32>();
@@ -347,7 +347,7 @@ StockWeightList Stock::getWeight(const Datetime& start,
     end_iter = lower_bound(start_iter,
                   (StockWeightList::const_iterator)m_data->m_weightList.end(),
                    end, std::less<StockWeight>());
-    for(; start_iter != end_iter; start_iter++) {
+    for(; start_iter != end_iter; ++start_iter) {
         result.push_back(*start_iter);
     }
 

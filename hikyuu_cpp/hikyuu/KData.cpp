@@ -30,7 +30,7 @@ string KData::toString() const {
 
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    if (stock.isNull()) {        
+    if (stock.isNull()) {
         return;
     }
 

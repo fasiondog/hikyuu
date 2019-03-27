@@ -106,7 +106,6 @@ public:
         if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
             throw(std::out_of_range("Try to access value out of bounds! "
                         + name() + " [IndicatorImp::_set]"));
-            return;
         }
         (*m_pBuffer[num])[pos] = val;
 #else

@@ -234,9 +234,8 @@ _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
     if (total != 0)
         out.reserve(total);
 
-    int id = 0;
     while((row = mysql_fetch_row(result))) {
-        id = boost::lexical_cast<int>(row[0]);
+        int id = boost::lexical_cast<int>(row[0]);
         Datetime date;
         try {
             date = Datetime(row[1]);

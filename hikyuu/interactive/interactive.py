@@ -117,9 +117,10 @@ kdata_config = ini.options('kdata')
 for p in kdata_config:
     kdata_param.set(p, ini.get('kdata', p))
 
-set_log_level(LOG_LEVEL.INFO)
+set_log_level(LOG_LEVEL.TRACE)
 sm = StockManager.instance()
 sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
+set_log_level(LOG_LEVEL.WARN)
 
 
 #==============================================================================

@@ -727,12 +727,11 @@ _getOtherIndexRangeByDate(const string& market, const string& code,
     }
 
     string _tablename(market + code);
-    size_t total = 0;
 
     try{
         H5::DataSet dataset(group.openDataSet(_tablename));
         H5::DataSpace dataspace = dataset.getSpace();
-        total = dataspace.getSelectNpoints();
+        size_t total = dataspace.getSelectNpoints();
         if (0 == total) {
             return false;
         }
