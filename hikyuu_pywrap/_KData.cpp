@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/serialization/KData_serialization.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 #include "pickle_support.h"
 
 using namespace boost::python;
@@ -22,6 +23,12 @@ void export_KData() {
             .add_property("startPos", &KData::startPos)
             .add_property("endPos", &KData::endPos)
             .add_property("lastPos", &KData::lastPos)
+            .add_property("open", &KData::open)
+            .add_property("close", &KData::close)
+            .add_property("high", &KData::high)
+            .add_property("low", &KData::low)
+            .add_property("amo", &KData::amo)
+            .add_property("vol", &KData::vol)
 
             .def("getDatetimeList", &KData::getDatetimeList)
             .def("getKRecord", &KData::getKRecord)

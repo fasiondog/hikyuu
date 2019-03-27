@@ -146,55 +146,55 @@ Indicator HKU_API KDATA() {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", "KDATA");
     p->name("KDATA");
-    return Indicator(p);
+    return p->calculate();
 }
 
 Indicator HKU_API OPEN() {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", "OPEN");
     p->name("OPEN");
-    return Indicator(p);
+    return p->calculate();
 }
 
 Indicator HKU_API HIGH() {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", "HIGH");
     p->name("HIGH");
-    return Indicator(p);
+    return p->calculate();
 }
 
 Indicator HKU_API LOW() {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", "LOW");
     p->name("LOW");
-    return Indicator(p);
+    return p->calculate();
 }
 
 Indicator HKU_API CLOSE() {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", "CLOSE");
     p->name("CLOSE");
-    return Indicator(p);
+    return p->calculate();
 }
 
 Indicator HKU_API AMO() {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", "AMO");
     p->name("AMO");
-    return Indicator(p);
+    return p->calculate();
 }
 
 Indicator HKU_API VOL() {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", "VOL");
     p->name("VOL");
-    return Indicator(p);
+    return p->calculate();
 }
 
 Indicator HKU_API KDATA_PART(const string& part) {
     IndicatorImpPtr p = make_shared<IKData>();
     p->setParam<string>("kpart", part);
     p->name("KDATA_PART");
-    return Indicator(p);
+    return p->calculate();
 }
 } /* namespace hku */

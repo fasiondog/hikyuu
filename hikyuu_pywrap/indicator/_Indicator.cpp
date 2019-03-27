@@ -64,6 +64,7 @@ void export_Indicator() {
         .def("get", &Indicator::get, get_overloads())
         .def("getResult", &Indicator::getResult)
         .def("getResultAsPriceList", &Indicator::getResultAsPriceList)
+        .def("setContext", &Indicator::setContext)
         .def("getCurrentKData", &Indicator::getCurrentKData)
         .def("getImp", &Indicator::getImp)
         .def("__len__", &Indicator::size)

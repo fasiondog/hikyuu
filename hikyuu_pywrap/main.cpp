@@ -27,6 +27,7 @@ void export_KData();
 void export_Parameter();
 void export_save_load();
 void export_io_redirect();
+void export_context();
 
 BOOST_PYTHON_MODULE(_hikyuu){
     boost::python::docstring_options doc_options(false);
@@ -52,6 +53,7 @@ BOOST_PYTHON_MODULE(_hikyuu){
     export_Stock();
     export_Block();
     export_Parameter();
+    export_context();
     export_save_load();
 
     export_io_redirect();
