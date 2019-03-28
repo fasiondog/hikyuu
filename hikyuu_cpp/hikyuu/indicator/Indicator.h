@@ -59,6 +59,7 @@ public:
     Indicator clone() const;
 
     void setContext(const Stock&, const KQuery&);
+    void setContext(const KData&);
 
     KData getCurrentKData() const {
         return m_imp ? m_imp->getCurrentKData() : KData();

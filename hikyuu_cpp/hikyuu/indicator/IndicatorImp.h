@@ -137,6 +137,8 @@ public:
 
     void setContext(const Stock&, const KQuery&);
 
+    void setContext(const KData&);
+
     KData getCurrentKData();
 
     void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);

@@ -174,22 +174,16 @@ def draw2(block, query = Query(-130),
     c = CLOSE(kdata)
     CVAL(c, 0.8).plot(axes=ax2,color='r',linestyle='--')
     CVAL(c, 0.2).plot(axes=ax2,color='r',linestyle='--')
-    #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
-    #ax2.hlines(0.2,0,len(kdata),color='r',linestyle='--')
     
     if ama1.name == "AMA":
         cer = PRICELIST(cama, 1)
         label = "ER(%s)" % cer[-1]
         cer.plot(axes=ax3, color='b', marker='.', label=label, 
                  legend_on=False, text_on=True)
-        CVAL(c, 0.8).plot(axes=ax2,color='r',linestyle='--')
-        CVAL(c, -0.6).plot(axes=ax2,color='r',linestyle='--')
-        CVAL(c, -0.8).plot(axes=ax2,color='r',linestyle='--')
-        CVAL(c, 0).plot(axes=ax2,color='k',linestyle='-')
-        #ax3.hlines(0.8,0,len(kdata),color='r',linestyle='--')    
-        #ax3.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
-        #ax3.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
-        #ax3.hlines(0,0,len(kdata))
+        CVAL(c, 0.8).plot(axes=ax3,color='r',linestyle='--')
+        CVAL(c, -0.6).plot(axes=ax3,color='r',linestyle='--')
+        CVAL(c, -0.8).plot(axes=ax3,color='r',linestyle='--')
+        CVAL(c, 0).plot(axes=ax3,color='k',linestyle='-')
     else:
         ax_draw_macd(ax2, kdata)
     #ax2.set_ylim(-1, 1)

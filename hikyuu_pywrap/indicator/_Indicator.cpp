@@ -45,6 +45,9 @@ Indicator (*indicator_or2)(const Indicator&, price_t) = operator|;
 string (Indicator::*ind_read_name)() const = &Indicator::name;
 void (Indicator::*ind_write_name)(const string&) = &Indicator::name;
 
+void (Indicator::*setContext_1)(const Stock&, const KQuery&) = &Indicator::setContext;
+void (Indicator::*setContext_2)(const KData&) = &Indicator::setContext;
+
 void export_Indicator() {
 
     class_<Indicator>("Indicator", init<>())
@@ -64,7 +67,8 @@ void export_Indicator() {
         .def("get", &Indicator::get, get_overloads())
         .def("getResult", &Indicator::getResult)
         .def("getResultAsPriceList", &Indicator::getResultAsPriceList)
-        .def("setContext", &Indicator::setContext)
+        .def("setContext", setContext_1)
+        .def("setContext", setContext_2)
         .def("getCurrentKData", &Indicator::getCurrentKData)
         .def("getImp", &Indicator::getImp)
         .def("__len__", &Indicator::size)

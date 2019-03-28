@@ -175,6 +175,46 @@ use_draw_engine('matplotlib')
 
 #==============================================================================
 #
+# 粗略的选股函数
+#
+#==============================================================================            
+
+def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=True):
+    """
+    示例：
+    #选出涨停股
+    C = CLOSE()
+    x = select(C / REF(C, 1) - 1 >= 0.0995))
+
+    :param Indicator cond: 条件指标
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期
+    :param bool print_out: 打印选中的股票
+    :rtype: 选中的股票列表
+    """
+    q = QueryByDate(start, end)
+    d = sm.getTradingCalendar(q, 'SH')
+    if len(d) == 0:
+        return
+
+    result = []
+    for s in blocka:
+        if not s.valid:
+            continue
+        
+        q = QueryByDate(start, end)
+        k = s.getKData(q)
+        cond.setContext(k)
+        if len(cond) > 0 and cond[-1] and len(k) > 0 and k[-1].datetime == d[-1]:
+            result.append(s)
+            if print_out:
+                print(d[-1], s)
+                
+    return result
+
+
+#==============================================================================
+#
 # 增加临时的实时数据更新函数 realtimeUpdate
 #
 #==============================================================================

@@ -20,6 +20,10 @@ void HKU_API setGlobalContext(const Stock& stock, const KQuery& query) {
     }
 }
 
+void HKU_API setGlobalContext(const KData& k) {
+    g_hikyuu_context.set<KData>("kdata", k);
+}
+
 KData HKU_API getGlobalContextKData() {
     return g_hikyuu_context.get<KData>("kdata");
 }

@@ -11,8 +11,12 @@
 using namespace boost::python;
 using namespace hku;
 
+void (*setGlobalContext_1)(const Stock&, const KQuery&) = setGlobalContext;
+void (*setGlobalContext_2)(const KData&) = setGlobalContext;
+
 void export_context() {
-    def("set_current_context", setGlobalContext);
+    def("set_current_context", setGlobalContext_1);
+    def("set_current_context", setGlobalContext_2);
     def("get_current_context", getGlobalContextKData);
 }
 

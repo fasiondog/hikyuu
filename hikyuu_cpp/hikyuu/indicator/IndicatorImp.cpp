@@ -75,6 +75,24 @@ void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
     calculate();
 }
 
+void IndicatorImp::setContext(const KData& k) {
+    m_need_calculate = true;
+
+    //子节点设置上下文
+    if (m_left) m_left->setContext(k);
+    if (m_right) m_right->setContext(k);
+    if (m_three) m_three->setContext(k);
+
+    //如果该节点依赖上下文
+    if (isNeedContext()) {
+        //如果上下文有变化则重设上下文
+        setParam<KData>("kdata", k);        
+    }
+
+    //启动重新计算
+    calculate();
+}
+
 KData IndicatorImp::getCurrentKData() {
     KData kdata = getParam<KData>("kdata");
     if (kdata.getStock().isNull()) {

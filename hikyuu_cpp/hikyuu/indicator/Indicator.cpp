@@ -35,6 +35,10 @@ void Indicator::setContext(const Stock& stock, const KQuery& query) {
     if (m_imp) m_imp->setContext(stock, query);
 }
 
+void Indicator::setContext(const KData& k) {
+    if (m_imp) m_imp->setContext(k);
+}
+
 Indicator& Indicator::operator=(const Indicator& indicator) {
     if (this == &indicator)
         return *this;

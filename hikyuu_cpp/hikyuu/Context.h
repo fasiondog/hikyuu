@@ -16,6 +16,8 @@ namespace hku {
 
 void HKU_API setGlobalContext(const Stock&, const KQuery&);
 
+void HKU_API setGlobalContext(const KData&);
+
 KData HKU_API getGlobalContextKData();
 
 } /* namespace */
