@@ -43,21 +43,26 @@ void ILiuTongPan::_calculate(const Indicator& data) {
 
     size_t pos = 0;
     auto sw_iter = sw_list.begin();
-    price_t free_count = 0;
+    price_t pre_free_count = sw_iter->freeCount();
     for (; sw_iter != sw_list.end(); ++sw_iter) {
-        free_count = sw_iter->freeCount();
+        price_t free_count = sw_iter->freeCount();
         if (free_count == 0) {
             continue; //忽略流通盘为0的权息
         }
 
-        while (pos < total && k[pos].datetime <= sw_iter->datetime()) {
-            _set(free_count, pos);
+        while (pos < total && k[pos].datetime < sw_iter->datetime()) {
+            _set(pre_free_count, pos);
             pos++;
+        }
+
+        pre_free_count = free_count;
+        if (pos >= total) {
+            break;
         }
     }
 
     for (; pos < total; pos++) {
-        _set(free_count, pos);
+        _set(pre_free_count, pos);
     }
 }
 
