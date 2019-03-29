@@ -34,9 +34,16 @@ void ConstantValue::_calculate(const Indicator& data) {
 
     size_t total = 0;
     if (isLeaf()) {
+        //叶子节点
         KData k = getCurrentKData();
         total = k.size();
+        if (0 == total) {
+            return;
+        }
+        _readyBuffer(total, 1);
+    
     } else {
+        //非叶子节点
         total = data.size();
         discard = data.discard() > discard ? data.discard() : discard;
     }

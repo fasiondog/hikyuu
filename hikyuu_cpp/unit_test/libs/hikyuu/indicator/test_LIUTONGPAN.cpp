@@ -45,9 +45,6 @@ BOOST_AUTO_TEST_CASE( test_LIUTONGPAN ) {
             BOOST_CHECK(liutong[i] == 49696);
         }
     }
-    std::cout << total << std::endl;
-
-
 }
 
 /** @} */
