@@ -40,7 +40,12 @@ bool IKData::check() {
 
 //支持KDATA Indicator作为参数
 void IKData::_calculate(const Indicator& ind) {
-    KData kdata = getCurrentKData();
+    if (!isLeaf() && !ind.empty()) {
+        HKU_WARN("The input is ignored because " << getParam<string>("kpart")
+                 << "depends on the context! [IKData::_calculate]");
+    }
+
+    KData kdata = getContext();
     size_t total = kdata.size();
     if (total == 0) {
         return;

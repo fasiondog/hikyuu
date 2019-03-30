@@ -20,7 +20,6 @@ namespace hku {
  */
 class Vigor: public IndicatorImp {
     INDICATOR_IMP(Vigor)
-    INDICATOR_IMP_NEED_CONTEXT(Vigor)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

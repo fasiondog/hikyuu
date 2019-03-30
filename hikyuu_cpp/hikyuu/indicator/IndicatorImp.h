@@ -66,30 +66,15 @@ public:
     typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
     virtual IndicatorImpPtr operator()(const Indicator& ind);
 
-    size_t getResultNumber() const {
-        return m_result_num;
-    }
+    size_t getResultNumber() const;
 
-    size_t discard() const {
-        return m_discard;
-    }
+    size_t discard() const;
 
     void setDiscard(size_t discard);
 
-    size_t size() const {
-        return m_pBuffer[0] ? m_pBuffer[0]->size() : 0;
-    }
+    size_t size() const;
 
-    price_t get(size_t pos, size_t num = 0) {
-#if CHECK_ACCESS_BOUND
-        if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
-            throw(std::out_of_range("Try to access value out of bounds! "
-                        + name() + " [IndicatorImp::get]"));
-            return Null<price_t>();
-        }
-#endif
-        return (*m_pBuffer[num])[pos];
-    }
+    price_t get(size_t pos, size_t num = 0);
 
     /** 以PriceList方式获取指定的输出集 */
     PriceList getResultAsPriceList(size_t result_num);
@@ -101,17 +86,7 @@ public:
      * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
      * 未做越界保护
      */
-    void _set(price_t val, size_t pos, size_t num = 0) {
-#if CHECK_ACCESS_BOUND
-        if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
-            throw(std::out_of_range("Try to access value out of bounds! "
-                        + name() + " [IndicatorImp::_set]"));
-        }
-        (*m_pBuffer[num])[pos] = val;
-#else
-        (*m_pBuffer[num])[pos] = val;
-#endif
-    }
+    void _set(price_t val, size_t pos, size_t num = 0);
 
     /**
      * 准备内存
@@ -121,17 +96,15 @@ public:
      */
     void _readyBuffer(size_t len, size_t result_num);
 
-    string name() const { return m_name; }
-    void name(const string& name) { m_name = name; }
+    string name() const;
+    void name(const string& name);
 
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
     string formula() const;
 
-    bool isLeaf() const { 
-        return m_optype == LEAF ? true : false; 
-    }
+    bool isLeaf() const;
 
     Indicator calculate();
 
@@ -139,7 +112,7 @@ public:
 
     void setContext(const KData&);
 
-    KData getCurrentKData();
+    KData getContext() const;
 
     void add(OPType, IndicatorImpPtr left, IndicatorImpPtr right);
 
@@ -156,11 +129,8 @@ public:
 
     virtual IndicatorImpPtr _clone() { return make_shared<IndicatorImp>(); }
 
-    virtual bool isNeedContext() const { return false; }
-
 private:
     void initContext();
-    IndicatorImpPtr getSameNameNeedContextLeaf(const string& name);
     void execute_add();
     void execute_sub();
     void execute_mul();
@@ -265,13 +235,62 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
     virtual void _calculate(const Indicator& data); \
     virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } 
 
-#define INDICATOR_IMP_NEED_CONTEXT(classname) public: \
-    virtual bool isNeedContext() const { return true; }
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
 
 HKU_API std::ostream & operator<<(std::ostream&, const IndicatorImp&);
 HKU_API std::ostream & operator<<(std::ostream&, const IndicatorImpPtr&);
+
+inline size_t IndicatorImp::getResultNumber() const {
+    return m_result_num;
+}
+
+inline size_t IndicatorImp::discard() const {
+    return m_discard;
+}
+
+inline size_t IndicatorImp::size() const {
+    return m_pBuffer[0] ? m_pBuffer[0]->size() : 0;
+}
+
+inline string IndicatorImp::name() const { 
+    return m_name; 
+}
+
+inline void IndicatorImp::name(const string& name) {
+    m_name = name; 
+}
+
+inline bool IndicatorImp::isLeaf() const { 
+    return m_optype == LEAF ? true : false; 
+}
+
+inline KData IndicatorImp::getContext() const { 
+    return getParam<KData>("kdata"); 
+}
+
+inline price_t IndicatorImp::get(size_t pos, size_t num) {
+#if CHECK_ACCESS_BOUND
+    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+        throw(std::out_of_range("Try to access value out of bounds! "
+                + name() + " [IndicatorImp::get]"));
+        return Null<price_t>();
+    }
+#endif
+    return (*m_pBuffer[num])[pos];
+}
+
+inline void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
+#if CHECK_ACCESS_BOUND
+    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+        throw(std::out_of_range("Try to access value out of bounds! "
+                + name() + " [IndicatorImp::_set]"));
+    }
+    (*m_pBuffer[num])[pos] = val;
+#else
+    (*m_pBuffer[num])[pos] = val;
+#endif
+}
 
 } /* namespace hku */
 #endif /* INDICATORIMP_H_ */

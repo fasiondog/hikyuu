@@ -35,7 +35,7 @@ void ConstantValue::_calculate(const Indicator& data) {
     size_t total = 0;
     if (isLeaf()) {
         //叶子节点
-        KData k = getCurrentKData();
+        KData k = getContext();
         total = k.size();
         if (0 == total) {
             return;

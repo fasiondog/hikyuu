@@ -84,7 +84,6 @@ Indicator (*LLV_2)(const Indicator&, int) = LLV;
 
 Indicator (*VIGOR_1)(const KData&, int) = VIGOR;
 Indicator (*VIGOR_2)(int) = VIGOR;
-Indicator (*VIGOR_3)(const Indicator&, int) = VIGOR;
 
 Indicator (*CVAL_1)(double, size_t) = CVAL;
 Indicator (*CVAL_2)(const Indicator&, double, int) = CVAL;
@@ -146,7 +145,6 @@ void export_Indicator_build_in() {
 
     def("VIGOR", VIGOR_1, (arg("kdata"), arg("n")=2));
     def("VIGOR", VIGOR_2, (arg("n")=2));
-    def("VIGOR", VIGOR_3, (arg("data"), arg("n")=2));
 
     def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1")=10, arg("n2")=3, arg("p")=2.0));
     def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1")=10, arg("n2")=3, arg("p")=2.0));

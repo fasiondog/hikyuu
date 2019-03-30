@@ -14,7 +14,6 @@ namespace hku {
 
 class ILiuTongPan: public IndicatorImp {
     INDICATOR_IMP(ILiuTongPan)
-    INDICATOR_IMP_NEED_CONTEXT(ILiuTongPan)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

@@ -422,8 +422,6 @@ __all__ = [#类
            'IS_PY3',
            
            #函数
-           'set_current_context',
-           'get_current_context',
            'getVersion',
            'getDateRange', 
            'getStock',

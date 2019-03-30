@@ -10,7 +10,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "utilities/util.h"
-#include "Context.h"
 #include "StockManager.h"
 #include "data_driver/DataDriverFactory.h"
 #include "data_driver/KDataTempCsvDriver.h"
@@ -282,8 +281,6 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         if (preload_min60)
             iter->second.loadKDataToBuffer(KQuery::MIN60);
     }
-
-    setGlobalContext(Stock(), KQuery());
 }
 
 

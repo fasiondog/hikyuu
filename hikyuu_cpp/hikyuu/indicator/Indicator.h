@@ -56,15 +56,17 @@ public:
     /** 返回形如：Name(param1_val,param2_val,...) */
     string long_name() const;
 
+    /** 克隆操作 */
     Indicator clone() const;
 
+    /** 设置上下文 */
     void setContext(const Stock&, const KQuery&);
     void setContext(const KData&);
 
-    KData getCurrentKData() const {
-        return m_imp ? m_imp->getCurrentKData() : KData();
-    }
+    /** 获取上下文 */
+    KData getContext() const;
 
+    /** 显示指标公式 */
     string formula() const;
 
     /** 结果中需抛弃的个数 */
@@ -82,40 +84,26 @@ public:
     /** 获取大小 **/
     size_t size() const;
 
-    /**
-     * 只获取第一个结果集中相应位置输出，等同于get(pos, 0)
-     * @note 不做下标越界检查，也不抛出异常
-     */
-    price_t operator[](size_t pos) const {
-#if CHECK_ACCESS_BOUND
-        if (!m_imp) {
-            throw(std::out_of_range(
-                "Try to access empty indicator! [Indicator::get]"));
-            return Null<price_t>();
-        }
-#endif        
-        return m_imp->get(pos, 0);
-    }
+    /** 只获取第一个结果集中相应位置输出，等同于get(pos, 0) */
+    price_t operator[](size_t pos) const;
 
     /**
      * 获取第num个结果集中指定位置的数据
      * @param pos 结果集中的位置
      * @param num 第几个结果集
-     * @note 不做下标越界检查，不会抛出异常
      */
-    price_t get(size_t pos, size_t num = 0) const {
-#if CHECK_ACCESS_BOUND
-        if (!m_imp) {
-            throw(std::out_of_range(
-                "Try to access empty indicator! [Indicator::get]"));
-            return Null<price_t>();
-        }
-#endif        
-        return m_imp->get(pos, num);
-    }
+    price_t get(size_t pos, size_t num = 0) const;
 
+    /** 
+     * 以指标的方式获取指定的结果集 
+     * @param num 指定的结果集
+     */    
     Indicator getResult(size_t num) const;
 
+    /**
+     * 以 PriceList 的方式获取指定的结果集
+     * @param num 指定的结果集
+     */
     PriceList getResultAsPriceList(size_t num) const;
 
     template <typename ValueType>
@@ -148,6 +136,71 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
+
+inline string Indicator::name() const {
+    return m_imp ? m_imp->name() : "IndicatorImp";
+}
+
+inline void Indicator::name(const string& name) {
+    if (m_imp) {
+        m_imp->name(name);
+    }
+}
+
+inline string Indicator::long_name() const {
+    return m_imp ? m_imp->long_name() : "IndicatorImp()";
+}
+
+inline size_t Indicator::discard() const {
+    return m_imp ? m_imp->discard() : 0 ;
+}
+
+inline void Indicator::setDiscard(size_t discard) {
+    if (m_imp) {
+        m_imp->setDiscard(discard);
+    }
+}
+
+inline size_t Indicator::getResultNumber() const {
+    return m_imp ? m_imp->getResultNumber() : 0;
+}
+
+inline bool Indicator::empty() const {
+    return (!m_imp || m_imp->size() == 0) ? true : false;
+}
+
+inline size_t Indicator::size() const {
+    return m_imp ? m_imp->size() : 0;
+}
+
+inline Indicator Indicator::clone() const {
+    return m_imp ? Indicator(m_imp->clone()) : Indicator();
+}
+
+inline price_t Indicator::operator[](size_t pos) const {
+#if CHECK_ACCESS_BOUND
+    if (!m_imp) {
+        throw(std::out_of_range(
+            "Try to access empty indicator! [Indicator::get]"));
+    }
+#endif        
+    return m_imp->get(pos, 0);
+}
+
+inline price_t Indicator::get(size_t pos, size_t num) const {
+#if CHECK_ACCESS_BOUND
+    if (!m_imp) {
+        throw(std::out_of_range(
+            "Try to access empty indicator! [Indicator::get]"));
+    }
+#endif        
+    return m_imp->get(pos, num);
+}
+
+
+//--------------------------------------------------------------
+// 指标操作
+//-------------------------------------------------------------
 HKU_API Indicator operator+(const Indicator&, const Indicator&);
 HKU_API Indicator operator-(const Indicator&, const Indicator&);
 HKU_API Indicator operator*(const Indicator&, const Indicator&);

@@ -300,13 +300,13 @@ STDEV([data, n=10])
 
 
 VIGOR.__doc__ = """
-VIGOR(data[, n=2])
+VIGOR([kdata, n=2])
 
     亚历山大.艾尔德力度指数 [BOOK2]_
     
     计算公式：（收盘价今－收盘价昨）＊成交量今
     
-    :param data: 输入数据（KData 或 具有6个结果集的Indicator）
+    :param KData data: 输入数据
     :param int n: EMA平滑窗口
     :return: Indicator
 """

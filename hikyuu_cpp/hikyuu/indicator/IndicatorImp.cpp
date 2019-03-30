@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include "Indicator.h"
 #include "../Stock.h"
-#include "../Context.h"
 #include "../Log.h"
 
 namespace hku {
@@ -62,13 +61,10 @@ void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
     if (m_right) m_right->setContext(stock, query);
     if (m_three) m_three->setContext(stock, query);
 
-    //如果该节点依赖上下文
-    if (isNeedContext()) {
-        //如果上下文有变化则重设上下文
-        KData kdata = getCurrentKData();
-        if (kdata.getStock() != stock || kdata.getQuery() != query) {
-            setParam<KData>("kdata", stock.getKData(query));        
-        }
+     //如果上下文有变化则重设上下文
+    KData kdata = getContext();
+    if (kdata.getStock() != stock || kdata.getQuery() != query) {
+        setParam<KData>("kdata", stock.getKData(query));        
     }
 
     //启动重新计算
@@ -83,24 +79,16 @@ void IndicatorImp::setContext(const KData& k) {
     if (m_right) m_right->setContext(k);
     if (m_three) m_three->setContext(k);
 
-    //如果该节点依赖上下文
-    if (isNeedContext()) {
-        //如果上下文有变化则重设上下文
-        setParam<KData>("kdata", k);        
+    //如果上下文有变化则重设上下文
+    KData old_k = getParam<KData>("kdata");
+    if (old_k.getStock() != k.getStock() || old_k.getQuery() != k.getQuery()) {
+        setParam<KData>("kdata", k);
     }
 
     //启动重新计算
     calculate();
 }
 
-KData IndicatorImp::getCurrentKData() {
-    KData kdata = getParam<KData>("kdata");
-    if (kdata.getStock().isNull()) {
-        kdata = getGlobalContextKData();
-    }
-
-    return kdata;
-}
 
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     if (result_num > MAX_RESULT_NUM) {
@@ -301,35 +289,9 @@ string IndicatorImp::formula() const {
 }
 
 
-IndicatorImpPtr IndicatorImp::getSameNameNeedContextLeaf(const string& name) {
-    if (isNeedContext() && m_name == name) {
-        return shared_from_this();
-    }
-
-    IndicatorImpPtr p;
-    if (m_left) {
-        p = m_left->getSameNameNeedContextLeaf(name);
-        if (p) {
-            return p;
-        }
-    }
-
-    if (m_right) {
-        p = m_right->getSameNameNeedContextLeaf(name);
-    }
-
-    return p;
-}
-
-
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (op == LEAF || op >= INVALID || !right) {
         HKU_ERROR("Wrong used [IndicatorImp::add]");
-        return;
-    }
-
-    if (op == LEAF && left && left->isNeedContext()) {
-        HKU_ERROR("Syntax error! [IndicatorImp::add]");
         return;
     }
 

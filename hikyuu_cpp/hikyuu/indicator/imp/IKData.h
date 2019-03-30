@@ -14,7 +14,6 @@ namespace hku {
 
 class IKData: public IndicatorImp {
     INDICATOR_IMP(IKData)
-    INDICATOR_IMP_NEED_CONTEXT(IKData)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

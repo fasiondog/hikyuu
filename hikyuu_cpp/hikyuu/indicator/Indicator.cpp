@@ -39,6 +39,11 @@ void Indicator::setContext(const KData& k) {
     if (m_imp) m_imp->setContext(k);
 }
 
+KData Indicator::getContext() const {
+    return m_imp ? m_imp->getContext() : KData();
+}
+
+
 Indicator& Indicator::operator=(const Indicator& indicator) {
     if (this == &indicator)
         return *this;
@@ -47,45 +52,6 @@ Indicator& Indicator::operator=(const Indicator& indicator) {
         m_imp = indicator.m_imp;
 
     return *this;
-}
-
-string Indicator::name() const {
-    return m_imp ? m_imp->name() : "IndicatorImp";
-}
-
-void Indicator::name(const string& name) {
-    if (m_imp) {
-        m_imp->name(name);
-    }
-}
-
-string Indicator::long_name() const {
-    return m_imp ? m_imp->long_name() : "IndicatorImp()";
-}
-
-size_t Indicator::discard() const {
-    return m_imp ? m_imp->discard() : 0 ;
-}
-
-void Indicator::setDiscard(size_t discard) {
-    if (m_imp)
-        m_imp->setDiscard(discard);
-}
-
-size_t Indicator::getResultNumber() const {
-    return m_imp ? m_imp->getResultNumber() : 0;
-}
-
-bool Indicator::empty() const {
-    return (!m_imp || m_imp->size() == 0) ? true : false;
-}
-
-size_t Indicator::size() const {
-    return m_imp ? m_imp->size() : 0;
-}
-
-Indicator Indicator::clone() const {
-    return m_imp ? Indicator(m_imp->clone()) : Indicator();
 }
 
 PriceList Indicator::getResultAsPriceList(size_t num) const {

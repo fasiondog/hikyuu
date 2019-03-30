@@ -69,7 +69,7 @@ void export_Indicator() {
         .def("getResultAsPriceList", &Indicator::getResultAsPriceList)
         .def("setContext", setContext_1)
         .def("setContext", setContext_2)
-        .def("getCurrentKData", &Indicator::getCurrentKData)
+        .def("getContext", &Indicator::getContext)
         .def("getImp", &Indicator::getImp)
         .def("__len__", &Indicator::size)
         .def("__call__", &Indicator::operator())

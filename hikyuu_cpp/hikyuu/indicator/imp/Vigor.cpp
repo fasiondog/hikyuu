@@ -37,7 +37,12 @@ bool Vigor::check() {
 }
 
 void Vigor::_calculate(const Indicator& ind) {
-    KData kdata = getCurrentKData();
+    if (!isLeaf() && !ind.empty()) {
+        HKU_WARN("The input is ignored because " << m_name
+                  << " depends on the context! [Vigor::_calculate]");
+    }
+
+    KData kdata = getContext();
     size_t total = kdata.size();
     _readyBuffer(total, 1);
 
@@ -64,15 +69,10 @@ Indicator HKU_API VIGOR(int n) {
     return make_shared<Vigor>(n)->calculate();
 }
 
-Indicator HKU_API VIGOR(const KData& data, int n) {
+Indicator HKU_API VIGOR(const KData& k, int n) {
     Indicator v = VIGOR(n);
-    v.setContext(data.getStock(), data.getQuery());
+    v.setContext(k);
     return v;
 }
-
-Indicator HKU_API VIGOR(const Indicator& ind, int n) {
-    return VIGOR(ind.getCurrentKData(), n);
-}
-
 
 } /* namespace hku */
