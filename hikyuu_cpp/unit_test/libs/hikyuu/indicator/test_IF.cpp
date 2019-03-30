@@ -31,8 +31,14 @@ BOOST_AUTO_TEST_CASE( test_IF ) {
     KData kdata = getStock("SH600000").getKData(KQuery(-10));
     Indicator x = IF(CLOSE() > OPEN(), CVAL(1), CVAL(0));
     x.setContext(kdata);
+    Indicator c = CLOSE(kdata);
+    Indicator o = OPEN(kdata);
     for (int i = 0; i < x.size(); i++) {
-        std::cout << i << " " << x[i] << std::endl;
+        if (c[i] > o[i]) {
+            BOOST_CHECK(x[i] == 1);
+        } else {
+            BOOST_CHECK(x[i] == 0);
+        }
     }
 }
 
