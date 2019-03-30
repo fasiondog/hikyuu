@@ -34,6 +34,7 @@
 #include "imp/HighLine.h"
 #include "imp/LowLine.h"
 #include "imp/IKData.h"
+#include "imp/ILiuTongPan.h"
 #include "imp/IPriceList.h"
 #include "imp/Sma.h"
 #include "imp/Macd.h"
@@ -51,6 +52,7 @@ BOOST_CLASS_EXPORT(hku::Ema)
 BOOST_CLASS_EXPORT(hku::HighLine)
 BOOST_CLASS_EXPORT(hku::IKData)
 BOOST_CLASS_EXPORT(hku::IPriceList)
+BOOST_CLASS_EXPORT(hku::ILiuTongPan)
 BOOST_CLASS_EXPORT(hku::LowLine)
 BOOST_CLASS_EXPORT(hku::Macd)
 BOOST_CLASS_EXPORT(hku::RightShift)
