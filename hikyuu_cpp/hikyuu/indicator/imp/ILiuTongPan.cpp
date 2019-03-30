@@ -7,6 +7,11 @@
 
 #include "ILiuTongPan.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::ILiuTongPan)
+#endif
+
+
 namespace hku {
 
 ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {

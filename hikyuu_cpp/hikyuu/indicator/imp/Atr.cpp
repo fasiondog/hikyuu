@@ -7,6 +7,11 @@
 
 #include "Atr.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Atr)
+#endif
+
+
 namespace hku {
 
 Atr::Atr() : IndicatorImp("ATR", 1){

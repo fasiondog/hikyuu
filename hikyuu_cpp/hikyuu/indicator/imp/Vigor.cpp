@@ -11,6 +11,11 @@
 #include "../crt/KDATA.h"
 #include "../crt/REF.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Vigor)
+#endif
+
+
 namespace hku {
 
 Vigor::Vigor(): IndicatorImp("VIGOR", 1) {

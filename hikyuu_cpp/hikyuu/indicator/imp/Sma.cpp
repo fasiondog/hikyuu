@@ -7,6 +7,11 @@
 
 #include "Sma.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Sma)
+#endif
+
+
 namespace hku {
 
 Sma::Sma(): IndicatorImp("SMA", 1) {

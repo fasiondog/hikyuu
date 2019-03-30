@@ -8,6 +8,11 @@
 #include <cmath>
 #include "Ama.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Ama)
+#endif
+
+
 namespace hku {
 
 Ama::Ama() : IndicatorImp("AMA", 2) {

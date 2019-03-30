@@ -8,6 +8,11 @@
 #include "IKData.h"
 #include <boost/algorithm/string.hpp>
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::IKData)
+#endif
+
+
 namespace hku {
 
 IKData::IKData(): IndicatorImp("KDATA") {

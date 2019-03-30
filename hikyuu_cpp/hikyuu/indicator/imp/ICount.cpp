@@ -7,6 +7,11 @@
 
 #include "ICount.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::ICount)
+#endif
+
+
 namespace hku {
 
 ICount::ICount() : IndicatorImp("COUNT", 1) {

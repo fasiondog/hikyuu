@@ -7,6 +7,11 @@
 
 #include "RightShift.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::RightShift)
+#endif
+
+
 namespace hku {
 
 RightShift::RightShift(): IndicatorImp("REF", 1) {

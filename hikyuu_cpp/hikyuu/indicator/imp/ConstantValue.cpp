@@ -7,6 +7,11 @@
 
 #include "ConstantValue.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::ConstantValue)
+#endif
+
+
 namespace hku {
 
 ConstantValue::ConstantValue() : IndicatorImp("CVAL", 1) {

@@ -7,6 +7,11 @@
 
 #include "Ema.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Ema)
+#endif
+
+
 namespace hku {
 
 Ema::Ema(): IndicatorImp("EMA", 1) {

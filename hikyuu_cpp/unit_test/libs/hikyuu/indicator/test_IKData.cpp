@@ -12,6 +12,7 @@
     #include <boost/test/unit_test.hpp>
 #endif
 
+#include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 
@@ -183,5 +184,47 @@ BOOST_AUTO_TEST_CASE( test_IKData_setContext ) {
         BOOST_CHECK(count[i] == kdata[i].transCount);
     }
 }
+
+
+//-----------------------------------------------------------------------------
+// test export
+//-----------------------------------------------------------------------------
+#if HKU_SUPPORT_SERIALIZATION
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_KDATA_export ) {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/IKDATA.xml";
+
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-20));
+    Indicator ma1 = KDATA(kdata);
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(ma1);
+    }
+
+    Indicator ma2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(ma2);
+    }
+
+    BOOST_CHECK(ma1.size() == ma2.size());
+    BOOST_CHECK(ma1.discard() == ma2.discard());
+    BOOST_CHECK(ma1.getResultNumber() == ma2.getResultNumber());
+    for (size_t i = 0; i < ma1.size(); ++i) {
+        BOOST_CHECK_CLOSE(ma1.get(i,0), ma2.get(i,0), 0.00001);
+        BOOST_CHECK_CLOSE(ma1.get(i,1), ma2.get(i,1), 0.00001);
+        BOOST_CHECK_CLOSE(ma1.get(i,2), ma2.get(i,2), 0.00001);
+        BOOST_CHECK_CLOSE(ma1.get(i,3), ma2.get(i,3), 0.00001);
+        BOOST_CHECK_CLOSE(ma1.get(i,4), ma2.get(i,4), 0.00001);
+        BOOST_CHECK_CLOSE(ma1.get(i,5), ma2.get(i,5), 0.00001);
+    }
+}
+#endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

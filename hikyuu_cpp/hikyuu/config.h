@@ -5,8 +5,8 @@
  *      Author: fasiondog
  */
 
-#ifndef CONFIG_H_
-#define CONFIG_H_
+#ifndef HIKYUU_CONFIG_H_
+#define HIKYUU_CONFIG_H_
 
 //support serialization
 #define HKU_SUPPORT_SERIALIZATION 1
@@ -20,4 +20,4 @@
 //检查下标越界
 #define CHECK_ACCESS_BOUND 1
 
-#endif /* CONFIG_H_ */
+#endif /* HIKYUU_CONFIG_H_ */

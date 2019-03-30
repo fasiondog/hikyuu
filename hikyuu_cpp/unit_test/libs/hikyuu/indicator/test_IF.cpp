@@ -13,8 +13,8 @@
     #include <boost/test/unit_test.hpp>
 #endif
 
+#include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/Context.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 

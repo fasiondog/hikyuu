@@ -14,12 +14,29 @@
 #include "../utilities/util.h"
 
 #if HKU_SUPPORT_SERIALIZATION
+    #if HKU_SUPPORT_XML_ARCHIVE
+    #include <boost/archive/xml_oarchive.hpp>
+    #include <boost/archive/xml_iarchive.hpp>
+    #endif /* HKU_SUPPORT_XML_ARCHIVE */
+
+    #if HKU_SUPPORT_TEXT_ARCHIVE
+    #include <boost/archive/text_oarchive.hpp>
+    #include <boost/archive/text_iarchive.hpp>
+    #endif /* HKU_SUPPORT_TEXT_ARCHIVE */
+
+    #if HKU_SUPPORT_BINARY_ARCHIVE
+    #include <boost/archive/binary_oarchive.hpp>
+    #include <boost/archive/binary_iarchive.hpp>
+    #endif /* HKU_SUPPORT_BINARY_ARCHIVE */
+
+#include <boost/serialization/export.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
-#endif
+#endif /* HKU_SUPPORT_SERIALIZATION */
+
 
 namespace hku {
 

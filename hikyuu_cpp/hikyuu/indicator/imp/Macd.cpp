@@ -8,6 +8,11 @@
 #include "Macd.h"
 #include "../crt/EMA.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Macd)
+#endif
+
+
 namespace hku {
 
 Macd::Macd(): IndicatorImp("MACD", 3) {

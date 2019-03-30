@@ -7,6 +7,11 @@
 
 #include "IPriceList.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::IPriceList)
+#endif
+
+
 namespace hku {
 
 IPriceList::IPriceList() : IndicatorImp("PRICELIST", 1) {

@@ -7,6 +7,11 @@
 
 #include "Diff.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::Diff)
+#endif
+
+
 namespace hku {
 
 Diff::Diff(): IndicatorImp("DIFF", 1) {

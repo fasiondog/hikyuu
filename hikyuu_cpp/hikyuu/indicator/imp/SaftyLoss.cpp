@@ -7,6 +7,11 @@
 
 #include "SaftyLoss.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::SaftyLoss)
+#endif
+
+
 namespace hku {
 
 SaftyLoss::SaftyLoss():IndicatorImp("SAFTYLOSS", 1) {

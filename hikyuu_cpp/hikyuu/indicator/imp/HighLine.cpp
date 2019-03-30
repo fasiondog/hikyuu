@@ -7,6 +7,11 @@
 
 #include "HighLine.h"
 
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::HighLine)
+#endif
+
+
 namespace hku {
 
 HighLine::HighLine() : IndicatorImp("HHV", 1) {
