@@ -44,13 +44,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         return os.path.expanduser('~') + '/.hikyuu'
 
     def saveConfig(self):
+        if not os.path.lexists(self.getUserConfigDir()):
+            os.mkdir(self.getUserConfigDir())
+
         current_config = self.getCurrentConfig()
         filename = self.getUserConfigDir() + '/importdata-gui.ini'
         with open(filename, 'w', encoding='utf-8') as f:
             current_config.write(f)
-
-        if not os.path.lexists(self.getUserConfigDir()):
-            os.mkdir(self.getUserConfigDir())
             
         filename = self.getUserConfigDir() + '/hikyuu.ini'
         data_dir = current_config['hdf5']['dir']
@@ -106,8 +106,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #self.trans_max_days_spinBox.setValue(import_config.getint('ktype', 'trans_max_days', fallback=70))
         #self.time_max_days_spinBox.setValue(import_config.getint('ktype', 'time_max_days', fallback=70))
 
-        #初始化权息数据设置
+        #初始化权息与财务数据设置
         self.import_weight_checkBox.setChecked(import_config.getboolean('weight', 'enable', fallback=True))
+        self.import_finance_checkBox.setChecked(import_config.getboolean('finance', 'enable', fallback=True))
 
         #初始化通道信目录配置
         tdx_enable = import_config.getboolean('tdx', 'enable', fallback=False)
@@ -144,6 +145,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                                   'trans_start_date': self.trans_start_dateEdit.date().toString('yyyy-MM-dd'),
                                   'time_start_date': self.time_start_dateEdit.date().toString('yyyy-MM-dd')}
         import_config['weight'] = {'enable': self.import_weight_checkBox.isChecked(),}
+        import_config['finance'] = {'enable': self.import_finance_checkBox.isChecked(),}
         import_config['tdx'] = {'enable': self.tdx_radioButton.isChecked(),
                                 'dir': self.tdx_dir_lineEdit.text()}
         import_config['pytdx'] = {'enable': self.pytdx_radioButton.isChecked(),
@@ -211,6 +213,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_5min_progressBar.setValue(0)
         self.hdf5_trans_progressBar.setValue(0)
         self.hdf5_time_progressBar.setValue(0)
+        self.finance_progressBar.setValue(0)
         self.import_detail_textEdit.clear()
 
     def on_escapte_time(self, escape):
@@ -271,6 +274,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 self.hdf5_weight_label.setText(msg[2])
                 if msg[2] == '导入完成!':
                     self.import_detail_textEdit.append('导入权息记录数：{}'.format(msg[3]))
+            
+            elif msg_task_name == 'IMPORT_FINANCE':
+                if msg[2] != 'FINISHED':
+                    self.finance_progressBar.setValue(msg[2])
 
 
     @pyqtSlot()

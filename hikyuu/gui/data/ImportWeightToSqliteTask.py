@@ -47,6 +47,10 @@ class ImportWeightToSqliteTask:
             return
 
         try:
+            download_dir = self.dest_dir + "/downloads"
+            if not os.path.lexists(download_dir):
+                os.makedirs(download_dir)
+            
             self.queue.put([self.msg_name, '正在下载...', 0, 0, 0])
             net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
             buffer = net_file.read()
@@ -54,7 +58,7 @@ class ImportWeightToSqliteTask:
             self.queue.put([self.msg_name, '下载完成，正在校验是否存在更新...', 0, 0, 0])
             new_md5 = hashlib.md5(buffer).hexdigest()
 
-            dest_filename = self.dest_dir+'/weight.rar'
+            dest_filename = download_dir + '/weight.rar'
             old_md5 = None
             if os.path.exists(dest_filename):
                 with open(dest_filename, 'rb') as oldfile:
@@ -66,13 +70,13 @@ class ImportWeightToSqliteTask:
                     file.write(buffer)
 
                 self.queue.put([self.msg_name, '下载完成，正在解压...', 0, 0, 0])
-                x = os.system('unrar x -o+ -inul {} {}'.format(dest_filename, self.dest_dir))
+                x = os.system('unrar x -o+ -inul {} {}'.format(dest_filename, download_dir))
                 if x != 0:
                     raise Exception("无法找到unrar命令！")
 
                 self.queue.put([self.msg_name, '解压完毕，正在导入权息数据...', 0, 0, 0])
-                total_count = qianlong_import_weight(connect, self.dest_dir + '/weight', 'SH')
-                total_count += qianlong_import_weight(connect, self.dest_dir + '/weight', 'SZ')
+                total_count = qianlong_import_weight(connect, download_dir + '/weight', 'SH')
+                total_count += qianlong_import_weight(connect, download_dir + '/weight', 'SZ')
                 self.queue.put([self.msg_name, '导入完成!', 0, 0, total_count])
 
             else:
