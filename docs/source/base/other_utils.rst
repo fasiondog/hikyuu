@@ -7,6 +7,20 @@
 函数
 ------
 
+.. py:function:: select()
+
+    示例::
+    
+        #选出涨停股
+        C = CLOSE()
+        x = select(C / REF(C, 1) - 1 >= 0.0995))
+
+    :param Indicator cond: 条件指标
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期
+    :param bool print_out: 打印选中的股票
+    :rtype: 选中的股票列表
+
 .. py:function:: get_log_level()
 
     获取当前日志打印级别
