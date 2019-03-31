@@ -13,6 +13,7 @@
     #include <boost/test/unit_test.hpp>
 #endif
 
+#include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/COUNT.h>
@@ -41,6 +42,44 @@ BOOST_AUTO_TEST_CASE( test_COUNT ) {
         std::cout << i << " " << C[i-1] << " " << C[i] << " " << x[i] << std::endl;
     }*/
 }
+
+
+//-----------------------------------------------------------------------------
+// test export
+//-----------------------------------------------------------------------------
+#if HKU_SUPPORT_SERIALIZATION
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_COUNT_export ) {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/COUNT.xml";
+
+    Indicator C = CLOSE();
+    Indicator x1 = COUNT(C > REF(C, 1), 5);
+    x1.setContext(getStock("sh600004"), KQuery(-8));
+
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(x1);
+    }
+
+    Indicator x2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(x2);
+    }
+
+    BOOST_CHECK(x1.size() == x2.size());
+    BOOST_CHECK(x1.discard() == x2.discard());
+    BOOST_CHECK(x1.getResultNumber() == x2.getResultNumber());
+    for (size_t i = 0; i < x1.size(); ++i) {
+        BOOST_CHECK_CLOSE(x1[i], x2[i], 0.00001);
+    }
+}
+#endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */
 
