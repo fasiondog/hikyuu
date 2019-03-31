@@ -37,6 +37,18 @@ void ICount::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
+    if (0 == n) {
+        m_discard = data.discard();
+        int count = 0;
+        for (size_t i = m_discard; i < total; ++i) {
+            if (data[i] > 0) {
+                count++;
+            }
+            _set(count, i);
+        }
+        return;
+    }
+
     m_discard = data.discard() + n - 1;
     if (m_discard >= total) {
         m_discard = total;

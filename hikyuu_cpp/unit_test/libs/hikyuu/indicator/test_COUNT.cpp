@@ -29,6 +29,7 @@ using namespace hku;
 
 /** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_COUNT ) {
+    /** @arg n > 0 */
     Indicator C = CLOSE();
     Indicator x = COUNT(C > REF(C, 1), 5);
     x.setContext(getStock("sh600004"), KQuery(-8));
@@ -41,6 +42,20 @@ BOOST_AUTO_TEST_CASE( test_COUNT ) {
     for (int i = 1; i < 8 ; i++) {
         std::cout << i << " " << C[i-1] << " " << C[i] << " " << x[i] << std::endl;
     }*/
+
+    /** @arg n == 0 */
+    x = COUNT(C > REF(C, 1), 0);
+    x.setContext(getStock("sh600004"), KQuery(-8));
+    BOOST_CHECK(x.size() == 8);
+    BOOST_CHECK(x.discard() == 1);
+    BOOST_CHECK(x[0] == Null<price_t>());
+    BOOST_CHECK(x[1] == 1);
+    BOOST_CHECK(x[2] == 2);
+    BOOST_CHECK(x[3] == 2);
+    BOOST_CHECK(x[4] == 3);
+    BOOST_CHECK(x[5] == 3);
+    BOOST_CHECK(x[6] == 3);
+    BOOST_CHECK(x[7] == 4);
 }
 
 
