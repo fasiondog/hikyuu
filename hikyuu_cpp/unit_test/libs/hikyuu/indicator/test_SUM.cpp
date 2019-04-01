@@ -1,7 +1,7 @@
 /*
- * test_LLV.cpp
+ * test_SUM.cpp
  *
- *  Created on: 2019年4月1日
+ *  Created on: 2019年4月2日
  *      Author: fasiondog
  */
 
@@ -15,19 +15,20 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/LLV.h>
+#include <hikyuu/indicator/crt/SUM.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_LLV test_indicator_LLV
+ * @defgroup test_indicator_SUM test_indicator_SUM
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_LLV ) {
+BOOST_AUTO_TEST_CASE( test_SUM ) {
     Indicator result;
 
     PriceList a;
@@ -38,29 +39,31 @@ BOOST_AUTO_TEST_CASE( test_LLV ) {
     Indicator data = PRICELIST(a);
 
     /** @arg n = 0 */
-    result = LLV(data, 0);
+    result = SUM(data, 0);
     BOOST_CHECK(result.discard() == 0);
+    price_t sum = 0;
     for (int i = 0; i <10; ++i) {
-        BOOST_CHECK(result[i] == data[0]);
+        sum += data[i];
+        BOOST_CHECK(result[i] == sum);
     }
 
     /** @arg n = 1 */
-    result = LLV(data, 1);
+    result = SUM(data, 1);
     BOOST_CHECK(result.discard() == 0);
     for (int i = 0; i < 10; ++i) {
         BOOST_CHECK(result[i] == data[i]);
     }
 
     /** @arg n = 9 */
-    result = LLV(data, 9);
+    result = SUM(data, 9);
     BOOST_CHECK(result.discard() == 8);
-    BOOST_CHECK(result[8] == data[0]);
-    BOOST_CHECK(result[9] == data[1]);
+    BOOST_CHECK(result[8] == 36);
+    BOOST_CHECK(result[9] == 45);
 
     /** @arg n = 10 */
-    result = LLV(data, 10);
+    result = SUM(data, 10);
     BOOST_CHECK(result.discard() == 9);
-    BOOST_CHECK(result[9] == data[0]);
+    BOOST_CHECK(result[9] == 45);
 }
 
 
@@ -70,14 +73,14 @@ BOOST_AUTO_TEST_CASE( test_LLV ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_LLV_export ) {
+BOOST_AUTO_TEST_CASE( test_SUM_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/LLV.xml";
+    filename += "SUM.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = LLV(CLOSE(kdata), 2);
+    Indicator x1 = SUM(CLOSE(kdata), 3);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

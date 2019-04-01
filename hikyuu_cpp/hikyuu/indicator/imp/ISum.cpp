@@ -61,11 +61,10 @@ void ISum::_calculate(const Indicator& ind) {
         return;
     }
 
-    size_t pos = m_discard + 1 - n;
     for (size_t i = m_discard; i < total; i++) {
         price_t sum = 0;
-        for (size_t j = i + 1 - n; j < i; j++) {
-            sum += ind[i];
+        for (size_t j = i + 1 - n; j <= i; j++) {
+            sum += ind[j];
         }
         _set(sum, i);
     }

@@ -248,6 +248,15 @@
     :rtype: Indicator
     
 
+.. py:function:: SUM([data, n=20])
+
+    求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: VIGOR([kdata, n=2])
 
     亚历山大.艾尔德力度指数 [BOOK2]_

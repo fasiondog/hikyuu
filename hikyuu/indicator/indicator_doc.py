@@ -299,6 +299,17 @@ STDEV([data, n=10])
 """
 
 
+SUM.__doc__ = """
+SUM([data, n=20])
+
+    求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+"""
+
+
 VIGOR.__doc__ = """
 VIGOR([kdata, n=2])
 
