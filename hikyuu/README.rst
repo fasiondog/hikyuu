@@ -1,9 +1,17 @@
 .. image:: https://hikyuu.org/images/00000_title.png
     :target: https://hikyuu.org
-    :width: 600px
     :align: center
     :alt: Hikyuu
 
+.. image:: https://travis-ci.org/fasiondog/hikyuu.svg?branch=master
+    :target: https://travis-ci.org/fasiondog/hikyuu    
+
+.. image:: https://img.shields.io/github/license/mashape/apistatus.svg
+    :target: https://github.com/fasiondog/hikyuu/blob/master/LICENSE.txt
+    :alt: GitHub
+
+-----------    
+    
 Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（仅受限于数据，如有数据也可用于期货等）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。例如：
 
 ::
@@ -24,7 +32,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 .. figure:: https://hikyuu.org/images/10000-overview.png
         :width: 600px
 
-完整示例参见：`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu_examples/blob/master/000-Index.ipynb?flush_cache=True>`_
+完整示例参见：`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
 
 Maybe，你已经注意到了，上面没有“选股策略”？！是的，选股策略是股票交易的重要方面，肯定不会少。事实上，之前所述的交易系统都是针对一个交易对象的，也就是经常听到的策略，但很多所谓的“策略”其实仅仅只是买入、卖出的指示信号而已，并非完整的交易策略。为了区别，在这里直接以系统指称，表示一个完整的系统化交易方法或策略。而在系统之上，称为Portfolio资产组合，选股策略则是Portfolio的组件，Portfolio的另一重要组成则是资金分配策略，比如选股策略选定了4个交易对象（股票或基金等），那么如何在它们之间进行合理的资金分配？
 

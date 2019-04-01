@@ -31,15 +31,14 @@ pip 安装 Hikyuu 后，可在命令行终端中执行 hikyuutdx 命令，启动
 
 您可以从下面的网址访问最新的代码示例，这些示例将帮助您逐步了解和掌握 Hikyuu 的使用以及系统交易的相关理念。在日常使用 Hikyuu 的过程中，您可以在本帮助内查询相应的内建指标、策略、函数的详细说明，获得更多的信息。
 
-`<http://nbviewer.jupyter.org/github/fasiondog/hikyuu_examples/blob/master/000-Index.ipynb?flush_cache=true>`_ 
+`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_ 
 
 上述示例代码均使用 Jupyter notebook 编辑和运行，您可以从每个示例网址的右上角下载示例代码，并在 Jupyter notebook 中打开直接运行。
 
 .. figure:: _static/quickstart_download.png
 
-或者从这里下载全部示例：
+或者从安装目录下的 “examples/notebook” 找到全部示例。
 
-`<https://git.oschina.net/fasiondog/hikyuu_examples>`_
 
 .. figure:: _static/quickstart_examples.png
 
