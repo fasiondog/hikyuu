@@ -44,6 +44,7 @@ void HighLine::_calculate(const Indicator& data) {
     if (0 == n) {
         m_discard = data.discard();
         if (m_discard >= total) {
+            m_discard = total;
             return;
         }
         

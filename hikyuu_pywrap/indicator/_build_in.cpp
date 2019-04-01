@@ -102,6 +102,9 @@ Indicator (*IF_4)(const Indicator&, price_t, price_t) = IF;
 Indicator (*COUNT_1)(int) = COUNT;
 Indicator (*COUNT_2)(const Indicator&, int) = COUNT;
 
+Indicator (*SUM_1)(int) = SUM;
+Indicator (*SUM_2)(const Indicator&, int) = SUM;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3);
@@ -186,6 +189,9 @@ void export_Indicator_build_in() {
 
     def("COUNT", COUNT_1, (arg("n")=20));
     def("COUNT", COUNT_2, (arg("data"), arg("n")=20));
+
+    def("SUM", SUM_1, (arg("n")=20));
+    def("SUM", SUM_2, (arg("data"), arg("n")=20));
 
 }
 
