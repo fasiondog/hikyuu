@@ -1,7 +1,7 @@
 /*
- * test_REF.cpp
+ * test_HHV.cpp
  *
- *  Created on: 2015年3月21日
+ *  Created on: 2019年4月1日
  *      Author: fasiondog
  */
 
@@ -14,20 +14,20 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/REF.h>
+#include <hikyuu/indicator/crt/HHV.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_REF test_indicator_REF
+ * @defgroup test_indicator_HHV test_indicator_HHV
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_REF ) {
+BOOST_AUTO_TEST_CASE( test_HHV ) {
     Indicator result;
 
     PriceList a;
@@ -38,27 +38,29 @@ BOOST_AUTO_TEST_CASE( test_REF ) {
     Indicator data = PRICELIST(a);
 
     /** @arg n = 0 */
-    result = REF(data, 0);
+    result = HHV(data, 0);
     BOOST_CHECK(result.discard() == 0);
     for (int i = 0; i <10; ++i) {
         BOOST_CHECK(result[i] == data[i]);
     }
 
     /** @arg n = 1 */
-    result = REF(data, 1);
-    BOOST_CHECK(result.discard() == 1);
-    for (int i = 1; i < 10; ++i) {
-        BOOST_CHECK(result[i] == data[i-1]);
+    result = HHV(data, 1);
+    BOOST_CHECK(result.discard() == 0);
+    for (int i = 0; i < 10; ++i) {
+        BOOST_CHECK(result[i] == data[i]);
     }
 
     /** @arg n = 9 */
-    result = REF(data, 9);
-    BOOST_CHECK(result.discard() == 9);
-    BOOST_CHECK(result[9] == data[0]);
+    result = HHV(data, 9);
+    BOOST_CHECK(result.discard() == 8);
+    BOOST_CHECK(result[8] == data[8]);
+    BOOST_CHECK(result[9] == data[9]);
 
     /** @arg n = 10 */
-    result = REF(data, 10);
-    BOOST_CHECK(result.discard() == 10);
+    result = HHV(data, 10);
+    BOOST_CHECK(result.discard() == 9);
+    BOOST_CHECK(result[9] == data[9]);
 }
 
 
@@ -68,14 +70,14 @@ BOOST_AUTO_TEST_CASE( test_REF ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_REF_export ) {
+BOOST_AUTO_TEST_CASE( test_HHV_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/REF.xml";
+    filename += "/LLV.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = REF(CLOSE(kdata), 1);
+    Indicator x1 = HHV(CLOSE(kdata), 2);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

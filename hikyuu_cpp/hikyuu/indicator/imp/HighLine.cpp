@@ -24,8 +24,8 @@ HighLine::~HighLine() {
 
 bool HighLine::check() {
     int n = getParam<int>("n");
-    if (n < 1) {
-        HKU_ERROR("Invalid param[n] ! (n >= 1) " << m_params
+    if (n < 0) {
+        HKU_ERROR("Invalid param[n] ! (n >= 0) " << m_params
                 << " [HighLine::calculate]");
         return false;
     }
@@ -35,8 +35,28 @@ bool HighLine::check() {
 
 void HighLine::_calculate(const Indicator& data) {
     size_t total = data.size();
+    if (0 == total) {
+        m_discard = 0;
+        return;
+    }
 
     int n = getParam<int>("n");
+    if (0 == n) {
+        m_discard = data.discard();
+        if (m_discard >= total) {
+            return;
+        }
+        
+        price_t max = data[0];
+        _set(max, 0);
+        for (size_t i = m_discard + 1; i < total; i++) {
+            if (data[i] > max) {
+                max = data[i];
+            }
+            _set(max, i);
+        }
+        return;
+    }
 
     m_discard = data.discard() + n - 1;
     if (m_discard >= total) {

@@ -84,7 +84,7 @@
     
 .. py:function:: HHV([data, n=20])
 
-    N日内最高价
+    N日内最高价，N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
     :param int n: N日时间窗口
@@ -148,7 +148,7 @@
     
 .. py:function:: LLV([data, n=20])
 
-    N日内最低价
+    N日内最低价，N=0则从第一个有效值开始。
 
     :param data: 输入数据
     :param int n: N日时间窗口

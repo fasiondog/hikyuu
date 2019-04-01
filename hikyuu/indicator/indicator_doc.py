@@ -115,7 +115,7 @@ EMA([data, n=22])
 HHV.__doc__ = """
 HHV([data, n=20])
 
-    N日内最高价
+    N日内最高价, N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
     :param int n: N日时间窗口
@@ -194,7 +194,7 @@ LIUTONGPAN(kdata)
 LLV.__doc__ = """
 LLV([data, n=20])
 
-    N日内最低价
+    N日内最低价, N=0则从第一个有效值开始。
 
     :param data: 输入数据
     :param int n: N日时间窗口

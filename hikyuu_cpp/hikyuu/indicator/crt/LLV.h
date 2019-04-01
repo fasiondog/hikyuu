@@ -14,14 +14,16 @@ namespace hku {
 
 /**
  * N日内最低价
- * @param n N日时间窗口
+ * @param n N日时间窗口, N=0则从第一个有效值开始。
+ * @ingroup Indicator
  */
 Indicator HKU_API LLV(int n = 20);
 
 /**
- * N日内最低价
+ * N日内最低价, N=0则从第一个有效值开始。
  * @param ind 待计算的数据
  * @param n N日时间窗口
+ * @ingroup Indicator
  */
 Indicator HKU_API LLV(const Indicator& ind, int n = 20);
 
