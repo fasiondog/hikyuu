@@ -27,6 +27,16 @@
 from .indicator import *
 
 
+ABS.__doc__ = """
+ABS([data])
+
+    求绝对值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 AMA.__doc__ = """
 AMA([data, n=10, fast_n=2, slow_n=30])
 

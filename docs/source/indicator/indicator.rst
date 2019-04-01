@@ -4,6 +4,15 @@
 内建技术指标
 ============
 
+
+.. py:function:: ABS([data])
+
+    求绝对值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: AMA([data, n=10, fast_n=2, slow_n=30])
 
     佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_

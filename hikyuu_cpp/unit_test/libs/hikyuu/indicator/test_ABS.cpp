@@ -1,5 +1,5 @@
 /*
- * test_SUM.cpp
+ * test_ABS.cpp
  *
  *  Created on: 2019年4月2日
  *      Author: fasiondog
@@ -14,55 +14,36 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/SUM.h>
+#include <hikyuu/indicator/crt/HHV.h>
+#include <hikyuu/indicator/crt/ABS.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_SUM test_indicator_SUM
+ * @defgroup test_indicator_ABS test_indicator_ABS
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_SUM ) {
+BOOST_AUTO_TEST_CASE( test_ABS ) {
     Indicator result;
 
     PriceList a;
     for (int i = 0; i < 10; ++i) {
-        a.push_back(i);
+        a.push_back(-i);
     }
 
     Indicator data = PRICELIST(a);
 
-    /** @arg n = 0 */
-    result = SUM(data, 0);
+    result = ABS(data);
+    BOOST_CHECK(result.name() == "ABS");
     BOOST_CHECK(result.discard() == 0);
-    price_t sum = 0;
     for (int i = 0; i <10; ++i) {
-        sum += data[i];
-        BOOST_CHECK(result[i] == sum);
+        BOOST_CHECK(result[i] == -data[i]);
     }
-
-    /** @arg n = 1 */
-    result = SUM(data, 1);
-    BOOST_CHECK(result.discard() == 0);
-    for (int i = 0; i < 10; ++i) {
-        BOOST_CHECK(result[i] == data[i]);
-    }
-
-    /** @arg n = 9 */
-    result = SUM(data, 9);
-    BOOST_CHECK(result.discard() == 8);
-    BOOST_CHECK(result[8] == 36);
-    BOOST_CHECK(result[9] == 45);
-
-    /** @arg n = 10 */
-    result = SUM(data, 10);
-    BOOST_CHECK(result.discard() == 9);
-    BOOST_CHECK(result[9] == 45);
 }
 
 
@@ -72,14 +53,14 @@ BOOST_AUTO_TEST_CASE( test_SUM ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_SUM_export ) {
+BOOST_AUTO_TEST_CASE( test_ABS_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "SUM.xml";
+    filename += "/ABS.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = SUM(CLOSE(kdata), 3);
+    Indicator x1 = ABS(CLOSE(kdata));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

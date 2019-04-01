@@ -10,6 +10,7 @@
 
 #include "Indicator.h"
 #include "crt/KDATA.h"
+#include "crt/ABS.h"
 #include "crt/AMA.h"
 #include "crt/ATR.h"
 #include "crt/COUNT.h"

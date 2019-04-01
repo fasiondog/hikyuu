@@ -20,7 +20,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/build_in.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 
 using namespace hku;
 

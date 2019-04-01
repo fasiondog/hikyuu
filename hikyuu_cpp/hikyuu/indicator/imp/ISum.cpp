@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::ISum)
 
 namespace hku {
 
-ISum::ISum() : IndicatorImp("ISum", 1) {
+ISum::ISum() : IndicatorImp("SUM", 1) {
     setParam<int>("n", 20);
 }
 
