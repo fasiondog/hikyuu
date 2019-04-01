@@ -29,10 +29,44 @@ using namespace hku;
 /** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_IF ) {
     KData kdata = getStock("SH600000").getKData(KQuery(-10));
+    
+    /** @arg 三个参数均为 indicator */
     Indicator x = IF(CLOSE() > OPEN(), CVAL(1), CVAL(0));
     x.setContext(kdata);
     Indicator c = CLOSE(kdata);
     Indicator o = OPEN(kdata);
+    for (int i = 0; i < x.size(); i++) {
+        if (c[i] > o[i]) {
+            BOOST_CHECK(x[i] == 1);
+        } else {
+            BOOST_CHECK(x[i] == 0);
+        }
+    }
+
+    /** @arg 参数其中之一为数字 */
+    x = IF(CLOSE() > OPEN(), 1, CVAL(0));
+    x.setContext(kdata);
+    for (int i = 0; i < x.size(); i++) {
+        if (c[i] > o[i]) {
+            BOOST_CHECK(x[i] == 1);
+        } else {
+            BOOST_CHECK(x[i] == 0);
+        }
+    }
+
+    x = IF(CLOSE() > OPEN(), CVAL(1), 0);
+    x.setContext(kdata);
+    for (int i = 0; i < x.size(); i++) {
+        if (c[i] > o[i]) {
+            BOOST_CHECK(x[i] == 1);
+        } else {
+            BOOST_CHECK(x[i] == 0);
+        }
+    }
+
+    /** @arg 两个参数为数字 */
+    x = IF(CLOSE() > OPEN(), 1, 0);
+    x.setContext(kdata);
     for (int i = 0; i < x.size(); i++) {
         if (c[i] > o[i]) {
             BOOST_CHECK(x[i] == 1);

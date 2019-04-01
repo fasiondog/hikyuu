@@ -94,6 +94,11 @@ Indicator (*LIUTONGPAN_2)(const KData&) = LIUTONGPAN;
 Indicator (*HSL_1)() = HSL;
 Indicator (*HSL_2)(const KData&) = HSL;
 
+Indicator (*IF_1)(const Indicator&, const Indicator&, const Indicator&) = IF;
+Indicator (*IF_2)(const Indicator&, price_t, const Indicator&) = IF;
+Indicator (*IF_3)(const Indicator&, const Indicator&, price_t) = IF;
+Indicator (*IF_4)(const Indicator&, price_t, price_t) = IF;
+
 Indicator (*COUNT_1)(int) = COUNT;
 Indicator (*COUNT_2)(const Indicator&, int) = COUNT;
 
@@ -174,7 +179,10 @@ void export_Indicator_build_in() {
     def("HSL", HSL_2);
 
     def("WEAVE", WEAVE);
-    def("IF", IF);
+    def("IF", IF_1);
+    def("IF", IF_2);
+    def("IF", IF_3);
+    def("IF", IF_4);
 
     def("COUNT", COUNT_1, (arg("n")=20));
     def("COUNT", COUNT_2, (arg("data"), arg("n")=20));

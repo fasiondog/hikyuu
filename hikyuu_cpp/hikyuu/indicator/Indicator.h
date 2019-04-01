@@ -272,6 +272,9 @@ Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2);
  * @ingroup Indicator
  */
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, const Indicator& b);
+Indicator HKU_API IF(const Indicator& x, price_t a, const Indicator& b);
+Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b);
+Indicator HKU_API IF(const Indicator& x, price_t a, price_t b);
 
 } /* namespace hku */
 #endif /* INDICATOR_H_ */
