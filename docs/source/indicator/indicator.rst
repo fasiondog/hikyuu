@@ -246,7 +246,15 @@
     :param float p: 噪音系数
     :rtype: Indicator
     
-    
+
+.. py:function:: SGN([data])
+
+    求符号值, SGN(X)，当 X>0, X=0, X<0分别返回 1, 0, -1。
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: SMA([data, n=22])
 
     简单移动平均线

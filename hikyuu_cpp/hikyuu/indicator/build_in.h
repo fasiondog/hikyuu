@@ -28,6 +28,7 @@
 #include "crt/PRICELIST.h"
 #include "crt/REF.h"
 #include "crt/SAFTYLOSS.h"
+#include "crt/SGN.h"
 #include "crt/SMA.h"
 #include "crt/STDEV.h"
 #include "crt/SUM.h"
