@@ -90,7 +90,15 @@
     :param int n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator
     
-    
+
+.. py:function:: EXP([data])
+
+    EXP(X)为e的X次幂
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: HHV([data, n=20])
 
     N日内最高价，N=0则从第一个有效值开始。

@@ -114,6 +114,9 @@ Indicator (*NOT_2)(const Indicator&) = NOT;
 Indicator (*SGN_1)() = SGN;
 Indicator (*SGN_2)(const Indicator&) = SGN;
 
+Indicator (*EXP_1)() = EXP;
+Indicator (*EXP_2)(const Indicator&) = EXP;
+
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -211,6 +214,9 @@ void export_Indicator_build_in() {
 
     def("SGN", SGN_1);
     def("SGN", SGN_2);
+
+    def("EXP", EXP_1);
+    def("EXP", EXP_2);
 }
 
 

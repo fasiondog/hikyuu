@@ -24,6 +24,7 @@
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
+* :py:func:`EXP` - e的X次幂
 * :py:func:`HHV` - N日内最高价
 * :py:func:`IF` - 根据条件求不同的值
 * :py:func:`LLV` - N日内最低价

@@ -122,6 +122,16 @@ EMA([data, n=22])
 """
 
 
+EXP.__doc__ = """
+EXP([data])
+
+    EXP(X)为e的X次幂
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 HHV.__doc__ = """
 HHV([data, n=20])
 

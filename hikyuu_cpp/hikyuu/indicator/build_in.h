@@ -17,6 +17,7 @@
 #include "crt/CVAL.h"
 #include "crt/DIFF.h"
 #include "crt/EMA.h"
+#include "crt/EXP.h"
 #include "crt/HHV.h"
 #include "crt/HSL.h"
 #include "crt/LLV.h"
