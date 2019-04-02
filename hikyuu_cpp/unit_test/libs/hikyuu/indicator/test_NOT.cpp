@@ -14,20 +14,20 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/ABS.h>
+#include <hikyuu/indicator/crt/NOT.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_ABS test_indicator_ABS
+ * @defgroup test_indicator_NOT test_indicator_NOT
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_ABS ) {
+BOOST_AUTO_TEST_CASE( test_NOT ) {
     Indicator result;
 
     PriceList a;
@@ -37,11 +37,12 @@ BOOST_AUTO_TEST_CASE( test_ABS ) {
 
     Indicator data = PRICELIST(a);
 
-    result = ABS(data);
-    BOOST_CHECK(result.name() == "ABS");
+    result = NOT(data);
+    BOOST_CHECK(result.name() == "NOT");
     BOOST_CHECK(result.discard() == 0);
-    for (int i = 0; i <10; ++i) {
-        BOOST_CHECK(result[i] == -data[i]);
+    BOOST_CHECK(result[0] == 1.0);
+    for (int i = 1; i <10; ++i) {
+        BOOST_CHECK(result[i] == 0.0);
     }
 }
 
@@ -52,14 +53,14 @@ BOOST_AUTO_TEST_CASE( test_ABS ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_ABS_export ) {
+BOOST_AUTO_TEST_CASE( test_NOT_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/ABS.xml";
+    filename += "/NOT.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = ABS(CLOSE(kdata));
+    Indicator x1 = NOT(CLOSE(kdata));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

@@ -251,6 +251,16 @@ MACD([data, n1=12, n2=26, n3=9])
 """
 
 
+NOT.__doc__ = """
+NOT([data])
+
+    求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
+    
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 OPEN.__doc__ = """
 OPEN([data])
 

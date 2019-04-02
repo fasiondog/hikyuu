@@ -108,6 +108,9 @@ Indicator (*SUM_2)(const Indicator&, int) = SUM;
 Indicator (*ABS_1)() = ABS;
 Indicator (*ABS_2)(const Indicator&) = ABS;
 
+Indicator (*NOT_1)() = NOT;
+Indicator (*NOT_2)(const Indicator&) = NOT;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3);
@@ -198,6 +201,9 @@ void export_Indicator_build_in() {
 
     def("ABS", ABS_1);
     def("ABS", ABS_2);
+
+    def("NOT", NOT_1);
+    def("NOT", NOT_2);
 }
 
 

@@ -23,6 +23,7 @@
 #include "crt/LIUTONGPAN.h"
 #include "crt/MA.h"
 #include "crt/MACD.h"
+#include "crt/NOT.h"
 #include "crt/POS.h"
 #include "crt/PRICELIST.h"
 #include "crt/REF.h"

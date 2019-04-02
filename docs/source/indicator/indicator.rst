@@ -197,6 +197,14 @@
     * result(2): DEA: 慢线，即快线的n3周期EMA平滑
     
     
+.. py:function:: NOT([data])
+
+    求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
+    
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+    
+    
 .. py:function:: OPEN([data])
 
     获取开盘价，包装KData的开盘价成Indicator
