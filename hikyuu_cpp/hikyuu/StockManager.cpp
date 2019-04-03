@@ -89,12 +89,7 @@ void StockManager::init(
     }
 
     //获取log配置文件信息
-    try {
-        string logger = hikyuuParam.get<string>("logger");
-        init_logger(logger);
-    } catch(...) {
-        init_logger("");
-    }
+    init_logger("");
     
     m_stockDict.clear();
     m_marketInfoDict.clear();

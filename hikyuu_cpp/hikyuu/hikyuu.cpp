@@ -32,7 +32,7 @@ void hikyuu_init(const string& config_file_name) {
     Parameter baseParam, blockParam, kdataParam, preloadParam, hkuParam;
 
     hkuParam.set<string>("tmpdir", config.get("hikyuu", "tmpdir", "."));
-    hkuParam.set<string>("logger", config.get("hikyuu", "logger", "."));
+    hkuParam.set<string>("datadir", config.get("hikyuu", "datadir", "."));
 
     if (!config.hasSection("baseinfo")) {
         HKU_FATAL("Missing configure of baseinfo!");

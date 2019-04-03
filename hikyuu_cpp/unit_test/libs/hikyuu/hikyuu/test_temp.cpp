@@ -18,6 +18,9 @@ BOOST_AUTO_TEST_CASE( test_temp ) {
 
     HistoryFinanceReader rd = HistoryFinanceReader(dirname);
     PriceList result = rd.getHistoryFinanceInfo(Datetime(201109300000), "SH", "600000");
+    BOOST_CHECK(result.size() == 286);
+
+    std::cout << result.size() << std::endl;
 
     std::cout << "**************************" << std::endl;
 }
