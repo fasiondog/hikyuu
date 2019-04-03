@@ -6,9 +6,18 @@
 #endif
 
 #include <hikyuu/StockManager.h>
+#include <hikyuu/data_driver/HistoryFinanceReader.h>
 
 using namespace hku;
 
 BOOST_AUTO_TEST_CASE( test_temp ) {
+    StockManager& sm = StockManager::instance();
+    string dirname(sm.datadir() + "\\downloads\\finance");
 
+    std::cout << "**************************" << std::endl;
+
+    HistoryFinanceReader rd = HistoryFinanceReader(dirname);
+    PriceList result = rd.getHistoryFinanceInfo(Datetime(201109300000), "SH", "600000");
+
+    std::cout << "**************************" << std::endl;
 }

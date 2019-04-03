@@ -82,6 +82,12 @@ void StockManager::init(
         m_tmpdir = "";
     }
 
+    try {
+        m_datadir = hikyuuParam.get<string>("datadir");
+    } catch (...) {
+        m_datadir = "";
+    }
+
     //获取log配置文件信息
     try {
         string logger = hikyuuParam.get<string>("logger");
@@ -288,6 +294,9 @@ string StockManager::tmpdir() const {
     return m_tmpdir;
 }
 
+string StockManager::datadir() const {
+    return m_datadir;
+}
 
 Stock StockManager::getStock(const string& querystr) const {
     Stock result;

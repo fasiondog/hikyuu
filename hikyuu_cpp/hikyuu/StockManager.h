@@ -61,6 +61,9 @@ public:
      */
     string tmpdir() const;
 
+    /** 获取数据目录 */
+    string datadir() const;
+
     /** 获取证券数量 */
     size_t size() const;
 
@@ -176,6 +179,7 @@ private:
 private:
     static shared_ptr<StockManager> m_sm;
     string m_tmpdir;
+    string m_datadir;
     BlockInfoDriverPtr m_blockDriver;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock

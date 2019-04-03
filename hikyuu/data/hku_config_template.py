@@ -25,6 +25,7 @@
 hdf5_template = """
 [hikyuu]
 tmpdir = {dir}/tmp
+datadir = {dir}
 
 [block]
 type  = qianlong
