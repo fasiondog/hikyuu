@@ -20,7 +20,9 @@ BOOST_AUTO_TEST_CASE( test_temp ) {
     PriceList result = rd.getHistoryFinanceInfo(Datetime(201109300000), "SH", "600000");
     BOOST_CHECK(result.size() == 286);
 
+    float x = 0xf8f8f8f8;
     std::cout << result.size() << std::endl;
+    std::cout << x << std::endl;
 
     std::cout << "**************************" << std::endl;
 }

@@ -46,8 +46,6 @@ PriceList HistoryFinanceReader
     memcpy(&max_count, header_buf + 6, 2);
     memcpy(&report_size, header_buf + 12, 4);
 
-    //std::cout << report_date << " " << max_count << " " << report_fields_count << std::endl;
-
     char stock_item_buf[11];
     char stock_code[7];
     unsigned long address = 0;
@@ -74,9 +72,13 @@ PriceList HistoryFinanceReader
         file.read((char *)result_buffer, report_size);
 
         result.reserve(report_fields_count);
+        price_t null_price = Null<price_t>();
         for (int i = 0; i < report_fields_count; i++) {
-            result.push_back(result_buffer[i]);
-            //std::cout << i << " " << result_buffer[i] << std::endl;
+            if (result_buffer[i] == 0xf8f8f8f8) {
+                result.push_back(null_price);
+            } else {
+                result.push_back(result_buffer[i]);
+            }
         }
     }
 
