@@ -9,10 +9,6 @@
 .. image:: https://img.shields.io/github/license/mashape/apistatus.svg
     :target: https://github.com/fasiondog/hikyuu/blob/master/LICENSE.txt
     :alt: GitHub
-	
-.. image:: https://img.shields.io/badge/link-996.icu-red.svg
-    :target: https://996.icu
-    :alt: 996.icu
 
 
 -----------    

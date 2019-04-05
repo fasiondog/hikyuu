@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <boost/lexical_cast.hpp>
+#include "../StockTypeInfo.h"
 #include "HistoryFinanceReader.h"
 
 namespace hku {
@@ -23,16 +24,20 @@ HistoryFinanceReader::~HistoryFinanceReader() {
 }
 
 PriceList HistoryFinanceReader
-::getHistoryFinanceInfo(Datetime date, 
-        const string& market, const string& code) {
+::getHistoryFinanceInfo(Datetime date, const Stock& stock) {
     PriceList result;
+    if (stock.type() != STOCKTYPE_A) {
+        return result;
+    }
+
     string filename(m_dir + "/gpcw" 
                    + boost::lexical_cast<string>(date.number() / 10000)
                    + ".dat");
     std::cout << filename << std::endl;
     std::ifstream file(filename.c_str(), std::ifstream::binary);
     if( !file ) {
-        std::cout << "error!" << std::endl;
+        HKU_INFO("Can't found " << filename 
+                 << " [HistoryFinanceReader::getHistoryFinanceInfo]");
         return result;
     }
 
@@ -53,19 +58,20 @@ PriceList HistoryFinanceReader
         file.read(stock_item_buf, 11);
         memcpy(stock_code, stock_item_buf, 6);
         stock_code[6] = '\0';
-        if (string(stock_code) == code) {
+        if (string(stock_code) == stock.code()) {
             memcpy(&address, stock_item_buf + 7, 4);
             break;
         }
     }
 
-    float result_buffer[500];
+    const int MAX_COL_NUM = 350;
+    float result_buffer[MAX_COL_NUM];
     if (address != 0) {
         std::cout << address << std::endl;
         int report_fields_count = int(report_size / 4);
-        if (report_fields_count >= 500) {
-            HKU_WARN("Over buffer! [HistoryFinanceReader::getHistoryFinanceInfo]");
-            report_fields_count = 500;
+        if (report_fields_count >= MAX_COL_NUM) {
+            HKU_WARN("Over MAX_COL_NUM! [HistoryFinanceReader::getHistoryFinanceInfo]");
+            report_fields_count = MAX_COL_NUM;
             report_size = report_fields_count * 4;
         }
         file.seekg(address);
