@@ -12,7 +12,7 @@ using namespace hku;
 
 BOOST_AUTO_TEST_CASE( test_temp ) {
     StockManager& sm = StockManager::instance();
-    string dirname(sm.datadir() + "\\downloads\\finance");
+    string dirname(sm.datadir() + "/downloads/finance");
 
     std::cout << "**************************" << std::endl;
 

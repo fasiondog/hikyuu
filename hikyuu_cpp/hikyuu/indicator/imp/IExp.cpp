@@ -36,7 +36,7 @@ void IExp::_calculate(const Indicator& data) {
 
     for (size_t i = m_discard; i < total; ++i) {
         price_t x = std::exp(data[i]);
-        if (isinf(x)) {
+        if (std::isinf(x)) {
             _set(Null<price_t>(), i);
         } else {
             _set(std::exp(data[i]), i);

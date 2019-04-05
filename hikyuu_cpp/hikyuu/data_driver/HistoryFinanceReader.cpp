@@ -26,7 +26,7 @@ PriceList HistoryFinanceReader
 ::getHistoryFinanceInfo(Datetime date, 
         const string& market, const string& code) {
     PriceList result;
-    string filename(m_dir + "\\gpcw" 
+    string filename(m_dir + "/gpcw" 
                    + boost::lexical_cast<string>(date.number() / 10000)
                    + ".dat");
     std::cout << filename << std::endl;
