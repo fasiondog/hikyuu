@@ -7,6 +7,7 @@
 
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
+#include "data_driver/HistoryFinanceReader.h"
 #include "utilities/util.h"
 #include "KData.h"
 
@@ -652,6 +653,17 @@ TimeLineList Stock::getTimeLineList(const KQuery& query) const {
 TransList Stock::getTransList(const KQuery& query) const {
     return isNull() ? TransList()
                     :m_kdataDriver->getTransList(market(), code(), query);
+}
+
+
+PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
+    if (type() == STOCKTYPE_A) {
+        StockManager& sm = StockManager::instance();
+        HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
+        return rd.getHistoryFinanceInfo(date, market(), code());
+    }
+
+    return PriceList();
 }
 
 

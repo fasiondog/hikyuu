@@ -60,6 +60,7 @@ void export_Stock() {
             .def("getKRecordList", &Stock::getKRecordList)
             .def("getDatetimeList", getDatetimeList1)
             .def("getDatetimeList", getDatetimeList2)
+            .def("getHistoryFinanceInfo", &Stock::getHistoryFinanceInfo)
             .def("realtimeUpdate", &Stock::realtimeUpdate)
             .def("getWeight", getWeight1)
             .def("getWeight", getWeight2)

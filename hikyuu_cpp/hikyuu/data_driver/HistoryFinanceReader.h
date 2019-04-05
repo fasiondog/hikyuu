@@ -24,7 +24,8 @@ public:
     HistoryFinanceReader(const string& dir);
     virtual ~HistoryFinanceReader();
 
-    PriceList getHistoryFinanceInfo(Datetime date, const Stock& stock);
+    PriceList getHistoryFinanceInfo(Datetime date, 
+                const string& market, const string& code);
 
 private:
     string m_dir;  //历史财务信息文件存放目录
