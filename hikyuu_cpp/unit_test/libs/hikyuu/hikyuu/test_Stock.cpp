@@ -1928,4 +1928,26 @@ BOOST_AUTO_TEST_CASE( test_Stock_id_map ) {
     MEMORY_CHECK;
 }
 
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_Stock_getHistoryFinanceInfo ) {
+    StockManager& sm = StockManager::instance();
+    Stock stk = getStock("sh600000");
+    PriceList result = stk.getHistoryFinanceInfo(Datetime(201109300000));
+    BOOST_CHECK(result.size() == 286);
+    BOOST_CHECK_CLOSE(result[0], 1.067, 0.00001);
+    BOOST_CHECK_CLOSE(result[1], 1.061, 0.00001);
+    BOOST_CHECK_CLOSE(result[2], 1.360, 0.00001);
+    BOOST_CHECK_CLOSE(result[3], 7.482, 0.00001);
+    BOOST_CHECK_CLOSE(result[9], 0.0, 0.00001);
+    BOOST_CHECK_CLOSE(result[14], 7.87818e+09, 0.00001);
+    BOOST_CHECK_CLOSE(result[282], 6.327156e+06, 0.00001);
+    BOOST_CHECK_CLOSE(result[285], 0.0, 0.00001);
+    //for (int i = 0; i < 286; i++) {
+    //    std::cout << result[i] << std::endl;
+    //}
+
+    MEMORY_CHECK;
+}
+
 /** @} */

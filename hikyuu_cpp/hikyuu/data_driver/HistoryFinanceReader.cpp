@@ -52,14 +52,14 @@ PriceList HistoryFinanceReader
     memcpy(&report_size, header_buf + 12, 4);
 
     char stock_code[7];
-    unsigned long address = 0;
+    hku_uint32 address = 0;
     for (int i = 0; i < max_count; i++) {
         if (!fread(stock_code, 1, 7, fp)) {
             HKU_ERROR("read stock_code failed! " << filename << funcname);
             return result;
         }
 
-        if (!fread(&address, sizeof(unsigned long), 1, fp)) {
+        if (!fread(&address, 4, 1, fp)) {
             HKU_ERROR("read stock_item address failed! " << filename << funcname);
             return result;
         }
@@ -75,14 +75,14 @@ PriceList HistoryFinanceReader
     if (address != 0) {
         int report_fields_count = int(report_size / 4);
         if (report_fields_count >= MAX_COL_NUM) {
-            HKU_WARN("Over MAX_COL_NUM! [HistoryFinanceReader::getHistoryFinanceInfo]");
+            HKU_WARN("Over MAX_COL_NUM! " << filename << funcname);
             report_fields_count = MAX_COL_NUM;
         }
         
         fseek(fp, address, SEEK_SET);
 
-        if (!fread((char *)result_buffer, sizeof(float), report_fields_count, fp)) {
-            HKU_ERROR("read col data failed!" << filename << funcname);
+        if (!fread(result_buffer, 4, report_fields_count, fp)) {
+            HKU_ERROR("read col data failed! " << filename << funcname);
             return result;
         }
 
@@ -95,6 +95,9 @@ PriceList HistoryFinanceReader
                 result.push_back(result_buffer[i]);
             }
         }
+    
+    } else {
+        HKU_ERROR("Invalid address(0)! " << filename << funcname);
     }
 
     fclose(fp);
