@@ -548,7 +548,6 @@ if __name__ == '__main__':
     add_count = qianlong_import_weight(connect, dest_dir + '/weight', 'SH')
     add_count += qianlong_import_weight(connect, dest_dir + '/weight', 'SZ')
     print("导入数量：", add_count)
-    """
 
     print("\n导入上证分笔数据")
     #add_count = import_trans(connect, 'SH', quotations, api, dest_dir, max_days=2, progress=ProgressBar)
@@ -558,7 +557,7 @@ if __name__ == '__main__':
     print("\n导入上证分时数据")
     add_count = import_time(connect, 'SZ', quotations, api, dest_dir, max_days=3, progress=ProgressBar)
     print("\n导入数量：", add_count)
-
+    """
 
     api.disconnect()
     connect.close()
