@@ -656,6 +656,21 @@ TransList Stock::getTransList(const KQuery& query) const {
 }
 
 
+Parameter Stock::getFinanceInfo() const {
+    Parameter result;
+    if (type() != STOCKTYPE_A) {
+        return result;
+    }
+
+    BaseInfoDriverPtr driver = StockManager::instance().getBaseInfoDriver();
+    if (driver) {
+        result = driver->getFinanceInfo(market(), code());
+    }
+    
+    return result;
+}
+
+
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     if (type() == STOCKTYPE_A) {
         StockManager& sm = StockManager::instance();

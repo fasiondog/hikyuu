@@ -357,4 +357,95 @@ int SQLiteBaseInfoDriver::_getStockTableCallBack(
     return result;
 }
 
+
+Parameter SQLiteBaseInfoDriver
+::getFinanceInfo(const string& market, const string& code) {
+    Parameter result;
+    if (!m_db) {
+        return result;
+    }
+    
+    std::stringstream buf;
+    buf << "select m.market, s.code, f.updated_date, f.ipo_date, f.province,"
+        << "f.industry, f.zongguben, f.liutongguben, f.guojiagu, f.faqirenfarengu,"
+        << "f.farengu, f.bgu, f.hgu, f.zhigonggu, f.zongzichan, f.liudongzichan,"
+        << "f.gudingzichan, f.wuxingzichan, f.gudongrenshu, f.liudongfuzhai,"
+        << "f.changqifuzhai, f.zibengongjijin, f.jingzichan, f.zhuyingshouru,"
+        << "f.zhuyinglirun, f.yingshouzhangkuan, f.yingyelirun, f.touzishouyu,"
+        << "f.jingyingxianjinliu, f.zongxianjinliu, f.cunhuo, f.lirunzonghe,"
+        << "f.shuihoulirun, f.jinglirun, f.weifenpeilirun, f.meigujingzichan,"
+        << "f.baoliu2 from stkfinance f, stock s, market m "
+        << "where m.market='" << market << "'"
+        << " and s.code = '" << code << "'"
+        << " and s.marketid = m.marketid"
+        << " and f.stockid = s.stockid"
+        << " order by updated_date DESC limit 1";
+    //std::cout << buf.str() << std::endl;
+    char *zErrMsg=0;
+    int rc = sqlite3_exec(m_db.get(), buf.str().c_str(),
+                    _getFinanceTableCallBack, &result, &zErrMsg);
+    if( rc != SQLITE_OK ){
+        HKU_ERROR("SQL error: " << zErrMsg
+                << " [SQLiteBaseInfoDriver::getFinanceInfo]");
+        sqlite3_free(zErrMsg);
+        return result;
+    }
+
+    return result;
+}
+
+int SQLiteBaseInfoDriver
+::_getFinanceTableCallBack(void *out, int nCol,
+                           char **azVals, char **azCols) {
+    assert(nCol == 37);
+    int result = 0;
+    Parameter *p = (Parameter *)out;
+    try {
+        p->set<string>("market", string(azVals[0]));
+        p->set<string>("code", string(azVals[1]));
+        p->set<int>("updated_date", atof(azVals[2]));
+        p->set<int>("ipo_date", atof(azVals[3]));
+        p->set<price_t>("province", atof(azVals[4]));
+        p->set<price_t>("industry", atof(azVals[5]));
+        p->set<price_t>("zongguben", atof(azVals[6]));
+        p->set<price_t>("liutongguben", atof(azVals[7]));
+        p->set<price_t>("guojiagu", atof(azVals[8]));
+        p->set<price_t>("faqirenfarengu", atof(azVals[9]));
+        p->set<price_t>("farengu", atof(azVals[10]));
+        p->set<price_t>("bgu", atof(azVals[11]));
+        p->set<price_t>("hgu", atof(azVals[12]));
+        p->set<price_t>("zhigonggu", atof(azVals[13]));
+        p->set<price_t>("zongzichan", atof(azVals[14]));
+        p->set<price_t>("liudongzichan", atof(azVals[15]));
+        p->set<price_t>("gudingzichan", atof(azVals[16]));
+        p->set<price_t>("wuxingzichan", atof(azVals[17]));
+        p->set<price_t>("gudongrenshu", atof(azVals[18]));
+        p->set<price_t>("liudongfuzhai", atof(azVals[19]));
+        p->set<price_t>("changqifuzhai", atof(azVals[20]));
+        p->set<price_t>("zibengongjijin", atof(azVals[21]));
+        p->set<price_t>("jingzichan", atof(azVals[22]));
+        p->set<price_t>("zhuyingshouru", atof(azVals[23]));
+        p->set<price_t>("zhuyinglirun", atof(azVals[24]));
+        p->set<price_t>("yingshouzhangkuan", atof(azVals[25]));
+        p->set<price_t>("yingyelirun", atof(azVals[26]));
+        p->set<price_t>("touzishouyi", atof(azVals[27]));
+        p->set<price_t>("jingyingxianjinliu", atof(azVals[28]));
+        p->set<price_t>("zongxianjinliu", atof(azVals[29]));
+        p->set<price_t>("cunhuo", atof(azVals[30]));
+        p->set<price_t>("lirunzonghe", atof(azVals[31]));
+        p->set<price_t>("shuihoulirun", atof(azVals[32]));
+        p->set<price_t>("jinglirun", atof(azVals[33]));
+        p->set<price_t>("weifenpeilirun", atof(azVals[34]));
+        p->set<price_t>("meigujingzichan", atof(azVals[35]));
+        //p->set<price_t>("baoliu2", atof(azVals[36]));
+        result = 0;
+
+    } catch(...) {
+        HKU_ERROR("Some error! [SQLiteBaseInfoDriver::_getFinanceTableCallBack]");
+        result = 1;
+    }
+    return result;
+}
+
+
 } /* namespace hku */

@@ -8,6 +8,7 @@
 #include <boost/python.hpp>
 #include <hikyuu/serialization/Stock_serialization.h>
 #include <hikyuu/KData.h>
+#include "_Parameter.h"
 #include "pickle_support.h"
 
 using namespace boost::python;
@@ -60,6 +61,7 @@ void export_Stock() {
             .def("getKRecordList", &Stock::getKRecordList)
             .def("getDatetimeList", getDatetimeList1)
             .def("getDatetimeList", getDatetimeList2)
+            .def("getFinanceInfo", &Stock::getFinanceInfo)
             .def("getHistoryFinanceInfo", &Stock::getHistoryFinanceInfo)
             .def("realtimeUpdate", &Stock::realtimeUpdate)
             .def("getWeight", getWeight1)

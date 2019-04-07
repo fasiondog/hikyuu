@@ -892,6 +892,23 @@ getWeight([start, end])
     :rtype: StockWeightList
 """
 
+Stock.getFinanceInfo.__doc__ = """
+getFinanceInfo(self)
+    
+    获取当前财务信息
+       
+    :rtype: Parameter
+"""
+
+Stock.getHistoryFinanceInfo.__doc__ = """
+getHistoryFinanceInfo(self, date)
+    
+    获取历史财务信息，字段含义参见：https://github.com/QUANTAXIS/QUANTAXIS/blob/master/QUANTAXIS/QAData/financial_mean.py
+        
+    :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
+    :rtype: PriceList
+"""
+
 Stock.realtimeUpdate.__doc__ = """
 realtimeUpdate(krecord)
     

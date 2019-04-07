@@ -24,21 +24,26 @@ public:
     virtual bool _loadStockTypeInfo();
     virtual bool _loadStock();
 
+    virtual Parameter getFinanceInfo(const string& market, const string& code);
+
 private:
     bool _getStockWeightList(hku_uint32, StockWeightList&);
 
 private:
     static int _getMarketTableCallBack(void *out, int nCol,
-                                           char **azVals, char **azCols);
+                                       char **azVals, char **azCols);
 
     static int _getStockTypeInfoTableCallBack(void *out, int nCol,
-                                           char **azVals, char **azCols);
+                                              char **azVals, char **azCols);
 
     static int _getStockWeightCallBack(void *out, int nCol,
-                                           char **azVals, char **azCols);
+                                       char **azVals, char **azCols);
 
     static int _getStockTableCallBack(void *out, int nCol,
-                                          char **azVals, char **azCols);
+                                      char **azVals, char **azCols);
+
+    static int _getFinanceTableCallBack(void *out, int nCol,
+                                        char **azVals, char **azCols);
 
 private:
     //股票基本信息数据库实例

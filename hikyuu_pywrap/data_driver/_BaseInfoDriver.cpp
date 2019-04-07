@@ -31,6 +31,18 @@ public:
     bool _loadStock() {
         return this->get_override("_loadStock")();
     }
+
+    Parameter getFinanceInfo(const string& market, const string& code) {
+        if (override call = get_override("getFinanceInfo")) {
+            return call(market, code);
+        }
+        return this->BaseInfoDriver::getFinanceInfo(market, code);
+    }
+
+    Parameter default_getFinanceInfo(const string& market, const string& code) {
+        return this->BaseInfoDriver::getFinanceInfo(market, code);
+    }
+
 };
 
 void export_BaseInfoDriver() {
@@ -48,6 +60,7 @@ void export_BaseInfoDriver() {
             .def("_loadMarketInfo", pure_virtual(&BaseInfoDriver::_loadMarketInfo))
             .def("_loadStockTypeInfo", pure_virtual(&BaseInfoDriver::_loadStockTypeInfo))
             .def("_loadStock", pure_virtual(&BaseInfoDriver::_loadStock))
+            .def("getFinanceInfo", &BaseInfoDriver::getFinanceInfo, &BaseInfoDriverWrap::default_getFinanceInfo)
             ;
 
     register_ptr_to_python<BaseInfoDriverPtr>();

@@ -89,4 +89,10 @@ bool BaseInfoDriver::loadBaseInfo() {
     return true;
 }
 
+Parameter BaseInfoDriver
+::getFinanceInfo(const string& market, const string& code) {
+    return Parameter();
+}
+
+
 } /* namespace hku */

@@ -44,6 +44,13 @@ public:
     bool loadBaseInfo();
 
     /**
+     * 获取当前财务信息
+     * @param market 市场标识
+     * @param code 证券代码
+     */
+    virtual Parameter getFinanceInfo(const string& market, const string& code);
+
+    /**
      * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
      * @return
      */

@@ -11,7 +11,7 @@
 #include <hikyuu_utils/iniparser/IniParser.h>
 
 #include "utilities/Parameter.h"
-#include "data_driver/BlockInfoDriver.h"
+#include "data_driver/DataDriverFactory.h"
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
@@ -52,6 +52,8 @@ public:
     Parameter getKDataDriverParameter() const;
     Parameter getPreloadParameter() const;
     Parameter getHikyuuParameter() const;
+
+    BaseInfoDriverPtr getBaseInfoDriver() const;
 
     void setKDataDriver(const KDataDriverPtr&);
 
@@ -202,7 +204,6 @@ inline size_t StockManager::size() const {
     return m_stockDict.size();
 }
 
-
 inline Stock StockManager::operator[](const string& query) const {
     return getStock(query);
 }
@@ -225,6 +226,10 @@ inline Parameter StockManager::getPreloadParameter() const {
 
 inline Parameter StockManager::getHikyuuParameter() const {
     return m_hikyuuParam;
+}
+
+inline BaseInfoDriverPtr StockManager::getBaseInfoDriver() const {
+    return DataDriverFactory::getBaseInfoDriver(m_baseInfoDriverParam);
 }
 
 } /* namespace */

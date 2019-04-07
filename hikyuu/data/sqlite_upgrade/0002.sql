@@ -43,6 +43,6 @@ CREATE TABLE `stkfinance` (
 
 CREATE INDEX "ix_stkfinance_date" ON "stkfinance" (updated_date);
 CREATE INDEX "ix_stkfinance_stock_date" ON "stkfinance" (stockid, updated_date);
-COMMIT;
 
 UPDATE `version` set `version` = 2;
+COMMIT;
