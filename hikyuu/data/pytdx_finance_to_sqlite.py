@@ -23,7 +23,7 @@
 # SOFTWARE.
 
 from hikyuu.data.common import MARKETID, STOCKTYPE
-from hikyuu.data.common_sqlite3 import get_marketid
+from hikyuu.data.common_sqlite3 import get_marketid, create_database
 
 
 def pytdx_import_finance(db_connect, pytdx_connect, market):
@@ -34,21 +34,21 @@ def pytdx_import_finance(db_connect, pytdx_connect, market):
     
     cur = db_connect.cursor()
     all_list = cur.execute(sql).fetchall()
-    connect.commit()
+    db_connect.commit()
 
     records = []
     for stk in all_list:
         x = pytdx_connect.get_finance_info(1 if stk[1] == MARKETID.SH else 0, stk[2])
-        #print(stk[2], x['code'])
+        #print(stk[2])
         if x is not None and x['code'] == stk[2]:
             cur.execute("select updated_date from stkfinance where stockid={} and updated_date={}".format(stk[0], x['updated_date']))
             a = cur.fetchall()
             a = [x[0] for x in a]
             if a:
-                print(a)
+                #print(a)
                 continue
-            else:
-                print(market, stk[2])
+            #else:
+            #    print(market, stk[2])
             records.append((stk[0],
                             x['updated_date'],
                             x['ipo_date'],
@@ -115,7 +115,7 @@ def pytdx_import_finance(db_connect, pytdx_connect, market):
                                                 zhuyinglirun, \
                                                 yingshouzhangkuan, \
                                                 yingyelirun, \
-                                                touzishouru, \
+                                                touzishouyu, \
                                                 jingyingxianjinliu, \
                                                 zongxianjinliu, \
                                                 cunhuo, \
@@ -130,7 +130,7 @@ def pytdx_import_finance(db_connect, pytdx_connect, market):
                                 ?,?,?,?,?,?,?,?,?,?, \
                                 ?,?,?,?,?,?)",
                         records)
-        connect.commit()
+        db_connect.commit()
 
     cur.close()
     return len(records)
@@ -143,18 +143,18 @@ if __name__ == '__main__':
 
     starttime = time.time()
 
-    dest_dir = "d:\\stock"
+    dest_dir = "c:\\stock"
     tdx_server = '119.147.212.81'
     tdx_port = 7709
 
     connect = sqlite3.connect(dest_dir + "\\stock.db")
-    #create_database(connect)
+    create_database(connect)
 
     from pytdx.hq import TdxHq_API, TDXParams
     api = TdxHq_API()
     api.connect(tdx_server, tdx_port)
 
-    x = pytdx_import_finance(connect, api, "SH")
+    x = pytdx_import_finance(connect, api, "SZ")
     print(x)
 
     api.disconnect()
