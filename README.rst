@@ -10,6 +10,10 @@
     :target: https://github.com/fasiondog/hikyuu/blob/master/LICENSE.txt
     :alt: GitHub
 
+.. image:: https://img.shields.io/badge/license-Anti%20996-blue.svg
+    :target: https://github.com/996icu/996.ICU/blob/master/LICENSE
+    :alt: GitHub
+
 
 -----------    
     
