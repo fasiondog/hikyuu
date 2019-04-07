@@ -1,6 +1,56 @@
 版本发布说明
 ===============
 
+1.1.1 - 2019年4月8日
+-------------------------
+
+1. HikyuuTDX 新增当前财务信息及历史财务信息下载
+2. Stock 新增 getFinanceInfo、getHistoryFinanceInfo 支持当前及历史财务信息
+3. 新增 LIUTONGPAN（流通盘）、HSL（换手率）、COUNT、IF、SUM、NOT、EXP、SGN、ABS指标
+4. Kdata添加便捷方法获取OPEN/CLOSE等基本行情数据，如::
+        
+        k = sm['sh000001'].getKData(Query(-100))
+        c = k.close # 返回的是 Indicator 实例，即 CLOSE(k)
+        
+        
+5. 实现 select 函数，示例::
+    
+        #选出涨停股
+        C = CLOSE()
+        x = select(C / REF(C, 1) - 1 >= 0.0995))
+
+6. 优化 Indicator 实现（取消 Operand），可以事先指定 KData，亦可后续通过 setContext 切换上下文，重新指定 KData。例如::
+
+        #示例：移植通达信 DMI（趋向指标系统）
+        #MTR:=SUM(MAX(MAX(HIGH-LOW,ABS(HIGH-REF(CLOSE,1))),ABS(REF(CLOSE,1)-LOW)),N);
+        #HD :=HIGH-REF(HIGH,1);
+        #LD :=REF(LOW,1)-LOW;
+        #DMP:=SUM(IF(HD>0&&HD>LD,HD,0),N);
+        #DMM:=SUM(IF(LD>0&&LD>HD,LD,0),N);
+        #PDI: DMP*100/MTR;
+        #MDI: DMM*100/MTR;
+        N = 14
+        C = CLOSE()
+        H = HIGH()
+        L = LOW()
+        MTR =SUM(H-L > ABS(H - REF(C,1) > ABS(REF(C,1) - L)),N);
+        HD = H-REF(H,1)
+        LD = REF(L,1)-L
+        DMP = SUM(IF(HD>0 & HD>LD, HD, 0), N)
+        DMM = SUM(IF(LD>0 & LD>HD, LD, 0), N)
+        PDI = DMP*100/MTR
+        MDI = DMM*100/MTR
+        
+        PDI.setContext(sm['sz000001'], Query(-100))
+        MDI.setContext(sm['sz000001'], Query(-100))
+        
+        PDI.plot()
+        MDI.plot(new=False)
+        
+        
+7. Parameter 支持 Stock、Query、KData
+
+
 1.1.0 - 2019年2月28日
 -------------------------
 
