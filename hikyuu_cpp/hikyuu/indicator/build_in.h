@@ -24,6 +24,8 @@
 #include "crt/LIUTONGPAN.h"
 #include "crt/MA.h"
 #include "crt/MACD.h"
+#include "crt/MAX.h"
+#include "crt/MIN.h"
 #include "crt/NOT.h"
 #include "crt/POS.h"
 #include "crt/PRICELIST.h"

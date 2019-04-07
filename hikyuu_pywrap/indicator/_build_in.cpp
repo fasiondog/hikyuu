@@ -117,6 +117,13 @@ Indicator (*SGN_2)(const Indicator&) = SGN;
 Indicator (*EXP_1)() = EXP;
 Indicator (*EXP_2)(const Indicator&) = EXP;
 
+Indicator (*MAX_1)(const Indicator&, const Indicator&) = MAX;
+Indicator (*MAX_2)(const Indicator&, price_t) = MAX;
+Indicator (*MAX_3)(price_t, const Indicator&) = MAX;
+
+Indicator (*MIN_1)(const Indicator&, const Indicator&) = MIN;
+Indicator (*MIN_2)(const Indicator&, price_t) = MIN;
+Indicator (*MIN_3)(price_t, const Indicator&) = MIN;
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -217,6 +224,14 @@ void export_Indicator_build_in() {
 
     def("EXP", EXP_1);
     def("EXP", EXP_2);
+
+    def("MAX", MAX_1);
+    def("MAX", MAX_2);
+    def("MAX", MAX_3);
+
+    def("MIN", MIN_1);
+    def("MIN", MIN_2);
+    def("MIN", MIN_3);    
 }
 
 

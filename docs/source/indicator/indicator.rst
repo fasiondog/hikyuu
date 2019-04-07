@@ -203,6 +203,24 @@
     * result(0): MACD_BAR：MACD直柱，即MACD快线－MACD慢线
     * result(1): DIFF: 快线,即（短期EMA-长期EMA）
     * result(2): DEA: 慢线，即快线的n3周期EMA平滑
+
+
+.. py:function:: MAX(ind1, ind2)
+
+    求最大值, MAX(A,B)返回A和B中的较大值。
+    
+    :param Indicator ind1: A
+    :param Indicator ind2: B
+    :rtype: Indicator
+
+
+.. py:function:: MIN(ind1, ind2)
+
+    求最小值, MIN(A,B)返回A和B中的较小值。
+    
+    :param Indicator ind1: A
+    :param Indicator ind2: B
+    :rtype: Indicator
     
     
 .. py:function:: NOT([data])

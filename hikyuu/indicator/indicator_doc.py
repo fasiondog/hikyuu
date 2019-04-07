@@ -261,6 +261,28 @@ MACD([data, n1=12, n2=26, n3=9])
 """
 
 
+MAX.__doc__ = """
+MAX(ind1, ind2)
+
+    求最大值, MAX(A,B)返回A和B中的较大值。
+    
+    :param Indicator ind1: A
+    :param Indicator ind2: B
+    :rtype: Indicator
+"""
+
+
+MIN.__doc__ = """
+MIN(ind1, ind2)
+
+    求最小值, MIN(A,B)返回A和B中的较小值。
+    
+    :param Indicator ind1: A
+    :param Indicator ind2: B
+    :rtype: Indicator
+"""
+
+
 NOT.__doc__ = """
 NOT([data])
 

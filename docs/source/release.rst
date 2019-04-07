@@ -6,7 +6,7 @@
 
 1. HikyuuTDX 新增当前财务信息及历史财务信息下载
 2. Stock 新增 getFinanceInfo、getHistoryFinanceInfo 支持当前及历史财务信息
-3. 新增 LIUTONGPAN（流通盘）、HSL（换手率）、COUNT、IF、SUM、NOT、EXP、SGN、ABS指标
+3. 新增 LIUTONGPAN（流通盘）、HSL（换手率）、COUNT、IF、SUM、NOT、EXP、SGN、ABS、MAX、MIN指标
 4. Kdata添加便捷方法获取OPEN/CLOSE等基本行情数据，如::
         
         k = sm['sh000001'].getKData(Query(-100))
@@ -33,7 +33,7 @@
         C = CLOSE()
         H = HIGH()
         L = LOW()
-        MTR =SUM(H-L > ABS(H - REF(C,1) > ABS(REF(C,1) - L)),N);
+        MTR = SUM(MAX(MAX(H-L,ABS(H-REF(C,1))),ABS(REF(C,1)-L)),N);
         HD = H-REF(H,1)
         LD = REF(L,1)-L
         DMP = SUM(IF(HD>0 & HD>LD, HD, 0), N)
