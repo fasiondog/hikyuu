@@ -44,6 +44,7 @@ PriceList HistoryFinanceReader
     char header_buf[20];
     if (!fread(header_buf, 1, 20, fp)) {
         HKU_ERROR("read data failed! " << filename << funcname);
+        fclose(fp);
         return result;
     }
 
@@ -56,11 +57,13 @@ PriceList HistoryFinanceReader
     for (int i = 0; i < max_count; i++) {
         if (!fread(stock_code, 1, 7, fp)) {
             HKU_ERROR("read stock_code failed! " << filename << funcname);
+            fclose(fp);
             return result;
         }
 
         if (!fread(&address, 4, 1, fp)) {
             HKU_ERROR("read stock_item address failed! " << filename << funcname);
+            fclose(fp);
             return result;
         }
 
@@ -70,9 +73,9 @@ PriceList HistoryFinanceReader
         }
     }
 
-    const int MAX_COL_NUM = 350;
-    float result_buffer[MAX_COL_NUM];
     if (address != 0) {
+        const int MAX_COL_NUM = 350;
+        float result_buffer[MAX_COL_NUM];
         int report_fields_count = int(report_size / 4);
         if (report_fields_count >= MAX_COL_NUM) {
             HKU_WARN("Over MAX_COL_NUM! " << filename << funcname);
@@ -83,6 +86,7 @@ PriceList HistoryFinanceReader
 
         if (!fread(result_buffer, 4, report_fields_count, fp)) {
             HKU_ERROR("read col data failed! " << filename << funcname);
+            fclose(fp);
             return result;
         }
 

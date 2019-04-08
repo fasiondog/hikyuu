@@ -399,7 +399,7 @@ int SQLiteBaseInfoDriver
                            char **azVals, char **azCols) {
     assert(nCol == 37);
     int result = 0;
-    Parameter *p = (Parameter *)out;
+    Parameter *p = static_cast<Parameter *>(out);
     try {
         p->set<string>("market", string(azVals[0]));
         p->set<string>("code", string(azVals[1]));
@@ -437,7 +437,7 @@ int SQLiteBaseInfoDriver
         p->set<price_t>("jinglirun", atof(azVals[33]));
         p->set<price_t>("weifenpeilirun", atof(azVals[34]));
         p->set<price_t>("meigujingzichan", atof(azVals[35]));
-        //p->set<price_t>("baoliu2", atof(azVals[36]));
+        p->set<price_t>("baoliu2", atof(azVals[36]));
         result = 0;
 
     } catch(...) {
