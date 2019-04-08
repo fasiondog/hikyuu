@@ -34,6 +34,20 @@
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator
 
+
+.. py:function:: BETWEEN(a, b, c)
+
+    介于(介于两个数之间)
+
+    用法：BETWEEN(A,B,C)表示A处于B和C之间时返回1，否则返回0
+
+    例如：BETWEEN(CLOSE,MA(CLOSE,10),MA(CLOSE,5))表示收盘价介于5日均线和10日均线之间
+
+    :param Indicator a: A
+    :param Indicator b: B
+    :param Indicator c: C
+    :rtype: Indicator
+
     
 .. py:function:: CLOSE([data])
    

@@ -32,49 +32,49 @@ Indicator BETWEEN(price_t, price_t, price_t);
 
 
 inline Indicator BETWEEN(const Indicator& a, const Indicator& b, const Indicator& c) {
-    Indicator result = IF((b >= c & a <= b & a >= c) | (b <= c & a >= b & a <= c), 1, 0);
+    Indicator result = IF(((b >= c) & (a <= b) & (a >= c)) | ((b <= c) & (a >= b) & (a <= c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
 inline Indicator BETWEEN(const Indicator& a, const Indicator& b, price_t c) {
-    Indicator result = IF((b >= c & a <= b & a >= c) | (b <= c & a >= b & a <= c), 1, 0);
+    Indicator result = IF(((b >= c) & (a <= b) & (a >= c)) | ((b <= c) & (a >= b) & (a <= c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
 inline Indicator BETWEEN(const Indicator& a, price_t b, const Indicator& c) {
-    Indicator result = IF((b >= c & a <= b & a >= c) | (b <= c & a >= b & a <= c), 1, 0);
+    Indicator result = IF(((b >= c) & (a <= b) & (a >= c)) | ((b <= c) & (a >= b) & (a <= c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
 inline Indicator BETWEEN(const Indicator& a, price_t b, price_t c) {
-    Indicator result = IF((b >= c & a <= b & a >= c) | (b <= c & a >= b & a <= c), 1, 0);
+    Indicator result = IF(((b >= c) & (a <= b) & (a >= c)) | ((b <= c) & (a >= b) & (a <= c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
 inline Indicator BETWEEN(price_t a, const Indicator& b, const Indicator& c) {
-    Indicator result = IF((b >= c & a <= b & a >= c) | (b <= c & a >= b & a <= c), 1, 0);
+    Indicator result = IF(((b >= c) & (a <= b) & (a >= c)) | ((b <= c) & (a >= b) & (a <= c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
 inline Indicator BETWEEN(price_t a, const Indicator& b, price_t c) {
-    Indicator result = IF((b >= c & a <= b & a >= c) | (b <= c & a >= b & a <= c), 1, 0);
+    Indicator result = IF(((b >= c) & (a <= b) & (a >= c)) | ((b <= c) & (a >= b) & (a <= c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
 inline Indicator BETWEEN(price_t a, price_t b, const Indicator& c) {
-    Indicator result = IF((b >= c & a <= b & a >= c) | (b <= c & a >= b & a <= c), 1, 0);
+    Indicator result = IF(((b >= c) & (a <= b) & (a >= c)) | ((b <= c) & (a >= b) & (a <= c)), 1, 0);
     result.name("BETWEEN");
     return result;
 }
 
 inline Indicator BETWEEN(price_t a, price_t b, price_t c) {
-    Indicator result = CVAL(((b >= c && a <= b && a >= c) || (b <= c && a >= b && a <= c)) ? 1 : 0);
+    Indicator result = CVAL((((b >= c) && (a <= b) && (a >= c)) || ((b <= c) && (a >= b) && (a <= c))) ? 1 : 0);
     result.name("BETWEEN");
     return result;
 }

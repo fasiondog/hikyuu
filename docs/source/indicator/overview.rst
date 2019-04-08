@@ -21,6 +21,7 @@
 
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
 * :py:func:`ABS` - 求绝对值
+* :py:func:`BETWEEN` - 介于(介于两个数之间)
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
@@ -28,6 +29,8 @@
 * :py:func:`HHV` - N日内最高价
 * :py:func:`IF` - 根据条件求不同的值
 * :py:func:`LLV` - N日内最低价
+* :py:func:`MAX` - 最大值
+* :py:func:`MIN` - 最小值
 * :py:func:`NOT` - 求逻辑非
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
 * :py:func:`SGN` - 求符号值
