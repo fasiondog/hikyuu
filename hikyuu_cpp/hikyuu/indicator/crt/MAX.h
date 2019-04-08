@@ -12,6 +12,15 @@
 
 namespace hku {
 
+/**
+ * 求最大值
+ * @details
+ * <pre>
+ * 用法: MAX(A,B)返回A和B中的较大值
+ * 例如: MAX(CLOSE-OPEN,0)表示若收盘价大于开盘价返回它们的差值，否则返回0
+ * </pre>
+ * @ingroup Indicator
+ */
 Indicator MAX(const Indicator&, const Indicator&);
 Indicator MAX(const Indicator&, price_t val);
 Indicator MAX(price_t val, const Indicator& ind);

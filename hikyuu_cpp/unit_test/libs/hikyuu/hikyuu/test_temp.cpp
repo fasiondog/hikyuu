@@ -11,9 +11,5 @@
 using namespace hku;
 
 BOOST_AUTO_TEST_CASE( test_temp ) {
-    std::cout << "*****************" << std::endl;
-    Stock stk = getStock("sh600000");
-    Parameter f = stk.getFinanceInfo();
-    std::cout << f << std::endl;
-    std::cout << "*****************" << std::endl;
+
 }

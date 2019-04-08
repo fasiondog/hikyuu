@@ -125,6 +125,15 @@ Indicator (*MIN_1)(const Indicator&, const Indicator&) = MIN;
 Indicator (*MIN_2)(const Indicator&, price_t) = MIN;
 Indicator (*MIN_3)(price_t, const Indicator&) = MIN;
 
+Indicator (*BETWEEN_1)(const Indicator&, const Indicator&, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_2)(const Indicator&, const Indicator&, price_t) = BETWEEN;
+Indicator (*BETWEEN_3)(const Indicator&, price_t, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_4)(const Indicator&, price_t, price_t) = BETWEEN;
+Indicator (*BETWEEN_5)(price_t, const Indicator&, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_6)(price_t, const Indicator&, price_t) = BETWEEN;
+Indicator (*BETWEEN_7)(price_t, price_t, const Indicator&) = BETWEEN;
+Indicator (*BETWEEN_8)(price_t, price_t, price_t) = BETWEEN;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3);
@@ -231,7 +240,16 @@ void export_Indicator_build_in() {
 
     def("MIN", MIN_1);
     def("MIN", MIN_2);
-    def("MIN", MIN_3);    
+    def("MIN", MIN_3);
+
+    def("BETWEEN", BETWEEN_1);
+    def("BETWEEN", BETWEEN_2);
+    def("BETWEEN", BETWEEN_3);
+    def("BETWEEN", BETWEEN_4);
+    def("BETWEEN", BETWEEN_5);
+    def("BETWEEN", BETWEEN_6);
+    def("BETWEEN", BETWEEN_7);
+    def("BETWEEN", BETWEEN_8);
 }
 
 

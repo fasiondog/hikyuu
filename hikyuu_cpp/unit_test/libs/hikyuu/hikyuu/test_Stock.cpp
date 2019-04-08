@@ -1950,4 +1950,20 @@ BOOST_AUTO_TEST_CASE( test_Stock_getHistoryFinanceInfo ) {
     MEMORY_CHECK;
 }
 
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_Stock_getFinanceInfo ) {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sh600000");
+    Parameter f = stk.getFinanceInfo();
+
+    BOOST_CHECK(f.get<string>("market") == "SH");
+    BOOST_CHECK(f.get<string>("code") == "600000");
+    
+    //BOOST_CHECK_CLOSE(f.get<string>("market"), 1.067, 0.00001);
+    std::cout << f << std::endl;
+
+    MEMORY_CHECK;
+}
+
 /** @} */

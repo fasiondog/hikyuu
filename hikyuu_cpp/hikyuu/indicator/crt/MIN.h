@@ -12,6 +12,15 @@
 
 namespace hku {
 
+/**
+ * 求最小值
+ * @details
+ * <pre>
+ * 用法: MIN(A,B)返回A和B中的较小值
+ * 例如: MIN(CLOSE,OPEN)返回开盘价和收盘价中的较小值
+ * </pre>
+ * @ingroup Indicator
+ */
 Indicator MIN(const Indicator&, const Indicator&);
 Indicator MIN(const Indicator&, price_t val);
 Indicator MIN(price_t val, const Indicator& ind);
