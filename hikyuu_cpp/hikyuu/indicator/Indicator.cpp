@@ -330,7 +330,7 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b) {
 }
 
 Indicator HKU_API IF(const Indicator& x, price_t a, price_t b) {
-    return IF(x, CVAL(a), CVAL(b));
+    return IF(x, CVAL(x, a), CVAL(x, b));
 }
 
 } /* namespace hku */

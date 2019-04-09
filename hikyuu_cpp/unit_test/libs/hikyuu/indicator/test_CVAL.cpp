@@ -68,19 +68,21 @@ BOOST_AUTO_TEST_CASE( test_CVAL ) {
     /** @arg operator() */
     result = CVAL(100);
     BOOST_CHECK(result.getParam<double>("value") == 100);
-    BOOST_CHECK(result.size() == 0);
-    BOOST_CHECK(result.empty() == true);
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result[0] == 100);
 
     /** @arg 测试discard, 未指定ind discard=2 */
     result = CVAL(100, 2);
     BOOST_CHECK(result.getParam<double>("value") == 100);
     BOOST_CHECK(result.getParam<int>("discard") == 2);
-    BOOST_CHECK(result.size() == 0);
-    BOOST_CHECK(result.empty() == true);
-    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.empty() == false);
+    BOOST_CHECK(result.discard() == 1);
     BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result[0] == Null<price_t>());
 
     /** @arg 测试discard, ind discard=2 */
     ind = PRICELIST(d);

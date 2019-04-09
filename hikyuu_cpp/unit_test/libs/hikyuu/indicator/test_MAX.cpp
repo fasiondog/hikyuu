@@ -34,6 +34,7 @@ BOOST_AUTO_TEST_CASE( test_MAX ) {
     Indicator C = CLOSE(k);
     Indicator O = OPEN(k);
     Indicator x = MAX(C, O);
+    BOOST_CHECK(x.name() == "MAX");
     BOOST_CHECK(x.size() == 8);
     BOOST_CHECK(x.discard() == 0);
     size_t total = x.size();

@@ -34,6 +34,8 @@ BOOST_AUTO_TEST_CASE( test_MIN ) {
     Indicator C = CLOSE(k);
     Indicator O = OPEN(k);
     Indicator x = MIN(C, O);
+
+    BOOST_CHECK(x.name() == "MIN");
     BOOST_CHECK(x.size() == 8);
     BOOST_CHECK(x.discard() == 0);
     size_t total = x.size();
