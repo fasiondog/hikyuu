@@ -969,6 +969,8 @@ void IndicatorImp::execute_if() {
     if (m_three->size() >= maxp->size()) {
         total = m_three->size();
         discard = total + discard - maxp->size();
+    } else {
+        discard = total - m_three->size();
     }
 
     size_t diff_right = total - m_right->size();

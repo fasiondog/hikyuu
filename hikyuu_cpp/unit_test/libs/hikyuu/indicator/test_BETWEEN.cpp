@@ -93,9 +93,9 @@ BOOST_AUTO_TEST_CASE( test_BETWEEN ) {
     /** @arg a、b、c均为数字 */
     result = BETWEEN(1, 2, 3);
     BOOST_CHECK(result.name() == "BETWEEN");
-    std::cout << result.size() << std::endl;
-    std::cout << result.discard() << std::endl;
-    std::cout << "***********" << std::endl;
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0);
 
 }
 
