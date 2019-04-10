@@ -222,6 +222,25 @@ LLV([data, n=20])
 """
 
 
+LN.__doc__ = """
+LN([data])
+
+    求自然对数, LN(X)以e为底的对数
+
+    :param data: 输入数据
+    :rtype: Indicator
+"""
+
+LOG.__doc__ = """
+LOG([data])
+
+    以10为底的对数
+
+    :param data: 输入数据
+    :rtype: Indicator
+"""
+
+
 LOW.__doc__ = """
 LOW([data])
 

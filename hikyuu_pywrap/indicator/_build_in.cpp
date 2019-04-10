@@ -106,16 +106,19 @@ Indicator (*SUM_1)(int) = SUM;
 Indicator (*SUM_2)(const Indicator&, int) = SUM;
 
 Indicator (*ABS_1)() = ABS;
-Indicator (*ABS_2)(const Indicator&) = ABS;
+Indicator (*ABS_2)(price_t) = ABS;
+Indicator (*ABS_3)(const Indicator&) = ABS;
 
 Indicator (*NOT_1)() = NOT;
 Indicator (*NOT_2)(const Indicator&) = NOT;
 
 Indicator (*SGN_1)() = SGN;
-Indicator (*SGN_2)(const Indicator&) = SGN;
+Indicator (*SGN_2)(price_t) = SGN;
+Indicator (*SGN_3)(const Indicator&) = SGN;
 
 Indicator (*EXP_1)() = EXP;
-Indicator (*EXP_2)(const Indicator&) = EXP;
+Indicator (*EXP_2)(price_t) = EXP;
+Indicator (*EXP_3)(const Indicator&) = EXP;
 
 Indicator (*MAX_1)(const Indicator&, const Indicator&) = MAX;
 Indicator (*MAX_2)(const Indicator&, price_t) = MAX;
@@ -133,6 +136,15 @@ Indicator (*BETWEEN_5)(price_t, const Indicator&, const Indicator&) = BETWEEN;
 Indicator (*BETWEEN_6)(price_t, const Indicator&, price_t) = BETWEEN;
 Indicator (*BETWEEN_7)(price_t, price_t, const Indicator&) = BETWEEN;
 Indicator (*BETWEEN_8)(price_t, price_t, price_t) = BETWEEN;
+
+Indicator (*LN_1)() = LN;
+Indicator (*LN_2)(price_t) = LN;
+Indicator (*LN_3)(const Indicator&) = LN;
+
+Indicator (*LOG_1)() = LOG;
+Indicator (*LOG_2)(price_t) = LOG;
+Indicator (*LOG_3)(const Indicator&) = LOG;
+
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -224,15 +236,18 @@ void export_Indicator_build_in() {
 
     def("ABS", ABS_1);
     def("ABS", ABS_2);
+    def("ABS", ABS_3);
 
     def("NOT", NOT_1);
     def("NOT", NOT_2);
 
     def("SGN", SGN_1);
     def("SGN", SGN_2);
+    def("SGN", SGN_3);
 
     def("EXP", EXP_1);
     def("EXP", EXP_2);
+    def("EXP", EXP_3);
 
     def("MAX", MAX_1);
     def("MAX", MAX_2);
@@ -250,6 +265,14 @@ void export_Indicator_build_in() {
     def("BETWEEN", BETWEEN_6);
     def("BETWEEN", BETWEEN_7);
     def("BETWEEN", BETWEEN_8);
+
+    def("LN", LN_1);
+    def("LN", LN_2);
+    def("LN", LN_3);
+
+    def("LOG", LOG_1);
+    def("LOG", LOG_2);
+    def("LOG", LOG_3);
 }
 
 

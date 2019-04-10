@@ -43,6 +43,11 @@ BOOST_AUTO_TEST_CASE( test_ABS ) {
     for (int i = 0; i <10; ++i) {
         BOOST_CHECK(result[i] == -data[i]);
     }
+
+    result = ABS(-11);
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 11);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * test_ABS.cpp
+ * test_LN.cpp
  *
  *  Created on: 2019年4月2日
  *      Author: fasiondog
@@ -14,40 +14,43 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/EXP.h>
+#include <hikyuu/indicator/crt/LN.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_EXP test_indicator_EXP
+ * @defgroup test_indicator_LN test_indicator_LN
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_EXP ) {
+BOOST_AUTO_TEST_CASE( test_LN ) {
     Indicator result;
 
     PriceList a;
     for (int i = 0; i < 10; ++i) {
         a.push_back(i);
     }
+    a.push_back(-1);
 
     Indicator data = PRICELIST(a);
 
-    result = EXP(data);
-    BOOST_CHECK(result.name() == "EXP");
+    result = LN(data);
+    BOOST_CHECK(result.name() == "LN");
+    BOOST_CHECK(result.size() == 11);
     BOOST_CHECK(result.discard() == 0);
     for (int i = 0; i <10; ++i) {
-        BOOST_CHECK(result[i] == std::exp(data[i]));
+        BOOST_CHECK_CLOSE(result[i], std::log(i), 0.00001);
     }
+    BOOST_CHECK(result[10] == Null<price_t>());
 
-    result = EXP(1);
+    result = LN(10);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == std::exp(1));
+    BOOST_CHECK_CLOSE(result[0], std::log(10.0), 0.00001);
 }
 
 
@@ -57,14 +60,14 @@ BOOST_AUTO_TEST_CASE( test_EXP ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_EXP_export ) {
+BOOST_AUTO_TEST_CASE( test_LN_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/EXP.xml";
+    filename += "/LN.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = EXP(CLOSE(kdata));
+    Indicator x1 = LN(CLOSE(kdata));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

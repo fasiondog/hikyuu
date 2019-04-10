@@ -1,32 +1,32 @@
 /*
- * IExp.cpp
+ * ILog.cpp
  *
- *  Created on: 2019年4月3日
+ *  Created on: 2019年4月11日
  *      Author: fasiondog
  */
 
-#include "IExp.h"
+#include "ILog.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::IExp)
+BOOST_CLASS_EXPORT(hku::ILog)
 #endif
 
 
 namespace hku {
 
-IExp::IExp() : IndicatorImp("EXP", 1) {
+ILog::ILog() : IndicatorImp("LOG", 1) {
 
 }
 
-IExp::~IExp() {
+ILog::~ILog() {
 
 }
 
-bool IExp::check() {
+bool ILog::check() {
     return true;
 }
 
-void IExp::_calculate(const Indicator& data) {
+void ILog::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -36,18 +36,17 @@ void IExp::_calculate(const Indicator& data) {
 
     price_t null_price = Null<price_t>();
     for (size_t i = m_discard; i < total; ++i) {
-        price_t x = std::exp(data[i]);
-        if (std::isinf(x)) {
+        if (data[i] < 0.0) {
             _set(null_price, i);
         } else {
-            _set(std::exp(data[i]), i);
+            _set(std::log10(data[i]), i);
         }
     }
 }
 
 
-Indicator HKU_API EXP() {
-    return Indicator(make_shared<IExp>());
+Indicator HKU_API LOG() {
+    return Indicator(make_shared<ILog>());
 }
 
 

@@ -8,7 +8,7 @@
 #ifndef INDICATOR_CRT_EXP_H_
 #define INDICATOR_CRT_EXP_H_
 
-#include "../Indicator.h"
+#include "CVAL.h"
 
 namespace hku {
 
@@ -17,16 +17,15 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API EXP();
-
-/**
- * 指数, EXP(X)为e的X次幂
- * @param ind 待计算的数据
- * @ingroup Indicator
- */
+Indicator EXP(price_t);
 Indicator EXP(const Indicator& ind);
 
 inline Indicator EXP(const Indicator& ind) {
     return EXP()(ind);
+}
+
+inline Indicator EXP(price_t val) {
+    return EXP(CVAL(val));
 }
 
 } /* namespace */

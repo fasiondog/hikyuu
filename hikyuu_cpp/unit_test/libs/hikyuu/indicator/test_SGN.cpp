@@ -44,6 +44,21 @@ BOOST_AUTO_TEST_CASE( test_SGN ) {
     BOOST_CHECK(result[0] == -1);
     BOOST_CHECK(result[1] == 0);
     BOOST_CHECK(result[2] == 1);
+
+    result = SGN(-1);
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == -1);
+
+    result = SGN(0);
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0);
+
+    result = SGN(1);
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 1);
 }
 
 

@@ -185,6 +185,22 @@
     :param int n: N日时间窗口
     :rtype: Indicator
 
+
+.. py:function:: LN([data])
+
+    求自然对数, LN(X)以e为底的对数
+
+    :param data: 输入数据
+    :rtype: Indicator
+
+
+.. py:function:: LOG([data])
+
+    以10为底的对数
+
+    :param data: 输入数据
+    :rtype: Indicator
+
     
 .. py:function:: LOW([data])
 
