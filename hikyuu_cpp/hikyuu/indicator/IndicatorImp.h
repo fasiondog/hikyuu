@@ -146,6 +146,8 @@ public:
 
     virtual IndicatorImpPtr _clone() { return make_shared<IndicatorImp>(); }
 
+    virtual bool isNeedContext() const { return false; }
+
 private:
     void initContext();
     void execute_add();
@@ -251,6 +253,9 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(IndicatorImp)
     virtual bool check(); \
     virtual void _calculate(const Indicator& data); \
     virtual IndicatorImpPtr _clone() { return make_shared<classname>(); } 
+
+#define INDICATOR_NEED_CONTEXT public: \
+    virtual bool isNeedContext() const { return true; }
 
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;

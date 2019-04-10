@@ -66,6 +66,18 @@ public:
     IndicatorImpPtr default_clone() {
         return this->IndicatorImp::_clone();
     }
+
+    bool isNeedContext() const {
+        if (override call = get_override("isNeedContext")) {
+            return call();
+        } else {
+            return IndicatorImp::isNeedContext();
+        }
+    }
+
+    bool default_isNeedContext() const {
+        return this->IndicatorImp::isNeedContext();
+    }
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(_set_overloads, _set, 2, 3)
@@ -96,6 +108,7 @@ void export_IndicatorImp() {
             .def("_calculate", &IndicatorImp::_calculate, &IndicatorImpWrap::default_calculate)
             .def("__call__", &IndicatorImp::operator(), &IndicatorImpWrap::default_call)
             .def("_clone", &IndicatorImp::_clone, &IndicatorImpWrap::default_clone)
+            .def("isNeedContext", &IndicatorImp::isNeedContext, &IndicatorImpWrap::default_isNeedContext)
             ;
 
     register_ptr_to_python<IndicatorImpPtr>();

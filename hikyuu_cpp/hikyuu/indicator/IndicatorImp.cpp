@@ -295,10 +295,31 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
         return;
     }
 
-    m_need_calculate = true;
-    m_optype = op;
-    m_left = left ? left->clone() : left;
-    m_right = right->clone();
+    if (OP == op && !isLeaf()) {
+        if (m_left && !m_left->isNeedContext()) {
+            if (m_left->isLeaf()) {
+                m_left->m_need_calculate = true;
+                m_left->m_optype = op;
+                m_left->m_right = right->clone();
+            } else {
+                m_left->add(OP, left, right);
+            }
+        }
+        if (m_right && !m_right->isNeedContext()) {
+            if (m_right->isLeaf()) {
+                m_right->m_need_calculate = true;
+                m_right->m_optype = op;
+                m_right->m_right = right->clone();
+            } else {
+                m_right->add(OP, left, right);
+            }
+        }
+    } else {
+        m_need_calculate = true;
+        m_optype = op;
+        m_left = left ? left->clone() : left;
+        m_right = right->clone();
+    }
 }
 
 void IndicatorImp::
