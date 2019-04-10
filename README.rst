@@ -32,6 +32,8 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 .. image:: https://hikyuu.org/images/hongbao.jpg
 .. image:: https://hikyuu.org/images/weixin.png
+    :width: 350
+    :height: 400
 
 
 示例：
