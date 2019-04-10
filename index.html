@@ -31,8 +31,16 @@
     <section class="main-content">
 
 <img alt="00000_title.png" src="images/00000-title3.png" width=250px/>
+<p>Hikyuu Quant Framework是基于C++/Python的高性能开源量化交易研究框架，用于策略分析及回测（目前用于国内证券市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。</p>
 
-<p>Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（目前用于国内证券市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。例如：</p>
+<h3>
+<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>祝贺 HIKYUU 入选 <a href="https://gitee.com/gvp">GITEE 最有价值开源项目 GVP</a></h3>
+<p><img alt="00000_title.png" src="images/gitee_GVP.jpg" width=800px/></p>
+<p>给作者加点油，每天扫扫红包，或者喝杯咖啡</p>
+<p><img src="images/hongbao.jpg" width=310 height=400>
+<img src="images/weixin.png" width=350 height=400></p>
+
+<p>示例：</p>
 
 <pre><code>#创建模拟交易账户进行回测，初始资金30万
 my_tm = crtTM(initCash = 300000)
@@ -52,14 +60,10 @@ sys.run(sm['sz000001'], Query(-150))
 
 <p>更多示例参见：<a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True">https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True</a></p>
 
-<p>Maybe，你已经注意到了，上面没有“选股策略”？！是的，选股策略是股票交易的重要方面，肯定不会少。事实上，之前所述的交易系统都是针对一个交易对象的，也就是经常听到的策略，但很多所谓的“策略”其实仅仅只是买入、卖出的指示信号而已，并非完整的交易策略。为了区别，在这里直接以系统指称，表示一个完整的系统化交易方法或策略。而在系统之上，称为Portfolio资产组合，选股策略则是Portfolio的组件，Portfolio的另一重要组成则是资金分配策略，比如选股策略选定了4个交易对象（股票或基金等），那么如何在它们之间进行合理的资金分配？</p>
-
-<p>所以，Hikyuu Quant Framework其实是在System和Portfolio基础之上、包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试，甚至可以更进一步，在选择交易对象的同时，选取与之匹配的最优系统交易策略（System）。</p>
-
 <h3>
 <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>为什么选择 Hikyuu</h3>
 
-<p><b>1、组合灵活，分类构建策略资产库</b> Hikyuu对系统化交易方法进行了良好的抽象，将完整的系统交易分为不同的策略组件接口，在进行策略探索时，可以更加专注于某一方面的策略性能与影响，可以构建自己的策略库累计资产，并灵活组合。其主要功能模块如下：</p>
+<p><b>1、组合灵活，分类构建策略资产库</b> Hikyuu对系统化交易方法进行了良好的抽象，包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试。在进行策略探索时，可以更加专注于某一方面的策略性能与影响。其主要功能模块如下：</p>
 <img alt="主要功能模块示意图" src="images/10002-function-arc.png" style="width: 600px"/>
 
 <p><b>2、性能保障，打造自己的专属应用</b> 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
