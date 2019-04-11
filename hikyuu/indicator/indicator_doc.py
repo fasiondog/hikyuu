@@ -143,6 +143,21 @@ HHV([data, n=20])
 """
 
 
+HHVBARS.__doc__ = """
+HHVBARS([data, n=20])
+
+    上一高点位置 求上一高点到当前的周期数。
+
+    用法：HHVBARS(X,N):求N周期内X最高值到当前周期数N=0表示从第一个有效值开始统计
+
+    例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口
+    :rtype: Indicator
+"""
+
+
 HIGH.__doc__ = """
 HIGH([data])
 

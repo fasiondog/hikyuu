@@ -27,6 +27,7 @@
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
 * :py:func:`EXP` - e的X次幂
 * :py:func:`HHV` - N日内最高价
+* :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
 * :py:func:`IF` - 根据条件求不同的值
 * :py:func:`LLV` - N日内最低价
 * :py:func:`MAX` - 最大值

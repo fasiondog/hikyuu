@@ -20,6 +20,7 @@
 #include "crt/EMA.h"
 #include "crt/EXP.h"
 #include "crt/HHV.h"
+#include "crt/HHVBARS.h"
 #include "crt/HSL.h"
 #include "crt/LIUTONGPAN.h"
 #include "crt/LLV.h"
