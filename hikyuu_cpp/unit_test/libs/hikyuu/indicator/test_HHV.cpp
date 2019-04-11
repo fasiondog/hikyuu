@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( test_HHV ) {
 BOOST_AUTO_TEST_CASE( test_HHV_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/LLV.xml";
+    filename += "/HHV.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));

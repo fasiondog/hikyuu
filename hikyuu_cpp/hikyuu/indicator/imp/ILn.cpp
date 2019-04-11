@@ -36,7 +36,7 @@ void ILn::_calculate(const Indicator& data) {
 
     price_t null_price = Null<price_t>();
     for (size_t i = m_discard; i < total; ++i) {
-        if (data[i] < 0.0) {
+        if (data[i] <= 0.0) {
             _set(null_price, i);
         } else {
             _set(std::log(data[i]), i);
