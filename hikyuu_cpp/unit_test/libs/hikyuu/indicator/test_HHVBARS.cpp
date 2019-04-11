@@ -16,7 +16,7 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/HHV.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/HHVBARS.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
@@ -94,9 +94,6 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
     result = HHVBARS(c, 5);
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
-    /*for (int i = 0; i < 10; i++) {
-        std::cout << i << " " << c[i] << " " << result[i] <<std::endl;
-    }*/
     BOOST_CHECK(result[0] == 0);
     BOOST_CHECK(result[1] == 0);
     BOOST_CHECK(result[2] == 1);
@@ -104,7 +101,7 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
     BOOST_CHECK(result[4] == 0);
     BOOST_CHECK(result[5] == 1);
     BOOST_CHECK(result[8] == 4);
-    BOOST_CHECK(result[9] == 4);
+    BOOST_CHECK(result[9] == 3);
 
     /** @arg n = 10 */
     result = HHVBARS(c, 10);
@@ -113,6 +110,27 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
     BOOST_CHECK(result[1] == 0);
+    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[6] == 2);
+    BOOST_CHECK(result[9] == 5);
+
+    /** @arg ind.size() == 1 */
+    result = HHVBARS(CVAL(1));
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0);
+
+    /** @arg n > ind.size() */
+    result = HHVBARS(c, 20);
+    BOOST_CHECK(20 > c.size());
+    BOOST_CHECK(result.name() == "HHVBARS");
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0);
+    BOOST_CHECK(result[1] == 0);
+    BOOST_CHECK(result[2] == 1);
+    BOOST_CHECK(result[3] == 2);
+    BOOST_CHECK(result[4] == 0);
     BOOST_CHECK(result[5] == 1);
     BOOST_CHECK(result[6] == 2);
     BOOST_CHECK(result[9] == 5);
