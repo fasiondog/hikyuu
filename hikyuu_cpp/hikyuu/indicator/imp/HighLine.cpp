@@ -33,56 +33,73 @@ bool HighLine::check() {
     return true;
 }
 
-void HighLine::_calculate(const Indicator& data) {
-    size_t total = data.size();
+void HighLine::_calculate(const Indicator& ind) {
+    size_t total = ind.size();
     if (0 == total) {
         m_discard = 0;
         return;
     }
 
-    int n = getParam<int>("n");
-    if (0 == n) {
-        m_discard = data.discard();
-        if (m_discard >= total) {
-            m_discard = total;
-            return;
-        }
-        
-        price_t max = data[0];
-        _set(max, 0);
-        for (size_t i = m_discard + 1; i < total; i++) {
-            if (data[i] > max) {
-                max = data[i];
-            }
-            _set(max, i);
-        }
+    if (ind.discard() >= total) {
+        m_discard = total;
         return;
     }
 
-    m_discard = data.discard() + n - 1;
+    int n = getParam<int>("n");
+    if (0 == n) {
+        n = total - ind.discard();
+        m_discard = ind.discard();
+    } else {
+        m_discard = ind.discard() + n - 1;
+        if (n + m_discard > total) {
+            n = total - m_discard;
+        }
+    }
+
     if (m_discard >= total) {
         m_discard = total;
         return;
     }
 
-    size_t pos = m_discard + 1 - n;
-    price_t max = 0;
-    for (size_t i = m_discard; i < total; ++i) {
-        size_t j = i + 1 - n;
-        if (pos > j) {
-            j = pos;
-        } else {
-            max = data[j];
+    if (1 == total) {
+        if (0 == m_discard) {
+            _set(ind[0], 0);
         }
-        for (; j <= i; ++j) {
-            if (data[j] > max) {
-                max = data[j];
-                pos = j;
-            }
+        return;
+    }
+
+    price_t max = ind[m_discard];
+    size_t pre_pos = m_discard;
+    size_t start_pos = m_discard + n <= total ? m_discard + n : m_discard;
+    for (size_t i = m_discard; i < start_pos; i++) {
+         if (ind[i] >= max) {
+            max = ind[i];
+            pre_pos = i;
         }
         _set(max, i);
     }
 
+    for (size_t i = start_pos; i < total-1; i++) {
+        size_t j = i + 1 - n;
+        if (pre_pos < j) {
+            pre_pos = j;
+            max = ind[j];
+        }
+        if (ind[i] >= max) {
+            max = ind[i];
+            pre_pos = i;
+        }
+        _set(max, i);
+    }
+
+    start_pos = total - n;
+    max = ind[start_pos];
+    for (size_t i = start_pos; i < total; i++) {
+        if (ind[i] >= max) {
+            max = ind[i];
+        }
+    }
+    _set(max, total-1);
 }
 
 
