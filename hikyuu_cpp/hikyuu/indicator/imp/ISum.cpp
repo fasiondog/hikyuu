@@ -39,14 +39,14 @@ void ISum::_calculate(const Indicator& ind) {
         return;
     }
 
-    int n = getParam<int>("n");
-    if (0 == n) {
-        m_discard = ind.discard();
-        if (m_discard >= total) {
-            m_discard = total;
-            return;
-        }
+    if (ind.discard() >= total) {
+        m_discard = total;
+        return;
+    }
 
+    int n = getParam<int>("n");
+    if (n <= 0) {
+        m_discard = ind.discard();
         price_t sum = 0;
         for (size_t i = m_discard; i < total; i++) {
             sum += ind[i];
@@ -61,11 +61,19 @@ void ISum::_calculate(const Indicator& ind) {
         return;
     }
 
-    for (size_t i = m_discard; i < total; i++) {
-        price_t sum = 0;
-        for (size_t j = i + 1 - n; j <= i; j++) {
-            sum += ind[j];
-        }
+    size_t startPos = ind.discard();
+    price_t sum = 0.0;
+    size_t first_end = startPos + n >= total ? total : startPos + n;
+    for (size_t i = startPos; i < first_end; ++i) {
+        sum += ind[i];
+    }
+
+    if (first_end >= 1) {
+        _set(sum, first_end - 1);
+    }
+    
+    for (size_t i = first_end; i < total; ++i) {
+        sum = ind[i] + sum - ind[i-n];
         _set(sum, i);
     }
 
