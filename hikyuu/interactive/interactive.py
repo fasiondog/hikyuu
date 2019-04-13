@@ -178,7 +178,31 @@ A = AMO()
 V = VOL()
 D = Datetime
 
-        
+def set_global_context(stk, query):
+    """设置全局的 context
+
+        :param Stock stk: 指定的全局Stock
+        :param Query query: 指定的查询条件
+    """
+    k = stk.getKData(query)
+    O.setContext(k)
+    C.setContext(k)
+    H.setContext(k)
+    L.setContext(k)
+    A.setContext(k)
+    V.setContext(k)
+
+
+def get_global_context():
+    """获取当前的全局上下文
+    
+        :rtype: KData
+    """
+    return C.getContext()    
+
+set_global_context(sm['sh000001'], Query(-150))
+
+
 #==============================================================================
 #
 # 设置默认绘图引擎

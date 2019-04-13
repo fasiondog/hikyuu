@@ -82,6 +82,20 @@
     :rtype: PriceList
     
 
+.. py:function:: set_global_context(stk, query)
+
+    设置全局的 context
+
+    :param Stock stk: 指定的全局Stock
+    :param Query query: 指定的查询条件
+    
+    
+.. py:function:: get_global_context()
+
+    获取当前全局默认上下文
+    
+    :rtype: KData
+
     
 类
 -----------
