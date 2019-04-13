@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/HHV.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
@@ -53,14 +54,26 @@ BOOST_AUTO_TEST_CASE( test_HHV ) {
 
     /** @arg n = 9 */
     result = HHV(data, 9);
-    BOOST_CHECK(result.discard() == 8);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == data[0]);
+    BOOST_CHECK(result[1] == data[1]);
+    BOOST_CHECK(result[7] == data[7]);
     BOOST_CHECK(result[8] == data[8]);
     BOOST_CHECK(result[9] == data[9]);
 
     /** @arg n = 10 */
     result = HHV(data, 10);
-    BOOST_CHECK(result.discard() == 9);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == data[0]);
+    BOOST_CHECK(result[1] == data[1]);
+    BOOST_CHECK(result[8] == data[8]);
     BOOST_CHECK(result[9] == data[9]);
+
+    /** ind.size() == 1 */
+    result = HHV(CVAL(2));
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 2);
 }
 
 

@@ -53,13 +53,17 @@ BOOST_AUTO_TEST_CASE( test_LLV ) {
 
     /** @arg n = 9 */
     result = LLV(data, 9);
-    BOOST_CHECK(result.discard() == 8);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == data[0]);
+    BOOST_CHECK(result[7] == data[0]);
     BOOST_CHECK(result[8] == data[0]);
     BOOST_CHECK(result[9] == data[1]);
 
     /** @arg n = 10 */
     result = LLV(data, 10);
-    BOOST_CHECK(result.discard() == 9);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == data[0]);
+    BOOST_CHECK(result[1] == data[0]);
     BOOST_CHECK(result[9] == data[0]);
 }
 

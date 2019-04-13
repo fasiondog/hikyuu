@@ -62,7 +62,7 @@ void IHhvbars::_calculate(const Indicator& ind) {
 
     price_t max = ind[m_discard];
     size_t pre_pos = m_discard;
-    size_t start_pos = m_discard + n;
+    size_t start_pos = m_discard + n < total ? m_discard + n : total;
     for (size_t i = m_discard; i < start_pos; i++) {
          if (ind[i] >= max) {
             max = ind[i];

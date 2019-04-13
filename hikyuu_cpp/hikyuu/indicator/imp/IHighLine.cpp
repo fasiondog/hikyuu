@@ -1,39 +1,41 @@
 /*
- * HighLine.cpp
+ * IHighLine.cpp
  *
+ *  Copyright (c) 2019 hikyuu.org 
+ * 
  *  Created on: 2016年4月1日
  *      Author: fasiondog
  */
 
-#include "HighLine.h"
+#include "IHighLine.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::HighLine)
+BOOST_CLASS_EXPORT(hku::IHighLine)
 #endif
 
 
 namespace hku {
 
-HighLine::HighLine() : IndicatorImp("HHV", 1) {
+IHighLine::IHighLine() : IndicatorImp("HHV", 1) {
     setParam<int>("n", 20);
 }
 
-HighLine::~HighLine() {
+IHighLine::~IHighLine() {
 
 }
 
-bool HighLine::check() {
+bool IHighLine::check() {
     int n = getParam<int>("n");
     if (n < 0) {
         HKU_ERROR("Invalid param[n] ! (n >= 0) " << m_params
-                << " [HighLine::calculate]");
+                << " [IHighLine::calculate]");
         return false;
     }
 
     return true;
 }
 
-void HighLine::_calculate(const Indicator& ind) {
+void IHighLine::_calculate(const Indicator& ind) {
     size_t total = ind.size();
     if (0 == total) {
         m_discard = 0;
@@ -45,22 +47,7 @@ void HighLine::_calculate(const Indicator& ind) {
         return;
     }
 
-    int n = getParam<int>("n");
-    if (0 == n) {
-        n = total - ind.discard();
-        m_discard = ind.discard();
-    } else {
-        m_discard = ind.discard() + n - 1;
-        if (n + m_discard > total) {
-            n = total - m_discard;
-        }
-    }
-
-    if (m_discard >= total) {
-        m_discard = total;
-        return;
-    }
-
+    m_discard = ind.discard();
     if (1 == total) {
         if (0 == m_discard) {
             _set(ind[0], 0);
@@ -68,10 +55,19 @@ void HighLine::_calculate(const Indicator& ind) {
         return;
     }
 
-    price_t max = ind[m_discard];
-    size_t pre_pos = m_discard;
-    size_t start_pos = m_discard + n <= total ? m_discard + n : m_discard;
-    for (size_t i = m_discard; i < start_pos; i++) {
+    int n = getParam<int>("n");
+    if (n <= 0) {
+        n = total - m_discard;
+    } else if (n > total) {
+        n = total;
+    }
+
+    size_t startPos = m_discard;
+    size_t first_end = startPos + n >= total ? total : startPos + n;
+
+    price_t max = ind[startPos];
+    size_t pre_pos = startPos;
+    for (size_t i = startPos; i < first_end; i++) {
          if (ind[i] >= max) {
             max = ind[i];
             pre_pos = i;
@@ -79,7 +75,7 @@ void HighLine::_calculate(const Indicator& ind) {
         _set(max, i);
     }
 
-    for (size_t i = start_pos; i < total-1; i++) {
+    for (size_t i = first_end; i < total; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
@@ -92,10 +88,12 @@ void HighLine::_calculate(const Indicator& ind) {
         _set(max, i);
     }
 
-    start_pos = total - n;
-    max = ind[start_pos];
-    for (size_t i = start_pos; i < total; i++) {
+    startPos = total - n;
+    max = ind[startPos];
+    pre_pos = startPos;
+    for (size_t i = startPos; i < total; i++) {
         if (ind[i] >= max) {
+            pre_pos = i;
             max = ind[i];
         }
     }
@@ -104,7 +102,7 @@ void HighLine::_calculate(const Indicator& ind) {
 
 
 Indicator HKU_API HHV(int n =20) {
-    IndicatorImpPtr p = make_shared<HighLine>();
+    IndicatorImpPtr p = make_shared<IHighLine>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
