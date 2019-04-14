@@ -328,6 +328,33 @@
     :rtype: Indicator
    
 
+.. py:function:: ROUND([data, ndigits=2])
+
+    四舍五入
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator
+
+
+.. py:function:: ROUNDDOWN([data, ndigits=2])
+
+    向下截取，如10.1截取后为10
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator
+
+
+.. py:function:: ROUNDUP([data, ndigits=2])
+
+    向上截取，如10.1截取后为11
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator
+
+
 .. py:function:: SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 
     亚历山大 艾尔德安全地带止损线，参见 [BOOK2]_

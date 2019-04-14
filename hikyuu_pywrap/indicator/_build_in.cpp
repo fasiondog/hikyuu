@@ -163,6 +163,13 @@ Indicator (*ROUND_1)(int) = ROUND;
 Indicator (*ROUND_2)(const Indicator&, int) = ROUND;
 Indicator (*ROUND_3)(price_t, int) = ROUND;
 
+Indicator (*ROUNDUP_1)(int) = ROUNDUP;
+Indicator (*ROUNDUP_2)(const Indicator&, int) = ROUNDUP;
+Indicator (*ROUNDUP_3)(price_t, int) = ROUNDUP;
+
+Indicator (*ROUNDDOWN_1)(int) = ROUNDDOWN;
+Indicator (*ROUNDDOWN_2)(const Indicator&, int) = ROUNDDOWN;
+Indicator (*ROUNDDOWN_3)(price_t, int) = ROUNDDOWN;
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -308,5 +315,13 @@ void export_Indicator_build_in() {
 
     def("ROUND", ROUND_1, (arg("ndigits") = 2));
     def("ROUND", ROUND_2, (arg("data"), arg("ndigits")=2));
-    def("ROUND", ROUND_3), (arg("data"), arg("ndigits")=2);
+    def("ROUND", ROUND_3, (arg("data"), arg("ndigits")=2));
+
+    def("ROUNDUP", ROUNDUP_1, (arg("ndigits") = 2));
+    def("ROUNDUP", ROUNDUP_2, (arg("data"), arg("ndigits")=2));
+    def("ROUNDUP", ROUNDUP_3, (arg("data"), arg("ndigits")=2));
+
+    def("ROUNDDOWN", ROUNDDOWN_1, (arg("ndigits") = 2));
+    def("ROUNDDOWN", ROUNDDOWN_2, (arg("data"), arg("ndigits")=2));
+    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits")=2));    
 }

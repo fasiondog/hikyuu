@@ -36,6 +36,9 @@
 * :py:func:`NOT` - 求逻辑非
 * :py:func:`POW` - 乘幂
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
+* :py:func:`ROUND` - 四舍五入
+* :py:func:`ROUNDUP` -  向上截取，如10.1截取后为11
+* :py:func:`ROUNDDOWN` - 向下截取，如10.1截取后为10
 * :py:func:`SGN` - 求符号值
 * :py:func:`SQRT` - 开平方
 * :py:func:`STDEV` - 计算N周期内样本标准差

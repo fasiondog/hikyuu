@@ -361,7 +361,41 @@ REF([data, n])
     :param Indicator data: 输入数据
     :param int n: 引用n周期前的值，即右移n位
     :return: Indicator
-"""    
+"""
+
+
+ROUND.__doc__ = """
+ROUND([data, ndigits=2])
+
+    四舍五入
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator
+"""
+
+
+ROUNDDOWN.__doc__ = """
+ROUNDDOWN([data, ndigits=2])
+
+    向下截取，如10.1截取后为10
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator
+"""
+
+
+ROUNDUP.__doc__ = """
+ROUNDUP([data, ndigits=2])
+
+    向上截取，如10.1截取后为11
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator
+"""
+
 
 SAFTYLOSS.__doc__ = """
 SAFTYLOSS([data, n1=10, n2=3, p=2.0])
