@@ -344,6 +344,18 @@
     :param int n: 时间窗口
     :rtype: Indicator
 
+
+.. py:function:: SQRT([data])
+
+    开平方
+
+    用法：SQRT(X)为X的平方根
+
+    例如：SQRT(CLOSE)收盘价的平方根
+
+    :param data: 输入数据
+    :rtype: Indicator
+
     
 .. py:function:: STDEV([data, n=10])
 

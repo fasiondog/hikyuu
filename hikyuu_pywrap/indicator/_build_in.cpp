@@ -152,6 +152,11 @@ Indicator (*POW_1)(int) = POW;
 Indicator (*POW_2)(const Indicator&, int) = POW;
 Indicator (*POW_3)(price_t, int) = POW;
 
+Indicator (*SQRT_1)() = SQRT;
+Indicator (*SQRT_2)(const Indicator&) = SQRT;
+Indicator (*SQRT_3)(price_t) = SQRT;
+
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3);
@@ -286,4 +291,8 @@ void export_Indicator_build_in() {
     def("POW", POW_1, (arg("n")));
     def("POW", POW_2, (arg("data"), arg("n")));
     def("POW", POW_3), (arg("data"), arg("n"));
+
+    def("SQRT", SQRT_1);
+    def("SQRT", SQRT_2);
+    def("SQRT", SQRT_3);
 }

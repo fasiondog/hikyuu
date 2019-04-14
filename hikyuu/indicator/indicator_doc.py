@@ -399,6 +399,20 @@ SMA([data, n=22])
 """
 
 
+SQRT.__doc__ = """
+SQRT([data])
+
+    开平方
+
+    用法：SQRT(X)为X的平方根
+
+    例如：SQRT(CLOSE)收盘价的平方根
+
+    :param data: 输入数据
+    :rtype: Indicator
+"""
+
+
 STDEV.__doc__ = """
 STDEV([data, n=10])
 

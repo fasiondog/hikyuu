@@ -36,6 +36,7 @@
 * :py:func:`POW` - 乘幂
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
 * :py:func:`SGN` - 求符号值
+* :py:func:`SQRT` - 开平方
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 

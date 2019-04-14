@@ -38,6 +38,7 @@
 #include "crt/SAFTYLOSS.h"
 #include "crt/SGN.h"
 #include "crt/SMA.h"
+#include "crt/SQRT.h"
 #include "crt/STDEV.h"
 #include "crt/SUM.h"
 #include "crt/VIGOR.h"
