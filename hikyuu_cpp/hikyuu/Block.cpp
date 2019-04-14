@@ -1,5 +1,7 @@
 /*
  * Block.cpp
+ *  
+ *  Copyright (c) hikyuu.org
  *
  *  Created on: 2015年2月8日
  *      Author: fasiondog
