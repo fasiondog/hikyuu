@@ -1,9 +1,9 @@
 /*
- * test_HHVBARS.cpp
+ * test_LLVBARS.cpp
  *
  *  Copyright (c) 2019 hikyuu.org
  * 
- *  Created on: 2019年4月1日
+ *  Created on: 2019-4-14
  *      Author: fasiondog
  */
 
@@ -17,20 +17,20 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/CVAL.h>
-#include <hikyuu/indicator/crt/HHVBARS.h>
+#include <hikyuu/indicator/crt/LLVBARS.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_HHVBARS test_indicator_HHVBARS
+ * @defgroup test_indicator_LLVBARS test_indicator_LLVBARS
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
+BOOST_AUTO_TEST_CASE( test_LLVBARS ) {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("sh000001");
     KData k = stk.getKData(-10);
@@ -38,30 +38,30 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
 
     Indicator result;
 
-    /** @arg n = 0, 高点顺序上升 */
+    /** @arg n = 0, 低点顺序下降 */
     PriceList a;
     for (int i = 0; i < 10; ++i) {
-        a.push_back(i);
+        a.push_back(10-i);
     }
 
     Indicator data = PRICELIST(a);
-    result = HHVBARS(data, 0);
-    BOOST_CHECK(result.name() == "HHVBARS");
+    result = LLVBARS(data, 0);
+    BOOST_CHECK(result.name() == "LLVBARS");
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
     for (int i = 0; i < 10; ++i) {
         BOOST_CHECK(result[i] == 0);
     }
 
-    /** @arg n = 0, 高点降序 */
+    /** @arg n = 0, 低点升序 */
     a.clear();
     for (int i = 0; i < 10; ++i) {
-        a.push_back(10-i);
+        a.push_back(i);
     }
 
     data = PRICELIST(a);
-    result = HHVBARS(data, 0);
-    BOOST_CHECK(result.name() == "HHVBARS");
+    result = LLVBARS(data, 0);
+    BOOST_CHECK(result.name() == "LLVBARS");
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
     for (int i = 0; i < 10; ++i) {
@@ -69,21 +69,21 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
     }
 
     /** @arg n = 0， 顺序随机 */
-    result = HHVBARS(c, 0);
-    BOOST_CHECK(result.name() == "HHVBARS");
+    result = LLVBARS(c, 0);
+    BOOST_CHECK(result.name() == "LLVBARS");
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
-    BOOST_CHECK(result[1] == 0);
-    BOOST_CHECK(result[2] == 1);
-    BOOST_CHECK(result[3] == 2);
-    BOOST_CHECK(result[4] == 0);
-    BOOST_CHECK(result[5] == 1);
-    BOOST_CHECK(result[6] == 2);
-    BOOST_CHECK(result[9] == 5);
+    BOOST_CHECK(result[1] == 1);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 1);
+    BOOST_CHECK(result[4] == 2);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[9] == 0);
 
     /** @arg n = 1 */
-    result = HHVBARS(c, 1);
+    result = LLVBARS(c, 1);
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
     for (int i = 0; i < 10; ++i) {
@@ -91,49 +91,50 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
     }
 
     /** @arg n = 5 */
-    result = HHVBARS(c, 5);
+    result = LLVBARS(c, 5);
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
-    BOOST_CHECK(result[1] == 0);
-    BOOST_CHECK(result[2] == 1);
-    BOOST_CHECK(result[3] == 2);
-    BOOST_CHECK(result[4] == 0);
-    BOOST_CHECK(result[5] == 1);
-    BOOST_CHECK(result[8] == 4);
-    BOOST_CHECK(result[9] == 3);
+    BOOST_CHECK(result[1] == 1);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 1);
+    BOOST_CHECK(result[4] == 2);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
 
     /** @arg n = 10 */
-    result = HHVBARS(c, 10);
-    BOOST_CHECK(result.name() == "HHVBARS");
+    result = LLVBARS(c, 10);
+    BOOST_CHECK(result.name() == "LLVBARS");
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
-    BOOST_CHECK(result[1] == 0);
-    BOOST_CHECK(result[5] == 1);
-    BOOST_CHECK(result[6] == 2);
-    BOOST_CHECK(result[9] == 5);
+    BOOST_CHECK(result[1] == 1);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[7] == 2);
+    BOOST_CHECK(result[9] == 0);
 
     /** @arg ind.size() == 1 */
-    result = HHVBARS(CVAL(1));
+    result = LLVBARS(CVAL(1));
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
 
     /** @arg n > ind.size() */
-    result = HHVBARS(c, 20);
+    result = LLVBARS(c, 20);
     BOOST_CHECK(20 > c.size());
-    BOOST_CHECK(result.name() == "HHVBARS");
+    BOOST_CHECK(result.name() == "LLVBARS");
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
-    BOOST_CHECK(result[1] == 0);
-    BOOST_CHECK(result[2] == 1);
-    BOOST_CHECK(result[3] == 2);
-    BOOST_CHECK(result[4] == 0);
-    BOOST_CHECK(result[5] == 1);
-    BOOST_CHECK(result[6] == 2);
-    BOOST_CHECK(result[9] == 5);
+    BOOST_CHECK(result[1] == 1);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 1);
+    BOOST_CHECK(result[4] == 2);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[9] == 0);
 }
 
 
@@ -143,14 +144,14 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_HHVBARS_export ) {
+BOOST_AUTO_TEST_CASE( test_LLVBARS_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/HHVBARS.xml";
+    filename += "/LLVBARS.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = HHVBARS(CLOSE(kdata), 2);
+    Indicator x1 = LLVBARS(CLOSE(kdata), 2);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -164,6 +165,7 @@ BOOST_AUTO_TEST_CASE( test_HHVBARS_export ) {
         ia >> BOOST_SERIALIZATION_NVP(x2);
     }
 
+    BOOST_CHECK(x2.name() == "LLVBARS");
     BOOST_CHECK(x1.size() == x2.size());
     BOOST_CHECK(x1.discard() == x2.discard());
     BOOST_CHECK(x1.getResultNumber() == x2.getResultNumber());

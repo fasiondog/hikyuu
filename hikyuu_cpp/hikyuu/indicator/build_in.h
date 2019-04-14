@@ -24,6 +24,7 @@
 #include "crt/HSL.h"
 #include "crt/LIUTONGPAN.h"
 #include "crt/LLV.h"
+#include "crt/LLVBARS.h"
 #include "crt/LN.h"
 #include "crt/LOG.h"
 #include "crt/MA.h"

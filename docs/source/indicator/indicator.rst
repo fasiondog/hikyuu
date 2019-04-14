@@ -198,6 +198,19 @@
     :rtype: Indicator
 
 
+.. py:function:: LLVBARS([data, n=20])
+
+    上一低点位置 求上一低点到当前的周期数。
+    
+    用法：LLVBARS(X,N):求N周期内X最低值到当前周期数N=0表示从第一个有效值开始统计
+    
+    例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
+    
+    :param data: 输入数据
+    :param int n: N日时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: LN([data])
 
     求自然对数, LN(X)以e为底的对数
