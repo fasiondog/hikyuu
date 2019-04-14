@@ -159,6 +159,10 @@ Indicator (*SQRT_1)() = SQRT;
 Indicator (*SQRT_2)(const Indicator&) = SQRT;
 Indicator (*SQRT_3)(price_t) = SQRT;
 
+Indicator (*ROUND_1)(int) = ROUND;
+Indicator (*ROUND_2)(const Indicator&, int) = ROUND;
+Indicator (*ROUND_3)(price_t, int) = ROUND;
+
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -301,4 +305,8 @@ void export_Indicator_build_in() {
     def("SQRT", SQRT_1);
     def("SQRT", SQRT_2);
     def("SQRT", SQRT_3);
+
+    def("ROUND", ROUND_1, (arg("ndigits") = 2));
+    def("ROUND", ROUND_2, (arg("data"), arg("ndigits")=2));
+    def("ROUND", ROUND_3), (arg("data"), arg("ndigits")=2);
 }
