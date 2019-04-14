@@ -35,13 +35,23 @@ bool ICount::check() {
 
 void ICount::_calculate(const Indicator& data) {
     size_t total = data.size();
+    if (0 == total) {
+        m_discard = 0;
+        return;
+    }
+
+    if (data.discard() >= total) {
+        m_discard = total;
+        return;
+    }
+
     int n = getParam<int>("n");
 
     if (0 == n) {
         m_discard = data.discard();
         int count = 0;
         for (size_t i = m_discard; i < total; ++i) {
-            if (data[i] > 0) {
+            if (data[i] != 0) {
                 count++;
             }
             _set(count, i);
@@ -55,14 +65,27 @@ void ICount::_calculate(const Indicator& data) {
         return;
     }
 
-    for (size_t i = m_discard; i < total; ++i) {
-        int count = 0;
-        for (size_t j = i + 1 - n; j <= i; ++j) {
-            if (data[j] > 0) {
-                count++;
-            }
+    size_t startPos = data.discard();
+    int sum = 0;
+    size_t first_end = startPos + n >= total ? total : startPos + n;
+    for (size_t i = startPos; i < first_end; ++i) {
+        if (data[i] != 0) {
+            sum++;
         }
-        _set(count, i);
+    }
+
+    if (first_end >= 1) {
+        _set(sum, first_end - 1);
+    }
+    
+    for (size_t i = first_end; i < total; ++i) {
+        if (data[i] != 0) {
+            sum++;
+        }
+        if (data[i-n] != 0) {
+            sum--;
+        }
+        _set(sum, i);
     }
 }
 
