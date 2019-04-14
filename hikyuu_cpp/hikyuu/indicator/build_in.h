@@ -32,6 +32,7 @@
 #include "crt/MIN.h"
 #include "crt/NOT.h"
 #include "crt/POS.h"
+#include "crt/POW.h"
 #include "crt/PRICELIST.h"
 #include "crt/REF.h"
 #include "crt/SAFTYLOSS.h"

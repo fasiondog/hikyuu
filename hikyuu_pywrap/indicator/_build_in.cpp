@@ -148,6 +148,10 @@ Indicator (*LOG_3)(const Indicator&) = LOG;
 Indicator (*HHVBARS_1)(int) = HHVBARS;
 Indicator (*HHVBARS_2)(const Indicator&, int) = HHVBARS;
 
+Indicator (*POW_1)(int) = POW;
+Indicator (*POW_2)(const Indicator&, int) = POW;
+Indicator (*POW_3)(price_t, int) = POW;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3);
@@ -278,4 +282,8 @@ void export_Indicator_build_in() {
 
     def("HHVBARS", HHVBARS_1, (arg("n")=20));
     def("HHVBARS", HHVBARS_2, (arg("data"), arg("n")=20));
+
+    def("POW", POW_1, (arg("n")));
+    def("POW", POW_2, (arg("data"), arg("n")));
+    def("POW", POW_3), (arg("data"), arg("n"));
 }

@@ -281,6 +281,19 @@
     :rtype: Indicator
 
 
+.. py:function:: POW(data, n)
+
+    乘幂
+    
+    用法：POW(A,B)返回A的B次幂
+    
+    例如：POW(CLOSE,3)求得收盘价的3次方
+    
+    :param data: 输入数据
+    :param int n: 幂
+    :rtype: Indicator
+
+
 .. py:function:: PRICELIST(data[, result_num=0, discard=0])
     
     将 list、tuple、Indicator 转化为普通的 Indicator
