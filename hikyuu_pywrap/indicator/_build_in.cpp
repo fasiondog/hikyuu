@@ -171,6 +171,15 @@ Indicator (*ROUNDDOWN_1)(int) = ROUNDDOWN;
 Indicator (*ROUNDDOWN_2)(const Indicator&, int) = ROUNDDOWN;
 Indicator (*ROUNDDOWN_3)(price_t, int) = ROUNDDOWN;
 
+Indicator (*FLOOR_1)() = FLOOR;
+Indicator (*FLOOR_2)(const Indicator&) = FLOOR;
+Indicator (*FLOOR_3)(price_t) = FLOOR;
+
+Indicator (*CEILING_1)() = CEILING;
+Indicator (*CEILING_2)(const Indicator&) = CEILING;
+Indicator (*CEILING_3)(price_t) = CEILING;
+
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3);
@@ -323,5 +332,13 @@ void export_Indicator_build_in() {
 
     def("ROUNDDOWN", ROUNDDOWN_1, (arg("ndigits") = 2));
     def("ROUNDDOWN", ROUNDDOWN_2, (arg("data"), arg("ndigits")=2));
-    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits")=2));    
+    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits")=2));
+
+    def("FLOOR", FLOOR_1);
+    def("FLOOR", FLOOR_2);
+    def("FLOOR", FLOOR_3);
+
+    def("CEILING", CEILING_1);
+    def("CEILING", CEILING_2);
+    def("CEILING", CEILING_3);    
 }

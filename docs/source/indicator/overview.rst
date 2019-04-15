@@ -22,10 +22,12 @@
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
 * :py:func:`ABS` - 求绝对值
 * :py:func:`BETWEEN` - 介于(介于两个数之间)
+* :py:func:`CEILING` - 向上舍入(向数值增大方向舍入)取整
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
 * :py:func:`EXP` - e的X次幂
+* :py:func:`FLOOR` - 向下舍入(向数值减小方向舍入)取整
 * :py:func:`HHV` - N日内最高价
 * :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
 * :py:func:`IF` - 根据条件求不同的值

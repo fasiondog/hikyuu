@@ -63,7 +63,24 @@
    
    :param KData kdata: k线数据
    :rtype: Indicator
+   
 
+.. py:function:: CEIL([data])
+
+    同  :py:func:`CEILING`
+
+   
+.. py:function:: CEILING([data])
+
+    向上舍入(向数值增大方向舍入)取整
+   
+    用法：CEILING(A)返回沿A数值增大方向最接近的整数
+   
+    例如：CEILING(12.3)求得13；CEILING(-3.5)求得-3
+   
+    :param data: 输入数据
+    :rtype: Indicator
+   
     
 .. py:function:: COUNT([data, n=20])
 
@@ -110,6 +127,18 @@
     EXP(X)为e的X次幂
 
     :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
+.. py:function:: FLOOR([data])
+
+    向下舍入(向数值减小方向舍入)取整
+    
+    用法：FLOOR(A)返回沿A数值减小方向最接近的整数
+    
+    例如：FLOOR(12.3)求得12
+
+    :param data: 输入数据
     :rtype: Indicator
 
 
