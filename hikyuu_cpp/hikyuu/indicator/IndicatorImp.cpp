@@ -437,7 +437,11 @@ Indicator IndicatorImp::calculate() {
             break;
     }
 
-    m_need_calculate = false;
+    //使用原型方式时，不加此判断无法立刻重新计算
+    if (size() != 0) {
+        m_need_calculate = false;
+    }
+
     try {
         result = shared_from_this();
     } catch (...) {
