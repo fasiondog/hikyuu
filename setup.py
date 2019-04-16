@@ -164,7 +164,7 @@ if sys.argv[-1] == 'install':
         except:
             pass
         os.makedirs(install_dir)
-    os.system("xmake install -o " + install_dir)
+    os.system('xmake install -o "{}"'.format(install_dir))
     sys.exit(0)
 
 if sys.argv[-1] == 'bdist_wheel':
