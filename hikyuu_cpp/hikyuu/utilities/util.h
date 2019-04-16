@@ -58,7 +58,7 @@ string HKU_API gb_to_utf8(const string& szinput);
 
 
 /**
- * 四舍五入，和python中的round行为一样
+ * 四舍五入，ROUND_HALF_EVEN 银行家舍入法
  * @param number  待四舍五入的数据
  * @param ndigits 保留小数位数
  * @return 处理过的数据

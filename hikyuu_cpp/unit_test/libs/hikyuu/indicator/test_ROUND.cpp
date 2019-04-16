@@ -34,16 +34,18 @@ BOOST_AUTO_TEST_CASE( test_ROUND ) {
     a.push_back(1.323);
     a.push_back(0.300);
     a.push_back(0.305);
+    a.push_back(2.675);
 
     Indicator data = PRICELIST(a);
 
     result = ROUND(data, 2);
     BOOST_CHECK(result.name() == "ROUND");
     BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result.size() == 3);
+    BOOST_CHECK(result.size() == 4);
     BOOST_CHECK_CLOSE(result[0], 1.32, 0.001);
     BOOST_CHECK_CLOSE(result[1], 0.30, 0.001);
-    BOOST_CHECK_CLOSE(result[2], 0.31, 0.001);
+    BOOST_CHECK_CLOSE(result[2], 0.30, 0.001);
+    BOOST_CHECK_CLOSE(result[3], 2.68, 0.001);
 
     result = ROUND(-11.15, 1);
     BOOST_CHECK(result.size() == 1);

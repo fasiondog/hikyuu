@@ -1203,7 +1203,8 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     BOOST_CHECK(kdata[151] == KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));
     BOOST_CHECK(kdata[152] == KRecord(Datetime(200007060000), 23.30, 23.42, 23.16, 23.23, 3049.5, 13200));
     BOOST_CHECK(kdata[657] == KRecord(Datetime(200208210000), 18.35, 18.75, 18.18, 18.55, 36409.8, 197640));
-    BOOST_CHECK(kdata[658] == KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.82, 13101.3, 106872));
+    BOOST_CHECK(kdata[658] == KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.81, 13101.3, 106872));
+    std::cout << kdata[658] << std::endl;
 
     /** @arg 前向等比复权*/
     query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::EQUAL_FORWARD);
