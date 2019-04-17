@@ -296,22 +296,46 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     }
 
     if (OP == op && !isLeaf()) {
-        if (m_left && !m_left->isNeedContext()) {
-            if (m_left->isLeaf()) {
-                m_left->m_need_calculate = true;
-                m_left->m_optype = op;
-                m_left->m_right = right->clone();
+        if (m_left) {
+            if (m_left->isNeedContext()) {
+                if (m_left->isLeaf()) {
+                    m_need_calculate = true;
+                    m_left = right->clone();
+                } else {
+                    HKU_WARN("Context-dependent indicator can only be at the leaf node!"
+                             << "parent node: " << name() 
+                             << ", try add node: " << right->name()
+                             << " [IndicatorImp::add]");
+                }
             } else {
-                m_left->add(OP, left, right);
+                if (m_left->isLeaf()) {
+                    m_left->m_need_calculate = true;
+                    m_left->m_optype = op;
+                    m_left->m_right = right->clone();
+                } else {
+                    m_left->add(OP, left, right);
+                }
             }
         }
-        if (m_right && !m_right->isNeedContext()) {
-            if (m_right->isLeaf()) {
-                m_right->m_need_calculate = true;
-                m_right->m_optype = op;
-                m_right->m_right = right->clone();
+        if (m_right) {
+            if (m_right->isNeedContext()) {
+                if (m_right->isLeaf()) {
+                    m_need_calculate = true;
+                    m_right = right->clone();
+                } else {
+                    HKU_WARN("Context-dependent indicator can only be at the leaf node!"
+                             << "parent node: " << name() 
+                             << ", try add node: " << right->name()
+                             << " [IndicatorImp::add]");
+                }
             } else {
-                m_right->add(OP, left, right);
+                if (m_right->isLeaf()) {
+                    m_right->m_need_calculate = true;
+                    m_right->m_optype = op;
+                    m_right->m_right = right->clone();
+                } else {
+                    m_right->add(OP, left, right);
+                }
             }
         }
     } else {
@@ -336,6 +360,36 @@ add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
     m_right = right->clone();
 }
 
+bool IndicatorImp::needCalculate() {
+    if (m_need_calculate) {
+        return true;
+    }
+    
+    //子节点设置上下文
+    if (m_left) {
+        m_need_calculate = m_left->needCalculate();
+        if (m_need_calculate) {
+            return true;
+        }
+    }
+
+    if (m_right) {
+        m_need_calculate = m_right->needCalculate();
+        if (m_need_calculate) {
+            return true;
+        }
+    }
+
+    if (m_three) {
+        m_need_calculate = m_three->needCalculate();
+        if (m_need_calculate) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 Indicator IndicatorImp::calculate() {
     IndicatorImpPtr result;
     if (!check()) {
@@ -355,7 +409,7 @@ Indicator IndicatorImp::calculate() {
         return Indicator(result);
     }
 
-    if (!m_need_calculate) {
+    if (!needCalculate()) {
         try {
             result = shared_from_this();
         } catch (...) {

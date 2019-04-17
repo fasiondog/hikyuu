@@ -150,6 +150,7 @@ public:
 
 private:
     void initContext();
+    bool needCalculate();
     void execute_add();
     void execute_sub();
     void execute_mul();
