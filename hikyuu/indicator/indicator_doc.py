@@ -446,6 +446,7 @@ SQRT([data])
     :rtype: Indicator
 """
 
+STD = STDEV
 
 STDEV.__doc__ = """
 STDEV([data, n=10])

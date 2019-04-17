@@ -425,7 +425,16 @@
     :param data: 输入数据
     :rtype: Indicator
 
+
+.. py:function:: STD([data, n=10])
+
+    计算N周期内样本标准差
     
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: STDEV([data, n=10])
 
     计算N周期内样本标准差
