@@ -48,6 +48,9 @@ public:
 
     /** 使用已有参数计算新值，返回全新的Indicator */
     Indicator operator()(const Indicator& ind);
+    
+    /** 同 setContext */
+    Indicator operator()(const KData& k);
 
     /** 指标名称 */
     string name() const;

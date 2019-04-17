@@ -31,6 +31,12 @@ string Indicator::formula() const {
     return m_imp ? m_imp->formula() : "Indicator";
 }
 
+Indicator Indicator::operator()(const KData& k) {
+    Indicator result = clone();
+    result.setContext(k);
+    return result;
+}
+
 void Indicator::setContext(const Stock& stock, const KQuery& query) {
     if (m_imp) m_imp->setContext(stock, query);
 }
