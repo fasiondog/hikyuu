@@ -48,8 +48,8 @@ void (Indicator::*ind_write_name)(const string&) = &Indicator::name;
 void (Indicator::*setContext_1)(const Stock&, const KQuery&) = &Indicator::setContext;
 void (Indicator::*setContext_2)(const KData&) = &Indicator::setContext;
 
-Indicator (Indicator::*call_1)operator()(const Indicator&) = &Indicator::operator();
-Indicator (Indicator::*call_2)operator()(const KData&) = &Indicator::operator();
+Indicator (Indicator::*ind_call_1)(const Indicator&) = &Indicator::operator();
+Indicator (Indicator::*ind_call_2)(const KData&) = &Indicator::operator();
 
 void export_Indicator() {
 
@@ -76,8 +76,8 @@ void export_Indicator() {
         .def("getImp", &Indicator::getImp)
         .def("__len__", &Indicator::size)
         //.def("__call__", &Indicator::operator())
-        .def("__call__", call_1)
-        .def("__call__", call_2)
+        .def("__call__", ind_call_1)
+        .def("__call__", ind_call_2)
 #if HKU_PYTHON_SUPPORT_PICKLE
         .def_pickle(normal_pickle_suite<Indicator>())
 #endif

@@ -49,7 +49,7 @@ public:
     /** 使用已有参数计算新值，返回全新的Indicator */
     Indicator operator()(const Indicator& ind);
     
-    /** 同 setContext */
+    /** 生成新的克隆，并使用参数 k 作为新实例的上下文 */
     Indicator operator()(const KData& k);
 
     /** 指标名称 */
