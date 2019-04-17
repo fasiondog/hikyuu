@@ -47,7 +47,7 @@ bool IKData::check() {
 void IKData::_calculate(const Indicator& ind) {
     if (!isLeaf() && !ind.empty()) {
         HKU_WARN("The input is ignored because " << getParam<string>("kpart")
-                 << "depends on the context! [IKData::_calculate]");
+                 << " depends on the context! [IKData::_calculate]");
     }
 
     KData kdata = getContext();
