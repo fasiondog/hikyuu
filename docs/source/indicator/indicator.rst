@@ -444,6 +444,15 @@
     :rtype: Indicator
     
 
+.. py:function:: STDP([data, n=10])
+
+    总体标准差，STDP(X,N)为X的N日总体标准差
+    
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: SUM([data, n=20])
 
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。

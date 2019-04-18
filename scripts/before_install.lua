@@ -17,7 +17,7 @@ function main(target)
         os.exec("xcopy /S /Q /Y /I hikyuu %s", os.args(installdir))
     end
     if is_plat("linux") then
-        os.exec("cp -f -r -T hikyuu %s" ,os.args(installdir))
+        os.exec("cp -f -r -T hikyuu %s", os.args(installdir))
     end
     if is_plat("macosx") then
         os.exec("cp -f -r hikyuu/* %s", os.args(installdir))

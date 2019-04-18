@@ -76,6 +76,9 @@ Indicator (*SAFTYLOSS_2)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS
 Indicator (*STDEV_1)(int) = STDEV;
 Indicator (*STDEV_2)(const Indicator&, int) = STDEV;
 
+Indicator (*STDP_1)(int) = STDP;
+Indicator (*STDP_2)(const Indicator&, int) = STDP;
+
 Indicator (*HHV_1)(int) = HHV;
 Indicator (*HHV_2)(const Indicator&, int) = HHV;
 
@@ -239,6 +242,9 @@ void export_Indicator_build_in() {
 
     def("STDEV", STDEV_1, (arg("n")=10));
     def("STDEV", STDEV_2, (arg("data"), arg("n")=10));
+
+    def("STDP", STDP_1, (arg("n")=10));
+    def("STDP", STDP_2, (arg("data"), arg("n")=10));
 
     def("POS", POS, (arg("block"), arg("query"), arg("sg")));
 

@@ -459,6 +459,17 @@ STDEV([data, n=10])
 """
 
 
+STDP.__doc__ = """
+STDP([data, n=10])
+
+    总体标准差，STDP(X,N)为X的N日总体标准差
+    
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+"""
+
+
 SUM.__doc__ = """
 SUM([data, n=20])
 

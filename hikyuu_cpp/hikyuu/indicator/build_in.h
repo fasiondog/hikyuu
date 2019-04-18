@@ -46,6 +46,7 @@
 #include "crt/SMA.h"
 #include "crt/SQRT.h"
 #include "crt/STDEV.h"
+#include "crt/STDP.h"
 #include "crt/SUM.h"
 #include "crt/VIGOR.h"
 
