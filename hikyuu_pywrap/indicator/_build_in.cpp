@@ -182,6 +182,10 @@ Indicator (*CEILING_1)() = CEILING;
 Indicator (*CEILING_2)(const Indicator&) = CEILING;
 Indicator (*CEILING_3)(price_t) = CEILING;
 
+Indicator (*INTPART_1)() = INTPART;
+Indicator (*INTPART_2)(const Indicator&) = INTPART;
+Indicator (*INTPART_3)(price_t) = INTPART;
+
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -346,5 +350,9 @@ void export_Indicator_build_in() {
 
     def("CEILING", CEILING_1);
     def("CEILING", CEILING_2);
-    def("CEILING", CEILING_3);    
+    def("CEILING", CEILING_3);
+
+    def("INTPART", INTPART_1);
+    def("INTPART", INTPART_2);
+    def("INTPART", INTPART_3);    
 }

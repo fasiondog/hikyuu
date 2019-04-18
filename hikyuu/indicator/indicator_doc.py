@@ -194,6 +194,16 @@ IF(x, a, b)
 """
 
 
+INTPART.__doc__ = """
+INTPART([data])
+
+    取整(绝对值减小取整，即取得数据的整数部分)
+    
+    :param data: 输入数据
+    :rtype: Indicator
+"""
+
+
 KDATA.__doc__ = """
 KDATA([data])
 
