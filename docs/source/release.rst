@@ -1,6 +1,30 @@
 版本发布说明
 ===============
 
+1.1.2 - 2019年4月18日
+-------------------------
+
+1. 修复 Indicator 无法作为原型使用，导致部分预定义的 SG 等无法正在运行的BUG。如::
+
+    #以下两种写法等效：
+    (EMA() + MA())(C) #原型法
+    EMA(C) + MA(C)    #普通写法
+
+2. 交互模式下，增加预定义的全局变量 O、H、L、C、A、V，分别代表 OPEN()、HIGH()、LOW()、CLOSE()、AMO()、VOL()，编写自定义指标时更快捷。默认绑定的上下文为 sh000001（上证指数），可使用 set_gloabl_context 更改绑定的默认上下文。如::
+
+    x = EMA(C) + MA(C)
+    x.plot()  #绘制的是 sh000001
+    x.setContext("sz000001")  #设置指标 x 的上下文为 sz000001
+    set_gloabl_context("sz000001")  #更改 O,H,L,C,A,V默认绑定的上下文
+    
+    
+3. 交互模式下，增加 Datetime 同名缩写 D。原 Datetime(201901010000) 可简写为 D(201901010000)
+4. 优化 HHV、LLV、SUM、COUNT 指标实现，去除双重循环
+5. 新增内建指标：HHVBARS, LLVBARS, ROUND,ROUNDUP, ROUNDDOWN, FLOOR, CEILING, BETWEEN, POW, STD, SQRT, LOG, LN
+6. 修复 IF 两个参数为 price_t 时的计算错误
+
+
+
 1.1.1 - 2019年4月8日
 -------------------------
 
