@@ -5,8 +5,8 @@ target("hikyuu_utils")
         add_defines("HKU_API=__declspec(dllexport)")
     end
 
-    add_headers("../(hikyuu_utils/*.h)|doc.h")
-    add_headers("../(hikyuu_utils/iniparser/*.h)")
+    add_headerfiles("../(hikyuu_utils/*.h)|doc.h")
+    add_headerfiles("../(hikyuu_utils/iniparser/*.h)")
     
     -- add files
     add_files("**.cpp")

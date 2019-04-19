@@ -1,5 +1,5 @@
 /*
- * test_ABS.cpp
+ * test_EXP.cpp
  *
  *  Created on: 2019年4月2日
  *      Author: fasiondog

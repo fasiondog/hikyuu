@@ -20,6 +20,7 @@
 #include "crt/DIFF.h"
 #include "crt/EMA.h"
 #include "crt/EXP.h"
+#include "crt/EXIST.h"
 #include "crt/FLOOR.h"
 #include "crt/HHV.h"
 #include "crt/HHVBARS.h"

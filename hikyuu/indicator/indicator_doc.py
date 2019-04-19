@@ -122,6 +122,15 @@ EMA([data, n=22])
 """
 
 
+EXIST.__doc__ = """
+存在, EXIST(X,N) 表示条件X在N周期有存在
+
+    :param data: 输入数据
+    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :rtype: Indicator
+"""
+
+
 EXP.__doc__ = """
 EXP([data])
 

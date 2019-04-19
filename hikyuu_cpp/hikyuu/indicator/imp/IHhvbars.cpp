@@ -26,7 +26,7 @@ IHhvbars::~IHhvbars() {
 
 bool IHhvbars::check() {
     if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=>0) "
+        HKU_ERROR("Invalid param! (n>=0) "
                   << m_params << " [IHhvbars::check]");
         return false;
     }

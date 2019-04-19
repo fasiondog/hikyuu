@@ -186,6 +186,9 @@ Indicator (*INTPART_1)() = INTPART;
 Indicator (*INTPART_2)(const Indicator&) = INTPART;
 Indicator (*INTPART_3)(price_t) = INTPART;
 
+Indicator (*EXIST_1)(int) = EXIST;
+Indicator (*EXIST_2)(const Indicator&, int) = EXIST;
+
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -354,5 +357,8 @@ void export_Indicator_build_in() {
 
     def("INTPART", INTPART_1);
     def("INTPART", INTPART_2);
-    def("INTPART", INTPART_3);    
+    def("INTPART", INTPART_3);
+
+    def("EXIST", EXIST_1, (arg("n")=20));
+    def("EXIST", EXIST_2, (arg("data"), arg("n")=20));
 }

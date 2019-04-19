@@ -2,7 +2,7 @@ target("hikyuu")
     set_kind("shared")
     
     -- set version for release
-    set_config_header("version.h", {prefix = "HKU"})
+    add_configfiles("version.h", {prefix = "HKU"})
 
     add_deps("hikyuu_utils")
 
@@ -60,7 +60,7 @@ target("hikyuu")
     -- add files
     add_files("./**.cpp")
     
-    add_headers("../(hikyuu/**.h)|**doc.h")
+    add_headerfiles("../(hikyuu/**.h)|**doc.h")
 
     on_load(function(target)
         assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_ROOT
