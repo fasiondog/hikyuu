@@ -1,4 +1,4 @@
-set_xmakever("2.2.2")
+set_xmakever("2.2.5")
 
 -- project
 set_project("hikyuu")

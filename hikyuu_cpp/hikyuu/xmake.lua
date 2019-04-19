@@ -60,7 +60,7 @@ target("hikyuu")
     -- add files
     add_files("./**.cpp")
     
-    add_headerfiles("../(hikyuu/**.h)|**doc.h")
+    add_headers("../(hikyuu/**.h)|**doc.h")
 
     on_load(function(target)
         assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_ROOT
