@@ -53,8 +53,8 @@ AMA([data, n=10, fast_n=2, slow_n=30])
 """
 
 
-AMO.__doc__ = """
-AMO([data])
+IAMO.__doc__ = """
+IAMO([data])
 
     获取成交金额，包装KData的成交金额成Indicator
     
@@ -63,8 +63,8 @@ AMO([data])
 """
 
 
-CLOSE.__doc__ = """
-CLOSE([data])
+ICLOSE.__doc__ = """
+ICLOSE([data])
    
     获取收盘价，包装KData的收盘价成Indicator
     
@@ -167,8 +167,8 @@ HHVBARS([data, n=20])
 """
 
 
-HIGH.__doc__ = """
-HIGH([data])
+IHIGH.__doc__ = """
+IHIGH([data])
 
     获取最高价，包装KData的最高价成Indicator
 
@@ -213,8 +213,8 @@ INTPART([data])
 """
 
 
-KDATA.__doc__ = """
-KDATA([data])
+IKDATA.__doc__ = """
+IKDATA([data])
 
     包装KData成Indicator，用于其他指标计算
 
@@ -275,8 +275,8 @@ LOG([data])
 """
 
 
-LOW.__doc__ = """
-LOW([data])
+ILOW.__doc__ = """
+ILOW([data])
 
     获取最低价，包装KData的最低价成Indicator
     
@@ -346,8 +346,8 @@ NOT([data])
 """
 
 
-OPEN.__doc__ = """
-OPEN([data])
+IOPEN.__doc__ = """
+IOPEN([data])
 
     获取开盘价，包装KData的开盘价成Indicator
     
@@ -513,8 +513,8 @@ VIGOR([kdata, n=2])
 """
 
 
-VOL.__doc__ = """
-VOL([data])
+IVOL.__doc__ = """
+IVOL([data])
 
     获取成交量，包装KData的成交量成Indicator
 

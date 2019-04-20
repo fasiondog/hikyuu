@@ -71,6 +71,15 @@ Indicator.__rand__ = lambda self, other: CVAL(self, other).__and__(self)
 Indicator.__ror__ = lambda self, other: CVAL(self, other).__or__(self)
 
 
+KDATA = IKDATA()
+OPEN = IOPEN()
+CLOSE = ICLOSE()
+HIGH = IHIGH()
+LOW = ILOW()
+AMO = IAMO()
+VOL = IVOL()
+
+
 def PRICELIST(data, result_num=0, discard=0):
     """
     将 list、tuple、Indicator 转化为普通的 Indicator

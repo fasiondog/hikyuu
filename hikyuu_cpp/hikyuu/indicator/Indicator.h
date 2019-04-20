@@ -52,6 +52,9 @@ public:
     /** 生成新的克隆，并使用参数 k 作为新实例的上下文 */
     Indicator operator()(const KData& k);
 
+    /** 生成新的克隆，同 clone */
+    Indicator operator()();
+
     /** 指标名称 */
     string name() const;
     void name(const string& name);
@@ -174,6 +177,10 @@ inline bool Indicator::empty() const {
 
 inline size_t Indicator::size() const {
     return m_imp ? m_imp->size() : 0;
+}
+
+inline Indicator Indicator::operator()() {
+    return clone();
 }
 
 inline Indicator Indicator::clone() const {

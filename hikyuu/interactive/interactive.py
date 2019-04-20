@@ -170,12 +170,12 @@ zsbk_zz100 = sm.getBlock("指数板块", "沪深300")
 # 设置关键类型简称
 #
 #==============================================================================            
-O = OPEN()
-C = CLOSE()
-H = HIGH()
-L = LOW()
-A = AMO()
-V = VOL()
+O = OPEN
+C = CLOSE
+H = HIGH
+L = LOW
+A = AMO
+V = VOL
 D = Datetime
 
 def set_global_context(stk, query):

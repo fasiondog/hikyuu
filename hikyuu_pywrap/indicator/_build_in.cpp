@@ -191,26 +191,26 @@ Indicator (*EXIST_2)(const Indicator&, int) = EXIST;
 
 
 void export_Indicator_build_in() {
-    def("KDATA", KDATA1);
-    def("KDATA", KDATA3);
+    def("IKDATA", KDATA1);
+    def("IKDATA", KDATA3);
 
-    def("CLOSE", CLOSE1);
-    def("CLOSE", CLOSE3);
+    def("ICLOSE", CLOSE1);
+    def("ICLOSE", CLOSE3);
 
-    def("OPEN", OPEN1);
-    def("OPEN", OPEN3);
+    def("IOPEN", OPEN1);
+    def("IOPEN", OPEN3);
 
-    def("HIGH", HIGH1);
-    def("HIGH", HIGH3);
+    def("IHIGH", HIGH1);
+    def("IHIGH", HIGH3);
 
-    def("LOW", LOW1);
-    def("LOW", LOW3);
+    def("ILOW", LOW1);
+    def("ILOW", LOW3);
 
-    def("AMO", AMO1);
-    def("AMO", AMO3);
+    def("IAMO", AMO1);
+    def("IAMO", AMO3);
 
-    def("VOL", VOL1);
-    def("VOL", VOL3);
+    def("IVOL", VOL1);
+    def("IVOL", VOL3);
 
     def("KDATA_PART", KDATA_PART1, (arg("data"), arg("kpart")));
     def("KDATA_PART", KDATA_PART3, (arg("kpart")));

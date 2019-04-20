@@ -50,6 +50,7 @@ void (Indicator::*setContext_2)(const KData&) = &Indicator::setContext;
 
 Indicator (Indicator::*ind_call_1)(const Indicator&) = &Indicator::operator();
 Indicator (Indicator::*ind_call_2)(const KData&) = &Indicator::operator();
+Indicator (Indicator::*ind_call_3)() = &Indicator::operator();
 
 void export_Indicator() {
 
@@ -78,6 +79,7 @@ void export_Indicator() {
         //.def("__call__", &Indicator::operator())
         .def("__call__", ind_call_1)
         .def("__call__", ind_call_2)
+        .def("__call__", ind_call_3)
 #if HKU_PYTHON_SUPPORT_PICKLE
         .def_pickle(normal_pickle_suite<Indicator>())
 #endif
