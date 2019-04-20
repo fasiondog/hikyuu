@@ -84,13 +84,13 @@ BOOST_AUTO_TEST_CASE( test_EXIST ) {
     BOOST_CHECK(result.name() == "EXIST");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
-    for (int i = 0; i < result.size(); i++) {
-        std::cout << i << " " << data[i] << " " << result[i] << std::endl;
-    }    
-    /*BOOST_CHECK(result[2] == 1);
+    for (int i = 0; i < result.discard(); i++) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+    }
+    BOOST_CHECK(result[2] == 1);
     BOOST_CHECK(result[3] == 1);
     BOOST_CHECK(result[4] == 1);
-    BOOST_CHECK(result[5] == 1);*/
+    BOOST_CHECK(result[5] == 1);
 
     a.push_back(0);
     a.push_back(0);
@@ -102,14 +102,17 @@ BOOST_AUTO_TEST_CASE( test_EXIST ) {
     BOOST_CHECK(result.name() == "EXIST");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
-    /*BOOST_CHECK(result[2] == 1);
+    for (int i = 0; i < result.discard(); i++) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+    }
+    BOOST_CHECK(result[2] == 1);
     BOOST_CHECK(result[3] == 1);
     BOOST_CHECK(result[4] == 1);
-    BOOST_CHECK(result[5] == 1);*/
-    
-    for (int i = 0; i < result.size(); i++) {
-        std::cout << i << " " << data[i] << " " << result[i] << std::endl;
-    }
+    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[7] == 0);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
 }
 
 

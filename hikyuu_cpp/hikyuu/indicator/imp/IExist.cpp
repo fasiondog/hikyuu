@@ -44,19 +44,16 @@ void IExist::_calculate(const Indicator& ind) {
 
     price_t exist = 0;
     size_t pre_pos = m_discard;
-    size_t start_pos = m_discard < total ? m_discard : total;
-    for (size_t i = ind.discard(); i < start_pos; i++) {
+    for (size_t i = ind.discard(); i <= m_discard; i++) {
          if (ind[i] != 0) {
              pre_pos = i;
              exist = 1;
         }
     }
 
-    if (start_pos >= 1) {
-        _set(exist, start_pos - 1);
-    }
+    _set(exist, m_discard);
 
-    for (size_t i = start_pos; i < total-1; i++) {
+    for (size_t i = m_discard + 1; i < total-1; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
@@ -69,7 +66,7 @@ void IExist::_calculate(const Indicator& ind) {
         _set(exist, i);
     }
 
-    start_pos = total - n;
+    size_t start_pos = total - n;
     exist = 0;
     for (size_t i = start_pos; i < total; i++) {
         if (ind[i] != 0) {
