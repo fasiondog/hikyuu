@@ -189,6 +189,9 @@ Indicator (*INTPART_3)(price_t) = INTPART;
 Indicator (*EXIST_1)(int) = EXIST;
 Indicator (*EXIST_2)(const Indicator&, int) = EXIST;
 
+Indicator (*EVERY_1)(int) = EVERY;
+Indicator (*EVERY_2)(const Indicator&, int) = EVERY;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -361,4 +364,7 @@ void export_Indicator_build_in() {
 
     def("EXIST", EXIST_1, (arg("n")=20));
     def("EXIST", EXIST_2, (arg("data"), arg("n")=20));
+
+    def("EVERY", EVERY_1, (arg("n")=20));
+    def("EVERY", EVERY_2, (arg("data"), arg("n")=20));
 }

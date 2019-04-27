@@ -122,6 +122,19 @@
     :rtype: Indicator
     
 
+.. py:function:: EVERY([data, n=20])
+
+    一直存在
+
+    用法：EVERY (X,N) 表示条件X在N周期一直存在
+
+    例如：EVERY(CLOSE>OPEN,10) 表示前10日内一直是阳线
+
+    :param data: 输入数据
+    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :rtype: Indicator
+
+
 .. py:function:: EXIST([data, n=20])
 
     存在, EXIST(X,N) 表示条件X在N周期有存在

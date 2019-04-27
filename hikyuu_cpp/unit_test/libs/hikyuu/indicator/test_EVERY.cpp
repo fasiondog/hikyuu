@@ -1,7 +1,7 @@
 /*
- * test_EXIST.cpp
+ * test_EVERY.cpp
  *
- *  Created on: 2019-4-19
+ *  Created on: 2019-4-28
  *      Author: fasiondog
  */
 
@@ -14,21 +14,22 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/EXIST.h>
+#include <hikyuu/indicator/crt/CVAL.h>
+#include <hikyuu/indicator/crt/EVERY.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_EXIST test_indicator_EXIST
+ * @defgroup test_indicator_EVERY test_indicator_EVERY
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_EXIST ) {
+BOOST_AUTO_TEST_CASE( test_EVERY ) {
     Indicator result;
 
     PriceList a;
@@ -42,13 +43,14 @@ BOOST_AUTO_TEST_CASE( test_EXIST ) {
     Indicator data = PRICELIST(a);
 
     /** @arg n=0 */
-    result = EXIST(data, 0);
+    result = EVERY(data, 0);
+    BOOST_CHECK(result.name() == "EVERY");
     BOOST_CHECK(result.discard() == data.size());
     BOOST_CHECK(result.size() == data.size());
     
     /** @arg n=1, total>1 */
-    result = EXIST(data, 1);
-    BOOST_CHECK(result.name() == "EXIST");
+    result = EVERY(data, 1);
+    BOOST_CHECK(result.name() == "EVERY");
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result.size() == data.size());
     for (int i = 0; i < data.size(); ++i) {
@@ -56,63 +58,63 @@ BOOST_AUTO_TEST_CASE( test_EXIST ) {
     }
 
     /** @arg n=1, total=1 */
-    result = EXIST(CVAL(1), 1);
+    result = EVERY(CVAL(1), 1);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 1);
 
-    result = EXIST(CVAL(0), 1);
+    result = EVERY(CVAL(0), 1);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
 
     /** @arg n > 1, total = n */
-    result = EXIST(data, 6);
-    BOOST_CHECK(result.name() == "EXIST");
+    result = EVERY(data, 6);
+    BOOST_CHECK(result.name() == "EVERY");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 5);
-    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[5] == 0);
 
     /** @arg n > 1, total < n */
-    result = EXIST(data, 7);
-    BOOST_CHECK(result.name() == "EXIST");
+    result = EVERY(data, 7);
+    BOOST_CHECK(result.name() == "EVERY");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 6);
 
     /** @arg n > 1, total > n */
-    result = EXIST(data, 3);
-    BOOST_CHECK(result.name() == "EXIST");
+    result = EVERY(data, 3);
+    BOOST_CHECK(result.name() == "EVERY");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
     for (int i = 0; i < result.discard(); i++) {
         BOOST_CHECK(result[i] == Null<price_t>());
     }
-    BOOST_CHECK(result[2] == 1);
-    BOOST_CHECK(result[3] == 1);
-    BOOST_CHECK(result[4] == 1);
-    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 0);
+    BOOST_CHECK(result[4] == 0);
+    BOOST_CHECK(result[5] == 0);
 
-    a.push_back(0);
-    a.push_back(0);
-    a.push_back(0);
-    a.push_back(0);
+    a.push_back(1);
+    a.push_back(1);
+    a.push_back(1);
+    a.push_back(1);
 
     data = PRICELIST(a);
-    result = EXIST(data, 3);
-    BOOST_CHECK(result.name() == "EXIST");
+    result = EVERY(data, 3);
+    BOOST_CHECK(result.name() == "EVERY");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
     for (int i = 0; i < result.discard(); i++) {
         BOOST_CHECK(result[i] == Null<price_t>());
     }
-    BOOST_CHECK(result[2] == 1);
-    BOOST_CHECK(result[3] == 1);
-    BOOST_CHECK(result[4] == 1);
-    BOOST_CHECK(result[5] == 1);
-    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 0);
+    BOOST_CHECK(result[4] == 0);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 0);
     BOOST_CHECK(result[7] == 0);
-    BOOST_CHECK(result[8] == 0);
-    BOOST_CHECK(result[9] == 0);
+    BOOST_CHECK(result[8] == 1);
+    BOOST_CHECK(result[9] == 1);
 }
 
 
@@ -122,14 +124,14 @@ BOOST_AUTO_TEST_CASE( test_EXIST ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_EXIST_export ) {
+BOOST_AUTO_TEST_CASE( test_EVERY_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/EXIST.xml";
+    filename += "/EVERY.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = EXIST(CLOSE(kdata)>OPEN(kdata));
+    Indicator x1 = EVERY(CLOSE(kdata)>OPEN(kdata));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -143,7 +145,7 @@ BOOST_AUTO_TEST_CASE( test_EXIST_export ) {
         ia >> BOOST_SERIALIZATION_NVP(x2);
     }
 
-    BOOST_CHECK(x2.name() == "EXIST");
+    BOOST_CHECK(x2.name() == "EVERY");
     BOOST_CHECK(x1.size() == x2.size());
     BOOST_CHECK(x1.discard() == x2.discard());
     BOOST_CHECK(x1.getResultNumber() == x2.getResultNumber());

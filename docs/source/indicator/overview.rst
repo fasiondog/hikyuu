@@ -26,6 +26,7 @@
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
+* :py:func:`EVERY` - 一直存在
 * :py:func:`EXIST` - 存在, EXIST(X,N) 表示条件X在N周期有存在
 * :py:func:`EXP` - e的X次幂
 * :py:func:`FLOOR` - 向下舍入(向数值减小方向舍入)取整
