@@ -192,6 +192,9 @@ Indicator (*EXIST_2)(const Indicator&, int) = EXIST;
 Indicator (*EVERY_1)(int) = EVERY;
 Indicator (*EVERY_2)(const Indicator&, int) = EVERY;
 
+Indicator (*LAST_1)(int, int) = LAST;
+Indicator (*LAST_2)(const Indicator&, int, int) = LAST;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -367,4 +370,7 @@ void export_Indicator_build_in() {
 
     def("EVERY", EVERY_1, (arg("n")=20));
     def("EVERY", EVERY_2, (arg("data"), arg("n")=20));
+
+    def("LAST", LAST_1, (arg("m")=10, arg("n")=5));
+    def("LAST", LAST_2, (arg("data"), arg("m")=10, arg("n")=5));
 }

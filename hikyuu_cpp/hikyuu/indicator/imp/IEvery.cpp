@@ -25,8 +25,8 @@ IEvery::~IEvery() {
 }
 
 bool IEvery::check() {
-    if (getParam<int>("n") < 1) {
-        HKU_ERROR("Invalid param! (n>=1) "
+    if (getParam<int>("n") < 0) {
+        HKU_ERROR("Invalid param! (n>=0) "
                   << m_params << " [IEvery::check]");
         return false;
     }
@@ -35,7 +35,15 @@ bool IEvery::check() {
 
 void IEvery::_calculate(const Indicator& ind) {
     size_t total = ind.size();
+    if (0 == total) {
+        return;
+    }
+
     int n = getParam<int>("n");
+    if (0 == n) {
+        n = total;
+    }
+    
     m_discard = ind.discard() + n - 1;
     if (m_discard >= total) {
         m_discard = total;

@@ -14,7 +14,6 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/EXIST.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/EVERY.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -45,8 +44,12 @@ BOOST_AUTO_TEST_CASE( test_EVERY ) {
     /** @arg n=0 */
     result = EVERY(data, 0);
     BOOST_CHECK(result.name() == "EVERY");
-    BOOST_CHECK(result.discard() == data.size());
+    BOOST_CHECK(result.discard() == data.size()-1);
     BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result[5] == 0);
+    for (int i = 0; i < 5; i++) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+    }
     
     /** @arg n=1, total>1 */
     result = EVERY(data, 1);

@@ -1,50 +1,62 @@
 /*
- * IExist.cpp
+ * ILast.cpp
  * 
  *  Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2019-4-19
+ *  Created on: 2019-4-28
  *      Author: fasiondog
  */
 
-#include "IExist.h"
+#include "ILast.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::IExist)
+BOOST_CLASS_EXPORT(hku::ILast)
 #endif
 
 
 namespace hku {
 
-IExist::IExist() : IndicatorImp("EXIST", 1) {
-    setParam<int>("n", 20);
+ILast::ILast() : IndicatorImp("LAST", 1) {
+    setParam<int>("m", 10);
+    setParam<int>("n", 5);
 }
 
-IExist::~IExist() {
+ILast::~ILast() {
 
 }
 
-bool IExist::check() {
-    if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=0) "
-                  << m_params << " [IExist::check]");
+bool ILast::check() {
+    if (getParam<int>("m") < 0 || getParam<int>("n") < 0) {
+        HKU_ERROR("Invalid param! (m>=0 and n>=0) "
+                  << m_params << " [ILast::check]");
         return false;
     }
     return true;
 }
 
-void IExist::_calculate(const Indicator& ind) {
+void ILast::_calculate(const Indicator& ind) {
     size_t total = ind.size();
-    if (total == 0) {
+    if (0 == total) {
         return;
     }
 
+    int m = getParam<int>("m");
     int n = getParam<int>("n");
-    if (n == 0) {
+    if (0 == m) {
+        m = total;
+    }
+
+    if (0 == n) {
         n = total;
     }
-    
-    m_discard = ind.discard() + n - 1;
+
+    if (m < n) {
+        int tmp = m;
+        m = n;
+        n = tmp;
+    }
+
+    m_discard = ind.discard() + m;
     if (m_discard >= total) {
         m_discard = total;
         return;
@@ -86,8 +98,9 @@ void IExist::_calculate(const Indicator& ind) {
 }
 
 
-Indicator HKU_API EXIST(int n) {
-    IndicatorImpPtr p = make_shared<IExist>();
+Indicator HKU_API LAST(int m, int n) {
+    IndicatorImpPtr p = make_shared<ILast>();
+    p->setParam<int>("m", m);
     p->setParam<int>("n", n);
     return Indicator(p);
 }
