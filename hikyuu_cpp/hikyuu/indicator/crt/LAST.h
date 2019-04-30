@@ -10,7 +10,8 @@
 #ifndef INDICATOR_CRT_LAST_H_
 #define INDICATOR_CRT_LAST_H_
 
-#include "../Indicator.h"
+#include "EVERY.h"
+#include "REF.h"
 
 namespace hku {
 
@@ -23,8 +24,16 @@ namespace hku {
  * </pre>
  * @ingroup Indicator
  */
-Indicator HKU_API LAST(int m=10, int n=5);
+Indicator LAST(int m=10, int n=5);
 Indicator LAST(const Indicator& ind, int m=10, int n=5);
+
+Indicator LAST(int m, int n) {
+    int max = std::max(m,n);
+    int min = std::min(m,n);
+    Indicator result = REF(EVERY(max-min), min);
+    result.name("LAST");
+    return result;
+}
 
 inline Indicator LAST(const Indicator& ind, int m, int n) {
     return LAST(m, n)(ind);

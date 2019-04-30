@@ -247,7 +247,21 @@
    :param KData kdata: k线数据
    :rtype: Indicator
 
-    
+
+.. py:function:: LAST([data, m=10, n=5])
+
+    区间存在。
+
+    用法：LAST (X,M,N) 表示条件 X 在前 M 周期到前 N 周期存在。
+
+    例如：LAST(CLOSE>OPEN,10,5) 表示从前10日到前5日内一直阳线。
+
+    :param data: 输入数据
+    :param int m: m周期
+    :param int n: n周期
+    :rtype: Indicator
+
+
 .. py:function:: LLV([data, n=20])
 
     N日内最低价，N=0则从第一个有效值开始。

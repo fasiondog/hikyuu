@@ -35,87 +35,24 @@ BOOST_AUTO_TEST_CASE( test_LAST ) {
     PriceList a;
     a.push_back(0);
     a.push_back(1);
+    a.push_back(2);
+    a.push_back(3);
+    a.push_back(4);
     a.push_back(0);
-    a.push_back(1);
-    a.push_back(1);
     a.push_back(0);
+    a.push_back(7);
+    a.push_back(8);
+    a.push_back(9);
+    a.push_back(10);
 
     Indicator data = PRICELIST(a);
 
     /** @arg n=0 */
-    result = EVERY(data, 0);
-    BOOST_CHECK(result.name() == "EVERY");
-    //BOOST_CHECK(result.discard() == data.size());
-    //BOOST_CHECK(result.size() == data.size());
-    
-    /** @arg n=1, total>1 */
-    result = EVERY(data, 1);
-    BOOST_CHECK(result.name() == "EVERY");
-    BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result.size() == data.size());
-    for (int i = 0; i < data.size(); ++i) {
-        BOOST_CHECK(result[i] == data[i]);
-    }
-
-    /** @arg n=1, total=1 */
-    result = EVERY(CVAL(1), 1);
-    BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == 1);
-
-    result = EVERY(CVAL(0), 1);
-    BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == 0);
-
-    /** @arg n > 1, total = n */
-    result = EVERY(data, 6);
-    BOOST_CHECK(result.name() == "EVERY");
-    BOOST_CHECK(result.size() == data.size());
-    BOOST_CHECK(result.discard() == 5);
-    BOOST_CHECK(result[5] == 0);
-
-    /** @arg n > 1, total < n */
-    result = EVERY(data, 7);
-    BOOST_CHECK(result.name() == "EVERY");
-    BOOST_CHECK(result.size() == data.size());
-    BOOST_CHECK(result.discard() == 6);
-
-    /** @arg n > 1, total > n */
-    result = EVERY(data, 3);
-    BOOST_CHECK(result.name() == "EVERY");
-    BOOST_CHECK(result.size() == data.size());
-    BOOST_CHECK(result.discard() == 2);
-    for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
-    }
-    BOOST_CHECK(result[2] == 0);
-    BOOST_CHECK(result[3] == 0);
-    BOOST_CHECK(result[4] == 0);
-    BOOST_CHECK(result[5] == 0);
-
-    a.push_back(1);
-    a.push_back(1);
-    a.push_back(1);
-    a.push_back(1);
-
-    data = PRICELIST(a);
-    result = EVERY(data, 3);
-    BOOST_CHECK(result.name() == "EVERY");
-    BOOST_CHECK(result.size() == data.size());
-    BOOST_CHECK(result.discard() == 2);
-    for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
-    }
-    BOOST_CHECK(result[2] == 0);
-    BOOST_CHECK(result[3] == 0);
-    BOOST_CHECK(result[4] == 0);
-    BOOST_CHECK(result[5] == 0);
-    BOOST_CHECK(result[6] == 0);
-    BOOST_CHECK(result[7] == 0);
-    BOOST_CHECK(result[8] == 1);
-    BOOST_CHECK(result[9] == 1);
-}
+    result = LAST(data, 0, 0);
+    BOOST_CHECK(result.name() == "LAST");
+    std::cout << result.size() << std::endl;
+    std::cout << result.discard() << std::endl;
+ }
 
 
 //-----------------------------------------------------------------------------
