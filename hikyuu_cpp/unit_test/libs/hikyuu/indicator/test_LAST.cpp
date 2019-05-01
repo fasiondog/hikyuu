@@ -14,8 +14,6 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/CVAL.h>
-#include <hikyuu/indicator/crt/EVERY.h>
 #include <hikyuu/indicator/crt/LAST.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
@@ -33,25 +31,98 @@ BOOST_AUTO_TEST_CASE( test_LAST ) {
     Indicator result;
 
     PriceList a;
-    a.push_back(0);
-    a.push_back(1);
-    a.push_back(2);
-    a.push_back(3);
-    a.push_back(4);
-    a.push_back(0);
-    a.push_back(0);
-    a.push_back(7);
-    a.push_back(8);
-    a.push_back(9);
-    a.push_back(10);
+    a.push_back(0); //0
+    a.push_back(1); //1
+    a.push_back(2); //2
+    a.push_back(3); //3 
+    a.push_back(4); //4
+    a.push_back(0); //5
+    a.push_back(0); //6
+    a.push_back(7); //7
+    a.push_back(8); //8
+    a.push_back(9); //9
+    a.push_back(10); //10
 
     Indicator data = PRICELIST(a);
 
-    /** @arg n=0 */
+    /** @arg m=0, n=0 */
     result = LAST(data, 0, 0);
     BOOST_CHECK(result.name() == "LAST");
-    std::cout << result.size() << std::endl;
-    std::cout << result.discard() << std::endl;
+    BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 0);
+    BOOST_CHECK(result[1] == 1);
+    BOOST_CHECK(result[2] == 1);
+    BOOST_CHECK(result[3] == 1);
+    BOOST_CHECK(result[4] == 1);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 0);
+    BOOST_CHECK(result[7] == 1);
+    BOOST_CHECK(result[8] == 1);
+    BOOST_CHECK(result[9] == 1);
+    BOOST_CHECK(result[10] == 1);
+
+    /** @arg m=0, n=5 */
+    result = LAST(data, 0, 5);
+    BOOST_CHECK(result.name() == "LAST");
+    BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 5);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 0);
+    BOOST_CHECK(result[7] == 0);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
+    BOOST_CHECK(result[10] == 0);
+
+    /** @arg m=6,n=3*/
+    result = LAST(data, 6, 3);
+    BOOST_CHECK(result.name() == "LAST");
+    BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 6);
+    BOOST_CHECK(result[6] == 0);
+    BOOST_CHECK(result[7] == 1);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
+    BOOST_CHECK(result[10] == 0);
+
+    /** @arg m=3,n=6*/
+    result = LAST(data, 6, 3);
+    BOOST_CHECK(result.name() == "LAST");
+    BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 6);
+    BOOST_CHECK(result[6] == 0);
+    BOOST_CHECK(result[7] == 1);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
+    BOOST_CHECK(result[10] == 0);
+
+    /** @arg m=3,n=2*/
+    result = LAST(data, 3, 2);
+    BOOST_CHECK(result.name() == "LAST");
+    BOOST_CHECK(result.size() == data.size()); 
+    BOOST_CHECK(result.discard() == 3);
+    BOOST_CHECK(result[3] == 0);
+    BOOST_CHECK(result[4] == 1);
+    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[7] == 0);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
+    BOOST_CHECK(result[10] == 1);
+
+    /** @arg m=3,n=3*/
+    result = LAST(data, 3, 3);
+    BOOST_CHECK(result.name() == "LAST");
+    BOOST_CHECK(result.size() == data.size()); 
+    BOOST_CHECK(result.discard() == 3);
+    BOOST_CHECK(result[3] == 0);
+    BOOST_CHECK(result[4] == 1);
+    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[7] == 1);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
+    BOOST_CHECK(result[10] == 1);
  }
 
 
