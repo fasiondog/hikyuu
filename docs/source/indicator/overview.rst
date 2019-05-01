@@ -25,6 +25,7 @@
 * :py:func:`BETWEEN` - 介于(介于两个数之间)
 * :py:func:`CEILING` - 向上舍入(向数值增大方向舍入)取整
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
+* :py:func:`COS` - 余弦值
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
 * :py:func:`EVERY` - 一直存在

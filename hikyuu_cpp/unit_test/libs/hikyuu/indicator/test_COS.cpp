@@ -1,5 +1,5 @@
 /*
- * test_ASIN.cpp
+ * test_COS.cpp
  *
  *  Copyright (c) 2019 hikyuu.org
  * 
@@ -16,20 +16,20 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/ASIN.h>
+#include <hikyuu/indicator/crt/COS.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_ASIN test_indicator_ASIN
+ * @defgroup test_indicator_COS test_indicator_COS
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_ASIN ) {
+BOOST_AUTO_TEST_CASE( test_COS ) {
     Indicator result;
 
     PriceList a;
@@ -39,17 +39,17 @@ BOOST_AUTO_TEST_CASE( test_ASIN ) {
 
     Indicator data = PRICELIST(a);
 
-    result = ASIN(data);
-    BOOST_CHECK(result.name() == "ASIN");
+    result = COS(data);
+    BOOST_CHECK(result.name() == "COS");
     BOOST_CHECK(result.discard() == 0);
     for (int i = 0; i <10; ++i) {
-        BOOST_CHECK(result[i] == std::asin(data[i]));
+        BOOST_CHECK(result[i] == std::cos(data[i]));
     }
 
-    result = ASIN(-11);
+    result = COS(-11);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == std::asin(-11));
+    BOOST_CHECK(result[0] == std::cos(-11));
 }
 
 
@@ -59,14 +59,14 @@ BOOST_AUTO_TEST_CASE( test_ASIN ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_ASIN_export ) {
+BOOST_AUTO_TEST_CASE( test_COS_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/ASIN.xml";
+    filename += "/COS.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator x1 = ASIN(CLOSE(kdata));
+    Indicator x1 = COS(CLOSE(kdata));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE( test_ASIN_export ) {
         ia >> BOOST_SERIALIZATION_NVP(x2);
     }
 
-    BOOST_CHECK(x2.name() == "ASIN");
+    BOOST_CHECK(x2.name() == "COS");
     BOOST_CHECK(x1.size() == x2.size());
     BOOST_CHECK(x1.discard() == x2.discard());
     BOOST_CHECK(x1.getResultNumber() == x2.getResultNumber());

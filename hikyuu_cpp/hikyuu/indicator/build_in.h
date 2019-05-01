@@ -16,6 +16,7 @@
 #include "crt/ATR.h"
 #include "crt/BETWEEN.h"
 #include "crt/CEILING.h"
+#include "crt/COS.h"
 #include "crt/COUNT.h"
 #include "crt/CVAL.h"
 #include "crt/DIFF.h"

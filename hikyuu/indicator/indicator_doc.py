@@ -83,6 +83,16 @@ ICLOSE([data])
 """
 
 
+COS.__doc__ = """
+COS([data])
+
+    余弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 COUNT.__doc__ = """
 COUNT([data, n=20])
 

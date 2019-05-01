@@ -89,7 +89,16 @@
     :param data: 输入数据
     :rtype: Indicator
    
-    
+
+
+.. py:function:: COS([data])
+
+    余弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: COUNT([data, n=20])
 
     统计满足条件的周期数。

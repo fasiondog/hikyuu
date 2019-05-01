@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * 正弦值
+ * 反正弦值
  * @ingroup Indicator
  */
 Indicator HKU_API ASIN();
