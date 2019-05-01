@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE( test_ASIN ) {
 
     PriceList a;
     for (int i = 0; i < 10; ++i) {
-        a.push_back(-i);
+        a.push_back(i/10);
     }
 
     Indicator data = PRICELIST(a);
@@ -46,10 +46,15 @@ BOOST_AUTO_TEST_CASE( test_ASIN ) {
         BOOST_CHECK(result[i] == std::asin(data[i]));
     }
 
-    result = ASIN(-11);
+    result = ASIN(-0.1);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == std::asin(-11));
+    BOOST_CHECK(result[0] == std::asin(-0.1));
+
+    result = ASIN(1.01);
+    BOOST_CHECK(result.size() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == Null<price_t>());
 }
 
 
