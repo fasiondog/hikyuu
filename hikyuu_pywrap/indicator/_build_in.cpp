@@ -215,6 +215,10 @@ Indicator (*TAN_1)() = TAN;
 Indicator (*TAN_2)(const Indicator&) = TAN;
 Indicator (*TAN_3)(price_t) = TAN;
 
+Indicator (*ATAN_1)() = ATAN;
+Indicator (*ATAN_2)(const Indicator&) = ATAN;
+Indicator (*ATAN_3)(price_t) = ATAN;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -413,4 +417,8 @@ void export_Indicator_build_in() {
     def("TAN", TAN_1);
     def("TAN", TAN_2);
     def("TAN", TAN_3); 
+
+    def("ATAN", ATAN_1);
+    def("ATAN", ATAN_2);
+    def("ATAN", ATAN_3); 
 }

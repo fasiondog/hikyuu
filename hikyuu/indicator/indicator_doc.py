@@ -83,6 +83,16 @@ ASIN([data])
 """
 
 
+ATAN.__doc__ = """
+ATAN([data])
+
+    反正切值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 ICLOSE.__doc__ = """
 ICLOSE([data])
    
