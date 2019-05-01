@@ -46,6 +46,7 @@
 #include "crt/POW.h"
 #include "crt/PRICELIST.h"
 #include "crt/REF.h"
+#include "crt/REVERSE.h"
 #include "crt/ROUND.h"
 #include "crt/ROUNDDOWN.h"
 #include "crt/ROUNDUP.h"

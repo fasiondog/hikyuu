@@ -219,6 +219,10 @@ Indicator (*ATAN_1)() = ATAN;
 Indicator (*ATAN_2)(const Indicator&) = ATAN;
 Indicator (*ATAN_3)(price_t) = ATAN;
 
+Indicator (*REVERSE_1)() = REVERSE;
+Indicator (*REVERSE_2)(const Indicator&) = REVERSE;
+Indicator (*REVERSE_3)(price_t) = REVERSE;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -421,4 +425,8 @@ void export_Indicator_build_in() {
     def("ATAN", ATAN_1);
     def("ATAN", ATAN_2);
     def("ATAN", ATAN_3); 
+
+    def("REVERSE", REVERSE_1);
+    def("REVERSE", REVERSE_2);
+    def("REVERSE", REVERSE_3); 
 }

@@ -431,7 +431,15 @@
     :param Indicator data: 输入数据
     :param int n: 引用n周期前的值，即右移n位
     :rtype: Indicator
-   
+
+
+.. py:function:: REVERSE([data])
+
+    求相反数，REVERSE(X)返回-X
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
 
 .. py:function:: ROUND([data, ndigits=2])
 

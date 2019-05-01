@@ -454,6 +454,16 @@ REF([data, n])
 """
 
 
+REVERSE.__doc__ = """
+REVERSE([data])
+
+    求相反数，REVERSE(X)返回-X
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 ROUND.__doc__ = """
 ROUND([data, ndigits=2])
 
