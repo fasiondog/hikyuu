@@ -54,6 +54,7 @@
 * :py:func:`STD` - 估算标准差，同 STDEV
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`STDP` - 总体标准差
+* :py:func:`TAN` - 正切值
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 
 

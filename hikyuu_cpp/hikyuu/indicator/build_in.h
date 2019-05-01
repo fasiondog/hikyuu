@@ -56,6 +56,7 @@
 #include "crt/STDEV.h"
 #include "crt/STDP.h"
 #include "crt/SUM.h"
+#include "crt/TAN.h"
 #include "crt/VIGOR.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

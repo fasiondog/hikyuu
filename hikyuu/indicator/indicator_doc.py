@@ -571,6 +571,16 @@ SUM([data, n=20])
 """
 
 
+TAN.__doc__ = """
+TAN([data])
+
+    正切值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 VIGOR.__doc__ = """
 VIGOR([kdata, n=2])
 

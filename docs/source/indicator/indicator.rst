@@ -538,6 +538,14 @@
     :rtype: Indicator
 
 
+.. py:function:: TAN([data])
+
+    正切值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: VIGOR([kdata, n=2])
 
     亚历山大.艾尔德力度指数 [BOOK2]_
