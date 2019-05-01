@@ -407,6 +407,21 @@ MIN(ind1, ind2)
 """
 
 
+MOD.__doc__ = """
+MOD(ind1, ind2)
+
+    取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符
+
+    用法：MOD(A,B)返回A对B求模
+
+    例如：MOD(26,10) 返回 6
+
+    :param Indicator ind1:
+    :param Indicator ind2:
+    :rtype: Indicator
+"""
+
+
 NOT.__doc__ = """
 NOT([data])
 

@@ -41,6 +41,7 @@
 #include "crt/MACD.h"
 #include "crt/MAX.h"
 #include "crt/MIN.h"
+#include "crt/MOD.h"
 #include "crt/NOT.h"
 #include "crt/POS.h"
 #include "crt/POW.h"

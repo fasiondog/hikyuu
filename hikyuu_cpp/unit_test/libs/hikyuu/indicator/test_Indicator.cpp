@@ -213,6 +213,59 @@ BOOST_AUTO_TEST_CASE( test_operator_division ) {
 }
 
 /** @par 检测点 */
+BOOST_AUTO_TEST_CASE( test_operator_mod ) {
+    /** @arg 正常取模*/
+    PriceList d1, d2;
+    for (size_t i = 0; i < 10; ++i) {
+        d1.push_back(i);
+        d2.push_back(i+2);
+    }
+
+    Indicator data1 = PRICELIST(d1);
+    Indicator data2 = PRICELIST(d2);
+    Indicator result = data2 % data1;
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.getResultNumber() == 1);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(result[1] == 0);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 2);
+    BOOST_CHECK(result[4] == 2);
+    BOOST_CHECK(result[5] == 2);
+    BOOST_CHECK(result[6] == 2);
+    BOOST_CHECK(result[7] == 2);
+    BOOST_CHECK(result[8] == 2);
+    BOOST_CHECK(result[9] == 2);
+
+    /** @arg 两个待除的ind的size不同 */
+    Indicator data3;
+    result = data1 % data3;
+    BOOST_CHECK(result.empty());
+    BOOST_CHECK(result.size() == 0);
+
+    /** @arg 两个待除的ind的size相同，但result_number不同 */
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KQuery query(0, 10);
+    KData kdata = stock.getKData(query);
+    Indicator k = KDATA(kdata);
+    BOOST_CHECK(k.size() == data1.size());
+    result = k % data1;
+    BOOST_CHECK(result.size() == k.size());
+    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(result[1] == 0);
+    BOOST_CHECK(result[2] == 1);
+    BOOST_CHECK(result[3] == 1);
+    BOOST_CHECK(result[4] == 3);
+    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[6] == 3);
+    BOOST_CHECK(result[7] == 6);
+    BOOST_CHECK(result[8] == 2);
+    BOOST_CHECK(result[9] == 8);
+}
+
+/** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_operator_eq ) {
     /** @arg 正常相等*/
     PriceList d1, d2;

@@ -223,6 +223,11 @@ Indicator (*REVERSE_1)() = REVERSE;
 Indicator (*REVERSE_2)(const Indicator&) = REVERSE;
 Indicator (*REVERSE_3)(price_t) = REVERSE;
 
+Indicator (*MOD_1)(const Indicator&, const Indicator&) = MOD;
+Indicator (*MOD_2)(const Indicator&, price_t) = MOD;
+Indicator (*MOD_3)(price_t, const Indicator&) = MOD;
+Indicator (*MOD_4)(price_t, price_t) = MOD;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -428,5 +433,10 @@ void export_Indicator_build_in() {
 
     def("REVERSE", REVERSE_1);
     def("REVERSE", REVERSE_2);
-    def("REVERSE", REVERSE_3); 
+    def("REVERSE", REVERSE_3);
+
+    def("MOD", MOD_1);
+    def("MOD", MOD_2);
+    def("MOD", MOD_3);
+    def("MOD", MOD_4);
 }

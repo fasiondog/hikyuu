@@ -59,6 +59,7 @@ public:
         SUB, ///<减
         MUL, ///<乘
         DIV, ///<除
+        MOD, ///<取模
         EQ,  ///<等于
         GT,  ///<大于
         LT,  ///<小于
@@ -155,6 +156,7 @@ private:
     void execute_sub();
     void execute_mul();
     void execute_div();
+    void execute_mod();
     void execute_eq();
     void execute_ne();
     void execute_gt();

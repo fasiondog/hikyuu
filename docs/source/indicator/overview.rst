@@ -43,6 +43,7 @@
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
 * :py:func:`MAX` - 最大值
 * :py:func:`MIN` - 最小值
+* :py:func:`MOD` - 取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符。
 * :py:func:`NOT` - 求逻辑非
 * :py:func:`POW` - 乘幂
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据

@@ -215,6 +215,7 @@ HKU_API Indicator operator+(const Indicator&, const Indicator&);
 HKU_API Indicator operator-(const Indicator&, const Indicator&);
 HKU_API Indicator operator*(const Indicator&, const Indicator&);
 HKU_API Indicator operator/(const Indicator&, const Indicator&);
+HKU_API Indicator operator%(const Indicator&, const Indicator&);
 HKU_API Indicator operator==(const Indicator&, const Indicator&);
 HKU_API Indicator operator!=(const Indicator&, const Indicator&);
 HKU_API Indicator operator>(const Indicator&, const Indicator&);
@@ -235,6 +236,9 @@ HKU_API Indicator operator*(price_t, const Indicator&);
 
 HKU_API Indicator operator/(const Indicator&, price_t);
 HKU_API Indicator operator/(price_t, const Indicator&);
+
+HKU_API Indicator operator%(const Indicator&, price_t);
+HKU_API Indicator operator%(price_t, const Indicator&);
 
 HKU_API Indicator operator==(const Indicator&, price_t);
 HKU_API Indicator operator==(price_t, const Indicator&);

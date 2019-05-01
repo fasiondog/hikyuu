@@ -128,6 +128,16 @@ HKU_API Indicator operator/(const Indicator& ind1, const Indicator& ind2) {
     return p->calculate();
 }
 
+HKU_API Indicator operator%(const Indicator& ind1, const Indicator& ind2) {
+    if (!ind1.getImp() || !ind2.getImp()) {
+        return Indicator();
+    }
+
+    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    p->add(IndicatorImp::MOD, ind1.getImp(), ind2.getImp());
+    return p->calculate();
+}
+
 HKU_API Indicator operator==(const Indicator& ind1, const Indicator& ind2) {
     if (!ind1.getImp() || !ind2.getImp()) {
         return Indicator();
@@ -239,6 +249,14 @@ HKU_API Indicator operator/(const Indicator& ind, price_t val) {
 
 HKU_API Indicator operator/(price_t val, const Indicator& ind) {
     return CVAL(ind, val) / ind;
+}
+
+HKU_API Indicator operator%(const Indicator& ind, price_t val) {
+    return ind % CVAL(ind, val);
+}
+
+HKU_API Indicator operator%(price_t val, const Indicator& ind) {
+    return CVAL(ind, val) % ind;
 }
 
 HKU_API Indicator operator==(const Indicator& ind, price_t val) {

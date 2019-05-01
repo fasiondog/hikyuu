@@ -239,6 +239,10 @@ string IndicatorImp::formula() const {
             buf << m_left->formula() << " / " << m_right->formula();
             break;
 
+        case MOD:
+            buf << m_left->formula() << " % " << m_right->formula();
+            break;
+
         case EQ:
             buf << m_left->formula() << " == " << m_right->formula();
             break;
@@ -443,6 +447,10 @@ Indicator IndicatorImp::calculate() {
 
         case DIV:
             execute_div();
+            break;
+
+        case MOD:
+            execute_mod();
             break;
 
         case EQ:
@@ -697,6 +705,52 @@ void IndicatorImp::execute_div() {
                     _set(Null<price_t>(), i, r); 
                 } else {
                     _set(m_left->get(i-diff, r) / m_right->get(i, r), i, r);
+                }
+            }
+        } 
+    }
+}
+
+void IndicatorImp::execute_mod() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_left->size() > m_right->size()) {
+        maxp = m_left.get();
+        minp = m_right.get();
+    } else {
+        maxp = m_right.get();
+        minp = m_left.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    size_t diff = maxp->size() - minp->size();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    if (m_left->size() > m_right->size()) {
+        for (size_t r = 0; r < result_number; ++r) {
+            for (size_t i = discard; i < total; ++i) {
+                if (m_right->get(i-diff, r) == 0.0) {
+                    _set(Null<price_t>(), i, r);    
+                } else {
+                    _set(hku_int64(m_left->get(i, r)) % hku_int64(m_right->get(i-diff, r)), i, r);
+                }
+            }
+        }
+    } else {
+        for (size_t r = 0; r < result_number; ++r) {
+            for (size_t i = discard; i < total; ++i) {
+                if (m_right->get(i, r) == 0.0) {
+                    _set(Null<price_t>(), i, r); 
+                } else {
+                    _set(hku_int64(m_left->get(i-diff, r)) % hku_int64(m_right->get(i, r)), i, r);
                 }
             }
         } 
