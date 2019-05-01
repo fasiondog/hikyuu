@@ -45,6 +45,7 @@
 * :py:func:`ROUND` - 四舍五入
 * :py:func:`ROUNDUP` -  向上截取，如10.1截取后为11
 * :py:func:`ROUNDDOWN` - 向下截取，如10.1截取后为10
+* :py:func:`SIN` - 正弦值
 * :py:func:`SGN` - 求符号值
 * :py:func:`SQRT` - 开平方
 * :py:func:`STD` - 估算标准差，同 STDEV

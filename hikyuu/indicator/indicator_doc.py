@@ -462,6 +462,16 @@ SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 """
 
 
+SIN.__doc__ = """
+SIN([data])
+
+    正弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 SGN.__doc__ = """
 SGN([data])
 

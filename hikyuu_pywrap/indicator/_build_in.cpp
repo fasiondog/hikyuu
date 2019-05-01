@@ -195,6 +195,10 @@ Indicator (*EVERY_2)(const Indicator&, int) = EVERY;
 Indicator (*LAST_1)(int, int) = LAST;
 Indicator (*LAST_2)(const Indicator&, int, int) = LAST;
 
+Indicator (*SIN_1)() = SIN;
+Indicator (*SIN_2)(const Indicator&) = SIN;
+Indicator (*SIN_3)(price_t) = SIN;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -373,4 +377,8 @@ void export_Indicator_build_in() {
 
     def("LAST", LAST_1, (arg("m")=10, arg("n")=5));
     def("LAST", LAST_2, (arg("data"), arg("m")=10, arg("n")=5));
+
+    def("SIN", SIN_1);
+    def("SIN", SIN_2);
+    def("SIN", SIN_3);
 }
