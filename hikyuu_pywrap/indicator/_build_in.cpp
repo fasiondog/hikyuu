@@ -199,6 +199,10 @@ Indicator (*SIN_1)() = SIN;
 Indicator (*SIN_2)(const Indicator&) = SIN;
 Indicator (*SIN_3)(price_t) = SIN;
 
+Indicator (*ASIN_1)() = ASIN;
+Indicator (*ASIN_2)(const Indicator&) = ASIN;
+Indicator (*ASIN_3)(price_t) = ASIN;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -381,4 +385,8 @@ void export_Indicator_build_in() {
     def("SIN", SIN_1);
     def("SIN", SIN_2);
     def("SIN", SIN_3);
+
+    def("ASIN", ASIN_1);
+    def("ASIN", ASIN_2);
+    def("ASIN", ASIN_3);    
 }

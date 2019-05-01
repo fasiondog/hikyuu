@@ -63,6 +63,16 @@ IAMO([data])
 """
 
 
+ASIN.__doc__ = """
+ASIN([data])
+
+    反正弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 ICLOSE.__doc__ = """
 ICLOSE([data])
    

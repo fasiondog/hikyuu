@@ -35,6 +35,14 @@
     :rtype: Indicator
 
 
+.. py:function:: ASIN([data])
+
+    反正弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: BETWEEN(a, b, c)
 
     介于(介于两个数之间)

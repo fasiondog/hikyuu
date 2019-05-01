@@ -12,6 +12,7 @@
 #include "crt/KDATA.h"
 #include "crt/ABS.h"
 #include "crt/AMA.h"
+#include "crt/ASIN.h"
 #include "crt/ATR.h"
 #include "crt/BETWEEN.h"
 #include "crt/CEILING.h"

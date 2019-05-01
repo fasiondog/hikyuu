@@ -21,6 +21,7 @@
 
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
 * :py:func:`ABS` - 求绝对值
+* :py:func:`ASIN` - 求反正弦值
 * :py:func:`BETWEEN` - 介于(介于两个数之间)
 * :py:func:`CEILING` - 向上舍入(向数值增大方向舍入)取整
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
