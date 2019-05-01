@@ -11,6 +11,7 @@
 #include "Indicator.h"
 #include "crt/KDATA.h"
 #include "crt/ABS.h"
+#include "crt/ACOS.h"
 #include "crt/AMA.h"
 #include "crt/ASIN.h"
 #include "crt/ATR.h"

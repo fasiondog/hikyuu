@@ -207,6 +207,10 @@ Indicator (*COS_1)() = COS;
 Indicator (*COS_2)(const Indicator&) = COS;
 Indicator (*COS_3)(price_t) = COS;
 
+Indicator (*ACOS_1)() = ACOS;
+Indicator (*ACOS_2)(const Indicator&) = ACOS;
+Indicator (*ACOS_3)(price_t) = ACOS;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -397,4 +401,8 @@ void export_Indicator_build_in() {
     def("COS", COS_1);
     def("COS", COS_2);
     def("COS", COS_2); 
+
+    def("ACOS", ACOS_1);
+    def("ACOS", ACOS_2);
+    def("ACOS", ACOS_2); 
 }

@@ -37,6 +37,16 @@ ABS([data])
 """
 
 
+ACOS.__doc__ = """
+ACOS([data])
+
+    反余弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
 AMA.__doc__ = """
 AMA([data, n=10, fast_n=2, slow_n=30])
 
