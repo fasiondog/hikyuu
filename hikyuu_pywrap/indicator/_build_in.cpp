@@ -239,6 +239,11 @@ Indicator (*CROSS_2)(const Indicator&, price_t) = CROSS;
 Indicator (*CROSS_3)(price_t, const Indicator&) = CROSS;
 Indicator (*CROSS_4)(price_t, price_t) = CROSS;
 
+Indicator (*LONGCROSS_1)(const Indicator&, const Indicator&, int) = LONGCROSS;
+Indicator (*LONGCROSS_2)(const Indicator&, price_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_3)(price_t, const Indicator&, int) = LONGCROSS;
+Indicator (*LONGCROSS_4)(price_t, price_t, int) = LONGCROSS;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -465,4 +470,9 @@ void export_Indicator_build_in() {
     def("CROSS", CROSS_2);
     def("CROSS", CROSS_3);
     def("CROSS", CROSS_4);
+
+    def("LONGCROSS", LONGCROSS_1, (arg("a"), arg("b"), arg("n")=3));
+    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n")=3));
+    def("LONGCROSS", LONGCROSS_3, (arg("a"), arg("b"), arg("n")=3));
+    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n")=3));
 }

@@ -367,6 +367,22 @@ LOG([data])
 """
 
 
+LONGCROSS.__doc__ = """
+LONGCROSS(a, b[, n=3])
+
+    两条线维持一定周期后交叉
+
+    用法：LONGCROSS(A,B,N)表示A在N周期内都小于B，本周期从下方向上穿过B时返 回1，否则返回0
+
+    例如：LONGCROSS(MA(CLOSE,5),MA(CLOSE,10),5)表示5日均线维持5周期后与10日均线交金叉
+
+    :param Indicator a:
+    :param Indicator b:
+    :param int n:
+    :rtype: Indicator
+"""
+
+
 ILOW.__doc__ = """
 ILOW([data])
 

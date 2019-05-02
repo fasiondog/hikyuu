@@ -39,6 +39,7 @@
 #include "crt/LLVBARS.h"
 #include "crt/LN.h"
 #include "crt/LOG.h"
+#include "crt/LONGCROSS.h"
 #include "crt/MA.h"
 #include "crt/MACD.h"
 #include "crt/MAX.h"

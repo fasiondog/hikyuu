@@ -43,6 +43,9 @@
 * :py:func:`LAST` - 区间存在
 * :py:func:`LLV` - N日内最低价
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
+* :py:func:`LN` - 求自然对数, LN(X)以e为底的对数
+* :py:func:`LOG` - 以10为底的对数
+* :py:func:`LONGCROSS` - 两条线维持一定周期后交叉
 * :py:func:`MAX` - 最大值
 * :py:func:`MIN` - 最小值
 * :py:func:`MOD` - 取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符。
