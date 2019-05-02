@@ -451,4 +451,8 @@ void export_Indicator_build_in() {
 
     def("VARP", VARP_1, (arg("n")=10));
     def("VARP", VARP_2, (arg("data"), arg("n")=10));
+
+    def("UPNDAY", UPNDAY, (arg("data"), arg("n")=3));
+    def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n")=3));
+    def("NDAY", NDAY, (arg("x"), arg("y"), arg("n")=3));
 }

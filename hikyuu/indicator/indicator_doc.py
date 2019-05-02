@@ -150,6 +150,16 @@ DIFF([data])
     :return: Indicator
 """
 
+DOWNNDAY.__doc__ = """
+DOWNNDAY(data[, n=3])
+
+    连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+"""
+
 
 EMA.__doc__ = """
 EMA([data, n=22])
@@ -422,6 +432,18 @@ MOD(ind1, ind2)
 """
 
 
+NDAY.__doc__ = """
+NDAY(x, y[, n=3])
+
+    连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
+
+    :param Indicator x:
+    :param Indicator y:
+    :param int n: 时间窗口
+    :rtype: Indicator
+"""
+
+
 NOT.__doc__ = """
 NOT([data])
 
@@ -612,6 +634,17 @@ TAN([data])
     正切值
 
     :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
+UPNDAY.__doc__ = """
+UPNDAY(data[, n=3])
+
+    连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
     :rtype: Indicator
 """
 

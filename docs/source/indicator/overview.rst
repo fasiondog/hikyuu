@@ -30,6 +30,7 @@
 * :py:func:`COS` - 余弦值
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
+* :py:func:`DOWNNDAY` - 连跌周期数
 * :py:func:`EVERY` - 一直存在
 * :py:func:`EXIST` - 存在, EXIST(X,N) 表示条件X在N周期有存在
 * :py:func:`EXP` - e的X次幂
@@ -44,6 +45,7 @@
 * :py:func:`MAX` - 最大值
 * :py:func:`MIN` - 最小值
 * :py:func:`MOD` - 取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符。
+* :py:func:`NDAY` - 连大
 * :py:func:`NOT` - 求逻辑非
 * :py:func:`POW` - 乘幂
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
@@ -58,6 +60,7 @@
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`STDP` - 总体标准差
 * :py:func:`TAN` - 正切值
+* :py:func:`UPNDAY` - 连涨周期数
 * :py:func:`VAR` - 估算样本方差
 * :py:func:`VARP` - 总体样本方差
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中

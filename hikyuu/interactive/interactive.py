@@ -244,7 +244,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
         q = QueryByDate(start, end)
         k = s.getKData(q)
         cond.setContext(k)
-        if len(cond) > 0 and cond[-1] and len(k) > 0 and k[-1].datetime == d[-1]:
+        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k) > 0 and k[-1].datetime == d[-1]:
             result.append(s)
             if print_out:
                 print(d[-1], s)

@@ -44,9 +44,6 @@ BOOST_AUTO_TEST_CASE( test_VARP ) {
     BOOST_CHECK(dev.name() == "VARP");
     BOOST_CHECK(dev.size() == 15);
     BOOST_CHECK(dev[8] == Null<price_t>());
-    for (int i = 0; i < dev.size(); i++) {
-        std::cout << i << ": " << dev[i] << std::endl;
-    }
     BOOST_CHECK(std::fabs(dev[9] - 7.69) < 0.01 );
     BOOST_CHECK(std::fabs(dev[10] - 8.89) < 0.01 );
     BOOST_CHECK(std::fabs(dev[11] - 7.21) < 0.01 );

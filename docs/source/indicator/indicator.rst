@@ -143,7 +143,16 @@
     
     :param Indicator data: 输入数据
     :rtype: Indicator
-    
+
+
+.. py:function:: DOWNNDAY(data[, n=3])
+
+    连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
     
 .. py:function:: EMA([data, n=22])
 
@@ -395,6 +404,17 @@
     :param Indicator ind2:
     :rtype: Indicator
 
+
+.. py:function:: NDAY(x, y[, n=3])
+
+    连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
+
+    :param Indicator x:
+    :param Indicator y:
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: NOT([data])
 
     求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
@@ -574,7 +594,16 @@
     :rtype: Indicator
 
 
-.. py:function:: VAR([data, n=2])
+.. py:function:: UPNDAY(data[, n=3])
+
+    连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
+.. py:function:: VAR([data, n=10])
 
     估算样本方差, VAR(X,N)为X的N日估算样本方差
 
@@ -583,7 +612,7 @@
     :rtype: Indicator
 
 
-.. py:function:: VARP([data, n=2])
+.. py:function:: VARP([data, n=10])
 
     总体样本方差, VARP(X,N)为X的N日总体样本方差
 
