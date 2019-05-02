@@ -1,7 +1,9 @@
 /*
- * test_STDP.cpp
+ * test_VARP.cpp
+ * 
+ *  Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2019-4-18
+ *  Created on: 2013-4-18
  *      Author: fasiondog
  */
 
@@ -15,19 +17,19 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
-#include <hikyuu/indicator/crt/STDP.h>
+#include <hikyuu/indicator/crt/VARP.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_STDP test_indicator_STDP
+ * @defgroup test_indicator_VARP test_indicator_VARP
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_STDP ) {
+BOOST_AUTO_TEST_CASE( test_VARP ) {
     /** @arg n > 1 的正常情况 */
     PriceList d;
     for (size_t i = 0; i < 15; ++i) {
@@ -38,28 +40,31 @@ BOOST_AUTO_TEST_CASE( test_STDP ) {
     d[11] = 6.0;
 
     Indicator ind = PRICELIST(d);
-    Indicator dev = STDP(ind, 10);
-    BOOST_CHECK(dev.name() == "STDP");
+    Indicator dev = VARP(ind, 10);
+    BOOST_CHECK(dev.name() == "VARP");
     BOOST_CHECK(dev.size() == 15);
     BOOST_CHECK(dev[8] == Null<price_t>());
-    BOOST_CHECK(std::fabs(dev[9] - 2.77308) < 0.00001 );
-    BOOST_CHECK(std::fabs(dev[10] - 2.98161) < 0.00001 );
-    BOOST_CHECK(std::fabs(dev[11] - 2.68514) < 0.00001 );
-    BOOST_CHECK(std::fabs(dev[12] - 3.1) < 0.00001 );
-    BOOST_CHECK(std::fabs(dev[13] - 3.46554) < 0.00001 );
-    BOOST_CHECK(std::fabs(dev[14] - 3.79605) < 0.00001 );
+    for (int i = 0; i < dev.size(); i++) {
+        std::cout << i << ": " << dev[i] << std::endl;
+    }
+    BOOST_CHECK(std::fabs(dev[9] - 7.69) < 0.01 );
+    BOOST_CHECK(std::fabs(dev[10] - 8.89) < 0.01 );
+    BOOST_CHECK(std::fabs(dev[11] - 7.21) < 0.01 );
+    BOOST_CHECK(std::fabs(dev[12] - 9.61) < 0.01 );
+    BOOST_CHECK(std::fabs(dev[13] - 12.01) < 0.01 );
+    BOOST_CHECK(std::fabs(dev[14] - 14.41) < 0.01 );
 
     /** @arg n = 1时 */
-    dev = STDP(ind, 1);
-    BOOST_CHECK(dev.name() == "STDP");
+    dev = VARP(ind, 1);
+    BOOST_CHECK(dev.name() == "VARP");
     BOOST_CHECK(dev.size() == 15);
     for (size_t i = 0; i < dev.size(); ++i) {
         BOOST_CHECK(dev[i] == Null<price_t>());
     }
 
     /** @arg operator() */
-    Indicator expect = STDP(ind, 10);
-    dev = STDP(10);
+    Indicator expect = VARP(ind, 10);
+    dev = VARP(10);
     Indicator result = dev(ind);
     BOOST_CHECK(result.size() == expect.size());
     for (size_t i = 0; i < expect.size(); ++i) {
@@ -74,14 +79,14 @@ BOOST_AUTO_TEST_CASE( test_STDP ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_STDP_export ) {
+BOOST_AUTO_TEST_CASE( test_VARP_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/STDP.xml";
+    filename += "/VARP.xml";
 
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
-    Indicator ma1 = STDP(CLOSE(kdata), 10);
+    Indicator ma1 = VARP(CLOSE(kdata), 10);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -95,7 +100,7 @@ BOOST_AUTO_TEST_CASE( test_STDP_export ) {
         ia >> BOOST_SERIALIZATION_NVP(ma2);
     }
 
-    BOOST_CHECK(ma2.name() == "STDP");
+    BOOST_CHECK(ma2.name() == "VARP");
     BOOST_CHECK(ma1.size() == ma2.size());
     BOOST_CHECK(ma1.discard() == ma2.discard());
     BOOST_CHECK(ma1.getResultNumber() == ma2.getResultNumber());

@@ -228,6 +228,12 @@ Indicator (*MOD_2)(const Indicator&, price_t) = MOD;
 Indicator (*MOD_3)(price_t, const Indicator&) = MOD;
 Indicator (*MOD_4)(price_t, price_t) = MOD;
 
+Indicator (*VAR_1)(int) = VAR;
+Indicator (*VAR_2)(const Indicator&, int) = VAR;
+
+Indicator (*VARP_1)(int) = VARP;
+Indicator (*VARP_2)(const Indicator&, int) = VARP;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -439,4 +445,10 @@ void export_Indicator_build_in() {
     def("MOD", MOD_2);
     def("MOD", MOD_3);
     def("MOD", MOD_4);
+
+    def("VAR", VAR_1, (arg("n")=10));
+    def("VAR", VAR_2, (arg("data"), arg("n")=10));
+
+    def("VARP", VARP_1, (arg("n")=10));
+    def("VARP", VARP_2, (arg("data"), arg("n")=10));
 }

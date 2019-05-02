@@ -397,7 +397,7 @@ bool IndicatorImp::needCalculate() {
 Indicator IndicatorImp::calculate() {
     IndicatorImpPtr result;
     if (!check()) {
-        HKU_WARN("Invalid param! " << formula() << " : " << long_name());
+        HKU_ERROR("Invalid param! " << formula() << " : " << long_name());
         if (m_right) {
             m_right->calculate();
             _readyBuffer(m_right->size(), m_result_num);

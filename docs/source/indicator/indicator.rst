@@ -574,6 +574,24 @@
     :rtype: Indicator
 
 
+.. py:function:: VAR([data, n=2])
+
+    估算样本方差, VAR(X,N)为X的N日估算样本方差
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
+.. py:function:: VARP([data, n=2])
+
+    总体样本方差, VARP(X,N)为X的N日总体样本方差
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: VIGOR([kdata, n=2])
 
     亚历山大.艾尔德力度指数 [BOOK2]_

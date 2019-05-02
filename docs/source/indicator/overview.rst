@@ -58,6 +58,8 @@
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`STDP` - 总体标准差
 * :py:func:`TAN` - 正切值
+* :py:func:`VAR` - 估算样本方差
+* :py:func:`VARP` - 总体样本方差
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 
 
