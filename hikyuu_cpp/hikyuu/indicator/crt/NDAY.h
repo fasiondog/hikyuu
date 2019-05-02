@@ -22,7 +22,9 @@ namespace hku {
 Indicator NDAY(const Indicator& x, const Indicator& y, int n = 3);
 
 inline Indicator NDAY(const Indicator& x, const Indicator& y, int n) {
-    return EVERY(x > y, n);
+    Indicator result = EVERY(x > y, n);
+    result.name("NDAY");
+    return result;
 }
 
 } /* namespace */

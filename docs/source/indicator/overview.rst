@@ -29,6 +29,7 @@
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
 * :py:func:`COS` - 余弦值
 * :py:func:`COUNT` - 统计满足条件的周期数
+* :py:func:`CROSS` - 交叉函数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
 * :py:func:`DOWNNDAY` - 连跌周期数
 * :py:func:`EVERY` - 一直存在

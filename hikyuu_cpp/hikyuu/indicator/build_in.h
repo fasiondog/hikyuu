@@ -20,6 +20,7 @@
 #include "crt/CEILING.h"
 #include "crt/COS.h"
 #include "crt/COUNT.h"
+#include "crt/CROSS.h"
 #include "crt/CVAL.h"
 #include "crt/DIFF.h"
 #include "crt/DOWNNDAY.h"

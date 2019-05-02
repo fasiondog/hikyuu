@@ -125,8 +125,17 @@
     :param Indicator data: 条件
     :param int n: 周期
     :rtype: Indicator
-    
-    
+
+
+.. py:function:: CROSS(x, y)
+
+    交叉函数
+
+    :param x: 变量或常量，判断交叉的第一条线
+    :param y: 变量或常量，判断交叉的第二条线
+    :rtype: Indicator
+
+
 .. py:function:: CVAL([data, value=0.0, discard=0])
 
     data 为 Indicator 实例，创建和 data 等长的常量指标，其值和为value，抛弃长度discard和data一样

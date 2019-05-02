@@ -128,6 +128,17 @@ COUNT([data, n=20])
 """
 
 
+CROSS.__doc__ = """
+CROSS(x, y)
+
+    交叉函数
+
+    :param x: 变量或常量，判断交叉的第一条线
+    :param y: 变量或常量，判断交叉的第二条线
+    :rtype: Indicator
+"""
+
+
 CVAL.__doc__ = """
 CVAL([data, value=0.0, discard=0])
     

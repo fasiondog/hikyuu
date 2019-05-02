@@ -234,6 +234,11 @@ Indicator (*VAR_2)(const Indicator&, int) = VAR;
 Indicator (*VARP_1)(int) = VARP;
 Indicator (*VARP_2)(const Indicator&, int) = VARP;
 
+Indicator (*CROSS_1)(const Indicator&, const Indicator&) = CROSS;
+Indicator (*CROSS_2)(const Indicator&, price_t) = CROSS;
+Indicator (*CROSS_3)(price_t, const Indicator&) = CROSS;
+Indicator (*CROSS_4)(price_t, price_t) = CROSS;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -455,4 +460,9 @@ void export_Indicator_build_in() {
     def("UPNDAY", UPNDAY, (arg("data"), arg("n")=3));
     def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n")=3));
     def("NDAY", NDAY, (arg("x"), arg("y"), arg("n")=3));
+
+    def("CROSS", CROSS_1);
+    def("CROSS", CROSS_2);
+    def("CROSS", CROSS_3);
+    def("CROSS", CROSS_4);
 }
