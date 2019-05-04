@@ -1,0 +1,78 @@
+/*
+ * ISumBars.cpp
+ * 
+ *  Copyright (c) 2019 hikyuu.org
+ *
+ *  Created on: 2019-5-5
+ *      Author: fasiondog
+ */
+
+#include "ISumBars.h"
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::ISumBars)
+#endif
+
+
+namespace hku {
+
+ISumBars::ISumBars() : IndicatorImp("SUMBARS", 1) {
+    setParam<double>("a", 0);
+}
+
+ISumBars::~ISumBars() {
+
+}
+
+bool ISumBars::check() {
+    return true;
+}
+
+void ISumBars::_calculate(const Indicator& ind) {
+    size_t total = ind.size();
+    m_discard = ind.discard();
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
+    double a = getParam<double>("a");
+    if (total == m_discard + 1) {
+        if (ind[m_discard] >= a) {
+            _set(0, m_discard);
+        } else {
+            m_discard = total;
+        }
+        return;
+    }
+
+    size_t pos = total;
+    double sum = 0;
+    for (size_t i = total-1; i != m_discard; i--) {
+        sum += ind[i];
+        if (sum >= a) {
+            for (size_t j = i; j < pos; j++) {
+                _set(j - i, j);
+            }
+            pos = i;
+        }
+    }
+
+    if (ind[m_discard] != 0.0) {
+        for (size_t i = m_discard; i < pos; i++) {
+            _set(i - m_discard, i);
+        }
+    } else {
+        m_discard = pos;
+    }
+}
+
+
+Indicator HKU_API SUMBARS(double a) {
+    IndicatorImpPtr p = make_shared<ISumBars>();
+    p->setParam<double>("a", a);
+    return Indicator(p);
+}
+
+
+} /* namespace hku */

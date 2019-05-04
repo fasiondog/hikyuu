@@ -646,6 +646,19 @@
     :rtype: Indicator
 
 
+.. py:function:: SUMBARS([data, a=0])
+
+    累加到指定周期数, 向前累加到指定值到现在的周期数
+
+    用法：SUMBARS(X,A):将X向前累加直到大于等于A,返回这个区间的周期数
+
+    例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
+
+    :param Indicator data: 输入数据
+    :param float a: 指定累加和
+    :rtype: Indicator
+
+
 .. py:function:: TAN([data])
 
     正切值

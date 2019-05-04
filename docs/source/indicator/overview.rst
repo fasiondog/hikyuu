@@ -66,6 +66,8 @@
 * :py:func:`STD` - 估算标准差，同 STDEV
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`STDP` - 总体标准差
+* :py:func:`SUM` - 求总和
+* :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
 * :py:func:`TAN` - 正切值
 * :py:func:`UPNDAY` - 连涨周期数
 * :py:func:`VAR` - 估算样本方差

@@ -66,6 +66,7 @@
 #include "crt/STDEV.h"
 #include "crt/STDP.h"
 #include "crt/SUM.h"
+#include "crt/SUMBARS.h"
 #include "crt/TAN.h"
 #include "crt/UPNDAY.h"
 #include "crt/VAR.h"
