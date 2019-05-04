@@ -24,7 +24,8 @@
 * :py:func:`ACOS` - 反余弦值
 * :py:func:`ASIN` - 反正弦值
 * :py:func:`ATAN` - 反正切值
-* :py:func:`BARSSINCE` - 上一次条件成立位置, 上一次条件成立到当前的周期数。
+* :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
+* :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数
 * :py:func:`BETWEEN` - 介于(介于两个数之间)
 * :py:func:`CEILING` - 向上舍入(向数值增大方向舍入)取整
 * :py:func:`CVAL` - 创建指定长度的固定数值指标

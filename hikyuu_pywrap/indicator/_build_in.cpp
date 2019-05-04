@@ -251,6 +251,10 @@ Indicator (*BARSSINCE_1)() = BARSSINCE;
 Indicator (*BARSSINCE_2)(const Indicator&) = BARSSINCE;
 Indicator (*BARSSINCE_3)(price_t) = BARSSINCE;
 
+Indicator (*BARSLAST_1)() = BARSLAST;
+Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
+Indicator (*BARSLAST_3)(price_t) = BARSLAST;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -489,4 +493,8 @@ void export_Indicator_build_in() {
     def("BARSSINCE", BARSSINCE_1);
     def("BARSSINCE", BARSSINCE_2);
     def("BARSSINCE", BARSSINCE_3); 
+
+    def("BARSLAST", BARSLAST_1);
+    def("BARSLAST", BARSLAST_2);
+    def("BARSLAST", BARSLAST_3); 
 }

@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2019 hikyuu.org
  * 
- *  Created on: 2019-5-1
+ *  Created on: 2019-5-4
  *      Author: fasiondog
  */
 
@@ -15,11 +15,11 @@
 namespace hku {
 
 /**
- * 上一次条件成立位置, 上一次条件成立到当前的周期数。
+ * 第一个条件成立位置到当前的周期数。
  * @details
  * <pre>
- * 用法：BARSLAST(X): 上一次 X 不为 0 到现在的天数。
- * 例如：BARSLAST(CLOSE/REF(CLOSE,1)>=1.1) 表示上一个涨停板到当前的周期数。
+ * 用法：BARSSINCE(X):第一次X不为0到现在的天数。
+ * 例如：BARSSINCE(HIGH>10)表示股价超过10元时到当前的周期数
  * </pre>
  * @ingroup Indicator
  */
