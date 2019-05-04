@@ -217,6 +217,35 @@ EXP([data])
 """
 
 
+FILTER.__doc__ = """
+FILTER([data, n=5])
+
+    信号过滤, 过滤连续出现的信号。
+
+    用法：FILTER(X,N): X 满足条件后，删除其后 N 周期内的数据置为 0。
+
+    例如：FILTER(CLOSE>OPEN,5) 查找阳线，5 天内再次出现的阳线不被记录在内。
+
+    :param Indicator data: 输入数据
+    :param int n: 过滤周期
+    :rtype: Indicator
+"""
+
+
+FLOOR.__doc__ = """
+FLOOR([data])
+
+    向下舍入(向数值减小方向舍入)取整
+    
+    用法：FLOOR(A)返回沿A数值减小方向最接近的整数
+    
+    例如：FLOOR(12.3)求得12
+
+    :param data: 输入数据
+    :rtype: Indicator
+"""
+
+
 HHV.__doc__ = """
 HHV([data, n=20])
 

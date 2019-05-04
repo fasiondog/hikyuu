@@ -35,6 +35,7 @@
 * :py:func:`EVERY` - 一直存在
 * :py:func:`EXIST` - 存在, EXIST(X,N) 表示条件X在N周期有存在
 * :py:func:`EXP` - e的X次幂
+* :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
 * :py:func:`FLOOR` - 向下舍入(向数值减小方向舍入)取整
 * :py:func:`HHV` - N日内最高价
 * :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
