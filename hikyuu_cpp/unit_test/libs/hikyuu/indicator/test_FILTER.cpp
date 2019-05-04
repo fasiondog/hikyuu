@@ -15,7 +15,6 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/CVAL.h>
-#include <hikyuu/indicator/crt/EVERY.h>
 #include <hikyuu/indicator/crt/FILTER.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>

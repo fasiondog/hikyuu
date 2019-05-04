@@ -247,6 +247,10 @@ Indicator (*LONGCROSS_4)(price_t, price_t, int) = LONGCROSS;
 Indicator (*FILTER_1)(int) = FILTER;
 Indicator (*FILTER_2)(const Indicator&, int) = FILTER;
 
+Indicator (*BARSSINCE_1)() = BARSSINCE;
+Indicator (*BARSSINCE_2)(const Indicator&) = BARSSINCE;
+Indicator (*BARSSINCE_3)(price_t) = BARSSINCE;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -481,4 +485,8 @@ void export_Indicator_build_in() {
 
     def("FILTER", FILTER_1, (arg("n")=5));
     def("FILTER", FILTER_2, (arg("data"), arg("n")=5));
+
+    def("BARSSINCE", BARSSINCE_1);
+    def("BARSSINCE", BARSSINCE_2);
+    def("BARSSINCE", BARSSINCE_3); 
 }

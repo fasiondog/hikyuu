@@ -16,6 +16,7 @@
 #include "crt/ASIN.h"
 #include "crt/ATAN.h"
 #include "crt/ATR.h"
+#include "crt/BARSSINCE.h"
 #include "crt/BETWEEN.h"
 #include "crt/CEILING.h"
 #include "crt/COS.h"

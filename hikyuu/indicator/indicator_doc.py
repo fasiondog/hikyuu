@@ -93,6 +93,36 @@ ATAN([data])
 """
 
 
+BARSSINCE.__doc__ = """
+BARSSINCE([data])
+
+    上一次条件成立位置 上一次条件成立到当前的周期数。
+
+    用法：BARSLAST(X): 上一次 X 不为 0 到现在的天数。
+
+    例如：BARSLAST(CLOSE/REF(CLOSE,1)>=1.1) 表示上一个涨停板到当前的周期数
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
+
+
+BETWEEN.__doc__ = """
+BETWEEN(a, b, c)
+
+    介于(介于两个数之间)
+
+    用法：BETWEEN(A,B,C)表示A处于B和C之间时返回1，否则返回0
+
+    例如：BETWEEN(CLOSE,MA(CLOSE,10),MA(CLOSE,5))表示收盘价介于5日均线和10日均线之间
+
+    :param Indicator a: A
+    :param Indicator b: B
+    :param Indicator c: C
+    :rtype: Indicator
+"""
+
+
 ICLOSE.__doc__ = """
 ICLOSE([data])
    
