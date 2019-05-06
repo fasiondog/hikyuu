@@ -501,6 +501,6 @@ void export_Indicator_build_in() {
     def("BARSLAST", BARSLAST_2);
     def("BARSLAST", BARSLAST_3); 
 
-    def("SUMBARS", SUMBARS_1, (arg("a")=0));
-    def("SUMBARS", SUMBARS_2, (arg("data"), arg("a")=0));
+    def("SUMBARS", SUMBARS_1);
+    def("SUMBARS", SUMBARS_2);
 }

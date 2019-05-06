@@ -46,24 +46,59 @@ void ISumBars::_calculate(const Indicator& ind) {
         return;
     }
 
-    size_t pos = total;
-    double sum = 0;
-    for (size_t i = total-1; i != m_discard; i--) {
-        sum += ind[i];
+    if (total == m_discard + 2) {
+        double sum = ind[m_discard] + ind[m_discard+1];
         if (sum >= a) {
-            for (size_t j = i; j < pos; j++) {
-                _set(j - i, j);
+            _set(ind[m_discard+1] >= a ? 0 : 1, m_discard+1);
+            if (ind[m_discard] >= a) {
+                _set(0, m_discard);
+            } else {
+                m_discard += 1;
             }
-            pos = i;
+        } else if (ind[m_discard] >= a) {
+            _set(0, m_discard);
+        } else {
+            m_discard = total;
+        }
+        return;
+    }
+
+    size_t pos = total - 1;
+    size_t last_pos = pos;
+    double sum = ind[total-1];
+    for (size_t i = total - 2; i >= m_discard; i--) {
+        sum = sum - ind[i+1];
+        if (sum < a) {
+            if (pos >= 1) {
+                for (size_t j = pos - 1; j >= m_discard; j--) {
+                    sum += ind[j];
+                    if (sum >= a) {
+                        pos = j;
+                        last_pos = j;
+                        break;
+                    }
+
+                    if (j == m_discard) {
+                        pos = Null<size_t>();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (pos == last_pos) {
+            _set(i - pos, i);
+        } else {
+            break;
+        }
+
+        if (i == m_discard) {
+            break;
         }
     }
 
-    if (ind[m_discard] != 0.0) {
-        for (size_t i = m_discard; i < pos; i++) {
-            _set(i - m_discard, i);
-        }
-    } else {
-        m_discard = pos;
+    if (pos != last_pos) {
+        m_discard = last_pos;
     }
 }
 

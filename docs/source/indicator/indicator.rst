@@ -646,7 +646,7 @@
     :rtype: Indicator
 
 
-.. py:function:: SUMBARS([data, a=0])
+.. py:function:: SUMBARS([data,] a)
 
     累加到指定周期数, 向前累加到指定值到现在的周期数
 

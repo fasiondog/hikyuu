@@ -729,7 +729,7 @@ SUM([data, n=20])
 
 
 SUMBARS.__doc__ = """
-SUMBARS([data, a=0])
+SUMBARS([data,] a)
 
     累加到指定周期数, 向前累加到指定值到现在的周期数
 
