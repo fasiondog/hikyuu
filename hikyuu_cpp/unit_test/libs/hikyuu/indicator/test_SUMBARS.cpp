@@ -172,7 +172,6 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
 
 /** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_SUMBARS_export ) {
-    #if 0
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
     filename += "/SUMBARS.xml";
@@ -200,7 +199,6 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS_export ) {
     for (size_t i = 0; i < x1.size(); ++i) {
         BOOST_CHECK_CLOSE(x1[i], x2[i], 0.00001);
     }
-    #endif
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
