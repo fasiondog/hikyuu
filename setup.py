@@ -313,7 +313,7 @@ setup(
             #'tushare>=0.8.2',
             'pytdx',
             'pyperclip>=1.5.27',
-            'pyecharts>=0.2.7',
+            'pyecharts==0.5.11',
             'pyecharts_snapshot',
             'PyQt5',
             'tables',
