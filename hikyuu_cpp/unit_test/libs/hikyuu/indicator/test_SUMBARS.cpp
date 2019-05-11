@@ -16,7 +16,6 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/BARSLAST.h>
 #include <hikyuu/indicator/crt/SUMBARS.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
@@ -34,19 +33,63 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     Indicator result;
 
     PriceList a;
-    a.push_back(0);
-    a.push_back(0);
-    a.push_back(0);
-    a.push_back(1);
-    a.push_back(0);
-    a.push_back(0);
-    a.push_back(1);
 
+    for (int i = 0; i < 10; i++) {
+        a.push_back(i * 10);
+    }
     Indicator data = PRICELIST(a);
 
-    result = BARSLAST(data);
-    BOOST_CHECK(result.name() == "BARSLAST");
+    result = SUMBARS(data, 10);
+    BOOST_CHECK(result.name() == "SUMBARS");
+#if 0
     BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 1);
+    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(result[1] == 0);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 0);
+    BOOST_CHECK(result[4] == 0);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 0);
+    BOOST_CHECK(result[7] == 0);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
+
+    result = SUMBARS(data, 90);
+    BOOST_CHECK(result.name() == "SUMBARS");
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 4);
+    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(result[1] == Null<price_t>());
+    BOOST_CHECK(result[2] == Null<price_t>());
+    BOOST_CHECK(result[3] == Null<price_t>());
+    BOOST_CHECK(result[4] == 2);
+    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[7] == 1);
+    BOOST_CHECK(result[8] == 1);
+    BOOST_CHECK(result[9] == 0);
+
+    result = SUMBARS(data, 0);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result.size() == 10);
+    BOOST_CHECK(result[1] == 0);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 0);
+    BOOST_CHECK(result[4] == 0);
+    BOOST_CHECK(result[5] == 0);
+    BOOST_CHECK(result[6] == 0);
+    BOOST_CHECK(result[7] == 0);
+    BOOST_CHECK(result[8] == 0);
+    BOOST_CHECK(result[9] == 0);
+    std::cout << result.discard() << std::endl;
+    for (size_t i = 0; i < result.size(); i++) {
+        std::cout << i << ": " << data[i] << ", " << result[i] << std::endl;
+    }
+
+
+
     BOOST_CHECK(result.discard() == 3);
     BOOST_CHECK(result[0] == Null<price_t>());
     BOOST_CHECK(result[1] == Null<price_t>());
@@ -94,7 +137,7 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 1);
     BOOST_CHECK(result[0] == Null<price_t>());
-
+#endif
 }
 
 

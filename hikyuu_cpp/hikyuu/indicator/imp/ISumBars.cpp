@@ -65,16 +65,21 @@ void ISumBars::_calculate(const Indicator& ind) {
 
     size_t pos = total - 1;
     size_t last_pos = pos;
-    double sum = ind[total-1];
-    for (size_t i = total - 2; i >= m_discard; i--) {
+    double sum = ind[pos];
+    if (sum >= a) {
+        _set(0, total-1);
+    }
+    size_t start = total - 2;
+    for (size_t i = start; i >= m_discard; i--) {
         sum = sum - ind[i+1];
         if (sum < a) {
             if (pos >= 1) {
                 for (size_t j = pos - 1; j >= m_discard; j--) {
+                    std::cout << "i: " << i << ", j: " << j << std::endl;
                     sum += ind[j];
                     if (sum >= a) {
                         pos = j;
-                        last_pos = j;
+                        //last_pos = j;
                         break;
                     }
 
@@ -84,11 +89,20 @@ void ISumBars::_calculate(const Indicator& ind) {
                     }
                 }
             }
+        } else {
+            if (i < pos) {
+                pos = i;
+                sum += ind[i];
+            } else {
+                pos = Null<size_t>();
+            }
         }
 
-        if (pos == last_pos) {
+        //std::cout << "i: " << i << ", pos: " << pos << ", last_pos: " << last_pos << std::endl;
+        if (pos != Null<size_t>()) {
             _set(i - pos, i);
         } else {
+            last_pos = i;
             break;
         }
 
@@ -97,8 +111,9 @@ void ISumBars::_calculate(const Indicator& ind) {
         }
     }
 
-    if (pos != last_pos) {
-        m_discard = last_pos;
+    std::cout << "pos: " << pos << ", last_pos: " << last_pos << std::endl;
+    if (pos != Null<price_t>()) {
+        m_discard = pos;
     }
 }
 
