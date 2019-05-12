@@ -258,6 +258,9 @@ Indicator (*BARSLAST_3)(price_t) = BARSLAST;
 Indicator (*SUMBARS_1)(double) = SUMBARS;
 Indicator (*SUMBARS_2)(const Indicator&, double) = SUMBARS;
 
+Indicator (*BARSCOUNT_1)() = BARSCOUNT;
+Indicator (*BARSCOUNT_2)(const Indicator&) = BARSCOUNT;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -503,4 +506,7 @@ void export_Indicator_build_in() {
 
     def("SUMBARS", SUMBARS_1);
     def("SUMBARS", SUMBARS_2);
+
+    def("BARSCOUNT", BARSCOUNT_1);
+    def("BARSCOUNT", BARSCOUNT_2);
 }
