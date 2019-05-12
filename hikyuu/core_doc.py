@@ -81,6 +81,18 @@ dayOfYear(self)
     :rtype: int
 """
 
+Datetime.startOfDay.__doc__ = """
+startOfDay(self)
+
+    返回当天 0点0分0秒
+"""
+
+Datetime.endOfDay.__doc__ = """
+endOfDay(self)
+
+    返回当日 23点59分59秒
+"""
+
 Datetime.startOfWeek.__doc__ = """
 startOfWeek(self)
     

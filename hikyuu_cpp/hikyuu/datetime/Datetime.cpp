@@ -378,4 +378,16 @@ Datetime Datetime::preYear() const {
     return result;
 }
 
+Datetime Datetime::endOfDay() const {
+    Datetime result;
+    if (*this == Null<Datetime>()) {
+        return result;
+    }
+    
+    result = date() != bd::date(bd::max_date_time) 
+               ? Datetime(year(), month(), day(), 23, 59, 59) 
+               : Datetime::max();
+    return result;
+}
+
 } /* namespace hku */

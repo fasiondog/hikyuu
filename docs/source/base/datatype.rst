@@ -58,6 +58,14 @@
         返回一年中的第几天，1月1日为一年中的第1天
         
         :rtype: int
+
+    .. py:method:: startOfDay(self)
+
+        返回当天 0点0分0秒
+
+    .. py:method:: endOfDay(self)
+
+        返回当日 23点59分59秒
         
     .. py:method:: startOfWeek(self)
     

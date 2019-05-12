@@ -80,6 +80,12 @@ public:
     /** 返回一年中的第几天，1月1日为1年中的第一天 */
     int dayOfYear() const;
 
+    /** 当日起始日期，即0点 */
+    Datetime startOfDay() const;
+    
+    /** 当日结束日期，即23:59:59 */
+    Datetime endOfDay() const;
+
     /**
      * 返回指定的本周中第几天的日期，周日为0天，周六为第6天
      * @param day 指明本周的第几天，如不在0~6之间，将返回Null
@@ -298,6 +304,10 @@ inline int Datetime::dayOfWeek() const {
 
 inline int Datetime::dayOfYear() const {
     return date().day_of_year();
+}
+
+inline Datetime Datetime::startOfDay() const {
+    return Datetime(date());
 }
 
 } /* namespace hku */

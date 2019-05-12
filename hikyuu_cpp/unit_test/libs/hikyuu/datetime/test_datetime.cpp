@@ -119,6 +119,18 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     BOOST_CHECK(Datetime(201901010000).dateOfWeek(6) == Datetime(201901050000));
     BOOST_CHECK(Datetime(201901010000).dateOfWeek(7) == Datetime(201901050000));
 
+    /** @arg 测试 startOfDay */
+    BOOST_CHECK(null_datetime.startOfDay() == null_datetime);
+    BOOST_CHECK(Datetime::min().startOfDay() == Datetime::min());
+    BOOST_CHECK(Datetime::max().startOfDay() == Datetime::max());
+    BOOST_CHECK(Datetime(201812310110).startOfDay() == Datetime(201812310000));
+
+    /** @arg 测试 endOfDay */
+    BOOST_CHECK(null_datetime.endOfDay() == null_datetime);
+    BOOST_CHECK(Datetime::min().endOfDay() == Datetime(1400,1,1,23,59,59));
+    BOOST_CHECK(Datetime::max().endOfDay() == Datetime::max());
+    BOOST_CHECK(Datetime(201812310110).endOfDay() == Datetime(2018,12,31,23,59,59));
+
     /** @arg 测试 startOfWeek */
     BOOST_CHECK(null_datetime.startOfWeek() == null_datetime);
     BOOST_CHECK(Datetime::min().startOfWeek() == Datetime::min());

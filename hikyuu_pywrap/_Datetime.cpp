@@ -36,6 +36,8 @@ void export_Datetime() {
             .def("toString", &Datetime::toString)
             .def("dayOfWeek", &Datetime::dayOfWeek)
             .def("dayOfYear", &Datetime::dayOfYear)
+            .def("startOfDay", &Datetime::startOfDay)
+            .def("endOfDay", &Datetime::endOfDay)
             .def("nextDay", &Datetime::nextDay)
             .def("nextWeek", &Datetime::nextWeek)
             .def("nextMonth", &Datetime::nextMonth)
