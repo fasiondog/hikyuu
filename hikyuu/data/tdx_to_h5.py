@@ -178,12 +178,12 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
         table.flush()
 
         #更新基础信息数据库中股票对应的起止日期及其有效标志
-        if valid == 0:
-            cur = connect.cursor()
-            cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
-                        (table[0]['datetime'], 99999999, stockid))
-            connect.commit()
-            cur.close()
+        #if valid == 0:
+        cur = connect.cursor()
+        cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
+                    (table[0]['datetime'], 99999999, stockid))
+        connect.commit()
+        cur.close()
 
         #记录最新更新日期
         if (code == '000001' and marketid == MARKETID.SH) \
