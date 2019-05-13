@@ -261,6 +261,9 @@ Indicator (*SUMBARS_2)(const Indicator&, double) = SUMBARS;
 Indicator (*BARSCOUNT_1)() = BARSCOUNT;
 Indicator (*BARSCOUNT_2)(const Indicator&) = BARSCOUNT;
 
+Indicator (*BACKSET_1)(int) = BACKSET;
+Indicator (*BACKSET_2)(const Indicator&, int) = BACKSET;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -509,4 +512,7 @@ void export_Indicator_build_in() {
 
     def("BARSCOUNT", BARSCOUNT_1);
     def("BARSCOUNT", BARSCOUNT_2);
+
+    def("BACKSET", BACKSET_1);
+    def("BACKSET", BACKSET_2);
 }

@@ -24,6 +24,7 @@
 * :py:func:`ACOS` - 反余弦值
 * :py:func:`ASIN` - 反正弦值
 * :py:func:`ATAN` - 反正切值
+* :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
 * :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
 * :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
 * :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数

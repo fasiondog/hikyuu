@@ -59,6 +59,19 @@
     :rtype: Indicator
 
 
+.. py:function:: BACKSET([data, n=2])
+
+    向前赋值将当前位置到若干周期前的数据设为1。
+
+    用法：BACKSET(X,N),X非0,则将当前位置到N周期前的数值设为1。
+
+    例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
+
+    :param Indicator data: 输入数据
+    :param int n: N周期
+    :rtype: Indicator
+
+
 .. py:function:: BARSCOUNT([data])
 
     有效值周期数, 求总的周期数。
