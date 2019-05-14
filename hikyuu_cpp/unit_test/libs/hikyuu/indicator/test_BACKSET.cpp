@@ -28,7 +28,6 @@ using namespace hku;
  * @{
  */
 
-#if 0
 /** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_BACKSET ) {
     Indicator result;
@@ -39,20 +38,92 @@ BOOST_AUTO_TEST_CASE( test_BACKSET ) {
     BOOST_CHECK(result.size() == 0);
     BOOST_CHECK(result.discard() == 0);
 
+    /** @arg n = 1, total = 0*/
+    PriceList a;
+    Indicator data = PRICELIST(a);
+    result = BACKSET(data, 1);
+    BOOST_CHECK(result.size() == 0);
+    BOOST_CHECK(result.discard() == 0);
 
     /** @arg n = 1, total = 1*/
-    PriceList a;
     a.push_back(0);
-
-    Indicator data = PRICELIST(a);
-    BOOST_CHECK(data.size() == 1);
-    BOOST_CHECK(data[0] == 0);
+    data = PRICELIST(a);
     result = BACKSET(data, 1);
     BOOST_CHECK(result.name() == "BACKSET");
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(result[0] == 0);
 
+    /** @arg n = 1, total > 1*/
+    a.push_back(1);
+    a.push_back(0);
+    a.push_back(1);
+    a.push_back(1);
+
+    data = PRICELIST(a);
+    result = BACKSET(data, 1);
+    BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 0);
+    for (size_t i = 0; i < data.size(); i++) {
+        BOOST_CHECK(result[i] == data[i]);
+    }
+
+    /** @arg n = 1, total = 0*/
+    a.clear();
+    data = PRICELIST(a);
+    result = BACKSET(data, 1);
+    BOOST_CHECK(result.size() == 0);
+    BOOST_CHECK(result.discard() == 0);
+
+    /** @arg n = 2, total = 2*/
+    a.clear();
+    a.push_back(1);
+    a.push_back(0);
+    data = PRICELIST(a);
+    result = BACKSET(data, 2);
+    BOOST_CHECK(result.size() == 2);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 1);
+    BOOST_CHECK(result[1] == 0);
+
+    a.clear();
+    a.push_back(0);
+    a.push_back(1);
+    data = PRICELIST(a);
+    result = BACKSET(data, 2);
+    BOOST_CHECK(result.size() == 2);
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 1);
+    BOOST_CHECK(result[1] == 1);
+
+    /** @arg n = 3 */
+    a.clear();
+    a.push_back(0);
+    a.push_back(1);
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(1);
+    a.push_back(0);
+    a.push_back(1);
+    a.push_back(0);
+    a.push_back(1);
+    data = PRICELIST(a);
+    result = BACKSET(data, 3);
+    BOOST_CHECK(result.size() == data.size());
+    BOOST_CHECK(result.discard() == 0);
+    BOOST_CHECK(result[0] == 1);
+    BOOST_CHECK(result[1] == 1);
+    BOOST_CHECK(result[2] == 0);
+    BOOST_CHECK(result[3] == 0);
+    BOOST_CHECK(result[4] == 1);
+    BOOST_CHECK(result[5] == 1);
+    BOOST_CHECK(result[6] == 1);
+    BOOST_CHECK(result[7] == 1);
+    BOOST_CHECK(result[8] == 1);
+    BOOST_CHECK(result[9] == 1);
+    BOOST_CHECK(result[10] == 1);
 }
 
 
@@ -93,7 +164,6 @@ BOOST_AUTO_TEST_CASE( test_BACKSET_export ) {
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
-#endif
 /** @} */
 
 
