@@ -264,6 +264,12 @@ Indicator (*BARSCOUNT_2)(const Indicator&) = BARSCOUNT;
 Indicator (*BACKSET_1)(int) = BACKSET;
 Indicator (*BACKSET_2)(const Indicator&, int) = BACKSET;
 
+Indicator (*TIMELINE_1)() = TIMELINE;
+Indicator (*TIMELINE_2)(const KData&) = TIMELINE;
+
+Indicator (*TIMELINEVOL_1)() = TIMELINEVOL;
+Indicator (*TIMELINEVOL_2)(const KData&) = TIMELINEVOL;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -515,4 +521,10 @@ void export_Indicator_build_in() {
 
     def("BACKSET", BACKSET_1);
     def("BACKSET", BACKSET_2);
+
+    def("TIMELINE", TIMELINE_1);
+    def("TIMELINE", TIMELINE_2);
+
+    def("TIMELINEVOL", TIMELINEVOL_1);
+    def("TIMELINEVOL", TIMELINEVOL_2);
 }

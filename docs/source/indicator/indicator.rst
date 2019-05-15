@@ -692,6 +692,22 @@
     :rtype: Indicator
 
 
+.. py:function:: TIMELINE([k])
+
+    分时价格数据
+
+    :param KData k: 上下文
+    :rtype: Indicator
+    
+
+.. py:function:: TIMELINEVOL([k])
+
+    分时成交量数据
+
+    :param KData k: 上下文
+    :rtype: Indicator
+
+
 .. py:function:: UPNDAY(data[, n=3])
 
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期

@@ -21,6 +21,8 @@
 * :py:func:`CLOSE` - 包装KData的收盘价成Indicator
 * :py:func:`AMO`   - 包装KData的成交金额成Indicator
 * :py:func:`VOL`   - 包装KData的成交量成Indicator
+* :py:func:`TIMELINE`   - 分时价格
+* :py:func:`TIMELINEVOL`   - 分时成交量
     
 
 **大盘函数**
