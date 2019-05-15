@@ -42,12 +42,12 @@
 * :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
 * :py:func:`LLV` - N日内最低价
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
-* :py:func:`MA`  - 移动平均数包装，默认为简单平均数
+* :py:func:`MA`  - 简单移动平均数
 * :py:func:`MACD` - 平滑异同移动平均线
 * :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 * :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
 * :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
-* :py:func:`SMA` - 简单移动平均线
+* :py:func:`SMA` - 移动平均线
 * :py:func:`SAFTYLOSS` - 亚历山大 艾尔德安全地带止损线
 * :py:func:`SUM` - 求总和
 * :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数

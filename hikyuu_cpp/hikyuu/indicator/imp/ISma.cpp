@@ -18,7 +18,7 @@ namespace hku {
 
 ISma::ISma(): IndicatorImp("SMA", 1) {
     setParam<int>("n", 22);
-    setParam<double>("m", 2);
+    setParam<double>("m", 2.0);
 }
 
 ISma::~ISma() {
@@ -36,12 +36,17 @@ bool ISma::check() {
 
 void ISma::_calculate(const Indicator& ind) {
     size_t total = ind.size();
-    int n = getParam<int>("n");
+    m_discard = ind.discard();
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
+    double n = getParam<int>("n");
     double m = getParam<double>("m");
 
-    m_discard = ind.discard() + n;
-    _set(m * ind[m_discard] / n, m_discard);
     double p = n - m;
+    _set(ind[m_discard], m_discard);
     for (size_t i = m_discard + 1; i < total; i++) {
         _set((m * ind[i] + p * get(i-1)) / n, i);
     }

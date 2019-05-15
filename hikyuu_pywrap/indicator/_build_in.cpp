@@ -48,14 +48,11 @@ Indicator (*ATR_2)(const Indicator&, int) = ATR;
 Indicator (*DIFF_1)() = DIFF;
 Indicator (*DIFF_2)(const Indicator&) = DIFF;
 
-Indicator (*MA_1)(int, const string&) = MA;
-Indicator (*MA_2)(const Indicator&, int, const string&) = MA;
-//BOOST_PYTHON_FUNCTION_OVERLOADS(MA_1_overload, MA, 1, 2);
-//BOOST_PYTHON_FUNCTION_OVERLOADS(MA_2_overload, MA, 2, 3);
+Indicator (*MA_1)(int) = MA;
+Indicator (*MA_2)(const Indicator&, int) = MA;
 
-
-Indicator (*SMA_1)(int) = SMA;
-Indicator (*SMA_2)(const Indicator&, int) = SMA;
+Indicator (*SMA_1)(int, double) = SMA;
+Indicator (*SMA_2)(const Indicator&, int, double) = SMA;
 
 Indicator (*EMA_1)(int) = EMA;
 Indicator (*EMA_2)(const Indicator&, int) = EMA;
@@ -306,8 +303,8 @@ void export_Indicator_build_in() {
     def("EMA", EMA_1, (arg("n")=22));
     def("EMA", EMA_2, (arg("data"), arg("n")=22));
 
-    def("MA", EMA_1, (arg("n")=22));
-    def("MA", EMA_2, (arg("data"), arg("n")=22));
+    def("MA", MA_1, (arg("n")=22));
+    def("MA", MA_2, (arg("data"), arg("n")=22));
 
     def("AMA", AMA_1, (arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));
     def("AMA", AMA_2, (arg("data"), arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));

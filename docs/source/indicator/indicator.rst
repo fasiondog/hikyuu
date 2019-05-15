@@ -434,13 +434,12 @@
     :rtype: Indicator
     
     
-.. py:function:: MA([data, n=22, type="SMA"])
+.. py:function:: MA([data, n=22])
 
-    移动平均数包装，默认为简单平均数
+    简单移动平均
     
     :param Indicator data: 输入数据
     :param int n: 时间窗口
-    :param string type: "EMA"|"SMA"|"AMA"
     :rtype: Indicator
 
     
@@ -614,12 +613,15 @@
     :rtype: Indicator
 
 
-.. py:function:: SMA([data, n=22])
+.. py:function:: SMA([data, n=22, m=2])
 
-    简单移动平均线
+    求移动平均
+
+    用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
     
     :param Indicator data: 输入数据
     :param int n: 时间窗口
+    :param float m: 系数
     :rtype: Indicator
 
 

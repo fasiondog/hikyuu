@@ -36,6 +36,7 @@ BOOST_AUTO_TEST_CASE( test_MA ) {
     /** @arg n = 3, 但关联数据为空 */
     open = OPEN(kdata);
     ma = MA(open, 3);
+    BOOST_CHECK(ma.name() == "MA");
     BOOST_CHECK(ma.size() == 0);
     BOOST_CHECK(ma.empty() == true);
 
@@ -165,6 +166,7 @@ BOOST_AUTO_TEST_CASE( test_MA_export ) {
         ia >> BOOST_SERIALIZATION_NVP(ma2);
     }
 
+    BOOST_CHECK(ma2.name() == "MA");
     BOOST_CHECK(ma1.size() == ma2.size());
     BOOST_CHECK(ma1.discard() == ma2.discard());
     BOOST_CHECK(ma1.getResultNumber() == ma2.getResultNumber());
