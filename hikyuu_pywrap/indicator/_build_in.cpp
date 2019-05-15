@@ -300,13 +300,14 @@ void export_Indicator_build_in() {
     def("PRICELIST", PRICELIST3, (arg("data"), arg("result_index")=0));
     def("PRICELIST", PRICELIST4, (arg("result_index")=0));
 
-    def("SMA", SMA_1, (arg("n")=22));
-    def("SMA", SMA_2, (arg("data"), arg("n")=22));
+    def("SMA", SMA_1, (arg("n")=22, arg("m")=2.0));
+    def("SMA", SMA_2, (arg("data"), arg("n")=22, arg("m")=2.0));
+    
     def("EMA", EMA_1, (arg("n")=22));
     def("EMA", EMA_2, (arg("data"), arg("n")=22));
 
-    def("MA", MA_1, (arg("n")=22, arg("type")="SMA"),"type='SMA|EMA|AMA'");
-    def("MA", MA_2, (arg("data"), arg("n")=22, arg("type")="SMA"), "type='SMA|EMA|AMA'");
+    def("MA", EMA_1, (arg("n")=22));
+    def("MA", EMA_2, (arg("data"), arg("n")=22));
 
     def("AMA", AMA_1, (arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));
     def("AMA", AMA_2, (arg("data"), arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));

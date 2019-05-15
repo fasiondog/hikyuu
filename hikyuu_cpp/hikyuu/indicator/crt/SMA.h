@@ -13,14 +13,23 @@
 namespace hku {
 
 /**
- * 简单移动平均
+ * 求移动平均
+ * @details
+ * <pre>
+ * 用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
+ * </pre>
  * @param data 待计算的数据
  * @param n 计算均值的周期窗口，必须为大于0的整数
+ * @param m 系数
  * @ingroup Indicator
  */
-Indicator HKU_API SMA(const Indicator& data, int n = 22);
+Indicator HKU_API SMA(int n = 22, double m = 2.0);
+Indicator SMA(const Indicator& data, int n = 22, double m = 2.0);
 
-Indicator HKU_API SMA(int n = 22);
+inline Indicator SMA(const Indicator& ind, int n, double m){
+    return SMA(n, m)(ind);
+}
+
 
 } /* namespace */
 

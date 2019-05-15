@@ -1,25 +1,25 @@
 /*
- * Ma.h
+ * IMa.h
  *
  *  Created on: 2013-2-10
  *      Author: fasiondog
  */
 
-#ifndef SMA_H_
-#define SMA_H_
+#ifndef INDICATOR__IMP_IMA_H_
+#define INDICATOR__IMP_IMA_H_
 
 #include "../Indicator.h"
 
 namespace hku {
 
-class Sma: public IndicatorImp {
-    INDICATOR_IMP(Sma)
+class IMa: public IndicatorImp {
+    INDICATOR_IMP(IMa)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    Sma();
-    virtual ~Sma();
+    IMa();
+    virtual ~IMa();
 };
 
 } /* namespace hku */
-#endif /* SMA_H_ */
+#endif /* INDICATOR__IMP_IMA_H_ */

@@ -1,38 +1,38 @@
 /*
- * Sma.cpp
+ * IMa.cpp
  *
  *  Created on: 2013-2-10
  *      Author: fasiondog
  */
 
-#include "Sma.h"
+#include "IMa.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::Sma)
+BOOST_CLASS_EXPORT(hku::IMa)
 #endif
 
 
 namespace hku {
 
-Sma::Sma(): IndicatorImp("SMA", 1) {
+IMa::IMa(): IndicatorImp("MA", 1) {
     setParam<int>("n", 22);
 }
 
-Sma::~Sma() {
+IMa::~IMa() {
 
 }
 
-bool Sma::check() {
+bool IMa::check() {
     int n = getParam<int>("n");
     if (n < 1) {
-        HKU_ERROR("Invalid param! (n >= 1) [Sma::check]");
+        HKU_ERROR("Invalid param! (n >= 1) [IMa::check]");
         return false;
     }
 
     return true;
 }
 
-void Sma::_calculate(const Indicator& indicator) {
+void IMa::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
     m_discard = indicator.discard();
     if (m_discard >= total) {
@@ -57,14 +57,14 @@ void Sma::_calculate(const Indicator& indicator) {
 }
 
 
-Indicator HKU_API SMA(int n) {
-    IndicatorImpPtr p = make_shared<Sma>();
+Indicator HKU_API MA(int n) {
+    IndicatorImpPtr p = make_shared<IMa>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API SMA(const Indicator& ind, int n){
-    return SMA(n)(ind);
+Indicator HKU_API MA(const Indicator& ind, int n){
+    return MA(n)(ind);
 }
 
 } /* namespace hku */
