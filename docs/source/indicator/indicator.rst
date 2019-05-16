@@ -59,6 +59,15 @@
     :rtype: Indicator
 
 
+.. py:function:: AVEDEV(data[, n=22])
+
+    平均绝对偏差，求X的N日平均绝对偏差
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: BACKSET([data, n=2])
 
     向前赋值将当前位置到若干周期前的数据设为1。

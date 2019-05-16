@@ -527,4 +527,6 @@ void export_Indicator_build_in() {
     def("TIMELINEVOL", TIMELINEVOL_2);
 
     def("DMA", DMA);
+
+    def("AVEDEV", AVEDEV, (arg("data"), arg("n")=22));
 }
