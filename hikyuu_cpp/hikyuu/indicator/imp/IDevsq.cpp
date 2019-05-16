@@ -1,42 +1,42 @@
 /*
- * IStdp.cpp
+ * IDevsq.cpp
  *
- *  Copyright (c) 2019 hikyuu.org
+ *  Copyright (c) 2019, hikyuu.org
  * 
  *  Created on: 2019-4-18
  *      Author: fasiondog
  */
 
-#include "IStdp.h"
+#include "IDevsq.h"
 #include "../crt/MA.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::IStdp)
+BOOST_CLASS_EXPORT(hku::IDevsq)
 #endif
 
 
 namespace hku {
 
-IStdp::IStdp(): IndicatorImp("STDP", 1) {
+IDevsq::IDevsq(): IndicatorImp("DEVSQ", 1) {
     setParam<int>("n", 10);
 }
 
-IStdp::~IStdp() {
+IDevsq::~IDevsq() {
 
 }
 
-bool IStdp::check() {
+bool IDevsq::check() {
     int n = getParam<int>("n");
     if (n < 2) {
         HKU_ERROR("Invalid param[n] ! (n >= 2) " << m_params
-                << " [IStdp::calculate]");
+                << " [IDevsq::calculate]");
         return false;
     }
 
     return true;
 }
 
-void IStdp::_calculate(const Indicator& data) {
+void IDevsq::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
@@ -53,12 +53,12 @@ void IStdp::_calculate(const Indicator& data) {
         for (size_t j = i + 1 - n; j <= i; ++j) {
             sum += std::pow(data[j] - mean, 2);
         }
-        _set(std::sqrt(sum/n), i);
+        _set(sum, i);
     }
 }
 
-Indicator HKU_API STDP(int n) {
-    IndicatorImpPtr p = make_shared<IStdp>();
+Indicator HKU_API DEVSQ(int n) {
+    IndicatorImpPtr p = make_shared<IDevsq>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }

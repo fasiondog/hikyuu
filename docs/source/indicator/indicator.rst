@@ -203,7 +203,16 @@
     :param int discard: 抛弃数量
     :rtype: Indicator
     
-    
+
+.. py:function:: DEVSQ([data, n=10])
+
+    数据偏差平方和，求X的N日数据偏差平方和
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: DIFF([data])
 
     差分指标，即data[i] - data[i-1]

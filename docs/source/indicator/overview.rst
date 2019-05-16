@@ -31,7 +31,6 @@
 
 **引用函数**
 
-* :py:func:`AVEDEV` - 平均绝对偏差，求X的N日平均绝对偏差
 * :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
 * :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
 * :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
@@ -100,6 +99,8 @@
 
 **统计函数**
 
+* :py:func:`AVEDEV` - 平均绝对偏差
+* :py:func:`DEVSQ` - 数据偏差平方和
 * :py:func:`STD` - 估算标准差，同 STDEV
 * :py:func:`STDEV` - 计算N周期内样本标准差
 * :py:func:`STDP` - 总体标准差

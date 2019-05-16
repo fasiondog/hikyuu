@@ -267,6 +267,9 @@ Indicator (*TIMELINE_2)(const KData&) = TIMELINE;
 Indicator (*TIMELINEVOL_1)() = TIMELINEVOL;
 Indicator (*TIMELINEVOL_2)(const KData&) = TIMELINEVOL;
 
+Indicator (*DEVSQ_1)(int) = DEVSQ;
+Indicator (*DEVSQ_2)(const Indicator&, int) = DEVSQ;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -529,4 +532,7 @@ void export_Indicator_build_in() {
     def("DMA", DMA);
 
     def("AVEDEV", AVEDEV, (arg("data"), arg("n")=22));
+
+    def("DEVSQ", DEVSQ_1, (arg("n")=10));
+    def("DEVSQ", DEVSQ_2, (arg("data"), arg("n")=10));
 }
