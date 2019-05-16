@@ -234,6 +234,24 @@ DIFF([data])
     :return: Indicator
 """
 
+
+DMA.__doc__ = """
+DIFF(ind, a)
+
+    动态移动平均
+
+    用法：DMA(X,A),求X的动态移动平均。
+
+    算法：若Y=DMA(X,A) 则 Y=A*X+(1-A)*Y',其中Y'表示上一周期Y值。
+
+    例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
+
+    :param Indicator ind: 输入数据
+    :param Indicator a: 动态系数
+    :rtype: Indicator
+"""
+
+
 DOWNNDAY.__doc__ = """
 DOWNNDAY(data[, n=3])
 

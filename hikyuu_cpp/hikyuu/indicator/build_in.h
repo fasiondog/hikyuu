@@ -27,6 +27,7 @@
 #include "crt/CROSS.h"
 #include "crt/CVAL.h"
 #include "crt/DIFF.h"
+#include "crt/DMA.h"
 #include "crt/DOWNNDAY.h"
 #include "crt/EMA.h"
 #include "crt/EXP.h"

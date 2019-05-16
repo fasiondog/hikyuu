@@ -525,4 +525,6 @@ void export_Indicator_build_in() {
 
     def("TIMELINEVOL", TIMELINEVOL_1);
     def("TIMELINEVOL", TIMELINEVOL_2);
+
+    def("DMA", DMA);
 }

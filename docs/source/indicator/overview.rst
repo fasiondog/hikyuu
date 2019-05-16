@@ -37,6 +37,7 @@
 * :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
+* :py:func:`DMA` - 动态移动平均
 * :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
 * :py:func:`HHV` - N日内最高价
 * :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
