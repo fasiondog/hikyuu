@@ -273,6 +273,15 @@ Indicator (*DEVSQ_2)(const Indicator&, int) = DEVSQ;
 Indicator (*ROC_1)(int) = ROC;
 Indicator (*ROC_2)(const Indicator&, int) = ROC;
 
+Indicator (*ROCP_1)(int) = ROCP;
+Indicator (*ROCP_2)(const Indicator&, int) = ROCP;
+
+Indicator (*ROCR_1)(int) = ROCR;
+Indicator (*ROCR_2)(const Indicator&, int) = ROCR;
+
+Indicator (*ROCR100_1)(int) = ROCR100;
+Indicator (*ROCR100_2)(const Indicator&, int) = ROCR100;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -541,4 +550,13 @@ void export_Indicator_build_in() {
 
     def("ROC", ROC_1, (arg("n")=10));
     def("ROC", ROC_2, (arg("data"), arg("n")=10));
+
+    def("ROCP", ROCP_1, (arg("n")=10));
+    def("ROCP", ROCP_2, (arg("data"), arg("n")=10));
+
+    def("ROCR", ROCR_1, (arg("n")=10));
+    def("ROCR", ROCR_2, (arg("data"), arg("n")=10));
+
+    def("ROCR100", ROCR100_1, (arg("n")=10));
+    def("ROCR100", ROCR100_2, (arg("data"), arg("n")=10));
 }

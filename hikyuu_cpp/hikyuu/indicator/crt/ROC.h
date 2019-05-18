@@ -10,12 +10,12 @@
 #ifndef INDICATOR_CRT_ROC_H_
 #define INDICATOR_CRT_ROC_H_
 
-#include "CVAL.h"
+#include "../Indicator.h"
 
 namespace hku {
 
 /**
- * 变动率指标
+ * 变动率指标 ((price / prevPrice)-1)*100
  * @ingroup Indicator
  */
 Indicator HKU_API ROC(int n =10);

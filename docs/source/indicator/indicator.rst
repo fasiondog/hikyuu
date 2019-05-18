@@ -599,6 +599,33 @@
     :rtype: Indicator
 
 
+.. py:function:: ROCP([data, n=10])
+
+    变动率指标: (price - prevPrice) / prevPrice
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
+.. py:function:: ROCR([data, n=10])
+
+    变动率指标: (price / prevPrice)
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
+.. py:function:: ROCR100([data, n=10])
+
+    变动率指标: (price / prevPrice) * 100
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+
+
 .. py:function:: ROUND([data, ndigits=2])
 
     四舍五入

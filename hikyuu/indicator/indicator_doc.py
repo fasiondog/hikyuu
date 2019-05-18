@@ -679,6 +679,35 @@ ROC([data, n=10])
     :rtype: Indicator
 """
 
+ROCP.__doc__ = """
+ROCP([data, n=10])
+
+    变动率指标: (price - prevPrice) / prevPrice
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+"""
+
+ROCR.__doc__ = """
+ROCR([data, n=10])
+
+    变动率指标: (price / prevPrice)
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+"""
+
+ROCR100.__doc__ = """
+ROCR([data, n=10])
+
+    变动率指标: (price / prevPrice) * 100
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator
+"""
 
 ROUND.__doc__ = """
 ROUND([data, ndigits=2])
@@ -690,7 +719,6 @@ ROUND([data, ndigits=2])
     :rtype: Indicator
 """
 
-
 ROUNDDOWN.__doc__ = """
 ROUNDDOWN([data, ndigits=2])
 
@@ -700,7 +728,6 @@ ROUNDDOWN([data, ndigits=2])
     :param int ndigits: 保留的小数点后位数
     :rtype: Indicator
 """
-
 
 ROUNDUP.__doc__ = """
 ROUNDUP([data, ndigits=2])

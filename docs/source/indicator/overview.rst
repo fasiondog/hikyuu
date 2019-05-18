@@ -109,4 +109,7 @@
 
 **动量指标**
 
-* :py:func:`ROC` - 变动率指标
+* :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
+* :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
+* :py:func:`ROCR` - 变动率指标: (price / prevPrice)
+* :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
