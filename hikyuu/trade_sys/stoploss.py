@@ -199,7 +199,7 @@ ST_Indicator(op[, kpart="CLOSE"])
     
         ST_Indicator(OP(EMA(n=10)))
 
-    :param Operand op:
+    :param Indicator op:
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 止损/止赢策略实例
 """

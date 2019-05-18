@@ -11,8 +11,8 @@
 
     快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
 
-    :param Operand fast: 快线指标
-    :param Operand slow: 慢线指标
+    :param Indicator fast: 快线指标
+    :param Indicator slow: 慢线指标
     :param string market: 市场名称
 
 

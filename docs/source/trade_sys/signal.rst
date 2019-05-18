@@ -25,8 +25,8 @@
 
         SG_Cross(OP(MA(n=10)), OP(MA(n=30)))
 
-    :param Operand fast: 快线
-    :param Operand slow: 慢线
+    :param Indicator fast: 快线
+    :param Indicator slow: 慢线
     :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
     :return: 信号指示器
         
@@ -41,8 +41,8 @@
     
         SG_CrossGold(OP(MA(n=10)), OP(MA(n=30)))
     
-    :param Operand fast: 快线
-    :param Operand slow: 慢线
+    :param Indicator fast: 快线
+    :param Indicator slow: 慢线
     :param string kpart: OPEN|HIGH|LOW|CLOSE|AMO|VOL|KDATA
     :return: 信号指示器    
         
@@ -60,7 +60,7 @@
         or Buy When AMA - AMA[2] > filter
         or Buy When AMA - AMA[3] > filter 
     
-    :param Operand ind:
+    :param Indicator ind:
     :param int filer_n: N日周期
     :param float filter_p: 过滤器百分比
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
@@ -75,7 +75,7 @@
         Buy  When AMA - @lowest(AMA,n) > filter
         Sell When @highest(AMA, n) - AMA > filter
     
-    :param Operand ind:
+    :param Indicator ind:
     :param int filer_n: N日周期
     :param float filter_p: 过滤器百分比
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
@@ -88,7 +88,7 @@
 
     使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
 
-    :param Operand ind:
+    :param Indicator ind:
     :param int slow_n: 慢线EMA周期
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
@@ -98,10 +98,10 @@
 
 .. py:function:: SG_Bool(buy, sell[, kpart='CLOSE'])
 
-    布尔信号指示器，使用运算结果为类似bool数组的Operand分别作为买入、卖出指示。
+    布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
     
-    :param Operand buy: 买入指示（结果Indicator中相应位置>0则代表买入）
-    :param Operand sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
+    :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
+    :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器
 

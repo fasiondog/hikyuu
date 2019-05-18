@@ -212,7 +212,7 @@ CN_OPLine(op)
 
     固定使用股票最小交易量进行交易，计算权益曲线的op值，当权益曲线高于op时，系统有效，否则无效。
 
-    :param Operand op: Operand实例
+    :param Indicator op: Indicator实例
     :return: 系统有效条件实例
     :rtype: ConditionBase
 """ 
