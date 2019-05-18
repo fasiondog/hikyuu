@@ -12,6 +12,7 @@
 #include "crt/KDATA.h"
 #include "crt/ABS.h"
 #include "crt/ACOS.h"
+#include "crt/AD.h"
 #include "crt/AVEDEV.h"
 #include "crt/AMA.h"
 #include "crt/ASIN.h"

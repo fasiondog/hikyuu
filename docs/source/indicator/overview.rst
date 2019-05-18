@@ -109,7 +109,16 @@
 
 **动量指标**
 
+以下指标计算方法同 Ta-lib
+
 * :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
 * :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
+
+
+**成交量指标**
+
+以下指标计算方法同 Ta-lib
+
+* :py:func:`AD` - 累积/派发线

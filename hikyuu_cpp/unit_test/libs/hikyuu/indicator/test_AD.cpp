@@ -1,7 +1,7 @@
 /*
- * test_LIUTONGPAN.cpp
+ * test_AD.cpp
  *
- *  Created on: 2019-3-29
+ *  Created on: 2019-5-18
  *      Author: fasiondog
  */
 
@@ -15,37 +15,32 @@
 
 #include <fstream>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/indicator/crt/LIUTONGPAN.h>
+#include <hikyuu/indicator/crt/AD.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_indicator_LIUTONGPAN test_indicator_LIUTONGPAN
+ * @defgroup test_indicator_AD test_indicator_AD
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_LIUTONGPAN ) {
+BOOST_AUTO_TEST_CASE( test_AD ) {
     StockManager& sm = StockManager::instance();
     
     Stock stk = getStock("SH600004");
-    KQuery query = KQueryByDate(Datetime(200301010000), Datetime(200708250000));
+    KQuery query = KQueryByIndex(-10);
     KData k = stk.getKData(query);
 
-    Indicator liutong = LIUTONGPAN(k);
-    BOOST_CHECK(liutong.size() == k.size());
-    size_t total = k.size();
-    for (int i = 0; i < total; i++) {
-        if (k[i].datetime < Datetime(200512200000)) {
-            BOOST_CHECK(liutong[i] == 40000);
-        } else if (k[i].datetime >= Datetime(200512200000) 
-                && k[i].datetime < Datetime(200612200000)) {
-            BOOST_CHECK(liutong[i] == 47600);
-        } else {
-            BOOST_CHECK(liutong[i] == 49696);
-        }
-    }
+    Indicator ad = AD(k);
+    BOOST_CHECK(ad.name() == "AD");
+    BOOST_CHECK(ad.size() == k.size());
+    BOOST_CHECK(ad.discard() == 0);
+    BOOST_CHECK(ad[0] == 0);
+    BOOST_CHECK_CLOSE(ad[1], 458.65, 0.1);
+    BOOST_CHECK_CLOSE(ad[2], 63.99, 0.1);
+    BOOST_CHECK_CLOSE(ad[5], 30.77, 0.1);
 }
 
 
@@ -55,13 +50,13 @@ BOOST_AUTO_TEST_CASE( test_LIUTONGPAN ) {
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_LIUTONGPAN_export ) {
+BOOST_AUTO_TEST_CASE( test_AD_export ) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
-    filename += "/LIUTONGPAN.xml";
+    filename += "/AD.xml";
 
     KData k = getStock("SH600000").getKData(KQuery(-10));
-    Indicator x1 = LIUTONGPAN(k);
+    Indicator x1 = AD(k);
     x1.setContext(k);
 
     {
@@ -77,7 +72,7 @@ BOOST_AUTO_TEST_CASE( test_LIUTONGPAN_export ) {
         ia >> BOOST_SERIALIZATION_NVP(x2);
     }
 
-    BOOST_CHECK(x2.name() == "LIUTONGPAN");
+    BOOST_CHECK(x2.name() == "AD");
     BOOST_CHECK(x1.size() == x2.size());
     BOOST_CHECK(x1.discard() == x2.discard());
     BOOST_CHECK(x1.getResultNumber() == x2.getResultNumber());

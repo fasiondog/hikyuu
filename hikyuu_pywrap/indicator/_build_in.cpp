@@ -282,6 +282,9 @@ Indicator (*ROCR_2)(const Indicator&, int) = ROCR;
 Indicator (*ROCR100_1)(int) = ROCR100;
 Indicator (*ROCR100_2)(const Indicator&, int) = ROCR100;
 
+Indicator (*AD_1)() = AD;
+Indicator (*AD_2)(const KData&) = AD;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -559,4 +562,7 @@ void export_Indicator_build_in() {
 
     def("ROCR100", ROCR100_1, (arg("n")=10));
     def("ROCR100", ROCR100_2, (arg("data"), arg("n")=10));
+
+    def("AD", AD_1);
+    def("AD", AD_2);
 }

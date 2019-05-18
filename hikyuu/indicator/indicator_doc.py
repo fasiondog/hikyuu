@@ -46,6 +46,14 @@ ACOS([data])
     :rtype: Indicator
 """
 
+AD.__doc__ = """
+AD(kdata)
+
+   累积/派发线
+   
+   :param KData kdata: k线数据
+   :rtype: Indicator
+"""
 
 AMA.__doc__ = """
 AMA([data, n=10, fast_n=2, slow_n=30])
