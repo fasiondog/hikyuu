@@ -406,6 +406,16 @@
     :rtype: Indicator
 
 
+.. py:function:: KDJ(kdata[, n=9, m12=3, m2=3])
+
+    经典 KDJ 随机指标
+
+    :param KData kdata: 关联的K线数据
+    :param int n:
+    :param int m1:
+    :param int m2:
+    :return: k, d, j
+
 .. py:function:: LIUTONGPAN(kdata)
 
    获取流通盘（单位：万股），同 CAPITAL
@@ -673,6 +683,17 @@
     :param int ndigits: 保留的小数点后位数
     :rtype: Indicator
 
+
+.. py:function:: RSI(kdata=None, N1=6, N2=12, N3=24)
+
+    相对强弱指标
+
+    :param KData kdata: 关联的K线数据
+    :param int N1: 参数N1
+    :param int N2: 参数N1
+    :param int N3: 参数N1
+    :return: rsi1, rsi2, rsi3
+    
 
 .. py:function:: SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 

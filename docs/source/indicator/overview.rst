@@ -11,7 +11,7 @@
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 
 
-**行情函数**
+**行情指标**
 
 * :py:func:`KDATA` - 包装KData成Indicator，用于其他指标计算
 * :py:func:`KDATA_PART` - 根据字符串选择返回指标KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL
@@ -27,41 +27,12 @@
 * :py:func:`TIMELINEVOL`   - 分时成交量
     
 
-**大盘函数**
-
-
-**引用函数**
-
-* :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
-* :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
-* :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
-* :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数
-* :py:func:`COUNT` - 统计满足条件的周期数
-* :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
-* :py:func:`DMA` - 动态移动平均
-* :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
-* :py:func:`HHV` - N日内最高价
-* :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
-* :py:func:`LLV` - N日内最低价
-* :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
-* :py:func:`MA`  - 简单移动平均数
-* :py:func:`MACD` - 平滑异同移动平均线
-* :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
-* :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
-* :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
-* :py:func:`SMA` - 移动平均线
-* :py:func:`SAFTYLOSS` - 亚历山大 艾尔德安全地带止损线
-* :py:func:`SUM` - 求总和
-* :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
-* :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
-
-
-**形态函数**
-
-* :py:func:`COST` - 成本分布
+**大盘指标**
 
 
 **逻辑算术函数**
+
+指标本身直接支持 "+"、"-"、"*" 、"/"、"&"（与）、"|"（或）、"<"、">"、"<="、">="、"=="、"!=" 操作。
 
 * :py:func:`BETWEEN` - 介于(介于两个数之间)
 * :py:func:`CEILING` - 向上舍入(向数值增大方向舍入)取整
@@ -79,7 +50,7 @@
 * :py:func:`NDAY` - 连大
 
 
-**数学函数**
+**数学指标**
 
 * :py:func:`ABS` - 求绝对值
 * :py:func:`ACOS` - 反余弦值
@@ -102,8 +73,7 @@
 * :py:func:`SQRT` - 开平方
 * :py:func:`TAN` - 正切值
 
-
-**统计函数**
+**统计指标**
 
 * :py:func:`AVEDEV` - 平均绝对偏差
 * :py:func:`DEVSQ` - 数据偏差平方和
@@ -114,18 +84,41 @@
 * :py:func:`VARP` - 总体样本方差
 
 
-**动量指标**
+**技术指标**
 
-以下指标计算方法同 Ta-lib
+* :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
+* :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
+* :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
+* :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数
+* :py:func:`COUNT` - 统计满足条件的周期数
+* :py:func:`COST` - 成本分布
+* :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
+* :py:func:`DMA` - 动态移动平均
+* :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
+* :py:func:`HHV` - N日内最高价
+* :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
+* :py:func:`KDJ` - 经典随机指标
+* :py:func:`LLV` - N日内最低价
+* :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
+* :py:func:`MA`  - 简单移动平均数
+* :py:func:`MACD` - 平滑异同移动平均线
+* :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
+* :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
+* :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
+* :py:func:`RSI` - 相对强弱指标
+* :py:func:`SMA` - 移动平均线
+* :py:func:`SAFTYLOSS` - 亚历山大 艾尔德安全地带止损线
+* :py:func:`SUM` - 求总和
+* :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
+* :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
 
-* :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
-* :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
-* :py:func:`ROCR` - 变动率指标: (price / prevPrice)
-* :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
 
-
-**成交量指标**
+**Ta-lib指标**
 
 以下指标计算方法同 Ta-lib
 
 * :py:func:`AD` - 累积/派发线
+* :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
+* :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
+* :py:func:`ROCR` - 变动率指标: (price / prevPrice)
+* :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
