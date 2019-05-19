@@ -92,7 +92,7 @@
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
 
-    .. py:method:: clone()
+    .. py:method:: clone(self)
     
         克隆操作
 

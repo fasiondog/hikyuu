@@ -6,6 +6,7 @@
 
 .. toctree::
 
+   ind_class
    overview
    indicator
    talib

@@ -210,6 +210,15 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     return imp;
 }
 
+price_t IndicatorImp::getByDate(Datetime date, size_t num) {
+    price_t result = Null<price_t>();
+    KData k = getContext();
+    size_t pos = k.getPos(date);
+    if (pos != Null<size_t>()) {
+        result = get(pos, num);
+    }
+    return result;
+}
 
 string IndicatorImp::formula() const {
     std::stringstream buf;

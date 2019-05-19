@@ -100,6 +100,13 @@ public:
      */
     price_t get(size_t pos, size_t num = 0) const;
 
+    /**
+     * 获取指定日期的数据
+     * @param date 指定日期
+     * @param num 第几个结果集
+     */
+    price_t getByDate(Datetime date, size_t num = 0) const;
+
     /** 
      * 以指标的方式获取指定的结果集 
      * @param num 指定的结果集
@@ -111,6 +118,11 @@ public:
      * @param num 指定的结果集
      */
     PriceList getResultAsPriceList(size_t num) const;
+
+    /**
+     * 获取 DatetimeList
+     */
+    DatetimeList getDatetimeList() const;
 
     template <typename ValueType>
     void setParam(const string& name, const ValueType& value) {
@@ -185,6 +197,14 @@ inline Indicator Indicator::operator()() {
 
 inline Indicator Indicator::clone() const {
     return m_imp ? Indicator(m_imp->clone()) : Indicator();
+}
+
+inline DatetimeList Indicator::getDatetimeList() const {
+    return m_imp ? m_imp->getDatetimeList() : DatetimeList();
+}
+
+inline price_t Indicator::getByDate(Datetime date, size_t num) const {
+    return m_imp ? m_imp->getByDate(date, num) : Null<price_t>();
 }
 
 inline price_t Indicator::operator[](size_t pos) const {
