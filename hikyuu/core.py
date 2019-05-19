@@ -263,6 +263,9 @@ def KData_getitem(kdata, i):
     elif isinstance(i, Datetime):
         return kdata.getKRecordByDate(i)
     
+    elif isinstance(i, str):
+        return kdata.getKRecordByDate(Datetime(i))
+
     elif isinstance(i, slice):
         return [kdata.getKRecord(x) for x in range(*i.indices(len(kdata)))]
         

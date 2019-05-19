@@ -93,6 +93,9 @@ public:
     /** 只获取第一个结果集中相应位置输出，等同于get(pos, 0) */
     price_t operator[](size_t pos) const;
 
+    /** 只获取第一个结果集中相应位置输出，等同于getByDate(date, 0) */
+    price_t operator[](Datetime) const;
+
     /**
      * 获取第num个结果集中指定位置的数据
      * @param pos 结果集中的位置
@@ -208,13 +211,7 @@ inline price_t Indicator::getByDate(Datetime date, size_t num) const {
 }
 
 inline price_t Indicator::operator[](size_t pos) const {
-#if CHECK_ACCESS_BOUND
-    if (!m_imp) {
-        throw(std::out_of_range(
-            "Try to access empty indicator! [Indicator::get]"));
-    }
-#endif        
-    return m_imp->get(pos, 0);
+    return get(pos, 0);
 }
 
 inline price_t Indicator::get(size_t pos, size_t num) const {
@@ -225,6 +222,10 @@ inline price_t Indicator::get(size_t pos, size_t num) const {
     }
 #endif        
     return m_imp->get(pos, num);
+}
+
+inline price_t Indicator::operator[](Datetime date) const {
+    return getByDate(date);
 }
 
 

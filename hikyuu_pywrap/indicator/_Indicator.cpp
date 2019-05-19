@@ -14,6 +14,7 @@ using namespace boost::python;
 using namespace hku;
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(get_overloads, get, 1, 2)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getByDate_overloads, getByDate, 1, 2)
 
 Indicator (*indicator_add1)(const Indicator&, const Indicator&) = operator+;
 Indicator (*indicator_sub1)(const Indicator&, const Indicator&) = operator-;
@@ -71,7 +72,7 @@ void export_Indicator() {
         .def("formula", &Indicator::formula)
         .def("getResultNumber", &Indicator::getResultNumber)
         .def("get", &Indicator::get, get_overloads())
-        .def("getByDate", &Indicator::getByDate)
+        .def("getByDate", &Indicator::getByDate, getByDate_overloads())
         .def("getResult", &Indicator::getResult)
         .def("getResultAsPriceList", &Indicator::getResultAsPriceList)
         .def("getDatetimeList", &Indicator::getDatetimeList)

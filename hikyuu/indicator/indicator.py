@@ -25,19 +25,41 @@
 # SOFTWARE.
 
 from ._indicator import *
-from hikyuu.util.slice import list_getitem
 from hikyuu.util.unicode import (IS_PY3, unicodeFunc, reprFunc)
-from hikyuu import constant, toPriceList, PriceList
+from hikyuu import constant, toPriceList, PriceList, Datetime
 
 
 def indicator_iter(indicator):
     for i in range(len(indicator)):
         yield indicator[i]
-        
 
-Indicator.__getitem__ = list_getitem
+
+def indicator_getitem(data, i):
+    """对C++引出的vector，实现python的切片，
+       将引入的vector类的__getitem__函数覆盖即可。
+    """
+    if isinstance(i, int):
+        length = len(data)
+        index = length + i if i < 0 else i
+        if index < 0 or index >= length:
+            raise IndexError("index out of range: %d" % i)
+        return data.get(index)
+    
+    elif isinstance(i, slice):
+        return [data.get(x) for x in range(*i.indices(len(data)))]
+
+    elif isinstance(i, Datetime):
+        return data.getByDate(i)
+
+    elif isinstance(i, str):
+        return data.getByDate(Datetime(i))
+
+    else:
+        raise IndexError("Error index type")
+
+
+Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
-
 
 Indicator.__unicode__ =  unicodeFunc
 Indicator.__repr__ =  reprFunc 
