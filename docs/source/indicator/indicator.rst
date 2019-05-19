@@ -180,6 +180,19 @@
     :rtype: Indicator
 
 
+.. py:function:: COST(k[, x=10.0])
+
+    成本分布
+
+    用法：COST(k, X) 表示X%获利盘的价格是多少
+
+    例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
+
+    :param KData k: 关联的K线数据
+    :param float x: x%获利价格, 0~100
+    :rtype: Indicator
+
+
 .. py:function:: COUNT([data, n=20])
 
     统计满足条件的周期数。

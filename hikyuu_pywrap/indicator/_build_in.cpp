@@ -285,6 +285,9 @@ Indicator (*ROCR100_2)(const Indicator&, int) = ROCR100;
 Indicator (*AD_1)() = AD;
 Indicator (*AD_2)(const KData&) = AD;
 
+Indicator (*COST_1)(double x) = COST;
+Indicator (*COST_2)(const KData&, double x) = COST;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -565,4 +568,7 @@ void export_Indicator_build_in() {
 
     def("AD", AD_1);
     def("AD", AD_2);
+
+    def("COST", COST_1, (arg("x")=10.0));
+    def("COST", COST_2, (arg("k"), arg("x")=10.0));
 }

@@ -21,6 +21,8 @@
 * :py:func:`CLOSE` - 包装KData的收盘价成Indicator
 * :py:func:`AMO`   - 包装KData的成交金额成Indicator
 * :py:func:`VOL`   - 包装KData的成交量成Indicator
+* :py:func:`HSL` - 换手率
+* :py:func:`CAPITAL` - 流通盘，同名：LIUTONGPAN
 * :py:func:`TIMELINE`   - 分时价格
 * :py:func:`TIMELINEVOL`   - 分时成交量
     
@@ -52,6 +54,11 @@
 * :py:func:`SUM` - 求总和
 * :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
 * :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
+
+
+**形态函数**
+
+* :py:func:`COST` - 成本分布
 
 
 **逻辑算术函数**

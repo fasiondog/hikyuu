@@ -177,6 +177,7 @@ L = LOW
 A = AMO
 V = VOL
 D = Datetime
+K = None
 
 def set_global_context(stk, query):
     """设置全局的 context
@@ -184,13 +185,14 @@ def set_global_context(stk, query):
         :param Stock stk: 指定的全局Stock
         :param Query query: 指定的查询条件
     """
-    k = stk.getKData(query)
-    O.setContext(k)
-    C.setContext(k)
-    H.setContext(k)
-    L.setContext(k)
-    A.setContext(k)
-    V.setContext(k)
+    global K, O, C, H, L, A, V
+    K = stk.getKData(query)
+    O.setContext(K)
+    C.setContext(K)
+    H.setContext(K)
+    L.setContext(K)
+    A.setContext(K)
+    V.setContext(K)
 
 
 def get_global_context():
