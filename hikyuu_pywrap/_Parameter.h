@@ -99,6 +99,15 @@ struct AnyToPython{
             //object* o = new object(eval(cmd.c_str()));
             return o->ptr();
 
+        } else if (x.type() == typeid(DatetimeList)) {
+            const DatetimeList& date_list = boost::any_cast<DatetimeList>(x);
+            boost::python::list* o = new boost::python::list();
+            for (auto iter = date_list.begin(); iter != date_list.end(); ++iter) {
+                o->append(*iter);
+            }
+            //object* o = new object(eval(cmd.c_str()));
+            return o->ptr();
+
         } else {
             HKU_ERROR("convert failed! Unkown type! Will return None!"
                     " [AnyToPython::convert]");
@@ -165,6 +174,12 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         extract<PriceList> x8(o);
         if (x8.check()) {
             m_params[name] = x8();
+            return;
+        }
+
+        extract<DatetimeList> x9(o);
+        if (x9.check()) {
+            m_params[name] = x9();
             return;
         }
 
@@ -247,6 +262,16 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         extract<KData> x8(o);
         if (x8.check()) {
             m_params[name] = x8();
+            return;
+        }
+        throw std::logic_error(mismatch);
+        return;
+    }
+
+    if (m_params[name].type() == typeid(DatetimeList)) {
+        extract<KData> x9(o);
+        if (x9.check()) {
+            m_params[name] = x9();
             return;
         }
         throw std::logic_error(mismatch);

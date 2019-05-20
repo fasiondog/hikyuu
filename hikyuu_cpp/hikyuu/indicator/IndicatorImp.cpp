@@ -210,6 +210,11 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     return imp;
 }
 
+Datetime IndicatorImp::getDatetime(size_t pos) const {
+    KData k = getContext();
+    return pos < k.size() ? k[pos].datetime : Null<Datetime>();
+}
+
 price_t IndicatorImp::getByDate(Datetime date, size_t num) {
     price_t result = Null<price_t>();
     KData k = getContext();

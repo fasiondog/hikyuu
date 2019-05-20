@@ -58,7 +58,7 @@ Indicator
 
     .. py:method:: getByDate(self, date[, num=0])
 
-        获取指定日期数值
+        获取指定日期数值。如果对应日期无结果，返回 constant.null_price
 
         :param Datetime date: 指定日期
         :param int num: 指定的结果集

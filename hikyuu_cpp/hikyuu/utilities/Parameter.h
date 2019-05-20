@@ -24,6 +24,7 @@
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/nvp.hpp>
 #include "../serialization/KData_serialization.h"
+#include "../serialization/Datetime_serialization.h"
 #endif
 
 
@@ -190,6 +191,10 @@ private:
                 type = "PriceList";
                 value = "price_list";
                 price_list = boost::any_cast<PriceList>(arg);
+            } else if (arg.type() == typeid(DatetimeList)) {
+                type = "DatetimeList";
+                value = "date_list";
+                price_list = boost::any_cast<PriceList>(arg);
             } else {
                 type = "Unknown";
                 value = "Unknown";
@@ -203,6 +208,7 @@ private:
         KQuery query;
         KData  kdata;
         PriceList price_list;
+        DatetimeList date_list;
 
         template<class Archive>
         void serialize(Archive & ar, const unsigned int version) {
@@ -213,6 +219,7 @@ private:
             ar & BOOST_SERIALIZATION_NVP(query);
             ar & BOOST_SERIALIZATION_NVP(kdata);
             ar & BOOST_SERIALIZATION_NVP(price_list);
+            ar & BOOST_SERIALIZATION_NVP(date_list);
         }
     };
 
@@ -253,6 +260,8 @@ private:
                 m_params[record.name] = record.kdata;
             } else if (record.type == "PriceList") {
                 m_params[record.name] = record.price_list;
+            } else if (record.type == "DatetimeList") {
+                m_params[record.name] = record.date_list;
             } else {
                 std::cout << "Unknown type! [Parameter::load]" << std::endl;
             }

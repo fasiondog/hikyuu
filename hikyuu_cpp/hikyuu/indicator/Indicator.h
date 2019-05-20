@@ -104,6 +104,12 @@ public:
     price_t get(size_t pos, size_t num = 0) const;
 
     /**
+     * 获取指定位置的日期
+     * @param pos 结果集中的位置
+     */
+    Datetime getDatetime(size_t pos) const;
+
+    /**
      * 获取指定日期的数据
      * @param date 指定日期
      * @param num 第几个结果集
@@ -222,6 +228,16 @@ inline price_t Indicator::get(size_t pos, size_t num) const {
     }
 #endif        
     return m_imp->get(pos, num);
+}
+
+inline Datetime Indicator::getDatetime(size_t pos) const {
+#if CHECK_ACCESS_BOUND
+    if (!m_imp) {
+        throw(std::out_of_range(
+            "Try to access empty indicator! [Indicator::get]"));
+    }
+#endif        
+    return m_imp->getDatetime(pos);
 }
 
 inline price_t Indicator::operator[](Datetime date) const {

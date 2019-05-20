@@ -96,6 +96,8 @@ public:
 
     price_t getByDate(Datetime, size_t num = 0);
 
+    Datetime getDatetime(size_t pos) const;
+
     DatetimeList getDatetimeList() const;
 
     /** 以PriceList方式获取指定的输出集 */
