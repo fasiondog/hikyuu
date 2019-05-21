@@ -221,23 +221,11 @@ inline price_t Indicator::operator[](size_t pos) const {
 }
 
 inline price_t Indicator::get(size_t pos, size_t num) const {
-#if CHECK_ACCESS_BOUND
-    if (!m_imp) {
-        throw(std::out_of_range(
-            "Try to access empty indicator! [Indicator::get]"));
-    }
-#endif        
     return m_imp->get(pos, num);
 }
 
 inline Datetime Indicator::getDatetime(size_t pos) const {
-#if CHECK_ACCESS_BOUND
-    if (!m_imp) {
-        throw(std::out_of_range(
-            "Try to access empty indicator! [Indicator::get]"));
-    }
-#endif        
-    return m_imp->getDatetime(pos);
+    return m_imp ? m_imp->getDatetime(pos) : Null<Datetime>();
 }
 
 inline price_t Indicator::operator[](Datetime date) const {

@@ -26,6 +26,78 @@
 
 from .indicator import *
 
+Indicator.__doc__ = """技术指标"""
+Indicator.clone.__doc__ = """克隆操作"""
+Indicator.discard.__doc__ = """需抛弃的数量"""
+Indicator.empty.__doc__ = """是否为空"""
+
+Indicator.formula.__doc__ = """
+formula(self)
+
+    打印指标公式
+
+    :rtype: str
+"""
+
+Indicator.getByDate.__doc__ = """
+getByDate(self, date[, num=0])
+
+    获取指定日期数值。如果对应日期无结果，返回 constant.null_price
+ 
+    :param Datetime date: 指定日期
+    :param int num: 指定的结果集
+    :rtype: float
+"""
+
+Indicator.getContext.__doc__ = """
+getContext(self)
+
+    获取上下文
+
+    :rtype: KData
+"""
+
+Indicator.getResult.__doc__ = """
+getResult(self, num)
+
+    获取指定结果集
+
+    :param int num: 指定的结果集
+    :rtype: Indicator
+"""
+
+Indicator.getResultAsPriceList.__doc__ = """
+getResultAsPriceList(self, num)
+
+    获取指定结果集
+
+    :param int num: 指定的结果集
+    :rtype: PriceList
+"""
+
+Indicator.getResultNumber.__doc__ = """
+getResultNumber(self)
+
+    获取结果集数量
+
+    :rtype: int
+"""
+
+Indicator.setContext.__doc__ = """
+setContext(self, kdata)
+
+    设置上下文
+
+    :param KData kdata: 关联的上下文K线
+
+setContext(self, stock, query)
+
+    设置上下文
+
+    :param Stock stock: 指定的 Stock
+    :param Query query: 指定的查询条件
+"""
+
 
 ABS.__doc__ = """
 ABS([data])

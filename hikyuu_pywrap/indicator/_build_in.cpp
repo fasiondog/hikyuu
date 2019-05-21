@@ -288,6 +288,11 @@ Indicator (*AD_2)(const KData&) = AD;
 Indicator (*COST_1)(double x) = COST;
 Indicator (*COST_2)(const KData&, double x) = COST;
 
+Indicator (*ALIGN_1)() = ALIGN;
+Indicator (*ALIGN_2)(const DatetimeList&) = ALIGN;
+Indicator (*ALIGN_3)(const Indicator&) = ALIGN;
+Indicator (*ALIGN_4)(const Indicator&, const DatetimeList&) = ALIGN;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -571,4 +576,9 @@ void export_Indicator_build_in() {
 
     def("COST", COST_1, (arg("x")=10.0));
     def("COST", COST_2, (arg("k"), arg("x")=10.0));
+
+    def("ALIGN", ALIGN_1);
+    def("ALIGN", ALIGN_2);
+    def("ALIGN", ALIGN_3);
+    def("ALIGN", ALIGN_4);
 }

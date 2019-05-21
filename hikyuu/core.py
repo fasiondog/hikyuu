@@ -253,6 +253,9 @@ def QueryByDate(start=None, end=None, kType=Query.DAY,
 #------------------------------------------------------------------
 
 def KData_getitem(kdata, i):
+    """
+    :param i: int | Datetime | slice | str 类型
+    """
     if isinstance(i, int):
         length = len(kdata)
         index = length + i if i < 0 else i

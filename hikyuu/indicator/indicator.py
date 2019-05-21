@@ -35,8 +35,8 @@ def indicator_iter(indicator):
 
 
 def indicator_getitem(data, i):
-    """对C++引出的vector，实现python的切片，
-       将引入的vector类的__getitem__函数覆盖即可。
+    """
+    :param i: int | Datetime | slice | str 类型
     """
     if isinstance(i, int):
         length = len(data)

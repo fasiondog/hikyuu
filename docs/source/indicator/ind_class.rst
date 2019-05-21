@@ -56,6 +56,19 @@ Indicator
 
         :rtype: int
 
+    .. py:method:: get(self, pos[, num=0])
+
+        获取指定位置的值
+
+        :param int pos: 指定的位置索引
+        :param int num: 指定的结果集
+
+    .. py:method:: getDatetime(self, pos)
+
+        获取指定位置的日期
+
+        :param int pos: 指定的位置索引
+
     .. py:method:: getByDate(self, date[, num=0])
 
         获取指定日期数值。如果对应日期无结果，返回 constant.null_price
