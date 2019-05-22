@@ -210,6 +210,31 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     return imp;
 }
 
+price_t IndicatorImp::get(size_t pos, size_t num) {
+#if CHECK_ACCESS_BOUND
+    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+        throw(std::out_of_range("Try to access value out of bounds! "
+                + name() + " [IndicatorImp::get]"));
+        return Null<price_t>();
+    }
+#endif
+    return (*m_pBuffer[num])[pos];
+}
+
+void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
+#if CHECK_ACCESS_BOUND
+    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+        std::stringstream buf;
+        buf << "Try to access value out of bounds! (pos=" << pos
+            << ") " << name() << " [IndicatorImp::_set]";
+        throw(std::out_of_range(buf.str()));
+    }
+    (*m_pBuffer[num])[pos] = val;
+#else
+    (*m_pBuffer[num])[pos] = val;
+#endif
+}
+
 Datetime IndicatorImp::getDatetime(size_t pos) const {
     KData k = getContext();
     return pos < k.size() ? k[pos].datetime : Null<Datetime>();

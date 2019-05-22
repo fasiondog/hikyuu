@@ -39,28 +39,43 @@ void IAlign::_calculate(const Indicator& ind) {
         return;
     }
 
+    m_result_num = ind.getResultNumber();
+    _readyBuffer(total, m_result_num);
+
     size_t ind_total = ind.size();
     size_t ind_idx = 0;
-    size_t i = 0;
-    while (i < total) {
-        if (dates[i] >= ind.getDatetime(ind_idx)) {
-            _set(ind[ind_idx], i);
-            i++;
-        } else {
-            _set(0.0, i);
+    for (size_t i = 0; i < total; i++) {
+        Datetime ind_date = ind.getDatetime(ind_idx);
+        if (dates[i] == ind_date) {
+            for (size_t r = 0; r < m_result_num; r++) {
+                _set(ind[ind_idx], i, r);
+            }
+        
+        } else if (dates[i] > ind_date) {
             size_t j = i + 1;
-            while (j < ind_total && ind.getDatetime(j) <= dates[i]) {
-                _set(0.0, j);
+            while (j < ind_total && dates[i] >= ind.getDatetime(j)) {
                 j++;
             }
-            
-            i = j;
+
             if (j == ind_total) {
                 for(; i < total; i++) {
-                    _set(0.0, i);
+                    for (size_t r = 0; r < m_result_num; r++) {
+                        _set(0.0, i, r);
+                    }
                 }
                 break;
             }
+
+            if (ind.getDatetime(j) == dates[i]) {
+                for (size_t r = 0; r < m_result_num; r++) {
+                    _set(ind[j], i, r);
+                }
+            }
+
+            ind_idx = j;
+
+        } else { //dates[i] < ind_date
+
         }
     }
 }

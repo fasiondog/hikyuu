@@ -304,28 +304,5 @@ inline DatetimeList IndicatorImp::getDatetimeList() const {
     return getContext().getDatetimeList();
 }
 
-inline price_t IndicatorImp::get(size_t pos, size_t num) {
-#if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
-        throw(std::out_of_range("Try to access value out of bounds! "
-                + name() + " [IndicatorImp::get]"));
-        return Null<price_t>();
-    }
-#endif
-    return (*m_pBuffer[num])[pos];
-}
-
-inline void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
-#if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
-        throw(std::out_of_range("Try to access value out of bounds! "
-                + name() + " [IndicatorImp::_set]"));
-    }
-    (*m_pBuffer[num])[pos] = val;
-#else
-    (*m_pBuffer[num])[pos] = val;
-#endif
-}
-
 } /* namespace hku */
 #endif /* INDICATORIMP_H_ */
