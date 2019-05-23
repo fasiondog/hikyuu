@@ -235,6 +235,10 @@ void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
 #endif
 }
 
+DatetimeList IndicatorImp::getDatetimeList() const {
+    return getContext().getDatetimeList();
+}
+
 Datetime IndicatorImp::getDatetime(size_t pos) const {
     KData k = getContext();
     return pos < k.size() ? k[pos].datetime : Null<Datetime>();
@@ -248,6 +252,10 @@ price_t IndicatorImp::getByDate(Datetime date, size_t num) {
         result = get(pos, num);
     }
     return result;
+}
+
+size_t IndicatorImp::getPos(Datetime date) const {
+    return getContext().getPos(date);
 }
 
 string IndicatorImp::formula() const {

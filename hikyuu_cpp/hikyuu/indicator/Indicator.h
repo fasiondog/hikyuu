@@ -116,6 +116,9 @@ public:
      */
     price_t getByDate(Datetime date, size_t num = 0) const;
 
+    /** 获取指定日期相应的索引位置 */
+    size_t getPos(Datetime) const;
+
     /** 
      * 以指标的方式获取指定的结果集 
      * @param num 指定的结果集
@@ -226,6 +229,10 @@ inline price_t Indicator::get(size_t pos, size_t num) const {
 
 inline Datetime Indicator::getDatetime(size_t pos) const {
     return m_imp ? m_imp->getDatetime(pos) : Null<Datetime>();
+}
+
+inline size_t Indicator::getPos(Datetime date) const {
+    return m_imp ? m_imp->getPos(date) : Null<size_t>();
 }
 
 inline price_t Indicator::operator[](Datetime date) const {

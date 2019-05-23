@@ -100,6 +100,8 @@ public:
 
     DatetimeList getDatetimeList() const;
 
+    size_t getPos(Datetime) const;
+
     /** 以PriceList方式获取指定的输出集 */
     PriceList getResultAsPriceList(size_t result_num);
 
@@ -298,10 +300,6 @@ inline bool IndicatorImp::isLeaf() const {
 
 inline KData IndicatorImp::getContext() const { 
     return getParam<KData>("kdata"); 
-}
-
-inline DatetimeList IndicatorImp::getDatetimeList() const {
-    return getContext().getDatetimeList();
 }
 
 } /* namespace hku */
