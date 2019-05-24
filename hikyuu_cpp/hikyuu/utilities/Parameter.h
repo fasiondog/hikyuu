@@ -194,7 +194,7 @@ private:
             } else if (arg.type() == typeid(DatetimeList)) {
                 type = "DatetimeList";
                 value = "date_list";
-                price_list = boost::any_cast<PriceList>(arg);
+                date_list = boost::any_cast<DatetimeList>(arg);
             } else {
                 type = "Unknown";
                 value = "Unknown";

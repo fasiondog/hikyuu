@@ -6,8 +6,9 @@
 
 **辅助类指标**
 
-* :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
+* :py:func:`ALIGN` - 按指定的参考日期对齐
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
+* :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 
 

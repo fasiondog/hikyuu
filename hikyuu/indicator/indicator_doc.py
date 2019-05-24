@@ -127,6 +127,16 @@ AD(kdata)
    :rtype: Indicator
 """
 
+ALIGN.__doc__ = """
+ALIGN(data, ref):
+
+    按指定的参考日期对齐
+
+    :param Indicator data: 输入数据
+    :param ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :retype: Indicator
+"""
+
 AMA.__doc__ = """
 AMA([data, n=10, fast_n=2, slow_n=30])
 

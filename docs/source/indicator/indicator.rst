@@ -29,6 +29,14 @@
    :rtype: Indicator
 
 
+.. py:function:: ALIGN(data, ref):
+
+    按指定的参考日期对齐
+
+    :param Indicator data: 输入数据
+    :param ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :retype: Indicator
+
 .. py:function:: AMA([data, n=10, fast_n=2, slow_n=30])
 
     佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_

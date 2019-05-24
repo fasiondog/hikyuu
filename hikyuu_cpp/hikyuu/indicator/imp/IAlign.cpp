@@ -17,7 +17,7 @@ BOOST_CLASS_EXPORT(hku::IAlign)
 namespace hku {
 
 IAlign::IAlign() : IndicatorImp("ALIGN", 1) {
-    setParam<DatetimeList>("ref_date_list", DatetimeList());
+    setParam<DatetimeList>("align_date_list", DatetimeList());
 }
 
 IAlign::~IAlign() {
@@ -29,11 +29,8 @@ bool IAlign::check() {
 }
 
 void IAlign::_calculate(const Indicator& ind) {
-    DatetimeList dates = getParam<DatetimeList>("ref_date_list");
-    if (dates.empty()) {
-        dates = getContext().getDatetimeList();
-    }
-
+    // ref_date_list 参数会影响 IndicatorImp 全局，勿随意修改
+    DatetimeList dates = getParam<DatetimeList>("align_date_list");
     size_t total = dates.size();
     m_result_num = ind.getResultNumber();
     _readyBuffer(total, m_result_num);
@@ -42,6 +39,37 @@ void IAlign::_calculate(const Indicator& ind) {
     if (total == 0 || ind_total == 0) {
         m_discard = 0;
         return;
+    }
+
+    //处理本身没有上下文日期的指标
+    if (ind.getDatetimeList().size() == 0) {
+        if (ind_total <= total) {
+            size_t offset = total - ind_total;
+            m_discard = offset + ind.discard();
+            for (size_t i = m_discard; i < total; i++) {
+                size_t pos = i - offset;
+                for (size_t r = 0; r < m_result_num; r++) {
+                    _set(ind.get(pos, r), i, r);
+                }
+            }
+            return;
+
+        } else {
+            //ind_total > total
+            m_discard = 0;
+            size_t offset = ind_total - total;
+            if (ind.discard() > offset) {
+                m_discard = ind.discard() - offset;
+            }
+
+            for (size_t i = m_discard; i < total; i++) {
+                size_t pos = i + offset;
+                for (size_t r = 0; r < m_result_num; r++) {
+                    _set(ind.get(pos, r), i, r);
+                }
+            }
+            return;
+        }
     }
 
     size_t ind_idx = 0;
@@ -77,8 +105,9 @@ void IAlign::_calculate(const Indicator& ind) {
                 }
             } else {
                 if (i >= 1) {
+                    size_t pos = i-1;
                     for (size_t r = 0; r < m_result_num; r++) {
-                        _set(get(i-1, r), i, r);
+                        _set(get(pos, r), i, r);
                     }
                 }
             }
@@ -109,13 +138,9 @@ void IAlign::_calculate(const Indicator& ind) {
 }
 
 
-Indicator HKU_API ALIGN() {
-    return Indicator(make_shared<IAlign>());
-}
-
 Indicator HKU_API ALIGN(const DatetimeList& ref) {
     IndicatorImpPtr p = make_shared<IAlign>();
-    p->setParam<DatetimeList>("ref", ref);
+    p->setParam<DatetimeList>("align_date_list", ref);
     return Indicator(p);
 }
 

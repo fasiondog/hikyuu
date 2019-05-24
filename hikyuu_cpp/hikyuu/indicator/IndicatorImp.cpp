@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 #include <stdexcept>
+#include <algorithm>
 #include "Indicator.h"
 #include "../Stock.h"
 #include "../Log.h"
@@ -236,25 +237,36 @@ void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
 }
 
 DatetimeList IndicatorImp::getDatetimeList() const {
+    if (haveParam("align_date_list")) {
+         return getParam<DatetimeList>("align_date_list");
+    }
     return getContext().getDatetimeList();
 }
 
 Datetime IndicatorImp::getDatetime(size_t pos) const {
+    if (haveParam("align_date_list")) {
+        DatetimeList dates(getParam<DatetimeList>("align_date_list"));
+        return pos < dates.size() ? dates[pos] : Null<Datetime>();
+    }
     KData k = getContext();
     return pos < k.size() ? k[pos].datetime : Null<Datetime>();
 }
 
 price_t IndicatorImp::getByDate(Datetime date, size_t num) {
-    price_t result = Null<price_t>();
-    KData k = getContext();
-    size_t pos = k.getPos(date);
-    if (pos != Null<size_t>()) {
-        result = get(pos, num);
-    }
-    return result;
+    size_t pos = getPos(date);
+    return (pos != Null<size_t>()) ? get(pos, num) : Null<price_t>();
 }
 
 size_t IndicatorImp::getPos(Datetime date) const {
+    if (haveParam("align_date_list")) {
+        DatetimeList dates(getParam<DatetimeList>("align_date_list"));
+        auto iter = std::lower_bound(dates.begin(), dates.end(), date);
+        if (iter != dates.end() && *iter == date) {
+            return iter - dates.begin();
+        } else {
+            return Null<size_t>();
+        }
+    }
     return getContext().getPos(date);
 }
 

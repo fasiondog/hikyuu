@@ -288,10 +288,10 @@ Indicator (*AD_2)(const KData&) = AD;
 Indicator (*COST_1)(double x) = COST;
 Indicator (*COST_2)(const KData&, double x) = COST;
 
-Indicator (*ALIGN_1)() = ALIGN;
-Indicator (*ALIGN_2)(const DatetimeList&) = ALIGN;
-Indicator (*ALIGN_3)(const Indicator&) = ALIGN;
-Indicator (*ALIGN_4)(const Indicator&, const DatetimeList&) = ALIGN;
+Indicator (*ALIGN_1)(const DatetimeList&) = ALIGN;
+Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&) = ALIGN;
+Indicator (*ALIGN_3)(const Indicator&, const Indicator&) = ALIGN;
+Indicator (*ALIGN_4)(const Indicator&, const KData&) = ALIGN;
 
 
 void export_Indicator_build_in() {
