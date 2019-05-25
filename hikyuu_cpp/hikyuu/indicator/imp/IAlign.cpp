@@ -37,7 +37,7 @@ void IAlign::_calculate(const Indicator& ind) {
 
     size_t ind_total = ind.size();
     if (total == 0 || ind_total == 0) {
-        m_discard = 0;
+        m_discard = total;
         return;
     }
 
@@ -72,6 +72,7 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
+    //其它有上下文日期对应的指标数据
     size_t ind_idx = 0;
     for (size_t i = 0; i < total; i++) {
         Datetime ind_date = ind.getDatetime(ind_idx);

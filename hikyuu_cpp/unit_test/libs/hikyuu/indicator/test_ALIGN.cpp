@@ -31,7 +31,126 @@ using namespace hku;
 /** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     Indicator result;
+    Stock stk = getStock("sh000001");
 
+    PriceList a;
+    for (int i = 0; i < 10; i++) {
+        a.push_back(i);
+    }
+
+    /** @arg 输入指标本身和上下文无关，参考日期长度为0 */
+    DatetimeList ref;
+    Indicator data = PRICELIST(a);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(ref.size() == 0);
+    BOOST_CHECK(result.size() == 0);
+    BOOST_CHECK(result.discard() == 0);
+
+    /** @arg 输入指标本身和上下文无关，和参考日期列表等长 */
+    ref = stk.getDatetimeList(KQuery(-10));
+    data = PRICELIST(a);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == 0);
+    DatetimeList result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.size(); i++) {
+        BOOST_CHECK(result[i] == data[i]);
+        BOOST_CHECK(result_dates[i] == ref[i]);
+    }
+
+    /** @arg 输入指标本身和上下文无关，且长度长于参考日期列表 */
+    a.push_back(11);
+    data = PRICELIST(a);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == 0);
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.size(); i++) {
+        BOOST_CHECK(result[i] == data[i+1]);
+        BOOST_CHECK(result_dates[i] == ref[i]);
+    }
+
+    /** @arg 输入指标本身和上下文无关，且长度小于参考日期列表 */
+    a.clear();
+    a.push_back(1);
+    data = PRICELIST(a);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == 9);
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.discard(); i++) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(result_dates[i] == ref[i]);
+    }
+    BOOST_CHECK(result[9] == 1);
+    BOOST_CHECK(result_dates[9] == ref[9]);
+
+    /** @arg 输入指标本身和上下文无关，且长度为0 */
+    a.clear();
+    data = PRICELIST(a);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == ref.size());
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.discard(); i++) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(result_dates[i] == ref[i]);
+    }
+
+    for (int i = 0; i < ref.size(); i++) {
+        std::cout << ref[i] << std::endl;
+    }
+
+    /** @arg ind对应日期全部大于参考日期 */
+    KData k = stk.getKData(KQuery(-10));
+    ref.clear();
+    ref.push_back(Datetime(201901010000));
+    ref.push_back(Datetime(201901020000));
+    ref.push_back(Datetime(201901030000));
+    data = CLOSE(k);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == ref.size());
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.discard(); i++) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(result_dates[i] == ref[i]);
+    }
+
+    /** @arg ind对应日期全部小于参考日期 */
+    ref.clear();
+    ref.push_back(Datetime(191901010000));
+    ref.push_back(Datetime(191901020000));
+    ref.push_back(Datetime(191901030000));
+    data = CLOSE(k);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == ref.size());
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.discard(); i++) {
+        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(result_dates[i] == ref[i]);
+    }
+ 
+    /** @arg ind对应日期等于参考日期 */
+    ref = k.getDatetimeList();
+    data = CLOSE(k);
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == 0);
+    result_dates = result.getDatetimeList();
+    for (int i = 0; i < result.size(); i++) {
+        BOOST_CHECK(result[i] == data[i]);
+        BOOST_CHECK(result_dates[i] == ref[i]);
+    }
 }
 
 
