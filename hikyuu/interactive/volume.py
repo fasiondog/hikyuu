@@ -44,15 +44,15 @@ from hikyuu.interactive.drawplot import (create_figure,
                                          show_gcf)
 
 def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60, 
-         ma5_n=100, ma_type="SMA", vma1_n=5, vma2_n=10):
+         ma5_n=100, vma1_n=5, vma2_n=10):
     """绘制普通K线图 + 成交量（成交金额）"""
     kdata = stock.getKData(query)
     close = CLOSE(kdata,)
-    ma1 = MA(close, ma1_n, ma_type)
-    ma2 = MA(close, ma2_n, ma_type)
-    ma3 = MA(close, ma3_n, ma_type)
-    ma4 = MA(close, ma4_n, ma_type)
-    ma5 = MA(close, ma5_n, ma_type)
+    ma1 = MA(close, ma1_n)
+    ma2 = MA(close, ma2_n)
+    ma3 = MA(close, ma3_n)
+    ma4 = MA(close, ma4_n)
+    ma5 = MA(close, ma5_n)
 
     ax1, ax2 = create_figure(2)
     kdata.plot(axes=ax1)
@@ -62,7 +62,7 @@ def draw(stock, query=Query(-130), ma1_n=5, ma2_n=10, ma3_n=20, ma4_n=60,
     ma4.plot(axes=ax1, legend_on=True)
     ma5.plot(axes=ax1, legend_on=True)
     
-    sg = SG_Cross(MA(n=ma1_n, type=ma_type), MA(n=ma2_n, type=ma_type))
+    sg = SG_Cross(MA(n=ma1_n), MA(n=ma2_n))
     sg.setTO(kdata)
     sg.plot(axes=ax1, kdata=kdata)
     
