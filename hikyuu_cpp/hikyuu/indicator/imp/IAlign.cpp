@@ -135,8 +135,8 @@ void IAlign::_calculate(const Indicator& ind) {
     for (size_t i = 0; i < total; i++) {
         all_not_null = true;
         for (size_t r = 0; r < m_result_num; r++) {
-            //if (get(i, r) == Null<price_t>()) {
-            if (std::isnan(get(i, r))) {
+            if (get(i, r) == Null<price_t>()) {
+            //if (std::isnan(get(i, r))) {
                 all_not_null = false;
                 break;
             }
