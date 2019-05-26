@@ -46,10 +46,9 @@ void IAlign::_calculate(const Indicator& ind) {
         if (ind_total <= total) {
             size_t offset = total - ind_total;
             m_discard = offset + ind.discard();
-            for (size_t i = m_discard; i < total; i++) {
-                size_t pos = i - offset;
-                for (size_t r = 0; r < m_result_num; r++) {
-                    _set(ind.get(pos, r), i, r);
+            for (size_t r = 0; r < m_result_num; r++) {
+                for (size_t i = m_discard; i < total; i++) {
+                    _set(ind.get(i - offset, r), i, r);
                 }
             }
             return;
@@ -62,10 +61,9 @@ void IAlign::_calculate(const Indicator& ind) {
                 m_discard = ind.discard() - offset;
             }
 
-            for (size_t i = m_discard; i < total; i++) {
-                size_t pos = i + offset;
-                for (size_t r = 0; r < m_result_num; r++) {
-                    _set(ind.get(pos, r), i, r);
+            for (size_t r = 0; r < m_result_num; r++) {
+                for (size_t i = m_discard; i < total; i++) {
+                    _set(ind.get(i + offset, r), i, r);
                 }
             }
             return;
@@ -75,6 +73,18 @@ void IAlign::_calculate(const Indicator& ind) {
     //其它有上下文日期对应的指标数据
     size_t ind_idx = 0;
     for (size_t i = 0; i < total; i++) {
+        if (ind_idx >= ind_total) {
+            if (i >= 1) {
+                for (size_t r = 0; r < m_result_num; r++) {
+                    price_t val = get(i - 1, r);
+                    for (; i < total; i++) {
+                        _set(val, i, r);
+                    }
+                }
+            }
+            break;
+        }
+
         Datetime ind_date = ind.getDatetime(ind_idx);
         if (ind_date == dates[i]) {
             for (size_t r = 0; r < m_result_num; r++) {
@@ -83,17 +93,17 @@ void IAlign::_calculate(const Indicator& ind) {
             ind_idx++;
         
         } else if (ind_date < dates[i]) {
-            size_t j = i + 1;
+            size_t j = ind_idx + 1;
             while (j < ind_total && ind.getDatetime(j) < dates[i]) {
                 j++;
             }
 
-            if (j == ind_total) {
+            if (j >= ind_total) {
                 if (i >= 1) {
-                    for(; i < total; i++) {
-                        size_t pos = i - 1;
-                        for (size_t r = 0; r < m_result_num; r++) {
-                            _set(get(pos, r), i, r);
+                    for (size_t r = 0; r < m_result_num; r++) {
+                        price_t val = ind.get(j-1, r);
+                        for(; i < total; i++) {
+                            _set(val, i, r);
                         }
                     }
                 }
@@ -106,9 +116,9 @@ void IAlign::_calculate(const Indicator& ind) {
                 }
             } else {
                 if (i >= 1) {
-                    size_t pos = i-1;
+                    size_t pos = j - 1;
                     for (size_t r = 0; r < m_result_num; r++) {
-                        _set(get(pos, r), i, r);
+                        _set(ind.get(pos, r), i, r);
                     }
                 }
             }
@@ -125,7 +135,8 @@ void IAlign::_calculate(const Indicator& ind) {
     for (size_t i = 0; i < total; i++) {
         all_not_null = true;
         for (size_t r = 0; r < m_result_num; r++) {
-            if (get(i, r) == Null<price_t>()) {
+            //if (get(i, r) == Null<price_t>()) {
+            if (std::isnan(get(i, r))) {
                 all_not_null = false;
                 break;
             }

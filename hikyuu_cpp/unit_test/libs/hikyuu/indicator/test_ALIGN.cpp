@@ -102,10 +102,6 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
         BOOST_CHECK(result_dates[i] == ref[i]);
     }
 
-    for (int i = 0; i < ref.size(); i++) {
-        std::cout << ref[i] << std::endl;
-    }
-
     /** @arg ind对应日期全部大于参考日期 */
     KData k = stk.getKData(KQuery(-10));
     ref.clear();
@@ -150,6 +146,31 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     for (int i = 0; i < result.size(); i++) {
         BOOST_CHECK(result[i] == data[i]);
         BOOST_CHECK(result_dates[i] == ref[i]);
+    }
+
+    /** @arg ind对应部分日期 */
+    ref.clear();
+    ref.push_back(Datetime(201111220000));
+    ref.push_back(Datetime(201111230000));
+    ref.push_back(Datetime(201111240000));
+    ref.push_back(Datetime(201111260000));
+    ref.push_back(Datetime(201112060000));
+    ref.push_back(Datetime(201112070000));
+    ref.push_back(Datetime(201112100000));
+    data = CLOSE(k);
+    for (size_t i = 0; i < data.size(); i++) {
+        std::cout << k[i].datetime << ": " << data[i] << std::endl;
+    }
+    result = ALIGN(data, ref);
+    BOOST_CHECK(result.name() == "ALIGN");
+    BOOST_CHECK(result.size() == ref.size());
+    BOOST_CHECK(result.discard() == 1);
+    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK_CLOSE(result[1], 2395.07, 0.01);
+    BOOST_CHECK_CLOSE(result[2], 2397.55, 0.01);
+    std::cout << result.discard() << std::endl;
+    for (int i = 0; i < result.size(); i++) {
+        std::cout << ref[i] << ": " << result[i] << std::endl;
     }
 }
 

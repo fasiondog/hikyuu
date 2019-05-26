@@ -103,6 +103,7 @@ class Null<double> {
 public:
     Null() {}
     operator double() {
+        //return (std::numeric_limits<double>::quiet_NaN)();
         return (std::numeric_limits<double>::max)();
     }
 };

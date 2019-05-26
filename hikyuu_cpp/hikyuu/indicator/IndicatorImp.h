@@ -17,6 +17,8 @@
     #if HKU_SUPPORT_XML_ARCHIVE
     #include <boost/archive/xml_oarchive.hpp>
     #include <boost/archive/xml_iarchive.hpp>
+    //TODO
+    //#include "../serialization/double_serialization.h"
     #endif /* HKU_SUPPORT_XML_ARCHIVE */
 
     #if HKU_SUPPORT_TEXT_ARCHIVE
