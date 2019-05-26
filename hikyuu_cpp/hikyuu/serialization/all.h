@@ -8,6 +8,7 @@
 #ifndef ALL_SERIALIZATION_H_
 #define ALL_SERIALIZATION_H_
 
+#include "double_serialization.h"
 #include "Datetime_serialization.h"
 #include "KData_serialization.h"
 #include "KQuery_serialization.h"

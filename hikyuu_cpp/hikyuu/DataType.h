@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <list>
+#include <cmath>
 #include <memory>
 //#include <vector>
 #include <map>
@@ -65,6 +66,10 @@ using std::unordered_map;
 
 typedef vector<price_t> PriceList;
 typedef vector<string> StringList;
+
+using std::isnan;
+using std::isinf;
+using std::isfinite;
 
 /** @} */
 

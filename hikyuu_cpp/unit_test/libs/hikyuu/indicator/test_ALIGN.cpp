@@ -172,6 +172,11 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     for (int i = 0; i < result.size(); i++) {
         std::cout << ref[i] << ": " << result[i] << std::endl;
     }
+
+    std::cout << "--------------------------" << std::endl;
+    std::cout << (double(1.0) == Null<price_t>()) << std::endl;
+    std::cout << (100.0 == Null<price_t>()) << std::endl;
+    std::cout << (Null<price_t>() == Null<price_t>()) << std::endl;
 }
 
 

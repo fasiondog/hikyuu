@@ -44,7 +44,10 @@ template <>
 class StreamSelector<double> {
  public:
   constexpr static double nan = std::numeric_limits<double>::quiet_NaN();
+  constexpr static double inf = std::numeric_limits<double>::infinity();
   constexpr static const char* nanCStr = "nan";
+  constexpr static const char* infCStr = "+inf";
+  constexpr static const char* pinfCStr = "-inf";
 
   static boost::archive::xml_iarchive&
   stream(boost::archive::xml_iarchive& ia,
@@ -52,8 +55,15 @@ class StreamSelector<double> {
   {
     std::string iStr;
     ia >>  boost::serialization::make_nvp(nvp.name(), iStr);
-    if(iStr == nanCStr) nvp.value() = nan;
-    else nvp.value() = std::stod(iStr);
+    if(iStr == nanCStr) {
+      nvp.value() = nan;
+    } else if (iStr == infCStr) {
+      nvp.value() = inf;
+    } else if (iStr == pinfCStr) {
+      nvp.value() = -inf;
+    } else {
+      nvp.value() = std::stod(iStr);
+    }
 
     return ia;
   }
@@ -65,8 +75,10 @@ class StreamSelector<double> {
     if(std::isnan(nvp.value())) {
       std::string nanStr = nanCStr;
       oa << boost::serialization::make_nvp(nvp.name(), nanStr);
-    }
-    else {
+    } else if (std::isinf(nvp.value())) {
+      std::string infStr = nvp.value() > 0 ? infCStr : pinfCStr;
+      oa << boost::serialization::make_nvp(nvp.name(), infStr);
+    } else {
       std::stringstream oStrm;
       oStrm << std::setprecision(std::numeric_limits<double>::digits10 + 1)
             << nvp.value();
