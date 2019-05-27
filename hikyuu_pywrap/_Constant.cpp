@@ -15,6 +15,7 @@ using namespace hku;
 struct Constant {
     Constant():
         null_datetime(Null<Datetime>()),
+        inf(std::numeric_limits<double>::infinity()),
         null_price(Null<price_t>()),
         null_int(Null<int>()),
         null_size(Null<size_t>()),
@@ -38,6 +39,7 @@ struct Constant {
     }
 
     Datetime null_datetime;
+    price_t inf;
     price_t null_price;
     int null_int;
     size_t null_size;
@@ -60,6 +62,8 @@ struct Constant {
 void export_Constant() {
     class_<Constant>("Constant")
             .def_readonly("null_datetime", &Constant::null_datetime)
+            .def_readonly("nan", &Constant::inf)
+            .def_readonly("nan", &Constant::null_price)
             .def_readonly("null_price", &Constant::null_price)
             .def_readonly("null_int", &Constant::null_int)
             .def_readonly("null_size", &Constant::null_size)

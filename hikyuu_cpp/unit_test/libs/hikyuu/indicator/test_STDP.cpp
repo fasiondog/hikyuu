@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( test_STDP ) {
     Indicator dev = STDP(ind, 10);
     BOOST_CHECK(dev.name() == "STDP");
     BOOST_CHECK(dev.size() == 15);
-    BOOST_CHECK(dev[8] == Null<price_t>());
+    BOOST_CHECK(std::isnan(dev[8]));
     BOOST_CHECK(std::fabs(dev[9] - 2.77308) < 0.00001 );
     BOOST_CHECK(std::fabs(dev[10] - 2.98161) < 0.00001 );
     BOOST_CHECK(std::fabs(dev[11] - 2.68514) < 0.00001 );
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE( test_STDP ) {
     BOOST_CHECK(dev.name() == "STDP");
     BOOST_CHECK(dev.size() == 15);
     for (size_t i = 0; i < dev.size(); ++i) {
-        BOOST_CHECK(dev[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(dev[i]));
     }
 
     /** @arg operator() */

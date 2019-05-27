@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( test_DIFF ) {
     Indicator diff = DIFF(ind);
     BOOST_CHECK(diff.size() == 10);
     BOOST_CHECK(diff.discard() == 1);
-    BOOST_CHECK(diff[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(diff[0]));
     for (size_t i = 1; i < 10; ++i) {
         BOOST_CHECK(diff[i] == d[i] - d[i-1]);
     }

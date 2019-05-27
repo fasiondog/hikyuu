@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE( test_STDEV ) {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 10);
     BOOST_CHECK(dev.size() == 15);
-    BOOST_CHECK(dev[8] == Null<price_t>());
+    BOOST_CHECK(std::isnan(dev[8]));
     BOOST_CHECK(std::fabs(dev[9] - 2.923088) < 0.000001 );
     BOOST_CHECK(std::fabs(dev[10] - 3.142893) < 0.000001 );
     BOOST_CHECK(std::fabs(dev[11] - 2.830390) < 0.000001 );
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( test_STDEV ) {
     dev = STDEV(ind, 1);
     BOOST_CHECK(dev.size() == 15);
     for (size_t i = 0; i < dev.size(); ++i) {
-        BOOST_CHECK(dev[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(dev[i]));
     }
 
     /** @arg operator() */

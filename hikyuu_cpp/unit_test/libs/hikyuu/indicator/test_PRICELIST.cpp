@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( test_PRICELIST ) {
     result = PRICELIST(tmp_list, 1);
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     for (size_t i = 1; i < 10; ++i) {
         BOOST_CHECK(result[i] == tmp_list[i]);
     }

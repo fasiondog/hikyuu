@@ -148,3 +148,4 @@ except:
     print("warning:can't import numpy or pandas lib, ",  
           "you can't use method Inidicator.to_np() and to_df!")
 
+VALUE = PRICELIST

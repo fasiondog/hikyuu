@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( test_CVAL ) {
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.discard() == 1);
     BOOST_CHECK(result.getResultNumber() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
 
     /** @arg 测试discard, ind discard=2 */
     ind = PRICELIST(d);

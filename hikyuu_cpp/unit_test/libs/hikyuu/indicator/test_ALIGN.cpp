@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     BOOST_CHECK(result.discard() == 9);
     result_dates = result.getDatetimeList();
     for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
         BOOST_CHECK(result_dates[i] == ref[i]);
     }
     BOOST_CHECK(result[9] == 1);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     BOOST_CHECK(result.discard() == ref.size());
     result_dates = result.getDatetimeList();
     for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
         BOOST_CHECK(result_dates[i] == ref[i]);
     }
 
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     BOOST_CHECK(result.discard() == ref.size());
     result_dates = result.getDatetimeList();
     for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
         BOOST_CHECK(result_dates[i] == ref[i]);
     }
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     BOOST_CHECK(result.discard() == ref.size());
     result_dates = result.getDatetimeList();
     for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
         BOOST_CHECK(result_dates[i] == ref[i]);
     }
  
@@ -165,18 +165,13 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     BOOST_CHECK(result.name() == "ALIGN");
     BOOST_CHECK(result.size() == ref.size());
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK_CLOSE(result[1], 2395.07, 0.01);
     BOOST_CHECK_CLOSE(result[2], 2397.55, 0.01);
     std::cout << result.discard() << std::endl;
     for (int i = 0; i < result.size(); i++) {
         std::cout << ref[i] << ": " << result[i] << std::endl;
     }
-
-    std::cout << "--------------------------" << std::endl;
-    std::cout << (double(1.0) == Null<price_t>()) << std::endl;
-    std::cout << (100.0 == Null<price_t>()) << std::endl;
-    std::cout << (Null<price_t>() == Null<price_t>()) << std::endl;
 }
 
 

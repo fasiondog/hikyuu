@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE( test_ASIN ) {
     result = ASIN(1.01);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
 }
 
 

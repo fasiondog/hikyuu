@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( test_operator_add ) {
     BOOST_CHECK(result.size() == 20);
     BOOST_CHECK(result.discard() == 10);
     for (size_t i = 0; i < result.discard(); ++i) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
     for (size_t i = result.discard(); i < 20; ++i) {
         BOOST_CHECK(result[i] == i + i - 10);
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( test_operator_division ) {
     BOOST_CHECK(result.discard() == 0);
     for (size_t i = 0; i < 10; ++i) {
         if (data1[i] == 0.0) {
-            BOOST_CHECK(result[i] == Null<price_t>());
+            BOOST_CHECK(std::isnan(result[i]));
         } else {
             BOOST_CHECK(result[i] == data2[i] / data1[i]);
         }
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE( test_operator_division ) {
     BOOST_CHECK(result.size() == k.size());
     for (size_t i = 0; i < result.size(); ++i) {
         if (data1[i] == 0.0) {
-            BOOST_CHECK(result[i] == Null<price_t>());
+            BOOST_CHECK(std::isnan(result[i]));
         } else {
             BOOST_CHECK(result[i] == (k[i] / data1[i]));
         }
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE( test_operator_mod ) {
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.getResultNumber() == 1);
     BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK(result[1] == 0);
     BOOST_CHECK(result[2] == 0);
     BOOST_CHECK(result[3] == 2);
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE( test_operator_mod ) {
     BOOST_CHECK(k.size() == data1.size());
     result = k % data1;
     BOOST_CHECK(result.size() == k.size());
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK(result[1] == 0);
     BOOST_CHECK(result[2] == 1);
     BOOST_CHECK(result[3] == 1);

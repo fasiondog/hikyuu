@@ -61,20 +61,6 @@ BOOST_AUTO_TEST_CASE( test_EMA ) {
     BOOST_CHECK(std::fabs(ema[1] - 0.18182) < 0.0001);
     BOOST_CHECK(std::fabs(ema[2] - 0.51240) < 0.0001);
 
-#if 0 //由于修改了SMA计算过程，MA的抛弃数量为零，下面的测试用例失效
-    /** @arg 待计算的数据存在非零的discard */
-    Indicator ma = MA(data, 2);
-    ema = EMA(ma, 2);
-    BOOST_CHECK(ma.discard() == 1);
-    BOOST_CHECK(ema.discard() == 1);
-    BOOST_CHECK(ma[0] == Null<price_t>());
-    BOOST_CHECK(ma[1] == 0.5);
-    BOOST_CHECK(ma[2] == 1.5);
-    BOOST_CHECK(ema[0] == Null<price_t>());
-    BOOST_CHECK(ema[1] == 0.5);
-    BOOST_CHECK(std::fabs(ema[2] - 1.16667) < 0.0001 );
-#endif
-
     /** @arg operator() */
     Indicator ma = MA(data, 2);
     Indicator expect = EMA(ma, 2);

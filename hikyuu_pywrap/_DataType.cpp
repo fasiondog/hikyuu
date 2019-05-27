@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include <boost/python.hpp>
 #include <hikyuu/DataType.h>
 #include <hikyuu/serialization/Datetime_serialization.h>
@@ -67,7 +68,8 @@ void export_DataType() {
 
 
     def("toPriceList", toPriceList);
-
+    def("isnan", std::isnan<price_t>);
+    def("isinf", std::isinf<price_t>);
 }
 
 

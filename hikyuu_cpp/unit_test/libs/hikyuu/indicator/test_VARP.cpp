@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE( test_VARP ) {
     Indicator dev = VARP(ind, 10);
     BOOST_CHECK(dev.name() == "VARP");
     BOOST_CHECK(dev.size() == 15);
-    BOOST_CHECK(dev[8] == Null<price_t>());
+    BOOST_CHECK(std::isnan(dev[8]));
     BOOST_CHECK(std::fabs(dev[9] - 7.69) < 0.01 );
     BOOST_CHECK(std::fabs(dev[10] - 8.89) < 0.01 );
     BOOST_CHECK(std::fabs(dev[11] - 7.21) < 0.01 );
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE( test_VARP ) {
     BOOST_CHECK(dev.name() == "VARP");
     BOOST_CHECK(dev.size() == 15);
     for (size_t i = 0; i < dev.size(); ++i) {
-        BOOST_CHECK(dev[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(dev[i]));
     }
 
     /** @arg operator() */

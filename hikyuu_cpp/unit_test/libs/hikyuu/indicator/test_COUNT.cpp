@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( test_COUNT ) {
     x.setContext(getStock("sh600004"), KQuery(-8));
     BOOST_CHECK(x.size() == 8);
     BOOST_CHECK(x.discard() == 1);
-    BOOST_CHECK(x[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(x[0]));
     BOOST_CHECK(x[1] == 1);
     BOOST_CHECK(x[2] == 2);
     BOOST_CHECK(x[3] == 2);

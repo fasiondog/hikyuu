@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( test_EVERY ) {
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result[5] == 0);
     for (int i = 0; i < 5; i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
     
     /** @arg n=1, total>1 */
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE( test_EVERY ) {
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
     for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
     BOOST_CHECK(result[2] == 0);
     BOOST_CHECK(result[3] == 0);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_EVERY ) {
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
     for (int i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
     BOOST_CHECK(result[2] == 0);
     BOOST_CHECK(result[3] == 0);

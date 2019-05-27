@@ -42,11 +42,11 @@ BOOST_AUTO_TEST_CASE( test_LOG ) {
     BOOST_CHECK(result.name() == "LOG");
     BOOST_CHECK(result.size() == 11);
     BOOST_CHECK(result.discard() == 0);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     for (int i = 1; i <10; ++i) {
         BOOST_CHECK_CLOSE(result[i], std::log10(i), 0.00001);
     }
-    BOOST_CHECK(result[10] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[10]));
 
     result = LOG(10);
     BOOST_CHECK(result.size() == 1);

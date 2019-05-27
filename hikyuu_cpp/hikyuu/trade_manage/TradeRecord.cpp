@@ -134,7 +134,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeRecord& record) {
             << strip << name << strip << getBusinessName(record.business)
             << strip << record.planPrice << strip << record.realPrice;
 
-    if (record.goalPrice == Null<price_t>()) {
+    if (std::isnan(record.goalPrice)) {
         os << strip << "NULL";
     }  else {
         os << strip << record.goalPrice;
@@ -167,8 +167,9 @@ string TradeRecord::toString() const {
             << strip << name << strip << getBusinessName(business)
             << strip << planPrice << strip << realPrice;
 
-    if (goalPrice == Null<price_t>()) {
-        os << strip << "NULL";
+    //if (goalPrice == Null<price_t>()) {
+    if (std::isnan(goalPrice)) {
+        os << strip << "nan";
     }  else {
         os << strip << goalPrice;
     }

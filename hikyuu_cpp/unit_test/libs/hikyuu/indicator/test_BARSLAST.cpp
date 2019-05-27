@@ -47,9 +47,9 @@ BOOST_AUTO_TEST_CASE( test_BARSLAST ) {
     BOOST_CHECK(result.name() == "BARSLAST");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 3);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
-    BOOST_CHECK(result[2] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
+    BOOST_CHECK(std::isnan(result[2]));
     BOOST_CHECK(result[3] == 0);
     BOOST_CHECK(result[4] == 1);
     BOOST_CHECK(result[5] == 2);
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( test_BARSLAST ) {
     result = BARSLAST(0);
     BOOST_CHECK(result.size() == 1);
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
 
 }
 

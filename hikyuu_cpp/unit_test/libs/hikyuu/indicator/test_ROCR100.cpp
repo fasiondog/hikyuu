@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( test_ROCR100 ) {
     BOOST_CHECK(result.name() == "ROCR100");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK(result[1] == 0);
     BOOST_CHECK(result[2] == 200);
     BOOST_CHECK(result[3] == 150);
@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE( test_ROCR100 ) {
     BOOST_CHECK(result.name() == "ROCR100");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
     BOOST_CHECK(result[2] == 0);
     BOOST_CHECK(result[3] == 300);
     BOOST_CHECK(result[4] == 200);

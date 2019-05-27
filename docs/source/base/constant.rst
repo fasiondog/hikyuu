@@ -47,7 +47,11 @@ Null 值及证券类别
 
     .. py:attribute:: null_datetime 无效Datetime
     
-    .. py:attribute:: null_price 无效price
+    .. py:attribute:: inf
+
+    .. py:attribute:: nan
+
+    .. py:attribute:: null_price 同 nan
 
     .. py:attribute:: null_int 无效int
     

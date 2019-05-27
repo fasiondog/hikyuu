@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_st) {
     BOOST_CHECK(tr_list[1].business == BUSINESS_BUY);
     BOOST_CHECK(std::fabs(tr_list[1].planPrice - 26.45) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[1].realPrice - 26.45) < 0.00001);
-    BOOST_CHECK(tr_list[1].goalPrice == Null<price_t>());
+    BOOST_CHECK(std::isnan(tr_list[1].goalPrice));
     BOOST_CHECK(tr_list[1].number == 100);
     BOOST_CHECK(std::fabs(tr_list[1].cost.total - 0) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[1].stoploss - 26.19) < 0.00001);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_st) {
     BOOST_CHECK(tr_list[2].business == BUSINESS_SELL);
     BOOST_CHECK(std::fabs(tr_list[2].planPrice - 26.00) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[2].realPrice - 26.00) < 0.00001);
-    BOOST_CHECK(tr_list[2].goalPrice == Null<price_t>());
+    BOOST_CHECK(std::isnan(tr_list[2].goalPrice));
     BOOST_CHECK(tr_list[2].number == 100);
     BOOST_CHECK(std::fabs(tr_list[2].cost.total - 0) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[2].stoploss - 25.74) < 0.00001);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_st) {
     BOOST_CHECK(tr_list[3].business == BUSINESS_BUY);
     BOOST_CHECK(std::fabs(tr_list[3].planPrice - 25.28) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[3].realPrice - 25.28) < 0.00001);
-    BOOST_CHECK(tr_list[3].goalPrice == Null<price_t>());
+    BOOST_CHECK(std::isnan(tr_list[3].goalPrice));
     BOOST_CHECK(tr_list[3].number == 100);
     BOOST_CHECK(std::fabs(tr_list[3].cost.total - 0) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[3].stoploss - 25.03) < 0.00001);
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_st) {
     BOOST_CHECK(tr_list[1].business == BUSINESS_BUY);
     BOOST_CHECK(std::fabs(tr_list[1].planPrice - 26.50) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[1].realPrice - 26.50) < 0.00001);
-    BOOST_CHECK(tr_list[1].goalPrice == Null<price_t>());
+    BOOST_CHECK(std::isnan(tr_list[1].goalPrice));
     BOOST_CHECK(tr_list[1].number == 100);
     BOOST_CHECK(std::fabs(tr_list[1].cost.total - 0) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[1].stoploss - 26.24) < 0.00001);
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_st) {
     BOOST_CHECK(tr_list[2].business == BUSINESS_SELL);
     BOOST_CHECK(std::fabs(tr_list[2].planPrice - 26.00) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[2].realPrice - 26.00) < 0.00001);
-    BOOST_CHECK(tr_list[2].goalPrice == Null<price_t>());
+    BOOST_CHECK(std::isnan(tr_list[2].goalPrice));
     BOOST_CHECK(tr_list[2].number == 100);
     BOOST_CHECK(std::fabs(tr_list[2].cost.total - 0) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[2].stoploss - 25.74) < 0.00001);
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE( test_SYS_Simple_for_st) {
     BOOST_CHECK(tr_list[3].business == BUSINESS_BUY);
     BOOST_CHECK(std::fabs(tr_list[3].planPrice - 25.18) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[3].realPrice - 25.18) < 0.00001);
-    BOOST_CHECK(tr_list[3].goalPrice == Null<price_t>());
+    BOOST_CHECK(std::isnan(tr_list[3].goalPrice));
     BOOST_CHECK(tr_list[3].number == 100);
     BOOST_CHECK(std::fabs(tr_list[3].cost.total - 0) < 0.00001);
     BOOST_CHECK(std::fabs(tr_list[3].stoploss - 24.93) < 0.00001);

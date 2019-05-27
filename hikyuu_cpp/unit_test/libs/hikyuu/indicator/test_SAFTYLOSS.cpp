@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     BOOST_CHECK(result.size() == close.size());
     BOOST_CHECK(result.discard() == close.size());
     for (size_t i = 0; i < result.size(); ++i) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
 
     result = SAFTYLOSS(close, 0, 0);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK(result[1] == 27.67);
     BOOST_CHECK(result[2] == 28.05);
     BOOST_CHECK(result[3] == 27.45);
@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
     BOOST_CHECK(result.discard() == 2);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
     BOOST_CHECK(result[2] == 28.05);
     BOOST_CHECK(result[3] == 28.05);
     BOOST_CHECK(result[4] == 27.45);
@@ -87,9 +87,9 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
     BOOST_CHECK(result.discard() == 3);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
-    BOOST_CHECK(result[2] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
+    BOOST_CHECK(std::isnan(result[2]));
     BOOST_CHECK(std::fabs(result[3] - 27.97) < 0.0001);
     BOOST_CHECK(std::fabs(result[4] - 27.15) < 0.0001);
     BOOST_CHECK(std::fabs(result[5] - 25.05) < 0.0001);
@@ -99,10 +99,10 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
     BOOST_CHECK(result.discard() == 4);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
-    BOOST_CHECK(result[2] == Null<price_t>());
-    BOOST_CHECK(result[3] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
+    BOOST_CHECK(std::isnan(result[2]));
+    BOOST_CHECK(std::isnan(result[3]));
     BOOST_CHECK(std::fabs(result[4] - 27.97) < 0.0001);
     BOOST_CHECK(std::fabs(result[5] - 27.15) < 0.0001);
     BOOST_CHECK(std::fabs(result[6] - 26.7) < 0.0001);
@@ -112,10 +112,10 @@ BOOST_AUTO_TEST_CASE( test_SAFTYLOSS ) {
     BOOST_CHECK(result.empty() == false);
     BOOST_CHECK(result.size() == close.size());
     BOOST_CHECK(result.discard() == 11);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
-    BOOST_CHECK(result[2] == Null<price_t>());
-    BOOST_CHECK(result[10] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
+    BOOST_CHECK(std::isnan(result[2]));
+    BOOST_CHECK(std::isnan(result[10]));
     BOOST_CHECK(std::fabs(result[11] - 25.7486) < 0.0001);
     BOOST_CHECK(std::fabs(result[12] - 25.79) < 0.0001);
     BOOST_CHECK(std::fabs(result[13] - 26.03) < 0.0001);

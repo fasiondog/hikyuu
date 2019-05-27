@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( test_MA ) {
     BOOST_CHECK(ma.size() == kdata.size());
     BOOST_CHECK(ma.discard() == kdata.size());
     for (size_t i = 0; i < kdata.size(); ++i) {
-        BOOST_CHECK(ma[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(ma[i]));
     }
 
     /** @arg n = 10 且数据大小刚好为10 时, 正常关联数据 */

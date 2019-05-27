@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE( test_VAR ) {
     Indicator dev = VAR(ind, 10);
     BOOST_CHECK(dev.name() == "VAR");
     BOOST_CHECK(dev.size() == 15);
-    BOOST_CHECK(dev[8] == Null<price_t>());
+    BOOST_CHECK(std::isnan(dev[8]));
     BOOST_CHECK(std::fabs(dev[9] - 8.54444) < 0.00001 );
     BOOST_CHECK(std::fabs(dev[10] - 9.87778) < 0.00001 );
     BOOST_CHECK(std::fabs(dev[11] - 8.01111) < 0.00001 );
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE( test_VAR ) {
     BOOST_CHECK(dev.name() == "VAR");
     BOOST_CHECK(dev.size() == 15);
     for (size_t i = 0; i < dev.size(); ++i) {
-        BOOST_CHECK(dev[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(dev[i]));
     }
 
     /** @arg operator() */

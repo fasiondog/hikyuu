@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     BOOST_CHECK(result.name() == "SUMBARS");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK(result[1] == 0);
     BOOST_CHECK(result[2] == 0);
     BOOST_CHECK(result[3] == 0);
@@ -59,8 +59,8 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     BOOST_CHECK(result.name() == "SUMBARS");
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 2);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
     BOOST_CHECK(result[2] == 0);
     BOOST_CHECK(result[3] == 0);
     BOOST_CHECK(result[4] == 0);
@@ -75,10 +75,10 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.size() == data.size());
     BOOST_CHECK(result.discard() == 4);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
-    BOOST_CHECK(result[2] == Null<price_t>());
-    BOOST_CHECK(result[3] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
+    BOOST_CHECK(std::isnan(result[2]));
+    BOOST_CHECK(std::isnan(result[3]));
     BOOST_CHECK(result[4] == 2);
     BOOST_CHECK(result[5] == 1);
     BOOST_CHECK(result[6] == 1);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     BOOST_CHECK(result.discard() == 6);
     BOOST_CHECK(result.size() == 10);
     for (size_t i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
     BOOST_CHECK(result[6] == 3);
     BOOST_CHECK(result[7] == 2);
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 9);
     for (size_t i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
     BOOST_CHECK(result[9] == 8);
 
@@ -122,13 +122,13 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     BOOST_CHECK(result.size() == 10);
     BOOST_CHECK(result.discard() == 10);
     for (size_t i = 0; i < result.discard(); i++) {
-        BOOST_CHECK(result[i] == Null<price_t>());
+        BOOST_CHECK(std::isnan(result[i]));
     }
 
     result = SUMBARS(CVAL(10), 451);
     BOOST_CHECK(result.discard() == 1);
     BOOST_CHECK(result.size() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
 
     result = SUMBARS(CVAL(10), 10);
     BOOST_CHECK(result.size() == 1);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     result = SUMBARS(data, 20);
     BOOST_CHECK(result.size() == 2);
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK(result[1] == 0);
 
     result = SUMBARS(data, 0);
@@ -154,14 +154,14 @@ BOOST_AUTO_TEST_CASE( test_SUMBARS ) {
     result = SUMBARS(data, 30);
     BOOST_CHECK(result.size() == 2);
     BOOST_CHECK(result.discard() == 1);
-    BOOST_CHECK(result[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK(result[1] == 1);
 
     result = SUMBARS(data, 40);
     BOOST_CHECK(result.size() == 2);
     BOOST_CHECK(result.discard() == 2);
-    BOOST_CHECK(result[0] == Null<price_t>());
-    BOOST_CHECK(result[1] == Null<price_t>());
+    BOOST_CHECK(std::isnan(result[0]));
+    BOOST_CHECK(std::isnan(result[1]));
 }
 
 

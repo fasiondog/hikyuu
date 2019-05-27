@@ -10,6 +10,8 @@
 
 #include "../Indicator.h"
 
+#define VALUE PRICELIST
+
 namespace hku {
 
 /**
@@ -42,7 +44,6 @@ Indicator HKU_API PRICELIST(int result_index = 0);
  * @ingroup Indicator
  */
 Indicator HKU_API PRICELIST(price_t *data, size_t total);
-
 
 } /* namespace */
 

@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( test_VIGOR ) {
     BOOST_CHECK(vigor.discard() == 1);
     BOOST_CHECK(vigor.size()== 10);
     BOOST_CHECK(vigor.empty() == false);
-    BOOST_CHECK(vigor[0] == Null<price_t>());
+    BOOST_CHECK(std::isnan(vigor[0]));
     BOOST_CHECK(std::fabs(vigor[1] + 11761.36) < 0.0001 );
 
     vigor = VIGOR(kdata, 2);
