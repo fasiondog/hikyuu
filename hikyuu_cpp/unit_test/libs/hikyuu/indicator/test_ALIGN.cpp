@@ -158,9 +158,6 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     ref.push_back(Datetime(201112070000));
     ref.push_back(Datetime(201112100000));
     data = CLOSE(k);
-    for (size_t i = 0; i < data.size(); i++) {
-        std::cout << k[i].datetime << ": " << data[i] << std::endl;
-    }
     result = ALIGN(data, ref);
     BOOST_CHECK(result.name() == "ALIGN");
     BOOST_CHECK(result.size() == ref.size());
@@ -168,9 +165,12 @@ BOOST_AUTO_TEST_CASE( test_ALIGN ) {
     BOOST_CHECK(std::isnan(result[0]));
     BOOST_CHECK_CLOSE(result[1], 2395.07, 0.01);
     BOOST_CHECK_CLOSE(result[2], 2397.55, 0.01);
-    std::cout << result.discard() << std::endl;
+    BOOST_CHECK(std::isnan(result[3]));
+    BOOST_CHECK_CLOSE(result[4], 2325.91, 0.01);
+    BOOST_CHECK(std::isnan(result[5]));
+    BOOST_CHECK(std::isnan(result[6]));
     for (int i = 0; i < result.size(); i++) {
-        std::cout << ref[i] << ": " << result[i] << std::endl;
+        BOOST_CHECK(result.getDatetime(i) == ref[i]);
     }
 }
 

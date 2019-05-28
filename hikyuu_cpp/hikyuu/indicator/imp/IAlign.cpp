@@ -74,14 +74,6 @@ void IAlign::_calculate(const Indicator& ind) {
     size_t ind_idx = 0;
     for (size_t i = 0; i < total; i++) {
         if (ind_idx >= ind_total) {
-            if (i >= 1) {
-                for (size_t r = 0; r < m_result_num; r++) {
-                    price_t val = get(i - 1, r);
-                    for (; i < total; i++) {
-                        _set(val, i, r);
-                    }
-                }
-            }
             break;
         }
 
@@ -114,19 +106,9 @@ void IAlign::_calculate(const Indicator& ind) {
                 for (size_t r = 0; r < m_result_num; r++) {
                     _set(ind.get(j, r), i, r);
                 }
-            } else {
-                if (i >= 1) {
-                    size_t pos = j - 1;
-                    for (size_t r = 0; r < m_result_num; r++) {
-                        _set(ind.get(pos, r), i, r);
-                    }
-                }
             }
 
             ind_idx = j + 1;
-
-        } else { //ind_date > dates[i]
-
         }
     }
 
@@ -135,7 +117,6 @@ void IAlign::_calculate(const Indicator& ind) {
     for (size_t i = 0; i < total; i++) {
         all_not_null = true;
         for (size_t r = 0; r < m_result_num; r++) {
-            //if (get(i, r) == Null<price_t>()) {
             if (std::isnan(get(i, r))) {
                 all_not_null = false;
                 break;
