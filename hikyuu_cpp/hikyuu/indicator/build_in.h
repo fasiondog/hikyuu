@@ -34,6 +34,7 @@
 #include "crt/DIFF.h"
 #include "crt/DMA.h"
 #include "crt/DOWNNDAY.h"
+#include "crt/DROPNA.h"
 #include "crt/EMA.h"
 #include "crt/EXP.h"
 #include "crt/EXIST.h"

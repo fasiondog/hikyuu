@@ -387,6 +387,14 @@ DOWNNDAY(data[, n=3])
     :rtype: Indicator
 """
 
+DROPNA.__doc__ = """
+DROPNA([data])
+
+    删除 nan 值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+"""
 
 EMA.__doc__ = """
 EMA([data, n=22])

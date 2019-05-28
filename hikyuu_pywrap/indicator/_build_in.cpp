@@ -293,6 +293,9 @@ Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&) = ALIGN;
 Indicator (*ALIGN_3)(const Indicator&, const Indicator&) = ALIGN;
 Indicator (*ALIGN_4)(const Indicator&, const KData&) = ALIGN;
 
+Indicator (*DROPNA_1)() = DROPNA;
+Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
+
 
 void export_Indicator_build_in() {
     def("IKDATA", KDATA1);
@@ -581,4 +584,7 @@ void export_Indicator_build_in() {
     def("ALIGN", ALIGN_2);
     def("ALIGN", ALIGN_3);
     def("ALIGN", ALIGN_4);
+
+    def("DROPNA", DROPNA_1);
+    def("DROPNA", DROPNA_2);
 }

@@ -265,6 +265,14 @@
     :rtype: Indicator
 
 
+.. py:function:: DROPNA([data])
+
+    删除 nan 值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: DOWNNDAY(data[, n=3])
 
     连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期

@@ -8,7 +8,8 @@
 
 * :py:func:`ALIGN` - 按指定的参考日期对齐
 * :py:func:`CVAL` - 创建指定长度的固定数值指标
-* :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator
+* :py:func:`DROPNA` - 删除 nan 值
+* :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
 * :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
 
 
