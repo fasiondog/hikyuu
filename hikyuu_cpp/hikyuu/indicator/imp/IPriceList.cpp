@@ -56,6 +56,10 @@ void IPriceList::_calculate(const Indicator& data) {
             _set(x[i], i);
         }
 
+        for (size_t i = m_discard; i < total && std::isnan(get(i)); ++i) {
+            m_discard++;
+        }
+
         return;
     }
 

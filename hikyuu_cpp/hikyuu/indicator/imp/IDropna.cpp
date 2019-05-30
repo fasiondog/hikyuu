@@ -34,6 +34,7 @@ void IDropna::_calculate(const Indicator& ind) {
     if (ind.discard() >= total) {
         m_discard = 0;
         setParam<DatetimeList>("align_date_list", DatetimeList());
+        _readyBuffer(0, ind.getResultNumber());
         return;
     }
 
@@ -48,15 +49,15 @@ void IDropna::_calculate(const Indicator& ind) {
     DatetimeList dates;
     size_t pos = 0;
     for (size_t i = ind.discard(); i < total; i++) {
-        bool had_nan = false;
+        bool has_nan = false;
         for (size_t r = 0; r < m_result_num; r++) {
             if (std::isnan(ind.get(i, r))) {
-                had_nan = true;
+                has_nan = true;
                 break;
             }
         }
 
-        if (!had_nan) {
+        if (!has_nan) {
             dates.push_back(ind.getDatetime(i));
             for (size_t r = 0; r < m_result_num; r++) {
                 buf[pos + r * m_result_num] = ind.get(i, r);

@@ -34,7 +34,6 @@ void IExp::_calculate(const Indicator& data) {
         return;
     }
 
-    price_t null_price = Null<price_t>();
     for (size_t i = m_discard; i < total; ++i) {
         _set(std::exp(data[i]), i);
     }
