@@ -337,7 +337,7 @@ string IndicatorImp::formula() const {
         case WEAVE:
             buf << "WEAVE(" << m_left->formula() << ", " << m_right->formula() << ")";
 
-        case IF:
+        case OP_IF:
             buf << "IF(" << m_three->formula() << ", " 
                 << m_left->formula() << ", "
                 << m_right->formula() << ")";
@@ -417,7 +417,7 @@ add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
     }
 
     m_need_calculate = true;
-    m_optype = IndicatorImp::IF;
+    m_optype = IndicatorImp::OP_IF;
     m_three = cond->clone();
     m_left = left->clone();
     m_right = right->clone();
@@ -548,7 +548,7 @@ Indicator IndicatorImp::calculate() {
             execute_weave();
             break;
 
-        case IF:
+        case OP_IF:
             execute_if();
             break;
 

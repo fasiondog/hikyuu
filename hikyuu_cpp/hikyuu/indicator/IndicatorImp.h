@@ -70,7 +70,7 @@ public:
         AND, ///<与
         OR,  ///<或
         WEAVE, ///<特殊的，需要两个指标作为参数的指标
-        IF,  ///if操作
+        OP_IF,  ///if操作
         INVALID
     };
 

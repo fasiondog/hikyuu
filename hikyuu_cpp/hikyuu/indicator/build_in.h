@@ -13,6 +13,7 @@
 #include "crt/ABS.h"
 #include "crt/ACOS.h"
 #include "crt/AD.h"
+#include "crt/ADVANCE.h"
 #include "crt/ALIGN.h"
 #include "crt/AMA.h"
 #include "crt/ASIN.h"
