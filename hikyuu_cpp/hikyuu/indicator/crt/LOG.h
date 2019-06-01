@@ -25,7 +25,7 @@ inline Indicator LOG(const Indicator& ind) {
     return LOG()(ind);
 }
 
-Indicator LOG(price_t val) {
+inline Indicator LOG(price_t val) {
     return LOG(CVAL(val));
 }
 

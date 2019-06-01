@@ -19,8 +19,9 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ROCR100(int n =10);
+Indicator ROCR100(const Indicator& ind, int n = 10);
 
-Indicator ROCR100(const Indicator& ind, int n = 10) {
+inline Indicator ROCR100(const Indicator& ind, int n) {
     return ROCR100(n)(ind);
 }
 

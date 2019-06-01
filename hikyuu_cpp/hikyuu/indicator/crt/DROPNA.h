@@ -19,8 +19,9 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API DROPNA();
+Indicator DROPNA(const Indicator& ind);
 
-Indicator DROPNA(const Indicator& ind) {
+inline Indicator DROPNA(const Indicator& ind) {
     return DROPNA()(ind);
 }
 

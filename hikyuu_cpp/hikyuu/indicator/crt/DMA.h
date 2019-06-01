@@ -28,7 +28,7 @@ namespace hku {
  */
 Indicator DMA(const Indicator& ind1, const Indicator& a);
 
-Indicator DMA(const Indicator& ind1, const Indicator& a) {
+inline Indicator DMA(const Indicator& ind1, const Indicator& a) {
     Indicator dma = a * ind1 + (1 - a) * REF(ind1, 1);
     dma.name("DMA");
     return dma;

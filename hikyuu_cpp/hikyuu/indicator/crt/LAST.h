@@ -27,7 +27,7 @@ namespace hku {
 Indicator LAST(int m=10, int n=5);
 Indicator LAST(const Indicator& ind, int m=10, int n=5);
 
-Indicator LAST(int m, int n) {
+inline Indicator LAST(int m, int n) {
     int max = std::max(m,n);
     int min = std::min(m,n);
     Indicator result = REF(EVERY(max-min+1), min);

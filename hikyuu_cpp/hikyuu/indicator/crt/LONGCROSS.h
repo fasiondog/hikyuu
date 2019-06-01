@@ -36,15 +36,15 @@ inline Indicator LONGCROSS(const Indicator& x, const Indicator& y, int n) {
     return result;
 }
 
-Indicator LONGCROSS(const Indicator& x, price_t y, int n) {
+inline Indicator LONGCROSS(const Indicator& x, price_t y, int n) {
     return LONGCROSS(x, CVAL(x, y), n);
 }
 
-Indicator LONGCROSS(price_t x, const Indicator& y, int n) {
+inline Indicator LONGCROSS(price_t x, const Indicator& y, int n) {
     return LONGCROSS(CVAL(y, x), y, n);
 }
 
-Indicator LONGCROSS(price_t x, price_t y, int n) {
+inline Indicator LONGCROSS(price_t x, price_t y, int n) {
     return LONGCROSS(CVAL(x), CVAL(y), n);
 }
 

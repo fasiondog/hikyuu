@@ -30,15 +30,15 @@ inline Indicator CROSS(const Indicator& x, const Indicator& y) {
     return result;
 }
 
-Indicator CROSS(const Indicator& x, price_t y) {
+inline Indicator CROSS(const Indicator& x, price_t y) {
     return CROSS(x, CVAL(x, y));
 }
 
-Indicator CROSS(price_t x, const Indicator& y) {
+inline Indicator CROSS(price_t x, const Indicator& y) {
     return CROSS(CVAL(y, x), y);
 }
 
-Indicator CROSS(price_t x, price_t y) {
+inline Indicator CROSS(price_t x, price_t y) {
     return CROSS(CVAL(x), CVAL(y));
 }
 

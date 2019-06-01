@@ -23,7 +23,7 @@ namespace hku {
  */
 Indicator AVEDEV(const Indicator& ind, int n=22);
 
-Indicator AVEDEV(const Indicator& ind, int n) {
+inline Indicator AVEDEV(const Indicator& ind, int n) {
     Indicator result = ABS(ind - MA(ind, n)) / n;
     result.name("AVEDEV");
     return result;

@@ -19,16 +19,19 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ALIGN(const DatetimeList&);
+Indicator ALIGN(const Indicator& ind, const DatetimeList& ref);
+Indicator ALIGN(const Indicator& ind, const Indicator& ref);
+Indicator ALIGN(const Indicator& ind, const KData& ref);
 
-Indicator ALIGN(const Indicator& ind, const DatetimeList& ref) {
+inline Indicator ALIGN(const Indicator& ind, const DatetimeList& ref) {
     return ALIGN(ref)(ind);
 }
 
-Indicator ALIGN(const Indicator& ind, const Indicator& ref) {
+inline Indicator ALIGN(const Indicator& ind, const Indicator& ref) {
     return ALIGN(ref.getDatetimeList())(ind);
 }
 
-Indicator ALIGN(const Indicator& ind, const KData& ref) {
+inline Indicator ALIGN(const Indicator& ind, const KData& ref) {
     return ALIGN(ref.getDatetimeList())(ind);
 }
 
