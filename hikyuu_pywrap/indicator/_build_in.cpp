@@ -587,4 +587,6 @@ void export_Indicator_build_in() {
 
     def("DROPNA", DROPNA_1);
     def("DROPNA", DROPNA_2);
+
+    def("ADVANCE", ADVANCE, (arg("query")=KQueryByIndex(-100), arg("market")="SH", arg("stk_type")=STOCKTYPE_A));
 }

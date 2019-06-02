@@ -50,41 +50,35 @@ void IAdvance::_calculate(const Indicator& ind) {
         return;
     }
 
-    vector<size_t> stk_total(total, 0);
-    vector<size_t> stk_ad(total, 0);
-    Indicator x = ALIGN(IF(CLOSE() > REF(CLOSE(), 1), 1.0, 0.0), dates);
+    m_discard = 1;
+    _readyBuffer(total, 1);
+    Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), dates);
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
-        if (iter->market() != market || iter->type() != stk_type) {
+        if ((market != "" && iter->market() != market) 
+          || (iter->type() > STOCKTYPE_TMP && iter->type() != stk_type)) {
             continue;
         }
-        KData k = iter->getKData(q);
-        x.setContext(k);
+        x.setContext(*iter, q);
         for (size_t i = x.discard(); i < total; i++) {
             if (x.getDatetime(i) > iter->lastDatetime()) {
                 break;
             }
 
-            stk_total[i]++;
-
-            if (x[i] == 1.0) {
-                stk_ad[i]++;
+            if (x[i]) {
+                price_t val = get(i);
+                _set(std::isnan(val) ? 1 : val + 1, i);
             }
         }
-    }
-
-    m_discard = 1;
-    _readyBuffer(total, 1);
-    for (size_t i = m_discard; i < total; i++) {
-        _set(stk_ad[i] / stk_total[i], i);
     }
 }
 
 
-Indicator HKU_API ADVANCE(const DatetimeList& ref, const string& market, int stk_type) {
+Indicator HKU_API ADVANCE(const KQuery& query, const string& market, int stk_type) {
     IndicatorImpPtr p = make_shared<IAdvance>();
-    p->setParam<DatetimeList>("align_date_list", ref);
+    p->setParam<KQuery>("query", query);
     p->setParam<string>("market", market);
     p->setParam<int>("stk_type", stk_type);
+    p->calculate();
     return Indicator(p);
 }
 

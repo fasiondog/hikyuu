@@ -73,6 +73,7 @@ void export_Indicator() {
         .def("getResultNumber", &Indicator::getResultNumber)
         .def("get", &Indicator::get, get_overloads())
         .def("getPos", &Indicator::getPos)
+        .def("getDatetime", &Indicator::getDatetime)
         .def("getByDate", &Indicator::getByDate, getByDate_overloads())
         .def("getResult", &Indicator::getResult)
         .def("getResultAsPriceList", &Indicator::getResultAsPriceList)

@@ -19,7 +19,8 @@ namespace hku {
  * 上涨家数
  * @ingroup Indicator
  */
-Indicator HKU_API ADVANCE(const DatetimeList& ref, const string& market="SH", int stk_type=STOCKTYPE_A);
+Indicator HKU_API ADVANCE(const KQuery& query = KQueryByIndex(-100), 
+                          const string& market="SH", int stk_type=STOCKTYPE_A);
 
 
 }
