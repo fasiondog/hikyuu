@@ -42,8 +42,6 @@ BOOST_AUTO_TEST_CASE( test_PG_FixedHoldDays) {
 
     tm->buy(Datetime(199911110000LL), stk, 29.51, 100, 0.0, 0.0, 0.0, PART_SIGNAL);
 
-    price_t null_price = Null<price_t>();
-
     /** @arg 检查默认参数 */
     BOOST_CHECK(pg->getParam<int>("days") == 5);
 
@@ -55,54 +53,54 @@ BOOST_AUTO_TEST_CASE( test_PG_FixedHoldDays) {
 
     /** @arg days = 1 */
     pg->setParam<int>("days", 1);
-    BOOST_CHECK(pg->getGoal(Datetime(199911100000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911110000LL), 0.0) == null_price);
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911100000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911110000LL), 0.0)));
     BOOST_CHECK(pg->getGoal(Datetime(199911120000LL), 0.0) == 0.0);
     BOOST_CHECK(pg->getGoal(Datetime(199911130000LL), 0.0) == 0.0);
     BOOST_CHECK(pg->getGoal(Datetime(199911150000LL), 0.0) == 0.0);
 
     /** @arg days = 2 */
     pg->setParam<int>("days", 2);
-    BOOST_CHECK(pg->getGoal(Datetime(199911100000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911110000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911120000LL), 0.0) == null_price);
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911100000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911110000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911120000LL), 0.0)));
     BOOST_CHECK(pg->getGoal(Datetime(199911130000LL), 0.0) == 0.0);
     BOOST_CHECK(pg->getGoal(Datetime(199911150000LL), 0.0) == 0.0);
     BOOST_CHECK(pg->getGoal(Datetime(199911160000LL), 0.0) == 0.0);
 
     /** @arg days = 3 */
     pg->setParam<int>("days", 3);
-    BOOST_CHECK(pg->getGoal(Datetime(199911100000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911110000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911120000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911130000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911150000LL), 0.0) == null_price);
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911100000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911110000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911120000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911130000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911150000LL), 0.0)));
     BOOST_CHECK(pg->getGoal(Datetime(199911160000LL), 0.0) == 0.0);
 
     /** @arg days = 4 */
     pg->setParam<int>("days", 4);
-    BOOST_CHECK(pg->getGoal(Datetime(199911100000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911110000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911120000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911130000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911150000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911160000LL), 0.0) == null_price);
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911100000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911110000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911120000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911130000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911150000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911160000LL), 0.0)));
     BOOST_CHECK(pg->getGoal(Datetime(199911170000LL), 0.0) == 0.0);
 
     /** @arg days = 8 */
     pg->setParam<int>("days", 8);
-    BOOST_CHECK(pg->getGoal(Datetime(199911100000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911110000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911120000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911130000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911150000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911160000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911170000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911180000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911190000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911200000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911210000LL), 0.0) == null_price);
-    BOOST_CHECK(pg->getGoal(Datetime(199911220000LL), 0.0) == null_price);
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911100000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911110000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911120000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911130000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911150000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911160000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911170000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911180000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911190000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911200000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911210000LL), 0.0)));
+    BOOST_CHECK(std::isnan(pg->getGoal(Datetime(199911220000LL), 0.0)));
     BOOST_CHECK(pg->getGoal(Datetime(199911230000LL), 0.0) == 0.0);
 }
 

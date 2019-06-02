@@ -89,8 +89,12 @@ BOOST_AUTO_TEST_CASE( test_ASIN_export ) {
     BOOST_CHECK(x1.size() == x2.size());
     BOOST_CHECK(x1.discard() == x2.discard());
     BOOST_CHECK(x1.getResultNumber() == x2.getResultNumber());
-    for (size_t i = 0; i < x1.size(); ++i) {
-        BOOST_CHECK_CLOSE(x1[i], x2[i], 0.00001);
+    for (size_t i = x1.discard(); i < x1.size(); ++i) {
+        if (std::isnan(x1[i])) {
+            BOOST_CHECK(std::isnan(x2[i]));
+        } else {
+            BOOST_CHECK_CLOSE(x1[i], x2[i], 0.00001);
+        }
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */

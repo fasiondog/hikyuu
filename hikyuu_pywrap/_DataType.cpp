@@ -25,6 +25,11 @@ PriceList toPriceList(object o) {
     return result;
 }
 
+#if !defined(_MSVC_VER)
+bool (*isnan_func)(price_t) = std::isnan;
+bool (*isinf_func)(price_t) = std::isinf;
+#endif
+
 void export_DataType() {
 
     DatetimeList::const_reference (DatetimeList::*datetimeList_at)(DatetimeList::size_type) const = &DatetimeList::at;
@@ -68,8 +73,14 @@ void export_DataType() {
 
 
     def("toPriceList", toPriceList);
+
+#if defined(_MSVC_VER)
     def("isnan", std::isnan<price_t>);
     def("isinf", std::isinf<price_t>);
+#else
+    def("isnan", isnan_func);
+    def("isinf", isinf_func);
+#endif
 }
 
 

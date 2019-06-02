@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE( test_COS_export ) {
     BOOST_CHECK(x1.size() == x2.size());
     BOOST_CHECK(x1.discard() == x2.discard());
     BOOST_CHECK(x1.getResultNumber() == x2.getResultNumber());
-    for (size_t i = 0; i < x1.size(); ++i) {
+    for (size_t i = x1.discard(); i < x1.size(); ++i) {
         BOOST_CHECK_CLOSE(x1[i], x2[i], 0.00001);
     }
 }

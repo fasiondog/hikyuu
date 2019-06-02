@@ -49,7 +49,10 @@ BOOST_AUTO_TEST_CASE( test_DIFF ) {
     Indicator expect = DIFF(ind);
     Indicator result = diff(ind);
     BOOST_CHECK(expect.size() == result.size());
-    for (size_t i = 0; i < expect.size(); ++i) {
+    for (size_t i = 0; i < result.discard(); i++) {
+        BOOST_CHECK(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < expect.size(); ++i) {
         BOOST_CHECK(result[i] == expect[i]);
     }
 }
@@ -85,7 +88,7 @@ BOOST_AUTO_TEST_CASE( test_DIFF_export ) {
     BOOST_CHECK(ma1.size() == ma2.size());
     BOOST_CHECK(ma1.discard() == ma2.discard());
     BOOST_CHECK(ma1.getResultNumber() == ma2.getResultNumber());
-    for (size_t i = 0; i < ma1.size(); ++i) {
+    for (size_t i = ma1.discard(); i < ma1.size(); ++i) {
         BOOST_CHECK_CLOSE(ma1[i], ma2[i], 0.00001);
     }
 }

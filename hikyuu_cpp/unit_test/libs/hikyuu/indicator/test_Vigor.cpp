@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( test_VIGOR_export ) {
     BOOST_CHECK(ma1.size() == ma2.size());
     BOOST_CHECK(ma1.discard() == ma2.discard());
     BOOST_CHECK(ma1.getResultNumber() == ma2.getResultNumber());
-    for (size_t i = 0; i < ma1.size(); ++i) {
+    for (size_t i = ma1.discard(); i < ma1.size(); ++i) {
         BOOST_CHECK_CLOSE(ma1[i], ma2[i], 0.00001);
     }
 }
