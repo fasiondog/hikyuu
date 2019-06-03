@@ -591,4 +591,8 @@ void export_Indicator_build_in() {
     def("ADVANCE", ADVANCE, (arg("query")=KQueryByIndex(-100), 
                              arg("market")="SH", arg("stk_type")=STOCKTYPE_A,
                              arg("ignore_context")=false));
+    def("DECLINE", DECLINE, (arg("query")=KQueryByIndex(-100), 
+                             arg("market")="SH", arg("stk_type")=STOCKTYPE_A,
+                             arg("ignore_context")=false));
+
 }

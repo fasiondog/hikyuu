@@ -32,6 +32,7 @@
 **大盘指标**
 
 * :py:func:`ADVANCE` - 上涨家数
+* :py:func:`DECLINE` - 下跌家数
 
 **逻辑算术函数**
 
