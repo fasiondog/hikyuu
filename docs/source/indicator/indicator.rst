@@ -29,6 +29,17 @@
    :rtype: Indicator
 
 
+.. py:function:: ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
+
+    上涨家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
+
+    :param Query query: 查询条件
+    :param str market: 所属市场，等于 "" 时，获取所有市场
+    :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
+    :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
+    :rtype: Indicator
+
+
 .. py:function:: ALIGN(data, ref):
 
     按指定的参考日期对齐

@@ -20,7 +20,8 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ADVANCE(const KQuery& query = KQueryByIndex(-100), 
-                          const string& market="SH", int stk_type=STOCKTYPE_A);
+                          const string& market="SH", int stk_type=STOCKTYPE_A, 
+                          bool ignore_context=false);
 
 
 }
