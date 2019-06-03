@@ -490,6 +490,7 @@ Indicator IndicatorImp::calculate() {
             m_right->calculate();
             _readyBuffer(m_right->size(), m_result_num);
             _calculate(Indicator(m_right));
+            setParam<KData>("kdata", m_right->getParam<KData>("kdata"));
             break;
 
         case ADD:
