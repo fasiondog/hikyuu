@@ -8,6 +8,8 @@ option("boost-python-suffix")
                     "    - 3X autocheck for 35, 36, 37, 3x")
 option_end()
 
+add_includedirs("../hikyuu_cpp")
+
 if is_plat("windows") then
     add_defines("HKU_API=__declspec(dllimport)")
 end

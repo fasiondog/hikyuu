@@ -12,6 +12,8 @@ target("demo")
         set_kind("phony")
     end
     
+    add_includedirs("..")
+
     if is_plat("windows") then
         add_cxflags("-wd4267")
     end

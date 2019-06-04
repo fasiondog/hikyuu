@@ -21,7 +21,6 @@ add_cxflags("-ftemplate-depth-500")
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
-set_headerdir("$(buildir)/$(mode)/$(plat)/$(arch)/inc")
 
 add_includedirs("hikyuu_extern_libs/inc")
 

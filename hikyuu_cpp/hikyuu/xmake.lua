@@ -1,10 +1,11 @@
 target("hikyuu")
     set_kind("shared")
     
+    add_deps("hikyuu_utils")
+    add_includedirs("..")
+
     -- set version for release
     add_configfiles("version.h", {prefix = "HKU"})
-
-    add_deps("hikyuu_utils")
 
     if is_plat("windows") then
         add_cxflags("-wd4819")  
@@ -22,6 +23,7 @@ target("hikyuu")
         add_defines("SQLITE_API=__declspec(dllimport)")
         add_defines("HKU_API=__declspec(dllexport)")
         add_defines("PY_VERSION_HEX=0x03000000")
+        add_includedirs("../../hikyuu_extern_libs/src/sqlite3")
         add_deps("sqlite3")
         add_packages("hdf5")
         add_packages("mysql")
@@ -60,7 +62,7 @@ target("hikyuu")
     -- add files
     add_files("./**.cpp")
     
-    add_headers("../(hikyuu/**.h)|**doc.h")
+    add_headerfiles("../(hikyuu/**.h)|**doc.h")
 
     on_load(function(target)
         assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_ROOT
