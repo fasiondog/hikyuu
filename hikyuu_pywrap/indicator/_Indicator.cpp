@@ -66,6 +66,7 @@ void export_Indicator() {
         .def("setDiscard", &Indicator::setDiscard)
         .def("getParam", &Indicator::getParam<boost::any>)
         .def("setParam", &Indicator::setParam<object>)
+        .def("haveParam", &Indicator::haveParam)
         .def("size", &Indicator::size)
         .def("empty", &Indicator::empty)
         .def("clone", &Indicator::clone)

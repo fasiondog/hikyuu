@@ -65,6 +65,7 @@ void export_Stoploss() {
             .add_property("name", st_get_name, st_set_name)
             .def("getParam", &StoplossBase::getParam<boost::any>)
             .def("setParam", &StoplossBase::setParam<object>)
+            .def("haveParam", &StoplossBase::haveParam)
             .def("setTM", &StoplossBase::setTM)
             .def("getTM", &StoplossBase::getTM)
             .def("setTO", &StoplossBase::setTO)

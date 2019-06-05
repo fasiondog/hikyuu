@@ -91,6 +91,7 @@ void export_System() {
 
             .def("getParam", &System::getParam<boost::any>)
             .def("setParam", &System::setParam<object>)
+            .def("haveParam", &System::haveParam)
 
             .def("getStock", &System::getStock)
             .def("getTradeRecordList", &System::getTradeRecordList,

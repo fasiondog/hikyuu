@@ -54,6 +54,7 @@ void export_Signal() {
             //                return_internal_reference<>()))
             .def("getParam", &SignalBase::getParam<boost::any>)
             .def("setParam", &SignalBase::setParam<object>)
+            .def("haveParam", &SignalBase::haveParam)
             .def("setTO", &SignalBase::setTO)
             .def("getTO", &SignalBase::getTO)
             .def("shouldBuy", &SignalBase::shouldBuy)

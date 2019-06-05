@@ -52,6 +52,7 @@ void export_Condition() {
             .add_property("name", cn_get_name, cn_set_name)
             .def("getParam", &ConditionBase::getParam<boost::any>)
             .def("setParam", &ConditionBase::setParam<object>)
+            .def("haveParam", &ConditionBase::haveParam)
             .def("isValid", &ConditionBase::isValid)
             .def("setTO", &ConditionBase::setTO)
             .def("getTO", &ConditionBase::getTO)

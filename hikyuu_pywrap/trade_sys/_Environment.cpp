@@ -57,6 +57,7 @@ void export_Environment() {
             .add_property("name", ev_get_name, ev_set_name)
             .def("getParam", &EnvironmentBase::getParam<boost::any>)
             .def("setParam", &EnvironmentBase::setParam<object>)
+            .def("haveParam", &EnvironmentBase::haveParam)
             .def("setQuery", &EnvironmentBase::setQuery)
             .def("getQuery", &EnvironmentBase::getQuery)
             .def("isValid", &EnvironmentBase::isValid)

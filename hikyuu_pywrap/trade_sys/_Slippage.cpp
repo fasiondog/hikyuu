@@ -61,6 +61,7 @@ void export_Slippage() {
             .add_property("name", sp_get_name, sp_set_name)
             .def("getParam", &SlippageBase::getParam<boost::any>)
             .def("setParam", &SlippageBase::setParam<object>)
+            .def("haveParam", &SlippageBase::haveParam)
             .def("setTO", &SlippageBase::setTO)
             .def("getTO", &SlippageBase::getTO)
             .def("getRealBuyPrice", pure_virtual(&SlippageBase::getRealBuyPrice))

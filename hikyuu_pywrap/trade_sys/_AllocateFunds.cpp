@@ -72,6 +72,7 @@ void export_AllocateFunds() {
             .add_property("name", af_get_name, af_set_name)
             .def("getParam", &AllocateFundsBase::getParam<boost::any>)
             .def("setParam", &AllocateFundsBase::setParam<object>)
+            .def("haveParam", &AllocateFundsBase::haveParam)
 
             .def("reset", &AllocateFundsBase::reset)
             .def("clone", &AllocateFundsBase::clone)

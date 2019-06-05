@@ -136,6 +136,10 @@ public:
      */
     DatetimeList getDatetimeList() const;
 
+    bool haveParam(const string& name) const {
+        return m_imp ? m_imp->haveParam(name) : false;
+    } 
+
     template <typename ValueType>
     void setParam(const string& name, const ValueType& value) {
         if (m_imp) {

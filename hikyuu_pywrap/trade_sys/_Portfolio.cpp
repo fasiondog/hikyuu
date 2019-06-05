@@ -28,6 +28,7 @@ void export_Portfolio() {
             .def(self_ns::str(self))
             .def("getParam", &Portfolio::getParam<boost::any>)
             .def("setParam", &Portfolio::setParam<object>)
+            .def("haveParam", &Portfolio::haveParam)
 
             .add_property("name", pf_get_name, pf_set_name)
             .add_property("tm", &Portfolio::getTM, &Portfolio::setTM)

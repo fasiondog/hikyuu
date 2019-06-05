@@ -115,6 +115,7 @@ void export_MoneyManager() {
             .add_property("name", mm_get_name, mm_set_name)
             .def("getParam", &MoneyManagerBase::getParam<boost::any>)
             .def("setParam", &MoneyManagerBase::setParam<object>)
+            .def("haveParam", &MoneyManagerBase::haveParam)
             .def("setTM", &MoneyManagerBase::setTM)
             .def("getTM", &MoneyManagerBase::getTM)
             .def("setQuery", &MoneyManagerBase::setQuery)

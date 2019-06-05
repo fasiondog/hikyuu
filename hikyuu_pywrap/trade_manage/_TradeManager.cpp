@@ -88,6 +88,7 @@ void export_TradeManager() {
 
             .def("getParam", &TradeManager::getParam<boost::any>)
             .def("setParam", &TradeManager::setParam<object>)
+            .def("haveParam", &TradeManager::haveParam)
 
             .def("reset", &TradeManager::reset)
             .def("clone", &TradeManager::clone)

@@ -53,6 +53,7 @@ void export_Selector() {
             .add_property("name", sb_get_name, sb_set_name)
             .def("getParam", &SelectorBase::getParam<boost::any>)
             .def("setParam", &SelectorBase::setParam<object>)
+            .def("haveParam", &SelectorBase::haveParam)
 
             .def("reset", &SelectorBase::reset)
             .def("clone", &SelectorBase::clone)

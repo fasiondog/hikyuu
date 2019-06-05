@@ -91,6 +91,7 @@ void export_ProfitGoal() {
             .add_property("name", pg_get_name, pg_set_name)
             .def("getParam", &ProfitGoalBase::getParam<boost::any>)
             .def("setParam", &ProfitGoalBase::setParam<object>)
+            .def("haveParam", &ProfitGoalBase::haveParam)
             .def("setTM", &ProfitGoalBase::setTM)
             .def("setTO", &ProfitGoalBase::setTO)
             .def("getTM", &ProfitGoalBase::getTM)
