@@ -21,7 +21,7 @@
 #endif
 
 #ifdef USE_SPDLOG_FOR_LOGGING
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 #endif
 
 #ifdef USE_STDOUT_FOR_LOGGING
