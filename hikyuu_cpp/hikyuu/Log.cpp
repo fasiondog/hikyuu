@@ -13,9 +13,9 @@ namespace logging = boost::log;
 #endif
 
 #ifdef USE_SPDLOG_FOR_LOGGING
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/ostream_sink.h>
-#include <spdlog/sinks/rotating_file_sink.h>
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/ostream_sink.h"
+#include "spdlog/sinks/rotating_file_sink.h"
 #endif
 
 namespace hku {
