@@ -53,14 +53,10 @@ end
 -- for the windows platform (msvc)
 if is_plat("windows") then 
     add_packagedirs("./hikyuu_extern_libs/pkg")
-
     -- add some defines only for windows
     add_defines("NOCRYPT", "NOGDI")
-
-    add_cxflags("-EHsc")
-    
+    add_cxflags("-EHsc", "/Zc:__cplusplus")
     add_cxflags("-wd4819")  --template dll export warning
-    
     if is_mode("release") then
         add_cxflags("-MD") 
     elseif is_mode("debug") then
@@ -69,7 +65,7 @@ if is_plat("windows") then
     end
 end
 
---add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "neon", "avx", "avx2")
+add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "neon", "avx", "avx2")
 
 if is_plat("windows") then
     add_subdirs("./hikyuu_extern_libs/src/sqlite3")
