@@ -5,7 +5,8 @@ target("hikyuu")
     add_includedirs("..")
 
     -- set version for release
-    add_configfiles("version.h", {prefix = "HKU"})
+    set_configdir("./")
+    add_configfiles("$(projectdir)/config.h.in")
 
     if is_plat("windows") then
         add_cxflags("-wd4819")  
@@ -16,7 +17,7 @@ target("hikyuu")
         add_cxflags("-wd4244")  --discable double to int
     else
         add_rpathdirs("$ORIGIN")
-        add_cxflags("-Wno-sign-compare", "-Wno-error=missing-braces")
+        add_cxflags("-Wno-sign-compare", "-Wno-missing-braces")
     end
     
     if is_plat("windows") then 

@@ -4,7 +4,14 @@ set_xmakever("2.2.5")
 set_project("hikyuu")
 
 -- version
-set_version("1.1.3")
+set_version("1.1.5")
+set_configvar("USE_ASYNC_LOGGER", 1)
+set_configvar("SPDLOG_ACTIVE_LEVEL", 2)
+set_configvar("CHECK_ACCESS_BOUND", 1)
+set_configvar("SUPPORT_SERIALIZATION", 1)
+set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
+set_configvar("SUPPORT_XML_ARCHIVE", 1)
+set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 
 -- set warning all as error
 set_warnings("all", "error")

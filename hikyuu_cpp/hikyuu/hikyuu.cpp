@@ -7,7 +7,6 @@
 
 #include <hikyuu_utils/iniparser/IniParser.h>
 #include "hikyuu.h"
-#include "version.h"
 
 namespace hku {
 

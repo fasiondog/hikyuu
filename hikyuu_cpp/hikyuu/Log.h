@@ -10,8 +10,7 @@
 
 #pragma once
 
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-
+#include "config.h"
 #include <string>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
@@ -54,10 +53,10 @@ void HKU_API set_log_level(LOG_LEVEL level);
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
-#define HKU_TRACE_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
+#define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
 #define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(spdlog::get("hikyuu"), __VA_ARGS__)
 
-#define HKU_DEBUG_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
+#define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
 #define HKU_DEBUG(...) SPDLOG_LOGGER_TRACE(spdlog::get("hikyuu"), __VA_ARGS__)
 
 #define HKU_LOGGER_INFO(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::info, __VA_ARGS__)
