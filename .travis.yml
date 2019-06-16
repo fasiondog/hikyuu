@@ -38,7 +38,7 @@ script:
   - export BOOST_LIB=./boost_1_67_0/stage/lib
   - ls .
   - xmake f --with-unit-test=y --cxx=$CXX
-  - xmake hikyuu
-  - xmake unit-test
+  - xmake -b hikyuu
+  - xmake -b unit-test
   - xmake r unit-test
   
