@@ -31,7 +31,7 @@ bool SQLiteBaseInfoDriver::_init() {
     string dbname;
     try {
         dbname = getParam<string>("db");
-        HKU_TRACE("SQLITE3: " << dbname);
+        HKU_TRACE("SQLITE3: {}", dbname);
     } catch(...) {
         HKU_ERROR("Can't get Sqlite3 filename!");
         return false;

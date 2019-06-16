@@ -16,7 +16,7 @@ target("hikyuu")
         add_cxflags("-wd4244")  --discable double to int
     else
         add_rpathdirs("$ORIGIN")
-        add_cxflags("-Wno-sign-compare")
+        add_cxflags("-Wno-sign-compare", "-Wno-error=missing-braces")
     end
     
     if is_plat("windows") then 

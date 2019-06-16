@@ -23,7 +23,7 @@ void FixedHoldDays::_calculate() {
 
 price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
     if (getParam<int>("days") <= 0) {
-        HKU_WARN("param days <= 0! Are you sure? [FixedHoldDays::getGoal]");
+        HKU_WARN("param days <= 0! Are you sure?");
         return 0.0;
     }
 

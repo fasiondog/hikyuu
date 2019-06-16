@@ -75,7 +75,7 @@ StockTypeInfo::StockTypeInfo(hku_uint32 type,
   m_maxTradeNumber(maxTradeNumber)  {
     if (m_tick == 0.0) {
         m_unit = 1.0;
-        HKU_WARN("tick should not be zero! [StockTypeInfo::StockTypeInfo]");
+        HKU_WARN("tick should not be zero!");
     } else {
         m_unit = m_tickValue / m_tick;
     }

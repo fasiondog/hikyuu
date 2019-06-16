@@ -46,12 +46,12 @@ ConditionPtr ConditionBase::clone() {
     try {
         p = _clone();
     } catch(...) {
-        HKU_ERROR("Subclass _clone failed! [ConditionBase::clone]");
+        HKU_ERROR("Subclass _clone failed!");
         p = ConditionPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr! [ConditionBase::clone]" );
+        HKU_ERROR("Failed clone! Will use self-ptr!" );
         return shared_from_this();
     }
 
@@ -71,7 +71,7 @@ void ConditionBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
     if (!m_sg) {
-        HKU_WARN("m_sg is NULL! [ConditionBase::setTO]");
+        HKU_WARN("m_sg is NULL!");
         return;
     }
     if (!kdata.empty()) {

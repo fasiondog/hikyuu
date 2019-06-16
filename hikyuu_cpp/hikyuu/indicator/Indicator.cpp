@@ -62,7 +62,7 @@ Indicator& Indicator::operator=(const Indicator& indicator) {
 
 PriceList Indicator::getResultAsPriceList(size_t num) const {
     if (!m_imp) {
-        HKU_WARN("indicator imptr is null! [Indicator::getResultAsPriceList]");
+        HKU_WARN("indicator imptr is null!");
         return PriceList();
     }
     return m_imp->getResultAsPriceList(num);
@@ -70,7 +70,7 @@ PriceList Indicator::getResultAsPriceList(size_t num) const {
 
 Indicator Indicator::getResult(size_t num) const {
     if (!m_imp) {
-        HKU_WARN("indicator imptr is null! [Indicator::getResult]");
+        HKU_WARN("indicator imptr is null!");
         return Indicator();
     }
     return m_imp->getResult(num);

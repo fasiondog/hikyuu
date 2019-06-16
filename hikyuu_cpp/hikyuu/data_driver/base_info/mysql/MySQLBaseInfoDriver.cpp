@@ -20,7 +20,6 @@ public:
     void operator()(MYSQL *db){
         if(db){
             mysql_close(db);
-            //HKU_TRACE("Closed MySQL database!");
         }
     }
 };
@@ -80,9 +79,9 @@ bool MySQLBaseInfoDriver::_init() {
         port = 3306;
     }
 
-    HKU_TRACE("MYSQL host: " << host);
-    HKU_TRACE("MYSQL port: " << port);
-    HKU_TRACE("MYSQL database: " << database);
+    HKU_TRACE("MYSQL host: {}", host);
+    HKU_TRACE("MYSQL port: {}", port);
+    HKU_TRACE("MYSQL database: {}", database);
 
     if (!mysql_init(mysql.get())) {
         HKU_FATAL("Initial MySQL handle error!");

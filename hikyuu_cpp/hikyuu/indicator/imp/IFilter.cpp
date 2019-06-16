@@ -41,45 +41,6 @@ void IFilter::_calculate(const Indicator& ind) {
     }
 
     int n = getParam<int>("n");
-    /*std::cout << "n: " << n << std::endl;
-    std::cout << "total: " << total << std::endl;
-    
-    bool have = false;
-    size_t pre_pos = m_discard;
-    size_t start_pos = m_discard + n < total ? m_discard + n : total;
-    for (size_t i = m_discard; i < start_pos; i++) {
-        if (ind[i] != 0.0) {
-            have = true;
-            pre_pos = i;
-            _set(1.0, i);
-        } else {
-            _set(0.0, i);
-        }
-    }
-
-    std::cout << "start_pos: " << start_pos << std::endl;
-
-    for (size_t i = start_pos; i < total; i++) {
-        size_t j = i - n;
-        std::cout << i << "," << j << ", " << have << ", " << pre_pos << std::endl;
-        if (pre_pos < j) {
-            have = ind[j] == 0.0 ? false : true;
-            pre_pos = j;
-        }
-        
-        if (have) {
-            _set(0.0, i);
-        } else {
-            _set(ind[i] != 0.0 ? 1.0 : 0.0, i);
-        }
-        
-        if (ind[i] != 0.0) {
-            have = true;
-            pre_pos = i;
-        }
-    }*/
-
-
     size_t i = m_discard;
     size_t len = total - m_discard;
     len = len > n + 1 ? len - n - 1 : len;

@@ -61,12 +61,12 @@ AFPtr AllocateFundsBase::clone() {
     try {
         p = _clone();
     } catch(...) {
-        HKU_ERROR("Subclass _clone failed! [AllocateMoneyBase::clone]");
+        HKU_ERROR("Subclass _clone failed!");
         p = AFPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr! [AllocateMoneyBase::clone]" );
+        HKU_ERROR("Failed clone! Will use self-ptr!" );
         return shared_from_this();
     }
 
@@ -117,8 +117,7 @@ SystemList AllocateFundsBase
 
     int max_num = getParam<int>("max_sys_num");
     if (max_num <= 0) {
-        HKU_ERROR("param(max_sys_num) need > 0! "
-                  "[AllocateFundsBase::getAllocatedSystemList]");
+        HKU_ERROR("param(max_sys_num) need > 0!");
         return result;
     }
 
@@ -349,8 +348,7 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(
         will_cash = roundDown(will_cash - tm->currentCash(), real_precision);
         if (will_cash > 0) {
             if (!m_tm->checkout(date, will_cash)) {
-                HKU_ERROR("m_tm->checkout failed! "
-                        "[AllocateFundsBase::getAllocatedSystemList]");
+                HKU_ERROR("m_tm->checkout failed!");
                 continue;
             }
             tm->checkin(date, will_cash);

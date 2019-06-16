@@ -55,7 +55,6 @@ BOOST_AUTO_TEST_CASE( test_DROPNA ) {
 
     data = VALUE(a);
     result = DROPNA(data);
-    std::cout << data.size() << " " << result.size() << " " << data.discard() << std::endl;
     BOOST_CHECK(result.size() == 0);
     BOOST_CHECK(result.discard() == 0);
 

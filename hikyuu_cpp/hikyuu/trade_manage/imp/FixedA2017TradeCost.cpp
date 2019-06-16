@@ -26,7 +26,7 @@ CostRecord FixedA2017TradeCost::getBuyCost(
         price_t price, size_t num) const {
     CostRecord result;
     if (stock.isNull()) {
-        HKU_WARN("Stock is Null! [FixedATradeCost::getBuyCost]");
+        HKU_WARN("Stock is Null!");
         return result;
     }
 
@@ -49,7 +49,7 @@ CostRecord FixedA2017TradeCost::getSellCost(
         price_t price, size_t num) const {
     CostRecord result;
     if( stock.isNull() ){
-        HKU_WARN("Stock is NULL! [FixedATradeCost::getBuyCost]");
+        HKU_WARN("Stock is NULL!");
         return result;
     }
 

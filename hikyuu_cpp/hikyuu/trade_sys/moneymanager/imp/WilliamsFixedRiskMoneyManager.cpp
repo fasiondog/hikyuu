@@ -24,8 +24,7 @@ size_t WilliamsFixedRiskMoneyManager
             price_t price, price_t risk, SystemPart from) {
     price_t max_loss = getParam<price_t>("max_loss");
     if (max_loss <= 0.0) {
-        HKU_WARN("max_loss is zero! "
-                "[WilliamsFixedRiskMoneyManager::_getBuyNumber]");
+        HKU_WARN("max_loss is zero!");
         return 0;
     }
 

@@ -44,7 +44,7 @@ bool BlockInfoDriver::checkType() {
 
     } catch(...) {
         result = false;
-        HKU_ERROR("Can't get type of driver! [BlockInfoDriver::checkType]");
+        HKU_ERROR("Can't get type of driver!");
     }
 
     return result;

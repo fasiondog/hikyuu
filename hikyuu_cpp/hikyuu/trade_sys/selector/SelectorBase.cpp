@@ -88,14 +88,12 @@ SelectorPtr SelectorBase::clone() {
 
 void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     if (stock.isNull()) {
-        HKU_WARN("Try add Null stock, will be discard! "
-                "[SelectorBase::addStock]");
+        HKU_WARN("Try add Null stock, will be discard!");
         return;
     }
 
     if (!protoSys) {
-        HKU_WARN("Try add Null protoSys, will be discard! "
-                "[SelectorBase::addStock]");
+        HKU_WARN("Try add Null protoSys, will be discard!");
         return;
     }
 
@@ -108,16 +106,14 @@ void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
 void SelectorBase::addStockList(const StockList& stkList,
                                 const SystemPtr& protoSys) {
     if (!protoSys) {
-        HKU_WARN("Try add Null protoSys, will be discard! "
-                "[SelectorBase::addStockList]");
+        HKU_WARN("Try add Null protoSys, will be discard!");
         return;
     }
 
     StockList::const_iterator iter = stkList.begin();
     for (; iter != stkList.end(); ++iter) {
         if (iter->isNull()) {
-            HKU_WARN("Try add Null stock, will be discard! "
-                    "[SelectorBase::addStockList]");
+            HKU_WARN("Try add Null stock, will be discard!");
             continue;
         }
 

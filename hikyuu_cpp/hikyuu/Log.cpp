@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "Log.h"
+#include <spdlog/async.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 //#include "spdlog/sinks/ostream_sink.h"
 //#include "spdlog/sinks/rotating_file_sink.h"
@@ -31,15 +32,19 @@ void init_logger(const std::string& configure_name) {
     //auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
-
-    auto logger = std::shared_ptr<spdlog::logger>(
-            //new spdlog::logger("hikyuu", {stdout_sink, file_sink}));
-            new spdlog::logger("hikyuu", stdout_sink));
+    
+    spdlog::init_thread_pool(8192, 1);
+    std::vector<spdlog::sink_ptr> sinks {stdout_sink};
+    auto logger = std::make_shared<spdlog::async_logger>("hikyuu", 
+        sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+    //auto logger = std::shared_ptr<spdlog::logger>(
+    //        new spdlog::logger("hikyuu", stdout_sink));
     logger->set_level(spdlog::level::trace);
     logger->flush_on(spdlog::level::trace);
     //logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
-    spdlog::details::registry::instance().register_logger(logger);
+    //spdlog::details::registry::instance().register_logger(logger);
+    spdlog::register_logger(logger);
 }
 
 } /* namespace hku */

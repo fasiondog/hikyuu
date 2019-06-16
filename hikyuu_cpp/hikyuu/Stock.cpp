@@ -100,7 +100,7 @@ Stock::Data::Data(const string& market, const string& code,
   m_minTradeNumber(minTradeNumber),
   m_maxTradeNumber(maxTradeNumber) {
     if (0.0 == m_tick) {
-        HKU_WARN("tick should not be zero! [Stock::Data::Data]");
+        HKU_WARN("tick should not be zero!");
         m_unit = 1.0;
     } else {
         m_unit = m_tickValue / m_tick;

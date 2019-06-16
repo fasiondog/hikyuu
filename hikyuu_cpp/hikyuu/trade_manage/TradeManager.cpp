@@ -2017,7 +2017,7 @@ void TradeManager::tocsv(const string& path) {
     //导出已平仓记录
     file.open(filename2.c_str());
     if (!file) {
-        HKU_ERROR("Can't create file! [TradeManager::tocvs");
+        HKU_ERROR("Can't create file!");
         return;
     }
 
@@ -2046,7 +2046,7 @@ void TradeManager::tocsv(const string& path) {
     //导出未平仓记录
     file.open(filename3.c_str());
     if (!file) {
-        HKU_ERROR("Can't create file! [TradeManager::tocvs");
+        HKU_ERROR("Can't create file!");
         return;
     }
 
@@ -2084,7 +2084,7 @@ void TradeManager::tocsv(const string& path) {
     //导出已平仓记录
     file.open(filename5.c_str());
     if (!file) {
-        HKU_ERROR("Can't create file! [TradeManager::tocvs");
+        HKU_ERROR("Can't create file!");
         return;
     }
 

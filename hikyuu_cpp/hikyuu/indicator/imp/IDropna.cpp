@@ -42,7 +42,7 @@ void IDropna::_calculate(const Indicator& ind) {
     size_t row_len = total - ind.discard();
     price_t *buf = new price_t[m_result_num * row_len];
     if (!buf) {
-        HKU_ERROR("Memory allocation failed! [IDropna::_calculate]");
+        HKU_ERROR("Memory allocation failed!");
         return;
     }
 
