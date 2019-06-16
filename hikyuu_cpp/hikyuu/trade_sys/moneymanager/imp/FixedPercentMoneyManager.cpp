@@ -23,13 +23,12 @@ size_t FixedPercentMoneyManager
             price_t price, price_t risk, SystemPart from) {
     double p = getParam<double>("p");
     if (p <= 0.0 || p > 1.0) {
-        HKU_ERROR("Error param (p = " << p
-                << ") [PercentRiskMoneyManager::_getBuyNumber]");
+        HKU_ERROR("Error param (p = {:<.4f})", p);
         return 0;
     }
 
     if (risk == 0.0) {
-        HKU_ERROR("risk is zero! [PercentRiskMoneyManager::_getBuyNumber");
+        HKU_ERROR("risk is zero!");
         return 0;
     }
 

@@ -25,7 +25,6 @@ HistoryFinanceReader::~HistoryFinanceReader() {
 PriceList HistoryFinanceReader
 ::getHistoryFinanceInfo(Datetime date, 
         const string& market, const string& code) {
-    string funcname(" [HistoryFinanceReader::getHistoryFinanceInfo]");
     PriceList result;
 
     string filename(m_dir + "/gpcw" 
@@ -33,7 +32,7 @@ PriceList HistoryFinanceReader
                    + ".dat");
     FILE *fp = fopen(filename.c_str(), "rb");
     if (NULL == fp) {
-        HKU_INFO("Can't found " << filename << funcname);
+        HKU_INFO("Can't found {}", filename);
         return result;
     }
 
@@ -43,7 +42,7 @@ PriceList HistoryFinanceReader
     
     char header_buf[20];
     if (!fread(header_buf, 1, 20, fp)) {
-        HKU_ERROR("read data failed! " << filename << funcname);
+        HKU_ERROR("read data failed! {}", filename);
         fclose(fp);
         return result;
     }
@@ -56,13 +55,13 @@ PriceList HistoryFinanceReader
     hku_uint32 address = 0;
     for (int i = 0; i < max_count; i++) {
         if (!fread(stock_code, 1, 7, fp)) {
-            HKU_ERROR("read stock_code failed! " << filename << funcname);
+            HKU_ERROR("read stock_code failed! {}", filename);
             fclose(fp);
             return result;
         }
 
         if (!fread(&address, 4, 1, fp)) {
-            HKU_ERROR("read stock_item address failed! " << filename << funcname);
+            HKU_ERROR("read stock_item address failed! {}", filename);
             fclose(fp);
             return result;
         }
@@ -78,14 +77,14 @@ PriceList HistoryFinanceReader
         float result_buffer[MAX_COL_NUM];
         int report_fields_count = int(report_size / 4);
         if (report_fields_count >= MAX_COL_NUM) {
-            HKU_WARN("Over MAX_COL_NUM! " << filename << funcname);
+            HKU_WARN("Over MAX_COL_NUM! {}", filename);
             report_fields_count = MAX_COL_NUM;
         }
         
         fseek(fp, address, SEEK_SET);
 
         if (!fread(result_buffer, 4, report_fields_count, fp)) {
-            HKU_ERROR("read col data failed! " << filename << funcname);
+            HKU_ERROR("read col data failed! {}", filename);
             fclose(fp);
             return result;
         }
@@ -101,7 +100,7 @@ PriceList HistoryFinanceReader
         }
     
     } else {
-        HKU_ERROR("Invalid address(0)! " << filename << funcname);
+        HKU_ERROR("Invalid address(0)! {}", filename);
     }
 
     fclose(fp);

@@ -100,7 +100,7 @@ loadKData(const string& market, const string& code,
     } else if (ktype == KQuery::DAY) {
         _loadDayKData(market, code, ktype, start_ix, end_ix, out_buffer);
     } else {
-        HKU_WARN("Don't support the ktype: " << ktype << " [TdxKDataDriver::loadKData]");
+        HKU_WARN("Don't support the ktype: {}", ktype);
     }
     /*switch (ktype) {
     case KQuery::MIN:
@@ -208,7 +208,7 @@ getKRecord(const string& market, const string& code,
     } else if (ktype == KQuery::DAY) {
         record = _getDayKRecord(market, code, pos, ktype);
     } else {
-        HKU_WARN("Don't support the ktype: " << ktype << " [TdxKDataDriver::getKRecord]");
+        HKU_WARN("Don't support the ktype: {}", ktype);
     }
 
     return record;
@@ -538,7 +538,7 @@ _getFileName(const string& market, const string& code, KQuery::KType ktype) {
     } else if (ktype == KQuery::DAY || ktype == KQuery::WEEK || ktype == KQuery::MONTH || ktype == KQuery::QUARTER || ktype == KQuery::HALFYEAR || ktype == KQuery::YEAR) {
         filename = m_dirname + "\\" + market + "\\lday\\" + market + code + ".day";
     } else {
-        HKU_WARN("Don't support this ktype: " << ktype << " [TdxKDataDriver::_getFileName]");
+        HKU_WARN("Don't support this ktype: {}", ktype);
     }
 
     return filename;

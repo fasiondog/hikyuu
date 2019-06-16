@@ -26,8 +26,7 @@ IExist::~IExist() {
 
 bool IExist::check() {
     if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=0) "
-                  << m_params << " [IExist::check]");
+        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
         return false;
     }
     return true;

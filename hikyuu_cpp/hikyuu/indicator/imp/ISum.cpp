@@ -25,8 +25,7 @@ ISum::~ISum() {
 bool ISum::check() {
     int n = getParam<int>("n");
     if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) " << m_params
-                << " [ISum::calculate]");
+        HKU_ERROR("Invalid param[n] ! (n >= 0) {}", m_params);
         return false;
     }
     return true;

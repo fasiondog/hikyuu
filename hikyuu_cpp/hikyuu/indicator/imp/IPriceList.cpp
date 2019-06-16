@@ -66,7 +66,7 @@ void IPriceList::_calculate(const Indicator& data) {
     //不在叶子节点上，则忽略本身的data参数，认为其输入实际为函数入参中的data
     int result_index = getParam<int>("result_index");
     if (result_index < 0 || result_index >= data.getResultNumber()) {
-        HKU_ERROR("result_index out of range! [IPriceList::IPriceList]");
+        HKU_ERROR("result_index out of range!");
         return;
     }
 

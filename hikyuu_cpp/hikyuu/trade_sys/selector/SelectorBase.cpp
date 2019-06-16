@@ -62,12 +62,12 @@ SelectorPtr SelectorBase::clone() {
     try {
         p = _clone();
     } catch(...) {
-        HKU_ERROR("Subclass _clone failed! [SelectorBase::clone]");
+        HKU_ERROR("Subclass _clone failed!");
         p = SelectorPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr! [SelectorBase::clone]" );
+        HKU_ERROR("Failed clone! Will use self-ptr!" );
         return shared_from_this();
     }
 

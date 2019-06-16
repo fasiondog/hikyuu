@@ -127,13 +127,13 @@ void StockManager::init(
                                          "000001", Null<Datetime>());
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
-    HKU_INFO(sec.count() << "s Loaded Data.");
+    HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
 }
 
 
 void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     if (!driver) {
-        HKU_ERROR("kdata driver is null! [StockManager::setKDataDriver]");
+        HKU_ERROR("kdata driver is null!");
         return;
     }
 
@@ -399,9 +399,7 @@ bool StockManager::addStock(const Stock& stock) {
     string market_code(stock.market_code());
     boost::to_upper(market_code);
     if(m_stockDict.find(market_code) != m_stockDict.end()) {
-        HKU_ERROR("The stock had exist! "
-                << market_code
-                << " [StockManager::addStock]");
+        HKU_ERROR("The stock had exist! {}", market_code);
         return false;
     }
 
@@ -414,9 +412,7 @@ bool StockManager::addMarketInfo(const MarketInfo& marketInfo) {
     string market = marketInfo.market();
     boost::to_upper(market);
     if (m_marketInfoDict.find(market) != m_marketInfoDict.end()) {
-        HKU_ERROR("The marketInfo had exist! "
-                << market
-                << " [StockManager::addMarketInfo]");
+        HKU_ERROR("The marketInfo had exist! {}", market);
         return false;
     }
 
@@ -426,9 +422,7 @@ bool StockManager::addMarketInfo(const MarketInfo& marketInfo) {
 
 bool StockManager::addStockTypeInfo(const StockTypeInfo& stkTypeInfo) {
     if (m_stockTypeInfo.find(stkTypeInfo.type()) != m_stockTypeInfo.end()) {
-        HKU_ERROR("The stockTypeInfo had exist! "
-                << stkTypeInfo.type()
-                << " [StockManager::addStockTypeInfo]");
+        HKU_ERROR("The stockTypeInfo had exist! {}", stkTypeInfo.type());
         return false;
     }
 

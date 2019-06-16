@@ -27,8 +27,7 @@ IHighLine::~IHighLine() {
 bool IHighLine::check() {
     int n = getParam<int>("n");
     if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) " << m_params
-                << " [IHighLine::calculate]");
+        HKU_ERROR("Invalid param[n] ! (n >= 0) {}", m_params);
         return false;
     }
 

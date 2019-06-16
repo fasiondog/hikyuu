@@ -25,8 +25,7 @@ RightShift::~RightShift() {
 bool RightShift::check() {
     int n = getParam<int>("n");
     if (n < 0) {
-        HKU_ERROR("Invalid param! (n>=0) "
-                  << m_params << " [RightShift::RightShift]");
+        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
         return false;
     }
 

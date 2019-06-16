@@ -33,8 +33,7 @@ bool SQLiteBaseInfoDriver::_init() {
         dbname = getParam<string>("db");
         HKU_TRACE("SQLITE3: " << dbname);
     } catch(...) {
-        HKU_ERROR("Can't get Sqlite3 filename!"
-                " [SQLiteBaseInfoDriver::SQLiteBaseInfoDriver]");
+        HKU_ERROR("Can't get Sqlite3 filename!");
         return false;
     }
 
@@ -42,8 +41,7 @@ bool SQLiteBaseInfoDriver::_init() {
     int rc=sqlite3_open_v2(dbname.c_str(), &db,
                              SQLITE_OPEN_READWRITE|SQLITE_OPEN_FULLMUTEX,0);
     if( rc ){
-        HKU_ERROR("Can't open database: " << sqlite3_errmsg(db) << "("
-                << dbname << ") [SQLiteBaseInfoDriver::SQLiteBaseInfoDriver]");
+        HKU_ERROR("Can't open database: err({}) - {}", sqlite3_errmsg(db), dbname);
         sqlite3_close(db);
         return false;
     }
@@ -65,8 +63,7 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
                             "description,code,lastdate from market",
                             _getMarketTableCallBack, &out, &zErrMsg);
     if( rc != SQLITE_OK ){
-        HKU_ERROR("SQL error: " << zErrMsg
-                << " [SQLiteBaseInfoDriver::loadMarketInfo]");
+        HKU_ERROR("SQL error: {}", zErrMsg);
         sqlite3_free(zErrMsg);
         return false;
     }
@@ -94,9 +91,8 @@ int SQLiteBaseInfoDriver::_getMarketTableCallBack(void *out,
             datetime = Datetime(d);
         } catch (std::out_of_range& e) {
             datetime = Null<Datetime>();
-            HKU_WARN("LastDate of market(" << market << ") is invalide!"
-                    " Assigned to Null<Dateteim>! " << e.what() <<
-                    " [SQLiteBaseInfoDriver::_getMarketTableCallBack]");
+            HKU_WARN("LastDate of market({}) is invalid! Assigned to Null<Dateteim>!\n{}", 
+                    market, e.what());
         }
 
         MarketInfo marketInfo(market, HKU_STR(azVals[1]),
@@ -104,13 +100,14 @@ int SQLiteBaseInfoDriver::_getMarketTableCallBack(void *out,
         ((list<MarketInfo> *)out)->push_back(marketInfo);
         result = 0;
 
-    }catch(boost::bad_lexical_cast& e){
-        HKU_ERROR("Can't get the information of market(" << market
-                << ") " << e.what() << " [SQLiteBaseInfoDriver::_getMarketTableCallBack]");
+    } catch(boost::bad_lexical_cast& e){
+        HKU_ERROR("Can't get the information of market({})\n{}", market, e.what());
         result = 1;
-
-    }catch(...){
-        HKU_ERROR("Some error! [SQLiteBaseInfoDriver::_getMarketTableCallBack]");
+    } catch(std::exception& e){
+        HKU_ERROR(e.what());
+        result = 1;
+    } catch(...) {
+        HKU_ERROR("Unkown error!");
         result = 1;
     }
     return result;
@@ -128,8 +125,7 @@ bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
                           "maxTradeNumber from StockTypeInfo",
                         _getStockTypeInfoTableCallBack, &out, &zErrMsg);
     if( rc!=SQLITE_OK ){
-        HKU_ERROR("SQL error: " << zErrMsg
-                << " [SQLiteBaseInfoDriver::loadStockTypeInfo]");
+        HKU_ERROR("SQL error: {}", zErrMsg);
         sqlite3_free(zErrMsg);
         return false;
     }
@@ -159,14 +155,16 @@ int SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack(
                 boost::lexical_cast<size_t>(azVals[6]));
         ((list<StockTypeInfo> *)out)->push_back(stockTypeInfo);
         result = 0;
-    }catch(boost::bad_lexical_cast& e){
-        HKU_ERROR("bad_lexical_cast! " << e.what()
-                << " [SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack]");
+    } catch (boost::bad_lexical_cast& e) {
+        HKU_ERROR(e.what());
         result = 1;
-    }catch(...){
-        HKU_ERROR("Some error! [SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack]");
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
         result = 1;
+    } catch (...) {
+        HKU_ERROR("Unkown error!");
     }
+
     return result;
 }
 
@@ -184,8 +182,7 @@ bool SQLiteBaseInfoDriver::_getStockWeightList(hku_uint32 id,
     int rc = sqlite3_exec(m_db.get(), buf.str().c_str(),
                            _getStockWeightCallBack, &out, &zErrMsg);
     if( rc!=SQLITE_OK ){
-        HKU_ERROR("SQL error: " << zErrMsg
-                << " [SQLiteBaseInfoDriver::getStockWeightList]");
+        HKU_ERROR("SQL error: {}", zErrMsg);
         sqlite3_free(zErrMsg);
         return false;
     }
@@ -215,18 +212,17 @@ int SQLiteBaseInfoDriver::_getStockWeightCallBack(
                 boost::lexical_cast<price_t>(azVals[8]));
         ((StockWeightList *)out)->push_back(weight);
         failure = 0;
-    }catch(std::out_of_range& e) {
-        HKU_ERROR("Date of id(" << id << ") is invalid! " << e.what()
-                << " [SQLiteBaseInfoDriver::_getStockWeightCallBack]");
+    } catch (std::out_of_range& e) {
+        HKU_ERROR("Date of id({}) is invalid! {}", id, e.what());
         //不返回失败，仅抛弃该条记录
-
-    }catch(boost::bad_lexical_cast& e){
-        HKU_ERROR("id(" << id << ") bad_lexical_cast! " << e.what()
-                << " [SQLiteBaseInfoDriver::_getStockWeightCallBack] ");
+    } catch (boost::bad_lexical_cast& e){
+        HKU_ERROR("id({}) bad_lexical_cast！{}", id, e.what());
         failure = 1;
-
-    }catch(...){
-        HKU_ERROR("Some error! [SQLiteBaseInfoDriver::_getStockWeightCallBack]");
+    } catch (std::exception& e){
+        HKU_ERROR(e.what());
+        failure = 1;
+    } catch (...) {
+        HKU_ERROR("Unkown error!");
         failure = 1;
     }
 
@@ -256,9 +252,8 @@ bool SQLiteBaseInfoDriver::_loadStock() {
             Stock.endDate from Stock inner join Market \
             on Stock.marketid = Market.marketid",
             _getStockTableCallBack, &stock_table, &zErrMsg);
-    if( rc != SQLITE_OK ){
-        HKU_ERROR("SQL error: " << zErrMsg
-                << " [SQLiteBaseInfoDriver::loadStock]");
+    if (rc != SQLITE_OK) {
+        HKU_ERROR("SQL error: {}", zErrMsg);
         sqlite3_free(zErrMsg);
         return false;
     }
@@ -339,18 +334,17 @@ int SQLiteBaseInfoDriver::_getStockTableCallBack(
         result = 0;
 
     } catch(std::out_of_range& e) {
-        HKU_WARN("Date of stock(" << stockRecord.id << ") is invalid! "
-                << e.what() << " [SQLiteBaseInfoDriver::_getStockTableCallBack]");
+        HKU_WARN("Date of stock({}) is invalid! {}", stockRecord.id, e.what());
         //不返回失败，仅抛弃该记录
         result = 0;
-
     } catch(boost::bad_lexical_cast& e) {
-        HKU_ERROR("bad_lexical_cast! " << e.what()
-                << " [SQLiteBaseInfoDriver::_getStockTableCallBack]");
+        HKU_ERROR(e.what());
         result = 1;
-
-    } catch(...) {
-        HKU_ERROR("Some error! [SQLiteBaseInfoDriver::_getStockTableCallBack]");
+    } catch(std::exception& e) {
+        HKU_ERROR(e.what());
+        result = 1;
+    } catch (...) {
+        HKU_ERROR("Unknow error!");
         result = 1;
     }
 
@@ -385,8 +379,7 @@ Parameter SQLiteBaseInfoDriver
     int rc = sqlite3_exec(m_db.get(), buf.str().c_str(),
                     _getFinanceTableCallBack, &result, &zErrMsg);
     if( rc != SQLITE_OK ){
-        HKU_ERROR("SQL error: " << zErrMsg
-                << " [SQLiteBaseInfoDriver::getFinanceInfo]");
+        HKU_ERROR("SQL error: {}", zErrMsg);
         sqlite3_free(zErrMsg);
         return result;
     }
@@ -440,8 +433,11 @@ int SQLiteBaseInfoDriver
         p->set<price_t>("baoliu2", atof(azVals[36]));
         result = 0;
 
-    } catch(...) {
-        HKU_ERROR("Some error! [SQLiteBaseInfoDriver::_getFinanceTableCallBack]");
+    } catch(std::exception& e) {
+        HKU_ERROR(e.what());
+        result = 1;
+    } catch (...) {
+        HKU_ERROR("Unkown error!");
         result = 1;
     }
     return result;

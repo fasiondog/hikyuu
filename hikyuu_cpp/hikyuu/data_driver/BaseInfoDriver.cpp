@@ -39,14 +39,12 @@ bool BaseInfoDriver::checkType() {
             result = true;
         } else {
             result = false;
-            HKU_WARN("Type of driver mismatch! ("
-                    << type << " != " << m_name << ") "
-                    << "[BaseInfoDriver::checkType]");
+            HKU_WARN("Type of driver mismatch! ({} != {})", type, m_name);
         }
 
     } catch(...) {
         result = false;
-        HKU_ERROR("Can't get type of driver! [BaseInfoDriver::checkType]");
+        HKU_ERROR("Can't get type of driver!");
     }
 
     return result;

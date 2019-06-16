@@ -22,15 +22,14 @@ bool QLBlockInfoDriver::_init() {
 
 Block QLBlockInfoDriver
 ::getBlock(const string& category, const string& name) {
-    string func_name("[QLBlockInfoDriver::getBlock]");
     Block result(category, name);
     if (!haveParam("dir")) {
-        HKU_ERROR("Missing 'dir' param! " << func_name);
+        HKU_ERROR("Missing 'dir' param!");
         return result;
     }
 
     if (!haveParam(category)) {
-        HKU_INFO("No such category (" << category << ")!" << func_name);
+        HKU_INFO("No such category ({})!", category);
         return result;
     }
 
@@ -38,13 +37,13 @@ Block QLBlockInfoDriver
     try {
         filename = getParam<string>("dir") + "/" + getParam<string>(category);
     } catch(...) {
-        HKU_ERROR("Maybe parameters errors! " << func_name);
+        HKU_ERROR("Maybe parameters errors!");
         return result;
     }
 
     std::ifstream inifile(filename.c_str(), std::ifstream::in);
     if (!inifile) {
-        HKU_ERROR("Can't open file(" << filename << ")! " << func_name);
+        HKU_ERROR("Can't open file({})!", filename);
         return result;
     }
 
@@ -110,15 +109,14 @@ Block QLBlockInfoDriver
 
 
 BlockList QLBlockInfoDriver::getBlockList(const string& category) {
-    string func_name("[QLBlockInfoDriver::getBlockList]");
     BlockList result;
     if (!haveParam("dir")) {
-        HKU_ERROR("Missing 'dir' param! " << func_name);
+        HKU_ERROR("Missing 'dir' param!");
         return result;
     }
 
     if (!haveParam(category)) {
-        HKU_INFO("No such category (" << category << ")!" << func_name);
+        HKU_INFO("No such category ({})!", category);
         return result;
     }
 
@@ -126,13 +124,13 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     try {
         filename = getParam<string>("dir") + "/" + getParam<string>(category);
     } catch(...) {
-        HKU_ERROR("Maybe parameters errors! " << func_name);
+        HKU_ERROR("Maybe parameters errors!");
         return result;
     }
 
     std::ifstream inifile(filename.c_str(), std::ifstream::in);
     if (!inifile) {
-        HKU_ERROR("Can't open file(" << filename << ")! " << func_name);
+        HKU_ERROR("Can't open file({})!", filename);
         return result;
     }
 
@@ -202,7 +200,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
 BlockList QLBlockInfoDriver::getBlockList() {
     BlockList result;
     if (!haveParam("dir")) {
-        HKU_ERROR("Missing 'dir' param! [QLBlockInfoDriver::getBlockList]");
+        HKU_ERROR("Missing 'dir' param!");
         return result;
     }
 

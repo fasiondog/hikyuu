@@ -25,8 +25,7 @@ ICount::~ICount() {
 bool ICount::check() {
     int n = getParam<int>("n");
     if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) " << m_params
-                << " [ICount::calculate]");
+        HKU_ERROR("Invalid param[n] ! (n >= 0)");
         return false;
     }
 

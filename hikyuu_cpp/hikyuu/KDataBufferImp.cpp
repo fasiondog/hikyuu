@@ -65,7 +65,7 @@ KDataBufferImp(const Stock& stock, const KQuery& query)
         break;
 
     default:
-        HKU_ERROR("Invalid RecvoerType! [KDataBufferImp::KDataBufferImp]");
+        HKU_ERROR("Invalid RecvoerType!");
         return;
     }
 }

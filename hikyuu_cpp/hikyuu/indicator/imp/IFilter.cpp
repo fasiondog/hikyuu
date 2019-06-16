@@ -26,8 +26,7 @@ IFilter::~IFilter() {
 
 bool IFilter::check() {
     if (getParam<int>("n") < 1) {
-        HKU_ERROR("Invalid param! (n>=1) "
-                  << m_params << " [IFilter::check]");
+        HKU_ERROR("Invalid param! (n>=1) {}", m_params);
         return false;
     }
     return true;

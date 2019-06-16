@@ -51,7 +51,7 @@ KData::KData(const Stock& stock, const KQuery& query) {
 void KData::tocsv(const string& filename) {
     std::ofstream file(filename.c_str());
     if (!file) {
-        HKU_ERROR("Can't open file! (" << filename << ") [KData::tocsv");
+        HKU_ERROR("Can't open file! ({})", filename);
         return;
     }
 

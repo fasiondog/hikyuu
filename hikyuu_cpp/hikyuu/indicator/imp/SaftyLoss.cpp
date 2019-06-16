@@ -30,12 +30,12 @@ bool SaftyLoss::check() {
     int n2 = getParam<int>("n2");
 
     if (n1 < 2) {
-        HKU_ERROR("Invalid param[n1] must >= 2 ! [SaftyLoss::SaftyLoss]");
+        HKU_ERROR("Invalid param[n1] must >= 2 !");
         return false;
     }
 
     if (n2 < 1) {
-        HKU_ERROR("Invalid param[n2] must >= 1 ! [SaftyLoss::SaftyLoss]");
+        HKU_ERROR("Invalid param[n2] must >= 1 !");
         return false;
     }
 

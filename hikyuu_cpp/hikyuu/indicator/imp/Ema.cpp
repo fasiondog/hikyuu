@@ -25,7 +25,7 @@ Ema::~Ema() {
 bool Ema::check() {
     int n = getParam<int>("n");
     if (n <= 0) {
-        HKU_ERROR("Invalid param[n] must > 0 ! [Ema::check]");
+        HKU_ERROR("Invalid param[n] must > 0 !");
         return false;
     }
 

@@ -39,9 +39,7 @@ bool BlockInfoDriver::checkType() {
             result = true;
         } else {
             result = false;
-            HKU_WARN("Type of driver mismatch! ("
-                    << type << " != " << m_name << ") "
-                    << "[BlockInfoDriver::checkType]");
+            HKU_WARN("Type of driver mismatch! ({} != {})", type, m_name);
         }
 
     } catch(...) {

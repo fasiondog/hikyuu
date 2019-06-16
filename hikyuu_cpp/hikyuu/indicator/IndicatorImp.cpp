@@ -160,8 +160,7 @@ IndicatorImpPtr IndicatorImp::clone() {
 
 
 IndicatorImpPtr IndicatorImp::operator()(const Indicator& ind) {
-    HKU_INFO("This indicator not support operator()! " << *this
-            << " [IndicatorImp::operator()]");
+    HKU_INFO("This indicator not support operator()! {}", *this);
     //保证对齐
     IndicatorImpPtr result = make_shared<IndicatorImp>();
     size_t total = ind.size();
@@ -344,7 +343,7 @@ string IndicatorImp::formula() const {
             break;
 
         default:
-            HKU_ERROR("Wrong optype!" << m_optype << " [IndicatorImp::formula]");
+            HKU_ERROR("Wrong optype! {}", m_optype);
             break;
     }
 
@@ -354,7 +353,7 @@ string IndicatorImp::formula() const {
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (op == LEAF || op >= INVALID || !right) {
-        HKU_ERROR("Wrong used [IndicatorImp::add]");
+        HKU_ERROR("Wrong used!");
         return;
     }
 
@@ -366,9 +365,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                     m_left = right->clone();
                 } else {
                     HKU_WARN("Context-dependent indicator can only be at the leaf node!"
-                             << "parent node: " << name() 
-                             << ", try add node: " << right->name()
-                             << " [IndicatorImp::add]");
+                             "parent node: {}, try add node: {}", name(), right->name());
                 }
             } else {
                 if (m_left->isLeaf()) {
@@ -387,9 +384,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                     m_right = right->clone();
                 } else {
                     HKU_WARN("Context-dependent indicator can only be at the leaf node!"
-                             << "parent node: " << name() 
-                             << ", try add node: " << right->name()
-                             << " [IndicatorImp::add]");
+                             "parent node: {}, try add node: {}", name(), right->name());
                 }
             } else {
                 if (m_right->isLeaf()) {
@@ -412,7 +407,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
 void IndicatorImp::
 add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (!cond || !left || !right) {
-        HKU_ERROR("Wrong used [IndicatorImp::add_if]");
+        HKU_ERROR("Wrong used!");
         return;
     }
 
@@ -456,7 +451,7 @@ bool IndicatorImp::needCalculate() {
 Indicator IndicatorImp::calculate() {
     IndicatorImpPtr result;
     if (!check()) {
-        HKU_ERROR("Invalid param! " << formula() << " : " << long_name());
+        HKU_ERROR("Invalid param! {} : {}", formula(), long_name());
         if (m_right) {
             m_right->calculate();
             _readyBuffer(m_right->size(), m_result_num);
@@ -554,8 +549,7 @@ Indicator IndicatorImp::calculate() {
             break;
 
         default:
-            HKU_ERROR("Unkown Indicator::OPType! " 
-                      << m_optype << " [IndicatorImp::calculate]");
+            HKU_ERROR("Unkown Indicator::OPType! {}", m_optype);
             break;
     }
 

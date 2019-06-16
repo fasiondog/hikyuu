@@ -42,9 +42,7 @@ bool KDataDriver::checkType() {
             result = true;
         } else {
             result = false;
-            HKU_WARN("Type of driver mismatch! ("
-                    << type << " != " << m_name << ") "
-                    << "[KDataDriver::checkType]");
+            HKU_WARN("Type of driver mismatch! ({} != {})", type, m_name);
         }
 
     } catch(...) {
@@ -100,7 +98,7 @@ TimeLineList KDataDriver
 
 TransList KDataDriver
 ::getTransList(const string& market, const string& code, const KQuery& query) {
-    HKU_INFO("This driver not support transaction record!")
+    HKU_INFO("This driver not support transaction record!");
     return TransList();
 }
 

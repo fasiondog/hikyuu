@@ -37,8 +37,7 @@ bool ITimeLine::check() {
 
 void ITimeLine::_calculate(const Indicator& data) {
     if (!isLeaf() && !data.empty()) {
-        HKU_WARN("The input is ignored because " << m_name
-                 << "depends on the context! [ITimeLine::_calculate]");
+        HKU_WARN("The input is ignored because {} depends on the context!", m_name);
     }
 
     KData k = getContext();

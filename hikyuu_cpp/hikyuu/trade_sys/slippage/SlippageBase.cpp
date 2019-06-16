@@ -36,12 +36,12 @@ SlippagePtr SlippageBase::clone() {
     try {
         p = _clone();
     } catch(...) {
-        HKU_ERROR("Subclass _clone failed! [SlippageBase::clone]");
+        HKU_ERROR("Subclass _clone failed!");
         p = SlippagePtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr! [SlippageBase::clone]" );
+        HKU_ERROR("Failed clone! Will use self-ptr!" );
         return shared_from_this();
     }
 

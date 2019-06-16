@@ -43,12 +43,12 @@ SignalPtr SignalBase::clone() {
     try {
         p = _clone();
     } catch(...) {
-        HKU_ERROR("Subclass _clone failed! [SignalBase::clone]");
+        HKU_ERROR("Subclass _clone failed!");
         p = SignalPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr! [SignalBase::clone]" );
+        HKU_ERROR("Failed clone! Will use self-ptr!" );
         return shared_from_this();
     }
 

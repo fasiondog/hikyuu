@@ -26,8 +26,7 @@ ILowLineBars::~ILowLineBars() {
 
 bool ILowLineBars::check() {
     if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=0) "
-                  << m_params << " [ILowLineBars::check]");
+        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
         return false;
     }
     return true;

@@ -226,17 +226,17 @@ void System::_sellNotifyAll(const TradeRecord& record) {
 
 bool System::readyForRun() {
     if (!m_tm) {
-        HKU_ERROR("Not setTradeManager! [SystemBase::readyForRun]");
+        HKU_ERROR("Not setTradeManager!");
         return false;
     }
 
     if( !m_mm ){
-        HKU_ERROR("Not setMoneyManager! [System::readyForRun]");
+        HKU_ERROR("Not setMoneyManager!");
         return false;
     }
 
     if( !m_sg ){
-        HKU_ERROR("Not setSignal! [System::readyForRun] ");
+        HKU_ERROR("Not setSignal!");
         return false;
     }
 
@@ -263,7 +263,7 @@ bool System::readyForRun() {
 
 void System::run(const KQuery& query, bool reset) {
     if( m_stock.isNull() ){
-        HKU_ERROR("m_stock is NULL! [System::run] ");
+        HKU_ERROR("m_stock is NULL!");
         return;
     }
 
@@ -277,7 +277,7 @@ void System::run(const KQuery& query, bool reset) {
     //m_stock = stock; 在setTO里赋值
     KData kdata = m_stock.getKData(query);
     if( kdata.empty() ){
-        HKU_INFO("KData is empty! [System::run]");
+        HKU_INFO("KData is empty!");
         return;
     }
 

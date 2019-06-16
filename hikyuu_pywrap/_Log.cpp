@@ -19,7 +19,7 @@ void export_log() {
             .value("WARN", LOG_LEVEL::WARN)
             .value("ERROR", LOG_LEVEL::ERROR)
             .value("FATAL", LOG_LEVEL::FATAL)
-            .value("NO_PRINT", LOG_LEVEL::NO_PRINT)
+            .value("OFF", LOG_LEVEL::OFF)
             ;
 
     def("get_log_level", get_log_level);

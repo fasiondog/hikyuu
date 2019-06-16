@@ -28,7 +28,7 @@ ISma::~ISma() {
 bool ISma::check() {
     int n = getParam<int>("n");
     if (n < 1) {
-        HKU_ERROR("Invalid param! (n >= 1) [ISma::check]");
+        HKU_ERROR("Invalid param! (n >= 1)");
         return false;
     }
     return true;

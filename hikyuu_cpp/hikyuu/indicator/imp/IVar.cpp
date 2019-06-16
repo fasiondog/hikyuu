@@ -28,8 +28,7 @@ IVar::~IVar() {
 bool IVar::check() {
     int n = getParam<int>("n");
     if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) " << m_params
-                << " [IVar::calculate]");
+        HKU_ERROR("Invalid param[n] ! (n >= 2) {}", m_params);
         return false;
     }
 

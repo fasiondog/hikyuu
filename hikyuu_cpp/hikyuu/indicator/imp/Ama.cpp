@@ -32,8 +32,7 @@ bool Ama::check() {
     int fast_n = getParam<int>("fast_n");
     int slow_n = getParam<int>("slow_n");
     if (n < 1 || fast_n < 0 || slow_n < 0) {
-        HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) "
-                  << m_params << " [Ama::check]");
+        HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) {}", m_params);
         return false;
     }
 

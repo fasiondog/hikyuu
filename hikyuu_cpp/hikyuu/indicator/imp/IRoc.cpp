@@ -27,8 +27,7 @@ IRoc::~IRoc() {
 bool IRoc::check() {
     int n = getParam<int>("n");
     if (n < 1) {
-        HKU_ERROR("Invalid param[n] ! (n >= 1) " << m_params
-                << " [IRoc::calculate]");
+        HKU_ERROR("Invalid param[n] ! (n >= 1) {}", m_params);
         return false;
     }
 

@@ -27,8 +27,7 @@ ILowLine::~ILowLine() {
 bool ILowLine::check() {
     int n = getParam<int>("n");
     if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) " << m_params
-                << " [LowLine::calculate]");
+        HKU_ERROR("Invalid param[n] ! (n >= 0) {}", m_params);
         return false;
     }
 

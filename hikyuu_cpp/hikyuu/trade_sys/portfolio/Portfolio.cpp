@@ -65,19 +65,18 @@ PortfolioPtr Portfolio::clone() {
 }
 
 bool Portfolio::readyForRun() {
-    string func_name(" [Portfolio::readyForRun]");
     if (!m_se) {
-        HKU_WARN("m_se is null!" << func_name);
+        HKU_WARN("m_se is null!");
         return false;
     }
 
     if (!m_tm) {
-        HKU_WARN("m_tm is null!" << func_name);
+        HKU_WARN("m_tm is null!");
         return false;
     }
 
     if (!m_af) {
-        HKU_WARN("m_am is null!" << func_name);
+        HKU_WARN("m_am is null!");
         return false;
     }
 
@@ -210,7 +209,7 @@ void Portfolio::run(const KQuery& query) {
 
         if (m_tm->currentCash() != m_tm_shadow->currentCash()) {
             HKU_INFO("m_tm->currentCash() != m_tm_shadow->currentCash()");
-            HKU_INFO(m_tm->currentCash() << " == " << m_tm_shadow->currentCash());
+            HKU_INFO("{:<.4f} == {:<.4f}", m_tm->currentCash(), m_tm_shadow->currentCash());
         }
 
     } // for datelist

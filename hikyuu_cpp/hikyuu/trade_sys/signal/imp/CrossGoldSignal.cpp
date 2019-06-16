@@ -40,7 +40,7 @@ void CrossGoldSignal::_calculate() {
     Indicator fast = m_fast(kdata);
     Indicator slow = m_slow(kdata);
     if (fast.size() != slow.size()) {
-        HKU_ERROR("fast.size() != slow.size() [CrossGoldSignal::_calculate]");
+        HKU_ERROR("fast.size() != slow.size()");
         return;
     }
 

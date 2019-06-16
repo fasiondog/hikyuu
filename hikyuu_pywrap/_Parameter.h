@@ -109,8 +109,7 @@ struct AnyToPython{
             return o->ptr();
 
         } else {
-            HKU_ERROR("convert failed! Unkown type! Will return None!"
-                    " [AnyToPython::convert]");
+            HKU_ERROR("convert failed! Unkown type! Will return None!");
             return Py_BuildValue("s", (char *)0);
         }
     }

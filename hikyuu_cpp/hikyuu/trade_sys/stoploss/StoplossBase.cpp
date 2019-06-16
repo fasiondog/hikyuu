@@ -41,12 +41,12 @@ StoplossPtr StoplossBase::clone() {
     try {
         p = _clone();
     } catch(...) {
-        HKU_ERROR("Subclass _clone failed! [StoplossBase::clone]");
+        HKU_ERROR("Subclass _clone failed!");
         p = StoplossPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr! [StoplossBase::clone]" );
+        HKU_ERROR("Failed clone! Will use self-ptr!" );
         return shared_from_this();
     }
 

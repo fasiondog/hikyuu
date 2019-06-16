@@ -35,8 +35,7 @@ bool IAd::check() {
 
 void IAd::_calculate(const Indicator& data) {
     if (!isLeaf() && !data.empty()) {
-        HKU_WARN("The input is ignored because " << m_name
-                 << "depends on the context! [IAd::_calculate]");
+        HKU_WARN("The input is ignored because {} depends on the context!", m_name);
     }
     
     m_discard = 0;

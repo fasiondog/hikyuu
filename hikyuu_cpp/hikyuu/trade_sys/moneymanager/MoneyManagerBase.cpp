@@ -77,10 +77,8 @@ size_t MoneyManagerBase
 ::getSellNumber(const Datetime& datetime, const Stock& stock,
             price_t price, price_t risk, SystemPart from) {
     if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ") [MoneyManagerBase::getSellNumber]");
+        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.4f}) risk({:<.2f})", 
+                  datetime, stock.market_code(), price, risk);
         return 0;
     }
 
@@ -112,31 +110,25 @@ size_t MoneyManagerBase
 size_t MoneyManagerBase
 ::getBuyNumber(const Datetime& datetime, const Stock& stock,
         price_t price, price_t risk, SystemPart from) {
-    string funcname(" [MoneyManagerBase::getBuyNumber]");
     if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ")" << funcname);
+        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                 datetime, stock.market_code(), price, risk);
         return 0;
     }
 
     if (stock.isNull()) {
-        HKU_ERROR("stock is Null!" << funcname);
+        HKU_ERROR("stock is Null!");
         return 0;
     }
 
     if (risk <= 0.0) {
-        HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ") Part(" << getSystemPartName(from)
-                << ")" << funcname);
+        HKU_ERROR("risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", 
+                datetime, stock.market_code(), price, risk, getSystemPartName(from));
         return 0;
     }
 
     if (m_tm->getStockNumber() >= getParam<int>("max-stock")) {
-        HKU_TRACE("Ignore! TM had max-stock number!" << funcname);
+        HKU_TRACE("Ignore! TM had max-stock number!");
         return 0;
     }
 
@@ -144,8 +136,7 @@ size_t MoneyManagerBase
     size_t min_trade = stock.minTradeNumber();
     
     if (n < min_trade) {
-        HKU_TRACE("Ignore! Is less than the minimum number of transactions("
-                << min_trade << ")!" << funcname);
+        HKU_TRACE("Ignore! Is less than the minimum number of transactions({})", min_trade);
         return 0;
     }
 
@@ -155,7 +146,7 @@ size_t MoneyManagerBase
 
     if (n > max_trade) {
         n = max_trade;
-        HKU_INFO("Over stock.maxTradeNumber(" << max_trade << ")!" << funcname);
+        HKU_INFO("Over stock.maxTradeNumber({})!", max_trade);
     }
 
     //在现金不足时，自动补充存入现金
@@ -186,18 +177,14 @@ size_t MoneyManagerBase
 ::getSellShortNumber(const Datetime& datetime, const Stock& stock,
         price_t price, price_t risk, SystemPart from) {
     if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ") [MoneyManagerBase::getSellShortNumber]");
+        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                datetime, stock.market_code(), price, risk);
         return 0;
     }
 
     if (risk <= 0.0) {
-        HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ") [MoneyManagerBase::getSellShortNumber]");
+        HKU_ERROR("risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                 datetime, stock.market_code(), price, risk);
         return 0;
     }
 
@@ -208,18 +195,14 @@ size_t MoneyManagerBase
 ::getBuyShortNumber(const Datetime& datetime, const Stock& stock,
         price_t price, price_t risk, SystemPart from) {
     if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ") [MoneyManagerBase::getBuyShortNumber]");
+        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                datetime, stock.market_code(), price, risk);
         return 0;
     }
 
     if (risk <= 0.0) {
-        HKU_ERROR("risk is zero! Datetime(" << datetime << ") Stock("
-                << stock.market_code() << ") price(" << price
-                << ") risk(" << risk
-                << ") [MoneyManagerBase::getBuyShortNumber]");
+        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                datetime, stock.market_code(), price, risk);
         return 0;
     }
 

@@ -26,8 +26,7 @@ StdDeviation::~StdDeviation() {
 bool StdDeviation::check() {
     int n = getParam<int>("n");
     if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) " << m_params
-                << " [StdDeviation::calculate]");
+        HKU_ERROR("Invalid param[n] ! (n >= 2) {}", m_params);
         return false;
     }
 

@@ -25,7 +25,7 @@ IMa::~IMa() {
 bool IMa::check() {
     int n = getParam<int>("n");
     if (n < 1) {
-        HKU_ERROR("Invalid param! (n >= 1) [IMa::check]");
+        HKU_ERROR("Invalid param! (n >= 1) {}", m_params);
         return false;
     }
 

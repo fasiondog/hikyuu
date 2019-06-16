@@ -28,8 +28,6 @@ MySQLKDataDriver::MySQLKDataDriver(): KDataDriver("mysql"), m_port(3306) {
 }
 
 bool MySQLKDataDriver::_init() {
-    string func_name(" [MySQLKDataDriver::MySQLKDataDriver]");
-
     string default_host("127.0.0.1");
     string default_usr("root");
     string default_pwd("");
@@ -38,7 +36,7 @@ bool MySQLKDataDriver::_init() {
         m_host = m_params.get<string>("host");
     } catch(...) {
         m_host = default_host;
-        HKU_WARN("Can't get mysql host! " << func_name);
+        HKU_WARN("Can't get mysql host!");
     }
 
     try {
@@ -61,18 +59,18 @@ bool MySQLKDataDriver::_init() {
 
     shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
     if (!mysql_init(mysql.get())) {
-        HKU_ERROR(" Initial MySQL handle error!" << func_name);
+        HKU_ERROR("Initial MySQL handle error!");
         return false;
     }
 
     if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
             m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
-        HKU_ERROR(" Failed to connect to database!" << func_name);
+        HKU_ERROR("Failed to connect to database!");
         return false;
     }
 
     if (mysql_set_character_set(mysql.get(), "utf8")) {
-        HKU_ERROR(" mysql_set_character_set error!" << func_name);
+        HKU_ERROR("mysql_set_character_set error!");
         return false;
     }
 
@@ -82,30 +80,29 @@ bool MySQLKDataDriver::_init() {
 }
 
 bool MySQLKDataDriver::_query(const string& sql_str) {
-    string func_name(" [MySQLKDataDriver::query]");
     int res = mysql_query(m_mysql.get(), sql_str.c_str());
     if (!res) {
         return true;
     }
 
     //重新连接数据库
-    HKU_INFO("MySQL connect invalid, will retry connect!" << func_name);
+    HKU_INFO("MySQL connect invalid, will retry connect!");
     m_mysql = NULL;
 
     shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
     if (!mysql_init(mysql.get())) {
-        HKU_ERROR(" Initial MySQL handle error!" << func_name);
+        HKU_ERROR(" Initial MySQL handle error!");
         return false;
     }
 
     if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
         m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
-        HKU_ERROR(" Failed to connect to database!" << func_name);
+        HKU_ERROR(" Failed to connect to database!");
         return false;
     }
 
     if (mysql_set_character_set(mysql.get(), "utf8")) {
-        HKU_ERROR(" mysql_set_character_set error!" << func_name);
+        HKU_ERROR(" mysql_set_character_set error!");
         return false;
     }
 
@@ -116,8 +113,7 @@ bool MySQLKDataDriver::_query(const string& sql_str) {
         return true;
     }
 
-    HKU_ERROR("mysql_query error! error no: " << res
-                << " " << sql_str << func_name);
+    HKU_ERROR("mysql_query error! error no: {} {}", res, sql_str);
     return false;
 }
 
@@ -137,16 +133,13 @@ void MySQLKDataDriver::
 loadKData(const string& market, const string& code,
         KQuery::KType kType, size_t start_ix, size_t end_ix,
         KRecordListPtr out_buffer) {
-    string func_name(" [MySQLKDataDriver::loadKData]");
     if (!m_mysql) {
-        //HKU_ERROR("Null m_mysql!" << func_name);
         return;
     }
 
     //if (kType >= KQuery::INVALID_KTYPE || start_ix >= end_ix) {
     if (start_ix >= end_ix) {        
-        HKU_WARN("ktype(" << kType << ") is invalid or start_ix("
-                << start_ix << ") >= endix(" << end_ix << ")" << func_name);
+        HKU_WARN("ktype({}) is invalid or start_ix({}) >= endix({})", kType, start_ix, end_ix );
         return;
     }
 
@@ -159,13 +152,12 @@ loadKData(const string& market, const string& code,
             << table << " order by date limit " << start_ix
             << ", " << (end_ix - start_ix);
     if (!_query(buf.str())) {
-        //HKU_ERROR("mysql_query error!" << func_name);
         return;
     }
 
     result = mysql_store_result(m_mysql.get());
     if (!result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return;
     }
 
@@ -184,8 +176,7 @@ loadKData(const string& market, const string& code,
             out_buffer->push_back(k);
             i++;
         } catch (...) {
-            HKU_INFO("Can't fecth No." << i << " record in "
-                    << table << func_name);
+            HKU_INFO("Can't fecth No.{} record in {}", i, table);
             i++;
             continue;
         }
@@ -200,10 +191,9 @@ size_t MySQLKDataDriver::
 getCount(const string& market,
         const string& code,
         KQuery::KType kType) {
-    string func_name(" [MySQLKDataDriver::getCount]");
     size_t result = 0;
     if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!" << func_name);
+        HKU_ERROR("Null m_mysql!");
         return result;
     }
 
@@ -219,13 +209,13 @@ getCount(const string& market,
     std::stringstream buf (std::stringstream::out);
     buf << "select count(1) from " << table;
     if (!_query(buf.str())) {
-        HKU_ERROR("mysql_query error! " << func_name);
+        HKU_ERROR("mysql_query error! ");
         return result;
     }
 
     mysql_result = mysql_store_result(m_mysql.get());
     if (!mysql_result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return result;
     }
 
@@ -233,7 +223,7 @@ getCount(const string& market,
         try {
             result = boost::lexical_cast<size_t>(row[0]);
         } catch (...) {
-            HKU_INFO("Error get record count of" << table << func_name);
+            HKU_INFO("Error get record count of {}", table);
             result = 0;
         }
     }
@@ -245,11 +235,10 @@ getCount(const string& market,
 bool MySQLKDataDriver::
 getIndexRangeByDate(const string& market, const string& code,
         const KQuery& query, size_t& out_start, size_t& out_end) {
-    string func_name(" [MySQLKDataDriver::getIndexRangeByDate]");
     out_start = 0;
     out_end = 0;
     if (query.queryType() != KQuery::DATE) {
-        HKU_ERROR("queryType must be KQuery::DATE" << func_name);
+        HKU_ERROR("queryType must be KQuery::DATE");
         return false;
     }
 
@@ -267,13 +256,13 @@ getIndexRangeByDate(const string& market, const string& code,
         << " where date<" << query.startDatetime().number();
 
     if (!_query(buf.str())) {
-        HKU_ERROR("mysql_query error! " << func_name);
+        HKU_ERROR("mysql_query error!");
         return false;
     }
 
     mysql_result = mysql_store_result(m_mysql.get());
     if (!mysql_result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return false;
     }
 
@@ -281,7 +270,7 @@ getIndexRangeByDate(const string& market, const string& code,
         try {
             out_start = boost::lexical_cast<size_t>(row[0]);
         } catch (...) {
-            HKU_INFO("Error boost::lexical_cast<size_t>" << table << func_name);
+            HKU_INFO("Error boost::lexical_cast<size_t> {}", table);
             out_start = 0;
             mysql_free_result(mysql_result);
             return false;
@@ -294,13 +283,13 @@ getIndexRangeByDate(const string& market, const string& code,
     buf << "select count(1) from " << table
         << " where date<=" << query.endDatetime().number();
     if (!_query(buf.str())) {
-        HKU_ERROR("mysql_query error! " << func_name);
+        HKU_ERROR("mysql_query error!");
         return false;
     }
 
     mysql_result = mysql_store_result(m_mysql.get());
     if (!mysql_result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return false;
     }
 
@@ -308,7 +297,7 @@ getIndexRangeByDate(const string& market, const string& code,
         try {
             out_end = boost::lexical_cast<size_t>(row[0]) - 1;
         } catch (...) {
-            HKU_INFO("Error boost::lexical_cast<size_t>" << table << func_name);
+            HKU_INFO("Error boost::lexical_cast<size_t> {}", table);
             out_end = 0;
             mysql_free_result(mysql_result);
             return false;
@@ -322,10 +311,9 @@ getIndexRangeByDate(const string& market, const string& code,
 KRecord MySQLKDataDriver::
 getKRecord(const string& market, const string& code,
           size_t pos, KQuery::KType kType) {
-    string func_name(" [MySQLKDataDriver::getKRecord]");
     KRecord result;
     if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!" << func_name);
+        HKU_ERROR("Null m_mysql!");
         return result;
     }
 
@@ -342,13 +330,13 @@ getKRecord(const string& market, const string& code,
     buf << "select date, open, high, low, close, amount, count from "
             << table << " order by date limit " << pos << ", 1";
     if (!_query(buf.str())) {
-        HKU_ERROR("mysql_query error! " << func_name);
+        HKU_ERROR("mysql_query error! ");
         return result;
     }
 
     mysql_result = mysql_store_result(m_mysql.get());
     if (!mysql_result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return result;
     }
 
@@ -363,7 +351,7 @@ getKRecord(const string& market, const string& code,
             result.transAmount = boost::lexical_cast<price_t>(row[5]);
             result.transCount = boost::lexical_cast<price_t>(row[6]);
         } catch (...) {
-            HKU_INFO("Error get record " << pos << " " << table << func_name);
+            HKU_INFO("Error get record {} {}", pos, table);
             result = Null<KRecord>();
         }
     }

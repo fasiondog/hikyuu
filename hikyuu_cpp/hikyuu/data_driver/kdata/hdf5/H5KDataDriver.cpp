@@ -108,9 +108,7 @@ bool H5KDataDriver::_init() {
             }
 
         } catch(...) {
-            HKU_ERROR("Can't open h5file: "
-                      << filename
-                      << " [H5KDataDriver::_init]");
+            HKU_ERROR("Can't open h5file: {}", filename);
         }
     }
 
@@ -207,6 +205,7 @@ _loadBaseData(const string& market, const string& code, KQuery::KType kType,
         size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
     H5FilePtr h5file;
     H5::Group group;
+
     if (!_getH5FileAndGroup(market, code, kType, h5file, group)) {
         return;
     }
@@ -239,12 +238,10 @@ _loadBaseData(const string& market, const string& code, KQuery::KType kType,
         }
 
     } catch(std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::_loadBaseData] Invalid date! market_code("
-                << market << code << ") "
-                << e.what());
+        HKU_WARN("Invalid date! market_code({}{}) {}", market, code, e.what());
 
     } catch(...) {
-
+        //忽略
     }
 
     delete [] pBuf;
@@ -325,7 +322,7 @@ _loadIndexData(const string& market, const string& code,
         }
 
     } catch(std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::_loadIndexData] Invalid date! " << e.what());
+        HKU_WARN("Invalid date! {}", e.what());
 
     } catch(...) {
 
@@ -379,7 +376,7 @@ _getH5FileAndGroup(const string& market, const string& code,
             return false;
         }
     } catch(...) {
-        HKU_ERROR("[H5KDataDriver::_getH5FileAndGroup] Exception of some HDF5 operator!");
+        HKU_ERROR("Exception of some HDF5 operator!");
         return false;
     }
 
@@ -403,9 +400,8 @@ size_t H5KDataDriver
         dataspace.close();
         dataset.close();
     }catch(...){
-        HKU_WARN("[H5KDataDriver::getCount] "
-              << "Exception of some HDF5 operator! stock: "
-              << market << code << " " << KQuery::getKTypeName(kType));
+        HKU_WARN("Exception of some HDF5 operator! stock: {}{} {}",
+                market, code, KQuery::getKTypeName(kType));
         total = 0;
     }
 
@@ -458,14 +454,12 @@ _getBaseRecord(const string& market, const string& code,
         result.transCount = price_t(h5record.transCount);
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver::_getBaseRecord] Invalid date!"
-               << market << code << "(pos: " << pos << ") datetime: "
-               << h5record.datetime);
+        HKU_WARN("Invalid date! {}{} (pos: {}) datetime: {}",
+            market, code, pos, h5record.datetime);
         result = Null<KRecord>();
 
     } catch(...) {
-        HKU_WARN("[H5KDataDriver::_getBaseRecord] HDF5(" << market << code
-                << "h5) read error!");
+        HKU_WARN("HDF5({}{}) read error!", market, code);
         result = Null<KRecord>();
     }
 
@@ -541,16 +535,13 @@ KRecord H5KDataDriver
         }
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver::_getOtherRecord] Invalid date!"
-                 " stock: " << market << code << " "
-                 << KQuery::getKTypeName(kType) << pos);
+        HKU_WARN("Invalid date! stock: {}{} {} {}", 
+            market, code, KQuery::getKTypeName(kType), pos);
         result = Null<KRecord>();
 
     }catch(...){
-        HKU_WARN("[H5KDataDriver::_getOtherRecord] "
-                "Exception of some HDF5 operator! stock: "
-                << market << code << " "
-                << KQuery::getKTypeName(kType) << " " << pos);
+        HKU_WARN("Exception of some HDF5 operator! stock: {}{} {} {}",
+                market, code, KQuery::getKTypeName(kType), pos);
         result = Null<KRecord>();
     }
 
@@ -682,15 +673,13 @@ _getBaseIndexRangeByDate(const string& market, const string& code,
         dataset.close();
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver::_getBaseIndexRangeByDate] "
-                    "Invalid datetime!");
+        HKU_WARN("Invalid datetime!");
         dataspace.close();
         dataset.close();
         return false;
 
     } catch(...) {
-        HKU_INFO("[H5KDataDriver::_getBaseIndexRangeByDate] error in "
-                << market << code);
+        HKU_INFO("error in {}{}", market, code);
         dataspace.close();
         dataset.close();
     }
@@ -872,16 +861,15 @@ TimeLineList H5KDataDriver
         }
 
     } catch (std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::_getTimeLine] Invalid date! market_code("
-                << market << code << ") "
-                << e.what());
+        HKU_WARN("Invalid date! market_code({}{} {}", market, code, e.what());
 
     } catch (boost::bad_numeric_cast&) {
-        HKU_WARN("You may be use 32bit system, but data is to larger! "
-                "[H5KDataDriver::_getTimeLine]");
+        HKU_WARN("You may be use 32bit system, but data is to larger! ");
 
+    } catch (std::exception& e) {
+        HKU_WARN(e.what());
     } catch (...) {
-
+        HKU_WARN("Unkown error!");
     }
 
     delete [] pBuf;
@@ -985,15 +973,13 @@ TimeLineList H5KDataDriver
         dataset.close();
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver::_getTimeLine] "
-                    "Invalid datetime!");
+        HKU_WARN("Invalid datetime!");
         dataspace.close();
         dataset.close();
         return result;
 
     } catch(...) {
-        HKU_INFO("[H5KDataDriver::_getTimeLine] error in "
-                << market << code);
+        HKU_INFO("error in {}{}", market, code);
         dataspace.close();
         dataset.close();
         return result;
@@ -1022,9 +1008,7 @@ TimeLineList H5KDataDriver
         }
 
     } catch(std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::_getTimeLine] Invalid date! market_code("
-                << market << code << ") "
-                << e.what());
+        HKU_WARN("Invalid date! market_code({}{}) {}", market, code, e.what());
 
     } catch(...) {
 
@@ -1104,17 +1088,15 @@ TransList H5KDataDriver
         }
 
     } catch (std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::_getTransList] Invalid date! market_code("
-                << market << code << ") "
-                << e.what());
+        HKU_WARN("Invalid date! market_code({}{}) {}", market, code, e.what());
 
     } catch (boost::bad_numeric_cast&) {
-        HKU_WARN("You may be use 32bit system, but data is to larger! "
-                "[H5KDataDriver::_getTransList]");
+        HKU_WARN("You may be use 32bit system, but data is to larger!");
 
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
     } catch (...) {
-        HKU_ERROR("Unknow error! [H5KDataDriver::_getTransList]");
-
+        HKU_ERROR("Unkown error!");
     }
 
     delete [] pBuf;
@@ -1218,15 +1200,13 @@ TransList H5KDataDriver
         dataset.close();
 
     } catch(std::out_of_range&) {
-        HKU_WARN("[H5KDataDriver::_getTransList] "
-                    "Invalid datetime!");
+        HKU_WARN("Invalid datetime!");
         dataspace.close();
         dataset.close();
         return result;
 
     } catch(...) {
-        HKU_INFO("[H5KDataDriver::_getTransList] error in "
-                << market << code);
+        HKU_INFO("error in {}{}", market, code);
         dataspace.close();
         dataset.close();
         return result;
@@ -1261,12 +1241,12 @@ TransList H5KDataDriver
         }
 
     } catch(std::out_of_range& e) {
-        HKU_WARN("[H5KDataDriver::_getTransList] Invalid date! market_code("
-                << market << code << ") "
-                << e.what());
+        HKU_WARN("Invalid date! market_code({}{}) {}", market, code, e.what());
 
-    } catch(...) {
-
+    } catch(std::exception& e) {
+        HKU_WARN(e.what());
+    } catch (...) {
+        HKU_WARN("Unkown error");
     }
 
     delete [] pBuf;

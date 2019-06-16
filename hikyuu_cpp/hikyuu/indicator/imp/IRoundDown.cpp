@@ -27,8 +27,7 @@ IRoundDown::~IRoundDown() {
 
 bool IRoundDown::check() {
     if (getParam<int>("ndigits") < 0) {
-        HKU_ERROR("Invalid param[ndigits] ! (n >= 0) " << m_params
-                << " [IRound::check]");
+        HKU_ERROR("Invalid param[ndigits] ! (n >= 0) {}", m_params);
         return false;
     }
     return true;

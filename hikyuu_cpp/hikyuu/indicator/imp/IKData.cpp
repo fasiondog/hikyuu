@@ -46,8 +46,8 @@ bool IKData::check() {
 //支持KDATA Indicator作为参数
 void IKData::_calculate(const Indicator& ind) {
     if (!isLeaf() && !ind.empty()) {
-        HKU_WARN("The input is ignored because " << getParam<string>("kpart")
-                 << " depends on the context! [IKData::_calculate]");
+        HKU_WARN("The input is ignored because {} depends on the context!", 
+            getParam<string>("kpart"));
     }
 
     KData kdata = getContext();
@@ -114,7 +114,7 @@ void IKData::_calculate(const Indicator& ind) {
     } else {
         m_name = "Unknow";
         m_discard = total;
-        HKU_INFO("Unkown ValueType of KData [IKData::IKData]");
+        HKU_INFO("Unkown ValueType of KData");
     }
 }
 

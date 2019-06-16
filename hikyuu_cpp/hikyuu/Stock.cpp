@@ -593,8 +593,7 @@ KRecordList Stock
     if (m_data->pKData.find(ktype) != m_data->pKData.end()) {
         size_t total = m_data->pKData[ktype]->size();
         if (start_ix >= end_ix || start_ix > total) {
-            HKU_WARN("Invalid param! (" << start_ix << ", "
-                    << end_ix << ") [Stock::getKRecordList]");
+            HKU_WARN("Invalid param! ({}, {})", start_ix, end_ix);
             return result;
         }
 
@@ -712,7 +711,7 @@ void Stock::realtimeUpdate(const KRecord& record) {
     } else if (tmp.datetime < record.datetime) {
         m_data->pKData[KQuery::DAY]->push_back(record);
     } else {
-        HKU_INFO("Ignore record, datetime < last record.datetime! [Stock::realtimeUpdate]");
+        HKU_INFO("Ignore record, datetime < last record.datetime!");
     }
 }
 

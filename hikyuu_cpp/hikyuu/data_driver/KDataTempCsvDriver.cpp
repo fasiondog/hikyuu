@@ -95,14 +95,13 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
     } else if (kType == KQuery::MIN) {
         filename = m_min_filename;
     } else {
-        HKU_INFO("Only support DAY and MIN! [KDataTempCsvDriver::loadKData]");
+        HKU_INFO("Only support DAY and MIN!");
         return;
     }
 
     std::ifstream infile(filename.c_str());
     if (!infile) {
-        HKU_ERROR("Can't open this file: " << filename
-                << " [KDataTempCsvDriver::loadKData]");
+        HKU_ERROR("Can't open this file: {}", filename);
         return;
     }
 
@@ -159,8 +158,7 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
             out_buffer->push_back(record);
 
         } catch (...) {
-            HKU_WARN("Invalid data in line " << line_no << "! at trans " << action
-                    << " [KDataTempCsvDriver::loadKData]");
+            HKU_WARN("Invalid data in line {}! at trans {}", line_no, action);
         }
 
         line_no++;

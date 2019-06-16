@@ -91,7 +91,7 @@ double Performance::get(const string& name) const {
 string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) {
     std::stringstream buf;
     if (!tm) {
-        HKU_INFO("TradeManagerPtr is Null! [Performance::report]");
+        HKU_INFO("TradeManagerPtr is Null!");
         return buf.str();
     }
 
@@ -122,12 +122,12 @@ void Performance
     reset();
 
     if (!tm) {
-        HKU_INFO("TradeManagerPtr is Null! [Performance::statistics]");
+        HKU_INFO("TradeManagerPtr is Null!");
         return;
     }
 
     if (datetime < tm->lastDatetime()) {
-        HKU_ERROR("datetime must >= tm->lastDatetime ! [Performance::statistics]");
+        HKU_ERROR("datetime must >= tm->lastDatetime !");
         return;
     }
 

@@ -19,10 +19,10 @@ void hikyuu_init(const string& config_file_name) {
         config.read(config_file_name);
 
     } catch (std::invalid_argument& e) {
-        HKU_FATAL("Reading configure error!\n" << e.what());
+        HKU_FATAL("Reading configure error!\n{}", e.what());
         exit(1);
     } catch (std::logic_error& e) {
-        HKU_FATAL("Reading configure error!\n" << e.what());
+        HKU_FATAL("Reading configure error!\n{}", e.what());
         exit(1);
     } catch(...) {
         HKU_WARN("Reading configure error! Don't know  error!");

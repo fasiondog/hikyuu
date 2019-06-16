@@ -32,11 +32,9 @@ MySQLBaseInfoDriver::~MySQLBaseInfoDriver() {
 
 
 bool MySQLBaseInfoDriver::_init() {
-    string func_name(" [MySQLBaseInfoDriver::MySQLBaseInfoDriver]");
-
     shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
     if (!mysql){
-        HKU_ERROR("Can't create MYSQL instance!" << func_name );
+        HKU_ERROR("Can't create MYSQL instance!");
         return false;
     }
 
@@ -87,18 +85,18 @@ bool MySQLBaseInfoDriver::_init() {
     HKU_TRACE("MYSQL database: " << database);
 
     if (!mysql_init(mysql.get())) {
-        HKU_FATAL("Initial MySQL handle error!" << func_name);
+        HKU_FATAL("Initial MySQL handle error!");
         return false;
     }
 
     if (!mysql_real_connect(mysql.get(), host.c_str(), usr.c_str(),
             pwd.c_str(), database.c_str(), port, NULL, 0) ) {
-        HKU_FATAL("Failed to connect to database!" << func_name);
+        HKU_FATAL("Failed to connect to database!");
         return false;
     }
 
     if (mysql_set_character_set(mysql.get(), "utf8")) {
-        HKU_ERROR("mysql_set_character_set error!" << func_name);
+        HKU_ERROR("mysql_set_character_set error!");
         return false;
     }
 
@@ -108,9 +106,8 @@ bool MySQLBaseInfoDriver::_init() {
 
 
 bool MySQLBaseInfoDriver::_loadMarketInfo() {
-    string func_name(" [MySQLBaseInfoDriver::loadMarketInfo]");
     if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!" << func_name);
+        HKU_ERROR("Null m_mysql!");
         return false;
     }
 
@@ -120,13 +117,13 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
     int res = mysql_query(m_mysql.get(), "select market,name,"
             "description,code,lastDate from market");
     if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res << func_name);
+        HKU_ERROR("mysql_query error! error no: {}", res);
         return false;
     }
 
     result = mysql_store_result(m_mysql.get());
     if (!result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return false;
     }
 
@@ -147,7 +144,7 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
                                      row[3], last_date);
             sm.addMarketInfo(marketInfo);
         } catch(...) {
-            HKU_ERROR("Can't get MarketInfo " << market << func_name);
+            HKU_ERROR("Can't get MarketInfo {}", market);
             continue;
         }
     }
@@ -158,9 +155,8 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
 
 
 bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
-    string func_name(" [MySQLBaseInfoDriver::loadStockTypeInfo]");
     if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!" << func_name);
+        HKU_ERROR("Null m_mysql!");
         return false;
     }
 
@@ -171,13 +167,13 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
             "sti.tick, sti.tickValue, sti.precision, sti.minTradeNumber, "
             "sti.maxTradeNumber from stocktypeinfo as sti");
     if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res << func_name);
+        HKU_ERROR("mysql_query error! error no: {}", res);
         return false;
     }
 
     result = mysql_store_result(m_mysql.get());
     if (!result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return false;
     }
 
@@ -193,7 +189,7 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
                     boost::lexical_cast<size_t>(row[6]));
             sm.addStockTypeInfo(stkTypeInfo);
         } catch(...) {
-            HKU_ERROR("Can't get StockTypeInfo " << type << func_name);
+            HKU_ERROR("Can't get StockTypeInfo {}", type);
             continue;
         }
     }
@@ -205,9 +201,8 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
 
 bool MySQLBaseInfoDriver::
 _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
-    string func_name(" [MySQLBaseInfoDriver::_getStockWeightList]");
     if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!" << func_name);
+        HKU_ERROR("Null m_mysql!");
         return false;
     }
 
@@ -220,13 +215,13 @@ _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
           where stockid=" << stockid << " order by date";
     int res = mysql_query(m_mysql.get(), buf.str().c_str());
     if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res << func_name);
+        HKU_ERROR("mysql_query error! error no: {}", res);
         return false;
     }
 
     result = mysql_store_result(m_mysql.get());
     if (!result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return false;
     }
 
@@ -240,7 +235,7 @@ _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
         try {
             date = Datetime(row[1]);
             if (date >= (Datetime::max)()) {
-                HKU_WARN("Invalid date!" << id << func_name);
+                HKU_WARN("Invalid date! id:{}", id);
                 continue;
             }
         } catch (...) {
@@ -257,7 +252,7 @@ _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
                     boost::lexical_cast<price_t>(row[7]),
                     boost::lexical_cast<price_t>(row[8])));
         } catch(...) {
-            HKU_WARN("Can't get weight record (id)" << id << func_name);
+            HKU_WARN("Can't get weight record ({})", id);
             continue;
         }
     }
@@ -268,9 +263,8 @@ _getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
 
 
 bool MySQLBaseInfoDriver::_loadStock() {
-    string func_name(" [MySQLBaseInfoDriver::_loadStock]");
     if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!" << func_name);
+        HKU_ERROR("Null m_mysql!");
         return false;
     }
 
@@ -287,13 +281,13 @@ bool MySQLBaseInfoDriver::_loadStock() {
            "left outer join market on stock.marketid = market.marketid";
     int res = mysql_query(m_mysql.get(), buf.str().c_str());
     if(res) {
-        HKU_ERROR("mysql_query error! error no: " << res << func_name);
+        HKU_ERROR("mysql_query error! error no: {}", res);
         return false;
     }
 
     result = mysql_store_result(m_mysql.get());
     if (!result) {
-        HKU_ERROR("mysql_store_result error!" << func_name);
+        HKU_ERROR("mysql_store_result error!");
         return false;
     }
 
@@ -346,7 +340,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
             sm.addStock(stock);
 
         } catch(...) {
-            HKU_ERROR("Can't get MarketInfo " << market << func_name);
+            HKU_ERROR("Can't get MarketInfo {}", market);
             continue;
         }
     }
