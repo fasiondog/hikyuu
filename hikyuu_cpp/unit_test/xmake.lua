@@ -20,7 +20,7 @@ target("unit-test")
         add_cxflags("-wd4244")
         add_cxflags("-wd4805")
     else
-        add_cxflags("-Wno-unused-variable")
+        add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")
         add_cxflags("-Wno-sign-compare")
     end
     
