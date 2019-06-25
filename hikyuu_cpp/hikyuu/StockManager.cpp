@@ -87,9 +87,6 @@ void StockManager::init(
         m_datadir = "";
     }
 
-    //获取log配置文件信息
-    init_logger("");
-    
     m_stockDict.clear();
     m_marketInfoDict.clear();
     m_stockTypeInfo.clear();

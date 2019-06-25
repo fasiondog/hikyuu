@@ -31,27 +31,54 @@ void set_log_level(LOG_LEVEL level) {
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
-void init_logger(const std::string& configure_name) {
+#if HKU_USE_ASYNC_LOGGER
+std::shared_ptr<spdlog::async_logger> init_logger() {
     //auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
     
-#if HKU_USE_ASYNC_LOGGER
     spdlog::init_thread_pool(8192, 1);
     std::vector<spdlog::sink_ptr> sinks {stdout_sink};
     auto logger = std::make_shared<spdlog::async_logger>("hikyuu", 
         sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-#else        
-    auto logger = std::shared_ptr<spdlog::logger>(
-            new spdlog::logger("hikyuu", stdout_sink));
-#endif /* HKU_USE_ASYNC_LOGGER */
 
     logger->set_level(spdlog::level::trace);
     logger->flush_on(spdlog::level::trace);
     //logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
-    //spdlog::details::registry::instance().register_logger(logger);
     spdlog::register_logger(logger);
+    return logger;
 }
+
+std::shared_ptr<spdlog::async_logger> g_hikyuu_logger = init_logger();
+
+std::shared_ptr<spdlog::async_logger> getHikyuuLogger() {
+    return g_hikyuu_logger;
+}
+#else
+
+std::shared_ptr<spdlog::logger> init_logger() {
+    //auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
+    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    stdout_sink->set_level(spdlog::level::trace);
+    
+    auto logger = std::shared_ptr<spdlog::logger>(
+            new spdlog::logger("hikyuu", stdout_sink));
+
+    logger->set_level(spdlog::level::trace);
+    logger->flush_on(spdlog::level::trace);
+    //logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
+    logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
+    spdlog::register_logger(logger);
+    return logger;
+}
+
+std::shared_ptr<spdlog::logger> g_hikyuu_logger = init_logger();
+
+std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger() {
+    return g_hikyuu_logger;
+}
+
+#endif /* #if HKU_USE_ASYNC_LOGGER */
 
 } /* namespace hku */

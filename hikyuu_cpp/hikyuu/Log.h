@@ -32,12 +32,6 @@ enum LOG_LEVEL {
 };
 
 /**
- * 初始化 LOGGER
- * @param configue_name 配置文件名称
- */
-void HKU_API init_logger(const std::string& configue_name);
-
-/**
  * 获取当前日志级别
  * @return
  */
@@ -49,27 +43,32 @@ LOG_LEVEL HKU_API get_log_level();
  */
 void HKU_API set_log_level(LOG_LEVEL level);
 
+#if HKU_USE_ASYNC_LOGGER
+std::shared_ptr<spdlog::async_logger> HKU_API getHikyuuLogger();
+#else
+std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
+#endif /* #if HKU_USE_ASYNC_LOGGER */
 
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
 #define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
-#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(spdlog::get("hikyuu"), __VA_ARGS__)
+#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
-#define HKU_DEBUG(...) SPDLOG_LOGGER_TRACE(spdlog::get("hikyuu"), __VA_ARGS__)
+#define HKU_DEBUG(...) SPDLOG_LOGGER_TRACE(getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_INFO(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::info, __VA_ARGS__)
-#define HKU_INFO(...) SPDLOG_LOGGER_INFO(spdlog::get("hikyuu"), __VA_ARGS__)
+#define HKU_INFO(...) SPDLOG_LOGGER_INFO(getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_WARN(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::warn, __VA_ARGS__)
-#define HKU_WARN(...) SPDLOG_LOGGER_WARN(spdlog::get("hikyuu"), __VA_ARGS__)
+#define HKU_WARN(...) SPDLOG_LOGGER_WARN(getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_ERROR(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::err, __VA_ARGS__)
-#define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(spdlog::get("hikyuu"), __VA_ARGS__)
+#define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_FATAL(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
-#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(spdlog::get("hikyuu"), __VA_ARGS__)
+#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(getHikyuuLogger(), __VA_ARGS__)
 
 } /* namespace hku */
 #endif /* HIKUU_LOG_H_ */

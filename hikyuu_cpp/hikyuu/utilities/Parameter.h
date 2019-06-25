@@ -127,6 +127,14 @@ public:
         return m_params.count(name) == 0 ? false : true;
     }
 
+    /** 
+     * 获取指定参数的实际类型 
+     * @param name 指定参数名称
+     * @return "string" | "int" | "double" | "bool" | "Stock" |
+     *         "KQuery" | "KData" | "PriceList" | "DatetimeList"
+     */
+    string type(const string& name) const;
+
     /**
      * 设定指定的参数值
      * @note 已经存在的参数修改其值，不存在的参数进行增加

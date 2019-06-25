@@ -5,7 +5,7 @@ set_project("hikyuu")
 
 -- version
 set_version("1.1.5")
-set_configvar("USE_ASYNC_LOGGER", 1)
+set_configvar("USE_ASYNC_LOGGER", 0)
 set_configvar("SPDLOG_ACTIVE_LEVEL", 2)
 set_configvar("CHECK_ACCESS_BOUND", 1)
 set_configvar("SUPPORT_SERIALIZATION", 1)

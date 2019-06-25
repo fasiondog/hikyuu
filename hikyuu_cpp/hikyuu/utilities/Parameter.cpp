@@ -102,6 +102,36 @@ bool Parameter::support(const boost::any& value) {
 }
 
 
+string Parameter::type(const string& name) const {
+    auto iter = m_params.find(name);
+    if (iter == m_params.end()) {
+        throw std::out_of_range("out_of_range in Parameter::get : " + name);
+    }
+    
+    if (iter->second.type() == typeid(int)) {
+        return "int";
+    } else if (iter->second.type() == typeid(bool)) {
+        return "bool";
+    } else if (iter->second.type() == typeid(double)) {
+        return "double";
+    } else if (iter->second.type() == typeid(string)) {
+        return "string";
+    } else if (iter->second.type() == typeid(Stock)) {
+        return "Stock";
+    } else if (iter->second.type() == typeid(KQuery)) {
+        return "KQuery";
+    } else if (iter->second.type() == typeid(KData)) {
+        return "KData";
+    } else if (iter->second.type() == typeid(PriceList)) {
+        return "PriceList";
+    } else if (iter->second.type() == typeid(DatetimeList)) {
+        return "DatetimeList";
+    }
+
+    return "Unknow";
+}
+
+
 StringList Parameter::getNameList() const {
     vector<string> result;
     param_map_t::const_iterator iter = m_params.begin();
