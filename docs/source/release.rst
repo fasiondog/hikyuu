@@ -1,6 +1,16 @@
 版本发布说明
 ===============
 
+1.1.3 - 2019年6月11日
+-------------------------
+
+1. 原表示浮点数的 Null 值更改为和 numpy 一致，在c++中为 std::nan, python中 为numpy::nan
+2. Indicator 支持按日期获取数据，如：c['2019-6-11'] 或 c[Datetime(201906110000)] （注：由于 indicator的四则运算无法判定绑定的上下文，所以四则运算产生的结果无法获取对应日期，此时需要先执行 setContext 对结果指定上下文）
+3. Datetime 增加 startOfDay, endOfDay 方法
+4. 从 Indicator, SYS, TM 等支持 set/getParam 的对象中引出 haveParam方法至Python
+5. 增加了近 40 个 通达信基础指标实现，方便移植和试验网上大量通达信指标公式。具体详见：https://hikyuu.readthedocs.io/zh_CN/latest/indicator/overview.html
+
+
 1.1.2 - 2019年4月18日
 -------------------------
 
