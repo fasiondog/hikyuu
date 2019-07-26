@@ -33,8 +33,12 @@ from hikyuu import KQuery, constant
 from hikyuu.indicator import MACD, CLOSE, HIGH, LOW
 from hikyuu.trade_manage import BUSINESS 
 
-from pyecharts import Overlap, Line, Kline, Bar, Grid, Style, EffectScatter
 from .common import get_draw_title
+
+try:
+    from pyecharts import Overlap, Line, Kline, Bar, Grid, Style, EffectScatter
+except:
+    print("Pyecharts version is not compatible, please switch to 0.5.11 version!")
 
 
 def ax_set_xlim(self, *args, **kwargs):
