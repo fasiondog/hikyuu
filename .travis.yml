@@ -39,6 +39,6 @@ script:
   - ls .
   - xmake f --with-unit-test=y --cxx=$CXX
   - xmake -b hikyuu
-  - xmake -b unit-test
-  - xmake r unit-test
+  - if [ "$CXX_FOR_BUILD" = "clang++" ]; then xmake -b unit-test; fi
+  - if [ "$CXX_FOR_BUILD" = "clang++" ]; then xmake r unit-test; fi
   
