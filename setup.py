@@ -164,9 +164,11 @@ def build(verbose):
 
 
 @click.command()
-def test():
+@click.option("--compile", default=False, type=click.BOOL, help='是否先进行编译（默认：false）')
+def test(compile):
     """ 执行单元测试 """
-    start_build()
+    if compile:
+        start_build()
     os.system("xmake r unit-test")
 
 
