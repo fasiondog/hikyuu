@@ -104,7 +104,7 @@ string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) 
     buf.setf(std::ios_base::fixed);
     buf.precision(tm->precision());
     for(iter = m_name_list.begin(); iter != m_name_list.end(); ++iter){
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
         buf << gb_to_utf8(*iter) << ": " << m_result[*iter] << std::endl;
 #else
         buf << (*iter) << ": " << m_result[*iter] << std::endl;

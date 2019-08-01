@@ -10,7 +10,7 @@
 
 #include "../../BaseInfoDriver.h"
 
-#if defined(BOOST_WINDOWS)
+#if defined(_MSC_VER)
     #include <mysql.h>
 #else
     #include <mysql/mysql.h>

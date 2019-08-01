@@ -10,7 +10,6 @@
 
 #ifndef DATATYPE_H_
 #include <string>
-#include <boost/config.hpp>
 
 #ifndef HKU_API
 #define HKU_API
@@ -29,7 +28,7 @@ using std::string;
  * @{
  */
 
-#if defined(BOOST_WINDOWS)
+#if defined(_MSC_VER)
 string HKU_API utf8_to_gb(const char* szinput);
 string HKU_API utf8_to_gb(const string& szinput);
 string HKU_API gb_to_utf8(const char* szinput);
@@ -45,7 +44,7 @@ string HKU_API gb_to_utf8(const string& szinput);
  * @note 为跨平台，源代码文件必须使用UTF8编码保存，程序中出现的
  *       中文字符串，应使用HKU_STR，如：std::cout << HKU_STR("中国")
  */
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX < 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX < 0x03000000)
     //将utf8编码的字符串转换为GB2312编码
     #define UTF8ToGB utf8_to_gb
     #define GBToUTF8 gb_to_utf8

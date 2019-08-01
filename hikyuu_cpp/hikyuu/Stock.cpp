@@ -36,7 +36,7 @@ HKU_API std::ostream& operator <<(std::ostream &os, const Stock& stock) {
     StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(stock.type()));
     os << "Stock(" << stock.market() << strip << stock.code() << strip
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
        << utf8_to_gb(stock.name()) << strip
        << utf8_to_gb(typeInfo.description()) << strip
 #else

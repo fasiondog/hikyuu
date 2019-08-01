@@ -22,7 +22,7 @@ GConfig::GConfig() {
     }
 
     std::cout << "current path  : " << current << std::endl;
-#if defined(BOOST_WINDOWS)
+#if defined(_MSC_VER)
     std::cout << "configure file: " << current.string() << "\\hikyuu_win.ini" << std::endl;
     hikyuu_init(current.string() + "\\hikyuu_win.ini");
 #else

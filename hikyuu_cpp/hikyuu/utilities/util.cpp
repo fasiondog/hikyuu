@@ -7,7 +7,7 @@
 #include <cmath>
 #include "util.h"
 
-#if defined(BOOST_WINDOWS)
+#if defined(_MSC_VER)
 #include <windows.h>
 #else
 #include <iconv.h>
@@ -133,7 +133,7 @@ double HKU_API roundDown(double number, int ndigits) {
 }
 
 
-#if defined(BOOST_WINDOWS)
+#if defined(_MSC_VER)
 /**
  * 将UTF8编码的字符串转换为GB2312编码的字符串
  * @param szinput 待转换的原始UTF8编码的字符串
@@ -227,7 +227,7 @@ string HKU_API gb_to_utf8(const string& szinput) {
     return gb_to_utf8(szinput.c_str());
 }
 
-#else /* else for defined(BOOST_WINDOWS) */
+#else /* else for defined(_MSC_VER) */
 string HKU_API utf8_to_gb(const string& szinput) {
     char *inbuf=const_cast<char*>(szinput.c_str());
     size_t inlen = strlen(inbuf);
@@ -260,6 +260,6 @@ string HKU_API gb_to_utf8(const string& szinput) {
     return result;
 }
 
-#endif /* defined(BOOST_WINDOWS) */
+#endif /* defined(_MSC_VER) */
 
 } /*namespace*/

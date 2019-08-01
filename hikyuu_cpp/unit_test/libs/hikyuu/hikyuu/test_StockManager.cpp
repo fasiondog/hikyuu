@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE( test_StockManager_getAllMarket ) {
     /** @arg 检测测试数据中的Market */
     MarketList result(sm.getAllMarket());
     BOOST_CHECK(result.size() == 3);
-#if defined(BOOST_WINDOWS)
+#if defined(_MSC_VER)
     BOOST_CHECK(result[0] == "TMP");
     BOOST_CHECK(result[1] == "SH");
     BOOST_CHECK(result[2] == "SZ");

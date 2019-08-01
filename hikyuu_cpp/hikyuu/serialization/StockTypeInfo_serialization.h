@@ -20,7 +20,7 @@ namespace boost {
 namespace serialization {
 
 //防止boost::serialization某些情况不能在独立的命名空间中
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX < 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX < 0x03000000)
     #ifndef HKU_GB_TO_UTF8
     #define HKU_GB_TO_UTF8(s)  hku::GBToUTF8(s)
     #endif

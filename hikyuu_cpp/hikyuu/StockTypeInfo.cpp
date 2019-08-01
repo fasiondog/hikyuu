@@ -19,7 +19,7 @@ HKU_API std::ostream& operator <<(std::ostream &os,
 
     string split(", ");
     os << "StockTypeInfo(" << stockTypeInfo.type() << split
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
        << utf8_to_gb(stockTypeInfo.description()) << split
 #else
        << stockTypeInfo.description() << split

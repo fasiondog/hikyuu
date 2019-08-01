@@ -120,7 +120,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeRecord& record) {
     string market_code(""), name("");
     if(!stock.isNull()){
         market_code = stock.market_code();
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
         name = utf8_to_gb(stock.name());
 #else
         name = stock.name();

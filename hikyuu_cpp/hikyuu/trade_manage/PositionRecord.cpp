@@ -43,7 +43,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const PositionRecord& record
     if(!stock.isNull()){
         market = stock.market();
         code = stock.code();
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
         name = utf8_to_gb(stock.name());
 #else
         name = stock.name();

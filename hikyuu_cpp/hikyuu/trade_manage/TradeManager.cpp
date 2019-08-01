@@ -1977,7 +1977,7 @@ void TradeManager::tocsv(const string& path) {
         }else{
             file << record.datetime << sep
                  << record.stock.market_code() << sep
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
                  << utf8_to_gb(record.stock.name()) << sep
 #else
                  << record.stock.name() << sep
@@ -2029,7 +2029,7 @@ void TradeManager::tocsv(const string& path) {
         file << record.takeDatetime << sep
              << record.cleanDatetime << sep
              << record.stock.market_code() << sep
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
              << utf8_to_gb(record.stock.name()) << sep
 #else
              << record.stock.name() << sep
@@ -2059,7 +2059,7 @@ void TradeManager::tocsv(const string& path) {
         file << record.takeDatetime << sep
              << record.cleanDatetime << sep
              << record.stock.market_code() << sep
-#if defined(BOOST_WINDOWS) && (PY_VERSION_HEX >= 0x03000000)
+#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
              << utf8_to_gb(record.stock.name()) << sep
 #else
              << record.stock.name() << sep
