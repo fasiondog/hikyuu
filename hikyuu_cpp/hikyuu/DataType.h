@@ -27,10 +27,12 @@
 #include <unordered_map>
 
 #include "Log.h"
-#include "utilities/Null.h"
 #include "datetime/Datetime.h"
+#include "utilities/Null.h"
+#include "utilities/arithmetic.h"
+#include "utilities/SpendTimer.h"
 
-#if defined(BOOST_MSVC)
+#if defined(_MSC_VER)
 #pragma warning (disable: 4251)
 #pragma warning (disable: 4290)
 #pragma warning (disable: 4996)

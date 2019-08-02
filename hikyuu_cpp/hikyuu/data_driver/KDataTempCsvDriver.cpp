@@ -59,7 +59,7 @@ void KDataTempCsvDriver::_get_title_column(const string& line) {
     int total = (int)m_token_buf.size();
     for (int i = 0; i < total; ++i) {
         string token = m_token_buf[i];
-        boost::to_upper(token);
+        to_upper(token);
 
         if ("DATE" == token || "DATETIME" == token || HKU_STR("日期") == token) {
             m_column[DATE] = i;

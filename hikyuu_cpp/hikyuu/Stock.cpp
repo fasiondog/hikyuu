@@ -106,7 +106,7 @@ Stock::Data::Data(const string& market, const string& code,
         m_unit = m_tickValue / m_tick;
     }
 
-    boost::to_upper(m_market);
+    to_upper(m_market);
     m_market_code = m_market + m_code;
     /*for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
         pKData[i] = KRecordListPtr();

@@ -79,7 +79,7 @@ public:
     }
 };
 
-#if !defined(BOOST_MSVC)
+#if !defined(_MSC_VER)
 /**
  * 提供size_t的Null值
  * @ingroup Common-Utilities

@@ -22,7 +22,7 @@ IKData::IKData(): IndicatorImp("KDATA") {
 IKData::IKData(const KData& kdata, const string& part)
 : IndicatorImp() {
     string part_name(part);
-    boost::to_upper(part_name);
+    to_upper(part_name);
     setParam<string>("kpart", part_name);
     setParam<KData>("kdata", kdata);
     _calculate(Indicator());

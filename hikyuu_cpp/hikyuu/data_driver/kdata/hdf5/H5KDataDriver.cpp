@@ -64,8 +64,8 @@ bool H5KDataDriver::_init() {
 
         string market = iter->substr(0, pos);
         string ktype = iter->substr(pos+1);
-        boost::to_upper(market);
-        boost::to_upper(ktype);
+        to_upper(market);
+        to_upper(ktype);
 
         try {
             if (ktype == KQuery::getKTypeName(KQuery::DAY)) {
@@ -338,7 +338,7 @@ _getH5FileAndGroup(const string& market, const string& code,
         KQuery::KType kType, H5FilePtr& out_file, H5::Group& out_group) {
     try {
         string key(market + "_" + kType); //KQuery::getKTypeName(kType));
-        boost::to_upper(key);
+        to_upper(key);
 
         out_file = m_h5file_map[key];
 

@@ -83,7 +83,7 @@ string KQuery::getQueryTypeName(QueryType queryType) {
 KQuery::QueryType KQuery::getQueryTypeEnum(const string& arg) {
     QueryType result;
     string name(arg);
-    boost::to_upper(name);
+    to_upper(name);
     if ("INDEX" == name) {
         result = INDEX;
     } else if ("DATE" == name) {
@@ -139,7 +139,7 @@ string KQuery::getKTypeName(KType dataType) {
 
 KQuery::KType KQuery::getKTypeEnum(const string& arg) {
     string name(arg);
-    boost::to_upper(name);
+    to_upper(name);
     return name;
    /* KType result;
     if ("MIN" == name) {
@@ -202,7 +202,7 @@ string KQuery::getRecoverTypeName(RecoverType recoverType) {
 KQuery::RecoverType KQuery::getRecoverTypeEnum(const string& arg) {
     RecoverType result;
     string name(arg);
-    boost::to_upper(name);
+    to_upper(name);
     if ("NO_RECOVER" == name) {
         result = NO_RECOVER;
     } else if ("FORWARD" == name) {

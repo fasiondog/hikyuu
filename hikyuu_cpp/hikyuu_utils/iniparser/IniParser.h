@@ -15,7 +15,7 @@
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(_MSC_VER)
 #pragma warning(disable: 4251)
 #pragma warning(disable: 4275)
 #pragma warning(disable: 4290)

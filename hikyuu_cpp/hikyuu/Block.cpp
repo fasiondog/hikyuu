@@ -48,7 +48,7 @@ Block& Block::operator=(const Block& block) {
 bool Block::have(const string& market_code) const {
     if (!m_data) return false;
     string query_str = market_code;
-    boost::to_upper(query_str);
+    to_upper(query_str);
     return m_data->m_stockDict.count(query_str) ? true : false;
 }
 
@@ -63,7 +63,7 @@ Stock Block::get(const string& market_code) const {
         return result;
 
     string query_str = market_code;
-    boost::to_upper(query_str);
+    to_upper(query_str);
     auto iter = m_data->m_stockDict.find(query_str);
     if (iter != m_data->m_stockDict.end()) {
         result = iter->second;
@@ -100,7 +100,7 @@ bool Block::remove(const string& market_code) {
         return false;
     }
     string query_str = market_code;
-    boost::to_upper(query_str);
+    to_upper(query_str);
     m_data->m_stockDict.erase(query_str);
     return true;
 }

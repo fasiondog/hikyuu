@@ -38,7 +38,7 @@ string HKU_API getSystemPartName(int part) {
 
 SystemPart HKU_API getSystemPartEnum(const string& arg) {
     string name(arg);
-    boost::to_upper(name);
+    to_upper(name);
     if ("EV" == name) {
         return PART_ENVIRONMENT;
 

@@ -30,14 +30,14 @@ KDataDriver::KDataDriver(): m_name("") {
 }
 
 KDataDriver::KDataDriver(const string& name): m_name(name) {
-    boost::to_upper(m_name);
+    to_upper(m_name);
 }
 
 bool KDataDriver::checkType() {
     bool result = false;
     try {
         string type = getParam<string>("type");
-        boost::to_upper(type);
+        to_upper(type);
         if (type == m_name) {
             result = true;
         } else {

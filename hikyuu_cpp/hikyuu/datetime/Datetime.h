@@ -12,7 +12,7 @@
 #include <vector>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(_MSC_VER)
 #pragma warning(disable: 4251)
 #endif
 

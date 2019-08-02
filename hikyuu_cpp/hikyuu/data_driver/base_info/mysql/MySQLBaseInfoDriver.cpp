@@ -129,7 +129,7 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
     StockManager& sm = StockManager::instance();
     while((row = mysql_fetch_row(result))) {
         string market(row[0]);
-        boost::to_upper(market);
+        to_upper(market);
         Datetime last_date;
         try {
             hku_int64 d = (boost::lexical_cast<hku_uint64>(row[4])*10000);
@@ -294,7 +294,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
     while((row = mysql_fetch_row(result))) {
         hku_uint64 stockid = boost::lexical_cast<hku_uint64>(row[0]);
         string market(row[1]);
-        boost::to_upper(market);
+        to_upper(market);
 
         Datetime start_date;
         try {

@@ -52,7 +52,7 @@ string HKU_API getBusinessName(BUSINESS business) {
 BUSINESS HKU_API getBusinessEnum(const string& arg) {
     BUSINESS business;
     string business_name(arg);
-    boost::to_upper(business_name);
+    to_upper(business_name);
     if (business_name == "INIT") {
         business = BUSINESS_INIT;
     } else if (business_name == "BUY") {

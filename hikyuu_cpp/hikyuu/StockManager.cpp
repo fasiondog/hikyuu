@@ -292,7 +292,7 @@ string StockManager::datadir() const {
 Stock StockManager::getStock(const string& querystr) const {
     Stock result;
     string query_str = querystr;
-    boost::to_upper(query_str);
+    to_upper(query_str);
     auto iter = m_stockDict.find(query_str);
     if(iter != m_stockDict.end()) {
         return iter->second;
@@ -303,7 +303,7 @@ Stock StockManager::getStock(const string& querystr) const {
 
 MarketInfo StockManager::getMarketInfo(const string& market) const {
     string market_tmp = market;
-    boost::to_upper(market_tmp);
+    to_upper(market_tmp);
     auto iter = m_marketInfoDict.find(market_tmp);
     if(iter != m_marketInfoDict.end()) {
         return iter->second;
@@ -364,7 +364,7 @@ Stock StockManager::addTempCsvStock(
         size_t minTradeNumber,
         size_t maxTradeNumber) {
     string new_code(code);
-    boost::to_upper(new_code);
+    to_upper(new_code);
     Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true,
             Datetime(199901010000), Null<Datetime>(),
             tick, tickValue, precision, minTradeNumber, maxTradeNumber);
@@ -384,7 +384,7 @@ Stock StockManager::addTempCsvStock(
 
 void StockManager::removeTempCsvStock(const string& code) {
     string query_str = "TMP" + code;
-    boost::to_upper(query_str);
+    to_upper(query_str);
     auto iter = m_stockDict.find(query_str);
     if(iter != m_stockDict.end()) {
         m_stockDict.erase(iter);
@@ -394,7 +394,7 @@ void StockManager::removeTempCsvStock(const string& code) {
 
 bool StockManager::addStock(const Stock& stock) {
     string market_code(stock.market_code());
-    boost::to_upper(market_code);
+    to_upper(market_code);
     if(m_stockDict.find(market_code) != m_stockDict.end()) {
         HKU_ERROR("The stock had exist! {}", market_code);
         return false;
@@ -407,7 +407,7 @@ bool StockManager::addStock(const Stock& stock) {
 
 bool StockManager::addMarketInfo(const MarketInfo& marketInfo) {
     string market = marketInfo.market();
-    boost::to_upper(market);
+    to_upper(market);
     if (m_marketInfoDict.find(market) != m_marketInfoDict.end()) {
         HKU_ERROR("The marketInfo had exist! {}", market);
         return false;

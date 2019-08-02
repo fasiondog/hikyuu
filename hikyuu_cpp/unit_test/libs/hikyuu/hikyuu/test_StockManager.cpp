@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( test_StockManager_getStockTypeInfo ) {
     stockTypeInfo = sm.getStockTypeInfo(8);
     BOOST_CHECK(stockTypeInfo != Null<StockTypeInfo>());
     BOOST_CHECK(stockTypeInfo.type() == 8);
-#if !defined(BOOST_MSVC)
+#if !defined(_MSC_VER)
     //msvc中文支持不好，此处无法编译
     BOOST_CHECK(stockTypeInfo.description() == HKU_STR("创业板"));
 #endif

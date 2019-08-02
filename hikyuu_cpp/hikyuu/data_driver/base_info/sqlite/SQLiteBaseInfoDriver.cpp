@@ -83,7 +83,7 @@ int SQLiteBaseInfoDriver::_getMarketTableCallBack(void *out,
     int result = 0;
     hku_uint64 d;
     string market(azVals[0]);
-    boost::to_upper(market);
+    to_upper(market);
     try{
         d = (boost::lexical_cast<hku_uint64>(azVals[4])*10000);
         Datetime datetime;
