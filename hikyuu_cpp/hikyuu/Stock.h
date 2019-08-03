@@ -136,7 +136,7 @@ public:
      * @param out_end [out] 对应的K线结束范围，不包含自身
      * @return true 成功 | false 失败
      */
-    bool getIndexRange(const KQuery&, size_t& out_start, size_t& out_end) const;
+    bool getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const;
 
     /** 获取指定索引的K线数据记录，未作越界检查 */
     KRecord getKRecord(size_t pos,

@@ -65,8 +65,8 @@ Indicator HKU_API VOL(const KData&);
  * @see KDATA, OPEN, HIGH, LOW, CLOSE, AMO, VOL
  * @ingroup Indicator
  */
-Indicator HKU_API KDATA_PART(const string& kpart);
 Indicator HKU_API KDATA_PART(const KData& kdata, const string& kpart);
+Indicator HKU_API KDATA_PART(const string& kpart);
 
 } /* namespace */
 

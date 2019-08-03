@@ -18,8 +18,8 @@ namespace hku {
  * @param n 计算均值的周期窗口，必须为大于0的整数
  * @ingroup Indicator
  */
-Indicator HKU_API MA(int n = 22);
 Indicator HKU_API MA(const Indicator& data, int n = 22);
+Indicator HKU_API MA(int n = 22);
 
 } /* namespace */
 

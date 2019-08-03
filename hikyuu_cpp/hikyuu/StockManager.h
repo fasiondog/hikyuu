@@ -74,7 +74,7 @@ public:
      * @param querystr 格式：“市场简称证券代码”，如"sh000001"
      * @return 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
      */
-    Stock getStock(const string&) const;
+    Stock getStock(const string& querystr) const;
 
     /** 同 getStock @see getStock */
     Stock operator[](const string&) const;
@@ -109,7 +109,7 @@ public:
      * @param category 板块分类
      * @return 板块列表
      */
-    BlockList getBlockList(const string&);
+    BlockList getBlockList(const string& category);
 
     /**
      * 获取所有板块

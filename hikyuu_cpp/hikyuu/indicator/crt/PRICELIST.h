@@ -20,7 +20,7 @@ namespace hku {
  * @param discard 前端抛弃的数据点数，抛弃的值使用Null<price_t>()填充
  * @ingroup Indicator
  */
-Indicator HKU_API PRICELIST(const PriceList&, int discard = 0);
+Indicator HKU_API PRICELIST(const PriceList& data, int discard = 0);
 
 /**
  * 将某指标转化为PRICELIST

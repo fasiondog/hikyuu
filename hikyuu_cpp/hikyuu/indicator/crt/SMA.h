@@ -23,8 +23,8 @@ namespace hku {
  * @param m 系数
  * @ingroup Indicator
  */
-Indicator HKU_API SMA(int n = 22, double m = 2.0);
 Indicator SMA(const Indicator& data, int n = 22, double m = 2.0);
+Indicator HKU_API SMA(int n = 22, double m = 2.0);
 
 inline Indicator SMA(const Indicator& ind, int n, double m){
     return SMA(n, m)(ind);
