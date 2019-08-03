@@ -70,8 +70,8 @@ def build_boost():
     if current_boost_root is None or current_boost_lib is None:
         print("Can't get boost environment!")
         return
+    current_dir = os.getcwd()
     if sys.platform == 'win32':
-        current_dir = os.getcwd()
         os.chdir(current_boost_root)
         if not os.path.exists('b2.exe'):
             os.system('bootstrap.bat')

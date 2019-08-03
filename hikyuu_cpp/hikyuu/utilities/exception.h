@@ -23,7 +23,7 @@ namespace hku {
  * @{
  */
 
-#ifndef __clang__
+#if !defined(__clang__) && !defined(__GNUC__)
     class exception: public std::exception {
     public:
         exception(): std::exception("Unknow exception!") {}
