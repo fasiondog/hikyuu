@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef EMA_H_
 #define EMA_H_
 

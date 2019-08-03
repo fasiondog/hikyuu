@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef FIXEDPERCENTSTOPLOSS_H_
 #define FIXEDPERCENTSTOPLOSS_H_
 

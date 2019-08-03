@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef KDATA_SERIALIZATION_H_
 #define KDATA_SERIALIZATION_H_
 

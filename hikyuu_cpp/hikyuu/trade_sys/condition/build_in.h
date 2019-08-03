@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef CONDITION_BUILD_IN_H_
 #define CONDITION_BUILD_IN_H_
 

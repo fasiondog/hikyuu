@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_ALLOCATEFUNDS_CRT_AF_EQUALWEIGHT_H_
 #define TRADE_SYS_ALLOCATEFUNDS_CRT_AF_EQUALWEIGHT_H_
 

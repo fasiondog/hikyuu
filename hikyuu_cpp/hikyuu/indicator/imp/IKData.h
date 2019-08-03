@@ -5,8 +5,9 @@
  *      Author: fasiondog
  */
 
-#ifndef IKDATA_H_
-#define IKDATA_H_
+#pragma once
+#ifndef INDICATOR_IMP_IKDATA_H_
+#define INDICATOR_IMP_IKDATA_H_
 
 #include "../Indicator.h"
 
@@ -24,4 +25,4 @@ public:
 };
 
 } /* namespace hku */
-#endif /* IKDATA_H_ */
+#endif /* INDICATOR_IMP_IKDATA_H_ */

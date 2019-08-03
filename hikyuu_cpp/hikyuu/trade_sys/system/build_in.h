@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SYSTEM_BUILD_IN_H_
 #define SYSTEM_BUILD_IN_H_
 

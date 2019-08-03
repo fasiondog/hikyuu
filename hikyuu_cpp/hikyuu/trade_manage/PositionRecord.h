@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef POSITIONRECORD_H_
 #define POSITIONRECORD_H_
 

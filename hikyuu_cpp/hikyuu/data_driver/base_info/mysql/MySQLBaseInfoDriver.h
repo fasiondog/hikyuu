@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef MYSQLBASEINFODRIVER_H_
 #define MYSQLBASEINFODRIVER_H_
 

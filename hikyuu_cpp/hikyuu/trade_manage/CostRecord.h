@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef COSTRECORD_H_
 #define COSTRECORD_H_
 

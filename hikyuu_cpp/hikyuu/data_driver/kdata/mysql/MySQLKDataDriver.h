@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef MYSQLKDATADRIVERIMP_H_
 #define MYSQLKDATADRIVERIMP_H_
 

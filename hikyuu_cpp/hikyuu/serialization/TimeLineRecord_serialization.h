@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TIMELINERECORD_SERIALIZATION_H_
 #define TIMELINERECORD_SERIALIZATION_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef BASEINFODRIVER_H_
 #define BASEINFODRIVER_H_
 

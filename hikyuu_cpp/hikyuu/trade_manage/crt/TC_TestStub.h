@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TESTSTUB_TC_H_
 #define TESTSTUB_TC_H_
 

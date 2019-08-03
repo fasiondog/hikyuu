@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STOPLOSSBASE_H_
 #define STOPLOSSBASE_H_
 

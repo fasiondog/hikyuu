@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRANSRECORD_H_
 #define TRANSRECORD_H_
 

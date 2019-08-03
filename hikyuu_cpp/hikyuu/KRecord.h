@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef KRECORD_H_
 #define KRECORD_H_
 

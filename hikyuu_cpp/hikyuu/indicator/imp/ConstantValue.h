@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef INDICATOR_IMP_CONSTANTVALUE_H_
 #define INDICATOR_IMP_CONSTANTVALUE_H_
 

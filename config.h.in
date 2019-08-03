@@ -1,7 +1,6 @@
+#pragma once
 #ifndef HIKYUU_CONFIG_H_
 #define HIKYUU_CONFIG_H_
-
-#pragma once
 
 #define HKU_VERSION      "${VERSION}"
 #define HKU_VERSION_MAJOR ${VERSION_MAJOR}

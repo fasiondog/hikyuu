@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_STOPLOSS_CRT_ST_INDICATOR_H_
 #define TRADE_SYS_STOPLOSS_CRT_ST_INDICATOR_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef HIKYUU_H_
 #define HIKYUU_H_
 

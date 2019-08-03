@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef COUNT_H_
 #define COUNT_H_
 

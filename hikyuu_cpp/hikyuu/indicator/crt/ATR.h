@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef INDICATOR_CRT_ATR_H_
 #define INDICATOR_CRT_ATR_H_
 

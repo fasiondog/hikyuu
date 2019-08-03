@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef CRTTM_H_
 #define CRTTM_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef LOANRECORD_H_
 #define LOANRECORD_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_
 #define TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_
 

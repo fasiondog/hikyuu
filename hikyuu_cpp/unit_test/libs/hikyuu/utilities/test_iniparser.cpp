@@ -16,7 +16,7 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <hikyuu_utils/iniparser/IniParser.h>
+#include <hikyuu/utilities/IniParser.h>
 
 using namespace boost::unit_test;
 using namespace boost::filesystem;

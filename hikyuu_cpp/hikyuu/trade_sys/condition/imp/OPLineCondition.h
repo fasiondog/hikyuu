@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_CONDITION_IMP_OPLINECONDITION_H_
 #define TRADE_SYS_CONDITION_IMP_OPLINECONDITION_H_
 

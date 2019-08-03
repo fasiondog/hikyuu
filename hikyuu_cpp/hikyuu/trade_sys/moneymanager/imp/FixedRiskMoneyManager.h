@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_MONEYMANAGER_IMP_FIXEDRISKMONEYMANAGER_H_
 #define TRADE_SYS_MONEYMANAGER_IMP_FIXEDRISKMONEYMANAGER_H_
 

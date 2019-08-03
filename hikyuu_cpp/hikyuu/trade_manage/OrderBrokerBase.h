@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_MANAGE_ORDERBROKERBASE_H_
 #define TRADE_MANAGE_ORDERBROKERBASE_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STOCK_SERIALIZATION_H_
 #define STOCK_SERIALIZATION_H_
 

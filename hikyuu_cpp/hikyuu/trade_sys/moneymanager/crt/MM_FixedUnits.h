@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDUNITS_H_
 #define TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDUNITS_H_
 

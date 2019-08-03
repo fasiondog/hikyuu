@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef FIXEDPERCENT_SL_H_
 #define FIXEDPERCENT_SL_H_
 

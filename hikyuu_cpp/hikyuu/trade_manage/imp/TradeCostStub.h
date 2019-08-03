@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADECOSTSTUB_H_
 #define TRADECOSTSTUB_H_
 

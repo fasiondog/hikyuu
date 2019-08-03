@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef ALL_TRADE_SYS_H_
 #define ALL_TRADE_SYS_H_
 

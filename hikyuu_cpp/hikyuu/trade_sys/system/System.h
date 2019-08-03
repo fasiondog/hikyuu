@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SYSTEMBASE_H_
 #define SYSTEMBASE_H_
 

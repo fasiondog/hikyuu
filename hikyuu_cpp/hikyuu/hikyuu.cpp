@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <hikyuu_utils/iniparser/IniParser.h>
+#include "utilities/IniParser.h"
 #include "hikyuu.h"
 
 namespace hku {

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef CRTZEROTC_H_
 #define CRTZEROTC_H_
 

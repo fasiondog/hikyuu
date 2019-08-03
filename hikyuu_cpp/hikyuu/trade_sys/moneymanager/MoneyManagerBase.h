@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef MONEYMANAGERBASE_H_
 #define MONEYMANAGERBASE_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STOCKWEIGHT_H_
 #define STOCKWEIGHT_H_
 

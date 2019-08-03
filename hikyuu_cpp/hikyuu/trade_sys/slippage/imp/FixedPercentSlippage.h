@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_SLIPPAGE_IMP_FIXEDPERCENTSLIPPAGE_H_
 #define TRADE_SYS_SLIPPAGE_IMP_FIXEDPERCENTSLIPPAGE_H_
 

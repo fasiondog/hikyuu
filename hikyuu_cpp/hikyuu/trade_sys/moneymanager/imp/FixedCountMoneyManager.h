@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef FIXEDCOUNTMONEYMANAGER_H_
 #define FIXEDCOUNTMONEYMANAGER_H_
 

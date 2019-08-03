@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef ZEROTRADECOST_H_
 #define ZEROTRADECOST_H_
 

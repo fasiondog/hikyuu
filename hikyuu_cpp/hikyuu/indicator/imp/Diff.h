@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DIFF_H_
 #define DIFF_H_
 

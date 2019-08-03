@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef PERFORMANCE_H_
 #define PERFORMANCE_H_
 

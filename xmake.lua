@@ -22,6 +22,9 @@ set_languages("C99", "cxx11")
 
 add_plugindirs("./xmake_plugins")
 
+-- use fmt, spdlog
+add_defines("FMT_HEADER_ONLY=1")
+
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
 add_cxflags("-ftemplate-depth-500")
@@ -77,8 +80,6 @@ add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "neon", "avx", "avx2")
 if is_plat("windows") then
     add_subdirs("./hikyuu_extern_libs/src/sqlite3")
 end
-add_subdirs("./hikyuu_cpp/hikyuu_utils")
--- add_subdirs("./hikyuu_cpp/importdata")
 add_subdirs("./hikyuu_cpp/hikyuu")
 add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")

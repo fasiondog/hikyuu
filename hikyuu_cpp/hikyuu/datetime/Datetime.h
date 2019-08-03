@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DATETIME_H_
 #define DATETIME_H_
 

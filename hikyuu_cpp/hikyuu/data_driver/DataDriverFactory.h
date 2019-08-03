@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DATADRIVERFACTORY_H_
 #define DATADRIVERFACTORY_H_
 

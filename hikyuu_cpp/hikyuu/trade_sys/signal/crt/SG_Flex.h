@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_SIGNAL_CRT_FLEX_SG_H_
 #define TRADE_SYS_SIGNAL_CRT_FLEX_SG_H_
 

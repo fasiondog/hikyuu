@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INDICATORSTOPLOSS_H_
 #define INDICATORSTOPLOSS_H_
 

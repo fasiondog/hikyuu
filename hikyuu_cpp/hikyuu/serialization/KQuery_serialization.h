@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SERIALIZATION_KQUERY_H_
 #define SERIALIZATION_KQUERY_H_
 

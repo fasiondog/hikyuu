@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SIGNALBASE_H_
 #define SIGNALBASE_H_
 

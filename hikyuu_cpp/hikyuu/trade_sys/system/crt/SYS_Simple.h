@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef CRTSIMPLESYSTEM_H_
 #define CRTSIMPLESYSTEM_H_
 

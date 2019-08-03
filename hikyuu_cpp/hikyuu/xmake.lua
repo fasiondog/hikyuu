@@ -1,7 +1,6 @@
 target("hikyuu")
     set_kind("shared")
     
-    add_deps("hikyuu_utils")
     add_includedirs("..")
 
     -- set version for release

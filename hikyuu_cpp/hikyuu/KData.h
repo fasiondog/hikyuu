@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef KDATA_H_
 #define KDATA_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INDICATOR_CRT_ABS_H_
 #define INDICATOR_CRT_ABS_H_
 

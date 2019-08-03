@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef H5RECORD_H_
 #define H5RECORD_H_
 

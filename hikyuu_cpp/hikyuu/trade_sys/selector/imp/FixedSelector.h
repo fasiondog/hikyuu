@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_SELECTOR_IMP_FIXEDSELECTOR_H_
 #define TRADE_SYS_SELECTOR_IMP_FIXEDSELECTOR_H_
 

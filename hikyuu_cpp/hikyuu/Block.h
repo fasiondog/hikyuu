@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef BLOCK_H_
 #define BLOCK_H_
 

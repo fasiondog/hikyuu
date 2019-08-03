@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef PROFITGOAL_H_
 #define PROFITGOAL_H_
 

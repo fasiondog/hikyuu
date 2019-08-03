@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INDICATOR_IMP_MOD_H_
 #define INDICATOR_IMP_MOD_H_
 

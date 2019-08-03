@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef KDATADRIVER_H_
 #define KDATADRIVER_H_
 

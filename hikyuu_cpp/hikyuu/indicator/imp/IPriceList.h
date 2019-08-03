@@ -5,8 +5,9 @@
  *      Author: fasiondog
  */
 
-#ifndef IPRICELIST_H_
-#define IPRICELIST_H_
+#pragma once
+#ifndef INDICATOR_IMP_IPRICELIST_H_
+#define INDICATOR_IMP_IPRICELIST_H_
 
 #include "../Indicator.h"
 
@@ -25,4 +26,4 @@ public:
 
 
 } /* namespace hku */
-#endif /* IPRICELIST_H_ */
+#endif /* INDICATOR_IMP_IPRICELIST_H_ */

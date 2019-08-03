@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_
 #define DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_
 

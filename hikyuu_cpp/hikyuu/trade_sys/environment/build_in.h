@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef ENVIRONMENT_BUILD_IN_H_
 #define ENVIRONMENT_BUILD_IN_H_
 

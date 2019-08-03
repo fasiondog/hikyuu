@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INDICATOR_CRT_DOWNNDAY_H_
 #define INDICATOR_CRT_DOWNNDAY_H_
 

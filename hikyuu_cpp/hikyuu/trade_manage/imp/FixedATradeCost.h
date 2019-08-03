@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef FIXEDATRADECOST_H_
 #define FIXEDATRADECOST_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SAFTYLOSS_H_
 #define SAFTYLOSS_H_
 

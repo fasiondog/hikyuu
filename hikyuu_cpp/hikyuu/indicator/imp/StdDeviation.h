@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STDDEVIATION_H_
 #define STDDEVIATION_H_
 

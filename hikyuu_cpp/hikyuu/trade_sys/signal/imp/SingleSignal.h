@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_SIGNAL_IMP_SINGLESIGNAL_H_
 #define TRADE_SYS_SIGNAL_IMP_SINGLESIGNAL_H_
 

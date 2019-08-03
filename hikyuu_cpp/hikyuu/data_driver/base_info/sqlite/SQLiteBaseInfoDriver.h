@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SQLITEBASEINFODRIVER_H_
 #define SQLITEBASEINFODRIVER_H_
 

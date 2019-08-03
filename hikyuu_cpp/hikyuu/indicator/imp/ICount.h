@@ -5,8 +5,9 @@
  *      Author: fasiondog
  */
 
-#ifndef ICOUNT_H_
-#define ICOUNT_H_
+#pragma once
+#ifndef INDICATOR_IMP_ICOUNT_H_
+#define INDICATOR_IMP_ICOUNT_H_
 
 #include "../Indicator.h"
 
@@ -27,4 +28,4 @@ public:
 };
 
 } /* namespace hku */
-#endif /* ICOUNT_H_ */
+#endif /* INDICATOR_IMP_ICOUNT_H_ */

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADERECORD_H_
 #define TRADERECORD_H_
 

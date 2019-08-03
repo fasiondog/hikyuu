@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_PROFITGOAL_IMP_NOGOALPROFITGOAL_H_
 #define TRADE_SYS_PROFITGOAL_IMP_NOGOALPROFITGOAL_H_
 

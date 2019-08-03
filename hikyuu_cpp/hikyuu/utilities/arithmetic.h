@@ -6,6 +6,7 @@
  *  Created on: 2019-7-15
  *      Author: fasiondog
  */
+
 #pragma once
 #ifndef HIKYUU_UTILITIES_ARITHMETIC_H
 #define HIKYUU_UTILITIES_ARITHMETIC_H
@@ -17,7 +18,7 @@
 namespace hku {
 
 /**
- * @ingroup Common-Utilities
+ * @ingroup Utilities
  * @{
  */
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SIGNAL_BUILD_IN_H_
 #define SIGNAL_BUILD_IN_H_
 

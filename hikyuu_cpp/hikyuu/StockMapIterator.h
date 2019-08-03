@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STOCKMAPITERATOR_H_
 #define STOCKMAPITERATOR_H_
 

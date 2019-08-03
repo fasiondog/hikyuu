@@ -8,8 +8,7 @@
 #ifndef STOCKMANAGER_H_
 #define STOCKMANAGER_H_
 
-#include <hikyuu_utils/iniparser/IniParser.h>
-
+#include "utilities/IniParser.h"
 #include "utilities/Parameter.h"
 #include "data_driver/DataDriverFactory.h"
 #include "Block.h"

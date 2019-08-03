@@ -5,8 +5,9 @@
  *      Author: fasiondog
  */
 
-#ifndef HKU_ISUM_H_
-#define HKU_ISUM_H_
+#pragma once
+#ifndef INDICATOR_IMP_HKU_ISUM_H_
+#define INDICATOR_IMP_HKU_ISUM_H_
 
 #include "../Indicator.h"
 
@@ -22,4 +23,4 @@ public:
 };
 
 } /* namespace hku */
-#endif /* HKU_ISUM_H_ */
+#endif /* INDICATOR_IMP_HKU_ISUM_H_ */

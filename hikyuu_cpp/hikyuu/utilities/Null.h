@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef NULL_H_
 #define NULL_H_
 
@@ -14,9 +15,13 @@
 namespace hku {
 
 /**
+ * @ingroup Utilities
+ * @addtogroup NullTools Null defines Null 值定义
+ * @{
+ */
+
+/**
  * 提供指定给定类型的Null值
- * @ingroup Common-Utilities
- * @ingroup DataType
  */
 template <typename T>
 class Null {
@@ -29,7 +34,6 @@ public:
 
 /**
  * 提供int的Null值
- * @ingroup Common-Utilities
  */
 template <>
 class Null<int> {
@@ -42,7 +46,6 @@ public:
 
 /**
  * 提供unsigned int的Null值
- * @ingroup Common-Utilities
  */
 template <>
 class Null<unsigned int> {
@@ -55,7 +58,6 @@ public:
 
 /**
  * 提供long long（64位整型）的Null值
- * @ingroup Common-Utilities
  */
 template <>
 class Null<long long> {
@@ -68,7 +70,6 @@ public:
 
 /**
  * 提供unsigned long long（无符号64位整型）的Null值
- * @ingroup Common-Utilities
  */
 template <>
 class Null<unsigned long long> {
@@ -82,7 +83,6 @@ public:
 #if !defined(_MSC_VER)
 /**
  * 提供size_t的Null值
- * @ingroup Common-Utilities
  */
 template <>
 class Null<size_t> {
@@ -96,7 +96,6 @@ public:
 
 /**
  * 提供double的Null值
- * @ingroup Common-Utilities
  */
 template <>
 class Null<double> {
@@ -108,6 +107,7 @@ public:
     }
 };
 
+/** @} */
 } /* namesapce hku */
 
 #endif /* NULL_H_ */

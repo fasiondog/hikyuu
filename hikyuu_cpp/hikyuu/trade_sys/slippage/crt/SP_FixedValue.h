@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDVALUE_H_
 #define TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDVALUE_H_
 

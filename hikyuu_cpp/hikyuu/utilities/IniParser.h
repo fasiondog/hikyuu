@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INIPARSER_H_
 #define INIPARSER_H_
 
@@ -49,7 +50,7 @@ namespace hku {
  *
  * @author fasiondog
  * @date 20100519
- * @ingroup IniParser
+ * @ingroup Utilities
  */
  
 class HKU_API IniParser : boost::noncopyable {

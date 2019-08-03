@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef ALL_SERIALIZATION_H_
 #define ALL_SERIALIZATION_H_
 

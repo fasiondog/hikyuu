@@ -5,21 +5,29 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef HIKUU_LOG_H_
 #define HIKUU_LOG_H_
-
-#pragma once
 
 #include "config.h"
 #include <string>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
+#include <fmt/format.h>
 
 #ifndef HKU_API
 #define HKU_API
 #endif
 
 namespace hku {
+
+/**
+ * @ingroup Utilities
+ * @addtogroup logging Logging tools 日志工具
+ * @details 打印等级：
+ * TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+ * @{
+ */
 
 enum LOG_LEVEL {
     TRACE = SPDLOG_LEVEL_TRACE,
@@ -70,5 +78,6 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 #define HKU_LOGGER_FATAL(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
 #define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(getHikyuuLogger(), __VA_ARGS__)
 
+/** @} */
 } /* namespace hku */
 #endif /* HIKUU_LOG_H_ */

@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INDICATOR_CRT_ACOS_H_
 #define INDICATOR_CRT_ACOS_H_
 

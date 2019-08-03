@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_PROFITGOAL_IMP_FIXEDHOLDDAYS_H_
 #define TRADE_SYS_PROFITGOAL_IMP_FIXEDHOLDDAYS_H_
 

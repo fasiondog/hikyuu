@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef MARKETINFO_H_
 #define MARKETINFO_H_
 

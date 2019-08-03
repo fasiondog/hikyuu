@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_MANAGE_CRT_TC_FIXEDA2015_H_
 #define TRADE_MANAGE_CRT_TC_FIXEDA2015_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef KDATABUFFERIMP_H_
 #define KDATABUFFERIMP_H_
 

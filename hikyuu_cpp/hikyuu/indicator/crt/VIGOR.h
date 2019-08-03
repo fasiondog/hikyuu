@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef VIGOR_H_
 #define VIGOR_H_
 

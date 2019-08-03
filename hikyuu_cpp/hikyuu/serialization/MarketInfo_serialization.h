@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef MARKETINFO_SERIALIZATION_H_
 #define MARKETINFO_SERIALIZATION_H_
 

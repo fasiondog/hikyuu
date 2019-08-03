@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADEMANAGER_H_
 #define TRADEMANAGER_H_
 

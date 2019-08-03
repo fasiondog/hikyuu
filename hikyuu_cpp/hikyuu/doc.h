@@ -48,11 +48,6 @@
  * @details 读取市场信息、证券信息、板块数据、K线数据等；可根据需要实现自定义的数据驱动引擎。
  * @ingroup Base
  *
- * @defgroup Common-Utilities Common-Utilities 公共小工具
- * 独立的一些小函数、对象工具集合
- * @details 附加的公共工具集
- * @ingroup Base
- *
  * @defgroup Indicator Indicator 指标库
  * 内建常用指标，及新指标定义实现基础设施
  * @details 包含指标基类定义、部分常用指标以及指标的生成函数
@@ -141,6 +136,11 @@
  *
  * @defgroup SystemInstance SystemInstance 系统实例
  * @details 系统实例
+ * @ingroup Hikyuu
+ * 
+ * @defgroup Utilities Utilities 程序工具集
+ * 独立的一些小函数、对象工具集合
+ * @details 附加的公共工具集
  * @ingroup Hikyuu
  */
 

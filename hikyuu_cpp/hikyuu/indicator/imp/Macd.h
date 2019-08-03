@@ -5,8 +5,9 @@
  *      Author: fasiondog
  */
 
-#ifndef MACD_H_
-#define MACD_H_
+#pragma once
+#ifndef INDICATOR_IMP_MACD_H_
+#define INDICATOR_IMP_MACD_H_
 
 #include "../Indicator.h"
 
@@ -31,4 +32,4 @@ public:
 };
 
 } /* namespace hku */
-#endif /* MACD_H_ */
+#endif /* INDICATOR_IMP_MACD_H_ */

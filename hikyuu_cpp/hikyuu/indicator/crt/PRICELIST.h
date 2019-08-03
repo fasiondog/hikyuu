@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef PRICELIST_H_
 #define PRICELIST_H_
 

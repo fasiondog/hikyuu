@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STOPLOSS_BUILD_IN_H_
 #define STOPLOSS_BUILD_IN_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef NOTHING_MM_H_
 #define NOTHING_MM_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef CONDITIONBASE_H_
 #define CONDITIONBASE_H_
 

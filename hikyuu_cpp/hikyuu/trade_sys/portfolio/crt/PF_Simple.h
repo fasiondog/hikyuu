@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_PORTFOLIO_IMP_PF_SIMPLE_H_
 #define TRADE_SYS_PORTFOLIO_IMP_PF_SIMPLE_H_
 

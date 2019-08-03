@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef PARAMETER_H_
 #define PARAMETER_H_
 
@@ -98,7 +99,7 @@ namespace hku {
  *    x.setParameter(param)
  * </pre>
  *
- * @ingroup Common-Utilities
+ * @ingroup Utilities
  */
 class HKU_API Parameter {
     HKU_API friend std::ostream& operator <<(std::ostream &os,

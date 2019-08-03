@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DATA_DRIVER_KDATATEMPCSVDRIVER_H_
 #define DATA_DRIVER_KDATATEMPCSVDRIVER_H_
 

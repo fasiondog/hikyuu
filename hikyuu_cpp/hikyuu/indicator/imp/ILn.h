@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INDICATOR_IMP_ILN_H_
 #define INDICATOR_IMP_ILN_H_
 

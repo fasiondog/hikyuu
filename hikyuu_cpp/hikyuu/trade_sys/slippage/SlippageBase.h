@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SLIPPAGEBASE_H_
 #define SLIPPAGEBASE_H_
 

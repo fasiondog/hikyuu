@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DATA_DRIVER_KDATA_TDX_TDXKDATADRIVER_H_
 #define DATA_DRIVER_KDATA_TDX_TDXKDATADRIVER_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef STOCKTYPEINFO_H_
 #define STOCKTYPEINFO_H_
 

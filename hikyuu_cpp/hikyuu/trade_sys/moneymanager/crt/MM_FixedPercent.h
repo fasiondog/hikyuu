@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDPERCENT_H_
 #define TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDPERCENT_H_
 

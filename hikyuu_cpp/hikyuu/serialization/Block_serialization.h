@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef BLOCK_SERIALIZATION_H_
 #define BLOCK_SERIALIZATION_H_
 

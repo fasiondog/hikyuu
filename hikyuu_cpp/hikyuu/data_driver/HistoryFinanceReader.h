@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef HISTORYFINANCEREADER_H_
 #define HISTORYFINANCEREADER_H_
 

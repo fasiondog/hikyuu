@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef KQUERY_H_
 #define KQUERY_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRANSRECORD_SERIALIZATION_H_
 #define TRANSRECORD_SERIALIZATION_H_
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef FIXEDCOUNT_MM_H_
 #define FIXEDCOUNT_MM_H_
 

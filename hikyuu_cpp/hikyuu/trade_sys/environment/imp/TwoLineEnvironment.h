@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_SYS_ENVIRONMENT_IMP_TWOLINEENVIRONMENT_H_
 #define TRADE_SYS_ENVIRONMENT_IMP_TWOLINEENVIRONMENT_H_
 

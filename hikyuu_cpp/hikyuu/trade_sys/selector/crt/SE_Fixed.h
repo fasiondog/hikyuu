@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef TRADE_SYS_SELECTOR_CRT_SE_FIXED_H_
 #define TRADE_SYS_SELECTOR_CRT_SE_FIXED_H_
 

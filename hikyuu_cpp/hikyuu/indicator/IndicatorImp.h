@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 

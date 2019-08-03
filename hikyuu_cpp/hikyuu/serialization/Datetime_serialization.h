@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DATETIME_SERIALIZATION_H_
 #define DATETIME_SERIALIZATION_H_
 

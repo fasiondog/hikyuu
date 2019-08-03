@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef BORROWRECORD_H_
 #define BORROWRECORD_H_
 

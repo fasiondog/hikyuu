@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef DATATYPE_H_
 #define DATATYPE_H_
 
@@ -31,6 +32,7 @@
 #include "utilities/Null.h"
 #include "utilities/arithmetic.h"
 #include "utilities/SpendTimer.h"
+#include "utilities/exception.h"
 
 #if defined(_MSC_VER)
 #pragma warning (disable: 4251)
@@ -72,6 +74,8 @@ typedef vector<string> StringList;
 using std::isnan;
 using std::isinf;
 using std::isfinite;
+
+using fmt::format;
 
 /** @} */
 

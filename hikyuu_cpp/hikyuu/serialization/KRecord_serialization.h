@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef KRECORD_SERIALIZATION_H_
 #define KRECORD_SERIALIZATION_H_
 

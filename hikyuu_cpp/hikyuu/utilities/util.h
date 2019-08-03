@@ -5,8 +5,9 @@
  *      Author: fasiondog
  */
 
-#ifndef UTIL_H_
-#define UTIL_H_
+#pragma once
+#ifndef HIKYUU_UTILIIES_UTIL_H_
+#define HIKYUU_UTILIIES_UTIL_H_
 
 #ifndef DATATYPE_H_
 #include <string>
@@ -24,7 +25,7 @@ using std::string;
 #endif
 
 /**
- * @ingroup Common-Utilities
+ * @ingroup Utilities
  * @{
  */
 
@@ -84,4 +85,4 @@ double HKU_API roundDown(double number, int ndigits=0);
 /** @} */
 } /* namespace */
 
-#endif /* UTIL_H_ */
+#endif /* HIKYUU_UTILIIES_UTIL_H_ */

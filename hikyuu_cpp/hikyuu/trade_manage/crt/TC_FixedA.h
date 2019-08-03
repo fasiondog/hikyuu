@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef CRTFIXEDATC_H_
 #define CRTFIXEDATC_H_
 

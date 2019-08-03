@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef SYSTEMPART_H_
 #define SYSTEMPART_H_
 

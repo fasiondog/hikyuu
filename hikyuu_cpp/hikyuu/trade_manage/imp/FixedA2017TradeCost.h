@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#pragma once
 #ifndef TRADE_MANAGE_IMP_FIXEDA2017TRADECOST_H_
 #define TRADE_MANAGE_IMP_FIXEDA2017TRADECOST_H_
 

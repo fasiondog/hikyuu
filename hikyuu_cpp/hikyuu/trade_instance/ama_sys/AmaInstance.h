@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#pragma once
 #ifndef AMAINSTANCE_H
 #define AMAINSTANCE_H
 
