@@ -11,6 +11,7 @@
 #define HIKYUU_DB_CONNECT_SQLSTATEMENTBASE_H
 
 #include <type_traits>
+#include <boost/archive/binary_iarchive.hpp>
 #include "../DataType.h"
 
 namespace hku {
@@ -198,7 +199,6 @@ template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type
 SQLStatementBase::bind(int idx, const T& item) {
     HKU_ASSERT_M(isValid(), "Invalid statement!");
-    using namespace dlib;
     std::ostringstream sout;
     boost::archive::binary_iarchive oa(sout);
     oa << BOOST_SERIALIZATION_NVP(item);
@@ -219,7 +219,6 @@ template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type
 SQLStatementBase::getColumn(int idx, T& item) {
     HKU_ASSERT_M(isValid(), "Invalid statement!");
-    using namespace dlib;
     string tmp;
     try {
         sub_getColumnAsBlob(idx, tmp);
