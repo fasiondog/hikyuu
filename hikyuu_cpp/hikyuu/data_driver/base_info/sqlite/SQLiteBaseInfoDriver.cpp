@@ -81,11 +81,11 @@ int SQLiteBaseInfoDriver::_getMarketTableCallBack(void *out,
         int nCol, char **azVals, char **azCols) {
     assert(nCol==5);
     int result = 0;
-    hku_uint64 d;
+    uint64 d;
     string market(azVals[0]);
     to_upper(market);
     try{
-        d = (boost::lexical_cast<hku_uint64>(azVals[4])*10000);
+        d = (boost::lexical_cast<uint64>(azVals[4])*10000);
         Datetime datetime;
         try {
             datetime = Datetime(d);
@@ -145,7 +145,7 @@ int SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack(
     assert(nCol == 7);
     int result = 0;
     try{
-        hku_uint32 type = boost::lexical_cast<hku_uint32>(azVals[0]);
+        uint32 type = boost::lexical_cast<uint32>(azVals[0]);
         StockTypeInfo stockTypeInfo(
                 type, HKU_STR(azVals[1]),
                 boost::lexical_cast<price_t>(azVals[2]),
@@ -168,7 +168,7 @@ int SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack(
     return result;
 }
 
-bool SQLiteBaseInfoDriver::_getStockWeightList(hku_uint32 id,
+bool SQLiteBaseInfoDriver::_getStockWeightList(uint32 id,
         StockWeightList& out) {
     if (!m_db) {
         return false;
@@ -200,8 +200,8 @@ int SQLiteBaseInfoDriver::_getStockWeightCallBack(
     int id = 0;
     try{
         id = boost::lexical_cast<int>(azVals[0]);
-        hku_uint64 datetime;
-        datetime = boost::lexical_cast<hku_uint64>(azVals[1]) * 10000;
+        uint64 datetime;
+        datetime = boost::lexical_cast<uint64>(azVals[1]) * 10000;
         StockWeight weight(Datetime(datetime),
                 boost::lexical_cast<price_t>(azVals[2]) * 0.0001,
                 boost::lexical_cast<price_t>(azVals[3]) * 0.0001,
@@ -230,11 +230,11 @@ int SQLiteBaseInfoDriver::_getStockWeightCallBack(
 }
 
 struct StockTable {
-    hku_uint32 id;
+    uint32 id;
     string market;
     string code;
     string name;
-    hku_uint32 type;
+    uint32 type;
     bool valid;
     Datetime startDate;
     Datetime endDate;
@@ -307,17 +307,17 @@ int SQLiteBaseInfoDriver::_getStockTableCallBack(
     int result = 0;
     StockTable stockRecord;
     try {
-        stockRecord.id = boost::lexical_cast<hku_uint32>(azVals[0]);
+        stockRecord.id = boost::lexical_cast<uint32>(azVals[0]);
         stockRecord.market = string(azVals[1]);
         stockRecord.code = string(azVals[2]);
         stockRecord.name = string(HKU_STR(azVals[3]));
-        stockRecord.type = boost::lexical_cast<hku_uint32>(azVals[4]);
-        hku_uint32 temp_valid = boost::lexical_cast<hku_uint32>(azVals[5]);
+        stockRecord.type = boost::lexical_cast<uint32>(azVals[4]);
+        uint32 temp_valid = boost::lexical_cast<uint32>(azVals[5]);
         stockRecord.valid = temp_valid > 0 ? true : false;
         Datetime datetime;
-        hku_uint64 startDate, endDate;
-        startDate = boost::lexical_cast<hku_uint64>(azVals[6])*10000;
-        endDate = boost::lexical_cast<hku_uint64>(azVals[7])*10000;
+        uint64 startDate, endDate;
+        startDate = boost::lexical_cast<uint64>(azVals[6])*10000;
+        endDate = boost::lexical_cast<uint64>(azVals[7])*10000;
         if(startDate > endDate || startDate == 0 || endDate == 0) {
             //日期非法，置为Null<Datetime>
             stockRecord.startDate = Null<Datetime>();

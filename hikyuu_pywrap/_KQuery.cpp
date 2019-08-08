@@ -20,7 +20,7 @@ void export_KQuery() {
     def("KQueryByIndex", KQueryByIndex, KQueryByIndex_overload());
 
     scope in_Query = class_<KQuery>("KQuery", init<>())
-            .def(init<hku_int64, optional<hku_int64, KQuery::KType, KQuery::RecoverType> >())
+            .def(init<int64, optional<int64, KQuery::KType, KQuery::RecoverType> >())
             .def(self_ns::str(self))
             .add_property("start", &KQuery::start)
             .add_property("end", &KQuery::end)

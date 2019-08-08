@@ -62,8 +62,8 @@ private:
     void save(Archive & ar, const unsigned int version) const {
         namespace bs = boost::serialization;
         ar & BOOST_SERIALIZATION_NVP(stock);
-        hku_uint64 take = takeDatetime.number();
-        hku_uint64 clean = cleanDatetime.number();
+        uint64 take = takeDatetime.number();
+        uint64 clean = cleanDatetime.number();
         ar & bs::make_nvp("takeDatetime", take);
         ar & bs::make_nvp("cleanDatetime", clean);
         ar & BOOST_SERIALIZATION_NVP(number);
@@ -80,7 +80,7 @@ private:
     void load(Archive & ar, const unsigned int version) {
         namespace bs = boost::serialization;
         ar & BOOST_SERIALIZATION_NVP(stock);
-        hku_uint64 take, clean;
+        uint64 take, clean;
         ar & bs::make_nvp("takeDatetime", take);
         ar & bs::make_nvp("cleanDatetime", clean);
         takeDatetime = Datetime(take);

@@ -21,7 +21,7 @@ namespace boost {
 namespace serialization {
 template<class Archive>
 void save(Archive & ar, const hku::StockWeight& record, unsigned int version) {
-    hku::hku_uint64 datetime = record.datetime().number();
+    hku::uint64 datetime = record.datetime().number();
     hku::price_t countAsGift = record.countAsGift();
     hku::price_t countForSell = record.countForSell();
     hku::price_t priceForSell = record.priceForSell();
@@ -41,7 +41,7 @@ void save(Archive & ar, const hku::StockWeight& record, unsigned int version) {
 
 template<class Archive>
 void load(Archive & ar, hku::StockWeight& record, unsigned int version) {
-    hku::hku_uint64 datetime;
+    hku::uint64 datetime;
     hku::price_t countAsGift, countForSell, priceForSell, bonus;
     hku::price_t increasement, totalCount, freeCount;
     ar & BOOST_SERIALIZATION_NVP(datetime);

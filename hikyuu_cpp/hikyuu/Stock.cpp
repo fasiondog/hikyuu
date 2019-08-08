@@ -20,7 +20,7 @@ const string Stock::default_market;
 const string Stock::default_code;
 const string Stock::default_market_code;
 const string Stock::default_name;
-const hku_uint32 Stock::default_type = Null<hku_uint32>();
+const uint32 Stock::default_type = Null<uint32>();
 const bool Stock::default_valid = false;
 const Datetime Stock::default_startDate;// = Null<Datetime>();
 const Datetime Stock::default_lastDate;// = Null<Datetime>();
@@ -83,7 +83,7 @@ Stock::Data::Data()
 
 
 Stock::Data::Data(const string& market, const string& code,
-      const string& name, hku_uint32 type, bool valid,
+      const string& name, uint32 type, bool valid,
       const Datetime& startDate, const Datetime& lastDate,
       price_t tick, price_t tickValue, int precision,
       size_t minTradeNumber, size_t maxTradeNumber)
@@ -165,7 +165,7 @@ Stock::Stock(const string& market,
 
 
 Stock::Stock(const string& market, const string& code,
-      const string& name, hku_uint32 type, bool valid,
+      const string& name, uint32 type, bool valid,
       const Datetime& startDate, const Datetime& lastDate) {
     m_data = shared_ptr<Data>(
             new Data(market, code, name, type, valid,
@@ -177,7 +177,7 @@ Stock::Stock(const string& market, const string& code,
 
 
 Stock::Stock(const string& market, const string& code,
-      const string& name, hku_uint32 type, bool valid,
+      const string& name, uint32 type, bool valid,
       const Datetime& startDate, const Datetime& lastDate,
       price_t tick, price_t tickValue, int precision,
       size_t minTradeNumber, size_t maxTradeNumber) {
@@ -221,7 +221,7 @@ const string& Stock::name() const {
     return m_data ? m_data->m_name : default_name;
 }
 
-hku_uint32 Stock::type() const {
+uint32 Stock::type() const {
     return m_data ? m_data->m_type : default_type;
 }
 
@@ -453,7 +453,7 @@ _getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) c
         return false;
     }
 
-    hku_int64 startix, endix;
+    int64 startix, endix;
     startix = query.start();
     if(startix < 0) {
         startix += total;

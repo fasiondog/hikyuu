@@ -595,8 +595,8 @@ _getBaseIndexRangeByDate(const string& market, const string& code,
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
-    hku_uint64 start_number = query.startDatetime().number();
-    hku_uint64 end_number = query.endDatetime().number();
+    uint64 start_number = query.startDatetime().number();
+    uint64 end_number = query.endDatetime().number();
     hsize_t startpos = 0, endpos = 0;
     try {
         dataset = group.openDataSet(market + code);
@@ -726,7 +726,7 @@ _getOtherIndexRangeByDate(const string& market, const string& code,
         }
 
         size_t mid, low=0, high=total-1;
-        hku_uint64 startDatetime = query.startDatetime().number();
+        uint64 startDatetime = query.startDatetime().number();
         H5IndexRecord h5record;
         while(low<=high){
             H5ReadIndexRecords(dataset, high, 1, &h5record);
@@ -757,7 +757,7 @@ _getOtherIndexRangeByDate(const string& market, const string& code,
 
         out_start = mid;
 
-        hku_uint64 endDatetime = query.endDatetime().number();
+        uint64 endDatetime = query.endDatetime().number();
         low=mid, high = total-1;
         while(low<=high){
             H5ReadIndexRecords(dataset, high, 1, &h5record);
@@ -810,7 +810,7 @@ TimeLineList H5KDataDriver
 
 TimeLineList H5KDataDriver
 ::_getTimeLine(const string& market, const string& code,
-        hku_int64 start_ix, hku_int64 end_ix) {
+        int64 start_ix, int64 end_ix) {
     TimeLineList result;
     H5FilePtr h5file;
     H5::Group group;
@@ -895,8 +895,8 @@ TimeLineList H5KDataDriver
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
-    hku_uint64 start_number = start.number();
-    hku_uint64 end_number = end.number();
+    uint64 start_number = start.number();
+    uint64 end_number = end.number();
     hsize_t startpos = 0, endpos = 0;
     try {
         dataset = group.openDataSet(market + code);
@@ -1031,7 +1031,7 @@ TransList H5KDataDriver
 
 TransList H5KDataDriver
 ::_getTransList(const string& market, const string& code,
-        hku_int64 start_ix, hku_int64 end_ix) {
+        int64 start_ix, int64 end_ix) {
     TransList result;
     H5FilePtr h5file;
     H5::Group group;
@@ -1074,7 +1074,7 @@ TransList H5KDataDriver
 
         TransRecord record;
         result.reserve(total + 2);
-        hku_uint64 number = 0, second = 0;
+        uint64 number = 0, second = 0;
         for(hsize_t i=0; i<total; i++){
             number = pBuf[i].datetime / 100;
             second = pBuf[i].datetime - number * 100;
@@ -1122,8 +1122,8 @@ TransList H5KDataDriver
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
-    hku_uint64 start_number = start.number() * 100 + start.second();
-    hku_uint64 end_number = end.number() * 100 + end.second();
+    uint64 start_number = start.number() * 100 + start.second();
+    uint64 end_number = end.number() * 100 + end.second();
     hsize_t startpos = 0, endpos = 0;
     try {
         dataset = group.openDataSet(market + code);
@@ -1227,7 +1227,7 @@ TransList H5KDataDriver
 
         TransRecord record;
         result.reserve(total + 2);
-        hku_uint64 number = 0, second = 0;
+        uint64 number = 0, second = 0;
         for(hsize_t i=0; i<total; i++){
             number = pBuf[i].datetime / 100;
             second = pBuf[i].datetime - number * 100;

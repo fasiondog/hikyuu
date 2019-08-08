@@ -34,11 +34,11 @@ class HKU_API StockTypeInfo {
 public:
     /** 默认构造函数，返回Null<StockTypeInfo>() */
     StockTypeInfo();
-    StockTypeInfo(hku_uint32, const string&, price_t, price_t,
+    StockTypeInfo(uint32, const string&, price_t, price_t,
                   int, size_t, size_t);
 
     /** 获取证券类型 */
-    hku_uint32 type() const { return m_type; }
+    uint32 type() const { return m_type; }
 
     /** 获取证券类型描述信息 */
     const string& description() const { return m_description; }
@@ -65,7 +65,7 @@ public:
     string toString() const;
 
 private:
-    hku_uint32 m_type;          //证券类型
+    uint32 m_type;          //证券类型
     string m_description;       //描述信息
     price_t m_tick;             //最小跳动量
     price_t m_tickValue;        //每一个tick价格

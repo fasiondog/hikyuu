@@ -165,7 +165,7 @@ loadKData(const string& market, const string& code,
     while ((row = mysql_fetch_row(result))) {
         try {
             KRecord k;
-            hku_uint64 d = boost::lexical_cast<hku_uint64>(row[0]);
+            uint64 d = boost::lexical_cast<uint64>(row[0]);
             k.datetime = Datetime(d);
             k.openPrice = boost::lexical_cast<price_t>(row[1]);
             k.highPrice = boost::lexical_cast<price_t>(row[2]);
@@ -342,7 +342,7 @@ getKRecord(const string& market, const string& code,
 
     while ((row = mysql_fetch_row(mysql_result))) {
         try {
-            hku_uint64 d = boost::lexical_cast<hku_uint64>(row[0]);
+            uint64 d = boost::lexical_cast<uint64>(row[0]);
             result.datetime = Datetime(d);
             result.openPrice = boost::lexical_cast<price_t>(row[1]);
             result.highPrice = boost::lexical_cast<price_t>(row[2]);

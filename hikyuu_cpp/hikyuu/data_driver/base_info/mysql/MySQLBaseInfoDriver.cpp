@@ -132,7 +132,7 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
         to_upper(market);
         Datetime last_date;
         try {
-            hku_int64 d = (boost::lexical_cast<hku_uint64>(row[4])*10000);
+            int64 d = (boost::lexical_cast<uint64>(row[4])*10000);
             last_date = Datetime(d);
         } catch(...) {
             last_date = Null<Datetime>();
@@ -178,7 +178,7 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
 
     StockManager& sm = StockManager::instance();
     while((row = mysql_fetch_row(result))) {
-        hku_uint32 type = boost::lexical_cast<hku_uint32>(row[0]);
+        uint32 type = boost::lexical_cast<uint32>(row[0]);
         try {
             StockTypeInfo stkTypeInfo(type, HKU_STR(row[1]),
                     boost::lexical_cast<price_t>(row[2]),
@@ -199,7 +199,7 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
 
 
 bool MySQLBaseInfoDriver::
-_getStockWeightList(hku_uint64 stockid, StockWeightList& out) {
+_getStockWeightList(uint64 stockid, StockWeightList& out) {
     if (!m_mysql) {
         HKU_ERROR("Null m_mysql!");
         return false;
@@ -292,7 +292,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
 
     StockManager& sm = StockManager::instance();
     while((row = mysql_fetch_row(result))) {
-        hku_uint64 stockid = boost::lexical_cast<hku_uint64>(row[0]);
+        uint64 stockid = boost::lexical_cast<uint64>(row[0]);
         string market(row[1]);
         to_upper(market);
 
@@ -323,7 +323,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
             Stock stock(market,
                     row[2], //code
                     HKU_STR(row[3]), //name
-                    boost::lexical_cast<hku_uint32>(row[4]), //type
+                    boost::lexical_cast<uint32>(row[4]), //type
                     boost::lexical_cast<bool>(row[5]), //valid;
                     start_date, //startDate
                     end_date, //endDate

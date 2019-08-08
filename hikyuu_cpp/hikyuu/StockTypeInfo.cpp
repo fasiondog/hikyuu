@@ -53,7 +53,7 @@ string StockTypeInfo::toString() const {
 }
 
 StockTypeInfo::StockTypeInfo()
-: m_type(Null<hku_uint32>()),
+: m_type(Null<uint32>()),
   m_tick(0.0),
   m_tickValue(0.0),
   m_unit(1.0),
@@ -62,7 +62,7 @@ StockTypeInfo::StockTypeInfo()
   m_maxTradeNumber(0)  { }
 
 
-StockTypeInfo::StockTypeInfo(hku_uint32 type,
+StockTypeInfo::StockTypeInfo(uint32 type,
 		const string& description, price_t tick,
 		price_t tickValue, int precision,
         size_t minTradeNumber, size_t maxTradeNumber)

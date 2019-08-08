@@ -28,7 +28,7 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code);
 
 private:
-    bool _getStockWeightList(hku_uint32, StockWeightList&);
+    bool _getStockWeightList(uint32, StockWeightList&);
 
 private:
     static int _getMarketTableCallBack(void *out, int nCol,

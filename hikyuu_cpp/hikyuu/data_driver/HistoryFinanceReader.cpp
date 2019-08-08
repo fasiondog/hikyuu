@@ -52,7 +52,7 @@ PriceList HistoryFinanceReader
     memcpy(&report_size, header_buf + 12, 4);
 
     char stock_code[7];
-    hku_uint32 address = 0;
+    uint32 address = 0;
     for (int i = 0; i < max_count; i++) {
         if (!fread(stock_code, 1, 7, fp)) {
             HKU_ERROR("read stock_code failed! {}", filename);

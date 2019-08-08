@@ -29,41 +29,41 @@ const string KQuery::HOUR12("HOUR12");
 //const string KQuery::INVALID_KTYPE("Z");
 
 
-KQuery KQueryByIndex(hku_int64 start, hku_int64 end,
+KQuery KQueryByIndex(int64 start, int64 end,
         KQuery::KType dataType, KQuery::RecoverType recoverType) {
     return KQuery(start, end, dataType, recoverType, KQuery::INDEX);
 }
 
 KQuery KQueryByDate(const Datetime& start, const Datetime& end,
         KQuery::KType dataType, KQuery::RecoverType recoverType) {
-    hku_int64 start_number = start == Null<Datetime>()
-                              ? (hku_int64)start.number()
-                              : (hku_int64)(start.number()*100 + start.second());
-    hku_int64 end_number = end == Null<Datetime>()
-                              ? (hku_int64)end.number()
-                              : (hku_int64)(end.number()*100 + end.second());
+    int64 start_number = start == Null<Datetime>()
+                              ? (int64)start.number()
+                              : (int64)(start.number()*100 + start.second());
+    int64 end_number = end == Null<Datetime>()
+                              ? (int64)end.number()
+                              : (int64)(end.number()*100 + end.second());
     return KQuery(start_number, end_number,
                   dataType, recoverType, KQuery::DATE);
 }
 
 
 Datetime KQuery::startDatetime() const {
-    if (m_queryType != DATE || (hku_uint64)m_start == Null<hku_uint64>()) {
+    if (m_queryType != DATE || (uint64)m_start == Null<uint64>()) {
         return Null<Datetime>();
     }
 
-    hku_uint64 number = (hku_uint64)(m_start/100);
+    uint64 number = (uint64)(m_start/100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(),
                     d.minute(), m_start - number * 100);
 }
 
 Datetime KQuery::endDatetime() const {
-    if (m_queryType != DATE || (hku_uint64)m_end == Null<hku_uint64>()) {
+    if (m_queryType != DATE || (uint64)m_end == Null<uint64>()) {
         return Null<Datetime>();
     }
 
-    hku_uint64 number = (hku_uint64)(m_end/100);
+    uint64 number = (uint64)(m_end/100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(),
                     d.minute(), m_end - number * 100);

@@ -85,7 +85,7 @@ public:
     /** 默认构造，按索引方式查询全部日线数据，不复权 */
     KQuery()
     : m_start(0),
-      m_end(Null<hku_int64>()),
+      m_end(Null<int64>()),
       m_queryType(INDEX),
       m_dataType(DAY),
       m_recoverType(NO_RECOVER) { };
@@ -98,8 +98,8 @@ public:
      * @param recoverType 复权类型
      * @param queryType 默认按索引方式查询
      */
-    KQuery(hku_int64 start,
-           hku_int64 end = Null<hku_int64>(),
+    KQuery(int64 start,
+           int64 end = Null<int64>(),
            KType dataType = DAY,
            RecoverType recoverType = NO_RECOVER,
            QueryType queryType = INDEX)
@@ -110,17 +110,17 @@ public:
       m_recoverType(recoverType) { }
 
     /**
-     * 按索引方式查询时，返回指定的起始索引，否则返回Null<hku_int64>()
+     * 按索引方式查询时，返回指定的起始索引，否则返回Null<int64>()
      */
-    hku_int64 start() const {
-        return m_queryType != INDEX ? Null<hku_int64>() : m_start;
+    int64 start() const {
+        return m_queryType != INDEX ? Null<int64>() : m_start;
     }
 
     /**
-     * 按索引方式查询时，返回指定的结束索引，否则返回Null<hku_int64>()
+     * 按索引方式查询时，返回指定的结束索引，否则返回Null<int64>()
      */
-    hku_int64 end() const {
-        return m_queryType != INDEX ? Null<hku_int64>() : m_end;
+    int64 end() const {
+        return m_queryType != INDEX ? Null<int64>() : m_end;
     }
 
     /**
@@ -162,8 +162,8 @@ public:
     static RecoverType getRecoverTypeEnum(const string&);
 
 private:
-    hku_int64 m_start;
-    hku_int64 m_end;
+    int64 m_start;
+    int64 m_end;
     QueryType m_queryType;
     KType m_dataType;
     RecoverType m_recoverType;
@@ -179,8 +179,8 @@ private:
  * @see KQuery
  * @ingroup StockManage*
  */
-KQuery HKU_API KQueryByIndex(hku_int64 start = 0,
-        hku_int64 end = Null<hku_int64>(),
+KQuery HKU_API KQueryByIndex(int64 start = 0,
+        int64 end = Null<int64>(),
         KQuery::KType dataType = KQuery::DAY,
         KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
@@ -241,8 +241,8 @@ class Null<KQuery> {
 public:
     Null() {}
     operator KQuery() {
-        return KQuery(Null<hku_int64>(),
-                Null<hku_int64>(),
+        return KQuery(Null<int64>(),
+                Null<int64>(),
                 "", //KQuery::INVALID_KTYPE,
                 KQuery::INVALID_RECOVER_TYPE,
                 KQuery::INVALID

@@ -483,61 +483,61 @@ BOOST_AUTO_TEST_CASE( test_Stock_getIndexRange ) {
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 5121);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::WEEK);
+    query = KQuery(0, Null<int64>(), KQuery::WEEK);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 1059);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::MONTH);
+    query = KQuery(0, Null<int64>(), KQuery::MONTH);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 253);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::QUARTER);
+    query = KQuery(0, Null<int64>(), KQuery::QUARTER);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 85);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::HALFYEAR);
+    query = KQuery(0, Null<int64>(), KQuery::HALFYEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 43);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::YEAR);
+    query = KQuery(0, Null<int64>(), KQuery::YEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 22);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(0, Null<int64>(), KQuery::MIN);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 682823L);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::MIN5);
+    query = KQuery(0, Null<int64>(), KQuery::MIN5);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 133980L);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::MIN15);
+    query = KQuery(0, Null<int64>(), KQuery::MIN15);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 44750);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::MIN30);
+    query = KQuery(0, Null<int64>(), KQuery::MIN30);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);
     BOOST_CHECK(out_end == 22380L);
 
-    query = KQuery(0, Null<hku_int64>(), KQuery::MIN60);
+    query = KQuery(0, Null<int64>(), KQuery::MIN60);
     success = stock.getIndexRange(query, out_start, out_end);
     BOOST_CHECK(success == true);
     BOOST_CHECK(out_start == 0);

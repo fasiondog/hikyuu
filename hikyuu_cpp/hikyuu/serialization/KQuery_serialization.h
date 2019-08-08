@@ -31,13 +31,13 @@ void save(Archive & ar, const hku::KQuery & query, unsigned int version) {
     ar & BOOST_SERIALIZATION_NVP(recoverType);
 
     if (query.queryType() == hku::KQuery::INDEX) {
-        hku::hku_int64 start = query.start();
-        hku::hku_int64 end = query.end();
+        hku::int64 start = query.start();
+        hku::int64 end = query.end();
         ar & BOOST_SERIALIZATION_NVP(start);
         ar & BOOST_SERIALIZATION_NVP(end);
     } else if (query.queryType() == hku::KQuery::DATE) {
-        hku::hku_uint64 start = query.startDatetime().number();
-        hku::hku_uint64 end = query.endDatetime().number();
+        hku::uint64 start = query.startDatetime().number();
+        hku::uint64 end = query.endDatetime().number();
         ar & BOOST_SERIALIZATION_NVP(start);
         ar & BOOST_SERIALIZATION_NVP(end);
     } else {
@@ -57,12 +57,12 @@ void load(Archive & ar, hku::KQuery& query, unsigned int version) {
     hku::KQuery::RecoverType enum_recover = hku::KQuery::getRecoverTypeEnum(recoverType);
 
     if (enum_query == hku::KQuery::INDEX) {
-        hku::hku_int64 start, end;
+        hku::int64 start, end;
         ar & BOOST_SERIALIZATION_NVP(start);
         ar & BOOST_SERIALIZATION_NVP(end);
         query = hku::KQuery(start, end, enmu_ktype, enum_recover);
     } else if (enum_query == hku::KQuery::DATE) {
-        hku::hku_uint64 start, end;
+        hku::uint64 start, end;
         ar & BOOST_SERIALIZATION_NVP(start);
         ar & BOOST_SERIALIZATION_NVP(end);
         query = hku::KQueryByDate(hku::Datetime(start), hku::Datetime(end),

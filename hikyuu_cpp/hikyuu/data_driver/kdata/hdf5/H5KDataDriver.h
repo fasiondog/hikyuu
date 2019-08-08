@@ -62,12 +62,12 @@ private:
             size_t& out_start, size_t& out_end);
 
     TimeLineList _getTimeLine(const string& market, const string& code,
-            hku_int64 start, hku_int64 end);
+            int64 start, int64 end);
     TimeLineList _getTimeLine(const string& market, const string& code,
             const Datetime& start, const Datetime& end);
 
     TransList _getTransList(const string& market, const string& code,
-            hku_int64 start, hku_int64 end);
+            int64 start, int64 end);
     TransList _getTransList(const string& market, const string& code,
             const Datetime& start, const Datetime& end);
 

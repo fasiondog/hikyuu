@@ -90,7 +90,7 @@ public:
      * @param type 证券类型
      * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
      */
-    StockTypeInfo getStockTypeInfo(hku_uint32 type) const;
+    StockTypeInfo getStockTypeInfo(uint32 type) const;
 
     /** 获取市场简称列表 */
     MarketList getAllMarket() const;
@@ -188,7 +188,7 @@ private:
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
     MarketInfoMap m_marketInfoDict;
 
-    typedef unordered_map<hku_uint32, StockTypeInfo> StockTypeInfoMap;
+    typedef unordered_map<uint32, StockTypeInfo> StockTypeInfoMap;
     StockTypeInfoMap m_stockTypeInfo;
 
     Parameter m_baseInfoDriverParam;

@@ -30,7 +30,7 @@ public:
     virtual bool _loadStock();
 
 private:
-    bool _getStockWeightList(hku_uint64, StockWeightList&);
+    bool _getStockWeightList(uint64, StockWeightList&);
 
 private:
     shared_ptr<MYSQL> m_mysql;

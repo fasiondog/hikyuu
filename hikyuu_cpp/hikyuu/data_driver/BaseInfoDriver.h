@@ -24,7 +24,7 @@ class HKU_API BaseInfoDriver {
 
 public:
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
-    typedef unordered_map<hku_uint32, StockTypeInfo> StockTypeInfoMap;
+    typedef unordered_map<uint32, StockTypeInfo> StockTypeInfoMap;
 
     BaseInfoDriver(const string& name);
     virtual ~BaseInfoDriver() { }

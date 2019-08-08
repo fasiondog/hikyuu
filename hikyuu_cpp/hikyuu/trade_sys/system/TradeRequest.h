@@ -47,7 +47,7 @@ private:
         ar & BOOST_SERIALIZATION_NVP(valid);
         string business_name(getBusinessName(business));
         ar & bs::make_nvp<string>("business", business_name);
-        hku_uint64 datetime_num = datetime.number();
+        uint64 datetime_num = datetime.number();
         ar & bs::make_nvp("datetime", datetime_num);
         ar & BOOST_SERIALIZATION_NVP(stoploss);
         ar & BOOST_SERIALIZATION_NVP(goal);
@@ -65,7 +65,7 @@ private:
         string business_name;
         ar & bs::make_nvp<string>("business", business_name);
         business = getBusinessEnum(business_name);
-        hku_uint64 datetime_num;
+        uint64 datetime_num;
         ar & bs::make_nvp("datetime", datetime_num);
         datetime = Datetime(datetime_num);
         ar & BOOST_SERIALIZATION_NVP(stoploss);

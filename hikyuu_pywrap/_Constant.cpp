@@ -19,7 +19,7 @@ struct Constant {
         null_price(Null<price_t>()),
         null_int(Null<int>()),
         null_size(Null<size_t>()),
-        null_int64(Null<hku_int64>()),
+        null_int64(Null<int64>()),
         STOCKTYPE_BLOCK(0),
         STOCKTYPE_A(1),
         STOCKTYPE_INDEX(2),
@@ -43,7 +43,7 @@ struct Constant {
     price_t null_price;
     int null_int;
     size_t null_size;
-    hku_int64 null_int64;
+    int64 null_int64;
     bool pickle_support; //是否支持pickle
 
     int STOCKTYPE_BLOCK;  ///板块

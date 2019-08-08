@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001日线数据，KQuery(-total) */
     total = stock.getCount();
-    query = KQuery(-(hku_int64)total);
+    query = KQuery(-(int64)total);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 5121);
     BOOST_CHECK(kdata.empty() == false);
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001日线数据，KQuery(-total-1) */
     total = stock.getCount();
-    query = KQuery(-1-(hku_int64)total);
+    query = KQuery(-1-(int64)total);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 5121);
     BOOST_CHECK(kdata.empty() == false);
@@ -330,7 +330,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001日线数据，KQuery(-total + 1) */
     total = stock.getCount();
-    query = KQuery(1-(hku_int64)total);
+    query = KQuery(1-(int64)total);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 5120);
     BOOST_CHECK(kdata.empty() == false);
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(kdata.lastPos() == 0);
 
     /** @arg SH000001日线数据，KQuery(-total, 1) */
-    query = KQuery(-(hku_int64)total, 1);
+    query = KQuery(-(int64)total, 1);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 1);
     BOOST_CHECK(kdata.empty() == false);
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(record == expect);
 
     /** @arg SH000001日线数据，KQuery(-total, 2) */
-    query = KQuery(-(hku_int64)total, 2);
+    query = KQuery(-(int64)total, 2);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 2);
     BOOST_CHECK(kdata.empty() == false);
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(record.datetime == Datetime(199012200000));
 
     /** @arg SH000001日线数据，KQuery(0, -total) */
-    query = KQuery(0, -(hku_int64)total);
+    query = KQuery(0, -(int64)total);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 0);
     BOOST_CHECK(kdata.empty() == true);
@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     /// 测试分钟线
     ///==============================
     /** @arg SH000001全部1分钟K线数据,KQuery(0) */
-    query = KQuery(0, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(0, Null<int64>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 682823L);
     record = kdata[0];
@@ -453,7 +453,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001分钟线数据，KQuery(total-1) */
     total = stock.getCount(KQuery::MIN);
-    query = KQuery(total - 1, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(total - 1, Null<int64>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 1);
     record = kdata[0];
@@ -462,7 +462,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001分钟线数据，KQuery(total) */
     total = stock.getCount(KQuery::MIN);
-    query = KQuery(total, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(total, Null<int64>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 0);
 
@@ -516,7 +516,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(kdata.size() == 0);
 
     /** @arg SH000001分钟线数据，KQuery(-1) */
-    query = KQuery(-1, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(-1, Null<int64>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 1);
     record = kdata[0];
@@ -524,7 +524,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001分钟线数据，KQuery(-total) */
     total = stock.getCount(KQuery::MIN);
-    query = KQuery(-(hku_int64)total, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(-(int64)total, Null<int64>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 682823);
     record = kdata[0];
@@ -535,7 +535,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001分钟线数据，KQuery(-total-1) */
     total = stock.getCount(KQuery::MIN);
-    query = KQuery(-1-(hku_int64)total, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(-1-(int64)total, Null<int64>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 682823);
     record = kdata[0];
@@ -546,7 +546,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
 
     /** @arg SH000001分钟线数据，KQuery(-total + 1) */
     total = stock.getCount(KQuery::MIN);
-    query = KQuery(1-(hku_int64)total, Null<hku_int64>(), KQuery::MIN);
+    query = KQuery(1-(int64)total, Null<int64>(), KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 682822);
     record = kdata[0];
@@ -578,14 +578,14 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(kdata.size() == 0);
 
     /** @arg SH000001分钟线数据，KQuery(-total, 1) */
-    query = KQuery(-(hku_int64)total, 1, KQuery::MIN);
+    query = KQuery(-(int64)total, 1, KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 1);
     record = kdata[0];
     BOOST_CHECK(record.datetime == Datetime(200001040931));
 
     /** @arg SH000001分钟线数据，KQuery(-total, 2) */
-    query = KQuery(-(hku_int64)total, 2, KQuery::MIN);
+    query = KQuery(-(int64)total, 2, KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 2);
     record = kdata[0];
@@ -595,7 +595,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_by_index ) {
     BOOST_CHECK(record.datetime == Datetime(200001040932));
 
     /** @arg SH000001分钟线数据，KQuery(0, -total) */
-    query = KQuery(0, -(hku_int64)total, KQuery::MIN);
+    query = KQuery(0, -(int64)total, KQuery::MIN);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata.size() == 0);
 
@@ -1188,7 +1188,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     KData kdata;
 
     /** @arg 前向复权*/
-    query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::FORWARD);
+    query = KQuery(0, Null<int64>(), KQuery::DAY, KQuery::FORWARD);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata[2710] == KRecord(Datetime(201106030000), 10.02, 10.14, 10.0, 10.09, 38726.1, 384820));
     BOOST_CHECK(kdata[2709] == KRecord(Datetime(201106020000), 10.34, 10.38, 9.93, 10.04, 103909.3, 780543.0));
@@ -1197,7 +1197,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     BOOST_CHECK(kdata[2547] == KRecord(Datetime(201009280000), 9.82, 9.82, 9.55, 9.55, 81241.5, 639882));
 
     /** @arg 后向复权*/
-    query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::BACKWARD);
+    query = KQuery(0, Null<int64>(), KQuery::DAY, KQuery::BACKWARD);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata[0] == KRecord(Datetime(199911100000), 29.5, 29.8, 27.0, 27.75, 485910.2, 1740850));
     BOOST_CHECK(kdata[151] == KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));
@@ -1206,7 +1206,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     BOOST_CHECK(kdata[658] == KRecord(Datetime(200208220000), 18.77, 18.89, 18.62, 18.81, 13101.3, 106872));
 
     /** @arg 前向等比复权*/
-    query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::EQUAL_FORWARD);
+    query = KQuery(0, Null<int64>(), KQuery::DAY, KQuery::EQUAL_FORWARD);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata[2710] == KRecord(Datetime(201106030000), 10.02, 10.14, 10.0, 10.09, 38726.1, 384820));
     BOOST_CHECK(kdata[2709] == KRecord(Datetime(201106020000), 10.33, 10.37, 9.93, 10.04, 103909.3, 780543.0));
@@ -1215,7 +1215,7 @@ BOOST_AUTO_TEST_CASE( test_getKData_recover ) {
     BOOST_CHECK(kdata[2547] == KRecord(Datetime(201009280000), 9.82, 9.82, 9.55, 9.56, 81241.5, 639882));
 
     /** @arg 等比后向复权*/
-    query = KQuery(0, Null<hku_int64>(), KQuery::DAY, KQuery::EQUAL_BACKWARD);
+    query = KQuery(0, Null<int64>(), KQuery::DAY, KQuery::EQUAL_BACKWARD);
     kdata = stock.getKData(query);
     BOOST_CHECK(kdata[0] == KRecord(Datetime(199911100000), 29.5, 29.8, 27.0, 27.75, 485910.2, 1740850));
     BOOST_CHECK(kdata[151] == KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));

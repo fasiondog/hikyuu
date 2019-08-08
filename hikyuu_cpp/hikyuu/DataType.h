@@ -47,13 +47,29 @@ namespace hku {
  * @{
  */
 
-typedef long long hku_int64;
-typedef unsigned long long hku_uint64;
-typedef int hku_int32;
-typedef unsigned hku_uint32;
-typedef char hku_int8;
-typedef unsigned char hku_uint8;
+#if !defined(int64)
+typedef long long int64;
+#endif 
 
+#if !defined(uint64)
+typedef unsigned long long uint64;
+#endif
+
+#if !defined(int32)
+typedef int int32;
+#endif
+
+#if !defined(uint32)
+typedef unsigned uint32;
+#endif
+
+#if !defined(int8)
+typedef char int8;
+#endif
+
+#if !defined(uint8)
+typedef unsigned char uint8;
+#endif
 
 typedef double price_t;
 

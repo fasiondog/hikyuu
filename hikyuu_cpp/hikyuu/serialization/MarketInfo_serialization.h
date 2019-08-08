@@ -46,7 +46,7 @@ void save(Archive & ar, const hku::MarketInfo& record, unsigned int version) {
     hku::string name = HKU_GB_TO_UTF8(record.name());
     hku::string description = HKU_GB_TO_UTF8(record.description());
     hku::string code = record.code();
-    hku::hku_uint64 lastDate = record.lastDate().number();
+    hku::uint64 lastDate = record.lastDate().number();
     ar & BOOST_SERIALIZATION_NVP(market);
     ar & BOOST_SERIALIZATION_NVP(name);
     ar & BOOST_SERIALIZATION_NVP(description);
@@ -57,7 +57,7 @@ void save(Archive & ar, const hku::MarketInfo& record, unsigned int version) {
 template<class Archive>
 void load(Archive & ar, hku::MarketInfo& record, unsigned int version) {
     hku::string market, name, description, code;
-    hku::hku_uint64 lastDate;
+    hku::uint64 lastDate;
     ar & BOOST_SERIALIZATION_NVP(market);
     ar & BOOST_SERIALIZATION_NVP(name);
     ar & BOOST_SERIALIZATION_NVP(description);

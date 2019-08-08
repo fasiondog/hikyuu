@@ -38,7 +38,7 @@ private:
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const {
         namespace bs = boost::serialization;
-        hku::hku_uint64 date_number = datetime.number();
+        hku::uint64 date_number = datetime.number();
         ar & bs::make_nvp("datetime", date_number);
         ar & BOOST_SERIALIZATION_NVP(value);
     }
@@ -46,7 +46,7 @@ private:
     template<class Archive>
     void load(Archive & ar, const unsigned int version) {
         namespace bs = boost::serialization;
-        hku::hku_uint64 date_number;
+        hku::uint64 date_number;
         ar & bs::make_nvp("datetime", date_number);
         datetime = Datetime(date_number);
         ar & BOOST_SERIALIZATION_NVP(value);
