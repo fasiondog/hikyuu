@@ -12,6 +12,7 @@
 
 #include <type_traits>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include "../DataType.h"
 
 namespace hku {
@@ -200,10 +201,9 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer>::type
 SQLStatementBase::bind(int idx, const T& item) {
     HKU_ASSERT_M(isValid(), "Invalid statement!");
     std::ostringstream sout;
-    boost::archive::binary_iarchive oa(sout);
+    boost::archive::binary_oarchive oa(sout);
     oa << BOOST_SERIALIZATION_NVP(item);
-    const std::string& str = sout.str();
-    sub_bindBlob(idx, str);
+    sub_bindBlob(idx, sout.str());
 }
 
 template <typename T>
