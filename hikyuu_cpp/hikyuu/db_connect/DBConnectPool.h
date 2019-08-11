@@ -52,20 +52,20 @@ private:
  * 从池中获取驱动辅助工具，以保证退出作用域时能够及时归还驱动至驱动池
  * @ingroup DataDriver
  */
-struct DataDriverGuard {
-    DataDriverGuard(DBConnectPool *pool): m_pool(pool) {
+struct DBConnectGuard {
+    DBConnectGuard(DBConnectPool *pool): m_pool(pool) {
         if (m_pool) {
             m_driver = m_pool->getDriver();
         }
     }
 
-    ~DataDriverGuard() {
+    ~DBConnectGuard() {
         if (m_pool && m_driver) {
             m_pool->returnDriver(m_driver);
         }
     }
 
-    DBConnectPtr getDriver() {
+    DBConnectPtr getConnect() {
         return m_driver;
     }
 
