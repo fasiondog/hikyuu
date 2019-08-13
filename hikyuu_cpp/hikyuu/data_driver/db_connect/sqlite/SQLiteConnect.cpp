@@ -7,8 +7,8 @@
  *      Author: fasiondog
  */
 
-#include "../../config.h"
-#include "../../Log.h"
+#include "../../../config.h"
+#include "../../../Log.h"
 #include "SQLiteConnect.h"
 #include "SQLiteStatement.h"
 

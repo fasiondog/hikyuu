@@ -143,8 +143,8 @@ void System::reset(bool with_tm, bool with_ev) {
     //一个sys实例绑定stock后，除非主动改变，否则不应该被reset
     //m_stock
 
-    m_pre_ev_valid = true;
-    m_pre_cn_valid= true;
+    m_pre_ev_valid = false;//true;
+    m_pre_cn_valid= false; //true;
 
     m_buy_days = 0;
     m_sell_short_days = 0;

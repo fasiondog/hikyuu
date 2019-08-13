@@ -141,7 +141,7 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
         try {
             MarketInfo marketInfo(market, HKU_STR(row[1]), HKU_STR(row[2]),
                                      row[3], last_date);
-            sm.addMarketInfo(marketInfo);
+            sm.loadMarketInfo(marketInfo);
         } catch(...) {
             HKU_ERROR("Can't get MarketInfo {}", market);
             continue;
@@ -186,7 +186,7 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
                     boost::lexical_cast<int>(row[4]),
                     boost::lexical_cast<size_t>(row[5]),
                     boost::lexical_cast<size_t>(row[6]));
-            sm.addStockTypeInfo(stkTypeInfo);
+            sm.loadStockTypeInfo(stkTypeInfo);
         } catch(...) {
             HKU_ERROR("Can't get StockTypeInfo {}", type);
             continue;

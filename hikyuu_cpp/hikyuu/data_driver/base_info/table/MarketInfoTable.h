@@ -1,5 +1,5 @@
 /*
- * SQLiteBaseInfoDriver.h
+ * MarketInfoTable.h
  *
  *  Copyright (c) 2019 fasiondog
  * 
@@ -7,14 +7,19 @@
  *      Author: fasiondog
  */
 
-#include "../../../DataType.h"
+#pragma once
+#ifndef HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_MARKETINFOTABLE_H
+#define HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_MARKETINFOTABLE_H
+
+#include "../../db_connect/SQLStatementBase.h"
 
 namespace hku {
 
 class MarketInfoTable {
-
 public:
-    int64 marketid() const {
+    MarketInfoTable(): m_marketid(0), m_lastDate(0) {}
+    
+    int64 id() const {
         return m_marketid;
     }
 
@@ -56,15 +61,15 @@ public:
     }
 
     void save(const SQLStatementPtr& st) const {
-        st->bind(0, m_marketid, m_market, m_market, m_name, m_description, m_code, m_lastDate);
+        st->bind(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate);
     }
 
     void update(const SQLStatementPtr& st) const {
-        st->bind(0, m_market, m_market, m_name, m_description, m_code, m_lastDate, m_marketid);
+        st->bind(0, m_market, m_name, m_description, m_code, m_lastDate, m_marketid);
     }
 
     void load(const SQLStatementPtr& st) {
-        st->getColumn(0, m_marketid, m_market, m_market, m_name, m_description, m_code, m_lastDate);
+        st->getColumn(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate);
     }
 
 private:
@@ -77,3 +82,5 @@ private:
 };
 
 } /* namespace */
+
+#endif /* HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_MARKETINFOTABLE_H */

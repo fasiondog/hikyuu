@@ -55,8 +55,8 @@ CREATE TABLE `hku_base`.`stocktypeinfo` (
 	`precision` INT(11) NULL DEFAULT NULL,
 	`tick` DOUBLE NULL DEFAULT NULL,
 	`tickValue` DOUBLE NULL DEFAULT NULL,
-	`minTradeNumber` VARCHAR(32) NULL DEFAULT NULL,
-	`maxTradeNumber` VARCHAR(32) NULL DEFAULT NULL,
+	`minTradeNumber` INT(32) UNSIGNED NULL DEFAULT NULL,
+	`maxTradeNumber` INT(32) UNSIGNED NULL DEFAULT NULL,
 	`description` VARCHAR(100) NULL DEFAULT NULL,
 	PRIMARY KEY (`id`)
 )

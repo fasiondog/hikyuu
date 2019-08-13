@@ -220,7 +220,7 @@ struct HKU_API Stock::Data {
     string        m_code;        //证券代码
     string        m_market_code; //市场简称证券代码
     string        m_name;        //证券名称
-    uint32    m_type;        //证券类型
+    uint32        m_type;        //证券类型
     bool          m_valid;       //当前证券是否有效
     Datetime      m_startDate;   //证券起始日期
     Datetime      m_lastDate;    //证券最后日期

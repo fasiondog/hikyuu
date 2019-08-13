@@ -70,7 +70,7 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
 
     StockManager& sm = StockManager::instance();
     for (auto iter = out.begin(); iter != out.end(); ++iter) {
-        sm.addMarketInfo(*iter);
+        sm.loadMarketInfo(*iter);
     }
 
     return true;
@@ -132,7 +132,7 @@ bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
 
     StockManager& sm = StockManager::instance();
     for (auto iter = out.begin(); iter != out.end(); ++iter) {
-        sm.addStockTypeInfo(*iter);
+        sm.loadStockTypeInfo(*iter);
     }
 
     return true;

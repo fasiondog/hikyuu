@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include "../DataType.h"
+#include "../../DataType.h"
 
 namespace hku {
 

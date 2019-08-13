@@ -10,8 +10,8 @@
 #ifndef HIKYUU_DB_CONNECT_DBCONNECTBASE_H
 #define HIKYUU_DB_CONNECT_DBCONNECTBASE_H
 
-#include "../DataType.h"
-#include "../utilities/Parameter.h"
+#include "../../DataType.h"
+#include "../../utilities/Parameter.h"
 #include "SQLStatementBase.h"
 
 namespace hku {

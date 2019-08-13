@@ -115,6 +115,7 @@ void export_System() {
             .def("run", run_1, (arg("query"), arg("reset")=true))
             .def("run", run_2, (arg("stock"), arg("query"), arg("reset")=true))
 
+            .def("readyForRun", &System::readyForRun)
             .def("runMoment", run_monent_1)
             .def("runMoment", run_monent_2)
             .def("_runMoment", &System::_runMoment)

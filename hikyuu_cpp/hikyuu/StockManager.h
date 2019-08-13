@@ -132,14 +132,14 @@ public:
      * @param marketInfo
      * @return
      */
-    bool addMarketInfo(const MarketInfo& marketInfo);
+    bool loadMarketInfo(const MarketInfo& marketInfo);
 
     /**
      * 初始化时，添加证券类型信息
      * @param stkTypeInfo
      * @return
      */
-    bool addStockTypeInfo(const StockTypeInfo& stkTypeInfo);
+    bool loadStockTypeInfo(const StockTypeInfo& stkTypeInfo);
 
     /**
      * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试

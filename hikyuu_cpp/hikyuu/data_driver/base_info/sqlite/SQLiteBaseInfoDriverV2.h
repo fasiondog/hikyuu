@@ -11,7 +11,7 @@
 #ifndef SQLITEBASEINFODRIVERV2_H_
 #define SQLITEBASEINFODRIVERV2_H_
 
-#include "../../../db_connect/DBConnect.h"
+#include "../../db_connect/DBConnect.h"
 #include "../../BaseInfoDriver.h"
 
 namespace hku {
@@ -23,8 +23,11 @@ public:
 
     virtual bool _init();
     virtual bool _loadMarketInfo();
-    virtual bool _loadStockTypeInfo() {return true;}
-    virtual bool _loadStock() {return true;}
+    virtual bool _loadStockTypeInfo();
+    virtual bool _loadStock();
+
+private:
+    StockWeightList _getStockWeightList(uint64 stockid);
 
 private:
     //股票基本信息数据库实例

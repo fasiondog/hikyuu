@@ -11,6 +11,8 @@
 #include "../../../StockManager.h"
 #include "SQLiteBaseInfoDriverV2.h"
 #include "../table/MarketInfoTable.h"
+#include "../table/StockTypeInfoTable.h"
+#include "../table/StockWeightoTable.h"
 
 namespace hku {
 
@@ -44,6 +46,7 @@ bool SQLiteBaseInfoDriverV2::_init() {
 
 bool SQLiteBaseInfoDriverV2::_loadMarketInfo() {
     if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
         return false;
     }
 
@@ -70,7 +73,7 @@ bool SQLiteBaseInfoDriverV2::_loadMarketInfo() {
             lastDate = Null<Datetime>();
             HKU_WARN("lastDate of market({}) is invalid! ", info.market());
         }
-        sm.addMarketInfo(
+        sm.loadMarketInfo(
             MarketInfo(
                 info.market(),
                 info.name(),
@@ -81,6 +84,82 @@ bool SQLiteBaseInfoDriverV2::_loadMarketInfo() {
     }
 
     return true;
+}
+
+bool SQLiteBaseInfoDriverV2::_loadStockTypeInfo() {
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
+        return false;
+    }
+
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+
+    vector<StockTypeInfoTable> infoTables;
+    try {
+        con->batchLoad(infoTables);
+    } catch (std::exception& e) {
+        HKU_FATAL("load StockTypeInfo table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load StockTypeInfo table failed!");
+        return false;
+    }
+
+    StockManager& sm = StockManager::instance();
+    for (auto& info: infoTables) {
+        sm.loadStockTypeInfo(
+            StockTypeInfo(
+                info.type(),
+                info.description(), 
+                info.tick(),
+                info.tickValue(), 
+                info.precision(),
+                info.minTradeNumber(), 
+                info.maxTradeNumber()
+        ));
+    }
+
+    return true;
+}
+
+bool SQLiteBaseInfoDriverV2::_loadStock() {
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
+        return false;
+    }
+
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+    return true;
+}
+
+StockWeightList SQLiteBaseInfoDriverV2::_getStockWeightList(uint64 stockid) {
+    StockWeightList result;
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
+        return result;
+    }
+
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+
+    vector<StockWeightTable> table;
+    try {
+        con->batchLoad(table, format("stockid={}", stockid));
+    } catch (std::exception& e) {
+        HKU_FATAL("load StockWeight table failed! {}", e.what());
+        return result;
+    } catch (...) {
+        HKU_FATAL("load StockWeight table failed!");
+        return result;
+    }
+/*
+    for (auto& weight: table) {
+        result.push_back(StockWeight());
+    }
+*/
+    return result;
 }
 
 } /* namespace */

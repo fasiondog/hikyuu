@@ -405,7 +405,7 @@ bool StockManager::addStock(const Stock& stock) {
 }
 
 
-bool StockManager::addMarketInfo(const MarketInfo& marketInfo) {
+bool StockManager::loadMarketInfo(const MarketInfo& marketInfo) {
     string market = marketInfo.market();
     to_upper(market);
     if (m_marketInfoDict.find(market) != m_marketInfoDict.end()) {
@@ -417,7 +417,7 @@ bool StockManager::addMarketInfo(const MarketInfo& marketInfo) {
     return true;
 }
 
-bool StockManager::addStockTypeInfo(const StockTypeInfo& stkTypeInfo) {
+bool StockManager::loadStockTypeInfo(const StockTypeInfo& stkTypeInfo) {
     if (m_stockTypeInfo.find(stkTypeInfo.type()) != m_stockTypeInfo.end()) {
         HKU_ERROR("The stockTypeInfo had exist! {}", stkTypeInfo.type());
         return false;

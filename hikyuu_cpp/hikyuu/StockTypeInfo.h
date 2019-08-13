@@ -65,7 +65,7 @@ public:
     string toString() const;
 
 private:
-    uint32 m_type;          //证券类型
+    uint32 m_type;              //证券类型
     string m_description;       //描述信息
     price_t m_tick;             //最小跳动量
     price_t m_tickValue;        //每一个tick价格
