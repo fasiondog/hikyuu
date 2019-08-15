@@ -6,7 +6,7 @@
  */
 
 #include <boost/algorithm/string.hpp>
-#include "base_info/sqlite/SQLiteBaseInfoDriverV2.h"
+#include "base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "block_info/qianlong/QLBlockInfoDriver.h"
 #include "kdata/hdf5/H5KDataDriver.h"
 #include "DataDriverFactory.h"
@@ -16,7 +16,7 @@ namespace hku {
 
 map<string, BaseInfoDriverPtr> default_baseinfo_driver() {
     map<string, BaseInfoDriverPtr> result;
-    result["SQLITE3"] = make_shared<SQLiteBaseInfoDriverV2>();
+    result["SQLITE3"] = make_shared<SQLiteBaseInfoDriver>();
     return result;
 }
 

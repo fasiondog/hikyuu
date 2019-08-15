@@ -1,31 +1,31 @@
 /*
  * SQLiteBaseInfoDriver.cpp
  *
- *  Created on: 2012-8-14
+ *  Copyright (c) 2019 fasiondog
+ * 
+ *  Created on: 2019-8-11
  *      Author: fasiondog
  */
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-#include "SQLiteBaseInfoDriver.h"
-#include "../../../utilities/util.h"
+#include <thread>
 #include "../../../StockManager.h"
-#include "../../../Log.h"
+#include "SQLiteBaseInfoDriver.h"
+#include "../table/MarketInfoTable.h"
+#include "../table/StockTypeInfoTable.h"
+#include "../table/StockWeightTable.h"
+#include "../table/StockTable.h"
 
 namespace hku {
 
-class Sqlite3Closer{
-public:
-    void operator()(sqlite3 *db){
-        if(db){
-            sqlite3_close(db);
-            //std::cout << "Closed Sqlite3 database!" << std::endl;
-            //Cannot use log output when exiting!
-            //HKU_TRACE("Closed Sqlite3 database!");
-        }
-    }
-};
+SQLiteBaseInfoDriver::SQLiteBaseInfoDriver()
+: BaseInfoDriver("sqlite3"), m_pool(nullptr) {
+}
 
+SQLiteBaseInfoDriver::~SQLiteBaseInfoDriver() {
+    if (m_pool) {
+        delete m_pool;
+    }
+}
 
 bool SQLiteBaseInfoDriver::_init() {
     string dbname;
@@ -37,224 +37,126 @@ bool SQLiteBaseInfoDriver::_init() {
         return false;
     }
 
-    sqlite3 *db;
-    int rc=sqlite3_open_v2(dbname.c_str(), &db,
-                             SQLITE_OPEN_READWRITE|SQLITE_OPEN_FULLMUTEX,0);
-    if( rc ){
-        HKU_ERROR("Can't open database: err({}) - {}", sqlite3_errmsg(db), dbname);
-        sqlite3_close(db);
-        return false;
+    int cpu_num = std::thread::hardware_concurrency();
+    if (cpu_num > 1) {
+        cpu_num--;
     }
-
-    m_db = shared_ptr<sqlite3>(db, Sqlite3Closer());
-
+    m_pool = new DBConnectPool(m_params, cpu_num);
     return true;
 }
 
-
 bool SQLiteBaseInfoDriver::_loadMarketInfo() {
-    if (!m_db) {
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
         return false;
     }
 
-    list<MarketInfo> out;
-    char *zErrMsg=0;
-    int rc = sqlite3_exec(m_db.get(), "select market,name,"
-                            "description,code,lastdate from market",
-                            _getMarketTableCallBack, &out, &zErrMsg);
-    if( rc != SQLITE_OK ){
-        HKU_ERROR("SQL error: {}", zErrMsg);
-        sqlite3_free(zErrMsg);
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+    
+    vector<MarketInfoTable> infoTables;
+    try {
+        con->batchLoad(infoTables);
+    } catch (std::exception& e) {
+        HKU_FATAL("load Market table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load Market table failed!");
         return false;
     }
 
     StockManager& sm = StockManager::instance();
-    for (auto iter = out.begin(); iter != out.end(); ++iter) {
-        sm.loadMarketInfo(*iter);
+    for (auto& info: infoTables) {
+        Datetime lastDate;
+        try {
+            lastDate = Datetime(info.lastDate() * 10000);
+        } catch (...) {
+            lastDate = Null<Datetime>();
+            HKU_WARN("lastDate of market({}) is invalid! ", info.market());
+        }
+        sm.loadMarketInfo(
+            MarketInfo(
+                info.market(),
+                info.name(),
+                info.description(),
+                info.code(),
+                lastDate
+        ));
     }
 
     return true;
-}
-
-//select market,name,description,code,lastdate from market
-int SQLiteBaseInfoDriver::_getMarketTableCallBack(void *out,
-        int nCol, char **azVals, char **azCols) {
-    assert(nCol==5);
-    int result = 0;
-    uint64 d;
-    string market(azVals[0]);
-    to_upper(market);
-    try{
-        d = (boost::lexical_cast<uint64>(azVals[4])*10000);
-        Datetime datetime;
-        try {
-            datetime = Datetime(d);
-        } catch (std::out_of_range& e) {
-            datetime = Null<Datetime>();
-            HKU_WARN("LastDate of market({}) is invalid! Assigned to Null<Dateteim>!\n{}", 
-                    market, e.what());
-        }
-
-        MarketInfo marketInfo(market, HKU_STR(azVals[1]),
-                HKU_STR(azVals[2]), azVals[3], datetime);
-        ((list<MarketInfo> *)out)->push_back(marketInfo);
-        result = 0;
-
-    } catch(boost::bad_lexical_cast& e){
-        HKU_ERROR("Can't get the information of market({})\n{}", market, e.what());
-        result = 1;
-    } catch(std::exception& e){
-        HKU_ERROR(e.what());
-        result = 1;
-    } catch(...) {
-        HKU_ERROR("Unkown error!");
-        result = 1;
-    }
-    return result;
 }
 
 bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
-    if (!m_db) {
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
         return false;
     }
 
-    list<StockTypeInfo> out;
-    char *zErrMsg=0;
-    int rc = sqlite3_exec(m_db.get(), "select type, description, tick, "
-                          "tickValue, precision, minTradeNumber, "
-                          "maxTradeNumber from StockTypeInfo",
-                        _getStockTypeInfoTableCallBack, &out, &zErrMsg);
-    if( rc!=SQLITE_OK ){
-        HKU_ERROR("SQL error: {}", zErrMsg);
-        sqlite3_free(zErrMsg);
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+
+    vector<StockTypeInfoTable> infoTables;
+    try {
+        con->batchLoad(infoTables);
+    } catch (std::exception& e) {
+        HKU_FATAL("load StockTypeInfo table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load StockTypeInfo table failed!");
         return false;
     }
 
     StockManager& sm = StockManager::instance();
-    for (auto iter = out.begin(); iter != out.end(); ++iter) {
-        sm.loadStockTypeInfo(*iter);
+    for (auto& info: infoTables) {
+        sm.loadStockTypeInfo(
+            StockTypeInfo(
+                info.type(),
+                info.description(), 
+                info.tick(),
+                info.tickValue(), 
+                info.precision(),
+                info.minTradeNumber(), 
+                info.maxTradeNumber()
+        ));
     }
 
     return true;
 }
-
-//select type,description,tick,precision,minTradeNumber,maxTradeNumber
-//from stockTypeInfo
-int SQLiteBaseInfoDriver::_getStockTypeInfoTableCallBack(
-            void *out, int nCol, char **azVals, char **azCols){
-    assert(nCol == 7);
-    int result = 0;
-    try{
-        uint32 type = boost::lexical_cast<uint32>(azVals[0]);
-        StockTypeInfo stockTypeInfo(
-                type, HKU_STR(azVals[1]),
-                boost::lexical_cast<price_t>(azVals[2]),
-                boost::lexical_cast<price_t>(azVals[3]),
-                boost::lexical_cast<int>(azVals[4]),
-                boost::lexical_cast<size_t>(azVals[5]),
-                boost::lexical_cast<size_t>(azVals[6]));
-        ((list<StockTypeInfo> *)out)->push_back(stockTypeInfo);
-        result = 0;
-    } catch (boost::bad_lexical_cast& e) {
-        HKU_ERROR(e.what());
-        result = 1;
-    } catch (std::exception& e) {
-        HKU_ERROR(e.what());
-        result = 1;
-    } catch (...) {
-        HKU_ERROR("Unkown error!");
-    }
-
-    return result;
-}
-
-bool SQLiteBaseInfoDriver::_getStockWeightList(uint32 id,
-        StockWeightList& out) {
-    if (!m_db) {
-        return false;
-    }
-
-    char *zErrMsg=0;
-    std::stringstream buf (std::stringstream::out);
-    buf<<"select id, date, countAsGift, countForSell, priceForSell, bonus,\
-          countOfIncreasement, totalCount, freeCount from stkWeight \
-          where stockid=" << id << " order by date";
-    int rc = sqlite3_exec(m_db.get(), buf.str().c_str(),
-                           _getStockWeightCallBack, &out, &zErrMsg);
-    if( rc!=SQLITE_OK ){
-        HKU_ERROR("SQL error: {}", zErrMsg);
-        sqlite3_free(zErrMsg);
-        return false;
-    }
-
-    return true;
-}
-
-//select id, date, countAsGift, countForSell, priceForSell,
-//bobus, countOfIncreasement, totalCount, freeCount
-//from stkweight where stockid=? order by date
-int SQLiteBaseInfoDriver::_getStockWeightCallBack(
-        void *out, int nCol, char **azVals, char **azCols){
-    assert(nCol == 9);
-    int failure = 0;
-    int id = 0;
-    try{
-        id = boost::lexical_cast<int>(azVals[0]);
-        uint64 datetime;
-        datetime = boost::lexical_cast<uint64>(azVals[1]) * 10000;
-        StockWeight weight(Datetime(datetime),
-                boost::lexical_cast<price_t>(azVals[2]) * 0.0001,
-                boost::lexical_cast<price_t>(azVals[3]) * 0.0001,
-                boost::lexical_cast<price_t>(azVals[4]) * 0.001,
-                boost::lexical_cast<price_t>(azVals[5]) * 0.001,
-                boost::lexical_cast<price_t>(azVals[6]) * 0.0001,
-                boost::lexical_cast<price_t>(azVals[7]),
-                boost::lexical_cast<price_t>(azVals[8]));
-        ((StockWeightList *)out)->push_back(weight);
-        failure = 0;
-    } catch (std::out_of_range& e) {
-        HKU_ERROR("Date of id({}) is invalid! {}", id, e.what());
-        //不返回失败，仅抛弃该条记录
-    } catch (boost::bad_lexical_cast& e){
-        HKU_ERROR("id({}) bad_lexical_cast！{}", id, e.what());
-        failure = 1;
-    } catch (std::exception& e){
-        HKU_ERROR(e.what());
-        failure = 1;
-    } catch (...) {
-        HKU_ERROR("Unkown error!");
-        failure = 1;
-    }
-
-    return failure;
-}
-
-struct StockTable {
-    uint32 id;
-    string market;
-    string code;
-    string name;
-    uint32 type;
-    bool valid;
-    Datetime startDate;
-    Datetime endDate;
-};
 
 bool SQLiteBaseInfoDriver::_loadStock() {
-    if (!m_db) {
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
         return false;
     }
 
-    list<StockTable> stock_table;
-    char *zErrMsg=0;
-    int rc = sqlite3_exec(m_db.get(), "select stock.stockid,market.market,\
-            Stock.code,Stock.name,Stock.type,Stock.valid,Stock.startDate, \
-            Stock.endDate from Stock inner join Market \
-            on Stock.marketid = Market.marketid",
-            _getStockTableCallBack, &stock_table, &zErrMsg);
-    if (rc != SQLITE_OK) {
-        HKU_ERROR("SQL error: {}", zErrMsg);
-        sqlite3_free(zErrMsg);
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+
+    vector<MarketInfoTable> marketTable;
+    try {
+        con->batchLoad(marketTable);
+    } catch (std::exception& e) {
+        HKU_FATAL("load Market table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load Market table failed!");
+        return false;
+    }
+
+    unordered_map<uint64, string> marketDict;
+    for (auto& m: marketTable) {
+        marketDict[m.id()] = m.market();
+    }
+
+    vector<StockTable> table;
+    try {
+        con->batchLoad(table);
+    } catch (std::exception& e) {
+        HKU_FATAL("load Stock table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load Stock table failed!");
         return false;
     }
 
@@ -262,35 +164,49 @@ bool SQLiteBaseInfoDriver::_loadStock() {
     StockTypeInfo stockTypeInfo;
     StockTypeInfo null_stockTypeInfo;
     StockManager& sm = StockManager::instance();
-    list<StockTable>::iterator iter = stock_table.begin();
-    for(; iter != stock_table.end(); ++iter) {
-        stockTypeInfo = sm.getStockTypeInfo(iter->type);
+    for (auto& r: table) {
+        //HKU_INFO("stock({},{},{},{},{},{},{},{})", r.stockid,r.marketid,r.code,HKU_STR(r.name),r.type,r.valid,r.startDate,r.endDate);
+        Datetime startDate, endDate;
+        if(r.startDate > r.endDate || r.startDate == 0 || r.endDate == 0) {
+            //日期非法，置为Null<Datetime>
+            startDate = Null<Datetime>();
+            endDate = Null<Datetime>();
+        } else {
+            startDate = (r.startDate == 99999999LL)
+                      ? Null<Datetime>()
+                      : Datetime(r.startDate*10000);
+            endDate = (r.endDate == 99999999LL)
+                    ? Null<Datetime>()
+                    : Datetime(r.endDate*10000);
+        }
+
+        stockTypeInfo = sm.getStockTypeInfo(r.type);
         if(stockTypeInfo != null_stockTypeInfo) {
-            stock = Stock(iter->market,
-                          iter->code,
-                          iter->name,
-                          iter->type,
-                          iter->valid,
-                          iter->startDate,
-                          iter->endDate,
+            stock = Stock(marketDict[r.marketid],
+                          r.code,
+                          HKU_STR(r.name),
+                          r.type,
+                          r.valid,
+                          startDate,
+                          endDate,
                           stockTypeInfo.tick(),
                           stockTypeInfo.tickValue(),
                           stockTypeInfo.precision(),
                           stockTypeInfo.minTradeNumber(),
                           stockTypeInfo.maxTradeNumber());
+            
         } else {
-            stock = Stock(iter->market,
-                          iter->code,
-                          iter->name,
-                          iter->type,
-                          iter->valid,
-                          iter->startDate,
-                          iter->endDate);
+            stock = Stock(marketDict[r.marketid],
+                          r.code,
+                          HKU_STR(r.name),
+                          r.type,
+                          r.valid,
+                          startDate,
+                          endDate);
         }
 
         if(sm.loadStock(stock)){
-            StockWeightList weightList;
-            _getStockWeightList(iter->id, weightList);
+            StockWeightList weightList = _getStockWeightList(r.stockid);
             stock.setWeightList(weightList);
         }
     }
@@ -298,69 +214,62 @@ bool SQLiteBaseInfoDriver::_loadStock() {
     return true;
 }
 
-//select stock.stockid,market.market,stock.code,stock.name,stock.type,
-//stock.valid,stock.startDate,stock.endDate from stock
-//inner join market on stock.marketid = market.marketid
-int SQLiteBaseInfoDriver::_getStockTableCallBack(
-        void *out, int nCol, char **azVals, char **azCols) {
-    assert(nCol == 8);
-    int result = 0;
-    StockTable stockRecord;
-    try {
-        stockRecord.id = boost::lexical_cast<uint32>(azVals[0]);
-        stockRecord.market = string(azVals[1]);
-        stockRecord.code = string(azVals[2]);
-        stockRecord.name = string(HKU_STR(azVals[3]));
-        stockRecord.type = boost::lexical_cast<uint32>(azVals[4]);
-        uint32 temp_valid = boost::lexical_cast<uint32>(azVals[5]);
-        stockRecord.valid = temp_valid > 0 ? true : false;
-        Datetime datetime;
-        uint64 startDate, endDate;
-        startDate = boost::lexical_cast<uint64>(azVals[6])*10000;
-        endDate = boost::lexical_cast<uint64>(azVals[7])*10000;
-        if(startDate > endDate || startDate == 0 || endDate == 0) {
-            //日期非法，置为Null<Datetime>
-            stockRecord.startDate = Null<Datetime>();
-            stockRecord.endDate = Null<Datetime>();
-        } else {
-            stockRecord.startDate = (startDate == 999999990000LL)
-                                  ? Null<Datetime>()
-                                  : Datetime(startDate);
-            stockRecord.endDate = (endDate == 999999990000LL)
-                                ? Null<Datetime>()
-                                : Datetime(endDate);
-        }
-        ((list<StockTable> *)out)->push_back(stockRecord);
-        result = 0;
+StockWeightList SQLiteBaseInfoDriver::_getStockWeightList(uint64 stockid) {
+    StockWeightList result;
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
+        return result;
+    }
 
-    } catch(std::out_of_range& e) {
-        HKU_WARN("Date of stock({}) is invalid! {}", stockRecord.id, e.what());
-        //不返回失败，仅抛弃该记录
-        result = 0;
-    } catch(boost::bad_lexical_cast& e) {
-        HKU_ERROR(e.what());
-        result = 1;
-    } catch(std::exception& e) {
-        HKU_ERROR(e.what());
-        result = 1;
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+
+    vector<StockWeightTable> table;
+    try {
+        con->batchLoad(table, format("stockid={}", stockid));
+    } catch (std::exception& e) {
+        HKU_FATAL("load StockWeight table failed! {}", e.what());
+        return result;
     } catch (...) {
-        HKU_ERROR("Unknow error!");
-        result = 1;
+        HKU_FATAL("load StockWeight table failed!");
+        return result;
+    }
+
+    for (auto& w: table) {
+        try {
+            result.push_back(
+                StockWeight(
+                    Datetime(w.date*10000), 
+                    w.countAsGift * 0.0001,
+                    w.countForSell * 0.0001, 
+                    w.priceForSell * 0.001,
+                    w.bonus * 0.001,
+                    w.countOfIncreasement * 0.0001,
+                    w.totalCount, 
+                    w.freeCount
+                )
+            );
+        } catch (std::out_of_range& e) {
+            HKU_WARN("Date of id({}) is invalid! {}", w.id(), e.what());
+        } catch (std::exception& e) {
+            HKU_WARN("Error StockWeight Record id({}) {}", w.id(), e.what());
+        } catch (...) {
+            HKU_WARN("Error StockWeight Record id({})! Unknow reason!", w.id());
+        }
     }
 
     return result;
 }
 
-
 Parameter SQLiteBaseInfoDriver
 ::getFinanceInfo(const string& market, const string& code) {
     Parameter result;
-    if (!m_db) {
+    if (!m_pool) {
         return result;
     }
     
     std::stringstream buf;
-    buf << "select m.market, s.code, f.updated_date, f.ipo_date, f.province,"
+    buf << "select f.updated_date, f.ipo_date, f.province,"
         << "f.industry, f.zongguben, f.liutongguben, f.guojiagu, f.faqirenfarengu,"
         << "f.farengu, f.bgu, f.hgu, f.zhigonggu, f.zongzichan, f.liudongzichan,"
         << "f.gudingzichan, f.wuxingzichan, f.gudongrenshu, f.liudongfuzhai,"
@@ -374,74 +283,72 @@ Parameter SQLiteBaseInfoDriver
         << " and s.marketid = m.marketid"
         << " and f.stockid = s.stockid"
         << " order by updated_date DESC limit 1";
-    //std::cout << buf.str() << std::endl;
-    char *zErrMsg=0;
-    int rc = sqlite3_exec(m_db.get(), buf.str().c_str(),
-                    _getFinanceTableCallBack, &result, &zErrMsg);
-    if( rc != SQLITE_OK ){
-        HKU_ERROR("SQL error: {}", zErrMsg);
-        sqlite3_free(zErrMsg);
+
+    DBConnectGuard dbGuard(m_pool);
+    auto con = dbGuard.getConnect();
+
+    auto st = con->getStatement(buf.str());
+    st->exec();
+    if(!st->moveNext()) {
         return result;
     }
 
+    int updated_date, ipo_date;
+    price_t province, industry, zongguben, liutongguben, guojiagu, faqirenfarengu;
+    price_t farengu, bgu, hgu, zhigonggu, zongzichan, liudongzichan, gudingzichan;
+    price_t wuxingzichan, gudongrenshu, liudongfuzhai, changqifuzhai, zibengongjijin;
+    price_t jingzichan, zhuyingshouru, zhuyinglirun, yingshouzhangkuan, yingyelirun;
+    price_t touzishouyi, jingyingxianjinliu, zongxianjinliu, cunhuo, lirunzonghe;
+    price_t shuihoulirun, jinglirun, weifenpeilirun, meigujingzichan, baoliu2;
+
+    st->getColumn(
+        0, updated_date, ipo_date,
+        province, industry, zongguben, liutongguben, guojiagu, faqirenfarengu,
+        farengu, bgu, hgu, zhigonggu, zongzichan, liudongzichan, gudingzichan,
+        wuxingzichan, gudongrenshu, liudongfuzhai, changqifuzhai, zibengongjijin,
+        jingzichan, zhuyingshouru, zhuyinglirun, yingshouzhangkuan, yingyelirun,
+        touzishouyi, jingyingxianjinliu, zongxianjinliu, cunhuo, lirunzonghe,
+        shuihoulirun, jinglirun, weifenpeilirun, meigujingzichan, baoliu2
+    );
+
+    result.set<string>("market", market);
+    result.set<string>("code", code);
+    result.set<int>("updated_date", updated_date);
+    result.set<int>("ipo_date", ipo_date);
+    result.set<price_t>("province", province);
+    result.set<price_t>("industry", industry);
+    result.set<price_t>("zongguben", zongguben);
+    result.set<price_t>("liutongguben", liutongguben);
+    result.set<price_t>("guojiagu", guojiagu);
+    result.set<price_t>("faqirenfarengu", faqirenfarengu);
+    result.set<price_t>("farengu", farengu);
+    result.set<price_t>("bgu", bgu);
+    result.set<price_t>("hgu", hgu);
+    result.set<price_t>("zhigonggu", zhigonggu);
+    result.set<price_t>("zongzichan", zongzichan);
+    result.set<price_t>("liudongzichan", liudongzichan);
+    result.set<price_t>("gudingzichan", gudingzichan);
+    result.set<price_t>("wuxingzichan", wuxingzichan);
+    result.set<price_t>("gudongrenshu", gudongrenshu);
+    result.set<price_t>("liudongfuzhai", liudongfuzhai);
+    result.set<price_t>("changqifuzhai", changqifuzhai);
+    result.set<price_t>("zibengongjijin", zibengongjijin);
+    result.set<price_t>("jingzichan", jingzichan);
+    result.set<price_t>("zhuyingshouru", zhuyingshouru);
+    result.set<price_t>("zhuyinglirun", zhuyinglirun);
+    result.set<price_t>("yingshouzhangkuan", yingshouzhangkuan);
+    result.set<price_t>("yingyelirun", yingyelirun);
+    result.set<price_t>("touzishouyi", touzishouyi);
+    result.set<price_t>("jingyingxianjinliu", jingyingxianjinliu);
+    result.set<price_t>("zongxianjinliu", zongxianjinliu);
+    result.set<price_t>("cunhuo", cunhuo);
+    result.set<price_t>("lirunzonghe", lirunzonghe);
+    result.set<price_t>("shuihoulirun", shuihoulirun);
+    result.set<price_t>("jinglirun", jinglirun);
+    result.set<price_t>("weifenpeilirun", weifenpeilirun);
+    result.set<price_t>("meigujingzichan", meigujingzichan);
+    result.set<price_t>("baoliu2", baoliu2);
     return result;
 }
 
-int SQLiteBaseInfoDriver
-::_getFinanceTableCallBack(void *out, int nCol,
-                           char **azVals, char **azCols) {
-    assert(nCol == 37);
-    int result = 0;
-    Parameter *p = static_cast<Parameter *>(out);
-    try {
-        p->set<string>("market", string(azVals[0]));
-        p->set<string>("code", string(azVals[1]));
-        p->set<int>("updated_date", atof(azVals[2]));
-        p->set<int>("ipo_date", atof(azVals[3]));
-        p->set<price_t>("province", atof(azVals[4]));
-        p->set<price_t>("industry", atof(azVals[5]));
-        p->set<price_t>("zongguben", atof(azVals[6]));
-        p->set<price_t>("liutongguben", atof(azVals[7]));
-        p->set<price_t>("guojiagu", atof(azVals[8]));
-        p->set<price_t>("faqirenfarengu", atof(azVals[9]));
-        p->set<price_t>("farengu", atof(azVals[10]));
-        p->set<price_t>("bgu", atof(azVals[11]));
-        p->set<price_t>("hgu", atof(azVals[12]));
-        p->set<price_t>("zhigonggu", atof(azVals[13]));
-        p->set<price_t>("zongzichan", atof(azVals[14]));
-        p->set<price_t>("liudongzichan", atof(azVals[15]));
-        p->set<price_t>("gudingzichan", atof(azVals[16]));
-        p->set<price_t>("wuxingzichan", atof(azVals[17]));
-        p->set<price_t>("gudongrenshu", atof(azVals[18]));
-        p->set<price_t>("liudongfuzhai", atof(azVals[19]));
-        p->set<price_t>("changqifuzhai", atof(azVals[20]));
-        p->set<price_t>("zibengongjijin", atof(azVals[21]));
-        p->set<price_t>("jingzichan", atof(azVals[22]));
-        p->set<price_t>("zhuyingshouru", atof(azVals[23]));
-        p->set<price_t>("zhuyinglirun", atof(azVals[24]));
-        p->set<price_t>("yingshouzhangkuan", atof(azVals[25]));
-        p->set<price_t>("yingyelirun", atof(azVals[26]));
-        p->set<price_t>("touzishouyi", atof(azVals[27]));
-        p->set<price_t>("jingyingxianjinliu", atof(azVals[28]));
-        p->set<price_t>("zongxianjinliu", atof(azVals[29]));
-        p->set<price_t>("cunhuo", atof(azVals[30]));
-        p->set<price_t>("lirunzonghe", atof(azVals[31]));
-        p->set<price_t>("shuihoulirun", atof(azVals[32]));
-        p->set<price_t>("jinglirun", atof(azVals[33]));
-        p->set<price_t>("weifenpeilirun", atof(azVals[34]));
-        p->set<price_t>("meigujingzichan", atof(azVals[35]));
-        p->set<price_t>("baoliu2", atof(azVals[36]));
-        result = 0;
-
-    } catch(std::exception& e) {
-        HKU_ERROR(e.what());
-        result = 1;
-    } catch (...) {
-        HKU_ERROR("Unkown error!");
-        result = 1;
-    }
-    return result;
-}
-
-
-} /* namespace hku */
+} /* namespace */

@@ -12,7 +12,7 @@
 #include "utilities/util.h"
 #include "StockManager.h"
 #include "data_driver/KDataTempCsvDriver.h"
-#include "data_driver/base_info/sqlite/SQLiteBaseInfoDriverV2.h"
+#include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
 #include "data_driver/block_info/qianlong/QLBlockInfoDriver.h"
 #include "data_driver/kdata/hdf5/H5KDataDriver.h"
@@ -94,7 +94,7 @@ void StockManager::init(
     string funcname(" [StockManager::init]");
 
     //初始化注册默认支持的数据驱动
-    DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriverV2>());
+    DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
 
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
 

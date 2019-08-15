@@ -1,56 +1,39 @@
 /*
  * SQLiteBaseInfoDriver.h
+ * 
+ *  Copyright (c) 2019 fasiondog
  *
- *  Created on: 2012-8-14
+ *  Created on: 2019-8-11
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef SQLITEBASEINFODRIVER_H_
-#define SQLITEBASEINFODRIVER_H_
+#ifndef HIKYUU_DATA_DRIVER_BASE_INFO_SQLITE_SQLITEBASEINFODRIVER_H
+#define HIKYUU_DATA_DRIVER_BASE_INFO_SQLITE_SQLITEBASEINFODRIVER_H
 
-#include <sqlite3.h>
-#include "../../../Log.h"
+#include "../../db_connect/DBConnect.h"
 #include "../../BaseInfoDriver.h"
 
 namespace hku {
 
 class SQLiteBaseInfoDriver: public BaseInfoDriver {
 public:
-    SQLiteBaseInfoDriver(): BaseInfoDriver("sqlite3") {}
-    virtual ~SQLiteBaseInfoDriver() { }
+    SQLiteBaseInfoDriver();
+    virtual ~SQLiteBaseInfoDriver();
 
     virtual bool _init();
     virtual bool _loadMarketInfo();
     virtual bool _loadStockTypeInfo();
     virtual bool _loadStock();
-
     virtual Parameter getFinanceInfo(const string& market, const string& code);
 
 private:
-    bool _getStockWeightList(uint32, StockWeightList&);
-
-private:
-    static int _getMarketTableCallBack(void *out, int nCol,
-                                       char **azVals, char **azCols);
-
-    static int _getStockTypeInfoTableCallBack(void *out, int nCol,
-                                              char **azVals, char **azCols);
-
-    static int _getStockWeightCallBack(void *out, int nCol,
-                                       char **azVals, char **azCols);
-
-    static int _getStockTableCallBack(void *out, int nCol,
-                                      char **azVals, char **azCols);
-
-    static int _getFinanceTableCallBack(void *out, int nCol,
-                                        char **azVals, char **azCols);
+    StockWeightList _getStockWeightList(uint64 stockid);
 
 private:
     //股票基本信息数据库实例
-    shared_ptr<sqlite3> m_db;
-
+    DBConnectPool *m_pool;
 };
 
 } /* namespace hku */
-#endif /* SQLITEBASEINFODRIVER_H_ */
+#endif /* HIKYUU_DATA_DRIVER_BASE_INFO_SQLITE_SQLITEBASEINFODRIVER_H */
