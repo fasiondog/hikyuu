@@ -12,7 +12,8 @@
 #include "SQLiteBaseInfoDriverV2.h"
 #include "../table/MarketInfoTable.h"
 #include "../table/StockTypeInfoTable.h"
-#include "../table/StockWeightoTable.h"
+#include "../table/StockWeightTable.h"
+#include "../table/StockTable.h"
 
 namespace hku {
 
@@ -131,6 +132,84 @@ bool SQLiteBaseInfoDriverV2::_loadStock() {
 
     DBConnectGuard dbGuard(m_pool);
     auto con = dbGuard.getConnect();
+
+    vector<MarketInfoTable> marketTable;
+    try {
+        con->batchLoad(marketTable);
+    } catch (std::exception& e) {
+        HKU_FATAL("load Market table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load Market table failed!");
+        return false;
+    }
+
+    unordered_map<uint64, string> marketDict;
+    for (auto& m: marketTable) {
+        marketDict[m.id()] = m.name();
+    }
+
+    vector<StockTable> table;
+    try {
+        con->batchLoad(table);
+    } catch (std::exception& e) {
+        HKU_FATAL("load Stock table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load Stock table failed!");
+        return false;
+    }
+
+    Stock stock;
+    StockTypeInfo stockTypeInfo;
+    StockTypeInfo null_stockTypeInfo;
+    StockManager& sm = StockManager::instance();
+    for (auto& r: table) {
+        Datetime startDate, endDate;
+        if(r.startDate > r.endDate || r.startDate == 0 || r.endDate == 0) {
+            //日期非法，置为Null<Datetime>
+            startDate = Null<Datetime>();
+            endDate = Null<Datetime>();
+        } else {
+            startDate = (r.startDate == 99999999LL)
+                      ? Null<Datetime>()
+                      : Datetime(r.startDate*10000);
+            endDate = (r.endDate == 99999999LL)
+                    ? Null<Datetime>()
+                    : Datetime(r.endDate*10000);
+        }
+
+        stockTypeInfo = sm.getStockTypeInfo(r.type);
+        if(stockTypeInfo != null_stockTypeInfo) {
+            stock = Stock(marketDict[r.marketid],
+                          r.code,
+                          r.name,
+                          r.type,
+                          r.valid,
+                          startDate,
+                          endDate,
+                          stockTypeInfo.tick(),
+                          stockTypeInfo.tickValue(),
+                          stockTypeInfo.precision(),
+                          stockTypeInfo.minTradeNumber(),
+                          stockTypeInfo.maxTradeNumber());
+            
+        } else {
+            stock = Stock(marketDict[r.marketid],
+                          r.code,
+                          r.name,
+                          r.type,
+                          r.valid,
+                          startDate,
+                          endDate);
+        }
+
+        if(sm.loadStock(stock)){
+            StockWeightList weightList = _getStockWeightList(r.stockid);
+            stock.setWeightList(weightList);
+        }
+    }
+
     return true;
 }
 
@@ -154,11 +233,30 @@ StockWeightList SQLiteBaseInfoDriverV2::_getStockWeightList(uint64 stockid) {
         HKU_FATAL("load StockWeight table failed!");
         return result;
     }
-/*
-    for (auto& weight: table) {
-        result.push_back(StockWeight());
+
+    for (auto& w: table) {
+        try {
+            result.push_back(
+                StockWeight(
+                    Datetime(w.date*10000), 
+                    w.countAsGift * 0.0001,
+                    w.countForSell * 0.0001, 
+                    w.priceForSell * 0.001,
+                    w.bonus * 0.001,
+                    w.countOfIncreasement * 0.0001,
+                    w.totalCount, 
+                    w.freeCount
+                )
+            );
+        } catch (std::out_of_range& e) {
+            HKU_WARN("Date of id({}) is invalid! {}", w.id(), e.what());
+        } catch (std::exception& e) {
+            HKU_WARN("Error StockWeight Record id({}) {}", w.id(), e.what());
+        } catch (...) {
+            HKU_WARN("Error StockWeight Record id({})! Unknow reason!", w.id());
+        }
     }
-*/
+
     return result;
 }
 

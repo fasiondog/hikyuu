@@ -336,7 +336,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
             StockWeightList weight;
             _getStockWeightList(stockid, weight);
             stock.setWeightList(weight);
-            sm.addStock(stock);
+            sm.loadStock(stock);
 
         } catch(...) {
             HKU_ERROR("Can't get MarketInfo {}", market);

@@ -125,7 +125,7 @@ public:
      * @param stock
      * @return true 成功 | false 失败
      */
-    bool addStock(const Stock& stock);
+    bool loadStock(const Stock& stock);
 
     /**
      * 初始化时，添加市场信息

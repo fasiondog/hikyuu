@@ -24,17 +24,7 @@ public:
     : m_id(0), stockid(0), date(0), countAsGift(0), countForSell(0),
       priceForSell(0), bonus(0), countOfIncreasement(0), totalCount(0), freeCount(0) {}
 
-    uint64 stockid() const { return stockid; }
-    uint64 date() const { return date; }
-    double countAsGift() const { return countAsGift; }
-    double countForSell() const { return countForSell; }
-    double priceForSell() const { return priceForSell; }
-    double bonus() const { return bonus; }
-    double countOfIncreasement() const { return countOfIncreasement; }
-    double totalCount() const { return totalCount; }
-    double freeCount() const { return freeCount; }
-
-private:
+public:
     uint64 stockid;
     uint64 date;
     double countAsGift;

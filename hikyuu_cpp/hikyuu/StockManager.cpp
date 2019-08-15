@@ -12,7 +12,7 @@
 #include "utilities/util.h"
 #include "StockManager.h"
 #include "data_driver/KDataTempCsvDriver.h"
-#include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
+#include "data_driver/base_info/sqlite/SQLiteBaseInfoDriverV2.h"
 #include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
 #include "data_driver/block_info/qianlong/QLBlockInfoDriver.h"
 #include "data_driver/kdata/hdf5/H5KDataDriver.h"
@@ -94,7 +94,7 @@ void StockManager::init(
     string funcname(" [StockManager::init]");
 
     //初始化注册默认支持的数据驱动
-    DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
+    DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriverV2>());
 
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
 
@@ -374,7 +374,7 @@ Stock StockManager::addTempCsvStock(
     result.loadKDataToBuffer(KQuery::DAY);
     result.loadKDataToBuffer(KQuery::MIN);
 
-    if (!addStock(result)){
+    if (!loadStock(result)){
         //加入失败，返回Null<Stock>
         return Null<Stock>();
     }
@@ -392,7 +392,7 @@ void StockManager::removeTempCsvStock(const string& code) {
 }
 
 
-bool StockManager::addStock(const Stock& stock) {
+bool StockManager::loadStock(const Stock& stock) {
     string market_code(stock.market_code());
     to_upper(market_code);
     if(m_stockDict.find(market_code) != m_stockDict.end()) {

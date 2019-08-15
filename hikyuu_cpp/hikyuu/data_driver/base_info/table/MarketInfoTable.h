@@ -19,7 +19,7 @@ class MarketInfoTable {
 public:
     MarketInfoTable(): m_marketid(0), m_lastDate(0) {}
     
-    int64 id() const {
+    uint64 id() const {
         return m_marketid;
     }
 
@@ -73,7 +73,7 @@ public:
     }
 
 private:
-    int64 m_marketid;
+    uint64 m_marketid;
     string m_market;
     string m_name;
     string m_description;

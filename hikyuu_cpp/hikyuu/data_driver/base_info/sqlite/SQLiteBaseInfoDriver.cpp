@@ -288,7 +288,7 @@ bool SQLiteBaseInfoDriver::_loadStock() {
                           iter->endDate);
         }
 
-        if(sm.addStock(stock)){
+        if(sm.loadStock(stock)){
             StockWeightList weightList;
             _getStockWeightList(iter->id, weightList);
             stock.setWeightList(weightList);
