@@ -293,13 +293,13 @@ Parameter SQLiteBaseInfoDriver
         return result;
     }
 
-    int updated_date, ipo_date;
-    price_t province, industry, zongguben, liutongguben, guojiagu, faqirenfarengu;
-    price_t farengu, bgu, hgu, zhigonggu, zongzichan, liudongzichan, gudingzichan;
-    price_t wuxingzichan, gudongrenshu, liudongfuzhai, changqifuzhai, zibengongjijin;
-    price_t jingzichan, zhuyingshouru, zhuyinglirun, yingshouzhangkuan, yingyelirun;
-    price_t touzishouyi, jingyingxianjinliu, zongxianjinliu, cunhuo, lirunzonghe;
-    price_t shuihoulirun, jinglirun, weifenpeilirun, meigujingzichan, baoliu2;
+    int updated_date(0), ipo_date(0);
+    price_t province(0), industry(0), zongguben(0), liutongguben(0), guojiagu(0), faqirenfarengu(0);
+    price_t farengu(0), bgu(0), hgu(0), zhigonggu(0), zongzichan(0), liudongzichan(0), gudingzichan(0);
+    price_t wuxingzichan(0), gudongrenshu(0), liudongfuzhai(0), changqifuzhai(0), zibengongjijin(0);
+    price_t jingzichan(0), zhuyingshouru(0), zhuyinglirun(0), yingshouzhangkuan(0), yingyelirun(0);
+    price_t touzishouyi(0), jingyingxianjinliu(0), zongxianjinliu(0), cunhuo(0), lirunzonghe(0);
+    price_t shuihoulirun(0), jinglirun(0), weifenpeilirun(0), meigujingzichan(0), baoliu2(0);
 
     st->getColumn(
         0, updated_date, ipo_date,
