@@ -26,7 +26,7 @@ public:
      * @param param 驱动参数
      * @param size 驱动池大小
      */
-    DBConnectPool(const Parameter& param, int size=10);
+    DBConnectPool(const Parameter& param);
 
     virtual ~DBConnectPool() = default;
 
@@ -37,6 +37,8 @@ public:
     void returnConnect(DBConnectPtr& p);
 
 private:
+    static const int MIN_SIZE = 1;
+    static const int MAX_SIZE = 10;
     Parameter m_param;
     std::mutex m_mutex;
     std::list<DBConnectPtr> m_connectList;

@@ -11,7 +11,7 @@
 #define HIYUU_DB_CONNECT_SQLITE_SQLITECONNECT_H
 
 #include <sqlite3.h>
-#include "../DBConnectPool.h"
+#include "../DBConnectBase.h"
 #include "SQLiteStatement.h"
 
 namespace hku {
