@@ -31,10 +31,10 @@ public:
     virtual ~DBConnectPool() = default;
 
     /** 获取数据驱动，如果当前无可用驱动，将返回空指针 */
-    DBConnectPtr getDriver() noexcept;
+    DBConnectPtr getConnect() noexcept;
 
     /** 归还数据驱动至驱动池 */
-    void returnDriver(DBConnectPtr& p);
+    void returnConnect(DBConnectPtr& p);
 
 private:
     Parameter m_param;
@@ -55,13 +55,13 @@ private:
 struct DBConnectGuard {
     DBConnectGuard(DBConnectPool *pool): m_pool(pool) {
         if (m_pool) {
-            m_driver = m_pool->getDriver();
+            m_driver = m_pool->getConnect();
         }
     }
 
     ~DBConnectGuard() {
         if (m_pool && m_driver) {
-            m_pool->returnDriver(m_driver);
+            m_pool->returnConnect(m_driver);
         }
     }
 

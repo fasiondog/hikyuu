@@ -21,7 +21,7 @@ class StockWeightTable {
 
 public:
     StockWeightTable()
-    : m_id(0), stockid(0), date(0), countAsGift(0), countForSell(0),
+    : stockid(0), date(0), countAsGift(0), countForSell(0),
       priceForSell(0), bonus(0), countOfIncreasement(0), totalCount(0), freeCount(0) {}
 
 public:

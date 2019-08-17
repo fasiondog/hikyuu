@@ -17,7 +17,7 @@ end
 local cc = get_config("cc")
 local cxx = get_config("cxx")
 if (cc and string.find(cc, "clang")) or (cxx and string.find(cxx, "clang")) then
-    add_cxflags("-Wno-error=parentheses-equality")
+    add_cxflags("-Wno-error=parentheses-equality -Wno-error=missing-braces")
 end
 
 on_load("xmake_on_load")

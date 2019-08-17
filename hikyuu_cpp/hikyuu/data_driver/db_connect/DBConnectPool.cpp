@@ -19,9 +19,10 @@ DBConnectPool::DBConnectPool(const Parameter& param, int size): m_param(param) {
     }
 }
 
-DBConnectPtr DBConnectPool::getDriver() noexcept {
+DBConnectPtr DBConnectPool::getConnect() noexcept {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_connectList.empty()) {
+        HKU_WARN("Can't get connect! DBConnectPool is empty!");
         return DBConnectPtr();
     }
     DBConnectPtr p = m_connectList.front();
@@ -29,7 +30,7 @@ DBConnectPtr DBConnectPool::getDriver() noexcept {
     return p;
 }
 
-void DBConnectPool::returnDriver(DBConnectPtr& p) {
+void DBConnectPool::returnConnect(DBConnectPtr& p) {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (p) {
         m_connectList.push_back(std::move(p));

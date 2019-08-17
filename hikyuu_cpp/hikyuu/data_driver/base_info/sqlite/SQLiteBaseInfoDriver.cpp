@@ -37,11 +37,7 @@ bool SQLiteBaseInfoDriver::_init() {
         return false;
     }
 
-    int cpu_num = std::thread::hardware_concurrency();
-    if (cpu_num > 1) {
-        cpu_num--;
-    }
-    m_pool = new DBConnectPool(m_params, cpu_num);
+    m_pool = new DBConnectPool(m_params);
     return true;
 }
 
@@ -223,6 +219,7 @@ StockWeightList SQLiteBaseInfoDriver::_getStockWeightList(uint64 stockid) {
 
     DBConnectGuard dbGuard(m_pool);
     auto con = dbGuard.getConnect();
+    HKU_ASSERT(con);
 
     vector<StockWeightTable> table;
     try {
