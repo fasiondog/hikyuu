@@ -11,6 +11,7 @@
 #ifndef HIYUU_DB_CONNECT_MYSQL_MYSQLSTATEMENT_H
 #define HIYUU_DB_CONNECT_MYSQL_MYSQLSTATEMENT_H
 
+#include <boost/any.hpp>
 #include "../SQLStatementBase.h"
 
 #if defined(_MSC_VER)
@@ -50,7 +51,9 @@ private:
     shared_ptr<MYSQL> m_db;
     MYSQL_STMT *m_stmt;
     bool m_needs_reset;
-    vector<MYSQL_BIND> m_bind;
+    vector<MYSQL_BIND> m_param_bind;
+    vector<MYSQL_BIND> m_result_bind;
+    vector<boost::any> m_param_buffer;
 };
 
 } /* namespace */
