@@ -15,6 +15,7 @@ namespace hku {
 MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_statement)
 : SQLStatementBase(driver, sql_statement), 
   m_stmt(nullptr), 
+  m_meta_result(nullptr),
   m_needs_reset(false) {
     m_db = (dynamic_cast<MySQLConnect *>(driver.get()))->m_mysql;
     m_stmt = mysql_stmt_init(m_db.get());
@@ -32,9 +33,19 @@ MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_sta
         m_param_bind.resize(param_count);
         memset(m_param_bind.data(), 0, param_count * sizeof(MYSQL_BIND));
     }
+
+    MYSQL_RES *m_meta_result = mysql_stmt_result_metadata(m_stmt);
+    if (m_meta_result) {
+        int column_count = mysql_num_fields(m_meta_result);
+        m_result_bind.resize(column_count);
+        memset(m_result_bind.data(), 0, column_count * sizeof(MYSQL_BIND));
+    }
 }
 
 MySQLStatement::~MySQLStatement() {
+    if (m_meta_result) {
+        mysql_free_result(m_meta_result);
+    }
     mysql_stmt_close(m_stmt);
 }
 
@@ -59,10 +70,8 @@ void MySQLStatement::sub_exec() {
         "Failed mysql_stmt_execute: {}", 
         mysql_stmt_error(m_stmt)
     );
-    auto affected_rows= mysql_stmt_affected_rows(m_stmt);
-    if (affected_rows == 0) {
-
-    }
+    m_needs_reset = true;
+    
 }
 
 bool MySQLStatement::sub_moveNext() {

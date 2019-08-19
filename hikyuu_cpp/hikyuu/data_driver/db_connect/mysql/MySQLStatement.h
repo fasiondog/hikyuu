@@ -50,6 +50,7 @@ private:
 private:
     shared_ptr<MYSQL> m_db;
     MYSQL_STMT *m_stmt;
+    MYSQL_RES *m_meta_result;
     bool m_needs_reset;
     vector<MYSQL_BIND> m_param_bind;
     vector<MYSQL_BIND> m_result_bind;
