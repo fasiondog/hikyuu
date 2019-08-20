@@ -46,15 +46,21 @@ public:
 
 private:
     void _reset();
+    void _bindResult();
 
 private:
     shared_ptr<MYSQL> m_db;
     MYSQL_STMT *m_stmt;
     MYSQL_RES *m_meta_result;
     bool m_needs_reset;
+    bool m_has_bind_result;
     vector<MYSQL_BIND> m_param_bind;
     vector<MYSQL_BIND> m_result_bind;
     vector<boost::any> m_param_buffer;
+    vector<boost::any> m_result_buffer;
+    vector<unsigned long> m_result_length;
+    vector<my_bool> m_result_is_null;
+    vector<my_bool> m_result_error;
 };
 
 } /* namespace */

@@ -16,7 +16,8 @@ MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_sta
 : SQLStatementBase(driver, sql_statement), 
   m_stmt(nullptr), 
   m_meta_result(nullptr),
-  m_needs_reset(false) {
+  m_needs_reset(false),
+  m_has_bind_result(false) {
     m_db = (dynamic_cast<MySQLConnect *>(driver.get()))->m_mysql;
     m_stmt = mysql_stmt_init(m_db.get());
     HKU_ASSERT_M(m_stmt != nullptr, "Failed mysql_stmt_init!");
@@ -39,6 +40,9 @@ MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_sta
         int column_count = mysql_num_fields(m_meta_result);
         m_result_bind.resize(column_count);
         memset(m_result_bind.data(), 0, column_count * sizeof(MYSQL_BIND));
+        m_result_length.resize(column_count, 0);
+        m_result_is_null.resize(column_count, 0);
+        m_result_error.resize(column_count, 0);
     }
 }
 
@@ -57,24 +61,89 @@ void MySQLStatement::_reset() {
     if (m_needs_reset) {
         int ret = mysql_stmt_reset(m_stmt);
         HKU_ASSERT_M(ret == 0, "Failed reset statement! {}", mysql_stmt_error(m_stmt));
-        m_param_bind.clear();
-        m_result_bind.clear();
+        //m_param_bind.clear();
+        //m_result_bind.clear();
+        m_param_buffer.clear();
+        m_result_buffer.clear();
         m_needs_reset = false;
+        m_has_bind_result = false;
     }
 }
 
 void MySQLStatement::sub_exec() {
     _reset();
-    HKU_ASSERT_M(
-        mysql_stmt_execute(m_stmt)==0, 
-        "Failed mysql_stmt_execute: {}", 
-        mysql_stmt_error(m_stmt)
-    );
     m_needs_reset = true;
-    
+    if (m_param_bind.size() > 0) {
+        HKU_ASSERT_M(
+            mysql_stmt_bind_param(m_stmt, m_param_bind.data()) == 0, 
+            "Failed mysql_stmt_bind_param! {}", mysql_stmt_error(m_stmt)
+        );
+    }
+    HKU_ASSERT_M(
+        mysql_stmt_execute(m_stmt) == 0, 
+        "Failed mysql_stmt_execute: {}", mysql_stmt_error(m_stmt)
+    );
+}
+
+void MySQLStatement::_bindResult() {
+    if (!m_meta_result) {
+        return;
+    }
+
+    MYSQL_FIELD *field;
+    int idx = 0;
+    while((field = mysql_fetch_field(m_meta_result))) {
+        m_result_bind[idx].buffer_type = field->type;
+        m_result_bind[idx].is_null = &m_result_is_null[idx];
+        m_result_bind[idx].length = &m_result_length[idx];
+        m_result_bind[idx].error = &m_result_error[idx];
+
+        if (field->type == MYSQL_TYPE_LONGLONG) {
+            int64 item = 0;
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<int64>(&buf);
+        } else if (field->type == MYSQL_TYPE_DOUBLE) {
+            double item = 0;
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<double>(&buf);
+        } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_BLOB) {
+            m_result_bind[idx].buffer_length = 100;
+            vector<char> item(100);
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            vector<char> *p = boost::any_cast<vector<char>>(&buf);
+            m_result_bind[idx].buffer = p->data();
+        }
+
+        idx++;
+    }
+
 }
 
 bool MySQLStatement::sub_moveNext() {
+    if (!m_has_bind_result) {
+        _bindResult();
+        m_has_bind_result = true;
+
+        HKU_ASSERT_M(
+            mysql_stmt_bind_result(m_stmt, m_result_bind.data()) == 0,
+            "Failed mysql_stmt_bind_result! {}", mysql_stmt_error(m_stmt)
+        );
+
+        HKU_ASSERT_M(
+            mysql_stmt_store_result(m_stmt) == 0,
+            "Failed mysql_stmt_store_result! {}", mysql_stmt_error(m_stmt)
+        );
+    }
+
+    int ret = mysql_stmt_fetch(m_stmt);
+    if (ret == 0) {
+        return true;
+    } else if (ret == 1) {
+        HKU_THROW("Error occurred in mysql_stmt_fetch! {}", mysql_stmt_error(m_stmt));
+    }
     return false;
 }
 
@@ -120,7 +189,7 @@ void MySQLStatement::sub_bindText(int idx, const string& item) {
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
     string *p = boost::any_cast<string>(&buf);
-    m_param_bind[idx].buffer_type = MYSQL_TYPE_STRING;
+    m_param_bind[idx].buffer_type = MYSQL_TYPE_VAR_STRING;
     m_param_bind[idx].buffer = (void *)p->data();
     m_param_bind[idx].buffer_length = item.size();
     m_param_bind[idx].is_null = 0;
@@ -156,11 +225,49 @@ int MySQLStatement::sub_getNumColumns() const {
 }
 
 void MySQLStatement::sub_getColumnAsInt64(int idx, int64& item) {
+    HKU_ASSERT_M(
+        idx < m_result_buffer.size(), 
+        "idx out of range! idx: {}, total: {}", m_result_buffer.size()
+    );
 
+    HKU_ASSERT_M(
+        m_result_error[idx] == 0,
+        "Error occurred in sub_getColumnAsInt64! idx: {}", idx
+    );
+
+    if (m_result_is_null[idx]) {
+        item = 0;
+        return;
+    }
+
+    try {
+        item = boost::any_cast<int64>(m_result_buffer[idx]);
+    } catch (...) {
+        HKU_THROW("Field type mismatch! idx: {}", idx);
+    }
 }
 
 void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
+    HKU_ASSERT_M(
+        idx < m_result_buffer.size(), 
+        "idx out of range! idx: {}, total: {}", m_result_buffer.size()
+    );
 
+    HKU_ASSERT_M(
+        m_result_error[idx] == 0,
+        "Error occurred in sub_getColumnAsDouble! idx: {}", idx
+    );
+
+    if (m_result_is_null[idx]) {
+        item = 0;
+        return;
+    }
+
+    try {
+        item = boost::any_cast<double>(m_result_buffer[idx]);
+    } catch (...) {
+        HKU_THROW("Field type mismatch! idx: {}", idx);
+    }
 }
 
 void MySQLStatement::sub_getColumnAsText(int idx, string& item) {
