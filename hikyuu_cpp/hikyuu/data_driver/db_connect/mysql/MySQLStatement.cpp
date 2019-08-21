@@ -109,8 +109,8 @@ void MySQLStatement::_bindResult() {
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<double>(&buf);
         } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_BLOB) {
-            m_result_bind[idx].buffer_length = 100;
-            vector<char> item(100);
+            m_result_bind[idx].buffer_length = 4096;
+            vector<char> item(4096);
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
             vector<char> *p = boost::any_cast<vector<char>>(&buf);
@@ -271,11 +271,59 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
 }
 
 void MySQLStatement::sub_getColumnAsText(int idx, string& item) {
+    HKU_ASSERT_M(
+        idx < m_result_buffer.size(), 
+        "idx out of range! idx: {}, total: {}", m_result_buffer.size()
+    );
 
+    HKU_ASSERT_M(
+        m_result_error[idx] == 0,
+        "Error occurred in sub_getColumnAsText! idx: {}", idx
+    );
+
+    if (m_result_is_null[idx]) {
+        item.clear();
+        return;
+    }
+
+    try {
+        vector<char> *p = boost::any_cast<vector<char> *>(m_result_buffer[idx]);
+        std::ostringstream buf;
+        for (unsigned long i = 0; i < m_result_length[idx]; i++) {
+            buf << (*p)[i];
+        }
+        item = buf.str();
+    } catch (...) {
+        HKU_THROW("Field type mismatch! idx: {}", idx);
+    }
 }
 
 void MySQLStatement::sub_getColumnAsBlob(int idx, string& item) {
-    
+    HKU_ASSERT_M(
+        idx < m_result_buffer.size(), 
+        "idx out of range! idx: {}, total: {}", m_result_buffer.size()
+    );
+
+    HKU_ASSERT_M(
+        m_result_error[idx] == 0,
+        "Error occurred in sub_getColumnAsBlob! idx: {}", idx
+    );
+
+    if (m_result_is_null[idx]) {
+        item.clear();
+        return;
+    }
+
+    try {
+        vector<char> *p = boost::any_cast<vector<char> *>(m_result_buffer[idx]);
+        std::ostringstream buf;
+        for (unsigned long i = 0; i < m_result_length[idx]; i++) {
+            buf << (*p)[i];
+        }
+        item = buf.str();
+    } catch (...) {
+        HKU_THROW("Field type mismatch! idx: {}", idx);
+    }
 }
 
 } /* namespace */
