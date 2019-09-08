@@ -75,7 +75,7 @@ if is_plat("windows") then
     end
 end
 
-add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "neon", "avx", "avx2")
+add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
 
 if is_plat("windows") then
     add_subdirs("./hikyuu_extern_libs/src/sqlite3")
