@@ -2,7 +2,7 @@ import("core.project.config")
 
 function main(target)
     local targetname = target:name()
-    if targetname ~= "demo" and targetname ~= "unit-test" then
+    if targetname ~= "demo" and targetname ~= "unit-test" and targetname ~= "small-test" then
         return
     end
     
@@ -13,15 +13,10 @@ function main(target)
         end
     end
     
-    if "unit-test" == targetname then
-        local with_test = config.get("with-unit-test")
-        if with_test then
-            print("copying test_data ...")
-            os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
-            os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        else
-            raise("You need to config first: xmake f --with-unit-test=y")
-        end
+    if "unit-test" == targetname or "small-test" == targetname then
+        print("copying test_data ...")
+        os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
+        os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end
     
     if is_plat("windows") then

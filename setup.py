@@ -139,12 +139,16 @@ def start_build(verbose=False ):
         build_boost()
 
     if py_version_changed:
-        os.system("xmake f -c")
-        os.system("xmake f --with-unit-test=y")
+        os.system("xmake f -c -y")
     else:
-        if not os.path.lexists('.xmake'):
-            os.system("xmake f --with-unit-test=y")
-    os.system("xmake -v -D" if verbose else "xmake")
+        os.system("xmake f -y")
+    os.system("xmake -b hikyuu {}".format("-v -D" if verbose else ""))
+    os.system("xmake -b _hikyuu {}".format("-v -D" if verbose else ""))
+    os.system("xmake -b _indicator {}".format("-v -D" if verbose else ""))
+    os.system("xmake -b _trade_manage {}".format("-v -D" if verbose else ""))
+    os.system("xmake -b _trade_sys {}".format("-v -D" if verbose else ""))
+    os.system("xmake -b _trade_instance {}".format("-v -D" if verbose else ""))
+    os.system("xmake -b _data_driver {}".format("-v -D" if verbose else ""))
 
 
 #------------------------------------------------------------------------------
@@ -164,12 +168,23 @@ def build(verbose):
 
 
 @click.command()
-@click.option("--compile", default=False, type=click.BOOL, help='是否先进行编译（默认：false）')
-def test(compile):
+@click.option('-f', "--f", default='small', 
+              type=click.Choice(['small', 'all']), 
+              help="测试范围（small：小， all：全部")
+@click.option("-compile", "--compile", default=False, type=click.BOOL, help='是否强制重新编译（默认：false）')
+@click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
+def test(f, compile, verbose):
     """ 执行单元测试 """
     if compile:
-        start_build()
-    os.system("xmake r unit-test")
+        start_build(verbose)
+    if f == 'all':
+        os.system("xmake f --test=all")
+        os.system("xmake -b unit-test")
+        os.system("xmake r unit-test")
+    else:
+        os.system("xmake f --test=small")
+        os.system("xmake -b small-test")
+        os.system("xmake r small-test")
 
 
 @click.command()    
@@ -219,7 +234,7 @@ def install():
     start_build()
     py_version, py_version_changed = get_python_version()
     if py_version_changed:
-        os.system("xmake f -c")
+        os.system("xmake f -c -y")
     if sys.platform == 'win32':
         install_dir = sys.base_prefix + "\\Lib\\site-packages\\Hikyuu"
     else:

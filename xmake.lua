@@ -22,6 +22,8 @@ set_languages("C99", "cxx11")
 
 add_plugindirs("./xmake_plugins")
 
+add_requires("fmt", "spdlog")
+
 -- use fmt, spdlog
 add_defines("FMT_HEADER_ONLY=1")
 

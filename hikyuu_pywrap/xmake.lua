@@ -24,6 +24,7 @@ on_load("xmake_on_load")
 
 target("_hikyuu")
     set_kind("shared")
+    add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_hikyuu.pyd")
@@ -34,6 +35,7 @@ target("_hikyuu")
 
 target("_indicator")
     set_kind("shared")
+    add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_indicator.pyd")
@@ -44,6 +46,7 @@ target("_indicator")
     
 target("_trade_manage")
     set_kind("shared")
+    add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_trade_manage.pyd")
@@ -54,6 +57,7 @@ target("_trade_manage")
 
 target("_trade_sys")
     set_kind("shared")
+    add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_trade_sys.pyd")
@@ -64,6 +68,7 @@ target("_trade_sys")
     
 target("_trade_instance")
     set_kind("shared")
+    add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_trade_instance.pyd")
@@ -74,6 +79,7 @@ target("_trade_instance")
     
 target("_data_driver")
     set_kind("shared")
+    add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("_data_driver.pyd")

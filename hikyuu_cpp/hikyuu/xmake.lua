@@ -1,6 +1,8 @@
 target("hikyuu")
     set_kind("shared")
     
+    add_packages("fmt", "spdlog")
+
     add_includedirs("..")
 
     -- set version for release

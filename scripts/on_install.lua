@@ -7,7 +7,7 @@ function main(target)
     end
 
     local targetname = target:name()
-    if "demo" == targetname or "unit-test" == targetname then
+    if "demo" == targetname or "unit-test" == targetname or "small-test" == targetname then
         return
     end
 
