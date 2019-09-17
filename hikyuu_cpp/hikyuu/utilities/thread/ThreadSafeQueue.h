@@ -35,14 +35,14 @@ public:
 
     void wait_and_pop(T& value) {
         std::unique_lock<std::mutex> lk(m_mut);
-        m_cond.wait(lk,[this]{return !m_queue.empty();});
+        m_cond.wait(lk, [this] { return !m_queue.empty(); });
         value = m_queue.front();
         m_queue.pop();
     }
 
     std::shared_ptr<T> wait_and_pop() {
         std::unique_lock<std::mutex> lk(m_mut);
-        m_cond.wait(lk,[this]{return !m_queue.empty();});
+        m_cond.wait(lk, [this] { return !m_queue.empty(); });
         std::shared_ptr<T> res(std::make_shared<T>(m_queue.front()));
         m_queue.pop();
         return res;
