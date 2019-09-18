@@ -16,9 +16,13 @@
 #include "WorkStealQueue.h"
 #include "ThreadSafeQueue.h"
 
+#ifndef HKU_API
+#define HKU_API
+#endif
+
 namespace hku {
 
-class ThreadPool {
+class HKU_API ThreadPool {
 public:
     ThreadPool(): ThreadPool(std::thread::hardware_concurrency()) {}
     ThreadPool(unsigned int n): m_done(false), m_worker_num(n) {
@@ -35,7 +39,7 @@ public:
 
     ~ThreadPool() {
         m_done = true;
-        for (auto i = 0; i < m_worker_num; i++) {
+        for (unsigned int i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
                 m_threads[i].join();
             }
@@ -50,7 +54,7 @@ public:
     using task_handle = std::future<ResultType>;
 
     template<typename FunctionType>
-    task_handle<std::result_of<FunctionType()>::type> submit(FunctionType f) {
+    task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
         typedef std::result_of<FunctionType()>::type result_type;
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
@@ -65,7 +69,7 @@ public:
     void run_pending_task() {
         task_type task;
         if (pop_task_from_local_queue(task)) {
-            if (!task.isStopTask()) {
+            if (!task.is_stop_task()) {
                 task();
             } else {
                 m_thread_need_stop = true;
@@ -78,11 +82,14 @@ public:
         }
     }
 
-    void join() {
-        for (auto i = 0; i < m_worker_num; i++) {
+    void wait_finish() {
+        for (unsigned int i = 0; i < m_worker_num; i++) {
             m_queues[i]->push(FuncWrapper());
         }
-        for (auto i = 0; i < m_worker_num; i++) {
+        
+        m_pool_work_queue.push(FuncWrapper());
+        
+        for (unsigned int i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
                 m_threads[i].join();
             }
@@ -105,7 +112,7 @@ private:
         m_thread_need_stop = false;
         m_index = my_index_;
         m_local_work_queue = m_queues[m_index].get();
-        while (!m_thread_need_stop && !m_done) {
+        while (!m_thread_need_stop && !m_done && !m_pool_work_queue.empty()) {
             run_pending_task();
         }
     }

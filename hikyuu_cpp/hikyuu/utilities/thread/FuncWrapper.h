@@ -14,6 +14,11 @@
 #include <memory>
 #include <functional>
 
+#ifdef _MSC_VER
+#pragma  warning(push) 
+#pragma  warning(disable: 4521)
+#endif
+
 namespace hku {
 
 class FuncWrapper {
@@ -35,7 +40,7 @@ public:
         return *this;
     }
 
-    bool isStopTask() {
+    bool is_stop_task() {
         return impl ? false : true;
     }
 
@@ -56,5 +61,9 @@ private:
 };
 
 } /* namespace hku */
+
+#ifdef _MSC_VER
+#pragma  warning(pop) 
+#endif
 
 #endif /* HIKYUU_UTILITIES_THREAD_FUNCWRAPPER_H */
