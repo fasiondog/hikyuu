@@ -168,16 +168,14 @@ def build(verbose):
 
 
 @click.command()
-@click.option('-f', "--f", default='small', 
-              type=click.Choice(['small', 'all']), 
-              help="测试范围（small：小， all：全部")
-@click.option("-compile", "--compile", default=False, type=click.BOOL, help='是否强制重新编译（默认：false）')
+@click.option('-all', "--all", is_flag=True, help="执行全部测试, 否则仅仅进行最小范围测试）")
+@click.option("-compile", "--compile", is_flag=True, help='强制重新编译')
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
-def test(f, compile, verbose):
+def test(all, compile, verbose):
     """ 执行单元测试 """
     if compile:
         start_build(verbose)
-    if f == 'all':
+    if all:
         os.system("xmake f --test=all")
         os.system("xmake -b unit-test")
         os.system("xmake r unit-test")

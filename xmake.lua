@@ -18,7 +18,7 @@ set_warnings("all", "error")
 --set_warnings("all")
 
 -- set language: C99, c++ standard
-set_languages("C99", "cxx11")
+set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 

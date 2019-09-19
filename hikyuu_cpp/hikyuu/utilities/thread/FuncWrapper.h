@@ -31,16 +31,16 @@ public:
     template<typename F>
     FuncWrapper(F&& f): impl(new impl_type<F>(std::move(f))) {}
 
-    void operator()() { impl->call(); }
+    void operator()() { if (impl) impl->call(); }
 
     FuncWrapper(FuncWrapper&& other): impl(std::move(other.impl)) {}
 
     FuncWrapper& operator=(FuncWrapper&& other) {
-        impl=std::move(other.impl);
+        impl = std::move(other.impl);
         return *this;
     }
 
-    bool is_stop_task() {
+    bool is_stop_task() const {
         return impl ? false : true;
     }
 

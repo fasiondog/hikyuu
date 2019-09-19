@@ -22,7 +22,7 @@
 
 namespace hku {
 
-class HKU_API ThreadPool {
+class ThreadPool {
 public:
     ThreadPool(): ThreadPool(std::thread::hardware_concurrency()) {}
     ThreadPool(unsigned int n): m_done(false), m_worker_num(n) {
@@ -44,6 +44,7 @@ public:
                 m_threads[i].join();
             }
         }
+        std::cout << "~ThreadPool()" << std::endl;
     }
 
     unsigned int worker_num() const {
@@ -73,7 +74,6 @@ public:
                 task();
             } else {
                 m_thread_need_stop = true;
-                return;
             }
         } else if (pop_task_from_pool_queue(task) || pop_task_from_other_thread_queue(task)) {
             task();
@@ -84,10 +84,8 @@ public:
 
     void wait_finish() {
         for (unsigned int i = 0; i < m_worker_num; i++) {
-            m_queues[i]->push(FuncWrapper());
+            ///TODO m_local_work_queue->push_back(FuncWrapper());
         }
-        
-        m_pool_work_queue.push(FuncWrapper());
         
         for (unsigned int i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
@@ -104,9 +102,9 @@ private:
     std::vector<std::thread> m_threads;
     unsigned int m_worker_num;
 
-    static thread_local WorkStealQueue* m_local_work_queue;
-    static thread_local unsigned m_index;
-    static thread_local bool m_thread_need_stop;
+    inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;
+    inline static thread_local unsigned m_index = 0;
+    inline static thread_local bool m_thread_need_stop = false;
    
     void worker_thread(unsigned my_index_) {
         m_thread_need_stop = false;

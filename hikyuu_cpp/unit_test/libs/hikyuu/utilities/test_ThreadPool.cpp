@@ -30,10 +30,10 @@ BOOST_AUTO_TEST_CASE( test_ThreadPool ) {
     ThreadPool tg;
     for (int i = 0; i < 10; i++) {
         tg.submit([&]() {
-            std::cout << i << std::endl;
+            std::cout << i << ": --------------------" << std::endl;
         });
     }
-    tg.wait_finish();
+    //tg.wait_finish();
     std::cout << "*********************" << std::endl;
 }
 
