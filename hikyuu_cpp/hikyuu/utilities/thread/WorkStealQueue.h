@@ -34,11 +34,6 @@ public:
         m_queue.push_front(std::move(data));
     }
 
-    void push_back(data_type data) {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_queue.push_back(std::move(data));
-    }
-
     bool empty() const {
         std::lock_guard<std::mutex> lock(m_mutex);
         return m_queue.empty();
