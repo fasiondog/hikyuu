@@ -59,7 +59,7 @@ public:
         if (m_local_work_queue) {
             m_local_work_queue->push(std::move(task));
         } else {
-            m_pool_work_queue.push_back(std::move(task));
+            m_pool_work_queue.push(std::move(task));
         }
         return res;
     }
@@ -81,7 +81,7 @@ public:
 
     void join() {
         for (size_t i = 0; i < m_worker_num; i++) {
-            m_pool_work_queue.push_back(FuncWrapper());
+            m_pool_work_queue.push(FuncWrapper());
         }
         
         for (size_t i = 0; i < m_worker_num; i++) {

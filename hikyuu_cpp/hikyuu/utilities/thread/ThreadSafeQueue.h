@@ -27,9 +27,9 @@ public:
         m_queue = other.m_queue;
     }
 
-    void push_back(T new_value) {
+    void push(T new_value) {
         std::lock_guard<std::mutex> lk(m_mut);
-        m_queue.push_back(std::move(new_value));
+        m_queue.push(std::move(new_value));
         m_cond.notify_one();
     }
 
@@ -37,14 +37,14 @@ public:
         std::unique_lock<std::mutex> lk(m_mut);
         m_cond.wait(lk, [this] { return !m_queue.empty(); });
         value = std::move(m_queue.front());
-        m_queue.pop_front();
+        m_queue.pop();
     }
 
     std::shared_ptr<T> wait_and_pop() {
         std::unique_lock<std::mutex> lk(m_mut);
         m_cond.wait(lk, [this] { return !m_queue.empty(); });
         std::shared_ptr<T> res(std::make_shared<T>(std::move(m_queue.front())));
-        m_queue.pop_front();
+        m_queue.pop();
         return res;
     }
 
@@ -54,7 +54,7 @@ public:
             return false;
         }
         value = std::move(m_queue.front());
-        m_queue.pop_front();
+        m_queue.pop();
         return true;
     }
 
@@ -64,7 +64,7 @@ public:
             return std::shared_ptr<T>();
         }
         std::shared_ptr<T> res(std::make_shared<T>(std::move(m_queue.front())));
-        m_queue.pop_front();
+        m_queue.pop();
         return res;
     }
 
@@ -75,7 +75,7 @@ public:
 
 private:
     mutable std::mutex m_mut;
-    std::deque<T> m_queue;
+    std::queue<T> m_queue;
     std::condition_variable m_cond;
 };
 

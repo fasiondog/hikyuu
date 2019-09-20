@@ -56,10 +56,6 @@ public:
             return false;
         }
         
-        if (m_queue.back().is_stop_task()) {
-            return false;
-        }
-
         res = std::move(m_queue.back());
         m_queue.pop_back();
         return true;
