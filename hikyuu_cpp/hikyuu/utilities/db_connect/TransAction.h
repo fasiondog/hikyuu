@@ -25,7 +25,7 @@ namespace hku {
  *  }
  * @endcode
  * @note 事务提交失败时，这里并没有处理回滚
- * @ingroup DataDriver
+ * @ingroup DBConnect
  */
 class TransAction {
 public:

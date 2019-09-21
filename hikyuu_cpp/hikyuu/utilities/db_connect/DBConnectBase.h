@@ -18,7 +18,7 @@ namespace hku {
 
 /**
  * 数据驱动基类
- * @ingroup DataDriver
+ * @ingroup DBConnect
  */
 class HKU_API DBConnectBase: public std::enable_shared_from_this<DBConnectBase> {
     PARAMETER_SUPPORT
@@ -164,7 +164,7 @@ private:
     DBConnectBase() = delete;
 };
 
-/** @ingroup DataDriver */
+/** @ingroup DBConnect */
 typedef shared_ptr<DBConnectBase> DBConnectPtr;
 
 

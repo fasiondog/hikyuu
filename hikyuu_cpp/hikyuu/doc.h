@@ -142,6 +142,13 @@
  * 独立的一些小函数、对象工具集合
  * @details 附加的公共工具集
  * @ingroup Hikyuu
+ * 
+ * @defgroup DBConnect DB Connect 数据库连接
+ * 数据库连接工具
+ * @ingroup Utilities
+ * 
+ * @defgroup ThreadPool Thread Pool 线程池
+ * @ingroup Utilities
  */
 
 /**

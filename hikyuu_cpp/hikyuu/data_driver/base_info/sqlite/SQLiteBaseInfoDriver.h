@@ -11,7 +11,7 @@
 #ifndef HIKYUU_DATA_DRIVER_BASE_INFO_SQLITE_SQLITEBASEINFODRIVER_H
 #define HIKYUU_DATA_DRIVER_BASE_INFO_SQLITE_SQLITEBASEINFODRIVER_H
 
-#include "../../db_connect/DBConnect.h"
+#include "../../../utilities/db_connect/DBConnect.h"
 #include "../../BaseInfoDriver.h"
 
 namespace hku {

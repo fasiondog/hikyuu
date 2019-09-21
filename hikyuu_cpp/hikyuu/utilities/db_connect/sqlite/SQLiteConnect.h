@@ -17,8 +17,8 @@
 namespace hku {
 
 /**
- * @defgroup SQLite SQLite3 driver SQLITE3 数据驱动
- * @ingroup DataDriver
+ * @defgroup SQLite SQLite3 数据库连接
+ * @ingroup DBConnect
  */
 
 /**

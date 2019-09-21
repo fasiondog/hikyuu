@@ -17,14 +17,13 @@ namespace hku {
 
 /**
  * 数据驱动池（连接池）
- * @ingroup DataDriver
+ * @ingroup DBConnect
  */
 class HKU_API DBConnectPool {
 public:
     /**
      * 构造函数
      * @param param 驱动参数
-     * @param size 驱动池大小
      */
     DBConnectPool(const Parameter& param);
 
@@ -52,7 +51,7 @@ private:
 
 /**
  * 从池中获取驱动辅助工具，以保证退出作用域时能够及时归还驱动至驱动池
- * @ingroup DataDriver
+ * @ingroup DBConnect
  */
 struct DBConnectGuard {
     DBConnectGuard(DBConnectPool *pool): m_pool(pool) {

@@ -27,7 +27,7 @@ public:
 
 /**
  * SQL Statement 基类
- * @ingroup DataDriver
+ * @ingroup DBConnect
  */
 class HKU_API SQLStatementBase {
 public:
@@ -112,7 +112,7 @@ protected:
     string m_sql_string;
 };
 
-/** @ingroup DataDriver */
+/** @ingroup DBConnect */
 typedef shared_ptr<SQLStatementBase> SQLStatementPtr;
 
 

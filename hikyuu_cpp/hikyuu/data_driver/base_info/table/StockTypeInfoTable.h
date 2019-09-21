@@ -11,7 +11,7 @@
 #ifndef HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_STOCKTYPEINFOTABLE_H
 #define HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_STOCKTYPEINFOTABLE_H
 
-#include "../../db_connect/SQLStatementBase.h"
+#include "../../../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
 

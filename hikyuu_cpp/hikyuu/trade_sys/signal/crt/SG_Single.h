@@ -43,8 +43,8 @@ SignalPtr HKU_API SG_Single(const Indicator& ind,
  * 使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式如下：
  *
  *     filter = percentage * STDEV((AMA-AMA[1], N)
- *     Buy  When AMA - @lowest(AMA,n) > filter
- *     Sell When @highest(AMA, n) - AMA > filter
+ *     Buy  When AMA - lowest(AMA,n) > filter
+ *     Sell When highest(AMA, n) - AMA > filter
  * </pre>
  * @param ind
  * @param filter_n N日周期

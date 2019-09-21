@@ -11,7 +11,7 @@
 #ifndef HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_STOCKWEIGHTTABLE_H
 #define HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_STOCKWEIGHTTABLE_H
 
-#include "../../db_connect/TableMacro.h"
+#include "../../../utilities/db_connect/TableMacro.h"
 
 namespace hku {
 
