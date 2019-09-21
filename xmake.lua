@@ -29,7 +29,9 @@ add_defines("FMT_HEADER_ONLY=1")
 
 -- disable some compiler errors
 add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
-add_cxflags("-ftemplate-depth-500")
+add_cxflags("-ftemplate-depth-500", "-pthread")
+add_shflags("-pthread")
+add_ldflags("-pthread")
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
