@@ -38,5 +38,6 @@ script:
   - export BOOST_LIB=./boost_1_67_0/stage/lib
   - ls .
   - xmake f --cxx=$CXX --confirm=y --test=small
+  - xmake -b small-test
   - xmake r small-test
   
