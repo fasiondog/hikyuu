@@ -53,7 +53,7 @@ public:
 
     template<typename FunctionType>
     task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
-        typedef std::result_of<FunctionType()>::type result_type;
+        typedef typename std::result_of<FunctionType()>::type result_type;
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
         if (m_local_work_queue) {

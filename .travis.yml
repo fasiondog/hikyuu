@@ -38,7 +38,5 @@ script:
   - export BOOST_LIB=./boost_1_67_0/stage/lib
   - ls .
   - xmake f --cxx=$CXX --confirm=y --test=small
-  - xmake -b hikyuu
-  - if [ "$CXX_FOR_BUILD" = "clang++" ]; then xmake -b small-test; fi
-  - if [ "$CXX_FOR_BUILD" = "clang++" ]; then xmake r small-test; fi
+  - xmake r small-test
   
