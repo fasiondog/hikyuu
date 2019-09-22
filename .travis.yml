@@ -28,7 +28,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-8
+            - g++-9
       env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
 
@@ -36,7 +36,7 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-bionic-5.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
       env:
@@ -46,7 +46,7 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-bionic-6.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-6.0
       env:
@@ -56,31 +56,11 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-bionic-7
+            - ubuntu-toolchain-r-test
           packages:
-            - clang-7
+            - clang-7.0
       env:
-        - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-bionic-8
-          packages:
-            - clang-8
-      env:
-        - MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-bionic-9
-          packages:
-            - clang-9
-      env:
-        - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
+        - MATRIX_EVAL="CC=clang-7.0 && CXX=clang++-7.0"
 
 
 before_install:

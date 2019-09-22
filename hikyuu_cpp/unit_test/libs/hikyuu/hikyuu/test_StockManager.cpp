@@ -141,15 +141,17 @@ BOOST_AUTO_TEST_CASE( test_StockManager_getAllMarket ) {
     /** @arg 检测测试数据中的Market */
     MarketList result(sm.getAllMarket());
     BOOST_CHECK(result.size() == 3);
-#if defined(_MSC_VER)
-    BOOST_CHECK(result[0] == "TMP");
-    BOOST_CHECK(result[1] == "SH");
-    BOOST_CHECK(result[2] == "SZ");
-#else
-    BOOST_CHECK(result[0] == "TMP");
-    BOOST_CHECK(result[1] == "SZ");
-    BOOST_CHECK(result[2] == "SH");
-#endif
+    std::vector<string> want_list{"TMP", "SH", "SZ"};
+    for (auto want: want_list) {
+        bool found = false;
+        for (auto i = 0; i < result.size(); i++) {
+            if (result[i] == want) {
+                found = true;
+                break;
+            }
+        }
+        BOOST_CHECK(found);
+    }
 }
 
 /** @par 检测点 */

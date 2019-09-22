@@ -14,8 +14,11 @@ set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 
 -- set warning all as error
-set_warnings("all", "error")
---set_warnings("all")
+if is_plat("windows") then
+    set_warnings("all", "error")
+else    
+    set_warnings("all")
+end
 
 -- set language: C99, c++ standard
 set_languages("cxx17", "C99")
