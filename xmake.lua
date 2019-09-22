@@ -16,7 +16,7 @@ set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 -- set warning all as error
 if is_plat("windows") then
     set_warnings("all", "error")
-else    
+else
     set_warnings("all")
 end
 
