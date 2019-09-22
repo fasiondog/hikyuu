@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: install xmake
-      run: Invoke-Command -ScriptBlock ([ScriptBlock]::Create((Invoke-Webrequest "https://raw.githubusercontent.com/tboox/xmake/dev/scripts/get.ps1" -UseBasicParsing).Content)) -ArgumentList "Just for &me"
+      run: Invoke-Command -ScriptBlock ([ScriptBlock]::Create((Invoke-Webrequest "https://raw.githubusercontent.com/tboox/xmake/dev/scripts/get.ps1" -UseBasicParsing).Content)) -ArgumentList "dev" "Just for &me"
       shell: pwsh
     - name: xmake
       run: xmake --version
