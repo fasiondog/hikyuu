@@ -10,6 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: install xmake
-      run: powershell Invoke-Command -ScriptBlock ([ScriptBlock]::Create((Invoke-Webrequest "https://raw.githubusercontent.com/tboox/xmake/dev/scripts/get.ps1" -UseBasicParsing).Content)) -ArgumentList "dev"
+      run: powershell (Invoke-Command -ScriptBlock ([ScriptBlock]::Create((Invoke-Webrequest "https://raw.githubusercontent.com/tboox/xmake/dev/scripts/get.ps1" -UseBasicParsing).Content)) -ArgumentList "dev")
     - name: xmake
       run: xmake --version
