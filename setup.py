@@ -27,16 +27,20 @@ def get_boost_envrionment():
     current_dir = os.getcwd()
     current_boost_root = None
     current_boost_lib = None
-    if 'BOOST_ROOT' not in os.environ or 'BOOST_LIB' not in os.environ:
+    if 'BOOST_ROOT' in os.environ:
+        current_boost_root = os.environ['BOOST_ROOT']
+        if 'BOOST_LIB' in os.environ:
+            current_boost_lib = os.environ['BOOST_LIB']
+        else:
+            current_boost_lib = current_boost_root + '/stage/lib'
+            os.environ['BOOST_LIB'] = current_boost_lib
+    else:
         for dir in os.listdir():
             if len(dir) >= 5 and dir[:5] == 'boost' and os.path.isdir(dir):
                 current_boost_root = current_dir + '/' + dir
                 current_boost_lib = current_dir + '/' + dir + '/stage/lib'
                 os.environ['BOOST_ROOT'] = current_boost_root
                 os.environ['BOOST_LIB'] = current_boost_lib
-    else:
-        current_boost_root = os.environ['BOOST_ROOT']
-        current_boost_lib = os.environ['BOOST_LIB']
     return (current_boost_root, current_boost_lib)
 
 
@@ -110,7 +114,7 @@ def clear_with_python_changed():
 #------------------------------------------------------------------------------
 # 执行构建
 #------------------------------------------------------------------------------
-def start_build(verbose=False ):
+def start_build(verbose=False):
     """ 执行编译 """
     global g_verbose
     g_verbose = verbose
@@ -142,13 +146,13 @@ def start_build(verbose=False ):
         os.system("xmake f -c -y")
     else:
         os.system("xmake f -y")
-    os.system("xmake -b hikyuu {}".format("-v -D" if verbose else ""))
-    os.system("xmake -b _hikyuu {}".format("-v -D" if verbose else ""))
-    os.system("xmake -b _indicator {}".format("-v -D" if verbose else ""))
-    os.system("xmake -b _trade_manage {}".format("-v -D" if verbose else ""))
-    os.system("xmake -b _trade_sys {}".format("-v -D" if verbose else ""))
-    os.system("xmake -b _trade_instance {}".format("-v -D" if verbose else ""))
-    os.system("xmake -b _data_driver {}".format("-v -D" if verbose else ""))
+    os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
+    os.system("xmake -b {} _hikyuu".format("-v -D" if verbose else ""))
+    os.system("xmake -b {} _indicator".format("-v -D" if verbose else ""))
+    os.system("xmake -b {} _trade_manage".format("-v -D" if verbose else ""))
+    os.system("xmake -b {} _trade_sys".format("-v -D" if verbose else ""))
+    os.system("xmake -b {} _trade_instance".format("-v -D" if verbose else ""))
+    os.system("xmake -b {} _data_driver".format("-v -D" if verbose else ""))
 
 
 #------------------------------------------------------------------------------

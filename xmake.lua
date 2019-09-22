@@ -30,12 +30,6 @@ add_requires("fmt", "spdlog")
 -- use fmt, spdlog
 add_defines("FMT_HEADER_ONLY=1")
 
--- disable some compiler errors
-add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
-add_cxflags("-ftemplate-depth-500", "-pthread")
-add_shflags("-pthread")
-add_ldflags("-pthread")
-
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
@@ -80,6 +74,14 @@ if is_plat("windows") then
         add_cxflags("-Gs", "-RTC1") 
         add_cxflags("-MDd") 
     end
+end 
+
+if not is_plat("windows") then
+    -- disable some compiler errors
+    add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
+    add_cxflags("-ftemplate-depth-500", "-pthread")
+    add_shflags("-pthread")
+    add_ldflags("-pthread")
 end
 
 add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
