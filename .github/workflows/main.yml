@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@master
     - name: install xmake
       run: |
-        set CI 1
+        $env:CI=1
         Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
       shell: pwsh
     - name: xmake
