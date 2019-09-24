@@ -177,6 +177,8 @@ def build(verbose):
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
 def test(all, compile, verbose):
     """ 执行单元测试 """
+    # 先取 BOOST 路径，避免为设置 BOOST_LIB 的情况
+    current_boost_root, current_boost_lib = get_boost_envrionment()
     if compile:
         start_build(verbose)
     if all:
