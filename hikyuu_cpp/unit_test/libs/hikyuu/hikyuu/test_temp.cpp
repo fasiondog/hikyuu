@@ -36,10 +36,11 @@ BOOST_AUTO_TEST_CASE( test_temp ) {
     ThreadPool tg;
     for (int i = 0; i < 40; i++) {
         tg.submit([=]() {
-            int x = Fibon(i+1);
+			std::cout << fmt::format("{}---------------------\n", i);
+            /*int x = Fibon(i+1);
             std::stringstream buf;
             buf << i+1 << ": " << x << std::endl;
-            std::cout << buf.str();
+            std::cout << buf.str();*/
         });
     }
     tg.join();

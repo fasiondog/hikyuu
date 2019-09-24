@@ -31,7 +31,7 @@ public:
 
     void push(data_type data) {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_queue.push_front(std::move(data));
+        m_queue.push_back(std::move(data));
     }
 
     bool empty() const {
