@@ -15,7 +15,6 @@
 #include <thread>
 #include <chrono>
 #include "WorkStealQueue.h"
-#include "ThreadSafeQueue.h"
 
 namespace hku {
 
@@ -65,7 +64,6 @@ public:
             if (m_current_index >= m_worker_num) {
                 m_current_index = 0;
             }
-            //m_pool_work_queue.push(std::move(task));
         }
         return res;
     }
@@ -73,39 +71,17 @@ public:
     void run_pending_task() {
         task_type task;
         if (pop_task_from_local_queue(task) 
-          || pop_task_from_pool_queue(task)
           || pop_task_from_other_thread_queue(task)) {
               task();
-        } else {
-            //auto now = std::chrono::steady_clock::now();
-            if (m_local_finish_until_empty) {
-                //auto duration = std::chrono::duration<double, std::ratio<1, 1000>>(now - m_pre_time).count();
-                //if (duration >= 10) {
-                    m_thread_need_stop = true;
-                //} else {
-                //    std::this_thread::yield();    
-                //}
-            } else {
-                //m_pre_time = now;
-                std::this_thread::yield();
-            }
-        }
-        /*if (pop_task_from_local_queue(task) || pop_task_from_other_thread_queue(task)) {
-            task();
-        } else if (pop_task_from_pool_queue(task)) {
-            if (task.is_stop_task()) {
-                m_thread_need_stop = true;
-            } else {
-                task();
-            }
+        } else if (m_local_finish_until_empty) {
+            m_thread_need_stop = true;
         } else {
             std::this_thread::yield();
-        }*/
+        }
     }
 
     void join() {
         for (size_t i = 0; i < m_worker_num; i++) {
-            //m_pool_work_queue.push(FuncWrapper());
             (*m_finish_until_empty[i]) = true;
         }
         
@@ -121,7 +97,6 @@ private:
     std::atomic_bool m_done;
     bool m_init_finished;
     size_t m_worker_num;
-    ThreadSafeQueue<task_type> m_pool_work_queue;
     std::vector<bool *> m_finish_until_empty;
     std::vector<std::unique_ptr<WorkStealQueue> > m_queues;
     std::vector<std::thread> m_threads;
@@ -132,7 +107,6 @@ private:
     inline static thread_local size_t m_index = 0;
     inline static thread_local bool m_local_finish_until_empty = false;
     inline static thread_local bool m_thread_need_stop = false;
-    inline static thread_local auto m_pre_time = std::chrono::steady_clock::now();
    
     void worker_thread(size_t index, std::promise<bool *>& promise) {
         m_thread_need_stop = false;
@@ -143,15 +117,10 @@ private:
         while (!m_thread_need_stop && !m_done) {
             run_pending_task();
         }
-        std::cout << fmt::format("finished!\n");
     }
 
     bool pop_task_from_local_queue(task_type& task) {
         return m_local_work_queue && m_local_work_queue->try_pop(task);
-    }
-
-    bool pop_task_from_pool_queue(task_type& task) {
-        return m_pool_work_queue.try_pop(task);
     }
 
     bool pop_task_from_other_thread_queue(task_type& task) {

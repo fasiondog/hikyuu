@@ -11,11 +11,11 @@
 
 using namespace hku;
 
-int Fibon(int n) {
-	int num1 = 1;
-	int num2 = 1;
-	int tmp = 0;
-	int i = 0;
+int64 Fibon(int64 n) {
+	int64 num1 = 1;
+	int64 num2 = 1;
+	int64 tmp = 0;
+	int64 i = 0;
 	if (n < 3)
 	{
 		return 1;
@@ -32,17 +32,23 @@ int Fibon(int n) {
 	}
 }
 
+double test_func() {
+	double x = 0;
+	for (int i = 0; i < 20000; i++) {
+		x += i;
+	}
+	return x;
+}
+
 BOOST_AUTO_TEST_CASE( test_temp ) {
-    ThreadPool tg;
-    for (int i = 0; i < 40; i++) {
-        tg.submit([=]() {
-			std::cout << fmt::format("{}---------------------\n", i);
-            /*int x = Fibon(i+1);
-            std::stringstream buf;
-            buf << i+1 << ": " << x << std::endl;
-            std::cout << buf.str();*/
-        });
-    }
-    tg.join();
-    std::cout << "*********************" << std::endl;
+    {
+		SPEND_TIME(test_temp);
+		ThreadPool tg;
+		for (int64 i = 0; i < 10; i++) {
+			tg.submit([=]() {
+				std::cout << fmt::format("{}---------------------\n", i);
+			});
+		}
+		tg.join();
+	}
 }
