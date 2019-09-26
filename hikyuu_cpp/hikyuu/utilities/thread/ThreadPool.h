@@ -20,8 +20,12 @@ namespace hku {
 
 class ThreadPool {
 public:
-    ThreadPool(): ThreadPool(std::thread::hardware_concurrency()) {}
-    ThreadPool(size_t n): m_done(false), m_init_finished(false), m_worker_num(n), m_current_index(0), m_count(0) {
+    ThreadPool(size_t n = 0)
+    : m_done(false), m_init_finished(false), 
+      m_worker_num(n), m_current_index(0), m_count(0) {
+        if (m_worker_num== 0) {
+            m_worker_num = std::thread::hardware_concurrency();
+        }
         try {
             for (size_t i = 0; i < m_worker_num; i++) {
                 std::promise<bool *> promise;
@@ -58,9 +62,9 @@ public:
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
         if (m_local_work_queue) {
-            m_local_work_queue->push(std::move(task));
+            m_local_work_queue->push_front(std::move(task));
         } else {
-            m_queues[m_current_index++]->push(std::move(task));
+            m_queues[m_current_index++]->push_back(std::move(task));
             if (m_current_index >= m_worker_num) {
                 m_current_index = 0;
             }

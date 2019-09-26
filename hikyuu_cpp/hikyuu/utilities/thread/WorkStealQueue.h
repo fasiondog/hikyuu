@@ -29,7 +29,12 @@ public:
     WorkStealQueue(const WorkStealQueue& other)=delete;
     WorkStealQueue& operator=(const WorkStealQueue& other)=delete;
 
-    void push(data_type data) {
+    void push_front(data_type data) {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_queue.push_front(std::move(data));
+    }
+
+    void push_back(data_type data) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push_back(std::move(data));
     }
