@@ -19,7 +19,7 @@ jobs:
     - name: build boost
       run: |
         "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsx86_amd64.bat"
-        cd $env:BOOST_ROOT%
+        cd $env:BOOST_ROOT
         bootstrap.bat
         b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
       shell: pwsh
