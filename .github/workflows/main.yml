@@ -14,6 +14,7 @@ jobs:
       run: |
         git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
         Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
+        set BOOST_LIB=%BOOST_ROOT%\stage\lib
         cd hikyuu
         xmake f --confirm=y --test=small
         xmake -b small-test
