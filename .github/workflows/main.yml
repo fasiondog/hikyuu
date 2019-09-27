@@ -8,12 +8,11 @@ jobs:
     runs-on: windows-2019
     
     steps:
-    - uses: actions/checkout@master
     - name: build
       env:
         CI: yes
       run: |
-        git submodule updata --init --recursive
+        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
         Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
         xmake f --confirm=y --test=small
         xmake -b small-test
