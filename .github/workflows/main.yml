@@ -13,6 +13,7 @@ jobs:
       env:
         CI: yes
       run: |
+        git submodule updata --init --recursive
         Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
         xmake f --confirm=y --test=small
         xmake -b small-test
