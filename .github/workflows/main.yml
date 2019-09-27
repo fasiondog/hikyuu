@@ -9,13 +9,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@master
-    - name: install xmake
-      env:
-        CI: yes
-      run: |
-        Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
-        ls
-      shell: pwsh
     - name: build boost
       env:
         VS150COMNTOOLS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools
@@ -24,3 +17,11 @@ jobs:
         cd %BOOST_ROOT%
         bootstrap.bat
         b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
+      shell: cmd
+    - name: install xmake
+      env:
+        CI: yes
+      run: |
+        Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
+        ls
+      shell: pwsh
