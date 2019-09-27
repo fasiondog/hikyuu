@@ -18,7 +18,7 @@ jobs:
       shell: pwsh
     - name: build boost
       env:
-        VS150COMNTOOLS: "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"
+        VS150COMNTOOLS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools
       run: |
         cd $env:BOOST_ROOT
         bootstrap.bat
