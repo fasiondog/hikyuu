@@ -5,9 +5,15 @@ on: [push]
 jobs:
   build:
 
-    runs-on: windows-2019
+    runs-on: windows-2016
     
     steps:
+    - name: build boost
+      run: |
+        cd %BOOST_ROOT%
+        bootstrap.bat
+        b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
+      shell: cmd
     - name: build
       env:
         CI: yes
