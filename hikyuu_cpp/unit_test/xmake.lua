@@ -61,6 +61,7 @@ target("small-test")
         add_cxflags("-wd4251")
         add_cxflags("-wd4244")
         add_cxflags("-wd4805")
+        add_cxflags("-wd4566")
     else
         add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")
         add_cxflags("-Wno-sign-compare")
