@@ -10,10 +10,11 @@ jobs:
     steps:
     - name: build boost
       run: |
-        cd %BOOST_ROOT%
+        ehco $env:BOOST_ROOT
+        cd $env:BOOST_ROOT
         bootstrap.bat
         b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
-      shell: cmd
+      shell: pwsh
     - name: build
       env:
         CI: yes
