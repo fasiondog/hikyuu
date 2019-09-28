@@ -8,6 +8,8 @@ jobs:
     runs-on: windows-2016
     
     steps:
+    - name: checkout
+      run: git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
     - name: build boost
       run: |
         echo $env:BOOST_ROOT
@@ -15,8 +17,6 @@ jobs:
         bootstrap.bat
         b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
       shell: pwsh
-    - name: checkout
-      run: git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
     - name: build hikyuu
       env:
         CI: yes
