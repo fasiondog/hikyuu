@@ -5,9 +5,14 @@ on: [push]
 jobs:
   build:
 
-    runs-on: windows-2016
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2016, windows-2019, ubuntu-16.04, ubuntu-18.04]
     
     steps:
+    - uses: textbook/git-checkout-submodule-action@master
+    - uses: xmake-io/github-action-setup-xmake@v1
     - name: checkout
       run: git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
     - name: build boost
@@ -21,8 +26,8 @@ jobs:
       env:
         CI: yes
       run: |
-        Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
-        $env:BOOST_LIB=$env:BOOST_ROOT + "\stage\lib"
+        #Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
+        #$env:BOOST_LIB=$env:BOOST_ROOT + "\stage\lib"
         cd hikyuu
         xmake f --confirm=y --test=small
         xmake -b small-test

@@ -68,6 +68,7 @@ if is_plat("windows") then
     add_defines("NOCRYPT", "NOGDI")
     add_cxflags("-EHsc", "/Zc:__cplusplus")
     add_cxflags("-wd4819")  --template dll export warning
+    add_defines("WIN32_LEAN_AND_MEAN")
     if is_mode("release") then
         add_cxflags("-MD") 
     elseif is_mode("debug") then

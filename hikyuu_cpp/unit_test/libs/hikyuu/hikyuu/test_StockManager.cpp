@@ -15,6 +15,7 @@
 #include <boost/filesystem.hpp>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/util.h>
+#include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/Log.h>
 
 using namespace hku;
@@ -156,15 +157,15 @@ BOOST_AUTO_TEST_CASE( test_StockManager_getAllMarket ) {
 
 /** @par 检测点 */
 BOOST_AUTO_TEST_CASE( test_StockManager_getBlock ) {
-    StockManager& sm = StockManager::instance();
+    if (supportChineseSimple()) {
+        StockManager& sm = StockManager::instance();
+        Block result = sm.getBlock("地域板块", "陕西");
+        BOOST_CHECK(result.size() != 0);
 
-    Block result = sm.getBlock("地域板块", "陕西");
-    BOOST_CHECK(result.size() != 0);
-
-    BlockList blk_list = sm.getBlockList("地域板块");
-    blk_list = sm.getBlockList();
-    BOOST_CHECK(blk_list.size() != 0);
-
+        BlockList blk_list = sm.getBlockList("地域板块");
+        blk_list = sm.getBlockList();
+        BOOST_CHECK(blk_list.size() != 0);
+    }
 }
 
 /** @par 检测点 */
