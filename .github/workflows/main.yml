@@ -26,7 +26,7 @@ jobs:
         CI: yes
       run: |
         #Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
-        #$env:BOOST_LIB=$env:BOOST_ROOT + "\stage\lib"
+        $env:BOOST_LIB=$env:BOOST_ROOT + "\stage\lib"
         cd hikyuu
         xmake f --confirm=y --test=small
         xmake -b small-test
