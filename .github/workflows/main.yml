@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2016, windows-2019]
+        os: [windows-2016]
     
     steps:
     - uses: xmake-io/github-action-setup-xmake@v1
