@@ -17,6 +17,7 @@ jobs:
     - name: build
       run: |
         cd hikyuu
+        pip install click
         python setup.py build
     - name: test
       run: |
