@@ -1,6 +1,6 @@
-name: CI
+name: win-build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -14,21 +14,11 @@ jobs:
     - uses: xmake-io/github-action-setup-xmake@v1
     - name: checkout
       run: git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-    - name: build boost
+    - name: build
       run: |
-        echo $env:BOOST_ROOT
-        cd $env:BOOST_ROOT
-        bootstrap.bat
-        b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test
-      shell: pwsh
-    - name: build hikyuu
-      env:
-        CI: yes
-      run: |
-        #Invoke-Expression (Invoke-Webrequest 'https://raw.githubusercontent.com/xmake-io/xmake/master/scripts/get.ps1' -UseBasicParsing).Content
-        $env:BOOST_LIB=$env:BOOST_ROOT + "\stage\lib"
         cd hikyuu
-        xmake f --confirm=y --test=small
-        xmake -b small-test
-        xmake r small-test
-      shell: pwsh
+        python setup.py build
+    - name: test
+      run: |
+        cd hikyuu
+        python setup.py test
