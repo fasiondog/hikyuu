@@ -79,10 +79,16 @@ def build_boost():
         os.chdir(current_boost_root)
         if not os.path.exists('b2.exe'):
             os.system('bootstrap.bat')
-        os.system('b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test')
+        os.system('b2 release link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
+                  ' --with-filesystem --with-system --with-serialization --with-test')
+        os.system('b2 release link=shared runtime-link=shared address-model=64 -j 4 --with-python')
         os.chdir(current_dir)
     else:
-        cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; ./b2 release link=shared address-model=64 -j 4 --with-python --with-date_time --with-filesystem --with-system --with-serialization --with-test; cd {current}'.format(boost=current_boost_root, current=current_dir)
+        cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
+              './b2 release link=shared address-model=64 -j 4 --with-python; '\
+              './b2 release link=static address-model=64 -j 4 --with-date_time '\
+              '--with-filesystem --with-system --with-serialization --with-test; '\
+              'cd {current}'.format(boost=current_boost_root, current=current_dir)
         os.system(cmd)
 
 

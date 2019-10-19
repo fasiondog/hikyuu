@@ -13,6 +13,8 @@ target("unit-test")
         set_kind("phony")
     end
 
+    --add_defines("BOOST_TEST_DYN_LINK")
+    
     add_packages("fmt", "spdlog")
 
     add_includedirs("..")
@@ -55,6 +57,8 @@ target("small-test")
     end
     add_packages("fmt", "spdlog")
     add_includedirs("..")
+
+    --add_defines("BOOST_TEST_DYN_LINK")
 
     if is_plat("windows") then
         add_cxflags("-wd4267")

@@ -305,4 +305,5 @@ inline KData IndicatorImp::getContext() const {
 }
 
 } /* namespace hku */
+
 #endif /* INDICATORIMP_H_ */

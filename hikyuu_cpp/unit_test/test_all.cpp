@@ -21,14 +21,16 @@
  * @see test_all.cpp
  */
 
+#ifdef BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE test_all
 #include <boost/test/unit_test.hpp>
-
-// Linux下在Eclipse中编译必须使用下面的头文件（使用bjam不需要），否则提示无法找到“main“函数，原因未知
-// 但bjam编译时会有告警，虽然可以编译通过。
-// Windows下，如果使用下面的头文件将无法编译。
-#ifdef ECLIPSE_GCC
-#include <boost/test/included/unit_test.hpp>
-#endif
-
 using namespace boost::unit_test;
+
+#else
+#include <boost/test/included/unit_test.hpp>
+boost::unit_test::test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[])
+{
+  std::cout << "using obsolete init" << std::endl;
+  return 0;
+}
+#endif /* #ifdef BOOST_TEST_DYN_LINK */

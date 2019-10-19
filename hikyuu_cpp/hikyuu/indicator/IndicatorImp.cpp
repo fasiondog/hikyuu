@@ -10,8 +10,11 @@
 #include "../Stock.h"
 #include "../Log.h"
 
-namespace hku {
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_EXPORT(hku::IndicatorImp)
+#endif
 
+namespace hku {
 
 HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImp& imp) {
     os << "Indicator(" << imp.name() << ", " << imp.getParameter() << ")";

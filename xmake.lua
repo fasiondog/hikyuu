@@ -38,7 +38,8 @@ add_includedirs("hikyuu_extern_libs/inc")
 add_includedirs("$(env BOOST_ROOT)")
 add_linkdirs("$(env BOOST_LIB)")
 
-add_defines("BOOST_ALL_DYN_LINK")
+-- modifed to use boost static library, except boost.python
+--add_defines("BOOST_ALL_DYN_LINK")
 
 if is_host("linux") then
     if is_arch("x86_64") then
@@ -73,14 +74,14 @@ if is_plat("windows") then
         add_cxflags("-MD") 
     elseif is_mode("debug") then
         add_cxflags("-Gs", "-RTC1") 
-        add_cxflags("-MDd") 
+        add_cxflags("-MDd")
     end
 end 
 
 if not is_plat("windows") then
     -- disable some compiler errors
     add_cxflags("-Wno-error=deprecated-declarations", "-fno-strict-aliasing")
-    add_cxflags("-ftemplate-depth-500", "-pthread")
+    add_cxflags("-ftemplate-depth=1023", "-pthread")
     add_shflags("-pthread")
     add_ldflags("-pthread")
 end

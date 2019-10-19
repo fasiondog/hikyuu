@@ -10,6 +10,9 @@ option_end()
 
 add_includedirs("../hikyuu_cpp")
 
+-- Can't use static boost.python lib, the function that using 'arg' will load failed!
+--add_defines("BOOST_PYTHON_STATIC_LIB")
+
 if is_plat("windows") then
     add_defines("HKU_API=__declspec(dllimport)")
 end
