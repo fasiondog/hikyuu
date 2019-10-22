@@ -13,8 +13,6 @@ target("unit-test")
         set_kind("phony")
     end
 
-    --add_defines("BOOST_TEST_DYN_LINK")
-    
     add_packages("fmt", "spdlog")
 
     add_includedirs("..")

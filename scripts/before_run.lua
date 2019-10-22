@@ -22,7 +22,7 @@ function main(target)
     if is_plat("windows") then
         --os.cp("$(env BOOST_LIB)/boost_date_time*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/boost_filesystem*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        --os.cp("$(env BOOST_LIB)/boost_serialization*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        os.cp("$(env BOOST_LIB)/boost_serialization*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/boost_system*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/boost_unit_test_framework*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/release/$(plat)/$(arch)/*.dll","$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
@@ -32,7 +32,7 @@ function main(target)
     if is_plat("linux") then
         --os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        --os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         os.cp("$(env BOOST_LIB)/libboost_system*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/libboost_unit_test_framework*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end    
@@ -40,7 +40,7 @@ function main(target)
     if is_plat("macosx") then
         --os.cp("$(env BOOST_LIB)/libboost_date_time*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/libboost_filesystem*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        --os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/libboost_system*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/libboost_unit_test_framework*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         -- macOSX下unit_test_framework依赖于timer和chrono
