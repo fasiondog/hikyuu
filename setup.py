@@ -199,7 +199,8 @@ def test(all, compile, verbose):
 
 
 @click.command()    
-def clear():
+@click.option("-with_boost", "--with_boost", is_flag=True, help='清除相应的BOOST库')
+def clear(with_boost):
     """ 清除当前编译设置及结果 """
     if os.path.lexists('.xmake'):
         print('delete .xmake')
@@ -210,7 +211,7 @@ def clear():
     if os.path.lexists('Hikyuu.egg-info'):
         print('delete Hikyuu.egg-info')
         shutil.rmtree('Hikyuu.egg-info')
-    if os.path.exists('py_version'):
+    if with_boost and os.path.exists('py_version'):
         print('delete py_version')
         os.remove('py_version')
     for r, _, f_list in os.walk('hikyuu'):

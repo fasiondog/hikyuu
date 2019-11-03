@@ -78,6 +78,16 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 #define HKU_LOGGER_FATAL(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
 #define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(getHikyuuLogger(), __VA_ARGS__)
 
+namespace inner {
+#if HKU_USE_ASYNC_LOGGER    
+    extern std::shared_ptr<spdlog::async_logger> g_hikyuu_logger;
+    std::shared_ptr<spdlog::async_logger> init_logger();
+#else
+    extern std::shared_ptr<spdlog::logger> g_hikyuu_logger;
+    std::shared_ptr<spdlog::logger> init_logger();
+#endif
+} /* namespace inner */
+
 /** @} */
 } /* namespace hku */
 #endif /* HIKUU_LOG_H_ */
