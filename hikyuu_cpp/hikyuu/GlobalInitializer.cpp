@@ -1,6 +1,6 @@
 /*
  * GlobalInitializer.cpp
- * 
+ *
  * Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-11-01
@@ -18,8 +18,6 @@ void GlobalInitializer::init() {
     inner::g_hikyuu_logger = inner::init_logger();
 }
 
-void GlobalInitializer::clean() {
-
-}
+void GlobalInitializer::clean() {}
 
 } /* namespace hku */
