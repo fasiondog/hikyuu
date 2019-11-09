@@ -2,7 +2,7 @@
  * ITimeLine.cpp
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019年3月6日
  *      Author: fasiondog
  */
@@ -13,21 +13,18 @@
 BOOST_CLASS_EXPORT(hku::ITimeLine)
 #endif
 
-
 namespace hku {
 
 ITimeLine::ITimeLine() : IndicatorImp("TIMELINE", 1) {
     setParam<string>("part", "price");
 }
 
-ITimeLine::~ITimeLine() {
-
-}
+ITimeLine::~ITimeLine() {}
 
 ITimeLine::ITimeLine(const KData& k) : IndicatorImp("TIMELINE", 1) {
     setParam<string>("part", "price");
     setParam<KData>("kdata", k);
-    _calculate(Indicator());
+    ITimeLine::_calculate(Indicator());
 }
 
 bool ITimeLine::check() {
@@ -49,7 +46,7 @@ void ITimeLine::_calculate(const Indicator& data) {
     if (total == 0) {
         return;
     }
-    
+
     _readyBuffer(total, 1);
 
     m_discard = 0;

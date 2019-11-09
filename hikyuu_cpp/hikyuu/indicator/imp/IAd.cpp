@@ -1,6 +1,6 @@
 /*
  * IAd.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-18
@@ -13,21 +13,16 @@
 BOOST_CLASS_EXPORT(hku::IAd)
 #endif
 
-
 namespace hku {
 
-IAd::IAd() : IndicatorImp("AD", 1) {
-
-}
+IAd::IAd() : IndicatorImp("AD", 1) {}
 
 IAd::IAd(const KData& k) : IndicatorImp("AD", 1) {
     setParam<KData>("kdata", k);
-    _calculate(Indicator());
+    IAd::_calculate(Indicator());
 }
 
-IAd::~IAd() {
-
-}
+IAd::~IAd() {}
 
 bool IAd::check() {
     return true;
@@ -37,14 +32,14 @@ void IAd::_calculate(const Indicator& data) {
     if (!isLeaf() && !data.empty()) {
         HKU_WARN("The input is ignored because {} depends on the context!", m_name);
     }
-    
+
     m_discard = 0;
     KData k = getContext();
     size_t total = k.size();
     if (total == 0) {
         return;
     }
-    
+
     _readyBuffer(total, 1);
 
     price_t ad = 0.0;
@@ -60,7 +55,6 @@ void IAd::_calculate(const Indicator& data) {
     }
 }
 
-
 Indicator HKU_API AD() {
     return make_shared<IAd>()->calculate();
 }
@@ -68,6 +62,5 @@ Indicator HKU_API AD() {
 Indicator HKU_API AD(const KData& k) {
     return Indicator(make_shared<IAd>(k));
 }
-
 
 } /* namespace hku */

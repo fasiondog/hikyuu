@@ -29,6 +29,7 @@ hikyuu.code-workspace
 /build
 /docs/build
 /docs/notepad-workspace
+/cppcheck-cppcheck-build-dir
 *~
 install
 .DS_Store

@@ -10,9 +10,9 @@
 
 namespace hku {
 
-HKU_API std::ostream& operator <<(std::ostream &os, const Parameter& param) {
-    //os << std::fixed;
-    //os.precision(4);
+HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
+    // os << std::fixed;
+    // os.precision(4);
     os << "params[";
     string strip(", ");
     string colon(": ");
@@ -20,37 +20,29 @@ HKU_API std::ostream& operator <<(std::ostream &os, const Parameter& param) {
     for (; iter != param.m_params.end(); ++iter) {
         os << iter->first;
         if (iter->second.type() == typeid(int)) {
-            os << "(int): "
-               << boost::any_cast<int>(iter->second) << strip;
+            os << "(int): " << boost::any_cast<int>(iter->second) << strip;
         } else if (iter->second.type() == typeid(bool)) {
-            os << "(bool): "
-               << boost::any_cast<bool>(iter->second) << strip;
+            os << "(bool): " << boost::any_cast<bool>(iter->second) << strip;
         } else if (iter->second.type() == typeid(double)) {
-            os << "(double): "
-               << boost::any_cast<double>(iter->second) << strip;
+            os << "(double): " << boost::any_cast<double>(iter->second) << strip;
         } else if (iter->second.type() == typeid(string)) {
-            os << "(string): "
-               << boost::any_cast<string>(iter->second) << strip;
+            os << "(string): " << boost::any_cast<string>(iter->second) << strip;
         } else if (iter->second.type() == typeid(Stock)) {
-            os << "(Stock): "
-               << boost::any_cast<Stock>(iter->second).market_code() << strip;
+            os << "(Stock): " << boost::any_cast<Stock>(iter->second).market_code() << strip;
         } else if (iter->second.type() == typeid(KQuery)) {
-            os << "(Query): "
-               << boost::any_cast<KQuery>(iter->second) << strip;
+            os << "(Query): " << boost::any_cast<KQuery>(iter->second) << strip;
         } else if (iter->second.type() == typeid(KData)) {
             os << "(KData): ";
             Stock stk = boost::any_cast<KData>(iter->second).getStock();
             if (stk.isNull()) {
-                os << "Null" <<strip;
+                os << "Null" << strip;
             } else {
                 os << stk.market_code() << strip;
             }
         } else if (iter->second.type() == typeid(PriceList)) {
-            os << "(PriceList): "
-               << boost::any_cast<PriceList>(iter->second).size() << strip;
+            os << "(PriceList): " << boost::any_cast<PriceList>(iter->second).size() << strip;
         } else if (iter->second.type() == typeid(DatetimeList)) {
-            os << "(DatetimeList): "
-               << boost::any_cast<DatetimeList>(iter->second).size() << strip;
+            os << "(DatetimeList): " << boost::any_cast<DatetimeList>(iter->second).size() << strip;
         } else {
             os << "Unsupported" << strip;
         }
@@ -59,21 +51,11 @@ HKU_API std::ostream& operator <<(std::ostream &os, const Parameter& param) {
     return os;
 }
 
+Parameter::Parameter() {}
 
-Parameter::Parameter() {
+Parameter::Parameter(const Parameter& p) : m_params(p.m_params) {}
 
-}
-
-
-Parameter::Parameter(const Parameter& p) {
-    m_params = p.m_params;
-}
-
-
-Parameter::~Parameter() {
-
-}
-
+Parameter::~Parameter() {}
 
 Parameter& Parameter::operator=(const Parameter& p) {
     if (this == &p) {
@@ -84,30 +66,24 @@ Parameter& Parameter::operator=(const Parameter& p) {
     return *this;
 }
 
-
 bool Parameter::support(const boost::any& value) {
-    if (value.type() == typeid(int)
-            || value.type() == typeid(bool)
-            || value.type() == typeid(double)
-            || value.type() == typeid(string)
-            || value.type() == typeid(Stock)
-            || value.type() == typeid(KQuery)
-            || value.type() == typeid(KData)
-            || value.type() == typeid(PriceList)
-            || value.type() == typeid(DatetimeList)) {
+    if (value.type() == typeid(int) || value.type() == typeid(bool) ||
+        value.type() == typeid(double) || value.type() == typeid(string) ||
+        value.type() == typeid(Stock) || value.type() == typeid(KQuery) ||
+        value.type() == typeid(KData) || value.type() == typeid(PriceList) ||
+        value.type() == typeid(DatetimeList)) {
         return true;
     }
 
     return false;
 }
 
-
 string Parameter::type(const string& name) const {
     auto iter = m_params.find(name);
     if (iter == m_params.end()) {
         throw std::out_of_range("out_of_range in Parameter::get : " + name);
     }
-    
+
     if (iter->second.type() == typeid(int)) {
         return "int";
     } else if (iter->second.type() == typeid(bool)) {
@@ -131,7 +107,6 @@ string Parameter::type(const string& name) const {
     return "Unknow";
 }
 
-
 StringList Parameter::getNameList() const {
     vector<string> result;
     param_map_t::const_iterator iter = m_params.begin();
@@ -140,7 +115,6 @@ StringList Parameter::getNameList() const {
     }
     return result;
 }
-
 
 string Parameter::getValueList() const {
     std::stringstream os;
@@ -160,7 +134,7 @@ string Parameter::getValueList() const {
         } else if (iter->second.type() == typeid(KQuery)) {
             os << boost::any_cast<KQuery>(iter->second);
         } else if (iter->second.type() == typeid(KData)) {
-        //    os << boost::any_cast<KData>(iter->second);
+            //    os << boost::any_cast<KData>(iter->second);
         } else if (iter->second.type() == typeid(PriceList)) {
             os << "PriceList(...)";
         } else if (iter->second.type() == typeid(DatetimeList)) {
@@ -177,7 +151,6 @@ string Parameter::getValueList() const {
     return os.str();
 }
 
-
 string Parameter::getNameValueList() const {
     std::stringstream os;
     Parameter::param_map_t::const_iterator iter = m_params.begin();
@@ -185,32 +158,24 @@ string Parameter::getNameValueList() const {
     string equal("=");
     for (; iter != m_params.end(); ++iter) {
         if (iter->second.type() == typeid(int)) {
-            os << iter->first << equal
-               << boost::any_cast<int>(iter->second);
+            os << iter->first << equal << boost::any_cast<int>(iter->second);
         } else if (iter->second.type() == typeid(bool)) {
-            os << iter->first << equal
-               << boost::any_cast<bool>(iter->second);
+            os << iter->first << equal << boost::any_cast<bool>(iter->second);
         } else if (iter->second.type() == typeid(double)) {
-            os << iter->first << equal
-               << boost::any_cast<double>(iter->second);
+            os << iter->first << equal << boost::any_cast<double>(iter->second);
         } else if (iter->second.type() == typeid(string)) {
-            os << "\"" << iter->first << "\"" << equal
-               << boost::any_cast<string>(iter->second);
+            os << "\"" << iter->first << "\"" << equal << boost::any_cast<string>(iter->second);
         } else if (iter->second.type() == typeid(Stock)) {
-            os << iter->first << equal
-               << boost::any_cast<Stock>(iter->second);
+            os << iter->first << equal << boost::any_cast<Stock>(iter->second);
         } else if (iter->second.type() == typeid(KQuery)) {
-            os << iter->first << equal
-               << boost::any_cast<KQuery>(iter->second);
+            os << iter->first << equal << boost::any_cast<KQuery>(iter->second);
         } else if (iter->second.type() == typeid(KData)) {
-        //    os << iter->first << equal
-        //       << boost::any_cast<KData>(iter->second);
+            //    os << iter->first << equal
+            //       << boost::any_cast<KData>(iter->second);
         } else if (iter->second.type() == typeid(PriceList)) {
-            os << iter->first << equal
-               << "PriceList(...)";
+            os << iter->first << equal << "PriceList(...)";
         } else if (iter->second.type() == typeid(DatetimeList)) {
-            os << iter->first << equal
-               << "DatetimeList(...)";
+            os << iter->first << equal << "DatetimeList(...)";
         } else {
             os << "Unsupported";
         }
@@ -236,6 +201,5 @@ HKU_API bool operator!=(const Parameter& p1, const Parameter& p2) {
 HKU_API bool operator<(const Parameter& p1, const Parameter& p2) {
     return p1.getNameValueList() < p2.getNameValueList();
 }
-
 
 } /* namespace hku */

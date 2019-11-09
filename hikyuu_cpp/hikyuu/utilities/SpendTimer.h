@@ -2,7 +2,7 @@
  * SpendTimer.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-6-15
  *      Author: fasiondog
  */
@@ -25,8 +25,8 @@
 #endif
 
 #ifdef _MSC_VER
-#pragma  warning(push) 
-#pragma  warning(disable: 4834)
+#pragma warning(push)
+#pragma warning(disable : 4834)
 #endif
 
 #ifdef __GNUC__
@@ -38,28 +38,27 @@
 namespace hku {
 
 #if HIKYUU_CLOSE_SPEND_TIME
-#define SPEND_TIME(id) 
+#define SPEND_TIME(id)
 #define SPEND_TIME_MSG(id, msg)
 #define close_spend_time()
 #define open_spend_time()
- 
+
 #else /* #if HIKYUU_CLOSE_SPEND_TIME */
-#define SPEND_TIME(id) std::stringstream sptmsg_buf_##id(std::stringstream::out); \
-            sptmsg_buf_##id << #id << " (" << __FILE__ << ":" << __LINE__ << ")"; \
-            SpendTimer test_spend_timer_##id(sptmsg_buf_##id.str());
-#define SPEND_TIME_MSG(id, msg) std::stringstream sptmsg_buf_##id(std::stringstream::out); \
-                    sptmsg_buf_##id << #id << ": " << msg << " (" << __FILE__ << ":" << __LINE__ << ")"; \
-                    SpendTimer test_spend_timer_##id(sptmsg_buf_##id.str());
+#define SPEND_TIME(id)                                                    \
+    std::stringstream sptmsg_buf_##id(std::stringstream::out);            \
+    sptmsg_buf_##id << #id << " (" << __FILE__ << ":" << __LINE__ << ")"; \
+    SpendTimer test_spend_timer_##id(sptmsg_buf_##id.str());
+#define SPEND_TIME_MSG(id, msg)                                                          \
+    std::stringstream sptmsg_buf_##id(std::stringstream::out);                           \
+    sptmsg_buf_##id << #id << ": " << msg << " (" << __FILE__ << ":" << __LINE__ << ")"; \
+    SpendTimer test_spend_timer_##id(sptmsg_buf_##id.str());
 
 class HKU_API SpendTimer {
 public:
-    SpendTimer(): m_msg("") {
-        m_start_time = std::chrono::steady_clock::now();
-    }
+    SpendTimer() : m_msg(""), m_start_time(std::chrono::steady_clock::now()) {}
 
-    SpendTimer(const std::string& msg) : m_msg(msg) {
-        m_start_time = std::chrono::steady_clock::now();
-    }
+    explicit SpendTimer(const std::string& msg)
+    : m_msg(msg), m_start_time(std::chrono::steady_clock::now()) {}
 
     virtual ~SpendTimer() {
         if (m_closed) {
@@ -69,29 +68,35 @@ public:
         std::ostringstream buf;
         int width = 7;
         buf.fill(' ');
-        buf.precision(width-1);
+        buf.precision(width - 1);
         if (sec.count() < 0.000001) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count()*1000000000 << " ns | " << m_msg;    
+            buf << "spend time: " << std::setw(width) << std::right << sec.count() * 1000000000
+                << " ns | " << m_msg;
         } else if (sec.count() < 0.001) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count()*1000000 << " us | " << m_msg;
+            buf << "spend time: " << std::setw(width) << std::right << sec.count() * 1000000
+                << " us | " << m_msg;
         } else if (sec.count() < 1) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count()*1000 << " ms | " << m_msg;
+            buf << "spend time: " << std::setw(width) << std::right << sec.count() * 1000
+                << " ms | " << m_msg;
         } else if (sec.count() > 60) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count()/60 << "  m | " << m_msg;
+            buf << "spend time: " << std::setw(width) << std::right << sec.count() / 60 << "  m | "
+                << m_msg;
         } else if (sec.count() > 86400) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count()/360 << "  h | " << m_msg;
+            buf << "spend time: " << std::setw(width) << std::right << sec.count() / 360 << "  h | "
+                << m_msg;
         } else {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count() << "  s | " << m_msg;
+            buf << "spend time: " << std::setw(width) << std::right << sec.count() << "  s | "
+                << m_msg;
         }
 
-    #ifdef __ANDROID__
-        __android_log_print(ANDROID_LOG_INFO, "HIKYUu", buf.str().c_str());
-        #if YIHUA_WITH_ANDROID_SHELL_OUTPUT
+#ifdef __ANDROID__
+        __android_log_print(ANDROID_LOG_INFO, "HIKYUU", buf.str().c_str());
+#if YIHUA_WITH_ANDROID_SHELL_OUTPUT
         std::cout << buf.str() << std::endl;
-        #endif
-    #else /* __ANDROID__ */        
+#endif
+#else  /* __ANDROID__ */
         std::cout << buf.str() << std::endl;
-    #endif /* __ANDROID__ */    
+#endif /* __ANDROID__ */
     }
 
 private:
@@ -120,7 +125,7 @@ inline void HKU_API open_spend_time() {
 #endif
 
 #ifdef _MSC_VER
-#pragma  warning(pop) 
+#pragma warning(pop)
 #endif
 
 #endif /* HIKYUU_UTILITIES_SPENDTIMER_H_ */

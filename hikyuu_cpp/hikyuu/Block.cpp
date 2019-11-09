@@ -1,6 +1,6 @@
 /*
  * Block.cpp
- *  
+ *
  *  Copyright (c) hikyuu.org
  *
  *  Created on: 2015年2月8日
@@ -12,21 +12,17 @@
 
 namespace hku {
 
-HKU_API std::ostream& operator <<(std::ostream &os, const Block& blk) {
+HKU_API std::ostream& operator<<(std::ostream& os, const Block& blk) {
     string strip(", ");
     os << "Block(" << blk.category() << strip << blk.name() << ")";
     return os;
 }
 
-Block::Block() {
-}
+Block::Block() {}
 
-Block::~Block() {
-}
+Block::~Block() {}
 
-
-Block::Block(const string& category, const string& name) {
-    m_data = shared_ptr<Data>(new Data);
+Block::Block(const string& category, const string& name) : m_data(make_shared<Data>()) {
     m_data->m_category = category;
     m_data->m_name = name;
 }
@@ -46,14 +42,16 @@ Block& Block::operator=(const Block& block) {
 }
 
 bool Block::have(const string& market_code) const {
-    if (!m_data) return false;
+    if (!m_data)
+        return false;
     string query_str = market_code;
     to_upper(query_str);
     return m_data->m_stockDict.count(query_str) ? true : false;
 }
 
 bool Block::have(const Stock& stock) const {
-    if (!m_data) return false;
+    if (!m_data)
+        return false;
     return m_data->m_stockDict.count(stock.market_code()) ? true : false;
 }
 
@@ -83,7 +81,7 @@ bool Block::add(const Stock& stock) {
 }
 
 bool Block::add(const string& market_code) {
-    StockManager& sm = StockManager::instance();
+    const StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock(market_code);
     if (stock.isNull() || have(stock))
         return false;
@@ -112,6 +110,5 @@ bool Block::remove(const Stock& stock) {
     m_data->m_stockDict.erase(stock.market_code());
     return true;
 }
-
 
 } /* namespace hku */

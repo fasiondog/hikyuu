@@ -12,31 +12,26 @@
 BOOST_CLASS_EXPORT(hku::IKData)
 #endif
 
-
 namespace hku {
 
-IKData::IKData(): IndicatorImp("KDATA") {
+IKData::IKData() : IndicatorImp("KDATA") {
     setParam<string>("kpart", "KDATA");
 }
 
-IKData::IKData(const KData& kdata, const string& part)
-: IndicatorImp() {
+IKData::IKData(const KData& kdata, const string& part) : IndicatorImp() {
     string part_name(part);
     to_upper(part_name);
     setParam<string>("kpart", part_name);
     setParam<KData>("kdata", kdata);
-    _calculate(Indicator());
+    IKData::_calculate(Indicator());
 }
 
-
-IKData::~IKData() {
-
-}
+IKData::~IKData() {}
 
 bool IKData::check() {
     string part = getParam<string>("kpart");
-    if ("KDATA" == part || "OPEN" == part || "HIGH" == part || "LOW" == part
-            || "CLOSE" == part || "AMO" == part || "VOL" == part) {
+    if ("KDATA" == part || "OPEN" == part || "HIGH" == part || "LOW" == part || "CLOSE" == part ||
+        "AMO" == part || "VOL" == part) {
         return true;
     }
 
@@ -46,8 +41,8 @@ bool IKData::check() {
 //支持KDATA Indicator作为参数
 void IKData::_calculate(const Indicator& ind) {
     if (!isLeaf() && !ind.empty()) {
-        HKU_WARN("The input is ignored because {} depends on the context!", 
-            getParam<string>("kpart"));
+        HKU_WARN("The input is ignored because {} depends on the context!",
+                 getParam<string>("kpart"));
     }
 
     KData kdata = getContext();
@@ -55,9 +50,9 @@ void IKData::_calculate(const Indicator& ind) {
     if (total == 0) {
         return;
     }
-    
+
     string part_name = getParam<string>("kpart");
-    
+
     if ("KDATA" == part_name) {
         m_name = "KDATA";
         _readyBuffer(total, 6);
@@ -149,7 +144,6 @@ Indicator HKU_API VOL(const KData& kdata) {
 Indicator HKU_API KDATA_PART(const KData& kdata, const string& part) {
     return Indicator(make_shared<IKData>(kdata, part));
 }
-
 
 //-----------------------------------------------------------
 Indicator HKU_API KDATA() {

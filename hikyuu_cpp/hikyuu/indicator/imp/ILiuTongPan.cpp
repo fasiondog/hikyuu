@@ -11,20 +11,15 @@
 BOOST_CLASS_EXPORT(hku::ILiuTongPan)
 #endif
 
-
 namespace hku {
 
-ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {
+ILiuTongPan::ILiuTongPan() : IndicatorImp("LIUTONGPAN", 1) {}
 
-}
-
-ILiuTongPan::~ILiuTongPan() {
-
-}
+ILiuTongPan::~ILiuTongPan() {}
 
 ILiuTongPan::ILiuTongPan(const KData& k) : IndicatorImp("LIUTONGPAN", 1) {
     setParam<KData>("kdata", k);
-    _calculate(Indicator());
+    ILiuTongPan::_calculate(Indicator());
 }
 
 bool ILiuTongPan::check() {
@@ -41,12 +36,12 @@ void ILiuTongPan::_calculate(const Indicator& data) {
     if (total == 0) {
         return;
     }
-    
+
     _readyBuffer(total, 1);
 
     Stock stock = k.getStock();
     StockWeightList sw_list = stock.getWeight();
-    if (sw_list.size() == 0){
+    if (sw_list.size() == 0) {
         return;
     }
 
@@ -56,7 +51,7 @@ void ILiuTongPan::_calculate(const Indicator& data) {
     for (; sw_iter != sw_list.end(); ++sw_iter) {
         price_t free_count = sw_iter->freeCount();
         if (free_count == 0) {
-            continue; //忽略流通盘为0的权息
+            continue;  //忽略流通盘为0的权息
         }
 
         while (pos < total && k[pos].datetime < sw_iter->datetime()) {
@@ -82,6 +77,5 @@ Indicator HKU_API LIUTONGPAN() {
 Indicator HKU_API LIUTONGPAN(const KData& k) {
     return Indicator(make_shared<ILiuTongPan>(k));
 }
-
 
 } /* namespace hku */

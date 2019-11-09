@@ -22,8 +22,8 @@ const string Stock::default_market_code;
 const string Stock::default_name;
 const uint32 Stock::default_type = Null<uint32>();
 const bool Stock::default_valid = false;
-const Datetime Stock::default_startDate;// = Null<Datetime>();
-const Datetime Stock::default_lastDate;// = Null<Datetime>();
+const Datetime Stock::default_startDate;  // = Null<Datetime>();
+const Datetime Stock::default_lastDate;   // = Null<Datetime>();
 const price_t Stock::default_tick = 0.01;
 const price_t Stock::default_tickValue = 0.01;
 const price_t Stock::default_unit = 1.0;
@@ -31,20 +31,17 @@ const int Stock::default_precision = 2;
 const size_t Stock::default_minTradeNumber = 100;
 const size_t Stock::default_maxTradeNumber = 1000000;
 
-HKU_API std::ostream& operator <<(std::ostream &os, const Stock& stock) {
+HKU_API std::ostream& operator<<(std::ostream& os, const Stock& stock) {
     string strip(", ");
     StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(stock.type()));
     os << "Stock(" << stock.market() << strip << stock.code() << strip
 #if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
-       << utf8_to_gb(stock.name()) << strip
-       << utf8_to_gb(typeInfo.description()) << strip
+       << utf8_to_gb(stock.name()) << strip << utf8_to_gb(typeInfo.description()) << strip
 #else
-       << stock.name() << strip
-       << typeInfo.description() << strip
+       << stock.name() << strip << typeInfo.description() << strip
 #endif
-       << stock.valid() << strip << stock.startDatetime() << strip
-       << stock.lastDatetime() << ")";
+       << stock.valid() << strip << stock.startDatetime() << strip << stock.lastDatetime() << ")";
     return os;
 }
 
@@ -53,14 +50,11 @@ string Stock::toString() const {
     string strip(", ");
     StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(type()));
-    os << "Stock(" << market() << strip << code() << strip
-       << name() << strip
-       << typeInfo.description() << strip
-       << valid() << strip << startDatetime() << strip
+    os << "Stock(" << market() << strip << code() << strip << name() << strip
+       << typeInfo.description() << strip << valid() << strip << startDatetime() << strip
        << lastDatetime() << ")";
     return os.str();
 }
-
 
 Stock::Data::Data()
 : m_market(default_market),
@@ -81,12 +75,9 @@ Stock::Data::Data()
     }*/
 }
 
-
-Stock::Data::Data(const string& market, const string& code,
-      const string& name, uint32 type, bool valid,
-      const Datetime& startDate, const Datetime& lastDate,
-      price_t tick, price_t tickValue, int precision,
-      size_t minTradeNumber, size_t maxTradeNumber)
+Stock::Data::Data(const string& market, const string& code, const string& name, uint32 type,
+                  bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
+                  price_t tickValue, int precision, size_t minTradeNumber, size_t maxTradeNumber)
 : m_market(market),
   m_code(code),
   m_name(name),
@@ -119,16 +110,9 @@ Stock::Data::~Data() {
     }*/
 }
 
+Stock::Stock() : m_kdataDriver(g_kdataDefaultDriver) {}
 
-Stock::Stock() {
-    m_kdataDriver = g_kdataDefaultDriver;
-}
-
-
-Stock::~Stock() {
-
-}
-
+Stock::~Stock() {}
 
 Stock::Stock(const Stock& x) {
     if (m_data != x.m_data)
@@ -138,9 +122,8 @@ Stock::Stock(const Stock& x) {
         m_kdataDriver = x.m_kdataDriver;
 }
 
-
 Stock& Stock::operator=(const Stock& x) {
-    if(this == &x)
+    if (this == &x)
         return *this;
 
     if (m_data != x.m_data)
@@ -151,43 +134,28 @@ Stock& Stock::operator=(const Stock& x) {
     return *this;
 }
 
-
-Stock::Stock(const string& market,
-        const string& code, const string& name) {
-    m_data = shared_ptr<Data>(
-            new Data(market, code, name,
-                    default_type, default_valid,
-                    default_startDate, default_lastDate,
-                    default_tick, default_tickValue, default_precision,
-                    default_minTradeNumber, default_maxTradeNumber));
+Stock::Stock(const string& market, const string& code, const string& name) {
+    m_data =
+      shared_ptr<Data>(new Data(market, code, name, default_type, default_valid, default_startDate,
+                                default_lastDate, default_tick, default_tickValue,
+                                default_precision, default_minTradeNumber, default_maxTradeNumber));
     m_kdataDriver = g_kdataDefaultDriver;
 }
 
-
-Stock::Stock(const string& market, const string& code,
-      const string& name, uint32 type, bool valid,
-      const Datetime& startDate, const Datetime& lastDate) {
-    m_data = shared_ptr<Data>(
-            new Data(market, code, name, type, valid,
-                     startDate, lastDate,
-                     default_tick, default_tickValue, default_precision,
-                     default_minTradeNumber, default_maxTradeNumber));
+Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
+             const Datetime& startDate, const Datetime& lastDate) {
+    m_data = shared_ptr<Data>(new Data(market, code, name, type, valid, startDate, lastDate,
+                                       default_tick, default_tickValue, default_precision,
+                                       default_minTradeNumber, default_maxTradeNumber));
     m_kdataDriver = g_kdataDefaultDriver;
 }
 
-
-Stock::Stock(const string& market, const string& code,
-      const string& name, uint32 type, bool valid,
-      const Datetime& startDate, const Datetime& lastDate,
-      price_t tick, price_t tickValue, int precision,
-      size_t minTradeNumber, size_t maxTradeNumber) {
-    m_data = shared_ptr<Data>(
-            new Data(market, code, name, type, valid,
-                    startDate, lastDate, tick, tickValue, precision,
-                    minTradeNumber, maxTradeNumber));
-    m_kdataDriver = g_kdataDefaultDriver;
-}
-
+Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
+             const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
+             int precision, size_t minTradeNumber, size_t maxTradeNumber)
+: m_data(make_shared<Data>(market, code, name, type, valid, startDate, lastDate, tick, tickValue,
+                           precision, minTradeNumber, maxTradeNumber)),
+  m_kdataDriver(g_kdataDefaultDriver) {}
 
 bool Stock::operator!=(const Stock& stock) const {
     if (this == &stock)
@@ -199,7 +167,7 @@ bool Stock::operator!=(const Stock& stock) const {
     if (!m_data || !stock.m_data)
         return true;
 
-    if( m_data->m_code != stock.code() || m_data->m_market != stock.market())
+    if (m_data->m_code != stock.code() || m_data->m_market != stock.market())
         return true;
 
     return false;
@@ -266,7 +234,7 @@ size_t Stock::maxTradeNumber() const {
 }
 
 void Stock::setKDataDriver(const KDataDriverPtr& kdataDriver) {
-    if (!kdataDriver) {//防止被置为空指针
+    if (!kdataDriver) {  //防止被置为空指针
         m_kdataDriver = g_kdataDefaultDriver;
     }
     m_kdataDriver = kdataDriver;
@@ -285,11 +253,9 @@ void Stock::setWeightList(const StockWeightList& weightList) {
         m_data->m_weightList = weightList;
 }
 
-
 KDataDriverPtr Stock::getKDataDriver() const {
     return m_kdataDriver;
 }
-
 
 bool Stock::isBuffer(KQuery::KType ktype) const {
     if (!m_data)
@@ -304,51 +270,45 @@ bool Stock::isNull() const {
     return false;
 }
 
-
 void Stock::releaseKDataBuffer(KQuery::KType kType) {
-    //if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    // if (!m_data || kType >= KQuery::INVALID_KTYPE)
     if (!m_data)
         return;
 
-    //if (m_data->pKData[kType])
-    //if (m_data->pKData.find(kType) != m_data->pKData.end())
-        //m_data->pKData[kType] = KRecordListPtr();
+    // if (m_data->pKData[kType])
+    // if (m_data->pKData.find(kType) != m_data->pKData.end())
+    // m_data->pKData[kType] = KRecordListPtr();
     m_data->pKData.erase(kType);
     return;
 }
 
-
 void Stock::loadKDataToBuffer(KQuery::KType kType) {
-    //if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    // if (!m_data || kType >= KQuery::INVALID_KTYPE)
     if (!m_data)
         return;
 
     releaseKDataBuffer(kType);
     m_data->pKData[kType] = make_shared<KRecordList>();
-    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code,
-            kType, 0, Null<size_t>(), m_data->pKData[kType]);
+    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(),
+                             m_data->pKData[kType]);
     return;
 }
 
-
-StockWeightList Stock::getWeight(const Datetime& start,
-                                 const Datetime& end) const {
+StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     if (!m_data || start >= end)
         return result;
 
     StockWeightList::const_iterator start_iter, end_iter;
-    start_iter = lower_bound(m_data->m_weightList.begin(),
-                             m_data->m_weightList.end(),
-                             start, std::less<StockWeight>());
-    if( start_iter == m_data->m_weightList.end() ) {
+    start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(), start,
+                             std::less<StockWeight>());
+    if (start_iter == m_data->m_weightList.end()) {
         return result;
     }
 
-    end_iter = lower_bound(start_iter,
-                  (StockWeightList::const_iterator)m_data->m_weightList.end(),
-                   end, std::less<StockWeight>());
-    for(; start_iter != end_iter; ++start_iter) {
+    end_iter = lower_bound(start_iter, (StockWeightList::const_iterator)m_data->m_weightList.end(),
+                           end, std::less<StockWeight>());
+    for (; start_iter != end_iter; ++start_iter) {
         result.push_back(*start_iter);
     }
 
@@ -359,9 +319,8 @@ KData Stock::getKData(const KQuery& query) const {
     return KData(*this, query);
 }
 
-
 size_t Stock::getCount(KQuery::KType kType) const {
-    //if (!m_data || kType >= KQuery::INVALID_KTYPE)
+    // if (!m_data || kType >= KQuery::INVALID_KTYPE)
     if (!m_data)
         return 0;
 
@@ -372,9 +331,7 @@ size_t Stock::getCount(KQuery::KType kType) const {
     return m_kdataDriver->getCount(market(), code(), kType);
 }
 
-
-price_t Stock
-::getMarketValue(const Datetime& datetime, KQuery::KType ktype) const{
+price_t Stock ::getMarketValue(const Datetime& datetime, KQuery::KType ktype) const {
     if (isNull()) {
         return 0.0;
     }
@@ -412,9 +369,7 @@ price_t Stock
     return price;
 }
 
-
-bool
-Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end)  const{
+bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const {
     out_start = 0;
     out_end = 0;
     if (!m_data || !m_kdataDriver)
@@ -424,16 +379,16 @@ Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end)  c
         return _getIndexRangeByIndex(query, out_start, out_end);
 
     if ((KQuery::DATE != query.queryType())
-            //|| (query.kType() >= KQuery::INVALID_KTYPE)
-            || query.startDatetime() >= query.endDatetime())
+        //|| (query.kType() >= KQuery::INVALID_KTYPE)
+        || query.startDatetime() >= query.endDatetime())
         return false;
 
     if (isBuffer(query.kType())) {
         return _getIndexRangeByDateFromBuffer(query, out_start, out_end);
     }
 
-    if (!m_kdataDriver->getIndexRangeByDate(m_data->m_market, m_data->m_code,
-            query, out_start, out_end)) {
+    if (!m_kdataDriver->getIndexRangeByDate(m_data->m_market, m_data->m_code, query, out_start,
+                                            out_end)) {
         out_start = 0;
         out_end = 0;
         return false;
@@ -442,8 +397,7 @@ Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end)  c
     return true;
 }
 
-bool Stock::
-_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) const {
+bool Stock::_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) const {
     assert(query.queryType() == KQuery::INDEX);
     out_start = 0;
     out_end = 0;
@@ -455,16 +409,16 @@ _getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) c
 
     int64 startix, endix;
     startix = query.start();
-    if(startix < 0) {
+    if (startix < 0) {
         startix += total;
-        if(startix < 0)
+        if (startix < 0)
             startix = 0;
     }
 
     endix = query.end();
-    if(endix < 0) {
+    if (endix < 0) {
         endix += total;
-        if(endix < 0)
+        if (endix < 0)
             endix = 0;
     }
 
@@ -474,7 +428,7 @@ _getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) c
 
     try {
         startpos = boost::numeric_cast<size_t>(startix);
-    } catch(...) {
+    } catch (...) {
         startpos = null_size_t;
     }
 
@@ -484,11 +438,11 @@ _getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) c
         endpos = null_size_t;
     }
 
-    if(endpos > total) {
+    if (endpos > total) {
         endpos = total;
     }
 
-    if(startpos >= endpos) {
+    if (startpos >= endpos) {
         return false;
     }
 
@@ -497,42 +451,40 @@ _getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t& out_end) c
     return true;
 }
 
-
-bool Stock::
-_getIndexRangeByDateFromBuffer(const KQuery& query,
-        size_t& out_start, size_t& out_end) const {
+bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_start,
+                                           size_t& out_end) const {
     out_start = 0;
     out_end = 0;
 
     //总数为0，视为失败
     size_t total = getCount(query.kType());
-    if( 0 == total ){
+    if (0 == total) {
         return false;
     }
 
     KRecordList& kdata = *(m_data->pKData[query.kType()]);
     size_t mid, low = 0, high = total - 1;
     size_t startpos, endpos;
-    while(low <= high) {
-        if(query.startDatetime() > kdata[high].datetime) {
+    while (low <= high) {
+        if (query.startDatetime() > kdata[high].datetime) {
             mid = high + 1;
             break;
         }
 
-        if(kdata[low].datetime >= query.startDatetime()) {
+        if (kdata[low].datetime >= query.startDatetime()) {
             mid = low;
             break;
         }
 
         mid = (low + high) / 2;
-        if(query.startDatetime() > kdata[mid].datetime) {
+        if (query.startDatetime() > kdata[mid].datetime) {
             low = mid + 1;
         } else {
             high = mid - 1;
         }
     }
 
-    if(mid >= total) {
+    if (mid >= total) {
         return false;
     }
 
@@ -540,19 +492,19 @@ _getIndexRangeByDateFromBuffer(const KQuery& query,
 
     low = mid;
     high = total - 1;
-    while(low <= high) {
-        if(query.endDatetime() > kdata[high].datetime) {
+    while (low <= high) {
+        if (query.endDatetime() > kdata[high].datetime) {
             mid = high + 1;
             break;
         }
 
-        if(kdata[low].datetime >= query.endDatetime()) {
+        if (kdata[low].datetime >= query.endDatetime()) {
             mid = low;
             break;
         }
 
         mid = (low + high) / 2;
-        if(query.endDatetime() > kdata[mid].datetime) {
+        if (query.endDatetime() > kdata[mid].datetime) {
             low = mid + 1;
         } else {
             high = mid - 1;
@@ -560,7 +512,7 @@ _getIndexRangeByDateFromBuffer(const KQuery& query,
     }
 
     endpos = (mid >= total) ? total : mid;
-    if(startpos >= endpos) {
+    if (startpos >= endpos) {
         return false;
     }
 
@@ -570,9 +522,7 @@ _getIndexRangeByDateFromBuffer(const KQuery& query,
     return true;
 }
 
-
-KRecord Stock
-::getKRecord(size_t pos, KQuery::KType kType) const {
+KRecord Stock ::getKRecord(size_t pos, KQuery::KType kType) const {
     if (!m_data)
         return KRecord();
 
@@ -582,14 +532,12 @@ KRecord Stock
     return m_kdataDriver->getKRecord(market(), code(), pos, kType);
 }
 
-
-KRecordList Stock
-::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType ktype) const {
+KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType ktype) const {
     KRecordList result;
     if (!m_data)
         return result;
 
-    //if (m_data->pKData[ktype]) {
+    // if (m_data->pKData[ktype]) {
     if (m_data->pKData.find(ktype) != m_data->pKData.end()) {
         size_t total = m_data->pKData[ktype]->size();
         if (start_ix >= end_ix || start_ix > total) {
@@ -606,8 +554,7 @@ KRecordList Stock
     }
 
     KRecordListPtr plist(new KRecordList);
-    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code,
-            ktype, start_ix, end_ix, plist);
+    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, ktype, start_ix, end_ix, plist);
     size_t total = plist->size();
     result.reserve(total);
     for (size_t i = 0; i < total; i++) {
@@ -616,9 +563,7 @@ KRecordList Stock
     return result;
 }
 
-
-DatetimeList Stock
-::getDatetimeList(size_t start, size_t end, KQuery::KType ktype) const {
+DatetimeList Stock ::getDatetimeList(size_t start, size_t end, KQuery::KType ktype) const {
     DatetimeList result;
     KRecordList kdata = getKRecordList(start, end, ktype);
     size_t total = kdata.size();
@@ -642,18 +587,13 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
     return result;
 }
 
-
 TimeLineList Stock::getTimeLineList(const KQuery& query) const {
-    return isNull() ? TimeLineList()
-                    :m_kdataDriver->getTimeLineList(market(), code(), query);
+    return isNull() ? TimeLineList() : m_kdataDriver->getTimeLineList(market(), code(), query);
 }
-
 
 TransList Stock::getTransList(const KQuery& query) const {
-    return isNull() ? TransList()
-                    :m_kdataDriver->getTransList(market(), code(), query);
+    return isNull() ? TransList() : m_kdataDriver->getTransList(market(), code(), query);
 }
-
 
 Parameter Stock::getFinanceInfo() const {
     Parameter result;
@@ -665,10 +605,9 @@ Parameter Stock::getFinanceInfo() const {
     if (driver) {
         result = driver->getFinanceInfo(market(), code());
     }
-    
+
     return result;
 }
-
 
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     if (type() == STOCKTYPE_A) {
@@ -680,9 +619,7 @@ PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     return PriceList();
 }
 
-
-KRecord Stock::
-getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
+KRecord Stock::getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
     size_t startix = 0, endix = 0;
     KQuery query = KQueryByDate(datetime, Datetime(datetime.number() + 1), ktype);
     if (getIndexRange(query, startix, endix)) {
@@ -692,11 +629,9 @@ getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
     return Null<KRecord>();
 }
 
-
 void Stock::realtimeUpdate(const KRecord& record) {
-    //if (!m_data || !m_data->pKData[KQuery::DAY] ||
-    if (!isBuffer(KQuery::DAY) ||
-            record.datetime == Null<Datetime>()) {
+    // if (!m_data || !m_data->pKData[KQuery::DAY] ||
+    if (!isBuffer(KQuery::DAY) || record.datetime == Null<Datetime>()) {
         return;
     }
 
@@ -705,7 +640,7 @@ void Stock::realtimeUpdate(const KRecord& record) {
         return;
     }
 
-    KRecord &tmp = m_data->pKData[KQuery::DAY]->back();
+    KRecord& tmp = m_data->pKData[KQuery::DAY]->back();
     if (tmp.datetime == record.datetime) {
         tmp = record;
     } else if (tmp.datetime < record.datetime) {
@@ -715,11 +650,9 @@ void Stock::realtimeUpdate(const KRecord& record) {
     }
 }
 
-
 Stock HKU_API getStock(const string& querystr) {
     StockManager& sm = StockManager::instance();
     return sm.getStock(querystr);
 }
 
-
-} /* namespace */
+}  // namespace hku

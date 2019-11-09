@@ -10,40 +10,37 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream &out, const Datetime& d) {
+HKU_API std::ostream& operator<<(std::ostream& out, const Datetime& d) {
     if (d == Null<Datetime>()) {
         out << "+infinity";
     } else {
-        out << d.year() << "-" << d.month() << "-" << d.day() << " "
-            << d.hour() << ":" << d.minute() << ":" << d.second();
+        out << d.year() << "-" << d.month() << "-" << d.day() << " " << d.hour() << ":"
+            << d.minute() << ":" << d.second();
     }
     return out;
 }
 
 Datetime::Datetime(unsigned long long datetime) {
-    if(Null<unsigned long long>() == datetime) {
+    if (Null<unsigned long long>() == datetime) {
         bd::date d(bd::pos_infin);
-        m_data = bt::ptime(d, bt::time_duration(0,0,0));
+        m_data = bt::ptime(d, bt::time_duration(0, 0, 0));
         return;
     }
 
     unsigned long long year, month, day, hh, mm;
-    year = datetime / 100000000;
-    month  = (datetime - year * 100000000) / 1000000;
-    day  = (datetime - datetime / 1000000 * 1000000) / 10000;
-    hh = (datetime - datetime / 10000 * 10000) / 100;
-    mm = (datetime - datetime / 100 * 100);
-    bd::date d((unsigned short)year,
-               (unsigned short)month,
-               (unsigned short)day);
-    if(hh >=24 ) {
+    year  = datetime / 100000000;
+    month = (datetime - year * 100000000) / 1000000;
+    day   = (datetime - datetime / 1000000 * 1000000) / 10000;
+    hh    = (datetime - datetime / 10000 * 10000) / 100;
+    mm    = (datetime - datetime / 100 * 100);
+    bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
+    if (hh >= 24) {
         throw std::out_of_range("Hour value is out of rang 0..23");
     }
-    if(mm >= 60) {
+    if (mm >= 60) {
         throw std::out_of_range("Minute value is out of range 0..59");
     }
-    m_data = bt::ptime(d, bt::time_duration((unsigned short)hh,
-                                            (unsigned short)mm, 0));
+    m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, 0));
 }
 
 Datetime& Datetime::operator=(const Datetime& d) {
@@ -55,10 +52,9 @@ Datetime& Datetime::operator=(const Datetime& d) {
     return *this;
 }
 
-
 std::string Datetime::toString() const {
     bd::date d(bd::pos_infin);
-    bt::ptime null_date = bt::ptime(d, bt::time_duration(0,0,0));
+    bt::ptime null_date = bt::ptime(d, bt::time_duration(0, 0, 0));
 
     if (m_data == null_date) {
         return "+infinity";
@@ -69,15 +65,13 @@ std::string Datetime::toString() const {
 }
 
 unsigned long long Datetime::number() const {
-    if(m_data.date() == bd::date(bd::pos_infin)) {
+    if (m_data.date() == bd::date(bd::pos_infin)) {
         return Null<unsigned long long>();
     }
 
-    return (unsigned long long)year() * 100000000
-            + (unsigned long long)month() * 1000000
-            + (unsigned long long)day() * 10000
-            + (unsigned long long)hour() * 100
-            + (unsigned long long)minute();
+    return (unsigned long long)year() * 100000000 + (unsigned long long)month() * 1000000 +
+           (unsigned long long)day() * 10000 + (unsigned long long)hour() * 100 +
+           (unsigned long long)minute();
 }
 
 Datetime Datetime::min() {
@@ -102,11 +96,11 @@ Datetime Datetime::today() {
 DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end) {
     DatetimeList result;
     bd::date start_day = start.date();
-    bd::date end_day = end.date();
+    bd::date end_day   = end.date();
     bd::date_period dp(start_day, end_day);
     bd::day_iterator iter = dp.begin();
     for (; iter != dp.end(); ++iter) {
-        result.push_back(*iter);
+        result.push_back(Datetime(*iter));
     }
     return result;
 }
@@ -121,7 +115,7 @@ Datetime Datetime::dateOfWeek(int day) const {
     } else if (dd > 6) {
         dd = 6;
     }
-    int today = dayOfWeek();
+    int today       = dayOfWeek();
     Datetime result = date() + bd::date_duration(dd - today);
     if (result > Datetime::max()) {
         result = Datetime::max();
@@ -148,7 +142,7 @@ Datetime Datetime::endOfYear() const {
 }
 
 Datetime Datetime::startOfWeek() const {
-    if (*this == Null<Datetime>()) 
+    if (*this == Null<Datetime>())
         return *this;
 
     Datetime result;
@@ -156,7 +150,8 @@ Datetime Datetime::startOfWeek() const {
     if (today == 0) {
         result = date() + bd::date_duration(-6);
     } else {
-        result = date() + bd::date_duration(1 - today);;
+        result = date() + bd::date_duration(1 - today);
+        ;
     }
 
     if (result < Datetime::min())
@@ -192,7 +187,7 @@ Datetime Datetime::startOfQuarter() const {
     if (m <= 3) {
         result = Datetime(y, 1, 1);
     } else if (m <= 6) {
-        result =  Datetime(y, 4, 1);
+        result = Datetime(y, 4, 1);
     } else if (m <= 9) {
         result = Datetime(y, 7, 1);
     } else if (m <= 12) {
@@ -212,7 +207,7 @@ Datetime Datetime::endOfQuarter() const {
     if (m <= 3) {
         result = Datetime(y, 3, 31);
     } else if (m <= 6) {
-        result =  Datetime(y, 6, 30);
+        result = Datetime(y, 6, 30);
     } else if (m <= 9) {
         result = Datetime(y, 9, 30);
     } else if (m <= 12) {
@@ -262,7 +257,7 @@ Datetime Datetime::nextMonth() const {
     result = endOfMonth().date() + bd::date_duration(1);
     if (result > Datetime::max())
         result = Datetime::max();
-    
+
     return result;
 }
 
@@ -311,10 +306,10 @@ Datetime Datetime::preWeek() const {
     Datetime result;
     if (*this == Null<Datetime>())
         return result;
-    
+
     try {
         result = Datetime(date() - bd::date_duration(7)).startOfWeek();
-    } catch(...) {
+    } catch (...) {
         result = Datetime::min();
     }
     return result;
@@ -326,9 +321,9 @@ Datetime Datetime::preMonth() const {
         return result;
 
     try {
-        int m = month();
-        result = (m == 1) ? Datetime(year()-1, 12, 1) : Datetime(year(), m-1, 1);
-    } catch(...) {
+        int m  = month();
+        result = (m == 1) ? Datetime(year() - 1, 12, 1) : Datetime(year(), m - 1, 1);
+    } catch (...) {
         result = Datetime::min();
     }
     return result;
@@ -340,9 +335,9 @@ Datetime Datetime::preQuarter() const {
         return result;
 
     try {
-        int m = startOfQuarter().month();
-        result = (m == 1) ? Datetime(year()-1, 10, 1) : Datetime(year(), m-3, 1);
-    } catch(...) {
+        int m  = startOfQuarter().month();
+        result = (m == 1) ? Datetime(year() - 1, 10, 1) : Datetime(year(), m - 3, 1);
+    } catch (...) {
         result = Datetime::min();
     }
 
@@ -355,9 +350,9 @@ Datetime Datetime::preHalfyear() const {
         return result;
 
     try {
-        int m = startOfHalfyear().month();
-        result = (m <= 6) ? Datetime(year()-1, 7, 1) : Datetime(year(), 1, 1);
-    } catch(...) {
+        int m  = startOfHalfyear().month();
+        result = (m <= 6) ? Datetime(year() - 1, 7, 1) : Datetime(year(), 1, 1);
+    } catch (...) {
         result = Datetime::min();
     }
 
@@ -370,11 +365,11 @@ Datetime Datetime::preYear() const {
         return result;
 
     try {
-        result = Datetime(year()-1, 1, 1);
-    } catch(...) {
+        result = Datetime(year() - 1, 1, 1);
+    } catch (...) {
         result = Datetime::min();
     }
-    
+
     return result;
 }
 
@@ -383,10 +378,9 @@ Datetime Datetime::endOfDay() const {
     if (*this == Null<Datetime>()) {
         return result;
     }
-    
-    result = date() != bd::date(bd::max_date_time) 
-               ? Datetime(year(), month(), day(), 23, 59, 59) 
-               : Datetime::max();
+
+    result = date() != bd::date(bd::max_date_time) ? Datetime(year(), month(), day(), 23, 59, 59)
+                                                   : Datetime::max();
     return result;
 }
 

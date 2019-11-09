@@ -14,7 +14,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #if defined(_MSC_VER)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
 #ifndef HKU_API
@@ -37,8 +37,7 @@ public:
     Datetime();
 
     Datetime(const Datetime&);
-    Datetime(int year, int month, int day,
-             int hh = 0, int mm = 0, int sec = 0);
+    Datetime(int year, int month, int day, int hh = 0, int mm = 0, int sec = 0);
 
     /** 从boost::gregorian::date构造日期类型 */
     Datetime(const bd::date&);
@@ -83,7 +82,7 @@ public:
 
     /** 当日起始日期，即0点 */
     Datetime startOfDay() const;
-    
+
     /** 当日结束日期，即23:59:59 */
     Datetime endOfDay() const;
 
@@ -175,14 +174,13 @@ private:
     bt::ptime m_data;
 };
 
-HKU_API std::ostream & operator<<(std::ostream &, const Datetime&);
+HKU_API std::ostream& operator<<(std::ostream&, const Datetime&);
 
 /**
  * 日期列表
  * @ingroup DataType
  */
 typedef std::vector<Datetime> DatetimeList;
-
 
 /**
  * 获取指定范围的日历日期列表[start, end)，仅仅是日，不含时分秒
@@ -191,7 +189,6 @@ typedef std::vector<Datetime> DatetimeList;
  * @return [start, end)范围内的日历日期
  */
 DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end);
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -237,32 +234,25 @@ inline bool operator<=(const Datetime& d1, const Datetime& d2) {
 
 inline Datetime::Datetime() {
     bd::date d(bd::pos_infin);
-    m_data = bt::ptime(d, bt::time_duration(0,0,0));
+    m_data = bt::ptime(d, bt::time_duration(0, 0, 0));
 }
 
-inline Datetime::Datetime(const Datetime& d) {
-    m_data = d.m_data;
-}
+inline Datetime::Datetime(const Datetime& d) : m_data(d.m_data) {}
 
-inline Datetime::Datetime(const bd::date& d) {
-    m_data = bt::ptime(d, bt::time_duration(0,0,0));
-}
+inline Datetime::Datetime(const bd::date& d) : m_data(bt::ptime(d, bt::time_duration(0, 0, 0))) {}
 
-inline Datetime::Datetime(const bt::ptime& d) {
-    m_data = d;
-}
+inline Datetime::Datetime(const bt::ptime& d) : m_data(d) {}
 
 inline Datetime::Datetime(const std::string& ts) {
     if (ts == "+infinity") {
         bd::date d(bd::pos_infin);
-        m_data = bt::ptime(d, bt::time_duration(0,0,0));
+        m_data = bt::ptime(d, bt::time_duration(0, 0, 0));
     } else {
         m_data = bt::time_from_string(ts);
     }
 }
 
-inline Datetime::Datetime(int year, int month, int day,
-                           int hh, int mm, int sec) {
+inline Datetime::Datetime(int year, int month, int day, int hh, int mm, int sec) {
     bd::date d(year, month, day);
     m_data = bt::ptime(d, bt::time_duration(hh, mm, sec));
 }
