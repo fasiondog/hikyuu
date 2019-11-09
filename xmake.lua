@@ -25,11 +25,8 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
-add_requires("fmt", {configs = {vs_runtime = "MD"}})
-add_requires("spdlog", {configs = {header_only = true}})
-
--- use fmt, spdlog
-add_defines("FMT_HEADER_ONLY=1")
+add_requires("fmt", {configs = {header_only = false, vs_runtime = "MD"}})
+add_requires("spdlog", {configs = {header_only = false, vs_runtime = "MD"}})
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
