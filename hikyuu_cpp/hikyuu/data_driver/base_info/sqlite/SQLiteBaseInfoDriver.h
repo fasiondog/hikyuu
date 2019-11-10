@@ -21,11 +21,11 @@ public:
     SQLiteBaseInfoDriver();
     virtual ~SQLiteBaseInfoDriver();
 
-    virtual bool _init();
-    virtual bool _loadMarketInfo();
-    virtual bool _loadStockTypeInfo();
-    virtual bool _loadStock();
-    virtual Parameter getFinanceInfo(const string& market, const string& code);
+    virtual bool _init() override;
+    virtual bool _loadMarketInfo() override;
+    virtual bool _loadStockTypeInfo() override;
+    virtual bool _loadStock() override;
+    virtual Parameter getFinanceInfo(const string& market, const string& code) override;
 
 private:
     StockWeightList _getStockWeightList(uint64 stockid);

@@ -1343,8 +1343,8 @@ FundsRecord TradeManager ::getFunds(KQuery::KType ktype) const {
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
-    price_t price = 0.0;
-    price_t value = 0.0;  //当前市值
+    price_t price(0.0);
+    price_t value(0.0);  //当前市值
     position_map_type::const_iterator iter = m_position.begin();
     for (; iter != m_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
@@ -1560,10 +1560,9 @@ FundsRecord TradeManager ::getFunds(const Datetime& indatetime, KQuery::KType kt
 
                 } else {
                     BorrowRecord& bor = bor_stock_iter->second;
-                    list<BorrowRecord::Data>::iterator bor_iter = bor.record_list.begin();
                     size_t remain_num = iter->number;
                     do {
-                        bor_iter = bor.record_list.begin();
+                        list<BorrowRecord::Data>::iterator bor_iter = bor.record_list.begin();
                         if (remain_num == bor_iter->number) {
                             funds.borrow_asset -=
                               roundEx(bor_iter->price * remain_num * iter->stock.unit(), precision);
@@ -1796,20 +1795,18 @@ void TradeManager::_saveAction(const TradeRecord& record) {
 }
 
 void TradeManager::tocsv(const string& path) {
-    string filename1, filename2, filename3, filename4, filename5;
+    string filename1, filename2, filename3, filename4;
     if (m_name.empty()) {
         string date = m_init_datetime.toString();
         filename1 = path + "/" + date + "_交易记录.csv";
         filename2 = path + "/" + date + "_已平仓记录.csv";
         filename3 = path + "/" + date + "_未平仓记录.csv";
-        filename4 = path + "/" + date + "_资产净值.csv";
-        filename5 = path + "/" + date + "_actions.txt";
+        filename4 = path + "/" + date + "_actions.txt";
     } else {
         filename1 = path + "/" + m_name + "_交易记录.csv";
         filename2 = path + "/" + m_name + "_已平仓记录.csv";
         filename3 = path + "/" + m_name + "_未平仓记录.csv";
-        filename4 = path + "/" + m_name + "_资产净值.csv";
-        filename5 = path + "/" + m_name + "_actions.txt";
+        filename4 = path + "/" + m_name + "_actions.txt";
     }
 
     string sep(",");
@@ -1925,7 +1922,7 @@ void TradeManager::tocsv(const string& path) {
 
     //到处执行命令
     //导出已平仓记录
-    file.open(filename5.c_str());
+    file.open(filename4.c_str());
     if (!file) {
         HKU_ERROR("Can't create file!");
         return;

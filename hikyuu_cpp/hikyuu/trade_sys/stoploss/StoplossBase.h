@@ -154,11 +154,11 @@ private:                                                       \
 
 #define STOPLOSS_IMP(classname, str_name)    \
 public:                                      \
-    virtual StoplossPtr _clone() {           \
+    virtual StoplossPtr _clone() override {  \
         return StoplossPtr(new classname()); \
     }                                        \
-    virtual void _calculate();               \
-    virtual price_t getPrice(const Datetime&, price_t);
+    virtual void _calculate() override;      \
+    virtual price_t getPrice(const Datetime&, price_t) override;
 
 /**
  * 客户程序都应使用该指针类型，操作止损策略实例

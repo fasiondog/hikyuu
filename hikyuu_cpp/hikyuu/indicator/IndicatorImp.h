@@ -276,10 +276,10 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_NEED_CONTEXT           \
-public:                                  \
-    virtual bool isNeedContext() const { \
-        return true;                     \
+#define INDICATOR_NEED_CONTEXT                    \
+public:                                           \
+    virtual bool isNeedContext() const override { \
+        return true;                              \
     }
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;

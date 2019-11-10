@@ -32,7 +32,7 @@ public:
      * @return CostRecord 交易成本记录
      */
     virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  size_t num) const;
+                                  size_t num) const override;
 
     /**
      * 计算卖出成本
@@ -43,10 +43,10 @@ public:
      * @return CostRecord 交易成本记录
      */
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                   size_t num) const;
+                                   size_t num) const override;
 
     /** 子类私有变量克隆接口 */
-    virtual TradeCostPtr _clone();
+    virtual TradeCostPtr _clone() override;
 };
 
 } /* namespace hku */

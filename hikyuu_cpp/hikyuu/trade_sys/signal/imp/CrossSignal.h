@@ -20,8 +20,8 @@ public:
     CrossSignal(const Indicator& fast, const Indicator& slow, const string& kpart);
     virtual ~CrossSignal();
 
-    virtual SignalPtr _clone();
-    virtual void _calculate();
+    virtual SignalPtr _clone() override;
+    virtual void _calculate() override;
 
 private:
     Indicator m_fast;

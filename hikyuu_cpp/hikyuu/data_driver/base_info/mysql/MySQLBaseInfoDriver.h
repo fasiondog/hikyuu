@@ -24,10 +24,10 @@ public:
     MySQLBaseInfoDriver() : BaseInfoDriver("mysql") {}
     virtual ~MySQLBaseInfoDriver();
 
-    virtual bool _init();
-    virtual bool _loadMarketInfo();
-    virtual bool _loadStockTypeInfo();
-    virtual bool _loadStock();
+    virtual bool _init() override;
+    virtual bool _loadMarketInfo() override;
+    virtual bool _loadStockTypeInfo() override;
+    virtual bool _loadStock() override;
 
 private:
     bool _getStockWeightList(uint64, StockWeightList&);

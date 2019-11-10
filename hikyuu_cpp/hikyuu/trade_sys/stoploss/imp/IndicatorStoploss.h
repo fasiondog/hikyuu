@@ -20,10 +20,10 @@ public:
     IndicatorStoploss(const Indicator& op, const string& kdata_part);
     virtual ~IndicatorStoploss();
 
-    virtual price_t getPrice(const Datetime& datetime, price_t price);
-    virtual void _reset();
-    virtual StoplossPtr _clone();
-    virtual void _calculate();
+    virtual price_t getPrice(const Datetime& datetime, price_t price) override;
+    virtual void _reset() override;
+    virtual StoplossPtr _clone() override;
+    virtual void _calculate() override;
 
 private:
     Indicator m_op;

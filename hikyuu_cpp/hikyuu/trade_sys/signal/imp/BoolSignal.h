@@ -20,8 +20,8 @@ public:
     BoolSignal(const Indicator& buy, const Indicator& sell, const string& kpart);
     virtual ~BoolSignal();
 
-    virtual SignalPtr _clone();
-    virtual void _calculate();
+    virtual SignalPtr _clone() override;
+    virtual void _calculate() override;
 
 private:
     Indicator m_bool_buy;

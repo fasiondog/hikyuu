@@ -52,7 +52,7 @@ void Ama::_calculate(const Indicator& data) {
     price_t slowest = 2.0 / (slow_n + 1);
     price_t delta = fastest - slowest;
 
-    price_t prevol = 0.0, vol = 0.0, er = 1.0, c = 0.0;
+    price_t prevol = 0.0, vol = 0.0, er = 1.0, c(0.0);
     price_t ama = data[start];
     size_t first_end = start + n + 1 >= total ? total : start + n + 1;
     _set(ama, start, 0);

@@ -89,16 +89,16 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        string name(GBToUTF8(m_name));
-        ar& boost::serialization::make_nvp("m_name", name);
+        string tmp_name(GBToUTF8(m_name));
+        ar& boost::serialization::make_nvp("m_name", tmp_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        string name;
-        ar& boost::serialization::make_nvp("m_name", name);
-        m_name = UTF8ToGB(name);
+        string tmp_name;
+        ar& boost::serialization::make_nvp("m_name", tmp_name);
+        m_name = UTF8ToGB(tmp_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
@@ -135,14 +135,14 @@ private:                                                       \
 #define SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define SLIPPAGE_IMP(classname)                                 \
-public:                                                         \
-    virtual SlippagePtr _clone() {                              \
-        return SlippagePtr(new classname());                    \
-    }                                                           \
-    virtual price_t getRealBuyPrice(const Datetime&, price_t);  \
-    virtual price_t getRealSellPrice(const Datetime&, price_t); \
-    virtual void _calculate();
+#define SLIPPAGE_IMP(classname)                                          \
+public:                                                                  \
+    virtual SlippagePtr _clone() override {                              \
+        return SlippagePtr(new classname());                             \
+    }                                                                    \
+    virtual price_t getRealBuyPrice(const Datetime&, price_t) override;  \
+    virtual price_t getRealSellPrice(const Datetime&, price_t) override; \
+    virtual void _calculate() override;
 
 /**
  * 客户程序都应使用该指针类型，操作移滑价差算法

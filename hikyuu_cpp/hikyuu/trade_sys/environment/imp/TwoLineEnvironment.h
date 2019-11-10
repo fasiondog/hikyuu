@@ -20,8 +20,8 @@ public:
     TwoLineEnvironment(const Indicator& fast, const Indicator& slow);
     virtual ~TwoLineEnvironment();
 
-    virtual void _calculate();
-    virtual EnvironmentPtr _clone();
+    virtual void _calculate() override;
+    virtual EnvironmentPtr _clone() override;
 
 private:
     Indicator m_fast;

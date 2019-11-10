@@ -18,10 +18,10 @@ public:
     FixedRatioMoneyManager();
     virtual ~FixedRatioMoneyManager();
 
-    virtual void _reset();
-    virtual MoneyManagerPtr _clone();
+    virtual void _reset() override;
+    virtual MoneyManagerPtr _clone() override;
     virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                 price_t risk, SystemPart from);
+                                 price_t risk, SystemPart from) override;
 
 private:
     int m_current_num;

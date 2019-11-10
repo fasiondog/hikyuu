@@ -20,9 +20,9 @@ public:
     OPLineCondition(const Indicator&);
     virtual ~OPLineCondition();
 
-    virtual void _calculate();
-    virtual void _reset();
-    virtual ConditionPtr _clone();
+    virtual void _calculate() override;
+    virtual void _reset() override;
+    virtual ConditionPtr _clone() override;
 
 private:
     Indicator m_op;

@@ -173,10 +173,10 @@ private:                                                      \
 
 #define SIGNAL_IMP(classname)              \
 public:                                    \
-    virtual SignalPtr _clone() {           \
+    virtual SignalPtr _clone() override {  \
         return SignalPtr(new classname()); \
     }                                      \
-    virtual void _calculate();
+    virtual void _calculate() override;
 
 /**
  * 客户程序都应使用该指针类型，操作信号指示器

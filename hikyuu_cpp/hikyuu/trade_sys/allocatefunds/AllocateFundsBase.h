@@ -166,10 +166,10 @@ private:                                                            \
 
 #define ALLOCATEFUNDS_IMP(classname)   \
 public:                                \
-    virtual AFPtr _clone() {           \
+    virtual AFPtr _clone() override {  \
         return AFPtr(new classname()); \
     }                                  \
-    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemList&);
+    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemList&) override;
 
 typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
 typedef shared_ptr<AllocateFundsBase> AFPtr;

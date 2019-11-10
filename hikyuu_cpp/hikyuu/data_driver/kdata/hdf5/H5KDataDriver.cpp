@@ -948,7 +948,7 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
     H5TimeLineRecord* pBuf = NULL;
     try {
         string tablename(market + code);
-        H5::DataSet dataset(group.openDataSet(tablename));
+        dataset = group.openDataSet(tablename);
 
         size_t total = endpos - startpos;
         pBuf = new H5TimeLineRecord[total];
@@ -1167,7 +1167,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     H5TransRecord* pBuf = NULL;
     try {
         string tablename(market + code);
-        H5::DataSet dataset(group.openDataSet(tablename));
+        dataset = group.openDataSet(tablename);
 
         size_t total = endpos - startpos;
         pBuf = new H5TransRecord[total];

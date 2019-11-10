@@ -29,9 +29,9 @@ public:
     SQLiteConnect(const Parameter& param);
     virtual ~SQLiteConnect() {}
 
-    virtual void exec(const string& sql_string);
-    virtual SQLStatementPtr getStatement(const string& sql_statement);
-    virtual bool tableExist(const string& tablename);
+    virtual void exec(const string& sql_string) override;
+    virtual SQLStatementPtr getStatement(const string& sql_statement) override;
+    virtual bool tableExist(const string& tablename) override;
 
 private:
     friend class SQLiteStatement;

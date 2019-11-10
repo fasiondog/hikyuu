@@ -19,11 +19,11 @@ public:
     KDataBufferImp(const Stock& stock, const KQuery& query);
     virtual ~KDataBufferImp();
 
-    virtual KRecord getKRecord(size_t pos) const {
+    virtual KRecord getKRecord(size_t pos) const override {
         return m_buffer[pos];
     }
 
-    virtual size_t getPos(const Datetime& datetime) const;
+    virtual size_t getPos(const Datetime& datetime) const override;
 
 private:
     void _recoverForward();

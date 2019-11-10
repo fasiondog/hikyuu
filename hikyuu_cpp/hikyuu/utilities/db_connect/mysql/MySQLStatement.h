@@ -28,21 +28,21 @@ public:
     MySQLStatement(const DBConnectPtr& driver, const string& sql_statement);
     virtual ~MySQLStatement();
 
-    virtual bool sub_isValid() const;
-    virtual void sub_exec();
-    virtual bool sub_moveNext();
+    virtual bool sub_isValid() const override;
+    virtual void sub_exec() override;
+    virtual bool sub_moveNext() override;
 
-    virtual void sub_bindNull(int idx);
-    virtual void sub_bindInt(int idx, int64 value);
-    virtual void sub_bindDouble(int idx, double item);
-    virtual void sub_bindText(int idx, const string& item);
-    virtual void sub_bindBlob(int idx, const string& item);
+    virtual void sub_bindNull(int idx) override;
+    virtual void sub_bindInt(int idx, int64 value) override;
+    virtual void sub_bindDouble(int idx, double item) override;
+    virtual void sub_bindText(int idx, const string& item) override;
+    virtual void sub_bindBlob(int idx, const string& item) override;
 
-    virtual int sub_getNumColumns() const;
-    virtual void sub_getColumnAsInt64(int idx, int64& item);
-    virtual void sub_getColumnAsDouble(int idx, double& item);
-    virtual void sub_getColumnAsText(int idx, string& item);
-    virtual void sub_getColumnAsBlob(int idx, string& item);
+    virtual int sub_getNumColumns() const override;
+    virtual void sub_getColumnAsInt64(int idx, int64& item) override;
+    virtual void sub_getColumnAsDouble(int idx, double& item) override;
+    virtual void sub_getColumnAsText(int idx, string& item) override;
+    virtual void sub_getColumnAsBlob(int idx, string& item) override;
 
 private:
     void _reset();

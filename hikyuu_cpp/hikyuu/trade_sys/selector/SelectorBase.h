@@ -126,10 +126,10 @@ private:                                                       \
 
 #define SELECTOR_IMP(classname)              \
 public:                                      \
-    virtual SelectorPtr _clone() {           \
+    virtual SelectorPtr _clone() override {  \
         return SelectorPtr(new classname()); \
     }                                        \
-    virtual SystemList getSelectedSystemList(Datetime date);
+    virtual SystemList getSelectedSystemList(Datetime date) override;
 
 /**
  * 客户程序都应使用该指针类型

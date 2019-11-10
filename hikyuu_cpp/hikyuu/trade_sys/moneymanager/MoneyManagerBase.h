@@ -160,8 +160,8 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        string name(GBToUTF8(m_name));
-        ar& boost::serialization::make_nvp("m_name", name);
+        string tmp_name(GBToUTF8(m_name));
+        ar& boost::serialization::make_nvp("m_name", tmp_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         // m_query、m_tm都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_query);
@@ -170,9 +170,9 @@ private:
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        string name;
-        ar& boost::serialization::make_nvp("m_name", name);
-        m_name = UTF8ToGB(name);
+        string tmp_name;
+        ar& boost::serialization::make_nvp("m_name", tmp_name);
+        m_name = UTF8ToGB(tmp_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
@@ -218,11 +218,11 @@ typedef shared_ptr<MoneyManagerBase> MMPtr;
 
 #define MONEY_MANAGER_IMP(classname)                                                          \
 public:                                                                                       \
-    virtual MoneyManagerPtr _clone() {                                                        \
+    virtual MoneyManagerPtr _clone() override {                                               \
         return MoneyManagerPtr(new classname());                                              \
     }                                                                                         \
     virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, \
-                                 price_t risk, SystemPart from);
+                                 price_t risk, SystemPart from) override;
 
 HKU_API std::ostream& operator<<(std::ostream&, const MoneyManagerBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const MoneyManagerPtr&);
