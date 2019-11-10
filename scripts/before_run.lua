@@ -33,7 +33,7 @@ function main(target)
         --os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        os.cp("$(env BOOST_LIB)/libboost_system*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        --os.cp("$(env BOOST_LIB)/libboost_system*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         --os.cp("$(env BOOST_LIB)/libboost_unit_test_framework*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end    
 
