@@ -69,9 +69,7 @@ Performance::Performance() {
     }
 }
 
-Performance::~Performance() {
-
-}
+Performance::~Performance() {}
 
 void Performance::reset() {
     map_type::iterator iter = m_result.begin();
@@ -103,7 +101,7 @@ string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) 
     list<string>::iterator iter;
     buf.setf(std::ios_base::fixed);
     buf.precision(tm->precision());
-    for(iter = m_name_list.begin(); iter != m_name_list.end(); ++iter){
+    for (iter = m_name_list.begin(); iter != m_name_list.end(); ++iter) {
 #if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
         buf << gb_to_utf8(*iter) << ": " << m_result[*iter] << std::endl;
 #else
@@ -116,8 +114,7 @@ string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) 
     return buf.str();
 }
 
-void Performance
-::statistics(const TradeManagerPtr& tm, const Datetime& datetime) {
+void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetime) {
     //清除上次统计结果
     reset();
 
@@ -140,10 +137,9 @@ void Performance
     m_result["累计借入现金"] = funds.borrow_cash;
     m_result["累计借入资产"] = funds.borrow_asset;
     m_result["未平仓头寸净值"] = funds.market_value;
-    m_result["当前总资产"] = funds.cash + funds.market_value - funds.borrow_cash
-                          - funds.borrow_asset;
+    m_result["当前总资产"] =
+      funds.cash + funds.market_value - funds.borrow_cash - funds.borrow_asset;
     price_t total_money = funds.base_cash + funds.base_asset;
-
 
     const TradeRecordList& trade_list = tm->getTradeList();
     TradeRecordList::const_iterator trade_iter = trade_list.begin();
@@ -154,19 +150,22 @@ void Performance
     }
 
     struct CalData {
-        CalData() :
-            total_duration(0),
-            continues(0), max_continues(0),
-            continues_money(0.0), max_continues_money(0.0),
-            total_r(0.0), max_continues_r(0.0) {}
+        CalData()
+        : total_duration(0),
+          continues(0),
+          max_continues(0),
+          continues_money(0.0),
+          max_continues_money(0.0),
+          total_r(0.0),
+          max_continues_r(0.0) {}
 
-        int total_duration; //总持仓时间
-        int continues;       //当前连续持仓时间
-        int max_continues;   //最大连续持仓数
-        price_t continues_money;  //当前连续持仓利润或损失
-        price_t max_continues_money; //最大连续持仓利润或损失
-        price_t total_r;     //累计r乘数
-        price_t max_continues_r; //最大连续盈利或损失的r乘数和
+        int total_duration;           //总持仓时间
+        int continues;                //当前连续持仓时间
+        int max_continues;            //最大连续持仓数
+        price_t continues_money;      //当前连续持仓利润或损失
+        price_t max_continues_money;  //最大连续持仓利润或损失
+        price_t total_r;              //累计r乘数
+        price_t max_continues_r;      //最大连续盈利或损失的r乘数和
     };
 
     CalData earn, loss;
@@ -180,7 +179,7 @@ void Performance
         const PositionRecord& pos = *his_iter;
         m_result["已平仓交易总成本"] += pos.totalCost;
 
-        price_t profit =  roundEx(pos.sellMoney - pos.totalCost - pos.buyMoney, precision);
+        price_t profit = roundEx(pos.sellMoney - pos.totalCost - pos.buyMoney, precision);
         m_result["已平仓净利润总额"] = roundEx(m_result["已平仓净利润总额"] + profit, precision);
 
         price_t r = roundEx(profit / pos.totalRisk, precision);
@@ -188,8 +187,9 @@ void Performance
 
         if (profit > 0.0) {
             m_result["赢利交易数"]++;
-            m_result["赢利交易赢利总额"] = roundEx(profit + m_result["赢利交易赢利总额"], precision);
-            if (profit > m_result["最大单笔赢利"] ) {
+            m_result["赢利交易赢利总额"] =
+              roundEx(profit + m_result["赢利交易赢利总额"], precision);
+            if (profit > m_result["最大单笔赢利"]) {
                 m_result["最大单笔赢利"] = profit;
             }
 
@@ -230,7 +230,8 @@ void Performance
         } else {
             //没赚钱的，记为亏损交易
             m_result["亏损交易数"]++;
-            m_result["亏损交易亏损总额"] = roundEx(profit + m_result["亏损交易亏损总额"], precision);
+            m_result["亏损交易亏损总额"] =
+              roundEx(profit + m_result["亏损交易亏损总额"], precision);
             if (profit < m_result["最大单笔亏损"]) {
                 m_result["最大单笔亏损"] = profit;
             }
@@ -278,31 +279,37 @@ void Performance
     m_result["最大连续亏损金额"] = loss.max_continues_money;
 
     if (m_result["最大连续赢利笔数"] != 0.0) {
-        m_result["最大连续赢利R乘数"] = roundEx(earn.max_continues_r / m_result["最大连续赢利笔数"], precision);
+        m_result["最大连续赢利R乘数"] =
+          roundEx(earn.max_continues_r / m_result["最大连续赢利笔数"], precision);
     }
 
     if (m_result["最大连续亏损笔数"] != 0.0) {
-        m_result["最大连续亏损R乘数"] = roundEx(loss.max_continues_r / m_result["最大连续亏损笔数"], precision);
+        m_result["最大连续亏损R乘数"] =
+          roundEx(loss.max_continues_r / m_result["最大连续亏损笔数"], precision);
     }
 
     if (m_result["累计投入本金"] != 0.0) {
-        m_result["已平仓帐户收益率%"] = 100 * m_result["已平仓净利润总额"] / m_result["累计投入本金"];
+        m_result["已平仓帐户收益率%"] =
+          100 * m_result["已平仓净利润总额"] / m_result["累计投入本金"];
     }
 
     if (m_result["赢利交易数"] != 0.0) {
-        m_result["赢利交易平均赢利"] = roundEx(m_result["赢利交易赢利总额"] / m_result["赢利交易数"], precision);
+        m_result["赢利交易平均赢利"] =
+          roundEx(m_result["赢利交易赢利总额"] / m_result["赢利交易数"], precision);
         m_result["赢利交易平均持仓时间"] = earn.total_duration / m_result["赢利交易数"];
         m_result["赢利交易平均R乘数"] = roundEx(earn.total_r / m_result["赢利交易数"], precision);
     }
 
     if (m_result["亏损交易数"] != 0.0) {
-        m_result["亏损交易平均亏损"] = roundEx(m_result["亏损交易亏损总额"] / m_result["亏损交易数"], precision);
+        m_result["亏损交易平均亏损"] =
+          roundEx(m_result["亏损交易亏损总额"] / m_result["亏损交易数"], precision);
         m_result["亏损交易平均持仓时间"] = loss.total_duration / m_result["亏损交易数"];
         m_result["亏损交易平均R乘数"] = roundEx(loss.total_r / m_result["亏损交易数"], precision);
     }
 
     if (m_result["亏损交易平均亏损"] != 0.0) {
-        m_result["平均赢利/平均亏损比例"] = roundEx(m_result["赢利交易平均赢利"] / std::fabs(m_result["亏损交易平均亏损"]), precision);
+        m_result["平均赢利/平均亏损比例"] = roundEx(
+          m_result["赢利交易平均赢利"] / std::fabs(m_result["亏损交易平均亏损"]), precision);
     }
 
     if (m_result["已平仓交易总数"] != 0.0) {
@@ -311,10 +318,12 @@ void Performance
     }
 
     if (m_result["亏损交易亏损总额"] != 0.0) {
-        m_result["净赢利/亏损比例"] = m_result["赢利交易赢利总额"] / std::fabs(m_result["亏损交易亏损总额"]);
+        m_result["净赢利/亏损比例"] =
+          m_result["赢利交易赢利总额"] / std::fabs(m_result["亏损交易亏损总额"]);
     }
 
-    m_result["赢利期望值"] = 0.01 * m_result["赢利交易比例%"] * m_result["赢利交易平均赢利"] + (1 - 0.01 * m_result["赢利交易比例%"]) * m_result["亏损交易平均亏损"];
+    m_result["赢利期望值"] = 0.01 * m_result["赢利交易比例%"] * m_result["赢利交易平均赢利"] +
+                             (1 - 0.01 * m_result["赢利交易比例%"]) * m_result["亏损交易平均亏损"];
 
     int duration = 0;
     if (tm->firstDatetime() != Null<Datetime>()) {
@@ -329,12 +338,15 @@ void Performance
 
     if (duration != 0) {
         m_result["交易机会频率/年"] = m_result["已平仓交易总数"] / years;
-        m_result["年度期望R乘数"] = roundEx(m_result["R乘数期望值"] * m_result["交易机会频率/年"], precision);
+        m_result["年度期望R乘数"] =
+          roundEx(m_result["R乘数期望值"] * m_result["交易机会频率/年"], precision);
     }
 
     if (total_money != 0.0 && years != 0.0) {
-        m_result["帐户平均年收益率%"] = 100 * (((m_result["当前总资产"] / total_money) - 1) / years);
-        m_result["帐户年复合收益率%"] = 100 * ((std::pow(10, (std::log10(m_result["当前总资产"] / total_money) / years)) - 1));
+        m_result["帐户平均年收益率%"] =
+          100 * (((m_result["当前总资产"] / total_money) - 1) / years);
+        m_result["帐户年复合收益率%"] =
+          100 * ((std::pow(10, (std::log10(m_result["当前总资产"] / total_money) / years)) - 1));
     }
 
     double max_percent = 0.0, sum_percent = 0.0;
@@ -344,7 +356,8 @@ void Performance
         if (trade_iter->business == BUSINESS_BUY) {
             trade_number++;
             const TradeRecord& record = *trade_iter;
-            price_t hold_cash = roundEx(record.realPrice * record.number + record.cost.total, precision);
+            price_t hold_cash =
+              roundEx(record.realPrice * record.number + record.cost.total, precision);
             price_t total_cash = roundEx(hold_cash + record.cash, precision);
             double percent = (total_cash != 0.0) ? hold_cash / total_cash : 0.0;
             sum_percent += percent;
@@ -355,7 +368,7 @@ void Performance
     }
 
     m_result["单笔交易最大占用现金比例%"] = 100 * max_percent;
-    if (trade_number != 0 ) {
+    if (trade_number != 0) {
         m_result["交易平均占用现金比例%"] = 100 * sum_percent / trade_number;
     }
 
@@ -368,7 +381,6 @@ void Performance
     bool pre_short = false;
 
     if (tm->firstDatetime() != Null<Datetime>()) {
-
         Datetime end_day;
         if (datetime == Null<Datetime>()) {
             end_day = Datetime(tm->lastDatetime().date() + bd::days(1));
@@ -382,8 +394,7 @@ void Performance
             bool hold = false;
             his_iter = his_position.begin();
             for (; his_iter != his_position.end(); ++his_iter) {
-                if (his_iter->takeDatetime <= *day_iter
-                        && *day_iter < his_iter->cleanDatetime) {
+                if (his_iter->takeDatetime <= *day_iter && *day_iter < his_iter->cleanDatetime) {
                     hold = true;
                     break;
                 }

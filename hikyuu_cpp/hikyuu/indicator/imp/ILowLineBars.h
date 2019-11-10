@@ -1,6 +1,6 @@
 /*
  * ILowLineBars.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-14
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ILowLineBars: public IndicatorImp {
+class ILowLineBars : public IndicatorImp {
     INDICATOR_IMP(ILowLineBars)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

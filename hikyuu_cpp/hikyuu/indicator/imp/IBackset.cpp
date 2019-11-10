@@ -1,6 +1,6 @@
 /*
  * IBackset.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-13
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IBackset)
 #endif
 
-
 namespace hku {
 
 IBackset::IBackset() : IndicatorImp("BACKSET", 1) {
     setParam<int>("n", 2);
 }
 
-IBackset::~IBackset() {
-
-}
+IBackset::~IBackset() {}
 
 bool IBackset::check() {
     if (getParam<int>("n") < 1) {
@@ -63,7 +60,7 @@ void IBackset::_calculate(const Indicator& ind) {
         }
     }
 
-    //i = end_i - 1;
+    // i = end_i - 1;
     while (true) {
         if (ind[i] != 0.0) {
             for (size_t j = m_discard; j <= i; j++) {
@@ -80,12 +77,10 @@ void IBackset::_calculate(const Indicator& ind) {
     }
 }
 
-
 Indicator HKU_API BACKSET(int n) {
     IndicatorImpPtr p = make_shared<IBackset>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

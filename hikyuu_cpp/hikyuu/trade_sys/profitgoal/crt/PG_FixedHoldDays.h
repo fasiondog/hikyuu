@@ -9,7 +9,6 @@
 #ifndef TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDHOLDDAYS_H_
 #define TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDHOLDDAYS_H_
 
-
 #include "../ProfitGoalBase.h"
 
 namespace hku {
@@ -20,9 +19,8 @@ namespace hku {
  * @return PGPtr
  * @ingroup ProfitGoal
  */
-ProfitGoalPtr HKU_API PG_FixedHoldDays(int days=5);
+ProfitGoalPtr HKU_API PG_FixedHoldDays(int days = 5);
 
 } /* namespace hku */
-
 
 #endif /* TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDPERCENT_H_ */

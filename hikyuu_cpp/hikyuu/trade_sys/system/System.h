@@ -35,16 +35,10 @@ class HKU_API System {
 public:
     System();
     System(const string& name);
-    System(const TradeManagerPtr& tm,
-            const MoneyManagerPtr& mm,
-            const EnvironmentPtr& ev,
-            const ConditionPtr& cn,
-            const SignalPtr& sg,
-            const StoplossPtr& st,
-            const StoplossPtr& tp,
-            const ProfitGoalPtr& pg,
-            const SlippagePtr& sp,
-            const string& name);
+    System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const EnvironmentPtr& ev,
+           const ConditionPtr& cn, const SignalPtr& sg, const StoplossPtr& st,
+           const StoplossPtr& tp, const ProfitGoalPtr& pg, const SlippagePtr& sp,
+           const string& name);
     virtual ~System();
 
     typedef SystemPart Part;
@@ -55,34 +49,82 @@ public:
     /** 设置名称 */
     void name(const string& name);
 
-    KData getTO() const { return m_kdata; }
-    TradeManagerPtr getTM() const { return m_tm; }
-    MoneyManagerPtr getMM() const { return m_mm; }
-    EnvironmentPtr getEV() const { return m_ev; }
-    ConditionPtr getCN() const { return m_cn; }
-    SignalPtr getSG() const { return m_sg; }
-    StoplossPtr getST() const { return m_st; }
-    StoplossPtr getTP() const { return m_tp; }
-    ProfitGoalPtr getPG() const { return m_pg; }
-    SlippagePtr getSP() const { return m_sp; }
+    KData getTO() const {
+        return m_kdata;
+    }
+    TradeManagerPtr getTM() const {
+        return m_tm;
+    }
+    MoneyManagerPtr getMM() const {
+        return m_mm;
+    }
+    EnvironmentPtr getEV() const {
+        return m_ev;
+    }
+    ConditionPtr getCN() const {
+        return m_cn;
+    }
+    SignalPtr getSG() const {
+        return m_sg;
+    }
+    StoplossPtr getST() const {
+        return m_st;
+    }
+    StoplossPtr getTP() const {
+        return m_tp;
+    }
+    ProfitGoalPtr getPG() const {
+        return m_pg;
+    }
+    SlippagePtr getSP() const {
+        return m_sp;
+    }
 
-    void setTM(const TradeManagerPtr& tm) { m_tm = tm; }
-    void setMM(const MoneyManagerPtr& mm) { m_mm = mm; }
-    void setEV(const EnvironmentPtr& ev) { m_ev = ev; }
-    void setCN(const ConditionPtr& cn) { m_cn = cn; }
-    void setSG(const SignalPtr& sg) { m_sg = sg; }
-    void setST(const StoplossPtr& st) { m_st = st; }
-    void setTP(const StoplossPtr& tp) { m_tp = tp; }
-    void setPG(const ProfitGoalPtr& pg) { m_pg = pg; }
-    void setSP(const SlippagePtr& sp) { m_sp = sp; }
+    void setTM(const TradeManagerPtr& tm) {
+        m_tm = tm;
+    }
+    void setMM(const MoneyManagerPtr& mm) {
+        m_mm = mm;
+    }
+    void setEV(const EnvironmentPtr& ev) {
+        m_ev = ev;
+    }
+    void setCN(const ConditionPtr& cn) {
+        m_cn = cn;
+    }
+    void setSG(const SignalPtr& sg) {
+        m_sg = sg;
+    }
+    void setST(const StoplossPtr& st) {
+        m_st = st;
+    }
+    void setTP(const StoplossPtr& tp) {
+        m_tp = tp;
+    }
+    void setPG(const ProfitGoalPtr& pg) {
+        m_pg = pg;
+    }
+    void setSP(const SlippagePtr& sp) {
+        m_sp = sp;
+    }
 
-    Stock getStock() const { return m_stock; }
-    void setStock(const Stock& stk) { m_stock = stk; }
+    Stock getStock() const {
+        return m_stock;
+    }
+    void setStock(const Stock& stk) {
+        m_stock = stk;
+    }
 
-    const TradeRecordList& getTradeRecordList() const { return m_trade_list;}
+    const TradeRecordList& getTradeRecordList() const {
+        return m_trade_list;
+    }
 
-    const TradeRequest& getBuyTradeRequest() const { return m_buyRequest; }
-    const TradeRequest& getSellTradeRequest() const { return m_sellRequest; }
+    const TradeRequest& getBuyTradeRequest() const {
+        return m_buyRequest;
+    }
+    const TradeRequest& getSellTradeRequest() const {
+        return m_sellRequest;
+    }
 
     const TradeRequest& getSellShortTradeRequest() const {
         return m_sellShortRequest;
@@ -91,7 +133,6 @@ public:
     const TradeRequest& getBuyShortTradeRequest() const {
         return m_buyShortRequest;
     }
-
 
     /**
      * 复位
@@ -120,8 +161,8 @@ public:
     void setTO(const KData& kdata);
 
     //不指定stock的方式下run，需要事先通过setStock设定stock
-    void run(const KQuery& query, bool reset=true);
-    void run(const Stock& stock, const KQuery& query, bool reset=true);
+    void run(const KQuery& query, bool reset = true);
+    void run(const Stock& stock, const KQuery& query, bool reset = true);
 
     void runMoment(const Datetime& datetime);
     void runMoment(const KRecord& record);
@@ -161,7 +202,6 @@ public:
     price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice);
     price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice);
 
-
     void _buy(const KRecord& today, Part from);
     void _buyNow(const KRecord& today, Part from);
     void _buyDelay(const KRecord& today);
@@ -189,13 +229,13 @@ public:
 protected:
     TradeManagerPtr m_tm;
     MoneyManagerPtr m_mm;
-    EnvironmentPtr  m_ev;
-    ConditionPtr    m_cn;
-    SignalPtr       m_sg;
-    StoplossPtr     m_st;
-    StoplossPtr     m_tp;
-    ProfitGoalPtr   m_pg;
-    SlippagePtr     m_sp;
+    EnvironmentPtr m_ev;
+    ConditionPtr m_cn;
+    SignalPtr m_sg;
+    StoplossPtr m_st;
+    StoplossPtr m_tp;
+    ProfitGoalPtr m_pg;
+    SlippagePtr m_sp;
 
     string m_name;
     Stock m_stock;
@@ -204,11 +244,11 @@ protected:
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
-    int m_buy_days; //每一次买入清零，计算一次加1，即买入后的天数
-    int m_sell_short_days; //每一次卖空清零
-    TradeRecordList m_trade_list; //保存实际执行的交易记录
-    price_t m_lastTakeProfit;     //上一次多头止损价，用于保证止赢价单调递增
-    price_t m_lastShortTakeProfit; //上一次空头止赢价
+    int m_buy_days;         //每一次买入清零，计算一次加1，即买入后的天数
+    int m_sell_short_days;  //每一次卖空清零
+    TradeRecordList m_trade_list;   //保存实际执行的交易记录
+    price_t m_lastTakeProfit;       //上一次多头止损价，用于保证止赢价单调递增
+    price_t m_lastShortTakeProfit;  //上一次空头止赢价
 
     TradeRequest m_buyRequest;
     TradeRequest m_sellRequest;
@@ -216,7 +256,7 @@ protected:
     TradeRequest m_buyShortRequest;
 
 private:
-    void initParam(); //初始化参数及其默认值
+    void initParam();  //初始化参数及其默认值
 
 //============================================
 // 序列化支持
@@ -224,74 +264,74 @@ private:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& boost::serialization::make_nvp("m_name", name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
 
-        ar & BOOST_SERIALIZATION_NVP(m_tm);
-        ar & BOOST_SERIALIZATION_NVP(m_ev);
-        ar & BOOST_SERIALIZATION_NVP(m_cn);
-        ar & BOOST_SERIALIZATION_NVP(m_mm);
-        ar & BOOST_SERIALIZATION_NVP(m_sg);
-        ar & BOOST_SERIALIZATION_NVP(m_st);
-        ar & BOOST_SERIALIZATION_NVP(m_tp);
-        ar & BOOST_SERIALIZATION_NVP(m_pg);
-        ar & BOOST_SERIALIZATION_NVP(m_sp);
+        ar& BOOST_SERIALIZATION_NVP(m_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_ev);
+        ar& BOOST_SERIALIZATION_NVP(m_cn);
+        ar& BOOST_SERIALIZATION_NVP(m_mm);
+        ar& BOOST_SERIALIZATION_NVP(m_sg);
+        ar& BOOST_SERIALIZATION_NVP(m_st);
+        ar& BOOST_SERIALIZATION_NVP(m_tp);
+        ar& BOOST_SERIALIZATION_NVP(m_pg);
+        ar& BOOST_SERIALIZATION_NVP(m_sp);
 
-        //m_kdata中包含了stock和query的信息，不用保存m_stock
-        ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // m_kdata中包含了stock和query的信息，不用保存m_stock
+        ar& BOOST_SERIALIZATION_NVP(m_kdata);
 
-        ar & BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar & BOOST_SERIALIZATION_NVP(m_buy_days);
-        ar & BOOST_SERIALIZATION_NVP(m_sell_short_days);
-        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
-        ar & BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
-        ar & BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
+        ar& BOOST_SERIALIZATION_NVP(m_buy_days);
+        ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
+        ar& BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
+        ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
 
-        ar & BOOST_SERIALIZATION_NVP(m_buyRequest);
-        ar & BOOST_SERIALIZATION_NVP(m_sellRequest);
-        ar & BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar & BOOST_SERIALIZATION_NVP(m_buyShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
+        ar& boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
 
-        ar & BOOST_SERIALIZATION_NVP(m_tm);
-        ar & BOOST_SERIALIZATION_NVP(m_ev);
-        ar & BOOST_SERIALIZATION_NVP(m_cn);
-        ar & BOOST_SERIALIZATION_NVP(m_mm);
-        ar & BOOST_SERIALIZATION_NVP(m_sg);
-        ar & BOOST_SERIALIZATION_NVP(m_st);
-        ar & BOOST_SERIALIZATION_NVP(m_tp);
-        ar & BOOST_SERIALIZATION_NVP(m_pg);
-        ar & BOOST_SERIALIZATION_NVP(m_sp);
+        ar& BOOST_SERIALIZATION_NVP(m_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_ev);
+        ar& BOOST_SERIALIZATION_NVP(m_cn);
+        ar& BOOST_SERIALIZATION_NVP(m_mm);
+        ar& BOOST_SERIALIZATION_NVP(m_sg);
+        ar& BOOST_SERIALIZATION_NVP(m_st);
+        ar& BOOST_SERIALIZATION_NVP(m_tp);
+        ar& BOOST_SERIALIZATION_NVP(m_pg);
+        ar& BOOST_SERIALIZATION_NVP(m_sp);
 
-        //m_kdata中包含了stock和query的信息，不用保存m_stock
-        ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // m_kdata中包含了stock和query的信息，不用保存m_stock
+        ar& BOOST_SERIALIZATION_NVP(m_kdata);
         m_stock = m_kdata.getStock();
 
-        ar & BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar & BOOST_SERIALIZATION_NVP(m_buy_days);
-        ar & BOOST_SERIALIZATION_NVP(m_sell_short_days);
-        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
-        ar & BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
-        ar & BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
+        ar& BOOST_SERIALIZATION_NVP(m_buy_days);
+        ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
+        ar& BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
+        ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
 
-        ar & BOOST_SERIALIZATION_NVP(m_buyRequest);
-        ar & BOOST_SERIALIZATION_NVP(m_sellRequest);
-        ar & BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar & BOOST_SERIALIZATION_NVP(m_buyShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -306,9 +346,8 @@ typedef shared_ptr<System> SystemPtr;
 typedef shared_ptr<System> SYSPtr;
 typedef vector<SystemPtr> SystemList;
 
-HKU_API std::ostream& operator <<(std::ostream &os, const System& sys);
-HKU_API std::ostream& operator <<(std::ostream &os, const SystemPtr& sys);
-
+HKU_API std::ostream& operator<<(std::ostream& os, const System& sys);
+HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys);
 
 inline string System::name() const {
     return m_name;
@@ -318,68 +357,59 @@ inline void System::name(const string& name) {
     m_name = name;
 }
 
-inline bool System::
-_environmentIsValid(const Datetime& datetime) {
+inline bool System::_environmentIsValid(const Datetime& datetime) {
     return m_ev ? m_ev->isValid(datetime) : true;
 }
 
-inline bool System::
-_conditionIsValid(const Datetime& datetime) {
+inline bool System::_conditionIsValid(const Datetime& datetime) {
     return m_cn ? m_cn->isValid(datetime) : true;
 }
 
-inline size_t System
-::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+inline size_t System ::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk,
+                                     Part from) {
     return m_mm ? m_mm->getBuyNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline size_t System
-::_getSellNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+inline size_t System ::_getSellNumber(const Datetime& datetime, price_t price, price_t risk,
+                                      Part from) {
     return m_mm ? m_mm->getSellNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline size_t System
-::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+inline size_t System ::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk,
+                                           Part from) {
     return m_mm ? m_mm->getSellShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline size_t System
-::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk, Part from) {
+inline size_t System ::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk,
+                                          Part from) {
     return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline price_t System
-::_getRealBuyPrice(const Datetime& datetime, price_t planPrice) {
+inline price_t System ::_getRealBuyPrice(const Datetime& datetime, price_t planPrice) {
     return m_sp ? m_sp->getRealBuyPrice(datetime, planPrice) : planPrice;
 }
 
-inline price_t System
-::_getRealSellPrice(const Datetime& datetime, price_t planPrice) {
+inline price_t System ::_getRealSellPrice(const Datetime& datetime, price_t planPrice) {
     return m_sp ? m_sp->getRealSellPrice(datetime, planPrice) : planPrice;
 }
 
-inline price_t System
-::_getStoplossPrice(const Datetime& datetime, price_t price) {
+inline price_t System ::_getStoplossPrice(const Datetime& datetime, price_t price) {
     return m_st ? m_st->getPrice(datetime, price) : 0.0;
 }
 
-inline price_t System
-::_getShortStoplossPrice(const Datetime& datetime, price_t price) {
+inline price_t System ::_getShortStoplossPrice(const Datetime& datetime, price_t price) {
     return m_st ? m_st->getShortPrice(datetime, price) : 0.0;
 }
 
-inline price_t System
-::_getTakeProfitPrice(const Datetime& datetime) {
+inline price_t System ::_getTakeProfitPrice(const Datetime& datetime) {
     return m_tp ? m_tp->getPrice(datetime, 0.0) : 0.0;
 }
 
-inline price_t System
-::_getGoalPrice(const Datetime& datetime, price_t price) {
+inline price_t System ::_getGoalPrice(const Datetime& datetime, price_t price) {
     return m_pg ? m_pg->getGoal(datetime, price) : Null<price_t>();
 }
 
-inline price_t System
-::_getShortGoalPrice(const Datetime& datetime, price_t price) {
+inline price_t System ::_getShortGoalPrice(const Datetime& datetime, price_t price) {
     return m_pg ? m_pg->getShortGoal(datetime, price) : 0.0;
 }
 

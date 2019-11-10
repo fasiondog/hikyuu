@@ -12,12 +12,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const Portfolio& pf) {
+HKU_API std::ostream& operator<<(std::ostream& os, const Portfolio& pf) {
     os << "Portfolio(" << pf.name() << ", " << pf.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const PortfolioPtr& pf) {
+HKU_API std::ostream& operator<<(std::ostream& os, const PortfolioPtr& pf) {
     if (pf) {
         os << *pf;
     } else {
@@ -27,40 +27,38 @@ HKU_API std::ostream & operator<<(std::ostream& os, const PortfolioPtr& pf) {
     return os;
 }
 
-Portfolio::Portfolio(): m_name("Portfolio") {
+Portfolio::Portfolio() : m_name("Portfolio") {}
 
-}
+Portfolio::Portfolio(const string& name) : m_name(name) {}
 
-Portfolio::Portfolio(const string& name) : m_name(name) {
+Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af)
+: m_name("Portfolio"), m_tm(tm), m_se(se), m_af(af) {}
 
-}
-
-Portfolio::Portfolio(const TradeManagerPtr& tm,
-        const SelectorPtr& se,
-        const AFPtr& af)
-: m_name("Portfolio"), m_tm(tm), m_se(se), m_af(af) {
-
-}
-
-Portfolio::~Portfolio() {
-
-}
+Portfolio::~Portfolio() {}
 
 void Portfolio::reset() {
-    if (m_tm) m_tm->reset();
-    if (m_se) m_se->reset();
-    if (m_af) m_af->reset();
-    if (m_tm_shadow) m_tm_shadow->reset();
+    if (m_tm)
+        m_tm->reset();
+    if (m_se)
+        m_se->reset();
+    if (m_af)
+        m_af->reset();
+    if (m_tm_shadow)
+        m_tm_shadow->reset();
 }
 
 PortfolioPtr Portfolio::clone() {
     PortfolioPtr p = make_shared<Portfolio>();
     p->m_params = m_params;
     p->m_name = m_name;
-    if (m_se) p->m_se = m_se->clone();
-    if (m_af) p->m_af = m_af->clone();
-    if (m_tm) p->m_tm = m_tm->clone();
-    if (m_tm_shadow) p->m_tm_shadow = m_tm_shadow->clone();
+    if (m_se)
+        p->m_se = m_se->clone();
+    if (m_af)
+        p->m_af = m_af->clone();
+    if (m_tm)
+        p->m_tm = m_tm->clone();
+    if (m_tm_shadow)
+        p->m_tm_shadow = m_tm_shadow->clone();
     return p;
 }
 
@@ -100,7 +98,6 @@ void Portfolio::run(const KQuery& query) {
     TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "SUB");
     auto sys_iter = all_sys_list.begin();
     for (; sys_iter != all_sys_list.end(); ++sys_iter) {
-
         //为每一个系统实例分配子账户
         SystemPtr& sys = *sys_iter;
         sys->setTM(pro_tm->clone());
@@ -111,14 +108,14 @@ void Portfolio::run(const KQuery& query) {
         }
     }
 
-    SystemList       cur_selected_list;  //当前选中系统列表
+    SystemList cur_selected_list;        //当前选中系统列表
     std::set<SYSPtr> cur_selected_sets;  //当前选中系统集合，方便计算使用
-    SystemList cur_allocated_list; //当前分配了资金的系统
-    SystemList cur_hold_sys_list;  //当前时刻有持仓的系统，每个时刻重新收集
+    SystemList cur_allocated_list;       //当前分配了资金的系统
+    SystemList cur_hold_sys_list;        //当前时刻有持仓的系统，每个时刻重新收集
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     DatetimeList::const_iterator date_iter = datelist.begin();
-    for(; date_iter != datelist.end(); ++date_iter) {
+    for (; date_iter != datelist.end(); ++date_iter) {
         const Datetime& cur_date = *date_iter;
 
         //忽略小于账户初始建立日期的交易日
@@ -133,7 +130,6 @@ void Portfolio::run(const KQuery& query) {
         //----------------------------------------------------------
         bool selected_changed = m_se->changed(cur_date);
         if (selected_changed) {
-
             //重新计算当前时刻选择的系统实例
             cur_selected_list = m_se->getSelectedSystemList(cur_date);
 
@@ -143,7 +139,6 @@ void Portfolio::run(const KQuery& query) {
             for (; sys_iter != cur_selected_list.end(); ++sys_iter) {
                 cur_selected_sets.insert(*sys_iter);
             }
-
         }
 
         //----------------------------------------------------------
@@ -175,8 +170,8 @@ void Portfolio::run(const KQuery& query) {
         //如果选择列表更新或调整资金时刻，则调整资金分配
         //----------------------------------------------------------
         if (selected_changed || m_af->changed(cur_date)) {
-            cur_allocated_list = m_af->getAllocatedSystemList(cur_date,
-                    cur_selected_list, cur_hold_sys_list);
+            cur_allocated_list =
+              m_af->getAllocatedSystemList(cur_date, cur_selected_list, cur_hold_sys_list);
         }
 
         //----------------------------------------------------------
@@ -199,8 +194,7 @@ void Portfolio::run(const KQuery& query) {
         TradeRecordList tr_list = m_tm_shadow->getTradeList(cur_date, Null<Datetime>());
         auto tr_iter = tr_list.begin();
         for (; tr_iter != tr_list.end(); ++tr_iter) {
-            if (tr_iter->business == BUSINESS_CHECKIN
-             || tr_iter->business == BUSINESS_CHECKOUT) {
+            if (tr_iter->business == BUSINESS_CHECKIN || tr_iter->business == BUSINESS_CHECKOUT) {
                 continue;
             }
 
@@ -212,9 +206,7 @@ void Portfolio::run(const KQuery& query) {
             HKU_INFO("{:<.4f} == {:<.4f}", m_tm->currentCash(), m_tm_shadow->currentCash());
         }
 
-    } // for datelist
+    }  // for datelist
 }
-
-
 
 } /* namespace hku */

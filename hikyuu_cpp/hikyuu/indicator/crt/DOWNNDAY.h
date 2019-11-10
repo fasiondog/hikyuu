@@ -1,8 +1,8 @@
 /*
  * DOWNNDAY.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-2
  *      Author: fasiondog
  */
@@ -28,6 +28,6 @@ inline Indicator DOWNNDAY(const Indicator& ind, int n) {
     return result;
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_DOWNNDAY_H_ */

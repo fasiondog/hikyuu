@@ -1,8 +1,8 @@
 /*
  * IVar.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2013-4-18
  *      Author: fasiondog
  */
@@ -14,16 +14,13 @@
 BOOST_CLASS_EXPORT(hku::IVar)
 #endif
 
-
 namespace hku {
 
-IVar::IVar(): IndicatorImp("VAR", 1) {
+IVar::IVar() : IndicatorImp("VAR", 1) {
     setParam<int>("n", 10);
 }
 
-IVar::~IVar() {
-
-}
+IVar::~IVar() {}
 
 bool IVar::check() {
     int n = getParam<int>("n");
@@ -53,10 +50,9 @@ void IVar::_calculate(const Indicator& data) {
         for (size_t j = i + 1 - n; j <= i; ++j) {
             sum += std::pow(data[j] - mean, 2);
         }
-        _set(sum/N, i);
+        _set(sum / N, i);
     }
 }
-
 
 Indicator HKU_API VAR(int n) {
     IndicatorImpPtr p = make_shared<IVar>();

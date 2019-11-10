@@ -1,8 +1,8 @@
 /*
  * IVarp.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2013-4-18
  *      Author: fasiondog
  */
@@ -14,16 +14,13 @@
 BOOST_CLASS_EXPORT(hku::IVarp)
 #endif
 
-
 namespace hku {
 
-IVarp::IVarp(): IndicatorImp("VARP", 1) {
+IVarp::IVarp() : IndicatorImp("VARP", 1) {
     setParam<int>("n", 10);
 }
 
-IVarp::~IVarp() {
-
-}
+IVarp::~IVarp() {}
 
 bool IVarp::check() {
     int n = getParam<int>("n");
@@ -52,10 +49,9 @@ void IVarp::_calculate(const Indicator& data) {
         for (size_t j = i + 1 - n; j <= i; ++j) {
             sum += std::pow(data[j] - mean, 2);
         }
-        _set(sum/n, i);
+        _set(sum / n, i);
     }
 }
-
 
 Indicator HKU_API VARP(int n) {
     IndicatorImpPtr p = make_shared<IVarp>();

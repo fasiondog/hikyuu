@@ -10,12 +10,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const BaseInfoDriver& driver) {
+HKU_API std::ostream& operator<<(std::ostream& os, const BaseInfoDriver& driver) {
     os << "BaseInfoDriver(" << driver.name() << ", " << driver.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const BaseInfoDriverPtr& driver) {
+HKU_API std::ostream& operator<<(std::ostream& os, const BaseInfoDriverPtr& driver) {
     if (driver) {
         os << *driver;
     } else {
@@ -25,8 +25,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const BaseInfoDriverPtr& dri
     return os;
 }
 
-BaseInfoDriver::BaseInfoDriver(const string& name)
-: m_name(name) {
+BaseInfoDriver::BaseInfoDriver(const string& name) : m_name(name) {
     to_upper(m_name);
 }
 
@@ -42,7 +41,7 @@ bool BaseInfoDriver::checkType() {
             HKU_WARN("Type of driver mismatch! ({} != {})", type, m_name);
         }
 
-    } catch(...) {
+    } catch (...) {
         result = false;
         HKU_ERROR("Can't get type of driver!");
     }
@@ -87,10 +86,8 @@ bool BaseInfoDriver::loadBaseInfo() {
     return true;
 }
 
-Parameter BaseInfoDriver
-::getFinanceInfo(const string& market, const string& code) {
+Parameter BaseInfoDriver ::getFinanceInfo(const string& market, const string& code) {
     return Parameter();
 }
-
 
 } /* namespace hku */

@@ -17,5 +17,3 @@ SignalPtr HKU_API SG_Flex(const Indicator& op, int slow_n, const string& kpart) 
 }
 
 } /* namespace hku */
-
-

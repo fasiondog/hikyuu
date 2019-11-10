@@ -2,7 +2,7 @@
  * IDropna.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-5-28
  *      Author: fasiondog
  */
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IDropna: public IndicatorImp {
+class IDropna : public IndicatorImp {
     INDICATOR_IMP(IDropna)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

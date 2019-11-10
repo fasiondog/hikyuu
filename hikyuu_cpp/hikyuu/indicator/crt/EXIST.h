@@ -1,8 +1,8 @@
 /*
  * EXIST.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-4-19
  *      Author: fasiondog
  */
@@ -31,6 +31,6 @@ inline Indicator EXIST(const Indicator& ind, int n) {
     return EXIST(n)(ind);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_EXIST_H_ */

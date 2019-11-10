@@ -25,7 +25,7 @@ namespace hku {
  *       n2: 对初步止损线取n2日内的最高值，默认为3
  *       p: 噪音系数，默认为2
  */
-class SaftyLoss: public hku::IndicatorImp {
+class SaftyLoss : public hku::IndicatorImp {
     INDICATOR_IMP(SaftyLoss)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

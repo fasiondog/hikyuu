@@ -17,6 +17,4 @@ AFPtr HKU_API AF_EqualWeight();
 
 } /* namespace hku */
 
-
-
 #endif /* TRADE_SYS_ALLOCATEFUNDS_CRT_AF_EQUALWEIGHT_H_ */

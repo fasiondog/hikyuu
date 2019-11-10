@@ -1,6 +1,6 @@
 /*
  * ITan.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ITan: public IndicatorImp {
+class ITan : public IndicatorImp {
     INDICATOR_IMP(ITan)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

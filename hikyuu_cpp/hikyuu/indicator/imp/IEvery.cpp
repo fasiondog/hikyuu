@@ -1,6 +1,6 @@
 /*
  * IEvery.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-28
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IEvery)
 #endif
 
-
 namespace hku {
 
 IEvery::IEvery() : IndicatorImp("EVERY", 1) {
     setParam<int>("n", 20);
 }
 
-IEvery::~IEvery() {
-
-}
+IEvery::~IEvery() {}
 
 bool IEvery::check() {
     if (getParam<int>("n") < 0) {
@@ -42,7 +39,7 @@ void IEvery::_calculate(const Indicator& ind) {
     if (0 == n) {
         n = total;
     }
-    
+
     m_discard = ind.discard() + n - 1;
     if (m_discard >= total) {
         m_discard = total;
@@ -52,15 +49,15 @@ void IEvery::_calculate(const Indicator& ind) {
     price_t every = 1;
     size_t pre_pos = m_discard;
     for (size_t i = ind.discard(); i <= m_discard; i++) {
-         if (ind[i] == 0) {
-             pre_pos = i;
-             every = 0;
+        if (ind[i] == 0) {
+            pre_pos = i;
+            every = 0;
         }
     }
 
     _set(every, m_discard);
 
-    for (size_t i = m_discard + 1; i < total-1; i++) {
+    for (size_t i = m_discard + 1; i < total - 1; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
@@ -81,15 +78,13 @@ void IEvery::_calculate(const Indicator& ind) {
             break;
         }
     }
-    _set(every, total-1);
+    _set(every, total - 1);
 }
-
 
 Indicator HKU_API EVERY(int n) {
     IndicatorImpPtr p = make_shared<IEvery>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

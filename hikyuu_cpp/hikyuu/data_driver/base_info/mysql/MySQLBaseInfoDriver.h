@@ -12,16 +12,16 @@
 #include "../../BaseInfoDriver.h"
 
 #if defined(_MSC_VER)
-    #include <mysql.h>
+#include <mysql.h>
 #else
-    #include <mysql/mysql.h>
+#include <mysql/mysql.h>
 #endif
 
 namespace hku {
 
-class MySQLBaseInfoDriver: public BaseInfoDriver {
+class MySQLBaseInfoDriver : public BaseInfoDriver {
 public:
-    MySQLBaseInfoDriver(): BaseInfoDriver("mysql") {}
+    MySQLBaseInfoDriver() : BaseInfoDriver("mysql") {}
     virtual ~MySQLBaseInfoDriver();
 
     virtual bool _init();

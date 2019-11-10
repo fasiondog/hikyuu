@@ -32,6 +32,6 @@ inline Indicator SUM(const Indicator& ind, int n) {
     return SUM(n)(ind);
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_SUM_H_ */

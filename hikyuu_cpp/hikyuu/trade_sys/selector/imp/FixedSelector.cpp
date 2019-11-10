@@ -9,14 +9,9 @@
 
 namespace hku {
 
-FixedSelector::FixedSelector(): SelectorBase("SE_Fixed") {
+FixedSelector::FixedSelector() : SelectorBase("SE_Fixed") {}
 
-}
-
-FixedSelector::~FixedSelector() {
-
-}
-
+FixedSelector::~FixedSelector() {}
 
 SystemList FixedSelector::getSelectedSystemList(Datetime date) {
     return m_sys_list;

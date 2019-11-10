@@ -17,5 +17,4 @@ StoplossPtr HKU_API ST_Saftyloss(int n1, int n2, double p) {
     return StoplossPtr(result);
 }
 
-} /* namespace */
-
+}  // namespace hku

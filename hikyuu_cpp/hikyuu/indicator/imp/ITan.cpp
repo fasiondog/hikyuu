@@ -1,6 +1,6 @@
 /*
  * ITan.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::ITan)
 #endif
 
-
 namespace hku {
 
-ITan::ITan() : IndicatorImp("TAN", 1) {
+ITan::ITan() : IndicatorImp("TAN", 1) {}
 
-}
-
-ITan::~ITan() {
-
-}
+ITan::~ITan() {}
 
 bool ITan::check() {
     return true;
@@ -41,10 +36,8 @@ void ITan::_calculate(const Indicator& data) {
     }
 }
 
-
 Indicator HKU_API TAN() {
     return Indicator(make_shared<ITan>());
 }
-
 
 } /* namespace hku */

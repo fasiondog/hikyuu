@@ -1,8 +1,8 @@
 /*
  * FILTER.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-4
  *      Author: fasiondog
  */
@@ -31,6 +31,6 @@ inline Indicator FILTER(const Indicator& ind, int n) {
     return FILTER(n)(ind);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_FILTER_H_ */

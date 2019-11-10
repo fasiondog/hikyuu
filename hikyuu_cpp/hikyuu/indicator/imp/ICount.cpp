@@ -11,16 +11,13 @@
 BOOST_CLASS_EXPORT(hku::ICount)
 #endif
 
-
 namespace hku {
 
 ICount::ICount() : IndicatorImp("COUNT", 1) {
     setParam<int>("n", 20);
 }
 
-ICount::~ICount() {
-
-}
+ICount::~ICount() {}
 
 bool ICount::check() {
     int n = getParam<int>("n");
@@ -76,18 +73,17 @@ void ICount::_calculate(const Indicator& data) {
     if (first_end >= 1) {
         _set(sum, first_end - 1);
     }
-    
+
     for (size_t i = first_end; i < total; ++i) {
         if (data[i] != 0) {
             sum++;
         }
-        if (data[i-n] != 0) {
+        if (data[i - n] != 0) {
             sum--;
         }
         _set(sum, i);
     }
 }
-
 
 Indicator HKU_API COUNT(int n) {
     IndicatorImpPtr p = make_shared<ICount>();

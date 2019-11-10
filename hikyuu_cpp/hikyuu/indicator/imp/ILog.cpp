@@ -11,16 +11,11 @@
 BOOST_CLASS_EXPORT(hku::ILog)
 #endif
 
-
 namespace hku {
 
-ILog::ILog() : IndicatorImp("LOG", 1) {
+ILog::ILog() : IndicatorImp("LOG", 1) {}
 
-}
-
-ILog::~ILog() {
-
-}
+ILog::~ILog() {}
 
 bool ILog::check() {
     return true;
@@ -44,10 +39,8 @@ void ILog::_calculate(const Indicator& data) {
     }
 }
 
-
 Indicator HKU_API LOG() {
     return Indicator(make_shared<ILog>());
 }
-
 
 } /* namespace hku */

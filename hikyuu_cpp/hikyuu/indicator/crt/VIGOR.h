@@ -29,6 +29,6 @@ Indicator HKU_API VIGOR(const KData& kdata, int n = 2);
 
 Indicator HKU_API VIGOR(int n = 2);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* VIGOR_H_ */

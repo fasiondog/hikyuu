@@ -2,7 +2,7 @@
  * IPow.cpp
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019年4月2日
  *      Author: fasiondog
  */
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IPow)
 #endif
 
-
 namespace hku {
 
 IPow::IPow() : IndicatorImp("POW", 1) {
     setParam<int>("n", 3);
 }
 
-IPow::~IPow() {
-
-}
+IPow::~IPow() {}
 
 bool IPow::check() {
     return true;
@@ -41,7 +38,6 @@ void IPow::_calculate(const Indicator& data) {
         _set(std::pow(data[i], n), i);
     }
 }
-
 
 Indicator HKU_API POW(int n) {
     IndicatorImpPtr p = make_shared<IPow>();

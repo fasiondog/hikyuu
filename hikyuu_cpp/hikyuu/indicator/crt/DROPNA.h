@@ -2,7 +2,7 @@
  * DROPNA.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-5-28
  *      Author: fasiondog
  */
@@ -26,6 +26,6 @@ inline Indicator DROPNA(const Indicator& ind) {
     return DROPNA()(ind);
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_DROPNA_H_ */

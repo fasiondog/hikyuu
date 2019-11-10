@@ -11,7 +11,7 @@
 
 namespace hku {
 
-FixedATradeCost::FixedATradeCost(): TradeCostBase("TC_FixedA") {
+FixedATradeCost::FixedATradeCost() : TradeCostBase("TC_FixedA") {
     setParam<price_t>("commission", 0.0018);
     setParam<price_t>("lowest_commission", 5.0);
     setParam<price_t>("stamptax", 0.001);
@@ -19,13 +19,8 @@ FixedATradeCost::FixedATradeCost(): TradeCostBase("TC_FixedA") {
     setParam<price_t>("lowest_transferfee", 1.0);
 }
 
-
-FixedATradeCost::FixedATradeCost(
-        price_t commission,
-        price_t lowestCommission,
-        price_t stamptax,
-        price_t transferfee,
-        price_t lowestTransferfee)
+FixedATradeCost::FixedATradeCost(price_t commission, price_t lowestCommission, price_t stamptax,
+                                 price_t transferfee, price_t lowestTransferfee)
 : TradeCostBase("FixedATradeCost") {
     setParam<price_t>("commission", commission);
     setParam<price_t>("lowest_commission", lowestCommission);
@@ -34,14 +29,10 @@ FixedATradeCost::FixedATradeCost(
     setParam<price_t>("lowest_transferfee", lowestTransferfee);
 }
 
+FixedATradeCost::~FixedATradeCost() {}
 
-FixedATradeCost::~FixedATradeCost() {
-
-}
-
-
-CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime,
-        const Stock& stock, price_t price, size_t num) const {
+CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                       size_t num) const {
     CostRecord result;
     if (stock.isNull()) {
         HKU_WARN("Stock is Null!");
@@ -49,8 +40,7 @@ CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime,
     }
 
     int precision = stock.precision();
-    result.commission = roundEx(price * num * getParam<price_t>("commission"),
-                                precision);
+    result.commission = roundEx(price * num * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
     if (result.commission < lowestCommission) {
         result.commission = lowestCommission;
@@ -58,9 +48,8 @@ CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime,
 
     //上证买入时，有过户费
     if (stock.market() == "SH") {
-        result.transferfee = num > 1000
-                ? roundEx(getParam<price_t>("transferfee") * num, precision)
-                : getParam<price_t>("lowest_transferfee");
+        result.transferfee = num > 1000 ? roundEx(getParam<price_t>("transferfee") * num, precision)
+                                        : getParam<price_t>("lowest_transferfee");
     }
 
     result.total = result.commission + result.transferfee;
@@ -68,54 +57,45 @@ CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime,
     return result;
 }
 
-
-CostRecord FixedATradeCost::getSellCost(const Datetime& datetime,
-        const Stock& stock, price_t price, size_t num) const {
+CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                        size_t num) const {
     CostRecord result;
-    if( stock.isNull() ){
+    if (stock.isNull()) {
         HKU_WARN("Stock is NULL!");
         return result;
     }
 
     int precision = stock.precision();
-    result.commission = roundEx(price * num * getParam<price_t>("commission"),
-                                precision);
+    result.commission = roundEx(price * num * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
-    if( result.commission < lowestCommission ){
+    if (result.commission < lowestCommission) {
         result.commission = lowestCommission;
     }
 
-    //A股和创业板有印花税，其他无
+    // A股和创业板有印花税，其他无
     if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM) {
-        result.stamptax = roundEx(price * num * getParam<price_t>("stamptax"),
-                              precision);
+        result.stamptax = roundEx(price * num * getParam<price_t>("stamptax"), precision);
     } else {
         result.stamptax = 0.0;
     }
     result.transferfee = 0.0;
-    if(stock.market() == "SH"){
-        result.transferfee = num > 1000
-                ? roundEx(getParam<price_t>("transferfee") * num, precision)
-                : getParam<price_t>("lowest_transferfee");
+    if (stock.market() == "SH") {
+        result.transferfee = num > 1000 ? roundEx(getParam<price_t>("transferfee") * num, precision)
+                                        : getParam<price_t>("lowest_transferfee");
     }
     result.others = 0.0;
     result.total = result.commission + result.stamptax + result.transferfee;
     return result;
 }
 
-
 TradeCostPtr FixedATradeCost::_clone() {
     return TradeCostPtr(new FixedATradeCost());
 }
 
-TradeCostPtr HKU_API TC_FixedA(
-        price_t commission,
-        price_t lowestCommission,
-        price_t stamptax,
-        price_t transferfee,
-        price_t lowestTransferfee) {
-    return TradeCostPtr(new FixedATradeCost(commission, lowestCommission,
-            stamptax, transferfee, lowestTransferfee));
+TradeCostPtr HKU_API TC_FixedA(price_t commission, price_t lowestCommission, price_t stamptax,
+                               price_t transferfee, price_t lowestTransferfee) {
+    return TradeCostPtr(
+      new FixedATradeCost(commission, lowestCommission, stamptax, transferfee, lowestTransferfee));
 }
 
 } /* namespace hku */

@@ -11,16 +11,13 @@
 BOOST_CLASS_EXPORT(hku::ISum)
 #endif
 
-
 namespace hku {
 
 ISum::ISum() : IndicatorImp("SUM", 1) {
     setParam<int>("n", 20);
 }
 
-ISum::~ISum() {
-
-}
+ISum::~ISum() {}
 
 bool ISum::check() {
     int n = getParam<int>("n");
@@ -70,9 +67,9 @@ void ISum::_calculate(const Indicator& ind) {
     if (first_end >= 1) {
         _set(sum, first_end - 1);
     }
-    
+
     for (size_t i = first_end; i < total; ++i) {
-        sum = ind[i] + sum - ind[i-n];
+        sum = ind[i] + sum - ind[i - n];
         _set(sum, i);
     }
 

@@ -14,16 +14,13 @@
 BOOST_CLASS_EXPORT(hku::IRound)
 #endif
 
-
 namespace hku {
 
 IRound::IRound() : IndicatorImp("ROUND", 1) {
     setParam<int>("ndigits", 2);
 }
 
-IRound::~IRound() {
-
-}
+IRound::~IRound() {}
 
 bool IRound::check() {
     if (getParam<int>("ndigits") < 0) {
@@ -46,7 +43,6 @@ void IRound::_calculate(const Indicator& data) {
         _set(roundEx(data[i], n), i);
     }
 }
-
 
 Indicator HKU_API ROUND(int ndigits) {
     IndicatorImpPtr p = make_shared<IRound>();

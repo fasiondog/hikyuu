@@ -42,9 +42,9 @@ struct H5TransRecord {
     uint64 datetime;
     uint64 price;
     uint64 vol;
-    uint8  buyorsell;
+    uint8 buyorsell;
 };
 
-} /* namespae */
+}  // namespace hku
 
 #endif /* H5RECORD_H_ */

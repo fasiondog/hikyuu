@@ -2,7 +2,7 @@
  * BARSLAST.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-4
  *      Author: fasiondog
  */
@@ -36,6 +36,6 @@ inline Indicator BARSLAST(price_t val) {
     return BARSLAST(CVAL(val));
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_BARSLAST_H_ */

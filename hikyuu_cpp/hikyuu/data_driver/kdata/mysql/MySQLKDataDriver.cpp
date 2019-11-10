@@ -11,21 +11,19 @@
 
 namespace hku {
 
-class MySQLCloser{
+class MySQLCloser {
 public:
-    void operator()(MYSQL *db){
-        if(db){
+    void operator()(MYSQL* db) {
+        if (db) {
             mysql_close(db);
-            //std::cout << "Closed Sqlite3 database!" << std::endl;
-            //Cannot use log output when exiting!
-            //HKU_TRACE("Closed MySQL database!");
+            // std::cout << "Closed Sqlite3 database!" << std::endl;
+            // Cannot use log output when exiting!
+            // HKU_TRACE("Closed MySQL database!");
         }
     }
 };
 
-MySQLKDataDriver::MySQLKDataDriver(): KDataDriver("mysql"), m_port(3306) {
-
-}
+MySQLKDataDriver::MySQLKDataDriver() : KDataDriver("mysql"), m_port(3306) {}
 
 bool MySQLKDataDriver::_init() {
     string default_host("127.0.0.1");
@@ -34,26 +32,26 @@ bool MySQLKDataDriver::_init() {
 
     try {
         m_host = m_params.get<string>("host");
-    } catch(...) {
+    } catch (...) {
         m_host = default_host;
         HKU_WARN("Can't get mysql host!");
     }
 
     try {
         m_port = m_params.get<int>("port");
-    } catch(...) {
+    } catch (...) {
         m_port = 3306;
     }
 
     try {
         m_usr = m_params.get<string>("usr");
-    } catch(...) {
+    } catch (...) {
         m_usr = default_usr;
     }
 
     try {
         m_pwd = m_params.get<string>("pwd");
-    } catch(...) {
+    } catch (...) {
         m_pwd = default_pwd;
     }
 
@@ -63,8 +61,8 @@ bool MySQLKDataDriver::_init() {
         return false;
     }
 
-    if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
-            m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
+    if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(), m_pwd.c_str(), NULL, m_port,
+                            NULL, 0)) {
         HKU_ERROR("Failed to connect to database!");
         return false;
     }
@@ -95,8 +93,8 @@ bool MySQLKDataDriver::_query(const string& sql_str) {
         return false;
     }
 
-    if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(),
-        m_pwd.c_str(), NULL, m_port, NULL, 0) ) {
+    if (!mysql_real_connect(mysql.get(), m_host.c_str(), m_usr.c_str(), m_pwd.c_str(), NULL, m_port,
+                            NULL, 0)) {
         HKU_ERROR(" Failed to connect to database!");
         return false;
     }
@@ -109,7 +107,7 @@ bool MySQLKDataDriver::_query(const string& sql_str) {
     m_mysql = mysql;
 
     res = mysql_query(m_mysql.get(), sql_str.c_str());
-    if(!res) {
+    if (!res) {
         return true;
     }
 
@@ -117,40 +115,34 @@ bool MySQLKDataDriver::_query(const string& sql_str) {
     return false;
 }
 
-string MySQLKDataDriver
-::_getTableName(const string& market, const string& code, KQuery::KType ktype) {
+string MySQLKDataDriver ::_getTableName(const string& market, const string& code,
+                                        KQuery::KType ktype) {
     string table(market + "_" + KQuery::getKTypeName(ktype) + "." + code);
     to_lower(table);
     return table;
 }
 
-MySQLKDataDriver::~MySQLKDataDriver() {
+MySQLKDataDriver::~MySQLKDataDriver() {}
 
-}
-
-
-void MySQLKDataDriver::
-loadKData(const string& market, const string& code,
-        KQuery::KType kType, size_t start_ix, size_t end_ix,
-        KRecordListPtr out_buffer) {
+void MySQLKDataDriver::loadKData(const string& market, const string& code, KQuery::KType kType,
+                                 size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
     if (!m_mysql) {
         return;
     }
 
-    //if (kType >= KQuery::INVALID_KTYPE || start_ix >= end_ix) {
-    if (start_ix >= end_ix) {        
-        HKU_WARN("ktype({}) is invalid or start_ix({}) >= endix({})", kType, start_ix, end_ix );
+    // if (kType >= KQuery::INVALID_KTYPE || start_ix >= end_ix) {
+    if (start_ix >= end_ix) {
+        HKU_WARN("ktype({}) is invalid or start_ix({}) >= endix({})", kType, start_ix, end_ix);
         return;
     }
 
-    MYSQL_RES *result;
+    MYSQL_RES* result;
     MYSQL_ROW row;
 
     string table(_getTableName(market, code, kType));
-    std::stringstream buf (std::stringstream::out);
-    buf << "select date, open, high, low, close, amount, count from "
-            << table << " order by date limit " << start_ix
-            << ", " << (end_ix - start_ix);
+    std::stringstream buf(std::stringstream::out);
+    buf << "select date, open, high, low, close, amount, count from " << table
+        << " order by date limit " << start_ix << ", " << (end_ix - start_ix);
     if (!_query(buf.str())) {
         return;
     }
@@ -186,11 +178,7 @@ loadKData(const string& market, const string& code,
     return;
 }
 
-
-size_t MySQLKDataDriver::
-getCount(const string& market,
-        const string& code,
-        KQuery::KType kType) {
+size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     size_t result = 0;
     if (!m_mysql) {
         HKU_ERROR("Null m_mysql!");
@@ -202,11 +190,11 @@ getCount(const string& market,
         return result;
     }*/
 
-    MYSQL_RES *mysql_result;
+    MYSQL_RES* mysql_result;
     MYSQL_ROW row;
 
     string table(_getTableName(market, code, kType));
-    std::stringstream buf (std::stringstream::out);
+    std::stringstream buf(std::stringstream::out);
     buf << "select count(1) from " << table;
     if (!_query(buf.str())) {
         HKU_ERROR("mysql_query error! ");
@@ -232,9 +220,9 @@ getCount(const string& market,
     return result;
 }
 
-bool MySQLKDataDriver::
-getIndexRangeByDate(const string& market, const string& code,
-        const KQuery& query, size_t& out_start, size_t& out_end) {
+bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& code,
+                                           const KQuery& query, size_t& out_start,
+                                           size_t& out_end) {
     out_start = 0;
     out_end = 0;
     if (query.queryType() != KQuery::DATE) {
@@ -242,18 +230,16 @@ getIndexRangeByDate(const string& market, const string& code,
         return false;
     }
 
-    if(query.startDatetime() >= query.endDatetime()
-    || query.startDatetime() > (Datetime::max)()) {
+    if (query.startDatetime() >= query.endDatetime() || query.startDatetime() > (Datetime::max)()) {
         return false;
     }
 
-    MYSQL_RES *mysql_result;
+    MYSQL_RES* mysql_result;
     MYSQL_ROW row;
 
     string table(_getTableName(market, code, query.kType()));
-    std::stringstream buf (std::stringstream::out);
-    buf << "select count(1) from " << table
-        << " where date<" << query.startDatetime().number();
+    std::stringstream buf(std::stringstream::out);
+    buf << "select count(1) from " << table << " where date<" << query.startDatetime().number();
 
     if (!_query(buf.str())) {
         HKU_ERROR("mysql_query error!");
@@ -280,8 +266,7 @@ getIndexRangeByDate(const string& market, const string& code,
     mysql_free_result(mysql_result);
 
     buf.str("");
-    buf << "select count(1) from " << table
-        << " where date<=" << query.endDatetime().number();
+    buf << "select count(1) from " << table << " where date<=" << query.endDatetime().number();
     if (!_query(buf.str())) {
         HKU_ERROR("mysql_query error!");
         return false;
@@ -308,9 +293,8 @@ getIndexRangeByDate(const string& market, const string& code,
     return true;
 }
 
-KRecord MySQLKDataDriver::
-getKRecord(const string& market, const string& code,
-          size_t pos, KQuery::KType kType) {
+KRecord MySQLKDataDriver::getKRecord(const string& market, const string& code, size_t pos,
+                                     KQuery::KType kType) {
     KRecord result;
     if (!m_mysql) {
         HKU_ERROR("Null m_mysql!");
@@ -322,13 +306,13 @@ getKRecord(const string& market, const string& code,
         return result;
     }*/
 
-    MYSQL_RES *mysql_result;
+    MYSQL_RES* mysql_result;
     MYSQL_ROW row;
 
     string table(_getTableName(market, code, kType));
-    std::stringstream buf (std::stringstream::out);
-    buf << "select date, open, high, low, close, amount, count from "
-            << table << " order by date limit " << pos << ", 1";
+    std::stringstream buf(std::stringstream::out);
+    buf << "select date, open, high, low, close, amount, count from " << table
+        << " order by date limit " << pos << ", 1";
     if (!_query(buf.str())) {
         HKU_ERROR("mysql_query error! ");
         return result;

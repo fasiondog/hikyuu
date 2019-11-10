@@ -1,6 +1,6 @@
 /*
  * ROUNDDOWN.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-14
@@ -31,6 +31,6 @@ inline Indicator ROUNDDOWN(price_t val, int n) {
     return ROUNDDOWN(CVAL(val), n);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ROUNDDOWN_H_ */

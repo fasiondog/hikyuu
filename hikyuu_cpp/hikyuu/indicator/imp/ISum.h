@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class ISum: public IndicatorImp {
+class ISum : public IndicatorImp {
     INDICATOR_IMP(ISum)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

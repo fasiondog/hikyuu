@@ -14,16 +14,11 @@
 BOOST_CLASS_EXPORT(hku::ICeil)
 #endif
 
-
 namespace hku {
 
-ICeil::ICeil() : IndicatorImp("CEILING", 1) {
+ICeil::ICeil() : IndicatorImp("CEILING", 1) {}
 
-}
-
-ICeil::~ICeil() {
-
-}
+ICeil::~ICeil() {}
 
 bool ICeil::check() {
     return true;
@@ -41,7 +36,6 @@ void ICeil::_calculate(const Indicator& data) {
         _set(std::ceil(data[i]), i);
     }
 }
-
 
 Indicator HKU_API CEILING() {
     return Indicator(make_shared<ICeil>());

@@ -19,7 +19,7 @@ namespace hku {
  * 计算公式：（收盘价今－收盘价昨）＊成交量今
  * n: 用于EMA平滑的周期窗口，必须为大于0的整数
  */
-class Vigor: public IndicatorImp {
+class Vigor : public IndicatorImp {
     INDICATOR_IMP(Vigor)
     INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

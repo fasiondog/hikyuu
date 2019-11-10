@@ -2,7 +2,7 @@
  * SQLiteBaseInfoDriver.cpp
  *
  *  Copyright (c) 2019 fasiondog
- * 
+ *
  *  Created on: 2019-8-11
  *      Author: fasiondog
  */
@@ -17,9 +17,7 @@
 
 namespace hku {
 
-SQLiteBaseInfoDriver::SQLiteBaseInfoDriver()
-: BaseInfoDriver("sqlite3"), m_pool(nullptr) {
-}
+SQLiteBaseInfoDriver::SQLiteBaseInfoDriver() : BaseInfoDriver("sqlite3"), m_pool(nullptr) {}
 
 SQLiteBaseInfoDriver::~SQLiteBaseInfoDriver() {
     if (m_pool) {
@@ -32,7 +30,7 @@ bool SQLiteBaseInfoDriver::_init() {
     try {
         dbname = getParam<string>("db");
         HKU_TRACE("SQLITE3: {}", dbname);
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Can't get Sqlite3 filename!");
         return false;
     }
@@ -49,7 +47,7 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
 
     DBConnectGuard dbGuard(m_pool);
     auto con = dbGuard.getConnect();
-    
+
     vector<MarketInfoTable> infoTables;
     try {
         con->batchLoad(infoTables);
@@ -62,7 +60,7 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
     }
 
     StockManager& sm = StockManager::instance();
-    for (auto& info: infoTables) {
+    for (auto& info : infoTables) {
         Datetime lastDate;
         try {
             lastDate = Datetime(info.lastDate() * 10000);
@@ -71,13 +69,7 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
             HKU_WARN("lastDate of market({}) is invalid! ", info.market());
         }
         sm.loadMarketInfo(
-            MarketInfo(
-                info.market(),
-                info.name(),
-                info.description(),
-                info.code(),
-                lastDate
-        ));
+          MarketInfo(info.market(), info.name(), info.description(), info.code(), lastDate));
     }
 
     return true;
@@ -104,17 +96,10 @@ bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
     }
 
     StockManager& sm = StockManager::instance();
-    for (auto& info: infoTables) {
-        sm.loadStockTypeInfo(
-            StockTypeInfo(
-                info.type(),
-                info.description(), 
-                info.tick(),
-                info.tickValue(), 
-                info.precision(),
-                info.minTradeNumber(), 
-                info.maxTradeNumber()
-        ));
+    for (auto& info : infoTables) {
+        sm.loadStockTypeInfo(StockTypeInfo(info.type(), info.description(), info.tick(),
+                                           info.tickValue(), info.precision(),
+                                           info.minTradeNumber(), info.maxTradeNumber()));
     }
 
     return true;
@@ -141,7 +126,7 @@ bool SQLiteBaseInfoDriver::_loadStock() {
     }
 
     unordered_map<uint64, string> marketDict;
-    for (auto& m: marketTable) {
+    for (auto& m : marketTable) {
         marketDict[m.id()] = m.market();
     }
 
@@ -160,48 +145,33 @@ bool SQLiteBaseInfoDriver::_loadStock() {
     StockTypeInfo stockTypeInfo;
     StockTypeInfo null_stockTypeInfo;
     StockManager& sm = StockManager::instance();
-    for (auto& r: table) {
-        //HKU_INFO("stock({},{},{},{},{},{},{},{})", r.stockid,r.marketid,r.code,HKU_STR(r.name),r.type,r.valid,r.startDate,r.endDate);
+    for (auto& r : table) {
+        // HKU_INFO("stock({},{},{},{},{},{},{},{})",
+        // r.stockid,r.marketid,r.code,HKU_STR(r.name),r.type,r.valid,r.startDate,r.endDate);
         Datetime startDate, endDate;
-        if(r.startDate > r.endDate || r.startDate == 0 || r.endDate == 0) {
+        if (r.startDate > r.endDate || r.startDate == 0 || r.endDate == 0) {
             //日期非法，置为Null<Datetime>
             startDate = Null<Datetime>();
             endDate = Null<Datetime>();
         } else {
-            startDate = (r.startDate == 99999999LL)
-                      ? Null<Datetime>()
-                      : Datetime(r.startDate*10000);
-            endDate = (r.endDate == 99999999LL)
-                    ? Null<Datetime>()
-                    : Datetime(r.endDate*10000);
+            startDate =
+              (r.startDate == 99999999LL) ? Null<Datetime>() : Datetime(r.startDate * 10000);
+            endDate = (r.endDate == 99999999LL) ? Null<Datetime>() : Datetime(r.endDate * 10000);
         }
 
         stockTypeInfo = sm.getStockTypeInfo(r.type);
-        if(stockTypeInfo != null_stockTypeInfo) {
-            stock = Stock(marketDict[r.marketid],
-                          r.code,
-                          HKU_STR(r.name),
-                          r.type,
-                          r.valid,
-                          startDate,
-                          endDate,
-                          stockTypeInfo.tick(),
-                          stockTypeInfo.tickValue(),
-                          stockTypeInfo.precision(),
-                          stockTypeInfo.minTradeNumber(),
+        if (stockTypeInfo != null_stockTypeInfo) {
+            stock = Stock(marketDict[r.marketid], r.code, HKU_STR(r.name), r.type, r.valid,
+                          startDate, endDate, stockTypeInfo.tick(), stockTypeInfo.tickValue(),
+                          stockTypeInfo.precision(), stockTypeInfo.minTradeNumber(),
                           stockTypeInfo.maxTradeNumber());
-            
+
         } else {
-            stock = Stock(marketDict[r.marketid],
-                          r.code,
-                          HKU_STR(r.name),
-                          r.type,
-                          r.valid,
-                          startDate,
-                          endDate);
+            stock = Stock(marketDict[r.marketid], r.code, HKU_STR(r.name), r.type, r.valid,
+                          startDate, endDate);
         }
 
-        if(sm.loadStock(stock)){
+        if (sm.loadStock(stock)) {
             StockWeightList weightList = _getStockWeightList(r.stockid);
             stock.setWeightList(weightList);
         }
@@ -232,20 +202,12 @@ StockWeightList SQLiteBaseInfoDriver::_getStockWeightList(uint64 stockid) {
         return result;
     }
 
-    for (auto& w: table) {
+    for (auto& w : table) {
         try {
-            result.push_back(
-                StockWeight(
-                    Datetime(w.date*10000), 
-                    w.countAsGift * 0.0001,
-                    w.countForSell * 0.0001, 
-                    w.priceForSell * 0.001,
-                    w.bonus * 0.001,
-                    w.countOfIncreasement * 0.0001,
-                    w.totalCount, 
-                    w.freeCount
-                )
-            );
+            result.push_back(StockWeight(Datetime(w.date * 10000), w.countAsGift * 0.0001,
+                                         w.countForSell * 0.0001, w.priceForSell * 0.001,
+                                         w.bonus * 0.001, w.countOfIncreasement * 0.0001,
+                                         w.totalCount, w.freeCount));
         } catch (std::out_of_range& e) {
             HKU_WARN("Date of id({}) is invalid! {}", w.id(), e.what());
         } catch (std::exception& e) {
@@ -258,13 +220,12 @@ StockWeightList SQLiteBaseInfoDriver::_getStockWeightList(uint64 stockid) {
     return result;
 }
 
-Parameter SQLiteBaseInfoDriver
-::getFinanceInfo(const string& market, const string& code) {
+Parameter SQLiteBaseInfoDriver ::getFinanceInfo(const string& market, const string& code) {
     Parameter result;
     if (!m_pool) {
         return result;
     }
-    
+
     std::stringstream buf;
     buf << "select f.updated_date, f.ipo_date, f.province,"
         << "f.industry, f.zongguben, f.liutongguben, f.guojiagu, f.faqirenfarengu,"
@@ -286,27 +247,25 @@ Parameter SQLiteBaseInfoDriver
 
     auto st = con->getStatement(buf.str());
     st->exec();
-    if(!st->moveNext()) {
+    if (!st->moveNext()) {
         return result;
     }
 
     int updated_date(0), ipo_date(0);
     price_t province(0), industry(0), zongguben(0), liutongguben(0), guojiagu(0), faqirenfarengu(0);
-    price_t farengu(0), bgu(0), hgu(0), zhigonggu(0), zongzichan(0), liudongzichan(0), gudingzichan(0);
+    price_t farengu(0), bgu(0), hgu(0), zhigonggu(0), zongzichan(0), liudongzichan(0),
+      gudingzichan(0);
     price_t wuxingzichan(0), gudongrenshu(0), liudongfuzhai(0), changqifuzhai(0), zibengongjijin(0);
     price_t jingzichan(0), zhuyingshouru(0), zhuyinglirun(0), yingshouzhangkuan(0), yingyelirun(0);
     price_t touzishouyi(0), jingyingxianjinliu(0), zongxianjinliu(0), cunhuo(0), lirunzonghe(0);
     price_t shuihoulirun(0), jinglirun(0), weifenpeilirun(0), meigujingzichan(0), baoliu2(0);
 
-    st->getColumn(
-        0, updated_date, ipo_date,
-        province, industry, zongguben, liutongguben, guojiagu, faqirenfarengu,
-        farengu, bgu, hgu, zhigonggu, zongzichan, liudongzichan, gudingzichan,
-        wuxingzichan, gudongrenshu, liudongfuzhai, changqifuzhai, zibengongjijin,
-        jingzichan, zhuyingshouru, zhuyinglirun, yingshouzhangkuan, yingyelirun,
-        touzishouyi, jingyingxianjinliu, zongxianjinliu, cunhuo, lirunzonghe,
-        shuihoulirun, jinglirun, weifenpeilirun, meigujingzichan, baoliu2
-    );
+    st->getColumn(0, updated_date, ipo_date, province, industry, zongguben, liutongguben, guojiagu,
+                  faqirenfarengu, farengu, bgu, hgu, zhigonggu, zongzichan, liudongzichan,
+                  gudingzichan, wuxingzichan, gudongrenshu, liudongfuzhai, changqifuzhai,
+                  zibengongjijin, jingzichan, zhuyingshouru, zhuyinglirun, yingshouzhangkuan,
+                  yingyelirun, touzishouyi, jingyingxianjinliu, zongxianjinliu, cunhuo, lirunzonghe,
+                  shuihoulirun, jinglirun, weifenpeilirun, meigujingzichan, baoliu2);
 
     result.set<string>("market", market);
     result.set<string>("code", code);
@@ -348,4 +307,4 @@ Parameter SQLiteBaseInfoDriver
     return result;
 }
 
-} /* namespace */
+}  // namespace hku

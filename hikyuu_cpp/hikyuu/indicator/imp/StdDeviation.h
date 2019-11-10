@@ -20,7 +20,7 @@ namespace hku {
  *       link：均值参数联动标志，默认true
  *
  */
-class StdDeviation: public hku::IndicatorImp {
+class StdDeviation : public hku::IndicatorImp {
     INDICATOR_IMP(StdDeviation)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

@@ -44,9 +44,8 @@ Indicator HKU_API PRICELIST(int result_index = 0);
  * @param total 数组大小
  * @ingroup Indicator
  */
-Indicator HKU_API PRICELIST(price_t *data, size_t total);
+Indicator HKU_API PRICELIST(price_t* data, size_t total);
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* PRICELIST_H_ */

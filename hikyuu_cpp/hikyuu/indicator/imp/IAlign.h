@@ -2,7 +2,7 @@
  * IAlign.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-5-20
  *      Author: fasiondog
  */
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IAlign: public IndicatorImp {
+class IAlign : public IndicatorImp {
     INDICATOR_IMP(IAlign)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

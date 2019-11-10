@@ -1,6 +1,6 @@
 /*
  * ISign.h
- * 
+ *
  *  Copyright (c) 2019 fasiondog
  *
  *  Created on: 2019-4-3
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ISign: public IndicatorImp {
+class ISign : public IndicatorImp {
     INDICATOR_IMP(ISign)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

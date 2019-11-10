@@ -1,6 +1,6 @@
 /*
  * HistoryFinanceReader.cpp
- * 
+ *
  * Copyright (c) 2019 fasiondog
  *
  *  Created on: 2019年4月2日
@@ -13,33 +13,25 @@
 
 namespace hku {
 
-HistoryFinanceReader::HistoryFinanceReader(const string& dir)
-: m_dir(dir) {
+HistoryFinanceReader::HistoryFinanceReader(const string& dir) : m_dir(dir) {}
 
-}
+HistoryFinanceReader::~HistoryFinanceReader() {}
 
-HistoryFinanceReader::~HistoryFinanceReader() {
-
-}
-
-PriceList HistoryFinanceReader
-::getHistoryFinanceInfo(Datetime date, 
-        const string& market, const string& code) {
+PriceList HistoryFinanceReader ::getHistoryFinanceInfo(Datetime date, const string& market,
+                                                       const string& code) {
     PriceList result;
 
-    string filename(m_dir + "/gpcw" 
-                   + boost::lexical_cast<string>(date.number() / 10000)
-                   + ".dat");
-    FILE *fp = fopen(filename.c_str(), "rb");
+    string filename(m_dir + "/gpcw" + boost::lexical_cast<string>(date.number() / 10000) + ".dat");
+    FILE* fp = fopen(filename.c_str(), "rb");
     if (NULL == fp) {
         HKU_INFO("Can't found {}", filename);
         return result;
     }
 
-    unsigned int report_date = 0;  
+    unsigned int report_date = 0;
     unsigned short max_count = 0;
     unsigned long report_size = 0;
-    
+
     char header_buf[20];
     if (!fread(header_buf, 1, 20, fp)) {
         HKU_ERROR("read data failed! {}", filename);
@@ -80,7 +72,7 @@ PriceList HistoryFinanceReader
             HKU_WARN("Over MAX_COL_NUM! {}", filename);
             report_fields_count = MAX_COL_NUM;
         }
-        
+
         fseek(fp, address, SEEK_SET);
 
         if (!fread(result_buffer, 4, report_fields_count, fp)) {
@@ -98,7 +90,7 @@ PriceList HistoryFinanceReader
                 result.push_back(result_buffer[i]);
             }
         }
-    
+
     } else {
         HKU_ERROR("Invalid address(0)! {}", filename);
     }
@@ -108,6 +100,3 @@ PriceList HistoryFinanceReader
 }
 
 } /* namespace hku */
-
-
-

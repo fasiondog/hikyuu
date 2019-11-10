@@ -18,6 +18,6 @@ namespace hku {
 Indicator HKU_API LIUTONGPAN();
 Indicator HKU_API LIUTONGPAN(const KData&);
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_LIUTONGPAN_H_ */

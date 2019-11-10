@@ -1,6 +1,6 @@
 /*
  * IAd.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-18
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IAd: public IndicatorImp {
+class IAd : public IndicatorImp {
     INDICATOR_IMP(IAd)
     INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

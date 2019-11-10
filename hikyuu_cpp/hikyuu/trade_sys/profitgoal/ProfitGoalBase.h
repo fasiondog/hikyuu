@@ -26,7 +26,7 @@ namespace hku {
  * @details 交易前确定盈利目标，用于系统在价格达到盈利目标时执行卖出
  * @ingroup ProfitGoal
  */
-class HKU_API ProfitGoalBase: public enable_shared_from_this<ProfitGoalBase>  {
+class HKU_API ProfitGoalBase : public enable_shared_from_this<ProfitGoalBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -98,25 +98,24 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& boost::serialization::make_nvp("m_name", name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
+        ar& boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(ProfitGoalBase)
@@ -136,25 +135,24 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ProfitGoalBase)
  * @endcode
  * @ingroup ProfitGoal
  */
-#define PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ProfitGoalBase); \
+#define PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION              \
+private:                                                         \
+    friend class boost::serialization::access;                   \
+    template <class Archive>                                     \
+    void serialize(Archive& ar, const unsigned int version) {    \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(ProfitGoalBase); \
     }
 #else
 #define PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-
-#define PROFITGOAL_IMP(classname) public:\
-    virtual ProfitGoalPtr _clone() {\
-        return ProfitGoalPtr(new classname());\
-    }\
+#define PROFITGOAL_IMP(classname)                      \
+public:                                                \
+    virtual ProfitGoalPtr _clone() {                   \
+        return ProfitGoalPtr(new classname());         \
+    }                                                  \
     virtual price_t getGoal(const Datetime&, price_t); \
     virtual void _calculate();
-
-
 
 /**
  * 客户程序都应使用该指针类型
@@ -163,9 +161,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ProfitGoalBase)
 typedef shared_ptr<ProfitGoalBase> ProfitGoalPtr;
 typedef shared_ptr<ProfitGoalBase> PGPtr;
 
-HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalBase& pg);
-HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalPtr& pg);
-
+HKU_API std::ostream& operator<<(std::ostream& os, const ProfitGoalBase& pg);
+HKU_API std::ostream& operator<<(std::ostream& os, const ProfitGoalPtr& pg);
 
 inline void ProfitGoalBase::setTM(const TradeManagerPtr& tm) {
     m_tm = tm;

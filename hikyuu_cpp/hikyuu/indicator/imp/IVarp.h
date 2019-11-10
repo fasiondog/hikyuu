@@ -2,7 +2,7 @@
  * IVarp.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-2
  *      Author: fasiondog
  */
@@ -18,7 +18,7 @@ namespace hku {
 /*
  * 估算总体样本方差
  */
-class IVarp: public hku::IndicatorImp {
+class IVarp : public hku::IndicatorImp {
     INDICATOR_IMP(IVarp)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

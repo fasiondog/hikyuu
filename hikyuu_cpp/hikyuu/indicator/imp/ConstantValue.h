@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class ConstantValue: public IndicatorImp {
+class ConstantValue : public IndicatorImp {
     INDICATOR_IMP(ConstantValue)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

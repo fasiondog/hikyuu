@@ -13,15 +13,15 @@
 
 namespace hku {
 
-class FixedRatioMoneyManager: public MoneyManagerBase {
+class FixedRatioMoneyManager : public MoneyManagerBase {
 public:
     FixedRatioMoneyManager();
     virtual ~FixedRatioMoneyManager();
 
     virtual void _reset();
     virtual MoneyManagerPtr _clone();
-    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
-                    price_t price, price_t risk, SystemPart from);
+    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                 price_t risk, SystemPart from);
 
 private:
     int m_current_num;
@@ -30,11 +30,11 @@ private:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version) {
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MoneyManagerBase);
-        ar & BOOST_SERIALIZATION_NVP(m_current_num);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_cash);
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(MoneyManagerBase);
+        ar& BOOST_SERIALIZATION_NVP(m_current_num);
+        ar& BOOST_SERIALIZATION_NVP(m_pre_cash);
     }
 
 #endif /* HKU_SUPPORT_SERIALIZATION */

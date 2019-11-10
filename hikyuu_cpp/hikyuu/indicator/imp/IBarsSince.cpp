@@ -1,6 +1,6 @@
 /*
  * IBarsSince.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-4
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::IBarsSince)
 #endif
 
-
 namespace hku {
 
-IBarsSince::IBarsSince() : IndicatorImp("BARSSINCE", 1) {
+IBarsSince::IBarsSince() : IndicatorImp("BARSSINCE", 1) {}
 
-}
-
-IBarsSince::~IBarsSince() {
-
-}
+IBarsSince::~IBarsSince() {}
 
 bool IBarsSince::check() {
     return true;
@@ -53,10 +48,8 @@ void IBarsSince::_calculate(const Indicator& ind) {
     m_discard = pos;
 }
 
-
 Indicator HKU_API BARSSINCE() {
     return Indicator(make_shared<IBarsSince>());
 }
-
 
 } /* namespace hku */

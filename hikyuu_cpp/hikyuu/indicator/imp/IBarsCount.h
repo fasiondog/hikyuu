@@ -1,6 +1,6 @@
 /*
  * IBarsCount.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-12
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IBarsCount: public IndicatorImp {
+class IBarsCount : public IndicatorImp {
     INDICATOR_IMP(IBarsCount)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

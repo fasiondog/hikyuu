@@ -2,7 +2,7 @@
  * StockWeightTable.h
  *
  *  Copyright (c) 2019 fasiondog
- * 
+ *
  *  Created on: 2019-8-11
  *      Author: fasiondog
  */
@@ -16,13 +16,20 @@
 namespace hku {
 
 class StockWeightTable {
-    TABLE_BIND9(stkWeight, stockid, date, countAsGift, countForSell, priceForSell,
-                bonus, countOfIncreasement, totalCount, freeCount) 
+    TABLE_BIND9(stkWeight, stockid, date, countAsGift, countForSell, priceForSell, bonus,
+                countOfIncreasement, totalCount, freeCount)
 
 public:
     StockWeightTable()
-    : stockid(0), date(0), countAsGift(0), countForSell(0),
-      priceForSell(0), bonus(0), countOfIncreasement(0), totalCount(0), freeCount(0) {}
+    : stockid(0),
+      date(0),
+      countAsGift(0),
+      countForSell(0),
+      priceForSell(0),
+      bonus(0),
+      countOfIncreasement(0),
+      totalCount(0),
+      freeCount(0) {}
 
 public:
     uint64 stockid;
@@ -36,6 +43,6 @@ public:
     double freeCount;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_STOCKWEIGHTTABLE_H */

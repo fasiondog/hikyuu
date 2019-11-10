@@ -15,10 +15,8 @@
 
 namespace hku {
 
-PortfolioPtr HKU_API PF_Simple(
-        const TMPtr& tm = TradeManagerPtr(),
-        const SEPtr& st = SE_Fixed(),
-        const AFPtr& af = AF_EqualWeight());
+PortfolioPtr HKU_API PF_Simple(const TMPtr& tm = TradeManagerPtr(), const SEPtr& st = SE_Fixed(),
+                               const AFPtr& af = AF_EqualWeight());
 
 } /* namespace hku */
 

@@ -30,9 +30,8 @@ Indicator HKU_API AMA(int n = 10, int fast_n = 2, int slow_n = 30);
  * @param slow_n 对应慢速EMA线的N值，默认为30，不过当超过60左右该指标会收敛不会有太大的影响
  * @ingroup Indicator
  */
-Indicator HKU_API AMA(const Indicator& indicator, int n = 10,
-        int fast_n = 2, int slow_n = 30);
+Indicator HKU_API AMA(const Indicator& indicator, int n = 10, int fast_n = 2, int slow_n = 30);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* AMA_H_ */

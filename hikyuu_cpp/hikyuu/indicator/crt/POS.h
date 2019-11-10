@@ -14,8 +14,7 @@
 
 namespace hku {
 
-Indicator HKU_API POS(const Block& block, KQuery query,
-        SignalPtr ind);
+Indicator HKU_API POS(const Block& block, KQuery query, SignalPtr ind);
 
 } /* namespace hku */
 

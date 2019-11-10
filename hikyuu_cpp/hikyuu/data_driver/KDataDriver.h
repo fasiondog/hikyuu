@@ -25,7 +25,7 @@ class HKU_API KDataDriver {
 public:
     KDataDriver();
     KDataDriver(const string& name);
-    virtual ~KDataDriver() { }
+    virtual ~KDataDriver() {}
 
     const string& name() const;
 
@@ -39,7 +39,6 @@ public:
         return true;
     }
 
-
     /**
      * 将指定类型的K线数据加载至缓存
      * @param market 市场简称
@@ -49,9 +48,8 @@ public:
      * @param end_ix 欲加载的结束位置，不包含自身
      * @param out_buffer [out] 缓存指针
      */
-    virtual void loadKData(const string& market, const string& code,
-            KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordListPtr out_buffer) ;
+    virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
+                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer);
 
     /**
      * 获取指定类型的K线数据量
@@ -60,8 +58,7 @@ public:
      * @param kType  K线类型
      * @return
      */
-    virtual size_t getCount(const string& market, const string& code,
-            KQuery::KType kType);
+    virtual size_t getCount(const string& market, const string& code, KQuery::KType kType);
 
     /**
      * 获取指定日期范围对应的K线记录索引
@@ -72,8 +69,8 @@ public:
      * @param out_end [out] 对应的K线记录位置
      * @return
      */
-    virtual bool getIndexRangeByDate(const string& market, const string& code,
-            const KQuery& query, size_t& out_start, size_t& out_end);
+    virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
+                                     size_t& out_start, size_t& out_end);
 
     /**
      * 获取指定的K线记录
@@ -83,8 +80,8 @@ public:
      * @param kType  K线类型
      * @return
      */
-    virtual KRecord getKRecord(const string& market, const string& code,
-              size_t pos, KQuery::KType kType);
+    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
+                               KQuery::KType kType);
 
     /**
      * 获取分时线
@@ -94,7 +91,7 @@ public:
      * @return
      */
     virtual TimeLineList getTimeLineList(const string& market, const string& code,
-            const KQuery& query);
+                                         const KQuery& query);
 
     /**
      * 获取历史分笔数据
@@ -103,8 +100,7 @@ public:
      * @param query  查询条件
      * @return
      */
-    virtual TransList getTransList(const string& market, const string& code,
-            const KQuery& query);
+    virtual TransList getTransList(const string& market, const string& code, const KQuery& query);
 
 private:
     bool checkType();
@@ -113,17 +109,15 @@ private:
     string m_name;
 };
 
-
 typedef shared_ptr<KDataDriver> KDataDriverPtr;
 
-
-HKU_API std::ostream & operator<<(std::ostream&, const KDataDriver&);
-HKU_API std::ostream & operator<<(std::ostream&, const KDataDriverPtr&);
+HKU_API std::ostream& operator<<(std::ostream&, const KDataDriver&);
+HKU_API std::ostream& operator<<(std::ostream&, const KDataDriverPtr&);
 
 inline const string& KDataDriver::name() const {
     return m_name;
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* KDATADRIVER_H_ */

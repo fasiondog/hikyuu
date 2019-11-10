@@ -25,7 +25,7 @@ namespace hku {
  * 资金管理基类
  * @ingroup MoneyManager
  */
-class HKU_API MoneyManagerBase: public enable_shared_from_this<MoneyManagerBase> {
+class HKU_API MoneyManagerBase : public enable_shared_from_this<MoneyManagerBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -93,8 +93,8 @@ public:
      * @param from 信号来源
      * @note 默认实现返回Null<size_t>() 卖出全部; 多次减仓才需要实现该接口
      */
-    size_t getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk, SystemPart from);
+    size_t getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
+                         SystemPart from);
 
     /**
      * 获取指定交易对象可卖空的数量
@@ -104,8 +104,8 @@ public:
      * @param from 信号来源
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
-    size_t getSellShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk, SystemPart from);
+    size_t getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                              price_t risk, SystemPart from);
 
     /**
      * 获取指定交易对象空头回补的买入数量
@@ -115,8 +115,8 @@ public:
      * @param from 信号来源
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
-    size_t getBuyShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk, SystemPart from);
+    size_t getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                             price_t risk, SystemPart from);
 
     /**
      * 获取指定交易对象可买入的数量
@@ -126,21 +126,20 @@ public:
      * @param from 信号来源
      * @param risk 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
      */
-    size_t getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk, SystemPart from);
+    size_t getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
+                        SystemPart from);
 
+    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                 price_t risk, SystemPart from) = 0;
 
-    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk, SystemPart from) = 0;
+    virtual size_t _getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                  price_t risk, SystemPart from);
 
-    virtual size_t _getSellNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk, SystemPart from);
+    virtual size_t _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                       price_t risk, SystemPart from);
 
-    virtual size_t _getSellShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk, SystemPart from);
-
-    virtual size_t _getBuyShortNumber(const Datetime& datetime,
-            const Stock& stock, price_t price, price_t risk, SystemPart from);
+    virtual size_t _getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                      price_t risk, SystemPart from);
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -159,28 +158,27 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& boost::serialization::make_nvp("m_name", name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
         // m_query、m_tm都是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_query);
-        //ar & BOOST_SERIALIZATION_NVP(m_tm);
+        // ar & BOOST_SERIALIZATION_NVP(m_query);
+        // ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
+        ar& boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(MoneyManagerBase)
@@ -200,16 +198,16 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(MoneyManagerBase)
  * @endcode
  * @ingroup MoneyManager
  */
-#define MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MoneyManagerBase); \
+#define MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION              \
+private:                                                           \
+    friend class boost::serialization::access;                     \
+    template <class Archive>                                       \
+    void serialize(Archive& ar, const unsigned int version) {      \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(MoneyManagerBase); \
     }
 #else
 #define MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
-
 
 /**
  * 客户程序都应使用该指针类型
@@ -218,17 +216,16 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(MoneyManagerBase)
 typedef shared_ptr<MoneyManagerBase> MoneyManagerPtr;
 typedef shared_ptr<MoneyManagerBase> MMPtr;
 
+#define MONEY_MANAGER_IMP(classname)                                                          \
+public:                                                                                       \
+    virtual MoneyManagerPtr _clone() {                                                        \
+        return MoneyManagerPtr(new classname());                                              \
+    }                                                                                         \
+    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, \
+                                 price_t risk, SystemPart from);
 
-#define MONEY_MANAGER_IMP(classname) public:\
-    virtual MoneyManagerPtr _clone() {\
-        return MoneyManagerPtr(new classname());\
-    }\
-    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock,\
-                price_t price, price_t risk, SystemPart from);
-
-
-HKU_API std::ostream & operator<<(std::ostream &, const MoneyManagerBase&);
-HKU_API std::ostream & operator<<(std::ostream &, const MoneyManagerPtr&);
+HKU_API std::ostream& operator<<(std::ostream&, const MoneyManagerBase&);
+HKU_API std::ostream& operator<<(std::ostream&, const MoneyManagerPtr&);
 
 } /* namespace hku */
 #endif /* MONEYMANAGERBASE_H_ */

@@ -18,7 +18,7 @@ namespace hku {
  * COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
  * COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
  */
-class ICount: public IndicatorImp {
+class ICount : public IndicatorImp {
     INDICATOR_IMP(ICount)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

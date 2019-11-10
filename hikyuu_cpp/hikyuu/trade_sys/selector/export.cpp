@@ -31,5 +31,3 @@
 BOOST_CLASS_EXPORT(hku::FixedSelector)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
-
-

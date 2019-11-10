@@ -11,16 +11,13 @@
 BOOST_CLASS_EXPORT(hku::Ema)
 #endif
 
-
 namespace hku {
 
-Ema::Ema(): IndicatorImp("EMA", 1) {
+Ema::Ema() : IndicatorImp("EMA", 1) {
     setParam<int>("n", 22);
 }
 
-Ema::~Ema() {
-
-}
+Ema::~Ema() {}
 
 bool Ema::check() {
     int n = getParam<int>("n");
@@ -51,7 +48,6 @@ void Ema::_calculate(const Indicator& indicator) {
         _set(ema, i);
     }
 }
-
 
 Indicator HKU_API EMA(int n) {
     IndicatorImpPtr p = make_shared<Ema>();

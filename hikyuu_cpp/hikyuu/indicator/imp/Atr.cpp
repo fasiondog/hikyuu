@@ -11,16 +11,13 @@
 BOOST_CLASS_EXPORT(hku::Atr)
 #endif
 
-
 namespace hku {
 
-Atr::Atr() : IndicatorImp("ATR", 1){
+Atr::Atr() : IndicatorImp("ATR", 1) {
     setParam<int>("n", 14);
 }
 
-Atr::~Atr() {
-
-}
+Atr::~Atr() {}
 
 bool Atr::check() {
     if (getParam<int>("n") < 1) {

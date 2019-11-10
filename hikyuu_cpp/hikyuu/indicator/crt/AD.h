@@ -2,7 +2,7 @@
  * AD.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-5-18
  *      Author: fasiondog
  */
@@ -23,7 +23,6 @@ namespace hku {
 Indicator HKU_API AD(const KData& k);
 Indicator HKU_API AD();
 
-
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_AD_H_ */

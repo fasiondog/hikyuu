@@ -1,8 +1,8 @@
 /*
  * ISign.cpp
  *
- * Copyright (c) 2019 fasiondog 
- * 
+ * Copyright (c) 2019 fasiondog
+ *
  *  Created on: 2019-4-3
  *      Author: fasiondog
  */
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::ISign)
 #endif
 
-
 namespace hku {
 
-ISign::ISign() : IndicatorImp("SGN", 1) {
+ISign::ISign() : IndicatorImp("SGN", 1) {}
 
-}
-
-ISign::~ISign() {
-
-}
+ISign::~ISign() {}
 
 bool ISign::check() {
     return true;

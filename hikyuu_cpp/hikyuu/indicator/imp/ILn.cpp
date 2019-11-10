@@ -11,16 +11,11 @@
 BOOST_CLASS_EXPORT(hku::ILn)
 #endif
 
-
 namespace hku {
 
-ILn::ILn() : IndicatorImp("LN", 1) {
+ILn::ILn() : IndicatorImp("LN", 1) {}
 
-}
-
-ILn::~ILn() {
-
-}
+ILn::~ILn() {}
 
 bool ILn::check() {
     return true;
@@ -44,10 +39,8 @@ void ILn::_calculate(const Indicator& data) {
     }
 }
 
-
 Indicator HKU_API LN() {
     return Indicator(make_shared<ILn>());
 }
-
 
 } /* namespace hku */

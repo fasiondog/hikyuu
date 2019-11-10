@@ -9,22 +9,17 @@
 
 namespace hku {
 
-ZeroTradeCost::ZeroTradeCost(): TradeCostBase("TC_Zero") {
+ZeroTradeCost::ZeroTradeCost() : TradeCostBase("TC_Zero") {}
 
-}
+ZeroTradeCost::~ZeroTradeCost() {}
 
-ZeroTradeCost::~ZeroTradeCost() {
-
-}
-
-CostRecord ZeroTradeCost
-::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price, size_t num) const {
+CostRecord ZeroTradeCost ::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                      size_t num) const {
     return CostRecord();
 }
 
-
-CostRecord ZeroTradeCost
-::getSellCost(const Datetime& datetime, const Stock& stock, price_t price, size_t num) const {
+CostRecord ZeroTradeCost ::getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                       size_t num) const {
     return CostRecord();
 }
 

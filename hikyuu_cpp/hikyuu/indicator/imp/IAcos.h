@@ -1,6 +1,6 @@
 /*
  * IAcos.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IAcos: public IndicatorImp {
+class IAcos : public IndicatorImp {
     INDICATOR_IMP(IAcos)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

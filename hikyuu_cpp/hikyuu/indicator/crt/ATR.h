@@ -28,6 +28,6 @@ Indicator HKU_API ATR(int n = 14);
  */
 Indicator HKU_API ATR(const Indicator& data, int n = 14);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ATR_H_ */

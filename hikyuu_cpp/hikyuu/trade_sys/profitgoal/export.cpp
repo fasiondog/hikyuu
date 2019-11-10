@@ -32,7 +32,4 @@
 BOOST_CLASS_EXPORT(hku::NoGoalProfitGoal)
 BOOST_CLASS_EXPORT(hku::FixedPercentProfitGoal)
 
-
 #endif /* HKU_SUPPORT_SERIALIZATION */
-
-

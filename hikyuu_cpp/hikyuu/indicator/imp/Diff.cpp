@@ -11,16 +11,11 @@
 BOOST_CLASS_EXPORT(hku::Diff)
 #endif
 
-
 namespace hku {
 
-Diff::Diff(): IndicatorImp("DIFF", 1) {
+Diff::Diff() : IndicatorImp("DIFF", 1) {}
 
-}
-
-Diff::~Diff() {
-
-}
+Diff::~Diff() {}
 
 bool Diff::check() {
     return true;
@@ -36,10 +31,9 @@ void Diff::_calculate(const Indicator& data) {
     }
 
     for (size_t i = discard(); i < total; ++i) {
-        _set(data[i] - data[i-1], i);
+        _set(data[i] - data[i - 1], i);
     }
 }
-
 
 Indicator HKU_API DIFF() {
     return Indicator(make_shared<Diff>());

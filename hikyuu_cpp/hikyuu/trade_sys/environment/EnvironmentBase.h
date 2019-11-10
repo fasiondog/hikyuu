@@ -30,7 +30,7 @@ namespace hku {
  * @note 外部环境应该和具体的交易对象没有关系
  * @ingroup Environment
  */
-class HKU_API EnvironmentBase: public enable_shared_from_this<EnvironmentBase>  {
+class HKU_API EnvironmentBase : public enable_shared_from_this<EnvironmentBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -102,23 +102,23 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        //ev可能多个系统共享，保留m_query可能用于查错
-        ar & BOOST_SERIALIZATION_NVP(m_query);
-        ar & BOOST_SERIALIZATION_NVP(m_valid);
+        ar& boost::serialization::make_nvp("m_name", name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        // ev可能多个系统共享，保留m_query可能用于查错
+        ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_valid);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
+        ar& boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_query);
-        ar & BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_valid);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -143,16 +143,16 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(EnvironmentBase)
  * @endcode
  * @ingroup Environment
  */
-#define ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(EnvironmentBase); \
+#define ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION               \
+private:                                                          \
+    friend class boost::serialization::access;                    \
+    template <class Archive>                                      \
+    void serialize(Archive& ar, const unsigned int version) {     \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(EnvironmentBase); \
     }
 #else
 #define ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
-
 
 /**
  * 客户程序都应使用该指针类型
@@ -161,20 +161,19 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(EnvironmentBase)
 typedef shared_ptr<EnvironmentBase> EnvironmentPtr;
 typedef shared_ptr<EnvironmentBase> EVPtr;
 
-
-#define ENVIRONMENT_IMP(classname) public:\
-    virtual EnvironmentPtr _clone() {\
-        return EnvironmentPtr(new classname());\
-    }\
+#define ENVIRONMENT_IMP(classname)              \
+public:                                         \
+    virtual EnvironmentPtr _clone() {           \
+        return EnvironmentPtr(new classname()); \
+    }                                           \
     virtual void _calculate();
-
 
 /**
  * 输出Environment信息，如：Environment(name, params[...])
  * @ingroup Environment
  */
-HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentPtr&);
-HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentBase&);
+HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentPtr&);
+HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentBase&);
 
 } /* namespace hku */
 #endif /* ENVIRONMENT_H_ */

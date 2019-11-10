@@ -11,16 +11,11 @@
 BOOST_CLASS_EXPORT(hku::IExp)
 #endif
 
-
 namespace hku {
 
-IExp::IExp() : IndicatorImp("EXP", 1) {
+IExp::IExp() : IndicatorImp("EXP", 1) {}
 
-}
-
-IExp::~IExp() {
-
-}
+IExp::~IExp() {}
 
 bool IExp::check() {
     return true;
@@ -39,10 +34,8 @@ void IExp::_calculate(const Indicator& data) {
     }
 }
 
-
 Indicator HKU_API EXP() {
     return Indicator(make_shared<IExp>());
 }
-
 
 } /* namespace hku */

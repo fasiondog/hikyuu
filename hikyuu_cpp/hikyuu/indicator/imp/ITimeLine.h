@@ -2,7 +2,7 @@
  * ITimeLine.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-15
  *      Author: fasiondog
  */
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ITimeLine: public IndicatorImp {
+class ITimeLine : public IndicatorImp {
     INDICATOR_IMP(ITimeLine)
     INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

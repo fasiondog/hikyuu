@@ -2,7 +2,7 @@
  * ALIGN.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-5-21
  *      Author: fasiondog
  */
@@ -36,7 +36,6 @@ inline Indicator ALIGN(const Indicator& ind, const KData& ref) {
     return ALIGN(ref.getDatetimeList())(ind);
 }
 
-
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ALIGN_H_ */

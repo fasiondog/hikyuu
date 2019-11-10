@@ -1,6 +1,6 @@
 /*
  * IDecline.cpp
- * 
+ *
  *  Copyright (c) 2019, hikyuu.org
  *
  *  Created on: 2019-6-3
@@ -18,7 +18,6 @@
 BOOST_CLASS_EXPORT(hku::IDecline)
 #endif
 
-
 namespace hku {
 
 IDecline::IDecline() : IndicatorImp("DECLINE", 1) {
@@ -28,9 +27,7 @@ IDecline::IDecline() : IndicatorImp("DECLINE", 1) {
     setParam<bool>("ignore_context", false);
 }
 
-IDecline::~IDecline() {
-
-}
+IDecline::~IDecline() {}
 
 bool IDecline::check() {
     return true;
@@ -67,8 +64,8 @@ void IDecline::_calculate(const Indicator& ind) {
     _readyBuffer(total, 1);
     Indicator x = ALIGN(CLOSE() < REF(CLOSE(), 1), dates);
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
-        if ( (stk_type <= STOCKTYPE_TMP && iter->type() != stk_type)
-          || (market != "" && iter->market() != market)) {
+        if ((stk_type <= STOCKTYPE_TMP && iter->type() != stk_type) ||
+            (market != "" && iter->market() != market)) {
             continue;
         }
         x.setContext(*iter, q);
@@ -85,9 +82,8 @@ void IDecline::_calculate(const Indicator& ind) {
     }
 }
 
-
-Indicator HKU_API DECLINE(const KQuery& query, const string& market, 
-        int stk_type, bool ignore_context) {
+Indicator HKU_API DECLINE(const KQuery& query, const string& market, int stk_type,
+                          bool ignore_context) {
     IndicatorImpPtr p = make_shared<IDecline>();
     p->setParam<KQuery>("query", query);
     p->setParam<string>("market", market);
@@ -96,6 +92,5 @@ Indicator HKU_API DECLINE(const KQuery& query, const string& market,
     p->calculate();
     return Indicator(p);
 }
-
 
 } /* namespace hku */

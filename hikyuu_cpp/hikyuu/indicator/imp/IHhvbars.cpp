@@ -1,6 +1,6 @@
 /*
  * IHhvbars.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-11
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IHhvbars)
 #endif
 
-
 namespace hku {
 
 IHhvbars::IHhvbars() : IndicatorImp("HHVBARS", 1) {
     setParam<int>("n", 20);
 }
 
-IHhvbars::~IHhvbars() {
-
-}
+IHhvbars::~IHhvbars() {}
 
 bool IHhvbars::check() {
     if (getParam<int>("n") < 0) {
@@ -51,7 +48,7 @@ void IHhvbars::_calculate(const Indicator& ind) {
         }
         return;
     }
-    
+
     int n = getParam<int>("n");
     if (0 == n) {
         n = total - m_discard;
@@ -63,14 +60,14 @@ void IHhvbars::_calculate(const Indicator& ind) {
     size_t pre_pos = m_discard;
     size_t start_pos = m_discard + n < total ? m_discard + n : total;
     for (size_t i = m_discard; i < start_pos; i++) {
-         if (ind[i] >= max) {
+        if (ind[i] >= max) {
             max = ind[i];
             pre_pos = i;
         }
         _set(i - pre_pos, i);
     }
 
-    for (size_t i = start_pos; i < total-1; i++) {
+    for (size_t i = start_pos; i < total - 1; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
@@ -92,15 +89,13 @@ void IHhvbars::_calculate(const Indicator& ind) {
             max = ind[i];
         }
     }
-    _set(total-pre_pos-1, total-1);
+    _set(total - pre_pos - 1, total - 1);
 }
-
 
 Indicator HKU_API HHVBARS(int n) {
     IndicatorImpPtr p = make_shared<IHhvbars>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

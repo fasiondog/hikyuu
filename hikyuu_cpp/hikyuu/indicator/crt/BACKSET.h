@@ -1,8 +1,8 @@
 /*
  * BACKSET.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-13
  *      Author: fasiondog
  */
@@ -31,6 +31,6 @@ inline Indicator BACKSET(const Indicator& ind, int n) {
     return BACKSET(n)(ind);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_BACKSET_H_ */

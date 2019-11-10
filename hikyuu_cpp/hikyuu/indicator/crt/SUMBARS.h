@@ -2,7 +2,7 @@
  * SUMBARS.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-4
  *      Author: fasiondog
  */
@@ -31,6 +31,6 @@ inline Indicator SUMBARS(const Indicator& ind, double a) {
     return SUMBARS(a)(ind);
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_SUMBARS_H_ */

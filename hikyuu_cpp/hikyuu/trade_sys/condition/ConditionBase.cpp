@@ -9,13 +9,12 @@
 
 namespace hku {
 
-
-HKU_API std::ostream & operator<<(std::ostream& os, const ConditionBase& cn) {
+HKU_API std::ostream& operator<<(std::ostream& os, const ConditionBase& cn) {
     os << "Condition(" << cn.name() << ", " << cn.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const ConditionPtr& cn) {
+HKU_API std::ostream& operator<<(std::ostream& os, const ConditionPtr& cn) {
     if (cn) {
         os << *cn;
     } else {
@@ -24,17 +23,11 @@ HKU_API std::ostream & operator<<(std::ostream& os, const ConditionPtr& cn) {
     return os;
 }
 
-ConditionBase::ConditionBase(): m_name("ConditionBase") {
+ConditionBase::ConditionBase() : m_name("ConditionBase") {}
 
-}
+ConditionBase::ConditionBase(const string& name) : m_name(name) {}
 
-ConditionBase::ConditionBase(const string& name): m_name(name) {
-
-}
-
-ConditionBase::~ConditionBase() {
-
-}
+ConditionBase::~ConditionBase() {}
 
 void ConditionBase::reset() {
     m_valid.clear();
@@ -45,13 +38,13 @@ ConditionPtr ConditionBase::clone() {
     ConditionPtr p;
     try {
         p = _clone();
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Subclass _clone failed!");
         p = ConditionPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!" );
+        HKU_ERROR("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 
@@ -60,12 +53,11 @@ ConditionPtr ConditionBase::clone() {
     p->m_kdata = m_kdata;
     p->m_valid = m_valid;
 
-    //tm、sg由系统运行时进行设定，不作clone
-    //p->m_tm = m_tm->clone();
-    //p->m_sg = m_sg->clone();
+    // tm、sg由系统运行时进行设定，不作clone
+    // p->m_tm = m_tm->clone();
+    // p->m_sg = m_sg->clone();
     return p;
 }
-
 
 void ConditionBase::setTO(const KData& kdata) {
     reset();

@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class WilliamsFixedRiskMoneyManager: public MoneyManagerBase {
+class WilliamsFixedRiskMoneyManager : public MoneyManagerBase {
     MONEY_MANAGER_IMP(WilliamsFixedRiskMoneyManager)
     MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION
 

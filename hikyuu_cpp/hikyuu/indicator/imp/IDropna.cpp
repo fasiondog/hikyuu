@@ -1,6 +1,6 @@
 /*
  * IDropna.cpp
- * 
+ *
  *  Copyright (c) 2019, hikyuu.org
  *
  *  Created on: 2019-5-28
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IDropna)
 #endif
 
-
 namespace hku {
 
 IDropna::IDropna() : IndicatorImp("DROPNA", 1) {
     setParam<DatetimeList>("align_date_list", DatetimeList());
 }
 
-IDropna::~IDropna() {
-
-}
+IDropna::~IDropna() {}
 
 bool IDropna::check() {
     return true;
@@ -40,7 +37,7 @@ void IDropna::_calculate(const Indicator& ind) {
 
     m_result_num = ind.getResultNumber();
     size_t row_len = total - ind.discard();
-    price_t *buf = new price_t[m_result_num * row_len];
+    price_t* buf = new price_t[m_result_num * row_len];
     if (!buf) {
         HKU_ERROR("Memory allocation failed!");
         return;
@@ -81,10 +78,8 @@ void IDropna::_calculate(const Indicator& ind) {
     setParam<DatetimeList>("align_date_list", dates);
 }
 
-
 Indicator HKU_API DROPNA() {
     return Indicator(make_shared<IDropna>());
 }
-
 
 } /* namespace hku */

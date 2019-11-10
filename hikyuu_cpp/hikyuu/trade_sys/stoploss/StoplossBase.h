@@ -26,7 +26,7 @@ namespace hku {
  * @details 负责向系统提供当前计划交易的预期止损价
  * @ingroup Stoploss
  */
-class HKU_API StoplossBase: public enable_shared_from_this<StoplossBase>  {
+class HKU_API StoplossBase : public enable_shared_from_this<StoplossBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -91,7 +91,6 @@ public:
     /** 子类计算接口，由setTO调用 */
     virtual void _calculate() = 0;
 
-
 protected:
     string m_name;
     TradeManagerPtr m_tm;
@@ -103,21 +102,21 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name_str(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("name", name_str);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& boost::serialization::make_nvp("name", name_str);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
-        ar & boost::serialization::make_nvp("name", m_name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& boost::serialization::make_nvp("name", m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
         // m_kdata都是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -142,24 +141,24 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(StoplossBase)
  * @endcode
  * @ingroup Stoploss
  */
-#define STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(StoplossBase); \
+#define STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION               \
+private:                                                       \
+    friend class boost::serialization::access;                 \
+    template <class Archive>                                   \
+    void serialize(Archive& ar, const unsigned int version) {  \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(StoplossBase); \
     }
 #else
 #define STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-
-#define STOPLOSS_IMP(classname, str_name) public:\
-    virtual StoplossPtr _clone() {\
-        return StoplossPtr(new classname());\
-    }\
-    virtual void _calculate();\
+#define STOPLOSS_IMP(classname, str_name)    \
+public:                                      \
+    virtual StoplossPtr _clone() {           \
+        return StoplossPtr(new classname()); \
+    }                                        \
+    virtual void _calculate();               \
     virtual price_t getPrice(const Datetime&, price_t);
-
 
 /**
  * 客户程序都应使用该指针类型，操作止损策略实例
@@ -170,8 +169,8 @@ typedef shared_ptr<StoplossBase> STPtr;
 typedef shared_ptr<StoplossBase> TakeProfitPtr;
 typedef shared_ptr<StoplossBase> TPPtr;
 
-HKU_API std::ostream& operator <<(std::ostream& os, const StoplossBase&);
-HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr&);
+HKU_API std::ostream& operator<<(std::ostream& os, const StoplossBase&);
+HKU_API std::ostream& operator<<(std::ostream& os, const StoplossPtr&);
 
 inline string StoplossBase::name() const {
     return m_name;

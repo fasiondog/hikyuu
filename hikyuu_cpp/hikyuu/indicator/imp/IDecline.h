@@ -1,6 +1,6 @@
 /*
  * IDecline.h
- * 
+ *
  *  Copyright (c) 2019, hikyuu.org
  *
  *  Created on: 2019-6-3
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IDecline: public IndicatorImp {
+class IDecline : public IndicatorImp {
     INDICATOR_IMP(IDecline)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

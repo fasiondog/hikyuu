@@ -14,16 +14,11 @@
 BOOST_CLASS_EXPORT(hku::IFloor)
 #endif
 
-
 namespace hku {
 
-IFloor::IFloor() : IndicatorImp("FLOOR", 1) {
+IFloor::IFloor() : IndicatorImp("FLOOR", 1) {}
 
-}
-
-IFloor::~IFloor() {
-
-}
+IFloor::~IFloor() {}
 
 bool IFloor::check() {
     return true;
@@ -41,7 +36,6 @@ void IFloor::_calculate(const Indicator& data) {
         _set(std::floor(data[i]), i);
     }
 }
-
 
 Indicator HKU_API FLOOR() {
     return Indicator(make_shared<IFloor>());

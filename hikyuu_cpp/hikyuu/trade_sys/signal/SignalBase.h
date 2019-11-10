@@ -28,7 +28,7 @@ namespace hku {
  * 信号指示器基类
  * @ingroup Signal
  */
-class HKU_API SignalBase: public enable_shared_from_this<SignalBase>  {
+class HKU_API SignalBase : public enable_shared_from_this<SignalBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -104,8 +104,8 @@ public:
 
 protected:
     string m_name;
-    KData  m_kdata;
-    bool   m_hold;
+    KData m_kdata;
+    bool m_hold;
     std::set<Datetime> m_buySig;
     std::set<Datetime> m_sellSig;
 
@@ -115,27 +115,27 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name_str(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("name", name_str);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_hold);
-        ar & BOOST_SERIALIZATION_NVP(m_buySig);
-        ar & BOOST_SERIALIZATION_NVP(m_sellSig);
+        ar& boost::serialization::make_nvp("name", name_str);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_hold);
+        ar& BOOST_SERIALIZATION_NVP(m_buySig);
+        ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
-        ar & boost::serialization::make_nvp("name", m_name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_hold);
-        ar & BOOST_SERIALIZATION_NVP(m_buySig);
-        ar & BOOST_SERIALIZATION_NVP(m_sellSig);
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& boost::serialization::make_nvp("name", m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_hold);
+        ar& BOOST_SERIALIZATION_NVP(m_buySig);
+        ar& BOOST_SERIALIZATION_NVP(m_sellSig);
         // m_kdata都是系统运行时临时设置，不需要序列化
-        //ar & BOOST_SERIALIZATION_NVP(m_kdata);
+        // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -160,24 +160,23 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SignalBase)
  * @endcode
  * @ingroup Signal
  */
-#define SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase); \
+#define SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION                \
+private:                                                      \
+    friend class boost::serialization::access;                \
+    template <class Archive>                                  \
+    void serialize(Archive& ar, const unsigned int version) { \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase);  \
     }
 #else
 #define SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-
-#define SIGNAL_IMP(classname) public:\
-    virtual SignalPtr _clone() {\
-        return SignalPtr(new classname());\
-    }\
+#define SIGNAL_IMP(classname)              \
+public:                                    \
+    virtual SignalPtr _clone() {           \
+        return SignalPtr(new classname()); \
+    }                                      \
     virtual void _calculate();
-
-
 
 /**
  * 客户程序都应使用该指针类型，操作信号指示器
@@ -186,8 +185,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SignalBase)
 typedef shared_ptr<SignalBase> SignalPtr;
 typedef shared_ptr<SignalBase> SGPtr;
 
-HKU_API std::ostream & operator<<(std::ostream&, const SignalBase&);
-HKU_API std::ostream & operator<<(std::ostream&, const SignalPtr&);
+HKU_API std::ostream& operator<<(std::ostream&, const SignalBase&);
+HKU_API std::ostream& operator<<(std::ostream&, const SignalPtr&);
 
 inline KData SignalBase::getTO() const {
     return m_kdata;

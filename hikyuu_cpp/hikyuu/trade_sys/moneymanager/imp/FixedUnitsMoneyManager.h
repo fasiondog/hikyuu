@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class FixedUnitsMoneyManager: public MoneyManagerBase {
+class FixedUnitsMoneyManager : public MoneyManagerBase {
     MONEY_MANAGER_IMP(FixedUnitsMoneyManager)
     MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION
 

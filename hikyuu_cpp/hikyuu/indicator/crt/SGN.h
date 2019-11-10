@@ -29,6 +29,6 @@ inline Indicator SGN(price_t val) {
     return SGN(CVAL(val));
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_SGN_H_ */

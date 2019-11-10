@@ -9,7 +9,6 @@
 #ifndef TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDPERCENT_H_
 #define TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDPERCENT_H_
 
-
 #include "../ProfitGoalBase.h"
 
 namespace hku {
@@ -22,6 +21,5 @@ namespace hku {
 ProfitGoalPtr HKU_API PG_FixedPercent(double p = 0.2);
 
 } /* namespace hku */
-
 
 #endif /* TRADE_SYS_PROFITGOAL_CRT_PG_FIXEDPERCENT_H_ */

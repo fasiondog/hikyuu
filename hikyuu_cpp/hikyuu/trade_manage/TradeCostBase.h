@@ -50,8 +50,8 @@ public:
      * @param num 买入数量
      * @return CostRecord 交易成本记录
      */
-    virtual CostRecord getBuyCost(const Datetime& datetime,
-            const Stock& stock, price_t price, size_t num) const = 0;
+    virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                  size_t num) const = 0;
 
     /**
      * 计算卖出成本
@@ -61,16 +61,15 @@ public:
      * @param num 卖出数量
      * @return CostRecord 交易成本记录
      */
-    virtual CostRecord getSellCost(const Datetime& datetime,
-            const Stock& stock, price_t price, size_t num) const = 0;
+    virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                   size_t num) const = 0;
 
     /**
      * 计算借入现金花费的成本
      * @param datetime 借入日期
      * @param cash 借入的资金
      */
-    virtual CostRecord getBorrowCashCost(const Datetime& datetime,
-            price_t cash) const {
+    virtual CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) const {
         return CostRecord();
     }
 
@@ -80,10 +79,8 @@ public:
      * @param return_datetime 归还日期
      * @param cash 归还金额
      */
-    virtual CostRecord getReturnCashCost(
-            const Datetime& borrow_datetime,
-            const Datetime& return_datetime,
-            price_t cash) const {
+    virtual CostRecord getReturnCashCost(const Datetime& borrow_datetime,
+                                         const Datetime& return_datetime, price_t cash) const {
         return CostRecord();
     }
 
@@ -94,8 +91,8 @@ public:
      * @param price 每股价格
      * @param num 借入的数量
      */
-    virtual CostRecord getBorrowStockCost(const Datetime& datetime,
-            const Stock& stock, price_t price, size_t num) const {
+    virtual CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock,
+                                          price_t price, size_t num) const {
         return CostRecord();
     }
 
@@ -108,11 +105,10 @@ public:
      * @param num 归还的数量
      */
     virtual CostRecord getReturnStockCost(const Datetime& borrow_datetime,
-            const Datetime& return_datetime,
-            const Stock& stock, price_t price, size_t num) const {
+                                          const Datetime& return_datetime, const Stock& stock,
+                                          price_t price, size_t num) const {
         return CostRecord();
     }
-
 
     /** 继承子类必须实现私有变量的克隆接口 */
     virtual TradeCostPtr _clone() = 0;
@@ -126,10 +122,10 @@ private:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version) {
-        ar & BOOST_SERIALIZATION_NVP(m_name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
@@ -152,16 +148,16 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeCostBase)
  * @endcode
  * @ingroup TradeCost
  */
-#define TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TradeCostBase); \
+#define TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION              \
+private:                                                        \
+    friend class boost::serialization::access;                  \
+    template <class Archive>                                    \
+    void serialize(Archive& ar, const unsigned int version) {   \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(TradeCostBase); \
     }
 #else
 #define TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
-
 
 /**
  * 交易成本算法指针
@@ -169,8 +165,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeCostBase)
  */
 typedef shared_ptr<TradeCostBase> TradeCostPtr;
 
-HKU_API std::ostream & operator<<(std::ostream &, const TradeCostBase&);
-HKU_API std::ostream & operator<<(std::ostream &, const TradeCostPtr&);
+HKU_API std::ostream& operator<<(std::ostream&, const TradeCostBase&);
+HKU_API std::ostream& operator<<(std::ostream&, const TradeCostPtr&);
 
 } /* namespace hku */
 #endif /* TRADECOSTBASE_H_ */

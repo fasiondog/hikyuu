@@ -11,7 +11,6 @@
 BOOST_CLASS_EXPORT(hku::IPriceList)
 #endif
 
-
 namespace hku {
 
 IPriceList::IPriceList() : IndicatorImp("PRICELIST", 1) {
@@ -20,17 +19,13 @@ IPriceList::IPriceList() : IndicatorImp("PRICELIST", 1) {
     setParam<int>("discard", 0);
 }
 
-IPriceList::IPriceList(const PriceList& data, int in_discard) 
-: IndicatorImp("PRICELIST", 1) {
+IPriceList::IPriceList(const PriceList& data, int in_discard) : IndicatorImp("PRICELIST", 1) {
     setParam<int>("result_index", 0);
     setParam<PriceList>("data", data);
     setParam<int>("discard", in_discard);
 }
 
-
-IPriceList::~IPriceList() {
-
-}
+IPriceList::~IPriceList() {}
 
 bool IPriceList::check() {
     if (getParam<int>("discard") < 0 || getParam<int>("result_index") < 0) {
@@ -81,7 +76,6 @@ void IPriceList::_calculate(const Indicator& data) {
     m_discard = data.discard();
 }
 
-
 Indicator HKU_API PRICELIST(const PriceList& data, int discard) {
     return make_shared<IPriceList>(data, discard)->calculate();
 }
@@ -98,9 +92,8 @@ Indicator HKU_API PRICELIST(int result_index) {
     return Indicator(p);
 }
 
-
-Indicator HKU_API PRICELIST(price_t *data, size_t total) {
-    return data ? PRICELIST(PriceList(data, data+total), 0) 
+Indicator HKU_API PRICELIST(price_t* data, size_t total) {
+    return data ? PRICELIST(PriceList(data, data + total), 0)
                 : Indicator(make_shared<IPriceList>());
 }
 

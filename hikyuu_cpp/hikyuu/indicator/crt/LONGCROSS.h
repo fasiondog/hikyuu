@@ -1,8 +1,8 @@
 /*
  * LONGCROSS.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-2
  *      Author: fasiondog
  */
@@ -26,10 +26,10 @@ namespace hku {
  * </pre>
  * @ingroup Indicator
  */
-Indicator LONGCROSS(const Indicator& x, const Indicator& y, int n=3);
-Indicator LONGCROSS(const Indicator& x, price_t, int n=3);
-Indicator LONGCROSS(price_t, const Indicator& y, int n=3);
-Indicator LONGCROSS(price_t, price_t, int n=3);
+Indicator LONGCROSS(const Indicator& x, const Indicator& y, int n = 3);
+Indicator LONGCROSS(const Indicator& x, price_t, int n = 3);
+Indicator LONGCROSS(price_t, const Indicator& y, int n = 3);
+Indicator LONGCROSS(price_t, price_t, int n = 3);
 
 inline Indicator LONGCROSS(const Indicator& x, const Indicator& y, int n) {
     Indicator result = EVERY((REF(x, 1) < REF(y, 1)), n) & (x > y);
@@ -49,6 +49,6 @@ inline Indicator LONGCROSS(price_t x, price_t y, int n) {
     return LONGCROSS(CVAL(x), CVAL(y), n);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_LONGCROSS_H_ */

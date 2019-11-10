@@ -2,7 +2,7 @@
  * IDevsq.cpp
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-4-18
  *      Author: fasiondog
  */
@@ -14,16 +14,13 @@
 BOOST_CLASS_EXPORT(hku::IDevsq)
 #endif
 
-
 namespace hku {
 
-IDevsq::IDevsq(): IndicatorImp("DEVSQ", 1) {
+IDevsq::IDevsq() : IndicatorImp("DEVSQ", 1) {
     setParam<int>("n", 10);
 }
 
-IDevsq::~IDevsq() {
-
-}
+IDevsq::~IDevsq() {}
 
 bool IDevsq::check() {
     int n = getParam<int>("n");
@@ -61,6 +58,5 @@ Indicator HKU_API DEVSQ(int n) {
     p->setParam<int>("n", n);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

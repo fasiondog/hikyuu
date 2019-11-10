@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class IAbs: public IndicatorImp {
+class IAbs : public IndicatorImp {
     INDICATOR_IMP(IAbs)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

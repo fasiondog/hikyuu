@@ -2,7 +2,7 @@
  * IStdp.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-4-18
  *      Author: fasiondog
  */
@@ -19,7 +19,7 @@ namespace hku {
  * 计算N周期内总体标准差
  * 参数： n: N日时间窗口
  */
-class IStdp: public hku::IndicatorImp {
+class IStdp : public hku::IndicatorImp {
     INDICATOR_IMP(IStdp)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

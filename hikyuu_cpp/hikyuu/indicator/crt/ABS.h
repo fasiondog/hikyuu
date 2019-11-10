@@ -29,6 +29,6 @@ inline Indicator ABS(price_t val) {
     return ABS(CVAL(val));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ABS_H_ */

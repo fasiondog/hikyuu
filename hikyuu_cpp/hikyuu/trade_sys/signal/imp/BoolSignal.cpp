@@ -14,16 +14,12 @@ BoolSignal::BoolSignal() : SignalBase("SG_Bool") {
     setParam<string>("kpart", "CLOSE");
 }
 
-BoolSignal::BoolSignal(const Indicator& buy,
-        const Indicator& sell,
-        const string& kpart)
+BoolSignal::BoolSignal(const Indicator& buy, const Indicator& sell, const string& kpart)
 : SignalBase("SG_Bool"), m_bool_buy(buy), m_bool_sell(sell) {
     setParam<string>("kpart", "CLOSE");
 }
 
-BoolSignal::~BoolSignal() {
-
-}
+BoolSignal::~BoolSignal() {}
 
 SignalPtr BoolSignal::_clone() {
     BoolSignal* p = new BoolSignal();
@@ -42,18 +38,19 @@ void BoolSignal::_calculate() {
         return;
     }
 
-    size_t discard = buy.discard() > sell.discard()
-            ? buy.discard() : sell.discard();
+    size_t discard = buy.discard() > sell.discard() ? buy.discard() : sell.discard();
 
     size_t total = buy.size();
     for (size_t i = discard; i < total; ++i) {
-        if (buy[i] > 0.0) _addBuySignal(m_kdata[i].datetime);
-        if (sell[i] > 0.0) _addSellSignal(m_kdata[i].datetime);
+        if (buy[i] > 0.0)
+            _addBuySignal(m_kdata[i].datetime);
+        if (sell[i] > 0.0)
+            _addSellSignal(m_kdata[i].datetime);
     }
 }
 
-SignalPtr HKU_API SG_Bool(const Indicator& buy,
-        const Indicator& sell, const string& kpart = "CLOSE") {
+SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell,
+                          const string& kpart = "CLOSE") {
     return SignalPtr(new BoolSignal(buy, sell, kpart));
 }
 

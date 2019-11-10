@@ -22,7 +22,6 @@ namespace hku {
 Indicator HKU_API MA(const Indicator& data, int n = 22);
 Indicator HKU_API MA(int n = 22);
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* MA_H_ */

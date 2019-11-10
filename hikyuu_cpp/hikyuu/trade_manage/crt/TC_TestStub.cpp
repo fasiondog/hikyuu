@@ -13,6 +13,4 @@ HKU_API TradeCostPtr TC_TestStub() {
     return TradeCostPtr(new TradeCostStub());
 }
 
-} /* namespace */
-
-
+}  // namespace hku

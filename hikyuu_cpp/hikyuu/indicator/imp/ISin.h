@@ -1,6 +1,6 @@
 /*
  * ISin.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ISin: public IndicatorImp {
+class ISin : public IndicatorImp {
     INDICATOR_IMP(ISin)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

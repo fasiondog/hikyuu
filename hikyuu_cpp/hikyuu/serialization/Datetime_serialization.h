@@ -18,19 +18,20 @@
 
 namespace boost {
 namespace serialization {
-template<class Archive>
-void save(Archive & ar, const hku::Datetime & date, unsigned int version) {
+template <class Archive>
+void save(Archive& ar, const hku::Datetime& date, unsigned int version) {
     std::string datetime = date.toString();
-    ar & BOOST_SERIALIZATION_NVP(datetime);
+    ar& BOOST_SERIALIZATION_NVP(datetime);
 }
 
-template<class Archive>
-void load(Archive & ar, hku::Datetime& date, unsigned int version) {
+template <class Archive>
+void load(Archive& ar, hku::Datetime& date, unsigned int version) {
     std::string datetime;
-    ar & BOOST_SERIALIZATION_NVP(datetime);
+    ar& BOOST_SERIALIZATION_NVP(datetime);
     date = hku::Datetime(datetime);
 }
-}} /* namespace boost::serailization */
+}  // namespace serialization
+}  // namespace boost
 
 BOOST_SERIALIZATION_SPLIT_FREE(hku::Datetime)
 

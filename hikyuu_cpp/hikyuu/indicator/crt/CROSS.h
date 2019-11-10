@@ -1,8 +1,8 @@
 /*
  * CROSS.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-2
  *      Author: fasiondog
  */
@@ -43,6 +43,6 @@ inline Indicator CROSS(price_t x, price_t y) {
     return CROSS(CVAL(x), CVAL(y));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_NDAY_H_ */

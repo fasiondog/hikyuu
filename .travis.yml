@@ -74,7 +74,7 @@ install:
   - ./bootstrap.sh --with-python=python3
   - cat project-config.jam
   - ./b2 release link=shared -d0 --with-python --with-serialization
-  - ./b2 release link=static -d0 --with-date_time --with-filesystem --with-system --with-test
+  - ./b2 release link=static cxxflags=-fPIC -d0 --with-date_time --with-filesystem --with-system --with-test
   - ls ./stage/lib
   - cd
   - git clone https://github.com/tboox/xmake.git tboox/xmake --depth 1

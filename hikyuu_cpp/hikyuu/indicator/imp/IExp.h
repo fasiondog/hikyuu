@@ -1,6 +1,6 @@
 /*
  * IExp.h
- * 
+ *
  *  Copyright (c) 2019 fasiondog
  *
  *  Created on: 2019-4-3
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IExp: public IndicatorImp {
+class IExp : public IndicatorImp {
     INDICATOR_IMP(IExp)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

@@ -1,6 +1,6 @@
 /*
  * IAtan.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IAtan: public IndicatorImp {
+class IAtan : public IndicatorImp {
     INDICATOR_IMP(IAtan)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

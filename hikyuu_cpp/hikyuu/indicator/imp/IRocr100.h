@@ -2,7 +2,7 @@
  * IRocr100.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-5-18
  *      Author: fasiondog
  */
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IRocr100: public hku::IndicatorImp {
+class IRocr100 : public hku::IndicatorImp {
     INDICATOR_IMP(IRocr100)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

@@ -44,10 +44,8 @@ class HKU_API TradeManager {
     PARAMETER_SUPPORT
 
 public:
-    TradeManager(const Datetime& datetime = Datetime(199001010000LL),
-            price_t initcash = 100000.0,
-            const TradeCostPtr& costfunc = TC_Zero(),
-            const string& name = "SYS");
+    TradeManager(const Datetime& datetime = Datetime(199001010000LL), price_t initcash = 100000.0,
+                 const TradeCostPtr& costfunc = TC_Zero(), const string& name = "SYS");
     virtual ~TradeManager();
 
     /** 复位，清空交易、持仓记录 */
@@ -65,7 +63,9 @@ public:
     void clearBroker();
 
     /** 从哪个时刻开始启动订单代理进行下单操作   */
-    Datetime getBrokerLastDatetime() const { return m_broker_last_datetime; }
+    Datetime getBrokerLastDatetime() const {
+        return m_broker_last_datetime;
+    }
 
     /** 设置开始订单代理操作的时刻 */
     void setBrokerLastDatetime(const Datetime& date) {
@@ -82,43 +82,60 @@ public:
     double getMarginRate(const Datetime& datetime, const Stock& stock);
 
     /** 账户名称 */
-    string name() const { return m_name; }
+    string name() const {
+        return m_name;
+    }
 
     /** 设置账户名称 */
-    void name(const string& name) { m_name = name; }
+    void name(const string& name) {
+        m_name = name;
+    }
 
     /** 初始资金 */
-    price_t initCash() const { return m_init_cash; }
+    price_t initCash() const {
+        return m_init_cash;
+    }
 
     /** 账户建立日期 */
-    Datetime initDatetime() const { return m_init_datetime; }
+    Datetime initDatetime() const {
+        return m_init_datetime;
+    }
 
     /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
     Datetime firstDatetime() const;
 
     /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
     Datetime lastDatetime() const {
-        return m_trade_list.empty()
-                ? m_init_datetime : m_trade_list.back().datetime;
+        return m_trade_list.empty() ? m_init_datetime : m_trade_list.back().datetime;
     }
 
     /** 红利/股息/送股再投资标志，即是否忽略权息信息 **/
-    bool reinvest() const { return getParam<bool>("reinvest"); }
+    bool reinvest() const {
+        return getParam<bool>("reinvest");
+    }
 
     /** 交易精度 */
-    int precision() const { return getParam<int>("precision"); }
+    int precision() const {
+        return getParam<int>("precision");
+    }
 
     /** 获取交易算法指针 */
-    TradeCostPtr costFunc() const { return m_costfunc; }
+    TradeCostPtr costFunc() const {
+        return m_costfunc;
+    }
 
     /** 设置交易算法指针 */
-    void costFunc(const TradeCostPtr& func) { m_costfunc = func; }
+    void costFunc(const TradeCostPtr& func) {
+        m_costfunc = func;
+    }
 
     /**
      * 返回当前现金
      * @note 仅返回当前信息，不会根据权息进行调整
      */
-    price_t currentCash() const { return m_cash; }
+    price_t currentCash() const {
+        return m_cash;
+    }
 
     /**
      * 获取指定日期的现金
@@ -132,7 +149,7 @@ public:
      * @param stock 指定证券
      * @return true 是 | false 否
      */
-    bool have(const Stock& stock) const{
+    bool have(const Stock& stock) const {
         return m_position.count(stock.id()) ? true : false;
     }
 
@@ -142,15 +159,19 @@ public:
      * @param stock 指定证券
      * @return true 是 | false 否
      */
-    bool haveShort(const Stock& stock) const{
+    bool haveShort(const Stock& stock) const {
         return m_short_position.count(stock.id()) ? true : false;
     }
 
     /** 当前持有的证券种类数量 */
-    size_t getStockNumber() const { return m_position.size(); }
+    size_t getStockNumber() const {
+        return m_position.size();
+    }
 
     /** 当前空头持有的证券种类数量 */
-    size_t getShortStockNumber() const { return m_short_position.size(); }
+    size_t getShortStockNumber() const {
+        return m_short_position.size();
+    }
 
     /** 获取指定时刻的某证券持有数量 */
     size_t getHoldNumber(const Datetime& datetime, const Stock& stock);
@@ -165,7 +186,9 @@ public:
     price_t getDebtCash(const Datetime& datetime);
 
     /** 获取全部交易记录 */
-    const TradeRecordList& getTradeList() const { return m_trade_list; }
+    const TradeRecordList& getTradeList() const {
+        return m_trade_list;
+    }
 
     /**
      * 获取指定日期范围内的交易记录[start, end)
@@ -208,11 +231,9 @@ public:
      * @param num 买入数量
      * @return CostRecord 交易成本记录
      */
-    CostRecord getBuyCost(const Datetime& datetime, const Stock& stock,
-            price_t price, size_t num) const{
-        return m_costfunc
-                ? m_costfunc->getBuyCost(datetime, stock, price, num)
-                : CostRecord();
+    CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
+                          size_t num) const {
+        return m_costfunc ? m_costfunc->getBuyCost(datetime, stock, price, num) : CostRecord();
     }
 
     /**
@@ -223,11 +244,9 @@ public:
      * @param num 卖出数量
      * @return CostRecord 交易成本记录
      */
-    CostRecord getSellCost(const Datetime& datetime, const Stock& stock,
-            price_t price, size_t num) const{
-        return m_costfunc
-                ? m_costfunc->getSellCost(datetime, stock, price, num)
-                : CostRecord();
+    CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
+                           size_t num) const {
+        return m_costfunc ? m_costfunc->getSellCost(datetime, stock, price, num) : CostRecord();
     }
 
     /**
@@ -236,9 +255,7 @@ public:
      * @param cash 现金额
      */
     CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) {
-        return m_costfunc
-                ? m_costfunc->getBorrowCashCost(datetime, cash)
-                : CostRecord();
+        return m_costfunc ? m_costfunc->getBorrowCashCost(datetime, cash) : CostRecord();
     }
 
     /**
@@ -247,13 +264,10 @@ public:
      * @param return_datetime 归还日期
      * @param cash 归还金额
      */
-    CostRecord getReturnCashCost(const Datetime& borrow_datetime,
-            const Datetime& return_datetime,
-            price_t cash) {
-        return m_costfunc
-                ? m_costfunc->getReturnCashCost(borrow_datetime,
-                                                return_datetime, cash)
-                : CostRecord();
+    CostRecord getReturnCashCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
+                                 price_t cash) {
+        return m_costfunc ? m_costfunc->getReturnCashCost(borrow_datetime, return_datetime, cash)
+                          : CostRecord();
     }
 
     /**
@@ -263,11 +277,10 @@ public:
      * @param price 每股价格
      * @param num 借入的数量
      */
-    CostRecord getBorrowStockCost(const Datetime& datetime,
-            const Stock& stock, price_t price, size_t num) {
-        return m_costfunc
-                ? m_costfunc->getBorrowStockCost(datetime, stock, price, num)
-                : CostRecord();
+    CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                  size_t num) {
+        return m_costfunc ? m_costfunc->getBorrowStockCost(datetime, stock, price, num)
+                          : CostRecord();
     }
 
     /**
@@ -278,13 +291,11 @@ public:
      * @param price 归还时每股价格
      * @param num 归还的数量
      */
-    CostRecord getReturnStockCost(const Datetime& borrow_datetime,
-            const Datetime& return_datetime,
-            const Stock& stock, price_t price, size_t num) {
-        return m_costfunc
-                ? m_costfunc->getReturnStockCost(borrow_datetime,
-                        return_datetime, stock, price, num)
-                : CostRecord();
+    CostRecord getReturnStockCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
+                                  const Stock& stock, price_t price, size_t num) {
+        return m_costfunc ? m_costfunc->getReturnStockCost(borrow_datetime, return_datetime, stock,
+                                                           price, num)
+                          : CostRecord();
     }
 
     /**
@@ -311,8 +322,7 @@ public:
      * @param number 存入股票的数量
      * @return true | false
      */
-    bool checkinStock(const Datetime& datetime, const Stock& stock,
-            price_t price, size_t number);
+    bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
 
     /**
      * 取出当前资产
@@ -323,8 +333,7 @@ public:
      * @return true | false
      * @note 应该不会被用到
      */
-    bool checkoutStock(const Datetime& datetime, const Stock& stock,
-            price_t price, size_t number);
+    bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
 
     /**
      * 买入操作
@@ -338,12 +347,9 @@ public:
      * @param from 记录是哪个系统部件发出的买入指示
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
-    TradeRecord buy(const Datetime& datetime, const Stock& stock,
-            price_t realPrice, size_t number,
-            price_t stoploss = 0.0,
-            price_t goalPrice = 0.0,
-            price_t planPrice = 0.0,
-            SystemPart from = PART_INVALID);
+    TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice, size_t number,
+                    price_t stoploss = 0.0, price_t goalPrice = 0.0, price_t planPrice = 0.0,
+                    SystemPart from = PART_INVALID);
 
     /**
      * 卖出操作
@@ -357,13 +363,10 @@ public:
      * @param from 记录是哪个系统部件发出的卖出指示
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
-    TradeRecord sell(const Datetime& datetime, const Stock& stock,
-            price_t realPrice,
-            size_t number = Null<size_t>(),
-            price_t stoploss = 0.0,
-            price_t goalPrice = 0.0,
-            price_t planPrice = 0.0,
-            SystemPart from = PART_INVALID);
+    TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                     size_t number = Null<size_t>(), price_t stoploss = 0.0,
+                     price_t goalPrice = 0.0, price_t planPrice = 0.0,
+                     SystemPart from = PART_INVALID);
 
     /**
      * 卖空
@@ -377,12 +380,9 @@ public:
      * @param from 记录是哪个系统部件发出的买入指示
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
-    TradeRecord sellShort(const Datetime& datetime, const Stock& stock,
-            price_t realPrice, size_t number,
-            price_t stoploss = 0.0,
-            price_t goalPrice = 0.0,
-            price_t planPrice = 0.0,
-            SystemPart from = PART_INVALID);
+    TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                          size_t number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
+                          price_t planPrice = 0.0, SystemPart from = PART_INVALID);
 
     /**
      * 卖空后回补
@@ -396,13 +396,10 @@ public:
      * @param from 记录是哪个系统部件发出的卖出指示
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
-    TradeRecord buyShort(const Datetime& datetime, const Stock& stock,
-            price_t realPrice,
-            size_t number = Null<size_t>(),
-            price_t stoploss = 0.0,
-            price_t goalPrice = 0.0,
-            price_t planPrice = 0.0,
-            SystemPart from = PART_INVALID);
+    TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                         size_t number = Null<size_t>(), price_t stoploss = 0.0,
+                         price_t goalPrice = 0.0, price_t planPrice = 0.0,
+                         SystemPart from = PART_INVALID);
 
     /**
      * 借入资金，从其他来源借取的资金，如融资
@@ -428,8 +425,7 @@ public:
      * @param number 借入时数量
      * @return true | false
      */
-    bool borrowStock(const Datetime& datetime, const Stock& stock,
-            price_t price, size_t number);
+    bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
 
     /**
      * 归还证券
@@ -439,8 +435,7 @@ public:
      * @param number 归还数量
      * @return true | false
      */
-    bool returnStock(const Datetime& datetime, const Stock& stock,
-            price_t price, size_t number);
+    bool returnStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
 
     /**
      * 获取账户当前时刻的资产详情
@@ -456,8 +451,7 @@ public:
      * @return 资产详情
      * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
      */
-    FundsRecord getFunds(const Datetime& datetime,
-            KQuery::KType ktype = KQuery::DAY);
+    FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY);
 
     /**
      * 获取资产净值曲线，含借入的资产
@@ -465,8 +459,7 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 资产净值列表
      */
-    PriceList getFundsCurve(const DatetimeList& dates,
-            KQuery::KType ktype = KQuery::DAY);
+    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
 
     /**
      * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
@@ -474,8 +467,7 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
      * @return 收益曲线
      */
-    PriceList getProfitCurve(const DatetimeList& dates,
-            KQuery::KType ktype = KQuery::DAY);
+    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
 
     /**
      * 直接加入交易记录
@@ -518,35 +510,35 @@ private:
     bool _add_buy_short_tr(const TradeRecord&);
 
 private:
-    string       m_name;            //账户名称
-    Datetime     m_init_datetime;   //账户建立日期
-    price_t      m_init_cash;       //初始资金
-    TradeCostPtr m_costfunc;        //成本算法
+    string m_name;             //账户名称
+    Datetime m_init_datetime;  //账户建立日期
+    price_t m_init_cash;       //初始资金
+    TradeCostPtr m_costfunc;   //成本算法
 
-    price_t      m_cash;            //当前现金
-    price_t      m_checkin_cash;    //累计存入资金，初始资金视为存入
-    price_t      m_checkout_cash;   //累计取出资金
-    price_t      m_checkin_stock;   //累计存入股票价值
-    price_t      m_checkout_stock;  //累计取出股票价值
-    price_t      m_borrow_cash;     //当前借入资金，负债
+    price_t m_cash;            //当前现金
+    price_t m_checkin_cash;    //累计存入资金，初始资金视为存入
+    price_t m_checkout_cash;   //累计取出资金
+    price_t m_checkin_stock;   //累计存入股票价值
+    price_t m_checkout_stock;  //累计取出股票价值
+    price_t m_borrow_cash;     //当前借入资金，负债
 
-    list<LoanRecord> m_loan_list;   //当前融资情况
+    list<LoanRecord> m_loan_list;  //当前融资情况
 
     typedef map<uint64, BorrowRecord> borrow_stock_map_type;
     borrow_stock_map_type m_borrow_stock;  //当前借入的股票及其数量
 
     TradeRecordList m_trade_list;  //交易记录
 
-    typedef map<uint64, PositionRecord > position_map_type;
-    position_map_type m_position; //当前持仓交易对象的持仓记录 ["sh000001"-> ]
-    PositionRecordList m_position_history; //持仓历史记录
-    position_map_type m_short_position; //空头仓位记录
-    PositionRecordList m_short_position_history; //空头仓位历史记录
+    typedef map<uint64, PositionRecord> position_map_type;
+    position_map_type m_position;  //当前持仓交易对象的持仓记录 ["sh000001"-> ]
+    PositionRecordList m_position_history;        //持仓历史记录
+    position_map_type m_short_position;           //空头仓位记录
+    PositionRecordList m_short_position_history;  //空头仓位历史记录
 
-    list<OrderBrokerPtr>  m_broker_list; //订单代理列表
-    Datetime m_broker_last_datetime; //订单代理最近一次执行操作的时刻
+    list<OrderBrokerPtr> m_broker_list;  //订单代理列表
+    Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
 
-    list<string> m_actions; //记录交易动作，便于修改或校准实盘时的交易
+    list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易
 
 //==================================================
 // 支持序列化
@@ -554,80 +546,79 @@ private:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_init_datetime);
-        ar & BOOST_SERIALIZATION_NVP(m_init_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_costfunc);
-        ar & BOOST_SERIALIZATION_NVP(m_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_checkin_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_checkout_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_checkin_stock);
-        ar & BOOST_SERIALIZATION_NVP(m_checkout_stock);
-        ar & BOOST_SERIALIZATION_NVP(m_borrow_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_loan_list);
+        ar& boost::serialization::make_nvp("m_name", name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_init_datetime);
+        ar& BOOST_SERIALIZATION_NVP(m_init_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        ar& BOOST_SERIALIZATION_NVP(m_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_checkin_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_checkout_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_checkin_stock);
+        ar& BOOST_SERIALIZATION_NVP(m_checkout_stock);
+        ar& BOOST_SERIALIZATION_NVP(m_borrow_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_loan_list);
         namespace bs = boost::serialization;
         BorrowRecordList borrow = getBorrowStockList();
-        ar & bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);
+        ar& bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);
         PositionRecordList position = getPositionList();
-        ar & bs::make_nvp<PositionRecordList>("m_position", position);
-        ar & BOOST_SERIALIZATION_NVP(m_position_history);
+        ar& bs::make_nvp<PositionRecordList>("m_position", position);
+        ar& BOOST_SERIALIZATION_NVP(m_position_history);
         position = getShortPositionList();
-        ar & bs::make_nvp<PositionRecordList>("m_short_position", position);
-        ar & BOOST_SERIALIZATION_NVP(m_short_position_history);
-        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
-        ar & BOOST_SERIALIZATION_NVP(m_actions);
+        ar& bs::make_nvp<PositionRecordList>("m_short_position", position);
+        ar& BOOST_SERIALIZATION_NVP(m_short_position_history);
+        ar& BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
+        ar& boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_init_datetime);
-        ar & BOOST_SERIALIZATION_NVP(m_init_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_costfunc);
-        ar & BOOST_SERIALIZATION_NVP(m_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_checkin_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_checkout_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_checkin_stock);
-        ar & BOOST_SERIALIZATION_NVP(m_checkout_stock);
-        ar & BOOST_SERIALIZATION_NVP(m_borrow_cash);
-        ar & BOOST_SERIALIZATION_NVP(m_loan_list);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_init_datetime);
+        ar& BOOST_SERIALIZATION_NVP(m_init_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        ar& BOOST_SERIALIZATION_NVP(m_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_checkin_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_checkout_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_checkin_stock);
+        ar& BOOST_SERIALIZATION_NVP(m_checkout_stock);
+        ar& BOOST_SERIALIZATION_NVP(m_borrow_cash);
+        ar& BOOST_SERIALIZATION_NVP(m_loan_list);
         namespace bs = boost::serialization;
         BorrowRecordList borrow;
-        ar & bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);
+        ar& bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);
         BorrowRecordList::const_iterator bor_iter = borrow.begin();
         for (; bor_iter != borrow.end(); ++bor_iter) {
             m_borrow_stock[bor_iter->stock.id()] = *bor_iter;
         }
         PositionRecordList position;
-        ar & bs::make_nvp<PositionRecordList>("m_position", position);
+        ar& bs::make_nvp<PositionRecordList>("m_position", position);
         PositionRecordList::const_iterator iter = position.begin();
         for (; iter != position.end(); ++iter) {
             m_position[iter->stock.id()] = *iter;
         }
-        ar & BOOST_SERIALIZATION_NVP(m_position_history);
+        ar& BOOST_SERIALIZATION_NVP(m_position_history);
 
         position.clear();
-        ar & bs::make_nvp<PositionRecordList>("m_short_position", position);
+        ar& bs::make_nvp<PositionRecordList>("m_short_position", position);
         iter = position.begin();
         for (; iter != position.end(); ++iter) {
             m_short_position[iter->stock.id()] = *iter;
         }
-        ar & BOOST_SERIALIZATION_NVP(m_short_position_history);
-        ar & BOOST_SERIALIZATION_NVP(m_trade_list);
-        ar & BOOST_SERIALIZATION_NVP(m_actions);
+        ar& BOOST_SERIALIZATION_NVP(m_short_position_history);
+        ar& BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
 
 /**
  * 客户程序应使用此类型进行实际操作
@@ -636,8 +627,8 @@ private:
 typedef shared_ptr<TradeManager> TradeManagerPtr;
 typedef shared_ptr<TradeManager> TMPtr;
 
-HKU_API std::ostream & operator<<(std::ostream &, const TradeManager&);
-HKU_API std::ostream & operator<<(std::ostream &, const TradeManagerPtr&);
+HKU_API std::ostream& operator<<(std::ostream&, const TradeManager&);
+HKU_API std::ostream& operator<<(std::ostream&, const TradeManagerPtr&);
 
 } /* namespace hku */
 #endif /* TRADEMANAGER_H_ */

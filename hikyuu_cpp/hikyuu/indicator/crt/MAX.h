@@ -44,7 +44,6 @@ inline Indicator MAX(price_t val, const Indicator& ind) {
     return result;
 }
 
-}
-
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_MAX_H_ */

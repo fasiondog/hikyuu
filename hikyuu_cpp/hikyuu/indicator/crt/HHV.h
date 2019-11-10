@@ -28,6 +28,6 @@ Indicator HKU_API HHV(int n = 20);
  */
 Indicator HKU_API HHV(const Indicator& ind, int n = 20);
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_HHV_H_ */

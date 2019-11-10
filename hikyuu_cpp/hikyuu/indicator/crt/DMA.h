@@ -2,7 +2,7 @@
  * DMA.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2015-5-16
  *      Author: fasiondog
  */
@@ -35,7 +35,6 @@ inline Indicator DMA(const Indicator& ind1, const Indicator& a) {
     return dma;
 }
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_DMA_H_ */

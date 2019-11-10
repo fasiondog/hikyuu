@@ -1,6 +1,6 @@
 /*
  * IHhvbars.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-11
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IHhvbars: public IndicatorImp {
+class IHhvbars : public IndicatorImp {
     INDICATOR_IMP(IHhvbars)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

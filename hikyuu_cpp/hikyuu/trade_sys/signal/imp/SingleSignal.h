@@ -14,7 +14,7 @@
 
 namespace hku {
 
-class SingleSignal: public SignalBase {
+class SingleSignal : public SignalBase {
 public:
     SingleSignal();
     SingleSignal(const Indicator& ind);
@@ -26,17 +26,17 @@ public:
 private:
     Indicator m_ind;
 
-    //============================================
-    // 序列化支持
-    //============================================
-    #if HKU_SUPPORT_SERIALIZATION
-        friend class boost::serialization::access; \
-        template<class Archive> \
-        void serialize(Archive & ar, const unsigned int version) { \
-            ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase); \
-            ar & BOOST_SERIALIZATION_NVP(m_ind);
-        }
-    #endif
+//============================================
+// 序列化支持
+//============================================
+#if HKU_SUPPORT_SERIALIZATION
+    friend class boost::serialization::access;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase);
+        ar& BOOST_SERIALIZATION_NVP(m_ind);
+    }
+#endif
 };
 
 } /* namespace hku */

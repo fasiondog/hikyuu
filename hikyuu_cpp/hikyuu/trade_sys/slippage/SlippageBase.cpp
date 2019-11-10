@@ -9,12 +9,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const SlippageBase& sp) {
+HKU_API std::ostream& operator<<(std::ostream& os, const SlippageBase& sp) {
     os << "Slippage(" << sp.name() << ", " << sp.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const SlippagePtr& sp) {
+HKU_API std::ostream& operator<<(std::ostream& os, const SlippagePtr& sp) {
     if (sp) {
         os << *sp;
     } else {
@@ -23,25 +23,21 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SlippagePtr& sp) {
     return os;
 }
 
-SlippageBase::SlippageBase(): m_name("SlippageBase") {
+SlippageBase::SlippageBase() : m_name("SlippageBase") {}
 
-}
-
-SlippageBase::SlippageBase(const string& name): m_name(name) {
-
-}
+SlippageBase::SlippageBase(const string& name) : m_name(name) {}
 
 SlippagePtr SlippageBase::clone() {
     SlippagePtr p;
     try {
         p = _clone();
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Subclass _clone failed!");
         p = SlippagePtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!" );
+        HKU_ERROR("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 

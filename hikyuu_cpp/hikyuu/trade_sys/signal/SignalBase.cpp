@@ -9,12 +9,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const SignalBase& sg) {
+HKU_API std::ostream& operator<<(std::ostream& os, const SignalBase& sg) {
     os << "Signal(" << sg.name() << ", " << sg.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const SignalPtr& sg) {
+HKU_API std::ostream& operator<<(std::ostream& os, const SignalPtr& sg) {
     if (sg) {
         os << *sg;
     } else {
@@ -24,31 +24,27 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SignalPtr& sg) {
     return os;
 }
 
-
 SignalBase::SignalBase() : m_name("SignalBase"), m_hold(false) {
-    setParam<bool>("alternate", true); //买入卖出信号交替出现
+    setParam<bool>("alternate", true);  //买入卖出信号交替出现
 }
 
-SignalBase::SignalBase(const string& name): m_name(name), m_hold(false) {
+SignalBase::SignalBase(const string& name) : m_name(name), m_hold(false) {
     setParam<bool>("alternate", true);
 }
 
-SignalBase::~SignalBase() {
-
-}
-
+SignalBase::~SignalBase() {}
 
 SignalPtr SignalBase::clone() {
     SignalPtr p;
     try {
         p = _clone();
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Subclass _clone failed!");
         p = SignalPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!" );
+        HKU_ERROR("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 
@@ -61,7 +57,6 @@ SignalPtr SignalBase::clone() {
     return p;
 }
 
-
 void SignalBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
@@ -70,14 +65,12 @@ void SignalBase::setTO(const KData& kdata) {
     }
 }
 
-
 void SignalBase::reset() {
     m_buySig.clear();
     m_sellSig.clear();
     m_hold = false;
     _reset();
 }
-
 
 DatetimeList SignalBase::getBuySignal() const {
     DatetimeList result;
@@ -88,7 +81,6 @@ DatetimeList SignalBase::getBuySignal() const {
     }
     return result;
 }
-
 
 DatetimeList SignalBase::getSellSignal() const {
     DatetimeList result;
@@ -121,6 +113,5 @@ void SignalBase::_addSellSignal(const Datetime& datetime) {
         }
     }
 }
-
 
 } /* namespace hku */

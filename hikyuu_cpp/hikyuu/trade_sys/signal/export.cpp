@@ -39,5 +39,3 @@ BOOST_CLASS_EXPORT(hku::SingleSignal2)
 BOOST_CLASS_EXPORT(hku::BoolSignal)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
-
-

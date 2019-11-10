@@ -11,16 +11,13 @@
 BOOST_CLASS_EXPORT(hku::IMa)
 #endif
 
-
 namespace hku {
 
-IMa::IMa(): IndicatorImp("MA", 1) {
+IMa::IMa() : IndicatorImp("MA", 1) {
     setParam<int>("n", 22);
 }
 
-IMa::~IMa() {
-
-}
+IMa::~IMa() {}
 
 bool IMa::check() {
     int n = getParam<int>("n");
@@ -47,15 +44,14 @@ void IMa::_calculate(const Indicator& indicator) {
     size_t first_end = startPos + n >= total ? total : startPos + n;
     for (size_t i = startPos; i < first_end; ++i) {
         sum += indicator[i];
-        _set(sum/count++, i);
+        _set(sum / count++, i);
     }
 
     for (size_t i = first_end; i < total; ++i) {
-        sum = indicator[i] + sum - indicator[i-n];
-        _set(sum/n, i);
+        sum = indicator[i] + sum - indicator[i - n];
+        _set(sum / n, i);
     }
 }
-
 
 Indicator HKU_API MA(int n) {
     IndicatorImpPtr p = make_shared<IMa>();
@@ -63,7 +59,7 @@ Indicator HKU_API MA(int n) {
     return Indicator(p);
 }
 
-Indicator HKU_API MA(const Indicator& ind, int n){
+Indicator HKU_API MA(const Indicator& ind, int n) {
     return MA(n)(ind);
 }
 

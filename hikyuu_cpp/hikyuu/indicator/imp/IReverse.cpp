@@ -1,6 +1,6 @@
 /*
  * IReverse.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::IReverse)
 #endif
 
-
 namespace hku {
 
-IReverse::IReverse() : IndicatorImp("REVERSE", 1) {
+IReverse::IReverse() : IndicatorImp("REVERSE", 1) {}
 
-}
-
-IReverse::~IReverse() {
-
-}
+IReverse::~IReverse() {}
 
 bool IReverse::check() {
     return true;
@@ -39,13 +34,10 @@ void IReverse::_calculate(const Indicator& data) {
     for (size_t i = m_discard; i < total; ++i) {
         _set(-data[i], i);
     }
-
 }
-
 
 Indicator HKU_API REVERSE() {
     return Indicator(make_shared<IReverse>());
 }
-
 
 } /* namespace hku */

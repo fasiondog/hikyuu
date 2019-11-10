@@ -1,6 +1,6 @@
 /*
  * IFilter.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-4
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IFilter: public IndicatorImp {
+class IFilter : public IndicatorImp {
     INDICATOR_IMP(IFilter)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

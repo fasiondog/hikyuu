@@ -9,17 +9,13 @@
 
 namespace hku {
 
-FixedHoldDays::FixedHoldDays(): ProfitGoalBase("PG_FixedHoldDays") {
+FixedHoldDays::FixedHoldDays() : ProfitGoalBase("PG_FixedHoldDays") {
     setParam<int>("days", 5);
 }
 
-FixedHoldDays::~FixedHoldDays() {
+FixedHoldDays::~FixedHoldDays() {}
 
-}
-
-void FixedHoldDays::_calculate() {
-
-}
+void FixedHoldDays::_calculate() {}
 
 price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
     if (getParam<int>("days") <= 0) {
@@ -36,7 +32,7 @@ price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
     size_t start_out, end_out;
     if (stk.getIndexRange(query, start_out, end_out)) {
         size_t d = end_out - start_out;
-        if (d >=  getParam<int>("days")) {
+        if (d >= getParam<int>("days")) {
             return 0.0;
         }
     }

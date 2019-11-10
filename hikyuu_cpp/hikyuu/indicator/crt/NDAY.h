@@ -1,8 +1,8 @@
 /*
  * NDAY.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-2
  *      Author: fasiondog
  */
@@ -28,6 +28,6 @@ inline Indicator NDAY(const Indicator& x, const Indicator& y, int n) {
     return result;
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_NDAY_H_ */

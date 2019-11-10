@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class NoGoalProfitGoal: public ProfitGoalBase {
+class NoGoalProfitGoal : public ProfitGoalBase {
     PROFITGOAL_IMP(NoGoalProfitGoal)
     PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION
 

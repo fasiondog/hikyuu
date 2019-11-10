@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::ISqrt)
 #endif
 
-
 namespace hku {
 
-ISqrt::ISqrt() : IndicatorImp("SQRT", 1) {
+ISqrt::ISqrt() : IndicatorImp("SQRT", 1) {}
 
-}
-
-ISqrt::~ISqrt() {
-
-}
+ISqrt::~ISqrt() {}
 
 bool ISqrt::check() {
     return true;
@@ -40,7 +35,6 @@ void ISqrt::_calculate(const Indicator& data) {
         _set(std::sqrt(data[i]), i);
     }
 }
-
 
 Indicator HKU_API SQRT() {
     return Indicator(make_shared<ISqrt>());

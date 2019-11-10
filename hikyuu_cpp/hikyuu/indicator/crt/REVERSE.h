@@ -2,7 +2,7 @@
  * REVERSE.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-1
  *      Author: fasiondog
  */
@@ -31,6 +31,6 @@ inline Indicator REVERSE(price_t val) {
     return REVERSE(CVAL(val));
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_REVERSE_H_ */

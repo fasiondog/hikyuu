@@ -11,7 +11,6 @@
 BOOST_CLASS_EXPORT(hku::ConstantValue)
 #endif
 
-
 namespace hku {
 
 ConstantValue::ConstantValue() : IndicatorImp("CVAL", 1) {
@@ -19,15 +18,12 @@ ConstantValue::ConstantValue() : IndicatorImp("CVAL", 1) {
     setParam<int>("discard", 0);
 }
 
-ConstantValue::ConstantValue(double value, size_t discard)
-:IndicatorImp("CVAL", 1) {
+ConstantValue::ConstantValue(double value, size_t discard) : IndicatorImp("CVAL", 1) {
     setParam<double>("value", value);
     setParam<int>("discard", discard);
 }
 
-ConstantValue::~ConstantValue() {
-
-}
+ConstantValue::~ConstantValue() {}
 
 bool ConstantValue::check() {
     return getParam<int>("discard") < 0 ? false : true;
@@ -58,7 +54,7 @@ void ConstantValue::_calculate(const Indicator& data) {
         }
 
         _readyBuffer(total, 1);
-    
+
     } else {
         //非叶子节点
         total = data.size();

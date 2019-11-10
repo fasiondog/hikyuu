@@ -9,7 +9,6 @@
 #ifndef TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDVALUE_H_
 #define TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDVALUE_H_
 
-
 #include "../SlippageBase.h"
 
 namespace hku {
@@ -23,6 +22,5 @@ namespace hku {
 SlippagePtr HKU_API SP_FixedValue(double value = 0.01);
 
 } /* namespace hku */
-
 
 #endif /* TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDVALUE_H_ */

@@ -30,8 +30,7 @@ namespace hku {
  * @param p 噪音系数，默认为2
  * @ingroup Indicator
  */
-Indicator HKU_API SAFTYLOSS(const Indicator& data,
-        int n1 = 10, int n2 = 3, double p = 2.0);
+Indicator HKU_API SAFTYLOSS(const Indicator& data, int n1 = 10, int n2 = 3, double p = 2.0);
 
 /**
  * 亚历山大 艾尔德安全地带止损
@@ -51,6 +50,6 @@ Indicator HKU_API SAFTYLOSS(const Indicator& data,
  */
 Indicator HKU_API SAFTYLOSS(int n1 = 10, int n2 = 3, double p = 2.0);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* SAFTYLOSS_H_ */

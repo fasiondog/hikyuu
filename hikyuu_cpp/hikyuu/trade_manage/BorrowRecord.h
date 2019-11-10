@@ -33,57 +33,57 @@ public:
     price_t value;  //借入总价值
 
     struct Data {
-        Data(): datetime(Null<Datetime>()), price(0.0), number(0) {}
+        Data() : datetime(Null<Datetime>()), price(0.0), number(0) {}
         Data(const Datetime& datetime, price_t price, size_t number)
-        :datetime(datetime), price(price), number(number) {}
+        : datetime(datetime), price(price), number(number) {}
 
-        Datetime datetime; //借入时间
-        price_t price;     //借入时的单价
-        size_t number;     //借入数量
+        Datetime datetime;  //借入时间
+        price_t price;      //借入时的单价
+        size_t number;      //借入数量
 
-    #if HKU_SUPPORT_SERIALIZATION
+#if HKU_SUPPORT_SERIALIZATION
     private:
         friend class boost::serialization::access;
-        template<class Archive>
-        void save(Archive & ar, const unsigned int version) const {
+        template <class Archive>
+        void save(Archive& ar, const unsigned int version) const {
             uint64 datetime_num = datetime.number();
-            ar & boost::serialization::make_nvp("datetime", datetime_num);
-            ar & BOOST_SERIALIZATION_NVP(number);
-            ar & BOOST_SERIALIZATION_NVP(price);
+            ar& boost::serialization::make_nvp("datetime", datetime_num);
+            ar& BOOST_SERIALIZATION_NVP(number);
+            ar& BOOST_SERIALIZATION_NVP(price);
         }
 
-        template<class Archive>
-        void load(Archive & ar, const unsigned int version) {
+        template <class Archive>
+        void load(Archive& ar, const unsigned int version) {
             uint64 datetime_num;
-            ar & boost::serialization::make_nvp("datetime", datetime_num);
+            ar& boost::serialization::make_nvp("datetime", datetime_num);
             datetime = Datetime(datetime_num);
-            ar & BOOST_SERIALIZATION_NVP(number);
-            ar & BOOST_SERIALIZATION_NVP(price);
+            ar& BOOST_SERIALIZATION_NVP(number);
+            ar& BOOST_SERIALIZATION_NVP(price);
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
-    #endif
+#endif
     };
 
-    list<Data> record_list; //当前的借入记录
+    list<Data> record_list;  //当前的借入记录
 
 //序列化支持
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version) {
-        ar & BOOST_SERIALIZATION_NVP(stock);
-        ar & BOOST_SERIALIZATION_NVP(number);
-        ar & BOOST_SERIALIZATION_NVP(value);
-        ar & BOOST_SERIALIZATION_NVP(record_list);
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(stock);
+        ar& BOOST_SERIALIZATION_NVP(number);
+        ar& BOOST_SERIALIZATION_NVP(value);
+        ar& BOOST_SERIALIZATION_NVP(record_list);
     }
 #endif
 };
 
 typedef vector<BorrowRecord> BorrowRecordList;
 
-HKU_API std::ostream & operator<<(std::ostream &, const BorrowRecord&);
+HKU_API std::ostream& operator<<(std::ostream&, const BorrowRecord&);
 
 } /* namespace hku */
 #endif /* BORROWRECORD_H_ */

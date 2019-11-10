@@ -2,7 +2,7 @@
  * IVar.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-2
  *      Author: fasiondog
  */
@@ -18,7 +18,7 @@ namespace hku {
 /*
  * 估算样本方差
  */
-class IVar: public hku::IndicatorImp {
+class IVar : public hku::IndicatorImp {
     INDICATOR_IMP(IVar)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

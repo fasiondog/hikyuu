@@ -15,7 +15,7 @@ namespace hku {
 
 /**
  * 统计总数 统计满足条件的周期数。
- * @details 
+ * @details
  * <pre>
  * 用法：COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
  * 例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
@@ -23,11 +23,11 @@ namespace hku {
  * @param n 周期数
  * @ingroup Indicator
  */
-Indicator HKU_API COUNT(int n=20);
+Indicator HKU_API COUNT(int n = 20);
 
 /**
  * 统计总数 统计满足条件的周期数。
- * @details 
+ * @details
  * <pre>
  * 用法：COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
  * 例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
@@ -38,6 +38,6 @@ Indicator HKU_API COUNT(int n=20);
  */
 Indicator HKU_API COUNT(const Indicator& ind, int n = 20);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* CVAL_H_ */

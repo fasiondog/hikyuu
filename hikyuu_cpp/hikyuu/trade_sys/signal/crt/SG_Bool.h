@@ -22,11 +22,9 @@ namespace hku {
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Bool(const Indicator& buy,
-        const Indicator& sell, const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell,
+                          const string& kpart = "CLOSE");
 
 } /* namespace hku */
-
-
 
 #endif /* TRADE_SYS_SIGNAL_CRT_SG_BOOL_H_ */

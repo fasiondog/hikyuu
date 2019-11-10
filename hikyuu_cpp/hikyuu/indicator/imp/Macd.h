@@ -22,7 +22,7 @@ namespace hku {
  *      2)DIFF: 快线,即（短期EMA-长期EMA）
  *      3)DEA: 慢线，即快线的n3周期EMA平滑
  */
-class Macd: public IndicatorImp {
+class Macd : public IndicatorImp {
     INDICATOR_IMP(Macd)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

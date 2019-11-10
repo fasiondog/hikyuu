@@ -23,5 +23,4 @@ SlippagePtr HKU_API SP_FixedPercent(double p = 0.001);
 
 } /* namespace hku */
 
-
 #endif /* TRADE_SYS_SLIPPAGE_CRT_SP_FIXEDPERCENT_H_ */

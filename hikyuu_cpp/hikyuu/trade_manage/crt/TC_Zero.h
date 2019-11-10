@@ -20,6 +20,6 @@ namespace hku {
  */
 TradeCostPtr HKU_API TC_Zero();
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* CRTZEROTC_H_ */

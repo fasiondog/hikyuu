@@ -33,5 +33,3 @@ BOOST_CLASS_EXPORT(hku::FixedPercentStoploss)
 BOOST_CLASS_EXPORT(hku::IndicatorStoploss)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
-
-

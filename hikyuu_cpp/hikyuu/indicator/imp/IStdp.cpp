@@ -2,7 +2,7 @@
  * IStdp.cpp
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-4-18
  *      Author: fasiondog
  */
@@ -14,16 +14,13 @@
 BOOST_CLASS_EXPORT(hku::IStdp)
 #endif
 
-
 namespace hku {
 
-IStdp::IStdp(): IndicatorImp("STDP", 1) {
+IStdp::IStdp() : IndicatorImp("STDP", 1) {
     setParam<int>("n", 10);
 }
 
-IStdp::~IStdp() {
-
-}
+IStdp::~IStdp() {}
 
 bool IStdp::check() {
     int n = getParam<int>("n");
@@ -52,7 +49,7 @@ void IStdp::_calculate(const Indicator& data) {
         for (size_t j = i + 1 - n; j <= i; ++j) {
             sum += std::pow(data[j] - mean, 2);
         }
-        _set(std::sqrt(sum/n), i);
+        _set(std::sqrt(sum / n), i);
     }
 }
 
@@ -61,6 +58,5 @@ Indicator HKU_API STDP(int n) {
     p->setParam<int>("n", n);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

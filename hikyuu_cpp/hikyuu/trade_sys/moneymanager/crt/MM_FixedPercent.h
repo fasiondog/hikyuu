@@ -22,6 +22,6 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_FixedPercent(double p);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* TRADE_SYS_MONEYMANAGER_CRT_MM_FIXEDPERCENT_H_ */

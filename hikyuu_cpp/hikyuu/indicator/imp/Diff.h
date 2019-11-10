@@ -16,7 +16,7 @@ namespace hku {
 /*
  * 差分指标，即 a[i] - a[i-1]
  */
-class Diff: public hku::IndicatorImp {
+class Diff : public hku::IndicatorImp {
     INDICATOR_IMP(Diff)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

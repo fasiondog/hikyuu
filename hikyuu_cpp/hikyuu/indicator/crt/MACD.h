@@ -42,9 +42,8 @@ Indicator HKU_API MACD(int n1 = 12, int n2 = 26, int n3 = 9);
  * </pre>
  * @ingroup Indicator
  */
-Indicator HKU_API MACD(const Indicator& data,
-        int n1 = 12, int n2 = 26, int n3 = 9);
+Indicator HKU_API MACD(const Indicator& data, int n1 = 12, int n2 = 26, int n3 = 9);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* MACD_H_ */

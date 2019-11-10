@@ -30,6 +30,6 @@ inline Indicator NOT(const Indicator& ind) {
     return NOT()(ind);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_NOT_H_ */

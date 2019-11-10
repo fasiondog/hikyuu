@@ -2,7 +2,7 @@
  * MarketInfoTable.h
  *
  *  Copyright (c) 2019 fasiondog
- * 
+ *
  *  Created on: 2019-8-11
  *      Author: fasiondog
  */
@@ -17,8 +17,8 @@ namespace hku {
 
 class MarketInfoTable {
 public:
-    MarketInfoTable(): m_marketid(0), m_lastDate(0) {}
-    
+    MarketInfoTable() : m_marketid(0), m_lastDate(0) {}
+
     uint64 id() const {
         return m_marketid;
     }
@@ -38,25 +38,24 @@ public:
     const string& code() const {
         return m_code;
     }
-    
+
     int64 lastDate() const {
         return m_lastDate;
     }
 
-
 public:
-    static const char * getInsertSQL() {
+    static const char* getInsertSQL() {
         return "insert into `Market` "
                "(`marketid`, `market`, `name`, `description`, `code`, `lastDate`) "
                "values (?,?,?,?,?,?)";
     }
 
-    static const char * getUpdateSQL() {
+    static const char* getUpdateSQL() {
         return "update `Market` set `market`=?, `name`=?, `description`=?, "
                "`code`=?, `lastDate`=? where `marketid`=?";
     }
 
-    static const char * getSelectSQL() {
+    static const char* getSelectSQL() {
         return "select `marketid`,`market`,`name`, `description`, `code`, `lastDate` from `Market`";
     }
 
@@ -81,6 +80,6 @@ private:
     int64 m_lastDate;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_MARKETINFOTABLE_H */

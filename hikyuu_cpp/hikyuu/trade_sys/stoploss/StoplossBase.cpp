@@ -9,12 +9,12 @@
 
 namespace hku {
 
-HKU_API std::ostream& operator <<(std::ostream& os, const StoplossBase& sl) {
+HKU_API std::ostream& operator<<(std::ostream& os, const StoplossBase& sl) {
     os << "Stoploss(" << sl.name() << ", " << sl.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr& sl) {
+HKU_API std::ostream& operator<<(std::ostream& os, const StoplossPtr& sl) {
     if (sl) {
         os << *sl;
     } else {
@@ -23,39 +23,31 @@ HKU_API std::ostream& operator <<(std::ostream& os, const StoplossPtr& sl) {
     return os;
 }
 
-StoplossBase::StoplossBase(): m_name("StoplossBase") {
+StoplossBase::StoplossBase() : m_name("StoplossBase") {}
 
-}
+StoplossBase::StoplossBase(const string& name) : m_name(name) {}
 
-StoplossBase::StoplossBase(const string& name) : m_name(name) {
-
-}
-
-StoplossBase::~StoplossBase() {
-
-}
-
+StoplossBase::~StoplossBase() {}
 
 StoplossPtr StoplossBase::clone() {
     StoplossPtr p;
     try {
         p = _clone();
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Subclass _clone failed!");
         p = StoplossPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!" );
+        HKU_ERROR("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 
     p->m_params = m_params;
-    //p->m_tm = m_tm;
+    // p->m_tm = m_tm;
     p->m_kdata = m_kdata;
     return p;
 }
-
 
 void StoplossBase::setTO(const KData& kdata) {
     reset();

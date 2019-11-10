@@ -23,6 +23,6 @@ namespace hku {
  */
 MoneyManagerPtr HKU_API MM_FixedCount(int n = 100);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* FIXEDCOUNT_MM_H_ */

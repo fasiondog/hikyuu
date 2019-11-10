@@ -2,7 +2,7 @@
  * BARSCOUNT.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-12
  *      Author: fasiondog
  */
@@ -32,6 +32,6 @@ inline Indicator BARSCOUNT(const Indicator& ind) {
     return BARSCOUNT()(ind);
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_BARSCOUNT_H_ */

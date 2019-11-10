@@ -1,6 +1,6 @@
 /*
  * IBarsLast.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-4
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::IBarsLast)
 #endif
 
-
 namespace hku {
 
-IBarsLast::IBarsLast() : IndicatorImp("BARSLAST", 1) {
+IBarsLast::IBarsLast() : IndicatorImp("BARSLAST", 1) {}
 
-}
-
-IBarsLast::~IBarsLast() {
-
-}
+IBarsLast::~IBarsLast() {}
 
 bool IBarsLast::check() {
     return true;
@@ -46,7 +41,7 @@ void IBarsLast::_calculate(const Indicator& ind) {
     }
 
     size_t pos = total;
-    for (size_t i = total-1; i != m_discard; i--) {
+    for (size_t i = total - 1; i != m_discard; i--) {
         if (ind[i] != 0.0) {
             for (size_t j = i; j < pos; j++) {
                 _set(j - i, j);
@@ -64,10 +59,8 @@ void IBarsLast::_calculate(const Indicator& ind) {
     }
 }
 
-
 Indicator HKU_API BARSLAST() {
     return Indicator(make_shared<IBarsLast>());
 }
-
 
 } /* namespace hku */

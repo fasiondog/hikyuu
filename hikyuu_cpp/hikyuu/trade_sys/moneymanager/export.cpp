@@ -43,5 +43,3 @@ BOOST_CLASS_EXPORT(hku::FixedUnitsMoneyManager)
 BOOST_CLASS_EXPORT(hku::WilliamsFixedRiskMoneyManager)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
-
-

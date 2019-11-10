@@ -9,30 +9,24 @@
 
 namespace hku {
 
-FixedPercentSlippage::FixedPercentSlippage(): SlippageBase("FixedPercent") {
+FixedPercentSlippage::FixedPercentSlippage() : SlippageBase("FixedPercent") {
     setParam<double>("p", 0.001);
 }
 
-FixedPercentSlippage::~FixedPercentSlippage() {
+FixedPercentSlippage::~FixedPercentSlippage() {}
 
-}
-
-price_t FixedPercentSlippage
-::getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t FixedPercentSlippage ::getRealBuyPrice(const Datetime& datetime, price_t price) {
     return price * (1 + getParam<double>("p"));
 }
 
-price_t FixedPercentSlippage
-::getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t FixedPercentSlippage ::getRealSellPrice(const Datetime& datetime, price_t price) {
     return price * (1 - getParam<double>("p"));
 }
 
-void FixedPercentSlippage::_calculate() {
-
-}
+void FixedPercentSlippage::_calculate() {}
 
 SlippagePtr HKU_API SP_FixedPercent(double p) {
-    FixedPercentSlippage *ptr = new FixedPercentSlippage;
+    FixedPercentSlippage* ptr = new FixedPercentSlippage;
     ptr->setParam("p", p);
     return SlippagePtr(ptr);
 }

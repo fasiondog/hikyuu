@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class Atr: public IndicatorImp {
+class Atr : public IndicatorImp {
     INDICATOR_IMP(Atr)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

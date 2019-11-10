@@ -1,6 +1,6 @@
 /*
  * SQLiteBaseInfoDriver.h
- * 
+ *
  *  Copyright (c) 2019 fasiondog
  *
  *  Created on: 2019-8-11
@@ -16,7 +16,7 @@
 
 namespace hku {
 
-class SQLiteBaseInfoDriver: public BaseInfoDriver {
+class SQLiteBaseInfoDriver : public BaseInfoDriver {
 public:
     SQLiteBaseInfoDriver();
     virtual ~SQLiteBaseInfoDriver();
@@ -32,7 +32,7 @@ private:
 
 private:
     //股票基本信息数据库实例
-    DBConnectPool *m_pool;
+    DBConnectPool* m_pool;
 };
 
 } /* namespace hku */

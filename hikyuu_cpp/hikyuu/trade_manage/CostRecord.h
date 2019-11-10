@@ -28,27 +28,27 @@ namespace hku {
 class HKU_API CostRecord {
 public:
     CostRecord();
-    CostRecord(price_t commission, price_t stamptax, price_t transferfee,
-            price_t others, price_t total);
+    CostRecord(price_t commission, price_t stamptax, price_t transferfee, price_t others,
+               price_t total);
 
-    price_t commission;     /**< 佣金     */
-    price_t stamptax;      /**< 印花税   */
-    price_t transferfee;   /**< 过户费   */
-    price_t others;        /**< 其他费用 */
-    price_t total;         /**< 总成本   */
+    price_t commission;  /**< 佣金     */
+    price_t stamptax;    /**< 印花税   */
+    price_t transferfee; /**< 过户费   */
+    price_t others;      /**< 其他费用 */
+    price_t total;       /**< 总成本   */
 
     string toString() const;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version) {
-        ar & BOOST_SERIALIZATION_NVP(commission);
-        ar & BOOST_SERIALIZATION_NVP(stamptax);
-        ar & BOOST_SERIALIZATION_NVP(transferfee);
-        ar & BOOST_SERIALIZATION_NVP(others);
-        ar & BOOST_SERIALIZATION_NVP(total);
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(commission);
+        ar& BOOST_SERIALIZATION_NVP(stamptax);
+        ar& BOOST_SERIALIZATION_NVP(transferfee);
+        ar& BOOST_SERIALIZATION_NVP(others);
+        ar& BOOST_SERIALIZATION_NVP(total);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
@@ -57,11 +57,9 @@ private:
  * 输出成本信息
  * @ingroup TradeCost
  */
-HKU_API std::ostream& operator <<(std::ostream &os, const CostRecord&);
+HKU_API std::ostream& operator<<(std::ostream& os, const CostRecord&);
 
-
-bool HKU_API operator==(const CostRecord& d1, const CostRecord&d2);
-
+bool HKU_API operator==(const CostRecord& d1, const CostRecord& d2);
 
 } /* namespace hku */
 #endif /* COSTRECORD_H_ */

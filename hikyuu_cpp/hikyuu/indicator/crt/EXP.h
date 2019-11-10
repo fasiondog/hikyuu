@@ -29,6 +29,6 @@ inline Indicator EXP(price_t val) {
     return EXP(CVAL(val));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_EXP_H_ */

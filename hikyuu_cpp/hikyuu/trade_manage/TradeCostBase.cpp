@@ -9,12 +9,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const TradeCostBase& tc) {
+HKU_API std::ostream& operator<<(std::ostream& os, const TradeCostBase& tc) {
     os << "TradeCostFunc(" << tc.name() << ", " << tc.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const TradeCostPtr& tc) {
+HKU_API std::ostream& operator<<(std::ostream& os, const TradeCostPtr& tc) {
     if (tc) {
         os << *tc;
     } else {
@@ -23,18 +23,13 @@ HKU_API std::ostream & operator<<(std::ostream& os, const TradeCostPtr& tc) {
     return os;
 }
 
-TradeCostBase::TradeCostBase(const string& name): m_name(name) {
+TradeCostBase::TradeCostBase(const string& name) : m_name(name) {}
 
-}
-
-TradeCostBase::~TradeCostBase() {
-
-}
-
+TradeCostBase::~TradeCostBase() {}
 
 TradeCostPtr TradeCostBase::clone() {
     TradeCostPtr result = _clone();
-    TradeCostBase *p = result.get();
+    TradeCostBase* p = result.get();
     p->m_params = m_params;
     p->m_name = m_name;
     return result;

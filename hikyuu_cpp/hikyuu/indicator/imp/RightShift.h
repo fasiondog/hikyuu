@@ -19,7 +19,7 @@ namespace hku {
  * 用法：　REF(X，A)　引用A周期前的X值。
  * 例如：　REF(CLOSE，1)　表示上一周期的收盘价，在日线上就是昨收。
  */
-class RightShift: public IndicatorImp {
+class RightShift : public IndicatorImp {
     INDICATOR_IMP(RightShift)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

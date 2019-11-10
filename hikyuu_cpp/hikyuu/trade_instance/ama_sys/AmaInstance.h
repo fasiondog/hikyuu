@@ -14,12 +14,8 @@
 
 namespace hku {
 
-Indicator HKU_API AmaSpecial(const Block& block, KQuery query,
-        Indicator ind);
+Indicator HKU_API AmaSpecial(const Block& block, KQuery query, Indicator ind);
 
 } /* namespace hku*/
 
 #endif /* AMAINSTANCE_H */
-
-
-

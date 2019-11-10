@@ -1,6 +1,6 @@
 /*
  * POW.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-2
@@ -36,6 +36,6 @@ inline Indicator POW(price_t val, int n) {
     return POW(CVAL(val), n);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_POW_H_ */

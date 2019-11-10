@@ -2,7 +2,7 @@
  * ISma.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-15
  *      Author: fasiondog
  */
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ISma: public IndicatorImp {
+class ISma : public IndicatorImp {
     INDICATOR_IMP(ISma)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

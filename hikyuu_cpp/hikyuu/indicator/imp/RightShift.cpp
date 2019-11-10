@@ -11,16 +11,13 @@
 BOOST_CLASS_EXPORT(hku::RightShift)
 #endif
 
-
 namespace hku {
 
-RightShift::RightShift(): IndicatorImp("REF", 1) {
+RightShift::RightShift() : IndicatorImp("REF", 1) {
     setParam<int>("n", 1);
 }
 
-RightShift::~RightShift() {
-
-}
+RightShift::~RightShift() {}
 
 bool RightShift::check() {
     int n = getParam<int>("n");
@@ -32,7 +29,7 @@ bool RightShift::check() {
     return true;
 }
 
-void RightShift::_calculate(const Indicator& data)  {
+void RightShift::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
@@ -42,7 +39,7 @@ void RightShift::_calculate(const Indicator& data)  {
         return;
     }
     for (size_t i = m_discard; i < total; ++i) {
-        _set(data[i-n], i);
+        _set(data[i - n], i);
     }
 }
 

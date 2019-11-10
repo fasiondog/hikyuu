@@ -14,16 +14,11 @@
 BOOST_CLASS_EXPORT(hku::IIntpart)
 #endif
 
-
 namespace hku {
 
-IIntpart::IIntpart() : IndicatorImp("INTPART", 1) {
+IIntpart::IIntpart() : IndicatorImp("INTPART", 1) {}
 
-}
-
-IIntpart::~IIntpart() {
-
-}
+IIntpart::~IIntpart() {}
 
 bool IIntpart::check() {
     return true;
@@ -41,7 +36,6 @@ void IIntpart::_calculate(const Indicator& data) {
         _set(int(data[i]), i);
     }
 }
-
 
 Indicator HKU_API INTPART() {
     return Indicator(make_shared<IIntpart>());

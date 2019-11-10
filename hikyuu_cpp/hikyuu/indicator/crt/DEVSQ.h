@@ -1,6 +1,6 @@
 /*
  * DEVSQ.h
- * 
+ *
  *  Copyright (c) 2019, hikyuu.org
  *
  *  Created on: 2013-4-18
@@ -27,7 +27,6 @@ inline Indicator DEVSQ(const Indicator& data, int n) {
     return DEVSQ(n)(data);
 }
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_DEVSQ_H_ */

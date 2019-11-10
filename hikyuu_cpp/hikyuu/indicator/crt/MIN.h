@@ -44,7 +44,6 @@ inline Indicator MIN(price_t val, const Indicator& ind) {
     return result;
 }
 
-}
-
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_MIN_H_ */

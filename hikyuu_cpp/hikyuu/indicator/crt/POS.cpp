@@ -10,8 +10,7 @@
 
 namespace hku {
 
-Indicator HKU_API POS(const Block& block, KQuery query,
-        SignalPtr sg) {
+Indicator HKU_API POS(const Block& block, KQuery query, SignalPtr sg) {
     Indicator result;
     StockManager& sm = StockManager::instance();
 
@@ -29,8 +28,8 @@ Indicator HKU_API POS(const Block& block, KQuery query,
     for (size_t i = 0; i < dayTotal; ++i) {
         numberPerDay[i] = 0;
         for (auto stk_iter = block.begin(); stk_iter != block.end(); ++stk_iter) {
-            if (stk_iter->startDatetime() <= dateList[i]
-                  && dateList[i] <= stk_iter->lastDatetime()) {
+            if (stk_iter->startDatetime() <= dateList[i] &&
+                dateList[i] <= stk_iter->lastDatetime()) {
                 numberPerDay[i]++;
             }
         }
@@ -63,8 +62,7 @@ Indicator HKU_API POS(const Block& block, KQuery query,
 
     PriceList tmp_result(dayTotal, Null<price_t>());
     for (auto i = 0; i < dayTotal; ++i) {
-        tmp_result[i] = numberPerDay[i]
-                  ? (double)position[i]/(double)numberPerDay[i] : 1.0;
+        tmp_result[i] = numberPerDay[i] ? (double)position[i] / (double)numberPerDay[i] : 1.0;
     }
 
     result = PRICELIST(tmp_result);
@@ -73,5 +71,3 @@ Indicator HKU_API POS(const Block& block, KQuery query,
 }
 
 } /* namespace hku */
-
-

@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class FixedHoldDays: public ProfitGoalBase {
+class FixedHoldDays : public ProfitGoalBase {
     PROFITGOAL_IMP(FixedHoldDays)
     PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION
 

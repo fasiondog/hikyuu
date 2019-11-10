@@ -9,27 +9,21 @@
 
 namespace hku {
 
-FixedRiskMoneyManager::FixedRiskMoneyManager()
-: MoneyManagerBase("MM_FixedRisk") {
+FixedRiskMoneyManager::FixedRiskMoneyManager() : MoneyManagerBase("MM_FixedRisk") {
     setParam<double>("risk", 1000.00);
 }
 
-FixedRiskMoneyManager::~FixedRiskMoneyManager() {
+FixedRiskMoneyManager::~FixedRiskMoneyManager() {}
 
-}
-
-size_t FixedRiskMoneyManager
-::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk, SystemPart from) {
+size_t FixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+                                             price_t price, price_t risk, SystemPart from) {
     return getParam<double>("risk") / risk;
 }
 
-
 MoneyManagerPtr HKU_API MM_FixedRisk(double risk) {
-    FixedRiskMoneyManager *p = new FixedRiskMoneyManager();
+    FixedRiskMoneyManager* p = new FixedRiskMoneyManager();
     p->setParam<double>("risk", risk);
     return MoneyManagerPtr(p);
 }
-
 
 } /* namespace hku */

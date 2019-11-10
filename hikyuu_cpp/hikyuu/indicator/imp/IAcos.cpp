@@ -1,6 +1,6 @@
 /*
  * IAcos.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::IAcos)
 #endif
 
-
 namespace hku {
 
-IAcos::IAcos() : IndicatorImp("ACOS", 1) {
+IAcos::IAcos() : IndicatorImp("ACOS", 1) {}
 
-}
-
-IAcos::~IAcos() {
-
-}
+IAcos::~IAcos() {}
 
 bool IAcos::check() {
     return true;
@@ -41,10 +36,8 @@ void IAcos::_calculate(const Indicator& data) {
     }
 }
 
-
 Indicator HKU_API ACOS() {
     return Indicator(make_shared<IAcos>());
 }
-
 
 } /* namespace hku */

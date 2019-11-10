@@ -30,40 +30,38 @@ public:
     price_t m_weight;
 
 private:
+//============================================
+// 序列化支持
+//============================================
+#if HKU_SUPPORT_SERIALIZATION
+private:
+    friend class boost::serialization::access;
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
+        ar& BOOST_SERIALIZATION_NVP(m_sys);
+        ar& BOOST_SERIALIZATION_NVP(m_weight);
+    }
 
-    //============================================
-    // 序列化支持
-    //============================================
-    #if HKU_SUPPORT_SERIALIZATION
-    private:
-        friend class boost::serialization::access;
-        template<class Archive>
-        void save(Archive & ar, const unsigned int version) const {
-            ar & BOOST_SERIALIZATION_NVP(m_sys);
-            ar & BOOST_SERIALIZATION_NVP(m_weight);
-        }
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_sys);
+        ar& BOOST_SERIALIZATION_NVP(m_weight);
+    }
 
-        template<class Archive>
-        void load(Archive & ar, const unsigned int version) {
-            ar & BOOST_SERIALIZATION_NVP(m_sys);
-            ar & BOOST_SERIALIZATION_NVP(m_weight);
-        }
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
-    #endif /* HKU_SUPPORT_SERIALIZATION */
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
 typedef vector<SystemWeight> SystemWeightList;
 
-HKU_API std::ostream & operator<<(std::ostream &, const SystemWeight&);
-
+HKU_API std::ostream& operator<<(std::ostream&, const SystemWeight&);
 
 inline void SystemWeight::setSYS(const SystemPtr& sys) {
     m_sys = sys;
 }
 
 inline SystemPtr SystemWeight::getSYS() const {
-     return m_sys;
+    return m_sys;
 }
 
 inline void SystemWeight::setWeight(price_t weight) {
@@ -73,7 +71,6 @@ inline void SystemWeight::setWeight(price_t weight) {
 inline price_t SystemWeight::getWeight() const {
     return m_weight;
 }
-
 
 } /* namespace hku */
 

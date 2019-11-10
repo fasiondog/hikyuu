@@ -36,7 +36,4 @@ BOOST_CLASS_EXPORT(hku::FixedATradeCost)
 BOOST_CLASS_EXPORT(hku::ZeroTradeCost)
 BOOST_CLASS_EXPORT(hku::FixedA2015TradeCost)
 
-
 #endif /* HKU_SUPPORT_SERIALIZATION */
-
-

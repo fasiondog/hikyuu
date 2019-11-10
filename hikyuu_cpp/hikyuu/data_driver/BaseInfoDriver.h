@@ -27,7 +27,7 @@ public:
     typedef unordered_map<uint32, StockTypeInfo> StockTypeInfoMap;
 
     BaseInfoDriver(const string& name);
-    virtual ~BaseInfoDriver() { }
+    virtual ~BaseInfoDriver() {}
 
     const string& name() const;
 
@@ -84,9 +84,8 @@ protected:
 
 typedef shared_ptr<BaseInfoDriver> BaseInfoDriverPtr;
 
-HKU_API std::ostream & operator<<(std::ostream&, const BaseInfoDriver&);
-HKU_API std::ostream & operator<<(std::ostream&, const BaseInfoDriverPtr&);
-
+HKU_API std::ostream& operator<<(std::ostream&, const BaseInfoDriver&);
+HKU_API std::ostream& operator<<(std::ostream&, const BaseInfoDriverPtr&);
 
 inline const string& BaseInfoDriver::name() const {
     return m_name;

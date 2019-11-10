@@ -9,12 +9,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalBase& pg) {
+HKU_API std::ostream& operator<<(std::ostream& os, const ProfitGoalBase& pg) {
     os << "ProfitGoal(" << pg.name() << ", " << pg.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalPtr& pg) {
+HKU_API std::ostream& operator<<(std::ostream& os, const ProfitGoalPtr& pg) {
     if (pg) {
         os << *pg;
     } else {
@@ -23,29 +23,23 @@ HKU_API std::ostream & operator<<(std::ostream& os, const ProfitGoalPtr& pg) {
     return os;
 }
 
-ProfitGoalBase::ProfitGoalBase(): m_name("ProfitGoalBase") {
+ProfitGoalBase::ProfitGoalBase() : m_name("ProfitGoalBase") {}
 
-}
+ProfitGoalBase::ProfitGoalBase(const string& name) : m_name(name) {}
 
-ProfitGoalBase::ProfitGoalBase(const string& name): m_name(name) {
-
-}
-
-ProfitGoalBase::~ProfitGoalBase() {
-
-}
+ProfitGoalBase::~ProfitGoalBase() {}
 
 ProfitGoalPtr ProfitGoalBase::clone() {
     ProfitGoalPtr p;
     try {
         p = _clone();
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Subclass _clone failed!");
         p = ProfitGoalPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!" );
+        HKU_ERROR("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 
@@ -55,7 +49,6 @@ ProfitGoalPtr ProfitGoalBase::clone() {
     p->m_kdata = m_kdata;
     return p;
 }
-
 
 void ProfitGoalBase::setTO(const KData& kdata) {
     reset();

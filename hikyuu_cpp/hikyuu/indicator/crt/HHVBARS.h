@@ -1,8 +1,8 @@
 /*
  * HHVBARS.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-4-11
  *      Author: fasiondog
  */
@@ -31,6 +31,6 @@ inline Indicator HHVBARS(const Indicator& ind, int n) {
     return HHVBARS(n)(ind);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_HHVBARS_H_ */

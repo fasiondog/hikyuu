@@ -30,23 +30,37 @@ class HKU_API Portfolio {
 public:
     Portfolio();
     Portfolio(const string& name);
-    Portfolio(const TradeManagerPtr& tm,
-            const SelectorPtr& st,
-            const AFPtr& af);
+    Portfolio(const TradeManagerPtr& tm, const SelectorPtr& st, const AFPtr& af);
     virtual ~Portfolio();
 
-    string name() const { return m_name; }
-    void name(const string& name) { m_name = name; }
+    string name() const {
+        return m_name;
+    }
+    void name(const string& name) {
+        m_name = name;
+    }
 
     void run(const KQuery& query);
 
-    TMPtr getTM() { return m_tm; }
-    SEPtr getSE() { return m_se; }
-    AFPtr getAF() { return m_af; }
+    TMPtr getTM() {
+        return m_tm;
+    }
+    SEPtr getSE() {
+        return m_se;
+    }
+    AFPtr getAF() {
+        return m_af;
+    }
 
-    void setTM(const TMPtr& tm) { m_tm = tm; }
-    void setSE(const SEPtr& se) { m_se = se; }
-    void setAF(const AFPtr& af) { m_af = af; }
+    void setTM(const TMPtr& tm) {
+        m_tm = tm;
+    }
+    void setSE(const SEPtr& se) {
+        m_se = se;
+    }
+    void setAF(const AFPtr& af) {
+        m_af = af;
+    }
 
     void reset();
 
@@ -60,12 +74,12 @@ private:
 
 protected:
     string m_name;
-    TMPtr  m_tm;
-    SEPtr  m_se;
-    AFPtr  m_af;
+    TMPtr m_tm;
+    SEPtr m_se;
+    AFPtr m_af;
 
     //以下为临时变量
-    TMPtr  m_tm_shadow;    //影子账户，用于内部协调分配资金
+    TMPtr m_tm_shadow;  //影子账户，用于内部协调分配资金
 
 //============================================
 // 序列化支持
@@ -73,31 +87,30 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name_str(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("name", name_str);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_af);
-        ar & BOOST_SERIALIZATION_NVP(m_tm);
+        ar& boost::serialization::make_nvp("name", name_str);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_se);
+        ar& BOOST_SERIALIZATION_NVP(m_af);
+        ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("name", name);
+        ar& boost::serialization::make_nvp("name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_se);
-        ar & BOOST_SERIALIZATION_NVP(m_af);
-        ar & BOOST_SERIALIZATION_NVP(m_tm);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_se);
+        ar& BOOST_SERIALIZATION_NVP(m_af);
+        ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
 
 /**
  * 客户程序都应使用该指针类型
@@ -106,8 +119,8 @@ private:
 typedef shared_ptr<Portfolio> PortfolioPtr;
 typedef shared_ptr<Portfolio> PFPtr;
 
-HKU_API std::ostream & operator<<(std::ostream&, const Portfolio&);
-HKU_API std::ostream & operator<<(std::ostream&, const PortfolioPtr&);
+HKU_API std::ostream& operator<<(std::ostream&, const Portfolio&);
+HKU_API std::ostream& operator<<(std::ostream&, const PortfolioPtr&);
 
 } /* namespace hku */
 

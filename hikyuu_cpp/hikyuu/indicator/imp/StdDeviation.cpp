@@ -12,16 +12,13 @@
 BOOST_CLASS_EXPORT(hku::StdDeviation)
 #endif
 
-
 namespace hku {
 
-StdDeviation::StdDeviation(): IndicatorImp("STD", 1) {
+StdDeviation::StdDeviation() : IndicatorImp("STD", 1) {
     setParam<int>("n", 10);
 }
 
-StdDeviation::~StdDeviation() {
-
-}
+StdDeviation::~StdDeviation() {}
 
 bool StdDeviation::check() {
     int n = getParam<int>("n");
@@ -51,10 +48,9 @@ void StdDeviation::_calculate(const Indicator& data) {
         for (size_t j = i + 1 - n; j <= i; ++j) {
             sum += std::pow(data[j] - mean, 2);
         }
-        _set(std::sqrt(sum/N), i);
+        _set(std::sqrt(sum / N), i);
     }
 }
-
 
 Indicator HKU_API STDEV(int n) {
     IndicatorImpPtr p = make_shared<StdDeviation>();

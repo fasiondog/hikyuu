@@ -15,21 +15,17 @@
 BOOST_CLASS_EXPORT(hku::Vigor)
 #endif
 
-
 namespace hku {
 
-Vigor::Vigor(): IndicatorImp("VIGOR", 1) {
+Vigor::Vigor() : IndicatorImp("VIGOR", 1) {
     setParam<int>("n", 2);
 }
 
-Vigor::Vigor(int n): IndicatorImp() {
+Vigor::Vigor(int n) : IndicatorImp() {
     setParam<int>("n", n);
 }
 
-
-Vigor::~Vigor() {
-
-}
+Vigor::~Vigor() {}
 
 bool Vigor::check() {
     int n = getParam<int>("n");
@@ -59,7 +55,7 @@ void Vigor::_calculate(const Indicator& ind) {
 
     PriceList tmp(total, Null<price_t>());
     for (size_t i = 1; i < total; ++i) {
-        tmp[i] = (kdata[i].closePrice - kdata[i-1].closePrice) * kdata[i].transCount;
+        tmp[i] = (kdata[i].closePrice - kdata[i - 1].closePrice) * kdata[i].transCount;
     }
 
     Indicator ema = EMA(PRICELIST(tmp, 1), n);
@@ -67,7 +63,6 @@ void Vigor::_calculate(const Indicator& ind) {
         _set(ema[i], i);
     }
 }
-
 
 Indicator HKU_API VIGOR(int n) {
     return make_shared<Vigor>(n)->calculate();

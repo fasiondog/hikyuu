@@ -30,7 +30,7 @@ namespace hku {
  * @note 系统有效性和待交易的对象有关也可能没关，所以保留setTradeObj接口
  * @ingroup Condition
  */
-class HKU_API ConditionBase: public enable_shared_from_this<ConditionBase> {
+class HKU_API ConditionBase : public enable_shared_from_this<ConditionBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -93,7 +93,7 @@ public:
 
 protected:
     string m_name;
-    KData  m_kdata;
+    KData m_kdata;
     TMPtr m_tm;
     SGPtr m_sg;
     std::set<Datetime> m_valid;
@@ -104,29 +104,28 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_valid);
+        ar& boost::serialization::make_nvp("m_name", name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_valid);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
+        ar& boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_valid);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_valid);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(ConditionBase)
@@ -146,16 +145,16 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ConditionBase)
  * @endcode
  * @ingroup Condition
  */
-#define CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase); \
+#define CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION               \
+private:                                                        \
+    friend class boost::serialization::access;                  \
+    template <class Archive>                                    \
+    void serialize(Archive& ar, const unsigned int version) {   \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase); \
     }
 #else
 #define CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
-
 
 /**
  * 客户程序都应使用该指针类型
@@ -164,18 +163,15 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ConditionBase)
 typedef shared_ptr<ConditionBase> ConditionPtr;
 typedef shared_ptr<ConditionBase> CNPtr;
 
-
-#define CONDITION_IMP(classname) public:\
-    virtual ConditionPtr _clone() {\
-        return ConditionPtr(new classname());\
-    }\
+#define CONDITION_IMP(classname)              \
+public:                                       \
+    virtual ConditionPtr _clone() {           \
+        return ConditionPtr(new classname()); \
+    }                                         \
     virtual void _calculate();
 
-
-
-HKU_API std::ostream & operator<<(std::ostream &, const ConditionPtr&);
-HKU_API std::ostream & operator<<(std::ostream &, const ConditionBase&);
-
+HKU_API std::ostream& operator<<(std::ostream&, const ConditionPtr&);
+HKU_API std::ostream& operator<<(std::ostream&, const ConditionBase&);
 
 inline string ConditionBase::name() const {
     return m_name;

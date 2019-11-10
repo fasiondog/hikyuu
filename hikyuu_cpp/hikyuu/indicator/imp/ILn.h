@@ -1,6 +1,6 @@
 /*
  * ILn.h
- * 
+ *
  *  Copyright (c) 2019 fasiondog
  *
  *  Created on: 2019-4-11
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ILn: public IndicatorImp {
+class ILn : public IndicatorImp {
     INDICATOR_IMP(ILn)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

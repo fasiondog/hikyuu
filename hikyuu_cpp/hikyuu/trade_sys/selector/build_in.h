@@ -11,5 +11,4 @@
 
 #include "crt/SE_Fixed.h"
 
-
 #endif /* TRADE_SYS_SELECTOR_BUILD_IN_H_ */

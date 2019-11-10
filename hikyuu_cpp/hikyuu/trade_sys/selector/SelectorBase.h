@@ -25,7 +25,7 @@ namespace hku {
  * 交易对象选择模块
  * @ingroup Selector
  */
-class HKU_API SelectorBase: public enable_shared_from_this<SelectorBase>  {
+class HKU_API SelectorBase : public enable_shared_from_this<SelectorBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -39,7 +39,9 @@ public:
     void addStock(const Stock& stock, const SystemPtr& protoSys);
     void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
-    SystemList getAllSystemList() const { return m_sys_list; }
+    SystemList getAllSystemList() const {
+        return m_sys_list;
+    }
 
     bool changed(Datetime date);
 
@@ -70,23 +72,23 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name_str(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("name", name_str);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_count);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_date);
-        ar & BOOST_SERIALIZATION_NVP(m_sys_list);
+        ar& boost::serialization::make_nvp("name", name_str);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_count);
+        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
+        ar& BOOST_SERIALIZATION_NVP(m_sys_list);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
-        ar & boost::serialization::make_nvp("name", m_name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
-        ar & BOOST_SERIALIZATION_NVP(m_count);
-        ar & BOOST_SERIALIZATION_NVP(m_pre_date);
-        ar & BOOST_SERIALIZATION_NVP(m_sys_list);
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar& boost::serialization::make_nvp("name", m_name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_count);
+        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
+        ar& BOOST_SERIALIZATION_NVP(m_sys_list);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -111,23 +113,23 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
  * @endcode
  * @ingroup Selector
  */
-#define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase); \
+#define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION               \
+private:                                                       \
+    friend class boost::serialization::access;                 \
+    template <class Archive>                                   \
+    void serialize(Archive& ar, const unsigned int version) {  \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SelectorBase); \
     }
 #else
 #define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-
-#define SELECTOR_IMP(classname) public:\
-    virtual SelectorPtr _clone() {\
-        return SelectorPtr(new classname());\
-    }\
+#define SELECTOR_IMP(classname)              \
+public:                                      \
+    virtual SelectorPtr _clone() {           \
+        return SelectorPtr(new classname()); \
+    }                                        \
     virtual SystemList getSelectedSystemList(Datetime date);
-
 
 /**
  * 客户程序都应使用该指针类型
@@ -136,9 +138,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
 typedef shared_ptr<SelectorBase> SelectorPtr;
 typedef shared_ptr<SelectorBase> SEPtr;
 
-HKU_API std::ostream & operator<<(std::ostream&, const SelectorBase&);
-HKU_API std::ostream & operator<<(std::ostream&, const SelectorPtr&);
-
+HKU_API std::ostream& operator<<(std::ostream&, const SelectorBase&);
+HKU_API std::ostream& operator<<(std::ostream&, const SelectorPtr&);
 
 inline string SelectorBase::name() const {
     return m_name;
@@ -147,7 +148,6 @@ inline string SelectorBase::name() const {
 inline void SelectorBase::name(const string& name) {
     m_name = name;
 }
-
 
 } /* namespace hku */
 

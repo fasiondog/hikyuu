@@ -44,6 +44,6 @@ inline Indicator MOD(price_t ind1, price_t ind2) {
     return CVAL(ind1) % CVAL(ind2);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_IMP_MOD_H_ */

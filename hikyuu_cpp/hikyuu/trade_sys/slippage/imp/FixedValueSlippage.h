@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class FixedValueSlippage: public SlippageBase {
+class FixedValueSlippage : public SlippageBase {
     SLIPPAGE_IMP(FixedValueSlippage)
     SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 

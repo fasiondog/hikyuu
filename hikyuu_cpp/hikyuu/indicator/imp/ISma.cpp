@@ -2,7 +2,7 @@
  * ISma.cpp
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-15
  *      Author: fasiondog
  */
@@ -13,17 +13,14 @@
 BOOST_CLASS_EXPORT(hku::ISma)
 #endif
 
-
 namespace hku {
 
-ISma::ISma(): IndicatorImp("SMA", 1) {
+ISma::ISma() : IndicatorImp("SMA", 1) {
     setParam<int>("n", 22);
     setParam<double>("m", 2.0);
 }
 
-ISma::~ISma() {
-
-}
+ISma::~ISma() {}
 
 bool ISma::check() {
     int n = getParam<int>("n");
@@ -48,10 +45,9 @@ void ISma::_calculate(const Indicator& ind) {
     double p = n - m;
     _set(ind[m_discard], m_discard);
     for (size_t i = m_discard + 1; i < total; i++) {
-        _set((m * ind[i] + p * get(i-1)) / n, i);
+        _set((m * ind[i] + p * get(i - 1)) / n, i);
     }
 }
-
 
 Indicator HKU_API SMA(int n, double m) {
     IndicatorImpPtr p = make_shared<ISma>();

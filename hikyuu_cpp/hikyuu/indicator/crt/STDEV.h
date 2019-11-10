@@ -28,7 +28,6 @@ Indicator HKU_API STDEV(int n = 10);
  */
 Indicator HKU_API STDEV(const Indicator& data, int n = 10);
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* STD_H_ */

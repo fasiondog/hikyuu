@@ -2,7 +2,7 @@
  * IRound.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-4-14
  *      Author: fasiondog
  */
@@ -18,7 +18,7 @@ namespace hku {
 /**
  * 四舍五入
  */
-class IRound: public IndicatorImp {
+class IRound : public IndicatorImp {
     INDICATOR_IMP(IRound)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

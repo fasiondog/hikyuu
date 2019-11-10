@@ -1,6 +1,6 @@
 /*
  * ROUND.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-14
@@ -31,6 +31,6 @@ inline Indicator ROUND(price_t val, int n) {
     return ROUND(CVAL(val), n);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ROUND_H_ */

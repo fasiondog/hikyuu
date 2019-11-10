@@ -2,7 +2,7 @@
  * AVEDEV.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2015-5-16
  *      Author: fasiondog
  */
@@ -22,7 +22,7 @@ namespace hku {
  * @param n 时间窗口
  * @ingroup Indicator
  */
-Indicator AVEDEV(const Indicator& ind, int n=22);
+Indicator AVEDEV(const Indicator& ind, int n = 22);
 
 inline Indicator AVEDEV(const Indicator& ind, int n) {
     Indicator result = ABS(ind - MA(ind, n)) / n;
@@ -30,7 +30,6 @@ inline Indicator AVEDEV(const Indicator& ind, int n) {
     return result;
 }
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_AVEDEV_H_ */

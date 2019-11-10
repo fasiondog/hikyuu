@@ -14,16 +14,13 @@
 BOOST_CLASS_EXPORT(hku::IRoundUp)
 #endif
 
-
 namespace hku {
 
 IRoundUp::IRoundUp() : IndicatorImp("ROUNDUP", 1) {
     setParam<int>("ndigits", 2);
 }
 
-IRoundUp::~IRoundUp() {
-
-}
+IRoundUp::~IRoundUp() {}
 
 bool IRoundUp::check() {
     if (getParam<int>("ndigits") < 0) {
@@ -46,7 +43,6 @@ void IRoundUp::_calculate(const Indicator& data) {
         _set(roundUp(data[i], n), i);
     }
 }
-
 
 Indicator HKU_API ROUNDUP(int ndigits) {
     IndicatorImpPtr p = make_shared<IRoundUp>();

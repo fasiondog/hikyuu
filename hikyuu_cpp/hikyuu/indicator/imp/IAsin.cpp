@@ -1,6 +1,6 @@
 /*
  * IAsin.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::IAsin)
 #endif
 
-
 namespace hku {
 
-IAsin::IAsin() : IndicatorImp("ASIN", 1) {
+IAsin::IAsin() : IndicatorImp("ASIN", 1) {}
 
-}
-
-IAsin::~IAsin() {
-
-}
+IAsin::~IAsin() {}
 
 bool IAsin::check() {
     return true;
@@ -37,15 +32,12 @@ void IAsin::_calculate(const Indicator& data) {
     }
 
     for (size_t i = m_discard; i < total; ++i) {
-        _set(data[i]<=1 && data[i]>=-1 ? std::asin(data[i]) : Null<price_t>(), i);
+        _set(data[i] <= 1 && data[i] >= -1 ? std::asin(data[i]) : Null<price_t>(), i);
     }
-
 }
-
 
 Indicator HKU_API ASIN() {
     return Indicator(make_shared<IAsin>());
 }
-
 
 } /* namespace hku */

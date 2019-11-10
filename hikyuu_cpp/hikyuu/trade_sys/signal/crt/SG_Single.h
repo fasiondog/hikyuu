@@ -32,9 +32,8 @@ namespace hku {
  * @return
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Single(const Indicator& ind,
-        int filter_n = 20, double filter_p = 0.1,
-        const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filter_p = 0.1,
+                            const string& kpart = "CLOSE");
 
 /**
  * 单线拐点信号指示器2
@@ -53,9 +52,8 @@ SignalPtr HKU_API SG_Single(const Indicator& ind,
  * @return
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Single2(const Indicator& ind,
-        int filter_n = 20, double filter_p = 0.1,
-        const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Single2(const Indicator& ind, int filter_n = 20, double filter_p = 0.1,
+                             const string& kpart = "CLOSE");
 
 } /* namespace hku */
 

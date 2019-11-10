@@ -11,16 +11,11 @@
 BOOST_CLASS_EXPORT(hku::INot)
 #endif
 
-
 namespace hku {
 
-INot::INot() : IndicatorImp("NOT", 1) {
+INot::INot() : IndicatorImp("NOT", 1) {}
 
-}
-
-INot::~INot() {
-
-}
+INot::~INot() {}
 
 bool INot::check() {
     return true;
@@ -43,10 +38,8 @@ void INot::_calculate(const Indicator& data) {
     }
 }
 
-
 Indicator HKU_API NOT() {
     return Indicator(make_shared<INot>());
 }
-
 
 } /* namespace hku */

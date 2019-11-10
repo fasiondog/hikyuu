@@ -21,6 +21,4 @@ ProfitGoalPtr HKU_API PG_NoGoal();
 
 } /* namespace hku */
 
-
-
 #endif /* TRADE_SYS_PROFITGOAL_CRT_PG_NOGOAL_H_ */

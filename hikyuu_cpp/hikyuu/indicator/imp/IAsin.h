@@ -1,6 +1,6 @@
 /*
  * IAsin.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IAsin: public IndicatorImp {
+class IAsin : public IndicatorImp {
     INDICATOR_IMP(IAsin)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

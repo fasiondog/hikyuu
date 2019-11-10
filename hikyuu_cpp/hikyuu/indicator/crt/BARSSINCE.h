@@ -2,7 +2,7 @@
  * BARSSINCE.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-4
  *      Author: fasiondog
  */
@@ -36,6 +36,6 @@ inline Indicator BARSSINCE(price_t val) {
     return BARSSINCE(CVAL(val));
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_BARSSINCE_H_ */

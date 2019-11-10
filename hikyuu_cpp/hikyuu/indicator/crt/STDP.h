@@ -25,7 +25,6 @@ inline Indicator STDP(const Indicator& data, int n) {
     return STDP(n)(data);
 }
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_STDP_H_ */

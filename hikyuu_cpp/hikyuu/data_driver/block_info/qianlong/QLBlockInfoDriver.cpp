@@ -12,16 +12,13 @@
 
 namespace hku {
 
-QLBlockInfoDriver::~QLBlockInfoDriver() {
-
-}
+QLBlockInfoDriver::~QLBlockInfoDriver() {}
 
 bool QLBlockInfoDriver::_init() {
     return true;
 }
 
-Block QLBlockInfoDriver
-::getBlock(const string& category, const string& name) {
+Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
     Block result(category, name);
     if (!haveParam("dir")) {
         HKU_ERROR("Missing 'dir' param!");
@@ -36,7 +33,7 @@ Block QLBlockInfoDriver
     string filename;
     try {
         filename = getParam<string>("dir") + "/" + getParam<string>(category);
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Maybe parameters errors!");
         return result;
     }
@@ -66,19 +63,19 @@ Block QLBlockInfoDriver
             boost::trim(line_str);
         }
 
-        //section行
+        // section行
         if (line_str.at(0) == '[') {
             if (is_find) {
-                break; //跳出循环
+                break;  //跳出循环
             }
             size_t len = line_str.size();
-            if(line_str[len-1] != ']') {
+            if (line_str[len - 1] != ']') {
                 continue;
             }
 
-            section.assign(line_str, 1, len-2);
+            section.assign(line_str, 1, len - 2);
             boost::trim(section);
-            if(section.empty()) {
+            if (section.empty()) {
                 continue;
             }
 
@@ -91,7 +88,7 @@ Block QLBlockInfoDriver
             pos = line_str.find(',');
             if (pos != std::string::npos) {
                 market.assign(line_str, 0, pos);
-                code.assign(line_str, pos+1, line_str.size());
+                code.assign(line_str, pos + 1, line_str.size());
                 boost::trim(market);
                 boost::trim(code);
                 if (market == "0") {
@@ -106,7 +103,6 @@ Block QLBlockInfoDriver
     inifile.close();
     return result;
 }
-
 
 BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     BlockList result;
@@ -123,7 +119,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     string filename;
     try {
         filename = getParam<string>("dir") + "/" + getParam<string>(category);
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Maybe parameters errors!");
         return result;
     }
@@ -153,26 +149,26 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
             boost::trim(line_str);
         }
 
-        //section行
+        // section行
         if (line_str.at(0) == '[') {
             size_t len = line_str.size();
-            if(line_str[len-1] != ']')
+            if (line_str[len - 1] != ']')
                 continue;
 
-            section.assign(line_str, 1, len-2);
+            section.assign(line_str, 1, len - 2);
             boost::trim(section);
-            if(section.empty())
+            if (section.empty())
                 continue;
 
             block = Block(category, gb_to_utf8(section));
             result.push_back(block);
 
-        }else {
+        } else {
             if (section.empty())
                 break;  //缺少section定义，后续无须处理，直接跳出循环
 
             pos = line_str.find(',');
-            if(pos == std::string::npos || pos == line_str.size()-1)
+            if (pos == std::string::npos || pos == line_str.size() - 1)
                 continue;
 
             key.assign(line_str, 0, pos);
@@ -180,7 +176,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
             if (key.empty())
                 continue;
 
-            value.assign(line_str, pos+1, std::string::npos);
+            value.assign(line_str, pos + 1, std::string::npos);
             boost::trim(value);
             if (value.empty())
                 continue;

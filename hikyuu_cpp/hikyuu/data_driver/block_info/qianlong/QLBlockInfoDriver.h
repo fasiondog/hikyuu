@@ -13,9 +13,9 @@
 
 namespace hku {
 
-class QLBlockInfoDriver: public BlockInfoDriver {
+class QLBlockInfoDriver : public BlockInfoDriver {
 public:
-    QLBlockInfoDriver(): BlockInfoDriver("qianlong") {};
+    QLBlockInfoDriver() : BlockInfoDriver("qianlong"){};
     virtual ~QLBlockInfoDriver();
 
     virtual bool _init();

@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class FixedA2015TradeCost: public TradeCostBase {
+class FixedA2015TradeCost : public TradeCostBase {
     TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
@@ -28,8 +28,8 @@ public:
      * @param num 买入数量
      * @return CostRecord 交易成本记录
      */
-    virtual CostRecord getBuyCost(const Datetime& datetime,
-            const Stock& stock, price_t price, size_t num) const;
+    virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                  size_t num) const;
 
     /**
      * 计算卖出成本
@@ -39,8 +39,8 @@ public:
      * @param num 卖出数量
      * @return CostRecord 交易成本记录
      */
-    virtual CostRecord getSellCost(const Datetime& datetime,
-            const Stock& stock, price_t price, size_t num) const;
+    virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
+                                   size_t num) const;
 
     /** 子类私有变量克隆接口 */
     virtual TradeCostPtr _clone();

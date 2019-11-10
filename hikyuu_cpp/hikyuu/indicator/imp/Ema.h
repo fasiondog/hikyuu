@@ -18,7 +18,7 @@ namespace hku {
  * 参数： n: 计算均值的周期窗口，必须为大于0的整数
  * 抛弃数 = 0
  */
-class Ema: public IndicatorImp {
+class Ema : public IndicatorImp {
     INDICATOR_IMP(Ema)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

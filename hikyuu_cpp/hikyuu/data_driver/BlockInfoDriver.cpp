@@ -10,12 +10,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const BlockInfoDriver& driver) {
+HKU_API std::ostream& operator<<(std::ostream& os, const BlockInfoDriver& driver) {
     os << "BlockInfoDriver(" << driver.name() << ", " << driver.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const BlockInfoDriverPtr& driver) {
+HKU_API std::ostream& operator<<(std::ostream& os, const BlockInfoDriverPtr& driver) {
     if (driver) {
         os << *driver;
     } else {
@@ -25,8 +25,7 @@ HKU_API std::ostream & operator<<(std::ostream& os, const BlockInfoDriverPtr& dr
     return os;
 }
 
-BlockInfoDriver::BlockInfoDriver(const string& name)
-: m_name(name) {
+BlockInfoDriver::BlockInfoDriver(const string& name) : m_name(name) {
     to_upper(m_name);
 }
 
@@ -42,7 +41,7 @@ bool BlockInfoDriver::checkType() {
             HKU_WARN("Type of driver mismatch! ({} != {})", type, m_name);
         }
 
-    } catch(...) {
+    } catch (...) {
         result = false;
         HKU_ERROR("Can't get type of driver!");
     }

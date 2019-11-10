@@ -12,18 +12,15 @@
 BOOST_CLASS_EXPORT(hku::Macd)
 #endif
 
-
 namespace hku {
 
-Macd::Macd(): IndicatorImp("MACD", 3) {
+Macd::Macd() : IndicatorImp("MACD", 3) {
     setParam<int>("n1", 12);
     setParam<int>("n2", 26);
     setParam<int>("n3", 9);
 }
 
-Macd::~Macd() {
-
-}
+Macd::~Macd() {}
 
 bool Macd::check() {
     int n1 = getParam<int>("n1");
@@ -40,7 +37,7 @@ void Macd::_calculate(const Indicator& data) {
     if (total == 0) {
         return;
     }
-    
+
     _readyBuffer(total, 3);
 
     int n1 = getParam<int>("n1");
@@ -65,7 +62,7 @@ void Macd::_calculate(const Indicator& data) {
     _set(diff, 0, 1);
     _set(dea, 0, 2);
 
-    for (size_t  i = 1; i < total; ++i) {
+    for (size_t i = 1; i < total; ++i) {
         ema1 = (data[i] - ema1) * m1 + ema1;
         ema2 = (data[i] - ema2) * m2 + ema2;
         diff = ema1 - ema2;
@@ -76,7 +73,6 @@ void Macd::_calculate(const Indicator& data) {
         _set(dea, i, 2);
     }
 }
-
 
 Indicator HKU_API MACD(int n1, int n2, int n3) {
     IndicatorImpPtr p = make_shared<Macd>();

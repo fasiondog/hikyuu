@@ -20,6 +20,6 @@ namespace hku {
  */
 StoplossPtr HKU_API ST_FixedPercent(double p = 0.03);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* FIXEDPERCENT_SL_H_ */

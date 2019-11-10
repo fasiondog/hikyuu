@@ -1,6 +1,6 @@
 /*
  * IBarsLast.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-4
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IBarsLast: public IndicatorImp {
+class IBarsLast : public IndicatorImp {
     INDICATOR_IMP(IBarsLast)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

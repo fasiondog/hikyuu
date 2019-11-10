@@ -12,5 +12,4 @@
 #include "crt/SP_FixedPercent.h"
 #include "crt/SP_FixedValue.h"
 
-
 #endif /* SLIPPAGE_BUILD_IN_H_ */

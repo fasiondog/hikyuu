@@ -10,15 +10,11 @@
 namespace hku {
 
 FixedRatioMoneyManager::FixedRatioMoneyManager()
-: MoneyManagerBase("MM_FixedRadio") ,
-  m_current_num(1),
-  m_pre_cash(0.0) {
+: MoneyManagerBase("MM_FixedRadio"), m_current_num(1), m_pre_cash(0.0) {
     setParam<double>("delta", 1000.00);
 }
 
-FixedRatioMoneyManager::~FixedRatioMoneyManager() {
-
-}
+FixedRatioMoneyManager::~FixedRatioMoneyManager() {}
 
 void FixedRatioMoneyManager::_reset() {
     m_current_num = 1;
@@ -26,15 +22,14 @@ void FixedRatioMoneyManager::_reset() {
 }
 
 MoneyManagerPtr FixedRatioMoneyManager::_clone() {
-    FixedRatioMoneyManager *p = new FixedRatioMoneyManager();
+    FixedRatioMoneyManager* p = new FixedRatioMoneyManager();
     p->m_current_num = m_current_num;
     p->m_pre_cash = m_pre_cash;
     return MoneyManagerPtr(p);
 }
 
-size_t FixedRatioMoneyManager
-::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-            price_t price, price_t risk, SystemPart from) {
+size_t FixedRatioMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+                                              price_t price, price_t risk, SystemPart from) {
     double delta = getParam<double>("delta");
     if (m_pre_cash == 0.0) {
         m_pre_cash = m_tm->initCash();

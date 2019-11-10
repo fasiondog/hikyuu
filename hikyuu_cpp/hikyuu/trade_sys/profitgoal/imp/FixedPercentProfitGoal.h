@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class FixedPercentProfitGoal: public ProfitGoalBase {
+class FixedPercentProfitGoal : public ProfitGoalBase {
     PROFITGOAL_IMP(FixedPercentProfitGoal)
     PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION
 

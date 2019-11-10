@@ -2,7 +2,7 @@
  * IRoundDown.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-4-14
  *      Author: fasiondog
  */
@@ -18,7 +18,7 @@ namespace hku {
 /**
  * 向下截取，如10.1截取后为10
  */
-class IRoundDown: public IndicatorImp {
+class IRoundDown : public IndicatorImp {
     INDICATOR_IMP(IRoundDown)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

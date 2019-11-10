@@ -16,13 +16,12 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImp& imp) {
+HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
     os << "Indicator(" << imp.name() << ", " << imp.getParameter() << ")";
     return os;
 }
 
-
-HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) {
+HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
     if (!imp) {
         os << "Indicator(NULL)";
     } else {
@@ -32,24 +31,21 @@ HKU_API std::ostream & operator<<(std::ostream& os, const IndicatorImpPtr& imp) 
 }
 
 IndicatorImp::IndicatorImp()
-: m_name("IndicatorImp"), m_discard(0), m_result_num(0), 
-  m_need_calculate(true), m_optype(LEAF)  {
+: m_name("IndicatorImp"), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(PriceList *) * MAX_RESULT_NUM);
 }
 
-IndicatorImp::IndicatorImp(const string& name)
-: m_name(name), m_discard(0), m_result_num(0), 
-  m_need_calculate(true), m_optype(LEAF) {
+IndicatorImp::IndicatorImp(const string &name)
+: m_name(name), m_discard(0), m_result_num(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(PriceList *) * MAX_RESULT_NUM);
 }
 
-IndicatorImp::IndicatorImp(const string& name, size_t result_num)
-: m_name(name), m_discard(0), 
-  m_need_calculate(true), m_optype(LEAF) {
+IndicatorImp::IndicatorImp(const string &name, size_t result_num)
+: m_name(name), m_discard(0), m_need_calculate(true), m_optype(LEAF) {
     initContext();
-    memset(m_pBuffer, 0, sizeof(PriceList*) * MAX_RESULT_NUM);
+    memset(m_pBuffer, 0, sizeof(PriceList *) * MAX_RESULT_NUM);
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 
@@ -57,31 +53,37 @@ void IndicatorImp::initContext() {
     setParam<KData>("kdata", KData());
 }
 
-void IndicatorImp::setContext(const Stock& stock, const KQuery& query) {
+void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
     m_need_calculate = true;
 
     //子节点设置上下文
-    if (m_left) m_left->setContext(stock, query);
-    if (m_right) m_right->setContext(stock, query);
-    if (m_three) m_three->setContext(stock, query);
+    if (m_left)
+        m_left->setContext(stock, query);
+    if (m_right)
+        m_right->setContext(stock, query);
+    if (m_three)
+        m_three->setContext(stock, query);
 
-     //如果上下文有变化则重设上下文
+    //如果上下文有变化则重设上下文
     KData kdata = getContext();
     if (kdata.getStock() != stock || kdata.getQuery() != query) {
-        setParam<KData>("kdata", stock.getKData(query));        
+        setParam<KData>("kdata", stock.getKData(query));
     }
 
     //启动重新计算
     calculate();
 }
 
-void IndicatorImp::setContext(const KData& k) {
+void IndicatorImp::setContext(const KData &k) {
     m_need_calculate = true;
 
     //子节点设置上下文
-    if (m_left) m_left->setContext(k);
-    if (m_right) m_right->setContext(k);
-    if (m_three) m_three->setContext(k);
+    if (m_left)
+        m_left->setContext(k);
+    if (m_right)
+        m_right->setContext(k);
+    if (m_three)
+        m_three->setContext(k);
 
     //如果上下文有变化则重设上下文
     KData old_k = getParam<KData>("kdata");
@@ -93,15 +95,16 @@ void IndicatorImp::setContext(const KData& k) {
     calculate();
 }
 
-
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
     if (result_num > MAX_RESULT_NUM) {
-        throw(std::invalid_argument("result_num oiverload MAX_RESULT_NUM! "
-                "[IndicatorImp::_readyBuffer]" + name()));
+        throw(
+          std::invalid_argument("result_num oiverload MAX_RESULT_NUM! "
+                                "[IndicatorImp::_readyBuffer]" +
+                                name()));
     }
 
     if (result_num == 0) {
-        //HKU_TRACE("result_num is zeror! (" << name() << ") [IndicatorImp::_readyBuffer]")
+        // HKU_TRACE("result_num is zeror! (" << name() << ") [IndicatorImp::_readyBuffer]")
         return;
     }
 
@@ -161,8 +164,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     return p;
 }
 
-
-IndicatorImpPtr IndicatorImp::operator()(const Indicator& ind) {
+IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
     HKU_INFO("This indicator not support operator()! {}", *this);
     //保证对齐
     IndicatorImpPtr result = make_shared<IndicatorImp>();
@@ -197,7 +199,6 @@ PriceList IndicatorImp::getResultAsPriceList(size_t result_num) {
     return (*m_pBuffer[result_num]);
 }
 
-
 IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     if (result_num >= m_result_num || m_pBuffer[result_num] == NULL) {
         return IndicatorImpPtr();
@@ -215,9 +216,9 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 
 price_t IndicatorImp::get(size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
-        throw(std::out_of_range("Try to access value out of bounds! "
-                + name() + " [IndicatorImp::get]"));
+    if ((m_pBuffer[num] == NULL) || pos >= m_pBuffer[num]->size()) {
+        throw(std::out_of_range("Try to access value out of bounds! " + name() +
+                                " [IndicatorImp::get]"));
         return Null<price_t>();
     }
 #endif
@@ -226,10 +227,10 @@ price_t IndicatorImp::get(size_t pos, size_t num) {
 
 void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos>= m_pBuffer[num]->size()) {
+    if ((m_pBuffer[num] == NULL) || pos >= m_pBuffer[num]->size()) {
         std::stringstream buf;
-        buf << "Try to access value out of bounds! (pos=" << pos
-            << ") " << name() << " [IndicatorImp::_set]";
+        buf << "Try to access value out of bounds! (pos=" << pos << ") " << name()
+            << " [IndicatorImp::_set]";
         throw(std::out_of_range(buf.str()));
     }
     (*m_pBuffer[num])[pos] = val;
@@ -240,7 +241,7 @@ void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
 
 DatetimeList IndicatorImp::getDatetimeList() const {
     if (haveParam("align_date_list")) {
-         return getParam<DatetimeList>("align_date_list");
+        return getParam<DatetimeList>("align_date_list");
     }
     return getContext().getDatetimeList();
 }
@@ -281,7 +282,7 @@ string IndicatorImp::formula() const {
             break;
 
         case OP:
-            buf << m_name << "("  << m_right->formula() << ")";
+            buf << m_name << "(" << m_right->formula() << ")";
             break;
 
         case ADD:
@@ -340,8 +341,7 @@ string IndicatorImp::formula() const {
             buf << "WEAVE(" << m_left->formula() << ", " << m_right->formula() << ")";
 
         case OP_IF:
-            buf << "IF(" << m_three->formula() << ", " 
-                << m_left->formula() << ", "
+            buf << "IF(" << m_three->formula() << ", " << m_left->formula() << ", "
                 << m_right->formula() << ")";
             break;
 
@@ -352,7 +352,6 @@ string IndicatorImp::formula() const {
 
     return buf.str();
 }
-
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (op == LEAF || op >= INVALID || !right) {
@@ -367,8 +366,10 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                     m_need_calculate = true;
                     m_left = right->clone();
                 } else {
-                    HKU_WARN("Context-dependent indicator can only be at the leaf node!"
-                             "parent node: {}, try add node: {}", name(), right->name());
+                    HKU_WARN(
+                      "Context-dependent indicator can only be at the leaf node!"
+                      "parent node: {}, try add node: {}",
+                      name(), right->name());
                 }
             } else {
                 if (m_left->isLeaf()) {
@@ -386,8 +387,10 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                     m_need_calculate = true;
                     m_right = right->clone();
                 } else {
-                    HKU_WARN("Context-dependent indicator can only be at the leaf node!"
-                             "parent node: {}, try add node: {}", name(), right->name());
+                    HKU_WARN(
+                      "Context-dependent indicator can only be at the leaf node!"
+                      "parent node: {}, try add node: {}",
+                      name(), right->name());
                 }
             } else {
                 if (m_right->isLeaf()) {
@@ -407,8 +410,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
     }
 }
 
-void IndicatorImp::
-add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
+void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
     if (!cond || !left || !right) {
         HKU_ERROR("Wrong used!");
         return;
@@ -425,7 +427,7 @@ bool IndicatorImp::needCalculate() {
     if (m_need_calculate) {
         return true;
     }
-    
+
     //子节点设置上下文
     if (m_left) {
         m_need_calculate = m_left->needCalculate();
@@ -462,11 +464,11 @@ Indicator IndicatorImp::calculate() {
             try {
                 result = shared_from_this();
             } catch (...) {
-                //Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
+                // Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
                 result = clone();
             }
         }
-            
+
         return Indicator(result);
     }
 
@@ -493,7 +495,7 @@ Indicator IndicatorImp::calculate() {
 
         case ADD:
             execute_add();
-            break; 
+            break;
 
         case SUB:
             execute_sub();
@@ -564,7 +566,7 @@ Indicator IndicatorImp::calculate() {
     try {
         result = shared_from_this();
     } catch (...) {
-        //Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
+        // Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
         result = clone();
     }
 
@@ -606,19 +608,19 @@ void IndicatorImp::execute_weave() {
         }
         for (size_t r = num; r < result_number; r++) {
             for (size_t i = discard; i < total; i++) {
-                _set(m_right->get(i-diff, r-num), i, r);
+                _set(m_right->get(i - diff, r - num), i, r);
             }
         }
     } else {
         size_t num = m_left->getResultNumber();
         for (size_t r = 0; r < num; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i-diff, r), i, r);
+                _set(m_left->get(i - diff, r), i, r);
             }
         }
         for (size_t r = num; r < result_number; r++) {
             for (size_t i = discard; i < total; i++) {
-                _set(m_right->get(i, r-num), i, r);
+                _set(m_right->get(i, r - num), i, r);
             }
         }
     }
@@ -649,7 +651,7 @@ void IndicatorImp::execute_add() {
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            _set(maxp->get(i, r) + minp->get(i-diff, r), i, r);
+            _set(maxp->get(i, r) + minp->get(i - diff, r), i, r);
         }
     }
 }
@@ -680,15 +682,15 @@ void IndicatorImp::execute_sub() {
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i, r) - m_right->get(i-diff, r), i, r);
+                _set(m_left->get(i, r) - m_right->get(i - diff, r), i, r);
             }
         }
     } else {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                _set(m_left->get(i-diff, r) - m_right->get(i, r), i, r);
+                _set(m_left->get(i - diff, r) - m_right->get(i, r), i, r);
             }
-        } 
+        }
     }
 }
 
@@ -717,7 +719,7 @@ void IndicatorImp::execute_mul() {
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            _set(maxp->get(i, r) * minp->get(i-diff, r), i, r);
+            _set(maxp->get(i, r) * minp->get(i - diff, r), i, r);
         }
     }
 }
@@ -748,10 +750,10 @@ void IndicatorImp::execute_div() {
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i-diff, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);    
+                if (m_right->get(i - diff, r) == 0.0) {
+                    _set(Null<price_t>(), i, r);
                 } else {
-                    _set(m_left->get(i, r) / m_right->get(i-diff, r), i, r);
+                    _set(m_left->get(i, r) / m_right->get(i - diff, r), i, r);
                 }
             }
         }
@@ -759,12 +761,12 @@ void IndicatorImp::execute_div() {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
                 if (m_right->get(i, r) == 0.0) {
-                    _set(Null<price_t>(), i, r); 
+                    _set(Null<price_t>(), i, r);
                 } else {
-                    _set(m_left->get(i-diff, r) / m_right->get(i, r), i, r);
+                    _set(m_left->get(i - diff, r) / m_right->get(i, r), i, r);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -794,10 +796,10 @@ void IndicatorImp::execute_mod() {
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i-diff, r) == 0.0) {
-                    _set(Null<price_t>(), i, r);    
+                if (m_right->get(i - diff, r) == 0.0) {
+                    _set(Null<price_t>(), i, r);
                 } else {
-                    _set(int64(m_left->get(i, r)) % int64(m_right->get(i-diff, r)), i, r);
+                    _set(int64(m_left->get(i, r)) % int64(m_right->get(i - diff, r)), i, r);
                 }
             }
         }
@@ -805,12 +807,12 @@ void IndicatorImp::execute_mod() {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
                 if (m_right->get(i, r) == 0.0) {
-                    _set(Null<price_t>(), i, r); 
+                    _set(Null<price_t>(), i, r);
                 } else {
-                    _set(int64(m_left->get(i-diff, r)) % int64(m_right->get(i, r)), i, r);
+                    _set(int64(m_left->get(i - diff, r)) % int64(m_right->get(i, r)), i, r);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -839,7 +841,7 @@ void IndicatorImp::execute_eq() {
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            if (std::fabs(maxp->get(i, r) - minp->get(i-diff, r)) < IND_EQ_THRESHOLD) {
+            if (std::fabs(maxp->get(i, r) - minp->get(i - diff, r)) < IND_EQ_THRESHOLD) {
                 _set(1, i, r);
             } else {
                 _set(0, i, r);
@@ -873,7 +875,7 @@ void IndicatorImp::execute_ne() {
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            if (std::fabs(maxp->get(i, r) - minp->get(i-diff, r)) < IND_EQ_THRESHOLD) {
+            if (std::fabs(maxp->get(i, r) - minp->get(i - diff, r)) < IND_EQ_THRESHOLD) {
                 _set(0, i, r);
             } else {
                 _set(1, i, r);
@@ -908,7 +910,7 @@ void IndicatorImp::execute_gt() {
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i, r) - m_right->get(i-diff, r) >= IND_EQ_THRESHOLD) {
+                if (m_left->get(i, r) - m_right->get(i - diff, r) >= IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
@@ -918,13 +920,13 @@ void IndicatorImp::execute_gt() {
     } else {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i-diff, r) - m_right->get(i, r) >= IND_EQ_THRESHOLD) {
+                if (m_left->get(i - diff, r) - m_right->get(i, r) >= IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -954,7 +956,7 @@ void IndicatorImp::execute_lt() {
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i-diff, r) - m_left->get(i, r) >= IND_EQ_THRESHOLD) {
+                if (m_right->get(i - diff, r) - m_left->get(i, r) >= IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
@@ -964,13 +966,13 @@ void IndicatorImp::execute_lt() {
     } else {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_right->get(i, r) - m_left->get(i-diff, r)>= IND_EQ_THRESHOLD) {
+                if (m_right->get(i, r) - m_left->get(i - diff, r) >= IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -1000,7 +1002,7 @@ void IndicatorImp::execute_ge() {
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i, r) > m_right->get(i-diff, r) - IND_EQ_THRESHOLD) {
+                if (m_left->get(i, r) > m_right->get(i - diff, r) - IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
@@ -1010,13 +1012,13 @@ void IndicatorImp::execute_ge() {
     } else {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i-diff, r) > m_right->get(i, r) - IND_EQ_THRESHOLD) {
+                if (m_left->get(i - diff, r) > m_right->get(i, r) - IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -1046,7 +1048,7 @@ void IndicatorImp::execute_le() {
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i, r) < m_right->get(i-diff, r) + IND_EQ_THRESHOLD) {
+                if (m_left->get(i, r) < m_right->get(i - diff, r) + IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
@@ -1056,13 +1058,13 @@ void IndicatorImp::execute_le() {
     } else {
         for (size_t r = 0; r < result_number; ++r) {
             for (size_t i = discard; i < total; ++i) {
-                if (m_left->get(i-diff, r) < m_right->get(i, r) + IND_EQ_THRESHOLD) {
+                if (m_left->get(i - diff, r) < m_right->get(i, r) + IND_EQ_THRESHOLD) {
                     _set(1, i, r);
                 } else {
                     _set(0, i, r);
                 }
             }
-        } 
+        }
     }
 }
 
@@ -1091,8 +1093,7 @@ void IndicatorImp::execute_and() {
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            if (maxp->get(i, r) >= IND_EQ_THRESHOLD
-                    && minp->get(i-diff, r) >= IND_EQ_THRESHOLD) {
+            if (maxp->get(i, r) >= IND_EQ_THRESHOLD && minp->get(i - diff, r) >= IND_EQ_THRESHOLD) {
                 _set(1, i, r);
             } else {
                 _set(0, i, r);
@@ -1126,8 +1127,7 @@ void IndicatorImp::execute_or() {
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            if (maxp->get(i, r) >= IND_EQ_THRESHOLD
-                    || minp->get(i-diff, r) >= IND_EQ_THRESHOLD) {
+            if (maxp->get(i, r) >= IND_EQ_THRESHOLD || minp->get(i - diff, r) >= IND_EQ_THRESHOLD) {
                 _set(1, i, r);
             } else {
                 _set(0, i, r);
@@ -1172,10 +1172,10 @@ void IndicatorImp::execute_if() {
     setDiscard(discard);
     for (size_t r = 0; r < result_number; ++r) {
         for (size_t i = discard; i < total; ++i) {
-            if (m_three->get(i-diff_cond) > 0.0) {
-                _set(m_left->get(i-diff_left), i, r);
+            if (m_three->get(i - diff_cond) > 0.0) {
+                _set(m_left->get(i - diff_left), i, r);
             } else {
-                _set(m_right->get(i-diff_right), i ,r);
+                _set(m_right->get(i - diff_right), i, r);
             }
         }
     }

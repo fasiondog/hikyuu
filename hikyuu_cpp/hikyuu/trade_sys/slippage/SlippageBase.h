@@ -25,7 +25,7 @@ namespace hku {
  * 移滑价差算法基类
  * @ingroup Slippage
  */
-class HKU_API SlippageBase: public enable_shared_from_this<SlippageBase>  {
+class HKU_API SlippageBase : public enable_shared_from_this<SlippageBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -58,8 +58,7 @@ public:
      * @param planPrice 计划买入价格
      * @return 实际买入价格
      */
-    virtual price_t getRealBuyPrice(const Datetime& datetime,
-            price_t planPrice) = 0;
+    virtual price_t getRealBuyPrice(const Datetime& datetime, price_t planPrice) = 0;
 
     /**
      * 计算实际卖出价格
@@ -67,8 +66,7 @@ public:
      * @param planPrice 计划卖出价格
      * @return 实际卖出价格
      */
-    virtual price_t getRealSellPrice(const Datetime& datetime,
-            price_t planPrice) = 0;
+    virtual price_t getRealSellPrice(const Datetime& datetime, price_t planPrice) = 0;
 
     /** 子类克隆接口 */
     virtual SlippagePtr _clone() = 0;
@@ -89,25 +87,24 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const {
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         string name(GBToUTF8(m_name));
-        ar & boost::serialization::make_nvp("m_name", name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& boost::serialization::make_nvp("m_name", name);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version) {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         string name;
-        ar & boost::serialization::make_nvp("m_name", name);
+        ar& boost::serialization::make_nvp("m_name", name);
         m_name = UTF8ToGB(name);
-        ar & BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_NVP(m_params);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(SlippageBase)
@@ -127,25 +124,25 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SlippageBase)
  * @endcode
  * @ingroup Slippage
  */
-#define SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION private:\
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(SlippageBase); \
+#define SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION               \
+private:                                                       \
+    friend class boost::serialization::access;                 \
+    template <class Archive>                                   \
+    void serialize(Archive& ar, const unsigned int version) {  \
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SlippageBase); \
     }
 #else
 #define SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-
-#define SLIPPAGE_IMP(classname) public:\
-    virtual SlippagePtr _clone() {\
-        return SlippagePtr(new classname());\
-    }\
-    virtual price_t getRealBuyPrice(const Datetime&, price_t); \
+#define SLIPPAGE_IMP(classname)                                 \
+public:                                                         \
+    virtual SlippagePtr _clone() {                              \
+        return SlippagePtr(new classname());                    \
+    }                                                           \
+    virtual price_t getRealBuyPrice(const Datetime&, price_t);  \
     virtual price_t getRealSellPrice(const Datetime&, price_t); \
     virtual void _calculate();
-
 
 /**
  * 客户程序都应使用该指针类型，操作移滑价差算法
@@ -154,9 +151,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SlippageBase)
 typedef shared_ptr<SlippageBase> SlippagePtr;
 typedef shared_ptr<SlippageBase> SPPtr;
 
-HKU_API std::ostream & operator<<(std::ostream&, const SlippageBase&);
-HKU_API std::ostream & operator<<(std::ostream&, const SlippagePtr&);
-
+HKU_API std::ostream& operator<<(std::ostream&, const SlippageBase&);
+HKU_API std::ostream& operator<<(std::ostream&, const SlippagePtr&);
 
 inline string SlippageBase::name() const {
     return m_name;

@@ -1,6 +1,6 @@
 /*
  * INTPART.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-18
@@ -33,6 +33,6 @@ inline Indicator INTPART(price_t val) {
     return INTPART(CVAL(val));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_INTPART_H_ */

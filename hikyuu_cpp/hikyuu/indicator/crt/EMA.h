@@ -28,6 +28,6 @@ Indicator HKU_API EMA(int n = 22);
  */
 Indicator HKU_API EMA(const Indicator& data, int n = 22);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* EMA_H_ */

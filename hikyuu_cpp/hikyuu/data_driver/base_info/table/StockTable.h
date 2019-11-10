@@ -2,7 +2,7 @@
  * StockTable.h
  *
  *  Copyright (c) 2019 fasiondog
- * 
+ *
  *  Created on: 2019-8-14
  *      Author: fasiondog
  */
@@ -17,21 +17,21 @@ namespace hku {
 
 class StockTable {
 public:
-    StockTable(): stockid(0), marketid(0), type(0), valid(0), startDate(0), endDate(0) {}
+    StockTable() : stockid(0), marketid(0), type(0), valid(0), startDate(0), endDate(0) {}
 
 public:
-    static const char * getInsertSQL() {
+    static const char* getInsertSQL() {
         return "insert into `Stock` "
                "(`marketid`, `code`, `name`, `type`, `valid`, `startDate`, `endDate`) "
                "values (?,?,?,?,?,?,?)";
     }
 
-    static const char * getUpdateSQL() {
+    static const char* getUpdateSQL() {
         return "update `Stock` set `marketid`=?, `code`=?, `name`=?, `type`=?, "
                "`valid`=?, `startDate`=?, `endDate`=?, `lastDate`=? where `stockid`=?";
     }
 
-    static const char * getSelectSQL() {
+    static const char* getSelectSQL() {
         return "select `stockid`,`marketid`, `code`, `name`, `type`, `valid`, "
                "`startDate`, `endDate` from `Stock`";
     }
@@ -59,6 +59,6 @@ public:
     uint64 endDate;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_DATA_DRIVER_BASE_INFO_TABLE_STOCKTABLE_H */

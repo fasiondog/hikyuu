@@ -19,7 +19,7 @@ namespace hku {
  *       fast_n: 快速趋势的周期，一般为2，不用改变
  *       slow_n: 对应慢速EMA线的N值，考夫曼一般设为30，不过当超过60左右该指标会收敛不会有太大的影响
  */
-class Ama: public IndicatorImp {
+class Ama : public IndicatorImp {
     INDICATOR_IMP(Ama)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

@@ -2,7 +2,7 @@
  * SIN.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-1
  *      Author: fasiondog
  */
@@ -31,6 +31,6 @@ inline Indicator SIN(price_t val) {
     return SIN(CVAL(val));
 }
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_SIN_H_ */

@@ -1,6 +1,6 @@
 /*
  * CEILING.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-15
@@ -33,6 +33,6 @@ inline Indicator CEILING(price_t val) {
     return CEILING(CVAL(val));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_CEIL_H_ */

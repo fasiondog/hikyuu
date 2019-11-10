@@ -23,8 +23,8 @@ namespace hku {
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_CrossGold(const Indicator& fast,
-        const Indicator& slow, const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_CrossGold(const Indicator& fast, const Indicator& slow,
+                               const string& kpart = "CLOSE");
 
 } /* namespace hku */
 

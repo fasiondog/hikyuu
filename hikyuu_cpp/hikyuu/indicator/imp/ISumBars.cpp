@@ -1,6 +1,6 @@
 /*
  * ISumBars.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-5
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::ISumBars)
 #endif
 
-
 namespace hku {
 
 ISumBars::ISumBars() : IndicatorImp("SUMBARS", 1) {
     setParam<double>("a", 0);
 }
 
-ISumBars::~ISumBars() {
-
-}
+ISumBars::~ISumBars() {}
 
 bool ISumBars::check() {
     return true;
@@ -52,7 +49,7 @@ void ISumBars::_calculate(const Indicator& ind) {
     double sum = ind[pos];
     for (size_t i = start; i >= m_discard; i--) {
         if (i != start) {
-            sum = sum - ind[i+1];
+            sum = sum - ind[i + 1];
         }
 
         if (i < pos) {
@@ -62,7 +59,7 @@ void ISumBars::_calculate(const Indicator& ind) {
 
         if (sum < a) {
             if (pos >= 1) {
-                for (size_t j = pos-1; j >= m_discard; j--) {
+                for (size_t j = pos - 1; j >= m_discard; j--) {
                     sum += ind[j];
                     if (sum >= a) {
                         pos = j;
@@ -92,12 +89,10 @@ void ISumBars::_calculate(const Indicator& ind) {
     m_discard = pos == Null<size_t>() ? last_pos + 1 : last_pos;
 }
 
-
 Indicator HKU_API SUMBARS(double a) {
     IndicatorImpPtr p = make_shared<ISumBars>();
     p->setParam<double>("a", a);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

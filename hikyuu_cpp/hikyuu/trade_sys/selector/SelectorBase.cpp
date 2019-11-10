@@ -9,12 +9,12 @@
 
 namespace hku {
 
-HKU_API std::ostream & operator<<(std::ostream& os, const SelectorBase& st) {
+HKU_API std::ostream& operator<<(std::ostream& os, const SelectorBase& st) {
     os << "Selector(" << st.name() << ", " << st.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream & operator<<(std::ostream& os, const SelectorPtr& st) {
+HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
     if (st) {
         os << *st;
     } else {
@@ -24,9 +24,8 @@ HKU_API std::ostream & operator<<(std::ostream& os, const SelectorPtr& st) {
     return os;
 }
 
-SelectorBase::SelectorBase()
-: m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {
-    setParam<int>("freq", 1); //已Bar为单位
+SelectorBase::SelectorBase() : m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {
+    setParam<int>("freq", 1);  //已Bar为单位
 }
 
 SelectorBase::SelectorBase(const string& name)
@@ -34,10 +33,7 @@ SelectorBase::SelectorBase(const string& name)
     setParam<int>("freq", 1);
 }
 
-
-SelectorBase::~SelectorBase() {
-
-}
+SelectorBase::~SelectorBase() {}
 
 void SelectorBase::clear() {
     m_count = 0;
@@ -61,13 +57,13 @@ SelectorPtr SelectorBase::clone() {
     SelectorPtr p;
     try {
         p = _clone();
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Subclass _clone failed!");
         p = SelectorPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!" );
+        HKU_ERROR("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 
@@ -85,7 +81,6 @@ SelectorPtr SelectorBase::clone() {
     return p;
 }
 
-
 void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     if (stock.isNull()) {
         HKU_WARN("Try add Null stock, will be discard!");
@@ -102,9 +97,7 @@ void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     m_sys_list.push_back(sys);
 }
 
-
-void SelectorBase::addStockList(const StockList& stkList,
-                                const SystemPtr& protoSys) {
+void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& protoSys) {
     if (!protoSys) {
         HKU_WARN("Try add Null protoSys, will be discard!");
         return;
@@ -132,7 +125,7 @@ bool SelectorBase::changed(Datetime date) {
     }
 
     m_count++;
-    if (m_count >= freq){
+    if (m_count >= freq) {
         m_count = 0;
         m_pre_date = date;
         return true;
@@ -140,6 +133,5 @@ bool SelectorBase::changed(Datetime date) {
 
     return false;
 }
-
 
 } /* namespace hku */

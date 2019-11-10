@@ -1,6 +1,6 @@
 /*
  * ROUNDUP.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-14
@@ -31,6 +31,6 @@ inline Indicator ROUNDUP(price_t val, int n) {
     return ROUNDUP(CVAL(val), n);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ROUNDUP_H_ */

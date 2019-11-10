@@ -11,16 +11,11 @@
 BOOST_CLASS_EXPORT(hku::IAbs)
 #endif
 
-
 namespace hku {
 
-IAbs::IAbs() : IndicatorImp("ABS", 1) {
+IAbs::IAbs() : IndicatorImp("ABS", 1) {}
 
-}
-
-IAbs::~IAbs() {
-
-}
+IAbs::~IAbs() {}
 
 bool IAbs::check() {
     return true;
@@ -37,13 +32,10 @@ void IAbs::_calculate(const Indicator& data) {
     for (size_t i = m_discard; i < total; ++i) {
         _set(std::abs(data[i]), i);
     }
-
 }
-
 
 Indicator HKU_API ABS() {
     return Indicator(make_shared<IAbs>());
 }
-
 
 } /* namespace hku */

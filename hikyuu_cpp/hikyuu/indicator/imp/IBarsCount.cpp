@@ -1,6 +1,6 @@
 /*
  * IBarsCount.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-12
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::IBarsCount)
 #endif
 
-
 namespace hku {
 
-IBarsCount::IBarsCount() : IndicatorImp("BARSCOUNT", 1) {
+IBarsCount::IBarsCount() : IndicatorImp("BARSCOUNT", 1) {}
 
-}
-
-IBarsCount::~IBarsCount() {
-
-}
+IBarsCount::~IBarsCount() {}
 
 bool IBarsCount::check() {
     return true;
@@ -31,7 +26,7 @@ bool IBarsCount::check() {
 void IBarsCount::_calculate(const Indicator& ind) {
     KData k = ind.getContext();
     Stock stk = k.getStock();
-    
+
     size_t total = ind.size();
     m_discard = ind.discard();
     if (m_discard >= total) {
@@ -61,7 +56,7 @@ void IBarsCount::_calculate(const Indicator& ind) {
             }
             _set(++count, i);
         }
-        
+
         return;
     }
 
@@ -76,10 +71,8 @@ void IBarsCount::_calculate(const Indicator& ind) {
     return;
 }
 
-
 Indicator HKU_API BARSCOUNT() {
     return Indicator(make_shared<IBarsCount>());
 }
-
 
 } /* namespace hku */

@@ -37,9 +37,7 @@ map<string, BlockInfoDriverPtr> DataDriverFactory::m_blockDrivers(default_block_
 map<string, KDataDriverPtr> DataDriverFactory::m_kdataDrivers(default_kdata_driver());
 map<Parameter, KDataDriverPtr> DataDriverFactory::m_param_kdataDrivers;
 
-
-void DataDriverFactory
-::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
+void DataDriverFactory ::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
     string new_type(driver->name());
     to_upper(new_type);
     m_baseInfoDrivers[new_type] = driver;
@@ -51,8 +49,7 @@ void DataDriverFactory::removeBaseInfoDriver(const string& name) {
     m_baseInfoDrivers.erase(new_type);
 }
 
-BaseInfoDriverPtr DataDriverFactory
-::getBaseInfoDriver(const Parameter& params) {
+BaseInfoDriverPtr DataDriverFactory ::getBaseInfoDriver(const Parameter& params) {
     map<string, BaseInfoDriverPtr>::const_iterator iter;
     string type = params.get<string>("type");
     to_upper(type);
@@ -91,7 +88,6 @@ BlockInfoDriverPtr DataDriverFactory::getBlockDriver(const Parameter& params) {
 
     return result;
 }
-
 
 void DataDriverFactory::regKDataDriver(const KDataDriverPtr& driver) {
     string new_type(driver->name());
@@ -142,6 +138,5 @@ KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
 
     return result;
 }
-
 
 } /* namespace hku */

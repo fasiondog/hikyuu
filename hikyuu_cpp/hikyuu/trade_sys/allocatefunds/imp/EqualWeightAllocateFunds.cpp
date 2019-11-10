@@ -9,18 +9,12 @@
 
 namespace hku {
 
-EqualWeightAllocateFunds::EqualWeightAllocateFunds()
-:AllocateFundsBase("AF_EqualWeight") {
+EqualWeightAllocateFunds::EqualWeightAllocateFunds() : AllocateFundsBase("AF_EqualWeight") {}
 
-}
+EqualWeightAllocateFunds::~EqualWeightAllocateFunds() {}
 
-EqualWeightAllocateFunds::~EqualWeightAllocateFunds() {
-
-}
-
-SystemWeightList EqualWeightAllocateFunds
-::_allocateWeight(const Datetime& date,
-        const SystemList& se_list) {
+SystemWeightList EqualWeightAllocateFunds ::_allocateWeight(const Datetime& date,
+                                                            const SystemList& se_list) {
     SystemWeightList result;
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
         SystemWeight sw;

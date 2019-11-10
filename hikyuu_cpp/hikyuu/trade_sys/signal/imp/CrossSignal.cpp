@@ -14,17 +14,12 @@ CrossSignal::CrossSignal() : SignalBase("SG_Cross") {
     setParam<string>("kpart", "CLOSE");
 }
 
-CrossSignal::CrossSignal(const Indicator& fast,
-        const Indicator& slow,
-        const string& kpart)
+CrossSignal::CrossSignal(const Indicator& fast, const Indicator& slow, const string& kpart)
 : SignalBase("SG_Cross"), m_fast(fast), m_slow(slow) {
     setParam<string>("kpart", kpart);
 }
 
-
-CrossSignal::~CrossSignal() {
-
-}
+CrossSignal::~CrossSignal() {}
 
 SignalPtr CrossSignal::_clone() {
     CrossSignal* p = new CrossSignal();
@@ -43,22 +38,19 @@ void CrossSignal::_calculate() {
         return;
     }
 
-    size_t discard = fast.discard() > slow.discard()
-            ? fast.discard() : slow.discard();
+    size_t discard = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
 
     size_t total = fast.size();
     for (size_t i = discard + 1; i < total; ++i) {
-        if (fast[i-1] < slow[i-1] && fast[i] > slow[i]) {
+        if (fast[i - 1] < slow[i - 1] && fast[i] > slow[i]) {
             _addBuySignal(m_kdata[i].datetime);
-        } else if (fast[i-1] > slow[i-1] && fast[i] < slow[i]) {
+        } else if (fast[i - 1] > slow[i - 1] && fast[i] < slow[i]) {
             _addSellSignal(m_kdata[i].datetime);
         }
     }
 }
 
-
-SignalPtr HKU_API SG_Cross(const Indicator& fast,
-        const Indicator& slow, const string& kpart) {
+SignalPtr HKU_API SG_Cross(const Indicator& fast, const Indicator& slow, const string& kpart) {
     return SignalPtr(new CrossSignal(fast, slow, kpart));
 }
 

@@ -16,7 +16,7 @@ namespace hku {
 /**
  * 获取临时载入的CSV文件
  */
-class KDataTempCsvDriver: public KDataDriver {
+class KDataTempCsvDriver : public KDataDriver {
 public:
     KDataTempCsvDriver(const string& day_filename, const string& min_filename);
     virtual ~KDataTempCsvDriver();
@@ -30,9 +30,8 @@ public:
      * @param end_ix 欲加载的结束位置，不包含自身
      * @param out_buffer [out] 缓存指针
      */
-    virtual void loadKData(const string& market, const string& code,
-            KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordListPtr out_buffer) ;
+    virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
+                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer);
 
     /**
      * 获取指定类型的K线数据量
@@ -41,8 +40,7 @@ public:
      * @param kType  K线类型
      * @return
      */
-    virtual size_t getCount(const string& market, const string& code,
-            KQuery::KType kType);
+    virtual size_t getCount(const string& market, const string& code, KQuery::KType kType);
 
     /**
      * 获取指定日期范围对应的K线记录索引
@@ -53,8 +51,8 @@ public:
      * @param out_end [out] 对应的K线记录位置
      * @return
      */
-    virtual bool getIndexRangeByDate(const string& market, const string& code,
-            const KQuery& query, size_t& out_start, size_t& out_end);
+    virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
+                                     size_t& out_start, size_t& out_end);
 
     /**
      * 获取指定的K线记录
@@ -64,8 +62,8 @@ public:
      * @param kType  K线类型
      * @return
      */
-    virtual KRecord getKRecord(const string& market, const string& code,
-              size_t pos, KQuery::KType kType);
+    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
+                               KQuery::KType kType);
 
 private:
     void _get_title_column(const string&);

@@ -2,7 +2,7 @@
  * VARP.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2013-4-18
  *      Author: fasiondog
  */
@@ -27,7 +27,6 @@ inline Indicator VARP(const Indicator& data, int n) {
     return VARP(n)(data);
 }
 
-} /* namespace */
-
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_VARP_H_ */

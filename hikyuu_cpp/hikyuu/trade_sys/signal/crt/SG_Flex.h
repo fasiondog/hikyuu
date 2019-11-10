@@ -9,7 +9,6 @@
 #ifndef TRADE_SYS_SIGNAL_CRT_FLEX_SG_H_
 #define TRADE_SYS_SIGNAL_CRT_FLEX_SG_H_
 
-
 #include "../../../indicator/Indicator.h"
 #include "../SignalBase.h"
 
@@ -24,11 +23,8 @@ namespace hku {
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Flex(const Indicator& op, int slow_n,
-        const string& kpart="CLOSE");
+SignalPtr HKU_API SG_Flex(const Indicator& op, int slow_n, const string& kpart = "CLOSE");
 
 } /* namespace hku */
-
-
 
 #endif /* TRADE_SYS_SIGNAL_CRT_FLEX_SG_H_ */

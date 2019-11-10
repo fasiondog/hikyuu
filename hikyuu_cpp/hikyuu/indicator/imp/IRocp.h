@@ -2,7 +2,7 @@
  * IRocp.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-5-18
  *      Author: fasiondog
  */
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class IRocp: public hku::IndicatorImp {
+class IRocp : public hku::IndicatorImp {
     INDICATOR_IMP(IRocp)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

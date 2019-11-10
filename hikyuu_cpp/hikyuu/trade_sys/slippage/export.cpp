@@ -33,5 +33,3 @@ BOOST_CLASS_EXPORT(hku::FixedPercentSlippage)
 BOOST_CLASS_EXPORT(hku::FixedValueSlippage)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
-
-

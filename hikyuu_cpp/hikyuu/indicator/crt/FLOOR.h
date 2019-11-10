@@ -1,6 +1,6 @@
 /*
  * FLOOR.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-15
@@ -33,6 +33,6 @@ inline Indicator FLOOR(price_t val) {
     return FLOOR(CVAL(val));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ROUNDUP_H_ */

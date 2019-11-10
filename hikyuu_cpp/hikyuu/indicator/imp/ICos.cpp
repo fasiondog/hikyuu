@@ -1,6 +1,6 @@
 /*
  * ICos.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-1
@@ -13,16 +13,11 @@
 BOOST_CLASS_EXPORT(hku::ICos)
 #endif
 
-
 namespace hku {
 
-ICos::ICos() : IndicatorImp("COS", 1) {
+ICos::ICos() : IndicatorImp("COS", 1) {}
 
-}
-
-ICos::~ICos() {
-
-}
+ICos::~ICos() {}
 
 bool ICos::check() {
     return true;
@@ -39,13 +34,10 @@ void ICos::_calculate(const Indicator& data) {
     for (size_t i = m_discard; i < total; ++i) {
         _set(std::cos(data[i]), i);
     }
-
 }
-
 
 Indicator HKU_API COS() {
     return Indicator(make_shared<ICos>());
 }
-
 
 } /* namespace hku */

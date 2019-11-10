@@ -14,16 +14,13 @@
 BOOST_CLASS_EXPORT(hku::IRoundDown)
 #endif
 
-
 namespace hku {
 
 IRoundDown::IRoundDown() : IndicatorImp("ROUNDDOWN", 1) {
     setParam<int>("ndigits", 2);
 }
 
-IRoundDown::~IRoundDown() {
-
-}
+IRoundDown::~IRoundDown() {}
 
 bool IRoundDown::check() {
     if (getParam<int>("ndigits") < 0) {
@@ -46,7 +43,6 @@ void IRoundDown::_calculate(const Indicator& data) {
         _set(roundDown(data[i], n), i);
     }
 }
-
 
 Indicator HKU_API ROUNDDOWN(int ndigits) {
     IndicatorImpPtr p = make_shared<IRoundDown>();

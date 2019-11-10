@@ -2,7 +2,7 @@
  * TIMELINE.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-5-15
  *      Author: fasiondog
  */
@@ -35,7 +35,6 @@ inline Indicator TIMELINEVOL(const KData& k) {
     return ind;
 }
 
-
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_TIMELINE_H_ */

@@ -10,8 +10,8 @@
 namespace hku {
 
 TradeManagerPtr HKU_API crtTM(const Datetime& datetime, price_t initcash,
-        const TradeCostPtr& costfunc, const string& name) {
+                              const TradeCostPtr& costfunc, const string& name) {
     return TradeManagerPtr(new TradeManager(datetime, initcash, costfunc, name));
 }
 
-} /* namespace */
+}  // namespace hku

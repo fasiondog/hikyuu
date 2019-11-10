@@ -13,18 +13,12 @@
 #include "../utilities/util.h"
 #include "../Log.h"
 
-
 namespace hku {
 
-KDataTempCsvDriver::~KDataTempCsvDriver() {
+KDataTempCsvDriver::~KDataTempCsvDriver() {}
 
-}
-
-KDataTempCsvDriver::KDataTempCsvDriver(
-        const string& day_filename,
-        const string& min_filename)
-: m_day_filename(day_filename),
-  m_min_filename(min_filename) {
+KDataTempCsvDriver::KDataTempCsvDriver(const string& day_filename, const string& min_filename)
+: m_day_filename(day_filename), m_min_filename(min_filename) {
     for (int i = 0; i < LAST; ++i) {
         m_column[i] = Null<size_t>();
     }
@@ -79,16 +73,15 @@ void KDataTempCsvDriver::_get_title_column(const string& line) {
         } else if ("AMOUNT" == token || HKU_STR("成交金额") == token) {
             m_column[AMOUNT] = i;
 
-        } else if ("VOLUME" == token || "COUNT" == token || "VOL" == token
-                || HKU_STR("成交量") == token) {
+        } else if ("VOLUME" == token || "COUNT" == token || "VOL" == token ||
+                   HKU_STR("成交量") == token) {
             m_column[VOLUME] = i;
         }
     }
 }
 
-void KDataTempCsvDriver::loadKData(const string& market, const string& code,
-        KQuery::KType kType, size_t start_ix, size_t end_ix,
-        KRecordListPtr out_buffer) {
+void KDataTempCsvDriver::loadKData(const string& market, const string& code, KQuery::KType kType,
+                                   size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
     string filename;
     if (kType == KQuery::DAY) {
         filename = m_day_filename;
@@ -167,23 +160,22 @@ void KDataTempCsvDriver::loadKData(const string& market, const string& code,
     infile.close();
 }
 
-size_t KDataTempCsvDriver::getCount(const string& market, const string& code,
-            KQuery::KType kType) {
+size_t KDataTempCsvDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     KRecordListPtr buffer(new KRecordList);
     loadKData(market, code, kType, 0, Null<size_t>(), buffer);
     return buffer->size();
 }
 
-KRecord KDataTempCsvDriver::getKRecord(const string& market, const string& code,
-              size_t pos, KQuery::KType kType) {
+KRecord KDataTempCsvDriver::getKRecord(const string& market, const string& code, size_t pos,
+                                       KQuery::KType kType) {
     KRecordListPtr buffer(new KRecordList);
     loadKData(market, code, kType, 0, Null<size_t>(), buffer);
     return pos < buffer->size() ? (*buffer)[pos] : Null<KRecord>();
 }
 
-bool KDataTempCsvDriver::getIndexRangeByDate(
-            const string& market, const string& code,
-            const KQuery& query, size_t& out_start, size_t& out_end) {
+bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string& code,
+                                             const KQuery& query, size_t& out_start,
+                                             size_t& out_end) {
     out_start = 0;
     out_end = 0;
 

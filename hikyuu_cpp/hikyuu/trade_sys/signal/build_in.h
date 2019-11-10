@@ -15,5 +15,4 @@
 #include "crt/SG_Single.h"
 #include "crt/SG_Bool.h"
 
-
 #endif /* SIGNAL_BUILD_IN_H_ */

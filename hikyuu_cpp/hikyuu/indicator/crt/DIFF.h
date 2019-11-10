@@ -26,6 +26,6 @@ Indicator HKU_API DIFF();
  */
 Indicator HKU_API DIFF(const Indicator& data);
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* DIFF_H_ */

@@ -12,40 +12,33 @@
 #include "../../KDataDriver.h"
 
 #if defined(_MSC_VER)
-    #include <mysql.h>
+#include <mysql.h>
 #else
-    #include <mysql/mysql.h>
+#include <mysql/mysql.h>
 #endif
 
 namespace hku {
 
-class MySQLKDataDriver: public KDataDriver {
+class MySQLKDataDriver : public KDataDriver {
 public:
     MySQLKDataDriver();
     virtual ~MySQLKDataDriver();
 
     virtual bool _init();
 
-    virtual void loadKData(const string& market, const string& code,
-            KQuery::KType kType, size_t start_ix, size_t end_ix,
-            KRecordListPtr out_buffer);
+    virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
+                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer);
 
-    virtual size_t getCount(const string& market,
-                            const string& code,
-                            KQuery::KType kType);
+    virtual size_t getCount(const string& market, const string& code, KQuery::KType kType);
 
-    virtual bool
-    getIndexRangeByDate(const string& market, const string& code,
-            const KQuery& query, size_t& out_start, size_t& out_end);
+    virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
+                                     size_t& out_start, size_t& out_end);
 
-    virtual KRecord
-    getKRecord(const string& market, const string& code,
-              size_t pos, KQuery::KType kType);
+    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
+                               KQuery::KType kType);
 
 private:
-    string _getTableName(const string& market,
-                        const string& code,
-                        KQuery::KType ktype);
+    string _getTableName(const string& market, const string& code, KQuery::KType ktype);
     bool _query(const string& sql_str);
 
 private:

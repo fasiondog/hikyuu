@@ -1,6 +1,6 @@
 /*
  * ILowLine.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2016年4月2日
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-class ILowLine: public IndicatorImp {
+class ILowLine : public IndicatorImp {
     INDICATOR_IMP(ILowLine)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 

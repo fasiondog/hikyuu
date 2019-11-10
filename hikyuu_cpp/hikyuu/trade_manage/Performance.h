@@ -30,7 +30,9 @@ public:
     double get(const string& name) const;
 
     /** 同 get */
-    double operator[](const string& name) const { return get(name); }
+    double operator[](const string& name) const {
+        return get(name);
+    }
 
     /**
      * 简单的文本统计报告，用于直接输出打印
@@ -38,8 +40,7 @@ public:
      * @param datetime 指定的截止时刻
      * @return
      */
-    string report(const TradeManagerPtr& tm,
-            const Datetime& datetime = Datetime::now());
+    string report(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
 
     /**
      * 根据交易记录，统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
@@ -47,14 +48,12 @@ public:
      * @param tm 指定的交易管理实例
      * @param datetime 统计截止时刻
      */
-    void statistics(const TradeManagerPtr& tm,
-            const Datetime& datetime = Datetime::now());
-
+    void statistics(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
 
     typedef map<string, double> map_type;
 
 private:
-    list<string> m_name_list; //保存指标顺序
+    list<string> m_name_list;  //保存指标顺序
     map_type m_result;
 };
 

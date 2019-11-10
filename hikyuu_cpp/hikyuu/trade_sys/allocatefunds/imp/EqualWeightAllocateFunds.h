@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class EqualWeightAllocateFunds: public AllocateFundsBase {
+class EqualWeightAllocateFunds : public AllocateFundsBase {
     ALLOCATEFUNDS_IMP(EqualWeightAllocateFunds)
     ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
 

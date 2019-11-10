@@ -16,7 +16,6 @@ namespace hku {
 /* 仅用于测试 */
 HKU_API TradeCostPtr TC_TestStub();
 
-}
-
+}  // namespace hku
 
 #endif /* TESTSTUB_TC_H_ */

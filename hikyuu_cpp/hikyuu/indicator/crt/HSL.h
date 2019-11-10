@@ -35,5 +35,5 @@ inline Indicator HSL(const KData& k) {
     return hsl;
 }
 
-}
+}  // namespace hku
 #endif /* INDICATOR_CRT_HSL_H_ */

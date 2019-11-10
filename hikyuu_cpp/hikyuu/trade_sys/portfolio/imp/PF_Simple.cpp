@@ -9,13 +9,8 @@
 
 namespace hku {
 
-PortfolioPtr HKU_API PF_Simple(
-        const TMPtr& tm,
-        const SEPtr& st,
-        const AFPtr& af) {
+PortfolioPtr HKU_API PF_Simple(const TMPtr& tm, const SEPtr& st, const AFPtr& af) {
     return make_shared<Portfolio>(tm, st, af);
 }
 
 } /* namespace hku */
-
-

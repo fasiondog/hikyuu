@@ -2,7 +2,7 @@
  * ADVANCE.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-6-1
  *      Author: fasiondog
  */
@@ -24,11 +24,9 @@ namespace hku {
  * @param ignore_context 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
  * @ingroup Indicator
  */
-Indicator HKU_API ADVANCE(const KQuery& query = KQueryByIndex(-100), 
-                          const string& market="SH", int stk_type=STOCKTYPE_A, 
-                          bool ignore_context=false);
+Indicator HKU_API ADVANCE(const KQuery& query = KQueryByIndex(-100), const string& market = "SH",
+                          int stk_type = STOCKTYPE_A, bool ignore_context = false);
 
-
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_ADVANCE_H_ */

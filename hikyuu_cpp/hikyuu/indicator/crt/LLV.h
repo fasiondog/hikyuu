@@ -2,7 +2,7 @@
  * LLV.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2016年4月2日
  *      Author: fasiondog
  */
@@ -30,6 +30,6 @@ Indicator HKU_API LLV(int n = 20);
  */
 Indicator HKU_API LLV(const Indicator& ind, int n = 20);
 
-}
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_LLV_H_ */

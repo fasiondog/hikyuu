@@ -14,7 +14,7 @@
 
 namespace hku {
 
-class CrossSignal: public SignalBase {
+class CrossSignal : public SignalBase {
 public:
     CrossSignal();
     CrossSignal(const Indicator& fast, const Indicator& slow, const string& kpart);
@@ -31,12 +31,12 @@ private:
 // 序列化支持
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
-    friend class boost::serialization::access; \
-    template<class Archive> \
-    void serialize(Archive & ar, const unsigned int version) { \
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase); \
-        ar & BOOST_SERIALIZATION_NVP(m_fast);
-        ar & BOOST_SERIALIZATION_NVP(m_slow);
+    friend class boost::serialization::access;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(SignalBase);
+        ar& BOOST_SERIALIZATION_NVP(m_fast);
+        ar& BOOST_SERIALIZATION_NVP(m_slow);
     }
 #endif
 };

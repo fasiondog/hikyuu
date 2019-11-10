@@ -30,6 +30,6 @@ inline Indicator LOG(price_t val) {
     return LOG(CVAL(val));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_LOG_H_ */

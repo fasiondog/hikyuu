@@ -1,6 +1,6 @@
 /*
  * SQRT.h
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-4-14
@@ -36,6 +36,6 @@ inline Indicator SQRT(price_t val) {
     return SQRT(CVAL(val));
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_SQRT_H_ */

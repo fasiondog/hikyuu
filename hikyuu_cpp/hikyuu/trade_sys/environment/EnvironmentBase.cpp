@@ -9,12 +9,12 @@
 
 namespace hku {
 
-HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentBase& en) {
+HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentBase& en) {
     os << "Environment(" << en.name() << " " << en.getParameter() << ")";
     return os;
 }
 
-HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentPtr& en) {
+HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentPtr& en) {
     if (en) {
         os << *en;
     } else {
@@ -23,19 +23,11 @@ HKU_API std::ostream& operator <<(std::ostream &os, const EnvironmentPtr& en) {
     return os;
 }
 
-EnvironmentBase::EnvironmentBase()
-: m_name("EnvironmentBase") {
+EnvironmentBase::EnvironmentBase() : m_name("EnvironmentBase") {}
 
-}
+EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 
-EnvironmentBase::EnvironmentBase(const string& name)
-: m_name(name) {
-
-}
-
-EnvironmentBase::~EnvironmentBase() {
-
-}
+EnvironmentBase::~EnvironmentBase() {}
 
 void EnvironmentBase::reset() {
     m_valid.clear();
@@ -46,13 +38,13 @@ EnvironmentPtr EnvironmentBase::clone() {
     EnvironmentPtr p;
     try {
         p = _clone();
-    } catch(...) {
+    } catch (...) {
         HKU_ERROR("Subclass _clone failed!");
         p = EnvironmentPtr();
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!" );
+        HKU_ERROR("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 

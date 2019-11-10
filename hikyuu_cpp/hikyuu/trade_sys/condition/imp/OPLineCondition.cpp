@@ -14,28 +14,18 @@
 
 namespace hku {
 
-OPLineCondition::OPLineCondition()
-: ConditionBase("OPLine") {
+OPLineCondition::OPLineCondition() : ConditionBase("OPLine") {}
 
-}
+OPLineCondition::OPLineCondition(const Indicator& op) : ConditionBase("OPLine"), m_op(op) {}
 
-OPLineCondition::OPLineCondition(const Indicator& op)
-: ConditionBase("OPLine"), m_op(op) {
-
-}
-
-OPLineCondition::~OPLineCondition() {
-
-}
+OPLineCondition::~OPLineCondition() {}
 
 ConditionPtr OPLineCondition::_clone() {
-    OPLineCondition *ptr = new OPLineCondition(m_op);
+    OPLineCondition* ptr = new OPLineCondition(m_op);
     return ConditionPtr(ptr);
 }
 
-void OPLineCondition::_reset() {
-
-}
+void OPLineCondition::_reset() {}
 
 void OPLineCondition::_calculate() {
     if (m_kdata.size() == 0)
@@ -66,7 +56,6 @@ void OPLineCondition::_calculate() {
         }
     }
 }
-
 
 CNPtr HKU_API CN_OPLine(const Indicator& op) {
     return make_shared<OPLineCondition>(op);
