@@ -48,10 +48,7 @@ KData Indicator::getContext() const {
 Indicator& Indicator::operator=(const Indicator& indicator) {
     if (this == &indicator)
         return *this;
-
-    if (m_imp != indicator.m_imp)
-        m_imp = indicator.m_imp;
-
+    m_imp = indicator.m_imp;
     return *this;
 }
 

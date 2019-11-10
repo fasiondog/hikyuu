@@ -2,7 +2,7 @@
  * MySQLStatement.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-8-17
  *      Author: fasiondog
  */
@@ -15,14 +15,14 @@
 #include "../SQLStatementBase.h"
 
 #if defined(_MSC_VER)
-    #include <mysql.h>
+#include <mysql.h>
 #else
-    #include <mysql/mysql.h>
+#include <mysql/mysql.h>
 #endif
 
 namespace hku {
 
-class HKU_API MySQLStatement: public SQLStatementBase {
+class HKU_API MySQLStatement : public SQLStatementBase {
 public:
     MySQLStatement() = delete;
     MySQLStatement(const DBConnectPtr& driver, const string& sql_statement);
@@ -50,8 +50,8 @@ private:
 
 private:
     shared_ptr<MYSQL> m_db;
-    MYSQL_STMT *m_stmt;
-    MYSQL_RES *m_meta_result;
+    MYSQL_STMT* m_stmt;
+    MYSQL_RES* m_meta_result;
     bool m_needs_reset;
     bool m_has_bind_result;
     vector<MYSQL_BIND> m_param_bind;
@@ -63,6 +63,6 @@ private:
     vector<my_bool> m_result_error;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIYUU_DB_CONNECT_MYSQL_MYSQLSTATEMENT_H */

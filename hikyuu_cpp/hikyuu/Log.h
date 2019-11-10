@@ -32,11 +32,11 @@ namespace hku {
 enum LOG_LEVEL {
     TRACE = SPDLOG_LEVEL_TRACE,
     DEBUG = SPDLOG_LEVEL_DEBUG,
-    INFO  = SPDLOG_LEVEL_INFO,
-    WARN  = SPDLOG_LEVEL_WARN,
+    INFO = SPDLOG_LEVEL_INFO,
+    WARN = SPDLOG_LEVEL_WARN,
     ERROR = SPDLOG_LEVEL_ERROR,
     FATAL = SPDLOG_LEVEL_CRITICAL,
-    OFF   = SPDLOG_LEVEL_OFF,
+    OFF = SPDLOG_LEVEL_OFF,
 };
 
 /**
@@ -75,16 +75,17 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 #define HKU_LOGGER_ERROR(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::err, __VA_ARGS__)
 #define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(getHikyuuLogger(), __VA_ARGS__)
 
-#define HKU_LOGGER_FATAL(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
+#define HKU_LOGGER_FATAL(logger, ...) \
+    SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
 #define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(getHikyuuLogger(), __VA_ARGS__)
 
 namespace inner {
-#if HKU_USE_ASYNC_LOGGER    
-    extern std::shared_ptr<spdlog::async_logger> g_hikyuu_logger;
-    std::shared_ptr<spdlog::async_logger> init_logger();
+#if HKU_USE_ASYNC_LOGGER
+extern std::shared_ptr<spdlog::async_logger> g_hikyuu_logger;
+std::shared_ptr<spdlog::async_logger> init_logger();
 #else
-    extern std::shared_ptr<spdlog::logger> g_hikyuu_logger;
-    std::shared_ptr<spdlog::logger> init_logger();
+extern std::shared_ptr<spdlog::logger> g_hikyuu_logger;
+std::shared_ptr<spdlog::logger> init_logger();
 #endif
 } /* namespace inner */
 

@@ -2,7 +2,7 @@
  * MySQLConnect.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-8-17
  *      Author: fasiondog
  */
@@ -15,14 +15,14 @@
 #include "MySQLStatement.h"
 
 #if defined(_MSC_VER)
-    #include <mysql.h>
+#include <mysql.h>
 #else
-    #include <mysql/mysql.h>
+#include <mysql/mysql.h>
 #endif
 
 namespace hku {
 
-class HKU_API MySQLConnect: public DBConnectBase {
+class HKU_API MySQLConnect : public DBConnectBase {
 public:
     MySQLConnect(const Parameter& param);
     virtual ~MySQLConnect();
@@ -36,6 +36,6 @@ private:
     shared_ptr<MYSQL> m_mysql;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIYUU_DB_CONNECT_MYSQL_MYSQLCONNECT_H */

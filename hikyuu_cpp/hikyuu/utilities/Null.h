@@ -103,11 +103,11 @@ public:
     Null() {}
     operator double() {
         return (std::numeric_limits<double>::quiet_NaN)();
-        //return (std::numeric_limits<double>::max)();
+        // return (std::numeric_limits<double>::max)();
     }
 };
 
 /** @} */
-} /* namesapce hku */
+}  // namespace hku
 
 #endif /* NULL_H_ */

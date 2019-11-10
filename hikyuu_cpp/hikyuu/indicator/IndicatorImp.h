@@ -212,10 +212,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_right);
         ar& BOOST_SERIALIZATION_NVP(m_three);
         size_t act_result_num = 0;
-        size_t i = 0;
-        while (i < m_result_num) {
-            if (m_pBuffer[i++])
+        for (size_t i = 0; i < m_result_num; i++) {
+            if (m_pBuffer[i]) {
                 act_result_num++;
+            }
         }
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
 

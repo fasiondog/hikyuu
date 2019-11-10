@@ -110,7 +110,8 @@ public:
 
     /** 清除包含的所有证券 */
     void clear() {
-        if (m_data) m_data->m_stockDict.clear();
+        if (m_data)
+            m_data->m_stockDict.clear();
     }
 
 private:
@@ -122,11 +123,10 @@ private:
     shared_ptr<Data> m_data;
 };
 
-
 /** @ingroup StockManage */
 typedef vector<Block> BlockList;
 
-HKU_API std::ostream& operator <<(std::ostream &os, const Block&);
+HKU_API std::ostream& operator<<(std::ostream& os, const Block&);
 
 } /* namespace hku */
 

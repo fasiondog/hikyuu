@@ -1,8 +1,8 @@
 /*
  * IHighLine.cpp
  *
- *  Copyright (c) 2019 hikyuu.org 
- * 
+ *  Copyright (c) 2019 hikyuu.org
+ *
  *  Created on: 2016年4月1日
  *      Author: fasiondog
  */
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IHighLine)
 #endif
 
-
 namespace hku {
 
 IHighLine::IHighLine() : IndicatorImp("HHV", 1) {
     setParam<int>("n", 20);
 }
 
-IHighLine::~IHighLine() {
-
-}
+IHighLine::~IHighLine() {}
 
 bool IHighLine::check() {
     int n = getParam<int>("n");
@@ -67,7 +64,7 @@ void IHighLine::_calculate(const Indicator& ind) {
     price_t max = ind[startPos];
     size_t pre_pos = startPos;
     for (size_t i = startPos; i < first_end; i++) {
-         if (ind[i] >= max) {
+        if (ind[i] >= max) {
             max = ind[i];
             pre_pos = i;
         }
@@ -89,24 +86,21 @@ void IHighLine::_calculate(const Indicator& ind) {
 
     startPos = total - n;
     max = ind[startPos];
-    pre_pos = startPos;
     for (size_t i = startPos; i < total; i++) {
         if (ind[i] >= max) {
-            pre_pos = i;
             max = ind[i];
         }
     }
-    _set(max, total-1);
+    _set(max, total - 1);
 }
 
-
-Indicator HKU_API HHV(int n =20) {
+Indicator HKU_API HHV(int n = 20) {
     IndicatorImpPtr p = make_shared<IHighLine>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API HHV(const Indicator& ind, int n =20) {
+Indicator HKU_API HHV(const Indicator& ind, int n = 20) {
     return HHV(n)(ind);
 }
 

@@ -35,9 +35,9 @@
 #include "utilities/exception.h"
 
 #if defined(_MSC_VER)
-#pragma warning (disable: 4251)
-#pragma warning (disable: 4290)
-#pragma warning (disable: 4996)
+#pragma warning(disable : 4251)
+#pragma warning(disable : 4290)
+#pragma warning(disable : 4996)
 #endif
 
 namespace hku {
@@ -49,7 +49,7 @@ namespace hku {
 
 #if !defined(int64)
 typedef long long int64;
-#endif 
+#endif
 
 #if !defined(uint64)
 typedef unsigned long long uint64;
@@ -75,26 +75,26 @@ typedef double price_t;
 
 typedef std::string string;
 
-using std::shared_ptr;
-using std::make_shared;
 using std::enable_shared_from_this;
+using std::make_shared;
+using std::shared_ptr;
 
-using std::vector;
 using std::list;
 using std::map;
 using std::unordered_map;
+using std::vector;
 
 typedef vector<price_t> PriceList;
 typedef vector<string> StringList;
 
-using std::isnan;
-using std::isinf;
 using std::isfinite;
+using std::isinf;
+using std::isnan;
 
 using fmt::format;
 
 /** @} */
 
-} /*namespace*/
+}  // namespace hku
 
 #endif /* DATATYPE_H_ */

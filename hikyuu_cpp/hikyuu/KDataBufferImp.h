@@ -13,7 +13,7 @@
 
 namespace hku {
 
-class KDataBufferImp: public KDataImp {
+class KDataBufferImp : public KDataImp {
 public:
     KDataBufferImp();
     KDataBufferImp(const Stock& stock, const KQuery& query);

@@ -28,22 +28,20 @@
 #include "../serialization/Datetime_serialization.h"
 #endif
 
-
 #ifndef DATATYPE_H_
-    #ifndef HKU_API
-    #define HKU_API
-    #endif
+#ifndef HKU_API
+#define HKU_API
+#endif
 #endif
 
 namespace hku {
 
 #ifndef DATATYPE_H_
-    using std::string;
-    using std::map;
-    using std::vector;
-    typedef vector<string> StringList;
+using std::map;
+using std::string;
+using std::vector;
+typedef vector<string> StringList;
 #endif
-
 
 /**
  * 供需要命名参数设定的类使用
@@ -102,8 +100,7 @@ namespace hku {
  * @ingroup Utilities
  */
 class HKU_API Parameter {
-    HKU_API friend std::ostream& operator <<(std::ostream &os,
-            const Parameter& param);
+    HKU_API friend std::ostream& operator<<(std::ostream& os, const Parameter& param);
 
 public:
     Parameter();
@@ -128,8 +125,8 @@ public:
         return m_params.count(name) == 0 ? false : true;
     }
 
-    /** 
-     * 获取指定参数的实际类型 
+    /**
+     * 获取指定参数的实际类型
      * @param name 指定参数名称
      * @return "string" | "int" | "double" | "bool" | "Stock" |
      *         "KQuery" | "KData" | "PriceList" | "DatetimeList"
@@ -168,7 +165,7 @@ private:
         friend class boost::serialization::access;
 
         ItemRecord() {}
-        ItemRecord(const string& name, const boost::any& arg): name(name) {
+        ItemRecord(const string& name, const boost::any& arg) : name(name) {
             if (arg.type() == typeid(bool)) {
                 type = "bool";
                 bool x = boost::any_cast<bool>(arg);
@@ -213,45 +210,45 @@ private:
         string name;
         string type;
         string value;
-        Stock  stock;
+        Stock stock;
         KQuery query;
-        KData  kdata;
+        KData kdata;
         PriceList price_list;
         DatetimeList date_list;
 
-        template<class Archive>
-        void serialize(Archive & ar, const unsigned int version) {
-            ar & BOOST_SERIALIZATION_NVP(name);
-            ar & BOOST_SERIALIZATION_NVP(type);
-            ar & BOOST_SERIALIZATION_NVP(value);
-            ar & BOOST_SERIALIZATION_NVP(stock);
-            ar & BOOST_SERIALIZATION_NVP(query);
-            ar & BOOST_SERIALIZATION_NVP(kdata);
-            ar & BOOST_SERIALIZATION_NVP(price_list);
-            ar & BOOST_SERIALIZATION_NVP(date_list);
+        template <class Archive>
+        void serialize(Archive& ar, const unsigned int version) {
+            ar& BOOST_SERIALIZATION_NVP(name);
+            ar& BOOST_SERIALIZATION_NVP(type);
+            ar& BOOST_SERIALIZATION_NVP(value);
+            ar& BOOST_SERIALIZATION_NVP(stock);
+            ar& BOOST_SERIALIZATION_NVP(query);
+            ar& BOOST_SERIALIZATION_NVP(kdata);
+            ar& BOOST_SERIALIZATION_NVP(price_list);
+            ar& BOOST_SERIALIZATION_NVP(date_list);
         }
     };
 
-    template<class Archive>
-    void save(Archive & ar, const unsigned int version) const{
+    template <class Archive>
+    void save(Archive& ar, const unsigned int version) const {
         namespace bs = boost::serialization;
         size_t total = m_params.size();
-        ar & bs::make_nvp<size_t>("count", total);
+        ar& bs::make_nvp<size_t>("count", total);
         param_map_t::const_iterator iter = m_params.begin();
         for (; iter != m_params.end(); ++iter) {
             ItemRecord record(iter->first, iter->second);
-            ar & bs::make_nvp<ItemRecord>("Item", record);
+            ar& bs::make_nvp<ItemRecord>("Item", record);
         }
     }
 
-    template<class Archive>
-    void load(Archive & ar, const unsigned int version)  {
+    template <class Archive>
+    void load(Archive& ar, const unsigned int version) {
         namespace bs = boost::serialization;
         size_t total = 0;
-        ar & bs::make_nvp<size_t>("count", total);
+        ar& bs::make_nvp<size_t>("count", total);
         ItemRecord record;
         for (size_t i = 0; i < total; i++) {
-            ar & bs::make_nvp<ItemRecord>("Item", record);
+            ar& bs::make_nvp<ItemRecord>("Item", record);
 
             if (record.type == "bool") {
                 m_params[record.name] = boost::lexical_cast<bool>(record.value);
@@ -280,32 +277,32 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-
-#define PARAMETER_SUPPORT protected: \
-    Parameter m_params; \
-    public: \
-    const Parameter& getParameter() const { \
-        return m_params; \
-    } \
-    \
-    void setParameter(const Parameter& param) { \
-        m_params = param; \
-    } \
-    \
-    bool haveParam(const string& name) const { \
-        return m_params.have(name); \
-    } \
-    \
-    template <typename ValueType> \
+#define PARAMETER_SUPPORT                                       \
+protected:                                                      \
+    Parameter m_params;                                         \
+                                                                \
+public:                                                         \
+    const Parameter& getParameter() const {                     \
+        return m_params;                                        \
+    }                                                           \
+                                                                \
+    void setParameter(const Parameter& param) {                 \
+        m_params = param;                                       \
+    }                                                           \
+                                                                \
+    bool haveParam(const string& name) const {                  \
+        return m_params.have(name);                             \
+    }                                                           \
+                                                                \
+    template <typename ValueType>                               \
     void setParam(const string& name, const ValueType& value) { \
-        m_params.set<ValueType>(name, value); \
-    } \
-    \
-    template <typename ValueType> \
-    ValueType getParam(const string& name) const { \
-        return m_params.get<ValueType>(name); \
+        m_params.set<ValueType>(name, value);                   \
+    }                                                           \
+                                                                \
+    template <typename ValueType>                               \
+    ValueType getParam(const string& name) const {              \
+        return m_params.get<ValueType>(name);                   \
     }
-
 
 template <typename ValueType>
 ValueType Parameter::get(const string& name) const {
@@ -317,11 +314,10 @@ ValueType Parameter::get(const string& name) const {
     return boost::any_cast<ValueType>(iter->second);
 }
 
-
 template <typename ValueType>
 void Parameter::set(const string& name, const ValueType& value) {
-    if( !have(name)){
-        if (!support(value)){
+    if (!have(name)) {
+        if (!support(value)) {
             throw std::logic_error("Unsuport Type! " + name);
         }
         m_params[name] = value;
@@ -334,7 +330,6 @@ void Parameter::set(const string& name, const ValueType& value) {
 
     m_params[name] = value;
 }
-
 
 HKU_API bool operator==(const Parameter&, const Parameter&);
 HKU_API bool operator!=(const Parameter&, const Parameter&);

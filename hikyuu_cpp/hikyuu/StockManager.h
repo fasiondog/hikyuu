@@ -40,10 +40,8 @@ public:
      * @param preloadParam
      * @param hikyuuParam
      */
-    void init(const Parameter& baseInfoParam,
-              const Parameter& blockParam,
-              const Parameter& kdataParam,
-              const Parameter& preloadParam = default_preload_param(),
+    void init(const Parameter& baseInfoParam, const Parameter& blockParam,
+              const Parameter& kdataParam, const Parameter& preloadParam = default_preload_param(),
               const Parameter& hikyuuParam = default_other_param());
 
     Parameter getBaseInfoDriverParameter() const;
@@ -117,8 +115,7 @@ public:
     BlockList getBlockList();
 
     //目前支持"SH"
-    DatetimeList getTradingCalendar(const KQuery& query,
-            const string& market = "SH");
+    DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
 
     /**
      * 初始化时，添加Stock，仅供BaseInfoDriver子类使用
@@ -154,14 +151,10 @@ public:
      * @param maxTradeNumber 单笔最大交易量，默认1000000
      * @return
      */
-    Stock addTempCsvStock(const string& code,
-            const string& day_filename,
-            const string& min_filename,
-            price_t tick = 0.01,
-            price_t tickValue = 0.01,
-            int precision = 2,
-            size_t minTradeNumber = 1,
-            size_t maxTradeNumber = 1000000);
+    Stock addTempCsvStock(const string& code, const string& day_filename,
+                          const string& min_filename, price_t tick = 0.01, price_t tickValue = 0.01,
+                          int precision = 2, size_t minTradeNumber = 1,
+                          size_t maxTradeNumber = 1000000);
 
     /**
      * 移除增加的临时Stock
@@ -171,11 +164,15 @@ public:
 
 public:
     typedef StockMapIterator const_iterator;
-    const_iterator begin() const { return m_stockDict.begin(); }
-    const_iterator end() const { return m_stockDict.end(); }
+    const_iterator begin() const {
+        return m_stockDict.begin();
+    }
+    const_iterator end() const {
+        return m_stockDict.end();
+    }
 
 private:
-    StockManager() { }
+    StockManager() {}
 
 private:
     static shared_ptr<StockManager> m_sm;
@@ -197,7 +194,6 @@ private:
     Parameter m_preloadParam;
     Parameter m_hikyuuParam;
 };
-
 
 inline size_t StockManager::size() const {
     return m_stockDict.size();
@@ -231,6 +227,6 @@ inline BaseInfoDriverPtr StockManager::getBaseInfoDriver() const {
     return DataDriverFactory::getBaseInfoDriver(m_baseInfoDriverParam);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* STOCKMANAGER_H_ */

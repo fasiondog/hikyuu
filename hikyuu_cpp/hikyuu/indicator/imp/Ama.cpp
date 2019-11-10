@@ -12,7 +12,6 @@
 BOOST_CLASS_EXPORT(hku::Ama)
 #endif
 
-
 namespace hku {
 
 Ama::Ama() : IndicatorImp("AMA", 2) {
@@ -21,11 +20,7 @@ Ama::Ama() : IndicatorImp("AMA", 2) {
     setParam<int>("slow_n", 30);
 }
 
-
-Ama::~Ama() {
-
-}
-
+Ama::~Ama() {}
 
 bool Ama::check() {
     int n = getParam<int>("n");
@@ -38,7 +33,6 @@ bool Ama::check() {
 
     return true;
 }
-
 
 void Ama::_calculate(const Indicator& data) {
     size_t total = data.size();
@@ -60,13 +54,14 @@ void Ama::_calculate(const Indicator& data) {
 
     price_t prevol = 0.0, vol = 0.0, er = 1.0, c = 0.0;
     price_t ama = data[start];
-    size_t first_end = start+n+1 >= total ? total : start + n + 1;
+    size_t first_end = start + n + 1 >= total ? total : start + n + 1;
     _set(ama, start, 0);
     _set(er, start, 1);
     for (size_t i = start + 1; i < first_end; ++i) {
-        vol += std::fabs(data[i] - data[i-1]);
+        vol += std::fabs(data[i] - data[i - 1]);
         er = (vol == 0.0) ? 1.0 : (data[i] - data[start]) / vol;
-        if (er > 1.0) er = 1.0;
+        if (er > 1.0)
+            er = 1.0;
         c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (data[i] - ama);
         _set(ama, i, 0);
@@ -75,11 +70,12 @@ void Ama::_calculate(const Indicator& data) {
 
     prevol = vol;
     for (size_t i = first_end; i < total; ++i) {
-        vol = prevol + std::fabs(data[i] - data[i-1])
-                     - std::fabs(data[i+1-n] - data[i-n]);
-        er = (vol == 0.0) ? 1.0 : (data[i] - data[i-n]) / vol;
-        if (er > 1.0) er = 1.0;
-        if (er < -1.0) er = -1.0;
+        vol = prevol + std::fabs(data[i] - data[i - 1]) - std::fabs(data[i + 1 - n] - data[i - n]);
+        er = (vol == 0.0) ? 1.0 : (data[i] - data[i - n]) / vol;
+        if (er > 1.0)
+            er = 1.0;
+        if (er < -1.0)
+            er = -1.0;
         c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (data[i] - ama);
         prevol = vol;
@@ -87,7 +83,6 @@ void Ama::_calculate(const Indicator& data) {
         _set(er, i, 1);
     }
 }
-
 
 Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
     IndicatorImpPtr p = make_shared<Ama>();
@@ -97,8 +92,7 @@ Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
     return Indicator(p);
 }
 
-Indicator HKU_API AMA(const Indicator& ind,
-        int n, int fast_n, int slow_n) {
+Indicator HKU_API AMA(const Indicator& ind, int n, int fast_n, int slow_n) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 

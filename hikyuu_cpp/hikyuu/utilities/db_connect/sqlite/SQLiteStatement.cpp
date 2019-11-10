@@ -12,7 +12,7 @@
 
 namespace hku {
 
-SQLiteStatement ::SQLiteStatement(const DBConnectPtr& driver, const string& sql_statement)
+SQLiteStatement::SQLiteStatement(const DBConnectPtr& driver, const string& sql_statement)
 : SQLStatementBase(driver, sql_statement),
   m_needs_reset(false),
   m_step_status(SQLITE_DONE),

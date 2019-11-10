@@ -33,7 +33,7 @@ const size_t Stock::default_maxTradeNumber = 1000000;
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Stock& stock) {
     string strip(", ");
-    StockManager& sm = StockManager::instance();
+    const StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(stock.type()));
     os << "Stock(" << stock.market() << strip << stock.code() << strip
 #if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
@@ -48,7 +48,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Stock& stock) {
 string Stock::toString() const {
     std::stringstream os;
     string strip(", ");
-    StockManager& sm = StockManager::instance();
+    const StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(type()));
     os << "Stock(" << market() << strip << code() << strip << name() << strip
        << typeInfo.description() << strip << valid() << strip << startDatetime() << strip
@@ -114,23 +114,13 @@ Stock::Stock() : m_kdataDriver(g_kdataDefaultDriver) {}
 
 Stock::~Stock() {}
 
-Stock::Stock(const Stock& x) {
-    if (m_data != x.m_data)
-        m_data = x.m_data;
-
-    if (m_kdataDriver != x.m_kdataDriver)
-        m_kdataDriver = x.m_kdataDriver;
-}
+Stock::Stock(const Stock& x) : m_data(x.m_data), m_kdataDriver(x.m_kdataDriver) {}
 
 Stock& Stock::operator=(const Stock& x) {
     if (this == &x)
         return *this;
-
-    if (m_data != x.m_data)
-        m_data = x.m_data;
-
-    if (m_kdataDriver != x.m_kdataDriver)
-        m_kdataDriver = x.m_kdataDriver;
+    m_data = x.m_data;
+    m_kdataDriver = x.m_kdataDriver;
     return *this;
 }
 
@@ -234,17 +224,7 @@ size_t Stock::maxTradeNumber() const {
 }
 
 void Stock::setKDataDriver(const KDataDriverPtr& kdataDriver) {
-    if (!kdataDriver) {  //防止被置为空指针
-        m_kdataDriver = g_kdataDefaultDriver;
-    }
-    m_kdataDriver = kdataDriver;
-
-    /*for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
-        releaseKDataBuffer((KQuery::KType)i);
-    }*/
-    /*for (auto iter = m_data->pKData.begin(); iter != m_data->pKData.end() ; ++iter) {
-        releaseKDataBuffer(iter->first);
-    }*/
+    m_kdataDriver = kdataDriver ? kdataDriver : g_kdataDefaultDriver;
     m_data->pKData.clear();
 }
 
@@ -462,7 +442,7 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
         return false;
     }
 
-    KRecordList& kdata = *(m_data->pKData[query.kType()]);
+    const KRecordList& kdata = *(m_data->pKData[query.kType()]);
     size_t mid, low = 0, high = total - 1;
     size_t startpos, endpos;
     while (low <= high) {
@@ -651,7 +631,7 @@ void Stock::realtimeUpdate(const KRecord& record) {
 }
 
 Stock HKU_API getStock(const string& querystr) {
-    StockManager& sm = StockManager::instance();
+    const StockManager& sm = StockManager::instance();
     return sm.getStock(querystr);
 }
 

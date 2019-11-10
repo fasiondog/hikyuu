@@ -35,16 +35,14 @@ public:
  */
 typedef vector<TimeLineRecord> TimeLineList;
 
-
 /** @ingroup StockManage */
 typedef shared_ptr<TimeLineList> TimeLineListPtr;
-
 
 /**
  * 输出TimeLineRecord信息，如：TimeSharingRecord(datetime, price, vol)
  * @ingroup StockManage
  */
-HKU_API std::ostream & operator<<(std::ostream &, const TimeLineRecord&);
+HKU_API std::ostream& operator<<(std::ostream&, const TimeLineRecord&);
 
 /**
  * 输出TimeLine信息
@@ -58,15 +56,13 @@ HKU_API std::ostream & operator<<(std::ostream &, const TimeLineRecord&);
  * </pre>
  * @ingroup StockManage
  */
-HKU_API std::ostream& operator <<(std::ostream &os, const TimeLineList&);
-
+HKU_API std::ostream& operator<<(std::ostream& os, const TimeLineList&);
 
 /**
  * 比较两个TimeLineRecord是否相等，一般仅测试时使用
  * @ingroup StockManage
  */
-bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord&d2);
-
+bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord& d2);
 
 } /* namespace hku */
 

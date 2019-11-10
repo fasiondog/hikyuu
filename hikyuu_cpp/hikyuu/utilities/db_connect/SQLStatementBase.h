@@ -2,7 +2,7 @@
  * SQLStatemantBase.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-7-11
  *      Author: fasiondog
  */
@@ -20,9 +20,9 @@ namespace hku {
 class DBConnectBase;
 typedef shared_ptr<DBConnectBase> DBConnectPtr;
 
-class null_blob_exception: public exception {
+class null_blob_exception : public exception {
 public:
-    null_blob_exception(): exception("Blob is null!") {}
+    null_blob_exception() : exception("Blob is null!") {}
 };
 
 /**
@@ -50,40 +50,36 @@ public:
     /** 移动至下一结果 */
     bool moveNext();
 
-    void bind(int idx); //bind_null
+    void bind(int idx);  // bind_null
     void bind(int idx, float item);
     void bind(int idx, double item);
     void bind(int idx, const string& item);
     void bindBlob(int idx, const string& item);
 
     template <typename T>
-    typename std::enable_if<std::numeric_limits<T>::is_integer>::type
-    bind(int idx, const T& item);
+    typename std::enable_if<std::numeric_limits<T>::is_integer>::type bind(int idx, const T& item);
 
     template <typename T>
-    typename std::enable_if<!std::numeric_limits<T>::is_integer>::type
-    bind(int idx, const T& item);
+    typename std::enable_if<!std::numeric_limits<T>::is_integer>::type bind(int idx, const T& item);
 
     template <typename T, typename... Args>
-    void bind(int idx, const T&, const Args&... rest); 
+    void bind(int idx, const T&, const Args&... rest);
 
     int getNumColumns() const;
 
-    //void getColumn(int idx, int64& item);
+    // void getColumn(int idx, int64& item);
     void getColumn(int idx, double& item);
     void getColumn(int idx, float& item);
     void getColumn(int idx, string& item);
 
     template <typename T>
-    typename std::enable_if<std::numeric_limits<T>::is_integer>::type
-    getColumn(int idx, T&);
+    typename std::enable_if<std::numeric_limits<T>::is_integer>::type getColumn(int idx, T&);
 
     template <typename T>
-    typename std::enable_if<!std::numeric_limits<T>::is_integer>::type
-    getColumn(int idx, T&);
+    typename std::enable_if<!std::numeric_limits<T>::is_integer>::type getColumn(int idx, T&);
 
     template <typename T, typename... Args>
-    void getColumn(int idx, T&, Args&... rest); 
+    void getColumn(int idx, T&, Args&... rest);
 
     //-------------------------------------------------------------------------
     // 子类接口
@@ -115,9 +111,7 @@ protected:
 /** @ingroup DBConnect */
 typedef shared_ptr<SQLStatementBase> SQLStatementPtr;
 
-
-inline SQLStatementBase
-::SQLStatementBase(const DBConnectPtr& driver, const string& sql_statement)
+inline SQLStatementBase ::SQLStatementBase(const DBConnectPtr& driver, const string& sql_statement)
 : m_driver(driver), m_sql_string(sql_statement) {
     HKU_ASSERT_M(driver, "driver is null!");
 }
@@ -190,15 +184,15 @@ inline void SQLStatementBase::getColumn(int idx, string& item) {
 }
 
 template <typename T>
-typename std::enable_if<std::numeric_limits<T>::is_integer>::type
-SQLStatementBase::bind(int idx, const T& item) {
+typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::bind(
+  int idx, const T& item) {
     HKU_ASSERT_M(isValid(), "Invalid statement!");
     sub_bindInt(idx, item);
 }
 
 template <typename T>
-typename std::enable_if<!std::numeric_limits<T>::is_integer>::type
-SQLStatementBase::bind(int idx, const T& item) {
+typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementBase::bind(
+  int idx, const T& item) {
     HKU_ASSERT_M(isValid(), "Invalid statement!");
     std::ostringstream sout;
     boost::archive::binary_oarchive oa(sout);
@@ -207,8 +201,8 @@ SQLStatementBase::bind(int idx, const T& item) {
 }
 
 template <typename T>
-typename std::enable_if<std::numeric_limits<T>::is_integer>::type
-SQLStatementBase::getColumn(int idx, T& item) {
+typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
+  int idx, T& item) {
     HKU_ASSERT_M(isValid(), "Invalid statement!");
     int64 temp;
     sub_getColumnAsInt64(idx, temp);
@@ -216,8 +210,8 @@ SQLStatementBase::getColumn(int idx, T& item) {
 }
 
 template <typename T>
-typename std::enable_if<!std::numeric_limits<T>::is_integer>::type
-SQLStatementBase::getColumn(int idx, T& item) {
+typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
+  int idx, T& item) {
     HKU_ASSERT_M(isValid(), "Invalid statement!");
     string tmp;
     try {
@@ -227,21 +221,21 @@ SQLStatementBase::getColumn(int idx, T& item) {
     }
     std::istringstream sin(tmp);
     boost::archive::binary_iarchive ia(sin);
-    ia >> BOOST_SERIALIZATION_NVP(item); 
+    ia >> BOOST_SERIALIZATION_NVP(item);
 }
 
 template <typename T, typename... Args>
 void SQLStatementBase::bind(int idx, const T& item, const Args&... rest) {
     bind(idx, item);
-    bind(idx+1, rest...);
+    bind(idx + 1, rest...);
 }
 
 template <typename T, typename... Args>
 void SQLStatementBase::getColumn(int i, T& item, Args&... rest) {
     getColumn(i, item);
-    getColumn(i+1, rest...);
+    getColumn(i + 1, rest...);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_DB_CONNECT_SQLSTATEMENTBASE_H */

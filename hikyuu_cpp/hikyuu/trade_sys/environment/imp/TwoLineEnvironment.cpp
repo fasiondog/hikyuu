@@ -11,8 +11,7 @@
 
 namespace hku {
 
-TwoLineEnvironment::TwoLineEnvironment()
-: EnvironmentBase("TwoLine") {
+TwoLineEnvironment::TwoLineEnvironment() : EnvironmentBase("TwoLine") {
     setParam<string>("market", "SH");
 }
 
@@ -21,12 +20,10 @@ TwoLineEnvironment::TwoLineEnvironment(const Indicator& fast, const Indicator& s
     setParam<string>("market", "SH");
 }
 
-TwoLineEnvironment::~TwoLineEnvironment() {
-
-}
+TwoLineEnvironment::~TwoLineEnvironment() {}
 
 EnvironmentPtr TwoLineEnvironment::_clone() {
-    TwoLineEnvironment *ptr = new TwoLineEnvironment;
+    TwoLineEnvironment* ptr = new TwoLineEnvironment;
     ptr->m_fast = m_fast;
     ptr->m_slow = m_slow;
     return EnvironmentPtr(ptr);
@@ -34,7 +31,7 @@ EnvironmentPtr TwoLineEnvironment::_clone() {
 
 void TwoLineEnvironment::_calculate() {
     string market = getParam<string>("market");
-    StockManager& sm = StockManager::instance();
+    const StockManager& sm = StockManager::instance();
     MarketInfo market_info = sm.getMarketInfo(market);
     if (market_info == Null<MarketInfo>()) {
         return;
@@ -55,9 +52,8 @@ void TwoLineEnvironment::_calculate() {
     }
 }
 
-EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow,
-        const string& market) {
-    TwoLineEnvironment *ptr = new TwoLineEnvironment(fast, slow);
+EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow, const string& market) {
+    TwoLineEnvironment* ptr = new TwoLineEnvironment(fast, slow);
     ptr->setParam<string>("market", market);
     return EVPtr(ptr);
 }

@@ -23,13 +23,12 @@ namespace hku {
  */
 void HKU_API hikyuu_init(const string& config_file_name);
 
-
 /**
  * 获取Hikyuu当前版本号
  * @return 版本号
  */
 string HKU_API getVersion();
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_H_ */

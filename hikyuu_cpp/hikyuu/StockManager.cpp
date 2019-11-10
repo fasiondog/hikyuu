@@ -25,18 +25,16 @@ shared_ptr<StockManager> StockManager::m_sm;
 
 StockManager::~StockManager() {
     std::cout << "Quit Hikyuu system!" << std::endl;
-    //Cannot use log output when exiting!
-    //HKU_TRACE("Quit Hikyuu system!\n");
+    // Cannot use log output when exiting!
+    // HKU_TRACE("Quit Hikyuu system!\n");
 }
 
-
 StockManager& StockManager::instance() {
-    if( !m_sm ) {
+    if (!m_sm) {
         m_sm = shared_ptr<StockManager>(new StockManager());
     }
     return (*m_sm);
 }
-
 
 Parameter default_preload_param() {
     Parameter param;
@@ -57,17 +55,13 @@ Parameter default_preload_param() {
 Parameter default_other_param() {
     Parameter param;
     param.set<string>("tmpdir", ".");
-    param.set<string>("logger","");
+    param.set<string>("logger", "");
     return param;
 }
 
-void StockManager::init(
-        const Parameter& baseInfoParam,
-        const Parameter& blockParam,
-        const Parameter& kdataParam,
-        const Parameter& preloadParam,
-        const Parameter& hikyuuParam) {
-
+void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
+                        const Parameter& kdataParam, const Parameter& preloadParam,
+                        const Parameter& hikyuuParam) {
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;
@@ -118,15 +112,13 @@ void StockManager::init(
 
     setKDataDriver(kdata_driver);
 
-    //add special Market, for temp csv file
-    m_marketInfoDict["TMP"] = MarketInfo("TMP", "Temp Csv file",
-                                         "temp load from csv file",
-                                         "000001", Null<Datetime>());
+    // add special Market, for temp csv file
+    m_marketInfoDict["TMP"] =
+      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>());
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
 }
-
 
 void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     if (!driver) {
@@ -135,7 +127,6 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     }
 
     if (m_kdataDriverParam == driver->getParameter()) {
-
     } else {
         m_kdataDriverParam = driver->getParameter();
     }
@@ -145,7 +136,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_day = m_preloadParam.get<bool>("day");
         if (preload_day)
             HKU_INFO("Preloading all day kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_day = false;
     }
 
@@ -154,7 +145,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_week = m_preloadParam.get<bool>("week");
         if (preload_week)
             HKU_INFO("Preloading all week kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_week = false;
     }
 
@@ -163,7 +154,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_month = m_preloadParam.get<bool>("month");
         if (preload_week)
             HKU_INFO("Preloading all month kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_month = false;
     }
 
@@ -172,7 +163,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_quarter = m_preloadParam.get<bool>("quarter");
         if (preload_quarter)
             HKU_INFO("Preloading all quarter kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_quarter = false;
     }
 
@@ -181,7 +172,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_halfyear = m_preloadParam.get<bool>("halfyear");
         if (preload_halfyear)
             HKU_INFO("Preloading all halfyear kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_halfyear = false;
     }
 
@@ -190,7 +181,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_year = m_preloadParam.get<bool>("year");
         if (preload_year)
             HKU_INFO("Preloading all year kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_year = false;
     }
 
@@ -199,7 +190,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_min = m_preloadParam.get<bool>("min");
         if (preload_min)
             HKU_INFO("Preloading all 1 min kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_min = false;
     }
 
@@ -208,7 +199,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_min5 = m_preloadParam.get<bool>("min5");
         if (preload_min5)
             HKU_INFO("Preloading all 5 min kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_min5 = false;
     }
 
@@ -217,7 +208,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_min15 = m_preloadParam.get<bool>("min15");
         if (preload_min15)
             HKU_INFO("Preloading all 15 min kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_min15 = false;
     }
 
@@ -226,7 +217,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_min30 = m_preloadParam.get<bool>("min30");
         if (preload_min30)
             HKU_INFO("Preloading all 30 min kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_min30 = false;
     }
 
@@ -235,11 +226,11 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         preload_min60 = m_preloadParam.get<bool>("min60");
         if (preload_min60)
             HKU_INFO("Preloading all 60 min kdata to buffer!");
-    } catch(...) {
+    } catch (...) {
         preload_min60 = false;
     }
 
-    for(auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
         if (iter->second.market() == "TMP")
             continue;
 
@@ -280,7 +271,6 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     }
 }
 
-
 string StockManager::tmpdir() const {
     return m_tmpdir;
 }
@@ -294,45 +284,41 @@ Stock StockManager::getStock(const string& querystr) const {
     string query_str = querystr;
     to_upper(query_str);
     auto iter = m_stockDict.find(query_str);
-    if(iter != m_stockDict.end()) {
+    if (iter != m_stockDict.end()) {
         return iter->second;
     }
     return result;
 }
-
 
 MarketInfo StockManager::getMarketInfo(const string& market) const {
     string market_tmp = market;
     to_upper(market_tmp);
     auto iter = m_marketInfoDict.find(market_tmp);
-    if(iter != m_marketInfoDict.end()) {
+    if (iter != m_marketInfoDict.end()) {
         return iter->second;
     }
     return Null<MarketInfo>();
 }
 
-
 StockTypeInfo StockManager::getStockTypeInfo(uint32 type) const {
     auto iter = m_stockTypeInfo.find(type);
-    if( iter != m_stockTypeInfo.end() ){
+    if (iter != m_stockTypeInfo.end()) {
         return iter->second;
     }
     return Null<StockTypeInfo>();
 }
 
-
 MarketList StockManager::getAllMarket() const {
     MarketList result;
     auto iter = m_marketInfoDict.begin();
-    for(; iter != m_marketInfoDict.end(); ++iter) {
+    for (; iter != m_marketInfoDict.end(); ++iter) {
         result.push_back(iter->first);
     }
     return result;
 }
 
-
 Block StockManager::getBlock(const string& category, const string& name) {
-    return m_blockDriver ? m_blockDriver->getBlock(category, name): Block();
+    return m_blockDriver ? m_blockDriver->getBlock(category, name) : Block();
 }
 
 BlockList StockManager::getBlockList(const string& category) {
@@ -343,8 +329,7 @@ BlockList StockManager::getBlockList() {
     return m_blockDriver ? m_blockDriver->getBlockList() : BlockList();
 }
 
-DatetimeList StockManager::
-getTradingCalendar(const KQuery& query, const string& market) {
+DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
     Stock stock = getStock("SH000001");
     size_t start_ix = 0, end_ix = 0;
     DatetimeList result;
@@ -354,27 +339,20 @@ getTradingCalendar(const KQuery& query, const string& market) {
     return result;
 }
 
-Stock StockManager::addTempCsvStock(
-        const string& code,
-        const string& day_filename,
-        const string& min_filename,
-        price_t tick,
-        price_t tickValue,
-        int precision,
-        size_t minTradeNumber,
-        size_t maxTradeNumber) {
+Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,
+                                    const string& min_filename, price_t tick, price_t tickValue,
+                                    int precision, size_t minTradeNumber, size_t maxTradeNumber) {
     string new_code(code);
     to_upper(new_code);
-    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true,
-            Datetime(199901010000), Null<Datetime>(),
-            tick, tickValue, precision, minTradeNumber, maxTradeNumber);
+    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000),
+                 Null<Datetime>(), tick, tickValue, precision, minTradeNumber, maxTradeNumber);
 
-    KDataTempCsvDriver *p = new KDataTempCsvDriver(day_filename, min_filename);
+    KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
     result.setKDataDriver(KDataDriverPtr(p));
     result.loadKDataToBuffer(KQuery::DAY);
     result.loadKDataToBuffer(KQuery::MIN);
 
-    if (!loadStock(result)){
+    if (!loadStock(result)) {
         //加入失败，返回Null<Stock>
         return Null<Stock>();
     }
@@ -386,16 +364,15 @@ void StockManager::removeTempCsvStock(const string& code) {
     string query_str = "TMP" + code;
     to_upper(query_str);
     auto iter = m_stockDict.find(query_str);
-    if(iter != m_stockDict.end()) {
+    if (iter != m_stockDict.end()) {
         m_stockDict.erase(iter);
     }
 }
 
-
 bool StockManager::loadStock(const Stock& stock) {
     string market_code(stock.market_code());
     to_upper(market_code);
-    if(m_stockDict.find(market_code) != m_stockDict.end()) {
+    if (m_stockDict.find(market_code) != m_stockDict.end()) {
         HKU_ERROR("The stock had exist! {}", market_code);
         return false;
     }
@@ -403,7 +380,6 @@ bool StockManager::loadStock(const Stock& stock) {
     m_stockDict[market_code] = stock;
     return true;
 }
-
 
 bool StockManager::loadMarketInfo(const MarketInfo& marketInfo) {
     string market = marketInfo.market();
@@ -427,4 +403,4 @@ bool StockManager::loadStockTypeInfo(const StockTypeInfo& stkTypeInfo) {
     return true;
 }
 
-} /* namespace */
+}  // namespace hku

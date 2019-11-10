@@ -12,4 +12,8 @@
     <libraries>
         <library>boost</library>
     </libraries>
+    <suppressions>
+        <suppression>noExplicitConstructor</suppression>
+        <suppression>unusedFunction</suppression>
+    </suppressions>
 </project>

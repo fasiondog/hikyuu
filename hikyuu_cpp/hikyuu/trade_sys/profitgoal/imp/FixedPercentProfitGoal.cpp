@@ -9,18 +9,13 @@
 
 namespace hku {
 
-FixedPercentProfitGoal::FixedPercentProfitGoal()
-: ProfitGoalBase("PG_FixedPercent") {
+FixedPercentProfitGoal::FixedPercentProfitGoal() : ProfitGoalBase("PG_FixedPercent") {
     setParam<double>("p", 0.2);
 }
 
-FixedPercentProfitGoal::~FixedPercentProfitGoal() {
+FixedPercentProfitGoal::~FixedPercentProfitGoal() {}
 
-}
-
-void FixedPercentProfitGoal::_calculate() {
-
-}
+void FixedPercentProfitGoal::_calculate() {}
 
 price_t FixedPercentProfitGoal::getGoal(const Datetime& datetime, price_t price) {
     Stock stock = getTO().getStock();
@@ -34,7 +29,7 @@ price_t FixedPercentProfitGoal::getGoal(const Datetime& datetime, price_t price)
     }
 
     return result;
-    //return price * (1 + getParam<double>("p"));
+    // return price * (1 + getParam<double>("p"));
 }
 
 ProfitGoalPtr HKU_API PG_FixedPercent(double p) {

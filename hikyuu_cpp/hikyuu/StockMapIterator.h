@@ -20,7 +20,7 @@ public:
     typedef Stock value_type;
     typedef Stock* pointer;
     typedef const Stock& reference;
-    //typedef stock_map_t::const_iterator::distance_type distance_type;
+    // typedef stock_map_t::const_iterator::distance_type distance_type;
     typedef stock_map_t::const_iterator::difference_type difference_type;
     typedef std::input_iterator_tag iterator_category;
     /*struct iterator {

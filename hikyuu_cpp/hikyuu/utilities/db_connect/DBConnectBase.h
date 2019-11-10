@@ -2,7 +2,7 @@
  * DBConnectBase.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-7-1
  *      Author: fasiondog
  */
@@ -20,7 +20,7 @@ namespace hku {
  * 数据驱动基类
  * @ingroup DBConnect
  */
-class HKU_API DBConnectBase: public std::enable_shared_from_this<DBConnectBase> {
+class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
     PARAMETER_SUPPORT
 
 public:
@@ -29,7 +29,7 @@ public:
 
     /** 开始事务 */
     void transaction();
-    
+
     /** 提交事务 */
     void commit();
 
@@ -51,24 +51,23 @@ public:
     //-------------------------------------------------------------------------
     // 模板方法
     //-------------------------------------------------------------------------
-    /** 
+    /**
      * 保存或更新 通过 TABLE_BIND 绑定的表结构
      * 可由 driver 直接保存，示例如下：
      * @code
      * class TTT {
      *   TABLE_BIND(TTT, ttt_table, age, name)
-     * 
+     *
      *   public:
      *       int age;
      *       string name;
      *   public:
      *       void save(const DBConnectPtr& driver) const {
-     *           SQLStatementPtr st = driver->getStatement("insert into ttt (name, age) values (?,?)");
-     *           st->bind(0, name, age);
-     *           st->exec();
+     *           SQLStatementPtr st = driver->getStatement("insert into ttt (name, age) values
+     * (?,?)"); st->bind(0, name, age); st->exec();
      *       }
      *   };
-     * 
+     *
      *   TEST_CASE("test_temp", "temp") {
      *       Parameter param;
      *       param.set<string>("db", TST_DATA("test.db"));
@@ -80,7 +79,7 @@ public:
      *       driver->save(a);
      *   }
      * @endcode
-     * 
+     *
      */
     template <typename T>
     void save(const T& item);
@@ -90,8 +89,8 @@ public:
      * @param container 拥有迭代器的容器
      * @param autotrans 启动事务
      */
-    template<class Container>
-    void batchSave(Container& container, bool autotrans=true);
+    template <class Container>
+    void batchSave(Container& container, bool autotrans = true);
 
     /**
      * 批量保存，迭代器中的数据必须是通过 TABLE_BIND 绑定的表模型
@@ -99,8 +98,8 @@ public:
      * @param last 迭代器终止点
      * @param autotrans 启动事务
      */
-    template<class InputIterator>
-    void batchSave(InputIterator first, InputIterator last, bool autotrans=true);
+    template <class InputIterator>
+    void batchSave(InputIterator first, InputIterator last, bool autotrans = true);
 
     /**
      * 加载模型数据至指定的模型实例
@@ -109,7 +108,7 @@ public:
      * @param where 查询条件，如：“id=1"
      */
     template <typename T>
-    void load(T& item, const string& where="");
+    void load(T& item, const string& where = "");
 
     /**
      * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
@@ -117,15 +116,15 @@ public:
      * @param where 查询条件
      */
     template <typename Container>
-    void batchLoad(Container& container, const string& where="");
+    void batchLoad(Container& container, const string& where = "");
 
     /**
      * 批量更新
      * @param container 拥有迭代器的容器
      * @param autotrans 启动事务
      */
-    template<class Container>
-    void batchUpdate(Container& container, bool autotrans=true);
+    template <class Container>
+    void batchUpdate(Container& container, bool autotrans = true);
 
     /**
      * 批量更新
@@ -133,16 +132,16 @@ public:
      * @param last 迭代器终止点
      * @param autotrans 启动事务
      */
-    template<class InputIterator>
-    void batchUpdate(InputIterator first, InputIterator last, bool autotrans=true);
+    template <class InputIterator>
+    void batchUpdate(InputIterator first, InputIterator last, bool autotrans = true);
 
     /**
      * 批量保存或更新
      * @param container 拥有迭代器的容器
      * @param autotrans 启动事务
      */
-    template<class Container>
-    void batchSaveOrUpdate(Container& container, bool autotrans=true);
+    template <class Container>
+    void batchSaveOrUpdate(Container& container, bool autotrans = true);
 
     /**
      * 批量保存或更新
@@ -150,8 +149,8 @@ public:
      * @param last 迭代器终止点
      * @param autotrans 启动事务
      */
-    template<class InputIterator>
-    void batchSaveOrUpdate(InputIterator first, InputIterator last, bool autotrans=true);
+    template <class InputIterator>
+    void batchSaveOrUpdate(InputIterator first, InputIterator last, bool autotrans = true);
 
     /**
      * 查询单个整数，如：select count(*) from table
@@ -167,12 +166,11 @@ private:
 /** @ingroup DBConnect */
 typedef shared_ptr<DBConnectBase> DBConnectPtr;
 
-
 //-------------------------------------------------------------------------
 // inline方法实现
 //-------------------------------------------------------------------------
 
-inline DBConnectBase::DBConnectBase(const Parameter& param): m_params(param) {}
+inline DBConnectBase::DBConnectBase(const Parameter& param) : m_params(param) {}
 
 inline void DBConnectBase::transaction() {
     exec("BEGIN TRANSACTION");
@@ -189,8 +187,8 @@ inline void DBConnectBase::rollback() {
 inline int DBConnectBase::queryInt(const string& query) {
     SQLStatementPtr st = getStatement(query);
     st->exec();
-    HKU_ASSERT_M((st->moveNext() && st->getNumColumns() == 1), 
-                "query doesn't result in exactly 1 element");
+    HKU_ASSERT_M((st->moveNext() && st->getNumColumns() == 1),
+                 "query doesn't result in exactly 1 element");
     int result = 0;
     st->getColumn(0, result);
     HKU_ASSERT_M(!st->moveNext(), "query doesn't result in exactly 1 element");
@@ -214,19 +212,18 @@ void DBConnectBase::save(const T& x) {
     }
 }
 
-template<class Container>
+template <class Container>
 inline void DBConnectBase::batchSave(Container& container, bool autotrans) {
     batchSave(container.begin(), container.end(), autotrans);
 }
 
-
-template<class InputIterator>
+template <class InputIterator>
 void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool autotrans) {
     SQLStatementPtr st = getStatement(InputIterator::value_type::getInsertSQL());
     if (autotrans) {
         transaction();
     }
-    
+
     try {
         for (InputIterator iter = first; iter != last; ++iter) {
             iter->save(st);
@@ -236,13 +233,13 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
         if (autotrans) {
             commit();
         }
-    
+
     } catch (std::exception& e) {
         if (autotrans) {
             rollback();
         }
         HKU_THROW("failed batch save! sql: {}! {}", st->getSqlString(), e.what());
-    
+
     } catch (...) {
         if (autotrans) {
             rollback();
@@ -261,7 +258,7 @@ void DBConnectBase::load(T& x, const string& where) {
     }
     SQLStatementPtr st = getStatement(sql.str());
     st->exec();
-    if(st->moveNext()) {
+    if (st->moveNext()) {
         x.load(st);
     }
 }
@@ -283,12 +280,12 @@ void DBConnectBase::batchLoad(Container& con, const string& where) {
     }
 }
 
-template<class Container>
+template <class Container>
 inline void DBConnectBase::batchUpdate(Container& container, bool autotrans) {
     batchUpdate(container.begin(), container.end(), autotrans);
 }
 
-template<class InputIterator>
+template <class InputIterator>
 void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool autotrans) {
     SQLStatementPtr st = getStatement(InputIterator::value_type::getUpdateSQL());
     if (autotrans) {
@@ -304,13 +301,13 @@ void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool au
         if (autotrans) {
             commit();
         }
-    
+
     } catch (std::exception& e) {
         if (autotrans) {
             rollback();
         }
         HKU_THROW("failed batch save! sql: {}! {}", st->getSqlString(), e.what());
-    
+
     } catch (...) {
         if (autotrans) {
             rollback();
@@ -319,7 +316,7 @@ void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool au
     }
 }
 
-template<class InputIterator>
+template <class InputIterator>
 void DBConnectBase::batchSaveOrUpdate(InputIterator first, InputIterator last, bool autotrans) {
     vector<typename InputIterator::value_type> save_list;
     vector<typename InputIterator::value_type> update_list;
@@ -335,11 +332,11 @@ void DBConnectBase::batchSaveOrUpdate(InputIterator first, InputIterator last, b
     batchUpdate(update_list.begin(), update_list.end(), autotrans);
 }
 
-template<class Container>
+template <class Container>
 inline void DBConnectBase::batchSaveOrUpdate(Container& container, bool autotrans) {
     batchSaveOrUpdate(container.begin(), container.end(), autotrans);
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_DB_CONNECT_DBCONNECTBASE_H */

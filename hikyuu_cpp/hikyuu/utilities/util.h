@@ -46,16 +46,15 @@ string HKU_API gb_to_utf8(const string& szinput);
  *       中文字符串，应使用HKU_STR，如：std::cout << HKU_STR("中国")
  */
 #if defined(_MSC_VER) && (PY_VERSION_HEX < 0x03000000)
-    //将utf8编码的字符串转换为GB2312编码
-    #define UTF8ToGB utf8_to_gb
-    #define GBToUTF8 gb_to_utf8
-    #define HKU_STR(s) UTF8ToGB(s)
+//将utf8编码的字符串转换为GB2312编码
+#define UTF8ToGB utf8_to_gb
+#define GBToUTF8 gb_to_utf8
+#define HKU_STR(s) UTF8ToGB(s)
 #else
-    #define HKU_STR(s) (s)
-    #define GBToUTF8(s) (s)
-    #define UTF8ToGB(s) (s)
+#define HKU_STR(s) (s)
+#define GBToUTF8(s) (s)
+#define UTF8ToGB(s) (s)
 #endif
-
 
 /**
  * 四舍五入，ROUND_HALF_EVEN 银行家舍入法
@@ -63,7 +62,7 @@ string HKU_API gb_to_utf8(const string& szinput);
  * @param ndigits 保留小数位数
  * @return 处理过的数据
  */
-double HKU_API roundEx(double number, int ndigits=0);
+double HKU_API roundEx(double number, int ndigits = 0);
 
 /**
  * 向上截取，如10.1截取后为11
@@ -71,7 +70,7 @@ double HKU_API roundEx(double number, int ndigits=0);
  * @param ndigits 保留小数位数
  * @return 处理过的数据
  */
-double HKU_API roundUp(double number, int ndigits=0);
+double HKU_API roundUp(double number, int ndigits = 0);
 
 /**
  * 向下截取，如10.1截取后为10
@@ -79,10 +78,9 @@ double HKU_API roundUp(double number, int ndigits=0);
  * @param ndigits 保留小数位数
  * @return 处理过的数据
  */
-double HKU_API roundDown(double number, int ndigits=0);
-
+double HKU_API roundDown(double number, int ndigits = 0);
 
 /** @} */
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_UTILIIES_UTIL_H_ */

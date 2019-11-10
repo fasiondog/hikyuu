@@ -2,7 +2,7 @@
  * SQLiteStatement.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-7-11
  *      Author: linjinhai
  */
@@ -19,7 +19,7 @@ namespace hku {
  * SQLite Statemen
  * @ingroup SQLite
  */
-class HKU_API SQLiteStatement: public SQLStatementBase {
+class HKU_API SQLiteStatement : public SQLStatementBase {
 public:
     SQLiteStatement() = delete;
     SQLiteStatement(const DBConnectPtr& driver, const string& sql_statement);
@@ -45,8 +45,8 @@ private:
     void _reset();
 
 private:
-    bool m_needs_reset; // true if sqlite3_step() has been called more recently than sqlite3_reset() 
-    int  m_step_status;
+    bool m_needs_reset;
+    int m_step_status;
     bool m_at_first_step;
     shared_ptr<sqlite3> m_db;
     sqlite3_stmt* m_stmt;

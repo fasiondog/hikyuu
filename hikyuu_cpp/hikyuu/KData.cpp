@@ -13,21 +13,18 @@
 
 namespace hku {
 
-HKU_API std::ostream& operator <<(std::ostream &os, const KData& kdata) {
-    os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock() << ",\n  query: "
-       << kdata.getQuery() << "\n }";
+HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
+    os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
+       << ",\n  query: " << kdata.getQuery() << "\n }";
     return os;
 }
 
-
 string KData::toString() const {
     std::stringstream os;
-    os << "KData{\n  size : " << size() << "\n  stock: "
-       << getStock().toString() << ",\n  query: "
-       << getQuery() << "\n }";
+    os << "KData{\n  size : " << size() << "\n  stock: " << getStock().toString()
+       << ",\n  query: " << getQuery() << "\n }";
     return os.str();
 }
-
 
 KData::KData(const Stock& stock, const KQuery& query) {
     if (stock.isNull()) {
@@ -47,7 +44,6 @@ KData::KData(const Stock& stock, const KQuery& query) {
 #endif
 }
 
-
 void KData::tocsv(const string& filename) {
     std::ofstream file(filename.c_str());
     if (!file) {
@@ -62,15 +58,13 @@ void KData::tocsv(const string& filename) {
     KRecord record;
     for (size_t i = 0; i < size(); ++i) {
         record = getKRecord(i);
-        file << record.datetime << sep << record.openPrice << sep
-                << record.highPrice << sep << record.lowPrice << sep
-                << record.closePrice << sep << record.transAmount << sep
-                << record.transCount << std::endl;
+        file << record.datetime << sep << record.openPrice << sep << record.highPrice << sep
+             << record.lowPrice << sep << record.closePrice << sep << record.transAmount << sep
+             << record.transCount << std::endl;
     }
 
     file.close();
 }
-
 
 Indicator KData::open() const {
     return OPEN(*this);
@@ -96,6 +90,4 @@ Indicator KData::amo() const {
     return AMO(*this);
 }
 
-} /* namespace */
-
-
+}  // namespace hku

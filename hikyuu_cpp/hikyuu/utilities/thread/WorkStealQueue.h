@@ -2,7 +2,7 @@
  * WorkStealQueue.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-9-16
  *      Author: fasiondog
  */
@@ -17,17 +17,16 @@
 
 namespace hku {
 
-class WorkStealQueue
-{
+class WorkStealQueue {
 private:
     typedef FuncWrapper data_type;
     std::deque<data_type> m_queue;
     mutable std::mutex m_mutex;
-    
+
 public:
     WorkStealQueue() {}
-    WorkStealQueue(const WorkStealQueue& other)=delete;
-    WorkStealQueue& operator=(const WorkStealQueue& other)=delete;
+    WorkStealQueue(const WorkStealQueue& other) = delete;
+    WorkStealQueue& operator=(const WorkStealQueue& other) = delete;
 
     void push_front(data_type data) {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -49,7 +48,7 @@ public:
         if (m_queue.empty()) {
             return false;
         }
-        
+
         res = std::move(m_queue.front());
         m_queue.pop_front();
         return true;
@@ -57,10 +56,10 @@ public:
 
     bool try_steal(data_type& res) {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if(m_queue.empty()) {
+        if (m_queue.empty()) {
             return false;
         }
-        
+
         res = std::move(m_queue.back());
         m_queue.pop_back();
         return true;

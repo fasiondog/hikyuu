@@ -51,14 +51,11 @@ public:
     Stock(const Stock&);
     Stock(const string& market, const string& code, const string& name);
 
-    Stock(const string& market, const string& code,
-          const string& name, uint32 type, bool valid,
+    Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
           const Datetime& startDate, const Datetime& lastDate);
-    Stock(const string& market, const string& code,
-          const string& name, uint32 type, bool valid,
-          const Datetime& startDate, const Datetime& lastDate,
-          price_t tick, price_t tickValue, int precision,
-          size_t minTradeNumber, size_t maxTradeNumber);
+    Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
+          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
+          int precision, size_t minTradeNumber, size_t maxTradeNumber);
     virtual ~Stock();
     Stock& operator=(const Stock&);
     bool operator==(const Stock&) const;
@@ -121,8 +118,7 @@ public:
      * @param end 结束日期
      * @return 满足要求的权息信息列表指针
      */
-    StockWeightList getWeight(const Datetime& start,
-                    const Datetime& end = Null<Datetime>()) const;
+    StockWeightList getWeight(const Datetime& start, const Datetime& end = Null<Datetime>()) const;
 
     /** 获取不同类型K线数据量 */
     size_t getCount(KQuery::KType dataType = KQuery::DAY) const;
@@ -140,8 +136,7 @@ public:
     bool getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const;
 
     /** 获取指定索引的K线数据记录，未作越界检查 */
-    KRecord getKRecord(size_t pos,
-                       KQuery::KType dataType = KQuery::DAY) const;
+    KRecord getKRecord(size_t pos, KQuery::KType dataType = KQuery::DAY) const;
 
     /** 根据数据类型（日线/周线等），获取指定日期的KRecord */
     KRecord getKRecordByDate(const Datetime&, KQuery::KType ktype = KQuery::DAY) const;
@@ -168,8 +163,8 @@ public:
      * 获取当前财务信息
      */
     Parameter getFinanceInfo() const;
-    
-    /** 
+
+    /**
      * 获取历史财务信息
      * @param date 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
      */
@@ -216,33 +211,31 @@ private:
 };
 
 struct HKU_API Stock::Data {
-    string        m_market;      //所属的市场简称
-    string        m_code;        //证券代码
-    string        m_market_code; //市场简称证券代码
-    string        m_name;        //证券名称
-    uint32        m_type;        //证券类型
-    bool          m_valid;       //当前证券是否有效
-    Datetime      m_startDate;   //证券起始日期
-    Datetime      m_lastDate;    //证券最后日期
+    string m_market;       //所属的市场简称
+    string m_code;         //证券代码
+    string m_market_code;  //市场简称证券代码
+    string m_name;         //证券名称
+    uint32 m_type;         //证券类型
+    bool m_valid;          //当前证券是否有效
+    Datetime m_startDate;  //证券起始日期
+    Datetime m_lastDate;   //证券最后日期
 
-    StockWeightList m_weightList; //权息信息列表
+    StockWeightList m_weightList;  //权息信息列表
 
     price_t m_tick;
     price_t m_tickValue;
     price_t m_unit;
-    int     m_precision;
-    size_t  m_minTradeNumber;
-    size_t  m_maxTradeNumber;
+    int m_precision;
+    size_t m_minTradeNumber;
+    size_t m_maxTradeNumber;
 
-    //KRecordListPtr pKData[KQuery::INVALID_KTYPE];
+    // KRecordListPtr pKData[KQuery::INVALID_KTYPE];
     map<string, KRecordListPtr> pKData;
 
     Data();
-    Data(const string& market, const string& code,
-          const string& name, uint32 type, bool valid,
-          const Datetime& startDate, const Datetime& lastDate,
-          price_t tick, price_t tickValue, int precision,
-          size_t minTradeNumber, size_t maxTradeNumber);
+    Data(const string& market, const string& code, const string& name, uint32 type, bool valid,
+         const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
+         int precision, size_t minTradeNumber, size_t maxTradeNumber);
 
     virtual ~Data();
 };
@@ -251,11 +244,10 @@ struct HKU_API Stock::Data {
  * 输出Stock信息，如：Stock(market, code, name, type, valid, startDatetime, lastDatetime)
  * @ingroup StockManage
  */
-HKU_API std::ostream& operator <<(std::ostream &os, const Stock& stock);
+HKU_API std::ostream& operator<<(std::ostream& os, const Stock& stock);
 
 /** @ingroup StockManage */
 typedef vector<Stock> StockList;
-
 
 /**
  * 获取Stock，目的是封装StockManager，客户端不直接使用StockManager对象
@@ -265,12 +257,10 @@ typedef vector<Stock> StockList;
  */
 Stock HKU_API getStock(const string& querystr);
 
-
-
 /* 用于将Stock实例作为map的key，一般建议使用stock.id做键值，
  * 否则map还要利用拷贝构造函数，创建新对象，效率低 */
-bool operator < (const Stock& s1, const Stock& s2);
-inline bool operator < (const Stock& s1, const Stock& s2) {
+bool operator<(const Stock& s1, const Stock& s2);
+inline bool operator<(const Stock& s1, const Stock& s2) {
     return s1.id() < s2.id();
 }
 
@@ -286,6 +276,6 @@ inline bool Stock::operator==(const Stock& stock) const {
     return (*this != stock) ? false : true;
 }
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* STOCK_H_ */

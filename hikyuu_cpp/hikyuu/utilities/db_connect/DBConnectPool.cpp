@@ -2,7 +2,7 @@
  * DBConnectPool.cpp
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-8-6
  *      Author: fasiondog
  */
@@ -12,7 +12,7 @@
 
 namespace hku {
 
-DBConnectPool::DBConnectPool(const Parameter& param): m_param(param) {
+DBConnectPool::DBConnectPool(const Parameter& param) : m_param(param) {
     for (int i = 0; i < MIN_SIZE; i++) {
         m_connectList.push_back(make_shared<SQLiteConnect>(param));
     }
@@ -39,4 +39,4 @@ void DBConnectPool::returnConnect(DBConnectPtr& p) {
     }
 }
 
-} /* namespace */
+}  // namespace hku

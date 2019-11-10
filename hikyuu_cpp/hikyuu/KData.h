@@ -113,10 +113,7 @@ inline KData::KData(const KData& x) : m_imp(x.m_imp) {}
 inline KData& KData::operator=(const KData& x) {
     if (this == &x)
         return *this;
-
-    if (m_imp != x.m_imp)
-        m_imp = x.m_imp;
-
+    m_imp = x.m_imp;
     return *this;
 }
 

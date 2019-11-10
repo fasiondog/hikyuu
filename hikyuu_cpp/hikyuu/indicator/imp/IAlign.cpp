@@ -1,6 +1,6 @@
 /*
  * IAlign.cpp
- * 
+ *
  *  Copyright (c) 2019, hikyuu.org
  *
  *  Created on: 2019-5-20
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IAlign)
 #endif
 
-
 namespace hku {
 
 IAlign::IAlign() : IndicatorImp("ALIGN", 1) {
     setParam<DatetimeList>("align_date_list", DatetimeList());
 }
 
-IAlign::~IAlign() {
-
-}
+IAlign::~IAlign() {}
 
 bool IAlign::check() {
     return true;
@@ -54,7 +51,7 @@ void IAlign::_calculate(const Indicator& ind) {
             return;
 
         } else {
-            //ind_total > total
+            // ind_total > total
             m_discard = 0;
             size_t offset = ind_total - total;
             if (ind.discard() > offset) {
@@ -83,7 +80,7 @@ void IAlign::_calculate(const Indicator& ind) {
                 _set(ind.get(ind_idx, r), i, r);
             }
             ind_idx++;
-        
+
         } else if (ind_date < dates[i]) {
             size_t j = ind_idx + 1;
             while (j < ind_total && ind.getDatetime(j) < dates[i]) {
@@ -93,8 +90,8 @@ void IAlign::_calculate(const Indicator& ind) {
             if (j >= ind_total) {
                 if (i >= 1) {
                     for (size_t r = 0; r < m_result_num; r++) {
-                        price_t val = ind.get(j-1, r);
-                        for(; i < total; i++) {
+                        price_t val = ind.get(j - 1, r);
+                        for (; i < total; i++) {
                             _set(val, i, r);
                         }
                     }
@@ -112,10 +109,9 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
-    bool all_not_null = false;
     m_discard = total;
     for (size_t i = 0; i < total; i++) {
-        all_not_null = true;
+        bool all_not_null = true;
         for (size_t r = 0; r < m_result_num; r++) {
             if (std::isnan(get(i, r))) {
                 all_not_null = false;
@@ -130,12 +126,10 @@ void IAlign::_calculate(const Indicator& ind) {
     }
 }
 
-
 Indicator HKU_API ALIGN(const DatetimeList& ref) {
     IndicatorImpPtr p = make_shared<IAlign>();
     p->setParam<DatetimeList>("align_date_list", ref);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

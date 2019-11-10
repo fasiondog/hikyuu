@@ -465,15 +465,18 @@ KRecord H5KDataDriver::_getOtherRecord(const string& market, const string& code,
         H5::DataSpace dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (pos >= total) {
+            dataspace.close();
             return result;
         }
+
+        dataspace.close();
 
         H5IndexRecord temp[2];
         if (pos == total - 1) {
             H5ReadIndexRecords(dataset, pos, 1, temp);
             group = h5file->openGroup("data");
             dataset = H5::DataSet(group.openDataSet(_tablename));
-            H5::DataSpace dataspace = dataset.getSpace();
+            dataspace = dataset.getSpace();
             temp[1].start = dataspace.getSelectNpoints();
             dataspace.close();
         } else {

@@ -2,7 +2,7 @@
  * SQLiteConnect.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-7-1
  *      Author: fasiondog
  */
@@ -24,7 +24,7 @@ namespace hku {
 /**
  * @ingroup SQLite
  */
-class HKU_API SQLiteConnect: public DBConnectBase {
+class HKU_API SQLiteConnect : public DBConnectBase {
 public:
     SQLiteConnect(const Parameter& param);
     virtual ~SQLiteConnect() {}
@@ -40,6 +40,6 @@ private:
     shared_ptr<sqlite3> m_db;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIYUU_DB_MANAGER_SQLITE_SQLITECONNECT_H */

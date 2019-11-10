@@ -1,6 +1,6 @@
 /*
  * GlobalInitializer.h
- * 
+ *
  * Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-11-01

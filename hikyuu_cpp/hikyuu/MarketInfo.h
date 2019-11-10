@@ -29,44 +29,51 @@ public:
      * @param code 基本指数：用于读取该市场的交易日历
      * @param lastDate 市场当前最后日期
      */
-    MarketInfo(const string& market, const string& name,
-               const string& description, const string& code,
-               const Datetime& lastDate);
+    MarketInfo(const string& market, const string& name, const string& description,
+               const string& code, const Datetime& lastDate);
 
     /** 获取市场简称 */
-    const string& market() const { return m_market; }
+    const string& market() const {
+        return m_market;
+    }
 
     /** 获取市场名称 */
-    const string& name() const { return m_name; }
+    const string& name() const {
+        return m_name;
+    }
 
     /** 获取市场描述 */
-    const string& description() const { return m_description; }
+    const string& description() const {
+        return m_description;
+    }
 
     /** 获取该市场对应的指数代码 */
-    const string& code() const { return m_code; }
+    const string& code() const {
+        return m_code;
+    }
 
     /** 获取市场数据的最后更新日期 */
-    Datetime lastDate() const { return m_lastDate; }
+    Datetime lastDate() const {
+        return m_lastDate;
+    }
 
     /** 仅用于python的__str__ */
     string toString() const;
 
 private:
-    string m_market;        //市场标识
-    string m_name;          //市场名称
-    string m_description;   //描述信息
-    string m_code;          //市场对应的指数代码，用于获取交易日历
-    Datetime m_lastDate;    //当前市场最后日期
+    string m_market;       //市场标识
+    string m_name;         //市场名称
+    string m_description;  //描述信息
+    string m_code;         //市场对应的指数代码，用于获取交易日历
+    Datetime m_lastDate;   //当前市场最后日期
 };
-
 
 /**
  * 输出市场信息，如：
  * MarketInfo(SH, 上海证劵交易所, 上海市场, 000001, 2011-Dec-06 00:00:00)
  * @ingroup StockManage
  */
-HKU_API std::ostream & operator<<(std::ostream &, const MarketInfo&);
-
+HKU_API std::ostream& operator<<(std::ostream&, const MarketInfo&);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -86,6 +93,6 @@ inline bool operator!=(const MarketInfo& m1, const MarketInfo& m2) {
     return m1.market() != m2.market();
 }
 
-} /* namespace hikyuu */
+}  // namespace hku
 
 #endif /* MARKETINFO_H_ */

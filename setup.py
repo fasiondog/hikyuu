@@ -87,7 +87,7 @@ def build_boost():
     else:
         cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
               './b2 release link=shared address-model=64 -j 4 --with-python --with-serialization; '\
-              './b2 release link=static address-model=64 -j 4 --with-date_time '\
+              './b2 release link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
               '--with-filesystem --with-system --with-test; '\
               'cd {current}'.format(boost=current_boost_root, current=current_dir)
         os.system(cmd)

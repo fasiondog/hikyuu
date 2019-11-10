@@ -1,6 +1,6 @@
 /*
  * IFilter.cpp
- * 
+ *
  *  Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2019-5-4
@@ -13,16 +13,13 @@
 BOOST_CLASS_EXPORT(hku::IFilter)
 #endif
 
-
 namespace hku {
 
 IFilter::IFilter() : IndicatorImp("FILTER", 1) {
     setParam<int>("n", 5);
 }
 
-IFilter::~IFilter() {
-
-}
+IFilter::~IFilter() {}
 
 bool IFilter::check() {
     if (getParam<int>("n") < 1) {
@@ -42,8 +39,6 @@ void IFilter::_calculate(const Indicator& ind) {
 
     int n = getParam<int>("n");
     size_t i = m_discard;
-    size_t len = total - m_discard;
-    len = len > n + 1 ? len - n - 1 : len;
     while (i < total) {
         if (ind[i] == 0.0) {
             _set(0.0, i);
@@ -62,12 +57,10 @@ void IFilter::_calculate(const Indicator& ind) {
     }
 }
 
-
 Indicator HKU_API FILTER(int n) {
     IndicatorImpPtr p = make_shared<IFilter>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
-
 
 } /* namespace hku */

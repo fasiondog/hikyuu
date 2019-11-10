@@ -66,26 +66,25 @@ public:
         }
         std::chrono::duration<double> sec = std::chrono::steady_clock::now() - m_start_time;
         std::ostringstream buf;
-        int width = 7;
         buf.fill(' ');
-        buf.precision(width - 1);
+        buf.precision(m_precision);
         if (sec.count() < 0.000001) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count() * 1000000000
+            buf << "spend time: " << std::setw(m_width) << std::right << sec.count() * 1000000000
                 << " ns | " << m_msg;
         } else if (sec.count() < 0.001) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count() * 1000000
+            buf << "spend time: " << std::setw(m_width) << std::right << sec.count() * 1000000
                 << " us | " << m_msg;
         } else if (sec.count() < 1) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count() * 1000
+            buf << "spend time: " << std::setw(m_width) << std::right << sec.count() * 1000
                 << " ms | " << m_msg;
         } else if (sec.count() > 60) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count() / 60 << "  m | "
-                << m_msg;
+            buf << "spend time: " << std::setw(m_width) << std::right << sec.count() / 60
+                << "  m | " << m_msg;
         } else if (sec.count() > 86400) {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count() / 360 << "  h | "
-                << m_msg;
+            buf << "spend time: " << std::setw(m_width) << std::right << sec.count() / 360
+                << "  h | " << m_msg;
         } else {
-            buf << "spend time: " << std::setw(width) << std::right << sec.count() << "  s | "
+            buf << "spend time: " << std::setw(m_width) << std::right << sec.count() << "  s | "
                 << m_msg;
         }
 
@@ -104,6 +103,8 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> m_start_time;
 
     static bool m_closed;
+    static const int m_width = 7;
+    static constexpr int m_precision = m_width - 1;
     friend void HKU_API close_spend_time();
     friend void HKU_API open_spend_time();
 };

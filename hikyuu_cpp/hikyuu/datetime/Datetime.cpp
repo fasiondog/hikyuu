@@ -28,11 +28,11 @@ Datetime::Datetime(unsigned long long datetime) {
     }
 
     unsigned long long year, month, day, hh, mm;
-    year  = datetime / 100000000;
+    year = datetime / 100000000;
     month = (datetime - year * 100000000) / 1000000;
-    day   = (datetime - datetime / 1000000 * 1000000) / 10000;
-    hh    = (datetime - datetime / 10000 * 10000) / 100;
-    mm    = (datetime - datetime / 100 * 100);
+    day = (datetime - datetime / 1000000 * 1000000) / 10000;
+    hh = (datetime - datetime / 10000 * 10000) / 100;
+    mm = (datetime - datetime / 100 * 100);
     bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
     if (hh >= 24) {
         throw std::out_of_range("Hour value is out of rang 0..23");
@@ -46,9 +46,7 @@ Datetime::Datetime(unsigned long long datetime) {
 Datetime& Datetime::operator=(const Datetime& d) {
     if (this == &d)
         return *this;
-
-    if (m_data != d.m_data)
-        m_data = d.m_data;
+    m_data = d.m_data;
     return *this;
 }
 
@@ -96,7 +94,7 @@ Datetime Datetime::today() {
 DatetimeList HKU_API getDateRange(const Datetime& start, const Datetime& end) {
     DatetimeList result;
     bd::date start_day = start.date();
-    bd::date end_day   = end.date();
+    bd::date end_day = end.date();
     bd::date_period dp(start_day, end_day);
     bd::day_iterator iter = dp.begin();
     for (; iter != dp.end(); ++iter) {
@@ -115,7 +113,7 @@ Datetime Datetime::dateOfWeek(int day) const {
     } else if (dd > 6) {
         dd = 6;
     }
-    int today       = dayOfWeek();
+    int today = dayOfWeek();
     Datetime result = date() + bd::date_duration(dd - today);
     if (result > Datetime::max()) {
         result = Datetime::max();
@@ -321,7 +319,7 @@ Datetime Datetime::preMonth() const {
         return result;
 
     try {
-        int m  = month();
+        int m = month();
         result = (m == 1) ? Datetime(year() - 1, 12, 1) : Datetime(year(), m - 1, 1);
     } catch (...) {
         result = Datetime::min();
@@ -335,7 +333,7 @@ Datetime Datetime::preQuarter() const {
         return result;
 
     try {
-        int m  = startOfQuarter().month();
+        int m = startOfQuarter().month();
         result = (m == 1) ? Datetime(year() - 1, 10, 1) : Datetime(year(), m - 3, 1);
     } catch (...) {
         result = Datetime::min();
@@ -350,7 +348,7 @@ Datetime Datetime::preHalfyear() const {
         return result;
 
     try {
-        int m  = startOfHalfyear().month();
+        int m = startOfHalfyear().month();
         result = (m <= 6) ? Datetime(year() - 1, 7, 1) : Datetime(year(), 1, 1);
     } catch (...) {
         result = Datetime::min();

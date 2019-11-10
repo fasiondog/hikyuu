@@ -23,7 +23,7 @@ void hikyuu_init(const string& config_file_name) {
     } catch (std::logic_error& e) {
         HKU_FATAL("Reading configure error!\n{}", e.what());
         exit(1);
-    } catch(...) {
+    } catch (...) {
         HKU_WARN("Reading configure error! Don't know  error!");
         exit(1);
     }
@@ -64,9 +64,8 @@ void hikyuu_init(const string& config_file_name) {
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam);
 }
 
-
 string getVersion() {
     return HKU_VERSION;
 }
 
-} /* namespace */
+}  // namespace hku

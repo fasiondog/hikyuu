@@ -2,7 +2,7 @@
  * TransAction.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-7-11
  *      Author: fasiondog
  */
@@ -40,12 +40,12 @@ public:
 private:
     TransAction() = delete;
     TransAction(const TransAction&) = delete;
-    TransAction& operator=(const TransAction&) = delete;    
+    TransAction& operator=(const TransAction&) = delete;
 
 private:
     DBConnectPtr m_driver;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_DB_CONNECT_TRANSACTION_H */

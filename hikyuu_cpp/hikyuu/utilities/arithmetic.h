@@ -2,7 +2,7 @@
  * arithmetic.h
  *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-7-15
  *      Author: fasiondog
  */
@@ -29,15 +29,11 @@ void to_lower(std::string& s);
 void to_upper(std::string& s);
 
 inline void to_lower(std::string& s) {
-    std::transform(s.begin(), s.end(), s.begin(), 
-                   [](unsigned char c){ return std::tolower(c); }
-                   );
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
 }
 
 inline void to_upper(std::string& s) {
-    std::transform(s.begin(), s.end(), s.begin(), 
-                   [](unsigned char c){ return std::toupper(c); }
-                  );
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
 }
 
 /** @} */

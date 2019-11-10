@@ -2,7 +2,7 @@
  * DBConnectPool.h
  *
  *  Copyright (c) 2019, hikyuu.org
- * 
+ *
  *  Created on: 2019-8-5
  *      Author: fasiondog
  */
@@ -48,13 +48,12 @@ private:
     DBConnectPool& operator=(const DBConnectPool&) = delete;
 };
 
-
 /**
  * 从池中获取驱动辅助工具，以保证退出作用域时能够及时归还驱动至驱动池
  * @ingroup DBConnect
  */
 struct DBConnectGuard {
-    DBConnectGuard(DBConnectPool *pool): m_pool(pool) {
+    DBConnectGuard(DBConnectPool* pool) : m_pool(pool) {
         if (m_pool) {
             m_driver = m_pool->getConnect();
         }
@@ -72,9 +71,9 @@ struct DBConnectGuard {
 
 private:
     DBConnectPtr m_driver;
-    DBConnectPool *m_pool;
+    DBConnectPool* m_pool;
 };
 
-} /* namespace */
+}  // namespace hku
 
 #endif /* HIKYUU_DB_CONNECT_DBCONNECTPOOL_H */
