@@ -17,14 +17,18 @@
 namespace hku {
 
 /**
- * 数据驱动基类
+ * 数据库连接基类
  * @ingroup DBConnect
  */
 class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
     PARAMETER_SUPPORT
 
 public:
-    DBConnectBase(const Parameter& param);
+    /**
+     * 构造函数
+     * @param param 数据库连接参数
+     */
+    explicit DBConnectBase(const Parameter& param);
     virtual ~DBConnectBase() = default;
 
     /** 开始事务 */
@@ -79,7 +83,6 @@ public:
      *       driver->save(a);
      *   }
      * @endcode
-     *
      */
     template <typename T>
     void save(const T& item);
@@ -200,14 +203,14 @@ inline int DBConnectBase::queryInt(const string& query) {
 //-------------------------------------------------------------------------
 
 template <typename T>
-void DBConnectBase::save(const T& x) {
-    if (x.id() == 0) {
+void DBConnectBase::save(const T& item) {
+    if (item.id() == 0) {
         SQLStatementPtr st = getStatement(T::getInsertSQL());
-        x.save(st);
+        item.save(st);
         st->exec();
     } else {
         SQLStatementPtr st = getStatement(T::getUpdateSQL());
-        x.update(st);
+        item.update(st);
         st->exec();
     }
 }
@@ -249,7 +252,7 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
 }
 
 template <typename T>
-void DBConnectBase::load(T& x, const string& where) {
+void DBConnectBase::load(T& item, const string& where) {
     std::ostringstream sql;
     if (where != "") {
         sql << T::getSelectSQL() << " where " << where << " limit 1";
@@ -259,12 +262,12 @@ void DBConnectBase::load(T& x, const string& where) {
     SQLStatementPtr st = getStatement(sql.str());
     st->exec();
     if (st->moveNext()) {
-        x.load(st);
+        item.load(st);
     }
 }
 
 template <typename Container>
-void DBConnectBase::batchLoad(Container& con, const string& where) {
+void DBConnectBase::batchLoad(Container& container, const string& where) {
     std::ostringstream sql;
     if (where != "") {
         sql << Container::value_type::getSelectSQL() << " where " << where;
@@ -276,7 +279,7 @@ void DBConnectBase::batchLoad(Container& con, const string& where) {
     while (st->moveNext()) {
         typename Container::value_type tmp;
         tmp.load(st);
-        con.push_back(tmp);
+        container.push_back(tmp);
     }
 }
 

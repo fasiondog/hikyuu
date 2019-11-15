@@ -21,6 +21,9 @@
 
 namespace hku {
 
+/**
+ * 函数及函数对象等包装器实现移动语义，以便线程池支持不同类型的任务
+ */
 class FuncWrapper {
 public:
     FuncWrapper() = default;
@@ -28,23 +31,24 @@ public:
     FuncWrapper(FuncWrapper&) = delete;
     FuncWrapper& operator=(const FuncWrapper&) = delete;
 
+    /** 移动构造函数，实现对函数及函数对象等任务包装 */
     template <typename F>
     FuncWrapper(F&& f) : impl(new impl_type<F>(std::move(f))) {}
 
+    /** 执行被包装的任务 */
     void operator()() {
-        if (impl)
+        if (impl) {
             impl->call();
+        }
     }
 
+    /** 移动构造函数 */
     FuncWrapper(FuncWrapper&& other) : impl(std::move(other.impl)) {}
 
+    /** 移动复制函数 */
     FuncWrapper& operator=(FuncWrapper&& other) {
         impl = std::move(other.impl);
         return *this;
-    }
-
-    bool is_stop_task() const {
-        return impl ? false : true;
     }
 
 private:

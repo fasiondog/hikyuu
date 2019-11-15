@@ -1,5 +1,5 @@
 /*
- * DBManager.h
+ * DBConnect.h
  *
  *  Copyright (c) 2019, hikyuu.org
  *
@@ -11,7 +11,6 @@
 #define HIKYUU_DB_CONNECT_H
 
 #include "DBConnectBase.h"
-#include "DBConnectPool.h"
 #include "SQLStatementBase.h"
 #include "TransAction.h"
 #include "TableMacro.h"

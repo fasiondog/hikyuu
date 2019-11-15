@@ -14,24 +14,18 @@
 
 namespace hku {
 
+// 自动关闭 sqlite3 数据库资源
 class Sqlite3Closer {
 public:
-    void operator()(sqlite3* db) {
+    void operator()(sqlite3* db) const {
         if (db) {
             sqlite3_close(db);
-            /*#ifdef __ANDROID__
-                        __android_log_print(ANDROID_LOG_INFO, "YIHUA", "Closed Sqlite3 database!");
-            #else
-                        //don't use log output(HKU_TRACE...) when exiting!
-                        std::cout << "Closed Sqlite3 database!" << std::endl;
-            #endif*/
         }
     }
 };
 
 // sqlite3 多线程处理时，等待其他锁释放回调处理
 static int sqlite_busy_call_back(void* ptr, int count) {
-    // std::this_thread::sleep_for(std::chrono::milliseconds(200));
     std::this_thread::yield();
     return 1;
 }
@@ -77,9 +71,8 @@ SQLStatementPtr SQLiteConnect::getStatement(const string& sql_statement) {
 }
 
 bool SQLiteConnect::tableExist(const string& tablename) {
-    std::ostringstream sql;
-    sql << "select count(1) from sqlite_master where name = '" << tablename << "'";
-    SQLStatementPtr st = getStatement(sql.str());
+    SQLStatementPtr st =
+      getStatement(fmt::format("select count(1) from sqlite_master where name='{}'", tablename));
     st->exec();
     bool result = false;
     if (st->moveNext()) {

@@ -22,7 +22,15 @@ namespace hku {
 class HKU_API SQLiteStatement : public SQLStatementBase {
 public:
     SQLiteStatement() = delete;
+
+    /**
+     * 构造函数
+     * @param driver 数据库连接
+     * @param sql_statement SQL语句
+     */
     SQLiteStatement(const DBConnectPtr& driver, const string& sql_statement);
+
+    /** 析构函数 */
     virtual ~SQLiteStatement();
 
     virtual bool sub_isValid() const override;
@@ -45,7 +53,8 @@ private:
     void _reset();
 
 private:
-    bool m_needs_reset;
+    bool m_needs_reset;  // true if sqlite3_step() has been called more recently than
+                         // sqlite3_reset()
     int m_step_status;
     bool m_at_first_step;
     shared_ptr<sqlite3> m_db;

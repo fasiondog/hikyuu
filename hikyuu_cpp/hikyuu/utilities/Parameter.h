@@ -109,6 +109,7 @@ public:
 
     Parameter& operator=(const Parameter&);
 
+    /** 判断输入对象是否属于支持的类型 */
     static bool support(const boost::any&);
 
     /** 获取所有参数名称列表 */
@@ -121,7 +122,7 @@ public:
     string getNameValueList() const;
 
     /** 是否存在指定名称的参数 */
-    bool have(const string& name) const {
+    bool have(const string& name) const noexcept {
         return m_params.count(name) == 0 ? false : true;
     }
 
@@ -290,7 +291,7 @@ public:                                                         \
         m_params = param;                                       \
     }                                                           \
                                                                 \
-    bool haveParam(const string& name) const {                  \
+    bool haveParam(const string& name) const noexcept {         \
         return m_params.have(name);                             \
     }                                                           \
                                                                 \

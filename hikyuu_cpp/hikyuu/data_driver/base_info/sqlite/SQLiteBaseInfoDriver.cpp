@@ -35,7 +35,7 @@ bool SQLiteBaseInfoDriver::_init() {
         return false;
     }
 
-    m_pool = new DBConnectPool(m_params);
+    m_pool = new ConnectPool<SQLiteConnect>(m_params);
     return true;
 }
 
@@ -45,8 +45,7 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
         return false;
     }
 
-    DBConnectGuard dbGuard(m_pool);
-    auto con = dbGuard.getConnect();
+    auto con = m_pool->getConnect();
 
     vector<MarketInfoTable> infoTables;
     try {
@@ -81,8 +80,7 @@ bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
         return false;
     }
 
-    DBConnectGuard dbGuard(m_pool);
-    auto con = dbGuard.getConnect();
+    auto con = m_pool->getConnect();
 
     vector<StockTypeInfoTable> infoTables;
     try {
@@ -111,8 +109,7 @@ bool SQLiteBaseInfoDriver::_loadStock() {
         return false;
     }
 
-    DBConnectGuard dbGuard(m_pool);
-    auto con = dbGuard.getConnect();
+    auto con = m_pool->getConnect();
 
     vector<MarketInfoTable> marketTable;
     try {
@@ -187,8 +184,7 @@ StockWeightList SQLiteBaseInfoDriver::_getStockWeightList(uint64 stockid) {
         return result;
     }
 
-    DBConnectGuard dbGuard(m_pool);
-    auto con = dbGuard.getConnect();
+    auto con = m_pool->getConnect();
     HKU_ASSERT(con);
 
     vector<StockWeightTable> table;
@@ -242,8 +238,7 @@ Parameter SQLiteBaseInfoDriver ::getFinanceInfo(const string& market, const stri
         << " and f.stockid = s.stockid"
         << " order by updated_date DESC limit 1";
 
-    DBConnectGuard dbGuard(m_pool);
-    auto con = dbGuard.getConnect();
+    auto con = m_pool->getConnect();
 
     auto st = con->getStatement(buf.str());
     st->exec();

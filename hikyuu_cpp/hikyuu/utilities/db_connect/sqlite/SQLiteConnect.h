@@ -17,16 +17,28 @@
 namespace hku {
 
 /**
- * @defgroup SQLite SQLite3 数据库连接
+ * @defgroup SQLite SQLite3 driver SQLITE3 数据驱动
  * @ingroup DBConnect
  */
 
 /**
+ * SQLite连接
  * @ingroup SQLite
  */
 class HKU_API SQLiteConnect : public DBConnectBase {
 public:
-    SQLiteConnect(const Parameter& param);
+    /**
+     * 构造函数
+     * @param param 数据库连接参数,支持如下参数：
+     * <pre>
+     * string db - 数据库文件名
+     * int flags - SQLite连接方式：SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX
+     *            （具体可参考 SQLite 帮助）
+     * </pre>
+     */
+    explicit SQLiteConnect(const Parameter& param);
+
+    /** 析构函数 */
     virtual ~SQLiteConnect() {}
 
     virtual void exec(const string& sql_string) override;
