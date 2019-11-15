@@ -4,7 +4,10 @@
     :alt: Hikyuu
 
 .. image:: https://travis-ci.org/fasiondog/hikyuu.svg?branch=master
-    :target: https://travis-ci.org/fasiondog/hikyuu    
+    :target: https://travis-ci.org/fasiondog/hikyuu
+    
+.. image:: https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg
+    :target: https://github.com/fasiondog/hikyuu/actions
 
 .. image:: https://img.shields.io/github/license/mashape/apistatus.svg
     :target: https://github.com/fasiondog/hikyuu/blob/master/LICENSE.txt
