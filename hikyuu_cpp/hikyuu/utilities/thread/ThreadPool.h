@@ -22,7 +22,7 @@ namespace hku {
 /**
  * @brief 线程池
  * @details
- * @ingroup Utilities
+ * @ingroup ThreadPool
  */
 class ThreadPool {
 public:
