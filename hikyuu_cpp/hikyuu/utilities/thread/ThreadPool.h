@@ -15,6 +15,7 @@
 #include <thread>
 #include <chrono>
 #include <vector>
+#include "ThreadSafeQueue.h"
 #include "WorkStealQueue.h"
 
 namespace hku {
@@ -39,14 +40,9 @@ public:
     : m_done(false), m_init_finished(false), m_worker_num(n), m_current_index(0) {
         try {
             for (size_t i = 0; i < m_worker_num; i++) {
-                // 创建工作线程的任务队列
+                // 创建工作线程及其任务队列
                 m_queues.push_back(std::unique_ptr<WorkStealQueue>(new WorkStealQueue));
-
-                // 创建工作线程，并获取线程局部变量 m_local_finish_until_empty 的地址
-                std::promise<bool*> promise;
-                m_threads.push_back(
-                  std::thread(&ThreadPool::worker_thread, this, i, std::ref(promise)));
-                m_finish_until_empty.push_back(promise.get_future().get());
+                m_threads.push_back(std::thread(&ThreadPool::worker_thread, this, i));
             }
         } catch (...) {
             m_done = true;
@@ -56,14 +52,11 @@ public:
     }
 
     /**
-     * 析构函数，等待各线程完成内部任务并结束退出
+     * 析构函数，等待并阻塞至线程池内所有任务完成
      */
     ~ThreadPool() {
-        m_done = true;
-        for (size_t i = 0; i < m_worker_num; i++) {
-            if (m_threads[i].joinable()) {
-                m_threads[i].join();
-            }
+        if (!m_done) {
+            join();
         }
     }
 
@@ -86,13 +79,21 @@ public:
             // 本地线程任务从前部入队列（递归成栈）
             m_local_work_queue->push_front(std::move(task));
         } else {
-            //主线程任务从后部入队列（FIFO）
-            m_queues[m_current_index++]->push_back(std::move(task));
-            if (m_current_index >= m_worker_num) {
-                m_current_index = 0;
-            }
+            m_master_work_queue.push(std::move(task));
         }
         return res;
+    }
+
+    /**
+     * 等待各线程完成当前执行的任务后立即结束退出
+     */
+    void stop() {
+        m_done = true;
+        for (size_t i = 0; i < m_worker_num; i++) {
+            if (m_threads[i].joinable()) {
+                m_threads[i].join();
+            }
+        }
     }
 
     /**
@@ -102,7 +103,7 @@ public:
     void join() {
         // 指示各工作线程在未获取到工作任务时，停止运行
         for (size_t i = 0; i < m_worker_num; i++) {
-            (*m_finish_until_empty[i]) = true;
+            m_master_work_queue.push(std::move(FuncWrapper()));
         }
 
         // 等待线程结束
@@ -111,6 +112,8 @@ public:
                 m_threads[i].join();
             }
         }
+
+        m_done = true;
     }
 
 private:
@@ -120,38 +123,45 @@ private:
     size_t m_worker_num;      // 工作线程数量
     size_t m_current_index;   // 指示从主线程提交任务时应提交至哪一个工作线程
 
-    std::vector<bool*> m_finish_until_empty;  // 指示无任务时终止线程（每个工作线程一个）
+    ThreadSafeQueue<task_type> m_master_work_queue;          // 主线程任务队列
     std::vector<std::unique_ptr<WorkStealQueue> > m_queues;  // 任务队列（每个工作线程一个）
     std::vector<std::thread> m_threads;                      // 工作线程
 
     // 线程本地变量
     inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
-    inline static thread_local size_t m_index = 0;                       //在线程池中的序号
-    inline static thread_local bool m_local_finish_until_empty = false;  // 未获取到任务时终止标识
+    inline static thread_local size_t m_index = 0;               //在线程池中的序号
     inline static thread_local bool m_thread_need_stop = false;  // 线程停止运行指示
 
-    void worker_thread(size_t index, std::promise<bool*>& promise) {
+    void worker_thread(size_t index) {
         m_thread_need_stop = false;
         m_index = index;
         m_local_work_queue = m_queues[m_index].get();
-        m_local_finish_until_empty = false;
-        promise.set_value(&m_local_finish_until_empty);
         while (!m_thread_need_stop && !m_done) {
             run_pending_task();
         }
     }
 
     void run_pending_task() {
-        // 从本地队列提前工作任务，如本地无任务则从其他工作队列偷取任务
-        // 如果都没有获取到工作任务，则检测 m_local_finish_until_empty 标识判断是否需要停止运行
+        // 从本地队列提前工作任务，如本地无任务则从主队列中提取任务
+        // 如果主队列中提取的任务是空任务，则认为需结束本线程，否则从其他工作队列中偷取任务
         task_type task;
-        if (pop_task_from_local_queue(task) || pop_task_from_other_thread_queue(task)) {
+        if (pop_task_from_local_queue(task)) {
             task();
-        } else if (m_local_finish_until_empty) {
-            m_thread_need_stop = true;
+        } else if (pop_task_from_master_queue(task)) {
+            if (!task.isNullTask()) {
+                task();
+            } else {
+                m_thread_need_stop = true;
+            }
+        } else if (pop_task_from_other_thread_queue(task)) {
+            task();
         } else {
             std::this_thread::yield();
         }
+    }
+
+    bool pop_task_from_master_queue(task_type& task) {
+        return m_master_work_queue.try_pop(task);
     }
 
     bool pop_task_from_local_queue(task_type& task) {
@@ -172,7 +182,7 @@ private:
         }
         return false;
     }
-};
+};  // namespace hku
 
 } /* namespace hku */
 

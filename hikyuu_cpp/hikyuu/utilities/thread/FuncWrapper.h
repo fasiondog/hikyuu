@@ -51,6 +51,11 @@ public:
         return *this;
     }
 
+    /** 是否是空任务，用于线程池判断是否在所有任务完成后终止运行 */
+    bool isNullTask() const {
+        return impl ? false : true;
+    }
+
 private:
     struct impl_base {
         virtual void call() = 0;
