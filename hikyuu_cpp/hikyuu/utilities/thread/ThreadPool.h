@@ -36,8 +36,7 @@ public:
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      */
-    explicit ThreadPool(size_t n)
-    : m_done(false), m_init_finished(false), m_worker_num(n), m_current_index(0) {
+    explicit ThreadPool(size_t n) : m_done(false), m_init_finished(false), m_worker_num(n) {
         try {
             for (size_t i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
@@ -121,7 +120,6 @@ private:
     std::atomic_bool m_done;  // 线程池全局需终止指示
     bool m_init_finished;     // 线程池是否初始化完毕
     size_t m_worker_num;      // 工作线程数量
-    size_t m_current_index;   // 指示从主线程提交任务时应提交至哪一个工作线程
 
     ThreadSafeQueue<task_type> m_master_work_queue;          // 主线程任务队列
     std::vector<std::unique_ptr<WorkStealQueue> > m_queues;  // 任务队列（每个工作线程一个）
