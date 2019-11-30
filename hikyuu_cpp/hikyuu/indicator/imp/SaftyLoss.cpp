@@ -61,7 +61,7 @@ void SaftyLoss::_calculate(const Indicator& data) {
     for (size_t i = start; i < total; ++i) {
         result = 0.0;
         for (size_t j = i + 1 - n2; j <= i; ++j) {
-            size_t sum = 0.0;
+            price_t sum = 0.0;
             size_t num = 0;
             for (size_t k = j + 2 - n1; k <= j; ++k) {
                 price_t pre = data[k - 1];
