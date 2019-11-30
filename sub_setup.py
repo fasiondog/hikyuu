@@ -18,7 +18,7 @@ if not hku_version:
 
 print('current hikyuu version:', hku_version)
 
-hku_name = "Hikyuu"
+hku_name = "hikyuu"
 #hku_version = "1.0.9"
 hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
@@ -36,6 +36,7 @@ hku_data_files = []
 
 packages = ['hikyuu',
             'hikyuu/config',
+            'hikyuu/config/block',
             'hikyuu/data',
             'hikyuu/data/mysql_upgrade',
             'hikyuu/data/sqlite_upgrade',

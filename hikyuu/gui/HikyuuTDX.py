@@ -61,7 +61,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             f.write(hku_config_template.hdf5_template.format(dir=data_dir))
 
         if not os.path.lexists(data_dir + '/block'):
-            shutil.copytree('../../config/block', data_dir + '/block')
+            current_dir = os.path.dirname(__file__)
+            dirname, _ = os.path.split(current_dir)
+            dirname = os.path.join(dirname, 'config/block')
+            shutil.copytree(dirname, data_dir + '/block')
             os.remove(data_dir + '/block/__init__.py')
             
         if not os.path.lexists(data_dir + '/tmp'):
