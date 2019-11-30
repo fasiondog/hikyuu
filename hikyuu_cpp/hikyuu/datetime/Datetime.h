@@ -40,10 +40,10 @@ public:
     Datetime(int year, int month, int day, int hh = 0, int mm = 0, int sec = 0);
 
     /** 从boost::gregorian::date构造日期类型 */
-    Datetime(const bd::date&);
+    explicit Datetime(const bd::date&);
 
     /** 从boost::posix_time::ptime构造 */
-    Datetime(const bt::ptime&);
+    explicit Datetime(const bt::ptime&);
 
     /** 通过数字方式构造日期类型，数字格式：YYYYMMDDhhmmss，如 200101010000 */
     explicit Datetime(unsigned long long);

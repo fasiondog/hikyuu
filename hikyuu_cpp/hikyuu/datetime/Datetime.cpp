@@ -114,7 +114,7 @@ Datetime Datetime::dateOfWeek(int day) const {
         dd = 6;
     }
     int today = dayOfWeek();
-    Datetime result = date() + bd::date_duration(dd - today);
+    Datetime result(date() + bd::date_duration(dd - today));
     if (result > Datetime::max()) {
         result = Datetime::max();
     } else if (result < Datetime::min()) {
@@ -128,7 +128,7 @@ Datetime Datetime::startOfMonth() const {
 }
 
 Datetime Datetime::endOfMonth() const {
-    return *this == Null<Datetime>() ? *this : date().end_of_month();
+    return *this == Null<Datetime>() ? *this : Datetime(date().end_of_month());
 }
 
 Datetime Datetime::startOfYear() const {
@@ -146,9 +146,9 @@ Datetime Datetime::startOfWeek() const {
     Datetime result;
     int today = dayOfWeek();
     if (today == 0) {
-        result = date() + bd::date_duration(-6);
+        result = Datetime(date() + bd::date_duration(-6));
     } else {
-        result = date() + bd::date_duration(1 - today);
+        result = Datetime(date() + bd::date_duration(1 - today));
         ;
     }
 
@@ -165,9 +165,9 @@ Datetime Datetime::endOfWeek() const {
     Datetime result;
     int today = dayOfWeek();
     if (today == 0) {
-        result = date();
+        result = Datetime(date());
     } else {
-        result = date() + bd::date_duration(7 - today);
+        result = Datetime(date() + bd::date_duration(7 - today));
     }
 
     if (result > Datetime::max())
@@ -232,7 +232,7 @@ Datetime Datetime::endOfHalfyear() const {
 Datetime Datetime::nextDay() const {
     if (*this == Null<Datetime>() || *this == Datetime::max())
         return *this;
-    return date() + bd::date_duration(1);
+    return Datetime(date() + bd::date_duration(1));
 }
 
 Datetime Datetime::nextWeek() const {
@@ -240,7 +240,7 @@ Datetime Datetime::nextWeek() const {
     if (*this == Null<Datetime>())
         return result;
 
-    result = endOfWeek().date() + bd::date_duration(1);
+    result = Datetime(endOfWeek().date() + bd::date_duration(1));
     if (result > Datetime::max())
         result = Datetime::max();
 
@@ -252,7 +252,7 @@ Datetime Datetime::nextMonth() const {
     if (*this == Null<Datetime>())
         return result;
 
-    result = endOfMonth().date() + bd::date_duration(1);
+    result = Datetime(endOfMonth().date() + bd::date_duration(1));
     if (result > Datetime::max())
         result = Datetime::max();
 
@@ -264,7 +264,7 @@ Datetime Datetime::nextQuarter() const {
     if (*this == Null<Datetime>())
         return result;
 
-    result = endOfQuarter().date() + bd::date_duration(1);
+    result = Datetime(endOfQuarter().date() + bd::date_duration(1));
     if (result > Datetime::max())
         result = Datetime::max();
 
@@ -276,7 +276,7 @@ Datetime Datetime::nextHalfyear() const {
     if (*this == Null<Datetime>())
         return result;
 
-    result = endOfHalfyear().date() + bd::date_duration(1);
+    result = Datetime(endOfHalfyear().date() + bd::date_duration(1));
     if (result > Datetime::max())
         result = Datetime::max();
 
@@ -288,7 +288,7 @@ Datetime Datetime::nextYear() const {
     if (*this == Null<Datetime>())
         return result;
 
-    result = endOfYear().date() + bd::date_duration(1);
+    result = Datetime(endOfYear().date() + bd::date_duration(1));
     if (result > Datetime::max())
         result = Datetime::max();
     return result;
@@ -297,7 +297,7 @@ Datetime Datetime::nextYear() const {
 Datetime Datetime::preDay() const {
     if (*this == Null<Datetime>() || *this == Datetime::min())
         return *this;
-    return date() - bd::date_duration(1);
+    return Datetime(date() - bd::date_duration(1));
 }
 
 Datetime Datetime::preWeek() const {

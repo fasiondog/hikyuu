@@ -6,10 +6,10 @@
  */
 
 #ifdef TEST_ALL_IN_ONE
-    #include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #else
-    #define BOOST_TEST_MODULE test_hikyuu_datetime
-    #include <boost/test/unit_test.hpp>
+#define BOOST_TEST_MODULE test_hikyuu_datetime
+#include <boost/test/unit_test.hpp>
 #endif
 
 #include <hikyuu/datetime/Datetime.h>
@@ -24,7 +24,7 @@ using namespace hku;
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_Datetime ) {
+BOOST_AUTO_TEST_CASE(test_Datetime) {
     Datetime null_datetime = Null<Datetime>();
 
     /** @arg 默认无参构造函数返回Null<Datetime>() */
@@ -40,23 +40,23 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
 
     /** @arg 从bd::date 隐式构造 */
     d = Datetime(200101010110);
-    d = d.date();
+    d = Datetime(d.date());
     BOOST_CHECK(Datetime(200101010000) == d);
 
     /** @arg 非法年份 */
-    BOOST_CHECK_THROW(Datetime(99999,1,1), std::out_of_range);
+    BOOST_CHECK_THROW(Datetime(99999, 1, 1), std::out_of_range);
     BOOST_CHECK_THROW(Datetime(000001010000L), std::out_of_range);
 
     /** @arg 非法月份 */
-    BOOST_CHECK_THROW(Datetime(2010,13,1), std::out_of_range);
-    BOOST_CHECK_THROW(Datetime(2010,0,1), std::out_of_range);
+    BOOST_CHECK_THROW(Datetime(2010, 13, 1), std::out_of_range);
+    BOOST_CHECK_THROW(Datetime(2010, 0, 1), std::out_of_range);
 
     BOOST_CHECK_THROW(Datetime(201013010000L), std::out_of_range);
     BOOST_CHECK_THROW(Datetime(201000010000L), std::out_of_range);
 
     /** @arg 非法日期 */
-    BOOST_CHECK_THROW(Datetime(2010,1,0), std::out_of_range);
-    BOOST_CHECK_THROW(Datetime(2010,1,32), std::out_of_range);
+    BOOST_CHECK_THROW(Datetime(2010, 1, 0), std::out_of_range);
+    BOOST_CHECK_THROW(Datetime(2010, 1, 32), std::out_of_range);
 
     BOOST_CHECK_THROW(Datetime(201001000000L), std::out_of_range);
     BOOST_CHECK_THROW(Datetime(201001320000L), std::out_of_range);
@@ -127,9 +127,9 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
 
     /** @arg 测试 endOfDay */
     BOOST_CHECK(null_datetime.endOfDay() == null_datetime);
-    BOOST_CHECK(Datetime::min().endOfDay() == Datetime(1400,1,1,23,59,59));
+    BOOST_CHECK(Datetime::min().endOfDay() == Datetime(1400, 1, 1, 23, 59, 59));
     BOOST_CHECK(Datetime::max().endOfDay() == Datetime::max());
-    BOOST_CHECK(Datetime(201812310110).endOfDay() == Datetime(2018,12,31,23,59,59));
+    BOOST_CHECK(Datetime(201812310110).endOfDay() == Datetime(2018, 12, 31, 23, 59, 59));
 
     /** @arg 测试 startOfWeek */
     BOOST_CHECK(null_datetime.startOfWeek() == null_datetime);
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     BOOST_CHECK(Datetime(201901050000).endOfWeek() == Datetime(201901060000));
     BOOST_CHECK(Datetime(201901060000).endOfWeek() == Datetime(201901060000));
     BOOST_CHECK(Datetime(201901090000).endOfWeek() == Datetime(201901130000));
-    
+
     /** @arg 测试 startOfMonth */
     BOOST_CHECK(null_datetime.startOfMonth() == null_datetime);
     BOOST_CHECK(Datetime::min().startOfMonth() == Datetime::min());
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
     BOOST_CHECK(Datetime::max().startOfYear() == Datetime(9999, 1, 1));
     BOOST_CHECK(Datetime(201901050000).startOfYear() == Datetime(201901010000));
     BOOST_CHECK(Datetime(201911050000).startOfYear() == Datetime(201901010000));
-    
+
     /** @arg 测试 endOfYear */
     BOOST_CHECK(null_datetime.endOfYear() == null_datetime);
     BOOST_CHECK(Datetime::min().endOfYear() == Datetime(1400, 12, 31));
@@ -384,15 +384,12 @@ BOOST_AUTO_TEST_CASE( test_Datetime ) {
 }
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_Datetime_related_operator ) {
+BOOST_AUTO_TEST_CASE(test_Datetime_related_operator) {
     /** @arg 小于比较 */
     BOOST_CHECK(Datetime(200101010000) < Null<Datetime>());
     BOOST_CHECK(Datetime(200101010000) < Datetime::max());
     BOOST_CHECK(Datetime::min() < Datetime(200101010000));
     BOOST_CHECK(Datetime(200101010000) < Datetime(200101020000));
-
 }
 
 /** @} */
-
-
