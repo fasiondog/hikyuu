@@ -103,7 +103,8 @@ string TradeManager::toString() const {
         KData k = iter->stock.getKData(query);
         price_t cur_val = k[0].closePrice * iter->number;
         price_t bonus = cur_val - invest;
-        DatetimeList date_list = sm.getTradingCalendar(KQueryByDate(iter->takeDatetime.date()));
+        DatetimeList date_list =
+          sm.getTradingCalendar(KQueryByDate(Datetime(iter->takeDatetime.date())));
         os << "    " << iter->stock.market_code() << " " << iter->stock.name() << " "
            << iter->takeDatetime << " " << date_list.size() << " " << iter->number << " " << invest
            << " " << cur_val << " " << bonus << " " << 100 * bonus / invest << "% "
@@ -1680,8 +1681,8 @@ void TradeManager::_update(const Datetime& datetime) {
     }
 
     //权息信息查询日期范围
-    bd::date start_date = lastDatetime().date() + bd::days(1);
-    bd::date end_date = datetime.date() + bd::days(1);
+    Datetime start_date(lastDatetime().date() + bd::days(1));
+    Datetime end_date(datetime.date() + bd::days(1));
 
     int precision = getParam<int>("precision");
     price_t total_bonus = 0.0;

@@ -27,7 +27,7 @@ price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
     PositionRecord position = m_tm->getPosition(stk);
     Datetime take_date = position.takeDatetime;
 
-    KQuery query = KQueryByDate(take_date.date(), datetime.date(), KQuery::DAY);
+    KQuery query = KQueryByDate(Datetime(take_date.date()), Datetime(datetime.date()), KQuery::DAY);
 
     size_t start_out, end_out;
     if (stk.getIndexRange(query, start_out, end_out)) {
