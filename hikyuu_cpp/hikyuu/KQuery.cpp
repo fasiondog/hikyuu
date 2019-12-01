@@ -28,19 +28,13 @@ const string KQuery::HOUR6("HOUR5");
 const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
-KQuery KQueryByIndex(int64 start, int64 end, KQuery::KType dataType,
-                     KQuery::RecoverType recoverType) {
-    return KQuery(start, end, dataType, recoverType, KQuery::INDEX);
-}
-
-KQuery KQueryByDate(const Datetime& start, const Datetime& end, KQuery::KType dataType,
-                    KQuery::RecoverType recoverType) {
-    int64 start_number = start == Null<Datetime>() ? (int64)start.number()
-                                                   : (int64)(start.number() * 100 + start.second());
-    int64 end_number =
-      end == Null<Datetime>() ? (int64)end.number() : (int64)(end.number() * 100 + end.second());
-    return KQuery(start_number, end_number, dataType, recoverType, KQuery::DATE);
-}
+KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverType)
+: m_start(start == Null<Datetime>() ? (int64)start.number()
+                                    : (int64)(start.number() * 100 + start.second())),
+  m_end(end == Null<Datetime>() ? (int64)end.number() : (int64)(end.number() * 100 + end.second())),
+  m_queryType(KQuery::DATE),
+  m_dataType(ktype),
+  m_recoverType(recoverType) {}
 
 Datetime KQuery::startDatetime() const {
     if (m_queryType != DATE || (uint64)m_start == Null<uint64>()) {

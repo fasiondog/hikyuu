@@ -107,6 +107,16 @@ public:
       m_recoverType(recoverType) {}
 
     /**
+     * 按指定日期查询 K 线，范围[start, end)
+     * @param start 起始日期
+     * @param end  结束日期
+     * @param dataType K线类型
+     * @param recoverType 复权类型
+     */
+    KQuery(Datetime start, Datetime end = Null<Datetime>(), KType ktype = DAY,
+           RecoverType recoverType = NO_RECOVER);
+
+    /**
      * 按索引方式查询时，返回指定的起始索引，否则返回Null<int64>()
      */
     int64 start() const {
@@ -185,6 +195,11 @@ KQuery HKU_API KQueryByIndex(int64 start = 0, int64 end = Null<int64>(),
                              KQuery::KType dataType = KQuery::DAY,
                              KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
+inline KQuery KQueryByIndex(int64 start, int64 end, KQuery::KType dataType,
+                            KQuery::RecoverType recoverType) {
+    return KQuery(start, end, dataType, recoverType, KQuery::INDEX);
+}
+
 /**
  * 构造按日期方式K线查询，范围[startDatetime, endDatetime)
  * @param start 起始日期
@@ -198,6 +213,11 @@ KQuery HKU_API KQueryByDate(const Datetime& start = Datetime::min(),
                             const Datetime& end = Null<Datetime>(),
                             KQuery::KType dataType = KQuery::DAY,
                             KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
+
+inline KQuery KQueryByDate(const Datetime& start, const Datetime& end, KQuery::KType dataType,
+                           KQuery::RecoverType recoverType) {
+    return KQuery(start, end, dataType, recoverType);
+}
 
 /**
  * 输出KQuery信息，如：KQuery(start, end, queryType, kType, recoverType)

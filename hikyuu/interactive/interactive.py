@@ -24,10 +24,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#===============================================================================
+# ===============================================================================
 # History:
 # 1. 20120926, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import urllib
 import sys
@@ -59,24 +59,24 @@ iodog = OstreamRedirect()
 iodog.open()
 
 
-#==============================================================================
+# ==============================================================================
 # 引入扯线木偶
-#==============================================================================
-#Puppet是一套以同花顺交易客户端为核心的完整的闭环实盘交易系统框架。
-#来自："睿瞳深邃(https://github.com/Raytone-D" 感谢睿瞳深邃的大度共享 :-)
-#可以用：tm.regBroker(crtRB(Puppet())) 的方式注册进tm实例，实现实盘下单
+# ==============================================================================
+# Puppet是一套以同花顺交易客户端为核心的完整的闭环实盘交易系统框架。
+# 来自："睿瞳深邃(https://github.com/Raytone-D" 感谢睿瞳深邃的大度共享 :-)
+# 可以用：tm.regBroker(crtRB(Puppet())) 的方式注册进tm实例，实现实盘下单
 if sys.platform == 'win32':
     from .puppet import *
 
 
-#==============================================================================
+# ==============================================================================
 #
 # 读取配置信息，并初始化
 #
-#==============================================================================
+# ==============================================================================
 config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
 if not os.path.exists(config_file):
-    #检查老版本配置是否存在，如果存在可继续使用，否则异常终止
+    # 检查老版本配置是否存在，如果存在可继续使用，否则异常终止
     data_config_file = os.path.expanduser('~') + "/.hikyuu/data_dir.ini"
     data_config = configparser.ConfigParser()
     data_config.read(data_config_file)
@@ -88,30 +88,29 @@ if not os.path.exists(config_file):
     if not os.path.exists(config_file):
         raise("未找到配置文件，请先使用数据导入工具导入数据（将自动生成配置文件）！！!")
 
-import configparser
 ini = configparser.ConfigParser()
 ini.read(config_file)
 hku_param = Parameter()
 hku_param.set("tmpdir", ini.get('hikyuu', 'tmpdir'))
 if ini.has_option('hikyuu', 'logger'):
     hku_param.set("logger", ini['hikyuu']['logger'])
-    
+
 base_param = Parameter()
 base_info_config = ini.options('baseinfo')
 for p in base_info_config:
     base_param.set(p, ini.get('baseinfo', p))
-    
+
 block_param = Parameter()
 block_config = ini.options('block')
 for p in block_config:
     block_param.set(p, ini.get('block', p))
-    
+
 preload_param = Parameter()
 preload_config = ini.options('preload')
 for p in preload_config:
-    #注意：proload参数是布尔类型
+    # 注意：proload参数是布尔类型
     preload_param.set(p, ini.getboolean('preload', p))
-    
+
 kdata_param = Parameter()
 kdata_config = ini.options('kdata')
 for p in kdata_config:
@@ -123,11 +122,11 @@ sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 set_log_level(LOG_LEVEL.WARN)
 
 
-#==============================================================================
+# ==============================================================================
 #
 # 引入blocka、blocksh、blocksz、blockg全局变量，便于交互式环境下使用
 #
-#==============================================================================
+# ==============================================================================
 
 blocka = Block("A", "ALL")
 for s in sm:
@@ -156,7 +155,7 @@ zsbk_cyb = blockg
 blockzxb = Block("A", "中小板")
 for s in blocksz:
     if s.code[:3] == "002":
-        blockzxb.add(s) 
+        blockzxb.add(s)
 zsbk_zxb = blockzxb
 
 zsbk_sz50 = sm.getBlock("指数板块", "上证50")
@@ -165,11 +164,11 @@ zsbk_hs300 = sm.getBlock("指数板块", "沪深300")
 zsbk_zz100 = sm.getBlock("指数板块", "沪深300")
 
 
-#==============================================================================
+# ==============================================================================
 #
 # 设置关键类型简称
 #
-#==============================================================================            
+# ==============================================================================
 O = OPEN
 C = CLOSE
 H = HIGH
@@ -178,6 +177,8 @@ A = AMO
 V = VOL
 D = Datetime
 K = None
+Q = Query
+
 
 def set_global_context(stk, query):
     """设置全局的 context
@@ -197,28 +198,29 @@ def set_global_context(stk, query):
 
 def get_global_context():
     """获取当前的全局上下文
-    
+
         :rtype: KData
     """
-    return C.getContext()    
+    return C.getContext()
+
 
 set_global_context(sm['sh000001'], Query(-150))
 
 
-#==============================================================================
+# ==============================================================================
 #
 # 设置默认绘图引擎
 #
-#==============================================================================            
+# ==============================================================================
 
 use_draw_engine('matplotlib')
 
 
-#==============================================================================
+# ==============================================================================
 #
 # 粗略的选股函数
 #
-#==============================================================================            
+# ==============================================================================
 
 def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=True):
     """
@@ -242,7 +244,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
     for s in blocka:
         if not s.valid:
             continue
-        
+
         q = QueryByDate(start, end)
         k = s.getKData(q)
         cond.setContext(k)
@@ -250,15 +252,15 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
             result.append(s)
             if print_out:
                 print(d[-1], s)
-                
+
     return result
 
 
-#==============================================================================
+# ==============================================================================
 #
 # 增加临时的实时数据更新函数 realtimeUpdate
 #
-#==============================================================================
+# ==============================================================================
 
 def UpdateOneRealtimeRecord_from_sina(tmpstr):
     try:
@@ -266,11 +268,12 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
             a = tmpstr.split(',')
             if len(a) < 9:
                 return
-            
-            open, close, high, low = float(a[1]), float(a[3]), float(a[4]), float(a[5])
+
+            open, close, high, low = float(a[1]), float(
+                a[3]), float(a[4]), float(a[5])
             transamount = float(a[9])
             transcount = float(a[8])
-                
+
             d = Datetime(a[-3]+" 00")
             temp = (open, high, low, close)
             if 0 in temp:
@@ -278,7 +281,7 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
 
             stockstr = a[0].split('=')
             stock = sm[stockstr[0][-8:]]
-            
+
             record = KRecord()
             record.datetime = d
             record.openPrice = open
@@ -289,10 +292,11 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
             record.transCount = transcount/100
 
             stock.realtimeUpdate(record)
-    
+
     except Exception as e:
         print(tmpstr)
         print(e)
+
 
 def UpdateOneRealtimeRecord_from_qq(tmpstr):
     try:
@@ -300,11 +304,12 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
             a = tmpstr.split('~')
             if len(a) < 9:
                 return
-            
-            open, close, high, low = float(a[5]), float(a[3]), float(a[33]), float(a[34])
+
+            open, close, high, low = float(a[5]), float(
+                a[3]), float(a[33]), float(a[34])
             transamount = float(a[36])
             transcount = float(a[37])
-                
+
             d = Datetime(int(a[30][:8] + '0000'))
             temp = (open, high, low, close)
             if 0 in temp:
@@ -312,7 +317,7 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
 
             stockstr = a[0].split('=')
             stock = sm[stockstr[0][-8:]]
-            
+
             record = KRecord()
             record.datetime = d
             record.openPrice = open
@@ -323,11 +328,12 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
             record.transCount = transcount/100
 
             stock.realtimeUpdate(record)
-    
+
     except Exception as e:
         print(tmpstr)
         print(e)
-        
+
+
 def realtimePartUpdate_from_sina(queryStr):
     result = urllib.request.urlopen(queryStr).read()
     try:
@@ -336,11 +342,12 @@ def realtimePartUpdate_from_sina(queryStr):
         print(result)
         print(e)
         return
-    
+
     result = result.split('\n')
     for tmpstr in result:
         UpdateOneRealtimeRecord_from_sina(tmpstr)
-        
+
+
 def realtimePartUpdate_from_qq(queryStr):
     result = urllib.request.urlopen(queryStr).read()
     try:
@@ -349,14 +356,15 @@ def realtimePartUpdate_from_qq(queryStr):
         print(result)
         print(e)
         return
-    
+
     result = result.split('\n')
     for tmpstr in result:
         UpdateOneRealtimeRecord_from_qq(tmpstr)
-                
+
+
 def realtimeUpdate_from_sina_qq(source):
     if source == 'sina':
-        queryStr = "http://hq.sinajs.cn/list=" 
+        queryStr = "http://hq.sinajs.cn/list="
         update_func = realtimePartUpdate_from_sina
         max_size = 140
     elif source == 'qq':
@@ -366,56 +374,56 @@ def realtimeUpdate_from_sina_qq(source):
     else:
         print('Not support!')
         return
-        
-    count  = 0
+
+    count = 0
     urls = []
     tmpstr = queryStr
     for stock in sm:
-        if stock.valid and stock.type in (constant.STOCKTYPE_A, 
+        if stock.valid and stock.type in (constant.STOCKTYPE_A,
                                           constant.STOCKTYPE_INDEX,
-                                          constant.STOCKTYPE_ETF, 
+                                          constant.STOCKTYPE_ETF,
                                           constant.STOCKTYPE_GEM):
             tmpstr += ("%s,") % (stock.market_code.lower())
             count = count + 1
             if count >= max_size:
-                #urls.append(tmpstr)
+                # urls.append(tmpstr)
                 update_func(tmpstr)
                 count = 0
                 tmpstr = queryStr
 
     if tmpstr != queryStr:
-        #urls.append(tmpstr)
+        # urls.append(tmpstr)
         update_func(tmpstr)
-   
-    #不用并行，防止过快，ip被网站屏蔽
+
+    # 不用并行，防止过快，ip被网站屏蔽
     #from multiprocessing import Pool
     #from multiprocessing.dummy import Pool as ThreadPool
     #pool = ThreadPool()
-    #if source == 'sina':
+    # if source == 'sina':
     #    pool.map(realtimePartUpdate_from_sina, urls)
-    #else:
+    # else:
     #    pool.map(realtimePartUpdate_from_qq, urls)
-    #pool.close()
-    #pool.join()
+    # pool.close()
+    # pool.join()
 
-    
+
 def realtimeUpdate_from_tushare():
     import tushare as ts
-    
-    #更新股票行情
+
+    # 更新股票行情
     df = ts.get_today_all()
     for i in range(len(df)):
         if df.ix[i, 'open'] == 0:
-            continue  #停牌
-        
+            continue  # 停牌
+
         code = df.ix[i][0]
         stock = getStock('sh' + code)
-        
+
         if stock.isNull() == True or stock.type != constant.STOCKTYPE_A:
             stock = getStock('sz' + code)
         if stock.isNull() == True:
             continue
-        
+
         record = KRecord()
         record.openPrice = df.ix[i, 'open']
         record.highPrice = df.ix[i, 'high']
@@ -423,13 +431,13 @@ def realtimeUpdate_from_tushare():
         record.closePrice = df.ix[i, 'trade']
         record.transAmount = float(df.ix[i, 'amount'])
         record.transCount = float(df.ix[i, 'volume'])
-        
+
         from datetime import date
         d = date.today()
         record.datetime = Datetime(d)
         stock.realtimeUpdate(record)
-        
-    #更新指数行情
+
+    # 更新指数行情
     df = ts.get_index()
     for i in range(len(df)):
         code = df.ix[i][0]
@@ -438,13 +446,13 @@ def realtimeUpdate_from_tushare():
             stock = getStock('sz' + code)
         if stock.isNull() == True:
             continue
-        
+
         total = stock.getCount(Query.DAY)
         if total == 0:
             continue
-            
+
         last_record = stock.getKRecord(total - 1)
-        
+
         record = KRecord()
         record.openPrice = df.ix[i, 'open']
         record.highPrice = df.ix[i, 'high']
@@ -452,15 +460,16 @@ def realtimeUpdate_from_tushare():
         record.closePrice = df.ix[i, 'close']
         record.transCount = float(df.ix[i, 'volume'])
         record.transAmount = float(df.ix[i, 'amount'])
-        
-        if (last_record.closePrice != record.closePrice 
-                or last_record.highPrice != record.highPrice 
+
+        if (last_record.closePrice != record.closePrice
+                or last_record.highPrice != record.highPrice
                 or last_record.lowPrice != record.lowPrice
                 or last_record.openPrice != record.openPrice):
             from datetime import date
             d = date.today()
             record.datetime = Datetime(d)
             stock.realtimeUpdate(record)
+
 
 def realtimeUpdate_inner(source='tushare'):
     if source == 'sina' or source == 'qq':
@@ -469,10 +478,11 @@ def realtimeUpdate_inner(source='tushare'):
         realtimeUpdate_from_tushare()
     else:
         print(source, ' not support!')
-        
-        
+
+
 def realtimeUpdateWrap():
     pre_update_time = None
+
     def realtimeUpdate_closure(source='tushare', delta=60):
         """
         更新实时日线数据
@@ -489,9 +499,8 @@ def realtimeUpdateWrap():
             print("更新完毕！", pre_update_time)
         else:
             print("更新间隔小于" + str(delta) + "秒，未更新")
-            print("上次更新时间: ", pre_update_time)  
+            print("上次更新时间: ", pre_update_time)
     return realtimeUpdate_closure
 
-realtimeUpdate = realtimeUpdateWrap()
-            
 
+realtimeUpdate = realtimeUpdateWrap()

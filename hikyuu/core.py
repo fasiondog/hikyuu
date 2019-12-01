@@ -219,34 +219,23 @@ class Query(KQuery):
         """
         构建按索引 [start, end) 方式获取K线数据条件
         
-        :param ind start: 起始日期
-        :param ind end: 结束日期
+        :param ind start: 起始索引位置或起始日期
+        :param ind end: 结束索引位置或结束日期
         :param KQuery.KType kType: K线数据类型（如日线、分钟线等）
         :param KQuery.RecoverType recoverType: 复权类型
         :return: 查询条件
         :rtype: KQuery
         """
-        end_pos = constant.null_int64 if end is None else end
+        if isinstance(start, int):
+            end_pos = constant.null_int64 if end is None else end
+        elif isinstance(start, Datetime):
+            end_pos = constant.null_datetime if end is None else end
+        else:
+            raise TypeError('Incorrect parameter type error!')
         super(Query, self).__init__(start, end_pos, kType, recoverType)
 
 QueryByIndex = Query
-
-def QueryByDate(start=None, end=None, kType=Query.DAY, 
-                recoverType=Query.NO_RECOVER):
-    """
-    构建按日期 [start, end) 方式获取K线数据条件
-    
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期
-    :param KQuery.KType kType: K线数据类型（如日线、分钟线等）
-    :param KQuery.RecoverType recoverType: 复权类型
-    :return: 查询条件
-    :rtype: KQuery        
-    """
-    start_date = Datetime.min() if start is None else start
-    end_date = Datetime.max() if end is None else end
-    return KQueryByDate(start_date, end_date, kType, recoverType)
-
+QueryByDate = Query
 
 #------------------------------------------------------------------
 # 增强 KData 的遍历
