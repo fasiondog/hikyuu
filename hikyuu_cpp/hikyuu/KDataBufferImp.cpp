@@ -151,8 +151,8 @@ void KDataBufferImp::_recoverForward() {
         return;
     }
 
-    bd::date start_date = m_buffer.front().datetime.date();
-    bd::date end_date = m_buffer.back().datetime.date() + bd::days(1);
+    Datetime start_date(m_buffer.front().datetime.date());
+    Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_iterator weightIter = weightList.begin();
     StockWeightList::const_iterator pre_weightIter = weightIter;
@@ -214,8 +214,8 @@ void KDataBufferImp::_recoverBackward() {
         return;
     }
 
-    bd::date start_date = m_buffer.front().datetime.date();
-    bd::date end_date = m_buffer.back().datetime.date() + bd::days(1);
+    Datetime start_date(m_buffer.front().datetime.date());
+    Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
     StockWeightList::const_reverse_iterator pre_weightIter;
@@ -278,8 +278,8 @@ void KDataBufferImp::_recoverEqualForward() {
         return;
     }
 
-    bd::date start_date = m_buffer.front().datetime.date();
-    bd::date end_date = m_buffer.back().datetime.date() + bd::days(1);
+    Datetime start_date(m_buffer.front().datetime.date());
+    Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     if (weightList.empty()) {
         return;
@@ -353,8 +353,8 @@ void KDataBufferImp::_recoverEqualBackward() {
         return;
     }
 
-    bd::date start_date = m_buffer.front().datetime.date();
-    bd::date end_date = m_buffer.back().datetime.date() + bd::days(1);
+    Datetime start_date(m_buffer.front().datetime.date());
+    Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_reverse_iterator weightIter = weightList.rbegin();
     StockWeightList::const_reverse_iterator pre_weightIter;
