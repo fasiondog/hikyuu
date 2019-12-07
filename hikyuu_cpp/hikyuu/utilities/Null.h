@@ -9,8 +9,8 @@
 #ifndef NULL_H_
 #define NULL_H_
 
-#include <boost/limits.hpp>
-#include <boost/type_traits.hpp>
+#include <limits>
+#include <type_traits>
 
 namespace hku {
 
