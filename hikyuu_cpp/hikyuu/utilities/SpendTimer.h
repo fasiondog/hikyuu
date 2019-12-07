@@ -15,13 +15,10 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <fmt/format.h>
 
 #ifndef HKU_API
 #define HKU_API
-#endif
-
-#ifdef __ANDROID__
-#include <android/log.h>
 #endif
 
 #ifdef _MSC_VER
@@ -107,46 +104,34 @@ public:
             return;
         }
         std::chrono::duration<double> sec = std::chrono::steady_clock::now() - m_start_time;
-        std::ostringstream buf;
-        buf.fill(' ');
-        buf.precision(m_precision);
-
+        double spend = 0;
+        std::string unit;
         if (sec.count() < 0.000001) {
-            buf << "spend time: " << std::setw(m_print_width) << std::right
-                << sec.count() * 1000000000 << " ns | " << m_msg;
+            spend = sec.count() * 1000000000;
+            unit = "ns";
         } else if (sec.count() < 0.001) {
-            buf << "spend time: " << std::setw(m_print_width) << std::right << sec.count() * 1000000
-                << " us | " << m_msg;
+            spend = sec.count() * 1000000;
+            unit = "us";
         } else if (sec.count() < 1) {
-            buf << "spend time: " << std::setw(m_print_width) << std::right << sec.count() * 1000
-                << " ms | " << m_msg;
+            spend = sec.count() * 1000;
+            unit = "ms";
         } else if (sec.count() > 60) {
-            buf << "spend time: " << std::setw(m_print_width) << std::right << sec.count() / 60
-                << "  m | " << m_msg;
+            spend = sec.count() / 60;
+            unit = " m";
         } else if (sec.count() > 86400) {
-            buf << "spend time: " << std::setw(m_print_width) << std::right << sec.count() / 360
-                << "  h | " << m_msg;
+            spend = sec.count() / 360;
+            unit = " h";
         } else {
-            buf << "spend time: " << std::setw(m_print_width) << std::right << sec.count()
-                << "  s | " << m_msg;
+            spend = sec.count();
+            unit = " s";
         }
 
-#ifdef __ANDROID__
-        __android_log_print(ANDROID_LOG_INFO, YIHUA_LOGGER_NAME, buf.str().c_str());
-#if YIHUA_WITH_ANDROID_SHELL_OUTPUT
-        std::cout << buf.str() << std::endl;
-#endif
-#else  /* __ANDROID__ */
-        std::cout << buf.str() << std::endl;
-#endif /* __ANDROID__ */
+        std::cout << fmt::format("spend time: {:>7.3f} {} | {} ", spend, unit, m_msg) << std::endl;
     }
 
 private:
     std::string m_msg;
     std::chrono::time_point<std::chrono::steady_clock> m_start_time;
-
-    static const int m_print_width = 7;
-    static constexpr int m_precision = m_print_width - 1;
 
     static bool m_closed;
     friend void HKU_API close_spend_time();
