@@ -9,6 +9,7 @@
 #ifndef NULL_H_
 #define NULL_H_
 
+#include <cstddef>
 #include <limits>
 #include <type_traits>
 
