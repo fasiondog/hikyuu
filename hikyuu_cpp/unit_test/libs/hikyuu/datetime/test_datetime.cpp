@@ -92,7 +92,9 @@ BOOST_AUTO_TEST_CASE(test_Datetime) {
 
     /** @arg 测试 toString */
     d = Datetime("2001-Jan-01 06:30:00");
-    BOOST_CHECK("2001-Jan-01 06:30:00" == d.toString());
+    BOOST_CHECK("2001-01-01 06:30:00" == d.toString());
+    d = Datetime("2001-Jan-01 06:30:00.001");
+    BOOST_CHECK("2001-01-01 06:30:00.001000" == d.toString());
 
     /** @arg 测试 dayOfWeek*/
     BOOST_CHECK(Datetime(201801010000L).dayOfWeek() == 1);

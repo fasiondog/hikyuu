@@ -109,7 +109,7 @@ Stock.__hash__ = stock_hash
 
 __old_Datetime_init__ = Datetime.__init__
 
-def __new_Datetime_init__(self, var = None):
+def __new_Datetime_init__(self, *args):
     """
     日期时间类（精确到秒），通过以下方式构建：
     
@@ -117,27 +117,27 @@ def __new_Datetime_init__(self, var = None):
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
     - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
+    - Datetime(year, month, day, hour, minute, second, microsecond)
     
     获取日期列表参见： :py:func:`getDateRange`
     
     获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
     """    
-    if var is None:
+    if args is None:
         __old_Datetime_init__(self)
     
     #datetime实例同时也是date的实例，判断必须放在date之前
-    elif isinstance(var, datetime):
-        __old_Datetime_init__(self, str(var))
-    elif isinstance(var, date):
-        __old_Datetime_init__(self, "{} 00".format(var))
+    elif isinstance(args[0], datetime):
+        d = args[0]
+        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, d.microsecond)
+    elif isinstance(args[0], date):
+        d = args[0]
+        __old_Datetime_init__(self, d.year, d.month, d.day, 0, 0, 0, 0)
     
-    elif isinstance(var, str):
-        if var.find(' ') == -1:
-            __old_Datetime_init__(self, "{} 00".format(var))
-        else:
-            __old_Datetime_init__(self, var)
+    elif isinstance(args[0], str):
+        __old_Datetime_init__(self, args[0])
     else:
-        __old_Datetime_init__(self, var)
+        __old_Datetime_init__(self, *args)
 
 def Datetime_date(self):
     """转化生成 python 的 date"""
@@ -146,7 +146,7 @@ def Datetime_date(self):
 def Datetime_datetime(self):
     """转化生成 python 的 datetime"""
     return datetime(self.year, self.month, self.day, 
-                    self.hour, self.minute, self.second)
+                    self.hour, self.minute, self.second, self.microsecond)
         
 def Datetime_isNull(self):
     """是否是Null值, 即是否等于 constant.null_datetime"""

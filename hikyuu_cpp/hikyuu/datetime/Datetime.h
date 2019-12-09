@@ -9,6 +9,7 @@
 #ifndef DATETIME_H_
 #define DATETIME_H_
 
+#include <chrono>
 #include <string>
 #include <vector>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -37,7 +38,19 @@ public:
     Datetime();
 
     Datetime(const Datetime&);
-    Datetime(int year, int month, int day, int hh = 0, int mm = 0, int sec = 0);
+
+    /**
+     * 构造函数
+     * @param year 年
+     * @param month 月
+     * @param day 日
+     * @param hh 时
+     * @param mm 分
+     * @param sec 秒
+     * @param microsec 微秒
+     */
+    Datetime(long year, long month, long day, long hh = 0, long mm = 0, long sec = 0,
+             long microsec = 0);
 
     /** 从boost::gregorian::date构造日期类型 */
     explicit Datetime(const bd::date&);
@@ -53,12 +66,13 @@ public:
 
     Datetime& operator=(const Datetime&);
 
-    int year() const;
-    int month() const;
-    int day() const;
-    int hour() const;
-    int minute() const;
-    int second() const;
+    long year() const;
+    long month() const;
+    long day() const;
+    long hour() const;
+    long minute() const;
+    long second() const;
+    long microsecond() const;
 
     /**
      * 返回如YYYYMMDDhhmmss格式的数字，方便比较操作，
@@ -73,6 +87,9 @@ public:
 
     /** 返回 boost::gregorian::date */
     bd::date date() const;
+
+    /** 返回 std::time_t */
+    std::time_t to_time_t() const;
 
     /** 返回一周中的第几天，周日为0，周一为1 */
     int dayOfWeek() const;
@@ -252,33 +269,38 @@ inline Datetime::Datetime(const std::string& ts) {
     }
 }
 
-inline Datetime::Datetime(int year, int month, int day, int hh, int mm, int sec) {
-    bd::date d(year, month, day);
-    m_data = bt::ptime(d, bt::time_duration(hh, mm, sec));
+inline Datetime::Datetime(long year, long month, long day, long hh, long mm, long sec,
+                          long microsec) {
+    bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
+    m_data = bt::ptime(d, bt::time_duration(hh, mm, sec, microsec));
 }
 
-inline int Datetime::year() const {
+inline long Datetime::year() const {
     return m_data.date().year();
 }
 
-inline int Datetime::month() const {
+inline long Datetime::month() const {
     return m_data.date().month();
 }
 
-inline int Datetime::day() const {
+inline long Datetime::day() const {
     return m_data.date().day();
 }
 
-inline int Datetime::hour() const {
-    return int(m_data.time_of_day().hours());
+inline long Datetime::hour() const {
+    return long(m_data.time_of_day().hours());
 }
 
-inline int Datetime::minute() const {
-    return int(m_data.time_of_day().minutes());
+inline long Datetime::minute() const {
+    return long(m_data.time_of_day().minutes());
 }
 
-inline int Datetime::second() const {
-    return int(m_data.time_of_day().seconds());
+inline long Datetime::second() const {
+    return long(m_data.time_of_day().seconds());
+}
+
+inline long Datetime::microsecond() const {
+    return long(m_data.time_of_day().fractional_seconds());
 }
 
 inline bt::ptime Datetime::ptime() const {
@@ -287,6 +309,11 @@ inline bt::ptime Datetime::ptime() const {
 
 inline bd::date Datetime::date() const {
     return m_data.date();
+}
+
+inline std::time_t Datetime::to_time_t() const {
+    std::tm tt = bt::to_tm(m_data);
+    return std::mktime(&tt);
 }
 
 inline int Datetime::dayOfWeek() const {

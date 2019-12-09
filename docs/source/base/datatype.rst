@@ -15,6 +15,7 @@
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
     - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
+    - Datetime(year, month, day, hour, minute, second, microsecond)
     
     获取日期列表参见： :py:func:`getDateRange`
     
@@ -26,6 +27,7 @@
     .. py:attribute:: hour 时
     .. py:attribute:: minute 分
     .. py:attribute:: second 秒
+    .. py:attribute:: microsecond 微秒
     .. py:attribute:: number YYYYMMDDHHMM 形式的整数
     
     .. py:method:: date(self)

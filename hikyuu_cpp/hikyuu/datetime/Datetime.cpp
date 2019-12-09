@@ -5,18 +5,14 @@
  *      Author: fasiondog
  */
 
+#include <fmt/format.h>
 #include "../utilities/Null.h"
 #include "Datetime.h"
 
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& out, const Datetime& d) {
-    if (d == Null<Datetime>()) {
-        out << "+infinity";
-    } else {
-        out << d.year() << "-" << d.month() << "-" << d.day() << " " << d.hour() << ":"
-            << d.minute() << ":" << d.second();
-    }
+    out << d.toString();
     return out;
 }
 
@@ -58,8 +54,17 @@ std::string Datetime::toString() const {
         return "+infinity";
     }
 
-    //不能像operator << 只输出到分钟信息，会导致序列化读取后不等
-    return bt::to_simple_string(m_data);
+    std::string result;
+    if (microsecond() == 0) {
+        result = fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:>02d}", year(), month(),
+                             day(), hour(), minute(), second());
+    } else {
+        result =
+          fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:<09.6f}", year(), month(), day(),
+                      hour(), minute(), double(second()) + double(microsecond()) * 0.000001);
+    }
+    return result;
+    // return bt::to_simple_string(m_data);
 }
 
 unsigned long long Datetime::number() const {
