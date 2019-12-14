@@ -58,7 +58,7 @@ public:
     /** 从boost::posix_time::ptime构造 */
     explicit Datetime(const bt::ptime&);
 
-    /** 通过数字方式构造日期类型，数字格式：YYYYMMDDhhmmss，如 200101010000 */
+    /** 通过数字方式构造日期类型，数字格式：YYYYMMDDhhmm，如 200101010000 */
     explicit Datetime(unsigned long long);
 
     /** 通过字符串方式构造日期类型，如："2001-01-01 18:00:00.12345" */

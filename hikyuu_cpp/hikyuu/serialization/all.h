@@ -11,6 +11,7 @@
 
 #include "PriceList_serialization.h"
 #include "Datetime_serialization.h"
+#include "TimeDelta_serialization.h"
 #include "KData_serialization.h"
 #include "KQuery_serialization.h"
 #include "KRecord_serialization.h"

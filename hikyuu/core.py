@@ -387,6 +387,7 @@ __all__ = [#类
            'BlockList', 
            'Datetime', 
            'DatetimeList', 
+           'TimeDelta',
            'KData',
            'KQuery', 
            'KQueryByDate', 

@@ -61,23 +61,23 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
  * Use SPDLOG for logging
  *********************************************/
 #define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
-#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(getHikyuuLogger(), __VA_ARGS__)
+#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
-#define HKU_DEBUG(...) SPDLOG_LOGGER_TRACE(getHikyuuLogger(), __VA_ARGS__)
+#define HKU_DEBUG(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_INFO(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::info, __VA_ARGS__)
-#define HKU_INFO(...) SPDLOG_LOGGER_INFO(getHikyuuLogger(), __VA_ARGS__)
+#define HKU_INFO(...) SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_WARN(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::warn, __VA_ARGS__)
-#define HKU_WARN(...) SPDLOG_LOGGER_WARN(getHikyuuLogger(), __VA_ARGS__)
+#define HKU_WARN(...) SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_ERROR(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::err, __VA_ARGS__)
-#define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(getHikyuuLogger(), __VA_ARGS__)
+#define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__)
 
 #define HKU_LOGGER_FATAL(logger, ...) \
     SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
-#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(getHikyuuLogger(), __VA_ARGS__)
+#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)
 
 namespace inner {
 #if HKU_USE_ASYNC_LOGGER

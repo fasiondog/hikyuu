@@ -12,6 +12,7 @@ set_configvar("SUPPORT_SERIALIZATION", 1)
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
+set_configvar("HKU_DISABLE_ASSERT", 0)
 
 -- set warning all as error
 if is_plat("windows") then
@@ -25,8 +26,8 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
-add_requires("fmt", {configs = {header_only = false, vs_runtime = "MD"}})
-add_requires("spdlog", {configs = {header_only = false, vs_runtime = "MD"}})
+add_requires("fmt", {configs = {header_only = true, vs_runtime = "MD"}})
+add_requires("spdlog", {configs = {header_only = true, vs_runtime = "MD"}})
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
