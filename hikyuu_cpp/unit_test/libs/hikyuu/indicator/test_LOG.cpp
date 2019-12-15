@@ -6,10 +6,10 @@
  */
 
 #ifdef TEST_ALL_IN_ONE
-    #include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #else
-    #define BOOST_TEST_MODULE test_hikyuu_indicator_suite
-    #include <boost/test/unit_test.hpp>
+#define BOOST_TEST_MODULE test_hikyuu_indicator_suite
+#include <boost/test/unit_test.hpp>
 #endif
 
 #include <fstream>
@@ -21,13 +21,13 @@
 using namespace hku;
 
 /**
- * @defgroup test_indicator_LN test_indicator_LOG
+ * @defgroup test_indicator_LOG test_indicator_LOG
  * @ingroup test_hikyuu_indicator_suite
  * @{
  */
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_LOG ) {
+BOOST_AUTO_TEST_CASE(test_LOG) {
     Indicator result;
 
     PriceList a;
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE( test_LOG ) {
     BOOST_CHECK(result.size() == 11);
     BOOST_CHECK(result.discard() == 0);
     BOOST_CHECK(std::isnan(result[0]));
-    for (int i = 1; i <10; ++i) {
+    for (int i = 1; i < 10; ++i) {
         BOOST_CHECK_CLOSE(result[i], std::log10(i), 0.00001);
     }
     BOOST_CHECK(std::isnan(result[10]));
@@ -54,14 +54,13 @@ BOOST_AUTO_TEST_CASE( test_LOG ) {
     BOOST_CHECK_CLOSE(result[0], std::log10(10.0), 0.00001);
 }
 
-
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par 检测点 */
-BOOST_AUTO_TEST_CASE( test_LOG_export ) {
+BOOST_AUTO_TEST_CASE(test_LOG_export) {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
     filename += "/LOG.xml";
@@ -92,5 +91,3 @@ BOOST_AUTO_TEST_CASE( test_LOG_export ) {
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */
-
-

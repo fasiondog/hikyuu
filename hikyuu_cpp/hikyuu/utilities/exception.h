@@ -52,14 +52,13 @@ protected:
  * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
  * @note 用于外部入参及结果检查
  */
-#define HKU_CHECK(expr, ...)                                                                       \
-    {                                                                                              \
-        if (!(expr)) {                                                                             \
-            std::string s(fmt::format("HKU_CHECK({}) {} ({}:{})", #expr, fmt::format(__VA_ARGS__), \
-                                      __FILE__, __LINE__));                                        \
-            HKU_ERROR(s);                                                                          \
-            throw hku::exception(s);                                                               \
-        }                                                                                          \
+#define HKU_CHECK(expr, ...)                                                                 \
+    {                                                                                        \
+        if (!(expr)) {                                                                       \
+            std::string s(fmt::format("HKU_CHECK({}) {}", #expr, fmt::format(__VA_ARGS__))); \
+            HKU_ERROR(s);                                                                    \
+            throw hku::exception(s);                                                         \
+        }                                                                                    \
     }
 
 #if HKU_DISABLE_ASSERT
@@ -72,47 +71,44 @@ protected:
  * 若表达式为 false，将抛出 hku::exception 异常
  * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
  */
-#define HKU_ASSERT(expr)                                                                     \
-    {                                                                                        \
-        if (!(expr)) {                                                                       \
-            std::string s(fmt::format("HKU_ASSERT({}) ({}:{})", #expr, __FILE__, __LINE__)); \
-            HKU_ERROR(s);                                                                    \
-            throw hku::exception(s);                                                         \
-        }                                                                                    \
+#define HKU_ASSERT(expr)                                         \
+    {                                                            \
+        if (!(expr)) {                                           \
+            std::string s(fmt::format("HKU_ASSERT({})", #expr)); \
+            HKU_ERROR(s);                                        \
+            throw hku::exception(s);                             \
+        }                                                        \
     }
 
 /**
  * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
  * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
  */
-#define HKU_ASSERT_M(expr, ...)                                                       \
-    {                                                                                 \
-        if (!(expr)) {                                                                \
-            std::string s(fmt::format("HKU_ASSERT({}) {} ({}:{})", #expr,             \
-                                      fmt::format(__VA_ARGS__), __FILE__, __LINE__)); \
-            HKU_ERROR(s);                                                             \
-            throw hku::exception(s);                                                  \
-        }                                                                             \
+#define HKU_ASSERT_M(expr, ...)                                                               \
+    {                                                                                         \
+        if (!(expr)) {                                                                        \
+            std::string s(fmt::format("HKU_ASSERT({}) {}", #expr, fmt::format(__VA_ARGS__))); \
+            HKU_ERROR(s);                                                                     \
+            throw hku::exception(s);                                                          \
+        }                                                                                     \
     }
 
 #endif /* #if HKU_DISABLE_ASSERT */
 
 /** 抛出 hku::exception 及传入信息 */
-#define HKU_THROW(...)                                                                             \
-    {                                                                                              \
-        std::string s(                                                                             \
-          fmt::format("HKU_EXCEPTION: {} ({}:{})", fmt::format(__VA_ARGS__), __FILE__, __LINE__)); \
-        HKU_ERROR(s);                                                                              \
-        throw hku::exception(s);                                                                   \
+#define HKU_THROW(...)                                                             \
+    {                                                                              \
+        std::string s(fmt::format("HKU_EXCEPTION: {}", fmt::format(__VA_ARGS__))); \
+        HKU_ERROR(s);                                                              \
+        throw hku::exception(s);                                                   \
     }
 
 /** 抛出指定异常及传入信息 */
-#define HKU_THROW_EXCEPTION(except, ...)                                                           \
-    {                                                                                              \
-        std::string s(                                                                             \
-          fmt::format("HKU_EXCEPTION: {} ({}:{})", fmt::format(__VA_ARGS__), __FILE__, __LINE__)); \
-        HKU_ERROR(s);                                                                              \
-        throw except(s);                                                                           \
+#define HKU_THROW_EXCEPTION(except, ...)                                           \
+    {                                                                              \
+        std::string s(fmt::format("HKU_EXCEPTION: {}", fmt::format(__VA_ARGS__))); \
+        HKU_ERROR(s);                                                              \
+        throw except(s);                                                           \
     }
 
 } /* namespace hku */

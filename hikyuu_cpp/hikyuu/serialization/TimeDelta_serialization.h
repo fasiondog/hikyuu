@@ -20,6 +20,7 @@
 
 namespace boost {
 namespace serialization {
+
 template <class Archive>
 void save(Archive& ar, const hku::TimeDelta& td, unsigned int version) {
     int64_t ticks = td.ticks();
@@ -30,8 +31,9 @@ template <class Archive>
 void load(Archive& ar, hku::TimeDelta& td, unsigned int version) {
     int64_t ticks;
     ar& BOOST_SERIALIZATION_NVP(ticks);
-    td = hku::TimeDelta(0, 0, 0, 0, 0, ticks);
+    td = hku::TimeDelta(boost::posix_time::time_duration(0, 0, 0, ticks));
 }
+
 }  // namespace serialization
 }  // namespace boost
 

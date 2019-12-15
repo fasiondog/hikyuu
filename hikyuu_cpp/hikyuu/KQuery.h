@@ -110,7 +110,7 @@ public:
      * 按指定日期查询 K 线，范围[start, end)
      * @param start 起始日期
      * @param end  结束日期
-     * @param dataType K线类型
+     * @param ktype K线类型
      * @param recoverType 复权类型
      */
     KQuery(Datetime start, Datetime end = Null<Datetime>(), KType ktype = DAY,

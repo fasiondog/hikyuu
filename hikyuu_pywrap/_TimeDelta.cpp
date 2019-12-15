@@ -20,6 +20,8 @@ void export_TimeDelta() {
       .def(init<int64_t, int64_t>())
       .def(init<int64_t, int64_t, int64_t>())
       .def(init<int64_t, int64_t, int64_t, int64_t>())
+      .def(init<int64_t, int64_t, int64_t, int64_t, int64_t>())
+      .def(init<int64_t, int64_t, int64_t, int64_t, int64_t, int64_t>())
       .def(self_ns::str(self))
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<TimeDelta>())
