@@ -68,33 +68,75 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta) {
     td = TimeDelta(0, 24);
     BOOST_CHECK(td.days() == 1);
     BOOST_CHECK(td.hours() == 0);
+    BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
     BOOST_CHECK(td.ticks() == 86400000000LL);
+    BOOST_CHECK(td.isNegative() == false);
 
     /** @arg 正常初始化，分大于59 */
     td = TimeDelta(0, 0, 60);
+    BOOST_CHECK(td.days() == 0);
     BOOST_CHECK(td.hours() == 1);
     BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
     BOOST_CHECK(td.ticks() == 3600000000LL);
+    BOOST_CHECK(td.isNegative() == false);
 
     /** @arg 正常初始化，秒大于59 */
     td = TimeDelta(0, 0, 0, 60);
+    BOOST_CHECK(td.days() == 0);
+    BOOST_CHECK(td.hours() == 0);
     BOOST_CHECK(td.minutes() == 1);
     BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
     BOOST_CHECK(td.ticks() == 60000000LL);
+    BOOST_CHECK(td.isNegative() == false);
 
-    /** @arg 负时长 */
-    /*td = TimeDelta(-1, 10);
-    BOOST_CHECK(td.days() == 0);
-    BOOST_CHECK(td.hours() == 14);
+    /** @arg 负时长初始化, 天数为 -1 */
+    td = TimeDelta(-1);
+    std::cout << td << std::endl;
+    std::cout << td.str() << std::endl;
     BOOST_CHECK(td.isNegative());
-    std::cout << td.repr() << std::endl;*/
-    std::cout << TimeDelta(0, 0, 0, 0, 0, -1).str() << std::endl;
-    std::cout << TimeDelta(0, 0, 0, 0, 0, -1).ticks() << std::endl;
-    std::cout << TimeDelta(0, 0, 0, 0, 0, -1).isNegative() << std::endl;
-    std::cout << bt::time_duration(-1, 0, 0, 0) << std::endl;
-    std::cout << bt::time_duration(-1, -1, 0, 0) << std::endl;
-    std::cout << bt::time_duration(0, 0, 0, -1) << std::endl;
-    std::cout << bt::time_duration(0, 0, 0, -1).ticks() << std::endl;
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 0);
+    BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == -86400000000LL);
+
+    /** @arg 负时长初始化, hours = -1 */
+    /*td = TimeDelta(0, -1);
+    std::cout << td.str() << std::endl;
+    std::cout << td << std::endl;
+    std::cout << td.ticks() << std::endl;
+    BOOST_CHECK(td.isNegative());
+    BOOST_CHECK(td.days() == 0);
+    BOOST_CHECK(td.hours() == 1);
+    BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == -60 * 60 * 1000000LL);*/
+
+    /** @arg 负时长初始化, microseconds = -1 */
+    td = TimeDelta(0, 0, 0, 0, 0, -1);
+    std::cout << td.str() << std::endl;
+    std::cout << td << std::endl;
+    std::cout << td.ticks() << std::endl;
+    BOOST_CHECK(td.isNegative());
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 0);
+    BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 999);
+    BOOST_CHECK(td.microseconds() == 999);
+    BOOST_CHECK(td.ticks() == -1LL);
 }
 
 /** @par 检测点 */

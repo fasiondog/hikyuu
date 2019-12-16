@@ -26,9 +26,6 @@ TimeDelta::TimeDelta(int64_t days, int64_t hours, int64_t minutes, int64_t secon
     int64_t total =
       ((((days * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000 + milliseconds) * 1000 +
       microseconds;
-    if (total < 0) {
-        total = -(86400000000LL + total);
-    }
     HKU_CHECK(total >= m_min_micro_seconds && total <= m_max_micro_seconds, "Out of total range!");
     m_duration = bt::time_duration(0, 0, 0, total);
 }

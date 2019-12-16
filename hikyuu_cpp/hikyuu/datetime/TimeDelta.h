@@ -25,14 +25,20 @@ namespace bt = boost::posix_time;
 namespace bd = boost::gregorian;
 
 /**
- * 持续时长，用于时间计算
+ * 时长，用于时间计算
  * @ingroup DataType
  */
 class HKU_API TimeDelta {
 public:
     /**
      * 构造函数
-     * @note 总时长不能超过 TimeDelta(99999999, 23, 59, 59, 999, 999)
+     * @note
+     * <pre>
+     * 1、总时长不能超过 TimeDelta(99999999, 23, 59, 59, 999, 999)。
+     * 2、和 boost::posix_time::time_duration 有所区别，time_duration 只要有一个参数为负数，
+     *    则认为是负时长，而 TimeDelta 则是各参数代表的ticks数之和。
+     * 3、各部分（days(), hours() ...）始终为正数，需通过 isNegative() 判断时长的正负。
+     * </pre>
      * @param days 天数 [-99999999, 99999999]
      * @param hours 小时数 [-10000, 10000]
      * @param minutes 分钟数 [-50000, 50000]
@@ -59,11 +65,14 @@ public:
 
     /** 获取规范化后的天数 */
     int64_t days() const {
-        int64_t result = m_duration.hours() / 24;
         if (isNegative()) {
-            result = -1 - result;
+            if (ticks() % m_one_day_ticks == 0) {
+                return ticks() / m_one_day_ticks;
+            } else {
+                return ticks() / m_one_day_ticks - 1;
+            }
         }
-        return result;
+        return std::abs(m_duration.hours() / 24);
     }
 
     /** 获取规范化后的小时数 [0, 23] */
@@ -83,11 +92,27 @@ public:
 
     /** 获取规范化后的毫秒数 [0, 999] */
     int64_t milliseconds() const {
+        if (isNegative()) {
+            if (ticks() % m_one_day_ticks == 0) {
+                return 0;
+            } else {
+                int64_t pos_ticks =
+                  std::abs((ticks() / m_one_day_ticks - 1) * m_one_day_ticks) + ticks();
+                return (pos_ticks % 1000000 - microseconds()) / 1000;
+            }
+        }
         return (std::abs(ticks()) % 1000000 - microseconds()) / 1000;
     }
 
     /** 获取规范化后的微秒数 [0, 999] */
     int64_t microseconds() const {
+        if (isNegative()) {
+            if (ticks() % m_one_day_ticks == 0) {
+                return 0;
+            } else {
+                return 1000 + ticks() % 1000;
+            }
+        }
         return std::abs(ticks() % 1000);
     }
 
@@ -184,7 +209,14 @@ private:
 
     static constexpr const int64_t m_max_micro_seconds = 100000000LL * 24 * 60 * 60 * 1000000 - 1;
     static constexpr const int64_t m_min_micro_seconds = -99999999LL * 24 * 60 * 60 * 1000000;
+    static constexpr const int64_t m_one_day_ticks = 24 * 60 * 60 * 1000000LL;
 };
+
+std::ostream& operator<<(std::ostream& out, TimeDelta td);
+inline std::ostream& operator<<(std::ostream& out, TimeDelta td) {
+    out << td.repr();
+    return out;
+}
 
 class HKU_API Days : public TimeDelta {
 public:
