@@ -30,6 +30,7 @@ static map<size_t , string> g_support_class_dict;
 void registerSupportClass() {
     g_support_class_dict[typeid(PriceList).hash_code()] = "PriceList";
     g_support_class_dict[typeid(Datetime).hash_code()] = "Datetime";
+    g_support_class_dict[typeid(Datetime).hash_code()] = "TimeDelta";
     g_support_class_dict[typeid(DatetimeList).hash_code()] = "DatetimeList";
     g_support_class_dict[typeid(KData).hash_code()] = "KData";
     g_support_class_dict[typeid(KQuery).hash_code()] = "KQuery";
@@ -130,6 +131,9 @@ void export_save_load() {
 
     def("hku_save", xml_save<Datetime>);
     def("hku_load", xml_load<Datetime>);
+
+    def("hku_save", xml_save<TimeDelta>);
+    def("hku_load", xml_load<TimeDelta>);
 
     def("hku_save", xml_save<DatetimeList>);
     def("hku_load", xml_load<DatetimeList>);

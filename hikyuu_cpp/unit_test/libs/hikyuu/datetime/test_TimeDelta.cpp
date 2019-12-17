@@ -32,24 +32,24 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta) {
     BOOST_CHECK_THROW(TimeDelta(-99999999LL - 1), hku::exception);
 
     /** @arg hours 超出限定值 */
-    BOOST_CHECK_THROW(TimeDelta(0, 10001), hku::exception);
-    BOOST_CHECK_THROW(TimeDelta(0, -10001), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 100001), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, -100001), hku::exception);
 
     /** @arg minutes 超出限定值 */
-    BOOST_CHECK_THROW(TimeDelta(0, 0, 50001), hku::exception);
-    BOOST_CHECK_THROW(TimeDelta(0, 0, -50001), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, 100001), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, -100001), hku::exception);
 
     /** @arg seconds 超出限定值 */
-    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 86400), hku::exception);
-    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, -86400), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 8640000), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, -8640000), hku::exception);
 
     /** @arg milliseconds 超出限定值 */
-    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 1000), hku::exception);
-    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, -1000), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 8640000000000), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, -8640000000000), hku::exception);
 
     /** @arg microseconds 超出限定值 */
-    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 0, 1000), hku::exception);
-    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 0, -1000), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 0, 8640000000000), hku::exception);
+    BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 0, -8640000000000), hku::exception);
 
     /** @arg microseconds总值超出限定值 */
     BOOST_CHECK_THROW(TimeDelta(99999999LL, 23, 59, 60, 999, 999), hku::exception);
@@ -99,8 +99,6 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta) {
 
     /** @arg 负时长初始化, 天数为 -1 */
     td = TimeDelta(-1);
-    std::cout << td << std::endl;
-    std::cout << td.str() << std::endl;
     BOOST_CHECK(td.isNegative());
     BOOST_CHECK(td.days() == -1);
     BOOST_CHECK(td.hours() == 0);
@@ -111,32 +109,192 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta) {
     BOOST_CHECK(td.ticks() == -86400000000LL);
 
     /** @arg 负时长初始化, hours = -1 */
-    /*td = TimeDelta(0, -1);
-    std::cout << td.str() << std::endl;
-    std::cout << td << std::endl;
-    std::cout << td.ticks() << std::endl;
+    td = TimeDelta(0, -1);
     BOOST_CHECK(td.isNegative());
-    BOOST_CHECK(td.days() == 0);
-    BOOST_CHECK(td.hours() == 1);
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 23);
     BOOST_CHECK(td.minutes() == 0);
     BOOST_CHECK(td.seconds() == 0);
     BOOST_CHECK(td.milliseconds() == 0);
     BOOST_CHECK(td.microseconds() == 0);
-    BOOST_CHECK(td.ticks() == -60 * 60 * 1000000LL);*/
+    BOOST_CHECK(td.ticks() == -60 * 60 * 1000000LL);
+
+    /** @arg 负时长初始化, minutes = -1 */
+    td = TimeDelta(0, 0, -1);
+    BOOST_CHECK(td.isNegative());
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 23);
+    BOOST_CHECK(td.minutes() == 59);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == -60000000LL);
+
+    /** @arg 负时长初始化, seconds = -1 */
+    td = TimeDelta(0, 0, 0, -1);
+    BOOST_CHECK(td.isNegative());
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 23);
+    BOOST_CHECK(td.minutes() == 59);
+    BOOST_CHECK(td.seconds() == 59);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == -1000000LL);
+
+    /** @arg 负时长初始化, milliseconds = -1 */
+    td = TimeDelta(0, 0, 0, 0, -1);
+    BOOST_CHECK(td.isNegative());
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 23);
+    BOOST_CHECK(td.minutes() == 59);
+    BOOST_CHECK(td.seconds() == 59);
+    BOOST_CHECK(td.milliseconds() == 999);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == -1000LL);
 
     /** @arg 负时长初始化, microseconds = -1 */
     td = TimeDelta(0, 0, 0, 0, 0, -1);
-    std::cout << td.str() << std::endl;
-    std::cout << td << std::endl;
-    std::cout << td.ticks() << std::endl;
     BOOST_CHECK(td.isNegative());
     BOOST_CHECK(td.days() == -1);
-    BOOST_CHECK(td.hours() == 0);
-    BOOST_CHECK(td.minutes() == 0);
-    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.hours() == 23);
+    BOOST_CHECK(td.minutes() == 59);
+    BOOST_CHECK(td.seconds() == 59);
     BOOST_CHECK(td.milliseconds() == 999);
     BOOST_CHECK(td.microseconds() == 999);
     BOOST_CHECK(td.ticks() == -1LL);
+
+    /** @arg 负时长初始化, microseconds = -999 */
+    td = TimeDelta(0, 0, 0, 0, 0, -999);
+    BOOST_CHECK(td.isNegative());
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 23);
+    BOOST_CHECK(td.minutes() == 59);
+    BOOST_CHECK(td.seconds() == 59);
+    BOOST_CHECK(td.milliseconds() == 999);
+    BOOST_CHECK(td.microseconds() == 1);
+    BOOST_CHECK(td.ticks() == -999LL);
+
+    /** @arg 负时长初始化，所有参数均为负数 */
+    td = TimeDelta(-1, -2, -13, -11, -12, -15);
+    BOOST_CHECK(td.isNegative());
+    BOOST_CHECK(td.days() == -2);
+    BOOST_CHECK(td.hours() == 21);
+    BOOST_CHECK(td.minutes() == 46);
+    BOOST_CHECK(td.seconds() == 48);
+    BOOST_CHECK(td.milliseconds() == 987);
+    BOOST_CHECK(td.microseconds() == 985);
+    BOOST_CHECK(td.ticks() == -94391012015LL);
+
+    /** @arg 正时长初始化，参数正负混合 */
+    td = TimeDelta(2, -23, -10, 4, 80, -917);
+    BOOST_CHECK(td.days() == 1);
+    BOOST_CHECK(td.hours() == 0);
+    BOOST_CHECK(td.minutes() == 50);
+    BOOST_CHECK(td.seconds() == 4);
+    BOOST_CHECK(td.milliseconds() == 79);
+    BOOST_CHECK(td.microseconds() == 83);
+    BOOST_CHECK(td.ticks() == 89404079083LL);
+}
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE(test_TimeDelta_operator) {
+    /** @arg 相加, 正正相加*/
+    TimeDelta td = TimeDelta(1, 20, 100, 1, 3, 5) + TimeDelta(30, 3, 2, 4, 5, 6);
+    BOOST_CHECK(td.isNegative() == false);
+    BOOST_CHECK(td.days() == 32);
+    BOOST_CHECK(td.hours() == 0);
+    BOOST_CHECK(td.minutes() == 42);
+    BOOST_CHECK(td.seconds() == 5);
+    BOOST_CHECK(td.milliseconds() == 8);
+    BOOST_CHECK(td.microseconds() == 11);
+    BOOST_CHECK(td.ticks() == 2767325008011LL);
+
+    /** @arg 相加，和为 0 时长 */
+    td = TimeDelta(1) + TimeDelta(-1);
+    BOOST_CHECK(td.isNegative() == false);
+    BOOST_CHECK(td.days() == 0);
+    BOOST_CHECK(td.hours() == 0);
+    BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == 0);
+
+    /** @arg 相加，和为负 */
+    td = TimeDelta(-1) + TimeDelta(0, -1);
+    BOOST_CHECK(td.isNegative() == true);
+    BOOST_CHECK(td.days() == -2);
+    BOOST_CHECK(td.hours() == 23);
+    BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == -90000000000LL);
+
+    /** @arg 相减，结果为0 */
+    td = TimeDelta(1, 0, 1) - TimeDelta(0, 24, 0, 60);
+    BOOST_CHECK(td.isNegative() == false);
+    BOOST_CHECK(td.days() == 0);
+    BOOST_CHECK(td.hours() == 0);
+    BOOST_CHECK(td.minutes() == 0);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == 0);
+
+    /** @arg 相减，结果为负 */
+    td = TimeDelta(0, 0, 1) - TimeDelta(0, 1);
+    BOOST_CHECK(td.isNegative() == true);
+    BOOST_CHECK(td.days() == -1);
+    BOOST_CHECK(td.hours() == 23);
+    BOOST_CHECK(td.minutes() == 1);
+    BOOST_CHECK(td.seconds() == 0);
+    BOOST_CHECK(td.milliseconds() == 0);
+    BOOST_CHECK(td.microseconds() == 0);
+    BOOST_CHECK(td.ticks() == -3540000000LL);
+
+    /** @arg 相等 */
+    BOOST_CHECK(TimeDelta(1, 2, 1, 1, 1, 1) == TimeDelta(1, 2, 1, 1, 1, 1));
+    BOOST_CHECK(TimeDelta(1) == TimeDelta(0, 24));
+    BOOST_CHECK(TimeDelta(-1) == TimeDelta(0, -24));
+
+    /** @arg 不等 */
+    BOOST_CHECK(TimeDelta(1, 2) != TimeDelta(1));
+
+    /** @arg >, <, >=, <= */
+    BOOST_CHECK(TimeDelta(1) > TimeDelta(0, 23, 59));
+    BOOST_CHECK(TimeDelta(1) >= TimeDelta(0, 23));
+    BOOST_CHECK(TimeDelta(0, 0, 0, 0, 0, 1) > TimeDelta());
+    BOOST_CHECK(TimeDelta(0, 0, 0, 0, 0, 1) > TimeDelta(0, 0, 0, 0, 0, -1));
+    BOOST_CHECK(TimeDelta(1) < TimeDelta(2));
+    BOOST_CHECK(TimeDelta(2) <= TimeDelta(2));
+}
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE(test_TimeDelta_subclass) {
+    /** @arg Days */
+    BOOST_CHECK(Days(1) == TimeDelta(1));
+    BOOST_CHECK(TimeDelta(1) == Days(1));
+
+    /** @arg Hours */
+    BOOST_CHECK(Hours(1) == TimeDelta(0, 1));
+    BOOST_CHECK(TimeDelta(0, 1) == Hours(1));
+
+    /** @arg Minutes */
+    BOOST_CHECK(Minutes(1) == TimeDelta(0, 0, 1));
+    BOOST_CHECK(TimeDelta(0, 0, 1) == Minutes(1));
+
+    /** @arg Seconds */
+    BOOST_CHECK(Seconds(1) == TimeDelta(0, 0, 0, 1));
+    BOOST_CHECK(TimeDelta(0, 0, 0, 1) == Seconds(1));
+
+    /** @arg Milliseconds */
+    BOOST_CHECK(Milliseconds(1) == TimeDelta(0, 0, 0, 0, 1));
+    BOOST_CHECK(TimeDelta(0, 0, 0, 0, 1) == Milliseconds(1));
+
+    /** @arg Microseconds */
+    BOOST_CHECK(Microseconds(1) == TimeDelta(0, 0, 0, 0, 0, 1));
+    BOOST_CHECK(TimeDelta(0, 0, 0, 0, 0, 1) == Microseconds(1));
 }
 
 /** @par 检测点 */

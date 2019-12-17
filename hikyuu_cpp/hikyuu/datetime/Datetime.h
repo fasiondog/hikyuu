@@ -12,7 +12,7 @@
 #include <chrono>
 #include <string>
 #include <vector>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include "TimeDelta.h"
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251)
@@ -66,13 +66,32 @@ public:
 
     Datetime& operator=(const Datetime&);
 
+    /** 年份 */
     long year() const;
+
+    /** 月份 [1, 12] */
     long month() const;
+
+    /** 日 [1, 31] */
     long day() const;
+
+    /** 时 [0, 23] */
     long hour() const;
+
+    /** 分钟 [0, 59] */
     long minute() const;
+
+    /** 秒 [0, 59] */
     long second() const;
+
+    /** 微秒 [0, 999999]。包含1秒后所有微秒数，无独立的毫秒数 */
     long microsecond() const;
+
+    /** 日期运算，加指定时长 */
+    Datetime operator+(TimeDelta d) const;
+
+    /** 日期运算，减指定时长 */
+    Datetime operator-(TimeDelta d) const;
 
     /**
      * 返回如YYYYMMDDhhmmss格式的数字，方便比较操作，
@@ -326,6 +345,14 @@ inline int Datetime::dayOfYear() const {
 
 inline Datetime Datetime::startOfDay() const {
     return Datetime(date());
+}
+
+inline Datetime Datetime::operator+(TimeDelta d) const {
+    return Datetime(m_data + d.time_duration());
+}
+
+inline Datetime Datetime::operator-(TimeDelta d) const {
+    return Datetime(m_data - d.time_duration());
 }
 
 } /* namespace hku */

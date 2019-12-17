@@ -37,14 +37,15 @@ public:
      * 1、总时长不能超过 TimeDelta(99999999, 23, 59, 59, 999, 999)。
      * 2、和 boost::posix_time::time_duration 有所区别，time_duration 只要有一个参数为负数，
      *    则认为是负时长，而 TimeDelta 则是各参数代表的ticks数之和。
-     * 3、各部分（days(), hours() ...）始终为正数，需通过 isNegative() 判断时长的正负。
+     * 3、当为负时长时，只有 days() 为负，其余各部分（hours() ...）均为正数。和 python 的
+     *    datetime.timedelta 行为一致。
      * </pre>
      * @param days 天数 [-99999999, 99999999]
-     * @param hours 小时数 [-10000, 10000]
-     * @param minutes 分钟数 [-50000, 50000]
-     * @param seconds 秒数 [-86399, 86399]
-     * @param milliseconds 毫秒数 [-999, 999]
-     * @param microseconds 微秒数 [-999, 999]
+     * @param hours 小时数 [-100000, 100000]
+     * @param minutes 分钟数 [-100000, 100000]
+     * @param seconds 秒数 [-8639900, 8639900]
+     * @param milliseconds 毫秒数 [-86399000000, 86399000000]
+     * @param microseconds 微秒数 [-86399000000, 86399000000]
      */
     TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0, int64_t seconds = 0,
               int64_t milliseconds = 0, int64_t microseconds = 0);
@@ -64,57 +65,22 @@ public:
     }
 
     /** 获取规范化后的天数 */
-    int64_t days() const {
-        if (isNegative()) {
-            if (ticks() % m_one_day_ticks == 0) {
-                return ticks() / m_one_day_ticks;
-            } else {
-                return ticks() / m_one_day_ticks - 1;
-            }
-        }
-        return std::abs(m_duration.hours() / 24);
-    }
+    int64_t days() const;
 
     /** 获取规范化后的小时数 [0, 23] */
-    int64_t hours() const {
-        return std::abs(m_duration.hours()) % 24;
-    }
+    int64_t hours() const;
 
     /** 获取规范化后的分钟数 [0, 59] */
-    int64_t minutes() const {
-        return std::abs(m_duration.minutes());
-    }
+    int64_t minutes() const;
 
     /** 获取规范化后的秒数 [0, 59] */
-    int64_t seconds() const {
-        return std::abs(m_duration.seconds());
-    }
+    int64_t seconds() const;
 
     /** 获取规范化后的毫秒数 [0, 999] */
-    int64_t milliseconds() const {
-        if (isNegative()) {
-            if (ticks() % m_one_day_ticks == 0) {
-                return 0;
-            } else {
-                int64_t pos_ticks =
-                  std::abs((ticks() / m_one_day_ticks - 1) * m_one_day_ticks) + ticks();
-                return (pos_ticks % 1000000 - microseconds()) / 1000;
-            }
-        }
-        return (std::abs(ticks()) % 1000000 - microseconds()) / 1000;
-    }
+    int64_t milliseconds() const;
 
     /** 获取规范化后的微秒数 [0, 999] */
-    int64_t microseconds() const {
-        if (isNegative()) {
-            if (ticks() % m_one_day_ticks == 0) {
-                return 0;
-            } else {
-                return 1000 + ticks() % 1000;
-            }
-        }
-        return std::abs(ticks() % 1000);
-    }
+    int64_t microseconds() const;
 
     /** 获取 tick 数，即转换为微秒后的总微秒数 */
     int64_t ticks() const {
@@ -150,12 +116,12 @@ public:
     //---------------------------------------------------------------
 
     /** 相加 */
-    TimeDelta operator+(TimeDelta td) {
+    TimeDelta operator+(TimeDelta td) const {
         return TimeDelta(td.m_duration + m_duration);
     }
 
     /** 相减 */
-    TimeDelta operator-(TimeDelta td) {
+    TimeDelta operator-(TimeDelta td) const {
         return TimeDelta(m_duration - td.m_duration);
     }
 
