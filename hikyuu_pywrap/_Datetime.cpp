@@ -21,8 +21,13 @@ bool (*le)(const Datetime&, const Datetime&) = operator<=;
 
 void export_Datetime() {
     class_<Datetime>("Datetime")
-      .def(init<unsigned long long>())
       .def(init<const std::string&>())
+      .def(init<unsigned long long>())
+      .def(init<long, long, long>())
+      .def(init<long, long, long, long>())
+      .def(init<long, long, long, long, long>())
+      .def(init<long, long, long, long, long, long>())
+      .def(init<long, long, long, long, long, long, long>())
       .def(init<long, long, long, long, long, long, long, long>())
       .def(self_ns::str(self))
       .add_property("year", &Datetime::year)
