@@ -31,6 +31,7 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta) {
     BOOST_CHECK_THROW(TimeDelta(99999999LL + 1), hku::exception);
     BOOST_CHECK_THROW(TimeDelta(-99999999LL - 1), hku::exception);
 
+#if !HKU_DISABLE_ASSERT
     /** @arg hours 超出限定值 */
     BOOST_CHECK_THROW(TimeDelta(0, 100001), hku::exception);
     BOOST_CHECK_THROW(TimeDelta(0, -100001), hku::exception);
@@ -50,6 +51,7 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta) {
     /** @arg microseconds 超出限定值 */
     BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 0, 8640000000000), hku::exception);
     BOOST_CHECK_THROW(TimeDelta(0, 0, 0, 0, 0, -8640000000000), hku::exception);
+#endif
 
     /** @arg microseconds总值超出限定值 */
     BOOST_CHECK_THROW(TimeDelta(99999999LL, 23, 59, 60, 999, 999), hku::exception);
@@ -295,6 +297,26 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta_subclass) {
     /** @arg Microseconds */
     BOOST_CHECK(Microseconds(1) == TimeDelta(0, 0, 0, 0, 0, 1));
     BOOST_CHECK(TimeDelta(0, 0, 0, 0, 0, 1) == Microseconds(1));
+}
+
+/** @par 检测点 */
+BOOST_AUTO_TEST_CASE(test_TimeDelta_Datetime_operator) {
+    /** @arg Datetime + TimeDelta */
+    Datetime d = Datetime(2019, 12, 18) + TimeDelta(1);
+    BOOST_CHECK(d == Datetime(2019, 12, 19));
+
+    d = Datetime(2019, 12, 31, 23, 59, 59, 999, 999) + Microseconds(1);
+    BOOST_CHECK(d == Datetime(2020, 1, 1));
+
+    d = Datetime(2019, 12, 18) + TimeDelta(-1);
+    BOOST_CHECK(d == Datetime(2019, 12, 17));
+
+    /** @arg Datetime - TimeDelta */
+    d = Datetime(2019, 12, 18) - TimeDelta(0, 0, 1);
+    BOOST_CHECK(d == Datetime(2019, 12, 17, 23, 59));
+
+    d = Datetime(2019, 12, 18) - TimeDelta(-2);
+    BOOST_CHECK(d == Datetime(2019, 12, 20));
 }
 
 /** @par 检测点 */

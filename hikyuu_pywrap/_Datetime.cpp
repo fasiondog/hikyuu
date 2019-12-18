@@ -23,7 +23,7 @@ void export_Datetime() {
     class_<Datetime>("Datetime")
       .def(init<unsigned long long>())
       .def(init<const std::string&>())
-      .def(init<long, long, long, long, long, long, long>())
+      .def(init<long, long, long, long, long, long, long, long>())
       .def(self_ns::str(self))
       .add_property("year", &Datetime::year)
       .add_property("month", &Datetime::month)
@@ -31,6 +31,7 @@ void export_Datetime() {
       .add_property("hour", &Datetime::hour)
       .add_property("minute", &Datetime::minute)
       .add_property("second", &Datetime::second)
+      .add_property("millisecond", &Datetime::millisecond)
       .add_property("microsecond", &Datetime::microsecond)
       .add_property("number", &Datetime::number)
 
@@ -78,6 +79,10 @@ void export_Datetime() {
       .def("__lt__", lt)
       .def("__ge__", ge)
       .def("__le__", le)
+
+      .def("__add__", &Datetime::operator+)
+      .def("__sub__", &Datetime::operator-)
+
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<Datetime>())
 #endif

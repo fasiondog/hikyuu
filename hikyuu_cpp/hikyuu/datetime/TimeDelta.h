@@ -41,11 +41,11 @@ public:
      *    datetime.timedelta 行为一致。
      * </pre>
      * @param days 天数 [-99999999, 99999999]
-     * @param hours 小时数 [-100000, 100000]
-     * @param minutes 分钟数 [-100000, 100000]
-     * @param seconds 秒数 [-8639900, 8639900]
-     * @param milliseconds 毫秒数 [-86399000000, 86399000000]
-     * @param microseconds 微秒数 [-86399000000, 86399000000]
+     * @param hours 小时数 (ASSERT下生效：[-100000, 100000]）
+     * @param minutes 分钟数 (ASSERT下生效：[-100000, 100000])
+     * @param seconds 秒数 (ASSERT下生效：[-8639900, 8639900])
+     * @param milliseconds 毫秒数 (ASSERT下生效：[-86399000000, 86399000000])
+     * @param microseconds 微秒数 (ASSERT下生效：[-86399000000, 86399000000])
      */
     TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0, int64_t seconds = 0,
               int64_t milliseconds = 0, int64_t microseconds = 0);
@@ -184,35 +184,65 @@ inline std::ostream& operator<<(std::ostream& out, TimeDelta td) {
     return out;
 }
 
-class HKU_API Days : public TimeDelta {
-public:
-    Days(int64_t days) : TimeDelta(days) {}
-};
+/**
+ * TimeDelta 快捷创建函数
+ * @param days 天数 [-99999999, 99999999]
+ * @ingroup DataType
+ */
+TimeDelta Days(int64_t days);
+inline TimeDelta Days(int64_t days) {
+    return TimeDelta(days);
+}
 
-class HKU_API Hours : public TimeDelta {
-public:
-    Hours(int64_t hours) : TimeDelta(0, hours) {}
-};
+/**
+ * TimeDelta 快捷创建函数
+ * @param hours 小时数
+ * @ingroup DataType
+ */
+TimeDelta Hours(int64_t hours);
+inline TimeDelta Hours(int64_t hours) {
+    return TimeDelta(0, hours);
+}
 
-class HKU_API Minutes : public TimeDelta {
-public:
-    Minutes(int64_t mins) : TimeDelta(0, 0, mins) {}
-};
+/**
+ * TimeDelta 快捷创建函数
+ * @param mins 分钟数
+ * @ingroup DataType
+ */
+TimeDelta Minutes(int64_t mins);
+inline TimeDelta Minutes(int64_t mins) {
+    return TimeDelta(0, 0, mins);
+}
 
-class HKU_API Seconds : public TimeDelta {
-public:
-    Seconds(int64_t secs) : TimeDelta(0, 0, 0, secs) {}
-};
+/**
+ * TimeDelta 快捷创建函数
+ * @param secs 秒数
+ * @ingroup DataType
+ */
+TimeDelta Seconds(int64_t secs);
+inline TimeDelta Seconds(int64_t secs) {
+    return TimeDelta(0, 0, 0, secs);
+}
 
-class HKU_API Milliseconds : public TimeDelta {
-public:
-    Milliseconds(int64_t milliseonds) : TimeDelta(0, 0, 0, 0, milliseonds) {}
-};
+/**
+ * TimeDelta 快捷创建函数
+ * @param milliseonds 毫秒数
+ * @ingroup DataType
+ */
+TimeDelta Milliseconds(int64_t milliseonds);
+inline TimeDelta Milliseconds(int64_t milliseonds) {
+    return TimeDelta(0, 0, 0, 0, milliseonds);
+}
 
-class HKU_API Microseconds : public TimeDelta {
-public:
-    Microseconds(int64_t microsecs) : TimeDelta(0, 0, 0, 0, 0, microsecs) {}
-};
+/**
+ * TimeDelta 快捷创建函数
+ * @param microsecs 微秒数
+ * @ingroup DataType
+ */
+TimeDelta Microseconds(int64_t microsecs);
+inline TimeDelta Microseconds(int64_t microsecs) {
+    return TimeDelta(0, 0, 0, 0, 0, microsecs);
+}
 
 } /* namespace hku */
 

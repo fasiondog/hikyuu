@@ -47,10 +47,11 @@ public:
      * @param hh 时
      * @param mm 分
      * @param sec 秒
+     * @param millisec 毫秒
      * @param microsec 微秒
      */
     Datetime(long year, long month, long day, long hh = 0, long mm = 0, long sec = 0,
-             long microsec = 0);
+             long millisec = 0, long microsec = 0);
 
     /** 从boost::gregorian::date构造日期类型 */
     explicit Datetime(const bd::date&);
@@ -84,7 +85,10 @@ public:
     /** 秒 [0, 59] */
     long second() const;
 
-    /** 微秒 [0, 999999]。包含1秒后所有微秒数，无独立的毫秒数 */
+    /** 毫秒 [0, 999] */
+    long millisecond() const;
+
+    /** 微秒 [0, 999] */
     long microsecond() const;
 
     /** 日期运算，加指定时长 */
@@ -288,12 +292,6 @@ inline Datetime::Datetime(const std::string& ts) {
     }
 }
 
-inline Datetime::Datetime(long year, long month, long day, long hh, long mm, long sec,
-                          long microsec) {
-    bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
-    m_data = bt::ptime(d, bt::time_duration(hh, mm, sec, microsec));
-}
-
 inline long Datetime::year() const {
     return m_data.date().year();
 }
@@ -318,8 +316,12 @@ inline long Datetime::second() const {
     return long(m_data.time_of_day().seconds());
 }
 
+inline long Datetime::millisecond() const {
+    return long(m_data.time_of_day().fractional_seconds()) / 1000;
+}
+
 inline long Datetime::microsecond() const {
-    return long(m_data.time_of_day().fractional_seconds());
+    return long(m_data.time_of_day().fractional_seconds()) % 1000;
 }
 
 inline bt::ptime Datetime::ptime() const {

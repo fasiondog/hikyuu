@@ -117,7 +117,7 @@ def __new_Datetime_init__(self, *args):
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
     - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
-    - Datetime(year, month, day, hour, minute, second, microsecond)
+    - Datetime(year, month, day, hour, minute, second, millisecond, microsecond)
     
     获取日期列表参见： :py:func:`getDateRange`
     
@@ -129,7 +129,8 @@ def __new_Datetime_init__(self, *args):
     #datetime实例同时也是date的实例，判断必须放在date之前
     elif isinstance(args[0], datetime):
         d = args[0]
-        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, d.microsecond)
+        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, 
+                              d.millisecond, d.microsecond)
     elif isinstance(args[0], date):
         d = args[0]
         __old_Datetime_init__(self, d.year, d.month, d.day, 0, 0, 0, 0)

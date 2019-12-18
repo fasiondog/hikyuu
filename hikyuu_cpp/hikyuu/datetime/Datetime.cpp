@@ -7,6 +7,7 @@
 
 #include <fmt/format.h>
 #include "../utilities/Null.h"
+#include "../utilities/exception.h"
 #include "Datetime.h"
 
 namespace hku {
@@ -14,6 +15,14 @@ namespace hku {
 HKU_API std::ostream& operator<<(std::ostream& out, const Datetime& d) {
     out << d.toString();
     return out;
+}
+
+Datetime::Datetime(long year, long month, long day, long hh, long mm, long sec, long millisec,
+                   long microsec) {
+    HKU_CHECK(millisec >= 0 && millisec <= 999, "Out of range! millisec: {}", millisec);
+    HKU_CHECK(microsec >= 0 && microsec <= 999, "Out of range! microsec: {}", microsec);
+    bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
+    m_data = bt::ptime(d, bt::time_duration(hh, mm, sec, millisec * 1000 + microsec));
 }
 
 Datetime::Datetime(unsigned long long datetime) {
@@ -55,13 +64,13 @@ std::string Datetime::toString() const {
     }
 
     std::string result;
-    if (microsecond() == 0) {
+    double microsecs = millisecond() * 1000 + microsecond();
+    if (microsecs == 0) {
         result = fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:>02d}", year(), month(),
                              day(), hour(), minute(), second());
     } else {
-        result =
-          fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:<09.6f}", year(), month(), day(),
-                      hour(), minute(), double(second()) + double(microsecond()) * 0.000001);
+        result = fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:<09.6f}", year(), month(),
+                             day(), hour(), minute(), microsecs * 0.000001);
     }
     return result;
     // return bt::to_simple_string(m_data);
