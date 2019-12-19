@@ -35,7 +35,7 @@ from .core_doc import *
 from hikyuu.util.mylog import escapetime
 from hikyuu.util.slice import list_getitem
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 
 #------------------------------------------------------------------
@@ -85,6 +85,9 @@ Block.__repr__ = reprFunc
 Datetime.__unicode__ = unicodeFunc
 Datetime.__repr__ = reprFunc
 
+TimeDelta.__unicode__ = unicodeFunc
+TimeDelta.__repr__ = reprFunc
+
 Parameter.__unicode__ = unicodeFunc
 Parameter.__repr__ = reprFunc
 
@@ -96,10 +99,14 @@ Parameter.__repr__ = reprFunc
 def datetime_hash(self):
     return self.number
 
+def timedelta_hash(self):
+    return self.ticks
+
 def stock_hash(self):
     return self.id
 
 Datetime.__hash__ = datetime_hash
+TimeDelta.__hash__ = timedelta_hash
 Stock.__hash__ = stock_hash
 
 
@@ -123,7 +130,7 @@ def __new_Datetime_init__(self, *args):
     
     获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
     """    
-    if args is None:
+    if not args:
         __old_Datetime_init__(self)
     
     #datetime实例同时也是date的实例，判断必须放在date之前
@@ -158,6 +165,29 @@ Datetime.date = Datetime_date
 Datetime.datetime = Datetime_datetime
 Datetime.isNull = Datetime_isNull 
 
+#------------------------------------------------------------------
+# 增强 TimeDelta
+#------------------------------------------------------------------
+
+__old_TimeDelta_init__ = TimeDelta.__init__
+
+def __new_TimeDelta_init__(self, *args):
+    if not args:
+        __old_TimeDelta_init__(self)
+    elif isinstance(args[0], timedelta):
+        ticks = (86400 * args[0].days + args[0].seconds) * 1000000 + args[0].microseconds
+        __old_TimeDelta_init__(self, 0, 0, 0, 0, 0, ticks)
+    else:
+        __old_TimeDelta_init__(self, *args)
+
+
+def TimeDelta_timedelta(self):
+    return timedelta(days=self.days, hours=self.hours, minutes=self.minutes,
+                     seconds=self.seconds, milliseconds=self.milliseconds, 
+                     microseconds=self.microseconds)
+
+TimeDelta.__init__ = __new_TimeDelta_init__
+TimeDelta.timedelta = TimeDelta_timedelta
 
 #------------------------------------------------------------------
 #重定义KQuery
