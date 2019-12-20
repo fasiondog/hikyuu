@@ -36,6 +36,12 @@ void export_TimeDelta() {
       .staticmethod("min")
       .def("resolution", &TimeDelta::resolution)
       .staticmethod("resolution")
+      .def("maxTicks", &TimeDelta::maxTicks)
+      .staticmethod("maxTicks")
+      .def("minTicks", &TimeDelta::minTicks)
+      .staticmethod("minTicks")
+      .def("fromTicks", &TimeDelta::fromTicks)
+      .staticmethod("fromTicks")
 
       .def("__eq__", &TimeDelta::operator==)
       .def("__ne__", &TimeDelta::operator!=)

@@ -39,6 +39,11 @@ TimeDelta::TimeDelta(bt::time_duration td) {
     m_duration = td;
 }
 
+TimeDelta TimeDelta::fromTicks(int64_t ticks) {
+    HKU_CHECK(ticks >= m_min_micro_seconds && ticks <= m_max_micro_seconds, "Out of total range!");
+    return TimeDelta(bt::time_duration(0, 0, 0, ticks));
+}
+
 int64_t TimeDelta::days() const {
     if (isNegative()) {
         if (ticks() % m_one_day_ticks == 0) {
@@ -113,6 +118,34 @@ int64_t TimeDelta::microseconds() const {
         }
     }
     return std::abs(ticks() % 1000);
+}
+
+TimeDelta HKU_API Hours(int64_t hours) {
+    HKU_CHECK(hours >= TimeDelta::maxTicks() / 3600000000LL &&
+                hours <= TimeDelta::minTicks() / 3600000000LL,
+              "Out of total range!");
+    return TimeDelta::fromTicks(hours * 3600000000LL);
+}
+
+TimeDelta HKU_API Minutes(int64_t mins) {
+    HKU_CHECK(
+      mins >= TimeDelta::maxTicks() / 60000000LL && mins <= TimeDelta::minTicks() / 60000000LL,
+      "Out of total range!");
+    return TimeDelta::fromTicks(mins * 60000000LL);
+}
+
+TimeDelta HKU_API Seconds(int64_t secs) {
+    HKU_CHECK(
+      secs >= TimeDelta::maxTicks() / 1000000LL && secs <= TimeDelta::minTicks() / 1000000LL,
+      "Out of total range!");
+    return TimeDelta::fromTicks(secs * 1000000LL);
+}
+
+TimeDelta HKU_API Milliseconds(int64_t milliseconds) {
+    HKU_CHECK(milliseconds >= TimeDelta::maxTicks() / 1000LL &&
+                milliseconds <= TimeDelta::minTicks() / 1000LL,
+              "Out of total range!");
+    return TimeDelta::fromTicks(milliseconds * 1000LL);
 }
 
 } /* namespace hku */

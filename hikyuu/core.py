@@ -24,30 +24,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# pylint: disable=E0602
 
+from datetime import date, datetime, timedelta
+from hikyuu.util.unicode import (unicodeFunc, reprFunc)
+from hikyuu.util.slice import list_getitem
+from hikyuu.util.mylog import escapetime
+from .core_doc import *
 import sys
 if sys.version > '3':
     IS_PY3 = True
 else:
     IS_PY3 = False
 
-from .core_doc import *
-from hikyuu.util.mylog import escapetime
-from hikyuu.util.slice import list_getitem
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-from datetime import date, datetime, timedelta
-
-
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 常量定义，各种C++中Null值
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 constant = Constant()
 
-
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 支持Python的__unicode__、__repr
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 MarketInfo.__unicode__ = unicodeFunc
 MarketInfo.__repr__ = reprFunc
@@ -91,107 +89,166 @@ TimeDelta.__repr__ = reprFunc
 Parameter.__unicode__ = unicodeFunc
 Parameter.__repr__ = reprFunc
 
-
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 增加Datetime、Stock的hash支持，以便可做为dict的key
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
+
 
 def datetime_hash(self):
     return self.number
 
+
 def timedelta_hash(self):
     return self.ticks
 
+
 def stock_hash(self):
     return self.id
+
 
 Datetime.__hash__ = datetime_hash
 TimeDelta.__hash__ = timedelta_hash
 Stock.__hash__ = stock_hash
 
-
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 增强 Datetime
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 __old_Datetime_init__ = Datetime.__init__
+__old_Datetime_add__ = Datetime.__add__
+__old_Datetime_sub__ = Datetime.__sub__
+
 
 def __new_Datetime_init__(self, *args):
     """
     日期时间类（精确到秒），通过以下方式构建：
-    
+
     - 通过字符串：Datetime("2010-1-1 10:00:00")
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
     - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
     - Datetime(year, month, day, hour, minute, second, millisecond, microsecond)
-    
+
     获取日期列表参见： :py:func:`getDateRange`
-    
+
     获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
-    """    
+    """
     if not args:
         __old_Datetime_init__(self)
-    
-    #datetime实例同时也是date的实例，判断必须放在date之前
+
+    # datetime实例同时也是date的实例，判断必须放在date之前
     elif isinstance(args[0], datetime):
         d = args[0]
-        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, 
-                              d.millisecond, d.microsecond)
+        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, d.millisecond, d.microsecond)
     elif isinstance(args[0], date):
         d = args[0]
         __old_Datetime_init__(self, d.year, d.month, d.day, 0, 0, 0, 0)
-    
+
     elif isinstance(args[0], str):
         __old_Datetime_init__(self, args[0])
     else:
         __old_Datetime_init__(self, *args)
 
+
+def __new_Datetime_add__(self, td):
+    if isinstance(td, TimeDelta):
+        return __old_Datetime_add__(self, td)
+    elif isinstance(td, timedelta):
+        return __old_Datetime_add__(self, TimeDelta(td))
+    else:
+        raise TypeError("unsupported operand type(s) for +: 'TimeDelta' and '{}'".format(type(td)))
+
+
+def __new_Datetime_sub__(self, td):
+    if isinstance(td, TimeDelta):
+        return __old_Datetime_sub__(self, td)
+    elif isinstance(td, timedelta):
+        return __old_Datetime_sub__(self, TimeDelta(td))
+    else:
+        raise TypeError("unsupported operand type(s) for +: 'TimeDelta' and '{}'".format(type(td)))
+
+
 def Datetime_date(self):
     """转化生成 python 的 date"""
     return date(self.year, self.month, self.day)
 
+
 def Datetime_datetime(self):
     """转化生成 python 的 datetime"""
-    return datetime(self.year, self.month, self.day, 
-                    self.hour, self.minute, self.second, self.microsecond)
-        
+    return datetime(self.year, self.month, self.day, self.hour, self.minute, self.second, self.microsecond)
+
+
 def Datetime_isNull(self):
     """是否是Null值, 即是否等于 constant.null_datetime"""
     return True if self == constant.null_datetime else False
 
-Datetime.__init__ =  __new_Datetime_init__
+
+Datetime.__init__ = __new_Datetime_init__
+Datetime.__add__ = __new_Datetime_add__
+Datetime.__radd__ = __new_Datetime_add__
+Datetime.__sub__ = __new_Datetime_sub__
 Datetime.date = Datetime_date
 Datetime.datetime = Datetime_datetime
-Datetime.isNull = Datetime_isNull 
+Datetime.isNull = Datetime_isNull
 
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 增强 TimeDelta
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 __old_TimeDelta_init__ = TimeDelta.__init__
+__old_TimeDelta_add__ = TimeDelta.__add__
+__old_TimeDelta_sub__ = TimeDelta.__sub__
+
 
 def __new_TimeDelta_init__(self, *args):
     if not args:
         __old_TimeDelta_init__(self)
     elif isinstance(args[0], timedelta):
-        ticks = (86400 * args[0].days + args[0].seconds) * 1000000 + args[0].microseconds
-        __old_TimeDelta_init__(self, 0, 0, 0, 0, 0, ticks)
+        days = args[0].days
+        secs = args[0].seconds
+        hours = secs // 3600
+        mins = secs // 60 - hours * 60
+        secs = secs - mins * 60 - hours * 3600
+        microsecs = args[0].microseconds
+        millisecs = microsecs // 1000
+        microsecs = microsecs - millisecs * 1000
+        __old_TimeDelta_init__(self, days, hours, mins, secs, millisecs, microsecs)
     else:
         __old_TimeDelta_init__(self, *args)
 
 
+def __new_TimeDelta_add__(self, td):
+    if isinstance(td, TimeDelta):
+        return __old_TimeDelta_add__(self, td)
+    elif isinstance(td, timedelta):
+        return __old_TimeDelta_add__(self, TimeDelta(td))
+    elif isinstance(td, Datetime):
+        return td + self
+    else:
+        raise TypeError("unsupported operand type(s) for +: 'TimeDelta' and '{}'".format(type(td)))
+
+
+def __new_TimeDelta_sub__(self, td):
+    return __old_TimeDelta_sub__(self, td) if isinstance(td, TimeDelta) else __old_TimeDelta_sub__(self, TimeDelta(td))
+
+
 def TimeDelta_timedelta(self):
-    return timedelta(days=self.days, hours=self.hours, minutes=self.minutes,
-                     seconds=self.seconds, milliseconds=self.milliseconds, 
+    return timedelta(days=self.days,
+                     hours=self.hours,
+                     minutes=self.minutes,
+                     seconds=self.seconds,
+                     milliseconds=self.milliseconds,
                      microseconds=self.microseconds)
 
+
 TimeDelta.__init__ = __new_TimeDelta_init__
+TimeDelta.__add__ = __new_TimeDelta_add__
+TimeDelta.__sub__ = __new_TimeDelta_sub__
 TimeDelta.timedelta = TimeDelta_timedelta
 
-#------------------------------------------------------------------
-#重定义KQuery
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
+# 重定义KQuery
+# ------------------------------------------------------------------
 KQuery.INDEX = KQuery.QueryType.INDEX
 KQuery.DATE = KQuery.QueryType.DATE
 KQuery.DAY = "DAY"
@@ -214,6 +271,7 @@ KQuery.FORWARD = KQuery.RecoverType.FORWARD
 KQuery.BACKWARD = KQuery.RecoverType.BACKWARD
 KQuery.EQUAL_FORWARD = KQuery.RecoverType.EQUAL_FORWARD
 KQuery.EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
+
 
 class Query(KQuery):
     """重新定义KQuery，目的如下：
@@ -244,12 +302,11 @@ class Query(KQuery):
     BACKWARD = KQuery.RecoverType.BACKWARD
     EQUAL_FORWARD = KQuery.RecoverType.EQUAL_FORWARD
     EQUAL_BACKWARD = KQuery.RecoverType.EQUAL_BACKWARD
-    
-    def __init__(self, start = 0, end = None, 
-                 kType = KQuery.DAY, recoverType = KQuery.RecoverType.NO_RECOVER):
+
+    def __init__(self, start=0, end=None, kType=KQuery.DAY, recoverType=KQuery.RecoverType.NO_RECOVER):
         """
         构建按索引 [start, end) 方式获取K线数据条件
-        
+
         :param ind start: 起始索引位置或起始日期
         :param ind end: 结束索引位置或结束日期
         :param KQuery.KType kType: K线数据类型（如日线、分钟线等）
@@ -265,12 +322,14 @@ class Query(KQuery):
             raise TypeError('Incorrect parameter type error!')
         super(Query, self).__init__(start, end_pos, kType, recoverType)
 
+
 QueryByIndex = Query
 QueryByDate = Query
 
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 增强 KData 的遍历
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
+
 
 def KData_getitem(kdata, i):
     """
@@ -282,28 +341,29 @@ def KData_getitem(kdata, i):
         if index < 0 or index >= length:
             raise IndexError("index out of range: %d" % i)
         return kdata.getKRecord(index)
-    
+
     elif isinstance(i, Datetime):
         return kdata.getKRecordByDate(i)
-    
+
     elif isinstance(i, str):
         return kdata.getKRecordByDate(Datetime(i))
 
     elif isinstance(i, slice):
         return [kdata.getKRecord(x) for x in range(*i.indices(len(kdata)))]
-        
+
     else:
         raise IndexError("Error index type")
-        return KRecord()
+
 
 def KData_iter(kdata):
     for i in range(len(kdata)):
         yield kdata[i]
-        
+
+
 def KData_getPos(kdata, datetime):
     """
     获取指定时间对应的索引位置
-    
+
     :param Datetime datetime: 指定的时间
     :return: 对应的索引位置，如果不在数据范围内，则返回 None
     """
@@ -315,11 +375,10 @@ KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
 KData.getPos = KData_getPos
 
-
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 封装增强其他C++ vector类型的遍历
-#------------------------------------------------------------------
-        
+# ------------------------------------------------------------------
+
 PriceList.__getitem__ = list_getitem
 DatetimeList.__getitem__ = list_getitem
 StringList.__getitem__ = list_getitem
@@ -327,80 +386,83 @@ BlockList.__getitem__ = list_getitem
 TimeLineList.__getitem__ = list_getitem
 TransList.__getitem__ = list_getitem
 
-
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 增加转化为 np.array、pandas.DataFrame 的功能
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 try:
     import numpy as np
     import pandas as pd
-    
+
     def KData_to_np(kdata):
         """转化为numpy结构数组"""
         if kdata.getQuery().kType in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
-            k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 
-                                        'amount', 'volume'], 
-                    'formats':['datetime64[D]','d','d','d','d','d','d']})
+            k_type = np.dtype({
+                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                'formats': ['datetime64[D]', 'd', 'd', 'd', 'd', 'd', 'd']
+            })
         else:
-            k_type = np.dtype({'names':['datetime','open', 'high', 'low','close', 
-                                        'amount', 'volume'], 
-                    'formats':['datetime64[ms]','d','d','d','d','d','d']})
-        return np.array([(k.datetime.datetime(), k.openPrice, k.highPrice, 
-                          k.lowPrice, k.closePrice, k.transAmount, 
-                          k.transCount) for k in kdata], dtype=k_type)
-        
+            k_type = np.dtype({
+                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                'formats': ['datetime64[ms]', 'd', 'd', 'd', 'd', 'd', 'd']
+            })
+        return np.array(
+            [(k.datetime.datetime(), k.openPrice, k.highPrice, k.lowPrice, k.closePrice, k.transAmount, k.transCount)
+             for k in kdata],
+            dtype=k_type)
+
     def KData_to_df(kdata):
         """转化为pandas的DataFrame"""
-        return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')    
+        return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')
 
     KData.to_np = KData_to_np
     KData.to_df = KData_to_df
-    
+
     def PriceList_to_np(data):
         """仅在安装了numpy模块时生效，转换为numpy.array"""
         return np.array(data, dtype='d')
-       
+
     def PriceList_to_df(data):
         """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
-        return pd.DataFrame(data.to_np(), columns=('Value',))
-        
+        return pd.DataFrame(data.to_np(), columns=('Value', ))
+
     PriceList.to_np = PriceList_to_np
     PriceList.to_df = PriceList_to_df
-    
+
     def DatetimeList_to_np(data):
         """仅在安装了numpy模块时生效，转换为numpy.array"""
         return np.array(data, dtype='datetime64[D]')
-        
+
     def DatetimeList_to_df(data):
         """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
-        return pd.DataFrame(data.to_np(), columns=('Datetime',))
-        
+        return pd.DataFrame(data.to_np(), columns=('Datetime', ))
+
     DatetimeList.to_np = DatetimeList_to_np
     DatetimeList.to_df = DatetimeList_to_df
-    
+
     def TimeLine_to_np(data):
         """转化为numpy结构数组"""
-        t_type = np.dtype({'names':['datetime','price', 'vol'], 
-                    'formats':['datetime64[ms]','d','d']})
+        t_type = np.dtype({'names': ['datetime', 'price', 'vol'], 'formats': ['datetime64[ms]', 'd', 'd']})
         return np.array([(t.datetime.datetime(), t.price, t.vol) for t in data], dtype=t_type)
 
     def TimeLine_to_df(kdata):
         """转化为pandas的DataFrame"""
-        return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')    
+        return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')
 
     TimeLineList.to_np = TimeLine_to_np
     TimeLineList.to_df = TimeLine_to_df
 
     def TransList_to_np(data):
         """转化为numpy结构数组"""
-        t_type = np.dtype({'names':['datetime','price', 'vol', 'direct'], 
-                    'formats':['datetime64[ms]','d','d', 'd']})
+        t_type = np.dtype({
+            'names': ['datetime', 'price', 'vol', 'direct'],
+            'formats': ['datetime64[ms]', 'd', 'd', 'd']
+        })
         return np.array([(t.datetime.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type)
 
     def TransList_to_df(kdata):
         """转化为pandas的DataFrame"""
-        return pd.DataFrame.from_records(TransList_to_np(kdata), index='datetime')    
+        return pd.DataFrame.from_records(TransList_to_np(kdata), index='datetime')
 
     TransList.to_np = TransList_to_np
     TransList.to_df = TransList_to_df
@@ -408,60 +470,59 @@ try:
 except:
     pass
 
-
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 # 净化命名空间
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
+# pylint: disable=E0603
+__all__ = [  # 类
+    'Block',
+    'BlockList',
+    'Datetime',
+    'DatetimeList',
+    'TimeDelta',
+    'KData',
+    'KQuery',
+    'KQueryByDate',
+    'KQueryByIndex',
+    'KRecord',
+    'KRecordList',
+    'LOG_LEVEL',
+    'MarketInfo',
+    'OstreamRedirect',
+    'Parameter',
+    'PriceList',
+    'Query',
+    'QueryByDate',
+    'QueryByIndex',
+    'Stock',
+    'StockManager',
+    'StockTypeInfo',
+    'StockWeight',
+    'StockWeightList',
+    'StringList',
+    'TimeLineRecord',
+    'TimeLineList',
+    'TransRecord',
+    'TransList',
 
-__all__ = [#类
-           'Block', 
-           'BlockList', 
-           'Datetime', 
-           'DatetimeList', 
-           'TimeDelta',
-           'KData',
-           'KQuery', 
-           'KQueryByDate', 
-           'KQueryByIndex', 
-           'KRecord', 
-           'KRecordList', 
-           'LOG_LEVEL',
-           'MarketInfo', 
-           'OstreamRedirect',
-           'Parameter', 
-           'PriceList',
-           'Query', 
-           'QueryByDate', 
-           'QueryByIndex', 
-           'Stock', 
-           'StockManager', 
-           'StockTypeInfo', 
-           'StockWeight', 
-           'StockWeightList', 
-           'StringList',
-           'TimeLineRecord',
-           'TimeLineList',
-           'TransRecord',
-           'TransList',
-           
-           #变量
-           'constant', 
-           'IS_PY3',
-           
-           #函数
-           'getVersion',
-           'getDateRange', 
-           'getStock',
-           'hikyuu_init', 
-           'hku_load', 
-           'hku_save',
-           'roundEx',
-           'roundDown',
-           'roundUp', 
-           'get_log_level',
-           'set_log_level',
-           'toPriceList', 
-           
-           #包
-           #'util'
-           ]
+    # 变量
+    'constant',
+    'IS_PY3',
+
+    # 函数
+    'getVersion',
+    'getDateRange',
+    'getStock',
+    'hikyuu_init',
+    'hku_load',
+    'hku_save',
+    'roundEx',
+    'roundDown',
+    'roundUp',
+    'get_log_level',
+    'set_log_level',
+    'toPriceList',
+
+    # 包
+    # 'util'
+]

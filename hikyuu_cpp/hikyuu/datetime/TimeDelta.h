@@ -47,8 +47,8 @@ public:
      * @param milliseconds 毫秒数 (ASSERT下生效：[-86399000000, 86399000000])
      * @param microseconds 微秒数 (ASSERT下生效：[-86399000000, 86399000000])
      */
-    TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0, int64_t seconds = 0,
-              int64_t milliseconds = 0, int64_t microseconds = 0);
+    explicit TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0,
+                       int64_t seconds = 0, int64_t milliseconds = 0, int64_t microseconds = 0);
 
     /** 通过 boost::posix_time::time_duration 构造 */
     explicit TimeDelta(bt::time_duration td);
@@ -165,10 +165,23 @@ public:
         return TimeDelta(99999999, 23, 59, 59, 999, 999);
     }
 
+    /** 支持的最大 tick 数 */
+    static int64_t maxTicks() {
+        return m_max_micro_seconds;
+    }
+
+    /** 支持的最小 tick 数 */
+    static int64_t minTicks() {
+        return m_min_micro_seconds;
+    }
+
     /** 获取表达精度 1 微秒, TimeDelta(0, 0, 0, 0, 0, 1) */
     static TimeDelta resolution() {
         return TimeDelta(0, 0, 0, 0, 0, 1);
     }
+
+    /** 从 ticks 创建 */
+    static TimeDelta fromTicks(int64_t ticks);
 
 private:
     bt::time_duration m_duration;
@@ -199,40 +212,28 @@ inline TimeDelta Days(int64_t days) {
  * @param hours 小时数
  * @ingroup DataType
  */
-TimeDelta Hours(int64_t hours);
-inline TimeDelta Hours(int64_t hours) {
-    return TimeDelta(0, hours);
-}
+TimeDelta HKU_API Hours(int64_t hours);
 
 /**
  * TimeDelta 快捷创建函数
  * @param mins 分钟数
  * @ingroup DataType
  */
-TimeDelta Minutes(int64_t mins);
-inline TimeDelta Minutes(int64_t mins) {
-    return TimeDelta(0, 0, mins);
-}
+TimeDelta HKU_API Minutes(int64_t mins);
 
 /**
  * TimeDelta 快捷创建函数
  * @param secs 秒数
  * @ingroup DataType
  */
-TimeDelta Seconds(int64_t secs);
-inline TimeDelta Seconds(int64_t secs) {
-    return TimeDelta(0, 0, 0, secs);
-}
+TimeDelta HKU_API Seconds(int64_t secs);
 
 /**
  * TimeDelta 快捷创建函数
- * @param milliseonds 毫秒数
+ * @param milliseconds 毫秒数
  * @ingroup DataType
  */
-TimeDelta Milliseconds(int64_t milliseonds);
-inline TimeDelta Milliseconds(int64_t milliseonds) {
-    return TimeDelta(0, 0, 0, 0, milliseonds);
-}
+TimeDelta HKU_API Milliseconds(int64_t milliseconds);
 
 /**
  * TimeDelta 快捷创建函数
@@ -241,7 +242,7 @@ inline TimeDelta Milliseconds(int64_t milliseonds) {
  */
 TimeDelta Microseconds(int64_t microsecs);
 inline TimeDelta Microseconds(int64_t microsecs) {
-    return TimeDelta(0, 0, 0, 0, 0, microsecs);
+    return TimeDelta::fromTicks(microsecs);
 }
 
 } /* namespace hku */
