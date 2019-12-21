@@ -23,12 +23,9 @@ void export_Datetime() {
     class_<Datetime>("Datetime")
       .def(init<const std::string&>())
       .def(init<unsigned long long>())
-      .def(init<long, long, long>())
-      .def(init<long, long, long, long>())
-      .def(init<long, long, long, long, long>())
-      .def(init<long, long, long, long, long, long>())
-      .def(init<long, long, long, long, long, long, long>())
-      .def(init<long, long, long, long, long, long, long, long>())
+      .def(init<long, long, long, long, long, long, long, long>(
+        (arg("year"), arg("month"), arg("day"), arg("hour") = 0, arg("minute") = 0,
+         arg("second") = 0, arg("millisecond") = 0, arg("microsecond") = 0)))
       .def(self_ns::str(self))
       .add_property("year", &Datetime::year)
       .add_property("month", &Datetime::month)

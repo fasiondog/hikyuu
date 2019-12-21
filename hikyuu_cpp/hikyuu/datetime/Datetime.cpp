@@ -65,6 +65,8 @@ std::string Datetime::toString() const {
 
     std::string result;
     double microsecs = millisecond() * 1000 + microsecond();
+
+    // 和 python datetime 打印方式保持一致
     if (microsecs == 0) {
         result = fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:>02d}", year(), month(),
                              day(), hour(), minute(), second());
@@ -73,7 +75,6 @@ std::string Datetime::toString() const {
                              day(), hour(), minute(), microsecs * 0.000001);
     }
     return result;
-    // return bt::to_simple_string(m_data);
 }
 
 unsigned long long Datetime::number() const {

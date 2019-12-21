@@ -83,9 +83,6 @@ Block.__repr__ = reprFunc
 Datetime.__unicode__ = unicodeFunc
 Datetime.__repr__ = reprFunc
 
-TimeDelta.__unicode__ = unicodeFunc
-TimeDelta.__repr__ = reprFunc
-
 Parameter.__unicode__ = unicodeFunc
 Parameter.__repr__ = reprFunc
 
@@ -119,7 +116,7 @@ __old_Datetime_add__ = Datetime.__add__
 __old_Datetime_sub__ = Datetime.__sub__
 
 
-def __new_Datetime_init__(self, *args):
+def __new_Datetime_init__(self, *args, **kwargs):
     """
     日期时间类（精确到秒），通过以下方式构建：
 
@@ -127,14 +124,14 @@ def __new_Datetime_init__(self, *args):
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
     - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
-    - Datetime(year, month, day, hour, minute, second, millisecond, microsecond)
+    - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0)
 
     获取日期列表参见： :py:func:`getDateRange`
 
     获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
     """
     if not args:
-        __old_Datetime_init__(self)
+        __old_Datetime_init__(self, **kwargs)
 
     # datetime实例同时也是date的实例，判断必须放在date之前
     elif isinstance(args[0], datetime):
@@ -200,9 +197,9 @@ __old_TimeDelta_add__ = TimeDelta.__add__
 __old_TimeDelta_sub__ = TimeDelta.__sub__
 
 
-def __new_TimeDelta_init__(self, *args):
+def __new_TimeDelta_init__(self, *args, **kwargs):
     if not args:
-        __old_TimeDelta_init__(self)
+        __old_TimeDelta_init__(self, **kwargs)
     elif isinstance(args[0], timedelta):
         days = args[0].days
         secs = args[0].seconds
@@ -233,12 +230,14 @@ def __new_TimeDelta_sub__(self, td):
 
 
 def TimeDelta_timedelta(self):
-    return timedelta(days=self.days,
-                     hours=self.hours,
-                     minutes=self.minutes,
-                     seconds=self.seconds,
-                     milliseconds=self.milliseconds,
-                     microseconds=self.microseconds)
+    return timedelta(
+        days=self.days,
+        hours=self.hours,
+        minutes=self.minutes,
+        seconds=self.seconds,
+        milliseconds=self.milliseconds,
+        microseconds=self.microseconds
+    )
 
 
 TimeDelta.__init__ = __new_TimeDelta_init__
@@ -397,19 +396,28 @@ try:
     def KData_to_np(kdata):
         """转化为numpy结构数组"""
         if kdata.getQuery().kType in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
-            k_type = np.dtype({
-                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
-                'formats': ['datetime64[D]', 'd', 'd', 'd', 'd', 'd', 'd']
-            })
+            k_type = np.dtype(
+                {
+                    'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                    'formats': ['datetime64[D]', 'd', 'd', 'd', 'd', 'd', 'd']
+                }
+            )
         else:
-            k_type = np.dtype({
-                'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
-                'formats': ['datetime64[ms]', 'd', 'd', 'd', 'd', 'd', 'd']
-            })
+            k_type = np.dtype(
+                {
+                    'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                    'formats': ['datetime64[ms]', 'd', 'd', 'd', 'd', 'd', 'd']
+                }
+            )
         return np.array(
-            [(k.datetime.datetime(), k.openPrice, k.highPrice, k.lowPrice, k.closePrice, k.transAmount, k.transCount)
-             for k in kdata],
-            dtype=k_type)
+            [
+                (
+                    k.datetime.datetime(), k.openPrice, k.highPrice, k.lowPrice, k.closePrice, k.transAmount,
+                    k.transCount
+                ) for k in kdata
+            ],
+            dtype=k_type
+        )
 
     def KData_to_df(kdata):
         """转化为pandas的DataFrame"""
@@ -454,10 +462,12 @@ try:
 
     def TransList_to_np(data):
         """转化为numpy结构数组"""
-        t_type = np.dtype({
-            'names': ['datetime', 'price', 'vol', 'direct'],
-            'formats': ['datetime64[ms]', 'd', 'd', 'd']
-        })
+        t_type = np.dtype(
+            {
+                'names': ['datetime', 'price', 'vol', 'direct'],
+                'formats': ['datetime64[ms]', 'd', 'd', 'd']
+            }
+        )
         return np.array([(t.datetime.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type)
 
     def TransList_to_df(kdata):
@@ -522,6 +532,12 @@ __all__ = [  # 类
     'get_log_level',
     'set_log_level',
     'toPriceList',
+    'Days',
+    'Hours',
+    'Minutes',
+    'Seconds',
+    'Milliseconds',
+    'Microseconds',
 
     # 包
     # 'util'

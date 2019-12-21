@@ -34,18 +34,18 @@ public:
      * 构造函数
      * @note
      * <pre>
-     * 1、总时长不能超过 TimeDelta(99999999, 23, 59, 59, 999, 999)。
+     * 1、总时长范围：TimeDetla(-99999999) - TimeDelta(99999999, 23, 59, 59, 999, 999)。
      * 2、和 boost::posix_time::time_duration 有所区别，time_duration 只要有一个参数为负数，
      *    则认为是负时长，而 TimeDelta 则是各参数代表的ticks数之和。
      * 3、当为负时长时，只有 days() 为负，其余各部分（hours() ...）均为正数。和 python 的
      *    datetime.timedelta 行为一致。
      * </pre>
      * @param days 天数 [-99999999, 99999999]
-     * @param hours 小时数 (ASSERT下生效：[-100000, 100000]）
-     * @param minutes 分钟数 (ASSERT下生效：[-100000, 100000])
-     * @param seconds 秒数 (ASSERT下生效：[-8639900, 8639900])
-     * @param milliseconds 毫秒数 (ASSERT下生效：[-86399000000, 86399000000])
-     * @param microseconds 微秒数 (ASSERT下生效：[-86399000000, 86399000000])
+     * @param hours 小时数 [-100000, 100000]
+     * @param minutes 分钟数 [-100000, 100000]
+     * @param seconds 秒数 [-8639900, 8639900])
+     * @param milliseconds 毫秒数 [-86399000000, 86399000000])
+     * @param microseconds 微秒数 [-86399000000, 86399000000])
      */
     explicit TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0,
                        int64_t seconds = 0, int64_t milliseconds = 0, int64_t microseconds = 0);
@@ -99,8 +99,8 @@ public:
 
     /** 转换为字符串，格式：-1 days hh:mm:ss.000000) */
     std::string str() const {
-        return fmt::format("{} days, {:>02d}:{:>02d}:{:>02d}.{:<6d}", days(), hours(), minutes(),
-                           seconds(), milliseconds() * 1000 + microseconds());
+        return fmt::format("{} days, {:>02d}:{:>02d}:{:<2.6f}", days(), hours(), minutes(),
+                           seconds() + double(milliseconds() * 1000 + microseconds()) * 0.000001);
     }
 
     /** 转换为字符串，格式为：TimeDelta(days,hours,mins,secs,millisecs,microsecs) */
@@ -193,7 +193,7 @@ private:
 
 std::ostream& operator<<(std::ostream& out, TimeDelta td);
 inline std::ostream& operator<<(std::ostream& out, TimeDelta td) {
-    out << td.repr();
+    out << td.str();
     return out;
 }
 

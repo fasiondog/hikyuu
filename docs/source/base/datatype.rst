@@ -9,13 +9,13 @@
 
 .. py:class:: Datetime
 
-    日期时间类（精确到秒），通过以下方式构建：
+    日期时间类（精确到微秒），通过以下方式构建：
     
     - 通过字符串：Datetime("2010-1-1 10:00:00")
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
     - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
-    - Datetime(year, month, day, hour, minute, second, millisecond, microsecond)
+    - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0)
     
     获取日期列表参见： :py:func:`getDateRange`
     
@@ -173,6 +173,118 @@
     .. py:staticmethod:: today()
     
         获取当前的日期
+
+
+.. py:class:: TimeDelta
+
+    时间时长，用于时间计算。可通过以下方式构建：
+
+    - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
+    - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)
+
+        - -99999999 <= days <= 99999999
+        - -100000 <= hours <= 100000
+        - -100000 <= minutes <= 100000
+        - -8639900 <= seconds <= 8639900
+        - -86399000000 <= milliseconds <= 86399000000
+        - -86399000000 <= microseconds <= 86399000000
+
+    以上参数限制，主要为防止求总微秒数时可能出现溢出的情况。如只使用一个参数不希望存在上述限制时，可使用快捷函数：
+    :py:func:`Days`, :py:func:`Hours`, :py:func:`Minutes`, :py:func:`Seconds`, :py:func:`Milliseconds`, 
+    :py:func:`Microseconds`
+
+    .. py:attribute:: days 天数 [-99999999, 99999999]
+    .. py:attribute:: hours 小时数 [0, 23]
+    .. py:attribute:: minutes 分钟数 [0, 59]
+    .. py:attribute:: seconds 秒数 [0, 59]
+    .. py:attribute:: milliseconds 毫秒数 [0, 999]
+    .. py:attribute:: microseconds 微秒数 [0, 999]
+
+    .. py:staticmethod:: max()
+
+        支持的最大时长
+
+        :return: TimeDelta(99999999, 23, 59, 59, 999, 999)
+
+    .. py:staticmethod:: min()
+
+        支持的最小时长
+
+        :return: TimeDelta(-99999999, 0, 0, 0, 0, 0)
+
+    .. py:staticmethod:: resolution()
+
+        支持的最小精度
+        
+        :return: TimeDelta(0, 0, 0, 0, 0, 1)
+
+    .. py:staticmethod:: maxTicks()
+
+        支持的最大 ticks （即微秒数）
+
+        :rtype: int
+
+    .. py:staticmethod:: minTicks()
+
+        支持的最小 ticks （即微秒数）
+
+        :rtype: int
+
+    .. py:staticmethod:: fromTicks(ticks)
+
+        使用 ticks（即微秒数） 值创建
+
+        :param int ticks: 微秒数
+        :rtype: TimeDelta
+
+
+.. py:function:: Days(days)
+
+    以天数创建 TimeDelta
+
+    :param int days: 天数
+    :rtype: TimeDelta
+
+
+.. py:function:: Hours(hours)
+
+    以小时数创建 TimeDelta
+
+    :param int hours: 小时数
+    :rtype: TimeDelta
+
+
+.. py:function:: Minutes(minutes)
+
+    以分钟数创建 TimeDelta
+
+    :param int minutes: 分钟数
+    :rtype: TimeDelta
+
+
+.. py:function:: Seconds(seconds)
+
+    以秒数创建 TimeDelta
+
+    :param int seconds: 秒数
+    :rtype: TimeDelta
+
+
+.. py:function:: Milliseconds(milliseconds)
+
+    以毫秒数创建 TimeDelta
+
+    :param int milliseconds: 毫秒数
+    :rtype: TimeDelta
+
+
+.. py:function:: Microseconds(microseconds)
+
+    以微秒数创建 TimeDelta
+
+    :param int microseconds: 微秒数
+    :rtype: TimeDelta
+
 
 
 K线数据

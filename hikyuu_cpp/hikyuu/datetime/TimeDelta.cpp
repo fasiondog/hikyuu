@@ -17,15 +17,15 @@ TimeDelta::TimeDelta(int64_t days, int64_t hours, int64_t minutes, int64_t secon
                      int64_t milliseconds, int64_t microseconds) {
     // 各参数添加限制，防止出现总和溢出的情况
     HKU_CHECK(days <= 99999999 && days >= -99999999, "Out of range! Input days: {}", days);
-    HKU_ASSERT_M(hours >= -100000 && hours <= 100000, "Out of range! Input hours: {}", hours);
-    HKU_ASSERT_M(minutes >= -100000 && minutes <= 100000, "Out of range! Input minutes: {}",
+    HKU_CHECK(hours >= -100000 && hours <= 100000, "Out of range! Input hours: {}", hours);
+    HKU_CHECK(minutes >= -100000 && minutes <= 100000, "Out of range! Input minutes: {}",
                  minutes);
-    HKU_ASSERT_M(seconds >= -8639900 && seconds <= 8639900, "Out of range! Input seconds: {}",
+    HKU_CHECK(seconds >= -8639900 && seconds <= 8639900, "Out of range! Input seconds: {}",
                  seconds);
-    HKU_ASSERT_M(milliseconds >= -86399000000 && milliseconds <= 86399000000,
+    HKU_CHECK(milliseconds >= -86399000000 && milliseconds <= 86399000000,
                  "Out of range! Input milliseconds: {}", milliseconds);
-    HKU_ASSERT_M(microseconds >= -86399000000 && microseconds <= 86399000000,
-                 "Out of range! Input microseconds: {}", microseconds);
+    HKU_CHECK(microseconds >= -86399000000 && microseconds <= 86399000000,
+              "Out of range! Input microseconds: {}", microseconds);
     int64_t total =
       ((((days * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000 + milliseconds) * 1000 +
       microseconds;

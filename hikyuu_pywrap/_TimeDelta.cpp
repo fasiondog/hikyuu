@@ -16,13 +16,12 @@ using namespace hku;
 
 void export_TimeDelta() {
     class_<TimeDelta>("TimeDelta", init<>())
-      .def(init<int64_t>())
-      .def(init<int64_t, int64_t>())
-      .def(init<int64_t, int64_t, int64_t>())
-      .def(init<int64_t, int64_t, int64_t, int64_t>())
-      .def(init<int64_t, int64_t, int64_t, int64_t, int64_t>())
-      .def(init<int64_t, int64_t, int64_t, int64_t, int64_t, int64_t>())
-      .def(self_ns::str(self))
+      .def(init<int64_t, int64_t, int64_t, int64_t, int64_t, int64_t>(
+        (arg("days") = 0, arg("hours") = 0, arg("minutes") = 0, arg("seconds") = 0,
+         arg("milliseconds") = 0, arg("microseconds") = 0)))
+      //.def(self_ns::str(self))
+      .def("__str__", &TimeDelta::str)
+      .def("__repr__", &TimeDelta::repr)
       .add_property("days", &TimeDelta::days)
       .add_property("hours", &TimeDelta::hours)
       .add_property("minutes", &TimeDelta::minutes)
@@ -57,4 +56,11 @@ void export_TimeDelta() {
       .def_pickle(normal_pickle_suite<TimeDelta>())
 #endif
       ;
+
+    def("Days", Days);
+    def("Hours", Hours);
+    def("Minutes", Minutes);
+    def("Seconds", Seconds);
+    def("Milliseconds", Milliseconds);
+    def("Microseconds", Microseconds);
 }
