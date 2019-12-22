@@ -70,14 +70,29 @@ BOOST_AUTO_TEST_CASE(test_Datetime) {
     BOOST_CHECK_THROW(Datetime(201001010061L), std::out_of_range);
 
     /** @arg 属性读取 */
-    d = Datetime(201208062359);
+    d = Datetime(2012, 8, 6, 23, 59, 2, 13, 15);
     BOOST_CHECK(2012 == d.year());
     BOOST_CHECK(8 == d.month());
     BOOST_CHECK(6 == d.day());
     BOOST_CHECK(23 == d.hour());
     BOOST_CHECK(59 == d.minute());
+    BOOST_CHECK(2 == d.second());
+    BOOST_CHECK(13 == d.millisecond());
+    BOOST_CHECK(15 == d.microsecond());
+
+    /** @arg Null<Datetime> 获取熟悉 */
+    d = Datetime();
+    BOOST_CHECK_THROW(d.year(), std::logic_error);
+    BOOST_CHECK_THROW(d.month(), std::logic_error);
+    BOOST_CHECK_THROW(d.day(), std::logic_error);
+    BOOST_CHECK_THROW(d.hour(), std::logic_error);
+    BOOST_CHECK_THROW(d.minute(), std::logic_error);
+    BOOST_CHECK_THROW(d.second(), std::logic_error);
+    BOOST_CHECK_THROW(d.millisecond(), std::logic_error);
+    BOOST_CHECK_THROW(d.microsecond(), std::logic_error);
 
     /** @arg 正常日期转化为unsigned long long */
+    d = Datetime(201208062359);
     unsigned long long x = d.number();
     BOOST_CHECK(x == 201208062359);
 
@@ -90,11 +105,11 @@ BOOST_AUTO_TEST_CASE(test_Datetime) {
     d = Null<Datetime>();
     BOOST_CHECK(x == d.number());
 
-    /** @arg 测试 toString */
+    /** @arg 测试 str */
     d = Datetime("2001-Jan-01 06:30:00");
-    BOOST_CHECK("2001-01-01 06:30:00" == d.toString());
+    BOOST_CHECK("2001-01-01 06:30:00" == d.str());
     d = Datetime("2001-Jan-01 06:30:00.001");
-    BOOST_CHECK("2001-01-01 06:30:00.001000" == d.toString());
+    BOOST_CHECK("2001-01-01 06:30:00.001000" == d.str());
 
     /** @arg 测试 dayOfWeek*/
     BOOST_CHECK(Datetime(201801010000L).dayOfWeek() == 1);

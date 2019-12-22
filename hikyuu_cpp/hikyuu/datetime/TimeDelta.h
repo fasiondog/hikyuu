@@ -109,21 +109,29 @@ public:
                            seconds(), milliseconds(), microseconds());
     }
 
-    //---------------------------------------------------------------
+    /////////////////////////////////////////////////////////////////
     //
     // 运算符重载
     //
-    //---------------------------------------------------------------
+    /////////////////////////////////////////////////////////////////
 
-    /** 相加 */
-    TimeDelta operator+(TimeDelta td) const {
-        return TimeDelta(td.m_duration + m_duration);
-    }
+    /** 两个时长相加 */
+    TimeDelta operator+(TimeDelta td) const;
 
-    /** 相减 */
-    TimeDelta operator-(TimeDelta td) const {
-        return TimeDelta(m_duration - td.m_duration);
-    }
+    /** 两个时长相减 */
+    TimeDelta operator-(TimeDelta td) const;
+
+    /** 时长乘以系数 */
+    TimeDelta operator*(double p) const;
+
+    /** 时长除以系数 */
+    TimeDelta operator/(double p) const;
+
+    /** 两个时长相除，求两者比例 */
+    double operator/(TimeDelta td) const;
+
+    /** 两个时长相除求余 */
+    TimeDelta operator%(TimeDelta td) const;
 
     bool operator==(TimeDelta td) const {
         return m_duration == td.m_duration;
@@ -149,11 +157,11 @@ public:
         return m_duration <= td.m_duration;
     }
 
-    //---------------------------------------------------------------
+    /////////////////////////////////////////////////////////////////
     //
     // 静态成员函数
     //
-    //---------------------------------------------------------------
+    /////////////////////////////////////////////////////////////////
 
     /** 获取能够表达的最小值 TimeDelta(-99999999) */
     static TimeDelta min() {

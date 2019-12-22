@@ -13,7 +13,7 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& out, const Datetime& d) {
-    out << d.toString();
+    out << d.str();
     return out;
 }
 
@@ -48,6 +48,12 @@ Datetime::Datetime(unsigned long long datetime) {
     m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, 0));
 }
 
+bool Datetime::isNull() const {
+    bd::date d(bd::pos_infin);
+    bt::ptime null_date = bt::ptime(d, bt::time_duration(0, 0, 0));
+    return (m_data == null_date) ? true : false;
+}
+
 Datetime& Datetime::operator=(const Datetime& d) {
     if (this == &d)
         return *this;
@@ -55,11 +61,8 @@ Datetime& Datetime::operator=(const Datetime& d) {
     return *this;
 }
 
-std::string Datetime::toString() const {
-    bd::date d(bd::pos_infin);
-    bt::ptime null_date = bt::ptime(d, bt::time_duration(0, 0, 0));
-
-    if (m_data == null_date) {
+std::string Datetime::str() const {
+    if (isNull()) {
         return "+infinity";
     }
 
@@ -77,6 +80,15 @@ std::string Datetime::toString() const {
     return result;
 }
 
+std::string Datetime::repr() const {
+    if (isNull()) {
+        return "Datetime()";
+    }
+
+    return fmt::format("Datetime({},{},{},{},{},{},{},{})", year(), month(), day(), hour(),
+                       minute(), second(), millisecond(), microsecond());
+}
+
 unsigned long long Datetime::number() const {
     if (m_data.date() == bd::date(bd::pos_infin)) {
         return Null<unsigned long long>();
@@ -85,6 +97,70 @@ unsigned long long Datetime::number() const {
     return (unsigned long long)year() * 100000000 + (unsigned long long)month() * 1000000 +
            (unsigned long long)day() * 10000 + (unsigned long long)hour() * 100 +
            (unsigned long long)minute();
+}
+
+long Datetime::year() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return m_data.date().year();
+    }
+}
+
+long Datetime::month() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return m_data.date().month();
+    }
+}
+
+long Datetime::day() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return m_data.date().day();
+    }
+}
+
+long Datetime::hour() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return long(m_data.time_of_day().hours());
+    }
+}
+
+long Datetime::minute() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return long(m_data.time_of_day().minutes());
+    }
+}
+
+long Datetime::second() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return long(m_data.time_of_day().seconds());
+    }
+}
+
+long Datetime::millisecond() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return long(m_data.time_of_day().fractional_seconds()) / 1000;
+    }
+}
+
+long Datetime::microsecond() const {
+    if (isNull()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "This is Null Datetime!");
+    } else {
+        return long(m_data.time_of_day().fractional_seconds()) % 1000;
+    }
 }
 
 Datetime Datetime::min() {

@@ -98,7 +98,6 @@ string TradeManager::toString() const {
     PositionRecordList position = getPositionList();
     PositionRecordList::const_iterator iter = position.begin();
     for (; iter != position.end(); ++iter) {
-        // os << "    " << iter->number << " " << iter->stock.toString() << "\n";
         price_t invest = iter->buyMoney - iter->sellMoney + iter->totalCost;
         KData k = iter->stock.getKData(query);
         price_t cur_val = k[0].closePrice * iter->number;
@@ -1757,7 +1756,7 @@ void TradeManager::_saveAction(const TradeRecord& record) {
     string sep(", ");
     switch (record.business) {
         case BUSINESS_INIT:
-            buf << "my_tm = crtTM(datetime=Datetime('" << record.datetime.toString() << "'), "
+            buf << "my_tm = crtTM(datetime=Datetime('" << record.datetime.str() << "'), "
                 << "initCash=" << record.cash << sep << "costFunc=" << m_costfunc->name() << "("
                 << m_costfunc->getParameter().getNameValueList() << "), "
                 << "name='" << m_name << "'"
@@ -1765,24 +1764,24 @@ void TradeManager::_saveAction(const TradeRecord& record) {
             break;
 
         case BUSINESS_CHECKIN:
-            buf << my_tm << "checkin(Datetime('" << record.datetime.toString() << "'), "
-                << record.cash << ")";
+            buf << my_tm << "checkin(Datetime('" << record.datetime.str() << "'), " << record.cash
+                << ")";
             break;
 
         case BUSINESS_CHECKOUT:
-            buf << my_tm << "checkout(Datetime('" << record.datetime.toString() << "'), "
-                << record.cash << ")";
+            buf << my_tm << "checkout(Datetime('" << record.datetime.str() << "'), " << record.cash
+                << ")";
             break;
 
         case BUSINESS_BUY:
-            buf << my_tm << "buy(Datetime('" << record.datetime.toString() << "'), "
+            buf << my_tm << "buy(Datetime('" << record.datetime.str() << "'), "
                 << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
                 << record.number << sep << record.stoploss << sep << record.goalPrice << sep
                 << record.planPrice << sep << record.from << ")";
             break;
 
         case BUSINESS_SELL:
-            buf << my_tm << "sell(Datetime('" << record.datetime.toString() << "'),"
+            buf << my_tm << "sell(Datetime('" << record.datetime.str() << "'),"
                 << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
                 << record.number << sep << record.stoploss << sep << record.goalPrice << sep
                 << record.planPrice << sep << record.from << ")";
@@ -1798,7 +1797,7 @@ void TradeManager::_saveAction(const TradeRecord& record) {
 void TradeManager::tocsv(const string& path) {
     string filename1, filename2, filename3, filename4;
     if (m_name.empty()) {
-        string date = m_init_datetime.toString();
+        string date = m_init_datetime.str();
         filename1 = path + "/" + date + "_交易记录.csv";
         filename2 = path + "/" + date + "_已平仓记录.csv";
         filename3 = path + "/" + date + "_未平仓记录.csv";

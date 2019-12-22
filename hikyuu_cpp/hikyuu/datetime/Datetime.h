@@ -67,29 +67,32 @@ public:
 
     Datetime& operator=(const Datetime&);
 
-    /** 年份 */
+    /** 年份，如果是 Null 将抛出异常 */
     long year() const;
 
-    /** 月份 [1, 12] */
+    /** 月份 [1, 12]，如果是 Null 将抛出异常 */
     long month() const;
 
-    /** 日 [1, 31] */
+    /** 日 [1, 31]，如果是 Null 将抛出异常 */
     long day() const;
 
-    /** 时 [0, 23] */
+    /** 时 [0, 23]，如果是 Null 将抛出异常 */
     long hour() const;
 
-    /** 分钟 [0, 59] */
+    /** 分钟 [0, 59]，如果是 Null 将抛出异常 */
     long minute() const;
 
-    /** 秒 [0, 59] */
+    /** 秒 [0, 59]，如果是 Null 将抛出异常 */
     long second() const;
 
-    /** 毫秒 [0, 999] */
+    /** 毫秒 [0, 999]，如果是 Null 将抛出异常 */
     long millisecond() const;
 
-    /** 微秒 [0, 999] */
+    /** 微秒 [0, 999]，如果是 Null 将抛出异常 */
     long microsecond() const;
+
+    /** 是否为 Null<Datetime> */
+    bool isNull() const;
 
     /** 日期运算，加指定时长 */
     Datetime operator+(TimeDelta d) const;
@@ -103,7 +106,20 @@ public:
      */
     unsigned long long number() const;
 
-    std::string toString() const;
+    /**
+     * 转化为字符串，供打印阅读，格式：
+     * <pre>
+     * 毫秒数、微秒数为零时： 2019-01-02 01:01:00
+     * 毫秒数、微秒数不为零时：2019-01-02 01:01:00:000001
+     * </pre>
+     */
+    std::string str() const;
+
+    /**
+     * 转化为字符串,
+     * 格式为：Datetime(year, month, day, hour, minute, second, millisecond, microsecond)
+     */
+    std::string repr() const;
 
     /** 返回 boost::posix_time::ptime */
     bt::ptime ptime() const;
@@ -290,38 +306,6 @@ inline Datetime::Datetime(const std::string& ts) {
     } else {
         m_data = bt::time_from_string(ts);
     }
-}
-
-inline long Datetime::year() const {
-    return m_data.date().year();
-}
-
-inline long Datetime::month() const {
-    return m_data.date().month();
-}
-
-inline long Datetime::day() const {
-    return m_data.date().day();
-}
-
-inline long Datetime::hour() const {
-    return long(m_data.time_of_day().hours());
-}
-
-inline long Datetime::minute() const {
-    return long(m_data.time_of_day().minutes());
-}
-
-inline long Datetime::second() const {
-    return long(m_data.time_of_day().seconds());
-}
-
-inline long Datetime::millisecond() const {
-    return long(m_data.time_of_day().fractional_seconds()) / 1000;
-}
-
-inline long Datetime::microsecond() const {
-    return long(m_data.time_of_day().fractional_seconds()) % 1000;
 }
 
 inline bt::ptime Datetime::ptime() const {

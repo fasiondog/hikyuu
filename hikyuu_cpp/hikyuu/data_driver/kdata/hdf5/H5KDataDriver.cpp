@@ -1071,7 +1071,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     H5::DataSet dataset;
     H5::DataSpace dataspace;
     uint64 start_number = start.number() * 100 + start.second();
-    uint64 end_number = end.number() * 100 + end.second();
+    uint64 end_number = end.number() * 100 + (end.isNull() ? 0 : end.second());
     hsize_t startpos = 0, endpos = 0;
     try {
         dataset = group.openDataSet(market + code);

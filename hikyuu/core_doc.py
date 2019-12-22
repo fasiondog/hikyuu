@@ -24,9 +24,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# pylint: disable=E0602
 
 from hikyuu._hikyuu import *
-
 
 #------------------------------------------------------------------
 # from _DataType.cpp
@@ -34,9 +34,7 @@ from hikyuu._hikyuu import *
 
 DatetimeList.__doc__ = """日期序列，对应C++中的std::vector<Datetime>"""
 
-
-PriceList.__doc__ ="""价格序列，其中价格使用double表示，对应C++中的std::vector<double>。"""
-
+PriceList.__doc__ = """价格序列，其中价格使用double表示，对应C++中的std::vector<double>。"""
 
 toPriceList.__doc__ = """
 将Python的可迭代对象如 list、tuple 转化为 PriceList
@@ -45,16 +43,25 @@ toPriceList.__doc__ = """
     :rtype: PriceList
 """
 
-
 StringList.__doc__ = """字符串列表，对应C++中的std::vector<String>"""
-
-
 
 #------------------------------------------------------------------
 # from _Datetime.cpp
 #------------------------------------------------------------------
 
-Datetime.__doc__ = """日期时间类，精确到秒"""
+Datetime.__doc__ = """日期时间类，精确到微秒"""
+
+Datetime.isNull.__doc__ = """是否是Null值, 即是否等于 constant.null_datetime"""
+
+Datetime.year.__doc__ = """年，如果是 Null 将抛出异常"""
+Datetime.month.__doc__ = """月，如果是 Null 将抛出异常"""
+Datetime.day.__doc__ = """日，如果是 Null 将抛出异常"""
+Datetime.hour.__doc__ = """时，如果是 Null 将抛出异常"""
+Datetime.minute.__doc__ = """分，如果是 Null 将抛出异常"""
+Datetime.second.__doc__ = """秒，如果是 Null 将抛出异常"""
+Datetime.millisecond.__doc__ = """毫秒，如果是 Null 将抛出异常"""
+Datetime.microsecond.__doc__ = """微秒，如果是 Null 将抛出异常"""
+Datetime.number.__doc__ = """YYYYMMDDHHMM 形式的整数，精度只到分钟"""
 
 Datetime.dayOfWeek.__doc__ = """
 dayOfWeek(self)
@@ -256,6 +263,91 @@ getDateRange.__doc__ = """\n
 :rtype: DatetimeList
 """
 
+#------------------------------------------------------------------
+# from _TimeDelta.cpp
+#------------------------------------------------------------------
+
+TimeDelta.__doc__ = """
+    时间时长，用于时间计算。可通过以下方式构建：
+
+    - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
+    - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)
+
+        - -99999999 <= days <= 99999999
+        - -100000 <= hours <= 100000
+        - -100000 <= minutes <= 100000
+        - -8639900 <= seconds <= 8639900
+        - -86399000000 <= milliseconds <= 86399000000
+        - -86399000000 <= microseconds <= 86399000000
+
+    以上参数限制，主要为防止求总微秒数时可能出现溢出的情况。如只使用一个参数不希望存在上述限制时，可使用快捷函数：
+    Days, Hours, Minutes, Seconds, Milliseconds, Microseconds
+"""
+
+TimeDelta.days.__doc__ = """天数 [-99999999, 99999999]"""
+TimeDelta.hours.__doc__ = """小时数 [0, 23]"""
+TimeDelta.minutes.__doc__ = """分钟数 [0, 59]"""
+TimeDelta.seconds.__doc__ = """秒数 [0, 59]"""
+TimeDelta.milliseconds.__doc__ = """毫秒数 [0, 999]"""
+TimeDelta.microseconds.__doc__ = """微秒数 [0, 999]"""
+TimeDelta.ticks.__doc__ = """同总微秒数"""
+
+TimeDelta.isNegative.__doc__ = """
+isNegative()
+
+    是否为负时长
+
+    :rtype: bool
+"""
+
+TimeDelta.max.__doc__ = """
+max()
+
+    支持的最大时长
+
+    :return: TimeDelta(99999999, 23, 59, 59, 999, 999)
+"""
+
+TimeDelta.min.__doc__ = """
+min()
+
+    支持的最小时长
+
+    :return: TimeDelta(-99999999, 0, 0, 0, 0, 0)
+"""
+
+TimeDelta.resolution.__doc__ = """
+resolution()
+
+    支持的最小精度
+        
+    :return: TimeDelta(0, 0, 0, 0, 0, 1)
+"""
+
+TimeDelta.maxTicks.__doc__ = """
+maxTicks()
+
+    支持的最大 ticks （即微秒数）
+
+    :rtype: int
+"""
+
+TimeDelta.minTicks.__doc__ = """
+minTicks()
+
+    支持的最小 ticks （即微秒数）
+
+    :rtype: int
+"""
+
+TimeDelta.fromTicks.__doc__ = """
+fromTicks(ticks)
+
+    使用 ticks（即微秒数） 值创建
+
+    :param int ticks: 微秒数
+    :rtype: TimeDelta
+"""
 
 #------------------------------------------------------------------
 # from _util.cpp
@@ -281,7 +373,6 @@ roundDown(arg1[, arg2=0])
     :return: 处理过的数据
 """
 
-
 #------------------------------------------------------------------
 # from _Log.cpp
 #------------------------------------------------------------------
@@ -300,7 +391,6 @@ LOG_LEVEL.__doc__ = """
     - NO_PRINT
 """
 
-
 #------------------------------------------------------------------
 # from _MarketInfo.cpp
 #------------------------------------------------------------------
@@ -314,7 +404,6 @@ MarketInfo.__doc__ = """
     .. py:attribute:: code : 该市场对应的主要指数，用于获取交易日历
     .. py:attribute:: lastDate : 该市场K线数据最后交易日期
 """
-
 
 #------------------------------------------------------------------
 # from _StockTypeInfo.cpp
@@ -332,7 +421,6 @@ StockTypeInfo.__doc__ = """
     .. py:attribute:: minTradeNumber : 每笔最小交易量
     .. py:attribute:: maxTradeNumber : 每笔最大交易量
 """
-
 
 #------------------------------------------------------------------
 # from _StockWeight.cpp
@@ -352,7 +440,6 @@ StockWeight.__doc__ = """
 """
 
 StockWeightList.__doc__ = """std::vector<StockWeight> 包装"""
-
 
 #------------------------------------------------------------------
 # from _StockManager.cpp
@@ -483,7 +570,6 @@ removeTempCsvStock(code)
     :param str code: 创建时自定义的编码
 """
 
-
 #------------------------------------------------------------------
 # from _KQuery.cpp
 #------------------------------------------------------------------
@@ -613,7 +699,6 @@ KQuery.recoverType.__doc__ = """
 查询的复权类型
 """
 
-
 #------------------------------------------------------------------
 # from _KRecord.cpp
 #------------------------------------------------------------------
@@ -629,7 +714,6 @@ KRecord.transAmount.__doc__ = """成交金额"""
 KRecord.transCount.__doc__ = """成交量"""
 
 KRecordList.__doc__ = """C++ std::vector<KRecord>包装"""
-
 
 #------------------------------------------------------------------
 # from _KData.cpp
@@ -733,7 +817,6 @@ tocsv(filename)
     :param str filename: 指定保存的文件名称
 """
 
-
 #------------------------------------------------------------------
 # from _TimeLineRecord.cpp
 #------------------------------------------------------------------
@@ -747,7 +830,6 @@ TimeLineRecord.vol.__doc__ = """成交量"""
 TimeLineList.__doc__ = """
 通过 Stock.getTimeLineList 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
 """
-
 
 #------------------------------------------------------------------
 # from _TransRecord.cpp
@@ -763,7 +845,6 @@ TransRecord.direct.__doc__ = """买卖盘方向"""
 TransList.__doc__ = """
 历史分笔成交记录列表
 """
-
 
 #------------------------------------------------------------------
 # from _Stock.cpp
@@ -945,7 +1026,6 @@ releaseKDataBuffer(ktype)
     :param KQuery.KType ktype: K线类型
 """
 
-
 #------------------------------------------------------------------
 # from _Block.cpp
 #------------------------------------------------------------------
@@ -1009,7 +1089,6 @@ Block.clear.__doc__ = """移除包含的所有证券"""
 
 Block.__len__.__doc__ = """包含的证券数量"""
 
-
 #------------------------------------------------------------------
 # from _save_load.cpp
 #------------------------------------------------------------------
@@ -1036,7 +1115,7 @@ hku_load(var, filename)
 # from iostream.cpp
 #------------------------------------------------------------------
 
-OstreamRedirect.__doc__ ="""
+OstreamRedirect.__doc__ = """
 OstreamRedirect([stdout=True, stderr=True])
 
     重定向C++ std::cout、std::cerr至python。在非命令行方式下，某些App无法显示C++ iostream的输出信息，如Jupyter notebook。默认构造时，只是指定是否需要重定向std::cout或std::cerr，必须使用open方法或with语法才会启用重定向。

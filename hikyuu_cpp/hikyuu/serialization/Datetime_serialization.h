@@ -20,7 +20,7 @@ namespace boost {
 namespace serialization {
 template <class Archive>
 void save(Archive& ar, const hku::Datetime& date, unsigned int version) {
-    std::string datetime = date.toString();
+    std::string datetime = date.str();
     ar& BOOST_SERIALIZATION_NVP(datetime);
 }
 

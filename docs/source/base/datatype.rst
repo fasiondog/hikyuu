@@ -21,16 +21,16 @@
     
     获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
 
-    .. py:attribute:: year 年
-    .. py:attribute:: month 月
-    .. py:attribute:: day 日
-    .. py:attribute:: hour 时
-    .. py:attribute:: minute 分
-    .. py:attribute:: second 秒
-    .. py:attribute:: millisecond 毫秒
-    .. py:attribute:: microsecond 微秒
-    .. py:attribute:: number YYYYMMDDHHMM 形式的整数
-    
+    .. py:attribute:: year 年，如果是 Null 将抛出异常
+    .. py:attribute:: month 月，如果是 Null 将抛出异常
+    .. py:attribute:: day 日，如果是 Null 将抛出异常
+    .. py:attribute:: hour 时，如果是 Null 将抛出异常
+    .. py:attribute:: minute 分，如果是 Null 将抛出异常
+    .. py:attribute:: second 秒，如果是 Null 将抛出异常
+    .. py:attribute:: millisecond 毫秒，如果是 Null 将抛出异常
+    .. py:attribute:: microsecond 微秒，如果是 Null 将抛出异常
+    .. py:attribute:: number YYYYMMDDHHMM 形式的整数，精度只到分钟
+
     .. py:method:: date(self)
     
         转化生成 python 的 date
@@ -42,6 +42,20 @@
     .. py:method:: isNull(self)
     
         是否是Null值, 即是否等于 constant.null_datetime
+
+    .. py:method:: __add__(self, td)
+
+        加上指定时长，时长对象可为 TimeDelta 或 datetime.timedelta 类型
+
+        :param TimeDelta td: 时长
+        :rtype: Datetime
+
+    .. py:method:: __sub__(self, td)
+
+        减去指定的时长, 时长对象可为 TimeDelta 或 datetime.timedelta 类型
+
+        :param TimeDelta td: 指定时长
+        :rtype: Datetime
 
     .. py:method:: dayOfWeek(self)
     
@@ -199,6 +213,13 @@
     .. py:attribute:: seconds 秒数 [0, 59]
     .. py:attribute:: milliseconds 毫秒数 [0, 999]
     .. py:attribute:: microseconds 微秒数 [0, 999]
+    .. py:attribute:: ticks 同总微秒数
+
+    .. py:method:: isNegative(self)
+
+        是否为负时长
+
+        :rtype: bool
 
     .. py:staticmethod:: max()
 

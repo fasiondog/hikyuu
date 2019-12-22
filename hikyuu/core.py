@@ -80,9 +80,6 @@ Stock.__repr__ = reprFunc
 Block.__unicode__ = unicodeFunc
 Block.__repr__ = reprFunc
 
-Datetime.__unicode__ = unicodeFunc
-Datetime.__repr__ = reprFunc
-
 Parameter.__unicode__ = unicodeFunc
 Parameter.__repr__ = reprFunc
 
@@ -148,6 +145,11 @@ def __new_Datetime_init__(self, *args, **kwargs):
 
 
 def __new_Datetime_add__(self, td):
+    """加上指定时长，时长对象可为 TimeDelta 或 datetime.timedelta 类型
+
+    :param TimeDelta td: 时长
+    :rtype: Datetime
+    """
     if isinstance(td, TimeDelta):
         return __old_Datetime_add__(self, td)
     elif isinstance(td, timedelta):
@@ -157,6 +159,11 @@ def __new_Datetime_add__(self, td):
 
 
 def __new_Datetime_sub__(self, td):
+    """减去指定的时长, 时长对象可为 TimeDelta 或 datetime.timedelta 类型
+
+    :param TimeDelta td: 指定时长
+    :rtype: Datetime
+    """
     if isinstance(td, TimeDelta):
         return __old_Datetime_sub__(self, td)
     elif isinstance(td, timedelta):

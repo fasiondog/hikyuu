@@ -26,7 +26,9 @@ void export_Datetime() {
       .def(init<long, long, long, long, long, long, long, long>(
         (arg("year"), arg("month"), arg("day"), arg("hour") = 0, arg("minute") = 0,
          arg("second") = 0, arg("millisecond") = 0, arg("microsecond") = 0)))
-      .def(self_ns::str(self))
+      //.def(self_ns::str(self))
+      .def("__str__", &Datetime::str)
+      .def("__repr__", &Datetime::repr)
       .add_property("year", &Datetime::year)
       .add_property("month", &Datetime::month)
       .add_property("day", &Datetime::day)
@@ -37,7 +39,7 @@ void export_Datetime() {
       .add_property("microsecond", &Datetime::microsecond)
       .add_property("number", &Datetime::number)
 
-      .def("toString", &Datetime::toString)
+      .def("isNull", &Datetime::isNull)
       .def("dayOfWeek", &Datetime::dayOfWeek)
       .def("dayOfYear", &Datetime::dayOfYear)
       .def("startOfDay", &Datetime::startOfDay)

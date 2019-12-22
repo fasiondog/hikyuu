@@ -29,6 +29,7 @@ void export_TimeDelta() {
       .add_property("milliseconds", &TimeDelta::milliseconds)
       .add_property("microseconds", &TimeDelta::microseconds)
       .add_property("ticks", &TimeDelta::ticks)
+      .def("isNegative", &TimeDelta::isNegative)
       .def("max", &TimeDelta::max)
       .staticmethod("max")
       .def("min", &TimeDelta::min)
