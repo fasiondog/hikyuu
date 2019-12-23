@@ -47,8 +47,8 @@ public:
      * @param milliseconds 毫秒数 [-86399000000, 86399000000])
      * @param microseconds 微秒数 [-86399000000, 86399000000])
      */
-    explicit TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0,
-                       int64_t seconds = 0, int64_t milliseconds = 0, int64_t microseconds = 0);
+    explicit TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0, int64_t seconds = 0,
+                       int64_t milliseconds = 0, int64_t microseconds = 0);
 
     /** 通过 boost::posix_time::time_duration 构造 */
     explicit TimeDelta(bt::time_duration td);
@@ -105,32 +105,41 @@ public:
 
     /** 转换为字符串，格式为：TimeDelta(days,hours,mins,secs,millisecs,microsecs) */
     std::string repr() const {
-        return fmt::format("TimeDelta({}, {}, {}, {}, {}, {})", days(), hours(), minutes(),
-                           seconds(), milliseconds(), microseconds());
+        return fmt::format("TimeDelta({}, {}, {}, {}, {}, {})", days(), hours(), minutes(), seconds(), milliseconds(),
+                           microseconds());
     }
 
     /////////////////////////////////////////////////////////////////
     //
-    // 运算符重载
+    // 运算符重载，TimeDelta 相关运算
     //
     /////////////////////////////////////////////////////////////////
 
+    /** 求绝对值 */
+    TimeDelta abs(TimeDelta td) const {
+        return TimeDelta::fromTicks(std::abs(td.ticks()));
+    }
+
     /** 两个时长相加 */
-    TimeDelta operator+(TimeDelta td) const;
+    TimeDelta operator+(TimeDelta td) const {
+        return TimeDelta(td.m_duration + m_duration);
+    }
 
     /** 两个时长相减 */
-    TimeDelta operator-(TimeDelta td) const;
+    TimeDelta operator-(TimeDelta td) const {
+        return TimeDelta(m_duration - td.m_duration);
+    }
 
-    /** 时长乘以系数 */
+    /** 时长乘以系数，结果四舍五入 */
     TimeDelta operator*(double p) const;
 
-    /** 时长除以系数 */
+    /** 时长除以系数，结果四舍五入。如果除零，将抛出 hku::exception。 */
     TimeDelta operator/(double p) const;
 
-    /** 两个时长相除，求两者比例 */
+    /** 两个时长相除，求两者比例。如果除以零时长，将抛出 hku::exception。 */
     double operator/(TimeDelta td) const;
 
-    /** 两个时长相除求余 */
+    /** 两个时长相除求余。如果除以零时长，将抛出 hku::exception。 */
     TimeDelta operator%(TimeDelta td) const;
 
     bool operator==(TimeDelta td) const {

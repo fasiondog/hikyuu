@@ -255,6 +255,55 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta_operator) {
     BOOST_CHECK(td.microseconds() == 0);
     BOOST_CHECK(td.ticks() == -3540000000LL);
 
+    /** @arg 求绝对值 */
+    td = TimeDelta() - Microseconds(1);
+    BOOST_CHECK(td == Microseconds(-1));
+    BOOST_CHECK(td.abs() == Microseconds(1));
+
+    /** @arg 乘以0 */
+    td = TimeDelta(1, 1, 3) * 0;
+    BOOST_CHECK(td == TimeDelta());
+
+    /** @arg 乘以大于0的整数 */
+    td = TimeDelta(1, 1, 3) * 2;
+    BOOST_CHECK(td == TimeDelta(2, 2, 6));
+
+    /** @arg 乘以大于0的小数 */
+    td = TimeDelta(2, 2, 6) * 0.5;
+    BOOST_CHECK(td == TimeDelta(1, 1, 3));
+
+    /** @arg 乘以小于0的整数 */
+    td = TimeDelta(1, 1, 3) * -2;
+    BOOST_CHECK(td == TimeDelta(-2, -2, -6));
+
+    /** @arg 乘以小于0的小数 */
+    td = TimeDelta(-2, -2, -6) * 0.5;
+    BOOST_CHECK(td == TimeDelta(-1, -1, -3));
+
+    /** @arg 正 TimeDelat 乘以负数 */
+    td = TimeDelta(1) * -2;
+    BOOST_CHECK(td == TimeDelta(-2));
+
+    /** @arg 负 TimeDelat 乘以负数 */
+    td = TimeDelta(-1) * -2;
+    BOOST_CHECK(td == TimeDelta(2));
+
+    /** @arg 除以 0 */
+    BOOST_CHECK_THROW(TimeDelta(1) / 0, hku::exception);
+
+    /** @arg 正常除法 */
+    BOOST_CHECK(TimeDelta(2) / 2 == TimeDelta(1));
+    BOOST_CHECK(TimeDelta(2) / TimeDelta(1) == 2);
+
+    /** @arg 除以 zero TimeDelta */
+    BOOST_CHECK_THROW(TimeDelta(1) / TimeDelta(), hku::exception);
+
+    /** @arg 对零时长取余 */
+    BOOST_CHECK_THROW(TimeDelta(1) % TimeDelta(), hku::exception);
+
+    /** @arg 取余 */
+    BOOST_CHECK(TimeDelta(3) % TimeDelta(2) == TimeDelta(1));
+
     /** @arg 相等 */
     BOOST_CHECK(TimeDelta(1, 2, 1, 1, 1, 1) == TimeDelta(1, 2, 1, 1, 1, 1));
     BOOST_CHECK(TimeDelta(1) == TimeDelta(0, 24));

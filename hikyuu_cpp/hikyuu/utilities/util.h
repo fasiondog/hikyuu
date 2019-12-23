@@ -9,20 +9,13 @@
 #ifndef HIKYUU_UTILIIES_UTIL_H_
 #define HIKYUU_UTILIIES_UTIL_H_
 
-#ifndef DATATYPE_H_
 #include <string>
 
 #ifndef HKU_API
 #define HKU_API
 #endif
 
-#endif /* DATATYPE_H_ */
-
 namespace hku {
-
-#ifndef DATATYPE_H_
-using std::string;
-#endif
 
 /**
  * @ingroup Utilities
@@ -30,13 +23,13 @@ using std::string;
  */
 
 #if defined(_MSC_VER)
-string HKU_API utf8_to_gb(const char* szinput);
-string HKU_API utf8_to_gb(const string& szinput);
-string HKU_API gb_to_utf8(const char* szinput);
-string HKU_API gb_to_utf8(const string& szinput);
+std::string HKU_API utf8_to_gb(const char* szinput);
+std::string HKU_API utf8_to_gb(const std::string& szinput);
+std::string HKU_API gb_to_utf8(const char* szinput);
+std::string HKU_API gb_to_utf8(const std::string& szinput);
 #else
-string HKU_API utf8_to_gb(const string& szinput);
-string HKU_API gb_to_utf8(const string& szinput);
+std::string HKU_API utf8_to_gb(const std::string& szinput);
+std::string HKU_API gb_to_utf8(const std::string& szinput);
 #endif
 
 /**

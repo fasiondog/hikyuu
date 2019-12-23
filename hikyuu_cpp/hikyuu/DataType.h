@@ -73,7 +73,7 @@ typedef unsigned char uint8;
 
 typedef double price_t;
 
-typedef std::string string;
+using std::string;
 
 using std::enable_shared_from_this;
 using std::make_shared;

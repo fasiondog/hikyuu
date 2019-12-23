@@ -14,11 +14,14 @@
 using namespace boost::python;
 using namespace hku;
 
+double (TimeDelta::*TimeDelta_div_1)(TimeDelta) const = &TimeDelta::operator/;
+TimeDelta (TimeDelta::*TimeDelta_div_2)(double) const = &TimeDelta::operator/;
+
 void export_TimeDelta() {
     class_<TimeDelta>("TimeDelta", init<>())
       .def(init<int64_t, int64_t, int64_t, int64_t, int64_t, int64_t>(
-        (arg("days") = 0, arg("hours") = 0, arg("minutes") = 0, arg("seconds") = 0,
-         arg("milliseconds") = 0, arg("microseconds") = 0)))
+        (arg("days") = 0, arg("hours") = 0, arg("minutes") = 0, arg("seconds") = 0, arg("milliseconds") = 0,
+         arg("microseconds") = 0)))
       //.def(self_ns::str(self))
       .def("__str__", &TimeDelta::str)
       .def("__repr__", &TimeDelta::repr)
@@ -50,8 +53,14 @@ void export_TimeDelta() {
       .def("__ge__", &TimeDelta::operator>=)
       .def("__le__", &TimeDelta::operator>=)
 
+      .def("__abs__", &TimeDelta::abs)
       .def("__add__", &TimeDelta::operator+)
       .def("__sub__", &TimeDelta::operator-)
+      .def("__mul__", &TimeDelta::operator*)
+      .def("__rmul__", &TimeDelta::operator*)
+      .def("__truediv__", TimeDelta_div_1)
+      .def("__truediv__", TimeDelta_div_2)
+      .def("__mod__", &TimeDelta::operator%)
 
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<TimeDelta>())

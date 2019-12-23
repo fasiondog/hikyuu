@@ -139,10 +139,10 @@ double HKU_API roundDown(double number, int ndigits) {
  * @return 以GB2312编码的字符串
  * @note 仅在Windows平台下生效
  */
-string HKU_API utf8_to_gb(const char *szinput) {
+std::string HKU_API utf8_to_gb(const char *szinput) {
     wchar_t *strSrc;
     char *szRes;
-    string nullStr;
+    std::string nullStr;
     if (!szinput) {
         return nullStr;
     }
@@ -168,14 +168,14 @@ string HKU_API utf8_to_gb(const char *szinput) {
         return nullStr;
     }
 
-    string result(szRes);
+    std::string result(szRes);
 
     delete[] strSrc;
     delete[] szRes;
     return result;
 }
 
-string HKU_API utf8_to_gb(const string &szinput) {
+std::string HKU_API utf8_to_gb(const std::string &szinput) {
     return utf8_to_gb(szinput.c_str());
 }
 
@@ -185,10 +185,10 @@ string HKU_API utf8_to_gb(const string &szinput) {
  * @return 以UTF8编码的字符串
  * @note 仅在Windows平台下生效
  */
-string HKU_API gb_to_utf8(const char *szinput) {
+std::string HKU_API gb_to_utf8(const char *szinput) {
     wchar_t *strSrc;
     char *szRes;
-    string nullstr;
+    std::string nullstr;
     if (!szinput) {
         return nullstr;
     }
@@ -215,19 +215,19 @@ string HKU_API gb_to_utf8(const char *szinput) {
         return nullstr;
     }
 
-    string result(szRes);
+    std::string result(szRes);
 
     delete[] strSrc;
     delete[] szRes;
     return result;
 }
 
-string HKU_API gb_to_utf8(const string &szinput) {
+std::string HKU_API gb_to_utf8(const std::string &szinput) {
     return gb_to_utf8(szinput.c_str());
 }
 
 #else /* else for defined(_MSC_VER) */
-string HKU_API utf8_to_gb(const string &szinput) {
+std::string HKU_API utf8_to_gb(const std::string &szinput) {
     char *inbuf = const_cast<char *>(szinput.c_str());
     size_t inlen = strlen(inbuf);
     size_t outlen = inlen;
@@ -238,12 +238,12 @@ string HKU_API utf8_to_gb(const string &szinput) {
     iconv_t cd = iconv_open("gbk", "utf-8");
     iconv(cd, &in, &inlen, &out, &outlen);
     iconv_close(cd);
-    string result(outbuf);
+    std::string result(outbuf);
     free(outbuf);
     return result;
 }
 
-string HKU_API gb_to_utf8(const string &szinput) {
+std::string HKU_API gb_to_utf8(const std::string &szinput) {
     char *inbuf = const_cast<char *>(szinput.c_str());
     size_t inlen = strlen(inbuf);
     size_t outlen = inlen * 2;
@@ -254,7 +254,7 @@ string HKU_API gb_to_utf8(const string &szinput) {
     iconv_t cd = iconv_open("utf-8", "gbk");
     iconv(cd, &in, &inlen, &out, &outlen);
     iconv_close(cd);
-    string result(outbuf);
+    std::string result(outbuf);
     free(outbuf);
     return result;
 }
