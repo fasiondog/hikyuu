@@ -92,6 +92,11 @@ public:
         return m_duration.is_negative();
     }
 
+    /** 求绝对值 */
+    TimeDelta abs() const {
+        return TimeDelta::fromTicks(std::abs(ticks()));
+    }
+
     /** 转换为 boost::posix_time::time_duration */
     bt::time_duration time_duration() const {
         return m_duration;
@@ -115,11 +120,6 @@ public:
     //
     /////////////////////////////////////////////////////////////////
 
-    /** 求绝对值 */
-    TimeDelta abs(TimeDelta td) const {
-        return TimeDelta::fromTicks(std::abs(td.ticks()));
-    }
-
     /** 两个时长相加 */
     TimeDelta operator+(TimeDelta td) const {
         return TimeDelta(td.m_duration + m_duration);
@@ -128,6 +128,16 @@ public:
     /** 两个时长相减 */
     TimeDelta operator-(TimeDelta td) const {
         return TimeDelta(m_duration - td.m_duration);
+    }
+
+    /** + 号,返回相同值 */
+    TimeDelta operator+() const {
+        return *this;
+    }
+
+    /** - 号, 求负值，相当于 TimeDelta(0) 减自身 */
+    TimeDelta operator-() const {
+        return TimeDelta::fromTicks(-ticks());
     }
 
     /** 时长乘以系数，结果四舍五入 */

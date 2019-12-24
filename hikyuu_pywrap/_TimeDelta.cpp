@@ -17,6 +17,11 @@ using namespace hku;
 double (TimeDelta::*TimeDelta_div_1)(TimeDelta) const = &TimeDelta::operator/;
 TimeDelta (TimeDelta::*TimeDelta_div_2)(double) const = &TimeDelta::operator/;
 
+TimeDelta (TimeDelta::*TimeDelta_pos)() const = &TimeDelta::operator+;
+TimeDelta (TimeDelta::*TimeDelta_add)(TimeDelta) const = &TimeDelta::operator+;
+TimeDelta (TimeDelta::*TimeDelta_neg)() const = &TimeDelta::operator-;
+TimeDelta (TimeDelta::*TimeDelta_sub)(TimeDelta) const = &TimeDelta::operator-;
+
 void export_TimeDelta() {
     class_<TimeDelta>("TimeDelta", init<>())
       .def(init<int64_t, int64_t, int64_t, int64_t, int64_t, int64_t>(
@@ -54,8 +59,10 @@ void export_TimeDelta() {
       .def("__le__", &TimeDelta::operator>=)
 
       .def("__abs__", &TimeDelta::abs)
-      .def("__add__", &TimeDelta::operator+)
-      .def("__sub__", &TimeDelta::operator-)
+      .def("__add__", TimeDelta_add)
+      .def("__pos__", TimeDelta_pos)
+      .def("__sub__", TimeDelta_sub)
+      .def("__neg__", TimeDelta_neg)
       .def("__mul__", &TimeDelta::operator*)
       .def("__rmul__", &TimeDelta::operator*)
       .def("__truediv__", TimeDelta_div_1)

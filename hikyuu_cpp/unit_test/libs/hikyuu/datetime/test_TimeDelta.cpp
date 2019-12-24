@@ -233,6 +233,14 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta_operator) {
     BOOST_CHECK(td.microseconds() == 0);
     BOOST_CHECK(td.ticks() == -90000000000LL);
 
+    /** @arg + 号 */
+    BOOST_CHECK(+TimeDelta(1) == TimeDelta(1));
+    BOOST_CHECK(+TimeDelta(-1) == TimeDelta(-1));
+
+    /** @arg -号 */
+    BOOST_CHECK(-TimeDelta(1) == TimeDelta(-1));
+    BOOST_CHECK(-TimeDelta(-1) == TimeDelta(1));
+
     /** @arg 相减，结果为0 */
     td = TimeDelta(1, 0, 1) - TimeDelta(0, 24, 0, 60);
     BOOST_CHECK(td.isNegative() == false);
