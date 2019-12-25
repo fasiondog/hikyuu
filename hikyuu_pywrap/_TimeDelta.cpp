@@ -38,6 +38,12 @@ void export_TimeDelta() {
       .add_property("microseconds", &TimeDelta::microseconds)
       .add_property("ticks", &TimeDelta::ticks)
       .def("isNegative", &TimeDelta::isNegative)
+      .def("total_days", &TimeDelta::total_days)
+      .def("total_hours", &TimeDelta::total_hours)
+      .def("total_minutes", &TimeDelta::total_minutes)
+      .def("total_seconds", &TimeDelta::total_seconds)
+      .def("total_milliseconds", &TimeDelta::total_milliseconds)
+
       .def("max", &TimeDelta::max)
       .staticmethod("max")
       .def("min", &TimeDelta::min)
@@ -67,6 +73,7 @@ void export_TimeDelta() {
       .def("__rmul__", &TimeDelta::operator*)
       .def("__truediv__", TimeDelta_div_1)
       .def("__truediv__", TimeDelta_div_2)
+      .def("__floordiv__", &TimeDelta::floorDiv)
       .def("__mod__", &TimeDelta::operator%)
 
 #if HKU_PYTHON_SUPPORT_PICKLE

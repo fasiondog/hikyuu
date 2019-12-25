@@ -87,6 +87,31 @@ public:
         return m_duration.ticks();
     }
 
+    /** 返回带小数的总天数 */
+    double total_days() const {
+        return double(ticks()) / 86400000000.0;
+    }
+
+    /** 返回带小数的总小时数 */
+    double total_hours() const {
+        return double(ticks()) / 3600000000.0;
+    }
+
+    /** 返回带小数的总分钟数 */
+    double total_minutes() const {
+        return double(ticks()) / 60000000.0;
+    }
+
+    /** 返回带小数的总秒数 */
+    double total_seconds() const {
+        return double(ticks()) / 1000000.0;
+    }
+
+    /** 返回带小数的总毫秒数 */
+    double total_milliseconds() const {
+        return double(ticks()) / 1000.0;
+    }
+
     /** 是否为负时长 */
     bool isNegative() const {
         return m_duration.is_negative();
@@ -143,11 +168,17 @@ public:
     /** 时长乘以系数，结果四舍五入 */
     TimeDelta operator*(double p) const;
 
-    /** 时长除以系数，结果四舍五入。如果除零，将抛出 hku::exception。 */
+    /**
+     * 时长除以系数，结果四舍五入。如果除零，将抛出 hku::exception。
+     * 如果不希望四舍五入，请使用 floorDiv
+     */
     TimeDelta operator/(double p) const;
 
     /** 两个时长相除，求两者比例。如果除以零时长，将抛出 hku::exception。 */
     double operator/(TimeDelta td) const;
+
+    /** 地板除，小数点后直接截断 */
+    TimeDelta floorDiv(double p) const;
 
     /** 两个时长相除求余。如果除以零时长，将抛出 hku::exception。 */
     TimeDelta operator%(TimeDelta td) const;

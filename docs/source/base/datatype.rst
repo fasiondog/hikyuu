@@ -7,6 +7,13 @@
 日期时间
 -----------
 
+日期时间及其运算主要涉及 :py:class:`Datetime`，:py:class:`TimeDelta`。
+
+两者及其相关运算规则可参考 python datetime 模块中的 datetime 和 timedelta 帮助，
+并且两者可和 datetime、timedelta 相互转换，并直接进行运算操作。
+
+TimeDelta 的运算规则基本与 datetime.timedelta 相同。
+
 .. py:class:: Datetime
 
     日期时间类（精确到微秒），通过以下方式构建：
@@ -220,6 +227,36 @@
         是否为负时长
 
         :rtype: bool
+
+    .. py:method:: total_days(self)
+
+        获取带小数的总天数
+
+        :rtype: float
+
+    .. py:method:: total_hours(self)
+
+        获取带小数的总小时数
+
+        :rtype: float
+
+    .. py:method:: total_minutes(self)
+
+        获取带小数的总分钟数
+
+        :rtype: float
+
+    .. py:method:: total_seconds(self)
+
+        获取带小数的总秒数
+
+        :rtype: float
+
+    .. py:method:: total_milliseconds(self)
+
+        获取带小数的总毫秒数
+
+        :rtype: float
 
     .. py:staticmethod:: max()
 

@@ -146,6 +146,11 @@ TimeDelta TimeDelta::operator/(double p) const {
     return TimeDelta::fromTicks(static_cast<int64_t>(roundEx(double(ticks()) / p, 0)));
 }
 
+TimeDelta TimeDelta::floorDiv(double p) const {
+    HKU_CHECK(p != 0, "Attempt to divide by 0!");
+    return TimeDelta::fromTicks(static_cast<int64_t>(double(ticks()) / p));
+}
+
 double TimeDelta::operator/(TimeDelta td) const {
     HKU_CHECK(td.ticks() != 0, "Attemp to divide by zero TimeDelta!");
     return double(ticks()) / double(td.ticks());

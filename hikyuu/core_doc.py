@@ -300,6 +300,46 @@ isNegative()
     :rtype: bool
 """
 
+TimeDelta.total_days.__doc__ = """
+total_days(self)
+
+    获取带小数的总天数
+
+    :rtype: float
+"""
+
+TimeDelta.total_hours.__doc__ = """
+total_hours(self)
+
+    获取带小数的总小时数
+
+    :rtype: float
+"""
+
+TimeDelta.total_minutes.__doc__ = """
+total_minutes(self)
+
+    获取带小数的总分钟数
+
+    :rtype: float
+"""
+
+TimeDelta.total_seconds.__doc__ = """
+total_seconds(self)
+
+    获取带小数的总秒数
+
+    :rtype: float
+"""
+
+TimeDelta.total_milliseconds.__doc__ = """
+total_milliseconds(self)
+
+    获取带小数的总毫秒数
+
+    :rtype: float
+"""
+
 TimeDelta.max.__doc__ = """
 max()
 

@@ -205,6 +205,19 @@ __old_TimeDelta_sub__ = TimeDelta.__sub__
 
 
 def __new_TimeDelta_init__(self, *args, **kwargs):
+    """
+    可通过以下方式构建：
+
+    - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
+    - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)
+
+        - -99999999 <= days <= 99999999
+        - -100000 <= hours <= 100000
+        - -100000 <= minutes <= 100000
+        - -8639900 <= seconds <= 8639900
+        - -86399000000 <= milliseconds <= 86399000000
+        - -86399000000 <= microseconds <= 86399000000
+    """
     if not args:
         __old_TimeDelta_init__(self, **kwargs)
     elif isinstance(args[0], timedelta):
@@ -222,21 +235,26 @@ def __new_TimeDelta_init__(self, *args, **kwargs):
 
 
 def __new_TimeDelta_add__(self, td):
+    """可和 TimeDelta, datetime.timedelta, Datetime执行相加操作"""
     if isinstance(td, TimeDelta):
         return __old_TimeDelta_add__(self, td)
     elif isinstance(td, timedelta):
         return __old_TimeDelta_add__(self, TimeDelta(td))
     elif isinstance(td, Datetime):
         return td + self
+    elif isinstance(td, datetime):
+        return td + Datetime(datetime)
     else:
         raise TypeError("unsupported operand type(s) for +: 'TimeDelta' and '{}'".format(type(td)))
 
 
 def __new_TimeDelta_sub__(self, td):
+    """可减去TimeDelta, datetime.timedelta"""
     return __old_TimeDelta_sub__(self, td) if isinstance(td, TimeDelta) else __old_TimeDelta_sub__(self, TimeDelta(td))
 
 
 def TimeDelta_timedelta(self):
+    """ 转化为 datetime.timedelta """
     return timedelta(
         days=self.days,
         hours=self.hours,

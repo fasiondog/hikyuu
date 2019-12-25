@@ -302,6 +302,14 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta_operator) {
     /** @arg 正常除法 */
     BOOST_CHECK(TimeDelta(2) / 2 == TimeDelta(1));
     BOOST_CHECK(TimeDelta(2) / TimeDelta(1) == 2);
+    BOOST_CHECK(Microseconds(1) / 3 == TimeDelta(0));
+    BOOST_CHECK(Microseconds(2) / 3 == Microseconds(1));
+
+    /** @arg 地板除 */
+    BOOST_CHECK_THROW(TimeDelta(1).floorDiv(0), hku::exception);
+    BOOST_CHECK(TimeDelta(2).floorDiv(2) == TimeDelta(1));
+    BOOST_CHECK(Microseconds(1).floorDiv(3) == TimeDelta(0));
+    BOOST_CHECK(Microseconds(2).floorDiv(3) == TimeDelta(0));
 
     /** @arg 除以 zero TimeDelta */
     BOOST_CHECK_THROW(TimeDelta(1) / TimeDelta(), hku::exception);
@@ -327,6 +335,21 @@ BOOST_AUTO_TEST_CASE(test_TimeDelta_operator) {
     BOOST_CHECK(TimeDelta(0, 0, 0, 0, 0, 1) > TimeDelta(0, 0, 0, 0, 0, -1));
     BOOST_CHECK(TimeDelta(1) < TimeDelta(2));
     BOOST_CHECK(TimeDelta(2) <= TimeDelta(2));
+
+    /** @arg total_days */
+    BOOST_CHECK(TimeDelta(1, 12).total_days() == 1.5);
+
+    /** @arg total_hours */
+    BOOST_CHECK(TimeDelta(1, 12, 30).total_hours() == 36.5);
+
+    /** @arg total_minutes */
+    BOOST_CHECK(TimeDelta(1, 12, 30, 30).total_minutes() == (24 + 12) * 60 + 30 + 0.5);
+
+    /** @arg total_seconds */
+    BOOST_CHECK(TimeDelta(0, 0, 0, 1, 500).total_seconds() == 1.5);
+
+    /** @arg total_milliseconds */
+    BOOST_CHECK(TimeDelta(0, 0, 0, 0, 1, 500).total_milliseconds() == 1.5);
 }
 
 /** @par 检测点 */
