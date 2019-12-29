@@ -197,7 +197,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_LT((record.openPrice - 3250.25), 0.00001);
     CHECK_LT((record.highPrice - 3262.22), 0.00001);
     CHECK_LT((record.lowPrice - 3246.70), 0.00001);
-    CHECK_LT((record.closePrice - 3261.61)0.00001);
+    CHECK_LT((record.closePrice - 3261.61), 0.00001);
     CHECK_LT((record.transAmount - 21912127.0), 0.00001);
     CHECK_LT((record.transCount - 162719306.0), 0.00001);
 
