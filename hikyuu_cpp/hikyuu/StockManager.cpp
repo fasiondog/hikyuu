@@ -24,7 +24,7 @@ namespace hku {
 shared_ptr<StockManager> StockManager::m_sm;
 
 StockManager::~StockManager() {
-    std::cout << "Quit Hikyuu system!" << std::endl;
+    std::cout << "Quit Hikyuu system!\n" << std::endl;
     // Cannot use log output when exiting!
     // HKU_TRACE("Quit Hikyuu system!\n");
 }
@@ -59,9 +59,8 @@ Parameter default_other_param() {
     return param;
 }
 
-void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
-                        const Parameter& kdataParam, const Parameter& preloadParam,
-                        const Parameter& hikyuuParam) {
+void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam, const Parameter& kdataParam,
+                        const Parameter& preloadParam, const Parameter& hikyuuParam) {
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;
@@ -113,8 +112,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     setKDataDriver(kdata_driver);
 
     // add special Market, for temp csv file
-    m_marketInfoDict["TMP"] =
-      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>());
+    m_marketInfoDict["TMP"] = MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>());
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
@@ -339,13 +337,13 @@ DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string&
     return result;
 }
 
-Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,
-                                    const string& min_filename, price_t tick, price_t tickValue,
-                                    int precision, size_t minTradeNumber, size_t maxTradeNumber) {
+Stock StockManager::addTempCsvStock(const string& code, const string& day_filename, const string& min_filename,
+                                    price_t tick, price_t tickValue, int precision, size_t minTradeNumber,
+                                    size_t maxTradeNumber) {
     string new_code(code);
     to_upper(new_code);
-    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000),
-                 Null<Datetime>(), tick, tickValue, precision, minTradeNumber, maxTradeNumber);
+    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000), Null<Datetime>(), tick,
+                 tickValue, precision, minTradeNumber, maxTradeNumber);
 
     KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
     result.setKDataDriver(KDataDriverPtr(p));

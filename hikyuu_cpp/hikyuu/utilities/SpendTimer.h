@@ -62,17 +62,16 @@ namespace hku {
 #define SPEND_TIME(id)                                                    \
     std::stringstream sptmsg_buf_##id(std::stringstream::out);            \
     sptmsg_buf_##id << #id << " (" << __FILE__ << ":" << __LINE__ << ")"; \
-    SpendTimer test_spend_timer_##id(sptmsg_buf_##id.str());
+    hku::SpendTimer test_spend_timer_##id(sptmsg_buf_##id.str());
 
 /**
  * 代码执行耗时计时器，附带输出信息
  * @param id 自定义耗时计时器id
  * @param ... 符合 fmt::format 方式的输出信息
  */
-#define SPEND_TIME_MSG(id, ...)                 \
-    string msg_##id = fmt::format(__VA_ARGS__); \
-    SpendTimer test_spend_timer_##id(           \
-      fmt::format("{} {} ({}:{})", #id, msg_##id, __FILE__, __LINE__));
+#define SPEND_TIME_MSG(id, ...)                      \
+    std::string msg_##id = fmt::format(__VA_ARGS__); \
+    hku::SpendTimer test_spend_timer_##id(fmt::format("{} {} ({}:{})", #id, msg_##id, __FILE__, __LINE__));
 
 /**
  * 用于动态控制当前代码块及其子块中的耗时计时器，主要用于测试代码中关闭和开启部分耗时统计
@@ -95,8 +94,7 @@ public:
      * 构造函数，记录当前系统时间
      * @param msg 辅导输出信息
      */
-    explicit SpendTimer(const std::string& msg)
-    : m_msg(msg), m_start_time(std::chrono::steady_clock::now()) {}
+    explicit SpendTimer(const std::string& msg) : m_msg(msg), m_start_time(std::chrono::steady_clock::now()) {}
 
     /** 析构函数，计算从构造至析构所消耗的时间，并打印输出 */
     virtual ~SpendTimer() {
