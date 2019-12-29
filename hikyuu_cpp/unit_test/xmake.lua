@@ -6,6 +6,8 @@ option("test")
     set_description("Complie with unit-test")
 option_end()
 
+add_requires("doctest")
+
 target("unit-test")
     if get_config("test") == "all" then
         set_kind("binary")
@@ -13,7 +15,7 @@ target("unit-test")
         set_kind("phony")
     end
 
-    add_packages("fmt", "spdlog")
+    add_packages("fmt", "spdlog", "doctest")
 
     add_includedirs("..")
 
@@ -53,7 +55,7 @@ target("small-test")
     else
         set_kind("phony")
     end
-    add_packages("fmt", "spdlog")
+    add_packages("fmt", "spdlog", "doctest")
     add_includedirs("..")
 
     --add_defines("BOOST_TEST_DYN_LINK")
@@ -85,8 +87,7 @@ target("small-test")
     end
 
     -- add files
-    add_files("./libs/hikyuu/hikyuu/**.cpp")
-    add_files("./libs/hikyuu/config.cpp")
-    add_files("./test_all.cpp")
+    add_files("./hikyuu/hikyuu/**.cpp")
+    add_files("./hikyuu/test_main.cpp")
     
 target_end()
