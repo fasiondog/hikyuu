@@ -8,11 +8,11 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
-#include <filesystem>
 #include <hikyuu/hikyuu.h>
-
-using namespace std::filesystem;
 using namespace hku;
+
+#include <filesystem>
+using namespace std::filesystem;
 
 void init_hikyuu_test() {
     path current = current_path();
