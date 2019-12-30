@@ -8,11 +8,16 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
-#include <hikyuu/hikyuu.h>
-using namespace hku;
-
+#if __GNUC__ <= 8 || __clang_major__ <= 6
+#include <boost/filesystem.hpp>
+using namespace boost::filesystem;
+#else
 #include <filesystem>
 using namespace std::filesystem;
+#endif
+
+#include <hikyuu/hikyuu.h>
+using namespace hku;
 
 void init_hikyuu_test() {
     path current = current_path();
