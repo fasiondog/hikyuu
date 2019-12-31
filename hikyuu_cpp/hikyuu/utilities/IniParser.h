@@ -13,8 +13,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251)
@@ -53,10 +52,14 @@ namespace hku {
  * @ingroup Utilities
  */
 
-class HKU_API IniParser : boost::noncopyable {
+class HKU_API IniParser {
 public:
     typedef std::list<std::string> StringList;
-    typedef boost::shared_ptr<std::list<std::string> > StringListPtr;
+    typedef std::shared_ptr<std::list<std::string> > StringListPtr;
+
+    IniParser(const IniParser&) = delete;
+    IniParser& operator=(const IniParser&) = delete;
+
     IniParser();
     virtual ~IniParser();
 

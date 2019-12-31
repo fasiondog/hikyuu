@@ -9,6 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "utilities/IniParser.h"
 #include "utilities/util.h"
 #include "StockManager.h"
 #include "data_driver/KDataTempCsvDriver.h"
