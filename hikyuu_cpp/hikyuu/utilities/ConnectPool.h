@@ -40,7 +40,18 @@ public:
       m_param(param),
       m_closer(this) {}
 
-    virtual ~ConnectPool() = default;
+    /**
+     * 析构函数，释放所有缓存的连接
+     */
+    virtual ~ConnectPool() {
+        while (!m_connectList.empty()) {
+            ConnectType *p = m_connectList.front();
+            m_connectList.pop();
+            if (p) {
+                delete p;
+            }
+        }
+    }
 
     /** 连接实例指针类型 */
     typedef std::shared_ptr<ConnectType> ConnectPtr;
@@ -73,6 +84,7 @@ private:
             if (0 == m_maxIdelSize || m_connectList.size() < m_maxIdelSize) {
                 m_connectList.push(p);
             } else {
+                delete p;
                 m_count--;
             }
         } else {
