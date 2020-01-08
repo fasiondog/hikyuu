@@ -74,7 +74,7 @@ if is_plat("windows") then
     if is_mode("release") then
         add_cxflags("-MD") 
     elseif is_mode("debug") then
-        add_cxflags("-Gs", "-RTC1") 
+        add_cxflags("-Gs", "-RTC1", "/bigobj") 
         add_cxflags("-MDd")
     end
 end 
