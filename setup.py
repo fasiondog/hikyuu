@@ -79,9 +79,9 @@ def build_boost():
         os.chdir(current_boost_root)
         if not os.path.exists('b2.exe'):
             os.system('bootstrap.bat')
-        os.system('b2 debug link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
+        os.system('b2 release link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
                   ' --with-filesystem --with-system --with-test')
-        os.system('b2 debug link=shared runtime-link=shared address-model=64 -j 4 --with-python'
+        os.system('b2 release link=shared runtime-link=shared address-model=64 -j 4 --with-python'
                   ' --with-serialization')
         os.chdir(current_dir)
     else:
@@ -150,9 +150,9 @@ def start_build(verbose=False):
         build_boost()
 
     if py_version_changed:
-        os.system("xmake f -c -y -m debug")
+        os.system("xmake f -c -y -m release")
     else:
-        os.system("xmake f -y -m debug")
+        os.system("xmake f -y -m release")
     os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
     os.system("xmake -b {} _hikyuu".format("-v -D" if verbose else ""))
     os.system("xmake -b {} _indicator".format("-v -D" if verbose else ""))
@@ -193,7 +193,7 @@ def test(all, compile, verbose):
         os.system("xmake -b unit-test")
         os.system("xmake r unit-test")
     else:
-        os.system("xmake f --test=small --mode=debug")
+        os.system("xmake f --test=small --mode=release")
         os.system("xmake -b small-test")
         os.system("xmake r small-test")
 
