@@ -68,7 +68,7 @@ def get_python_version():
     return (py_version, py_version_changed)
 
 
-def build_boost():
+def build_boost(mode):
     """ 编译依赖的 boost 库 """
     current_boost_root, current_boost_lib = get_boost_envrionment()
     if current_boost_root is None or current_boost_lib is None:
@@ -79,21 +79,21 @@ def build_boost():
         os.chdir(current_boost_root)
         if not os.path.exists('b2.exe'):
             os.system('bootstrap.bat')
-        os.system('b2 release link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
-                  ' --with-filesystem --with-system --with-test')
-        os.system('b2 release link=shared runtime-link=shared address-model=64 -j 4 --with-python'
-                  ' --with-serialization')
+        os.system('b2 {} link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
+                  ' --with-filesystem --with-system --with-test'.format(mode))
+        os.system('b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
+                  ' --with-serialization'.format(mode))
         os.chdir(current_dir)
     else:
         cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
-              './b2 release link=shared address-model=64 -j 4 --with-python --with-serialization; '\
-              './b2 release link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
+              './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization; '\
+              './b2 {mode} link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
               '--with-filesystem --with-system --with-test; '\
-              'cd {current}'.format(boost=current_boost_root, current=current_dir)
+              'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
         os.system(cmd)
 
 
-def clear_with_python_changed():
+def clear_with_python_changed(mode):
     """
     python版本发生变化时，清理之前的python编译结果
     应该仅在 pyhon 版本发生变化时被调用
@@ -101,13 +101,13 @@ def clear_with_python_changed():
     current_plat = sys.platform
     current_bits = 64 if sys.maxsize > 2**32 else 32
     if current_plat == 'win32' and current_bits == 64:
-        build_pywrap_dir = 'build\\release\\windows\\x64\\.objs\\windows\\x64\\release\\hikyuu_pywrap'
+        build_pywrap_dir = 'build\\{mode}\\windows\\x64\\.objs\\windows\\x64\\{mode}\\hikyuu_pywrap'.format(mode=mode)
     elif current_plat == 'win32' and current_bits == 32:
-        build_pywrap_dir = 'build\\release\\windows\\x86\\.objs\\windows\\x64\\release\\hikyuu_pywrap'
+        build_pywrap_dir = 'build\\{mode}\\windows\\x86\\.objs\\windows\\x64\\{mode}\\hikyuu_pywrap'.format(mode=mode)
     elif current_plat == 'linux' and current_bits == 64:
-        build_pywrap_dir = 'build/release/linux/x86_64/.objs/linux/x86_64/release/hikyuu_pywrap'
+        build_pywrap_dir = 'build/{mode}/linux/x86_64/.objs/linux/x86_64/{mode}/hikyuu_pywrap'.format(mode=mode)
     elif current_plat == "darwin" and current_bits == 64:
-        build_pywrap_dir = 'build/release/macosx/x86_64/.objs/macosx/x86_64/release/hikyuu_pywrap'
+        build_pywrap_dir = 'build/{mode}/macosx/x86_64/.objs/macosx/x86_64/{mode}/hikyuu_pywrap'.format(mode=mode)
     else:
         print("************不支持的平台**************")
         exit(0)
@@ -121,7 +121,7 @@ def clear_with_python_changed():
 #------------------------------------------------------------------------------
 # 执行构建
 #------------------------------------------------------------------------------
-def start_build(verbose=False):
+def start_build(verbose=False, mode='release'):
     """ 执行编译 """
     global g_verbose
     g_verbose = verbose
@@ -145,14 +145,14 @@ def start_build(verbose=False):
 
     #如果 python 发生变化，则编译依赖的 boost 库（boost.python)
     if py_version_changed:
-        clear_with_python_changed()
+        clear_with_python_changed(mode)
         print('\ncompile boost ...')
-        build_boost()
+        build_boost(mode)
 
     if py_version_changed:
-        os.system("xmake f -c -y -m release")
+        os.system("xmake f -c -y -m {}".format(mode))
     else:
-        os.system("xmake f -y -m release")
+        os.system("xmake f -y -m {}".format(mode))
     os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
     os.system("xmake -b {} _hikyuu".format("-v -D" if verbose else ""))
     os.system("xmake -b {} _indicator".format("-v -D" if verbose else ""))
@@ -173,27 +173,31 @@ def cli():
 
 @click.command()
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
-def build(verbose):
+@click.option('-m', '--mode', default='release',
+              type=click.Choice(['release', 'debug']), help='编译模式')
+def build(verbose, mode):
     """ 执行编译 """
-    start_build(verbose)
+    start_build(verbose, mode)
 
 
 @click.command()
 @click.option('-all', "--all", is_flag=True, help="执行全部测试, 否则仅仅进行最小范围测试）")
 @click.option("-compile", "--compile", is_flag=True, help='强制重新编译')
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
-def test(all, compile, verbose):
+@click.option('-m', '--mode', default='release',
+              type=click.Choice(['release', 'debug']), help='编译模式')
+def test(all, compile, verbose, mode):
     """ 执行单元测试 """
     # 先取 BOOST 路径，避免为设置 BOOST_LIB 的情况
     current_boost_root, current_boost_lib = get_boost_envrionment()
     if compile:
-        start_build(verbose)
+        start_build(verbose, mode)
     if all:
-        os.system("xmake f --test=all")
+        os.system("xmake f --test=all --mode={}".format(mode))
         os.system("xmake -b unit-test")
         os.system("xmake r unit-test")
     else:
-        os.system("xmake f --test=small --mode=release")
+        os.system("xmake f --test=small --mode={}".format(mode))
         os.system("xmake -b small-test")
         os.system("xmake r small-test")
 
