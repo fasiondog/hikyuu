@@ -3,6 +3,7 @@
 
 from setuptools import setup, find_packages
 import sys
+import json
 import os
 import shutil
 import platform
@@ -25,8 +26,8 @@ def get_boost_envrionment():
         @return (current_boost_root, current_boost_lib)
     """
     current_dir = os.getcwd()
-    current_boost_root = None
-    current_boost_lib = None
+    current_boost_root = ''
+    current_boost_lib = ''
     if 'BOOST_ROOT' in os.environ:
         current_boost_root = os.environ['BOOST_ROOT']
         if 'BOOST_LIB' in os.environ:
@@ -45,33 +46,61 @@ def get_boost_envrionment():
 
 
 def get_python_version():
-    """
-    获取 python版本，并判断当前 python 版本是否发生了变化
-        @return (py_version, py_version_changed)
-    """
+    """获取当前 python版本"""
     py_version = platform.python_version_tuple()
-    py_version = int(py_version[0])*10 + int(py_version[1])
-    py_version_changed = True
-    if os.path.exists('py_version'):
-        with open('py_version', 'r+') as f:
-            old_py_version = f.read()
-            if old_py_version == str(py_version):
-                py_version_changed = False
-            else:
-                f.seek(0)
-                f.write(str(py_version))
-                print('old python version:', int(old_py_version)*0.1)
+    py_version = int(py_version[0]) * 10 + int(py_version[1])
+    print('current python version:', int(py_version) * 0.1)
+    return py_version
+
+
+def get_current_compile_info():
+    """获取当前编译信息, 其中 mode 无效"""
+    current_bits = 64 if sys.maxsize > 2**32 else 32
+    if sys.platform == 'win32':
+        current_arch = 'x64' if current_bits == 64 else 'x86'
     else:
-        with open('py_version', 'w') as f:
-            f.write(str(py_version))
-    print('current python version:', int(py_version)*0.1, '\n')
-    return (py_version, py_version_changed)
+        current_arch = 'x86_64' if current_bits == 64 else 'i386'
+
+    py_version = get_python_version()
+    current_boost_root, current_boost_lib = get_boost_envrionment()
+    current_compile_info = {
+        'plat': sys.platform,
+        'arch': current_arch,
+        'mode': '',
+        'py_version': py_version,
+        'boost_root': current_boost_root,
+        'boost_lib': current_boost_lib
+    }
+    return current_compile_info
+
+
+def get_history_compile_info():
+    """获取历史编译信息"""
+    try:
+        with open('compile_info', 'r') as f:
+            result = json.load(f)
+    except:
+        result = {
+            'plat': '',
+            'arch': '',
+            'mode': '',
+            'py_version': 0,
+            'boost_root': '',
+            'boost_lib': ''
+        }
+    return result
+
+
+def save_current_compile_info(compile_info):
+    """保持当前编译信息"""
+    with open('compile_info', 'w') as f:
+        json.dump(compile_info, f)
 
 
 def build_boost(mode):
     """ 编译依赖的 boost 库 """
     current_boost_root, current_boost_lib = get_boost_envrionment()
-    if current_boost_root is None or current_boost_lib is None:
+    if current_boost_root == '' or current_boost_lib == '':
         print("Can't get boost environment!")
         return
     current_dir = os.getcwd()
@@ -79,10 +108,12 @@ def build_boost(mode):
         os.chdir(current_boost_root)
         if not os.path.exists('b2.exe'):
             os.system('bootstrap.bat')
-        os.system('b2 {} link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
-                  ' --with-filesystem --with-system --with-test'.format(mode))
-        os.system('b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
-                  ' --with-serialization'.format(mode))
+        os.system(
+            'b2 {} link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
+            ' --with-filesystem --with-system --with-test'.format(mode))
+        os.system(
+            'b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
+            ' --with-serialization'.format(mode))
         os.chdir(current_dir)
     else:
         cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
@@ -101,13 +132,23 @@ def clear_with_python_changed(mode):
     current_plat = sys.platform
     current_bits = 64 if sys.maxsize > 2**32 else 32
     if current_plat == 'win32' and current_bits == 64:
-        build_pywrap_dir = 'build\\{mode}\\windows\\x64\\.objs\\windows\\x64\\{mode}\\hikyuu_pywrap'.format(mode=mode)
+        build_pywrap_dir = 'build\\{mode}\\windows\\x64\\.objs\\windows\\x64\\{mode}\\hikyuu_pywrap'.format(
+            mode=mode)
     elif current_plat == 'win32' and current_bits == 32:
-        build_pywrap_dir = 'build\\{mode}\\windows\\x86\\.objs\\windows\\x64\\{mode}\\hikyuu_pywrap'.format(mode=mode)
+        build_pywrap_dir = 'build\\{mode}\\windows\\x86\\.objs\\windows\\x86\\{mode}\\hikyuu_pywrap'.format(
+            mode=mode)
     elif current_plat == 'linux' and current_bits == 64:
-        build_pywrap_dir = 'build/{mode}/linux/x86_64/.objs/linux/x86_64/{mode}/hikyuu_pywrap'.format(mode=mode)
+        build_pywrap_dir = 'build/{mode}/linux/x86_64/.objs/linux/x86_64/{mode}/hikyuu_pywrap'.format(
+            mode=mode)
+    elif current_plat == 'linux' and current_bits == 32:
+        build_pywrap_dir = 'build/{mode}/linux/i386/.objs/linux/i386/{mode}/hikyuu_pywrap'.format(
+            mode=mode)
     elif current_plat == "darwin" and current_bits == 64:
-        build_pywrap_dir = 'build/{mode}/macosx/x86_64/.objs/macosx/x86_64/{mode}/hikyuu_pywrap'.format(mode=mode)
+        build_pywrap_dir = 'build/{mode}/macosx/x86_64/.objs/macosx/x86_64/{mode}/hikyuu_pywrap'.format(
+            mode=mode)
+    elif current_plat == "darwin" and current_bits == 32:
+        build_pywrap_dir = 'build/{mode}/macosx/i386/.objs/macosx/i386/{mode}/hikyuu_pywrap'.format(
+            mode=mode)
     else:
         print("************不支持的平台**************")
         exit(0)
@@ -129,30 +170,32 @@ def start_build(verbose=False, mode='release'):
         print("Please install xmake")
         return
 
-    print("\nchecking python version ...")
-    py_version, py_version_changed = get_python_version()
-    if py_version < 31:
+    current_compile_info = get_current_compile_info()
+    current_compile_info['mode'] = mode
+
+    py_version = current_compile_info['py_version']
+    if py_version != 0 and py_version < 31:
         print("Python version must >= 3.1 !")
         return
 
-    print("checking boost ...")
-    current_boost_root, current_boost_lib = get_boost_envrionment()
-    if current_boost_root is None or current_boost_lib is None:
+    current_boost_root = current_compile_info['boost_root']
+    current_boost_lib = current_compile_info['boost_lib']
+    if current_boost_root == '' or current_boost_lib == '':
         print("Please configure BOOST")
         exit(0)
     print('BOOST_ROOT:', current_boost_root)
     print('BOOST_LIB:', current_boost_lib)
 
-    #如果 python 发生变化，则编译依赖的 boost 库（boost.python)
-    if py_version_changed:
+    #如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
+    history_compile_info = get_history_compile_info()
+    if py_version != history_compile_info['py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
         print('\ncompile boost ...')
         build_boost(mode)
-
-    if py_version_changed:
         os.system("xmake f -c -y -m {}".format(mode))
     else:
         os.system("xmake f -y -m {}".format(mode))
+
     os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
     os.system("xmake -b {} _hikyuu".format("-v -D" if verbose else ""))
     os.system("xmake -b {} _indicator".format("-v -D" if verbose else ""))
@@ -161,10 +204,14 @@ def start_build(verbose=False, mode='release'):
     os.system("xmake -b {} _trade_instance".format("-v -D" if verbose else ""))
     os.system("xmake -b {} _data_driver".format("-v -D" if verbose else ""))
 
+    # 保存当前的编译信息
+    save_current_compile_info(current_compile_info)
+
 
 #------------------------------------------------------------------------------
 # 控制台命令
 #------------------------------------------------------------------------------
+
 
 @click.group()
 def cli():
@@ -173,8 +220,11 @@ def cli():
 
 @click.command()
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
-@click.option('-m', '--mode', default='release',
-              type=click.Choice(['release', 'debug']), help='编译模式')
+@click.option('-m',
+              '--mode',
+              default='release',
+              type=click.Choice(['release', 'debug']),
+              help='编译模式')
 def build(verbose, mode):
     """ 执行编译 """
     start_build(verbose, mode)
@@ -184,13 +234,17 @@ def build(verbose, mode):
 @click.option('-all', "--all", is_flag=True, help="执行全部测试, 否则仅仅进行最小范围测试）")
 @click.option("-compile", "--compile", is_flag=True, help='强制重新编译')
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
-@click.option('-m', '--mode', default='release',
-              type=click.Choice(['release', 'debug']), help='编译模式')
+@click.option('-m',
+              '--mode',
+              default='release',
+              type=click.Choice(['release', 'debug']),
+              help='编译模式')
 def test(all, compile, verbose, mode):
     """ 执行单元测试 """
-    # 先取 BOOST 路径，避免为设置 BOOST_LIB 的情况
-    current_boost_root, current_boost_lib = get_boost_envrionment()
-    if compile:
+    current_compile_info = get_current_compile_info()
+    current_compile_info['mode'] = mode
+    history_compile_info = get_history_compile_info()
+    if compile or current_compile_info != history_compile_info:
         start_build(verbose, mode)
     if all:
         os.system("xmake f --test=all --mode={}".format(mode))
@@ -202,7 +256,7 @@ def test(all, compile, verbose, mode):
         os.system("xmake r small-test")
 
 
-@click.command()    
+@click.command()
 @click.option("-with_boost", "--with_boost", is_flag=True, help='清除相应的BOOST库')
 def clear(with_boost):
     """ 清除当前编译设置及结果 """
@@ -215,9 +269,9 @@ def clear(with_boost):
     if os.path.lexists('Hikyuu.egg-info'):
         print('delete Hikyuu.egg-info')
         shutil.rmtree('Hikyuu.egg-info')
-    if with_boost and os.path.exists('py_version'):
-        print('delete py_version')
-        os.remove('py_version')
+    if os.path.exists('compile_info'):
+        print('delete compile_info')
+        os.remove('compile_info')
     for r, _, f_list in os.walk('hikyuu'):
         for name in f_list:
             if (name != 'UnRAR.exe' and len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
@@ -236,7 +290,8 @@ def uninstall():
     else:
         usr_dir = os.path.expanduser('~')
         py_version, _ = get_python_version()
-        site_lib_dir = '{}/.local/lib/python{:>.1f}/site-packages'.format(usr_dir, py_version*0.1)
+        site_lib_dir = '{}/.local/lib/python{:>.1f}/site-packages'.format(
+            usr_dir, py_version * 0.1)
     for dir in os.listdir(site_lib_dir):
         if dir == 'hikyuu' or (len(dir) > 6 and dir[:6] == 'Hikyuu'):
             print('delete', site_lib_dir + '/' + dir)
@@ -247,15 +302,13 @@ def uninstall():
 @click.command()
 def install():
     """ 编译并安装 Hikyuu python 库 """
-    start_build()
-    py_version, py_version_changed = get_python_version()
-    if py_version_changed:
-        os.system("xmake f -c -y")
+    start_build(False, 'release')
     if sys.platform == 'win32':
         install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
     else:
         usr_dir = os.path.expanduser('~')
-        install_dir = '{}/.local/lib/python{:>.1f}/site-packages/hikyuu'.format(usr_dir, py_version*0.1)
+        install_dir = '{}/.local/lib/python{:>.1f}/site-packages/hikyuu'.format(
+            usr_dir, get_python_version() * 0.1)
         try:
             shutil.rmtree(install_dir)
         except:
@@ -268,7 +321,7 @@ def install():
 def wheel():
     """ 生成 python 的 wheel 安装包 """
     # 尝试编译
-    start_build()
+    start_build(False, 'release')
 
     # 清理之前遗留的打包产物
     print("Clean up the before papackaging outputs ...")
@@ -279,7 +332,8 @@ def wheel():
         shutil.rmtree('build/lib')
     if os.path.lexists('build'):
         for bdist in os.listdir('build'):
-            if len(bdist) >= 5 and bdist[:5] == 'bdist' and os.path.lexists(bdist):
+            if len(bdist) >= 5 and bdist[:5] == 'bdist' and os.path.lexists(
+                    bdist):
                 shutil.rmtree(bdist)
     for x in os.listdir('hikyuu'):
         if x[:12] == 'boost_python':
@@ -301,7 +355,8 @@ def wheel():
     else:
         print("*********尚未实现该平台的支持*******")
         return
-    cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(py_version, plat)
+    cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
+        py_version, plat)
     os.system(cmd)
 
 
@@ -330,7 +385,6 @@ cli.add_command(install)
 cli.add_command(uninstall)
 cli.add_command(wheel)
 cli.add_command(upload)
-
 
 if __name__ == "__main__":
     cli()
