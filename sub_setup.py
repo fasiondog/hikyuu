@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 
 hku_version = ''
-with open('xmake.lua', 'r') as f:
+with open('xmake.lua', 'r', encoding='utf-8') as f:
     for line in f:
         if len(line) > 15 and line[:11] == 'set_version':
             pre_pos = line.find('"') + 1

@@ -325,7 +325,7 @@ def wheel():
 
     # 清理之前遗留的打包产物
     print("Clean up the before papackaging outputs ...")
-    py_version, _ = get_python_version()
+    py_version = get_python_version()
     if os.path.lexists('Hikyuu.egg-info'):
         shutil.rmtree('Hikyuu.egg-info')
     if os.path.lexists('build/lib'):
