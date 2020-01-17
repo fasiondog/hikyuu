@@ -133,7 +133,9 @@ def __new_Datetime_init__(self, *args, **kwargs):
     # datetime实例同时也是date的实例，判断必须放在date之前
     elif isinstance(args[0], datetime):
         d = args[0]
-        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, d.millisecond, d.microsecond)
+        milliseconds = d.microsecond // 1000
+        microseconds = d.microsecond - milliseconds * 1000
+        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, milliseconds, microseconds)
     elif isinstance(args[0], date):
         d = args[0]
         __old_Datetime_init__(self, d.year, d.month, d.day, 0, 0, 0, 0)
