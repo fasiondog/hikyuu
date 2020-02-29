@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "GlobalInitializer.h"
+//#include "GlobalInitializer.h"
 #include "Log.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>

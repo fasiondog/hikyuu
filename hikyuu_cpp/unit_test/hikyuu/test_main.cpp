@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     // overrides
     context.setOption("no-breaks", true);  // don't break in the debugger when assertions fail
 
-    // init_hikyuu_test();
+    init_hikyuu_test();
 
     int res = 0;
     {
