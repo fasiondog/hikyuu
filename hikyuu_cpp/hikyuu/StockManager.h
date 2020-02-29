@@ -43,6 +43,9 @@ public:
               const Parameter& preloadParam = default_preload_param(),
               const Parameter& hikyuuParam = default_other_param());
 
+    /** 主动退出并释放资源 */
+    static void quit();
+
     Parameter getBaseInfoDriverParameter() const;
     Parameter getBlockDriverParameter() const;
     Parameter getKDataDriverParameter() const;

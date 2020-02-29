@@ -24,10 +24,17 @@ namespace hku {
 
 shared_ptr<StockManager> StockManager::m_sm;
 
-StockManager::~StockManager() {
+void StockManager::quit() {
     std::cout << "Quit Hikyuu system!\n" << std::endl;
     // Cannot use log output when exiting!
     // HKU_TRACE("Quit Hikyuu system!\n");
+    if (!m_sm) {
+        m_sm.reset();
+    }
+}
+
+StockManager::~StockManager() {
+    quit();
 }
 
 StockManager& StockManager::instance() {

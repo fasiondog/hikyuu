@@ -24,7 +24,11 @@ function main(target)
         if is_plat("windows") then
             os.cp("$(env BOOST_LIB)/boost_python3*.dll", './hikyuu')
             os.cp("$(env BOOST_LIB)/boost_serialization*.dll", './hikyuu')
-            os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", './hikyuu')
+            if is_mode("release") then
+                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", './hikyuu')
+            else
+                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5_D.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", './hikyuu')
+            end
             os.cp("$(projectdir)/hikyuu_extern_libs/pkg/mysql.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", './hikyuu')
             return
         end

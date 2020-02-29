@@ -28,7 +28,11 @@ target("hikyuu")
         add_defines("PY_VERSION_HEX=0x03000000")
         add_includedirs("../../hikyuu_extern_libs/src/sqlite3")
         add_deps("sqlite3")
-        add_packages("hdf5")
+        if is_mode("release") then
+            add_packages("hdf5")
+        else
+            add_packages("hdf5_D")
+        end
         add_packages("mysql")
     end
     

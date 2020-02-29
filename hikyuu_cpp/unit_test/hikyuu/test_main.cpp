@@ -17,6 +17,7 @@ using namespace std::filesystem;
 #endif
 
 #include <hikyuu/hikyuu.h>
+#include <hikyuu/debug.h>
 using namespace hku;
 
 void init_hikyuu_test() {
@@ -58,7 +59,7 @@ int main(int argc, char** argv) {
     // overrides
     context.setOption("no-breaks", true);  // don't break in the debugger when assertions fail
 
-    init_hikyuu_test();
+    // init_hikyuu_test();
 
     int res = 0;
     {
@@ -68,6 +69,9 @@ int main(int argc, char** argv) {
     }
 
     std::cout << std::endl;
+
+    StockManager::quit();
+    spdlog::drop_all();
 
     if (context.shouldExit())  // important - query flags (and --exit) rely on the user doing this
         return res;            // propagate the result of the tests

@@ -8,7 +8,6 @@
  */
 
 #pragma once
-
 #ifndef HKU_GLOBAL_INITIALIZER_H
 #define HKU_GLOBAL_INITIALIZER_H
 
@@ -18,7 +17,7 @@
 
 namespace hku {
 
-class HKU_API GlobalInitializer {
+class GlobalInitializer {
 public:
     GlobalInitializer() {
         if (m_count++ == 0) {

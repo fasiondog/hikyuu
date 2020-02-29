@@ -14,7 +14,7 @@
 
 namespace hku {
 
-class H5KDataDriver : public KDataDriver {
+class HKU_API H5KDataDriver : public KDataDriver {
 public:
     H5KDataDriver();
     virtual ~H5KDataDriver();
