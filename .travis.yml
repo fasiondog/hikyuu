@@ -83,8 +83,8 @@ install:
 
 script:
   - cd ./build/fasiondog/hikyuu
-  - export BOOST_ROOT=./boost_1_72_0
-  - export BOOST_LIB=./boost_1_72_0/stage/lib
+  - export BOOST_ROOT=./boost_1_71_0
+  - export BOOST_LIB=./boost_1_71_0/stage/lib
   - ls .
   - xmake f --cxx=$CXX --confirm=y --test=small
   - xmake -b small-test
