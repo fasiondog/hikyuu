@@ -17,7 +17,7 @@
 
 namespace hku {
 
-class GlobalInitializer {
+class HKU_API GlobalInitializer {
 public:
     GlobalInitializer() {
         if (m_count++ == 0) {

@@ -31,7 +31,7 @@ void GlobalInitializer::init() {
     _CrtSetBreakAlloc(4018);
 #endif
 
-    // inner::init_logger();
+    inner::init_logger();
 }
 
 void GlobalInitializer::clean() {

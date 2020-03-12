@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 
-//#include "GlobalInitializer.h"
+#include "GlobalInitializer.h"
 #include "Log.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>
@@ -26,6 +26,8 @@ static LOG_LEVEL g_log_level = TRACE;
  * Use SPDLOG for logging
  *********************************************/
 #if HKU_USE_ASYNC_LOGGER
+std::shared_ptr<spdlog::async_logger> g_hikyuu_logger;
+
 void init_logger() {
     // auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -41,13 +43,15 @@ void init_logger() {
     // logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
     spdlog::register_logger(logger);
-    return logger;
+    g_hikyuu_logger = logger;
 }
 
 std::shared_ptr<spdlog::async_logger> getHikyuuLogger() {
-    return spdlog::get("hikyuu");
+    return g_hikyuu_logger;
 }
 #else
+
+std::shared_ptr<spdlog::logger> g_hikyuu_logger;
 
 void init_logger() {
     // auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
@@ -61,6 +65,7 @@ void init_logger() {
     // logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
     spdlog::register_logger(logger);
+    g_hikyuu_logger = logger;
 }
 
 } /*namespace inner */

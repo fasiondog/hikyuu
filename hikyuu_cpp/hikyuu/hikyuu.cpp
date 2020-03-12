@@ -13,7 +13,7 @@ namespace hku {
 static Parameter g_hikyuu_context;
 
 void hikyuu_init(const string& config_file_name) {
-    inner::init_logger();
+    // inner::init_logger();
 
     IniParser config;
     try {
