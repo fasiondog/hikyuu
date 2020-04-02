@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "GlobalInitializer.h"
 #include <chrono>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -22,24 +23,25 @@
 
 namespace hku {
 
-shared_ptr<StockManager> StockManager::m_sm;
+StockManager* StockManager::m_sm = nullptr;
 
 void StockManager::quit() {
     // Cannot use log output when exiting!
     // HKU_TRACE("Quit Hikyuu system!\n");
     if (m_sm) {
         std::cout << "Quit Hikyuu system!\n" << std::endl;
-        m_sm.reset();
+        delete m_sm;
+        m_sm = nullptr;
     }
 }
 
 StockManager::~StockManager() {
-    quit();
+
 }
 
 StockManager& StockManager::instance() {
     if (!m_sm) {
-        m_sm = shared_ptr<StockManager>(new StockManager());
+        m_sm = new StockManager();
     }
     return (*m_sm);
 }

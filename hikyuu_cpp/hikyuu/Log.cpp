@@ -46,10 +46,13 @@ void init_logger() {
     g_hikyuu_logger = logger;
 }
 
+} /*namespace inner */
+
 std::shared_ptr<spdlog::async_logger> getHikyuuLogger() {
-    return g_hikyuu_logger;
+    return inner::g_hikyuu_logger;
 }
-#else
+
+#else /* #if HKU_USE_ASYNC_LOGGER */
 
 std::shared_ptr<spdlog::logger> g_hikyuu_logger;
 
@@ -58,17 +61,23 @@ void init_logger() {
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
 
-    auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("hikyuu", stdout_sink));
+    auto logger = std::make_shared<spdlog::logger>("hikyuu", stdout_sink);
 
     logger->set_level(spdlog::level::trace);
     logger->flush_on(spdlog::level::trace);
     // logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
     spdlog::register_logger(logger);
-    g_hikyuu_logger = logger;
+    //g_hikyuu_logger = logger;
 }
 
 } /*namespace inner */
+
+std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger() {
+    return spdlog::get("hikyuu");  // inner::g_hikyuu_logger;
+}
+
+#endif /* #if HKU_USE_ASYNC_LOGGER */
 
 LOG_LEVEL get_log_level() {
     return inner::g_log_level;
@@ -79,10 +88,4 @@ void set_log_level(LOG_LEVEL level) {
     getHikyuuLogger()->set_level((spdlog::level::level_enum)level);
 }
 
-std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger() {
-    return spdlog::get("hikyuu");
-}
-
-#endif /* #if HKU_USE_ASYNC_LOGGER */
-
-}  // namespace inner
+}  // namespace hku

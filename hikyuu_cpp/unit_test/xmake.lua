@@ -71,7 +71,7 @@ target("small-test")
         add_cxflags("-Wno-sign-compare")
     end
     
-    if is_plat("windows") then
+    if is_plat("windows") and is_mode("release") then
         add_defines("HKU_API=__declspec(dllimport)")
     end
 
@@ -87,7 +87,8 @@ target("small-test")
     end
 
     -- add files
-    add_files("./hikyuu/hikyuu/**.cpp")
+    --add_files("./hikyuu/hikyuu/**.cpp");
+    add_files("./hikyuu/hikyuu/test_StockManager.cpp");
     add_files("./hikyuu/test_main.cpp")
     
 target_end()

@@ -176,7 +176,7 @@ private:
     StockManager() {}
 
 private:
-    static shared_ptr<StockManager> m_sm;
+    static StockManager* m_sm;
     string m_tmpdir;
     string m_datadir;
     BlockInfoDriverPtr m_blockDriver;

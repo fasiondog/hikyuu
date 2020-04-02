@@ -68,11 +68,6 @@ int main(int argc, char** argv) {
         std::cout << std::endl;
     }
 
-    std::cout << std::endl;
-
-    StockManager::quit();
-    spdlog::drop_all();
-
     if (context.shouldExit())  // important - query flags (and --exit) rely on the user doing this
         return res;            // propagate the result of the tests
 

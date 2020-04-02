@@ -26,6 +26,8 @@
 #include <boost/serialization/nvp.hpp>
 #include "../serialization/KData_serialization.h"
 #include "../serialization/Datetime_serialization.h"
+#else
+#include "../KData.h"
 #endif
 
 #ifndef DATATYPE_H_

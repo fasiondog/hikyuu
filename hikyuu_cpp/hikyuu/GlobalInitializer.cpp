@@ -8,8 +8,10 @@
  */
 
 #include <iostream>
+#include <H5public.h>
 #include "Log.h"
 #include "GlobalInitializer.h"
+#include "StockManager.h"
 #include "debug.h"
 
 namespace hku {
@@ -28,13 +30,20 @@ void GlobalInitializer::init() {
 
     // 存在内存泄露时，可在填写 VS 输出的泄露点，VS 调试时可自动跳转
     // 记得重新设回 -1 或注释掉，否则会运行失败
-    _CrtSetBreakAlloc(4018);
+    _CrtSetBreakAlloc(-1);
 #endif
 
     inner::init_logger();
+    auto& sm = StockManager::instance();
 }
 
 void GlobalInitializer::clean() {
+    StockManager::quit();
+
+    H5close();
+
+    spdlog::drop_all();
+
 #ifdef MSVC_LEAKER_DETECT
     // MSVC 内存泄露检测，输出至 VS 的输出窗口
     _CrtDumpMemoryLeaks();

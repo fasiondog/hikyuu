@@ -1,5 +1,9 @@
 target("hikyuu")
-    set_kind("shared")
+    if is_mode("debug") then 
+        set_kind("static")
+    else
+        set_kind("shared")
+    end
     
     add_packages("fmt", "spdlog")
 

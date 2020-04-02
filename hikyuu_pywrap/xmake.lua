@@ -26,7 +26,7 @@ end
 on_load("xmake_on_load")
 
 target("_hikyuu")
-    set_kind("shared")
+    set_kind(ifelse(is_mode("release"), "shared", "phony"))
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -37,7 +37,7 @@ target("_hikyuu")
     add_files("./*.cpp")
 
 target("_indicator")
-    set_kind("shared")
+    set_kind(ifelse(is_mode("release"), "shared", "phony"))
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -48,7 +48,7 @@ target("_indicator")
     add_files("./indicator/*.cpp")
     
 target("_trade_manage")
-    set_kind("shared")
+    set_kind(ifelse(is_mode("release"), "shared", "phony"))
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -59,7 +59,7 @@ target("_trade_manage")
     add_files("./trade_manage/*.cpp")
 
 target("_trade_sys")
-    set_kind("shared")
+    set_kind(ifelse(is_mode("release"), "shared", "phony"))
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -70,7 +70,7 @@ target("_trade_sys")
     add_files("./trade_sys/*.cpp")
     
 target("_trade_instance")
-    set_kind("shared")
+    set_kind(ifelse(is_mode("release"), "shared", "phony"))
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -81,7 +81,7 @@ target("_trade_instance")
     add_files("./trade_instance/*.cpp")
     
 target("_data_driver")
-    set_kind("shared")
+    set_kind(ifelse(is_mode("release"), "shared", "phony"))
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then

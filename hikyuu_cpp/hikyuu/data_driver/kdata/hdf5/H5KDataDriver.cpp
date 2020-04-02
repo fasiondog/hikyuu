@@ -14,9 +14,9 @@ class Hdf5FileCloser {
 public:
     void operator()(H5::H5File* h5file) {
         if (h5file) {
-            // string filename(h5file->getFileName());
+            string filename(h5file->getFileName());
             h5file->close();
-            // HKU_TRACE("Closed " << filename);
+            HKU_INFO("Closed {}", filename);
         }
     }
 };
