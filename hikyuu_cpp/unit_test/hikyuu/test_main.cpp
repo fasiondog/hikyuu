@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
 
     int res = 0;
     {
-        SPEND_TIME_MSG(total_test_run, utf8_to_gb("测试总耗时"));
+        SPEND_TIME_MSG(total_test_run, "Total test time");
         res = context.run();  // run
         std::cout << std::endl;
     }

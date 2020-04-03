@@ -34,8 +34,15 @@ map<string, KDataDriverPtr> default_kdata_driver() {
 
 map<string, BaseInfoDriverPtr> DataDriverFactory::m_baseInfoDrivers(default_baseinfo_driver());
 map<string, BlockInfoDriverPtr> DataDriverFactory::m_blockDrivers(default_block_driver());
-map<string, KDataDriverPtr> DataDriverFactory::m_kdataDrivers(default_kdata_driver());
+map<string, KDataDriverPtr> DataDriverFactory::m_kdataDrivers;  //(default_kdata_driver());
 map<Parameter, KDataDriverPtr> DataDriverFactory::m_param_kdataDrivers;
+
+void DataDriverFactory::release() {
+    m_baseInfoDrivers.clear();
+    m_blockDrivers.clear();
+    m_kdataDrivers.clear();
+    m_param_kdataDrivers.clear();
+}
 
 void DataDriverFactory ::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
     string new_type(driver->name());

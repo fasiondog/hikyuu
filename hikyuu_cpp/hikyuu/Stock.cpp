@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "GlobalInitializer.h"
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
 #include "data_driver/HistoryFinanceReader.h"
@@ -14,7 +15,7 @@
 namespace hku {
 
 //默认Stock的KData读取驱动，防止没有指定KData驱动
-static KDataDriverPtr g_kdataDefaultDriver(new KDataDriver);
+KDataDriverPtr g_kdataDefaultDriver;  //(new KDataDriver);
 
 const string Stock::default_market;
 const string Stock::default_code;
@@ -50,9 +51,8 @@ string Stock::toString() const {
     string strip(", ");
     const StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(type()));
-    os << "Stock(" << market() << strip << code() << strip << name() << strip
-       << typeInfo.description() << strip << valid() << strip << startDatetime() << strip
-       << lastDatetime() << ")";
+    os << "Stock(" << market() << strip << code() << strip << name() << strip << typeInfo.description() << strip
+       << valid() << strip << startDatetime() << strip << lastDatetime() << ")";
     return os.str();
 }
 
@@ -75,9 +75,9 @@ Stock::Data::Data()
     }*/
 }
 
-Stock::Data::Data(const string& market, const string& code, const string& name, uint32 type,
-                  bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
-                  price_t tickValue, int precision, size_t minTradeNumber, size_t maxTradeNumber)
+Stock::Data::Data(const string& market, const string& code, const string& name, uint32 type, bool valid,
+                  const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue, int precision,
+                  size_t minTradeNumber, size_t maxTradeNumber)
 : m_market(market),
   m_code(code),
   m_name(name),
@@ -125,26 +125,25 @@ Stock& Stock::operator=(const Stock& x) {
 }
 
 Stock::Stock(const string& market, const string& code, const string& name) {
-    m_data =
-      shared_ptr<Data>(new Data(market, code, name, default_type, default_valid, default_startDate,
-                                default_lastDate, default_tick, default_tickValue,
-                                default_precision, default_minTradeNumber, default_maxTradeNumber));
-    m_kdataDriver = g_kdataDefaultDriver;
-}
-
-Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-             const Datetime& startDate, const Datetime& lastDate) {
-    m_data = shared_ptr<Data>(new Data(market, code, name, type, valid, startDate, lastDate,
-                                       default_tick, default_tickValue, default_precision,
+    m_data = shared_ptr<Data>(new Data(market, code, name, default_type, default_valid, default_startDate,
+                                       default_lastDate, default_tick, default_tickValue, default_precision,
                                        default_minTradeNumber, default_maxTradeNumber));
     m_kdataDriver = g_kdataDefaultDriver;
 }
 
 Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-             const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
-             int precision, size_t minTradeNumber, size_t maxTradeNumber)
-: m_data(make_shared<Data>(market, code, name, type, valid, startDate, lastDate, tick, tickValue,
-                           precision, minTradeNumber, maxTradeNumber)),
+             const Datetime& startDate, const Datetime& lastDate) {
+    m_data =
+      shared_ptr<Data>(new Data(market, code, name, type, valid, startDate, lastDate, default_tick, default_tickValue,
+                                default_precision, default_minTradeNumber, default_maxTradeNumber));
+    m_kdataDriver = g_kdataDefaultDriver;
+}
+
+Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
+             const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue, int precision,
+             size_t minTradeNumber, size_t maxTradeNumber)
+: m_data(make_shared<Data>(market, code, name, type, valid, startDate, lastDate, tick, tickValue, precision,
+                           minTradeNumber, maxTradeNumber)),
   m_kdataDriver(g_kdataDefaultDriver) {}
 
 bool Stock::operator!=(const Stock& stock) const {
@@ -269,8 +268,7 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) {
 
     releaseKDataBuffer(kType);
     m_data->pKData[kType] = make_shared<KRecordList>();
-    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(),
-                             m_data->pKData[kType]);
+    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(), m_data->pKData[kType]);
     return;
 }
 
@@ -280,14 +278,13 @@ StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) con
         return result;
 
     StockWeightList::const_iterator start_iter, end_iter;
-    start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(), start,
-                             std::less<StockWeight>());
+    start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(), start, std::less<StockWeight>());
     if (start_iter == m_data->m_weightList.end()) {
         return result;
     }
 
-    end_iter = lower_bound(start_iter, (StockWeightList::const_iterator)m_data->m_weightList.end(),
-                           end, std::less<StockWeight>());
+    end_iter = lower_bound(start_iter, (StockWeightList::const_iterator)m_data->m_weightList.end(), end,
+                           std::less<StockWeight>());
     for (; start_iter != end_iter; ++start_iter) {
         result.push_back(*start_iter);
     }
@@ -367,8 +364,7 @@ bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_en
         return _getIndexRangeByDateFromBuffer(query, out_start, out_end);
     }
 
-    if (!m_kdataDriver->getIndexRangeByDate(m_data->m_market, m_data->m_code, query, out_start,
-                                            out_end)) {
+    if (!m_kdataDriver->getIndexRangeByDate(m_data->m_market, m_data->m_code, query, out_start, out_end)) {
         out_start = 0;
         out_end = 0;
         return false;
@@ -431,8 +427,7 @@ bool Stock::_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t
     return true;
 }
 
-bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_start,
-                                           size_t& out_end) const {
+bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_start, size_t& out_end) const {
     out_start = 0;
     out_end = 0;
 

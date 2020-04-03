@@ -22,6 +22,8 @@ typedef shared_ptr<KDataDriver> KDataDriverPtr;
 class HKU_API KData;
 class HKU_API Parameter;
 
+extern KDataDriverPtr g_kdataDefaultDriver;
+
 /**
  * Stock基类，Application中一般使用StockPtr进行操作
  * @ingroup StockManage
@@ -54,8 +56,8 @@ public:
     Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
           const Datetime& startDate, const Datetime& lastDate);
     Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
-          int precision, size_t minTradeNumber, size_t maxTradeNumber);
+          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue, int precision,
+          size_t minTradeNumber, size_t maxTradeNumber);
     virtual ~Stock();
     Stock& operator=(const Stock&);
     bool operator==(const Stock&) const;
@@ -234,8 +236,8 @@ struct HKU_API Stock::Data {
 
     Data();
     Data(const string& market, const string& code, const string& name, uint32 type, bool valid,
-         const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
-         int precision, size_t minTradeNumber, size_t maxTradeNumber);
+         const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue, int precision,
+         size_t minTradeNumber, size_t maxTradeNumber);
 
     virtual ~Data();
 };

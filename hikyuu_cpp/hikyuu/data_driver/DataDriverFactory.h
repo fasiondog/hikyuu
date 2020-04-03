@@ -21,17 +21,22 @@ namespace hku {
  */
 class HKU_API DataDriverFactory {
 public:
-    static void regBaseInfoDriver(const BaseInfoDriverPtr&);
-    static void removeBaseInfoDriver(const string& name);
-    static BaseInfoDriverPtr getBaseInfoDriver(const Parameter&);
+    /**
+     * 主动释放资源，主要用于内存泄漏检测，退出时主动清理，避免误报
+     */
+    static void release();
 
-    static void regBlockDriver(const BlockInfoDriverPtr&);
-    static void removeBlockDriver(const string& name);
-    static BlockInfoDriverPtr getBlockDriver(const Parameter&);
+    static void regBaseInfoDriver(const BaseInfoDriverPtr &);
+    static void removeBaseInfoDriver(const string &name);
+    static BaseInfoDriverPtr getBaseInfoDriver(const Parameter &);
 
-    static void regKDataDriver(const KDataDriverPtr&);
-    static void removeKDataDriver(const string& name);
-    static KDataDriverPtr getKDataDriver(const Parameter&);
+    static void regBlockDriver(const BlockInfoDriverPtr &);
+    static void removeBlockDriver(const string &name);
+    static BlockInfoDriverPtr getBlockDriver(const Parameter &);
+
+    static void regKDataDriver(const KDataDriverPtr &);
+    static void removeKDataDriver(const string &name);
+    static KDataDriverPtr getKDataDriver(const Parameter &);
 
 private:
     static map<string, BaseInfoDriverPtr> m_baseInfoDrivers;

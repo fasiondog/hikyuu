@@ -35,9 +35,7 @@ void StockManager::quit() {
     }
 }
 
-StockManager::~StockManager() {
-
-}
+StockManager::~StockManager() {}
 
 StockManager& StockManager::instance() {
     if (!m_sm) {
@@ -98,9 +96,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     //初始化注册默认支持的数据驱动
     DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
-
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
-
     DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
     DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
