@@ -22,8 +22,6 @@ typedef shared_ptr<KDataDriver> KDataDriverPtr;
 class HKU_API KData;
 class HKU_API Parameter;
 
-extern KDataDriverPtr g_kdataDefaultDriver;
-
 /**
  * Stock基类，Application中一般使用StockPtr进行操作
  * @ingroup StockManage

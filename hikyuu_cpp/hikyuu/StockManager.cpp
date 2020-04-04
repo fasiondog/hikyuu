@@ -94,16 +94,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     string funcname(" [StockManager::init]");
 
-    //初始化注册默认支持的数据驱动
-    DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
-    DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
-    DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
-    DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
-    DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
-    DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
-
     //加载证券基本信息
     BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
+    HKU_CHECK(base_info, "Failed get base info driver!");
     base_info->loadBaseInfo();
 
     //获取板块驱动
@@ -113,7 +106,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_INFO("Loading KData...");
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
-    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(kdataParam);
+    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_kdataDriverParam);
 
     setKDataDriver(kdata_driver);
 

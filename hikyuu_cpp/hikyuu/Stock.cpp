@@ -14,9 +14,6 @@
 
 namespace hku {
 
-//默认Stock的KData读取驱动，防止没有指定KData驱动
-KDataDriverPtr g_kdataDefaultDriver;  //(new KDataDriver);
-
 const string Stock::default_market;
 const string Stock::default_code;
 const string Stock::default_market_code;
@@ -110,7 +107,7 @@ Stock::Data::~Data() {
     }*/
 }
 
-Stock::Stock() : m_kdataDriver(g_kdataDefaultDriver) {}
+Stock::Stock() {}
 
 Stock::~Stock() {}
 
@@ -128,7 +125,6 @@ Stock::Stock(const string& market, const string& code, const string& name) {
     m_data = shared_ptr<Data>(new Data(market, code, name, default_type, default_valid, default_startDate,
                                        default_lastDate, default_tick, default_tickValue, default_precision,
                                        default_minTradeNumber, default_maxTradeNumber));
-    m_kdataDriver = g_kdataDefaultDriver;
 }
 
 Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
@@ -136,15 +132,13 @@ Stock::Stock(const string& market, const string& code, const string& name, uint3
     m_data =
       shared_ptr<Data>(new Data(market, code, name, type, valid, startDate, lastDate, default_tick, default_tickValue,
                                 default_precision, default_minTradeNumber, default_maxTradeNumber));
-    m_kdataDriver = g_kdataDefaultDriver;
 }
 
 Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
              const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue, int precision,
              size_t minTradeNumber, size_t maxTradeNumber)
 : m_data(make_shared<Data>(market, code, name, type, valid, startDate, lastDate, tick, tickValue, precision,
-                           minTradeNumber, maxTradeNumber)),
-  m_kdataDriver(g_kdataDefaultDriver) {}
+                           minTradeNumber, maxTradeNumber)) {}
 
 bool Stock::operator!=(const Stock& stock) const {
     if (this == &stock)
@@ -223,7 +217,8 @@ size_t Stock::maxTradeNumber() const {
 }
 
 void Stock::setKDataDriver(const KDataDriverPtr& kdataDriver) {
-    m_kdataDriver = kdataDriver ? kdataDriver : g_kdataDefaultDriver;
+    HKU_CHECK(kdataDriver, "kdataDriver is nullptr!");
+    m_kdataDriver = kdataDriver;
     m_data->pKData.clear();
 }
 
@@ -243,7 +238,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const {
 }
 
 bool Stock::isNull() const {
-    if (!m_data || m_kdataDriver == g_kdataDefaultDriver) {
+    if (!m_data || !m_kdataDriver) {
         return true;
     }
     return false;
@@ -268,7 +263,9 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) {
 
     releaseKDataBuffer(kType);
     m_data->pKData[kType] = make_shared<KRecordList>();
-    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(), m_data->pKData[kType]);
+    if (m_kdataDriver) {
+        m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(), m_data->pKData[kType]);
+    }
     return;
 }
 
@@ -305,7 +302,7 @@ size_t Stock::getCount(KQuery::KType kType) const {
         return m_data->pKData[kType]->size();
     }
 
-    return m_kdataDriver->getCount(market(), code(), kType);
+    return m_kdataDriver ? m_kdataDriver->getCount(market(), code(), kType) : 0;
 }
 
 price_t Stock ::getMarketValue(const Datetime& datetime, KQuery::KType ktype) const {
@@ -504,7 +501,7 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType kType) const {
     if (m_data->pKData.find(kType) != m_data->pKData.end())
         return m_data->pKData[kType]->at(pos);
 
-    return m_kdataDriver->getKRecord(market(), code(), pos, kType);
+    return m_kdataDriver ? m_kdataDriver->getKRecord(market(), code(), pos, kType) : KRecord();
 }
 
 KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType ktype) const {
@@ -525,6 +522,10 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
         for (size_t i = start_ix; i < end; ++i) {
             result.push_back((*m_data->pKData[ktype])[i]);
         }
+        return result;
+    }
+
+    if (!m_kdataDriver) {
         return result;
     }
 
@@ -563,11 +564,11 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
 }
 
 TimeLineList Stock::getTimeLineList(const KQuery& query) const {
-    return isNull() ? TimeLineList() : m_kdataDriver->getTimeLineList(market(), code(), query);
+    return m_kdataDriver ? TimeLineList() : m_kdataDriver->getTimeLineList(market(), code(), query);
 }
 
 TransList Stock::getTransList(const KQuery& query) const {
-    return isNull() ? TransList() : m_kdataDriver->getTransList(market(), code(), query);
+    return m_kdataDriver ? TransList() : m_kdataDriver->getTransList(market(), code(), query);
 }
 
 Parameter Stock::getFinanceInfo() const {

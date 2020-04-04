@@ -22,6 +22,11 @@ namespace hku {
 class HKU_API DataDriverFactory {
 public:
     /**
+     * 初始化支持的默认驱动
+     */
+    static void init();
+
+    /**
      * 主动释放资源，主要用于内存泄漏检测，退出时主动清理，避免误报
      */
     static void release();
@@ -39,10 +44,10 @@ public:
     static KDataDriverPtr getKDataDriver(const Parameter &);
 
 private:
-    static map<string, BaseInfoDriverPtr> m_baseInfoDrivers;
-    static map<string, BlockInfoDriverPtr> m_blockDrivers;
-    static map<string, KDataDriverPtr> m_kdataDrivers;
-    static map<Parameter, KDataDriverPtr> m_param_kdataDrivers;
+    static map<string, BaseInfoDriverPtr> *m_baseInfoDrivers;
+    static map<string, BlockInfoDriverPtr> *m_blockDrivers;
+    static map<string, KDataDriverPtr> *m_kdataDrivers;
+    static map<Parameter, KDataDriverPtr> *m_param_kdataDrivers;
 };
 
 } /* namespace hku */

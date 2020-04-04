@@ -5,81 +5,90 @@
  *      Author: fasiondog
  */
 
+#include "../GlobalInitializer.h"
 #include <boost/algorithm/string.hpp>
 #include "base_info/sqlite/SQLiteBaseInfoDriver.h"
+#include "base_info/mysql/MySQLBaseInfoDriver.h"
 #include "block_info/qianlong/QLBlockInfoDriver.h"
+#include "kdata/hdf5/H5KDataDriver.h"
+#include "kdata/mysql/MySQLKDataDriver.h"
+#include "kdata/tdx/TdxKDataDriver.h"
 #include "kdata/hdf5/H5KDataDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
 namespace hku {
 
-map<string, BaseInfoDriverPtr> default_baseinfo_driver() {
-    map<string, BaseInfoDriverPtr> result;
-    result["SQLITE3"] = make_shared<SQLiteBaseInfoDriver>();
-    return result;
-}
+map<string, BaseInfoDriverPtr>* DataDriverFactory::m_baseInfoDrivers;
+map<string, BlockInfoDriverPtr>* DataDriverFactory::m_blockDrivers;
+map<string, KDataDriverPtr>* DataDriverFactory::m_kdataDrivers;
+map<Parameter, KDataDriverPtr>* DataDriverFactory::m_param_kdataDrivers;
 
-map<string, BlockInfoDriverPtr> default_block_driver() {
-    map<string, BlockInfoDriverPtr> result;
-    result["QIANLONG"] = make_shared<QLBlockInfoDriver>();
-    return result;
-}
+void DataDriverFactory::init() {
+    m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
+    DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
+    DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
 
-map<string, KDataDriverPtr> default_kdata_driver() {
-    map<string, KDataDriverPtr> result;
-    result["HDF5"] = make_shared<H5KDataDriver>();
-    return result;
-}
+    m_blockDrivers = new map<string, BlockInfoDriverPtr>();
+    DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
 
-map<string, BaseInfoDriverPtr> DataDriverFactory::m_baseInfoDrivers(default_baseinfo_driver());
-map<string, BlockInfoDriverPtr> DataDriverFactory::m_blockDrivers(default_block_driver());
-map<string, KDataDriverPtr> DataDriverFactory::m_kdataDrivers;  //(default_kdata_driver());
-map<Parameter, KDataDriverPtr> DataDriverFactory::m_param_kdataDrivers;
+    m_kdataDrivers = new map<string, KDataDriverPtr>();
+    m_param_kdataDrivers = new map<Parameter, KDataDriverPtr>();
+    DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
+    DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
+    DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
+}
 
 void DataDriverFactory::release() {
-    m_baseInfoDrivers.clear();
-    m_blockDrivers.clear();
-    m_kdataDrivers.clear();
-    m_param_kdataDrivers.clear();
+    m_baseInfoDrivers->clear();
+    delete m_baseInfoDrivers;
+
+    m_blockDrivers->clear();
+    delete m_blockDrivers;
+
+    m_kdataDrivers->clear();
+    m_param_kdataDrivers->clear();
+    delete m_kdataDrivers;
+    delete m_param_kdataDrivers;
 }
 
-void DataDriverFactory ::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
+void DataDriverFactory::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
+    HKU_CHECK(driver, "driver is nullptr!");
     string new_type(driver->name());
     to_upper(new_type);
-    m_baseInfoDrivers[new_type] = driver;
+    (*m_baseInfoDrivers)[new_type] = driver;
 }
 
 void DataDriverFactory::removeBaseInfoDriver(const string& name) {
     string new_type(name);
     to_upper(new_type);
-    m_baseInfoDrivers.erase(new_type);
+    m_baseInfoDrivers->erase(new_type);
 }
 
 BaseInfoDriverPtr DataDriverFactory ::getBaseInfoDriver(const Parameter& params) {
     map<string, BaseInfoDriverPtr>::const_iterator iter;
     string type = params.get<string>("type");
     to_upper(type);
-    iter = m_baseInfoDrivers.find(type);
+    iter = m_baseInfoDrivers->find(type);
     BaseInfoDriverPtr result;
-    if (iter != m_baseInfoDrivers.end()) {
+    if (iter != m_baseInfoDrivers->end()) {
         result = iter->second;
         result->init(params);
     }
-
     return result;
 }
 
 void DataDriverFactory::regBlockDriver(const BlockInfoDriverPtr& driver) {
+    HKU_CHECK(driver, "driver is nullptr!");
     string name(driver->name());
     to_upper(name);
-    m_blockDrivers[name] = driver;
+    (*m_blockDrivers)[name] = driver;
 }
 
 void DataDriverFactory::removeBlockDriver(const string& name) {
     string new_name(name);
     to_upper(new_name);
-    m_blockDrivers.erase(new_name);
+    m_blockDrivers->erase(new_name);
 }
 
 BlockInfoDriverPtr DataDriverFactory::getBlockDriver(const Parameter& params) {
@@ -87,8 +96,8 @@ BlockInfoDriverPtr DataDriverFactory::getBlockDriver(const Parameter& params) {
     map<string, BlockInfoDriverPtr>::const_iterator iter;
     string name = params.get<string>("type");
     to_upper(name);
-    iter = m_blockDrivers.find(name);
-    if (iter != m_blockDrivers.end()) {
+    iter = m_blockDrivers->find(name);
+    if (iter != m_blockDrivers->end()) {
         result = iter->second;
         result->init(params);
     }
@@ -99,15 +108,15 @@ BlockInfoDriverPtr DataDriverFactory::getBlockDriver(const Parameter& params) {
 void DataDriverFactory::regKDataDriver(const KDataDriverPtr& driver) {
     string new_type(driver->name());
     to_upper(new_type);
-    m_kdataDrivers[new_type] = driver;
+    (*m_kdataDrivers)[new_type] = driver;
 }
 
 void DataDriverFactory::removeKDataDriver(const string& name) {
     string new_name(name);
     to_upper(new_name);
-    m_kdataDrivers.erase(new_name);
-    auto iter = m_param_kdataDrivers.begin();
-    for (; iter != m_param_kdataDrivers.end(); ++iter) {
+    m_kdataDrivers->erase(new_name);
+    auto iter = m_param_kdataDrivers->begin();
+    for (; iter != m_param_kdataDrivers->end(); ++iter) {
         string new_type(iter->first.get<string>("type"));
         to_upper(new_type);
         if (new_type == new_name) {
@@ -115,15 +124,15 @@ void DataDriverFactory::removeKDataDriver(const string& name) {
         }
     }
 
-    if (iter != m_param_kdataDrivers.end()) {
-        m_param_kdataDrivers.erase(iter);
+    if (iter != m_param_kdataDrivers->end()) {
+        m_param_kdataDrivers->erase(iter);
     }
 }
 
 KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
     KDataDriverPtr result;
-    auto param_iter = m_param_kdataDrivers.find(params);
-    if (param_iter != m_param_kdataDrivers.end()) {
+    auto param_iter = m_param_kdataDrivers->find(params);
+    if (param_iter != m_param_kdataDrivers->end()) {
         result = param_iter->second;
         return result;
     }
@@ -136,11 +145,11 @@ KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
     }
 
     to_upper(name);
-    auto iter = m_kdataDrivers.find(name);
-    if (iter != m_kdataDrivers.end()) {
+    auto iter = m_kdataDrivers->find(name);
+    if (iter != m_kdataDrivers->end()) {
         result = iter->second;
         result->init(params);
-        m_param_kdataDrivers[params] = result;
+        (*m_param_kdataDrivers)[params] = result;
     }
 
     return result;

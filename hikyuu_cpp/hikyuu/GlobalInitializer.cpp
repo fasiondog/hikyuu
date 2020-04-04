@@ -34,17 +34,13 @@ void GlobalInitializer::init() {
 #endif
 
     inner::init_logger();
-
-    g_kdataDefaultDriver = std::make_shared<KDataDriver>();
+    DataDriverFactory::init();
     auto& sm = StockManager::instance();
 }
 
 void GlobalInitializer::clean() {
+    DataDriverFactory::release();
     StockManager::quit();
-
-    g_kdataDefaultDriver.reset();
- 
-    // DataDriverFactory::release();
 
     H5close();
 
