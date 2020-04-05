@@ -47,7 +47,6 @@ private:
     static map<string, BaseInfoDriverPtr> *m_baseInfoDrivers;
     static map<string, BlockInfoDriverPtr> *m_blockDrivers;
     static map<string, KDataDriverPtr> *m_kdataDrivers;
-    static map<Parameter, KDataDriverPtr> *m_param_kdataDrivers;
 };
 
 } /* namespace hku */

@@ -16,6 +16,8 @@ public:
     void operator()(MYSQL* db) {
         if (db) {
             mysql_close(db);
+            delete db;
+            db = nullptr;
         }
     }
 };

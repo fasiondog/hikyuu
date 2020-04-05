@@ -18,10 +18,9 @@
 
 namespace hku {
 
-map<string, BaseInfoDriverPtr>* DataDriverFactory::m_baseInfoDrivers;
-map<string, BlockInfoDriverPtr>* DataDriverFactory::m_blockDrivers;
-map<string, KDataDriverPtr>* DataDriverFactory::m_kdataDrivers;
-map<Parameter, KDataDriverPtr>* DataDriverFactory::m_param_kdataDrivers;
+map<string, BaseInfoDriverPtr>* DataDriverFactory::m_baseInfoDrivers{nullptr};
+map<string, BlockInfoDriverPtr>* DataDriverFactory::m_blockDrivers{nullptr};
+map<string, KDataDriverPtr>* DataDriverFactory::m_kdataDrivers{nullptr};
 
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
@@ -32,7 +31,6 @@ void DataDriverFactory::init() {
     DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
 
     m_kdataDrivers = new map<string, KDataDriverPtr>();
-    m_param_kdataDrivers = new map<Parameter, KDataDriverPtr>();
     DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
@@ -46,9 +44,7 @@ void DataDriverFactory::release() {
     delete m_blockDrivers;
 
     m_kdataDrivers->clear();
-    m_param_kdataDrivers->clear();
     delete m_kdataDrivers;
-    delete m_param_kdataDrivers;
 }
 
 void DataDriverFactory::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
@@ -114,18 +110,6 @@ void DataDriverFactory::removeKDataDriver(const string& name) {
     string new_name(name);
     to_upper(new_name);
     m_kdataDrivers->erase(new_name);
-    auto iter = m_param_kdataDrivers->begin();
-    for (; iter != m_param_kdataDrivers->end(); ++iter) {
-        string new_type(iter->first.get<string>("type"));
-        to_upper(new_type);
-        if (new_type == new_name) {
-            break;
-        }
-    }
-
-    if (iter != m_param_kdataDrivers->end()) {
-        m_param_kdataDrivers->erase(iter);
-    }
 }
 
 KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
@@ -138,29 +122,6 @@ KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
         result->init(params);
     }
     return result;
-    /*KDataDriverPtr result;
-    auto param_iter = m_param_kdataDrivers->find(params);
-    if (param_iter != m_param_kdataDrivers->end()) {
-        result = param_iter->second;
-        return result;
-    }
-
-    string name;
-    try {
-        name = params.get<string>("type");
-    } catch (...) {
-        return result;
-    }
-
-    to_upper(name);
-    auto iter = m_kdataDrivers->find(name);
-    if (iter != m_kdataDrivers->end()) {
-        result = iter->second;
-        result->init(params);
-        (*m_param_kdataDrivers)[params] = result;
-    }
-
-    return result;*/
 }
 
 } /* namespace hku */

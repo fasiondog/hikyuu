@@ -26,8 +26,6 @@ static LOG_LEVEL g_log_level = TRACE;
  * Use SPDLOG for logging
  *********************************************/
 #if HKU_USE_ASYNC_LOGGER
-std::shared_ptr<spdlog::async_logger> g_hikyuu_logger;
-
 void init_logger() {
     // auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -35,7 +33,8 @@ void init_logger() {
 
     spdlog::init_thread_pool(8192, 1);
     std::vector<spdlog::sink_ptr> sinks{stdout_sink};
-    auto logger = std::make_shared<spdlog::async_logger>("hikyuu", sinks.begin(), sinks.end(), spdlog::thread_pool(),
+    auto logger = std::make_shared<spdlog::async_logger>("hikyuu", sinks.begin(), sinks.end(),
+                                                         spdlog::thread_pool(),
                                                          spdlog::async_overflow_policy::block);
 
     logger->set_level(spdlog::level::trace);
@@ -43,32 +42,24 @@ void init_logger() {
     // logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
     spdlog::register_logger(logger);
-    g_hikyuu_logger = logger;
 }
 
 } /*namespace inner */
 
 std::shared_ptr<spdlog::async_logger> getHikyuuLogger() {
-    return inner::g_hikyuu_logger;
+    return spdlog::get("hikyuu");
 }
 
 #else /* #if HKU_USE_ASYNC_LOGGER */
 
-std::shared_ptr<spdlog::logger> g_hikyuu_logger;
-
 void init_logger() {
-    // auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
-
     auto logger = std::make_shared<spdlog::logger>("hikyuu", stdout_sink);
-
     logger->set_level(spdlog::level::trace);
     logger->flush_on(spdlog::level::trace);
-    // logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
     spdlog::register_logger(logger);
-    //g_hikyuu_logger = logger;
 }
 
 } /*namespace inner */

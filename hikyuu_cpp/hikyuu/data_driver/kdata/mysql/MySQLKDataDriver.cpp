@@ -16,6 +16,8 @@ public:
     void operator()(MYSQL* db) {
         if (db) {
             mysql_close(db);
+            delete db;
+            db = nullptr;
             // std::cout << "Closed Sqlite3 database!" << std::endl;
             // Cannot use log output when exiting!
             // HKU_TRACE("Closed MySQL database!");

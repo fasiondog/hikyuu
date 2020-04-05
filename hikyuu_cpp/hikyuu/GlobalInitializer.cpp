@@ -43,7 +43,7 @@ void GlobalInitializer::clean() {
 
     DataDriverFactory::release();
 
-    //H5close();
+    // H5close();
 
     spdlog::drop_all();
 
