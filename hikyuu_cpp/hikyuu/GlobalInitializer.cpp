@@ -39,10 +39,11 @@ void GlobalInitializer::init() {
 }
 
 void GlobalInitializer::clean() {
-    DataDriverFactory::release();
     StockManager::quit();
 
-    H5close();
+    DataDriverFactory::release();
+
+    //H5close();
 
     spdlog::drop_all();
 

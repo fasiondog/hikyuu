@@ -13,7 +13,6 @@
 #include "kdata/hdf5/H5KDataDriver.h"
 #include "kdata/mysql/MySQLKDataDriver.h"
 #include "kdata/tdx/TdxKDataDriver.h"
-#include "kdata/hdf5/H5KDataDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
@@ -131,6 +130,15 @@ void DataDriverFactory::removeKDataDriver(const string& name) {
 
 KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
     KDataDriverPtr result;
+    string name = params.get<string>("type");
+    to_upper(name);
+    auto iter = m_kdataDrivers->find(name);
+    if (iter != m_kdataDrivers->end()) {
+        result = iter->second;
+        result->init(params);
+    }
+    return result;
+    /*KDataDriverPtr result;
     auto param_iter = m_param_kdataDrivers->find(params);
     if (param_iter != m_param_kdataDrivers->end()) {
         result = param_iter->second;
@@ -152,7 +160,7 @@ KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
         (*m_param_kdataDrivers)[params] = result;
     }
 
-    return result;
+    return result;*/
 }
 
 } /* namespace hku */
