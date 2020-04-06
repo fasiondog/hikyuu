@@ -76,8 +76,8 @@ install:
   - ./b2 release link=static cxxflags=-fPIC -d0 --with-date_time --with-filesystem --with-system --with-test
   - ls ./stage/lib
   - cd
-  - git clone https://github.com/tboox/xmake.git tboox/xmake --depth 1
-  - cd ./tboox/xmake
+  - git clone https://github.com/xmake-io/xmake.git xmake-io/xmake --depth 1
+  - cd ./xmake-io/xmake
   - ./scripts/get.sh __local__
   - cd
 
