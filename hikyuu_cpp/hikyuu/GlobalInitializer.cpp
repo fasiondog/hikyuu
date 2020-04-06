@@ -30,7 +30,7 @@ void GlobalInitializer::init() {
 
     // 存在内存泄露时，可在填写 VS 输出的泄露点，VS 调试时可自动跳转
     // 记得重新设回 -1 或注释掉，否则会运行失败
-    _CrtSetBreakAlloc(-1);
+    _CrtSetBreakAlloc(3755);
 #endif
 
     inner::init_logger();
@@ -43,7 +43,7 @@ void GlobalInitializer::clean() {
 
     DataDriverFactory::release();
 
-    // H5close();
+    H5close();
 
     spdlog::drop_all();
 

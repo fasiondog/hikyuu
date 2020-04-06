@@ -86,6 +86,7 @@ script:
   - export BOOST_ROOT=./boost_1_71_0
   - export BOOST_LIB=./boost_1_71_0/stage/lib
   - ls .
+  - echo $CXX
   - xmake f --cxx=$CXX --confirm=y --test=small
   - xmake -b small-test
   - xmake r small-test
