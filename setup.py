@@ -188,7 +188,8 @@ def start_build(verbose=False, mode='release'):
 
     #如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
     history_compile_info = get_history_compile_info()
-    if py_version != history_compile_info['py_version'] or history_compile_info['mode'] != mode:
+    if py_version != history_compile_info[
+            'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
         print('\ncompile boost ...')
         build_boost(mode)
@@ -197,12 +198,16 @@ def start_build(verbose=False, mode='release'):
         os.system("xmake f -y -m {}".format(mode))
 
     os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
-    os.system("xmake -b {} _hikyuu".format("-v -D" if verbose else ""))
-    os.system("xmake -b {} _indicator".format("-v -D" if verbose else ""))
-    os.system("xmake -b {} _trade_manage".format("-v -D" if verbose else ""))
-    os.system("xmake -b {} _trade_sys".format("-v -D" if verbose else ""))
-    os.system("xmake -b {} _trade_instance".format("-v -D" if verbose else ""))
-    os.system("xmake -b {} _data_driver".format("-v -D" if verbose else ""))
+    if mode == "release":
+        os.system("xmake -b {} _hikyuu".format("-v -D" if verbose else ""))
+        os.system("xmake -b {} _indicator".format("-v -D" if verbose else ""))
+        os.system(
+            "xmake -b {} _trade_manage".format("-v -D" if verbose else ""))
+        os.system("xmake -b {} _trade_sys".format("-v -D" if verbose else ""))
+        os.system(
+            "xmake -b {} _trade_instance".format("-v -D" if verbose else ""))
+        os.system(
+            "xmake -b {} _data_driver".format("-v -D" if verbose else ""))
 
     # 保存当前的编译信息
     save_current_compile_info(current_compile_info)
@@ -308,7 +313,8 @@ def install():
     else:
         usr_dir = os.path.expanduser('~')
         install_dir = '{}/.local/lib/python{:>.1f}/site-packages/hikyuu'.format(
-            usr_dir, get_python_version() * 0.1)
+            usr_dir,
+            get_python_version() * 0.1)
         try:
             shutil.rmtree(install_dir)
         except:

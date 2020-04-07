@@ -6,19 +6,19 @@ option("with-demo")
 option_end()
 
 target("demo")
-    if has_config("with-demo") then
-        set_kind("binary")
-    else
-        set_kind("phony")
+    set_kind("binary")
+    if is_mode("debug") then
+        set_default(false)
     end
     
+    add_packages("spdlog", "fmt")
     add_includedirs("..")
 
     if is_plat("windows") then
         add_cxflags("-wd4267")
     end
-    
-    if is_plat("windows") then
+
+    if is_plat("windows") and is_mode("release") then
         add_defines("HKU_API=__declspec(dllimport)")
         add_defines("SQLITE_API=__declspec(dllimport)")
     end

@@ -9,10 +9,9 @@ option_end()
 add_requires("doctest")
 
 target("unit-test")
-    if get_config("test") == "all" then
-        set_kind("binary")
-    else
-        set_kind("phony")
+    set_kind("binary")
+    if get_config("test") == "small" then
+        set_default(false)
     end
 
     add_packages("fmt", "spdlog", "doctest")
@@ -50,10 +49,9 @@ target("unit-test")
 target_end()
 
 target("small-test")
-    if get_config("test") == "small" then
-        set_kind("binary")
-    else
-        set_kind("phony")
+    set_kind("binary")
+    if get_config("test") == "all" then
+        set_default(false)
     end
     add_packages("fmt", "spdlog", "doctest")
     add_includedirs("..")

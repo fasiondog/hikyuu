@@ -26,7 +26,11 @@ end
 on_load("xmake_on_load")
 
 target("_hikyuu")
-    set_kind(ifelse(is_mode("release"), "shared", "phony"))
+    set_kind("shared")
+    if is_mode("debug") then 
+        set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
+        --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
+    end
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -37,7 +41,10 @@ target("_hikyuu")
     add_files("./*.cpp")
 
 target("_indicator")
-    set_kind(ifelse(is_mode("release"), "shared", "phony"))
+    set_kind("shared")
+    if is_mode("debug") then 
+        set_default(false)
+    end
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -48,7 +55,10 @@ target("_indicator")
     add_files("./indicator/*.cpp")
     
 target("_trade_manage")
-    set_kind(ifelse(is_mode("release"), "shared", "phony"))
+    set_kind("shared")
+    if is_mode("debug") then 
+        set_default(false)
+    end
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -59,7 +69,10 @@ target("_trade_manage")
     add_files("./trade_manage/*.cpp")
 
 target("_trade_sys")
-    set_kind(ifelse(is_mode("release"), "shared", "phony"))
+    set_kind("shared")
+    if is_mode("debug") then 
+        set_default(false)
+    end
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -70,7 +83,10 @@ target("_trade_sys")
     add_files("./trade_sys/*.cpp")
     
 target("_trade_instance")
-    set_kind(ifelse(is_mode("release"), "shared", "phony"))
+    set_kind("shared")
+    if is_mode("debug") then 
+        set_default(false)
+    end
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
@@ -81,7 +97,10 @@ target("_trade_instance")
     add_files("./trade_instance/*.cpp")
     
 target("_data_driver")
-    set_kind(ifelse(is_mode("release"), "shared", "phony"))
+    set_kind("shared")
+    if is_mode("debug") then 
+        set_default(false)
+    end
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
