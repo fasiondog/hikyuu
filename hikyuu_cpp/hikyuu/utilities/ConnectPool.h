@@ -11,6 +11,7 @@
 #define HIKYUU_UTILITIES_CONNECTPOOL_H
 
 #include <thread>
+#include <mutex>
 #include <queue>
 #include "Parameter.h"
 
@@ -85,6 +86,7 @@ private:
                 m_connectList.push(p);
             } else {
                 delete p;
+                p = nullptr;
                 m_count--;
             }
         } else {

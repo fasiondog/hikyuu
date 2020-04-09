@@ -400,6 +400,8 @@ TEST_CASE("test_TimeDelta_Datetime_operator") {
     CHECK(d == Datetime(2019, 12, 20));
 }
 
+#if HKU_SUPPORT_SERIALIZATION
+
 /** @par 检测点 */
 TEST_CASE("test_TimeDelat_serialize") {
     string filename(StockManager::instance().tmpdir());
@@ -421,5 +423,7 @@ TEST_CASE("test_TimeDelat_serialize") {
 
     CHECK(td1 == td2);
 }
+
+#endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

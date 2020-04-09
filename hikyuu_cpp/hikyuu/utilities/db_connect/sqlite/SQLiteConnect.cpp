@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <thread>
 #include "../../../config.h"
 #include "../../../Log.h"
 #include "SQLiteConnect.h"

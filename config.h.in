@@ -2,6 +2,8 @@
 #ifndef HIKYUU_CONFIG_H_
 #define HIKYUU_CONFIG_H_
 
+// clang-format off
+
 #define HKU_VERSION      "${VERSION}"
 #define HKU_VERSION_MAJOR ${VERSION_MAJOR}
 #define HKU_VERSION_MINOR ${VERSION_MINOR}
@@ -19,11 +21,21 @@
 // 检查下标越界
 #define CHECK_ACCESS_BOUND ${CHECK_ACCESS_BOUND}
 
+// 默认激活的日志级别
+#define LOG_ACTIVE_LEVEL ${LOG_ACTIVE_LEVEL}
+
+// 是否使用 spdlog
+#define USE_SPDLOG_LOGGER ${USE_SPDLOG_LOGGER}
+
 // 使用异步 logger
-#define HKU_USE_ASYNC_LOGGER ${USE_ASYNC_LOGGER}
-#define SPDLOG_ACTIVE_LEVEL ${SPDLOG_ACTIVE_LEVEL}
+#define HKU_USE_SPDLOG_ASYNC_LOGGER ${USE_SPDLOG_ASYNC_LOGGER}
+
+// spdlog默认日志级别
+#define SPDLOG_ACTIVE_LEVEL ${LOG_ACTIVE_LEVEL}
 
 // 关闭 HKU_ASSERT
 #define HKU_DISABLE_ASSERT ${HKU_DISABLE_ASSERT}
+
+// clang-format on
 
 #endif /* HIKYUU_CONFIG_H_ */

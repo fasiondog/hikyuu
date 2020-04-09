@@ -5,10 +5,15 @@ set_project("hikyuu")
 
 -- version
 set_version("1.1.5")
-set_configvar("USE_ASYNC_LOGGER", 0)
-set_configvar("SPDLOG_ACTIVE_LEVEL", 2)
+if is_mode("debug") then
+    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
+else 
+    set_configvar("LOG_ACTIVE_LEVEL", 2)  -- 激活的日志级别 
+end
+set_configvar("USE_SPDLOG_LOGGER", 0) -- 是否使用spdlog作为日志输出
+set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
-set_configvar("SUPPORT_SERIALIZATION", ifelse(is_mode("debug"), 0, 1))
+set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)

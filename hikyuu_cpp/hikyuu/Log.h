@@ -10,9 +10,13 @@
 #define HIKUU_LOG_H_
 
 #include "config.h"
-#include <string>
+
+#if USE_SPDLOG_LOGGER
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
+#endif
+
+#include <fmt/ostream.h>
 #include <fmt/format.h>
 
 #ifndef HKU_API
@@ -29,14 +33,19 @@ namespace hku {
  * @{
  */
 
+/**********************************************
+ * Use SPDLOG for logging
+ *********************************************/
+#if USE_SPDLOG_LOGGER
+/** 日志级别 */
 enum LOG_LEVEL {
-    TRACE = SPDLOG_LEVEL_TRACE,
-    DEBUG = SPDLOG_LEVEL_DEBUG,
-    INFO = SPDLOG_LEVEL_INFO,
-    WARN = SPDLOG_LEVEL_WARN,
-    ERROR = SPDLOG_LEVEL_ERROR,
-    FATAL = SPDLOG_LEVEL_CRITICAL,
-    OFF = SPDLOG_LEVEL_OFF,
+    TRACE = SPDLOG_LEVEL_TRACE,     ///< 跟踪
+    DEBUG = SPDLOG_LEVEL_DEBUG,     ///< 调试
+    INFO = SPDLOG_LEVEL_INFO,       ///< 一般信息
+    WARN = SPDLOG_LEVEL_WARN,       ///< 告警
+    ERROR = SPDLOG_LEVEL_ERROR,     ///< 错误
+    FATAL = SPDLOG_LEVEL_CRITICAL,  ///< 致命
+    OFF = SPDLOG_LEVEL_OFF,         ///< 关闭日志打印
 };
 
 /**
@@ -51,15 +60,12 @@ LOG_LEVEL HKU_API get_log_level();
  */
 void HKU_API set_log_level(LOG_LEVEL level);
 
-#if HKU_USE_ASYNC_LOGGER
+#if HKU_USE_SPDLOG_ASYNC_LOGGER
 std::shared_ptr<spdlog::async_logger> HKU_API getHikyuuLogger();
 #else
 std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
-#endif /* #if HKU_USE_ASYNC_LOGGER */
+#endif /* #if HKU_USE_SPDLOG_ASYNC_LOGGER */
 
-/**********************************************
- * Use SPDLOG for logging
- *********************************************/
 #define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
 #define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
 
@@ -75,17 +81,77 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 #define HKU_LOGGER_ERROR(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::err, __VA_ARGS__)
 #define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__)
 
-#define HKU_LOGGER_FATAL(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
+#define HKU_LOGGER_FATAL(logger, ...) \
+    SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
 #define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)
 
-namespace inner {
-#if HKU_USE_ASYNC_LOGGER
+#if HKU_USE_SPDLOG_ASYNC_LOGGER
 void init_logger();
 #else
 void init_logger();
 #endif
-} /* namespace inner */
+
+#else
+enum LOG_LEVEL {
+    TRACE = 0,
+    DEBUG = 1,
+    INFO = 2,
+    WARN = 3,
+    ERROR = 4,
+    FATAL = 5,
+    OFF = 6,
+};
+
+LOG_LEVEL HKU_API get_log_level();
+void HKU_API set_log_level(LOG_LEVEL level);
+void init_logger();
+
+#if LOG_ACTIVE_LEVEL <= 0
+#define HKU_TRACE(...) \
+    fmt::print("[HKU-T] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#else
+#define HKU_TRACE(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 1
+#define HKU_DEBUG(...) \
+    fmt::print("[HKU-D] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#else
+#define HKU_DEBUG(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 2
+#define HKU_INFO(...) \
+    fmt::print("[HKU-I] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#else
+#define HKU_INFO(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 3
+#define HKU_WARN(...) \
+    fmt::print("[HKU-W] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#else
+#define HKU_WARN(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 4
+#define HKU_ERROR(...) \
+    fmt::print("[HKU-E] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#else
+#define HKU_ERROR(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 5
+#define HKU_FATAL(...) \
+    fmt::print("[HKU-F] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#else
+#define HKU_FATAL(...)
+#endif
+
+#endif /* USE_SPDLOG_LOGGER */
 
 /** @} */
+
 } /* namespace hku */
+
 #endif /* HIKUU_LOG_H_ */

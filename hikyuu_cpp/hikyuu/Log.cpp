@@ -7,25 +7,31 @@
 
 #include "GlobalInitializer.h"
 #include "Log.h"
+
+#if USE_SPDLOG_LOGGER
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>
 //#include "spdlog/sinks/ostream_sink.h"
 //#include "spdlog/sinks/rotating_file_sink.h"
 
-#if HKU_USE_ASYNC_LOGGER
+#if HKU_USE_SPDLOG_ASYNC_LOGGER
 #include <spdlog/async.h>
-#endif /* HKU_USE_ASYNC_LOGGER */
+#endif /* HKU_USE_SPDLOG_ASYNC_LOGGER */
+#endif /* #if USE_SPDLOG_LOGGER */
 
 namespace hku {
 
-namespace inner {
-
 static LOG_LEVEL g_log_level = TRACE;
+
+LOG_LEVEL get_log_level() {
+    return g_log_level;
+}
 
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
-#if HKU_USE_ASYNC_LOGGER
+#if USE_SPDLOG_LOGGER
+#if HKU_USE_SPDLOG_ASYNC_LOGGER
 void init_logger() {
     // auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -44,13 +50,11 @@ void init_logger() {
     spdlog::register_logger(logger);
 }
 
-} /*namespace inner */
-
 std::shared_ptr<spdlog::async_logger> getHikyuuLogger() {
     return spdlog::get("hikyuu");
 }
 
-#else /* #if HKU_USE_ASYNC_LOGGER */
+#else /* #if HKU_USE_SPDLOG_ASYNC_LOGGER */
 
 void init_logger() {
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -62,21 +66,26 @@ void init_logger() {
     spdlog::register_logger(logger);
 }
 
-} /*namespace inner */
-
 std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger() {
     return spdlog::get("hikyuu");  // inner::g_hikyuu_logger;
 }
 
-#endif /* #if HKU_USE_ASYNC_LOGGER */
-
-LOG_LEVEL get_log_level() {
-    return inner::g_log_level;
-}
+#endif /* #if HKU_USE_SPDLOG_ASYNC_LOGGER */
 
 void set_log_level(LOG_LEVEL level) {
-    inner::g_log_level = level;
+    g_log_level = level;
     getHikyuuLogger()->set_level((spdlog::level::level_enum)level);
 }
+
+#else  /* #if USE_SPDLOG_LOGGER */
+/**********************************************
+ * Use SPDLOG for logging
+ *********************************************/
+void init_logger() {}
+
+void set_log_level(LOG_LEVEL level) {
+    g_log_level = level;
+}
+#endif /* #if USE_SPDLOG_LOGGER */
 
 }  // namespace hku

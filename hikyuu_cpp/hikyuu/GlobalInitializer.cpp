@@ -33,7 +33,7 @@ void GlobalInitializer::init() {
     _CrtSetBreakAlloc(-1);
 #endif
 
-    inner::init_logger();
+    init_logger();
     DataDriverFactory::init();
     auto& sm = StockManager::instance();
 }
@@ -45,7 +45,9 @@ void GlobalInitializer::clean() {
 
     H5close();
 
-    spdlog::drop_all();
+#if USE_SPDLOG_LOGGER
+    spdlog::shutdown();
+#endif
 
 #ifdef MSVC_LEAKER_DETECT
     // MSVC 内存泄露检测，输出至 VS 的输出窗口
