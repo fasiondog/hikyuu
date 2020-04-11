@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "config.h"
 #include "GlobalInitializer.h"
 #include "Log.h"
 
@@ -27,6 +28,10 @@ LOG_LEVEL get_log_level() {
     return g_log_level;
 }
 
+std::shared_ptr<spdlog::logger> getHikyuuLogger() {
+    return spdlog::get("hikyuu");
+}
+
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
@@ -45,13 +50,8 @@ void init_logger() {
 
     logger->set_level(spdlog::level::trace);
     logger->flush_on(spdlog::level::trace);
-    // logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v [%!]");
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
     spdlog::register_logger(logger);
-}
-
-std::shared_ptr<spdlog::async_logger> getHikyuuLogger() {
-    return spdlog::get("hikyuu");
 }
 
 #else /* #if HKU_USE_SPDLOG_ASYNC_LOGGER */
@@ -64,10 +64,6 @@ void init_logger() {
     logger->flush_on(spdlog::level::trace);
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
     spdlog::register_logger(logger);
-}
-
-std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger() {
-    return spdlog::get("hikyuu");  // inner::g_hikyuu_logger;
 }
 
 #endif /* #if HKU_USE_SPDLOG_ASYNC_LOGGER */
