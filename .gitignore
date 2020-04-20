@@ -36,6 +36,7 @@ hikyuu.code-workspace
 install
 .DS_Store
 hikyuu_cpp/hikyuu/config.h
+hikyuu_cpp/hikyuu/version.h
 hikyuu/tools/maintain/importdata.ini
 hikyuu/libboost_*
 hikyuu/importdata
