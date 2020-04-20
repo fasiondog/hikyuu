@@ -37,7 +37,7 @@ std::shared_ptr<spdlog::logger> getHikyuuLogger() {
  *********************************************/
 #if USE_SPDLOG_LOGGER
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
-void init_logger() {
+void initLogger() {
     // auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
@@ -56,7 +56,7 @@ void init_logger() {
 
 #else /* #if HKU_USE_SPDLOG_ASYNC_LOGGER */
 
-void init_logger() {
+void initLogger() {
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
     auto logger = std::make_shared<spdlog::logger>("hikyuu", stdout_sink);
@@ -77,7 +77,7 @@ void set_log_level(LOG_LEVEL level) {
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
-void init_logger() {}
+void initLogger() {}
 
 void set_log_level(LOG_LEVEL level) {
     g_log_level = level;

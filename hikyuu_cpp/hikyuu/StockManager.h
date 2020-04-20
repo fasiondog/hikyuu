@@ -39,8 +39,8 @@ public:
      * @param preloadParam
      * @param hikyuuParam
      */
-    void init(const Parameter& baseInfoParam, const Parameter& blockParam, const Parameter& kdataParam,
-              const Parameter& preloadParam = default_preload_param(),
+    void init(const Parameter& baseInfoParam, const Parameter& blockParam,
+              const Parameter& kdataParam, const Parameter& preloadParam = default_preload_param(),
               const Parameter& hikyuuParam = default_other_param());
 
     /** 主动退出并释放资源 */
@@ -153,8 +153,9 @@ public:
      * @param maxTradeNumber 单笔最大交易量，默认1000000
      * @return
      */
-    Stock addTempCsvStock(const string& code, const string& day_filename, const string& min_filename,
-                          price_t tick = 0.01, price_t tickValue = 0.01, int precision = 2, size_t minTradeNumber = 1,
+    Stock addTempCsvStock(const string& code, const string& day_filename,
+                          const string& min_filename, price_t tick = 0.01, price_t tickValue = 0.01,
+                          int precision = 2, size_t minTradeNumber = 1,
                           size_t maxTradeNumber = 1000000);
 
     /**
@@ -173,7 +174,7 @@ public:
     }
 
 private:
-    StockManager() {}
+    StockManager();
 
 private:
     static StockManager* m_sm;

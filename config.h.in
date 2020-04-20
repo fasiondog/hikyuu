@@ -4,11 +4,6 @@
 
 // clang-format off
 
-#define HKU_VERSION      "${VERSION}"
-#define HKU_VERSION_MAJOR ${VERSION_MAJOR}
-#define HKU_VERSION_MINOR ${VERSION_MINOR}
-#define HKU_VERSION_ALTER ${VERSION_ALTER}
-
 // support serialization
 #define HKU_SUPPORT_SERIALIZATION  ${SUPPORT_SERIALIZATION}
 

@@ -12,6 +12,7 @@ target("hikyuu")
     -- set version for release
     set_configdir("./")
     add_configfiles("$(projectdir)/config.h.in")
+    add_configfiles("$(projectdir)/version.h.in")
 
     if is_plat("windows") then
         add_cxflags("-wd4819")  

@@ -4,7 +4,7 @@ set_xmakever("2.2.5")
 set_project("hikyuu")
 
 -- version
-set_version("1.1.5")
+set_version("1.1.5", {build="%Y%m%d%H%M"})
 if is_mode("debug") then
     set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
 else 

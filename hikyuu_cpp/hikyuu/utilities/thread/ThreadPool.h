@@ -11,6 +11,7 @@
 #ifndef HIKYUU_UTILITIES_THREAD_THREADPOOL_H
 #define HIKYUU_UTILITIES_THREAD_THREADPOOL_H
 
+//#include <fmt/format.h>
 #include <future>
 #include <thread>
 #include <chrono>
@@ -84,11 +85,22 @@ public:
         return res;
     }
 
+    /** 返回线程池结束状态 */
+    bool done() const {
+        return m_done;
+    }
+
     /**
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
         m_done = true;
+
+        // 同时加入结束任务指示，以便在dll退出时也能够终止
+        for (size_t i = 0; i < m_worker_num; i++) {
+            m_queues[i]->push_front(std::move(FuncWrapper()));
+        }
+
         m_cv.notify_all();  // 唤醒所有工作线程
         for (size_t i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
@@ -134,8 +146,8 @@ private:
 
     // 线程本地变量
     inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
-    inline static thread_local size_t m_index = 0;                            //在线程池中的序号
-    inline static thread_local bool m_thread_need_stop = false;               // 线程停止运行指示
+    inline static thread_local size_t m_index = 0;               //在线程池中的序号
+    inline static thread_local bool m_thread_need_stop = false;  // 线程停止运行指示
 
     void worker_thread(size_t index) {
         m_thread_need_stop = false;
@@ -144,6 +156,7 @@ private:
         while (!m_thread_need_stop && !m_done) {
             run_pending_task();
         }
+        // fmt::print("thread ({}) finished!\n", std::this_thread::get_id());
     }
 
     void run_pending_task() {

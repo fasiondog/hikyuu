@@ -9,7 +9,9 @@
 
 #include <iostream>
 #include <H5public.h>
+#include <fmt/format.h>
 #include "Log.h"
+#include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"
 #include "debug.h"
@@ -33,16 +35,16 @@ void GlobalInitializer::init() {
     _CrtSetBreakAlloc(-1);
 #endif
 
-    init_logger();
+    fmt::print("Initialize hikyuu_{} ...\n", getVersionWithBuild());
+
+    initLogger();
     DataDriverFactory::init();
     auto& sm = StockManager::instance();
 }
 
 void GlobalInitializer::clean() {
     StockManager::quit();
-
     DataDriverFactory::release();
-
     H5close();
 
 #if USE_SPDLOG_LOGGER

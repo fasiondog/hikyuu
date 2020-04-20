@@ -1,0 +1,22 @@
+/*
+ * version.h
+ *
+ *  Copyright (c) 2020, hikyuu.org
+ *
+ *  Created on: 2020-4-19
+ *      Author: fasiondog
+ */
+
+#pragma once
+#ifndef HKU_VERSION_H
+#define HKU_VERSION_H
+
+// clang-format off
+#define HKU_VERSION "${VERSION}"
+#define HKU_VERSION_MAJOR ${VERSION_MAJOR}
+#define HKU_VERSION_MINOR ${VERSION_MINOR}
+#define HKU_VERSION_ALTER ${VERSION_ALTER}
+#define HKU_VERSION_BUILD ${VERSION_BUILD}
+// clang-format on
+
+#endif /* HKU_VERSION_H */

@@ -87,9 +87,9 @@ std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 #define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)
 
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
-void init_logger();
+void initLogger();
 #else
-void init_logger();
+void initLogger();
 #endif
 
 #else
@@ -105,7 +105,7 @@ enum LOG_LEVEL {
 
 LOG_LEVEL HKU_API get_log_level();
 void HKU_API set_log_level(LOG_LEVEL level);
-void init_logger();
+void initLogger();
 
 #if LOG_ACTIVE_LEVEL <= 0
 #define HKU_TRACE(...) \

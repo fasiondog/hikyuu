@@ -29,6 +29,11 @@ void HKU_API hikyuu_init(const string& config_file_name);
  */
 string HKU_API getVersion();
 
+/**
+ * 获取详细版本号，包含构建时间
+ */
+std::string HKU_API getVersionWithBuild();
+
 }  // namespace hku
 
 #endif /* HIKYUU_H_ */

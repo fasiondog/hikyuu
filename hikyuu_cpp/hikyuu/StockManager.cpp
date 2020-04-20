@@ -7,12 +7,14 @@
 
 #include "GlobalInitializer.h"
 #include <chrono>
+#include <fmt/format.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include "utilities/IniParser.h"
 #include "utilities/util.h"
 #include "StockManager.h"
+#include "GlobalTaskGroup.h"
 #include "data_driver/KDataTempCsvDriver.h"
 #include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
@@ -26,16 +28,21 @@ namespace hku {
 StockManager* StockManager::m_sm = nullptr;
 
 void StockManager::quit() {
-    // Cannot use log output when exiting!
-    // HKU_TRACE("Quit Hikyuu system!\n");
+    releaseThreadPool();
     if (m_sm) {
-        std::cout << "Quit Hikyuu system!\n" << std::endl;
         delete m_sm;
         m_sm = nullptr;
     }
 }
 
-StockManager::~StockManager() {}
+StockManager::StockManager() {}
+StockManager::~StockManager() {
+    auto tg = getGlobalTaskGroup();
+    if (tg && !tg->done()) {
+        releaseThreadPool();
+    }
+    fmt::print("Quit Hikyuu system!\n\n");
+}
 
 StockManager& StockManager::instance() {
     if (!m_sm) {
@@ -67,15 +74,21 @@ Parameter default_other_param() {
     return param;
 }
 
-void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam, const Parameter& kdataParam,
-                        const Parameter& preloadParam, const Parameter& hikyuuParam) {
+void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
+                        const Parameter& kdataParam, const Parameter& preloadParam,
+                        const Parameter& hikyuuParam) {
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;
     m_preloadParam = preloadParam;
     m_hikyuuParam = hikyuuParam;
 
-    //获取临时路径信息
+    // 创建内部线程池
+    // 不能同过 GlobalInitializer 初始化全局线程池
+    // 原因是 std::thread 无法在 dllmain 中创建使用，会造成死锁
+    initThreadPool();
+
+    // 获取临时路径信息
     try {
         m_tmpdir = hikyuuParam.get<string>("tmpdir");
     } catch (...) {
@@ -111,7 +124,8 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     setKDataDriver(kdata_driver);
 
     // add special Market, for temp csv file
-    m_marketInfoDict["TMP"] = MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>());
+    m_marketInfoDict["TMP"] =
+      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>());
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
@@ -336,13 +350,13 @@ DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string&
     return result;
 }
 
-Stock StockManager::addTempCsvStock(const string& code, const string& day_filename, const string& min_filename,
-                                    price_t tick, price_t tickValue, int precision, size_t minTradeNumber,
-                                    size_t maxTradeNumber) {
+Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,
+                                    const string& min_filename, price_t tick, price_t tickValue,
+                                    int precision, size_t minTradeNumber, size_t maxTradeNumber) {
     string new_code(code);
     to_upper(new_code);
-    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000), Null<Datetime>(), tick,
-                 tickValue, precision, minTradeNumber, maxTradeNumber);
+    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000),
+                 Null<Datetime>(), tick, tickValue, precision, minTradeNumber, maxTradeNumber);
 
     KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
     result.setKDataDriver(KDataDriverPtr(p));
