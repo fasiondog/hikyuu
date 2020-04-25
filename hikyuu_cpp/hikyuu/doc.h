@@ -22,7 +22,6 @@
  * 更多信息，请访问：<a href="http://hikyuu.org">http://hikyuu.org</a>
  */
 
-
 /**
  * 核心库，包含股票数据的管理、指标实现、交易系统框架等
  * @defgroup Hikyuu Hikyuu 核心引擎库
@@ -51,10 +50,9 @@
  * @defgroup Indicator Indicator 指标库
  * 内建常用指标，及新指标定义实现基础设施
  * @details 包含指标基类定义、部分常用指标以及指标的生成函数
- * @note 在客户端程序中，建议尽可能使用指标的生成函数，生成具体的指标进行调用，以避免错误的内存申请和释放 \n
- *       示例： \n
- *       Indicator ma = MA(); \n
- *       std::cout << ma.name() << std::endl; \n
+ * @note
+ * 在客户端程序中，建议尽可能使用指标的生成函数，生成具体的指标进行调用，以避免错误的内存申请和释放
+ * \n 示例： \n Indicator ma = MA(); \n std::cout << ma.name() << std::endl; \n
  * @ingroup Hikyuu
  *
  * @defgroup TradeManager TradeManager 交易管理
@@ -124,7 +122,8 @@
  * @ingroup TradeSystem
  *
  * @defgroup Slippage Slippage 移滑价差算法
- * @details 系统产生的买入或卖出信号所指示的价格，在真实的环境中通常无法准确的以该价格进行实际的买入或卖出
+ * @details
+ * 系统产生的买入或卖出信号所指示的价格，在真实的环境中通常无法准确的以该价格进行实际的买入或卖出
  *         活动，如操作的延时、出价的跳跃等等。这种理论价格和直接可能买入的价格之间的偏差称为“移滑价差”。
  *         在系统模拟中，应充分考虑移滑价差带来的影响，同时也是对系统稳定性的一种检验，即较小的偏差，不会
  *         对系统最终的收益存在较大的影响。
@@ -137,25 +136,26 @@
  * @defgroup SystemInstance SystemInstance 系统实例
  * @details 系统实例
  * @ingroup Hikyuu
- * 
+ *
  * @defgroup Utilities Utilities 程序工具集
  * 独立的一些小函数、对象工具集合
  * @details 附加的公共工具集
  * @ingroup Hikyuu
- * 
+ *
  * @defgroup DBConnect DB Connect 数据库连接
  * 数据库连接工具
  * @ingroup Utilities
- * 
+ *
  * @defgroup ThreadPool Thread Pool 线程池
+ * @ingroup Utilities
+ *
+ * @defgroup TaskGroup Task Group 并行任务组
  * @ingroup Utilities
  */
 
 /**
  * Hikyuu核心命名空间，包含股票数据的管理、指标实现、交易系统框架等
  */
-namespace hku {
-
-}
+namespace hku {}
 
 #endif /* DOC_H_ */
