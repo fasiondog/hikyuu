@@ -49,7 +49,16 @@ StringList.__doc__ = """字符串列表，对应C++中的std::vector<String>"""
 # from _Datetime.cpp
 #------------------------------------------------------------------
 
-Datetime.__doc__ = """日期时间类，精确到微秒"""
+Datetime.__doc__ = """
+日期时间类（精确到微秒），通过以下方式构建：
+    
+    - 通过字符串：Datetime("2010-1-1 10:00:00")、Datetime("2001-1-1")、
+                 Datetime("20010101")、Datetime("20010101T232359)
+    - 通过 Python 的date：Datetime(date(2010,1,1))
+    - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
+    - 通过 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
+    - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0)
+"""
 
 Datetime.isNull.__doc__ = """是否是Null值, 即是否等于 constant.null_datetime"""
 

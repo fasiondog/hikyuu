@@ -59,10 +59,26 @@ public:
     /** 从boost::posix_time::ptime构造 */
     explicit Datetime(const bt::ptime&);
 
-    /** 通过数字方式构造日期类型，数字格式：YYYYMMDDhhmm，如 200101010000 */
+    /**
+     * 通过数字方式构造日期类型
+     * @details 支持以下两种数字格式
+     * <pre>
+     *     1、YYYYMMDDhhmm，如 200101010000
+     *     2、YYYYMMDD, 如 20010101
+     * </pre>
+     */
     explicit Datetime(unsigned long long);
 
-    /** 通过字符串方式构造日期类型，如："2001-01-01 18:00:00.12345" */
+    /**
+     * 通过字符串方式构造日期类型
+     * @details 支持以下格式的字符串构造：
+     * <pre>
+     *     1、"2001-01-01" 或 "2001/1/1"
+     *     2、"20010101"
+     *     3、"2001-01-01 18:00:00.12345"
+     *     4、"20010101T181159"
+     * </pre>
+     */
     explicit Datetime(const std::string&);
 
     Datetime& operator=(const Datetime&);
@@ -298,15 +314,6 @@ inline Datetime::Datetime(const Datetime& d) : m_data(d.m_data) {}
 inline Datetime::Datetime(const bd::date& d) : m_data(bt::ptime(d, bt::time_duration(0, 0, 0))) {}
 
 inline Datetime::Datetime(const bt::ptime& d) : m_data(d) {}
-
-inline Datetime::Datetime(const std::string& ts) {
-    if (ts == "+infinity") {
-        bd::date d(bd::pos_infin);
-        m_data = bt::ptime(d, bt::time_duration(0, 0, 0));
-    } else {
-        m_data = bt::time_from_string(ts);
-    }
-}
 
 inline bt::ptime Datetime::ptime() const {
     return m_data;

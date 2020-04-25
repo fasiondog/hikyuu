@@ -8,6 +8,7 @@
 #include <fmt/format.h>
 #include "../utilities/Null.h"
 #include "../utilities/exception.h"
+#include "../utilities/arithmetic.h"
 #include "Datetime.h"
 
 namespace hku {
@@ -32,20 +33,44 @@ Datetime::Datetime(unsigned long long datetime) {
         return;
     }
 
-    unsigned long long year, month, day, hh, mm;
-    year = datetime / 100000000;
-    month = (datetime - year * 100000000) / 1000000;
-    day = (datetime - datetime / 1000000 * 1000000) / 10000;
-    hh = (datetime - datetime / 10000 * 10000) / 100;
-    mm = (datetime - datetime / 100 * 100);
-    bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
-    if (hh >= 24) {
-        throw std::out_of_range("Hour value is out of rang 0..23");
+    if (datetime <= 99999999L) {
+        unsigned long long year, month, day;
+        year = datetime / 10000;
+        month = (datetime - year * 10000) / 100;
+        day = datetime - datetime / 100 * 100;
+        bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
+        m_data = bt::ptime(d, bt::time_duration(0, 0, 0));
+    } else {
+        unsigned long long year, month, day, hh, mm;
+        year = datetime / 100000000;
+        month = (datetime - year * 100000000) / 1000000;
+        day = (datetime - datetime / 1000000 * 1000000) / 10000;
+        hh = (datetime - datetime / 10000 * 10000) / 100;
+        mm = (datetime - datetime / 100 * 100);
+        HKU_CHECK_THROW(hh < 24, std::out_of_range, "Hour value is out of rang 0..23");
+        HKU_CHECK_THROW(mm < 60, std::out_of_range, "Minute value is out of range 0..59");
+        bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
+        m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, 0));
     }
-    if (mm >= 60) {
-        throw std::out_of_range("Minute value is out of range 0..59");
+}
+
+Datetime::Datetime(const std::string& ts) {
+    std::string timeStr(ts);
+    trim(timeStr);
+    if ("+infinity" == timeStr) {
+        m_data = bt::ptime(bd::date(bd::pos_infin), bt::time_duration(0, 0, 0));
+    } else if (timeStr.size() <= 10) {
+        auto pos1 = timeStr.rfind("-");
+        auto pos2 = timeStr.rfind("/");
+        m_data = (pos1 != std::string::npos || pos2 != std::string::npos)
+                   ? bt::ptime(bd::from_string(timeStr), bt::time_duration(0, 0, 0))
+                   : bt::ptime(bd::from_undelimited_string(timeStr), bt::time_duration(0, 0, 0));
+    } else {
+        to_upper(timeStr);
+        auto pos = timeStr.find("T");
+        m_data =
+          (pos != std::string::npos) ? bt::from_iso_string(timeStr) : bt::time_from_string(timeStr);
     }
-    m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, 0));
 }
 
 bool Datetime::isNull() const {

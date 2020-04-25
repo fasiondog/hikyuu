@@ -38,6 +38,29 @@ TEST_CASE("test_Datetime") {
     d = Datetime(d.date());
     CHECK(Datetime(200101010000) == d);
 
+    /** @arg 测试 unsigned long long 构造 */
+    CHECK(Datetime(20010101) == Datetime(2001, 1, 1));
+    CHECK(Datetime(20101231) == Datetime(2010, 12, 31));
+    CHECK(Datetime(200101010000) == Datetime(2001, 1, 1));
+
+    /** @arg 测试 string 构造 */
+    d = Datetime(200101010000L);
+    CHECK(Datetime("2001-1-1") == d);
+    CHECK(Datetime("2001-01-1") == d);
+    CHECK(Datetime("2001-1-01") == d);
+    CHECK(Datetime("2001-01-01") == d);
+    CHECK(Datetime("2001/1/1") == d);
+    CHECK(Datetime("2001/1/01") == d);
+    CHECK(Datetime("2001/01/1") == d);
+    CHECK(Datetime("2001/01/01") == d);
+    CHECK(Datetime("20010101") == d);
+    d = Datetime(2001, 1, 2, 3, 4, 5, 0, 0);
+    CHECK(Datetime("2001-1-2 3:4:5") == d);
+    CHECK(Datetime("2001/1/2 3:4:5") == d);
+    CHECK(Datetime("20010102T030405") == d);
+    CHECK(Datetime("20010102t030405") == d);
+    CHECK_THROWS(Datetime("2001"));
+
     /** @arg 非法年份 */
     CHECK_THROWS_AS(Datetime(99999, 1, 1), std::out_of_range);
     CHECK_THROWS_AS(Datetime(000001010000L), std::out_of_range);

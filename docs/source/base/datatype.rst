@@ -18,10 +18,10 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
 
     日期时间类（精确到微秒），通过以下方式构建：
     
-    - 通过字符串：Datetime("2010-1-1 10:00:00")
+    - 通过字符串：Datetime("2010-1-1 10:00:00")、Datetime("2001-1-1")、Datetime("20010101")、Datetime("20010101T232359)
     - 通过 Python 的date：Datetime(date(2010,1,1))
     - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
-    - 通过 YYYYMMDDHHMM 形式的整数：Datetime(201001011000)
+    - 通过 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
     - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0)
     
     获取日期列表参见： :py:func:`getDateRange`
