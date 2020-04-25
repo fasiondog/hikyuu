@@ -25,6 +25,17 @@ namespace hku {
  */
 HKU_API ThreadPool* getGlobalTaskGroup();
 
+template <typename ResultType>
+using task_handle = std::future<ResultType>;
+
+/**
+ * 向全局任务池中增加任务
+ */
+template <typename FunctionType>
+task_handle<typename std::result_of<FunctionType()>::type> addTask(FunctionType f) {
+    return getGlobalTaskGroup()->submit(f);
+}
+
 /*
  * 内部函数，初始化全局任务组
  */

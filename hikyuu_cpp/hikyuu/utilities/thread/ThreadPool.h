@@ -81,7 +81,7 @@ public:
         } else {
             m_master_work_queue.push(std::move(task));
         }
-        m_cv.notify_one();
+        m_cv.notify_all();
         return res;
     }
 
@@ -179,7 +179,7 @@ private:
         } else {
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);
-            m_cv.wait(lk);
+            m_cv.wait(lk, [=] { return this->m_done || !this->m_master_work_queue.empty(); });
         }
     }
 
