@@ -10,9 +10,10 @@
 #include "Log.h"
 
 #if USE_SPDLOG_LOGGER
-#include <spdlog/sinks/stdout_color_sinks.h>
+// 使用 stdout_color 将无法将日志输出重定向至 python
+//#include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>
-//#include "spdlog/sinks/ostream_sink.h"
+#include "spdlog/sinks/ostream_sink.h"
 //#include "spdlog/sinks/rotating_file_sink.h"
 
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
@@ -38,8 +39,8 @@ std::shared_ptr<spdlog::logger> getHikyuuLogger() {
 #if USE_SPDLOG_LOGGER
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
 void initLogger() {
-    // auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
-    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
+    // auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
 
     spdlog::init_thread_pool(8192, 1);
@@ -57,7 +58,8 @@ void initLogger() {
 #else /* #if HKU_USE_SPDLOG_ASYNC_LOGGER */
 
 void initLogger() {
-    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);
+    // auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_level(spdlog::level::trace);
     auto logger = std::make_shared<spdlog::logger>("hikyuu", stdout_sink);
     logger->set_level(spdlog::level::trace);
