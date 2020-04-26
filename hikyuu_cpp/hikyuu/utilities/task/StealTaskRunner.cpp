@@ -11,28 +11,26 @@
 
 #include <functional>
 #include <iostream>
+#include "../../Log.h"
 #include "StealTaskRunner.h"
 #include "StealTaskGroup.h"
 
-#define QUEUE_LOCK std::lock_guard<std::mutex> lock(_mutex);
+#define QUEUE_LOCK std::lock_guard<std::mutex> lock(m_queue_mutex);
 
 namespace hku {
 
 StealTaskRunner::StealTaskRunner(StealTaskGroup* group, size_t id, StealTaskPtr stopTask) {
-    _id = id;
-    _group = group;
+    m_index = id;
+    m_group = group;
     _stopTask = stopTask;
 }
 
 StealTaskRunner::~StealTaskRunner() {}
 
-/**
- * 加入一个普通任务，将其放入私有队列的后端
- * @param task
- */
+// 加入一个普通任务，将其放入私有队列的后端
 void StealTaskRunner::putTask(const StealTaskPtr& task) {
     QUEUE_LOCK;
-    _queue.push_back(task);
+    m_queue.push_back(task);
 }
 
 /**
@@ -41,7 +39,7 @@ void StealTaskRunner::putTask(const StealTaskPtr& task) {
  */
 void StealTaskRunner::putWatchTask(const StealTaskPtr& task) {
     QUEUE_LOCK;
-    _queue.push_front(task);
+    m_queue.push_front(task);
 }
 
 /**
@@ -51,9 +49,9 @@ void StealTaskRunner::putWatchTask(const StealTaskPtr& task) {
 StealTaskPtr StealTaskRunner::takeTaskBySelf() {
     QUEUE_LOCK;
     StealTaskPtr result;
-    if (!_queue.empty()) {
-        result = _queue.back();
-        _queue.pop_back();
+    if (!m_queue.empty()) {
+        result = m_queue.back();
+        m_queue.pop_back();
     }
 
     return result;
@@ -66,12 +64,12 @@ StealTaskPtr StealTaskRunner::takeTaskBySelf() {
 StealTaskPtr StealTaskRunner::takeTaskByOther() {
     QUEUE_LOCK;
     StealTaskPtr result;
-    if (!_queue.empty()) {
-        StealTaskPtr front = _queue.front();
+    if (!m_queue.empty()) {
+        StealTaskPtr front = m_queue.front();
         //如果提取的任务是停止任务，则放弃并返回空
         if (front != _stopTask) {
             result = front;
-            _queue.pop_front();
+            m_queue.pop_front();
         }
     }
 
@@ -96,6 +94,9 @@ void StealTaskRunner::join() {
  * 循环执行所有分配的任务
  */
 void StealTaskRunner::run() {
+    m_local_queue = m_group->m_runner_queues[m_index].get();
+    m_local_index = m_index;
+    m_locla_need_stop = false;
     StealTaskPtr task;
     try {
         while (task != _stopTask) {
@@ -109,6 +110,7 @@ void StealTaskRunner::run() {
                 steal(StealTaskPtr());
             }
         }
+        HKU_INFO("{} local size: {}", std::this_thread::get_id(), m_local_queue->size());
 
     } catch (...) {
         std::cerr << "[TaskRunner::run] Some error!" << std::endl;
@@ -116,7 +118,7 @@ void StealTaskRunner::run() {
 }
 
 /**
- * 等待某一任务执行结束
+ * 等待某一任务执行结束，如等待的任务未结束，则先执行其他任务
  * @param waitingFor - 等待结束的任务
  */
 void StealTaskRunner::taskJoin(const StealTaskPtr& waitingFor) {
@@ -145,10 +147,10 @@ void StealTaskRunner::steal(const StealTaskPtr& waitingFor) {
     std::srand(temp);
 #endif
 
-    size_t total = _group->size();
+    size_t total = m_group->size();
     size_t ran_num = std::rand() % total;
     for (size_t i = 0; i < total; i++) {
-        StealTaskRunnerPtr tr = _group->getRunner(ran_num);
+        StealTaskRunnerPtr tr = m_group->getRunner(ran_num);
         if (waitingFor && waitingFor->isDone()) {
             break;
         }

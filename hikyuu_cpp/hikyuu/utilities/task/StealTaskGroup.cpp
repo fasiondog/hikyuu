@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include "../../Log.h"
 #include "StealTaskGroup.h"
 
 namespace hku {
@@ -47,13 +48,17 @@ private:
 
 StealTaskGroup::StealTaskGroup(size_t taskCount, size_t groupSize) {
     _taskList.reserve(taskCount);
-    _groupSize = (groupSize != 0) ? groupSize : std::thread::hardware_concurrency();
-    _runnerList.reserve(_groupSize);
+    m_runnerNum = (groupSize != 0) ? groupSize : std::thread::hardware_concurrency();
+    _runnerList.reserve(m_runnerNum);
     _stopTask = StealTaskPtr(new StopTask());
     _currentRunnerId = 0;
-    for (size_t i = 0; i < _groupSize; i++) {
+    for (size_t i = 0; i < m_runnerNum; i++) {
         StealTaskRunnerPtr runner(new StealTaskRunner(this, i, _stopTask));
         _runnerList.push_back(runner);
+    }
+
+    for (auto i = 0; i < m_runnerNum; i++) {
+        m_runner_queues.push_back(std::make_shared<StealRunnerQueue>());
     }
 
     start();
@@ -63,7 +68,7 @@ StealTaskGroup::~StealTaskGroup() {}
 
 StealTaskRunnerPtr StealTaskGroup::getRunner(size_t id) {
     StealTaskRunnerPtr result;
-    if (id >= _groupSize) {
+    if (id >= m_runnerNum) {
         std::cerr << "[StealTaskGroup::getRunner] Invalid id: " << id << std::endl;
         return result;
     }
@@ -74,17 +79,23 @@ StealTaskRunnerPtr StealTaskGroup::getRunner(size_t id) {
 StealTaskRunnerPtr StealTaskGroup::getCurrentRunner() {
     StealTaskRunnerPtr result = _runnerList[_currentRunnerId];
     _currentRunnerId++;
-    if (_currentRunnerId >= _groupSize) {
+    if (_currentRunnerId >= m_runnerNum) {
         _currentRunnerId = 0;
     }
     return result;
 }
 
-void StealTaskGroup::addTask(const StealTaskPtr& task) {
+StealTaskPtr StealTaskGroup::addTask(const StealTaskPtr& task) {
+    if (StealTaskRunner::m_local_queue) {
+        HKU_INFO("add task to local queue!");
+        StealTaskRunner::m_local_queue->push_front(task);
+    }
+
     _taskList.push_back(task);
     StealTaskRunnerPtr runner = getCurrentRunner();
     task->setTaskRunner(runner.get());
     runner->putTask(task);
+    return task;
 }
 
 void StealTaskGroup::start() {

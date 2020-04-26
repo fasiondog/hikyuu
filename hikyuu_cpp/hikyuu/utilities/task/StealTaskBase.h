@@ -19,36 +19,49 @@
 namespace hku {
 
 class StealTaskRunner;
+class StealTaskGroup;
 
 /**
  * 并行任务基类
  * @ingroup TaskGroup
  */
 class HKU_API StealTaskBase : public std::enable_shared_from_this<StealTaskBase> {
+    friend class StealTaskRunner;
+    friend class StealTaskGroup;
+
 public:
     StealTaskBase();
     virtual ~StealTaskBase();
 
-    virtual void run() = 0;
+    /**
+     * 任务的实际执行动作，子类任务必须实现该接口
+     */
+    virtual void run();
 
+    /**
+     * 任务是否已完成
+     */
     bool isDone() const {
-        return _done;
+        return m_done;
     }
 
-    void fork(StealTaskRunner *);
+    /**
+     * 等待任务完成
+     */
     void join();
+
+private:
+    // StealTaskRunner 实际执行任务
     void invoke();
 
+    // StealTaskGroup 设置
     void setTaskRunner(StealTaskRunner *runner) {
-        _runner = runner;
-    }
-    StealTaskRunner *getTaskRunner() {
-        return _runner;
+        m_runner = runner;
     }
 
 private:
-    mutable bool _done;
-    mutable StealTaskRunner *_runner;
+    mutable bool m_done;  // 标记该任务是否已执行完毕
+    mutable StealTaskRunner *m_runner;
 };
 
 typedef std::shared_ptr<StealTaskBase> StealTaskPtr;

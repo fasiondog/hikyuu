@@ -10,6 +10,7 @@
 #define STEALTASKGROUP_H_
 
 #include "StealTaskRunner.h"
+#include "StealRunnerQueue.h"
 
 namespace hku {
 
@@ -18,6 +19,8 @@ namespace hku {
  * @ingroup TaskGroup
  */
 class HKU_API StealTaskGroup {
+    friend class StealTaskRunner;
+
 public:
     /**
      * 构造函数
@@ -26,16 +29,24 @@ public:
      * @return
      */
     StealTaskGroup(size_t taskCount = 3072, size_t groupSize = 0);
+
+    /**
+     * 析构函数
+     */
     virtual ~StealTaskGroup();
 
+    /**
+     * 工作线程数量
+     */
     size_t size() const {
-        return _groupSize;
+        return m_runnerNum;
     }
+
     StealTaskRunnerPtr getRunner(size_t id);
     StealTaskRunnerPtr getCurrentRunner();
 
     //增加一个任务
-    void addTask(const StealTaskPtr& task);
+    StealTaskPtr addTask(const StealTaskPtr& task);
 
     void start();
 
@@ -58,9 +69,11 @@ private:
     typedef std::vector<StealTaskRunnerPtr> RunnerList;
     RunnerList _runnerList;
     StealTaskList _taskList;
-    size_t _groupSize;
+    size_t m_runnerNum;
     StealTaskPtr _stopTask;
     size_t _currentRunnerId;  //记录当前执行addTask任务时，需放入的TaskRunnerid，用于均衡任务分配
+
+    std::vector<std::shared_ptr<StealRunnerQueue>> m_runner_queues;  // 任务队列（每个工作线程一个）
 };
 
 typedef std::shared_ptr<StealTaskGroup> StealTaskGroupPtr;
