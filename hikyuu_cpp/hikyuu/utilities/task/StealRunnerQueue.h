@@ -18,7 +18,8 @@
 namespace hku {
 
 /**
- * 任务偷取队列
+ * 工作线程任务队列
+ * @ingroup TaskGroup
  */
 class StealRunnerQueue {
 public:
@@ -30,15 +31,22 @@ public:
     StealRunnerQueue(const StealRunnerQueue& other) = delete;
     StealRunnerQueue& operator=(const StealRunnerQueue& other) = delete;
 
-    /** 将数据插入队列头部 */
+    /**
+     * 将任务插入队列头部
+     * @param task 任务
+     */
     void push_front(const StealTaskPtr& task);
 
-    /** 将数据插入队列尾部 */
+    /**
+     * 将任务插入队列尾部
+     * @param task 任务
+     */
     void push_back(const StealTaskPtr& task);
 
     /** 队列是否为空 */
     bool empty() const;
 
+    /** 队列当前大小 */
     size_t size() const {
         return m_queue.size();
     }

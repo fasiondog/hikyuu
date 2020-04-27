@@ -41,7 +41,7 @@ public:
     /**
      * 任务是否已完成
      */
-    bool isDone() const {
+    bool done() const {
         return m_done;
     }
 
@@ -59,9 +59,14 @@ private:
         m_runner = runner;
     }
 
+    void setTaskGroup(StealTaskGroup *group) {
+        m_group = group;
+    }
+
 private:
     mutable bool m_done;  // 标记该任务是否已执行完毕
     mutable StealTaskRunner *m_runner;
+    StealTaskGroup *m_group;  // 任务组指针
 };
 
 typedef std::shared_ptr<StealTaskBase> StealTaskPtr;

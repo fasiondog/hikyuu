@@ -53,6 +53,10 @@ private:
         return m_group;
     }
 
+    std::thread::id get_thread_id() const {
+        return m_thread_id;
+    }
+
 private:
     size_t m_index;           // 表示在任务组中的第几个线程
     StealTaskGroup* m_group;  // 所属任务组的指针
@@ -62,7 +66,8 @@ private:
     inline static thread_local size_t m_local_index = 0;        // 在任务组中的序号(m_index)
     inline static thread_local bool m_locla_need_stop = false;  // 线程停止运行指示
 
-    std::thread m_thread;  // 本地工作线程
+    std::thread m_thread;         // 本地工作线程
+    std::thread::id m_thread_id;  // 线程id
 
     // 线程内工作任务队列
     std::mutex m_queue_mutex;

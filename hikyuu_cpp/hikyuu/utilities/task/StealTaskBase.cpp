@@ -7,8 +7,10 @@
 
 #include <iostream>
 #include "../../Log.h"
+#include "../exception.h"
 #include "StealTaskBase.h"
 #include "StealTaskRunner.h"
+#include "StealTaskGroup.h"
 
 namespace hku {
 
@@ -20,11 +22,14 @@ StealTaskBase::StealTaskBase() {
 StealTaskBase::~StealTaskBase() {}
 
 void StealTaskBase::join() {
-    if (m_runner) {
+    HKU_CHECK(m_group, "This taks had not be added to any task group!");
+    auto runner = m_group->getRunnerByThreadId(std::this_thread::get_id());
+    runner->taskJoin(shared_from_this());
+    /*if (m_runner) {
         m_runner->taskJoin(shared_from_this());
     } else {
         HKU_ERROR("Invalid runner!");
-    }
+    }*/
 }
 
 void StealTaskBase::invoke() {

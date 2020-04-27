@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "../../Log.h"
+#include "../exception.h"
 #include "StealTaskGroup.h"
 
 namespace hku {
@@ -46,22 +47,27 @@ private:
     StealTaskGroup* _pTaskGroup;
 };
 
-StealTaskGroup::StealTaskGroup(size_t taskCount, size_t groupSize) {
-    _taskList.reserve(taskCount);
+StealTaskGroup::StealTaskGroup(size_t groupSize) {
     m_runnerNum = (groupSize != 0) ? groupSize : std::thread::hardware_concurrency();
-    _runnerList.reserve(m_runnerNum);
+    m_runnerList.reserve(m_runnerNum);
     _stopTask = StealTaskPtr(new StopTask());
     _currentRunnerId = 0;
-    for (size_t i = 0; i < m_runnerNum; i++) {
-        StealTaskRunnerPtr runner(new StealTaskRunner(this, i, _stopTask));
-        _runnerList.push_back(runner);
-    }
 
+    // 创建工作线程队列
     for (auto i = 0; i < m_runnerNum; i++) {
         m_runner_queues.push_back(std::make_shared<StealRunnerQueue>());
     }
 
-    start();
+    // 创建工作线程
+    for (size_t i = 0; i < m_runnerNum; i++) {
+        m_runnerList.push_back(std::make_shared<StealTaskRunner>(this, i, _stopTask));
+    }
+
+    // 启动各个工作线程
+    for (auto runnerIter = m_runnerList.begin(); runnerIter != m_runnerList.end(); ++runnerIter) {
+        (*runnerIter)->start();
+        m_thread_runner_map[(*runnerIter)->get_thread_id()] = *runnerIter;
+    }
 }
 
 StealTaskGroup::~StealTaskGroup() {}
@@ -73,11 +79,11 @@ StealTaskRunnerPtr StealTaskGroup::getRunner(size_t id) {
         return result;
     }
 
-    return _runnerList[id];
+    return m_runnerList[id];
 }
 
 StealTaskRunnerPtr StealTaskGroup::getCurrentRunner() {
-    StealTaskRunnerPtr result = _runnerList[_currentRunnerId];
+    StealTaskRunnerPtr result = m_runnerList[_currentRunnerId];
     _currentRunnerId++;
     if (_currentRunnerId >= m_runnerNum) {
         _currentRunnerId = 0;
@@ -86,9 +92,12 @@ StealTaskRunnerPtr StealTaskGroup::getCurrentRunner() {
 }
 
 StealTaskPtr StealTaskGroup::addTask(const StealTaskPtr& task) {
+    HKU_CHECK(task, "Input task is nullptr!");
+    task->setTaskGroup(this);
     if (StealTaskRunner::m_local_queue) {
-        HKU_INFO("add task to local queue!");
         StealTaskRunner::m_local_queue->push_front(task);
+    } else {
+        m_master_queue.push(task);
     }
 
     _taskList.push_back(task);
@@ -98,23 +107,16 @@ StealTaskPtr StealTaskGroup::addTask(const StealTaskPtr& task) {
     return task;
 }
 
-void StealTaskGroup::start() {
-    RunnerList::iterator runnerIter;
-    for (runnerIter = _runnerList.begin(); runnerIter != _runnerList.end(); runnerIter++) {
-        (*runnerIter)->start();
-    }
-}
-
 void StealTaskGroup::cancel() {
     RunnerList::iterator runnerIter;
-    for (runnerIter = _runnerList.begin(); runnerIter != _runnerList.end(); runnerIter++) {
+    for (runnerIter = m_runnerList.begin(); runnerIter != m_runnerList.end(); runnerIter++) {
         (*runnerIter)->putTask(_stopTask);
     }
 }
 
 void StealTaskGroup::join() {
     RunnerList::iterator runnerIter;
-    for (runnerIter = _runnerList.begin(); runnerIter != _runnerList.end(); runnerIter++) {
+    for (runnerIter = m_runnerList.begin(); runnerIter != m_runnerList.end(); runnerIter++) {
         (*runnerIter)->join();
     }
 }
@@ -127,7 +129,6 @@ void StealTaskGroup::stop() {
 }
 
 void StealTaskGroup::run() {
-    // start();
     stop();
     join();
 }

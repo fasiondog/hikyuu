@@ -6,9 +6,10 @@
  */
 
 #pragma once
-#ifndef STEALTASKGROUP_H_
-#define STEALTASKGROUP_H_
+#ifndef HKU_UTILITIES_STEALTASKGROUP_H_
+#define HKU_UTILITIES_STEALTASKGROUP_H_
 
+#include "StealMasterQueue.h"
 #include "StealTaskRunner.h"
 #include "StealRunnerQueue.h"
 
@@ -25,10 +26,10 @@ public:
     /**
      * 构造函数
      * @param taskCount - 预计的任务总数
-     * @param groupSize - 线程数量： 0表示自动选择2倍CPU数量
+     * @param groupSize - 线程数量： 0表示自动选择同CPU数量的线程数
      * @return
      */
-    StealTaskGroup(size_t taskCount = 3072, size_t groupSize = 0);
+    StealTaskGroup(size_t groupSize = 0);
 
     /**
      * 析构函数
@@ -42,13 +43,15 @@ public:
         return m_runnerNum;
     }
 
+    StealTaskRunnerPtr getRunnerByThreadId(std::thread::id thread_id) {
+        return m_thread_runner_map[thread_id];
+    }
+
     StealTaskRunnerPtr getRunner(size_t id);
     StealTaskRunnerPtr getCurrentRunner();
 
     //增加一个任务
     StealTaskPtr addTask(const StealTaskPtr& task);
-
-    void start();
 
     //所有任务都已加入指示
     void stop();
@@ -67,13 +70,15 @@ public:
 
 private:
     typedef std::vector<StealTaskRunnerPtr> RunnerList;
-    RunnerList _runnerList;
+    RunnerList m_runnerList;
     StealTaskList _taskList;
     size_t m_runnerNum;
     StealTaskPtr _stopTask;
     size_t _currentRunnerId;  //记录当前执行addTask任务时，需放入的TaskRunnerid，用于均衡任务分配
 
+    StealMasterQueue m_master_queue;                                 // 主任务队列
     std::vector<std::shared_ptr<StealRunnerQueue>> m_runner_queues;  // 任务队列（每个工作线程一个）
+    std::unordered_map<std::thread::id, StealTaskRunnerPtr> m_thread_runner_map;
 };
 
 typedef std::shared_ptr<StealTaskGroup> StealTaskGroupPtr;
@@ -83,4 +88,4 @@ typedef StealTaskGroupPtr TaskGroupPtr;
 
 }  // namespace hku
 
-#endif /* STEALTASKGROUP_H_ */
+#endif /* HKU_UTILITIES_STEALTASKGROUP_H_ */

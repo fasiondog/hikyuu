@@ -94,6 +94,7 @@ void StealTaskRunner::join() {
  * 循环执行所有分配的任务
  */
 void StealTaskRunner::run() {
+    m_thread_id = std::this_thread::get_id();
     m_local_queue = m_group->m_runner_queues[m_index].get();
     m_local_index = m_index;
     m_locla_need_stop = false;
@@ -102,7 +103,7 @@ void StealTaskRunner::run() {
         while (task != _stopTask) {
             task = takeTaskBySelf();
             if (task) {
-                if (!task->isDone()) {
+                if (!task->done()) {
                     task->invoke();
                 }
 
@@ -122,10 +123,10 @@ void StealTaskRunner::run() {
  * @param waitingFor - 等待结束的任务
  */
 void StealTaskRunner::taskJoin(const StealTaskPtr& waitingFor) {
-    while (!waitingFor->isDone()) {
+    while (!waitingFor->done()) {
         StealTaskPtr task = takeTaskBySelf();
         if (task) {
-            if (!task->isDone()) {
+            if (!task->done()) {
                 task->invoke();
             }
         } else {
@@ -151,7 +152,7 @@ void StealTaskRunner::steal(const StealTaskPtr& waitingFor) {
     size_t ran_num = std::rand() % total;
     for (size_t i = 0; i < total; i++) {
         StealTaskRunnerPtr tr = m_group->getRunner(ran_num);
-        if (waitingFor && waitingFor->isDone()) {
+        if (waitingFor && waitingFor->done()) {
             break;
         }
 
@@ -165,7 +166,7 @@ void StealTaskRunner::steal(const StealTaskPtr& waitingFor) {
         }
     }
 
-    if (task && !task->isDone()) {
+    if (task && !task->done()) {
         task->invoke();
     }
 }
