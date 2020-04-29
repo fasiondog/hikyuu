@@ -10,7 +10,7 @@
 #include "doctest/doctest.h"
 #include <hikyuu/utilities/thread/ThreadPool.h>
 #include <hikyuu/utilities/SpendTimer.h>
-#include <fmt/format.h>
+#include <hikyuu/Log.h>
 
 using namespace hku;
 
@@ -25,8 +25,8 @@ TEST_CASE("test_ThreadPool") {
     {
         SPEND_TIME(test_temp);
         ThreadPool tg;
-        for (int i = 0; i < 10; i++) {
-            tg.submit([=]() { std::cout << fmt::format("{}---------------------\n", i); });
+        for (int i = 0; i < 100; i++) {
+            tg.submit([=]() { fmt::print("{}: ----------------------\n", i); });
         }
         tg.join();
     }

@@ -54,18 +54,12 @@ private:
     // StealTaskRunner 实际执行任务
     void invoke();
 
-    // StealTaskGroup 设置
-    void setTaskRunner(StealTaskRunner *runner) {
-        m_runner = runner;
-    }
-
     void setTaskGroup(StealTaskGroup *group) {
         m_group = group;
     }
 
 private:
-    mutable bool m_done;  // 标记该任务是否已执行完毕
-    mutable StealTaskRunner *m_runner;
+    mutable bool m_done;      // 标记该任务是否已执行完毕
     StealTaskGroup *m_group;  // 任务组指针
 };
 
@@ -77,6 +71,17 @@ typedef StealTaskBase TaskBase;
 typedef StealTaskPtr TaskPtr;
 typedef StealTaskList TaskList;
 typedef StealTaskListPtr TaskListPtr;
+
+/**
+ * “停止”任务，用于指示工作线程停止运行
+ */
+class StopTask : public StealTaskBase {
+public:
+    StopTask() {}
+    virtual ~StopTask() {}
+
+    void run(){};
+};
 
 }  // namespace hku
 

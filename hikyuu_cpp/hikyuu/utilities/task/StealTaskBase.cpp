@@ -14,26 +14,29 @@
 
 namespace hku {
 
-StealTaskBase::StealTaskBase() {
-    m_done = false;
-    m_runner = NULL;
-}
+StealTaskBase::StealTaskBase() : m_done(false) {}
 
 StealTaskBase::~StealTaskBase() {}
 
 void StealTaskBase::join() {
-    HKU_CHECK(m_group, "This taks had not be added to any task group!");
-    auto runner = m_group->getRunnerByThreadId(std::this_thread::get_id());
-    runner->taskJoin(shared_from_this());
-    /*if (m_runner) {
-        m_runner->taskJoin(shared_from_this());
+    if (StealTaskRunner::m_local_runner) {
+        // 当前在子线程中
+        StealTaskRunner::m_local_runner->taskJoin(shared_from_this());
     } else {
-        HKU_ERROR("Invalid runner!");
-    }*/
+        // 当前在主线程中
+        HKU_CHECK(m_group, "This taks had not be added to any task group!");
+        m_group->taskJoinInMaster(shared_from_this());
+    }
 }
 
 void StealTaskBase::invoke() {
-    run();
+    try {
+        run();
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
+    } catch (...) {
+        HKU_ERROR("Unknown error in task runnin!");
+    }
     m_done = true;
 }
 

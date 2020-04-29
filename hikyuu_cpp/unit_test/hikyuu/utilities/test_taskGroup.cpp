@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/Log.h>
+#include <hikyuu/utilities/SpendTimer.h>
 #include <hikyuu/utilities/task/StealTaskBase.h>
 #include <hikyuu/utilities/task/StealTaskGroup.h>
 
@@ -25,6 +26,7 @@ public:
 
     virtual void run() {
         HKU_INFO("{}: *****************", m_i);
+        // fmt::print("{}: ----------------------\n", m_i);
     }
 
 private:
@@ -33,11 +35,15 @@ private:
 
 /** @par 检测点 */
 TEST_CASE("test_TaskGroup") {
-    TaskGroup tg;
-    for (int i = 0; i < 30; i++) {
-        tg.addTask(std::make_shared<TestTask>(i));
+    {
+        SPEND_TIME(test_temp);
+        TaskGroup tg(6);
+        for (int i = 0; i < 100; i++) {
+            tg.addTask(std::make_shared<TestTask>(i));
+        }
+        tg.join();
     }
-    tg.run();
+    // tg.run();
 }
 
 /** @} */

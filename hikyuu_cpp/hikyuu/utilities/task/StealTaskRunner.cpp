@@ -19,61 +19,35 @@
 
 namespace hku {
 
-StealTaskRunner::StealTaskRunner(StealTaskGroup* group, size_t id, StealTaskPtr stopTask) {
+StealTaskRunner::StealTaskRunner(StealTaskGroup* group, size_t id) : m_done(false) {
     m_index = id;
     m_group = group;
-    _stopTask = stopTask;
 }
 
 StealTaskRunner::~StealTaskRunner() {}
 
-// 加入一个普通任务，将其放入私有队列的后端
-void StealTaskRunner::putTask(const StealTaskPtr& task) {
-    QUEUE_LOCK;
-    m_queue.push_back(task);
+// 尝试从自己的任务队列中提取一个任务，供自己执行
+StealTaskPtr StealTaskRunner::takeTaskFromLocal() {
+    return m_local_queue->try_pop();
 }
 
-/**
- * 加入一个特殊的监护任务，在所有任务完成后，终止任务包的执行
- * @param task - 必须是预定义的监护任务，该任务在所有任务完成后，终止任务包
- */
-void StealTaskRunner::putWatchTask(const StealTaskPtr& task) {
-    QUEUE_LOCK;
-    m_queue.push_front(task);
+// 阻塞等待直至从主线程任务队列中获取到任务
+StealTaskPtr StealTaskRunner::takeTaskFromMasterAndWait() {
+    return m_local_group->m_master_queue.wait_and_pop();
 }
 
-/**
- * 从自己的任务队列中提取一个任务，供自己执行
- * @return StealTaskPtr - 提取的任务
- */
-StealTaskPtr StealTaskRunner::takeTaskBySelf() {
-    QUEUE_LOCK;
-    StealTaskPtr result;
-    if (!m_queue.empty()) {
-        result = m_queue.back();
-        m_queue.pop_back();
-    }
-
-    return result;
-}
-
-/**
- * 从自己的任务队列中提取一个任务，供其他线程使用
- * @return StealTaskPtr - 提取的任务
- */
-StealTaskPtr StealTaskRunner::takeTaskByOther() {
-    QUEUE_LOCK;
-    StealTaskPtr result;
-    if (!m_queue.empty()) {
-        StealTaskPtr front = m_queue.front();
-        //如果提取的任务是停止任务，则放弃并返回空
-        if (front != _stopTask) {
-            result = front;
-            m_queue.pop_front();
+// 尝试从其他子线程任务队列中偷取任务
+StealTaskPtr StealTaskRunner::takeTaskFromOther() {
+    StealTaskPtr task;
+    auto total = m_local_group->m_runnerNum;
+    for (size_t i = 0; i < total; ++i) {
+        size_t index = (m_local_index + i + 1) % total;
+        task = m_local_group->m_runner_queues[index]->try_steal();
+        if (task && typeid(*task) != typeid(StopTask)) {
+            return task;
         }
     }
-
-    return result;
+    return task;
 }
 
 /**
@@ -87,87 +61,73 @@ void StealTaskRunner::start() {
  * 等待内部线程终止
  */
 void StealTaskRunner::join() {
-    m_thread.join();
+    if (m_thread.joinable()) {
+        m_thread.join();
+    }
+}
+
+void StealTaskRunner::stop() {
+    // 设置结束表示，同时在本地任务队列头部插入停止任务
+    m_done = true;
+    m_local_queue->push_front(std::make_shared<StopTask>());
 }
 
 /**
- * 循环执行所有分配的任务
+ * 循环执行所有分配的任务，线程函数
  */
 void StealTaskRunner::run() {
     m_thread_id = std::this_thread::get_id();
-    m_local_queue = m_group->m_runner_queues[m_index].get();
+    m_local_group = m_group;
+    m_local_runner = this;
+    m_local_queue = m_local_group->m_runner_queues[m_index].get();
     m_local_index = m_index;
     m_locla_need_stop = false;
     StealTaskPtr task;
     try {
-        while (task != _stopTask) {
-            task = takeTaskBySelf();
-            if (task) {
-                if (!task->done()) {
-                    task->invoke();
-                }
+        while (!m_done && (!task || typeid(*task) != typeid(StopTask))) {
+            // 从本地队列中获取待执行任务
+            task = takeTaskFromLocal();
 
-            } else {
-                steal(StealTaskPtr());
+            // 如果本地队列中没有取到任务，则尝试从其他子线程队列中偷取任务
+            if (!task) {
+                task = takeTaskFromOther();
             }
-        }
-        HKU_INFO("{} local size: {}", std::this_thread::get_id(), m_local_queue->size());
 
+            // 如果本地和其他子线程任务队列中都无法获取任务，则等待并直至从主任务队列中获取任务
+            if (!task) {
+                task = takeTaskFromMasterAndWait();
+            }
+
+            if (!task->done()) {
+                task->invoke();
+            }
+            std::this_thread::yield();
+        }
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
     } catch (...) {
-        std::cerr << "[TaskRunner::run] Some error!" << std::endl;
+        HKU_ERROR("Unknown error!");
     }
 }
 
 /**
- * 等待某一任务执行结束，如等待的任务未结束，则先执行其他任务
+ * 在当前子线程中等待某一任务执行结束，如等待的任务未结束，则先执行其他任务
  * @param waitingFor - 等待结束的任务
  */
 void StealTaskRunner::taskJoin(const StealTaskPtr& waitingFor) {
-    while (!waitingFor->done()) {
-        StealTaskPtr task = takeTaskBySelf();
-        if (task) {
-            if (!task->done()) {
-                task->invoke();
-            }
-        } else {
-            steal(waitingFor);
-        }
-    }
-}
-
-void StealTaskRunner::steal(const StealTaskPtr& waitingFor) {
-    StealTaskPtr task;
-
-#ifdef _WIN32
-    std::srand((unsigned)time(NULL));
-#else
-    struct timeval tstart;
-    struct timezone tz;
-    gettimeofday(&tstart, &tz);
-    size_t temp = tstart.tv_usec;
-    std::srand(temp);
-#endif
-
-    size_t total = m_group->size();
-    size_t ran_num = std::rand() % total;
-    for (size_t i = 0; i < total; i++) {
-        StealTaskRunnerPtr tr = m_group->getRunner(ran_num);
-        if (waitingFor && waitingFor->done()) {
-            break;
+    while (waitingFor && !waitingFor->done()) {
+        // 如果获取的任务有效且任务未执行，则执行该任务;
+        // 否则从其他子线程任务队列中进行偷取
+        auto task = takeTaskFromLocal();
+        if (!task) {
+            task = takeTaskFromOther();
         }
 
-        if (tr && tr.get() != this) {
-            task = tr->takeTaskByOther();
-            if (task) {
-                break;
-            }
-            std::this_thread::yield();
-            ran_num = (ran_num + 1) % total;
+        if (task && !task->done()) {
+            task->invoke();
         }
-    }
 
-    if (task && !task->done()) {
-        task->invoke();
+        std::this_thread::yield();
     }
 }
 

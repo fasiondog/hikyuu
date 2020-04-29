@@ -43,11 +43,6 @@ public:
         return m_runnerNum;
     }
 
-    StealTaskRunnerPtr getRunnerByThreadId(std::thread::id thread_id) {
-        return m_thread_runner_map[thread_id];
-    }
-
-    StealTaskRunnerPtr getRunner(size_t id);
     StealTaskRunnerPtr getCurrentRunner();
 
     //增加一个任务
@@ -57,28 +52,23 @@ public:
     void stop();
 
     //强制终止
-    void cancel();
+    // void cancel();
 
     //等待执行结束
     void join();
 
-    void run();
-
-    const StealTaskList& getTaskList() const {
-        return _taskList;
-    }
+    void taskJoinInMaster(const StealTaskPtr& waitingFor);
+    void stealInMaster(const StealTaskPtr& waitingFor);
 
 private:
     typedef std::vector<StealTaskRunnerPtr> RunnerList;
     RunnerList m_runnerList;
-    StealTaskList _taskList;
     size_t m_runnerNum;
-    StealTaskPtr _stopTask;
-    size_t _currentRunnerId;  //记录当前执行addTask任务时，需放入的TaskRunnerid，用于均衡任务分配
+    size_t m_currentRunnerId;  //记录当前执行addTask任务时，需放入的TaskRunnerId，用于均衡任务分配
+    bool m_done;  // 任务组执行结束标志
 
     StealMasterQueue m_master_queue;                                 // 主任务队列
     std::vector<std::shared_ptr<StealRunnerQueue>> m_runner_queues;  // 任务队列（每个工作线程一个）
-    std::unordered_map<std::thread::id, StealTaskRunnerPtr> m_thread_runner_map;
 };
 
 typedef std::shared_ptr<StealTaskGroup> StealTaskGroupPtr;
