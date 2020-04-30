@@ -19,6 +19,10 @@ StealTaskBase::StealTaskBase() : m_done(false) {}
 StealTaskBase::~StealTaskBase() {}
 
 void StealTaskBase::join() {
+    if (m_done) {
+        return;
+    }
+
     if (StealTaskRunner::m_local_runner) {
         // 当前在子线程中
         StealTaskRunner::m_local_runner->taskJoin(shared_from_this());

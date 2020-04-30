@@ -38,10 +38,16 @@ TEST_CASE("test_TaskGroup") {
     {
         SPEND_TIME(test_temp);
         TaskGroup tg(6);
+        std::vector<TaskPtr> task_list;
         for (int i = 0; i < 100; i++) {
-            tg.addTask(std::make_shared<TestTask>(i));
+            task_list.push_back(tg.addTask(std::make_shared<TestTask>(i)));
+            CHECK(!task_list[i]->done());
         }
         tg.join();
+        CHECK(task_list.size() == 100);
+        for (auto& task : task_list) {
+            CHECK(task->done());
+        }
     }
     // tg.run();
 }

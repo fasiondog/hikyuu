@@ -57,6 +57,10 @@ public:
     //等待执行结束
     void join();
 
+    bool done() const {
+        return m_done;
+    }
+
     void taskJoinInMaster(const StealTaskPtr& waitingFor);
     void stealInMaster(const StealTaskPtr& waitingFor);
 
@@ -67,7 +71,7 @@ private:
     size_t m_currentRunnerId;  //记录当前执行addTask任务时，需放入的TaskRunnerId，用于均衡任务分配
     bool m_done;  // 任务组执行结束标志
 
-    StealMasterQueue m_master_queue;                                 // 主任务队列
+    std::shared_ptr<StealMasterQueue> m_master_queue;                // 主任务队列
     std::vector<std::shared_ptr<StealRunnerQueue>> m_runner_queues;  // 任务队列（每个工作线程一个）
 };
 

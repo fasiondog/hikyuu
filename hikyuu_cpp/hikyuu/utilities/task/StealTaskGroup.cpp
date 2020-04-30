@@ -40,6 +40,8 @@ StealTaskGroup::StealTaskGroup(size_t groupSize) : m_currentRunnerId(0), m_done(
     m_runnerNum = (groupSize != 0) ? groupSize : std::thread::hardware_concurrency();
     m_runnerList.reserve(m_runnerNum);
 
+    m_master_queue = std::make_shared<StealMasterQueue>();
+
     // 创建工作线程队列
     for (auto i = 0; i < m_runnerNum; i++) {
         m_runner_queues.push_back(std::make_shared<StealRunnerQueue>());
@@ -75,14 +77,18 @@ StealTaskPtr StealTaskGroup::addTask(const StealTaskPtr& task) {
     HKU_CHECK(task, "Input task is nullptr!");
     task->setTaskGroup(this);
 
-    if (StealTaskRunner::m_local_queue) {
+    if (m_master_queue->empty()) {
+        // 如果主线程任务队列为空，优先加入主队列，以便唤醒休眠线程
+        m_master_queue->push(task);
+
+    } else if (StealTaskRunner::m_local_queue) {
         // 如果是在子线程中执行增加任务，则直接插入子任务队列的头部
         StealTaskRunner::m_local_queue->push_front(task);
 
     } else {
         // 如果是在主线程中增加任务，则轮流插入主线程和各子线程任务队列的尾部
         if (m_currentRunnerId >= m_runnerNum) {
-            m_master_queue.push(task);
+            m_master_queue->push(task);
         } else {
             m_runner_queues[m_currentRunnerId]->push_back(task);
         }
@@ -104,7 +110,7 @@ void StealTaskGroup::join() {
     std::vector<StealTaskPtr> stopTaskList;
     for (auto i = 0; i < m_runnerNum; i++) {
         auto stopTask = std::make_shared<StopTask>();
-        m_master_queue.push(stopTask);
+        m_master_queue->push(stopTask);
     }
 
     // 等待“停止”任务被执行
@@ -125,8 +131,6 @@ void StealTaskGroup::stop() {
         return;
     }
 
-    m_done = true;
-
     // 指示各子线程需要停止
     for (auto runnerIter = m_runnerList.begin(); runnerIter != m_runnerList.end(); ++runnerIter) {
         (*runnerIter)->stop();
@@ -134,13 +138,15 @@ void StealTaskGroup::stop() {
 
     // 同时向主任务队列插入任务停止标识，以便唤醒休眠状态的子线程
     for (auto i = 0; i < m_runnerNum; i++) {
-        m_master_queue.push(std::make_shared<StopTask>());
+        m_master_queue->push(std::make_shared<StopTask>());
     }
+
+    m_done = true;
 }
 
 void StealTaskGroup::taskJoinInMaster(const StealTaskPtr& waitingFor) {
-    while (!waitingFor->done()) {
-        auto task = m_master_queue.try_pop();
+    while (waitingFor && !waitingFor->done()) {
+        auto task = m_master_queue->try_pop();
         if (task && !task->done()) {
             task->invoke();
         } else {

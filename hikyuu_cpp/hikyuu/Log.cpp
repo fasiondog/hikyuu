@@ -29,14 +29,14 @@ LOG_LEVEL get_log_level() {
     return g_log_level;
 }
 
-std::shared_ptr<spdlog::logger> getHikyuuLogger() {
-    return spdlog::get("hikyuu");
-}
-
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
 #if USE_SPDLOG_LOGGER
+std::shared_ptr<spdlog::logger> getHikyuuLogger() {
+    return spdlog::get("hikyuu");
+}
+
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
 void initLogger() {
     auto stdout_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(std::cout, true);

@@ -33,7 +33,7 @@ StealTaskPtr StealTaskRunner::takeTaskFromLocal() {
 
 // 阻塞等待直至从主线程任务队列中获取到任务
 StealTaskPtr StealTaskRunner::takeTaskFromMasterAndWait() {
-    return m_local_group->m_master_queue.wait_and_pop();
+    return m_local_group->m_master_queue->wait_and_pop();
 }
 
 // 尝试从其他子线程任务队列中偷取任务
@@ -67,9 +67,7 @@ void StealTaskRunner::join() {
 }
 
 void StealTaskRunner::stop() {
-    // 设置结束表示，同时在本地任务队列头部插入停止任务
     m_done = true;
-    m_local_queue->push_front(std::make_shared<StopTask>());
 }
 
 /**
