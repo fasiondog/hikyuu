@@ -11,6 +11,10 @@
 #ifndef HIKYUU_UTILITIES_SPENDTIMER_H_
 #define HIKYUU_UTILITIES_SPENDTIMER_H_
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -71,7 +75,8 @@ namespace hku {
  */
 #define SPEND_TIME_MSG(id, ...)                      \
     std::string msg_##id = fmt::format(__VA_ARGS__); \
-    hku::SpendTimer test_spend_timer_##id(fmt::format("{} {} ({}:{})", #id, msg_##id, __FILE__, __LINE__));
+    hku::SpendTimer test_spend_timer_##id(           \
+      fmt::format("{} {} ({}:{})", #id, msg_##id, __FILE__, __LINE__));
 
 /**
  * 用于动态控制当前代码块及其子块中的耗时计时器，主要用于测试代码中关闭和开启部分耗时统计
@@ -94,7 +99,8 @@ public:
      * 构造函数，记录当前系统时间
      * @param msg 辅导输出信息
      */
-    explicit SpendTimer(const std::string& msg) : m_msg(msg), m_start_time(std::chrono::steady_clock::now()) {}
+    explicit SpendTimer(const std::string& msg)
+    : m_msg(msg), m_start_time(std::chrono::steady_clock::now()) {}
 
     /** 析构函数，计算从构造至析构所消耗的时间，并打印输出 */
     virtual ~SpendTimer() {
