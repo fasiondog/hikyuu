@@ -5,6 +5,10 @@
  *      Author: fasiondog
  */
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "GlobalInitializer.h"
 #include <chrono>
 #include <fmt/format.h>

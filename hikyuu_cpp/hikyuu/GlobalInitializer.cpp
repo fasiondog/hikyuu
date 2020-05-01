@@ -7,6 +7,10 @@
  *      Author: fasiondog
  */
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <iostream>
 #include <H5public.h>
 #include <fmt/format.h>

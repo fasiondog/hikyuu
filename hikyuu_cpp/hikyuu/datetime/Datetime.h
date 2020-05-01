@@ -9,6 +9,10 @@
 #ifndef DATETIME_H_
 #define DATETIME_H_
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <chrono>
 #include <string>
 #include <vector>

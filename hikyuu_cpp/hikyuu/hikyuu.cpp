@@ -5,6 +5,10 @@
  *      Author: fasiondog
  */
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <fmt/format.h>
 #include "utilities/IniParser.h"
 #include "hikyuu.h"

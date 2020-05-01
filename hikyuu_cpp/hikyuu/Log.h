@@ -9,6 +9,10 @@
 #ifndef HIKUU_LOG_H_
 #define HIKUU_LOG_H_
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "config.h"
 
 // clang-format off

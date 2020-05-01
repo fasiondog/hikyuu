@@ -5,6 +5,10 @@
  *      Author: fasiondog
  */
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <fmt/format.h>
 #include "../utilities/Null.h"
 #include "../utilities/exception.h"

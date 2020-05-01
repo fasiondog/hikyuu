@@ -13,6 +13,10 @@
 #define HKU_API
 #endif
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <boost/config.hpp>
 //#include <boost/shared_ptr.hpp>
 //#include <boost/make_shared.hpp>

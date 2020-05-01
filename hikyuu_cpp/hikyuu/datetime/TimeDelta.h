@@ -11,6 +11,10 @@
 #ifndef HIKYUU_DATETIME_TIMEDELTA_H
 #define HIKYUU_DATETIME_TIMEDELTA_H
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include <cstdint>
 #include <fmt/format.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -47,8 +51,8 @@ public:
      * @param milliseconds 毫秒数 [-86399000000, 86399000000])
      * @param microseconds 微秒数 [-86399000000, 86399000000])
      */
-    explicit TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0, int64_t seconds = 0,
-                       int64_t milliseconds = 0, int64_t microseconds = 0);
+    explicit TimeDelta(int64_t days = 0, int64_t hours = 0, int64_t minutes = 0,
+                       int64_t seconds = 0, int64_t milliseconds = 0, int64_t microseconds = 0);
 
     /** 通过 boost::posix_time::time_duration 构造 */
     explicit TimeDelta(bt::time_duration td);
@@ -135,8 +139,8 @@ public:
 
     /** 转换为字符串，格式为：TimeDelta(days,hours,mins,secs,millisecs,microsecs) */
     std::string repr() const {
-        return fmt::format("TimeDelta({}, {}, {}, {}, {}, {})", days(), hours(), minutes(), seconds(), milliseconds(),
-                           microseconds());
+        return fmt::format("TimeDelta({}, {}, {}, {}, {}, {})", days(), hours(), minutes(),
+                           seconds(), milliseconds(), microseconds());
     }
 
     /////////////////////////////////////////////////////////////////

@@ -15,6 +15,7 @@ add_includedirs("../hikyuu_cpp")
 
 if is_plat("windows") then
     add_defines("HKU_API=__declspec(dllimport)")
+    add_cxflags("-wd4566")
 end
 
 local cc = get_config("cc")
