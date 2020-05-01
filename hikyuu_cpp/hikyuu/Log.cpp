@@ -75,7 +75,7 @@ void set_log_level(LOG_LEVEL level) {
     getHikyuuLogger()->set_level((spdlog::level::level_enum)level);
 }
 
-#else  /* #if USE_SPDLOG_LOGGER */
+#else /* #if USE_SPDLOG_LOGGER */
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
@@ -84,6 +84,23 @@ void initLogger() {}
 void set_log_level(LOG_LEVEL level) {
     g_log_level = level;
 }
+
+std::string HKU_API getLocalTime() {
+    auto now = std::chrono::system_clock::now();
+    uint64_t dis_millseconds =
+      std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() -
+      std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count() * 1000;
+    time_t tt = std::chrono::system_clock::to_time_t(now);
+#ifdef _WIN32
+    struct tm now_time;
+    localtime_s(&now_time, &tt);
+#else
+    struct tm now_time;
+    localtime_r(&tt, &now_time);
+#endif
+    return fmt::format("{:%Y-%m-%d %H:%M:%S}.{:<3d}", now_time, dis_millseconds);
+}
+
 #endif /* #if USE_SPDLOG_LOGGER */
 
 }  // namespace hku

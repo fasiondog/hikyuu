@@ -27,6 +27,7 @@
 
 #include <fmt/ostream.h>
 #include <fmt/format.h>
+#include <fmt/chrono.h>
 
 #ifndef HKU_API
 #define HKU_API
@@ -111,44 +112,53 @@ LOG_LEVEL HKU_API get_log_level();
 void HKU_API set_log_level(LOG_LEVEL level);
 void initLogger();
 
+/** 获取系统当前时间，精确到毫秒，如：2001-01-02 13:01:02.001 */
+std::string HKU_API getLocalTime();
+
 #if LOG_ACTIVE_LEVEL <= 0
-#define HKU_TRACE(...) \
-    fmt::print("[HKU-T] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#define HKU_TRACE(...)                                                                            \
+    fmt::print("[{}] [HKU-T] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
+               __LINE__);
 #else
 #define HKU_TRACE(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 1
-#define HKU_DEBUG(...) \
-    fmt::print("[HKU-D] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#define HKU_DEBUG(...)                                                                            \
+    fmt::print("[{}] [HKU-D] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
+               __LINE__);
 #else
 #define HKU_DEBUG(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 2
-#define HKU_INFO(...) \
-    fmt::print("[HKU-I] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#define HKU_INFO(...)                                                                             \
+    fmt::print("[{}] [HKU-I] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
+               __LINE__);
 #else
 #define HKU_INFO(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 3
-#define HKU_WARN(...) \
-    fmt::print("[HKU-W] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#define HKU_WARN(...)                                                                             \
+    fmt::print("[{}] [HKU-W] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
+               __LINE__);
 #else
 #define HKU_WARN(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 4
-#define HKU_ERROR(...) \
-    fmt::print("[HKU-E] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#define HKU_ERROR(...)                                                                            \
+    fmt::print("[{}] [HKU-E] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
+               __LINE__);
 #else
 #define HKU_ERROR(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 5
-#define HKU_FATAL(...) \
-    fmt::print("[HKU-F] - {} ({}:{})\n", fmt::format(__VA_ARGS__), __FILE__, __LINE__);
+#define HKU_FATAL(...)                                                                            \
+    fmt::print("[{}] [HKU-F] - {} ({}:{})\n", getLocalTime(), fmt::format(__VA_ARGS__), __FILE__, \
+               __LINE__);
 #else
 #define HKU_FATAL(...)
 #endif
