@@ -15,6 +15,7 @@
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/split_free.hpp>
+#include <boost/serialization/split_member.hpp>
 #endif
 
 namespace hku {
