@@ -19,7 +19,7 @@ namespace hku {
  * 偷取式并行任务组
  * @ingroup TaskGroup
  */
-class HKU_API StealTaskGroup {
+class StealTaskGroup {
     friend class StealTaskRunner;
 
 public:

@@ -8,6 +8,7 @@
  */
 
 #include "doctest/doctest.h"
+#include <hikyuu/utilities/thread/StealThreadPool.h>
 #include <hikyuu/utilities/thread/ThreadPool.h>
 #include <hikyuu/utilities/SpendTimer.h>
 #include <hikyuu/Log.h>
@@ -23,10 +24,28 @@ using namespace hku;
 /** @par 检测点 */
 TEST_CASE("test_ThreadPool") {
     {
-        SPEND_TIME(test_temp);
-        ThreadPool tg;
+        SPEND_TIME(test_ThreadPool);
+        ThreadPool tg(8);
+        HKU_INFO("worker_num: {}", tg.worker_num());
         for (int i = 0; i < 100; i++) {
-            tg.submit([=]() { fmt::print("{}: ----------------------\n", i); });
+            tg.submit([=]() {  // fmt::print("{}: ----------------------\n", i);
+                HKU_INFO("{}: ------------------- [{}]", i, std::this_thread::get_id());
+            });
+        }
+        tg.join();
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_StealThreadPool") {
+    {
+        SPEND_TIME(test_StealThreadPool);
+        StealThreadPool tg(8);
+        HKU_INFO("worker_num: {}", tg.worker_num());
+        for (int i = 0; i < 100; i++) {
+            tg.submit([=]() {  // fmt::print("{}: ----------------------\n", i);
+                HKU_INFO("{}: ------------------- [{}]", i, std::this_thread::get_id());
+            });
         }
         tg.join();
     }

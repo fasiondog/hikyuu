@@ -25,7 +25,7 @@ public:
     virtual ~TestTask() = default;
 
     virtual void run() {
-        HKU_INFO("{}: *****************", m_i);
+        HKU_INFO("{}: ------------------- [{}]", m_i, std::this_thread::get_id());
         // fmt::print("{}: ----------------------\n", m_i);
     }
 
@@ -36,14 +36,19 @@ private:
 /** @par 检测点 */
 TEST_CASE("test_TaskGroup") {
     {
-        SPEND_TIME(test_temp);
-        TaskGroup tg(6);
         std::vector<TaskPtr> task_list;
-        for (int i = 0; i < 100; i++) {
-            task_list.push_back(tg.addTask(std::make_shared<TestTask>(i)));
-            CHECK(!task_list[i]->done());
+        {
+            SPEND_TIME(test_TaskGroup);
+            TaskGroup tg(8);
+            HKU_INFO("worker_num: {}", tg.size());
+            HKU_INFO("main thread: {}", std::this_thread::get_id());
+
+            for (int i = 0; i < 100; i++) {
+                task_list.push_back(tg.addTask(std::make_shared<TestTask>(i)));
+                // CHECK(!task_list[i]->done());
+            }
+            tg.join();
         }
-        tg.join();
         CHECK(task_list.size() == 100);
         for (auto& task : task_list) {
             CHECK(task->done());

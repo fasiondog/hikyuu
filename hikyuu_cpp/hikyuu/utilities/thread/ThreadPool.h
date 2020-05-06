@@ -1,5 +1,5 @@
 /*
- * ThreadPool.h
+ * StealThreadPool.h
  *
  *  Copyright (c) 2019 hikyuu.org
  *
@@ -16,13 +16,14 @@
 #include <thread>
 #include <chrono>
 #include <vector>
+#include "FuncWrapper.h"
 #include "ThreadSafeQueue.h"
-#include "WorkStealQueue.h"
 
 namespace hku {
 
 /**
- * @brief 线程池
+ * @brief 普通集中式任务队列线程池，任务之间彼此独立不能互相等待
+ * @note 任务运行之间如存在先后顺序，请使用 StealThreadPool。
  * @details
  * @ingroup ThreadPool
  */
@@ -37,18 +38,16 @@ public:
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      */
-    explicit ThreadPool(size_t n) : m_done(false), m_init_finished(false), m_worker_num(n) {
+    explicit ThreadPool(size_t n) : m_done(false), m_worker_num(n) {
         try {
             for (size_t i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
-                m_queues.push_back(std::unique_ptr<WorkStealQueue>(new WorkStealQueue));
-                m_threads.push_back(std::thread(&ThreadPool::worker_thread, this, i));
+                m_threads.push_back(std::thread(&ThreadPool::worker_thread, this));
             }
         } catch (...) {
             m_done = true;
             throw;
         }
-        m_init_finished = true;
     }
 
     /**
@@ -75,13 +74,7 @@ public:
         typedef typename std::result_of<FunctionType()>::type result_type;
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
-        if (m_local_work_queue) {
-            // 本地线程任务从前部入队列（递归成栈）
-            m_local_work_queue->push_front(std::move(task));
-        } else {
-            m_master_work_queue.push(std::move(task));
-        }
-        m_cv.notify_all();
+        m_master_work_queue.push(std::move(task));
         return res;
     }
 
@@ -98,10 +91,9 @@ public:
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
-            m_queues[i]->push_front(std::move(FuncWrapper()));
+            m_master_work_queue.push(std::move(FuncWrapper()));
         }
 
-        m_cv.notify_all();  // 唤醒所有工作线程
         for (size_t i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
                 m_threads[i].join();
@@ -119,9 +111,6 @@ public:
             m_master_work_queue.push(std::move(FuncWrapper()));
         }
 
-        // 唤醒所有工作线程
-        m_cv.notify_all();
-
         // 等待线程结束
         for (size_t i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
@@ -134,77 +123,34 @@ public:
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;       // 线程池全局需终止指示
-    bool m_init_finished;          // 线程池是否初始化完毕
-    size_t m_worker_num;           // 工作线程数量
-    std::condition_variable m_cv;  // 信号量，无任务时阻塞线程并等待
-    std::mutex m_cv_mutex;         // 配合信号量的互斥量
+    std::atomic_bool m_done;  // 线程池全局需终止指示
+    size_t m_worker_num;      // 工作线程数量
 
-    ThreadSafeQueue<task_type> m_master_work_queue;          // 主线程任务队列
-    std::vector<std::unique_ptr<WorkStealQueue> > m_queues;  // 任务队列（每个工作线程一个）
-    std::vector<std::thread> m_threads;                      // 工作线程
+    ThreadSafeQueue<task_type> m_master_work_queue;  // 主线程任务队列
+    std::vector<std::thread> m_threads;              // 工作线程
 
     // 线程本地变量
-    inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
-    inline static thread_local size_t m_index = 0;               //在线程池中的序号
     inline static thread_local bool m_thread_need_stop = false;  // 线程停止运行指示
 
-    void worker_thread(size_t index) {
+    void worker_thread() {
         m_thread_need_stop = false;
-        m_index = index;
-        m_local_work_queue = m_queues[m_index].get();
-        while (!m_thread_need_stop && !m_done) {
+        while (!m_done && !m_thread_need_stop) {
             run_pending_task();
+            std::this_thread::yield();
         }
         // fmt::print("thread ({}) finished!\n", std::this_thread::get_id());
     }
 
     void run_pending_task() {
-        // 从本地队列提前工作任务，如本地无任务则从主队列中提取任务
-        // 如果主队列中提取的任务是空任务，则认为需结束本线程，否则从其他工作队列中偷取任务
         task_type task;
-        if (pop_task_from_local_queue(task)) {
-            task();
-            std::this_thread::yield();
-        } else if (pop_task_from_master_queue(task)) {
-            if (!task.isNullTask()) {
-                task();
-                std::this_thread::yield();
-            } else {
-                m_thread_need_stop = true;
-            }
-        } else if (pop_task_from_other_thread_queue(task)) {
-            task();
-            std::this_thread::yield();
+        m_master_work_queue.wait_and_pop(task);
+        if (task.isNullTask()) {
+            m_thread_need_stop = true;
         } else {
-            // std::this_thread::yield();
-            std::unique_lock<std::mutex> lk(m_cv_mutex);
-            m_cv.wait(lk, [=] { return this->m_done || !this->m_master_work_queue.empty(); });
+            task();
         }
     }
 
-    bool pop_task_from_master_queue(task_type& task) {
-        return m_master_work_queue.try_pop(task);
-    }
-
-    bool pop_task_from_local_queue(task_type& task) {
-        return m_local_work_queue && m_local_work_queue->try_pop(task);
-    }
-
-    bool pop_task_from_other_thread_queue(task_type& task) {
-        // 线程池尚未初始化化完成时，其他任务队列可能尚未创建
-        // 此时不能从其他队列偷取任务
-        if (!m_init_finished) {
-            return false;
-        }
-        for (size_t i = 0; i < m_worker_num; ++i) {
-            size_t index = (m_index + i + 1) % m_worker_num;
-            if (m_queues[index]->try_steal(task)) {
-                return true;
-            }
-        }
-        return false;
-    }
 };  // namespace hku
 
 } /* namespace hku */

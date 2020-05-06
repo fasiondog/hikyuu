@@ -12,9 +12,9 @@
 
 namespace hku {
 
-static ThreadPool* g_threadPool;
+static StealThreadPool* g_threadPool;
 
-HKU_API ThreadPool* getGlobalTaskGroup() {
+HKU_API StealThreadPool* getGlobalTaskGroup() {
     return g_threadPool;
 }
 
@@ -26,7 +26,7 @@ void initThreadPool() {
         } else if (cpu_num > 1) {
             cpu_num--;
         }
-        g_threadPool = new ThreadPool(cpu_num);
+        g_threadPool = new StealThreadPool(cpu_num);
     }
 }
 

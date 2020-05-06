@@ -6,13 +6,16 @@
  */
 
 #include <iostream>
-#include "../../Log.h"
-#include "../exception.h"
+#include <hikyuu/Log.h>
+#include <hikyuu/utilities/exception.h>
 #include "StealTaskGroup.h"
+#include "PyThreadStateLock.h"
 
 namespace hku {
 
 StealTaskGroup::StealTaskGroup(size_t groupSize) : m_currentRunnerId(0), m_done(false) {
+    HKU_CHECK(Py_IsInitialized(), "Python is not initialized!");
+    HKU_TRACE("StealTaskGroup::StealTaskGroup");
     m_runnerNum = (groupSize != 0) ? groupSize : std::thread::hardware_concurrency();
     m_runnerList.reserve(m_runnerNum);
 
@@ -27,6 +30,10 @@ StealTaskGroup::StealTaskGroup(size_t groupSize) : m_currentRunnerId(0), m_done(
     for (size_t i = 0; i < m_runnerNum; i++) {
         m_runnerList.push_back(std::make_shared<StealTaskRunner>(this, i));
     }
+
+    // py3.7 以后不需要调用
+    PyEval_InitThreads();
+    // PyEval_ReleaseThread(PyThreadState_Get());
 
     // 启动各个工作线程
     for (auto runnerIter = m_runnerList.begin(); runnerIter != m_runnerList.end(); ++runnerIter) {
@@ -58,6 +65,7 @@ StealTaskPtr StealTaskGroup::addTask(const StealTaskPtr& task, bool inMain) {
     if (!inMain && StealTaskRunner::m_local_queue) {
         StealTaskRunner::m_local_queue->push_front(task);
     } else {
+        HKU_INFO("StealTaskGroup::addTask in main");
         m_master_queue->push(task);
     }
 
@@ -69,6 +77,7 @@ void StealTaskGroup::join() {
         return;
     }
 
+    HKU_INFO("0--------------");
     // 向主任务队列插入“停止”任务
     std::vector<StealTaskPtr> stopTaskList;
     for (auto i = 0; i < m_runnerNum; i++) {
@@ -76,17 +85,21 @@ void StealTaskGroup::join() {
         m_master_queue->push(stopTask);
     }
 
-    // 等待“停止”任务被执行
-    for (auto& task : stopTaskList) {
-        task->join();
-    }
+    HKU_INFO("1--------------");
 
+    // 等待“停止”任务被执行
+    /*for (auto& task : stopTaskList) {
+        task->join();
+    }*/
+
+    HKU_INFO("2--------------");
     m_done = true;
 
     RunnerList::iterator runnerIter;
     for (runnerIter = m_runnerList.begin(); runnerIter != m_runnerList.end(); ++runnerIter) {
         (*runnerIter)->join();
     }
+    HKU_INFO("3--------------");
 }
 
 void StealTaskGroup::stop() {
@@ -115,7 +128,6 @@ void StealTaskGroup::taskJoinInMaster(const StealTaskPtr& waitingFor) {
         } else {
             stealInMaster(waitingFor);
         }
-        std::this_thread::yield();
     }
 }
 
@@ -136,11 +148,20 @@ void StealTaskGroup::stealInMaster(const StealTaskPtr& waitingFor) {
     size_t ran_num = std::rand() % total;
     for (size_t i = 0; i < total; i++) {
         if (waitingFor && waitingFor->done()) {
-            return;
+            break;
         }
 
         task = m_runner_queues[ran_num]->try_steal();
-        if (task && !task->done()) {
+        if (!task) {
+            HKU_WARN("task is nullptr!");
+            continue;
+        }
+
+        if (typeid(*task) == typeid(StopTask)) {
+            return;
+        }
+
+        if (!task->done()) {
             task->invoke();
             return;
         }

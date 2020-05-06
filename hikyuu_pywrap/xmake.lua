@@ -39,7 +39,9 @@ target("_hikyuu")
     else 
         set_filename("_hikyuu.so")
     end
+    add_cxflags("-wd4251")
     add_files("./*.cpp")
+    add_files("./task/*.cpp")
 
 target("_indicator")
     set_kind("shared")

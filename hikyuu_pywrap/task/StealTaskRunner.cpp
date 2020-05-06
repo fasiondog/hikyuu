@@ -11,9 +11,13 @@
 
 #include <functional>
 #include <iostream>
-#include "../../Log.h"
+#include <hikyuu/Log.h>
+
 #include "StealTaskRunner.h"
 #include "StealTaskGroup.h"
+#include "PyThreadStateLock.h"
+
+#include <boost/python.hpp>
 
 #define QUEUE_LOCK std::lock_guard<std::mutex> lock(m_queue_mutex);
 
@@ -34,6 +38,7 @@ StealTaskPtr StealTaskRunner::takeTaskFromLocal() {
 // 阻塞等待直至从主线程任务队列中获取到任务
 StealTaskPtr StealTaskRunner::takeTaskFromMasterAndWait() {
     return m_local_group->m_master_queue->wait_and_pop();
+    // return m_local_group->m_master_queue->try_pop();
 }
 
 // 尝试从其他子线程任务队列中偷取任务
@@ -61,7 +66,10 @@ void StealTaskRunner::start() {
  * 等待内部线程终止
  */
 void StealTaskRunner::join() {
+    HKU_INFO("StealTaskRunner::join");
     if (m_thread.joinable()) {
+        HKU_INFO("m_thread.joinable");
+        // PyEval_ReleaseThread(PyThreadState_Get());
         m_thread.join();
     }
 }
@@ -94,13 +102,26 @@ void StealTaskRunner::run() {
             // 如果本地和其他子线程任务队列中都无法获取任务，则等待并直至从主任务队列中获取任务
             if (!task) {
                 task = takeTaskFromMasterAndWait();
+                HKU_INFO("takeTaskFromMasterAndWait");
             }
 
-            if (task && !task->done()) {
-                task->invoke();
+            if (!task) {
+                HKU_INFO("task is nullptr!");
+                continue;
+            }
+
+            {
+                HKU_INFO("ready task->invoke");
+                // PyEval_ReleaseThread(PyThreadState_Get());
+                PyThreadStateLock pylock;
+                if (!task->done()) {
+                    HKU_INFO("task->invoke");
+                    task->invoke();
+                }
             }
             std::this_thread::yield();
         }
+
     } catch (std::exception& e) {
         HKU_ERROR(e.what());
     } catch (...) {
@@ -113,19 +134,24 @@ void StealTaskRunner::run() {
  * @param waitingFor - 等待结束的任务
  */
 void StealTaskRunner::taskJoin(const StealTaskPtr& waitingFor) {
-    while (waitingFor && !waitingFor->done()) {
-        // 如果获取的任务有效且任务未执行，则执行该任务;
-        // 否则从其他子线程任务队列中进行偷取
-        auto task = takeTaskFromLocal();
-        if (!task) {
-            task = takeTaskFromOther();
-        }
+    if (waitingFor) {
+        while (!waitingFor->done()) {
+                        // 如果获取的任务有效且任务未执行，则执行该任务;
+            // 否则从其他子线程任务队列中进行偷取
+            /*auto task = takeTaskFromLocal();
+            if (!task) {
+                task = takeTaskFromOther();
+            }
 
-        if (task && !task->done()) {
-            task->invoke();
-        }
+            {
+                PyThreadStateLock pylock;
+                if (task && !task->done()) {
+                    task->invoke();
+                }
+            }*/
 
-        std::this_thread::yield();
+            std::this_thread::yield();
+        }
     }
 }
 
