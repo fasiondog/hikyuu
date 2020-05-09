@@ -82,7 +82,7 @@ public:
         } else {
             m_master_work_queue.push(std::move(task));
         }
-        m_cv.notify_all();
+        m_cv.notify_one();
         return res;
     }
 
@@ -157,7 +157,6 @@ private:
         while (!m_thread_need_stop && !m_done) {
             run_pending_task();
         }
-        // fmt::print("thread ({}) finished!\n", std::this_thread::get_id());
     }
 
     void run_pending_task() {
