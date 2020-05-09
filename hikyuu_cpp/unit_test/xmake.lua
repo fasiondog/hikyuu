@@ -85,7 +85,6 @@ target("small-test")
     end
 
     -- add files
-    add_files("./hikyuu/utilities/test_TaskGroup.cpp");
     add_files("./hikyuu/utilities/test_ThreadPool.cpp");
     --add_files("./hikyuu/hikyuu/**.cpp");
     --add_files("./hikyuu/hikyuu/test_StockManager.cpp");
