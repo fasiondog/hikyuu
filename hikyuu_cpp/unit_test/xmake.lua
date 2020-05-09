@@ -23,6 +23,7 @@ target("unit-test")
         add_cxflags("-wd4251")
         add_cxflags("-wd4244")
         add_cxflags("-wd4805")
+        add_cxflags("-wd4566")
     else
         add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")
         add_cxflags("-Wno-sign-compare")
@@ -85,9 +86,7 @@ target("small-test")
     end
 
     -- add files
-    add_files("./hikyuu/utilities/test_ThreadPool.cpp");
-    --add_files("./hikyuu/hikyuu/**.cpp");
-    --add_files("./hikyuu/hikyuu/test_StockManager.cpp");
+    add_files("./hikyuu/hikyuu/**.cpp");
     add_files("./hikyuu/test_main.cpp")
     
 target_end()
