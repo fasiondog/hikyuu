@@ -23,9 +23,10 @@ MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_sta
     HKU_ASSERT_M(m_stmt != nullptr, "Failed mysql_stmt_init!");
     int ret = mysql_stmt_prepare(m_stmt, sql_statement.c_str(), sql_statement.size());
     if (ret != 0) {
+        std::string stmt_errorstr = mysql_stmt_error(m_stmt);
         mysql_stmt_close(m_stmt);
         m_stmt = nullptr;
-        HKU_THROW("Failed prepare statement! error: {} SQL: {}", mysql_stmt_error(m_stmt),
+        HKU_THROW("Failed prepare statement! error: {} SQL: {}", stmt_errorstr.c_str(),
                   sql_statement);
     }
 
@@ -35,7 +36,7 @@ MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_sta
         memset(m_param_bind.data(), 0, param_count * sizeof(MYSQL_BIND));
     }
 
-    MYSQL_RES* m_meta_result = mysql_stmt_result_metadata(m_stmt);
+    m_meta_result = mysql_stmt_result_metadata(m_stmt);
     if (m_meta_result) {
         int column_count = mysql_num_fields(m_meta_result);
         m_result_bind.resize(column_count);
