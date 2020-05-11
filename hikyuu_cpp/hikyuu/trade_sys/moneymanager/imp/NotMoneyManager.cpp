@@ -13,9 +13,9 @@ NotMoneyManager::NotMoneyManager() : MoneyManagerBase("MM_Nothing") {}
 
 NotMoneyManager::~NotMoneyManager() {}
 
-size_t NotMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
+double NotMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                        price_t risk, SystemPart from) {
-    return size_t(m_tm->currentCash() / price);
+    return m_tm->currentCash() / price;
 }
 
 MoneyManagerPtr HKU_API MM_Nothing() {

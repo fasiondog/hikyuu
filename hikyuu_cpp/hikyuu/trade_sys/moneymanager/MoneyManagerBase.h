@@ -91,9 +91,9 @@ public:
      * @param price 交易价格
      * @param risk 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
      * @param from 信号来源
-     * @note 默认实现返回Null<size_t>() 卖出全部; 多次减仓才需要实现该接口
+     * @note 默认实现返回 MAX_DOUBLE 卖出全部; 多次减仓才需要实现该接口
      */
-    size_t getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
+    double getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                          SystemPart from);
 
     /**
@@ -104,7 +104,7 @@ public:
      * @param from 信号来源
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
-    size_t getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+    double getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                               price_t risk, SystemPart from);
 
     /**
@@ -115,7 +115,7 @@ public:
      * @param from 信号来源
      * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
      */
-    size_t getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+    double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                              price_t risk, SystemPart from);
 
     /**
@@ -126,19 +126,19 @@ public:
      * @param from 信号来源
      * @param risk 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
      */
-    size_t getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
+    double getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                         SystemPart from);
 
-    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
+    virtual double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                  price_t risk, SystemPart from) = 0;
 
-    virtual size_t _getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
+    virtual double _getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                   price_t risk, SystemPart from);
 
-    virtual size_t _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+    virtual double _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                        price_t risk, SystemPart from);
 
-    virtual size_t _getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+    virtual double _getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                       price_t risk, SystemPart from);
 
     /** 子类复位接口 */
@@ -221,7 +221,7 @@ public:                                                                         
     virtual MoneyManagerPtr _clone() override {                                               \
         return MoneyManagerPtr(new classname());                                              \
     }                                                                                         \
-    virtual size_t _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, \
+    virtual double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, \
                                  price_t risk, SystemPart from) override;
 
 HKU_API std::ostream& operator<<(std::ostream&, const MoneyManagerBase&);

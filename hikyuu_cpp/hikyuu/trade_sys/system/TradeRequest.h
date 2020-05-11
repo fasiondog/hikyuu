@@ -28,7 +28,7 @@ public:
     Datetime datetime;
     price_t stoploss;
     price_t goal;
-    size_t number;  //计划的买入/卖出数量，使用发出请求时刻的收盘价，
+    double number;  //计划的买入/卖出数量，使用发出请求时刻的收盘价，
                     //用于避免实际买入时需用重新计算数量时，人工执行速度较慢
                     //可通过系统参数进行设置，是否使用
     SystemPart from;  //记录SystemBase::Part

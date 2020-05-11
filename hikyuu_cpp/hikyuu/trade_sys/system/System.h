@@ -186,10 +186,10 @@ public:
     //通知所有需要接收实际卖出交易记录的部件
     void _sellNotifyAll(const TradeRecord&);
 
-    size_t _getBuyNumber(const Datetime&, price_t price, price_t risk, Part from);
-    size_t _getSellNumber(const Datetime&, price_t price, price_t risk, Part from);
-    size_t _getSellShortNumber(const Datetime&, price_t price, price_t risk, Part from);
-    size_t _getBuyShortNumber(const Datetime&, price_t price, price_t risk, Part from);
+    double _getBuyNumber(const Datetime&, price_t price, price_t risk, Part from);
+    double _getSellNumber(const Datetime&, price_t price, price_t risk, Part from);
+    double _getSellShortNumber(const Datetime&, price_t price, price_t risk, Part from);
+    double _getBuyShortNumber(const Datetime&, price_t price, price_t risk, Part from);
 
     price_t _getStoplossPrice(const Datetime& datetime, price_t price);
     price_t _getShortStoplossPrice(const Datetime& datetime, price_t price);
@@ -365,22 +365,22 @@ inline bool System::_conditionIsValid(const Datetime& datetime) {
     return m_cn ? m_cn->isValid(datetime) : true;
 }
 
-inline size_t System ::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk,
+inline double System ::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk,
                                      Part from) {
     return m_mm ? m_mm->getBuyNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline size_t System ::_getSellNumber(const Datetime& datetime, price_t price, price_t risk,
+inline double System ::_getSellNumber(const Datetime& datetime, price_t price, price_t risk,
                                       Part from) {
     return m_mm ? m_mm->getSellNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline size_t System ::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk,
+inline double System ::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk,
                                            Part from) {
     return m_mm ? m_mm->getSellShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
-inline size_t System ::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk,
+inline double System ::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk,
                                           Part from) {
     return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk, from) : 0;
 }

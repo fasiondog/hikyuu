@@ -29,8 +29,8 @@ public:
         m_x = x;
     }
 
-    virtual size_t _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price, price_t risk,
-                                 SystemPart from) {
+    virtual double _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                 price_t risk, SystemPart from) {
         return 0;
     }
 
@@ -68,7 +68,8 @@ TEST_CASE("test_MoneyManager") {
     p->setTM(tm);
     CHECK_EQ(p_src->getTM(), tm);
     CHECK_EQ(p->getBuyNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL), 0);
-    CHECK_UNARY((p->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL) == Null<size_t>()));
+    CHECK_UNARY(
+      (p->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL) == MAX_DOUBLE));
     CHECK_EQ(p_src->getX(), 0);
     p_src->setX(10);
     CHECK_EQ(p_src->getX(), 10);

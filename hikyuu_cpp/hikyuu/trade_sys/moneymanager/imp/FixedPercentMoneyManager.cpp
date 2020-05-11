@@ -15,7 +15,7 @@ FixedPercentMoneyManager::FixedPercentMoneyManager() : MoneyManagerBase("MM_Fixe
 
 FixedPercentMoneyManager::~FixedPercentMoneyManager() {}
 
-size_t FixedPercentMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+double FixedPercentMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                                 price_t price, price_t risk, SystemPart from) {
     double p = getParam<double>("p");
     if (p <= 0.0 || p > 1.0) {
@@ -28,7 +28,7 @@ size_t FixedPercentMoneyManager ::_getBuyNumber(const Datetime& datetime, const 
         return 0;
     }
 
-    return int(m_tm->currentCash() * p / risk);
+    return m_tm->currentCash() * p / risk;
 }
 
 MoneyManagerPtr HKU_API MM_FixedPercent(double p) {

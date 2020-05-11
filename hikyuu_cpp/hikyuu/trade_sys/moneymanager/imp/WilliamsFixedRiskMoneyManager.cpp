@@ -17,7 +17,7 @@ WilliamsFixedRiskMoneyManager::WilliamsFixedRiskMoneyManager()
 
 WilliamsFixedRiskMoneyManager::~WilliamsFixedRiskMoneyManager() {}
 
-size_t WilliamsFixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+double WilliamsFixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                                      price_t price, price_t risk, SystemPart from) {
     price_t max_loss = getParam<price_t>("max_loss");
     if (max_loss <= 0.0) {

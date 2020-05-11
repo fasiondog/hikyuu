@@ -15,7 +15,7 @@ FixedCapitalMoneyManager::FixedCapitalMoneyManager() : MoneyManagerBase("MM_Fixe
 
 FixedCapitalMoneyManager::~FixedCapitalMoneyManager() {}
 
-size_t FixedCapitalMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+double FixedCapitalMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                                 price_t price, price_t risk, SystemPart from) {
     double capital = getParam<double>("capital");
     return capital > 0.0 ? size_t(m_tm->currentCash() / capital) : 0;

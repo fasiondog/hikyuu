@@ -15,7 +15,7 @@ FixedRiskMoneyManager::FixedRiskMoneyManager() : MoneyManagerBase("MM_FixedRisk"
 
 FixedRiskMoneyManager::~FixedRiskMoneyManager() {}
 
-size_t FixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+double FixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                              price_t price, price_t risk, SystemPart from) {
     return getParam<double>("risk") / risk;
 }

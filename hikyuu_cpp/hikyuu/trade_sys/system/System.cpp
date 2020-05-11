@@ -497,12 +497,12 @@ void System::_buyNow(const KRecord& today, Part from) {
     }
 
     //获取可买入数量
-    size_t number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
+    double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
     if (number == 0 || number > m_stock.maxTradeNumber()) {
         return;
     }
 
-    size_t min_num = m_stock.minTradeNumber();
+    double min_num = m_stock.minTradeNumber();
     if (min_num > 1) {
         number = number / min_num * min_num;
     }
@@ -532,7 +532,7 @@ void System::_buyDelay(const KRecord& today) {
 
     //计算止损价和可买入数量
     price_t stoploss = 0;
-    size_t number = 0;
+    double number = 0;
     price_t goalPrice = 0;
     if (getParam<bool>("delay_use_current_price")) {
         //使用当前计划价格计算止损价和可买入数量
@@ -552,7 +552,7 @@ void System::_buyDelay(const KRecord& today) {
         return;
     }
 
-    size_t min_num = m_stock.minTradeNumber();
+    double min_num = m_stock.minTradeNumber();
     if (min_num > 1) {
         number = number / min_num * min_num;
     }
@@ -611,7 +611,7 @@ void System::_sell(const KRecord& today, Part from) {
 void System::_sellNow(const KRecord& today, Part from) {
     price_t planPrice = today.closePrice;
 
-    size_t number = 0;
+    double number = 0;
 
     //计算新的止损价
     price_t stoploss = _getStoplossPrice(today.datetime, planPrice);
@@ -659,7 +659,7 @@ void System::_sellDelay(const KRecord& today) {
 
     //发出卖出请求时刻的止损价
     price_t stoploss = 0.0;
-    size_t number = 0;
+    double number = 0;
     price_t goalPrice = 0.0;
 
     Part from = m_sellRequest.from;
@@ -753,7 +753,7 @@ void System::_buyShortNow(const KRecord& today, Part from) {
     price_t stoploss = _getShortStoplossPrice(m_buyRequest.datetime, planPrice);
 
     //确定数量
-    size_t number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
+    double number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
     if (number == 0) {
         m_buyShortRequest.clear();
         return;
@@ -797,7 +797,7 @@ void System::_buyShortDelay(const KRecord& today) {
     price_t planPrice = today.openPrice;  //取当前时刻的收盘价
 
     price_t stoploss = 0.0;
-    size_t number = 0;
+    double number = 0;
     price_t goalPrice = 0.0;
     if (getParam<bool>("delay_use_current_price")) {
         //取当前时刻的收盘价对应的止损价
@@ -894,7 +894,7 @@ void System::_sellShortNow(const KRecord& today, Part from) {
     //计算止损价
     price_t stoploss = _getShortStoplossPrice(today.datetime, planPrice);
 
-    size_t number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
+    double number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
     if (number == 0) {
         m_sellShortRequest.clear();
         return;
@@ -927,7 +927,7 @@ void System::_sellShortDelay(const KRecord& today) {
 
     //发出卖出请求时刻的止损价
     price_t stoploss = 0.0;
-    size_t number = 0;
+    double number = 0;
     price_t goalPrice = 0.0;
     if (getParam<bool>("delay_use_current_price")) {
         stoploss = _getShortStoplossPrice(today.datetime, planPrice);

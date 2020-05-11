@@ -28,7 +28,7 @@ MoneyManagerPtr FixedRatioMoneyManager::_clone() {
     return MoneyManagerPtr(p);
 }
 
-size_t FixedRatioMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+double FixedRatioMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                               price_t price, price_t risk, SystemPart from) {
     double delta = getParam<double>("delta");
     if (m_pre_cash == 0.0) {
