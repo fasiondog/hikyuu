@@ -11,18 +11,18 @@
 namespace hku {
 
 PositionRecord::PositionRecord()
-: number(0),
+: number(0.0),
   stoploss(0.0),
   goalPrice(0.0),
-  totalNumber(0),
+  totalNumber(0.0),
   buyMoney(0.0),
   totalCost(0.0),
   totalRisk(0.0),
   sellMoney(0.0) {}
 
 PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
-                               const Datetime& cleanDatetime, size_t number, price_t stoploss,
-                               price_t goalPrice, size_t totalNumber, price_t totalMoney,
+                               const Datetime& cleanDatetime, double number, price_t stoploss,
+                               price_t goalPrice, double totalNumber, price_t totalMoney,
                                price_t totalCost, price_t totalRisk, price_t sellMoney)
 : stock(stock),
   takeDatetime(takeDatetime),
@@ -101,10 +101,11 @@ string PositionRecord::toString() const {
 
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
     if (d1.stock == d2.stock && d1.takeDatetime == d2.takeDatetime &&
-        d1.cleanDatetime == d2.cleanDatetime && d1.number == d2.number &&
+        d1.cleanDatetime == d2.cleanDatetime && fabs(d1.number - d2.number) < 0.00001 &&
         fabs(d1.stoploss - d2.stoploss) < 0.0001 && fabs(d1.goalPrice - d2.goalPrice) < 0.0001 &&
-        d1.totalNumber == d2.totalNumber && fabs(d1.buyMoney - d2.buyMoney) < 0.0001 &&
-        fabs(d1.totalCost - d2.totalCost) < 0.0001 && fabs(d1.sellMoney - d2.sellMoney) < 0.0001) {
+        fabs(d1.totalNumber - d2.totalNumber) < 0.00001 &&
+        fabs(d1.buyMoney - d2.buyMoney) < 0.0001 && fabs(d1.totalCost - d2.totalCost) < 0.0001 &&
+        fabs(d1.sellMoney - d2.sellMoney) < 0.0001) {
         return true;
     }
     return false;

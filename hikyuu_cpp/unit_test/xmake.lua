@@ -86,7 +86,8 @@ target("small-test")
     end
 
     -- add files
-    add_files("./hikyuu/hikyuu/**.cpp");
+    --add_files("./hikyuu/hikyuu/**.cpp");
+    add_files(("./hikyuu/trade_manage/test_TradeManager.cpp"))
     add_files("./hikyuu/test_main.cpp")
     
 target_end()

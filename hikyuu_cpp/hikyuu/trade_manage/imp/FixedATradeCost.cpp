@@ -32,7 +32,7 @@ FixedATradeCost::FixedATradeCost(price_t commission, price_t lowestCommission, p
 FixedATradeCost::~FixedATradeCost() {}
 
 CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                       size_t num) const {
+                                       double num) const {
     CostRecord result;
     if (stock.isNull()) {
         HKU_WARN("Stock is Null!");
@@ -58,7 +58,7 @@ CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& st
 }
 
 CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                        size_t num) const {
+                                        double num) const {
     CostRecord result;
     if (stock.isNull()) {
         HKU_WARN("Stock is NULL!");

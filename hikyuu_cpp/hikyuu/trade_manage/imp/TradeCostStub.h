@@ -22,12 +22,12 @@ public:
     virtual ~TradeCostStub() {}
 
     virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  size_t num) const override {
+                                  double num) const override {
         return CostRecord(0, 0, 0, 10, 10);
     }
 
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                   size_t num) const override {
+                                   double num) const override {
         return CostRecord(0, 0, 0, 20, 20);
     }
 
@@ -42,13 +42,13 @@ public:
     }
 
     virtual CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock,
-                                          price_t price, size_t num) const override {
+                                          price_t price, double num) const override {
         return CostRecord(0, 0, 0, 50, 50);
     }
 
     virtual CostRecord getReturnStockCost(const Datetime& borrow_datetime,
                                           const Datetime& return_datetime, const Stock& stock,
-                                          price_t price, size_t num) const override {
+                                          price_t price, double num) const override {
         return CostRecord(0, 0, 0, 60, 60);
     }
 

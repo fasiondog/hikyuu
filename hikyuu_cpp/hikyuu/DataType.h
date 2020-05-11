@@ -76,6 +76,10 @@ typedef char int8;
 typedef unsigned char uint8;
 #endif
 
+#ifndef MAX_DOUBLE
+#define MAX_DOUBLE std::numeric_limits<double>::max()
+#endif
+
 typedef double price_t;
 
 using std::string;

@@ -17,7 +17,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const BorrowRecord& bor) {
 
 BorrowRecord::BorrowRecord() : number(0), value(0.0) {}
 
-BorrowRecord ::BorrowRecord(const Stock& stock, size_t number, price_t value)
+BorrowRecord ::BorrowRecord(const Stock& stock, double number, price_t value)
 : stock(stock), number(number), value(value) {}
 
 } /* namespace hku */

@@ -28,7 +28,8 @@ TEST_CASE("test_TradeManager_init") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
-    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    TradeManagerPtr tm =
+      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
 
     CHECK_EQ(tm->name(), "TEST");
     CHECK_EQ(tm->initCash(), 100000.0);
@@ -41,8 +42,9 @@ TEST_CASE("test_TradeManager_init") {
     CHECK_EQ(tm->getHoldNumber(Datetime(199901010000), stock), 0);
     const TradeRecordList& tradeList = tm->getTradeList();
     CHECK_EQ(tradeList.size(), 1);
-    CHECK_EQ(tradeList[0], TradeRecord(Null<Stock>(), Datetime(199901010000), BUSINESS_INIT, 100000.0, 100000.0, 0.0, 0,
-                                       Null<CostRecord>(), 0.0, 100000.0, PART_INVALID));
+    CHECK_EQ(tradeList[0],
+             TradeRecord(Null<Stock>(), Datetime(199901010000), BUSINESS_INIT, 100000.0, 100000.0,
+                         0.0, 0, Null<CostRecord>(), 0.0, 100000.0, PART_INVALID));
     CHECK_EQ(tm->getPositionList().empty(), true);
     CHECK_EQ(tm->getPosition(stock), Null<PositionRecord>());
 
@@ -55,7 +57,8 @@ TEST_CASE("test_TradeManager_getBuyCost") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
-    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    TradeManagerPtr tm =
+      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
 
     /** @arg 调用CostFunc是否正常 */
     result = tm->getBuyCost(Datetime(200101010000), stock, 10.0, 1000);
@@ -71,7 +74,8 @@ TEST_CASE("test_TradeManager_getSellCost") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600004");
     CostRecord result, expect;
-    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0));
+    TradeManagerPtr tm =
+      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0));
 
     /** @arg 调用CostFunc是否正常 */
     result = tm->getSellCost(Datetime(200101010000), stock, 10.0, 100);
@@ -125,8 +129,8 @@ TEST_CASE("test_TradeManager_can_not_buy") {
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0, 27.18, 27.18);
     cost = tm->getBuyCost(Datetime(199911170000), stock, 27.18, 100);
-    trade = TradeRecord(stock, Datetime(199911170000), BUSINESS_BUY, 27.18, 27.18, 27.18, 100, cost, 0.0,
-                        100000 - cost.total - 27.18 * 100, PART_INVALID);
+    trade = TradeRecord(stock, Datetime(199911170000), BUSINESS_BUY, 27.18, 27.18, 27.18, 100, cost,
+                        0.0, 100000 - cost.total - 27.18 * 100, PART_INVALID);
     CHECK_EQ(result, trade);
     CHECK_EQ(tm->cash(Datetime(199911170000)), trade.cash);
     trade_list = tm->getTradeList();
@@ -144,8 +148,8 @@ TEST_CASE("test_TradeManager_can_not_buy") {
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911160000), stock, 26.48, 100, 0, 26.48, 26.48);
     cost = tm->getBuyCost(Datetime(199911160000), stock, 26.48, 100);
-    CHECK_EQ(result, TradeRecord(stock, Datetime(199911160000), BUSINESS_BUY, 26.48, 26.48, 26.48, 100, cost, 0.0,
-                                 100000 - cost.total - 26.48 * 100, PART_INVALID));
+    CHECK_EQ(result, TradeRecord(stock, Datetime(199911160000), BUSINESS_BUY, 26.48, 26.48, 26.48,
+                                 100, cost, 0.0, 100000 - cost.total - 26.48 * 100, PART_INVALID));
 
     /** @arg 试图在最后一笔交易时间之前进行交易 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
@@ -161,12 +165,14 @@ TEST_CASE("test_TradeManager_can_not_buy") {
 
     /** @arg 买入数量小于该股票的最小交易量 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
-    result = tm->buy(Datetime(199911170000), stock, 26.48, stock.minTradeNumber() - 1, 0, 26.48, 26.48);
+    result =
+      tm->buy(Datetime(199911170000), stock, 26.48, stock.minTradeNumber() - 1, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 买入数量大于该股票的最大交易量 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
-    result = tm->buy(Datetime(199911170000), stock, 26.48, stock.maxTradeNumber() - 1, 0, 26.48, 26.48);
+    result =
+      tm->buy(Datetime(199911170000), stock, 26.48, stock.maxTradeNumber() - 1, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 }
 
@@ -236,15 +242,16 @@ TEST_CASE("test_TradeManager_can_not_sell") {
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0, 27.18, 27.18);
     cost = tm->getBuyCost(Datetime(199911170000), stock, 27.18, 100);
-    CHECK_EQ(result, TradeRecord(stock, Datetime(199911170000), BUSINESS_BUY, 27.18, 27.18, 27.18, 100, cost, 0.0,
-                                 100000 - cost.total - 27.18 * 100, PART_INVALID));
+    CHECK_EQ(result, TradeRecord(stock, Datetime(199911170000), BUSINESS_BUY, 27.18, 27.18, 27.18,
+                                 100, cost, 0.0, 100000 - cost.total - 27.18 * 100, PART_INVALID));
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     CHECK_EQ(tm->getStockNumber(), 1);
     CHECK_EQ(tm->cash(Datetime(199911170000)), 97276.0);
-    result = tm->sell(Datetime(199911180000), stock, 26.36, Null<size_t>(), 0, 0, 26.36);
+    result = tm->sell(Datetime(199911180000), stock, 26.36, std::numeric_limits<double>::max(), 0,
+                      0, 26.36);
     cost = tm->getSellCost(Datetime(199911180000), stock, 26.36, 100);
-    CHECK_EQ(result, TradeRecord(stock, Datetime(199911180000), BUSINESS_SELL, 26.36, 26.36, 0.0, 100, cost, 0.0,
-                                 99903.36, PART_INVALID));
+    CHECK_EQ(result, TradeRecord(stock, Datetime(199911180000), BUSINESS_SELL, 26.36, 26.36, 0.0,
+                                 100, cost, 0.0, 99903.36, PART_INVALID));
     CHECK_EQ(tm->getHoldNumber(Datetime(199911180000), stock), 0);
     CHECK_EQ(tm->getStockNumber(), 0);
     CHECK_EQ(tm->cash(Datetime(199911180000)), 99903.36);
@@ -257,7 +264,7 @@ TEST_CASE("test_TradeManager_can_not_sell") {
     tm->sell(Datetime(200605150000), stock, 10.2, 100);
     CHECK_EQ(tm->cash(Datetime(200605150000)), 974685);  // 973840);
     CHECK_EQ(tm->getHoldNumber(Datetime(200605160000), stock), 1850);
-    tm->sell(Datetime(200612010000), stock, 16.87, Null<size_t>());
+    tm->sell(Datetime(200612010000), stock, 16.87, std::numeric_limits<double>::max());
     CHECK_EQ(tm->cash(Datetime(200612010000)), 1006135.0);  // 1005049.5);
 }
 
@@ -726,8 +733,8 @@ TEST_CASE("test_TradeManager_trade_no_rights_by_day") {
     next_date = Datetime(199911180000);
     trade = tm->buy(cur_date, stock, 27.18, 1000, 27.0, 27.18, 27.18);
     cost = tc->getBuyCost(cur_date, stock, 27.18, 1000);
-    CHECK_EQ(trade,
-             TradeRecord(stock, cur_date, BUSINESS_BUY, 27.18, 27.18, 27.18, 1000, cost, 27.0, 72810, PART_INVALID));
+    CHECK_EQ(trade, TradeRecord(stock, cur_date, BUSINESS_BUY, 27.18, 27.18, 27.18, 1000, cost,
+                                27.0, 72810, PART_INVALID));
     CHECK_EQ(tm->firstDatetime(), cur_date);
     CHECK_EQ(tm->lastDatetime(), cur_date);
     CHECK_LT(std::fabs(tm->cash(cur_date) - 72810), 0.001);
@@ -752,8 +759,8 @@ TEST_CASE("test_TradeManager_trade_no_rights_by_day") {
     next_date = Datetime(200007060000);
     trade = tm->buy(cur_date, stock, 23.24, 1000, 23.11, 23.25, 23.23);
     cost = tc->getBuyCost(cur_date, stock, 23.24, 1000);
-    CHECK_EQ(trade,
-             TradeRecord(stock, cur_date, BUSINESS_BUY, 23.23, 23.24, 23.25, 1000, cost, 23.11, 49560, PART_INVALID));
+    CHECK_EQ(trade, TradeRecord(stock, cur_date, BUSINESS_BUY, 23.23, 23.24, 23.25, 1000, cost,
+                                23.11, 49560, PART_INVALID));
     CHECK_EQ(tm->lastDatetime(), cur_date);
     CHECK_LT(std::fabs(tm->cash(cur_date) - 49560), 0.001);
     CHECK_EQ(tm->have(stock), true);
@@ -777,8 +784,8 @@ TEST_CASE("test_TradeManager_trade_no_rights_by_day") {
     next_date = Datetime(200007060000);
     trade = tm->buy(cur_date, stock2, 17.73, 500, 17.56, 18.0, 17.70);
     cost = tc->getBuyCost(cur_date, stock2, 17.73, 500);
-    CHECK_EQ(trade,
-             TradeRecord(stock2, cur_date, BUSINESS_BUY, 17.70, 17.73, 18.0, 500, cost, 17.56, 40685, PART_INVALID));
+    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_BUY, 17.70, 17.73, 18.0, 500, cost,
+                                17.56, 40685, PART_INVALID));
     CHECK_EQ(tm->lastDatetime(), cur_date);
     CHECK_LT(std::fabs(tm->cash(cur_date) - 40685), 0.001);
     CHECK_EQ(tm->have(stock2), true);
@@ -804,8 +811,8 @@ TEST_CASE("test_TradeManager_trade_no_rights_by_day") {
     next_date = Datetime(200007060000);
     trade = tm->buy(cur_date, stock2, 17.61, 300, 17.50, 17.62, 17.60);
     cost = tc->getBuyCost(cur_date, stock2, 17.61, 300);
-    CHECK_EQ(trade,
-             TradeRecord(stock2, cur_date, BUSINESS_BUY, 17.60, 17.61, 17.62, 300, cost, 17.50, 35392, PART_INVALID));
+    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_BUY, 17.60, 17.61, 17.62, 300, cost,
+                                17.50, 35392, PART_INVALID));
     CHECK_EQ(tm->lastDatetime(), cur_date);
     CHECK_LT(std::fabs(tm->cash(cur_date) - 35392), 0.001);
     CHECK_EQ(tm->have(stock2), true);
@@ -1032,8 +1039,8 @@ TEST_CASE("test_TradeManager_trade_no_rights_by_day") {
     next_date = Datetime(200007140000);
     trade = tm->buy(cur_date, stock2, 18.2, 300, 17.50, 19.62, 18.20);
     cost = tc->getBuyCost(cur_date, stock2, 18.2, 300);
-    CHECK_EQ(trade,
-             TradeRecord(stock2, cur_date, BUSINESS_BUY, 18.2, 18.2, 19.62, 300, cost, 17.50, 139622, PART_INVALID));
+    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_BUY, 18.2, 18.2, 19.62, 300, cost, 17.50,
+                                139622, PART_INVALID));
     CHECK_EQ(tm->lastDatetime(), cur_date);
     CHECK_LT(std::fabs(tm->cash(cur_date) - 139622), 0.001);
     CHECK_EQ(tm->have(stock), false);
@@ -1225,37 +1232,37 @@ TEST_CASE("test_getTradeList") {
     /** @arg 获取全部交易记录 */
     TradeRecordList tr_list = tm->getTradeList();
     CHECK_EQ(tr_list.size(), 8);
-    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000, 100000, 0, 0, cost, 0,
-                                     100000, PART_INVALID));
-    CHECK_EQ(tr_list[7],
-             TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200, cost, 0, 90142.50, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000,
+                                     100000, 0, 0, cost, 0, 100000, PART_INVALID));
+    CHECK_EQ(tr_list[7], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
+                                     cost, 0, 90142.50, PART_INVALID));
 
     /** @arg 指定日期范围获取交易记录 start 等于账户建立日期，end 为  Null<Datetime>() */
     tr_list = tm->getTradeList(Datetime(199305010000), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 8);
-    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000, 100000, 0, 0, cost, 0,
-                                     100000, PART_INVALID));
-    CHECK_EQ(tr_list[7],
-             TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200, cost, 0, 90142.50, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000,
+                                     100000, 0, 0, cost, 0, 100000, PART_INVALID));
+    CHECK_EQ(tr_list[7], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
+                                     cost, 0, 90142.50, PART_INVALID));
 
     /** @arg 指定日期范围获取交易记录 start 等于第一条买入记录日期，end为Null */
     tr_list = tm->getTradeList(Datetime(199305200000L), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 7);
-    CHECK_EQ(tr_list[0],
-             TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0, 55.70, 0, 100, cost, 0, 94430, PART_INVALID));
-    CHECK_EQ(tr_list[6],
-             TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200, cost, 0, 90142.50, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0, 55.70, 0, 100,
+                                     cost, 0, 94430, PART_INVALID));
+    CHECK_EQ(tr_list[6], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
+                                     cost, 0, 90142.50, PART_INVALID));
 
     /** @arg 指定日期范围获取交易记录 start 介于两个交易记录日期之间，end为Null */
     tr_list = tm->getTradeList(Datetime(199305210000L), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 6);
-    CHECK_EQ(tr_list[0],
-             TradeRecord(stk, Datetime(199305240000L), BUSINESS_BONUS, 30, 30, 0, 0, cost, 0, 94490, PART_INVALID));
-    CHECK_EQ(tr_list[5],
-             TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200, cost, 0, 90142.50, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(stk, Datetime(199305240000L), BUSINESS_BONUS, 30, 30, 0, 0,
+                                     cost, 0, 94490, PART_INVALID));
+    CHECK_EQ(tr_list[5], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
+                                     cost, 0, 90142.50, PART_INVALID));
 
     /** @arg 指定日期范围获取交易记录 start 大于 end */
     tr_list = tm->getTradeList(Null<Datetime>(), Datetime(199305210000L));
@@ -1269,19 +1276,19 @@ TEST_CASE("test_getTradeList") {
     tr_list = tm->getTradeList(Datetime(199305200000L), Datetime(199407120000L));
 
     CHECK_EQ(tr_list.size(), 7);
-    CHECK_EQ(tr_list[0],
-             TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0, 55.70, 0, 100, cost, 0, 94430, PART_INVALID));
-    CHECK_EQ(tr_list[6],
-             TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200, cost, 0, 90142.50, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0, 55.70, 0, 100,
+                                     cost, 0, 94430, PART_INVALID));
+    CHECK_EQ(tr_list[6], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
+                                     cost, 0, 90142.50, PART_INVALID));
 
     /** @arg 指定日期范围获取交易记录 start等于某交易记录日期，end等于最后一条交易记录日期 */
     tr_list = tm->getTradeList(Datetime(199305200000L), Datetime(199407110000L));
 
     CHECK_EQ(tr_list.size(), 4);
-    CHECK_EQ(tr_list[0],
-             TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0, 55.70, 0, 100, cost, 0, 94430, PART_INVALID));
-    CHECK_EQ(tr_list[3],
-             TradeRecord(stk, Datetime(199305250000L), BUSINESS_BUY, 0, 27.5, 0, 100, cost, 0, 91710, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0, 55.70, 0, 100,
+                                     cost, 0, 94430, PART_INVALID));
+    CHECK_EQ(tr_list[3], TradeRecord(stk, Datetime(199305250000L), BUSINESS_BUY, 0, 27.5, 0, 100,
+                                     cost, 0, 91710, PART_INVALID));
 }
 
 /** @par 检测点, 测试addTradeRecord */
@@ -1301,11 +1308,11 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
     /** @arg 加入账户初始化交易记录 */
     TradeRecordList tr_list = tm->getTradeList();
     CHECK_EQ(tr_list.size(), 8);
-    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000, 100000, 0, 0, cost, 0,
-                                     100000, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000,
+                                     100000, 0, 0, cost, 0, 100000, PART_INVALID));
 
-    TradeRecord tr(Stock(), Datetime(199201010000L), BUSINESS_INIT, 200000, 200000, 0, 0, cost, 0, 200000,
-                   PART_INVALID);
+    TradeRecord tr(Stock(), Datetime(199201010000L), BUSINESS_INIT, 200000, 200000, 0, 0, cost, 0,
+                   200000, PART_INVALID);
     tm->addTradeRecord(tr);
 
     tr_list = tm->getTradeList();
@@ -1335,10 +1342,10 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
 
     tr_list = tm2->getTradeList();
     CHECK_EQ(tr_list.size(), 8);
-    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000, 100000, 0, 0, cost, 0,
-                                     100000, PART_INVALID));
-    CHECK_EQ(tr_list[7],
-             TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200, cost, 0, 90142.50, PART_INVALID));
+    CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000,
+                                     100000, 0, 0, cost, 0, 100000, PART_INVALID));
+    CHECK_EQ(tr_list[7], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
+                                     cost, 0, 90142.50, PART_INVALID));
 }
 
 /** @} */

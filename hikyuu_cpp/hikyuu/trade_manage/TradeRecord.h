@@ -60,7 +60,7 @@ class HKU_API TradeRecord {
 public:
     TradeRecord();
     TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business, price_t planPrice,
-                price_t realPrice, price_t goalPrice, size_t number, const CostRecord& cost,
+                price_t realPrice, price_t goalPrice, double number, const CostRecord& cost,
                 price_t stoploss, price_t cash, SystemPart from);
 
     /** 仅用于python的__str__ */
@@ -72,7 +72,7 @@ public:
     price_t planPrice;  ///< 计划交易价格
     price_t realPrice;  ///< 实际交易价格
     price_t goalPrice;  ///< 目标价位，如果为0表示未限定目标
-    size_t number;      ///< 成交数量
+    double number;      ///< 成交数量
     CostRecord cost;    ///< 交易成本
     price_t stoploss;   ///< 止损价
     price_t cash;       ///< 现金余额

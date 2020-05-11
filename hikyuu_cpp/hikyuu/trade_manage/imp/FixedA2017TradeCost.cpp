@@ -20,7 +20,7 @@ FixedA2017TradeCost::FixedA2017TradeCost() : TradeCostBase("TC_FixedA2017") {
 FixedA2017TradeCost::~FixedA2017TradeCost() {}
 
 CostRecord FixedA2017TradeCost::getBuyCost(const Datetime& datetime, const Stock& stock,
-                                           price_t price, size_t num) const {
+                                           price_t price, double num) const {
     CostRecord result;
     if (stock.isNull()) {
         HKU_WARN("Stock is Null!");
@@ -42,7 +42,7 @@ CostRecord FixedA2017TradeCost::getBuyCost(const Datetime& datetime, const Stock
 }
 
 CostRecord FixedA2017TradeCost::getSellCost(const Datetime& datetime, const Stock& stock,
-                                            price_t price, size_t num) const {
+                                            price_t price, double num) const {
     CostRecord result;
     if (stock.isNull()) {
         HKU_WARN("Stock is NULL!");

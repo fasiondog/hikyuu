@@ -236,10 +236,10 @@ Datetime TradeManager::firstDatetime() const {
     return result;
 }
 
-size_t TradeManager ::getHoldNumber(const Datetime& datetime, const Stock& stock) {
+double TradeManager ::getHoldNumber(const Datetime& datetime, const Stock& stock) {
     //日期小于账户建立日期，返回0
     if (datetime < m_init_datetime) {
-        return 0;
+        return 0.0;
     }
 
     //根据权息信息调整持仓数量
@@ -251,11 +251,11 @@ size_t TradeManager ::getHoldNumber(const Datetime& datetime, const Stock& stock
         if (pos_iter != m_position.end()) {
             return pos_iter->second.number;
         }
-        return 0;
+        return 0.0;
     }
 
     //在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
-    size_t number = 0;
+    double number = 0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {
         //交易记录中的交易日期已经大于查询日期，则跳出循环
@@ -280,7 +280,7 @@ size_t TradeManager ::getHoldNumber(const Datetime& datetime, const Stock& stock
     return number;
 }
 
-size_t TradeManager ::getShortHoldNumber(const Datetime& datetime, const Stock& stock) {
+double TradeManager ::getShortHoldNumber(const Datetime& datetime, const Stock& stock) {
     //日期小于账户建立日期，返回0
     if (datetime < m_init_datetime) {
         return 0;
@@ -299,7 +299,7 @@ size_t TradeManager ::getShortHoldNumber(const Datetime& datetime, const Stock& 
     }
 
     //在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
-    size_t number = 0;
+    double number = 0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {
         //交易记录中的交易日期已经大于查询日期，则跳出循环
@@ -322,7 +322,7 @@ size_t TradeManager ::getShortHoldNumber(const Datetime& datetime, const Stock& 
     return number;
 }
 
-size_t TradeManager ::getDebtNumber(const Datetime& datetime, const Stock& stock) {
+double TradeManager ::getDebtNumber(const Datetime& datetime, const Stock& stock) {
     if (datetime < m_init_datetime) {
         return 0;
     }
@@ -339,7 +339,7 @@ size_t TradeManager ::getDebtNumber(const Datetime& datetime, const Stock& stock
         return 0;
     }
 
-    size_t debt_n = 0;
+    double debt_n = 0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {
         if (iter->datetime > datetime) {
@@ -518,7 +518,7 @@ bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
 }
 
 bool TradeManager ::checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
-                                 size_t number) {
+                                 double number) {
     if (stock.isNull()) {
         HKU_ERROR("{} Try checkin Null stock!", datetime);
         return false;
@@ -572,7 +572,7 @@ bool TradeManager ::checkinStock(const Datetime& datetime, const Stock& stock, p
 }
 
 bool TradeManager ::checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
-                                  size_t number) {
+                                  double number) {
     if (stock.isNull()) {
         HKU_ERROR("{} Try checkout Null stock!", datetime);
         return false;
@@ -742,7 +742,7 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
 }
 
 bool TradeManager ::borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
-                                size_t number) {
+                                double number) {
     if (stock.isNull()) {
         HKU_ERROR("{} Try checkin Null stock!", datetime);
         return false;
@@ -798,7 +798,7 @@ bool TradeManager ::borrowStock(const Datetime& datetime, const Stock& stock, pr
 }
 
 bool TradeManager ::returnStock(const Datetime& datetime, const Stock& stock, price_t price,
-                                size_t number) {
+                                double number) {
     if (stock.isNull()) {
         HKU_ERROR("{} Try checkout Null stock!", datetime);
         return false;
@@ -843,7 +843,7 @@ bool TradeManager ::returnStock(const Datetime& datetime, const Stock& stock, pr
     int precision = getParam<int>("precision");
     CostRecord cost, cur_cost;
     price_t market_value = 0.0;
-    size_t remain_num = number;
+    double remain_num = number;
     list<BorrowRecord::Data>::iterator iter = bor.record_list.begin();
     for (; iter != bor.record_list.end(); ++iter) {
         if (remain_num <= iter->number) {
@@ -900,7 +900,7 @@ bool TradeManager ::returnStock(const Datetime& datetime, const Stock& stock, pr
 }
 
 TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                              size_t number, price_t stoploss, price_t goalPrice, price_t planPrice,
+                              double number, price_t stoploss, price_t goalPrice, price_t planPrice,
                               SystemPart from) {
     TradeRecord result;
     result.business = INVALID_BUSINESS;
@@ -1027,8 +1027,9 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 }
 
 TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                               size_t number, price_t stoploss, price_t goalPrice,
+                               double number, price_t stoploss, price_t goalPrice,
                                price_t planPrice, SystemPart from) {
+    HKU_CHECK(!std::isnan(number), "sell number should be a valid double!");
     TradeRecord result;
 
     if (stock.isNull()) {
@@ -1047,14 +1048,14 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
         return result;
     }
 
-    //对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=Null<size_t>()的方式全仓卖出
+    //对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
     if (number < stock.minTradeNumber()) {
         HKU_ERROR("{} {} Sell number({}) must be >= minTradeNumber({})!", datetime,
                   stock.market_code(), number, stock.minTradeNumber());
         return result;
     }
 
-    if (number != Null<size_t>() && number > stock.maxTradeNumber()) {
+    if (number != MAX_DOUBLE && number > stock.maxTradeNumber()) {
         HKU_ERROR("{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
                   stock.market_code(), number, stock.maxTradeNumber());
         return result;
@@ -1073,9 +1074,8 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     PositionRecord& position = pos_iter->second;
 
-    //调整欲卖出的数量，如果卖出数量等于Null<size_t>()，则表示卖出全部
-    size_t real_number = (number == Null<size_t>()) ? position.number : number;
-
+    //调整欲卖出的数量，如果卖出数量等于MAX_DOUBLE，则表示卖出全部
+    double real_number = number == MAX_DOUBLE ? position.number : number;
     if (position.number < real_number) {
         //欲卖出的数量大于当前持仓的数量
         HKU_ERROR("{} {} Try to sell number({}) > number of position({})!", datetime,
@@ -1131,7 +1131,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 }
 
 TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                                    size_t number, price_t stoploss, price_t goalPrice,
+                                    double number, price_t stoploss, price_t goalPrice,
                                     price_t planPrice, SystemPart from) {
     TradeRecord result;
     result.business = INVALID_BUSINESS;
@@ -1194,8 +1194,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         return result;
     }
 
-    size_t total_borrow_num = bor_iter->second.number;
-    size_t can_sell_num = 0;
+    double total_borrow_num = bor_iter->second.number;
+    double can_sell_num = 0;
     position_map_type::iterator pos_iter = m_short_position.find(stock.id());
     if (pos_iter == m_short_position.end()) {
         //借入的股票并未卖出过
@@ -1213,7 +1213,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     }
 
     //如果计划卖出的数量大于可卖出的数量，则已可每卖出的数量卖出
-    size_t sell_num = number;
+    double sell_num = number;
     if (number > can_sell_num) {
         sell_num = can_sell_num;
     }
@@ -1253,7 +1253,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 }
 
 TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                                   size_t number, price_t stoploss, price_t goalPrice,
+                                   double number, price_t stoploss, price_t goalPrice,
                                    price_t planPrice, SystemPart from) {
     TradeRecord result;
 
@@ -1279,7 +1279,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
         return result;
     }
 
-    if (number != Null<size_t>() && number > stock.maxTradeNumber()) {
+    if (number != MAX_DOUBLE && number > stock.maxTradeNumber()) {
         HKU_ERROR("{} {} buyShort number({}) must be <= maxTradeNumber({})!", datetime,
                   stock.market_code(), number, stock.maxTradeNumber());
         return result;
@@ -1297,9 +1297,9 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 
     PositionRecord& position = pos_iter->second;
 
-    //调整欲买入的数量，如果买入数量等于Null<size_t>()或者大于实际仓位，则表示全部买入
-    size_t real_number =
-      (number == Null<size_t>() || number > position.number) ? position.number : number;
+    //调整欲买入的数量，如果买入数量等于MAX_DOUBLE或者大于实际仓位，则表示全部买入
+    double real_number =
+      (number == MAX_DOUBLE || number > position.number) ? position.number : number;
 
     CostRecord cost = getBuyCost(datetime, stock, realPrice, real_number);
 

@@ -93,13 +93,13 @@ TradeRecord::TradeRecord()
   planPrice(0.0),
   realPrice(0.0),
   goalPrice(0.0),
-  number(0),
+  number(0.0),
   stoploss(0.0),
   cash(0.0),
   from(PART_INVALID) {}
 
 TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business,
-                         price_t planPrice, price_t realPrice, price_t goalPrice, size_t number,
+                         price_t planPrice, price_t realPrice, price_t goalPrice, double number,
                          const CostRecord& cost, price_t stoploss, price_t cash, SystemPart from)
 : stock(stock),
   datetime(datetime),
@@ -181,7 +181,7 @@ string TradeRecord::toString() const {
 bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2) {
     if (d1.stock == d2.stock && d1.datetime == d2.datetime && d1.business == d2.business &&
         fabs(d1.planPrice - d2.planPrice) < 0.0001 && fabs(d1.realPrice - d2.realPrice) < 0.0001 &&
-        fabs(d1.goalPrice - d2.goalPrice) < 0.0001 && d1.number == d2.number &&
+        fabs(d1.goalPrice - d2.goalPrice) < 0.0001 && fabs(d1.number - d2.number) < 0.000001 &&
         d1.cost == d2.cost && fabs(d1.stoploss - d2.stoploss) < 0.0001 &&
         fabs(d1.cash - d2.cash) < 0.0001 && d1.from == d2.from) {
         return true;

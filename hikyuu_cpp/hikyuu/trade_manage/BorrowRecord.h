@@ -26,20 +26,20 @@ namespace hku {
 class HKU_API BorrowRecord {
 public:
     BorrowRecord();
-    BorrowRecord(const Stock&, size_t number, price_t value);
+    BorrowRecord(const Stock&, double number, price_t value);
 
     Stock stock;
-    size_t number;  //借入总数量
+    double number;  //借入总数量
     price_t value;  //借入总价值
 
     struct Data {
         Data() : datetime(Null<Datetime>()), price(0.0), number(0) {}
-        Data(const Datetime& datetime, price_t price, size_t number)
+        Data(const Datetime& datetime, price_t price, double number)
         : datetime(datetime), price(price), number(number) {}
 
         Datetime datetime;  //借入时间
         price_t price;      //借入时的单价
-        size_t number;      //借入数量
+        double number;      //借入数量
 
 #if HKU_SUPPORT_SERIALIZATION
     private:

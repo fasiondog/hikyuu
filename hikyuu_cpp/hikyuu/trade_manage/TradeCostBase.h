@@ -51,7 +51,7 @@ public:
      * @return CostRecord 交易成本记录
      */
     virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  size_t num) const = 0;
+                                  double num) const = 0;
 
     /**
      * 计算卖出成本
@@ -62,7 +62,7 @@ public:
      * @return CostRecord 交易成本记录
      */
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                   size_t num) const = 0;
+                                   double num) const = 0;
 
     /**
      * 计算借入现金花费的成本
@@ -92,7 +92,7 @@ public:
      * @param num 借入的数量
      */
     virtual CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock,
-                                          price_t price, size_t num) const {
+                                          price_t price, double num) const {
         return CostRecord();
     }
 
@@ -106,7 +106,7 @@ public:
      */
     virtual CostRecord getReturnStockCost(const Datetime& borrow_datetime,
                                           const Datetime& return_datetime, const Stock& stock,
-                                          price_t price, size_t num) const {
+                                          price_t price, double num) const {
         return CostRecord();
     }
 

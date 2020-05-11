@@ -174,13 +174,13 @@ public:
     }
 
     /** 获取指定时刻的某证券持有数量 */
-    size_t getHoldNumber(const Datetime& datetime, const Stock& stock);
+    double getHoldNumber(const Datetime& datetime, const Stock& stock);
 
     /** 获取指定时刻的空头某证券持有数量 */
-    size_t getShortHoldNumber(const Datetime& datetime, const Stock& stock);
+    double getShortHoldNumber(const Datetime& datetime, const Stock& stock);
 
     /** 获取指定时刻已借入的股票数量 */
-    size_t getDebtNumber(const Datetime& datetime, const Stock& stock);
+    double getDebtNumber(const Datetime& datetime, const Stock& stock);
 
     /** 获取指定时刻已借入的现金额 */
     price_t getDebtCash(const Datetime& datetime);
@@ -232,7 +232,7 @@ public:
      * @return CostRecord 交易成本记录
      */
     CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                          size_t num) const {
+                          double num) const {
         return m_costfunc ? m_costfunc->getBuyCost(datetime, stock, price, num) : CostRecord();
     }
 
@@ -245,7 +245,7 @@ public:
      * @return CostRecord 交易成本记录
      */
     CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                           size_t num) const {
+                           double num) const {
         return m_costfunc ? m_costfunc->getSellCost(datetime, stock, price, num) : CostRecord();
     }
 
@@ -278,7 +278,7 @@ public:
      * @param num 借入的数量
      */
     CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  size_t num) {
+                                  double num) {
         return m_costfunc ? m_costfunc->getBorrowStockCost(datetime, stock, price, num)
                           : CostRecord();
     }
@@ -292,7 +292,7 @@ public:
      * @param num 归还的数量
      */
     CostRecord getReturnStockCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
-                                  const Stock& stock, price_t price, size_t num) {
+                                  const Stock& stock, price_t price, double num) {
         return m_costfunc ? m_costfunc->getReturnStockCost(borrow_datetime, return_datetime, stock,
                                                            price, num)
                           : CostRecord();
@@ -322,7 +322,7 @@ public:
      * @param number 存入股票的数量
      * @return true | false
      */
-    bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
+    bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
 
     /**
      * 取出当前资产
@@ -333,7 +333,7 @@ public:
      * @return true | false
      * @note 应该不会被用到
      */
-    bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
+    bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
 
     /**
      * 买入操作
@@ -347,7 +347,7 @@ public:
      * @param from 记录是哪个系统部件发出的买入指示
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
-    TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice, size_t number,
+    TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice, double number,
                     price_t stoploss = 0.0, price_t goalPrice = 0.0, price_t planPrice = 0.0,
                     SystemPart from = PART_INVALID);
 
@@ -356,7 +356,7 @@ public:
      * @param datetime 卖出时间
      * @param stock 卖出的证券
      * @param realPrice 实际卖出价格
-     * @param number 卖出数量，如果等于Null<size_t>(), 表示全部卖出
+     * @param number 卖出数量，如果是 MAX_DOUBLE, 表示全部卖出
      * @param stoploss 新的止损价
      * @param goalPrice 新的目标价格
      * @param planPrice 原计划卖出价格
@@ -364,9 +364,8 @@ public:
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
     TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                     size_t number = Null<size_t>(), price_t stoploss = 0.0,
-                     price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                     SystemPart from = PART_INVALID);
+                     double number = MAX_DOUBLE, price_t stoploss = 0.0, price_t goalPrice = 0.0,
+                     price_t planPrice = 0.0, SystemPart from = PART_INVALID);
 
     /**
      * 卖空
@@ -381,7 +380,7 @@ public:
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
     TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                          size_t number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
+                          double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
                           price_t planPrice = 0.0, SystemPart from = PART_INVALID);
 
     /**
@@ -389,7 +388,7 @@ public:
      * @param datetime 买入时间
      * @param stock 买入的证券
      * @param realPrice 实际买入价格
-     * @param number 卖出数量，如果等于Null<size_t>(), 表示全部卖出
+     * @param number 卖出数量，如果是 MAX_DOUBLE, 表示全部卖出
      * @param stoploss 止损价
      * @param goalPrice 目标价格
      * @param planPrice 计划买入价格
@@ -397,7 +396,7 @@ public:
      * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
      */
     TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                         size_t number = Null<size_t>(), price_t stoploss = 0.0,
+                         double number = MAX_DOUBLE, price_t stoploss = 0.0,
                          price_t goalPrice = 0.0, price_t planPrice = 0.0,
                          SystemPart from = PART_INVALID);
 
@@ -425,7 +424,7 @@ public:
      * @param number 借入时数量
      * @return true | false
      */
-    bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
+    bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
 
     /**
      * 归还证券
@@ -435,7 +434,7 @@ public:
      * @param number 归还数量
      * @return true | false
      */
-    bool returnStock(const Datetime& datetime, const Stock& stock, price_t price, size_t number);
+    bool returnStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
 
     /**
      * 获取账户当前时刻的资产详情
