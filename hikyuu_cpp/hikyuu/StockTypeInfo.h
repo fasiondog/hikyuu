@@ -34,7 +34,7 @@ class HKU_API StockTypeInfo {
 public:
     /** 默认构造函数，返回Null<StockTypeInfo>() */
     StockTypeInfo();
-    StockTypeInfo(uint32, const string&, price_t, price_t, int, size_t, size_t);
+    StockTypeInfo(uint32, const string&, price_t, price_t, int, double, double);
 
     /** 获取证券类型 */
     uint32 type() const {
@@ -67,12 +67,12 @@ public:
     }
 
     /** 获取每笔最小交易数量 */
-    size_t minTradeNumber() const {
+    double minTradeNumber() const {
         return m_minTradeNumber;
     }
 
     /** 获取每笔最大交易数量 */
-    size_t maxTradeNumber() const {
+    double maxTradeNumber() const {
         return m_maxTradeNumber;
     }
 
@@ -86,8 +86,8 @@ private:
     price_t m_tickValue;      //每一个tick价格
     price_t m_unit;           //每最小变动量价格，即单位价格 = tickValue/tick
     int m_precision;          //价格精度
-    size_t m_minTradeNumber;  //每笔最小交易量
-    size_t m_maxTradeNumber;  //每笔最大交易量
+    double m_minTradeNumber;  //每笔最小交易量
+    double m_maxTradeNumber;  //每笔最大交易量
 };
 
 /**

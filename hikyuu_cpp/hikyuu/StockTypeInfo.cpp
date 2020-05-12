@@ -53,8 +53,8 @@ StockTypeInfo::StockTypeInfo()
   m_maxTradeNumber(0) {}
 
 StockTypeInfo::StockTypeInfo(uint32 type, const string& description, price_t tick,
-                             price_t tickValue, int precision, size_t minTradeNumber,
-                             size_t maxTradeNumber)
+                             price_t tickValue, int precision, double minTradeNumber,
+                             double maxTradeNumber)
 : m_type(type),
   m_description(description),
   m_tick(tick),
