@@ -15,6 +15,7 @@
 
 #include <thread>
 #include <memory>
+#include <vector>
 
 namespace hku {
 
