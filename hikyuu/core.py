@@ -541,8 +541,6 @@ __all__ = [  # 类
     'TimeLineList',
     'TransRecord',
     'TransList',
-    'Task',
-    'TaskGroup',
 
     # 变量
     'constant',
