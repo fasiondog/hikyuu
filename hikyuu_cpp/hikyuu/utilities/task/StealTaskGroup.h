@@ -43,8 +43,6 @@ public:
         return m_runnerNum;
     }
 
-    StealTaskRunnerPtr getCurrentRunner();
-
     //增加一个任务
     StealTaskPtr addTask(const StealTaskPtr& task, bool inMain = true);
 
@@ -68,8 +66,8 @@ private:
     typedef std::vector<StealTaskRunnerPtr> RunnerList;
     RunnerList m_runnerList;
     size_t m_runnerNum;
-    size_t m_currentRunnerId;  //记录当前执行addTask任务时，需放入的TaskRunnerId，用于均衡任务分配
-    bool m_done;  // 任务组执行结束标志
+    size_t m_steal_index;  // 辅助记录主线程从哪个子线程偷取任务
+    bool m_done;           // 任务组执行结束标志
 
     std::shared_ptr<StealMasterQueue> m_master_queue;                // 主任务队列
     std::vector<std::shared_ptr<StealRunnerQueue>> m_runner_queues;  // 任务队列（每个工作线程一个）

@@ -43,7 +43,7 @@ StealTaskPtr StealTaskRunner::takeTaskFromOther() {
     for (size_t i = 0; i < total; ++i) {
         size_t index = (m_local_index + i + 1) % total;
         task = m_local_group->m_runner_queues[index]->try_steal();
-        if (task && typeid(*task) != typeid(StopTask)) {
+        if (task) {
             return task;
         }
     }

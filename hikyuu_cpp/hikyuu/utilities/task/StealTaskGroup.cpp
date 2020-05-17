@@ -12,7 +12,7 @@
 
 namespace hku {
 
-StealTaskGroup::StealTaskGroup(size_t groupSize) : m_currentRunnerId(0), m_done(false) {
+StealTaskGroup::StealTaskGroup(size_t groupSize) : m_steal_index(0), m_done(false) {
     m_runnerNum = (groupSize != 0) ? groupSize : std::thread::hardware_concurrency();
     m_runnerList.reserve(m_runnerNum);
 
@@ -38,15 +38,6 @@ StealTaskGroup::~StealTaskGroup() {
     if (!m_done) {
         join();
     }
-}
-
-StealTaskRunnerPtr StealTaskGroup::getCurrentRunner() {
-    StealTaskRunnerPtr result = m_runnerList[m_currentRunnerId];
-    m_currentRunnerId++;
-    if (m_currentRunnerId >= m_runnerNum) {
-        m_currentRunnerId = 0;
-    }
-    return result;
 }
 
 StealTaskPtr StealTaskGroup::addTask(const StealTaskPtr& task, bool inMain) {
@@ -121,31 +112,18 @@ void StealTaskGroup::taskJoinInMaster(const StealTaskPtr& waitingFor) {
 
 void StealTaskGroup::stealInMaster(const StealTaskPtr& waitingFor) {
     StealTaskPtr task;
-
-#ifdef _WIN32
-    std::srand((unsigned)time(NULL));
-#else
-    struct timeval tstart;
-    struct timezone tz;
-    gettimeofday(&tstart, &tz);
-    size_t temp = tstart.tv_usec;
-    std::srand(temp);
-#endif
-
-    size_t total = m_runnerNum;
-    size_t ran_num = std::rand() % total;
-    for (size_t i = 0; i < total; i++) {
+    auto total = m_runnerNum;
+    for (size_t i = 0; i < total; ++i) {
         if (waitingFor && waitingFor->done()) {
             return;
         }
-
-        task = m_runner_queues[ran_num]->try_steal();
-        if (task && !task->done()) {
+        size_t index = (m_steal_index + i + 1) % total;
+        task = m_runner_queues[index]->try_steal();
+        if (task) {
             task->invoke();
+            m_steal_index = i;
             return;
         }
-
-        ran_num = (ran_num + 1) % total;
     }
 }
 

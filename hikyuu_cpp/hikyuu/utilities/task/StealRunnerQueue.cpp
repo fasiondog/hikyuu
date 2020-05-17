@@ -45,12 +45,15 @@ StealTaskPtr StealRunnerQueue::try_pop() {
 /* 尝试从队列尾部偷取一条数据，失败返回空指针 */
 StealTaskPtr StealRunnerQueue::try_steal() {
     std::lock_guard<std::mutex> lock(m_mutex);
-    StealTaskPtr result;
     if (m_queue.empty()) {
-        return result;
+        return StealTaskPtr();
     }
 
-    result = m_queue.back();
+    StealTaskPtr result = m_queue.back();
+    if (typeid(*result) == typeid(StopTask)) {
+        return StealTaskPtr();
+    }
+
     m_queue.pop_back();
     return result;
 }
