@@ -13,6 +13,7 @@
 
 #include <queue>
 #include <thread>
+#include <condition_variable>
 
 namespace hku {
 
