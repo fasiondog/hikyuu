@@ -7,7 +7,7 @@
  *      Author: fasiondog
  */
 
-#pragma
+#pragma once
 #ifndef HKU_GLOBAL_TASK_GROUP
 #define HKU_GLOBAL_TASK_GROUP
 
