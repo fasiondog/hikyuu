@@ -10,7 +10,7 @@ if is_mode("debug") then
 else 
     set_configvar("LOG_ACTIVE_LEVEL", 2)  -- 激活的日志级别 
 end
-set_configvar("USE_SPDLOG_LOGGER", 0) -- 是否使用spdlog作为日志输出
+set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
 set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
