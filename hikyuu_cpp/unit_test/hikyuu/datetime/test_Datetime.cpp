@@ -126,8 +126,8 @@ TEST_CASE("test_Datetime") {
     /** @arg 测试 str */
     d = Datetime("2001-Jan-01 06:30:00");
     CHECK("2001-01-01 06:30:00" == d.str());
-    d = Datetime("2001-Jan-01 06:30:00.001");
-    CHECK("2001-01-01 06:30:00.001000" == d.str());
+    d = Datetime("2001-Jan-01 06:30:11.001");
+    CHECK("2001-01-01 06:30:11.001000" == d.str());
 
     /** @arg 测试 dayOfWeek*/
     CHECK(Datetime(201801010000L).dayOfWeek() == 1);

@@ -96,17 +96,14 @@ std::string Datetime::str() const {
     }
 
     std::string result;
-    double microsecs = millisecond() * 1000 + microsecond();
+    double microseconds = millisecond() * 1000 + microsecond();
 
     // 和 python datetime 打印方式保持一致
-    if (microsecs == 0) {
-        result = fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:>02d}", year(), month(),
-                             day(), hour(), minute(), second());
-    } else {
-        result = fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:<09.6f}", year(), month(),
-                             day(), hour(), minute(), microsecs * 0.000001);
-    }
-    return result;
+    return microseconds == 0
+             ? fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:>02d}", year(), month(), day(),
+                           hour(), minute(), second())
+             : fmt::format("{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:<09.6f}", year(), month(),
+                           day(), hour(), minute(), (second() * 1000000 + microseconds) * 0.000001);
 }
 
 std::string Datetime::repr() const {
