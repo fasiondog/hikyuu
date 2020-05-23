@@ -37,14 +37,14 @@ Datetime::Datetime(unsigned long long datetime) {
         return;
     }
 
-    if (datetime <= 99999999L) {
+    if (datetime <= 99999999LL) {
         unsigned long long year, month, day;
         year = datetime / 10000;
         month = (datetime - year * 10000) / 100;
         day = datetime - datetime / 100 * 100;
         bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
         m_data = bt::ptime(d, bt::time_duration(0, 0, 0));
-    } else {
+    } else if (datetime <= 999999999999LL) {
         unsigned long long year, month, day, hh, mm;
         year = datetime / 100000000;
         month = (datetime - year * 100000000) / 1000000;
@@ -55,6 +55,10 @@ Datetime::Datetime(unsigned long long datetime) {
         HKU_CHECK_THROW(mm < 60, std::out_of_range, "Minute value is out of range 0..59");
         bd::date d((unsigned short)year, (unsigned short)month, (unsigned short)day);
         m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, 0));
+    } else {
+        HKU_THROW_EXCEPTION(std::out_of_range,
+                            "Only suport YYYYMMDDhhmm or YYYYMMDD, but current param is {}",
+                            datetime);
     }
 }
 

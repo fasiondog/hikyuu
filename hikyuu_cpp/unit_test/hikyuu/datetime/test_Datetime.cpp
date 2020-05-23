@@ -87,6 +87,9 @@ TEST_CASE("test_Datetime") {
     CHECK_THROWS_AS(Datetime(201001010060L), std::out_of_range);
     CHECK_THROWS_AS(Datetime(201001010061L), std::out_of_range);
 
+    /** @arg 非法参数 */
+    CHECK_THROWS_AS(Datetime(2001010203041LL), std::out_of_range);
+
     /** @arg 属性读取 */
     d = Datetime(2012, 8, 6, 23, 59, 2, 13, 15);
     CHECK(2012 == d.year());
