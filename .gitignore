@@ -22,6 +22,7 @@
 .vscode
 .vs
 .ipynb_checkpoints
+temp
 temp.txt
 compile_info
 release.x64.version.h

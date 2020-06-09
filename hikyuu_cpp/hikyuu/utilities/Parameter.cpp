@@ -116,41 +116,6 @@ StringList Parameter::getNameList() const {
     return result;
 }
 
-string Parameter::getValueList() const {
-    std::stringstream os;
-    Parameter::param_map_t::const_iterator iter = m_params.begin();
-    Parameter::param_map_t::const_iterator next_iter = iter;
-    for (; iter != m_params.end(); ++iter) {
-        if (iter->second.type() == typeid(int)) {
-            os << boost::any_cast<int>(iter->second);
-        } else if (iter->second.type() == typeid(bool)) {
-            os << boost::any_cast<bool>(iter->second);
-        } else if (iter->second.type() == typeid(double)) {
-            os << boost::any_cast<double>(iter->second);
-        } else if (iter->second.type() == typeid(string)) {
-            os << boost::any_cast<string>(iter->second);
-        } else if (iter->second.type() == typeid(Stock)) {
-            os << boost::any_cast<Stock>(iter->second);
-        } else if (iter->second.type() == typeid(KQuery)) {
-            os << boost::any_cast<KQuery>(iter->second);
-        } else if (iter->second.type() == typeid(KData)) {
-            //    os << boost::any_cast<KData>(iter->second);
-        } else if (iter->second.type() == typeid(PriceList)) {
-            os << "PriceList(...)";
-        } else if (iter->second.type() == typeid(DatetimeList)) {
-            os << "DatetimeList(...)";
-        } else {
-            os << "Unsupported";
-        }
-
-        ++next_iter;
-        if (next_iter != m_params.end() && iter->second.type() != typeid(KData)) {
-            os << ",";
-        }
-    }
-    return os.str();
-}
-
 string Parameter::getNameValueList() const {
     std::stringstream os;
     Parameter::param_map_t::const_iterator iter = m_params.begin();

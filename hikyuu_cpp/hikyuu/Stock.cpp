@@ -236,6 +236,8 @@ KDataDriverPtr Stock::getKDataDriver() const {
 bool Stock::isBuffer(KQuery::KType ktype) const {
     if (!m_data)
         return false;
+    string nktype(ktype);
+    to_upper(ktype);
     return m_data->pKData.find(ktype) != m_data->pKData.end() ? true : false;
 }
 
@@ -246,7 +248,7 @@ bool Stock::isNull() const {
     return false;
 }
 
-void Stock::releaseKDataBuffer(KQuery::KType kType) {
+void Stock::releaseKDataBuffer(KQuery::KType inkType) {
     // if (!m_data || kType >= KQuery::INVALID_KTYPE)
     if (!m_data)
         return;
@@ -254,14 +256,19 @@ void Stock::releaseKDataBuffer(KQuery::KType kType) {
     // if (m_data->pKData[kType])
     // if (m_data->pKData.find(kType) != m_data->pKData.end())
     // m_data->pKData[kType] = KRecordListPtr();
+    string kType(inkType);
+    to_upper(kType);
     m_data->pKData.erase(kType);
     return;
 }
 
-void Stock::loadKDataToBuffer(KQuery::KType kType) {
+void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     // if (!m_data || kType >= KQuery::INVALID_KTYPE)
     if (!m_data)
         return;
+
+    string kType(inkType);
+    to_upper(kType);
 
     releaseKDataBuffer(kType);
     m_data->pKData[kType] = make_shared<KRecordList>();
@@ -302,14 +309,16 @@ size_t Stock::getCount(KQuery::KType kType) const {
     if (!m_data)
         return 0;
 
-    if (m_data->pKData.find(kType) != m_data->pKData.end()) {
-        return m_data->pKData[kType]->size();
+    string nktype(kType);
+    to_upper(nktype);
+    if (m_data->pKData.find(nktype) != m_data->pKData.end()) {
+        return m_data->pKData[nktype]->size();
     }
 
-    return m_kdataDriver ? m_kdataDriver->getCount(market(), code(), kType) : 0;
+    return m_kdataDriver ? m_kdataDriver->getCount(market(), code(), nktype) : 0;
 }
 
-price_t Stock ::getMarketValue(const Datetime& datetime, KQuery::KType ktype) const {
+price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) const {
     if (isNull()) {
         return 0.0;
     }
@@ -319,6 +328,9 @@ price_t Stock ::getMarketValue(const Datetime& datetime, KQuery::KType ktype) co
             return 0.0;
         }
     }
+
+    string ktype(inktype);
+    to_upper(ktype);
 
     KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
     price_t price = 0.0;
@@ -500,9 +512,12 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     return true;
 }
 
-KRecord Stock ::getKRecord(size_t pos, KQuery::KType kType) const {
+KRecord Stock ::getKRecord(size_t pos, KQuery::KType inkType) const {
     if (!m_data)
         return KRecord();
+
+    string kType(inkType);
+    to_upper(kType);
 
     if (m_data->pKData.find(kType) != m_data->pKData.end())
         return m_data->pKData[kType]->at(pos);
@@ -510,10 +525,13 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType kType) const {
     return m_kdataDriver ? m_kdataDriver->getKRecord(market(), code(), pos, kType) : KRecord();
 }
 
-KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType ktype) const {
+KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType inktype) const {
     KRecordList result;
     if (!m_data)
         return result;
+
+    string ktype(inktype);
+    to_upper(ktype);
 
     // if (m_data->pKData[ktype]) {
     if (m_data->pKData.find(ktype) != m_data->pKData.end()) {

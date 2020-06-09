@@ -104,7 +104,9 @@ public:
       m_end(end),
       m_queryType(queryType),
       m_dataType(dataType),
-      m_recoverType(recoverType) {}
+      m_recoverType(recoverType) {
+        to_upper(m_dataType);
+    }
 
     /**
      * 按指定日期查询 K 线，范围[start, end)

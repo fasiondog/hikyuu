@@ -15,14 +15,14 @@ namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata) {
     os << "KData{\n  size : " << kdata.size() << "\n  stock: " << kdata.getStock()
-       << ",\n  query: " << kdata.getQuery() << "\n }";
+       << "\n  query: " << kdata.getQuery() << "\n}";
     return os;
 }
 
 string KData::toString() const {
     std::stringstream os;
     os << "KData{\n  size : " << size() << "\n  stock: " << getStock().toString()
-       << ",\n  query: " << getQuery() << "\n }";
+       << ",\n  query: " << getQuery() << "\n}";
     return os.str();
 }
 
@@ -88,6 +88,22 @@ Indicator KData::vol() const {
 
 Indicator KData::amo() const {
     return AMO(*this);
+}
+
+KData HKU_API getKData(const string& market_code, const Datetime& start, const Datetime& end,
+                       KQuery::KType ktype, KQuery::RecoverType recoverType) {
+    const StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock(market_code);
+    KQuery query(start, end, ktype, recoverType);
+    return stock.getKData(query);
+}
+
+KData HKU_API getKData(const string& market_code, int64 start, int64 end, KQuery::KType ktype,
+                       KQuery::RecoverType recoverType) {
+    const StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock(market_code);
+    KQuery query(start, end, ktype, recoverType);
+    return stock.getKData(query);
 }
 
 }  // namespace hku

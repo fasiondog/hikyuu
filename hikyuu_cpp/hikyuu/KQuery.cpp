@@ -34,7 +34,9 @@ KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverTyp
   m_end(end == Null<Datetime>() ? (int64)end.number() : (int64)(end.number() * 100 + end.second())),
   m_queryType(KQuery::DATE),
   m_dataType(ktype),
-  m_recoverType(recoverType) {}
+  m_recoverType(recoverType) {
+    to_upper(m_dataType);
+}
 
 Datetime KQuery::startDatetime() const {
     if (m_queryType != DATE || (uint64)m_start == Null<uint64>()) {
@@ -82,7 +84,9 @@ KQuery::QueryType KQuery::getQueryTypeEnum(const string& arg) {
 }
 
 string KQuery::getKTypeName(KType dataType) {
-    return dataType;
+    string result(dataType);
+    to_upper(result);
+    return result;
     /*switch(dataType) {
     case MIN:
         return "MIN";

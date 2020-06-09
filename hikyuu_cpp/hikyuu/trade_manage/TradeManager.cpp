@@ -1339,9 +1339,12 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     return funds.cash;
 }
 
-FundsRecord TradeManager ::getFunds(KQuery::KType ktype) const {
+FundsRecord TradeManager ::getFunds(KQuery::KType inktype) const {
     FundsRecord funds;
     int precision = getParam<int>("precision");
+
+    string ktype(inktype);
+    to_upper(ktype);
 
     price_t price(0.0);
     price_t value(0.0);  //当前市值

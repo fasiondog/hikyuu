@@ -83,7 +83,7 @@ typedef vector<string> StringList;
  * 1、Parameter::support
  * 2、std::ostream& operator <<(std::ostream &os, const Parameter& param)
  * 3、_Parameter.cpp中的AnyToPython、arameter::add<object>、Parameter::set<object>
- * 4、Parameter::getValueList、getNameValueList
+ * 4、getNameValueList
  * 5、Parameter的序列化支持 <br/>
  * 在Python中，增加和修改参数，需要先创建或获取Parameter对象实例，通过Parameter示例
  * 造成，之后将Parameter实例直接设定修改，如：
@@ -116,9 +116,6 @@ public:
 
     /** 获取所有参数名称列表 */
     StringList getNameList() const;
-
-    /** 返回形如"val1,val2,..."的字符串 */
-    string getValueList() const;
 
     /** 返回形如"name1=val1,name2=val2,..."的字符串 */
     string getNameValueList() const;
