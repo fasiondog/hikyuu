@@ -38,8 +38,6 @@ add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
-add_includedirs("hikyuu_extern_libs/inc")
-
 add_includedirs("$(env BOOST_ROOT)")
 add_linkdirs("$(env BOOST_LIB)")
 
