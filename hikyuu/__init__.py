@@ -53,7 +53,7 @@ import sys
 import os
 import configparser
 
-from .cpp.core import *
+from .typeinit import *
 
 __version__ = getVersion()
 
@@ -76,7 +76,8 @@ if sys.platform == 'win32':
 # 读取配置信息，并初始化
 #
 # ==============================================================================
-config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
+config_file = './test_data/hikyuu_win.ini'
+#config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
 if not os.path.exists(config_file):
     # 检查老版本配置是否存在，如果存在可继续使用，否则异常终止
     data_config_file = os.path.expanduser('~') + "/.hikyuu/data_dir.ini"
@@ -128,7 +129,6 @@ set_log_level(LOG_LEVEL.WARN)
 # 引入blocka、blocksh、blocksz、blockg全局变量，便于交互式环境下使用
 #
 # ==============================================================================
-constant = Constant()
 blocka = Block("A", "ALL")
 for s in sm:
     if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_GEM):

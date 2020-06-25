@@ -14,11 +14,11 @@
 template <class T>
 struct vector_to_python_list {
     static PyObject* convert(T const& x) {
-        boost::python::list* pylist = new boost::python::list();
+        boost::python::list pylist;
         for (auto const& d : x) {
-            pylist->append(d);
+            pylist.append(d);
         }
-        return pylist->ptr();
+        return boost::python::incref(pylist.ptr());
     }
 };
 

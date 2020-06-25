@@ -36,6 +36,9 @@ void export_trade_manage_main();
 void export_trade_sys_main();
 
 BOOST_PYTHON_MODULE(core) {
+    boost::python::docstring_options doc_options;
+    doc_options.disable_cpp_signatures();
+
     boost::python::def("hikyuu_init", hku::hikyuu_init);
     boost::python::def("getStock", hku::getStock);
     boost::python::def("getVersion", hku::getVersion);
