@@ -53,7 +53,7 @@ import sys
 import os
 import configparser
 
-from .typeinit import *
+from .hku_init import *
 
 __version__ = getVersion()
 

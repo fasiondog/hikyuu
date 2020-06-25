@@ -21,18 +21,18 @@ using namespace boost::python;
 /*
  * boost::any To Python转换器
  */
-struct AnyToPython{
+struct AnyToPython {
     static PyObject* convert(boost::any x) {
         if (x.type() == typeid(bool)) {
             bool tmp = boost::any_cast<bool>(x);
             return tmp ? Py_True : Py_False;
-            //object *o = new object(boost::any_cast<bool>(x));
-            //return (*o).ptr();
+            // object *o = new object(boost::any_cast<bool>(x));
+            // return (*o).ptr();
 
         } else if (x.type() == typeid(int)) {
             return Py_BuildValue("n", boost::any_cast<int>(x));
 
-        } else if (x.type() == typeid(double)){
+        } else if (x.type() == typeid(double)) {
             return Py_BuildValue("d", boost::any_cast<double>(x));
 
         } else if (x.type() == typeid(string)) {
@@ -47,24 +47,24 @@ struct AnyToPython{
             } else {
                 cmd = "getStock('" + stk.market_code() + "')";
             }
-            object* o = new object(eval(cmd.c_str()));
-            return o->ptr();
+            object o = eval(cmd.c_str());
+            return boost::python::incref(o.ptr());
 
         } else if (x.type() == typeid(KQuery)) {
             const KQuery& query = boost::any_cast<KQuery>(x);
-            std::stringstream cmd (std::stringstream::out);
+            std::stringstream cmd(std::stringstream::out);
             if (query.queryType() == KQuery::INDEX) {
-                cmd << "QueryByIndex(" << query.start() << "," << query.end() 
-                    << ", Query." << KQuery::getKTypeName(query.kType()) 
-                    << ", Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                cmd << "QueryByIndex(" << query.start() << "," << query.end() << ", Query."
+                    << KQuery::getKTypeName(query.kType()) << ", Query."
+                    << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             } else {
-                cmd << "QueryByDate(Datetime("  << query.startDatetime() 
-                    << "), Datetime(" << query.endDatetime() << "), " 
-                    << "Query." << KQuery::getKTypeName(query.kType()) 
-                    << "Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                cmd << "QueryByDate(Datetime(" << query.startDatetime() << "), Datetime("
+                    << query.endDatetime() << "), "
+                    << "Query." << KQuery::getKTypeName(query.kType()) << "Query."
+                    << KQuery::getRecoverTypeName(query.recoverType()) << ")";
             }
-            object* o = new object(eval(cmd.str().c_str()));
-            return o->ptr();
+            object o = eval(cmd.str().c_str());
+            return boost::python::incref(o.ptr());
 
         } else if (x.type() == typeid(KData)) {
             KData kdata = boost::any_cast<KData>(x);
@@ -76,41 +76,39 @@ struct AnyToPython{
             } else {
                 cmd << "getStock('" << stock.market_code() << "').getKData(";
                 if (query.queryType() == KQuery::INDEX) {
-                    cmd << "QueryByIndex(" << query.start() << "," << query.end()
-                        << ", Query." << KQuery::getKTypeName(query.kType())
-                        << ", Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                    cmd << "QueryByIndex(" << query.start() << "," << query.end() << ", Query."
+                        << KQuery::getKTypeName(query.kType()) << ", Query."
+                        << KQuery::getRecoverTypeName(query.recoverType()) << ")";
                 } else {
-                    cmd << "QueryByDate(Datetime("  << query.startDatetime()
-                        << "), Datetime(" << query.endDatetime() << "), "
-                        << "Query." << KQuery::getKTypeName(query.kType())
-                        << "Query." << KQuery::getRecoverTypeName(query.recoverType()) << ")";
+                    cmd << "QueryByDate(Datetime(" << query.startDatetime() << "), Datetime("
+                        << query.endDatetime() << "), "
+                        << "Query." << KQuery::getKTypeName(query.kType()) << "Query."
+                        << KQuery::getRecoverTypeName(query.recoverType()) << ")";
                 }
             }
             std::cout << cmd.str() << std::endl;
-            object* o = new object(eval(cmd.str().c_str()));
-            return o->ptr();
+            object o = eval(cmd.str().c_str());
+            return boost::python::incref(o.ptr());
 
         } else if (x.type() == typeid(PriceList)) {
             const PriceList& price_list = boost::any_cast<PriceList>(x);
-            boost::python::list* o = new boost::python::list();
+            boost::python::list o;
             for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
-                o->append(*iter);
+                o.append(*iter);
             }
-            //object* o = new object(eval(cmd.c_str()));
-            return o->ptr();
+            return boost::python::incref(o.ptr());
 
         } else if (x.type() == typeid(DatetimeList)) {
             const DatetimeList& date_list = boost::any_cast<DatetimeList>(x);
-            boost::python::list* o = new boost::python::list();
+            boost::python::list o;
             for (auto iter = date_list.begin(); iter != date_list.end(); ++iter) {
-                o->append(*iter);
+                o.append(*iter);
             }
-            //object* o = new object(eval(cmd.c_str()));
-            return o->ptr();
+            return boost::python::incref(o.ptr());
 
         } else {
             HKU_ERROR("convert failed! Unkown type! Will return None!");
-            return Py_BuildValue("s", (char *)0);
+            return Py_BuildValue("s", (char*)0);
         }
     }
 };
@@ -125,10 +123,13 @@ inline boost::any Parameter::get<boost::any>(const std::string& name) const {
     return iter->second;
 }
 
-
 template <>
 inline void Parameter::set<object>(const string& name, const object& o) {
-    if( !have(name)){
+    if (o.is_none()) {
+        HKU_THROW_EXCEPTION(std::logic_error, "Not support None!");
+    }
+
+    if (!have(name)) {
         if (PyBool_Check(o.ptr())) {
             m_params[name] = bool(extract<bool>(o));
             return;
@@ -170,16 +171,33 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
 
-        extract<PriceList> x8(o);
-        if (x8.check()) {
-            m_params[name] = x8();
-            return;
-        }
+        try {
+            boost::python::list pylist(o);
+            size_t total = len(pylist);
+            if (total > 0) {
+                extract<price_t> x8(pylist[0]);
+                if (x8.check()) {
+                    PriceList price_list(total);
+                    for (size_t i = 0; i < total; ++i) {
+                        price_list[i] = extract<price_t>(pylist[i])();
+                    }
+                    m_params[name] = price_list;
+                    return;
+                }
 
-        extract<DatetimeList> x9(o);
-        if (x9.check()) {
-            m_params[name] = x9();
-            return;
+                extract<Datetime> x9(pylist[0]);
+                if (x9.check()) {
+                    DatetimeList date_list(total);
+                    for (size_t i = 0; i < total; ++i) {
+                        date_list[i] = extract<Datetime>(pylist[i])();
+                    }
+                    m_params[name] = date_list;
+                    return;
+                }
+            }
+
+        } catch (...) {
+            // do nothing
         }
 
         throw std::logic_error("Unsuport Type! " + name);
@@ -258,22 +276,24 @@ inline void Parameter::set<object>(const string& name, const object& o) {
     }
 
     if (m_params[name].type() == typeid(PriceList)) {
-        extract<KData> x8(o);
-        if (x8.check()) {
-            m_params[name] = x8();
-            return;
+        boost::python::list pylist(o);
+        size_t total = len(pylist);
+        PriceList price_list(total);
+        for (size_t i = 0; i < total; ++i) {
+            price_list[i] = extract<price_t>(pylist[i])();
         }
-        throw std::logic_error(mismatch);
+        m_params[name] = price_list;
         return;
     }
 
     if (m_params[name].type() == typeid(DatetimeList)) {
-        extract<KData> x9(o);
-        if (x9.check()) {
-            m_params[name] = x9();
-            return;
+        boost::python::list pylist(o);
+        size_t total = len(pylist);
+        DatetimeList date_list(total);
+        for (size_t i = 0; i < total; ++i) {
+            date_list[i] = extract<Datetime>(pylist[i])();
         }
-        throw std::logic_error(mismatch);
+        m_params[name] = date_list;
         return;
     }
 
