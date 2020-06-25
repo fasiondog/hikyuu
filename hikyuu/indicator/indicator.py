@@ -24,9 +24,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ._indicator import *
+from hikyuu.cpp.core import *
 from hikyuu.util.unicode import (IS_PY3, unicodeFunc, reprFunc)
-from hikyuu import constant, toPriceList, PriceList, Datetime
+from hikyuu import constant, toPriceList, Datetime
 
 
 def indicator_iter(indicator):
@@ -44,7 +44,7 @@ def indicator_getitem(data, i):
         if index < 0 or index >= length:
             raise IndexError("index out of range: %d" % i)
         return data.get(index)
-    
+
     elif isinstance(i, slice):
         return [data.get(x) for x in range(*i.indices(len(data)))]
 
@@ -61,15 +61,15 @@ def indicator_getitem(data, i):
 Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
 
-Indicator.__unicode__ =  unicodeFunc
-Indicator.__repr__ =  reprFunc 
+Indicator.__unicode__ = unicodeFunc
+Indicator.__repr__ = reprFunc
 
 Indicator.__add__ = indicator_add
 Indicator.__sub__ = indicator_sub
 Indicator.__mul__ = indicator_mul
 Indicator.__div__ = indicator_div
 Indicator.__mod__ = indicator_mod
-Indicator.__truediv__ = indicator_div #Python3 div
+Indicator.__truediv__ = indicator_div  #Python3 div
 Indicator.__eq__ = indicator_eq
 Indicator.__ne__ = indicator_ne
 Indicator.__ge__ = indicator_ge
@@ -95,15 +95,6 @@ Indicator.__rand__ = lambda self, other: CVAL(self, other).__and__(self)
 Indicator.__ror__ = lambda self, other: CVAL(self, other).__or__(self)
 
 
-KDATA = IKDATA()
-OPEN = IOPEN()
-CLOSE = ICLOSE()
-HIGH = IHIGH()
-LOW = ILOW()
-AMO = IAMO()
-VOL = IVOL()
-
-
 def PRICELIST(data, result_num=0, discard=0):
     """
     将 list、tuple、Indicator 转化为普通的 Indicator
@@ -118,34 +109,36 @@ def PRICELIST(data, result_num=0, discard=0):
         return ind.PRICELIST(data, result_num)
     else:
         return ind.PRICELIST(toPriceList(data), discard)
-    
+
 
 try:
     import numpy as np
     import pandas as pd
-    
+
     def indicator_to_np(indicator):
         """转化为np.array，如果indicator存在多个值，只返回第一个"""
         return np.array(indicator, dtype='d')
-    
+
     def indicator_to_df(indicator):
         """转化为pandas.DataFrame"""
         if indicator.getResultNumber() == 1:
             return pd.DataFrame(indicator_to_np(indicator), columns=[indicator.name])
-    
+
         data = {}
         name = indicator.name
         columns = []
         for i in range(indicator.getResultNumber()):
             data[name + str(i)] = indicator.getResult(i)
-            columns.append(name + str(i+1))
+            columns.append(name + str(i + 1))
         return pd.DataFrame(data, columns=columns)
-    
+
     Indicator.to_np = indicator_to_np
     Indicator.to_df = indicator_to_df
 
 except:
-    print("warning:can't import numpy or pandas lib, ",  
-          "you can't use method Inidicator.to_np() and to_df!")
+    print(
+        "warning:can't import numpy or pandas lib, ",
+        "you can't use method Inidicator.to_np() and to_df!"
+    )
 
 VALUE = PRICELIST

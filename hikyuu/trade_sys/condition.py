@@ -25,7 +25,7 @@
 # SOFTWARE.
 
 
-from ._trade_sys import ConditionBase, CN_OPLine
+from hikyuu.cpp.core import ConditionBase, CN_OPLine
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 ConditionBase.__unicode__ = unicodeFunc

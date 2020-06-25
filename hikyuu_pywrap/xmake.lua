@@ -24,9 +24,9 @@ if (cc and string.find(cc, "clang")) or (cxx and string.find(cxx, "clang")) then
     add_cxflags("-Wno-error=parentheses-equality -Wno-error=missing-braces")
 end
 
-on_load("xmake_on_load")
+--on_load("xmake_on_load")
 
-target("_hikyuu")
+target("core")
     set_kind("shared")
     if is_mode("debug") then 
         set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
@@ -35,80 +35,84 @@ target("_hikyuu")
     add_packages("fmt", "spdlog")
     add_deps("hikyuu")
     if is_plat("windows") then
-        set_filename("_hikyuu.pyd")
+        set_filename("core.pyd")
     else 
-        set_filename("_hikyuu.so")
+        set_filename("core.so")
     end
     add_cxflags("-wd4251")
-    add_files("./*.cpp")
+    add_files("./**.cpp")
 
-target("_indicator")
-    set_kind("shared")
-    if is_mode("debug") then 
-        set_default(false)
-    end
-    add_packages("fmt", "spdlog")
-    add_deps("hikyuu")
-    if is_plat("windows") then
-        set_filename("_indicator.pyd")
-    else
-        set_filename("_indicator.so")
-    end
-    add_files("./indicator/*.cpp")
-    
-target("_trade_manage")
-    set_kind("shared")
-    if is_mode("debug") then 
-        set_default(false)
-    end
-    add_packages("fmt", "spdlog")
-    add_deps("hikyuu")
-    if is_plat("windows") then
-        set_filename("_trade_manage.pyd")
-    else 
-        set_filename("_trade_manage.so")
-    end
-    add_files("./trade_manage/*.cpp")
+    add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 
-target("_trade_sys")
-    set_kind("shared")
-    if is_mode("debug") then 
-        set_default(false)
-    end
-    add_packages("fmt", "spdlog")
-    add_deps("hikyuu")
-    if is_plat("windows") then
-        set_filename("_trade_sys.pyd")
-    else
-        set_filename("_trade_sys.so")
-    end
-    add_files("./trade_sys/*.cpp")
-    
-target("_trade_instance")
-    set_kind("shared")
-    if is_mode("debug") then 
-        set_default(false)
-    end
-    add_packages("fmt", "spdlog")
-    add_deps("hikyuu")
-    if is_plat("windows") then
-        set_filename("_trade_instance.pyd")
-    else 
-        set_filename("_trade_instance.so")
-    end
-    add_files("./trade_instance/*.cpp")
-    
-target("_data_driver")
-    set_kind("shared")
-    if is_mode("debug") then 
-        set_default(false)
-    end
-    add_packages("fmt", "spdlog")
-    add_deps("hikyuu")
-    if is_plat("windows") then
-        set_filename("_data_driver.pyd")
-    else 
-        set_filename("_data_driver.so")
-    end
-    add_files("./data_driver/*.cpp")
+    on_load(function(target)
+        import("lib.detect.find_tool")
+        if is_plat("windows") then
+            -- detect installed python3
+            local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
+
+            -- find python include and libs directory
+            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            pydir = path.directory(pydir)
+            target:add("includedirs", pydir .. "/include")
+            target:add("linkdirs", pydir .. "/libs")
+            return
+        end
+
+        if is_plat("macosx") then
+            local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
+            target:add("linkdirs", libdir)
+            local out, err = os.iorun("python3 --version")
+            local ver = (out .. err):trim()
+            local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
+            target:add("links", python_lib)
+        end
+
+        -- get python include directory.
+        local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
+        assert(pydir, "python3-config not found!")
+        target:add("cxflags", pydir)
+
+        -- get suffix configure for link libboost_pythonX.so
+        local suffix = get_config("boost-python-suffix")
+        if suffix == nil then
+            raise("You need to config --boost-python-suffix specify libboost_python suffix")
+        end
+
+        suffix = string.upper(suffix)
+        if suffix == "3X" then
+            local out, err = os.iorun("python3 --version")
+            local ver = (out .. err):trim()
+            local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
+            target:add("links", boost_python_lib)
+        else
+            target:add("links", "boost_python"..suffix)
+        end    
+    end)
+
+    after_build(function(target)
+        local dst_dir = "$(projectdir)/hikyuu/cpp/"
+        os.cp(target:targetdir() .. '/*.pyd', dst_dir)
+        os.cp(target:targetdir() .. '/*.dll', dst_dir)
+        os.cp(target:targetdir() .. '/*.so', dst_dir)
+        os.cp(target:targetdir() .. '/*.dylib', dst_dir)
+
+        os.cp("$(env BOOST_LIB)/boost_python3*.dll", dst_dir)
+        os.cp("$(env BOOST_LIB)/boost_serialization*.dll", dst_dir)
+        os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", dst_dir)
+        os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", dst_dir)
+        os.cp("$(env BOOST_LIB)/libboost_python3*.dylib", dst_dir)
+        os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", dst_dir)
+
+        if is_plat("windows") then
+            if is_mode("release") then
+                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
+            else
+                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5_D.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
+            end
+            os.cp("$(projectdir)/hikyuu_extern_libs/pkg/mysql.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
+        end
+
+    end)
+
 

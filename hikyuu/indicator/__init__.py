@@ -25,7 +25,5 @@
 # SOFTWARE.
 
 from .indicator import *
-from .indicator_doc import *
 from .pyind import *
-from .talib_wrap import * 
-
+from .talib_wrap import *

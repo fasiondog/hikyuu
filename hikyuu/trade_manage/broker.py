@@ -29,15 +29,14 @@
 # 1. 20170704, Added by fasiondog
 #===============================================================================
 
-from hikyuu.trade_manage import OrderBrokerBase
+from hikyuu import OrderBrokerBase
 from hikyuu import Datetime
 
-    
+
 class OrderBrokerWrap(OrderBrokerBase):
     """订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
        包装只有买卖操作参数只有(code, price, num)的交易接口类
     """
-    
     def __init__(self, broker, real=True, slip=0.03):
         """
         订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
@@ -49,8 +48,8 @@ class OrderBrokerWrap(OrderBrokerBase):
         super(OrderBrokerWrap, self).__init__()
         self._broker = broker
         self._real = real
-        self._slip=slip
-        
+        self._slip = slip
+
     def _buy(self, datetime, market, code, price, num):
         """实现 OrderBrokerBase 的 _buy 接口"""
         if self._real:
@@ -65,7 +64,7 @@ class OrderBrokerWrap(OrderBrokerBase):
         else:
             self._broker.buy(code, price, num)
             return datetime
-        
+
     def _sell(self, datetime, market, code, price, num):
         """实现 OrderBrokerBase 的 _sell 接口"""
         if self._real:
@@ -78,19 +77,19 @@ class OrderBrokerWrap(OrderBrokerBase):
             self._broker.sell(code, price, num)
             return datetime
 
-        
+
 class TestOrderBroker:
     """用于测试的订单代理，仅在执行买入/卖出时打印信息"""
     def __init__(self):
         pass
-    
+
     def buy(self, code, price, num):
         print("买入：%s  %.3f  %i" % (code, price, num))
-    
+
     def sell(self, code, price, num):
         print("卖出：%s  %.3f  %i" % (code, price, num))
-    
-        
+
+
 def crtOB(broker, real=True, slip=0.03):
     """
     快速生成订单代理包装对象

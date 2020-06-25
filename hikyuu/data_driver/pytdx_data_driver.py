@@ -35,7 +35,7 @@
 #
 #####################################################################
 
-from ._data_driver import KDataDriver, DataDriverFactory
+from ..cpp.core import KDataDriver, DataDriverFactory
 from hikyuu import KRecord, Query, Datetime, Parameter
 
 from pytdx.hq import TdxHq_API

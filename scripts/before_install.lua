@@ -7,7 +7,7 @@ function main(target)
     end
     
     local targetname = target:name()
-    if "_hikyuu" ~= targetname then
+    if "core" ~= targetname then
         return
     end
 

@@ -29,9 +29,13 @@ void export_Parameter();
 void export_save_load();
 void export_io_redirect();
 
-BOOST_PYTHON_MODULE(_hikyuu) {
-    boost::python::docstring_options doc_options(false);
+void export_data_driver_main();
+void export_indicator_main();
+void export_instance_main();
+void export_trade_manage_main();
+void export_trade_sys_main();
 
+BOOST_PYTHON_MODULE(core) {
     boost::python::def("hikyuu_init", hku::hikyuu_init);
     boost::python::def("getStock", hku::getStock);
     boost::python::def("getVersion", hku::getVersion);
@@ -55,6 +59,13 @@ BOOST_PYTHON_MODULE(_hikyuu) {
     export_Block();
     export_Parameter();
     export_save_load();
+
+    export_data_driver_main();
+    export_indicator_main();
+    export_instance_main();
+
+    export_trade_sys_main();
+    export_trade_manage_main();  // must after export_trade_sys_main
 
     export_io_redirect();
 }

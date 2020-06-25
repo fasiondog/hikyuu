@@ -24,16 +24,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from ._trade_sys import (SignalBase,
-                         SG_Bool,
-                         SG_Single,
-                         SG_Single2,
-                         SG_Cross,
-                         SG_CrossGold,
-                         SG_Flex)
+from hikyuu.cpp.core import (
+    SignalBase, SG_Bool, SG_Single, SG_Single2, SG_Cross, SG_CrossGold, SG_Flex
+)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
 
 SignalBase.__unicode__ = unicodeFunc
 SignalBase.__repr__ = reprFunc
@@ -43,9 +37,10 @@ def sig_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
     self._params = params
-    for k,v in params.items():
+    for k, v in params.items():
         self.setParam(k, v)
-    
+
+
 def crtSG(func, params={}, name='crtSG'):
     """
     快速创建自定义不带私有属性的信号指示器
@@ -55,11 +50,10 @@ def crtSG(func, params={}, name='crtSG'):
     :param str name: 自定义名称
     :return: 自定义信号指示器实例
     """
-    meta_x = type(name, (SignalBase,), {'__init__': sig_init})
+    meta_x = type(name, (SignalBase, ), {'__init__': sig_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
-
 
 
 #------------------------------------------------------------------
@@ -267,7 +261,6 @@ _clone(self)
     
     【重载接口】子类克隆接口
 """
-
 
 #------------------------------------------------------------------
 # add doc-string for build_in func

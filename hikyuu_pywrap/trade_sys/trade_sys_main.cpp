@@ -21,8 +21,7 @@ void export_Selector();
 void export_Portfolio();
 void export_AllocateFunds();
 
-BOOST_PYTHON_MODULE(_trade_sys) {
-    docstring_options doc_options(false);
+void export_trade_sys_main() {
     export_Environment();
     export_Condition();
     export_MoneyManager();
@@ -35,5 +34,4 @@ BOOST_PYTHON_MODULE(_trade_sys) {
     export_AllocateFunds();
     export_Portfolio();
 }
-
 

@@ -24,10 +24,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from ._trade_sys import (SlippageBase, SL_FixedPercent, SL_FixedValue)
+from hikyuu.cpp.core import (SlippageBase, SL_FixedPercent, SL_FixedValue)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
 
 SlippageBase.__unicode__ = unicodeFunc
 SlippageBase.__repr__ = reprFunc
@@ -37,9 +35,10 @@ def sl_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
     self._params = params
-    for k,v in params.items():
+    for k, v in params.items():
         self.setParam(k, v)
-    
+
+
 def crtSL(func, params={}, name='crtSL'):
     """
     快速创建自定义不带私有属性的移滑价差算法
@@ -49,11 +48,11 @@ def crtSL(func, params={}, name='crtSL'):
     :param str name: 自定义名称
     :return: 移滑价差算法实例
     """
-    meta_x = type(name, (SlippageBase,), {'__init__': sl_init})
+    meta_x = type(name, (SlippageBase, ), {'__init__': sl_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
-    return meta_x(name, params)    
-  
+    return meta_x(name, params)
+
 
 #------------------------------------------------------------------
 # add doc-string
@@ -166,7 +165,6 @@ _clone(self)
     
     【重载接口】子类克隆接口  
 """
-
 
 #------------------------------------------------------------------
 # add doc-string for build_in func

@@ -24,17 +24,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from ._trade_sys import (MoneyManagerBase, 
-                         MM_Nothing, 
-                         MM_FixedRisk,
-                         MM_FixedCapital,
-                         MM_FixedCount,
-                         MM_FixedPercent,
-                         MM_FixedUnits,
-                         MM_WilliamsFixedRisk)
+from hikyuu.cpp.core import (
+    MoneyManagerBase, MM_Nothing, MM_FixedRisk, MM_FixedCapital, MM_FixedCount, MM_FixedPercent,
+    MM_FixedUnits, MM_WilliamsFixedRisk
+)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
 
 MoneyManagerBase.__unicode__ = unicodeFunc
 MoneyManagerBase.__repr__ = reprFunc
@@ -44,9 +38,10 @@ def mm_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
     self._params = params
-    for k,v in params.items():
+    for k, v in params.items():
         self.setParam(k, v)
-    
+
+
 def crtMM(func, params={}, name='crtMM'):
     """
     快速创建自定义不带私有属性的资金管理策略
@@ -56,7 +51,7 @@ def crtMM(func, params={}, name='crtMM'):
     :param str name: 自定义名称
     :return: 自定义资金管理策略实例
     """
-    meta_x = type(name, (MoneyManagerBase,), {'__init__': mm_init})
+    meta_x = type(name, (MoneyManagerBase, ), {'__init__': mm_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -217,7 +212,6 @@ _clone(self)
     【重载接口】子类克隆接口
 """
 
-
 #------------------------------------------------------------------
 # add doc-string for build_in func
 #------------------------------------------------------------------
@@ -278,7 +272,4 @@ MM_WilliamsFixedRisk.__doc__ = """
 MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
     威廉斯固定风险资金管理策略
-""" 
-
-    
-
+"""

@@ -100,7 +100,6 @@ add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")
 add_subdirs("./hikyuu_cpp/demo")
 
-after_build("scripts.after_build")
 before_install("scripts.before_install")
 on_install("scripts.on_install")
 before_run("scripts.before_run")

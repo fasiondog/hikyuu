@@ -24,13 +24,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from ._trade_sys import (Portfolio, PF_Simple)
+from hikyuu.cpp.core import (Portfolio, PF_Simple)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 Portfolio.__unicode__ = unicodeFunc
 Portfolio.__repr__ = reprFunc
-
 
 #------------------------------------------------------------------
 # add doc-string
@@ -52,7 +50,6 @@ run(self, query)
     :param Query query: 查询条件
 """
 
-
 #------------------------------------------------------------------
 # add doc-string for build_in func
 #------------------------------------------------------------------
@@ -66,4 +63,3 @@ PF_Simple([tm, sys, se])
     :param System sys: 系统策略
     :param SelectorBase se: 选择器
 """
-

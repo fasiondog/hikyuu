@@ -24,13 +24,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from ._trade_sys import (SelectorBase, SE_Fixed)
+from hikyuu.cpp.core import (SelectorBase, SE_Fixed)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 SelectorBase.__unicode__ = unicodeFunc
 SelectorBase.__repr__ = reprFunc
-
 
 #------------------------------------------------------------------
 # add doc-string
@@ -105,7 +103,6 @@ clear(self)
     清除已加入的所有交易系统实例
 """
 
-
 SelectorBase.getSelectedSystemList.__doc__ = """
 getSelectedSystemList(self, datetime)
     
@@ -127,7 +124,6 @@ _clone(self)
     
     【重载接口】子类克隆接口 
 """
-
 
 #------------------------------------------------------------------
 # add doc-string for build_in func

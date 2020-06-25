@@ -29,7 +29,8 @@
 # 1. 20171122, Added by fasiondog
 #===============================================================================
 
-from hikyuu import KQuery
+from hikyuu import Query
+
 
 def get_draw_title(kdata):
     """根据typ值，返回相应的标题，如 上证指数（日线）
@@ -43,29 +44,29 @@ def get_draw_title(kdata):
     stock = kdata.getStock()
     if stock.isNull():
         return ""
-    
+
     s1 = ''
-    if query.kType == KQuery.DAY:
+    if query.kType == Query.DAY:
         s1 = u' （日线）'
-    elif query.kType == KQuery.WEEK:
+    elif query.kType == Query.WEEK:
         s1 = u' （周线）'
-    elif query.kType == KQuery.MONTH:
+    elif query.kType == Query.MONTH:
         s1 = u' （月线）'
-    elif query.kType == KQuery.QUARTER:
+    elif query.kType == Query.QUARTER:
         s1 = u' （季线）'
-    elif query.kType == KQuery.HALFYEAR:
+    elif query.kType == Query.HALFYEAR:
         s1 = u' （半年线）'
-    elif query.kType == KQuery.YEAR:
+    elif query.kType == Query.YEAR:
         s1 = u' （年线）'
-    elif query.kType == KQuery.MIN:
+    elif query.kType == Query.MIN:
         s1 = u' （1分钟线）'
-    elif query.kType == KQuery.MIN5:
+    elif query.kType == Query.MIN5:
         s1 = u' （5分钟线）'
-    elif query.kType == KQuery.MIN15:
+    elif query.kType == Query.MIN15:
         s1 = u' （15分钟线）'
-    elif query.kType == KQuery.MIN30:
+    elif query.kType == Query.MIN30:
         s1 = u' （30分钟线）'
-    elif query.kType == KQuery.MIN60:
+    elif query.kType == Query.MIN60:
         s1 = u' （60分钟线）'
 
     name = stock.name

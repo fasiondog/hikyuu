@@ -29,11 +29,7 @@
 # 1. 20171122, Added by fasiondog
 #===============================================================================
 
-from hikyuu import KData
-from hikyuu.indicator import Indicator
-from hikyuu.trade_sys.signal import SignalBase
-from hikyuu.trade_sys.condition import ConditionBase
-from hikyuu.trade_sys.system import System
+from hikyuu.cpp.core import KData, Indicator, SignalBase, ConditionBase, System
 
 from .echart_draw import gca as ect_gca
 from .echart_draw import gcf as ect_gcf
@@ -63,34 +59,36 @@ from .matplotlib_draw import ax_draw_macd2 as mpl_ax_draw_macd2
 from .matplotlib_draw import ax_set_locator_formatter as mpl_ax_set_locator_formatter
 from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 
-
 g_draw_engine = 'matplotlib'
+
 
 def get_current_draw_engine():
     global g_draw_engine
     return g_draw_engine
 
+
 def set_current_draw_engine(engine):
     global g_draw_engine
     g_draw_engine = engine
+
 
 def use_draw_engine(engine='matplotlib'):
     if engine == 'echarts':
         use_draw_with_echarts()
     else:
         use_draw_with_matplotlib()
-        
-     
+
+
 def use_draw_with_matplotlib():
     set_current_draw_engine('matplotlib')
-    
+
     KData.plot = mpl_kplot
     KData.kplot = mpl_kplot
     KData.mkplot = mpl_mkplot
-    
+
     Indicator.plot = mpl_iplot
     Indicator.bar = mpl_ibar
-    
+
     SignalBase.plot = mpl_sgplot
     ConditionBase.plot = mpl_cnplot
 
@@ -99,14 +97,14 @@ def use_draw_with_matplotlib():
 
 def use_draw_with_echarts():
     set_current_draw_engine('echarts')
-    
+
     KData.plot = ect_kplot
     KData.kplot = ect_kplot
     KData.mkplot = ect_mkplot
-    
+
     Indicator.plot = ect_iplot
     Indicator.bar = ect_ibar
-    
+
     SignalBase.plot = ect_sgplot
     ConditionBase.plot = ect_cnplot
 
@@ -119,8 +117,8 @@ def gca():
     if engine == 'matplotlib':
         return mpl_gca()
     else:
-        return ect_gca()    
-    
+        return ect_gca()
+
 
 def gcf():
     """获取当前figure"""
@@ -128,7 +126,7 @@ def gcf():
     if engine == 'matplotlib':
         return mpl_gcf()
     else:
-        return ect_gcf()   
+        return ect_gcf()
 
 
 def show_gcf():
@@ -137,8 +135,8 @@ def show_gcf():
     if engine == 'matplotlib':
         return None
     else:
-        return ect_gcf()   
-    
+        return ect_gcf()
+
 
 def create_figure(n=1, figsize=None):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
@@ -149,12 +147,12 @@ def create_figure(n=1, figsize=None):
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
-        fsize = (10,8) if figsize is None else figsize
+        fsize = (10, 8) if figsize is None else figsize
         return mpl_create_figure(n, fsize)
     else:
-        fsize = (8,6) if figsize is None else figsize
+        fsize = (8, 6) if figsize is None else figsize
         return ect_create_figure(n, fsize)
-    
+
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     """绘制MACD
@@ -170,8 +168,8 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
         return mpl_ax_draw_macd(axes, kdata, n1, n2, n3)
     else:
         return ect_ax_draw_macd(axes, kdata, n1, n2, n3)
-    
-    
+
+
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     """绘制MACD。
     当BAR值变化与参考序列ref变化不一致时，显示为灰色，
@@ -184,13 +182,13 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     :param int n1: 指标 MACD 的参数1
     :param int n2: 指标 MACD 的参数2
     :param int n3: 指标 MACD 的参数3
-    """    
+    """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
         return mpl_ax_draw_macd2(axes, ref, kdata, n1, n2, n3)
     else:
         return ect_ax_draw_macd2(axes, ref, kdata, n1, n2, n3)
-    
+
 
 def adjust_axes_show(axeslist):
     """用于调整上下紧密相连的坐标轴显示时，其上一坐标轴最小值刻度和下一坐标轴最大值刻度
@@ -203,7 +201,7 @@ def adjust_axes_show(axeslist):
         mpl_adjust_axes_show(axeslist)
     else:
         pass
-    
+
 
 def ax_set_locator_formatter(axes, dates, typ):
     """ 设置指定坐标轴的日期显示，根据指定的K线类型优化X轴坐标显示
@@ -217,14 +215,9 @@ def ax_set_locator_formatter(axes, dates, typ):
         mpl_ax_set_locator_formatter(axes, dates, typ)
     else:
         pass
-    
 
-__all__ = ['use_draw_engine',
-           'get_current_draw_engine',
-           'create_figure',
-           'gcf',
-           'show_gcf',
-           'gca',
-           'ax_draw_macd',
-           'ax_draw_macd2']
 
+__all__ = [
+    'use_draw_engine', 'get_current_draw_engine', 'create_figure', 'gcf', 'show_gcf', 'gca',
+    'ax_draw_macd', 'ax_draw_macd2'
+]

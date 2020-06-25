@@ -59,16 +59,16 @@ Indicator (*EMA_2)(const Indicator&, int) = EMA;
 
 Indicator (*MACD_1)(int, int, int) = MACD;
 Indicator (*MACD_2)(const Indicator&, int, int, int) = MACD;
-//BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_1_overload, MACD, 0, 3);
-//BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_2_overload, MACD, 1, 4);
+// BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_1_overload, MACD, 0, 3);
+// BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_2_overload, MACD, 1, 4);
 
 Indicator (*REF_1)(int) = REF;
 Indicator (*REF_2)(const Indicator&, int) = REF;
 
 Indicator (*SAFTYLOSS_1)(int n1, int n2, double p) = SAFTYLOSS;
 Indicator (*SAFTYLOSS_2)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS;
-//BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_1_overload, SAFTYLOSS, 0, 3);
-//BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_2_overload, SAFTYLOSS, 1, 4);
+// BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_1_overload, SAFTYLOSS, 0, 3);
+// BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_2_overload, SAFTYLOSS, 1, 4);
 
 Indicator (*STDEV_1)(int) = STDEV;
 Indicator (*STDEV_2)(const Indicator&, int) = STDEV;
@@ -296,81 +296,80 @@ Indicator (*ALIGN_4)(const Indicator&, const KData&) = ALIGN;
 Indicator (*DROPNA_1)() = DROPNA;
 Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
 
-
 void export_Indicator_build_in() {
-    def("IKDATA", KDATA1);
-    def("IKDATA", KDATA3);
+    def("KDATA", KDATA1);
+    def("KDATA", KDATA3);
 
-    def("ICLOSE", CLOSE1);
-    def("ICLOSE", CLOSE3);
+    def("CLOSE", CLOSE1);
+    def("CLOSE", CLOSE3);
 
-    def("IOPEN", OPEN1);
-    def("IOPEN", OPEN3);
+    def("OPEN", OPEN1);
+    def("OPEN", OPEN3);
 
-    def("IHIGH", HIGH1);
-    def("IHIGH", HIGH3);
+    def("HIGH", HIGH1);
+    def("HIGH", HIGH3);
 
-    def("ILOW", LOW1);
-    def("ILOW", LOW3);
+    def("LOW", LOW1);
+    def("LOW", LOW3);
 
-    def("IAMO", AMO1);
-    def("IAMO", AMO3);
+    def("AMO", AMO1);
+    def("AMO", AMO3);
 
-    def("IVOL", VOL1);
-    def("IVOL", VOL3);
+    def("VOL", VOL1);
+    def("VOL", VOL3);
 
     def("KDATA_PART", KDATA_PART1, (arg("data"), arg("kpart")));
     def("KDATA_PART", KDATA_PART3, (arg("kpart")));
 
-    def("PRICELIST", PRICELIST2, (arg("data"), arg("discard")=0));
-    def("PRICELIST", PRICELIST3, (arg("data"), arg("result_index")=0));
-    def("PRICELIST", PRICELIST4, (arg("result_index")=0));
+    def("PRICELIST", PRICELIST2, (arg("data"), arg("discard") = 0));
+    def("PRICELIST", PRICELIST3, (arg("data"), arg("result_index") = 0));
+    def("PRICELIST", PRICELIST4, (arg("result_index") = 0));
 
-    def("SMA", SMA_1, (arg("n")=22, arg("m")=2.0));
-    def("SMA", SMA_2, (arg("data"), arg("n")=22, arg("m")=2.0));
-    
-    def("EMA", EMA_1, (arg("n")=22));
-    def("EMA", EMA_2, (arg("data"), arg("n")=22));
+    def("SMA", SMA_1, (arg("n") = 22, arg("m") = 2.0));
+    def("SMA", SMA_2, (arg("data"), arg("n") = 22, arg("m") = 2.0));
 
-    def("MA", MA_1, (arg("n")=22));
-    def("MA", MA_2, (arg("data"), arg("n")=22));
+    def("EMA", EMA_1, (arg("n") = 22));
+    def("EMA", EMA_2, (arg("data"), arg("n") = 22));
 
-    def("AMA", AMA_1, (arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));
-    def("AMA", AMA_2, (arg("data"), arg("n")=10, arg("fast_n")=2, arg("slow_n")=30));
+    def("MA", MA_1, (arg("n") = 22));
+    def("MA", MA_2, (arg("data"), arg("n") = 22));
 
-    def("ATR", ATR_1, (arg("n")=14));
-    def("ATR", ATR_2, (arg("data"), arg("n")=14));
+    def("AMA", AMA_1, (arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
+    def("AMA", AMA_2, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
 
-    def("MACD", MACD_1, (arg("n1")=12, arg("n2")=26, arg("n3")=9));
-    def("MACD", MACD_2, (arg("data"), arg("n1")=12, arg("n2")=26, arg("n3")=9));
+    def("ATR", ATR_1, (arg("n") = 14));
+    def("ATR", ATR_2, (arg("data"), arg("n") = 14));
 
-    def("VIGOR", VIGOR_1, (arg("kdata"), arg("n")=2));
-    def("VIGOR", VIGOR_2, (arg("n")=2));
+    def("MACD", MACD_1, (arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
+    def("MACD", MACD_2, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
 
-    def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1")=10, arg("n2")=3, arg("p")=2.0));
-    def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1")=10, arg("n2")=3, arg("p")=2.0));
+    def("VIGOR", VIGOR_1, (arg("kdata"), arg("n") = 2));
+    def("VIGOR", VIGOR_2, (arg("n") = 2));
+
+    def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
     def("DIFF", DIFF_1);
     def("DIFF", DIFF_2);
 
     def("REF", REF_1, (arg("n")));
     def("REF", REF_2, (arg("data"), arg("n")));
 
-    def("STDEV", STDEV_1, (arg("n")=10));
-    def("STDEV", STDEV_2, (arg("data"), arg("n")=10));
+    def("STDEV", STDEV_1, (arg("n") = 10));
+    def("STDEV", STDEV_2, (arg("data"), arg("n") = 10));
 
-    def("STDP", STDP_1, (arg("n")=10));
-    def("STDP", STDP_2, (arg("data"), arg("n")=10));
+    def("STDP", STDP_1, (arg("n") = 10));
+    def("STDP", STDP_2, (arg("data"), arg("n") = 10));
 
     def("POS", POS, (arg("block"), arg("query"), arg("sg")));
 
-    def("HHV", HHV_1, (arg("n")=20));
-    def("HHV", HHV_2, (arg("data"), arg("n")=20));
+    def("HHV", HHV_1, (arg("n") = 20));
+    def("HHV", HHV_2, (arg("data"), arg("n") = 20));
 
-    def("LLV", LLV_1, (arg("n")=20));
-    def("LLV", LLV_2, (arg("data"), arg("n")=20));
+    def("LLV", LLV_1, (arg("n") = 20));
+    def("LLV", LLV_2, (arg("data"), arg("n") = 20));
 
-    def("CVAL", CVAL_1, (arg("value")=0.0, arg("discard")=0));
-    def("CVAL", CVAL_2, (arg("data"), arg("value")=0.0, arg("discard")=0));
+    def("CVAL", CVAL_1, (arg("value") = 0.0, arg("discard") = 0));
+    def("CVAL", CVAL_2, (arg("data"), arg("value") = 0.0, arg("discard") = 0));
 
     def("LIUTONGPAN", LIUTONGPAN_1);
     def("LIUTONGPAN", LIUTONGPAN_2);
@@ -383,11 +382,11 @@ void export_Indicator_build_in() {
     def("IF", IF_3);
     def("IF", IF_4);
 
-    def("COUNT", COUNT_1, (arg("n")=20));
-    def("COUNT", COUNT_2, (arg("data"), arg("n")=20));
+    def("COUNT", COUNT_1, (arg("n") = 20));
+    def("COUNT", COUNT_2, (arg("data"), arg("n") = 20));
 
-    def("SUM", SUM_1, (arg("n")=20));
-    def("SUM", SUM_2, (arg("data"), arg("n")=20));
+    def("SUM", SUM_1, (arg("n") = 20));
+    def("SUM", SUM_2, (arg("data"), arg("n") = 20));
 
     def("ABS", ABS_1);
     def("ABS", ABS_2);
@@ -429,11 +428,11 @@ void export_Indicator_build_in() {
     def("LOG", LOG_2);
     def("LOG", LOG_3);
 
-    def("HHVBARS", HHVBARS_1, (arg("n")=20));
-    def("HHVBARS", HHVBARS_2, (arg("data"), arg("n")=20));
+    def("HHVBARS", HHVBARS_1, (arg("n") = 20));
+    def("HHVBARS", HHVBARS_2, (arg("data"), arg("n") = 20));
 
-    def("LLVBARS", LLVBARS_1, (arg("n")=20));
-    def("LLVBARS", LLVBARS_2, (arg("data"), arg("n")=20));
+    def("LLVBARS", LLVBARS_1, (arg("n") = 20));
+    def("LLVBARS", LLVBARS_2, (arg("data"), arg("n") = 20));
 
     def("POW", POW_1, (arg("n")));
     def("POW", POW_2, (arg("data"), arg("n")));
@@ -444,16 +443,16 @@ void export_Indicator_build_in() {
     def("SQRT", SQRT_3);
 
     def("ROUND", ROUND_1, (arg("ndigits") = 2));
-    def("ROUND", ROUND_2, (arg("data"), arg("ndigits")=2));
-    def("ROUND", ROUND_3, (arg("data"), arg("ndigits")=2));
+    def("ROUND", ROUND_2, (arg("data"), arg("ndigits") = 2));
+    def("ROUND", ROUND_3, (arg("data"), arg("ndigits") = 2));
 
     def("ROUNDUP", ROUNDUP_1, (arg("ndigits") = 2));
-    def("ROUNDUP", ROUNDUP_2, (arg("data"), arg("ndigits")=2));
-    def("ROUNDUP", ROUNDUP_3, (arg("data"), arg("ndigits")=2));
+    def("ROUNDUP", ROUNDUP_2, (arg("data"), arg("ndigits") = 2));
+    def("ROUNDUP", ROUNDUP_3, (arg("data"), arg("ndigits") = 2));
 
     def("ROUNDDOWN", ROUNDDOWN_1, (arg("ndigits") = 2));
-    def("ROUNDDOWN", ROUNDDOWN_2, (arg("data"), arg("ndigits")=2));
-    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits")=2));
+    def("ROUNDDOWN", ROUNDDOWN_2, (arg("data"), arg("ndigits") = 2));
+    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits") = 2));
 
     def("FLOOR", FLOOR_1);
     def("FLOOR", FLOOR_2);
@@ -467,14 +466,14 @@ void export_Indicator_build_in() {
     def("INTPART", INTPART_2);
     def("INTPART", INTPART_3);
 
-    def("EXIST", EXIST_1, (arg("n")=20));
-    def("EXIST", EXIST_2, (arg("data"), arg("n")=20));
+    def("EXIST", EXIST_1, (arg("n") = 20));
+    def("EXIST", EXIST_2, (arg("data"), arg("n") = 20));
 
-    def("EVERY", EVERY_1, (arg("n")=20));
-    def("EVERY", EVERY_2, (arg("data"), arg("n")=20));
+    def("EVERY", EVERY_1, (arg("n") = 20));
+    def("EVERY", EVERY_2, (arg("data"), arg("n") = 20));
 
-    def("LAST", LAST_1, (arg("m")=10, arg("n")=5));
-    def("LAST", LAST_2, (arg("data"), arg("m")=10, arg("n")=5));
+    def("LAST", LAST_1, (arg("m") = 10, arg("n") = 5));
+    def("LAST", LAST_2, (arg("data"), arg("m") = 10, arg("n") = 5));
 
     def("SIN", SIN_1);
     def("SIN", SIN_2);
@@ -482,23 +481,23 @@ void export_Indicator_build_in() {
 
     def("ASIN", ASIN_1);
     def("ASIN", ASIN_2);
-    def("ASIN", ASIN_3); 
+    def("ASIN", ASIN_3);
 
     def("COS", COS_1);
     def("COS", COS_2);
-    def("COS", COS_3); 
+    def("COS", COS_3);
 
     def("ACOS", ACOS_1);
     def("ACOS", ACOS_2);
-    def("ACOS", ACOS_3); 
+    def("ACOS", ACOS_3);
 
     def("TAN", TAN_1);
     def("TAN", TAN_2);
-    def("TAN", TAN_3); 
+    def("TAN", TAN_3);
 
     def("ATAN", ATAN_1);
     def("ATAN", ATAN_2);
-    def("ATAN", ATAN_3); 
+    def("ATAN", ATAN_3);
 
     def("REVERSE", REVERSE_1);
     def("REVERSE", REVERSE_2);
@@ -509,36 +508,36 @@ void export_Indicator_build_in() {
     def("MOD", MOD_3);
     def("MOD", MOD_4);
 
-    def("VAR", VAR_1, (arg("n")=10));
-    def("VAR", VAR_2, (arg("data"), arg("n")=10));
+    def("VAR", VAR_1, (arg("n") = 10));
+    def("VAR", VAR_2, (arg("data"), arg("n") = 10));
 
-    def("VARP", VARP_1, (arg("n")=10));
-    def("VARP", VARP_2, (arg("data"), arg("n")=10));
+    def("VARP", VARP_1, (arg("n") = 10));
+    def("VARP", VARP_2, (arg("data"), arg("n") = 10));
 
-    def("UPNDAY", UPNDAY, (arg("data"), arg("n")=3));
-    def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n")=3));
-    def("NDAY", NDAY, (arg("x"), arg("y"), arg("n")=3));
+    def("UPNDAY", UPNDAY, (arg("data"), arg("n") = 3));
+    def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n") = 3));
+    def("NDAY", NDAY, (arg("x"), arg("y"), arg("n") = 3));
 
     def("CROSS", CROSS_1);
     def("CROSS", CROSS_2);
     def("CROSS", CROSS_3);
     def("CROSS", CROSS_4);
 
-    def("LONGCROSS", LONGCROSS_1, (arg("a"), arg("b"), arg("n")=3));
-    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n")=3));
-    def("LONGCROSS", LONGCROSS_3, (arg("a"), arg("b"), arg("n")=3));
-    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n")=3));
+    def("LONGCROSS", LONGCROSS_1, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_3, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n") = 3));
 
-    def("FILTER", FILTER_1, (arg("n")=5));
-    def("FILTER", FILTER_2, (arg("data"), arg("n")=5));
+    def("FILTER", FILTER_1, (arg("n") = 5));
+    def("FILTER", FILTER_2, (arg("data"), arg("n") = 5));
 
     def("BARSSINCE", BARSSINCE_1);
     def("BARSSINCE", BARSSINCE_2);
-    def("BARSSINCE", BARSSINCE_3); 
+    def("BARSSINCE", BARSSINCE_3);
 
     def("BARSLAST", BARSLAST_1);
     def("BARSLAST", BARSLAST_2);
-    def("BARSLAST", BARSLAST_3); 
+    def("BARSLAST", BARSLAST_3);
 
     def("SUMBARS", SUMBARS_1);
     def("SUMBARS", SUMBARS_2);
@@ -557,28 +556,28 @@ void export_Indicator_build_in() {
 
     def("DMA", DMA);
 
-    def("AVEDEV", AVEDEV, (arg("data"), arg("n")=22));
+    def("AVEDEV", AVEDEV, (arg("data"), arg("n") = 22));
 
-    def("DEVSQ", DEVSQ_1, (arg("n")=10));
-    def("DEVSQ", DEVSQ_2, (arg("data"), arg("n")=10));
+    def("DEVSQ", DEVSQ_1, (arg("n") = 10));
+    def("DEVSQ", DEVSQ_2, (arg("data"), arg("n") = 10));
 
-    def("ROC", ROC_1, (arg("n")=10));
-    def("ROC", ROC_2, (arg("data"), arg("n")=10));
+    def("ROC", ROC_1, (arg("n") = 10));
+    def("ROC", ROC_2, (arg("data"), arg("n") = 10));
 
-    def("ROCP", ROCP_1, (arg("n")=10));
-    def("ROCP", ROCP_2, (arg("data"), arg("n")=10));
+    def("ROCP", ROCP_1, (arg("n") = 10));
+    def("ROCP", ROCP_2, (arg("data"), arg("n") = 10));
 
-    def("ROCR", ROCR_1, (arg("n")=10));
-    def("ROCR", ROCR_2, (arg("data"), arg("n")=10));
+    def("ROCR", ROCR_1, (arg("n") = 10));
+    def("ROCR", ROCR_2, (arg("data"), arg("n") = 10));
 
-    def("ROCR100", ROCR100_1, (arg("n")=10));
-    def("ROCR100", ROCR100_2, (arg("data"), arg("n")=10));
+    def("ROCR100", ROCR100_1, (arg("n") = 10));
+    def("ROCR100", ROCR100_2, (arg("data"), arg("n") = 10));
 
     def("AD", AD_1);
     def("AD", AD_2);
 
-    def("COST", COST_1, (arg("x")=10.0));
-    def("COST", COST_2, (arg("k"), arg("x")=10.0));
+    def("COST", COST_1, (arg("x") = 10.0));
+    def("COST", COST_2, (arg("k"), arg("x") = 10.0));
 
     def("ALIGN", ALIGN_1);
     def("ALIGN", ALIGN_2);
@@ -588,11 +587,10 @@ void export_Indicator_build_in() {
     def("DROPNA", DROPNA_1);
     def("DROPNA", DROPNA_2);
 
-    def("ADVANCE", ADVANCE, (arg("query")=KQueryByIndex(-100), 
-                             arg("market")="SH", arg("stk_type")=STOCKTYPE_A,
-                             arg("ignore_context")=false));
-    def("DECLINE", DECLINE, (arg("query")=KQueryByIndex(-100), 
-                             arg("market")="SH", arg("stk_type")=STOCKTYPE_A,
-                             arg("ignore_context")=false));
-
+    def("ADVANCE", ADVANCE,
+        (arg("query") = KQueryByIndex(-100), arg("market") = "SH", arg("stk_type") = STOCKTYPE_A,
+         arg("ignore_context") = false));
+    def("DECLINE", DECLINE,
+        (arg("query") = KQueryByIndex(-100), arg("market") = "SH", arg("stk_type") = STOCKTYPE_A,
+         arg("ignore_context") = false));
 }

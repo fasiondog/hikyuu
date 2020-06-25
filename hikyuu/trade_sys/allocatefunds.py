@@ -24,11 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from ._trade_sys import (AllocateFundsBase,
-                         SystemWeight,
-                         SystemWeightList, 
-                         AF_EqualWeight)
+from hikyuu.cpp.core import (AllocateFundsBase, SystemWeight, SystemWeightList, AF_EqualWeight)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from hikyuu.util.slice import list_getitem
 
@@ -43,8 +39,6 @@ SystemWeightList.__getitem__ = list_getitem
 #------------------------------------------------------------------
 # add doc-string
 #------------------------------------------------------------------
-
-
 
 #------------------------------------------------------------------
 # add doc-string for build_in func

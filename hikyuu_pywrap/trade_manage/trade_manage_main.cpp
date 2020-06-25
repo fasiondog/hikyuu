@@ -21,8 +21,7 @@ void export_TradeManager();
 void export_Performance();
 void export_OrderBroker();
 
-BOOST_PYTHON_MODULE(_trade_manage) {
-    docstring_options doc_options(false);
+void export_trade_manage_main() {
     export_CostRecord();
     export_PositionRecord();
     export_TradeCost();
@@ -35,4 +34,3 @@ BOOST_PYTHON_MODULE(_trade_manage) {
     export_Performance();
     export_build_in();
 }
-

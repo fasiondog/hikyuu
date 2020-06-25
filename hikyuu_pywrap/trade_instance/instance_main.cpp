@@ -5,16 +5,12 @@
  *      Author: fasiondog
  */
 
-
 #include <boost/python.hpp>
 
 using namespace boost::python;
 
 void export_AmaInstance();
 
-BOOST_PYTHON_MODULE(_trade_instance) {
-    docstring_options doc_options(false);
+void export_instance_main() {
     export_AmaInstance();
 }
-
-

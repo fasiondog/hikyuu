@@ -14,11 +14,9 @@ void export_KDataDriver();
 void export_BaseInfoDriver();
 void export_BlockInfoDriver();
 
-BOOST_PYTHON_MODULE(_data_driver) {
+void export_data_driver_main() {
     export_BaseInfoDriver();
     export_BlockInfoDriver();
     export_KDataDriver();
     export_DataDriverFactory();
 }
-
-

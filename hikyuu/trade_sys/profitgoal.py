@@ -24,13 +24,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from ._trade_sys import (ProfitGoalBase, 
-                         PG_NoGoal, 
-                         PG_FixedPercent,
-                         PG_FixedHoldDays)
+from hikyuu.cpp.core import (ProfitGoalBase, PG_NoGoal, PG_FixedPercent, PG_FixedHoldDays)
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
 
 ProfitGoalBase.__unicode__ = unicodeFunc
 ProfitGoalBase.__repr__ = reprFunc
@@ -40,9 +35,10 @@ def pg_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
     self._params = params
-    for k,v in params.items():
+    for k, v in params.items():
         self.setParam(k, v)
-    
+
+
 def crtPG(func, params={}, name='crtPG'):
     """
     快速创建自定义不带私有属性的盈利目标策略
@@ -52,7 +48,7 @@ def crtPG(func, params={}, name='crtPG'):
     :param str name: 自定义名称
     :return: 盈利目标策略实例
     """
-    meta_x = type(name, (ProfitGoalBase,), {'__init__': pg_init})
+    meta_x = type(name, (ProfitGoalBase, ), {'__init__': pg_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -189,7 +185,6 @@ sellNotify(self, trade_record)
     :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录
 """
 
-
 #------------------------------------------------------------------
 # add doc-string for build_in func
 #------------------------------------------------------------------
@@ -219,4 +214,3 @@ PG_FixedHoldDays([days=5])
     :param int days: 允许持仓天数（按交易日算）,默认5天
     :return: 盈利目标策略实例
 """
-

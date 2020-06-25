@@ -24,8 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-from . import _trade_sys as csys
+import hikyuu.cpp.core as csys
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 StoplossBase = csys.StoplossBase
@@ -36,13 +35,15 @@ ST_FixedPercent = csys.ST_FixedPercent
 ST_Indicator = csys.ST_Indicator
 ST_Saftyloss = csys.ST_Saftyloss
 
+
 def st_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
     self._params = params
-    for k,v in params.items():
+    for k, v in params.items():
         self.setParam(k, v)
-    
+
+
 def crtST(func, params={}, name='crtST'):
     """
     快速创建自定义不带私有属性的止损/止盈策略
@@ -52,7 +53,7 @@ def crtST(func, params={}, name='crtST'):
     :param str name: 自定义名称
     :return: 止损/止盈策略实例
     """
-    meta_x = type(name, (StoplossBase,), {'__init__': st_init})
+    meta_x = type(name, (StoplossBase, ), {'__init__': st_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -178,12 +179,11 @@ _clone(self)
     【重载接口】子类克隆接口
 """
 
-
 #------------------------------------------------------------------
 # add doc-string for build_in func
 #------------------------------------------------------------------
 
-ST_FixedPercent.__doc__ =  """
+ST_FixedPercent.__doc__ = """
 ST_FixedPercent([p=0.03])
 
     固定百分比止损策略，即当价格低于买入价格的某一百分比时止损

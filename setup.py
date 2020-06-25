@@ -199,15 +199,7 @@ def start_build(verbose=False, mode='release'):
 
     os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
     if mode == "release":
-        os.system("xmake -b {} _hikyuu".format("-v -D" if verbose else ""))
-        os.system("xmake -b {} _indicator".format("-v -D" if verbose else ""))
-        os.system(
-            "xmake -b {} _trade_manage".format("-v -D" if verbose else ""))
-        os.system("xmake -b {} _trade_sys".format("-v -D" if verbose else ""))
-        os.system(
-            "xmake -b {} _trade_instance".format("-v -D" if verbose else ""))
-        os.system(
-            "xmake -b {} _data_driver".format("-v -D" if verbose else ""))
+        os.system("xmake -b {} core".format("-v -D" if verbose else ""))
 
     # 保存当前的编译信息
     save_current_compile_info(current_compile_info)

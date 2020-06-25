@@ -24,15 +24,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ._trade_sys import (System,
-                         SystemList,
-                         getSystemPartName,
-                         getSystemPartEnum,
-                         TradeRequest)
-from ._trade_sys import SYS_Simple as cpp_SYS_Simple
+from hikyuu.cpp.core import (System, SystemList, getSystemPartName, getSystemPartEnum, TradeRequest)
+from hikyuu.cpp.core import SYS_Simple as cpp_SYS_Simple
 from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from hikyuu.util.slice import list_getitem
-    
+
 System.__unicode__ = unicodeFunc
 System.__repr__ = reprFunc
 
@@ -51,8 +47,7 @@ SystemList.__getitem__ = list_getitem
 #SystemPart = System.Part
 
 
-def SYS_Simple(tm = None, mm = None, ev = None, cn = None, 
-               sg = None, st = None, tp = None, pg = None, sp = None):
+def SYS_Simple(tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg=None, sp=None):
     """
     创建简单系统实例（每次交易不进行多次加仓或减仓，即每次买入后在卖出时全部卖出）， 
      系统实例在运行时(调用run方法），至少需要一个配套的交易管理实例、一个资金管理策略
@@ -127,8 +122,6 @@ TradeRequest.stoploss.__doc__ = """发出交易请求时刻的止损价"""
 TradeRequest.part.__doc__ = """发出交易请求的来源，参见：:py:class:`System.Part`"""
 TradeRequest.count.__doc__ = """因操作失败，连续延迟的次数"""
 
-
-
 System.Part.__doc__ = """
 系统部件枚举值，系统的买入/卖出等操作可由这些部件触发，用于标识实际交易指令的来源，
 参见：:py:class:`TradeRecord`。
@@ -146,7 +139,6 @@ System.Part.__doc__ = """
 - System.Part.SLIPPAGE     - 移滑价差算法
 - System.Part.INVALID      - 无效值边界，大于等于该值时为无效部件
 """
-
 
 System.__doc__ = """
 系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
@@ -168,7 +160,7 @@ System.__doc__ = """
     support_borrow_stock=False (bool) : 在没有持仓时，是否支持借入证券，融券
 """
 
-System.name.__doc__ = """系统名称""" 
+System.name.__doc__ = """系统名称"""
 System.tm.__doc__ = """交易管理实例"""
 System.mm.__doc__ = """资金管理策略"""
 System.ev.__doc__ = """市场环境判断策略"""
@@ -178,7 +170,6 @@ System.st.__doc__ = """止损策略"""
 System.tp.__doc__ = """止盈策略"""
 System.pg.__doc__ = """盈利目标策略"""
 System.sp.__doc__ = """移滑价差算法"""
-
 
 System.getParam.__doc__ = """
 getParam(self, name)
@@ -279,7 +270,6 @@ clone(self, with_tm, with_ev)
     :param bool with_tm: 是clone还是共享
     :param bool with_ev: 是clone还是共享
 """
-
 
 #------------------------------------------------------------------
 # add doc-string for build_in func
