@@ -903,7 +903,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
                               double number, price_t stoploss, price_t goalPrice, price_t planPrice,
                               SystemPart from) {
     TradeRecord result;
-    result.business = INVALID_BUSINESS;
+    result.business = BUSINESS_INVALID;
 
     if (stock.isNull()) {
         HKU_ERROR("{} Stock is Null!", datetime);
@@ -1134,7 +1134,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
                                     double number, price_t stoploss, price_t goalPrice,
                                     price_t planPrice, SystemPart from) {
     TradeRecord result;
-    result.business = INVALID_BUSINESS;
+    result.business = BUSINESS_INVALID;
 
     if (stock.isNull()) {
         HKU_ERROR("{} Stock is Null!", datetime);
@@ -1994,7 +1994,7 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
         case BUSINESS_BUY_SHORT:
             return _add_buy_short_tr(tr);
 
-        case INVALID_BUSINESS:
+        case BUSINESS_INVALID:
         default:
             HKU_ERROR("tr.business is invalid({})!", tr.business);
             return false;

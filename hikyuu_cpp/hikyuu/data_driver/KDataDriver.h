@@ -18,17 +18,25 @@ namespace hku {
 
 /**
  * K线数据驱动基类
+ * @ingroup DataDriver
  */
 class HKU_API KDataDriver {
     PARAMETER_SUPPORT
 
 public:
     KDataDriver();
+
+    /**
+     * 构造函数
+     * @param name 驱动名称
+     */
     KDataDriver(const string& name);
     virtual ~KDataDriver() {}
 
+    /** 获取驱动名称 */
     const string& name() const;
 
+    /** 驱动初始化 */
     bool init(const Parameter&);
 
     /**

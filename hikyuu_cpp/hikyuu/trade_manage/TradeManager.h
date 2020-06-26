@@ -345,7 +345,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划买入价格
      * @param from 记录是哪个系统部件发出的买入指示
-     * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
+     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice, double number,
                     price_t stoploss = 0.0, price_t goalPrice = 0.0, price_t planPrice = 0.0,
@@ -361,7 +361,7 @@ public:
      * @param goalPrice 新的目标价格
      * @param planPrice 原计划卖出价格
      * @param from 记录是哪个系统部件发出的卖出指示
-     * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
+     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                      double number = MAX_DOUBLE, price_t stoploss = 0.0, price_t goalPrice = 0.0,
@@ -377,7 +377,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划卖空价格
      * @param from 记录是哪个系统部件发出的买入指示
-     * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
+     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                           double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
@@ -393,7 +393,7 @@ public:
      * @param goalPrice 目标价格
      * @param planPrice 计划买入价格
      * @param from 记录是哪个系统部件发出的卖出指示
-     * @return 返回对应的交易记录，如果操作失败，business等于INVALID_BUSINESS
+     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
     TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                          double number = MAX_DOUBLE, price_t stoploss = 0.0,

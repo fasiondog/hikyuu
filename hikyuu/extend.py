@@ -1,5 +1,5 @@
 #
-# 对 C++ 引出的类型进行补充定义
+# 对 C++ 引出类和函数进行扩展
 #
 
 from hikyuu.cpp.core import *

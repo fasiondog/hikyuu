@@ -83,7 +83,7 @@ public:
     virtual ~IndicatorImp();
 
     typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
-    virtual IndicatorImpPtr operator()(const Indicator& ind);
+    IndicatorImpPtr operator()(const Indicator& ind);
 
     size_t getResultNumber() const;
 

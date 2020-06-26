@@ -18,6 +18,7 @@ namespace hku {
 
 /**
  * 基本信息数据获取驱动基类
+ * @ingroup DataDriver
  */
 class HKU_API BaseInfoDriver {
     PARAMETER_SUPPORT
@@ -26,9 +27,14 @@ public:
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
     typedef unordered_map<uint32, StockTypeInfo> StockTypeInfoMap;
 
+    /**
+     * 构造函数
+     * @param name 驱动名称
+     */
     BaseInfoDriver(const string& name);
     virtual ~BaseInfoDriver() {}
 
+    /** 获取驱动名称 */
     const string& name() const;
 
     /**

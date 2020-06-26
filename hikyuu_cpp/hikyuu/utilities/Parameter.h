@@ -318,14 +318,43 @@ template <typename ValueType>
 void Parameter::set(const string& name, const ValueType& value) {
     if (!have(name)) {
         if (!support(value)) {
-            throw std::logic_error("Unsuport Type! " + name);
+            throw std::logic_error("Unsuport Type! input valut type: " +
+                                   string(typeid(ValueType).name()));
         }
         m_params[name] = value;
         return;
     }
 
     if (m_params[name].type() != typeid(ValueType)) {
-        throw std::logic_error("Mismatching type! " + name);
+        throw std::logic_error("Mismatching type! need type " +
+                               string(m_params[name].type().name()) + " but value type is " +
+                               string(typeid(ValueType).name()));
+    }
+
+    m_params[name] = value;
+}
+
+template <>
+inline boost::any Parameter::get<boost::any>(const std::string& name) const {
+    param_map_t::const_iterator iter;
+    iter = m_params.find(name);
+    if (iter == m_params.end()) {
+        throw std::out_of_range("out_of_range in Parameter::get : " + name);
+    }
+    return iter->second;
+}
+
+template <>
+inline void Parameter::set(const string& name, const boost::any& value) {
+    if (!have(name)) {
+        m_params[name] = value;
+        return;
+    }
+
+    if (m_params[name].type() != value.type()) {
+        throw std::logic_error("Mismatching type! need type " +
+                               string(m_params[name].type().name()) + " but value type is " +
+                               string(value.type().name()));
     }
 
     m_params[name] = value;

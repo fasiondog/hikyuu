@@ -17,13 +17,16 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 namespace hku {
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
-    os << "Indicator(" << imp.name() << ", " << imp.getParameter() << ")";
+    os << "Indicator{\n"
+       << "  name: " << imp.name() << "\n  size: " << imp.size()
+       << "\n  result sets: " << imp.getResultNumber() << "\n  params: " << imp.getParameter()
+       << "\n  formula: " << imp.formula() << "\n}";
     return os;
 }
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
     if (!imp) {
-        os << "Indicator(NULL)";
+        os << "Indicator {}";
     } else {
         os << *imp;
     }

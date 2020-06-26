@@ -38,7 +38,7 @@ enum BUSINESS {
     BUSINESS_RETURN_STOCK = 12,  /**< 归还股票资产 */
     BUSINESS_SELL_SHORT = 13,    /**< 卖空 */
     BUSINESS_BUY_SHORT = 14,     /**< 卖空后回补 */
-    INVALID_BUSINESS = 15        /**< 无效类型 */
+    BUSINESS_INVALID = 15        /**< 无效类型 */
 };
 
 /**

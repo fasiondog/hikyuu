@@ -33,7 +33,7 @@ public:
     Portfolio(const TradeManagerPtr& tm, const SelectorPtr& st, const AFPtr& af);
     virtual ~Portfolio();
 
-    string name() const {
+    const string& name() const {
         return m_name;
     }
     void name(const string& name) {

@@ -5,8 +5,12 @@
  *      Author: fasiondog
  */
 
+#include <cstdint>
 #include <boost/python.hpp>
 #include <hikyuu/hikyuu.h>
+
+namespace py = boost::python;
+using namespace hku;
 
 void export_DataType();
 void export_Constant();
@@ -35,13 +39,53 @@ void export_instance_main();
 void export_trade_manage_main();
 void export_trade_sys_main();
 
-BOOST_PYTHON_MODULE(core) {
-    boost::python::docstring_options doc_options;
-    doc_options.disable_cpp_signatures();
+KData Py_GetKData(const string& market_code, py::object start = py::long_(0),
+                  py::object end = py::long_(Null<int64>()), KQuery::KType ktype = KQuery::DAY,
+                  KQuery::RecoverType recovertType = KQuery::NO_RECOVER) {
+    py::extract<int64> int_x(start);
+    if (int_x.check()) {
+        int64 start_ix = 0, end_ix = 0;
+        if (end.is_none()) {
+            end_ix = Null<int64>();
+        } else {
+            py::extract<int64> int_y(end);
+            if (!int_y.check()) {
+                HKU_THROW_EXCEPTION(
+                  std::invalid_argument,
+                  "The input parameters start and end must be of the same type (Datetime or int)!");
+            }
+            end_ix = int_y();
+        }
+        start_ix = int_x();
+        return getKData(market_code, start_ix, end_ix, ktype, recovertType);
+    }
 
-    boost::python::def("hikyuu_init", hku::hikyuu_init);
-    boost::python::def("getStock", hku::getStock);
-    boost::python::def("getVersion", hku::getVersion);
+    py::extract<Datetime> date_x(start);
+    if (!date_x.check()) {
+        HKU_THROW_EXCEPTION(std::invalid_argument,
+                            "The type of input parameter start must be Datetime or int!");
+    }
+
+    Datetime start_date, end_date;
+    if (end.is_none()) {
+        end_date = Null<Datetime>();
+    } else {
+        py::extract<Datetime> date_y(end);
+        if (!date_y.check()) {
+            HKU_THROW_EXCEPTION(
+              std::invalid_argument,
+              "The input parameters start and end must be of the same type (Datetime or int)!");
+        }
+        end_date = date_y();
+    }
+
+    start_date = date_x();
+    return getKData(market_code, start_date, end_date, ktype, recovertType);
+}
+
+BOOST_PYTHON_MODULE(core) {
+    py::docstring_options doc_options;
+    doc_options.disable_signatures();
 
     export_DataType();
     export_Constant();
@@ -71,4 +115,34 @@ BOOST_PYTHON_MODULE(core) {
     export_trade_manage_main();  // must after export_trade_sys_main
 
     export_io_redirect();
+
+    py::def("hikyuu_init", hikyuu_init);
+    py::def("getVersion", getVersion, R"(getVersion()
+    
+    :return: hikyuu 当前版本
+    :rtype: str)");
+
+    py::def("getStock", getStock,
+            R"(getStock(market_code)
+
+    根据"市场简称证券代码"获取对应的证券实例
+            
+    :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
+    :return: 对应的证券实例，如果实例不存在，则返回空实例，即Stock()，不抛出异常
+    :rtype: Stock)");
+
+    int64 null_int = Null<int64>();
+    py::def(
+      "getKData", &Py_GetKData,
+      (py::arg("market_code"), py::arg("start") = py::long_(0), py::arg("end") = py::object(),
+       py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER),
+      R"(getKData(market_code[, start=0, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER])
+    
+    获取K线数据，其中 start 和 end 需同时为 int 或 同时为 Datetime。
+        
+    :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
+    :param int or Datetime start: 起始索引或起始日期
+    :param int or Datetime end: 终止索引或终止日期
+    :return: 满足查询条件的K线数据
+    :rtype: KData)");
 }

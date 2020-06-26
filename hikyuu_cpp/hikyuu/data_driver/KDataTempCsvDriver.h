@@ -15,6 +15,7 @@ namespace hku {
 
 /**
  * 获取临时载入的CSV文件
+ * @ingroup DataDriver
  */
 class KDataTempCsvDriver : public KDataDriver {
 public:

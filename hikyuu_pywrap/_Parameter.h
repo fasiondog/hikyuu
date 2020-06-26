@@ -12,6 +12,7 @@
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/Log.h>
 #include <hikyuu/KData.h>
+#include "pybind_utils.h"
 #include "pickle_support.h"
 
 namespace hku {
@@ -114,16 +115,6 @@ struct AnyToPython {
 };
 
 template <>
-inline boost::any Parameter::get<boost::any>(const std::string& name) const {
-    param_map_t::const_iterator iter;
-    iter = m_params.find(name);
-    if (iter == m_params.end()) {
-        throw std::out_of_range("out_of_range in Parameter::get : " + name);
-    }
-    return iter->second;
-}
-
-template <>
 inline void Parameter::set<object>(const string& name, const object& o) {
     if (o.is_none()) {
         HKU_THROW_EXCEPTION(std::logic_error, "Not support None!");
@@ -177,21 +168,13 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             if (total > 0) {
                 extract<price_t> x8(pylist[0]);
                 if (x8.check()) {
-                    PriceList price_list(total);
-                    for (size_t i = 0; i < total; ++i) {
-                        price_list[i] = extract<price_t>(pylist[i])();
-                    }
-                    m_params[name] = price_list;
+                    m_params[name] = python_list_to_vector<PriceList>(pylist);
                     return;
                 }
 
                 extract<Datetime> x9(pylist[0]);
                 if (x9.check()) {
-                    DatetimeList date_list(total);
-                    for (size_t i = 0; i < total; ++i) {
-                        date_list[i] = extract<Datetime>(pylist[i])();
-                    }
-                    m_params[name] = date_list;
+                    m_params[name] = python_list_to_vector<DatetimeList>(pylist);
                     return;
                 }
             }
@@ -276,24 +259,12 @@ inline void Parameter::set<object>(const string& name, const object& o) {
     }
 
     if (m_params[name].type() == typeid(PriceList)) {
-        boost::python::list pylist(o);
-        size_t total = len(pylist);
-        PriceList price_list(total);
-        for (size_t i = 0; i < total; ++i) {
-            price_list[i] = extract<price_t>(pylist[i])();
-        }
-        m_params[name] = price_list;
+        m_params[name] = python_list_to_vector<PriceList>(boost::python::list(o));
         return;
     }
 
     if (m_params[name].type() == typeid(DatetimeList)) {
-        boost::python::list pylist(o);
-        size_t total = len(pylist);
-        DatetimeList date_list(total);
-        for (size_t i = 0; i < total; ++i) {
-            date_list[i] = extract<Datetime>(pylist[i])();
-        }
-        m_params[name] = date_list;
+        m_params[name] = python_list_to_vector<DatetimeList>(boost::python::list(o));
         return;
     }
 

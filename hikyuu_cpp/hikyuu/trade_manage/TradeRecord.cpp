@@ -83,13 +83,13 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
     } else if (business_name == "BUY_SHORT") {
         return BUSINESS_BUY_SHORT;
     } else {
-        business = INVALID_BUSINESS;
+        business = BUSINESS_INVALID;
     }
     return business;
 }
 
 TradeRecord::TradeRecord()
-: business(INVALID_BUSINESS),
+: business(BUSINESS_INVALID),
   planPrice(0.0),
   realPrice(0.0),
   goalPrice(0.0),

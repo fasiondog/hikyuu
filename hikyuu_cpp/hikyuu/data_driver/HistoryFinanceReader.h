@@ -17,6 +17,7 @@ namespace hku {
 
 /**
  * 读取历史财务信息
+ * @ingroup DataDriver
  */
 class HKU_API HistoryFinanceReader {
 public:

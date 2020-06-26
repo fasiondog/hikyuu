@@ -12,7 +12,7 @@ namespace hku {
 
 TradeRequest::TradeRequest()
 : valid(false),
-  business(INVALID_BUSINESS),
+  business(BUSINESS_INVALID),
   datetime(Null<Datetime>()),
   stoploss(0.0),
   goal(0.0),
@@ -22,7 +22,7 @@ TradeRequest::TradeRequest()
 
 void TradeRequest::clear() {
     valid = false;
-    business = INVALID_BUSINESS;
+    business = BUSINESS_INVALID;
     datetime = Null<Datetime>();
     stoploss = 0.0;
     goal = 0.0;

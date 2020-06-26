@@ -27,7 +27,7 @@ void export_TradeRecord() {
       .value("BUSINESS_RETURN_CASH", BUSINESS_RETURN_CASH)
       .value("BUSINESS_BORROW_STOCK", BUSINESS_BORROW_STOCK)
       .value("BUSINESS_RETURN_STOCK", BUSINESS_RETURN_STOCK)
-      .value("INVALID_BUSINESS", INVALID_BUSINESS);
+      .value("BUSINESS_INVALID", BUSINESS_INVALID);
 
     def("getBusinessName", getBusinessName);
 
