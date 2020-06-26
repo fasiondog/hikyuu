@@ -310,8 +310,10 @@ TEST_CASE("test_IniParser_getFloat") {
     CHECK_EQ(ini_parser.getFloat("section2", "key1"), doctest::Approx(10).epsilon(0.00001));
 
     /** @arg 存在指定section和option, 并且指定了有效缺省值*/
-    CHECK_EQ(ini_parser.getFloat("section1", "key1", "2.01"), doctest::Approx(1.123456).epsilon(0.00001));
-    CHECK_EQ(ini_parser.getFloat("section2", "key1", "20.20"), doctest::Approx(10).epsilon(0.00001));
+    CHECK_EQ(ini_parser.getFloat("section1", "key1", "2.01"),
+             doctest::Approx(1.123456).epsilon(0.00001));
+    CHECK_EQ(ini_parser.getFloat("section2", "key1", "20.20"),
+             doctest::Approx(10).epsilon(0.00001));
 
     /** @arg 存在指定section和option，但对应的值无法转换为int类型*/
     CHECK_THROWS_AS(ini_parser.getFloat("section2", "key2"), std::invalid_argument);
@@ -336,11 +338,14 @@ TEST_CASE("test_IniParser_getFloat") {
     CHECK_THROWS_AS(ini_parser.getFloat("section3", "key1", "1"), std::invalid_argument);
 
     /** @arg 测试值为-3.4e-38和3.4e+38的情况 */
-    CHECK_EQ(ini_parser.getFloat("section1", "key2", "-3.4e-38"), doctest::Approx(-3.4e-38F).epsilon(0.1e-30));
+    CHECK_EQ(ini_parser.getFloat("section1", "key2", "-3.4e-38"),
+             doctest::Approx(-3.4e-38F).epsilon(0.1e-30));
     CHECK_EQ(ini_parser.getFloat("section1", "key2", "3.402823466e+38"),
              doctest::Approx(3.402823466e+38F).epsilon(0.1e-38));
 
-    /** @arg 测试超出float范围的数据：3.41+38。注：MSVC使用中，超出float范围的数据不会抛出异常，而是转换为INF */
+    /** @arg
+     * 测试超出float范围的数据：3.41+38。注：MSVC使用中，超出float范围的数据不会抛出异常，而是转换为INF
+     */
 #ifdef __MSVC__
     CHECK_THROWS_AS(ini_parser.getFloat("section1", "key2", "3.41e+38"), std::invalid_argument);
 #endif
@@ -383,7 +388,8 @@ TEST_CASE("test_IniParser_getDouble") {
     CHECK_THROWS_AS(ini_parser.getDouble("section1", "key2"), std::invalid_argument);
 
     /** @arg 存在指定section，但不存在相应的option，但指定了有效缺省值 */
-    CHECK_EQ(ini_parser.getDouble("section1", "key2", "10"), doctest::Approx(10.0).epsilon(0.00001));
+    CHECK_EQ(ini_parser.getDouble("section1", "key2", "10"),
+             doctest::Approx(10.0).epsilon(0.00001));
 
     /** @arg 存在指定section，但不存在相应的option，但指定了无效缺省值（无法转换到int类型） */
     CHECK_THROWS_AS(ini_parser.getDouble("section1", "key2", "1A0"), std::invalid_argument);
@@ -431,7 +437,8 @@ TEST_CASE("test_IniParser_getBool") {
     IniParser ini_parser;
     ini_parser.read(test_filename);
 
-    /** @arg 存在指定section和option, 并且无缺省值，对应值分别为1|0|true|yes|on|false|no|off（含不同大小写）*/
+    /** @arg 存在指定section和option,
+     * 并且无缺省值，对应值分别为1|0|true|yes|on|false|no|off（含不同大小写）*/
     CHECK_UNARY(ini_parser.getBool("section1", "key1"));
     CHECK_UNARY(!ini_parser.getBool("section1", "key2"));
     CHECK_UNARY(ini_parser.getBool("section1", "key3"));
@@ -467,7 +474,8 @@ TEST_CASE("test_IniParser_getBool") {
     /** @arg 存在指定section，但不存在相应的option，并且无缺省值 */
     CHECK_THROWS_AS(ini_parser.getBool("section1", "key22"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，但指定了有效缺省值（0|1|true|false|yes|no|on|off）（含不同大小写）
+    /** @arg
+     * 存在指定section，但不存在相应的option，但指定了有效缺省值（0|1|true|false|yes|no|on|off）（含不同大小写）
      */
     CHECK_UNARY(!ini_parser.getBool("section1", "key22", "0"));
     CHECK_UNARY(!ini_parser.getBool("section1", "key22", "false"));

@@ -392,6 +392,10 @@ TEST_CASE("test_TimeDelta_Datetime_operator") {
     d = Datetime(2019, 12, 18) + TimeDelta(-1);
     CHECK(d == Datetime(2019, 12, 17));
 
+    /** @arg TimeDelta + Datetime*/
+    d = TimeDelta(1) + Datetime(2019, 12, 18);
+    CHECK(d == Datetime(2019, 12, 19));
+
     /** @arg Datetime - TimeDelta */
     d = Datetime(2019, 12, 18) - TimeDelta(0, 0, 1);
     CHECK(d == Datetime(2019, 12, 17, 23, 59));

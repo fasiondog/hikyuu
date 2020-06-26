@@ -12,13 +12,6 @@
 using namespace boost::python;
 using namespace hku;
 
-bool (*eq)(const Datetime&, const Datetime&) = operator==;
-bool (*ne)(const Datetime&, const Datetime&) = operator!=;
-bool (*gt)(const Datetime&, const Datetime&) = operator>;
-bool (*lt)(const Datetime&, const Datetime&) = operator<;
-bool (*ge)(const Datetime&, const Datetime&) = operator>=;
-bool (*le)(const Datetime&, const Datetime&) = operator<=;
-
 void export_Datetime() {
     class_<Datetime>("Datetime",
                      R"(日期时间类（精确到微秒），通过以下方式构建：
@@ -78,31 +71,31 @@ void export_Datetime() {
       .def("endOfWeek", &Datetime::endOfWeek, "\n返回周结束日期（周日）")
       .def("startOfMonth", &Datetime::startOfMonth, "\n返回月度起始日期")
       .def("endOfMonth", &Datetime::endOfMonth, "\n返回月末最后一天日期")
-      .def("startOfQuarter", &Datetime::startOfQuarter)
-      .def("endOfQuarter", &Datetime::endOfQuarter)
-      .def("startOfHalfyear", &Datetime::startOfHalfyear)
-      .def("endOfHalfyear", &Datetime::endOfHalfyear)
-      .def("startOfYear", &Datetime::startOfYear)
-      .def("endOfYear", &Datetime::endOfYear)
-      .def("min", &Datetime::min)
+      .def("startOfQuarter", &Datetime::startOfQuarter, "\n返回季度起始日期")
+      .def("endOfQuarter", &Datetime::endOfQuarter, "\n返回季度结束日期")
+      .def("startOfHalfyear", &Datetime::startOfHalfyear, "\n返回半年度起始日期")
+      .def("endOfHalfyear", &Datetime::endOfHalfyear, "\n返回半年度结束日期")
+      .def("startOfYear", &Datetime::startOfYear, "\n返回年度起始日期")
+      .def("endOfYear", &Datetime::endOfYear, "\n返回年度结束日期")
+      .def("min", &Datetime::min, "\n获取支持的最小日期, Datetime(1400, 1, 1)")
       .staticmethod("min")
-      .def("max", &Datetime::max)
+      .def("max", &Datetime::max, "\n获取支持的最大日期, Datetime(9999, 12, 31)")
       .staticmethod("max")
-      .def("now", &Datetime::now)
+      .def("now", &Datetime::now, "\n获取系统当前日期时间")
       .staticmethod("now")
-      .def("today", &Datetime::today)
+      .def("today", &Datetime::today, "\n获取当前的日期")
       .staticmethod("today")
-      //不支持boost.date
-      //.def("date", &Datetime::date)
-      .def("__eq__", eq)
-      .def("__ne__", ne)
-      .def("__gt__", gt)
-      .def("__lt__", lt)
-      .def("__ge__", ge)
-      .def("__le__", le)
 
-      .def("__add__", &Datetime::operator+)
-      .def("__sub__", &Datetime::operator-)
+      .def(self == self)
+      .def(self != self)
+      .def(self >= self)
+      .def(self <= self)
+      .def(self > self)
+      .def(self < self)
+
+      .def(self + other<TimeDelta>())
+      .def(other<TimeDelta>() + self)
+      .def(self - other<TimeDelta>())
 
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<Datetime>())
