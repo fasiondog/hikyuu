@@ -244,7 +244,8 @@ std::string IniParser::get(const std::string& section, const std::string& option
  * @param default_str 缺省值。在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值。
  *                    默认为空，没有指定缺省值。
  */
-int IniParser::getInt(const std::string& section, const std::string& option, const std::string& default_str) const {
+int IniParser::getInt(const std::string& section, const std::string& option,
+                      const std::string& default_str) const {
     int result = 0;
     size_t remain = 0;
 
@@ -259,7 +260,7 @@ int IniParser::getInt(const std::string& section, const std::string& option, con
     std::string value_str = get(section, option, default_str);
     remain = 0;
     result = std::stoi(value_str, &remain);
-    if (remain != default_str.size()) {
+    if (remain != value_str.size()) {
         throw(std::invalid_argument("This option cannot be converted to an integer! " + value_str));
     }
 
@@ -276,7 +277,8 @@ int IniParser::getInt(const std::string& section, const std::string& option, con
  * @param default_str 缺省值。在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值。
  *                    默认为空，没有指定缺省值。
  */
-float IniParser::getFloat(const std::string& section, const std::string& option, const std::string& default_str) const {
+float IniParser::getFloat(const std::string& section, const std::string& option,
+                          const std::string& default_str) const {
     float result;
     size_t remain = 0;
 
@@ -343,7 +345,8 @@ double IniParser::getDouble(const std::string& section, const std::string& optio
  * @param default_str 缺省值。在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值。
  *                    默认为空，没有指定缺省值。
  */
-bool IniParser::getBool(const std::string& section, const std::string& option, const std::string& default_str) const {
+bool IniParser::getBool(const std::string& section, const std::string& option,
+                        const std::string& default_str) const {
     //先检查default_str是否可以转换为bool
     std::string new_default_str(default_str);
     if (!default_str.empty()) {
@@ -351,7 +354,8 @@ bool IniParser::getBool(const std::string& section, const std::string& option, c
             to_upper(new_default_str);
             if (new_default_str == "TRUE" || new_default_str == "YES" || new_default_str == "ON") {
                 new_default_str.assign("1");
-            } else if (new_default_str == "FALSE" || new_default_str == "NO" || new_default_str == "OFF") {
+            } else if (new_default_str == "FALSE" || new_default_str == "NO" ||
+                       new_default_str == "OFF") {
                 new_default_str.assign("0");
             } else {
                 throw(std::invalid_argument("Invalid default value: " + default_str));
