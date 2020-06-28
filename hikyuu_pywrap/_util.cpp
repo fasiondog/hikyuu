@@ -20,5 +20,3 @@ void export_util() {
     def("roundUp", roundUp, roundUp_overload());
     def("roundDown", roundDown, roundDown_overload());
 }
-
-
