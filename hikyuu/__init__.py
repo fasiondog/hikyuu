@@ -76,8 +76,8 @@ if sys.platform == 'win32':
 # 读取配置信息，并初始化
 #
 # ==============================================================================
-config_file = './test_data/hikyuu_win.ini'
-#config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
+#config_file = './test_data/hikyuu_win.ini'
+config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
 if not os.path.exists(config_file):
     # 检查老版本配置是否存在，如果存在可继续使用，否则异常终止
     data_config_file = os.path.expanduser('~') + "/.hikyuu/data_dir.ini"
