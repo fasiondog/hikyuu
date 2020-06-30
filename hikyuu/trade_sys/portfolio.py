@@ -25,10 +25,6 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import (Portfolio, PF_Simple)
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-Portfolio.__unicode__ = unicodeFunc
-Portfolio.__repr__ = reprFunc
 
 #------------------------------------------------------------------
 # add doc-string

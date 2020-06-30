@@ -13,29 +13,29 @@
     
     :param Datetime start: 起始日期
     :param Datetime end: 结束日期
-    :param KQuery.KType kType: K线数据类型（如日线、分钟线等）
-    :param KQuery.RecoverType recoverType: 复权类型
+    :param Query.KType kType: K线数据类型（如日线、分钟线等）
+    :param Query.RecoverType recoverType: 复权类型
     :return: 查询条件
-    :rtype: KQuery
+    :rtype: Query
 
     
-.. py:class:: QueryByIndex([start=0, end=None, kType=KQuery.KType.DAT, recoverType=KQuery.RecoverType.NO_RECOVER])
+.. py:class:: QueryByIndex([start=0, end=None, kType=Query.KType.DAT, recoverType=Query.RecoverType.NO_RECOVER])
 
     构建按索引 [start, end) 方式获取K线数据条件，等同于直接使用 Query 构造
     
     :param ind start: 起始日期
     :param ind end: 结束日期
-    :param KQuery.KType kType: K线数据类型（如日线、分钟线等）
-    :param KQuery.RecoverType recoverType: 复权类型
+    :param Query.KType kType: K线数据类型（如日线、分钟线等）
+    :param Query.RecoverType recoverType: 复权类型
     :return: 查询条件
-    :rtype: KQuery
+    :rtype: Query
     
     
 .. py:class:: Query
 
-    对 KQuery 的简单包装，并简化定义相关常量，可视同为 :py:class:`KQuery`
+    对 Query 的简单包装，并简化定义相关常量，可视同为 :py:class:`Query`
     
-    简化 :py:data:`KQuery.KType` 枚举值
+    简化 :py:data:`Query.KType` 枚举值
     
     - Query.DAY - 日线类型
     - Query.WEEK - 周线类型
@@ -49,7 +49,7 @@
     - Query.MIN30 - 30分钟线类型
     - Query.MIN60 - 60分钟线类型
     
-    简化 :py:data:`KQuery.RecoverType` 枚举值
+    简化 :py:data:`Query.RecoverType` 枚举值
     
     - Query.NO_RECOVER      - 不复权
     - Query.FORWARD         - 前向复权
@@ -58,9 +58,9 @@
     - Query.EQUAL_BACKWARD  - 等比后向复权
 
     
-.. py:class:: KQuery
+.. py:class:: Query
 
-    K线数据查询条件，一般在Python中使用 Query 即可，不用指明 KQuery。
+    K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
 
     .. py:attribute:: start 
     
@@ -127,21 +127,21 @@
     
         获取queryType名称，用于显示输出
         
-        :param KQuery.QueryType queryType: 查询类型
+        :param Query.QueryType queryType: 查询类型
         :rtype: str
     
     .. py:staticmethod:: getKTypeName(kType)
     
         获取KType名称，用于显示输出
         
-        :param KQuery.KType kType: K线类型
+        :param Query.KType kType: K线类型
         :rtype: str
     
     .. py:staticmethod:: getRecoverTypeName(recoverType)
     
         获取recoverType名称，用于显示输出
         
-        :param KQuery.RecoverType recoverType: 复权类型
+        :param Query.RecoverType recoverType: 复权类型
         :rtype: str
         
     .. py:staticmethod:: getQueryTypeEnum(queryType)
@@ -149,21 +149,21 @@
         根据字符串名称获取相应的queryType枚举值
         
         :param str queryType: 字符串名称，如“DATE”
-        :rtype: KQuery.QueryType
+        :rtype: Query.QueryType
         
     .. py:staticmethod:: getKTypeEnum(ktype)
     
         根据字符串名称，获取相应的枚举值 
         
         :param str ktype: 字符串名称，如“DAY”
-        :rtype: KQuery.KType
+        :rtype: Query.KType
         
     .. py:staticmethod:: getRecoverTypeEnum(recoverType)
 
         根据字符串名称，获取相应的枚举值
         
         :param str recoverType: 字符串名称，如“NO_RECOVER”
-        :rtype: KQuery.RecoverType
+        :rtype: Query.RecoverType
         
     
 StockManager/Block/Stock
@@ -275,7 +275,7 @@ StockManager/Block/Stock
     
         获取指定市场的交易日日历
         
-        :param KQuery query: Query查询条件
+        :param Query query: Query查询条件
         :param str market: 市场简称
         :return: 日期列表
         :rtype: DatetimeList
@@ -346,7 +346,7 @@ StockManager/Block/Stock
     
         获取不同类型K线数据量
         
-        :param KQuery.KType ktype: K线数据类别
+        :param Query.KType ktype: K线数据类别
         :return: K线记录数
         :rtype: int
     
@@ -355,7 +355,7 @@ StockManager/Block/Stock
         获取指定时刻的市值，即小于等于指定时刻的最后一条记录的收盘价
         
         :param Datetime datetime: 指定时刻
-        :param KQuery.KType ktype: K线数据类别
+        :param Query.KType ktype: K线数据类别
         :return: 指定时刻的市值
         :rtype: float
     
@@ -364,7 +364,7 @@ StockManager/Block/Stock
         获取指定索引的K线数据记录，未作越界检查
         
         :param int pos: 指定的索引位置
-        :param KQuery.KType ktype: K线数据类别
+        :param Query.KType ktype: K线数据类别
         :return: K线记录
         :rtype: KRecord
     
@@ -373,7 +373,7 @@ StockManager/Block/Stock
         根据数据类型（日线/周线等），获取指定时刻的KRecord
         
         :param Datetime datetime: 指定时刻
-        :param KQuery.KType ktype: K线数据类别
+        :param Query.KType ktype: K线数据类别
         :return: K线记录
         :rtype: KRecord
     
@@ -383,7 +383,7 @@ StockManager/Block/Stock
         
         :param int start: 起始位置
         :param int end: 结束位置
-        :param KQuery.KType ktype: K线类别
+        :param Query.KType ktype: K线类别
         :return: K线记录列表
         :rtype: KRecordList
     
@@ -400,7 +400,7 @@ StockManager/Block/Stock
         
         :param int start: 起始位置
         :param ind end: 结束位置
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
         :rtype: DatetimeList
         
     .. py:method:: getTimeLineList(self, query)
@@ -448,13 +448,13 @@ StockManager/Block/Stock
     
         将指定类别的K线数据加载至内存缓存
         
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
 
     .. py:method:: releaseKDataBuffer(self, ktype)
     
         释放指定类别的内存K线数据
         
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
     
     
 .. py:class:: Block

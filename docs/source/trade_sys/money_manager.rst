@@ -157,13 +157,13 @@
     
         设置查询条件
     
-        :param KQuery query:  查询条件
+        :param Query query:  查询条件
         
     .. py:method:: getQuery(self)
     
         获取查询条件
         
-        :rtype: KQuery 
+        :rtype: Query 
         
     .. py:method:: reset(self)
     

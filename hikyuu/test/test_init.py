@@ -7,7 +7,6 @@
 # 历史：1）20130128, Added by fasiondog
 #===============================================================================
 from hikyuu import *
-from hikyuu.util.unicode import unicodeFunc
 
 import os
 #curdir = os.path.dirname(os.path.realpath(__file__))
@@ -23,13 +22,12 @@ else:
     #config_file = os.path.join(head, "test_data/hikyuu_linux.ini")
     config_file = "test_data/hikyuu_linux.ini"
     #print(config_file)
-    
+
 #tmp_dir = os.path.join(head, "test/data/tmp")
 tmp_dir = "test_data/tmp"
 if not os.path.lexists(tmp_dir):
     os.mkdir(tmp_dir)
-    
-    
+
 #starttime = time.time()
 #print "Loading Day Data ..."
 hikyuu_init(config_file)

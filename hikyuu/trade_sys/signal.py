@@ -27,10 +27,6 @@
 from hikyuu.cpp.core import (
     SignalBase, SG_Bool, SG_Single, SG_Single2, SG_Cross, SG_CrossGold, SG_Flex
 )
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-SignalBase.__unicode__ = unicodeFunc
-SignalBase.__repr__ = reprFunc
 
 
 def sig_init(self, name, params):

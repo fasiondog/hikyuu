@@ -25,7 +25,6 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import *
-from hikyuu.util.unicode import (IS_PY3, unicodeFunc, reprFunc)
 from hikyuu import constant, toPriceList, Datetime
 
 
@@ -60,9 +59,6 @@ def indicator_getitem(data, i):
 
 Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
-
-Indicator.__unicode__ = unicodeFunc
-Indicator.__repr__ = reprFunc
 
 Indicator.__add__ = indicator_add
 Indicator.__sub__ = indicator_sub

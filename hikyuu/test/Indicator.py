@@ -12,21 +12,21 @@ import unittest
 from test_init import *
 from hikyuu.indicator import *
 
+
 class AddIndicator(IndicatorImp):
     def __init__(self, indicator):
         super(AddIndicator, self).__init__("AddIndicator")
         self._readyBuffer(indicator.size(), 1)
         for i in range(len(indicator)):
             self._set(indicator[i] + 1, i)
-    
+
     def __call__(self, ind):
         return AddIndicator(ind)
-    
-   
+
 
 class IndicatorTest(unittest.TestCase):
     def test_PRICELIST(self):
-        a = toPriceList([0,1,2,3])
+        a = toPriceList([0, 1, 2, 3])
         x = PRICELIST(a)
         self.assertEqual(x.size(), 4)
         self.assertEqual(x.empty(), False)
@@ -37,7 +37,7 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(x[3], 3)
 
     def test_PythonIndicator(self):
-        a = toPriceList([0,1,2,3])
+        a = toPriceList([0, 1, 2, 3])
         x = PRICELIST(a)
         m = Indicator(AddIndicator(x))
         self.assertEqual(m.name, "AddIndicator")
@@ -47,8 +47,8 @@ class IndicatorTest(unittest.TestCase):
         self.assert_(abs(m[1] - 2) < 0.0001)
         self.assert_(abs(m[2] - 3) < 0.0001)
         self.assert_(abs(m[3] - 4) < 0.0001)
-        
-        b = toPriceList([1,2,3,4])
+
+        b = toPriceList([1, 2, 3, 4])
         x = PRICELIST(b)
         m = m(x)
         self.assertEqual(m.size(), 4)
@@ -59,24 +59,24 @@ class IndicatorTest(unittest.TestCase):
         self.assert_(abs(m[3] - 5) < 0.0001)
         #print m.name
         #print m
-        
+
     def test_operator(self):
-        a = toPriceList([0,1,2,3])
+        a = toPriceList([0, 1, 2, 3])
         x1 = PRICELIST(a)
-        a = toPriceList([1,2,3,4])
+        a = toPriceList([1, 2, 3, 4])
         x2 = PRICELIST(a)
         a = x1 + x2
         self.assertEqual(a[0], 1)
         self.assertEqual(a[1], 3)
         self.assertEqual(a[2], 5)
         self.assertEqual(a[3], 7)
-        
+
         a = x2 - x1
         self.assertEqual(a[0], 1)
         self.assertEqual(a[1], 1)
         self.assertEqual(a[2], 1)
         self.assertEqual(a[3], 1)
-        
+
         a = x1 * x2
         self.assertEqual(a[0], 0)
         self.assertEqual(a[1], 2)
@@ -87,12 +87,11 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[0], constant.null_price)
         self.assertEqual(a[1], 2)
         self.assertEqual(a[2], 1.5)
-        self.assertEqual(a[3], 4.0/3.0)
-        
-        
+        self.assertEqual(a[3], 4.0 / 3.0)
+
     def test_IKDATA(self):
         s = sm['sh000001']
-        q = KQuery(0,10)
+        q = Query(0, 10)
         k = s.getKData(q)
         o = OPEN(k)
         h = HIGH(k)
@@ -100,14 +99,14 @@ class IndicatorTest(unittest.TestCase):
         c = CLOSE(k)
         a = AMO(k)
         v = VOL(k)
-       
+
         self.assertEqual(o.size(), 10)
         self.assertEqual(h.size(), 10)
         self.assertEqual(l.size(), 10)
         self.assertEqual(c.size(), 10)
         self.assertEqual(a.size(), 10)
         self.assertEqual(v.size(), 10)
-        
+
         self.assertEqual(o.empty(), False)
         self.assertEqual(h.empty(), False)
         self.assertEqual(l.empty(), False)
@@ -128,28 +127,28 @@ class IndicatorTest(unittest.TestCase):
         self.assert_(abs(c[1] - 104.39) < 0.0001)
         self.assert_(abs(a[1] - 8.4) < 0.0001)
         self.assert_(abs(v[1] - 197) < 0.0001)
-        
+
     def test_MA(self):
-        a = toPriceList([0,1,2,3])
+        a = toPriceList([0, 1, 2, 3])
         x = PRICELIST(a)
-        m = MA(x,2)
+        m = MA(x, 2)
         self.assertEqual(m.size(), 4)
         self.assertEqual(m.discard, 0)
         self.assert_(abs(m[0] - 0.0) < 0.0001)
         self.assert_(abs(m[1] - 0.5) < 0.0001)
         self.assert_(abs(m[2] - 1.5) < 0.0001)
         self.assert_(abs(m[3] - 2.5) < 0.0001)
-        
+
     def test_pickle(self):
         if not constant.pickle_support:
             return
-        
+
         #TODO Python3出错，暂未解决
         """
         import pickle as pl
         filename = sm.tmpdir() + '/Indicator.plk'
         stock = sm['sh000001']
-        kdata = stock.getKData(KQuery(0,10))
+        kdata = stock.getKData(Query(0,10))
         a = CLOSE(kdata)
         fh = open(filename, 'wb')
         pl.dump(a, fh)
@@ -162,6 +161,7 @@ class IndicatorTest(unittest.TestCase):
         for i in range(len(a)):
             self.assertEqual(a[i], b[i])
         """
-        
+
+
 def suite():
-    return unittest.TestLoader().loadTestsFromTestCase(IndicatorTest)        
+    return unittest.TestLoader().loadTestsFromTestCase(IndicatorTest)

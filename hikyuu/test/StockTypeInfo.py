@@ -11,22 +11,23 @@ import unittest
 
 from test_init import *
 
+
 class StockTypeInfoTest(unittest.TestCase):
     def test_stockType(self):
         stockType = sm.getStockTypeInfo(1)
         self.assertEqual(stockType.type, 1)
-        self.assertEqual(unicodeFunc(stockType.description), u"A股")
+        self.assertEqual(stockType.description, u"A股")
         self.assertEqual(stockType.tick, 0.01)
         self.assertEqual(stockType.tickValue, 0.01)
         self.assertEqual(stockType.unit, 1.0)
         self.assertEqual(stockType.precision, 2)
         self.assertEqual(stockType.minTradeNumber, 100)
         self.assertEqual(stockType.maxTradeNumber, 1000000)
-        
+
     def test_pickle(self):
         if not constant.pickle_support:
             return
-        
+
         #TODO: Python3 出错，暂未解决
         """import pickle as pl
         filename = sm.tmpdir() + '/StockTypeInfo.plk'
@@ -40,6 +41,7 @@ class StockTypeInfoTest(unittest.TestCase):
         self.assertEqual(a.type, b.type)
         self.assertEqual(a.description, b.description)
         """
-        
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(StockTypeInfoTest)

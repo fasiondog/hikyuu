@@ -34,7 +34,7 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     
     :param axes: 指定的坐标轴
     :param dates: Datetime构成可迭代序列
-    :param KQuery.KType typ: K线类型
+    :param Query.KType typ: K线类型
     
  
 .. py:function:: adjust_axes_show(axeslist)

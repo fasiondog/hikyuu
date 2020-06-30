@@ -235,3 +235,47 @@ def KData_getPos(kdata, datetime):
 KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
 KData.getPos = KData_getPos
+
+# ------------------------------------------------------------------
+# 增加转化为 np.array、pandas.DataFrame 的功能
+# ------------------------------------------------------------------
+
+try:
+    import numpy as np
+    import pandas as pd
+
+    def KData_to_np(kdata):
+        """转化为numpy结构数组"""
+        if kdata.getQuery().kType in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
+            k_type = np.dtype(
+                {
+                    'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                    'formats': ['datetime64[D]', 'd', 'd', 'd', 'd', 'd', 'd']
+                }
+            )
+        else:
+            k_type = np.dtype(
+                {
+                    'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
+                    'formats': ['datetime64[ms]', 'd', 'd', 'd', 'd', 'd', 'd']
+                }
+            )
+        return np.array(
+            [
+                (
+                    k.datetime.datetime(), k.openPrice, k.highPrice, k.lowPrice, k.closePrice,
+                    k.transAmount, k.transCount
+                ) for k in kdata
+            ],
+            dtype=k_type
+        )
+
+    def KData_to_df(kdata):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(KData_to_np(kdata), index='datetime')
+
+    KData.to_np = KData_to_np
+    KData.to_df = KData_to_df
+
+except:
+    pass

@@ -25,10 +25,6 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import (ProfitGoalBase, PG_NoGoal, PG_FixedPercent, PG_FixedHoldDays)
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-ProfitGoalBase.__unicode__ = unicodeFunc
-ProfitGoalBase.__repr__ = reprFunc
 
 
 def pg_init(self, name, params):

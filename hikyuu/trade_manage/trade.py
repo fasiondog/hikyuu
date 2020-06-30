@@ -32,7 +32,6 @@
 #TradeManager.buy等方法默认参数使用了Part，这里必须先导入，否则报初始化错误
 from hikyuu import Datetime, Query, QueryByDate, StockManager, System
 from hikyuu.util.slice import list_getitem
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from hikyuu.trade_sys.system import getSystemPartName
 
 BUSINESS.INIT = BUSINESS.BUSINESS_INIT
@@ -43,23 +42,6 @@ BUSINESS.BONUS = BUSINESS.BUSINESS_BONUS
 BUSINESS.CHECKIN = BUSINESS.BUSINESS_CHECKIN
 BUSINESS.CHECKOUT = BUSINESS.BUSINESS_CHECKOUT
 BUSINESS.INVALID = BUSINESS.BUSINESS_INVALID
-
-TradeManager.__unicode__ = unicodeFunc
-TradeManager.__repr__ = reprFunc
-CostRecord.__unicode__ = unicodeFunc
-CostRecord.__repr__ = reprFunc
-TradeRecord.__unicode__ = unicodeFunc
-TradeRecord.__repr__ = reprFunc
-PositionRecord.__unicode__ = unicodeFunc
-PositionRecord.__repr__ = reprFunc
-TradeCostBase.__unicode__ = unicodeFunc
-TradeCostBase.__repr__ = reprFunc
-FundsRecord.__unicode__ = unicodeFunc
-FundsRecord.__repr__ = reprFunc
-BorrowRecord.__unicode__ = unicodeFunc
-BorrowRecord.__repr__ = reprFunc
-OrderBrokerBase.__unicode__ = unicodeFunc
-OrderBrokerBase.__repr__ = reprFunc
 
 BorrowRecordList.__getitem__ = list_getitem
 PositionRecordList.__getitem__ = list_getitem

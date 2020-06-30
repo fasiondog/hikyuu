@@ -68,7 +68,7 @@ class PytdxKDataDriver(KDataDriver):
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
         :param int start_ix: 起始位置
         :param int end_ix: 结束位置
         :param KRecordListPtr out_buffer: 传入的数据缓存，读取数据后使用 
@@ -101,7 +101,7 @@ class PytdxKDataDriver(KDataDriver):
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param KQuery.KType ktype: K线类型        
+        :param Query.KType ktype: K线类型        
         """
         data = self._get_bars(market, code, ktype)
         return len(data) if data else 0
@@ -112,7 +112,7 @@ class PytdxKDataDriver(KDataDriver):
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param KQuery query: 日期查询条件（QueryByDate）        
+        :param Query query: 日期查询条件（QueryByDate）        
         """
         print("getIndexRangeByDate")
 
@@ -189,7 +189,7 @@ class PytdxKDataDriver(KDataDriver):
         :param str market: 市场标识
         :param str code: 证券代码
         :param int pos: 指定位置（大于等于0）
-        :param KQuery.KType ktype: K线类型        
+        :param Query.KType ktype: K线类型        
         """
         record = KRecord()
         if pos < 0:

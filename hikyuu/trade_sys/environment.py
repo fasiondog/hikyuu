@@ -25,10 +25,6 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import EnvironmentBase, EV_TwoLine
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-EnvironmentBase.__unicode__ = unicodeFunc
-EnvironmentBase.__repr__ = reprFunc
 
 
 def ev_init(self, name, params):
@@ -104,7 +100,7 @@ setQuery(self, query)
     
     设置查询条件
     
-    :param KQuery query:  查询条件
+    :param Query query:  查询条件
 """
 
 EnvironmentBase.getQuery.__doc__ = """
@@ -113,7 +109,7 @@ getQuery(self)
     获取查询条件
         
     :return: 查询条件
-    :rtype: KQuery 
+    :rtype: Query 
 """
 
 EnvironmentBase.isValid.__doc__ = """

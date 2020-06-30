@@ -28,10 +28,6 @@ from hikyuu.cpp.core import (
     MoneyManagerBase, MM_Nothing, MM_FixedRisk, MM_FixedCapital, MM_FixedCount, MM_FixedPercent,
     MM_FixedUnits, MM_WilliamsFixedRisk
 )
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-MoneyManagerBase.__unicode__ = unicodeFunc
-MoneyManagerBase.__repr__ = reprFunc
 
 
 def mm_init(self, name, params):

@@ -25,11 +25,8 @@
 # SOFTWARE.
 
 import hikyuu.cpp.core as csys
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 
 StoplossBase = csys.StoplossBase
-StoplossBase.__unicode__ = unicodeFunc
-StoplossBase.__repr__ = reprFunc
 
 ST_FixedPercent = csys.ST_FixedPercent
 ST_Indicator = csys.ST_Indicator

@@ -208,7 +208,7 @@ def ax_set_locator_formatter(axes, dates, typ):
     
     :param axes: 指定的坐标轴
     :param dates: Datetime构成可迭代序列
-    :param KQuery.KType typ: K线类型
+    :param Query.KType typ: K线类型
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':

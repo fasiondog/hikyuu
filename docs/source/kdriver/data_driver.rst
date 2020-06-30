@@ -43,7 +43,7 @@ K线数据驱动基类
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
         :param int start_ix: 起始位置
         :param int end_ix: 结束位置
         :param KRecordListPtr out_buffer: 传入的数据缓存，读取数据后使用 out_buffer.append(krecord) 加入数据
@@ -54,7 +54,7 @@ K线数据驱动基类
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
         
     .. py:method:: getKRecord(self, market, code, pos, ktype)
     
@@ -63,7 +63,7 @@ K线数据驱动基类
         :param str market: 市场标识
         :param str code: 证券代码
         :param int pos: 指定位置（大于等于0）
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
         
     .. py:method:: _getIndexRangeByDate(self, market, code, query)
     
@@ -71,5 +71,5 @@ K线数据驱动基类
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param KQuery query: 日期查询条件（QueryByDate）
+        :param Query query: 日期查询条件（QueryByDate）
     

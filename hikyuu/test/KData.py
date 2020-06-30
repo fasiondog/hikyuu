@@ -12,6 +12,7 @@ import unittest
 from test_init import *
 from hikyuu.trade_sys import *
 
+
 class KDataTest(unittest.TestCase):
     def test_null_kdata(self):
         k = KData()
@@ -22,10 +23,10 @@ class KDataTest(unittest.TestCase):
         self.assertEqual(k.lastPos, 0)
         stock = k.getStock()
         self.assertEqual(stock.isNull(), True)
-        
+
     def test_kdata(self):
         stock = sm["Sh000001"]
-        q = KQuery(0, 10)
+        q = Query(0, 10)
         k = stock.getKData(q)
         self.assertEqual(k.size(), 10)
         self.assertEqual(k.empty(), False)
@@ -41,15 +42,15 @@ class KDataTest(unittest.TestCase):
         self.assert_(abs(k[0].transCount - 1260) < 0.0001)
         self.assert_(abs(k[1].openPrice - 104.3) < 0.0001)
         self.assert_(abs(k[9].openPrice - 127.61) < 0.0001)
-        
+
     def test_pickle(self):
         if not constant.pickle_support:
             return
-        
+
         import pickle as pl
         filename = sm.tmpdir() + "/KData.plk"
         fh = open(filename, 'wb')
-        kdata = sm['sh000001'].getKData(KQuery(10, 20))
+        kdata = sm['sh000001'].getKData(Query(10, 20))
         pl.dump(kdata, fh)
         fh.close()
         fh = open(filename, 'rb')
@@ -58,7 +59,7 @@ class KDataTest(unittest.TestCase):
         self.assertEqual(kdata.size(), b.size())
         for i in range(len(kdata)):
             self.assertEqual(kdata[i], b[i])
-        
-                 
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(KDataTest)

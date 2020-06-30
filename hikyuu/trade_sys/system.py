@@ -26,11 +26,7 @@
 
 from hikyuu.cpp.core import (System, SystemList, getSystemPartName, getSystemPartEnum, TradeRequest)
 from hikyuu.cpp.core import SYS_Simple as cpp_SYS_Simple
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from hikyuu.util.slice import list_getitem
-
-System.__unicode__ = unicodeFunc
-System.__repr__ = reprFunc
 
 System.ENVIRONMENT = System.Part.ENVIRONMENT
 System.CONDITION = System.Part.CONDITION

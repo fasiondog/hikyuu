@@ -25,14 +25,7 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import (AllocateFundsBase, SystemWeight, SystemWeightList, AF_EqualWeight)
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
 from hikyuu.util.slice import list_getitem
-
-AllocateFundsBase.__unicode__ = unicodeFunc
-AllocateFundsBase.__repr__ = reprFunc
-
-SystemWeight.__unicode__ = unicodeFunc
-SystemWeight.__repr = reprFunc
 
 SystemWeightList.__getitem__ = list_getitem
 

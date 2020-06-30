@@ -25,10 +25,6 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import (SlippageBase, SL_FixedPercent, SL_FixedValue)
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-SlippageBase.__unicode__ = unicodeFunc
-SlippageBase.__repr__ = reprFunc
 
 
 def sl_init(self, name, params):

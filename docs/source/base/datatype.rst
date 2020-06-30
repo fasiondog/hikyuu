@@ -432,7 +432,7 @@ K线数据
     
         获取关联的查询条件
     
-        :rtype: KQuery
+        :rtype: Query
     
     .. py:method:: getStock()
     

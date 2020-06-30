@@ -43,10 +43,6 @@ public:
 typedef vector<TransRecord> TransList;
 typedef vector<TransRecord> TransRecordList;
 
-/** @ingroup StockManage */
-typedef shared_ptr<TransList> TransListPtr;
-typedef shared_ptr<TransList> TransRecordListPtr;
-
 /**
  * 输出 TransRecord 信息，如：TimeSharingRecord(datetime, price, vol)
  * @ingroup StockManage

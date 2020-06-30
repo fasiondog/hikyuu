@@ -160,7 +160,7 @@
         :param Stock stock: 指定证券
         :rtype: bool
         
-    .. py:method:: cash(self, datetime[, ktype=KQuery.KType.DAY])
+    .. py:method:: cash(self, datetime[, ktype=Query.KType.DAY])
     
         获取指定日期的现金。（注：如果不带日期参数，无法根据权息信息调整持仓。）
         
@@ -229,36 +229,36 @@
         :param int num:           卖出数量
         :rtype: CostRecord        
      
-    .. py:method:: getFunds(self[,ktype = KQuery.DAY])
+    .. py:method:: getFunds(self[,ktype = Query.DAY])
     
         获取账户当前时刻的资产详情
         
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
         :rtype: FundsRecord
         
-    .. py:method:: getFunds(self, datetime, [ktype = KQuery.DAY])
+    .. py:method:: getFunds(self, datetime, [ktype = Query.DAY])
     
         获取指定时刻的资产市值详情
         
         :param Datetime datetime:  指定时刻
-        :param KQuery.KType ktype: K线类型
+        :param Query.KType ktype: K线类型
         :rtype: FundsRecord
         
-    .. py:method:: getFundsCurve(self, dates[, ktype = KQuery.DAY])
+    .. py:method:: getFundsCurve(self, dates[, ktype = Query.DAY])
     
         获取资产净值曲线
         
         :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的资产净值曲线
-        :param KQuery.KType ktype: K线类型，必须与日期列表匹配
+        :param Query.KType ktype: K线类型，必须与日期列表匹配
         :return: 资产净值列表
         :rtype: PriceList
         
-    .. py:method:: getProfitCurve(self, dates[, ktype = KQuery.DAY])
+    .. py:method:: getProfitCurve(self, dates[, ktype = Query.DAY])
     
         获取收益曲线，即扣除历次存入资金后的资产净值曲线
         
         :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
-        :param KQuery.KType ktype: K线类型，必须与日期列表匹配
+        :param Query.KType ktype: K线类型，必须与日期列表匹配
         :return: 收益曲线
         :rtype: PriceList
         

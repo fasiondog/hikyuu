@@ -24,21 +24,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 from hikyuu.cpp.core import ConditionBase, CN_OPLine
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-ConditionBase.__unicode__ = unicodeFunc
-ConditionBase.__repr__ = reprFunc
 
 
 def cn_init(self, name, params):
     super(self.__class__, self).__init__(name)
     self._name = name
     self._params = params
-    for k,v in params.items():
+    for k, v in params.items():
         self.setParam(k, v)
-    
+
+
 def crtCN(func, params={}, name='crtCN'):
     """
     快速创建自定义不带私有属性的系统有效条件
@@ -48,7 +44,7 @@ def crtCN(func, params={}, name='crtCN'):
     :param str name: 自定义名称
     :return: 自定义系统有效条件实例
     """
-    meta_x = type(name, (ConditionBase,), {'__init__': cn_init})
+    meta_x = type(name, (ConditionBase, ), {'__init__': cn_init})
     meta_x._clone = lambda self: meta_x(self._name, self._params)
     meta_x._calculate = func
     return meta_x(name, params)
@@ -202,7 +198,6 @@ _clone(self)
     【重载接口】子类克隆接口
 """
 
-
 #------------------------------------------------------------------
 # add doc-string for build_in func
 #------------------------------------------------------------------
@@ -215,4 +210,4 @@ CN_OPLine(op)
     :param Indicator op: Indicator实例
     :return: 系统有效条件实例
     :rtype: ConditionBase
-""" 
+"""

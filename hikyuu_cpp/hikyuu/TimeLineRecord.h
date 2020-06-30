@@ -35,9 +35,6 @@ public:
  */
 typedef vector<TimeLineRecord> TimeLineList;
 
-/** @ingroup StockManage */
-typedef shared_ptr<TimeLineList> TimeLineListPtr;
-
 /**
  * 输出TimeLineRecord信息，如：TimeSharingRecord(datetime, price, vol)
  * @ingroup StockManage

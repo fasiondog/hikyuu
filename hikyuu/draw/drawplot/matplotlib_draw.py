@@ -179,20 +179,20 @@ def ax_set_locator_formatter(axes, dates, typ):
     
     :param axes: 指定的坐标轴
     :param dates: Datetime构成可迭代序列
-    :param KQuery.KType typ: K线类型
+    :param Query.KType typ: K线类型
     """
     major_loc, major_fm = None, None
-    if typ == KQuery.DAY:
+    if typ == Query.DAY:
         major_loc, major_fm = getDayLocatorAndFormatter(dates)
-    elif typ == KQuery.WEEK:
+    elif typ == Query.WEEK:
         major_loc, major_fm = getDayLocatorAndFormatter(dates)
-    elif typ == KQuery.MONTH:
+    elif typ == Query.MONTH:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.QUARTER:
+    elif typ == Query.QUARTER:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.HALFYEAR:
+    elif typ == Query.HALFYEAR:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
-    elif typ == KQuery.YEAR:
+    elif typ == Query.YEAR:
         major_loc, major_fm = getMonthLocatorAndFormatter(dates)
 
     if major_loc:

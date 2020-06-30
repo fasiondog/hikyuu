@@ -25,10 +25,6 @@
 # SOFTWARE.
 
 from hikyuu.cpp.core import (SelectorBase, SE_Fixed)
-from hikyuu.util.unicode import (unicodeFunc, reprFunc)
-
-SelectorBase.__unicode__ = unicodeFunc
-SelectorBase.__repr__ = reprFunc
 
 #------------------------------------------------------------------
 # add doc-string
