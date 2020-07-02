@@ -34,5 +34,18 @@ void export_TransRecord() {
       .value("SELL", TransRecord::SELL)
       .value("AUCTION", TransRecord::AUCTION);
 
-    VECTOR_TO_PYTHON_CONVERT(TransRecordList);
+    TransList::const_reference (TransList::*TransList_at)(TransList::size_type) const =
+      &TransList::at;
+    void (TransList::*append)(const TransRecord&) = &TransList::push_back;
+    class_<TransList>("TransList")
+      .def(self_ns::str(self))
+      .def("__iter__", iterator<TransList>())
+      .def("size", &TransList::size)
+      .def("__len__", &TransList::size)
+      .def("get", TransList_at, return_value_policy<copy_const_reference>())
+      .def("append", append)
+#if HKU_PYTHON_SUPPORT_PICKLE
+      .def_pickle(normal_pickle_suite<TransList>())
+#endif
+      ;
 }

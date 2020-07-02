@@ -28,5 +28,18 @@ void export_TimeLineReord() {
 #endif
       ;
 
-    VECTOR_TO_PYTHON_CONVERT(TimeLineList);
+    TimeLineList::const_reference (TimeLineList::*TimeLine_at)(TimeLineList::size_type) const =
+      &TimeLineList::at;
+    void (TimeLineList::*append)(const TimeLineRecord&) = &TimeLineList::push_back;
+    class_<TimeLineList>("TimeLineList")
+      .def(self_ns::str(self))
+      .def("__iter__", iterator<TimeLineList>())
+      .def("size", &TimeLineList::size)
+      .def("__len__", &TimeLineList::size)
+      .def("get", TimeLine_at, return_value_policy<copy_const_reference>())
+      .def("append", append)
+#if HKU_PYTHON_SUPPORT_PICKLE
+      .def_pickle(normal_pickle_suite<TimeLineList>())
+#endif
+      ;
 }
