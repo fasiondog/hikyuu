@@ -18,34 +18,6 @@
 namespace hku {
 
 double HKU_API roundEx(double number, int ndigits) {
-    /*double f;
-    int i;
-    f = 1.0;
-    i = abs(ndigits);
-    while  (--i >= 0){
-        f = f*10.0;
-    }
-
-    if (ndigits < 0){
-        number /= f;
-    }else{
-        number *= f;
-    }
-
-    if (number >= 0.0){
-        number = std::floor(number + 0.5);
-    }else{
-        number = std::ceil(number - 0.5);
-    }
-
-    if (ndigits < 0){
-        number *= f;
-    }else{
-        number /= f;
-    }
-
-    return number;*/
-
     //切换至：ROUND_HALF_EVEN 银行家舍入法
     double pow1, pow2, y, z;
     double x = number;

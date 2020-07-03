@@ -39,6 +39,7 @@ void export_TransRecord() {
     void (TransList::*append)(const TransRecord&) = &TransList::push_back;
     class_<TransList>("TransList")
       .def(self_ns::str(self))
+      .def(self_ns::repr(self))
       .def("__iter__", iterator<TransList>())
       .def("size", &TransList::size)
       .def("__len__", &TransList::size)
