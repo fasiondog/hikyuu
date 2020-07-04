@@ -518,9 +518,8 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     title = get_draw_title(kdata)
     last_record = kdata[-1]
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime.date(), last_record.openPrice, last_record.highPrice,
-        last_record.lowPrice, last_record.closePrice, 100 *
-        (last_record.closePrice - kdata[-2].closePrice) / kdata[-2].closePrice
+        last_record.datetime.date(), last_record.open, last_record.high, last_record.low,
+        last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
     )
 
     date_list = kdata.getDatetimeList()
@@ -529,7 +528,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     else:
         x_list = [d.datetime() for d in date_list]
 
-    y_list = [[k.openPrice, k.closePrice, k.lowPrice, k.highPrice] for k in kdata]
+    y_list = [[k.open, k.close, k.low, k.high] for k in kdata]
 
     style = gcf().get_style(axes)
     kline = Kline(title, text, title_pos='center', subtitle_color='#FF0000')
@@ -689,7 +688,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
             continue
         pos = date_index[d]
         krecord = kdata[pos]
-        buy_y_list[pos] = round(krecord.lowPrice - height * 0.02, 2)
+        buy_y_list[pos] = round(krecord.low - height * 0.02, 2)
 
     es.add(
         "",
@@ -713,7 +712,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
             continue
         pos = date_index[d]
         krecord = kdata[pos]
-        sell_y_list[pos] = round(krecord.highPrice + height * 0.015, 2)
+        sell_y_list[pos] = round(krecord.high + height * 0.015, 2)
 
     es.add(
         "",
@@ -858,7 +857,7 @@ def sysplot(sys, new=True, axes=None, style=1):
             continue
         pos = date_index[d]
         krecord = kdata[pos]
-        buy_y_list[pos] = round(krecord.lowPrice - height * 0.02, 2)
+        buy_y_list[pos] = round(krecord.low - height * 0.02, 2)
 
     es.add(
         "",
@@ -882,7 +881,7 @@ def sysplot(sys, new=True, axes=None, style=1):
             continue
         pos = date_index[d]
         krecord = kdata[pos]
-        sell_y_list[pos] = round(krecord.highPrice + height * 0.015, 2)
+        sell_y_list[pos] = round(krecord.high + height * 0.015, 2)
 
     es.add(
         "",

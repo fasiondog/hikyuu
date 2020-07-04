@@ -353,12 +353,12 @@ K线数据
     K线记录，组成K线数据，属性可读写。
     
     .. py:attribute:: datetime : 日期时间
-    .. py:attribute:: openPrice : 开盘价
-    .. py:attribute:: highPrice : 最高价
-    .. py:attribute:: lowPrice  : 最低价
-    .. py:attribute:: closePrice : 收盘价
-    .. py:attribute:: transAmount : 成交金额
-    .. py:attribute:: transCount: 成交量
+    .. py:attribute:: open     : 开盘价
+    .. py:attribute:: high     : 最高价
+    .. py:attribute:: low      : 最低价
+    .. py:attribute:: close    : 收盘价
+    .. py:attribute:: amount   : 成交金额
+    .. py:attribute:: volume   : 成交量
 
     
 .. py:class:: KData
@@ -377,40 +377,22 @@ K线数据
     
         获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1
         
-    .. py:method:: size()
-    
-        K线记录数量，同 __len__
-    
     .. py:method:: getDatetimeList()
     
         返回交易日期列表
 
         :rtype: DatetimeList
         
-    .. py:method:: getKRecord(pos)
-    
-        获取指定索引位置的K线记录
-        
-        :param int pos: 位置索引
-        :rtype: KRecord
-        
     .. py:method:: get(pos)
 
-        同 :py:meth:`KData.getKRecord`。获取指定索引位置的K线记录
+        获取指定索引位置的K线记录
         
         :param int pos: 位置索引
         :rtype: KRecord        
     
-    .. py:method:: getKRecordByDate(datetime)
-
-        获取指定时间的K线记录
-    
-        :param Datetime datetime: 指定的日期
-        :rtype: KRecord
-        
     .. py:method:: getByDate(datetime)    
 
-        获取指定时间的K线记录。同 getKRecordByDate。
+        获取指定时间的K线记录。
     
         :param Datetime datetime: 指定的日期
         :rtype: KRecord

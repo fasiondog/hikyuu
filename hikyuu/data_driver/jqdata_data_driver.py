@@ -84,12 +84,12 @@ class jqdataKDataDriver(KDataDriver):
         for i in range(start_ix, total):
             record = KRecord()
             record.datetime = Datetime(data.index[i])
-            record.openPrice = data['open'][i]
-            record.highPrice = data['high'][i]
-            record.lowPrice = data['low'][i]
-            record.closePrice = data['close'][i]
-            record.transAmount = data['money'][i]
-            record.transCount = data['volume'][i]
+            record.open = data['open'][i]
+            record.high = data['high'][i]
+            record.low = data['low'][i]
+            record.close = data['close'][i]
+            record.amount = data['money'][i]
+            record.volume = data['volume'][i]
             out_buffer.append(record)
 
     def getCount(self, market, code, ktype):
@@ -195,12 +195,12 @@ class jqdataKDataDriver(KDataDriver):
 
         if pos < len(data):
             record.datetime = Datetime(data.index[pos])
-            record.openPrice = data['open'][pos]
-            record.highPrice = data['high'][pos]
-            record.lowPrice = data['low'][pos]
-            record.closePrice = data['close'][pos]
-            record.transAmount = data['money'][pos]
-            record.transCount = data['volume'][pos]
+            record.open = data['open'][pos]
+            record.high = data['high'][pos]
+            record.low = data['low'][pos]
+            record.close = data['close'][pos]
+            record.amount = data['money'][pos]
+            record.volume = data['volume'][pos]
 
         return record
 

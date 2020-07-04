@@ -36,11 +36,11 @@ void export_DataType() {
       &DatetimeList::at;
     void (DatetimeList::*datetimelist_append)(const DatetimeList::value_type& val) =
       &DatetimeList::push_back;
-    class_<DatetimeList>("DatetimeList")
+    class_<DatetimeList>("DatetimeList", "日期序列，对应C++中的std::vector<Datetime>")
       .def("__iter__", iterator<DatetimeList>())
       .def("size", &DatetimeList::size)
       .def("__len__", &DatetimeList::size)
-      .def("append", datetimelist_append)
+      .def("append", datetimelist_append, "向列表末端加入元素")
       .def("get", datetimeList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<DatetimeList>())

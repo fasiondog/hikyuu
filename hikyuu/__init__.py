@@ -310,12 +310,12 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
 
             record = KRecord()
             record.datetime = d
-            record.openPrice = open
-            record.highPrice = high
-            record.lowPrice = low
-            record.closePrice = close
-            record.transAmount = transamount
-            record.transCount = transcount / 100
+            record.open = open
+            record.high = high
+            record.low = low
+            record.close = close
+            record.amount = transamount
+            record.volume = transcount / 100
 
             stock.realtimeUpdate(record)
 
@@ -345,12 +345,12 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
 
             record = KRecord()
             record.datetime = d
-            record.openPrice = open
-            record.highPrice = high
-            record.lowPrice = low
-            record.closePrice = close
-            record.transAmount = transamount
-            record.transCount = transcount / 100
+            record.open = open
+            record.high = high
+            record.low = low
+            record.close = close
+            record.amount = transamount
+            record.volume = transcount / 100
 
             stock.realtimeUpdate(record)
 
@@ -450,12 +450,12 @@ def realtimeUpdate_from_tushare():
             continue
 
         record = KRecord()
-        record.openPrice = df.ix[i, 'open']
-        record.highPrice = df.ix[i, 'high']
-        record.lowPrice = df.ix[i, 'low']
-        record.closePrice = df.ix[i, 'trade']
-        record.transAmount = float(df.ix[i, 'amount'])
-        record.transCount = float(df.ix[i, 'volume'])
+        record.open = df.ix[i, 'open']
+        record.high = df.ix[i, 'high']
+        record.lowe = df.ix[i, 'low']
+        record.close = df.ix[i, 'trade']
+        record.amount = float(df.ix[i, 'amount'])
+        record.volume = float(df.ix[i, 'volume'])
 
         from datetime import date
         d = date.today()
@@ -479,16 +479,16 @@ def realtimeUpdate_from_tushare():
         last_record = stock.getKRecord(total - 1)
 
         record = KRecord()
-        record.openPrice = df.ix[i, 'open']
-        record.highPrice = df.ix[i, 'high']
-        record.lowPrice = df.ix[i, 'low']
-        record.closePrice = df.ix[i, 'close']
-        record.transCount = float(df.ix[i, 'volume'])
-        record.transAmount = float(df.ix[i, 'amount'])
+        record.open = df.ix[i, 'open']
+        record.high = df.ix[i, 'high']
+        record.low = df.ix[i, 'low']
+        record.close = df.ix[i, 'close']
+        record.volume = float(df.ix[i, 'volume'])
+        record.amount = float(df.ix[i, 'amount'])
 
         if (
-            last_record.closePrice != record.closePrice or last_record.highPrice != record.highPrice
-            or last_record.lowPrice != record.lowPrice or last_record.openPrice != record.openPrice
+            last_record.close != record.close or last_record.high != record.high
+            or last_record.low != record.low or last_record.open != record.open
         ):
             from datetime import date
             d = date.today()

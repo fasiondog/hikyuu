@@ -99,7 +99,7 @@ try:
         for pos in pos_list:
             invest = pos.buyMoney - pos.sellMoney + pos.totalCost
             k = pos.stock.getKData(query)
-            cur_val = k[0].closePrice * pos.number
+            cur_val = k[0].close * pos.number
             bonus = cur_val - invest
             date_list = sm.getTradingCalendar(QueryByDate(Datetime(pos.takeDatetime.date())))
             data.append(

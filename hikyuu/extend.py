@@ -3,7 +3,7 @@
 #
 
 from datetime import *
-from hikyuu.cpp.core import *
+from .cpp.core import *
 
 # ------------------------------------------------------------------
 # 常量定义，各种C++中Null值
@@ -201,16 +201,16 @@ def KData_getitem(kdata, i):
         index = length + i if i < 0 else i
         if index < 0 or index >= length:
             raise IndexError("index out of range: %d" % i)
-        return kdata.getKRecord(index)
+        return kdata.get(index)
 
     elif isinstance(i, Datetime):
-        return kdata.getKRecordByDate(i)
+        return kdata.getByDate(i)
 
     elif isinstance(i, str):
-        return kdata.getKRecordByDate(Datetime(i))
+        return kdata.getByDate(Datetime(i))
 
     elif isinstance(i, slice):
-        return [kdata.getKRecord(x) for x in range(*i.indices(len(kdata)))]
+        return [kdata.get(x) for x in range(*i.indices(len(kdata)))]
 
     else:
         raise IndexError("Error index type")
@@ -235,6 +235,36 @@ def KData_getPos(kdata, datetime):
 KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
 KData.getPos = KData_getPos
+
+# ------------------------------------------------------------------
+# 封装增强其他C++ vector类型的遍历
+# ------------------------------------------------------------------
+
+
+def list_getitem(data, i):
+    """对C++引出的vector，实现python的切片，
+       将引入的vector类的__getitem__函数覆盖即可。
+    """
+    if isinstance(i, int):
+        length = len(data)
+        index = length + i if i < 0 else i
+        if index < 0 or index >= length:
+            raise IndexError("index out of range: %d" % i)
+        return data.get(index)
+
+    elif isinstance(i, slice):
+        return [data.get(x) for x in range(*i.indices(len(data)))]
+
+    else:
+        raise IndexError("Error index type")
+
+
+PriceList.__getitem__ = list_getitem
+DatetimeList.__getitem__ = list_getitem
+StringList.__getitem__ = list_getitem
+BlockList.__getitem__ = list_getitem
+TimeLineList.__getitem__ = list_getitem
+TransList.__getitem__ = list_getitem
 
 # ------------------------------------------------------------------
 # 增加转化为 np.array、pandas.DataFrame 的功能
@@ -262,10 +292,8 @@ try:
             )
         return np.array(
             [
-                (
-                    k.datetime.datetime(), k.openPrice, k.highPrice, k.lowPrice, k.closePrice,
-                    k.transAmount, k.transCount
-                ) for k in kdata
+                (k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume)
+                for k in kdata
             ],
             dtype=k_type
         )

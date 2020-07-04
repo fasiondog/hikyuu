@@ -235,7 +235,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     rfcolor = matplotlib.rcParams['axes.facecolor']
     for i in range(len(kdata)):
         record = kdata[i]
-        open, high, low, close = record.openPrice, record.highPrice, record.lowPrice, record.closePrice
+        open, high, low, close = record.open, record.high, record.low, record.close
         if close >= open:
             color = colorup
             lower = open
@@ -278,11 +278,10 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     title = get_draw_title(kdata)
     axes.set_title(title)
     last_record = kdata[-1]
-    color = 'r' if last_record.closePrice > kdata[-2].closePrice else 'g'
+    color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime.number / 10000, last_record.openPrice, last_record.highPrice,
-        last_record.lowPrice, last_record.closePrice, 100 *
-        (last_record.closePrice - kdata[-2].closePrice) / kdata[-2].closePrice
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
+        last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
     )
     axes.text(
         0.99,
@@ -319,7 +318,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
 
     for t in range(len(kdata)):
         record = kdata[t]
-        open, high, low, close = record.openPrice, record.highPrice, record.lowPrice, record.closePrice
+        open, high, low, close = record.open, record.high, record.low, record.close
         color = colorup if close >= open else colordown
 
         vline = Line2D(xdata=(t, t), ydata=(low, high), color=color, antialiased=False)
@@ -347,10 +346,10 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     title = get_draw_title(kdata)
     axes.set_title(title)
     last_record = kdata[-1]
-    color = 'r' if last_record.closePrice > kdata[-2].closePrice else 'g'
+    color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f' % (
-        last_record.datetime.number / 10000, last_record.openPrice, last_record.highPrice,
-        last_record.lowPrice, last_record.closePrice
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
+        last_record.close
     )
     axes.text(
         0.99,
@@ -655,7 +654,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         pos = date_index[d]
         krecord = kdata[pos]
         axes.annotate(
-            'B', (pos, krecord.lowPrice - height * 0.01), (pos, krecord.lowPrice - height * 0.1),
+            'B', (pos, krecord.low - height * 0.01), (pos, krecord.low - height * 0.1),
             arrowprops=arrow_buy,
             horizontalalignment='center',
             verticalalignment='bottom',
@@ -669,7 +668,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         pos = date_index[d]
         krecord = kdata[pos]
         axes.annotate(
-            'S', (pos, krecord.highPrice + height * 0.01), (pos, krecord.highPrice + height * 0.1),
+            'S', (pos, krecord.high + height * 0.01), (pos, krecord.high + height * 0.1),
             arrowprops=arrow_sell,
             horizontalalignment='center',
             verticalalignment='top',
@@ -756,7 +755,7 @@ def sysplot(sys, new=True, axes=None, style=1):
         pos = date_index[d]
         krecord = kdata[pos]
         axes.annotate(
-            'B', (pos, krecord.lowPrice - height * 0.01), (pos, krecord.lowPrice - height * 0.1),
+            'B', (pos, krecord.low - height * 0.01), (pos, krecord.low - height * 0.1),
             arrowprops=arrow_buy,
             horizontalalignment='center',
             verticalalignment='bottom',
@@ -769,7 +768,7 @@ def sysplot(sys, new=True, axes=None, style=1):
         pos = date_index[d]
         krecord = kdata[pos]
         axes.annotate(
-            'S', (pos, krecord.highPrice + height * 0.01), (pos, krecord.highPrice + height * 0.1),
+            'S', (pos, krecord.high + height * 0.01), (pos, krecord.high + height * 0.1),
             arrowprops=arrow_sell,
             horizontalalignment='center',
             verticalalignment='top',

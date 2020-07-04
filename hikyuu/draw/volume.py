@@ -79,10 +79,10 @@ def draw(
     if engine == 'matplotlib':
         rg = range(total)
         x = [i - 0.2 for i in rg]
-        x1 = [x[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-        y1 = [vol[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-        x2 = [x[i] for i in rg if kdata[i].closePrice <= kdata[i].openPrice]
-        y2 = [vol[i] for i in rg if kdata[i].closePrice <= kdata[i].openPrice]
+        x1 = [x[i] for i in rg if kdata[i].close > kdata[i].open]
+        y1 = [vol[i] for i in rg if kdata[i].close > kdata[i].open]
+        x2 = [x[i] for i in rg if kdata[i].close <= kdata[i].open]
+        y2 = [vol[i] for i in rg if kdata[i].close <= kdata[i].open]
         ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
         ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
 
@@ -140,10 +140,10 @@ def draw2(
     if engine == 'matplotlib':
         rg = range(total)
         x = [i - 0.2 for i in rg]
-        x1 = [x[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-        y1 = [vol[i] for i in rg if kdata[i].closePrice > kdata[i].openPrice]
-        x2 = [x[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
-        y2 = [vol[i] for i in rg if kdata[i].closePrice < kdata[i].openPrice]
+        x1 = [x[i] for i in rg if kdata[i].close > kdata[i].open]
+        y1 = [vol[i] for i in rg if kdata[i].close > kdata[i].open]
+        x2 = [x[i] for i in rg if kdata[i].close < kdata[i].open]
+        y2 = [vol[i] for i in rg if kdata[i].close < kdata[i].open]
         ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
         ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
 

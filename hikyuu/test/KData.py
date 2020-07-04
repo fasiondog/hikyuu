@@ -34,14 +34,14 @@ class KDataTest(unittest.TestCase):
         self.assertEqual(k.endPos, 10)
         self.assertEqual(k.lastPos, 9)
         self.assertEqual(k[0].datetime, Datetime(199012190000))
-        self.assert_(abs(k[0].openPrice - 96.05) < 0.0001)
-        self.assert_(abs(k[0].highPrice - 99.980) < 0.0001)
-        self.assert_(abs(k[0].lowPrice - 95.79) < 0.0001)
-        self.assert_(abs(k[0].closePrice - 99.98) < 0.0001)
-        self.assert_(abs(k[0].transAmount - 49.4) < 0.0001)
-        self.assert_(abs(k[0].transCount - 1260) < 0.0001)
-        self.assert_(abs(k[1].openPrice - 104.3) < 0.0001)
-        self.assert_(abs(k[9].openPrice - 127.61) < 0.0001)
+        self.assert_(abs(k[0].open - 96.05) < 0.0001)
+        self.assert_(abs(k[0].high - 99.980) < 0.0001)
+        self.assert_(abs(k[0].low - 95.79) < 0.0001)
+        self.assert_(abs(k[0].close - 99.98) < 0.0001)
+        self.assert_(abs(k[0].amount - 49.4) < 0.0001)
+        self.assert_(abs(k[0].volume - 1260) < 0.0001)
+        self.assert_(abs(k[1].open - 104.3) < 0.0001)
+        self.assert_(abs(k[9].open - 127.61) < 0.0001)
 
     def test_pickle(self):
         if not constant.pickle_support:
