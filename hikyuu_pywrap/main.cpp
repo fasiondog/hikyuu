@@ -117,13 +117,13 @@ BOOST_PYTHON_MODULE(core) {
     export_io_redirect();
 
     py::def("hikyuu_init", hikyuu_init);
-    py::def("getVersion", getVersion, R"(getVersion()
+    py::def("get_version", getVersion, R"(getVersion()
     
     :return: hikyuu 当前版本
     :rtype: str)");
 
-    py::def("getStock", getStock,
-            R"(getStock(market_code)
+    py::def("get_stock", getStock,
+            R"(get_stock(market_code)
 
     根据"市场简称证券代码"获取对应的证券实例
             
@@ -133,10 +133,10 @@ BOOST_PYTHON_MODULE(core) {
 
     int64 null_int = Null<int64>();
     py::def(
-      "getKData", &Py_GetKData,
+      "get_kdata", &Py_GetKData,
       (py::arg("market_code"), py::arg("start") = py::long_(0), py::arg("end") = py::object(),
        py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER),
-      R"(getKData(market_code[, start=0, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER])
+      R"(get_kdata(market_code[, start=0, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER])
     
     获取K线数据，其中 start 和 end 需同时为 int 或 同时为 Datetime。
         

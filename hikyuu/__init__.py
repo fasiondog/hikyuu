@@ -54,8 +54,9 @@ import os
 import configparser
 
 from .extend import *
+from .deprecated import *
 
-__version__ = getVersion()
+__version__ = get_version()
 
 #重定向C++ stdout/stderr输出至python
 #iodog = ostream_redirect()
@@ -213,7 +214,7 @@ def set_global_context(stk, query):
         :param Query query: 指定的查询条件
     """
     global K, O, C, H, L, A, V
-    K = stk.getKData(query)
+    K = stk.get_kdata(query)
     O.setContext(K)
     C.setContext(K)
     H.setContext(K)
