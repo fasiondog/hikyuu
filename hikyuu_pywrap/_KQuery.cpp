@@ -12,11 +12,12 @@
 using namespace boost::python;
 using namespace hku;
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(KQueryByDate_overload, KQueryByDate, 0, 4);
+// BOOST_PYTHON_FUNCTION_OVERLOADS(KQueryByDate_overload, KQueryByDate, 0, 4);
 BOOST_PYTHON_FUNCTION_OVERLOADS(KQueryByIndex_overload, KQueryByIndex, 0, 4);
 
 void export_KQuery() {
-    def("QueryByDate", KQueryByDate, KQueryByDate_overload());
+    // def("QueryByDate", KQueryByDate, KQueryByDate_overload());
+
     def("QueryByIndex", KQueryByIndex, KQueryByIndex_overload());
 
     scope in_Query =
@@ -49,30 +50,6 @@ void export_KQuery() {
       ;
 
     enum_<KQuery::QueryType>("QueryType").value("INDEX", KQuery::INDEX).value("DATE", KQuery::DATE);
-
-    /*enum_<KQuery::KType>("KType")
-            .value("MIN", KQuery::MIN)
-            .value("MIN5", KQuery::MIN5)
-            .value("MIN15", KQuery::MIN15)
-            .value("MIN30", KQuery::MIN30)
-            .value("MIN60", KQuery::MIN60)
-            .value("DAY", KQuery::DAY)
-            .value("WEEK", KQuery::WEEK)
-            .value("MONTH", KQuery::MONTH)
-            .value("QUARTER", KQuery::QUARTER)
-            .value("HALFYEAR", KQuery::HALFYEAR)
-            .value("YEAR", KQuery::YEAR)
-
-            //BTC扩展
-            .value("MIN3", KQuery::MIN3)
-            .value("HOUR2", KQuery::HOUR2)
-            .value("HOUR4", KQuery::HOUR4)
-            .value("HOUR6", KQuery::HOUR6)
-            .value("HOUR12", KQuery::HOUR12)
-
-            .value("INVALID_KTYPE", KQuery::INVALID_KTYPE)
-            ;
-        */
 
     enum_<KQuery::RecoverType>("RecoverType")
       .value("NO_RECOVER", KQuery::NO_RECOVER)

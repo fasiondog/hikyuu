@@ -76,13 +76,13 @@ void export_DataType() {
 #endif
       ;
 
-    def("toPriceList", toPriceList);
+    def("toPriceList", toPriceList, "将 python list/tuple/np.arry 对象转化为 PriceList 对象");
 
 #if defined(_MSVC_VER)
-    def("isnan", std::isnan<price_t>);
-    def("isinf", std::isinf<price_t>);
+    def("isnan", std::isnan<price_t>, "是否为非数字");
+    def("isinf", std::isinf<price_t>, "是否是无穷大或无穷小");
 #else
-    def("isnan", isnan_func);
-    def("isinf", isinf_func);
+    def("isnan", isnan_func, "是否为非数字");
+    def("isinf", isinf_func, "是否是无穷大或无穷小");
 #endif
 }

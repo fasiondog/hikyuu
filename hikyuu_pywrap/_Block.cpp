@@ -66,13 +66,18 @@ void export_Block() {
     移除指定证券
 
     :param str market_code: 市场简称证券代码
-    :return: 是否成功
+    :return: True 成功 | False 失败
     :rtype: bool)")
 
       .def("clear", &Block::clear, "移除包含的所有证券")
 
-      .def("__len__", &Block::size)
-      .def("__getitem__", &Block::get)
+      .def("__len__", &Block::size, "包含的证券数量")
+
+      .def("__getitem__", &Block::get, R"(__getitem__(self, market_code)
+
+    :param str market_code: 证券代码
+    :return: Stock 实例)")
+
       .def("__iter__", iterator<const Block>())
 
 #if HKU_PYTHON_SUPPORT_PICKLE
@@ -82,10 +87,11 @@ void export_Block() {
 
     BlockList::const_reference (BlockList::*BlockList_at)(BlockList::size_type) const =
       &BlockList::at;
+    void (BlockList::*BlockList_append)(const BlockList::value_type& val) = &BlockList::push_back;
     class_<BlockList>("BlockList", "C++ std::vector<Block>包装")
       .def("__iter__", iterator<BlockList>())
-      .def("size", &BlockList::size)
       .def("__len__", &BlockList::size)
+      .def("append", BlockList_append)
       .def("get", BlockList_at, return_value_policy<copy_const_reference>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<BlockList>())

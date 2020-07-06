@@ -20,6 +20,7 @@ void export_KData() {
       //.def(self_ns::str(self)) //无法正常处理 utf8
       .def("__str__", &KData::toString)
       .def("__repr__", &KData::toString)
+
       .add_property("startPos", &KData::startPos,
                     "获取在原始K线记录中对应的起始位置，如果KData为空返回0")
       .add_property(

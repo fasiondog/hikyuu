@@ -52,39 +52,41 @@ struct Constant {
     int64 null_int64;
     bool pickle_support;  //是否支持pickle
 
-    int STOCKTYPE_BLOCK;  ///板块
+    int STOCKTYPE_BLOCK;  /// 板块
     int STOCKTYPE_A;      /// A股
-    int STOCKTYPE_INDEX;  ///指数
+    int STOCKTYPE_INDEX;  /// 指数
     int STOCKTYPE_B;      /// B股
-    int STOCKTYPE_FUND;   ///基金
+    int STOCKTYPE_FUND;   /// 基金
     int STOCKTYPE_ETF;    /// ETF
-    int STOCKTYPE_ND;     ///国债
-    int STOCKTYPE_BOND;   ///债券
-    int STOCKTYPE_GEM;    ///创业板
-    int STOCKTYPE_BTC;    ///比特币
-    int STOCKTYPE_TMP;    ///临时Stock
+    int STOCKTYPE_ND;     /// 国债
+    int STOCKTYPE_BOND;   /// 债券
+    int STOCKTYPE_GEM;    /// 创业板
+    int STOCKTYPE_BTC;    /// 比特币
+    int STOCKTYPE_TMP;    /// 临时Stock
 };
 
 void export_Constant() {
     class_<Constant>("Constant")
-      .def_readonly("null_datetime", &Constant::null_datetime)
-      .def_readonly("inf", &Constant::inf)
-      .def_readonly("nan", &Constant::nan)
-      .def_readonly("null_double", &Constant::null_double)
-      .def_readonly("max_double", &Constant::max_double)
-      .def_readonly("null_price", &Constant::null_price)
-      .def_readonly("null_int", &Constant::null_int)
-      .def_readonly("null_size", &Constant::null_size)
-      .def_readonly("null_int64", &Constant::null_int64)
-      .def_readonly("pickle_support", &Constant::pickle_support)
+      .def_readonly("null_datetime", &Constant::null_datetime, "无效Datetime")
+      .def_readonly("inf", &Constant::inf, "无穷大或无穷小")
+      .def_readonly("nan", &Constant::nan, "非数字")
+      .def_readonly("null_double", &Constant::null_double, "同 nan")
+      .def_readonly("max_double", &Constant::max_double, "最大double值")
+      .def_readonly("null_price", &Constant::null_price, "同 nan")
+      .def_readonly("null_int", &Constant::null_int, "无效int")
+      .def_readonly("null_size", &Constant::null_size, "无效size")
+      .def_readonly("null_int64", &Constant::null_int64, "无效int64")
+      .def_readonly("pickle_support", &Constant::pickle_support, "是否支持 pickle")
 
-      .def_readonly("STOCKTYPE_BLOCK", &Constant::STOCKTYPE_BLOCK)
-      .def_readonly("STOCKTYPE_A", &Constant::STOCKTYPE_A)
-      .def_readonly("STOCKTYPE_INDEX", &Constant::STOCKTYPE_INDEX)
-      .def_readonly("STOCKTYPE_B", &Constant::STOCKTYPE_B)
-      .def_readonly("STOCKTYPE_FUND", &Constant::STOCKTYPE_FUND)
-      .def_readonly("STOCKTYPE_ETF", &Constant::STOCKTYPE_ETF)
-      .def_readonly("STOCKTYPE_ND", &Constant::STOCKTYPE_ND)
-      .def_readonly("STOCKTYPE_BOND", &Constant::STOCKTYPE_BOND)
-      .def_readonly("STOCKTYPE_GEM", &Constant::STOCKTYPE_GEM);
+      .def_readonly("STOCKTYPE_BLOCK", &Constant::STOCKTYPE_BLOCK, "板块")
+      .def_readonly("STOCKTYPE_A", &Constant::STOCKTYPE_A, "A股")
+      .def_readonly("STOCKTYPE_INDEX", &Constant::STOCKTYPE_INDEX, "指数")
+      .def_readonly("STOCKTYPE_B", &Constant::STOCKTYPE_B, "B股")
+      .def_readonly("STOCKTYPE_FUND", &Constant::STOCKTYPE_FUND, "基金")
+      .def_readonly("STOCKTYPE_ETF", &Constant::STOCKTYPE_ETF, "ETF")
+      .def_readonly("STOCKTYPE_ND", &Constant::STOCKTYPE_ND, "国债")
+      .def_readonly("STOCKTYPE_BOND", &Constant::STOCKTYPE_BOND, "债券")
+      .def_readonly("STOCKTYPE_GEM", &Constant::STOCKTYPE_GEM, "创业板")
+      .def_readonly("STOCKTYPE_BTC", &Constant::STOCKTYPE_GEM, "比特币")
+      .def_readonly("STOCKTYPE_TMP", &Constant::STOCKTYPE_GEM, "临时Stock");
 }

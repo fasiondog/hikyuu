@@ -42,6 +42,11 @@ void export_trade_sys_main();
 KData Py_GetKData(const string& market_code, py::object start = py::long_(0),
                   py::object end = py::long_(Null<int64>()), KQuery::KType ktype = KQuery::DAY,
                   KQuery::RecoverType recovertType = KQuery::NO_RECOVER) {
+    py::extract<KQuery> query_x(start);
+    if (query_x.check()) {
+        return getKData(market_code, query_x());
+    }
+
     py::extract<int64> int_x(start);
     if (int_x.check()) {
         int64 start_ix = 0, end_ix = 0;
@@ -133,16 +138,34 @@ BOOST_PYTHON_MODULE(core) {
 
     int64 null_int = Null<int64>();
     py::def(
-      "get_kdata", &Py_GetKData,
+      "get_kdata", Py_GetKData,
       (py::arg("market_code"), py::arg("start") = py::long_(0), py::arg("end") = py::object(),
        py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER),
       R"(get_kdata(market_code[, start=0, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER])
     
+    or get_kdata(market_code, query)
+
     获取K线数据，其中 start 和 end 需同时为 int 或 同时为 Datetime。
         
     :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
     :param int or Datetime start: 起始索引或起始日期
     :param int or Datetime end: 终止索引或终止日期
+    :param Query query: 查询条件
     :return: 满足查询条件的K线数据
     :rtype: KData)");
+
+    py::def(
+      "QueryByDate", KQueryByDate,
+      (py::arg("start") = Datetime::min(), py::arg("end") = Datetime(),
+       py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER),
+      R"(QueryByDate([start=Datetime.min(), end=Datetime(), ktype=Query.DAY, recover_type=Query.NO_RECOVER])
+
+    构建按日期 [start, end) 方式获取K线数据条件
+    
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期
+    :param Query.KType ktype: K线数据类型（如日线、分钟线等）
+    :param Query.RecoverType recover_type: 复权类型
+    :return: 查询条件
+    :rtype: KQuery)");
 }

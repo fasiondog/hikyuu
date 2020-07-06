@@ -109,6 +109,14 @@ private:
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata);
 
 /**
+ * 根据股票标识按指定的查询条件查询的 K 线数据
+ * @param market_code 股票标识
+ * @param query 查询条件
+ * @ingroup StockManage
+ */
+KData HKU_API getKData(const string& market_code, const KQuery& query);
+
+/**
  * 根据股票标识直接按日期查询获取相应的 K 线数据
  * @param market_code 股票标识
  * @param start 起始日期

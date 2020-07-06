@@ -90,20 +90,20 @@ Indicator KData::amo() const {
     return AMO(*this);
 }
 
+KData HKU_API getKData(const string& market_code, const KQuery& query) {
+    return StockManager::instance().getStock(market_code).getKData(query);
+}
+
 KData HKU_API getKData(const string& market_code, const Datetime& start, const Datetime& end,
                        KQuery::KType ktype, KQuery::RecoverType recoverType) {
-    const StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock(market_code);
     KQuery query(start, end, ktype, recoverType);
-    return stock.getKData(query);
+    return StockManager::instance().getStock(market_code).getKData(query);
 }
 
 KData HKU_API getKData(const string& market_code, int64 start, int64 end, KQuery::KType ktype,
                        KQuery::RecoverType recoverType) {
-    const StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock(market_code);
     KQuery query(start, end, ktype, recoverType);
-    return stock.getKData(query);
+    return StockManager::instance().getStock(market_code).getKData(query);
 }
 
 }  // namespace hku

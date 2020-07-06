@@ -260,11 +260,27 @@ def list_getitem(data, i):
 
 
 PriceList.__getitem__ = list_getitem
-DatetimeList.__getitem__ = list_getitem
 StringList.__getitem__ = list_getitem
+DatetimeList.__getitem__ = list_getitem
 BlockList.__getitem__ = list_getitem
-TimeLineList.__getitem__ = list_getitem
+KRecordList.__getitem__ = list_getitem
 TransList.__getitem__ = list_getitem
+TimeLineList.__getitem__ = list_getitem
+
+PriceList.__str__ = lambda self: str(list(self))
+PriceList.__repr__ = lambda self: repr(list(self))
+StringList.__str__ = lambda self: str(list(self))
+StringList.__repr__ = lambda self: repr(list(self))
+DatetimeList.__str__ = lambda self: str(list(self))
+DatetimeList.__repr__ = lambda self: repr(list(self))
+BlockList.__str__ = lambda self: str(list(self))
+BlockList.__repr__ = lambda self: repr(list(self))
+KRecordList.__str__ = lambda self: str(list(self))
+KRecordList.__repr__ = lambda self: repr(list(self))
+TransList.__str__ = lambda self: str(list(self))
+TransList.__repr__ = lambda self: repr(list(self))
+TimeLineList.__str__ = lambda self: str(list(self))
+TimeLineList.__repr__ = lambda self: repr(list(self))
 
 # ------------------------------------------------------------------
 # 增加转化为 np.array、pandas.DataFrame 的功能
@@ -304,6 +320,64 @@ try:
 
     KData.to_np = KData_to_np
     KData.to_df = KData_to_df
+
+    def PriceList_to_np(data):
+        """仅在安装了numpy模块时生效，转换为numpy.array"""
+        return np.array(data, dtype='d')
+
+    def PriceList_to_df(data):
+        """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
+        return pd.DataFrame(data.to_np(), columns=('Value', ))
+
+    PriceList.to_np = PriceList_to_np
+    PriceList.to_df = PriceList_to_df
+
+    def DatetimeList_to_np(data):
+        """仅在安装了numpy模块时生效，转换为numpy.array"""
+        return np.array(data, dtype='datetime64[D]')
+
+    def DatetimeList_to_df(data):
+        """仅在安装了pandas模块时生效，转换为pandas.DataFrame"""
+        return pd.DataFrame(data.to_np(), columns=('Datetime', ))
+
+    DatetimeList.to_np = DatetimeList_to_np
+    DatetimeList.to_df = DatetimeList_to_df
+
+    def TimeLine_to_np(data):
+        """转化为numpy结构数组"""
+        t_type = np.dtype(
+            {
+                'names': ['datetime', 'price', 'vol'],
+                'formats': ['datetime64[ms]', 'd', 'd']
+            }
+        )
+        return np.array([(t.datetime.datetime(), t.price, t.vol) for t in data], dtype=t_type)
+
+    def TimeLine_to_df(kdata):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(TimeLine_to_np(kdata), index='datetime')
+
+    TimeLineList.to_np = TimeLine_to_np
+    TimeLineList.to_df = TimeLine_to_df
+
+    def TransList_to_np(data):
+        """转化为numpy结构数组"""
+        t_type = np.dtype(
+            {
+                'names': ['datetime', 'price', 'vol', 'direct'],
+                'formats': ['datetime64[ms]', 'd', 'd', 'd']
+            }
+        )
+        return np.array(
+            [(t.datetime.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type
+        )
+
+    def TransList_to_df(kdata):
+        """转化为pandas的DataFrame"""
+        return pd.DataFrame.from_records(TransList_to_np(kdata), index='datetime')
+
+    TransList.to_np = TransList_to_np
+    TransList.to_df = TransList_to_df
 
 except:
     pass
