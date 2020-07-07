@@ -35,9 +35,7 @@
 from pylab import plot
 from numpy import mean
 
-from hikyuu import (
-    QueryByIndex, constant, Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS, CVAL, PRICELIST
-)
+from hikyuu import (Query, constant, Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS, CVAL, PRICELIST)
 from .drawplot import (
     create_figure, show_gcf, ax_draw_macd2, adjust_axes_show, ax_set_locator_formatter
 )
@@ -99,7 +97,7 @@ def _draw_ema_pipe(axes, kdata, ema, n=22, w=0.10):
     axes.fill_between(range(emas_len), fy1, fy2, alpha=0.2, color='y')
 
 
-def draw(stock, query=QueryByIndex(-130), ma_n=22, ma_w='auto', vigor_n=13):
+def draw(stock, query=Query(-130), ma_n=22, ma_w='auto', vigor_n=13):
     """绘制亚历山大.艾尔德交易系统图形"""
     kdata = stock.getKData(query)
     close = CLOSE(kdata)

@@ -46,7 +46,7 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
     
         转化生成 python 的datetime
     
-    .. py:method:: isNull(self)
+    .. py:method:: is_null(self)
     
         是否是Null值, 即是否等于 constant.null_datetime
 
@@ -64,118 +64,118 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
         :param TimeDelta td: 指定时长
         :rtype: Datetime
 
-    .. py:method:: dayOfWeek(self)
+    .. py:method:: day_of_week(self)
     
         返回是一周中的第几天，周日为0，周一为1
         
         :rtype: int
         
-    .. py:method:: dateOfWeek(self, day)
+    .. py:method:: date_of_week(self, day)
     
         返回指定的本周中第几天的日期，周日为0天，周六为第6天
         
         :param int day: 指明本周的第几天，如小于则认为为第0天，如大于6则认为为第6天
         :rtype: Datetime
         
-    .. py:method:: dayOfYear(self)
+    .. py:method:: day_of_year(self)
     
         返回一年中的第几天，1月1日为一年中的第1天
         
         :rtype: int
 
-    .. py:method:: startOfDay(self)
+    .. py:method:: start_of_day(self)
 
         返回当天 0点0分0秒
 
-    .. py:method:: endOfDay(self)
+    .. py:method:: end_of_day(self)
 
         返回当日 23点59分59秒
         
-    .. py:method:: startOfWeek(self)
+    .. py:method:: start_of_week(self)
     
         返回周起始日期（周一）
         
-    .. py:method:: endOfWeek(self)
+    .. py:method:: end_of_week(self)
     
         返回周结束日期（周日）
         
-    .. py:method:: startOfMonth(self)
+    .. py:method:: start_of_month(self)
     
         返回月度起始日期
         
-    .. py:method:: endOfMonth(self)
+    .. py:method:: end_of_month(self)
     
         返回月末最后一天日期
         
-    .. py:method:: startOfQuarter(self)
+    .. py:method:: start_of_quarter(self)
     
         返回季度起始日期
         
-    .. py:method:: endOfQuarter(self)
+    .. py:method:: end_of_quarter(self)
     
         返回季度结束日期
         
-    .. py:method:: startOfHalfyear(self)
+    .. py:method:: start_of_halfyear(self)
     
         返回半年度起始日期
         
-    .. py:method:: endOfHalfyear(self)
+    .. py:method:: end_of_halfyear(self)
     
         返回半年度结束日期
         
-    .. py:method:: startOfYear(self)
+    .. py:method:: start_of_year(self)
     
         返回年度起始日期
         
-    .. py:method:: endOfYear(self)
+    .. py:method:: end_of_year(self)
     
         返回年度结束日期
         
-    .. py:method:: nextDay(self)
+    .. py:method:: next_day(self)
     
         返回下一自然日
         
-    .. py:method:: nextWeek(self)
+    .. py:method:: next_week(self)
     
         返回下周周一日期
         
-    .. py:method:: nextMonth(self)
+    .. py:method:: next_month(self)
     
         返回下月首日日期
         
-    .. py:method:: nextQuarter(self)
+    .. py:method:: next_quarter(self)
     
         返回下一季度首日日期
         
-    .. py:method:: nextHalfyear(self)
+    .. py:method:: next_halfyear(self)
     
         返回下一半年度首日日期
         
-    .. py:method:: nextYear(self)
+    .. py:method:: next_year(self)
     
         返回下一年度首日日期
         
-    .. py:method:: preDay(self)
-    
+    .. py:method:: pre_day(self)
+
         返回前一自然日日期
         
-    .. py:method:: preWeek(self)
+    .. py:method:: pre_week(self)
     
         返回上周周一日期
         
-    .. py:method:: preMonth(self)
+    .. py:method:: pre_month(self)
     
         返回上月首日日期
         
-    .. py:method:: preQuarter(self)
+    .. py:method:: pre_quarter(self)
     
         返回上一季度首日日期
         
-    .. py:method:: preHalfyear(self)
+    .. py:method:: pre_halfyear(self)
     
         返回上一半年度首日日期
 
-    .. py:method:: preYear(self)
+    .. py:method:: pre_year(self)
     
         返回上一年度首日日期
         
@@ -363,21 +363,21 @@ K线数据
     
 .. py:class:: KData
 
-    通过 Stock.getKData 获取的K线数据，由 KRecord 组成的数组，可象 list 一样进行遍历
+    通过 Stock.get_kdata 获取的K线数据，由 KRecord 组成的数组，可象 list 一样进行遍历
     
-    .. py:attribute:: startPos
+    .. py:attribute:: start_pos
     
         获取在原始K线记录中对应的起始位置，如果KData为空返回0
         
-    .. py:attribute:: lastPos
+    .. py:attribute:: last_pos
     
         获取在原始K线记录中对应的最后一条记录的位置，如果为空返回0,其他等于endPos - 1
         
-    .. py:attribute:: endPos
+    .. py:attribute:: end_pos
     
         获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1
         
-    .. py:method:: getDatetimeList()
+    .. py:method:: get_date_list()
     
         返回交易日期列表
 
@@ -390,14 +390,14 @@ K线数据
         :param int pos: 位置索引
         :rtype: KRecord        
     
-    .. py:method:: getByDate(datetime)    
+    .. py:method:: get_by_date(datetime)    
 
         获取指定时间的K线记录。
     
         :param Datetime datetime: 指定的日期
         :rtype: KRecord
     
-    .. py:method:: getPos(datetime)
+    .. py:method:: get_pos(datetime)
 
         获取指定时间对应的索引位置
         
@@ -410,13 +410,13 @@ K线数据
     
         :rtype: bool
     
-    .. py:method:: getQuery()
+    .. py:method:: get_query()
     
         获取关联的查询条件
     
         :rtype: Query
     
-    .. py:method:: getStock()
+    .. py:method:: get_stock()
     
         获取关联的Stock
     

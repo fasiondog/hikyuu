@@ -7,30 +7,6 @@
 构建K线查询条件
 -----------------
 
-.. py:function:: QueryByDate([start=None, end=None, kType=Query.DAY, recoverType=Query.NO_RECOVER])        
-
-    构建按日期 [start, end) 方式获取K线数据条件
-    
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期
-    :param Query.KType kType: K线数据类型（如日线、分钟线等）
-    :param Query.RecoverType recoverType: 复权类型
-    :return: 查询条件
-    :rtype: Query
-
-    
-.. py:class:: QueryByIndex([start=0, end=None, kType=Query.KType.DAT, recoverType=Query.RecoverType.NO_RECOVER])
-
-    构建按索引 [start, end) 方式获取K线数据条件，等同于直接使用 Query 构造
-    
-    :param ind start: 起始日期
-    :param ind end: 结束日期
-    :param Query.KType kType: K线数据类型（如日线、分钟线等）
-    :param Query.RecoverType recoverType: 复权类型
-    :return: 查询条件
-    :rtype: Query
-    
-    
 .. py:class:: Query
 
     对 Query 的简单包装，并简化定义相关常量，可视同为 :py:class:`Query`
@@ -70,23 +46,23 @@
 
         结束索引，当按日期查询方式创建时无效，为 constant.null_int64
         
-    .. py:attribute:: startDatetime
+    .. py:attribute:: start_date
     
         起始日期，当按索引查询方式创建时无效，为 constant.null_datetime
         
-    .. py:attribute:: endDatetime
+    .. py:attribute:: end_date
     
         结束日期，当按索引查询方式创建时无效，为 constant.null_datetime
         
-    .. py:attribute:: queryType
+    .. py:attribute:: query_type
     
         查询方式
         
-    .. py:attribute:: kType
+    .. py:attribute:: ktype
     
         查询的K线类型
         
-    .. py:attribute:: recoverType
+    .. py:attribute:: recover_type
     
         查询的复权类型
     
@@ -123,47 +99,6 @@
         - EQUAL_FORWARD   - 等比前向复权
         - EQUAL_BACKWARD  - 等比后向复权  
 
-    .. py:staticmethod:: getQueryTypeName(queryType)
-    
-        获取queryType名称，用于显示输出
-        
-        :param Query.QueryType queryType: 查询类型
-        :rtype: str
-    
-    .. py:staticmethod:: getKTypeName(kType)
-    
-        获取KType名称，用于显示输出
-        
-        :param Query.KType kType: K线类型
-        :rtype: str
-    
-    .. py:staticmethod:: getRecoverTypeName(recoverType)
-    
-        获取recoverType名称，用于显示输出
-        
-        :param Query.RecoverType recoverType: 复权类型
-        :rtype: str
-        
-    .. py:staticmethod:: getQueryTypeEnum(queryType)
-    
-        根据字符串名称获取相应的queryType枚举值
-        
-        :param str queryType: 字符串名称，如“DATE”
-        :rtype: Query.QueryType
-        
-    .. py:staticmethod:: getKTypeEnum(ktype)
-    
-        根据字符串名称，获取相应的枚举值 
-        
-        :param str ktype: 字符串名称，如“DAY”
-        :rtype: Query.KType
-        
-    .. py:staticmethod:: getRecoverTypeEnum(recoverType)
-
-        根据字符串名称，获取相应的枚举值
-        
-        :param str recoverType: 字符串名称，如“NO_RECOVER”
-        :rtype: Query.RecoverType
         
     
 StockManager/Block/Stock
@@ -587,7 +522,7 @@ StockManager/Block/Stock
     .. py:attribute:: name : 市场全称
     .. py:attribute:: description :描述说明
     .. py:attribute:: code : 该市场对应的主要指数，用于获取交易日历
-    .. py:attribute:: lastDate : 该市场K线数据最后交易日期
+    .. py:attribute:: last_date : 该市场K线数据最后交易日期
 
 
 

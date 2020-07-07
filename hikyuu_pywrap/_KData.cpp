@@ -21,13 +21,14 @@ void export_KData() {
       .def("__str__", &KData::toString)
       .def("__repr__", &KData::toString)
 
-      .add_property("startPos", &KData::startPos,
+      .add_property("start_pos", &KData::startPos,
                     "获取在原始K线记录中对应的起始位置，如果KData为空返回0")
       .add_property(
-        "endPos", &KData::endPos,
+        "end_pos", &KData::endPos,
         "获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1")
-      .add_property("lastPos", &KData::lastPos,
+      .add_property("last_pos", &KData::lastPos,
                     "获取在原始K线记录中对应的最后一条记录的位置，如果为空返回0,其他等于endPos - 1")
+
       .add_property("open", &KData::open, "返回包含开盘价的 Indicator 实例，相当于 OPEN(k)")
       .add_property("close", &KData::close, "返回包含收盘价的 Indicator 实例，相当于 CLOSE(k)")
       .add_property("high", &KData::high, "返回包含最高价的 Indicator 实例，相当于 HIGH(k)")
@@ -35,7 +36,7 @@ void export_KData() {
       .add_property("amo", &KData::amo, "返回包含成交金额的 Indicator 实例，相当于 AMO(k)")
       .add_property("vol", &KData::vol, "返回包含成交量的 Indicator 实例，相当于 VOL(k)")
 
-      .def("getDatetimeList", &KData::getDatetimeList, R"(getDatetimeList(self)
+      .def("get_date_list", &KData::getDatetimeList, R"(get_date_list(self)
 
     返回交易日期列表
 
@@ -48,7 +49,7 @@ void export_KData() {
     :param int pos: 位置索引
     :rtype: KRecord)")
 
-      .def("getByDate", &KData::getKRecordByDate, R"(getByDate(self, datetime)    
+      .def("get_by_date", &KData::getKRecordByDate, R"(get_by_date(self, datetime)    
 
     获取指定时间的K线记录。
 
@@ -63,13 +64,13 @@ void export_KData() {
 
     :rtype: bool)")
 
-      .def("getQuery", &KData::getQuery, R"(getQuery(self)
+      .def("get_query", &KData::getQuery, R"(get_query(self)
 
     获取关联的查询条件
 
     :rtype: KQuery)")
 
-      .def("getStock", &KData::getStock, R"(getStock(self)
+      .def("get_stock", &KData::getStock, R"(get_stock(self)
 
     获取关联的Stock
 

@@ -153,19 +153,4 @@ BOOST_PYTHON_MODULE(core) {
     :param Query query: 查询条件
     :return: 满足查询条件的K线数据
     :rtype: KData)");
-
-    py::def(
-      "QueryByDate", KQueryByDate,
-      (py::arg("start") = Datetime::min(), py::arg("end") = Datetime(),
-       py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER),
-      R"(QueryByDate([start=Datetime.min(), end=Datetime(), ktype=Query.DAY, recover_type=Query.NO_RECOVER])
-
-    构建按日期 [start, end) 方式获取K线数据条件
-    
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期
-    :param Query.KType ktype: K线数据类型（如日线、分钟线等）
-    :param Query.RecoverType recover_type: 复权类型
-    :return: 查询条件
-    :rtype: KQuery)");
 }

@@ -234,7 +234,7 @@ def KData_getPos(kdata, datetime):
 
 KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
-KData.getPos = KData_getPos
+KData.get_pos = KData_getPos
 
 # ------------------------------------------------------------------
 # 封装增强其他C++ vector类型的遍历、打印
@@ -281,6 +281,58 @@ TransList.__str__ = lambda self: str(list(self))
 TransList.__repr__ = lambda self: repr(list(self))
 TimeLineList.__str__ = lambda self: str(list(self))
 TimeLineList.__repr__ = lambda self: repr(list(self))
+
+# ------------------------------------------------------------------
+# 重定义Query
+# ------------------------------------------------------------------
+
+Query.INDEX = Query.QueryType.INDEX
+Query.DATE = Query.QueryType.DATE
+Query.DAY = "DAY"
+Query.WEEK = "WEEK"
+Query.MONTH = "MONTH"
+Query.QUARTER = "QUARTER"
+Query.HALFYEAR = "HALFYEAR"
+Query.YEAR = "YEAR"
+Query.MIN = "MIN"
+Query.MIN5 = "MIN5"
+Query.MIN15 = "MIN15"
+Query.MIN30 = "MIN30"
+Query.MIN60 = "MIN60"
+Query.HOUR2 = "HOUR2"
+Query.HOUR4 = "HOUR4"
+Query.HOUR6 = "HOUR6"
+Query.HOUR12 = "HOUR12"
+Query.NO_RECOVER = Query.RecoverType.NO_RECOVER
+Query.FORWARD = Query.RecoverType.FORWARD
+Query.BACKWARD = Query.RecoverType.BACKWARD
+Query.EQUAL_FORWARD = Query.RecoverType.EQUAL_FORWARD
+Query.EQUAL_BACKWARD = Query.RecoverType.EQUAL_BACKWARD
+
+old_Query_init = Query.__init__
+
+
+def new_Query_init(self, start=0, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER):
+    """
+        构建按索引 [start, end) 方式获取K线数据条件。start，end应同为 int 或 同为 Datetime 类型。
+
+        :param int|Datetime start: 起始索引位置或起始日期
+        :param int|Datetime end: 结束索引位置或结束日期
+        :param Query.KType ktype: K线数据类型（如日线、分钟线等）
+        :param Query.RecoverType recover_type: 复权类型
+        :return: 查询条件
+        :rtype: KQuery
+        """
+    if isinstance(start, int):
+        end_pos = constant.null_int64 if end is None else end
+    elif isinstance(start, Datetime):
+        end_pos = constant.null_datetime if end is None else end
+    else:
+        raise TypeError('Incorrect parameter type error!')
+    old_Query_init(self, start, end_pos, ktype, recover_type)
+
+
+Query.__init__ = new_Query_init
 
 # ------------------------------------------------------------------
 # 增加转化为 np.array、pandas.DataFrame 的功能

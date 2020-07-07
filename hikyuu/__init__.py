@@ -165,32 +165,6 @@ zsbk_sz180 = sm.getBlock("指数板块", "上证180")
 zsbk_hs300 = sm.getBlock("指数板块", "沪深300")
 zsbk_zz100 = sm.getBlock("指数板块", "沪深300")
 
-# ------------------------------------------------------------------
-# 重定义Query
-# ------------------------------------------------------------------
-Query.INDEX = Query.QueryType.INDEX
-Query.DATE = Query.QueryType.DATE
-Query.DAY = "DAY"
-Query.WEEK = "WEEK"
-Query.MONTH = "MONTH"
-Query.QUARTER = "QUARTER"
-Query.HALFYEAR = "HALFYEAR"
-Query.YEAR = "YEAR"
-Query.MIN = "MIN"
-Query.MIN5 = "MIN5"
-Query.MIN15 = "MIN15"
-Query.MIN30 = "MIN30"
-Query.MIN60 = "MIN60"
-Query.HOUR2 = "HOUR2"
-Query.HOUR4 = "HOUR4"
-Query.HOUR6 = "HOUR6"
-Query.HOUR12 = "HOUR12"
-Query.NO_RECOVER = Query.RecoverType.NO_RECOVER
-Query.FORWARD = Query.RecoverType.FORWARD
-Query.BACKWARD = Query.RecoverType.BACKWARD
-Query.EQUAL_FORWARD = Query.RecoverType.EQUAL_FORWARD
-Query.EQUAL_BACKWARD = Query.RecoverType.EQUAL_BACKWARD
-
 # ==============================================================================
 #
 # 设置关键类型简称

@@ -43,39 +43,39 @@ void export_Datetime() {
       .add_property("microsecond", &Datetime::microsecond, "微秒")
       .add_property("number", &Datetime::number)
 
-      .def("isNull", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
+      .def("is_null", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
 
-      .def("dayOfWeek", &Datetime::dayOfWeek, "\n返回是一周中的第几天，周日为0，周一为1")
-      .def("dayOfYear", &Datetime::dayOfYear, "\n返回一年中的第几天，1月1日为一年中的第1天")
-      .def("startOfDay", &Datetime::startOfDay, "\n返回当天 0点0分0秒")
-      .def("endOfDay", &Datetime::endOfDay, "\n返回当日 23点59分59秒")
-      .def("nextDay", &Datetime::nextDay, "\n返回下一自然日")
-      .def("nextWeek", &Datetime::nextWeek, "\n返回下周周一日期")
-      .def("nextMonth", &Datetime::nextMonth, "\n返回下月首日日期")
-      .def("nextQuarter", &Datetime::nextQuarter, "\n返回下一季度首日日期")
-      .def("nextHalfyear", &Datetime::nextHalfyear, "\n返回下一半年度首日日期")
-      .def("nextYear", &Datetime::nextYear, "\n返回下一年度首日日期")
-      .def("preDay", &Datetime::preDay, "\n返回前一自然日日期")
-      .def("preWeek", &Datetime::preWeek, "\n返回上周周一日期")
-      .def("preMonth", &Datetime::preMonth, "\n返回上月首日日期")
-      .def("preQuarter", &Datetime::preQuarter, "\n返回上一季度首日日期")
-      .def("preHalfyear", &Datetime::preHalfyear, "\n返回上一半年度首日日期")
-      .def("preYear", &Datetime::preYear, "\n返回上一年度首日日期")
-      .def("dateOfWeek", &Datetime::dateOfWeek,
+      .def("day__of_week", &Datetime::dayOfWeek, "\n返回是一周中的第几天，周日为0，周一为1")
+      .def("day_of_year", &Datetime::dayOfYear, "\n返回一年中的第几天，1月1日为一年中的第1天")
+      .def("start_of_day", &Datetime::startOfDay, "\n返回当天 0点0分0秒")
+      .def("end__of_day", &Datetime::endOfDay, "\n返回当日 23点59分59秒")
+      .def("next_day", &Datetime::nextDay, "\n返回下一自然日")
+      .def("next_week", &Datetime::nextWeek, "\n返回下周周一日期")
+      .def("next_month", &Datetime::nextMonth, "\n返回下月首日日期")
+      .def("next_quarter", &Datetime::nextQuarter, "\n返回下一季度首日日期")
+      .def("next_halfyear", &Datetime::nextHalfyear, "\n返回下一半年度首日日期")
+      .def("next_year", &Datetime::nextYear, "\n返回下一年度首日日期")
+      .def("pre_day", &Datetime::preDay, "\n返回前一自然日日期")
+      .def("pre_week", &Datetime::preWeek, "\n返回上周周一日期")
+      .def("pre_month", &Datetime::preMonth, "\n返回上月首日日期")
+      .def("pre_quarter", &Datetime::preQuarter, "\n返回上一季度首日日期")
+      .def("pre_halfyear", &Datetime::preHalfyear, "\n返回上一半年度首日日期")
+      .def("pre_year", &Datetime::preYear, "\n返回上一年度首日日期")
+      .def("date_of_week", &Datetime::dateOfWeek,
            R"(
 返回指定的本周中第几天的日期，周日为0天，周六为第6天
         
 :param int day: 指明本周的第几天，如小于则认为为第0天，如大于6则认为为第6天)")
 
-      .def("startOfWeek", &Datetime::startOfWeek, "\n返回周起始日期（周一）")
-      .def("endOfWeek", &Datetime::endOfWeek, "\n返回周结束日期（周日）")
-      .def("startOfMonth", &Datetime::startOfMonth, "\n返回月度起始日期")
-      .def("endOfMonth", &Datetime::endOfMonth, "\n返回月末最后一天日期")
-      .def("startOfQuarter", &Datetime::startOfQuarter, "\n返回季度起始日期")
-      .def("endOfQuarter", &Datetime::endOfQuarter, "\n返回季度结束日期")
-      .def("startOfHalfyear", &Datetime::startOfHalfyear, "\n返回半年度起始日期")
-      .def("endOfHalfyear", &Datetime::endOfHalfyear, "\n返回半年度结束日期")
-      .def("startOfYear", &Datetime::startOfYear, "\n返回年度起始日期")
+      .def("start_of_week", &Datetime::startOfWeek, "\n返回周起始日期（周一）")
+      .def("end_of_week", &Datetime::endOfWeek, "\n返回周结束日期（周日）")
+      .def("start_of_month", &Datetime::startOfMonth, "\n返回月度起始日期")
+      .def("end_of_month", &Datetime::endOfMonth, "\n返回月末最后一天日期")
+      .def("start_of_quarter", &Datetime::startOfQuarter, "\n返回季度起始日期")
+      .def("end_of_quarter", &Datetime::endOfQuarter, "\n返回季度结束日期")
+      .def("start_of_halfyear", &Datetime::startOfHalfyear, "\n返回半年度起始日期")
+      .def("end_of_halfyear", &Datetime::endOfHalfyear, "\n返回半年度结束日期")
+      .def("start_of_year", &Datetime::startOfYear, "\n返回年度起始日期")
       .def("endOfYear", &Datetime::endOfYear, "\n返回年度结束日期")
       .def("min", &Datetime::min, "\n获取支持的最小日期, Datetime(1400, 1, 1)")
       .staticmethod("min")
@@ -102,5 +102,5 @@ void export_Datetime() {
 #endif
       ;
 
-    def("getDateRange", getDateRange, (arg("start"), arg("end")));
+    def("get_date_range", getDateRange, (arg("start"), arg("end")));
 }
