@@ -95,30 +95,30 @@ if not os.path.exists(config_file):
 ini = configparser.ConfigParser()
 ini.read(config_file)
 hku_param = Parameter()
-hku_param.set("tmpdir", ini.get('hikyuu', 'tmpdir'))
+hku_param["tmpdir"] = ini.get('hikyuu', 'tmpdir')
 if ini.has_option('hikyuu', 'logger'):
-    hku_param.set("logger", ini['hikyuu']['logger'])
+    hku_param["logger"] = ini['hikyuu']['logger']
 
 base_param = Parameter()
 base_info_config = ini.options('baseinfo')
 for p in base_info_config:
-    base_param.set(p, ini.get('baseinfo', p))
+    base_param[p] = ini.get('baseinfo', p)
 
 block_param = Parameter()
 block_config = ini.options('block')
 for p in block_config:
-    block_param.set(p, ini.get('block', p))
+    block_param[p] = ini.get('block', p)
 
 preload_param = Parameter()
 preload_config = ini.options('preload')
 for p in preload_config:
     # 注意：proload参数是布尔类型
-    preload_param.set(p, ini.getboolean('preload', p))
+    preload_param[p] = ini.getboolean('preload', p)
 
 kdata_param = Parameter()
 kdata_config = ini.options('kdata')
 for p in kdata_config:
-    kdata_param.set(p, ini.get('kdata', p))
+    kdata_param[p] = ini.get('kdata', p)
 
 set_log_level(LOG_LEVEL.TRACE)
 sm = StockManager.instance()
@@ -235,7 +235,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
     :param bool print_out: 打印选中的股票
     :rtype: 选中的股票列表
     """
-    q = QueryByDate(start, end)
+    q = Query(start, end)
     d = sm.getTradingCalendar(q, 'SH')
     if len(d) == 0:
         return
@@ -245,11 +245,11 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
         if not s.valid:
             continue
 
-        q = QueryByDate(start, end)
+        q = Query(start, end)
         k = s.getKData(q)
         cond.setContext(k)
         if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k) > 0 and k[
-            -1].datetime == d[-1]:
+            -1].date == d[-1]:
             result.append(s)
             if print_out:
                 print(d[-1], s)
@@ -284,7 +284,7 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
             stock = sm[stockstr[0][-8:]]
 
             record = KRecord()
-            record.datetime = d
+            record.date = d
             record.open = open
             record.high = high
             record.low = low
@@ -319,7 +319,7 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
             stock = sm[stockstr[0][-8:]]
 
             record = KRecord()
-            record.datetime = d
+            record.date = d
             record.open = open
             record.high = high
             record.low = low
@@ -417,10 +417,10 @@ def realtimeUpdate_from_tushare():
             continue  # 停牌
 
         code = df.ix[i][0]
-        stock = getStock('sh' + code)
+        stock = get_stock('sh' + code)
 
         if stock.isNull() == True or stock.type != constant.STOCKTYPE_A:
-            stock = getStock('sz' + code)
+            stock = get_stock('sz' + code)
         if stock.isNull() == True:
             continue
 
@@ -434,16 +434,16 @@ def realtimeUpdate_from_tushare():
 
         from datetime import date
         d = date.today()
-        record.datetime = Datetime(d)
+        record.date = Datetime(d)
         stock.realtimeUpdate(record)
 
     # 更新指数行情
     df = ts.get_index()
     for i in range(len(df)):
         code = df.ix[i][0]
-        stock = getStock('sh' + code)
+        stock = get_stock('sh' + code)
         if stock.isNull() == True or stock.type != constant.STOCKTYPE_INDEX:
-            stock = getStock('sz' + code)
+            stock = get_stock('sz' + code)
         if stock.isNull() == True:
             continue
 
@@ -467,11 +467,11 @@ def realtimeUpdate_from_tushare():
         ):
             from datetime import date
             d = date.today()
-            record.datetime = Datetime(d)
+            record.date = Datetime(d)
             stock.realtimeUpdate(record)
 
 
-def realtimeUpdate_inner(source='tushare'):
+def realtimeUpdate_inner(source='sina'):
     if source == 'sina' or source == 'qq':
         realtimeUpdate_from_sina_qq(source)
     elif source == 'tushare':
@@ -483,7 +483,7 @@ def realtimeUpdate_inner(source='tushare'):
 def realtimeUpdateWrap():
     pre_update_time = None
 
-    def realtimeUpdate_closure(source='tushare', delta=60):
+    def realtimeUpdate_closure(source='sina', delta=60):
         """
         更新实时日线数据
         参数：

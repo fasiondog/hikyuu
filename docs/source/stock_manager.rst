@@ -241,7 +241,7 @@ StockManager/Block/Stock
 
 .. py:class:: Stock
 
-    Stock基类
+    证券对象
 
     .. py:attribute:: id : 内部id，一般用于作为map的键值使用
     .. py:attribute:: market : 获取所属市场简称，市场简称是市场的唯一标识
@@ -253,23 +253,23 @@ StockManager/Block/Stock
         获取证券类型，参见：:py:data:`constant`
         
     .. py:attribute:: valid : 该证券当前是否有效
-    .. py:attribute:: startDatetime : 证券起始日期
-    .. py:attribute:: lastDatetime : 证券最后日期
+    .. py:attribute:: start_date : 证券起始日期
+    .. py:attribute:: last_date : 证券最后日期
     .. py:attribute:: tick : 最小跳动量
-    .. py:attribute:: tickValue : 最小跳动量价值
+    .. py:attribute:: tick_value : 最小跳动量价值
     .. py:attribute:: unit : 每单位价值 = tickValue / tick
     .. py:attribute:: precision : 价格精度
     .. py:attribute:: atom : 最小交易数量，同minTradeNumber
-    .. py:attribute:: minTradeNumber : 最小交易数量
-    .. py:attribute:: maxTradeNumber : 最大交易数量
+    .. py:attribute:: min_trade_number : 最小交易数量
+    .. py:attribute:: max_trade_number : 最大交易数量
 
-    .. py:method:: isNull(self)
+    .. py:method:: is_null(self)
     
         是否为Null
     
         :rtype: bool
     
-    .. py:method:: getKData(self, query)
+    .. py:method:: get_kdata(self, query)
     
         获取K线数据
         
@@ -277,7 +277,7 @@ StockManager/Block/Stock
         :return: 满足查询条件的K线数据
         :rtype: KData
     
-    .. py:method:: getCount(self[, ktype=Query.DAY])
+    .. py:method:: get_count(self[, ktype=Query.DAY])
     
         获取不同类型K线数据量
         
@@ -285,16 +285,16 @@ StockManager/Block/Stock
         :return: K线记录数
         :rtype: int
     
-    .. py:method:: getMarketValue(self, datetime, ktype)
+    .. py:method:: get_market_value(self, date, ktype)
     
         获取指定时刻的市值，即小于等于指定时刻的最后一条记录的收盘价
         
-        :param Datetime datetime: 指定时刻
+        :param Datetime date: 指定时刻
         :param Query.KType ktype: K线数据类别
         :return: 指定时刻的市值
         :rtype: float
     
-    .. py:method:: getKRecord(self, pos[, ktype=Query.DAY])
+    .. py:method:: get_krecord(self, pos[, ktype=Query.DAY])
     
         获取指定索引的K线数据记录，未作越界检查
         
@@ -303,16 +303,16 @@ StockManager/Block/Stock
         :return: K线记录
         :rtype: KRecord
     
-    .. py:method:: getKRecordByDate(self, datetime[, ktype=Query.DAY])
+    .. py:method:: get_krecord_by_date(self, date[, ktype=Query.DAY])
     
         根据数据类型（日线/周线等），获取指定时刻的KRecord
         
-        :param Datetime datetime: 指定时刻
+        :param Datetime date: 指定时刻
         :param Query.KType ktype: K线数据类别
         :return: K线记录
         :rtype: KRecord
     
-    .. py:method:: getKRecordList(self, start, end, ktype)
+    .. py:method:: get_krecord_list(self, start, end, ktype)
     
         获取K线记录 [start, end)，一般不直接使用，用getKData替代
         
@@ -322,14 +322,14 @@ StockManager/Block/Stock
         :return: K线记录列表
         :rtype: KRecordList
     
-    .. py:method:: getDatetimeList(self, query)
+    .. py:method:: get_date_list(self, query)
     
         获取日期列表
         
         :param Query query: 查询条件
         :rtype: DatetimeList
 
-    .. py:method:: getDatetimeList(self, start, end, ktype)
+    .. py:method:: get_date_list(self, start, end, ktype)
     
         获取日期列表
         
@@ -338,21 +338,21 @@ StockManager/Block/Stock
         :param Query.KType ktype: K线类型
         :rtype: DatetimeList
         
-    .. py:method:: getTimeLineList(self, query)
+    .. py:method:: get_timeline_list(self, query)
     
         获取分时线数据
         
         :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
         :rtype: TimeLineList
     
-    .. py:method:: getTransList(self, query)
+    .. py:method:: get_trans_list(self, query)
     
         获取历史分笔数据
         
         :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
         :rtype: TransList
 
-    .. py:method:: getWeight(self[, start, end])
+    .. py:method:: get_weight(self[, start, end])
     
         获取指定时间段[start,end)内的权息信息。未指定起始、结束时刻时，获取全部权息记录。
         
@@ -360,32 +360,32 @@ StockManager/Block/Stock
         :param Datetime end: 结束时刻
         :rtype: StockWeightList
         
-    .. py:method:: getFinanceInfo(self)
+    .. py:method:: get_finance_info(self)
     
         获取当前财务信息
         
         :rtype: Parameter
         
-    .. py:method:: getHistoryFinanceInfo(self, date)
+    .. py:method:: get_history_finance_info(self, date)
     
         获取历史财务信息, 字段含义参见：`<https://hikyuu.org/finance_fields.html>`_
         
         :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
         :rtype: PriceList
     
-    .. py:method:: realtimeUpdate(self, krecord)
+    .. py:method:: realtime_update(self, krecord)
     
         （临时函数）只用于更新内存缓存中的日线数据
         
         :param KRecord krecord: 新增的实时K线记录
         
-    .. py:method:: loadKDataToBuffer(self, ktype)
+    .. py:method:: load_kdata_to_buffer(self, ktype)
     
         将指定类别的K线数据加载至内存缓存
         
         :param Query.KType ktype: K线类型
 
-    .. py:method:: releaseKDataBuffer(self, ktype)
+    .. py:method:: release_kdata_buffer(self, ktype)
     
         释放指定类别的内存K线数据
         

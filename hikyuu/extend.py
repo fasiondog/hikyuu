@@ -204,10 +204,10 @@ def KData_getitem(kdata, i):
         return kdata.get(index)
 
     elif isinstance(i, Datetime):
-        return kdata.getByDate(i)
+        return kdata.get_by_date(i)
 
     elif isinstance(i, str):
-        return kdata.getByDate(Datetime(i))
+        return kdata.get_by_date(Datetime(i))
 
     elif isinstance(i, slice):
         return [kdata.get(x) for x in range(*i.indices(len(kdata)))]
@@ -433,3 +433,32 @@ try:
 
 except:
     pass
+
+# ------------------------------------------------------------------
+# 增强 Parameter
+# ------------------------------------------------------------------
+
+
+def Parameter_iter(self):
+    name_list = self.get_name_list()
+    for key in name_list:
+        yield self[key]
+
+
+def Parameter_keys(self):
+    return list(self.get_name_list())
+
+
+def Parameter_items(self):
+    return [(key, self[key]) for key in self.get_name_list()]
+
+
+def Parameter_to_dict(self):
+    """转化为 Python dict 对象"""
+    return dict(self.items())
+
+
+Parameter.__iter__ = Parameter_iter
+Parameter.keys = Parameter_keys
+Parameter.items = Parameter_items
+Parameter.to_dict = Parameter_to_dict

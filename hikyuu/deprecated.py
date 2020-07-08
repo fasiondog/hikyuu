@@ -180,6 +180,22 @@ MarketInfo.__getattr__ = MarketInfo_getattr
 
 @deprecated_attr(
     {
+        'set': '__setitem__',
+        'get': '__getitem__',
+        'have': '__contains__',
+        'getNameList': 'get_name_list',
+        'getNameValueList': None
+    }
+)
+def Parameter_getattr(self, name):
+    return getattr(self, name)
+
+
+Parameter.__getattr__ = Parameter_getattr
+
+
+@deprecated_attr(
+    {
         'startDatetime': 'start_date',
         'endDatetime': 'end_date',
         'queryType': 'query_type',
@@ -194,7 +210,32 @@ def Query_getattr(self, name):
 Query.__getattr__ = Query_getattr
 
 
-@deprecated_attr({'getKData': 'get_kdata'})
+@deprecated_attr(
+    {
+        'startDatetime': 'start_date',
+        'lastDatetime': 'last_date',
+        'tickValue': 'tick_value',
+        'minTradeNumber': 'min_trade_number',
+        'maxTradeNumber': 'max_trade_number',
+        'isNull': 'is_null',
+        'isBuffer': 'is_buffer',
+        'getKData': 'get_kdata',
+        'getTimeLineList': 'get_timeLine_list',
+        'getTransList': 'get_trans_list',
+        'getCount': 'get_count',
+        'getMarketValue': 'get_market_value',
+        'getKRecord': 'get_krecord',
+        'getKRecordByDate': 'get_krecord_by_date',
+        'getKRecordList': 'get_krecord_list',
+        'getDatetimeList': 'get_date_list',
+        'getFinanceInfo': 'get_finance_info',
+        'getHistoryFinanceInfo': 'get_history_finance_info',
+        'realtimeUpdate': 'realtime_update',
+        'getWeight': 'get_weight',
+        'loadKDataToBuffer': 'load_kdata_to_buffer',
+        'releaseKDataBuffer': 'release_kdata_buffer'
+    }
+)
 def Stock_getattr(self, name):
     return getattr(self, name)
 
