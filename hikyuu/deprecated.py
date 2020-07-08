@@ -33,6 +33,8 @@ def deprecated_attr(name_dict):
                         format(clzname, name, clzname, name_dict[name])
                     )
                 return func(self, name_dict[name])
+            if name not in dir(self):
+                raise AttributeError("'{}' object has no attribute '{}'".format(clzname, name))
             return func(self, name)
 
         return wrapfunc
@@ -152,6 +154,7 @@ KData.__getattr__ = KData_getattr
 
 @deprecated_attr(
     {
+        'datetime': 'date',
         'openPrice': 'open',
         'closePrice': 'close',
         'highPrice': 'high',

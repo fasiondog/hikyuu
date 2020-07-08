@@ -21,7 +21,7 @@ void export_KReord() {
       .def(self_ns::str(self))
       .def(self_ns::repr(self))
 
-      .def_readwrite("datetime", &KRecord::datetime, "时间")
+      .def_readwrite("date", &KRecord::datetime, "时间")
       .def_readwrite("open", &KRecord::openPrice, "开盘价")
       .def_readwrite("high", &KRecord::highPrice, "最高价")
       .def_readwrite("low", &KRecord::lowPrice, "最低价")

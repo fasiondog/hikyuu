@@ -120,57 +120,36 @@ class StockFuncFormatter(object):
 
 def getDayLocatorAndFormatter(dates):
     """获取显示日线时使用的Major Locator和Major Formatter"""
-    premonth, preyear = dates[0].month, dates[0].year
-    month = []
-    loc = []
-    if (len(dates) <= 700):
-        for i, d in enumerate(dates):
-            curmonth, curyear = d.month, d.year
-            if curyear > preyear:
-                strloc = str(curmonth)
-                loc.append(i)
-                month.append((i, "{}-{}".format(str(curyear)[-2:], str(curmonth))))
-                preyear = curyear
-                premonth = curmonth
-            elif curmonth > premonth:
-                strloc = str(curmonth)
-                loc.append(i)
-                month.append((i, strloc[-2:]))
-                premonth = curmonth
-            else:
-                month.append((i, str(d.number)))
+    sep = len(dates) / 8
+    loc = [
+        (
+            i, str(d) if
+            (i !=
+             (len(dates) - 1)) and (i % sep != 0) else "{}-{}-{}".format(d.year, d.month, d.day)
+        ) for i, d in enumerate(dates)
+    ]
+    fixed_loc = [
+        i for i in range(len(dates)) if (i == (len(dates) - 1)) or (i != 0 and i % sep == 0)
+    ]
 
-    else:
-        for i, d in enumerate(dates):
-            curyear = d.year
-            if curyear > preyear:
-                month.append((i, curyear))
-                loc.append(i)
-                preyear = curyear
-            else:
-                month.append((i, str(d.number)))
-
-    month_loc = FixedLocator(loc)
-    month_fm = FuncFormatter(StockFuncFormatter(dict(month)))
+    month_loc = FixedLocator(fixed_loc)
+    month_fm = FuncFormatter(StockFuncFormatter(dict(loc)))
     return month_loc, month_fm
 
 
-def getMonthLocatorAndFormatter(dates):
-    """获取显示月线时使用的Major Locator和Major Formatter"""
-    preyear = dates[0].year
-    month = []
-    loc = []
-    for i, d in enumerate(dates):
-        curyear = d.year
-        if curyear > preyear:
-            month.append((i, curyear))
-            loc.append(i)
-            preyear = curyear
-        else:
-            month.append((i, str(d.number)))
+def getMinLocatorAndFormatter(dates):
+    """获取显示分钟线时使用的Major Locator和Major Formatter"""
+    sep = len(dates) / 5
+    loc = [
+        (
+            i, str(d)
+            if i % sep != 0 else "{}-{}-{} {}:{}".format(d.year, d.month, d.day, d.hour, d.minute)
+        ) for i, d in enumerate(dates)
+    ]
+    fixed_loc = [i for i in range(len(dates)) if i != 0 and i % sep == 0]
 
-    month_loc = FixedLocator(loc)
-    month_fm = FuncFormatter(StockFuncFormatter(dict(month)))
+    month_loc = FixedLocator(fixed_loc)
+    month_fm = FuncFormatter(StockFuncFormatter(dict(loc)))
     return month_loc, month_fm
 
 
@@ -187,17 +166,18 @@ def ax_set_locator_formatter(axes, dates, typ):
     elif typ == Query.WEEK:
         major_loc, major_fm = getDayLocatorAndFormatter(dates)
     elif typ == Query.MONTH:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+        major_loc, major_fm = getDayLocatorAndFormatter(dates)
     elif typ == Query.QUARTER:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+        major_loc, major_fm = getDayLocatorAndFormatter(dates)
     elif typ == Query.HALFYEAR:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+        major_loc, major_fm = getDayLocatorAndFormatter(dates)
     elif typ == Query.YEAR:
-        major_loc, major_fm = getMonthLocatorAndFormatter(dates)
+        major_loc, major_fm = getDayLocatorAndFormatter(dates)
+    else:
+        major_loc, major_fm = getMinLocatorAndFormatter(dates)
 
-    if major_loc:
-        axes.xaxis.set_major_locator(major_loc)
-        axes.xaxis.set_major_formatter(major_fm)
+    axes.xaxis.set_major_locator(major_loc)
+    axes.xaxis.set_major_formatter(major_fm)
 
 
 def adjust_axes_show(axeslist):
@@ -280,7 +260,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
+        last_record.date.number / 10000, last_record.open, last_record.high, last_record.low,
         last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
     )
     axes.text(
@@ -295,7 +275,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(kdata) + 1)
-    ax_set_locator_formatter(axes, kdata.getDatetimeList(), kdata.getQuery().kType)
+    ax_set_locator_formatter(axes, kdata.get_date_list(), kdata.get_query().ktype)
     #draw()
 
 
@@ -348,7 +328,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f' % (
-        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
+        last_record.date.number / 10000, last_record.open, last_record.high, last_record.low,
         last_record.close
     )
     axes.text(
@@ -363,7 +343,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
 
     axes.autoscale_view()
     #axes.set_xlim(0, len(kdata))
-    ax_set_locator_formatter(axes, kdata.getDatetimeList(), kdata.getQuery().kType)
+    ax_set_locator_formatter(axes, kdata.get_date_list(), kdata.get_query().ktype)
     #draw()
 
 
@@ -627,7 +607,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
     else:
         sg.setTO(kdata)
 
-    refdates = kdata.getDatetimeList()
+    refdates = kdata.get_date_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
 
     if axes is None:
@@ -690,7 +670,7 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     else:
         cn.setTO(kdata)
 
-    refdates = kdata.getDatetimeList()
+    refdates = kdata.get_date_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
 
     if axes is None:
@@ -718,7 +698,7 @@ def sysplot(sys, new=True, axes=None, style=1):
     """
     kdata = sys.getTO()
 
-    refdates = kdata.getDatetimeList()
+    refdates = kdata.get_date_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
 
     if axes is None:
