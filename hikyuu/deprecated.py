@@ -135,6 +135,24 @@ Block.__getattr__ = Block_getattr
 
 @deprecated_attr(
     {
+        'setDiscard': 'set_discard',
+        'size': '__len__',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'getResultNumber': 'get_result_num',
+        'getByDate': 'get_by_date',
+    }
+)
+def Indicator_getattr(self, name):
+    return getattr(self, name)
+
+
+Indicator.__getattr__ = Indicator_getattr
+
+
+@deprecated_attr(
+    {
         'startPos': 'start_pos',
         'endPos': 'end_pos',
         'lastPos': 'last_pos',
@@ -241,3 +259,77 @@ def Stock_getattr(self, name):
 
 
 Stock.__getattr__ = Stock_getattr
+
+
+@deprecated_attr(
+    {
+        'size': '__len__',
+        'setKDataDriver': None,
+        'getBaseInfoDriverParameter': 'get_base_info_parameter',
+        'getBlockDriverParameter': 'get_block_parameter',
+        'getKDataDriverParameter': 'get_kdata_parameter',
+        'getPreloadParameter': 'get_preload_parameter',
+        'getHikyuuParameter': 'get_hikyuu_parameter',
+        'getAllMarket': "get_market_list",
+        'getMarketInfo': 'get_market_info',
+        'getStockTypeInfo': 'get_stock_type_info',
+        'getStock': 'get_stock',
+        'getBlock': 'get_block',
+        'getBlockList': 'get_block_list',
+        'getTradingCalendar': 'get_trading_calendar',
+        'addTempCsvStock': 'add_temp_csv_stock',
+        'removeTempCsvStock': 'remove_temp_csv_stock'
+    }
+)
+def StockManager_getattr(self, name):
+    return getattr(self, name)
+
+
+StockManager.__getattr__ = StockManager_getattr
+
+
+@deprecated_attr(
+    {
+        'tickValue': 'tick_value',
+        'minTradeNumber': 'min_trade_num',
+        'maxTradeNumber': 'max_trade_num',
+    }
+)
+def StockTypeInfo_getattr(self, name):
+    return getattr(self, name)
+
+
+StockTypeInfo.__getattr__ = StockTypeInfo_getattr
+
+
+@deprecated_attr(
+    {
+        'datetime': 'date',
+        'countAsGift': 'count_as_gift',
+        'countForSell': 'count_for_sell',
+        'priceForSell': 'price_for_sell',
+        'totalCount': 'total_count',
+        'freeCount': 'free_count',
+    }
+)
+def StockWeight_getattr(self, name):
+    return getattr(self, name)
+
+
+StockWeight.__getattr__ = StockWeight_getattr
+
+
+@deprecated_attr({'datetime': 'date'})
+def TimeLineRecord_getattr(self, name):
+    return getattr(self, name)
+
+
+TimeLineRecord.__getattr__ = TimeLineRecord_getattr
+
+
+@deprecated_attr({'datetime': 'date'})
+def TransRecord_getattr(self, name):
+    return getattr(self, name)
+
+
+TransRecord.__getattr__ = TransRecord_getattr

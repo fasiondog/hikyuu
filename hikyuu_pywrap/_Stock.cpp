@@ -65,40 +65,40 @@ void export_Stock() {
       .def("is_buffer", &Stock::isBuffer, R"(指定类型的K线数据是否被缓存)")
 
       .def("get_kdata", &Stock::getKData, R"(get_kdata(self, query)
-    
+
     获取K线数据
-        
+
     :param Query query: 查询条件
     :return: 满足查询条件的K线数据
     :rtype: KData)")
 
       .def("get_timeLine_list", &Stock::getTimeLineList, R"(get_timeLine_list(self, query)
-    
+
     获取分时线
-        
+
     :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
     :rtype: TimeLineList)")
 
       .def("get_trans_list", &Stock::getTransList, R"(get_trans_list(self, query)
-    
+
     获取历史分笔数据
-        
+
     :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
     :rtype: TransList)")
 
       .def("get_count", &Stock::getCount, arg("ktype") = KQuery::DAY,
            R"(get_count(self, [ktype=Query.DAY])
-    
+
     获取不同类型K线数据量
-        
+
     :param Query.KType ktype: K线数据类别
     :return: K线记录数
     :rtype: int)")
 
       .def("get_market_value", &Stock::getMarketValue, R"(get_market_value(self, date, ktype)
-    
+
     获取指定时刻的市值，即小于等于指定时刻的最后一条记录的收盘价
-        
+
     :param Datetime date: 指定时刻
     :param Query.KType ktype: K线数据类别
     :return: 指定时刻的市值
@@ -106,9 +106,9 @@ void export_Stock() {
 
       .def("get_krecord", &Stock::getKRecord, (arg("pos"), arg("ktype") = KQuery::DAY),
            R"(get_krecord(self, pos[, ktype=Query.DAY])
-    
+
     获取指定索引的K线数据记录，未作越界检查
-        
+
     :param int pos: 指定的索引位置
     :param Query.KType ktype: K线数据类别
     :return: K线记录
@@ -117,18 +117,18 @@ void export_Stock() {
       .def("get_krecord_by_date", &Stock::getKRecordByDate,
            (arg("date"), arg("ktype") = KQuery::DAY),
            R"(get_krecord_by_date(self, date[, ktype=Query.DAY])
-    
+
     根据数据类型（日线/周线等），获取指定时刻的KRecord
-        
+
     :param Datetime date: 指定日期时刻
     :param Query.KType ktype: K线数据类别
     :return: K线记录
     :rtype: KRecord)")
 
       .def("get_krecord_list", &Stock::getKRecordList, R"(get_krecord_list(self, start, end, ktype)
-    
+
     获取K线记录 [start, end)，一般不直接使用.
-        
+
     :param int start: 起始位置
     :param int end: 结束位置
     :param Query.KType ktype: K线类别
@@ -137,60 +137,60 @@ void export_Stock() {
 
       .def("get_date_list", getDatetimeList1)
       .def("get_date_list", getDatetimeList2, R"(get_date_list(self, query)
-    
+
     获取日期列表
-        
+
     :param Query query: 查询条件
     :rtype: DatetimeList
-        
+
 get_date_list(self, start, end, ktype)
-    
+
     获取日期列表
-        
+
     :param int start: 起始位置
     :param ind end: 结束位置
     :param Query.KType ktype: K线类型
     :rtype: DatetimeList )")
 
       .def("get_finance_info", &Stock::getFinanceInfo, R"(get_finance_info(self)
-    
+
     获取当前财务信息
-       
+  
     :rtype: Parameter)")
 
       .def("get_history_finance_info", &Stock::getHistoryFinanceInfo,
            R"(get_history_finance_info(self, date)
-    
+
     获取历史财务信息, 字段含义参见：https://hikyuu.org/finance_fields.html
-        
+
     :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
     :rtype: PriceList)")
 
       .def("realtime_update", &Stock::realtimeUpdate, R"(realtime_update(self, krecord)
-    
+
     （临时函数）只用于更新缓存中的日线数据
-        
+
     :param KRecord krecord: 新增的实时K线记录)")
 
       .def("get_weight", getWeight1)
       .def("get_weight", getWeight2, R"(get_weight(self, [start, end])
-    
+
     获取指定时间段[start,end)内的权息信息。未指定起始、结束时刻时，获取全部权息记录。
-        
+
     :param Datetime start: 起始时刻
     :param Datetime end: 结束时刻
     :rtype: StockWeightList)")
 
       .def("load_kdata_to_buffer", &Stock::loadKDataToBuffer, R"(load_kdata_to_buffer(self, ktype)
-    
+
     将指定类别的K线数据加载至内存缓存
-        
+
     :param Query.KType ktype: K线类型)")
 
       .def("release_kdata_buffer", &Stock::releaseKDataBuffer, R"(release_kdata_buffer(self, ktype)
-    
+
     释放指定类别的内存K线数据
-        
+
     :param Query.KType ktype: K线类型)")
 
       .def(self == self)

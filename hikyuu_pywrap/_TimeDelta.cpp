@@ -110,27 +110,27 @@ void export_TimeDelta() {
     :return: TimeDelta(0, 0, 0, 0, 0, 1))")
       .staticmethod("resolution")
 
-      .def("maxTicks", &TimeDelta::maxTicks, R"(maxTicks()
+      .def("max_ticks", &TimeDelta::maxTicks, R"(max_ticks()
 
     支持的最大 ticks （即微秒数）
 
     :rtype: int)")
-      .staticmethod("maxTicks")
+      .staticmethod("max_ticks")
 
-      .def("minTicks", &TimeDelta::minTicks, R"(minTicks()
+      .def("min_ticks", &TimeDelta::minTicks, R"(min_ticks()
 
     支持的最小 ticks （即微秒数）
 
     :rtype: int)")
-      .staticmethod("minTicks")
+      .staticmethod("min_ticks")
 
-      .def("fromTicks", &TimeDelta::fromTicks, R"(fromTicks(ticks)
+      .def("from_ticks", &TimeDelta::fromTicks, R"(from_ticks(ticks)
 
     使用 ticks（即微秒数） 值创建
 
     :param int ticks: 微秒数
     :rtype: TimeDelta)")
-      .staticmethod("fromTicks")
+      .staticmethod("from_ticks")
 
       .def(self == self)
       .def(self != self)

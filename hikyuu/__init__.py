@@ -259,7 +259,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 
 # ==============================================================================
 #
-# 增加临时的实时数据更新函数 realtimeUpdate
+# 增加临时的实时数据更新函数 realtime_update
 #
 # ==============================================================================
 
@@ -292,7 +292,7 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
             record.amount = transamount
             record.volume = transcount / 100
 
-            stock.realtimeUpdate(record)
+            stock.realtime_update(record)
 
     except Exception as e:
         print(tmpstr)
@@ -327,7 +327,7 @@ def UpdateOneRealtimeRecord_from_qq(tmpstr):
             record.amount = transamount
             record.volume = transcount / 100
 
-            stock.realtimeUpdate(record)
+            stock.realtime_update(record)
 
     except Exception as e:
         print(tmpstr)
@@ -362,7 +362,7 @@ def realtimePartUpdate_from_qq(queryStr):
         UpdateOneRealtimeRecord_from_qq(tmpstr)
 
 
-def realtimeUpdate_from_sina_qq(source):
+def realtime_update_from_sina_qq(source):
     if source == 'sina':
         queryStr = "http://hq.sinajs.cn/list="
         update_func = realtimePartUpdate_from_sina
@@ -407,7 +407,7 @@ def realtimeUpdate_from_sina_qq(source):
     # pool.join()
 
 
-def realtimeUpdate_from_tushare():
+def realtime_update_from_tushare():
     import tushare as ts
 
     # 更新股票行情
@@ -435,7 +435,7 @@ def realtimeUpdate_from_tushare():
         from datetime import date
         d = date.today()
         record.date = Datetime(d)
-        stock.realtimeUpdate(record)
+        stock.realtime_update(record)
 
     # 更新指数行情
     df = ts.get_index()
@@ -468,22 +468,22 @@ def realtimeUpdate_from_tushare():
             from datetime import date
             d = date.today()
             record.date = Datetime(d)
-            stock.realtimeUpdate(record)
+            stock.realtime_update(record)
 
 
-def realtimeUpdate_inner(source='sina'):
+def realtime_update_inner(source='sina'):
     if source == 'sina' or source == 'qq':
-        realtimeUpdate_from_sina_qq(source)
+        realtime_update_from_sina_qq(source)
     elif source == 'tushare':
-        realtimeUpdate_from_tushare()
+        realtime_update_from_tushare()
     else:
         print(source, ' not support!')
 
 
-def realtimeUpdateWrap():
+def realtime_update_wrap():
     pre_update_time = None
 
-    def realtimeUpdate_closure(source='sina', delta=60):
+    def realtime_update_closure(source='sina', delta=60):
         """
         更新实时日线数据
         参数：
@@ -495,14 +495,14 @@ def realtimeUpdateWrap():
         now_update_time = datetime.now()
         if (pre_update_time is
             None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
-            realtimeUpdate_inner(source)
+            realtime_update_inner(source)
             pre_update_time = datetime.now()
             print("更新完毕！", pre_update_time)
         else:
             print("更新间隔小于" + str(delta) + "秒，未更新")
             print("上次更新时间: ", pre_update_time)
 
-    return realtimeUpdate_closure
+    return realtime_update_closure
 
 
-realtimeUpdate = realtimeUpdateWrap()
+realtime_update = realtime_update_wrap()

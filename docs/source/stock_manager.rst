@@ -122,27 +122,27 @@ StockManager/Block/Stock
         :param Parameter preloadParam: 预加载参数
         :param Parameter hkuParam: 其他hikyuu参数
        
-    .. py:method:: getBaseInfoDriverParameter(self)
+    .. py:method:: get_base_info_parameter(self)
     
         :return: 基础信息数据驱动参数
         :rtype: Parameter
         
-    .. py:method:: getBlockDriverParameter(self)
+    .. py:method:: get_block_parameter(self)
 
         :return: 板块信息数据驱动参数
         :rtype: Parameter
         
-    .. py:method:: getKDataDriverParameter(self)
+    .. py:method:: get_kdata_parameter(self)
     
         :return: K线数据驱动参数
         :rtype: Parameter
         
-    .. py:method:: getPreloadParameter(self)
+    .. py:method:: get_preload_parameter(self)
     
         :return: 预加载参数
         :rtype: Parameter
         
-    .. py:method:: getHikyuuParameter(self)
+    .. py:method:: get_hikyuu_parameter(self)
     
         :return: 其他hikyuu参数
         :rtype: Parameter
@@ -151,13 +151,13 @@ StockManager/Block/Stock
     
         获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定
     
-    .. py:method:: getAllMarket(self)
+    .. py:method:: get_market_list(self)
     
         获取市场简称列表
         
         :rtype: StringList
     
-    .. py:method:: getMarketInfo(self, market)
+    .. py:method:: get_market_info(self, market)
     
         获取相应的市场信息
         
@@ -165,7 +165,7 @@ StockManager/Block/Stock
         :return: 相应的市场信息，如果相应的市场信息不存在，则返回Null<MarketInfo>()
         :rtype: MarketInfo
     
-    .. py:method:: getStockTypeInfo(self, stk_type)
+    .. py:method:: get_stock_type_info(self, stk_type)
     
         获取相应的证券类型详细信息
         
@@ -173,11 +173,7 @@ StockManager/Block/Stock
         :return: 对应的证券类型信息，如果不存在，则返回Null<StockTypeInfo>()
         :rtype: StockTypeInfo
         
-    .. py:method:: size(self)
-    
-        获取证券数量
-        
-    .. py:method:: getStock(self, querystr)
+    .. py:method:: get_stock(self, querystr)
     
         根据"市场简称证券代码"获取对应的证券实例
         
@@ -187,9 +183,9 @@ StockManager/Block/Stock
     
     .. py:method:: __getitem__
 
-        同 getStock
+        同 get_stock
     
-    .. py:method:: getBlock(self, category, name)
+    .. py:method:: get_block(self, category, name)
     
         获取预定义的板块
         
@@ -198,7 +194,7 @@ StockManager/Block/Stock
         :return: 板块，如找不到返回空Block
         :rtype: Block
         
-    .. py:method:: getBlockList(self[, category])
+    .. py:method:: get_block_list(self[, category])
     
         获取指定分类的板块列表
         
@@ -206,7 +202,7 @@ StockManager/Block/Stock
         :return: 板块列表
         :rtype: BlockList
     
-    .. py:method:: getTradingCalendar(self, query[, market='SH'])
+    .. py:method:: get_trading_calendar(self, query[, market='SH'])
     
         获取指定市场的交易日日历
         
@@ -215,7 +211,7 @@ StockManager/Block/Stock
         :return: 日期列表
         :rtype: DatetimeList
         
-    .. py:method:: addTempCsvStock(self, code, day_filename, min_filename[, tick=0.01, tickValue=0.01, precision=2, minTradeNumber = 1, maxTradeNumber=1000000])
+    .. py:method:: add_temp_csv_stock(self, code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
 
         从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。        
         
@@ -225,14 +221,14 @@ StockManager/Block/Stock
         :param str day_filename: 日线CSV文件名
         :param str min_filename: 分钟线CSV文件名
         :param float tick: 最小跳动量，默认0.01
-        :param float tickValue: 最小跳动量价值，默认0.01
+        :param float tick_value: 最小跳动量价值，默认0.01
         :param int precision: 价格精度，默认2
-        :param int minTradeNumber: 单笔最小交易量，默认1
-        :param int maxTradeNumber: 单笔最大交易量，默认1000000
+        :param int min_trade_num: 单笔最小交易量，默认1
+        :param int min_trade_num: 单笔最大交易量，默认1000000
         :return: 加入的Stock
         :rtype: Stock
 
-    .. py:method:: removeTempCsvStock(self, code)
+    .. py:method:: remove_temp_csv_stock(self, code)
     
         移除增加的临时Stock
         
@@ -488,25 +484,25 @@ StockManager/Block/Stock
     .. py:attribute:: type : 证券类型
     .. py:attribute:: description : 描述信息
     .. py:attribute:: tick : 最小跳动量
-    .. py:attribute:: tickValue : 每一个tick价格
+    .. py:attribute:: tick_value : 每一个tick价格
     .. py:attribute:: unit : 每最小变动量价格，即单位价格 = tickValue/tick
     .. py:attribute:: precision : 价格精度
-    .. py:attribute:: minTradeNumber : 每笔最小交易量
-    .. py:attribute:: maxTradeNumber : 每笔最大交易量
+    .. py:attribute:: min_trade_num : 每笔最小交易量
+    .. py:attribute:: max_trade_num : 每笔最大交易量
 
 
 .. py:class:: StockWeight
 
     权息记录
     
-    .. py:attribute:: datetime : 权息日期
-    .. py:attribute:: countAsGift : 每10股送X股
-    .. py:attribute:: countForSell : 每10股配X股
-    .. py:attribute:: priceForSell : 配股价
+    .. py:attribute:: date : 权息日期
+    .. py:attribute:: count_as_gift : 每10股送X股
+    .. py:attribute:: count_for_sell : 每10股配X股
+    .. py:attribute:: price_for_sell : 配股价
     .. py:attribute:: bonus : 每10股红利
     .. py:attribute:: increasement : 每10股转增X股
-    .. py:attribute:: totalCount : 总股本（万股）
-    .. py:attribute:: freeCount : 流通股（万股）
+    .. py:attribute:: total_count : 总股本（万股）
+    .. py:attribute:: free_count : 流通股（万股）
     
 
 .. py:class:: StockWeightList

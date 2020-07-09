@@ -266,6 +266,7 @@ BlockList.__getitem__ = list_getitem
 KRecordList.__getitem__ = list_getitem
 TransList.__getitem__ = list_getitem
 TimeLineList.__getitem__ = list_getitem
+StockWeightList.__getitem__ = list_getitem
 
 PriceList.__str__ = lambda self: str(list(self))
 PriceList.__repr__ = lambda self: repr(list(self))
@@ -281,6 +282,8 @@ TransList.__str__ = lambda self: str(list(self))
 TransList.__repr__ = lambda self: repr(list(self))
 TimeLineList.__str__ = lambda self: str(list(self))
 TimeLineList.__repr__ = lambda self: repr(list(self))
+StockWeightList.__str__ = lambda self: str(list(self))
+StockWeightList.__repr__ = lambda self: repr(list(self))
 
 # ------------------------------------------------------------------
 # 重定义Query

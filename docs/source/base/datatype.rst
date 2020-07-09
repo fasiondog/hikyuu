@@ -276,19 +276,19 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
         
         :return: TimeDelta(0, 0, 0, 0, 0, 1)
 
-    .. py:staticmethod:: maxTicks()
+    .. py:staticmethod:: max_ticks()
 
         支持的最大 ticks （即微秒数）
 
         :rtype: int
 
-    .. py:staticmethod:: minTicks()
+    .. py:staticmethod:: min_ticks()
 
         支持的最小 ticks （即微秒数）
 
         :rtype: int
 
-    .. py:staticmethod:: fromTicks(ticks)
+    .. py:staticmethod:: from_ticks(ticks)
 
         使用 ticks（即微秒数） 值创建
 
@@ -448,7 +448,7 @@ K线数据
 
     分时线记录，属性可读写。
     
-    .. py:attribute:: datetime : 时间
+    .. py:attribute:: date : 日期时间
     .. py:attribute:: price : 价格
     .. py:attribute:: vol : 成交量
 
@@ -477,7 +477,7 @@ K线数据
 
     历史分笔数据记录
     
-    .. py:attribute:: datetime : 时间
+    .. py:attribute:: date : 时间
     .. py:attribute:: price : 价格
     .. py:attribute:: vol : 成交量
     .. py:attribute:: direct : 买卖盘性质
