@@ -142,6 +142,12 @@ Block.__getattr__ = Block_getattr
         'haveParam': 'have_param',
         'getResultNumber': 'get_result_num',
         'getByDate': 'get_by_date',
+        'getDatetime': 'get_date',
+        'getResult': 'get_result',
+        'getResultAsPriceList': 'get_result_as_price_list',
+        'getDatetimeList': 'get_date_list',
+        'getContext': 'get_context',
+        'setContext': 'set_context'
     }
 )
 def Indicator_getattr(self, name):

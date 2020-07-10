@@ -189,12 +189,12 @@ def set_global_context(stk, query):
     """
     global K, O, C, H, L, A, V
     K = stk.get_kdata(query)
-    O.setContext(K)
-    C.setContext(K)
-    H.setContext(K)
-    L.setContext(K)
-    A.setContext(K)
-    V.setContext(K)
+    O.set_context(K)
+    C.set_context(K)
+    H.set_context(K)
+    L.set_context(K)
+    A.set_context(K)
+    V.set_context(K)
 
 
 def get_global_context():
@@ -247,7 +247,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 
         q = Query(start, end)
         k = s.getKData(q)
-        cond.setContext(k)
+        cond.set_context(k)
         if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k) > 0 and k[
             -1].date == d[-1]:
             result.append(s)

@@ -60,30 +60,18 @@ def indicator_getitem(data, i):
 Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
 
-Indicator.__add__ = indicator_add
-Indicator.__sub__ = indicator_sub
-Indicator.__mul__ = indicator_mul
 Indicator.__div__ = indicator_div
 Indicator.__mod__ = indicator_mod
 Indicator.__truediv__ = indicator_div  #Python3 div
-Indicator.__eq__ = indicator_eq
-Indicator.__ne__ = indicator_ne
-Indicator.__ge__ = indicator_ge
 Indicator.__le__ = indicator_le
 Indicator.__gt__ = indicator_gt
 Indicator.__lt__ = indicator_lt
 Indicator.__and__ = indicator_and
 Indicator.__or__ = indicator_or
 
-Indicator.__radd__ = lambda self, other: self.__add__(other)
-Indicator.__rsub__ = lambda self, other: CVAL(self, other).__sub__(self)
-Indicator.__rmul__ = lambda self, other: self.__mul__(other)
 Indicator.__rdiv__ = lambda self, other: CVAL(self, other).__div__(self)
 Indicator.__rmod__ = lambda self, other: CVAL(self, other).__mod__(self)
 Indicator.__rtruediv__ = lambda self, other: CVAL(self, other).__truediv__(self)
-Indicator.__req__ = lambda self, other: self.__eq__(other)
-Indicator.__rne__ = lambda self, other: self.__ne__(other)
-Indicator.__rge__ = lambda self, other: CVAL(self, other).__ge__(self)
 Indicator.__rle__ = lambda self, other: CVAL(self, other).__le__(self)
 Indicator.__rgt__ = lambda self, other: CVAL(self, other).__gt__(self)
 Indicator.__rlt__ = lambda self, other: CVAL(self, other).__lt__(self)

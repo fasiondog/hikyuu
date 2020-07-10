@@ -342,7 +342,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     )
 
     axes.autoscale_view()
-    #axes.set_xlim(0, len(kdata))
+    axes.set_xlim(-1, len(kdata) + 1)
     ax_set_locator_formatter(axes, kdata.get_date_list(), kdata.get_query().ktype)
     #draw()
 
@@ -413,6 +413,9 @@ def iplot(
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator) + 1)
+    k = indicator.get_context()
+    if len(k) > 0:
+        ax_set_locator_formatter(axes, k.get_date_list(), k.get_query().ktype)
     #draw()
 
 
@@ -489,6 +492,9 @@ def ibar(
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator) + 1)
+    k = indicator.get_context()
+    if len(k) > 0:
+        ax_set_locator_formatter(axes, k.get_date_list(), k.get_query().ktype)
     #draw()
 
 

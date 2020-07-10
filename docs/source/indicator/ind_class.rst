@@ -56,7 +56,7 @@ Indicator
 
         :rtype: int
 
-    .. py:method:: get(self, pos[, num=0])
+    .. py:method:: get(self, result_index[, num=0])
 
         获取指定位置的值
 
@@ -69,7 +69,7 @@ Indicator
 
         :param int pos: 指定的位置索引
 
-    .. py:method:: getByDate(self, date[, num=0])
+    .. py:method:: get_by_date(self, date[, result_index=0])
 
         获取指定日期数值。如果对应日期无结果，返回 constant.null_price
 
@@ -77,39 +77,39 @@ Indicator
         :param int num: 指定的结果集
         :rtype: float
 
-    .. py:method:: getResult(self, num)
+    .. py:method:: get_result(self, result_index)
 
         获取指定结果集
 
-        :param int num: 指定的结果集
+        :param int result_index: 指定的结果集
         :rtype: Indicator
 
-    .. py:method:: getResultAsPriceList(self, num)
+    .. py:method:: get_result_as_price_list(self, result_index)
 
         获取指定结果集
 
-        :param int num: 指定的结果集
+        :param int result_index: 指定的结果集
         :rtype: PriceList
 
-    .. py:method:: getDatetimeList(self)
+    .. py:method:: get_date_list(self)
 
         返回对应的日期列表
 
         :rtype: DatetimeList
 
-    .. py:method:: getContext(self)
+    .. py:method:: get_context(self)
 
         获取上下文
 
         :rtype: KData
 
-    .. py:method:: setContext(self, kdata)
+    .. py:method:: set_context(self, kdata)
 
         设置上下文
 
         :param KData kdata: 关联的上下文K线
 
-    .. py:method:: setContext(self, stock, query)
+    .. py:method:: set_context(self, stock, query)
 
         设置上下文
 
