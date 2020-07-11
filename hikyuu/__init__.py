@@ -56,6 +56,7 @@ import configparser
 from .extend import *
 from .deprecated import *
 from .indicator import *
+from .trade_manage import *
 
 __version__ = get_version()
 

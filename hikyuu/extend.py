@@ -4,6 +4,7 @@
 
 from datetime import *
 from .cpp.core import *
+from .util.slice import list_getitem
 
 # ------------------------------------------------------------------
 # 常量定义，各种C++中Null值
@@ -240,25 +241,6 @@ KData.get_pos = KData_getPos
 # 封装增强其他C++ vector类型的遍历、打印
 # ------------------------------------------------------------------
 
-
-def list_getitem(data, i):
-    """对C++引出的vector，实现python的切片，
-       将引入的vector类的__getitem__函数覆盖即可。
-    """
-    if isinstance(i, int):
-        length = len(data)
-        index = length + i if i < 0 else i
-        if index < 0 or index >= length:
-            raise IndexError("index out of range: %d" % i)
-        return data.get(index)
-
-    elif isinstance(i, slice):
-        return [data.get(x) for x in range(*i.indices(len(data)))]
-
-    else:
-        raise IndexError("Error index type")
-
-
 PriceList.__getitem__ = list_getitem
 StringList.__getitem__ = list_getitem
 DatetimeList.__getitem__ = list_getitem
@@ -363,7 +345,7 @@ try:
             )
         return np.array(
             [
-                (k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume)
+                (k.date.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume)
                 for k in kdata
             ],
             dtype=k_type
@@ -406,7 +388,7 @@ try:
                 'formats': ['datetime64[ms]', 'd', 'd']
             }
         )
-        return np.array([(t.datetime.datetime(), t.price, t.vol) for t in data], dtype=t_type)
+        return np.array([(t.date.datetime(), t.price, t.vol) for t in data], dtype=t_type)
 
     def TimeLine_to_df(kdata):
         """转化为pandas的DataFrame"""
@@ -423,9 +405,7 @@ try:
                 'formats': ['datetime64[ms]', 'd', 'd', 'd']
             }
         )
-        return np.array(
-            [(t.datetime.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type
-        )
+        return np.array([(t.date.datetime(), t.price, t.vol, t.direct) for t in data], dtype=t_type)
 
     def TransList_to_df(kdata):
         """转化为pandas的DataFrame"""

@@ -13,19 +13,21 @@ using namespace boost::python;
 using namespace hku;
 
 void export_FundsRecord() {
-    class_<FundsRecord>("FundsRecord", init<>())
-            .def(self_ns::str(self))
-            .def_readwrite("cash", &FundsRecord::cash)
-            .def_readwrite("market_value", &FundsRecord::market_value)
-            .def_readwrite("short_market_value", &FundsRecord::short_market_value)
-            .def_readwrite("base_cash", &FundsRecord::base_cash)
-            .def_readwrite("base_asset", &FundsRecord::base_asset)
-            .def_readwrite("borrow_cash", &FundsRecord::borrow_cash)
-            .def_readwrite("borrow_asset", &FundsRecord::borrow_asset)
+    class_<FundsRecord>("FundsRecord", "当前资产情况记录", init<>())
+      .def(self_ns::str(self))
+      .def(self_ns::repr(self))
+
+      .def_readwrite("cash", &FundsRecord::cash, "当前现金（float）")
+      .def_readwrite("market_value", &FundsRecord::market_value, "当前多头市值（float）")
+      .def_readwrite("short_market_value", &FundsRecord::short_market_value,
+                     "当前空头仓位市值（float）")
+      .def_readwrite("base_cash", &FundsRecord::base_cash, "当前投入本金（float）")
+      .def_readwrite("base_asset", &FundsRecord::base_asset, "当前投入的资产价值（float）")
+      .def_readwrite("borrow_cash", &FundsRecord::borrow_cash, "当前借入的资金（float），即负债")
+      .def_readwrite("borrow_asset", &FundsRecord::borrow_asset, "当前借入证券资产价值（float）")
+
 #if HKU_PYTHON_SUPPORT_PICKLE
-            .def_pickle(normal_pickle_suite<FundsRecord>())
+      .def_pickle(normal_pickle_suite<FundsRecord>())
 #endif
-            ;
+      ;
 }
-
-

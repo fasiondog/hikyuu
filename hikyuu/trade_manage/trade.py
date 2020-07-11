@@ -47,6 +47,13 @@ BorrowRecordList.__getitem__ = list_getitem
 PositionRecordList.__getitem__ = list_getitem
 TradeRecordList.__getitem__ = list_getitem
 
+BorrowRecordList.__str__ = lambda self: str(list(self))
+BorrowRecordList.__repr__ = lambda self: repr(list(self))
+PositionRecordList.__str__ = lambda self: str(list(self))
+PositionRecordList.__repr__ = lambda self: repr(list(self))
+TradeRecordList.__str__ = lambda self: str(list(self))
+TradeRecordList.__repr__ = lambda self: repr(list(self))
+
 try:
     import numpy as np
     import pandas as pd

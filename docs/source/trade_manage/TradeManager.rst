@@ -15,13 +15,13 @@
     * **save_action=True** *(bool)* : 是否保存Python命令序列
 
 
-.. py:function:: crtTM([datetime = Datetime(199001010000), initcash = 100000, costFunc = TC_Zero(), name = "SYS"])
+.. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])
 
     创建交易管理模块，管理帐户的交易记录及资金使用情况
     
-    :param Datetime datetime:  账户建立日期
-    :param float initcash:    初始资金
-    :param TradeCost costFunc: 交易成本算法
+    :param Datetime date:  账户建立日期
+    :param float init_cash:    初始资金
+    :param TradeCost cost_func: 交易成本算法
     :param string name:        账户名称
     :rtype: TradeManager
     
