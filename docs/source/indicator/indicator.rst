@@ -86,6 +86,15 @@
     :rtype: Indicator
 
 
+.. py:function:: ATR([data, n=14])
+
+    平均真实波幅(Average True Range)
+
+    :param Indicator data 待计算的源数据
+    :param int n: 计算均值的周期窗口，必须为大于1的整数
+    :rtype: Indicator
+
+
 .. py:function:: AVEDEV(data[, n=22])
 
     平均绝对偏差，求X的N日平均绝对偏差
@@ -630,12 +639,12 @@
     :rtype: Indicator
 
 
-.. py:function:: PRICELIST(data[, result_num=0, discard=0])
+.. py:function:: PRICELIST(data[, result_index=0, discard=0])
     
     将 list、tuple、Indicator 转化为普通的 Indicator
     
     :param data: 输入数据，可以为 list、tuple、Indicator
-    :param int result_num: 当data为Indicator实例时，指示Indicator的第几个结果集
+    :param int result_index: 当data为Indicator实例时，指示Indicator的第几个结果集
     :param int discard: 在 data 为 Indicator类型时无效。表示前端抛弃的数据点数，抛弃的值使用 constant.null_price 填充
     :rtype: Indicator
  

@@ -15,9 +15,9 @@ Indicator
 
     .. py:attribute:: discard 需抛弃的点数
 
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -25,7 +25,7 @@ Indicator
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -50,7 +50,7 @@ Indicator
 
         :rtype: str
 
-    .. py:method:: getResultNumber(self)
+    .. py:method:: get_result_num(self)
 
         获取结果集数量
 
@@ -63,7 +63,14 @@ Indicator
         :param int pos: 指定的位置索引
         :param int num: 指定的结果集
 
-    .. py:method:: getDatetime(self, pos)
+    .. py::method:: get_pos(self, date):
+
+        获取指定日期相应的索引位置
+
+        :param Datetime date: 指定日期
+        :rtype: int
+
+    .. py:method:: get_date(self, pos)
 
         获取指定位置的日期
 

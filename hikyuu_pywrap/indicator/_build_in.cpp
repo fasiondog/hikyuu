@@ -298,118 +298,353 @@ Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
-    def("KDATA", KDATA3);
+    def("KDATA", KDATA3, R"(KDATA([data])
+
+    包装KData成Indicator，用于其他指标计算
+
+    :param data: KData 或 具有6个返回结果的Indicator（如KDATA生成的Indicator）
+    :rtype: Indicator)");
 
     def("CLOSE", CLOSE1);
-    def("CLOSE", CLOSE3);
+    def("CLOSE", CLOSE3, R"(CLOSE([data])
+
+    获取收盘价，包装KData的收盘价成Indicator
+
+    :param data: 输入数据（KData 或 Indicator）
+    :rtype: Indicator)");
 
     def("OPEN", OPEN1);
-    def("OPEN", OPEN3);
+    def("OPEN", OPEN3, R"(OPEN([data])
+
+    获取开盘价，包装KData的开盘价成Indicator
+
+    :param data: 输入数据（KData 或 Indicator） 
+    :rtype: Indicator)");
 
     def("HIGH", HIGH1);
-    def("HIGH", HIGH3);
+    def("HIGH", HIGH3, R"(HIGH([data])
+
+    获取最高价，包装KData的最高价成Indicator
+
+    :param data: 输入数据（KData 或 Indicator） 
+    :rtype: Indicator)");
 
     def("LOW", LOW1);
-    def("LOW", LOW3);
+    def("LOW", LOW3, R"(LOW([data])
+
+    获取最低价，包装KData的最低价成Indicator
+
+    :param data: 输入数据（KData 或 Indicator） 
+    :rtype: Indicator)");
 
     def("AMO", AMO1);
-    def("AMO", AMO3);
+    def("AMO", AMO3, R"(AMO([data])
+
+    获取成交金额，包装KData的成交金额成Indicator
+    
+    :param data: 输入数据（KData 或 Indicator）
+    :rtype: Indicator)");
 
     def("VOL", VOL1);
-    def("VOL", VOL3);
+    def("VOL", VOL3, R"(VOL([data])
+
+    获取成交量，包装KData的成交量成Indicator
+
+    :param data: 输入数据（KData 或 Indicator）
+    :rtype: Indicator)");
 
     def("KDATA_PART", KDATA_PART1, (arg("data"), arg("kpart")));
-    def("KDATA_PART", KDATA_PART3, (arg("kpart")));
+    def("KDATA_PART", KDATA_PART3, (arg("kpart")), R"(KDATA_PART([data, kpart])
+
+    根据字符串选择返回指标KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL，如:KDATA_PART("CLOSE")等同于CLOSE()
+
+    :param data: 输入数据（KData 或 Indicator） 
+    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
+    :rtype: Indicator)");
 
     def("PRICELIST", PRICELIST2, (arg("data"), arg("discard") = 0));
     def("PRICELIST", PRICELIST3, (arg("data"), arg("result_index") = 0));
     def("PRICELIST", PRICELIST4, (arg("result_index") = 0));
 
     def("SMA", SMA_1, (arg("n") = 22, arg("m") = 2.0));
-    def("SMA", SMA_2, (arg("data"), arg("n") = 22, arg("m") = 2.0));
+    def("SMA", SMA_2, (arg("data"), arg("n") = 22, arg("m") = 2.0), R"(SMA([data, n=22, m=2])
+
+    求移动平均
+
+    用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :param float m: 系数
+    :rtype: Indicator)");
 
     def("EMA", EMA_1, (arg("n") = 22));
-    def("EMA", EMA_2, (arg("data"), arg("n") = 22));
+    def("EMA", EMA_2, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
+
+    指数移动平均线(Exponential Moving Average)
+
+    :param data: 输入数据
+    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :rtype: Indicator)");
 
     def("MA", MA_1, (arg("n") = 22));
-    def("MA", MA_2, (arg("data"), arg("n") = 22));
+    def("MA", MA_2, (arg("data"), arg("n") = 22), R"(MA([data, n=22])
+
+    简单移动平均
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("AMA", AMA_1, (arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
-    def("AMA", AMA_2, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
+    def("AMA", AMA_2, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30),
+        R"(AMA([data, n=10, fast_n=2, slow_n=30])
+
+    佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
+
+    :param Indicator data: 输入数据
+    :param int n: 计算均值的周期窗口，必须为大于2的整数
+    :param int fast_n: 对应快速周期N
+    :param int slow_n: 对应慢速EMA线的N值
+    :rtype: Indicator
+
+    * result(0): AMA
+    * result(1): ER)");
 
     def("ATR", ATR_1, (arg("n") = 14));
-    def("ATR", ATR_2, (arg("data"), arg("n") = 14));
+    def("ATR", ATR_2, (arg("data"), arg("n") = 14), R"(ATR([data, n=14])
+
+    平均真实波幅(Average True Range)
+
+    :param Indicator data 待计算的源数据
+    :param int n: 计算均值的周期窗口，必须为大于1的整数
+    :rtype: Indicator)");
 
     def("MACD", MACD_1, (arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
-    def("MACD", MACD_2, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
+    def("MACD", MACD_2, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9),
+        R"(MACD([data, n1=12, n2=26, n3=9])
+
+    平滑异同移动平均线
+
+    :param Indicator data: 输入数据
+    :param int n1: 短期EMA时间窗
+    :param int n2: 长期EMA时间窗
+    :param int n3: （短期EMA-长期EMA）EMA平滑时间窗
+    :rtype: 具有三个结果集的 Indicator
+
+    * result(0): MACD_BAR：MACD直柱，即MACD快线－MACD慢线
+    * result(1): DIFF: 快线,即（短期EMA-长期EMA）
+    * result(2): DEA: 慢线，即快线的n3周期EMA平滑)");
 
     def("VIGOR", VIGOR_1, (arg("kdata"), arg("n") = 2));
-    def("VIGOR", VIGOR_2, (arg("n") = 2));
+    def("VIGOR", VIGOR_2, (arg("n") = 2), R"(VIGOR([kdata, n=2])
+
+    亚历山大.艾尔德力度指数 [BOOK2]_
+
+    计算公式：（收盘价今－收盘价昨）＊成交量今
+
+    :param KData data: 输入数据
+    :param int n: EMA平滑窗口
+    :rtype: Indicator)");
 
     def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0),
+        R"(SAFTYLOSS([data, n1=10, n2=3, p=2.0])
+
+    亚历山大 艾尔德安全地带止损线，参见 [BOOK2]_
+
+    计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
+
+    :param Indicator data: 输入数据
+    :param int n1: 计算平均噪音的回溯时间窗口
+    :param int n2: 对初步止损线去n2日内的最高值
+    :param float p: 噪音系数
+    :rtype: Indicator)");
+
     def("DIFF", DIFF_1);
-    def("DIFF", DIFF_2);
+    def("DIFF", DIFF_2, R"(DIFF([data])
+
+    差分指标，即data[i] - data[i-1]
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("REF", REF_1, (arg("n")));
-    def("REF", REF_2, (arg("data"), arg("n")));
+    def("REF", REF_2, (arg("data"), arg("n")), R"(REF([data, n])
+
+    向前引用 （即右移），引用若干周期前的数据。
+
+    用法：REF(X，A)　引用A周期前的X值。
+
+    :param Indicator data: 输入数据
+    :param int n: 引用n周期前的值，即右移n位
+    :rtype: Indicator)");
 
     def("STDEV", STDEV_1, (arg("n") = 10));
-    def("STDEV", STDEV_2, (arg("data"), arg("n") = 10));
+    def("STDEV", STDEV_2, (arg("data"), arg("n") = 10), R"(STDEV([data, n=10])
+
+    计算N周期内样本标准差
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("STDP", STDP_1, (arg("n") = 10));
-    def("STDP", STDP_2, (arg("data"), arg("n") = 10));
+    def("STDP", STDP_2, (arg("data"), arg("n") = 10), R"(STDP([data, n=10])
+
+    总体标准差，STDP(X,N)为X的N日总体标准差
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("POS", POS, (arg("block"), arg("query"), arg("sg")));
 
     def("HHV", HHV_1, (arg("n") = 20));
-    def("HHV", HHV_2, (arg("data"), arg("n") = 20));
+    def("HHV", HHV_2, (arg("data"), arg("n") = 20), R"(HHV([data, n=20])
+
+    N日内最高价，N=0则从第一个有效值开始。
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口
+    :rtype: Indicator)");
 
     def("LLV", LLV_1, (arg("n") = 20));
-    def("LLV", LLV_2, (arg("data"), arg("n") = 20));
+    def("LLV", LLV_2, (arg("data"), arg("n") = 20), R"(LLV([data, n=20])
+
+    N日内最低价，N=0则从第一个有效值开始。
+
+    :param data: 输入数据
+    :param int n: N日时间窗口
+    :rtype: Indicator)");
 
     def("CVAL", CVAL_1, (arg("value") = 0.0, arg("discard") = 0));
-    def("CVAL", CVAL_2, (arg("data"), arg("value") = 0.0, arg("discard") = 0));
+    def("CVAL", CVAL_2, (arg("data"), arg("value") = 0.0, arg("discard") = 0),
+        R"(CVAL([data, value=0.0, discard=0])
+
+    data 为 Indicator 实例，创建和 data 等长的常量指标，其值和为value，抛弃长度discard和data一样
+
+    :param Indicator data: Indicator实例
+    :param float value: 常数值
+    :param int discard: 抛弃数量
+    :rtype: Indicator)");
 
     def("LIUTONGPAN", LIUTONGPAN_1);
-    def("LIUTONGPAN", LIUTONGPAN_2);
-    def("HSL", HSL_1);
-    def("HSL", HSL_2);
+    def("LIUTONGPAN", LIUTONGPAN_2, R"(LIUTONGPAN(kdata)
 
-    def("WEAVE", WEAVE);
+   获取流通盘（单位：万股），同 CAPITAL
+
+   :param KData kdata: k线数据
+   :rtype: Indicator)");
+
+    def("HSL", HSL_1);
+    def("HSL", HSL_2, R"(HSL(kdata)
+
+    获取换手率，等于 VOL(k) / CAPITAL(k)
+
+    :param KData kdata: k线数据
+    :rtype: Indicator)");
+
+    def("WEAVE", WEAVE, R"(WEAVE(ind1, ind2)
+
+    将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
+    
+    :param Indicator ind1: 指标1
+    :param Indicator ind2: 指标2
+    :rtype: Indicator)");
+
     def("IF", IF_1);
     def("IF", IF_2);
     def("IF", IF_3);
-    def("IF", IF_4);
+    def("IF", IF_4, R"(IF(x, a, b)
+
+    条件函数, 根据条件求不同的值。
+
+    用法：IF(X,A,B)若X不为0则返回A,否则返回B
+
+    例如：IF(CLOSE>OPEN,HIGH,LOW)表示该周期收阳则返回最高值,否则返回最低值
+
+    :param Indicator x: 条件指标
+    :param Indicator a: 待选指标 a
+    :param Indicator b: 待选指标 b
+    :rtype: Indicator)");
 
     def("COUNT", COUNT_1, (arg("n") = 20));
-    def("COUNT", COUNT_2, (arg("data"), arg("n") = 20));
+    def("COUNT", COUNT_2, (arg("data"), arg("n") = 20), R"(COUNT([data, n=20])
+
+    统计满足条件的周期数。
+
+    用法：COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
+
+    例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
+
+    :param Indicator data: 条件
+    :param int n: 周期
+    :rtype: Indicator)");
 
     def("SUM", SUM_1, (arg("n") = 20));
-    def("SUM", SUM_2, (arg("data"), arg("n") = 20));
+    def("SUM", SUM_2, (arg("data"), arg("n") = 20), R"(SUM([data, n=20])
+
+    求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("ABS", ABS_1);
     def("ABS", ABS_2);
-    def("ABS", ABS_3);
+    def("ABS", ABS_3, R"(ABS([data])
+
+    求绝对值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("NOT", NOT_1);
-    def("NOT", NOT_2);
+    def("NOT", NOT_2, R"(NOT([data])
+
+    求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("SGN", SGN_1);
     def("SGN", SGN_2);
-    def("SGN", SGN_3);
+    def("SGN", SGN_3, R"(SGN([data])
+
+    求符号值, SGN(X)，当 X>0, X=0, X<0分别返回 1, 0, -1。
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("EXP", EXP_1);
     def("EXP", EXP_2);
-    def("EXP", EXP_3);
+    def("EXP", EXP_3, R"(EXP([data])
+
+    EXP(X)为e的X次幂
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("MAX", MAX_1);
     def("MAX", MAX_2);
-    def("MAX", MAX_3);
+    def("MAX", MAX_3, R"(MAX(ind1, ind2)
+
+    求最大值, MAX(A,B)返回A和B中的较大值。
+
+    :param Indicator ind1: A
+    :param Indicator ind2: B
+    :rtype: Indicator)");
 
     def("MIN", MIN_1);
     def("MIN", MIN_2);
-    def("MIN", MIN_3);
+    def("MIN", MIN_3, R"(MIN(ind1, ind2)
+
+    求最小值, MIN(A,B)返回A和B中的较小值。
+
+    :param Indicator ind1: A
+    :param Indicator ind2: B
+    :rtype: Indicator)");
 
     def("BETWEEN", BETWEEN_1);
     def("BETWEEN", BETWEEN_2);
@@ -418,179 +653,562 @@ void export_Indicator_build_in() {
     def("BETWEEN", BETWEEN_5);
     def("BETWEEN", BETWEEN_6);
     def("BETWEEN", BETWEEN_7);
-    def("BETWEEN", BETWEEN_8);
+    def("BETWEEN", BETWEEN_8, R"(BETWEEN(a, b, c)
+
+    介于(介于两个数之间)
+
+    用法：BETWEEN(A,B,C)表示A处于B和C之间时返回1，否则返回0
+
+    例如：BETWEEN(CLOSE,MA(CLOSE,10),MA(CLOSE,5))表示收盘价介于5日均线和10日均线之间
+
+    :param Indicator a: A
+    :param Indicator b: B
+    :param Indicator c: C
+    :rtype: Indicator)");
 
     def("LN", LN_1);
     def("LN", LN_2);
-    def("LN", LN_3);
+    def("LN", LN_3, R"(LN([data])
+
+    求自然对数, LN(X)以e为底的对数
+
+    :param data: 输入数据
+    :rtype: Indicator)");
 
     def("LOG", LOG_1);
     def("LOG", LOG_2);
-    def("LOG", LOG_3);
+    def("LOG", LOG_3, R"(LOG([data])
+
+    以10为底的对数
+
+    :param data: 输入数据
+    :rtype: Indicator)");
 
     def("HHVBARS", HHVBARS_1, (arg("n") = 20));
-    def("HHVBARS", HHVBARS_2, (arg("data"), arg("n") = 20));
+    def("HHVBARS", HHVBARS_2, (arg("data"), arg("n") = 20), R"(HHVBARS([data, n=20])
+
+    上一高点位置 求上一高点到当前的周期数。
+
+    用法：HHVBARS(X,N):求N周期内X最高值到当前周期数N=0表示从第一个有效值开始统计
+
+    例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口
+    :rtype: Indicator)");
 
     def("LLVBARS", LLVBARS_1, (arg("n") = 20));
-    def("LLVBARS", LLVBARS_2, (arg("data"), arg("n") = 20));
+    def("LLVBARS", LLVBARS_2, (arg("data"), arg("n") = 20), R"(LLVBARS([data, n=20])
+
+    上一低点位置 求上一低点到当前的周期数。
+
+    用法：LLVBARS(X,N):求N周期内X最低值到当前周期数N=0表示从第一个有效值开始统计
+
+    例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
+
+    :param data: 输入数据
+    :param int n: N日时间窗口
+    :rtype: Indicator)");
 
     def("POW", POW_1, (arg("n")));
     def("POW", POW_2, (arg("data"), arg("n")));
-    def("POW", POW_3), (arg("data"), arg("n"));
+    def("POW", POW_3), (arg("data"), arg("n"), R"(POW(data, n)
+
+    乘幂
+
+    用法：POW(A,B)返回A的B次幂
+
+    例如：POW(CLOSE,3)求得收盘价的3次方
+
+    :param data: 输入数据
+    :param int n: 幂
+    :rtype: Indicator)");
 
     def("SQRT", SQRT_1);
     def("SQRT", SQRT_2);
-    def("SQRT", SQRT_3);
+    def("SQRT", SQRT_3, R"(SQRT([data])
+
+    开平方
+
+    用法：SQRT(X)为X的平方根
+
+    例如：SQRT(CLOSE)收盘价的平方根
+
+    :param data: 输入数据
+    :rtype: Indicator)");
 
     def("ROUND", ROUND_1, (arg("ndigits") = 2));
     def("ROUND", ROUND_2, (arg("data"), arg("ndigits") = 2));
-    def("ROUND", ROUND_3, (arg("data"), arg("ndigits") = 2));
+    def("ROUND", ROUND_3, (arg("data"), arg("ndigits") = 2), R"(ROUND([data, ndigits=2])
+
+    四舍五入
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator)");
 
     def("ROUNDUP", ROUNDUP_1, (arg("ndigits") = 2));
     def("ROUNDUP", ROUNDUP_2, (arg("data"), arg("ndigits") = 2));
-    def("ROUNDUP", ROUNDUP_3, (arg("data"), arg("ndigits") = 2));
+    def("ROUNDUP", ROUNDUP_3, (arg("data"), arg("ndigits") = 2), R"(ROUNDUP([data, ndigits=2])
+
+    向上截取，如10.1截取后为11
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator)");
 
     def("ROUNDDOWN", ROUNDDOWN_1, (arg("ndigits") = 2));
     def("ROUNDDOWN", ROUNDDOWN_2, (arg("data"), arg("ndigits") = 2));
-    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits") = 2));
+    def("ROUNDDOWN", ROUNDDOWN_3, (arg("data"), arg("ndigits") = 2), R"(ROUND([data, ndigits=2])
+
+    四舍五入
+
+    :param data: 输入数据
+    :param int ndigits: 保留的小数点后位数
+    :rtype: Indicator)");
 
     def("FLOOR", FLOOR_1);
     def("FLOOR", FLOOR_2);
-    def("FLOOR", FLOOR_3);
+    def("FLOOR", FLOOR_3, R"(FLOOR([data])
+
+    向下舍入(向数值减小方向舍入)取整
+
+    用法：FLOOR(A)返回沿A数值减小方向最接近的整数
+
+    例如：FLOOR(12.3)求得12
+
+    :param data: 输入数据
+    :rtype: Indicator)");
 
     def("CEILING", CEILING_1);
     def("CEILING", CEILING_2);
-    def("CEILING", CEILING_3);
+    def("CEILING", CEILING_3, R"(CEILING([data])
+
+    向上舍入(向数值增大方向舍入)取整
+   
+    用法：CEILING(A)返回沿A数值增大方向最接近的整数
+   
+    例如：CEILING(12.3)求得13；CEILING(-3.5)求得-3
+   
+    :param data: 输入数据
+    :rtype: Indicator)");
 
     def("INTPART", INTPART_1);
     def("INTPART", INTPART_2);
-    def("INTPART", INTPART_3);
+    def("INTPART", INTPART_3, R"(INTPART([data])
+
+    取整(绝对值减小取整，即取得数据的整数部分)
+
+    :param data: 输入数据
+    :rtype: Indicator)");
 
     def("EXIST", EXIST_1, (arg("n") = 20));
-    def("EXIST", EXIST_2, (arg("data"), arg("n") = 20));
+    def("EXIST", EXIST_2, (arg("data"), arg("n") = 20), R"(EXIST([data, n=20])
+
+    存在, EXIST(X,N) 表示条件X在N周期有存在
+
+    :param data: 输入数据
+    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :rtype: Indicator)");
 
     def("EVERY", EVERY_1, (arg("n") = 20));
-    def("EVERY", EVERY_2, (arg("data"), arg("n") = 20));
+    def("EVERY", EVERY_2, (arg("data"), arg("n") = 20), R"(EVERY([data, n=20])
+
+    一直存在
+
+    用法：EVERY (X,N) 表示条件X在N周期一直存在
+
+    例如：EVERY(CLOSE>OPEN,10) 表示前10日内一直是阳线
+
+    :param data: 输入数据
+    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :rtype: Indicator)");
 
     def("LAST", LAST_1, (arg("m") = 10, arg("n") = 5));
-    def("LAST", LAST_2, (arg("data"), arg("m") = 10, arg("n") = 5));
+    def("LAST", LAST_2, (arg("data"), arg("m") = 10, arg("n") = 5), R"(LAST([data, m=10, n=5])
+
+    区间存在。
+
+    用法：LAST (X,M,N) 表示条件 X 在前 M 周期到前 N 周期存在。
+
+    例如：LAST(CLOSE>OPEN,10,5) 表示从前10日到前5日内一直阳线。
+
+    :param data: 输入数据
+    :param int m: m周期
+    :param int n: n周期
+    :rtype: Indicator)");
 
     def("SIN", SIN_1);
     def("SIN", SIN_2);
-    def("SIN", SIN_3);
+    def("SIN", SIN_3, R"(SIN([data])
+
+    正弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("ASIN", ASIN_1);
     def("ASIN", ASIN_2);
-    def("ASIN", ASIN_3);
+    def("ASIN", ASIN_3, R"(ASIN([data])
+
+    反正弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("COS", COS_1);
     def("COS", COS_2);
-    def("COS", COS_3);
+    def("COS", COS_3, R"(COS([data])
+
+    余弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("ACOS", ACOS_1);
     def("ACOS", ACOS_2);
-    def("ACOS", ACOS_3);
+    def("ACOS", ACOS_3, R"(ACOS([data])
+
+    反余弦值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("TAN", TAN_1);
     def("TAN", TAN_2);
-    def("TAN", TAN_3);
+    def("TAN", TAN_3, R"(TAN([data])
+
+    正切值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicato)");
 
     def("ATAN", ATAN_1);
     def("ATAN", ATAN_2);
-    def("ATAN", ATAN_3);
+    def("ATAN", ATAN_3, R"(ATAN([data])
+
+    反正切值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("REVERSE", REVERSE_1);
     def("REVERSE", REVERSE_2);
-    def("REVERSE", REVERSE_3);
+    def("REVERSE", REVERSE_3, R"(REVERSE([data])
+
+    求相反数，REVERSE(X)返回-X
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("MOD", MOD_1);
     def("MOD", MOD_2);
     def("MOD", MOD_3);
-    def("MOD", MOD_4);
+    def("MOD", MOD_4, R"(MOD(ind1, ind2)
+
+    取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符
+
+    用法：MOD(A,B)返回A对B求模
+
+    例如：MOD(26,10) 返回 6
+
+    :param Indicator ind1:
+    :param Indicator ind2:
+    :rtype: Indicator)");
 
     def("VAR", VAR_1, (arg("n") = 10));
-    def("VAR", VAR_2, (arg("data"), arg("n") = 10));
+    def("VAR", VAR_2, (arg("data"), arg("n") = 10), R"(VAR([data, n=10])
+
+    估算样本方差, VAR(X,N)为X的N日估算样本方差
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("VARP", VARP_1, (arg("n") = 10));
-    def("VARP", VARP_2, (arg("data"), arg("n") = 10));
+    def("VARP", VARP_2, (arg("data"), arg("n") = 10), R"(VARP([data, n=10])
 
-    def("UPNDAY", UPNDAY, (arg("data"), arg("n") = 3));
-    def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n") = 3));
-    def("NDAY", NDAY, (arg("x"), arg("y"), arg("n") = 3));
+    总体样本方差, VARP(X,N)为X的N日总体样本方差
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
+
+    def("UPNDAY", UPNDAY, (arg("data"), arg("n") = 3), R"(UPNDAY(data[, n=3])
+
+    连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
+
+    def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n") = 3), R"(DOWNNDAY(data[, n=3])
+
+    连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
+
+    def("NDAY", NDAY, (arg("x"), arg("y"), arg("n") = 3), R"(NDAY(x, y[, n=3])
+
+    连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
+
+    :param Indicator x:
+    :param Indicator y:
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("CROSS", CROSS_1);
     def("CROSS", CROSS_2);
     def("CROSS", CROSS_3);
-    def("CROSS", CROSS_4);
+    def("CROSS", CROSS_4, R"(CROSS(x, y)
+
+    交叉函数
+
+    :param x: 变量或常量，判断交叉的第一条线
+    :param y: 变量或常量，判断交叉的第二条线
+    :rtype: Indicator)");
 
     def("LONGCROSS", LONGCROSS_1, (arg("a"), arg("b"), arg("n") = 3));
     def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n") = 3));
     def("LONGCROSS", LONGCROSS_3, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n") = 3), R"(LONGCROSS(a, b[, n=3])
+
+    两条线维持一定周期后交叉
+
+    用法：LONGCROSS(A,B,N)表示A在N周期内都小于B，本周期从下方向上穿过B时返 回1，否则返回0
+
+    例如：LONGCROSS(MA(CLOSE,5),MA(CLOSE,10),5)表示5日均线维持5周期后与10日均线交金叉
+
+    :param Indicator a:
+    :param Indicator b:
+    :param int n:
+    :rtype: Indicator)");
 
     def("FILTER", FILTER_1, (arg("n") = 5));
-    def("FILTER", FILTER_2, (arg("data"), arg("n") = 5));
+    def("FILTER", FILTER_2, (arg("data"), arg("n") = 5), R"(FILTER([data, n=5])
+
+    信号过滤, 过滤连续出现的信号。
+
+    用法：FILTER(X,N): X 满足条件后，删除其后 N 周期内的数据置为 0。
+
+    例如：FILTER(CLOSE>OPEN,5) 查找阳线，5 天内再次出现的阳线不被记录在内。
+
+    :param Indicator data: 输入数据
+    :param int n: 过滤周期
+    :rtype: Indicator)");
 
     def("BARSSINCE", BARSSINCE_1);
     def("BARSSINCE", BARSSINCE_2);
-    def("BARSSINCE", BARSSINCE_3);
+    def("BARSSINCE", BARSSINCE_3, R"(BARSSINCE([data])
+
+    第一个条件成立位置到当前的周期数。
+
+    用法：BARSSINCE(X):第一次X不为0到现在的天数。
+
+    例如：BARSSINCE(HIGH>10)表示股价超过10元时到当前的周期数
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("BARSLAST", BARSLAST_1);
     def("BARSLAST", BARSLAST_2);
-    def("BARSLAST", BARSLAST_3);
+    def("BARSLAST", BARSLAST_3, R"(BARSLAST([data])
+
+    上一次条件成立位置 上一次条件成立到当前的周期数。
+
+    用法：BARSLAST(X): 上一次 X 不为 0 到现在的天数。
+
+    例如：BARSLAST(CLOSE/REF(CLOSE,1)>=1.1) 表示上一个涨停板到当前的周期数
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("SUMBARS", SUMBARS_1);
-    def("SUMBARS", SUMBARS_2);
+    def("SUMBARS", SUMBARS_2, R"(SUMBARS([data,] a)
+
+    累加到指定周期数, 向前累加到指定值到现在的周期数
+
+    用法：SUMBARS(X,A):将X向前累加直到大于等于A,返回这个区间的周期数
+
+    例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
+
+    :param Indicator data: 输入数据
+    :param float a: 指定累加和
+    :rtype: Indicator)");
 
     def("BARSCOUNT", BARSCOUNT_1);
-    def("BARSCOUNT", BARSCOUNT_2);
+    def("BARSCOUNT", BARSCOUNT_2, R"(BARSCOUNT([data])
+
+    有效值周期数, 求总的周期数。
+
+    用法：BARSCOUNT(X)第一个有效数据到当前的天数。
+
+    例如：BARSCOUNT(CLOSE)对于日线数据取得上市以来总交易日数，对于1分钟线取得当日交易分钟数。
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("BACKSET", BACKSET_1);
-    def("BACKSET", BACKSET_2);
+    def("BACKSET", BACKSET_2, R"(BACKSET([data, n=2])
+
+    向前赋值将当前位置到若干周期前的数据设为1。
+
+    用法：BACKSET(X,N),X非0,则将当前位置到N周期前的数值设为1。
+
+    例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
+
+    :param Indicator data: 输入数据
+    :param int n: N周期
+    :rtype: Indicator)");
 
     def("TIMELINE", TIMELINE_1);
-    def("TIMELINE", TIMELINE_2);
+    def("TIMELINE", TIMELINE_2, R"(TIMELINE([k])
+
+    分时价格数据
+
+    :param KData k: 上下文
+    :rtype: Indicator)");
 
     def("TIMELINEVOL", TIMELINEVOL_1);
-    def("TIMELINEVOL", TIMELINEVOL_2);
+    def("TIMELINEVOL", TIMELINEVOL_2, R"(TIMELINEVOL([k])
 
-    def("DMA", DMA);
+    分时成交量数据
 
-    def("AVEDEV", AVEDEV, (arg("data"), arg("n") = 22));
+    :param KData k: 上下文
+    :rtype: Indicator)");
+
+    def("DMA", DMA, R"(DMA(ind, a)
+
+    动态移动平均
+
+    用法：DMA(X,A),求X的动态移动平均。
+
+    算法：若Y=DMA(X,A) 则 Y=A*X+(1-A)*Y',其中Y'表示上一周期Y值。
+
+    例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
+
+    :param Indicator ind: 输入数据
+    :param Indicator a: 动态系数
+    :rtype: Indicator)");
+
+    def("AVEDEV", AVEDEV, (arg("data"), arg("n") = 22), R"(AVEDEV(data[, n=22])
+
+    平均绝对偏差，求X的N日平均绝对偏差
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("DEVSQ", DEVSQ_1, (arg("n") = 10));
-    def("DEVSQ", DEVSQ_2, (arg("data"), arg("n") = 10));
+    def("DEVSQ", DEVSQ_2, (arg("data"), arg("n") = 10), R"(DEVSQ([data, n=10])
+
+    数据偏差平方和，求X的N日数据偏差平方和
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("ROC", ROC_1, (arg("n") = 10));
-    def("ROC", ROC_2, (arg("data"), arg("n") = 10));
+    def("ROC", ROC_2, (arg("data"), arg("n") = 10), R"(ROC([data, n=10])
+
+    变动率指标: ((price / prevPrice)-1)*100
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("ROCP", ROCP_1, (arg("n") = 10));
-    def("ROCP", ROCP_2, (arg("data"), arg("n") = 10));
+    def("ROCP", ROCP_2, (arg("data"), arg("n") = 10), R"(ROCP([data, n=10])
+
+    变动率指标: (price - prevPrice) / prevPrice
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("ROCR", ROCR_1, (arg("n") = 10));
-    def("ROCR", ROCR_2, (arg("data"), arg("n") = 10));
+    def("ROCR", ROCR_2, (arg("data"), arg("n") = 10), R"(ROCR([data, n=10])
+
+    变动率指标: (price / prevPrice)
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("ROCR100", ROCR100_1, (arg("n") = 10));
-    def("ROCR100", ROCR100_2, (arg("data"), arg("n") = 10));
+    def("ROCR100", ROCR100_2, (arg("data"), arg("n") = 10), R"(ROCR100([data, n=10])
+
+    变动率指标: (price / prevPrice) * 100
+
+    :param data: 输入数据
+    :param int n: 时间窗口
+    :rtype: Indicator)");
 
     def("AD", AD_1);
-    def("AD", AD_2);
+    def("AD", AD_2, R"(AD(kdata)
+
+   累积/派发线
+
+   :param KData kdata: k线数据
+   :rtype: Indicator)");
 
     def("COST", COST_1, (arg("x") = 10.0));
-    def("COST", COST_2, (arg("k"), arg("x") = 10.0));
+    def("COST", COST_2, (arg("k"), arg("x") = 10.0), R"(COST(k[, x=10.0])
+
+    成本分布
+
+    用法：COST(k, X) 表示X%获利盘的价格是多少
+
+    例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
+
+    :param KData k: 关联的K线数据
+    :param float x: x%获利价格, 0~100
+    :rtype: Indicator)");
 
     def("ALIGN", ALIGN_1);
     def("ALIGN", ALIGN_2);
     def("ALIGN", ALIGN_3);
-    def("ALIGN", ALIGN_4);
+    def("ALIGN", ALIGN_4, R"(ALIGN(data, ref):
+
+    按指定的参考日期对齐
+
+    :param Indicator data: 输入数据
+    :param ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
+    :retype: Indicator)");
 
     def("DROPNA", DROPNA_1);
-    def("DROPNA", DROPNA_2);
+    def("DROPNA", DROPNA_2, R"(DROPNA([data])
+
+    删除 nan 值
+
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
 
     def("ADVANCE", ADVANCE,
         (arg("query") = KQueryByIndex(-100), arg("market") = "SH", arg("stk_type") = STOCKTYPE_A,
-         arg("ignore_context") = false));
+         arg("ignore_context") = false),
+        R"(ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
+
+    上涨家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
+
+    :param Query query: 查询条件
+    :param str market: 所属市场，等于 "" 时，获取所有市场
+    :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
+    :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
+    :rtype: Indicator)");
+
     def("DECLINE", DECLINE,
         (arg("query") = KQueryByIndex(-100), arg("market") = "SH", arg("stk_type") = STOCKTYPE_A,
-         arg("ignore_context") = false));
+         arg("ignore_context") = false),
+        R"(DECLINE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
+
+    下跌家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
+
+    :param Query query: 查询条件
+    :param str market: 所属市场，等于 "" 时，获取所有市场
+    :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
+    :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
+    :rtype: Indicator)");
 }

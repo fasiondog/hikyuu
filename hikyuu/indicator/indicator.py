@@ -48,10 +48,10 @@ def indicator_getitem(data, i):
         return [data.get(x) for x in range(*i.indices(len(data)))]
 
     elif isinstance(i, Datetime):
-        return data.getByDate(i)
+        return data.get_by_date(i)
 
     elif isinstance(i, str):
-        return data.getByDate(Datetime(i))
+        return data.get_by_date(Datetime(i))
 
     else:
         raise IndexError("Error index type")
@@ -60,37 +60,19 @@ def indicator_getitem(data, i):
 Indicator.__getitem__ = indicator_getitem
 Indicator.__iter__ = indicator_iter
 
-Indicator.__div__ = indicator_div
-Indicator.__mod__ = indicator_mod
-Indicator.__truediv__ = indicator_div  #Python3 div
-Indicator.__le__ = indicator_le
-Indicator.__gt__ = indicator_gt
-Indicator.__lt__ = indicator_lt
-Indicator.__and__ = indicator_and
-Indicator.__or__ = indicator_or
 
-Indicator.__rdiv__ = lambda self, other: CVAL(self, other).__div__(self)
-Indicator.__rmod__ = lambda self, other: CVAL(self, other).__mod__(self)
-Indicator.__rtruediv__ = lambda self, other: CVAL(self, other).__truediv__(self)
-Indicator.__rle__ = lambda self, other: CVAL(self, other).__le__(self)
-Indicator.__rgt__ = lambda self, other: CVAL(self, other).__gt__(self)
-Indicator.__rlt__ = lambda self, other: CVAL(self, other).__lt__(self)
-Indicator.__rand__ = lambda self, other: CVAL(self, other).__and__(self)
-Indicator.__ror__ = lambda self, other: CVAL(self, other).__or__(self)
-
-
-def PRICELIST(data, result_num=0, discard=0):
+def PRICELIST(data, result_index=0, discard=0):
     """
     将 list、tuple、Indicator 转化为普通的 Indicator
     
     :param data: 输入数据，可以为 list、tuple、Indicator
-    :param int result_num: 当data为Indicator实例时，指示Indicator的第几个结果集
+    :param int result_index: 当data为Indicator实例时，指示Indicator的第几个结果集
     :param int discard: 在 data 为 Indicator类型时无效。表示前端抛弃的数据点数，抛弃的值使用 constant.null_price 填充
     :return: Indicator
     """
     from . import _indicator as ind
     if isinstance(data, ind.Indicator):
-        return ind.PRICELIST(data, result_num)
+        return ind.PRICELIST(data, result_index)
     else:
         return ind.PRICELIST(toPriceList(data), discard)
 
@@ -105,14 +87,14 @@ try:
 
     def indicator_to_df(indicator):
         """转化为pandas.DataFrame"""
-        if indicator.getResultNumber() == 1:
+        if indicator.get_result_num() == 1:
             return pd.DataFrame(indicator_to_np(indicator), columns=[indicator.name])
 
         data = {}
         name = indicator.name
         columns = []
-        for i in range(indicator.getResultNumber()):
-            data[name + str(i)] = indicator.getResult(i)
+        for i in range(indicator.get_result_num()):
+            data[name + str(i)] = indicator.get_result(i)
             columns.append(name + str(i + 1))
         return pd.DataFrame(data, columns=columns)
 

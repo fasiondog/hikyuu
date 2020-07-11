@@ -75,20 +75,25 @@ string (IndicatorImp::*read_name)() const = &IndicatorImp::name;
 void (IndicatorImp::*write_name)(const string&) = &IndicatorImp::name;
 
 void export_IndicatorImp() {
-    class_<IndicatorImpWrap, boost::noncopyable>("IndicatorImp", init<>())
+    class_<IndicatorImpWrap, boost::noncopyable>("IndicatorImp", "指标实现基类", init<>())
       .def(init<const string&>())
       .def(init<const string&, size_t>())
       .def(self_ns::str(self))
-      .add_property("name", read_name, write_name)
-      .add_property("discard", &IndicatorImp::discard)
-      .def("getParameter", &IndicatorImp::getParameter, return_value_policy<copy_const_reference>())
-      .def("getParam", &IndicatorImp::getParam<boost::any>)
-      .def("setParam", &IndicatorImp::setParam<object>)
-      .def("setDiscard", &IndicatorImp::setDiscard)
+      .def(self_ns::repr(self))
+
+      .add_property("name", read_name, write_name, "指标名称")
+      .add_property("discard", &IndicatorImp::discard, "结果中需抛弃的个数")
+
+      .def("get_parameter", &IndicatorImp::getParameter,
+           return_value_policy<copy_const_reference>(), "获取内部参数类对象")
+
+      .def("get_param", &IndicatorImp::getParam<boost::any>)
+      .def("set_param", &IndicatorImp::setParam<object>)
+      .def("set_discard", &IndicatorImp::setDiscard)
       .def("_set", &IndicatorImp::_set, _set_overloads())
-      .def("_readyBuffer", &IndicatorImp::_readyBuffer)
-      .def("getResultNumber", &IndicatorImp::getResultNumber)
-      .def("getResultAsPriceList", &IndicatorImp::getResultAsPriceList)
+      .def("_ready_buffer", &IndicatorImp::_readyBuffer)
+      .def("get_result_num", &IndicatorImp::getResultNumber)
+      .def("get_result_as_price_list", &IndicatorImp::getResultAsPriceList)
       .def("calculate", &IndicatorImp::calculate)
       .def("check", &IndicatorImp::check, &IndicatorImpWrap::default_check)
       .def("clone", &IndicatorImp::clone)

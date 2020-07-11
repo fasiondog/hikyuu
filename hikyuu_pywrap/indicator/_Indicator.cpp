@@ -13,24 +13,6 @@
 using namespace boost::python;
 using namespace hku;
 
-Indicator (*indicator_div1)(const Indicator&, const Indicator&) = operator/;
-Indicator (*indicator_mod1)(const Indicator&, const Indicator&) = operator%;
-Indicator (*indicator_gt1)(const Indicator&, const Indicator&) = operator>;
-Indicator (*indicator_lt1)(const Indicator&, const Indicator&) = operator<;
-Indicator (*indicator_ge1)(const Indicator&, const Indicator&) = operator>=;
-Indicator (*indicator_le1)(const Indicator&, const Indicator&) = operator<=;
-Indicator (*indicator_and1)(const Indicator&, const Indicator&) = operator&;
-Indicator (*indicator_or1)(const Indicator&, const Indicator&) = operator|;
-
-Indicator (*indicator_div2)(const Indicator&, price_t) = operator/;
-Indicator (*indicator_mod2)(const Indicator&, price_t) = operator%;
-Indicator (*indicator_gt2)(const Indicator&, price_t) = operator>;
-Indicator (*indicator_lt2)(const Indicator&, price_t) = operator<;
-Indicator (*indicator_ge2)(const Indicator&, price_t) = operator>=;
-Indicator (*indicator_le2)(const Indicator&, price_t) = operator<=;
-Indicator (*indicator_and2)(const Indicator&, price_t) = operator&;
-Indicator (*indicator_or2)(const Indicator&, price_t) = operator|;
-
 string (Indicator::*ind_read_name)() const = &Indicator::name;
 void (Indicator::*ind_write_name)(const string&) = &Indicator::name;
 
@@ -98,7 +80,12 @@ void export_Indicator() {
     :param int result_index: 指定的结果集
     :rtype: float)")
 
-      .def("getPos", &Indicator::getPos)
+      .def("get_pos", &Indicator::getPos, R"(get_pos(self, date):
+
+    获取指定日期相应的索引位置
+
+    :param Datetime date: 指定日期
+    :rtype: int)")
 
       .def("get_date", &Indicator::getDatetime, R"(get_date(self, pos)
 
@@ -176,6 +163,10 @@ setContext(self, stock, query)
       .def(self * other<price_t>())
       .def(other<price_t>() * self)
 
+      .def(self / self)
+      .def(self / other<price_t>())
+      .def(other<price_t>() / self)
+
       .def(self == self)
       .def(self == other<price_t>())
       .def(other<price_t>() == self)
@@ -184,26 +175,36 @@ setContext(self, stock, query)
       .def(self != other<price_t>())
       .def(other<price_t>() != self)
 
+      .def(self >= self)
+      .def(self >= other<price_t>())
+      .def(other<price_t>() >= self)
+
+      .def(self <= self)
+      .def(self <= other<price_t>())
+      .def(other<price_t>() <= self)
+
+      .def(self > self)
+      .def(self > other<price_t>())
+      .def(other<price_t>() > self)
+
+      .def(self < self)
+      .def(self < other<price_t>())
+      .def(other<price_t>() < self)
+
+      .def(self % self)
+      .def(self % other<price_t>())
+      .def(other<price_t>() % self)
+
+      .def(self & self)
+      .def(self & other<price_t>())
+      .def(other<price_t>() & self)
+
+      .def(self | self)
+      .def(self | other<price_t>())
+      .def(other<price_t>() | self)
+
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<Indicator>())
 #endif
       ;
-
-    def("indicator_div", indicator_div1);
-    def("indicator_mod", indicator_mod1);
-    def("indicator_gt", indicator_gt1);
-    def("indicator_lt", indicator_lt1);
-    def("indicator_ge", indicator_ge1);
-    def("indicator_le", indicator_le1);
-    def("indicator_and", indicator_and1);
-    def("indicator_or", indicator_or1);
-
-    def("indicator_div", indicator_div2);
-    def("indicator_mod", indicator_mod2);
-    def("indicator_gt", indicator_gt2);
-    def("indicator_lt", indicator_lt2);
-    def("indicator_ge", indicator_ge2);
-    def("indicator_le", indicator_le2);
-    def("indicator_and", indicator_and2);
-    def("indicator_or", indicator_or2);
 }

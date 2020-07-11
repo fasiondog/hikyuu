@@ -142,6 +142,7 @@ Block.__getattr__ = Block_getattr
         'haveParam': 'have_param',
         'getResultNumber': 'get_result_num',
         'getByDate': 'get_by_date',
+        'getPos': 'get_pos',
         'getDatetime': 'get_date',
         'getResult': 'get_result',
         'getResultAsPriceList': 'get_result_as_price_list',
@@ -155,6 +156,25 @@ def Indicator_getattr(self, name):
 
 
 Indicator.__getattr__ = Indicator_getattr
+
+
+@deprecated_attr(
+    {
+        'getParameter': 'get_parameter',
+        'getParam': 'get_param',
+        'setParam': "set_param",
+        'setDiscard': 'set_discard',
+        '_readyBuffer': '_ready_buffer',
+        'getResultNumber': 'get_result_num',
+        'getResultAsPriceList': 'get_result_as_price_list',
+        'isNeedContext': 'is_need_context'
+    }
+)
+def IndicatorImp_getattr(self, name):
+    return getattr(self, name)
+
+
+IndicatorImp.__getattr__ = IndicatorImp_getattr
 
 
 @deprecated_attr(
