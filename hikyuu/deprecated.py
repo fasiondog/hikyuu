@@ -141,12 +141,12 @@ Block.__getattr__ = Block_getattr
         'setParam': 'set_param',
         'haveParam': 'have_param',
         'getResultNumber': 'get_result_num',
-        'getByDate': 'get_by_date',
+        'getByDate': 'get_by_datetime',
         'getPos': 'get_pos',
-        'getDatetime': 'get_date',
+        'getDatetime': 'get_datetime',
         'getResult': 'get_result',
         'getResultAsPriceList': 'get_result_as_price_list',
-        'getDatetimeList': 'get_date_list',
+        'getDatetimeList': 'get_datetime_list',
         'getContext': 'get_context',
         'setContext': 'set_context'
     }
@@ -183,8 +183,8 @@ IndicatorImp.__getattr__ = IndicatorImp_getattr
         'endPos': 'end_pos',
         'lastPos': 'last_pos',
         'getPos': 'get_pos',
-        'getDatetimeList': 'get_date_list',
-        'getByDate': 'get_by_date',
+        'getDatetimeList': 'get_datetime_list',
+        'getByDatetime': 'get_by_datetime',
         'getQuery': 'get_query',
         'getStock': 'get_stock',
     }
@@ -198,7 +198,6 @@ KData.__getattr__ = KData_getattr
 
 @deprecated_attr(
     {
-        'datetime': 'date',
         'openPrice': 'open',
         'closePrice': 'close',
         'highPrice': 'high',
@@ -214,7 +213,7 @@ def KRecord_getattr(self, name):
 KRecord.__getattr__ = KRecord_getattr
 
 
-@deprecated_attr({'lastDate': 'last_date'})
+@deprecated_attr({'lastDate': 'last_datetime'})
 def MarketInfo_getattr(self, name):
     return getattr(self, name)
 
@@ -240,8 +239,8 @@ Parameter.__getattr__ = Parameter_getattr
 
 @deprecated_attr(
     {
-        'startDatetime': 'start_date',
-        'endDatetime': 'end_date',
+        'startDatetime': 'start_datetime',
+        'endDatetime': 'end_datetime',
         'queryType': 'query_type',
         'kType': 'ktype',
         'recoverType': 'recover_type'
@@ -256,8 +255,8 @@ Query.__getattr__ = Query_getattr
 
 @deprecated_attr(
     {
-        'startDatetime': 'start_date',
-        'lastDatetime': 'last_date',
+        'startDatetime': 'start_datetime',
+        'lastDatetime': 'last_datetime',
         'tickValue': 'tick_value',
         'minTradeNumber': 'min_trade_number',
         'maxTradeNumber': 'max_trade_number',
@@ -269,9 +268,9 @@ Query.__getattr__ = Query_getattr
         'getCount': 'get_count',
         'getMarketValue': 'get_market_value',
         'getKRecord': 'get_krecord',
-        'getKRecordByDate': 'get_krecord_by_date',
+        'getKRecordByDate': 'get_krecord_by_datetime',
         'getKRecordList': 'get_krecord_list',
-        'getDatetimeList': 'get_date_list',
+        'getDatetimeList': 'get_datetime_list',
         'getFinanceInfo': 'get_finance_info',
         'getHistoryFinanceInfo': 'get_history_finance_info',
         'realtimeUpdate': 'realtime_update',
@@ -330,7 +329,6 @@ StockTypeInfo.__getattr__ = StockTypeInfo_getattr
 
 @deprecated_attr(
     {
-        'datetime': 'date',
         'countAsGift': 'count_as_gift',
         'countForSell': 'count_for_sell',
         'priceForSell': 'price_for_sell',
@@ -343,19 +341,3 @@ def StockWeight_getattr(self, name):
 
 
 StockWeight.__getattr__ = StockWeight_getattr
-
-
-@deprecated_attr({'datetime': 'date'})
-def TimeLineRecord_getattr(self, name):
-    return getattr(self, name)
-
-
-TimeLineRecord.__getattr__ = TimeLineRecord_getattr
-
-
-@deprecated_attr({'datetime': 'date'})
-def TransRecord_getattr(self, name):
-    return getattr(self, name)
-
-
-TransRecord.__getattr__ = TransRecord_getattr

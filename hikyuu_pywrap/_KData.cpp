@@ -36,7 +36,7 @@ void export_KData() {
       .add_property("amo", &KData::amo, "返回包含成交金额的 Indicator 实例，相当于 AMO(k)")
       .add_property("vol", &KData::vol, "返回包含成交量的 Indicator 实例，相当于 VOL(k)")
 
-      .def("get_date_list", &KData::getDatetimeList, R"(get_date_list(self)
+      .def("get_datetime_list", &KData::getDatetimeList, R"(get_datetime_list(self)
 
     返回交易日期列表
 
@@ -49,7 +49,7 @@ void export_KData() {
     :param int pos: 位置索引
     :rtype: KRecord)")
 
-      .def("get_by_date", &KData::getKRecordByDate, R"(get_by_date(self, datetime)    
+      .def("get_by_datetime", &KData::getKRecordByDate, R"(get_by_datetime(self, datetime)    
 
     获取指定时间的K线记录。
 

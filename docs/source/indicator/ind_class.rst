@@ -70,17 +70,17 @@ Indicator
         :param Datetime date: 指定日期
         :rtype: int
 
-    .. py:method:: get_date(self, pos)
+    .. py:method:: get_datetime(self, pos)
 
         获取指定位置的日期
 
         :param int pos: 指定的位置索引
 
-    .. py:method:: get_by_date(self, date[, result_index=0])
+    .. py:method:: get_by_datetime(self, datetime[, result_index=0])
 
         获取指定日期数值。如果对应日期无结果，返回 constant.null_price
 
-        :param Datetime date: 指定日期
+        :param Datetime datetime: 指定日期
         :param int num: 指定的结果集
         :rtype: float
 
@@ -98,7 +98,7 @@ Indicator
         :param int result_index: 指定的结果集
         :rtype: PriceList
 
-    .. py:method:: get_date_list(self)
+    .. py:method:: get_datetime_list(self)
 
         返回对应的日期列表
 

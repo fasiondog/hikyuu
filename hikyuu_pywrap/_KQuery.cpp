@@ -25,9 +25,9 @@ void export_KQuery() {
                       "起始索引，当按日期查询方式创建时无效，为 constant.null_int64")
         .add_property("end", &KQuery::end,
                       "结束索引，当按日期查询方式创建时无效，为 constant.null_int64")
-        .add_property("start_date", &KQuery::startDatetime,
+        .add_property("start_datetime", &KQuery::startDatetime,
                       "起始日期，当按索引查询方式创建时无效，为 constant.null_datetime")
-        .add_property("end_date", &KQuery::endDatetime,
+        .add_property("end_datetime", &KQuery::endDatetime,
                       "结束日期，当按索引查询方式创建时无效，为 constant.null_datetime")
         .add_property("query_type", &KQuery::queryType, "查询方式 Query.QueryType")
         .add_property("ktype", &KQuery::kType, "查询的K线类型 Query.KType")

@@ -99,7 +99,7 @@ def _draw_ema_pipe(axes, kdata, ema, n=22, w=0.10):
 
 def draw(stock, query=Query(-130), ma_n=22, ma_w='auto', vigor_n=13):
     """绘制亚历山大.艾尔德交易系统图形"""
-    kdata = stock.getKData(query)
+    kdata = stock.get_kdata(query)
     close = CLOSE(kdata)
     ema = EMA(close, ma_n)
     sf = SAFTYLOSS(close, 10, 3, 2.0)
@@ -131,6 +131,6 @@ def draw(stock, query=Query(-130), ma_n=22, ma_w='auto', vigor_n=13):
         #ax3.hlines(lmean * (i + 1),0,len(kdata),color='g',linestyle='--')
 
     ax1.set_xlim((0, len(kdata)))
-    ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
+    ax_set_locator_formatter(ax1, kdata.get_datetime_list(), kdata.get_query().ktype)
     adjust_axes_show([ax1, ax2, ax3])
     return show_gcf()

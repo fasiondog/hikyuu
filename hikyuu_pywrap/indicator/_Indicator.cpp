@@ -87,19 +87,19 @@ void export_Indicator() {
     :param Datetime date: 指定日期
     :rtype: int)")
 
-      .def("get_date", &Indicator::getDatetime, R"(get_date(self, pos)
+      .def("get_datetime", &Indicator::getDatetime, R"(get_datetime(self, pos)
 
     获取指定位置的日期
 
     :param int pos: 指定的位置索引
     :rtype: float)")
 
-      .def("get_by_date", &Indicator::getByDate, (arg("date"), arg("result_index") = 0),
-           R"(get_by_date(self, date[, result_index=0])
+      .def("get_by_datetime", &Indicator::getByDate, (arg("datetime"), arg("result_index") = 0),
+           R"(get_by_datetime(self, date[, result_index=0])
 
     获取指定日期数值。如果对应日期无结果，返回 constant.null_price
 
-    :param Datetime date: 指定日期
+    :param Datetime datetime: 指定日期
     :param int result_index: 指定的结果集
     :rtype: float)")
 
@@ -118,7 +118,7 @@ void export_Indicator() {
     :param int result_index: 指定的结果集
     :rtype: PriceList)")
 
-      .def("get_date_list", &Indicator::getDatetimeList, R"(get_date_list(self)
+      .def("get_datetime_list", &Indicator::getDatetimeList, R"(get_datetime_list(self)
 
     返回对应的日期列表
 

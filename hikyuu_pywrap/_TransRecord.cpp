@@ -17,7 +17,7 @@ void export_TransRecord() {
     class_<TransRecord>("TransRecord", init<>())
       .def(init<const Datetime&, price_t, price_t, TransRecord::DIRECT>())
       .def(self_ns::str(self))
-      .def_readwrite("date", &TransRecord::datetime, "时间")
+      .def_readwrite("datetime", &TransRecord::datetime, "时间")
       .def_readwrite("price", &TransRecord::price, "价格")
       .def_readwrite("vol", &TransRecord::vol, "成交量")
       .def_readwrite("direct", &TransRecord::direct, "买卖盘性质, 参见: TransRecord.DIRECT")

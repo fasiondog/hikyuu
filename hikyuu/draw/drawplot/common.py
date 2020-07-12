@@ -42,7 +42,7 @@ def get_draw_title(kdata):
 
     query = kdata.get_query()
     stock = kdata.get_stock()
-    if stock.isNull():
+    if stock.is_null():
         return ""
 
     s1 = ''

@@ -260,7 +260,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.date.number / 10000, last_record.open, last_record.high, last_record.low,
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
         last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
     )
     axes.text(
@@ -275,7 +275,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(kdata) + 1)
-    ax_set_locator_formatter(axes, kdata.get_date_list(), kdata.get_query().ktype)
+    ax_set_locator_formatter(axes, kdata.get_datetime_list(), kdata.get_query().ktype)
     #draw()
 
 
@@ -328,7 +328,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f' % (
-        last_record.date.number / 10000, last_record.open, last_record.high, last_record.low,
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
         last_record.close
     )
     axes.text(
@@ -343,7 +343,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(kdata) + 1)
-    ax_set_locator_formatter(axes, kdata.get_date_list(), kdata.get_query().ktype)
+    ax_set_locator_formatter(axes, kdata.get_datetime_list(), kdata.get_query().ktype)
     #draw()
 
 
@@ -415,7 +415,7 @@ def iplot(
     axes.set_xlim(-1, len(indicator) + 1)
     k = indicator.get_context()
     if len(k) > 0:
-        ax_set_locator_formatter(axes, k.get_date_list(), k.get_query().ktype)
+        ax_set_locator_formatter(axes, k.get_datetime_list(), k.get_query().ktype)
     #draw()
 
 
@@ -494,7 +494,7 @@ def ibar(
     axes.set_xlim(-1, len(indicator) + 1)
     k = indicator.get_context()
     if len(k) > 0:
-        ax_set_locator_formatter(axes, k.get_date_list(), k.get_query().ktype)
+        ax_set_locator_formatter(axes, k.get_datetime_list(), k.get_query().ktype)
     #draw()
 
 
@@ -508,7 +508,7 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     :param int n3: 指标 MACD 的参数3
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
-    bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
+    bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
     text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
         n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
@@ -554,7 +554,7 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     :param int n3: 指标 MACD 的参数3
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
-    bmacd, fmacd, smacd = macd.getResult(0), macd.getResult(1), macd.getResult(2)
+    bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
     text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
         n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
@@ -613,7 +613,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
     else:
         sg.setTO(kdata)
 
-    refdates = kdata.get_date_list()
+    refdates = kdata.get_datetime_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
 
     if axes is None:
@@ -676,7 +676,7 @@ def cnplot(cn, new=True, axes=None, kdata=None):
     else:
         cn.setTO(kdata)
 
-    refdates = kdata.get_date_list()
+    refdates = kdata.get_datetime_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
 
     if axes is None:
@@ -704,7 +704,7 @@ def sysplot(sys, new=True, axes=None, style=1):
     """
     kdata = sys.getTO()
 
-    refdates = kdata.get_date_list()
+    refdates = kdata.get_datetime_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
 
     if axes is None:

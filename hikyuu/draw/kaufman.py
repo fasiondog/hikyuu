@@ -53,7 +53,7 @@ def draw(
     arrow_style=1
 ):
     """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
-    kdata = stock.getKData(query)
+    kdata = stock.get_kdata(query)
 
     ax1, ax2 = create_figure(2)
     kdata.plot(axes=ax1)
@@ -107,7 +107,7 @@ def draw(
     #ax2.hlines(0,0,len(kdata))
 
     ax1.set_xlim((0, len(kdata)))
-    ax_set_locator_formatter(ax1, kdata.getDatetimeList(), query.kType)
+    ax_set_locator_formatter(ax1, kdata.get_datetime_list(), query.ktype)
     adjust_axes_show([ax1, ax2])
     return show_gcf()
 
@@ -127,11 +127,11 @@ def draw2(
     """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
     sm = StockManager.instance()
     if block.name == 'SZ':
-        kdata = sm['sz000001'].getKData(query)
+        kdata = sm['sz000001'].get_kdata(query)
     elif block.name == 'GEM':
-        kdata = sm['sz399006'].getKData(query)
+        kdata = sm['sz399006'].get_kdata(query)
     else:
-        kdata = sm['sh000001'].getKData(query)
+        kdata = sm['sh000001'].get_kdata(query)
 
     ax1, ax2, ax3 = create_figure(3)
     kdata.plot(axes=ax1)
@@ -194,6 +194,6 @@ def draw2(
     #ax2.set_ylim(-1, 1)
 
     ax1.set_xlim((0, len(kdata)))
-    ax_set_locator_formatter(ax1, kdata.getDatetimeList(), query.kType)
+    ax_set_locator_formatter(ax1, kdata.get_datetime_list(), query.ktype)
     adjust_axes_show([ax1, ax2])
     return show_gcf()

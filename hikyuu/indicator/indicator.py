@@ -70,7 +70,7 @@ def PRICELIST(data, result_index=0, discard=0):
     :param int discard: 在 data 为 Indicator类型时无效。表示前端抛弃的数据点数，抛弃的值使用 constant.null_price 填充
     :return: Indicator
     """
-    from . import _indicator as ind
+    import hikyuu.cpp.core as ind
     if isinstance(data, ind.Indicator):
         return ind.PRICELIST(data, result_index)
     else:

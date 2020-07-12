@@ -35,7 +35,7 @@ void export_MarketInfo() {
                     make_function(&MarketInfo::code, return_value_policy<copy_const_reference>()),
                     "该市场对应的主要指数代码，用于获取交易日历")
 
-      .add_property("last_date", &MarketInfo::lastDate, "该市场K线数据最后交易日期")
+      .add_property("last_datetime", &MarketInfo::lastDate, "该市场K线数据最后交易日期")
 
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<MarketInfo>())

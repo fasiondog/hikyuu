@@ -46,8 +46,8 @@ void export_Stock() {
                     "证券名称")
       .add_property("type", &Stock::type, "证券类型，参见：constant")
       .add_property("valid", &Stock::valid, "该证券当前是否有效")
-      .add_property("start_date", &Stock::startDatetime, "证券起始日期")
-      .add_property("last_date", &Stock::lastDatetime, "证券最后日期")
+      .add_property("start_datetime", &Stock::startDatetime, "证券起始日期")
+      .add_property("last_datetime", &Stock::lastDatetime, "证券最后日期")
       .add_property("tick", &Stock::tick, "最小跳动量")
       .add_property("tick_value", &Stock::tickValue, "最小跳动量价值")
       .add_property("unit", &Stock::unit, "每单位价值 = tickValue / tick")
@@ -114,13 +114,13 @@ void export_Stock() {
     :return: K线记录
     :rtype: KRecord)")
 
-      .def("get_krecord_by_date", &Stock::getKRecordByDate,
+      .def("get_krecord_by_datetime", &Stock::getKRecordByDate,
            (arg("date"), arg("ktype") = KQuery::DAY),
-           R"(get_krecord_by_date(self, date[, ktype=Query.DAY])
+           R"(get_krecord_by_datetime(self, datetime[, ktype=Query.DAY])
 
     根据数据类型（日线/周线等），获取指定时刻的KRecord
 
-    :param Datetime date: 指定日期时刻
+    :param Datetime datetime: 指定日期时刻
     :param Query.KType ktype: K线数据类别
     :return: K线记录
     :rtype: KRecord)")
@@ -135,8 +135,8 @@ void export_Stock() {
     :return: K线记录列表
     :rtype: KRecordList)")
 
-      .def("get_date_list", getDatetimeList1)
-      .def("get_date_list", getDatetimeList2, R"(get_date_list(self, query)
+      .def("get_datetime_list", getDatetimeList1)
+      .def("get_datetime_list", getDatetimeList2, R"(get_datetime_list(self, query)
 
     获取日期列表
 

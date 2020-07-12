@@ -27,7 +27,7 @@ void export_StockWeight() {
       .def(self_ns::str(self))
       .def(self_ns::repr(self))
 
-      .add_property("datet", &StockWeight::datetime, "权息日期")
+      .add_property("datetime", &StockWeight::datetime, "权息日期")
       .add_property("count_as_gift", &StockWeight::countAsGift, "每10股送X股")
       .add_property("count_for_sell", &StockWeight::countForSell, "每10股配X股")
       .add_property("price_for_sell", &StockWeight::priceForSell, "配股价")

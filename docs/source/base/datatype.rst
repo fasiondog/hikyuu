@@ -377,7 +377,7 @@ K线数据
     
         获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1
         
-    .. py:method:: get_date_list()
+    .. py:method:: get_datetime_list()
     
         返回交易日期列表
 
@@ -390,7 +390,7 @@ K线数据
         :param int pos: 位置索引
         :rtype: KRecord        
     
-    .. py:method:: get_by_date(datetime)    
+    .. py:method:: get_by_datetime(datetime)    
 
         获取指定时间的K线记录。
     

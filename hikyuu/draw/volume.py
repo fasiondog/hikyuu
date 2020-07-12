@@ -52,7 +52,7 @@ def draw(
     vma2_n=10
 ):
     """绘制普通K线图 + 成交量（成交金额）"""
-    kdata = stock.getKData(query)
+    kdata = stock.get_kdata(query)
     close = CLOSE(kdata, )
     ma1 = MA(close, ma1_n)
     ma2 = MA(close, ma2_n)
@@ -96,11 +96,11 @@ def draw(
     vma1.plot(axes=ax2, legend_on=True)
     vma2.plot(axes=ax2, legend_on=True)
 
-    if query.kType == Query.WEEK and stock.market == 'SH' and stock.code == '000001':
+    if query.ktype == Query.WEEK and stock.market == 'SH' and stock.code == '000001':
         CVAL(0.16e+009, total, color='b', linestyle='--')
         #ax2.hlines(0.16e+009,0,len(kdata),color='b',linestyle='--')
 
-    ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
+    ax_set_locator_formatter(ax1, kdata.get_datetime_list(), kdata.get_query().ktype)
     adjust_axes_show([ax1, ax2])
     return show_gcf()
 
@@ -117,7 +117,7 @@ def draw2(
     vma2_n=10
 ):
     """绘制普通K线图 + 成交量（成交金额）+ MACD"""
-    kdata = stock.getKData(query)
+    kdata = stock.get_kdata(query)
     close = CLOSE(kdata)
     ma1 = MA(close, ma1_n)
     ma2 = MA(close, ma2_n)
@@ -160,6 +160,6 @@ def draw2(
     ax_draw_macd(ax3, kdata)
 
     ax1.set_xlim((0, len(kdata)))
-    ax_set_locator_formatter(ax1, kdata.getDatetimeList(), kdata.getQuery().kType)
+    ax_set_locator_formatter(ax1, kdata.get_datetime_list(), kdata.get_query().ktype)
     adjust_axes_show([ax1, ax2, ax3])
     return show_gcf()

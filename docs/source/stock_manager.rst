@@ -46,11 +46,11 @@
 
         结束索引，当按日期查询方式创建时无效，为 constant.null_int64
         
-    .. py:attribute:: start_date
+    .. py:attribute:: start_datetime
     
         起始日期，当按索引查询方式创建时无效，为 constant.null_datetime
         
-    .. py:attribute:: end_date
+    .. py:attribute:: end_datetime
     
         结束日期，当按索引查询方式创建时无效，为 constant.null_datetime
         
@@ -249,8 +249,8 @@ StockManager/Block/Stock
         获取证券类型，参见：:py:data:`constant`
         
     .. py:attribute:: valid : 该证券当前是否有效
-    .. py:attribute:: start_date : 证券起始日期
-    .. py:attribute:: last_date : 证券最后日期
+    .. py:attribute:: start_datetime : 证券起始日期
+    .. py:attribute:: last_datetime : 证券最后日期
     .. py:attribute:: tick : 最小跳动量
     .. py:attribute:: tick_value : 最小跳动量价值
     .. py:attribute:: unit : 每单位价值 = tickValue / tick
@@ -299,11 +299,11 @@ StockManager/Block/Stock
         :return: K线记录
         :rtype: KRecord
     
-    .. py:method:: get_krecord_by_date(self, date[, ktype=Query.DAY])
+    .. py:method:: get_krecord_by_datetime(self, datetime[, ktype=Query.DAY])
     
         根据数据类型（日线/周线等），获取指定时刻的KRecord
         
-        :param Datetime date: 指定时刻
+        :param Datetime datetime: 指定时刻
         :param Query.KType ktype: K线数据类别
         :return: K线记录
         :rtype: KRecord
@@ -318,14 +318,14 @@ StockManager/Block/Stock
         :return: K线记录列表
         :rtype: KRecordList
     
-    .. py:method:: get_date_list(self, query)
+    .. py:method:: get_datetime_list(self, query)
     
         获取日期列表
         
         :param Query query: 查询条件
         :rtype: DatetimeList
 
-    .. py:method:: get_date_list(self, start, end, ktype)
+    .. py:method:: get_datetime_list(self, start, end, ktype)
     
         获取日期列表
         
@@ -495,7 +495,7 @@ StockManager/Block/Stock
 
     权息记录
     
-    .. py:attribute:: date : 权息日期
+    .. py:attribute:: datetime : 权息日期
     .. py:attribute:: count_as_gift : 每10股送X股
     .. py:attribute:: count_for_sell : 每10股配X股
     .. py:attribute:: price_for_sell : 配股价
@@ -518,7 +518,7 @@ StockManager/Block/Stock
     .. py:attribute:: name : 市场全称
     .. py:attribute:: description :描述说明
     .. py:attribute:: code : 该市场对应的主要指数，用于获取交易日历
-    .. py:attribute:: last_date : 该市场K线数据最后交易日期
+    .. py:attribute:: last_datetime : 该市场K线数据最后交易日期
 
 
 
