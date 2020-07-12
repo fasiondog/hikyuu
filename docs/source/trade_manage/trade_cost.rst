@@ -75,7 +75,7 @@
     
     .. py:attribute:: name 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -83,7 +83,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -96,7 +96,7 @@
     
         克隆操作
 
-    .. py:method:: getBuyCost(self, datetime, stock, price, num)
+    .. py:method:: get_buy_cost(self, datetime, stock, price, num)
     
         【重载接口】获取买入成本
         
@@ -107,7 +107,7 @@
         :return: 交易成本记录
         :rtype: CostRecord
     
-    .. py:method:: getSellCost(self, datetime, stock, price, num)
+    .. py:method:: get_sell_cost(self, datetime, stock, price, num)
     
         【重载接口】获取卖出成本
         

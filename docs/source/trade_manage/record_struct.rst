@@ -68,7 +68,7 @@
     .. py:attribute:: planPrice 计划交易价格（float）
     .. py:attribute:: realPrice 实际交易价格（float）
     .. py:attribute:: goalPrice 目标价格（float），如果为0表示未限定目标
-    .. py:attribute:: number    成交数量（int）
+    .. py:attribute:: number    成交数量（float）
     .. py:attribute:: cost      交易成本
 
         类型：:py:class:`CostRecord`
@@ -97,21 +97,21 @@
         仅在安装了pandas模块时生效，转换为pandas.DataFrame
         
 
-.. py:class:: PositionRecord([stock, takeDatetime, cleanDatetime, number, stoploss, goalPrice, totalNumber, buyMoney, totalCost, totalRisk, sellMoney])
+.. py:class:: PositionRecord([stock, take_datetime, clean_datetime, number, stoploss, goal_price, total_number, buy_money, total_cost, total_risk, sell_money])
 
     持仓记录
     
-    .. py:attribute:: stock         交易对象（Stock）
-    .. py:attribute:: takeDatetime  初次建仓时刻（Datetime）
-    .. py:attribute:: cleanDatetime 平仓日期，当前持仓记录中为 constant.null_datetime
-    .. py:attribute:: number      当前持仓数量（int）
-    .. py:attribute:: stoploss    当前止损价（float）
-    .. py:attribute:: goalPrice   当前的目标价格（float）
-    .. py:attribute:: totalNumber 累计持仓数量（int）
-    .. py:attribute:: buyMoney    累计买入资金（float）
-    .. py:attribute:: totalCost   累计交易总成本（float）
-    .. py:attribute:: totalRisk   累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本
-    .. py:attribute:: sellMoney   累计卖出资金（float）
+    .. py:attribute:: stock          交易对象（Stock）
+    .. py:attribute:: take_datetime  初次建仓时刻（Datetime）
+    .. py:attribute:: clean_datetime 平仓日期，当前持仓记录中为 constant.null_datetime
+    .. py:attribute:: number       当前持仓数量（float）
+    .. py:attribute:: stoploss     当前止损价（float）
+    .. py:attribute:: goal_price   当前的目标价格（float）
+    .. py:attribute:: total_number 累计持仓数量（float）
+    .. py:attribute:: buy_money    累计买入资金（float）
+    .. py:attribute:: total_cost   累计交易总成本（float）
+    .. py:attribute:: total_risk   累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本
+    .. py:attribute:: sell_money   累计卖出资金（float）
 
     
 资产情况记录

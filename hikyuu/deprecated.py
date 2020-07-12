@@ -237,6 +237,33 @@ def Parameter_getattr(self, name):
 Parameter.__getattr__ = Parameter_getattr
 
 
+@deprecated_attr({'get': '__getitem__'})
+def Performance_getattr(self, name):
+    return getattr(self, name)
+
+
+Performance.__getattr__ = Performance_getattr
+
+
+@deprecated_attr(
+    {
+        'takeDatetime': 'take_datetime',
+        'cleanDatetime': 'clean_datetime',
+        'goalPrice': 'goal_price',
+        'totalNumber': 'total_number',
+        'buyMoney': 'buy_money',
+        'totalCost': 'total_cost',
+        'totalRisk': 'total_risk',
+        'sellMoney': 'sell_money'
+    }
+)
+def PositionRecord_getattr(self, name):
+    return getattr(self, name)
+
+
+PositionRecord.__getattr__ = PositionRecord_getattr
+
+
 @deprecated_attr(
     {
         'startDatetime': 'start_datetime',
@@ -341,3 +368,26 @@ def StockWeight_getattr(self, name):
 
 
 StockWeight.__getattr__ = StockWeight_getattr
+
+
+@deprecated_attr(
+    {
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'getBuyCost': 'get_buy_cost',
+        'getSellCost': 'get_sell_cost',
+    }
+)
+def TradeCostBase_getattr(self, name):
+    return getattr(self, name)
+
+
+TradeCostBase.__getattr__ = TradeCostBase_getattr
+
+
+@deprecated_attr({})
+def TradeRecord_getattr(self, name):
+    return getattr(self, name)
+
+
+TradeRecord.__getattr__ = TradeRecord_getattr
