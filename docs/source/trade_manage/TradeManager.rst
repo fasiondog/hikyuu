@@ -34,27 +34,27 @@
         
         名称
         
-    .. py:attribute:: costFunc 
+    .. py:attribute:: cost_func 
         
         交易成本算法
         
-    .. py:attribute:: initCash
+    .. py:attribute:: init_cash
         
         （只读）初始资金
         
-    .. py:attribute:: currentCash
+    .. py:attribute:: current_cash
     
         （只读）当前资金
         
-    .. py:attribute:: initDatetime
+    .. py:attribute:: init_datetime
         
         （只读）账户建立日期
         
-    .. py:attribute:: firstDatetime 
+    .. py:attribute:: first_datetime 
         
-        （只读）第一笔买入交易发生日期，如未发生交易返回Null<Datetime>()
+        （只读）第一笔买入交易发生日期，如未发生交易返回 Datetime()
         
-    .. py:attribute:: lastDatetime
+    .. py:attribute:: last_datetime
         
         （只读）最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期
         
@@ -66,7 +66,7 @@
         
         （只读）价格精度，同公共参数“precision”
         
-    .. py:attribute:: brokeLastDatetime
+    .. py:attribute:: broker_last_datetime
     
         实际开始订单代理操作的时刻。
         
@@ -82,7 +82,7 @@
         :param TradeCostBase costFunc: 成本算法
         :param str name: 账户名称
 
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -90,7 +90,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -125,31 +125,31 @@
         :param float cash: 取出的资金量
         :rtype: TradeRecord
         
-    .. py:method:: buy(self, datetime, stock, realPrice, number[, stoploss=0.0, goalPrice=0.0, planPrice=0.0, part=System.INVALID])
+    .. py:method:: buy(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID])
     
         买入操作
         
         :param Datetime datetime: 买入时间
         :param Stock stock:       买入的证券
-        :param float realPrice:  实际买入价格
-        :param int num:           买入数量
-        :param float stoploss:   止损价
-        :param float goalPrice:  目标价格
-        :param float planPrice:  计划买入价格
+        :param float real_price:  实际买入价格
+        :param float num:         买入数量
+        :param float stoploss:    止损价
+        :param float goal_price:  目标价格
+        :param float plan_price:  计划买入价格
         :param SystemPart part:   交易指示来源
         :rtype: TradeRecord
         
-    .. py:method:: sell(self, datetime, stock, realPrice[, number=Constant.null_size, stoploss=0.0, goalPrice=0.0, planPrice=0.0, part=System.INVALID])
+    .. py:method:: sell(self, datetime, stock, real_price[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID])
     
         卖出操作
         
         :param Datetime datetime: 卖出时间
         :param Stock stock:       卖出的证券
-        :param float realPrice:  实际卖出价格
-        :param int num:           卖出数量，如果等于Constant.null_size，表示全部卖出
-        :param float stoploss:   新的止损价
-        :param float goalPrice:  新的目标价格
-        :param float planPrice:  原计划卖出价格
+        :param float real_price:  实际卖出价格
+        :param float num:         卖出数量，如果等于constant.max_double, 表示全部卖出
+        :param float stoploss:    新的止损价
+        :param float goal_price:  新的目标价格
+        :param float plan_price:  原计划卖出价格
         :param SystemPart part:   交易指示来源
         :rtype: TradeRecord
         
@@ -168,13 +168,13 @@
         :param ktype: K线类型
         :rtype: float
         
-    .. py:method:: getStockNumber(self)
+    .. py:method:: get_stock_num(self)
     
         当前持有的证券种类数量，即当前持有几只股票（非各个股票的持仓数）
         
         :rtype: int
         
-    .. py:method:: getHoldNumber(self, datetime, stock)
+    .. py:method:: get_hold_num(self, datetime, stock)
 
         获取指定时刻指定证券的持有数量
         
@@ -182,14 +182,14 @@
         :param Stock stock: 指定的证券
         :rtype: int
 
-    .. py:method:: getPosition(self, stock)
+    .. py:method:: get_position(self, stock)
 
         获取指定证券的当前持仓记录，如当前未持有该票，返回PositionRecord()
         
         :param Stock stock: 指定的证券
         :rtype: PositionRecord
         
-    .. py:method:: getTradeList(self[, start, end])
+    .. py:method:: get_trade_list(self[, start, end])
     
         获取交易记录，未指定参数时，获取全部交易记录
         
@@ -197,46 +197,46 @@
         :param Datetime end: 结束日期
         :rtype: TradeRecordList
         
-    .. py:method:: getPositionList(self)
+    .. py:method:: get_position_list(self)
     
         获取当前全部持仓记录
         
         :rtype: PositionRecordList
         
-    .. py:method:: getHistoryPositionList(self)
+    .. py:method:: get_history_position_list(self)
     
         获取全部历史持仓记录，即已平仓记录
         
         :rtype: PositionRecordList
 
-    .. py:method:: getBuyCost(self, datetime, stock, price, num)
+    .. py:method:: get_buy_cost(self, datetime, stock, price, num)
     
         计算买入成本
         
         :param Datetime datetime: 交易时间
         :param Stock stock:       交易的证券
-        :param float price:      买入价格
-        :param int num:           买入数量
+        :param float price:       买入价格
+        :param float num:         买入数量
         :rtype: CostRecord
         
-    .. py:method:: getSellCost(self, datetime, stock, price, num)
+    .. py:method:: get_sell_cost(self, datetime, stock, price, num)
     
         计算卖出成本
 
         :param Datetime datetime: 交易时间
         :param Stock stock:       交易的证券
-        :param float price:      卖出价格
-        :param int num:           卖出数量
+        :param float price:       卖出价格
+        :param float num:         卖出数量
         :rtype: CostRecord        
      
-    .. py:method:: getFunds(self[,ktype = Query.DAY])
+    .. py:method:: get_funds(self[,ktype = Query.DAY])
     
         获取账户当前时刻的资产详情
         
         :param Query.KType ktype: K线类型
         :rtype: FundsRecord
         
-    .. py:method:: getFunds(self, datetime, [ktype = Query.DAY])
+    .. py:method:: get_funds(self, datetime, [ktype = Query.DAY])
     
         获取指定时刻的资产市值详情
         
@@ -244,7 +244,7 @@
         :param Query.KType ktype: K线类型
         :rtype: FundsRecord
         
-    .. py:method:: getFundsCurve(self, dates[, ktype = Query.DAY])
+    .. py:method:: get_funds_curve(self, dates[, ktype = Query.DAY])
     
         获取资产净值曲线
         
@@ -253,7 +253,7 @@
         :return: 资产净值列表
         :rtype: PriceList
         
-    .. py:method:: getProfitCurve(self, dates[, ktype = Query.DAY])
+    .. py:method:: get_profit_curve(self, dates[, ktype = Query.DAY])
     
         获取收益曲线，即扣除历次存入资金后的资产净值曲线
         
@@ -262,7 +262,7 @@
         :return: 收益曲线
         :rtype: PriceList
         
-    .. py:method:: addTradeRecord(self, tr)
+    .. py:method:: add_trade_record(self, tr)
 
         直接加入交易记录，如果加入初始化账户记录，将清除全部已有交易及持仓记录。
 
@@ -276,13 +276,13 @@
         
         :param str path: 输出文件所在目录
         
-    .. py:method:: regBroker(self, broker)
+    .. py:method:: reg_broker(self, broker)
     
         注册订单代理。可执行多次该命令注册多个订单代理。
         
         :param OrderBrokerBase broker: 订单代理实例
         
-    .. py:method:: clearBroker(self)
+    .. py:method:: clear_broker(self)
 
         清空所有已注册订单代理
         

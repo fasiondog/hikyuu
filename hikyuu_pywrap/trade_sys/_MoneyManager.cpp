@@ -107,13 +107,48 @@ string (MoneyManagerBase::*mm_get_name)() const = &MoneyManagerBase::name;
 void (MoneyManagerBase::*mm_set_name)(const string&) = &MoneyManagerBase::name;
 
 void export_MoneyManager() {
-    class_<MoneyManagerWrap, boost::noncopyable>("MoneyManagerBase", init<>())
+    class_<MoneyManagerWrap, boost::noncopyable>("MoneyManagerBase", R"(资金管理策略基类
+
+公共参数：
+
+    - auto-checkin=False (bool) : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。
+    - max-stock=20000 (int) : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
+    - disable_ev_force_clean_position=False (bool) : 禁用市场环境失效时强制清仓
+    - disable_cn_force_clean_position=False (bool) : 禁用系统有效条件失效时强制清仓
+
+自定义资金管理策略接口：
+
+    - buyNotify : 【可选】接收实际买入通知，预留用于多次增减仓处理
+    - sellNotify : 【可选】接收实际卖出通知，预留用于多次增减仓处理
+    - _getBuyNumber : 【必须】获取指定交易对象可买入的数量
+    - _getSellNumber : 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
+    - _reset : 【可选】重置私有属性
+    - _clone : 【必须】克隆接口)",
+                                                 init<>())
       .def(init<const string&>())
       .def(self_ns::str(self))
-      .add_property("name", mm_get_name, mm_set_name)
-      .def("getParam", &MoneyManagerBase::getParam<boost::any>)
-      .def("setParam", &MoneyManagerBase::setParam<object>)
-      .def("haveParam", &MoneyManagerBase::haveParam)
+      .def(self_ns::repr(self))
+
+      .add_property("name", mm_get_name, mm_set_name, "名称")
+
+      .def("getParam", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
+
+    获取指定的参数
+
+    :param str name: 参数名称
+    :return: 参数值
+    :raises out_of_range: 无此参数)")
+
+      .def("setParam", &MoneyManagerBase::setParam<object>, R"(set_param(self, name, value)
+
+    设置参数
+
+    :param str name: 参数名称
+    :param value: 参数值
+    :raises logic_error: Unsupported type! 不支持的参数类型)")
+
+      .def("haveParam", &MoneyManagerBase::haveParam, "是否存在指定参数")
+
       .def("setTM", &MoneyManagerBase::setTM)
       .def("getTM", &MoneyManagerBase::getTM)
       .def("setQuery", &MoneyManagerBase::setQuery)

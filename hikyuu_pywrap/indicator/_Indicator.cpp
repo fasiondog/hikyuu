@@ -41,7 +41,7 @@ void export_Indicator() {
       .def("get_param", &Indicator::getParam<boost::any>, R"(get_param(self, name)
 
     获取指定的参数
-        
+
     :param str name: 参数名称
     :return: 参数值
     :raises out_of_range: 无此参数)")

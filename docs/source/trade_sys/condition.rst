@@ -7,11 +7,11 @@
 内建系统有效条件
 ----------------
 
-.. py:function:: CN_OPLine(op)
+.. py:function:: CN_OPLine(ind)
 
     固定使用股票最小交易量进行交易，计算权益曲线的op值，当权益曲线高于op时，系统有效，否则无效。
 
-    :param Indicator op: Indicator实例
+    :param Indicator ind: Indicator实例
     :return: 系统有效条件实例
     :rtype: ConditionBase
 
@@ -45,6 +45,9 @@
     系统有效条件基类
     
     .. py:attribute:: name 名称
+    .. py:attribute:: to 设置或获取交易对象
+    .. py:attribute:: tm 设置或获取交易管理账户
+    .. py:attribute:: sg 设置或获取交易信号指示器
     
     .. py:method:: __init__(self[, name="ConditionBase"])
     
@@ -52,7 +55,7 @@
         
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -60,7 +63,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -68,47 +71,15 @@
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
-        
-    .. py:method:: setTO(self, k)
-    
-        :param KData k: 设置交易对象
-        
-    .. py:method:: getTO(self)
-    
-        :return: 交易对象
-        :rtype: KData    
-
-    .. py:method:: setTM(self, tm)
-    
-        :param TradeManager tm: 设置交易管理账户
-        
-    .. py:method:: getTM(self)
-    
-        获取交易管理账户
-        
-        :return: 交易管理账户
-        :rtype: TradeManager        
-        
-    .. py:method:: setSG(self, sg)
-
-        设置交易信号指示器
-        
-        :param SignalBase sg:
-        
-    .. py:method:: getSG(self)
-    
-        获取信号指示器
-        
-        :rtype: SignalBase
-    
-    .. py:method:: isValid(self, datetime)
+            
+    .. py:method:: is_valid(self, datetime)
     
         指定时间系统是否有效
         
         :param Datetime datetime: 指定时间
         :return: True 有效 | False 无效
     
-    .. py:method:: _addValid(self, datetime)
+    .. py:method:: _add_valid(self, datetime)
     
         加入有效时间，在_calculate中调用
         

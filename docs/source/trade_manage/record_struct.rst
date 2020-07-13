@@ -65,9 +65,9 @@
     .. py:attribute:: stock     股票（Stock）
     .. py:attribute:: datetime  交易时间（Datetime）
     .. py:attribute:: business  交易类型
-    .. py:attribute:: planPrice 计划交易价格（float）
-    .. py:attribute:: realPrice 实际交易价格（float）
-    .. py:attribute:: goalPrice 目标价格（float），如果为0表示未限定目标
+    .. py:attribute:: plan_price 计划交易价格（float）
+    .. py:attribute:: real_price 实际交易价格（float）
+    .. py:attribute:: goal_price 目标价格（float），如果为0表示未限定目标
     .. py:attribute:: number    成交数量（float）
     .. py:attribute:: cost      交易成本
 

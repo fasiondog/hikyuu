@@ -33,6 +33,7 @@
     市场环境判定策略基类
     
     .. py:attribute:: name 名称
+    .. py:attribute:: query 设置或获取查询条件
     
     .. py:method:: __init__(self[, name='EnvironmentBase'])
     
@@ -40,7 +41,7 @@
         
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -48,7 +49,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -57,27 +58,14 @@
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
         
-    .. py:method:: setQuery(self, query)
-    
-        设置查询条件
-    
-        :param Query query:  查询条件
-        
-    .. py:method:: getQuery(self)
-    
-        获取查询条件
-        
-        :return: 查询条件
-        :rtype: Query 
-
-    .. py:method:: isValid(self, datetime)
+    .. py:method:: is_valid(self, datetime)
     
         指定时间系统是否有效
         
         :param Datetime datetime: 指定时间
         :return: True 有效 | False 无效
     
-    .. py:method:: _addValid(self, datetime)
+    .. py:method:: _add_valid(self, datetime)
     
         加入有效时间，在_calculate中调用
         

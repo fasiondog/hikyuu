@@ -86,6 +86,36 @@ def getDateRange(*args, **kwargs):
 #--------------------------------------------------------------------
 
 
+@deprecated_attr({'size': '__len__', 'get': '__getitem__'})
+def Block_getattr(self, name):
+    return getattr(self, name)
+
+
+Block.__getattr__ = Block_getattr
+
+
+@deprecated_attr(
+    {
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'isValid': 'is_valid',
+        '_add_valid': '_add_valid',
+        'setTO': 'to',
+        'getTO': 'to',
+        'setTM': 'tm',
+        'getTM': 'tm',
+        'setSG': 'sg',
+        'getSG': 'sg'
+    }
+)
+def ConditionBase_getattr(self, name):
+    return getattr(self, name)
+
+
+ConditionBase.__getattr__ = ConditionBase_getattr
+
+
 @deprecated_attr(
     {
         'isNull': 'is_null',
@@ -125,12 +155,22 @@ def Datetime_getattr(self, name):
 Datetime.__getattr__ = Datetime_getattr
 
 
-@deprecated_attr({'size': '__len__', 'get': '__getitem__'})
-def Block_getattr(self, name):
+@deprecated_attr(
+    {
+        'setQuery': 'query',
+        'getQuery': 'query',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'isValid': 'is_valid',
+        '_addValid': '_add_valid'
+    }
+)
+def EnvironmentBase_getattr(self, name):
     return getattr(self, name)
 
 
-Block.__getattr__ = Block_getattr
+EnvironmentBase.__getattr__ = EnvironmentBase_getattr
 
 
 @deprecated_attr(
@@ -385,7 +425,42 @@ def TradeCostBase_getattr(self, name):
 TradeCostBase.__getattr__ = TradeCostBase_getattr
 
 
-@deprecated_attr({})
+@deprecated_attr(
+    {
+        'initCash': 'init_cash',
+        'currentCash': 'current_cash',
+        'initDatetime': 'init_datetime',
+        'firstDatetime': 'first_datetime',
+        'lastDatetime': 'last_datetime',
+        'costFunc': 'cost_func',
+        'brokeLastDatetime': 'broker_last_datetime',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'regBroker': 'reg_broker',
+        'clearBroker': 'clear_broker',
+        'getStockNumber': 'get_stock_num',
+        'getHoldNumber': 'get_hold_num',
+        'getTradeList': 'get_trade_list',
+        'getPositionList': 'get_position_list',
+        'getHistoryPositionList': 'get_history_position_list',
+        'getPosition': 'get_position',
+        'getBuyCost': 'get_buy_cost',
+        'getSellCost': 'get_sell_cost',
+        'getFunds': 'get_funds',
+        'getFundsCurve': 'get_funds_curve',
+        'getProfitCurve': 'get_profit_curve',
+        'addTradeRecord': 'add_trade_record'
+    }
+)
+def TradeManager_getattr(self, name):
+    return getattr(self, name)
+
+
+TradeManager.__getattr__ = TradeManager_getattr
+
+
+@deprecated_attr({'planPrice': 'plan_price', 'realPrice': 'real_price', 'goalPrice': 'goal_price'})
 def TradeRecord_getattr(self, name):
     return getattr(self, name)
 

@@ -41,9 +41,9 @@ void export_TradeRecord() {
       .def_readwrite("stock", &TradeRecord::stock, "股票（Stock）")
       .def_readwrite("datetime", &TradeRecord::datetime, " 交易时间（Datetime）")
       .def_readwrite("business", &TradeRecord::business, "交易类型（BUSINESS）")
-      .def_readwrite("planPrice", &TradeRecord::planPrice, "计划交易价格（float）")
-      .def_readwrite("realPrice", &TradeRecord::realPrice, "实际交易价格（float）")
-      .def_readwrite("goalPrice", &TradeRecord::goalPrice,
+      .def_readwrite("plan_price", &TradeRecord::planPrice, "计划交易价格（float）")
+      .def_readwrite("real_price", &TradeRecord::realPrice, "实际交易价格（float）")
+      .def_readwrite("goal_price", &TradeRecord::goalPrice,
                      "目标价格（float），如果为0表示未限定目标")
       .def_readwrite("number", &TradeRecord::number, "成交数量（float）")
       .def_readwrite("cost", &TradeRecord::cost, "交易成本")
