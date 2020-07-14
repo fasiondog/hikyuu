@@ -39,6 +39,8 @@ System.SLIPPAGE = System.Part.SLIPPAGE
 System.INVALID = System.Part.INVALID
 
 SystemList.__getitem__ = list_getitem
+SystemList.__str__ = lambda self: str(list(self))
+SystemList.__repr__ = lambda self: repr(list(self))
 
 #SystemPart = System.Part
 
