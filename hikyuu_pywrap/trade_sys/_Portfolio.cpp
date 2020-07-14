@@ -23,9 +23,11 @@ void export_Portfolio() {
       .def(init<const string&>())
       .def(init<const TradeManagerPtr&, const SelectorPtr&, const AFPtr&>())
       .def(self_ns::str(self))
-      .def("getParam", &Portfolio::getParam<boost::any>)
-      .def("setParam", &Portfolio::setParam<object>)
-      .def("haveParam", &Portfolio::haveParam)
+      .def(self_ns::repr(self))
+
+      .def("get_param", &Portfolio::getParam<boost::any>)
+      .def("set_param", &Portfolio::setParam<object>)
+      .def("have_param", &Portfolio::haveParam)
 
       .add_property("name", make_function(pf_get_name, return_value_policy<copy_const_reference>()),
                     pf_set_name)

@@ -147,7 +147,7 @@
     
         移滑价差算法
 
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -155,7 +155,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -163,38 +163,26 @@
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
-        
-    .. py:method:: getTO(self)
-
-        获取交易对象，即运行 :py:meth:`System.run` 方法时，stock + query 获取到的 KData
-        
-        :rtype: KData
-        
-    .. py:method:: setTO(self, kdata)
-
-        设置交易对象，即运行 :py:meth:`Systemrun` 方法时，stock + query 获取到的 KData
-        
-        :param KData kdata: K线数据
-        
-    .. py:method:: getStock(self)
+                
+    .. py:method:: get_stock(self)
     
         获取关联的证券
         
         :rtype: Stock
         
-    .. py:method:: getTradeRecordList(self)
+    .. py:method:: get_trade_record_list(self)
     
         获取交易记录
         
         :rtype: TradeRecordList
         
-    .. py:method:: getBuyTradeRequest(self)
+    .. py:method:: get_buy_trade_request(self)
     
         获取买入请求，“delay”模式下查看下一时刻是否存在买入操作
         
         :rtype: TradeRequest
 
-    .. py:method:: getSellTradeRequest(self)
+    .. py:method:: get_sell_trade_request(self)
     
         获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作
         
@@ -210,7 +198,7 @@
         
     .. py:method:: reset(self, with_tm, with_ev)
     
-        复位操作。            TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统运行时被重新清空并计算。尤其是在共享TM时需要注意！
+        复位操作。TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统运行时被重新清空并计算。尤其是在共享TM时需要注意！
         
         :param bool with_tm: 是否复位TM组件
         :param bool with_ev: 是否复位EV组件

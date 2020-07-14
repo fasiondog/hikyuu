@@ -609,9 +609,9 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
                        否则，使用该参数作为交易对象
     """
     if kdata is None:
-        kdata = sg.getTO()
+        kdata = sg.to
     else:
-        sg.setTO(kdata)
+        sg.to = kdata
 
     refdates = kdata.get_datetime_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
@@ -633,7 +633,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         arrow_buy = dict(facecolor='red', frac=0.5)
         arrow_sell = dict(facecolor='blue', frac=0.5)
 
-    dates = sg.getBuySignal()
+    dates = sg.get_buy_signal()
     for d in dates:
         if d not in date_index:
             continue
@@ -647,7 +647,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
             color='red'
         )
 
-    dates = sg.getSellSignal()
+    dates = sg.get_sell_signal()
     for d in dates:
         if d not in date_index:
             continue
@@ -672,9 +672,9 @@ def cnplot(cn, new=True, axes=None, kdata=None):
                         指定了交易对象，否则，使用该参数作为交易对象
     """
     if kdata is None:
-        kdata = cn.getTO()
+        kdata = cn.to
     else:
-        cn.setTO(kdata)
+        cn.to = kdata
 
     refdates = kdata.get_datetime_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
@@ -702,7 +702,7 @@ def sysplot(sys, new=True, axes=None, style=1):
     :param axes:  指定在那个轴对象中进行绘制
     :param style: 1 | 2 信号箭头绘制样式
     """
-    kdata = sys.getTO()
+    kdata = sys.to
 
     refdates = kdata.get_datetime_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])

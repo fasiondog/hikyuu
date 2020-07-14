@@ -49,6 +49,8 @@
     盈利目标策略基类
     
     .. py:attribute:: name 名称
+    .. py:attribute:: to 设置或获取交易对象
+    .. py:attribute:: tm 设置或获取交易管理账户
     
     .. py:method:: __init__(self[, name="ProfitGoalBase"])
     
@@ -56,7 +58,7 @@
         
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -64,7 +66,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -73,25 +75,6 @@
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
         
-    .. py:method:: setTO(self, k)
-    
-        :param KData k: 设置交易对象
-        
-    .. py:method:: getTO(self)
-    
-        :return: 交易对象
-        :rtype: KData
-        
-    .. py:method:: setTM(self, tm)
-    
-        :param TradeManager tm: 设置交易管理账户
-        
-    .. py:method:: getTM(self)
-    
-        获取交易管理账户
-        
-        :rtype: TradeManager
-
     .. py:method:: reset(self)
     
         复位操作
@@ -100,7 +83,7 @@
     
         克隆操作        
         
-    .. py:method:: getGoal(self, datetime, price)
+    .. py:method:: get_goal(self, datetime, price)
     
         【重载接口】获取盈利目标价格，返回constant.null_price时，表示未限定目标；返回0意味着需要卖出
         
@@ -109,13 +92,13 @@
         :return: 目标价格
         :rtype: float
         
-    .. py:method:: buyNotify(self, trade_record)
+    .. py:method:: buy_notify(self, trade_record)
     
         【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
         
         :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
         
-    .. py:method:: sellNotify(self, trade_record)
+    .. py:method:: sell_notify(self, trade_record)
     
         【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
         

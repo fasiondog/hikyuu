@@ -170,7 +170,7 @@
     
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -178,7 +178,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -186,49 +186,40 @@
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
-        
-    .. py:method:: setTO(self, k)
-    
-        :param KData k: 设置交易对象
-        
-    .. py:method:: getTO(self)
-    
-        :return: 交易对象
-        :rtype: KData
-        
-    .. py:method:: shouldBuy(self, datetime)
+                
+    .. py:method:: should_buy(self, datetime)
     
         指定时刻是否可以买入
     
         :param Datetime datetime: 指定时刻
         :rtype: bool
     
-    .. py:method:: shouldSell(self, datetime)
+    .. py:method:: should_sell(self, datetime)
     
         指定时刻是否可以卖出
         
         :param Datetime datetime: 指定时刻
         :rtype: bool
     
-    .. py:method:: getBuySignal(self)
+    .. py:method:: get_buy_signal(self)
     
         获取所有买入指示日期列表
         
         :rtype: DatetimeList
     
-    .. py:method:: getSellSignal(self)
+    .. py:method:: get_sell_signal(self)
     
         获取所有卖出指示日期列表
         
         :rtype: DatetimeList
     
-    .. py:method:: _addBuySignal(self, datetime)
+    .. py:method:: _add_buy_signal(self, datetime)
     
         加入买入信号，在_calculate中调用
         
         :param Datetime datetime: 指示买入的日期
     
-    .. py:method:: _addSellSignal(self, datetime)
+    .. py:method:: _add_sell_signal(self, datetime)
     
         加入卖出信号，在_calculate中调用
 

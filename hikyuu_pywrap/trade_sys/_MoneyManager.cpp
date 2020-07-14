@@ -130,8 +130,12 @@ void export_MoneyManager() {
       .def(self_ns::repr(self))
 
       .add_property("name", mm_get_name, mm_set_name, "名称")
+      .add_property("tm", &MoneyManagerBase::getTM, &MoneyManagerBase::setTM,
+                    "设置或获取交易管理对象")
+      .add_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
+                    "设置或获取查询条件")
 
-      .def("getParam", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
+      .def("get_param", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
     获取指定的参数
 
@@ -139,7 +143,7 @@ void export_MoneyManager() {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("setParam", &MoneyManagerBase::setParam<object>, R"(set_param(self, name, value)
+      .def("set_param", &MoneyManagerBase::setParam<object>, R"(set_param(self, name, value)
 
     设置参数
 
@@ -149,29 +153,87 @@ void export_MoneyManager() {
 
       .def("haveParam", &MoneyManagerBase::haveParam, "是否存在指定参数")
 
-      .def("setTM", &MoneyManagerBase::setTM)
-      .def("getTM", &MoneyManagerBase::getTM)
-      .def("setQuery", &MoneyManagerBase::setQuery)
-      .def("getQuery", &MoneyManagerBase::getQuery)
-      .def("reset", &MoneyManagerBase::reset)
-      .def("clone", &MoneyManagerBase::clone)
-      .def("buyNotify", &MoneyManagerBase::buyNotify, &MoneyManagerWrap::default_buyNotify)
-      .def("sellNotify", &MoneyManagerBase::sellNotify, &MoneyManagerWrap::default_sellNotify)
+      .def("reset", &MoneyManagerBase::reset, "复位操作")
+      .def("clone", &MoneyManagerBase::clone, "克隆操作")
 
-      .def("getBuyNumber", &MoneyManagerBase::getBuyNumber)
-      .def("getSellNumber", &MoneyManagerBase::getSellNumber)
-      .def("getSellShortNumber", &MoneyManagerBase::getSellShortNumber)
+      .def("buy_notify", &MoneyManagerBase::buyNotify, &MoneyManagerWrap::default_buyNotify,
+           R"(buy_notify(self, trade_record)
+
+    【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
+
+    :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录)")
+
+      .def("sell_notify", &MoneyManagerBase::sellNotify, &MoneyManagerWrap::default_sellNotify,
+           R"(sell_notify(self, trade_record)
+
+    【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
+
+    :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录)")
+
+      .def("get_buy_num", &MoneyManagerBase::getBuyNumber,
+           R"(get_buy_num(self, datetime, stock, price, risk, part_from)
+
+    获取指定交易对象可买入的数量
+
+    :param Datetime datetime: 交易时间
+    :param Stock stock: 交易对象
+    :param float price: 交易价格
+    :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+    :param System.Part part_from: 来源系统组件
+    :return: 可买入数量
+    :rtype: float)")
+
+      .def("get_sell_num", &MoneyManagerBase::getSellNumber,
+           R"(get_sell_num(self, datetime, stock, price, risk, part_from)
+
+    获取指定交易对象可卖出的数量
+    
+    :param Datetime datetime: 交易时间
+    :param Stock stock: 交易对象
+    :param float price: 交易价格
+    :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+    :param System.Part part_from: 来源系统组件
+    :return: 可卖出数量
+    :rtype: float)")
+
+      .def("_get_buy_num", pure_virtual(&MoneyManagerBase::_getBuyNumber),
+           R"(_get_buy_num(self, datetime, stock, price, risk, part_from)
+
+    【重载接口】获取指定交易对象可买入的数量
+
+    :param Datetime datetime: 交易时间
+    :param Stock stock: 交易对象
+    :param float price: 交易价格
+    :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+    :param System.Part part_from: 来源系统组件
+    :return: 可买入数量
+    :rtype: float)")
+
+      .def("_get_sell_num", &MoneyManagerBase::_getSellNumber,
+           &MoneyManagerWrap::default_getSellNumber,
+           R"(_get_sell_num(self, datetime, stock, price, risk, part_from)
+
+    【重载接口】获取指定交易对象可卖出的数量。如未重载，默认为卖出全部已持仓数量。
+
+    :param Datetime datetime: 交易时间
+    :param Stock stock: 交易对象
+    :param float price: 交易价格
+    :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+    :param System.Part part_from: 来源系统组件
+    :return: 可卖出数量
+    :rtype: float)")
+
+      /*.def("getSellShortNumber", &MoneyManagerBase::getSellShortNumber)
       .def("getBuyShortNumber", &MoneyManagerBase::getBuyShortNumber)
-
-      .def("_getBuyNumber", pure_virtual(&MoneyManagerBase::_getBuyNumber))
-      .def("_getSellNumber", &MoneyManagerBase::_getSellNumber,
-           &MoneyManagerWrap::default_getSellNumber)
       .def("_getSellShortNumber", &MoneyManagerBase::_getSellShortNumber,
            &MoneyManagerWrap::default_getSellShortNumber)
       .def("_getBuyShortNumber", &MoneyManagerBase::_getBuyShortNumber,
-           &MoneyManagerWrap::default_getBuyShortNumber)
-      .def("_reset", &MoneyManagerBase::_reset, &MoneyManagerWrap::default_reset)
-      .def("_clone", pure_virtual(&MoneyManagerBase::_clone))
+           &MoneyManagerWrap::default_getBuyShortNumber)*/
+
+      .def("_reset", &MoneyManagerBase::_reset, &MoneyManagerWrap::default_reset,
+           R"(【重载接口】子类复位接口，复位内部私有变量)")
+      .def("_clone", pure_virtual(&MoneyManagerBase::_clone), "【重载接口】子类克隆接口")
+
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(name_init_pickle_suite<MoneyManagerBase>())
 #endif
@@ -179,11 +241,48 @@ void export_MoneyManager() {
 
     register_ptr_to_python<MoneyManagerPtr>();
 
-    def("MM_Nothing", MM_Nothing);
-    def("MM_FixedRisk", MM_FixedRisk, (arg("risk") = 1000.00));
-    def("MM_FixedCapital", MM_FixedCapital, (arg("capital") = 10000.00));
-    def("MM_FixedCount", MM_FixedCount, (arg("n") = 100));
-    def("MM_FixedPercent", MM_FixedPercent, (arg("p") = 0.03));
-    def("MM_FixedUnits", MM_FixedUnits, (arg("n") = 33));
-    def("MM_WilliamsFixedRisk", MM_WilliamsFixedRisk, (arg("p") = 0.1, arg("max_loss") = 1000.0));
+    def("MM_Nothing", MM_Nothing, R"(MM_Nothing()
+
+    特殊的资金管理策略，相当于不做资金管理，有多少钱买多少。)");
+
+    def("MM_FixedRisk", MM_FixedRisk, (arg("risk") = 1000.00), R"(MM_FixedRisk([risk = 1000.00])
+
+    固定风险资金管理策略对每笔交易限定一个预先确定的或者固定的资金风险，如每笔交易固定风险1000元。公式：交易数量 = 固定风险 / 交易风险。
+
+    :param float risk: 固定风险
+    :return: 资金管理策略实例)");
+
+    def("MM_FixedCapital", MM_FixedCapital, (arg("capital") = 10000.00),
+        R"(MM_FixedCapital([capital = 10000.0])
+
+    固定资本资金管理策略
+
+    :param float capital: 固定资本单位
+    :return: 资金管理策略实例)");
+
+    def("MM_FixedCount", MM_FixedCount, (arg("n") = 100), R"(MM_FixedCount([n = 100])
+
+    固定交易数量资金管理策略。每次买入固定的数量。
+    
+    :param float n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
+    :return: 资金管理策略实例)");
+
+    def("MM_FixedPercent", MM_FixedPercent, (arg("p") = 0.03), R"(MM_FixedPercent([p = 0.03])
+
+    固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
+    
+    :param float p: 百分比
+    :return: 资金管理策略实例)");
+
+    def("MM_FixedUnits", MM_FixedUnits, (arg("n") = 33), R"(MM_FixedUnits([n = 33])
+
+    固定单位资金管理策略
+
+    :param int n: n个资金单位
+    :return: 资金管理策略实例)");
+
+    def("MM_WilliamsFixedRisk", MM_WilliamsFixedRisk, (arg("p") = 0.1, arg("max_loss") = 1000.0),
+        R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
+
+    威廉斯固定风险资金管理策略)");
 }

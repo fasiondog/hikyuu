@@ -50,7 +50,7 @@
         
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -58,7 +58,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -67,16 +67,7 @@
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
         
-    .. py:method:: setTO(self, k)
-    
-        :param KData k: 设置交易对象
-        
-    .. py:method:: getTO(self)
-    
-        :return: 交易对象
-        :rtype: KData
-        
-    .. py:method:: getRealBuyPrice(self, datetime, price)
+    .. py:method:: get_real_buy_price(self, datetime, price)
 
         【重载接口】计算实际买入价格
         
@@ -85,7 +76,7 @@
         :return: 实际买入价格
         :rtype: float
         
-    .. py:method:: getRealSellPrice(self, datetime, price)
+    .. py:method:: get_real_sell_price(self, datetime, price)
 
         【重载接口】计算实际卖出价格
         

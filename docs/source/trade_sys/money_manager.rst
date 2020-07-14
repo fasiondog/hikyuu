@@ -30,7 +30,7 @@
 
     固定交易数量资金管理策略。每次买入固定的数量。
     
-    :param int n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
+    :param float n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
     :return: 资金管理策略实例
 
 
@@ -116,7 +116,9 @@
 
     资金管理策略基类
     
-    .. py:attribute:: name 名称
+    .. py:attribute:: name  名称
+    .. py:attribute:: tm    设置或获取交易管理对象
+    .. py:attribute:: query 设置或获取查询条件
     
     .. py:method:: __init__(self[, name="MoneyManagerBase])
     
@@ -124,7 +126,7 @@
         
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
         
@@ -136,7 +138,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -144,26 +146,6 @@
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
-
-    .. py:method:: setTM(self, tm)
-    
-        :param TradeManager tm: 设置交易管理对象
-
-    .. py:method:: getTM(self, tm)
-
-        :param TradeManager tm: 获取交易管理对象
-        
-    .. py:method:: setQuery(self, query)
-    
-        设置查询条件
-    
-        :param Query query:  查询条件
-        
-    .. py:method:: getQuery(self)
-    
-        获取查询条件
-        
-        :rtype: Query 
         
     .. py:method:: reset(self)
     
@@ -173,7 +155,7 @@
     
         克隆操作
         
-    .. py:method:: getBuyNumber(self, datetime, stock, price, risk, part_from)
+    .. py:method:: get_buy_num(self, datetime, stock, price, risk, part_from)
     
         获取指定交易对象可买入的数量
         
@@ -183,9 +165,9 @@
         :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :param System.Part part_from: 来源系统组件
         :return: 可买入数量
-        :rtype: int
+        :rtype: float
         
-    .. py:method:: getSellNumber(self, datetime, stock, price, risk, part_from)
+    .. py:method:: get_sell_num(self, datetime, stock, price, risk, part_from)
     
         获取指定交易对象可卖出的数量
         
@@ -195,21 +177,21 @@
         :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :param System.Part part_from: 来源系统组件
         :return: 可卖出数量
-        :rtype: int
+        :rtype: float
         
-    .. py:method:: buyNotify(self, trade_record)
+    .. py:method:: buy_notify(self, trade_record)
     
         【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
         
         :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
         
-    .. py:method:: sellNotify(self, trade_record)
+    .. py:method:: sell_notify(self, trade_record)
     
         【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
         
         :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录
     
-    .. py:method:: _getBuyNumber(self, datetime, stock, price, risk, part_from)
+    .. py:method:: _get_buy_num(self, datetime, stock, price, risk, part_from)
 
         【重载接口】获取指定交易对象可买入的数量
         
@@ -219,9 +201,9 @@
         :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :param System.Part part_from: 来源系统组件
         :return: 可买入数量
-        :rtype: int
+        :rtype: float
 
-    .. py:method:: _getSellNumber(self, datetime, stock, price, risk, part_from)
+    .. py:method:: _get_sell_num(self, datetime, stock, price, risk, part_from)
     
         【重载接口】获取指定交易对象可卖出的数量。如未重载，默认为卖出全部已持仓数量。
         
@@ -231,7 +213,7 @@
         :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
         :param System.Part part_from: 来源系统组件
         :return: 可卖出数量
-        :rtype: int
+        :rtype: float
         
     .. py:method:: _reset(self)
     

@@ -8,9 +8,8 @@ def deprecated_func(new_func, old_func_name, new_func_name):
     def wrap_deprecated_func(func):
         def wrapfunc(*args, **kwarg):
             print(
-                'Deprecated warning: "{}" will be deprecated, please use: "{}"'.format(
-                    old_func_name, new_func_name
-                )
+                #'Deprecated warning: "{}" will be deprecated, please use: "{}"'.format(
+                '警告: "{}" 函数即将废弃，请使用 "{}" 代替'.format(old_func_name, new_func_name)
             )
             return new_func(*args, **kwarg)
 
@@ -26,11 +25,14 @@ def deprecated_attr(name_dict):
             clzname = self.__class__.__name__
             if name in name_dict:
                 if name_dict[name] is None:
-                    print('Removed warning: the {}.{} will be removed!'.format(clzname, name))
+                    #print('Removed warning: the {}.{} will be removed!'.format(clzname, name))
+                    print('警告: "{}.{}" 接口已被删除!'.format(clzname, name))
                 else:
                     print(
-                        'Deprecated warning: the "{}.{}" will be deprecated, please use: "{}.{}"'.
-                        format(clzname, name, clzname, name_dict[name])
+                        #'Deprecated warning: the "{}.{}" will be deprecated, please use: "{}.{}"'.
+                        '警告: "{}.{}" 即将被废弃，请使用 "{}.{}" 代替'.format(
+                            clzname, name, clzname, name_dict[name]
+                        )
                     )
                 return func(self, name_dict[name])
             if name not in dir(self):
@@ -76,6 +78,16 @@ def QueryByDate(*args, **kwargs):
 
 @deprecated_func(get_date_range, 'getDateRange', 'get_date_range')
 def getDateRange(*args, **kwargs):
+    pass
+
+
+@deprecated_func(SP_FixedPercent, 'SL_FixedPercent', 'SP_FixedPercent')
+def SL_FixedPercent(*args, **kwargs):
+    pass
+
+
+@deprecated_func(SP_FixedValue, 'SL_FixedValue', 'SP_FixedValue')
+def SL_FixedValue(*args, **kwargs):
     pass
 
 
@@ -263,6 +275,30 @@ MarketInfo.__getattr__ = MarketInfo_getattr
 
 @deprecated_attr(
     {
+        'setTM': 'tm',
+        'getTM': 'tm',
+        'setQuery': 'query',
+        'getQuery': 'query',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'buyNotify': 'buy_notify',
+        'sellNotify': 'sell_notify',
+        'getBuyNumber': 'get_buy_num',
+        'getSellNumber': 'get_sell_num',
+        '_getBuyNumber': '_get_buy_num',
+        '_getSellNumber': '_get_sell_num',
+    }
+)
+def MoneyManagerBase_getattr(self, name):
+    return getattr(self, name)
+
+
+MoneyManagerBase.__getattr__ = MoneyManagerBase_getattr
+
+
+@deprecated_attr(
+    {
         'set': '__setitem__',
         'get': '__getitem__',
         'have': '__contains__',
@@ -283,6 +319,14 @@ def Performance_getattr(self, name):
 
 
 Performance.__getattr__ = Performance_getattr
+
+
+@deprecated_attr({'getParam': 'get_param', 'setParam': 'set_param', 'haveParam': 'have_param'})
+def Portfolio_getattr(self, name):
+    return getattr(self, name)
+
+
+Portfolio.__getattr__ = Portfolio_getattr
 
 
 @deprecated_attr(
@@ -306,6 +350,27 @@ PositionRecord.__getattr__ = PositionRecord_getattr
 
 @deprecated_attr(
     {
+        'getTM': 'tm',
+        'setTM': 'tm',
+        'getTO': 'to',
+        'setTO': 'to',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'buyNotify': 'buy_notify',
+        'sellNotify': 'sell_notify',
+        'getGoal': 'get_goal'
+    }
+)
+def ProfitGoalBase_getattr(self, name):
+    return getattr(self, name)
+
+
+ProfitGoalBase.__getattr__ = ProfitGoalBase_getattr
+
+
+@deprecated_attr(
+    {
         'startDatetime': 'start_datetime',
         'endDatetime': 'end_datetime',
         'queryType': 'query_type',
@@ -318,6 +383,46 @@ def Query_getattr(self, name):
 
 
 Query.__getattr__ = Query_getattr
+
+
+@deprecated_attr(
+    {
+        'getTO': 'to',
+        'setTO': 'to',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'shouldBuy': 'should_buy',
+        'shouldSell': 'should_sell',
+        'getBuySignal': 'get_buy_signal',
+        'getSellSignal': 'get_sell_signal',
+        '_addBuySignal': '_add_buy_signal',
+        '_addSellSignal': '_add_sell_signal'
+    }
+)
+def SignalBase_getattr(self, name):
+    return getattr(self, name)
+
+
+SignalBase.__getattr__ = SignalBase_getattr
+
+
+@deprecated_attr(
+    {
+        'getTO': 'to',
+        'setTO': 'to',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'getRealBuyPrice': 'get_real_buy_price',
+        'getRealSellPrice': 'get_real_sell_price'
+    }
+)
+def SlippageBase_getattr(self, name):
+    return getattr(self, name)
+
+
+SlippageBase.__getattr__ = SlippageBase_getattr
 
 
 @deprecated_attr(
@@ -408,6 +513,45 @@ def StockWeight_getattr(self, name):
 
 
 StockWeight.__getattr__ = StockWeight_getattr
+
+
+@deprecated_attr(
+    {
+        'getTO': 'to',
+        'setTO': 'to',
+        'getTM': 'tm',
+        'setTM': 'tm',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'getPrice': 'get_price'
+    }
+)
+def StoplossBase_getattr(self, name):
+    return getattr(self, name)
+
+
+StoplossBase.__getattr__ = StoplossBase_getattr
+
+
+@deprecated_attr(
+    {
+        'getTO': 'to',
+        'setTO': 'to',
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'getStock': 'get_stock',
+        'getTradeRecordList': 'get_trade_record_list',
+        'getBuyTradeRequest': 'get_buy_trade_request',
+        'getSellTradeRequest': 'get_sell_trade_request'
+    }
+)
+def System_getattr(self, name):
+    return getattr(self, name)
+
+
+System.__getattr__ = System_getattr
 
 
 @deprecated_attr(

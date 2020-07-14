@@ -73,12 +73,14 @@
     止损/止赢算法基类
     
     .. py:attribute:: name 名称
+    .. py:attribute:: tm 设置或获取交易管理实例
+    .. py:attribute:: to 设置或获取交易对象
     
     .. py:method:: __init__(self[, name="StoplossBase"])
     
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
     
@@ -86,7 +88,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -94,27 +96,6 @@
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
-
-    .. py:method:: setTM(self, tm)
-        
-        设置交易管理实例
-        
-        :param TradeManager tm: 交易管理实例
-        
-    .. py:method:: getTM(self)
-    
-        获取交易管理实例
-        
-        :rtype: TradeManager
-        
-    .. py:method:: setTO(self, k)
-    
-        :param KData k: 设置交易对象
-        
-    .. py:method:: getTO(self)
-    
-        :return: 交易对象
-        :rtype: KData
    
     .. py:method:: reset(self)
     
@@ -124,7 +105,7 @@
     
         克隆操作
 
-    .. py:method:: getPrice(self, datetime, price)
+    .. py:method:: get_price(self, datetime, price)
     
         【重载接口】获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
         
