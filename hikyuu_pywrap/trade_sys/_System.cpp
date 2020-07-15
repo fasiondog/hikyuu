@@ -138,6 +138,7 @@ void export_System() {
 
         .add_property("name", sys_get_name, sys_set_name, "系统名称")
         .add_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
+        .add_property("to", &System::getTO, &System::setTO, "交易对象 KData")
         .add_property("mm", &System::getMM, &System::setMM, "资金管理策略")
         .add_property("ev", &System::getEV, &System::setEV, "市场环境判断策略")
         .add_property("cn", &System::getCN, &System::setCN, "系统有效条件")

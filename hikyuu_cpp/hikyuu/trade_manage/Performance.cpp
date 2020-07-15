@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Performance.cpp
  *
  *  Created on: 2013-4-23
@@ -102,11 +102,7 @@ string Performance::report(const TradeManagerPtr& tm, const Datetime& datetime) 
     buf.setf(std::ios_base::fixed);
     buf.precision(tm->precision());
     for (iter = m_name_list.begin(); iter != m_name_list.end(); ++iter) {
-#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
-        buf << gb_to_utf8(*iter) << ": " << m_result[*iter] << std::endl;
-#else
         buf << (*iter) << ": " << m_result[*iter] << std::endl;
-#endif
     }
 
     buf.unsetf(std::ostream::floatfield);

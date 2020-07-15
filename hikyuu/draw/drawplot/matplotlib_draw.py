@@ -724,7 +724,7 @@ def sysplot(sys, new=True, axes=None, style=1):
         arrow_buy = dict(facecolor='red', frac=0.5)
         arrow_sell = dict(facecolor='blue', frac=0.5)
 
-    tds = sys.tm.getTradeList()
+    tds = sys.tm.get_trade_list()
     buy_dates = []
     sell_dates = []
     for t in tds:

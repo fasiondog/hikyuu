@@ -31,7 +31,7 @@ if __name__ == "__main__":
     
     #只有设置交易对象时，才会开始实际计算
     sg.setTO(k)
-    dates = k.getDatetimeList()
+    dates = k.get_datetime_list()
     for d in dates:
         if (sg.shouldBuy(d)):
             print("买入：%s" % d)

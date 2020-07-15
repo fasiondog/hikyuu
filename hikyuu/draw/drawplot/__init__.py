@@ -31,19 +31,6 @@
 
 from hikyuu.cpp.core import KData, Indicator, SignalBase, ConditionBase, System
 
-from .echart_draw import gca as ect_gca
-from .echart_draw import gcf as ect_gcf
-from .echart_draw import create_figure as ect_create_figure
-from .echart_draw import kplot as ect_kplot
-from .echart_draw import mkplot as ect_mkplot
-from .echart_draw import iplot as ect_iplot
-from .echart_draw import ibar as ect_ibar
-from .echart_draw import sgplot as ect_sgplot
-from .echart_draw import cnplot as ect_cnplot
-from .echart_draw import sysplot as ect_sysplot
-from .echart_draw import ax_draw_macd as ect_ax_draw_macd
-from .echart_draw import ax_draw_macd2 as ect_ax_draw_macd2
-
 from matplotlib.pylab import gca as mpl_gca
 from matplotlib.pylab import gcf as mpl_gcf
 from .matplotlib_draw import create_figure as mpl_create_figure
@@ -95,29 +82,13 @@ def use_draw_with_matplotlib():
     System.plot = mpl_sysplot
 
 
-def use_draw_with_echarts():
-    set_current_draw_engine('echarts')
-
-    KData.plot = ect_kplot
-    KData.kplot = ect_kplot
-    KData.mkplot = ect_mkplot
-
-    Indicator.plot = ect_iplot
-    Indicator.bar = ect_ibar
-
-    SignalBase.plot = ect_sgplot
-    ConditionBase.plot = ect_cnplot
-
-    System.plot = ect_sysplot
-
-
 def gca():
     """获取当前Axis"""
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
         return mpl_gca()
     else:
-        return ect_gca()
+        pass
 
 
 def gcf():
@@ -126,7 +97,7 @@ def gcf():
     if engine == 'matplotlib':
         return mpl_gcf()
     else:
-        return ect_gcf()
+        pass
 
 
 def show_gcf():
@@ -135,7 +106,7 @@ def show_gcf():
     if engine == 'matplotlib':
         return None
     else:
-        return ect_gcf()
+        pass
 
 
 def create_figure(n=1, figsize=None):
@@ -150,8 +121,7 @@ def create_figure(n=1, figsize=None):
         fsize = (10, 8) if figsize is None else figsize
         return mpl_create_figure(n, fsize)
     else:
-        fsize = (8, 6) if figsize is None else figsize
-        return ect_create_figure(n, fsize)
+        pass
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
@@ -167,7 +137,7 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     if engine == 'matplotlib':
         return mpl_ax_draw_macd(axes, kdata, n1, n2, n3)
     else:
-        return ect_ax_draw_macd(axes, kdata, n1, n2, n3)
+        pass
 
 
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
@@ -186,8 +156,7 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
         return mpl_ax_draw_macd2(axes, ref, kdata, n1, n2, n3)
-    else:
-        return ect_ax_draw_macd2(axes, ref, kdata, n1, n2, n3)
+
 
 
 def adjust_axes_show(axeslist):
