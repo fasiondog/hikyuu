@@ -24,8 +24,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-__all__ = ['system', 'environment', 'condition', 'moneymanager', 'signal',
-           'stoploss', 'profitgoal', 'slippage', 'selector', 'portfolio',
-           'allocatefunds']
-
+from .trade_sys import *

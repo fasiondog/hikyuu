@@ -30,9 +30,8 @@
 #===============================================================================
 
 #TradeManager.buy等方法默认参数使用了Part，这里必须先导入，否则报初始化错误
-from hikyuu import Datetime, Query, QueryByDate, StockManager, System
+from hikyuu import Datetime, Query, QueryByDate, StockManager, System, getSystemPartName
 from hikyuu.util.slice import list_getitem
-from hikyuu.trade_sys.system import getSystemPartName
 
 BUSINESS.INIT = BUSINESS.BUSINESS_INIT
 BUSINESS.BUY = BUSINESS.BUSINESS_BUY

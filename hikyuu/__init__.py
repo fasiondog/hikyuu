@@ -57,6 +57,7 @@ from .extend import *
 from .deprecated import *
 from .indicator import *
 from .trade_manage import *
+from .trade_sys import *
 
 __version__ = get_version()
 
