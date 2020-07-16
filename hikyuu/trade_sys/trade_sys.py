@@ -124,7 +124,7 @@ def cn_init(self, name, params):
     self._name = name
     self._params = params
     for k, v in params.items():
-        self.setParam(k, v)
+        self.set_param(k, v)
 
 
 def crtCN(func, params={}, name='crtCN'):
@@ -160,7 +160,7 @@ def ev_init(self, name, params):
     self._name = name
     self._params = params
     for k, v in params.items():
-        self.setParam(k, v)
+        self.set_param(k, v)
 
 
 def crtEV(func, params={}, name='crtEV'):
@@ -196,7 +196,7 @@ def mm_init(self, name, params):
     self._name = name
     self._params = params
     for k, v in params.items():
-        self.setParam(k, v)
+        self.set_param(k, v)
 
 
 def crtMM(func, params={}, name='crtMM'):
@@ -232,7 +232,7 @@ def pg_init(self, name, params):
     self._name = name
     self._params = params
     for k, v in params.items():
-        self.setParam(k, v)
+        self.set_param(k, v)
 
 
 def crtPG(func, params={}, name='crtPG'):
@@ -278,7 +278,7 @@ def sig_init(self, name, params):
     self._name = name
     self._params = params
     for k, v in params.items():
-        self.setParam(k, v)
+        self.set_param(k, v)
 
 
 def crtSG(func, params={}, name='crtSG'):
@@ -314,7 +314,7 @@ def sl_init(self, name, params):
     self._name = name
     self._params = params
     for k, v in params.items():
-        self.setParam(k, v)
+        self.set_param(k, v)
 
 
 def crtSL(func, params={}, name='crtSL'):
@@ -348,7 +348,7 @@ def st_init(self, name, params):
     self._name = name
     self._params = params
     for k, v in params.items():
-        self.setParam(k, v)
+        self.set_param(k, v)
 
 
 def crtST(func, params={}, name='crtST'):

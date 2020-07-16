@@ -57,7 +57,7 @@ void export_System() {
     :param SlippageBase sp: 移滑价差算法
     :return: system实例)");
 
-    def("getSystemPartName", getSystemPartName, R"(getSystemPartName(part)
+    def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
 
     获取部件的字符串名称
     
@@ -74,7 +74,7 @@ void export_System() {
     :param int part: System.Part 枚举值
     :rtype: str)");
 
-    def("getSystemPartEnum", getSystemPartEnum, R"(getSystemPartEnum(part_name)
+    def("get_system_part_enum", getSystemPartEnum, R"(get_system_part_enum(part_name)
 
      根据系统部件的字符串名称获取相应的枚举值
 

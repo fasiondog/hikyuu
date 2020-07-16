@@ -61,6 +61,21 @@ def getStock(querystr):
     pass
 
 
+@deprecated_func(get_business_name, 'getBusinessName', 'get_business_name')
+def getBusinessName(querystr):
+    pass
+
+
+@deprecated_func(get_system_part_name, 'getSystemPartName', 'get_system_part_name')
+def getSystemPartName(querystr):
+    pass
+
+
+@deprecated_func(get_system_part_enum, 'getSystemPartEnum', 'get_system_part_enum')
+def getSystemPartEnum(querystr):
+    pass
+
+
 @deprecated_func(Query, 'KQuery', 'Query')
 def KQuery(*args, **kwargs):
     pass

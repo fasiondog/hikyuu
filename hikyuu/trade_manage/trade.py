@@ -29,18 +29,8 @@
 # 1. 20130213, Added by fasiondog
 #===============================================================================
 
-#TradeManager.buy等方法默认参数使用了Part，这里必须先导入，否则报初始化错误
-from hikyuu import Datetime, Query, QueryByDate, StockManager, System, getSystemPartName
 from hikyuu.util.slice import list_getitem
-
-BUSINESS.INIT = BUSINESS.BUSINESS_INIT
-BUSINESS.BUY = BUSINESS.BUSINESS_BUY
-BUSINESS.SELL = BUSINESS.BUSINESS_SELL
-BUSINESS.GIFT = BUSINESS.BUSINESS_GIFT
-BUSINESS.BONUS = BUSINESS.BUSINESS_BONUS
-BUSINESS.CHECKIN = BUSINESS.BUSINESS_CHECKIN
-BUSINESS.CHECKOUT = BUSINESS.BUSINESS_CHECKOUT
-BUSINESS.INVALID = BUSINESS.BUSINESS_INVALID
+from hikyuu import *
 
 BorrowRecordList.__getitem__ = list_getitem
 PositionRecordList.__getitem__ = list_getitem
@@ -74,10 +64,10 @@ try:
         return np.array(
             [
                 (
-                    t.datetime, t.stock.market_code, t.stock.name, getBusinessName(t.business),
+                    t.datetime, t.stock.market_code, t.stock.name, get_business_name(t.business),
                     t.planPrice, t.realPrice, t.goalPrice, t.number, t.cost.commission,
                     t.cost.stamptax, t.cost.transferfee, t.cost.others, t.cost.total, t.stoploss,
-                    t.cash, getSystemPartName(t.part)
+                    t.cash, get_system_part_name(t.part)
                 ) for t in t_list
             ],
             dtype=t_type
@@ -103,14 +93,14 @@ try:
         query = Query(-1)
         data = []
         for pos in pos_list:
-            invest = pos.buyMoney - pos.sellMoney + pos.totalCost
-            k = pos.stock.getKData(query)
+            invest = pos.buy_money - pos.sell_money + pos.total_cost
+            k = pos.stock.get_kdata(query)
             cur_val = k[0].close * pos.number
             bonus = cur_val - invest
-            date_list = sm.getTradingCalendar(QueryByDate(Datetime(pos.takeDatetime.date())))
+            date_list = sm.get_trading_calendar(Query(Datetime(pos.take_datetime.date())))
             data.append(
                 (
-                    pos.stock.market_code, pos.stock.name, pos.takeDatetime, len(date_list),
+                    pos.stock.market_code, pos.stock.name, pos.take_datetime, len(date_list),
                     pos.number, invest, cur_val, bonus, 100 * bonus / invest
                 )
             )

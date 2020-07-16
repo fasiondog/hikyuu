@@ -24,5 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from .trade import *
 from .broker import OrderBrokerBase, OrderBrokerWrap, TestOrderBroker, crtOB
 from .broker_mail import MailOrderBroker
+

@@ -73,7 +73,7 @@
     - System.Part.INVALID      - 无效值边界，大于等于该值时为无效部件
 
     
-.. py:function:: getSystemPartName(part)
+.. py:function:: get_system_part_name(part)
 
     获取部件的字符串名称
     
@@ -91,7 +91,7 @@
     :rtype: str
     
 
-.. py:function:: getSystemPartEnum(part_name)
+.. py:function:: get_system_part_enum(part_name)
 
      根据系统部件的字符串名称获取相应的枚举值
 

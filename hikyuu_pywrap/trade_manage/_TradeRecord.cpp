@@ -29,7 +29,11 @@ void export_TradeRecord() {
       .value("RETURN_STOCK", BUSINESS_RETURN_STOCK)
       .value("INVALID", BUSINESS_INVALID);
 
-    def("getBusinessName", getBusinessName);
+    def("get_business_name", getBusinessName, R"(get_business_name(business)
+
+    :param BUSINESS business: 交易业务类型
+    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
+    :rtype: string)");
 
     class_<TradeRecord>("TradeRecord", "交易记录", init<>())
       .def(init<const Stock&, const Datetime&, BUSINESS, price_t, price_t, price_t, double,

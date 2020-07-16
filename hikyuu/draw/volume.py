@@ -69,7 +69,7 @@ def draw(
     ma5.plot(axes=ax1, legend_on=True)
 
     sg = SG_Cross(MA(n=ma1_n), MA(n=ma2_n))
-    sg.setTO(kdata)
+    sg.to = kdata
     sg.plot(axes=ax1, kdata=kdata)
 
     vol = VOL(kdata)

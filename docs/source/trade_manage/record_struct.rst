@@ -7,7 +7,7 @@
 交易业务类型
 ------------
 
-.. py:function:: getBusinessName(business)
+.. py:function:: get_business_name(business)
 
     :param BUSINESS business: 交易业务类型
     :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
