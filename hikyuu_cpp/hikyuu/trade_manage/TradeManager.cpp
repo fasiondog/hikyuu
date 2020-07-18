@@ -1812,12 +1812,19 @@ void TradeManager::tocsv(const string& path) {
         filename4 = path + "/" + m_name + "_actions.txt";
     }
 
+#if defined(_MSC_VER)
+    filename1 = utf8_to_gb(filename1);
+    filename2 = utf8_to_gb(filename2);
+    filename3 = utf8_to_gb(filename3);
+    filename4 = utf8_to_gb(filename4);
+#endif
+
     string sep(",");
 
     //导出交易记录
     std::ofstream file(filename1.c_str());
     if (!file) {
-        HKU_ERROR("Can't create file({})!", filename1);
+        HKU_ERROR("Can't create file {}!", filename1);
         return;
     }
 
@@ -1867,7 +1874,7 @@ void TradeManager::tocsv(const string& path) {
     //导出已平仓记录
     file.open(filename2.c_str());
     if (!file) {
-        HKU_ERROR("Can't create file!");
+        HKU_ERROR("Can't create file {}!", filename2);
         return;
     }
 
@@ -1893,7 +1900,7 @@ void TradeManager::tocsv(const string& path) {
     //导出未平仓记录
     file.open(filename3.c_str());
     if (!file) {
-        HKU_ERROR("Can't create file!");
+        HKU_ERROR("Can't create file {}!", filename3);
         return;
     }
 
@@ -1927,7 +1934,7 @@ void TradeManager::tocsv(const string& path) {
     //导出已平仓记录
     file.open(filename4.c_str());
     if (!file) {
-        HKU_ERROR("Can't create file!");
+        HKU_ERROR("Can't create file {}!", filename4);
         return;
     }
 
