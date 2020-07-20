@@ -46,6 +46,9 @@ from .matplotlib_draw import ax_draw_macd2 as mpl_ax_draw_macd2
 from .matplotlib_draw import ax_set_locator_formatter as mpl_ax_set_locator_formatter
 from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 
+from .bokeh_draw import gcf as bk_gcf
+from .bokeh_draw import kplot as bk_gcf
+
 g_draw_engine = 'matplotlib'
 
 
@@ -60,10 +63,18 @@ def set_current_draw_engine(engine):
 
 
 def use_draw_engine(engine='matplotlib'):
-    if engine == 'echarts':
-        use_draw_with_echarts()
-    else:
+    if engine == 'matplotlib':
         use_draw_with_matplotlib()
+    else:
+        use_draw_with_bokeh()
+
+
+def use_draw_with_bokeh():
+    from bokeh.io import output_notebook
+    output_notebook()
+    set_current_draw_engine('bokeh')
+
+    KData.plot = bk_plot
 
 
 def use_draw_with_matplotlib():
