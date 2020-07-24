@@ -329,7 +329,7 @@ try:
 
     def KData_to_np(kdata):
         """转化为numpy结构数组"""
-        if kdata.getQuery().kType in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
+        if kdata.get_query().ktype in ('DAY', 'WEEK', 'MONTH', 'QUARTER', 'HALFYEAR', 'YEAR'):
             k_type = np.dtype(
                 {
                     'names': ['datetime', 'open', 'high', 'low', 'close', 'amount', 'volume'],
@@ -345,7 +345,7 @@ try:
             )
         return np.array(
             [
-                (k.date.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume)
+                (k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume)
                 for k in kdata
             ],
             dtype=k_type

@@ -8,8 +8,9 @@ from hikyuu import *
 from .common import get_draw_title
 
 from bokeh.plotting import figure,ColumnDataSource
-from bokeh.models import DatetimeTickFormatter
-from bokeh.io import show
+from bokeh.models import DatetimeTickFormatter,HoverTool, Title, Label
+from bokeh.layouts import column
+from bokeh.io import output_notebook, show
 
 global g_figure
 
@@ -32,7 +33,7 @@ def create_one_axes_figure(figsize=(800,450)):
     return g_figure
 
 
-def create_figure(n=1, figsize=(10, 8)):
+def create_figure(n=1, figsize=(800, 450)):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
 
     :param int n: 坐标轴数量
@@ -45,7 +46,7 @@ def create_figure(n=1, figsize=(10, 8)):
         pass
 
 
-def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alpha=1.0):
+def kplot(kdata, new=True, axes=None, colorup='red', colordown='green', width=0.6, alpha=1.0):
     """绘制K线图
     
     :param KData kdata: K线数据
@@ -64,21 +65,63 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
         axes = create_figure() if new else gca()
 
     k = kdata
-    up_dates = [r.datetime.datetime() for r in k if r.close > r.open]
-    up_high = [r.high for r in k if r.close > r.open]
-    up_low = [r.low for r in k if r.close > r.open]
-    up_open = [r.open for r in k if r.close > r.open]
-    up_close = [r.close for r in k if r.close > r.open]
-    down_dates = [r.datetime.datetime() for r in k if r.close <= r.open]
-    down_high = [r.high for r in k if r.close <= r.open]
-    down_low = [r.low for r in k if r.close <= r.open]
-    down_open = [r.open for r in k if r.close <= r.open]
-    down_low = [r.close for r in k if r.close <= r.open]
-
+    inc_k = [r for r in k if r.close >  r.open]
+    dec_k = [r for r in k if r.close <= r.open]
+    
+    inc_source = ColumnDataSource(dict(datetime=[r.datetime.datetime() for r in inc_k],
+                                      open=[r.open for r in inc_k],
+                                      high=[r.high for r in inc_k],
+                                      low=[r.low for r in inc_k],
+                                      close=[r.close for r in inc_k],
+                                      amount=[r.amount for r in inc_k],
+                                      volume=[r.volume for r in inc_k]))
+    dec_source = ColumnDataSource(dict(datetime=[r.datetime.datetime() for r in dec_k],
+                                      open=[r.open for r in dec_k],
+                                      high=[r.high for r in dec_k],
+                                      low=[r.low for r in dec_k],
+                                      close=[r.close for r in dec_k],
+                                      amount=[r.amount for r in dec_k],
+                                      volume=[r.volume for r in dec_k]))
+    
     w = 12*60*60*1000
-    axes.segment(up_dates, up_high, up_dates, up_low, color='red')
-    axes.segment(down_dates, down_high, down_dates, down_low, color='green')
-    axes.vbar(up_dates, w, up_open, up_close, fill_color="white", line_color="red")
-    axes.vbar(down_dates, w, down_open, down_low, fill_color="green", line_color="green")
+    axes.segment(x0='datetime', y0='high', x1='datetime', y1='low', color='red', source=inc_source)
+    axes.segment(x0='datetime', y0='high', x1='datetime', y1='low', color='green', source=dec_source)
+    axes.vbar(x='datetime', width=w, top='close', bottom='open', fill_color="white", 
+              line_color="red", source=inc_source)
+    axes.vbar(x='datetime', width=w, top='open', bottom='close', fill_color="green", 
+              line_color="green", source=dec_source)
+    date_format = '@datetime{%F}' if k.get_query().ktype \
+        in (Query.DAY, Query.WEEK, Query.MONTH, Query.QUARTER, Query.HALFYEAR, Query.YEAR) \
+        else '@datetime{%F %H:%M:%S}'
+    axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('日期', date_format), 
+                                       ("开盘价", "@open{0.0000}"), ("最高价", "@high{0.0000}"), 
+                                       ("最低价", "@low{0.0000}"),("收盘价", "@close{0.0000}"),
+                                      ("成交金额", "@amount{0.0000}"), ("成交量", "@volume{0.0000}")],
+                     formatters = { "datetime": "datetime"}))
+
     axes.xaxis[0].formatter = DatetimeTickFormatter()
+    axes.title.text = k.get_stock().name
+    axes.title.align = "center"
+    axes.title.text_font_size = "16px"
+
+    last_record = kdata[-1]
+    color = 'red' if last_record.close > kdata[-2].close else 'green'
+    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
+        last_record.datetime, last_record.open, last_record.high, last_record.low,
+        last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
+    )
+    
+    label = Label(
+        x=20,
+        y=axes.plot_height - 90,
+        x_units='screen', y_units='screen',
+        text=text,
+        render_mode='css',
+        text_font_size='14px',
+        text_color=color,
+        background_fill_color='white', 
+        background_fill_alpha=0.5
+    )
+    axes.add_layout(label)
+
     show(axes)

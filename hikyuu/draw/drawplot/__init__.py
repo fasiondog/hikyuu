@@ -47,7 +47,8 @@ from .matplotlib_draw import ax_set_locator_formatter as mpl_ax_set_locator_form
 from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 
 from .bokeh_draw import gcf as bk_gcf
-from .bokeh_draw import kplot as bk_gcf
+from .bokeh_draw import gca as bk_gca
+from .bokeh_draw import kplot as bk_kplot
 
 g_draw_engine = 'matplotlib'
 
@@ -74,7 +75,7 @@ def use_draw_with_bokeh():
     output_notebook()
     set_current_draw_engine('bokeh')
 
-    KData.plot = bk_plot
+    KData.plot = bk_kplot
 
 
 def use_draw_with_matplotlib():
@@ -98,6 +99,8 @@ def gca():
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
         return mpl_gca()
+    elif engine == 'bokeh':
+        return bk_gca()
     else:
         pass
 
@@ -107,6 +110,8 @@ def gcf():
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
         return mpl_gcf()
+    elif engine == 'bokeh':
+        return bk_gcf()
     else:
         pass
 
