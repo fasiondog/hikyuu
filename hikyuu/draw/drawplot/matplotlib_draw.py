@@ -193,7 +193,7 @@ def adjust_axes_show(axeslist):
         ylabels[0].set_visible(False)
 
 
-def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alpha=1.0):
+def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     """绘制K线图
     
     :param KData kdata: K线数据
@@ -201,8 +201,6 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     :param axes:        指定的坐标轴
     :param colorup:     the color of the rectangle where close >= open
     :param colordown:   the color of the rectangle where close < open
-    :param width:       fraction of a day for the rectangle width
-    :param alpha:       the rectangle alpha level, 透明度(0.0~1.0) 1.0为不透明
     """
     if not kdata:
         print("kdata is None")
@@ -211,6 +209,8 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g', width=0.6, alp
     if not axes:
         axes = create_figure() if new else gca()
 
+    alpha = 1.0
+    width = 0.6
     OFFSET = width / 2.0
     rfcolor = matplotlib.rcParams['axes.facecolor']
     for i in range(len(kdata)):
