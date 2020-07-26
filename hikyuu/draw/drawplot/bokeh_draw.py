@@ -56,6 +56,37 @@ def create_one_axes_figure(figsize=(800,450)):
     return g_axes
 
 
+def create_two_axes_figure(figsize=(800,450)):
+    """生成一个含有2个坐标轴的figure，并返回坐标轴列表
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2)    
+    """
+    global g_figure
+    global g_axes
+    ax1 = figure(width=figsize[0], height=int(figsize[1] * 0.667))
+    ax2 = figure(width=figsize[0], height=int(figsize[1] * 0.333))
+    g_figure = column(ax1, ax2)
+    g_axes = ax2
+    return ax1, ax2
+
+
+def create_three_axes_figure(figsize=(800,450)):
+    """生成一个含有2个坐标轴的figure，并返回坐标轴列表
+    
+    :param figsize: (宽, 高)
+    :return: (ax1, ax2)    
+    """
+    global g_figure
+    global g_axes
+    ax1 = figure(width=figsize[0], height=int(figsize[1] * 0.5))
+    ax2 = figure(width=figsize[0], height=int(figsize[1] * 0.25))
+    ax3 = figure(width=figsize[0], height=int(figsize[1] * 0.25))
+    g_figure = column(ax1, ax2, ax3)
+    g_axes = ax3
+    return ax1, ax2, ax3
+
+
 def create_figure(n=1, figsize=(800, 450)):
     """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
 
@@ -65,9 +96,19 @@ def create_figure(n=1, figsize=(800, 450)):
     """
     if n == 1:
         return create_one_axes_figure(figsize)
+    elif n == 2:
+        return create_two_axes_figure(figsize)
+    elif n == 3:
+        return create_three_axes_figure(figsize)
     else:
         pass
 
+
+def trans_color(color):
+    """将 matplotlib 常用的 color 转换为对应的 bokeh color，如果无法转换则返回原值"""
+    color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue'}
+    return color_dict[color] if color in color_dict else color
+    
 
 def get_date_format(kdata):
     return '@datetime{%F}' if kdata.get_query().ktype \
@@ -75,7 +116,7 @@ def get_date_format(kdata):
         else '@datetime{%F %H:%M:%S}'
 
 
-def kplot(kdata, new=True, axes=None, colorup='red', colordown='green'):
+def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     """绘制K线图
     
     :param KData kdata: K线数据
@@ -89,7 +130,7 @@ def kplot(kdata, new=True, axes=None, colorup='red', colordown='green'):
         return
 
     if not axes:
-        axes = create_figure() if new else gca()
+        axes = create_figure() if new or gca() is None else gca()
 
     k = kdata
     inc_k = [r for r in k if r.close >  r.open]
@@ -111,6 +152,8 @@ def kplot(kdata, new=True, axes=None, colorup='red', colordown='green'):
                                       volume=[r.volume for r in dec_k]))
     
     w = 12*60*60*1000
+    colorup = trans_color(colorup)
+    colordown = trans_color(colordown)
     axes.segment(x0='datetime', y0='high', x1='datetime', y1='low', color=colorup, source=inc_source)
     axes.segment(x0='datetime', y0='high', x1='datetime', y1='low', color=colordown, source=dec_source)
     axes.vbar(x='datetime', width=w, top='close', bottom='open', fill_color="white", 
@@ -136,8 +179,8 @@ def kplot(kdata, new=True, axes=None, colorup='red', colordown='green'):
     )
     
     label = Label(
-        x=20,
-        y=axes.plot_height - 90,
+        x=axes.plot_width * 0.01,
+        y=axes.plot_height * 0.82,
         x_units='screen', y_units='screen',
         text=text,
         render_mode='css',
@@ -164,13 +207,20 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     print("Bokeh 暂不支持绘制美式K线图, 请使用 matplotlib")
 
 
+def get_color(index):
+    """获取 index 指定的颜色，如果没有固定返回 index=0 的颜色"""
+    color_list = ['blue', 'orange', 'green', 'red', 'purple', 'darkgoldenrod', 'pink', 'darkcyan']
+    return color_list[index] if index in range(len(color_list)) else color_list[0]
+
+
 def iplot(
     indicator,
     new=True,
     axes=None,
+    kref=None,
     legend_on=False,
     text_on=False,
-    text_color='black',
+    text_color='k',
     zero_on=False,
     label=None,
     *args,
@@ -181,6 +231,7 @@ def iplot(
     :param Indicator indicator: indicator实例
     :param axes:            指定的坐标轴
     :param new:             是否在新窗口中显示，只在没有指定axes时生效
+    :param kref:            参考的K线数据，以便绘制日期X坐标
     :param legend_on:       是否打开图例
     :param text_on:         是否在左上角显示指标名称及其参数
     :param text_color:      指标名称解释文字的颜色，默认为黑色
@@ -196,32 +247,210 @@ def iplot(
         return
 
     if not axes:
-        axes = create_figure() if new else gca()
+        axes = create_figure() if new or gca() is None else gca()
 
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
+    line_color = get_color(len(axes.tags))
+
+    width = 1
     py_indicator = [None if x == constant.null_price else x for x in indicator]
-    k = indicator.get_context()
-    if len(k) > 0:
-        source = ColumnDataSource(dict(
-            datetime=[r.datetime() for r in k.get_datetime_list()], 
-            value=py_indicator))
+    if kref:
+        x_value = [r.datetime() for r in kref.get_datetime_list()]
+        source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
         if legend_on:
-            axes.line(x='datetime', y='value', legend_label=label, line_width=2, source=source)
+            axes.line(x='datetime', y='value', legend_label=label, line_width=width, 
+                      line_color=line_color, source=source)
         else:
-            axes.line(x='datetime', y='value', line_width=2, source=source)
+            axes.line(x='datetime', y='value', line_width=width, line_color=line_color, 
+                      source=source)
         axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
-                                 ('日期', get_date_format(k)), ("值", "@value{0.0000}")],
+                                 ('日期', get_date_format(kref)), ("值", "@value{0.0000}")],
                      formatters = { "datetime": "datetime"}))
         axes.xaxis[0].formatter = DatetimeTickFormatter()
     else:
-        source = ColumnDataSource(dict(datetime=list(range(len(k))), value=py_indicator))
+        x_value = list(range(len(indicator)))
+        source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
         if legend_on:
-            axes.line(x='datetime', y='value', legend_label=label, line_width=2, source=source)
+            axes.line(x='datetime', y='value', legend_label=label, line_width=width, 
+                      line_color=line_color, source=source)
         else:
-            axes.line(x='datetime', y='value', line_width=2, source=source)
+            axes.line(x='datetime', y='value', line_width=width, line_color=line_color, 
+                      source=source)
         axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
                                  ("值", "@value{0.0000}")]))
 
+    if zero_on:
+        axes.line(x=x_value, y=[0 for i in range(len(indicator))], line_color='black')
+
+    if text_on:
+        label = Label(
+            x=int(axes.plot_width * 0.01),
+            y=int(axes.plot_height * 0.88),
+            x_units='screen', y_units='screen',
+            text=label,
+            render_mode='css',
+            text_font_size='14px',
+            text_color=trans_color(text_color),
+            background_fill_color='white', 
+            background_fill_alpha=0.5
+        )
+        axes.add_layout(label)
+
+    axes.tags.append(line_color)
     show_gcf()
+
+
+def ibar(
+    indicator,
+    new=True,
+    axes=None,
+    kref=None,
+    legend_on=False,
+    text_on=False,
+    text_color='k',
+    label=None,
+    width=0.4,
+    color='r',
+    edgecolor='r',
+    zero_on=False,
+    *args,
+    **kwargs
+):
+    """绘制indicator柱状图
+    
+    :param Indicator indicator: Indicator实例
+    :param axes:       指定的坐标轴
+    :param new:        是否在新窗口中显示，只在没有指定axes时生效
+    :param kref:       参考的K线数据，以便绘制日期X坐标
+    :param legend_on:  是否打开图例
+    :param text_on:    是否在左上角显示指标名称及其参数
+    :param text_color: 指标名称解释文字的颜色，默认为黑色
+    :param str label:  label显示文字信息，text_on 及 legend_on 为 True 时生效
+    :param zero_on:    是否需要在y=0轴上绘制一条直线
+    :param width:      Bar的宽度
+    :param color:      Bar的颜色
+    :param edgecolor:  Bar边缘颜色
+    :param args:       pylab plot参数
+    :param kwargs:     pylab plot参数
+    """
+    if not indicator:
+        print("indicator is None")
+        return
+
+    if not axes:
+        axes = create_figure() if new or gca() is None else gca()
+
+    if not label:
+        label = "%s %.2f" % (indicator.long_name, indicator[-1])
+
+    line_color = get_color(len(axes.tags))
+
+    py_indicator = [None if x == constant.null_price else x for x in indicator]
+    if kref:
+        width = 12*60*60*1000
+        x_value = [r.datetime() for r in kref.get_datetime_list()]
+        source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
+        if legend_on:
+            axes.vbar(x='datetime', top='value', legend_label=label, width=width, 
+                      color=line_color, source=source)
+        else:
+            axes.vbar(x='datetime', top='value', width=width, color=line_color, 
+                      source=source)
+        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
+                                 ('日期', get_date_format(kref)), ("值", "@value{0.0000}")],
+                     formatters = { "datetime": "datetime"}))
+        axes.xaxis[0].formatter = DatetimeTickFormatter()
+    else:
+        width = 0.5
+        x_value = list(range(len(indicator)))
+        source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
+        if legend_on:
+            axes.vbar(x='datetime', top='value', legend_label=label, width=width, 
+                      color=line_color, source=source)
+        else:
+            axes.vbar(x='datetime', top='value', width=width, color=line_color, 
+                      source=source)
+        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
+                                 ("值", "@value{0.0000}")]))
+
+    if text_on:
+        label = Label(
+            x=int(axes.plot_width * 0.01),
+            y=int(axes.plot_height * 0.88),
+            x_units='screen', y_units='screen',
+            text=label,
+            render_mode='css',
+            text_font_size='14px',
+            text_color=trans_color(text_color),
+            background_fill_color='white', 
+            background_fill_alpha=0.5
+        )
+        axes.add_layout(label)
+
+    axes.tags.append(line_color)
+    show_gcf()
+
+
+def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
+    """绘制MACD。
+    当BAR值变化与参考序列ref变化不一致时，显示为灰色，
+    当BAR和参考序列ref同时上涨，显示红色
+    当BAR和参考序列ref同时下跌，显示绿色
+
+    :param axes: 指定的坐标轴
+    :param ref: 参考序列，EMA
+    :param KData kdata: KData
+    :param int n1: 指标 MACD 的参数1
+    :param int n2: 指标 MACD 的参数2
+    :param int n3: 指标 MACD 的参数3
+    """
+    macd = MACD(CLOSE(kdata), n1, n2, n3)
+    bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
+
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
+        n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
+    )
+    label = Label(
+        x=int(axes.plot_width * 0.01),
+        y=int(axes.plot_height * 0.88),
+        x_units='screen', y_units='screen',
+        text=text,
+        render_mode='css',
+        text_font_size='14px',
+        background_fill_color='white', 
+        background_fill_alpha=0.5
+    )
+    axes.add_layout(label)
+
+    total = len(kdata)
+    x = [i - 0.2 for i in range(0, total)]
+    y = bmacd
+    x1, x2, x3 = [x[0]], [], []
+    y1, y2, y3 = [y[0]], [], []
+    for i in range(1, total):
+        if ref[i] - ref[i - 1] > 0 and y[i] - y[i - 1] > 0:
+            x2.append(x[i])
+            y2.append(y[i])
+        elif ref[i] - ref[i - 1] < 0 and y[i] - y[i - 1] < 0:
+            x3.append(x[i])
+            y3.append(y[i])
+        else:
+            x1.append(x[i])
+            y1.append(y[i])
+
+    #axes.vbar(x1, y1, width=0.4, color='#BFBFBF', edgecolor='#BFBFBF')
+    #axes.vbar(x2, y2, width=0.4, color='r', edgecolor='r')
+    #axes.vbar(x3, y3, width=0.4, color='g', edgecolor='g')
+
+    #axt = axes.twinx()
+    #axt.grid(False)
+    #axt.set_yticks([])
+    #fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
+    #smacd.plot(axes=axt, legend_on=False, text_on=False)
+    fmacd.plot(axes=axes, linestyle='--', legend_on=False, text_on=False)
+    smacd.plot(axes=axes, legend_on=False, text_on=False)
+
+    #for label in axt.get_xticklabels():
+    #    label.set_visible(False)

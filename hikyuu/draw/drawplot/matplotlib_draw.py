@@ -351,6 +351,7 @@ def iplot(
     indicator,
     new=True,
     axes=None,
+    kref=None,
     legend_on=False,
     text_on=False,
     text_color='k',
@@ -364,6 +365,7 @@ def iplot(
     :param Indicator indicator: indicator实例
     :param axes:            指定的坐标轴
     :param new:             是否在新窗口中显示，只在没有指定axes时生效
+    :param kref:            参考的K线数据，以便绘制日期X坐标
     :param legend_on:       是否打开图例
     :param text_on:         是否在左上角显示指标名称及其参数
     :param text_color:      指标名称解释文字的颜色，默认为黑色
@@ -413,9 +415,8 @@ def iplot(
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator) + 1)
-    k = indicator.get_context()
-    if len(k) > 0:
-        ax_set_locator_formatter(axes, k.get_datetime_list(), k.get_query().ktype)
+    if kref:
+        ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
     #draw()
 
 
@@ -423,6 +424,7 @@ def ibar(
     indicator,
     new=True,
     axes=None,
+    kref=None,
     legend_on=False,
     text_on=False,
     text_color='k',
@@ -439,6 +441,7 @@ def ibar(
     :param Indicator indicator: Indicator实例
     :param axes:       指定的坐标轴
     :param new:        是否在新窗口中显示，只在没有指定axes时生效
+    :param kref:       参考的K线数据，以便绘制日期X坐标
     :param legend_on:  是否打开图例
     :param text_on:    是否在左上角显示指标名称及其参数
     :param text_color: 指标名称解释文字的颜色，默认为黑色
@@ -492,9 +495,8 @@ def ibar(
 
     axes.autoscale_view()
     axes.set_xlim(-1, len(indicator) + 1)
-    k = indicator.get_context()
-    if len(k) > 0:
-        ax_set_locator_formatter(axes, k.get_datetime_list(), k.get_query().ktype)
+    if kref:
+        ax_set_locator_formatter(axes, kref.get_datetime_list(), kref.get_query().ktype)
     #draw()
 
 
