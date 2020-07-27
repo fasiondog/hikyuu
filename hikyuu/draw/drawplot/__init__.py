@@ -53,6 +53,7 @@ from .bokeh_draw import show_gcf as bk_show_gcf
 from .bokeh_draw import kplot as bk_kplot
 from .bokeh_draw import iplot as bk_iplot
 from .bokeh_draw import ibar as bk_ibar
+from .bokeh_draw import ax_draw_macd as bk_ax_draw_macd
 from .bokeh_draw import ax_draw_macd2 as bk_ax_draw_macd2
 
 
@@ -117,7 +118,7 @@ def create_figure(n=1, figsize=None):
     if engine == 'matplotlib':
         return mpl_create_figure(n, figsize if figsize else (10, 8))
     elif engine == 'bokeh':
-        return bk_create_figure(n, figsize if figsize else (800, 450))
+        return bk_create_figure(n, figsize if figsize else (800, 800))
     else:
         print("未知的引擎: {}".format(engine))
 
@@ -166,6 +167,24 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
         mpl_ax_draw_macd(axes, kdata, n1, n2, n3)
     elif engine == 'bokeh':
         pass
+    else:
+        print("未知的引擎: {}".format(engine))
+
+
+def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
+    """绘制MACD
+    
+    :param axes: 指定的坐标轴
+    :param KData kdata: KData
+    :param int n1: 指标 MACD 的参数1
+    :param int n2: 指标 MACD 的参数2
+    :param int n3: 指标 MACD 的参数3
+    """
+    engine = get_current_draw_engine()
+    if engine == 'matplotlib':
+        return mpl_ax_draw_macd(axes, kdata, n1, n2, n3)
+    elif engine == 'bokeh':
+        return bk_ax_draw_macd(axes, kdata, n1, n2, n3)
     else:
         print("未知的引擎: {}".format(engine))
 

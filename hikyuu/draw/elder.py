@@ -75,19 +75,21 @@ def _draw_ema_pipe(axes, kdata, ema, n=22, w=0.10):
     emas_len = len(emas)
 
     PRICELIST(emas).plot(
-        axes=axes, color='b', linestyle='-', label='%s(%s)  %.2f' % (ema.name, n, emas[-1])
+        axes=axes, color='b', linestyle='-', label='%s(%s)  %.2f' % (ema.name, n, emas[-1]), kref=kdata
     )
     PRICELIST(emas_high).plot(
         axes=axes,
         color='b',
         linestyle=':',
-        label='U%s(%.2f%%) %.2f' % (ema.name, p * 100, emas_high[-1])
+        label='U%s(%.2f%%) %.2f' % (ema.name, p * 100, emas_high[-1]),
+        kref=kdata
     )
     PRICELIST(emas_low).plot(
         axes=axes,
         color='b',
         linestyle=':',
-        label='L%s(%.2f%%) %.2f' % (ema.name, p * 100, emas_low[-1])
+        label='L%s(%.2f%%) %.2f' % (ema.name, p * 100, emas_low[-1]),
+        kref=kdata
     )
     #axes.plot(emas, '-b', label='%s(%s)  %.2f'%(ema.name, n, emas[-1]))
     #axes.plot(emas_high, ':b', label='U%s(%.2f%%) %.2f'%(ema.name, p*100, emas_high[-1]))
@@ -108,12 +110,11 @@ def draw(stock, query=Query(-130), ma_n=22, ma_w='auto', vigor_n=13):
     ax1, ax2, ax3 = create_figure(3)
     kdata.plot(axes=ax1)
     _draw_ema_pipe(ax1, kdata, ema, n=ma_n, w=ma_w)
-    sf.plot(axes=ax1, color='y', legend_on=True)
-    #ax1.legend(loc='upper left')
+    sf.plot(axes=ax1, color='y', legend_on=True, kref=kdata)
 
     ax_draw_macd2(ax2, ema, kdata)
 
-    vigor.plot(axes=ax3, marker='.', color='r', zero_on=True, legend_on=False, text_on=True)
+    vigor.plot(axes=ax3, marker='.', color='r', zero_on=True, legend_on=False, text_on=True, kref=kdata)
     u = [i for i in vigor if i > 0 and i != constant.null_price]
     l = [i for i in vigor if i < 0]
     umean = mean(u)
@@ -123,12 +124,10 @@ def draw(stock, query=Query(-130), ma_n=22, ma_w='auto', vigor_n=13):
     up = int(umax / umean)
     lp = int(lmin / lmean)
     for i in range(up):
-        CVAL(close, umean * (i + 1)).plot(axes=ax3, color='r', linestyle='--')
-        #ax3.hlines(umean * (i + 1),0,len(kdata),color='r',linestyle='--')
+        CVAL(close, umean * (i + 1)).plot(axes=ax3, color='r', linestyle='--', kref=kdata)
 
     for i in range(lp):
-        CVAL(close, lmean * (i + 1)).plot(axes=ax3, color='g', linestyle='--')
-        #ax3.hlines(lmean * (i + 1),0,len(kdata),color='g',linestyle='--')
+        CVAL(close, lmean * (i + 1)).plot(axes=ax3, color='g', linestyle='--', kref=kdata)
 
     ax1.set_xlim((0, len(kdata)))
     ax_set_locator_formatter(ax1, kdata.get_datetime_list(), kdata.get_query().ktype)

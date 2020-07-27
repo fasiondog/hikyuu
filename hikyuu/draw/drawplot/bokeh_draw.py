@@ -7,10 +7,30 @@
 from hikyuu import *
 from .common import get_draw_title
 
-from bokeh.plotting import figure,ColumnDataSource
+from bokeh.plotting import Figure, figure, ColumnDataSource
 from bokeh.models import DatetimeTickFormatter,HoverTool, Title, Label
 from bokeh.layouts import column
 from bokeh.io import output_notebook, output_file, show
+
+
+def trans_color(color):
+    """将 matplotlib 常用的 color 转换为对应的 bokeh color，如果无法转换则返回原值"""
+    color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue', 'y': 'yellow'}
+    return color_dict[color] if color in color_dict else color
+
+
+def ax_set_xlim(self, *args, **kwargs):
+    pass
+
+def ax_set_ylim(self, *args, **kwargs):
+    pass
+
+def ax_fill_between(self, *args, **kwargs):
+    pass
+
+Figure.set_xlim = ax_set_xlim
+Figure.set_ylim = ax_set_ylim
+Figure.fill_between = ax_fill_between
 
 g_use_in_notbook = False
 g_figure = None
@@ -104,12 +124,6 @@ def create_figure(n=1, figsize=(800, 450)):
         pass
 
 
-def trans_color(color):
-    """将 matplotlib 常用的 color 转换为对应的 bokeh color，如果无法转换则返回原值"""
-    color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue'}
-    return color_dict[color] if color in color_dict else color
-    
-
 def get_date_format(kdata):
     return '@datetime{%F}' if kdata.get_query().ktype \
         in (Query.DAY, Query.WEEK, Query.MONTH, Query.QUARTER, Query.HALFYEAR, Query.YEAR) \
@@ -191,7 +205,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     )
     axes.add_layout(label)
 
-    show_gcf()
+    return gcf()
 
 
 def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
@@ -205,6 +219,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     :param ticksize:    open/close tick marker in points
     """
     print("Bokeh 暂不支持绘制美式K线图, 请使用 matplotlib")
+    return None
 
 
 def get_color(index):
@@ -252,7 +267,7 @@ def iplot(
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
-    line_color = get_color(len(axes.tags))
+    line_color = get_color(len(axes.tags)) if 'color' not in kwargs else trans_color(kwargs['color'])
 
     width = 1
     py_indicator = [None if x == constant.null_price else x for x in indicator]
@@ -299,7 +314,7 @@ def iplot(
         axes.add_layout(label)
 
     axes.tags.append(line_color)
-    show_gcf()
+    return gcf()
 
 
 def ibar(
@@ -345,7 +360,7 @@ def ibar(
     if not label:
         label = "%s %.2f" % (indicator.long_name, indicator[-1])
 
-    line_color = get_color(len(axes.tags))
+    line_color = trans_color(color)
 
     py_indicator = [None if x == constant.null_price else x for x in indicator]
     if kref:
@@ -390,7 +405,42 @@ def ibar(
         axes.add_layout(label)
 
     axes.tags.append(line_color)
-    show_gcf()
+    return gcf()
+
+
+def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
+    """绘制MACD
+    
+    :param axes: 指定的坐标轴
+    :param KData kdata: KData
+    :param int n1: 指标 MACD 的参数1
+    :param int n2: 指标 MACD 的参数2
+    :param int n3: 指标 MACD 的参数3
+    """
+    macd = MACD(CLOSE(kdata), n1, n2, n3)
+    bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
+
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
+        n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
+    )
+    label = Label(
+        x=int(axes.plot_width * 0.01),
+        y=int(axes.plot_height * 0.88),
+        x_units='screen', y_units='screen',
+        text=text,
+        render_mode='css',
+        text_font_size='14px',
+        background_fill_color='white', 
+        background_fill_alpha=0.5
+    )
+    axes.add_layout(label)
+
+    bmacd.bar(axes=axes, kref=kdata, color='red')
+
+    fmacd.plot(axes=axes, legend_on=False, text_on=False, kref=kdata)
+    smacd.plot(axes=axes, legend_on=False, text_on=False, kref=kdata)
+
+    return gcf()
 
 
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
@@ -424,33 +474,17 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     )
     axes.add_layout(label)
 
-    total = len(kdata)
-    x = [i - 0.2 for i in range(0, total)]
-    y = bmacd
-    x1, x2, x3 = [x[0]], [], []
-    y1, y2, y3 = [y[0]], [], []
-    for i in range(1, total):
-        if ref[i] - ref[i - 1] > 0 and y[i] - y[i - 1] > 0:
-            x2.append(x[i])
-            y2.append(y[i])
-        elif ref[i] - ref[i - 1] < 0 and y[i] - y[i - 1] < 0:
-            x3.append(x[i])
-            y3.append(y[i])
-        else:
-            x1.append(x[i])
-            y1.append(y[i])
+    pre_ref = REF(ref, 1)
+    pre_bmacd = REF(bmacd, 1)
+    x1 = IF((ref < pre_ref) & (bmacd < pre_bmacd), bmacd, 0)
+    x2 = IF((ref > pre_ref) & (bmacd > pre_bmacd), bmacd, 0)
+    x3 = IF(NOT((ref < pre_ref) & (bmacd < pre_bmacd)) & NOT((ref > pre_ref) & (bmacd > pre_bmacd)), bmacd, 0)
+    
+    x1.bar(axes=axes, kref=kdata, color='#BFBFBF')
+    x2.bar(axes=axes, kref=kdata, color='red')
+    x3.bar(axes=axes, kref=kdata, color='green')
 
-    #axes.vbar(x1, y1, width=0.4, color='#BFBFBF', edgecolor='#BFBFBF')
-    #axes.vbar(x2, y2, width=0.4, color='r', edgecolor='r')
-    #axes.vbar(x3, y3, width=0.4, color='g', edgecolor='g')
+    fmacd.plot(axes=axes, legend_on=False, text_on=False, kref=kdata)
+    smacd.plot(axes=axes, legend_on=False, text_on=False, kref=kdata)
 
-    #axt = axes.twinx()
-    #axt.grid(False)
-    #axt.set_yticks([])
-    #fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
-    #smacd.plot(axes=axt, legend_on=False, text_on=False)
-    fmacd.plot(axes=axes, linestyle='--', legend_on=False, text_on=False)
-    smacd.plot(axes=axes, legend_on=False, text_on=False)
-
-    #for label in axt.get_xticklabels():
-    #    label.set_visible(False)
+    return gcf()
