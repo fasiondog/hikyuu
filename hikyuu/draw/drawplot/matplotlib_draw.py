@@ -610,11 +610,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
                        如该值为None，则认为该信号发生器已经指定了交易对象，
                        否则，使用该参数作为交易对象
     """
-    if kdata is None:
-        kdata = sg.to
-    else:
-        sg.to = kdata
-
+    kdata = sg.to if kdata is None else kdata
     refdates = kdata.get_datetime_list()
     date_index = dict([(d, i) for i, d in enumerate(refdates)])
 

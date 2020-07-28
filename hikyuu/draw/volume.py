@@ -33,7 +33,7 @@
 """
 from hikyuu.util.mylog import escapetime
 from hikyuu import Query
-from hikyuu.indicator import Indicator, MA, CLOSE, VOL, CVAL, PRICELIST, SG_Cross
+from hikyuu.indicator import Indicator, IF, MA, CLOSE, VOL, CVAL, PRICELIST, SG_Cross
 from .drawplot import (
     create_figure, get_current_draw_engine, ax_set_locator_formatter, adjust_axes_show,
     ax_draw_macd, show_gcf
@@ -62,11 +62,11 @@ def draw(
 
     ax1, ax2 = create_figure(2)
     kdata.plot(axes=ax1)
-    ma1.plot(axes=ax1, legend_on=True)
-    ma2.plot(axes=ax1, legend_on=True)
-    ma3.plot(axes=ax1, legend_on=True)
-    ma4.plot(axes=ax1, legend_on=True)
-    ma5.plot(axes=ax1, legend_on=True)
+    ma1.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma2.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma3.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma4.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma5.plot(axes=ax1, legend_on=True, kref=kdata)
 
     sg = SG_Cross(MA(n=ma1_n), MA(n=ma2_n))
     sg.to = kdata
@@ -76,28 +76,18 @@ def draw(
     total = len(kdata)
 
     engine = get_current_draw_engine()
-    if engine == 'matplotlib':
-        rg = range(total)
-        x = [i - 0.2 for i in rg]
-        x1 = [x[i] for i in rg if kdata[i].close > kdata[i].open]
-        y1 = [vol[i] for i in rg if kdata[i].close > kdata[i].open]
-        x2 = [x[i] for i in rg if kdata[i].close <= kdata[i].open]
-        y2 = [vol[i] for i in rg if kdata[i].close <= kdata[i].open]
-        ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
-        ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
-
-    elif engine == 'echarts':
-        vol.bar(axes=ax2, color='r')
-    else:
-        pass
+    x1 = IF(kdata.close > kdata.open, vol, 0)
+    x2 = IF(kdata.close <= kdata.open, vol, 0)
+    x1.bar(axes=ax2, width=0.4, color='r', edgecolor='r', kref=kdata)
+    x2.bar(axes=ax2, width=0.4, color='g', edgecolor='g', kref=kdata)
 
     vma1 = MA(vol, vma1_n)
     vma2 = MA(vol, vma2_n)
-    vma1.plot(axes=ax2, legend_on=True)
-    vma2.plot(axes=ax2, legend_on=True)
+    vma1.plot(axes=ax2, legend_on=True, kref=kdata)
+    vma2.plot(axes=ax2, legend_on=True, kref=kdata)
 
     if query.ktype == Query.WEEK and stock.market == 'SH' and stock.code == '000001':
-        CVAL(0.16e+009, total, color='b', linestyle='--')
+        CVAL(0.16e+009, total, color='b', linestyle='--', kref=kdata)
         #ax2.hlines(0.16e+009,0,len(kdata),color='b',linestyle='--')
 
     ax_set_locator_formatter(ax1, kdata.get_datetime_list(), kdata.get_query().ktype)

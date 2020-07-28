@@ -55,6 +55,7 @@ from .bokeh_draw import iplot as bk_iplot
 from .bokeh_draw import ibar as bk_ibar
 from .bokeh_draw import ax_draw_macd as bk_ax_draw_macd
 from .bokeh_draw import ax_draw_macd2 as bk_ax_draw_macd2
+from .bokeh_draw import sgplot as bk_sgplot
 
 
 g_draw_engine = 'matplotlib'
@@ -89,6 +90,8 @@ def use_draw_with_bokeh():
 
     Indicator.plot = bk_iplot
     Indicator.bar = bk_ibar
+
+    SignalBase.plot = bk_sgplot
 
 
 def use_draw_with_matplotlib():

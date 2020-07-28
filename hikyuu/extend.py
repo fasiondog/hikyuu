@@ -88,6 +88,8 @@ def __new_Datetime_sub__(self, td):
         return __old_Datetime_sub__(self, td)
     elif isinstance(td, timedelta):
         return __old_Datetime_sub__(self, TimeDelta(td))
+    elif isinstance(td, Datetime):
+        return __old_Datetime_sub__(self, td)
     else:
         raise TypeError("unsupported operand type(s) for +: 'TimeDelta' and '{}'".format(type(td)))
 

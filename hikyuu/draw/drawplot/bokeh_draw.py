@@ -488,3 +488,73 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     smacd.plot(axes=axes, legend_on=False, text_on=False, kref=kdata)
 
     return gcf()
+
+
+def sgplot(sg, new=True, axes=None, style=1, kdata=None):
+    """绘制买入/卖出信号
+
+    :param SignalBase sg: 信号指示器
+    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
+    :param axes: 指定在那个轴对象中进行绘制
+    :param style: 1 | 2 信号箭头绘制样式
+    :param KData kdata: 指定的KData（即信号发生器的交易对象），
+                       如该值为None，则认为该信号发生器已经指定了交易对象，
+                       否则，使用该参数作为交易对象
+    """
+    kdata = sg.to if kdata is None else kdata
+    date_index = dict([(d, i) for i, d in enumerate(kdata.get_datetime_list())])
+
+    if axes is None:
+        if new:
+            axes = create_figure()
+            kplot(kdata, axes=axes)
+        else:
+            axes = gca()
+
+    height = max(kdata.high) - min(kdata.low)
+
+    buy_dates = sg.get_buy_signal()
+    buy_y = []
+    for d in buy_dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        x = krecord.datetime.datetime().timestamp() * 1000
+        if pos > 0:
+            x = x - (krecord.datetime - kdata[pos-1].datetime).ticks * 0.001 / 2
+        buy_y.append(krecord.low - height * 0.05)
+        label = Label(
+            x=x,
+            y=krecord.low - height * 0.1,
+            text='B',
+            text_font_size='14px',
+            text_color='red', 
+        )
+        axes.add_layout(label)
+    axes.triangle(x=[d.datetime() for d in buy_dates], y=buy_y, 
+                  fill_color='red', line_color='red', size=10)
+
+    sell_dates = sg.get_sell_signal()
+    sell_y = []
+    for d in sell_dates:
+        if d not in date_index:
+            continue
+        pos = date_index[d]
+        krecord = kdata[pos]
+        x = krecord.datetime.datetime().timestamp() * 1000
+        if pos > 0:
+            x = x - (krecord.datetime - kdata[pos-1].datetime).ticks * 0.001 / 2
+        sell_y.append(krecord.high + height * 0.05)
+        label = Label(
+            x=x,
+            y=krecord.high + height * 0.08,
+            text='S',
+            text_font_size='14px',
+            text_color='blue', 
+        )
+        axes.add_layout(label)
+    axes.inverted_triangle(x=[d.datetime() for d in sell_dates], y=sell_y, 
+                  fill_color='blue', line_color='blue', size=10)
+
+    return gcf()
