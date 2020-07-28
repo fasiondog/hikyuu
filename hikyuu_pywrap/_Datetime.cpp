@@ -95,6 +95,7 @@ void export_Datetime() {
 
       .def(self + other<TimeDelta>())
       //.def(other<TimeDelta>() + self) 在python里扩展支持
+      .def(self - self)
       .def(self - other<TimeDelta>())
 
 #if HKU_PYTHON_SUPPORT_PICKLE
