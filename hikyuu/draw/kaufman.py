@@ -60,7 +60,7 @@ def draw(
 
     cama = AMA(CLOSE(kdata), n=n)
     cama.name = "CAMA"
-    cama.plot(axes=ax1, color='b', legend_on=True)
+    cama.plot(axes=ax1, color='b', legend_on=True, kref=kdata)
 
     hama = AMA(HIGH(kdata), n=n)
     hama.name = "HAMA"
@@ -73,8 +73,8 @@ def draw(
     ax1.fill_between(range(lstd.discard, len(kdata)), fy1, fy2, alpha=0.2, color='y')
 
     if show_high_low:
-        hama.plot(axes=ax1, color='r', legend_on=True)
-        lama.plot(axes=ax1, color='g', legend_on=True)
+        hama.plot(axes=ax1, color='r', legend_on=True, kref=kdata)
+        lama.plot(axes=ax1, color='g', legend_on=True, kref=kdata)
 
     if sg_type == 'CROSS':
         fast_op = AMA(n=n)
@@ -83,7 +83,7 @@ def draw(
         sg.plot(axes=ax1, kdata=kdata)
         ind = slow_op(KDATA(kdata))
         ind.name = "EMA(CAMA)"
-        ind.plot(axes=ax1, color='m', legend_on=True)
+        ind.plot(axes=ax1, color='m', legend_on=True, kref=kdata)
 
     elif sg_type == 'SINGLE':
         sg = SG_Single(cama, filter_n=filter_n, filter_p=filter_p)
@@ -94,13 +94,13 @@ def draw(
 
     cer = PRICELIST(cama, 1)
     label = "ER(%s)" % cer[-1]
-    cer.plot(axes=ax2, color='b', marker='o', label=label, legend_on=False, text_on=True)
+    cer.plot(axes=ax2, color='b', marker='o', label=label, legend_on=False, text_on=True, kref=kdata)
 
     c = CLOSE(kdata)
-    CVAL(c, 0.8).plot(axes=ax2, color='r', linestyle='--')
-    CVAL(c, -0.6).plot(axes=ax2, color='r', linestyle='--')
-    CVAL(c, -0.8).plot(axes=ax2, color='r', linestyle='--')
-    CVAL(c, 0).plot(axes=ax2, color='k', linestyle='-')
+    CVAL(c, 0.8).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
+    CVAL(c, -0.6).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
+    CVAL(c, -0.8).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
+    CVAL(c, 0).plot(axes=ax2, color='k', linestyle='-', kref=kdata)
     #ax2.hlines(0.8,0,len(kdata),color='r',linestyle='--')
     #ax2.hlines(-0.6,0,len(kdata),color='r',linestyle='--')
     #ax2.hlines(-0.8,0,len(kdata),color='r',linestyle='--')
@@ -138,7 +138,7 @@ def draw2(
 
     cama = AMA(CLOSE(kdata), n=n)
     cama.name = "CAMA"
-    cama.plot(axes=ax1, color='b', legend_on=True)
+    cama.plot(axes=ax1, color='b', legend_on=True, kref=kdata)
 
     hama = AMA(HIGH(kdata), n=n)
     hama.name = "HAMA"
@@ -151,8 +151,8 @@ def draw2(
     ax1.fill_between(range(lstd.discard, len(kdata)), fy1, fy2, alpha=0.2, color='y')
 
     if show_high_low:
-        hama.plot(axes=ax1, color='r', legend_on=True)
-        lama.plot(axes=ax1, color='g', legend_on=True)
+        hama.plot(axes=ax1, color='r', legend_on=True, kref=kdata)
+        lama.plot(axes=ax1, color='g', legend_on=True, kref=kdata)
 
     if sg_type == 'CROSS':
         fast_op = AMA(n=n)
@@ -161,7 +161,7 @@ def draw2(
         sg.plot(axes=ax1, kdata=kdata)
         ind = slow_op(KDATA(kdata))
         ind.name = "EMA(CAMA)"
-        ind.plot(axes=ax1, color='m', legend_on=True)
+        ind.plot(axes=ax1, color='m', legend_on=True, kref=kdata)
 
     elif sg_type == 'SINGLE':
         sg = SG_Single(cama, filter_n=filter_n, filter_p=filter_p)
@@ -172,23 +172,23 @@ def draw2(
 
     a = POS(block, query, SG_Flex(AMA(n=3), 6))
     a.name = "POS(3)"
-    a.plot(axes=ax2, color='b', marker='.', legend_on=True)
+    a.plot(axes=ax2, color='b', marker='.', legend_on=True, kref=kdata)
     a = POS(block, query, SG_Flex(AMA(n=30), 60))
     a.name = "POS(30)"
-    a.plot(axes=ax2, color='g', marker='.', legend_on=True)
+    a.plot(axes=ax2, color='g', marker='.', legend_on=True, kref=kdata)
 
     c = CLOSE(kdata)
-    CVAL(c, 0.8).plot(axes=ax2, color='r', linestyle='--')
-    CVAL(c, 0.2).plot(axes=ax2, color='r', linestyle='--')
+    CVAL(c, 0.8).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
+    CVAL(c, 0.2).plot(axes=ax2, color='r', linestyle='--', kref=kdata)
 
     if ama1.name == "AMA":
         cer = PRICELIST(cama, 1)
         label = "ER(%s)" % cer[-1]
-        cer.plot(axes=ax3, color='b', marker='.', label=label, legend_on=False, text_on=True)
-        CVAL(c, 0.8).plot(axes=ax3, color='r', linestyle='--')
-        CVAL(c, -0.6).plot(axes=ax3, color='r', linestyle='--')
-        CVAL(c, -0.8).plot(axes=ax3, color='r', linestyle='--')
-        CVAL(c, 0).plot(axes=ax3, color='k', linestyle='-')
+        cer.plot(axes=ax3, color='b', marker='.', label=label, legend_on=False, text_on=True, kref=kdata)
+        CVAL(c, 0.8).plot(axes=ax3, color='r', linestyle='--', kref=kdata)
+        CVAL(c, -0.6).plot(axes=ax3, color='r', linestyle='--', kref=kdata)
+        CVAL(c, -0.8).plot(axes=ax3, color='r', linestyle='--', kref=kdata)
+        CVAL(c, 0).plot(axes=ax3, color='k', linestyle='-', kref=kdata)
     else:
         ax_draw_macd(ax2, kdata)
     #ax2.set_ylim(-1, 1)

@@ -75,7 +75,6 @@ def draw(
     vol = VOL(kdata)
     total = len(kdata)
 
-    engine = get_current_draw_engine()
     x1 = IF(kdata.close > kdata.open, vol, 0)
     x2 = IF(kdata.close <= kdata.open, vol, 0)
     x1.bar(axes=ax2, width=0.4, color='r', edgecolor='r', kref=kdata)
@@ -117,30 +116,19 @@ def draw2(
 
     ax1, ax2, ax3 = create_figure(3)
     kdata.plot(axes=ax1)
-    ma1.plot(axes=ax1, legend_on=True)
-    ma2.plot(axes=ax1, legend_on=True)
-    ma3.plot(axes=ax1, legend_on=True)
-    ma4.plot(axes=ax1, legend_on=True)
-    ma5.plot(axes=ax1, legend_on=True)
+    ma1.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma2.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma3.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma4.plot(axes=ax1, legend_on=True, kref=kdata)
+    ma5.plot(axes=ax1, legend_on=True, kref=kdata)
 
     vol = VOL(kdata)
-    total = len(kdata)
+    x1 = IF(kdata.close > kdata.open, vol, 0)
+    x2 = IF(kdata.close <= kdata.open, vol, 0)
+    x1.bar(axes=ax2, width=0.4, color='r', edgecolor='r', kref=kdata)
+    x2.bar(axes=ax2, width=0.4, color='g', edgecolor='g', kref=kdata)
 
-    engine = get_current_draw_engine()
-    if engine == 'matplotlib':
-        rg = range(total)
-        x = [i - 0.2 for i in rg]
-        x1 = [x[i] for i in rg if kdata[i].close > kdata[i].open]
-        y1 = [vol[i] for i in rg if kdata[i].close > kdata[i].open]
-        x2 = [x[i] for i in rg if kdata[i].close < kdata[i].open]
-        y2 = [vol[i] for i in rg if kdata[i].close < kdata[i].open]
-        ax2.bar(x1, y1, width=0.4, color='r', edgecolor='r')
-        ax2.bar(x2, y2, width=0.4, color='g', edgecolor='g')
-
-    elif engine == 'echarts':
-        vol.bar(axes=ax2, color='r', legend_on=True)
-    else:
-        pass
+    vol.bar(axes=ax2, color='r', legend_on=True)
 
     vma1 = MA(vol, vma1_n)
     vma2 = MA(vol, vma2_n)

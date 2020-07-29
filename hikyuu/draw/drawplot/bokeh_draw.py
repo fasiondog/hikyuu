@@ -15,7 +15,8 @@ from bokeh.io import output_notebook, output_file, show
 
 def trans_color(color):
     """将 matplotlib 常用的 color 转换为对应的 bokeh color，如果无法转换则返回原值"""
-    color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue', 'y': 'yellow'}
+    color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue', 'y': 'yellow', 
+                  'm': 'mediumorchid'}
     return color_dict[color] if color in color_dict else color
 
 
@@ -277,6 +278,7 @@ def iplot(
         if legend_on:
             axes.line(x='datetime', y='value', legend_label=label, line_width=width, 
                       line_color=line_color, source=source)
+            axes.legend.location = "top_left"
         else:
             axes.line(x='datetime', y='value', line_width=width, line_color=line_color, 
                       source=source)
@@ -290,6 +292,7 @@ def iplot(
         if legend_on:
             axes.line(x='datetime', y='value', legend_label=label, line_width=width, 
                       line_color=line_color, source=source)
+            axes.legend.location = "top_left"
         else:
             axes.line(x='datetime', y='value', line_width=width, line_color=line_color, 
                       source=source)
@@ -370,6 +373,7 @@ def ibar(
         if legend_on:
             axes.vbar(x='datetime', top='value', legend_label=label, width=width, 
                       color=line_color, source=source)
+            axes.legend.location = "top_left"
         else:
             axes.vbar(x='datetime', top='value', width=width, color=line_color, 
                       source=source)
@@ -384,6 +388,7 @@ def ibar(
         if legend_on:
             axes.vbar(x='datetime', top='value', legend_label=label, width=width, 
                       color=line_color, source=source)
+            axes.legend.location = "top_left"
         else:
             axes.vbar(x='datetime', top='value', width=width, color=line_color, 
                       source=source)
