@@ -163,10 +163,10 @@ for s in blocksz:
         blockzxb.add(s)
 zsbk_zxb = blockzxb
 
-zsbk_sz50 = sm.getBlock("指数板块", "上证50")
-zsbk_sz180 = sm.getBlock("指数板块", "上证180")
-zsbk_hs300 = sm.getBlock("指数板块", "沪深300")
-zsbk_zz100 = sm.getBlock("指数板块", "沪深300")
+zsbk_sz50 = sm.get_block("指数板块", "上证50")
+zsbk_sz180 = sm.get_block("指数板块", "上证180")
+zsbk_hs300 = sm.get_block("指数板块", "沪深300")
+zsbk_zz100 = sm.get_block("指数板块", "沪深300")
 
 # ==============================================================================
 #

@@ -76,7 +76,7 @@ void export_StockManager() {
     :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
     :rtype: Stock)")
 
-      .def("getBlock", &StockManager::getBlock, R"(getBlock(self, category, name)
+      .def("get_block", &StockManager::getBlock, R"(get_block(self, category, name)
 
     获取预定义的板块
 
