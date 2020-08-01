@@ -33,7 +33,7 @@ T python_list_to_vector(py::list pylist) {
     size_t total = py::len(pylist);
     T result(total);
     for (size_t i = 0; i < total; i++) {
-        result[i] = py::extract<T::value_type>(pylist[i])();
+        result[i] = py::extract<typename T::value_type>(pylist[i])();
     }
     return result;
 }

@@ -36,10 +36,10 @@ target("core")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("core.pyd")
+        add_cxflags("-wd4251")
     else 
         set_filename("core.so")
     end
-    add_cxflags("-wd4251")
     add_files("./**.cpp")
 
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")

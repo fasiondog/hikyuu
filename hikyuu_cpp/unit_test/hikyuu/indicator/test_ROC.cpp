@@ -8,7 +8,7 @@
  */
 
 #include "doctest/doctest.h"
-#include < fstream >
+#include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ROC.h>
 #include <hikyuu/indicator/crt/KDATA.h>
