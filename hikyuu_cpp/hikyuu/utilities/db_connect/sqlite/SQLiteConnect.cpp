@@ -53,7 +53,7 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param) {
     } catch (std::out_of_range& e) {
         HKU_THROW("Can't get database name! {}", e.what());
     } catch (hku::exception& e) {
-        HKU_THROW("Failed initialize data driver({})! SQLite3 error: {}", m_dbname, e.what());
+        HKU_THROW("Failed open database: {})! SQLite3 error: {}", m_dbname, e.what());
     } catch (std::exception& e) {
         HKU_THROW("Failed initialize data driver({})! exception: {}", m_dbname, e.what());
     } catch (...) {
