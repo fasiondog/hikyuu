@@ -286,7 +286,7 @@ def uninstall():
         site_lib_dir = sys.base_prefix + "/lib/site-packages"
     else:
         usr_dir = os.path.expanduser('~')
-        py_version, _ = get_python_version()
+        py_version = get_python_version()
         site_lib_dir = '{}/.local/lib/python{:>.1f}/site-packages'.format(
             usr_dir, py_version * 0.1)
     for dir in os.listdir(site_lib_dir):
