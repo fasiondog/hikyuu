@@ -70,6 +70,8 @@ def import_stock_name(connect, api, market, quotations=None):
 
     for i in range(int(stk_count/1000)+1):
         stock_list = api.get_security_list(pytdx_market, i * 1000)
+        if stock_list is None:
+            continue
         for stock in stock_list:
             newStockDict[stock['code']] = stock['name']
 
