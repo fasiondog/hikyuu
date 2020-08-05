@@ -35,7 +35,7 @@ public:
      * @param maxIdleConnect 运行的最大空闲连接数，为 0 表示不限制
      */
     explicit ConnectPool(const Parameter &param, size_t maxConnect = 0, size_t maxIdleConnect = 0)
-    : m_maxConnectSize(0),
+    : m_maxConnectSize(maxConnect),
       m_maxIdelSize(maxIdleConnect),
       m_count(0),
       m_param(param),
@@ -60,10 +60,10 @@ public:
     /** 获取可用连接，如超出允许的最大连接数将返回空指针 */
     ConnectPtr getConnect() noexcept {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_maxConnectSize > 0 && m_count > m_maxConnectSize) {
-            return ConnectPtr();
-        }
         if (m_connectList.empty()) {
+            if (m_maxConnectSize > 0 && m_count >= m_maxConnectSize) {
+                return ConnectPtr();
+            }
             m_count++;
             return ConnectPtr(new ConnectType(m_param), m_closer);
         }
