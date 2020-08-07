@@ -20,7 +20,7 @@
 #include <mysql/mysql.h>
 #endif
 
-#if !defined(my_bool)
+#if MYSQL_VERSION_ID >= 80000
 typedef bool my_bool;
 #endif
 
