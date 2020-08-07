@@ -36,9 +36,21 @@ public:
     string name() const;
     void name(const string& name);
 
+    /**
+     * 添加备选股票及其交易策略原型
+     * @param 备选股票
+     * @param 交易系统策略原型
+     */
     void addStock(const Stock& stock, const SystemPtr& protoSys);
+
+    /**
+     * 加入一组相同交易策略的股票
+     * @param 备选股票列表
+     * @param 交易系统策略原型
+     */
     void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
+    /** 获取所有系统实例 */
     SystemList getAllSystemList() const {
         return m_sys_list;
     }

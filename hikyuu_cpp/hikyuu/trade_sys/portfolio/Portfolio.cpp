@@ -87,6 +87,8 @@ bool Portfolio::readyForRun() {
     return true;
 }
 
+void Portfolio::runMoment(const Datetime& datetime) {}
+
 void Portfolio::run(const KQuery& query) {
     if (!readyForRun()) {
         return;

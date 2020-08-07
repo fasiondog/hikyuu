@@ -27,9 +27,10 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AFPtr& af) {
 
 AllocateFundsBase::AllocateFundsBase()
 : m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()), m_reserve_percent(0) {
-    setParam<bool>("adjust_hold_sys", false);  //是否调整之前已经持仓策略的持仓
-    setParam<int>("max_sys_num", 10);          //最大系统实例数
-    setParam<int>("freq", 1);                  //调仓频率
+    //是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
+    setParam<bool>("adjust_hold_sys", false);
+    setParam<int>("max_sys_num", 100000);  //最大系统实例数
+    setParam<int>("freq", 1);              //调仓频率
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name)
@@ -127,6 +128,9 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(const Datetime& date
                                                             SystemList& out_sys_list) {
     //计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
+    if (sw_list.size() == 0) {
+        return;
+    }
 
     //构建实际分配权重大于零的的系统集合，同时计算总权重
     std::set<SYSPtr> selected_sets;
@@ -147,8 +151,11 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(const Datetime& date
             TMPtr tm = sys->getTM();
             price_t cash = tm->currentCash();
             if (cash > 0) {
-                m_tm->checkin(date, cash);
-                tm->checkout(date, cash);
+                if (tm->checkout(date, cash)) {
+                    m_tm->checkin(date, cash);
+                } else {
+                    HKU_ERROR("Can't checkout from sub_tm!");
+                }
             }
         }
     }
@@ -234,41 +241,6 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(const Datetime& 
         return;
     }
 
-    /*
-        //获取分配的资产权重
-        SystemWeightList sw_list = _allocateWeight(date, se_list);
-        if (sw_list.size() == 0) {
-            return;
-        }
-
-        //计算总权重和
-        price_t total_weight = 0.0;
-        auto sw_iter = sw_list.rbegin();
-        for (size_t count = 0; sw_iter != sw_list.rend(); ++sw_iter, count++) {
-            total_weight += sw_iter->weight;
-        }
-
-        if (total_weight == 0.0) {
-            return;
-        }
-
-        //计算每份权重的资金
-        int precision = m_tm->getParam<int>("precision");
-        price_t per_cash = m_tm->currentCash() / total_weight;
-
-        for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
-            SYSPtr& sys = *iter;
-            TMPtr& tm = sys->getTM();
-        }
-
-        //
-        std::set<SYSPtr> selected_sets;
-        for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-            selected_sets.insert(*iter);
-        }
-
-    */
-
     //从当前选中的系统列表中将持仓的系统排除
     std::set<SYSPtr> hold_sets;
     for (auto iter = hold_list.begin(); iter != hold_list.end(); ++iter) {
@@ -288,9 +260,9 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(const Datetime& 
         return;
     }
 
-    //按权重排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
+    //按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
     std::sort(sw_list.begin(), sw_list.end(),
-              boost::bind(std::less<price_t>(), boost::bind(&SystemWeight::m_weight, _1),
+              boost::bind(std::less<double>(), boost::bind(&SystemWeight::m_weight, _1),
                           boost::bind(&SystemWeight::m_weight, _2)));
 
     //倒序遍历，计算总权重，并在遇到权重为0或等于最大持仓时
@@ -303,7 +275,7 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(const Datetime& 
         total_weight += sw_iter->getWeight();
     }
 
-    if (total_weight == 0.0) {
+    if (total_weight <= 0.0) {
         return;
     }
 
@@ -312,32 +284,37 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(const Datetime& 
     int precision = m_tm->getParam<int>("precision");
     price_t per_cash = 0.0;
 
-    per_cash = m_tm->currentCash() / total_weight;
+    per_cash = m_tm->currentCash() / total_weight;  // 每单位权重资金
     sw_iter = sw_list.rbegin();
     for (; sw_iter != end_iter; ++sw_iter) {
+        // 该系统期望分配的资金
         price_t will_cash = per_cash * sw_iter->getWeight();
-        if (will_cash == 0.0) {
-            continue;
+
+        if (will_cash <= 0.0) {
+            break;
         }
 
-        TMPtr tm = sw_iter->getSYS()->getTM();
-        assert(tm);
+        SYSPtr sub_sys = sw_iter->getSYS();
+        TMPtr sub_tm = sub_sys->getTM();
+        assert(sub_tm);
 
-        int real_precision = tm->getParam<int>("precision");
+        // 计算实际的价格精度（总账户和当前系统账号之间的最小值）
+        int real_precision = sub_tm->getParam<int>("precision");
         if (precision < real_precision) {
             real_precision = precision;
         }
 
-        will_cash = roundDown(will_cash - tm->currentCash(), real_precision);
+        // 计算该系统实际期望分配的资金，并将总账户中的资金移入该系统账户中
+        will_cash = roundDown(will_cash - sub_tm->currentCash(), real_precision);
         if (will_cash > 0) {
             if (!m_tm->checkout(date, will_cash)) {
                 HKU_ERROR("m_tm->checkout failed!");
                 continue;
             }
-            tm->checkin(date, will_cash);
+            sub_tm->checkin(date, will_cash);
         }
 
-        out_sys_list.push_back(sw_iter->getSYS());
+        out_sys_list.push_back(sub_sys);
     }
 }
 

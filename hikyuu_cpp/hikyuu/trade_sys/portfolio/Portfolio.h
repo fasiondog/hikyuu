@@ -41,6 +41,7 @@ public:
     }
 
     void run(const KQuery& query);
+    void runMoment(const Datetime& datetime);
 
     TMPtr getTM() {
         return m_tm;
