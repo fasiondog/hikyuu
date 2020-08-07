@@ -91,9 +91,14 @@ void MySQLStatement::_bindResult() {
     int idx = 0;
     while ((field = mysql_fetch_field(m_meta_result))) {
         m_result_bind[idx].buffer_type = field->type;
+#if MYSQL_VERSION_ID >= 80000
         m_result_bind[idx].is_null = (bool*)&m_result_is_null[idx];
-        m_result_bind[idx].length = &m_result_length[idx];
         m_result_bind[idx].error = (bool*)&m_result_error[idx];
+#else
+        m_result_bind[idx].is_null = &m_result_is_null[idx];
+        m_result_bind[idx].error = &m_result_error[idx];
+#endif
+        m_result_bind[idx].length = &m_result_length[idx];
 
         if (field->type == MYSQL_TYPE_LONGLONG) {
             int64 item = 0;
