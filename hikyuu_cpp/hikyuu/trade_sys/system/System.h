@@ -211,6 +211,7 @@ public:
     void _sellNow(const KRecord& today, Part from);
     void _sellDelay(const KRecord& today);
     void _submitSellRequest(const KRecord& today, Part from);
+    void _sellFromAllocateFunds(const KRecord& today, double num);
 
     void _sellShort(const KRecord& today, Part from);
     void _sellShortNow(const KRecord& today, Part from);

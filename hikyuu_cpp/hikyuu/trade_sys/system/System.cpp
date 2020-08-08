@@ -600,6 +600,39 @@ void System::_submitBuyRequest(const KRecord& today, Part from) {
     }
 }
 
+void System::_sellFromAllocateFunds(const KRecord& today, double num) {
+    if (getParam<bool>("delay")) {
+        if (m_sellRequest.valid) {
+            if (m_sellRequest.count > getParam<int>("max_delay_count")) {
+                //超出最大延迟次数，清除买入请求
+                m_sellRequest.clear();
+                return;
+            }
+            m_sellRequest.count++;
+
+        } else {
+            m_sellRequest.valid = true;
+            m_sellRequest.business = BUSINESS_SELL;
+            m_sellRequest.count = 1;
+        }
+
+        PositionRecord position = m_tm->getPosition(m_stock);
+        m_sellRequest.from = PART_ALLOCATEFUNDS;
+        m_sellRequest.datetime = today.datetime;
+        m_sellRequest.stoploss = position.stoploss;
+        m_sellRequest.goal = position.goalPrice;
+        m_sellRequest.number = num;
+
+    } else {
+        PositionRecord position = m_tm->getPosition(m_stock);
+        price_t realPrice = _getRealSellPrice(today.datetime, today.closePrice);
+        TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, num, position.stoploss,
+                                        position.goalPrice, today.closePrice, PART_ALLOCATEFUNDS);
+        m_trade_list.push_back(record);
+        _sellNotifyAll(record);
+    }
+}
+
 void System::_sell(const KRecord& today, Part from) {
     if (getParam<bool>("delay")) {
         _submitSellRequest(today, from);
