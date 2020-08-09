@@ -89,7 +89,7 @@
  * @details 选择交易对象
  * @ingroup Portfolio
  *
- * @defgroup AllocateMoney AllocateMoney 资金分配算法模块
+ * @defgroup AllocateFunds Allocate Funds 资产分配算法模块
  * @details 进行资金分配
  * @ingroup Portfolio
  *

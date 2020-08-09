@@ -262,7 +262,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
         return;
     }
 
-    //如果持仓的系统数已大于等于最大持仓系统数，直接输出已持仓系统列表，并返回
+    //如果运行中的系统数已大于等于允许的最大系统数，直接返回
     int max_num = getParam<int>("max_sys_num");
     if (running_list.size() >= max_num) {
         return;
@@ -281,7 +281,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
         }
     }
 
-    //获取权重
+    //获取计划分配的资金权重
     SystemWeightList sw_list = _allocateWeight(date, pure_se_list);
     if (sw_list.size() == 0) {
         return;
@@ -292,26 +292,26 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
               boost::bind(std::less<double>(), boost::bind(&SystemWeight::m_weight, _1),
                           boost::bind(&SystemWeight::m_weight, _2)));
 
-    //倒序遍历，计算总权重，并在遇到权重为0或等于最大持仓时结束遍历
-    size_t remain = max_num - running_list.size();
+    //倒序遍历，计算总权重，并在遇到权重为0或等于运行的最大运行时系统数时结束遍历
     price_t total_weight = 0.0;
+    size_t count = 0;
     auto sw_iter = sw_list.rbegin();
-    for (size_t count = 0; sw_iter != sw_list.rend(); ++sw_iter, count++) {
-        if (sw_iter->getWeight() <= 0.0 || count >= remain)
+    for (; sw_iter != sw_list.rend(); ++sw_iter) {
+        if (sw_iter->getWeight() <= 0.0 || count >= max_num)
             break;
         total_weight += sw_iter->getWeight();
+        count++;
     }
 
     if (total_weight <= 0.0) {
         return;
     }
 
-    auto end_iter = sw_iter;
+    auto end_iter = sw_iter;  // 记录结束位置
 
-    int precision = m_tm->getParam<int>("precision");
-    price_t per_cash = 0.0;
-
-    per_cash = m_tm->currentCash() / total_weight;  // 每单位权重资金
+    // 再次遍历选中子系统列表，并将剩余现金按权重比例转入子账户
+    int precision = m_tm->getParam<int>("precision");       // 总账号资金精度
+    price_t per_cash = m_tm->currentCash() / total_weight;  // 每单位权重资金
     sw_iter = sw_list.rbegin();
     for (; sw_iter != end_iter; ++sw_iter) {
         // 该系统期望分配的资金
@@ -321,8 +321,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
         }
 
         // 尝试从总账户中取出资金存入子账户
-        SYSPtr sub_sys = sw_iter->getSYS();
-        TMPtr sub_tm = sub_sys->getTM();
+        TMPtr sub_tm = sw_iter->getSYS()->getTM();
         if (m_tm->checkout(date, will_cash)) {
             sub_tm->checkin(date, will_cash);
         }

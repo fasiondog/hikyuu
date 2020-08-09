@@ -20,15 +20,30 @@
 
 namespace hku {
 
+/**
+ * 资产分配算法
+ * @ingroup AllocateFunds
+ */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
     PARAMETER_SUPPORT
 
 public:
+    /** 默认构造函数 */
     AllocateFundsBase();
+
+    /**
+     * 构造函数
+     * @param name 算法名称
+     */
     AllocateFundsBase(const string& name);
+
+    /** 析构函数 */
     virtual ~AllocateFundsBase();
 
+    /** 获取算法名称 */
     string name() const;
+
+    /** 修改算法名称 */
     void name(const string& name);
 
     /**
@@ -47,7 +62,10 @@ public:
     /** 设定交易账户 */
     void setTM(const TMPtr&);
 
+    /** 获取关联查询条件 */
     KQuery getQuery();
+
+    /** 设置查询条件 */
     void setQuery(KQuery query);
 
     /** 获取不参与资产分配的保留比例 */
@@ -80,11 +98,14 @@ public:
      * @param se_list 系统实例选择器选出的系统实例
      * @return
      */
-
     virtual SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) = 0;
 
+private:
+    /* 同时调整已运行中的子系统（已分配资金或已持仓） */
     void _adjust_with_running(const Datetime& date, const SystemList& se_list,
                               const std::list<SYSPtr>& running_list);
+
+    /* 仅适用剩余资金在选中的子系统中分配资金 */
     void _adjust_without_running(const Datetime& date, const SystemList& se_list,
                                  const std::list<SYSPtr>& running_list);
 
