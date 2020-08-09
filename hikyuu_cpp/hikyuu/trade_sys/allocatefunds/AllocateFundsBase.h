@@ -32,14 +32,14 @@ public:
     void name(const string& name);
 
     /**
-     * Portfolio获取实际获得资产分配的系统策略实例
+     * 执行资产分配调整
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
-     * @param hold_list 当前分配过资金的系统实例
+     * @param running_list 当前运行中的系统实例
      * @return
      */
-    SystemList getAllocatedSystemList(const Datetime& date, const SystemList& se_list,
-                                      const SystemList& hold_list);
+    void adjustFunds(const Datetime& date, const SystemList& se_list,
+                     const std::list<SYSPtr>& running_list);
 
     /** 获取交易账户 */
     TMPtr getTM();
@@ -58,8 +58,6 @@ public:
      * @param p 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
      */
     void setReserverPercent(double p);
-
-    bool changed(Datetime date);
 
     /** 复位 */
     void reset();
@@ -85,11 +83,10 @@ public:
 
     virtual SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) = 0;
 
-    void _getAllocatedSystemList_adjust_hold(const Datetime& date, const SystemList& se_list,
-                                             const SystemList& hold_list, SystemList& out_sys_list);
-    void _getAllocatedSystemList_not_adjust_hold(const Datetime& date, const SystemList& se_list,
-                                                 const SystemList& hold_list,
-                                                 SystemList& out_sys_list);
+    void _adjust_with_running(const Datetime& date, const SystemList& se_list,
+                              const std::list<SYSPtr>& running_list);
+    void _adjust_without_running(const Datetime& date, const SystemList& se_list,
+                                 const std::list<SYSPtr>& running_list);
 
 private:
     string m_name;

@@ -24,14 +24,10 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
     return os;
 }
 
-SelectorBase::SelectorBase() : m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {
-    setParam<int>("freq", 1);  //已Bar为单位
-}
+SelectorBase::SelectorBase() : m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {}
 
 SelectorBase::SelectorBase(const string& name)
-: m_name(name), m_count(0), m_pre_date(Datetime::min()) {
-    setParam<int>("freq", 1);
-}
+: m_name(name), m_count(0), m_pre_date(Datetime::min()) {}
 
 SelectorBase::~SelectorBase() {}
 
@@ -75,6 +71,7 @@ SelectorPtr SelectorBase::clone() {
 
     SystemList::const_iterator iter = m_sys_list.begin();
     for (; iter != m_sys_list.end(); ++iter) {
+        // TODO
         p->m_sys_list.push_back((*iter)->clone(true, false));
     }
 
@@ -113,25 +110,6 @@ void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
         SYSPtr sys = protoSys->clone(true, false);
         m_sys_list.push_back(sys);
     }
-}
-
-bool SelectorBase::changed(Datetime date) {
-    if (date <= m_pre_date || date == Null<Datetime>())
-        return false;
-
-    int freq = getParam<int>("freq");
-    if (freq <= 0) {
-        freq = 1;
-    }
-
-    m_count++;
-    if (m_count >= freq) {
-        m_count = 0;
-        m_pre_date = date;
-        return true;
-    }
-
-    return false;
 }
 
 } /* namespace hku */

@@ -28,8 +28,9 @@ enum SystemPart {
     PART_SLIPPAGE = 7,     /**< 移滑价差算法 */
 
     PART_ALLOCATEFUNDS = 8, /**< 资产分配算法 */
+    PART_PORTFOLIO = 9,     /**< 资产组合 */
 
-    PART_INVALID = 9, /**< 无效值 */
+    PART_INVALID = 10, /**< 无效值 */
 };
 
 /**

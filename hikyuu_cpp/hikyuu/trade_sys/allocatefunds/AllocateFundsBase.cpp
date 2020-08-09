@@ -28,16 +28,14 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AFPtr& af) {
 AllocateFundsBase::AllocateFundsBase()
 : m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()), m_reserve_percent(0) {
     //是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
-    setParam<bool>("adjust_hold_sys", false);
+    setParam<bool>("adjust_running_sys", false);
     setParam<int>("max_sys_num", 100000);  //最大系统实例数
-    setParam<int>("freq", 1);              //调仓频率
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name)
 : m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()), m_reserve_percent(0) {
-    setParam<bool>("adjust_hold_sys", false);
+    setParam<bool>("adjust_running_sys", false);
     setParam<int>("max_sys_num", 100000);  //最大系统实例数
-    setParam<int>("freq", 1);              //调仓频率
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
@@ -83,49 +81,23 @@ void AllocateFundsBase::setReserverPercent(double percent) {
     }
 }
 
-bool AllocateFundsBase::changed(Datetime date) {
-    if (date <= m_pre_date || date == Null<Datetime>())
-        return false;
-
-    int freq = getParam<int>("freq");
-    if (freq <= 0) {
-        freq = 1;
-    }
-
-    m_count++;
-    if (m_count >= freq) {
-        m_count = 0;
-        m_pre_date = date;
-        return true;
-    }
-
-    return false;
-}
-
-SystemList AllocateFundsBase ::getAllocatedSystemList(const Datetime& date,
-                                                      const SystemList& se_list,
-                                                      const SystemList& hold_list) {
-    SystemList result;
-
+void AllocateFundsBase ::adjustFunds(const Datetime& date, const SystemList& se_list,
+                                     const std::list<SYSPtr>& running_list) {
     int max_num = getParam<int>("max_sys_num");
     if (max_num <= 0) {
         HKU_ERROR("param(max_sys_num) need > 0!");
-        return result;
+        return;
     }
 
-    if (getParam<bool>("adjust_hold_sys")) {
-        _getAllocatedSystemList_adjust_hold(date, se_list, hold_list, result);
+    if (getParam<bool>("adjust_running_sys")) {
+        _adjust_with_running(date, se_list, running_list);
     } else {
-        _getAllocatedSystemList_not_adjust_hold(date, se_list, hold_list, result);
+        _adjust_without_running(date, se_list, running_list);
     }
-
-    return result;
 }
 
-void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(const Datetime& date,
-                                                            const SystemList& se_list,
-                                                            const SystemList& hold_list,
-                                                            SystemList& out_sys_list) {
+void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemList& se_list,
+                                             const std::list<SYSPtr>& running_list) {
     //计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     if (sw_list.size() == 0) {
@@ -143,7 +115,7 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(const Datetime& date
     }
 
     //如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，如果账户有现金则同时回收现金
-    for (auto iter = hold_list.begin(); iter != hold_list.end(); ++iter) {
+    for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
         const SYSPtr& sys = *iter;
         if (selected_sets.find(sys) == selected_sets.end()) {
             KRecord record = sys->getTO().getKRecordByDate(date);
@@ -251,7 +223,7 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(const Datetime& date
                     need_sell_num =
                       size_t(need_sell_num / stock.minTradeNumber()) * stock.minTradeNumber();
                     if (position.number >= need_sell_num) {
-                        sys->_sellFromAllocateFunds(k, need_sell_num);
+                        sys->_sellForce(k, need_sell_num, PART_ALLOCATEFUNDS);
                     }
                 }
 
@@ -284,30 +256,25 @@ void AllocateFundsBase::_getAllocatedSystemList_adjust_hold(const Datetime& date
     }
 }
 
-void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(const Datetime& date,
-                                                                const SystemList& se_list,
-                                                                const SystemList& hold_list,
-                                                                SystemList& out_sys_list) {
+void AllocateFundsBase::_adjust_without_running(const Datetime& date, const SystemList& se_list,
+                                                const std::list<SYSPtr>& running_list) {
     if (se_list.size() == 0) {
         return;
     }
 
-    //不调整持仓，先将所有持仓系统加入到输出系统列表中
-    out_sys_list.insert(out_sys_list.end(), hold_list.begin(), hold_list.end());
-
     //如果持仓的系统数已大于等于最大持仓系统数，直接输出已持仓系统列表，并返回
     int max_num = getParam<int>("max_sys_num");
-    if (hold_list.size() >= max_num) {
+    if (running_list.size() >= max_num) {
         return;
     }
 
-    //从当前选中的系统列表中将持仓的系统排除
+    //从当前选中的系统列表中将运行中的子系统排除
     std::set<SYSPtr> hold_sets;
-    for (auto iter = hold_list.begin(); iter != hold_list.end(); ++iter) {
+    for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
         hold_sets.insert(*iter);
     }
 
-    SystemList pure_se_list;
+    SystemList pure_se_list;  // 不包含运行中系统的子系统列表
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
         if (hold_sets.find(*iter) == hold_sets.end()) {
             pure_se_list.push_back(*iter);
@@ -325,8 +292,8 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(const Datetime& 
               boost::bind(std::less<double>(), boost::bind(&SystemWeight::m_weight, _1),
                           boost::bind(&SystemWeight::m_weight, _2)));
 
-    //倒序遍历，计算总权重，并在遇到权重为0或等于最大持仓时
-    size_t remain = max_num - hold_list.size();
+    //倒序遍历，计算总权重，并在遇到权重为0或等于最大持仓时结束遍历
+    size_t remain = max_num - running_list.size();
     price_t total_weight = 0.0;
     auto sw_iter = sw_list.rbegin();
     for (size_t count = 0; sw_iter != sw_list.rend(); ++sw_iter, count++) {
@@ -348,33 +315,17 @@ void AllocateFundsBase::_getAllocatedSystemList_not_adjust_hold(const Datetime& 
     sw_iter = sw_list.rbegin();
     for (; sw_iter != end_iter; ++sw_iter) {
         // 该系统期望分配的资金
-        price_t will_cash = per_cash * sw_iter->getWeight();
-
-        if (will_cash <= 0.0) {
+        price_t will_cash = roundDown(per_cash * sw_iter->getWeight(), precision);
+        if (will_cash <= std::abs(roundDown(0.0, precision))) {
             break;
         }
 
+        // 尝试从总账户中取出资金存入子账户
         SYSPtr sub_sys = sw_iter->getSYS();
         TMPtr sub_tm = sub_sys->getTM();
-        assert(sub_tm);
-
-        // 计算实际的价格精度（总账户和当前系统账号之间的最小值）
-        int real_precision = sub_tm->getParam<int>("precision");
-        if (precision < real_precision) {
-            real_precision = precision;
-        }
-
-        // 计算该系统实际期望分配的资金，并将总账户中的资金移入该系统账户中
-        will_cash = roundDown(will_cash - sub_tm->currentCash(), real_precision);
-        if (will_cash > 0) {
-            if (!m_tm->checkout(date, will_cash)) {
-                HKU_ERROR("m_tm->checkout failed!");
-                continue;
-            }
+        if (m_tm->checkout(date, will_cash)) {
             sub_tm->checkin(date, will_cash);
         }
-
-        out_sys_list.push_back(sub_sys);
     }
 }
 

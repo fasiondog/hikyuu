@@ -600,7 +600,9 @@ void System::_submitBuyRequest(const KRecord& today, Part from) {
     }
 }
 
-void System::_sellFromAllocateFunds(const KRecord& today, double num) {
+void System::_sellForce(const KRecord& today, double num, Part from) {
+    HKU_ASSERT_M(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO,
+                 "Only Allocator or Portfolis can perform this operation!");
     if (getParam<bool>("delay")) {
         if (m_sellRequest.valid) {
             if (m_sellRequest.count > getParam<int>("max_delay_count")) {
@@ -617,7 +619,7 @@ void System::_sellFromAllocateFunds(const KRecord& today, double num) {
         }
 
         PositionRecord position = m_tm->getPosition(m_stock);
-        m_sellRequest.from = PART_ALLOCATEFUNDS;
+        m_sellRequest.from = from;
         m_sellRequest.datetime = today.datetime;
         m_sellRequest.stoploss = position.stoploss;
         m_sellRequest.goal = position.goalPrice;
@@ -627,7 +629,7 @@ void System::_sellFromAllocateFunds(const KRecord& today, double num) {
         PositionRecord position = m_tm->getPosition(m_stock);
         price_t realPrice = _getRealSellPrice(today.datetime, today.closePrice);
         TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, num, position.stoploss,
-                                        position.goalPrice, today.closePrice, PART_ALLOCATEFUNDS);
+                                        position.goalPrice, today.closePrice, from);
         m_trade_list.push_back(record);
         _sellNotifyAll(record);
     }

@@ -211,7 +211,9 @@ public:
     void _sellNow(const KRecord& today, Part from);
     void _sellDelay(const KRecord& today);
     void _submitSellRequest(const KRecord& today, Part from);
-    void _sellFromAllocateFunds(const KRecord& today, double num);
+
+    // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
+    void _sellForce(const KRecord& today, double num, Part from);
 
     void _sellShort(const KRecord& today, Part from);
     void _sellShortNow(const KRecord& today, Part from);

@@ -55,8 +55,6 @@ public:
         return m_sys_list;
     }
 
-    bool changed(Datetime date);
-
     void reset();
 
     void clear();
