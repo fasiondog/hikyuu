@@ -145,14 +145,8 @@ public:
 
     typedef shared_ptr<System> SystemPtr;
 
-    /** 克隆操作，会依次调用所有部件的clone操作
-     * @details TM、EV都是和具体系统无关的策略组件，可以在不同的系统中进行共享。clone将
-     * 生成新的独立实例，此时非共享状态。尤其需要注意TM是否共享的情况！
-     * @param with_tm 是clone还是共享
-     * @param with_ev 是clone还是共享
-     * @note 不设默认值，强迫用户了解其间的区别，避免误用。
-     */
-    SystemPtr clone(bool with_tm, bool with_ev);
+    /** 克隆操作，会依次调用所有部件的clone操作 */
+    SystemPtr clone();
 
     /**
      * 设置交易对象

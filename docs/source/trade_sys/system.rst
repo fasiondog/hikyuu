@@ -203,12 +203,9 @@
         :param bool with_tm: 是否复位TM组件
         :param bool with_ev: 是否复位EV组件
         
-    .. py:method:: clone(self, with_tm, with_ev)
+    .. py:method:: clone(self)
     
-        克隆操作。TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享。clone将生成新的独立实例，此时非共享状态。尤其需要注意TM是否共享的情况！
-        
-        :param bool with_tm: 是clone还是共享
-        :param bool with_ev: 是clone还是共享
+        克隆操作。
 
         
         

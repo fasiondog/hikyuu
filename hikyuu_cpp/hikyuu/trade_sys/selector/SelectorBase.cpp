@@ -72,7 +72,7 @@ SelectorPtr SelectorBase::clone() {
     SystemList::const_iterator iter = m_sys_list.begin();
     for (; iter != m_sys_list.end(); ++iter) {
         // TODO
-        p->m_sys_list.push_back((*iter)->clone(true, false));
+        p->m_sys_list.push_back((*iter)->clone());
     }
 
     return p;
@@ -89,7 +89,7 @@ void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
         return;
     }
 
-    SYSPtr sys = protoSys->clone(true, false);
+    SYSPtr sys = protoSys->clone();
     sys->setStock(stock);
     m_sys_list.push_back(sys);
 }
@@ -107,7 +107,7 @@ void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
             continue;
         }
 
-        SYSPtr sys = protoSys->clone(true, false);
+        SYSPtr sys = protoSys->clone();
         m_sys_list.push_back(sys);
     }
 }

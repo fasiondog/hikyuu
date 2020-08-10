@@ -172,11 +172,12 @@ void System::setTO(const KData& kdata) {
         m_mm->setQuery(query);
 }
 
-SystemPtr System::clone(bool with_tm, bool with_ev) {
+SystemPtr System::clone() {
     SystemPtr p = make_shared<System>();
-    p->m_tm = (with_tm && m_tm) ? m_tm->clone() : m_tm;
-    p->m_ev = (with_ev && m_ev) ? m_ev->clone() : m_ev;
-
+    if (m_tm)
+        p->m_tm = m_tm->clone();
+    if (m_ev)
+        p->m_ev = m_ev->clone();
     if (m_mm)
         p->m_mm = m_mm->clone();
     if (m_cn)
