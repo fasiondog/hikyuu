@@ -5,7 +5,8 @@
  *      Author: fasiondog
  */
 
-#include <boost/bind.hpp>
+#include <unordered_set>
+#include <functional>
 #include "AllocateFundsBase.h"
 
 namespace hku {
@@ -96,11 +97,35 @@ void AllocateFundsBase ::adjustFunds(const Datetime& date, const SystemList& se_
     }
 }
 
+price_t AllocateFundsBase::_getTotalFunds(const std::list<SYSPtr>& running_list) {
+    price_t total_value = 0;
+
+    // 计算运行中的子系统总资产净值
+    for (auto& sub_sys : running_list) {
+        TMPtr sub_tm = sub_sys->getTM();
+        KQuery sub_query = sub_sys->getTO().getQuery();
+        FundsRecord funds = sub_tm->getFunds(sub_query.kType());
+        total_value +=
+          funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
+    }
+
+    // 加上当前总账户现金余额
+    int precision = m_tm->getParam<int>("precision");
+    total_value = roundDown(total_value + m_tm->currentCash(), m_tm->getParam<int>("precision"));
+    return total_value;
+}
+
 void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemList& se_list,
                                              const std::list<SYSPtr>& running_list) {
-    //计算当前选中系统列表的权重
+    // 计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     if (sw_list.size() == 0) {
+        return;
+    }
+
+    // 如果运行中的系统数已大于等于允许的最大系统数，直接返回
+    int max_num = getParam<int>("max_sys_num");
+    if (running_list.size() >= max_num) {
         return;
     }
 
@@ -114,7 +139,9 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         }
     }
 
-    //如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，如果账户有现金则同时回收现金
+    std::unordered_set<SYSPtr> selected_running_sets;
+
+    // 如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，如果账户有现金则同时回收现金
     for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
         const SYSPtr& sys = *iter;
         if (selected_sets.find(sys) == selected_sets.end()) {
@@ -129,25 +156,56 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                     HKU_ERROR("Can't checkout from sub_tm!");
                 }
             }
+        } else {
+            selected_running_sets.insert(*iter);
         }
     }
 
-    //获取当前总账户资产，计算每单位权重代表的资金，当前能分配的现金
-    FundsRecord funds = m_tm->getFunds(m_query.kType());
-    price_t total_funds =
-      funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
+    // 按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
+    std::sort(
+      sw_list.begin(), sw_list.end(),
+      std::bind(std::less<double>(), std::bind(&SystemWeight::m_weight, std::placeholders::_1),
+                std::bind(&SystemWeight::m_weight, std::placeholders::_2)));
+
+    // 按权重从大到小遍历，构建不超过最大允许的运行子系统数的新权重列表（此时按从大到小顺序存放）
+    // 同时，将超出最大允许的运行子系统数范围外的运行中子系统清仓回收资金
+    std::list<SystemWeight> new_sw_list;  // 存放新的权重列表
+    size_t count = 0;
+    for (auto iter = sw_list.rbegin(); iter != sw_list.rend(); ++iter) {
+        if (count < max_num) {
+            // 小于最大允许运行数，保存至新的权重列表
+            new_sw_list.push_back(*iter);
+
+        } else if (selected_running_sets.find(iter->getSYS()) != selected_running_sets.end()) {
+            // 超出最大允许运行数且属于正在运行的子系统，则尝试清仓并回收资金
+            auto sys = iter->getSYS();
+            KRecord record = sys->getTO().getKRecordByDate(date);
+            sys->_sell(record, PART_ALLOCATEFUNDS);
+            TMPtr tm = sys->getTM();
+            price_t cash = tm->currentCash();
+            if (cash > 0) {
+                if (tm->checkout(date, cash)) {
+                    m_tm->checkin(date, cash);
+                } else {
+                    HKU_ERROR("Can't checkout from sub_tm!");
+                }
+            }
+        }
+        count++;
+    }
+
+    //获取当前总账户资产净值，并计算每单位权重代表的资金
+    price_t total_funds = _getTotalFunds(running_list);
     price_t per_weight_funds = total_funds / total_weight;
     int precision = m_tm->getParam<int>("precision");
     price_t can_allocate_cash = m_tm->currentCash();
 
-    // 按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
-    std::sort(sw_list.begin(), sw_list.end(),
-              boost::bind(std::less<double>(), boost::bind(&SystemWeight::m_weight, _1),
-                          boost::bind(&SystemWeight::m_weight, _2)));
-
-    // 按分配的权重将现金转移至子账户
     std::list<std::pair<SYSPtr, price_t>> wait_list;
-    for (auto iter = sw_list.rbegin(); iter != sw_list.rend(); ++iter) {
+
+    // 按权重从大到小遍历
+    // 1.如果子系统当前资产已经等于期望被分配的资产则不做处理
+    // 2.如果子系统当前资产小于期望被分配的资产
+    for (auto iter = new_sw_list.begin(); iter != new_sw_list.end(); ++iter) {
         // 如果可分配的现金不足或选中系统的分配权重已经小于等于0，则退出
         if (can_allocate_cash <= 0 || iter->getWeight() <= 0) {
             break;
@@ -156,7 +214,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         // 获取系统账户的当前资产市值
         SYSPtr sys = iter->getSYS();
         TMPtr tm = sys->getTM();
-        funds = tm->getFunds(m_query.kType());
+        FundsRecord funds = tm->getFunds(m_query.kType());
         price_t funds_value =
           funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
 
@@ -288,9 +346,10 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     }
 
     //按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
-    std::sort(sw_list.begin(), sw_list.end(),
-              boost::bind(std::less<double>(), boost::bind(&SystemWeight::m_weight, _1),
-                          boost::bind(&SystemWeight::m_weight, _2)));
+    std::sort(
+      sw_list.begin(), sw_list.end(),
+      std::bind(std::less<double>(), std::bind(&SystemWeight::m_weight, std::placeholders::_1),
+                std::bind(&SystemWeight::m_weight, std::placeholders::_2)));
 
     //倒序遍历，计算总权重，并在遇到权重为0或等于运行的最大运行时系统数时结束遍历
     price_t total_weight = 0.0;

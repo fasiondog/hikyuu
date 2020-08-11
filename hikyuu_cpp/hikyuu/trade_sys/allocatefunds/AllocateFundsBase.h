@@ -109,6 +109,9 @@ private:
     void _adjust_without_running(const Datetime& date, const SystemList& se_list,
                                  const std::list<SYSPtr>& running_list);
 
+    /* 计算当前的资产总值 */
+    price_t _getTotalFunds(const std::list<SYSPtr>& running_list);
+
 private:
     string m_name;
     KQuery m_query;
