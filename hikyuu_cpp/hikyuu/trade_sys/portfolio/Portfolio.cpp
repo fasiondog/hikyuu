@@ -207,4 +207,48 @@ void Portfolio::run(const KQuery& query) {
     }
 }
 
+FundsRecord Portfolio::getFunds(KQuery::KType ktype) const {
+    FundsRecord total_funds;
+    for (auto& sub_sys : m_running_sys_list) {
+        FundsRecord funds = sub_sys->getTM()->getFunds(ktype);
+        total_funds += funds;
+    }
+    total_funds.cash += m_tm->currentCash();
+    return total_funds;
+}
+
+FundsRecord Portfolio::getFunds(const Datetime& datetime, KQuery::KType ktype) {
+    FundsRecord total_funds;
+    for (auto& sub_sys : m_all_sys_set) {
+        FundsRecord funds = sub_sys->getTM()->getFunds(datetime, ktype);
+        total_funds += funds;
+    }
+    total_funds.cash += m_tm->cash(datetime, ktype);
+    return total_funds;
+}
+
+PriceList Portfolio::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
+    size_t total = dates.size();
+    PriceList result(total);
+    for (auto& sub_sys : m_all_sys_set) {
+        auto curve = sub_sys->getTM()->getFundsCurve(dates, ktype);
+        for (auto i = 0; i < total; i++) {
+            result[i] += curve[i];
+        }
+    }
+    return result;
+}
+
+PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
+    size_t total = dates.size();
+    PriceList result(total);
+    for (auto& sub_sys : m_all_sys_set) {
+        auto curve = sub_sys->getTM()->getProfitCurve(dates, ktype);
+        for (auto i = 0; i < total; i++) {
+            result[i] += curve[i];
+        }
+    }
+    return result;
+}
+
 } /* namespace hku */

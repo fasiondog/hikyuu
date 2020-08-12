@@ -35,6 +35,12 @@ void export_Portfolio() {
       .add_property("tm", &Portfolio::getTM, &Portfolio::setTM, "设置或获取交易管理对象")
       .add_property("se", &Portfolio::getSE, &Portfolio::setSE, "设置或获取交易对象选择算法")
 
+      .def("reset", &Portfolio::reset)
+      .def("clone", &Portfolio::clone)
+
+      .def("readyForRun", &Portfolio::readyForRun)
+      .def("runMoment", &Portfolio::runMoment)
+
       .def("run", &Portfolio::run, R"(run(self, query)
     
     运行投资组合策略

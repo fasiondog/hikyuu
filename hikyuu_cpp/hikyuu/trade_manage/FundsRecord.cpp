@@ -43,6 +43,29 @@ FundsRecord ::FundsRecord(price_t cash, price_t market_value, price_t short_mark
   borrow_cash(borrow_cash),
   borrow_asset(borrow_asset) {}
 
+FundsRecord FundsRecord::operator+(const FundsRecord other) {
+    FundsRecord result;
+    result.cash = cash + other.cash;
+    result.market_value = market_value + other.market_value;
+    result.short_market_value = short_market_value + other.short_market_value;
+    result.base_cash = base_cash + other.base_cash;
+    result.base_asset = base_asset + other.base_asset;
+    result.borrow_cash = borrow_cash + other.borrow_cash;
+    result.borrow_asset = borrow_asset + other.borrow_asset;
+    return result;
+}
+
+FundsRecord& FundsRecord::operator+=(const FundsRecord other) {
+    cash += other.cash;
+    market_value += other.market_value;
+    short_market_value += other.short_market_value;
+    base_cash += other.base_cash;
+    base_asset += other.base_asset;
+    borrow_cash += other.borrow_cash;
+    borrow_asset += other.borrow_asset;
+    return *this;
+}
+
 bool HKU_API operator==(const FundsRecord& d1, const FundsRecord& d2) {
     if (std::fabs(d1.cash - d2.cash) < 0.0001 &&
         std::fabs(d1.market_value - d2.market_value) < 0.0001 &&

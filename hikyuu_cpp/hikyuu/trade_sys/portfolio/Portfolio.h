@@ -89,6 +89,38 @@ public:
     typedef shared_ptr<Portfolio> PortfolioPtr;
     PortfolioPtr clone();
 
+    /**
+     * 获取资产组合账户当前时刻的资产详情
+     * @param ktype 日期的类型
+     * @return 资产详情
+     */
+    FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const;
+
+    /**
+     * 获取指定时刻的资产市值详情
+     * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
+     * @param ktype 日期的类型
+     * @return 资产详情
+     * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
+     */
+    FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY);
+
+    /**
+     * 获取资产净值曲线，含借入的资产
+     * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
+     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
+     * @return 资产净值列表
+     */
+    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
+
+    /**
+     * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
+     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
+     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
+     * @return 收益曲线
+     */
+    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
+
 protected:
     string m_name;
     TMPtr m_tm;
