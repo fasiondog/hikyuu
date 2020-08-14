@@ -64,7 +64,8 @@ target("core")
             target:add("linkdirs", libdir)
             local out, err = os.iorun("python3 --version")
             local ver = (out .. err):trim()
-            local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
+            --local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
+            local python_lib = format("python%s.%s", string.sub(ver,8,8), string.sub(ver,10,10))
             target:add("links", python_lib)
         end
 
@@ -91,6 +92,15 @@ target("core")
     end)
 
     after_build(function(target)
+        if is_plat("macosx") then
+            local out, err = os.iorun("python3 --version")
+            local ver = (out .. err):trim()
+            local boost_python_lib = format("libboost_python%s%s.dylib", string.sub(ver,8,8), string.sub(ver,10,10))
+            os.run(format("install_name_tool -change @rpath/libhikyuu.dylib @loader_path/libhikyuu.dylib %s/%s", target:targetdir(), "core.so"))
+            os.run(format("install_name_tool -change @rpath/libboost_serialization.dylib @loader_path/libboost_serialization.dylib %s/%s", target:targetdir(), "core.so"))
+            os.run(format("install_name_tool -change @rpath/%s @loader_path/%s %s/%s", boost_python_lib, boost_python_lib, target:targetdir(), "core.so"))
+        end
+
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
         os.cp(target:targetdir() .. '/*.pyd', dst_dir)
         os.cp(target:targetdir() .. '/*.dll', dst_dir)
@@ -112,7 +122,6 @@ target("core")
             end
             os.cp("$(projectdir)/hikyuu_extern_libs/pkg/mysql.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
         end
-
     end)
 
 

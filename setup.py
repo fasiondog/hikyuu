@@ -350,12 +350,24 @@ def wheel():
         plat = "manylinux1_x86_64"
     elif current_plat == 'linux' and current_bits == 32:
         plat = "manylinux1_i386"
+    elif current_plat == 'darwin' and current_bits == 32:
+        plat = "macosx_i686"
+    elif current_plat == 'darwin' and current_bits == 64:
+        plat = "macosx_10_9_x86_64"
     else:
         print("*********尚未实现该平台的支持*******")
         return
-    cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
+    if current_plat == 'win32':
+        cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
         py_version, plat)
-    os.system(cmd)
+        print(cmd)
+        os.system(cmd)
+    else:
+        cmd = 'python3 sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
+        py_version, plat)
+        print(cmd)
+        os.system(cmd)
+
 
 
 @click.command()

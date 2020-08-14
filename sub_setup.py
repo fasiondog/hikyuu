@@ -78,7 +78,7 @@ setup(
     package_data={
         '': [
             '*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml',
-            'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so',
+            'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib',
             'libboost_serialization*', 'libboost_python{}*'.format(py_version)
         ],
     },
