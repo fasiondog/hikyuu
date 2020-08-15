@@ -123,5 +123,6 @@ setup(
         'pytdx',
         'PyQt5',
         'tables',
+        'bokeh',
     ],
 )
