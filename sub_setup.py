@@ -124,5 +124,7 @@ setup(
         'PyQt5',
         'tables',
         'bokeh',
+        'gitpython',
+        'SQLAlchemy>=1.4.0'
     ],
 )
