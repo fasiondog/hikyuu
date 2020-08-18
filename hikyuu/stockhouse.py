@@ -40,7 +40,7 @@ class HouseModel(Base):
     __tablename__ = 'house_repo'
     id = Column(Integer, Sequence('remote_id_seq'), primary_key=True)
     name = Column(String, index=True)  # 本地仓库名
-    house_type = Column(String)
+    house_type = Column(String)  # 'remote' (远程仓库) | 'local' （本地仓库）
     local = Column(String)  # 本地地址
     url = Column(String)  # git 仓库地址
     branch = Column(String)  # 远程仓库分支
@@ -49,7 +49,9 @@ class HouseModel(Base):
     __table_args__ = (UniqueConstraint('name'), )
 
     def __str__(self):
-        return "RemoteHouse(id={}, url={}, local={})".format(self.id, self.url, self.local)
+        return "HouseModel(id={}, name={}, house_type={}, local={}, url={}, branch={})".format(
+            self.id, self.name, self.house_type, self.local, self.url, self.branch
+        )
 
     def __repr__(self):
         return "<{}>".format(self.__str__())
@@ -60,11 +62,20 @@ class PartModel(Base):
     id = Column(Integer, Sequence('part_id_seq'), primary_key=True)
     house_id = Column(Integer)  #所属仓库标识
     part = Column(String)  # 部件类型
-    module_name = Column(String)  # 策略导入模块名
+    module_name = Column(String, index=True)  # 用于查询检索的模块名 (如：仓库名称.part.sg.ama)
+    real_module_name = Column(String)  # 实际策略导入模块名
     name = Column(String)  # 策略名称
     author = Column(String)  # 策略作者
     brief = Column(String)  # 策略概要描述
     params = Column(String)  # 策略参数说明
+
+    def __str__(self):
+        return 'PartModel(id={}, house_id={}, part={}, name={}, author={}, module_name={})'.format(
+            self.id, self.house_id, self.part, self.name, self.author, self.module_name
+        )
+
+    def __repr__(self):
+        return '<{}>'.format(self.__str__())
 
 
 class StockHouse(object):
@@ -97,7 +108,13 @@ class StockHouse(object):
         # 将远程仓库本地缓存地址加入系统路径
         sys.path.append(self.remote_cache_dir)
 
-        # 检查并下载 hikyuu 策略仓库
+        # 将所有本地仓库的上层路径加入系统路径
+        house_models = self._session.query(HouseModel).filter_by(house_type='local').all()
+        for model in house_models:
+            base_dir = os.path.basename(model.local)
+            sys.path.append(base_dir)
+
+        # 检查并下载 hikyuu 默认策略仓库, hikyuu_house 避免导入时模块和 hikyuu 重名
         hikyuu_house_path = self._session.query(HouseModel.local
                                                 ).filter(HouseModel.name == 'hikyuu_house').first()
         if hikyuu_house_path is None:
@@ -139,8 +156,6 @@ class StockHouse(object):
         # 导入仓库各部件策略信息
         self.import_part_to_db(record)
 
-        # TODO 导入本地仓库部件信息
-
     def import_part_to_db(self, house_model):
         part_dict = {
             'af': 'part/af',
@@ -168,36 +183,67 @@ class StockHouse(object):
 
         base_local = os.path.basename(local_dir)
 
+        # 遍历仓库导入部件信息
         for part, part_dir in part_dict.items():
             path = "{}/{}".format(house_model.local, part_dir)
             try:
                 with os.scandir(path) as it:
                     for entry in it:
                         if not entry.name.startswith('.') and entry.is_dir():
-                            module_name = '{}.part.{}.{}.part'.format(
+                            # 计算实际的导入模块名
+                            real_module_name = '{}.part.{}.{}.part'.format(
                                 base_local, part, entry.name
-                            ) if part not in ('portfolio',
-                                              'system') else '{}.{}.part'.format(part, entry.name)
-                            print(sys.path)
-                            print(module_name)
-                            part_module = importlib.import_module(module_name)
+                            ) if part not in (
+                                'portfolio', 'system'
+                            ) else '{}.{}.{}.part'.format(base_local, part, entry.name)
+
+                            # 导入模块
+                            try:
+                                part_module = importlib.import_module(real_module_name)
+                            except ModuleNotFoundError:
+                                self.logger.error('忽略部件：缺失 part.py 文件, 位置："{}"！'.format(entry.path))
+                                continue
+
+                            module_vars = vars(part_module)
+
+                            module_name = '{}.{}.{}'.format(
+                                house_model.name, part, entry.name
+                            ) if part not in (
+                                'portfolio', 'system'
+                            ) else '{}.{}.{}'.format(house_model.name, part, entry.name)
+
                             part_model = PartModel(
                                 house_id=house_model.id,
                                 part=part,
                                 module_name=module_name,
-                                name=part_module.name,
-                                author=part_module.author,
-                                brief=part_module.brief,
+                                real_module_name=real_module_name,
+                                name=part_module.name if 'name' in module_vars else 'None',
+                                author=part_module.author if 'author' in module_vars else 'None',
+                                brief=part_module.brief if 'brief' in module_vars else 'None',
                                 params=str(part_module.params)
+                                if 'params' in module_vars else 'None'
                             )
-                            print(house_model.local, part, entry.name, module_name)
+                            self._session.add(part_model)
+                            print(part_model)
             except FileNotFoundError:
                 continue
-        #for part_dir in part_dirs:
-        #    for root, dirs, files in os.walk("{}/{}".format(house_model.local, part_dir)):
-        #        for dir_name in dirs:
-        #            print(house_model.local, dir_name)
+
+        self._session.commit()
+
+    def get_part(self, name):
+        part_list = self._session.query(PartModel.real_module_name).filter_by(module_name=name
+                                                                              ).first()
+        assert not part_list and len(part_list) == 1, 'Not found this part "%s"' % name
+
+        part_module = importlib.import_module(part_list[0])
+        part = part_module.sg.clone()
+
+        return part
 
 
 if __name__ == "__main__":
     house = StockHouse()
+    sg = house.get_part('hikyuu_house.sg.ama')
+    print(sg)
+
+    house.get_part('hikyuu_house.sg.tt')
