@@ -44,7 +44,6 @@ class HouseModel(Base):
     local = Column(String)  # 本地地址
     url = Column(String)  # git 仓库地址
     branch = Column(String)  # 远程仓库分支
-    status = Column(String)  # 导入状态 'success' | 'failed'
 
     __table_args__ = (UniqueConstraint('name'), )
 
@@ -78,7 +77,7 @@ class PartModel(Base):
         return '<{}>'.format(self.__str__())
 
 
-class StockHouse(object):
+class HouseManager(object):
     """策略库管理"""
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -89,6 +88,9 @@ class StockHouse(object):
         Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
         self._session = Session()
+
+    def setup_house(self):
+        usr_dir = os.path.expanduser('~')
 
         # 检查并建立远端仓库的本地缓存目录
         self.remote_cache_dir = self._session.query(ConfigModel.value
@@ -148,13 +150,13 @@ class StockHouse(object):
         except:
             raise RuntimeError("请检查网络是否正常或链接地址({})是否正确!".format(url))
 
-        # 更新仓库记录
+        # 导入仓库各部件策略信息
         record = HouseModel(name=name, house_type='remote', url=url, branch=branch, local=local_dir)
+        self.import_part_to_db(record)
+
+        # 更新仓库记录
         self._session.add(record)
         self._session.commit()
-
-        # 导入仓库各部件策略信息
-        self.import_part_to_db(record)
 
     def import_part_to_db(self, house_model):
         part_dict = {
@@ -231,19 +233,18 @@ class StockHouse(object):
         self._session.commit()
 
     def get_part(self, name):
-        part_list = self._session.query(PartModel.real_module_name).filter_by(module_name=name
-                                                                              ).first()
-        assert not part_list and len(part_list) == 1, 'Not found this part "%s"' % name
-
-        part_module = importlib.import_module(part_list[0])
+        part_list = self._session.query(PartModel).filter_by(module_name=name).one()
+        assert part_list, 'Not found this part "%s"' % name
+        part_module = importlib.import_module(part_list.real_module_name)
         part = part_module.sg.clone()
-
+        part.name = part_module.name
         return part
 
 
 if __name__ == "__main__":
-    house = StockHouse()
+    house = HouseManager()
+    house.setup_house()
     sg = house.get_part('hikyuu_house.sg.ama')
     print(sg)
 
-    house.get_part('hikyuu_house.sg.tt')
+    #house.get_part('hikyuu_house.sg.tt')
