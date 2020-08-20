@@ -61,8 +61,7 @@ class PartModel(Base):
     id = Column(Integer, Sequence('part_id_seq'), primary_key=True)
     house_id = Column(Integer)  #所属仓库标识
     part = Column(String)  # 部件类型
-    module_name = Column(String, index=True)  # 用于查询检索的模块名 (如：仓库名称.part.sg.ama)
-    real_module_name = Column(String)  # 实际策略导入模块名
+    module_name = Column(String)  # 实际策略导入模块名
     name = Column(String)  # 策略名称
     author = Column(String)  # 策略作者
     brief = Column(String)  # 策略概要描述
@@ -113,8 +112,7 @@ class HouseManager(object):
         # 将所有本地仓库的上层路径加入系统路径
         house_models = self._session.query(HouseModel).filter_by(house_type='local').all()
         for model in house_models:
-            base_dir = os.path.basename(model.local)
-            sys.path.append(base_dir)
+            sys.path.append(os.path.dirname(model.local))
 
         # 检查并下载 hikyuu 默认策略仓库, hikyuu_house 避免导入时模块和 hikyuu 重名
         hikyuu_house_path = self._session.query(HouseModel.local
@@ -158,6 +156,32 @@ class HouseManager(object):
         self._session.add(record)
         self._session.commit()
 
+    def add_local_house(self, name, path):
+        """增加本地数据仓库
+
+        :param str name: 仓库名称
+        :param str path: 本地全路径
+        """
+        assert os.path.lexists(path), '指定的路径不存在（"{}"）'.format(path)
+
+        record = self._session.query(HouseModel).filter(HouseModel.name == name).first()
+        assert record is None, '本地仓库名重复'
+
+        # 获取绝对路径
+        local_path = os.path.abspath(path)
+
+        # 将本地路径的上一层路径加入系统路径
+        sys.path.append(os.path.dirname(path))
+        print(sys.path)
+
+        # 导入部件信息
+        house_model = HouseModel(name=name, house_type='local', local=local_path)
+        self.import_part_to_db(house_model)
+
+        # 更新仓库记录
+        self._session.add(house_model)
+        self._session.commit()
+
     def import_part_to_db(self, house_model):
         part_dict = {
             'af': 'part/af',
@@ -193,7 +217,7 @@ class HouseManager(object):
                     for entry in it:
                         if not entry.name.startswith('.') and entry.is_dir():
                             # 计算实际的导入模块名
-                            real_module_name = '{}.part.{}.{}.part'.format(
+                            module_name = '{}.part.{}.{}.part'.format(
                                 base_local, part, entry.name
                             ) if part not in (
                                 'portfolio', 'system'
@@ -201,14 +225,15 @@ class HouseManager(object):
 
                             # 导入模块
                             try:
-                                part_module = importlib.import_module(real_module_name)
+                                part_module = importlib.import_module(module_name)
                             except ModuleNotFoundError:
+                                print(module_name)
                                 self.logger.error('忽略部件：缺失 part.py 文件, 位置："{}"！'.format(entry.path))
                                 continue
 
                             module_vars = vars(part_module)
 
-                            module_name = '{}.{}.{}'.format(
+                            name = '{}.{}.{}'.format(
                                 house_model.name, part, entry.name
                             ) if part not in (
                                 'portfolio', 'system'
@@ -217,9 +242,8 @@ class HouseManager(object):
                             part_model = PartModel(
                                 house_id=house_model.id,
                                 part=part,
+                                name=name,
                                 module_name=module_name,
-                                real_module_name=real_module_name,
-                                name=part_module.name if 'name' in module_vars else 'None',
                                 author=part_module.author if 'author' in module_vars else 'None',
                                 brief=part_module.brief if 'brief' in module_vars else 'None',
                                 params=str(part_module.params)
@@ -233,17 +257,18 @@ class HouseManager(object):
         self._session.commit()
 
     def get_part(self, name):
-        part_list = self._session.query(PartModel).filter_by(module_name=name).one()
-        assert part_list, 'Not found this part "%s"' % name
-        part_module = importlib.import_module(part_list.real_module_name)
+        part_model = self._session.query(PartModel).filter_by(name=name).first()
+        assert part_model, 'Not found this part "%s"' % name
+        part_module = importlib.import_module(part_model.module_name)
         part = part_module.sg.clone()
-        part.name = part_module.name
+        part.name = part_model.name
         return part
 
 
 if __name__ == "__main__":
     house = HouseManager()
     house.setup_house()
+    #house.add_local_house('test', '/home/fasiondog/workspace/stockhouse')
     sg = house.get_part('hikyuu_house.sg.ama')
     print(sg)
 
