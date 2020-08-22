@@ -8,6 +8,8 @@
 #===============================================================================
 
 import os
+import stat
+import errno
 import sys
 import shutil
 import logging
@@ -64,11 +66,12 @@ class PartModel(Base):
     id = Column(Integer, Sequence('part_id_seq'), primary_key=True)
     house_name = Column(String)  #所属仓库标识
     part = Column(String)  # 部件类型
-    module_name = Column(String)  # 实际策略导入模块名
     name = Column(String)  # 策略名称
     author = Column(String)  # 策略作者
-    brief = Column(String)  # 策略概要描述
+    brief = Column(String)  # 概要说明
+    details = Column(String)  # 详细说明
     params = Column(String)  # 策略参数说明
+    module_name = Column(String)  # 实际策略导入模块名
 
     def __str__(self):
         return 'PartModel(id={}, house_name={}, part={}, name={}, author={}, module_name={})'.format(
@@ -106,6 +109,17 @@ class PartNotFoundError(Exception):
 
     def __str__(self):
         return '未找到指定的策略部件: "{}", {}!'.format(self.name, self.cause)
+
+
+# Windows下 shutil.rmtree 删除的目录中如有存在只读文件或目录会导致失败，需要此函数辅助处理
+# 可参见：https://blog.csdn.net/Tri_C/article/details/99862201
+def handle_remove_read_only(func, path, exc):
+    excvalue = exc[1]
+    if func in (os.rmdir, os.remove, os.unlink) and excvalue.errno == errno.EACCES:
+        os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
+        func(path)
+    else:
+        raise RuntimeError('无法移除目录 "{}"，请手工删除'.format(path))
 
 
 def dbsession(func):
@@ -178,10 +192,10 @@ class HouseManager(metaclass=SingletonType):
 
         # 如果存在同名缓存目录，则强制删除
         if os.path.lexists(local_dir):
-            shutil.rmtree(local_dir)
+            shutil.rmtree(local_dir, onerror=handle_remove_read_only)
 
         try:
-            clone = git.Repo.clone_from(url, local_dir, branch=branch)
+            git.Repo.clone_from(url, local_dir, branch=branch)
         except:
             raise RuntimeError("请检查网络是否正常或链接地址({})是否正确!".format(url))
         print('下载完毕')
@@ -337,6 +351,7 @@ class HouseManager(metaclass=SingletonType):
                                 module_name=module_name,
                                 author=part_module.author if 'author' in module_vars else 'None',
                                 brief=part_module.brief if 'brief' in module_vars else 'None',
+                                details=part_module.details if 'details' in module_vars else 'None',
                                 params=str(part_module.params)
                                 if 'params' in module_vars else 'None'
                             )
@@ -413,7 +428,7 @@ if __name__ == "__main__":
     house.setup_house()
     #add_local_house('/home/fasiondog/workspace/test1')
     #update_house('test1')
-    #update_house('default')
+    update_house('default')
     #remove_house('test1')
     remove_house('test')
     sg = house.get_part('default.sg.ama')
