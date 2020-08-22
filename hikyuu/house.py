@@ -16,9 +16,10 @@ import git
 from configparser import ConfigParser
 
 from hikyuu.util.check import checkif
+from hikyuu.util.singleton import SingletonType
 
 from sqlalchemy import (create_engine, Sequence, Column, Integer, String, and_, UniqueConstraint)
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
@@ -87,14 +88,43 @@ class HouseNameRepeatError(Exception):
 
 
 class ModuleConflictError(Exception):
-    def __init__(self, confict):
-        self.confict = confict
+    def __init__(self, house_name, conflict_module, house_path):
+        self.house_name = house_name
+        self.conflict_module = conflict_module
+        self.house_path = house_path
 
     def __str__(self):
-        return '仓库名与其他 python 模块（"{}"）冲突，请更改仓库目录名称！'.format(self.confict)
+        return '仓库名（{}）与其他 python 模块（"{}"）冲突，请更改仓库目录名称！（"{}"）'.format(
+            self.house_name, self.conflict_module, self.house_path
+        )
 
 
-class HouseManager(object):
+class PartNotFoundError(Exception):
+    def __init__(self, name, cause):
+        self.name = name
+        self.cause = cause
+
+    def __str__(self):
+        return '未找到指定的策略部件: "{}", {}!'.format(self.name, self.cause)
+
+
+def dbsession(func):
+    def wrapfunc(*args, **kwargs):
+        x = args[0]
+        old_session = x._session
+        if x._session is None:
+            x._session = x._scoped_Session()
+        result = func(*args, **kwargs)
+        x._session.commit()
+        if old_session is not x._session:
+            x._session.close()
+            x._session = old_session
+        return result
+
+    return wrapfunc
+
+
+class HouseManager(metaclass=SingletonType):
     """策略库管理"""
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -103,9 +133,12 @@ class HouseManager(object):
         # 创建仓库数据库
         engine = create_engine("sqlite:///{}/.hikyuu/stockhouse.db".format(usr_dir))
         Base.metadata.create_all(engine)
-        Session = sessionmaker(bind=engine)
-        self._session = Session()
+        self._scoped_Session = scoped_session(
+            sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        )
+        self._session = None
 
+    @dbsession
     def setup_house(self):
         """初始化 hikyuu 默认策略仓库"""
         usr_dir = os.path.expanduser('~')
@@ -118,7 +151,6 @@ class HouseManager(object):
             self.remote_cache_dir = "{}/.hikyuu/house_cache".format(usr_dir)
             record = ConfigModel(key='remote_cache_dir', value=self.remote_cache_dir)
             self._session.add(record)
-            self._session.commit()
         else:
             self.remote_cache_dir = self.remote_cache_dir[0]
 
@@ -137,8 +169,24 @@ class HouseManager(object):
         hikyuu_house_path = self._session.query(HouseModel.local
                                                 ).filter(HouseModel.name == 'default').first()
         if hikyuu_house_path is None:
-            self.add_remote_house('default', 'https://gitee.com/fasiondog/stockhouse.git', 'master')
+            self.add_remote_house(
+                'default', 'https://gitee.com/fasiondog/hikyuu_house.git', 'master'
+            )
 
+    def download_remote_house(self, local_dir, url, branch):
+        print('正在下载 hikyuu 策略仓库至："{}"'.format(local_dir))
+
+        # 如果存在同名缓存目录，则强制删除
+        if os.path.lexists(local_dir):
+            shutil.rmtree(local_dir)
+
+        try:
+            clone = git.Repo.clone_from(url, local_dir, branch=branch)
+        except:
+            raise RuntimeError("请检查网络是否正常或链接地址({})是否正确!".format(url))
+        print('下载完毕')
+
+    @dbsession
     def add_remote_house(self, name, url, branch='master'):
         """增加远程策略仓库
 
@@ -153,16 +201,9 @@ class HouseManager(object):
             and_(HouseModel.url == url, HouseModel.branch == branch)
         ).first()
 
-        # 如果存在同名缓存目录，则强制删除
+        # 下载远程仓库
         local_dir = "{}/{}".format(self.remote_cache_dir, name)
-        if os.path.lexists(local_dir):
-            shutil.rmtree(local_dir)
-
-        print('正在克隆至 "{}/{}"'.format(self.remote_cache_dir, name))
-        try:
-            clone = git.Repo.clone_from(url, local_dir, branch=branch)
-        except:
-            raise RuntimeError("请检查网络是否正常或链接地址({})是否正确!".format(url))
+        self.download_remote_house(local_dir, url, branch)
 
         # 导入仓库各部件策略信息
         record = HouseModel(name=name, house_type='remote', url=url, branch=branch, local=local_dir)
@@ -170,8 +211,8 @@ class HouseManager(object):
 
         # 更新仓库记录
         self._session.add(record)
-        self._session.commit()
 
+    @dbsession
     def add_local_house(self, path):
         """增加本地数据仓库
 
@@ -192,7 +233,13 @@ class HouseManager(object):
 
         # 检查仓库目录名称是否与其他 python 模块存在冲突
         tmp = importlib.import_module(name)
-        checkif(tmp.__path__[0] != local_path, tmp.__path__[0], ModuleConflictError)
+        checkif(
+            tmp.__path__[0] != local_path,
+            name,
+            ModuleConflictError,
+            conflict_module=tmp.__path__[0],
+            house_path=local_path
+        )
 
         # 导入部件信息
         house_model = HouseModel(name=name, house_type='local', local=local_path)
@@ -200,8 +247,8 @@ class HouseManager(object):
 
         # 更新仓库记录
         self._session.add(house_model)
-        self._session.commit()
 
+    @dbsession
     def update_house(self, name):
         """更新指定仓库
 
@@ -211,8 +258,11 @@ class HouseManager(object):
         checkif(house_model is None, '指定的仓库（{}）不存在！'.format(name))
 
         self._session.query(PartModel).filter_by(house_name=name).delete()
+        if house_model.house_type == 'remote':
+            self.download_remote_house(house_model.local, house_model.url, house_model.branch)
         self.import_part_to_db(house_model)
 
+    @dbsession
     def remove_house(self, name):
         """删除指定的仓库
 
@@ -220,8 +270,8 @@ class HouseManager(object):
         """
         self._session.query(PartModel).filter_by(house_name=name).delete()
         self._session.query(HouseModel).filter_by(name=name).delete()
-        self._session.commit()
 
+    @dbsession
     def import_part_to_db(self, house_model):
         part_dict = {
             'af': 'part/af',
@@ -269,7 +319,7 @@ class HouseManager(object):
                                 part_module = importlib.import_module(module_name)
                             except ModuleNotFoundError:
                                 print(module_name)
-                                self.logger.error('忽略部件：缺失 part.py 文件, 位置："{}"！'.format(entry.path))
+                                self.logger.error('忽略：缺失 part.py 文件, 位置："{}"！'.format(entry.path))
                                 continue
 
                             module_vars = vars(part_module)
@@ -295,23 +345,21 @@ class HouseManager(object):
             except FileNotFoundError:
                 continue
 
-        self._session.commit()
-
+    @dbsession
     def get_part(self, name):
+        """获取指定策略部件
+
+        :param str name: 策略部件名称
+        """
         part_model = self._session.query(PartModel).filter_by(name=name).first()
-        assert part_model, 'Not found this part "%s"' % name
-        part_module = importlib.import_module(part_model.module_name)
+        checkif(part_model is None, name, PartNotFoundError, cause='仓库中不存在')
+        try:
+            part_module = importlib.import_module(part_model.module_name)
+        except ModuleNotFoundError:
+            raise PartNotFoundError(name, '请检查部件对应路径是否存在')
         part = part_module.sg.clone()
         part.name = part_model.name
         return part
-
-
-#----------------------------------------------------------
-#
-# 仓库操作函数，应使用这些函数完成仓库操作
-# 原因：多线程环境下，不能使用1个HouseManager实例去进行仓库的增删改
-#
-#----------------------------------------------------------
 
 
 def add_remote_house(name, url, branch='master'):
@@ -348,14 +396,29 @@ def remove_house(name):
     HouseManager().remove_house(name)
 
 
+def get_part(name):
+    """获取指定策略部件
+
+    :param str name: 策略部件名称
+    """
+    return HouseManager().get_part(name)
+
+
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
+    )
     house = HouseManager()
     house.setup_house()
-    add_local_house('/home/fasiondog/workspace/test1')
-    update_house('test1')
-    remove_house('test1')
+    #add_local_house('/home/fasiondog/workspace/test1')
+    #update_house('test1')
+    #update_house('default')
+    #remove_house('test1')
     remove_house('test')
-    #sg = house.get_part('stockhouse.sg.ama')
-    #print(sg)
+    sg = house.get_part('default.sg.ama')
+    print(sg)
+    sg = get_part('default.sg.ama')
+    print(sg)
 
     #house.get_part('hikyuu_house.sg.tt')

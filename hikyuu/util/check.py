@@ -17,9 +17,9 @@ class CheckError(Exception):
         return self.message
 
 
-def checkif(expression, message, excepion=None):
+def checkif(expression, message, excepion=None, **kwargs):
     if expression:
         if excepion is None:
             raise CheckError(expression, message)
         else:
-            raise excepion(message)
+            raise excepion(message, **kwargs)

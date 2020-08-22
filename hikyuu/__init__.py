@@ -53,6 +53,5 @@ from .deprecated import *
 from .indicator import *
 from .trade_manage import *
 from .trade_sys import *
-from .stockhouse import *
 
 __version__ = get_version()
