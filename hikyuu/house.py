@@ -69,6 +69,7 @@ class PartModel(Base):
     part = Column(String)  # 部件类型
     name = Column(String)  # 策略名称
     author = Column(String)  # 策略作者
+    version = Column(String)  # 版本
     doc = Column(String)  # 帮助说明
     module_name = Column(String)  # 实际策略导入模块名
 
@@ -312,8 +313,8 @@ class HouseManager(metaclass=SingletonType):
             'sg': 'part/sg',
             'sp': 'part/sp',
             'st': 'part/st',
-            'portfolio': 'portfolio',
-            'system': 'system',
+            'prtflo': 'prtflo',
+            'sys': 'sys',
         }
 
         # 检查仓库本地目录是否存在，不存在则给出告警信息并直接返回
@@ -340,15 +341,17 @@ class HouseManager(metaclass=SingletonType):
                             module_name = '{}.part.{}.{}.part'.format(
                                 base_local, part, entry.name
                             ) if part not in (
-                                'portfolio', 'system'
+                                'prtflo', 'sys'
                             ) else '{}.{}.{}.part'.format(base_local, part, entry.name)
 
                             # 导入模块
                             try:
                                 part_module = importlib.import_module(module_name)
                             except ModuleNotFoundError:
-                                print(module_name)
-                                self.logger.error('忽略：缺失 part.py 文件, 位置："{}"！'.format(entry.path))
+                                self.logger.error('缺失 part.py 文件, 位置："{}"！'.format(entry.path))
+                                continue
+                            except:
+                                self.logger.error('无法导入该文件: {}'.format(entry.path))
                                 continue
 
                             module_vars = vars(part_module)
@@ -356,7 +359,7 @@ class HouseManager(metaclass=SingletonType):
                             name = '{}.{}.{}'.format(
                                 house_model.name, part, entry.name
                             ) if part not in (
-                                'portfolio', 'system'
+                                'prtflo', 'sys'
                             ) else '{}.{}.{}'.format(house_model.name, part, entry.name)
 
                             part_model = PartModel(
@@ -366,6 +369,8 @@ class HouseManager(metaclass=SingletonType):
                                 module_name=module_name,
                                 author=part_module.author.strip()
                                 if 'author' in module_vars else 'None',
+                                version=part_module.version.strip()
+                                if 'version' in module_vars else 'None',
                                 doc=part_module.doc.strip() if 'doc' in module_vars else 'None',
                             )
                             self._session.add(part_model)
@@ -408,7 +413,7 @@ class HouseManager(metaclass=SingletonType):
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
             raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
-        part = part_module.sg.clone()
+        part = part_module.part.clone()
         for k, v in kwargs.items():
             part.set_param(k, v)
         part.name = part_model.name
@@ -425,14 +430,23 @@ class HouseManager(metaclass=SingletonType):
         return {
             'name': name,
             'author': part_model.author,
+            'version': part_model.version,
             'doc': part_model.doc,
         }
 
     def print_part_info(self, name):
         info = self.get_part_info(name)
-        print('name:', info['name'])
-        print('author:', info['author'])
-        print('doc:', info['doc'])
+        print('+---------+------------------------------------------------')
+        print('| name    | ', info['name'])
+        print('+---------+------------------------------------------------')
+        print('| author  | ', info['author'])
+        print('+---------+------------------------------------------------')
+        print('| version | ', info['version'])
+        print('+---------+------------------------------------------------')
+        #print('\n')
+        print(info['doc'])
+        #print('\n')
+        #print('----------------------------------------------------------')
 
     @dbsession
     def get_house_path(self, name):
@@ -452,7 +466,7 @@ def add_remote_house(name, url, branch='master'):
     :param str url: git 仓库地址
     :param str branch: git 仓库分支
     """
-    HouseManager().add_remote_house()
+    HouseManager().add_remote_house(name, url, branch)
 
 
 def add_local_house(path):
@@ -518,8 +532,6 @@ if __name__ == "__main__":
     #add_local_house('/home/fasiondog/workspace/test1')
     #update_house('test1')
     #update_house('default')
-    #remove_house('test1')
-    remove_house('test')
     sg = get_part('default.sg.ama', a=1, b=2)
     print(sg)
-    print_part_info('default.sg.ama')
+    print_part_info('default.sp.fixed_value')
