@@ -12,6 +12,7 @@ import stat
 import errno
 import sys
 import shutil
+import pathlib
 import logging
 import importlib
 import git
@@ -68,9 +69,7 @@ class PartModel(Base):
     part = Column(String)  # 部件类型
     name = Column(String)  # 策略名称
     author = Column(String)  # 策略作者
-    brief = Column(String)  # 概要说明
-    details = Column(String)  # 详细说明
-    params = Column(String)  # 策略参数说明
+    doc = Column(String)  # 帮助说明
     module_name = Column(String)  # 实际策略导入模块名
 
     def __str__(self):
@@ -88,6 +87,14 @@ class HouseNameRepeatError(Exception):
 
     def __str__(self):
         return "已存在相同名称的仓库（{}），请更换仓库名！".format(self.name)
+
+
+class HouseNotFoundError(Exception):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return '找不到指定的仓库（"{}"）'.format(self.name)
 
 
 class ModuleConflictError(Exception):
@@ -109,6 +116,14 @@ class PartNotFoundError(Exception):
 
     def __str__(self):
         return '未找到指定的策略部件: "{}", {}!'.format(self.name, self.cause)
+
+
+class PartNameError(Exception):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return '无效的策略部件名称: "{}"!'.format(self.name)
 
 
 # Windows下 shutil.rmtree 删除的目录中如有存在只读文件或目录会导致失败，需要此函数辅助处理
@@ -349,32 +364,85 @@ class HouseManager(metaclass=SingletonType):
                                 part=part,
                                 name=name,
                                 module_name=module_name,
-                                author=part_module.author if 'author' in module_vars else 'None',
-                                brief=part_module.brief if 'brief' in module_vars else 'None',
-                                details=part_module.details if 'details' in module_vars else 'None',
-                                params=str(part_module.params)
-                                if 'params' in module_vars else 'None'
+                                author=part_module.author.strip()
+                                if 'author' in module_vars else 'None',
+                                doc=part_module.doc.strip() if 'doc' in module_vars else 'None',
                             )
                             self._session.add(part_model)
-                            #print(part_model)
+
             except FileNotFoundError:
                 continue
 
     @dbsession
-    def get_part(self, name):
+    def get_part(self, name, **kwargs):
         """获取指定策略部件
 
         :param str name: 策略部件名称
+        :param kwargs: 其他部件相关参数
         """
-        part_model = self._session.query(PartModel).filter_by(name=name).first()
-        checkif(part_model is None, name, PartNotFoundError, cause='仓库中不存在')
+        name_parts = name.split('.')
+        checkif(
+            len(name_parts) < 2 or (
+                name_parts[-2] not in
+                ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys')
+            ), name, PartNameError
+        )
+
+        if len(name_parts) == 2:
+            # 未指定仓库名，尝试获取所在仓库名，并重新组装名称
+            abs_path = os.path.abspath(__file__)  #当前文件的绝对路径
+            path_parts = pathlib.Path(abs_path).parts
+            cause = '当前文件（"{}"）并非仓库中的策略文件，请手工指定仓库名'.format(abs_path)
+            if name_parts[0] in ('prtflo', 'sys'):
+                checkif(len(path_parts) < 4, name, PartNotFoundError, cause=cause)
+                part_name = '{}.{}'.format(path_parts[-4], name)
+            else:
+                checkif(len(path_parts) < 5, name, PartNotFoundError, cause=cause)
+                part_name = '{}.{}'.format(path_parts[-5], name)
+        else:
+            part_name = name
+
+        part_model = self._session.query(PartModel).filter_by(name=part_name).first()
+        checkif(part_model is None, part_name, PartNotFoundError, cause='仓库中不存在')
         try:
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
-            raise PartNotFoundError(name, '请检查部件对应路径是否存在')
+            raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
         part = part_module.sg.clone()
+        for k, v in kwargs.items():
+            part.set_param(k, v)
         part.name = part_model.name
         return part
+
+    @dbsession
+    def get_part_info(self, name):
+        """获取策略部件信息
+
+        :param str name: 部件名称
+        """
+        part_model = self._session.query(PartModel).filter_by(name=name).first()
+        checkif(part_model is None, name, PartNotFoundError, cause='仓库中不存在')
+        return {
+            'name': name,
+            'author': part_model.author,
+            'doc': part_model.doc,
+        }
+
+    def print_part_info(self, name):
+        info = self.get_part_info(name)
+        print('name:', info['name'])
+        print('author:', info['author'])
+        print('doc:', info['doc'])
+
+    @dbsession
+    def get_house_path(self, name):
+        """获取仓库所在的本地路径
+        
+        :param str name: 仓库名
+        """
+        path = self._session.query(HouseModel.local).filter_by(name=name).first()
+        checkif(path is None, name, HouseNotFoundError)
+        return path[0]
 
 
 def add_remote_house(name, url, branch='master'):
@@ -411,12 +479,33 @@ def remove_house(name):
     HouseManager().remove_house(name)
 
 
-def get_part(name):
+def get_part(name, **kwargs):
     """获取指定策略部件
 
     :param str name: 策略部件名称
+    :param kwargs: 其他部件相关参数
     """
-    return HouseManager().get_part(name)
+    return HouseManager().get_part(name, **kwargs)
+
+
+def get_house_path(name):
+    """获取仓库所在的本地路径
+    
+    :param str name: 仓库名
+    """
+    return HouseManager().get_house_path(name)
+
+
+def get_part_info(name):
+    """获取策略部件信息
+    
+    :param str name: 部件名称
+    """
+    return HouseManager().get_part_info(name)
+
+
+def print_part_info(name):
+    HouseManager().print_part_info(name)
 
 
 if __name__ == "__main__":
@@ -428,12 +517,9 @@ if __name__ == "__main__":
     house.setup_house()
     #add_local_house('/home/fasiondog/workspace/test1')
     #update_house('test1')
-    update_house('default')
+    #update_house('default')
     #remove_house('test1')
     remove_house('test')
-    sg = house.get_part('default.sg.ama')
+    sg = get_part('default.sg.ama', a=1, b=2)
     print(sg)
-    sg = get_part('default.sg.ama')
-    print(sg)
-
-    #house.get_part('hikyuu_house.sg.tt')
+    print_part_info('default.sg.ama')
