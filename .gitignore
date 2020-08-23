@@ -42,6 +42,7 @@ hikyuu/tools/maintain/importdata.ini
 hikyuu/libboost_*
 hikyuu/cpp/libboost_*
 hikyuu/importdata
+hikyuu/.eggs
 Hikyuu.egg-info
 hikyuu.egg-info
 dist

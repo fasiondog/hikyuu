@@ -129,9 +129,11 @@ TEST_CASE("test_Parameter_serialize") {
     Stock stk = getStock("sh600000");
     KQuery q = KQueryByDate(Datetime(200001041025), Datetime(200001041100), KQuery::MIN5);
     KData k = stk.getKData(q);
+    DatetimeList d = k.getDatetimeList();
     p1.set<Stock>("stk", stk);
     p1.set<KQuery>("query", q);
     p1.set<KData>("kdata", k);
+    p1.set<DatetimeList>("dates", d);
 
     PriceList x;
     for (int i = 0; i < 10; i++) {
@@ -166,6 +168,12 @@ TEST_CASE("test_Parameter_serialize") {
     CHECK(x.size() == x2.size());
     for (int i = 0; i < 10; i++) {
         CHECK(x[i] == x2[i]);
+    }
+    DatetimeList d2 = p2.get<DatetimeList>("dates");
+    CHECK(d.size() == k.size());
+    CHECK(d.size() == d2.size());
+    for (int i = 0; i < d.size(); i++) {
+        CHECK(d[i] == d2[i]);
     }
 }
 #endif /* HKU_SUPPORT_SERIALIZATION */
