@@ -413,9 +413,7 @@ class HouseManager(metaclass=SingletonType):
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
             raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
-        part = part_module.part.clone()
-        for k, v in kwargs.items():
-            part.set_param(k, v)
+        part = part_module.part(**kwargs)
         part.name = part_model.name
         return part
 
@@ -531,7 +529,7 @@ if __name__ == "__main__":
     house.setup_house()
     #add_local_house('/home/fasiondog/workspace/test1')
     #update_house('test1')
-    #update_house('default')
-    sg = get_part('default.sg.ama', a=1, b=2)
+    update_house('default')
+    sg = get_part('default.sg.ama', filter_n=15)
     print(sg)
     print_part_info('default.sp.fixed_value')
