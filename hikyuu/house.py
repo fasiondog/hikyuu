@@ -470,7 +470,7 @@ class HouseManager(metaclass=SingletonType):
         return [record[0] for record in self._session.query(HouseModel.name).all()]
 
     @dbsession
-    def get_part_name(self, house=None, part_type=None):
+    def get_part_name_list(self, house=None, part_type=None):
         """获取部件名称列表
 
         :param str house: 仓库名
@@ -557,25 +557,39 @@ def get_house_name_list():
     return HouseManager().get_house_name_list()
 
 
-def get_part_name(house=None, part_type=None):
+def get_part_name_list(house=None, part_type=None):
     """获取部件名称列表
     :param str house: 仓库名
     :param str part_type: 部件类型
     """
-    return HouseManager().get_part_name(house, part_type)
+    return HouseManager().get_part_name_list(house, part_type)
 
+
+# 初始化仓库
+HouseManager().setup_house()
+
+__all__ = [
+    'add_remote_house',
+    'add_local_house',
+    'update_house',
+    'remove_house',
+    'get_part',
+    'get_house_path',
+    'get_part_info',
+    'print_part_info',
+    'get_house_name_list',
+    'get_part_name_list',
+]
 
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
     )
-    house = HouseManager()
-    house.setup_house()
     #add_local_house('/home/fasiondog/workspace/test1')
     #update_house('test1')
     update_house('default')
-    sg = get_part('default.sg.ama', filter_n=15)
+    sg = get_part('default.st.fixed_percent')
     print(sg)
     print_part_info('default.sp.fixed_value')
-    print(get_part_name(part_type='sg'))
+    print(get_part_name_list(part_type='sg'))
