@@ -48,6 +48,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
+)
+
 from .extend import *
 from .deprecated import *
 from .indicator import *
