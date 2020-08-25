@@ -464,6 +464,30 @@ class HouseManager(metaclass=SingletonType):
         checkif(path is None, name, HouseNotFoundError)
         return path[0]
 
+    @dbsession
+    def get_house_name_list(self):
+        """返回仓库名称列表"""
+        return [record[0] for record in self._session.query(HouseModel.name).all()]
+
+    @dbsession
+    def get_part_name(self, house=None, part_type=None):
+        """获取部件名称列表
+
+        :param str house: 仓库名
+        :param str part_type: 部件类型
+        """
+        if house is None and part_type is None:
+            results = self._session.query(PartModel.name).all()
+        elif house is None:
+            results = self._session.query(PartModel.name).filter_by(part=part_type).all()
+        elif part_type is None:
+            results = self._session.query(PartModel.name).filter_by(house_name=house).all()
+        else:
+            results = self._session.query(PartModel.name).filter(
+                and_(PartModel.house_name == house, PartModel.part == part_type)
+            ).all()
+        return [record[0] for record in results]
+
 
 def add_remote_house(name, url, branch='master'):
     """增加远程策略仓库
@@ -528,6 +552,19 @@ def print_part_info(name):
     HouseManager().print_part_info(name)
 
 
+def get_house_name_list():
+    """返回仓库名称列表"""
+    return HouseManager().get_house_name_list()
+
+
+def get_part_name(house=None, part_type=None):
+    """获取部件名称列表
+    :param str house: 仓库名
+    :param str part_type: 部件类型
+    """
+    return HouseManager().get_part_name(house, part_type)
+
+
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
@@ -541,3 +578,4 @@ if __name__ == "__main__":
     sg = get_part('default.sg.ama', filter_n=15)
     print(sg)
     print_part_info('default.sp.fixed_value')
+    print(get_part_name(part_type='sg'))
