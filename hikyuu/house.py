@@ -569,7 +569,7 @@ def get_part_name_list(house=None, part_type=None):
 try:
     HouseManager().setup_house()
 except Exception as e:
-    self.logger.warning("无法初始化 hikyuu 策略仓库，请检查网络连接！ {}".format(e))
+    HouseManager().logger.warning("无法初始化 hikyuu 策略仓库！ {}".format(e))
 
 __all__ = [
     'add_remote_house',
