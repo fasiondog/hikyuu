@@ -355,6 +355,9 @@ class HouseManager(metaclass=SingletonType):
                                 continue
 
                             module_vars = vars(part_module)
+                            if 'part' not in module_vars:
+                                self.logger.error('缺失 part 函数！("{}")'.format(entry.path))
+                                continue
 
                             name = '{}.{}.{}'.format(
                                 house_model.name, part, entry.name
@@ -362,18 +365,23 @@ class HouseManager(metaclass=SingletonType):
                                 'prtflo', 'sys'
                             ) else '{}.{}.{}'.format(house_model.name, part, entry.name)
 
-                            part_model = PartModel(
-                                house_name=house_model.name,
-                                part=part,
-                                name=name,
-                                module_name=module_name,
-                                author=part_module.author.strip()
-                                if 'author' in module_vars else 'None',
-                                version=part_module.version.strip()
-                                if 'version' in module_vars else 'None',
-                                doc=part_module.doc.strip() if 'doc' in module_vars else 'None',
-                            )
-                            self._session.add(part_model)
+                            try:
+                                part_model = PartModel(
+                                    house_name=house_model.name,
+                                    part=part,
+                                    name=name,
+                                    module_name=module_name,
+                                    author=part_module.author.strip()
+                                    if 'author' in module_vars else 'None',
+                                    version=part_module.version.strip()
+                                    if 'version' in module_vars else 'None',
+                                    doc=part_module.part.__doc__.strip()
+                                    if part_module.part.__doc__ else "None"
+                                )
+                                self._session.add(part_model)
+                            except Exception as e:
+                                self.logger.error('存在语法错误 ("{}/part.py")! {}'.format(entry.path, e))
+                                continue
 
             except FileNotFoundError:
                 continue
