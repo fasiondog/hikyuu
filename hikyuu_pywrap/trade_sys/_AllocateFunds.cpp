@@ -15,8 +15,8 @@ using namespace hku;
 
 class AllocateFundsBaseWrap : public AllocateFundsBase, public wrapper<AllocateFundsBase> {
 public:
-    AllocateFundsBaseWrap(): AllocateFundsBase() {}
-    AllocateFundsBaseWrap(const string& name): AllocateFundsBase(name) {}
+    AllocateFundsBaseWrap() : AllocateFundsBase() {}
+    AllocateFundsBaseWrap(const string& name) : AllocateFundsBase(name) {}
     virtual ~AllocateFundsBaseWrap() {}
 
     void _reset() {
@@ -31,8 +31,7 @@ public:
         this->AllocateFundsBase::_reset();
     }
 
-    SystemWeightList _allocateWeight(const Datetime& date,
-                                    const SystemList& se_list) {
+    SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) {
         return this->get_override("_allocateWeight")(date, se_list);
     }
 
@@ -46,48 +45,45 @@ void (AllocateFundsBase::*af_set_name)(const string&) = &AllocateFundsBase::name
 
 void export_AllocateFunds() {
     class_<SystemWeight>("SystemWeight", init<>())
-            .def(init<const SystemPtr&, price_t>())
-            .def(self_ns::str(self))
-            .def_readwrite("sys", &SystemWeight::m_sys)
-            .def_readwrite("weight", &SystemWeight::m_weight)
+      .def(init<const SystemPtr&, price_t>())
+      .def(self_ns::str(self))
+      .def_readwrite("sys", &SystemWeight::m_sys)
+      .def_readwrite("weight", &SystemWeight::m_weight)
 #if HKU_PYTHON_SUPPORT_PICKLE
-            .def_pickle(normal_pickle_suite<SystemWeight>())
+      .def_pickle(normal_pickle_suite<SystemWeight>())
 #endif
-            ;
+      ;
 
-    SystemWeightList::const_reference (SystemWeightList::*SystemWeightList_at)(SystemWeightList::size_type) const = &SystemWeightList::at;
+    SystemWeightList::const_reference (SystemWeightList::*SystemWeightList_at)(
+      SystemWeightList::size_type) const = &SystemWeightList::at;
     void (SystemWeightList::*append)(const SystemWeight&) = &SystemWeightList::push_back;
     class_<SystemWeightList>("SystemWeightList")
-            .def("__iter__", iterator<SystemWeightList>())
-            .def("size", &SystemWeightList::size)
-            .def("__len__", &SystemWeightList::size)
-            .def("get", SystemWeightList_at, return_value_policy<copy_const_reference>())
-            .def("append", append)
-            ;
-
+      .def("__iter__", iterator<SystemWeightList>())
+      .def("size", &SystemWeightList::size)
+      .def("__len__", &SystemWeightList::size)
+      .def("get", SystemWeightList_at, return_value_policy<copy_const_reference>())
+      .def("append", append);
 
     class_<AllocateFundsBaseWrap, boost::noncopyable>("AllocateFundsBase", init<>())
-            .def(init<const string&>())
-            .def(self_ns::str(self))
-            .add_property("name", af_get_name, af_set_name)
-            .def("getParam", &AllocateFundsBase::getParam<boost::any>)
-            .def("setParam", &AllocateFundsBase::setParam<object>)
-            .def("haveParam", &AllocateFundsBase::haveParam)
+      .def(init<const string&>())
+      .def(self_ns::str(self))
+      .def(self_ns::repr(self))
+      .add_property("name", af_get_name, af_set_name)
+      .def("getParam", &AllocateFundsBase::getParam<boost::any>)
+      .def("setParam", &AllocateFundsBase::setParam<object>)
+      .def("haveParam", &AllocateFundsBase::haveParam)
 
-            .def("reset", &AllocateFundsBase::reset)
-            .def("clone", &AllocateFundsBase::clone)
-            .def("_reset", &AllocateFundsBase::_reset, &AllocateFundsBaseWrap::default_reset)
-            .def("_clone", pure_virtual(&AllocateFundsBase::_clone))
-            .def("_allocateWeight", pure_virtual(&AllocateFundsBase::_allocateWeight))
+      .def("reset", &AllocateFundsBase::reset)
+      .def("clone", &AllocateFundsBase::clone)
+      .def("_reset", &AllocateFundsBase::_reset, &AllocateFundsBaseWrap::default_reset)
+      .def("_clone", pure_virtual(&AllocateFundsBase::_clone))
+      .def("_allocateWeight", pure_virtual(&AllocateFundsBase::_allocateWeight))
 #if HKU_PYTHON_SUPPORT_PICKLE
-            .def_pickle(name_init_pickle_suite<AllocateFundsBase>())
+      .def_pickle(name_init_pickle_suite<AllocateFundsBase>())
 #endif
-            ;
+      ;
 
     register_ptr_to_python<AFPtr>();
 
     def("AF_EqualWeight", AF_EqualWeight);
-
 }
-
-

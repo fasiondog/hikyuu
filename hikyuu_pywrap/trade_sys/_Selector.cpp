@@ -15,8 +15,8 @@ using namespace hku;
 
 class SelectorWrap : public SelectorBase, public wrapper<SelectorBase> {
 public:
-    SelectorWrap(): SelectorBase() {}
-    SelectorWrap(const string& name): SelectorBase(name) {}
+    SelectorWrap() : SelectorBase() {}
+    SelectorWrap(const string& name) : SelectorBase(name) {}
     virtual ~SelectorWrap() {}
 
     void _reset() {
@@ -48,31 +48,29 @@ SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
 
 void export_Selector() {
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())
-            .def(init<const string&>())
-            .def(self_ns::str(self))
-            .add_property("name", sb_get_name, sb_set_name)
-            .def("getParam", &SelectorBase::getParam<boost::any>)
-            .def("setParam", &SelectorBase::setParam<object>)
-            .def("haveParam", &SelectorBase::haveParam)
+      .def(init<const string&>())
+      .def(self_ns::str(self))
+      .def(self_ns::repr(self))
+      .add_property("name", sb_get_name, sb_set_name)
+      .def("getParam", &SelectorBase::getParam<boost::any>)
+      .def("setParam", &SelectorBase::setParam<object>)
+      .def("haveParam", &SelectorBase::haveParam)
 
-            .def("reset", &SelectorBase::reset)
-            .def("clone", &SelectorBase::clone)
-            .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
-            .def("_clone", pure_virtual(&SelectorBase::_clone))
-            .def("getSelectedSystemList", pure_virtual(&SelectorBase::getSelectedSystemList))
-            .def("addStock", &SelectorBase::addStock)
-            .def("addStockList", &SelectorBase::addStockList)
-            .def("clear", &SelectorBase::clear)
+      .def("reset", &SelectorBase::reset)
+      .def("clone", &SelectorBase::clone)
+      .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
+      .def("_clone", pure_virtual(&SelectorBase::_clone))
+      .def("getSelectedSystemList", pure_virtual(&SelectorBase::getSelectedSystemList))
+      .def("addStock", &SelectorBase::addStock)
+      .def("addStockList", &SelectorBase::addStockList)
+      .def("clear", &SelectorBase::clear)
 #if HKU_PYTHON_SUPPORT_PICKLE
-            .def_pickle(name_init_pickle_suite<SelectorBase>())
+      .def_pickle(name_init_pickle_suite<SelectorBase>())
 #endif
-            ;
+      ;
 
     register_ptr_to_python<SelectorPtr>();
 
     def("SE_Fixed", SE_Fixed_1);
     def("SE_Fixed", SE_Fixed_2);
-
 }
-
-

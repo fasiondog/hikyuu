@@ -68,6 +68,7 @@ void export_Stoploss() {
                                              init<>())
       .def(init<const string&>())
       .def(self_ns::str(self))
+      .def(self_ns::repr(self))
 
       .add_property("name", st_get_name, st_set_name, "名称")
       .add_property("to", &StoplossBase::getTO, &StoplossBase::setTO, "设置或获取交易对象")
