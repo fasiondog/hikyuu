@@ -565,6 +565,16 @@ def get_part_name_list(house=None, part_type=None):
     return HouseManager().get_part_name_list(house, part_type)
 
 
+def get_current_house(filename):
+    """用于在仓库part.py中获取当前所在的仓库名
+
+    示例： get_current_house(__file__)
+    """
+    abs_path = os.path.abspath(filename)  #当前文件的绝对路径
+    path_parts = pathlib.Path(abs_path).parts
+    return path_parts[-4] if path_parts[-3] in ('prtflo', 'sys') else path_parts[5]
+
+
 # 初始化仓库
 try:
     HouseManager().setup_house()
@@ -582,6 +592,7 @@ __all__ = [
     'print_part_info',
     'get_house_name_list',
     'get_part_name_list',
+    'get_current_house',
 ]
 
 if __name__ == "__main__":
