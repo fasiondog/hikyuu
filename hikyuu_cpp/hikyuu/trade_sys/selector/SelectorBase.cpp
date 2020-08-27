@@ -78,26 +78,42 @@ SelectorPtr SelectorBase::clone() {
     return p;
 }
 
-void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
+bool SelectorBase::addSystem(const SystemPtr& sys) {
+    if (!sys) {
+        HKU_WARN("Try add null sys, will be discard!");
+        return false;
+    }
+
+    if (sys->getStock().isNull()) {
+        HKU_WARN("sys has not bind stock!");
+        return false;
+    }
+
+    m_sys_list.push_back(sys);
+    return true;
+}
+
+bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     if (stock.isNull()) {
         HKU_WARN("Try add Null stock, will be discard!");
-        return;
+        return false;
     }
 
     if (!protoSys) {
         HKU_WARN("Try add Null protoSys, will be discard!");
-        return;
+        return false;
     }
 
     SYSPtr sys = protoSys->clone();
     sys->setStock(stock);
     m_sys_list.push_back(sys);
+    return false;
 }
 
-void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& protoSys) {
+bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& protoSys) {
     if (!protoSys) {
         HKU_WARN("Try add Null protoSys, will be discard!");
-        return;
+        return false;
     }
 
     StockList::const_iterator iter = stkList.begin();
@@ -110,6 +126,8 @@ void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
         SYSPtr sys = protoSys->clone();
         m_sys_list.push_back(sys);
     }
+
+    return true;
 }
 
 } /* namespace hku */

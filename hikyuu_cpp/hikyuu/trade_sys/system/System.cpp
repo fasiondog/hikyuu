@@ -304,29 +304,6 @@ void System::run(const KQuery& query, bool reset) {
 void System::run(const Stock& stock, const KQuery& query, bool reset) {
     m_stock = stock;
     run(query, reset);
-
-    /*
-        //reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
-        if (reset)  this->reset(true, true, true, true);
-
-        if (!readyForRun()) {
-            return;
-        }
-
-        //m_stock = stock; 在setTO里赋值
-        KData kdata = stock.getKData(query);
-        if( kdata.empty() ){
-            HKU_INFO("KData is empty! [System::run]");
-            return;
-        }
-
-        setTO(kdata);
-        size_t total = kdata.size();
-        for (size_t i = 0; i < total; ++i) {
-            if (kdata[i].datetime >= m_tm->initDatetime()) {
-                runMoment(kdata[i]);
-            }
-        }*/
 }
 
 void System::clearDelayRequest() {
