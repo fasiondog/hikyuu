@@ -18,7 +18,6 @@
 #if HKU_SUPPORT_XML_ARCHIVE
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
-#include "../serialization/PriceList_serialization.h"
 #endif /* HKU_SUPPORT_XML_ARCHIVE */
 
 #if HKU_SUPPORT_TEXT_ARCHIVE
@@ -33,10 +32,13 @@
 
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/string.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
+
+#if HKU_SUPPORT_XML_ARCHIVE || HKU_SUPPORT_TEXT_ARCHIVE
+#include "../serialization/PriceList_serialization.h"
+#endif
 #endif /* HKU_SUPPORT_SERIALIZATION */
 
 namespace hku {
@@ -244,7 +246,7 @@ private:
             m_pBuffer[i] = new PriceList();
             std::stringstream buf;
             buf << "result_" << i;
-            ar& bs::make_nvp<PriceList>(buf.str().c_str(), *m_pBuffer[i]);
+            ar& bs::make_nvp<PriceList>(buf.str().c_str(), *(m_pBuffer[i]));
         }
     }
 
