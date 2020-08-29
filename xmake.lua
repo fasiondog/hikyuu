@@ -13,7 +13,7 @@ end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
-if is_plat("macosx", "linux") then 
+if is_plat("macosx") then 
     set_configvar("SUPPORT_SERIALIZATION", 0)
 else
     set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)

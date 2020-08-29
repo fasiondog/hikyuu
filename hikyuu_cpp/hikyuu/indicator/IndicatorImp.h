@@ -36,9 +36,10 @@
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
 
-#if HKU_SUPPORT_XML_ARCHIVE || HKU_SUPPORT_TEXT_ARCHIVE
-#include "../serialization/PriceList_serialization.h"
-#endif
+// linux 下，PriceList_serialization 始终无法特化（及时拷贝到本文件内也一样），取消引用
+//#if HKU_SUPPORT_XML_ARCHIVE || HKU_SUPPORT_TEXT_ARCHIVE
+//#include "../serialization/PriceList_serialization.h"
+//#endif
 #endif /* HKU_SUPPORT_SERIALIZATION */
 
 namespace hku {
@@ -220,11 +221,22 @@ private:
             }
         }
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
-
+        string nan("nan");
+        string inf;
         for (size_t i = 0; i < act_result_num; ++i) {
-            std::stringstream buf;
-            buf << "result_" << i;
-            ar& bs::make_nvp<PriceList>(buf.str().c_str(), *m_pBuffer[i]);
+            size_t count = size();
+            ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
+            PriceList& values = *m_pBuffer[i];
+            for (size_t i = 0; i < count; i++) {
+                if (std::isnan(values[i])) {
+                    ar& boost::serialization::make_nvp<string>("item", nan);
+                } else if (std::isinf(values[i])) {
+                    inf = values[i] > 0 ? "+inf" : "-inf";
+                    ar& boost::serialization::make_nvp<string>("item", inf);
+                } else {
+                    ar& boost::serialization::make_nvp<price_t>("item", values[i]);
+                }
+            }
         }
     }
 
@@ -244,9 +256,23 @@ private:
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
             m_pBuffer[i] = new PriceList();
-            std::stringstream buf;
-            buf << "result_" << i;
-            ar& bs::make_nvp<PriceList>(buf.str().c_str(), *(m_pBuffer[i]));
+            size_t count = 0;
+            ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
+            PriceList& values = *m_pBuffer[i];
+            values.resize(count);
+            for (size_t i = 0; i < count; i++) {
+                std::string vstr;
+                ar >> boost::serialization::make_nvp<string>("item", vstr);
+                if (vstr == "nan") {
+                    values[i] = std::numeric_limits<double>::quiet_NaN();
+                } else if (vstr == "+inf") {
+                    values[i] = std::numeric_limits<double>::infinity();
+                } else if (vstr == "-inf") {
+                    values[i] = 0.0 - std::numeric_limits<double>::infinity();
+                } else {
+                    values[i] = std::atof(vstr.c_str());
+                }
+            }
         }
     }
 
