@@ -105,7 +105,7 @@ class ModuleConflictError(Exception):
         self.hub_path = hub_path
 
     def __str__(self):
-        return '仓库名（{}）与其他 python 模块（"{}"）冲突，请更改仓库目录名称！（"{}"）'.format(
+        return '该仓库（{}）路径名与其他 python 模块（"{}"）冲突，请更改目录名称！（"{}"）'.format(
             self.hub_name, self.conflict_module, self.hub_path
         )
 
@@ -241,26 +241,25 @@ class HubManager(metaclass=SingletonType):
         self._session.add(record)
 
     @dbsession
-    def add_local_hub(self, path):
+    def add_local_hub(self, name, path):
         """增加本地数据仓库
 
+        :param str name: 仓库名称
         :param str path: 本地全路径
         """
         checkif(not os.path.lexists(path), '找不到指定的路径（"{}"）'.format(path))
 
         # 获取绝对路径
         local_path = os.path.abspath(path)
-        name = os.path.basename(local_path)
 
         record = self._session.query(HubModel).filter(HubModel.name == name).first()
         checkif(record is not None, name, HubNameRepeatError)
-        #assert record is None, '本地仓库名重复'
 
         # 将本地路径的上一层路径加入系统路径
         sys.path.append(os.path.dirname(path))
 
         # 检查仓库目录名称是否与其他 python 模块存在冲突
-        tmp = importlib.import_module(name)
+        tmp = importlib.import_module(os.path.basename(local_path))
         checkif(
             tmp.__path__[0] != local_path,
             name,
@@ -399,20 +398,8 @@ class HubManager(metaclass=SingletonType):
             ), name, PartNameError
         )
 
-        if len(name_parts) == 2:
-            # 未指定仓库名，尝试获取所在仓库名，并重新组装名称
-            abs_path = os.path.abspath(__file__)  #当前文件的绝对路径
-            path_parts = pathlib.Path(abs_path).parts
-            cause = '当前文件（"{}"）并非仓库中的策略文件，请手工指定仓库名'.format(abs_path)
-            if name_parts[0] in ('prtflo', 'sys'):
-                checkif(len(path_parts) < 4, name, PartNotFoundError, cause=cause)
-                part_name = '{}.{}'.format(path_parts[-4], name)
-            else:
-                checkif(len(path_parts) < 5, name, PartNotFoundError, cause=cause)
-                part_name = '{}.{}'.format(path_parts[-5], name)
-        else:
-            part_name = name
-
+        # 未指定仓库名，则默认使用 'default' 仓库
+        part_name = 'default.{}'.format(name) if len(name_parts) == 2 else name
         part_model = self._session.query(PartModel).filter_by(name=part_name).first()
         checkif(part_model is None, part_name, PartNotFoundError, cause='仓库中不存在')
         try:
@@ -497,12 +484,13 @@ def add_remote_hub(name, url, branch='master'):
     HubManager().add_remote_hub(name, url, branch)
 
 
-def add_local_hub(path):
+def add_local_hub(name, path):
     """增加本地数据仓库
 
+    :param str name: 仓库名称
     :param str path: 本地全路径
     """
-    HubManager().add_local_hub(path)
+    HubManager().add_local_hub(name, path)
 
 
 def update_hub(name):
@@ -598,10 +586,10 @@ if __name__ == "__main__":
         level=logging.INFO,
         format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
     )
-    #add_local_hub('/home/fasiondog/workspace/test1')
+    add_local_hub('dev', '/home/fasiondog/workspace/stockhouse')
     #update_hub('test1')
     update_hub('default')
-    sg = get_part('default.st.fixed_percent')
+    sg = get_part('dev.st.fixed_percent')
     print(sg)
     print_part_info('default.sp.fixed_value')
     print(get_part_name_list(part_type='sg'))
