@@ -28,7 +28,7 @@ Base = declarative_base()
 
 
 class ConfigModel(Base):
-    __tablename__ = 'house_config'
+    __tablename__ = 'hub_config'
     id = Column(Integer, Sequence('config_id_seq'), primary_key=True)
     key = Column(String, index=True)  # 参数名
     value = Column(String)  # 参数值
@@ -42,11 +42,11 @@ class ConfigModel(Base):
         return "<{}>".format(self.__str__())
 
 
-class HouseModel(Base):
-    __tablename__ = 'house_repo'
+class HubModel(Base):
+    __tablename__ = 'hub_repo'
     id = Column(Integer, Sequence('remote_id_seq'), primary_key=True)
     name = Column(String, index=True)  # 本地仓库名
-    house_type = Column(String)  # 'remote' (远程仓库) | 'local' （本地仓库）
+    hub_type = Column(String)  # 'remote' (远程仓库) | 'local' （本地仓库）
     local = Column(String)  # 本地地址
     url = Column(String)  # git 仓库地址
     branch = Column(String)  # 远程仓库分支
@@ -54,8 +54,8 @@ class HouseModel(Base):
     __table_args__ = (UniqueConstraint('name'), )
 
     def __str__(self):
-        return "HouseModel(id={}, name={}, house_type={}, local={}, url={}, branch={})".format(
-            self.id, self.name, self.house_type, self.local, self.url, self.branch
+        return "HubModel(id={}, name={}, hub_type={}, local={}, url={}, branch={})".format(
+            self.id, self.name, self.hub_type, self.local, self.url, self.branch
         )
 
     def __repr__(self):
@@ -63,9 +63,9 @@ class HouseModel(Base):
 
 
 class PartModel(Base):
-    __tablename__ = 'house_part'
+    __tablename__ = 'hub_part'
     id = Column(Integer, Sequence('part_id_seq'), primary_key=True)
-    house_name = Column(String)  #所属仓库标识
+    hub_name = Column(String)  #所属仓库标识
     part = Column(String)  # 部件类型
     name = Column(String)  # 策略名称
     author = Column(String)  # 策略作者
@@ -74,15 +74,15 @@ class PartModel(Base):
     module_name = Column(String)  # 实际策略导入模块名
 
     def __str__(self):
-        return 'PartModel(id={}, house_name={}, part={}, name={}, author={}, module_name={})'.format(
-            self.id, self.house_name, self.part, self.name, self.author, self.module_name
+        return 'PartModel(id={}, hub_name={}, part={}, name={}, author={}, module_name={})'.format(
+            self.id, self.hub_name, self.part, self.name, self.author, self.module_name
         )
 
     def __repr__(self):
         return '<{}>'.format(self.__str__())
 
 
-class HouseNameRepeatError(Exception):
+class HubNameRepeatError(Exception):
     def __init__(self, name):
         self.name = name
 
@@ -90,7 +90,7 @@ class HouseNameRepeatError(Exception):
         return "已存在相同名称的仓库（{}），请更换仓库名！".format(self.name)
 
 
-class HouseNotFoundError(Exception):
+class HubNotFoundError(Exception):
     def __init__(self, name):
         self.name = name
 
@@ -99,14 +99,14 @@ class HouseNotFoundError(Exception):
 
 
 class ModuleConflictError(Exception):
-    def __init__(self, house_name, conflict_module, house_path):
-        self.house_name = house_name
+    def __init__(self, hub_name, conflict_module, hub_path):
+        self.hub_name = hub_name
         self.conflict_module = conflict_module
-        self.house_path = house_path
+        self.hub_path = hub_path
 
     def __str__(self):
         return '仓库名（{}）与其他 python 模块（"{}"）冲突，请更改仓库目录名称！（"{}"）'.format(
-            self.house_name, self.conflict_module, self.house_path
+            self.hub_name, self.conflict_module, self.hub_path
         )
 
 
@@ -154,14 +154,14 @@ def dbsession(func):
     return wrapfunc
 
 
-class HouseManager(metaclass=SingletonType):
+class HubManager(metaclass=SingletonType):
     """策略库管理"""
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
         usr_dir = os.path.expanduser('~')
 
         # 创建仓库数据库
-        engine = create_engine("sqlite:///{}/.hikyuu/stockhouse.db".format(usr_dir))
+        engine = create_engine("sqlite:///{}/.hikyuu/hub.db".format(usr_dir))
         Base.metadata.create_all(engine)
         self._scoped_Session = scoped_session(
             sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -169,7 +169,7 @@ class HouseManager(metaclass=SingletonType):
         self._session = None
 
     @dbsession
-    def setup_house(self):
+    def setup_hub(self):
         """初始化 hikyuu 默认策略仓库"""
         usr_dir = os.path.expanduser('~')
 
@@ -178,7 +178,7 @@ class HouseManager(metaclass=SingletonType):
                                                     ).filter(ConfigModel.key == 'remote_cache_dir'
                                                              ).first()
         if self.remote_cache_dir is None:
-            self.remote_cache_dir = "{}/.hikyuu/house_cache".format(usr_dir)
+            self.remote_cache_dir = "{}/.hikyuu/hub_cache".format(usr_dir)
             record = ConfigModel(key='remote_cache_dir', value=self.remote_cache_dir)
             self._session.add(record)
         else:
@@ -191,19 +191,17 @@ class HouseManager(metaclass=SingletonType):
         sys.path.append(self.remote_cache_dir)
 
         # 将所有本地仓库的上层路径加入系统路径
-        house_models = self._session.query(HouseModel).filter_by(house_type='local').all()
-        for model in house_models:
+        hub_models = self._session.query(HubModel).filter_by(hub_type='local').all()
+        for model in hub_models:
             sys.path.append(os.path.dirname(model.local))
 
-        # 检查并下载 hikyuu 默认策略仓库, hikyuu_house 避免导入时模块和 hikyuu 重名
-        hikyuu_house_path = self._session.query(HouseModel.local
-                                                ).filter(HouseModel.name == 'default').first()
-        if hikyuu_house_path is None:
-            self.add_remote_house(
-                'default', 'https://gitee.com/fasiondog/hikyuu_house.git', 'master'
-            )
+        # 检查并下载 hikyuu 默认策略仓库, hikyuu_hub 避免导入时模块和 hikyuu 重名
+        hikyuu_hub_path = self._session.query(HubModel.local).filter(HubModel.name == 'default'
+                                                                     ).first()
+        if hikyuu_hub_path is None:
+            self.add_remote_hub('default', 'https://gitee.com/fasiondog/hikyuu_hub.git', 'master')
 
-    def download_remote_house(self, local_dir, url, branch):
+    def download_remote_hub(self, local_dir, url, branch):
         print('正在下载 hikyuu 策略仓库至："{}"'.format(local_dir))
 
         # 如果存在同名缓存目录，则强制删除
@@ -217,33 +215,33 @@ class HouseManager(metaclass=SingletonType):
         print('下载完毕')
 
     @dbsession
-    def add_remote_house(self, name, url, branch='master'):
+    def add_remote_hub(self, name, url, branch='master'):
         """增加远程策略仓库
 
         :param str name: 本地仓库名称（自行起名）
         :param str url: git 仓库地址
         :param str branch: git 仓库分支
         """
-        record = self._session.query(HouseModel).filter(HouseModel.name == name).first()
-        checkif(record is not None, name, HouseNameRepeatError)
+        record = self._session.query(HubModel).filter(HubModel.name == name).first()
+        checkif(record is not None, name, HubNameRepeatError)
 
-        record = self._session.query(HouseModel).filter(
-            and_(HouseModel.url == url, HouseModel.branch == branch)
+        record = self._session.query(HubModel).filter(
+            and_(HubModel.url == url, HubModel.branch == branch)
         ).first()
 
         # 下载远程仓库
         local_dir = "{}/{}".format(self.remote_cache_dir, name)
-        self.download_remote_house(local_dir, url, branch)
+        self.download_remote_hub(local_dir, url, branch)
 
         # 导入仓库各部件策略信息
-        record = HouseModel(name=name, house_type='remote', url=url, branch=branch, local=local_dir)
+        record = HubModel(name=name, hub_type='remote', url=url, branch=branch, local=local_dir)
         self.import_part_to_db(record)
 
         # 更新仓库记录
         self._session.add(record)
 
     @dbsession
-    def add_local_house(self, path):
+    def add_local_hub(self, path):
         """增加本地数据仓库
 
         :param str path: 本地全路径
@@ -254,8 +252,8 @@ class HouseManager(metaclass=SingletonType):
         local_path = os.path.abspath(path)
         name = os.path.basename(local_path)
 
-        record = self._session.query(HouseModel).filter(HouseModel.name == name).first()
-        checkif(record is not None, name, HouseNameRepeatError)
+        record = self._session.query(HubModel).filter(HubModel.name == name).first()
+        checkif(record is not None, name, HubNameRepeatError)
         #assert record is None, '本地仓库名重复'
 
         # 将本地路径的上一层路径加入系统路径
@@ -268,41 +266,41 @@ class HouseManager(metaclass=SingletonType):
             name,
             ModuleConflictError,
             conflict_module=tmp.__path__[0],
-            house_path=local_path
+            hub_path=local_path
         )
 
         # 导入部件信息
-        house_model = HouseModel(name=name, house_type='local', local=local_path)
-        self.import_part_to_db(house_model)
+        hub_model = HubModel(name=name, hub_type='local', local=local_path)
+        self.import_part_to_db(hub_model)
 
         # 更新仓库记录
-        self._session.add(house_model)
+        self._session.add(hub_model)
 
     @dbsession
-    def update_house(self, name):
+    def update_hub(self, name):
         """更新指定仓库
 
         :param str name: 仓库名称
         """
-        house_model = self._session.query(HouseModel).filter_by(name=name).first()
-        checkif(house_model is None, '指定的仓库（{}）不存在！'.format(name))
+        hub_model = self._session.query(HubModel).filter_by(name=name).first()
+        checkif(hub_model is None, '指定的仓库（{}）不存在！'.format(name))
 
-        self._session.query(PartModel).filter_by(house_name=name).delete()
-        if house_model.house_type == 'remote':
-            self.download_remote_house(house_model.local, house_model.url, house_model.branch)
-        self.import_part_to_db(house_model)
+        self._session.query(PartModel).filter_by(hub_name=name).delete()
+        if hub_model.hub_type == 'remote':
+            self.download_remote_hub(hub_model.local, hub_model.url, hub_model.branch)
+        self.import_part_to_db(hub_model)
 
     @dbsession
-    def remove_house(self, name):
+    def remove_hub(self, name):
         """删除指定的仓库
 
         :param str name: 仓库名称
         """
-        self._session.query(PartModel).filter_by(house_name=name).delete()
-        self._session.query(HouseModel).filter_by(name=name).delete()
+        self._session.query(PartModel).filter_by(hub_name=name).delete()
+        self._session.query(HubModel).filter_by(name=name).delete()
 
     @dbsession
-    def import_part_to_db(self, house_model):
+    def import_part_to_db(self, hub_model):
         part_dict = {
             'af': 'part/af',
             'cn': 'part/cn',
@@ -318,11 +316,11 @@ class HouseManager(metaclass=SingletonType):
         }
 
         # 检查仓库本地目录是否存在，不存在则给出告警信息并直接返回
-        local_dir = house_model.local
+        local_dir = hub_model.local
         if not os.path.lexists(local_dir):
             self.logger.warning(
-                'The {} house path ("{}") is not exists! Ignored this house!'.format(
-                    house_model.name, house_model.local
+                'The {} hub path ("{}") is not exists! Ignored this hub!'.format(
+                    hub_model.name, hub_model.local
                 )
             )
             return
@@ -331,7 +329,7 @@ class HouseManager(metaclass=SingletonType):
 
         # 遍历仓库导入部件信息
         for part, part_dir in part_dict.items():
-            path = "{}/{}".format(house_model.local, part_dir)
+            path = "{}/{}".format(hub_model.local, part_dir)
             try:
                 with os.scandir(path) as it:
                     for entry in it:
@@ -360,14 +358,14 @@ class HouseManager(metaclass=SingletonType):
                                 continue
 
                             name = '{}.{}.{}'.format(
-                                house_model.name, part, entry.name
+                                hub_model.name, part, entry.name
                             ) if part not in (
                                 'prtflo', 'sys'
-                            ) else '{}.{}.{}'.format(house_model.name, part, entry.name)
+                            ) else '{}.{}.{}'.format(hub_model.name, part, entry.name)
 
                             try:
                                 part_model = PartModel(
-                                    house_name=house_model.name,
+                                    hub_name=hub_model.name,
                                     part=part,
                                     name=name,
                                     module_name=module_name,
@@ -455,72 +453,72 @@ class HouseManager(metaclass=SingletonType):
         #print('----------------------------------------------------------')
 
     @dbsession
-    def get_house_path(self, name):
+    def get_hub_path(self, name):
         """获取仓库所在的本地路径
         
         :param str name: 仓库名
         """
-        path = self._session.query(HouseModel.local).filter_by(name=name).first()
-        checkif(path is None, name, HouseNotFoundError)
+        path = self._session.query(HubModel.local).filter_by(name=name).first()
+        checkif(path is None, name, HubNotFoundError)
         return path[0]
 
     @dbsession
-    def get_house_name_list(self):
+    def get_hub_name_list(self):
         """返回仓库名称列表"""
-        return [record[0] for record in self._session.query(HouseModel.name).all()]
+        return [record[0] for record in self._session.query(HubModel.name).all()]
 
     @dbsession
-    def get_part_name_list(self, house=None, part_type=None):
+    def get_part_name_list(self, hub=None, part_type=None):
         """获取部件名称列表
 
-        :param str house: 仓库名
+        :param str hub: 仓库名
         :param str part_type: 部件类型
         """
-        if house is None and part_type is None:
+        if hub is None and part_type is None:
             results = self._session.query(PartModel.name).all()
-        elif house is None:
+        elif hub is None:
             results = self._session.query(PartModel.name).filter_by(part=part_type).all()
         elif part_type is None:
-            results = self._session.query(PartModel.name).filter_by(house_name=house).all()
+            results = self._session.query(PartModel.name).filter_by(hub_name=hub).all()
         else:
             results = self._session.query(PartModel.name).filter(
-                and_(PartModel.house_name == house, PartModel.part == part_type)
+                and_(PartModel.hub_name == hub, PartModel.part == part_type)
             ).all()
         return [record[0] for record in results]
 
 
-def add_remote_house(name, url, branch='master'):
+def add_remote_hub(name, url, branch='master'):
     """增加远程策略仓库
 
     :param str name: 本地仓库名称（自行起名）
     :param str url: git 仓库地址
     :param str branch: git 仓库分支
     """
-    HouseManager().add_remote_house(name, url, branch)
+    HubManager().add_remote_hub(name, url, branch)
 
 
-def add_local_house(path):
+def add_local_hub(path):
     """增加本地数据仓库
 
     :param str path: 本地全路径
     """
-    HouseManager().add_local_house(path)
+    HubManager().add_local_hub(path)
 
 
-def update_house(name):
+def update_hub(name):
     """更新指定仓库
 
     :param str name: 仓库名称
     """
-    HouseManager().update_house(name)
+    HubManager().update_hub(name)
 
 
-def remove_house(name):
+def remove_hub(name):
     """删除指定的仓库
 
     :param str name: 仓库名称
     """
-    HouseManager().remove_house(name)
+    HubManager().remove_hub(name)
 
 
 def get_part(name, **kwargs):
@@ -529,15 +527,15 @@ def get_part(name, **kwargs):
     :param str name: 策略部件名称
     :param kwargs: 其他部件相关参数
     """
-    return HouseManager().get_part(name, **kwargs)
+    return HubManager().get_part(name, **kwargs)
 
 
-def get_house_path(name):
+def get_hub_path(name):
     """获取仓库所在的本地路径
     
     :param str name: 仓库名
     """
-    return HouseManager().get_house_path(name)
+    return HubManager().get_hub_path(name)
 
 
 def get_part_info(name):
@@ -545,30 +543,30 @@ def get_part_info(name):
     
     :param str name: 部件名称
     """
-    return HouseManager().get_part_info(name)
+    return HubManager().get_part_info(name)
 
 
 def print_part_info(name):
-    HouseManager().print_part_info(name)
+    HubManager().print_part_info(name)
 
 
-def get_house_name_list():
+def get_hub_name_list():
     """返回仓库名称列表"""
-    return HouseManager().get_house_name_list()
+    return HubManager().get_hub_name_list()
 
 
-def get_part_name_list(house=None, part_type=None):
+def get_part_name_list(hub=None, part_type=None):
     """获取部件名称列表
-    :param str house: 仓库名
+    :param str hub: 仓库名
     :param str part_type: 部件类型
     """
-    return HouseManager().get_part_name_list(house, part_type)
+    return HubManager().get_part_name_list(hub, part_type)
 
 
-def get_current_house(filename):
+def get_current_hub(filename):
     """用于在仓库part.py中获取当前所在的仓库名
 
-    示例： get_current_house(__file__)
+    示例： get_current_hub(__file__)
     """
     abs_path = os.path.abspath(filename)  #当前文件的绝对路径
     path_parts = pathlib.Path(abs_path).parts
@@ -577,22 +575,22 @@ def get_current_house(filename):
 
 # 初始化仓库
 try:
-    HouseManager().setup_house()
+    HubManager().setup_hub()
 except Exception as e:
-    HouseManager().logger.warning("无法初始化 hikyuu 策略仓库！ {}".format(e))
+    HubManager().logger.warning("无法初始化 hikyuu 策略仓库！ {}".format(e))
 
 __all__ = [
-    'add_remote_house',
-    'add_local_house',
-    'update_house',
-    'remove_house',
+    'add_remote_hub',
+    'add_local_hub',
+    'update_hub',
+    'remove_hub',
     'get_part',
-    'get_house_path',
+    'get_hub_path',
     'get_part_info',
     'print_part_info',
-    'get_house_name_list',
+    'get_hub_name_list',
     'get_part_name_list',
-    'get_current_house',
+    'get_current_hub',
 ]
 
 if __name__ == "__main__":
@@ -600,9 +598,9 @@ if __name__ == "__main__":
         level=logging.INFO,
         format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
     )
-    #add_local_house('/home/fasiondog/workspace/test1')
-    #update_house('test1')
-    update_house('default')
+    #add_local_hub('/home/fasiondog/workspace/test1')
+    #update_hub('test1')
+    update_hub('default')
     sg = get_part('default.st.fixed_percent')
     print(sg)
     print_part_info('default.sp.fixed_value')
