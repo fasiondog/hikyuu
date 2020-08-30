@@ -47,7 +47,8 @@ class HubModel(Base):
     id = Column(Integer, Sequence('remote_id_seq'), primary_key=True)
     name = Column(String, index=True)  # 本地仓库名
     hub_type = Column(String)  # 'remote' (远程仓库) | 'local' （本地仓库）
-    local = Column(String)  # 本地地址
+    local_base = Column(String)  # 本地路径的基础名称
+    local = Column(String)  # 本地路径
     url = Column(String)  # git 仓库地址
     branch = Column(String)  # 远程仓库分支
 
@@ -234,7 +235,9 @@ class HubManager(metaclass=SingletonType):
         self.download_remote_hub(local_dir, url, branch)
 
         # 导入仓库各部件策略信息
-        record = HubModel(name=name, hub_type='remote', url=url, branch=branch, local=local_dir)
+        record = HubModel(
+            name=name, hub_type='remote', url=url, branch=branch, local_base=name, local=local_dir
+        )
         self.import_part_to_db(record)
 
         # 更新仓库记录
@@ -269,7 +272,8 @@ class HubManager(metaclass=SingletonType):
         )
 
         # 导入部件信息
-        hub_model = HubModel(name=name, hub_type='local', local=local_path)
+        local_base = os.path.basename(local_path)
+        hub_model = HubModel(name=name, hub_type='local', local_base=local_base, local=local_path)
         self.import_part_to_db(hub_model)
 
         # 更新仓库记录
@@ -473,6 +477,19 @@ class HubManager(metaclass=SingletonType):
             ).all()
         return [record[0] for record in results]
 
+    @dbsession
+    def get_current_hub(self, filename):
+        """用于在仓库part.py中获取当前所在的仓库名
+
+        示例： get_current_hub(__file__)
+        """
+        abs_path = os.path.abspath(filename)  #当前文件的绝对路径
+        path_parts = pathlib.Path(abs_path).parts
+        local_base = path_parts[-4] if path_parts[-3] in ('prtflo', 'sys') else path_parts[5]
+        hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
+        checkif(hub_model is None, local_base, HubNotFoundError)
+        return hub_model.name
+
 
 def add_remote_hub(name, url, branch='master'):
     """增加远程策略仓库
@@ -556,9 +573,7 @@ def get_current_hub(filename):
 
     示例： get_current_hub(__file__)
     """
-    abs_path = os.path.abspath(filename)  #当前文件的绝对路径
-    path_parts = pathlib.Path(abs_path).parts
-    return path_parts[-4] if path_parts[-3] in ('prtflo', 'sys') else path_parts[5]
+    return HubManager().get_current_hub(filename)
 
 
 # 初始化仓库
