@@ -12,8 +12,12 @@ jobs:
     
     steps:
     - uses: xmake-io/github-action-setup-xmake@v1
-    - name: checkout
-      run: git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
+    - name: prepare
+      run: | 
+        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
+        Invoke-WebRequest "https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" -UseBasicParsing -OutFile ./boost_1_74_0.zip
+        Expand-Archive ./boost_1_74_0.zip -DestinationPath .
+        Copy-Item ./boost_1_74_0 ./hikyuu
     - name: build
       run: |
         python --version
