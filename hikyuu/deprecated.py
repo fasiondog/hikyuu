@@ -402,6 +402,20 @@ Query.__getattr__ = Query_getattr
 
 @deprecated_attr(
     {
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        'getSelectedSystemList': 'get_selected_system_list',
+        'addStock': 'add_stock',
+        'addStockList': 'add_stock_list',
+    }
+)
+def SelectorBase_getattr(self, name):
+    return getattr(self, name)
+
+
+@deprecated_attr(
+    {
         'getTO': 'to',
         'setTO': 'to',
         'getParam': 'get_param',

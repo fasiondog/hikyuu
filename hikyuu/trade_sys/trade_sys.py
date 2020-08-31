@@ -297,6 +297,21 @@ def crtSG(func, params={}, name='crtSG'):
 
 
 #------------------------------------------------------------------
+# Selector
+#------------------------------------------------------------------
+def se_add_stock_list(self, stk_list, proto_sys):
+    result = True
+    for stk in stk_list:
+        success = self.add_stock(stk, proto_sys)
+        if not success:
+            result = False
+            break
+    return result
+
+
+SelectorBase.add_stock_list = se_add_stock_list
+
+#------------------------------------------------------------------
 # slippage
 #------------------------------------------------------------------
 

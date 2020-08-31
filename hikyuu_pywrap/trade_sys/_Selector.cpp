@@ -32,7 +32,7 @@ public:
     }
 
     SystemList getSelectedSystemList(Datetime date) {
-        return this->get_override("getSelectedSystemList")(date);
+        return this->get_override("get_selected_system_list")(date);
     }
 
     SelectorPtr _clone() {
@@ -51,18 +51,19 @@ void export_Selector() {
       .def(init<const string&>())
       .def(self_ns::str(self))
       .def(self_ns::repr(self))
+
       .add_property("name", sb_get_name, sb_set_name)
-      .def("getParam", &SelectorBase::getParam<boost::any>)
-      .def("setParam", &SelectorBase::setParam<object>)
-      .def("haveParam", &SelectorBase::haveParam)
+      .def("get_param", &SelectorBase::getParam<boost::any>)
+      .def("set_param", &SelectorBase::setParam<object>)
+      .def("have_param", &SelectorBase::haveParam)
 
       .def("reset", &SelectorBase::reset)
       .def("clone", &SelectorBase::clone)
       .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
       .def("_clone", pure_virtual(&SelectorBase::_clone))
-      .def("getSelectedSystemList", pure_virtual(&SelectorBase::getSelectedSystemList))
-      .def("addStock", &SelectorBase::addStock)
-      .def("addStockList", &SelectorBase::addStockList)
+      .def("get_selected_system_list", pure_virtual(&SelectorBase::getSelectedSystemList))
+      .def("add_stock", &SelectorBase::addStock)
+      //.def("add_stock_list", &SelectorBase::addStockList)  // 在python中扩展
       .def("clear", &SelectorBase::clear)
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(name_init_pickle_suite<SelectorBase>())
