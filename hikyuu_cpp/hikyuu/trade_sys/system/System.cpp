@@ -13,10 +13,11 @@ HKU_API std::ostream& operator<<(std::ostream& os, const System& sys) {
     string strip(",\n");
     string space("  ");
     os << "System{\n"
-       << space << sys.name() << strip << space << sys.getParameter() << strip << space
-       << sys.getEV() << strip << space << sys.getCN() << strip << space << sys.getMM() << strip
-       << space << sys.getSG() << strip << space << sys.getST() << strip << space << sys.getTP()
-       << strip << space << sys.getPG() << strip << space << sys.getSP() << strip << space
+       << space << sys.name() << strip << space << sys.getTO().getQuery() << strip << space
+       << sys.getStock() << strip << space << sys.getParameter() << strip << space << sys.getEV()
+       << strip << space << sys.getCN() << strip << space << sys.getMM() << strip << space
+       << sys.getSG() << strip << space << sys.getST() << strip << space << sys.getTP() << strip
+       << space << sys.getPG() << strip << space << sys.getSP() << strip << space
        << (sys.getTM() ? sys.getTM()->toString() : "TradeManager(NULL)") << strip << "}";
     return os;
 }
