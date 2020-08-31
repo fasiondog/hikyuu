@@ -16,10 +16,11 @@ EqualWeightAllocateFunds::~EqualWeightAllocateFunds() {}
 SystemWeightList EqualWeightAllocateFunds ::_allocateWeight(const Datetime& date,
                                                             const SystemList& se_list) {
     SystemWeightList result;
+    double weight = 1.0 / se_list.size();
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
         SystemWeight sw;
         sw.setSYS(*iter);
-        sw.setWeight(1);
+        sw.setWeight(weight);
         result.push_back(sw);
     }
 

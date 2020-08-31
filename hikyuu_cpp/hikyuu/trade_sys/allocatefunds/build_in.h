@@ -10,5 +10,6 @@
 #define TRADE_SYS_ALLOCATEFUNDS_BUILD_IN_H_
 
 #include "crt/AF_EqualWeight.h"
+#include "crt/AF_FixedWeight.h"
 
 #endif /* TRADE_SYS_ALLOCATEFUNDS_BUILD_IN_H_ */

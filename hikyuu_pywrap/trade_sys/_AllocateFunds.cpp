@@ -86,4 +86,5 @@ void export_AllocateFunds() {
     register_ptr_to_python<AFPtr>();
 
     def("AF_EqualWeight", AF_EqualWeight);
+    def("AF_FixedWeight", AF_FixedWeight);
 }
