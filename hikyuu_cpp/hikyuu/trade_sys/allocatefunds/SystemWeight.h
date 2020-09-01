@@ -22,7 +22,7 @@ public:
     void setSYS(const SystemPtr& sys);
     SystemPtr getSYS() const;
 
-    void setWeight(price_t weight);
+    void setWeight(double weight);
     double getWeight() const;
 
 public:
@@ -64,11 +64,13 @@ inline SystemPtr SystemWeight::getSYS() const {
     return m_sys;
 }
 
-inline void SystemWeight::setWeight(price_t weight) {
+inline void SystemWeight::setWeight(double weight) {
+    HKU_CHECK_THROW(weight >= 0 && weight <= 1, std::out_of_range,
+                    "weigth ({}) is out of range [0, 1]!", weight);
     m_weight = weight;
 }
 
-inline price_t SystemWeight::getWeight() const {
+inline double SystemWeight::getWeight() const {
     return m_weight;
 }
 

@@ -21,7 +21,8 @@
 namespace hku {
 
 /**
- * 资产分配算法
+ * 资产分配调整算法
+ * @details 根据资产市值对资产比例进行分配调整。单纯的资金调整，请使用资金管理算法。
  * @ingroup AllocateFunds
  */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
@@ -75,7 +76,7 @@ public:
      * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为0
      * @param p 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
      */
-    void setReserverPercent(double p);
+    void setReservePercent(double p);
 
     /** 复位 */
     void reset();
@@ -105,7 +106,7 @@ private:
     void _adjust_with_running(const Datetime& date, const SystemList& se_list,
                               const std::list<SYSPtr>& running_list);
 
-    /* 仅适用剩余资金在选中的子系统中分配资金 */
+    /* 不调整已在运行中的子系统 */
     void _adjust_without_running(const Datetime& date, const SystemList& se_list,
                                  const std::list<SYSPtr>& running_list);
 
