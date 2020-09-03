@@ -1632,7 +1632,7 @@ FundsRecord TradeManager ::getFunds(const Datetime& indatetime, KQuery::KType kt
     return funds;
 }
 
-PriceList TradeManager ::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
+PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
     int precision = getParam<int>("precision");
@@ -1644,7 +1644,12 @@ PriceList TradeManager ::getFundsCurve(const DatetimeList& dates, KQuery::KType 
     return result;
 }
 
-PriceList TradeManager ::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
+PriceList TradeManager::getFundsCurve() {
+    DatetimeList dates = getDateRange(m_init_datetime, Datetime::now());
+    return getFundsCurve(dates, KQuery::DAY);
+}
+
+PriceList TradeManager::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
     if (total == 0)

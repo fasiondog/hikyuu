@@ -37,7 +37,8 @@ AllocateFundsBase::AllocateFundsBase()
 AllocateFundsBase::AllocateFundsBase(const string& name)
 : m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()), m_reserve_percent(0) {
     setParam<bool>("adjust_running_sys", false);
-    setParam<int>("max_sys_num", 100000);  //最大系统实例数
+    setParam<int>("max_sys_num", 100000);     //最大系统实例数
+    setParam<double>("weight_unit", 0.0001);  //最小权重单位
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}

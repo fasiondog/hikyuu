@@ -37,11 +37,12 @@ struct TradeManager_pickle_suite : bp::pickle_suite {
 };
 #endif /* HKU_PYTHON_SUPPORT_PICKLE */
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFundsCurve_overload, getFundsCurve, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getProfitCurve_overload, getProfitCurve, 1, 2);
-
 FundsRecord (TradeManager::*getFunds_1)(KQuery::KType) const = &TradeManager::getFunds;
 FundsRecord (TradeManager::*getFunds_2)(const Datetime&, KQuery::KType) = &TradeManager::getFunds;
+
+PriceList (TradeManager::*getTMFundsCurve_1)(const DatetimeList&,
+                                             KQuery::KType) = &TradeManager::getFundsCurve;
+PriceList (TradeManager::*getTMFundsCurve_2)() = &TradeManager::getFundsCurve;
 
 TradeCostPtr (TradeManager::*get_costFunc)() const = &TradeManager::costFunc;
 void (TradeManager::*set_costFunc)(const TradeCostPtr&) = &TradeManager::costFunc;
@@ -229,7 +230,7 @@ void export_TradeManager() {
 
       //.def("getFunds", getFunds_1, (arg("ktype") = KQuery::DAY))
       //.def("getFunds", getFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY))
-      .def("get_funds_curve", &TradeManager::getFundsCurve,
+      .def("get_funds_curve", getTMFundsCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_funds_curve(self, dates[, ktype = Query.DAY])
 
     获取资产净值曲线
@@ -239,7 +240,16 @@ void export_TradeManager() {
     :return: 资产净值列表
     :rtype: PriceList)")
 
+      .def("get_funds_curve", getTMFundsCurve_2,
+           R"(get_funds_curve(self)
+
+    获取从账户建立日期到系统当前日期的资产净值曲线（按自然日）
+
+    :return: 资产净值列表
+    :rtype: PriceList)")
+
       .def("get_profit_curve", &TradeManager::getProfitCurve,
+           (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_profit_curve(self, dates[, ktype = Query.DAY])
 
     获取收益曲线，即扣除历次存入资金后的资产净值曲线
