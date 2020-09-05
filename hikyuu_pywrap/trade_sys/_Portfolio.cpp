@@ -22,6 +22,14 @@ FundsRecord (Portfolio::*getPortfolioFunds_1)(KQuery::KType) const = &Portfolio:
 FundsRecord (Portfolio::*getPortfolioFunds_2)(const Datetime&,
                                               KQuery::KType) = &Portfolio::getFunds;
 
+PriceList (Portfolio::*getPFFundsCurve_1)(const DatetimeList&,
+                                          KQuery::KType) = &Portfolio::getFundsCurve;
+PriceList (Portfolio::*getPFFundsCurve_2)() = &Portfolio::getFundsCurve;
+
+PriceList (Portfolio::*getPFProfitCurve_1)(const DatetimeList&,
+                                           KQuery::KType ktype) = &Portfolio::getProfitCurve;
+PriceList (Portfolio::*getPFProfitCurve_2)() = &Portfolio::getProfitCurve;
+
 void export_Portfolio() {
     class_<Portfolio>("Portfolio", R"(实现多标的、多策略的投资组合)", init<>())
       .def(init<const string&>())
@@ -61,7 +69,7 @@ void export_Portfolio() {
     :param Query.KType ktype: K线类型
     :rtype: FundsRecord)")
 
-      .def("get_funds_curve", &Portfolio::getFundsCurve, (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_funds_curve", getPFFundsCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_funds_curve(self, dates[, ktype = Query.DAY])
 
     获取资产净值曲线
@@ -71,14 +79,29 @@ void export_Portfolio() {
     :return: 资产净值列表
     :rtype: PriceList)")
 
-      .def("get_profit_curve", &Portfolio::getProfitCurve,
-           (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_funds_curve", getPFFundsCurve_2,
+           R"(get_funds_curve(self)
+
+    获取从账户建立日期到系统当前日期的资产净值曲线（按自然日）
+
+    :return: 资产净值列表
+    :rtype: PriceList)")
+
+      .def("get_profit_curve", getPFProfitCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_profit_curve(self, dates[, ktype = Query.DAY])
 
     获取收益曲线，即扣除历次存入资金后的资产净值曲线
 
     :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
     :param Query.KType ktype: K线类型，必须与日期列表匹配
+    :return: 收益曲线
+    :rtype: PriceList)")
+
+      .def("get_profit_curve", getPFProfitCurve_2,
+           R"(get_profit_curve(self)
+
+    获取获取从账户建立日期到系统当前日期的收益曲线
+
     :return: 收益曲线
     :rtype: PriceList)")
 

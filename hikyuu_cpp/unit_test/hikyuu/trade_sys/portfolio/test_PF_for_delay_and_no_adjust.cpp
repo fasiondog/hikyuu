@@ -36,10 +36,12 @@ TEST_CASE("test_PF_for_delay_and_no_adjust") {
 
     TMPtr tm = crtTM(Datetime(199001010000L), 500000);
     SEPtr se = SE_Fixed();
+    se->addStockList({sm["sz000001"], sm["sz000063"],sm["sz000651"]}, sys);
     AFPtr af = AF_EqualWeight();
     PFPtr pf = PF_Simple(tm, se, af);
 
     KQuery query = KQueryByDate(Datetime(201101010000L), Null<Datetime>(), KQuery::DAY);
+    pf->run(query);
 
     /** @arg */
 }

@@ -44,6 +44,10 @@ PriceList (TradeManager::*getTMFundsCurve_1)(const DatetimeList&,
                                              KQuery::KType) = &TradeManager::getFundsCurve;
 PriceList (TradeManager::*getTMFundsCurve_2)() = &TradeManager::getFundsCurve;
 
+PriceList (TradeManager::*getTMProfitCurve_1)(const DatetimeList&,
+                                              KQuery::KType ktype) = &TradeManager::getProfitCurve;
+PriceList (TradeManager::*getTMProfitCurve_2)() = &TradeManager::getProfitCurve;
+
 TradeCostPtr (TradeManager::*get_costFunc)() const = &TradeManager::costFunc;
 void (TradeManager::*set_costFunc)(const TradeCostPtr&) = &TradeManager::costFunc;
 
@@ -248,14 +252,21 @@ void export_TradeManager() {
     :return: 资产净值列表
     :rtype: PriceList)")
 
-      .def("get_profit_curve", &TradeManager::getProfitCurve,
-           (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_profit_curve", getTMProfitCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_profit_curve(self, dates[, ktype = Query.DAY])
 
     获取收益曲线，即扣除历次存入资金后的资产净值曲线
 
     :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
     :param Query.KType ktype: K线类型，必须与日期列表匹配
+    :return: 收益曲线
+    :rtype: PriceList)")
+
+      .def("get_profit_curve", getTMProfitCurve_2,
+           R"(get_profit_curve(self)
+
+    获取获取从账户建立日期到系统当前日期的收益曲线，即扣除历次存入资金后的资产净值曲线
+
     :return: 收益曲线
     :rtype: PriceList)")
 

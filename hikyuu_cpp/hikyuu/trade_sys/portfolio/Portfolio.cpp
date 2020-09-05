@@ -113,8 +113,6 @@ bool Portfolio::readyForRun() {
             sys->setTO(k);
 
             // 保存记录子系统
-            m_running_sys_set.insert(sys);
-            m_running_sys_list.push_back(sys);
             m_all_sys_set.insert(sys);
 
         } else {
@@ -146,32 +144,25 @@ void Portfolio::runMoment(const Datetime& date) {
     // 资产分配算法调整各子系统资产分配
     m_af->adjustFunds(date, cur_selected_list, m_running_sys_list);
 
-    // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则移除
+    // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
     SystemList will_remove_sys;
     for (auto& running_sys : m_running_sys_list) {
         Stock stock = running_sys->getStock();
         TMPtr sub_tm = running_sys->getTM();
-        KRecord krecord = running_sys->getTO().getKRecordByDate(date);
         PositionRecord position = sub_tm->getPosition(stock);
-        running_sys->_sellForce(krecord, position.number, PART_PORTFOLIO);
-
         price_t cash = sub_tm->currentCash();
-        if (cash > 0) {
-            if (sub_tm->checkout(date, cash)) {
-                m_tm->checkin(date, cash);
-                // 重新获取此时的子账户资金
-                cash = sub_tm->currentCash();
-            }
-        }
-
-        position = sub_tm->getPosition(stock);
 
         // 已没有持仓且没有现金，则放入待移除列表
-        if (position.number == 0 && cash <= std::abs(roundDown(0, precision))) {
+        if (position.number == 0 && cash <= precision) {
+            if (cash != 0) {
+                sub_tm->checkout(date, cash);
+                m_tm->checkin(date, cash);
+            }
             will_remove_sys.push_back(running_sys);
         }
     }
 
+    // 依据待移除列表将系统从运行中系统列表里删除
     for (auto& sub_sys : will_remove_sys) {
         m_running_sys_list.remove(sub_sys);
         m_running_sys_set.erase(sub_sys);
@@ -239,6 +230,11 @@ PriceList Portfolio::getFundsCurve(const DatetimeList& dates, KQuery::KType ktyp
     return result;
 }
 
+PriceList Portfolio::getFundsCurve() {
+    DatetimeList dates = getDateRange(m_tm->initDatetime(), Datetime::now());
+    return getFundsCurve(dates, KQuery::DAY);
+}
+
 PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
@@ -249,6 +245,11 @@ PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType kty
         }
     }
     return result;
+}
+
+PriceList Portfolio::getProfitCurve() {
+    DatetimeList dates = getDateRange(m_tm->initDatetime(), Datetime::now());
+    return getProfitCurve(dates, KQuery::DAY);
 }
 
 } /* namespace hku */

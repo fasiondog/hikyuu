@@ -114,12 +114,24 @@ public:
     PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
 
     /**
+     * 获取从账户建立日期到系统当前日期的资产净值曲线（按自然日）
+     * @return 资产净值列表
+     */
+    PriceList getFundsCurve();
+
+    /**
      * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
      * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
      * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
      * @return 收益曲线
      */
     PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
+
+    /**
+     * 获取获取从账户建立日期到系统当前日期的收益曲线
+     * @return 收益曲线
+     */
+    PriceList getProfitCurve();
 
 protected:
     string m_name;

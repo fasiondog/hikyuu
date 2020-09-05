@@ -198,7 +198,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
     // 计算每单位权重资产
     double weight_unit = getParam<double>("weight_unit");
-    price_t per_weight_funds = total_funds / weight_unit;
+    price_t per_weight_funds = total_funds * weight_unit;
 
     // 账户资金精度
     int precision = m_tm->getParam<int>("precision");
@@ -391,7 +391,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
 
     // 再次遍历选中子系统列表，并将剩余现金按权重比例转入子账户
     double weight_unit = getParam<double>("weight_unit");
-    price_t per_cash = total_funds / weight_unit;  // 每单位权重资金
+    price_t per_cash = total_funds * weight_unit;  // 每单位权重资金
     sw_iter = sw_list.rbegin();
     for (; sw_iter != end_iter; ++sw_iter) {
         // 该系统期望分配的资金
