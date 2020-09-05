@@ -29,7 +29,7 @@ target("unit-test")
         add_cxflags("-Wno-sign-compare")
     end
     
-    if is_plat("windows") then
+    if is_plat("windows") and is_mode("release") then
         add_defines("HKU_API=__declspec(dllimport)")
     end
 
