@@ -1671,6 +1671,11 @@ PriceList TradeManager::getProfitCurve(const DatetimeList& dates, KQuery::KType 
     return result;
 }
 
+PriceList TradeManager::getProfitCurve() {
+    DatetimeList dates = getDateRange(m_init_datetime, Datetime::now());
+    return getProfitCurve(dates, KQuery::DAY);
+}
+
 /******************************************************************************
  *  每次执行交易操作时，先根据权息信息调整持有仓位及现金记录
  *  采用滞后更新的策略，即只在需要获取当前持仓情况及卖出时更新当前的持仓及资产情况

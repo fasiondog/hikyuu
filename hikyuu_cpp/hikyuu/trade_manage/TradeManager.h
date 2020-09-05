@@ -475,6 +475,12 @@ public:
     PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
 
     /**
+     * 获取获取从账户建立日期到系统当前日期的收益曲线，即扣除历次存入资金后的资产净值曲线
+     * @return 收益曲线
+     */
+    PriceList getProfitCurve();
+
+    /**
      * 直接加入交易记录
      * @note 如果加入初始化账户记录，将清除全部已有交易及持仓记录
      * @param tr 待加入的交易记录
