@@ -158,8 +158,8 @@ public:
     void run(const KQuery& query, bool reset = true);
     void run(const Stock& stock, const KQuery& query, bool reset = true);
 
-    void runMoment(const Datetime& datetime);
-    void runMoment(const KRecord& record);
+    TradeRecord runMoment(const Datetime& datetime);
+    TradeRecord runMoment(const KRecord& record);
 
     //清除已有的交易请求，供Portfolio使用
     void clearDelayRequest();
@@ -196,32 +196,32 @@ public:
     price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice);
     price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice);
 
-    void _buy(const KRecord& today, Part from);
-    void _buyNow(const KRecord& today, Part from);
-    void _buyDelay(const KRecord& today);
+    TradeRecord _buy(const KRecord& today, Part from);
+    TradeRecord _buyNow(const KRecord& today, Part from);
+    TradeRecord _buyDelay(const KRecord& today);
     void _submitBuyRequest(const KRecord& today, Part from);
 
-    void _sell(const KRecord& today, Part from);
-    void _sellNow(const KRecord& today, Part from);
-    void _sellDelay(const KRecord& today);
+    TradeRecord _sell(const KRecord& today, Part from);
+    TradeRecord _sellNow(const KRecord& today, Part from);
+    TradeRecord _sellDelay(const KRecord& today);
     void _submitSellRequest(const KRecord& today, Part from);
 
     // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
-    void _sellForce(const KRecord& today, double num, Part from);
+    TradeRecord _sellForce(const KRecord& today, double num, Part from);
 
-    void _sellShort(const KRecord& today, Part from);
-    void _sellShortNow(const KRecord& today, Part from);
-    void _sellShortDelay(const KRecord& today);
+    TradeRecord _sellShort(const KRecord& today, Part from);
+    TradeRecord _sellShortNow(const KRecord& today, Part from);
+    TradeRecord _sellShortDelay(const KRecord& today);
     void _submitSellShortRequest(const KRecord& today, Part from);
 
-    void _buyShort(const KRecord& today, Part from);
-    void _buyShortNow(const KRecord& today, Part from);
-    void _buyShortDelay(const KRecord& today);
+    TradeRecord _buyShort(const KRecord& today, Part from);
+    TradeRecord _buyShortNow(const KRecord& today, Part from);
+    TradeRecord _buyShortDelay(const KRecord& today);
     void _submitBuyShortRequest(const KRecord& today, Part from);
 
-    void _processRequest(const KRecord& today);
+    TradeRecord _processRequest(const KRecord& today);
 
-    void _runMoment(const KRecord& record);
+    TradeRecord _runMoment(const KRecord& record);
 
 protected:
     TradeManagerPtr m_tm;

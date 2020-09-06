@@ -178,6 +178,10 @@ string TradeRecord::toString() const {
     return os.str();
 }
 
+bool TradeRecord::isInvalid() const {
+    return business == BUSINESS_INVALID;
+}
+
 bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2) {
     if (d1.stock == d2.stock && d1.datetime == d2.datetime && d1.business == d2.business &&
         fabs(d1.planPrice - d2.planPrice) < 0.0001 && fabs(d1.realPrice - d2.realPrice) < 0.0001 &&
