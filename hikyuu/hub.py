@@ -160,6 +160,9 @@ class HubManager(metaclass=SingletonType):
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
         usr_dir = os.path.expanduser('~')
+        hku_dir = '{}/.hikyuu'.format(usr_dir)
+        if not os.path.lexists(hku_dir):
+            os.mkdir(hku_dir)
 
         # 创建仓库数据库
         engine = create_engine("sqlite:///{}/.hikyuu/hub.db".format(usr_dir))

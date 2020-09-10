@@ -117,7 +117,7 @@ setup(
         ]
     },
     install_requires=[
-        'matplotlib>=1.5.0',
+        'matplotlib',
         'pandas>=0.17.1',
         #'tushare>=0.8.2',
         'pytdx',
@@ -125,6 +125,6 @@ setup(
         'tables',
         'bokeh',
         'gitpython',
-        'SQLAlchemy>=1.4.0'
+        'SQLAlchemy'
     ],
 )
