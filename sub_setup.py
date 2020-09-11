@@ -125,6 +125,7 @@ setup(
         'tables',
         'bokeh',
         'gitpython',
-        'SQLAlchemy'
+        'SQLAlchemy',
+        'pyperclip'
     ],
 )
