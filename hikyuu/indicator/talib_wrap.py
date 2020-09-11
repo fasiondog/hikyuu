@@ -1508,4 +1508,5 @@ try:
     TA_OBV.__doc__ = talib.OBV.__doc__
 
 except:
-    print("warning: can't import TA-Lib, will be ignored!")
+    print("warning: can't import TA-Lib, will be ignored! You can fetch ta-lib "
+          "from https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib")
