@@ -15,8 +15,11 @@ import shutil
 import pathlib
 import logging
 import importlib
-import git
 from configparser import ConfigParser
+
+# 引入 git 前需设置环境变量，否则某些情况下会报错失败
+os.environ['GIT_PYTHON_REFRESH'] = 'quiet'
+import git
 
 from hikyuu.util.check import checkif
 from hikyuu.util.singleton import SingletonType
@@ -400,8 +403,8 @@ class HubManager(metaclass=SingletonType):
         name_parts = name.split('.')
         checkif(
             len(name_parts) < 2 or (
-                name_parts[-2] not in
-                ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys')
+                name_parts[-2]
+                not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys')
             ), name, PartNameError
         )
 
