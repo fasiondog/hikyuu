@@ -245,11 +245,11 @@ def test(all, compile, verbose, mode):
         start_build(verbose, mode)
     if all:
         os.system("xmake f --test=all --mode={}".format(mode))
-        os.system("xmake -b unit-test")
+        os.system("xmake -b {} unit-test".format("-v -D" if verbose else ""))
         os.system("xmake r unit-test")
     else:
         os.system("xmake f --test=small --mode={}".format(mode))
-        os.system("xmake -b small-test")
+        os.system("xmake -b {} small-test".format("-v -D" if verbose else ""))
         os.system("xmake r small-test")
 
 
@@ -359,15 +359,14 @@ def wheel():
         return
     if current_plat == 'win32':
         cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
-        py_version, plat)
+            py_version, plat)
         print(cmd)
         os.system(cmd)
     else:
         cmd = 'python3 sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
-        py_version, plat)
+            py_version, plat)
         print(cmd)
         os.system(cmd)
-
 
 
 @click.command()
