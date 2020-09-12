@@ -68,6 +68,11 @@ public:
     template <typename ResultType>
     using task_handle = std::future<ResultType>;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
     /** 向线程池提交任务 */
     template <typename FunctionType>
     task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
@@ -77,6 +82,10 @@ public:
         m_master_work_queue.push(std::move(task));
         return res;
     }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
     /** 返回线程池结束状态 */
     bool done() const {
