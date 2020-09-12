@@ -16,6 +16,10 @@ using namespace boost::filesystem;
 using namespace std::filesystem;
 #endif
 
+#if defined(_WIN32)
+#include <Windows.h>
+#endif
+
 #include <hikyuu/hikyuu.h>
 #include <hikyuu/debug.h>
 using namespace hku;
@@ -45,6 +49,11 @@ void init_hikyuu_test() {
 }
 
 int main(int argc, char** argv) {
+#if defined(_WIN32)
+    // Windows 下设置控制台程序输出代码页为 UTF8
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+
     doctest::Context context;
 
     // !!! THIS IS JUST AN EXAMPLE SHOWING HOW DEFAULTS/OVERRIDES ARE SET !!!

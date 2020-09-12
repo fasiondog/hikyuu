@@ -32,22 +32,8 @@ std::string HKU_API utf8_to_gb(const std::string& szinput);
 std::string HKU_API gb_to_utf8(const std::string& szinput);
 #endif
 
-/**
- * Windows平台下将字符串由UTF8转换为GB2312编码，
- * Linux平台下不做任何事
- * @note 为跨平台，源代码文件必须使用UTF8编码保存，程序中出现的
- *       中文字符串，应使用HKU_STR，如：std::cout << HKU_STR("中国")
- */
-#if defined(_MSC_VER) && (PY_VERSION_HEX < 0x03000000)
-//将utf8编码的字符串转换为GB2312编码
 #define UTF8ToGB utf8_to_gb
 #define GBToUTF8 gb_to_utf8
-#define HKU_STR(s) UTF8ToGB(s)
-#else
-#define HKU_STR(s) (s)
-#define GBToUTF8(s) (s)
-#define UTF8ToGB(s) (s)
-#endif
 
 /**
  * 四舍五入，ROUND_HALF_EVEN 银行家舍入法

@@ -1857,16 +1857,11 @@ void TradeManager::tocsv(const string& path) {
                  << getSystemPartName(record.from) << std::endl;
         } else {
             file << record.datetime << sep << record.stock.market_code() << sep
-#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
-                 << utf8_to_gb(record.stock.name()) << sep
-#else
-                 << record.stock.name() << sep
-#endif
-                 << getBusinessName(record.business) << sep << record.planPrice << sep
-                 << record.realPrice << sep << record.goalPrice << sep << record.number << sep
-                 << record.cost.commission << sep << record.cost.stamptax << sep
-                 << record.cost.transferfee << sep << record.cost.others << sep << record.cost.total
-                 << sep << record.stoploss << sep << record.cash << sep
+                 << record.stock.name() << sep << getBusinessName(record.business) << sep
+                 << record.planPrice << sep << record.realPrice << sep << record.goalPrice << sep
+                 << record.number << sep << record.cost.commission << sep << record.cost.stamptax
+                 << sep << record.cost.transferfee << sep << record.cost.others << sep
+                 << record.cost.total << sep << record.stoploss << sep << record.cash << sep
                  << getSystemPartName(record.from) << sep;
             if (BUSINESS_BUY == record.business || BUSINESS_SELL == record.business) {
                 KRecord kdata = record.stock.getKRecordByDate(record.datetime, KQuery::DAY);
@@ -1895,12 +1890,7 @@ void TradeManager::tocsv(const string& path) {
     for (; history_iter != m_position_history.end(); ++history_iter) {
         const PositionRecord& record = *history_iter;
         file << record.takeDatetime << sep << record.cleanDatetime << sep
-             << record.stock.market_code() << sep
-#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
-             << utf8_to_gb(record.stock.name()) << sep
-#else
-             << record.stock.name() << sep
-#endif
+             << record.stock.market_code() << sep << record.stock.name() << sep
              << record.totalNumber << sep << record.buyMoney << sep << record.totalCost << sep
              << record.sellMoney << sep << record.sellMoney - record.totalCost - record.buyMoney
              << sep << record.totalRisk << std::endl;
@@ -1922,14 +1912,9 @@ void TradeManager::tocsv(const string& path) {
     for (; position_iter != m_position.end(); ++position_iter) {
         const PositionRecord& record = position_iter->second;
         file << record.takeDatetime << sep << record.cleanDatetime << sep
-             << record.stock.market_code() << sep
-#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
-             << utf8_to_gb(record.stock.name()) << sep
-#else
-             << record.stock.name() << sep
-#endif
-             << record.number << sep << record.totalNumber << sep << record.buyMoney << sep
-             << record.totalCost << sep << record.sellMoney << sep << record.totalRisk << sep;
+             << record.stock.market_code() << sep << record.stock.name() << sep << record.number
+             << sep << record.totalNumber << sep << record.buyMoney << sep << record.totalCost
+             << sep << record.sellMoney << sep << record.totalRisk << sep;
         size_t pos = record.stock.getCount(KQuery::DAY);
         if (pos != 0) {
             KRecord krecord = record.stock.getKRecord(pos - 1, KQuery::DAY);

@@ -33,7 +33,6 @@ target("unit-test")
         add_defines("HKU_API=__declspec(dllimport)")
     end
 
-    add_defines("PY_VERSION_HEX=0x03000000")
     add_defines("TEST_ALL_IN_ONE")
 
     add_deps("hikyuu")
@@ -74,7 +73,6 @@ target("small-test")
         add_defines("HKU_API=__declspec(dllimport)")
     end
 
-    add_defines("PY_VERSION_HEX=0x03000000")
     add_defines("TEST_ALL_IN_ONE")
 
     add_deps("hikyuu")

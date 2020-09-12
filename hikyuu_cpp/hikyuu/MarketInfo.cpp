@@ -17,15 +17,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const MarketInfo& market) {
     }
 
     string split(", ");
-#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
-    os << "MarketInfo(" << market.market() << split << utf8_to_gb(market.name()) << split
-       << utf8_to_gb(market.description()) << split << market.code() << split << market.lastDate()
-       << ")";
-
-#else
     os << "MarketInfo(" << market.market() << split << market.name() << split
        << market.description() << split << market.code() << split << market.lastDate() << ")";
-#endif
     return os;
 }
 

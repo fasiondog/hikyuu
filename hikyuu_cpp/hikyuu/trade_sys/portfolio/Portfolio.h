@@ -153,8 +153,7 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        string name_str(GBToUTF8(m_name));
-        ar& boost::serialization::make_nvp("name", name_str);
+        ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);
@@ -163,9 +162,7 @@ private:
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        string name;
-        ar& boost::serialization::make_nvp("name", name);
-        m_name = UTF8ToGB(name);
+        ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_af);

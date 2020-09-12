@@ -143,8 +143,6 @@ bool SQLiteBaseInfoDriver::_loadStock() {
     StockTypeInfo null_stockTypeInfo;
     StockManager& sm = StockManager::instance();
     for (auto& r : table) {
-        // HKU_INFO("stock({},{},{},{},{},{},{},{})",
-        // r.stockid,r.marketid,r.code,HKU_STR(r.name),r.type,r.valid,r.startDate,r.endDate);
         Datetime startDate, endDate;
         if (r.startDate > r.endDate || r.startDate == 0 || r.endDate == 0) {
             //日期非法，置为Null<Datetime>
@@ -158,14 +156,14 @@ bool SQLiteBaseInfoDriver::_loadStock() {
 
         stockTypeInfo = sm.getStockTypeInfo(r.type);
         if (stockTypeInfo != null_stockTypeInfo) {
-            stock = Stock(marketDict[r.marketid], r.code, HKU_STR(r.name), r.type, r.valid,
-                          startDate, endDate, stockTypeInfo.tick(), stockTypeInfo.tickValue(),
-                          stockTypeInfo.precision(), stockTypeInfo.minTradeNumber(),
-                          stockTypeInfo.maxTradeNumber());
+            stock =
+              Stock(marketDict[r.marketid], r.code, r.name, r.type, r.valid, startDate, endDate,
+                    stockTypeInfo.tick(), stockTypeInfo.tickValue(), stockTypeInfo.precision(),
+                    stockTypeInfo.minTradeNumber(), stockTypeInfo.maxTradeNumber());
 
         } else {
-            stock = Stock(marketDict[r.marketid], r.code, HKU_STR(r.name), r.type, r.valid,
-                          startDate, endDate);
+            stock =
+              Stock(marketDict[r.marketid], r.code, r.name, r.type, r.valid, startDate, endDate);
         }
 
         if (sm.loadStock(stock)) {

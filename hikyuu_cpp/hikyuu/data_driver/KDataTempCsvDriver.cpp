@@ -55,26 +55,25 @@ void KDataTempCsvDriver::_get_title_column(const string& line) {
         string token = m_token_buf[i];
         to_upper(token);
 
-        if ("DATE" == token || "DATETIME" == token || HKU_STR("日期") == token) {
+        if ("DATE" == token || "DATETIME" == token || "日期" == token) {
             m_column[DATE] = i;
 
-        } else if ("OPEN" == token || HKU_STR("开盘价") == token) {
+        } else if ("OPEN" == token || "开盘价" == token) {
             m_column[OPEN] = i;
 
-        } else if ("HIGH" == token || HKU_STR("最高价") == token) {
+        } else if ("HIGH" == token || "最高价" == token) {
             m_column[HIGH] = i;
 
-        } else if ("LOW" == token || HKU_STR("最低价") == token) {
+        } else if ("LOW" == token || "最低价" == token) {
             m_column[LOW] = i;
 
-        } else if ("CLOSE" == token || HKU_STR("收盘价") == token) {
+        } else if ("CLOSE" == token || "收盘价" == token) {
             m_column[CLOSE] = i;
 
-        } else if ("AMOUNT" == token || HKU_STR("成交金额") == token) {
+        } else if ("AMOUNT" == token || "成交金额" == token) {
             m_column[AMOUNT] = i;
 
-        } else if ("VOLUME" == token || "COUNT" == token || "VOL" == token ||
-                   HKU_STR("成交量") == token) {
+        } else if ("VOLUME" == token || "COUNT" == token || "VOL" == token || "成交量" == token) {
             m_column[VOLUME] = i;
         }
     }

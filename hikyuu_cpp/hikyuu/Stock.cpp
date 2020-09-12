@@ -33,13 +33,9 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Stock& stock) {
     string strip(", ");
     const StockManager& sm = StockManager::instance();
     StockTypeInfo typeInfo(sm.getStockTypeInfo(stock.type()));
-    os << "Stock(" << stock.market() << strip << stock.code() << strip
-#if defined(_MSC_VER) && (PY_VERSION_HEX >= 0x03000000)
-       << utf8_to_gb(stock.name()) << strip << utf8_to_gb(typeInfo.description()) << strip
-#else
-       << stock.name() << strip << typeInfo.description() << strip
-#endif
-       << stock.valid() << strip << stock.startDatetime() << strip << stock.lastDatetime() << ")";
+    os << "Stock(" << stock.market() << strip << stock.code() << strip << stock.name() << strip
+       << typeInfo.description() << strip << stock.valid() << strip << stock.startDatetime()
+       << strip << stock.lastDatetime() << ")";
     return os;
 }
 

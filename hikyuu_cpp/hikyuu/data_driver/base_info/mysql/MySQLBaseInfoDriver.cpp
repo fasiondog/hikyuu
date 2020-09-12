@@ -137,7 +137,7 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
         }
 
         try {
-            MarketInfo marketInfo(market, HKU_STR(row[1]), HKU_STR(row[2]), row[3], last_date);
+            MarketInfo marketInfo(market, row[1], row[2], row[3], last_date);
             sm.loadMarketInfo(marketInfo);
         } catch (...) {
             HKU_ERROR("Can't get MarketInfo {}", market);
@@ -178,7 +178,7 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
         uint32 type = boost::lexical_cast<uint32>(row[0]);
         try {
             StockTypeInfo stkTypeInfo(
-              type, HKU_STR(row[1]), boost::lexical_cast<price_t>(row[2]),
+              type, row[1], boost::lexical_cast<price_t>(row[2]),
               boost::lexical_cast<price_t>(row[3]), boost::lexical_cast<int>(row[4]),
               boost::lexical_cast<size_t>(row[5]), boost::lexical_cast<size_t>(row[6]));
             sm.loadStockTypeInfo(stkTypeInfo);
@@ -312,7 +312,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
         try {
             Stock stock(market,
                         row[2],                                // code
-                        HKU_STR(row[3]),                       // name
+                        row[3],                                // name
                         boost::lexical_cast<uint32>(row[4]),   // type
                         boost::lexical_cast<bool>(row[5]),     // valid;
                         start_date,                            // startDate

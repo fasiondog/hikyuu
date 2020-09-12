@@ -44,7 +44,8 @@ TEST_CASE("test_StockManager_getStock") {
     stock = sm.getStock("sh000001");
     CHECK_EQ(stock.market(), "SH");
     CHECK_EQ(stock.code(), "000001");
-    CHECK_EQ(stock.name(), HKU_STR("上证指数"));
+    CHECK_EQ(stock.name(), "上证指数");
+    HKU_INFO("{}", stock.toString());
     CHECK_EQ(stock.type(), 2);
     CHECK_EQ(stock.valid(), true);
     CHECK_EQ(stock.startDatetime(), Datetime(199012190000));
@@ -71,8 +72,8 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     CHECK_NE(marketInfo, Null<MarketInfo>());
     CHECK_EQ(marketInfo.market(), "SH");
     CHECK_EQ(marketInfo.code(), "000001");
-    CHECK_EQ(marketInfo.name(), HKU_STR("上海证劵交易所"));
-    CHECK_EQ(marketInfo.description(), HKU_STR("上海市场"));
+    CHECK_EQ(marketInfo.name(), "上海证劵交易所");
+    CHECK_EQ(marketInfo.description(), "上海市场");
     CHECK_EQ(marketInfo.lastDate(), Datetime(201112060000L));
 
     /** @arg 查询已存在的市场，市场简称全部小写 */
@@ -98,7 +99,7 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
     stockTypeInfo = sm.getStockTypeInfo(0);
     CHECK_NE(stockTypeInfo, Null<StockTypeInfo>());
     CHECK_EQ(stockTypeInfo.type(), 0);
-    CHECK_EQ(stockTypeInfo.description(), HKU_STR("Block"));
+    CHECK_EQ(stockTypeInfo.description(), "Block");
     CHECK_EQ(stockTypeInfo.tick(), 100);
     CHECK_EQ(stockTypeInfo.precision(), 2);
     CHECK_EQ(stockTypeInfo.minTradeNumber(), 100);
@@ -108,10 +109,7 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
     stockTypeInfo = sm.getStockTypeInfo(8);
     CHECK_NE(stockTypeInfo, Null<StockTypeInfo>());
     CHECK_EQ(stockTypeInfo.type(), 8);
-#if !defined(_MSC_VER)
-    // msvc中文支持不好，此处无法编译
-    CHECK_EQ(stockTypeInfo.description(), HKU_STR("创业板"));
-#endif
+    CHECK_EQ(stockTypeInfo.description(), "创业板");
     CHECK_EQ(stockTypeInfo.tick(), 0.01);
     CHECK_EQ(stockTypeInfo.precision(), 2);
     CHECK_EQ(stockTypeInfo.minTradeNumber(), 100);
@@ -121,7 +119,7 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
     stockTypeInfo = sm.getStockTypeInfo(2);
     CHECK_NE(stockTypeInfo, Null<StockTypeInfo>());
     CHECK_EQ(stockTypeInfo.type(), 2);
-    CHECK_EQ(stockTypeInfo.description(), HKU_STR("指数"));
+    CHECK_EQ(stockTypeInfo.description(), "指数");
     CHECK_EQ(stockTypeInfo.tick(), 0.001);
     CHECK_EQ(stockTypeInfo.precision(), 3);
     CHECK_EQ(stockTypeInfo.minTradeNumber(), 1);

@@ -204,8 +204,7 @@ private:
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
         namespace bs = boost::serialization;
-        string name_str(GBToUTF8(m_name));
-        ar& bs::make_nvp<string>("m_name", name_str);
+        ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_discard);
         ar& BOOST_SERIALIZATION_NVP(m_result_num);

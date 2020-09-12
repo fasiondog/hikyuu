@@ -106,8 +106,7 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        string tmp_name(GBToUTF8(m_name));
-        ar& boost::serialization::make_nvp("m_name", tmp_name);
+        ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_valid);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
@@ -115,9 +114,7 @@ private:
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        string tmp_name;
-        ar& boost::serialization::make_nvp("m_name", tmp_name);
-        m_name = UTF8ToGB(tmp_name);
+        ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_valid);
         // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化

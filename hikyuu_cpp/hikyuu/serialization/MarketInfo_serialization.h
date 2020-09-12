@@ -21,30 +21,11 @@
 namespace boost {
 namespace serialization {
 
-//防止boost::serialization某些情况不能在独立的命名空间中
-#if defined(_MSC_VER) && (PY_VERSION_HEX < 0x03000000)
-#ifndef HKU_GB_TO_UTF8
-#define HKU_GB_TO_UTF8(s) hku::GBToUTF8(s)
-#endif
-
-#ifndef HKU_UTF8_TO_GB
-#define HKU_UTF8_TO_GB(s) hku::UTF8ToGB(s)
-#endif
-#else
-#ifndef HKU_GB_TO_UTF8
-#define HKU_GB_TO_UTF8(s) (s)
-#endif
-
-#ifndef HKU_UTF8_TO_GB
-#define HKU_UTF8_TO_GB(s) (s)
-#endif
-#endif
-
 template <class Archive>
 void save(Archive& ar, const hku::MarketInfo& record, unsigned int version) {
     hku::string market = record.market();
-    hku::string name = HKU_GB_TO_UTF8(record.name());
-    hku::string description = HKU_GB_TO_UTF8(record.description());
+    hku::string name = record.name();
+    hku::string description = record.description();
     hku::string code = record.code();
     hku::uint64 lastDate = record.lastDate().number();
     ar& BOOST_SERIALIZATION_NVP(market);
@@ -63,8 +44,7 @@ void load(Archive& ar, hku::MarketInfo& record, unsigned int version) {
     ar& BOOST_SERIALIZATION_NVP(description);
     ar& BOOST_SERIALIZATION_NVP(code);
     ar& BOOST_SERIALIZATION_NVP(lastDate);
-    record = hku::MarketInfo(market, HKU_UTF8_TO_GB(name), HKU_UTF8_TO_GB(description), code,
-                             hku::Datetime(lastDate));
+    record = hku::MarketInfo(market, name, description, code, hku::Datetime(lastDate));
 }
 }  // namespace serialization
 }  // namespace boost

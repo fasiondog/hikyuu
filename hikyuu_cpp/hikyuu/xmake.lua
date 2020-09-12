@@ -30,7 +30,6 @@ target("hikyuu")
     if is_plat("windows") then 
         add_defines("SQLITE_API=__declspec(dllimport)")
         add_defines("HKU_API=__declspec(dllexport)")
-        add_defines("PY_VERSION_HEX=0x03000000")
         add_includedirs("../../hikyuu_extern_libs/src/sqlite3")
         add_deps("sqlite3")
         if is_mode("release") then
