@@ -356,7 +356,7 @@ TradeRecord System::_runMoment(const KRecord& today) {
         }
 
         m_pre_ev_valid = current_ev_valid;
-        return tr.isInvalid() ? result : tr;
+        return tr.isNull() ? result : tr;
     }
 
     //环境是从无效变为有效时
@@ -365,7 +365,7 @@ TradeRecord System::_runMoment(const KRecord& today) {
         if (getParam<bool>("ev_open_position")) {
             TradeRecord tr = _buy(today, PART_ENVIRONMENT);
             m_pre_ev_valid = current_ev_valid;
-            return tr.isInvalid() ? result : tr;
+            return tr.isNull() ? result : tr;
         }
     }
 
@@ -386,7 +386,7 @@ TradeRecord System::_runMoment(const KRecord& today) {
         }
 
         m_pre_cn_valid = current_cn_valid;
-        return tr.isInvalid() ? result : tr;
+        return tr.isNull() ? result : tr;
     }
 
     //如果系统从无效变为有效
@@ -395,7 +395,7 @@ TradeRecord System::_runMoment(const KRecord& today) {
         if (getParam<bool>("cn_open_position")) {
             TradeRecord tr = _buy(today, PART_CONDITION);
             m_pre_cn_valid = current_cn_valid;
-            return tr.isInvalid() ? result : tr;
+            return tr.isNull() ? result : tr;
         }
     }
 
@@ -409,7 +409,7 @@ TradeRecord System::_runMoment(const KRecord& today) {
     if (m_sg->shouldBuy(today.datetime)) {
         TradeRecord tr = _buy(today, PART_SIGNAL);
         // if (m_tm->haveShort(m_stock)) _sellShort(today);
-        return tr.isInvalid() ? result : tr;
+        return tr.isNull() ? result : tr;
     }
 
     //发出卖出信号
@@ -418,7 +418,7 @@ TradeRecord System::_runMoment(const KRecord& today) {
         if (m_tm->have(m_stock))
             tr = _sell(today, PART_SIGNAL);
         //_buyShort(today, PART_SIGNAL);
-        return tr.isInvalid() ? result : tr;
+        return tr.isNull() ? result : tr;
     }
 
     //----------------------------------------------------------
@@ -449,7 +449,7 @@ TradeRecord System::_runMoment(const KRecord& today) {
             }
         }
 
-        return tr.isInvalid() ? result : tr;
+        return tr.isNull() ? result : tr;
     }
 
     return result;

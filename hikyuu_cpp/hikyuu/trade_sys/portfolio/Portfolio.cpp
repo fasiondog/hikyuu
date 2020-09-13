@@ -32,7 +32,11 @@ Portfolio::Portfolio() : m_name("Portfolio"), m_is_ready(false) {}
 Portfolio::Portfolio(const string& name) : m_name(name), m_is_ready(false) {}
 
 Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af)
-: m_name("Portfolio"), m_tm(tm), m_se(se), m_af(af), m_is_ready(false) {}
+: m_name("Portfolio"), m_tm(tm), m_se(se), m_af(af), m_is_ready(false) {
+    if (m_tm) {
+        m_shadow_tm = m_tm->clone();
+    }
+}
 
 Portfolio::~Portfolio() {}
 
@@ -43,6 +47,8 @@ void Portfolio::reset() {
     m_all_sys_set.clear();
     if (m_tm)
         m_tm->reset();
+    if (m_shadow_tm)
+        m_shadow_tm->reset();
     if (m_se)
         m_se->reset();
     if (m_af)
@@ -64,6 +70,8 @@ PortfolioPtr Portfolio::clone() {
         p->m_af = m_af->clone();
     if (m_tm)
         p->m_tm = m_tm->clone();
+    if (m_shadow_tm)
+        p->m_shadow_tm = m_shadow_tm->clone();
     return p;
 }
 
@@ -89,9 +97,8 @@ bool Portfolio::readyForRun() {
     reset();
 
     // 将影子账户指定给资产分配器
-    // m_tm_shadow = m_tm->clone();
-    // m_af->setTM(m_tm_shadow);
     m_af->setTM(m_tm);
+    m_af->setShadowTM(m_shadow_tm);
 
     // 为资金分配器设置关联查询条件
     m_af->setQuery(m_query);
@@ -128,11 +135,11 @@ void Portfolio::runMoment(const Datetime& date) {
     HKU_CHECK(isReady(), "Not ready to run! Please perform readyForRun() first!");
 
     // 当前日期小于账户建立日期，直接忽略
-    if (date < m_tm->initDatetime()) {
+    if (date < m_shadow_tm->initDatetime()) {
         return;
     }
 
-    int precision = m_tm->getParam<int>("precision");
+    int precision = m_shadow_tm->getParam<int>("precision");
     SystemList cur_selected_list;        //当前选中系统列表
     std::set<SYSPtr> cur_selected_sets;  //当前选中系统集合，方便计算使用
     SystemList cur_allocated_list;       //当前分配了资金的系统
@@ -156,7 +163,7 @@ void Portfolio::runMoment(const Datetime& date) {
         if (position.number == 0 && cash <= precision) {
             if (cash != 0) {
                 sub_tm->checkout(date, cash);
-                m_tm->checkin(date, cash);
+                m_shadow_tm->checkin(date, cash);
             }
             will_remove_sys.push_back(running_sys);
         }
@@ -183,7 +190,10 @@ void Portfolio::runMoment(const Datetime& date) {
 
     // 执行所有运行中的系统
     for (auto& sub_sys : m_running_sys_list) {
-        sub_sys->runMoment(date);
+        auto tr = sub_sys->runMoment(date);
+        if (!tr.isNull()) {
+            m_tm->addTradeRecord(tr);
+        }
     }
 }
 
@@ -204,7 +214,7 @@ FundsRecord Portfolio::getFunds(KQuery::KType ktype) const {
         FundsRecord funds = sub_sys->getTM()->getFunds(ktype);
         total_funds += funds;
     }
-    total_funds.cash += m_tm->currentCash();
+    total_funds.cash += m_shadow_tm->currentCash();
     return total_funds;
 }
 
@@ -214,7 +224,7 @@ FundsRecord Portfolio::getFunds(const Datetime& datetime, KQuery::KType ktype) {
         FundsRecord funds = sub_sys->getTM()->getFunds(datetime, ktype);
         total_funds += funds;
     }
-    total_funds.cash += m_tm->cash(datetime, ktype);
+    total_funds.cash += m_shadow_tm->cash(datetime, ktype);
     return total_funds;
 }
 
@@ -231,7 +241,7 @@ PriceList Portfolio::getFundsCurve(const DatetimeList& dates, KQuery::KType ktyp
 }
 
 PriceList Portfolio::getFundsCurve() {
-    DatetimeList dates = getDateRange(m_tm->initDatetime(), Datetime::now());
+    DatetimeList dates = getDateRange(m_shadow_tm->initDatetime(), Datetime::now());
     return getFundsCurve(dates, KQuery::DAY);
 }
 
@@ -248,7 +258,7 @@ PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType kty
 }
 
 PriceList Portfolio::getProfitCurve() {
-    DatetimeList dates = getDateRange(m_tm->initDatetime(), Datetime::now());
+    DatetimeList dates = getDateRange(m_shadow_tm->initDatetime(), Datetime::now());
     return getProfitCurve(dates, KQuery::DAY);
 }
 

@@ -174,7 +174,7 @@ string TradeRecord::toString() const {
     return os.str();
 }
 
-bool TradeRecord::isInvalid() const {
+bool TradeRecord::isNull() const {
     return business == BUSINESS_INVALID;
 }
 

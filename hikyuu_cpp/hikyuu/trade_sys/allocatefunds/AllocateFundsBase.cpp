@@ -70,7 +70,10 @@ AFPtr AllocateFundsBase::clone() {
     p->m_count = m_count;
     p->m_pre_date = m_pre_date;
     p->m_reserve_percent = m_reserve_percent;
-    p->m_tm = m_tm;
+    /*if (m_tm)
+        p->m_tm = m_tm->clone();
+    if (m_shadow_tm)
+        p->m_shadow_tm = m_shadow_tm->clone();*/
     return p;
 }
 
@@ -108,8 +111,9 @@ price_t AllocateFundsBase::_getTotalFunds(const std::list<SYSPtr>& running_list)
     }
 
     // 加上当前总账户现金余额
-    int precision = m_tm->getParam<int>("precision");
-    total_value = roundDown(total_value + m_tm->currentCash(), m_tm->getParam<int>("precision"));
+    int precision = m_shadow_tm->getParam<int>("precision");
+    total_value =
+      roundDown(total_value + m_shadow_tm->currentCash(), m_shadow_tm->getParam<int>("precision"));
     return total_value;
 }
 
@@ -142,12 +146,15 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         const SYSPtr& sys = *iter;
         if (selected_sets.find(sys) == selected_sets.end()) {
             KRecord record = sys->getTO().getKRecordByDate(date);
-            sys->_sell(record, PART_ALLOCATEFUNDS);
+            TradeRecord tr = sys->_sell(record, PART_ALLOCATEFUNDS);
+            if (!tr.isNull()) {
+                m_tm->addTradeRecord(tr);
+            }
             TMPtr tm = sys->getTM();
             price_t cash = tm->currentCash();
             if (cash > 0) {
                 if (tm->checkout(date, cash)) {
-                    m_tm->checkin(date, cash);
+                    m_shadow_tm->checkin(date, cash);
                 } else {
                     HKU_ERROR("Can't checkout from sub_tm!");
                 }
@@ -176,12 +183,15 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
             // 超出最大允许运行数且属于正在运行的子系统，则尝试清仓并回收资金
             auto sys = iter->getSYS();
             KRecord record = sys->getTO().getKRecordByDate(date);
-            sys->_sell(record, PART_ALLOCATEFUNDS);
+            auto tr = sys->_sell(record, PART_ALLOCATEFUNDS);
+            if (!tr.isNull()) {
+                m_tm->addTradeRecord(tr);
+            }
             TMPtr tm = sys->getTM();
             price_t cash = tm->currentCash();
             if (cash > 0) {
                 if (tm->checkout(date, cash)) {
-                    m_tm->checkin(date, cash);
+                    m_shadow_tm->checkin(date, cash);
                 } else {
                     HKU_ERROR("Can't checkout from sub_tm!");
                 }
@@ -201,11 +211,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     price_t per_weight_funds = total_funds * weight_unit;
 
     // 账户资金精度
-    int precision = m_tm->getParam<int>("precision");
+    int precision = m_shadow_tm->getParam<int>("precision");
 
     // 计算可分配现金
     price_t can_allocate_cash =
-      m_tm->currentCash() > reserve_funds ? m_tm->currentCash() - reserve_funds : 0;
+      m_shadow_tm->currentCash() > reserve_funds ? m_shadow_tm->currentCash() - reserve_funds : 0;
 
     // 缓存需要进一步处理的系统及其待补充资金的列表
     std::list<std::pair<SYSPtr, price_t>> wait_list;
@@ -239,7 +249,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
             // 如果当前可用于分配的资金大于期望的资金，则尝试从总账户中将现金补充进子账户中
             if (will_cash <= can_allocate_cash) {
-                if (m_tm->checkout(date, will_cash)) {
+                if (m_shadow_tm->checkout(date, will_cash)) {
                     tm->checkin(date, will_cash);
                     can_allocate_cash = roundDown(can_allocate_cash - will_cash, precision);
                 }
@@ -248,7 +258,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                 // 如果当前可用于分配的资金已经不足，则先全部转入子账户，并调整该系统实例权重。
                 // 同时，将该系统实例放入带重分配列表中，等有需要腾出仓位的系统卖出后，再重新分配补充现金
                 price_t reserve_cash = roundDown(will_cash - can_allocate_cash, precision);
-                if (m_tm->checkout(date, can_allocate_cash)) {
+                if (m_shadow_tm->checkout(date, can_allocate_cash)) {
                     tm->checkin(date, can_allocate_cash);
                     can_allocate_cash = 0;
                 }
@@ -263,7 +273,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
             price_t sub_cash = tm->currentCash();
             if (sub_cash >= will_return_cash) {
                 if (tm->checkout(date, will_return_cash)) {
-                    m_tm->checkin(date, will_return_cash);
+                    m_shadow_tm->checkin(date, will_return_cash);
                     can_allocate_cash = roundDown(can_allocate_cash + will_return_cash, precision);
                 }
 
@@ -276,27 +286,31 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                 KRecord k = sys->getTO().getKRecordByDate(date);
                 PositionRecord position = tm->getPosition(stock);
                 if (position.number > 0) {
+                    TradeRecord tr;
                     double need_sell_num = need_cash / k.closePrice;
                     need_sell_num =
                       size_t(need_sell_num / stock.minTradeNumber()) * stock.minTradeNumber();
                     if (position.number <= need_sell_num) {
                         // 如果当前持仓数小于等于需要卖出的数量，则全部卖出
-                        sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
+                        tr = sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
                     } else {
                         if (position.number - need_sell_num >= stock.minTradeNumber()) {
                             // 如果按需要卖出数量卖出后，可能剩余的数量大于等于最小交易数则按需要卖出的数量卖出
-                            sys->_sellForce(k, need_sell_num, PART_ALLOCATEFUNDS);
+                            tr = sys->_sellForce(k, need_sell_num, PART_ALLOCATEFUNDS);
                         } else {
                             // 如果按需要卖出的数量卖出后，剩余的持仓数小于最小交易数量则全部卖出
-                            sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
+                            tr = sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
                         }
+                    }
+                    if (!tr.isNull()) {
+                        m_tm->addTradeRecord(tr);
                     }
                 }
 
                 // 卖出后，尝试将资金取出转移至总账户
                 sub_cash = tm->currentCash();
                 if (tm->checkout(date, sub_cash)) {
-                    m_tm->checkin(date, sub_cash);
+                    m_shadow_tm->checkin(date, sub_cash);
                     can_allocate_cash = roundDown(can_allocate_cash + sub_cash, precision);
                 }
             }
@@ -304,7 +318,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     }
 
     // 部分调整仓位的股票被卖出后，再次将资金分配至等待资金的子系统
-    can_allocate_cash = m_tm->currentCash();
+    can_allocate_cash = m_shadow_tm->currentCash();
     for (auto iter = wait_list.begin(); iter != wait_list.end(); ++iter) {
         // 如果可分配的现金不足或选中系统的分配权重已经小于等于0，则退出
         if (can_allocate_cash <= 0) {
@@ -316,7 +330,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         TMPtr tm = sys->getTM();
 
         price_t need_cash = iter->second;
-        if (m_tm->checkout(date, need_cash)) {
+        if (m_shadow_tm->checkout(date, need_cash)) {
             tm->checkin(date, need_cash);
             can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
         }
@@ -373,7 +387,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     auto end_iter = sw_iter;  // 记录结束位置
 
     // 总账号资金精度
-    int precision = m_tm->getParam<int>("precision");
+    int precision = m_shadow_tm->getParam<int>("precision");
 
     // 获取当前总资产市值
     price_t total_funds = _getTotalFunds(running_list);
@@ -382,12 +396,12 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     price_t reserve_funds = total_funds * m_reserve_percent;
 
     // 如果当前现金小于等于需保留的资产，则直接返回
-    if (m_tm->currentCash() <= reserve_funds) {
+    if (m_shadow_tm->currentCash() <= reserve_funds) {
         return;
     }
 
     // 计算可用于分配的现金
-    price_t can_allocate_cash = roundDown(m_tm->currentCash() - reserve_funds, precision);
+    price_t can_allocate_cash = roundDown(m_shadow_tm->currentCash() - reserve_funds, precision);
 
     // 再次遍历选中子系统列表，并将剩余现金按权重比例转入子账户
     double weight_unit = getParam<double>("weight_unit");
@@ -405,7 +419,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
 
         // 尝试从总账户中取出资金存入子账户
         TMPtr sub_tm = sw_iter->getSYS()->getTM();
-        if (m_tm->checkout(date, need_cash)) {
+        if (m_shadow_tm->checkout(date, need_cash)) {
             sub_tm->checkin(date, need_cash);
             can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
         }

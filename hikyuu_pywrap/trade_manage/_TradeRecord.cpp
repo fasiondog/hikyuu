@@ -42,6 +42,8 @@ void export_TradeRecord() {
       .def("__str__", &TradeRecord::toString)
       .def("__repr__", &TradeRecord::toString)
 
+      .def("is_null", &TradeRecord::isNull)
+
       .def_readwrite("stock", &TradeRecord::stock, "股票（Stock）")
       .def_readwrite("datetime", &TradeRecord::datetime, " 交易时间（Datetime）")
       .def_readwrite("business", &TradeRecord::business, "交易类型（BUSINESS）")

@@ -66,7 +66,7 @@ public:
     /** 仅用于python的__str__ */
     string toString() const;
 
-    bool isInvalid() const;
+    bool isNull() const;
 
     Stock stock;        ///< 交易对象
     Datetime datetime;  ///< 交易日期

@@ -63,6 +63,9 @@ public:
     /** 设定交易账户 */
     void setTM(const TMPtr&);
 
+    /** 设置 Portfolio 的影子账户, 仅由 Portfolio 调用 */
+    void setShadowTM(const TMPtr&);
+
     /** 获取关联查询条件 */
     KQuery getQuery();
 
@@ -119,6 +122,7 @@ private:
     int m_count;
     Datetime m_pre_date;
     TMPtr m_tm;
+    TMPtr m_shadow_tm;
 
     double m_reserve_percent;  //保留资产比例，不参与资产分配
 
@@ -210,6 +214,10 @@ inline TMPtr AllocateFundsBase::getTM() {
 
 inline void AllocateFundsBase::setTM(const TMPtr& tm) {
     m_tm = tm;
+}
+
+inline void AllocateFundsBase::setShadowTM(const TMPtr& tm) {
+    m_shadow_tm = tm;
 }
 
 inline KQuery AllocateFundsBase::getQuery() {

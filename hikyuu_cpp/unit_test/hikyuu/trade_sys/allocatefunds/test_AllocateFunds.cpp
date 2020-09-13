@@ -44,7 +44,6 @@ TEST_CASE("test_AllocateFunds") {
     AFPtr af2 = af->clone();
     CHECK_NE(af2.get(), af.get());
     CHECK_EQ(af2->name(), af->name());
-    CHECK_EQ(af2->getTM(), af->getTM());
 
     /** @arg 出入的se_list、hold_list均为空  */
     CHECK_EQ(se_list.size(), 0);

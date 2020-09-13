@@ -136,6 +136,7 @@ public:
 protected:
     string m_name;
     TMPtr m_tm;
+    TMPtr m_shadow_tm;
     SEPtr m_se;
     AFPtr m_af;
 

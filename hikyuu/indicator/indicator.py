@@ -77,6 +77,8 @@ def PRICELIST(data, result_index=0, discard=0):
         return ind.PRICELIST(toPriceList(data), discard)
 
 
+VALUE = PRICELIST
+
 try:
     import numpy as np
     import pandas as pd
