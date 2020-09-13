@@ -105,10 +105,16 @@ target("core")
         end
 
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
-        os.cp(target:targetdir() .. '/*.pyd', dst_dir)
-        os.cp(target:targetdir() .. '/*.dll', dst_dir)
-        os.cp(target:targetdir() .. '/*.so', dst_dir)
-        os.cp(target:targetdir() .. '/*.dylib', dst_dir)
+        if is_plat("windows") then
+            os.cp(target:targetdir() .. '/core.pyd', dst_dir)
+            os.cp(target:targetdir() .. '/hikyuu.dll', dst_dir)
+        elseif is_plat("macosx") then
+            os.cp(target:targetdir() .. '/core.so', dst_dir)
+            os.cp(target:targetdir() .. '/hikyuu.dylib', dst_dir)
+        else
+            os.cp(target:targetdir() .. '/core.so', dst_dir)
+            os.cp(target:targetdir() .. '/hikyuu.so', dst_dir)
+        end
 
         os.cp("$(env BOOST_LIB)/boost_date_time*.dll", dst_dir)
         os.cp("$(env BOOST_LIB)/boost_filesystem*.dll", dst_dir)
