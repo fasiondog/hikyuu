@@ -72,8 +72,8 @@ install:
   - cd boost_1_71_0
   - ./bootstrap.sh --with-python=python3
   - cat project-config.jam
-  - ./b2 release toolset=$CXX link=shared -d0 --with-python --with-serialization
-  - ./b2 release toolset=$CXX link=static cflags=-fPIC cxxflags=-fPIC -d0 --with-date_time --with-filesystem --with-system --with-test
+  - ./b2 release link=shared -d0 --with-python --with-serialization
+  - ./b2 release link=static cflags=-fPIC cxxflags=-fPIC -d0 --with-date_time --with-filesystem --with-system --with-test
   - ls ./stage/lib
   - cd
   - git clone https://github.com/xmake-io/xmake.git xmake-io/xmake --depth 1

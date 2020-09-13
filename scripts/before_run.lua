@@ -20,7 +20,7 @@ function main(target)
     end
     
     if is_plat("windows") then
-        os.cp("$(env BOOST_LIB)/boost_serialization*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        os.cp("$(env BOOST_LIB)/boost_*.dll", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         if is_mode("release") then
             os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll","$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
         else
@@ -30,11 +30,11 @@ function main(target)
     end
     
     if is_plat("linux") then
-        os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end    
 
     if is_plat("macosx") then
-        os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        os.cp("$(env BOOST_LIB)/libboost_*.dylib", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end    
     
 end

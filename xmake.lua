@@ -45,9 +45,7 @@ set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 add_includedirs("$(env BOOST_ROOT)")
 add_linkdirs("$(env BOOST_LIB)")
 
--- modifed to use boost static library, except boost.python
---add_defines("BOOST_ALL_DYN_LINK")
-add_defines("BOOST_SERIALIZATION_DYN_LINK")
+add_defines("BOOST_ALL_DYN_LINK")
 
 if is_host("linux") then
     if is_arch("x86_64") then
