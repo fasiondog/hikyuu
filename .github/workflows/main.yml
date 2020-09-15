@@ -19,11 +19,9 @@ jobs:
         Expand-Archive ./boost_1_74_0.zip -DestinationPath .
         Copy-Item ./boost_1_74_0 ./hikyuu
         cd ./hikyuu
-        ./bootstrap.bat --with-python=python3
     - name: build
       run: |
         python --version
-        cd hikyuu
         pip install click
         python setup.py build
     - name: test
