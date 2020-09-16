@@ -277,31 +277,42 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-#define PARAMETER_SUPPORT                                       \
-protected:                                                      \
-    Parameter m_params;                                         \
-                                                                \
-public:                                                         \
-    const Parameter& getParameter() const {                     \
-        return m_params;                                        \
-    }                                                           \
-                                                                \
-    void setParameter(const Parameter& param) {                 \
-        m_params = param;                                       \
-    }                                                           \
-                                                                \
-    bool haveParam(const string& name) const noexcept {         \
-        return m_params.have(name);                             \
-    }                                                           \
-                                                                \
-    template <typename ValueType>                               \
-    void setParam(const string& name, const ValueType& value) { \
-        m_params.set<ValueType>(name, value);                   \
-    }                                                           \
-                                                                \
-    template <typename ValueType>                               \
-    ValueType getParam(const string& name) const {              \
-        return m_params.get<ValueType>(name);                   \
+#define PARAMETER_SUPPORT                                                   \
+protected:                                                                  \
+    Parameter m_params;                                                     \
+                                                                            \
+public:                                                                     \
+    const Parameter& getParameter() const {                                 \
+        return m_params;                                                    \
+    }                                                                       \
+                                                                            \
+    void setParameter(const Parameter& param) {                             \
+        m_params = param;                                                   \
+    }                                                                       \
+                                                                            \
+    bool haveParam(const string& name) const noexcept {                     \
+        return m_params.have(name);                                         \
+    }                                                                       \
+                                                                            \
+    template <typename ValueType>                                           \
+    void setParam(const string& name, const ValueType& value) {             \
+        m_params.set<ValueType>(name, value);                               \
+    }                                                                       \
+                                                                            \
+    template <typename ValueType>                                           \
+    ValueType getParam(const string& name) const {                          \
+        return m_params.get<ValueType>(name);                               \
+    }                                                                       \
+                                                                            \
+    template <typename ValueType>                                           \
+    ValueType getParamFromOther(const Parameter& other, const string& name, \
+                                const ValueType& default_value) {           \
+        if (other.have(name)) {                                             \
+            setParam<ValueType>(name, other.get<ValueType>(name));          \
+        } else {                                                            \
+            setParam<ValueType>(name, default_value);                       \
+        }                                                                   \
+        return getParam<ValueType>(name);                                   \
     }
 
 template <typename ValueType>

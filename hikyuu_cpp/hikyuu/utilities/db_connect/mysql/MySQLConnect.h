@@ -27,13 +27,15 @@ public:
     MySQLConnect(const Parameter& param);
     virtual ~MySQLConnect();
 
+    bool ping();
+
     virtual void exec(const string& sql_string) override;
     virtual SQLStatementPtr getStatement(const string& sql_statement) override;
     virtual bool tableExist(const string& tablename) override;
 
 private:
     friend class MySQLStatement;
-    shared_ptr<MYSQL> m_mysql;
+    MYSQL* m_mysql;
 };
 
 }  // namespace hku

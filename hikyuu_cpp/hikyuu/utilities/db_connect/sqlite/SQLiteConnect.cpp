@@ -62,9 +62,9 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param) {
 }
 
 void SQLiteConnect::exec(const string& sql_string) {
-    HKU_ASSERT_M(m_db, "database is not open! {}", m_dbname);
+    HKU_CHECK(m_db, "database is not open! {}", m_dbname);
     int rc = sqlite3_exec(m_db.get(), sql_string.c_str(), NULL, NULL, NULL);
-    HKU_ASSERT_M(rc == SQLITE_OK, "SQL error: {}! ({})", sqlite3_errmsg(m_db.get()), sql_string);
+    HKU_CHECK(rc == SQLITE_OK, "SQL error: {}! ({})", sqlite3_errmsg(m_db.get()), sql_string);
 }
 
 SQLStatementPtr SQLiteConnect::getStatement(const string& sql_statement) {
