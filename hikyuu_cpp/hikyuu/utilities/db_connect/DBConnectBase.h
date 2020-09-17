@@ -28,7 +28,7 @@ public:
      * 构造函数
      * @param param 数据库连接参数
      */
-    explicit DBConnectBase(const Parameter& param);
+    explicit DBConnectBase(const Parameter& param) noexcept;
     virtual ~DBConnectBase() = default;
 
     /** 开始事务 */
@@ -43,6 +43,9 @@ public:
     //-------------------------------------------------------------------------
     // 子类接口
     //-------------------------------------------------------------------------
+    /** 检测连接是否可用 */
+    virtual bool ping() = 0;
+
     /** 执行无返回结果的 SQL */
     virtual void exec(const string& sql_string) = 0;
 
@@ -173,7 +176,7 @@ typedef shared_ptr<DBConnectBase> DBConnectPtr;
 // inline方法实现
 //-------------------------------------------------------------------------
 
-inline DBConnectBase::DBConnectBase(const Parameter& param) : m_params(param) {}
+inline DBConnectBase::DBConnectBase(const Parameter& param) noexcept : m_params(param) {}
 
 inline void DBConnectBase::transaction() {
     exec("BEGIN TRANSACTION");

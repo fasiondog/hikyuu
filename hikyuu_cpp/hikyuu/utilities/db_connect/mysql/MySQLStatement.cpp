@@ -20,7 +20,7 @@ MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_sta
   m_needs_reset(false),
   m_has_bind_result(false) {
     m_stmt = mysql_stmt_init(m_db.get());
-    HKU_ASSERT_M(m_stmt != nullptr, "Failed mysql_stmt_init!");
+    HKU_CHECK(m_stmt != nullptr, "Failed mysql_stmt_init!");
     int ret = mysql_stmt_prepare(m_stmt, sql_statement.c_str(), sql_statement.size());
     if (ret != 0) {
         std::string stmt_errorstr = mysql_stmt_error(m_stmt);
@@ -61,7 +61,7 @@ bool MySQLStatement::sub_isValid() const {
 void MySQLStatement::_reset() {
     if (m_needs_reset) {
         int ret = mysql_stmt_reset(m_stmt);
-        HKU_ASSERT_M(ret == 0, "Failed reset statement! {}", mysql_stmt_error(m_stmt));
+        HKU_CHECK(ret == 0, "Failed reset statement! {}", mysql_stmt_error(m_stmt));
         // m_param_bind.clear();
         // m_result_bind.clear();
         m_param_buffer.clear();
@@ -75,11 +75,11 @@ void MySQLStatement::sub_exec() {
     _reset();
     m_needs_reset = true;
     if (m_param_bind.size() > 0) {
-        HKU_ASSERT_M(mysql_stmt_bind_param(m_stmt, m_param_bind.data()) == 0,
-                     "Failed mysql_stmt_bind_param! {}", mysql_stmt_error(m_stmt));
+        HKU_CHECK(mysql_stmt_bind_param(m_stmt, m_param_bind.data()) == 0,
+                  "Failed mysql_stmt_bind_param! {}", mysql_stmt_error(m_stmt));
     }
-    HKU_ASSERT_M(mysql_stmt_execute(m_stmt) == 0, "Failed mysql_stmt_execute: {}",
-                 mysql_stmt_error(m_stmt));
+    HKU_CHECK(mysql_stmt_execute(m_stmt) == 0, "Failed mysql_stmt_execute: {}",
+              mysql_stmt_error(m_stmt));
 }
 
 void MySQLStatement::_bindResult() {
@@ -128,11 +128,11 @@ bool MySQLStatement::sub_moveNext() {
         _bindResult();
         m_has_bind_result = true;
 
-        HKU_ASSERT_M(mysql_stmt_bind_result(m_stmt, m_result_bind.data()) == 0,
-                     "Failed mysql_stmt_bind_result! {}", mysql_stmt_error(m_stmt));
+        HKU_CHECK(mysql_stmt_bind_result(m_stmt, m_result_bind.data()) == 0,
+                  "Failed mysql_stmt_bind_result! {}", mysql_stmt_error(m_stmt));
 
-        HKU_ASSERT_M(mysql_stmt_store_result(m_stmt) == 0, "Failed mysql_stmt_store_result! {}",
-                     mysql_stmt_error(m_stmt));
+        HKU_CHECK(mysql_stmt_store_result(m_stmt) == 0, "Failed mysql_stmt_store_result! {}",
+                  mysql_stmt_error(m_stmt));
     }
 
     int ret = mysql_stmt_fetch(m_stmt);
@@ -145,14 +145,14 @@ bool MySQLStatement::sub_moveNext() {
 }
 
 void MySQLStatement::sub_bindNull(int idx) {
-    HKU_ASSERT_M(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
-                 m_param_bind.size());
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
     m_param_bind[idx].buffer_type = MYSQL_TYPE_NULL;
 }
 
 void MySQLStatement::sub_bindInt(int idx, int64 value) {
-    HKU_ASSERT_M(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
-                 m_param_bind.size());
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
     m_param_buffer.push_back(value);
     auto& buf = m_param_buffer.back();
     m_param_bind[idx].buffer_type = MYSQL_TYPE_LONGLONG;
@@ -160,8 +160,8 @@ void MySQLStatement::sub_bindInt(int idx, int64 value) {
 }
 
 void MySQLStatement::sub_bindDouble(int idx, double item) {
-    HKU_ASSERT_M(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
-                 m_param_bind.size());
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
     m_param_bind[idx].buffer_type = MYSQL_TYPE_DOUBLE;
@@ -169,8 +169,8 @@ void MySQLStatement::sub_bindDouble(int idx, double item) {
 }
 
 void MySQLStatement::sub_bindText(int idx, const string& item) {
-    HKU_ASSERT_M(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
-                 m_param_bind.size());
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
     string* p = boost::any_cast<string>(&buf);
@@ -187,8 +187,8 @@ void MySQLStatement::sub_bindText(int idx, const string& item) {
 }
 
 void MySQLStatement::sub_bindBlob(int idx, const string& item) {
-    HKU_ASSERT_M(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
-                 m_param_bind.size());
+    HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
+              m_param_bind.size());
     m_param_buffer.push_back(item);
     auto& buf = m_param_buffer.back();
     string* p = boost::any_cast<string>(&buf);
@@ -209,10 +209,10 @@ int MySQLStatement::sub_getNumColumns() const {
 }
 
 void MySQLStatement::sub_getColumnAsInt64(int idx, int64& item) {
-    HKU_ASSERT_M(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
-                 m_result_buffer.size());
+    HKU_CHECK(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
+              m_result_buffer.size());
 
-    HKU_ASSERT_M(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsInt64! idx: {}", idx);
+    HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsInt64! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
         item = 0;
@@ -227,10 +227,10 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64& item) {
 }
 
 void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
-    HKU_ASSERT_M(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
-                 m_result_buffer.size());
+    HKU_CHECK(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
+              m_result_buffer.size());
 
-    HKU_ASSERT_M(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsDouble! idx: {}", idx);
+    HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsDouble! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
         item = 0;
@@ -245,10 +245,10 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
 }
 
 void MySQLStatement::sub_getColumnAsText(int idx, string& item) {
-    HKU_ASSERT_M(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
-                 m_result_buffer.size());
+    HKU_CHECK(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
+              m_result_buffer.size());
 
-    HKU_ASSERT_M(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsText! idx: {}", idx);
+    HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsText! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
         item.clear();
@@ -268,10 +268,10 @@ void MySQLStatement::sub_getColumnAsText(int idx, string& item) {
 }
 
 void MySQLStatement::sub_getColumnAsBlob(int idx, string& item) {
-    HKU_ASSERT_M(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
-                 m_result_buffer.size());
+    HKU_CHECK(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
+              m_result_buffer.size());
 
-    HKU_ASSERT_M(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsBlob! idx: {}", idx);
+    HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsBlob! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
         item.clear();

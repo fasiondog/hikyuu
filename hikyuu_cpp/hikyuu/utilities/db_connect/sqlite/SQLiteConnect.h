@@ -36,11 +36,12 @@ public:
      *            （具体可参考 SQLite 帮助）
      * </pre>
      */
-    explicit SQLiteConnect(const Parameter& param);
+    explicit SQLiteConnect(const Parameter& param) noexcept;
 
     /** 析构函数 */
     virtual ~SQLiteConnect() {}
 
+    virtual bool ping() override;
     virtual void exec(const string& sql_string) override;
     virtual SQLStatementPtr getStatement(const string& sql_statement) override;
     virtual bool tableExist(const string& tablename) override;

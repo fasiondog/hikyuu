@@ -11,27 +11,34 @@
 
 namespace hku {
 
-MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mysql(nullptr) {
+MySQLConnect::MySQLConnect(const Parameter& param) noexcept
+: DBConnectBase(param), m_mysql(nullptr) {
     m_mysql = new MYSQL;
-    HKU_CHECK(m_mysql, "Failed new MYSQL instance!");
-    HKU_CHECK(mysql_init(m_mysql) != NULL, "Initial MySQL handle error!");
+    try {
+        HKU_CHECK(m_mysql, "Failed new MYSQL instance!");
+        HKU_CHECK(mysql_init(m_mysql) != NULL, "Initial MySQL handle error!");
 
-    string host = getParamFromOther<string>(param, "host", "127.0.0.1");
-    string usr = getParamFromOther<string>(param, "usr", "root");
-    string pwd = getParamFromOther<string>(param, "pwd", "");
-    string database = getParamFromOther<string>(param, "db", "hku_base");
-    unsigned int port = getParamFromOther<int>(param, "port", 3306);
-    // HKU_TRACE("MYSQL host: {}", host);
-    // HKU_TRACE("MYSQL port: {}", port);
-    // HKU_TRACE("MYSQL database: {}", database);
+        string host = getParamFromOther<string>(param, "host", "127.0.0.1");
+        string usr = getParamFromOther<string>(param, "usr", "root");
+        string pwd = getParamFromOther<string>(param, "pwd", "");
+        string database = getParamFromOther<string>(param, "db", "mysql");
+        unsigned int port = getParamFromOther<int>(param, "port", 3306);
+        HKU_TRACE("MYSQL host: {}", host);
+        HKU_TRACE("MYSQL port: {}", port);
+        HKU_TRACE("MYSQL database: {}", database);
 
-    my_bool reconnect = 1;
-    HKU_CHECK(mysql_options(m_mysql, MYSQL_OPT_RECONNECT, &reconnect) == 0,
-              "Failed set reconnect options");
-    HKU_CHECK(mysql_real_connect(m_mysql, host.c_str(), usr.c_str(), pwd.c_str(), database.c_str(),
-                                 port, NULL, CLIENT_MULTI_STATEMENTS) != NULL,
-              "Failed to connect to database! {}", mysql_error(m_mysql));
-    HKU_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, "mysql_set_character_set error!");
+        my_bool reconnect = 1;
+        HKU_CHECK(mysql_options(m_mysql, MYSQL_OPT_RECONNECT, &reconnect) == 0,
+                  "Failed set reconnect options");
+        HKU_CHECK(mysql_real_connect(m_mysql, host.c_str(), usr.c_str(), pwd.c_str(),
+                                     database.c_str(), port, NULL, CLIENT_MULTI_STATEMENTS) != NULL,
+                  "Failed to connect to database! {}", mysql_error(m_mysql));
+        HKU_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, "mysql_set_character_set error!");
+    } catch (std::exception& e) {
+        HKU_FATAL(e.what());
+    } catch (...) {
+        HKU_FATAL("Unknown error!");
+    }
 }
 
 MySQLConnect::~MySQLConnect() {
@@ -42,13 +49,22 @@ MySQLConnect::~MySQLConnect() {
 }
 
 bool MySQLConnect::ping() {
-    return m_mysql ? mysql_ping(m_mysql) == 0 : false;
+    if (!m_mysql) {
+        return false;
+    }
+
+    auto ret = mysql_ping(m_mysql);
+    if (ret) {
+        HKU_ERROR("mysql_ping error code: {}, msg: {}", ret, mysql_error(m_mysql));
+        return false;
+    }
+    return true;
 }
 
 void MySQLConnect::exec(const string& sql_string) {
-    HKU_CHECK(m_mysql, "mysql connect is not open!");
+    HKU_CHECK(m_mysql, "mysql connect is invalid!");
     int ret = mysql_query(m_mysql, sql_string.c_str());
-    HKU_CHECK(ret == 0, "SQL error： {}! error code：{}", sql_string, ret);
+    HKU_CHECK(ret == 0, "SQL error：{}! error code：{}", sql_string, ret);
 }
 
 SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
@@ -56,7 +72,16 @@ SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
 }
 
 bool MySQLConnect::tableExist(const string& tablename) {
-    return false;
+    HKU_CHECK(m_mysql, "mysql connect is invalid!");
+    SQLStatementPtr st = getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", tablename));
+    bool result = false;
+    try {
+        st->exec();
+        result = true;
+    } catch (...) {
+        result = false;
+    }
+    return result;
 }
 
 }  // namespace hku

@@ -31,7 +31,7 @@ static int sqlite_busy_call_back(void* ptr, int count) {
     return 1;
 }
 
-SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param) {
+SQLiteConnect::SQLiteConnect(const Parameter& param) noexcept : DBConnectBase(param) {
     try {
         m_dbname = getParam<string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
@@ -51,14 +51,18 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param) {
         sqlite3_busy_handler(db, sqlite_busy_call_back, (void*)db);
 
     } catch (std::out_of_range& e) {
-        HKU_THROW("Can't get database name! {}", e.what());
+        HKU_FATAL("Can't get database name! {}", e.what());
     } catch (hku::exception& e) {
-        HKU_THROW("Failed open database: {})! SQLite3 error: {}", m_dbname, e.what());
+        HKU_FATAL("Failed open database: {})! SQLite3 error: {}", m_dbname, e.what());
     } catch (std::exception& e) {
-        HKU_THROW("Failed initialize data driver({})! exception: {}", m_dbname, e.what());
+        HKU_FATAL("Failed initialize data driver({})! exception: {}", m_dbname, e.what());
     } catch (...) {
-        HKU_THROW("Failed open database({})! Unkown error!", m_dbname);
+        HKU_FATAL("Failed open database({})! Unkown error!", m_dbname);
     }
+}
+
+bool SQLiteConnect::ping() {
+    return m_db ? true : false;
 }
 
 void SQLiteConnect::exec(const string& sql_string) {
@@ -84,7 +88,6 @@ bool SQLiteConnect::tableExist(const string& tablename) {
         }
     }
     return result;
-    ;
 }
 
 } /* namespace hku */
