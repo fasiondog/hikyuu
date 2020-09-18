@@ -53,7 +53,7 @@ target("small-test")
     if get_config("test") == "all" then
         set_default(false)
     end
-    add_packages("fmt", "spdlog", "doctest")
+    add_packages("fmt", "spdlog", "doctest", "mysql")
     add_includedirs("..")
 
     --add_defines("BOOST_TEST_DYN_LINK")

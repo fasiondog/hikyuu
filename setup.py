@@ -233,7 +233,8 @@ def build(verbose, mode):
               default='release',
               type=click.Choice(['release', 'debug']),
               help='编译模式')
-def test(all, compile, verbose, mode):
+@click.option('-case', '--case', default='', help="执行指定的 TestCase")
+def test(all, compile, verbose, mode, case):
     """ 执行单元测试 """
     current_compile_info = get_current_compile_info()
     current_compile_info['mode'] = mode
@@ -243,11 +244,13 @@ def test(all, compile, verbose, mode):
     if all:
         os.system("xmake f --test=all --mode={}".format(mode))
         os.system("xmake -b {} unit-test".format("-v -D" if verbose else ""))
-        os.system("xmake r unit-test")
+        os.system("xmake r unit-test {}".format('' if case ==
+                                                '' else '-tc {}'.format(case)))
     else:
         os.system("xmake f --test=small --mode={}".format(mode))
         os.system("xmake -b {} small-test".format("-v -D" if verbose else ""))
-        os.system("xmake r small-test")
+        os.system("xmake r small-test {}".format(
+            '' if case == '' else '-tc {}'.format(case)))
 
 
 @click.command()

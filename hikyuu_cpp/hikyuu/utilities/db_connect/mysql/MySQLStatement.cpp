@@ -26,7 +26,7 @@ MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_sta
         std::string stmt_errorstr = mysql_stmt_error(m_stmt);
         mysql_stmt_close(m_stmt);
         m_stmt = nullptr;
-        HKU_THROW("Failed prepare statement! error: {} SQL: {}", stmt_errorstr.c_str(),
+        HKU_THROW("Failed prepare statement! error msg: {}! SQL: {}", stmt_errorstr.c_str(),
                   sql_statement);
     }
 

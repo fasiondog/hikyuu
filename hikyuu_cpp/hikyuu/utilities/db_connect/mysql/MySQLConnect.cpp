@@ -21,7 +21,7 @@ MySQLConnect::MySQLConnect(const Parameter& param) noexcept
         string host = getParamFromOther<string>(param, "host", "127.0.0.1");
         string usr = getParamFromOther<string>(param, "usr", "root");
         string pwd = getParamFromOther<string>(param, "pwd", "");
-        string database = getParamFromOther<string>(param, "db", "mysql");
+        string database = getParamFromOther<string>(param, "db", "");
         unsigned int port = getParamFromOther<int>(param, "port", 3306);
         HKU_TRACE("MYSQL host: {}", host);
         HKU_TRACE("MYSQL port: {}", port);
@@ -64,7 +64,27 @@ bool MySQLConnect::ping() {
 void MySQLConnect::exec(const string& sql_string) {
     HKU_CHECK(m_mysql, "mysql connect is invalid!");
     int ret = mysql_query(m_mysql, sql_string.c_str());
-    HKU_CHECK(ret == 0, "SQL error：{}! error code：{}", sql_string, ret);
+    if (ret) {
+        HKU_THROW("SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
+                  mysql_error(m_mysql));
+    } else {
+        do {
+            MYSQL_RES* result = mysql_store_result(m_mysql);
+            if (result) {
+                auto num_fields = mysql_num_fields(result);
+                HKU_TRACE("num_fields: {}", num_fields);
+                mysql_free_result(result);
+            } else {
+                if (mysql_field_count(m_mysql) == 0) {
+                    auto num_rows = mysql_affected_rows(m_mysql);
+                    HKU_TRACE("num_rows: {}", num_rows);
+                } else {
+                    HKU_THROW("mysql_field_count error：{}! error code：{}, error msg: {}",
+                              sql_string, ret, mysql_error(m_mysql));
+                }
+            }
+        } while (!mysql_next_result(m_mysql));
+    }
 }
 
 SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
@@ -73,9 +93,9 @@ SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
 
 bool MySQLConnect::tableExist(const string& tablename) {
     HKU_CHECK(m_mysql, "mysql connect is invalid!");
-    SQLStatementPtr st = getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", tablename));
     bool result = false;
     try {
+        SQLStatementPtr st = getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", tablename));
         st->exec();
         result = true;
     } catch (...) {
