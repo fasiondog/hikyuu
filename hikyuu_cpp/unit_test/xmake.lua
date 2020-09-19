@@ -14,7 +14,7 @@ target("unit-test")
         set_default(false)
     end
 
-    add_packages("fmt", "spdlog", "doctest")
+    add_packages("fmt", "spdlog", "doctest", "mysql")
 
     add_includedirs("..")
 

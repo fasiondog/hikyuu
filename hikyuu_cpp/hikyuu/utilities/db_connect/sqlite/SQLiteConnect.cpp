@@ -15,23 +15,14 @@
 
 namespace hku {
 
-// 自动关闭 sqlite3 数据库资源
-class Sqlite3Closer {
-public:
-    void operator()(sqlite3* db) const {
-        if (db) {
-            sqlite3_close(db);
-        }
-    }
-};
-
 // sqlite3 多线程处理时，等待其他锁释放回调处理
 static int sqlite_busy_call_back(void* ptr, int count) {
     std::this_thread::yield();
     return 1;
 }
 
-SQLiteConnect::SQLiteConnect(const Parameter& param) noexcept : DBConnectBase(param) {
+SQLiteConnect::SQLiteConnect(const Parameter& param) noexcept
+: DBConnectBase(param), m_db(nullptr) {
     try {
         m_dbname = getParam<string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
@@ -41,23 +32,33 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) noexcept : DBConnectBase(pa
         if (haveParam("flags")) {
             flags = getParam<int>("flags");
         }
-        sqlite3* db = NULL;
-        int rc = sqlite3_open_v2(m_dbname.c_str(), &db, flags, NULL);
-        if (rc != SQLITE_OK) {
-            sqlite3_close(db);
-            throw exception(sqlite3_errmsg(db));
-        }
-        m_db.reset(db, Sqlite3Closer());
-        sqlite3_busy_handler(db, sqlite_busy_call_back, (void*)db);
+        int rc = sqlite3_open_v2(m_dbname.c_str(), &m_db, flags, NULL);
+        HKU_CHECK(rc == SQLITE_OK, sqlite3_errmsg(m_db));
+        sqlite3_busy_handler(m_db, sqlite_busy_call_back, (void*)m_db);
 
     } catch (std::out_of_range& e) {
         HKU_FATAL("Can't get database name! {}", e.what());
+        close();
     } catch (hku::exception& e) {
         HKU_FATAL("Failed open database: {})! SQLite3 error: {}", m_dbname, e.what());
+        close();
     } catch (std::exception& e) {
         HKU_FATAL("Failed initialize data driver({})! exception: {}", m_dbname, e.what());
+        close();
     } catch (...) {
         HKU_FATAL("Failed open database({})! Unkown error!", m_dbname);
+        close();
+    }
+}
+
+SQLiteConnect::~SQLiteConnect() {
+    close();
+}
+
+void SQLiteConnect::close() {
+    if (m_db) {
+        sqlite3_close(m_db);
+        m_db = nullptr;
     }
 }
 
@@ -67,12 +68,12 @@ bool SQLiteConnect::ping() {
 
 void SQLiteConnect::exec(const string& sql_string) {
     HKU_CHECK(m_db, "database is not open! {}", m_dbname);
-    int rc = sqlite3_exec(m_db.get(), sql_string.c_str(), NULL, NULL, NULL);
-    HKU_CHECK(rc == SQLITE_OK, "SQL error: {}! ({})", sqlite3_errmsg(m_db.get()), sql_string);
+    int rc = sqlite3_exec(m_db, sql_string.c_str(), NULL, NULL, NULL);
+    HKU_CHECK(rc == SQLITE_OK, "SQL error: {}! ({})", sqlite3_errmsg(m_db), sql_string);
 }
 
 SQLStatementPtr SQLiteConnect::getStatement(const string& sql_statement) {
-    return make_shared<SQLiteStatement>(shared_from_this(), sql_statement);
+    return make_shared<SQLiteStatement>(this, sql_statement);
 }
 
 bool SQLiteConnect::tableExist(const string& tablename) {

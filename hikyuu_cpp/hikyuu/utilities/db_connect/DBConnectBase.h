@@ -20,7 +20,7 @@ namespace hku {
  * 数据库连接基类
  * @ingroup DBConnect
  */
-class HKU_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
+class HKU_API DBConnectBase {
     PARAMETER_SUPPORT
 
 public:

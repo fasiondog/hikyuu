@@ -39,7 +39,7 @@ public:
     explicit SQLiteConnect(const Parameter& param) noexcept;
 
     /** 析构函数 */
-    virtual ~SQLiteConnect() {}
+    virtual ~SQLiteConnect();
 
     virtual bool ping() override;
     virtual void exec(const string& sql_string) override;
@@ -47,10 +47,12 @@ public:
     virtual bool tableExist(const string& tablename) override;
 
 private:
-    friend class SQLiteStatement;
+    void close();
 
+private:
+    friend class SQLiteStatement;
     string m_dbname;
-    shared_ptr<sqlite3> m_db;
+    sqlite3* m_db;
 };
 
 }  // namespace hku

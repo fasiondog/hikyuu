@@ -34,6 +34,9 @@ public:
     virtual bool tableExist(const string& tablename) override;
 
 private:
+    void close();
+
+private:
     friend class MySQLStatement;
     MYSQL* m_mysql;
 };

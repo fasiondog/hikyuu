@@ -28,7 +28,7 @@ public:
      * @param driver 数据库连接
      * @param sql_statement SQL语句
      */
-    SQLiteStatement(const DBConnectPtr& driver, const string& sql_statement);
+    SQLiteStatement(DBConnectBase* driver, const string& sql_statement);
 
     /** 析构函数 */
     virtual ~SQLiteStatement();
@@ -57,7 +57,7 @@ private:
                          // sqlite3_reset()
     int m_step_status;
     bool m_at_first_step;
-    shared_ptr<sqlite3> m_db;
+    sqlite3* m_db;
     sqlite3_stmt* m_stmt;
 };
 

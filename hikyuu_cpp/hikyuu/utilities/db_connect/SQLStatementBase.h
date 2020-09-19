@@ -40,7 +40,7 @@ public:
      * @param driver 数据库连接
      * @param sql_statement SQL语句
      */
-    SQLStatementBase(const DBConnectPtr& driver, const string& sql_statement);
+    SQLStatementBase(DBConnectBase* driver, const string& sql_statement);
 
     virtual ~SQLStatementBase() = default;
 
@@ -48,7 +48,7 @@ public:
     const string& getSqlString() const;
 
     /** 获取数据驱动 */
-    DBConnectPtr getConnect() const;
+    DBConnectBase* getConnect() const;
 
     /** 当前 SQL 表达式是否有效 */
     bool isValid() const;
@@ -133,14 +133,14 @@ private:
     SQLStatementBase() = delete;
 
 protected:
-    DBConnectPtr m_driver;  ///< 数据库连接
-    string m_sql_string;    ///< 原始 SQL 语句
+    DBConnectBase* m_driver;  ///< 数据库连接
+    string m_sql_string;      ///< 原始 SQL 语句
 };
 
 /** @ingroup DBConnect */
 typedef shared_ptr<SQLStatementBase> SQLStatementPtr;
 
-inline SQLStatementBase ::SQLStatementBase(const DBConnectPtr& driver, const string& sql_statement)
+inline SQLStatementBase ::SQLStatementBase(DBConnectBase* driver, const string& sql_statement)
 : m_driver(driver), m_sql_string(sql_statement) {
     HKU_CHECK(driver, "driver is null!");
 }
@@ -149,7 +149,7 @@ inline const string& SQLStatementBase::getSqlString() const {
     return m_sql_string;
 }
 
-inline DBConnectPtr SQLStatementBase::getConnect() const {
+inline DBConnectBase* SQLStatementBase::getConnect() const {
     return m_driver;
 }
 

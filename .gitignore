@@ -48,7 +48,11 @@ hikyuu.egg-info
 dist
 boost_*
 py_version
+vsxmake2010
+vsxmake2013
+vsxmake2015
 vsxmake2017
+vsxmake2019
 vs2017
 vs2019
 vs2010
