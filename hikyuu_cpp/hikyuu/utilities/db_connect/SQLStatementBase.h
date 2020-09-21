@@ -235,7 +235,11 @@ typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBa
     HKU_CHECK(isValid(), "Invalid statement!");
     int64 temp;
     sub_getColumnAsInt64(idx, temp);
-    item = (T)temp;
+    if (sizeof(T) == sizeof(int64)) {
+        item = temp;
+    } else {
+        item = temp == Null<int64>() ? Null<int>() : (T)temp;
+    }
 }
 
 template <typename T>
