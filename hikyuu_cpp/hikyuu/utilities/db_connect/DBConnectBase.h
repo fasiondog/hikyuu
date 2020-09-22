@@ -179,15 +179,15 @@ typedef shared_ptr<DBConnectBase> DBConnectPtr;
 inline DBConnectBase::DBConnectBase(const Parameter& param) noexcept : m_params(param) {}
 
 inline void DBConnectBase::transaction() {
-    exec("BEGIN TRANSACTION");
+    exec("BEGIN;");
 }
 
 inline void DBConnectBase::commit() {
-    exec("COMMIT TRANSACTION");
+    exec("COMMIT;");
 }
 
 inline void DBConnectBase::rollback() {
-    exec("ROLLBACK TRANSACTION");
+    exec("ROLLBACK;");
 }
 
 inline int DBConnectBase::queryInt(const string& query) {

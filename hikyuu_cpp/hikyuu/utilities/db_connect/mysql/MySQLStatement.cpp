@@ -89,6 +89,7 @@ void MySQLStatement::_bindResult() {
     MYSQL_FIELD* field;
     int idx = 0;
     while ((field = mysql_fetch_field(m_meta_result))) {
+        HKU_INFO("field {} len: {}", field->name, field->length);
         m_result_bind[idx].buffer_type = field->type;
 #if MYSQL_VERSION_ID >= 80000
         m_result_bind[idx].is_null = (bool*)&m_result_is_null[idx];
@@ -121,18 +122,24 @@ void MySQLStatement::_bindResult() {
             m_result_bind[idx].buffer = boost::any_cast<float>(&buf);
         } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_STRING ||
                    field->type == MYSQL_TYPE_BLOB) {
-            m_result_bind[idx].buffer_length = 4096;
-            m_result_buffer.emplace_back(vector<char>(4096));
+            unsigned long length = field->length + 1;
+            m_result_bind[idx].buffer_length = length;
+            m_result_buffer.emplace_back(vector<char>(length));
             auto& buf = m_result_buffer.back();
             vector<char>* p = boost::any_cast<vector<char>>(&buf);
             m_result_bind[idx].buffer = p->data();
-        } else if (field->type == MYSQL_TYPE_LONG) {
-            int32 item = 0;
+        } else if (field->type == MYSQL_TYPE_TINY) {
+            int8 item = 0;
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
-            m_result_bind[idx].buffer = boost::any_cast<int64>(&buf);
+            m_result_bind[idx].buffer = boost::any_cast<int8>(&buf);
+        } else if (field->type == MYSQL_TYPE_SHORT) {
+            short item = 0;
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<short>(&buf);
         } else {
-            HKU_THROW("Unsupport field type: {}", field->type);
+            HKU_THROW("Unsupport field type: {}, field name: {}", field->type, field->name);
         }
 
         idx++;
@@ -231,7 +238,7 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64& item) {
     HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsInt64! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
-        item = Null<int64>();
+        item = 0;
         return;
     }
 
@@ -253,7 +260,7 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsDouble! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
-        item = Null<double>();
+        item = 0.0;
         return;
     }
 
