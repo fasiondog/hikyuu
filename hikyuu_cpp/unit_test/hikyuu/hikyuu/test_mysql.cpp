@@ -106,12 +106,15 @@ TEST_CASE("test_mysql") {
         t_list.push_back(TTT("bbb", 30, "bbb@x.com"));
         t_list.push_back(TTT("ccc", 15, "ccc@x.com"));
         con->batchSave(t_list.begin(), t_list.end());
+        /*for (auto& r : t_list) {
+            HKU_INFO("{}", r.toString());
+        }*/
 
         vector<TTT> r_list;
         con->batchLoad(r_list, "1=1 order by name DESC");
-        for (auto& r : r_list) {
+        /*for (auto& r : r_list) {
             HKU_INFO("{}", r.toString());
-        }
+        }*/
 
         CHECK(r_list.size() == 3);
         CHECK(r_list[0].name == "ccc");
@@ -124,17 +127,16 @@ TEST_CASE("test_mysql") {
         CHECK(r_list[2].age == 20);
         CHECK(r_list[2].email == "aaa@x.com");
 
-        /*TTT x;
+        TTT x;
         con->load(x, "name='bbb'");
-        HKU_INFO("id: {}, name: {}, age: {}", x.id(), x.name, x.age);
         x.age = 100;
         con->save(x);
 
         TTT y;
         con->load(y, "name='bbb'");
-        CHECK(y.age == 100);*/
+        CHECK(y.age == 100);
 
-        // con->exec("drop table ttt");
+        con->exec("drop table ttt");
     }
 }
 #endif

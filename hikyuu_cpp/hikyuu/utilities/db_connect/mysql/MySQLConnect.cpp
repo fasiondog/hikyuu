@@ -111,4 +111,16 @@ bool MySQLConnect::tableExist(const string& tablename) {
     return result;
 }
 
+void MySQLConnect::transaction() {
+    exec("BEGIN");
+}
+
+void MySQLConnect::commit() {
+    exec("COMMIT");
+}
+
+void MySQLConnect::rollback() {
+    exec("ROLLBACK");
+}
+
 }  // namespace hku

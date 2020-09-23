@@ -46,6 +46,10 @@ public:
     virtual SQLStatementPtr getStatement(const string& sql_statement) override;
     virtual bool tableExist(const string& tablename) override;
 
+    virtual void transaction() override;
+    virtual void commit() override;
+    virtual void rollback() override;
+
 private:
     void close();
 

@@ -63,7 +63,7 @@ void MySQLStatement::_reset() {
         HKU_CHECK(ret == 0, "Failed reset statement! {}", mysql_stmt_error(m_stmt));
         // m_param_bind.clear();
         // m_result_bind.clear();
-        m_param_buffer.clear();
+        // m_param_buffer.clear();
         m_result_buffer.clear();
         m_needs_reset = false;
         m_has_bind_result = false;
@@ -89,7 +89,7 @@ void MySQLStatement::_bindResult() {
     MYSQL_FIELD* field;
     int idx = 0;
     while ((field = mysql_fetch_field(m_meta_result))) {
-        HKU_INFO("field {} len: {}", field->name, field->length);
+        // HKU_INFO("field {} len: {}", field->name, field->length);
         m_result_bind[idx].buffer_type = field->type;
 #if MYSQL_VERSION_ID >= 80000
         m_result_bind[idx].is_null = (bool*)&m_result_is_null[idx];
@@ -201,12 +201,6 @@ void MySQLStatement::sub_bindText(int idx, const string& item) {
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
     m_param_bind[idx].is_null = 0;
-
-    unsigned long str_len = item.size();
-    m_param_buffer.push_back(str_len);
-    auto& ref = m_param_buffer.back();
-    m_param_bind[idx].length = boost::any_cast<unsigned long>(&ref);
-    ;
 }
 
 void MySQLStatement::sub_bindBlob(int idx, const string& item) {
@@ -219,12 +213,6 @@ void MySQLStatement::sub_bindBlob(int idx, const string& item) {
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
     m_param_bind[idx].is_null = 0;
-
-    unsigned long str_len = item.size();
-    m_param_buffer.push_back(str_len);
-    auto& ref = m_param_buffer.back();
-    m_param_bind[idx].length = boost::any_cast<unsigned long>(&ref);
-    ;
 }
 
 int MySQLStatement::sub_getNumColumns() const {
@@ -287,10 +275,10 @@ void MySQLStatement::sub_getColumnAsText(int idx, string& item) {
     }
 
     try {
-        vector<char> p = boost::any_cast<vector<char>>(m_result_buffer[idx]);
+        vector<char>* p = boost::any_cast<vector<char>>(&(m_result_buffer[idx]));
         std::ostringstream buf;
         for (unsigned long i = 0; i < m_result_length[idx]; i++) {
-            buf << p[i];
+            buf << (*p)[i];
         }
         item = buf.str();
     } catch (...) {
@@ -310,10 +298,10 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, string& item) {
     }
 
     try {
-        vector<char> p = boost::any_cast<vector<char>>(m_result_buffer[idx]);
+        vector<char>* p = boost::any_cast<vector<char>>(&m_result_buffer[idx]);
         std::ostringstream buf;
         for (unsigned long i = 0; i < m_result_length[idx]; i++) {
-            buf << p[i];
+            buf << (*p)[i];
         }
         item = buf.str();
     } catch (...) {

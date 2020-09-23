@@ -91,4 +91,16 @@ bool SQLiteConnect::tableExist(const string& tablename) {
     return result;
 }
 
+void SQLiteConnect::transaction() {
+    exec("BEGIN TRANSACTION");
+}
+
+void SQLiteConnect::commit() {
+    exec("COMMIT TRANSACTION");
+}
+
+void SQLiteConnect::rollback() {
+    exec("ROLLBACK TRANSACTION");
+}
+
 } /* namespace hku */

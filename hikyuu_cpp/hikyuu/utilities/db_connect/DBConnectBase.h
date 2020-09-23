@@ -31,18 +31,18 @@ public:
     explicit DBConnectBase(const Parameter& param) noexcept;
     virtual ~DBConnectBase() = default;
 
-    /** 开始事务 */
-    void transaction();
-
-    /** 提交事务 */
-    void commit();
-
-    /** 回滚事务 */
-    void rollback();
-
     //-------------------------------------------------------------------------
     // 子类接口
     //-------------------------------------------------------------------------
+    /** 开始事务 */
+    virtual void transaction() = 0;
+
+    /** 提交事务 */
+    virtual void commit() = 0;
+
+    /** 回滚事务 */
+    virtual void rollback() = 0;
+
     /** 检测连接是否可用 */
     virtual bool ping() = 0;
 
@@ -177,18 +177,6 @@ typedef shared_ptr<DBConnectBase> DBConnectPtr;
 //-------------------------------------------------------------------------
 
 inline DBConnectBase::DBConnectBase(const Parameter& param) noexcept : m_params(param) {}
-
-inline void DBConnectBase::transaction() {
-    exec("BEGIN;");
-}
-
-inline void DBConnectBase::commit() {
-    exec("COMMIT;");
-}
-
-inline void DBConnectBase::rollback() {
-    exec("ROLLBACK;");
-}
 
 inline int DBConnectBase::queryInt(const string& query) {
     SQLStatementPtr st = getStatement(query);
