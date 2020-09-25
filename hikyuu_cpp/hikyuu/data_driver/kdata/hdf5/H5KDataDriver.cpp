@@ -206,6 +206,9 @@ void H5KDataDriver::_loadBaseData(const string& market, const string& code, KQue
 
     try {
         string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return;
+        }
         H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t all_total = dataspace.getSelectNpoints();
@@ -254,6 +257,9 @@ void H5KDataDriver::_loadIndexData(const string& market, const string& code, KQu
 
     try {
         H5::Group base_group = h5file->openGroup("data");
+        if (!base_group.exists(tablename)) {
+            return;
+        }
         H5::DataSet base_dataset(base_group.openDataSet(tablename));
         H5::DataSpace base_dataspace = base_dataset.getSpace();
         size_t base_total = base_dataspace.getSelectNpoints();
@@ -261,6 +267,9 @@ void H5KDataDriver::_loadIndexData(const string& market, const string& code, KQu
             return;
         }
 
+        if (!index_group.exists(tablename)) {
+            return;
+        }
         H5::DataSet index_dataset(index_group.openDataSet(tablename));
         H5::DataSpace index_dataspace = index_dataset.getSpace();
         size_t index_total = index_dataspace.getSelectNpoints();
@@ -379,7 +388,11 @@ size_t H5KDataDriver::getCount(const string& market, const string& code, KQuery:
     size_t total = 0;
 
     try {
-        H5::DataSet dataset(group.openDataSet(market + code));
+        string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return total;
+        }
+        H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         total = dataspace.getSelectNpoints();
         dataspace.close();
@@ -417,7 +430,11 @@ KRecord H5KDataDriver::_getBaseRecord(const string& market, const string& code, 
 
     H5Record h5record;
     try {
-        H5::DataSet dataset(group.openDataSet(market + code));
+        string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return result;
+        }
+        H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (pos >= total) {
@@ -460,6 +477,9 @@ KRecord H5KDataDriver::_getOtherRecord(const string& market, const string& code,
 
     string _tablename(market + code);
     try {
+        if (!group.exists(_tablename)) {
+            return result;
+        }
         H5::DataSet dataset(group.openDataSet(_tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
@@ -564,7 +584,11 @@ bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string&
     uint64 end_number = query.endDatetime().number();
     hsize_t startpos = 0, endpos = 0;
     try {
-        dataset = group.openDataSet(market + code);
+        string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return false;
+        }
+        dataset = group.openDataSet(tablename);
         dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (0 == total) {
@@ -678,6 +702,9 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
     string _tablename(market + code);
 
     try {
+        if (!group.exists(_tablename)) {
+            return false;
+        }
         H5::DataSet dataset(group.openDataSet(_tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t total = dataspace.getSelectNpoints();
@@ -776,6 +803,9 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
 
     try {
         string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return result;
+        }
         H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t all_total = dataspace.getSelectNpoints();
@@ -856,7 +886,11 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
     uint64 end_number = end.number();
     hsize_t startpos = 0, endpos = 0;
     try {
-        dataset = group.openDataSet(market + code);
+        string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return result;
+        }
+        dataset = group.openDataSet(tablename);
         dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (0 == total) {
@@ -948,6 +982,9 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
 
     try {
         string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return result;
+        }
         dataset = group.openDataSet(tablename);
 
         size_t total = endpos - startpos;
@@ -995,6 +1032,9 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     H5TransRecord* pBuf = NULL;
     try {
         string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return result;
+        }
         H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t all_total = dataspace.getSelectNpoints();
@@ -1083,7 +1123,11 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     uint64 end_number = end.number() * 100 + (end.isNull() ? 0 : end.second());
     hsize_t startpos = 0, endpos = 0;
     try {
-        dataset = group.openDataSet(market + code);
+        string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return result;
+        }
+        dataset = group.openDataSet(tablename);
         dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (0 == total) {
@@ -1176,6 +1220,9 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     H5TransRecord* pBuf = NULL;
     try {
         string tablename(market + code);
+        if (!group.exists(tablename)) {
+            return result;
+        }
         dataset = group.openDataSet(tablename);
 
         size_t total = endpos - startpos;
