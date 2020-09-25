@@ -342,30 +342,56 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
         }
 
         if (kType == KQuery::MIN) {
+            if (!out_file->exists("data"))
+                return false;
             out_group = out_file->openGroup("data");
         } else if (kType == KQuery::MIN5) {
+            if (!out_file->exists("data"))
+                return false;
             out_group = out_file->openGroup("data");
         } else if (kType == KQuery::MIN15) {
+            if (!out_file->exists("min15"))
+                return false;
             out_group = out_file->openGroup("min15");
         } else if (kType == KQuery::MIN30) {
+            if (!out_file->exists("min30"))
+                return false;
             out_group = out_file->openGroup("min30");
         } else if (kType == KQuery::MIN60) {
+            if (!out_file->exists("min60"))
+                return false;
             out_group = out_file->openGroup("min60");
         } else if (kType == KQuery::DAY) {
+            if (!out_file->exists("data"))
+                return false;
             out_group = out_file->openGroup("data");
         } else if (kType == KQuery::WEEK) {
+            if (!out_file->exists("week"))
+                return false;
             out_group = out_file->openGroup("week");
         } else if (kType == KQuery::MONTH) {
+            if (!out_file->exists("month"))
+                return false;
             out_group = out_file->openGroup("month");
         } else if (kType == KQuery::QUARTER) {
+            if (!out_file->exists("quarter"))
+                return false;
             out_group = out_file->openGroup("quarter");
         } else if (kType == KQuery::HALFYEAR) {
+            if (!out_file->exists("halfyear"))
+                return false;
             out_group = out_file->openGroup("halfyear");
         } else if (kType == KQuery::YEAR) {
+            if (!out_file->exists("year"))
+                return false;
             out_group = out_file->openGroup("year");
         } else if (kType == "TIME") {
+            if (!out_file->exists("data"))
+                return false;
             out_group = out_file->openGroup("data");
         } else if (kType == "TRANS") {
+            if (!out_file->exists("data"))
+                return false;
             out_group = out_file->openGroup("data");
         } else {
             return false;
