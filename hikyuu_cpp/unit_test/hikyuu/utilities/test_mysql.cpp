@@ -7,11 +7,15 @@
 
 using namespace hku;
 
+#define HOST "127.0.0.1"
 #define PASSWORD ""
 
 #if 0
 TEST_CASE("test_mysql") {
     Parameter param;
+    param.set<string>("host", HOST);
+    param.set<int>("port", 3306);
+    param.set<string>("usr", "root");
     param.set<string>("pwd", PASSWORD);
     auto con = std::make_shared<MySQLConnect>(param);
     CHECK(con->ping());
@@ -22,7 +26,6 @@ TEST_CASE("test_mysql") {
     CHECK(con->tableExist("t2018") == true);
     con->exec("drop table t2018");
     CHECK(con->tableExist("t2018") == false);
-    // con.exec(format("drop database if exists test;"));
 
     {
         if (!con->tableExist("t2019")) {
@@ -138,5 +141,35 @@ TEST_CASE("test_mysql") {
 
         con->exec("drop table ttt");
     }
+
+    {
+        con->exec(
+          "create table if not exists perf_test (id INTEGER PRIMARY KEY AUTO_INCREMENT, name "
+          "CHAR(10), value DOUBLE)");
+
+        class PerformancTest {
+            TABLE_BIND2(perf_test, name, value)
+
+        public:
+            PerformancTest(const string& name, double value) : name(name), value(value) {}
+
+        public:
+            string name;
+            double value;
+        };
+
+        vector<PerformancTest> t_list;
+        size_t total = 10000;
+        for (auto i = 0; i < total; i++) {
+            t_list.push_back(PerformancTest(std::to_string(i), i));
+        }
+        {
+            SPEND_TIME_MSG(batch, "insert mysql, total records: {}", total);
+            con->batchSave(t_list.begin(), t_list.end());
+        }
+        con->exec("drop table perf_test");
+    }
+
+    con->exec("drop database if exists test;");
 }
 #endif
