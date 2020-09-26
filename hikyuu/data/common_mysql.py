@@ -81,7 +81,9 @@ def create_database(connect):
 
 def get_marketid(connect, market):
     cur = connect.cursor()
-    cur.execute("select marketid, market from `hku_base`.`market` where market='{}'".format(market.upper()))
+    cur.execute(
+        "select marketid, market from `hku_base`.`market` where market='{}'".format(market.upper())
+    )
     marketid = cur.fetchone()
     marketid = marketid[0]
     cur.close()
@@ -125,9 +127,12 @@ def get_table(connect, market, code, ktype):
         connect.commit()
 
     tablename = code.lower()
-    cur.execute("SELECT 1 FROM information_schema.tables "
-                "where table_schema='{schema}' and table_name='{name}'"
-                .format(schema=schema, name=tablename))
+    cur.execute(
+        "SELECT 1 FROM information_schema.tables "
+        "where table_schema='{schema}' and table_name='{name}'".format(
+            schema=schema, name=tablename
+        )
+    )
     a = cur.fetchone()
     if not a:
         sql = """
@@ -174,7 +179,6 @@ if __name__ == '__main__':
     #print(get_stock_list(cnx, 'sh', ['stock']))
     #print(get_lastdatetime(cnx, "`hb__min`.`bch_usd`"))
     print(get_table(cnx, 'sh', '000001', 'MIN'))
-
 
     from pathlib import Path
     #x = list(Path("./mysql_upgrade").glob("*.sql"))
