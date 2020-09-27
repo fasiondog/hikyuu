@@ -388,7 +388,7 @@ if __name__ == '__main__':
     host = '127.0.0.1'
     port = 3306
     usr = 'root'
-    pwd = 'Hikyuu2020*'
+    pwd = ''
 
     src_dir = "D:\\TdxW_HuaTai"
     quotations = ['stock', 'fund']  #通达信盘后数据没有债券
