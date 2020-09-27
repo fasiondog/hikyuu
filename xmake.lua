@@ -35,8 +35,8 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
-add_requires("fmt", {configs = {header_only = true, vs_runtime = "MD"}})
-add_requires("spdlog", {configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
+add_requires("fmt", {configs = {system=false, header_only = true, vs_runtime = "MD"}})
+add_requires("spdlog", {configs = {system=false, header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
