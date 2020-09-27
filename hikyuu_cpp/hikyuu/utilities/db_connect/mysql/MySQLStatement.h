@@ -29,7 +29,7 @@ namespace hku {
 class HKU_API MySQLStatement : public SQLStatementBase {
 public:
     MySQLStatement() = delete;
-    MySQLStatement(const DBConnectPtr& driver, const string& sql_statement);
+    MySQLStatement(DBConnectBase* driver, const string& sql_statement);
     virtual ~MySQLStatement();
 
     virtual bool sub_isValid() const override;
@@ -53,7 +53,7 @@ private:
     void _bindResult();
 
 private:
-    shared_ptr<MYSQL> m_db;
+    MYSQL* m_db;
     MYSQL_STMT* m_stmt;
     MYSQL_RES* m_meta_result;
     bool m_needs_reset;

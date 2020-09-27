@@ -126,6 +126,7 @@ setup(
         'bokeh',
         'gitpython',
         'SQLAlchemy',
+        'mysql-connector-python',
         'pyperclip'
     ],
 )

@@ -277,6 +277,7 @@ def clear(with_boost):
                 print('delete', r + '/' + name)
                 os.remove(os.path.join(r, name))
     print('clear finished!')
+    os.system("xmake clean")
 
 
 @click.command()

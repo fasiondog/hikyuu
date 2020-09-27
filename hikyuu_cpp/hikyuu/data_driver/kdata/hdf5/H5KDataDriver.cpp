@@ -8,6 +8,34 @@
 #include <boost/algorithm/string.hpp>
 #include "H5KDataDriver.h"
 
+#if H5_VERSION_GE(1, 12, 0)
+#define CHECK_DATASET_EXISTS(group, tablename) \
+    do {                                       \
+        if (!group.exists(tablename)) {        \
+            return;                            \
+        }                                      \
+    } while (0)
+
+#define CHECK_DATASET_EXISTS_RET(group, tablename, ret) \
+    do {                                                \
+        if (!group.exists(tablename)) {                 \
+            return ret;                                 \
+        }                                               \
+    } while (0)
+
+#define CHECK_GROUP_EXISTS_RET(outfile, name, ret) \
+    do {                                           \
+        if (!outfile->exists(name)) {              \
+            return ret;                            \
+        }                                          \
+    } while (0)
+
+#else
+#define CHECK_DATASET_EXISTS(group, tablename)
+#define CHECK_DATASET_EXISTS_RET(group, tablename, ret)
+#define CHECK_GROUP_EXISTS_RET(outfile, name, ret)
+#endif
+
 namespace hku {
 
 class Hdf5FileCloser {
@@ -206,6 +234,7 @@ void H5KDataDriver::_loadBaseData(const string& market, const string& code, KQue
 
     try {
         string tablename(market + code);
+        CHECK_DATASET_EXISTS(group, tablename);
         H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t all_total = dataspace.getSelectNpoints();
@@ -254,6 +283,7 @@ void H5KDataDriver::_loadIndexData(const string& market, const string& code, KQu
 
     try {
         H5::Group base_group = h5file->openGroup("data");
+        CHECK_DATASET_EXISTS(base_group, tablename);
         H5::DataSet base_dataset(base_group.openDataSet(tablename));
         H5::DataSpace base_dataspace = base_dataset.getSpace();
         size_t base_total = base_dataspace.getSelectNpoints();
@@ -261,6 +291,7 @@ void H5KDataDriver::_loadIndexData(const string& market, const string& code, KQu
             return;
         }
 
+        CHECK_DATASET_EXISTS(index_group, tablename);
         H5::DataSet index_dataset(index_group.openDataSet(tablename));
         H5::DataSpace index_dataspace = index_dataset.getSpace();
         size_t index_total = index_dataspace.getSelectNpoints();
@@ -333,30 +364,43 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
         }
 
         if (kType == KQuery::MIN) {
+            CHECK_GROUP_EXISTS_RET(out_file, "data", false);
             out_group = out_file->openGroup("data");
         } else if (kType == KQuery::MIN5) {
+            CHECK_GROUP_EXISTS_RET(out_file, "data", false);
             out_group = out_file->openGroup("data");
         } else if (kType == KQuery::MIN15) {
+            CHECK_GROUP_EXISTS_RET(out_file, "min15", false);
             out_group = out_file->openGroup("min15");
         } else if (kType == KQuery::MIN30) {
+            CHECK_GROUP_EXISTS_RET(out_file, "min30", false);
             out_group = out_file->openGroup("min30");
         } else if (kType == KQuery::MIN60) {
+            CHECK_GROUP_EXISTS_RET(out_file, "min60", false);
             out_group = out_file->openGroup("min60");
         } else if (kType == KQuery::DAY) {
+            CHECK_GROUP_EXISTS_RET(out_file, "data", false);
             out_group = out_file->openGroup("data");
         } else if (kType == KQuery::WEEK) {
+            CHECK_GROUP_EXISTS_RET(out_file, "week", false);
             out_group = out_file->openGroup("week");
         } else if (kType == KQuery::MONTH) {
+            CHECK_GROUP_EXISTS_RET(out_file, "month", false);
             out_group = out_file->openGroup("month");
         } else if (kType == KQuery::QUARTER) {
+            CHECK_GROUP_EXISTS_RET(out_file, "quarter", false);
             out_group = out_file->openGroup("quarter");
         } else if (kType == KQuery::HALFYEAR) {
+            CHECK_GROUP_EXISTS_RET(out_file, "halfyear", false);
             out_group = out_file->openGroup("halfyear");
         } else if (kType == KQuery::YEAR) {
+            CHECK_GROUP_EXISTS_RET(out_file, "year", false);
             out_group = out_file->openGroup("year");
         } else if (kType == "TIME") {
+            CHECK_GROUP_EXISTS_RET(out_file, "data", false);
             out_group = out_file->openGroup("data");
         } else if (kType == "TRANS") {
+            CHECK_GROUP_EXISTS_RET(out_file, "data", false);
             out_group = out_file->openGroup("data");
         } else {
             return false;
@@ -379,7 +423,9 @@ size_t H5KDataDriver::getCount(const string& market, const string& code, KQuery:
     size_t total = 0;
 
     try {
-        H5::DataSet dataset(group.openDataSet(market + code));
+        string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, total);
+        H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         total = dataspace.getSelectNpoints();
         dataspace.close();
@@ -417,7 +463,9 @@ KRecord H5KDataDriver::_getBaseRecord(const string& market, const string& code, 
 
     H5Record h5record;
     try {
-        H5::DataSet dataset(group.openDataSet(market + code));
+        string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
+        H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (pos >= total) {
@@ -460,6 +508,7 @@ KRecord H5KDataDriver::_getOtherRecord(const string& market, const string& code,
 
     string _tablename(market + code);
     try {
+        CHECK_DATASET_EXISTS_RET(group, _tablename, result);
         H5::DataSet dataset(group.openDataSet(_tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
@@ -564,7 +613,9 @@ bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string&
     uint64 end_number = query.endDatetime().number();
     hsize_t startpos = 0, endpos = 0;
     try {
-        dataset = group.openDataSet(market + code);
+        string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, false);
+        dataset = group.openDataSet(tablename);
         dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (0 == total) {
@@ -678,6 +729,7 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
     string _tablename(market + code);
 
     try {
+        CHECK_DATASET_EXISTS_RET(group, _tablename, false);
         H5::DataSet dataset(group.openDataSet(_tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t total = dataspace.getSelectNpoints();
@@ -776,6 +828,7 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
 
     try {
         string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
         H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t all_total = dataspace.getSelectNpoints();
@@ -856,7 +909,9 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
     uint64 end_number = end.number();
     hsize_t startpos = 0, endpos = 0;
     try {
-        dataset = group.openDataSet(market + code);
+        string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
+        dataset = group.openDataSet(tablename);
         dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (0 == total) {
@@ -948,8 +1003,8 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
 
     try {
         string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
         dataset = group.openDataSet(tablename);
-
         size_t total = endpos - startpos;
         std::unique_ptr<H5TimeLineRecord[]> pBuf = std::make_unique<H5TimeLineRecord[]>(total);
         H5ReadTimeLineRecords(dataset, startpos, total, pBuf.get());
@@ -995,6 +1050,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     H5TransRecord* pBuf = NULL;
     try {
         string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
         H5::DataSet dataset(group.openDataSet(tablename));
         H5::DataSpace dataspace = dataset.getSpace();
         size_t all_total = dataspace.getSelectNpoints();
@@ -1083,7 +1139,9 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     uint64 end_number = end.number() * 100 + (end.isNull() ? 0 : end.second());
     hsize_t startpos = 0, endpos = 0;
     try {
-        dataset = group.openDataSet(market + code);
+        string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
+        dataset = group.openDataSet(tablename);
         dataspace = dataset.getSpace();
         hsize_t total = dataspace.getSelectNpoints();
         if (0 == total) {
@@ -1176,6 +1234,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     H5TransRecord* pBuf = NULL;
     try {
         string tablename(market + code);
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
         dataset = group.openDataSet(tablename);
 
         size_t total = endpos - startpos;

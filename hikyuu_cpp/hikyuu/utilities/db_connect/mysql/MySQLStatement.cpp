@@ -12,22 +12,21 @@
 
 namespace hku {
 
-MySQLStatement::MySQLStatement(const DBConnectPtr& driver, const string& sql_statement)
+MySQLStatement::MySQLStatement(DBConnectBase* driver, const string& sql_statement)
 : SQLStatementBase(driver, sql_statement),
-  m_db((dynamic_cast<MySQLConnect*>(driver.get()))->m_mysql),
+  m_db((dynamic_cast<MySQLConnect*>(driver))->m_mysql),
   m_stmt(nullptr),
   m_meta_result(nullptr),
   m_needs_reset(false),
   m_has_bind_result(false) {
-    m_stmt = mysql_stmt_init(m_db.get());
+    m_stmt = mysql_stmt_init(m_db);
     HKU_CHECK(m_stmt != nullptr, "Failed mysql_stmt_init!");
     int ret = mysql_stmt_prepare(m_stmt, sql_statement.c_str(), sql_statement.size());
     if (ret != 0) {
-        std::string stmt_errorstr = mysql_stmt_error(m_stmt);
+        std::string stmt_errorstr(mysql_stmt_error(m_stmt));
         mysql_stmt_close(m_stmt);
         m_stmt = nullptr;
-        HKU_THROW("Failed prepare statement! error msg: {}! SQL: {}", stmt_errorstr.c_str(),
-                  sql_statement);
+        HKU_THROW("Failed prepare sql statement: {}! error msg: {}!", sql_statement, stmt_errorstr);
     }
 
     auto param_count = mysql_stmt_param_count(m_stmt);
@@ -64,7 +63,7 @@ void MySQLStatement::_reset() {
         HKU_CHECK(ret == 0, "Failed reset statement! {}", mysql_stmt_error(m_stmt));
         // m_param_bind.clear();
         // m_result_bind.clear();
-        m_param_buffer.clear();
+        // m_param_buffer.clear();
         m_result_buffer.clear();
         m_needs_reset = false;
         m_has_bind_result = false;
@@ -90,6 +89,7 @@ void MySQLStatement::_bindResult() {
     MYSQL_FIELD* field;
     int idx = 0;
     while ((field = mysql_fetch_field(m_meta_result))) {
+        // HKU_INFO("field {} len: {}", field->name, field->length);
         m_result_bind[idx].buffer_type = field->type;
 #if MYSQL_VERSION_ID >= 80000
         m_result_bind[idx].is_null = (bool*)&m_result_is_null[idx];
@@ -105,18 +105,41 @@ void MySQLStatement::_bindResult() {
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<int64>(&buf);
+        } else if (field->type == MYSQL_TYPE_LONG) {
+            int32 item = 0;
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<int32>(&buf);
         } else if (field->type == MYSQL_TYPE_DOUBLE) {
             double item = 0;
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<double>(&buf);
-        } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_BLOB) {
-            m_result_bind[idx].buffer_length = 4096;
-            vector<char> item(4096);
+        } else if (field->type == MYSQL_TYPE_FLOAT) {
+            float item = 0;
             m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<float>(&buf);
+        } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_STRING ||
+                   field->type == MYSQL_TYPE_BLOB) {
+            unsigned long length = field->length + 1;
+            m_result_bind[idx].buffer_length = length;
+            m_result_buffer.emplace_back(vector<char>(length));
             auto& buf = m_result_buffer.back();
             vector<char>* p = boost::any_cast<vector<char>>(&buf);
             m_result_bind[idx].buffer = p->data();
+        } else if (field->type == MYSQL_TYPE_TINY) {
+            int8 item = 0;
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<int8>(&buf);
+        } else if (field->type == MYSQL_TYPE_SHORT) {
+            short item = 0;
+            m_result_buffer.push_back(item);
+            auto& buf = m_result_buffer.back();
+            m_result_bind[idx].buffer = boost::any_cast<short>(&buf);
+        } else {
+            HKU_THROW("Unsupport field type: {}, field name: {}", field->type, field->name);
         }
 
         idx++;
@@ -178,12 +201,6 @@ void MySQLStatement::sub_bindText(int idx, const string& item) {
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
     m_param_bind[idx].is_null = 0;
-
-    unsigned long str_len = item.size();
-    m_param_buffer.push_back(str_len);
-    auto& ref = m_param_buffer.back();
-    m_param_bind[idx].length = boost::any_cast<unsigned long>(&ref);
-    ;
 }
 
 void MySQLStatement::sub_bindBlob(int idx, const string& item) {
@@ -196,12 +213,6 @@ void MySQLStatement::sub_bindBlob(int idx, const string& item) {
     m_param_bind[idx].buffer = (void*)p->data();
     m_param_bind[idx].buffer_length = item.size();
     m_param_bind[idx].is_null = 0;
-
-    unsigned long str_len = item.size();
-    m_param_buffer.push_back(str_len);
-    auto& ref = m_param_buffer.back();
-    m_param_bind[idx].length = boost::any_cast<unsigned long>(&ref);
-    ;
 }
 
 int MySQLStatement::sub_getNumColumns() const {
@@ -222,7 +233,11 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64& item) {
     try {
         item = boost::any_cast<int64>(m_result_buffer[idx]);
     } catch (...) {
-        HKU_THROW("Field type mismatch! idx: {}", idx);
+        try {
+            item = boost::any_cast<int32>(m_result_buffer[idx]);
+        } catch (...) {
+            HKU_THROW("Field type mismatch! idx: {}", idx);
+        }
     }
 }
 
@@ -233,14 +248,18 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsDouble! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
-        item = 0;
+        item = 0.0;
         return;
     }
 
     try {
         item = boost::any_cast<double>(m_result_buffer[idx]);
     } catch (...) {
-        HKU_THROW("Field type mismatch! idx: {}", idx);
+        try {
+            item = boost::any_cast<float>(m_result_buffer[idx]);
+        } catch (...) {
+            HKU_THROW("Field type mismatch! idx: {}", idx);
+        }
     }
 }
 
@@ -256,7 +275,7 @@ void MySQLStatement::sub_getColumnAsText(int idx, string& item) {
     }
 
     try {
-        vector<char>* p = boost::any_cast<vector<char>*>(m_result_buffer[idx]);
+        vector<char>* p = boost::any_cast<vector<char>>(&(m_result_buffer[idx]));
         std::ostringstream buf;
         for (unsigned long i = 0; i < m_result_length[idx]; i++) {
             buf << (*p)[i];
@@ -279,7 +298,7 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, string& item) {
     }
 
     try {
-        vector<char>* p = boost::any_cast<vector<char>*>(m_result_buffer[idx]);
+        vector<char>* p = boost::any_cast<vector<char>>(&m_result_buffer[idx]);
         std::ostringstream buf;
         for (unsigned long i = 0; i < m_result_length[idx]; i++) {
             buf << (*p)[i];

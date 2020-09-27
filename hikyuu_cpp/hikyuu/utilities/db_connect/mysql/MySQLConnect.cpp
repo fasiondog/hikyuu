@@ -36,15 +36,22 @@ MySQLConnect::MySQLConnect(const Parameter& param) noexcept
         HKU_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, "mysql_set_character_set error!");
     } catch (std::exception& e) {
         HKU_FATAL(e.what());
+        close();
     } catch (...) {
         HKU_FATAL("Unknown error!");
+        close();
     }
 }
 
 MySQLConnect::~MySQLConnect() {
+    close();
+}
+
+void MySQLConnect::close() {
     if (m_mysql) {
         mysql_close(m_mysql);
         delete m_mysql;
+        m_mysql = nullptr;
     }
 }
 
@@ -88,7 +95,7 @@ void MySQLConnect::exec(const string& sql_string) {
 }
 
 SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
-    return make_shared<MySQLStatement>(shared_from_this(), sql_statement);
+    return make_shared<MySQLStatement>(this, sql_statement);
 }
 
 bool MySQLConnect::tableExist(const string& tablename) {
@@ -102,6 +109,18 @@ bool MySQLConnect::tableExist(const string& tablename) {
         result = false;
     }
     return result;
+}
+
+void MySQLConnect::transaction() {
+    exec("BEGIN");
+}
+
+void MySQLConnect::commit() {
+    exec("COMMIT");
+}
+
+void MySQLConnect::rollback() {
+    exec("ROLLBACK");
 }
 
 }  // namespace hku
