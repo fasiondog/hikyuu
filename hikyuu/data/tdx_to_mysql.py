@@ -33,8 +33,8 @@ import tables as tb
 
 from io import SEEK_END, SEEK_SET
 
-from .common import get_stktype_list, MARKETID
-from .common_mysql import (
+from hikyuu.data.common import get_stktype_list, MARKETID
+from hikyuu.data.common_mysql import (
     create_database, get_marketid, get_codepre_list, get_table, get_lastdatetime
 )
 
@@ -388,7 +388,7 @@ if __name__ == '__main__':
     host = '127.0.0.1'
     port = 3306
     usr = 'root'
-    pwd = ''
+    pwd = 'Hikyuu2020*'
 
     src_dir = "D:\\TdxW_HuaTai"
     quotations = ['stock', 'fund']  #通达信盘后数据没有债券
@@ -410,11 +410,11 @@ if __name__ == '__main__':
     print("\n导入上证日线数据")
     add_count = tdx_import_data(connect, 'SH', 'DAY', quotations, src_dir + "\\vipdoc\\sh\\lday")
     print("\n导入数量：", add_count)
-    """
+
     print("\n导入深证日线数据")
     add_count = tdx_import_data(connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday")
     print("\n导入数量：", add_count)
-
+    """
     print("\n导入上证5分钟数据")
     add_count = tdx_import_data(connect, 'SH', '5MIN', quotations, src_dir + "\\vipdoc\\sh\\fzline")
     print("\n导入数量：", add_count)
