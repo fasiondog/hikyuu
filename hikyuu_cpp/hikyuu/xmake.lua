@@ -44,6 +44,7 @@ target("hikyuu")
         add_includedirs("/usr/include/hdf5")
         add_includedirs("/usr/include/hdf5/serial")
         if is_arch("x86_64")  then
+            add_linkdirs("/usr/lib64/mysql")
             add_linkdirs("/usr/lib/x86_64-linux-gnu")
             add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
         end
@@ -79,7 +80,7 @@ target("hikyuu")
         assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_ROOT
 You need to specify where the boost headers is via the BOOST_ROOT variable!]])
 
-        assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_LIB
+        assert(os.getenv("BOOST_LIB"), [[Missing environment variable: BOOST_LIB
 You need to specify where the boost library is via the BOOST_LIB variable!]])
     end)
     
