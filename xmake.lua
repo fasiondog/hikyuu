@@ -35,7 +35,7 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
-add_requires("fmt", {configs = {header_only = true, vs_runtime = "MD"}})
+add_requires("fmt", {system=false, configs = {header_only = true, vs_runtime = "MD"}})
 add_requires("spdlog", {configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 
@@ -49,6 +49,7 @@ add_defines("BOOST_ALL_DYN_LINK")
 
 if is_host("linux") then
     if is_arch("x86_64") then
+        add_linkdirs("/usr/lib64")
         add_linkdirs("/usr/lib/x86_64-linux-gnu")
     end
 end
