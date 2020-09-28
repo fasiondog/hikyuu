@@ -72,7 +72,7 @@ void export_Stock() {
     :return: 满足查询条件的K线数据
     :rtype: KData)")
 
-      .def("get_timeLine_list", &Stock::getTimeLineList, R"(get_timeLine_list(self, query)
+      .def("get_timeline_list", &Stock::getTimeLineList, R"(get_timeline_list(self, query)
 
     获取分时线
 

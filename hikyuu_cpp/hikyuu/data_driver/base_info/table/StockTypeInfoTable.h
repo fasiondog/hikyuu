@@ -46,11 +46,11 @@ public:
         return m_tickValue;
     }
 
-    uint32 minTradeNumber() const {
+    double minTradeNumber() const {
         return m_minTradeNumber;
     }
 
-    uint32 maxTradeNumber() const {
+    double maxTradeNumber() const {
         return m_maxTradeNumber;
     }
 
@@ -98,8 +98,8 @@ private:
     uint32 m_precision;       //价格精度
     double m_tick;            //最小跳动量
     double m_tickValue;       //每一个tick价格
-    uint32 m_minTradeNumber;  //每笔最小交易量
-    uint32 m_maxTradeNumber;  //每笔最大交易量
+    double m_minTradeNumber;  //每笔最小交易量
+    double m_maxTradeNumber;  //每笔最大交易量
     string m_description;     //描述信息
 };
 

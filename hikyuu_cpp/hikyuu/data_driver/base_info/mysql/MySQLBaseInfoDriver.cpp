@@ -12,329 +12,214 @@
 #include "../../../utilities/util.h"
 #include "../../../StockManager.h"
 #include "../../../Log.h"
+#include "../table/MarketInfoTable.h"
+#include "../table/StockTypeInfoTable.h"
+#include "../table/StockWeightTable.h"
+#include "../table/StockTable.h"
 
 namespace hku {
 
-class MySQLCloser {
-public:
-    void operator()(MYSQL *db) {
-        if (db) {
-            mysql_close(db);
-            delete db;
-            db = nullptr;
-        }
-    }
-};
+MySQLBaseInfoDriver::MySQLBaseInfoDriver() : BaseInfoDriver("mysql"), m_pool(nullptr) {}
 
-MySQLBaseInfoDriver::~MySQLBaseInfoDriver() {}
+MySQLBaseInfoDriver::~MySQLBaseInfoDriver() {
+    if (m_pool) {
+        delete m_pool;
+    }
+}
 
 bool MySQLBaseInfoDriver::_init() {
-    shared_ptr<MYSQL> mysql(new MYSQL, MySQLCloser());
-    if (!mysql) {
-        HKU_ERROR("Can't create MYSQL instance!");
-        return false;
-    }
-
-    string host("127.0.0.1");
-    if (haveParam("host")) {
-        host = getParam<string>("host");
-    } else {
-        setParam<string>("host", host);
-    }
-
-    string usr("root");
-    if (haveParam("usr")) {
-        usr = getParam<string>("usr");
-    } else {
-        setParam<string>("usr", usr);
-    }
-
-    string pwd;
-    if (haveParam("pwd")) {
-        pwd = getParam<string>("pwd");
-    } else {
-        setParam<string>("pwd", pwd);
-    }
-
-    string database("hku_base");
-    if (haveParam("db")) {
-        database = getParam<string>("db");
-    } else {
-        setParam<string>("db", database);
-    }
-
-    string port_str("3306");
-    if (haveParam("port")) {
-        port_str = getParam<string>("port");
-    } else {
-        setParam<string>("port", port_str);
-    }
-
-    unsigned int port;
-    try {
-        port = boost::lexical_cast<unsigned int>(port_str);
-    } catch (...) {
-        port = 3306;
-    }
-
+    HKU_ASSERT_M(m_pool == nullptr, "Maybe repeat initialization!");
+    Parameter connect_param;
+    connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));
+    connect_param.set<string>("usr", getParamFromOther<string>(m_params, "usr", "root"));
+    connect_param.set<string>("pwd", getParamFromOther<string>(m_params, "pwd", ""));
+    connect_param.set<string>("db", getParamFromOther<string>(m_params, "db", "hku_base"));
+    string port_str = getParamFromOther<string>(m_params, "port", "3306");
+    unsigned int port = boost::lexical_cast<unsigned int>(port_str);
     HKU_TRACE("MYSQL host: {}", host);
     HKU_TRACE("MYSQL port: {}", port);
     HKU_TRACE("MYSQL database: {}", database);
 
-    if (!mysql_init(mysql.get())) {
-        HKU_FATAL("Initial MySQL handle error!");
-        return false;
-    }
-
-    if (!mysql_real_connect(mysql.get(), host.c_str(), usr.c_str(), pwd.c_str(), database.c_str(),
-                            port, NULL, 0)) {
-        HKU_FATAL("Failed to connect to database!");
-        return false;
-    }
-
-    if (mysql_set_character_set(mysql.get(), "utf8")) {
-        HKU_ERROR("mysql_set_character_set error!");
-        return false;
-    }
-
-    m_mysql = mysql;
+    m_pool = new ConnectPool<MySQLConnect>(connect_param);
     return true;
 }
 
 bool MySQLBaseInfoDriver::_loadMarketInfo() {
-    if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!");
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
         return false;
     }
 
-    MYSQL_RES *result;
-    MYSQL_ROW row;
+    auto con = m_pool->getConnect();
 
-    int res = mysql_query(m_mysql.get(),
-                          "select market,name,"
-                          "description,code,lastDate from market");
-    if (res) {
-        HKU_ERROR("mysql_query error! error no: {}", res);
+    vector<MarketInfoTable> infoTables;
+    try {
+        HKU_CHECK(con->ping(), "Can't connect mysql");
+        con->batchLoad(infoTables);
+    } catch (std::exception &e) {
+        HKU_FATAL("load Market table failed! {}", e.what());
         return false;
-    }
-
-    result = mysql_store_result(m_mysql.get());
-    if (!result) {
-        HKU_ERROR("mysql_store_result error!");
+    } catch (...) {
+        HKU_FATAL("load Market table failed!");
         return false;
     }
 
     StockManager &sm = StockManager::instance();
-    while ((row = mysql_fetch_row(result))) {
-        string market(row[0]);
-        to_upper(market);
-        Datetime last_date;
+    for (auto &info : infoTables) {
+        Datetime lastDate;
         try {
-            int64 d = (boost::lexical_cast<uint64>(row[4]) * 10000);
-            last_date = Datetime(d);
+            lastDate = Datetime(info.lastDate() * 10000);
         } catch (...) {
-            last_date = Null<Datetime>();
+            lastDate = Null<Datetime>();
+            HKU_WARN("lastDate of market({}) is invalid! ", info.market());
         }
-
-        try {
-            MarketInfo marketInfo(market, row[1], row[2], row[3], last_date);
-            sm.loadMarketInfo(marketInfo);
-        } catch (...) {
-            HKU_ERROR("Can't get MarketInfo {}", market);
-            continue;
-        }
+        sm.loadMarketInfo(
+          MarketInfo(info.market(), info.name(), info.description(), info.code(), lastDate));
     }
 
-    mysql_free_result(result);
     return true;
 }
 
 bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
-    if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!");
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
         return false;
     }
 
-    MYSQL_RES *result;
-    MYSQL_ROW row;
+    auto con = m_pool->getConnect();
 
-    int res = mysql_query(m_mysql.get(),
-                          "select sti.type, sti.description, "
-                          "sti.tick, sti.tickValue, sti.precision, sti.minTradeNumber, "
-                          "sti.maxTradeNumber from stocktypeinfo as sti");
-    if (res) {
-        HKU_ERROR("mysql_query error! error no: {}", res);
+    vector<StockTypeInfoTable> infoTables;
+    try {
+        HKU_CHECK(con->ping(), "Can't connect mysql");
+        con->batchLoad(infoTables);
+    } catch (std::exception &e) {
+        HKU_FATAL("load StockTypeInfo table failed! {}", e.what());
         return false;
-    }
-
-    result = mysql_store_result(m_mysql.get());
-    if (!result) {
-        HKU_ERROR("mysql_store_result error!");
+    } catch (...) {
+        HKU_FATAL("load StockTypeInfo table failed!");
         return false;
     }
 
     StockManager &sm = StockManager::instance();
-    while ((row = mysql_fetch_row(result))) {
-        uint32 type = boost::lexical_cast<uint32>(row[0]);
-        try {
-            StockTypeInfo stkTypeInfo(
-              type, row[1], boost::lexical_cast<price_t>(row[2]),
-              boost::lexical_cast<price_t>(row[3]), boost::lexical_cast<int>(row[4]),
-              boost::lexical_cast<size_t>(row[5]), boost::lexical_cast<size_t>(row[6]));
-            sm.loadStockTypeInfo(stkTypeInfo);
-        } catch (...) {
-            HKU_ERROR("Can't get StockTypeInfo {}", type);
-            continue;
-        }
+    for (auto &info : infoTables) {
+        sm.loadStockTypeInfo(StockTypeInfo(info.type(), info.description(), info.tick(),
+                                           info.tickValue(), info.precision(),
+                                           info.minTradeNumber(), info.maxTradeNumber()));
     }
 
-    mysql_free_result(result);
     return true;
 }
 
-bool MySQLBaseInfoDriver::_getStockWeightList(uint64 stockid, StockWeightList &out) {
-    if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!");
-        return false;
+StockWeightList MySQLBaseInfoDriver::_getStockWeightList(uint64 stockid) {
+    StockWeightList result;
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
+        return result;
     }
 
-    MYSQL_RES *result;
-    MYSQL_ROW row;
+    auto con = m_pool->getConnect();
+    HKU_ASSERT(con);
 
-    std::stringstream buf(std::stringstream::out);
-    buf << "select id, date, countAsGift, countForSell, priceForSell, bonus,\
-          countOfIncreasement, totalCount, freeCount from stkweight \
-          where stockid="
-        << stockid << " order by date";
-    int res = mysql_query(m_mysql.get(), buf.str().c_str());
-    if (res) {
-        HKU_ERROR("mysql_query error! error no: {}", res);
-        return false;
+    vector<StockWeightTable> table;
+    try {
+        HKU_CHECK(con->ping(), "Can't connect mysql");
+        con->batchLoad(table, format("stockid={}", stockid));
+    } catch (std::exception &e) {
+        HKU_FATAL("load StockWeight table failed! {}", e.what());
+        return result;
+    } catch (...) {
+        HKU_FATAL("load StockWeight table failed!");
+        return result;
     }
 
-    result = mysql_store_result(m_mysql.get());
-    if (!result) {
-        HKU_ERROR("mysql_store_result error!");
-        return false;
-    }
-
-    my_ulonglong total = mysql_num_rows(result);
-    if (total != 0)
-        out.reserve(total);
-
-    while ((row = mysql_fetch_row(result))) {
-        int id = boost::lexical_cast<int>(row[0]);
-        Datetime date;
+    for (auto &w : table) {
         try {
-            date = Datetime(row[1]);
-            if (date >= (Datetime::max)()) {
-                HKU_WARN("Invalid date! id:{}", id);
-                continue;
-            }
+            result.push_back(StockWeight(Datetime(w.date * 10000), w.countAsGift * 0.0001,
+                                         w.countForSell * 0.0001, w.priceForSell * 0.001,
+                                         w.bonus * 0.001, w.countOfIncreasement * 0.0001,
+                                         w.totalCount, w.freeCount));
+        } catch (std::out_of_range &e) {
+            HKU_WARN("Date of id({}) is invalid! {}", w.id(), e.what());
+        } catch (std::exception &e) {
+            HKU_WARN("Error StockWeight Record id({}) {}", w.id(), e.what());
         } catch (...) {
-            continue;
-        }
-
-        try {
-            out.push_back(StockWeight(
-              date, boost::lexical_cast<price_t>(row[2]), boost::lexical_cast<price_t>(row[3]),
-              boost::lexical_cast<price_t>(row[4]), boost::lexical_cast<price_t>(row[5]),
-              boost::lexical_cast<price_t>(row[6]), boost::lexical_cast<price_t>(row[7]),
-              boost::lexical_cast<price_t>(row[8])));
-        } catch (...) {
-            HKU_WARN("Can't get weight record ({})", id);
-            continue;
+            HKU_WARN("Error StockWeight Record id({})! Unknow reason!", w.id());
         }
     }
 
-    mysql_free_result(result);
-    return true;
+    return result;
 }
 
 bool MySQLBaseInfoDriver::_loadStock() {
-    if (!m_mysql) {
-        HKU_ERROR("Null m_mysql!");
+    if (!m_pool) {
+        HKU_ERROR("Connect pool ptr is null!");
         return false;
     }
 
-    MYSQL_RES *result;
-    MYSQL_ROW row;
+    auto con = m_pool->getConnect();
 
-    std::stringstream buf(std::stringstream::out);
-    buf << "select stock.stockid, market.market, stock.code, stock.name, "
-           "stock.type, stock.valid, stock.startDate, stock.endDate, "
-           "stocktypeinfo.tick, stocktypeinfo.tickValue, stocktypeinfo.precision, "
-           "stocktypeinfo.minTradeNumber, stocktypeinfo.maxTradeNumber "
-           "from (stock left outer join stocktypeinfo on "
-           "(stock.type = stocktypeinfo.type)) "
-           "left outer join market on stock.marketid = market.marketid";
-    int res = mysql_query(m_mysql.get(), buf.str().c_str());
-    if (res) {
-        HKU_ERROR("mysql_query error! error no: {}", res);
+    vector<MarketInfoTable> marketTable;
+    try {
+        HKU_CHECK(con->ping(), "Can't connect mysql");
+        con->batchLoad(marketTable);
+    } catch (std::exception &e) {
+        HKU_FATAL("load Market table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load Market table failed!");
         return false;
     }
 
-    result = mysql_store_result(m_mysql.get());
-    if (!result) {
-        HKU_ERROR("mysql_store_result error!");
+    unordered_map<uint64, string> marketDict;
+    for (auto &m : marketTable) {
+        marketDict[m.id()] = m.market();
+    }
+
+    vector<StockTable> table;
+    try {
+        con->batchLoad(table);
+    } catch (std::exception &e) {
+        HKU_FATAL("load Stock table failed! {}", e.what());
+        return false;
+    } catch (...) {
+        HKU_FATAL("load Stock table failed!");
         return false;
     }
 
+    Stock stock;
+    StockTypeInfo stockTypeInfo;
+    StockTypeInfo null_stockTypeInfo;
     StockManager &sm = StockManager::instance();
-    while ((row = mysql_fetch_row(result))) {
-        uint64 stockid = boost::lexical_cast<uint64>(row[0]);
-        string market(row[1]);
-        to_upper(market);
-
-        Datetime start_date;
-        try {
-            start_date = Datetime(row[6]);
-            if (start_date >= (Datetime::max)())
-                start_date = Null<Datetime>();
-        } catch (...) {
-            start_date = Null<Datetime>();
+    for (auto &r : table) {
+        Datetime startDate, endDate;
+        if (r.startDate > r.endDate || r.startDate == 0 || r.endDate == 0) {
+            //日期非法，置为Null<Datetime>
+            startDate = Null<Datetime>();
+            endDate = Null<Datetime>();
+        } else {
+            startDate =
+              (r.startDate == 99999999LL) ? Null<Datetime>() : Datetime(r.startDate * 10000);
+            endDate = (r.endDate == 99999999LL) ? Null<Datetime>() : Datetime(r.endDate * 10000);
         }
 
-        Datetime end_date;
-        try {
-            end_date = Datetime(row[7]);
-            if (end_date >= (Datetime::max)())
-                end_date = Null<Datetime>();
-        } catch (...) {
-            end_date = Null<Datetime>();
+        stockTypeInfo = sm.getStockTypeInfo(r.type);
+        if (stockTypeInfo != null_stockTypeInfo) {
+            stock =
+              Stock(marketDict[r.marketid], r.code, r.name, r.type, r.valid, startDate, endDate,
+                    stockTypeInfo.tick(), stockTypeInfo.tickValue(), stockTypeInfo.precision(),
+                    stockTypeInfo.minTradeNumber(), stockTypeInfo.maxTradeNumber());
+
+        } else {
+            stock =
+              Stock(marketDict[r.marketid], r.code, r.name, r.type, r.valid, startDate, endDate);
         }
 
-        if (start_date >= end_date) {
-            start_date = Null<Datetime>();
-            end_date = Null<Datetime>();
-        }
-
-        try {
-            Stock stock(market,
-                        row[2],                                // code
-                        row[3],                                // name
-                        boost::lexical_cast<uint32>(row[4]),   // type
-                        boost::lexical_cast<bool>(row[5]),     // valid;
-                        start_date,                            // startDate
-                        end_date,                              // endDate
-                        boost::lexical_cast<price_t>(row[8]),  // tick
-                        boost::lexical_cast<price_t>(row[9]),  // tickValue
-                        boost::lexical_cast<int>(row[10]),     // precision
-                        boost::lexical_cast<size_t>(row[11]),  // minTradeNumber
-                        boost::lexical_cast<size_t>(row[12])   // maxTradeNumber
-            );
-            StockWeightList weight;
-            _getStockWeightList(stockid, weight);
-            stock.setWeightList(weight);
-            sm.loadStock(stock);
-
-        } catch (...) {
-            HKU_ERROR("Can't get MarketInfo {}", market);
-            continue;
+        if (sm.loadStock(stock)) {
+            StockWeightList weightList = _getStockWeightList(r.stockid);
+            stock.setWeightList(weightList);
         }
     }
 
-    mysql_free_result(result);
     return true;
 }
 

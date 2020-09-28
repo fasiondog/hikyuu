@@ -464,7 +464,7 @@ SlippageBase.__getattr__ = SlippageBase_getattr
         'isNull': 'is_null',
         'isBuffer': 'is_buffer',
         'getKData': 'get_kdata',
-        'getTimeLineList': 'get_timeLine_list',
+        'getTimeLineList': 'get_timeline_list',
         'getTransList': 'get_trans_list',
         'getCount': 'get_count',
         'getMarketValue': 'get_market_value',
