@@ -1,3 +1,10 @@
+/*
+ * test_mysql.cpp
+ *
+ *  Created on: 2020-9-26
+ *      Author: fasiondog
+ */
+
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
 

@@ -15,7 +15,9 @@ namespace hku {
 
 class KRecordTable {
 public:
-    KRecordTable() = delete;
+    KRecordTable()
+    : m_date(0), m_open(0.0), m_high(0.0), m_low(0.0), m_close(0.0), m_amount(0.0), m_count(0.0) {}
+
     KRecordTable(const string& market, const string& code, const KQuery::KType& ktype)
     : m_code(code),
       m_date(0),
@@ -25,7 +27,7 @@ public:
       m_close(0.0),
       m_amount(0.0),
       m_count(0.0) {
-        m_db_name = fmt::format("{}{}", market, ktype);
+        m_db_name = fmt::format("{}_{}", market, KQuery::getKTypeName(ktype));
         to_lower(m_db_name);
     };
 
@@ -57,8 +59,14 @@ public:
         return m_count;
     }
 
+    string str() const {
+        return fmt::format(
+          "KRecordTable({}(date), {}(open), {}(high), {}(low), {}(close), {}(amount), {}(count))",
+          m_date, m_open, m_high, m_low, m_close, m_amount, m_count);
+    }
+
 public:
-    static string getInsertSQL() {
+    string getInsertSQL() {
         return fmt::format(
           "insert into `{}`.`{}` "
           "(`date`, `open`, `high`, `low`, `close`, `amount`, `count`) "
@@ -66,14 +74,14 @@ public:
           m_db_name, m_code);
     }
 
-    static string getUpdateSQL() {
+    string getUpdateSQL() {
         return fmt::format(
           "update `{}`.`{}` set `open`=?, `high`=?, `low`=?, "
           "`close`=?, `amount`=? `count`=? where `date`=?",
           m_db_name, m_code);
     }
 
-    static string getSelectSQL() {
+    string getSelectSQL() {
         return fmt::format(
           "select `date`,`open`,`high`, `low`, `close`, `amount`, `count` from `{}`.`{}`",
           m_db_name, m_code);

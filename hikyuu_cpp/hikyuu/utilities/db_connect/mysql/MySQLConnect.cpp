@@ -71,27 +71,37 @@ bool MySQLConnect::ping() {
 void MySQLConnect::exec(const string& sql_string) {
     HKU_CHECK(m_mysql, "mysql connect is invalid!");
     int ret = mysql_query(m_mysql, sql_string.c_str());
+    if (CR_SERVER_GONE_ERROR == ret) {
+        // 尝试重新连接
+        if (ping()) {
+            ret = mysql_query(m_mysql, sql_string.c_str());
+        } else {
+            HKU_THROW("SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
+                      mysql_error(m_mysql));
+        }
+    }
+
     if (ret) {
         HKU_THROW("SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
                   mysql_error(m_mysql));
-    } else {
-        do {
-            MYSQL_RES* result = mysql_store_result(m_mysql);
-            if (result) {
-                auto num_fields = mysql_num_fields(result);
-                HKU_TRACE("num_fields: {}", num_fields);
-                mysql_free_result(result);
-            } else {
-                if (mysql_field_count(m_mysql) == 0) {
-                    auto num_rows = mysql_affected_rows(m_mysql);
-                    HKU_TRACE("num_rows: {}", num_rows);
-                } else {
-                    HKU_THROW("mysql_field_count error：{}! error code：{}, error msg: {}",
-                              sql_string, ret, mysql_error(m_mysql));
-                }
-            }
-        } while (!mysql_next_result(m_mysql));
     }
+
+    do {
+        MYSQL_RES* result = mysql_store_result(m_mysql);
+        if (result) {
+            auto num_fields = mysql_num_fields(result);
+            HKU_TRACE("num_fields: {}", num_fields);
+            mysql_free_result(result);
+        } else {
+            if (mysql_field_count(m_mysql) == 0) {
+                auto num_rows = mysql_affected_rows(m_mysql);
+                HKU_TRACE("num_rows: {}", num_rows);
+            } else {
+                HKU_THROW("mysql_field_count error：{}! error code：{}, error msg: {}", sql_string,
+                          ret, mysql_error(m_mysql));
+            }
+        }
+    } while (!mysql_next_result(m_mysql));
 }
 
 SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {

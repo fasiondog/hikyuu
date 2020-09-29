@@ -62,6 +62,9 @@ public:
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_connectList.empty()) {
             if (m_maxConnectSize > 0 && m_count >= m_maxConnectSize) {
+                HKU_WARN(
+                  "There are no idle connections. The current maximum number of connections: {}",
+                  m_maxConnectSize);
                 return ConnectPtr();
             }
             m_count++;
