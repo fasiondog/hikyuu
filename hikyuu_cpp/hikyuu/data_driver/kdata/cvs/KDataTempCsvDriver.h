@@ -9,7 +9,7 @@
 #ifndef DATA_DRIVER_KDATATEMPCSVDRIVER_H_
 #define DATA_DRIVER_KDATATEMPCSVDRIVER_H_
 
-#include "KDataDriver.h"
+#include "../../KDataDriver.h"
 
 namespace hku {
 
@@ -21,6 +21,10 @@ class KDataTempCsvDriver : public KDataDriver {
 public:
     KDataTempCsvDriver(const string& day_filename, const string& min_filename);
     virtual ~KDataTempCsvDriver();
+
+    virtual bool isIndexFirst() override {
+        return false;
+    }
 
     /**
      * 将指定类型的K线数据加载至缓存

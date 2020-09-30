@@ -214,6 +214,12 @@ void H5KDataDriver::loadKData(const string& market, const string& code, KQuery::
         return;
     }
 
+    /*KRecordList result = getKRecordList(market, code, KQuery(start_ix, end_ix, kType));
+    for (auto& record : result) {
+        out_buffer->push_back(record);
+        return;
+    }*/
+
     if (KQuery::DAY == kType || KQuery::MIN5 == kType || KQuery::MIN == kType) {
         _loadBaseData(market, code, kType, start_ix, end_ix, out_buffer);
         return;
@@ -354,7 +360,7 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
                                        KQuery::KType kType, H5FilePtr& out_file,
                                        H5::Group& out_group) {
     try {
-        string key(market + "_" + kType);  // KQuery::getKTypeName(kType));
+        string key(format("{}_{}", market, kType));
         to_upper(key);
 
         out_file = m_h5file_map[key];
@@ -452,7 +458,7 @@ KRecord H5KDataDriver::getKRecord(const string& market, const string& code, size
 
 KRecord H5KDataDriver::_getBaseRecord(const string& market, const string& code, size_t pos,
                                       KQuery::KType kType) {
-    assert(KQuery::DAY == kType || KQuery::MIN == kType || KQuery::MIN5 == kType);
+    HKU_ASSERT(KQuery::DAY == kType || KQuery::MIN == kType || KQuery::MIN5 == kType);
 
     KRecord result;
     H5FilePtr h5file;
@@ -808,6 +814,154 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
     }
 
     return true;
+}
+
+KRecordList H5KDataDriver::getKRecordList(const string& market, const string& code, KQuery query) {
+    KRecordList result;
+    auto kType = query.kType();
+    if (query.queryType() == KQuery::INDEX) {
+        if (query.start() >= query.end()) {
+            return result;
+        }
+        if (KQuery::DAY == kType || KQuery::MIN5 == kType || KQuery::MIN == kType) {
+            result = _getBaseKRecordList(market, code, kType, query.start(), query.end());
+        } else {
+            result = _getIndexKRecordList(market, code, kType, query.start(), query.end());
+        }
+    }
+
+    return result;
+}
+
+KRecordList H5KDataDriver::_getBaseKRecordList(const string& market, const string& code,
+                                               KQuery::KType kType, size_t start_ix,
+                                               size_t end_ix) {
+    KRecordList result;
+    H5FilePtr h5file;
+    H5::Group group;
+    if (!_getH5FileAndGroup(market, code, kType, h5file, group)) {
+        return result;
+    }
+
+    try {
+        string tablename(format("{}{}", market, code));
+        CHECK_DATASET_EXISTS_RET(group, tablename, result);
+        H5::DataSet dataset(group.openDataSet(tablename));
+        H5::DataSpace dataspace = dataset.getSpace();
+        size_t all_total = dataspace.getSelectNpoints();
+        if (0 == all_total || start_ix >= all_total) {
+            return result;
+        }
+
+        size_t total = end_ix > all_total ? all_total - start_ix : end_ix - start_ix;
+        std::unique_ptr<H5Record[]> pBuf = std::make_unique<H5Record[]>(total);
+        H5ReadRecords(dataset, start_ix, total, pBuf.get());
+
+        KRecord record;
+        result.reserve(total + 2);
+        for (hsize_t i = 0; i < total; i++) {
+            record.datetime = Datetime(pBuf[i].datetime);
+            record.openPrice = price_t(pBuf[i].openPrice) * 0.001;
+            record.highPrice = price_t(pBuf[i].highPrice) * 0.001;
+            record.lowPrice = price_t(pBuf[i].lowPrice) * 0.001;
+            record.closePrice = price_t(pBuf[i].closePrice) * 0.001;
+            record.transAmount = price_t(pBuf[i].transAmount) * 0.1;
+            record.transCount = price_t(pBuf[i].transCount);
+            result.push_back(record);
+        }
+
+    } catch (std::out_of_range& e) {
+        HKU_WARN("Invalid date! market_code({}{}) {}", market, code, e.what());
+
+    } catch (std::exception& e) {
+        HKU_WARN(e.what());
+
+    } catch (...) {
+        //忽略
+    }
+
+    return result;
+}
+
+KRecordList H5KDataDriver::_getIndexKRecordList(const string& market, const string& code,
+                                                KQuery::KType kType, size_t start_ix,
+                                                size_t end_ix) {
+    KRecordList result;
+    string tablename(format("{}{}", market, code));
+    H5FilePtr h5file;
+    H5::Group index_group;
+    if (!_getH5FileAndGroup(market, code, kType, h5file, index_group)) {
+        return result;
+    }
+
+    try {
+        H5::Group base_group = h5file->openGroup("data");
+        CHECK_DATASET_EXISTS_RET(base_group, tablename, result);
+        H5::DataSet base_dataset(base_group.openDataSet(tablename));
+        H5::DataSpace base_dataspace = base_dataset.getSpace();
+        size_t base_total = base_dataspace.getSelectNpoints();
+        if (0 == base_total) {
+            return result;
+        }
+
+        CHECK_DATASET_EXISTS_RET(index_group, tablename, result);
+        H5::DataSet index_dataset(index_group.openDataSet(tablename));
+        H5::DataSpace index_dataspace = index_dataset.getSpace();
+        size_t index_total = index_dataspace.getSelectNpoints();
+        if (0 == index_total || start_ix >= index_total) {
+            return result;
+        }
+
+        size_t index_len = end_ix > index_total ? index_total - start_ix : end_ix - start_ix;
+        std::unique_ptr<H5IndexRecord[]> p_index_buf =
+          std::make_unique<H5IndexRecord[]>(index_len + 1);
+        if (end_ix >= index_total) {
+            H5ReadIndexRecords(index_dataset, start_ix, index_len, p_index_buf.get());
+            p_index_buf[index_len].start = base_total;
+        } else {
+            index_len = end_ix - start_ix;
+            H5ReadIndexRecords(index_dataset, start_ix, index_len + 1, p_index_buf.get());
+        }
+
+        size_t base_len = p_index_buf[index_len].start - p_index_buf[0].start;
+        std::unique_ptr<H5Record[]> p_base_buf = std::make_unique<H5Record[]>(base_len);
+        H5ReadRecords(base_dataset, p_index_buf[0].start, base_len, p_base_buf.get());
+
+        KRecord record;
+        result.reserve(index_len);
+        for (hsize_t i = 0; i < index_len; i++) {
+            record.datetime = Datetime(p_index_buf[i].datetime);
+            size_t start_pos = p_index_buf[i].start - p_index_buf[0].start;
+            size_t end_pos = p_index_buf[i + 1].start - p_index_buf[0].start;
+            record.openPrice = 0.001 * price_t(p_base_buf[start_pos].openPrice);
+            record.closePrice = 0.001 * price_t(p_base_buf[end_pos - 1].closePrice);
+            record.highPrice = 0.001 * price_t(p_base_buf[start_pos].highPrice);
+            record.lowPrice = 0.001 * price_t(p_base_buf[start_pos].lowPrice);
+            record.transAmount = 0.1 * price_t(p_base_buf[start_pos].transAmount);
+            record.transCount = price_t(p_base_buf[start_pos].transCount);
+            for (hsize_t j = start_pos + 1; j < end_pos; j++) {
+                price_t temp = 0.001 * price_t(p_base_buf[j].highPrice);
+                if (temp > record.highPrice) {
+                    record.highPrice = temp;
+                }
+                temp = 0.001 * price_t(p_base_buf[j].lowPrice);
+                if (temp < record.lowPrice) {
+                    record.lowPrice = temp;
+                }
+                record.transAmount += 0.1 * price_t(p_base_buf[j].transAmount);
+                record.transCount += p_base_buf[j].transCount;
+            }
+            result.push_back(record);
+        }
+
+    } catch (std::out_of_range& e) {
+        HKU_WARN("Invalid date! {}", e.what());
+
+    } catch (...) {
+        //忽略
+    }
+
+    return result;
 }
 
 TimeLineList H5KDataDriver::getTimeLineList(const string& market, const string& code,

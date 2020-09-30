@@ -29,6 +29,10 @@ public:
 
     virtual bool _init() override;
 
+    virtual bool isIndexFirst() override {
+        return false;
+    }
+
     virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
                            size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) override;
 

@@ -11,10 +11,10 @@
 using namespace hku;
 using namespace boost::python;
 
-class KDataDriverWrap: public KDataDriver, public wrapper<KDataDriver> {
+class KDataDriverWrap : public KDataDriver, public wrapper<KDataDriver> {
 public:
-    KDataDriverWrap(): KDataDriver() {}
-    KDataDriverWrap(const string& name): KDataDriver(name) {}
+    KDataDriverWrap() : KDataDriver() {}
+    KDataDriverWrap(const string& name) : KDataDriver(name) {}
     virtual ~KDataDriverWrap() {}
 
     bool _init() {
@@ -29,26 +29,25 @@ public:
         return this->KDataDriver::_init();
     }
 
-    void loadKData(const string& market, const string& code,
-                KQuery::KType ktype, size_t start_ix, size_t end_ix,
-                KRecordListPtr out_buffer) {
+    bool isIndexFirst() {
+        return this->get_override("isIndexFirst")();
+    }
+
+    void loadKData(const string& market, const string& code, KQuery::KType ktype, size_t start_ix,
+                   size_t end_ix, KRecordListPtr out_buffer) {
         if (override call = get_override("loadKData")) {
             call(market, code, ktype, start_ix, end_ix, out_buffer);
         } else {
-            KDataDriver::loadKData(market, code, ktype,
-                                   start_ix, end_ix, out_buffer);
+            KDataDriver::loadKData(market, code, ktype, start_ix, end_ix, out_buffer);
         }
     }
 
-    void default_loadKData(const string& market, const string& code,
-                KQuery::KType ktype, size_t start_ix, size_t end_ix,
-                KRecordListPtr out_buffer) {
-        this->KDataDriver::loadKData(market, code, ktype,
-                start_ix, end_ix, out_buffer);
+    void default_loadKData(const string& market, const string& code, KQuery::KType ktype,
+                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
+        this->KDataDriver::loadKData(market, code, ktype, start_ix, end_ix, out_buffer);
     }
 
-    size_t getCount(const string& market, const string& code,
-                KQuery::KType ktype) {
+    size_t getCount(const string& market, const string& code, KQuery::KType ktype) {
         if (override call = get_override("getCount")) {
             return call(market, code, ktype);
         } else {
@@ -56,13 +55,12 @@ public:
         }
     }
 
-    size_t default_getCount(const string& market, const string& code,
-            KQuery::KType ktype) {
+    size_t default_getCount(const string& market, const string& code, KQuery::KType ktype) {
         return this->KDataDriver::getCount(market, code, ktype);
     }
 
-    virtual object _getIndexRangeByDate(const string& market,
-            const string& code, const KQuery& query) {
+    virtual object _getIndexRangeByDate(const string& market, const string& code,
+                                        const KQuery& query) {
         if (override call = get_override("_getIndexRangeByDate")) {
             return call(market, code, query);
         }
@@ -70,13 +68,13 @@ public:
         return make_tuple(0, 0);
     }
 
-    object default_getIndexRangeByDate(const string& market,
-                const string& code, const KQuery& query) {
+    object default_getIndexRangeByDate(const string& market, const string& code,
+                                       const KQuery& query) {
         return make_tuple(0, 0);
     }
 
-    bool getIndexRangeByDate(const string& market, const string& code,
-            const KQuery& query, size_t& out_start, size_t& out_end) {
+    bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
+                             size_t& out_start, size_t& out_end) {
         out_start = 0;
         out_end = 0;
 
@@ -120,8 +118,7 @@ public:
                 query, out_start, out_end);
     }*/
 
-    KRecord getKRecord(const string& market, const string& code,
-                  size_t pos, KQuery::KType ktype) {
+    KRecord getKRecord(const string& market, const string& code, size_t pos, KQuery::KType ktype) {
         if (override call = get_override("getKRecord")) {
             return call(market, code, pos, ktype);
         } else {
@@ -129,13 +126,25 @@ public:
         }
     }
 
-    KRecord default_getKRecord(const string& market, const string& code,
-                      size_t pos, KQuery::KType ktype) {
+    KRecord default_getKRecord(const string& market, const string& code, size_t pos,
+                               KQuery::KType ktype) {
         return this->KDataDriver::getKRecord(market, code, pos, ktype);
     }
 
-    TimeLineList getTimeLineList(const string& market, const string& code,
-                const KQuery& query) {
+    KRecordList getKRecordList(const string& market, const string& code, const KQuery& query) {
+        if (override call = get_override("getKRecordList")) {
+            return call(market, code, query);
+        } else {
+            return KDataDriver::getKRecordList(market, code, query);
+        }
+    }
+
+    KRecordList default_getKRecordList(const string& market, const string& code,
+                                       const KQuery& query) {
+        return this->KDataDriver::getKRecordList(market, code, query);
+    }
+
+    TimeLineList getTimeLineList(const string& market, const string& code, const KQuery& query) {
         if (override call = get_override("getTimeLineList")) {
             return call(market, code, query);
         } else {
@@ -144,38 +153,45 @@ public:
     }
 
     TimeLineList default_getTimeLineList(const string& market, const string& code,
-                const KQuery& query) {
+                                         const KQuery& query) {
         return this->KDataDriver::getTimeLineList(market, code, query);
+    }
+
+    TransList getTransList(const string& market, const string& code, const KQuery& query) {
+        if (override call = get_override("getTransList")) {
+            return call(market, code, query);
+        } else {
+            return KDataDriver::getTransList(market, code, query);
+        }
+    }
+
+    TransList default_getTransList(const string& market, const string& code, const KQuery& query) {
+        return this->KDataDriver::getTransList(market, code, query);
     }
 };
 
 void export_KDataDriver() {
-
     class_<KDataDriverWrap, boost::noncopyable>("KDataDriver", init<>())
-            .def(init<const string&>())
-            .def(self_ns::str(self))
-            .add_property("name", make_function(&KDataDriver::name,
-                            return_value_policy<copy_const_reference>()))
-            .def("getParam", &KDataDriver::getParam<boost::any>)
+      .def(init<const string&>())
+      .def(self_ns::str(self))
+      .add_property("name",
+                    make_function(&KDataDriver::name, return_value_policy<copy_const_reference>()))
+      .def("getParam", &KDataDriver::getParam<boost::any>)
 
-            .def("_init", &KDataDriver::_init, &KDataDriverWrap::default_init)
-            .def("loadKData", &KDataDriver::loadKData,
-                    &KDataDriverWrap::default_loadKData)
-            .def("getCount", &KDataDriver::getCount,
-                    &KDataDriverWrap::default_getCount)
-            //.def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
-            //        &KDataDriverWrap::default_getIndexRangeByDate)
-            .def("getKRecord", &KDataDriver::getKRecord,
-                    &KDataDriverWrap::default_getKRecord)
-            .def("_getIndexRangeByDate",
-                    &KDataDriverWrap::_getIndexRangeByDate,
-                    &KDataDriverWrap::default_getIndexRangeByDate)
-            .def("getTimeLine",
-                    &KDataDriverWrap::getTimeLineList,
-                    &KDataDriverWrap::default_getTimeLineList)
-             ;
+      .def("_init", &KDataDriver::_init, &KDataDriverWrap::default_init)
+      .def("isIndexFirst", pure_virtual(&KDataDriver::isIndexFirst))
+      .def("loadKData", &KDataDriver::loadKData, &KDataDriverWrap::default_loadKData)
+      .def("getCount", &KDataDriver::getCount, &KDataDriverWrap::default_getCount)
+      //.def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
+      //        &KDataDriverWrap::default_getIndexRangeByDate)
+      .def("getKRecord", &KDataDriver::getKRecord, &KDataDriverWrap::default_getKRecord)
+      .def("_getIndexRangeByDate", &KDataDriverWrap::_getIndexRangeByDate,
+           &KDataDriverWrap::default_getIndexRangeByDate)
+      .def("getKRecordList", &KDataDriverWrap::getKRecordList,
+           &KDataDriverWrap::default_getKRecordList)
+      .def("getTimeLine", &KDataDriverWrap::getTimeLineList,
+           &KDataDriverWrap::default_getTimeLineList)
+      .def("getTransList", &KDataDriverWrap::getTransList, &KDataDriverWrap::default_getTransList);
 
     register_ptr_to_python<KDataDriverPtr>();
 }
-
-

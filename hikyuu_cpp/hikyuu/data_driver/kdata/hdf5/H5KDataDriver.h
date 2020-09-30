@@ -20,6 +20,11 @@ public:
     virtual ~H5KDataDriver();
 
     virtual bool _init() override;
+
+    virtual bool isIndexFirst() override {
+        return true;
+    }
+
     virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
                            size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) override;
     virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
@@ -27,6 +32,8 @@ public:
                                      size_t& out_start, size_t& out_end) override;
     virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
                                KQuery::KType kType) override;
+    virtual KRecordList getKRecordList(const string& market, const string& code,
+                                       KQuery query) override;
     virtual TimeLineList getTimeLineList(const string& market, const string& code,
                                          const KQuery& query) override;
     virtual TransList getTransList(const string& market, const string& code,
@@ -53,6 +60,15 @@ private:
                                   size_t& out_end);
     bool _getOtherIndexRangeByDate(const string&, const string&, const KQuery&, size_t& out_start,
                                    size_t& out_end);
+
+    KRecordList _getBaseKRecordList(const string& market, const string& code, KQuery::KType kType,
+                                    size_t start_ix, size_t end_ix);
+    KRecordList _getIndexKRecordList(const string& market, const string& code, KQuery::KType kType,
+                                     size_t start_ix, size_t end_ix);
+
+    // KRecordList _getBaseKRecordList(std::const string& market, std::const string& code, Datetime
+    // start,
+    //                                Datetime end);
 
     TimeLineList _getTimeLine(const string& market, const string& code, int64 start, int64 end);
     TimeLineList _getTimeLine(const string& market, const string& code, const Datetime& start,

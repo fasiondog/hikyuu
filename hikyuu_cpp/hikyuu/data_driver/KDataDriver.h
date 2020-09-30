@@ -48,6 +48,11 @@ public:
     }
 
     /**
+     * 判断该引擎是否是位置索引方式查询速度更快，还是按日期方式查询更快
+     */
+    virtual bool isIndexFirst() = 0;
+
+    /**
      * 将指定类型的K线数据加载至缓存
      * @param market 市场简称
      * @param code   证券代码
@@ -90,6 +95,14 @@ public:
      */
     virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
                                KQuery::KType kType);
+
+    /**
+     * 获取 K 线数据
+     * @param market 市场简称
+     * @param code   证券代码
+     * @param query  查询条件
+     */
+    virtual KRecordList getKRecordList(const string& market, const string& code, KQuery query);
 
     /**
      * 获取分时线
