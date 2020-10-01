@@ -65,6 +65,8 @@ Linux、macOSX 执行以下指令安装：
     
     - Windows：1.67
     - linux、macOS：1.68
+
+3.  如果使用 Anaconda 的 python，需手工修改 boost 根目录下的 project-config.jam 文件, 找到 “using python” 所在行，手工添加python的版本、可执行文件、include目录，如：using python : 3.7 : "/Users/ljh/opt/anaconda3/bin/python3.7" : /Users/ljh/opt/anaconda3/include/python3.7m ;
     
 5、Linux下安装依赖软件包
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
