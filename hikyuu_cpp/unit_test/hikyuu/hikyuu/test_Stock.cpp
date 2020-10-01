@@ -291,7 +291,8 @@ TEST_CASE("test_Stock_getKRecord") {
     /** @arg 获取最后一条日线记录 */
     size_t total = stock.getCount();
     record = stock.getKRecord(total - 1);
-    expect = KRecord(Datetime(201112060000), 2326.66, 2331.892, 2310.155, 2325.905, 4262559.5, 45917078);
+    expect =
+      KRecord(Datetime(201112060000), 2326.66, 2331.892, 2310.155, 2325.905, 4262559.5, 45917078);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条周线记录 */
@@ -307,7 +308,8 @@ TEST_CASE("test_Stock_getKRecord") {
     /** @arg 获取最后一条周线记录 */
     total = stock.getCount(KQuery::WEEK);
     record = stock.getKRecord(total - 1, KQuery::WEEK);
-    expect = KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048);
+    expect =
+      KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条月线记录 */
@@ -323,7 +325,8 @@ TEST_CASE("test_Stock_getKRecord") {
     /** @arg 获取最后一条月线记录 */
     total = stock.getCount(KQuery::MONTH);
     record = stock.getKRecord(total - 1, KQuery::MONTH);
-    expect = KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941);
+    expect = KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5,
+                     256650941);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条季线记录 */
@@ -333,13 +336,15 @@ TEST_CASE("test_Stock_getKRecord") {
 
     /** @arg 获取中间随机一条季线记录 */
     record = stock.getKRecord(10, KQuery::QUARTER);
-    expect = KRecord(Datetime(199306300000), 921.590, 1392.620, 859.48, 1007.050, 5181883.5, 27631999);
+    expect =
+      KRecord(Datetime(199306300000), 921.590, 1392.620, 859.48, 1007.050, 5181883.5, 27631999);
     CHECK_EQ(record, expect);
 
     /** @arg 获取最后一条季线记录 */
     total = stock.getCount(KQuery::QUARTER);
     record = stock.getKRecord(total - 1, KQuery::QUARTER);
-    expect = KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936);
+    expect = KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1,
+                     3100147936);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条半年线记录 */
@@ -349,13 +354,15 @@ TEST_CASE("test_Stock_getKRecord") {
 
     /** @arg 获取中间随机一条半年线记录 */
     record = stock.getKRecord(10, KQuery::HALFYEAR);
-    expect = KRecord(Datetime(199512310000), 623.140, 792.540, 552.840, 555.290, 18764625.6, 351276329);
+    expect =
+      KRecord(Datetime(199512310000), 623.140, 792.540, 552.840, 555.290, 18764625.6, 351276329);
     CHECK_EQ(record, expect);
 
     /** @arg 获取最后一条半年线记录 */
     total = stock.getCount(KQuery::HALFYEAR);
     record = stock.getKRecord(total - 1, KQuery::HALFYEAR);
-    expect = KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694);
+    expect = KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6,
+                     8187717694);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条年线记录 */
@@ -365,34 +372,40 @@ TEST_CASE("test_Stock_getKRecord") {
 
     /** @arg 获取中间随机一条年线记录 */
     record = stock.getKRecord(10, KQuery::YEAR);
-    expect = KRecord(Datetime(200012310000), 1368.693, 2125.724, 1361.214, 2073.476, 326945832.5, 3433225623);
+    expect = KRecord(Datetime(200012310000), 1368.693, 2125.724, 1361.214, 2073.476, 326945832.5,
+                     3433225623);
     CHECK_EQ(record, expect);
 
     /** @arg 获取最后一条年线记录 */
     total = stock.getCount(KQuery::YEAR);
     record = stock.getKRecord(total - 1, KQuery::YEAR);
-    expect = KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512);
+    expect = KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3,
+                     21513978512);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条分钟线记录 */
     record = stock.getKRecord(0, KQuery::MIN);
-    expect = KRecord(Datetime("2000-1-4 9:31"), 1366.580, 1368.692, 1366.579, 1368.692, 4124880, 191158);
+    expect =
+      KRecord(Datetime("2000-1-4 9:31"), 1366.580, 1368.692, 1366.579, 1368.692, 4124880, 191158);
     CHECK_EQ(record, expect);
 
     /** @arg 获取中间随机一条分钟线记录 */
     record = stock.getKRecord(10, KQuery::MIN);
-    expect = KRecord(Datetime(200001040941), 1367.389, 1367.389, 1366.578, 1366.578, 1214910.4, 31811);
+    expect =
+      KRecord(Datetime(200001040941), 1367.389, 1367.389, 1366.578, 1366.578, 1214910.4, 31811);
     CHECK_EQ(record, expect);
 
     /** @arg 获取最后一条分钟线记录 */
     total = stock.getCount(KQuery::MIN);
     record = stock.getKRecord(total - 1, KQuery::MIN);
-    expect = KRecord(Datetime("2011-12-06 15:00"), 2325.380, 2326.1, 2324.6, 2325.9, 5215150, 566312);
+    expect =
+      KRecord(Datetime("2011-12-06 15:00"), 2325.380, 2326.1, 2324.6, 2325.9, 5215150, 566312);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条5分钟线记录 */
     record = stock.getKRecord(0, KQuery::MIN5);
-    expect = KRecord(Datetime(200001040935), 1366.580, 1369.680, 1366.579, 1369.187, 106611.5, 438171);
+    expect =
+      KRecord(Datetime(200001040935), 1366.580, 1369.680, 1366.579, 1369.187, 106611.5, 438171);
     CHECK_EQ(record, expect);
 
     /** @arg 获取中间随机一条5分钟线记录 */
@@ -403,55 +416,65 @@ TEST_CASE("test_Stock_getKRecord") {
     /** @arg 获取最后一条5分钟线记录 */
     total = stock.getCount(KQuery::MIN5);
     record = stock.getKRecord(total - 1, KQuery::MIN5);
-    expect = KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905, 176347.1, 1873675);
+    expect =
+      KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905, 176347.1, 1873675);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条15分钟线记录 */
     record = stock.getKRecord(0, KQuery::MIN15);
-    expect = KRecord(Datetime(200001040945), 1366.580, 1369.680, 1364.645, 1364.763, 250875.9, 912990);
+    expect =
+      KRecord(Datetime(200001040945), 1366.580, 1369.680, 1364.645, 1364.763, 250875.9, 912990);
     CHECK_EQ(record, expect);
 
     /** @arg 获取中间随机一条15分钟线记录 */
     record = stock.getKRecord(10, KQuery::MIN15);
-    expect = KRecord(Datetime(200001041345), 1399.325, 1403.996, 1399.325, 1403.056, 441489.9, 547552);
+    expect =
+      KRecord(Datetime(200001041345), 1399.325, 1403.996, 1399.325, 1403.056, 441489.9, 547552);
     CHECK_EQ(record, expect);
 
     /** @arg 获取最后一条15分钟线记录 */
     total = stock.getCount(KQuery::MIN15);
     record = stock.getKRecord(total - 1, KQuery::MIN15);
-    expect = KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905, 402339.3, 4060591);
+    expect =
+      KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905, 402339.3, 4060591);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条30分钟线记录 */
     record = stock.getKRecord(0, KQuery::MIN30);
-    expect = KRecord(Datetime(200001041000), 1366.580, 1369.68, 1361.459, 1361.459, 455153, 1370442);
+    expect =
+      KRecord(Datetime(200001041000), 1366.580, 1369.68, 1361.459, 1361.459, 455153, 1370442);
     CHECK_EQ(record, expect);
 
     /** @arg 获取中间随机一条30分钟线记录 */
     record = stock.getKRecord(10, KQuery::MIN30);
-    expect = KRecord(Datetime(200001051100), 1421.179, 1425.868, 1421.179, 1423.859, 1109219.5, 1282851);
+    expect =
+      KRecord(Datetime(200001051100), 1421.179, 1425.868, 1421.179, 1423.859, 1109219.5, 1282851);
     CHECK_EQ(record, expect);
 
     /** @arg 获取最后一条30分钟线记录 */
     total = stock.getCount(KQuery::MIN30);
     record = stock.getKRecord(total - 1, KQuery::MIN30);
-    expect = KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905, 660297.5, 6415054);
+    expect =
+      KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905, 660297.5, 6415054);
     CHECK_EQ(record, expect);
 
     /** @arg 获取第一条60分钟线记录 */
     record = stock.getKRecord(0, KQuery::MIN60);
-    expect = KRecord(Datetime(200001041030), 1366.580, 1369.68, 1361.295, 1367.683, 1041787.5, 2370736);
+    expect =
+      KRecord(Datetime(200001041030), 1366.580, 1369.68, 1361.295, 1367.683, 1041787.5, 2370736);
     CHECK_EQ(record, expect);
 
     /** @arg 获取中间随机一条60分钟线记录 */
     record = stock.getKRecord(10, KQuery::MIN60);
-    expect = KRecord(Datetime(200001061400), 1411.490, 1436.53, 1411.49, 1436.53, 2432679.2, 3016536);
+    expect =
+      KRecord(Datetime(200001061400), 1411.490, 1436.53, 1411.49, 1436.53, 2432679.2, 3016536);
     CHECK_EQ(record, expect);
 
     /** @arg 获取最后一条60分钟线记录 */
     total = stock.getCount(KQuery::MIN60);
     record = stock.getKRecord(total - 1, KQuery::MIN60);
-    expect = KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356);
+    expect =
+      KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356);
     CHECK_EQ(record, expect);
 
     MEMORY_CHECK;
@@ -473,61 +496,61 @@ TEST_CASE("test_Stock_getIndexRange") {
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 5121);
 
-    query = KQuery(0, Null<int64>(), KQuery::WEEK);
+    query = KQuery(0, Null<int64_t>(), KQuery::WEEK);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 1059);
 
-    query = KQuery(0, Null<int64>(), KQuery::MONTH);
+    query = KQuery(0, Null<int64_t>(), KQuery::MONTH);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 253);
 
-    query = KQuery(0, Null<int64>(), KQuery::QUARTER);
+    query = KQuery(0, Null<int64_t>(), KQuery::QUARTER);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 85);
 
-    query = KQuery(0, Null<int64>(), KQuery::HALFYEAR);
+    query = KQuery(0, Null<int64_t>(), KQuery::HALFYEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 43);
 
-    query = KQuery(0, Null<int64>(), KQuery::YEAR);
+    query = KQuery(0, Null<int64_t>(), KQuery::YEAR);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 22);
 
-    query = KQuery(0, Null<int64>(), KQuery::MIN);
+    query = KQuery(0, Null<int64_t>(), KQuery::MIN);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 682823L);
 
-    query = KQuery(0, Null<int64>(), KQuery::MIN5);
+    query = KQuery(0, Null<int64_t>(), KQuery::MIN5);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 133980L);
 
-    query = KQuery(0, Null<int64>(), KQuery::MIN15);
+    query = KQuery(0, Null<int64_t>(), KQuery::MIN15);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 44750);
 
-    query = KQuery(0, Null<int64>(), KQuery::MIN30);
+    query = KQuery(0, Null<int64_t>(), KQuery::MIN30);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
     CHECK_EQ(out_end, 22380L);
 
-    query = KQuery(0, Null<int64>(), KQuery::MIN60);
+    query = KQuery(0, Null<int64_t>(), KQuery::MIN60);
     success = stock.getIndexRange(query, out_start, out_end);
     CHECK_EQ(success, true);
     CHECK_EQ(out_start, 0);
@@ -1128,25 +1151,32 @@ TEST_CASE("test_Stock_getKRecordList") {
     total = stock.getCount(KQuery::DAY);
     result = stock.getKRecordList(0, total, KQuery::DAY);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(199012190000), 96.050, 99.980, 95.790, 99.980, 49.4, 1260));
-    CHECK_EQ(result[10], KRecord(Datetime(199101030000), 128.840, 130.140, 128.840, 130.140, 9.3, 141));
-    CHECK_EQ(result[5120],
-             KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905, 4262559.5, 45917078));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199012190000), 96.050, 99.980, 95.790, 99.980, 49.4, 1260));
+    CHECK_EQ(result[10],
+             KRecord(Datetime(199101030000), 128.840, 130.140, 128.840, 130.140, 9.3, 141));
+    CHECK_EQ(result[5120], KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905,
+                                   4262559.5, 45917078));
 
     /** @arg 日线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::DAY);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(199012190000), 96.050, 99.980, 95.790, 99.980, 49.4, 1260));
-    CHECK_EQ(result[10], KRecord(Datetime(199101030000), 128.840, 130.140, 128.840, 130.140, 9.3, 141));
-    CHECK_EQ(result[5120],
-             KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905, 4262559.5, 45917078));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199012190000), 96.050, 99.980, 95.790, 99.980, 49.4, 1260));
+    CHECK_EQ(result[10],
+             KRecord(Datetime(199101030000), 128.840, 130.140, 128.840, 130.140, 9.3, 141));
+    CHECK_EQ(result[5120], KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905,
+                                   4262559.5, 45917078));
 
     /** @arg 日线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::DAY);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(199012200000), 104.300, 104.390, 99.980, 104.390, 8.4, 197));
-    CHECK_EQ(result[1], KRecord(Datetime(199012210000), 109.070, 109.130, 103.730, 109.130, 1.6, 28));
-    CHECK_EQ(result[8], KRecord(Datetime(199101020000), 127.610, 128.840, 127.610, 128.840, 5.9, 91));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199012200000), 104.300, 104.390, 99.980, 104.390, 8.4, 197));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199012210000), 109.070, 109.130, 103.730, 109.130, 1.6, 28));
+    CHECK_EQ(result[8],
+             KRecord(Datetime(199101020000), 127.610, 128.840, 127.610, 128.840, 5.9, 91));
 
     /** @arg 日线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::DAY);
@@ -1163,17 +1193,20 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 日线 start, 0, end, 1 */
     result = stock.getKRecordList(0, 1, KQuery::DAY);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(199012190000), 96.050, 99.980, 95.790, 99.980, 49.4, 1260));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199012190000), 96.050, 99.980, 95.790, 99.980, 49.4, 1260));
 
     /** @arg 日线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::DAY);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905, 4262559.5, 45917078));
+    CHECK_EQ(result[0], KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905,
+                                4262559.5, 45917078));
 
     /** @arg 日线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::DAY);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905, 4262559.5, 45917078));
+    CHECK_EQ(result[0], KRecord(Datetime(201112060000), 2326.660, 2331.892, 2310.155, 2325.905,
+                                4262559.5, 45917078));
 
     ///=====================
     /// 测试周线
@@ -1183,24 +1216,29 @@ TEST_CASE("test_Stock_getKRecordList") {
     result = stock.getKRecordList(0, total, KQuery::WEEK);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012210000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
-    CHECK_EQ(result[1], KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
-    CHECK_EQ(result[1058],
-             KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
+    CHECK_EQ(result[1058], KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905,
+                                   9126681.1, 98132048));
 
     /** @arg 周线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::WEEK);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012210000), 96.05, 109.13, 95.79, 109.130, 59.4, 1485));
-    CHECK_EQ(result[1], KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
-    CHECK_EQ(result[1058],
-             KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
+    CHECK_EQ(result[1058], KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905,
+                                   9126681.1, 98132048));
 
     /** @arg 周线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::WEEK);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
-    CHECK_EQ(result[1], KRecord(Datetime(199101040000), 126.56, 131.44, 126.48, 131.440, 47.3, 730));
-    CHECK_EQ(result[8], KRecord(Datetime(199102220000), 133.12, 134.87, 133.08, 134.870, 551, 9271));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199012280000), 113.57, 126.45, 109.13, 126.450, 28.2, 321));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199101040000), 126.56, 131.44, 126.48, 131.440, 47.3, 730));
+    CHECK_EQ(result[8],
+             KRecord(Datetime(199102220000), 133.12, 134.87, 133.08, 134.870, 551, 9271));
 
     /** @arg 周线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::WEEK);
@@ -1222,12 +1260,14 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 周线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::WEEK);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    CHECK_EQ(result[0], KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905,
+                                9126681.1, 98132048));
 
     /** @arg 周线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::WEEK);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905, 9126681.1, 98132048));
+    CHECK_EQ(result[0], KRecord(Datetime(201112090000), 2363.111, 2363.127, 2310.155, 2325.905,
+                                9126681.1, 98132048));
 
     ///=====================
     /// 测试月线
@@ -1237,24 +1277,29 @@ TEST_CASE("test_Stock_getKRecordList") {
     result = stock.getKRecordList(0, total, KQuery::MONTH);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
-    CHECK_EQ(result[252],
-             KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
+    CHECK_EQ(result[252], KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905,
+                                  24378748.5, 256650941));
 
     /** @arg 月线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::MONTH);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
-    CHECK_EQ(result[252],
-             KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
+    CHECK_EQ(result[252], KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905,
+                                  24378748.5, 256650941));
 
     /** @arg 月线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::MONTH);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
-    CHECK_EQ(result[1], KRecord(Datetime(199102280000), 129.5, 134.87, 128.06, 133.010, 3027.3, 50982));
-    CHECK_EQ(result[8], KRecord(Datetime(199109300000), 180.08, 191.18, 178.43, 180.920, 19410.4, 286133));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199101310000), 127.61, 135.19, 127.61, 129.970, 3637.1, 67197));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199102280000), 129.5, 134.87, 128.06, 133.010, 3027.3, 50982));
+    CHECK_EQ(result[8],
+             KRecord(Datetime(199109300000), 180.08, 191.18, 178.43, 180.920, 19410.4, 286133));
 
     /** @arg 月线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::MONTH);
@@ -1276,12 +1321,14 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 月线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::MONTH);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905,
+                                24378748.5, 256650941));
 
     /** @arg 月线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MONTH);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905, 24378748.5, 256650941));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2392.485, 2423.559, 2310.155, 2325.905,
+                                24378748.5, 256650941));
 
     ///=====================
     /// 测试季线
@@ -1291,24 +1338,29 @@ TEST_CASE("test_Stock_getKRecordList") {
     result = stock.getKRecordList(0, total, KQuery::QUARTER);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
-    CHECK_EQ(result[84],
-             KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
+    CHECK_EQ(result[84], KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905,
+                                 298278573.1, 3100147936));
 
     /** @arg 季线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::QUARTER);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
-    CHECK_EQ(result[84],
-             KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
+    CHECK_EQ(result[84], KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905,
+                                 298278573.1, 3100147936));
 
     /** @arg 季线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::QUARTER);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
-    CHECK_EQ(result[1], KRecord(Datetime(199106300000), 120.69, 137.56, 104.96, 137.560, 12095.6, 222753));
-    CHECK_EQ(result[8], KRecord(Datetime(199303310000), 784.13, 1558.95, 777.16, 925.910, 5003866.3, 26182794));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199103310000), 127.61, 135.19, 120.11, 120.190, 8389.7, 142707));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199106300000), 120.69, 137.56, 104.96, 137.560, 12095.6, 222753));
+    CHECK_EQ(result[8], KRecord(Datetime(199303310000), 784.13, 1558.95, 777.16, 925.910, 5003866.3,
+                                26182794));
 
     /** @arg 季线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::QUARTER);
@@ -1330,14 +1382,14 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 季线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::QUARTER);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0],
-             KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905,
+                                298278573.1, 3100147936));
 
     /** @arg 季线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::QUARTER);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0],
-             KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905, 298278573.1, 3100147936));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2363.078, 2536.779, 2307.146, 2325.905,
+                                298278573.1, 3100147936));
 
     ///=====================
     /// 测试半年线
@@ -1347,24 +1399,29 @@ TEST_CASE("test_Stock_getKRecordList") {
     result = stock.getKRecordList(0, total, KQuery::HALFYEAR);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
-    CHECK_EQ(result[42],
-             KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
+    CHECK_EQ(result[42], KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905,
+                                 842271699.6, 8187717694));
 
     /** @arg 半年线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::HALFYEAR);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
-    CHECK_EQ(result[42],
-             KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
+    CHECK_EQ(result[42], KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905,
+                                 842271699.6, 8187717694));
 
     /** @arg 半年线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::HALFYEAR);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
-    CHECK_EQ(result[1], KRecord(Datetime(199112310000), 136.64, 292.75, 131.87, 292.750, 60078.8, 890458));
-    CHECK_EQ(result[8], KRecord(Datetime(199506300000), 637.72, 926.41, 524.43, 630.580, 12294596.7, 164388191));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199106300000), 127.61, 137.56, 104.96, 137.560, 20485.3, 365460));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199112310000), 136.64, 292.75, 131.87, 292.750, 60078.8, 890458));
+    CHECK_EQ(result[8], KRecord(Datetime(199506300000), 637.72, 926.41, 524.43, 630.580, 12294596.7,
+                                164388191));
 
     /** @arg 半年线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::HALFYEAR);
@@ -1386,14 +1443,14 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 半年线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::HALFYEAR);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0],
-             KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905,
+                                842271699.6, 8187717694));
 
     /** @arg 半年线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::HALFYEAR);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0],
-             KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905, 842271699.6, 8187717694));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2767.834, 2826.959, 2307.146, 2325.905,
+                                842271699.6, 8187717694));
 
     ///=====================
     /// 测试年线
@@ -1403,25 +1460,29 @@ TEST_CASE("test_Stock_getKRecordList") {
     result = stock.getKRecordList(0, total, KQuery::YEAR);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
-    CHECK_EQ(result[21],
-             KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
+    CHECK_EQ(result[21], KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905,
+                                 2308389935.3, 21513978512));
 
     /** @arg 年线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::YEAR);
     CHECK_EQ(result.size(), total);
     CHECK_EQ(result[0], KRecord(Datetime(199012310000), 96.05, 127.61, 95.79, 127.610, 93.6, 1884));
-    CHECK_EQ(result[1], KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
-    CHECK_EQ(result[21],
-             KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
+    CHECK_EQ(result[21], KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905,
+                                 2308389935.3, 21513978512));
 
     /** @arg 年线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::YEAR);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
-    CHECK_EQ(result[1], KRecord(Datetime(199212310000), 293.74, 1429.01, 292.76, 780.390, 2497452.9, 18170898));
-    CHECK_EQ(result[8],
-             KRecord(Datetime(199912310000), 1144.888, 1756.184, 1047.833, 1366.580, 181932093.8, 2287638100));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(199112310000), 127.61, 292.75, 104.96, 292.750, 80564.1, 1255918));
+    CHECK_EQ(result[1], KRecord(Datetime(199212310000), 293.74, 1429.01, 292.76, 780.390, 2497452.9,
+                                18170898));
+    CHECK_EQ(result[8], KRecord(Datetime(199912310000), 1144.888, 1756.184, 1047.833, 1366.580,
+                                181932093.8, 2287638100));
 
     /** @arg 年线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::YEAR);
@@ -1443,14 +1504,14 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 年线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::YEAR);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0],
-             KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905,
+                                2308389935.3, 21513978512));
 
     /** @arg 年线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::YEAR);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0],
-             KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905, 2308389935.3, 21513978512));
+    CHECK_EQ(result[0], KRecord(Datetime(201112310000), 2825.329, 3067.456, 2307.146, 2325.905,
+                                2308389935.3, 21513978512));
 
     ///=====================
     /// 测试分钟线
@@ -1459,23 +1520,32 @@ TEST_CASE("test_Stock_getKRecordList") {
     total = stock.getCount(KQuery::MIN);
     result = stock.getKRecordList(0, total, KQuery::MIN);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040931), 1366.58, 1368.692, 1366.579, 1368.692, 4124880, 191158));
-    CHECK_EQ(result[1], KRecord(Datetime(200001040932), 1368.3, 1368.491, 1368.3, 1368.491, 2783200, 106916));
-    CHECK_EQ(result[682822], KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040931), 1366.58, 1368.692, 1366.579, 1368.692,
+                                4124880, 191158));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(200001040932), 1368.3, 1368.491, 1368.3, 1368.491, 2783200, 106916));
+    CHECK_EQ(result[682822],
+             KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
 
     /** @arg 分钟线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::MIN);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040931), 1366.58, 1368.692, 1366.579, 1368.692, 4124880, 191158));
-    CHECK_EQ(result[1], KRecord(Datetime(200001040932), 1368.3, 1368.491, 1368.3, 1368.491, 2783200, 106916));
-    CHECK_EQ(result[682822], KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040931), 1366.58, 1368.692, 1366.579, 1368.692,
+                                4124880, 191158));
+    CHECK_EQ(result[1],
+             KRecord(Datetime(200001040932), 1368.3, 1368.491, 1368.3, 1368.491, 2783200, 106916));
+    CHECK_EQ(result[682822],
+             KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
 
     /** @arg 分钟线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::MIN);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040932), 1368.3, 1368.491, 1368.3, 1368.491, 2783200, 106916));
-    CHECK_EQ(result[1], KRecord(Datetime(200001040933), 1368.859, 1369.474, 1368.859, 1369.308, 1060260, 37789));
-    CHECK_EQ(result[8], KRecord(Datetime(200001040940), 1367.651, 1367.662, 1367.389, 1367.389, 1335200, 41924));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(200001040932), 1368.3, 1368.491, 1368.3, 1368.491, 2783200, 106916));
+    CHECK_EQ(result[1], KRecord(Datetime(200001040933), 1368.859, 1369.474, 1368.859, 1369.308,
+                                1060260, 37789));
+    CHECK_EQ(result[8], KRecord(Datetime(200001040940), 1367.651, 1367.662, 1367.389, 1367.389,
+                                1335200, 41924));
 
     /** @arg 分钟线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::MIN);
@@ -1492,17 +1562,20 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 分钟线 start, 0, end, 1 */
     result = stock.getKRecordList(0, 1, KQuery::MIN);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040931), 1366.58, 1368.692, 1366.579, 1368.692, 4124880, 191158));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040931), 1366.58, 1368.692, 1366.579, 1368.692,
+                                4124880, 191158));
 
     /** @arg 分钟线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::MIN);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
 
     /** @arg 分钟线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MIN);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
+    CHECK_EQ(result[0],
+             KRecord(Datetime(201112061500), 2325.38, 2326.1, 2324.6, 2325.900, 5215150, 566312));
 
     ///=====================
     /// 测试5分钟线
@@ -1511,25 +1584,32 @@ TEST_CASE("test_Stock_getKRecordList") {
     total = stock.getCount(KQuery::MIN5);
     result = stock.getKRecordList(0, total, KQuery::MIN5);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040935), 1366.58, 1369.68, 1366.579, 1369.187, 106611.5, 438171));
-    CHECK_EQ(result[1], KRecord(Datetime(200001040940), 1369.187, 1369.371, 1367.389, 1367.389, 70687.3, 251473));
-    CHECK_EQ(result[133979],
-             KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905, 176347.1, 1873675));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040935), 1366.58, 1369.68, 1366.579, 1369.187,
+                                106611.5, 438171));
+    CHECK_EQ(result[1], KRecord(Datetime(200001040940), 1369.187, 1369.371, 1367.389, 1367.389,
+                                70687.3, 251473));
+    CHECK_EQ(result[133979], KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905,
+                                     176347.1, 1873675));
 
     /** @arg 5分钟线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::MIN5);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040935), 1366.58, 1369.68, 1366.579, 1369.187, 106611.5, 438171));
-    CHECK_EQ(result[1], KRecord(Datetime(200001040940), 1369.187, 1369.371, 1367.389, 1367.389, 70687.3, 251473));
-    CHECK_EQ(result[133979],
-             KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905, 176347.1, 1873675));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040935), 1366.58, 1369.68, 1366.579, 1369.187,
+                                106611.5, 438171));
+    CHECK_EQ(result[1], KRecord(Datetime(200001040940), 1369.187, 1369.371, 1367.389, 1367.389,
+                                70687.3, 251473));
+    CHECK_EQ(result[133979], KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905,
+                                     176347.1, 1873675));
 
     /** @arg 5分钟线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::MIN5);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040940), 1369.187, 1369.371, 1367.389, 1367.389, 70687.3, 251473));
-    CHECK_EQ(result[1], KRecord(Datetime(200001040945), 1367.389, 1367.389, 1364.645, 1364.763, 73577.1, 223346));
-    CHECK_EQ(result[8], KRecord(Datetime(200001041020), 1366.043, 1366.458, 1365.946, 1366.458, 111601.7, 205190));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040940), 1369.187, 1369.371, 1367.389, 1367.389,
+                                70687.3, 251473));
+    CHECK_EQ(result[1], KRecord(Datetime(200001040945), 1367.389, 1367.389, 1364.645, 1364.763,
+                                73577.1, 223346));
+    CHECK_EQ(result[8], KRecord(Datetime(200001041020), 1366.043, 1366.458, 1365.946, 1366.458,
+                                111601.7, 205190));
 
     /** @arg 5分钟线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::MIN5);
@@ -1546,17 +1626,20 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 5分钟线 start, 0, end, 1 */
     result = stock.getKRecordList(0, 1, KQuery::MIN5);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040935), 1366.58, 1369.68, 1366.579, 1369.187, 106611.5, 438171));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040935), 1366.58, 1369.68, 1366.579, 1369.187,
+                                106611.5, 438171));
 
     /** @arg 5分钟线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::MIN5);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905, 176347.1, 1873675));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905,
+                                176347.1, 1873675));
 
     /** @arg 5分钟线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MIN5);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905, 176347.1, 1873675));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.059, 2325.931, 2323.059, 2325.905,
+                                176347.1, 1873675));
 
     ///=====================
     /// 测试15分钟线
@@ -1565,23 +1648,32 @@ TEST_CASE("test_Stock_getKRecordList") {
     total = stock.getCount(KQuery::MIN15);
     result = stock.getKRecordList(0, total, KQuery::MIN15);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040945), 1366.58, 1369.68, 1364.645, 1364.763, 250875.9, 912990));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041000), 1364.763, 1364.763, 1361.459, 1361.459, 204277.1, 457452));
-    CHECK_EQ(result[44749], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905, 402339.3, 4060591));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040945), 1366.58, 1369.68, 1364.645, 1364.763,
+                                250875.9, 912990));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041000), 1364.763, 1364.763, 1361.459, 1361.459,
+                                204277.1, 457452));
+    CHECK_EQ(result[44749], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905,
+                                    402339.3, 4060591));
 
     /** @arg 15分钟线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::MIN15);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040945), 1366.58, 1369.68, 1364.645, 1364.763, 250875.9, 912990));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041000), 1364.763, 1364.763, 1361.459, 1361.459, 204277.1, 457452));
-    CHECK_EQ(result[44749], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905, 402339.3, 4060591));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040945), 1366.58, 1369.68, 1364.645, 1364.763,
+                                250875.9, 912990));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041000), 1364.763, 1364.763, 1361.459, 1361.459,
+                                204277.1, 457452));
+    CHECK_EQ(result[44749], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905,
+                                    402339.3, 4060591));
 
     /** @arg 15分钟线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::MIN15);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1364.763, 1364.763, 1361.459, 1361.459, 204277.1, 457452));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041015), 1361.558, 1366.093, 1361.295, 1365.927, 307531.8, 548313));
-    CHECK_EQ(result[8], KRecord(Datetime(200001041330), 1399.56, 1399.664, 1396.679, 1399.325, 407799.9, 554965));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1364.763, 1364.763, 1361.459, 1361.459,
+                                204277.1, 457452));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041015), 1361.558, 1366.093, 1361.295, 1365.927,
+                                307531.8, 548313));
+    CHECK_EQ(result[8], KRecord(Datetime(200001041330), 1399.56, 1399.664, 1396.679, 1399.325,
+                                407799.9, 554965));
 
     /** @arg 15分钟线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::MIN15);
@@ -1598,17 +1690,20 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 15分钟线 start, 0, end, 1 */
     result = stock.getKRecordList(0, 1, KQuery::MIN15);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(200001040945), 1366.58, 1369.68, 1364.645, 1364.763, 250875.9, 912990));
+    CHECK_EQ(result[0], KRecord(Datetime(200001040945), 1366.58, 1369.68, 1364.645, 1364.763,
+                                250875.9, 912990));
 
     /** @arg 15分钟线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::MIN15);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905, 402339.3, 4060591));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905,
+                                402339.3, 4060591));
 
     /** @arg 15分钟线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MIN15);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905, 402339.3, 4060591));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2323.068, 2325.931, 2320.819, 2325.905,
+                                402339.3, 4060591));
 
     ///=====================
     /// 测试30分钟线
@@ -1617,23 +1712,32 @@ TEST_CASE("test_Stock_getKRecordList") {
     total = stock.getCount(KQuery::MIN30);
     result = stock.getKRecordList(0, total, KQuery::MIN30);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1366.58, 1369.68, 1361.459, 1361.459, 455153, 1370442));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041030), 1361.558, 1367.683, 1361.295, 1367.683, 586634.5, 1000294));
-    CHECK_EQ(result[22379], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905, 660297.5, 6415054));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1366.58, 1369.68, 1361.459, 1361.459,
+                                455153, 1370442));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041030), 1361.558, 1367.683, 1361.295, 1367.683,
+                                586634.5, 1000294));
+    CHECK_EQ(result[22379], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905,
+                                    660297.5, 6415054));
 
     /** @arg 30分钟线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::MIN30);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1366.58, 1369.68, 1361.459, 1361.459, 455153, 1370442));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041030), 1361.558, 1367.683, 1361.295, 1367.683, 586634.5, 1000294));
-    CHECK_EQ(result[22379], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905, 660297.5, 6415054));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1366.58, 1369.68, 1361.459, 1361.459,
+                                455153, 1370442));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041030), 1361.558, 1367.683, 1361.295, 1367.683,
+                                586634.5, 1000294));
+    CHECK_EQ(result[22379], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905,
+                                    660297.5, 6415054));
 
     /** @arg 30分钟线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::MIN30);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1361.558, 1367.683, 1361.295, 1367.683, 586634.5, 1000294));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041100), 1367.667, 1378.543, 1367.6, 1377.098, 622250.5, 1248350));
-    CHECK_EQ(result[8], KRecord(Datetime(200001051030), 1409.486, 1421.612, 1409.486, 1421.139, 1397089.8, 1777404));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1361.558, 1367.683, 1361.295, 1367.683,
+                                586634.5, 1000294));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041100), 1367.667, 1378.543, 1367.6, 1377.098,
+                                622250.5, 1248350));
+    CHECK_EQ(result[8], KRecord(Datetime(200001051030), 1409.486, 1421.612, 1409.486, 1421.139,
+                                1397089.8, 1777404));
 
     /** @arg 30分钟线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::MIN30);
@@ -1650,17 +1754,20 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 30分钟线 start, 0, end, 1 */
     result = stock.getKRecordList(0, 1, KQuery::MIN30);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1366.58, 1369.68, 1361.459, 1361.459, 455153, 1370442));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041000), 1366.58, 1369.68, 1361.459, 1361.459,
+                                455153, 1370442));
 
     /** @arg 30分钟线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::MIN30);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905, 660297.5, 6415054));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905,
+                                660297.5, 6415054));
 
     /** @arg 30分钟线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MIN30);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905, 660297.5, 6415054));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2327.919, 2327.919, 2320.819, 2325.905,
+                                660297.5, 6415054));
 
     ///=====================
     /// 测试60分钟线
@@ -1669,23 +1776,32 @@ TEST_CASE("test_Stock_getKRecordList") {
     total = stock.getCount(KQuery::MIN60);
     result = stock.getKRecordList(0, total, KQuery::MIN60);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1366.58, 1369.68, 1361.295, 1367.683, 1041787.5, 2370736));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041130), 1367.667, 1387.853, 1367.6, 1387.853, 1411191.4, 2172479));
-    CHECK_EQ(result[11192], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1366.58, 1369.68, 1361.295, 1367.683,
+                                1041787.5, 2370736));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041130), 1367.667, 1387.853, 1367.6, 1387.853,
+                                1411191.4, 2172479));
+    CHECK_EQ(result[11192], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905,
+                                    1332210, 11886356));
 
     /** @arg 60分钟线 start, 0, end, total + 1 */
     result = stock.getKRecordList(0, total + 1, KQuery::MIN60);
     CHECK_EQ(result.size(), total);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1366.58, 1369.68, 1361.295, 1367.683, 1041787.5, 2370736));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041130), 1367.667, 1387.853, 1367.6, 1387.853, 1411191.4, 2172479));
-    CHECK_EQ(result[11192], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1366.58, 1369.68, 1361.295, 1367.683,
+                                1041787.5, 2370736));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041130), 1367.667, 1387.853, 1367.6, 1387.853,
+                                1411191.4, 2172479));
+    CHECK_EQ(result[11192], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905,
+                                    1332210, 11886356));
 
     /** @arg 60分钟线 start, 1, end, 10 */
     result = stock.getKRecordList(1, 10, KQuery::MIN60);
     CHECK_EQ(result.size(), 9);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041130), 1367.667, 1387.853, 1367.6, 1387.853, 1411191.4, 2172479));
-    CHECK_EQ(result[1], KRecord(Datetime(200001041400), 1389.996, 1403.996, 1389.97, 1400.685, 1740709.6, 2348753));
-    CHECK_EQ(result[8], KRecord(Datetime(200001061130), 1420.098, 1420.098, 1410.706, 1411.387, 1291509.5, 1378193));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041130), 1367.667, 1387.853, 1367.6, 1387.853,
+                                1411191.4, 2172479));
+    CHECK_EQ(result[1], KRecord(Datetime(200001041400), 1389.996, 1403.996, 1389.97, 1400.685,
+                                1740709.6, 2348753));
+    CHECK_EQ(result[8], KRecord(Datetime(200001061130), 1420.098, 1420.098, 1410.706, 1411.387,
+                                1291509.5, 1378193));
 
     /** @arg 60分钟线 start, end, 0 */
     result = stock.getKRecordList(0, 0, KQuery::MIN60);
@@ -1702,17 +1818,20 @@ TEST_CASE("test_Stock_getKRecordList") {
     /** @arg 60分钟线 start, 0, end, 1 */
     result = stock.getKRecordList(0, 1, KQuery::MIN60);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1366.58, 1369.68, 1361.295, 1367.683, 1041787.5, 2370736));
+    CHECK_EQ(result[0], KRecord(Datetime(200001041030), 1366.58, 1369.68, 1361.295, 1367.683,
+                                1041787.5, 2370736));
 
     /** @arg 60分钟线 start, total - 1, end, total */
     result = stock.getKRecordList(total - 1, total, KQuery::MIN60);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905,
+                                1332210, 11886356));
 
     /** @arg 60分钟线 start, total - 1, end, total + 1 */
     result = stock.getKRecordList(total - 1, total + 1, KQuery::MIN60);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905, 1332210, 11886356));
+    CHECK_EQ(result[0], KRecord(Datetime(201112061500), 2326.036, 2331.378, 2320.819, 2325.905,
+                                1332210, 11886356));
 
     MEMORY_CHECK;
 }
@@ -1732,11 +1851,13 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecordByDate(Datetime(199012190000), KQuery::DAY);
-    CHECK_EQ(record, KRecord(Datetime(199012190000), 96.0500, 99.9800, 95.7900, 99.9800, 49.4000, 1260.0000));
+    CHECK_EQ(record, KRecord(Datetime(199012190000), 96.0500, 99.9800, 95.7900, 99.9800, 49.4000,
+                             1260.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199502150000), KQuery::DAY);
-    CHECK_EQ(record, KRecord(Datetime(199502150000), 547.8300, 548.5900, 542.5000, 542.8400, 11889.3000, 232116.0000));
+    CHECK_EQ(record, KRecord(Datetime(199502150000), 547.8300, 548.5900, 542.5000, 542.8400,
+                             11889.3000, 232116.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199502180000), KQuery::DAY);
@@ -1744,8 +1865,8 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112060000), KQuery::DAY);
-    CHECK_EQ(record,
-             KRecord(Datetime(201112060000), 2326.6600, 2331.8920, 2310.1550, 2325.9050, 4262559.5000, 45917078.0000));
+    CHECK_EQ(record, KRecord(Datetime(201112060000), 2326.6600, 2331.8920, 2310.1550, 2325.9050,
+                             4262559.5000, 45917078.0000));
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112070000), KQuery::DAY);
@@ -1761,11 +1882,13 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecordByDate(Datetime(199012210000), KQuery::WEEK);
-    CHECK_EQ(record, KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000, 1485.0000));
+    CHECK_EQ(record, KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000,
+                             1485.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199103290000), KQuery::WEEK);
-    CHECK_EQ(record, KRecord(Datetime(199103290000), 122.1200, 122.6200, 120.1100, 120.1900, 409.0000, 5421.0000));
+    CHECK_EQ(record, KRecord(Datetime(199103290000), 122.1200, 122.6200, 120.1100, 120.1900,
+                             409.0000, 5421.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199103120000), KQuery::WEEK);
@@ -1773,8 +1896,8 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112090000), KQuery::WEEK);
-    CHECK_EQ(record,
-             KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050, 9126681.1000, 98132048.0000));
+    CHECK_EQ(record, KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050,
+                             9126681.1000, 98132048.0000));
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112100000), KQuery::WEEK);
@@ -1790,12 +1913,13 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecordByDate(Datetime(199012310000), KQuery::MONTH);
-    CHECK_EQ(record, KRecord(Datetime(199012310000), 96.0500, 127.6100, 95.7900, 127.6100, 93.6000, 1884.0000));
+    CHECK_EQ(record, KRecord(Datetime(199012310000), 96.0500, 127.6100, 95.7900, 127.6100, 93.6000,
+                             1884.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199208310000), KQuery::MONTH);
-    CHECK_EQ(record,
-             KRecord(Datetime(199208310000), 1034.7000, 1060.3600, 627.3600, 823.2700, 286256.7000, 2040679.0000));
+    CHECK_EQ(record, KRecord(Datetime(199208310000), 1034.7000, 1060.3600, 627.3600, 823.2700,
+                             286256.7000, 2040679.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(199103120000), KQuery::MONTH);
@@ -1803,8 +1927,8 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112310000), KQuery::MONTH);
-    CHECK_EQ(record, KRecord(Datetime(201112310000), 2392.4850, 2423.5590, 2310.1550, 2325.9050, 24378748.5000,
-                             256650941.0000));
+    CHECK_EQ(record, KRecord(Datetime(201112310000), 2392.4850, 2423.5590, 2310.1550, 2325.9050,
+                             24378748.5000, 256650941.0000));
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201201010000), KQuery::MONTH);
@@ -1820,13 +1944,13 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于第一条记录 */
     record = stock.getKRecordByDate(Datetime(200001040945), KQuery::MIN15);
-    CHECK_EQ(record,
-             KRecord(Datetime(200001040945), 1366.5800, 1369.6800, 1364.6450, 1364.7630, 250875.9000, 912990.0000));
+    CHECK_EQ(record, KRecord(Datetime(200001040945), 1366.5800, 1369.6800, 1364.6450, 1364.7630,
+                             250875.9000, 912990.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(200001071045), KQuery::MIN15);
-    CHECK_EQ(record,
-             KRecord(Datetime(200001071045), 1482.5210, 1490.0070, 1481.9910, 1485.2770, 1030800.2000, 1663302.0000));
+    CHECK_EQ(record, KRecord(Datetime(200001071045), 1482.5210, 1490.0070, 1481.9910, 1485.2770,
+                             1030800.2000, 1663302.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
     record = stock.getKRecordByDate(Datetime(200001071044), KQuery::MIN15);
@@ -1834,8 +1958,8 @@ TEST_CASE("test_Stock_getKRecordByDate") {
 
     /** @arg 日期等于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112061500), KQuery::MIN15);
-    CHECK_EQ(record,
-             KRecord(Datetime(201112061500), 2323.0680, 2325.9310, 2320.8190, 2325.9050, 402339.3000, 4060591.0000));
+    CHECK_EQ(record, KRecord(Datetime(201112061500), 2323.0680, 2325.9310, 2320.8190, 2325.9050,
+                             402339.3000, 4060591.0000));
 
     /** @arg 日期大于最后一条记录 */
     record = stock.getKRecordByDate(Datetime(201112061501), KQuery::MIN15);
@@ -1983,14 +2107,16 @@ TEST_CASE("test_Stock_getFinanceInfo") {
     CHECK_EQ(f.get<price_t>("yingshouzhangkuan"), doctest::Approx(0.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("yingyelirun"), doctest::Approx(653430000000.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("touzishouyi"), doctest::Approx(147650000000.0).epsilon(0.00001));
-    CHECK_EQ(f.get<price_t>("jingyingxianjinliu"), doctest::Approx(-3383600000000.0).epsilon(0.00001));
+    CHECK_EQ(f.get<price_t>("jingyingxianjinliu"),
+             doctest::Approx(-3383600000000.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("zongxianjinliu"), doctest::Approx(374319920000.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("cunhuo"), doctest::Approx(0.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("lirunzonghe"), doctest::Approx(652840000000.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("shuihoulirun"), doctest::Approx(565150000000.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("jinglirun"), doctest::Approx(559140000000.0).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("weifenpeilirun"), doctest::Approx(1402080000000.0).epsilon(0.00001));
-    CHECK_EQ(f.get<price_t>("meigujingzichan"), doctest::Approx(15.050000190734863).epsilon(0.00001));
+    CHECK_EQ(f.get<price_t>("meigujingzichan"),
+             doctest::Approx(15.050000190734863).epsilon(0.00001));
     CHECK_EQ(f.get<price_t>("baoliu2"), doctest::Approx(12.0).epsilon(0.00001));
 
     MEMORY_CHECK;

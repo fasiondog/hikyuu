@@ -214,11 +214,12 @@ void H5KDataDriver::loadKData(const string& market, const string& code, KQuery::
         return;
     }
 
-    /*KRecordList result = getKRecordList(market, code, KQuery(start_ix, end_ix, kType));
+    /*int64_t end = end_ix == Null<size_t>() ? Null<int64_t>() : (int64_t)end_ix;
+    KRecordList result = getKRecordList(market, code, KQuery(start_ix, end, kType));
     for (auto& record : result) {
         out_buffer->push_back(record);
-        return;
-    }*/
+    }
+    return;*/
 
     if (KQuery::DAY == kType || KQuery::MIN5 == kType || KQuery::MIN == kType) {
         _loadBaseData(market, code, kType, start_ix, end_ix, out_buffer);
@@ -615,8 +616,8 @@ bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string&
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
-    uint64 start_number = query.startDatetime().number();
-    uint64 end_number = query.endDatetime().number();
+    uint64_t start_number = query.startDatetime().number();
+    uint64_t end_number = query.endDatetime().number();
     hsize_t startpos = 0, endpos = 0;
     try {
         string tablename(market + code);
@@ -744,7 +745,7 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
         }
 
         size_t mid, low = 0, high = total - 1;
-        uint64 startDatetime = query.startDatetime().number();
+        uint64_t startDatetime = query.startDatetime().number();
         H5IndexRecord h5record;
         while (low <= high) {
             H5ReadIndexRecords(dataset, high, 1, &h5record);
@@ -775,7 +776,7 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
 
         out_start = mid;
 
-        uint64 endDatetime = query.endDatetime().number();
+        uint64_t endDatetime = query.endDatetime().number();
         low = mid, high = total - 1;
         while (low <= high) {
             H5ReadIndexRecords(dataset, high, 1, &h5record);
@@ -971,8 +972,8 @@ TimeLineList H5KDataDriver::getTimeLineList(const string& market, const string& 
              : _getTimeLine(market, code, query.startDatetime(), query.endDatetime());
 }
 
-TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& code, int64 start_ix,
-                                         int64 end_ix) {
+TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& code, int64_t start_ix,
+                                         int64_t end_ix) {
     TimeLineList result;
     H5FilePtr h5file;
     H5::Group group;
@@ -1059,8 +1060,8 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
-    uint64 start_number = start.number();
-    uint64 end_number = end.number();
+    uint64_t start_number = start.number();
+    uint64_t end_number = end.number();
     hsize_t startpos = 0, endpos = 0;
     try {
         string tablename(market + code);
@@ -1192,8 +1193,8 @@ TransList H5KDataDriver::getTransList(const string& market, const string& code,
              : _getTransList(market, code, query.startDatetime(), query.endDatetime());
 }
 
-TransList H5KDataDriver::_getTransList(const string& market, const string& code, int64 start_ix,
-                                       int64 end_ix) {
+TransList H5KDataDriver::_getTransList(const string& market, const string& code, int64_t start_ix,
+                                       int64_t end_ix) {
     TransList result;
     H5FilePtr h5file;
     H5::Group group;
@@ -1244,7 +1245,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
 
         TransRecord record;
         result.reserve(total + 2);
-        uint64 number = 0, second = 0;
+        uint64_t number = 0, second = 0;
         for (hsize_t i = 0; i < total; i++) {
             number = pBuf[i].datetime / 100;
             second = pBuf[i].datetime - number * 100;
@@ -1289,8 +1290,8 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
-    uint64 start_number = start.number() * 100 + start.second();
-    uint64 end_number = end.number() * 100 + (end.isNull() ? 0 : end.second());
+    uint64_t start_number = start.number() * 100 + start.second();
+    uint64_t end_number = end.number() * 100 + (end.isNull() ? 0 : end.second());
     hsize_t startpos = 0, endpos = 0;
     try {
         string tablename(market + code);
@@ -1397,7 +1398,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
 
         TransRecord record;
         result.reserve(total + 2);
-        uint64 number = 0, second = 0;
+        uint64_t number = 0, second = 0;
         for (hsize_t i = 0; i < total; i++) {
             number = pBuf[i].datetime / 100;
             second = pBuf[i].datetime - number * 100;

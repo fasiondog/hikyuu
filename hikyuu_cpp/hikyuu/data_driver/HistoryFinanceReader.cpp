@@ -44,7 +44,7 @@ PriceList HistoryFinanceReader ::getHistoryFinanceInfo(Datetime date, const stri
     memcpy(&report_size, header_buf + 12, 4);
 
     char stock_code[7];
-    uint32 address = 0;
+    uint32_t address = 0;
     for (int i = 0; i < max_count; i++) {
         if (!fread(stock_code, 1, 7, fp)) {
             HKU_ERROR("read stock_code failed! {}", filename);

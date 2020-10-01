@@ -122,7 +122,7 @@ bool SQLiteBaseInfoDriver::_loadStock() {
         return false;
     }
 
-    unordered_map<uint64, string> marketDict;
+    unordered_map<uint64_t, string> marketDict;
     for (auto& m : marketTable) {
         marketDict[m.id()] = m.market();
     }
@@ -175,7 +175,7 @@ bool SQLiteBaseInfoDriver::_loadStock() {
     return true;
 }
 
-StockWeightList SQLiteBaseInfoDriver::_getStockWeightList(uint64 stockid) {
+StockWeightList SQLiteBaseInfoDriver::_getStockWeightList(uint64_t stockid) {
     StockWeightList result;
     if (!m_pool) {
         HKU_ERROR("Connect pool ptr is null!");

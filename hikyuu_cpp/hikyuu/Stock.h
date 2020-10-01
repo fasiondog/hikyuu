@@ -34,7 +34,7 @@ private:
     static const string default_code;
     static const string default_market_code;
     static const string default_name;
-    static const uint32 default_type;
+    static const uint32_t default_type;
     static const bool default_valid;
     static const Datetime default_startDate;
     static const Datetime default_lastDate;
@@ -51,18 +51,18 @@ public:
     Stock(const Stock&);
     Stock(const string& market, const string& code, const string& name);
 
-    Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
+    Stock(const string& market, const string& code, const string& name, uint32_t type, bool valid,
           const Datetime& startDate, const Datetime& lastDate);
-    Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue, int precision,
-          size_t minTradeNumber, size_t maxTradeNumber);
+    Stock(const string& market, const string& code, const string& name, uint32_t type, bool valid,
+          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
+          int precision, size_t minTradeNumber, size_t maxTradeNumber);
     virtual ~Stock();
     Stock& operator=(const Stock&);
     bool operator==(const Stock&) const;
     bool operator!=(const Stock&) const;
 
     /** 获取内部id，一般用于作为map的键值使用，该id实质为m_data的内存地址 */
-    uint64 id() const;
+    uint64_t id() const;
 
     /** 获取所属市场简称，市场简称是市场的唯一标识 */
     const string& market() const;
@@ -77,7 +77,7 @@ public:
     const string& name() const;
 
     /** 获取证券类型 */
-    uint32 type() const;
+    uint32_t type() const;
 
     /** 该证券当前是否有效 */
     bool valid() const;
@@ -215,7 +215,7 @@ struct HKU_API Stock::Data {
     string m_code;         //证券代码
     string m_market_code;  //市场简称证券代码
     string m_name;         //证券名称
-    uint32 m_type;         //证券类型
+    uint32_t m_type;       //证券类型
     bool m_valid;          //当前证券是否有效
     Datetime m_startDate;  //证券起始日期
     Datetime m_lastDate;   //证券最后日期
@@ -233,9 +233,9 @@ struct HKU_API Stock::Data {
     map<string, KRecordListPtr> pKData;
 
     Data();
-    Data(const string& market, const string& code, const string& name, uint32 type, bool valid,
-         const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue, int precision,
-         size_t minTradeNumber, size_t maxTradeNumber);
+    Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,
+         const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
+         int precision, size_t minTradeNumber, size_t maxTradeNumber);
 
     virtual ~Data();
 };
@@ -264,8 +264,8 @@ inline bool operator<(const Stock& s1, const Stock& s2) {
     return s1.id() < s2.id();
 }
 
-inline uint64 Stock::id() const {
-    return isNull() ? 0 : (int64)m_data.get();
+inline uint64_t Stock::id() const {
+    return isNull() ? 0 : (int64_t)m_data.get();
 }
 
 inline StockWeightList Stock::getWeight() const {

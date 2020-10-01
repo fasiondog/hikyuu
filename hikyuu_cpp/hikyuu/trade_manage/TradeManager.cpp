@@ -1438,12 +1438,12 @@ FundsRecord TradeManager ::getFunds(const Datetime& indatetime, KQuery::KType kt
     price_t checkout_cash = 0.0;
     price_t checkin_stock = 0.0;
     price_t checkout_stock = 0.0;
-    map<uint64, Stock_Number> stock_map;
-    map<uint64, Stock_Number> short_stock_map;
-    map<uint64, Stock_Number>::iterator stock_iter;
-    map<uint64, Stock_Number>::iterator short_stock_iter;
-    map<uint64, BorrowRecord> bor_stock_map;
-    map<uint64, BorrowRecord>::iterator bor_stock_iter;
+    map<uint64_t, Stock_Number> stock_map;
+    map<uint64_t, Stock_Number> short_stock_map;
+    map<uint64_t, Stock_Number>::iterator stock_iter;
+    map<uint64_t, Stock_Number>::iterator short_stock_iter;
+    map<uint64_t, BorrowRecord> bor_stock_map;
+    map<uint64_t, BorrowRecord>::iterator bor_stock_iter;
 
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {

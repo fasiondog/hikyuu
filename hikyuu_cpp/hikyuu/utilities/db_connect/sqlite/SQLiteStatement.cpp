@@ -87,7 +87,7 @@ void SQLiteStatement::sub_bindNull(int idx) {
     HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
 }
 
-void SQLiteStatement::sub_bindInt(int idx, int64 value) {
+void SQLiteStatement::sub_bindInt(int idx, int64_t value) {
     _reset();
     int status = sqlite3_bind_int64(m_stmt, idx + 1, value);
     HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
@@ -111,7 +111,7 @@ void SQLiteStatement::sub_bindBlob(int idx, const string& item) {
     HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
 }
 
-void SQLiteStatement::sub_getColumnAsInt64(int idx, int64& item) {
+void SQLiteStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     item = sqlite3_column_int64(m_stmt, idx);
 }
 

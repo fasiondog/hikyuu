@@ -802,7 +802,7 @@ void IndicatorImp::execute_mod() {
                 if (m_right->get(i - diff, r) == 0.0) {
                     _set(Null<price_t>(), i, r);
                 } else {
-                    _set(int64(m_left->get(i, r)) % int64(m_right->get(i - diff, r)), i, r);
+                    _set(int64_t(m_left->get(i, r)) % int64_t(m_right->get(i - diff, r)), i, r);
                 }
             }
         }
@@ -812,7 +812,7 @@ void IndicatorImp::execute_mod() {
                 if (m_right->get(i, r) == 0.0) {
                     _set(Null<price_t>(), i, r);
                 } else {
-                    _set(int64(m_left->get(i - diff, r)) % int64(m_right->get(i, r)), i, r);
+                    _set(int64_t(m_left->get(i - diff, r)) % int64_t(m_right->get(i, r)), i, r);
                 }
             }
         }

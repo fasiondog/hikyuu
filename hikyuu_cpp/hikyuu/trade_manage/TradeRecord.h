@@ -87,7 +87,7 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         namespace bs = boost::serialization;
         ar& BOOST_SERIALIZATION_NVP(stock);
-        hku::uint64 date_number = datetime.number();
+        hku::uint64_t date_number = datetime.number();
         ar& bs::make_nvp("datetime", date_number);
         string business_name = getBusinessName(business);
         ar& bs::make_nvp<string>("business", business_name);
@@ -106,7 +106,7 @@ private:
     void load(Archive& ar, const unsigned int version) {
         namespace bs = boost::serialization;
         ar& BOOST_SERIALIZATION_NVP(stock);
-        hku::uint64 date_number;
+        hku::uint64_t date_number;
         ar& bs::make_nvp("datetime", date_number);
         datetime = Datetime(date_number);
         string business_name;

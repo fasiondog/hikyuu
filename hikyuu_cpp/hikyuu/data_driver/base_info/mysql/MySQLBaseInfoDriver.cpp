@@ -108,7 +108,7 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
     return true;
 }
 
-StockWeightList MySQLBaseInfoDriver::_getStockWeightList(uint64 stockid) {
+StockWeightList MySQLBaseInfoDriver::_getStockWeightList(uint64_t stockid) {
     StockWeightList result;
     if (!m_pool) {
         HKU_ERROR("Connect pool ptr is null!");
@@ -166,7 +166,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
         return false;
     }
 
-    unordered_map<uint64, string> marketDict;
+    unordered_map<uint64_t, string> marketDict;
     for (auto &m : marketTable) {
         marketDict[m.id()] = m.market();
     }

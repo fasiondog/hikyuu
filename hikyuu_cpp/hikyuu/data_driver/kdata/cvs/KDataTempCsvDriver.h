@@ -70,10 +70,22 @@ public:
     virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
                                KQuery::KType kType) override;
 
+    /**
+     * 获取 K 线数据
+     * @param market 市场简称
+     * @param code   证券代码
+     * @param query  查询条件
+     */
+    virtual KRecordList getKRecordList(const string& market, const string& code,
+                                       KQuery query) override;
+
 private:
     void _get_title_column(const string&);
     void _get_token(const string&);
     string _get_filename();
+
+    KRecordList _getKRecordListByIndex(const string& market, const string& code, size_t start_ix,
+                                       size_t end_ix, KQuery::KType kType);
 
 private:
     string m_day_filename;

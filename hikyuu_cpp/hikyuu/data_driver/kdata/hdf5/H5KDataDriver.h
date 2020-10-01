@@ -70,11 +70,11 @@ private:
     // start,
     //                                Datetime end);
 
-    TimeLineList _getTimeLine(const string& market, const string& code, int64 start, int64 end);
+    TimeLineList _getTimeLine(const string& market, const string& code, int64_t start, int64_t end);
     TimeLineList _getTimeLine(const string& market, const string& code, const Datetime& start,
                               const Datetime& end);
 
-    TransList _getTransList(const string& market, const string& code, int64 start, int64 end);
+    TransList _getTransList(const string& market, const string& code, int64_t start, int64_t end);
     TransList _getTransList(const string& market, const string& code, const Datetime& start,
                             const Datetime& end);
 

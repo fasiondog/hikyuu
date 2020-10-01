@@ -315,7 +315,7 @@ MarketInfo StockManager::getMarketInfo(const string& market) const {
     return Null<MarketInfo>();
 }
 
-StockTypeInfo StockManager::getStockTypeInfo(uint32 type) const {
+StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
     auto iter = m_stockTypeInfo.find(type);
     if (iter != m_stockTypeInfo.end()) {
         return iter->second;

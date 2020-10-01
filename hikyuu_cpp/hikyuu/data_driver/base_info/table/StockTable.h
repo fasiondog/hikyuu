@@ -49,14 +49,14 @@ public:
     }
 
 public:
-    uint64 stockid;
-    uint64 marketid;
+    uint64_t stockid;
+    uint64_t marketid;
     string code;
     string name;
-    uint32 type;
-    uint32 valid;
-    uint64 startDate;
-    uint64 endDate;
+    uint32_t type;
+    uint32_t valid;
+    uint64_t startDate;
+    uint64_t endDate;
 };
 
 }  // namespace hku

@@ -40,20 +40,20 @@ void export_trade_manage_main();
 void export_trade_sys_main();
 
 KData Py_GetKData(const string& market_code, py::object start = py::long_(0),
-                  py::object end = py::long_(Null<int64>()), KQuery::KType ktype = KQuery::DAY,
+                  py::object end = py::long_(Null<int64_t>()), KQuery::KType ktype = KQuery::DAY,
                   KQuery::RecoverType recovertType = KQuery::NO_RECOVER) {
     py::extract<KQuery> query_x(start);
     if (query_x.check()) {
         return getKData(market_code, query_x());
     }
 
-    py::extract<int64> int_x(start);
+    py::extract<int64_t> int_x(start);
     if (int_x.check()) {
-        int64 start_ix = 0, end_ix = 0;
+        int64_t start_ix = 0, end_ix = 0;
         if (end.is_none()) {
-            end_ix = Null<int64>();
+            end_ix = Null<int64_t>();
         } else {
-            py::extract<int64> int_y(end);
+            py::extract<int64_t> int_y(end);
             if (!int_y.check()) {
                 HKU_THROW_EXCEPTION(
                   std::invalid_argument,
@@ -136,7 +136,7 @@ BOOST_PYTHON_MODULE(core) {
     :return: 对应的证券实例，如果实例不存在，则返回空实例，即Stock()，不抛出异常
     :rtype: Stock)");
 
-    int64 null_int = Null<int64>();
+    int64_t null_int = Null<int64_t>();
     py::def(
       "get_kdata", Py_GetKData,
       (py::arg("market_code"), py::arg("start") = py::long_(0), py::arg("end") = py::object(),

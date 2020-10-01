@@ -18,7 +18,7 @@ const string Stock::default_market;
 const string Stock::default_code;
 const string Stock::default_market_code;
 const string Stock::default_name;
-const uint32 Stock::default_type = Null<uint32>();
+const uint32_t Stock::default_type = Null<uint32_t>();
 const bool Stock::default_valid = false;
 const Datetime Stock::default_startDate;  // = Null<Datetime>();
 const Datetime Stock::default_lastDate;   // = Null<Datetime>();
@@ -69,7 +69,7 @@ Stock::Data::Data()
     }*/
 }
 
-Stock::Data::Data(const string& market, const string& code, const string& name, uint32 type,
+Stock::Data::Data(const string& market, const string& code, const string& name, uint32_t type,
                   bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
                   price_t tickValue, int precision, size_t minTradeNumber, size_t maxTradeNumber)
 : m_market(market),
@@ -125,16 +125,16 @@ Stock::Stock(const string& market, const string& code, const string& name) {
                                 default_precision, default_minTradeNumber, default_maxTradeNumber));
 }
 
-Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-             const Datetime& startDate, const Datetime& lastDate) {
+Stock::Stock(const string& market, const string& code, const string& name, uint32_t type,
+             bool valid, const Datetime& startDate, const Datetime& lastDate) {
     m_data = shared_ptr<Data>(new Data(market, code, name, type, valid, startDate, lastDate,
                                        default_tick, default_tickValue, default_precision,
                                        default_minTradeNumber, default_maxTradeNumber));
 }
 
-Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-             const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
-             int precision, size_t minTradeNumber, size_t maxTradeNumber)
+Stock::Stock(const string& market, const string& code, const string& name, uint32_t type,
+             bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
+             price_t tickValue, int precision, size_t minTradeNumber, size_t maxTradeNumber)
 : m_data(make_shared<Data>(market, code, name, type, valid, startDate, lastDate, tick, tickValue,
                            precision, minTradeNumber, maxTradeNumber)) {}
 
@@ -170,7 +170,7 @@ const string& Stock::name() const {
     return m_data ? m_data->m_name : default_name;
 }
 
-uint32 Stock::type() const {
+uint32_t Stock::type() const {
     return m_data ? m_data->m_type : default_type;
 }
 
@@ -269,6 +269,8 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     releaseKDataBuffer(kType);
     m_data->pKData[kType] = make_shared<KRecordList>();
     if (m_kdataDriver) {
+        //*(m_data->pKData[kType]) =
+        //  m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code, KQuery(0));
         m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(),
                                  m_data->pKData[kType]);
     }
@@ -393,7 +395,7 @@ bool Stock::_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t
         return false;
     }
 
-    int64 startix, endix;
+    int64_t startix, endix;
     startix = query.start();
     if (startix < 0) {
         startix += total;

@@ -19,7 +19,7 @@ class MarketInfoTable {
 public:
     MarketInfoTable() : m_marketid(0), m_lastDate(0) {}
 
-    uint64 id() const {
+    uint64_t id() const {
         return m_marketid;
     }
 
@@ -39,7 +39,7 @@ public:
         return m_code;
     }
 
-    int64 lastDate() const {
+    int64_t lastDate() const {
         return m_lastDate;
     }
 
@@ -72,12 +72,12 @@ public:
     }
 
 private:
-    uint64 m_marketid;
+    uint64_t m_marketid;
     string m_market;
     string m_name;
     string m_description;
     string m_code;
-    int64 m_lastDate;
+    int64_t m_lastDate;
 };
 
 }  // namespace hku

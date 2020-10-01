@@ -22,7 +22,7 @@ namespace serialization {
 
 template <class Archive>
 void save(Archive& ar, const hku::StockTypeInfo& record, unsigned int version) {
-    hku::uint32 type = record.type();
+    hku::uint32_t type = record.type();
     hku::string description = record.description();
     hku::price_t tick = record.tick();
     hku::price_t tickValue = record.tickValue();
@@ -40,7 +40,7 @@ void save(Archive& ar, const hku::StockTypeInfo& record, unsigned int version) {
 
 template <class Archive>
 void load(Archive& ar, hku::StockTypeInfo& record, unsigned int version) {
-    hku::uint32 type;
+    hku::uint32_t type;
     hku::string description;
     hku::price_t tick, tickValue;
     int precision;

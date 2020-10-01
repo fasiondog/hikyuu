@@ -18,11 +18,9 @@
 #endif
 
 #include <boost/config.hpp>
-//#include <boost/shared_ptr.hpp>
-//#include <boost/make_shared.hpp>
-//#include <boost/enable_shared_from_this.hpp>
 
 #include <stdio.h>
+#include <string_view>
 #include <iostream>
 #include <list>
 #include <cmath>
@@ -52,28 +50,28 @@ namespace hku {
  * @{
  */
 
-#if !defined(int64)
-typedef long long int64;
+#if !defined(int64_t)
+typedef long long int64_t;
 #endif
 
-#if !defined(uint64)
-typedef unsigned long long uint64;
+#if !defined(uint64_t)
+typedef unsigned long long uint64_t;
 #endif
 
-#if !defined(int32)
-typedef int int32;
+#if !defined(int32_t)
+typedef int int32_t;
 #endif
 
-#if !defined(uint32)
-typedef unsigned uint32;
+#if !defined(uint32_t)
+typedef unsigned uint32_t;
 #endif
 
-#if !defined(int8)
-typedef char int8;
+#if !defined(int8_t)
+typedef char int8_t;
 #endif
 
-#if !defined(uint8)
-typedef unsigned char uint8;
+#if !defined(uint8_t)
+typedef unsigned char uint8_t;
 #endif
 
 #ifndef MAX_DOUBLE
