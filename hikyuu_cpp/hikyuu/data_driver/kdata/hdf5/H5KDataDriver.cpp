@@ -829,6 +829,8 @@ KRecordList H5KDataDriver::getKRecordList(const string& market, const string& co
         } else {
             result = _getIndexKRecordList(market, code, kType, query.start(), query.end());
         }
+    } else {
+        HKU_INFO("Query by date are not supported!");
     }
 
     return result;

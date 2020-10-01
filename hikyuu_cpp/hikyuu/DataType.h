@@ -20,6 +20,7 @@
 #include <boost/config.hpp>
 
 #include <stdio.h>
+#include <cstdint>
 #include <string_view>
 #include <iostream>
 #include <list>

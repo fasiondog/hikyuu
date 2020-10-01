@@ -44,8 +44,13 @@ public:
     virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
                                KQuery::KType kType) override;
 
+    virtual KRecordList getKRecordList(const string& market, const string& code,
+                                       KQuery query) override;
+
 private:
     string _getTableName(const string& market, const string& code, KQuery::KType ktype);
+    KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType kType,
+                               size_t start_ix, size_t end_ix);
 
 private:
     ConnectPool<MySQLConnect>* m_pool;

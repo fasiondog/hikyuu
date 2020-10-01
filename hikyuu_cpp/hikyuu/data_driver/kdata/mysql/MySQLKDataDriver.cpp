@@ -82,6 +82,61 @@ void MySQLKDataDriver::loadKData(const string& market, const string& code, KQuer
     }
 }
 
+KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string& code,
+                                             KQuery query) {
+    KRecordList result;
+    if (query.queryType() == KQuery::INDEX) {
+        result = _getKRecordList(market, code, query.kType(), query.start(), query.end());
+    } else {
+        HKU_INFO("Query by date are not supported!");
+    }
+    return result;
+}
+
+KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string& code,
+                                              KQuery::KType kType, size_t start_ix, size_t end_ix) {
+    KRecordList result;
+    if (!m_pool) {
+        HKU_ERROR("The connection pool is not initialized.");
+        return result;
+    };
+
+    if (start_ix >= end_ix) {
+        HKU_ERROR("start_ix({}) >= endix({})", start_ix, end_ix);
+        return result;
+    }
+
+    auto con = m_pool->getConnect();
+    if (!con) {
+        HKU_ERROR("The acquisition connection failed.");
+        return result;
+    };
+
+    KRecordTable r(market, code, kType);
+    SQLStatementPtr st = con->getStatement(
+      fmt::format("{} order by date limit {}, {}", r.getSelectSQL(), start_ix, end_ix - start_ix));
+
+    st->exec();
+    while (st->moveNext()) {
+        KRecordTable record;
+        try {
+            record.load(st);
+            KRecord k;
+            k.datetime = record.date();
+            k.openPrice = record.open();
+            k.highPrice = record.high();
+            k.lowPrice = record.low();
+            k.closePrice = record.close();
+            k.transAmount = record.amount();
+            k.transCount = record.count();
+            result.push_back(k);
+        } catch (...) {
+            HKU_ERROR("Failed get record: {}", record.str());
+        }
+    }
+    return result;
+}
+
 size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     size_t result = 0;
     if (!m_pool) {

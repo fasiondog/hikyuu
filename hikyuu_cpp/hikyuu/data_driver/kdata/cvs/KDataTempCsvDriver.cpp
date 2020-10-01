@@ -222,11 +222,16 @@ bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string&
 KRecordList KDataTempCsvDriver::getKRecordList(const string& market, const string& code,
                                                KQuery query) {
     KRecordList result;
+    if (query.queryType() == KQuery::INDEX) {
+        result = _getKRecordListByIndex(market, code, query.start(), query.end(), query.kType());
+    } else {
+        HKU_INFO("Query by date are not supported!");
+    }
     return result;
 }
 
 KRecordList KDataTempCsvDriver::_getKRecordListByIndex(const string& market, const string& code,
-                                                       size_t start_ix, size_t end_ix,
+                                                       int64_t start_ix, int64_t end_ix,
                                                        KQuery::KType kType) {
     KRecordList result;
 
@@ -254,7 +259,7 @@ KRecordList KDataTempCsvDriver::_getKRecordListByIndex(const string& market, con
 
     _get_title_column(line);
 
-    size_t line_no = 0;
+    int64_t line_no = 0;
     while (std::getline(infile, line)) {
         if (line_no++ < start_ix)
             continue;

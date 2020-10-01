@@ -84,8 +84,8 @@ private:
     void _get_token(const string&);
     string _get_filename();
 
-    KRecordList _getKRecordListByIndex(const string& market, const string& code, size_t start_ix,
-                                       size_t end_ix, KQuery::KType kType);
+    KRecordList _getKRecordListByIndex(const string& market, const string& code, int64_t start_ix,
+                                       int64_t end_ix, KQuery::KType kType);
 
 private:
     string m_day_filename;
