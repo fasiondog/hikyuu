@@ -147,6 +147,12 @@ public:
     /** 获取K线记录，一般不直接使用，用getKData替代 */
     KRecordList getKRecordList(size_t start, size_t end, KQuery::KType) const;
 
+    /**
+     * 根据查询条件获取 KRecordList，不支持复权，不建议在客户端使用
+     * @param query 查询条件
+     */
+    KRecordList getKRecordList(const KQuery& query) const;
+
     /** 获取日期列表 */
     DatetimeList getDatetimeList(size_t start, size_t end, KQuery::KType) const;
 

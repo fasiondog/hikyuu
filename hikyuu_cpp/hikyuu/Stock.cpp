@@ -537,30 +537,54 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
             return result;
         }
 
-        /*size_t end = end_ix > total ? total : end_ix;
-        result.reserve(end - start_ix);
-        for (size_t i = start_ix; i < end; ++i) {
-            result.push_back((*m_data->pKData[ktype])[i]);
-        }*/
         size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
         result.resize(length);
         std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
                     sizeof(KRecord) * length);
-        return result;
+
+    } else if (m_kdataDriver) {
+        int64_t end = end_ix >= (size_t)Null<int64_t>() ? Null<int64_t>() : end_ix;
+        result = m_kdataDriver->getKRecordList(
+          m_data->m_market, m_data->m_code,
+          KQuery(start_ix, (end_ix == Null<size_t>() ? Null<int64_t>() : end_ix), ktype));
     }
 
-    if (!m_kdataDriver) {
-        return result;
-    }
-
-    int64_t end = end_ix >= (size_t)Null<int64_t>() ? Null<int64_t>() : end_ix;
-    result = m_kdataDriver->getKRecordList(
-      m_data->m_market, m_data->m_code,
-      KQuery(start_ix, (end_ix == Null<size_t>() ? Null<int64_t>() : end_ix), ktype));
     return result;
 }
 
-DatetimeList Stock ::getDatetimeList(size_t start, size_t end, KQuery::KType ktype) const {
+KRecordList Stock::getKRecordList(const KQuery& query) const {
+    KRecordList result;
+    if (m_data->pKData.find(query.kType()) != m_data->pKData.end()) {
+        size_t start_ix = 0, end_ix = 0;
+        if (query.queryType() == KQuery::DATE) {
+            if (!_getIndexRangeByDateFromBuffer(query, start_ix, end_ix)) {
+                return result;
+            }
+        } else {
+            start_ix = query.start();
+            end_ix = query.end();
+        }
+
+        size_t total = m_data->pKData[ktype]->size();
+        if (start_ix >= end_ix || start_ix > total) {
+            return result;
+        }
+
+        size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
+        result.resize(length);
+        std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
+                    sizeof(KRecord) * length);
+
+    } else {
+        if (m_kdataDriver) {
+            result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code, query);
+        }
+    }
+
+    return result;
+}
+
+DatetimeList Stock::getDatetimeList(size_t start, size_t end, KQuery::KType ktype) const {
     DatetimeList result;
     KRecordList kdata = getKRecordList(start, end, ktype);
     size_t total = kdata.size();
