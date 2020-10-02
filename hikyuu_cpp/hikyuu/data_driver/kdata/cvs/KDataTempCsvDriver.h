@@ -77,7 +77,7 @@ public:
      * @param query  查询条件
      */
     virtual KRecordList getKRecordList(const string& market, const string& code,
-                                       KQuery query) override;
+                                       const KQuery& query) override;
 
 private:
     void _get_title_column(const string&);

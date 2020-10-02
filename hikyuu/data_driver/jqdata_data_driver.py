@@ -33,7 +33,7 @@
 #####################################################################
 
 from ..cpp.core import KDataDriver, DataDriverFactory
-from hikyuu import KRecord, Query, Datetime, Parameter
+from hikyuu import KRecord, Query, Datetime, Parameter, KRecordList
 
 from jqdatasdk import *
 from datetime import *
@@ -60,7 +60,10 @@ class jqdataKDataDriver(KDataDriver):
         }
         return
 
-    def loadKData(self, market, code, ktype, start_ix, end_ix, out_buffer):
+    def isIndexFirst(self):
+        return False
+
+    def loadKData(self, market, code, query):  # ktype, start_ix, end_ix, out_buffer):
         """
         【重载接口】（必须）按指定的位置[start_ix, end_ix)读取K线数据至out_buffer
         
@@ -72,14 +75,17 @@ class jqdataKDataDriver(KDataDriver):
         :param KRecordListPtr out_buffer: 传入的数据缓存，读取数据后使用 
                                            out_buffer.append(krecord) 加入数据        
         """
+        start_ix = query.start
+        end_ix = query.end
         if start_ix >= end_ix or start_ix < 0 or end_ix < 0:
-            return
+            return KRecordList()
 
-        data = self._get_bars(market, code, ktype)
+        data = self._get_bars(market, code, query.ktype)
 
         if len(data) < start_ix:
-            return
+            return KRecordList()
 
+        result = KRecordList()
         total = end_ix if end_ix < len(data) else len(data)
         for i in range(start_ix, total):
             record = KRecord()
@@ -90,7 +96,8 @@ class jqdataKDataDriver(KDataDriver):
             record.close = data['close'][i]
             record.amount = data['money'][i]
             record.volume = data['volume'][i]
-            out_buffer.append(record)
+            result.append(record)
+        return result
 
     def getCount(self, market, code, ktype):
         """

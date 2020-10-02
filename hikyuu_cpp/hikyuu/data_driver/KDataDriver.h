@@ -102,7 +102,8 @@ public:
      * @param code   证券代码
      * @param query  查询条件
      */
-    virtual KRecordList getKRecordList(const string& market, const string& code, KQuery query);
+    virtual KRecordList getKRecordList(const string& market, const string& code,
+                                       const KQuery& query);
 
     /**
      * 获取分时线

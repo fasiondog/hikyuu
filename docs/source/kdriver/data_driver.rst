@@ -18,7 +18,8 @@ K线数据驱动基类
     自定义K线数据驱动接口：
 
     * :py:meth:`KDataDriver._init` - 【可选】初始化子类私有变量
-    * :py:meth:`KDataDriver.loadKData` - 【必须】初始化子类私有变量
+    * :py:meth:`KDataDriver.isIndexFirst` - 【必须】指示该引擎是按位置索引查询方式更快还是按日期
+    * :py:meth:`KDataDriver.getKRecordList` - 【必须】初始化子类私有变量
     * :py:meth:`KDataDriver.getCount` - 【必须】初始化子类私有变量
     * :py:meth:`KDataDriver.getKRecord` - 【必须】初始化子类私有变量
     * :py:meth:`KDataDriver._getIndexRangeByDate` - 【必须】初始化子类私有变量
@@ -37,16 +38,18 @@ K线数据驱动基类
     
         【重载接口】（可选）初始化子类私有变量
         
-    .. py:method:: loadKData(self, market, code, ktype, start_ix, end_ix, out_buffer)
+    .. py:method:: isIndexFirst(self)
+
+        【重载接口】（必须）指示该引擎是按位置索引查询方式更快还是按日期
+
+    .. py:method:: getKRecordList(self, market, code, query)
     
         【重载接口】（必须）按指定的位置[start_ix, end_ix)读取K线数据至out_buffer
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param Query.KType ktype: K线类型
-        :param int start_ix: 起始位置
-        :param int end_ix: 结束位置
-        :param KRecordListPtr out_buffer: 传入的数据缓存，读取数据后使用 out_buffer.append(krecord) 加入数据
+        :param Query query: 查询条件
+        :rtype: getKRecordList
         
     .. py:method:: getCount(self, market, code, ktype)
     

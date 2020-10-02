@@ -83,7 +83,7 @@ void MySQLKDataDriver::loadKData(const string& market, const string& code, KQuer
 }
 
 KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string& code,
-                                             KQuery query) {
+                                             const KQuery& query) {
     KRecordList result;
     if (query.queryType() == KQuery::INDEX) {
         result = _getKRecordList(market, code, query.kType(), query.start(), query.end());

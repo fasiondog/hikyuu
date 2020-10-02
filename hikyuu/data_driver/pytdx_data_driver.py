@@ -35,7 +35,7 @@
 #####################################################################
 
 from ..cpp.core import KDataDriver, DataDriverFactory
-from hikyuu import KRecord, Query, Datetime, Parameter
+from hikyuu import KRecord, Query, Datetime, Parameter, KRecordList
 
 from pytdx.hq import TdxHq_API
 from pytdx.params import TDXParams
@@ -62,27 +62,30 @@ class PytdxKDataDriver(KDataDriver):
         }
         return
 
-    def loadKData(self, market, code, ktype, start_ix, end_ix, out_buffer):
+    def isIndexFirst(self):
+        return True
+
+    def getKRecordList(self, market, code, query):
         """
         【重载接口】（必须）按指定的位置[start_ix, end_ix)读取K线数据至out_buffer
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param Query.KType ktype: K线类型
-        :param int start_ix: 起始位置
-        :param int end_ix: 结束位置
-        :param KRecordListPtr out_buffer: 传入的数据缓存，读取数据后使用 
-                                           out_buffer.append(krecord) 加入数据        
+        :param Query query: 查询条件
+        :rtype: KRecordList
         """
+        start_ix = query.start
+        end_ix = query.end
         if start_ix >= end_ix or start_ix < 0 or end_ix < 0:
-            return
+            return KRecordList()
 
-        data = self._get_bars(market, code, ktype)
+        data = self._get_bars(market, code, query.ktype)
 
         if len(data) < start_ix:
-            return
+            return KRecordList()
 
         total = end_ix if end_ix < len(data) else len(data)
+        result = KRecordList()
         for i in range(start_ix, total):
             record = KRecord()
             record.datetime = Datetime(data[i].get('datetime'))
@@ -92,7 +95,8 @@ class PytdxKDataDriver(KDataDriver):
             record.close = data[i].get('close')
             record.amount = data[i].get('amount')
             record.volume = data[i].get('vol')
-            out_buffer.append(record)
+            result.append(record)
+        return result
 
     def getCount(self, market, code, ktype):
         """

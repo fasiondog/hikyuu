@@ -33,20 +33,6 @@ public:
         return this->get_override("isIndexFirst")();
     }
 
-    void loadKData(const string& market, const string& code, KQuery::KType ktype, size_t start_ix,
-                   size_t end_ix, KRecordListPtr out_buffer) {
-        if (override call = get_override("loadKData")) {
-            call(market, code, ktype, start_ix, end_ix, out_buffer);
-        } else {
-            KDataDriver::loadKData(market, code, ktype, start_ix, end_ix, out_buffer);
-        }
-    }
-
-    void default_loadKData(const string& market, const string& code, KQuery::KType ktype,
-                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
-        this->KDataDriver::loadKData(market, code, ktype, start_ix, end_ix, out_buffer);
-    }
-
     size_t getCount(const string& market, const string& code, KQuery::KType ktype) {
         if (override call = get_override("getCount")) {
             return call(market, code, ktype);
@@ -180,18 +166,15 @@ void export_KDataDriver() {
 
       .def("_init", &KDataDriver::_init, &KDataDriverWrap::default_init)
       .def("isIndexFirst", pure_virtual(&KDataDriver::isIndexFirst))
-      .def("loadKData", &KDataDriver::loadKData, &KDataDriverWrap::default_loadKData)
       .def("getCount", &KDataDriver::getCount, &KDataDriverWrap::default_getCount)
       //.def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
       //        &KDataDriverWrap::default_getIndexRangeByDate)
       .def("getKRecord", &KDataDriver::getKRecord, &KDataDriverWrap::default_getKRecord)
       .def("_getIndexRangeByDate", &KDataDriverWrap::_getIndexRangeByDate,
            &KDataDriverWrap::default_getIndexRangeByDate)
-      .def("getKRecordList", &KDataDriverWrap::getKRecordList,
-           &KDataDriverWrap::default_getKRecordList)
-      .def("getTimeLine", &KDataDriverWrap::getTimeLineList,
-           &KDataDriverWrap::default_getTimeLineList)
-      .def("getTransList", &KDataDriverWrap::getTransList, &KDataDriverWrap::default_getTransList);
+      .def("getKRecordList", &KDataDriver::getKRecordList, &KDataDriverWrap::default_getKRecordList)
+      .def("getTimeLine", &KDataDriver::getTimeLineList, &KDataDriverWrap::default_getTimeLineList)
+      .def("getTransList", &KDataDriver::getTransList, &KDataDriverWrap::default_getTransList);
 
     register_ptr_to_python<KDataDriverPtr>();
 }

@@ -220,7 +220,7 @@ bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string&
 }
 
 KRecordList KDataTempCsvDriver::getKRecordList(const string& market, const string& code,
-                                               KQuery query) {
+                                               const KQuery& query) {
     KRecordList result;
     if (query.queryType() == KQuery::INDEX) {
         result = _getKRecordListByIndex(market, code, query.start(), query.end(), query.kType());

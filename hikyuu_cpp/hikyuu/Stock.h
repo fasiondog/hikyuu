@@ -230,7 +230,7 @@ struct HKU_API Stock::Data {
     size_t m_maxTradeNumber;
 
     // KRecordListPtr pKData[KQuery::INVALID_KTYPE];
-    map<string, KRecordListPtr> pKData;
+    unordered_map<string, KRecordListPtr> pKData;
 
     Data();
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,

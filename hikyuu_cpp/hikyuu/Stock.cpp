@@ -271,8 +271,6 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     if (m_kdataDriver) {
         *(m_data->pKData[kType]) = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
                                                                  KQuery(0, Null<int64_t>(), kType));
-        // m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(),
-        //                         m_data->pKData[kType]);
     }
     return;
 }
@@ -531,7 +529,7 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
     string ktype(inktype);
     to_upper(ktype);
 
-    // if (m_data->pKData[ktype]) {
+    // 如果在内存缓存中
     if (m_data->pKData.find(ktype) != m_data->pKData.end()) {
         size_t total = m_data->pKData[ktype]->size();
         if (start_ix >= end_ix || start_ix > total) {
@@ -539,11 +537,15 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
             return result;
         }
 
-        size_t end = end_ix > total ? total : end_ix;
+        /*size_t end = end_ix > total ? total : end_ix;
         result.reserve(end - start_ix);
         for (size_t i = start_ix; i < end; ++i) {
             result.push_back((*m_data->pKData[ktype])[i]);
-        }
+        }*/
+        size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
+        result.resize(length);
+        std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
+                    sizeof(KRecord) * length);
         return result;
     }
 
@@ -551,17 +553,10 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
         return result;
     }
 
-    int64_t end = end_ix == Null<size_t>() ? Null<int64_t>() : end_ix;
+    int64_t end = end_ix >= (size_t)Null<int64_t>() ? Null<int64_t>() : end_ix;
     result = m_kdataDriver->getKRecordList(
       m_data->m_market, m_data->m_code,
       KQuery(start_ix, (end_ix == Null<size_t>() ? Null<int64_t>() : end_ix), ktype));
-    /*KRecordListPtr plist(new KRecordList);
-    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, ktype, start_ix, end_ix, plist);
-    size_t total = plist->size();
-    result.reserve(total);
-    for (size_t i = 0; i < total; i++) {
-        result.push_back((*plist)[i]);
-    }*/
     return result;
 }
 
