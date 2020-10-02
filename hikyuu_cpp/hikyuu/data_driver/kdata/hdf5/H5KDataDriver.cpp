@@ -671,6 +671,7 @@ KRecordList H5KDataDriver::getKRecordList(const string& market, const string& co
     KRecordList result;
     auto kType = query.kType();
     if (query.queryType() == KQuery::INDEX) {
+        // 按索引方式查询
         if (query.start() >= query.end()) {
             return result;
         }
@@ -679,8 +680,19 @@ KRecordList H5KDataDriver::getKRecordList(const string& market, const string& co
         } else {
             result = _getIndexKRecordList(market, code, kType, query.start(), query.end());
         }
+
     } else {
-        HKU_INFO("Query by date are not supported!");
+        // 按日期方式查询
+        size_t out_start = 0, out_end = 0;
+        if (KQuery::DAY == kType || KQuery::MIN5 == kType || KQuery::MIN == kType) {
+            if (_getBaseIndexRangeByDate(market, code, query, out_start, out_end)) {
+                result = _getBaseKRecordList(market, code, kType, out_start, out_end);
+            }
+        } else {
+            if (_getOtherIndexRangeByDate(market, code, query, out_start, out_end)) {
+                result = _getIndexKRecordList(market, code, kType, out_start, out_end);
+            }
+        }
     }
 
     return result;

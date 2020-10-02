@@ -77,6 +77,15 @@ typedef char int8_t;
 #if !defined(uint8_t)
 typedef unsigned char uint8_t;
 #endif
+
+#else
+using std::int32_t;
+using std::int64_t;
+using std::int8_t;
+using std::uint32_t;
+using std::uint64_t;
+using std::uint8_t;
+
 #endif /* #if defined(_MSC_VER) || __cplusplus < 201103L */
 
 #ifndef MAX_DOUBLE
