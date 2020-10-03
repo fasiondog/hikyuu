@@ -348,8 +348,12 @@ DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string&
     Stock stock = getStock("SH000001");
     size_t start_ix = 0, end_ix = 0;
     DatetimeList result;
-    if (stock.getIndexRange(query, start_ix, end_ix)) {
-        result = stock.getDatetimeList(start_ix, end_ix, query.kType());
+    if (query.queryType() == KQuery::INDEX) {
+        if (stock.getIndexRange(query, start_ix, end_ix)) {
+            result = stock.getDatetimeList(KQuery(start_ix, end_ix, query.kType()));
+        }
+    } else {
+        result = stock.getDatetimeList(query);
     }
     return result;
 }

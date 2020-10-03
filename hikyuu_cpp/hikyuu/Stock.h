@@ -144,17 +144,16 @@ public:
     /** 获取K线数据 */
     KData getKData(const KQuery&) const;
 
-    /** 获取K线记录，一般不直接使用，用getKData替代 */
-    KRecordList getKRecordList(size_t start, size_t end, KQuery::KType) const;
-
     /**
-     * 根据查询条件获取 KRecordList，不支持复权，不建议在客户端使用
+     * 根据查询条件获取 KRecordList，不建议在客户端直接使用
+     * @note 该方法不支持复权，不支持负数索引
      * @param query 查询条件
+     * @exception 负数索引下将抛出异常 hku::exception
      */
     KRecordList getKRecordList(const KQuery& query) const;
 
     /** 获取日期列表 */
-    DatetimeList getDatetimeList(size_t start, size_t end, KQuery::KType) const;
+    // DatetimeList getDatetimeList(size_t start, size_t end, KQuery::KType) const;
 
     /** 获取日期列表 */
     DatetimeList getDatetimeList(const KQuery& query) const;

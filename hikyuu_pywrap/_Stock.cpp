@@ -19,10 +19,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getIndex_overloads, getIndex, 1, 2)
 StockWeightList (Stock::*getWeight1)() const = &Stock::getWeight;
 StockWeightList (Stock::*getWeight2)(const Datetime&, const Datetime&) const = &Stock::getWeight;
 
-DatetimeList (Stock::*getDatetimeList1)(size_t, size_t,
-                                        KQuery::KType) const = &Stock::getDatetimeList;
-DatetimeList (Stock::*getDatetimeList2)(const KQuery&) const = &Stock::getDatetimeList;
-
 void export_Stock() {
     class_<Stock>("Stock", "证券对象", init<>())
       .def(init<const string&, const string&, const string&>())
@@ -135,22 +131,12 @@ void export_Stock() {
     :return: K线记录列表
     :rtype: KRecordList)")
 
-      .def("get_datetime_list", getDatetimeList1)
-      .def("get_datetime_list", getDatetimeList2, R"(get_datetime_list(self, query)
+      .def("get_datetime_list", &Stock::getDatetimeList, R"(get_datetime_list(self, query)
 
     获取日期列表
 
     :param Query query: 查询条件
-    :rtype: DatetimeList
-
-get_date_list(self, start, end, ktype)
-
-    获取日期列表
-
-    :param int start: 起始位置
-    :param ind end: 结束位置
-    :param Query.KType ktype: K线类型
-    :rtype: DatetimeList )")
+    :rtype: DatetimeList)")
 
       .def("get_finance_info", &Stock::getFinanceInfo, R"(get_finance_info(self)
 

@@ -22,7 +22,7 @@ KDataBufferImp::KDataBufferImp(const Stock& stock, const KQuery& query) : KDataI
         return;
     }
 
-    m_buffer = m_stock.getKRecordList(startPos(), endPos(), query.kType());
+    m_buffer = m_stock.getKRecordList(KQuery(startPos(), endPos(), query.kType()));
 
     //不支持复权时，直接返回
     if (query.recoverType() == KQuery::NO_RECOVER)

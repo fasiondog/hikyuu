@@ -521,7 +521,7 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType inkType) const {
     return m_kdataDriver ? m_kdataDriver->getKRecord(market(), code(), pos, kType) : KRecord();
 }
 
-KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType inktype) const {
+/*KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType inktype) const {
     KRecordList result;
     if (!m_data)
         return result;
@@ -550,10 +550,12 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
     }
 
     return result;
-}
+}*/
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {
     KRecordList result;
+
+    // 如果是在内存缓存中
     if (m_data->pKData.find(query.kType()) != m_data->pKData.end()) {
         size_t start_ix = 0, end_ix = 0;
         if (query.queryType() == KQuery::DATE) {
@@ -561,18 +563,25 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
                 return result;
             }
         } else {
-            start_ix = query.start();
-            end_ix = query.end();
+            if (query.start() < 0 || query.end() < 0) {
+                if (!getIndexRange(query, start_ix, end_ix)) {
+                    return result;
+                }
+            } else {
+                start_ix = query.start();
+                end_ix = query.end();
+            }
         }
 
-        size_t total = m_data->pKData[ktype]->size();
+        size_t total = m_data->pKData[query.kType()]->size();
         if (start_ix >= end_ix || start_ix > total) {
+            HKU_WARN("Invalid param! ({}, {})", start_ix, end_ix);
             return result;
         }
 
         size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
         result.resize(length);
-        std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
+        std::memcpy(&(result.front()), &((*m_data->pKData[query.kType()])[start_ix]),
                     sizeof(KRecord) * length);
 
     } else {
@@ -584,9 +593,9 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
     return result;
 }
 
-DatetimeList Stock::getDatetimeList(size_t start, size_t end, KQuery::KType ktype) const {
+/*DatetimeList Stock::getDatetimeList(size_t start, size_t end, KQuery::KType ktype) const {
     DatetimeList result;
-    KRecordList kdata = getKRecordList(start, end, ktype);
+    KRecordList kdata = getKRecordList(KQuery(start, end, ktype));
     size_t total = kdata.size();
     if (0 == total) {
         return result;
@@ -597,13 +606,14 @@ DatetimeList Stock::getDatetimeList(size_t start, size_t end, KQuery::KType ktyp
         result.push_back(kdata[i].datetime);
     }
     return result;
-}
+}*/
 
 DatetimeList Stock::getDatetimeList(const KQuery& query) const {
     DatetimeList result;
-    size_t start = 0, end = 0;
-    if (getIndexRange(query, start, end)) {
-        result = getDatetimeList(start, end, query.kType());
+    KRecordList k_list = getKRecordList(query);
+    result.reserve(k_list.size());
+    for (auto& k : k_list) {
+        result.push_back(k.datetime);
     }
     return result;
 }

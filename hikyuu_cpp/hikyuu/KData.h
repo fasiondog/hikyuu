@@ -152,10 +152,12 @@ inline KData& KData::operator=(const KData& x) {
 }
 
 inline DatetimeList KData::getDatetimeList() const {
+    DatetimeList result;
     if (empty()) {
-        return DatetimeList();
+        return result;
     }
-    return getStock().getDatetimeList(startPos(), lastPos() + 1, getQuery().kType());
+    result = getStock().getDatetimeList(KQuery(startPos(), lastPos() + 1, getQuery().kType()));
+    return result;
 }
 
 inline KRecord KData::getKRecord(size_t pos) const {
