@@ -29,9 +29,10 @@ const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
 KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverType)
-: m_start(start == Null<Datetime>() ? (int64)start.number()
-                                    : (int64)(start.number() * 100 + start.second())),
-  m_end(end == Null<Datetime>() ? (int64)end.number() : (int64)(end.number() * 100 + end.second())),
+: m_start(start == Null<Datetime>() ? (int64_t)start.number()
+                                    : (int64_t)(start.number() * 100 + start.second())),
+  m_end(end == Null<Datetime>() ? (int64_t)end.number()
+                                : (int64_t)(end.number() * 100 + end.second())),
   m_queryType(KQuery::DATE),
   m_dataType(ktype),
   m_recoverType(recoverType) {
@@ -39,21 +40,21 @@ KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverTyp
 }
 
 Datetime KQuery::startDatetime() const {
-    if (m_queryType != DATE || (uint64)m_start == Null<uint64>()) {
+    if (m_queryType != DATE || (uint64_t)m_start == Null<uint64_t>()) {
         return Null<Datetime>();
     }
 
-    uint64 number = (uint64)(m_start / 100);
+    uint64_t number = (uint64_t)(m_start / 100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_start - number * 100);
 }
 
 Datetime KQuery::endDatetime() const {
-    if (m_queryType != DATE || (uint64)m_end == Null<uint64>()) {
+    if (m_queryType != DATE || (uint64_t)m_end == Null<uint64_t>()) {
         return Null<Datetime>();
     }
 
-    uint64 number = (uint64)(m_end / 100);
+    uint64_t number = (uint64_t)(m_end / 100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_end - number * 100);
 }

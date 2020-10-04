@@ -32,7 +32,7 @@ public:
     virtual bool _loadStock() override;
 
 private:
-    StockWeightList _getStockWeightList(uint64);
+    StockWeightList _getStockWeightList(uint64_t);
 
 private:
     ConnectPool<MySQLConnect> *m_pool;

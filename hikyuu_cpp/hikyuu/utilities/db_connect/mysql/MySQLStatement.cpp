@@ -101,15 +101,15 @@ void MySQLStatement::_bindResult() {
         m_result_bind[idx].length = &m_result_length[idx];
 
         if (field->type == MYSQL_TYPE_LONGLONG) {
-            int64 item = 0;
+            int64_t item = 0;
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
-            m_result_bind[idx].buffer = boost::any_cast<int64>(&buf);
+            m_result_bind[idx].buffer = boost::any_cast<int64_t>(&buf);
         } else if (field->type == MYSQL_TYPE_LONG) {
-            int32 item = 0;
+            int32_t item = 0;
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
-            m_result_bind[idx].buffer = boost::any_cast<int32>(&buf);
+            m_result_bind[idx].buffer = boost::any_cast<int32_t>(&buf);
         } else if (field->type == MYSQL_TYPE_DOUBLE) {
             double item = 0;
             m_result_buffer.push_back(item);
@@ -129,10 +129,10 @@ void MySQLStatement::_bindResult() {
             vector<char>* p = boost::any_cast<vector<char>>(&buf);
             m_result_bind[idx].buffer = p->data();
         } else if (field->type == MYSQL_TYPE_TINY) {
-            int8 item = 0;
+            int8_t item = 0;
             m_result_buffer.push_back(item);
             auto& buf = m_result_buffer.back();
-            m_result_bind[idx].buffer = boost::any_cast<int8>(&buf);
+            m_result_bind[idx].buffer = boost::any_cast<int8_t>(&buf);
         } else if (field->type == MYSQL_TYPE_SHORT) {
             short item = 0;
             m_result_buffer.push_back(item);
@@ -173,13 +173,13 @@ void MySQLStatement::sub_bindNull(int idx) {
     m_param_bind[idx].buffer_type = MYSQL_TYPE_NULL;
 }
 
-void MySQLStatement::sub_bindInt(int idx, int64 value) {
+void MySQLStatement::sub_bindInt(int idx, int64_t value) {
     HKU_CHECK(idx < m_param_bind.size(), "idx out of range! idx: {}, total: {}", idx,
               m_param_bind.size());
     m_param_buffer.push_back(value);
     auto& buf = m_param_buffer.back();
     m_param_bind[idx].buffer_type = MYSQL_TYPE_LONGLONG;
-    m_param_bind[idx].buffer = boost::any_cast<int64>(&buf);
+    m_param_bind[idx].buffer = boost::any_cast<int64_t>(&buf);
 }
 
 void MySQLStatement::sub_bindDouble(int idx, double item) {
@@ -219,11 +219,11 @@ int MySQLStatement::sub_getNumColumns() const {
     return mysql_stmt_field_count(m_stmt);
 }
 
-void MySQLStatement::sub_getColumnAsInt64(int idx, int64& item) {
+void MySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     HKU_CHECK(idx < m_result_buffer.size(), "idx out of range! idx: {}, total: {}",
               m_result_buffer.size());
 
-    HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsInt64! idx: {}", idx);
+    HKU_CHECK(m_result_error[idx] == 0, "Error occurred in sub_getColumnAsint64_t! idx: {}", idx);
 
     if (m_result_is_null[idx]) {
         item = 0;
@@ -231,10 +231,10 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64& item) {
     }
 
     try {
-        item = boost::any_cast<int64>(m_result_buffer[idx]);
+        item = boost::any_cast<int64_t>(m_result_buffer[idx]);
     } catch (...) {
         try {
-            item = boost::any_cast<int32>(m_result_buffer[idx]);
+            item = boost::any_cast<int32_t>(m_result_buffer[idx]);
         } catch (...) {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }

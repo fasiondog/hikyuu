@@ -535,12 +535,12 @@ private:
 
     list<LoanRecord> m_loan_list;  //当前融资情况
 
-    typedef map<uint64, BorrowRecord> borrow_stock_map_type;
+    typedef map<uint64_t, BorrowRecord> borrow_stock_map_type;
     borrow_stock_map_type m_borrow_stock;  //当前借入的股票及其数量
 
     TradeRecordList m_trade_list;  //交易记录
 
-    typedef map<uint64, PositionRecord> position_map_type;
+    typedef map<uint64_t, PositionRecord> position_map_type;
     position_map_type m_position;  //当前持仓交易对象的持仓记录 ["sh000001"-> ]
     PositionRecordList m_position_history;        //持仓历史记录
     position_map_type m_short_position;           //空头仓位记录

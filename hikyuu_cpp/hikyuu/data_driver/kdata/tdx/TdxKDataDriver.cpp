@@ -13,21 +13,21 @@
 namespace hku {
 
 struct TdxDayData {
-    uint32 date;
-    uint32 open;
-    uint32 high;
-    uint32 low;
-    uint32 close;
+    uint32_t date;
+    uint32_t open;
+    uint32_t high;
+    uint32_t low;
+    uint32_t close;
     float amount;
-    uint32 vol;
-    uint32 other;
+    uint32_t vol;
+    uint32_t other;
 
     Datetime getDatetime() {
-        return Datetime(uint64(date) * 10000);
+        return Datetime(uint64_t(date) * 10000);
     }
 
     void toKRecord(KRecord& record) {
-        record.datetime = Datetime(uint64(date) * 10000);
+        record.datetime = Datetime(uint64_t(date) * 10000);
         record.openPrice = price_t(open) * 0.01;
         record.highPrice = price_t(high) * 0.01;
         record.lowPrice = price_t(low) * 0.01;
@@ -46,8 +46,8 @@ struct TdxMinData {
     float low;
     float close;
     float amount;
-    uint32 vol;
-    uint32 other;
+    uint32_t vol;
+    uint32_t other;
 
     Datetime getDatetime() {
         int tmp_date = date >> 11;

@@ -18,31 +18,31 @@ namespace hku {
 typedef shared_ptr<H5::H5File> H5FilePtr;
 
 struct H5Record {
-    uint64 datetime;
-    uint32 openPrice;
-    uint32 highPrice;
-    uint32 lowPrice;
-    uint32 closePrice;
-    uint64 transAmount;
-    uint64 transCount;
+    uint64_t datetime;
+    uint32_t openPrice;
+    uint32_t highPrice;
+    uint32_t lowPrice;
+    uint32_t closePrice;
+    uint64_t transAmount;
+    uint64_t transCount;
 };
 
 struct H5IndexRecord {
-    uint64 datetime;
-    uint64 start;
+    uint64_t datetime;
+    uint64_t start;
 };
 
 struct H5TimeLineRecord {
-    uint64 datetime;
-    uint64 price;
-    uint64 vol;
+    uint64_t datetime;
+    uint64_t price;
+    uint64_t vol;
 };
 
 struct H5TransRecord {
-    uint64 datetime;
-    uint64 price;
-    uint64 vol;
-    uint8 buyorsell;
+    uint64_t datetime;
+    uint64_t price;
+    uint64_t vol;
+    uint8_t buyorsell;
 };
 
 }  // namespace hku

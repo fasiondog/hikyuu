@@ -65,7 +65,7 @@ KDataBufferImp::KDataBufferImp(const Stock& stock, const KQuery& query) : KDataI
 
 KDataBufferImp::~KDataBufferImp() {}
 
-size_t KDataBufferImp::getPos(const Datetime& datetime) const {
+size_t KDataBufferImp::getPos(const Datetime& datetime) {
     KRecordList::const_iterator iter;
     KRecord comp_record;
     comp_record.datetime = datetime;

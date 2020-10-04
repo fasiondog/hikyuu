@@ -10,8 +10,8 @@
 #include <boost/lexical_cast.hpp>
 #include "KDataTempCsvDriver.h"
 
-#include "../utilities/util.h"
-#include "../Log.h"
+#include "../../../utilities/util.h"
+#include "../../../Log.h"
 
 namespace hku {
 
@@ -217,6 +217,102 @@ bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string&
     }
 
     return true;
+}
+
+KRecordList KDataTempCsvDriver::getKRecordList(const string& market, const string& code,
+                                               const KQuery& query) {
+    KRecordList result;
+    if (query.queryType() == KQuery::INDEX) {
+        result = _getKRecordListByIndex(market, code, query.start(), query.end(), query.kType());
+    } else {
+        HKU_INFO("Query by date are not supported!");
+    }
+    return result;
+}
+
+KRecordList KDataTempCsvDriver::_getKRecordListByIndex(const string& market, const string& code,
+                                                       int64_t start_ix, int64_t end_ix,
+                                                       KQuery::KType kType) {
+    KRecordList result;
+
+    string filename;
+    if (kType == KQuery::DAY) {
+        filename = m_day_filename;
+    } else if (kType == KQuery::MIN) {
+        filename = m_min_filename;
+    } else {
+        HKU_INFO("Only support DAY and MIN!");
+        return result;
+    }
+
+    std::ifstream infile(filename.c_str());
+    if (!infile) {
+        HKU_ERROR("Can't open this file: {}", filename);
+        return result;
+    }
+
+    string line;
+    if (!std::getline(infile, line)) {
+        infile.close();
+        return result;
+    }
+
+    _get_title_column(line);
+
+    int64_t line_no = 0;
+    while (std::getline(infile, line)) {
+        if (line_no++ < start_ix)
+            continue;
+
+        if (line_no >= end_ix)
+            break;
+
+        _get_token(line);
+        size_t token_count = m_token_buf.size();
+
+        KRecord record;
+        string action;
+        try {
+            action = "DATE";
+            if (token_count >= m_column[DATE])
+                record.datetime = Datetime(m_token_buf[m_column[DATE]]);
+
+            action = "OPEN";
+            if (token_count >= m_column[OPEN])
+                record.openPrice = boost::lexical_cast<price_t>(m_token_buf[m_column[OPEN]]);
+
+            action = "HIGH";
+            if (token_count >= m_column[HIGH])
+                record.highPrice = boost::lexical_cast<price_t>(m_token_buf[m_column[HIGH]]);
+
+            action = "LOW";
+            if (token_count >= m_column[LOW])
+                record.lowPrice = boost::lexical_cast<price_t>(m_token_buf[m_column[LOW]]);
+
+            action = "CLOSE";
+            if (token_count >= m_column[CLOSE])
+                record.closePrice = boost::lexical_cast<price_t>(m_token_buf[m_column[CLOSE]]);
+
+            action = "VOLUME";
+            if (token_count >= m_column[VOLUME])
+                record.transCount = boost::lexical_cast<price_t>(m_token_buf[m_column[VOLUME]]);
+
+            action = "AMOUNT";
+            if (token_count >= m_column[AMOUNT])
+                record.transAmount = boost::lexical_cast<price_t>(m_token_buf[m_column[AMOUNT]]);
+
+            result.push_back(record);
+
+        } catch (...) {
+            HKU_WARN("Invalid data in line {}! at trans {}", line_no, action);
+        }
+
+        line_no++;
+    }
+
+    infile.close();
+
+    return result;
 }
 
 } /* namespace hku */

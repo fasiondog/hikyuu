@@ -118,13 +118,13 @@ public:
     virtual bool sub_moveNext() = 0;       ///< 子类接口 @see moveNext
 
     virtual void sub_bindNull(int idx) = 0;                      ///< 子类接口 @see bind
-    virtual void sub_bindInt(int idx, int64 value) = 0;          ///< 子类接口 @see bind
+    virtual void sub_bindInt(int idx, int64_t value) = 0;        ///< 子类接口 @see bind
     virtual void sub_bindDouble(int idx, double item) = 0;       ///< 子类接口 @see bind
     virtual void sub_bindText(int idx, const string& item) = 0;  ///< 子类接口 @see bind
     virtual void sub_bindBlob(int idx, const string& item) = 0;  ///< 子类接口 @see bind
 
     virtual int sub_getNumColumns() const = 0;                 ///< 子类接口 @see getNumColumns
-    virtual void sub_getColumnAsInt64(int idx, int64&) = 0;    ///< 子类接口 @see getColumn
+    virtual void sub_getColumnAsInt64(int idx, int64_t&) = 0;  ///< 子类接口 @see getColumn
     virtual void sub_getColumnAsDouble(int idx, double&) = 0;  ///< 子类接口 @see getColumn
     virtual void sub_getColumnAsText(int idx, string&) = 0;    ///< 子类接口 @see getColumn
     virtual void sub_getColumnAsBlob(int idx, string&) = 0;    ///< 子类接口 @see getColumn
@@ -233,7 +233,7 @@ template <typename T>
 typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
   int idx, T& item) {
     HKU_CHECK(isValid(), "Invalid statement!");
-    int64 temp;
+    int64_t temp;
     sub_getColumnAsInt64(idx, temp);
     item = (T)temp;
 }

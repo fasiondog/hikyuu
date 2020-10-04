@@ -110,7 +110,7 @@ target("core")
             os.cp(target:targetdir() .. '/hikyuu.dll', dst_dir)
         elseif is_plat("macosx") then
             os.cp(target:targetdir() .. '/core.so', dst_dir)
-            os.cp(target:targetdir() .. '/hikyuu.dylib', dst_dir)
+            os.cp(target:targetdir() .. '/libhikyuu.dylib', dst_dir)
         else
             os.cp(target:targetdir() .. '/core.so', dst_dir)
             os.cp(target:targetdir() .. '/libhikyuu.so', dst_dir)

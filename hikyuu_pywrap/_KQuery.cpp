@@ -15,16 +15,16 @@ using namespace hku;
 void export_KQuery() {
     scope in_Query =
       class_<KQuery>("Query", "K线数据查询条件", init<>())
-        .def(init<int64, optional<int64, KQuery::KType, KQuery::RecoverType> >())
+        .def(init<int64_t, optional<int64_t, KQuery::KType, KQuery::RecoverType> >())
         .def(init<Datetime, optional<Datetime, KQuery::KType, KQuery::RecoverType> >())
 
         .def(self_ns::str(self))
         .def(self_ns::repr(self))
 
         .add_property("start", &KQuery::start,
-                      "起始索引，当按日期查询方式创建时无效，为 constant.null_int64")
+                      "起始索引，当按日期查询方式创建时无效，为 constant.null_int64_t")
         .add_property("end", &KQuery::end,
-                      "结束索引，当按日期查询方式创建时无效，为 constant.null_int64")
+                      "结束索引，当按日期查询方式创建时无效，为 constant.null_int64_t")
         .add_property("start_datetime", &KQuery::startDatetime,
                       "起始日期，当按索引查询方式创建时无效，为 constant.null_datetime")
         .add_property("end_datetime", &KQuery::endDatetime,

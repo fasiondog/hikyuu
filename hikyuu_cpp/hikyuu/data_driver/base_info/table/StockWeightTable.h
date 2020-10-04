@@ -32,8 +32,8 @@ public:
       freeCount(0) {}
 
 public:
-    uint64 stockid;
-    uint64 date;
+    uint64_t stockid;
+    uint64_t date;
     double countAsGift;
     double countForSell;
     double priceForSell;

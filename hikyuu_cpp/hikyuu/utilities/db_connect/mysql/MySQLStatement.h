@@ -37,13 +37,13 @@ public:
     virtual bool sub_moveNext() override;
 
     virtual void sub_bindNull(int idx) override;
-    virtual void sub_bindInt(int idx, int64 value) override;
+    virtual void sub_bindInt(int idx, int64_t value) override;
     virtual void sub_bindDouble(int idx, double item) override;
     virtual void sub_bindText(int idx, const string& item) override;
     virtual void sub_bindBlob(int idx, const string& item) override;
 
     virtual int sub_getNumColumns() const override;
-    virtual void sub_getColumnAsInt64(int idx, int64& item) override;
+    virtual void sub_getColumnAsInt64(int idx, int64_t& item) override;
     virtual void sub_getColumnAsDouble(int idx, double& item) override;
     virtual void sub_getColumnAsText(int idx, string& item) override;
     virtual void sub_getColumnAsBlob(int idx, string& item) override;

@@ -19,7 +19,7 @@
 #include "utilities/util.h"
 #include "StockManager.h"
 #include "GlobalTaskGroup.h"
-#include "data_driver/KDataTempCsvDriver.h"
+#include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 #include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
 #include "data_driver/block_info/qianlong/QLBlockInfoDriver.h"
@@ -315,7 +315,7 @@ MarketInfo StockManager::getMarketInfo(const string& market) const {
     return Null<MarketInfo>();
 }
 
-StockTypeInfo StockManager::getStockTypeInfo(uint32 type) const {
+StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
     auto iter = m_stockTypeInfo.find(type);
     if (iter != m_stockTypeInfo.end()) {
         return iter->second;

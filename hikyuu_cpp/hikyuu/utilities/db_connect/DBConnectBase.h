@@ -181,11 +181,11 @@ inline DBConnectBase::DBConnectBase(const Parameter& param) noexcept : m_params(
 inline int DBConnectBase::queryInt(const string& query) {
     SQLStatementPtr st = getStatement(query);
     st->exec();
-    HKU_ASSERT_M((st->moveNext() && st->getNumColumns() == 1),
-                 "query doesn't result in exactly 1 element");
+    HKU_CHECK((st->moveNext() && st->getNumColumns() == 1),
+              "query doesn't result in exactly 1 element");
     int result = 0;
     st->getColumn(0, result);
-    HKU_ASSERT_M(!st->moveNext(), "query doesn't result in exactly 1 element");
+    HKU_CHECK(!st->moveNext(), "query doesn't result in exactly 1 element");
     return result;
 }
 

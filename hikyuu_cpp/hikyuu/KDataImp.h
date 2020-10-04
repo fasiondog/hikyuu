@@ -19,9 +19,7 @@ public:
     KDataImp(const Stock& stock, const KQuery& query);
     virtual ~KDataImp();
 
-    bool empty() const {
-        return m_start == m_end ? true : false;
-    }
+    bool empty();
 
     size_t size() const {
         return m_end - m_start;
@@ -35,27 +33,23 @@ public:
         return m_stock;
     }
 
-    size_t startPos() const {
-        return m_start;
-    }
+    size_t startPos();
+    size_t endPos();
+    size_t lastPos();
 
-    size_t endPos() const {
-        return m_end;
-    }
+    virtual KRecord getKRecord(size_t pos);
 
-    size_t lastPos() const {
-        return m_end == 0 ? 0 : m_end - 1;
-    }
+    virtual size_t getPos(const Datetime& datetime);
 
-    virtual KRecord getKRecord(size_t pos) const;
-
-    virtual size_t getPos(const Datetime& datetime) const;
+protected:
+    void _getPosInStock();
 
 protected:
     KQuery m_query;
     Stock m_stock;
     size_t m_start;
     size_t m_end;
+    bool m_have_pos_in_stock;
 };
 
 typedef shared_ptr<KDataImp> KDataImpPtr;

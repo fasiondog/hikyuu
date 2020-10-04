@@ -86,6 +86,12 @@ KRecord KDataDriver::getKRecord(const string& market, const string& code, size_t
     return Null<KRecord>();
 }
 
+KRecordList KDataDriver::getKRecordList(const string& market, const string& code,
+                                        const KQuery& query) {
+    HKU_INFO("The getKRecordList method has not been implemented! (KDataDriver: {})", m_name);
+    return KRecordList();
+}
+
 TimeLineList KDataDriver::getTimeLineList(const string& market, const string& code,
                                           const KQuery& query) {
     HKU_INFO("The getTimeLineList method has not been implemented! (KDataDriver: {})", m_name);

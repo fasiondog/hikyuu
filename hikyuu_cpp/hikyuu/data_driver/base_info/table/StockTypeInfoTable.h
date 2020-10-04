@@ -26,15 +26,15 @@ public:
       m_minTradeNumber(0),
       m_maxTradeNumber(0) {}
 
-    int64 id() const {
+    int64_t id() const {
         return m_id;
     }
 
-    uint32 type() const {
+    uint32_t type() const {
         return m_type;
     }
 
-    uint32 precision() const {
+    uint32_t precision() const {
         return m_precision;
     }
 
@@ -93,9 +93,9 @@ public:
     }
 
 private:
-    int64 m_id;
-    uint32 m_type;            //证券类型
-    uint32 m_precision;       //价格精度
+    int64_t m_id;
+    uint32_t m_type;          //证券类型
+    uint32_t m_precision;     //价格精度
     double m_tick;            //最小跳动量
     double m_tickValue;       //每一个tick价格
     double m_minTradeNumber;  //每笔最小交易量

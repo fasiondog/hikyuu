@@ -14,7 +14,7 @@ using namespace hku;
 
 void export_StockTypeInfo() {
     class_<StockTypeInfo>("StockTypeInfo", "股票类型详情记录", init<>())
-      .def(init<uint32, const string&, price_t, price_t, int, double, double>())
+      .def(init<uint32_t, const string&, price_t, price_t, int, double, double>())
 
       .def("__str__", &StockTypeInfo::toString)
       .def("__repr__", &StockTypeInfo::toString)

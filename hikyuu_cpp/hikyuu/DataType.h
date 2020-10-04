@@ -18,11 +18,10 @@
 #endif
 
 #include <boost/config.hpp>
-//#include <boost/shared_ptr.hpp>
-//#include <boost/make_shared.hpp>
-//#include <boost/enable_shared_from_this.hpp>
 
 #include <stdio.h>
+#include <cstdint>
+#include <string_view>
 #include <iostream>
 #include <list>
 #include <cmath>
@@ -52,29 +51,42 @@ namespace hku {
  * @{
  */
 
-#if !defined(int64)
-typedef long long int64;
+// MSVC 的 __cpluscplus 之在 VS2017 之后才有正确的版本号，且只支持 C++17 及以上, 详见：
+// https://docs.microsoft.com/zh-cn/cpp/build/reference/zc-cplusplus?view=vs-2019
+#if defined(_MSC_VER) || __cplusplus < 201103L
+#if !defined(int64_t)
+typedef long long int64_t;
 #endif
 
-#if !defined(uint64)
-typedef unsigned long long uint64;
+#if !defined(uint64_t)
+typedef unsigned long long uint64_t;
 #endif
 
-#if !defined(int32)
-typedef int int32;
+#if !defined(int32_t)
+typedef int int32_t;
 #endif
 
-#if !defined(uint32)
-typedef unsigned uint32;
+#if !defined(uint32_t)
+typedef unsigned uint32_t;
 #endif
 
-#if !defined(int8)
-typedef char int8;
+#if !defined(int8_t)
+typedef char int8_t;
 #endif
 
-#if !defined(uint8)
-typedef unsigned char uint8;
+#if !defined(uint8_t)
+typedef unsigned char uint8_t;
 #endif
+
+#else
+using std::int32_t;
+using std::int64_t;
+using std::int8_t;
+using std::uint32_t;
+using std::uint64_t;
+using std::uint8_t;
+
+#endif /* #if defined(_MSC_VER) || __cplusplus < 201103L */
 
 #ifndef MAX_DOUBLE
 #define MAX_DOUBLE std::numeric_limits<double>::max()
@@ -83,6 +95,7 @@ typedef unsigned char uint8;
 typedef double price_t;
 
 using std::string;
+using std::string_view;
 
 using std::enable_shared_from_this;
 using std::make_shared;

@@ -9,6 +9,9 @@
 #ifndef MYSQLKDATADRIVERIMP_H_
 #define MYSQLKDATADRIVERIMP_H_
 
+#include "../../../utilities/ConnectPool.h"
+#include "../../../utilities/db_connect/DBConnect.h"
+#include "../../../utilities/db_connect/mysql/MySQLConnect.h"
 #include "../../KDataDriver.h"
 
 #if defined(_MSC_VER)
@@ -26,6 +29,10 @@ public:
 
     virtual bool _init() override;
 
+    virtual bool isIndexFirst() override {
+        return false;
+    }
+
     virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
                            size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) override;
 
@@ -37,16 +44,16 @@ public:
     virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
                                KQuery::KType kType) override;
 
-private:
-    string _getTableName(const string& market, const string& code, KQuery::KType ktype);
-    bool _query(const string& sql_str);
+    virtual KRecordList getKRecordList(const string& market, const string& code,
+                                       const KQuery& query) override;
 
 private:
-    shared_ptr<MYSQL> m_mysql;
-    string m_host;
-    unsigned int m_port;
-    string m_usr;
-    string m_pwd;
+    string _getTableName(const string& market, const string& code, KQuery::KType ktype);
+    KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType kType,
+                                size_t start_ix, size_t end_ix);
+
+private:
+    ConnectPool<MySQLConnect>* m_pool;
 };
 
 } /* namespace hku */

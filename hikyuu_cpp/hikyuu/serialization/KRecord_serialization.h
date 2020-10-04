@@ -21,7 +21,7 @@ namespace boost {
 namespace serialization {
 template <class Archive>
 void save(Archive& ar, const hku::KRecord& record, unsigned int version) {
-    hku::uint64 datetime = record.datetime.number();
+    hku::uint64_t datetime = record.datetime.number();
     ar& BOOST_SERIALIZATION_NVP(datetime);
     ar& make_nvp("openPrice", record.openPrice);
     ar& make_nvp("highPrice", record.highPrice);
@@ -33,7 +33,7 @@ void save(Archive& ar, const hku::KRecord& record, unsigned int version) {
 
 template <class Archive>
 void load(Archive& ar, hku::KRecord& record, unsigned int version) {
-    hku::uint64 datetime;
+    hku::uint64_t datetime;
     ar& BOOST_SERIALIZATION_NVP(datetime);
     record.datetime = hku::Datetime(datetime);
     ar& make_nvp("openPrice", record.openPrice);

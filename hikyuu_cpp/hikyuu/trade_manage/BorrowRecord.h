@@ -46,7 +46,7 @@ public:
         friend class boost::serialization::access;
         template <class Archive>
         void save(Archive& ar, const unsigned int version) const {
-            uint64 datetime_num = datetime.number();
+            uint64_t datetime_num = datetime.number();
             ar& boost::serialization::make_nvp("datetime", datetime_num);
             ar& BOOST_SERIALIZATION_NVP(number);
             ar& BOOST_SERIALIZATION_NVP(price);
@@ -54,7 +54,7 @@ public:
 
         template <class Archive>
         void load(Archive& ar, const unsigned int version) {
-            uint64 datetime_num;
+            uint64_t datetime_num;
             ar& boost::serialization::make_nvp("datetime", datetime_num);
             datetime = Datetime(datetime_num);
             ar& BOOST_SERIALIZATION_NVP(number);

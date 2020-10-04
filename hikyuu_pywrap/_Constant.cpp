@@ -22,7 +22,7 @@ struct Constant {
       null_price(Null<price_t>()),
       null_int(Null<int>()),
       null_size(Null<size_t>()),
-      null_int64(Null<int64>()),
+      null_int64(Null<int64_t>()),
       STOCKTYPE_BLOCK(0),
       STOCKTYPE_A(1),
       STOCKTYPE_INDEX(2),
@@ -49,7 +49,7 @@ struct Constant {
     double null_price;
     int null_int;
     size_t null_size;
-    int64 null_int64;
+    int64_t null_int64;
     bool pickle_support;  //是否支持pickle
 
     int STOCKTYPE_BLOCK;  /// 板块
@@ -75,7 +75,7 @@ void export_Constant() {
       .def_readonly("null_price", &Constant::null_price, "同 nan")
       .def_readonly("null_int", &Constant::null_int, "无效int")
       .def_readonly("null_size", &Constant::null_size, "无效size")
-      .def_readonly("null_int64", &Constant::null_int64, "无效int64")
+      .def_readonly("null_int64", &Constant::null_int64, "无效int64_t")
       .def_readonly("pickle_support", &Constant::pickle_support, "是否支持 pickle")
 
       .def_readonly("STOCKTYPE_BLOCK", &Constant::STOCKTYPE_BLOCK, "板块")

@@ -138,7 +138,7 @@ KData HKU_API getKData(const string& market_code, const Datetime& start = Dateti
  * @param recoverType 复权类型
  * @ingroup StockManage
  */
-KData HKU_API getKData(const string& market_code, int64 start = 0, int64 end = Null<int64>(),
+KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end = Null<int64_t>(),
                        KQuery::KType ktype = KQuery::DAY,
                        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 

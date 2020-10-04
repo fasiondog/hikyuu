@@ -18,7 +18,7 @@ const string Stock::default_market;
 const string Stock::default_code;
 const string Stock::default_market_code;
 const string Stock::default_name;
-const uint32 Stock::default_type = Null<uint32>();
+const uint32_t Stock::default_type = Null<uint32_t>();
 const bool Stock::default_valid = false;
 const Datetime Stock::default_startDate;  // = Null<Datetime>();
 const Datetime Stock::default_lastDate;   // = Null<Datetime>();
@@ -69,7 +69,7 @@ Stock::Data::Data()
     }*/
 }
 
-Stock::Data::Data(const string& market, const string& code, const string& name, uint32 type,
+Stock::Data::Data(const string& market, const string& code, const string& name, uint32_t type,
                   bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
                   price_t tickValue, int precision, size_t minTradeNumber, size_t maxTradeNumber)
 : m_market(market),
@@ -125,16 +125,16 @@ Stock::Stock(const string& market, const string& code, const string& name) {
                                 default_precision, default_minTradeNumber, default_maxTradeNumber));
 }
 
-Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-             const Datetime& startDate, const Datetime& lastDate) {
+Stock::Stock(const string& market, const string& code, const string& name, uint32_t type,
+             bool valid, const Datetime& startDate, const Datetime& lastDate) {
     m_data = shared_ptr<Data>(new Data(market, code, name, type, valid, startDate, lastDate,
                                        default_tick, default_tickValue, default_precision,
                                        default_minTradeNumber, default_maxTradeNumber));
 }
 
-Stock::Stock(const string& market, const string& code, const string& name, uint32 type, bool valid,
-             const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
-             int precision, size_t minTradeNumber, size_t maxTradeNumber)
+Stock::Stock(const string& market, const string& code, const string& name, uint32_t type,
+             bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
+             price_t tickValue, int precision, size_t minTradeNumber, size_t maxTradeNumber)
 : m_data(make_shared<Data>(market, code, name, type, valid, startDate, lastDate, tick, tickValue,
                            precision, minTradeNumber, maxTradeNumber)) {}
 
@@ -170,7 +170,7 @@ const string& Stock::name() const {
     return m_data ? m_data->m_name : default_name;
 }
 
-uint32 Stock::type() const {
+uint32_t Stock::type() const {
     return m_data ? m_data->m_type : default_type;
 }
 
@@ -269,8 +269,8 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     releaseKDataBuffer(kType);
     m_data->pKData[kType] = make_shared<KRecordList>();
     if (m_kdataDriver) {
-        m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, kType, 0, Null<size_t>(),
-                                 m_data->pKData[kType]);
+        *(m_data->pKData[kType]) = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
+                                                                 KQuery(0, Null<int64_t>(), kType));
     }
     return;
 }
@@ -393,7 +393,7 @@ bool Stock::_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t
         return false;
     }
 
-    int64 startix, endix;
+    int64_t startix, endix;
     startix = query.start();
     if (startix < 0) {
         startix += total;
@@ -529,7 +529,7 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
     string ktype(inktype);
     to_upper(ktype);
 
-    // if (m_data->pKData[ktype]) {
+    // 如果在内存缓存中
     if (m_data->pKData.find(ktype) != m_data->pKData.end()) {
         size_t total = m_data->pKData[ktype]->size();
         if (start_ix >= end_ix || start_ix > total) {
@@ -537,11 +537,15 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
             return result;
         }
 
-        size_t end = end_ix > total ? total : end_ix;
+        /*size_t end = end_ix > total ? total : end_ix;
         result.reserve(end - start_ix);
         for (size_t i = start_ix; i < end; ++i) {
             result.push_back((*m_data->pKData[ktype])[i]);
-        }
+        }*/
+        size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
+        result.resize(length);
+        std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
+                    sizeof(KRecord) * length);
         return result;
     }
 
@@ -549,13 +553,10 @@ KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType
         return result;
     }
 
-    KRecordListPtr plist(new KRecordList);
-    m_kdataDriver->loadKData(m_data->m_market, m_data->m_code, ktype, start_ix, end_ix, plist);
-    size_t total = plist->size();
-    result.reserve(total);
-    for (size_t i = 0; i < total; i++) {
-        result.push_back((*plist)[i]);
-    }
+    int64_t end = end_ix >= (size_t)Null<int64_t>() ? Null<int64_t>() : end_ix;
+    result = m_kdataDriver->getKRecordList(
+      m_data->m_market, m_data->m_code,
+      KQuery(start_ix, (end_ix == Null<size_t>() ? Null<int64_t>() : end_ix), ktype));
     return result;
 }
 

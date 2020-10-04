@@ -29,7 +29,7 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code) override;
 
 private:
-    StockWeightList _getStockWeightList(uint64 stockid);
+    StockWeightList _getStockWeightList(uint64_t stockid);
 
 private:
     //股票基本信息数据库实例

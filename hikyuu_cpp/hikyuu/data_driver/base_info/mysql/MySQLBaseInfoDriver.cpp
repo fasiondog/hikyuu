@@ -54,7 +54,6 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
 
     vector<MarketInfoTable> infoTables;
     try {
-        HKU_CHECK(con->ping(), "Can't connect mysql");
         con->batchLoad(infoTables);
     } catch (std::exception &e) {
         HKU_FATAL("load Market table failed! {}", e.what());
@@ -90,7 +89,6 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
 
     vector<StockTypeInfoTable> infoTables;
     try {
-        HKU_CHECK(con->ping(), "Can't connect mysql");
         con->batchLoad(infoTables);
     } catch (std::exception &e) {
         HKU_FATAL("load StockTypeInfo table failed! {}", e.what());
@@ -110,7 +108,7 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
     return true;
 }
 
-StockWeightList MySQLBaseInfoDriver::_getStockWeightList(uint64 stockid) {
+StockWeightList MySQLBaseInfoDriver::_getStockWeightList(uint64_t stockid) {
     StockWeightList result;
     if (!m_pool) {
         HKU_ERROR("Connect pool ptr is null!");
@@ -122,7 +120,6 @@ StockWeightList MySQLBaseInfoDriver::_getStockWeightList(uint64 stockid) {
 
     vector<StockWeightTable> table;
     try {
-        HKU_CHECK(con->ping(), "Can't connect mysql");
         con->batchLoad(table, format("stockid={}", stockid));
     } catch (std::exception &e) {
         HKU_FATAL("load StockWeight table failed! {}", e.what());
@@ -160,7 +157,6 @@ bool MySQLBaseInfoDriver::_loadStock() {
 
     vector<MarketInfoTable> marketTable;
     try {
-        HKU_CHECK(con->ping(), "Can't connect mysql");
         con->batchLoad(marketTable);
     } catch (std::exception &e) {
         HKU_FATAL("load Market table failed! {}", e.what());
@@ -170,7 +166,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
         return false;
     }
 
-    unordered_map<uint64, string> marketDict;
+    unordered_map<uint64_t, string> marketDict;
     for (auto &m : marketTable) {
         marketDict[m.id()] = m.market();
     }

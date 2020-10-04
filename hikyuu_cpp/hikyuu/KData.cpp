@@ -100,7 +100,7 @@ KData HKU_API getKData(const string& market_code, const Datetime& start, const D
     return StockManager::instance().getStock(market_code).getKData(query);
 }
 
-KData HKU_API getKData(const string& market_code, int64 start, int64 end, KQuery::KType ktype,
+KData HKU_API getKData(const string& market_code, int64_t start, int64_t end, KQuery::KType ktype,
                        KQuery::RecoverType recoverType) {
     KQuery query(start, end, ktype, recoverType);
     return StockManager::instance().getStock(market_code).getKData(query);

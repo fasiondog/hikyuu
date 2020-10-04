@@ -9,7 +9,7 @@
 #ifndef DATA_DRIVER_KDATATEMPCSVDRIVER_H_
 #define DATA_DRIVER_KDATATEMPCSVDRIVER_H_
 
-#include "KDataDriver.h"
+#include "../../KDataDriver.h"
 
 namespace hku {
 
@@ -21,6 +21,10 @@ class KDataTempCsvDriver : public KDataDriver {
 public:
     KDataTempCsvDriver(const string& day_filename, const string& min_filename);
     virtual ~KDataTempCsvDriver();
+
+    virtual bool isIndexFirst() override {
+        return false;
+    }
 
     /**
      * 将指定类型的K线数据加载至缓存
@@ -66,10 +70,22 @@ public:
     virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
                                KQuery::KType kType) override;
 
+    /**
+     * 获取 K 线数据
+     * @param market 市场简称
+     * @param code   证券代码
+     * @param query  查询条件
+     */
+    virtual KRecordList getKRecordList(const string& market, const string& code,
+                                       const KQuery& query) override;
+
 private:
     void _get_title_column(const string&);
     void _get_token(const string&);
     string _get_filename();
+
+    KRecordList _getKRecordListByIndex(const string& market, const string& code, int64_t start_ix,
+                                       int64_t end_ix, KQuery::KType kType);
 
 private:
     string m_day_filename;
