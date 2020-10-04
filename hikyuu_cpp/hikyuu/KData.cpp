@@ -7,7 +7,7 @@
 
 #include "KData.h"
 #include "StockManager.h"
-#include "KDataBufferImp.h"
+#include "KDataImp.h"
 #include "indicator/crt/KDATA.h"
 #include <fstream>
 
@@ -27,21 +27,9 @@ string KData::toString() const {
 }
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    if (stock.isNull()) {
-        return;
-    }
-
-    m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
-    return;
-#if 0
-    if (stock.isBuffer(query.kType())
-            && query.recoverType() == KQuery::NO_RECOVER) {
-        //当Stock已缓存了该类型的K线数据，且不进行复权
+    if (!stock.isNull()) {
         m_imp = KDataImpPtr(new KDataImp(stock, query));
-    } else {
-        m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
     }
-#endif
 }
 
 void KData::tocsv(const string& filename) {

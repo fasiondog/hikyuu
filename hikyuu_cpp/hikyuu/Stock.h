@@ -146,14 +146,11 @@ public:
 
     /**
      * 根据查询条件获取 KRecordList，不建议在客户端直接使用
-     * @note 该方法不支持复权，不支持负数索引
+     * @note 该方法不支持复权
      * @param query 查询条件
      * @exception 负数索引下将抛出异常 hku::exception
      */
     KRecordList getKRecordList(const KQuery& query) const;
-
-    /** 获取日期列表 */
-    // DatetimeList getDatetimeList(size_t start, size_t end, KQuery::KType) const;
 
     /** 获取日期列表 */
     DatetimeList getDatetimeList(const KQuery& query) const;

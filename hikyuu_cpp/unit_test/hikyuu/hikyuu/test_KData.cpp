@@ -1234,6 +1234,7 @@ TEST_CASE("test_getKData_recover") {
     kdata = stock.getKData(query);
     CHECK_EQ(kdata[2710],
              KRecord(Datetime(201106030000), 10.02, 10.14, 10.0, 10.09, 38726.1, 384820));
+    HKU_INFO("{}", kdata[2710]);
     CHECK_EQ(kdata[2709],
              KRecord(Datetime(201106020000), 10.34, 10.38, 9.93, 10.04, 103909.3, 780543.0));
     CHECK_EQ(kdata[2554],

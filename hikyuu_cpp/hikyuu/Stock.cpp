@@ -555,6 +555,19 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType inkType) const {
 KRecordList Stock::getKRecordList(const KQuery& query) const {
     KRecordList result;
 
+    size_t start_ix = 0, end_ix = 0;
+    if (query.queryType() == KQuery::INDEX) {
+        if (query.start() < 0 || query.end() < 0) {
+            // 处理负数索引
+            if (!getIndexRange(query, start_ix, end_ix)) {
+                return result;
+            }
+        } else {
+            start_ix = query.start();
+            end_ix = query.end();
+        }
+    }
+
     // 如果是在内存缓存中
     if (m_data->pKData.find(query.kType()) != m_data->pKData.end()) {
         size_t start_ix = 0, end_ix = 0;
@@ -564,6 +577,7 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
             }
         } else {
             if (query.start() < 0 || query.end() < 0) {
+                // 处理负数索引
                 if (!getIndexRange(query, start_ix, end_ix)) {
                     return result;
                 }
@@ -586,7 +600,12 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
 
     } else {
         if (m_kdataDriver) {
-            result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code, query);
+            if (query.queryType() == KQuery::DATE) {
+                result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code, query);
+            } else {
+                result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
+                                                       KQuery(start_ix, end_ix, query.kType()));
+            }
         }
     }
 
