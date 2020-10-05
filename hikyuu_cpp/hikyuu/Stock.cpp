@@ -63,11 +63,7 @@ Stock::Data::Data()
   m_unit(default_unit),
   m_precision(default_precision),
   m_minTradeNumber(default_minTradeNumber),
-  m_maxTradeNumber(default_maxTradeNumber) {
-    /*for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
-        pKData[i] = KRecordListPtr();
-    }*/
-}
+  m_maxTradeNumber(default_maxTradeNumber) {}
 
 Stock::Data::Data(const string& market, const string& code, const string& name, uint32_t type,
                   bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
@@ -93,15 +89,14 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
 
     to_upper(m_market);
     m_market_code = m_market + m_code;
-    /*for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
-        pKData[i] = KRecordListPtr();
-    }*/
 }
 
 Stock::Data::~Data() {
-    /*for (int i = 0; i < KQuery::INVALID_KTYPE; ++i) {
-        delete pKData[i];
-    }*/
+    for (auto iter = pKData.begin(); iter != pKData.end(); ++iter) {
+        if (iter->second) {
+            delete iter->second;
+        }
+    }
 }
 
 Stock::Stock() {}
@@ -233,46 +228,38 @@ bool Stock::isBuffer(KQuery::KType ktype) const {
     if (!m_data)
         return false;
     string nktype(ktype);
-    to_upper(ktype);
-    return m_data->pKData.find(ktype) != m_data->pKData.end() ? true : false;
+    to_upper(nktype);
+    return m_data->pKData.find(nktype) != m_data->pKData.end() ? true : false;
 }
 
 bool Stock::isNull() const {
-    if (!m_data || !m_kdataDriver) {
-        return true;
-    }
-    return false;
+    return !m_data || !m_kdataDriver;
 }
 
 void Stock::releaseKDataBuffer(KQuery::KType inkType) {
-    // if (!m_data || kType >= KQuery::INVALID_KTYPE)
-    if (!m_data)
-        return;
-
-    // if (m_data->pKData[kType])
-    // if (m_data->pKData.find(kType) != m_data->pKData.end())
-    // m_data->pKData[kType] = KRecordListPtr();
-    string kType(inkType);
-    to_upper(kType);
-    m_data->pKData.erase(kType);
-    return;
+    if (m_data) {
+        string kType(inkType);
+        to_upper(kType);
+        auto iter = m_data->pKData.find(kType);
+        if (iter != m_data->pKData.end()) {
+            delete iter->second;
+            m_data->pKData.erase(kType);
+        }
+    }
 }
 
 void Stock::loadKDataToBuffer(KQuery::KType inkType) {
-    // if (!m_data || kType >= KQuery::INVALID_KTYPE)
-    if (!m_data)
-        return;
+    if (m_data) {
+        string kType(inkType);
+        to_upper(kType);
 
-    string kType(inkType);
-    to_upper(kType);
-
-    releaseKDataBuffer(kType);
-    m_data->pKData[kType] = make_shared<KRecordList>();
-    if (m_kdataDriver) {
-        *(m_data->pKData[kType]) = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
-                                                                 KQuery(0, Null<int64_t>(), kType));
+        releaseKDataBuffer(kType);
+        m_data->pKData[kType] = new KRecordList;
+        if (m_kdataDriver) {
+            *(m_data->pKData[kType]) = m_kdataDriver->getKRecordList(
+              m_data->m_market, m_data->m_code, KQuery(0, Null<int64_t>(), kType));
+        }
     }
-    return;
 }
 
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
@@ -301,7 +288,6 @@ KData Stock::getKData(const KQuery& query) const {
 }
 
 size_t Stock::getCount(KQuery::KType kType) const {
-    // if (!m_data || kType >= KQuery::INVALID_KTYPE)
     if (!m_data)
         return 0;
 
@@ -521,52 +507,8 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType inkType) const {
     return m_kdataDriver ? m_kdataDriver->getKRecord(market(), code(), pos, kType) : KRecord();
 }
 
-/*KRecordList Stock ::getKRecordList(size_t start_ix, size_t end_ix, KQuery::KType inktype) const {
-    KRecordList result;
-    if (!m_data)
-        return result;
-
-    string ktype(inktype);
-    to_upper(ktype);
-
-    // 如果在内存缓存中
-    if (m_data->pKData.find(ktype) != m_data->pKData.end()) {
-        size_t total = m_data->pKData[ktype]->size();
-        if (start_ix >= end_ix || start_ix > total) {
-            HKU_WARN("Invalid param! ({}, {})", start_ix, end_ix);
-            return result;
-        }
-
-        size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
-        result.resize(length);
-        std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
-                    sizeof(KRecord) * length);
-
-    } else if (m_kdataDriver) {
-        int64_t end = end_ix >= (size_t)Null<int64_t>() ? Null<int64_t>() : end_ix;
-        result = m_kdataDriver->getKRecordList(
-          m_data->m_market, m_data->m_code,
-          KQuery(start_ix, (end_ix == Null<size_t>() ? Null<int64_t>() : end_ix), ktype));
-    }
-
-    return result;
-}*/
-
 KRecordList Stock::getKRecordList(const KQuery& query) const {
     KRecordList result;
-
-    size_t start_ix = 0, end_ix = 0;
-    if (query.queryType() == KQuery::INDEX) {
-        if (query.start() < 0 || query.end() < 0) {
-            // 处理负数索引
-            if (!getIndexRange(query, start_ix, end_ix)) {
-                return result;
-            }
-        } else {
-            start_ix = query.start();
-            end_ix = query.end();
-        }
-    }
 
     // 如果是在内存缓存中
     if (m_data->pKData.find(query.kType()) != m_data->pKData.end()) {
@@ -603,6 +545,18 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
             if (query.queryType() == KQuery::DATE) {
                 result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code, query);
             } else {
+                size_t start_ix = 0, end_ix = 0;
+                if (query.queryType() == KQuery::INDEX) {
+                    if (query.start() < 0 || query.end() < 0) {
+                        // 处理负数索引
+                        if (!getIndexRange(query, start_ix, end_ix)) {
+                            return result;
+                        }
+                    } else {
+                        start_ix = query.start();
+                        end_ix = query.end();
+                    }
+                }
                 result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
                                                        KQuery(start_ix, end_ix, query.kType()));
             }
@@ -611,21 +565,6 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
 
     return result;
 }
-
-/*DatetimeList Stock::getDatetimeList(size_t start, size_t end, KQuery::KType ktype) const {
-    DatetimeList result;
-    KRecordList kdata = getKRecordList(KQuery(start, end, ktype));
-    size_t total = kdata.size();
-    if (0 == total) {
-        return result;
-    }
-
-    result.reserve(total);
-    for (size_t i = 0; i < kdata.size(); ++i) {
-        result.push_back(kdata[i].datetime);
-    }
-    return result;
-}*/
 
 DatetimeList Stock::getDatetimeList(const KQuery& query) const {
     DatetimeList result;
