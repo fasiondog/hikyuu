@@ -212,7 +212,12 @@ size_t Stock::maxTradeNumber() const {
 void Stock::setKDataDriver(const KDataDriverPtr& kdataDriver) {
     HKU_CHECK(kdataDriver, "kdataDriver is nullptr!");
     m_kdataDriver = kdataDriver;
-    m_data->pKData.clear();
+    if (m_data) {
+        for (auto iter = m_data->pKData.begin(); iter != m_data->pKData.end(); ++iter) {
+            delete iter->second;
+        }
+        m_data->pKData.clear();
+    }
 }
 
 void Stock::setWeightList(const StockWeightList& weightList) {
@@ -317,10 +322,9 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
     KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
     price_t price = 0.0;
     size_t out_start, out_end;
-    KRecord k;
     if (getIndexRange(query, out_start, out_end)) {
         //找到的是>=datetime的记录
-        k = getKRecord(out_start, ktype);
+        KRecord k = getKRecord(out_start, ktype);
         if (k.datetime == datetime) {
             price = k.closePrice;
         } else {
@@ -509,6 +513,9 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType inkType) const {
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {
     KRecordList result;
+    if (isNull()) {
+        return result;
+    }
 
     // 如果是在内存缓存中
     if (m_data->pKData.find(query.kType()) != m_data->pKData.end()) {
@@ -541,25 +548,23 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
                     sizeof(KRecord) * length);
 
     } else {
-        if (m_kdataDriver) {
-            if (query.queryType() == KQuery::DATE) {
-                result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code, query);
-            } else {
-                size_t start_ix = 0, end_ix = 0;
-                if (query.queryType() == KQuery::INDEX) {
-                    if (query.start() < 0 || query.end() < 0) {
-                        // 处理负数索引
-                        if (!getIndexRange(query, start_ix, end_ix)) {
-                            return result;
-                        }
-                    } else {
-                        start_ix = query.start();
-                        end_ix = query.end();
+        if (query.queryType() == KQuery::DATE) {
+            result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code, query);
+        } else {
+            size_t start_ix = 0, end_ix = 0;
+            if (query.queryType() == KQuery::INDEX) {
+                if (query.start() < 0 || query.end() < 0) {
+                    // 处理负数索引
+                    if (!getIndexRange(query, start_ix, end_ix)) {
+                        return result;
                     }
+                } else {
+                    start_ix = query.start();
+                    end_ix = query.end();
                 }
-                result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
-                                                       KQuery(start_ix, end_ix, query.kType()));
             }
+            result = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
+                                                   KQuery(start_ix, end_ix, query.kType()));
         }
     }
 
