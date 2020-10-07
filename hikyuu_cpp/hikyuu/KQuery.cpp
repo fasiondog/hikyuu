@@ -88,90 +88,12 @@ string KQuery::getKTypeName(KType dataType) {
     string result(dataType);
     to_upper(result);
     return result;
-    /*switch(dataType) {
-    case MIN:
-        return "MIN";
-    case MIN5:
-        return "MIN5";
-    case MIN15:
-        return "MIN15";
-    case MIN30:
-        return "MIN30";
-    case MIN60:
-        return "MIN60";
-    case DAY:
-        return "DAY";
-    case WEEK:
-        return "WEEK";
-    case MONTH:
-        return "MONTH";
-    case QUARTER:
-        return "QUARTER";
-    case HALFYEAR:
-        return "HALFYEAR";
-    case YEAR:
-        return "YEAR";
-
-    //BTC扩展
-    case MIN3:
-        return "MIN3";
-    case HOUR2:
-        return "HOUR2";
-    case HOUR4:
-        return "HOUR4";
-    case HOUR6:
-        return "HOUR6";
-    case HOUR12:
-        return "HOUR12";
-
-    default:
-        return "INVALID_DATA_TYPE";
-    }*/
 }
 
 KQuery::KType KQuery::getKTypeEnum(const string& arg) {
     string name(arg);
     to_upper(name);
     return name;
-    /* KType result;
-     if ("MIN" == name) {
-         result = MIN;
-     } else if ("MIN5" == name) {
-         result = MIN5;
-     } else if ("MIN15" == name) {
-         result = MIN15;
-     } else if ("MIN30" == name) {
-         result = MIN30;
-     } else if ("MIN60" == name) {
-         result = MIN60;
-     } else if ("DAY" == name) {
-         result = DAY;
-     } else if ("WEEK" == name) {
-         result = WEEK;
-     } else if ("MONTH" == name) {
-         result = MONTH;
-     } else if ("QUARTER" == name) {
-         result = QUARTER;
-     } else if ("HALFYEAR" == name) {
-         result = HALFYEAR;
-     } else if ("YEAR" == name) {
-         result = YEAR;
-
-     //BTC扩展
-     } else if ("MIN3" == name) {
-         result = MIN3;
-     } else if ("HOUR2" == name) {
-         result = HOUR2;
-     } else if ("HOUR4" == name) {
-         result = HOUR4;
-     } else if ("HOUR6" == name) {
-         result = HOUR6;
-     } else if ("HOUR12" == name) {
-         result = HOUR12;
-     } else {
-         result = INVALID_KTYPE;
-     }
-     return result;*/
 }
 
 string KQuery::getRecoverTypeName(RecoverType recoverType) {

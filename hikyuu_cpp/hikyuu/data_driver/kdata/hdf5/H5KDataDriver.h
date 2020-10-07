@@ -59,10 +59,6 @@ private:
     KRecordList _getIndexKRecordList(const string& market, const string& code, KQuery::KType kType,
                                      size_t start_ix, size_t end_ix);
 
-    // KRecordList _getBaseKRecordList(std::const string& market, std::const string& code, Datetime
-    // start,
-    //                                Datetime end);
-
     TimeLineList _getTimeLine(const string& market, const string& code, int64_t start, int64_t end);
     TimeLineList _getTimeLine(const string& market, const string& code, const Datetime& start,
                               const Datetime& end);

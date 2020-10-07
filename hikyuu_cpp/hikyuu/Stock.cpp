@@ -234,7 +234,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const {
         return false;
     string nktype(ktype);
     to_upper(nktype);
-    return m_data->pKData.find(nktype) != m_data->pKData.end() ? true : false;
+    return m_data->pKData.find(nktype) != m_data->pKData.end();
 }
 
 bool Stock::isNull() const {
@@ -321,20 +321,30 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
 
     KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
     price_t price = 0.0;
-    size_t out_start, out_end;
-    if (getIndexRange(query, out_start, out_end)) {
-        //找到的是>=datetime的记录
-        KRecord k = getKRecord(out_start, ktype);
-        if (k.datetime == datetime) {
-            price = k.closePrice;
-        } else {
-            if (out_start != 0) {
-                k = getKRecord(out_start - 1, ktype);
+
+    if (m_kdataDriver->isIndexFirst()) {
+        size_t out_start, out_end;
+        if (getIndexRange(query, out_start, out_end)) {
+            //找到的是>=datetime的记录
+            KRecord k = getKRecord(out_start, ktype);
+            if (k.datetime == datetime) {
                 price = k.closePrice;
+            } else {
+                if (out_start != 0) {
+                    k = getKRecord(out_start - 1, ktype);
+                    price = k.closePrice;
+                }
             }
         }
-
     } else {
+        query = KQueryByDate(datetime, Null<Datetime>(), ktype);
+        auto k_list = getKRecordList(query);
+        if (k_list.size() > 0) {
+            price = k_list[0].closePrice;
+        }
+    }
+
+    if (price <= 0.0) {
         //没有找到，则取最后一条记录
         size_t total = getCount(ktype);
         if (total > 0) {

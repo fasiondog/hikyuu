@@ -33,9 +33,6 @@ public:
         return false;
     }
 
-    virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
-                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) override;
-
     virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
 
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,

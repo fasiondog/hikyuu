@@ -24,13 +24,13 @@ public:
         return true;
     }
 
-    virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
-                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) override;
     virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end) override;
     virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
                                KQuery::KType kType) override;
+    virtual KRecordList getKRecordList(const string& market, const string& code,
+                                       const KQuery& query) override;
 
 private:
     string _getFileName(const string& market, const string& code, KQuery::KType);
@@ -40,10 +40,10 @@ private:
     KRecord _getMinKRecord(const string& market, const string& code, size_t pos,
                            KQuery::KType ktype);
 
-    void _loadDayKData(const string& market, const string& code, KQuery::KType ktype,
-                       size_t start_ix, size_t end_ix, KRecordListPtr out_buffer);
-    void _loadMinKData(const string& market, const string& code, KQuery::KType ktype,
-                       size_t start_ix, size_t end_ix, KRecordListPtr out_buffer);
+    KRecordList _getDayKRecordList(const string& market, const string& code, KQuery::KType ktype,
+                                   size_t start_ix, size_t end_ix);
+    KRecordList _getMinKRecordList(const string& market, const string& code, KQuery::KType ktype,
+                                   size_t start_ix, size_t end_ix);
 
     bool _getDayIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                  size_t& out_start, size_t& out_end);

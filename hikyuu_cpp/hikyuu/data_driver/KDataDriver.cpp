@@ -64,11 +64,6 @@ bool KDataDriver::init(const Parameter& params) {
     return _init();
 }
 
-void KDataDriver::loadKData(const string& market, const string& code, KQuery::KType kType,
-                            size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
-    HKU_INFO("The loadKData method has not been implemented! (KDataDriver: {})", m_name);
-}
-
 size_t KDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     HKU_INFO("The getCount method has not been implemented! (KDataDriver: {})", m_name);
     return 0;

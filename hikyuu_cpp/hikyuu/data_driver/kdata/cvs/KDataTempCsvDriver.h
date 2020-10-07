@@ -27,18 +27,6 @@ public:
     }
 
     /**
-     * 将指定类型的K线数据加载至缓存
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param kType  K线类型
-     * @param start_ix 欲加载的起始位置
-     * @param end_ix 欲加载的结束位置，不包含自身
-     * @param out_buffer [out] 缓存指针
-     */
-    virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
-                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) override;
-
-    /**
      * 获取指定类型的K线数据量
      * @param market 市场简称
      * @param code   证券代码
