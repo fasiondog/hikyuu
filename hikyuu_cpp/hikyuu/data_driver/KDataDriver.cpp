@@ -75,12 +75,6 @@ bool KDataDriver::getIndexRangeByDate(const string& market, const string& code, 
     return false;
 }
 
-KRecord KDataDriver::getKRecord(const string& market, const string& code, size_t pos,
-                                KQuery::KType kType) {
-    HKU_INFO("The getKRecord method has not been implemented! (KDataDriver: {})", m_name);
-    return Null<KRecord>();
-}
-
 KRecordList KDataDriver::getKRecordList(const string& market, const string& code,
                                         const KQuery& query) {
     HKU_INFO("The getKRecordList method has not been implemented! (KDataDriver: {})", m_name);

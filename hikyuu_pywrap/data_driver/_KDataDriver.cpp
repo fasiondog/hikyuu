@@ -104,19 +104,6 @@ public:
                 query, out_start, out_end);
     }*/
 
-    KRecord getKRecord(const string& market, const string& code, size_t pos, KQuery::KType ktype) {
-        if (override call = get_override("getKRecord")) {
-            return call(market, code, pos, ktype);
-        } else {
-            return KDataDriver::getKRecord(market, code, pos, ktype);
-        }
-    }
-
-    KRecord default_getKRecord(const string& market, const string& code, size_t pos,
-                               KQuery::KType ktype) {
-        return this->KDataDriver::getKRecord(market, code, pos, ktype);
-    }
-
     KRecordList getKRecordList(const string& market, const string& code, const KQuery& query) {
         if (override call = get_override("getKRecordList")) {
             return call(market, code, query);
@@ -169,7 +156,6 @@ void export_KDataDriver() {
       .def("getCount", &KDataDriver::getCount, &KDataDriverWrap::default_getCount)
       //.def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
       //        &KDataDriverWrap::default_getIndexRangeByDate)
-      .def("getKRecord", &KDataDriver::getKRecord, &KDataDriverWrap::default_getKRecord)
       .def("_getIndexRangeByDate", &KDataDriverWrap::_getIndexRangeByDate,
            &KDataDriverWrap::default_getIndexRangeByDate)
       .def("getKRecordList", &KDataDriver::getKRecordList, &KDataDriverWrap::default_getKRecordList)

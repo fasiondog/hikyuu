@@ -48,17 +48,6 @@ public:
                                      size_t& out_start, size_t& out_end) override;
 
     /**
-     * 获取指定的K线记录
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param pos    K线记录索引
-     * @param kType  K线类型
-     * @return
-     */
-    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
-                               KQuery::KType kType) override;
-
-    /**
      * 获取 K 线数据
      * @param market 市场简称
      * @param code   证券代码

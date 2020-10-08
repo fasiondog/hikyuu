@@ -168,43 +168,4 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
     return true;
 }
 
-KRecord MySQLKDataDriver::getKRecord(const string& market, const string& code, size_t pos,
-                                     KQuery::KType kType) {
-    KRecord result;
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
-        return result;
-    }
-
-    auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return result;
-    };
-
-    KRecordTable r(market, code, kType);
-    SQLStatementPtr st =
-      con->getStatement(fmt::format("{} order by date limit {}, 1", r.getSelectSQL(), pos));
-
-    st->exec();
-    if (st->moveNext()) {
-        KRecordTable record;
-        try {
-            record.load(st);
-            result.datetime = record.date();
-            result.openPrice = record.open();
-            result.highPrice = record.high();
-            result.lowPrice = record.low();
-            result.closePrice = record.close();
-            result.transAmount = record.amount();
-            result.transCount = record.count();
-        } catch (...) {
-            HKU_ERROR("Failed get record: {}", record.str());
-            result = KRecord();
-        }
-    }
-
-    return result;
-}
-
 } /* namespace hku */

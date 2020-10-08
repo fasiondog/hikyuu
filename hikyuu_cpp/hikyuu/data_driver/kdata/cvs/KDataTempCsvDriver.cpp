@@ -83,15 +83,6 @@ size_t KDataTempCsvDriver::getCount(const string& market, const string& code, KQ
     return getKRecordList(market, code, KQuery(0, Null<int64_t>(), kType)).size();
 }
 
-KRecord KDataTempCsvDriver::getKRecord(const string& market, const string& code, size_t pos,
-                                       KQuery::KType kType) {
-    if (pos >= size_t(Null<int64_t>())) {
-        return Null<KRecord>();
-    }
-    auto klist = getKRecordList(market, code, KQuery(pos, pos + 1, kType));
-    return klist.size() > 0 ? klist[0] : Null<KRecord>();
-}
-
 bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string& code,
                                              const KQuery& query, size_t& out_start,
                                              size_t& out_end) {

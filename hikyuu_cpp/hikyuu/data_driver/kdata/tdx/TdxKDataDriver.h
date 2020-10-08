@@ -27,18 +27,12 @@ public:
     virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end) override;
-    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
-                               KQuery::KType kType) override;
     virtual KRecordList getKRecordList(const string& market, const string& code,
                                        const KQuery& query) override;
 
 private:
     string _getFileName(const string& market, const string& code, KQuery::KType);
     size_t _getBaseCount(const string& market, const string& code, KQuery::KType);
-    KRecord _getDayKRecord(const string& market, const string& code, size_t pos,
-                           KQuery::KType ktype);
-    KRecord _getMinKRecord(const string& market, const string& code, size_t pos,
-                           KQuery::KType ktype);
 
     KRecordList _getDayKRecordList(const string& market, const string& code, KQuery::KType ktype,
                                    size_t start_ix, size_t end_ix);

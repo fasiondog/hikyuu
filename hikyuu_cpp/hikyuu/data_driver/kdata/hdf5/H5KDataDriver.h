@@ -28,8 +28,6 @@ public:
     virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end) override;
-    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
-                               KQuery::KType kType) override;
     virtual KRecordList getKRecordList(const string& market, const string& code,
                                        const KQuery& query) override;
     virtual TimeLineList getTimeLineList(const string& market, const string& code,
@@ -45,9 +43,6 @@ private:
 
     bool _getH5FileAndGroup(const string& market, const string& code, KQuery::KType kType,
                             H5FilePtr& out_file, H5::Group& out_group);
-
-    KRecord _getBaseRecord(const string&, const string&, size_t, KQuery::KType);
-    KRecord _getOtherRecord(const string&, const string&, size_t, KQuery::KType);
 
     bool _getBaseIndexRangeByDate(const string&, const string&, const KQuery&, size_t& out_start,
                                   size_t& out_end);

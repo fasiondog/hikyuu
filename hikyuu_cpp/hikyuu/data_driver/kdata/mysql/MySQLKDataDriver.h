@@ -38,9 +38,6 @@ public:
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end) override;
 
-    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
-                               KQuery::KType kType) override;
-
     virtual KRecordList getKRecordList(const string& market, const string& code,
                                        const KQuery& query) override;
 

@@ -174,69 +174,6 @@ KRecordList TdxKDataDriver::_getMinKRecordList(const string& market, const strin
     return result;
 }
 
-KRecord TdxKDataDriver::getKRecord(const string& market, const string& code, size_t pos,
-                                   KQuery::KType ktype) {
-    KRecord record;
-    if (ktype == KQuery::MIN || ktype == KQuery::MIN5) {
-        record = _getMinKRecord(market, code, pos, ktype);
-    } else if (ktype == KQuery::DAY) {
-        record = _getDayKRecord(market, code, pos, ktype);
-    } else {
-        HKU_WARN("Don't support the ktype: {}", ktype);
-    }
-
-    return record;
-}
-
-KRecord TdxKDataDriver::_getDayKRecord(const string& market, const string& code, size_t pos,
-                                       KQuery::KType ktype) {
-    assert(KQuery::DAY == ktype);
-
-    KRecord record;
-    size_t total = getCount(market, code, ktype);
-    if (0 == total || pos >= total) {
-        return record;
-    }
-
-    string filename = _getFileName(market, code, ktype);
-    std::ifstream file(filename.c_str(), std::ios::binary | std::ios::in);
-    if (!file) {
-        return record;
-    }
-
-    file.seekg(pos * sizeof(TdxDayData));
-    struct TdxDayData tdx_data;
-    file.read((char*)&tdx_data, sizeof(tdx_data));
-    tdx_data.toKRecord(record);
-    file.close();
-    return record;
-}
-
-KRecord TdxKDataDriver::_getMinKRecord(const string& market, const string& code, size_t pos,
-                                       KQuery::KType ktype) {
-    assert(KQuery::MIN == ktype || KQuery::MIN5 == ktype);
-
-    KRecord record;
-    size_t total = getCount(market, code, ktype);
-    if (0 == total || pos >= total) {
-        return record;
-    }
-
-    string filename = _getFileName(market, code, ktype);
-    std::ifstream file(filename.c_str(), std::ios::binary | std::ios::in);
-    if (!file) {
-        return record;
-    }
-
-    file.seekg(pos * sizeof(TdxMinData));
-    struct TdxMinData tdx_data;
-    file.read((char*)&tdx_data, sizeof(tdx_data));
-    tdx_data.toKRecord(record);
-
-    file.close();
-    return record;
-}
-
 bool TdxKDataDriver::getIndexRangeByDate(const string& market, const string& code,
                                          const KQuery& query, size_t& out_start, size_t& out_end) {
     assert(KQuery::DATE == query.queryType());
