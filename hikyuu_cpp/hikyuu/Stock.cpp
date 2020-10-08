@@ -509,7 +509,7 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     return true;
 }
 
-KRecord Stock ::getKRecord(size_t pos, KQuery::KType kType) const {
+KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
     if (!m_data)
         return Null<KRecord>();
 
@@ -523,7 +523,7 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType kType) const {
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
-KRecord Stock::getKRecordByDate(const Datetime& datetime, KQuery::KType inktype) const {
+KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType inktype) const {
     if (isNull())
         return Null<KRecord>();
 

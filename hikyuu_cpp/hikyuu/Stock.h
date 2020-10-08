@@ -139,7 +139,7 @@ public:
     KRecord getKRecord(size_t pos, KQuery::KType dataType = KQuery::DAY) const;
 
     /** 根据数据类型（日线/周线等），获取指定日期的KRecord */
-    KRecord getKRecordByDate(const Datetime&, KQuery::KType ktype = KQuery::DAY) const;
+    KRecord getKRecord(const Datetime&, KQuery::KType ktype = KQuery::DAY) const;
 
     /** 获取K线数据 */
     KData getKData(const KQuery&) const;

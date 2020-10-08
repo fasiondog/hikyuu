@@ -469,7 +469,7 @@ SlippageBase.__getattr__ = SlippageBase_getattr
         'getCount': 'get_count',
         'getMarketValue': 'get_market_value',
         'getKRecord': 'get_krecord',
-        'getKRecordByDate': 'get_krecord_by_datetime',
+        'getKRecordByDate': 'get_krecord',
         'getKRecordList': 'get_krecord_list',
         'getDatetimeList': 'get_datetime_list',
         'getFinanceInfo': 'get_finance_info',

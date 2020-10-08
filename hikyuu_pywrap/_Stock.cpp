@@ -19,6 +19,9 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getIndex_overloads, getIndex, 1, 2)
 StockWeightList (Stock::*getWeight1)() const = &Stock::getWeight;
 StockWeightList (Stock::*getWeight2)(const Datetime&, const Datetime&) const = &Stock::getWeight;
 
+KRecord (Stock::*getKRecord1)(size_t pos, KQuery::KType kType) const = &Stock::getKRecord;
+KRecord (Stock::*getKRecord2)(const Datetime&, KQuery::KType kType) const = &Stock::getKRecord;
+
 void export_Stock() {
     class_<Stock>("Stock", "证券对象", init<>())
       .def(init<const string&, const string&, const string&>())
@@ -100,7 +103,7 @@ void export_Stock() {
     :return: 指定时刻的市值
     :rtype: float)")
 
-      .def("get_krecord", &Stock::getKRecord, (arg("pos"), arg("ktype") = KQuery::DAY),
+      .def("get_krecord", getKRecord1, (arg("pos"), arg("ktype") = KQuery::DAY),
            R"(get_krecord(self, pos[, ktype=Query.DAY])
 
     获取指定索引的K线数据记录，未作越界检查
@@ -110,9 +113,8 @@ void export_Stock() {
     :return: K线记录
     :rtype: KRecord)")
 
-      .def("get_krecord_by_datetime", &Stock::getKRecordByDate,
-           (arg("date"), arg("ktype") = KQuery::DAY),
-           R"(get_krecord_by_datetime(self, datetime[, ktype=Query.DAY])
+      .def("get_krecord", getKRecord2, (arg("date"), arg("ktype") = KQuery::DAY),
+           R"(get_krecord(self, datetime[, ktype=Query.DAY])
 
     根据数据类型（日线/周线等），获取指定时刻的KRecord
 

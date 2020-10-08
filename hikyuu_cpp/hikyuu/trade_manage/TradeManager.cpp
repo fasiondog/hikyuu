@@ -936,7 +936,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 #if 0  //取消此处的检查，放松限制，另外也可以提高效率。另外，TM只负责交易管理，不许检查
     //检查当日是否存在日线数据，不存在则认为不可交易
     bd::date daydate = datetime.date();
-    KRecord krecord = stock.getKRecordByDate(daydate, KQuery::DAY);
+    KRecord krecord = stock.getKRecord(daydate, KQuery::DAY);
     if (krecord == Null<KRecord>()){
         HKU_ERROR(datetime << " " << stock.market_code()
                 <<" Non-trading day(" << daydate
@@ -1864,7 +1864,7 @@ void TradeManager::tocsv(const string& path) {
                  << record.cost.total << sep << record.stoploss << sep << record.cash << sep
                  << getSystemPartName(record.from) << sep;
             if (BUSINESS_BUY == record.business || BUSINESS_SELL == record.business) {
-                KRecord kdata = record.stock.getKRecordByDate(record.datetime, KQuery::DAY);
+                KRecord kdata = record.stock.getKRecord(record.datetime, KQuery::DAY);
                 if (kdata.isValid()) {
                     file << kdata.datetime << sep << kdata.openPrice << sep << kdata.highPrice
                          << sep << kdata.lowPrice << sep << kdata.closePrice << sep

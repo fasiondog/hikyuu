@@ -1837,7 +1837,7 @@ TEST_CASE("test_Stock_getKRecordList") {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_Stock_getKRecordByDate") {
+TEST_CASE("test_Stock_getKRecord_By_Date") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
     KRecord record;
@@ -1846,30 +1846,30 @@ TEST_CASE("test_Stock_getKRecordByDate") {
     ///===================================
 
     /** @arg 日期小于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199012180000), KQuery::DAY);
+    record = stock.getKRecord(Datetime(199012180000), KQuery::DAY);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199012190000), KQuery::DAY);
+    record = stock.getKRecord(Datetime(199012190000), KQuery::DAY);
     CHECK_EQ(record, KRecord(Datetime(199012190000), 96.0500, 99.9800, 95.7900, 99.9800, 49.4000,
                              1260.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199502150000), KQuery::DAY);
+    record = stock.getKRecord(Datetime(199502150000), KQuery::DAY);
     CHECK_EQ(record, KRecord(Datetime(199502150000), 547.8300, 548.5900, 542.5000, 542.8400,
                              11889.3000, 232116.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199502180000), KQuery::DAY);
+    record = stock.getKRecord(Datetime(199502180000), KQuery::DAY);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112060000), KQuery::DAY);
+    record = stock.getKRecord(Datetime(201112060000), KQuery::DAY);
     CHECK_EQ(record, KRecord(Datetime(201112060000), 2326.6600, 2331.8920, 2310.1550, 2325.9050,
                              4262559.5000, 45917078.0000));
 
     /** @arg 日期大于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112070000), KQuery::DAY);
+    record = stock.getKRecord(Datetime(201112070000), KQuery::DAY);
     CHECK_EQ(record, Null<KRecord>());
 
     ///===================================
@@ -1877,30 +1877,30 @@ TEST_CASE("test_Stock_getKRecordByDate") {
     ///===================================
 
     /** @arg 日期小于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199012160000), KQuery::WEEK);
+    record = stock.getKRecord(Datetime(199012160000), KQuery::WEEK);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199012210000), KQuery::WEEK);
+    record = stock.getKRecord(Datetime(199012210000), KQuery::WEEK);
     CHECK_EQ(record, KRecord(Datetime(199012210000), 96.0500, 109.1300, 95.7900, 109.1300, 59.4000,
                              1485.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199103290000), KQuery::WEEK);
+    record = stock.getKRecord(Datetime(199103290000), KQuery::WEEK);
     CHECK_EQ(record, KRecord(Datetime(199103290000), 122.1200, 122.6200, 120.1100, 120.1900,
                              409.0000, 5421.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199103120000), KQuery::WEEK);
+    record = stock.getKRecord(Datetime(199103120000), KQuery::WEEK);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112090000), KQuery::WEEK);
+    record = stock.getKRecord(Datetime(201112090000), KQuery::WEEK);
     CHECK_EQ(record, KRecord(Datetime(201112090000), 2363.1110, 2363.1270, 2310.1550, 2325.9050,
                              9126681.1000, 98132048.0000));
 
     /** @arg 日期大于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112100000), KQuery::WEEK);
+    record = stock.getKRecord(Datetime(201112100000), KQuery::WEEK);
     CHECK_EQ(record, Null<KRecord>());
 
     ///===================================
@@ -1908,30 +1908,30 @@ TEST_CASE("test_Stock_getKRecordByDate") {
     ///===================================
 
     /** @arg 日期小于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199011300000), KQuery::MONTH);
+    record = stock.getKRecord(Datetime(199011300000), KQuery::MONTH);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(199012310000), KQuery::MONTH);
+    record = stock.getKRecord(Datetime(199012310000), KQuery::MONTH);
     CHECK_EQ(record, KRecord(Datetime(199012310000), 96.0500, 127.6100, 95.7900, 127.6100, 93.6000,
                              1884.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199208310000), KQuery::MONTH);
+    record = stock.getKRecord(Datetime(199208310000), KQuery::MONTH);
     CHECK_EQ(record, KRecord(Datetime(199208310000), 1034.7000, 1060.3600, 627.3600, 823.2700,
                              286256.7000, 2040679.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(199103120000), KQuery::MONTH);
+    record = stock.getKRecord(Datetime(199103120000), KQuery::MONTH);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112310000), KQuery::MONTH);
+    record = stock.getKRecord(Datetime(201112310000), KQuery::MONTH);
     CHECK_EQ(record, KRecord(Datetime(201112310000), 2392.4850, 2423.5590, 2310.1550, 2325.9050,
                              24378748.5000, 256650941.0000));
 
     /** @arg 日期大于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201201010000), KQuery::MONTH);
+    record = stock.getKRecord(Datetime(201201010000), KQuery::MONTH);
     CHECK_EQ(record, Null<KRecord>());
 
     ///===================================
@@ -1939,30 +1939,30 @@ TEST_CASE("test_Stock_getKRecordByDate") {
     ///===================================
 
     /** @arg 日期小于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(200001040944), KQuery::MIN15);
+    record = stock.getKRecord(Datetime(200001040944), KQuery::MIN15);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于第一条记录 */
-    record = stock.getKRecordByDate(Datetime(200001040945), KQuery::MIN15);
+    record = stock.getKRecord(Datetime(200001040945), KQuery::MIN15);
     CHECK_EQ(record, KRecord(Datetime(200001040945), 1366.5800, 1369.6800, 1364.6450, 1364.7630,
                              250875.9000, 912990.0000));
 
     /** @arg 中间存在数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(200001071045), KQuery::MIN15);
+    record = stock.getKRecord(Datetime(200001071045), KQuery::MIN15);
     CHECK_EQ(record, KRecord(Datetime(200001071045), 1482.5210, 1490.0070, 1481.9910, 1485.2770,
                              1030800.2000, 1663302.0000));
 
     /** @arg 中间不存在对应数据的随机一条数据 */
-    record = stock.getKRecordByDate(Datetime(200001071044), KQuery::MIN15);
+    record = stock.getKRecord(Datetime(200001071044), KQuery::MIN15);
     CHECK_EQ(record, Null<KRecord>());
 
     /** @arg 日期等于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112061500), KQuery::MIN15);
+    record = stock.getKRecord(Datetime(201112061500), KQuery::MIN15);
     CHECK_EQ(record, KRecord(Datetime(201112061500), 2323.0680, 2325.9310, 2320.8190, 2325.9050,
                              402339.3000, 4060591.0000));
 
     /** @arg 日期大于最后一条记录 */
-    record = stock.getKRecordByDate(Datetime(201112061501), KQuery::MIN15);
+    record = stock.getKRecord(Datetime(201112061501), KQuery::MIN15);
     CHECK_EQ(record, Null<KRecord>());
 
     MEMORY_CHECK;
