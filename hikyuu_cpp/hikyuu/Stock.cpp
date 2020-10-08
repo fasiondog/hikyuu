@@ -306,50 +306,53 @@ size_t Stock::getCount(KQuery::KType kType) const {
 }
 
 price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) const {
-    if (isNull()) {
+    if (isNull())
         return 0.0;
-    }
 
-    if (!valid()) {
-        if (datetime > lastDatetime()) {
-            return 0.0;
-        }
-    }
+    if (!valid() && datetime > lastDatetime())
+        return 0.0;
 
     string ktype(inktype);
     to_upper(ktype);
 
-    KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
-    price_t price = 0.0;
-
-    if (m_kdataDriver->isIndexFirst()) {
+    // 如果为内存缓存或者数据驱动为索引优先，则按索引方式获取
+    if (m_data->pKData.find(ktype) != m_data->pKData.end() || m_kdataDriver->isIndexFirst()) {
+        KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
         size_t out_start, out_end;
         if (getIndexRange(query, out_start, out_end)) {
             //找到的是>=datetime的记录
             KRecord k = getKRecord(out_start, ktype);
             if (k.datetime == datetime) {
-                price = k.closePrice;
-            } else {
-                if (out_start != 0) {
-                    k = getKRecord(out_start - 1, ktype);
-                    price = k.closePrice;
-                }
+                return k.closePrice;
+            }
+            if (out_start != 0) {
+                k = getKRecord(out_start - 1, ktype);
+                return k.closePrice;
             }
         }
+
     } else {
-        query = KQueryByDate(datetime, Null<Datetime>(), ktype);
+        // 未在缓存中，且日期优先的情况下
+        // 先尝试获取等于该日期的K线数据
+        // 如未找到，则获取小于该日期的最后一条记录
+        KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
         auto k_list = getKRecordList(query);
+        if (k_list.size() > 0 && k_list[0].datetime == datetime) {
+            return k_list[0].closePrice;
+        }
+
+        query = KQueryByDate(startDatetime(), datetime, ktype);
+        k_list = getKRecordList(query);
         if (k_list.size() > 0) {
-            price = k_list[0].closePrice;
+            return k_list[k_list.size() - 1].closePrice;
         }
     }
 
-    if (price <= 0.0) {
-        //没有找到，则取最后一条记录
-        size_t total = getCount(ktype);
-        if (total > 0) {
-            price = getKRecord(total - 1, ktype).closePrice;
-        }
+    //没有找到，则取最后一条记录
+    price_t price = 0.0;
+    size_t total = getCount(ktype);
+    if (total > 0) {
+        price = getKRecord(total - 1, ktype).closePrice;
     }
 
     return price;
@@ -364,9 +367,7 @@ bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_en
     if (KQuery::INDEX == query.queryType())
         return _getIndexRangeByIndex(query, out_start, out_end);
 
-    if ((KQuery::DATE != query.queryType())
-        //|| (query.kType() >= KQuery::INVALID_KTYPE)
-        || query.startDatetime() >= query.endDatetime())
+    if ((KQuery::DATE != query.queryType()) || query.startDatetime() >= query.endDatetime())
         return false;
 
     if (isBuffer(query.kType())) {
@@ -521,6 +522,24 @@ KRecord Stock ::getKRecord(size_t pos, KQuery::KType inkType) const {
     return m_kdataDriver ? m_kdataDriver->getKRecord(market(), code(), pos, kType) : KRecord();
 }
 
+KRecord Stock::getKRecordByDate(const Datetime& datetime, KQuery::KType inktype) const {
+    if (isNull())
+        return Null<KRecord>();
+
+    string ktype(inktype);
+    to_upper(ktype);
+
+    size_t startix = 0, endix = 0;
+    if (m_data->pKData.find(ktype) != m_data->pKData.end() || m_kdataDriver->isIndexFirst()) {
+        KQuery query = KQueryByDate(datetime, Datetime(datetime.number() + 1), ktype);
+        return getIndexRange(query, startix, endix) ? getKRecord(startix, ktype) : Null<KRecord>();
+    }
+
+    auto klist = m_kdataDriver->getKRecordList(market(), code(),
+                                               KQuery(datetime, datetime + Minutes(1), ktype));
+    return klist.size() > 0 ? klist[0] : Null<KRecord>();
+}
+
 KRecordList Stock::getKRecordList(const KQuery& query) const {
     KRecordList result;
     if (isNull()) {
@@ -621,16 +640,6 @@ PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     }
 
     return PriceList();
-}
-
-KRecord Stock::getKRecordByDate(const Datetime& datetime, KQuery::KType ktype) const {
-    size_t startix = 0, endix = 0;
-    KQuery query = KQueryByDate(datetime, Datetime(datetime.number() + 1), ktype);
-    if (getIndexRange(query, startix, endix)) {
-        return getKRecord(startix, ktype);
-    }
-
-    return Null<KRecord>();
 }
 
 void Stock::realtimeUpdate(const KRecord& record) {
