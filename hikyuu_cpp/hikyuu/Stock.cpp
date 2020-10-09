@@ -524,8 +524,9 @@ KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
 }
 
 KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType inktype) const {
+    KRecord result;
     if (isNull())
-        return Null<KRecord>();
+        return result;
 
     string ktype(inktype);
     to_upper(ktype);
@@ -533,12 +534,21 @@ KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType inktype) const
     size_t startix = 0, endix = 0;
     if (m_data->pKData.find(ktype) != m_data->pKData.end() || m_kdataDriver->isIndexFirst()) {
         KQuery query = KQueryByDate(datetime, Datetime(datetime.number() + 1), ktype);
-        return getIndexRange(query, startix, endix) ? getKRecord(startix, ktype) : Null<KRecord>();
+        if (getIndexRange(query, startix, endix)) {
+            auto k = getKRecord(startix, ktype);
+            if (k.datetime == datetime) {
+                result = k;
+            }
+        }
+        return result;
     }
 
     auto klist = m_kdataDriver->getKRecordList(market(), code(),
                                                KQuery(datetime, datetime + Minutes(1), ktype));
-    return klist.size() > 0 ? klist[0] : Null<KRecord>();
+    if (klist.size() > 0 && klist[0].datetime == datetime) {
+        result = klist[0];
+    }
+    return result;
 }
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {
