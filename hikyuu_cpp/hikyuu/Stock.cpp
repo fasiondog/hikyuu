@@ -523,32 +523,22 @@ KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
-KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType inktype) const {
+KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
     KRecord result;
     if (isNull())
         return result;
 
-    string ktype(inktype);
-    to_upper(ktype);
+    // string ktype(inktype);
+    // to_upper(ktype);
 
+    KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
     size_t startix = 0, endix = 0;
     if (m_data->pKData.find(ktype) != m_data->pKData.end() || m_kdataDriver->isIndexFirst()) {
-        KQuery query = KQueryByDate(datetime, Datetime(datetime.number() + 1), ktype);
-        if (getIndexRange(query, startix, endix)) {
-            auto k = getKRecord(startix, ktype);
-            if (k.datetime == datetime) {
-                result = k;
-            }
-        }
-        return result;
+        return getIndexRange(query, startix, endix) ? getKRecord(startix, ktype) : Null<KRecord>();
     }
 
-    auto klist = m_kdataDriver->getKRecordList(market(), code(),
-                                               KQuery(datetime, datetime + Minutes(1), ktype));
-    if (klist.size() > 0 && klist[0].datetime == datetime) {
-        result = klist[0];
-    }
-    return result;
+    auto klist = m_kdataDriver->getKRecordList(market(), code(), query);
+    return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {

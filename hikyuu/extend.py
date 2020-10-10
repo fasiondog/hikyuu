@@ -207,10 +207,10 @@ def KData_getitem(kdata, i):
         return kdata.get(index)
 
     elif isinstance(i, Datetime):
-        return kdata.get_by_date(i)
+        return kdata.get_by_datetime(i)
 
     elif isinstance(i, str):
-        return kdata.get_by_date(Datetime(i))
+        return kdata.get_by_datetime(Datetime(i))
 
     elif isinstance(i, slice):
         return [kdata.get(x) for x in range(*i.indices(len(kdata)))]
