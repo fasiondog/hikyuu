@@ -13,6 +13,9 @@
 using namespace boost::python;
 using namespace hku;
 
+KRecord (KData::*KData_getKRecord1)(size_t pos) const = &KData::getKRecord;
+KRecord (KData::*KData_getKRecord2)(Datetime datetime) const = &KData::getKRecord;
+
 void export_KData() {
     class_<KData>(
       "KData", "通过 Stock.getKData 获取的K线数据，由 KRecord 组成的数组，可象 list 一样进行遍历",
@@ -42,14 +45,14 @@ void export_KData() {
 
     :rtype: DatetimeList)")
 
-      .def("get", &KData::getKRecord, R"(get(self, pos)
+      .def("get", KData_getKRecord1, R"(get(self, pos)
 
     获取指定索引位置的K线记录
 
     :param int pos: 位置索引
     :rtype: KRecord)")
 
-      .def("get_by_datetime", &KData::getKRecordByDate, R"(get_by_datetime(self, datetime)    
+      .def("get_by_datetime", KData_getKRecord2, R"(get_by_datetime(self, datetime)    
 
     获取指定时间的K线记录。
 

@@ -321,7 +321,7 @@ TradeRecord System::runMoment(const KRecord& record) {
 }
 
 TradeRecord System::runMoment(const Datetime& datetime) {
-    KRecord today = m_kdata.getKRecordByDate(datetime);
+    KRecord today = m_kdata.getKRecord(datetime);
     if (today.isValid()) {
         m_buy_days++;
         m_sell_short_days++;

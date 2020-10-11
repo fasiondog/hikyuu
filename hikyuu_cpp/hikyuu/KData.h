@@ -37,16 +37,16 @@ public:
     KRecord getKRecord(size_t pos) const;
 
     /** 按日期查询KRecord */
-    KRecord getKRecordByDate(const Datetime& datetime) const;
+    KRecord getKRecord(Datetime datetime) const;
 
     /** 同getKRecord @see getKRecord */
     KRecord operator[](size_t pos) const {
         return getKRecord(pos);
     }
 
-    /** 同getKRecordByDate @see getKRecordByDate */
-    KRecord operator[](const Datetime& datetime) const {
-        return getKRecordByDate(datetime);
+    /** 同getKRecord @see getKRecord */
+    KRecord operator[](Datetime datetime) const {
+        return getKRecord(datetime);
     }
 
     /** 按日期查询对应的索引位置  */
@@ -164,7 +164,7 @@ inline KRecord KData::getKRecord(size_t pos) const {
     return m_imp->getKRecord(pos);  //如果为空，将抛出异常
 }
 
-inline KRecord KData::getKRecordByDate(const Datetime& datetime) const {
+inline KRecord KData::getKRecord(Datetime datetime) const {
     size_t pos = getPos(datetime);
     return pos != Null<size_t>() ? getKRecord(pos) : Null<KRecord>();
 }

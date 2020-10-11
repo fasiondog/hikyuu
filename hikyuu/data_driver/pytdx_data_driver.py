@@ -74,6 +74,9 @@ class PytdxKDataDriver(KDataDriver):
         :param Query query: 查询条件
         :rtype: KRecordList
         """
+        if query.queryType == Query.DATE:
+            print("未实现按日期查询")
+            return KRecordList()
         start_ix = query.start
         end_ix = query.end
         if start_ix >= end_ix or start_ix < 0 or end_ix < 0:
