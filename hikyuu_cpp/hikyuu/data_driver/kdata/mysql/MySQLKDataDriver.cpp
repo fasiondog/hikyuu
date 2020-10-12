@@ -46,7 +46,8 @@ KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string&
     if (query.queryType() == KQuery::INDEX) {
         result = _getKRecordList(market, code, query.kType(), query.start(), query.end());
     } else {
-        HKU_INFO("Query by date are not supported!");
+        result =
+          _getKRecordList(market, code, query.kType(), query.startDatetime(), query.endDatetime());
     }
     return result;
 }
@@ -54,15 +55,8 @@ KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string&
 KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string& code,
                                               KQuery::KType kType, size_t start_ix, size_t end_ix) {
     KRecordList result;
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
+    if (start_ix >= end_ix)
         return result;
-    };
-
-    if (start_ix >= end_ix) {
-        HKU_ERROR("start_ix({}) >= endix({})", start_ix, end_ix);
-        return result;
-    }
 
     auto con = m_pool->getConnect();
     if (!con) {
@@ -95,13 +89,46 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
     return result;
 }
 
+KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string& code,
+                                              KQuery::KType ktype, Datetime start_date,
+                                              Datetime end_date) {
+    KRecordList result;
+    if (start_date >= end_date)
+        return result;
+
+    auto con = m_pool->getConnect();
+    if (!con) {
+        HKU_ERROR("The acquisition connection failed.");
+        return result;
+    };
+
+    KRecordTable r(market, code, ktype);
+    SQLStatementPtr st =
+      con->getStatement(fmt::format("{} order by date where date >= {} and date < {}",
+                                    r.getSelectSQL(), start_date.number(), end_date.number()));
+    st->exec();
+    while (st->moveNext()) {
+        KRecordTable record;
+        try {
+            record.load(st);
+            KRecord k;
+            k.datetime = record.date();
+            k.openPrice = record.open();
+            k.highPrice = record.high();
+            k.lowPrice = record.low();
+            k.closePrice = record.close();
+            k.transAmount = record.amount();
+            k.transCount = record.count();
+            result.push_back(k);
+        } catch (...) {
+            HKU_ERROR("Failed get record: {}", record.str());
+        }
+    }
+    return result;
+}
+
 size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     size_t result = 0;
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
-        return result;
-    }
-
     auto con = m_pool->getConnect();
     if (!con) {
         HKU_ERROR("The acquisition connection failed.");
@@ -133,11 +160,6 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
     }
 
     if (query.startDatetime() >= query.endDatetime() || query.startDatetime() > (Datetime::max)()) {
-        return false;
-    }
-
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
         return false;
     }
 

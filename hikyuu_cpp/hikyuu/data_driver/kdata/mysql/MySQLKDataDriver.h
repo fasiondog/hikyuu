@@ -45,6 +45,8 @@ private:
     string _getTableName(const string& market, const string& code, KQuery::KType ktype);
     KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType kType,
                                 size_t start_ix, size_t end_ix);
+    KRecordList _getKRecordList(const string& market, const string& code, KQuery::KType ktype,
+                                Datetime start_date, Datetime end_date);
 
 private:
     ConnectPool<MySQLConnect>* m_pool;
