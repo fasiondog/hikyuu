@@ -29,6 +29,7 @@ bool MySQLKDataDriver::_init() {
     connect_param.set<string>("pwd", getParamFromOther<string>(m_params, "pwd", ""));
     string port_str = getParamFromOther<string>(m_params, "port", "3306");
     unsigned int port = boost::lexical_cast<unsigned int>(port_str);
+    connect_param.set<int>("port", port);
     m_pool = new ConnectPool<MySQLConnect>(connect_param);
     return true;
 }
@@ -37,7 +38,7 @@ string MySQLKDataDriver ::_getTableName(const string& market, const string& code
                                         KQuery::KType ktype) {
     string table = fmt::format("`{}`_`{}`.`{}`", market, KQuery::getKTypeName(ktype), code);
     to_lower(table);
-    return std::move(table);
+    return table;
 }
 
 KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string& code,

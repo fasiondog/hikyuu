@@ -95,8 +95,10 @@ void MySQLConnect::exec(const string& sql_string) {
             mysql_free_result(result);
         } else {
             if (mysql_field_count(m_mysql) == 0) {
+#if defined(_DEBUG) || defined(DEBUG)
                 auto num_rows = mysql_affected_rows(m_mysql);
                 HKU_TRACE("num_rows: {}", num_rows);
+#endif
             } else {
                 HKU_THROW("mysql_field_count error：{}! error code：{}, error msg: {}", sql_string,
                           ret, mysql_error(m_mysql));

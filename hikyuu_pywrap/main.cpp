@@ -136,7 +136,6 @@ BOOST_PYTHON_MODULE(core) {
     :return: 对应的证券实例，如果实例不存在，则返回空实例，即Stock()，不抛出异常
     :rtype: Stock)");
 
-    int64_t null_int = Null<int64_t>();
     py::def(
       "get_kdata", Py_GetKData,
       (py::arg("market_code"), py::arg("start") = py::long_(0), py::arg("end") = py::object(),

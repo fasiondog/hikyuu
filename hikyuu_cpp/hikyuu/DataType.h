@@ -21,7 +21,6 @@
 
 #include <stdio.h>
 #include <cstdint>
-#include <string_view>
 #include <iostream>
 #include <list>
 #include <cmath>
@@ -95,7 +94,6 @@ using std::uint8_t;
 typedef double price_t;
 
 using std::string;
-using std::string_view;
 
 using std::enable_shared_from_this;
 using std::make_shared;

@@ -934,7 +934,6 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
         return result;
     }
 
-    H5TransRecord* pBuf = NULL;
     try {
         string tablename(market + code);
         CHECK_DATASET_EXISTS_RET(group, tablename, result);
@@ -1118,7 +1117,6 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
         return result;
     }
 
-    H5TransRecord* pBuf = NULL;
     try {
         string tablename(market + code);
         CHECK_DATASET_EXISTS_RET(group, tablename, result);

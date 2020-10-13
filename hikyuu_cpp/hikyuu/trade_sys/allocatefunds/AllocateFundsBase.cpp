@@ -111,7 +111,6 @@ price_t AllocateFundsBase::_getTotalFunds(const std::list<SYSPtr>& running_list)
     }
 
     // 加上当前总账户现金余额
-    int precision = m_shadow_tm->getParam<int>("precision");
     total_value =
       roundDown(total_value + m_shadow_tm->currentCash(), m_shadow_tm->getParam<int>("precision"));
     return total_value;

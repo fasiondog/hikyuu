@@ -43,7 +43,7 @@ void GlobalInitializer::init() {
 
     initLogger();
     DataDriverFactory::init();
-    auto& sm = StockManager::instance();
+    StockManager::instance();
 }
 
 void GlobalInitializer::clean() {

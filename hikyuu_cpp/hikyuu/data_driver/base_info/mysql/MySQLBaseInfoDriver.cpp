@@ -36,10 +36,7 @@ bool MySQLBaseInfoDriver::_init() {
     connect_param.set<string>("db", getParamFromOther<string>(m_params, "db", "hku_base"));
     string port_str = getParamFromOther<string>(m_params, "port", "3306");
     unsigned int port = boost::lexical_cast<unsigned int>(port_str);
-    HKU_TRACE("MYSQL host: {}", host);
-    HKU_TRACE("MYSQL port: {}", port);
-    HKU_TRACE("MYSQL database: {}", database);
-
+    connect_param.set<int>("port", port);
     m_pool = new ConnectPool<MySQLConnect>(connect_param);
     return true;
 }

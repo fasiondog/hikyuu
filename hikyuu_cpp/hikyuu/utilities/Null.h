@@ -69,6 +69,20 @@ public:
     }
 };
 
+#if !defined(_MSC_VER)
+/**
+ * int64_t Null值
+ */
+template <>
+class Null<int64_t> {
+public:
+    Null() {}
+    operator int64_t() {
+        return (std::numeric_limits<int64_t>::max)();
+    }
+};
+#endif
+
 /**
  * 提供unsigned long long（无符号64位整型）的Null值
  */
