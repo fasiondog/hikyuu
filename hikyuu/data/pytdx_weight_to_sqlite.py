@@ -42,7 +42,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
     stockid_list = cur.execute("select stockid, code from Stock where marketid=%s" % (marketid))
     for stockrecord in stockid_list:
         stockid, code = stockrecord
-        xdxr_list = api.get_xdxr_info(pytdx_market, '600300')
+        xdxr_list = pytdx_api.get_xdxr_info(pytdx_market, code)
 
         # 获取当前数据库中最后的一条权息记录的总股本和流通股本
         a = cur.execute(
