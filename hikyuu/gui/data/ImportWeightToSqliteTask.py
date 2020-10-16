@@ -30,7 +30,9 @@ import urllib.request
 from pytdx.hq import TdxHq_API
 from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
+from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
+
 
 class ImportWeightToSqliteTask:
     def __init__(self, queue, sqlitefile, dest_dir):
@@ -50,12 +52,15 @@ class ImportWeightToSqliteTask:
             return
 
         try:
+            """
             download_dir = self.dest_dir + "/downloads"
             if not os.path.lexists(download_dir):
                 os.makedirs(download_dir)
-            
+
             self.queue.put([self.msg_name, '正在下载钱龙权息信息...', 0, 0, 0])
-            net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+            net_file = urllib.request.urlopen(
+                'http://www.qianlong.com.cn/download/history/weight.rar', timeout=60
+            )
             buffer = net_file.read()
 
             self.queue.put([self.msg_name, '钱龙权息信息下载完成，正在校验是否存在更新...', 0, 0, 0])
@@ -84,17 +89,23 @@ class ImportWeightToSqliteTask:
 
             else:
                 self.queue.put([self.msg_name, '钱龙权息数据无变化', 0, 0, 0])
+            """
 
             hosts = search_best_tdx()
             api = TdxHq_API()
             api.connect(hosts[0][2], hosts[0][3])
 
-            self.queue.put([self.msg_name, '下载通达信权息信息(上证)...', 0, 0, 0])
-            x = pytdx_import_finance(connect, api, "SH")
+            self.queue.put([self.msg_name, '正在导入权息数据...', 0, 0, 0])
+            total_count = pytdx_import_weight_to_sqlite(api, connect, "SH")
+            total_count += pytdx_import_weight_to_sqlite(api, connect, "SZ")
+            self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
 
-            self.queue.put([self.msg_name, '下载通达信权息信息(深证)...', 0, 0, 0])
-            x += pytdx_import_finance(connect, api, "SZ")
-            self.queue.put([self.msg_name, '导入通达信权息信息完毕!', 0, 0, x])
+            #self.queue.put([self.msg_name, '下载通达信财务信息(上证)...', 0, 0, 0])
+            #x = pytdx_import_finance(connect, api, "SH")
+
+            #self.queue.put([self.msg_name, '下载通达信财务信息(深证)...', 0, 0, 0])
+            #x += pytdx_import_finance(connect, api, "SZ")
+            #self.queue.put([self.msg_name, '导入通达信财务信息完毕!', 0, 0, x])
 
             api.disconnect()
 

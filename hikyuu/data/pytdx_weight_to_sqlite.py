@@ -39,9 +39,12 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
     marketid = marketid[0]
     pytdx_market = to_pytdx_market(market)
 
+    total_count = 0
     stockid_list = cur.execute("select stockid, code from Stock where marketid=%s" % (marketid))
+    stockid_list = [x for x in stockid_list]
     for stockrecord in stockid_list:
         stockid, code = stockrecord
+        #print("{}{}".format(market, code))
         xdxr_list = pytdx_api.get_xdxr_info(pytdx_market, code)
 
         # 获取当前数据库中最后的一条权息记录的总股本和流通股本
@@ -50,6 +53,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                          freeCount from stkweight where stockid=%s \
                          order by date desc limit 1" % stockid
         )
+        a = [x for x in a]
         if a:
             last_date, last_total_count, last_free_count = a[0]
         else:
@@ -58,7 +62,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
         records = {}
         for xdxr in xdxr_list:
             date = xdxr['year'] * 1000 + xdxr['month'] * 100 + xdxr['day']
-            if date <= last_date:
+            if date < last_date:
                 continue
             if date not in records:
                 records[date] = [
@@ -95,4 +99,45 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
             if xdxr['panhouliutong'] is not None:
                 last_free_count = round(xdxr['panhouliutong'])
 
-    return
+            if records:
+                cur.executemany(
+                    "INSERT INTO StkWeight(stockid, date, countAsGift, \
+                                 countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
+                                 VALUES (?,?,?,?,?,?,?,?,?)", [x for x in records.values()]
+                )
+                total_count += len(records)
+
+    connect.commit()
+    cur.close()
+
+    return total_count
+
+
+if __name__ == '__main__':
+    import os
+    import time
+    import sqlite3
+    from hikyuu.data.common_sqlite3 import create_database
+    starttime = time.time()
+
+    dest_dir = "c:\\stock"
+    tdx_server = '119.147.212.81'
+    tdx_port = 7709
+    quotations = ['stock', 'fund']
+
+    connect = sqlite3.connect(dest_dir + "\\hikyuu.db")
+    create_database(connect)
+
+    from pytdx.hq import TdxHq_API, TDXParams
+    api = TdxHq_API()
+    api.connect(tdx_server, tdx_port)
+
+    print("导入数量: {}".format(pytdx_import_weight_to_sqlite(api, connect, 'SH')))
+
+    api.disconnect()
+    connect.close()
+
+    endtime = time.time()
+    print("\nTotal time:")
+    print("%.2fs" % (endtime - starttime))
+    print("%.2fm" % ((endtime - starttime) / 60))

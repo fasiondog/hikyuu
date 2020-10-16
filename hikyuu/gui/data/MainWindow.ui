@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1011</width>
-    <height>660</height>
+    <height>559</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>1071</width>
-      <height>661</height>
+      <height>601</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -47,7 +47,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>490</y>
+        <y>390</y>
         <width>481</width>
         <height>131</height>
        </rect>
@@ -201,7 +201,7 @@
         <x>510</x>
         <y>70</y>
         <width>481</width>
-        <height>551</height>
+        <height>451</height>
        </rect>
       </property>
       <property name="title">
@@ -213,21 +213,21 @@
          <x>10</x>
          <y>20</y>
          <width>461</width>
-         <height>181</height>
+         <height>151</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="4" column="1">
-         <widget class="QProgressBar" name="hdf5_time_progressBar">
-          <property name="value">
-           <number>0</number>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>导入日线：</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_11">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>导入财务数据：</string>
+           <string>导入分笔数据：</string>
           </property>
          </widget>
         </item>
@@ -238,24 +238,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QProgressBar" name="hdf5_5min_progressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <widget class="QProgressBar" name="hdf5_trans_progressBar">
           <property name="value">
            <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>导入日线：</string>
           </property>
          </widget>
         </item>
@@ -273,20 +259,6 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QProgressBar" name="hdf5_min_progressBar">
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLabel" name="hdf5_weight_label">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_12">
           <property name="text">
@@ -294,24 +266,38 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="2" column="1">
+         <widget class="QProgressBar" name="hdf5_min_progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QProgressBar" name="hdf5_time_progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QProgressBar" name="hdf5_5min_progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string>导入权息数据：</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>导入分笔数据：</string>
-          </property>
-         </widget>
-        </item>
         <item row="5" column="1">
-         <widget class="QProgressBar" name="finance_progressBar">
-          <property name="value">
-           <number>0</number>
+         <widget class="QLabel" name="hdf5_weight_label">
+          <property name="text">
+           <string>TextLabel</string>
           </property>
          </widget>
         </item>
@@ -321,9 +307,9 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>220</y>
+         <y>180</y>
          <width>461</width>
-         <height>311</height>
+         <height>261</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -358,7 +344,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>110</y>
         <width>481</width>
-        <height>231</height>
+        <height>261</height>
        </rect>
       </property>
       <property name="title">
@@ -368,7 +354,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>30</y>
+         <y>60</y>
          <width>155</width>
          <height>18</height>
         </rect>
@@ -404,7 +390,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>60</y>
+         <y>90</y>
          <width>301</width>
          <height>18</height>
         </rect>
@@ -457,7 +443,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>90</y>
+         <y>120</y>
          <width>271</width>
          <height>126</height>
         </rect>
@@ -555,6 +541,25 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>198</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QCheckBox" name="import_weight_checkBox">
+          <property name="text">
+           <string>下载权息数据</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QLabel" name="import_status_label">
       <property name="geometry">
@@ -568,77 +573,6 @@ p, li { white-space: pre-wrap; }
       <property name="text">
        <string>import_status_label</string>
       </property>
-     </widget>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>360</y>
-        <width>481</width>
-        <height>111</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>导入权息数据（钱龙或大智慧格式）</string>
-      </property>
-      <widget class="QWidget" name="">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>30</y>
-         <width>451</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>上证权息数据路径：</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="sh_weight_dir_lineEdit"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="sh_weight_dir_pushButton">
-          <property name="text">
-           <string>选择</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>70</y>
-         <width>451</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="QLabel" name="label_18">
-          <property name="text">
-           <string>深证权息数据路径：</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="sz_weight_dir_lineEdit"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="sz_weight_dir_pushButton">
-          <property name="text">
-           <string>选择</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </widget>
    </widget>
