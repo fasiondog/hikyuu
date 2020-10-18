@@ -32,7 +32,9 @@ class ProgressBar:
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put([self.src.task_name, self.src.market, 'TRANS', (cur+1) * 100 // total, 0])
+        self.src.queue.put(
+            [self.src.task_name, self.src.market, 'TRANS', (cur + 1) * 100 // total, 0]
+        )
 
 
 class ImportPytdxTransToH5:
@@ -47,17 +49,23 @@ class ImportPytdxTransToH5:
         self.dest_dir = dest_dir
         self.max_days = int(max_days)
 
-
     def __call__(self):
         count = 0
-        connect = sqlite3.connect(self.sqlitefile)
+        connect = sqlite3.connect(self.sqlitefile, timeout=1800)
         try:
 
             progress = ProgressBar(self)
             api = TdxHq_API()
             api.connect(self.ip, self.port)
-            count = import_trans(connect, self.market, self.quotations, api,
-                                 self.dest_dir, max_days=self.max_days, progress=progress)
+            count = import_trans(
+                connect,
+                self.market,
+                self.quotations,
+                api,
+                self.dest_dir,
+                max_days=self.max_days,
+                progress=progress
+            )
         except Exception as e:
             print(e)
         finally:

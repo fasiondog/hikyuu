@@ -42,12 +42,14 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
     total_count = 0
     stockid_list = cur.execute("select stockid, code from Stock where marketid=%s" % (marketid))
     stockid_list = [x for x in stockid_list]
+    cur.close()
+
     for stockrecord in stockid_list:
         stockid, code = stockrecord
         #print("{}{}".format(market, code))
-        xdxr_list = pytdx_api.get_xdxr_info(pytdx_market, code)
 
         # 获取当前数据库中最后的一条权息记录的总股本和流通股本
+        cur = connect.cursor()
         a = cur.execute(
             "select date, totalCount, \
                          freeCount from stkweight where stockid=%s \
@@ -58,7 +60,9 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
             last_date, last_total_count, last_free_count = a[0]
         else:
             last_date, last_total_count, last_free_count = (0, 0, 0)
+        cur.close()
 
+        xdxr_list = pytdx_api.get_xdxr_info(pytdx_market, code)
         records = {}
         for xdxr in xdxr_list:
             date = xdxr['year'] * 1000 + xdxr['month'] * 100 + xdxr['day']
@@ -100,15 +104,15 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                 last_free_count = round(xdxr['panhouliutong'])
 
             if records:
+                cur = connect.cursor()
                 cur.executemany(
                     "INSERT INTO StkWeight(stockid, date, countAsGift, \
                                  countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
                                  VALUES (?,?,?,?,?,?,?,?,?)", [x for x in records.values()]
                 )
+                connect.commit()
+                cur.close()
                 total_count += len(records)
-
-    connect.commit()
-    cur.close()
 
     return total_count
 

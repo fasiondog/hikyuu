@@ -44,7 +44,7 @@ class ImportWeightToSqliteTask:
     def __call__(self):
         total_count = 0
         try:
-            connect = sqlite3.connect(self.sqlitefile)
+            connect = sqlite3.connect(self.sqlitefile, timeout=1800)
         except Exception as e:
             #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])

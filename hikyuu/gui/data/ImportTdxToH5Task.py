@@ -26,12 +26,16 @@ import sqlite3
 
 from hikyuu.data.tdx_to_h5 import tdx_import_data
 
+
 class ProgressBar:
     def __init__(self, src):
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put([self.src.task_name, self.src.market, self.src.ktype, (cur+1) * 100 // total, 0])
+        self.src.queue.put(
+            [self.src.task_name, self.src.market, self.src.ktype, (cur + 1) * 100 // total, 0]
+        )
+
 
 class ImportTdxToH5Task:
     def __init__(self, queue, sqlitefile, market, ktype, quotations, src_dir, dest_dir):
@@ -65,9 +69,12 @@ class ImportTdxToH5Task:
     def __call__(self):
         count = 0
         try:
-            connect = sqlite3.connect(self.sqlitefile)
+            connect = sqlite3.connect(self.sqlitefile, timeout=1800)
             progress = ProgressBar(self)
-            count = tdx_import_data(connect, self.market, self.ktype, self.quotations, self.src_dir, self.dest_dir, progress)
+            count = tdx_import_data(
+                connect, self.market, self.ktype, self.quotations, self.src_dir, self.dest_dir,
+                progress
+            )
         except Exception as e:
             print(e)
         self.queue.put([self.task_name, self.market, self.ktype, None, count])

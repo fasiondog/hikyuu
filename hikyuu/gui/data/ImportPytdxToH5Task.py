@@ -32,11 +32,15 @@ class ProgressBar:
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put([self.src.task_name, self.src.market, self.src.ktype, (cur+1) * 100 // total, 0])
+        self.src.queue.put(
+            [self.src.task_name, self.src.market, self.src.ktype, (cur + 1) * 100 // total, 0]
+        )
 
 
 class ImportPytdxToH5:
-    def __init__(self, queue, sqlitefile, market, ktype, quotations, ip, port, dest_dir, start_datetime):
+    def __init__(
+        self, queue, sqlitefile, market, ktype, quotations, ip, port, dest_dir, start_datetime
+    ):
         self.task_name = 'IMPORT_KDATA'
         self.queue = queue
         self.sqlitefile = sqlitefile
@@ -50,16 +54,18 @@ class ImportPytdxToH5:
 
     def __call__(self):
         count = 0
-        connect = sqlite3.connect(self.sqlitefile)
+        connect = sqlite3.connect(self.sqlitefile, timeout=1800)
         try:
-
             progress = ProgressBar(self)
             api = TdxHq_API()
             api.connect(self.ip, self.port)
-            count = import_data(connect, self.market, self.ktype, self.quotations,
-                                api, self.dest_dir, self.startDatetime, progress)
+            count = import_data(
+                connect, self.market, self.ktype, self.quotations, api, self.dest_dir,
+                self.startDatetime, progress
+            )
         except Exception as e:
-            print(e)
+            print("ImportPytdxToH5Task failed!", e)
+            #self.queue.put([self.task_name, self.market, self.ktype, str(e), count])
         finally:
             connect.commit()
             connect.close()
