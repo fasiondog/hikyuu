@@ -241,15 +241,18 @@ def import_one_stock_data(
                     and bar['high'] >= bar['open'] >= bar['low'] > 0 \
                     and bar['high'] >= bar['close'] >= bar['low'] > 0 \
                     and int(bar['vol']) != 0 and int(bar['amount']*0.001) != 0:
-                row['datetime'] = bar_datetime
-                row['openPrice'] = bar['open'] * 1000
-                row['highPrice'] = bar['high'] * 1000
-                row['lowPrice'] = bar['low'] * 1000
-                row['closePrice'] = bar['close'] * 1000
-                row['transAmount'] = int(bar['amount'] * 0.001)
-                row['transCount'] = bar['vol']
-                row.append()
-                add_record_count += 1
+                try:
+                    row['datetime'] = bar_datetime
+                    row['openPrice'] = bar['open'] * 1000
+                    row['highPrice'] = bar['high'] * 1000
+                    row['lowPrice'] = bar['low'] * 1000
+                    row['closePrice'] = bar['close'] * 1000
+                    row['transAmount'] = int(bar['amount'] * 0.001)
+                    row['transCount'] = bar['vol']
+                    row.append()
+                    add_record_count += 1
+                except:
+                    print("Can't trans record:", bar)
                 last_datetime = bar_datetime
 
     if add_record_count > 0:
