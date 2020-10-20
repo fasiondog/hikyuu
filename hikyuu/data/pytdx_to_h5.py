@@ -247,8 +247,8 @@ def import_one_stock_data(
                     row['highPrice'] = bar['high'] * 1000
                     row['lowPrice'] = bar['low'] * 1000
                     row['closePrice'] = bar['close'] * 1000
-                    row['transAmount'] = int(bar['amount'] * 0.001)
-                    row['transCount'] = bar['vol']
+                    row['transAmount'] = round(bar['amount'] * 0.001)
+                    row['transCount'] = round(bar['vol'])
                     row.append()
                     add_record_count += 1
                 except:
