@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>638</width>
+    <width>593</width>
     <height>559</height>
    </rect>
   </property>
@@ -35,7 +35,7 @@
        <rect>
         <x>20</x>
         <y>20</y>
-        <width>481</width>
+        <width>551</width>
         <height>131</height>
        </rect>
       </property>
@@ -47,7 +47,7 @@
         <rect>
          <x>20</x>
          <y>90</y>
-         <width>451</width>
+         <width>521</width>
          <height>25</height>
         </rect>
        </property>
@@ -95,7 +95,7 @@
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>371</width>
+         <width>411</width>
          <height>22</height>
         </rect>
        </property>
@@ -145,7 +145,7 @@
        <rect>
         <x>20</x>
         <y>170</y>
-        <width>481</width>
+        <width>551</width>
         <height>261</height>
        </rect>
       </property>
@@ -372,7 +372,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>120</y>
+        <y>250</y>
         <width>551</width>
         <height>191</height>
        </rect>
@@ -380,12 +380,12 @@
       <property name="title">
        <string>MYSQL存储设置</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>20</x>
          <y>30</y>
-         <width>371</width>
+         <width>401</width>
          <height>131</height>
         </rect>
        </property>
@@ -398,7 +398,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="mysql_ip_lineEdit"/>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_19">
@@ -408,7 +408,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_2"/>
+         <widget class="QLineEdit" name="mysql_port_lineEdit"/>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_11">
@@ -418,7 +418,7 @@
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QLineEdit" name="lineEdit_3"/>
+         <widget class="QLineEdit" name="mysql_usr_lineEdit"/>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label_13">
@@ -428,14 +428,14 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="mysql_pwd_lineEdit"/>
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="mysql_test_pushButton">
        <property name="geometry">
         <rect>
-         <x>420</x>
+         <x>450</x>
          <y>80</y>
          <width>75</width>
          <height>23</height>
@@ -450,7 +450,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>20</y>
+        <y>130</y>
         <width>551</width>
         <height>71</height>
        </rect>
@@ -488,6 +488,45 @@
        </layout>
       </widget>
      </widget>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>551</width>
+        <height>80</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>存储引擎设置</string>
+      </property>
+      <widget class="QRadioButton" name="enable_hdf55_radioButton">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>40</y>
+         <width>89</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>使用HDF5</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="enable_mysql_radioButton">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>40</y>
+         <width>89</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>使用MYSQL</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -511,7 +550,7 @@
        <rect>
         <x>20</x>
         <y>70</y>
-        <width>481</width>
+        <width>551</width>
         <height>451</height>
        </rect>
       </property>
@@ -523,7 +562,7 @@
         <rect>
          <x>10</x>
          <y>20</y>
-         <width>461</width>
+         <width>531</width>
          <height>151</height>
         </rect>
        </property>
@@ -619,7 +658,7 @@
         <rect>
          <x>10</x>
          <y>180</y>
-         <width>461</width>
+         <width>531</width>
          <height>261</height>
         </rect>
        </property>

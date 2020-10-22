@@ -146,12 +146,33 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         #初始化hdf5设置
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
+        self.enable_hdf55_radioButton.setChecked(hdf5_enable)
         hdf5_dir = import_config.get(
             'hdf5',
             'dir',
             fallback="c:\stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock"
         )
         self.hdf5_dir_lineEdit.setText(hdf5_dir)
+        self.hdf5_dir_lineEdit.setEnabled(hdf5_enable)
+
+        #初始化MYSQL设置
+        mysql_enable = import_config.getboolean('mysql', 'enable', fallback=False)
+        if hdf5_enable:
+            mysql_enable = False
+        self.enable_mysql_radioButton.setChecked(mysql_enable)
+        mysql_ip = import_config.get('mysql', 'ip', fallback='127.0.0.1')
+        self.mysql_ip_lineEdit.setText(mysql_ip)
+        self.mysql_ip_lineEdit.setEnabled(mysql_enable)
+        mysql_port = import_config.get('mysql', 'port', fallback='3306')
+        self.mysql_port_lineEdit.setText(mysql_port)
+        self.mysql_port_lineEdit.setEnabled(mysql_enable)
+        mysql_usr = import_config.get('mysql', 'usr', fallback='root')
+        self.mysql_usr_lineEdit.setText(mysql_usr)
+        self.mysql_usr_lineEdit.setEnabled(mysql_enable)
+        mysql_pwd = import_config.get('mysql', 'pwd', fallback='')
+        self.mysql_pwd_lineEdit.setText(mysql_pwd)
+        self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
+        self.mysql_test_pushButton.setEnabled(mysql_enable)
 
         self.on_tdx_or_pytdx_toggled()
 
@@ -185,7 +206,17 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'enable': self.pytdx_radioButton.isChecked(),
             'use_tdx_number': self.use_tdx_number_spinBox.value()
         }
-        import_config['hdf5'] = {'enable': True, 'dir': self.hdf5_dir_lineEdit.text()}
+        import_config['hdf5'] = {
+            'enable': self.enable_hdf55_radioButton.isChecked(),
+            'dir': self.hdf5_dir_lineEdit.text()
+        }
+        import_config['mysql'] = {
+            'enable': self.enable_mysql_radioButton.isChecked(),
+            'ip': self.mysql_ip_lineEdit.text(),
+            'port': self.mysql_port_lineEdit.text(),
+            'usr': self.mysql_usr_lineEdit.text(),
+            'pwd': self.mysql_pwd_lineEdit.text()
+        }
         return import_config
 
     def initThreads(self):
@@ -241,6 +272,28 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if dlg.exec_():
             dirname = dlg.selectedFiles()
             self.hdf5_dir_lineEdit.setText(dirname[0])
+
+    @pyqtSlot()
+    def on_enable_hdf55_radioButton_clicked(self):
+        if self.enable_hdf55_radioButton.isChecked():
+            self.enable_mysql_radioButton.setChecked(False)
+        self.on_enable_hdf5_or_mysql_toggled()
+
+    @pyqtSlot()
+    def on_enable_mysql_radioButton_clicked(self):
+        if self.enable_mysql_radioButton.isChecked():
+            self.enable_hdf55_radioButton.setChecked(False)
+        self.on_enable_hdf5_or_mysql_toggled()
+
+    def on_enable_hdf5_or_mysql_toggled(self):
+        hdf5_enable = self.enable_hdf55_radioButton.isChecked()
+        mysql_enable = not hdf5_enable
+        self.hdf5_dir_lineEdit.setEnabled(hdf5_enable)
+        self.mysql_ip_lineEdit.setEnabled(mysql_enable)
+        self.mysql_port_lineEdit.setEnabled(mysql_enable)
+        self.mysql_usr_lineEdit.setEnabled(mysql_enable)
+        self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
+        self.mysql_test_pushButton.setEnabled(mysql_enable)
 
     def reset_progress_bar(self):
         self.hdf5_weight_label.setText('')
