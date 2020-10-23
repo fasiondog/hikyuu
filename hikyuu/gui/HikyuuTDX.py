@@ -11,6 +11,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QIcon
 
+import mysql.connector
+from mysql.connector import errorcode
+from mysql.connector.locales.eng import client_error  #此句仅为pyinstaller打包时能够自动引入
+
 from hikyuu.gui.data.MainWindow import *
 from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
@@ -294,6 +298,30 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_usr_lineEdit.setEnabled(mysql_enable)
         self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
         self.mysql_test_pushButton.setEnabled(mysql_enable)
+
+    @pyqtSlot()
+    def on_mysql_test_pushButton_clicked(self):
+        """测试数据库连接"""
+        db_config = {
+            'user': self.mysql_usr_lineEdit.text(),
+            'password': self.mysql_pwd_lineEdit.text(),
+            'host': self.mysql_ip_lineEdit.text(),
+            'port': self.mysql_port_lineEdit.text()
+        }
+
+        try:
+            cnx = mysql.connector.connect(**db_config)
+            cnx.close()
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                QMessageBox.critical(self, "测试数据库连接", "MYSQL密码或用户名错误！")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                QMessageBox.critical(self, "测试数据库连接", "MySQL数据库不存在！")
+            else:
+                QMessageBox.critical(self, "测试数据库连接", err.msg)
+            return
+
+        QMessageBox.about(self, "测试数据库连接", " 连接成功！")
 
     def reset_progress_bar(self):
         self.hdf5_weight_label.setText('')

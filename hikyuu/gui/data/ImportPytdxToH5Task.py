@@ -23,8 +23,10 @@
 # SOFTWARE.
 
 import sqlite3
+import mysql.connector
 from pytdx.hq import TdxHq_API
-from hikyuu.data.pytdx_to_h5 import import_data
+from hikyuu.data.pytdx_to_h5 import import_data as h5_import_data
+from hikyuu.data.pytdx_to_mysql import import_data as mysql_import_data
 
 
 class ProgressBar:
@@ -39,11 +41,11 @@ class ProgressBar:
 
 class ImportPytdxToH5:
     def __init__(
-        self, queue, sqlitefile, market, ktype, quotations, ip, port, dest_dir, start_datetime
+        self, queue, config, market, ktype, quotations, ip, port, dest_dir, start_datetime
     ):
         self.task_name = 'IMPORT_KDATA'
         self.queue = queue
-        self.sqlitefile = sqlitefile
+        self.config = config
         self.market = market
         self.ktype = ktype
         self.quotations = quotations
@@ -51,15 +53,27 @@ class ImportPytdxToH5:
         self.port = port
         self.dest_dir = dest_dir
         self.startDatetime = start_datetime
+        self.import_data = h5_import_data
 
     def __call__(self):
+        if self.config['hdf5']['enable']:
+            sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
+            connect = sqlite3.connect(sqlite_file, timeout=1800)
+        else:
+            db_config = {
+                'user': self.config['mysql']['usr'],
+                'password': self.config['mysql']['pwd'],
+                'host': self.config['mysql']['ip'],
+                'port': self.config['mysql']['port']
+            }
+            connect = mysql.connector.connect(**db_config)
+
         count = 0
-        connect = sqlite3.connect(self.sqlitefile, timeout=1800)
         try:
             progress = ProgressBar(self)
             api = TdxHq_API()
             api.connect(self.ip, self.port)
-            count = import_data(
+            count = self.import_data(
                 connect, self.market, self.ktype, self.quotations, api, self.dest_dir,
                 self.startDatetime, progress
             )

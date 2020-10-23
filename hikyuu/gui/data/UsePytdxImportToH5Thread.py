@@ -32,9 +32,12 @@ from hikyuu.gui.data.ImportPytdxTransToH5Task import ImportPytdxTransToH5
 from hikyuu.gui.data.ImportPytdxTimeToH5Task import ImportPytdxTimeToH5
 from hikyuu.gui.data.ImportHistoryFinanceTask import ImportHistoryFinanceTask
 from pytdx.hq import TdxHq_API
-from hikyuu.data.common_sqlite3 import create_database
-from hikyuu.data.pytdx_to_h5 import import_stock_name
 from hikyuu.data.common_pytdx import search_best_tdx
+
+from hikyuu.data.common_sqlite3 import create_database as sqlite_create_database
+from hikyuu.data.pytdx_to_h5 import import_stock_name as sqlite_import_stock_name
+from hikyuu.data.common_mysql import create_database as mysql_create_database
+from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
 
 
 class UsePytdxImportToH5Thread(QThread):
@@ -57,6 +60,13 @@ class UsePytdxImportToH5Thread(QThread):
 
         self.queue = Queue()
 
+        if config['hdf5']['enable']:
+            self.create_database = sqlite_create_database
+            self.import_stock_name = sqlite_import_stock_name
+        else:
+            self.create_database = mysql_create_database
+            self.import_stock_name = mysql_import_stock_name
+
     def __del__(self):
         for p in self.process_list:
             if p.is_alive():
@@ -74,8 +84,8 @@ class UsePytdxImportToH5Thread(QThread):
         if self.config.getboolean('weight', 'enable', fallback=False):
             self.tasks.append(ImportWeightToSqliteTask(self.queue, sqlite_file_name, dest_dir))
 
-        if self.config.getboolean('finance', 'enable', fallback=False):
-            self.tasks.append(ImportHistoryFinanceTask(self.queue, dest_dir))
+        #if self.config.getboolean('finance', 'enable', fallback=False):
+        #    self.tasks.append(ImportHistoryFinanceTask(self.queue, dest_dir))
 
         task_count = 0
         if self.config.getboolean('ktype', 'day', fallback=False):
@@ -141,19 +151,17 @@ class UsePytdxImportToH5Thread(QThread):
                                                     '%Y-%m-%d').date()
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.queue, sqlite_file_name, 'SH', '1MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 +
-                    start_date.day * 10000
+                    self.queue, self.config, 'SH', '1MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir, start_date.year * 100000000 +
+                    start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.queue, sqlite_file_name, 'SZ', '1MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 +
-                    start_date.day * 10000
+                    self.queue, self.config, 'SZ', '1MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir, start_date.year * 100000000 +
+                    start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
@@ -184,19 +192,17 @@ class UsePytdxImportToH5Thread(QThread):
                                                     '%Y-%m-%d').date()
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.queue, sqlite_file_name, 'SH', '5MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 +
-                    start_date.day * 10000
+                    self.queue, self.config, 'SH', '5MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir, start_date.year * 100000000 +
+                    start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.queue, sqlite_file_name, 'SZ', '5MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 +
-                    start_date.day * 10000
+                    self.queue, self.config, 'SZ', '5MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir, start_date.year * 100000000 +
+                    start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
@@ -206,19 +212,17 @@ class UsePytdxImportToH5Thread(QThread):
                                                     '%Y-%m-%d').date()
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.queue, sqlite_file_name, 'SH', 'DAY', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 +
-                    start_date.day * 10000
+                    self.queue, self.config, 'SH', 'DAY', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir, start_date.year * 100000000 +
+                    start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.queue, sqlite_file_name, 'SZ', 'DAY', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 +
-                    start_date.day * 10000
+                    self.queue, self.config, 'SZ', 'DAY', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir, start_date.year * 100000000 +
+                    start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
@@ -254,15 +258,15 @@ class UsePytdxImportToH5Thread(QThread):
         self.send_message(['INFO', '导入股票代码表'])
 
         connect = sqlite3.connect(dest_dir + "/stock.db")
-        create_database(connect)
+        self.create_database(connect)
 
         pytdx_api = TdxHq_API()
         pytdx_api.connect(self.hosts[0][2], self.hosts[0][3])
 
-        count = import_stock_name(connect, pytdx_api, 'SH', self.quotations)
+        count = self.import_stock_name(connect, pytdx_api, 'SH', self.quotations)
         if count > 0:
             self.send_message(['INFO', '上证新增股票数：%s' % count])
-        count = import_stock_name(connect, pytdx_api, 'SZ', self.quotations)
+        count = self.import_stock_name(connect, pytdx_api, 'SZ', self.quotations)
         if count > 0:
             self.send_message(['INFO', '深证新增股票数：%s' % count])
 
