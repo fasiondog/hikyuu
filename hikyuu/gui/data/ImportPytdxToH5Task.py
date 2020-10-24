@@ -53,12 +53,13 @@ class ImportPytdxToH5:
         self.port = port
         self.dest_dir = dest_dir
         self.startDatetime = start_datetime
-        self.import_data = h5_import_data
 
     def __call__(self):
-        if self.config['hdf5']['enable']:
+        if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
             connect = sqlite3.connect(sqlite_file, timeout=1800)
+            import_data = h5_import_data
+            print('use hdf5 import kdata')
         else:
             db_config = {
                 'user': self.config['mysql']['usr'],
@@ -67,13 +68,15 @@ class ImportPytdxToH5:
                 'port': self.config['mysql']['port']
             }
             connect = mysql.connector.connect(**db_config)
+            import_data = mysql_import_data
+            print('use mysql import kdata')
 
         count = 0
         try:
             progress = ProgressBar(self)
             api = TdxHq_API()
             api.connect(self.ip, self.port)
-            count = self.import_data(
+            count = import_data(
                 connect, self.market, self.ktype, self.quotations, api, self.dest_dir,
                 self.startDatetime, progress
             )

@@ -26,25 +26,42 @@ import os
 import hashlib
 import sqlite3
 import urllib.request
+import mysql.connector
 
 from pytdx.hq import TdxHq_API
 from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
-from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
+from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
+#from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
 
 
 class ImportWeightToSqliteTask:
-    def __init__(self, queue, sqlitefile, dest_dir):
+    def __init__(self, queue, config, dest_dir):
         self.queue = queue
-        self.sqlitefile = sqlitefile
+        self.config = config
         self.dest_dir = dest_dir
         self.msg_name = 'IMPORT_WEIGHT'
 
     def __call__(self):
         total_count = 0
         try:
-            connect = sqlite3.connect(self.sqlitefile, timeout=1800)
+            if self.config.getboolean('hdf5', 'enable', fallback=True):
+                sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
+                connect = sqlite3.connect(sqlite_file, timeout=1800)
+                pytdx_import_weight = pytdx_import_weight_to_sqlite
+                print('use sqlite import weight')
+            else:
+                db_config = {
+                    'user': self.config['mysql']['usr'],
+                    'password': self.config['mysql']['pwd'],
+                    'host': self.config['mysql']['ip'],
+                    'port': self.config['mysql']['port']
+                }
+                connect = mysql.connector.connect(**db_config)
+                pytdx_import_weight = pytdx_import_weight_to_mysql
+                print('use mysql import weight')
+
         except Exception as e:
             #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
@@ -96,8 +113,8 @@ class ImportWeightToSqliteTask:
             api.connect(hosts[0][2], hosts[0][3])
 
             self.queue.put([self.msg_name, '正在导入权息数据...', 0, 0, 0])
-            total_count = pytdx_import_weight_to_sqlite(api, connect, "SH")
-            total_count += pytdx_import_weight_to_sqlite(api, connect, "SZ")
+            total_count = pytdx_import_weight(api, connect, "SH")
+            total_count += pytdx_import_weight(api, connect, "SZ")
             self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
 
             #self.queue.put([self.msg_name, '下载通达信财务信息(上证)...', 0, 0, 0])

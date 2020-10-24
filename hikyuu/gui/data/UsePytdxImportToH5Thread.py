@@ -24,6 +24,7 @@
 
 import sqlite3
 import datetime
+import mysql.connector
 from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
 from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
@@ -60,13 +61,6 @@ class UsePytdxImportToH5Thread(QThread):
 
         self.queue = Queue()
 
-        if config['hdf5']['enable']:
-            self.create_database = sqlite_create_database
-            self.import_stock_name = sqlite_import_stock_name
-        else:
-            self.create_database = mysql_create_database
-            self.import_stock_name = mysql_import_stock_name
-
     def __del__(self):
         for p in self.process_list:
             if p.is_alive():
@@ -82,7 +76,7 @@ class UsePytdxImportToH5Thread(QThread):
 
         self.tasks = []
         if self.config.getboolean('weight', 'enable', fallback=False):
-            self.tasks.append(ImportWeightToSqliteTask(self.queue, sqlite_file_name, dest_dir))
+            self.tasks.append(ImportWeightToSqliteTask(self.queue, self.config, dest_dir))
 
         #if self.config.getboolean('finance', 'enable', fallback=False):
         #    self.tasks.append(ImportHistoryFinanceTask(self.queue, dest_dir))
@@ -237,8 +231,6 @@ class UsePytdxImportToH5Thread(QThread):
             self.send_message(['THREAD', 'FINISHED'])
 
     def _run(self):
-        #src_dir = self.config['tdx']['dir']
-        dest_dir = self.config['hdf5']['dir']
         hdf5_import_progress = {
             'SH': {
                 'DAY': 0,
@@ -257,16 +249,30 @@ class UsePytdxImportToH5Thread(QThread):
         #正在导入代码表
         self.send_message(['INFO', '导入股票代码表'])
 
-        connect = sqlite3.connect(dest_dir + "/stock.db")
-        self.create_database(connect)
+        if self.config.getboolean('hdf5', 'enable', fallback=True):
+            connect = sqlite3.connect("{}/stock.db".format(self.config['hdf5']['dir']))
+            create_database = sqlite_create_database
+            import_stock_name = sqlite_import_stock_name
+        else:
+            db_config = {
+                'user': self.config['mysql']['usr'],
+                'password': self.config['mysql']['pwd'],
+                'host': self.config['mysql']['ip'],
+                'port': self.config['mysql']['port']
+            }
+            connect = mysql.connector.connect(**db_config)
+            create_database = mysql_create_database
+            import_stock_name = mysql_import_stock_name
+
+        create_database(connect)
 
         pytdx_api = TdxHq_API()
         pytdx_api.connect(self.hosts[0][2], self.hosts[0][3])
 
-        count = self.import_stock_name(connect, pytdx_api, 'SH', self.quotations)
+        count = import_stock_name(connect, pytdx_api, 'SH', self.quotations)
         if count > 0:
             self.send_message(['INFO', '上证新增股票数：%s' % count])
-        count = self.import_stock_name(connect, pytdx_api, 'SZ', self.quotations)
+        count = import_stock_name(connect, pytdx_api, 'SZ', self.quotations)
         if count > 0:
             self.send_message(['INFO', '深证新增股票数：%s' % count])
 
