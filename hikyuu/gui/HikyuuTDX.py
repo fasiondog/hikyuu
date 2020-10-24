@@ -57,14 +57,30 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             current_config.write(f)
 
         filename = self.getUserConfigDir() + '/hikyuu.ini'
-        data_dir = current_config['hdf5']['dir']
+        if current_config.getboolean('hdf5', 'enable', fallback=True):
+            data_dir = current_config['hdf5']['dir']
+            if not os.path.lexists(data_dir + '/tmp'):
+                os.mkdir(data_dir + '/tmp')
+
+            # 此处不能使用 utf-8 参数，否则导致Windows下getBlock无法找到板块分类
+            # with open(filename, 'w', encoding='utf-8') as f:
+            with open(filename, 'w') as f:
+                f.write(hku_config_template.hdf5_template.format(dir=data_dir))
+        else:
+            data_dir = current_config['mysql']['tmpdir']
+            with open(filename, 'w') as f:
+                f.write(
+                    hku_config_template.mysql_template.format(
+                        dir=data_dir,
+                        host=current_config['mysql']['host'],
+                        port=current_config['mysql']['port'],
+                        usr=current_config['mysql']['usr'],
+                        pwd=current_config['mysql']['pwd']
+                    )
+                )
+
         if not os.path.lexists(data_dir):
             os.makedirs(data_dir)
-
-        # 此处不能使用 utf-8 参数，否则导致Windows下getBlock无法找到板块分类
-        # with open(filename, 'w', encoding='utf-8') as f:
-        with open(filename, 'w') as f:
-            f.write(hku_config_template.hdf5_template.format(dir=data_dir))
 
         if not os.path.lexists(data_dir + '/block'):
             current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -72,9 +88,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             dirname = os.path.join(dirname, 'config/block')
             shutil.copytree(dirname, data_dir + '/block')
             os.remove(data_dir + '/block/__init__.py')
-
-        if not os.path.lexists(data_dir + '/tmp'):
-            os.mkdir(data_dir + '/tmp')
 
     def initUI(self):
         current_dir = os.path.dirname(__file__)
@@ -164,7 +177,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if hdf5_enable:
             mysql_enable = False
         self.enable_mysql_radioButton.setChecked(mysql_enable)
-        mysql_ip = import_config.get('mysql', 'ip', fallback='127.0.0.1')
+        self.mysql_tmpdir_lineEdit.setText(
+            import_config.get('mysql', 'tmpdir', fallback='c:\stock')
+        )
+        mysql_ip = import_config.get('mysql', 'host', fallback='127.0.0.1')
         self.mysql_ip_lineEdit.setText(mysql_ip)
         self.mysql_ip_lineEdit.setEnabled(mysql_enable)
         mysql_port = import_config.get('mysql', 'port', fallback='3306')
@@ -216,7 +232,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         }
         import_config['mysql'] = {
             'enable': self.enable_mysql_radioButton.isChecked(),
-            'ip': self.mysql_ip_lineEdit.text(),
+            'tmpdir': self.mysql_tmpdir_lineEdit.text(),
+            'host': self.mysql_ip_lineEdit.text(),
             'port': self.mysql_port_lineEdit.text(),
             'usr': self.mysql_usr_lineEdit.text(),
             'pwd': self.mysql_pwd_lineEdit.text()
@@ -298,6 +315,16 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_usr_lineEdit.setEnabled(mysql_enable)
         self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
         self.mysql_test_pushButton.setEnabled(mysql_enable)
+
+    @pyqtSlot()
+    def on_mysql_tmpdir_pushButton_clicked(self):
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.Directory)
+        config = self.getCurrentConfig()
+        dlg.setDirectory(config['mysql']['tmpdir'])
+        if dlg.exec_():
+            dirname = dlg.selectedFiles()
+            self.mysql_tmpdir_lineEdit.setText(dirname[0])
 
     @pyqtSlot()
     def on_mysql_test_pushButton_clicked(self):

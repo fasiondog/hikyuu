@@ -257,7 +257,7 @@ class UsePytdxImportToH5Thread(QThread):
             db_config = {
                 'user': self.config['mysql']['usr'],
                 'password': self.config['mysql']['pwd'],
-                'host': self.config['mysql']['ip'],
+                'host': self.config['mysql']['host'],
                 'port': self.config['mysql']['port']
             }
             connect = mysql.connector.connect(**db_config)

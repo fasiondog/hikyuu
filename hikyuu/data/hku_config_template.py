@@ -64,10 +64,9 @@ sh_trans = {dir}/sh_trans.h5
 sz_trans = {dir}/sz_trans.h5
 """
 
-
 mysql_template = """
 [hikyuu]
-tmpdir = {dir}/tmp
+tmpdir = {dir}
 
 [block]
 type  = qianlong

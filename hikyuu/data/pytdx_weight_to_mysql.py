@@ -75,7 +75,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
         records = {}
         for xdxr in xdxr_list:
             try:
-                date = xdxr['year'] * 1000 + xdxr['month'] * 100 + xdxr['day']
+                date = xdxr['year'] * 10000 + xdxr['month'] * 100 + xdxr['day']
                 if date < db_last_date:
                     continue
                 if date == db_last_date and new_last_db_weight is not None:

@@ -372,9 +372,9 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>250</y>
+        <y>240</y>
         <width>551</width>
-        <height>191</height>
+        <height>241</height>
        </rect>
       </property>
       <property name="title">
@@ -384,8 +384,8 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>30</y>
-         <width>401</width>
+         <y>80</y>
+         <width>421</width>
          <height>131</height>
         </rect>
        </property>
@@ -436,7 +436,7 @@
        <property name="geometry">
         <rect>
          <x>450</x>
-         <y>80</y>
+         <y>130</y>
          <width>75</width>
          <height>23</height>
         </rect>
@@ -444,6 +444,35 @@
        <property name="text">
         <string>测试连接</string>
        </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>501</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>临时文件目录：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="mysql_tmpdir_lineEdit"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="mysql_tmpdir_pushButton">
+          <property name="text">
+           <string>选择</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_3">

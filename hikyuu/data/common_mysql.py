@@ -117,7 +117,7 @@ def get_stock_list(connect, market, quotations):
 
 
 def get_table(connect, market, code, ktype):
-    """note: market: 'DAY' | 'MIN' | 'MIN5' """
+    """note: ktype: 'DAY' | 'MIN' | 'MIN5' """
     cur = connect.cursor()
     schema = "{market}_{ktype}".format(market=market, ktype=ktype).lower()
     cur.execute("SELECT 1 FROM information_schema.SCHEMATA where SCHEMA_NAME='{}'".format(schema))
