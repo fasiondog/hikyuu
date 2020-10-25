@@ -178,7 +178,7 @@ if __name__ == '__main__':
     host = '127.0.0.1'
     port = 3306
     usr = 'root'
-    pwd = 'Hikyuu2020*'
+    pwd = ''
     tdx_server = '119.147.212.81'
     tdx_port = 7709
     quotations = ['stock', 'fund']

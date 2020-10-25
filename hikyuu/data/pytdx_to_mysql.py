@@ -31,7 +31,8 @@ import mysql.connector
 
 from .common import MARKETID, STOCKTYPE, get_stktype_list
 from .common_mysql import (
-    create_database, get_marketid, get_codepre_list, get_stock_list, get_table, get_lastdatetime
+    create_database, get_marketid, get_codepre_list, get_stock_list, get_table, get_lastdatetime,
+    update_extern_data
 )
 from .weight_to_mysql import qianlong_import_weight
 
@@ -316,13 +317,12 @@ def import_data(
 
         this_count = import_one_stock_data(connect, api, market, ktype, stock, startDate)
         add_record_count += this_count
-        """
         if this_count > 0:
             if ktype == 'DAY':
-                update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+                update_extern_data(connect, market.upper(), stock[2], 'DAY')
             elif ktype == '5MIN':
-                update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
-        """
+                update_extern_data(connect, market.upper(), stock[2], '5MIN')
+
         if progress:
             progress(i, total)
 

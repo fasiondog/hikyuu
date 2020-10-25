@@ -65,27 +65,31 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
         return result;
     };
 
-    KRecordTable r(market, code, kType);
-    SQLStatementPtr st = con->getStatement(
-      fmt::format("{} order by date limit {}, {}", r.getSelectSQL(), start_ix, end_ix - start_ix));
+    try {
+        KRecordTable r(market, code, kType);
+        SQLStatementPtr st = con->getStatement(fmt::format(
+          "{} order by date limit {}, {}", r.getSelectSQL(), start_ix, end_ix - start_ix));
 
-    st->exec();
-    while (st->moveNext()) {
-        KRecordTable record;
-        try {
-            record.load(st);
-            KRecord k;
-            k.datetime = record.date();
-            k.openPrice = record.open();
-            k.highPrice = record.high();
-            k.lowPrice = record.low();
-            k.closePrice = record.close();
-            k.transAmount = record.amount();
-            k.transCount = record.count();
-            result.push_back(k);
-        } catch (...) {
-            HKU_ERROR("Failed get record: {}", record.str());
+        st->exec();
+        while (st->moveNext()) {
+            KRecordTable record;
+            try {
+                record.load(st);
+                KRecord k;
+                k.datetime = record.date();
+                k.openPrice = record.open();
+                k.highPrice = record.high();
+                k.lowPrice = record.low();
+                k.closePrice = record.close();
+                k.transAmount = record.amount();
+                k.transCount = record.count();
+                result.push_back(k);
+            } catch (...) {
+                HKU_ERROR("Failed get record: {}", record.str());
+            }
         }
+    } catch (...) {
+        // 表可能不存在
     }
     return result;
 }
@@ -103,27 +107,31 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
         return result;
     };
 
-    KRecordTable r(market, code, ktype);
-    SQLStatementPtr st =
-      con->getStatement(fmt::format("{} order by date where date >= {} and date < {}",
-                                    r.getSelectSQL(), start_date.number(), end_date.number()));
-    st->exec();
-    while (st->moveNext()) {
-        KRecordTable record;
-        try {
-            record.load(st);
-            KRecord k;
-            k.datetime = record.date();
-            k.openPrice = record.open();
-            k.highPrice = record.high();
-            k.lowPrice = record.low();
-            k.closePrice = record.close();
-            k.transAmount = record.amount();
-            k.transCount = record.count();
-            result.push_back(k);
-        } catch (...) {
-            HKU_ERROR("Failed get record: {}", record.str());
+    try {
+        KRecordTable r(market, code, ktype);
+        SQLStatementPtr st =
+          con->getStatement(fmt::format("{} order by date where date >= {} and date < {}",
+                                        r.getSelectSQL(), start_date.number(), end_date.number()));
+        st->exec();
+        while (st->moveNext()) {
+            KRecordTable record;
+            try {
+                record.load(st);
+                KRecord k;
+                k.datetime = record.date();
+                k.openPrice = record.open();
+                k.highPrice = record.high();
+                k.lowPrice = record.low();
+                k.closePrice = record.close();
+                k.transAmount = record.amount();
+                k.transCount = record.count();
+                result.push_back(k);
+            } catch (...) {
+                HKU_ERROR("Failed get record: {}", record.str());
+            }
         }
+    } catch (...) {
+        // 表可能不存在
     }
     return result;
 }

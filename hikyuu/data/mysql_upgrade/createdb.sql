@@ -28,7 +28,7 @@ CREATE TABLE `hku_base`.`stkweight` (
 	`totalCount` DOUBLE UNSIGNED NOT NULL,
 	`freeCount` DOUBLE UNSIGNED NOT NULL,
 	PRIMARY KEY (`id`),
-	INDEX `stockid` (`stockid`)
+	INDEX `ix_stockid_date` (`stockid`, `date`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
