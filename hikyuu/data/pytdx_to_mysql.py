@@ -241,7 +241,7 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
                     buf.append(
                         (
                             bar_datetime, bar['open'], bar['high'], bar['low'], bar['close'],
-                            round(bar['amount'] * 0.001), round(bar['vol'])
+                            bar['amount'] * 0.001, bar['vol']
                             #bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)
                         )
                     )

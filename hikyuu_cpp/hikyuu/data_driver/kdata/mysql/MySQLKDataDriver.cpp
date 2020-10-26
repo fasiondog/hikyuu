@@ -36,7 +36,7 @@ bool MySQLKDataDriver::_init() {
 
 string MySQLKDataDriver ::_getTableName(const string& market, const string& code,
                                         KQuery::KType ktype) {
-    string table = fmt::format("`{}`_`{}`.`{}`", market, KQuery::getKTypeName(ktype), code);
+    string table = fmt::format("`{}_{}`.`{}`", market, KQuery::getKTypeName(ktype), code);
     to_lower(table);
     return table;
 }
