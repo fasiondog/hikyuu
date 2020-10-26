@@ -222,6 +222,7 @@ struct HKU_API Stock::Data {
     Datetime m_lastDate;   //证券最后日期
 
     StockWeightList m_weightList;  //权息信息列表
+    Datetime m_lastUpdateWeight;   //上次更新权息列表缓存的时刻
 
     price_t m_tick;
     price_t m_tickValue;
