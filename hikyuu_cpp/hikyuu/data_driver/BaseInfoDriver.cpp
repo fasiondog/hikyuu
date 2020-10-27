@@ -86,8 +86,15 @@ bool BaseInfoDriver::loadBaseInfo() {
     return true;
 }
 
-Parameter BaseInfoDriver ::getFinanceInfo(const string& market, const string& code) {
+Parameter BaseInfoDriver::getFinanceInfo(const string& market, const string& code) {
+    HKU_INFO("The getFinanceInfo method has not been implemented! (BaseInfoDriver: {})", m_name);
     return Parameter();
+}
+
+StockWeightList BaseInfoDriver::getStockWeightList(uint64_t stockid, Datetime start, Datetime end) {
+    HKU_INFO("The getStockWeightList method has not been implemented! (BaseInfoDriver: {})",
+             m_name);
+    return StockWeightList();
 }
 
 } /* namespace hku */

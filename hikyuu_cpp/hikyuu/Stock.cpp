@@ -269,6 +269,10 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     }
 }
 
+StockWeightList Stock::getWeight() const {
+    return m_data ? m_data->m_weightList : StockWeightList();
+}
+
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     if (!m_data || start >= end)

@@ -38,6 +38,7 @@ bool MySQLBaseInfoDriver::_init() {
     unsigned int port = boost::lexical_cast<unsigned int>(port_str);
     connect_param.set<int>("port", port);
     m_pool = new ConnectPool<MySQLConnect>(connect_param);
+    HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
     return true;
 }
 
@@ -105,40 +106,41 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
     return true;
 }
 
-StockWeightList MySQLBaseInfoDriver::_getStockWeightList(uint64_t stockid) {
+StockWeightList MySQLBaseInfoDriver::getStockWeightList(uint64_t stockid, Datetime start,
+                                                        Datetime end) {
     StockWeightList result;
-    if (!m_pool) {
-        HKU_ERROR("Connect pool ptr is null!");
-        return result;
-    }
+    HKU_ASSERT(m_pool);
 
-    auto con = m_pool->getConnect();
-    HKU_ASSERT(con);
-
-    vector<StockWeightTable> table;
     try {
-        con->batchLoad(table, format("stockid={}", stockid));
+        auto con = m_pool->getConnect();
+        HKU_CHECK(con, "Failed fetch connect!");
+
+        vector<StockWeightTable> table;
+        con->batchLoad(table, format("stockid={} and date>={} and date<{}", stockid,
+                                     start.year() * 10000 + start.month() * 100 + start.day(),
+                                     end.year() * 10000 + end.month() * 100 + end.day()));
+
+        for (auto &w : table) {
+            try {
+                result.push_back(StockWeight(Datetime(w.date * 10000), w.countAsGift * 0.0001,
+                                             w.countForSell * 0.0001, w.priceForSell * 0.001,
+                                             w.bonus * 0.001, w.countOfIncreasement * 0.0001,
+                                             w.totalCount, w.freeCount));
+            } catch (std::out_of_range &e) {
+                HKU_WARN("Date of id({}) is invalid! {}", w.id(), e.what());
+            } catch (std::exception &e) {
+                HKU_WARN("Error StockWeight Record id({}) {}", w.id(), e.what());
+            } catch (...) {
+                HKU_WARN("Error StockWeight Record id({})! Unknow reason!", w.id());
+            }
+        }
+
     } catch (std::exception &e) {
         HKU_FATAL("load StockWeight table failed! {}", e.what());
         return result;
     } catch (...) {
         HKU_FATAL("load StockWeight table failed!");
         return result;
-    }
-
-    for (auto &w : table) {
-        try {
-            result.push_back(StockWeight(Datetime(w.date * 10000), w.countAsGift * 0.0001,
-                                         w.countForSell * 0.0001, w.priceForSell * 0.001,
-                                         w.bonus * 0.001, w.countOfIncreasement * 0.0001,
-                                         w.totalCount, w.freeCount));
-        } catch (std::out_of_range &e) {
-            HKU_WARN("Date of id({}) is invalid! {}", w.id(), e.what());
-        } catch (std::exception &e) {
-            HKU_WARN("Error StockWeight Record id({}) {}", w.id(), e.what());
-        } catch (...) {
-            HKU_WARN("Error StockWeight Record id({})! Unknow reason!", w.id());
-        }
     }
 
     return result;
@@ -208,7 +210,8 @@ bool MySQLBaseInfoDriver::_loadStock() {
         }
 
         if (sm.loadStock(stock)) {
-            StockWeightList weightList = _getStockWeightList(r.stockid);
+            StockWeightList weightList =
+              getStockWeightList(r.stockid, Datetime::min(), Datetime::max());
             stock.setWeightList(weightList);
         }
     }

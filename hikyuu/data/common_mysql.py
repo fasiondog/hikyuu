@@ -350,8 +350,8 @@ def update_extern_data(connect, market, code, data_type):
             return None
 
     if data_type.lower() == 'day':
-        index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
-        #index_list = ('week', )
+        index_list = ('week', 'month', 'year')
+        #index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
         base_table = get_table(connect, market, code, 'day')
     else:
         index_list = ('min15', 'min30', 'min60')

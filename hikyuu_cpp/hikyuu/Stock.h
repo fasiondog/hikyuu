@@ -269,10 +269,6 @@ inline uint64_t Stock::id() const {
     return isNull() ? 0 : (int64_t)m_data.get();
 }
 
-inline StockWeightList Stock::getWeight() const {
-    return m_data ? m_data->m_weightList : StockWeightList();
-}
-
 inline bool Stock::operator==(const Stock& stock) const {
     return (*this != stock) ? false : true;
 }

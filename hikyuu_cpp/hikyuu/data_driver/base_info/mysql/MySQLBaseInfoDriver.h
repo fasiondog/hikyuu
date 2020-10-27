@@ -30,9 +30,8 @@ public:
     virtual bool _loadMarketInfo() override;
     virtual bool _loadStockTypeInfo() override;
     virtual bool _loadStock() override;
-
-private:
-    StockWeightList _getStockWeightList(uint64_t);
+    virtual StockWeightList getStockWeightList(uint64_t stockid, Datetime start,
+                                               Datetime end) override;
 
 private:
     ConnectPool<MySQLConnect> *m_pool;

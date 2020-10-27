@@ -51,6 +51,14 @@ public:
     bool loadBaseInfo();
 
     /**
+     * 获取指定日期范围内 [start, end) 的权限列表
+     * @param stockid stock id
+     * @param start 起始日期
+     * @param end 结束日期
+     */
+    virtual StockWeightList getStockWeightList(uint64_t stockid, Datetime start, Datetime end);
+
+    /**
      * 获取当前财务信息
      * @param market 市场标识
      * @param code 证券代码
