@@ -16,9 +16,6 @@ using namespace hku;
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getIndex_overloads, getIndex, 1, 2)
 
-StockWeightList (Stock::*getWeight1)() const = &Stock::getWeight;
-StockWeightList (Stock::*getWeight2)(const Datetime&, const Datetime&) const = &Stock::getWeight;
-
 KRecord (Stock::*getKRecord1)(size_t pos, KQuery::KType kType) const = &Stock::getKRecord;
 KRecord (Stock::*getKRecord2)(const Datetime&, KQuery::KType kType) const = &Stock::getKRecord;
 
@@ -160,8 +157,9 @@ void export_Stock() {
 
     :param KRecord krecord: 新增的实时K线记录)")
 
-      .def("get_weight", getWeight1)
-      .def("get_weight", getWeight2, R"(get_weight(self, [start, end])
+      .def("get_weight", &Stock::getWeight,
+           (arg("start") = Datetime::min(), arg("end") = Datetime()),
+           R"(get_weight(self, [start, end])
 
     获取指定时间段[start,end)内的权息信息。未指定起始、结束时刻时，获取全部权息记录。
 

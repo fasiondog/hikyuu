@@ -106,8 +106,8 @@ bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
     return true;
 }
 
-StockWeightList MySQLBaseInfoDriver::getStockWeightList(uint64_t stockid, Datetime start,
-                                                        Datetime end) {
+StockWeightList MySQLBaseInfoDriver::getStockWeightList(const string &market, const string &code,
+                                                        Datetime start, Datetime end) {
     StockWeightList result;
     HKU_ASSERT(m_pool);
 
@@ -116,9 +116,14 @@ StockWeightList MySQLBaseInfoDriver::getStockWeightList(uint64_t stockid, Dateti
         HKU_CHECK(con, "Failed fetch connect!");
 
         vector<StockWeightTable> table;
-        con->batchLoad(table, format("stockid={} and date>={} and date<{}", stockid,
-                                     start.year() * 10000 + start.month() * 100 + start.day(),
-                                     end.year() * 10000 + end.month() * 100 + end.day()));
+        Datetime new_end = end.isNull() ? Datetime::max() : end;
+        con->batchLoad(
+          table,
+          format(
+            "stockid=(select stockid from stock where marketid=(select marketid from "
+            "market where market='{}') and code='{}') and date>={} and date<{} order by date asc",
+            market, code, start.year() * 10000 + start.month() * 100 + start.day(),
+            new_end.year() * 10000 + new_end.month() * 100 + new_end.day()));
 
         for (auto &w : table) {
             try {
@@ -211,7 +216,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
 
         if (sm.loadStock(stock)) {
             StockWeightList weightList =
-              getStockWeightList(r.stockid, Datetime::min(), Datetime::max());
+              getStockWeightList(marketDict[r.marketid], r.code, Datetime::min(), Null<Datetime>());
             stock.setWeightList(weightList);
         }
     }

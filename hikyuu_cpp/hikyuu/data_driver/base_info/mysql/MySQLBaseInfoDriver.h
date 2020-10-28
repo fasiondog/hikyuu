@@ -30,11 +30,11 @@ public:
     virtual bool _loadMarketInfo() override;
     virtual bool _loadStockTypeInfo() override;
     virtual bool _loadStock() override;
-    virtual StockWeightList getStockWeightList(uint64_t stockid, Datetime start,
-                                               Datetime end) override;
+    virtual StockWeightList getStockWeightList(const string& market, const string& code,
+                                               Datetime start, Datetime end) override;
 
 private:
-    ConnectPool<MySQLConnect> *m_pool;
+    ConnectPool<MySQLConnect>* m_pool;
 };
 
 } /* namespace hku */

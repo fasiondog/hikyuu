@@ -169,7 +169,7 @@ bool SQLiteBaseInfoDriver::_loadStock() {
 
         if (sm.loadStock(stock)) {
             StockWeightList weightList =
-              getStockWeightList(r.stockid, Datetime::min(), Datetime::max());
+              getStockWeightList(marketDict[r.marketid], r.code, Datetime::min(), Null<Datetime>());
             stock.setWeightList(weightList);
         }
     }
@@ -177,8 +177,8 @@ bool SQLiteBaseInfoDriver::_loadStock() {
     return true;
 }
 
-StockWeightList SQLiteBaseInfoDriver::getStockWeightList(uint64_t stockid, Datetime start,
-                                                         Datetime end) {
+StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, const string& code,
+                                                         Datetime start, Datetime end) {
     HKU_ASSERT(m_pool);
     StockWeightList result;
 
@@ -187,9 +187,14 @@ StockWeightList SQLiteBaseInfoDriver::getStockWeightList(uint64_t stockid, Datet
         HKU_CHECK(con, "Failed fetch connect!");
 
         vector<StockWeightTable> table;
-        con->batchLoad(table, format("stockid={} and date>={} and date<{}", stockid,
-                                     start.year() * 10000 + start.month() * 100 + start.day(),
-                                     end.year() * 10000 + end.month() * 100 + end.day()));
+        Datetime new_end = end.isNull() ? Datetime::max() : end;
+        con->batchLoad(
+          table,
+          format(
+            "stockid=(select stockid from stock where marketid=(select marketid from "
+            "market where market='{}') and code='{}') and date>={} and date<{} order by date asc",
+            market, code, start.year() * 10000 + start.month() * 100 + start.day(),
+            new_end.year() * 10000 + new_end.month() * 100 + new_end.day()));
 
         for (auto& w : table) {
             try {

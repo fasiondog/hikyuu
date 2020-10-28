@@ -109,16 +109,14 @@ public:
     /** 获取最大交易量 */
     size_t maxTradeNumber() const;
 
-    /** 获取所有权息信息 */
-    StockWeightList getWeight() const;
-
     /**
      * 获取指定时间段[start,end)内的权息信息
      * @param start 起始日期
      * @param end 结束日期
      * @return 满足要求的权息信息列表指针
      */
-    StockWeightList getWeight(const Datetime& start, const Datetime& end = Null<Datetime>()) const;
+    StockWeightList getWeight(const Datetime& start = Datetime::min(),
+                              const Datetime& end = Null<Datetime>()) const;
 
     /** 获取不同类型K线数据量 */
     size_t getCount(KQuery::KType dataType = KQuery::DAY) const;
@@ -171,7 +169,7 @@ public:
      */
     PriceList getHistoryFinanceInfo(const Datetime& date) const;
 
-    /** 设置权息信息 */
+    /** 设置权息信息, 仅供初始化时调用 */
     void setWeightList(const StockWeightList&);
 
     /** 设置K线数据获取驱动 */
@@ -221,8 +219,8 @@ struct HKU_API Stock::Data {
     Datetime m_startDate;  //证券起始日期
     Datetime m_lastDate;   //证券最后日期
 
-    StockWeightList m_weightList;  //权息信息列表
-    Datetime m_lastUpdateWeight;   //上次更新权息列表缓存的时刻
+    StockWeightList m_weightList;     //权息信息列表
+    Datetime m_lastUpdateWeightDate;  //上次更新权息列表缓存的时刻
 
     price_t m_tick;
     price_t m_tickValue;

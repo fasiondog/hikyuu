@@ -46,15 +46,23 @@ public:
     /** 主动退出并释放资源 */
     static void quit();
 
+    /** 获取基础信息驱动参数 */
     Parameter getBaseInfoDriverParameter() const;
+
+    /** 获取板块驱动参数 */
     Parameter getBlockDriverParameter() const;
+
+    /** 获取 K 线数据驱动参数 */
     Parameter getKDataDriverParameter() const;
+
+    /** 获取预加载参数 */
     Parameter getPreloadParameter() const;
+
+    /** 获取其他参数 */
     Parameter getHikyuuParameter() const;
 
+    /** 获取基础信息驱动 */
     BaseInfoDriverPtr getBaseInfoDriver() const;
-
-    void setKDataDriver(const KDataDriverPtr&);
 
     /**
      * 获取用于保存零时变量等的临时目录，如为配置则为当前目录
@@ -174,12 +182,17 @@ public:
     }
 
 private:
+    /* 设置K线驱动 */
+    void setKDataDriver(const KDataDriverPtr&);
+
+private:
     StockManager();
 
 private:
     static StockManager* m_sm;
     string m_tmpdir;
     string m_datadir;
+    BaseInfoDriverPtr m_baseInfoDriver;
     BlockInfoDriverPtr m_blockDriver;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
@@ -226,7 +239,7 @@ inline Parameter StockManager::getHikyuuParameter() const {
 }
 
 inline BaseInfoDriverPtr StockManager::getBaseInfoDriver() const {
-    return DataDriverFactory::getBaseInfoDriver(m_baseInfoDriverParam);
+    return m_baseInfoDriver;
 }
 
 }  // namespace hku

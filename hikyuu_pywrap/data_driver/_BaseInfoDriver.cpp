@@ -43,15 +43,17 @@ public:
         return this->BaseInfoDriver::getFinanceInfo(market, code);
     }
 
-    StockWeightList getStockWeightList(uint64_t stockid, Datetime start, Datetime end) {
+    StockWeightList getStockWeightList(const string& market, const string& code, Datetime start,
+                                       Datetime end) {
         if (override call = get_override("getStockWeightList")) {
-            return call(stockid, start, end);
+            return call(market, code, start, end);
         }
-        return this->BaseInfoDriver::getStockWeightList(stockid, start, end);
+        return this->BaseInfoDriver::getStockWeightList(market, code, start, end);
     }
 
-    StockWeightList default_getStockWeightList(uint64_t stockid, Datetime start, Datetime end) {
-        return this->BaseInfoDriver::getStockWeightList(stockid, start, end);
+    StockWeightList default_getStockWeightList(const string& market, const string& code,
+                                               Datetime start, Datetime end) {
+        return this->BaseInfoDriver::getStockWeightList(market, code, start, end);
     }
 };
 

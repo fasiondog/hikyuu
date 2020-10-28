@@ -91,7 +91,8 @@ Parameter BaseInfoDriver::getFinanceInfo(const string& market, const string& cod
     return Parameter();
 }
 
-StockWeightList BaseInfoDriver::getStockWeightList(uint64_t stockid, Datetime start, Datetime end) {
+StockWeightList BaseInfoDriver::getStockWeightList(const string& market, const string& code,
+                                                   Datetime start, Datetime end) {
     HKU_INFO("The getStockWeightList method has not been implemented! (BaseInfoDriver: {})",
              m_name);
     return StockWeightList();

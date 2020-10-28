@@ -112,9 +112,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     string funcname(" [StockManager::init]");
 
     //加载证券基本信息
-    BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
-    HKU_CHECK(base_info, "Failed get base info driver!");
-    base_info->loadBaseInfo();
+    m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
+    HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
+    m_baseInfoDriver->loadBaseInfo();
 
     //获取板块驱动
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);

@@ -27,8 +27,8 @@ public:
     virtual bool _loadStockTypeInfo() override;
     virtual bool _loadStock() override;
     virtual Parameter getFinanceInfo(const string& market, const string& code) override;
-    virtual StockWeightList getStockWeightList(uint64_t stockid, Datetime start,
-                                               Datetime end) override;
+    virtual StockWeightList getStockWeightList(const string& market, const string& code,
+                                               Datetime start, Datetime end) override;
 
 private:
     //股票基本信息数据库实例
