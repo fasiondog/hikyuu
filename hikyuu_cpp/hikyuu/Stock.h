@@ -203,6 +203,8 @@ private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
 
+    void _loadNewKRecordToBuffer(const KQuery&);
+
 private:
     struct HKU_API Data;
     shared_ptr<Data> m_data;

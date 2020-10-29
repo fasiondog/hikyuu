@@ -57,15 +57,39 @@ public:
         return m_lastDate;
     }
 
+    /** 开市时间1 */
+    TimeDelta openTime1() const {
+        return m_openTime1;
+    }
+
+    /** 闭市时间1 */
+    TimeDelta closeTime1() const {
+        return m_closeTime1;
+    }
+
+    /** 开市时间2 */
+    TimeDelta openTime2() const {
+        return m_openTime2;
+    }
+
+    /** 闭市时间2 */
+    TimeDelta closeTime2() const {
+        return m_closeTime2;
+    }
+
     /** 仅用于python的__str__ */
     string toString() const;
 
 private:
-    string m_market;       //市场标识
-    string m_name;         //市场名称
-    string m_description;  //描述信息
-    string m_code;         //市场对应的指数代码，用于获取交易日历
-    Datetime m_lastDate;   //当前市场最后日期
+    string m_market;         // 市场标识
+    string m_name;           // 市场名称
+    string m_description;    // 描述信息
+    string m_code;           // 市场对应的指数代码，用于获取交易日历
+    Datetime m_lastDate;     // 当前市场最后日期
+    TimeDelta m_openTime1;   // 上午开市时间
+    TimeDelta m_closeTime1;  // 上午闭市时间
+    TimeDelta m_openTime2;   // 下午开市时间
+    TimeDelta m_closeTime2;  // 下午闭市时间
 };
 
 /**

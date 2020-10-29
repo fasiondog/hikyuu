@@ -31,7 +31,8 @@ string MarketInfo::toString() const {
 
     string split(", ");
     os << "MarketInfo(" << m_market << split << m_name << split << m_description << split << m_code
-       << split << m_lastDate << ")";
+       << split << m_lastDate << split << m_openTime1.minutes() << split << m_closeTime1.minutes()
+       << split << m_openTime2.minutes() << split << m_closeTime2.minutes() << ")";
     return os.str();
 }
 

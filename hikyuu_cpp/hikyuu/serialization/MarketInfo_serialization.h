@@ -17,6 +17,7 @@
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
+#include "TimeDelta_serialization.h"
 
 namespace boost {
 namespace serialization {
