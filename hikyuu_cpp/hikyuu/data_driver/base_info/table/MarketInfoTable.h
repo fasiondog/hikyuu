@@ -17,7 +17,13 @@ namespace hku {
 
 class MarketInfoTable {
 public:
-    MarketInfoTable() : m_marketid(0), m_lastDate(0) {}
+    MarketInfoTable()
+    : m_marketid(0),
+      m_lastDate(0),
+      m_openTime1(0),
+      m_closeTime1(0),
+      m_openTime2(0),
+      m_closeTime2(0) {}
 
     uint64_t id() const {
         return m_marketid;
@@ -39,36 +45,68 @@ public:
         return m_code;
     }
 
-    int64_t lastDate() const {
-        return m_lastDate;
+    Datetime lastDate() const {
+        HKU_CHECK(m_lastDate <= 99999999, "Invalid lastDate: {}!", m_lastDate);
+        return Datetime(m_lastDate * 10000);
+    }
+
+    TimeDelta openTime1() const {
+        return _transTimeDelta(m_openTime1);
+    }
+
+    TimeDelta closeTime1() const {
+        return _transTimeDelta(m_closeTime1);
+    }
+
+    TimeDelta openTime2() const {
+        return _transTimeDelta(m_openTime2);
+    }
+
+    TimeDelta closeTime2() const {
+        return _transTimeDelta(m_closeTime2);
+    }
+
+private:
+    TimeDelta _transTimeDelta(uint64_t time) const {
+        int64_t hours = time / 100;
+        HKU_CHECK(hours >= 0 && hours <= 23, "Invalid time: {}!", time);
+        int64_t mins = time - hours * 100;
+        HKU_CHECK(mins >= 0 && mins <= 59, "Invalid time: {}!", time);
+        return TimeDelta(0, hours, mins);
     }
 
 public:
     static const char* getInsertSQL() {
         return "insert into `Market` "
-               "(`marketid`, `market`, `name`, `description`, `code`, `lastDate`) "
-               "values (?,?,?,?,?,?)";
+               "(`marketid`, `market`, `name`, `description`, `code`, `lastDate`,"
+               " `openTime1`, `closeTime1`, `openTime2`, `closeTime2`) "
+               "values (?,?,?,?,?,?,?,?,?,?)";
     }
 
     static const char* getUpdateSQL() {
         return "update `Market` set `market`=?, `name`=?, `description`=?, "
-               "`code`=?, `lastDate`=? where `marketid`=?";
+               "`code`=?, `lastDate`=?, `openTime1`=?, `closeTime1`=?, "
+               "`openTime2=`=?, `closeTime2`=? where `marketid`=?";
     }
 
     static const char* getSelectSQL() {
-        return "select `marketid`,`market`,`name`, `description`, `code`, `lastDate` from `Market`";
+        return "select `marketid`,`market`,`name`, `description`, `code`, `lastDate`, "
+               "`openTime1`, `closeTime1`, `openTime2`, `closeTime2` from `Market`";
     }
 
     void save(const SQLStatementPtr& st) const {
-        st->bind(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate);
+        st->bind(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate, m_openTime1,
+                 m_closeTime1, m_openTime2, m_closeTime2);
     }
 
     void update(const SQLStatementPtr& st) const {
-        st->bind(0, m_market, m_name, m_description, m_code, m_lastDate, m_marketid);
+        st->bind(0, m_market, m_name, m_description, m_code, m_lastDate, m_openTime1, m_closeTime1,
+                 m_openTime2, m_closeTime2, m_marketid);
     }
 
     void load(const SQLStatementPtr& st) {
-        st->getColumn(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate);
+        st->getColumn(0, m_marketid, m_market, m_name, m_description, m_code, m_lastDate,
+                      m_openTime1, m_closeTime1, m_openTime2, m_closeTime2);
     }
 
 private:
@@ -77,7 +115,11 @@ private:
     string m_name;
     string m_description;
     string m_code;
-    int64_t m_lastDate;
+    uint64_t m_lastDate;
+    uint64_t m_openTime1;
+    uint64_t m_closeTime1;
+    uint64_t m_openTime2;
+    uint64_t m_closeTime2;
 };
 
 }  // namespace hku

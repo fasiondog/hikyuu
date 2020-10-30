@@ -30,7 +30,8 @@ public:
      * @param lastDate 市场当前最后日期
      */
     MarketInfo(const string& market, const string& name, const string& description,
-               const string& code, const Datetime& lastDate);
+               const string& code, const Datetime& lastDate, TimeDelta openTime1,
+               TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2);
 
     /** 获取市场简称 */
     const string& market() const {

@@ -48,30 +48,30 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
         return false;
     }
 
-    auto con = m_pool->getConnect();
-
-    vector<MarketInfoTable> infoTables;
     try {
+        auto con = m_pool->getConnect();
+        vector<MarketInfoTable> infoTables;
         con->batchLoad(infoTables);
+
+        StockManager &sm = StockManager::instance();
+        for (auto &info : infoTables) {
+            try {
+                sm.loadMarketInfo(MarketInfo(
+                  info.market(), info.name(), info.description(), info.code(), info.lastDate(),
+                  info.openTime1(), info.closeTime1(), info.openTime2(), info.closeTime2()));
+            } catch (std::exception &e) {
+                HKU_ERROR("Failed load market, {}", e.what());
+            } catch (...) {
+                HKU_ERROR("Unknown error!");
+            }
+        }
+
     } catch (std::exception &e) {
         HKU_FATAL("load Market table failed! {}", e.what());
         return false;
     } catch (...) {
         HKU_FATAL("load Market table failed!");
         return false;
-    }
-
-    StockManager &sm = StockManager::instance();
-    for (auto &info : infoTables) {
-        Datetime lastDate;
-        try {
-            lastDate = Datetime(info.lastDate() * 10000);
-        } catch (...) {
-            lastDate = Null<Datetime>();
-            HKU_WARN("lastDate of market({}) is invalid! ", info.market());
-        }
-        sm.loadMarketInfo(
-          MarketInfo(info.market(), info.name(), info.description(), info.code(), lastDate));
     }
 
     return true;

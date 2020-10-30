@@ -39,7 +39,16 @@ string MarketInfo::toString() const {
 MarketInfo::MarketInfo() {}
 
 MarketInfo::MarketInfo(const string& market, const string& name, const string& description,
-                       const string& code, const Datetime& lastDate)
-: m_market(market), m_name(name), m_description(description), m_code(code), m_lastDate(lastDate) {}
+                       const string& code, const Datetime& lastDate, TimeDelta openTime1,
+                       TimeDelta closeTime1, TimeDelta openTime2, TimeDelta closeTime2)
+: m_market(market),
+  m_name(name),
+  m_description(description),
+  m_code(code),
+  m_lastDate(lastDate),
+  m_openTime1(openTime1),
+  m_closeTime1(closeTime1),
+  m_openTime2(openTime2),
+  m_closeTime2(closeTime2) {}
 
 }  // namespace hku

@@ -75,6 +75,10 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     CHECK_EQ(marketInfo.name(), "上海证劵交易所");
     CHECK_EQ(marketInfo.description(), "上海市场");
     CHECK_EQ(marketInfo.lastDate(), Datetime(201112060000L));
+    CHECK_EQ(marketInfo.openTime1(), TimeDelta(0, 9, 30));
+    CHECK_EQ(marketInfo.closeTime1(), TimeDelta(0, 11, 30));
+    CHECK_EQ(marketInfo.openTime2(), TimeDelta(0, 13, 00));
+    CHECK_EQ(marketInfo.closeTime2(), TimeDelta(0, 15, 00));
 
     /** @arg 查询已存在的市场，市场简称全部小写 */
     marketInfo = sm.getMarketInfo("sh");

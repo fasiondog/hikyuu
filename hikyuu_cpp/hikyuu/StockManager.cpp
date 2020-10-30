@@ -129,7 +129,8 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
-      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>());
+      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
+                 TimeDelta(0), TimeDelta(0), TimeDelta(0), TimeDelta(0));
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
