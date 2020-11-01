@@ -109,15 +109,26 @@ def build_boost(mode):
         if not os.path.exists('b2.exe'):
             os.system('bootstrap.bat')
         os.system(
+            'b2 {} link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
+            ' --with-filesystem --with-system --with-test'.format(mode))
+        os.system(
             'b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
-            ' --with-date_time --with-filesystem --with-system --with-test'
             ' --with-serialization'.format(mode))
+        #os.system(
+        #    'b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
+        #    ' --with-date_time --with-filesystem --with-system --with-test'
+        #    ' --with-serialization'.format(mode))
         os.chdir(current_dir)
     else:
         cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
-              './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization '\
-              '--with-date_time --with-filesystem --with-system --with-test; '\
+              './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization; '\
+              './b2 {mode} link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
+              '--with-filesystem --with-system --with-test; '\
               'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
+        # cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
+        #       './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization '\
+        #       '--with-date_time --with-filesystem --with-system --with-test; '\
+        #       'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
         os.system(cmd)
 
 
