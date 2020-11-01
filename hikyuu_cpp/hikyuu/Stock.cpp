@@ -597,7 +597,7 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
         }
 
         size_t total = m_data->pKData[query.kType()]->size();
-        if (start_ix >= end_ix || start_ix > total) {
+        if (start_ix >= end_ix || start_ix >= total) {
             HKU_WARN("Invalid param! ({}, {})", start_ix, end_ix);
             return result;
         }
