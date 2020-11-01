@@ -19,7 +19,8 @@ public:
     : m_date(0), m_open(0.0), m_high(0.0), m_low(0.0), m_close(0.0), m_amount(0.0), m_count(0.0) {}
 
     KRecordTable(const string& market, const string& code, const KQuery::KType& ktype)
-    : m_code(code),
+    : m_db_name(fmt::format("{}_{}", market, KQuery::getKTypeName(ktype))),
+      m_code(code),
       m_date(0),
       m_open(0.0),
       m_high(0.0),
@@ -27,7 +28,7 @@ public:
       m_close(0.0),
       m_amount(0.0),
       m_count(0.0) {
-        m_db_name = fmt::format("{}_{}", market, KQuery::getKTypeName(ktype));
+        // m_db_name = fmt::format("{}_{}", market, KQuery::getKTypeName(ktype));
         to_lower(m_db_name);
     };
 

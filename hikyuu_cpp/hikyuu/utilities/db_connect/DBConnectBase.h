@@ -28,7 +28,7 @@ public:
      * 构造函数
      * @param param 数据库连接参数
      */
-    explicit DBConnectBase(const Parameter& param) noexcept;
+    explicit DBConnectBase(const Parameter& param);
     virtual ~DBConnectBase() = default;
 
     //-------------------------------------------------------------------------
@@ -176,7 +176,7 @@ typedef shared_ptr<DBConnectBase> DBConnectPtr;
 // inline方法实现
 //-------------------------------------------------------------------------
 
-inline DBConnectBase::DBConnectBase(const Parameter& param) noexcept : m_params(param) {}
+inline DBConnectBase::DBConnectBase(const Parameter& param) : m_params(param) {}
 
 inline int DBConnectBase::queryInt(const string& query) {
     SQLStatementPtr st = getStatement(query);

@@ -236,6 +236,7 @@ bool operator==(const KQuery&, const KQuery&);
 bool operator!=(const KQuery&, const KQuery&);
 
 inline bool operator!=(const KQuery& q1, const KQuery& q2) {
+    // cppcheck-suppress [mismatchingContainerExpression]
     if (q1.start() != q2.start() || q1.end() != q2.end() || q1.queryType() != q2.queryType() ||
         q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType()) {
         return true;

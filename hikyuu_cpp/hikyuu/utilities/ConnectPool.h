@@ -89,7 +89,6 @@ private:
                 m_connectList.push(p);
             } else {
                 delete p;
-                p = nullptr;
                 m_count--;
             }
         } else {

@@ -81,7 +81,7 @@ public:
     StopTask() {}
     virtual ~StopTask() {}
 
-    void run(){};
+    void run() override{};
 };
 
 }  // namespace hku

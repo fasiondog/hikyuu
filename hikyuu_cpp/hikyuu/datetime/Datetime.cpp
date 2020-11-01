@@ -99,7 +99,6 @@ std::string Datetime::str() const {
         return "+infinity";
     }
 
-    std::string result;
     double microseconds = millisecond() * 1000 + microsecond();
 
     // 和 python datetime 打印方式保持一致

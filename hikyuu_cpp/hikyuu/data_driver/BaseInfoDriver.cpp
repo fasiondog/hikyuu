@@ -57,6 +57,8 @@ bool BaseInfoDriver::init(const Parameter& params) {
     if (!checkType()) {
         return false;
     }
+
+    HKU_INFO("Using {} BaseInfoDriver", name());
     return _init();
 }
 

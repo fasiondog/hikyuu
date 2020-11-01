@@ -46,7 +46,6 @@ public:
             h5file->close();
             // HKU_INFO("Closed {}", filename);
             delete h5file;
-            h5file = nullptr;
         }
     }
 };
@@ -461,7 +460,7 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
             return false;
         }
 
-        size_t mid, low = 0, high = total - 1;
+        size_t mid = total, low = 0, high = total - 1;
         uint64_t startDatetime = query.startDatetime().number();
         H5IndexRecord h5record;
         while (low <= high) {
@@ -976,10 +975,9 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
 
         TransRecord record;
         result.reserve(total + 2);
-        uint64_t number = 0, second = 0;
         for (hsize_t i = 0; i < total; i++) {
-            number = pBuf[i].datetime / 100;
-            second = pBuf[i].datetime - number * 100;
+            uint64_t number = pBuf[i].datetime / 100;
+            uint64_t second = pBuf[i].datetime - number * 100;
             Datetime d(number);
             record.datetime = Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), second);
             record.price = price_t(pBuf[i].price) * 0.001;
@@ -1128,10 +1126,9 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
 
         TransRecord record;
         result.reserve(total + 2);
-        uint64_t number = 0, second = 0;
         for (hsize_t i = 0; i < total; i++) {
-            number = pBuf[i].datetime / 100;
-            second = pBuf[i].datetime - number * 100;
+            uint64_t number = pBuf[i].datetime / 100;
+            uint64_t second = pBuf[i].datetime - number * 100;
             Datetime d(number);
             record.datetime = Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), second);
             record.price = price_t(pBuf[i].price) * 0.001;

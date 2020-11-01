@@ -14,7 +14,7 @@
 
 namespace hku {
 
-StealTaskBase::StealTaskBase() : m_done(false) {}
+StealTaskBase::StealTaskBase() : m_done(false), m_group(nullptr) {}
 
 StealTaskBase::~StealTaskBase() {}
 

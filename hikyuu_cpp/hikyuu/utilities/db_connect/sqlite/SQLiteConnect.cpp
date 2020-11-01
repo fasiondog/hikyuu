@@ -21,8 +21,7 @@ static int sqlite_busy_call_back(void* ptr, int count) {
     return 1;
 }
 
-SQLiteConnect::SQLiteConnect(const Parameter& param) noexcept
-: DBConnectBase(param), m_db(nullptr) {
+SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param), m_db(nullptr) {
     try {
         m_dbname = getParam<string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;

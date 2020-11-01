@@ -11,8 +11,7 @@
 
 namespace hku {
 
-MySQLConnect::MySQLConnect(const Parameter& param) noexcept
-: DBConnectBase(param), m_mysql(nullptr) {
+MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mysql(nullptr) {
     m_mysql = new MYSQL;
     try {
         HKU_CHECK(m_mysql, "Failed new MYSQL instance!");

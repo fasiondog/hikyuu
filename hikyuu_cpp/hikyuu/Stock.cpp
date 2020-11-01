@@ -466,7 +466,7 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     }
 
     const KRecordList& kdata = *(m_data->pKData[query.kType()]);
-    size_t mid, low = 0, high = total - 1;
+    size_t mid = total, low = 0, high = total - 1;
     size_t startpos, endpos;
     while (low <= high) {
         if (query.startDatetime() > kdata[high].datetime) {
@@ -560,10 +560,9 @@ KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
 
     // string ktype(inktype);
     // to_upper(ktype);
-
     KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
-    size_t startix = 0, endix = 0;
     if (m_data->pKData.find(ktype) != m_data->pKData.end() || m_kdataDriver->isIndexFirst()) {
+        size_t startix = 0, endix = 0;
         return getIndexRange(query, startix, endix) ? getKRecord(startix, ktype) : Null<KRecord>();
     }
 

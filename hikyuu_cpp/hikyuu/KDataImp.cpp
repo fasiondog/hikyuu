@@ -13,7 +13,7 @@
 
 namespace hku {
 
-KDataImp::KDataImp() : m_start(0), m_end(0) {}
+KDataImp::KDataImp() : m_start(0), m_end(0), m_have_pos_in_stock(false) {}
 
 KDataImp::KDataImp(const Stock& stock, const KQuery& query)
 : m_query(query), m_stock(stock), m_start(0), m_end(0), m_have_pos_in_stock(false) {
@@ -63,20 +63,6 @@ KDataImp::KDataImp(const Stock& stock, const KQuery& query)
 }
 
 KDataImp::~KDataImp() {}
-
-/*bool KDataImp::empty() {
-    if (!m_have_pos_in_stock) {
-        _getPosInStock();
-    }
-    return m_start == m_end ? true : false;
-}
-
-size_t KDataImp::size() {
-    if (!m_have_pos_in_stock) {
-        _getPosInStock();
-    }
-    return m_end - m_start;
-}*/
 
 size_t KDataImp::startPos() {
     if (!m_have_pos_in_stock) {

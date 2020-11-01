@@ -224,7 +224,7 @@ bool TdxKDataDriver::_getDayIndexRangeByDate(const string& market, const string&
     struct TdxDayData tdx_data;
 
     size_t len = sizeof(tdx_data);
-    size_t mid, low = 0, high = total - 1;
+    size_t mid = total, low = 0, high = total - 1;
     size_t startpos = 0, endpos = 0;
     while (low <= high) {
         file.seekg(high * len, file.beg);
@@ -329,7 +329,7 @@ bool TdxKDataDriver::_getMinIndexRangeByDate(const string& market, const string&
     struct TdxMinData tdx_data;
 
     size_t len = sizeof(tdx_data);
-    size_t mid, low = 0, high = total - 1;
+    size_t mid = total, low = 0, high = total - 1;
     size_t startpos = 0, endpos = 0;
     while (low <= high) {
         file.seekg(high * len, file.beg);

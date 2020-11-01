@@ -24,7 +24,7 @@ namespace hku {
 
 class HKU_API MySQLConnect : public DBConnectBase {
 public:
-    MySQLConnect(const Parameter& param) noexcept;
+    MySQLConnect(const Parameter& param);
     virtual ~MySQLConnect();
 
     virtual bool ping() override;
