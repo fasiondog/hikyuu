@@ -12,9 +12,8 @@
 namespace hku {
 
 MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mysql(nullptr) {
-    m_mysql = new MYSQL;
     try {
-        HKU_CHECK(m_mysql, "Failed new MYSQL instance!");
+        m_mysql = new MYSQL;
         HKU_CHECK(mysql_init(m_mysql) != NULL, "Initial MySQL handle error!");
 
         string host = getParamFromOther<string>(param, "host", "127.0.0.1");
@@ -33,6 +32,8 @@ MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mys
                                      database.c_str(), port, NULL, CLIENT_MULTI_STATEMENTS) != NULL,
                   "Failed to connect to database! {}", mysql_error(m_mysql));
         HKU_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, "mysql_set_character_set error!");
+    } catch (std::bad_alloc& e) {
+        HKU_FATAL(e.what());
     } catch (std::exception& e) {
         HKU_FATAL(e.what());
         close();
@@ -107,6 +108,7 @@ void MySQLConnect::exec(const string& sql_string) {
 }
 
 SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
+    HKU_CHECK(m_mysql, "mysql connect is invalid!");
     return make_shared<MySQLStatement>(this, sql_statement);
 }
 

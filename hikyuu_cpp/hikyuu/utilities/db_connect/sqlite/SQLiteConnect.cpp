@@ -72,6 +72,7 @@ void SQLiteConnect::exec(const string& sql_string) {
 }
 
 SQLStatementPtr SQLiteConnect::getStatement(const string& sql_statement) {
+    HKU_CHECK(m_db, "database is not open! {}", m_dbname);
     return make_shared<SQLiteStatement>(this, sql_statement);
 }
 
