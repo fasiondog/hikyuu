@@ -289,14 +289,14 @@ StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) con
     }
 
     StockWeightList::const_iterator start_iter, end_iter;
-    start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(), start,
-                             std::less<StockWeight>());
+    start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(),
+                             StockWeight(start), std::less<StockWeight>());
     if (start_iter == m_data->m_weightList.end()) {
         return result;
     }
 
     end_iter = lower_bound(start_iter, (StockWeightList::const_iterator)m_data->m_weightList.end(),
-                           end, std::less<StockWeight>());
+                           StockWeight(end), std::less<StockWeight>());
     for (; start_iter != end_iter; ++start_iter) {
         result.push_back(*start_iter);
     }
@@ -635,7 +635,7 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
     KRecordList k_list = getKRecordList(query);
     result.reserve(k_list.size());
     for (auto& k : k_list) {
-        result.push_back(k.datetime);
+        result.push_back(k.datetime);  // cppcheck-suppress useStlAlgorithm
     }
     return result;
 }

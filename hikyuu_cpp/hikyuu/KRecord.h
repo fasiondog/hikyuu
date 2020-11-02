@@ -36,7 +36,7 @@ public:
       transAmount(0.0),
       transCount(0.0) {}
 
-    KRecord(const Datetime& indate)
+    explicit KRecord(const Datetime& indate)
     : datetime(indate),
       openPrice(0.0),
       highPrice(0.0),

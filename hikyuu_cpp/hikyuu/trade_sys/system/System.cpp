@@ -508,7 +508,7 @@ TradeRecord System::_buyDelay(const KRecord& today) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
         //无法实际执行，延迟至下一时刻
-        _submitBuyRequest(m_buyRequest.datetime, m_buyRequest.from);
+        _submitBuyRequest(KRecord(m_buyRequest.datetime), m_buyRequest.from);
         return result;
     }
 
@@ -678,7 +678,7 @@ TradeRecord System::_sellDelay(const KRecord& today) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice && !getParam<bool>("can_trade_when_high_eq_low")) {
         //无法执行，保留卖出请求，继续延迟至下一时刻
-        _submitSellRequest(m_sellRequest.datetime, m_sellRequest.from);
+        _submitSellRequest(KRecord(m_sellRequest.datetime), m_sellRequest.from);
         return result;
     }
 
@@ -922,7 +922,7 @@ TradeRecord System::_sellShortNow(const KRecord& today, Part from) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice) {
         //当前无法卖出，延迟至下一时刻卖出
-        _submitSellShortRequest(today.datetime, from);
+        _submitSellShortRequest(KRecord(today.datetime), from);
         return result;
     }
 
@@ -958,7 +958,7 @@ TradeRecord System::_sellShortDelay(const KRecord& today) {
     TradeRecord result;
     if (today.highPrice == today.lowPrice) {
         //无法执行，保留卖出请求，继续延迟至下一时刻
-        _submitSellShortRequest(m_sellShortRequest.datetime, m_sellShortRequest.from);
+        _submitSellShortRequest(KRecord(m_sellShortRequest.datetime), m_sellShortRequest.from);
         return result;
     }
 

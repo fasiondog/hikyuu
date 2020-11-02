@@ -27,8 +27,9 @@ namespace hku {
 class exception : public std::exception {
 public:
     exception() : std::exception("Unknow exception!") {}
-    exception(const std::string& msg) : std::exception(msg.c_str()) {}
-    exception(const char* msg) : std::exception(msg) {}
+    exception(const std::string& msg)  // cppcheck-suppress noExplicitConstructor
+    : std::exception(msg.c_str()) {}
+    exception(const char* msg) : std::exception(msg) {}  // cppcheck-suppress noExplicitConstructor
 };
 
 #else
@@ -36,8 +37,8 @@ public:
 class exception : public std::exception {
 public:
     exception() : m_msg("Unknow exception!") {}
-    exception(const char *msg) : m_msg(msg) {}
-    exception(const std::string &msg) : m_msg(msg) {}
+    exception(const char *msg) : m_msg(msg) {}         // cppcheck-suppress noExplicitConstructor
+    exception(const std::string &msg) : m_msg(msg) {}  // cppcheck-suppress noExplicitConstructor
     virtual ~exception() noexcept {}
     virtual const char *what() const noexcept {
         return m_msg.c_str();

@@ -98,7 +98,8 @@ public:
      * @param recoverType 复权类型
      * @param queryType 默认按索引方式查询
      */
-    KQuery(int64_t start, int64_t end = Null<int64_t>(), KType dataType = DAY,
+    KQuery(int64_t start,  // cppcheck-suppress [noExplicitConstructor]
+           int64_t end = Null<int64_t>(), KType dataType = DAY,
            RecoverType recoverType = NO_RECOVER, QueryType queryType = INDEX)
     : m_start(start),
       m_end(end),
@@ -115,7 +116,8 @@ public:
      * @param ktype K线类型
      * @param recoverType 复权类型
      */
-    KQuery(Datetime start, Datetime end = Null<Datetime>(), KType ktype = DAY,
+    KQuery(Datetime start,  // cppcheck-suppress [noExplicitConstructor]
+           Datetime end = Null<Datetime>(), KType ktype = DAY,
            RecoverType recoverType = NO_RECOVER);
 
     /**

@@ -33,7 +33,10 @@ public:
     };*/
 
     StockMapIterator() {}
+
+    // cppcheck-suppress noExplicitConstructor
     StockMapIterator(const stock_map_t::const_iterator& iter) : m_iter(iter) {}
+
     StockMapIterator(const StockMapIterator& iter) : m_iter(iter.m_iter) {}
 
     StockMapIterator& operator++() {

@@ -181,10 +181,7 @@ void Portfolio::runMoment(const Datetime& date) {
         if (cash > 0 && m_running_sys_set.find(sub_sys) == m_running_sys_set.end()) {
             m_running_sys_list.push_back(sub_sys);
             m_running_sys_set.insert(sub_sys);
-
-            if (m_all_sys_set.find(sub_sys) == m_all_sys_set.end()) {
-                m_all_sys_set.insert(sub_sys);
-            }
+            m_all_sys_set.insert(sub_sys);
         }
     }
 

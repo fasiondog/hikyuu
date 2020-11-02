@@ -22,7 +22,7 @@ public:
     /** 默认构造函数，返回Null<StockWeight>() */
     StockWeight();
 
-    StockWeight(const Datetime& datetime);
+    explicit StockWeight(const Datetime& datetime);
 
     StockWeight(const Datetime& datetime, price_t countAsGift, price_t countForSell,
                 price_t priceForSell, price_t bonus, price_t increasement, price_t totalCount,
