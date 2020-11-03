@@ -108,6 +108,7 @@ target("core")
         if is_plat("windows") then
             os.cp(target:targetdir() .. '/core.pyd', dst_dir)
             os.cp(target:targetdir() .. '/hikyuu.dll', dst_dir)
+            os.cp(target:targetdir() .. '/sqlite3.dll', dst_dir)
         elseif is_plat("macosx") then
             os.cp(target:targetdir() .. '/core.so', dst_dir)
             os.cp(target:targetdir() .. '/libhikyuu.dylib', dst_dir)
