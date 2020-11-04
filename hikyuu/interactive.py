@@ -274,7 +274,10 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
             transamount = float(a[9])
             transcount = float(a[8])
 
-            d = Datetime(a[-3] + " 00")
+            try:
+                d = Datetime(a[-3])
+            except:
+                d = Datetime(a[-4])
             temp = (open, high, low, close)
             if 0 in temp:
                 return

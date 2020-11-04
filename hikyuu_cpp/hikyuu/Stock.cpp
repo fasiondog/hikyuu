@@ -525,20 +525,6 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     return true;
 }
 
-void Stock::_loadNewKRecordToBuffer(const KQuery& query) {
-    if (!m_data || m_data->pKData.find(query.kType()) == m_data->pKData.end()) {
-        return;
-    }
-
-    KQuery::KType ktype = query.kType();
-    KRecordList& buffer = *(m_data->pKData[ktype]);
-    if (buffer.empty()) {
-        return;
-    }
-
-    // auto& lastRecord = buffer.back();
-}
-
 KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
     if (!m_data)
         return Null<KRecord>();
