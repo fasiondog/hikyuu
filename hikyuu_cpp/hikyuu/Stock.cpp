@@ -99,6 +99,12 @@ Stock::Data::~Data() {
             delete iter->second;
         }
     }
+
+    for (auto iter = pMutex.begin(); iter != pMutex.end(); ++iter) {
+        if (iter->second) {
+            delete iter->second;
+        }
+    }
 }
 
 Stock::Stock() {}
@@ -219,6 +225,11 @@ void Stock::setKDataDriver(const KDataDriverPtr& kdataDriver) {
             delete iter->second;
         }
         m_data->pKData.clear();
+
+        for (auto iter = m_data->pMutex.begin(); iter != m_data->pMutex.end(); ++iter) {
+            delete iter->second;
+        }
+        m_data->pMutex.clear();
     }
 }
 
@@ -256,17 +267,25 @@ void Stock::releaseKDataBuffer(KQuery::KType inkType) {
             delete iter->second;
             m_data->pKData.erase(kType);
         }
+
+        auto mutex_iter = m_data->pMutex.find(kType);
+        if (mutex_iter != m_data->pMutex.end()) {
+            delete mutex_iter->second;
+            m_data->pMutex.erase(kType);
+        }
     }
 }
 
+// 仅在初始化时调用
 void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     if (m_data) {
         string kType(inkType);
         to_upper(kType);
 
         releaseKDataBuffer(kType);
-        m_data->pKData[kType] = new KRecordList;
         if (m_kdataDriver) {
+            m_data->pKData[kType] = new KRecordList;
+            m_data->pMutex[kType] = new std::shared_mutex();
             *(m_data->pKData[kType]) = m_kdataDriver->getKRecordList(
               m_data->m_market, m_data->m_code, KQuery(0, Null<int64_t>(), kType));
         }
@@ -315,6 +334,7 @@ size_t Stock::getCount(KQuery::KType kType) const {
     string nktype(kType);
     to_upper(nktype);
     if (m_data->pKData.find(nktype) != m_data->pKData.end()) {
+        std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
         return m_data->pKData[nktype]->size();
     }
 

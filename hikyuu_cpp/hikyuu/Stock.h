@@ -9,6 +9,7 @@
 #ifndef STOCK_H_
 #define STOCK_H_
 
+#include <shared_mutex>
 #include "StockWeight.h"
 #include "KQuery.h"
 #include "TimeLineRecord.h"
@@ -230,6 +231,7 @@ struct HKU_API Stock::Data {
     size_t m_maxTradeNumber;
 
     unordered_map<string, KRecordList*> pKData;
+    unordered_map<string, std::shared_mutex*> pMutex;
 
     Data();
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,
