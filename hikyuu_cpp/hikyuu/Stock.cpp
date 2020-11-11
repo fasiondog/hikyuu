@@ -327,6 +327,11 @@ KData Stock::getKData(const KQuery& query) const {
     return KData(*this, query);
 }
 
+size_t Stock::_getCountFromBuffer(KQuery::KType ktype) const {
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    return m_data->pKData[ktype]->size();
+}
+
 size_t Stock::getCount(KQuery::KType kType) const {
     if (!m_data)
         return 0;
@@ -334,8 +339,7 @@ size_t Stock::getCount(KQuery::KType kType) const {
     string nktype(kType);
     to_upper(nktype);
     if (m_data->pKData.find(nktype) != m_data->pKData.end()) {
-        std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
-        return m_data->pKData[nktype]->size();
+        return _getCountFromBuffer(nktype);
     }
 
     return m_kdataDriver ? m_kdataDriver->getCount(market(), code(), nktype) : 0;
@@ -476,16 +480,16 @@ bool Stock::_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t
 
 bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_start,
                                            size_t& out_end) const {
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[query.kType()]));
     out_start = 0;
     out_end = 0;
 
-    //总数为0，视为失败
-    size_t total = getCount(query.kType());
+    const KRecordList& kdata = *(m_data->pKData[query.kType()]);
+    size_t total = kdata.size();
     if (0 == total) {
         return false;
     }
 
-    const KRecordList& kdata = *(m_data->pKData[query.kType()]);
     size_t mid = total, low = 0, high = total - 1;
     size_t startpos, endpos;
     while (low <= high) {
@@ -545,12 +549,18 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     return true;
 }
 
+KRecord Stock::_getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const {
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    return m_data->pKData[ktype]->at(pos);
+}
+
 KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
     if (!m_data)
         return Null<KRecord>();
 
-    if (m_data->pKData.find(kType) != m_data->pKData.end())
-        return m_data->pKData[kType]->at(pos);
+    if (m_data->pKData.find(kType) != m_data->pKData.end()) {
+        return _getKRecordFromBuffer(pos, kType);
+    }
 
     if (!m_kdataDriver || pos >= size_t(Null<int64_t>()))
         return Null<KRecord>();
@@ -574,6 +584,22 @@ KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
 
     auto klist = m_kdataDriver->getKRecordList(market(), code(), query);
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
+}
+
+KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
+                                             KQuery::KType ktype) const {
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    KRecordList result;
+    size_t total = m_data->pKData[ktype]->size();
+    if (start_ix >= end_ix || start_ix >= total) {
+        HKU_WARN("Invalid param! ({}, {})", start_ix, end_ix);
+        return result;
+    }
+
+    size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
+    result.resize(length);
+    std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]), sizeof(KRecord) * length);
+    return result;
 }
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {
@@ -600,17 +626,7 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
                 end_ix = query.end();
             }
         }
-
-        size_t total = m_data->pKData[query.kType()]->size();
-        if (start_ix >= end_ix || start_ix >= total) {
-            HKU_WARN("Invalid param! ({}, {})", start_ix, end_ix);
-            return result;
-        }
-
-        size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
-        result.resize(length);
-        std::memcpy(&(result.front()), &((*m_data->pKData[query.kType()])[start_ix]),
-                    sizeof(KRecord) * length);
+        result = _getKRecordListFromBuffer(start_ix, end_ix, query.kType());
 
     } else {
         if (query.queryType() == KQuery::DATE) {

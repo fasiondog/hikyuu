@@ -202,6 +202,11 @@ public:
 
 private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
+
+    size_t _getCountFromBuffer(KQuery::KType ktype) const;
+    KRecord _getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const;
+    KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
+                                          KQuery::KType ktype) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
 
 private:
