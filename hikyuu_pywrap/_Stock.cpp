@@ -151,11 +151,13 @@ void export_Stock() {
     :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
     :rtype: PriceList)")
 
-      .def("realtime_update", &Stock::realtimeUpdate, R"(realtime_update(self, krecord)
+      .def("realtime_update", &Stock::realtimeUpdate, (arg("krecord"), arg("ktype") = KQuery::DAY),
+           R"(realtime_update(self, krecord)
 
-    （临时函数）只用于更新缓存中的日线数据
+    只用于更新缓存中的日线数据
 
-    :param KRecord krecord: 新增的实时K线记录)")
+    :param KRecord krecord: 新增的实时K线记录
+    :param KQuery.KType ktype: K 线类型)")
 
       .def("get_weight", &Stock::getWeight,
            (arg("start") = Datetime::min(), arg("end") = Datetime()),

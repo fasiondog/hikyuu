@@ -694,22 +694,29 @@ PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     return PriceList();
 }
 
-void Stock::realtimeUpdate(const KRecord& record) {
-    // if (!m_data || !m_data->pKData[KQuery::DAY] ||
-    if (!isBuffer(KQuery::DAY) || record.datetime == Null<Datetime>()) {
+void Stock::realtimeUpdate(const KRecord& record, KQuery::KType inktype) {
+    string ktype(inktype);
+    to_lower(ktype);
+    if (!m_data || m_data->pKData.find(ktype) == m_data->pKData.end() ||
+        record.datetime == Null<Datetime>()) {
         return;
     }
 
-    if (m_data->pKData[KQuery::DAY]->empty()) {
-        m_data->pKData[KQuery::DAY]->push_back(record);
+    // 加写锁
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+
+    if (m_data->pKData[ktype]->empty()) {
+        m_data->pKData[ktype]->push_back(record);
         return;
     }
 
-    KRecord& tmp = m_data->pKData[KQuery::DAY]->back();
+    KRecord& tmp = m_data->pKData[ktype]->back();
+
+    // 如果传入的记录日期等于最后一条记录日期，则更新最后一条记录；否则，追加入缓存
     if (tmp.datetime == record.datetime) {
         tmp = record;
     } else if (tmp.datetime < record.datetime) {
-        m_data->pKData[KQuery::DAY]->push_back(record);
+        m_data->pKData[ktype]->push_back(record);
     } else {
         HKU_INFO("Ignore record, datetime < last record.datetime!");
     }
