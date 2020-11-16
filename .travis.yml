@@ -36,7 +36,7 @@ matrix:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-5.0
           packages:
             - clang-5.0
       env:
@@ -46,7 +46,7 @@ matrix:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-6.0
           packages:
             - clang-6.0
       env:
