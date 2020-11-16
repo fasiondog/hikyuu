@@ -91,6 +91,6 @@ script:
   - ls .
   - echo $CXX
   - xmake f --cxx=$CXX --confirm=y --test=small
-  - xmake -b small-test
+  - xmake -bvD small-test
   - xmake r small-test
   
