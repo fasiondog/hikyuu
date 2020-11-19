@@ -1,3 +1,4 @@
+dist: bionic
 sudo: true
 language: C++
 matrix:
@@ -36,8 +37,9 @@ matrix:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
+            - llvm-toolchain-bionic-5.0
           packages:
+            - g++-8
             - clang-5.0
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
@@ -46,8 +48,9 @@ matrix:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
+            - llvm-toolchain-bionic-6.0
           packages:
+            - g++-8
             - clang-6.0
       env:
         - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
@@ -91,6 +94,6 @@ script:
   - ls .
   - echo $CXX
   - xmake f --cxx=$CXX --confirm=y --test=small
-  - xmake -b small-test
+  - xmake -bvD small-test
   - xmake r small-test
   
