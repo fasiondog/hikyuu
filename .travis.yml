@@ -1,3 +1,4 @@
+dist: bionic
 sudo: true
 language: C++
 matrix:
@@ -36,7 +37,7 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-xenial-5.0
+            - llvm-toolchain-bionic-5.0
           packages:
             - g++-8
             - clang-5.0
@@ -47,7 +48,7 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-xenial-6.0
+            - llvm-toolchain-bionic-6.0
           packages:
             - g++-8
             - clang-6.0
