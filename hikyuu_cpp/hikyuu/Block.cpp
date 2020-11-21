@@ -34,32 +34,26 @@ Block::Block(const Block& block) {
 }
 
 Block& Block::operator=(const Block& block) {
-    if (this == &block || m_data == block.m_data)
-        return *this;
-
+    HKU_IF_RETURN(this == &block || m_data == block.m_data, *this);
     m_data = block.m_data;
     return *this;
 }
 
 bool Block::have(const string& market_code) const {
-    if (!m_data)
-        return false;
+    HKU_IF_RETURN(!m_data, false);
     string query_str = market_code;
     to_upper(query_str);
     return m_data->m_stockDict.count(query_str) ? true : false;
 }
 
 bool Block::have(const Stock& stock) const {
-    if (!m_data)
-        return false;
+    HKU_IF_RETURN(!m_data, false);
     return m_data->m_stockDict.count(stock.market_code()) ? true : false;
 }
 
 Stock Block::get(const string& market_code) const {
     Stock result;
-    if (!m_data)
-        return result;
-
+    HKU_IF_RETURN(!m_data, result);
     string query_str = market_code;
     to_upper(query_str);
     auto iter = m_data->m_stockDict.find(query_str);
@@ -70,9 +64,7 @@ Stock Block::get(const string& market_code) const {
 }
 
 bool Block::add(const Stock& stock) {
-    if (stock.isNull() || have(stock))
-        return false;
-
+    HKU_IF_RETURN(stock.isNull() || have(stock), false);
     if (!m_data)
         m_data = shared_ptr<Data>(new Data);
 
@@ -83,9 +75,7 @@ bool Block::add(const Stock& stock) {
 bool Block::add(const string& market_code) {
     const StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock(market_code);
-    if (stock.isNull() || have(stock))
-        return false;
-
+    HKU_IF_RETURN(stock.isNull() || have(stock), false);
     if (!m_data)
         m_data = shared_ptr<Data>(new Data);
 
@@ -94,9 +84,7 @@ bool Block::add(const string& market_code) {
 }
 
 bool Block::remove(const string& market_code) {
-    if (!have(market_code)) {
-        return false;
-    }
+    HKU_IF_RETURN(!have(market_code), false);
     string query_str = market_code;
     to_upper(query_str);
     m_data->m_stockDict.erase(query_str);
@@ -104,9 +92,7 @@ bool Block::remove(const string& market_code) {
 }
 
 bool Block::remove(const Stock& stock) {
-    if (!have(stock)) {
-        return false;
-    }
+    HKU_IF_RETURN(!have(stock), false);
     m_data->m_stockDict.erase(stock.market_code());
     return true;
 }

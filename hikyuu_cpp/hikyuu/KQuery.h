@@ -23,7 +23,7 @@ public:
     enum QueryType {
         INDEX = 0,  ///<按索引方式查询
         DATE = 1,   ///<按日期方式查询
-        INVALID = 3
+        INVALID = 2
     };
 
     ///查询K线类型：日线/周线等

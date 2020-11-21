@@ -34,10 +34,7 @@ KData::KData(const Stock& stock, const KQuery& query) {
 
 void KData::tocsv(const string& filename) {
     std::ofstream file(filename.c_str());
-    if (!file) {
-        HKU_ERROR("Can't open file! ({})", filename);
-        return;
-    }
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't open file! ({})", filename);
 
     file << "date, open, high, low, close, amount, count" << std::endl;
     file.setf(std::ios_base::fixed);

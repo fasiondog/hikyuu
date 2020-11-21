@@ -40,20 +40,14 @@ KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverTyp
 }
 
 Datetime KQuery::startDatetime() const {
-    if (m_queryType != DATE || (uint64_t)m_start == Null<uint64_t>()) {
-        return Null<Datetime>();
-    }
-
+    HKU_IF_RETURN(m_queryType != DATE || (uint64_t)m_start == Null<uint64_t>(), Null<Datetime>());
     uint64_t number = (uint64_t)(m_start / 100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_start - number * 100);
 }
 
 Datetime KQuery::endDatetime() const {
-    if (m_queryType != DATE || (uint64_t)m_end == Null<uint64_t>()) {
-        return Null<Datetime>();
-    }
-
+    HKU_IF_RETURN(m_queryType != DATE || (uint64_t)m_end == Null<uint64_t>(), Null<Datetime>());
     uint64_t number = (uint64_t)(m_end / 100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_end - number * 100);

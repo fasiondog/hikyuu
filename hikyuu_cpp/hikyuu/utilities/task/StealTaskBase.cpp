@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include "../../Log.h"
-#include "../exception.h"
 #include "StealTaskBase.h"
 #include "StealTaskRunner.h"
 #include "StealTaskGroup.h"

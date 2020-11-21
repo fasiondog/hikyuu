@@ -110,9 +110,7 @@ size_t KDataImp::getPos(const Datetime& datetime) {
 }
 
 void KDataImp::_recoverForUpDay() {
-    if (empty())
-        return;
-
+    HKU_IF_RETURN(empty(), void());
     std::function<Datetime(const Datetime&)> startOfPhase;
     if (m_query.kType() == KQuery::WEEK) {
         startOfPhase = &Datetime::startOfWeek;
@@ -176,9 +174,7 @@ void KDataImp::_recoverForUpDay() {
  *****************************************************************************/
 void KDataImp::_recoverForward() {
     size_t total = m_buffer.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     Datetime start_date(m_buffer.front().datetime.date());
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
@@ -239,9 +235,7 @@ void KDataImp::_recoverForward() {
  *****************************************************************************/
 void KDataImp::_recoverBackward() {
     size_t total = m_buffer.size();
-    if (0 == total) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     Datetime start_date(m_buffer.front().datetime.date());
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
@@ -303,9 +297,7 @@ void KDataImp::_recoverBackward() {
  *****************************************************************************/
 void KDataImp::_recoverEqualForward() {
     size_t total = m_buffer.size();
-    if (0 == total) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     Datetime start_date(m_buffer.front().datetime.date());
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
@@ -378,9 +370,7 @@ void KDataImp::_recoverEqualForward() {
  *****************************************************************************/
 void KDataImp::_recoverEqualBackward() {
     size_t total = m_buffer.size();
-    if (0 == total) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     Datetime start_date(m_buffer.front().datetime.date());
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));

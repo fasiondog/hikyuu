@@ -83,7 +83,7 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
   m_minTradeNumber(minTradeNumber),
   m_maxTradeNumber(maxTradeNumber) {
     if (0.0 == m_tick) {
-        HKU_WARN("tick should not be zero!");
+        HKU_WARN("tick should not be zero! now use as 1.0");
         m_unit = 1.0;
     } else {
         m_unit = m_tickValue / m_tick;
@@ -114,8 +114,7 @@ Stock::~Stock() {}
 Stock::Stock(const Stock& x) : m_data(x.m_data), m_kdataDriver(x.m_kdataDriver) {}
 
 Stock& Stock::operator=(const Stock& x) {
-    if (this == &x)
-        return *this;
+    HKU_IF_RETURN(this == &x, *this);
     m_data = x.m_data;
     m_kdataDriver = x.m_kdataDriver;
     return *this;
@@ -142,18 +141,10 @@ Stock::Stock(const string& market, const string& code, const string& name, uint3
                            precision, minTradeNumber, maxTradeNumber)) {}
 
 bool Stock::operator!=(const Stock& stock) const {
-    if (this == &stock)
-        return false;
-
-    if (m_data == stock.m_data)
-        return false;
-
-    if (!m_data || !stock.m_data)
-        return true;
-
-    if (m_data->m_code != stock.code() || m_data->m_market != stock.market())
-        return true;
-
+    HKU_IF_RETURN(this == &stock, false);
+    HKU_IF_RETURN(m_data == stock.m_data, false);
+    HKU_IF_RETURN(!m_data || !stock.m_data, true);
+    HKU_IF_RETURN(m_data->m_code != stock.code() || m_data->m_market != stock.market(), true);
     return false;
 }
 
@@ -247,8 +238,7 @@ KDataDriverPtr Stock::getKDataDriver() const {
 }
 
 bool Stock::isBuffer(KQuery::KType ktype) const {
-    if (!m_data)
-        return false;
+    HKU_IF_RETURN(!m_data, false);
     string nktype(ktype);
     to_upper(nktype);
     return m_data->pKData.find(nktype) != m_data->pKData.end();
@@ -294,9 +284,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
 
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
-    if (!m_data || start >= end)
-        return result;
-
+    HKU_IF_RETURN(!m_data || start >= end, result);
     if (m_data->m_lastUpdateWeightDate < Datetime::today()) {
         auto baseInfoDriver = StockManager::instance().getBaseInfoDriver();
         auto new_weight_list =
@@ -333,9 +321,7 @@ size_t Stock::_getCountFromBuffer(KQuery::KType ktype) const {
 }
 
 size_t Stock::getCount(KQuery::KType kType) const {
-    if (!m_data)
-        return 0;
-
+    HKU_IF_RETURN(!m_data, 0);
     string nktype(kType);
     to_upper(nktype);
     if (m_data->pKData.find(nktype) != m_data->pKData.end()) {
@@ -346,11 +332,8 @@ size_t Stock::getCount(KQuery::KType kType) const {
 }
 
 price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) const {
-    if (isNull())
-        return 0.0;
-
-    if (!valid() && datetime > lastDatetime())
-        return 0.0;
+    HKU_IF_RETURN(isNull(), 0.0);
+    HKU_IF_RETURN(!valid() && datetime > lastDatetime(), 0.0);
 
     string ktype(inktype);
     to_upper(ktype);
@@ -401,8 +384,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
 bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_end) const {
     out_start = 0;
     out_end = 0;
-    if (!m_data || !m_kdataDriver)
-        return false;
+    HKU_IF_RETURN(!m_data || !m_kdataDriver, false);
 
     if (KQuery::INDEX == query.queryType())
         return _getIndexRangeByIndex(query, out_start, out_end);
@@ -430,9 +412,7 @@ bool Stock::_getIndexRangeByIndex(const KQuery& query, size_t& out_start, size_t
     out_end = 0;
 
     size_t total = getCount(query.kType());
-    if (0 == total) {
-        return false;
-    }
+    HKU_IF_RETURN(0 == total, false);
 
     int64_t startix, endix;
     startix = query.start();
@@ -486,9 +466,7 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
 
     const KRecordList& kdata = *(m_data->pKData[query.kType()]);
     size_t total = kdata.size();
-    if (0 == total) {
-        return false;
-    }
+    HKU_IF_RETURN(0 == total, false);
 
     size_t mid = total, low = 0, high = total - 1;
     size_t startpos, endpos;
@@ -555,24 +533,19 @@ KRecord Stock::_getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const {
 }
 
 KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
-    if (!m_data)
-        return Null<KRecord>();
-
+    HKU_IF_RETURN(!m_data, Null<KRecord>());
     if (m_data->pKData.find(kType) != m_data->pKData.end()) {
         return _getKRecordFromBuffer(pos, kType);
     }
 
-    if (!m_kdataDriver || pos >= size_t(Null<int64_t>()))
-        return Null<KRecord>();
-
+    HKU_IF_RETURN(!m_kdataDriver || pos >= size_t(Null<int64_t>()), Null<KRecord>());
     auto klist = m_kdataDriver->getKRecordList(market(), code(), KQuery(pos, pos + 1, kType));
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
 KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
     KRecord result;
-    if (isNull())
-        return result;
+    HKU_IF_RETURN(isNull(), result);
 
     // string ktype(inktype);
     // to_upper(ktype);
@@ -591,11 +564,8 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     KRecordList result;
     size_t total = m_data->pKData[ktype]->size();
-    if (start_ix >= end_ix || start_ix >= total) {
-        HKU_WARN("Invalid param! ({}, {})", start_ix, end_ix);
-        return result;
-    }
-
+    HKU_WARN_IF_RETURN(start_ix >= end_ix || start_ix >= total, result, "Invalid param! ({}, {})",
+                       start_ix, end_ix);
     size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
     result.resize(length);
     std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]), sizeof(KRecord) * length);
@@ -604,9 +574,7 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
 
 KRecordList Stock::getKRecordList(const KQuery& query) const {
     KRecordList result;
-    if (isNull()) {
-        return result;
-    }
+    HKU_IF_RETURN(isNull(), result);
 
     // 如果是在内存缓存中
     if (m_data->pKData.find(query.kType()) != m_data->pKData.end()) {
@@ -672,9 +640,7 @@ TransList Stock::getTransList(const KQuery& query) const {
 
 Parameter Stock::getFinanceInfo() const {
     Parameter result;
-    if (type() != STOCKTYPE_A) {
-        return result;
-    }
+    HKU_IF_RETURN(type() != STOCKTYPE_A, result);
 
     BaseInfoDriverPtr driver = StockManager::instance().getBaseInfoDriver();
     if (driver) {
@@ -685,13 +651,12 @@ Parameter Stock::getFinanceInfo() const {
 }
 
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
-    if (type() == STOCKTYPE_A) {
-        StockManager& sm = StockManager::instance();
-        HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
-        return rd.getHistoryFinanceInfo(date, market(), code());
-    }
-
-    return PriceList();
+    PriceList result;
+    HKU_IF_RETURN(type() != STOCKTYPE_A, result);
+    StockManager& sm = StockManager::instance();
+    HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
+    result = rd.getHistoryFinanceInfo(date, market(), code());
+    return result;
 }
 
 void Stock::realtimeUpdate(const KRecord& record, KQuery::KType inktype) {

@@ -34,7 +34,6 @@
 #include "utilities/Null.h"
 #include "utilities/arithmetic.h"
 #include "utilities/SpendTimer.h"
-#include "utilities/exception.h"
 #include "utilities/util.h"
 
 #if defined(_MSC_VER)

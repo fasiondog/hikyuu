@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include "../../Log.h"
-#include "../exception.h"
 #include "StealTaskGroup.h"
 
 namespace hku {

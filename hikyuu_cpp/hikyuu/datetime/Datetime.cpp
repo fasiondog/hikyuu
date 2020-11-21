@@ -11,7 +11,7 @@
 
 #include <fmt/format.h>
 #include "../utilities/Null.h"
-#include "../utilities/exception.h"
+#include "../Log.h"
 #include "../utilities/arithmetic.h"
 #include "Datetime.h"
 
