@@ -110,7 +110,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
     try {
         KRecordTable r(market, code, ktype);
         SQLStatementPtr st =
-          con->getStatement(fmt::format("{} order by date where date >= {} and date < {}",
+          con->getStatement(fmt::format("{} where date >= {} and date < {} order by date",
                                         r.getSelectSQL(), start_date.number(), end_date.number()));
         st->exec();
         while (st->moveNext()) {
