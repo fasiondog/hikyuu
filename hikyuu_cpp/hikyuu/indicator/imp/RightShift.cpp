@@ -20,13 +20,7 @@ RightShift::RightShift() : IndicatorImp("REF", 1) {
 RightShift::~RightShift() {}
 
 bool RightShift::check() {
-    int n = getParam<int>("n");
-    if (n < 0) {
-        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void RightShift::_calculate(const Indicator& data) {

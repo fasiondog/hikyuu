@@ -31,12 +31,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const TransList& data) {
 }
 
 bool HKU_API operator==(const TransRecord& d1, const TransRecord& d2) {
-    if (d1.datetime == d2.datetime && (std::fabs(d1.price - d2.price) < 0.0001) &&
-        (std::fabs(d1.vol - d2.vol) < 0.0001) && (d1.direct == d2.direct)) {
-        return true;
-    }
-
-    return false;
+    return (d1.datetime == d2.datetime && (std::fabs(d1.price - d2.price) < 0.0001) &&
+            (std::fabs(d1.vol - d2.vol) < 0.0001) && (d1.direct == d2.direct));
 }
 
 TransRecord::TransRecord() : datetime(Datetime()), price(0.0), vol(0.0), direct(BUY) {}

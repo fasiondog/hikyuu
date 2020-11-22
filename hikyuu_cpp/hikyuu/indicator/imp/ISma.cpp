@@ -23,12 +23,7 @@ ISma::ISma() : IndicatorImp("SMA", 1) {
 ISma::~ISma() {}
 
 bool ISma::check() {
-    int n = getParam<int>("n");
-    if (n < 1) {
-        HKU_ERROR("Invalid param! (n >= 1)");
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 1;
 }
 
 void ISma::_calculate(const Indicator& ind) {

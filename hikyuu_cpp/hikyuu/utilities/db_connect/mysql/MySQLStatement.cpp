@@ -82,10 +82,7 @@ void MySQLStatement::sub_exec() {
 }
 
 void MySQLStatement::_bindResult() {
-    if (!m_meta_result) {
-        return;
-    }
-
+    HKU_IF_RETURN(!m_meta_result, void());
     MYSQL_FIELD* field;
     int idx = 0;
     while ((field = mysql_fetch_field(m_meta_result))) {

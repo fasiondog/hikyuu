@@ -18,10 +18,7 @@ FixedHoldDays::~FixedHoldDays() {}
 void FixedHoldDays::_calculate() {}
 
 price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
-    if (getParam<int>("days") <= 0) {
-        HKU_WARN("param days <= 0! Are you sure?");
-        return 0.0;
-    }
+    HKU_WARN_IF_RETURN(getParam<int>("days") <= 0, 0.0, "param days <= 0! Are you sure?");
 
     Stock stk = m_kdata.getStock();
     PositionRecord position = m_tm->getPosition(stk);

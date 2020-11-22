@@ -56,15 +56,10 @@ void MySQLConnect::close() {
 }
 
 bool MySQLConnect::ping() {
-    if (!m_mysql) {
-        return false;
-    }
-
+    HKU_IF_RETURN(!m_mysql, false);
     auto ret = mysql_ping(m_mysql);
-    if (ret) {
-        HKU_ERROR("mysql_ping error code: {}, msg: {}", ret, mysql_error(m_mysql));
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(ret, false, "mysql_ping error code: {}, msg: {}", ret,
+                        mysql_error(m_mysql));
     return true;
 }
 

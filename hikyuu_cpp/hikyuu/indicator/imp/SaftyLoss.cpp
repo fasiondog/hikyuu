@@ -22,27 +22,12 @@ SaftyLoss::SaftyLoss() : IndicatorImp("SAFTYLOSS", 1) {
 SaftyLoss::~SaftyLoss() {}
 
 bool SaftyLoss::check() {
-    int n1 = getParam<int>("n1");
-    int n2 = getParam<int>("n2");
-
-    if (n1 < 2) {
-        HKU_ERROR("Invalid param[n1] must >= 2 !");
-        return false;
-    }
-
-    if (n2 < 1) {
-        HKU_ERROR("Invalid param[n2] must >= 1 !");
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n1") >= 2 && getParam<int>("n2") >= 1;
 }
 
 void SaftyLoss::_calculate(const Indicator& data) {
     size_t total = data.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
     _readyBuffer(total, 1);
 
     int n1 = getParam<int>("n1");

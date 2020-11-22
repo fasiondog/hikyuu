@@ -37,13 +37,10 @@ std::string CostRecord::toString() const {
 }
 
 bool HKU_API operator==(const CostRecord& d1, const CostRecord& d2) {
-    if (std::fabs(d1.commission - d2.commission) < 0.0001 &&
-        std::fabs(d1.stamptax - d2.stamptax) < 0.0001 &&
-        std::fabs(d1.transferfee - d2.transferfee) < 0.0001 &&
-        std::fabs(d1.others - d2.others) < 0.0001 && std::fabs(d1.total - d2.total) < 0.0001) {
-        return true;
-    }
-    return false;
+    return (std::fabs(d1.commission - d2.commission) < 0.0001 &&
+            std::fabs(d1.stamptax - d2.stamptax) < 0.0001 &&
+            std::fabs(d1.transferfee - d2.transferfee) < 0.0001 &&
+            std::fabs(d1.others - d2.others) < 0.0001 && std::fabs(d1.total - d2.total) < 0.0001);
 }
 
 } /* namespace hku */

@@ -23,15 +23,7 @@ Ama::Ama() : IndicatorImp("AMA", 2) {
 Ama::~Ama() {}
 
 bool Ama::check() {
-    int n = getParam<int>("n");
-    int fast_n = getParam<int>("fast_n");
-    int slow_n = getParam<int>("slow_n");
-    if (n < 1 || fast_n < 0 || slow_n < 0) {
-        HKU_ERROR("Invalid param! (n>=1, fast_n>0, slow_n>0) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 1 && getParam<int>("fast_n") >= 0 && getParam<int>("slow_n") >= 0;
 }
 
 void Ama::_calculate(const Indicator& data) {

@@ -23,13 +23,7 @@ IDevsq::IDevsq() : IndicatorImp("DEVSQ", 1) {
 IDevsq::~IDevsq() {}
 
 bool IDevsq::check() {
-    int n = getParam<int>("n");
-    if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 2;
 }
 
 void IDevsq::_calculate(const Indicator& data) {

@@ -30,26 +30,19 @@ IKData::~IKData() {}
 
 bool IKData::check() {
     string part = getParam<string>("kpart");
-    if ("KDATA" == part || "OPEN" == part || "HIGH" == part || "LOW" == part || "CLOSE" == part ||
-        "AMO" == part || "VOL" == part) {
-        return true;
-    }
-
-    return false;
+    return ("KDATA" == part || "OPEN" == part || "HIGH" == part || "LOW" == part ||
+            "CLOSE" == part || "AMO" == part || "VOL" == part);
 }
 
 //支持KDATA Indicator作为参数
 void IKData::_calculate(const Indicator& ind) {
-    if (!isLeaf() && !ind.empty()) {
-        HKU_WARN("The input is ignored because {} depends on the context!",
-                 getParam<string>("kpart"));
-    }
+    HKU_WARN_IF(!isLeaf() && !ind.empty(),
+                "The input is ignored because {} depends on the context!",
+                getParam<string>("kpart"));
 
     KData kdata = getContext();
     size_t total = kdata.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     string part_name = getParam<string>("kpart");
 

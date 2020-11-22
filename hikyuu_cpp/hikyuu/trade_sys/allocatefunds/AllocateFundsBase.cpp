@@ -86,10 +86,7 @@ void AllocateFundsBase::setReservePercent(double percent) {
 void AllocateFundsBase ::adjustFunds(const Datetime& date, const SystemList& se_list,
                                      const std::list<SYSPtr>& running_list) {
     int max_num = getParam<int>("max_sys_num");
-    if (max_num <= 0) {
-        HKU_ERROR("param(max_sys_num) need > 0!");
-        return;
-    }
+    HKU_ERROR_IF_RETURN(max_num <= 0, void(), "param(max_sys_num) need > 0!");
 
     if (getParam<bool>("adjust_running_sys")) {
         _adjust_with_running(date, se_list, running_list);
@@ -120,15 +117,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                                              const std::list<SYSPtr>& running_list) {
     // 计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
-    if (sw_list.size() == 0) {
-        return;
-    }
+    HKU_IF_RETURN(sw_list.size() == 0, void());
 
     // 如果运行中的系统数已大于等于允许的最大系统数，直接返回
     int max_num = getParam<int>("max_sys_num");
-    if (running_list.size() >= max_num) {
-        return;
-    }
+    HKU_IF_RETURN(running_list.size() >= max_num, void());
 
     //构建实际分配权重大于零的的系统集合
     std::set<SYSPtr> selected_sets;
@@ -338,15 +331,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
 void AllocateFundsBase::_adjust_without_running(const Datetime& date, const SystemList& se_list,
                                                 const std::list<SYSPtr>& running_list) {
-    if (se_list.size() == 0) {
-        return;
-    }
+    HKU_IF_RETURN(se_list.size() == 0, void());
 
     //如果运行中的系统数已大于等于允许的最大系统数，直接返回
     int max_num = getParam<int>("max_sys_num");
-    if (running_list.size() >= max_num) {
-        return;
-    }
+    HKU_IF_RETURN(running_list.size() >= max_num, void());
 
     // 计算选中系统中当前正在运行中的子系统
     std::set<SYSPtr> hold_sets;
@@ -364,9 +353,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
 
     //获取计划分配的资产权重
     SystemWeightList sw_list = _allocateWeight(date, pure_se_list);
-    if (sw_list.size() == 0) {
-        return;
-    }
+    HKU_IF_RETURN(sw_list.size() == 0, void());
 
     //按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
     std::sort(
@@ -395,9 +382,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     price_t reserve_funds = total_funds * m_reserve_percent;
 
     // 如果当前现金小于等于需保留的资产，则直接返回
-    if (m_shadow_tm->currentCash() <= reserve_funds) {
-        return;
-    }
+    HKU_IF_RETURN(m_shadow_tm->currentCash() <= reserve_funds, void());
 
     // 计算可用于分配的现金
     price_t can_allocate_cash = roundDown(m_shadow_tm->currentCash() - reserve_funds, precision);

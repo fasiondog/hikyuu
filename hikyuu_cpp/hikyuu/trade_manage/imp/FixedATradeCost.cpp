@@ -34,11 +34,7 @@ FixedATradeCost::~FixedATradeCost() {}
 CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
                                        double num) const {
     CostRecord result;
-    if (stock.isNull()) {
-        HKU_WARN("Stock is Null!");
-        return result;
-    }
-
+    HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
     int precision = stock.precision();
     result.commission = roundEx(price * num * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");

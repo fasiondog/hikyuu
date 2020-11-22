@@ -65,10 +65,7 @@ void EnvironmentBase::_addValid(const Datetime& datetime) {
 }
 
 bool EnvironmentBase::isValid(const Datetime& datetime) {
-    if (m_valid.count(datetime) != 0) {
-        return true;
-    }
-    return false;
+    return m_valid.count(datetime) != 0;
 }
 
 } /* namespace hku */

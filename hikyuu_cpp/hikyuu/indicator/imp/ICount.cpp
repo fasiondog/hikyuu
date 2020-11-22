@@ -20,13 +20,7 @@ ICount::ICount() : IndicatorImp("COUNT", 1) {
 ICount::~ICount() {}
 
 bool ICount::check() {
-    int n = getParam<int>("n");
-    if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0)");
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void ICount::_calculate(const Indicator& data) {

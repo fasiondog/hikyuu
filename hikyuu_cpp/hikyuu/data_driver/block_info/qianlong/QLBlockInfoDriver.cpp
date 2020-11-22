@@ -20,15 +20,8 @@ bool QLBlockInfoDriver::_init() {
 
 Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
     Block result(category, name);
-    if (!haveParam("dir")) {
-        HKU_ERROR("Missing 'dir' param!");
-        return result;
-    }
-
-    if (!haveParam(category)) {
-        HKU_INFO("No such category ({})!", category);
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(!haveParam("dir"), result, "Missing 'dir' param!");
+    HKU_INFO_IF_RETURN(!haveParam(category), result, "No such category ({})!", category);
 
     string filename;
     try {
@@ -39,10 +32,7 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
     }
 
     std::ifstream inifile(filename.c_str(), std::ifstream::in);
-    if (!inifile) {
-        HKU_ERROR("Can't open file({})!", filename);
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(!inifile, result, "Can't open file({})!", filename);
 
     string line_str;
     string section, market, code;
@@ -106,15 +96,8 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
 
 BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     BlockList result;
-    if (!haveParam("dir")) {
-        HKU_ERROR("Missing 'dir' param!");
-        return result;
-    }
-
-    if (!haveParam(category)) {
-        HKU_INFO("No such category ({})!", category);
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(!haveParam("dir"), result, "Missing 'dir' param!");
+    HKU_INFO_IF_RETURN(!haveParam(category), result, "No such category ({})!", category);
 
     string filename;
     try {
@@ -125,10 +108,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     }
 
     std::ifstream inifile(filename.c_str(), std::ifstream::in);
-    if (!inifile) {
-        HKU_ERROR("Can't open file({})!", filename);
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(!inifile, result, "Can't open file({})!", filename);
 
     std::string section;
     std::string key;
@@ -195,11 +175,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
 
 BlockList QLBlockInfoDriver::getBlockList() {
     BlockList result;
-    if (!haveParam("dir")) {
-        HKU_ERROR("Missing 'dir' param!");
-        return result;
-    }
-
+    HKU_ERROR_IF_RETURN(!haveParam("dir"), result, "Missing 'dir' param!");
     StringList category_list = m_params.getNameList();
     for (auto iter = category_list.begin(); iter != category_list.end(); ++iter) {
         if (*iter == "dir" || *iter == "type")

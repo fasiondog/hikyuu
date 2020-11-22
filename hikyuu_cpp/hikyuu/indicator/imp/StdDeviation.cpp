@@ -21,13 +21,7 @@ StdDeviation::StdDeviation() : IndicatorImp("STD", 1) {
 StdDeviation::~StdDeviation() {}
 
 bool StdDeviation::check() {
-    int n = getParam<int>("n");
-    if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 2;
 }
 
 void StdDeviation::_calculate(const Indicator& data) {

@@ -67,16 +67,13 @@ FundsRecord& FundsRecord::operator+=(const FundsRecord other) {
 }
 
 bool HKU_API operator==(const FundsRecord& d1, const FundsRecord& d2) {
-    if (std::fabs(d1.cash - d2.cash) < 0.0001 &&
-        std::fabs(d1.market_value - d2.market_value) < 0.0001 &&
-        std::fabs(d1.short_market_value - d2.short_market_value) < 0.0001 &&
-        std::fabs(d1.base_cash - d2.base_cash) < 0.0001 &&
-        std::fabs(d1.base_asset - d2.base_asset) < 0.0001 &&
-        std::fabs(d1.borrow_cash - d2.borrow_cash) < 0.0001 &&
-        std::fabs(d1.borrow_asset - d2.borrow_asset) < 0.0001) {
-        return true;
-    }
-    return false;
+    return (std::fabs(d1.cash - d2.cash) < 0.0001 &&
+            std::fabs(d1.market_value - d2.market_value) < 0.0001 &&
+            std::fabs(d1.short_market_value - d2.short_market_value) < 0.0001 &&
+            std::fabs(d1.base_cash - d2.base_cash) < 0.0001 &&
+            std::fabs(d1.base_asset - d2.base_asset) < 0.0001 &&
+            std::fabs(d1.borrow_cash - d2.borrow_cash) < 0.0001 &&
+            std::fabs(d1.borrow_asset - d2.borrow_asset) < 0.0001);
 }
 
 } /* namespace hku */

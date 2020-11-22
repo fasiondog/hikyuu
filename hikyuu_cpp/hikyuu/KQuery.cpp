@@ -65,17 +65,11 @@ string KQuery::getQueryTypeName(QueryType queryType) {
 }
 
 KQuery::QueryType KQuery::getQueryTypeEnum(const string& arg) {
-    QueryType result;
     string name(arg);
     to_upper(name);
-    if ("INDEX" == name) {
-        result = INDEX;
-    } else if ("DATE" == name) {
-        result = DATE;
-    } else {
-        result = INVALID;
-    }
-    return result;
+    HKU_IF_RETURN("INDEX" == name, INDEX);
+    HKU_IF_RETURN("DATE" == name, DATE);
+    return INVALID;
 }
 
 string KQuery::getKTypeName(KType dataType) {
@@ -108,23 +102,14 @@ string KQuery::getRecoverTypeName(RecoverType recoverType) {
 }
 
 KQuery::RecoverType KQuery::getRecoverTypeEnum(const string& arg) {
-    RecoverType result;
     string name(arg);
     to_upper(name);
-    if ("NO_RECOVER" == name) {
-        result = NO_RECOVER;
-    } else if ("FORWARD" == name) {
-        result = FORWARD;
-    } else if ("BACKWARD" == name) {
-        result = BACKWARD;
-    } else if ("EQUAL_FORWARD" == name) {
-        result = EQUAL_FORWARD;
-    } else if ("EQUAL_BACKWARD" == name) {
-        result = EQUAL_BACKWARD;
-    } else {
-        result = INVALID_RECOVER_TYPE;
-    }
-    return result;
+    HKU_IF_RETURN("NO_RECOVER" == name, NO_RECOVER);
+    HKU_IF_RETURN("FORWARD" == name, FORWARD);
+    HKU_IF_RETURN("BACKWARD" == name, BACKWARD);
+    HKU_IF_RETURN("EQUAL_FORWARD" == name, EQUAL_FORWARD);
+    HKU_IF_RETURN("EQUAL_BACKWARD" == name, EQUAL_BACKWARD);
+    return INVALID_RECOVER_TYPE;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query) {

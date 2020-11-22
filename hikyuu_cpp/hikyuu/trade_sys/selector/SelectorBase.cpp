@@ -79,31 +79,15 @@ SelectorPtr SelectorBase::clone() {
 }
 
 bool SelectorBase::addSystem(const SystemPtr& sys) {
-    if (!sys) {
-        HKU_WARN("Try add null sys, will be discard!");
-        return false;
-    }
-
-    if (sys->getStock().isNull()) {
-        HKU_WARN("sys has not bind stock!");
-        return false;
-    }
-
+    HKU_WARN_IF_RETURN(!sys, false, "Try add null sys, will be discard!");
+    HKU_WARN_IF_RETURN(sys->getStock().isNull(), false, "sys has not bind stock!");
     m_sys_list.push_back(sys);
     return true;
 }
 
 bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
-    if (stock.isNull()) {
-        HKU_WARN("Try add Null stock, will be discard!");
-        return false;
-    }
-
-    if (!protoSys) {
-        HKU_WARN("Try add Null protoSys, will be discard!");
-        return false;
-    }
-
+    HKU_WARN_IF_RETURN(stock.isNull(), false, "Try add Null stock, will be discard!");
+    HKU_WARN_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
     SYSPtr sys = protoSys->clone();
     sys->setStock(stock);
     m_sys_list.push_back(sys);
@@ -111,11 +95,7 @@ bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
 }
 
 bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& protoSys) {
-    if (!protoSys) {
-        HKU_WARN("Try add Null protoSys, will be discard!");
-        return false;
-    }
-
+    HKU_WARN_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
     StockList::const_iterator iter = stkList.begin();
     for (; iter != stkList.end(); ++iter) {
         if (iter->isNull()) {

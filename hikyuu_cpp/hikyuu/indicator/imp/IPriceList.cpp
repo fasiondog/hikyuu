@@ -28,11 +28,7 @@ IPriceList::IPriceList(const PriceList& data, int in_discard) : IndicatorImp("PR
 IPriceList::~IPriceList() {}
 
 bool IPriceList::check() {
-    if (getParam<int>("discard") < 0 || getParam<int>("result_index") < 0) {
-        return false;
-    }
-
-    return true;
+    return (getParam<int>("discard") >= 0 && getParam<int>("result_index") >= 0);
 }
 
 void IPriceList::_calculate(const Indicator& data) {
@@ -60,10 +56,8 @@ void IPriceList::_calculate(const Indicator& data) {
 
     //不在叶子节点上，则忽略本身的data参数，认为其输入实际为函数入参中的data
     int result_index = getParam<int>("result_index");
-    if (result_index < 0 || result_index >= data.getResultNumber()) {
-        HKU_ERROR("result_index out of range!");
-        return;
-    }
+    HKU_ERROR_IF_RETURN(result_index < 0 || result_index >= data.getResultNumber(), void(),
+                        "result_index out of range!");
 
     size_t total = data.size();
     _readyBuffer(total, 1);

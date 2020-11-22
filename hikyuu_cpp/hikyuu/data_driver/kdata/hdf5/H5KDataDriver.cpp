@@ -271,12 +271,9 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
 size_t H5KDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     H5FilePtr h5file;
     H5::Group group;
-    if (!_getH5FileAndGroup(market, code, kType, h5file, group)) {
-        return 0;
-    }
+    HKU_IF_RETURN(!_getH5FileAndGroup(market, code, kType, h5file, group), 0);
 
     size_t total = 0;
-
     try {
         string tablename(market + code);
         CHECK_DATASET_EXISTS_RET(group, tablename, total);
@@ -326,9 +323,7 @@ bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string&
     H5::Group group;
     bool success;
     success = _getH5FileAndGroup(market, code, query.kType(), h5file, group);
-    if (!success) {
-        return false;
-    }
+    HKU_IF_RETURN(!success, false);
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
@@ -439,18 +434,13 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
            KQuery::MIN30 == query.kType() || KQuery::MIN60 == query.kType());
     out_start = 0;
     out_end = 0;
-    if (query.startDatetime() >= query.endDatetime()) {
-        return false;
-    }
+    HKU_IF_RETURN(query.startDatetime() >= query.endDatetime(), false);
 
     H5FilePtr h5file;
     H5::Group group;
-    if (!_getH5FileAndGroup(market, code, query.kType(), h5file, group)) {
-        return false;
-    }
+    HKU_IF_RETURN(!_getH5FileAndGroup(market, code, query.kType(), h5file, group), false);
 
     string _tablename(market + code);
-
     try {
         CHECK_DATASET_EXISTS_RET(group, _tablename, false);
         H5::DataSet dataset(group.openDataSet(_tablename));
@@ -539,9 +529,7 @@ KRecordList H5KDataDriver::getKRecordList(const string& market, const string& co
     auto kType = query.kType();
     if (query.queryType() == KQuery::INDEX) {
         // 按索引方式查询
-        if (query.start() >= query.end()) {
-            return result;
-        }
+        HKU_IF_RETURN(query.start() >= query.end(), result);
         if (KQuery::DAY == kType || KQuery::MIN5 == kType || KQuery::MIN == kType) {
             result = _getBaseKRecordList(market, code, kType, query.start(), query.end());
         } else {
@@ -571,9 +559,7 @@ KRecordList H5KDataDriver::_getBaseKRecordList(const string& market, const strin
     KRecordList result;
     H5FilePtr h5file;
     H5::Group group;
-    if (!_getH5FileAndGroup(market, code, kType, h5file, group)) {
-        return result;
-    }
+    HKU_IF_RETURN(!_getH5FileAndGroup(market, code, kType, h5file, group), result);
 
     try {
         string tablename(format("{}{}", market, code));
@@ -622,9 +608,7 @@ KRecordList H5KDataDriver::_getIndexKRecordList(const string& market, const stri
     string tablename(format("{}{}", market, code));
     H5FilePtr h5file;
     H5::Group index_group;
-    if (!_getH5FileAndGroup(market, code, kType, h5file, index_group)) {
-        return result;
-    }
+    HKU_IF_RETURN(!_getH5FileAndGroup(market, code, kType, h5file, index_group), result);
 
     try {
         H5::Group base_group = h5file->openGroup("data");
@@ -708,9 +692,7 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
     TimeLineList result;
     H5FilePtr h5file;
     H5::Group group;
-    if (!_getH5FileAndGroup(market, code, "TIME", h5file, group)) {
-        return result;
-    }
+    HKU_IF_RETURN(!_getH5FileAndGroup(market, code, "TIME", h5file, group), result);
 
     try {
         string tablename(market + code);
@@ -777,17 +759,13 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
 TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& code,
                                          const Datetime& start, const Datetime& end) {
     TimeLineList result;
-    if (start >= end || start > Datetime::max()) {
-        return result;
-    }
+    HKU_IF_RETURN(start >= end || start > Datetime::max(), result);
 
     H5FilePtr h5file;
     H5::Group group;
     bool success;
     success = _getH5FileAndGroup(market, code, "TIME", h5file, group);
-    if (!success) {
-        return result;
-    }
+    HKU_IF_RETURN(!success, result);
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;
@@ -929,9 +907,7 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
     TransList result;
     H5FilePtr h5file;
     H5::Group group;
-    if (!_getH5FileAndGroup(market, code, "TRANS", h5file, group)) {
-        return result;
-    }
+    HKU_IF_RETURN(!_getH5FileAndGroup(market, code, "TRANS", h5file, group), result);
 
     try {
         string tablename(market + code);
@@ -1005,17 +981,13 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
 TransList H5KDataDriver::_getTransList(const string& market, const string& code,
                                        const Datetime& start, const Datetime& end) {
     TransList result;
-    if (start >= end || start > Datetime::max()) {
-        return result;
-    }
+    HKU_IF_RETURN(start >= end || start > Datetime::max(), result);
 
     H5FilePtr h5file;
     H5::Group group;
     bool success;
     success = _getH5FileAndGroup(market, code, "TRANS", h5file, group);
-    if (!success) {
-        return result;
-    }
+    HKU_IF_RETURN(!success, result);
 
     H5::DataSet dataset;
     H5::DataSpace dataspace;

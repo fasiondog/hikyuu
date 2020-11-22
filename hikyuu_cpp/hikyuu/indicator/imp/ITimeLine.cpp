@@ -29,13 +29,12 @@ ITimeLine::ITimeLine(const KData& k) : IndicatorImp("TIMELINE", 1) {
 
 bool ITimeLine::check() {
     string part = getParam<string>("part");
-    return part != "price" && part != "vol" ? false : true;
+    return part == "price" || part == "vol";
 }
 
 void ITimeLine::_calculate(const Indicator& data) {
-    if (!isLeaf() && !data.empty()) {
-        HKU_WARN("The input is ignored because {} depends on the context!", m_name);
-    }
+    HKU_WARN_IF(!isLeaf() && !data.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
 
     KData k = getContext();
     KQuery q = k.getQuery();
@@ -43,9 +42,7 @@ void ITimeLine::_calculate(const Indicator& data) {
 
     TimeLineList time_line = stk.getTimeLineList(q);
     size_t total = time_line.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
 

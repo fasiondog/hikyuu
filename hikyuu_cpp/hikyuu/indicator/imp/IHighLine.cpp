@@ -22,13 +22,7 @@ IHighLine::IHighLine() : IndicatorImp("HHV", 1) {
 IHighLine::~IHighLine() {}
 
 bool IHighLine::check() {
-    int n = getParam<int>("n");
-    if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void IHighLine::_calculate(const Indicator& ind) {

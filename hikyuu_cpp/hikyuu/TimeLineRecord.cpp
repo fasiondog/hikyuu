@@ -31,12 +31,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const TimeLineList& data) {
 }
 
 bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord& d2) {
-    if (d1.datetime == d2.datetime && (std::fabs(d1.price - d2.price) < 0.0001) &&
-        (std::fabs(d1.vol - d2.vol) < 0.0001)) {
-        return true;
-    }
-
-    return false;
+    return (d1.datetime == d2.datetime && (std::fabs(d1.price - d2.price) < 0.0001) &&
+            (std::fabs(d1.vol - d2.vol) < 0.0001));
 }
 
 TimeLineRecord::TimeLineRecord() : datetime(Datetime()), price(0.0), vol(0.0) {}

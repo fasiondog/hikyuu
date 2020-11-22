@@ -41,9 +41,7 @@ void SingleSignal::_calculate() {
     Indicator dev = STDEV(DIFF(ind), filter_n);
 
     size_t start = dev.discard();
-    if (start < 3) {
-        return;
-    }
+    HKU_IF_RETURN(start < 3, void());
 
     size_t total = dev.size();
     for (size_t i = start; i < total; ++i) {

@@ -20,13 +20,7 @@ Ema::Ema() : IndicatorImp("EMA", 1) {
 Ema::~Ema() {}
 
 bool Ema::check() {
-    int n = getParam<int>("n");
-    if (n <= 0) {
-        HKU_ERROR("Invalid param[n] must > 0 !");
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") > 0;
 }
 
 void Ema::_calculate(const Indicator& indicator) {

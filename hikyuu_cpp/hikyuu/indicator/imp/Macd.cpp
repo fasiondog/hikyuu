@@ -23,20 +23,12 @@ Macd::Macd() : IndicatorImp("MACD", 3) {
 Macd::~Macd() {}
 
 bool Macd::check() {
-    int n1 = getParam<int>("n1");
-    int n2 = getParam<int>("n2");
-    int n3 = getParam<int>("n3");
-    if (n1 <= 0 || n2 <= 0 || n3 <= 0) {
-        return false;
-    }
-    return true;
+    return getParam<int>("n1") > 0 && getParam<int>("n2") > 0 && getParam<int>("n3") > 0;
 }
 
 void Macd::_calculate(const Indicator& data) {
     size_t total = data.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 3);
 

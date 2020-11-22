@@ -6,6 +6,7 @@
  */
 
 #include <boost/algorithm/string.hpp>
+#include "../Log.h"
 #include "Parameter.h"
 
 namespace hku {
@@ -67,43 +68,26 @@ Parameter& Parameter::operator=(const Parameter& p) {
 }
 
 bool Parameter::support(const boost::any& value) {
-    if (value.type() == typeid(int) || value.type() == typeid(bool) ||
-        value.type() == typeid(double) || value.type() == typeid(string) ||
-        value.type() == typeid(Stock) || value.type() == typeid(KQuery) ||
-        value.type() == typeid(KData) || value.type() == typeid(PriceList) ||
-        value.type() == typeid(DatetimeList)) {
-        return true;
-    }
-
-    return false;
+    return value.type() == typeid(int) || value.type() == typeid(bool) ||
+           value.type() == typeid(double) || value.type() == typeid(string) ||
+           value.type() == typeid(Stock) || value.type() == typeid(KQuery) ||
+           value.type() == typeid(KData) || value.type() == typeid(PriceList) ||
+           value.type() == typeid(DatetimeList);
 }
 
 string Parameter::type(const string& name) const {
     auto iter = m_params.find(name);
-    if (iter == m_params.end()) {
-        throw std::out_of_range("out_of_range in Parameter::get : " + name);
-    }
-
-    if (iter->second.type() == typeid(int)) {
-        return "int";
-    } else if (iter->second.type() == typeid(bool)) {
-        return "bool";
-    } else if (iter->second.type() == typeid(double)) {
-        return "double";
-    } else if (iter->second.type() == typeid(string)) {
-        return "string";
-    } else if (iter->second.type() == typeid(Stock)) {
-        return "Stock";
-    } else if (iter->second.type() == typeid(KQuery)) {
-        return "KQuery";
-    } else if (iter->second.type() == typeid(KData)) {
-        return "KData";
-    } else if (iter->second.type() == typeid(PriceList)) {
-        return "PriceList";
-    } else if (iter->second.type() == typeid(DatetimeList)) {
-        return "DatetimeList";
-    }
-
+    HKU_CHECK_THROW(iter != m_params.end(), std::out_of_range,
+                    "out_of_range in Parameter::get : {}", name);
+    HKU_IF_RETURN(iter->second.type() == typeid(int), "int");
+    HKU_IF_RETURN(iter->second.type() == typeid(bool), "bool");
+    HKU_IF_RETURN(iter->second.type() == typeid(double), "double");
+    HKU_IF_RETURN(iter->second.type() == typeid(string), "string");
+    HKU_IF_RETURN(iter->second.type() == typeid(Stock), "Stock");
+    HKU_IF_RETURN(iter->second.type() == typeid(KQuery), "KQuery");
+    HKU_IF_RETURN(iter->second.type() == typeid(KData), "KData");
+    HKU_IF_RETURN(iter->second.type() == typeid(PriceList), "PriceList");
+    HKU_IF_RETURN(iter->second.type() == typeid(DatetimeList), "DatetimeList");
     return "Unknow";
 }
 

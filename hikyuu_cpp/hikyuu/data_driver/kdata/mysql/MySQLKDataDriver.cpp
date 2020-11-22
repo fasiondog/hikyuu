@@ -56,14 +56,10 @@ KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string&
 KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string& code,
                                               KQuery::KType kType, size_t start_ix, size_t end_ix) {
     KRecordList result;
-    if (start_ix >= end_ix)
-        return result;
+    HKU_IF_RETURN(start_ix >= end_ix, result);
 
     auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return result;
-    };
+    HKU_ERROR_IF_RETURN(!con, result, "The acquisition connection failed.");
 
     try {
         KRecordTable r(market, code, kType);
@@ -98,14 +94,10 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
                                               KQuery::KType ktype, Datetime start_date,
                                               Datetime end_date) {
     KRecordList result;
-    if (start_date >= end_date)
-        return result;
+    HKU_IF_RETURN(start_date >= end_date, result);
 
     auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return result;
-    };
+    HKU_ERROR_IF_RETURN(!con, result, "The acquisition connection failed.");
 
     try {
         KRecordTable r(market, code, ktype);
@@ -139,10 +131,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
 size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     size_t result = 0;
     auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return result;
-    };
+    HKU_ERROR_IF_RETURN(!con, result, "The acquisition connection failed.");
 
     try {
         result =
@@ -163,21 +152,13 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
                                            size_t& out_end) {
     out_start = 0;
     out_end = 0;
-    if (query.queryType() != KQuery::DATE) {
-        HKU_ERROR("queryType must be KQuery::DATE");
-        return false;
-    }
-
-    if (query.startDatetime() >= query.endDatetime() || query.startDatetime() > (Datetime::max)()) {
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(query.queryType() != KQuery::DATE, false, "queryType must be KQuery::DATE");
+    HKU_IF_RETURN(
+      query.startDatetime() >= query.endDatetime() || query.startDatetime() > (Datetime::max)(),
+      false);
 
     auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return false;
-    };
-
+    HKU_ERROR_IF_RETURN(!con, false, "The acquisition connection failed.");
     string tablename = _getTableName(market, code, query.kType());
     try {
         out_start = con->queryInt(fmt::format("select count(1) from {} where date<{}", tablename,

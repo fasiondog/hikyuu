@@ -22,11 +22,7 @@ FixedA2017TradeCost::~FixedA2017TradeCost() {}
 CostRecord FixedA2017TradeCost::getBuyCost(const Datetime& datetime, const Stock& stock,
                                            price_t price, double num) const {
     CostRecord result;
-    if (stock.isNull()) {
-        HKU_WARN("Stock is Null!");
-        return result;
-    }
-
+    HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
     int precision = stock.precision();
     price_t value = price * num;
     result.commission = roundEx(value * getParam<price_t>("commission"), precision);

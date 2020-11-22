@@ -43,10 +43,7 @@ bool MySQLBaseInfoDriver::_init() {
 }
 
 bool MySQLBaseInfoDriver::_loadMarketInfo() {
-    if (!m_pool) {
-        HKU_ERROR("Connect pool ptr is null!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
 
     try {
         auto con = m_pool->getConnect();
@@ -78,13 +75,8 @@ bool MySQLBaseInfoDriver::_loadMarketInfo() {
 }
 
 bool MySQLBaseInfoDriver::_loadStockTypeInfo() {
-    if (!m_pool) {
-        HKU_ERROR("Connect pool ptr is null!");
-        return false;
-    }
-
+    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
     auto con = m_pool->getConnect();
-
     vector<StockTypeInfoTable> infoTables;
     try {
         con->batchLoad(infoTables);
@@ -152,13 +144,8 @@ StockWeightList MySQLBaseInfoDriver::getStockWeightList(const string &market, co
 }
 
 bool MySQLBaseInfoDriver::_loadStock() {
-    if (!m_pool) {
-        HKU_ERROR("Connect pool ptr is null!");
-        return false;
-    }
-
+    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
     auto con = m_pool->getConnect();
-
     vector<MarketInfoTable> marketTable;
     try {
         con->batchLoad(marketTable);

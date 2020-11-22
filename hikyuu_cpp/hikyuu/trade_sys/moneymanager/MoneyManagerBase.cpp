@@ -67,55 +67,37 @@ MoneyManagerPtr MoneyManagerBase::clone() {
 
 double MoneyManagerBase ::getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                         price_t risk, SystemPart from) {
-    if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.4f}) risk({:<.2f})", datetime,
-                  stock.market_code(), price, risk);
-        return 0;
-    }
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
+                        "m_tm is null! Datetime({}) Stock({}) price({:<.4f}) risk({:<.2f})",
+                        datetime, stock.market_code(), price, risk);
 
     if (PART_ENVIRONMENT == from) {
-        if (false == getParam<bool>("disable_ev_force_clean_position")) {
-            //强制全部卖出
-            return MAX_DOUBLE;
-        }
+        //强制全部卖出
+        HKU_IF_RETURN(!getParam<bool>("disable_ev_force_clean_position"), MAX_DOUBLE);
     }
 
     if (PART_CONDITION == from) {
-        if (false == getParam<bool>("disable_cn_force_clean_position")) {
-            return MAX_DOUBLE;
-        }
+        HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    if (risk <= 0.0) {
-        return 0;
-    }
-
+    HKU_IF_RETURN(risk <= 0.0, 0.0);
     return _getSellNumber(datetime, stock, price, risk, from);
 }
 
 double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                        price_t risk, SystemPart from) {
-    if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})", datetime,
-                  stock.market_code(), price, risk);
-        return 0;
-    }
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
+                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, stock.market_code(), price, risk);
+    HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
 
-    if (stock.isNull()) {
-        HKU_ERROR("stock is Null!");
-        return 0;
-    }
+    HKU_ERROR_IF_RETURN(
+      risk <= 0.0, 0.0,
+      "risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})", datetime,
+      stock.market_code(), price, risk, getSystemPartName(from));
 
-    if (risk <= 0.0) {
-        HKU_ERROR("risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f}) Part({})",
-                  datetime, stock.market_code(), price, risk, getSystemPartName(from));
-        return 0;
-    }
-
-    if (m_tm->getStockNumber() >= getParam<int>("max-stock")) {
-        HKU_TRACE("Ignore! TM had max-stock number!");
-        return 0;
-    }
+    HKU_TRACE_IF_RETURN(m_tm->getStockNumber() >= getParam<int>("max-stock"), 0.0,
+                        "Ignore! TM had max-stock number!");
 
     double n = _getBuyNumber(datetime, stock, price, risk, from);
     double min_trade = stock.minTradeNumber();
@@ -160,35 +142,23 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
 
 double MoneyManagerBase ::getSellShortNumber(const Datetime& datetime, const Stock& stock,
                                              price_t price, price_t risk, SystemPart from) {
-    if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})", datetime,
-                  stock.market_code(), price, risk);
-        return 0;
-    }
-
-    if (risk <= 0.0) {
-        HKU_ERROR("risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})", datetime,
-                  stock.market_code(), price, risk);
-        return 0;
-    }
-
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
+                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, stock.market_code(), price, risk);
+    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
+                        "risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, stock.market_code(), price, risk);
     return _getSellShortNumber(datetime, stock, price, risk, from);
 }
 
 double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stock& stock,
                                             price_t price, price_t risk, SystemPart from) {
-    if (!m_tm) {
-        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})", datetime,
-                  stock.market_code(), price, risk);
-        return 0;
-    }
-
-    if (risk <= 0.0) {
-        HKU_ERROR("m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})", datetime,
-                  stock.market_code(), price, risk);
-        return 0;
-    }
-
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
+                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, stock.market_code(), price, risk);
+    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
+                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, stock.market_code(), price, risk);
     return _getBuyShortNumber(datetime, stock, price, risk, from);
 }
 

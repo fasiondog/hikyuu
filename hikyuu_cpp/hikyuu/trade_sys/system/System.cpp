@@ -231,20 +231,9 @@ void System::_sellNotifyAll(const TradeRecord& record) {
 }
 
 bool System::readyForRun() {
-    if (!m_tm) {
-        HKU_ERROR("Not setTradeManager!");
-        return false;
-    }
-
-    if (!m_mm) {
-        HKU_ERROR("Not setMoneyManager!");
-        return false;
-    }
-
-    if (!m_sg) {
-        HKU_ERROR("Not setSignal!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(!m_tm, false, "Not setTradeManager!");
+    HKU_ERROR_IF_RETURN(!m_mm, false, "Not setMoneyManager!");
+    HKU_ERROR_IF_RETURN(!m_sg, false, "Not setSignal!");
 
     //如果存在市场环境判断策略，则需要将默认的前一日市场有效标志置为false
     //因为需要由市场环境判断策略全权判定市场是否有效
@@ -273,25 +262,17 @@ bool System::readyForRun() {
 }
 
 void System::run(const KQuery& query, bool reset) {
-    if (m_stock.isNull()) {
-        HKU_ERROR("m_stock is NULL!");
-        return;
-    }
+    HKU_ERROR_IF_RETURN(m_stock.isNull(), void(), "m_stock is NULL!");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
     if (reset)
         this->reset(true, true);
 
-    if (!readyForRun()) {
-        return;
-    }
+    HKU_IF_RETURN(!readyForRun(), void());
 
     // m_stock = stock; 在setTO里赋值
     KData kdata = m_stock.getKData(query);
-    if (kdata.empty()) {
-        HKU_INFO("KData is empty!");
-        return;
-    }
+    HKU_INFO_IF_RETURN(kdata.empty(), void(), "KData is empty!");
 
     setTO(kdata);
     size_t total = kdata.size();
@@ -1031,32 +1012,16 @@ void System::_submitSellShortRequest(const KRecord& today, Part from) {
 }
 
 TradeRecord System::_processRequest(const KRecord& today) {
-    if (m_buyRequest.valid) {
-        return _buyDelay(today);
-    }
-
-    if (m_sellRequest.valid) {
-        return _sellDelay(today);
-    }
-
-    if (m_sellShortRequest.valid) {
-        return _sellShortDelay(today);
-    }
-
-    if (m_buyShortRequest.valid) {
-        return _buyShortDelay(today);
-    }
-
+    HKU_IF_RETURN(m_buyRequest.valid, _buyDelay(today));
+    HKU_IF_RETURN(m_sellRequest.valid, _sellDelay(today));
+    HKU_IF_RETURN(m_sellShortRequest.valid, _sellShortDelay(today));
+    HKU_IF_RETURN(m_buyShortRequest.valid, _buyShortDelay(today));
     return TradeRecord();
 }
 
 bool System::haveDelayRequest() const {
-    if (m_buyRequest.valid || m_sellRequest.valid || m_sellShortRequest.valid ||
-        m_buyShortRequest.valid) {
-        return true;
-    }
-
-    return false;
+    return (m_buyRequest.valid || m_sellRequest.valid || m_sellShortRequest.valid ||
+            m_buyShortRequest.valid);
 }
 
 } /* namespace hku */

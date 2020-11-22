@@ -20,11 +20,7 @@ Atr::Atr() : IndicatorImp("ATR", 1) {
 Atr::~Atr() {}
 
 bool Atr::check() {
-    if (getParam<int>("n") < 1) {
-        HKU_ERROR("Invalid param! (n>=1) ", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 1;
 }
 
 void Atr::_calculate(const Indicator& indicator) {

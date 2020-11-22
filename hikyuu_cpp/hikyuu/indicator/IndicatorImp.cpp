@@ -99,20 +99,11 @@ void IndicatorImp::setContext(const KData &k) {
 }
 
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
-    if (result_num > MAX_RESULT_NUM) {
-        throw(
-          std::invalid_argument("result_num oiverload MAX_RESULT_NUM! "
-                                "[IndicatorImp::_readyBuffer]" +
-                                name()));
-    }
-
-    if (result_num == 0) {
-        // HKU_TRACE("result_num is zeror! (" << name() << ") [IndicatorImp::_readyBuffer]")
-        return;
-    }
+    HKU_CHECK_THROW(result_num <= MAX_RESULT_NUM, std::invalid_argument,
+                    "result_num oiverload MAX_RESULT_NUM! {}", name());
+    HKU_IF_RETURN(result_num == 0, void());
 
     price_t null_price = Null<price_t>();
-
     for (size_t i = 0; i < result_num; ++i) {
         if (!m_pBuffer[i]) {
             m_pBuffer[i] = new PriceList(len, null_price);
@@ -195,18 +186,12 @@ string IndicatorImp::long_name() const {
 }
 
 PriceList IndicatorImp::getResultAsPriceList(size_t result_num) {
-    if (result_num >= m_result_num || m_pBuffer[result_num] == NULL) {
-        return PriceList();
-    }
-
+    HKU_IF_RETURN(result_num >= m_result_num || m_pBuffer[result_num] == NULL, PriceList());
     return (*m_pBuffer[result_num]);
 }
 
 IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
-    if (result_num >= m_result_num || m_pBuffer[result_num] == NULL) {
-        return IndicatorImpPtr();
-    }
-
+    HKU_IF_RETURN(result_num >= m_result_num || m_pBuffer[result_num] == NULL, IndicatorImpPtr());
     IndicatorImpPtr imp = make_shared<IndicatorImp>();
     size_t total = size();
     imp->_readyBuffer(total, 1);
@@ -219,33 +204,22 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 
 price_t IndicatorImp::get(size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos >= m_pBuffer[num]->size()) {
-        throw(std::out_of_range("Try to access value out of bounds! " + name() +
-                                " [IndicatorImp::get]"));
-        return Null<price_t>();
-    }
+    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
+                    "Try to access value out of bounds! {}", name());
 #endif
     return (*m_pBuffer[num])[pos];
 }
 
 void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos >= m_pBuffer[num]->size()) {
-        std::stringstream buf;
-        buf << "Try to access value out of bounds! (pos=" << pos << ") " << name()
-            << " [IndicatorImp::_set]";
-        throw(std::out_of_range(buf.str()));
-    }
-    (*m_pBuffer[num])[pos] = val;
-#else
-    (*m_pBuffer[num])[pos] = val;
+    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
+                    "Try to access value out of bounds! (pos={}) {}", pos, name());
 #endif
+    (*m_pBuffer[num])[pos] = val;
 }
 
 DatetimeList IndicatorImp::getDatetimeList() const {
-    if (haveParam("align_date_list")) {
-        return getParam<DatetimeList>("align_date_list");
-    }
+    HKU_IF_RETURN(haveParam("align_date_list"), getParam<DatetimeList>("align_date_list"));
     return getContext().getDatetimeList();
 }
 
@@ -357,11 +331,7 @@ string IndicatorImp::formula() const {
 }
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
-    if (op == LEAF || op >= INVALID || !right) {
-        HKU_ERROR("Wrong used!");
-        return;
-    }
-
+    HKU_ERROR_IF_RETURN(op == LEAF || op >= INVALID || !right, void(), "Wrong used!");
     if (OP == op && !isLeaf()) {
         if (m_left) {
             if (m_left->isNeedContext()) {
@@ -414,11 +384,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
 }
 
 void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
-    if (!cond || !left || !right) {
-        HKU_ERROR("Wrong used!");
-        return;
-    }
-
+    HKU_ERROR_IF_RETURN(!cond || !left || !right, void(), "Wrong used!");
     m_need_calculate = true;
     m_optype = IndicatorImp::OP_IF;
     m_three = cond->clone();

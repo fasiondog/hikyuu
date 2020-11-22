@@ -90,10 +90,8 @@ KRecordList TdxKDataDriver::getKRecordList(const string& market, const string& c
                                            const KQuery& query) {
     KRecordList result;
     auto ktype = query.kType();
-    if (!(ktype == KQuery::MIN || ktype == KQuery::MIN5 || ktype == KQuery::DAY)) {
-        HKU_WARN("The driver({}) don't support the ktype: {}", name(), ktype);
-        return result;
-    }
+    HKU_WARN_IF_RETURN(!(ktype == KQuery::MIN || ktype == KQuery::MIN5 || ktype == KQuery::DAY),
+                       result, "The driver({}) don't support the ktype: {}", name(), ktype);
 
     if (query.queryType() == KQuery::INDEX) {
         if (ktype == KQuery::DAY) {
@@ -113,15 +111,11 @@ KRecordList TdxKDataDriver::_getDayKRecordList(const string& market, const strin
                                                size_t end_ix) {
     KRecordList result;
     size_t total = getCount(market, code, ktype);
-    if (0 == total || start_ix >= total) {
-        return result;
-    }
+    HKU_IF_RETURN(0 == total || start_ix >= total, result);
 
     string filename = _getFileName(market, code, ktype);
     std::ifstream file(filename.c_str(), std::ios::binary | std::ios::in);
-    if (!file) {
-        return result;
-    }
+    HKU_IF_RETURN(!file, result);
 
     struct TdxDayData tdx_data;
     file.seekg(start_ix * sizeof(tdx_data));
@@ -147,9 +141,7 @@ KRecordList TdxKDataDriver::_getMinKRecordList(const string& market, const strin
     KRecordList result;
 
     size_t total = getCount(market, code, ktype);
-    if (0 == total || start_ix >= total) {
-        return result;
-    }
+    HKU_IF_RETURN(0 == total || start_ix >= total, result);
 
     string filename = _getFileName(market, code, ktype);
     std::ifstream file(filename.c_str(), std::ios::binary | std::ios::in);
@@ -199,24 +191,17 @@ bool TdxKDataDriver::_getDayIndexRangeByDate(const string& market, const string&
     out_start = 0;
     out_end = 0;
 
-    if (query.kType() != KQuery::DAY) {
-        return false;
-    }
-
-    if (query.startDatetime() >= query.endDatetime() || query.startDatetime() > Datetime::max()) {
-        return false;
-    }
+    HKU_IF_RETURN(query.kType() != KQuery::DAY, false);
+    HKU_IF_RETURN(
+      query.startDatetime() >= query.endDatetime() || query.startDatetime() > Datetime::max(),
+      false);
 
     string filename = _getFileName(market, code, query.kType());
     std::ifstream file(filename.c_str(), std::ios::binary | std::ios::in);
-    if (!file) {
-        return false;
-    }
+    HKU_IF_RETURN(!file, false);
 
     size_t total = getCount(market, code, query.kType());
-    if (0 == total) {
-        return false;
-    }
+    HKU_IF_RETURN(0 == total, false);
 
     Datetime start_number = query.startDatetime();
     Datetime end_number = query.endDatetime();
@@ -304,24 +289,17 @@ bool TdxKDataDriver::_getMinIndexRangeByDate(const string& market, const string&
     out_start = 0;
     out_end = 0;
 
-    if (query.kType() != KQuery::MIN && query.kType() != KQuery::MIN5) {
-        return false;
-    }
-
-    if (query.startDatetime() >= query.endDatetime() || query.startDatetime() > Datetime::max()) {
-        return false;
-    }
+    HKU_IF_RETURN(query.kType() != KQuery::MIN && query.kType() != KQuery::MIN5, false);
+    HKU_IF_RETURN(
+      query.startDatetime() >= query.endDatetime() || query.startDatetime() > Datetime::max(),
+      false);
 
     string filename = _getFileName(market, code, query.kType());
     std::ifstream file(filename.c_str(), std::ios::binary | std::ios::in);
-    if (!file) {
-        return false;
-    }
+    HKU_IF_RETURN(!file, false);
 
     size_t total = getCount(market, code, query.kType());
-    if (0 == total) {
-        return false;
-    }
+    HKU_IF_RETURN(0 == total, false);
 
     Datetime start_number = query.startDatetime();
     Datetime end_number = query.endDatetime();
@@ -433,9 +411,7 @@ size_t TdxKDataDriver::_getBaseCount(const string& market, const string& code,
                                      KQuery::KType ktype) {
     assert(KQuery::DAY == ktype || KQuery::MIN5 == ktype || KQuery::MIN == ktype);
     string filename = _getFileName(market, code, ktype);
-    if (filename.empty()) {
-        return 0;
-    }
+    HKU_IF_RETURN(filename.empty(), 0);
 
     size_t count = 0;
     struct stat info;

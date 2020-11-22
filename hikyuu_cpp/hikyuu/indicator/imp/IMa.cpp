@@ -20,13 +20,7 @@ IMa::IMa() : IndicatorImp("MA", 1) {
 IMa::~IMa() {}
 
 bool IMa::check() {
-    int n = getParam<int>("n");
-    if (n < 1) {
-        HKU_ERROR("Invalid param! (n >= 1) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 1;
 }
 
 void IMa::_calculate(const Indicator& indicator) {

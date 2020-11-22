@@ -23,13 +23,7 @@ IVar::IVar() : IndicatorImp("VAR", 1) {
 IVar::~IVar() {}
 
 bool IVar::check() {
-    int n = getParam<int>("n");
-    if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 2;
 }
 
 void IVar::_calculate(const Indicator& data) {

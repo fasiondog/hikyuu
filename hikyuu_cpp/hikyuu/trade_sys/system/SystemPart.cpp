@@ -38,36 +38,16 @@ string HKU_API getSystemPartName(int part) {
 SystemPart HKU_API getSystemPartEnum(const string& arg) {
     string name(arg);
     to_upper(name);
-    if ("EV" == name) {
-        return PART_ENVIRONMENT;
-
-    } else if ("CN" == name) {
-        return PART_CONDITION;
-
-    } else if ("SG" == name) {
-        return PART_SIGNAL;
-
-    } else if ("ST" == name) {
-        return PART_STOPLOSS;
-
-    } else if ("TP" == name) {
-        return PART_TAKEPROFIT;
-
-    } else if ("PG" == name) {
-        return PART_PROFITGOAL;
-
-    } else if ("SP" == name) {
-        return PART_SLIPPAGE;
-
-    } else if ("MM" == name) {
-        return PART_MONEYMANAGER;
-
-    } else if ("AF" == name) {
-        return PART_ALLOCATEFUNDS;
-
-    } else {
-        return PART_INVALID;
-    }
+    HKU_IF_RETURN("EV" == name, PART_ENVIRONMENT);
+    HKU_IF_RETURN("CN" == name, PART_CONDITION);
+    HKU_IF_RETURN("SG" == name, PART_SIGNAL);
+    HKU_IF_RETURN("ST" == name, PART_STOPLOSS);
+    HKU_IF_RETURN("TP" == name, PART_TAKEPROFIT);
+    HKU_IF_RETURN("PG" == name, PART_PROFITGOAL);
+    HKU_IF_RETURN("SP" == name, PART_SLIPPAGE);
+    HKU_IF_RETURN("MM" == name, PART_MONEYMANAGER);
+    HKU_IF_RETURN("AF" == name, PART_ALLOCATEFUNDS);
+    return PART_INVALID;
 }
 
 } /* namespace hku */

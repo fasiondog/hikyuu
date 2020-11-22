@@ -22,11 +22,7 @@ IHhvbars::IHhvbars() : IndicatorImp("HHVBARS", 1) {
 IHhvbars::~IHhvbars() {}
 
 bool IHhvbars::check() {
-    if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void IHhvbars::_calculate(const Indicator& ind) {

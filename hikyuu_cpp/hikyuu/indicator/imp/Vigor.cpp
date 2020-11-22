@@ -28,19 +28,12 @@ Vigor::Vigor(int n) : IndicatorImp("VIGOR") {
 Vigor::~Vigor() {}
 
 bool Vigor::check() {
-    int n = getParam<int>("n");
-    if (n < 1) {
-        HKU_ERROR("Invalide param[n] must >= 1 !");
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 1;
 }
 
 void Vigor::_calculate(const Indicator& ind) {
-    if (!isLeaf() && !ind.empty()) {
-        HKU_WARN("The input is ignored because {} depends on the context!", m_name);
-    }
+    HKU_WARN_IF(!isLeaf() && !ind.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
 
     KData kdata = getContext();
     size_t total = kdata.size();

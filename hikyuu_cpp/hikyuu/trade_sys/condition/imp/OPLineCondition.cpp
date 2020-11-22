@@ -28,9 +28,7 @@ ConditionPtr OPLineCondition::_clone() {
 void OPLineCondition::_reset() {}
 
 void OPLineCondition::_calculate() {
-    if (m_kdata.size() == 0)
-        return;
-
+    HKU_IF_RETURN(m_kdata.size() == 0, void());
     Stock stock = m_kdata.getStock();
     KQuery query = m_kdata.getQuery();
     SYSPtr sys = SYS_Simple();

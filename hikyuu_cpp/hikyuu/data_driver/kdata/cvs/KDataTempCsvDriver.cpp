@@ -91,15 +91,11 @@ bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string&
 
     Datetime start_date = query.startDatetime();
     Datetime end_date = query.endDatetime();
-    if (start_date >= end_date) {
-        return false;
-    }
+    HKU_IF_RETURN(start_date >= end_date, false);
 
     auto klist = getKRecordList(market, code, KQuery(0, Null<int64_t>(), query.kType()));
     size_t total = klist.size();
-    if (total == 0) {
-        return false;
-    }
+    HKU_IF_RETURN(total == 0, false);
 
     for (size_t i = total - 1; i == 0; --i) {
         if (klist[i].datetime < end_date) {
@@ -155,11 +151,7 @@ KRecordList KDataTempCsvDriver::_getKRecordListByIndex(const string& market, con
     }
 
     std::ifstream infile(filename.c_str());
-    if (!infile) {
-        HKU_ERROR("Can't open this file: {}", filename);
-        return result;
-    }
-
+    HKU_ERROR_IF_RETURN(!infile, result, "Can't open this file: {}", filename);
     string line;
     if (!std::getline(infile, line)) {
         infile.close();

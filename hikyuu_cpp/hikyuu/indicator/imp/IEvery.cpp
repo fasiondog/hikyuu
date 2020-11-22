@@ -22,18 +22,12 @@ IEvery::IEvery() : IndicatorImp("EVERY", 1) {
 IEvery::~IEvery() {}
 
 bool IEvery::check() {
-    if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void IEvery::_calculate(const Indicator& ind) {
     size_t total = ind.size();
-    if (0 == total) {
-        return;
-    }
+    HKU_IF_RETURN(0 == total, void());
 
     int n = getParam<int>("n");
     if (0 == n) {

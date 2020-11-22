@@ -26,25 +26,16 @@ SQLiteBaseInfoDriver::~SQLiteBaseInfoDriver() {
 }
 
 bool SQLiteBaseInfoDriver::_init() {
-    string dbname;
-    try {
-        dbname = getParam<string>("db");
-        HKU_TRACE("SQLITE3: {}", dbname);
-    } catch (...) {
-        HKU_ERROR("Can't get Sqlite3 filename!");
-        return false;
-    }
-
+    string dbname = tryGetParam<string>("db", "");
+    HKU_ERROR_IF_RETURN(dbname == "", false, "Can't get Sqlite3 filename!");
+    HKU_TRACE("SQLITE3: {}", dbname);
     m_pool = new ConnectPool<SQLiteConnect>(m_params);
     HKU_CHECK(m_pool, "Failed malloc ConnectPool!");
     return true;
 }
 
 bool SQLiteBaseInfoDriver::_loadMarketInfo() {
-    if (!m_pool) {
-        HKU_ERROR("Connect pool ptr is null!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
 
     try {
         auto con = m_pool->getConnect();
@@ -76,13 +67,8 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
 }
 
 bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
-    if (!m_pool) {
-        HKU_ERROR("Connect pool ptr is null!");
-        return false;
-    }
-
+    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
     auto con = m_pool->getConnect();
-
     vector<StockTypeInfoTable> infoTables;
     try {
         con->batchLoad(infoTables);
@@ -105,13 +91,8 @@ bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
 }
 
 bool SQLiteBaseInfoDriver::_loadStock() {
-    if (!m_pool) {
-        HKU_ERROR("Connect pool ptr is null!");
-        return false;
-    }
-
+    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
     auto con = m_pool->getConnect();
-
     vector<MarketInfoTable> marketTable;
     try {
         con->batchLoad(marketTable);
@@ -222,9 +203,7 @@ StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, c
 
 Parameter SQLiteBaseInfoDriver ::getFinanceInfo(const string& market, const string& code) {
     Parameter result;
-    if (!m_pool) {
-        return result;
-    }
+    HKU_IF_RETURN(!m_pool, result);
 
     std::stringstream buf;
     buf << "select f.updated_date, f.ipo_date, f.province,"

@@ -50,40 +50,23 @@ bool BaseInfoDriver::checkType() {
 }
 
 bool BaseInfoDriver::init(const Parameter& params) {
-    if (m_params == params)
-        return true;
-
+    HKU_IF_RETURN(m_params == params, true);
     m_params = params;
-    if (!checkType()) {
-        return false;
-    }
-
+    HKU_IF_RETURN(!checkType(), false);
     HKU_INFO("Using {} BaseInfoDriver", name());
     return _init();
 }
 
 bool BaseInfoDriver::loadBaseInfo() {
-    if (!checkType()) {
-        return false;
-    }
-
+    HKU_IF_RETURN(!checkType(), false);
     HKU_INFO("Loading market information...");
-    if (!_loadMarketInfo()) {
-        HKU_FATAL("Can't load Market Information.");
-        return false;
-    }
+    HKU_FATAL_IF_RETURN(!_loadMarketInfo(), false, "Can't load Market Information.");
 
     HKU_INFO("Loading stock type information...");
-    if (!_loadStockTypeInfo()) {
-        HKU_FATAL("Can't load StockType Information.");
-        return false;
-    }
+    HKU_FATAL_IF_RETURN(!_loadStockTypeInfo(), false, "Can't load StockType Information.");
 
     HKU_INFO("Loading stock information...");
-    if (!_loadStock()) {
-        HKU_FATAL("Can't load Stock");
-        return false;
-    }
+    HKU_FATAL_IF_RETURN(!_loadStock(), false, "Can't load Stock");
 
     return true;
 }

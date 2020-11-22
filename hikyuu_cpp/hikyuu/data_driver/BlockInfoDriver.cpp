@@ -50,13 +50,9 @@ bool BlockInfoDriver::checkType() {
 }
 
 bool BlockInfoDriver::init(const Parameter& params) {
-    if (m_params == params)
-        return true;
-
+    HKU_IF_RETURN(m_params == params, true);
     m_params = params;
-    if (!checkType()) {
-        return false;
-    }
+    HKU_IF_RETURN(!checkType(), false);
     return _init();
 }
 

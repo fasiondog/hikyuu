@@ -33,13 +33,9 @@ void CrossSignal::_calculate() {
     Indicator kdata = KDATA_PART(m_kdata, kpart);
     Indicator fast = m_fast(kdata);
     Indicator slow = m_slow(kdata);
-    if (fast.size() != slow.size()) {
-        HKU_ERROR("fast.size() != slow.size()");
-        return;
-    }
+    HKU_ERROR_IF_RETURN(fast.size() != slow.size(), void(), "fast.size() != slow.size()");
 
     size_t discard = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
-
     size_t total = fast.size();
     for (size_t i = discard + 1; i < total; ++i) {
         if (fast[i - 1] < slow[i - 1] && fast[i] > slow[i]) {
