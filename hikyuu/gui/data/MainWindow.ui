@@ -739,7 +739,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>40</y>
+        <y>200</y>
         <width>101</width>
         <height>16</height>
        </rect>
@@ -748,83 +748,11 @@ p, li { white-space: pre-wrap; }
        <string>周末不执行</string>
       </property>
      </widget>
-     <widget class="QWidget" name="layoutWidget_9">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>120</y>
-        <width>214</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_9">
-       <item>
-        <widget class="QLabel" name="label_24">
-         <property name="text">
-          <string>执行时间段2：</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QTimeEdit" name="time_phase2_start_timeEdit"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_25">
-           <property name="text">
-            <string>-</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QTimeEdit" name="time_phase2_last_timeEdit"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>80</y>
-        <width>214</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_8">
-       <item>
-        <widget class="QLabel" name="label_21">
-         <property name="text">
-          <string>执行时间段1：</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <item>
-          <widget class="QTimeEdit" name="time_phase1_start_timeEdit"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>-</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QTimeEdit" name="time_phase1_last_timeEdit"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>180</y>
+        <y>160</y>
         <width>158</width>
         <height>22</height>
        </rect>
@@ -843,6 +771,100 @@ p, li { white-space: pre-wrap; }
           <number>86400</number>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>30</y>
+        <width>201</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_11">
+       <item>
+        <widget class="QPushButton" name="time_start_pushButton">
+         <property name="text">
+          <string>启动定时采集</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="time_status">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>80</y>
+        <width>216</width>
+        <height>56</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>执行时间段1：</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QTimeEdit" name="time_phase1_start_timeEdit"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTimeEdit" name="time_phase1_last_timeEdit"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QLabel" name="label_24">
+           <property name="text">
+            <string>执行时间段2：</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QTimeEdit" name="time_phase2_start_timeEdit"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_25">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTimeEdit" name="time_phase2_last_timeEdit"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
