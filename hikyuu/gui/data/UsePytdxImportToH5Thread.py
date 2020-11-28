@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
 import sqlite3
 import datetime
 import mysql.connector
@@ -46,6 +47,7 @@ class UsePytdxImportToH5Thread(QThread):
 
     def __init__(self, config):
         super(self.__class__, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
 
@@ -315,4 +317,4 @@ class UsePytdxImportToH5Thread(QThread):
                 current_progress = (time_progress['SH'] + time_progress['SZ']) // 2
                 self.send_message([taskname, ktype, current_progress])
             else:
-                print("Unknow task: ", taskname)
+                self.logger.error("Unknow task: {}".format(taskname))

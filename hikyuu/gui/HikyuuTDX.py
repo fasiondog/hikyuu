@@ -8,8 +8,8 @@ import datetime
 from configparser import ConfigParser
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
+from PyQt5.QtGui import QIcon, QTextCursor
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -19,18 +19,35 @@ from hikyuu.gui.data.MainWindow import *
 from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
+from hikyuu.gui.data.CollectThread import CollectThread
 
 from hikyuu.data import hku_config_template
 
 
+class EmittingStream(QObject):
+    """输出重定向至QT"""
+    textWritten = pyqtSignal(str)
+
+    def write(self, text):
+        self.textWritten.emit(str(text))
+
+    def flush(self):
+        pass
+
+
 class MyMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, capture_output=False):
         super(MyMainWindow, self).__init__(parent)
+        self._capture_output = capture_output  #捕获Python stdout 输出
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.setupUi(self)
         self.initUI()
+        self.initLogger()
         self.initThreads()
+        self.logger.info("Init...")
 
     def closeEvent(self, event):
+        self.stop_collect()
         if self.import_running:
             QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
             event.ignore()
@@ -89,7 +106,39 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             shutil.copytree(dirname, data_dir + '/block')
             os.remove(data_dir + '/block/__init__.py')
 
+    def normalOutputWritten(self, text):
+        """普通打印信息重定向"""
+        cursor = self.log_textEdit.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        cursor.insertText(text)
+        self.log_textEdit.setTextCursor(cursor)
+        self.log_textEdit.ensureCursorVisible()
+
+    def initLogger(self):
+        if not self._capture_output:
+            return
+
+        #普通日志输出控制台
+        con = logging.StreamHandler(EmittingStream(textWritten=self.normalOutputWritten))
+        FORMAT = logging.Formatter(
+            '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
+        )
+        con.setFormatter(FORMAT)
+        logger_name_list = [
+            self.__class__.__name__, CollectThread.__name__, UsePytdxImportToH5Thread.__name__,
+            UseTdxImportToH5Thread.__name__
+        ]
+        for name in logger_name_list:
+            logger = logging.getLogger(name)
+            logger.addHandler(con)
+            logger.setLevel(logging.INFO)
+
     def initUI(self):
+        if self._capture_output:
+            stream = EmittingStream(textWritten=self.normalOutputWritten)
+            sys.stdout = stream
+            sys.stderr = stream
+
         current_dir = os.path.dirname(__file__)
         self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
         self.setFixedSize(self.width(), self.height())
@@ -107,6 +156,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.time_start_dateEdit.setDate(today - datetime.timedelta(7))
         self.trans_start_dateEdit.setMinimumDate(today - datetime.timedelta(90))
         self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
+        self.collect_running = False
+        self.collect_status_Label.setText("未启动")
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
@@ -244,6 +295,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread = None
         self.hdf5_import_thread = None
         self.mysql_import_thread = None
+        self.collect_sh_thread = None
+        self.collect_sz_thread = None
 
         self.import_running = False
         self.hdf5_import_progress_bar = {
@@ -460,6 +513,43 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.message.connect(self.on_message_from_thread)
         self.escape_time_thread.start()
 
+    def start_collect(self):
+        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH', 2)
+        self.collect_sh_thread.start()
+        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ', 2)
+        self.collect_sz_thread.start()
+
+    def stop_collect(self):
+        self.logger.info("终止采集！")
+        if self.collect_sh_thread is not None:
+            self.collect_sh_thread.working = False
+            self.collect_sh_thread.terminate()
+            del self.collect_sh_thread
+            self.collect_sh_thread = None
+
+        if self.collect_sz_thread is not None:
+            self.collect_sz_thread.working = False
+            self.collect_sz_thread.terminate()
+            del self.collect_sz_thread
+            self.collect_sz_thread = None
+
+    @pyqtSlot()
+    def on_collect_start_pushButton_clicked(self):
+        if self.collect_running:
+            self.stop_collect()
+            self.collect_status_Label.setText("已停止")
+            self.collect_start_pushButton.setText("启动定时采集")
+            self.collect_running = False
+        else:
+            config = self.getCurrentConfig()
+            if not config.getboolean("mysql", "enable", fallback=False):
+                QMessageBox.critical(self, "定时采集", "仅在存储设置为 MySQL 时支持定时采集！")
+                return
+            self.collect_status_Label.setText("运行中...")
+            self.start_collect()
+            self.collect_start_pushButton.setText("停止采集")
+            self.collect_running = True
+
 
 def start():
     app = QApplication(sys.argv)
@@ -471,16 +561,15 @@ def start():
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
-        FORMAT = '%(asctime)-15s %(levelname)s: %(message)s [%(name)s::%(funcName)s]'
+        FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
         logging.basicConfig(
             format=FORMAT, level=logging.INFO, handlers=[
                 logging.StreamHandler(),
             ]
         )
-        capture_output = False
+        myWin = MyMainWindow(capture_output=False)
     else:
-        capture_output = True
+        myWin = MyMainWindow(capture_output=True)
 
-    myWin = MyMainWindow(None)
     myWin.show()
     sys.exit(app.exec())

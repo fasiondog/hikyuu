@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
 import sqlite3
 
 from hikyuu.data.tdx_to_h5 import tdx_import_data
@@ -40,6 +41,7 @@ class ProgressBar:
 class ImportTdxToH5Task:
     def __init__(self, queue, sqlitefile, market, ktype, quotations, src_dir, dest_dir):
         super(self.__class__, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_KDATA'
         self.queue = queue
         self.sqlitefile = sqlitefile
@@ -76,5 +78,5 @@ class ImportTdxToH5Task:
                 progress
             )
         except Exception as e:
-            print(e)
+            self.logger.error(e)
         self.queue.put([self.task_name, self.market, self.ktype, None, count])

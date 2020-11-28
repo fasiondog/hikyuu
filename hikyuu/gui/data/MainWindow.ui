@@ -735,7 +735,7 @@ p, li { white-space: pre-wrap; }
      <attribute name="title">
       <string>MySQL定时导入</string>
      </attribute>
-     <widget class="QCheckBox" name="time_no_week_checkBox">
+     <widget class="QCheckBox" name="collect_no_week_checkBox">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -766,7 +766,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="time_sample_spinBox">
+        <widget class="QSpinBox" name="collect_sample_spinBox">
          <property name="maximum">
           <number>86400</number>
          </property>
@@ -774,7 +774,7 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -785,14 +785,14 @@ p, li { white-space: pre-wrap; }
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_11">
        <item>
-        <widget class="QPushButton" name="time_start_pushButton">
+        <widget class="QPushButton" name="collect_start_pushButton">
          <property name="text">
           <string>启动定时采集</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="time_status">
+        <widget class="QLabel" name="collect_status_Label">
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -800,7 +800,7 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -822,7 +822,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QTimeEdit" name="time_phase1_start_timeEdit"/>
+            <widget class="QTimeEdit" name="collect_phase1_start_timeEdit"/>
            </item>
            <item>
             <widget class="QLabel" name="label_22">
@@ -832,7 +832,7 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
-            <widget class="QTimeEdit" name="time_phase1_last_timeEdit"/>
+            <widget class="QTimeEdit" name="collect_phase1_last_timeEdit"/>
            </item>
           </layout>
          </item>
@@ -850,7 +850,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
-            <widget class="QTimeEdit" name="time_phase2_start_timeEdit"/>
+            <widget class="QTimeEdit" name="collect_phase2_start_timeEdit"/>
            </item>
            <item>
             <widget class="QLabel" name="label_25">
@@ -860,7 +860,7 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
-            <widget class="QTimeEdit" name="time_phase2_last_timeEdit"/>
+            <widget class="QTimeEdit" name="collect_phase2_last_timeEdit"/>
            </item>
           </layout>
          </item>
@@ -881,6 +881,12 @@ p, li { white-space: pre-wrap; }
         <width>571</width>
         <height>511</height>
        </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="acceptRichText">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>

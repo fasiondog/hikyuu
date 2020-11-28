@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 import os
+import logging
 import hashlib
 import sqlite3
 import urllib.request
@@ -38,6 +39,7 @@ from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
 
 class ImportWeightToSqliteTask:
     def __init__(self, queue, config, dest_dir):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.queue = queue
         self.config = config
         self.dest_dir = dest_dir
@@ -50,7 +52,7 @@ class ImportWeightToSqliteTask:
                 sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
                 connect = sqlite3.connect(sqlite_file, timeout=1800)
                 pytdx_import_weight = pytdx_import_weight_to_sqlite
-                print('use sqlite import weight')
+                self.logger.debug('use sqlite import weight')
             else:
                 db_config = {
                     'user': self.config['mysql']['usr'],
@@ -60,7 +62,7 @@ class ImportWeightToSqliteTask:
                 }
                 connect = mysql.connector.connect(**db_config)
                 pytdx_import_weight = pytdx_import_weight_to_mysql
-                print('use mysql import weight')
+                self.logger.debug('use mysql import weight')
 
         except Exception as e:
             #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
@@ -127,6 +129,7 @@ class ImportWeightToSqliteTask:
             api.disconnect()
 
         except Exception as e:
+            self.logger.error(e)
             #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
         finally:

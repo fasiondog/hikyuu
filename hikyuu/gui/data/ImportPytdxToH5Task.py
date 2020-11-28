@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
 import sqlite3
 import mysql.connector
 from pytdx.hq import TdxHq_API
@@ -43,6 +44,7 @@ class ImportPytdxToH5:
     def __init__(
         self, queue, config, market, ktype, quotations, ip, port, dest_dir, start_datetime
     ):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_KDATA'
         self.queue = queue
         self.config = config
@@ -59,7 +61,7 @@ class ImportPytdxToH5:
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
             connect = sqlite3.connect(sqlite_file, timeout=1800)
             import_data = h5_import_data
-            print('use hdf5 import kdata')
+            self.logger.debug('use hdf5 import kdata')
         else:
             db_config = {
                 'user': self.config['mysql']['usr'],
@@ -69,7 +71,7 @@ class ImportPytdxToH5:
             }
             connect = mysql.connector.connect(**db_config)
             import_data = mysql_import_data
-            print('use mysql import kdata')
+            self.logger.debug('use mysql import kdata')
 
         count = 0
         try:
@@ -81,7 +83,7 @@ class ImportPytdxToH5:
                 self.startDatetime, progress
             )
         except Exception as e:
-            print("ImportPytdxToH5Task failed!", e)
+            self.logger.error("ImportPytdxToH5Task failed! {}".format(e))
             #self.queue.put([self.task_name, self.market, self.ktype, str(e), count])
         finally:
             connect.commit()

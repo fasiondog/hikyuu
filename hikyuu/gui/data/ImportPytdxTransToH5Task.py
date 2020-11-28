@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
 import sqlite3
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_data, import_trans
@@ -39,6 +40,7 @@ class ProgressBar:
 
 class ImportPytdxTransToH5:
     def __init__(self, queue, sqlitefile, market, quotations, ip, port, dest_dir, max_days):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_TRANS'
         self.queue = queue
         self.sqlitefile = sqlitefile
@@ -67,7 +69,7 @@ class ImportPytdxTransToH5:
                 progress=progress
             )
         except Exception as e:
-            print(e)
+            self.logger.error(e)
         finally:
             connect.commit()
             connect.close()
