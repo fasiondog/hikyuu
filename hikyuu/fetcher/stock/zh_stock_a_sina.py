@@ -6,27 +6,24 @@
 #     Author: fasiondog
 
 import requests
+from hikyuu.util import *
 
 
 def parse_one_result(resultstr):
     result = {}
-    if not resultstr:
-        return result
-
-    if len(resultstr) <= 3 and resultstr[:3] != 'var':
-        return result
-
-    a = resultstr.split(',')
-    if len(a) < 9:
-        return
-
     try:
+        HKU_CHECK(resultstr, "Invalid input param!")
+        HKU_CHECK(len(resultstr) <= 3 and resultstr[:3] != 'var', "Invalid input param!")
+
+        a = resultstr.split(',')
+        HKU_CHECK(len(a) < 9, "被解析的字符串长度小于9，无效")
+
         tmp = a[0].split('"')
         result['name'] = tmp[1]
-
+    except HKUCheckError as e:
+        print(e)
     except Exception as e:
         print(e)
-
     return result
 
 

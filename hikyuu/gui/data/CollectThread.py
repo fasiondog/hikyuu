@@ -8,11 +8,12 @@ from PyQt5.QtCore import QThread
 import mysql.connector
 from mysql.connector import errorcode
 
+from hikyuu.util.mylog import class_logger
+
 
 class CollectThread(QThread):
     def __init__(self, config, market='SH', interval=60):
         super(self.__class__, self).__init__()
-        self.logger = logging.getLogger(self.__class__.__name__)
         self.working = True
         self._interval = interval
         self._config = config
@@ -62,3 +63,6 @@ class CollectThread(QThread):
             except:
                 self.logger.error("未知原因导致无法连接数据库！")
         return self._connect
+
+
+class_logger(CollectThread)

@@ -9,4 +9,11 @@
 
 #from singleton import Singleton
 
-__all__ = ['mylog', 'check']
+from .mylog import *
+from .check import *
+
+__all__ = [
+    'escapetime', 'class_logger', 'add_class_logger_handler', 'HKU_TRACE', 'HKU_DEBUG', 'HKU_TRACE',
+    'HKU_INFO', 'HKU_WARN', 'HKU_ERROR', 'HKU_FATAL', 'HKUCheckError', 'HKU_CHECK',
+    'HKU_CHECK_THROW'
+]

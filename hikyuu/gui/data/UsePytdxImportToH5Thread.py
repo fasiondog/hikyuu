@@ -40,14 +40,13 @@ from hikyuu.data.common_sqlite3 import create_database as sqlite_create_database
 from hikyuu.data.pytdx_to_h5 import import_stock_name as sqlite_import_stock_name
 from hikyuu.data.common_mysql import create_database as mysql_create_database
 from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
-
+from hikyuu.util.mylog import class_logger
 
 class UsePytdxImportToH5Thread(QThread):
     message = pyqtSignal(list)
 
     def __init__(self, config):
         super(self.__class__, self).__init__()
-        self.logger = logging.getLogger(self.__class__.__name__)
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
 
@@ -318,3 +317,5 @@ class UsePytdxImportToH5Thread(QThread):
                 self.send_message([taskname, ktype, current_progress])
             else:
                 self.logger.error("Unknow task: {}".format(taskname))
+
+class_logger(UsePytdxImportToH5Thread)

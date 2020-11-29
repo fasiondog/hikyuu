@@ -22,7 +22,7 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 from hikyuu.gui.data.CollectThread import CollectThread
 
 from hikyuu.data import hku_config_template
-from hikyuu.util.mylog import add_class_logger_handler
+from hikyuu.util.mylog import add_class_logger_handler, class_logger
 
 
 class EmittingStream(QObject):
@@ -40,7 +40,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, capture_output=False):
         super(MyMainWindow, self).__init__(parent)
         self._capture_output = capture_output  #捕获Python stdout 输出
-        self.logger = logging.getLogger(self.__class__.__name__)
         self.setupUi(self)
         self.initUI()
         self.initLogger()
@@ -122,19 +121,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #普通日志输出控制台
         con = logging.StreamHandler(EmittingStream(textWritten=self.normalOutputWritten))
         FORMAT = logging.Formatter(
-            '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
+            '%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
         )
         con.setFormatter(FORMAT)
-        logger_name_list = [
-            self.__class__.__name__, UsePytdxImportToH5Thread.__name__,
-            UseTdxImportToH5Thread.__name__, CollectThread.__name__
-        ]
-        for name in logger_name_list:
-            logger = logging.getLogger(name)
-            logger.addHandler(con)
-            logger.setLevel(logging.INFO)
-
-        #add_class_logger_handler(con, [CollectThread])
+        add_class_logger_handler(
+            con, [MyMainWindow, CollectThread, UsePytdxImportToH5Thread, UseTdxImportToH5Thread],
+            logging.INFO
+        )
 
     def initUI(self):
         if self._capture_output:
@@ -552,6 +545,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.start_collect()
             self.collect_start_pushButton.setText("停止采集")
             self.collect_running = True
+
+
+class_logger(MyMainWindow)
 
 
 def start():

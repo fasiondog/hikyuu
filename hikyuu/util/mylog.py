@@ -22,17 +22,16 @@ def escapetime(func):
     return wrappedFunc
 
 
+FORMAT = '%(asctime)-15s [%(levelname)s] : %(message)s [%(name)s::%(funcName)s]'
+logging.basicConfig(format=FORMAT)
+
 mylogger_name = 'hikyuu'
 mylogger = logging.getLogger(mylogger_name)
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(
-    logging.Formatter('%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]')
-)
-mylogger.addHandler(handler)
 
 
 def class_logger(cls, enable=False):
-    logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
+    #logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
+    logger = logging.getLogger("{}".format(cls.__name__))
     if enable == 'debug':
         logger.setLevel(logging.DEBUG)
     elif enable == 'info':
@@ -50,6 +49,31 @@ def add_class_logger_handler(handler, class_list, level=logging.INFO):
     :param level: 日志级别
     """
     for cls in class_list:
-        logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
+        #logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
+        logger = logging.getLogger("{}".format(cls.__name__))
         logger.addHandler(handler)
         logger.setLevel(level)
+
+
+def HKU_TRACE(msg):
+    mylogger.debug(msg)
+
+
+def HKU_DEBUG(msg):
+    mylogger.debug(msg)
+
+
+def HKU_INFO(msg):
+    mylogger.info(msg)
+
+
+def HKU_WARN(msg):
+    mylogger.warning(msg)
+
+
+def HKU_ERROR(msg):
+    mylogger.error(msg)
+
+
+def HKU_FATAL(msg):
+    mylogger.critical(msg)

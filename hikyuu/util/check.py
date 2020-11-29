@@ -7,8 +7,10 @@
 # 1. 20200821, Added by fasiondog
 #==========================================================
 
+from .mylog import mylogger
 
-class CheckError(Exception):
+
+class HKUCheckError(Exception):
     def __init__(self, expression, message):
         self.expression = expression
         self.message = message
@@ -22,18 +24,18 @@ def checkif(expression, message, excepion=None, **kwargs):
 
     :param boolean expression: 判断条件
     :param str message: 异常注解信息
-    :param Exception exception: 指定的异常类，为None时，为默认 CheckError 异常
+    :param Exception exception: 指定的异常类，为None时，为默认 HKUCheckError 异常
     """
     if expression:
         if excepion is None:
-            raise CheckError(expression, message)
+            raise HKUCheckError(expression, message)
         else:
             raise excepion(message, **kwargs)
 
 
 def HKU_CHECK(exp, msg):
     if not exp:
-        raise CheckError(exp, msg)
+        raise HKUCheckError(exp, msg)
 
 
 def HKU_CHECK_THROW(expression, message, excepion=None, **kwargs):
@@ -41,10 +43,10 @@ def HKU_CHECK_THROW(expression, message, excepion=None, **kwargs):
 
     :param boolean expression: 判断条件
     :param str message: 异常注解信息
-    :param Exception exception: 指定的异常类，为None时，为默认 CheckError 异常
+    :param Exception exception: 指定的异常类，为None时，为默认 HKUCheckError 异常
     """
     if not expression:
         if excepion is None:
-            raise CheckError(expression, message)
+            raise HKUCheckError(expression, message)
         else:
             raise excepion(message, **kwargs)
