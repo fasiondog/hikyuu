@@ -378,7 +378,7 @@ def realtime_update_from_sina_qq(source):
         return
 
     count = 0
-    urls = []
+    #urls = []
     tmpstr = queryStr
     for stock in sm:
         if stock.valid and stock.type in (

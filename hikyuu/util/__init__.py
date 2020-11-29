@@ -9,4 +9,4 @@
 
 #from singleton import Singleton
 
-__all__ = ['mylog']
+__all__ = ['mylog', 'check']

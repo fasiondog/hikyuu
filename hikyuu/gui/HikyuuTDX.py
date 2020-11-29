@@ -22,6 +22,7 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 from hikyuu.gui.data.CollectThread import CollectThread
 
 from hikyuu.data import hku_config_template
+from hikyuu.util.mylog import add_class_logger_handler
 
 
 class EmittingStream(QObject):
@@ -125,13 +126,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         )
         con.setFormatter(FORMAT)
         logger_name_list = [
-            self.__class__.__name__, CollectThread.__name__, UsePytdxImportToH5Thread.__name__,
-            UseTdxImportToH5Thread.__name__
+            self.__class__.__name__, UsePytdxImportToH5Thread.__name__,
+            UseTdxImportToH5Thread.__name__, CollectThread.__name__
         ]
         for name in logger_name_list:
             logger = logging.getLogger(name)
             logger.addHandler(con)
             logger.setLevel(logging.INFO)
+
+        #add_class_logger_handler(con, [CollectThread])
 
     def initUI(self):
         if self._capture_output:

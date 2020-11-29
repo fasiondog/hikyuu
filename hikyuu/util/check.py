@@ -18,7 +18,32 @@ class CheckError(Exception):
 
 
 def checkif(expression, message, excepion=None, **kwargs):
+    """如果 expression 为 True，则抛出异常。注意：该函数的判定和 assert 是相反的。
+
+    :param boolean expression: 判断条件
+    :param str message: 异常注解信息
+    :param Exception exception: 指定的异常类，为None时，为默认 CheckError 异常
+    """
     if expression:
+        if excepion is None:
+            raise CheckError(expression, message)
+        else:
+            raise excepion(message, **kwargs)
+
+
+def HKU_CHECK(exp, msg):
+    if not exp:
+        raise CheckError(exp, msg)
+
+
+def HKU_CHECK_THROW(expression, message, excepion=None, **kwargs):
+    """如果 expression 为 False，则抛出异常。
+
+    :param boolean expression: 判断条件
+    :param str message: 异常注解信息
+    :param Exception exception: 指定的异常类，为None时，为默认 CheckError 异常
+    """
+    if not expression:
         if excepion is None:
             raise CheckError(expression, message)
         else:

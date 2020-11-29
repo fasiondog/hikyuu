@@ -49,6 +49,8 @@ packages = [
     'hikyuu/data/sqlite_upgrade',
     'hikyuu/data_driver',
     'hikyuu/examples',
+    'hikyuu/fetcher',
+    'hikyuu/fetcher/stock',
     'hikyuu/gui',
     'hikyuu/gui/data',
     'hikyuu/indicator',
@@ -127,6 +129,7 @@ setup(
         'gitpython',
         'SQLAlchemy',
         'mysql-connector-python',
-        'pyperclip'
+        'pyperclip',
+        'requests'
     ],
 )
