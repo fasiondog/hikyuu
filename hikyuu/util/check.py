@@ -7,7 +7,10 @@
 # 1. 20200821, Added by fasiondog
 #==========================================================
 
-from .mylog import mylogger
+import sys
+import traceback
+from functools import wraps
+from .mylog import hku_logger
 
 
 class HKUCheckError(Exception):
@@ -16,7 +19,16 @@ class HKUCheckError(Exception):
         self.message = message
 
     def __str__(self):
-        return self.message
+        return str(self.message)
+
+
+class HKUIngoreError(Exception):
+    def __init__(self, expression, message=None):
+        self.expression = expression
+        self.message = message if message is not None else 'ignore'
+
+    def __str__(self):
+        return str(self.message)
 
 
 def checkif(expression, message, excepion=None, **kwargs):
@@ -33,12 +45,12 @@ def checkif(expression, message, excepion=None, **kwargs):
             raise excepion(message, **kwargs)
 
 
-def HKU_CHECK(exp, msg):
+def hku_check(exp, msg):
     if not exp:
         raise HKUCheckError(exp, msg)
 
 
-def HKU_CHECK_THROW(expression, message, excepion=None, **kwargs):
+def hku_check_throw(expression, message, excepion=None, **kwargs):
     """如果 expression 为 False，则抛出异常。
 
     :param boolean expression: 判断条件
@@ -50,3 +62,46 @@ def HKU_CHECK_THROW(expression, message, excepion=None, **kwargs):
             raise HKUCheckError(expression, message)
         else:
             raise excepion(message, **kwargs)
+
+
+def hku_check_ignore(exp, msg=None):
+    """可忽略的检查"""
+    if not exp:
+        raise HKUIngoreError(exp, msg)
+
+
+def get_exception_info():
+    info = sys.exc_info()
+    return "{}: {}".format(info[0].__name__, info[1])
+
+
+def hku_catch(ret=None, trace=False):
+    """捕获发生的异常, 包装方式: @hku_catch()
+    :param ret: 异常发生时返回值
+    :param boolean trace: 打印异常堆栈信息
+    """
+    def hku_catch_wrap(func):
+        def wrappedFunc(*args, **kargs):
+            try:
+                return func(*args, **kargs)
+            except HKUIngoreError:
+                hku_logger.debug(
+                    "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
+                )
+            except Exception:
+                hku_logger.error(
+                    "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
+                )
+                traceback.print_exc()
+            except:
+                hku_logger.error(
+                    "Unknown error! {} [{}.{}]".format(
+                        get_exception_info(), func.__module__, func.__name__
+                    )
+                )
+                traceback.print_exc()
+            return ret
+
+        return wrappedFunc
+
+    return hku_catch_wrap

@@ -1,7 +1,7 @@
 # 已废弃接口
 
 from .extend import *
-from .util.mylog import escapetime
+from .util.mylog import spend_time
 
 
 def deprecated_func(new_func, old_func_name, new_func_name):

@@ -13,7 +13,6 @@ from .mylog import *
 from .check import *
 
 __all__ = [
-    'escapetime', 'class_logger', 'add_class_logger_handler', 'HKU_TRACE', 'HKU_DEBUG', 'HKU_TRACE',
-    'HKU_INFO', 'HKU_WARN', 'HKU_ERROR', 'HKU_FATAL', 'HKUCheckError', 'HKU_CHECK',
-    'HKU_CHECK_THROW'
+    'spend_time', 'hku_logger', 'class_logger', 'add_class_logger_handler', 'HKUCheckError',
+    'hku_check', 'hku_check_throw', 'hku_check_ignore', 'hku_catch'
 ]

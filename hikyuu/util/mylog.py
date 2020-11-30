@@ -8,7 +8,7 @@ import time
 from functools import wraps
 
 
-def escapetime(func):
+def spend_time(func):
     @wraps(func)
     def wrappedFunc(*args, **kargs):
         starttime = time.time()
@@ -17,16 +17,16 @@ def escapetime(func):
             return func(*args, **kargs)
         finally:
             endtime = time.time()
-            print("Escaped time: %.4fs, %.2fm" % (endtime - starttime, (endtime - starttime) / 60))
+            print("spend time: %.4fs, %.2fm" % (endtime - starttime, (endtime - starttime) / 60))
 
     return wrappedFunc
 
 
-FORMAT = '%(asctime)-15s [%(levelname)s] : %(message)s [%(name)s::%(funcName)s]'
+FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s [%(name)s::%(funcName)s]'
 logging.basicConfig(format=FORMAT)
 
-mylogger_name = 'hikyuu'
-mylogger = logging.getLogger(mylogger_name)
+hku_logger_name = 'hikyuu'
+hku_logger = logging.getLogger(hku_logger_name)
 
 
 def class_logger(cls, enable=False):
@@ -53,27 +53,3 @@ def add_class_logger_handler(handler, class_list, level=logging.INFO):
         logger = logging.getLogger("{}".format(cls.__name__))
         logger.addHandler(handler)
         logger.setLevel(level)
-
-
-def HKU_TRACE(msg):
-    mylogger.debug(msg)
-
-
-def HKU_DEBUG(msg):
-    mylogger.debug(msg)
-
-
-def HKU_INFO(msg):
-    mylogger.info(msg)
-
-
-def HKU_WARN(msg):
-    mylogger.warning(msg)
-
-
-def HKU_ERROR(msg):
-    mylogger.error(msg)
-
-
-def HKU_FATAL(msg):
-    mylogger.critical(msg)
