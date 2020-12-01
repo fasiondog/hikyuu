@@ -59,7 +59,7 @@ def parse_one_result(resultstr):
 def request_data(querystr):
     proxy = get_proxy()
     proxies = {'http': 'http://{}'.format(proxy)} if proxy else None
-    print(proxies)
+    hku_logger.info("使用代理: {}".format(proxies))
     query = requests.get(querystr, proxies=proxies).text
     query = query.split('\n')
     result = []

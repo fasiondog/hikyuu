@@ -75,32 +75,39 @@ def get_exception_info():
     return "{}: {}".format(info[0].__name__, info[1])
 
 
-def hku_catch(ret=None, trace=False):
+def hku_catch(ret=None, trace=False, callback=None, retry=1):
     """捕获发生的异常, 包装方式: @hku_catch()
     :param ret: 异常发生时返回值
     :param boolean trace: 打印异常堆栈信息
+    :param func callback: 发生异常后的回调函数，入参同func
+    :param int retry: 发生异常后，重复尝试执行的次数
     """
     def hku_catch_wrap(func):
         def wrappedFunc(*args, **kargs):
-            try:
-                return func(*args, **kargs)
-            except HKUIngoreError:
-                hku_logger.debug(
-                    "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
-                )
-            except Exception:
-                hku_logger.error(
-                    "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
-                )
-                traceback.print_exc()
-            except:
-                hku_logger.error(
-                    "Unknown error! {} [{}.{}]".format(
-                        get_exception_info(), func.__module__, func.__name__
+            for i in range(retry):
+                try:
+                    return func(*args, **kargs)
+                except HKUIngoreError:
+                    hku_logger.debug(
+                        "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
                     )
-                )
-                traceback.print_exc()
-            return ret
+                except Exception:
+                    hku_logger.error(
+                        "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
+                    )
+                    traceback.print_exc()
+                    if callback and i == (retry - 1):
+                        callback(*args, **kargs)
+                except:
+                    hku_logger.error(
+                        "Unknown error! {} [{}.{}]".format(
+                            get_exception_info(), func.__module__, func.__name__
+                        )
+                    )
+                    traceback.print_exc()
+                    if callback and i == (retry - 1):
+                        callback(*args, **kargs)
+                return ret
 
         return wrappedFunc
 
