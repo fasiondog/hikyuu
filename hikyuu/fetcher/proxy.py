@@ -11,7 +11,7 @@ import datetime
 from hikyuu.util import hku_logger, hku_catch, hku_check
 
 # 芝麻 http 代理获取代理 API url，本机ip地址需在芝麻的白名单内
-zhimahttp_url = 'http://webapi.http.zhimacangku.com/getip?num=1&type=2&pro=330000&city=0&yys=0&port=1&time=1&ts=1&ys=1&cs=1&lb=1&sb=0&pb=45&mr=2&regions='
+zhimahttp_url = 'http://webapi.http.zhimacangku.com/getip?num=1&type=2&pro=0&city=0&yys=0&port=1&time=1&ts=1&ys=1&cs=1&lb=1&sb=0&pb=45&mr=2&regions=110000,130000,140000,310000,320000,330000,370000,410000'
 
 
 @hku_catch(retry=10)
@@ -30,7 +30,7 @@ def request_proxy_from_zhima():
     x = x['data'][0]
     x['expire_time'] = datetime.datetime.fromisoformat(x['expire_time'])
     x['request_time'] = datetime.datetime.now()
-    return x['data'][0]
+    return x
 
 
 # 最后使用的代理
@@ -62,3 +62,28 @@ def get_proxy(new=False):
     :return: 'host ip:port'， 如: '183.164.239.57:4264'
     """
     return get_proxy_from_zhima(new)
+    #return None
+
+
+def request_with_proxy(url):
+    """通过代理进行请求"""
+    new = False
+    for i in range(10):  # pylint: disable=unused-variable
+        try:
+            proxy = get_proxy(new)
+            if proxy is None:
+                # 因为get_proxy 已经进行过重试获取，这里直接返回
+                hku_logger.warning("Failed get proxy!")
+                return None
+            proxies = {'http': 'http://{}'.format(proxy)}
+            hku_logger.info("use proxy: {}".format(proxies['http']))
+            return requests.get(url, proxies=proxies).text
+        except:
+            new = True
+    return None
+
+
+@hku_catch()
+def request_with_local(url):
+    """通过本机ip直接获取请求"""
+    return requests.get(url).text
