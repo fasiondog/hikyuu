@@ -9,6 +9,8 @@ import mysql.connector
 from mysql.connector import errorcode
 
 from hikyuu.util.mylog import class_logger
+from hikyuu.data.common_mysql import get_stock_list
+from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
 
 
 class CollectThread(QThread):
