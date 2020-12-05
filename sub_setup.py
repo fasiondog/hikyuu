@@ -50,6 +50,7 @@ packages = [
     'hikyuu/data_driver',
     'hikyuu/examples',
     'hikyuu/fetcher',
+    'hikyuu/fetcher/proxy',
     'hikyuu/fetcher/stock',
     'hikyuu/gui',
     'hikyuu/gui/data',
@@ -130,6 +131,7 @@ setup(
         'SQLAlchemy',
         'mysql-connector-python',
         'pyperclip',
-        'requests'
+        'requests',
+        'qdarkstyle'
     ],
 )

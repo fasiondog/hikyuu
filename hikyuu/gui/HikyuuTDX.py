@@ -37,14 +37,15 @@ class EmittingStream(QObject):
 
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None, capture_output=False):
+    def __init__(self, parent=None, capture_output=False, use_dark_style=False):
         super(MyMainWindow, self).__init__(parent)
-        self._capture_output = capture_output  #捕获Python stdout 输出
+        self._capture_output = capture_output  # 捕获Python stdout 输出
+        self._use_dark_style = use_dark_style  # 使用暗黑主题
+        self._text_color = '#FFFFFF' if use_dark_style else '#000000'
         self.setupUi(self)
         self.initUI()
         self.initLogger()
         self.initThreads()
-        self.logger.info("Init...")
 
     def closeEvent(self, event):
         self.stop_collect()
@@ -108,7 +109,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def normalOutputWritten(self, text):
         """普通打印信息重定向"""
-        if text.find('[WARN]') >= 0:
+        if text.find('[DEBUG]') >= 0:
+            text = '<font color="#66CC99">{}</font>'.format(text)
+        elif text.find('[WARNING]') >= 0:
             text = '<font color="#0000FF">{}</font>'.format(text)
         elif text.find('[ERROR]') >= 0:
             text = '<font color="#FF0000">{}</font>'.format(text)
@@ -116,7 +119,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             text = '<span style="background-color: #ff0000;">{}</span>'.format(text)
         else:
             # 主动加入<font>标签，避免 append 时多加入空行
-            text = '<font color="#000000">{}</font>'.format(text)
+            text = '<font color="{}">{}</font>'.format(self._text_color, text)
         cursor = self.log_textEdit.textCursor()
         cursor.movePosition(QTextCursor.End)
         self.log_textEdit.append(text)
@@ -133,7 +136,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         con.setFormatter(FORMAT)
         add_class_logger_handler(
             con, [MyMainWindow, CollectThread, UsePytdxImportToH5Thread, UseTdxImportToH5Thread],
-            logging.INFO
+            logging.DEBUG
         )
         hku_logger.addHandler(con)
 
@@ -142,11 +145,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             stream = EmittingStream(textWritten=self.normalOutputWritten)
             sys.stdout = stream
             sys.stderr = stream
-        self.log_textEdit.document().setMaximumBlockCount(500)
+        self.log_textEdit.document().setMaximumBlockCount(1000)
 
         current_dir = os.path.dirname(__file__)
         self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
-        self.setFixedSize(self.width(), self.height())
+        #self.setFixedSize(self.width(), self.height())
         self.import_status_label.setText('')
         self.import_detail_textEdit.clear()
         self.reset_progress_bar()
@@ -519,24 +522,24 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
     def start_collect(self):
-        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH', 2)
+        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH', 60)
         self.collect_sh_thread.start()
-        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ', 2)
+        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ', 60)
         self.collect_sz_thread.start()
 
     def stop_collect(self):
         self.logger.info("终止采集！")
         if self.collect_sh_thread is not None:
             self.collect_sh_thread.stop()
-            self.collect_sh_thread.terminate()
-            del self.collect_sh_thread
-            self.collect_sh_thread = None
+            #self.collect_sh_thread.terminate()
+            #del self.collect_sh_thread
+            #self.collect_sh_thread = None
 
         if self.collect_sz_thread is not None:
             self.collect_sz_thread.stop()
-            self.collect_sz_thread.terminate()
-            del self.collect_sz_thread
-            self.collect_sz_thread = None
+            #self.collect_sz_thread.terminate()
+            #del self.collect_sz_thread
+            #self.collect_sz_thread = None
 
     @pyqtSlot()
     def on_collect_start_pushButton_clicked(self):
@@ -575,7 +578,15 @@ def start():
 
 
 if __name__ == "__main__":
+    import requests
+    import urllib
+    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
     app = QApplication(sys.argv)
+    use_dark_style = False  # 使用暗黑主题
+    if use_dark_style:
+        import qdarkstyle
+        app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
         logging.basicConfig(
@@ -583,9 +594,9 @@ if __name__ == "__main__":
                 logging.StreamHandler(),
             ]
         )
-        myWin = MyMainWindow(capture_output=False)
+        myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
     else:
-        myWin = MyMainWindow(capture_output=True)
+        myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
 
     myWin.show()
     sys.exit(app.exec())

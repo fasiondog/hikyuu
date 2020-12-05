@@ -7,11 +7,11 @@
 
 import requests
 import datetime
-from hikyuu.util import hku_catch, hku_logger, hku_check_ignore
+from hikyuu.util import *
 from hikyuu.fetcher.proxy import request_with_proxy, request_with_local
 
 
-@hku_catch()
+@hku_catch(callback=lambda resultstr: hku_warn(resultstr))
 def parse_one_result_sina(resultstr):
     result = {}
     hku_check_ignore(resultstr, "Invalid input param!")
@@ -52,12 +52,13 @@ def parse_one_result_sina(resultstr):
     result['ask4'] = float(a[27])
     result['ask5_amount'] = float(a[28]) / 100.0
     result['ask5'] = float(a[29])
-    result['date'] = a[30]
-    result['time'] = a[31]
+    result['datetime'] = datetime.datetime.combine(
+        datetime.date.fromisoformat(a[30]), datetime.time.fromisoformat(a[31])
+    )
     return result
 
 
-@hku_catch()
+@hku_catch(callback=lambda resultstr: hku_warn(resultstr))
 def parse_one_result_qq(resultstr):
     result = {}
     hku_check_ignore(resultstr, "Invalid input param!")
@@ -72,7 +73,7 @@ def parse_one_result_qq(resultstr):
     result['last_price'] = float(a[3])  # 当前价格
     result['yesterday_close'] = float(a[4])  # 昨日收盘价
     result['open'] = float(a[5])  # 今日开盘价
-    result['amount'] = float(a[6])  # 成交量
+    #result['amount'] = float(a[6])  # 成交量
     # 7: 外盘 ？
     # 8：内盘 ？
     result['bid1'] = float(a[9])  # “买一”报价
@@ -107,12 +108,12 @@ def parse_one_result_qq(resultstr):
     # 35: 价格/成交量（手）/成交额
     result['amount'] = float(a[36])  # 成交量（手）
     result['volumn'] = float(a[37])  # 成交额（万）
-    result['turnover_rate'] = float(a[38])  #换手率
-    result['pe'] = float(a[39])  # 市盈率 Price Earnings Ratio，简称P/E或PER
-    result['amplitude'] = float(a[43])  #振幅
-    result['circulation_market_value'] = float(a[44])  # 流通市值
-    result['total_value'] = float(a[45])  # 总市值
-    result['pb'] = float(a[46])  # 市净率 PB:Price/Book value
+    result['turnover_rate'] = float(a[38]) if a[38] else 0.0  #换手率
+    result['pe'] = float(a[39]) if a[39] else 0.0  # 市盈率 Price Earnings Ratio，简称P/E或PER
+    result['amplitude'] = float(a[43]) if a[43] else 0.0  #振幅
+    result['circulation_market_value'] = float(a[44]) if a[44] else 0.0  # 流通市值
+    result['total_value'] = float(a[45]) if a[45] else 0.0  # 总市值
+    result['pb'] = float(a[46]) if a[46] else 0.0  # 市净率 PB:Price/Book value
     result['limit_up'] = float(a[47])  # 涨停价
     result['limit_down'] = float(a[48])  # 涨停价
     return result
