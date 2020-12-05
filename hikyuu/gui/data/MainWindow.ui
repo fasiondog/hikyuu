@@ -886,7 +886,7 @@ p, li { white-space: pre-wrap; }
        <bool>true</bool>
       </property>
       <property name="acceptRichText">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
     </widget>

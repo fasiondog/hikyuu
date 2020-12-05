@@ -388,7 +388,7 @@ class Ui_MainWindow(object):
         self.log_textEdit = QtWidgets.QTextEdit(self.tab_5)
         self.log_textEdit.setGeometry(QtCore.QRect(10, 10, 571, 511))
         self.log_textEdit.setReadOnly(True)
-        self.log_textEdit.setAcceptRichText(False)
+        self.log_textEdit.setAcceptRichText(True)
         self.log_textEdit.setObjectName("log_textEdit")
         self.tabWidget.addTab(self.tab_5, "")
         MainWindow.setCentralWidget(self.centralwidget)

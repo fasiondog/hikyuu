@@ -47,7 +47,10 @@ def checkif(expression, message, excepion=None, **kwargs):
 
 def hku_check(exp, msg):
     if not exp:
-        raise HKUCheckError(exp, msg)
+        st = traceback.extract_stack()[-2]
+        check_exp = st._line.split(',')[0]
+        errmsg = "{}) {} [{}] [{}:{}]".format(check_exp, msg, st.name, st.filename, st.lineno)
+        raise HKUCheckError(exp, errmsg)
 
 
 def hku_check_throw(expression, message, excepion=None, **kwargs):
@@ -58,16 +61,22 @@ def hku_check_throw(expression, message, excepion=None, **kwargs):
     :param Exception exception: 指定的异常类，为None时，为默认 HKUCheckError 异常
     """
     if not expression:
+        st = traceback.extract_stack()[-2]
+        check_exp = st._line.split(',')[0]
+        errmsg = "{}) {} [{}] [{}:{}]".format(check_exp, message, st.name, st.filename, st.lineno)
         if excepion is None:
-            raise HKUCheckError(expression, message)
+            raise HKUCheckError(expression, errmsg)
         else:
-            raise excepion(message, **kwargs)
+            raise excepion(errmsg, **kwargs)
 
 
 def hku_check_ignore(exp, msg=None):
     """可忽略的检查"""
     if not exp:
-        raise HKUIngoreError(exp, msg)
+        st = traceback.extract_stack()[-2]
+        check_exp = st._line.split(',')[0]
+        errmsg = "{}) {} [{}] [{}:{}]".format(check_exp, msg, st.name, st.filename, st.lineno)
+        raise HKUIngoreError(exp, errmsg)
 
 
 def get_exception_info():
@@ -95,7 +104,8 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1):
                     hku_logger.error(
                         "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
                     )
-                    traceback.print_exc()
+                    if trace:
+                        traceback.print_exc()
                     if callback and i == (retry - 1):
                         callback(*args, **kargs)
                 except:
@@ -104,7 +114,8 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1):
                             get_exception_info(), func.__module__, func.__name__
                         )
                     )
-                    traceback.print_exc()
+                    if trace:
+                        traceback.print_exc()
                     if callback and i == (retry - 1):
                         callback(*args, **kargs)
                 return ret

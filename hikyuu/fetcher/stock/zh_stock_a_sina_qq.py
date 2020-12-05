@@ -119,10 +119,8 @@ def parse_one_result_qq(resultstr):
 
 
 def request_data(querystr, parse_one_result, use_proxy=False):
+    """请求失败将抛出异常"""
     query = request_with_proxy(querystr) if use_proxy else request_with_local(querystr)
-    if query is None:
-        hku_logger.error('请求失败！无法获取数据')
-        return
     query = query.split('\n')
     result = []
     for tmpstr in query:
@@ -134,6 +132,7 @@ def request_data(querystr, parse_one_result, use_proxy=False):
 
 
 def get_spot(stocklist, source='sina', use_proxy=False):
+    """获取失败时，请抛出异常"""
     if source == 'sina':
         queryStr = "http://hq.sinajs.cn/list="
         max_size = 140

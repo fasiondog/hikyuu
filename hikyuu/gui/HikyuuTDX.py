@@ -22,7 +22,7 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 from hikyuu.gui.data.CollectThread import CollectThread
 
 from hikyuu.data import hku_config_template
-from hikyuu.util.mylog import add_class_logger_handler, class_logger
+from hikyuu.util.mylog import add_class_logger_handler, class_logger, hku_logger
 
 
 class EmittingStream(QObject):
@@ -108,11 +108,18 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def normalOutputWritten(self, text):
         """普通打印信息重定向"""
+        if text.find('[WARN]') >= 0:
+            text = '<font color="#0000FF">{}</font>'.format(text)
+        elif text.find('[ERROR]') >= 0:
+            text = '<font color="#FF0000">{}</font>'.format(text)
+        elif text.find('[CRITICAL]') >= 0:
+            text = '<span style="background-color: #ff0000;">{}</span>'.format(text)
+        else:
+            # 主动加入<font>标签，避免 append 时多加入空行
+            text = '<font color="#000000">{}</font>'.format(text)
         cursor = self.log_textEdit.textCursor()
         cursor.movePosition(QTextCursor.End)
-        cursor.insertText(text)
-        self.log_textEdit.setTextCursor(cursor)
-        self.log_textEdit.ensureCursorVisible()
+        self.log_textEdit.append(text)
 
     def initLogger(self):
         if not self._capture_output:
@@ -128,12 +135,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             con, [MyMainWindow, CollectThread, UsePytdxImportToH5Thread, UseTdxImportToH5Thread],
             logging.INFO
         )
+        hku_logger.addHandler(con)
 
     def initUI(self):
         if self._capture_output:
             stream = EmittingStream(textWritten=self.normalOutputWritten)
             sys.stdout = stream
             sys.stderr = stream
+        self.log_textEdit.document().setMaximumBlockCount(500)
 
         current_dir = os.path.dirname(__file__)
         self.setWindowIcon(QIcon("{}/hikyuu.ico".format(current_dir)))
@@ -518,13 +527,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def stop_collect(self):
         self.logger.info("终止采集！")
         if self.collect_sh_thread is not None:
-            self.collect_sh_thread.working = False
+            self.collect_sh_thread.stop()
             self.collect_sh_thread.terminate()
             del self.collect_sh_thread
             self.collect_sh_thread = None
 
         if self.collect_sz_thread is not None:
-            self.collect_sz_thread.working = False
+            self.collect_sz_thread.stop()
             self.collect_sz_thread.terminate()
             del self.collect_sz_thread
             self.collect_sz_thread = None
@@ -532,19 +541,27 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_collect_start_pushButton_clicked(self):
         if self.collect_running:
+            self.collect_start_pushButton.setEnabled(False)
+            self.collect_status_Label.setText("正在停止...")
+            QApplication.processEvents()
             self.stop_collect()
-            self.collect_status_Label.setText("已停止")
             self.collect_start_pushButton.setText("启动定时采集")
             self.collect_running = False
+            self.collect_status_Label.setText("已停止")
+            self.collect_start_pushButton.setEnabled(True)
         else:
             config = self.getCurrentConfig()
             if not config.getboolean("mysql", "enable", fallback=False):
                 QMessageBox.critical(self, "定时采集", "仅在存储设置为 MySQL 时支持定时采集！")
                 return
-            self.collect_status_Label.setText("运行中...")
+            self.collect_status_Label.setText("正在启动...")
+            self.collect_start_pushButton.setEnabled(False)
+            QApplication.processEvents()
             self.start_collect()
             self.collect_start_pushButton.setText("停止采集")
             self.collect_running = True
+            self.collect_status_Label.setText("运行中...")
+            self.collect_start_pushButton.setEnabled(True)
 
 
 class_logger(MyMainWindow)

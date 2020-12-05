@@ -3,7 +3,7 @@
 # cp936
 
 import logging
-import sys
+import traceback
 import time
 from functools import wraps
 
@@ -53,3 +53,94 @@ def add_class_logger_handler(handler, class_list, level=logging.INFO):
         logger = logging.getLogger("{}".format(cls.__name__))
         logger.addHandler(handler)
         logger.setLevel(level)
+
+
+def hku_debug(msg, logger=None):
+    st = traceback.extract_stack()[-2]
+    if logger:
+        logger.debug("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+    else:
+        hku_logger.debug("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+hku_trace = hku_debug
+
+
+def hku_info(msg, logger=None):
+    st = traceback.extract_stack()[-2]
+    if logger:
+        logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+    else:
+        hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+def hku_warn(msg, logger=None):
+    st = traceback.extract_stack()[-2]
+    if logger:
+        logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+    else:
+        hku_logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+def hku_error(msg, logger=None):
+    st = traceback.extract_stack()[-2]
+    if logger:
+        logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+    else:
+        hku_logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+def hku_fatal(msg, logger=None):
+    st = traceback.extract_stack()[-2]
+    if logger:
+        logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+    else:
+        hku_logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+def hku_debug_if(exp, msg, logger=None):
+    if exp:
+        st = traceback.extract_stack()[-2]
+        if logger:
+            logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        else:
+            hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+hku_trace_if = hku_debug_if
+
+
+def hku_info_if(exp, msg, logger=None):
+    if exp:
+        st = traceback.extract_stack()[-2]
+        if logger:
+            logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        else:
+            hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+def hku_warn_if(exp, msg, logger=None):
+    if exp:
+        st = traceback.extract_stack()[-2]
+        if logger:
+            logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        else:
+            hku_logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+def hku_error_if(exp, msg, logger=None):
+    if exp:
+        st = traceback.extract_stack()[-2]
+        if logger:
+            logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        else:
+            hku_logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+def hku_fatal_if(exp, msg, logger=None):
+    if exp:
+        st = traceback.extract_stack()[-2]
+        if logger:
+            logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        else:
+            hku_logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
