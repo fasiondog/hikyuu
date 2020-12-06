@@ -729,24 +729,11 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>MySQL定时导入</string>
        </attribute>
-       <widget class="QCheckBox" name="collect_no_week_checkBox">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>200</y>
-          <width>101</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>周末不执行</string>
-        </property>
-       </widget>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>40</x>
-          <y>160</y>
+          <y>90</y>
           <width>158</width>
           <height>22</height>
          </rect>
@@ -794,69 +781,54 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QCheckBox" name="collect_use_zhima_checkBox">
         <property name="geometry">
          <rect>
           <x>40</x>
-          <y>80</y>
-          <width>216</width>
-          <height>56</height>
+          <y>190</y>
+          <width>141</width>
+          <height>16</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="text">
+         <string>使用芝麻代理</string>
+        </property>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>140</y>
+          <width>214</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
-           <item>
-            <widget class="QLabel" name="label_21">
-             <property name="text">
-              <string>执行时间段1：</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <item>
-              <widget class="QTimeEdit" name="collect_phase1_start_timeEdit"/>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_22">
-               <property name="text">
-                <string>-</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QTimeEdit" name="collect_phase1_last_timeEdit"/>
-             </item>
-            </layout>
-           </item>
-          </layout>
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>执行时间段：</string>
+           </property>
+          </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QLabel" name="label_24">
-             <property name="text">
-              <string>执行时间段2：</string>
+            <widget class="QTimeEdit" name="collect_phase1_start_timeEdit">
+             <property name="currentSection">
+              <enum>QDateTimeEdit::HourSection</enum>
              </property>
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <widget class="QTimeEdit" name="collect_phase2_start_timeEdit"/>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_25">
-               <property name="text">
-                <string>-</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QTimeEdit" name="collect_phase2_last_timeEdit"/>
-             </item>
-            </layout>
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>-</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTimeEdit" name="collect_phase1_last_timeEdit"/>
            </item>
           </layout>
          </item>

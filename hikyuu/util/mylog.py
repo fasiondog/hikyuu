@@ -23,7 +23,7 @@ def spend_time(func):
 
 
 FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s [%(name)s::%(funcName)s]'
-logging.basicConfig(format=FORMAT, level=logging.DEBUG if __debug__ else logging.INFO)
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 hku_logger_name = 'hikyuu'
 hku_logger = logging.getLogger(hku_logger_name)

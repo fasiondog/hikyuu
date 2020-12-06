@@ -136,7 +136,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         con.setFormatter(FORMAT)
         add_class_logger_handler(
             con, [MyMainWindow, CollectThread, UsePytdxImportToH5Thread, UseTdxImportToH5Thread],
-            logging.DEBUG
+            logging.INFO
         )
         hku_logger.addHandler(con)
 
@@ -220,6 +220,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             import_config.getint('pytdx', 'use_tdx_number', fallback=10)
         )
 
+        self.on_tdx_or_pytdx_toggled()
+
         #初始化hdf5设置
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
         self.enable_hdf55_radioButton.setChecked(hdf5_enable)
@@ -253,7 +255,21 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
         self.mysql_test_pushButton.setEnabled(mysql_enable)
 
-        self.on_tdx_or_pytdx_toggled()
+        # 初始化定时采集设置
+        interval_time = import_config.getint('collect', 'interval', fallback=60 * 60)
+        self.collect_sample_spinBox.setValue(interval_time)
+        use_zhima_proxy = import_config.getboolean('collect', 'use_zhima_proxy', fallback=False)
+        self.collect_use_zhima_checkBox.setChecked(use_zhima_proxy)
+        self.collect_phase1_start_timeEdit.setTime(
+            datetime.time.fromisoformat(
+                import_config.get('collect', 'phase1_start', fallback='09:05')
+            )
+        )
+        self.collect_phase1_last_timeEdit.setTime(
+            datetime.time.fromisoformat(
+                import_config.get('collect', 'phase1_end', fallback='15:15')
+            )
+        )
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
@@ -296,6 +312,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'port': self.mysql_port_lineEdit.text(),
             'usr': self.mysql_usr_lineEdit.text(),
             'pwd': self.mysql_pwd_lineEdit.text()
+        }
+        import_config['collect'] = {
+            'interval': self.collect_sample_spinBox.value(),
+            'use_zhima_proxy': self.collect_use_zhima_checkBox.isChecked(),
+            'phase1_start': self.collect_phase1_start_timeEdit.time().toString(),
+            'phase1_end': self.collect_phase1_last_timeEdit.time().toString()
         }
         return import_config
 
@@ -522,9 +544,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
     def start_collect(self):
-        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH', 60)
+        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH', 5 * 60)
         self.collect_sh_thread.start()
-        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ', 60)
+        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ', 5 * 60)
         self.collect_sz_thread.start()
 
     def stop_collect(self):

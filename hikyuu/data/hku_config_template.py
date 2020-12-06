@@ -78,7 +78,7 @@ dir = {dir}/block
 self = self.ini
 
 [preload]
-day = 0
+day = 1
 week = 0
 month = 0
 quarter = 0
