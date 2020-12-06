@@ -3,22 +3,23 @@
 # cp936
 import logging
 import time
+import datetime
+from math import ceil
 from PyQt5.QtCore import QThread, QWaitCondition, QMutex
 
 import mysql.connector
 from mysql.connector import errorcode
 
-from hikyuu import Datetime
+from hikyuu import Datetime, TimeDelta
 from hikyuu.util import *
 from hikyuu.data.common_mysql import get_stock_list, get_marketid, get_table
 from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
 
 
 class CollectThread(QThread):
-    def __init__(self, config, market='SH', interval=60):
+    def __init__(self, config, market='SH'):
         super(self.__class__, self).__init__()
         self.working = True
-        self._interval = interval
         self._config = config
         self.market = market.lower()
         self.marketid = None
@@ -39,6 +40,25 @@ class CollectThread(QThread):
         #    self.quotations.append('fund')
         #self.logger.info(self.quotations)
 
+        self._interval = TimeDelta(seconds=config.getint('collect', 'interval', fallback=60 * 60))
+        self._phase1_start_time = Datetime(
+            datetime.datetime.combine(
+                datetime.date.today(),
+                datetime.time.fromisoformat(
+                    (config.get('collect', 'phase1_start', fallback='09:05'))
+                )
+            )
+        )
+        self._phase1_end_time = Datetime(
+            datetime.datetime.combine(
+                datetime.date.today(),
+                datetime.time.fromisoformat(
+                    (config.get('collect', 'phase1_end', fallback='09:05'))
+                )
+            )
+        )
+        self._use_zhima_proxy = config.getboolean('collect', 'use_zhima_proxy', fallback=False)
+
         self.cond = QWaitCondition()
         self.mutex = QMutex()
 
@@ -54,21 +74,46 @@ class CollectThread(QThread):
     def __del__(self):
         self.stop()
 
+    @hku_catch()
     def run(self):
         self.logger.info("{} 数据采集同步线程启动".format(self.market))
         stk_list = self.get_stock_list()
         hku_warn_if(not stk_list, "从数据库中获取的股票列表为空！", self.logger)
         self.mutex.tryLock()
-        delta = 0
-        while not self.cond.wait(self.mutex, int(delta * 1000)) and self.working:
-            start = time.time()
-            hku_trace("start：{}".format(Datetime.now()))
+
+        end_delta = self._phase1_end_time - self._phase1_end_time.start_of_day()
+        start_delta = self._phase1_start_time - self._phase1_start_time.start_of_day()
+
+        start = Datetime.now()
+        if self._phase1_start_time >= self._phase1_end_time:
+            delta = TimeDelta(0)
+        elif start >= self._phase1_end_time:
+            delta = (self._phase1_start_time + TimeDelta(1) - start)
+        elif start < self._phase1_start_time:
+            delta = (self._phase1_start_time - start)
+        else:
+            delta = self._interval * ceil((start - self._phase1_start_time) / self._interval
+                                          ) - (start - self._phase1_start_time)
+
+        hku_info('{} 下次采集时间：{}'.format(self.market, start + delta), self.logger)
+        delta = int(delta.total_milliseconds())
+        while self.working and not self.cond.wait(self.mutex, int(delta)):
+            last_time = Datetime.today() + end_delta
+            start = Datetime.now()
+            if start >= last_time:
+                next_time = Datetime.today() + TimeDelta(1) + start_delta
+                hku_info('{} 明日采集时间：{}'.format(self.market, next_time), self.logger)
+                delta = next_time - start
+                delta = int(delta.total_milliseconds())
+                continue
+            hku_trace("start：{}".format(start))
             self.collect(stk_list)
-            end = time.time()
+            end = Datetime.now()
             x = end - start
-            if x + 1.0 < self._interval:
-                delta = self._interval - x - 1.0
-                self.logger.info("{} {:<.2f} 秒后重新采集".format(self.market, delta))
+            if x + TimeDelta(seconds=1) < self._interval:
+                delta = self._interval - x - TimeDelta(seconds=1)
+                delta = int(delta.total_milliseconds())
+                self.logger.info("{} {:<.2f} 秒后重新采集".format(self.market, delta / 1000))
                 #self.sleep(delta)
 
         self.logger.info("{} 数据采集同步线程终止!".format(self.market))
@@ -119,7 +164,7 @@ class CollectThread(QThread):
 
     @hku_catch()
     def collect(self, stk_list):
-        record_list = get_spot(stk_list, source='sina', use_proxy=False)
+        record_list = get_spot(stk_list, source='sina', use_proxy=self._use_zhima_proxy)
         hku_info("{} 网络获取数量：{}".format(self.market, len(record_list)))
         connect = self.get_connect()
         if self.marketid == None:

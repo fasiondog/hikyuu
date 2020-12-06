@@ -8,7 +8,7 @@
 import requests
 import json
 import datetime
-from hikyuu.util import hku_logger, hku_check
+from hikyuu.util import hku_warn, hku_info, hku_check
 
 from .zhima import get_proxy
 
@@ -17,13 +17,15 @@ def request_with_proxy(url):
     """通过代理进行请求，访问失败将抛出异常"""
     # 获取到的 ip 可能无法访问相应的 url，重试10次，以便找到能用的 proxy
     new = False
+    proxies = {'http': '127.0.0.1'}
     for i in range(10):  # pylint: disable=unused-variable
         try:
             proxy = get_proxy(new)
             hku_check(proxy, "Failed get proxy!")
             proxies = {'http': 'http://{}'.format(proxy)}
-            hku_logger.info("use proxy: {}".format(proxies['http']))
-            return requests.get(url, proxies=proxies).text
+            result = requests.get(url, proxies=proxies).text
+            hku_info("use proxy: {}".format(proxies['http']))
+            return result
         except:
             new = True
     raise Exception("无法通过代理访问！")

@@ -544,24 +544,17 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
     def start_collect(self):
-        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH', 5 * 60)
+        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH')
         self.collect_sh_thread.start()
-        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ', 5 * 60)
+        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ')
         self.collect_sz_thread.start()
 
     def stop_collect(self):
         self.logger.info("终止采集！")
         if self.collect_sh_thread is not None:
             self.collect_sh_thread.stop()
-            #self.collect_sh_thread.terminate()
-            #del self.collect_sh_thread
-            #self.collect_sh_thread = None
-
         if self.collect_sz_thread is not None:
             self.collect_sz_thread.stop()
-            #self.collect_sz_thread.terminate()
-            #del self.collect_sz_thread
-            #self.collect_sz_thread = None
 
     @pyqtSlot()
     def on_collect_start_pushButton_clicked(self):
@@ -616,6 +609,7 @@ if __name__ == "__main__":
                 logging.StreamHandler(),
             ]
         )
+        #myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
         myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
     else:
         myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
