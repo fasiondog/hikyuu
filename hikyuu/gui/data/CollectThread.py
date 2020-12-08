@@ -13,7 +13,7 @@ from mysql.connector import errorcode
 from hikyuu import Datetime, TimeDelta
 from hikyuu.util import *
 from hikyuu.data.common_mysql import get_stock_list, get_marketid, get_table
-from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot
+from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot, get_spot_parallel
 
 
 class CollectThread(QThread):
@@ -121,64 +121,40 @@ class CollectThread(QThread):
     def record_is_valid(self, record):
         return record['amount'] > 0.0 and record['volumn'] > 0.0 \
             and record['high'] >= record['open'] >= record['low'] > 0.0 \
-            and record['high'] >= record['last_price'] >= record['low']
+            and record['high'] >= record['close'] >= record['low']
 
-    @hku_catch(ret=[])
+    @hku_catch(ret=False)
     def process_one_record(self, record):
         if not self.record_is_valid(record):
             return (0, 0)
         connect = self.get_connect()
         current_date = Datetime(record['datetime'].date()).number
         table = get_table(connect, self.market, record['code'], 'day')
-        sql = 'select date,open,high,low,close,amount,count from {} where date={}'.format(
-            table, current_date
+        sql = 'replace into {} (date, open, high, low, close, amount, count) \
+             values ({}, {}, {}, {}, {}, {}, {})'.format(
+            table, current_date, record['open'], record['high'], record['low'], record['close'],
+            record['amount'], record['volumn']
         )
         cur = connect.cursor()
         cur.execute(sql)
-        a = [x for x in cur]
-        insert_count = 0
-        update_count = 0
-        sql = None
-        if not a:
-            sql = 'insert into {} (date, open, high, low, close, amount, count) \
-                 values ({}, {}, {}, {}, {}, {}, {})'.format(
-                table, current_date, record['open'], record['high'], record['low'],
-                record['last_price'], record['amount'], record['volumn']
-            )
-            insert_count += 1
-        else:
-            old = a[0]
-            if old[1] != record['open'] or old[2] != record['high'] or old[3] != record['low'] \
-                    or old[4] != record['last_price'] or old[5] != record['amount'] \
-                    or old[6] != record['volumn']:
-                sql = "update {} set open={}, high={}, low={}, close={}, amount={}, count={} \
-                    where date={}".format(
-                    table, record['open'], record['high'], record['low'], record['last_price'],
-                    record['amount'], record['volumn'], current_date
-                )
-                update_count += 1
-        if sql is not None:
-            cur.execute(sql)
         cur.close()
-        return (insert_count, update_count)
+        return
 
     @hku_catch()
     def collect(self, stk_list):
-        record_list = get_spot(stk_list, source='sina', use_proxy=self._use_zhima_proxy)
+        record_list = get_spot_parallel(stk_list, source='sina', use_proxy=self._use_zhima_proxy)
         hku_info("{} 网络获取数量：{}".format(self.market, len(record_list)))
         connect = self.get_connect()
         if self.marketid == None:
             self.marketid = get_marketid(connect, self.market)
-        insert_count = 0
         update_count = 0
         for record in record_list:
             if not self.working:
                 break
-            insert, update = self.process_one_record(record)
-            insert_count += insert
-            update_count += update
+            if self.process_one_record(record):
+                update_count += 1
         connect.commit()
-        hku_info("{} 数据库插入记录数：{}，更新记录数：{}".format(self.market, insert_count, update_count))
+        hku_info("{} 数据库更新记录数：{}".format(self.market, update_count))
 
     def get_connect(self):
         if self._connect:

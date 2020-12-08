@@ -24,7 +24,7 @@ def request_with_proxy(url):
             hku_check(proxy, "Failed get proxy!")
             proxies = {'http': 'http://{}'.format(proxy)}
             result = requests.get(url, proxies=proxies).text
-            hku_info("use proxy: {}".format(proxies['http']))
+            #hku_info("use proxy: {}".format(proxies['http']))
             return result
         except:
             new = True

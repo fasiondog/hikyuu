@@ -48,12 +48,12 @@ class SqliteMemDriver:
             self.cursor.executescript(f.read())
 
     @dbcommit
-    def insert_bars(self, market, code, bars, ktype):
+    def insert_bars(self, market, bars, ktype):
         kline = [
             (
-                code, bar['datetime'], bar['open'], bar['high'], bar['low'], bar['close'],
+                bars['code'], bar['datetime'], bar['open'], bar['high'], bar['low'], bar['close'],
                 bar['amount'], bar['volumn']
-            ) for bar in bars
+            ) for bar in bars if market.lower() == bars['market'].lower()
         ]
         sql = 'INSERT OR REPLACE INTO {}_{}(code, datetime, open, high, low, close, amount, \
                volumn) VALUES (?,?,?,?,?,?,?,?)'.format(market, ktype)

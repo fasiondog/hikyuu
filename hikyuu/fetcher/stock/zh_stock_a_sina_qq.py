@@ -7,6 +7,7 @@
 
 import requests
 import datetime
+from concurrent import futures
 from hikyuu.util import *
 from hikyuu.fetcher.proxy import request_with_proxy, request_with_local
 
@@ -25,7 +26,7 @@ def parse_one_result_sina(resultstr):
     result['name'] = a[0][21:]
     result['open'] = float(a[1])  # 今日开盘价
     result['yesterday_close'] = float(a[2])  # 昨日收盘价
-    result['last_price'] = float(a[3])  # 当前价格
+    result['close'] = float(a[3])  # 当前价格
     result['high'] = float(a[4])  # 今日最高价
     result['low'] = float(a[5])  # 今日最低价
     result['bid'] = float(a[6])  # 竞买价，即“买一”报价
@@ -70,7 +71,7 @@ def parse_one_result_qq(resultstr):
     result['market'] = a[0][2:4]
     result['code'] = a[0][4:10]
     result['name'] = a[1]
-    result['last_price'] = float(a[3])  # 当前价格
+    result['close'] = float(a[3])  # 当前价格
     result['yesterday_close'] = float(a[4])  # 昨日收盘价
     result['open'] = float(a[5])  # 今日开盘价
     #result['amount'] = float(a[6])  # 成交量
@@ -132,8 +133,14 @@ def request_data(querystr, parse_one_result, use_proxy=False):
     return result
 
 
-def get_spot(stocklist, source='sina', use_proxy=False):
-    """获取失败时，请抛出异常"""
+def get_spot(stocklist, source='sina', use_proxy=False, batch_func=None):
+    """获取实时数据，获取失败时，抛出异常
+
+    :param list stocklist: 股票名称列表，股票名称示例：sh000001, sz000001
+    :param str source: 使用 sina 还是 qq 作为数据来源
+    :param boolean: use_proxy: 是否使用代理
+    :param function batch_func: 当网络请求返回一个批次数据时，调用该函数，通常用于向数据库写入数据
+    """
     if source == 'sina':
         queryStr = "http://hq.sinajs.cn/list="
         max_size = 140
@@ -152,12 +159,61 @@ def get_spot(stocklist, source='sina', use_proxy=False):
             phase_result = request_data(tmpstr, parse_one_result, use_proxy)
             if phase_result:
                 result.extend(phase_result)
+                if batch_func:
+                    batch_func(phase_result)
             count = 0
             tmpstr = queryStr
     if tmpstr != queryStr:
         phase_result = request_data(tmpstr, parse_one_result, use_proxy)
         if phase_result:
             result.extend(phase_result)
+            if batch_func:
+                batch_func(phase_result)
+    return result
+
+
+def get_spot_parallel(stocklist, source='sina', use_proxy=False, batch_func=None):
+    """并发网络请求获取实时数据，获取失败时，抛出异常
+
+    :param list stocklist: 股票名称列表，股票名称示例：sh000001, sz000001
+    :param str source: 使用 sina 还是 qq 作为数据来源
+    :param boolean: use_proxy: 是否使用代理
+    :param function batch_func: 当网络请求返回一个批次数据时，调用该函数，通常用于向数据库写入数据
+    """
+    if source == 'sina':
+        queryStr = "http://hq.sinajs.cn/list="
+        max_size = 140
+        parse_one_result = parse_one_result_sina
+    else:
+        queryStr = "http://qt.gtimg.cn/q="
+        max_size = 60
+        parse_one_result = parse_one_result_qq
+    count = 0
+    tmpstr = queryStr
+    batchs = []
+    for stock in stocklist:
+        tmpstr += ("%s,") % (stock)
+        count += 1
+        if count >= max_size:
+            batchs.append(tmpstr)
+            count = 0
+            tmpstr = queryStr
+    if tmpstr != queryStr:
+        batchs.append(tmpstr)
+
+    def request_inner(url):
+        batch_result = request_data(url, parse_one_result, use_proxy)
+        if batch_func and batch_result:
+            batch_func(batch_result)
+        return batch_result
+
+    with futures.ThreadPoolExecutor() as executor:
+        res = executor.map(request_inner, batchs, timeout=2)
+
+    result = []
+    for batch_result in res:
+        if batch_result:
+            result.extend(batch_result)
     return result
 
 
