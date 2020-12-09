@@ -121,7 +121,7 @@ BOOST_PYTHON_MODULE(core) {
 
     export_io_redirect();
 
-    py::def("hikyuu_init", hikyuu_init);
+    py::def("hikyuu_init", hikyuu_init, (py::arg("filename"), py::arg("ignore_preload") = false));
     py::def("get_version", getVersion, R"(getVersion()
     
     :return: hikyuu 当前版本

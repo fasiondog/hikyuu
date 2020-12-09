@@ -18,7 +18,7 @@ namespace hku {
 
 static Parameter g_hikyuu_context;
 
-void hikyuu_init(const string& config_file_name) {
+void hikyuu_init(const string& config_file_name, bool ignore_preload) {
     IniParser config;
     try {
         config.read(config_file_name);
@@ -63,7 +63,7 @@ void hikyuu_init(const string& config_file_name) {
 
     option = config.getOptionList("preload");
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
-        preloadParam.set<bool>(*iter, config.getBool("preload", *iter));
+        preloadParam.set<bool>(*iter, ignore_preload ? false : config.getBool("preload", *iter));
     }
 
     StockManager& sm = StockManager::instance();

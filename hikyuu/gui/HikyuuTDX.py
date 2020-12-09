@@ -20,6 +20,7 @@ from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 from hikyuu.gui.data.CollectThread import CollectThread
+from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 
 from hikyuu.data import hku_config_template
 from hikyuu.util.mylog import add_class_logger_handler, class_logger, hku_logger
@@ -65,6 +66,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def getUserConfigDir(self):
         return os.path.expanduser('~') + '/.hikyuu'
 
+    def getHikyuuConfigFileName(self):
+        return self.getUserConfigDir() + '/hikyuu.ini'
+
     def saveConfig(self):
         if not os.path.lexists(self.getUserConfigDir()):
             os.mkdir(self.getUserConfigDir())
@@ -74,7 +78,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         with open(filename, 'w', encoding='utf-8') as f:
             current_config.write(f)
 
-        filename = self.getUserConfigDir() + '/hikyuu.ini'
+        filename = self.getHikyuuConfigFileName()
         if current_config.getboolean('hdf5', 'enable', fallback=True):
             data_dir = current_config['hdf5']['dir']
             if not os.path.lexists(data_dir + '/tmp'):
@@ -135,8 +139,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         )
         con.setFormatter(FORMAT)
         add_class_logger_handler(
-            con, [MyMainWindow, CollectThread, UsePytdxImportToH5Thread, UseTdxImportToH5Thread],
-            logging.INFO
+            con, [
+                MyMainWindow, CollectThread, CollectToMemThread, UsePytdxImportToH5Thread,
+                UseTdxImportToH5Thread
+            ], logging.INFO
         )
         hku_logger.addHandler(con)
 
@@ -544,9 +550,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
     def start_collect(self):
-        self.collect_sh_thread = CollectThread(self.getCurrentConfig(), 'SH')
+        self.collect_sh_thread = CollectToMemThread(
+            self.getCurrentConfig(), self.getHikyuuConfigFileName(), 'SH'
+        )
         self.collect_sh_thread.start()
-        self.collect_sz_thread = CollectThread(self.getCurrentConfig(), 'SZ')
+        self.collect_sz_thread = CollectToMemThread(
+            self.getCurrentConfig(), self.getHikyuuConfigFileName(), 'SZ'
+        )
         self.collect_sz_thread.start()
 
     def stop_collect(self):
@@ -569,9 +579,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.collect_start_pushButton.setEnabled(True)
         else:
             config = self.getCurrentConfig()
-            if not config.getboolean("mysql", "enable", fallback=False):
-                QMessageBox.critical(self, "定时采集", "仅在存储设置为 MySQL 时支持定时采集！")
-                return
+            #if not config.getboolean("mysql", "enable", fallback=False):
+            #    QMessageBox.critical(self, "定时采集", "仅在存储设置为 MySQL 时支持定时采集！")
+            #    return
             self.collect_status_Label.setText("正在启动...")
             self.collect_start_pushButton.setEnabled(False)
             QApplication.processEvents()

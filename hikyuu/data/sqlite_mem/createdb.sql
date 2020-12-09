@@ -1,5 +1,5 @@
 BEGIN TRANSACTION;
-CREATE TABLE "sh_day" (
+CREATE TABLE IF NOT EXISTS "sh_day" (
 	"code"	TEXT NOT NULL,
 	"datetime"	NUMERIC NOT NULL,
 	"open"	REAL NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE "sh_day" (
 	"volumn"	REAL NOT NULL,
 	PRIMARY KEY("code","datetime")
 );
-CREATE TABLE "sz_day" (
+CREATE TABLE IF NOT EXISTS "sz_day" (
 	"code"	TEXT NOT NULL,
 	"datetime"	NUMERIC NOT NULL,
 	"open"	REAL NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE "sz_day" (
 	"volumn"	REAL NOT NULL,
 	PRIMARY KEY("code","datetime")
 );
-CREATE TABLE "sh_min" (
+CREATE TABLE IF NOT EXISTS "sh_min" (
 	"code"	TEXT NOT NULL,
 	"datetime"	NUMERIC NOT NULL,
 	"open"	REAL NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE "sh_min" (
 	"volumn"	REAL NOT NULL,
 	PRIMARY KEY("code","datetime")
 );
-CREATE TABLE "sz_min" (
+CREATE TABLE IF NOT EXISTS "sz_min" (
 	"code"	TEXT NOT NULL,
 	"datetime"	NUMERIC NOT NULL,
 	"open"	REAL NOT NULL,

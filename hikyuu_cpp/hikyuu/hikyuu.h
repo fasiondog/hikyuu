@@ -25,8 +25,10 @@ namespace hku {
 /**
  * Hikyuu核心初始化，客户端必须在程序入口处调用
  * @param config_file_name 配置信息文件名
+ * @param ignore_preload 忽略配置信息中的预加载设置，即不加载数据至内存。
+ *                       用于某些场合启动hikyuu，但仅用于获取数据库的基本信息。
  */
-void HKU_API hikyuu_init(const string& config_file_name);
+void HKU_API hikyuu_init(const string& config_file_name, bool ignore_preload = false);
 
 /**
  * 获取Hikyuu当前版本号
