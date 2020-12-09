@@ -23,6 +23,7 @@
 .vs
 .ipynb_checkpoints
 temp
+file
 temp.txt
 compile_info
 release.x64.version.h
