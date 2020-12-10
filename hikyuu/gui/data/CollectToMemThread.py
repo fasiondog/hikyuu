@@ -21,10 +21,6 @@ class CollectToMemThread(QThread):
         self.hku_config_file = hku_config_file
         self.market = market.lower()
         self.marketid = None
-        self.quotations = [
-            'stock',
-        ]  # sina 不支持基金，qq支持，此处屏蔽基金
-
         self._interval = TimeDelta(seconds=config.getint('collect', 'interval', fallback=60 * 60))
         self._phase1_start_time = Datetime(
             datetime.datetime.combine(
@@ -125,6 +121,7 @@ class CollectToMemThread(QThread):
         hku_info("{} 网络获取数量：{}".format(self.market, len(record_list)))
         record_list = [r for r in record_list if self.record_is_valid(r)]
         self.db.insert_bars(self.market, record_list, 'day')
+        self.db.insert_bars(self.market, record_list, 'min')
 
 
 class_logger(CollectToMemThread)

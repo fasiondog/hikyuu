@@ -47,6 +47,7 @@ packages = [
     'hikyuu/data',
     'hikyuu/data/mysql_upgrade',
     'hikyuu/data/sqlite_upgrade',
+    'hikyuu/data/sqlite_mem',
     'hikyuu/data_driver',
     'hikyuu/examples',
     'hikyuu/fetcher',
