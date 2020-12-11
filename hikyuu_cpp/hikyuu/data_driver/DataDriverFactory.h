@@ -12,6 +12,7 @@
 #include "BaseInfoDriver.h"
 #include "KDataDriver.h"
 #include "BlockInfoDriver.h"
+#include "MemCacheDriver.h"
 
 namespace hku {
 
@@ -43,10 +44,15 @@ public:
     static void removeKDataDriver(const string &name);
     static KDataDriverPtr getKDataDriver(const Parameter &);
 
+    static void regMemCacheDriver(const MemCacheDriverPtr &);
+    static void removeMemCacheDriver(const string &name);
+    static MemCacheDriverPtr getMemCacheDriver(const Parameter &);
+
 private:
     static map<string, BaseInfoDriverPtr> *m_baseInfoDrivers;
     static map<string, BlockInfoDriverPtr> *m_blockDrivers;
     static map<string, KDataDriverPtr> *m_kdataDrivers;
+    static map<string, MemCacheDriverPtr> *m_memCacheDrivers;
 };
 
 } /* namespace hku */

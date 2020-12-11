@@ -13,6 +13,7 @@
 #include "kdata/hdf5/H5KDataDriver.h"
 #include "kdata/mysql/MySQLKDataDriver.h"
 #include "kdata/tdx/TdxKDataDriver.h"
+#include "mem_cache/sqlite/SqliteMemCacheDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
@@ -21,6 +22,7 @@ namespace hku {
 map<string, BaseInfoDriverPtr>* DataDriverFactory::m_baseInfoDrivers{nullptr};
 map<string, BlockInfoDriverPtr>* DataDriverFactory::m_blockDrivers{nullptr};
 map<string, KDataDriverPtr>* DataDriverFactory::m_kdataDrivers{nullptr};
+map<string, MemCacheDriverPtr>* DataDriverFactory::m_memCacheDrivers{nullptr};
 
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
@@ -34,6 +36,9 @@ void DataDriverFactory::init() {
     DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
+
+    m_memCacheDrivers = new map<string, MemCacheDriverPtr>();
+    DataDriverFactory::regMemCacheDriver(make_shared<SqliteMemCacheDriver>());
 }
 
 void DataDriverFactory::release() {
@@ -45,6 +50,9 @@ void DataDriverFactory::release() {
 
     m_kdataDrivers->clear();
     delete m_kdataDrivers;
+
+    m_memCacheDrivers->clear();
+    delete m_memCacheDrivers;
 }
 
 void DataDriverFactory::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
@@ -118,6 +126,30 @@ KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
     to_upper(name);
     auto iter = m_kdataDrivers->find(name);
     if (iter != m_kdataDrivers->end()) {
+        result = iter->second;
+        result->init(params);
+    }
+    return result;
+}
+
+void DataDriverFactory::regMemCacheDriver(const MemCacheDriverPtr& driver) {
+    string new_type(driver->name());
+    to_upper(new_type);
+    (*m_memCacheDrivers)[new_type] = driver;
+}
+
+void DataDriverFactory::removeMemCacheDriver(const string& name) {
+    string new_name(name);
+    to_upper(new_name);
+    m_memCacheDrivers->erase(new_name);
+}
+
+MemCacheDriverPtr DataDriverFactory::getMemCacheDriver(const Parameter& params) {
+    MemCacheDriverPtr result;
+    string name = params.get<string>("type");
+    to_upper(name);
+    auto iter = m_memCacheDrivers->find(name);
+    if (iter != m_memCacheDrivers->end()) {
         result = iter->second;
         result->init(params);
     }

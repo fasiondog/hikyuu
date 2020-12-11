@@ -10,7 +10,7 @@ from PyQt5.QtCore import QThread, QWaitCondition, QMutex
 from hikyuu import Datetime, TimeDelta, hikyuu_init, StockManager, constant
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot, get_spot_parallel
-from hikyuu.data.SqliteMemDriver import SqliteMemDriver
+from hikyuu.data.sqlite_mem import SqliteMemDriver
 
 
 class CollectToMemThread(QThread):
