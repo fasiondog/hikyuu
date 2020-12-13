@@ -5,11 +5,12 @@
 import logging
 import traceback
 import time
-from functools import wraps
+import functools
 
 
+# 统计函数运行时间
 def spend_time(func):
-    @wraps(func)
+    @functools.wraps(func)
     def wrappedFunc(*args, **kargs):
         starttime = time.time()
         try:
@@ -144,3 +145,18 @@ def hku_fatal_if(exp, msg, logger=None):
             logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
         else:
             hku_logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+
+
+# 跟踪函数运行
+def with_trace(level=logging.INFO):
+    def with_trace_wrap(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            hku_info('start run: %s' % func.__name__)
+            result = func(*args, **kwargs)
+            hku_info('completed: %s' % func.__name__)
+            return result
+
+        return wrapper
+
+    return with_trace_wrap

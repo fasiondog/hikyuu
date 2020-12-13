@@ -9,7 +9,7 @@
 
 import sys
 import traceback
-from functools import wraps
+import functools
 from .mylog import hku_logger
 
 
@@ -92,6 +92,7 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1):
     :param int retry: 发生异常后，重复尝试执行的次数
     """
     def hku_catch_wrap(func):
+        @functools.wraps(func)
         def wrappedFunc(*args, **kargs):
             for i in range(retry):
                 try:

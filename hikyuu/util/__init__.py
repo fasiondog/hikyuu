@@ -36,4 +36,5 @@ __all__ = [
     'hku_warn_if',
     'hku_error_if',
     'hku_fatal_if',
+    'with_trace',
 ]
