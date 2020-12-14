@@ -50,6 +50,7 @@ packages = [
     'hikyuu/data/sqlite_mem',
     'hikyuu/data_driver',
     'hikyuu/examples',
+    'hikyuu/flat',
     'hikyuu/fetcher',
     'hikyuu/fetcher/proxy',
     'hikyuu/fetcher/stock',
@@ -133,6 +134,7 @@ setup(
         'mysql-connector-python',
         'pyperclip',
         'requests',
-        'qdarkstyle'
+        'qdarkstyle',
+        'flatbuffers'
     ],
 )

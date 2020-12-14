@@ -1,0 +1,41 @@
+namespace hikyuu.flat;
+
+table Spot {
+    market: string;
+    code: string;
+    name: string;
+    datetime: string;
+    yesterday_close:float;
+    open: float;
+    high: float;
+    low: float;
+    close: float;
+    amount: float;
+    volumn: float;
+    bid1: float;
+    bid1_amount: float;
+    bid2: float;
+    bid2_amount: float;
+    bid3: float;
+    bid3_amount: float;
+    bid4: float;
+    bid4_amount: float;
+    bid5: float;
+    bid5_amount: float;
+    ask1: float;
+    ask1_amount: float;
+    ask2: float;
+    ask2_amount: float;
+    ask3: float;
+    ask3_amount: float;
+    ask4: float;
+    ask4_amount: float;
+    ask5: float;
+    ask5_amount: float;
+}
+
+table SpotList {
+    spot: [Spot];
+}
+
+root_type SpotList;
