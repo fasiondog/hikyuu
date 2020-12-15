@@ -53,7 +53,7 @@ class SqliteMemDriver:
 
     @dbcommit
     def _create_table(self):
-        filename = os.path.dirname(__file__) + '/sqlite_mem/createdb.sql'
+        filename = os.path.dirname(__file__) + '/sqlite_mem_sql/createdb.sql'
         with open(filename, 'r', encoding='utf8') as f:
             self.cursor.executescript(f.read())
 
