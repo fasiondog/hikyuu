@@ -47,7 +47,7 @@ packages = [
     'hikyuu/data',
     'hikyuu/data/mysql_upgrade',
     'hikyuu/data/sqlite_upgrade',
-    'hikyuu/data/sqlite_mem',
+    'hikyuu/data/sqlite_mem_sql',
     'hikyuu/data_driver',
     'hikyuu/examples',
     'hikyuu/flat',
@@ -135,6 +135,7 @@ setup(
         'pyperclip',
         'requests',
         'qdarkstyle',
-        'flatbuffers'
+        'flatbuffers',
+        'pynng'
     ],
 )
