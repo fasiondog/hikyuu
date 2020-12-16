@@ -154,7 +154,7 @@ def run(use_proxy, source):
             records = get_spot_parallel(stk_list, source, use_proxy, batch_func)
             print(len(records))
             #pub_sock.send(date.encode())
-            time.sleep(3)
+            time.sleep(5)
     except KeyboardInterrupt:
         exit(1)
 

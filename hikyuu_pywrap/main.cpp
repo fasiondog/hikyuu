@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <boost/python.hpp>
 #include <hikyuu/hikyuu.h>
+#include <hikyuu/realtime/receive.h>
 
 namespace py = boost::python;
 using namespace hku;
@@ -152,4 +153,6 @@ BOOST_PYTHON_MODULE(core) {
     :param Query query: 查询条件
     :return: 满足查询条件的K线数据
     :rtype: KData)");
+
+    py::def("start_receive", start_receive);
 }

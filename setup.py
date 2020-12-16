@@ -201,9 +201,11 @@ def start_build(verbose=False, mode='release'):
         clear_with_python_changed(mode)
         print('\ncompile boost ...')
         build_boost(mode)
-        os.system("xmake f -c -y -m {}".format(mode))
+        os.system("xmake f {} -c -y -m {}".format("-v -D" if verbose else "",
+                                                  mode))
     else:
-        os.system("xmake f -y -m {}".format(mode))
+        os.system("xmake f {} -y -m {}".format("-v -D" if verbose else "",
+                                               mode))
 
     os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
     if mode == "release":

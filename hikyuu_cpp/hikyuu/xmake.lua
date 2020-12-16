@@ -5,7 +5,7 @@ target("hikyuu")
         set_kind("shared")
     end
     
-    add_packages("fmt", "spdlog")
+    add_packages("fmt", "spdlog", "flatbuffers", "nng")
 
     add_includedirs("..")
 
@@ -59,6 +59,11 @@ target("hikyuu")
         add_linkdirs("/usr/local/opt/hdf5/lib")
         add_includedirs("/usr/local/opt/mysql-client/include")
         add_linkdirs("/usr/local/opt/mysql-client/lib")
+    end
+
+    if is_plat("windows") then 
+        -- nng 静态链接需要的系统库
+        add_syslinks("ws2_32", "advapi32")
     end
 
     if is_plat("linux") or is_plat("macosx") then
