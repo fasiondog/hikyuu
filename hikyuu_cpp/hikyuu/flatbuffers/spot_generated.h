@@ -62,86 +62,86 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *datetime() const {
     return GetPointer<const flatbuffers::String *>(VT_DATETIME);
   }
-  float yesterday_close() const {
-    return GetField<float>(VT_YESTERDAY_CLOSE, 0.0f);
+  double yesterday_close() const {
+    return GetField<double>(VT_YESTERDAY_CLOSE, 0.0);
   }
-  float open() const {
-    return GetField<float>(VT_OPEN, 0.0f);
+  double open() const {
+    return GetField<double>(VT_OPEN, 0.0);
   }
-  float high() const {
-    return GetField<float>(VT_HIGH, 0.0f);
+  double high() const {
+    return GetField<double>(VT_HIGH, 0.0);
   }
-  float low() const {
-    return GetField<float>(VT_LOW, 0.0f);
+  double low() const {
+    return GetField<double>(VT_LOW, 0.0);
   }
-  float close() const {
-    return GetField<float>(VT_CLOSE, 0.0f);
+  double close() const {
+    return GetField<double>(VT_CLOSE, 0.0);
   }
-  float amount() const {
-    return GetField<float>(VT_AMOUNT, 0.0f);
+  double amount() const {
+    return GetField<double>(VT_AMOUNT, 0.0);
   }
-  float volumn() const {
-    return GetField<float>(VT_VOLUMN, 0.0f);
+  double volumn() const {
+    return GetField<double>(VT_VOLUMN, 0.0);
   }
-  float bid1() const {
-    return GetField<float>(VT_BID1, 0.0f);
+  double bid1() const {
+    return GetField<double>(VT_BID1, 0.0);
   }
-  float bid1_amount() const {
-    return GetField<float>(VT_BID1_AMOUNT, 0.0f);
+  double bid1_amount() const {
+    return GetField<double>(VT_BID1_AMOUNT, 0.0);
   }
-  float bid2() const {
-    return GetField<float>(VT_BID2, 0.0f);
+  double bid2() const {
+    return GetField<double>(VT_BID2, 0.0);
   }
-  float bid2_amount() const {
-    return GetField<float>(VT_BID2_AMOUNT, 0.0f);
+  double bid2_amount() const {
+    return GetField<double>(VT_BID2_AMOUNT, 0.0);
   }
-  float bid3() const {
-    return GetField<float>(VT_BID3, 0.0f);
+  double bid3() const {
+    return GetField<double>(VT_BID3, 0.0);
   }
-  float bid3_amount() const {
-    return GetField<float>(VT_BID3_AMOUNT, 0.0f);
+  double bid3_amount() const {
+    return GetField<double>(VT_BID3_AMOUNT, 0.0);
   }
-  float bid4() const {
-    return GetField<float>(VT_BID4, 0.0f);
+  double bid4() const {
+    return GetField<double>(VT_BID4, 0.0);
   }
-  float bid4_amount() const {
-    return GetField<float>(VT_BID4_AMOUNT, 0.0f);
+  double bid4_amount() const {
+    return GetField<double>(VT_BID4_AMOUNT, 0.0);
   }
-  float bid5() const {
-    return GetField<float>(VT_BID5, 0.0f);
+  double bid5() const {
+    return GetField<double>(VT_BID5, 0.0);
   }
-  float bid5_amount() const {
-    return GetField<float>(VT_BID5_AMOUNT, 0.0f);
+  double bid5_amount() const {
+    return GetField<double>(VT_BID5_AMOUNT, 0.0);
   }
-  float ask1() const {
-    return GetField<float>(VT_ASK1, 0.0f);
+  double ask1() const {
+    return GetField<double>(VT_ASK1, 0.0);
   }
-  float ask1_amount() const {
-    return GetField<float>(VT_ASK1_AMOUNT, 0.0f);
+  double ask1_amount() const {
+    return GetField<double>(VT_ASK1_AMOUNT, 0.0);
   }
-  float ask2() const {
-    return GetField<float>(VT_ASK2, 0.0f);
+  double ask2() const {
+    return GetField<double>(VT_ASK2, 0.0);
   }
-  float ask2_amount() const {
-    return GetField<float>(VT_ASK2_AMOUNT, 0.0f);
+  double ask2_amount() const {
+    return GetField<double>(VT_ASK2_AMOUNT, 0.0);
   }
-  float ask3() const {
-    return GetField<float>(VT_ASK3, 0.0f);
+  double ask3() const {
+    return GetField<double>(VT_ASK3, 0.0);
   }
-  float ask3_amount() const {
-    return GetField<float>(VT_ASK3_AMOUNT, 0.0f);
+  double ask3_amount() const {
+    return GetField<double>(VT_ASK3_AMOUNT, 0.0);
   }
-  float ask4() const {
-    return GetField<float>(VT_ASK4, 0.0f);
+  double ask4() const {
+    return GetField<double>(VT_ASK4, 0.0);
   }
-  float ask4_amount() const {
-    return GetField<float>(VT_ASK4_AMOUNT, 0.0f);
+  double ask4_amount() const {
+    return GetField<double>(VT_ASK4_AMOUNT, 0.0);
   }
-  float ask5() const {
-    return GetField<float>(VT_ASK5, 0.0f);
+  double ask5() const {
+    return GetField<double>(VT_ASK5, 0.0);
   }
-  float ask5_amount() const {
-    return GetField<float>(VT_ASK5_AMOUNT, 0.0f);
+  double ask5_amount() const {
+    return GetField<double>(VT_ASK5_AMOUNT, 0.0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -153,33 +153,33 @@ struct Spot FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyString(name()) &&
            VerifyOffset(verifier, VT_DATETIME) &&
            verifier.VerifyString(datetime()) &&
-           VerifyField<float>(verifier, VT_YESTERDAY_CLOSE) &&
-           VerifyField<float>(verifier, VT_OPEN) &&
-           VerifyField<float>(verifier, VT_HIGH) &&
-           VerifyField<float>(verifier, VT_LOW) &&
-           VerifyField<float>(verifier, VT_CLOSE) &&
-           VerifyField<float>(verifier, VT_AMOUNT) &&
-           VerifyField<float>(verifier, VT_VOLUMN) &&
-           VerifyField<float>(verifier, VT_BID1) &&
-           VerifyField<float>(verifier, VT_BID1_AMOUNT) &&
-           VerifyField<float>(verifier, VT_BID2) &&
-           VerifyField<float>(verifier, VT_BID2_AMOUNT) &&
-           VerifyField<float>(verifier, VT_BID3) &&
-           VerifyField<float>(verifier, VT_BID3_AMOUNT) &&
-           VerifyField<float>(verifier, VT_BID4) &&
-           VerifyField<float>(verifier, VT_BID4_AMOUNT) &&
-           VerifyField<float>(verifier, VT_BID5) &&
-           VerifyField<float>(verifier, VT_BID5_AMOUNT) &&
-           VerifyField<float>(verifier, VT_ASK1) &&
-           VerifyField<float>(verifier, VT_ASK1_AMOUNT) &&
-           VerifyField<float>(verifier, VT_ASK2) &&
-           VerifyField<float>(verifier, VT_ASK2_AMOUNT) &&
-           VerifyField<float>(verifier, VT_ASK3) &&
-           VerifyField<float>(verifier, VT_ASK3_AMOUNT) &&
-           VerifyField<float>(verifier, VT_ASK4) &&
-           VerifyField<float>(verifier, VT_ASK4_AMOUNT) &&
-           VerifyField<float>(verifier, VT_ASK5) &&
-           VerifyField<float>(verifier, VT_ASK5_AMOUNT) &&
+           VerifyField<double>(verifier, VT_YESTERDAY_CLOSE) &&
+           VerifyField<double>(verifier, VT_OPEN) &&
+           VerifyField<double>(verifier, VT_HIGH) &&
+           VerifyField<double>(verifier, VT_LOW) &&
+           VerifyField<double>(verifier, VT_CLOSE) &&
+           VerifyField<double>(verifier, VT_AMOUNT) &&
+           VerifyField<double>(verifier, VT_VOLUMN) &&
+           VerifyField<double>(verifier, VT_BID1) &&
+           VerifyField<double>(verifier, VT_BID1_AMOUNT) &&
+           VerifyField<double>(verifier, VT_BID2) &&
+           VerifyField<double>(verifier, VT_BID2_AMOUNT) &&
+           VerifyField<double>(verifier, VT_BID3) &&
+           VerifyField<double>(verifier, VT_BID3_AMOUNT) &&
+           VerifyField<double>(verifier, VT_BID4) &&
+           VerifyField<double>(verifier, VT_BID4_AMOUNT) &&
+           VerifyField<double>(verifier, VT_BID5) &&
+           VerifyField<double>(verifier, VT_BID5_AMOUNT) &&
+           VerifyField<double>(verifier, VT_ASK1) &&
+           VerifyField<double>(verifier, VT_ASK1_AMOUNT) &&
+           VerifyField<double>(verifier, VT_ASK2) &&
+           VerifyField<double>(verifier, VT_ASK2_AMOUNT) &&
+           VerifyField<double>(verifier, VT_ASK3) &&
+           VerifyField<double>(verifier, VT_ASK3_AMOUNT) &&
+           VerifyField<double>(verifier, VT_ASK4) &&
+           VerifyField<double>(verifier, VT_ASK4_AMOUNT) &&
+           VerifyField<double>(verifier, VT_ASK5) &&
+           VerifyField<double>(verifier, VT_ASK5_AMOUNT) &&
            verifier.EndTable();
   }
 };
@@ -200,86 +200,86 @@ struct SpotBuilder {
   void add_datetime(flatbuffers::Offset<flatbuffers::String> datetime) {
     fbb_.AddOffset(Spot::VT_DATETIME, datetime);
   }
-  void add_yesterday_close(float yesterday_close) {
-    fbb_.AddElement<float>(Spot::VT_YESTERDAY_CLOSE, yesterday_close, 0.0f);
+  void add_yesterday_close(double yesterday_close) {
+    fbb_.AddElement<double>(Spot::VT_YESTERDAY_CLOSE, yesterday_close, 0.0);
   }
-  void add_open(float open) {
-    fbb_.AddElement<float>(Spot::VT_OPEN, open, 0.0f);
+  void add_open(double open) {
+    fbb_.AddElement<double>(Spot::VT_OPEN, open, 0.0);
   }
-  void add_high(float high) {
-    fbb_.AddElement<float>(Spot::VT_HIGH, high, 0.0f);
+  void add_high(double high) {
+    fbb_.AddElement<double>(Spot::VT_HIGH, high, 0.0);
   }
-  void add_low(float low) {
-    fbb_.AddElement<float>(Spot::VT_LOW, low, 0.0f);
+  void add_low(double low) {
+    fbb_.AddElement<double>(Spot::VT_LOW, low, 0.0);
   }
-  void add_close(float close) {
-    fbb_.AddElement<float>(Spot::VT_CLOSE, close, 0.0f);
+  void add_close(double close) {
+    fbb_.AddElement<double>(Spot::VT_CLOSE, close, 0.0);
   }
-  void add_amount(float amount) {
-    fbb_.AddElement<float>(Spot::VT_AMOUNT, amount, 0.0f);
+  void add_amount(double amount) {
+    fbb_.AddElement<double>(Spot::VT_AMOUNT, amount, 0.0);
   }
-  void add_volumn(float volumn) {
-    fbb_.AddElement<float>(Spot::VT_VOLUMN, volumn, 0.0f);
+  void add_volumn(double volumn) {
+    fbb_.AddElement<double>(Spot::VT_VOLUMN, volumn, 0.0);
   }
-  void add_bid1(float bid1) {
-    fbb_.AddElement<float>(Spot::VT_BID1, bid1, 0.0f);
+  void add_bid1(double bid1) {
+    fbb_.AddElement<double>(Spot::VT_BID1, bid1, 0.0);
   }
-  void add_bid1_amount(float bid1_amount) {
-    fbb_.AddElement<float>(Spot::VT_BID1_AMOUNT, bid1_amount, 0.0f);
+  void add_bid1_amount(double bid1_amount) {
+    fbb_.AddElement<double>(Spot::VT_BID1_AMOUNT, bid1_amount, 0.0);
   }
-  void add_bid2(float bid2) {
-    fbb_.AddElement<float>(Spot::VT_BID2, bid2, 0.0f);
+  void add_bid2(double bid2) {
+    fbb_.AddElement<double>(Spot::VT_BID2, bid2, 0.0);
   }
-  void add_bid2_amount(float bid2_amount) {
-    fbb_.AddElement<float>(Spot::VT_BID2_AMOUNT, bid2_amount, 0.0f);
+  void add_bid2_amount(double bid2_amount) {
+    fbb_.AddElement<double>(Spot::VT_BID2_AMOUNT, bid2_amount, 0.0);
   }
-  void add_bid3(float bid3) {
-    fbb_.AddElement<float>(Spot::VT_BID3, bid3, 0.0f);
+  void add_bid3(double bid3) {
+    fbb_.AddElement<double>(Spot::VT_BID3, bid3, 0.0);
   }
-  void add_bid3_amount(float bid3_amount) {
-    fbb_.AddElement<float>(Spot::VT_BID3_AMOUNT, bid3_amount, 0.0f);
+  void add_bid3_amount(double bid3_amount) {
+    fbb_.AddElement<double>(Spot::VT_BID3_AMOUNT, bid3_amount, 0.0);
   }
-  void add_bid4(float bid4) {
-    fbb_.AddElement<float>(Spot::VT_BID4, bid4, 0.0f);
+  void add_bid4(double bid4) {
+    fbb_.AddElement<double>(Spot::VT_BID4, bid4, 0.0);
   }
-  void add_bid4_amount(float bid4_amount) {
-    fbb_.AddElement<float>(Spot::VT_BID4_AMOUNT, bid4_amount, 0.0f);
+  void add_bid4_amount(double bid4_amount) {
+    fbb_.AddElement<double>(Spot::VT_BID4_AMOUNT, bid4_amount, 0.0);
   }
-  void add_bid5(float bid5) {
-    fbb_.AddElement<float>(Spot::VT_BID5, bid5, 0.0f);
+  void add_bid5(double bid5) {
+    fbb_.AddElement<double>(Spot::VT_BID5, bid5, 0.0);
   }
-  void add_bid5_amount(float bid5_amount) {
-    fbb_.AddElement<float>(Spot::VT_BID5_AMOUNT, bid5_amount, 0.0f);
+  void add_bid5_amount(double bid5_amount) {
+    fbb_.AddElement<double>(Spot::VT_BID5_AMOUNT, bid5_amount, 0.0);
   }
-  void add_ask1(float ask1) {
-    fbb_.AddElement<float>(Spot::VT_ASK1, ask1, 0.0f);
+  void add_ask1(double ask1) {
+    fbb_.AddElement<double>(Spot::VT_ASK1, ask1, 0.0);
   }
-  void add_ask1_amount(float ask1_amount) {
-    fbb_.AddElement<float>(Spot::VT_ASK1_AMOUNT, ask1_amount, 0.0f);
+  void add_ask1_amount(double ask1_amount) {
+    fbb_.AddElement<double>(Spot::VT_ASK1_AMOUNT, ask1_amount, 0.0);
   }
-  void add_ask2(float ask2) {
-    fbb_.AddElement<float>(Spot::VT_ASK2, ask2, 0.0f);
+  void add_ask2(double ask2) {
+    fbb_.AddElement<double>(Spot::VT_ASK2, ask2, 0.0);
   }
-  void add_ask2_amount(float ask2_amount) {
-    fbb_.AddElement<float>(Spot::VT_ASK2_AMOUNT, ask2_amount, 0.0f);
+  void add_ask2_amount(double ask2_amount) {
+    fbb_.AddElement<double>(Spot::VT_ASK2_AMOUNT, ask2_amount, 0.0);
   }
-  void add_ask3(float ask3) {
-    fbb_.AddElement<float>(Spot::VT_ASK3, ask3, 0.0f);
+  void add_ask3(double ask3) {
+    fbb_.AddElement<double>(Spot::VT_ASK3, ask3, 0.0);
   }
-  void add_ask3_amount(float ask3_amount) {
-    fbb_.AddElement<float>(Spot::VT_ASK3_AMOUNT, ask3_amount, 0.0f);
+  void add_ask3_amount(double ask3_amount) {
+    fbb_.AddElement<double>(Spot::VT_ASK3_AMOUNT, ask3_amount, 0.0);
   }
-  void add_ask4(float ask4) {
-    fbb_.AddElement<float>(Spot::VT_ASK4, ask4, 0.0f);
+  void add_ask4(double ask4) {
+    fbb_.AddElement<double>(Spot::VT_ASK4, ask4, 0.0);
   }
-  void add_ask4_amount(float ask4_amount) {
-    fbb_.AddElement<float>(Spot::VT_ASK4_AMOUNT, ask4_amount, 0.0f);
+  void add_ask4_amount(double ask4_amount) {
+    fbb_.AddElement<double>(Spot::VT_ASK4_AMOUNT, ask4_amount, 0.0);
   }
-  void add_ask5(float ask5) {
-    fbb_.AddElement<float>(Spot::VT_ASK5, ask5, 0.0f);
+  void add_ask5(double ask5) {
+    fbb_.AddElement<double>(Spot::VT_ASK5, ask5, 0.0);
   }
-  void add_ask5_amount(float ask5_amount) {
-    fbb_.AddElement<float>(Spot::VT_ASK5_AMOUNT, ask5_amount, 0.0f);
+  void add_ask5_amount(double ask5_amount) {
+    fbb_.AddElement<double>(Spot::VT_ASK5_AMOUNT, ask5_amount, 0.0);
   }
   explicit SpotBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -299,33 +299,33 @@ inline flatbuffers::Offset<Spot> CreateSpot(
     flatbuffers::Offset<flatbuffers::String> code = 0,
     flatbuffers::Offset<flatbuffers::String> name = 0,
     flatbuffers::Offset<flatbuffers::String> datetime = 0,
-    float yesterday_close = 0.0f,
-    float open = 0.0f,
-    float high = 0.0f,
-    float low = 0.0f,
-    float close = 0.0f,
-    float amount = 0.0f,
-    float volumn = 0.0f,
-    float bid1 = 0.0f,
-    float bid1_amount = 0.0f,
-    float bid2 = 0.0f,
-    float bid2_amount = 0.0f,
-    float bid3 = 0.0f,
-    float bid3_amount = 0.0f,
-    float bid4 = 0.0f,
-    float bid4_amount = 0.0f,
-    float bid5 = 0.0f,
-    float bid5_amount = 0.0f,
-    float ask1 = 0.0f,
-    float ask1_amount = 0.0f,
-    float ask2 = 0.0f,
-    float ask2_amount = 0.0f,
-    float ask3 = 0.0f,
-    float ask3_amount = 0.0f,
-    float ask4 = 0.0f,
-    float ask4_amount = 0.0f,
-    float ask5 = 0.0f,
-    float ask5_amount = 0.0f) {
+    double yesterday_close = 0.0,
+    double open = 0.0,
+    double high = 0.0,
+    double low = 0.0,
+    double close = 0.0,
+    double amount = 0.0,
+    double volumn = 0.0,
+    double bid1 = 0.0,
+    double bid1_amount = 0.0,
+    double bid2 = 0.0,
+    double bid2_amount = 0.0,
+    double bid3 = 0.0,
+    double bid3_amount = 0.0,
+    double bid4 = 0.0,
+    double bid4_amount = 0.0,
+    double bid5 = 0.0,
+    double bid5_amount = 0.0,
+    double ask1 = 0.0,
+    double ask1_amount = 0.0,
+    double ask2 = 0.0,
+    double ask2_amount = 0.0,
+    double ask3 = 0.0,
+    double ask3_amount = 0.0,
+    double ask4 = 0.0,
+    double ask4_amount = 0.0,
+    double ask5 = 0.0,
+    double ask5_amount = 0.0) {
   SpotBuilder builder_(_fbb);
   builder_.add_ask5_amount(ask5_amount);
   builder_.add_ask5(ask5);
@@ -367,33 +367,33 @@ inline flatbuffers::Offset<Spot> CreateSpotDirect(
     const char *code = nullptr,
     const char *name = nullptr,
     const char *datetime = nullptr,
-    float yesterday_close = 0.0f,
-    float open = 0.0f,
-    float high = 0.0f,
-    float low = 0.0f,
-    float close = 0.0f,
-    float amount = 0.0f,
-    float volumn = 0.0f,
-    float bid1 = 0.0f,
-    float bid1_amount = 0.0f,
-    float bid2 = 0.0f,
-    float bid2_amount = 0.0f,
-    float bid3 = 0.0f,
-    float bid3_amount = 0.0f,
-    float bid4 = 0.0f,
-    float bid4_amount = 0.0f,
-    float bid5 = 0.0f,
-    float bid5_amount = 0.0f,
-    float ask1 = 0.0f,
-    float ask1_amount = 0.0f,
-    float ask2 = 0.0f,
-    float ask2_amount = 0.0f,
-    float ask3 = 0.0f,
-    float ask3_amount = 0.0f,
-    float ask4 = 0.0f,
-    float ask4_amount = 0.0f,
-    float ask5 = 0.0f,
-    float ask5_amount = 0.0f) {
+    double yesterday_close = 0.0,
+    double open = 0.0,
+    double high = 0.0,
+    double low = 0.0,
+    double close = 0.0,
+    double amount = 0.0,
+    double volumn = 0.0,
+    double bid1 = 0.0,
+    double bid1_amount = 0.0,
+    double bid2 = 0.0,
+    double bid2_amount = 0.0,
+    double bid3 = 0.0,
+    double bid3_amount = 0.0,
+    double bid4 = 0.0,
+    double bid4_amount = 0.0,
+    double bid5 = 0.0,
+    double bid5_amount = 0.0,
+    double ask1 = 0.0,
+    double ask1_amount = 0.0,
+    double ask2 = 0.0,
+    double ask2_amount = 0.0,
+    double ask3 = 0.0,
+    double ask3_amount = 0.0,
+    double ask4 = 0.0,
+    double ask4_amount = 0.0,
+    double ask5 = 0.0,
+    double ask5_amount = 0.0) {
   auto market__ = market ? _fbb.CreateString(market) : 0;
   auto code__ = code ? _fbb.CreateString(code) : 0;
   auto name__ = name ? _fbb.CreateString(name) : 0;

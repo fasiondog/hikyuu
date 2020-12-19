@@ -143,8 +143,10 @@ def run(use_proxy, source):
     ]
 
     def batch_func(records):
+        spot = bytearray(b'spot')
         buf = create_fb_spot(records)
-        pub_sock.send(bytes(buf))
+        spot.extend(buf)
+        pub_sock.send(bytes(spot))
 
     address = "ipc:///tmp/hikyuu_real_pub.ipc"
     pub_sock = pynng.Pub0()

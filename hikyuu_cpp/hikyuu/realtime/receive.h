@@ -11,8 +11,6 @@
 
 namespace hku {
 
-void receive_data(const void *buf);
-
 void HKU_API start_receive();
 
 }  // namespace hku

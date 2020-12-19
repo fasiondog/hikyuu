@@ -38,12 +38,15 @@ void export_StockManager() {
     获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定)")
 
       .def("get_base_info_parameter", &StockManager::getBaseInfoDriverParameter,
-           "获取当前基础信息驱动参数")
+           return_value_policy<copy_const_reference>(), "获取当前基础信息驱动参数")
       .def("get_block_parameter", &StockManager::getBlockDriverParameter,
-           "获取当前板块信息驱动参数")
-      .def("get_kdata_parameter", &StockManager::getKDataDriverParameter, "获取当前K线数据驱动参数")
-      .def("get_preload_parameter", &StockManager::getPreloadParameter, "获取当前预加载参数")
-      .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter, "获取当前其他参数")
+           return_value_policy<copy_const_reference>(), "获取当前板块信息驱动参数")
+      .def("get_kdata_parameter", &StockManager::getKDataDriverParameter,
+           return_value_policy<copy_const_reference>(), "获取当前K线数据驱动参数")
+      .def("get_preload_parameter", &StockManager::getPreloadParameter,
+           return_value_policy<copy_const_reference>(), "获取当前预加载参数")
+      .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter,
+           return_value_policy<copy_const_reference>(), "获取当前其他参数")
 
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 

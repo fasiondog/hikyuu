@@ -47,19 +47,19 @@ public:
     static void quit();
 
     /** 获取基础信息驱动参数 */
-    Parameter getBaseInfoDriverParameter() const;
+    const Parameter& getBaseInfoDriverParameter() const;
 
     /** 获取板块驱动参数 */
-    Parameter getBlockDriverParameter() const;
+    const Parameter& getBlockDriverParameter() const;
 
     /** 获取 K 线数据驱动参数 */
-    Parameter getKDataDriverParameter() const;
+    const Parameter& getKDataDriverParameter() const;
 
     /** 获取预加载参数 */
-    Parameter getPreloadParameter() const;
+    const Parameter& getPreloadParameter() const;
 
     /** 获取其他参数 */
-    Parameter getHikyuuParameter() const;
+    const Parameter& getHikyuuParameter() const;
 
     /** 获取基础信息驱动 */
     BaseInfoDriverPtr getBaseInfoDriver() const;
@@ -218,23 +218,23 @@ inline Stock StockManager::operator[](const string& query) const {
     return getStock(query);
 }
 
-inline Parameter StockManager::getBaseInfoDriverParameter() const {
+inline const Parameter& StockManager::getBaseInfoDriverParameter() const {
     return m_baseInfoDriverParam;
 }
 
-inline Parameter StockManager::getBlockDriverParameter() const {
+inline const Parameter& StockManager::getBlockDriverParameter() const {
     return m_blockDriverParam;
 }
 
-inline Parameter StockManager::getKDataDriverParameter() const {
+inline const Parameter& StockManager::getKDataDriverParameter() const {
     return m_kdataDriverParam;
 }
 
-inline Parameter StockManager::getPreloadParameter() const {
+inline const Parameter& StockManager::getPreloadParameter() const {
     return m_preloadParam;
 }
 
-inline Parameter StockManager::getHikyuuParameter() const {
+inline const Parameter& StockManager::getHikyuuParameter() const {
     return m_hikyuuParam;
 }
 

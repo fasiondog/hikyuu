@@ -16,6 +16,7 @@ target("demo")
 
     if is_plat("windows") then
         add_cxflags("-wd4267")
+        add_cxflags("-wd4251")
     end
 
     if is_plat("windows") and is_mode("release") then

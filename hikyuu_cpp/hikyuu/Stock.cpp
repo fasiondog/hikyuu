@@ -659,16 +659,26 @@ PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     return result;
 }
 
-void Stock::realtimeUpdate(const KRecord& record, KQuery::KType inktype) {
+void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     string ktype(inktype);
-    to_lower(ktype);
-    if (!m_data || m_data->pKData.find(ktype) == m_data->pKData.end() ||
-        record.datetime == Null<Datetime>()) {
+    to_upper(ktype);
+    if (!m_data || m_data->pKData.find(ktype) == m_data->pKData.end() || record.datetime.isNull()) {
         return;
     }
 
     // 加写锁
     std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+
+    // 根据 K线类型校正输入日期
+    Datetime date = record.datetime;
+    if (KQuery::DAY == ktype) {
+        record.datetime = Datetime(date.year(), date.month(), date.day());
+    } else if (KQuery::MIN == ktype) {
+        record.datetime =
+          Datetime(date.year(), date.month(), date.day(), date.hour(), date.minute());
+    } else {
+        HKU_WARN("This type {} does not support real-time update!", ktype);
+    }
 
     if (m_data->pKData[ktype]->empty()) {
         m_data->pKData[ktype]->push_back(record);
