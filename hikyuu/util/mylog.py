@@ -99,52 +99,62 @@ def hku_fatal(msg, logger=None):
         hku_logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
 
 
-def hku_debug_if(exp, msg, logger=None):
+def hku_debug_if(exp, msg, logger=None, callback=None):
     if exp:
         st = traceback.extract_stack()[-2]
         if logger:
             logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
         else:
             hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        if callback:
+            callback()
 
 
 hku_trace_if = hku_debug_if
 
 
-def hku_info_if(exp, msg, logger=None):
+def hku_info_if(exp, msg, logger=None, callback=None):
     if exp:
         st = traceback.extract_stack()[-2]
         if logger:
             logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
         else:
             hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        if callback:
+            callback()
 
 
-def hku_warn_if(exp, msg, logger=None):
+def hku_warn_if(exp, msg, logger=None, callback=None):
     if exp:
         st = traceback.extract_stack()[-2]
         if logger:
             logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
         else:
             hku_logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        if callback:
+            callback()
 
 
-def hku_error_if(exp, msg, logger=None):
+def hku_error_if(exp, msg, logger=None, callback=None):
     if exp:
         st = traceback.extract_stack()[-2]
         if logger:
             logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
         else:
             hku_logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        if callback:
+            callback()
 
 
-def hku_fatal_if(exp, msg, logger=None):
+def hku_fatal_if(exp, msg, logger=None, callback=None):
     if exp:
         st = traceback.extract_stack()[-2]
         if logger:
             logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
         else:
             hku_logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        if callback:
+            callback()
 
 
 # 跟踪函数运行
