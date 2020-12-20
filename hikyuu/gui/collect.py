@@ -18,7 +18,7 @@ import hikyuu.flat as fb
 
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot_parallel
-from hikyuu import hikyuu_init, StockManager, constant
+from hikyuu import hikyuu_init, StockManager, constant, Datetime, TimeDelta
 
 
 def create_fb_spot_record(builder, record):
@@ -123,10 +123,86 @@ def print_spot_list(buf):
         print_spot(spot_list.Spot(i))
 
 
+@hku_catch()
+def parse_phase(phase):
+    return [
+        TimeDelta(hours=int(a[0]), minutes=int(a[1]))
+        for a in [x.split(':') for x in phase.split('-')]
+    ]
+
+
+def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend):
+    interval_delta = TimeDelta(seconds=interval)
+    phase1_start_delta, phase1_end_delta = phase1_delta
+    phase2_start_delta, phase2_end_delta = phase2_delta
+    today = Datetime.today()
+    phase1_start, phase1_end = today + phase1_start_delta, today + phase1_end_delta
+    phase2_start, phase2_end = today + phase2_start_delta, today + phase2_end_delta
+
+    current_time = Datetime.now()
+    maybe_time = current_time + interval_delta
+    if phase1_start_delta == phase1_end_delta and phase2_start_delta == phase2_end_delta:
+        # 两个时间周期各自的起止时间相等，则认为未做限制
+        delta = interval_delta - (current_time - start_time)
+    elif maybe_time > phase2_end:
+        # 如果预计的下一次时间大于周期2的结束日期, 则取下一日的周期1起始时间计算
+        next_time = today + TimeDelta(1) + phase1_start_delta
+        if ignore_weekend and next_time.day_of_week() in (0, 6):
+            next_time = today.next_week() + phase1_start_delta
+        delta = next_time - start_time
+    elif maybe_time in (phase1_start, phase1_end, phase2_start, phase2_end):
+        # 如果下一次时间刚好等于时间周期的起止点，则直接返回预计的时间间隔
+        delta = interval_delta
+    elif start_time < phase1_start and phase1_start < maybe_time < phase1_end:
+        # 如果本次的时间小于周期1的起始时间且预计下一次的时间在phase1内，则取phase1起始时间计算
+        delta = phase1_start - start_time
+    elif phase1_end < maybe_time < phase2_start:
+        delta = phase2_start - start_time
+    else:
+        delta = interval_delta - (current_time - start_time)
+    return delta
+
+
 @click.command()
 @click.option('-use_proxy', '--use_proxy', is_flag=True, help='是否使用代理，须自行申请芝麻http代理并加入ip白名单')
 @click.option('-source', '--source', default='sina', type=click.Choice(['sina', 'qq']), help='数据来源')
-def run(use_proxy, source):
+@click.option('-seconds', '--seconds', default=60)
+@click.option('-phase1', '--phase1', default='9:00-10:00')
+@click.option('-phase2', '--phase2', default='13:00-15:30')
+@click.option('-ignore_weekend', '--ignore_weekend', is_flag=True)
+def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
+    phase1_delta = parse_phase(phase1)
+    hku_error_if(
+        phase1_delta is None or len(phase1_delta) != 2,
+        "无效参数 phase1: {}".format(phase1),
+        callback=lambda: exit(1)
+    )
+    hku_error_if(
+        phase1_delta[0] > phase1_delta[1],
+        "无效参数 phase1: {}, 结束时间应大于等于起始时间".format(phase1),
+        callback=lambda: exit(1)
+    )
+
+    phase2_delta = parse_phase(phase2)
+    hku_error_if(
+        phase2_delta is None or len(phase2_delta) != 2,
+        "无效参数 phase2: {}".format(phase2),
+        callback=lambda: exit(1)
+    )
+    hku_error_if(
+        phase2_delta[0] > phase2_delta[1],
+        "无效参数 phase2: {}, 结束时间应大于等于起始时间".format(phase2),
+        callback=lambda: exit(1)
+    )
+    hku_error_if(
+        phase1_delta[1] > phase2_delta[0],
+        "无效参数 phase1: {}, phase2: {}, phase2 起始时间应大于等于 phase1 结束时间".format(phase1, phase2),
+        callback=lambda: exit(1)
+    )
+
+    hku_logger.info("采集时间段1：{}".format(phase1))
+    hku_logger.info("采集时间段2：{}".format(phase2))
+
     config_file = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
     if not os.path.exists(config_file):
         print("未找到配置文件，请先运行 HikyuuTDX 进行配置与数据导入")
@@ -151,11 +227,30 @@ def run(use_proxy, source):
     address = "ipc:///tmp/hikyuu_real_pub.ipc"
     pub_sock = pynng.Pub0()
     pub_sock.listen(address)
+
+    today = Datetime.today()
+    phase1_time = [today + x for x in phase1_delta]
+    phase2_time = [today + x for x in phase2_delta]
+    start_time = Datetime.now()
+    if not (
+        phase1_time[0] <= start_time <= phase1_time[1]
+        or phase2_time[0] <= start_time <= phase2_time[1]
+    ):
+        delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
+        next_time = start_time + delta
+        hku_info("启动采集时间：{}".format(next_time))
+        time.sleep(delta.total_seconds())
     try:
         while True:
+            start_time = Datetime.now()
             records = get_spot_parallel(stk_list, source, use_proxy, batch_func)
-            print(len(records))
-            time.sleep(10)
+            hku_info(
+                "{}:{}:{} 采集数量: {}".format(
+                    start_time.hour, start_time.minute, start_time.second, len(records)
+                )
+            )
+            delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
+            time.sleep(delta.total_seconds())
     except KeyboardInterrupt:
         exit(1)
 
