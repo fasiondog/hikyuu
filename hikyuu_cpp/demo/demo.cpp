@@ -2,7 +2,7 @@
 //
 
 #include <hikyuu/hikyuu.h>
-#include <hikyuu/realtime/receive.h>
+//#include <hikyuu/realtime/receive.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     }
 
-    start_receive();
+    // start_receive();
 
     return 0;
 }

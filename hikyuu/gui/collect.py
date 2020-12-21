@@ -240,9 +240,10 @@ def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
         next_time = start_time + delta
         hku_info("启动采集时间：{}".format(next_time))
         time.sleep(delta.total_seconds())
-    try:
-        while True:
+    while True:
+        try:
             start_time = Datetime.now()
+            #pub_sock.send(b'[start spot]')
             records = get_spot_parallel(stk_list, source, use_proxy, batch_func)
             hku_info(
                 "{}:{}:{} 采集数量: {}".format(
@@ -251,9 +252,14 @@ def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
             )
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
             time.sleep(delta.total_seconds())
-    except KeyboardInterrupt:
-        exit(1)
+            #pub_sock.send(b'[end spot]')
+        except Exception as e:
+            hku_error(e)
+            time.sleep(10)
 
 
 if __name__ == '__main__':
-    run()
+    try:
+        run()
+    except KeyboardInterrupt:
+        exit(1)

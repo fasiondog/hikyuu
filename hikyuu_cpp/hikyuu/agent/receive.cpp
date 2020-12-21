@@ -11,7 +11,6 @@
 #include "../utilities/util.h"
 #include "../StockManager.h"
 #include "receive.h"
-#include <thread>
 
 using namespace hikyuu::flat;
 
@@ -45,7 +44,6 @@ static void receive_data(const void* buf, size_t buf_len, bool print) {
         KRecord krecord(Datetime(spot->datetime()->str()), spot->open(), spot->high(), spot->low(),
                         spot->close(), spot->amount(), spot->volumn());
         stk.realtimeUpdate(krecord, KQuery::DAY);
-        // HKU_INFO("{} {} {}", market_code_buf.str(), spot->name()->str(), krecord);
     }
 }
 

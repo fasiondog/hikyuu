@@ -5,7 +5,7 @@
  *     Author: fasiondog
  */
 
-#pragma
+#pragma once
 
 #include "../DataType.h"
 
