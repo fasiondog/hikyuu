@@ -166,9 +166,9 @@ def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend)
 @click.command()
 @click.option('-use_proxy', '--use_proxy', is_flag=True, help='是否使用代理，须自行申请芝麻http代理并加入ip白名单')
 @click.option('-source', '--source', default='sina', type=click.Choice(['sina', 'qq']), help='数据来源')
-@click.option('-seconds', '--seconds', default=60)
-@click.option('-phase1', '--phase1', default='9:00-10:00')
-@click.option('-phase2', '--phase2', default='13:00-15:30')
+@click.option('-seconds', '--seconds', default=10)
+@click.option('-phase1', '--phase1', default='9:00-9:00')
+@click.option('-phase2', '--phase2', default='13:00-13:000')
 @click.option('-ignore_weekend', '--ignore_weekend', is_flag=True)
 def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     phase1_delta = parse_phase(phase1)
@@ -243,16 +243,16 @@ def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     while True:
         try:
             start_time = Datetime.now()
-            #pub_sock.send(b'[start spot]')
+            pub_sock.send(b'[start spot]')
             records = get_spot_parallel(stk_list, source, use_proxy, batch_func)
             hku_info(
                 "{}:{}:{} 采集数量: {}".format(
                     start_time.hour, start_time.minute, start_time.second, len(records)
                 )
             )
+            pub_sock.send(b'[end spot]')
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
             time.sleep(delta.total_seconds())
-            #pub_sock.send(b'[end spot]')
         except Exception as e:
             hku_error(e)
             time.sleep(10)

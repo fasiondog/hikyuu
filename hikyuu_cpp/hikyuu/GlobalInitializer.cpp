@@ -18,6 +18,7 @@
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"
+#include "agent/SpotAgent.h"
 #include "debug.h"
 
 namespace hku {
@@ -44,9 +45,11 @@ void GlobalInitializer::init() {
     initLogger();
     DataDriverFactory::init();
     StockManager::instance();
+    SpotAgent::instance();
 }
 
 void GlobalInitializer::clean() {
+    SpotAgent::release();
     StockManager::quit();
     DataDriverFactory::release();
     H5close();

@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#include "../GlobalInitializer.h"
 #include <chrono>
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
@@ -17,11 +18,41 @@ using namespace hikyuu::flat;
 
 namespace hku {
 
+SpotAgent* SpotAgent::ms_spotAgent = nullptr;
 const char* SpotAgent::ms_pubUrl = "ipc:///tmp/hikyuu_real_pub.ipc";
 const char* SpotAgent::ms_startTag = "[start spot]";
 const char* SpotAgent::ms_endTag = "[end spot]";
 const char* SpotAgent::ms_spotTopic = "spot";
-int SpotAgent::ms_spotTopicLength = 4;
+const int SpotAgent::ms_startTagLength = strlen(SpotAgent::ms_startTag);
+const int SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
+const int SpotAgent::ms_spotTopicLength = strlen(SpotAgent::ms_spotTopic);
+
+SpotAgent& SpotAgent::instance() {
+    if (!ms_spotAgent) {
+        ms_spotAgent = new SpotAgent;
+    }
+    return *ms_spotAgent;
+}
+
+void SpotAgent::release() {
+    if (ms_spotAgent) {
+        HKU_INFO("relase spot agent");
+        delete ms_spotAgent;
+        ms_spotAgent = nullptr;
+    }
+}
+
+SpotAgent::~SpotAgent() {
+    if (m_receiveThread.joinable()) {
+        m_stop = true;
+        m_receiveThread.join();
+    }
+}
+
+void HKU_API start_spot_agent() {
+    auto& agent = SpotAgent::instance();
+    agent.start();
+}
 
 void SpotAgent::parseSpotData(const void* buf, size_t buf_len, bool print) {
     // SPEND_TIME(receive_data);
@@ -52,13 +83,6 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len, bool print) {
     }
 }
 
-SpotAgent::~SpotAgent() {
-    if (m_receiveThread.joinable()) {
-        m_stop = true;
-        m_receiveThread.join();
-    }
-}
-
 void SpotAgent::work_thread() {
     nng_socket sock;
 
@@ -71,10 +95,11 @@ void SpotAgent::work_thread() {
     rv = nng_setopt_ms(sock, NNG_OPT_RECVTIMEO, m_revTimeout);
     HKU_ERROR_IF_RETURN(rv != 0, void(), "Failed set receive timeout option!");
 
+    rv = -1;
     while (!m_stop && rv != 0) {
         rv = nng_dial(sock, ms_pubUrl, nullptr, 0);
         HKU_WARN_IF(
-          rv != 0 && rv != NNG_ETIMEDOUT,
+          rv != 0,
           "Faied nng_dial, will retry after 5 seconds! You Maybe need start the collection service "
           "first.");
         std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -86,15 +111,46 @@ void SpotAgent::work_thread() {
         char* buf = nullptr;
         size_t length = 0;
         try {
-            HKU_CHECK(rv = nng_recv(sock, &buf, &length, NNG_FLAG_ALLOC) == 0,
-                      "Failed nng_recv! {}", nng_strerror(rv));
-            parseSpotData(buf, length, true);
+            rv = nng_recv(sock, &buf, &length, NNG_FLAG_ALLOC);
+            if (!buf || length == 0) {
+                continue;
+            }
+            HKU_CHECK(rv == 0 || rv == NNG_ETIMEDOUT, "Failed nng_recv! {} ", nng_strerror(rv));
+            switch (m_status) {
+                case WAITING:
+                    HKU_INFO("WAITING start tag: {}, len: {}, buf len:{}", ms_startTag,
+                             ms_startTagLength, length);
+                    if (memcmp(buf, ms_startTag, ms_startTagLength) == 0) {
+                        // if (length == ms_startTagLength) {
+                        HKU_INFO("start RECEIVE");
+                        m_status = RECEIVING;
+                    }
+                    break;
+                case RECEIVING:
+                    HKU_INFO("RECEIVING end tag: {}, len: {}", ms_endTag, ms_endTagLength);
+                    if (length == ms_endTagLength) {
+                        // if (memcmp(buf, ms_endTag, ms_endTagLength) == 0) {
+                        HKU_INFO("end RECEIVE");
+                        m_status = WAITING;
+                        for (auto& f : m_postProcessList) {
+                            f();
+                        }
+                    } else {
+                        HKU_INFO("RECEIVED");
+                        HKU_CHECK(memcmp(buf, ms_startTag, ms_startTagLength) != 0,
+                                  "Data not received in time, maybe the send speed is too fast!");
+                        parseSpotData(buf, length, true);
+                    }
+                    break;
+            }
         } catch (std::exception& e) {
             HKU_ERROR(e.what());
         } catch (...) {
             HKU_ERROR("Unknow error!");
         }
-        nng_free(buf, length);
+        if (buf) {
+            nng_free(buf, length);
+        }
     }
 
     nng_close(sock);
