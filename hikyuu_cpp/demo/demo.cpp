@@ -2,7 +2,9 @@
 //
 
 #include <hikyuu/hikyuu.h>
-//#include <hikyuu/realtime/receive.h>
+#include <thread>
+#include <chrono>
+#include <hikyuu/agent/SpotAgent.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -31,7 +33,10 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     }
 
-    // start_receive();
+    start_spot_agent();
 
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     return 0;
 }

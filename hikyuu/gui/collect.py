@@ -218,8 +218,10 @@ def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
         (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM)
     ]
 
+    spot_topic = ':spot:'
+
     def batch_func(records):
-        spot = bytearray(b'spot')
+        spot = bytearray(spot_topic.encode('utf-8'))
         buf = create_fb_spot(records)
         spot.extend(buf)
         pub_sock.send(bytes(spot))
@@ -243,14 +245,14 @@ def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     while True:
         try:
             start_time = Datetime.now()
-            pub_sock.send(b'[start spot]')
+            pub_sock.send("{}{}".format(spot_topic, '[start spot]').encode('utf-8'))
             records = get_spot_parallel(stk_list, source, use_proxy, batch_func)
             hku_info(
                 "{}:{}:{} 采集数量: {}".format(
                     start_time.hour, start_time.minute, start_time.second, len(records)
                 )
             )
-            pub_sock.send(b'[end spot]')
+            pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
             time.sleep(delta.total_seconds())
         except Exception as e:

@@ -9,7 +9,9 @@
 
 #include <thread>
 #include <functional>
+#include "../flatbuffers/spot_generated.h"
 #include "../DataType.h"
+#include "../utilities/thread/ThreadPool.h"
 
 namespace hku {
 
@@ -22,6 +24,7 @@ public:
     void start();
     void stop();
 
+    void addProcess(std::function<void(const hikyuu::flat::Spot*)> process);
     void addPostProcess(std::function<void()> func);
 
 private:
@@ -34,10 +37,10 @@ private:
     static const int ms_endTagLength;
     static const int ms_spotTopicLength;
 
-    static void parseSpotData(const void* buf, size_t buf_len, bool print);
-
 private:
     SpotAgent() = default;
+
+    void parseSpotData(const void* buf, size_t buf_len);
 
     void work_thread();
 
@@ -46,7 +49,10 @@ private:
     enum STATUS m_status = WAITING;
     bool m_stop = false;
     int m_revTimeout = 100;
+    size_t m_batch_count = 0;
     std::thread m_receiveThread;
+    ThreadPool m_tg;
+    list<std::function<void(const hikyuu::flat::Spot*)>> m_processList;
     list<std::function<void()>> m_postProcessList;
 };
 

@@ -9,7 +9,6 @@
 #include <chrono>
 #include <nng/nng.h>
 #include <nng/protocol/pubsub0/sub.h>
-#include "../flatbuffers/spot_generated.h"
 #include "../utilities/util.h"
 #include "../StockManager.h"
 #include "SpotAgent.h"
@@ -20,12 +19,12 @@ namespace hku {
 
 SpotAgent* SpotAgent::ms_spotAgent = nullptr;
 const char* SpotAgent::ms_pubUrl = "ipc:///tmp/hikyuu_real_pub.ipc";
-const char* SpotAgent::ms_startTag = "[start spot]";
-const char* SpotAgent::ms_endTag = "[end spot]";
-const char* SpotAgent::ms_spotTopic = "spot";
+const char* SpotAgent::ms_startTag = ":spot:[start spot]";
+const char* SpotAgent::ms_endTag = ":spot:[end spot]";
+const char* SpotAgent::ms_spotTopic = ":spot:";
+const int SpotAgent::ms_spotTopicLength = strlen(SpotAgent::ms_spotTopic);
 const int SpotAgent::ms_startTagLength = strlen(SpotAgent::ms_startTag);
 const int SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
-const int SpotAgent::ms_spotTopicLength = strlen(SpotAgent::ms_spotTopic);
 
 SpotAgent& SpotAgent::instance() {
     if (!ms_spotAgent) {
@@ -49,13 +48,50 @@ SpotAgent::~SpotAgent() {
     }
 }
 
+static void updateStockDayData(const hikyuu::flat::Spot* spot) {
+    auto& sm = StockManager::instance();
+    std::stringstream market_code_buf;
+    market_code_buf << spot->market()->str() << spot->code()->str();
+    Stock stk = sm[market_code_buf.str()];
+    if (stk.isNull())
+        return;
+
+    KRecord krecord(Datetime(spot->datetime()->str()), spot->open(), spot->high(), spot->low(),
+                    spot->close(), spot->amount(), spot->volumn());
+    HKU_INFO("{} {}", stk.market_code(), krecord);
+    stk.realtimeUpdate(krecord, KQuery::DAY);
+}
+
 void HKU_API start_spot_agent() {
     auto& agent = SpotAgent::instance();
+    agent.addProcess(updateStockDayData);
     agent.start();
 }
 
-void SpotAgent::parseSpotData(const void* buf, size_t buf_len, bool print) {
-    // SPEND_TIME(receive_data);
+class ProcessTask {
+public:
+    ProcessTask(std::function<void(const hikyuu::flat::Spot*)> func, const void* buf, size_t len)
+    : m_func(func) {
+        m_buf.resize(len);
+        memcpy(m_buf.data(), buf, len);
+    }
+
+    ProcessTask(ProcessTask&& other) {
+        m_func = other.m_func;
+        m_buf = std::move(other.m_buf);
+    }
+
+    void operator()() {
+        m_func((const hikyuu::flat::Spot*)m_buf.data());
+    }
+
+private:
+    std::function<void(const hikyuu::flat::Spot*)> m_func;
+    std::vector<char> m_buf;
+};
+
+void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
+    SPEND_TIME(receive_data);
     const uint8_t* spot_list_buf = (const uint8_t*)(buf) + ms_spotTopicLength;
 
     // 校验数据
@@ -66,20 +102,13 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len, bool print) {
     auto* spot_list = GetSpotList(spot_list_buf);
     auto* spots = spot_list->spot();
     size_t total = spots->size();
-    auto& sm = StockManager::instance();
-    HKU_INFO_IF(print, "received total {}", total);
+    m_batch_count += total;
     for (size_t i = 0; i < total; i++) {
         auto* spot = spots->Get(i);
-        std::stringstream market_code_buf;
-        market_code_buf << spot->market()->str() << spot->code()->str();
-        Stock stk = sm[market_code_buf.str()];
-        if (stk.isNull())
-            continue;
-
-        KRecord krecord(Datetime(spot->datetime()->str()), spot->open(), spot->high(), spot->low(),
-                        spot->close(), spot->amount(), spot->volumn());
-        stk.realtimeUpdate(krecord, KQuery::DAY);
-        // HKU_INFO("{} {} {}", market_code_buf.str(), spot->name()->str(), krecord);
+        for (auto& process : m_processList) {
+            process(spot);
+            // m_tg.submit(ProcessTask(process, spot, spot->GetSize()));
+        }
     }
 }
 
@@ -118,28 +147,22 @@ void SpotAgent::work_thread() {
             HKU_CHECK(rv == 0 || rv == NNG_ETIMEDOUT, "Failed nng_recv! {} ", nng_strerror(rv));
             switch (m_status) {
                 case WAITING:
-                    HKU_INFO("WAITING start tag: {}, len: {}, buf len:{}", ms_startTag,
-                             ms_startTagLength, length);
                     if (memcmp(buf, ms_startTag, ms_startTagLength) == 0) {
-                        // if (length == ms_startTagLength) {
-                        HKU_INFO("start RECEIVE");
                         m_status = RECEIVING;
                     }
                     break;
                 case RECEIVING:
-                    HKU_INFO("RECEIVING end tag: {}, len: {}", ms_endTag, ms_endTagLength);
                     if (length == ms_endTagLength) {
-                        // if (memcmp(buf, ms_endTag, ms_endTagLength) == 0) {
-                        HKU_INFO("end RECEIVE");
                         m_status = WAITING;
+                        HKU_INFO("received: {}", m_batch_count);
+                        m_batch_count = 0;
                         for (auto& f : m_postProcessList) {
                             f();
                         }
                     } else {
-                        HKU_INFO("RECEIVED");
                         HKU_CHECK(memcmp(buf, ms_startTag, ms_startTagLength) != 0,
                                   "Data not received in time, maybe the send speed is too fast!");
-                        parseSpotData(buf, length, true);
+                        parseSpotData(buf, length);
                     }
                     break;
             }
@@ -162,6 +185,10 @@ void SpotAgent::start() {
 
 void SpotAgent::stop() {
     m_stop = true;
+}
+
+void SpotAgent::addProcess(std::function<void(const hikyuu::flat::Spot*)> process) {
+    m_processList.push_back(process);
 }
 
 void SpotAgent::addPostProcess(std::function<void()> func) {
