@@ -15,6 +15,40 @@
 
 namespace hku {
 
+struct HKU_API SpotRecord {
+    string market;
+    string code;
+    string name;
+    Datetime datetime;
+    price_t yesterday_close;
+    price_t open;
+    price_t high;
+    price_t low;
+    price_t close;
+    price_t amount;
+    price_t volumn;
+    price_t bid1;
+    price_t bid1_amount;
+    price_t bid2;
+    price_t bid2_amount;
+    price_t bid3;
+    price_t bid3_amount;
+    price_t bid4;
+    price_t bid4_amount;
+    price_t bid5;
+    price_t bid5_amount;
+    price_t ask1;
+    price_t ask1_amount;
+    price_t ask2;
+    price_t ask2_amount;
+    price_t ask3;
+    price_t ask3_amount;
+    price_t ask4;
+    price_t ask4_amount;
+    price_t ask5;
+    price_t ask5_amount;
+};
+
 class HKU_API SpotAgent {
 public:
     static SpotAgent& instance();
@@ -24,7 +58,7 @@ public:
     void start();
     void stop();
 
-    void addProcess(std::function<void(const hikyuu::flat::Spot*)> process);
+    void addProcess(std::function<void(const SpotRecord&)> process);
     void addPostProcess(std::function<void()> func);
 
 private:
@@ -40,6 +74,7 @@ private:
 private:
     SpotAgent() = default;
 
+    unique_ptr<SpotRecord> parseFlatSpot(const hikyuu::flat::Spot* spot);
     void parseSpotData(const void* buf, size_t buf_len);
 
     void work_thread();
@@ -52,7 +87,7 @@ private:
     size_t m_batch_count = 0;
     std::thread m_receiveThread;
     ThreadPool m_tg;
-    list<std::function<void(const hikyuu::flat::Spot*)>> m_processList;
+    list<std::function<void(const SpotRecord&)>> m_processList;
     list<std::function<void()>> m_postProcessList;
 };
 

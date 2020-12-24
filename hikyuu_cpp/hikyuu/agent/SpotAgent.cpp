@@ -48,17 +48,17 @@ SpotAgent::~SpotAgent() {
     }
 }
 
-static void updateStockDayData(const hikyuu::flat::Spot* spot) {
+static void updateStockDayData(const SpotRecord& spot) {
     auto& sm = StockManager::instance();
     std::stringstream market_code_buf;
-    market_code_buf << spot->market()->str() << spot->code()->str();
+    market_code_buf << spot.market << spot.code;
     Stock stk = sm[market_code_buf.str()];
     if (stk.isNull())
         return;
 
-    KRecord krecord(Datetime(spot->datetime()->str()), spot->open(), spot->high(), spot->low(),
-                    spot->close(), spot->amount(), spot->volumn());
-    HKU_INFO("{} {}", stk.market_code(), krecord);
+    KRecord krecord(spot.datetime, spot.open, spot.high, spot.low, spot.close, spot.amount,
+                    spot.volumn);
+    // HKU_INFO("{} {}", stk.market_code(), krecord);
     stk.realtimeUpdate(krecord, KQuery::DAY);
 }
 
@@ -70,25 +70,64 @@ void HKU_API start_spot_agent() {
 
 class ProcessTask {
 public:
-    ProcessTask(std::function<void(const hikyuu::flat::Spot*)> func, const void* buf, size_t len)
-    : m_func(func) {
-        m_buf.resize(len);
-        memcpy(m_buf.data(), buf, len);
-    }
-
-    ProcessTask(ProcessTask&& other) {
-        m_func = other.m_func;
-        m_buf = std::move(other.m_buf);
-    }
+    ProcessTask(std::function<void(const SpotRecord&)> func, const SpotRecord& spot)
+    : m_func(func), m_spot(spot) {}
 
     void operator()() {
-        m_func((const hikyuu::flat::Spot*)m_buf.data());
+        m_func(m_spot);
     }
 
 private:
-    std::function<void(const hikyuu::flat::Spot*)> m_func;
-    std::vector<char> m_buf;
+    std::function<void(const SpotRecord&)> m_func;
+    SpotRecord m_spot;
 };
+
+unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) {
+    SpotRecord* result = nullptr;
+    try {
+        result = new SpotRecord;
+        result->market = spot->market()->str();
+        result->code = spot->code()->str();
+        result->name = spot->name()->str();
+        result->datetime = Datetime(spot->datetime()->str());
+        result->yesterday_close = spot->yesterday_close();
+        result->open = spot->open();
+        result->high = spot->high();
+        result->low = spot->low();
+        result->close = spot->close();
+        result->amount = spot->amount();
+        result->volumn = spot->volumn();
+        result->bid1 = spot->bid1();
+        result->bid1_amount = spot->bid1_amount();
+        result->bid2 = spot->bid2();
+        result->bid2_amount = spot->bid2_amount();
+        result->bid3 = spot->bid3();
+        result->bid3_amount = spot->bid3_amount();
+        result->bid4 = spot->bid4();
+        result->bid4_amount = spot->bid4_amount();
+        result->bid5 = spot->bid5();
+        result->bid5_amount = spot->bid5_amount();
+        result->ask1 = spot->ask1();
+        result->ask1_amount = spot->ask1_amount();
+        result->ask2 = spot->ask2();
+        result->ask2_amount = spot->ask2_amount();
+        result->ask3 = spot->ask3();
+        result->ask3_amount = spot->ask3_amount();
+        result->ask4 = spot->ask4();
+        result->ask4_amount = spot->ask4_amount();
+        result->ask5 = spot->ask5();
+        result->ask5_amount = spot->ask5_amount();
+
+    } catch (std::exception& e) {
+        result = nullptr;
+        HKU_ERROR(e.what());
+    } catch (...) {
+        result = nullptr;
+        HKU_ERROR("Unknow error!");
+    }
+
+    return unique_ptr<SpotRecord>(result);
+}
 
 void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     SPEND_TIME(receive_data);
@@ -106,8 +145,10 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     for (size_t i = 0; i < total; i++) {
         auto* spot = spots->Get(i);
         for (auto& process : m_processList) {
-            process(spot);
-            // m_tg.submit(ProcessTask(process, spot, spot->GetSize()));
+            auto spot_record = parseFlatSpot(spot);
+            if (spot_record) {
+                m_tg.submit(ProcessTask(process, *spot_record));
+            }
         }
     }
 }
@@ -154,7 +195,6 @@ void SpotAgent::work_thread() {
                 case RECEIVING:
                     if (length == ms_endTagLength) {
                         m_status = WAITING;
-                        HKU_INFO("received: {}", m_batch_count);
                         m_batch_count = 0;
                         for (auto& f : m_postProcessList) {
                             f();
@@ -187,7 +227,7 @@ void SpotAgent::stop() {
     m_stop = true;
 }
 
-void SpotAgent::addProcess(std::function<void(const hikyuu::flat::Spot*)> process) {
+void SpotAgent::addProcess(std::function<void(const SpotRecord&)> process) {
     m_processList.push_back(process);
 }
 
