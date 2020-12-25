@@ -238,7 +238,7 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
         if (autotrans) {
             rollback();
         }
-        HKU_THROW("failed batch save! sql: {}! Unknow error!", st->getSqlString());
+        HKU_THROW("failed batch save! sql: {}! Unknown error!", st->getSqlString());
     }
 }
 
@@ -306,7 +306,7 @@ void DBConnectBase::batchUpdate(InputIterator first, InputIterator last, bool au
         if (autotrans) {
             rollback();
         }
-        HKU_THROW("failed batch save! sql: {}! Unknow error!", st->getSqlString());
+        HKU_THROW("failed batch save! sql: {}! Unknown error!", st->getSqlString());
     }
 }
 

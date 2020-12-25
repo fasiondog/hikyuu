@@ -100,7 +100,7 @@ void IKData::_calculate(const Indicator& ind) {
         }
 
     } else {
-        m_name = "Unknow";
+        m_name = "Unknown";
         m_discard = total;
         HKU_INFO("Unkown ValueType of KData");
     }

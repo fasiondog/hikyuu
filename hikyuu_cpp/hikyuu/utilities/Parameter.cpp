@@ -88,7 +88,7 @@ string Parameter::type(const string& name) const {
     HKU_IF_RETURN(iter->second.type() == typeid(KData), "KData");
     HKU_IF_RETURN(iter->second.type() == typeid(PriceList), "PriceList");
     HKU_IF_RETURN(iter->second.type() == typeid(DatetimeList), "DatetimeList");
-    return "Unknow";
+    return "Unknown";
 }
 
 StringList Parameter::getNameList() const {

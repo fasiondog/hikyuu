@@ -51,7 +51,7 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
             } catch (std::exception& e) {
                 HKU_ERROR("Failed load market, {}", e.what());
             } catch (...) {
-                HKU_ERROR("Unknown error!");
+                HKU_ERROR_UNKNOWN;
             }
         }
 
@@ -188,7 +188,7 @@ StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, c
             } catch (std::exception& e) {
                 HKU_WARN("Error StockWeight Record id({}) {}", w.id(), e.what());
             } catch (...) {
-                HKU_WARN("Error StockWeight Record id({})! Unknow reason!", w.id());
+                HKU_WARN("Error StockWeight Record id({})! Unknown reason!", w.id());
             }
         }
 

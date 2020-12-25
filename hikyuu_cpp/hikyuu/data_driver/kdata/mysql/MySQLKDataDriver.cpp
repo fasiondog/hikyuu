@@ -140,7 +140,7 @@ size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQue
         HKU_ERROR(e.what());
         result = 0;
     } catch (...) {
-        HKU_ERROR("Unknow error!");
+        HKU_ERROR_UNKNOWN;
         result = 0;
     }
 
@@ -171,7 +171,7 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
         out_end = 0;
         return false;
     } catch (...) {
-        HKU_ERROR("Unknow error!");
+        HKU_ERROR_UNKNOWN;
         out_start = 0;
         out_end = 0;
         return false;

@@ -378,6 +378,10 @@ std::string HKU_API getLocalTime();
         return ret;                         \
     }
 
+extern std::string g_unknown_error_msg;
+#define HKU_ERROR_UNKNOWN HKU_ERROR(g_unknown_error_msg)
+#define HKU_FATAL_UNKNOWN HKU_ERROR(g_unknown_error_msg)
+
 /** @} */
 
 } /* namespace hku */

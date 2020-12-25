@@ -123,7 +123,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         HKU_ERROR(e.what());
     } catch (...) {
         result = nullptr;
-        HKU_ERROR("Unknow error!");
+        HKU_ERROR_UNKNOWN;
     }
 
     return unique_ptr<SpotRecord>(result);
@@ -209,7 +209,7 @@ void SpotAgent::work_thread() {
         } catch (std::exception& e) {
             HKU_ERROR(e.what());
         } catch (...) {
-            HKU_ERROR("Unknow error!");
+            HKU_ERROR_UNKNOWN;
         }
         if (buf) {
             nng_free(buf, length);

@@ -142,6 +142,10 @@
  * @details 附加的公共工具集
  * @ingroup Hikyuu
  *
+ * @defgroup Agent Agent 对外数据接收发送代理
+ * @details 用于接收和发送对外数据
+ * @ingroup Hikyuu
+ *
  * @defgroup DBConnect DB Connect 数据库连接
  * 数据库连接工具
  * @ingroup Utilities

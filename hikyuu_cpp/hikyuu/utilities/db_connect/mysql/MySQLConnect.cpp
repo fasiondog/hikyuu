@@ -38,7 +38,7 @@ MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mys
         HKU_FATAL(e.what());
         close();
     } catch (...) {
-        HKU_FATAL("Unknown error!");
+        HKU_FATAL_UNKNOWN;
         close();
     }
 }

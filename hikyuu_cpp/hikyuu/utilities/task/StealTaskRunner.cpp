@@ -104,7 +104,7 @@ void StealTaskRunner::run() {
     } catch (std::exception& e) {
         HKU_ERROR(e.what());
     } catch (...) {
-        HKU_ERROR("Unknown error!");
+        HKU_ERROR_UNKNOWN;
     }
 }
 

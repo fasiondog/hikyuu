@@ -25,7 +25,7 @@ namespace hku {
 #if !defined(__clang__) && !defined(__GNUC__)
 class exception : public std::exception {
 public:
-    exception() : std::exception("Unknow exception!") {}
+    exception() : std::exception("Unknown exception!") {}
     exception(const std::string& msg)  // cppcheck-suppress noExplicitConstructor
     : std::exception(msg.c_str()) {}
     exception(const char* msg) : std::exception(msg) {}  // cppcheck-suppress noExplicitConstructor
@@ -35,7 +35,7 @@ public:
 // llvm 中的 std::exception 不接受参数
 class exception : public std::exception {
 public:
-    exception() : m_msg("Unknow exception!") {}
+    exception() : m_msg("Unknown exception!") {}
     exception(const char *msg) : m_msg(msg) {}         // cppcheck-suppress noExplicitConstructor
     exception(const std::string &msg) : m_msg(msg) {}  // cppcheck-suppress noExplicitConstructor
     virtual ~exception() noexcept {}

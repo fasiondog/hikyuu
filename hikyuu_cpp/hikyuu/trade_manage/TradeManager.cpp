@@ -1402,7 +1402,7 @@ FundsRecord TradeManager ::getFunds(const Datetime& indatetime, KQuery::KType kt
                 break;
 
             default:
-                HKU_WARN("{} {} Unknow business in m_trade_list!", datetime,
+                HKU_WARN("{} {} Unknown business in m_trade_list!", datetime,
                          iter->stock.market_code());
                 break;
         }
