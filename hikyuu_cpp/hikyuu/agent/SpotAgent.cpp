@@ -58,7 +58,6 @@ static void updateStockDayData(const SpotRecord& spot) {
 
     KRecord krecord(spot.datetime, spot.open, spot.high, spot.low, spot.close, spot.amount,
                     spot.volumn);
-    // HKU_INFO("{} {}", stk.market_code(), krecord);
     stk.realtimeUpdate(krecord, KQuery::DAY);
 }
 
