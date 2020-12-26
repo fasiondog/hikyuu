@@ -33,7 +33,6 @@ public:
      * 子工作线程构造函数
      * @param group 所属任务组指针
      * @param id 所属任务组中的id
-     * @param stopTask 用于指示线程应停止运行的特殊任务
      */
     StealTaskRunner(StealTaskGroup* group, size_t id);
 

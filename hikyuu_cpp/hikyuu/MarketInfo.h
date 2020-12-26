@@ -28,6 +28,10 @@ public:
      * @param description 市场描述
      * @param code 基本指数：用于读取该市场的交易日历
      * @param lastDate 市场当前最后日期
+     * @param openTime1 开市时间段1起始时间
+     * @param closeTime1 开市时间段1结束时间
+     * @param openTime2 开市时间段2起始时间
+     * @param closeTime2 开市时间段2结束时间
      */
     MarketInfo(const string& market, const string& name, const string& description,
                const string& code, const Datetime& lastDate, TimeDelta openTime1,

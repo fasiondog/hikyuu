@@ -118,6 +118,7 @@ private:
 
 /**
  * 启动 Spot 数据接收代理
+ * @details 默认增加缓存日线数据更新处理
  * @ingroup Agent
  */
 void HKU_API start_spot_agent();
