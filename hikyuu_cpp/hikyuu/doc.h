@@ -137,13 +137,13 @@
  * @details 系统实例
  * @ingroup Hikyuu
  *
+ * @defgroup Agent Agent 对外数据接收发送代理
+ * @details 用于接收和发送对外数据
+ * @ingroup Hikyuu
+ *
  * @defgroup Utilities Utilities 程序工具集
  * 独立的一些小函数、对象工具集合
  * @details 附加的公共工具集
- * @ingroup Hikyuu
- *
- * @defgroup Agent Agent 对外数据接收发送代理
- * @details 用于接收和发送对外数据
  * @ingroup Hikyuu
  *
  * @defgroup DBConnect DB Connect 数据库连接

@@ -48,25 +48,6 @@ SpotAgent::~SpotAgent() {
     }
 }
 
-static void updateStockDayData(const SpotRecord& spot) {
-    auto& sm = StockManager::instance();
-    std::stringstream market_code_buf;
-    market_code_buf << spot.market << spot.code;
-    Stock stk = sm[market_code_buf.str()];
-    if (stk.isNull())
-        return;
-
-    KRecord krecord(spot.datetime, spot.open, spot.high, spot.low, spot.close, spot.amount,
-                    spot.volumn);
-    stk.realtimeUpdate(krecord, KQuery::DAY);
-}
-
-void HKU_API start_spot_agent() {
-    auto& agent = SpotAgent::instance();
-    agent.addProcess(updateStockDayData);
-    agent.start();
-}
-
 class ProcessTask {
 public:
     ProcessTask(std::function<void(const SpotRecord&)> func, const SpotRecord& spot)
@@ -195,8 +176,9 @@ void SpotAgent::work_thread() {
                     if (length == ms_endTagLength) {
                         m_status = WAITING;
                         m_batch_count = 0;
-                        for (auto& f : m_postProcessList) {
-                            f();
+                        // 执行后处理
+                        for (auto& postProcess : m_postProcessList) {
+                            postProcess();
                         }
                     } else {
                         HKU_CHECK(memcmp(buf, ms_startTag, ms_startTagLength) != 0,
@@ -232,6 +214,30 @@ void SpotAgent::addProcess(std::function<void(const SpotRecord&)> process) {
 
 void SpotAgent::addPostProcess(std::function<void()> func) {
     m_postProcessList.push_back(func);
+}
+
+static void updateStockDayData(const SpotRecord& spot) {
+    const auto& sm = StockManager::instance();
+    std::stringstream market_code_buf;
+    market_code_buf << spot.market << spot.code;
+    Stock stk = sm[market_code_buf.str()];
+    if (stk.isNull())
+        return;
+
+    KRecord krecord(spot.datetime, spot.open, spot.high, spot.low, spot.close, spot.amount,
+                    spot.volumn);
+    stk.realtimeUpdate(krecord, KQuery::DAY);
+}
+
+void HKU_API start_spot_agent() {
+    auto& agent = SpotAgent::instance();
+    agent.addProcess(updateStockDayData);
+    agent.start();
+}
+
+void HKU_API stop_spot_agent() {
+    auto& agent = SpotAgent::instance();
+    agent.stop();
 }
 
 }  // namespace hku

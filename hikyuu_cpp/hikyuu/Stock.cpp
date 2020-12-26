@@ -653,7 +653,7 @@ Parameter Stock::getFinanceInfo() const {
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     PriceList result;
     HKU_IF_RETURN(type() != STOCKTYPE_A, result);
-    StockManager& sm = StockManager::instance();
+    const StockManager& sm = StockManager::instance();
     HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
     result = rd.getHistoryFinanceInfo(date, market(), code());
     return result;
