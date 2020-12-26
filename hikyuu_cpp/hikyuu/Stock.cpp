@@ -276,8 +276,16 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
         if (m_kdataDriver) {
             m_data->pKData[kType] = new KRecordList;
             m_data->pMutex[kType] = new std::shared_mutex();
+            const auto& param = StockManager::instance().getPreloadParameter();
+            string preload_type = fmt::format("{}_max", kType);
+            to_lower(preload_type);
+            int max_num = param.tryGet<int>(preload_type, 5120);
+            HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
+                                max_num);
+            size_t total = m_kdataDriver->getCount(m_data->m_market, m_data->m_code, kType);
+            int start = total <= max_num ? 0 : total - max_num;
             *(m_data->pKData[kType]) = m_kdataDriver->getKRecordList(
-              m_data->m_market, m_data->m_code, KQuery(0, Null<int64_t>(), kType));
+              m_data->m_market, m_data->m_code, KQuery(start, Null<int64_t>(), kType));
         }
     }
 }

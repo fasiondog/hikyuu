@@ -282,8 +282,13 @@ Stock StockManager::addTempCsvStock(const string& code, const string& day_filena
 
     KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
     result.setKDataDriver(KDataDriverPtr(p));
-    result.loadKDataToBuffer(KQuery::DAY);
-    result.loadKDataToBuffer(KQuery::MIN);
+    const auto& preload_param = getPreloadParameter();
+    if (preload_param.tryGet<bool>("day", true)) {
+        result.loadKDataToBuffer(KQuery::DAY);
+    }
+    if (preload_param.tryGet<bool>("min", false)) {
+        result.loadKDataToBuffer(KQuery::MIN);
+    }
     return loadStock(result) ? result : Null<Stock>();
 }
 

@@ -9,6 +9,7 @@
 #define NOMINMAX
 #endif
 
+#include <set>
 #include <fmt/format.h>
 #include "utilities/IniParser.h"
 #include "hikyuu.h"
@@ -62,8 +63,14 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload) {
     }
 
     option = config.getOptionList("preload");
+
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
-        preloadParam.set<bool>(*iter, ignore_preload ? false : config.getBool("preload", *iter));
+        try {
+            preloadParam.set<bool>(*iter,
+                                   ignore_preload ? false : config.getBool("preload", *iter));
+        } catch (...) {
+            preloadParam.set<int>(*iter, ignore_preload ? false : config.getInt("preload", *iter));
+        }
     }
 
     StockManager& sm = StockManager::instance();
