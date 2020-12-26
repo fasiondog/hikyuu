@@ -65,6 +65,19 @@ Parameter default_preload_param() {
     param.set<bool>("min15", false);
     param.set<bool>("min30", false);
     param.set<bool>("min60", false);
+    param.set<bool>("ticks", false);
+    param.set<int>("day_max", 100000);
+    param.set<int>("week_max", 100000);
+    param.set<int>("month_max", 100000);
+    param.set<int>("quarter_max", 100000);
+    param.set<int>("halfyear_max", 100000);
+    param.set<int>("year_max", 100000);
+    param.set<int>("min_max", 5120);
+    param.set<int>("min5_max", 5120);
+    param.set<int>("min15_max", 5120);
+    param.set<int>("min30_max", 5120);
+    param.set<int>("min60_max", 5120);
+    param.set<int>("ticks_max", 5120);
     return param;
 }
 

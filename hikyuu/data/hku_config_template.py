@@ -37,12 +37,29 @@ dir = {dir}/block
 self = self.ini
 
 [preload]
-day = 1
-week = 0
-month = 0
-quarter = 0
-halfyear = 0
-year = 0
+day = {day}
+week = {week}
+month = {month}
+quarter = {quarter}
+halfyear = {halfyear}
+year = {year}
+min = {min1}
+min5 = {min5}
+min15 = {min15}
+min30 = {min30}
+min60 = {min60}
+day_max = {day_max}
+week_max = {week_max}
+month_max = {month_max}
+quarter_max = {quarter_max}
+halfyear_max = {halfyear_max}
+year_max = {year_max}
+min_max = {min1_max}
+min5_max = {min5_max}
+min15_max = {min15_max}
+min30_max = {min30_max}
+min60_max = {min60_max}
+
 
 [baseinfo]
 type = sqlite3
@@ -78,12 +95,28 @@ dir = {dir}/block
 self = self.ini
 
 [preload]
-day = 1
-week = 0
-month = 0
-quarter = 0
-halfyear = 0
-year = 0
+day = {day}
+week = {week}
+month = {month}
+quarter = {quarter}
+halfyear = {halfyear}
+year = {year}
+min = {min1}
+min5 = {min5}
+min15 = {min15}
+min30 = {min30}
+min60 = {min60}
+day_max = {day_max}
+week_max = {week_max}
+month_max = {month_max}
+quarter_max = {quarter_max}
+halfyear_max = {halfyear_max}
+year_max = {year_max}
+min_max = {min1_max}
+min5_max = {min5_max}
+min15_max = {min15_max}
+min30_max = {min30_max}
+min60_max = {min60_max}
 
 [baseinfo]
 type = mysql

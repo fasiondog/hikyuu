@@ -111,8 +111,13 @@ for p in block_config:
 preload_param = Parameter()
 preload_config = ini.options('preload')
 for p in preload_config:
-    # 注意：proload参数是布尔类型
-    preload_param[p] = ini.getboolean('preload', p)
+    if p in (
+        'day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30',
+        'min60'
+    ):
+        preload_param[p] = ini.getboolean('preload', p)
+    else:
+        preload_param[p] = ini.getint('preload', p)
 
 kdata_param = Parameter()
 kdata_config = ini.options('kdata')

@@ -87,7 +87,37 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             # 此处不能使用 utf-8 参数，否则导致Windows下getBlock无法找到板块分类
             # with open(filename, 'w', encoding='utf-8') as f:
             with open(filename, 'w') as f:
-                f.write(hku_config_template.hdf5_template.format(dir=data_dir))
+                f.write(
+                    hku_config_template.hdf5_template.format(
+                        dir=data_dir,
+                        day=current_config.getboolean('preload', 'day', fallback=True),
+                        week=current_config.getboolean('preload', 'week', fallback=False),
+                        month=current_config.getboolean('preload', 'month', fallback=False),
+                        quarter=current_config.getboolean('preload', 'quarter', fallback=False),
+                        halfyear=current_config.getboolean('preload', 'halfyear', fallback=False),
+                        year=current_config.getboolean('preload', 'year', fallback=False),
+                        min1=current_config.getboolean('preload', 'min', fallback=False),
+                        min5=current_config.getboolean('preload', 'min5', fallback=False),
+                        min15=current_config.getboolean('preload', 'min15', fallback=False),
+                        min30=current_config.getboolean('preload', 'min30', fallback=False),
+                        min60=current_config.getboolean('preload', 'min60', fallback=False),
+                        day_max=current_config.getint('preload', 'day_max', fallback=100000),
+                        week_max=current_config.getint('preload', 'week_max', fallback=100000),
+                        month_max=current_config.getint('preload', 'month_max', fallback=100000),
+                        quarter_max=current_config.getint(
+                            'preload', 'quarter_max', fallback=100000
+                        ),
+                        halfyear_max=current_config.getint(
+                            'preload', 'halfyear_max', fallback=100000
+                        ),
+                        year_max=current_config.getint('preload', 'year_max', fallback=100000),
+                        min1_max=current_config.getint('preload', 'min_max', fallback=5120),
+                        min5_max=current_config.getint('preload', 'min5_max', fallback=5120),
+                        min15_max=current_config.getint('preload', 'min15_max', fallback=5120),
+                        min30_max=current_config.getint('preload', 'min30_max', fallback=5120),
+                        min60_max=current_config.getint('preload', 'min60_max', fallback=5120),
+                    )
+                )
         else:
             data_dir = current_config['mysql']['tmpdir']
             with open(filename, 'w') as f:
@@ -97,7 +127,33 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         host=current_config['mysql']['host'],
                         port=current_config['mysql']['port'],
                         usr=current_config['mysql']['usr'],
-                        pwd=current_config['mysql']['pwd']
+                        pwd=current_config['mysql']['pwd'],
+                        day=current_config.getboolean('preload', 'day', fallback=True),
+                        week=current_config.getboolean('preload', 'week', fallback=False),
+                        month=current_config.getboolean('preload', 'month', fallback=False),
+                        quarter=current_config.getboolean('preload', 'quarter', fallback=False),
+                        halfyear=current_config.getboolean('preload', 'halfyear', fallback=False),
+                        year=current_config.getboolean('preload', 'year', fallback=False),
+                        min1=current_config.getboolean('preload', 'min', fallback=False),
+                        min5=current_config.getboolean('preload', 'min5', fallback=False),
+                        min15=current_config.getboolean('preload', 'min15', fallback=False),
+                        min30=current_config.getboolean('preload', 'min30', fallback=False),
+                        min60=current_config.getboolean('preload', 'min60', fallback=False),
+                        day_max=current_config.getint('preload', 'day_max', fallback=100000),
+                        week_max=current_config.getint('preload', 'week_max', fallback=100000),
+                        month_max=current_config.getint('preload', 'month_max', fallback=100000),
+                        quarter_max=current_config.getint(
+                            'preload', 'quarter_max', fallback=100000
+                        ),
+                        halfyear_max=current_config.getint(
+                            'preload', 'halfyear_max', fallback=100000
+                        ),
+                        year_max=current_config.getint('preload', 'year_max', fallback=100000),
+                        min1_max=current_config.getint('preload', 'min_max', fallback=5120),
+                        min5_max=current_config.getint('preload', 'min5_max', fallback=5120),
+                        min15_max=current_config.getint('preload', 'min15_max', fallback=5120),
+                        min30_max=current_config.getint('preload', 'min30_max', fallback=5120),
+                        min60_max=current_config.getint('preload', 'min60_max', fallback=5120),
                     )
                 )
 
@@ -110,6 +166,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             dirname = os.path.join(dirname, 'config/block')
             shutil.copytree(dirname, data_dir + '/block')
             os.remove(data_dir + '/block/__init__.py')
+
+    @pyqtSlot()
+    def on_save_pushButton_clicked(self):
+        try:
+            self.saveConfig()
+            QMessageBox.about(self, '', '保存成功')
+        except Exception as e:
+            QMessageBox.about(self, "错误", str(e))
 
     def normalOutputWritten(self, text):
         """普通打印信息重定向"""
@@ -277,6 +341,74 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             )
         )
 
+        # 预加载设置
+        self.preload_day_checkBox.setChecked(
+            import_config.getboolean('preload', 'day', fallback=True)
+        )
+        self.preload_week_checkBox.setChecked(
+            import_config.getboolean('preload', 'week', fallback=False)
+        )
+        self.preload_month_checkBox.setChecked(
+            import_config.getboolean('preload', 'month', fallback=False)
+        )
+        self.preload_quarter_checkBox.setChecked(
+            import_config.getboolean('preload', 'quarter', fallback=False)
+        )
+        self.preload_halfyear_checkBox.setChecked(
+            import_config.getboolean('preload', 'halfyear', fallback=False)
+        )
+        self.preload_year_checkBox.setChecked(
+            import_config.getboolean('preload', 'year', fallback=False)
+        )
+        self.preload_min1_checkBox.setChecked(
+            import_config.getboolean('preload', 'min', fallback=False)
+        )
+        self.preload_min5_checkBox.setChecked(
+            import_config.getboolean('preload', 'min5', fallback=False)
+        )
+        self.preload_min15_checkBox.setChecked(
+            import_config.getboolean('preload', 'min15', fallback=False)
+        )
+        self.preload_min30_checkBox.setChecked(
+            import_config.getboolean('preload', 'min30', fallback=False)
+        )
+        self.preload_min60_checkBox.setChecked(
+            import_config.getboolean('preload', 'min60', fallback=False)
+        )
+        self.preload_day_spinBox.setValue(
+            import_config.getint('preload', 'day_max', fallback=100000)
+        )
+        self.preload_week_spinBox.setValue(
+            import_config.getint('preload', 'week_max', fallback=100000)
+        )
+        self.preload_month_spinBox.setValue(
+            import_config.getint('preload', 'month_max', fallback=100000)
+        )
+        self.preload_quarter_spinBox.setValue(
+            import_config.getint('preload', 'quarter_max', fallback=100000)
+        )
+        self.preload_halfyear_spinBox.setValue(
+            import_config.getint('preload', 'halfyear_max', fallback=100000)
+        )
+        self.preload_year_spinBox.setValue(
+            import_config.getint('preload', 'year_max', fallback=100000)
+        )
+        self.preload_min1_spinBox.setValue(
+            import_config.getint('preload', 'min_max', fallback=5120)
+        )
+        self.preload_min5_spinBox.setValue(
+            import_config.getint('preload', 'min5_max', fallback=5120)
+        )
+        self.preload_min15_spinBox.setValue(
+            import_config.getint('preload', 'min15_max', fallback=5120)
+        )
+        self.preload_min30_spinBox.setValue(
+            import_config.getint('preload', 'min30_max', fallback=5120)
+        )
+        self.preload_min60_spinBox.setValue(
+            import_config.getint('preload', 'min60_max', fallback=5120)
+        )
+
     def getCurrentConfig(self):
         import_config = ConfigParser()
         import_config['quotation'] = {
@@ -324,6 +456,30 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'use_zhima_proxy': self.collect_use_zhima_checkBox.isChecked(),
             'phase1_start': self.collect_phase1_start_timeEdit.time().toString(),
             'phase1_end': self.collect_phase1_last_timeEdit.time().toString()
+        }
+        import_config['preload'] = {
+            'day': self.preload_day_checkBox.isChecked(),
+            'week': self.preload_week_checkBox.isChecked(),
+            'month': self.preload_month_checkBox.isChecked(),
+            'quarter': self.preload_quarter_checkBox.isChecked(),
+            'halfyear': self.preload_halfyear_checkBox.isChecked(),
+            'year': self.preload_year_checkBox.isChecked(),
+            'min': self.preload_min1_checkBox.isChecked(),
+            'min5': self.preload_min5_checkBox.isChecked(),
+            'min15': self.preload_min15_checkBox.isChecked(),
+            'min30': self.preload_min30_checkBox.isChecked(),
+            'min60': self.preload_min60_checkBox.isChecked(),
+            'day_max': self.preload_day_spinBox.value(),
+            'week_max': self.preload_week_spinBox.value(),
+            'month_max': self.preload_month_spinBox.value(),
+            'quarter_max': self.preload_quarter_spinBox.value(),
+            'halfyear_max': self.preload_halfyear_spinBox.value(),
+            'year_max': self.preload_year_spinBox.value(),
+            'min_max': self.preload_min1_spinBox.value(),
+            'min5_max': self.preload_min5_spinBox.value(),
+            'min15_max': self.preload_min15_spinBox.value(),
+            'min30_max': self.preload_min30_spinBox.value(),
+            'min60_max': self.preload_min60_spinBox.value(),
         }
         return import_config
 
