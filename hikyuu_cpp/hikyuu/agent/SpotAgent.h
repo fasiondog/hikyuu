@@ -9,7 +9,7 @@
 
 #include <thread>
 #include <functional>
-#include "../flatbuffers/spot_generated.h"
+#include "spot_generated.h"
 #include "../DataType.h"
 #include "../utilities/thread/ThreadPool.h"
 
