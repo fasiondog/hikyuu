@@ -113,7 +113,7 @@ bool H5KDataDriver::_init() {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 auto id = h5file->getId();
-                if (m_mutex_map.find(id) != m_mutex_map.end()) {
+                if (m_mutex_map.find(id) == m_mutex_map.end()) {
                     m_mutex_map[id] = new std::mutex;
                 }
                 m_h5file_map[market + "_DAY"] = h5file;
@@ -127,7 +127,7 @@ bool H5KDataDriver::_init() {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 auto id = h5file->getId();
-                if (m_mutex_map.find(id) != m_mutex_map.end()) {
+                if (m_mutex_map.find(id) == m_mutex_map.end()) {
                     m_mutex_map[id] = new std::mutex;
                 }
                 m_h5file_map[market + "_MIN"] = h5file;
@@ -136,7 +136,7 @@ bool H5KDataDriver::_init() {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 auto id = h5file->getId();
-                if (m_mutex_map.find(id) != m_mutex_map.end()) {
+                if (m_mutex_map.find(id) == m_mutex_map.end()) {
                     m_mutex_map[id] = new std::mutex;
                 }
                 m_h5file_map[market + "_MIN5"] = h5file;
@@ -148,7 +148,7 @@ bool H5KDataDriver::_init() {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 auto id = h5file->getId();
-                if (m_mutex_map.find(id) != m_mutex_map.end()) {
+                if (m_mutex_map.find(id) == m_mutex_map.end()) {
                     m_mutex_map[id] = new std::mutex;
                 }
                 m_h5file_map[market + "_TIME"] = h5file;
@@ -157,7 +157,7 @@ bool H5KDataDriver::_init() {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
                 auto id = h5file->getId();
-                if (m_mutex_map.find(id) != m_mutex_map.end()) {
+                if (m_mutex_map.find(id) == m_mutex_map.end()) {
                     m_mutex_map[id] = new std::mutex;
                 }
                 m_h5file_map[market + "_TRANS"] = h5file;
