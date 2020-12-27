@@ -32,7 +32,7 @@ namespace hku {
 StockManager* StockManager::m_sm = nullptr;
 
 void StockManager::quit() {
-    // releaseThreadPool();
+    releaseThreadPool();
     if (m_sm) {
         delete m_sm;
         m_sm = nullptr;
@@ -41,7 +41,7 @@ void StockManager::quit() {
 
 StockManager::StockManager() {}
 StockManager::~StockManager() {
-    // releaseThreadPool();
+    releaseThreadPool();
     fmt::print("Quit Hikyuu system!\n\n");
 }
 
@@ -100,7 +100,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 创建内部线程池
     // 不能同过 GlobalInitializer 初始化全局线程池
     // 原因是 std::thread 无法在 dllmain 中创建使用，会造成死锁
-    // initThreadPool();
+    initThreadPool();
 
     // 获取路径信息
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
@@ -176,44 +176,70 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     bool preload_min60 = m_preloadParam.tryGet<bool>("min60", false);
     HKU_INFO_IF(preload_min60, "Preloading all 60 min kdata to buffer!");
 
-    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        if (iter->second.market() == "TMP")
-            continue;
+    if (!driver->canParallelLoad()) {
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (iter->second.market() == "TMP")
+                continue;
+            iter->second.setKDataDriver(driver);
+            if (preload_day)
+                iter->second.loadKDataToBuffer(KQuery::DAY);
+            if (preload_week)
+                iter->second.loadKDataToBuffer(KQuery::WEEK);
+            if (preload_month)
+                iter->second.loadKDataToBuffer(KQuery::MONTH);
+            if (preload_quarter)
+                iter->second.loadKDataToBuffer(KQuery::QUARTER);
+            if (preload_halfyear)
+                iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
+            if (preload_year)
+                iter->second.loadKDataToBuffer(KQuery::YEAR);
+            if (preload_min)
+                iter->second.loadKDataToBuffer(KQuery::MIN);
+            if (preload_min5)
+                iter->second.loadKDataToBuffer(KQuery::MIN5);
+            if (preload_min15)
+                iter->second.loadKDataToBuffer(KQuery::MIN15);
+            if (preload_min30)
+                iter->second.loadKDataToBuffer(KQuery::MIN30);
+            if (preload_min60)
+                iter->second.loadKDataToBuffer(KQuery::MIN60);
+        }
 
-        iter->second.setKDataDriver(driver);
-
-        if (preload_day)
-            iter->second.loadKDataToBuffer(KQuery::DAY);
-
-        if (preload_week)
-            iter->second.loadKDataToBuffer(KQuery::WEEK);
-
-        if (preload_month)
-            iter->second.loadKDataToBuffer(KQuery::MONTH);
-
-        if (preload_quarter)
-            iter->second.loadKDataToBuffer(KQuery::QUARTER);
-
-        if (preload_halfyear)
-            iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
-
-        if (preload_year)
-            iter->second.loadKDataToBuffer(KQuery::YEAR);
-
-        if (preload_min)
-            iter->second.loadKDataToBuffer(KQuery::MIN);
-
-        if (preload_min5)
-            iter->second.loadKDataToBuffer(KQuery::MIN5);
-
-        if (preload_min15)
-            iter->second.loadKDataToBuffer(KQuery::MIN15);
-
-        if (preload_min30)
-            iter->second.loadKDataToBuffer(KQuery::MIN30);
-
-        if (preload_min60)
-            iter->second.loadKDataToBuffer(KQuery::MIN60);
+    } else {
+        // 异步并行加载
+        list<std::future<void>> task_list;
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (iter->second.market() == "TMP")
+                continue;
+            Stock stk = iter->second;
+            stk.setKDataDriver(driver);
+            if (preload_day)
+                // iter->second.loadKDataToBuffer(KQuery::DAY);
+                task_list.push_back(addTask([=]() mutable { stk.loadKDataToBuffer(KQuery::DAY); }));
+            if (preload_week)
+                iter->second.loadKDataToBuffer(KQuery::WEEK);
+            if (preload_month)
+                iter->second.loadKDataToBuffer(KQuery::MONTH);
+            if (preload_quarter)
+                iter->second.loadKDataToBuffer(KQuery::QUARTER);
+            if (preload_halfyear)
+                iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
+            if (preload_year)
+                iter->second.loadKDataToBuffer(KQuery::YEAR);
+            if (preload_min)
+                iter->second.loadKDataToBuffer(KQuery::MIN);
+            if (preload_min5)
+                iter->second.loadKDataToBuffer(KQuery::MIN5);
+            if (preload_min15)
+                iter->second.loadKDataToBuffer(KQuery::MIN15);
+            if (preload_min30)
+                iter->second.loadKDataToBuffer(KQuery::MIN30);
+            if (preload_min60)
+                iter->second.loadKDataToBuffer(KQuery::MIN60);
+        }
+        for (auto& task : task_list) {
+            task.get();
+        }
     }
 }
 

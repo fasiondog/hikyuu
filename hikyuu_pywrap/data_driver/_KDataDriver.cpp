@@ -33,6 +33,10 @@ public:
         return this->get_override("isIndexFirst")();
     }
 
+    bool canParallelLoad() {
+        return this->get_override("canParallelLoad")();
+    }
+
     size_t getCount(const string& market, const string& code, KQuery::KType ktype) {
         if (override call = get_override("getCount")) {
             return call(market, code, ktype);
@@ -153,6 +157,7 @@ void export_KDataDriver() {
 
       .def("_init", &KDataDriver::_init, &KDataDriverWrap::default_init)
       .def("isIndexFirst", pure_virtual(&KDataDriver::isIndexFirst))
+      .def("canParallelLoad", pure_virtual(&KDataDriver::canParallelLoad))
       .def("getCount", &KDataDriver::getCount, &KDataDriverWrap::default_getCount)
       //.def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
       //        &KDataDriverWrap::default_getIndexRangeByDate)

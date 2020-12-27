@@ -33,6 +33,10 @@ public:
         return false;
     }
 
+    virtual bool canParallelLoad() override {
+        return true;
+    }
+
     virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
 
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,

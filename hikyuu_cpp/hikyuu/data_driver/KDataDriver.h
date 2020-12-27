@@ -53,6 +53,11 @@ public:
     virtual bool isIndexFirst() = 0;
 
     /**
+     * 是否支持并行数据加载
+     */
+    virtual bool canParallelLoad() = 0;
+
+    /**
      * 获取指定类型的K线数据量
      * @param market 市场简称
      * @param code   证券代码

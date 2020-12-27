@@ -26,6 +26,10 @@ public:
         return false;
     }
 
+    virtual bool canParallelLoad() override {
+        return false;
+    }
+
     /**
      * 获取指定类型的K线数据量
      * @param market 市场简称

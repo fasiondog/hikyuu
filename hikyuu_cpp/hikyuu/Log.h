@@ -307,9 +307,9 @@ std::string HKU_API getLocalTime();
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define HKU_IF_RETURN(expr, ret, ...) \
-    if (expr) {                       \
-        return ret;                   \
+#define HKU_IF_RETURN(expr, ret) \
+    if (expr) {                  \
+        return ret;              \
     }
 
 /**
