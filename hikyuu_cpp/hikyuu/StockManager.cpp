@@ -211,31 +211,40 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             if (iter->second.market() == "TMP")
                 continue;
-            Stock stk = iter->second;
-            stk.setKDataDriver(driver);
+            iter->second.setKDataDriver(driver);
             if (preload_day)
-                // iter->second.loadKDataToBuffer(KQuery::DAY);
-                task_list.push_back(addTask([=]() mutable { stk.loadKDataToBuffer(KQuery::DAY); }));
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::DAY); }));
             if (preload_week)
-                iter->second.loadKDataToBuffer(KQuery::WEEK);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::WEEK); }));
             if (preload_month)
-                iter->second.loadKDataToBuffer(KQuery::MONTH);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MONTH); }));
             if (preload_quarter)
-                iter->second.loadKDataToBuffer(KQuery::QUARTER);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::QUARTER); }));
             if (preload_halfyear)
-                iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::HALFYEAR); }));
             if (preload_year)
-                iter->second.loadKDataToBuffer(KQuery::YEAR);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::YEAR); }));
             if (preload_min)
-                iter->second.loadKDataToBuffer(KQuery::MIN);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN); }));
             if (preload_min5)
-                iter->second.loadKDataToBuffer(KQuery::MIN5);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN5); }));
             if (preload_min15)
-                iter->second.loadKDataToBuffer(KQuery::MIN15);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN15); }));
             if (preload_min30)
-                iter->second.loadKDataToBuffer(KQuery::MIN30);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN30); }));
             if (preload_min60)
-                iter->second.loadKDataToBuffer(KQuery::MIN60);
+                task_list.push_back(
+                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN60); }));
         }
         for (auto& task : task_list) {
             task.get();

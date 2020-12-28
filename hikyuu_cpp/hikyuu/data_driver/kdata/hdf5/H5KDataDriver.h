@@ -27,7 +27,12 @@ public:
     }
 
     virtual bool canParallelLoad() override {
+#if defined(H5_HAVE_WIN_THREADS)
         return true;
+#else
+        HKU_WARN("Current hdf5 library is not thread-safe!");
+        return false;
+#endif
     }
 
     virtual size_t getCount(const string& market, const string& code, KQuery::KType kType) override;
