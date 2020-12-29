@@ -203,6 +203,9 @@ public:
 private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
 
+    // 判断是否在交易时间段内（不判断日期）
+    bool _isTransactionTime(Datetime time);
+
     // 以下函数属于基础操作添加了读锁
     size_t _getCountFromBuffer(KQuery::KType ktype) const;
     KRecord _getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const;

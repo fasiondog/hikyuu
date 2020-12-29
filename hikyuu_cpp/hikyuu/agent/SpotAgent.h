@@ -74,6 +74,11 @@ public:
     /** 停止代理 */
     void stop();
 
+    /** 设置是否打印数据接收进展情况，主要用于在交互环境下关闭打印 */
+    void setPrintFlag(bool print) {
+        m_print = print;
+    }
+
     /**
      * 增加收到 Spot 数据时的处理函数
      * @param process 处理函数，仅处理单条 spot 数据
@@ -108,20 +113,23 @@ private:
     enum STATUS { WAITING, RECEIVING };  // 等待新的批次数据，正在接收批次数据中
     enum STATUS m_status = WAITING;      // 当前内部状态
     bool m_stop = false;                 // 结束代理工作标识
-    int m_revTimeout = 100;              // 连接数据服务超时时长（毫秒）
-    size_t m_batch_count = 0;            // 记录本次批次接收的数据数量
-    std::thread m_receiveThread;         // 数据接收线程
-    ThreadPool m_tg;                     // 数据处理任务线程池
+    bool m_print = true;          // 是否打印接收进度，防止的交互模式的影响
+    int m_revTimeout = 100;       // 连接数据服务超时时长（毫秒）
+    size_t m_batch_count = 0;     // 记录本次批次接收的数据数量
+    std::thread m_receiveThread;  // 数据接收线程
+    ThreadPool m_tg;              // 数据处理任务线程池
     list<std::function<void(const SpotRecord&)>> m_processList;  // 已注册的 spot 处理函数列表
     list<std::function<void()>> m_postProcessList;  // 已注册的批次后处理函数列表
+    vector<std::future<void>> m_process_task_list;
 };
 
 /**
  * 启动 Spot 数据接收代理
  * @details 默认增加缓存日线数据更新处理
+ * @param print 打印接收数据进展
  * @ingroup Agent
  */
-void HKU_API start_spot_agent();
+void HKU_API start_spot_agent(bool print = true);
 
 /**
  * 终止 Spot 数据接收代理

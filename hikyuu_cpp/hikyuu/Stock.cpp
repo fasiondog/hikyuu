@@ -667,6 +667,23 @@ PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     return result;
 }
 
+// 判断是否在交易时间段内（不判断日期）
+bool Stock::_isTransactionTime(Datetime time) {
+    MarketInfo market_info = StockManager::instance().getMarketInfo(market());
+    HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
+    HKU_IF_RETURN(market_info.openTime1() == market_info.closeTime1() ||
+                    market_info.openTime2() == market_info.closeTime2(),
+                  false);
+    Datetime today = Datetime::today();
+    Datetime openTime1 = today + market_info.openTime1();
+    Datetime closeTime1 = today + market_info.closeTime1();
+    HKU_IF_RETURN(time >= openTime1 && time <= closeTime1, true);
+
+    Datetime openTime2 = today + market_info.openTime2();
+    Datetime closeTime2 = today + market_info.closeTime2();
+    return time >= openTime2 && time <= closeTime2;
+}
+
 void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
     string ktype(inktype);
     to_upper(ktype);

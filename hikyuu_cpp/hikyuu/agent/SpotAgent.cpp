@@ -110,7 +110,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
 }
 
 void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
-    SPEND_TIME(receive_data);
+    // SPEND_TIME(receive_data);
     const uint8_t* spot_list_buf = (const uint8_t*)(buf) + ms_spotTopicLength;
 
     // 校验数据
@@ -127,7 +127,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
         for (auto& process : m_processList) {
             auto spot_record = parseFlatSpot(spot);
             if (spot_record) {
-                m_tg.submit(ProcessTask(process, *spot_record));
+                m_process_task_list.push_back(m_tg.submit(ProcessTask(process, *spot_record)));
             }
         }
     }
@@ -173,13 +173,18 @@ void SpotAgent::work_thread() {
                     }
                     break;
                 case RECEIVING:
-                    if (length == ms_endTagLength) {
+                    if (memcmp(buf, ms_endTag, ms_endTagLength) == 0) {
                         m_status = WAITING;
+                        for (auto& task : m_process_task_list) {
+                            task.get();
+                        }
+                        HKU_INFO_IF(m_print, "received count: {}", m_batch_count);
                         m_batch_count = 0;
                         // 执行后处理
                         for (auto& postProcess : m_postProcessList) {
                             postProcess();
                         }
+                        m_process_task_list.clear();
                     } else {
                         HKU_CHECK(memcmp(buf, ms_startTag, ms_startTagLength) != 0,
                                   "Data not received in time, maybe the send speed is too fast!");
@@ -201,7 +206,9 @@ void SpotAgent::work_thread() {
 }
 
 void SpotAgent::start() {
-    m_receiveThread = std::thread(&SpotAgent::work_thread, this);
+    if (m_stop) {
+        m_receiveThread = std::thread(&SpotAgent::work_thread, this);
+    }
 }
 
 void SpotAgent::stop() {
@@ -229,8 +236,9 @@ static void updateStockDayData(const SpotRecord& spot) {
     stk.realtimeUpdate(krecord, KQuery::DAY);
 }
 
-void HKU_API start_spot_agent() {
+void HKU_API start_spot_agent(bool print) {
     auto& agent = SpotAgent::instance();
+    agent.setPrintFlag(print);
     agent.addProcess(updateStockDayData);
     agent.start();
 }
