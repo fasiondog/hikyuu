@@ -671,17 +671,24 @@ PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
 bool Stock::_isTransactionTime(Datetime time) {
     MarketInfo market_info = StockManager::instance().getMarketInfo(market());
     HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
-    HKU_IF_RETURN(market_info.openTime1() == market_info.closeTime1() ||
+
+    HKU_ERROR_IF_RETURN(market_info.openTime1() > market_info.closeTime1() ||
+                          market_info.openTime2() > market_info.closeTime2(),
+                        false, "Error transaction time in market({})!", market_info.market());
+
+    // 如果交易时间段的起始和终止时间都相等则认未做限定，全天都为可交易时间
+    HKU_IF_RETURN(market_info.openTime1() == market_info.closeTime1() &&
                     market_info.openTime2() == market_info.closeTime2(),
-                  false);
+                  true);
+
     Datetime today = Datetime::today();
     Datetime openTime1 = today + market_info.openTime1();
     Datetime closeTime1 = today + market_info.closeTime1();
-    HKU_IF_RETURN(time >= openTime1 && time <= closeTime1, true);
+    HKU_IF_RETURN(time >= openTime1 && time < closeTime1, true);  // close判断不包括等于
 
     Datetime openTime2 = today + market_info.openTime2();
     Datetime closeTime2 = today + market_info.closeTime2();
-    return time >= openTime2 && time <= closeTime2;
+    return time >= openTime2 && time < closeTime2;
 }
 
 void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
