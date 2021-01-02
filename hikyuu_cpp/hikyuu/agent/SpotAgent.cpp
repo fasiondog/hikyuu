@@ -224,22 +224,76 @@ void SpotAgent::addPostProcess(std::function<void()> func) {
 }
 
 static void updateStockDayData(const SpotRecord& spot) {
-    const auto& sm = StockManager::instance();
     std::stringstream market_code_buf;
     market_code_buf << spot.market << spot.code;
-    Stock stk = sm[market_code_buf.str()];
-    if (stk.isNull())
-        return;
-
-    KRecord krecord(spot.datetime, spot.open, spot.high, spot.low, spot.close, spot.amount,
-                    spot.volumn);
+    Stock stk = StockManager::instance().getStock(market_code_buf.str());
+    HKU_IF_RETURN(stk.isNull(), void());
+    KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day()),
+                    spot.open, spot.high, spot.low, spot.close, spot.amount, spot.volumn);
     stk.realtimeUpdate(krecord, KQuery::DAY);
+}
+
+static void updateStockWeekData(const SpotRecord& spot) {
+    std::stringstream market_code_buf;
+    market_code_buf << spot.market << spot.code;
+    Stock stk = StockManager::instance().getStock(market_code_buf.str());
+    HKU_IF_RETURN(stk.isNull(), void());
+
+    Datetime spot_day = Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day());
+    Datetime spot_end_of_week = spot_day.endOfWeek() - TimeDelta(2);  // 周五日期
+    KQuery::KType ktype(KQuery::WEEK);
+    size_t total = stk.getCount(ktype);
+
+    // 没有历史数据，则直接更新并返回
+    if (total == 0) {
+        stk.realtimeUpdate(KRecord(spot_end_of_week, spot.open, spot.high, spot.low, spot.close,
+                                   spot.amount, spot.volumn),
+                           ktype);
+        return;
+    }
+
+    KRecord last_record = stk.getKRecord(total - 1, ktype);
+    if (spot_end_of_week > last_record.datetime) {
+        // 如果当前的日期大于最后记录的日期，则为新增数据，直接更新并返回
+        stk.realtimeUpdate(KRecord(spot_end_of_week, spot.open, spot.high, spot.low, spot.close,
+                                   spot.amount, spot.volumn),
+                           ktype);
+
+    } else if (spot_end_of_week == last_record.datetime) {
+        // 如果当前日期等于最后记录的日期，则需要重新计算最高价、最低价、交易金额、交易量
+        Datetime spot_start_of_week = spot_day.startOfWeek();
+        KRecordList klist =
+          stk.getKRecordList(KQuery(spot_start_of_week, spot_end_of_week + TimeDelta(1), ktype));
+        price_t amount = 0, volumn = 0;
+        for (auto& k : klist) {
+            amount += k.transAmount;
+            volumn += k.transCount;
+        }
+        stk.realtimeUpdate(
+          KRecord(spot_end_of_week, last_record.openPrice,
+                  spot.high > last_record.highPrice ? spot.high : last_record.highPrice,
+                  spot.low < last_record.lowPrice ? spot.low : last_record.lowPrice, spot.close,
+                  amount, volumn));
+    } else {
+        // 不应该出现的情况：当前日期小于最后记录的日期
+        HKU_WARN(
+          "Ignore, What should not happen, the current date is less than the last recorded date!");
+    }
 }
 
 void HKU_API start_spot_agent(bool print) {
     auto& agent = SpotAgent::instance();
     agent.setPrintFlag(print);
-    agent.addProcess(updateStockDayData);
+
+    const auto& preloadParam = StockManager::instance().getPreloadParameter();
+    if (preloadParam.tryGet<bool>("day", false)) {
+        agent.addProcess(updateStockDayData);
+    }
+
+    if (preloadParam.tryGet<bool>("week", false)) {
+        agent.addProcess(updateStockWeekData);
+    }
+
     agent.start();
 }
 
