@@ -74,6 +74,11 @@ public:
     /** 停止代理 */
     void stop();
 
+    /** 是否处于运行状态 */
+    bool isRunning() {
+        return !m_stop;
+    }
+
     /** 设置是否打印数据接收进展情况，主要用于在交互环境下关闭打印 */
     void setPrintFlag(bool print) {
         m_print = print;
@@ -81,15 +86,29 @@ public:
 
     /**
      * 增加收到 Spot 数据时的处理函数
+     * @note 仅能在停止状态时执行此操作，否则将抛出异常
      * @param process 处理函数，仅处理单条 spot 数据
      */
     void addProcess(std::function<void(const SpotRecord&)> process);
 
     /**
      * 在接受某时刻全部批次的数据后，进行相应的后处理函数
+     * @note 仅能在停止状态时执行此操作，否则将抛出异常
      * @param func 后处理函数
      */
     void addPostProcess(std::function<void()> func);
+
+    /**
+     * 清除之前增加的所有处理函数
+     * @note 仅能在停止状态时执行此操作，否则将抛出异常
+     */
+    void clearProcessList();
+
+    /**
+     * 清除之前增加的所有后处理函数
+     * @note 仅能在停止状态时执行此操作，否则将抛出异常
+     */
+    void clearPostProcessList();
 
 private:
     static SpotAgent* ms_spotAgent;  // 全局单例
@@ -103,6 +122,10 @@ private:
 
 private:
     SpotAgent() = default;
+    SpotAgent(const SpotAgent&) = delete;
+    SpotAgent(SpotAgent&&) = delete;
+    SpotAgent& operator=(const SpotAgent&) = delete;
+    SpotAgent& operator=(SpotAgent&&) = delete;
 
     unique_ptr<SpotRecord> parseFlatSpot(const hikyuu::flat::Spot* spot);
     void parseSpotData(const void* buf, size_t buf_len);
@@ -112,7 +135,7 @@ private:
 private:
     enum STATUS { WAITING, RECEIVING };  // 等待新的批次数据，正在接收批次数据中
     enum STATUS m_status = WAITING;      // 当前内部状态
-    bool m_stop = false;                 // 结束代理工作标识
+    std::atomic_bool m_stop = true;      // 结束代理工作标识
     bool m_print = true;          // 是否打印接收进度，防止的交互模式的影响
     int m_revTimeout = 100;       // 连接数据服务超时时长（毫秒）
     size_t m_batch_count = 0;     // 记录本次批次接收的数据数量
@@ -124,8 +147,7 @@ private:
 };
 
 /**
- * 启动 Spot 数据接收代理
- * @details 默认增加缓存日线数据更新处理
+ * 启动 Spot 数据接收代理，如果之前已经处于运行状态，将抛出异常
  * @param print 打印接收数据进展
  * @ingroup Agent
  */

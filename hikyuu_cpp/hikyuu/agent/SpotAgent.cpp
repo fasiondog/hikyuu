@@ -42,8 +42,19 @@ void SpotAgent::release() {
 }
 
 SpotAgent::~SpotAgent() {
+    stop();
+}
+
+void SpotAgent::start() {
+    if (m_stop) {
+        m_stop = false;
+        m_receiveThread = std::thread(&SpotAgent::work_thread, this);
+    }
+}
+
+void SpotAgent::stop() {
+    m_stop = true;
     if (m_receiveThread.joinable()) {
-        m_stop = true;
         m_receiveThread.join();
     }
 }
@@ -205,28 +216,34 @@ void SpotAgent::work_thread() {
     nng_close(sock);
 }
 
-void SpotAgent::start() {
-    if (m_stop) {
-        m_receiveThread = std::thread(&SpotAgent::work_thread, this);
-    }
-}
-
-void SpotAgent::stop() {
-    m_stop = true;
-}
-
 void SpotAgent::addProcess(std::function<void(const SpotRecord&)> process) {
+    HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
     m_processList.push_back(process);
 }
 
 void SpotAgent::addPostProcess(std::function<void()> func) {
+    HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
     m_postProcessList.push_back(func);
 }
 
-static void updateStockDayData(const SpotRecord& spot) {
+void SpotAgent::clearProcessList() {
+    HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    m_processList.clear();
+}
+
+void SpotAgent::clearPostProcessList() {
+    HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
+    m_postProcessList.clear();
+}
+
+static string getSpotMarketCode(const SpotRecord& spot) {
     std::stringstream market_code_buf;
     market_code_buf << spot.market << spot.code;
-    Stock stk = StockManager::instance().getStock(market_code_buf.str());
+    return market_code_buf.str();
+}
+
+static void updateStockDayData(const SpotRecord& spot) {
+    Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
     HKU_IF_RETURN(stk.isNull(), void());
     KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day()),
                     spot.open, spot.high, spot.low, spot.close, spot.amount, spot.volumn);
@@ -234,13 +251,14 @@ static void updateStockDayData(const SpotRecord& spot) {
 }
 
 static void updateStockWeekData(const SpotRecord& spot) {
-    std::stringstream market_code_buf;
-    market_code_buf << spot.market << spot.code;
-    Stock stk = StockManager::instance().getStock(market_code_buf.str());
+    Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
     HKU_IF_RETURN(stk.isNull(), void());
 
+    std::function<Datetime(Datetime*)> endOfPhase = &Datetime::endOfWeek;
+    std::function<Datetime(Datetime*)> startOfPhase = &Datetime::startOfWeek;
+
     Datetime spot_day = Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day());
-    Datetime spot_end_of_week = spot_day.endOfWeek() - TimeDelta(2);  // 周五日期
+    Datetime spot_end_of_week = endOfPhase(&spot_day) - TimeDelta(2);  // 周五日期
     KQuery::KType ktype(KQuery::WEEK);
     size_t total = stk.getCount(ktype);
 
@@ -261,10 +279,10 @@ static void updateStockWeekData(const SpotRecord& spot) {
 
     } else if (spot_end_of_week == last_record.datetime) {
         // 如果当前日期等于最后记录的日期，则需要重新计算最高价、最低价、交易金额、交易量
-        Datetime spot_start_of_week = spot_day.startOfWeek();
+        Datetime spot_start_of_week = startOfPhase(&spot_day);
         KRecordList klist =
           stk.getKRecordList(KQuery(spot_start_of_week, spot_end_of_week + TimeDelta(1), ktype));
-        price_t amount = 0, volumn = 0;
+        price_t amount = 0.0, volumn = 0.0;
         for (auto& k : klist) {
             amount += k.transAmount;
             volumn += k.transCount;
@@ -273,7 +291,8 @@ static void updateStockWeekData(const SpotRecord& spot) {
           KRecord(spot_end_of_week, last_record.openPrice,
                   spot.high > last_record.highPrice ? spot.high : last_record.highPrice,
                   spot.low < last_record.lowPrice ? spot.low : last_record.lowPrice, spot.close,
-                  amount, volumn));
+                  amount, volumn),
+          ktype);
     } else {
         // 不应该出现的情况：当前日期小于最后记录的日期
         HKU_WARN(
@@ -281,11 +300,39 @@ static void updateStockWeekData(const SpotRecord& spot) {
     }
 }
 
+static void updateStockMinData(const SpotRecord& spot) {
+    Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
+    HKU_IF_RETURN(stk.isNull(), void());
+
+    KQuery::KType ktype(KQuery::MIN);
+    Datetime minute = Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day(),
+                               spot.datetime.hour(), spot.datetime.minute());
+    KRecordList klist = stk.getKRecordList(KQuery(minute, minute + TimeDelta(0, 0, 1), ktype));
+    price_t sum_amount = 0.0, sum_volumn = 0.0;
+    for (auto& k : klist) {
+        sum_amount += k.transAmount;
+        sum_volumn += k.transCount;
+    }
+
+    price_t amount = spot.amount > sum_amount ? spot.amount - sum_amount : spot.amount;
+    price_t volumn = spot.volumn > sum_volumn ? spot.volumn - sum_volumn : spot.volumn;
+    KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day(),
+                             spot.datetime.hour(), spot.datetime.minute()),
+                    spot.open, spot.high, spot.low, spot.close, amount, volumn);
+    stk.realtimeUpdate(krecord, ktype);
+}
+
 void HKU_API start_spot_agent(bool print) {
     auto& agent = SpotAgent::instance();
+    HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
+
     agent.setPrintFlag(print);
 
     const auto& preloadParam = StockManager::instance().getPreloadParameter();
+    if (preloadParam.tryGet<bool>("min", false)) {
+        agent.addProcess(updateStockMinData);
+    }
+
     if (preloadParam.tryGet<bool>("day", false)) {
         agent.addProcess(updateStockDayData);
     }
