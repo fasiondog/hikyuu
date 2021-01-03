@@ -28,6 +28,14 @@ const string KQuery::HOUR6("HOUR5");
 const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
+// 获取所有的 KType
+vector<string> KQuery::getAllKType() {
+    return vector<string>{KQuery::MIN,     KQuery::MIN5,     KQuery::MIN15, KQuery::MIN30,
+                          KQuery::MIN60,   KQuery::DAY,      KQuery::WEEK,  KQuery::MONTH,
+                          KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::MIN3,
+                          KQuery::HOUR2,   KQuery::HOUR4,    KQuery::HOUR6, KQuery::HOUR12};
+}
+
 KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverType)
 : m_start(start == Null<Datetime>() ? (int64_t)start.number()
                                     : (int64_t)(start.number() * 100 + start.second())),

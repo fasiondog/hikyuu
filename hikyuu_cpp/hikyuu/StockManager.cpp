@@ -150,7 +150,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     HKU_INFO_IF(preload_week, "Preloading all week kdata to buffer!");
 
     bool preload_month = m_preloadParam.tryGet<bool>("month", false);
-    HKU_INFO_IF(preload_week, "Preloading all month kdata to buffer!");
+    HKU_INFO_IF(preload_month, "Preloading all month kdata to buffer!");
 
     bool preload_quarter = m_preloadParam.tryGet<bool>("quarter", false);
     HKU_INFO_IF(preload_quarter, "Preloading all quarter kdata to buffer!");

@@ -11,7 +11,7 @@ target("demo")
         set_default(false)
     end
     
-    add_packages("spdlog", "fmt")
+    add_packages("spdlog", "fmt", "flatbuffers")
     add_includedirs("..")
 
     if is_plat("windows") then

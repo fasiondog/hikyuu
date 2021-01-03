@@ -111,11 +111,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                             'preload', 'halfyear_max', fallback=100000
                         ),
                         year_max=current_config.getint('preload', 'year_max', fallback=100000),
-                        min1_max=current_config.getint('preload', 'min_max', fallback=5120),
-                        min5_max=current_config.getint('preload', 'min5_max', fallback=5120),
-                        min15_max=current_config.getint('preload', 'min15_max', fallback=5120),
-                        min30_max=current_config.getint('preload', 'min30_max', fallback=5120),
-                        min60_max=current_config.getint('preload', 'min60_max', fallback=5120),
+                        min1_max=current_config.getint('preload', 'min_max', fallback=4096),
+                        min5_max=current_config.getint('preload', 'min5_max', fallback=4096),
+                        min15_max=current_config.getint('preload', 'min15_max', fallback=4096),
+                        min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
+                        min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
                     )
                 )
         else:
@@ -149,11 +149,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                             'preload', 'halfyear_max', fallback=100000
                         ),
                         year_max=current_config.getint('preload', 'year_max', fallback=100000),
-                        min1_max=current_config.getint('preload', 'min_max', fallback=5120),
-                        min5_max=current_config.getint('preload', 'min5_max', fallback=5120),
-                        min15_max=current_config.getint('preload', 'min15_max', fallback=5120),
-                        min30_max=current_config.getint('preload', 'min30_max', fallback=5120),
-                        min60_max=current_config.getint('preload', 'min60_max', fallback=5120),
+                        min1_max=current_config.getint('preload', 'min_max', fallback=4096),
+                        min5_max=current_config.getint('preload', 'min5_max', fallback=4096),
+                        min15_max=current_config.getint('preload', 'min15_max', fallback=4096),
+                        min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
+                        min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
                     )
                 )
 

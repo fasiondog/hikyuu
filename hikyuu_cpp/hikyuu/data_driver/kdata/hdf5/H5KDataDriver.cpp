@@ -339,14 +339,15 @@ bool H5KDataDriver::getIndexRangeByDate(const string& market, const string& code
     HKU_IF_RETURN(!h5file, false);
     std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
 
+    bool result = false;
     if (KQuery::MIN5 == query.kType() || KQuery::MIN == query.kType() ||
         KQuery::DAY == query.kType()) {
-        return _getBaseIndexRangeByDate(market, code, query, out_start, out_end);
+        result = _getBaseIndexRangeByDate(market, code, query, out_start, out_end);
     } else {
-        return _getOtherIndexRangeByDate(market, code, query, out_start, out_end);
+        result = _getOtherIndexRangeByDate(market, code, query, out_start, out_end);
     }
 
-    return false;
+    return result;
 }
 
 bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string& code,

@@ -69,6 +69,9 @@ public:
     static const string HOUR12;
     // static const string INVALID_KTYPE;
 
+    /** 获取所有的 KType */
+    static vector<string> getAllKType();
+
     /**
      * 复权类型
      * @note 日线以上，如周线/月线不支持复权
