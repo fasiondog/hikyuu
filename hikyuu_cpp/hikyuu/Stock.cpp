@@ -112,7 +112,6 @@ Stock::Data::~Data() {
             std::unique_lock<std::shared_mutex> lock(*pMutex[ktype]);
             if (pKData[ktype]) {
                 delete pKData[ktype];
-                pKData[ktype] = nullptr;
             }
 
             delete pMutex[ktype];
@@ -225,12 +224,15 @@ void Stock::setKDataDriver(const KDataDriverPtr& kdataDriver) {
     HKU_CHECK(kdataDriver, "kdataDriver is nullptr!");
     m_kdataDriver = kdataDriver;
     if (m_data) {
+        std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
         auto ktype_list = KQuery::getAllKType();
         for (auto& ktype : ktype_list) {
             if (m_data->pMutex[ktype]) {
                 std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
                 delete m_data->pKData[ktype];
                 m_data->pKData[ktype] = nullptr;
+                delete m_data->pMutex[ktype];
+                m_data->pMutex[ktype] = nullptr;
             }
         }
     }
@@ -265,10 +267,13 @@ void Stock::releaseKDataBuffer(KQuery::KType inkType) {
         string ktype(inkType);
         to_upper(ktype);
 
+        std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
         if (m_data->pKData.find(ktype) != m_data->pKData.end() && m_data->pMutex[ktype]) {
             std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
             delete m_data->pKData[ktype];
             m_data->pKData[ktype] = nullptr;
+            delete m_data->pMutex[ktype];
+            m_data->pMutex[ktype] = nullptr;
         }
     }
 }
@@ -281,11 +286,9 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
 
         releaseKDataBuffer(kType);
         if (m_kdataDriver && m_data->pKData.find(kType) != m_data->pKData.end()) {
+            std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
             KRecordList* ptr_klist = new KRecordList;
-            std::shared_mutex* ptr_mutex = m_data->pMutex[kType];
-            if (!ptr_mutex) {
-                ptr_mutex = new std::shared_mutex();
-            }
+            std::shared_mutex* ptr_mutex = new std::shared_mutex();
             m_data->pKData[kType] = ptr_klist;
             m_data->pMutex[kType] = ptr_mutex;
             const auto& param = StockManager::instance().getPreloadParameter();
@@ -362,7 +365,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
     to_upper(ktype);
 
     // 如果为内存缓存或者数据驱动为索引优先，则按索引方式获取
-    if (m_data->pKData[ktype] || m_kdataDriver->isIndexFirst()) {
+    if (isBuffer(ktype) || m_kdataDriver->isIndexFirst()) {
         KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
         size_t out_start, out_end;
         if (getIndexRange(query, out_start, out_end)) {
@@ -557,7 +560,7 @@ KRecord Stock::_getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const {
 
 KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
     HKU_IF_RETURN(!m_data, Null<KRecord>());
-    if (m_data->pKData[kType]) {
+    if (isBuffer(kType)) {
         return _getKRecordFromBuffer(pos, kType);
     }
 
@@ -570,10 +573,8 @@ KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
     KRecord result;
     HKU_IF_RETURN(isNull(), result);
 
-    // string ktype(inktype);
-    // to_upper(ktype);
     KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
-    if (m_data->pKData[ktype] || m_kdataDriver->isIndexFirst()) {
+    if (isBuffer(query.kType()) || m_kdataDriver->isIndexFirst()) {
         size_t startix = 0, endix = 0;
         return getIndexRange(query, startix, endix) ? getKRecord(startix, ktype) : Null<KRecord>();
     }
@@ -600,7 +601,7 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
     HKU_IF_RETURN(isNull(), result);
 
     // 如果是在内存缓存中
-    if (m_data->pKData[query.kType()]) {
+    if (isBuffer(query.kType())) {
         size_t start_ix = 0, end_ix = 0;
         if (query.queryType() == KQuery::DATE) {
             if (!_getIndexRangeByDateFromBuffer(query, start_ix, end_ix)) {
@@ -707,11 +708,10 @@ bool Stock::_isTransactionTime(Datetime time) {
 }
 
 void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
+    HKU_IF_RETURN(!isBuffer(inktype) || record.datetime.isNull(), void());
+
     string ktype(inktype);
     to_upper(ktype);
-    if (!m_data || m_data->pKData[ktype] || record.datetime.isNull()) {
-        return;
-    }
 
     // 加写锁
     std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
