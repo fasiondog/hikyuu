@@ -250,45 +250,66 @@ static void updateStockDayData(const SpotRecord& spot) {
     stk.realtimeUpdate(krecord, KQuery::DAY);
 }
 
-static void updateStockWeekData(const SpotRecord& spot) {
+static void updateStockDayUpData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
     HKU_IF_RETURN(stk.isNull(), void());
 
-    std::function<Datetime(Datetime*)> endOfPhase = &Datetime::endOfWeek;
-    std::function<Datetime(Datetime*)> startOfPhase = &Datetime::startOfWeek;
+    std::function<Datetime(Datetime*)> endOfPhase;
+    std::function<Datetime(Datetime*)> startOfPhase;
+
+    if (KQuery::WEEK == ktype) {
+        endOfPhase = &Datetime::endOfWeek;
+        startOfPhase = &Datetime::startOfWeek;
+    } else if (KQuery::MONTH == ktype) {
+        endOfPhase = &Datetime::endOfMonth;
+        startOfPhase = &Datetime::startOfMonth;
+    } else if (KQuery::QUARTER == ktype) {
+        endOfPhase = &Datetime::endOfQuarter;
+        startOfPhase = &Datetime::startOfQuarter;
+    } else if (KQuery::HALFYEAR == ktype) {
+        endOfPhase = &Datetime::endOfHalfyear;
+        startOfPhase = &Datetime::startOfHalfyear;
+    } else if (KQuery::YEAR == ktype) {
+        endOfPhase = &Datetime::endOfYear;
+        startOfPhase = &Datetime::startOfYear;
+    } else {
+        HKU_THROW("Invalid ktype: {}", ktype);
+    }
 
     Datetime spot_day = Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day());
-    Datetime spot_end_of_week = endOfPhase(&spot_day) - TimeDelta(2);  // 周五日期
-    KQuery::KType ktype(KQuery::WEEK);
+    Datetime spot_end_of_phase = endOfPhase(&spot_day);
+    if (KQuery::WEEK == ktype) {
+        spot_end_of_phase = spot_end_of_phase - TimeDelta(2);  // 周五日期
+    }
     size_t total = stk.getCount(ktype);
 
     // 没有历史数据，则直接更新并返回
     if (total == 0) {
-        stk.realtimeUpdate(KRecord(spot_end_of_week, spot.open, spot.high, spot.low, spot.close,
+        stk.realtimeUpdate(KRecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close,
                                    spot.amount, spot.volumn),
                            ktype);
         return;
     }
 
     KRecord last_record = stk.getKRecord(total - 1, ktype);
-    if (spot_end_of_week > last_record.datetime) {
+    if (spot_end_of_phase > last_record.datetime) {
         // 如果当前的日期大于最后记录的日期，则为新增数据，直接更新并返回
-        stk.realtimeUpdate(KRecord(spot_end_of_week, spot.open, spot.high, spot.low, spot.close,
+        stk.realtimeUpdate(KRecord(spot_end_of_phase, spot.open, spot.high, spot.low, spot.close,
                                    spot.amount, spot.volumn),
                            ktype);
 
-    } else if (spot_end_of_week == last_record.datetime) {
+    } else if (spot_end_of_phase == last_record.datetime) {
         // 如果当前日期等于最后记录的日期，则需要重新计算最高价、最低价、交易金额、交易量
-        Datetime spot_start_of_week = startOfPhase(&spot_day);
+        Datetime spot_start_of_phase = startOfPhase(&spot_day);
         KRecordList klist =
-          stk.getKRecordList(KQuery(spot_start_of_week, spot_end_of_week + TimeDelta(1), ktype));
+          stk.getKRecordList(KQuery(spot_start_of_phase, spot_end_of_phase + TimeDelta(1), ktype));
         price_t amount = 0.0, volumn = 0.0;
         for (auto& k : klist) {
             amount += k.transAmount;
             volumn += k.transCount;
         }
         stk.realtimeUpdate(
-          KRecord(spot_end_of_week, last_record.openPrice,
+          KRecord(spot_end_of_phase, last_record.openPrice,
                   spot.high > last_record.highPrice ? spot.high : last_record.highPrice,
                   spot.low < last_record.lowPrice ? spot.low : last_record.lowPrice, spot.close,
                   amount, volumn),
@@ -300,14 +321,38 @@ static void updateStockWeekData(const SpotRecord& spot) {
     }
 }
 
-static void updateStockMinData(const SpotRecord& spot) {
+static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     Stock stk = StockManager::instance().getStock(getSpotMarketCode(spot));
     HKU_IF_RETURN(stk.isNull(), void());
 
-    KQuery::KType ktype(KQuery::MIN);
-    Datetime minute = Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day(),
-                               spot.datetime.hour(), spot.datetime.minute());
-    KRecordList klist = stk.getKRecordList(KQuery(minute, minute + TimeDelta(0, 0, 1), ktype));
+    TimeDelta gap;
+    if (KQuery::MIN == ktype) {
+        gap = TimeDelta(0, 0, 1);
+    } else if (KQuery::MIN5 == ktype) {
+        gap = TimeDelta(0, 0, 5);
+    } else if (KQuery::MIN15 == ktype) {
+        gap = TimeDelta(0, 0, 15);
+    } else if (KQuery::MIN30 == ktype) {
+        gap = TimeDelta(0, 0, 30);
+    } else if (KQuery::MIN60 == ktype) {
+        gap = TimeDelta(0, 0, 60);
+    } else if (KQuery::MIN3 == ktype) {
+        gap = TimeDelta(0, 0, 3);
+    } else if (KQuery::HOUR2 == ktype) {
+        gap = TimeDelta(0, 2);
+    } else if (KQuery::HOUR4 == ktype) {
+        gap = TimeDelta(0, 4);
+    } else if (KQuery::HOUR6 == ktype) {
+        gap = TimeDelta(0, 6);
+    } else if (KQuery::HOUR12 == ktype) {
+        gap = TimeDelta(0, 12);
+    } else {
+        HKU_THROW("Invalid ktype: {}", ktype);
+    }
+
+    Datetime minute = spot.datetime;
+    minute = minute - (minute - minute.startOfDay()) % gap;
+    KRecordList klist = stk.getKRecordList(KQuery(minute, minute + gap, ktype));
     price_t sum_amount = 0.0, sum_volumn = 0.0;
     for (auto& k : klist) {
         sum_amount += k.transAmount;
@@ -316,9 +361,7 @@ static void updateStockMinData(const SpotRecord& spot) {
 
     price_t amount = spot.amount > sum_amount ? spot.amount - sum_amount : spot.amount;
     price_t volumn = spot.volumn > sum_volumn ? spot.volumn - sum_volumn : spot.volumn;
-    KRecord krecord(Datetime(spot.datetime.year(), spot.datetime.month(), spot.datetime.day(),
-                             spot.datetime.hour(), spot.datetime.minute()),
-                    spot.open, spot.high, spot.low, spot.close, amount, volumn);
+    KRecord krecord(minute, spot.open, spot.high, spot.low, spot.close, amount, volumn);
     stk.realtimeUpdate(krecord, ktype);
 }
 
@@ -330,7 +373,7 @@ void HKU_API start_spot_agent(bool print) {
 
     const auto& preloadParam = StockManager::instance().getPreloadParameter();
     if (preloadParam.tryGet<bool>("min", false)) {
-        agent.addProcess(updateStockMinData);
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN));
     }
 
     if (preloadParam.tryGet<bool>("day", false)) {
@@ -338,7 +381,59 @@ void HKU_API start_spot_agent(bool print) {
     }
 
     if (preloadParam.tryGet<bool>("week", false)) {
-        agent.addProcess(updateStockWeekData);
+        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::WEEK));
+    }
+
+    if (preloadParam.tryGet<bool>("month", false)) {
+        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::MONTH));
+    }
+
+    if (preloadParam.tryGet<bool>("quarter", false)) {
+        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::QUARTER));
+    }
+
+    if (preloadParam.tryGet<bool>("halfyear", false)) {
+        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::HALFYEAR));
+    }
+
+    if (preloadParam.tryGet<bool>("year", false)) {
+        agent.addProcess(std::bind(updateStockDayUpData, std::placeholders::_1, KQuery::YEAR));
+    }
+
+    if (preloadParam.tryGet<bool>("min5", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN5));
+    }
+
+    if (preloadParam.tryGet<bool>("min15", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN15));
+    }
+
+    if (preloadParam.tryGet<bool>("min30", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN30));
+    }
+
+    if (preloadParam.tryGet<bool>("min60", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN60));
+    }
+
+    if (preloadParam.tryGet<bool>("min3", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN3));
+    }
+
+    if (preloadParam.tryGet<bool>("hour2", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR2));
+    }
+
+    if (preloadParam.tryGet<bool>("hour4", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR4));
+    }
+
+    if (preloadParam.tryGet<bool>("hour6", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR6));
+    }
+
+    if (preloadParam.tryGet<bool>("hour12", false)) {
+        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::HOUR12));
     }
 
     agent.start();
