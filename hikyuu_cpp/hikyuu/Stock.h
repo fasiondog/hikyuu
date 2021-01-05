@@ -173,6 +173,12 @@ public:
     /** 设置权息信息, 仅供初始化时调用 */
     void setWeightList(const StockWeightList&);
 
+    /**
+     * 判断是否在交易时间段内，忽略日期仅判断时分秒
+     * @param time 时间
+     */
+    bool isTransactionTime(Datetime time);
+
     /** 设置K线数据获取驱动 */
     void setKDataDriver(const KDataDriverPtr& kdataDriver);
 
@@ -202,9 +208,6 @@ public:
 
 private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
-
-    // 判断是否在交易时间段内（不判断日期）
-    bool _isTransactionTime(Datetime time);
 
     // 以下函数属于基础操作添加了读锁
     size_t _getCountFromBuffer(KQuery::KType ktype) const;

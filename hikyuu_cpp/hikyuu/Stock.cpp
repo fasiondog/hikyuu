@@ -684,7 +684,7 @@ PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
 }
 
 // 判断是否在交易时间段内（不判断日期）
-bool Stock::_isTransactionTime(Datetime time) {
+bool Stock::isTransactionTime(Datetime time) {
     MarketInfo market_info = StockManager::instance().getMarketInfo(market());
     HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
 
