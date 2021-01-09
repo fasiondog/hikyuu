@@ -86,5 +86,6 @@ target("small-test")
     -- add files
     add_files("./hikyuu/hikyuu/**.cpp");
     add_files("./hikyuu/test_main.cpp")
+    add_files("./hikyuu/utilities/test_TimerManager.cpp")
     
 target_end()
