@@ -20,8 +20,11 @@ using namespace hku;
 TEST_CASE("test_TimerManager") {
     TimerManager tm;
     tm.start();
-    CHECK(tm.addDelayFunc(Seconds(1), []() { HKU_INFO("test delay *************************"); }));
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    tm.addDelayFunc(Microseconds(30), []() { HKU_INFO("1 test delay *************************"); });
+    tm.addDelayFunc(Seconds(2), []() { HKU_INFO("2 test delay *************************"); });
+    tm.addDurationFunc(std::numeric_limits<int>::max(), Milliseconds(500),
+                       []() { HKU_INFO("3 test delay *************************"); });
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 }
 
 /** @} */

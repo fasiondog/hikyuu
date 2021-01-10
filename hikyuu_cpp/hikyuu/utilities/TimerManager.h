@@ -112,46 +112,88 @@ public:
     }
 
     /**
-     * 增加延迟运行任务（只执行一次）
+     * 增加计划任务, 添加失败时抛出异常
      * @tparam F 任务类型
      * @tparam Args 任务参数
-     * @param delay 延迟时间，需大于 TimeDelta(0)
+     * @param start_date 允许运行的起始日期
+     * @param end_date 允许运行的结束日期
+     * @param start_time 允许运行的起始时间
+     * @param end_time 允许运行的结束时间
+     * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
+     * @param delay 间隔时间，需大于 TimeDelta(0)
+     * @param f 待执行的延迟任务
+     * @param args 任务具体参数
+     */
+    template <typename F, typename... Args>
+    void addFunc(Datetime start_date, Datetime end_date, TimeDelta start_time, TimeDelta end_time,
+                 int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
+        HKU_CHECK(!start_date.isNull(), "Invalid start_date!");
+        HKU_CHECK(!end_date.isNull(), "Invalid end_date!");
+        HKU_CHECK(end_date > start_date, "end_date({}) need > start_date({})!", end_date,
+                  start_date);
+        HKU_CHECK(start_time > TimeDelta(0) && start_time <= TimeDelta(0, 23, 59, 59, 999, 999),
+                  "Invalid start_time: {}", start_time.repr());
+        HKU_CHECK(end_time > TimeDelta(0) && end_time <= TimeDelta(0, 23, 59, 59, 999, 999),
+                  "Invalid end_time: {}", end_time.repr());
+        HKU_CHECK(end_time >= start_time, "end_time({}) need >= start_time({})!", end_time,
+                  start_time);
+        HKU_CHECK(repeat_num > 0, "Invalid repeat_num: {}", repeat_num);
+        HKU_CHECK(duration > TimeDelta(0), "Invalid duration: {}", duration.repr());
+
+        _addFunc(start_date, end_date, start_time, end_time, repeat_num, duration,
+                 std::forward<F>(f), std::forward<Args>(args)...);
+    }
+
+    /**
+     * 增加重复定时任务，添加失败时抛出异常
+     * @tparam F 任务类型
+     * @tparam Args 任务参数
+     * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
+     * @param delay 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
      * @return true 成功 | false 失败
      */
     template <typename F, typename... Args>
-    bool addDelayFunc(TimeDelta delay, F&& f, Args&&... args) {
-        HKU_ERROR_IF_RETURN(delay <= TimeDelta(), false, "Invalid delay: {}, must > TimeDelta(0)!",
-                            delay.repr());
-        Timer* t = new Timer;
-        t->m_func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-        IntervalS s;
-        s.m_time_point = Datetime::now() + delay;
-
-        std::unique_lock<std::mutex> lock(m_mutex);
-        int id = getNewTimerId();
-        if (id < 0) {
-            HKU_INFO("Invalid id {}", id);
-            delete t;
-            return false;
-        }
-
-        m_timers[id] = t;
-        s.m_timer_id = id;
-        m_queue.push(s);
-        lock.unlock();
-        m_cond.notify_all();
-        return true;
+    void addDurationFunc(int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
+        HKU_CHECK(repeat_num > 0, "Invalid repeat_num: {}, must > 0", repeat_num);
+        HKU_CHECK(duration > TimeDelta(), "Invalid duration: {}, must > TimeDelta(0)!",
+                  duration.repr());
+        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(), TimeDelta(), repeat_num, duration,
+                 std::forward<F>(f), std::forward<Args>(args)...);
     }
 
-    /*template <typename F, typename... Args>
-            void add_func_at_time_point(
-              const std::chrono::time_point<std::chrono::high_resolution_clock>& time_point, F&&
-       f, Args&&... args) { IntervalS t; t.m_time_point = time_point; t.m_func =
-       std::bind(std::forward<F>(f), std::forward<Args>(args)...); std::unique_lock<std::mutex>
-       lock(m_mutex); m_queue.push(t); m_cond.notify_all();
-            }*/
+    /**
+     * 增加延迟运行任务（只执行一次）, 添加失败时抛出异常
+     * @tparam F 任务类型
+     * @tparam Args 任务参数
+     * @param delay 延迟时间，需大于 TimeDelta(0)
+     * @param f 待执行的延迟任务
+     * @param args 任务具体参数
+     */
+    template <typename F, typename... Args>
+    void addDelayFunc(TimeDelta delay, F&& f, Args&&... args) {
+        HKU_CHECK(delay > TimeDelta(), "Invalid delay: {}, must > TimeDelta(0)!");
+        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(), TimeDelta(), 1, delay,
+                 std::forward<F>(f), std::forward<Args>(args)...);
+    }
+
+    /**
+     * 在指定时刻执行任务（只执行一次）, 添加失败时抛出异常
+     * @tparam F 任务类型
+     * @tparam Args 任务参数
+     * @param time_point 指定的运行时刻
+     */
+    template <typename F, typename... Args>
+    void addFuncAtPoint(Datetime time_point, F&& f, Args&&... args) {
+        HKU_CHECK(!time_point.isNull(), "Invalid time_point");
+        TimeDelta delay(0, 0, 0, 0, 100);
+        Datetime run_point = time_point - delay;
+        Datetime date = run_point.startOfDay();
+        TimeDelta time = run_point - date;
+        _addFunc(date, Datetime::max(), time, TimeDelta(0, 23, 59, 59, 999, 999), 1, delay,
+                 std::forward<F>(f), std::forward<Args>(args)...);
+    }
 
 private:
     void removeTimer(int id) {
@@ -161,13 +203,13 @@ private:
 
     void detectThread() {
         while (!m_stop) {
+            Datetime now = Datetime::now();
             std::unique_lock<std::mutex> lock(m_mutex);
             if (m_queue.empty()) {
                 m_cond.wait(lock);
                 continue;
             }
 
-            Datetime now = Datetime::now();
             IntervalS s = m_queue.top();
             TimeDelta diff = s.m_time_point - now;
             if (diff > TimeDelta()) {
@@ -183,7 +225,11 @@ private:
 
             auto timer = timer_iter->second;
             m_tg->submit(timer->m_func);
-            timer->m_repeat_num--;
+
+            if (timer->m_repeat_num != std::numeric_limits<int>::max()) {
+                timer->m_repeat_num--;
+            }
+
             if (timer->m_repeat_num <= 0) {
                 removeTimer(s.m_timer_id);
                 continue;
@@ -201,6 +247,7 @@ private:
                 s.m_time_point > today + timer->m_end_time) {
                 s.m_time_point = today + timer->m_start_time + TimeDelta(1);
             }
+
             m_queue.push(s);
         }
     }
@@ -253,6 +300,35 @@ private:
             return m_time_point > other.m_time_point;
         }
     };
+
+    template <typename F, typename... Args>
+    void _addFunc(Datetime start_date, Datetime end_date, TimeDelta start_time, TimeDelta end_time,
+                  int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
+        Timer* t = new Timer;
+        t->m_start_date = start_date;
+        t->m_end_date = end_date;
+        t->m_start_time = start_time;
+        t->m_end_time = end_time;
+        t->m_repeat_num = repeat_num;
+        t->m_duration = duration;
+        t->m_func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+        IntervalS s;
+        s.m_time_point = Datetime::now() + duration;
+
+        std::unique_lock<std::mutex> lock(m_mutex);
+        int id = getNewTimerId();
+        if (id < 0) {
+            delete t;
+            lock.unlock();
+            HKU_THROW("Failed to get new id, maybe too timers!");
+        }
+
+        m_timers[id] = t;
+        s.m_timer_id = id;
+        m_queue.push(s);
+        lock.unlock();
+        m_cond.notify_all();
+    }
 
 private:
     std::priority_queue<IntervalS> m_queue;
