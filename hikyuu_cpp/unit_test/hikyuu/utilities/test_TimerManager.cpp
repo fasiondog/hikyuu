@@ -6,7 +6,7 @@
  */
 
 #include "doctest/doctest.h"
-#include <hikyuu/utilities/thread/TimerManager.h>
+#include <hikyuu/utilities/TimerManager.h>
 #include <hikyuu/Log.h>
 
 using namespace hku;
@@ -17,6 +17,11 @@ using namespace hku;
  * @{
  */
 
-TEST_CASE("test_TimerManager") {}
+TEST_CASE("test_TimerManager") {
+    TimerManager tm;
+    tm.start();
+    CHECK(tm.addDelayFunc(Seconds(1), []() { HKU_INFO("test delay *************************"); }));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+}
 
 /** @} */

@@ -3,30 +3,42 @@
  *
  *  Create on: 2021-01-08
  *     Author: fasiondog
- *
- *  参考：https://github.com/fightingwangzq/wzq_utils 实现
- *
  */
 
 #pragma once
 
 #include <forward_list>
-#include "../../datetime/Datetime.h"
-#include "../../Log.h"
-#include "../Null.h"
-#include "ThreadPool.h"
+#include "../datetime/Datetime.h"
+#include "../Log.h"
+#include "thread/ThreadPool.h"
 
 namespace hku {
 
+/**
+ * 定时管理与调度
+ * @ingroup Utilities
+ */
 class TimerManager {
 public:
+    TimerManager(const TimerManager&) = delete;
+    TimerManager(TimerManager&) = delete;
+    TimerManager(TimerManager&&) = delete;
+    TimerManager& operator=(const TimerManager&) = delete;
+    TimerManager& operator=(TimerManager&) = delete;
+    TimerManager& operator=(TimerManager&&) = delete;
+
+    /**
+     * 构造函数，此时尚未启动运行，需调用 start 方法显示启动调度
+     */
     TimerManager() : m_current_timer_id(-1), m_stop(true) {}
 
+    /** 析构函数 */
     ~TimerManager() {
         stop();
         m_tg->stop();
     }
 
+    /** 启动调度, 可在停止后重新启动 */
     void start() {
         if (m_stop) {
             m_stop = false;
@@ -43,33 +55,36 @@ public:
             for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
                 int time_id = iter->first;
                 Timer* timer = iter->second;
-
                 Datetime now = Datetime::now();
-                if (timer->m_repeat_num <= 0 || timer->m_end_date <= now) {
+
+                // 记录已失效的 timer id
+                if (timer->m_repeat_num <= 0 || (timer->m_end_date != Datetime::max() &&
+                                                 timer->m_end_date + timer->m_end_time <= now)) {
                     invalid_timers.push_front(time_id);
-                } else {
-                    IntervalS s;
-                    s.m_timer_id = time_id;
-                    s.m_time_point = now + timer->m_duration;
-                    TimeDelta point(0, s.m_time_point.hour(), s.m_time_point.minute(),
-                                    s.m_time_point.second(), s.m_time_point.millisecond(),
-                                    s.m_time_point.microsecond());
+                    continue;
+                }
+
+                IntervalS s;
+                s.m_timer_id = time_id;
+                s.m_time_point = now + timer->m_duration;
+                if (timer->m_start_time != timer->m_end_time) {
+                    Datetime point_date = s.m_time_point.startOfDay();
+                    TimeDelta point = s.m_time_point - point_date;
                     if (point < timer->m_start_time) {
-                        s.m_time_point = s.m_time_point.startOfDay() + timer->m_start_time;
+                        s.m_time_point = point_date + timer->m_start_time;
                     } else if (point > timer->m_end_time) {
-                        s.m_time_point =
-                          s.m_time_point.startOfDay() + timer->m_start_time + TimeDelta(1);
-                    } else if (timer->m_start_time != TimeDelta()) {
+                        s.m_time_point = point_date + timer->m_start_time + TimeDelta(1);
+                    } else {
                         TimeDelta gap = point - timer->m_start_time;
                         if (gap % timer->m_duration != TimeDelta()) {
-                            int x = int(gap / timer->m_duration);
-                            s.m_time_point = s.m_time_point.startOfDay() + timer->m_start_time +
-                                             timer->m_duration * double(x);
+                            int x = int(gap / timer->m_duration) + 1;
+                            s.m_time_point =
+                              point_date + timer->m_start_time + timer->m_duration * double(x);
                         }
                     }
-
-                    m_queue.push(s);
                 }
+
+                m_queue.push(s);
             }
 
             // 清除已无效的 timer
@@ -84,6 +99,7 @@ public:
         }
     }
 
+    /** 终止调度 */
     void stop() {
         if (!m_stop) {
             m_stop = true;
@@ -95,20 +111,38 @@ public:
         }
     }
 
-    template <typename R, typename P, typename F, typename... Args>
-    void add_func_after_duration(TimeDelta duration, F&& f, Args&&... args) {
+    /**
+     * 增加延迟运行任务（只执行一次）
+     * @tparam F 任务类型
+     * @tparam Args 任务参数
+     * @param delay 延迟时间，需大于 TimeDelta(0)
+     * @param f 待执行的延迟任务
+     * @param args 任务具体参数
+     * @return true 成功 | false 失败
+     */
+    template <typename F, typename... Args>
+    bool addDelayFunc(TimeDelta delay, F&& f, Args&&... args) {
+        HKU_ERROR_IF_RETURN(delay <= TimeDelta(), false, "Invalid delay: {}, must > TimeDelta(0)!",
+                            delay.repr());
         Timer* t = new Timer;
         t->m_func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
         IntervalS s;
-        s.m_time_point = Datetime::now() + duration;
+        s.m_time_point = Datetime::now() + delay;
 
         std::unique_lock<std::mutex> lock(m_mutex);
         int id = getNewTimerId();
-        HKU_IF_RETURN(id < 0, void());
+        if (id < 0) {
+            HKU_INFO("Invalid id {}", id);
+            delete t;
+            return false;
+        }
+
         m_timers[id] = t;
+        s.m_timer_id = id;
         m_queue.push(s);
         lock.unlock();
         m_cond.notify_all();
+        return true;
     }
 
     /*template <typename F, typename... Args>
@@ -139,21 +173,35 @@ private:
             if (diff > TimeDelta()) {
                 m_cond.wait_for(lock, std::chrono::duration<int64_t, std::micro>(diff.ticks()));
                 continue;
-            } else {
-                m_queue.pop();
-                auto timer = m_timers[s.m_timer_id];
-                m_tg->submit(*timer);
-                timer->m_repeat_num--;
-                if (timer->m_repeat_num <= 0) {
-                    delete timer;
-                    m_timers.erase(s.m_timer_id);
-                } else {
-                    s.m_time_point = s.m_time_point + timer->m_duration;
-                    if (s.m_time_point <= timer->m_end_date) {
-                        m_queue.push(s);
-                    }
-                }
             }
+
+            m_queue.pop();
+            auto timer_iter = m_timers.find(s.m_timer_id);
+            if (timer_iter == m_timers.end()) {
+                continue;
+            }
+
+            auto timer = timer_iter->second;
+            m_tg->submit(timer->m_func);
+            timer->m_repeat_num--;
+            if (timer->m_repeat_num <= 0) {
+                removeTimer(s.m_timer_id);
+                continue;
+            }
+
+            s.m_time_point = s.m_time_point + timer->m_duration;
+            if (timer->m_end_date != Datetime::max() &&
+                s.m_time_point > timer->m_end_date + timer->m_end_time) {
+                removeTimer(s.m_timer_id);
+                continue;
+            }
+
+            Datetime today = now.startOfDay();
+            if (timer->m_start_time != timer->m_end_time &&
+                s.m_time_point > today + timer->m_end_time) {
+                s.m_time_point = today + timer->m_start_time + TimeDelta(1);
+            }
+            m_queue.push(s);
         }
     }
 
@@ -162,20 +210,24 @@ private:
         int max_int = std::numeric_limits<int>::max();
         HKU_WARN_IF_RETURN(m_timers.size() >= max_int, -1, "Timer queue is full!");
 
-        int id = m_current_timer_id >= max_int ? 0 : m_current_timer_id;
+        if (m_current_timer_id >= max_int) {
+            m_current_timer_id = 0;
+        } else {
+            m_current_timer_id++;
+        }
+
         while (true) {
-            if (m_timers.find(id) != m_timers.end()) {
-                if (id >= max_int) {
-                    id = 0;
+            if (m_timers.find(m_current_timer_id) != m_timers.end()) {
+                if (m_current_timer_id >= max_int) {
+                    m_current_timer_id = 0;
                 } else {
-                    id++;
+                    m_current_timer_id++;
                 }
             } else {
                 break;
             }
         }
-        m_current_timer_id = id;
-        return id;
+        return m_current_timer_id;
     }
 
 private:
