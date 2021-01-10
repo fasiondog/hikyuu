@@ -32,6 +32,8 @@ void init_hikyuu_test() {
         current /= "test_data";
     }
 
+    set_log_level(TRACE);
+
     std::cout << "current path  : " << current << std::endl;
 #if defined(_MSC_VER)
     std::cout << "configure file: " << current.string() << "\\hikyuu_win.ini" << std::endl;

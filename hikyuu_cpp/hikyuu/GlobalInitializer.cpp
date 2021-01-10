@@ -43,6 +43,12 @@ void GlobalInitializer::init() {
     fmt::print("Initialize hikyuu_{} ...\n", getVersionWithBuild());
 
     initLogger();
+#if defined(_DEBUG) || defined(DEBUG)
+    set_log_level(TRACE);
+#else
+    set_log_level(INFO);
+#endif
+
     DataDriverFactory::init();
     StockManager::instance();
     SpotAgent::instance();

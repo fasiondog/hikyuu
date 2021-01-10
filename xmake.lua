@@ -5,11 +5,12 @@ set_project("hikyuu")
 
 -- version
 set_version("1.1.5", {build="%Y%m%d%H%M"})
-if is_mode("debug") then
-    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
-else 
-    set_configvar("LOG_ACTIVE_LEVEL", 2)  -- 激活的日志级别 
-end
+set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
+--if is_mode("debug") then
+--    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
+--else 
+--    set_configvar("LOG_ACTIVE_LEVEL", 2)  -- 激活的日志级别 
+--end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
