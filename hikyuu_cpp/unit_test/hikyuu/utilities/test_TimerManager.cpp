@@ -22,9 +22,15 @@ TEST_CASE("test_TimerManager") {
     tm.start();
     tm.addDelayFunc(Microseconds(30), []() { HKU_INFO("1 test delay *************************"); });
     tm.addDelayFunc(Seconds(2), []() { HKU_INFO("2 test delay *************************"); });
-    tm.addDurationFunc(std::numeric_limits<int>::max(), Milliseconds(500),
+    tm.addDurationFunc(3, Milliseconds(500),
                        []() { HKU_INFO("3 test delay *************************"); });
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    // tm.addFuncAtTime(Datetime(202101112305),
+    //                 []() { HKU_INFO("addFuncAtTime test delay *************************"); });
+    tm.addFuncAtTimeEveryDay(TimeDelta(0, 0, 36), []() {
+        HKU_INFO("addFuncAtTimeEveryDay test delay *************************");
+    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(50));
 }
 
 /** @} */

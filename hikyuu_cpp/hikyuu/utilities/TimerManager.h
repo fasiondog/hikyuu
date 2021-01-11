@@ -59,27 +59,47 @@ public:
 
                 // 记录已失效的 timer id
                 if (timer->m_repeat_num <= 0 || (timer->m_end_date != Datetime::max() &&
-                                                 timer->m_end_date + timer->m_end_time <= now)) {
+                                                 timer->m_end_date + timer->m_end_time < now)) {
                     invalid_timers.push_front(time_id);
                     continue;
                 }
 
                 IntervalS s;
                 s.m_timer_id = time_id;
-                s.m_time_point = now + timer->m_duration;
-                if (timer->m_start_time != timer->m_end_time) {
-                    Datetime point_date = s.m_time_point.startOfDay();
-                    TimeDelta point = s.m_time_point - point_date;
-                    if (point < timer->m_start_time) {
-                        s.m_time_point = point_date + timer->m_start_time;
-                    } else if (point > timer->m_end_time) {
-                        s.m_time_point = point_date + timer->m_start_time + TimeDelta(1);
+                if (timer->m_start_time < TimeDelta()) {
+                    Datetime first_start_time = timer->m_start_date + timer->m_end_time;
+                    if (first_start_time >= now) {
+                        s.m_time_point = first_start_time;
                     } else {
-                        TimeDelta gap = point - timer->m_start_time;
-                        if (gap % timer->m_duration != TimeDelta()) {
-                            int x = int(gap / timer->m_duration) + 1;
-                            s.m_time_point =
-                              point_date + timer->m_start_time + timer->m_duration * double(x);
+                        if (timer->m_repeat_num <= 1) {
+                            invalid_timers.push_front(time_id);
+                            continue;
+                        }
+                        s.m_time_point = now.startOfDay() + timer->m_end_time;
+                        if (s.m_time_point < now) {
+                            s.m_time_point = s.m_time_point + TimeDelta(1);
+                        }
+                    }
+
+                } else {
+                    s.m_time_point =
+                      timer->m_start_date >= now.startOfDay()
+                        ? timer->m_start_date + timer->m_start_time + timer->m_duration
+                        : now + timer->m_duration;
+                    if (timer->m_start_time != timer->m_end_time) {
+                        Datetime point_date = s.m_time_point.startOfDay();
+                        TimeDelta point = s.m_time_point - point_date;
+                        if (point < timer->m_start_time) {
+                            s.m_time_point = point_date + timer->m_start_time;
+                        } else if (point > timer->m_end_time) {
+                            s.m_time_point = point_date + timer->m_start_time + TimeDelta(1);
+                        } else {
+                            TimeDelta gap = point - timer->m_start_time;
+                            if (gap % timer->m_duration != TimeDelta()) {
+                                int x = int(gap / timer->m_duration) + 1;
+                                s.m_time_point =
+                                  point_date + timer->m_start_time + timer->m_duration * double(x);
+                            }
                         }
                     }
                 }
@@ -185,14 +205,31 @@ public:
      * @param time_point 指定的运行时刻
      */
     template <typename F, typename... Args>
-    void addFuncAtPoint(Datetime time_point, F&& f, Args&&... args) {
+    void addFuncAtTime(Datetime time_point, F&& f, Args&&... args) {
         HKU_CHECK(!time_point.isNull(), "Invalid time_point");
-        TimeDelta delay(0, 0, 0, 0, 100);
+        TimeDelta delay = Milliseconds(10);
         Datetime run_point = time_point - delay;
         Datetime date = run_point.startOfDay();
         TimeDelta time = run_point - date;
+        Datetime now = Datetime::now();
+        HKU_CHECK(time_point > now, "You want run at {}, but now is {}", time_point, now);
         _addFunc(date, Datetime::max(), time, TimeDelta(0, 23, 59, 59, 999, 999), 1, delay,
                  std::forward<F>(f), std::forward<Args>(args)...);
+    }
+
+    /**
+     * 在指定时刻执行任务（只执行一次）, 添加失败时抛出异常
+     * @tparam F 任务类型
+     * @tparam Args 任务参数
+     * @param time_point 指定的运行时刻
+     */
+    template <typename F, typename... Args>
+    void addFuncAtTimeEveryDay(TimeDelta time, F&& f, Args&&... args) {
+        HKU_CHECK(time >= TimeDelta() && time <= TimeDelta(0, 23, 59, 59, 999, 999),
+                  "Invalid time {}", time.repr());
+        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(-1), time,
+                 std::numeric_limits<int>::max(), TimeDelta(), std::forward<F>(f),
+                 std::forward<Args>(args)...);
     }
 
 private:
@@ -235,15 +272,16 @@ private:
                 continue;
             }
 
-            s.m_time_point = s.m_time_point + timer->m_duration;
+            Datetime today = now.startOfDay();
+            s.m_time_point = timer->m_start_time >= TimeDelta() ? s.m_time_point + timer->m_duration
+                                                                : s.m_time_point + TimeDelta(1);
             if (timer->m_end_date != Datetime::max() &&
                 s.m_time_point > timer->m_end_date + timer->m_end_time) {
                 removeTimer(s.m_timer_id);
                 continue;
             }
 
-            Datetime today = now.startOfDay();
-            if (timer->m_start_time != timer->m_end_time &&
+            if (timer->m_start_time >= TimeDelta() && timer->m_start_time != timer->m_end_time &&
                 s.m_time_point > today + timer->m_end_time) {
                 s.m_time_point = today + timer->m_start_time + TimeDelta(1);
             }
@@ -286,6 +324,10 @@ private:
 
         Datetime m_start_date = Datetime::min().startOfDay();  // 允许执行的起始日期（包含该日期）
         Datetime m_end_date = Datetime::max().startOfDay();  // 允许执行的终止日期（包含该日期）
+        /*
+         * 注：如果 m_start_time < TimeDelta(0), 则 m_end_time 代表每日指定的运行时刻，此时忽略
+         * m_duration
+         */
         TimeDelta m_start_time;  // 允许执行的当日起始时间（包含该时间）
         TimeDelta m_end_time;    // 允许执行的当日结束时间（包含该时间）
         TimeDelta m_duration;    // 延迟时长或间隔时长
@@ -304,27 +346,70 @@ private:
     template <typename F, typename... Args>
     void _addFunc(Datetime start_date, Datetime end_date, TimeDelta start_time, TimeDelta end_time,
                   int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
-        Timer* t = new Timer;
-        t->m_start_date = start_date;
-        t->m_end_date = end_date;
-        t->m_start_time = start_time;
-        t->m_end_time = end_time;
-        t->m_repeat_num = repeat_num;
-        t->m_duration = duration;
-        t->m_func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+        Datetime now = Datetime::now();
+        Datetime today = now.startOfDay();
+        HKU_CHECK(end_date >= today, "Invalid end_date {}, because today is {}", end_date, today);
+        if (end_date != Datetime::max()) {
+            HKU_CHECK(end_date + end_time >= now,
+                      "Invalid param! You want end time is {}, but now is {}", end_date + end_time,
+                      now);
+        }
+
+        Timer* timer = new Timer;
+        timer->m_start_date = start_date;
+        timer->m_end_date = end_date;
+        timer->m_start_time = start_time;
+        timer->m_end_time = end_time;
+        timer->m_repeat_num = repeat_num;
+        timer->m_duration = duration;
+        timer->m_func = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+
         IntervalS s;
-        s.m_time_point = Datetime::now() + duration;
+        if (start_time < TimeDelta()) {
+            Datetime first_start_time = start_date + end_time;
+            if (first_start_time >= now) {
+                s.m_time_point = first_start_time;
+            } else {
+                HKU_CHECK(repeat_num > 1, "The time has expired! expect time {}, but now is {}",
+                          first_start_time, now);
+                s.m_time_point = today + end_time;
+                if (s.m_time_point < now) {
+                    s.m_time_point = s.m_time_point + TimeDelta(1);
+                }
+            }
+
+        } else {
+            s.m_time_point =
+              start_date >= today ? start_date + start_time + duration : now + duration;
+            if (timer->m_start_time != timer->m_end_time) {
+                Datetime point_date = s.m_time_point.startOfDay();
+                TimeDelta point = s.m_time_point - point_date;
+                if (point < timer->m_start_time) {
+                    s.m_time_point = point_date + timer->m_start_time;
+                } else if (point > timer->m_end_time) {
+                    s.m_time_point = point_date + timer->m_start_time + TimeDelta(1);
+                } else {
+                    TimeDelta gap = point - timer->m_start_time;
+                    if (gap % timer->m_duration != TimeDelta()) {
+                        int x = int(gap / timer->m_duration) + 1;
+                        s.m_time_point =
+                          point_date + timer->m_start_time + timer->m_duration * double(x);
+                    }
+                }
+            }
+        }
 
         std::unique_lock<std::mutex> lock(m_mutex);
         int id = getNewTimerId();
         if (id < 0) {
-            delete t;
+            delete timer;
             lock.unlock();
             HKU_THROW("Failed to get new id, maybe too timers!");
         }
 
-        m_timers[id] = t;
+        m_timers[id] = timer;
         s.m_timer_id = id;
+        HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
         m_queue.push(s);
         lock.unlock();
         m_cond.notify_all();
