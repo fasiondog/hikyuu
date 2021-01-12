@@ -149,19 +149,19 @@ public:
                  int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
         HKU_CHECK(!start_date.isNull(), "Invalid start_date!");
         HKU_CHECK(!end_date.isNull(), "Invalid end_date!");
-        HKU_CHECK(end_date > start_date, "end_date({}) need > start_date({})!", end_date,
-                  start_date);
-        HKU_CHECK(start_time > TimeDelta(0) && start_time <= TimeDelta(0, 23, 59, 59, 999, 999),
+        Datetime start = start_date.startOfDay();
+        Datetime end = end_date.startOfDay();
+        HKU_CHECK(end >= start, "end_date({}) need > start_date({})!", end, start);
+        HKU_CHECK(start_time >= TimeDelta(0) && start_time <= TimeDelta(0, 23, 59, 59, 999, 999),
                   "Invalid start_time: {}", start_time.repr());
-        HKU_CHECK(end_time > TimeDelta(0) && end_time <= TimeDelta(0, 23, 59, 59, 999, 999),
+        HKU_CHECK(end_time >= TimeDelta(0) && end_time <= TimeDelta(0, 23, 59, 59, 999, 999),
                   "Invalid end_time: {}", end_time.repr());
         HKU_CHECK(end_time >= start_time, "end_time({}) need >= start_time({})!", end_time,
                   start_time);
         HKU_CHECK(repeat_num > 0, "Invalid repeat_num: {}", repeat_num);
         HKU_CHECK(duration > TimeDelta(0), "Invalid duration: {}", duration.repr());
-
-        _addFunc(start_date, end_date, start_time, end_time, repeat_num, duration,
-                 std::forward<F>(f), std::forward<Args>(args)...);
+        _addFunc(start, end, start_time, end_time, repeat_num, duration, std::forward<F>(f),
+                 std::forward<Args>(args)...);
     }
 
     /**
@@ -193,7 +193,7 @@ public:
      */
     template <typename F, typename... Args>
     void addDelayFunc(TimeDelta delay, F&& f, Args&&... args) {
-        HKU_CHECK(delay > TimeDelta(), "Invalid delay: {}, must > TimeDelta(0)!");
+        HKU_CHECK(delay > TimeDelta(), "Invalid delay: {}, must > TimeDelta(0)!", delay);
         _addFunc(Datetime::min(), Datetime::max(), TimeDelta(), TimeDelta(), 1, delay,
                  std::forward<F>(f), std::forward<Args>(args)...);
     }
@@ -202,34 +202,51 @@ public:
      * 在指定时刻执行任务（只执行一次）, 添加失败时抛出异常
      * @tparam F 任务类型
      * @tparam Args 任务参数
-     * @param time_point 指定的运行时刻
+     * @param time_point 指定的运行时刻（包含具体的日、时、分、秒...）
      */
     template <typename F, typename... Args>
     void addFuncAtTime(Datetime time_point, F&& f, Args&&... args) {
-        HKU_CHECK(!time_point.isNull(), "Invalid time_point");
-        TimeDelta delay = Milliseconds(10);
-        Datetime run_point = time_point - delay;
-        Datetime date = run_point.startOfDay();
-        TimeDelta time = run_point - date;
         Datetime now = Datetime::now();
         HKU_CHECK(time_point > now, "You want run at {}, but now is {}", time_point, now);
-        _addFunc(date, Datetime::max(), time, TimeDelta(0, 23, 59, 59, 999, 999), 1, delay,
+        Datetime point_date = time_point.startOfDay();
+        TimeDelta point = time_point - point_date;
+        _addFunc(time_point.startOfDay(), Datetime::max(), TimeDelta(-1), point, 1, TimeDelta(),
                  std::forward<F>(f), std::forward<Args>(args)...);
+    }
+
+    /**
+     * 在日内指定时刻执行任务, 添加失败时抛出异常
+     * @tparam F 任务类型
+     * @tparam Args 任务参数
+     * @param start_date 允许执行的开始日期
+     * @param end_date 允许执行的结束日期
+     * @param time 指定运行的日内时刻
+     */
+    template <typename F, typename... Args>
+    void addFuncAtTimeEveryDay(Datetime start_date, Datetime end_date, TimeDelta time, F&& f,
+                               Args&&... args) {
+        HKU_CHECK(!start_date.isNull() && !end_date.isNull(),
+                  "Invalid start_date({}) or end_date({})!", start_date, end_date);
+        HKU_CHECK(time >= TimeDelta() && time <= TimeDelta(0, 23, 59, 59, 999, 999),
+                  "Invalid time {}", time.repr());
+        Datetime start = start_date.startOfDay();
+        Datetime end = end_date.startOfDay();
+        HKU_CHECK(end >= start, "Invalid range of date! ({} - {})", start, end);
+        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(-1), time,
+                 std::numeric_limits<int>::max(), TimeDelta(), std::forward<F>(f),
+                 std::forward<Args>(args)...);
     }
 
     /**
      * 在指定时刻执行任务（只执行一次）, 添加失败时抛出异常
      * @tparam F 任务类型
      * @tparam Args 任务参数
-     * @param time_point 指定的运行时刻
+     * @param time 指定运行的日内时刻
      */
     template <typename F, typename... Args>
     void addFuncAtTimeEveryDay(TimeDelta time, F&& f, Args&&... args) {
-        HKU_CHECK(time >= TimeDelta() && time <= TimeDelta(0, 23, 59, 59, 999, 999),
-                  "Invalid time {}", time.repr());
-        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(-1), time,
-                 std::numeric_limits<int>::max(), TimeDelta(), std::forward<F>(f),
-                 std::forward<Args>(args)...);
+        addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), time, std::forward<F>(f),
+                              std::forward<Args>(args)...);
     }
 
 private:
@@ -285,7 +302,7 @@ private:
                 s.m_time_point > today + timer->m_end_time) {
                 s.m_time_point = today + timer->m_start_time + TimeDelta(1);
             }
-
+            HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
             m_queue.push(s);
         }
     }
