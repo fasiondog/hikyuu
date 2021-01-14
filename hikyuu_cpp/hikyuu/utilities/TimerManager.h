@@ -29,8 +29,10 @@ public:
 
     /**
      * 构造函数，此时尚未启动运行，需调用 start 方法显示启动调度
+     * @param work_num 定时任务执行线程池线程数量
      */
-    TimerManager() : m_current_timer_id(-1), m_stop(true) {}
+    TimerManager(size_t work_num = std::thread::hardware_concurrency())
+    : m_current_timer_id(-1), m_stop(true), m_work_num(work_num) {}
 
     /** 析构函数 */
     ~TimerManager() {
@@ -43,7 +45,7 @@ public:
         if (m_stop) {
             m_stop = false;
             if (!m_tg) {
-                m_tg = std::make_unique<ThreadPool>();
+                m_tg = std::make_unique<ThreadPool>(m_work_num);
             }
 
             /*
@@ -440,6 +442,7 @@ private:
 
     std::unordered_map<int, Timer*> m_timers;
     int m_current_timer_id;
+    size_t m_work_num;  // 任务执行线程池线程数量
     std::unique_ptr<ThreadPool> m_tg;
 };  // namespace hku
 
