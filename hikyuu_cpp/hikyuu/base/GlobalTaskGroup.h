@@ -11,11 +11,7 @@
 #ifndef HKU_GLOBAL_TASK_GROUP
 #define HKU_GLOBAL_TASK_GROUP
 
-#include "utilities/thread/StealThreadPool.h"
-
-#ifndef HKU_API
-#define HKU_API
-#endif
+#include "../utilities/thread/StealThreadPool.h"
 
 namespace hku {
 
@@ -23,7 +19,7 @@ namespace hku {
  * 获取全局线程池任务组
  * @note 请使用 future 获取任务返回
  */
-HKU_API StealThreadPool* getGlobalTaskGroup();
+StealThreadPool* getGlobalTaskGroup();
 
 template <typename ResultType>
 using task_handle = std::future<ResultType>;
@@ -36,13 +32,10 @@ task_handle<typename std::result_of<FunctionType()>::type> addTask(FunctionType 
     return getGlobalTaskGroup()->submit(f);
 }
 
-/*
- * 内部函数，初始化全局任务组
+/**
+ * 程序退出时释放全局任务组实例，仅内部调用
  */
-void initThreadPool();
-
-/* 内部函数，初始化全局任务组 */
-void releaseThreadPool();
+void releaseGlobalTaskGroup();
 
 } /* namespace hku */
 

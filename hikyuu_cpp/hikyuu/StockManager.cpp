@@ -18,7 +18,8 @@
 #include "utilities/IniParser.h"
 #include "utilities/util.h"
 #include "StockManager.h"
-#include "GlobalTaskGroup.h"
+#include "base/GlobalTaskGroup.h"
+#include "base/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 #include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
@@ -32,7 +33,6 @@ namespace hku {
 StockManager* StockManager::m_sm = nullptr;
 
 void StockManager::quit() {
-    releaseThreadPool();
     if (m_sm) {
         delete m_sm;
         m_sm = nullptr;
@@ -41,7 +41,6 @@ void StockManager::quit() {
 
 StockManager::StockManager() {}
 StockManager::~StockManager() {
-    releaseThreadPool();
     fmt::print("Quit Hikyuu system!\n\n");
 }
 
@@ -96,11 +95,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_kdataDriverParam = kdataParam;
     m_preloadParam = preloadParam;
     m_hikyuuParam = hikyuuParam;
-
-    // 创建内部线程池
-    // 不能同过 GlobalInitializer 初始化全局线程池
-    // 原因是 std::thread 无法在 dllmain 中创建使用，会造成死锁
-    initThreadPool();
 
     // 获取路径信息
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
@@ -250,6 +244,8 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
             task.get();
         }
     }
+
+    InitInnerTask();
 }
 
 string StockManager::tmpdir() const {

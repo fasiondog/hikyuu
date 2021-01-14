@@ -7,19 +7,16 @@
  *      Author: fasiondog
  */
 
-#include <chrono>
 #include "GlobalTaskGroup.h"
+#include "../Log.h"
 
 namespace hku {
 
 static StealThreadPool* g_threadPool;
 
-HKU_API StealThreadPool* getGlobalTaskGroup() {
-    return g_threadPool;
-}
-
-void initThreadPool() {
-    if (!g_threadPool) {
+StealThreadPool* getGlobalTaskGroup() {
+    static std::once_flag oc;
+    std::call_once(oc, [&]() {
         auto cpu_num = std::thread::hardware_concurrency();
         if (cpu_num >= 4) {
             cpu_num -= 2;
@@ -27,14 +24,15 @@ void initThreadPool() {
             cpu_num--;
         }
         g_threadPool = new StealThreadPool(cpu_num);
-    }
+    });
+    return g_threadPool;
 }
 
-void releaseThreadPool() {
+void releaseGlobalTaskGroup() {
+    HKU_TRACE("releaseGlobalTaskGroup");
     if (g_threadPool) {
         g_threadPool->stop();
         delete g_threadPool;
-        g_threadPool = nullptr;
     }
 }
 
