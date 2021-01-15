@@ -117,23 +117,23 @@ public:
             lock.unlock();
             m_cond.notify_all();
 
-            std::thread([this]() { detectThread(); }).detach();
+            m_detect_thread = std::move(std::thread([this]() { detectThread(); }));
         }
     }
 
     /** 终止调度 */
     void stop() {
-        HKU_TRACE("stop enter");
         if (!m_stop) {
-            HKU_TRACE("stop 1");
-            HKU_TRACE("stop 2");
             std::unique_lock<std::mutex> lock(m_mutex);
             std::priority_queue<IntervalS> queue;
             m_queue.swap(queue);
-            HKU_TRACE("stop 3");
             m_stop = true;
             lock.unlock();
             m_cond.notify_all();
+        }
+
+        if (m_detect_thread.joinable()) {
+            m_detect_thread.join();
         }
     }
 
@@ -443,6 +443,7 @@ private:
     std::atomic_bool m_stop;
     std::mutex m_mutex;
     std::condition_variable m_cond;
+    std::thread m_detect_thread;
 
     std::unordered_map<int, Timer*> m_timers;
     int m_current_timer_id;
