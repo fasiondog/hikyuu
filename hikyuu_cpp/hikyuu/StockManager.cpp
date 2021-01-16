@@ -17,6 +17,7 @@
 
 #include "utilities/IniParser.h"
 #include "utilities/util.h"
+#include "utilities/thread/ThreadPool.h"
 #include "StockManager.h"
 #include "base/GlobalTaskGroup.h"
 #include "base/schedule/inner_tasks.h"
@@ -201,52 +202,38 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
 
     } else {
         // 异步并行加载
-        list<std::future<void>> task_list;
+        auto& tg = *getGlobalTaskGroup();
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             if (iter->second.market() == "TMP")
                 continue;
             iter->second.setKDataDriver(driver);
             if (preload_day)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::DAY); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::DAY); });
             if (preload_week)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::WEEK); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::WEEK); });
             if (preload_month)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MONTH); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MONTH); });
             if (preload_quarter)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::QUARTER); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::QUARTER); });
             if (preload_halfyear)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::HALFYEAR); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::HALFYEAR); });
             if (preload_year)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::YEAR); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::YEAR); });
             if (preload_min)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN); });
             if (preload_min5)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN5); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN5); });
             if (preload_min15)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN15); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN15); });
             if (preload_min30)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN30); }));
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN30); });
             if (preload_min60)
-                task_list.push_back(
-                  addTask([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN60); }));
-        }
-        for (auto& task : task_list) {
-            task.get();
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN60); });
         }
     }
 
     InitInnerTask();
-}
+}  // namespace hku
 
 string StockManager::tmpdir() const {
     return m_tmpdir;

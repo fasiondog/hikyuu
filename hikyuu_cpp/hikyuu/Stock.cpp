@@ -280,31 +280,30 @@ void Stock::releaseKDataBuffer(KQuery::KType inkType) {
 
 // 仅在初始化时调用
 void Stock::loadKDataToBuffer(KQuery::KType inkType) {
-    if (m_data) {
-        string kType(inkType);
-        to_upper(kType);
+    HKU_IF_RETURN(!m_data || !m_kdataDriver, void());
 
-        releaseKDataBuffer(kType);
-        if (m_kdataDriver && m_data->pKData.find(kType) != m_data->pKData.end()) {
-            std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
-            KRecordList* ptr_klist = new KRecordList;
-            std::shared_mutex* ptr_mutex = new std::shared_mutex();
-            m_data->pKData[kType] = ptr_klist;
-            m_data->pMutex[kType] = ptr_mutex;
-            const auto& param = StockManager::instance().getPreloadParameter();
-            string preload_type = fmt::format("{}_max", kType);
-            to_lower(preload_type);
-            int max_num = param.tryGet<int>(preload_type, 4096);
-            HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
-                                max_num);
-            size_t total = m_kdataDriver->getCount(m_data->m_market, m_data->m_code, kType);
-            int start = total <= max_num ? 0 : total - max_num;
-            {
-                std::unique_lock<std::shared_mutex> lock(*ptr_mutex);
-                (*ptr_klist) = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
-                                                             KQuery(start, Null<int64_t>(), kType));
-            }
-        }
+    string kType(inkType);
+    to_upper(kType);
+    HKU_IF_RETURN(m_data->pKData.find(kType) == m_data->pKData.end(), void());
+
+    releaseKDataBuffer(kType);
+
+    std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
+    KRecordList* ptr_klist = new KRecordList;
+    std::shared_mutex* ptr_mutex = new std::shared_mutex();
+    m_data->pKData[kType] = ptr_klist;
+    m_data->pMutex[kType] = ptr_mutex;
+    const auto& param = StockManager::instance().getPreloadParameter();
+    string preload_type = fmt::format("{}_max", kType);
+    to_lower(preload_type);
+    int max_num = param.tryGet<int>(preload_type, 4096);
+    HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
+    size_t total = m_kdataDriver->getCount(m_data->m_market, m_data->m_code, kType);
+    int start = total <= max_num ? 0 : total - max_num;
+    {
+        std::unique_lock<std::shared_mutex> lock(*ptr_mutex);
+        (*ptr_klist) = m_kdataDriver->getKRecordList(m_data->m_market, m_data->m_code,
+                                                     KQuery(start, Null<int64_t>(), kType));
     }
 }
 
