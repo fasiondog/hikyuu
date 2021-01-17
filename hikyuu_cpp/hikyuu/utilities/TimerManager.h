@@ -36,8 +36,17 @@ public:
 
     /** 析构函数 */
     ~TimerManager() {
-        stop();
-        m_tg->stop();
+        if (!m_stop) {
+            IntervalS s;
+            s.m_time_point = Datetime::min();
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_queue.push(s);
+            lock.unlock();
+            m_cond.notify_all();
+            if (m_detect_thread.joinable()) {
+                m_detect_thread.join();
+            }
+        }
     }
 
     /** 启动调度, 可在停止后重新启动 */
@@ -271,6 +280,10 @@ private:
             }
 
             IntervalS s = m_queue.top();
+            if (s.m_time_point == Datetime::min()) {
+                break;  // 结束检测线程，用于 dll 能够安全退出，因为atomic在dll退出时可能无效
+            }
+
             TimeDelta diff = s.m_time_point - now;
             if (diff > TimeDelta()) {
                 m_cond.wait_for(lock, std::chrono::duration<int64_t, std::micro>(diff.ticks()));

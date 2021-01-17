@@ -57,13 +57,9 @@ void GlobalInitializer::init() {
 }
 
 void GlobalInitializer::clean() {
-#if !_MSC_VER
-    // windows dll 退出时，暂无法安全停止线程，需程序自动回收
-    // 会导致对内存泄露误报
     releaseGlobalTaskGroup();
     releaseScheduler();
     SpotAgent::release();
-#endif
 
     StockManager::quit();
     DataDriverFactory::release();
