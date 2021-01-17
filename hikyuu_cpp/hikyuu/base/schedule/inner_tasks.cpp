@@ -7,7 +7,7 @@
 
 #include "inner_tasks.h"
 #include "scheduler.h"
-#include "../../utilities/thread/ThreadPool.h"
+#include "../GlobalTaskGroup.h"
 #include "../../StockManager.h"
 
 namespace hku {
@@ -15,24 +15,23 @@ namespace hku {
 void InitInnerTask() {
     auto* tm = getScheduler();
     // tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(), ReloadHikyuuTask);
-    tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(0, 21, 9),
-                              ReloadHikyuuTask);
+    tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(), ReloadHikyuuTask);
     tm->start();
 }
 
 void ReloadHikyuuTask() {
     auto& sm = StockManager::instance();
-    ThreadPool tg;
+    auto& tg = *getGlobalTaskGroup();
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
-        tg.submit([=]() {
-            Stock stk = *iter;
-            auto ktype_list = KQuery::getAllKType();
-            for (auto& ktype : ktype_list) {
-                if (stk.isBuffer(ktype)) {
+        auto ktype_list = KQuery::getAllKType();
+        for (auto& ktype : ktype_list) {
+            if ((*iter).isBuffer(ktype)) {
+                tg.submit([=]() mutable {
+                    Stock stk(*iter);
                     stk.loadKDataToBuffer(ktype);
-                }
+                });
             }
-        });
+        }
     }
 }
 

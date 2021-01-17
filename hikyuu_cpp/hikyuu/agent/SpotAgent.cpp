@@ -35,7 +35,7 @@ SpotAgent& SpotAgent::instance() {
 
 void SpotAgent::release() {
     if (ms_spotAgent) {
-        HKU_INFO("relase spot agent");
+        HKU_TRACE("relase spot agent");
         delete ms_spotAgent;
         ms_spotAgent = nullptr;
     }
