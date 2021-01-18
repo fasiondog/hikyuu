@@ -171,10 +171,9 @@ std::string HKU_API getLocalTime();
 #define HKU_CHECK(expr, ...)                                                                   \
     do {                                                                                       \
         if (!(expr)) {                                                                         \
-            std::string err_msg(fmt::format("CHECK({}) {}", #expr, fmt::format(__VA_ARGS__))); \
-            HKU_ERROR(err_msg);                                                                \
-            throw hku::exception(                                                              \
-              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__));      \
+            throw hku::exception(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr,               \
+                                             fmt::format(__VA_ARGS__), __FUNCTION__, __FILE__, \
+                                             __LINE__));                                       \
         }                                                                                      \
     } while (0)
 
@@ -182,14 +181,12 @@ std::string HKU_API getLocalTime();
  * 若表达式为 false，将抛出指定的异常, 并附带传入信息
  * @note 用于外部入参及结果检查
  */
-#define HKU_CHECK_THROW(expr, except, ...)                                                     \
-    do {                                                                                       \
-        if (!(expr)) {                                                                         \
-            std::string err_msg(fmt::format("CHECK({}) {}", #expr, fmt::format(__VA_ARGS__))); \
-            HKU_ERROR(err_msg);                                                                \
-            throw except(                                                                      \
-              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__));      \
-        }                                                                                      \
+#define HKU_CHECK_THROW(expr, except, ...)                                                         \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            throw except(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, fmt::format(__VA_ARGS__), \
+                                     __FUNCTION__, __FILE__, __LINE__));                           \
+        }                                                                                          \
     } while (0)
 
 #if HKU_DISABLE_ASSERT
@@ -229,20 +226,17 @@ std::string HKU_API getLocalTime();
 #endif /* #if HKU_DISABLE_ASSERT */
 
 /** 抛出 hku::exception 及传入信息 */
-#define HKU_THROW(...)                                                                \
-    do {                                                                              \
-        std::string err_msg(fmt::format("EXCEPTION: {}", fmt::format(__VA_ARGS__)));  \
-        HKU_ERROR(err_msg);                                                           \
-        throw hku::exception(                                                         \
-          fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__)); \
+#define HKU_THROW(...)                                                                           \
+    do {                                                                                         \
+        throw hku::exception(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
+                                         __FUNCTION__, __FILE__, __LINE__));                     \
     } while (0)
 
 /** 抛出指定异常及传入信息 */
-#define HKU_THROW_EXCEPTION(except, ...)                                                         \
-    do {                                                                                         \
-        std::string err_msg(fmt::format("EXCEPTION: {}", fmt::format(__VA_ARGS__)));             \
-        HKU_ERROR(err_msg);                                                                      \
-        throw except(fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__)); \
+#define HKU_THROW_EXCEPTION(except, ...)                                                 \
+    do {                                                                                 \
+        throw except(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
+                                 __FUNCTION__, __FILE__, __LINE__));                     \
     } while (0)
 
 /**
