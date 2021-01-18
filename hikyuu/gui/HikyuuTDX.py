@@ -706,11 +706,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.start()
 
     def start_collect(self):
-        self.collect_sh_thread = CollectToMemThread(
+        self.collect_sh_thread = CollectThread(
             self.getCurrentConfig(), self.getHikyuuConfigFileName(), 'SH'
         )
         self.collect_sh_thread.start()
-        self.collect_sz_thread = CollectToMemThread(
+        self.collect_sz_thread = CollectThread(
             self.getCurrentConfig(), self.getHikyuuConfigFileName(), 'SZ'
         )
         self.collect_sz_thread.start()
