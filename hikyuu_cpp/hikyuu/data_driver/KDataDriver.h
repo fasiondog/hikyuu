@@ -26,6 +26,8 @@ class HKU_API KDataDriver {
 public:
     KDataDriver();
 
+    KDataDriver(const Parameter& params);
+
     /**
      * 构造函数
      * @param name 驱动名称
@@ -38,6 +40,17 @@ public:
 
     /** 驱动初始化 */
     bool init(const Parameter&);
+
+    typedef shared_ptr<KDataDriver> KDataDriverPtr;
+    /**
+     * 克隆实现
+     */
+    KDataDriverPtr clone();
+
+    /**
+     * 子类克隆函数实现
+     */
+    virtual KDataDriverPtr _clone() = 0;
 
     /**
      * 子类初始化私有变量接口

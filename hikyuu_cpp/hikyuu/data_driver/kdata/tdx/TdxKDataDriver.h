@@ -18,6 +18,10 @@ public:
     TdxKDataDriver();
     virtual ~TdxKDataDriver();
 
+    virtual KDataDriverPtr _clone() override {
+        return std::make_shared<TdxKDataDriver>();
+    }
+
     virtual bool _init() override;
 
     virtual bool isIndexFirst() override {

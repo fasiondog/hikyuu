@@ -17,6 +17,10 @@ public:
     KDataDriverWrap(const string& name) : KDataDriver(name) {}
     virtual ~KDataDriverWrap() {}
 
+    KDataDriverPtr _clone() {
+        return this->get_override("_clone")();
+    }
+
     bool _init() {
         if (override call = get_override("_init")) {
             return call();
@@ -154,7 +158,9 @@ void export_KDataDriver() {
       .add_property("name",
                     make_function(&KDataDriver::name, return_value_policy<copy_const_reference>()))
       .def("getParam", &KDataDriver::getParam<boost::any>)
+      .def("clone", &KDataDriver::clone)
 
+      .def("_clone", pure_virtual(&KDataDriver::_clone))
       .def("_init", &KDataDriver::_init, &KDataDriverWrap::default_init)
       .def("isIndexFirst", pure_virtual(&KDataDriver::isIndexFirst))
       .def("canParallelLoad", pure_virtual(&KDataDriver::canParallelLoad))

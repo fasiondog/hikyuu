@@ -20,6 +20,10 @@ public:
     H5KDataDriver();
     virtual ~H5KDataDriver();
 
+    virtual KDataDriverPtr _clone() override {
+        return std::make_shared<H5KDataDriver>();
+    }
+
     virtual bool _init() override;
 
     virtual bool isIndexFirst() override {

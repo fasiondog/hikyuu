@@ -27,8 +27,18 @@ HKU_API std::ostream& operator<<(std::ostream& os, const KDataDriverPtr& driver)
 
 KDataDriver::KDataDriver() : m_name("") {}
 
+KDataDriver::KDataDriver(const Parameter& params) : m_params(params) {}
+
 KDataDriver::KDataDriver(const string& name) : m_name(name) {
     to_upper(m_name);
+}
+
+shared_ptr<KDataDriver> KDataDriver::clone() {
+    shared_ptr<KDataDriver> ptr = _clone();
+    ptr->m_params = m_params;
+    ptr->m_name = m_name;
+    ptr->_init();
+    return ptr;
 }
 
 bool KDataDriver::checkType() {

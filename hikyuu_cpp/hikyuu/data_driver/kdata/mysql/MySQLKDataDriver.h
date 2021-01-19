@@ -27,6 +27,10 @@ public:
     MySQLKDataDriver();
     virtual ~MySQLKDataDriver();
 
+    virtual KDataDriverPtr _clone() override {
+        return std::make_shared<MySQLKDataDriver>();
+    }
+
     virtual bool _init() override;
 
     virtual bool isIndexFirst() override {

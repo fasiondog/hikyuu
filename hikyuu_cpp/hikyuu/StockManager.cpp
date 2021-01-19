@@ -298,8 +298,15 @@ Stock StockManager::addTempCsvStock(const string& code, const string& day_filena
     Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000),
                  Null<Datetime>(), tick, tickValue, precision, minTradeNumber, maxTradeNumber);
 
-    KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
-    result.setKDataDriver(KDataDriverPtr(p));
+    Parameter param;
+    param.set<string>("type", "TMPCSV");
+    KDataDriverPtr driver = DataDriverFactory::getKDataDriver(param);
+    KDataTempCsvDriver* p = dynamic_cast<KDataTempCsvDriver*>(driver.get());
+    p->setDayFileName(day_filename);
+    p->setMinFileName(min_filename);
+    result.setKDataDriver(driver);
+    // KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
+    // result.setKDataDriver(KDataDriverPtr(p));
     const auto& preload_param = getPreloadParameter();
     if (preload_param.tryGet<bool>("day", true)) {
         result.loadKDataToBuffer(KQuery::DAY);

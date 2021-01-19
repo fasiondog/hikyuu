@@ -17,8 +17,10 @@ namespace hku {
 
 KDataTempCsvDriver::~KDataTempCsvDriver() {}
 
+KDataTempCsvDriver::KDataTempCsvDriver() : KDataTempCsvDriver("", "") {}
+
 KDataTempCsvDriver::KDataTempCsvDriver(const string& day_filename, const string& min_filename)
-: m_day_filename(day_filename), m_min_filename(min_filename) {
+: KDataDriver("TMPCSV"), m_day_filename(day_filename), m_min_filename(min_filename) {
     for (int i = 0; i < LAST; ++i) {
         m_column[i] = Null<size_t>();
     }

@@ -9,6 +9,7 @@
 #ifndef DATADRIVERFACTORY_H_
 #define DATADRIVERFACTORY_H_
 
+#include "DriverPool.h"
 #include "BaseInfoDriver.h"
 #include "KDataDriver.h"
 #include "BlockInfoDriver.h"
@@ -43,10 +44,15 @@ public:
     static void removeKDataDriver(const string &name);
     static KDataDriverPtr getKDataDriver(const Parameter &);
 
+    typedef DriverPool<KDataDriver> KDataDriverPool;
+    static KDataDriverPool *getKDataDriverPool(const Parameter &);
+
 private:
     static map<string, BaseInfoDriverPtr> *m_baseInfoDrivers;
     static map<string, BlockInfoDriverPtr> *m_blockDrivers;
     static map<string, KDataDriverPtr> *m_kdataDrivers;
+
+    static map<string, KDataDriverPool *> *m_kdataDriverPools;
 };
 
 } /* namespace hku */
