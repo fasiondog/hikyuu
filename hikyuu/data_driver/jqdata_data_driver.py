@@ -43,6 +43,9 @@ class jqdataKDataDriver(KDataDriver):
     def __init__(self):
         super(jqdataKDataDriver, self).__init__('jqdata')
 
+    def clone(self):
+        return jqdataKDataDriver()
+
     def _init(self):
         """【重载接口】（可选）初始化子类私有变量"""
         self._max = {

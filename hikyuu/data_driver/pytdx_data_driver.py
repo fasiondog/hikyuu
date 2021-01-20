@@ -45,6 +45,9 @@ class PytdxKDataDriver(KDataDriver):
     def __init__(self):
         super(PytdxKDataDriver, self).__init__('pytdx')
 
+    def _clone(self):
+        return PytdxKDataDriver()
+
     def _init(self):
         """【重载接口】（可选）初始化子类私有变量"""
         self._max = {
