@@ -16,6 +16,9 @@
 
 namespace hku {
 
+typedef DriverPool<KDataDriver> KDataDriverPool;
+typedef shared_ptr<KDataDriverPool> KDataDriverPoolPtr;
+
 /**
  * 数据驱动工厂类
  * @ingroup DataDriver
@@ -44,15 +47,14 @@ public:
     static void removeKDataDriver(const string &name);
     static KDataDriverPtr getKDataDriver(const Parameter &);
 
-    typedef DriverPool<KDataDriver> KDataDriverPool;
-    static KDataDriverPool *getKDataDriverPool(const Parameter &);
+    static KDataDriverPoolPtr getKDataDriverPool(const Parameter &);
 
 private:
     static map<string, BaseInfoDriverPtr> *m_baseInfoDrivers;
     static map<string, BlockInfoDriverPtr> *m_blockDrivers;
     static map<string, KDataDriverPtr> *m_kdataDrivers;
 
-    static map<string, KDataDriverPool *> *m_kdataDriverPools;
+    static map<string, KDataDriverPoolPtr> *m_kdataDriverPools;
 };
 
 } /* namespace hku */

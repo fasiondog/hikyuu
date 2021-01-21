@@ -19,7 +19,13 @@ namespace hku {
 
 class HKU_API StockManager;
 class KDataDriver;
+
+template <class DriverType>
+class DriverPool;
+
 typedef shared_ptr<KDataDriver> KDataDriverPtr;
+typedef DriverPool<KDataDriver> KDataDriverPool;
+typedef shared_ptr<KDataDriverPool> KDataDriverPoolPtr;
 class HKU_API KData;
 class HKU_API Parameter;
 
@@ -180,7 +186,7 @@ public:
     bool isTransactionTime(Datetime time);
 
     /** 设置K线数据获取驱动 */
-    void setKDataDriver(const KDataDriverPtr& kdataDriver);
+    void setKDataDriver(const KDataDriverPoolPtr& kdataDriver);
 
     /** 获取K线数据获取驱动 */
     KDataDriverPtr getKDataDriver() const;
@@ -219,7 +225,7 @@ private:
 private:
     struct HKU_API Data;
     shared_ptr<Data> m_data;
-    KDataDriverPtr m_kdataDriver;
+    KDataDriverPoolPtr m_kdataDriver;
 };
 
 struct HKU_API Stock::Data {

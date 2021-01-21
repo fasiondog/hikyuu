@@ -119,8 +119,9 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_INFO("Loading KData...");
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
-    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_kdataDriverParam);
-    setKDataDriver(kdata_driver);
+    // KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_kdataDriverParam);
+    // setKDataDriver(kdata_driver);
+    setKDataDriver(DataDriverFactory::getKDataDriverPool(m_kdataDriverParam));
 
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
@@ -131,11 +132,11 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
 }
 
-void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
+void StockManager::setKDataDriver(const KDataDriverPoolPtr& driver) {
     HKU_ERROR_IF_RETURN(!driver, void(), "kdata driver is null!");
 
-    if (m_kdataDriverParam != driver->getParameter()) {
-        m_kdataDriverParam = driver->getParameter();
+    if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
+        m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
 
     bool preload_day = m_preloadParam.tryGet<bool>("day", false);
@@ -171,7 +172,7 @@ void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
     bool preload_min60 = m_preloadParam.tryGet<bool>("min60", false);
     HKU_INFO_IF(preload_min60, "Preloading all 60 min kdata to buffer!");
 
-    if (!driver->canParallelLoad()) {
+    if (!driver->getPrototype()->canParallelLoad()) {
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             if (iter->second.market() == "TMP")
                 continue;
