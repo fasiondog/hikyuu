@@ -51,10 +51,10 @@ public:
      * 构造函数
      * @param param 驱动原型，所有权将被转移至该 pool
      * @param maxConnect 允许的最大连接数，为 0 表示不限制
-     * @param maxIdleConnect 运行的最大空闲连接数，等于 0 时表示立刻释放
+     * @param maxIdleConnect 运行的最大空闲连接数，等于 0 时表示立刻释放，默认为CPU数
      */
     explicit DriverPool(const std::shared_ptr<DriverType> &prototype, size_t maxConnect = 0,
-                        size_t maxIdleConnect = 100)
+                        size_t maxIdleConnect = std::thread::hardware_concurrency())
     : m_maxSize(maxConnect),
       m_maxIdelSize(maxIdleConnect),
       m_count(0),
