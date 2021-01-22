@@ -84,13 +84,7 @@ H5KDataDriver::H5KDataDriver() : KDataDriver("hdf5"), m_h5DataType(H5::CompType(
                                H5::PredType::NATIVE_UINT8);
 }
 
-H5KDataDriver::~H5KDataDriver() {
-    for (auto iter = m_mutex_map.begin(); iter != m_mutex_map.end(); ++iter) {
-        if (iter->second) {
-            delete iter->second;
-        }
-    }
-}
+H5KDataDriver::~H5KDataDriver() {}
 
 bool H5KDataDriver::_init() {
     //关闭HDF异常自动打印
@@ -112,10 +106,6 @@ bool H5KDataDriver::_init() {
             if (ktype == KQuery::getKTypeName(KQuery::DAY)) {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
-                auto id = h5file->getId();
-                if (m_mutex_map.find(id) == m_mutex_map.end()) {
-                    m_mutex_map[id] = new std::mutex;
-                }
                 m_h5file_map[market + "_DAY"] = h5file;
                 m_h5file_map[market + "_WEEK"] = h5file;
                 m_h5file_map[market + "_MONTH"] = h5file;
@@ -126,19 +116,11 @@ bool H5KDataDriver::_init() {
             } else if (ktype == KQuery::getKTypeName(KQuery::MIN)) {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
-                auto id = h5file->getId();
-                if (m_mutex_map.find(id) == m_mutex_map.end()) {
-                    m_mutex_map[id] = new std::mutex;
-                }
                 m_h5file_map[market + "_MIN"] = h5file;
 
             } else if (ktype == KQuery::getKTypeName(KQuery::MIN5)) {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
-                auto id = h5file->getId();
-                if (m_mutex_map.find(id) == m_mutex_map.end()) {
-                    m_mutex_map[id] = new std::mutex;
-                }
                 m_h5file_map[market + "_MIN5"] = h5file;
                 m_h5file_map[market + "_MIN15"] = h5file;
                 m_h5file_map[market + "_MIN30"] = h5file;
@@ -147,19 +129,11 @@ bool H5KDataDriver::_init() {
             } else if (ktype == "TIME") {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
-                auto id = h5file->getId();
-                if (m_mutex_map.find(id) == m_mutex_map.end()) {
-                    m_mutex_map[id] = new std::mutex;
-                }
                 m_h5file_map[market + "_TIME"] = h5file;
 
             } else if (ktype == "TRANS") {
                 filename = getParam<string>(*iter);
                 H5FilePtr h5file(new H5::H5File(filename, H5F_ACC_RDONLY), Hdf5FileCloser());
-                auto id = h5file->getId();
-                if (m_mutex_map.find(id) == m_mutex_map.end()) {
-                    m_mutex_map[id] = new std::mutex;
-                }
                 m_h5file_map[market + "_TRANS"] = h5file;
             }
 
@@ -231,17 +205,6 @@ void H5KDataDriver::H5ReadTransRecords(H5::DataSet& dataset, hsize_t start, hsiz
     return;
 }
 
-H5FilePtr H5KDataDriver::_getH5File(const string& market, const string& code, KQuery::KType kType) {
-    H5FilePtr result;
-    string key(format("{}_{}", market, kType));
-    to_upper(key);
-    auto iter = m_h5file_map.find(key);
-    if (iter != m_h5file_map.end()) {
-        result = iter->second;
-    }
-    return result;
-}
-
 bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
                                        KQuery::KType kType, H5FilePtr& out_file,
                                        H5::Group& out_group) {
@@ -306,10 +269,7 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
 }
 
 size_t H5KDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
-    H5FilePtr h5file = _getH5File(market, code, kType);
-    HKU_IF_RETURN(!h5file, 0);
-    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
-
+    H5FilePtr h5file;
     H5::Group group;
     HKU_IF_RETURN(!_getH5FileAndGroup(market, code, kType, h5file, group), 0);
 
@@ -334,11 +294,6 @@ size_t H5KDataDriver::getCount(const string& market, const string& code, KQuery:
 bool H5KDataDriver::getIndexRangeByDate(const string& market, const string& code,
                                         const KQuery& query, size_t& out_start, size_t& out_end) {
     assert(KQuery::DATE == query.queryType());
-
-    H5FilePtr h5file = _getH5File(market, code, query.kType());
-    HKU_IF_RETURN(!h5file, false);
-    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
-
     bool result = false;
     if (KQuery::MIN5 == query.kType() || KQuery::MIN == query.kType() ||
         KQuery::DAY == query.kType()) {
@@ -571,10 +526,6 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
 KRecordList H5KDataDriver::getKRecordList(const string& market, const string& code,
                                           const KQuery& query) {
     KRecordList result;
-    H5FilePtr h5file = _getH5File(market, code, query.kType());
-    HKU_IF_RETURN(!h5file, result);
-    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
-
     auto kType = query.kType();
     if (query.queryType() == KQuery::INDEX) {
         // 按索引方式查询
@@ -731,10 +682,6 @@ KRecordList H5KDataDriver::_getIndexKRecordList(const string& market, const stri
 
 TimeLineList H5KDataDriver::getTimeLineList(const string& market, const string& code,
                                             const KQuery& query) {
-    H5FilePtr h5file = _getH5File(market, code, query.kType());
-    HKU_IF_RETURN(!h5file, TimeLineList());
-    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
-
     return query.queryType() == KQuery::INDEX
              ? _getTimeLine(market, code, query.start(), query.end())
              : _getTimeLine(market, code, query.startDatetime(), query.endDatetime());
@@ -950,10 +897,6 @@ TimeLineList H5KDataDriver::_getTimeLine(const string& market, const string& cod
 
 TransList H5KDataDriver::getTransList(const string& market, const string& code,
                                       const KQuery& query) {
-    H5FilePtr h5file = _getH5File(market, code, query.kType());
-    HKU_IF_RETURN(!h5file, TransList());
-    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
-
     return query.queryType() == KQuery::INDEX
              ? _getTransList(market, code, query.start(), query.end())
              : _getTransList(market, code, query.startDatetime(), query.endDatetime());

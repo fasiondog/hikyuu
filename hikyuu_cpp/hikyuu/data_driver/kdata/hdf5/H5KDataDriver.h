@@ -9,7 +9,6 @@
 #ifndef DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_
 #define DATA_DRIVER_KDATA_HDF5_H5KDATADRIVER_H_
 
-#include <thread>
 #include "../../KDataDriver.h"
 #include "H5Record.h"
 
@@ -55,8 +54,6 @@ private:
     void H5ReadTimeLineRecords(H5::DataSet&, hsize_t, hsize_t, void*);
     void H5ReadTransRecords(H5::DataSet&, hsize_t, hsize_t, void*);
 
-    H5FilePtr _getH5File(const string& market, const string& code, KQuery::KType kType);
-
     bool _getH5FileAndGroup(const string& market, const string& code, KQuery::KType kType,
                             H5FilePtr& out_file, H5::Group& out_group);
 
@@ -84,7 +81,6 @@ private:
     H5::CompType m_h5TimeLineType;
     H5::CompType m_h5TransType;
     unordered_map<string, H5FilePtr> m_h5file_map;  // key: market+code
-    unordered_map<hid_t, std::mutex*> m_mutex_map;
 };
 
 } /* namespace hku */
