@@ -301,13 +301,12 @@ Stock StockManager::addTempCsvStock(const string& code, const string& day_filena
 
     Parameter param;
     param.set<string>("type", "TMPCSV");
-    KDataDriverPtr driver = DataDriverFactory::getKDataDriver(param);
+    auto driver_pool = DataDriverFactory::getKDataDriverPool(param);
+    auto driver = driver_pool->getPrototype();
     KDataTempCsvDriver* p = dynamic_cast<KDataTempCsvDriver*>(driver.get());
     p->setDayFileName(day_filename);
     p->setMinFileName(min_filename);
-    result.setKDataDriver(driver);
-    // KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
-    // result.setKDataDriver(KDataDriverPtr(p));
+    result.setKDataDriver(driver_pool);
     const auto& preload_param = getPreloadParameter();
     if (preload_param.tryGet<bool>("day", true)) {
         result.loadKDataToBuffer(KQuery::DAY);

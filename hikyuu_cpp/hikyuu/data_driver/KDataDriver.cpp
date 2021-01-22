@@ -65,7 +65,6 @@ bool KDataDriver::init(const Parameter& params) {
     HKU_IF_RETURN(m_params == params, true);
     m_params = params;
     HKU_IF_RETURN(!checkType(), false);
-    HKU_INFO("Using {} KDataDriver, load parallel: {}", name(), canParallelLoad());
     return _init();
 }
 

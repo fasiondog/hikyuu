@@ -308,7 +308,7 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
 size_t H5KDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     H5FilePtr h5file = _getH5File(market, code, kType);
     HKU_IF_RETURN(!h5file, 0);
-    std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
+    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
 
     H5::Group group;
     HKU_IF_RETURN(!_getH5FileAndGroup(market, code, kType, h5file, group), 0);
@@ -337,7 +337,7 @@ bool H5KDataDriver::getIndexRangeByDate(const string& market, const string& code
 
     H5FilePtr h5file = _getH5File(market, code, query.kType());
     HKU_IF_RETURN(!h5file, false);
-    std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
+    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
 
     bool result = false;
     if (KQuery::MIN5 == query.kType() || KQuery::MIN == query.kType() ||
@@ -573,7 +573,7 @@ KRecordList H5KDataDriver::getKRecordList(const string& market, const string& co
     KRecordList result;
     H5FilePtr h5file = _getH5File(market, code, query.kType());
     HKU_IF_RETURN(!h5file, result);
-    std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
+    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
 
     auto kType = query.kType();
     if (query.queryType() == KQuery::INDEX) {
@@ -733,7 +733,7 @@ TimeLineList H5KDataDriver::getTimeLineList(const string& market, const string& 
                                             const KQuery& query) {
     H5FilePtr h5file = _getH5File(market, code, query.kType());
     HKU_IF_RETURN(!h5file, TimeLineList());
-    std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
+    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
 
     return query.queryType() == KQuery::INDEX
              ? _getTimeLine(market, code, query.start(), query.end())
@@ -952,7 +952,7 @@ TransList H5KDataDriver::getTransList(const string& market, const string& code,
                                       const KQuery& query) {
     H5FilePtr h5file = _getH5File(market, code, query.kType());
     HKU_IF_RETURN(!h5file, TransList());
-    std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
+    // std::lock_guard<std::mutex> lock(*(m_mutex_map[h5file->getId()]));
 
     return query.queryType() == KQuery::INDEX
              ? _getTransList(market, code, query.start(), query.end())

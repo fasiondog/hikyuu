@@ -78,41 +78,20 @@ public:
         }
     }
 
-    /** 获取可用连接，如超出允许的最大连接数将返回空指针 */
+    /** 获取可用连接，如超出允许的最大连接数，将阻塞等待，直到获得空闲资源 */
     WrapPtr getConnect() noexcept {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         if (m_driverList.empty()) {
             if (m_maxSize > 0 && m_count >= m_maxSize) {
-                HKU_WARN(
-                  "There are no idle connections. The current maximum number of connections: {}",
-                  m_maxSize);
-                return WrapPtr();
+                m_cond.wait(lock, [this] { return !m_driverList.empty(); });
+            } else {
+                m_count++;
+                return WrapPtr(new Wrap(m_prototype->clone()), m_closer);
             }
-            m_count++;
-            return WrapPtr(new Wrap(m_prototype->clone()), m_closer);
         }
         Wrap *p = m_driverList.front();
         m_driverList.pop();
         return WrapPtr(p, m_closer);
-    }
-
-    /**
-     * 等待并获取连接，如果超出将抛出异常
-     * @param timeout 超时时长（毫秒），如果等于或小于0，则表示不作超时限制
-     * @return 连接指针
-     */
-    WrapPtr getAndWait(int timeout = 0) {
-        int sleep = 100;
-        int count = 0, max_count = timeout / sleep;
-        WrapPtr result = getConnect();
-        while (!result) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
-            result = getConnect();
-            if (timeout > 0) {
-                YH_CHECK(count++ < max_count, "Can't get connect, timeout!");
-            }
-        }
-        return result;
     }
 
     DriverPtr getPrototype() {
@@ -145,10 +124,11 @@ public:
 private:
     /** 归还至连接池 */
     void returnDriver(Wrap *p) {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         if (p) {
             if (m_driverList.size() < m_maxIdelSize) {
                 m_driverList.push(p);
+                m_cond.notify_all();
             } else {
                 delete p;
                 m_count--;
@@ -165,6 +145,7 @@ private:
     size_t m_count;                           //当前活动的连接数
     std::shared_ptr<DriverType> m_prototype;  // 驱动原型
     std::mutex m_mutex;
+    std::condition_variable m_cond;
     std::queue<Wrap *> m_driverList;
 
     class DriverCloser {

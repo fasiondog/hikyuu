@@ -45,16 +45,13 @@ public:
 
     static void regKDataDriver(const KDataDriverPtr &);
     static void removeKDataDriver(const string &name);
-    static KDataDriverPtr getKDataDriver(const Parameter &);
-
     static KDataDriverPoolPtr getKDataDriverPool(const Parameter &);
 
 private:
     static map<string, BaseInfoDriverPtr> *m_baseInfoDrivers;
     static map<string, BlockInfoDriverPtr> *m_blockDrivers;
-    static map<string, KDataDriverPtr> *m_kdataDrivers;
-
-    static map<string, KDataDriverPoolPtr> *m_kdataDriverPools;
+    static map<string, KDataDriverPtr> *m_kdataPrototypeDrivers;  // K线驱动原型
+    static map<string, KDataDriverPoolPtr> *m_kdataDriverPools;   // K线驱动池
 };
 
 } /* namespace hku */
