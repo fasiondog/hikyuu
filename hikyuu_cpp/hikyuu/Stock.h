@@ -188,9 +188,6 @@ public:
     /** 设置K线数据获取驱动 */
     void setKDataDriver(const KDataDriverPoolPtr& kdataDriver);
 
-    /** 获取K线数据获取驱动 */
-    KDataDriverPtr getKDataDriver() const;
-
     /**
      * 将K线数据做自身缓存
      *  @note 一般不主动调用，谨慎

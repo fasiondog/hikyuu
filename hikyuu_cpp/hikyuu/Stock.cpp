@@ -242,10 +242,6 @@ void Stock::setWeightList(const StockWeightList& weightList) {
     }
 }
 
-KDataDriverPtr Stock::getKDataDriver() const {
-    return m_kdataDriver->getConnect()->get();
-}
-
 bool Stock::isBuffer(KQuery::KType ktype) const {
     HKU_IF_RETURN(!m_data, false);
     string nktype(ktype);
@@ -288,16 +284,16 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     int max_num = param.tryGet<int>(preload_type, 4096);
     HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
 
-    auto driver = getKDataDriver();
-    size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
+    auto driver = m_kdataDriver->getConnect();
+    size_t total = driver->get()->getCount(m_data->m_market, m_data->m_code, kType);
     HKU_IF_RETURN(total == 0, void());
     int start = total <= max_num ? 0 : total - max_num;
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
         KRecordList* ptr_klist = new KRecordList;
         m_data->pKData[kType] = ptr_klist;
-        (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
-                                              KQuery(start, Null<int64_t>(), kType));
+        (*ptr_klist) = driver->get()->getKRecordList(m_data->m_market, m_data->m_code,
+                                                     KQuery(start, Null<int64_t>(), kType));
     }
 }
 
@@ -347,7 +343,8 @@ size_t Stock::getCount(KQuery::KType kType) const {
         return _getCountFromBuffer(nktype);
     }
 
-    return m_kdataDriver ? getKDataDriver()->getCount(market(), code(), nktype) : 0;
+    return m_kdataDriver ? m_kdataDriver->getConnect()->get()->getCount(market(), code(), nktype)
+                         : 0;
 }
 
 price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) const {
@@ -358,7 +355,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
     to_upper(ktype);
 
     // 如果为内存缓存或者数据驱动为索引优先，则按索引方式获取
-    if (isBuffer(ktype) || getKDataDriver()->isIndexFirst()) {
+    if (isBuffer(ktype) || m_kdataDriver->getConnect()->get()->isIndexFirst()) {
         KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
         size_t out_start, out_end;
         if (getIndexRange(query, out_start, out_end)) {
@@ -415,8 +412,8 @@ bool Stock::getIndexRange(const KQuery& query, size_t& out_start, size_t& out_en
         return _getIndexRangeByDateFromBuffer(query, out_start, out_end);
     }
 
-    if (!getKDataDriver()->getIndexRangeByDate(m_data->m_market, m_data->m_code, query, out_start,
-                                               out_end)) {
+    if (!m_kdataDriver->getConnect()->get()->getIndexRangeByDate(m_data->m_market, m_data->m_code,
+                                                                 query, out_start, out_end)) {
         out_start = 0;
         out_end = 0;
         return false;
@@ -558,7 +555,8 @@ KRecord Stock::getKRecord(size_t pos, KQuery::KType kType) const {
     }
 
     HKU_IF_RETURN(!m_kdataDriver || pos >= size_t(Null<int64_t>()), Null<KRecord>());
-    auto klist = getKDataDriver()->getKRecordList(market(), code(), KQuery(pos, pos + 1, kType));
+    auto klist = m_kdataDriver->getConnect()->get()->getKRecordList(market(), code(),
+                                                                    KQuery(pos, pos + 1, kType));
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
@@ -567,12 +565,13 @@ KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
     HKU_IF_RETURN(isNull(), result);
 
     KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
-    if (isBuffer(query.kType()) || getKDataDriver()->isIndexFirst()) {
+    auto driver = m_kdataDriver->getConnect();
+    if (isBuffer(query.kType()) || driver->get()->isIndexFirst()) {
         size_t startix = 0, endix = 0;
         return getIndexRange(query, startix, endix) ? getKRecord(startix, ktype) : Null<KRecord>();
     }
 
-    auto klist = getKDataDriver()->getKRecordList(market(), code(), query);
+    auto klist = driver->get()->getKRecordList(market(), code(), query);
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
@@ -617,7 +616,8 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
 
     } else {
         if (query.queryType() == KQuery::DATE) {
-            result = getKDataDriver()->getKRecordList(m_data->m_market, m_data->m_code, query);
+            result = m_kdataDriver->getConnect()->get()->getKRecordList(m_data->m_market,
+                                                                        m_data->m_code, query);
         } else {
             size_t start_ix = 0, end_ix = 0;
             if (query.queryType() == KQuery::INDEX) {
@@ -631,8 +631,8 @@ KRecordList Stock::getKRecordList(const KQuery& query) const {
                     end_ix = query.end();
                 }
             }
-            result = getKDataDriver()->getKRecordList(m_data->m_market, m_data->m_code,
-                                                      KQuery(start_ix, end_ix, query.kType()));
+            result = m_kdataDriver->getConnect()->get()->getKRecordList(
+              m_data->m_market, m_data->m_code, KQuery(start_ix, end_ix, query.kType()));
         }
     }
 
@@ -650,12 +650,14 @@ DatetimeList Stock::getDatetimeList(const KQuery& query) const {
 }
 
 TimeLineList Stock::getTimeLineList(const KQuery& query) const {
-    return m_kdataDriver ? getKDataDriver()->getTimeLineList(market(), code(), query)
-                         : TimeLineList();
+    return m_kdataDriver
+             ? m_kdataDriver->getConnect()->get()->getTimeLineList(market(), code(), query)
+             : TimeLineList();
 }
 
 TransList Stock::getTransList(const KQuery& query) const {
-    return m_kdataDriver ? getKDataDriver()->getTransList(market(), code(), query) : TransList();
+    return m_kdataDriver ? m_kdataDriver->getConnect()->get()->getTransList(market(), code(), query)
+                         : TransList();
 }
 
 Parameter Stock::getFinanceInfo() const {
