@@ -70,7 +70,7 @@ public:
     // static const string INVALID_KTYPE;
 
     /** 获取所有的 KType */
-    static vector<string> getAllKType();
+    static vector<string>& getAllKType();
 
     /**
      * 复权类型

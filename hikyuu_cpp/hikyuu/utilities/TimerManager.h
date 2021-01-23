@@ -47,6 +47,10 @@ public:
                 m_detect_thread.join();
             }
         }
+
+        for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
+            delete iter->second;
+        }
     }
 
     /** 启动调度, 可在停止后重新启动 */

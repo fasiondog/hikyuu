@@ -250,7 +250,6 @@ struct HKU_API Stock::Data {
 
     unordered_map<string, KRecordList*> pKData;
     unordered_map<string, std::shared_mutex*> pMutex;
-    std::mutex m_load_release_mutex;  // 对 pMutex、pKData写入时保护
 
     Data();
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,

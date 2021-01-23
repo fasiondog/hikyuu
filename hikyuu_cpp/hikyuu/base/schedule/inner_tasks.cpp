@@ -22,7 +22,7 @@ void ReloadHikyuuTask() {
     auto& sm = StockManager::instance();
     auto& tg = *getGlobalTaskGroup();
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
-        auto ktype_list = KQuery::getAllKType();
+        auto& ktype_list = KQuery::getAllKType();
         for (auto& ktype : ktype_list) {
             if ((*iter).isBuffer(ktype)) {
                 tg.submit([=]() mutable {

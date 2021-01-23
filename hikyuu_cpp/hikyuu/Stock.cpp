@@ -65,7 +65,7 @@ Stock::Data::Data()
   m_precision(default_precision),
   m_minTradeNumber(default_minTradeNumber),
   m_maxTradeNumber(default_maxTradeNumber) {
-    auto ktype_list = KQuery::getAllKType();
+    auto& ktype_list = KQuery::getAllKType();
     for (auto& ktype : ktype_list) {
         pKData[ktype] = nullptr;
         pMutex[ktype] = nullptr;
@@ -98,23 +98,23 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
     to_upper(m_market);
     m_market_code = m_market + m_code;
 
-    auto ktype_list = KQuery::getAllKType();
+    auto& ktype_list = KQuery::getAllKType();
     for (auto& ktype : ktype_list) {
+        pMutex[ktype] = new std::shared_mutex();
         pKData[ktype] = nullptr;
-        pMutex[ktype] = nullptr;
     }
 }
 
 Stock::Data::~Data() {
-    auto ktype_list = KQuery::getAllKType();
-    for (auto& ktype : ktype_list) {
-        if (pMutex[ktype]) {
-            std::unique_lock<std::shared_mutex> lock(*pMutex[ktype]);
-            if (pKData[ktype]) {
-                delete pKData[ktype];
-            }
+    for (auto iter = pKData.begin(); iter != pKData.end(); ++iter) {
+        if (iter->second) {
+            delete iter->second;
+        }
+    }
 
-            delete pMutex[ktype];
+    for (auto iter = pMutex.begin(); iter != pMutex.end(); ++iter) {
+        if (iter->second) {
+            delete iter->second;
         }
     }
 }
@@ -224,16 +224,11 @@ void Stock::setKDataDriver(const KDataDriverPoolPtr& kdataDriver) {
     HKU_CHECK(kdataDriver, "kdataDriver is nullptr!");
     m_kdataDriver = kdataDriver;
     if (m_data) {
-        std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
-        auto ktype_list = KQuery::getAllKType();
+        auto& ktype_list = KQuery::getAllKType();
         for (auto& ktype : ktype_list) {
-            if (m_data->pMutex[ktype]) {
-                std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-                delete m_data->pKData[ktype];
-                m_data->pKData[ktype] = nullptr;
-                delete m_data->pMutex[ktype];
-                m_data->pMutex[ktype] = nullptr;
-            }
+            std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+            delete m_data->pKData[ktype];
+            m_data->pKData[ktype] = nullptr;
         }
     }
 }
@@ -263,18 +258,17 @@ bool Stock::isNull() const {
 }
 
 void Stock::releaseKDataBuffer(KQuery::KType inkType) {
-    if (m_data) {
-        string ktype(inkType);
-        to_upper(ktype);
+    HKU_IF_RETURN(!m_data, void());
 
-        std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
-        if (m_data->pKData.find(ktype) != m_data->pKData.end() && m_data->pMutex[ktype]) {
-            std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-            delete m_data->pKData[ktype];
-            m_data->pKData[ktype] = nullptr;
-            delete m_data->pMutex[ktype];
-            m_data->pMutex[ktype] = nullptr;
-        }
+    string ktype(inkType);
+    to_upper(ktype);
+    HKU_IF_RETURN(m_data->pMutex.find(ktype) == m_data->pMutex.end(), void());
+
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    auto iter = m_data->pKData.find(ktype);
+    if (iter->second) {
+        delete iter->second;
+        iter->second = nullptr;
     }
 }
 
@@ -288,21 +282,20 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
 
     releaseKDataBuffer(kType);
 
-    std::lock_guard<std::mutex> lock(m_data->m_load_release_mutex);
-    KRecordList* ptr_klist = new KRecordList;
-    std::shared_mutex* ptr_mutex = new std::shared_mutex();
-    m_data->pKData[kType] = ptr_klist;
-    m_data->pMutex[kType] = ptr_mutex;
     const auto& param = StockManager::instance().getPreloadParameter();
     string preload_type = fmt::format("{}_max", kType);
     to_lower(preload_type);
     int max_num = param.tryGet<int>(preload_type, 4096);
     HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
+
     auto driver = getKDataDriver();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
+    HKU_IF_RETURN(total == 0, void());
     int start = total <= max_num ? 0 : total - max_num;
     {
-        std::unique_lock<std::shared_mutex> lock(*ptr_mutex);
+        std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
+        KRecordList* ptr_klist = new KRecordList;
+        m_data->pKData[kType] = ptr_klist;
         (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
                                               KQuery(start, Null<int64_t>(), kType));
     }
@@ -588,8 +581,10 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     KRecordList result;
     size_t total = m_data->pKData[ktype]->size();
-    HKU_WARN_IF_RETURN(start_ix >= end_ix || start_ix >= total, result, "Invalid param! ({}, {})",
-                       start_ix, end_ix);
+    HKU_IF_RETURN(total == 0, result);
+    HKU_WARN_IF_RETURN(start_ix >= end_ix || start_ix >= total, result,
+                       "Invalid param (start_ix: {}, end_ix: {})! current total: {}", start_ix,
+                       end_ix, total);
     size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
     result.resize(length);
     std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]), sizeof(KRecord) * length);
