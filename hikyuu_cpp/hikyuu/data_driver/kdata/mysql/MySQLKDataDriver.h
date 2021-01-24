@@ -9,7 +9,6 @@
 #ifndef MYSQLKDATADRIVERIMP_H_
 #define MYSQLKDATADRIVERIMP_H_
 
-#include "../../../utilities/ConnectPool.h"
 #include "../../../utilities/db_connect/DBConnect.h"
 #include "../../../utilities/db_connect/mysql/MySQLConnect.h"
 #include "../../KDataDriver.h"
@@ -57,7 +56,7 @@ private:
                                 Datetime start_date, Datetime end_date);
 
 private:
-    ConnectPool<MySQLConnect>* m_pool;
+    MySQLConnect* m_connect;
 };
 
 } /* namespace hku */
