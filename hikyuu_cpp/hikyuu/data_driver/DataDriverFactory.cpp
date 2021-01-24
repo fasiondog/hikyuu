@@ -23,7 +23,7 @@ map<string, BaseInfoDriverPtr>* DataDriverFactory::m_baseInfoDrivers{nullptr};
 map<string, BlockInfoDriverPtr>* DataDriverFactory::m_blockDrivers{nullptr};
 map<string, KDataDriverPtr>* DataDriverFactory::m_kdataPrototypeDrivers{nullptr};
 
-map<string, KDataDriverPoolPtr>* DataDriverFactory::m_kdataDriverPools{nullptr};
+map<string, KDataDriverConnectPoolPtr>* DataDriverFactory::m_kdataDriverPools{nullptr};
 
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
@@ -34,7 +34,7 @@ void DataDriverFactory::init() {
     DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
 
     m_kdataPrototypeDrivers = new map<string, KDataDriverPtr>();
-    m_kdataDriverPools = new map<string, KDataDriverPoolPtr>();
+    m_kdataDriverPools = new map<string, KDataDriverConnectPoolPtr>();
 
     DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
@@ -129,8 +129,8 @@ void DataDriverFactory::removeKDataDriver(const string& name) {
     }
 }
 
-KDataDriverPoolPtr DataDriverFactory::getKDataDriverPool(const Parameter& params) {
-    KDataDriverPoolPtr result;
+KDataDriverConnectPoolPtr DataDriverFactory::getKDataDriverPool(const Parameter& params) {
+    KDataDriverConnectPoolPtr result;
     string name = params.get<string>("type");
     to_upper(name);
     auto iter = m_kdataDriverPools->find(name);
@@ -140,8 +140,8 @@ KDataDriverPoolPtr DataDriverFactory::getKDataDriverPool(const Parameter& params
         auto prototype_iter = m_kdataPrototypeDrivers->find(name);
         HKU_CHECK(prototype_iter != m_kdataPrototypeDrivers->end(), "Unregistered driver：{}",
                   name);
-        HKU_CHECK(prototype_iter->second->init(params),"Failed init driver: {}", name);
-        (*m_kdataDriverPools)[name] = make_shared<KDataDriverPool>(prototype_iter->second);
+        HKU_CHECK(prototype_iter->second->init(params), "Failed init driver: {}", name);
+        (*m_kdataDriverPools)[name] = make_shared<KDataDriverConnectPool>(prototype_iter->second);
         result = (*m_kdataDriverPools)[name];
     }
     return result;

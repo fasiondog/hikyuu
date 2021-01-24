@@ -135,6 +135,60 @@ inline const string& KDataDriver::name() const {
     return m_name;
 }
 
+class KDataDriverConnect {
+public:
+    typedef KDataDriver DriverType;
+    typedef KDataDriverPtr DriverTypePtr;
+
+    KDataDriverConnect(const KDataDriverPtr& driver) : m_driver(driver) {}
+    ~KDataDriverConnect() = default;
+
+    KDataDriverConnect(const KDataDriverConnect&) = delete;
+    KDataDriverConnect(KDataDriverConnect&&) = delete;
+    KDataDriverConnect& operator=(const KDataDriverConnect&) = delete;
+    KDataDriverConnect& operator=(KDataDriverConnect&&) = delete;
+
+    explicit operator bool() const noexcept {
+        return m_driver.get() != nullptr;
+    }
+
+    const string& name() const {
+        return m_driver->name();
+    }
+
+    bool isIndexFirst() {
+        return m_driver->isIndexFirst();
+    }
+
+    bool canParallelLoad() {
+        return m_driver->canParallelLoad();
+    }
+
+    size_t getCount(const string& market, const string& code, KQuery::KType kType) {
+        return m_driver->getCount(market, code, kType);
+    }
+
+    bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
+                             size_t& out_start, size_t& out_end) {
+        return m_driver->getIndexRangeByDate(market, code, query, out_start, out_end);
+    }
+
+    KRecordList getKRecordList(const string& market, const string& code, const KQuery& query) {
+        return m_driver->getKRecordList(market, code, query);
+    }
+
+    TimeLineList getTimeLineList(const string& market, const string& code, const KQuery& query) {
+        return m_driver->getTimeLineList(market, code, query);
+    }
+
+    TransList getTransList(const string& market, const string& code, const KQuery& query) {
+        return m_driver->getTransList(market, code, query);
+    }
+
+private:
+    KDataDriverPtr m_driver;
+};
+
 }  // namespace hku
 
 #endif /* KDATADRIVER_H_ */

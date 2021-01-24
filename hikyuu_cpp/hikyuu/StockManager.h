@@ -183,7 +183,7 @@ public:
 
 private:
     /* 设置K线驱动 */
-    void setKDataDriver(const KDataDriverPoolPtr&);
+    void setKDataDriver(const KDataDriverConnectPoolPtr&);
 
 private:
     StockManager();

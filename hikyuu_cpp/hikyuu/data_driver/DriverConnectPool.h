@@ -15,37 +15,20 @@
 
 namespace hku {
 
-template <typename DriverType>
-class DriverWrap {
-public:
-    DriverWrap() = default;
-
-    typedef std::shared_ptr<DriverType> DriverPtr;
-    DriverWrap(const DriverPtr &driver) : m_driver(driver) {}
-
-    DriverPtr get() {
-        return m_driver;
-    }
-
-    explicit operator bool() const noexcept {
-        return m_driver.get() != nullptr;
-    }
-
-private:
-    DriverPtr m_driver;
-};
-
 /**
  * 驱动资源池
- * @tparam DriverType 驱动类型，要求具备 DriverType *clone() 方法
+ * @tparam DriverConnectT 驱动类型，要求具备 DriverType *clone() 方法
  * @ingroup DataDriver
  */
-template <typename DriverType>
-class DriverPool {
+template <class DriverConnectT>
+class DriverConnectPool {
 public:
-    DriverPool() = delete;
-    DriverPool(const DriverPool &) = delete;
-    DriverPool &operator=(const DriverPool &) = delete;
+    DriverConnectPool() = delete;
+    DriverConnectPool(const DriverConnectPool &) = delete;
+    DriverConnectPool &operator=(const DriverConnectPool &) = delete;
+
+    typedef typename DriverConnectT::DriverTypePtr DriverPtr;
+    typedef std::shared_ptr<DriverConnectT> DriverConnectPtr;
 
     /**
      * 构造函数
@@ -53,24 +36,20 @@ public:
      * @param maxConnect 允许的最大连接数，为 0 表示不限制
      * @param maxIdleConnect 运行的最大空闲连接数，等于 0 时表示立刻释放，默认为CPU数
      */
-    explicit DriverPool(const std::shared_ptr<DriverType> &prototype, size_t maxConnect = 0,
-                        size_t maxIdleConnect = std::thread::hardware_concurrency())
+    explicit DriverConnectPool(const DriverPtr &prototype, size_t maxConnect = 0,
+                               size_t maxIdleConnect = std::thread::hardware_concurrency())
     : m_maxSize(maxConnect),
       m_maxIdelSize(maxIdleConnect),
       m_count(0),
       m_prototype(prototype),
       m_closer(this) {}
 
-    typedef DriverWrap<DriverType> Wrap;
-    typedef std::shared_ptr<Wrap> WrapPtr;
-    typedef std::shared_ptr<DriverType> DriverPtr;
-
     /**
      * 析构函数，释放所有缓存的连接
      */
-    virtual ~DriverPool() {
+    virtual ~DriverConnectPool() {
         while (!m_driverList.empty()) {
-            Wrap *p = m_driverList.front();
+            DriverConnectT *p = m_driverList.front();
             m_driverList.pop();
             if (p) {
                 delete p;
@@ -79,19 +58,19 @@ public:
     }
 
     /** 获取可用连接，如超出允许的最大连接数，将阻塞等待，直到获得空闲资源 */
-    WrapPtr getConnect() noexcept {
+    DriverConnectPtr getConnect() noexcept {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (m_driverList.empty()) {
             if (m_maxSize > 0 && m_count >= m_maxSize) {
                 m_cond.wait(lock, [this] { return !m_driverList.empty(); });
             } else {
                 m_count++;
-                return WrapPtr(new Wrap(m_prototype->clone()), m_closer);
+                return DriverConnectPtr(new DriverConnectT(m_prototype->clone()), m_closer);
             }
         }
-        Wrap *p = m_driverList.front();
+        DriverConnectT *p = m_driverList.front();
         m_driverList.pop();
-        return WrapPtr(p, m_closer);
+        return DriverConnectPtr(p, m_closer);
     }
 
     DriverPtr getPrototype() {
@@ -112,7 +91,7 @@ public:
     void releaseIdleConnect() {
         std::lock_guard<std::mutex> lock(m_mutex);
         while (!m_driverList.empty()) {
-            Wrap *p = m_driverList.front();
+            DriverConnectT *p = m_driverList.front();
             m_driverList.pop();
             m_count--;
             if (p) {
@@ -123,7 +102,7 @@ public:
 
 private:
     /** 归还至连接池 */
-    void returnDriver(Wrap *p) {
+    void returnDriver(DriverConnectT *p) {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (p) {
             if (m_driverList.size() < m_maxIdelSize) {
@@ -140,25 +119,25 @@ private:
     }
 
 private:
-    size_t m_maxSize;                         //允许的最大连接数
-    size_t m_maxIdelSize;                     //允许的最大空闲连接数
-    size_t m_count;                           //当前活动的连接数
-    std::shared_ptr<DriverType> m_prototype;  // 驱动原型
+    size_t m_maxSize;       //允许的最大连接数
+    size_t m_maxIdelSize;   //允许的最大空闲连接数
+    size_t m_count;         //当前活动的连接数
+    DriverPtr m_prototype;  // 驱动原型
     std::mutex m_mutex;
     std::condition_variable m_cond;
-    std::queue<Wrap *> m_driverList;
+    std::queue<DriverConnectT *> m_driverList;
 
     class DriverCloser {
     public:
-        explicit DriverCloser(DriverPool *pool) : m_pool(pool) {}
-        void operator()(Wrap *conn) {
+        explicit DriverCloser(DriverConnectPool *pool) : m_pool(pool) {}
+        void operator()(DriverConnectT *conn) {
             if (m_pool && conn) {
                 m_pool->returnDriver(conn);
             }
         }
 
     private:
-        DriverPool *m_pool;
+        DriverConnectPool *m_pool;
     };
 
     DriverCloser m_closer;

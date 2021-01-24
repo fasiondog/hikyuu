@@ -132,7 +132,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
 }
 
-void StockManager::setKDataDriver(const KDataDriverPoolPtr& driver) {
+void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
     HKU_ERROR_IF_RETURN(!driver, void(), "kdata driver is null!");
 
     if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
