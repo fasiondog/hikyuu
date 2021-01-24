@@ -40,8 +40,14 @@ void StockManager::quit() {
     }
 }
 
-StockManager::StockManager() {}
+StockManager::StockManager() {
+    m_marketInfoDict_mutex = new std::mutex;
+    m_stockTypeInfo_mutex = new std::mutex;
+}
+
 StockManager::~StockManager() {
+    delete m_marketInfoDict_mutex;
+    delete m_stockTypeInfo_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
 }
 
@@ -119,8 +125,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_INFO("Loading KData...");
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
-    // KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_kdataDriverParam);
-    // setKDataDriver(kdata_driver);
     setKDataDriver(DataDriverFactory::getKDataDriverPool(m_kdataDriverParam));
 
     // add special Market, for temp csv file
@@ -253,15 +257,36 @@ Stock StockManager::getStock(const string& querystr) const {
 }
 
 MarketInfo StockManager::getMarketInfo(const string& market) const {
+    MarketInfo result;
     string market_tmp = market;
     to_upper(market_tmp);
+
+    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.find(market_tmp);
-    return (iter != m_marketInfoDict.end()) ? iter->second : Null<MarketInfo>();
+    if (iter != m_marketInfoDict.end()) {
+        result = iter->second;
+    } else {
+        result = m_baseInfoDriver->getMarketInfo(market_tmp);
+        if (result != Null<MarketInfo>()) {
+            m_marketInfoDict[market_tmp] = result;
+        }
+    }
+    return result;
 }
 
 StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
+    StockTypeInfo result;
+    std::lock_guard<std::mutex> lock(*m_stockTypeInfo_mutex);
     auto iter = m_stockTypeInfo.find(type);
-    return (iter != m_stockTypeInfo.end()) ? iter->second : Null<StockTypeInfo>();
+    if (iter != m_stockTypeInfo.end()) {
+        result = iter->second;
+    } else {
+        result = m_baseInfoDriver->getStockTypeInfo(type);
+        if (result != Null<StockTypeInfo>()) {
+            m_stockTypeInfo[type] = result;
+        }
+    }
+    return result;
 }
 
 MarketList StockManager::getAllMarket() const {

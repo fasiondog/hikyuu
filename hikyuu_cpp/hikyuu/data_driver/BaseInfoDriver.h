@@ -68,6 +68,20 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code);
 
     /**
+     * 获取指定的MarketInfo
+     * @param market 市场简称
+     * @return 如未找到，则返回 Null<MarketInfo>()
+     */
+    virtual MarketInfo getMarketInfo(const string& market);
+
+    /**
+     * 获取相应的证券类型详细信息
+     * @param type 证券类型
+     * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
+     */
+    virtual StockTypeInfo getStockTypeInfo(uint32_t type);
+
+    /**
      * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
      * @return
      */

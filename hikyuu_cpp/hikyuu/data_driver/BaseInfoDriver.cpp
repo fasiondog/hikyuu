@@ -83,4 +83,14 @@ StockWeightList BaseInfoDriver::getStockWeightList(const string& market, const s
     return StockWeightList();
 }
 
+MarketInfo BaseInfoDriver::getMarketInfo(const string& market) {
+    HKU_INFO("The getMarketInfo method has not been implemented! (BaseInfoDriver: {})", m_name);
+    return MarketInfo();
+}
+
+StockTypeInfo BaseInfoDriver::getStockTypeInfo(uint32_t type) {
+    HKU_INFO("The getStockTypeInfo method has not been implemented! (BaseInfoDriver: {})", m_name);
+    return StockTypeInfo();
+}
+
 } /* namespace hku */

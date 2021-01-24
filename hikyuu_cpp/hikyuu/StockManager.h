@@ -8,6 +8,7 @@
 #ifndef STOCKMANAGER_H_
 #define STOCKMANAGER_H_
 
+#include <mutex>
 #include "utilities/Parameter.h"
 #include "data_driver/DataDriverFactory.h"
 #include "Block.h"
@@ -198,10 +199,12 @@ private:
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
 
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
-    MarketInfoMap m_marketInfoDict;
+    mutable MarketInfoMap m_marketInfoDict;
+    std::mutex* m_marketInfoDict_mutex;
 
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
-    StockTypeInfoMap m_stockTypeInfo;
+    mutable StockTypeInfoMap m_stockTypeInfo;
+    std::mutex* m_stockTypeInfo_mutex;
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;

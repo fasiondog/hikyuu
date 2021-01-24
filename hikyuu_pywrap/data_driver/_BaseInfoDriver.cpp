@@ -55,6 +55,28 @@ public:
                                                Datetime start, Datetime end) {
         return this->BaseInfoDriver::getStockWeightList(market, code, start, end);
     }
+
+    MarketInfo getMarketInfo(const string& market) {
+        if (override call = get_override("getMarketInfo")) {
+            return call(market);
+        }
+        return this->BaseInfoDriver::getMarketInfo(market);
+    }
+
+    MarketInfo default_getMarketInfo(const string& market) {
+        return this->BaseInfoDriver::getMarketInfo(market);
+    }
+
+    StockTypeInfo getStockTypeInfo(uint32_t type) {
+        if (override call = get_override("getStockTypeInfo")) {
+            return call(type);
+        }
+        return this->BaseInfoDriver::getStockTypeInfo(type);
+    }
+
+    StockTypeInfo default_getStockTypeInfo(uint32_t type) {
+        return this->BaseInfoDriver::getStockTypeInfo(type);
+    }
 };
 
 void export_BaseInfoDriver() {
@@ -73,7 +95,9 @@ void export_BaseInfoDriver() {
       .def("getFinanceInfo", &BaseInfoDriver::getFinanceInfo,
            &BaseInfoDriverWrap::default_getFinanceInfo)
       .def("getStockWeightList", &BaseInfoDriver::getStockWeightList,
-           &BaseInfoDriverWrap::getStockWeightList);
+           &BaseInfoDriverWrap::default_getStockWeightList)
+      .def("getMarketInfo", &BaseInfoDriver::getMarketInfo,
+           &BaseInfoDriverWrap::default_getMarketInfo);
 
     register_ptr_to_python<BaseInfoDriverPtr>();
 }

@@ -211,4 +211,33 @@ bool MySQLBaseInfoDriver::_loadStock() {
     return true;
 }
 
+MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
+    MarketInfo result;
+    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
+    auto con = m_pool->getConnect();
+    try {
+        MarketInfoTable info;
+        con->load(info);
+        result =
+          MarketInfo(info.market(), info.name(), info.description(), info.code(), info.lastDate(),
+                     info.openTime1(), info.closeTime1(), info.openTime2(), info.closeTime2());
+    } catch (...) {
+    }
+    return result;
+}
+
+StockTypeInfo MySQLBaseInfoDriver::getStockTypeInfo(uint32_t type) {
+    StockTypeInfo result;
+    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
+    auto con = m_pool->getConnect();
+    try {
+        StockTypeInfoTable info;
+        con->load(info);
+        result = StockTypeInfo(info.type(), info.description(), info.tick(), info.tickValue(),
+                               info.precision(), info.minTradeNumber(), info.maxTradeNumber());
+    } catch (...) {
+    }
+    return result;
+}
+
 } /* namespace hku */
