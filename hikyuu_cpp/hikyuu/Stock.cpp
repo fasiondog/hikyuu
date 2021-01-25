@@ -58,7 +58,6 @@ Stock::Data::Data()
   m_valid(default_valid),
   m_startDate(default_startDate),
   m_lastDate(default_lastDate),
-  m_lastUpdateWeightDate(Datetime::min()),
   m_tick(default_tick),
   m_tickValue(default_tickValue),
   m_unit(default_unit),
@@ -82,7 +81,6 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
   m_valid(valid),
   m_startDate(startDate),
   m_lastDate(lastDate),
-  m_lastUpdateWeightDate(Datetime::min()),
   m_tick(tick),
   m_tickValue(tickValue),
   m_precision(precision),
@@ -235,10 +233,8 @@ void Stock::setKDataDriver(const KDataDriverConnectPoolPtr& kdataDriver) {
 
 void Stock::setWeightList(const StockWeightList& weightList) {
     if (m_data) {
+        std::lock_guard<std::mutex> lock(m_data->m_weight_mutex);
         m_data->m_weightList = weightList;
-        if (!weightList.empty()) {
-            m_data->m_lastUpdateWeightDate = weightList.back().datetime();
-        }
     }
 }
 
@@ -300,16 +296,7 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     HKU_IF_RETURN(!m_data || start >= end, result);
-    if (m_data->m_lastUpdateWeightDate < Datetime::today()) {
-        auto baseInfoDriver = StockManager::instance().getBaseInfoDriver();
-        auto new_weight_list =
-          baseInfoDriver->getStockWeightList(market(), code(), Datetime::today(), Datetime::max());
-        for (auto& weight : new_weight_list) {
-            m_data->m_weightList.push_back(weight);
-        }
-        m_data->m_lastUpdateWeightDate = Datetime::today();
-    }
-
+    std::lock_guard<std::mutex> lock(m_data->m_weight_mutex);
     StockWeightList::const_iterator start_iter, end_iter;
     start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(),
                              StockWeight(start), std::less<StockWeight>());
