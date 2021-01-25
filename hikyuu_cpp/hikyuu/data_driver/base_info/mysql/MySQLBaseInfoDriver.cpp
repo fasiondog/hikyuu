@@ -217,10 +217,14 @@ MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
     auto con = m_pool->getConnect();
     try {
         MarketInfoTable info;
-        con->load(info);
-        result =
-          MarketInfo(info.market(), info.name(), info.description(), info.code(), info.lastDate(),
-                     info.openTime1(), info.closeTime1(), info.openTime2(), info.closeTime2());
+        string new_market(market);
+        to_upper(new_market);
+        con->load(info, format("market=\"{}\"", new_market));
+        if (!info.market().empty()) {
+            result = MarketInfo(info.market(), info.name(), info.description(), info.code(),
+                                info.lastDate(), info.openTime1(), info.closeTime1(),
+                                info.openTime2(), info.closeTime2());
+        }
     } catch (...) {
     }
     return result;
@@ -232,9 +236,11 @@ StockTypeInfo MySQLBaseInfoDriver::getStockTypeInfo(uint32_t type) {
     auto con = m_pool->getConnect();
     try {
         StockTypeInfoTable info;
-        con->load(info);
-        result = StockTypeInfo(info.type(), info.description(), info.tick(), info.tickValue(),
-                               info.precision(), info.minTradeNumber(), info.maxTradeNumber());
+        con->load(info, format("type={}", type));
+        if (info.type() != Null<uint32_t>()) {
+            result = StockTypeInfo(info.type(), info.description(), info.tick(), info.tickValue(),
+                                   info.precision(), info.minTradeNumber(), info.maxTradeNumber());
+        }
     } catch (...) {
     }
     return result;

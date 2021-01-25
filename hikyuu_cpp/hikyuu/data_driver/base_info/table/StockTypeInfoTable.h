@@ -19,7 +19,7 @@ class StockTypeInfoTable {
 public:
     StockTypeInfoTable()
     : m_id(0),
-      m_type(0),
+      m_type(Null<uint32_t>()),
       m_precision(0),
       m_tick(0.0),
       m_tickValue(0.0),
