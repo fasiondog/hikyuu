@@ -201,11 +201,7 @@ bool MySQLBaseInfoDriver::_loadStock() {
               Stock(marketDict[r.marketid], r.code, r.name, r.type, r.valid, startDate, endDate);
         }
 
-        if (sm.loadStock(stock)) {
-            StockWeightList weightList =
-              getStockWeightList(marketDict[r.marketid], r.code, Datetime::min(), Null<Datetime>());
-            stock.setWeightList(weightList);
-        }
+        sm.loadStock(stock);
     }
 
     return true;

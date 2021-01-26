@@ -41,11 +41,13 @@ void StockManager::quit() {
 }
 
 StockManager::StockManager() {
+    m_stockDict_mutex = new std::mutex;
     m_marketInfoDict_mutex = new std::mutex;
     m_stockTypeInfo_mutex = new std::mutex;
 }
 
 StockManager::~StockManager() {
+    delete m_stockDict_mutex;
     delete m_marketInfoDict_mutex;
     delete m_stockTypeInfo_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
@@ -252,6 +254,7 @@ Stock StockManager::getStock(const string& querystr) const {
     Stock result;
     string query_str = querystr;
     to_upper(query_str);
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(query_str);
     return (iter != m_stockDict.end()) ? iter->second : result;
 }
@@ -354,6 +357,7 @@ void StockManager::removeTempCsvStock(const string& code) {
 bool StockManager::loadStock(const Stock& stock) {
     string market_code(stock.market_code());
     to_upper(market_code);
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     HKU_ERROR_IF_RETURN(m_stockDict.find(market_code) != m_stockDict.end(), false,
                         "The stock had exist! {}", market_code);
     m_stockDict[market_code] = stock;
@@ -361,6 +365,7 @@ bool StockManager::loadStock(const Stock& stock) {
 }
 
 bool StockManager::loadMarketInfo(const MarketInfo& marketInfo) {
+    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
     string market = marketInfo.market();
     to_upper(market);
     HKU_ERROR_IF_RETURN(m_marketInfoDict.find(market) != m_marketInfoDict.end(), false,
@@ -370,6 +375,7 @@ bool StockManager::loadMarketInfo(const MarketInfo& marketInfo) {
 }
 
 bool StockManager::loadStockTypeInfo(const StockTypeInfo& stkTypeInfo) {
+    std::lock_guard<std::mutex> lock(*m_stockTypeInfo_mutex);
     HKU_ERROR_IF_RETURN(m_stockTypeInfo.find(stkTypeInfo.type()) != m_stockTypeInfo.end(), false,
                         "The stockTypeInfo had exist! {}", stkTypeInfo.type());
     m_stockTypeInfo[stkTypeInfo.type()] = stkTypeInfo;

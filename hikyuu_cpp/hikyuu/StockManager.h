@@ -197,6 +197,7 @@ private:
     BlockInfoDriverPtr m_blockDriver;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
+    std::mutex* m_stockDict_mutex;
 
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
     mutable MarketInfoMap m_marketInfoDict;

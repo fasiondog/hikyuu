@@ -6,6 +6,8 @@
  */
 
 #include <boost/algorithm/string.hpp>
+#include "../StockManager.h"
+#include "../base/GlobalTaskGroup.h"
 #include "BaseInfoDriver.h"
 
 namespace hku {
@@ -67,6 +69,22 @@ bool BaseInfoDriver::loadBaseInfo() {
 
     HKU_INFO("Loading stock information...");
     HKU_FATAL_IF_RETURN(!_loadStock(), false, "Can't load Stock");
+
+    HKU_INFO("Loading stock weight...");
+    auto* tg = getGlobalTaskGroup();
+    auto& sm = StockManager::instance();
+    std::vector<std::future<void>> task_list;
+    for (auto stock : sm) {
+        task_list.push_back(tg->submit([=]() mutable {
+            StockWeightList weightList = this->getStockWeightList(
+              stock.market(), stock.code(), Datetime::min(), Null<Datetime>());
+            stock.setWeightList(weightList);
+        }));
+    }
+    // 权息信息如果不等待加载完毕，在数据加载期间进行计算可能导致复权错误，所以这里需要等待
+    for (auto& task : task_list) {
+        task.get();
+    }
 
     return true;
 }
