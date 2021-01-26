@@ -27,9 +27,10 @@ public:
     virtual ~MySQLBaseInfoDriver();
 
     virtual bool _init() override;
-    virtual bool _loadMarketInfo() override;
-    virtual bool _loadStockTypeInfo() override;
     virtual bool _loadStock() override;
+    virtual vector<MarketInfo> getAllMarketInfo() override;
+    virtual vector<StockTypeInfo> getAllStockTypeInfo() override;
+
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end) override;
     virtual MarketInfo getMarketInfo(const string& market);

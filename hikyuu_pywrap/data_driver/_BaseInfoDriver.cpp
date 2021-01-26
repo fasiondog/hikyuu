@@ -12,6 +12,8 @@
 using namespace hku;
 using namespace boost::python;
 
+#if 0  // 基本不会在Python中重载，取消引出
+
 class BaseInfoDriverWrap : public BaseInfoDriver, public wrapper<BaseInfoDriver> {
 public:
     BaseInfoDriverWrap(const string& name) : BaseInfoDriver(name) {}
@@ -101,3 +103,5 @@ void export_BaseInfoDriver() {
 
     register_ptr_to_python<BaseInfoDriverPtr>();
 }
+
+#endif

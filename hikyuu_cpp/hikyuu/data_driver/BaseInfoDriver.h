@@ -72,32 +72,30 @@ public:
      * @param market 市场简称
      * @return 如未找到，则返回 Null<MarketInfo>()
      */
-    virtual MarketInfo getMarketInfo(const string& market);
+    virtual MarketInfo getMarketInfo(const string& market) = 0;
+
+    /**
+     * 获取全部市场信息
+     */
+    virtual vector<MarketInfo> getAllMarketInfo() = 0;
+
+    /**
+     * 获取全部证券类型信息
+     */
+    virtual vector<StockTypeInfo> getAllStockTypeInfo() = 0;
 
     /**
      * 获取相应的证券类型详细信息
      * @param type 证券类型
      * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
      */
-    virtual StockTypeInfo getStockTypeInfo(uint32_t type);
+    virtual StockTypeInfo getStockTypeInfo(uint32_t type) = 0;
 
     /**
      * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
      * @return
      */
     virtual bool _init() = 0;
-
-    /**
-     * 加载市场信息
-     * @return true 成功 | false 失败
-     */
-    virtual bool _loadMarketInfo() = 0;
-
-    /**
-     * 加载证券类型信息
-     * @return true 成功 | false 失败
-     */
-    virtual bool _loadStockTypeInfo() = 0;
 
     /**
      * 加载股票信息

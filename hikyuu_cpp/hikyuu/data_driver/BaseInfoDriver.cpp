@@ -61,18 +61,25 @@ bool BaseInfoDriver::init(const Parameter& params) {
 
 bool BaseInfoDriver::loadBaseInfo() {
     HKU_IF_RETURN(!checkType(), false);
+    auto& sm = StockManager::instance();
+
     HKU_INFO("Loading market information...");
-    HKU_FATAL_IF_RETURN(!_loadMarketInfo(), false, "Can't load Market Information.");
+    auto market_list = getAllMarketInfo();
+    for (auto& market : market_list) {
+        sm.loadMarketInfo(market);
+    }
 
     HKU_INFO("Loading stock type information...");
-    HKU_FATAL_IF_RETURN(!_loadStockTypeInfo(), false, "Can't load StockType Information.");
+    auto stktype_list = getAllStockTypeInfo();
+    for (auto& stktype : stktype_list) {
+        sm.loadStockTypeInfo(stktype);
+    }
 
     HKU_INFO("Loading stock information...");
     HKU_FATAL_IF_RETURN(!_loadStock(), false, "Can't load Stock");
 
     HKU_INFO("Loading stock weight...");
     auto* tg = getGlobalTaskGroup();
-    auto& sm = StockManager::instance();
     std::vector<std::future<void>> task_list;
     for (auto stock : sm) {
         task_list.push_back(tg->submit([=]() mutable {
@@ -99,16 +106,6 @@ StockWeightList BaseInfoDriver::getStockWeightList(const string& market, const s
     HKU_INFO("The getStockWeightList method has not been implemented! (BaseInfoDriver: {})",
              m_name);
     return StockWeightList();
-}
-
-MarketInfo BaseInfoDriver::getMarketInfo(const string& market) {
-    HKU_INFO("The getMarketInfo method has not been implemented! (BaseInfoDriver: {})", m_name);
-    return MarketInfo();
-}
-
-StockTypeInfo BaseInfoDriver::getStockTypeInfo(uint32_t type) {
-    HKU_INFO("The getStockTypeInfo method has not been implemented! (BaseInfoDriver: {})", m_name);
-    return StockTypeInfo();
 }
 
 } /* namespace hku */

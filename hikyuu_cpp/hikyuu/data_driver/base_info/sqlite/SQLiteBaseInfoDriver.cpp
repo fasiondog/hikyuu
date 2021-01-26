@@ -34,20 +34,19 @@ bool SQLiteBaseInfoDriver::_init() {
     return true;
 }
 
-bool SQLiteBaseInfoDriver::_loadMarketInfo() {
-    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
+vector<MarketInfo> SQLiteBaseInfoDriver::getAllMarketInfo() {
+    vector<MarketInfo> result;
+    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
 
     try {
         auto con = m_pool->getConnect();
         vector<MarketInfoTable> infoTables;
         con->batchLoad(infoTables);
-
-        StockManager& sm = StockManager::instance();
         for (auto& info : infoTables) {
             try {
-                sm.loadMarketInfo(MarketInfo(
-                  info.market(), info.name(), info.description(), info.code(), info.lastDate(),
-                  info.openTime1(), info.closeTime1(), info.openTime2(), info.closeTime2()));
+                result.emplace_back(info.market(), info.name(), info.description(), info.code(),
+                                    info.lastDate(), info.openTime1(), info.closeTime1(),
+                                    info.openTime2(), info.closeTime2());
             } catch (std::exception& e) {
                 HKU_ERROR("Failed load market, {}", e.what());
             } catch (...) {
@@ -57,37 +56,32 @@ bool SQLiteBaseInfoDriver::_loadMarketInfo() {
 
     } catch (std::exception& e) {
         HKU_FATAL("load Market table failed! {}", e.what());
-        return false;
     } catch (...) {
         HKU_FATAL("load Market table failed!");
-        return false;
     }
 
-    return true;
+    return result;
 }
 
-bool SQLiteBaseInfoDriver::_loadStockTypeInfo() {
-    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
-    auto con = m_pool->getConnect();
-    vector<StockTypeInfoTable> infoTables;
+vector<StockTypeInfo> SQLiteBaseInfoDriver::getAllStockTypeInfo() {
+    vector<StockTypeInfo> result;
+    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
+
     try {
+        auto con = m_pool->getConnect();
+        vector<StockTypeInfoTable> infoTables;
         con->batchLoad(infoTables);
+        for (auto& info : infoTables) {
+            result.emplace_back(info.type(), info.description(), info.tick(), info.tickValue(),
+                                info.precision(), info.minTradeNumber(), info.maxTradeNumber());
+        }
     } catch (std::exception& e) {
         HKU_FATAL("load StockTypeInfo table failed! {}", e.what());
-        return false;
     } catch (...) {
         HKU_FATAL("load StockTypeInfo table failed!");
-        return false;
     }
 
-    StockManager& sm = StockManager::instance();
-    for (auto& info : infoTables) {
-        sm.loadStockTypeInfo(StockTypeInfo(info.type(), info.description(), info.tick(),
-                                           info.tickValue(), info.precision(),
-                                           info.minTradeNumber(), info.maxTradeNumber()));
-    }
-
-    return true;
+    return result;
 }
 
 bool SQLiteBaseInfoDriver::_loadStock() {
