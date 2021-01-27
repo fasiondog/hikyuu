@@ -138,68 +138,15 @@ StockWeightList MySQLBaseInfoDriver::getStockWeightList(const string &market, co
     return result;
 }
 
-bool MySQLBaseInfoDriver::_loadStock() {
-    HKU_ERROR_IF_RETURN(!m_pool, false, "Connect pool ptr is null!");
-    auto con = m_pool->getConnect();
-    vector<MarketInfoTable> marketTable;
+vector<StockInfo> MySQLBaseInfoDriver::getAllStockInfo() {
+    vector<StockInfo> result;
+    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
-        con->batchLoad(marketTable);
-    } catch (std::exception &e) {
-        HKU_FATAL("load Market table failed! {}", e.what());
-        return false;
+        auto con = m_pool->getConnect();
+        con->batchLoad(result);
     } catch (...) {
-        HKU_FATAL("load Market table failed!");
-        return false;
     }
-
-    unordered_map<uint64_t, string> marketDict;
-    for (auto &m : marketTable) {
-        marketDict[m.id()] = m.market();
-    }
-
-    vector<StockTable> table;
-    try {
-        con->batchLoad(table);
-    } catch (std::exception &e) {
-        HKU_FATAL("load Stock table failed! {}", e.what());
-        return false;
-    } catch (...) {
-        HKU_FATAL("load Stock table failed!");
-        return false;
-    }
-
-    Stock stock;
-    StockTypeInfo stockTypeInfo;
-    StockTypeInfo null_stockTypeInfo;
-    StockManager &sm = StockManager::instance();
-    for (auto &r : table) {
-        Datetime startDate, endDate;
-        if (r.startDate > r.endDate || r.startDate == 0 || r.endDate == 0) {
-            //日期非法，置为Null<Datetime>
-            startDate = Null<Datetime>();
-            endDate = Null<Datetime>();
-        } else {
-            startDate =
-              (r.startDate == 99999999LL) ? Null<Datetime>() : Datetime(r.startDate * 10000);
-            endDate = (r.endDate == 99999999LL) ? Null<Datetime>() : Datetime(r.endDate * 10000);
-        }
-
-        stockTypeInfo = sm.getStockTypeInfo(r.type);
-        if (stockTypeInfo != null_stockTypeInfo) {
-            stock =
-              Stock(marketDict[r.marketid], r.code, r.name, r.type, r.valid, startDate, endDate,
-                    stockTypeInfo.tick(), stockTypeInfo.tickValue(), stockTypeInfo.precision(),
-                    stockTypeInfo.minTradeNumber(), stockTypeInfo.maxTradeNumber());
-
-        } else {
-            stock =
-              Stock(marketDict[r.marketid], r.code, r.name, r.type, r.valid, startDate, endDate);
-        }
-
-        sm.loadStock(stock);
-    }
-
-    return true;
+    return result;
 }
 
 MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {

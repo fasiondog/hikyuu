@@ -76,7 +76,24 @@ bool BaseInfoDriver::loadBaseInfo() {
     }
 
     HKU_INFO("Loading stock information...");
-    HKU_FATAL_IF_RETURN(!_loadStock(), false, "Can't load Stock");
+    auto stockinfo_list = getAllStockInfo();
+    for (auto& info : stockinfo_list) {
+        Datetime startDate, endDate;
+        try {
+            startDate = Datetime(info.startDate * 10000LL);
+        } catch (...) {
+            startDate = Null<Datetime>();
+        }
+        try {
+            endDate = Datetime(info.endDate * 10000LL);
+        } catch (...) {
+            endDate = Null<Datetime>();
+        }
+        Stock stock(info.market, info.code, info.name, info.type, info.valid, startDate, endDate,
+                    info.tick, info.tickValue, info.precision, info.minTradeNumber,
+                    info.maxTradeNumber);
+        sm.loadStock(stock);
+    }
 
     HKU_INFO("Loading stock weight...");
     auto* tg = getGlobalTaskGroup();

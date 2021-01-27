@@ -23,7 +23,6 @@ public:
     virtual ~SQLiteBaseInfoDriver();
 
     virtual bool _init() override;
-    virtual bool _loadStock() override;
     virtual vector<MarketInfo> getAllMarketInfo() override;
     virtual vector<StockTypeInfo> getAllStockTypeInfo() override;
 
@@ -32,6 +31,8 @@ public:
                                                Datetime start, Datetime end) override;
     virtual MarketInfo getMarketInfo(const string& market);
     virtual StockTypeInfo getStockTypeInfo(uint32_t type);
+
+    virtual vector<StockInfo> getAllStockInfo() override;
 
 private:
     //股票基本信息数据库实例

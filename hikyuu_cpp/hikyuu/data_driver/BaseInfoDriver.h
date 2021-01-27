@@ -13,8 +13,46 @@
 #include "../MarketInfo.h"
 #include "../StockTypeInfo.h"
 #include "../Stock.h"
+#include "../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
+
+struct StockInfo {
+    StockInfo()
+    : type(Null<uint32_t>()),
+      valid(0),
+      startDate(0),
+      endDate(0),
+      precision(1),
+      tick(0.0),
+      tickValue(0.0),
+      minTradeNumber(0.0),
+      maxTradeNumber(0.0) {}
+
+    static const char* getSelectSQL() {
+        return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, b.tick, "
+               "b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from stock a, "
+               "StockTypeInfo b, market c where a.type = b.id and a.marketid = c.marketid";
+    }
+
+    void load(const SQLStatementPtr& st) {
+        st->getColumn(0, market, code, name, type, valid, startDate, endDate, tick, tickValue,
+                      precision, minTradeNumber, maxTradeNumber);
+    }
+
+    string market;
+    string code;
+    string name;
+    uint32_t type;
+    uint32_t valid;
+    uint64_t startDate;
+    uint64_t endDate;
+    uint32_t precision;
+    double tick;
+    double tickValue;
+    double minTradeNumber;
+    double maxTradeNumber;
+};
 
 /**
  * 基本信息数据获取驱动基类
@@ -49,6 +87,17 @@ public:
      * @return
      */
     bool loadBaseInfo();
+
+    /**
+     * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
+     * @return
+     */
+    virtual bool _init() = 0;
+
+    /**
+     * 获取所有股票详情信息
+     */
+    virtual vector<StockInfo> getAllStockInfo() = 0;
 
     /**
      * 获取指定日期范围内 [start, end) 的权限列表
@@ -90,18 +139,6 @@ public:
      * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
      */
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) = 0;
-
-    /**
-     * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
-     * @return
-     */
-    virtual bool _init() = 0;
-
-    /**
-     * 加载股票信息
-     * @return true 成功 | false 失败
-     */
-    virtual bool _loadStock() = 0;
 
 private:
     bool checkType();

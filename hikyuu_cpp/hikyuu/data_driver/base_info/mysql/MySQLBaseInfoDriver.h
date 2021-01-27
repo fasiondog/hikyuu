@@ -27,7 +27,7 @@ public:
     virtual ~MySQLBaseInfoDriver();
 
     virtual bool _init() override;
-    virtual bool _loadStock() override;
+    virtual vector<StockInfo> getAllStockInfo() override;
     virtual vector<MarketInfo> getAllMarketInfo() override;
     virtual vector<StockTypeInfo> getAllStockTypeInfo() override;
 
