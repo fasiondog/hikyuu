@@ -70,7 +70,7 @@ public:
     KQuery getQuery();
 
     /** 设置查询条件 */
-    void setQuery(KQuery query);
+    void setQuery(const KQuery& query);
 
     /** 获取不参与资产分配的保留比例 */
     double getReservePercent();
@@ -224,7 +224,7 @@ inline KQuery AllocateFundsBase::getQuery() {
     return m_query;
 }
 
-inline void AllocateFundsBase::setQuery(KQuery query) {
+inline void AllocateFundsBase::setQuery(const KQuery& query) {
     m_query = query;
 }
 

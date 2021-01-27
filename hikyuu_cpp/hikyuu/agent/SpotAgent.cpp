@@ -61,7 +61,7 @@ void SpotAgent::stop() {
 
 class ProcessTask {
 public:
-    ProcessTask(std::function<void(const SpotRecord&)> func, const SpotRecord& spot)
+    ProcessTask(const std::function<void(const SpotRecord&)>& func, const SpotRecord& spot)
     : m_func(func), m_spot(spot) {}
 
     void operator()() {
