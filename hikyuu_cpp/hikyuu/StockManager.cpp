@@ -240,7 +240,117 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
     }
 
     InitInnerTask();
-}  // namespace hku
+}
+
+void StockManager::reload() {
+    {
+        SPEND_TIME(reload_marketinfo);
+        auto marketinfo_list = m_baseInfoDriver->getAllMarketInfo();
+        std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
+        for (auto& marketinfo : marketinfo_list) {
+            m_marketInfoDict[marketinfo.market()] = marketinfo;
+        }
+    }
+
+    {
+        SPEND_TIME(reload_stock_type_info);
+        auto stktypeinfo_list = m_baseInfoDriver->getAllStockTypeInfo();
+        std::lock_guard<std::mutex> lock(*m_stockTypeInfo_mutex);
+        for (auto& info : stktypeinfo_list) {
+            m_stockTypeInfo[info.type()] = info;
+        }
+    }
+
+    {
+        SPEND_TIME(reload_stock_info);
+        auto stockinfo_list = m_baseInfoDriver->getAllStockInfo();
+        std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+        for (auto& info : stockinfo_list) {
+            Datetime startDate, endDate;
+            try {
+                startDate = Datetime(info.startDate * 10000LL);
+            } catch (...) {
+                startDate = Null<Datetime>();
+            }
+            try {
+                endDate = Datetime(info.endDate * 10000LL);
+            } catch (...) {
+                endDate = Null<Datetime>();
+            }
+
+            string market_code = format("{}{}", info.market, info.code);
+            to_upper(market_code);
+            auto iter = m_stockDict.find(market_code);
+            if (iter == m_stockDict.end()) {
+                Stock stock(info.market, info.code, info.name, info.type, info.valid, startDate,
+                            endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
+                            info.maxTradeNumber);
+                m_stockDict[market_code] = stock;
+
+            } else {
+                Stock& stock = iter->second;
+                if (!stock.m_data) {
+                    stock.m_data = shared_ptr<Stock::Data>(
+                      new Stock::Data(info.market, info.code, info.name, info.type, info.valid,
+                                      startDate, endDate, info.tick, info.tickValue, info.precision,
+                                      info.minTradeNumber, info.maxTradeNumber));
+                } else {
+                    stock.m_data->m_market = info.market;
+                    stock.m_data->m_code = info.code;
+                    stock.m_data->m_name = info.name;
+                    stock.m_data->m_type = info.type;
+                    stock.m_data->m_valid = info.valid;
+                    stock.m_data->m_startDate = startDate;
+                    stock.m_data->m_lastDate = endDate;
+                    stock.m_data->m_tick = info.tick;
+                    stock.m_data->m_tickValue = info.tickValue;
+                    stock.m_data->m_precision = info.precision;
+                    stock.m_data->m_minTradeNumber = info.minTradeNumber;
+                    stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
+                }
+            }
+        }
+    }
+
+    {
+        SPEND_TIME(reload_stock_weight);
+        ThreadPool tg;
+        std::vector<std::future<void>> task_list;
+        std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            task_list.push_back(tg.submit([=]() mutable {
+                Stock& stock = iter->second;
+                StockWeightList weightList = m_baseInfoDriver->getStockWeightList(
+                  stock.market(), stock.code(), Datetime::min(), Null<Datetime>());
+                if (stock.m_data) {
+                    std::lock_guard<std::mutex> lock(stock.m_data->m_weight_mutex);
+                    stock.m_data->m_weightList.swap(weightList);
+                }
+            }));
+        }
+        // 权息信息如果不等待加载完毕，在数据加载期间进行计算可能导致复权错误，所以这里需要等待
+        for (auto& task : task_list) {
+            task.get();
+        }
+    }
+
+    {
+        HKU_INFO("start reload kdata to buffer");
+        auto* tg = getGlobalTaskGroup();
+        std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            auto& ktype_list = KQuery::getAllKType();
+            for (auto& ktype : ktype_list) {
+                if (iter->second.isBuffer(ktype)) {
+                    tg->submit([=]() mutable {
+                        Stock& stk = iter->second;
+                        stk.loadKDataToBuffer(ktype);
+                    });
+                }
+            }
+        }
+    }
+}
 
 string StockManager::tmpdir() const {
     return m_tmpdir;

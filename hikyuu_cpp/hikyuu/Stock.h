@@ -67,7 +67,10 @@ public:
     bool operator==(const Stock&) const;
     bool operator!=(const Stock&) const;
 
-    /** 获取内部id，一般用于作为map的键值使用，该id实质为m_data的内存地址 */
+    /**
+     * 获取内部id，一般用于作为map的键值使用，该id实际为m_data的内存地址
+     * @note 非数据库中的stockid
+     */
     uint64_t id() const;
 
     /** 获取所属市场简称，市场简称是市场的唯一标识 */

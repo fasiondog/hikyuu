@@ -33,6 +33,8 @@ void export_StockManager() {
      param preload_param 预加载参数
      param hikyuu_param 其他参数)")
 
+      .def("reload", &StockManager::reload, "重新加载所有证券数据")
+
       .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str
 
     获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定)")

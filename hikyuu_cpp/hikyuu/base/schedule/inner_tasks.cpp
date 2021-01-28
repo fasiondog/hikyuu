@@ -19,19 +19,7 @@ void InitInnerTask() {
 }
 
 void ReloadHikyuuTask() {
-    auto& sm = StockManager::instance();
-    auto& tg = *getGlobalTaskGroup();
-    for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
-        auto& ktype_list = KQuery::getAllKType();
-        for (auto& ktype : ktype_list) {
-            if ((*iter).isBuffer(ktype)) {
-                tg.submit([=]() mutable {
-                    Stock stk(*iter);
-                    stk.loadKDataToBuffer(ktype);
-                });
-            }
-        }
-    }
+    StockManager::instance().reload();
 }
 
 }  // namespace hku

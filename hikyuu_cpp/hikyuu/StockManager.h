@@ -44,6 +44,9 @@ public:
               const Parameter& kdataParam, const Parameter& preloadParam = default_preload_param(),
               const Parameter& hikyuuParam = default_other_param());
 
+    /** 重新加载 */
+    void reload();
+
     /** 主动退出并释放资源 */
     static void quit();
 
