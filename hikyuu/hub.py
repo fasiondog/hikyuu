@@ -19,7 +19,11 @@ from configparser import ConfigParser
 
 # 引入 git 前需设置环境变量，否则某些情况下会报错失败
 os.environ['GIT_PYTHON_REFRESH'] = 'quiet'
-import git
+try:
+    import git
+except Exception as e:
+    print(e)
+    print("You need install git! see: https://git-scm.com/downloads")
 
 from hikyuu.util.check import checkif
 from hikyuu.util.singleton import SingletonType
