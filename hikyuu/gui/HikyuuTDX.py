@@ -19,8 +19,9 @@ from hikyuu.gui.data.MainWindow import *
 from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
-from hikyuu.gui.data.CollectThread import CollectThread
-from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
+#from hikyuu.gui.data.CollectToMySQLThread import CollectToMySQLThread
+#from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
+from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 
 from hikyuu.data import hku_config_template
 from hikyuu.util.mylog import add_class_logger_handler, class_logger, hku_logger
@@ -49,11 +50,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.initThreads()
 
     def closeEvent(self, event):
-        self.stop_collect()
         if self.import_running:
             QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
             event.ignore()
             return
+
+        if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
+            self.collect_spot_thread.terminate()
 
         self.saveConfig()
 
@@ -203,10 +206,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         )
         con.setFormatter(FORMAT)
         add_class_logger_handler(
-            con, [
-                MyMainWindow, CollectThread, CollectToMemThread, UsePytdxImportToH5Thread,
+            con,
+            [
+                MyMainWindow,
+                CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread, 
+                UsePytdxImportToH5Thread,
                 UseTdxImportToH5Thread
-            ], logging.INFO
+            ],
+            logging.INFO
         )
         hku_logger.addHandler(con)
 
@@ -234,8 +241,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.time_start_dateEdit.setDate(today - datetime.timedelta(7))
         self.trans_start_dateEdit.setMinimumDate(today - datetime.timedelta(90))
         self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
-        self.collect_running = False
-        self.collect_status_Label.setText("未启动")
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
@@ -332,12 +337,22 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.collect_use_zhima_checkBox.setChecked(use_zhima_proxy)
         self.collect_phase1_start_timeEdit.setTime(
             datetime.time.fromisoformat(
-                import_config.get('collect', 'phase1_start', fallback='09:05')
+                import_config.get('collect', 'phase1_start', fallback='09:00')
             )
         )
         self.collect_phase1_last_timeEdit.setTime(
             datetime.time.fromisoformat(
-                import_config.get('collect', 'phase1_end', fallback='15:15')
+                import_config.get('collect', 'phase1_end', fallback='12:05')
+            )
+        )
+        self.collect_phase2_start_timeEdit.setTime(
+            datetime.time.fromisoformat(
+                import_config.get('collect', 'phase2_start', fallback='13:00')
+            )
+        )
+        self.collect_phase2_last_timeEdit.setTime(
+            datetime.time.fromisoformat(
+                import_config.get('collect', 'phase2_end', fallback='15:05')
             )
         )
 
@@ -455,7 +470,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'interval': self.collect_sample_spinBox.value(),
             'use_zhima_proxy': self.collect_use_zhima_checkBox.isChecked(),
             'phase1_start': self.collect_phase1_start_timeEdit.time().toString(),
-            'phase1_end': self.collect_phase1_last_timeEdit.time().toString()
+            'phase1_end': self.collect_phase1_last_timeEdit.time().toString(),
+            'phase2_start': self.collect_phase2_start_timeEdit.time().toString(),
+            'phase2_end': self.collect_phase2_last_timeEdit.time().toString(),
         }
         import_config['preload'] = {
             'day': self.preload_day_checkBox.isChecked(),
@@ -487,8 +504,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread = None
         self.hdf5_import_thread = None
         self.mysql_import_thread = None
-        self.collect_sh_thread = None
-        self.collect_sz_thread = None
+        self.collect_spot_thread = None
 
         self.import_running = False
         self.hdf5_import_progress_bar = {
@@ -705,55 +721,33 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.message.connect(self.on_message_from_thread)
         self.escape_time_thread.start()
 
-    def start_collect(self):
-        self.collect_sh_thread = CollectThread(
-            self.getCurrentConfig(), self.getHikyuuConfigFileName(), 'SH'
-        )
-        self.collect_sh_thread.start()
-        self.collect_sz_thread = CollectThread(
-            self.getCurrentConfig(), self.getHikyuuConfigFileName(), 'SZ'
-        )
-        self.collect_sz_thread.start()
-
-    def stop_collect(self):
-        self.logger.info("终止采集！")
-        if self.collect_sh_thread is not None:
-            self.collect_sh_thread.stop()
-        if self.collect_sz_thread is not None:
-            self.collect_sz_thread.stop()
-
     @pyqtSlot()
     def on_collect_start_pushButton_clicked(self):
-        if self.collect_running:
-            self.collect_start_pushButton.setEnabled(False)
-            self.collect_status_Label.setText("正在停止...")
-            QApplication.processEvents()
-            self.stop_collect()
-            self.collect_start_pushButton.setText("启动定时采集")
-            self.collect_running = False
-            self.collect_status_Label.setText("已停止")
-            self.collect_start_pushButton.setEnabled(True)
-        else:
-            config = self.getCurrentConfig()
-            #if not config.getboolean("mysql", "enable", fallback=False):
-            #    QMessageBox.critical(self, "定时采集", "仅在存储设置为 MySQL 时支持定时采集！")
-            #    return
-            self.collect_status_Label.setText("正在启动...")
-            self.collect_start_pushButton.setEnabled(False)
-            QApplication.processEvents()
-            self.start_collect()
-            self.collect_start_pushButton.setText("停止采集")
-            self.collect_running = True
-            self.collect_status_Label.setText("运行中...")
-            self.collect_start_pushButton.setEnabled(True)
+        if self.collect_spot_thread is None or self.collect_spot_thread.isFinished():
+            self.collect_spot_thread = CollectSpotThread(
+                self.getCurrentConfig(),
+                self.getHikyuuConfigFileName(),
+            )
+            self.collect_spot_thread.start()
+        QMessageBox.about(self, '', '已启动，请在控制台日志查看是否正常运行')
+
+    @pyqtSlot()
+    def on_collect_stop_pushButton_clicked(self):
+        if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
+            self.collect_spot_thread.terminate()
+            self.collect_spot_thread.wait()
+        QMessageBox.about(self, '', '已停止')
 
 
 class_logger(MyMainWindow)
 
 
 def start():
+    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
     app = QApplication(sys.argv)
-    myWin = MyMainWindow(None)
+    use_dark_style = False  # 使用暗黑主题
+    myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
     myWin.show()
     sys.exit(app.exec())
 
@@ -775,8 +769,8 @@ if __name__ == "__main__":
                 logging.StreamHandler(),
             ]
         )
-        #myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
-        myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
+        myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
+        #myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
     else:
         myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
 

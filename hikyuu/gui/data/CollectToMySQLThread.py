@@ -16,7 +16,7 @@ from hikyuu.data.common_mysql import get_stock_list, get_marketid, get_table
 from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot, get_spot_parallel
 
 
-class CollectThread(QThread):
+class CollectToMySQLThread(QThread):
     def __init__(self, config, market='SH'):
         super(self.__class__, self).__init__()
         self.working = True
@@ -179,4 +179,4 @@ class CollectThread(QThread):
         return ["{}{}".format(self.market.lower(), item[2]) for item in stk_list if item[3] == 1]
 
 
-class_logger(CollectThread)
+class_logger(CollectToMySQLThread)
