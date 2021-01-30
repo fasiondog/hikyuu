@@ -88,7 +88,7 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
             result = getConnect();
             if (timeout > 0) {
-                YH_CHECK(count++ < max_count, "Can't get connect, timeout!");
+                HKU_CHECK(count++ < max_count, "Can't get connect, timeout!");
             }
         }
         return result;

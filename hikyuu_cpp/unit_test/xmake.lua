@@ -43,6 +43,11 @@ target("unit-test")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
+    if is_plat("macosx") then
+        add_includedirs("/usr/local/opt/mysql-client/include")
+        add_linkdirs("/usr/local/opt/mysql-client/lib")
+    end
+
     -- add files
     add_files("**.cpp")
     

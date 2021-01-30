@@ -9,6 +9,7 @@
 #ifndef NULL_H_
 #define NULL_H_
 
+#include "../config.h"
 #include <cstddef>
 #include <limits>
 #include <type_traits>
@@ -69,7 +70,7 @@ public:
     }
 };
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) && !HKU_OS_OSX
 /**
  * int64_t Null值
  */
