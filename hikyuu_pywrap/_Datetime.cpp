@@ -45,10 +45,10 @@ void export_Datetime() {
 
       .def("is_null", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
 
-      .def("day__of_week", &Datetime::dayOfWeek, "\n返回是一周中的第几天，周日为0，周一为1")
+      .def("day_of_week", &Datetime::dayOfWeek, "\n返回是一周中的第几天，周日为0，周一为1")
       .def("day_of_year", &Datetime::dayOfYear, "\n返回一年中的第几天，1月1日为一年中的第1天")
       .def("start_of_day", &Datetime::startOfDay, "\n返回当天 0点0分0秒")
-      .def("end__of_day", &Datetime::endOfDay, "\n返回当日 23点59分59秒")
+      .def("end_of_day", &Datetime::endOfDay, "\n返回当日 23点59分59秒")
       .def("next_day", &Datetime::nextDay, "\n返回下一自然日")
       .def("next_week", &Datetime::nextWeek, "\n返回下周周一日期")
       .def("next_month", &Datetime::nextMonth, "\n返回下月首日日期")
