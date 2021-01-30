@@ -21,10 +21,10 @@ class CollectSpotThread(QThread):
         self._config = config
         self.hku_config_file = hku_config_file
         self._interval = config.getint('collect', 'interval', fallback=60 * 60)
-        self._phase1_start_time = config.get('collect', 'phase1_start', fallback='09:05')
-        self._phase1_end_time = config.get('collect', 'phase1_end', fallback='09:05')
-        self._phase2_start_time = config.get('collect', 'phase2_start', fallback='09:05')
-        self._phase2_end_time = config.get('collect', 'phase2_end', fallback='09:05')
+        self._phase1_start_time = config.get('collect', 'phase1_start', fallback='09:00')
+        self._phase1_end_time = config.get('collect', 'phase1_end', fallback='12:05')
+        self._phase2_start_time = config.get('collect', 'phase2_start', fallback='13:00')
+        self._phase2_end_time = config.get('collect', 'phase2_end', fallback='15:05')
         self._use_zhima_proxy = config.getboolean('collect', 'use_zhima_proxy', fallback=False)
 
     def __del__(self):

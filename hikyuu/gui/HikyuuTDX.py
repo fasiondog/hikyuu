@@ -743,10 +743,15 @@ class_logger(MyMainWindow)
 
 
 def start():
+    import requests
+    import urllib
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     app = QApplication(sys.argv)
     use_dark_style = False  # 使用暗黑主题
+    if use_dark_style:
+        import qdarkstyle
+        app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
     myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
     myWin.show()
     sys.exit(app.exec())
@@ -769,8 +774,7 @@ if __name__ == "__main__":
                 logging.StreamHandler(),
             ]
         )
-        myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
-        #myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
+        myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
     else:
         myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
 
