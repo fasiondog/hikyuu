@@ -48,7 +48,7 @@ SpotAgent::~SpotAgent() {
 void SpotAgent::start() {
     if (m_stop) {
         m_stop = false;
-        m_receiveThread = std::thread(&SpotAgent::work_thread, this);
+        m_receiveThread = std::move(std::thread([this]() { work_thread(); }));
     }
 }
 
@@ -368,7 +368,7 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
     stk.realtimeUpdate(krecord, ktype);
 }
 
-void HKU_API start_spot_agent(bool print) {
+void HKU_API startSpotAgent(bool print) {
     auto& agent = SpotAgent::instance();
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
 
@@ -442,7 +442,7 @@ void HKU_API start_spot_agent(bool print) {
     agent.start();
 }
 
-void HKU_API stop_spot_agent() {
+void HKU_API stopSpotAgent() {
     auto& agent = SpotAgent::instance();
     agent.stop();
 }

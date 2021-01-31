@@ -21,6 +21,7 @@
 #include "StockManager.h"
 #include "base/GlobalTaskGroup.h"
 #include "base/schedule/inner_tasks.h"
+#include "agent/SpotAgent.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 #include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
@@ -239,7 +240,7 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
         }
     }
 
-    InitInnerTask();
+    initInnerTasek();
 }
 
 void StockManager::reload() {

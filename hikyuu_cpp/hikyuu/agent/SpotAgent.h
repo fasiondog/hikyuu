@@ -151,12 +151,12 @@ private:
  * @param print 打印接收数据进展
  * @ingroup Agent
  */
-void HKU_API start_spot_agent(bool print = true);
+void HKU_API startSpotAgent(bool print = true);
 
 /**
  * 终止 Spot 数据接收代理
  * @ingroup Agent
  */
-void HKU_API stop_spot_agent();
+void HKU_API stopSpotAgent();
 
 }  // namespace hku

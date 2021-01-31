@@ -12,13 +12,13 @@
 
 namespace hku {
 
-void InitInnerTask() {
+void initInnerTasek() {
     auto* tm = getScheduler();
-    tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(), ReloadHikyuuTask);
+    tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(), reloadHikyuuTask);
     tm->start();
 }
 
-void ReloadHikyuuTask() {
+void reloadHikyuuTask() {
     StockManager::instance().reload();
 }
 

@@ -12,6 +12,6 @@ using namespace boost::python;
 using namespace hku;
 
 void export_SpotAgent() {
-    def("start_spot_agent", start_spot_agent, (arg("print") = false));
-    def("stop_spot_agent", stop_spot_agent);
+    def("start_spot_agent", startSpotAgent, (arg("print") = false));
+    def("stop_spot_agent", stopSpotAgent);
 }
