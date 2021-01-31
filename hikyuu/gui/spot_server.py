@@ -203,8 +203,6 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
     hikyuu_init(config_file, ignore_preload=True)
 
-    print("采集程序运行中，可使用 Ctrl-C 终止！")
-
     sm = StockManager.instance()
     stk_list = [
         stk.market_code.lower() for stk in sm if stk.valid and stk.type in
@@ -266,6 +264,7 @@ def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
 if __name__ == '__main__':
     try:
+        print("采集程序运行中，可使用 Ctrl-C 终止！")
         run()
     except KeyboardInterrupt:
         exit(1)

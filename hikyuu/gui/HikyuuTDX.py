@@ -200,7 +200,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             return
 
         #普通日志输出控制台
-        con = logging.StreamHandler(EmittingStream(textWritten=self.normalOutputWritten))
+        if self._stream is None:
+            self._stream = EmittingStream(textWritten=self.normalOutputWritten)
+        con = logging.StreamHandler(self._stream)
         FORMAT = logging.Formatter(
             '%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
         )
@@ -218,10 +220,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         hku_logger.addHandler(con)
 
     def initUI(self):
+        self._stream = None
         if self._capture_output:
-            stream = EmittingStream(textWritten=self.normalOutputWritten)
-            sys.stdout = stream
-            sys.stderr = stream
+            self._stream = EmittingStream(textWritten=self.normalOutputWritten)
+            if self._stream is not None:
+                sys.stdout = self._stream
+                sys.stderr = self._stream
         self.log_textEdit.document().setMaximumBlockCount(1000)
 
         current_dir = os.path.dirname(__file__)
@@ -736,6 +740,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
             self.collect_spot_thread.terminate()
             self.collect_spot_thread.wait()
+        self.logger.info("停止采集")
         QMessageBox.about(self, '', '已停止')
 
 
