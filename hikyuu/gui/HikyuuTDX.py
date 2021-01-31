@@ -225,7 +225,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self._stream = EmittingStream(textWritten=self.normalOutputWritten)
             if self._stream is not None:
                 sys.stdout = self._stream
-                sys.stderr = self._stream
+                # python构建时丢失stderr通道，导致安装后的hikyuutdx执行时，
+                # logging总是报 'NoneType' object has no attribute 'write'
+                #sys.stderr = self._stream
         self.log_textEdit.document().setMaximumBlockCount(1000)
 
         current_dir = os.path.dirname(__file__)
