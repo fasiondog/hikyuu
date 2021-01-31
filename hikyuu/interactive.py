@@ -56,8 +56,7 @@ import configparser
 from hikyuu import *
 
 #重定向C++ stdout/stderr输出至python
-#iodog = ostream_redirect()
-iodog = OstreamRedirect()
+iodog = ostream_redirect()
 iodog.open()
 
 # ==============================================================================

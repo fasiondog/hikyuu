@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <thread>
 #include "config.h"
 #include "GlobalInitializer.h"
 #include "Log.h"
@@ -22,6 +23,25 @@
 #endif /* #if USE_SPDLOG_LOGGER */
 
 namespace hku {
+
+static std::thread::id g_main_thread_id = std::this_thread::get_id();
+static int g_ioredirect_to_python_count = 0;
+
+bool isLogInMainThread() {
+    return std::this_thread::get_id() == g_main_thread_id;
+}
+
+int getIORedirectToPythonCount() {
+    return g_ioredirect_to_python_count;
+}
+
+void increaseIORedicrectToPythonCount() {
+    g_ioredirect_to_python_count++;
+}
+
+void decreaseIORedicrectToPythonCount() {
+    g_ioredirect_to_python_count--;
+}
 
 static LOG_LEVEL g_log_level = TRACE;
 

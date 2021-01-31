@@ -44,6 +44,12 @@ namespace hku {
  * @{
  */
 
+bool HKU_API isLogInMainThread();
+
+void HKU_API increaseIORedicrectToPythonCount();
+void HKU_API decreaseIORedicrectToPythonCount();
+int HKU_API getIORedirectToPythonCount();
+
 /**********************************************
  * Use SPDLOG for logging
  *********************************************/
@@ -73,12 +79,54 @@ void HKU_API set_log_level(LOG_LEVEL level);
 
 std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 
-#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
+/*#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_DEBUG(...) SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_INFO(...) SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_WARN(...) SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__)
-#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)
+#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)*/
+
+#define HKU_TRACE(...)                                                  \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__);   \
+        }                                                               \
+    } while (0)
+
+#define HKU_DEBUG(...)                                                  \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__);   \
+        }                                                               \
+    } while (0)
+
+#define HKU_INFO(...)                                                   \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__);    \
+        }                                                               \
+    } while (0)
+
+#define HKU_WARN(...)                                                   \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__);    \
+        }                                                               \
+    } while (0)
+
+#define HKU_ERROR(...)                                                  \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__);   \
+        }                                                               \
+    } while (0)
+
+#define HKU_FATAL(...)                                                   \
+    do {                                                                 \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) {  \
+            SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__); \
+        }                                                                \
+    } while (0)
 
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
 void initLogger();
