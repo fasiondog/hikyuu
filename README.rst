@@ -1,5 +1,5 @@
-.. image:: https://hikyuu.org/images/00000_title.png
-    :target: https://hikyuu.org
+.. image:: http://fasiondog.gitee.io/hikyuu/images/00000_title.png
+    :target: http://fasiondog.gitee.io/hikyuu
     :align: left
     :alt: Hikyuu
 
@@ -24,19 +24,19 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 详细文档： `<https://hikyuu.org/>`_
 
-如果s上述网站无法访问，请戳这里： `<https://hikyuu.readthedocs.io/zh_CN/latest/>`_
+如果上述网站无法访问，请戳这里： `<http://fasiondog.gitee.io/hikyuu/>`_
 
 祝贺 HIKYUU 入选 GITEE 最有价值开源项目 GVP
 -----------------------------------------------
 
-.. image:: https://hikyuu.org/images/gitee_GVP.jpg
+.. image:: http://fasiondog.gitee.io/hikyuu/images/gitee_GVP.jpg
     :target: https://gitee.com/gvp
     :alt: Gitee
     
 
 **给作者加点油，每天扫扫红包，或者请作者喝杯咖啡**
 
-.. image:: https://hikyuu.org/images/juanzeng.jpg
+.. image:: http://fasiondog.gitee.io/hikyuu/images/juanzeng.jpg
 
 
 示例：
@@ -56,7 +56,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
     sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
     sys.run(sm['sz000001'], Query(-150))
 
-.. figure:: https://hikyuu.org/images/10000-overview.png
+.. figure:: http://fasiondog.gitee.io/hikyuu/images/10000-overview.png
         :width: 600px
 
 完整示例参见：`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
@@ -67,7 +67,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 - **组合灵活，分类构建策略资产库** Hikyuu对系统化交易方法进行了良好的抽象，包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试。在进行策略探索时，可以更加专注于某一方面的策略性能与影响。其主要功能模块如下：
 
-  .. figure:: https://hikyuu.org/images/10002-function-arc.png
+  .. figure:: http://fasiondog.gitee.io/hikyuu/images/10002-function-arc.png
         :width: 600px
 
 - **性能保障，打造自己的专属应用** 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
