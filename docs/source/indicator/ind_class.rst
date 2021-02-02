@@ -17,8 +17,6 @@ Indicator
 
     .. py:method:: get_param(self, name)
 
-    .. py:method:: get_param(self, name)
-
         获取指定的参数
     
         :param str name: 参数名称
@@ -116,7 +114,7 @@ Indicator
 
         :param KData kdata: 关联的上下文K线
 
-    .. py:method:: set_context(self, stock, query)
+        set_context(self, stock, query)
 
         设置上下文
 

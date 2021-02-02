@@ -236,7 +236,7 @@
         :param Query.KType ktype: K线类型
         :rtype: FundsRecord
         
-    .. py:method:: get_funds(self, datetime, [ktype = Query.DAY])
+        get_funds(self, datetime, [ktype = Query.DAY])
     
         获取指定时刻的资产市值详情
         

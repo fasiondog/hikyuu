@@ -131,7 +131,7 @@ void export_Indicator() {
 
     :param KData kdata: 关联的上下文K线)
       
-setContext(self, stock, query)
+set_context(self, stock, query)
 
     设置上下文
 

@@ -8,15 +8,15 @@
 2. 支持 MySQL 作为存储引擎（通过导入工具配置）
 3. 整改 python api 命名，类按大写驼峰，方法和函数统一为小写加下划线
 4. 增加 TimeDelta，方便日期时间计算，如：Datetime(202011090000) + TimeDelta(1)。python中可以使用 datetime.timedelta
-4. Portfolio（资产组合算法）、Allocatefunds（资金分配算法）、Selector（交易对象选择算法）可用
-5. 交易数量从整型改为float，方便支持数字币、外汇等 
-6. 增加策略算法仓库，欢迎大家提交PR贡献公共策略：https://gitee.com/fasiondog/hikyuu_hub
+5. Portfolio（资产组合算法）、Allocatefunds（资金分配算法）、Selector（交易对象选择算法）可用
+6. 交易数量从整型改为float，方便支持数字币、外汇等 
+7. 增加策略算法仓库，欢迎大家提交PR贡献公共策略：https://gitee.com/fasiondog/hikyuu_hub
 
     增加本地仓库：add_local_hub('dev', '/home/fasiondog/workspace/stockhouse')
     更新参考：update_hub('default')
     获取指定仓库的策略部件：st = get_part('default.st.fixed_percent')
 
-7. 其他BUG修复与优化
+8. 其他BUG修复与优化
 
 
 1.1.3 - 2019年6月11日

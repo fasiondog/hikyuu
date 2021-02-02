@@ -6,11 +6,11 @@
 
 构建K线查询条件
 -----------------
-
+    
 .. py:class:: Query
 
-    对 Query 的简单包装，并简化定义相关常量，可视同为 :py:class:`Query`
-    
+    K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
+
     简化 :py:data:`Query.KType` 枚举值
     
     - Query.DAY - 日线类型
@@ -32,11 +32,6 @@
     - Query.BACKWARD        - 后向复权
     - Query.EQUAL_FORWARD   - 等比前向复权
     - Query.EQUAL_BACKWARD  - 等比后向复权
-
-    
-.. py:class:: Query
-
-    K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
 
     .. py:attribute:: start 
     
@@ -325,7 +320,7 @@ StockManager/Block/Stock
         :param Query query: 查询条件
         :rtype: DatetimeList
 
-    .. py:method:: get_datetime_list(self, start, end, ktype)
+        get_datetime_list(self, start, end, ktype)
     
         获取日期列表
         
@@ -432,7 +427,7 @@ StockManager/Block/Stock
         :return: 是否成功加入
         :rtype: bool
         
-    .. py:method:: add(self, market_code)
+        add(self, market_code)
     
         根据"市场简称证券代码"加入指定的证券
         
@@ -448,7 +443,7 @@ StockManager/Block/Stock
         :return: 是否成功
         :rtype: bool
         
-    .. py:method:: remove(self, market_code)
+        remove(self, market_code)
     
         移除指定证券
         
