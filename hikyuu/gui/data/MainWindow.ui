@@ -559,22 +559,22 @@
         <property name="geometry">
          <rect>
           <x>30</x>
-          <y>20</y>
-          <width>75</width>
+          <y>80</y>
+          <width>91</width>
           <height>23</height>
          </rect>
         </property>
         <property name="text">
-         <string>执行导入</string>
+         <string>手工执行导入</string>
         </property>
        </widget>
        <widget class="QGroupBox" name="groupBox_5">
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>70</y>
+          <y>140</y>
           <width>551</width>
-          <height>451</height>
+          <height>371</height>
          </rect>
         </property>
         <property name="title">
@@ -682,7 +682,7 @@
            <x>10</x>
            <y>180</y>
            <width>531</width>
-           <height>261</height>
+           <height>181</height>
           </rect>
          </property>
          <property name="frameShape">
@@ -715,14 +715,49 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>140</x>
-          <y>20</y>
-          <width>361</width>
+          <y>80</y>
+          <width>421</width>
           <height>21</height>
          </rect>
         </property>
         <property name="text">
          <string>import_status_label</string>
         </property>
+       </widget>
+       <widget class="QPushButton" name="sched_import_pushButton">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>30</y>
+          <width>91</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>启动定时导入</string>
+        </property>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>30</y>
+          <width>171</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_14">
+         <item>
+          <widget class="QLabel" name="label_40">
+           <property name="text">
+            <string>导入执行时间：</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTimeEdit" name="sched_import_timeEdit"/>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_6">
@@ -1191,7 +1226,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;注：&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;行情采集服务仅对预加载数据有效&lt;/span&gt;，在行情采集服务运行期间，hikyuu运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>40</x>

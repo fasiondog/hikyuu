@@ -22,6 +22,7 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 #from hikyuu.gui.data.CollectToMySQLThread import CollectToMySQLThread
 #from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
+from hikyuu.gui.data.SchedImportThread import SchedImportThread
 
 from hikyuu.data import hku_config_template
 from hikyuu.util.mylog import add_class_logger_handler, class_logger, hku_logger
@@ -54,6 +55,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
             event.ignore()
             return
+
+        if self.sched_import_thread is not None and self.sched_import_thread.isRunning():
+            self.sched_import_thread.terminate()
 
         if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
             self.collect_spot_thread.terminate()
@@ -220,6 +224,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         hku_logger.addHandler(con)
 
     def initUI(self):
+        self._is_sched_import_running = False
         self._stream = None
         if self._capture_output:
             self._stream = EmittingStream(textWritten=self.normalOutputWritten)
@@ -335,6 +340,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.mysql_pwd_lineEdit.setText(mysql_pwd)
         self.mysql_pwd_lineEdit.setEnabled(mysql_enable)
         self.mysql_test_pushButton.setEnabled(mysql_enable)
+
+        self.sched_import_timeEdit.setTime(
+            datetime.time.fromisoformat(import_config.get('schec', 'time', fallback='18:00'))
+        )
 
         # 初始化定时采集设置
         interval_time = import_config.getint('collect', 'interval', fallback=60 * 60)
@@ -474,6 +483,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'usr': self.mysql_usr_lineEdit.text(),
             'pwd': self.mysql_pwd_lineEdit.text()
         }
+        import_config['sched'] = {
+            'time': self.sched_import_timeEdit.time().toString(),
+        }
         import_config['collect'] = {
             'interval': self.collect_sample_spinBox.value(),
             'source': self.collect_source_comboBox.currentText(),
@@ -514,6 +526,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.hdf5_import_thread = None
         self.mysql_import_thread = None
         self.collect_spot_thread = None
+        self.sched_import_thread = None
 
         self.import_running = False
         self.hdf5_import_progress_bar = {
@@ -642,7 +655,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if msg_name == 'ESCAPE_TIME':
             self.escape_time = msg_task_name
             self.import_status_label.setText(
-                "耗时：{:>.2f} 秒 （{:>.2f}分钟）".format(self.escape_time, self.escape_time / 60)
+                "耗时：{:>.2f} 秒 （{:>.2f}分钟） {}".format(
+                    self.escape_time, self.escape_time / 60, datetime.datetime.now()
+                )
             )
 
         elif msg_name == 'HDF5_IMPORT':
@@ -698,6 +713,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
+        if not self._is_sched_import_running:
+            self.sched_import_pushButton.setEnabled(False)
         config = self.getCurrentConfig()
         dest_dir = config.get('hdf5', 'dir')
         if not os.path.exists(dest_dir) or not os.path.isdir(dest_dir):
@@ -729,6 +746,29 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread = EscapetimeThread()
         self.escape_time_thread.message.connect(self.on_message_from_thread)
         self.escape_time_thread.start()
+
+        if self._is_sched_import_running:
+            delta = self.next_time_delta()
+
+    @pyqtSlot()
+    def on_sched_import_pushButton_clicked(self):
+        self.sched_import_pushButton.setEnabled(False)
+        if self._is_sched_import_running:
+            self._is_sched_import_running = False
+            self.sched_import_pushButton.setText("启动定时导入")
+            self.sched_import_thread.terminate()
+            self.sched_import_thread.wait()
+            self.sched_import_thread = None
+            self.sched_import_pushButton.setEnabled(True)
+            self.start_import_pushButton.setEnabled(True)
+            return
+
+        self.start_import_pushButton.setEnabled(False)
+        self._is_sched_import_running = True
+        self.sched_import_thread = SchedImportThread(self.getCurrentConfig(), self)
+        self.sched_import_thread.start()
+        self.sched_import_pushButton.setText("停止定时导入")
+        self.sched_import_pushButton.setEnabled(True)
 
     @pyqtSlot()
     def on_collect_start_pushButton_clicked(self):
