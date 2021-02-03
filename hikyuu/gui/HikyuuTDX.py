@@ -226,6 +226,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def initUI(self):
         self._is_sched_import_running = False
+        self._is_collect_running = False
         self._stream = None
         if self._capture_output:
             self._stream = EmittingStream(textWritten=self.normalOutputWritten)
@@ -253,6 +254,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.time_start_dateEdit.setDate(today - datetime.timedelta(7))
         self.trans_start_dateEdit.setMinimumDate(today - datetime.timedelta(90))
         self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
+        self.collect_status_label.setText("已停止")
 
         #读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
@@ -772,21 +774,26 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_collect_start_pushButton_clicked(self):
-        if self.collect_spot_thread is None or self.collect_spot_thread.isFinished():
-            self.collect_spot_thread = CollectSpotThread(
-                self.getCurrentConfig(),
-                self.getHikyuuConfigFileName(),
-            )
-            self.collect_spot_thread.start()
-        QMessageBox.about(self, '', '已启动，请在控制台日志查看是否正常运行')
-
-    @pyqtSlot()
-    def on_collect_stop_pushButton_clicked(self):
-        if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
-            self.collect_spot_thread.terminate()
-            self.collect_spot_thread.wait()
-        self.logger.info("停止采集")
-        QMessageBox.about(self, '', '已停止')
+        if self._is_collect_running:
+            if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
+                self.collect_spot_thread.terminate()
+                self.collect_spot_thread.wait()
+            self._is_collect_running = False
+            self.logger.info("停止采集")
+            self.collect_status_label.setText("已停止")
+            self.collect_start_pushButton.setText("启动采集")
+            QMessageBox.about(self, '', '已停止')
+        else:
+            if self.collect_spot_thread is None or self.collect_spot_thread.isFinished():
+                self.collect_spot_thread = CollectSpotThread(
+                    self.getCurrentConfig(),
+                    self.getHikyuuConfigFileName(),
+                )
+                self.collect_spot_thread.start()
+            self._is_collect_running = True
+            self.collect_status_label.setText("运行中")
+            self.collect_start_pushButton.setText("停止采集")
+            QMessageBox.about(self, '', '已启动，请在控制台日志查看是否正常运行')
 
 
 class_logger(MyMainWindow)
