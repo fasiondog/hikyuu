@@ -217,7 +217,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 MyMainWindow,
                 CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread, 
                 UsePytdxImportToH5Thread,
-                UseTdxImportToH5Thread
+                UseTdxImportToH5Thread,
+                SchedImportThread
             ],
             logging.INFO
         )
@@ -747,9 +748,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.escape_time_thread.message.connect(self.on_message_from_thread)
         self.escape_time_thread.start()
 
-        if self._is_sched_import_running:
-            delta = self.next_time_delta()
-
     @pyqtSlot()
     def on_sched_import_pushButton_clicked(self):
         self.sched_import_pushButton.setEnabled(False)
@@ -758,6 +756,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.sched_import_pushButton.setText("启动定时导入")
             self.sched_import_thread.terminate()
             self.sched_import_thread.wait()
+            self.logger.info("已停止定时采集")
             self.sched_import_thread = None
             self.sched_import_pushButton.setEnabled(True)
             self.start_import_pushButton.setEnabled(True)
@@ -765,7 +764,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         self.start_import_pushButton.setEnabled(False)
         self._is_sched_import_running = True
-        self.sched_import_thread = SchedImportThread(self.getCurrentConfig(), self)
+        self.sched_import_thread = SchedImportThread(self.getCurrentConfig())
+        self.sched_import_thread.message.connect(self.on_start_import_pushButton_clicked)
         self.sched_import_thread.start()
         self.sched_import_pushButton.setText("停止定时导入")
         self.sched_import_pushButton.setEnabled(True)

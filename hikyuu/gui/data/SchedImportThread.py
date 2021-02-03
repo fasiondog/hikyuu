@@ -6,19 +6,23 @@ import logging
 import time
 import datetime
 from math import ceil
-from PyQt5.QtCore import QThread, QWaitCondition, QMutex
+from PyQt5.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
 
 from hikyuu.util import *
 from hikyuu import Datetime, TimeDelta
 
 
 class SchedImportThread(QThread):
-    def __init__(self, config, parent_win):
+    message = pyqtSignal()
+
+    def __init__(self, config):
         super(self.__class__, self).__init__()
         self.working = True
         self._config = config
-        #self._interval = TimeDelta(seconds=config.get('sched', 'time', fallback='18:00'))
-        self._win = parent_win
+        hh_mm = config.get('sched', 'time', fallback='18:00')
+        x = hh_mm.split(':')
+        self.hour = int(x[0])
+        self.minute = int(x[1])
         self.cond = QWaitCondition()
         self.mutex = QMutex()
 
@@ -33,21 +37,23 @@ class SchedImportThread(QThread):
 
     def next_time_delta(self):
         now = Datetime.now()
-        current_date = Datetime(now.year, now.month, now.day)
-        next_date = Datetime(now.year, now.month, now.day, 18)
-        if current_date.dayOfWeek() == 5:
-            next_time = next_date + TimeDelta(3)
-        else:
-            next_time = next_date + TimeDelta(1)
-        return (next_date, next_time - now)
+        next_time = Datetime(now.year, now.month, now.day, self.hour, self.minute)
+        if next_time < now:
+            current_date = Datetime(now.year, now.month, now.day)
+            if current_date.day_of_week() == 5:
+                next_time = next_time + TimeDelta(3)
+            else:
+                next_time = next_time + TimeDelta(1)
+        return (next_time, next_time - now)
 
     @hku_catch()
     def run(self):
+        self.mutex.tryLock()
         next_datetime, delta = self.next_time_delta()
         self.logger.info("下次导入时间：{}".format(next_datetime))
         delta = int(delta.total_milliseconds())
         while self.working and not self.cond.wait(self.mutex, int(delta)):
-            self._win.on_collect_start_pushButton_clicked()
+            self.message.emit()
             next_datetime, delta = self.next_time_delta()
             self.logger.info("下次导入时间：{}".format(next_datetime))
             delta = int(delta.total_milliseconds())
