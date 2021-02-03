@@ -10,7 +10,7 @@
 using namespace boost::python;
 
 void export_io_redirect() {
-    class_<OstreamRedirect>("ostream_redirect",
+    class_<OstreamRedirect>("OstreamRedirect",
                             init<bool, bool>((arg("stdout") = true, arg("stderr") = true)))
       .def("__enter__", &OstreamRedirect::enter)
       .def("__exit__", &OstreamRedirect::exit)
