@@ -128,6 +128,9 @@ sm = StockManager.instance()
 sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 set_log_level(LOG_LEVEL.INFO)
 
+# 启动行情接收代理
+start_spot_agent()
+
 # ==============================================================================
 #
 # 引入blocka、blocksh、blocksz、blockg全局变量，便于交互式环境下使用
