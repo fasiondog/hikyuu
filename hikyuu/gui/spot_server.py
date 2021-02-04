@@ -225,14 +225,10 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     phase1_time = [today + x for x in phase1_delta]
     phase2_time = [today + x for x in phase2_delta]
     start_time = Datetime.now()
-    if not (
-        phase1_time[0] <= start_time <= phase1_time[1]
-        or phase2_time[0] <= start_time <= phase2_time[1]
-    ):
-        delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
-        next_time = start_time + delta
-        hku_info("启动采集时间：{}".format(next_time))
-        time.sleep(delta.total_seconds())
+    delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
+    next_time = start_time + delta
+    hku_info("启动采集时间：{}".format(next_time))
+    time.sleep(delta.total_seconds())
     while True:
         try:
             start_time = Datetime.now()

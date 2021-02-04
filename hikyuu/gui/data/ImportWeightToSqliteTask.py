@@ -114,10 +114,12 @@ class ImportWeightToSqliteTask:
             api = TdxHq_API()
             api.connect(hosts[0][2], hosts[0][3])
 
+            self.logger.info('正在导入权息数据')
             self.queue.put([self.msg_name, '正在导入权息数据...', 0, 0, 0])
             total_count = pytdx_import_weight(api, connect, "SH")
             total_count += pytdx_import_weight(api, connect, "SZ")
             self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
+            self.logger.info('导入权息数据完毕')
 
             #self.queue.put([self.msg_name, '下载通达信财务信息(上证)...', 0, 0, 0])
             #x = pytdx_import_finance(connect, api, "SH")

@@ -716,8 +716,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
-        if not self._is_sched_import_running:
-            self.sched_import_pushButton.setEnabled(False)
         config = self.getCurrentConfig()
         dest_dir = config.get('hdf5', 'dir')
         if not os.path.exists(dest_dir) or not os.path.isdir(dest_dir):
@@ -758,7 +756,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.sched_import_pushButton.setText("启动定时导入")
             self.sched_import_thread.terminate()
             self.sched_import_thread.wait()
-            self.logger.info("已停止定时采集")
+            self.logger.info("已停止定时导入")
             self.sched_import_thread = None
             self.sched_import_pushButton.setEnabled(True)
             self.start_import_pushButton.setEnabled(True)

@@ -675,9 +675,9 @@ class Ui_MainWindow(object):
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">注：</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600; color:#ff0000;\">1、行情采集服务仅对预加载数据有效</span>，在行情采集服务运行期间，hikyuu运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600; color:#ff0000;\">1、行情采集服务仅对预加载数据有效</span>，在行情采集服务运行期间，hikyuu.interactive运行时将自动连接采集服务获取行情数据，并更新预加载的内容数据。</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">2、如使用芝麻代理（<a href=\"http://h.zhimaruanjian.com/\"><span style=\" text-decoration: underline; color:#0000ff;\">http://h.zhimaruanjian.com/</span></a>），请自行申请，并确保ip为其白名单</p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">2、如使用芝麻代理（<a href=\"http://h.zhimaruanjian.com/\"><span style=\" text-decoration: underline; color:#0000ff;\">http://h.zhimaruanjian.com/</span></a>），请自行申请（需付费），并确保ip为其白名单。</p></body></html>"))
         self.label_39.setText(_translate("MainWindow", "行情数据源："))
         self.collect_source_comboBox.setItemText(0, _translate("MainWindow", "sina"))
         self.collect_source_comboBox.setItemText(1, _translate("MainWindow", "qq"))

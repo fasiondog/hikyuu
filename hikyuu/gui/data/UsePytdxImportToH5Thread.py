@@ -42,6 +42,7 @@ from hikyuu.data.common_mysql import create_database as mysql_create_database
 from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
 from hikyuu.util.mylog import class_logger
 
+
 class UsePytdxImportToH5Thread(QThread):
     message = pyqtSignal(list)
 
@@ -94,9 +95,11 @@ class UsePytdxImportToH5Thread(QThread):
         if self.config.getboolean('ktype', 'time', fallback=False):
             task_count += 2
 
+        self.logger.info('搜索通达信服务器')
         self.send_message(['INFO', '搜索通达信服务器'])
         self.hosts = search_best_tdx()
         if not self.hosts:
+            self.logger.warn('无法连接通达信行情服务器！请检查网络设置！')
             self.send_message(['INFO', '无法连接通达信行情服务器！请检查网络设置！'])
             return
 
@@ -227,8 +230,10 @@ class UsePytdxImportToH5Thread(QThread):
             self.init_task()
             self._run()
         except Exception as e:
+            self.logger.error(str(e))
             self.send_message(['THREAD', 'FAILURE', str(e)])
         else:
+            self.logger.info('导入完毕')
             self.send_message(['THREAD', 'FINISHED'])
 
     def _run(self):
@@ -248,6 +253,7 @@ class UsePytdxImportToH5Thread(QThread):
         time_progress = {'SH': 0, 'SZ': 0}
 
         #正在导入代码表
+        self.logger.info('导入股票代码表')
         self.send_message(['INFO', '导入股票代码表'])
 
         if self.config.getboolean('hdf5', 'enable', fallback=True):
@@ -317,5 +323,6 @@ class UsePytdxImportToH5Thread(QThread):
                 self.send_message([taskname, ktype, current_progress])
             else:
                 self.logger.error("Unknow task: {}".format(taskname))
+
 
 class_logger(UsePytdxImportToH5Thread)
