@@ -4,11 +4,13 @@
 1.1.6 - 2020年2月5日
 -------------------------
 
-1. 优化数据加载速度，hikyuu.interactive 秒级启动
+1. 优化 hikyuu.interactive 启动加载速度
 2. 完善 HikyuuTDX 预加载设置参数，可根据机器内存大小自行设置需加载至内存的K线数据，加快 hikyuu 运行速度
-3、HikyuuTDX 支持定时行情采集，定时采集服务运行时，hikyuu.interactive 自动连接采集服务获取最新的 K 线数据
-4、HikyuuTDX 支持定时导入，避免每日手工导入数据的繁琐
-5、fixed 使用MySQL时无法按日期查询获取K线数据
+3. HikyuuTDX 支持定时行情采集，定时采集服务运行时，hikyuu.interactive 自动连接采集服务获取最新的 K 线数据
+4. HikyuuTDX 支持定时导入，避免每日手工导入数据的繁琐
+5. hikyuu.interactive 每日0:00定时重新加载内存数据，可24小时运行无需终止
+6. fixed 使用MySQL时无法按日期查询获取K线数据
+
 
 
 1.1.5 - 2020年11月9日
