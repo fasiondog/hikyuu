@@ -41,7 +41,7 @@ void StockManager::quit() {
     }
 }
 
-StockManager::StockManager() {
+StockManager::StockManager() : m_initializing(false) {
     m_stockDict_mutex = new std::mutex;
     m_marketInfoDict_mutex = new std::mutex;
     m_stockTypeInfo_mutex = new std::mutex;
@@ -100,6 +100,8 @@ Parameter default_other_param() {
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam) {
+    HKU_WARN_IF_RETURN(m_initializing, void(), "An attempt was made to initialize repeatedly!");
+    m_initializing = true;
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;
@@ -137,6 +139,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
+    m_initializing = false;
 }
 
 void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {

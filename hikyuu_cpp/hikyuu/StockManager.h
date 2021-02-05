@@ -194,6 +194,7 @@ private:
 
 private:
     static StockManager* m_sm;
+    bool m_initializing;
     string m_tmpdir;
     string m_datadir;
     BaseInfoDriverPtr m_baseInfoDriver;
