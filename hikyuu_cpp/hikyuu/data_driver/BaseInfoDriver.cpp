@@ -59,60 +59,6 @@ bool BaseInfoDriver::init(const Parameter& params) {
     return _init();
 }
 
-bool BaseInfoDriver::loadBaseInfo() {
-    HKU_IF_RETURN(!checkType(), false);
-    auto& sm = StockManager::instance();
-
-    HKU_INFO("Loading market information...");
-    auto market_list = getAllMarketInfo();
-    for (auto& market : market_list) {
-        sm.loadMarketInfo(market);
-    }
-
-    HKU_INFO("Loading stock type information...");
-    auto stktype_list = getAllStockTypeInfo();
-    for (auto& stktype : stktype_list) {
-        sm.loadStockTypeInfo(stktype);
-    }
-
-    HKU_INFO("Loading stock information...");
-    auto stockinfo_list = getAllStockInfo();
-    for (auto& info : stockinfo_list) {
-        Datetime startDate, endDate;
-        try {
-            startDate = Datetime(info.startDate * 10000LL);
-        } catch (...) {
-            startDate = Null<Datetime>();
-        }
-        try {
-            endDate = Datetime(info.endDate * 10000LL);
-        } catch (...) {
-            endDate = Null<Datetime>();
-        }
-        Stock stock(info.market, info.code, info.name, info.type, info.valid, startDate, endDate,
-                    info.tick, info.tickValue, info.precision, info.minTradeNumber,
-                    info.maxTradeNumber);
-        sm.loadStock(stock);
-    }
-
-    HKU_INFO("Loading stock weight...");
-    auto* tg = getGlobalTaskGroup();
-    std::vector<std::future<void>> task_list;
-    for (auto stock : sm) {
-        task_list.push_back(tg->submit([=]() mutable {
-            StockWeightList weightList = this->getStockWeightList(
-              stock.market(), stock.code(), Datetime::min(), Null<Datetime>());
-            stock.setWeightList(weightList);
-        }));
-    }
-    // 权息信息如果不等待加载完毕，在数据加载期间进行计算可能导致复权错误，所以这里需要等待
-    for (auto& task : task_list) {
-        task.get();
-    }
-
-    return true;
-}
-
 Parameter BaseInfoDriver::getFinanceInfo(const string& market, const string& code) {
     HKU_INFO("The getFinanceInfo method has not been implemented! (BaseInfoDriver: {})", m_name);
     return Parameter();

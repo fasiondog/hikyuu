@@ -132,25 +132,17 @@ public:
     DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
 
     /**
-     * 初始化时，添加Stock，仅供BaseInfoDriver子类使用
+     * 判断指定日期是否为节假日
+     * @param d 指定日期
+     */
+    bool isHoliday(const Datetime& d) const;
+
+    /**
+     * 添加Stock，仅供临时增加的特殊Stock使用
      * @param stock
      * @return true 成功 | false 失败
      */
-    bool loadStock(const Stock& stock);
-
-    /**
-     * 初始化时，添加市场信息
-     * @param marketInfo
-     * @return
-     */
-    bool loadMarketInfo(const MarketInfo& marketInfo);
-
-    /**
-     * 初始化时，添加证券类型信息
-     * @param stkTypeInfo
-     * @return
-     */
-    bool loadStockTypeInfo(const StockTypeInfo& stkTypeInfo);
+    bool addStock(const Stock& stock);
 
     /**
      * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试
@@ -189,6 +181,21 @@ private:
     /* 设置K线驱动 */
     void setKDataDriver(const KDataDriverConnectPoolPtr&);
 
+    /* 加载节假日信息 */
+    void loadAllHolidays();
+
+    /* 初始化时，添加市场信息 */
+    void loadAllMarketInfos();
+
+    /* 初始化时，添加证券类型信息 */
+    void loadAllStockTypeInfo();
+
+    /* 加载所有证券 */
+    void loadAllStocks();
+
+    /* 加载所有权息数据 */
+    void loadAllStockWeights();
+
 private:
     StockManager();
 
@@ -211,6 +218,9 @@ private:
     mutable StockTypeInfoMap m_stockTypeInfo;
     std::mutex* m_stockTypeInfo_mutex;
 
+    std::unordered_set<Datetime> m_holidays;  // 节假日
+    std::mutex* m_holidays_mutex;
+
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;
     Parameter m_kdataDriverParam;
@@ -224,6 +234,10 @@ inline size_t StockManager::size() const {
 
 inline Stock StockManager::operator[](const string& query) const {
     return getStock(query);
+}
+
+inline bool StockManager::isHoliday(const Datetime& d) const {
+    return m_holidays.count(d);
 }
 
 inline const Parameter& StockManager::getBaseInfoDriverParameter() const {

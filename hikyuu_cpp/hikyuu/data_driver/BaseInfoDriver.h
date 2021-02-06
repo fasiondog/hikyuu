@@ -9,6 +9,7 @@
 #ifndef BASEINFODRIVER_H_
 #define BASEINFODRIVER_H_
 
+#include <unordered_set>
 #include "../utilities/Parameter.h"
 #include "../MarketInfo.h"
 #include "../StockTypeInfo.h"
@@ -83,12 +84,6 @@ public:
     bool init(const Parameter& params);
 
     /**
-     * 加载基础信息
-     * @return
-     */
-    bool loadBaseInfo();
-
-    /**
      * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
      * @return
      */
@@ -139,6 +134,11 @@ public:
      * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
      */
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) = 0;
+
+    /**
+     * 获取所有节假日日期
+     */
+    virtual std::unordered_set<Datetime> getAllHolidays() = 0;
 
 private:
     bool checkType();

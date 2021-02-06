@@ -14,6 +14,7 @@
 #include "../table/StockTypeInfoTable.h"
 #include "../table/StockWeightTable.h"
 #include "../table/StockTable.h"
+#include "../table/HolidayTable.h"
 
 namespace hku {
 
@@ -251,6 +252,27 @@ StockTypeInfo SQLiteBaseInfoDriver::getStockTypeInfo(uint32_t type) {
         if (info.type() != Null<uint32_t>()) {
             result = StockTypeInfo(info.type(), info.description(), info.tick(), info.tickValue(),
                                    info.precision(), info.minTradeNumber(), info.maxTradeNumber());
+        }
+    } catch (...) {
+    }
+    return result;
+}
+
+std::unordered_set<Datetime> SQLiteBaseInfoDriver::getAllHolidays() {
+    HKU_ASSERT(m_pool);
+    std::unordered_set<Datetime> result;
+    try {
+        auto con = m_pool->getConnect();
+        std::vector<HolidayTable> holidays;
+        con->batchLoad(holidays);
+        for (auto& holiday : holidays) {
+            try {
+                result.insert(holiday.datetime());
+            } catch (std::exception& e) {
+                HKU_WARN(e.what());
+            } catch (...) {
+                HKU_ERROR_UNKNOWN;
+            }
         }
     } catch (...) {
     }

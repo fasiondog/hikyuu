@@ -187,8 +187,11 @@ public:
      */
     bool isTransactionTime(Datetime time);
 
-    /** 设置K线数据获取驱动 */
+    /** 设置K线数据驱动 */
     void setKDataDriver(const KDataDriverConnectPoolPtr& kdataDriver);
+
+    /** 获取K线驱动*/
+    KDataDriverConnectPoolPtr getKDataDirver() const;
 
     /**
      * 将K线数据做自身缓存

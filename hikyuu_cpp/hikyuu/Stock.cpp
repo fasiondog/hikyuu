@@ -231,6 +231,10 @@ void Stock::setKDataDriver(const KDataDriverConnectPoolPtr& kdataDriver) {
     }
 }
 
+KDataDriverConnectPoolPtr Stock::getKDataDirver() const {
+    return m_kdataDriver;
+}
+
 void Stock::setWeightList(const StockWeightList& weightList) {
     if (m_data) {
         std::lock_guard<std::mutex> lock(m_data->m_weight_mutex);

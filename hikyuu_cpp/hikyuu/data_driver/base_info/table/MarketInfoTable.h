@@ -47,7 +47,7 @@ public:
 
     Datetime lastDate() const {
         HKU_CHECK(m_lastDate <= 99999999, "Invalid lastDate: {}!", m_lastDate);
-        return Datetime(m_lastDate * 10000);
+        return Datetime(m_lastDate * 10000LL);
     }
 
     TimeDelta openTime1() const {

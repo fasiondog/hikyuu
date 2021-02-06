@@ -29,10 +29,10 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code) override;
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end) override;
-    virtual MarketInfo getMarketInfo(const string& market);
-    virtual StockTypeInfo getStockTypeInfo(uint32_t type);
-
+    virtual MarketInfo getMarketInfo(const string& market) override;
+    virtual StockTypeInfo getStockTypeInfo(uint32_t type) override;
     virtual vector<StockInfo> getAllStockInfo() override;
+    virtual std::unordered_set<Datetime> getAllHolidays() override;
 
 private:
     //股票基本信息数据库实例
