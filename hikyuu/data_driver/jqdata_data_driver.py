@@ -61,9 +61,12 @@ class jqdataKDataDriver(KDataDriver):
             Query.MIN30: 25,
             Query.MIN60: 25
         }
-        return
+        return True
 
     def isIndexFirst(self):
+        return False
+
+    def canParallelLoad(self):
         return False
 
     def getKRecordList(self, market, code, query):  # ktype, start_ix, end_ix, out_buffer):
@@ -78,7 +81,7 @@ class jqdataKDataDriver(KDataDriver):
         :param KRecordListPtr out_buffer: 传入的数据缓存，读取数据后使用 
                                            out_buffer.append(krecord) 加入数据        
         """
-        if query.queryType == Query.DATE:
+        if query.query_type == Query.DATE:
             print("未实现按日期查询")
             return KRecordList()
         start_ix = query.start
@@ -126,7 +129,7 @@ class jqdataKDataDriver(KDataDriver):
         """
         print("getIndexRangeByDate")
 
-        if query.queryType != Query.DATE:
+        if query.query_type != Query.DATE:
             return (0, 0)
 
         start_datetime = query.startDatetime

@@ -100,7 +100,8 @@ Parameter default_other_param() {
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
                         const Parameter& hikyuuParam) {
-    HKU_WARN_IF_RETURN(m_initializing, void(), "An attempt was made to initialize repeatedly!");
+    HKU_WARN_IF_RETURN(m_initializing, void(),
+                       "The last initialization has not finished. Please try again later!");
     m_initializing = true;
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
