@@ -57,4 +57,19 @@ from .trade_manage import *
 from .trade_sys import *
 from .hub import *
 
+# ==============================================================================
+#
+# 设置关键类型简称
+#
+# ==============================================================================
+O = OPEN()
+C = CLOSE()
+H = HIGH()
+L = LOW()
+A = AMO()
+V = VOL()
+D = Datetime
+K = None
+Q = Query
+
 __version__ = get_version()
