@@ -238,4 +238,13 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_EQ(stk.isNull(), true);
 }
 
+/** @par 检测点 */
+TEST_CASE("test_StockManager_isHoliday") {
+    auto& sm = StockManager::instance();
+    CHECK_EQ(sm.isHoliday(Datetime(202101010000LL)), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL)), false);
+    CHECK_EQ(sm.isHoliday(Datetime(202110010000LL)), true);
+    CHECK_EQ(sm.isHoliday(Datetime(202109300000LL)), false);
+}
+
 /** @} */

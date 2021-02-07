@@ -132,12 +132,18 @@ void export_StockManager() {
     :return: 加入的Stock
     :rtype: Stock)")
 
-      .def("removeTempCsvStock", &StockManager::removeTempCsvStock,
-           R"(removeTempCsvStock(self, code)
+      .def("remove_temp_csv_stock", &StockManager::removeTempCsvStock,
+           R"(remove_temp_csv_stock(self, code)
 
     移除增加的临时Stock
 
     :param str code: 创建时自定义的编码)")
+
+      .def("is_holiday", &StockManager::isHoliday, R"(is_holiday(self, d)
+
+    判断日期是否为节假日
+
+    :param Datetime d: 待判断的日期)")
 
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")

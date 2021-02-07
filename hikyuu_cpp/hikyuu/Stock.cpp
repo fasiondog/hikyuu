@@ -695,7 +695,9 @@ bool Stock::isTransactionTime(Datetime time) {
 }
 
 void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
-    HKU_IF_RETURN(!isBuffer(inktype) || record.datetime.isNull(), void());
+    HKU_IF_RETURN(!isBuffer(inktype) || record.datetime.isNull() ||
+                    StockManager::instance().isHoliday(record.datetime),
+                  void());
 
     string ktype(inktype);
     to_upper(ktype);
