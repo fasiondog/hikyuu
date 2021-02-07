@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu.data_driver
-.. highlightlang:: python
+.. highlight:: python
 
 自定义K线驱动
 ==============

@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu.trade_sys
-.. highlightlang:: python
+.. highlight:: python
 
 盈利目标策略
 ============

@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu.indicator
-.. highlightlang:: python
+.. highlight:: python
 
 内建技术指标
 ============

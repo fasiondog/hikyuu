@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu
-.. highlightlang:: python
+.. highlight:: python
 
 证券管理
 ========
@@ -206,6 +206,12 @@ StockManager/Block/Stock
         :return: 日期列表
         :rtype: DatetimeList
         
+    .. py:method:: is_holiday(self, d)
+
+        判断日期是否为节假日
+
+        :param Datetime d: 待判定的日期
+
     .. py:method:: add_temp_csv_stock(self, code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
 
         从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。        

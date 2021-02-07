@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu
-.. highlightlang:: python
+.. highlight:: python
 
 基础数据类型
 ============
