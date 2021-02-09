@@ -200,6 +200,14 @@
         
         :param Datetime datetime: 指定时刻
         :rtype: bool
+
+    .. py:method:: next_time_should_buy(self)
+
+        下一时刻是否可以买入，相当于最后时刻是否指示买入
+
+    .. py:method:: next_time_should_sell(self)
+
+        下一时刻是否可以卖出，相当于最后时刻是否指示卖出
     
     .. py:method:: get_buy_signal(self)
     
