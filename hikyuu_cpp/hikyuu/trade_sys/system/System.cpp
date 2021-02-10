@@ -272,7 +272,7 @@ void System::run(const KQuery& query, bool reset) {
 
     // m_stock = stock; 在setTO里赋值
     KData kdata = m_stock.getKData(query);
-    HKU_INFO_IF_RETURN(kdata.empty(), void(), "KData is empty!");
+    HKU_IF_RETURN(kdata.empty(), void());
 
     setTO(kdata);
     size_t total = kdata.size();
