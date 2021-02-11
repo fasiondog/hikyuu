@@ -101,7 +101,7 @@ Parameter default_other_param() {
 
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
-                        const Parameter& hikyuuParam) {
+                        const Parameter& hikyuuParam, const StrategyContext& context) {
     HKU_WARN_IF_RETURN(m_initializing, void(),
                        "The last initialization has not finished. Please try again later!");
     m_initializing = true;
@@ -110,6 +110,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_kdataDriverParam = kdataParam;
     m_preloadParam = preloadParam;
     m_hikyuuParam = hikyuuParam;
+    m_context = context;
 
     // 获取路径信息
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
@@ -348,6 +349,7 @@ StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
 
 MarketList StockManager::getAllMarket() const {
     MarketList result;
+    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.begin();
     for (; iter != m_marketInfoDict.end(); ++iter) {
         result.push_back(iter->first);
@@ -420,7 +422,35 @@ bool StockManager::addStock(const Stock& stock) {
 
 void StockManager::loadAllStocks() {
     HKU_INFO("Loading stock information...");
-    auto stockInfos = m_baseInfoDriver->getAllStockInfo();
+    const vector<string>& context_stock_code_list = m_context.getStockCodeList();
+    auto iter =
+      std::find_if(context_stock_code_list.begin(), context_stock_code_list.end(), [](string val) {
+          to_upper(val);
+          return val == "ALL";
+      });
+
+    vector<StockInfo> stockInfos;
+    if (iter != context_stock_code_list.end()) {
+        stockInfos = m_baseInfoDriver->getAllStockInfo();
+    } else {
+        auto all_market = getAllMarket();
+        for (auto stkcode : context_stock_code_list) {
+            to_upper(stkcode);
+            bool find = false;
+            for (auto& market : all_market) {
+                auto pos = stkcode.find(market);
+                if (pos != string::npos && market.size() <= stkcode.size()) {
+                    string stk_market = stkcode.substr(pos, market.size());
+                    string stk_code = stkcode.substr(market.size(), stkcode.size());
+                    stockInfos.push_back(m_baseInfoDriver->getStockInfo(stk_market, stk_code));
+                    find = true;
+                    break;
+                }
+            }
+            HKU_WARN_IF(!find, "Invalid stock code: {}", stkcode);
+        }
+    }
+
     std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     for (auto& info : stockInfos) {
         Datetime startDate, endDate;

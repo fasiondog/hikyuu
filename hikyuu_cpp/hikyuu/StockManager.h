@@ -14,6 +14,7 @@
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
+#include "StrategyContext.h"
 
 namespace hku {
 
@@ -34,15 +35,17 @@ public:
 
     /**
      * 初始化函数，必须在程序入口调用
-     * @param baseInfoParam
-     * @param blockParam
-     * @param kdataParam
-     * @param preloadParam
-     * @param hikyuuParam
+     * @param baseInfoParam 基础信息驱动参数
+     * @param blockParam 板块驱动参数
+     * @param kdataParam K线驱动参数
+     * @param preloadParam 预加载参数
+     * @param hikyuuParam 其他参数
+     * @param context 策略上下文
      */
     void init(const Parameter& baseInfoParam, const Parameter& blockParam,
               const Parameter& kdataParam, const Parameter& preloadParam = default_preload_param(),
-              const Parameter& hikyuuParam = default_other_param());
+              const Parameter& hikyuuParam = default_other_param(),
+              const StrategyContext& context = StrategyContext());
 
     /** 重新加载 */
     void reload();
@@ -64,6 +67,9 @@ public:
 
     /** 获取其他参数 */
     const Parameter& getHikyuuParameter() const;
+
+    /** 获取策略上下文 */
+    const StrategyContext& getStrategyContext() const;
 
     /** 获取基础信息驱动 */
     BaseInfoDriverPtr getBaseInfoDriver() const;
@@ -226,6 +232,7 @@ private:
     Parameter m_kdataDriverParam;
     Parameter m_preloadParam;
     Parameter m_hikyuuParam;
+    StrategyContext m_context;
 };
 
 inline size_t StockManager::size() const {
@@ -258,6 +265,10 @@ inline const Parameter& StockManager::getPreloadParameter() const {
 
 inline const Parameter& StockManager::getHikyuuParameter() const {
     return m_hikyuuParam;
+}
+
+inline const StrategyContext& StockManager::getStrategyContext() const {
+    return m_context;
 }
 
 inline BaseInfoDriverPtr StockManager::getBaseInfoDriver() const {

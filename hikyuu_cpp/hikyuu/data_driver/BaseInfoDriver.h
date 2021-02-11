@@ -95,6 +95,13 @@ public:
     virtual vector<StockInfo> getAllStockInfo() = 0;
 
     /**
+     * 获取指定的证券信息
+     * @param market 市场简称
+     * @param code 证券代码
+     */
+    virtual StockInfo getStockInfo(string market, const string& code) = 0;
+
+    /**
      * 获取指定日期范围内 [start, end) 的权限列表
      * @param market 市场简称
      * @param code 证券代码

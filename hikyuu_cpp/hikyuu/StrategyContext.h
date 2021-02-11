@@ -13,7 +13,7 @@ namespace hku {
 
 class HKU_API StrategyContext {
 public:
-    StrategyContext() = default;
+    StrategyContext() : m_stockCodeList({"all"}){};
     StrategyContext(const StrategyContext&) = default;
 
     virtual ~StrategyContext() = default;

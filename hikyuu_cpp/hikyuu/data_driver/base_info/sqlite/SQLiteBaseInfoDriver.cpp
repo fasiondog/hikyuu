@@ -96,6 +96,24 @@ vector<StockInfo> SQLiteBaseInfoDriver::getAllStockInfo() {
     return result;
 }
 
+StockInfo SQLiteBaseInfoDriver::getStockInfo(string market, const string& code) {
+    HKU_ASSERT(m_pool);
+    StockInfo result;
+    try {
+        to_upper(market);
+        auto con = m_pool->getConnect();
+        string sql =
+          format("{} a.code='{}' and c.market='{}'", StockInfo::getSelectSQL(), code, market);
+        SQLStatementPtr st = con->getStatement(sql);
+        st->exec();
+        if (st->moveNext()) {
+            result.load(st);
+        }
+    } catch (...) {
+    }
+    return result;
+}
+
 StockWeightList SQLiteBaseInfoDriver::getStockWeightList(const string& market, const string& code,
                                                          Datetime start, Datetime end) {
     HKU_ASSERT(m_pool);

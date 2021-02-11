@@ -150,6 +150,24 @@ vector<StockInfo> MySQLBaseInfoDriver::getAllStockInfo() {
     return result;
 }
 
+StockInfo MySQLBaseInfoDriver::getStockInfo(string market, const string &code) {
+    HKU_ASSERT(m_pool);
+    StockInfo result;
+    try {
+        to_upper(market);
+        auto con = m_pool->getConnect();
+        string sql =
+          format("{} a.code='{}' and c.market='{}'", StockInfo::getSelectSQL(), code, market);
+        SQLStatementPtr st = con->getStatement(sql);
+        st->exec();
+        if (st->moveNext()) {
+            result.load(st);
+        }
+    } catch (...) {
+    }
+    return result;
+}
+
 MarketInfo MySQLBaseInfoDriver::getMarketInfo(const string &market) {
     MarketInfo result;
     HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
