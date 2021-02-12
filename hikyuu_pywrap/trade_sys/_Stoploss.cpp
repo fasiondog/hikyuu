@@ -40,11 +40,11 @@ public:
     }
 
     price_t getPrice(const Datetime& datetime, price_t price) {
-        return this->get_override("getPrice")(datetime, price);
+        return this->get_override("get_price")(datetime, price);
     }
 
     price_t getShortPrice(const Datetime& datetime, price_t price) {
-        if (override getShortPrice = get_override("getShortPrice")) {
+        if (override getShortPrice = get_override("get_short_price")) {
             return getShortPrice(datetime, price);
         }
         return StoplossBase::getShortPrice(datetime, price);

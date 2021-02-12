@@ -40,7 +40,7 @@ public:
     }
 
     void buyNotify(const TradeRecord& tr) {
-        if (override buy_notify = this->get_override("buyNotify")) {
+        if (override buy_notify = this->get_override("buy_notify")) {
             buy_notify(tr);
             return;
         }
@@ -53,7 +53,7 @@ public:
     }
 
     void sellNotify(const TradeRecord& tr) {
-        if (override sell_notify = this->get_override("sellNotify")) {
+        if (override sell_notify = this->get_override("sell_notify")) {
             sell_notify(tr);
             return;
         }
@@ -66,11 +66,11 @@ public:
     }
 
     price_t getGoal(const Datetime& datetime, price_t price) {
-        return this->get_override("getGoal")(datetime, price);
+        return this->get_override("get_goal")(datetime, price);
     }
 
     price_t getShortGoal(const Datetime& datetime, price_t price) {
-        if (override getShortGoal = get_override("getShortGoal")) {
+        if (override getShortGoal = get_override("get_short_goal")) {
             return getShortGoal(datetime, price);
         }
         return ProfitGoalBase::getShortGoal(datetime, price);

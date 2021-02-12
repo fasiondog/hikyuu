@@ -113,6 +113,21 @@ def SL_FixedValue(*args, **kwargs):
 #--------------------------------------------------------------------
 
 
+@deprecated_attr(
+    {
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        '_allocateWeight': '_allocate_weight',
+    }
+)
+def AllocateFundsBase_getattr(self, name):
+    return getattr(self, name)
+
+
+AllocateFundsBase.__getattr__ = AllocateFundsBase_getattr
+
+
 @deprecated_attr({'size': '__len__', 'get': '__getitem__'})
 def Block_getattr(self, name):
     return getattr(self, name)

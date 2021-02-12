@@ -41,11 +41,11 @@ public:
     }
 
     price_t getRealBuyPrice(const Datetime& datetime, price_t price) {
-        return this->get_override("getRealBuyPrice")(datetime, price);
+        return this->get_override("get_real_buy_price")(datetime, price);
     }
 
     price_t getRealSellPrice(const Datetime& datetime, price_t price) {
-        return this->get_override("getRealSellPrice")(datetime, price);
+        return this->get_override("get_real_sell_price")(datetime, price);
     }
 };
 

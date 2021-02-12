@@ -74,7 +74,7 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload) {
     }
 
     StockManager& sm = StockManager::instance();
-    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam);
+    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, StrategyContext());
 }
 
 string getVersion() {

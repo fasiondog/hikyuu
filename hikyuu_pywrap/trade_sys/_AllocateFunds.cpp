@@ -32,7 +32,7 @@ public:
     }
 
     SystemWeightList _allocateWeight(const Datetime& date, const SystemList& se_list) {
-        return this->get_override("_allocateWeight")(date, se_list);
+        return this->get_override("_allocate_weight")(date, se_list);
     }
 
     AFPtr _clone() {
@@ -69,15 +69,15 @@ void export_AllocateFunds() {
       .def(self_ns::str(self))
       .def(self_ns::repr(self))
       .add_property("name", af_get_name, af_set_name)
-      .def("getParam", &AllocateFundsBase::getParam<boost::any>)
-      .def("setParam", &AllocateFundsBase::setParam<object>)
-      .def("haveParam", &AllocateFundsBase::haveParam)
+      .def("get_param", &AllocateFundsBase::getParam<boost::any>)
+      .def("set_param", &AllocateFundsBase::setParam<object>)
+      .def("have_param", &AllocateFundsBase::haveParam)
 
       .def("reset", &AllocateFundsBase::reset)
       .def("clone", &AllocateFundsBase::clone)
       .def("_reset", &AllocateFundsBase::_reset, &AllocateFundsBaseWrap::default_reset)
       .def("_clone", pure_virtual(&AllocateFundsBase::_clone))
-      .def("_allocateWeight", pure_virtual(&AllocateFundsBase::_allocateWeight))
+      .def("_allocate_weight", pure_virtual(&AllocateFundsBase::_allocateWeight))
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(name_init_pickle_suite<AllocateFundsBase>())
 #endif
