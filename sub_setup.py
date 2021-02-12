@@ -28,8 +28,8 @@ hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
 hku_license = "MIT"
-hku_keywords = ("quant", "trade", "System Trading", "backtester", "量化",
-                "程序化交易", "量化交易", "系统交易")
+hku_keywords = ["quant", "trade", "System Trading", "backtester", "量化",
+                "程序化交易", "量化交易", "系统交易"]
 hku_platforms = "Independant"
 hku_url = "http://hikyuu.org/"
 
