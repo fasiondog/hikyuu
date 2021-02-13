@@ -58,10 +58,6 @@
         
         （只读）最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期
         
-    .. py:attribute:: reinvest 
-        
-        （只读）红利/股息/送股再投资标志，同公共参数“reinvest”
-        
     .. py:attribute:: precision 
         
         （只读）价格精度，同公共参数“precision”

@@ -87,8 +87,6 @@ void export_TradeManager() {
                     "（只读）第一笔买入交易发生日期，如未发生交易返回 Datetime>()")
       .add_property("last_datetime", &TradeManager::lastDatetime,
                     "（只读）最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期")
-      .add_property("reinvest", &TradeManager::reinvest,
-                    "（只读）红利/股息/送股再投资标志，同公共参数“reinvest”")
       .add_property("precision", &TradeManager::precision,
                     "（只读）价格精度，同公共参数“precision”")
       .add_property("cost_func", get_costFunc, set_costFunc, "交易成本算法")

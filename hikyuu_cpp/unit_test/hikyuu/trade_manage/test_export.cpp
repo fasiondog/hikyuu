@@ -153,7 +153,6 @@ TEST_CASE("test_TradeManager_export") {
     CHECK_EQ(tm1->initDatetime(), tm2->initDatetime());
     CHECK_EQ(tm1->firstDatetime(), tm2->firstDatetime());
     CHECK_EQ(tm1->lastDatetime(), tm2->lastDatetime());
-    CHECK_EQ(tm1->reinvest(), tm2->reinvest());
     CHECK_EQ(tm1->precision(), tm2->precision());
 
     const TradeRecordList& trade_list_1 = tm1->getTradeList();

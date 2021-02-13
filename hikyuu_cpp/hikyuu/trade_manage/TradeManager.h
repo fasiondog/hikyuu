@@ -9,7 +9,7 @@
 #ifndef TRADEMANAGER_H_
 #define TRADEMANAGER_H_
 
-#include <boost/tuple/tuple.hpp>
+#include "TradeManagerBase.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/util.h"
 #include "TradeRecord.h"
@@ -40,8 +40,8 @@ namespace hku {
  * </pre>
  * @ingroup TradeManagerClass
  */
-class HKU_API TradeManager {
-    PARAMETER_SUPPORT
+class HKU_API TradeManager : public TradeManagerBase {
+    // PARAMETER_SUPPORT
 
 public:
     TradeManager(const Datetime& datetime = Datetime(199001010000LL), price_t initcash = 100000.0,
@@ -63,14 +63,14 @@ public:
     void clearBroker();
 
     /** 从哪个时刻开始启动订单代理进行下单操作   */
-    Datetime getBrokerLastDatetime() const {
+    /*Datetime getBrokerLastDatetime() const {
         return m_broker_last_datetime;
-    }
+    }*/
 
     /** 设置开始订单代理操作的时刻 */
-    void setBrokerLastDatetime(const Datetime& date) {
+    /*void setBrokerLastDatetime(const Datetime& date) {
         m_broker_last_datetime = date;
-    }
+    }*/
 
     shared_ptr<TradeManager> clone();
 
@@ -107,11 +107,6 @@ public:
     /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
     Datetime lastDatetime() const {
         return m_trade_list.empty() ? m_init_datetime : m_trade_list.back().datetime;
-    }
-
-    /** 红利/股息/送股再投资标志，即是否忽略权息信息 **/
-    bool reinvest() const {
-        return getParam<bool>("reinvest");
     }
 
     /** 交易精度 */
@@ -547,7 +542,7 @@ private:
     PositionRecordList m_short_position_history;  //空头仓位历史记录
 
     list<OrderBrokerPtr> m_broker_list;  //订单代理列表
-    Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
+    // Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
 
     list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易
 
