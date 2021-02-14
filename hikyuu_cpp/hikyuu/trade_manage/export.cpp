@@ -26,11 +26,14 @@
 
 #include <boost/serialization/export.hpp>
 
+#include "TradeManager.h"
 #include "imp/TradeCostStub.h"
 #include "imp/FixedATradeCost.h"
 #include "imp/ZeroTradeCost.h"
 #include "imp/FixedA2015TradeCost.h"
 
+BOOST_CLASS_EXPORT(hku::TradeManager)
+BOOST_CLASS_EXPORT(hku::TradeManagerBase)
 BOOST_CLASS_EXPORT(hku::TradeCostStub)
 BOOST_CLASS_EXPORT(hku::FixedATradeCost)
 BOOST_CLASS_EXPORT(hku::ZeroTradeCost)

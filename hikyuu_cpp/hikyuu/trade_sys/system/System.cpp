@@ -18,7 +18,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const System& sys) {
        << strip << space << sys.getCN() << strip << space << sys.getMM() << strip << space
        << sys.getSG() << strip << space << sys.getST() << strip << space << sys.getTP() << strip
        << space << sys.getPG() << strip << space << sys.getSP() << strip << space
-       << (sys.getTM() ? sys.getTM()->toString() : "TradeManager(NULL)") << strip << "}";
+       << (sys.getTM() ? sys.getTM()->str() : "TradeManager(NULL)") << strip << "}";
     return os;
 }
 

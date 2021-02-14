@@ -51,10 +51,10 @@ PriceList (TradeManager::*getTMProfitCurve_2)() = &TradeManager::getProfitCurve;
 TradeCostPtr (TradeManager::*get_costFunc)() const = &TradeManager::costFunc;
 void (TradeManager::*set_costFunc)(const TradeCostPtr&) = &TradeManager::costFunc;
 
-string (TradeManager::*tm_get_name)() const = &TradeManager::name;
+const string& (TradeManager::*tm_get_name)() const = &TradeManager::name;
 void (TradeManager::*tm_set_name)(const string&) = &TradeManager::name;
 
-const TradeRecordList& (TradeManager::*_getTradeList_1)() const = &TradeManager::getTradeList;
+TradeRecordList (TradeManager::*_getTradeList_1)() const = &TradeManager::getTradeList;
 TradeRecordList (TradeManager::*_getTradeList_2)(const Datetime&, const Datetime&) const =
   &TradeManager::getTradeList;
 
@@ -76,10 +76,11 @@ void export_TradeManager() {
     - save_action=True (bool) : 是否保存Python命令序列)",
       init<const Datetime&, price_t, const TradeCostPtr&, const string&>())
 
-      .def("__str__", &TradeManager::toString)
-      .def("__repr__", &TradeManager::toString)
+      .def("__str__", &TradeManager::str)
+      .def("__repr__", &TradeManager::str)
 
-      .add_property("name", tm_get_name, tm_set_name, "名称")
+      .add_property("name", make_function(tm_get_name, return_value_policy<copy_const_reference>()),
+                    tm_set_name, "名称")
       .add_property("init_cash", &TradeManager::initCash, "（只读）初始资金")
       .add_property("current_cash", &TradeManager::currentCash, "（只读）当前资金")
       .add_property("init_datetime", &TradeManager::initDatetime, "（只读）账户建立日期")
@@ -155,7 +156,7 @@ void export_TradeManager() {
 
       //.def("getShortHoldNumber", &TradeManager::getShortHoldNumber)
 
-      .def("get_trade_list", _getTradeList_1, return_value_policy<copy_const_reference>())
+      .def("get_trade_list", _getTradeList_1)
       .def("get_trade_list", _getTradeList_2, R"(get_trade_list(self[, start, end])
 
     获取交易记录，未指定参数时，获取全部交易记录
@@ -171,7 +172,7 @@ void export_TradeManager() {
     :rtype: PositionRecordList)")
 
       .def("get_history_position_list", &TradeManager::getHistoryPositionList,
-           return_value_policy<copy_const_reference>(), R"(get_history_position_list(self)
+           R"(get_history_position_list(self)
 
     获取全部历史持仓记录，即已平仓记录
 

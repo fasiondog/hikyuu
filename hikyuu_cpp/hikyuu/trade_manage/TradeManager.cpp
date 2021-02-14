@@ -17,64 +17,7 @@
 
 namespace hku {
 
-HKU_API std::ostream& operator<<(std::ostream& os, const TradeManager& tm) {
-    os << std::fixed;
-    os.precision(4);
-
-    FundsRecord funds = tm.getFunds();
-    string strip(",\n");
-    os << "TradeManager {\n"
-       << "  params: " << tm.getParameter() << strip << "  name: " << tm.name() << strip
-       << "  init_date: " << tm.initDatetime() << strip << "  init_cash: " << tm.initCash() << strip
-       << "  firstDatetime: " << tm.firstDatetime() << strip
-       << "  lastDatetime: " << tm.lastDatetime() << strip
-       << "  brokeLastDatetime: " << tm.getBrokerLastDatetime() << strip
-       << "  TradeCostFunc: " << tm.costFunc() << strip << "  current cash: " << tm.currentCash()
-       << strip << "  current market_value: " << funds.market_value << strip
-       << "  current short_market_value: " << funds.short_market_value << strip
-       << "  current base_cash: " << funds.base_cash << strip
-       << "  current base_asset: " << funds.base_asset << strip
-       << "  current borrow_cash: " << funds.borrow_cash << strip
-       << "  current borrow_asset: " << funds.borrow_asset << strip << "  Position: \n";
-
-    PositionRecordList position = tm.getPositionList();
-    PositionRecordList::const_iterator iter = position.begin();
-    for (; iter != position.end(); ++iter) {
-        os << "    " << iter->number << " " << iter->stock << "\n";
-    }
-
-    os << "  Short Position: \n";
-    position = tm.getShortPositionList();
-    iter = position.begin();
-    for (; iter != position.end(); ++iter) {
-        os << "    " << iter->number << " " << iter->stock << "\n";
-    }
-
-    os << "  Borrow Stock: \n";
-    BorrowRecordList borrow = tm.getBorrowStockList();
-    BorrowRecordList::const_iterator bor_iter = borrow.begin();
-    for (; bor_iter != borrow.end(); ++bor_iter) {
-        os << "    " << bor_iter->number << " " << bor_iter->value << " " << bor_iter->stock
-           << "\n";
-    }
-
-    os << "}";
-
-    os.unsetf(std::ostream::floatfield);
-    os.precision();
-    return os;
-}
-
-HKU_API std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
-    if (ptm) {
-        os << *ptm;
-    } else {
-        os << "TradeManager(NULL)";
-    }
-    return os;
-}
-
-string TradeManager::toString() const {
+string TradeManager::str() const {
     std::stringstream os;
     os << std::fixed;
     os.precision(2);
@@ -134,18 +77,17 @@ string TradeManager::toString() const {
 
 TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const TradeCostPtr& costfunc,
                            const string& name)
-: m_name(name),
-  m_init_datetime(datetime),
-  m_costfunc(costfunc),
+: m_init_datetime(datetime),
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
   m_checkout_stock(0.0),
   m_borrow_cash(0.0) {
     setParam<bool>("reinvest", false);              //红利是否再投资
-    setParam<int>("precision", 2);                  //计算精度
     setParam<bool>("support_borrow_cash", false);   //是否自动融资
     setParam<bool>("support_borrow_stock", false);  //是否自动融券
     setParam<bool>("save_action", true);            //是否保存命令
+    m_name = name;
+    m_costfunc = costfunc;
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -158,7 +100,7 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
 
 TradeManager::~TradeManager() {}
 
-void TradeManager::reset() {
+void TradeManager::_reset() {
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
     m_checkout_cash = 0.0;
@@ -182,7 +124,7 @@ void TradeManager::reset() {
     _saveAction(m_trade_list.back());
 }
 
-TradeManagerPtr TradeManager::clone() {
+TradeManagerPtr TradeManager::_clone() {
     TradeManager* p = new TradeManager(m_init_datetime, m_init_cash, m_costfunc, m_name);
     p->m_params = m_params;
     p->m_name = m_name;
@@ -1149,7 +1091,7 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     return funds.cash;
 }
 
-FundsRecord TradeManager ::getFunds(KQuery::KType inktype) const {
+FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
@@ -1187,7 +1129,7 @@ FundsRecord TradeManager ::getFunds(KQuery::KType inktype) const {
     return funds;
 }
 
-FundsRecord TradeManager ::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
+FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
