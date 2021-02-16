@@ -41,6 +41,7 @@ void export_trade_sys_main();
 void export_agent_main();
 
 void export_StrategeContext();
+void export_strategy_main();
 
 KData Py_GetKData(const string& market_code, py::object start = py::long_(0),
                   py::object end = py::long_(Null<int64_t>()), KQuery::KType ktype = KQuery::DAY,
@@ -123,6 +124,7 @@ BOOST_PYTHON_MODULE(core) {
     export_trade_manage_main();  // must after export_trade_sys_main
 
     export_StrategeContext();
+    export_strategy_main();
 
     export_agent_main();
 

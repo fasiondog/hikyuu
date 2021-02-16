@@ -37,6 +37,7 @@ class HKU_API TradeManagerBase {
 
 public:
     TradeManagerBase();
+    virtual ~TradeManagerBase() {}
 
     /** 账户名称 */
     const string& name() const {
