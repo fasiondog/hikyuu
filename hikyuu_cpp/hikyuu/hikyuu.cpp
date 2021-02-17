@@ -19,7 +19,8 @@ namespace hku {
 
 static Parameter g_hikyuu_context;
 
-void hikyuu_init(const string& config_file_name, bool ignore_preload) {
+void hikyuu_init(const string& config_file_name, bool ignore_preload,
+                 const StrategyContext& context) {
     IniParser config;
     try {
         config.read(config_file_name);
@@ -74,7 +75,7 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload) {
     }
 
     StockManager& sm = StockManager::instance();
-    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, StrategyContext());
+    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, context);
 }
 
 string getVersion() {

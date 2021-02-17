@@ -22,8 +22,11 @@ void export_StockManager() {
            "获取StockManager单例实例")
       .staticmethod("instance")
 
-      .def("init", &StockManager::init,
-           R"(init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param)
+      .def(
+        "init", &StockManager::init,
+        (arg("base_info_param"), arg("block_param"), arg("kdata_param"), arg("preload_param"),
+         arg("hikyuu_param"), arg("context") = StrategyContext({"all"})),
+        R"(init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param, context)
               
     初始化函数，必须在程序入口调用
     
@@ -31,7 +34,8 @@ void export_StockManager() {
      param block_param 板块信息驱动参数
      param kdata_param K线数据驱动参数
      param preload_param 预加载参数
-     param hikyuu_param 其他参数)")
+     param hikyuu_param 其他参数
+     param StrategyContext context 策略上下文, 默认加载全部证券)")
 
       .def("reload", &StockManager::reload, "重新加载所有证券数据")
 

@@ -28,7 +28,8 @@ namespace hku {
  * @param ignore_preload 忽略配置信息中的预加载设置，即不加载数据至内存。
  *                       用于某些场合启动hikyuu，但仅用于获取数据库的基本信息。
  */
-void HKU_API hikyuu_init(const string& config_file_name, bool ignore_preload = false);
+void HKU_API hikyuu_init(const string& config_file_name, bool ignore_preload = false,
+                         const StrategyContext& context = StrategyContext({"all"}));
 
 /**
  * 获取Hikyuu当前版本号

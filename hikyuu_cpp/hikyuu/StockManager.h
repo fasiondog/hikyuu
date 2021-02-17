@@ -45,7 +45,7 @@ public:
     void init(const Parameter& baseInfoParam, const Parameter& blockParam,
               const Parameter& kdataParam, const Parameter& preloadParam = default_preload_param(),
               const Parameter& hikyuuParam = default_other_param(),
-              const StrategyContext& context = StrategyContext());
+              const StrategyContext& context = StrategyContext({"all"}));
 
     /** 重新加载 */
     void reload();

@@ -289,4 +289,4 @@ class PytdxKDataDriver(KDataDriver):
 #hku_param = sm.get_hikyuu_parameter()
 
 #切换K线数据驱动，重新初始化
-#sm.init(base_param, block_param, tdx_param, preload_param, hku_param, StrategyContext())
+#sm.init(base_param, block_param, tdx_param, preload_param, hku_param)

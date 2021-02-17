@@ -105,6 +105,7 @@ BOOST_PYTHON_MODULE(core) {
     export_MarketInfo();
     export_StockTypeInfo();
     export_StockWeight();
+    export_StrategeContext();
     export_StockManager();
     export_KQuery();
     export_KReord();
@@ -123,14 +124,15 @@ BOOST_PYTHON_MODULE(core) {
     export_trade_sys_main();
     export_trade_manage_main();  // must after export_trade_sys_main
 
-    export_StrategeContext();
     export_strategy_main();
 
     export_agent_main();
 
     export_io_redirect();
 
-    py::def("hikyuu_init", hikyuu_init, (py::arg("filename"), py::arg("ignore_preload") = false));
+    py::def("hikyuu_init", hikyuu_init,
+            (py::arg("filename"), py::arg("ignore_preload") = false,
+             py::arg("context") = StrategyContext({"all"})));
     py::def("get_version", getVersion, R"(getVersion()
     
     :return: hikyuu 当前版本

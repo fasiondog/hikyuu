@@ -125,7 +125,7 @@ for p in kdata_config:
 
 #set_log_level(LOG_LEVEL.INFO)
 sm = StockManager.instance()
-sm.init(base_param, block_param, kdata_param, preload_param, hku_param, StrategyContext())
+sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 set_log_level(LOG_LEVEL.INFO)
 
 # 启动行情接收代理
