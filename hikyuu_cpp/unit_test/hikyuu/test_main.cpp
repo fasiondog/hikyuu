@@ -53,6 +53,7 @@ void init_hikyuu_test() {
 int main(int argc, char** argv) {
 #if defined(_WIN32)
     // Windows 下设置控制台程序输出代码页为 UTF8
+    auto old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
@@ -85,6 +86,10 @@ int main(int argc, char** argv) {
 
     int client_stuff_return_code = 0;
     // your program - if the testing framework is integrated in your production code
+
+#if defined(_WIN32)
+    SetConsoleOutputCP(old_cp);
+#endif
 
     return res + client_stuff_return_code;  // the result from doctest is propagated here as well
 }
