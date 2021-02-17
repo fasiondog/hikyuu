@@ -14,4 +14,11 @@ void StrategyContext::setStockCodeList(const vector<string>& stockList) {
     std::copy(stockList.begin(), stockList.end(), m_stockCodeList.begin());
 }
 
+bool StrategyContext::isAll() const {
+    return std::find_if(m_stockCodeList.begin(), m_stockCodeList.end(), [](string val) {
+               to_upper(val);
+               return val == "ALL";
+           }) != m_stockCodeList.end();
+}
+
 }  // namespace hku

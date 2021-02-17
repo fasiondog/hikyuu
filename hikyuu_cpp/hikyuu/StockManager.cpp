@@ -422,17 +422,11 @@ bool StockManager::addStock(const Stock& stock) {
 
 void StockManager::loadAllStocks() {
     HKU_INFO("Loading stock information...");
-    const vector<string>& context_stock_code_list = m_context.getStockCodeList();
-    auto iter =
-      std::find_if(context_stock_code_list.begin(), context_stock_code_list.end(), [](string val) {
-          to_upper(val);
-          return val == "ALL";
-      });
-
     vector<StockInfo> stockInfos;
-    if (iter != context_stock_code_list.end()) {
+    if (m_context.isAll()) {
         stockInfos = m_baseInfoDriver->getAllStockInfo();
     } else {
+        const vector<string>& context_stock_code_list = m_context.getStockCodeList();
         auto all_market = getAllMarket();
         for (auto stkcode : context_stock_code_list) {
             to_upper(stkcode);

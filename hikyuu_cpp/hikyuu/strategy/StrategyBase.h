@@ -35,10 +35,7 @@ public:
 private:
     string m_name;
     StrategyContext m_context;
-
     TMPtr m_tm;
-    SYSPtr m_sys;
-    PFPtr m_portfolio;
 };
 
 typedef shared_ptr<StrategyBase> StrategyPtr;

@@ -36,6 +36,8 @@ public:
         return m_stockCodeList;
     }
 
+    bool isAll() const;
+
 private:
     Datetime m_startDatetime;
     vector<string> m_stockCodeList;
