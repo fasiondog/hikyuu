@@ -14,6 +14,15 @@ void StrategyContext::setStockCodeList(const vector<string>& stockList) {
     std::copy(stockList.begin(), stockList.end(), m_stockCodeList.begin());
 }
 
+void StrategyContext::setKTypeList(const vector<KQuery::KType>& ktypeList) {
+    m_ktypeList.resize(ktypeList.size());
+    std::transform(ktypeList.begin(), ktypeList.end(), m_ktypeList.begin(),
+                   [](KQuery::KType ktype) {
+                       to_upper(ktype);
+                       return ktype;
+                   });
+}
+
 bool StrategyContext::isAll() const {
     return std::find_if(m_stockCodeList.begin(), m_stockCodeList.end(), [](string val) {
                to_upper(val);

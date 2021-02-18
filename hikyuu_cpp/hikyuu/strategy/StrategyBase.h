@@ -18,7 +18,11 @@ class HKU_API StrategyBase {
     PARAMETER_SUPPORT
 
 public:
-    StrategyBase() {}
+    StrategyBase();
+    StrategyBase(const string& name);
+    StrategyBase(const string& name, const string& config_file)
+    : m_name(name), m_config_file(config_file) {}
+
     virtual ~StrategyBase() {}
 
     const string& name() const {
@@ -29,11 +33,22 @@ public:
         m_name = name;
     }
 
-    // virtual void start() = 0;
+    const StrategyContext& context() const {
+        return m_context;
+    }
+
+    void context(const StrategyContext& context) {
+        m_context = context;
+    }
+
+    void start();
+
+    virtual void init() = 0;
     virtual void on_bar() = 0;
 
 private:
     string m_name;
+    string m_config_file;
     StrategyContext m_context;
     TMPtr m_tm;
 };

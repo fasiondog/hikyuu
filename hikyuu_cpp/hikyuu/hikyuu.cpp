@@ -70,7 +70,14 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
             preloadParam.set<bool>(*iter,
                                    ignore_preload ? false : config.getBool("preload", *iter));
         } catch (...) {
-            preloadParam.set<int>(*iter, ignore_preload ? false : config.getInt("preload", *iter));
+            if (!ignore_preload) {
+                // 获取预加载的最大数量
+                try {
+                    preloadParam.set<int>(*iter, config.getInt("preload", *iter));
+                } catch (...) {
+                    HKU_WARN("Invalid option: {}", *iter);
+                }
+            }
         }
     }
 

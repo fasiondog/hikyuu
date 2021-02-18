@@ -8,6 +8,7 @@
 #pragma once
 
 #include "DataType.h"
+#include "KQuery.h"
 
 namespace hku {
 
@@ -20,6 +21,8 @@ public:
     StrategyContext(vector<string>&& stockCodeList) : m_stockCodeList(std::move(stockCodeList)) {}
 
     virtual ~StrategyContext() = default;
+
+    bool isAll() const;
 
     Datetime startDatetime() const {
         return m_startDatetime;
@@ -39,11 +42,16 @@ public:
         return m_stockCodeList;
     }
 
-    bool isAll() const;
+    void setKTypeList(const vector<KQuery::KType>& ktypeList);
+
+    const vector<KQuery::KType>& getKTypeList() const {
+        return m_ktypeList;
+    }
 
 private:
     Datetime m_startDatetime;
     vector<string> m_stockCodeList;
+    vector<KQuery::KType> m_ktypeList;
 };
 
 }  // namespace hku

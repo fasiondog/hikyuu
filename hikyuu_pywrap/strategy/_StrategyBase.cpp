@@ -17,6 +17,10 @@ public:
     StrategyBaseWrap() : StrategyBase() {}
     virtual ~StrategyBaseWrap() {}
 
+    void init() override {
+        this->get_override("init")();
+    }
+
     void on_bar() override {
         this->get_override("on_bar")();
     }
@@ -30,5 +34,7 @@ void export_Strategy() {
       .add_property("name",
                     make_function(strategy_get_name, return_value_policy<copy_const_reference>()),
                     strategy_set_name)
+      .def("start", &StrategyBase::start)
+      .def("init", pure_virtual(&StrategyBase::init))
       .def("on_bar", pure_virtual(&StrategyBase::on_bar));
 }

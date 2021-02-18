@@ -25,7 +25,19 @@ void setStockList(StrategyContext* self, object seq) {
             stk_list.push_back(x());
         }
     }
-    self->setStockCodeList(stk_list);
+    self->setStockCodeList(std::move(stk_list));
+}
+
+void setKTypeList(StrategyContext* self, object seq) {
+    vector<string> stk_list;
+    size_t total = len(seq);
+    for (size_t i = 0; i < total; i++) {
+        extract<string> x(seq[i]);
+        if (x.check()) {
+            stk_list.push_back(x());
+        }
+    }
+    self->setKTypeList(stk_list);
 }
 
 void export_StrategeContext() {
@@ -34,5 +46,9 @@ void export_StrategeContext() {
       .add_property("stock_list",
                     make_function(&StrategyContext::getStockCodeList,
                                   return_value_policy<copy_const_reference>()),
-                    setStockList, "股票代码列表");
+                    setStockList, "股票代码列表")
+      .add_property(
+        "ktype_list",
+        make_function(&StrategyContext::getKTypeList, return_value_policy<copy_const_reference>()),
+        setKTypeList, "需要的K线类型");
 }
