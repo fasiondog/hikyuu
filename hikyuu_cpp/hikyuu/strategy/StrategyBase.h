@@ -20,10 +20,9 @@ class HKU_API StrategyBase {
 public:
     StrategyBase();
     StrategyBase(const string& name);
-    StrategyBase(const string& name, const string& config_file)
-    : m_name(name), m_config_file(config_file) {}
+    StrategyBase(const string& name, const string& config_file);
 
-    virtual ~StrategyBase() {}
+    virtual ~StrategyBase();
 
     const string& name() const {
         return m_name;
@@ -41,7 +40,35 @@ public:
         m_context = context;
     }
 
-    void start();
+    Datetime startDatetime() const {
+        return m_context.startDatetime();
+    }
+
+    void startDatetime(const Datetime& d) {
+        m_context.startDatetime(d);
+    }
+
+    void setStockCodeList(vector<string>&& stockList) {
+        m_context.setStockCodeList(std::move(stockList));
+    }
+
+    void setStockCodeList(const vector<string>& stockList) {
+        m_context.setStockCodeList(stockList);
+    }
+
+    const vector<string>& getStockCodeList() const {
+        return m_context.getStockCodeList();
+    }
+
+    void setKTypeList(const vector<KQuery::KType>& ktypeList) {
+        m_context.setKTypeList(ktypeList);
+    }
+
+    const vector<KQuery::KType>& getKTypeList() const {
+        return m_context.getKTypeList();
+    }
+
+    void run();
 
     virtual void init() = 0;
     virtual void on_bar() = 0;

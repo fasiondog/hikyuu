@@ -5,8 +5,10 @@
  *     Author: fasiondog
  */
 
+#include <csignal>
 #include "../utilities/os.h"
 #include "../utilities/IniParser.h"
+#include "../agent/SpotAgent.h"
 #include "StrategyBase.h"
 
 namespace hku {
@@ -23,7 +25,29 @@ StrategyBase::StrategyBase(const string& name) {
 #endif
 }
 
-void StrategyBase::start() {
+StrategyBase::StrategyBase(const string& name, const string& config_file)
+: m_name(name), m_config_file(config_file) {}
+
+StrategyBase::~StrategyBase() {}
+
+static bool g_stratege_keep_running = true;
+
+static void sig_handler(int sig) {
+    if (sig == SIGINT) {
+        g_stratege_keep_running = false;
+    }
+}
+
+void StrategyBase::run() {
+    HKU_INFO("Strategy {} is running! You can press Ctrl-C to terminte ...", m_name);
+
+    // 注册 ctrl-c 终止信号
+    std::signal(SIGINT, sig_handler);
+
+    // 调用 strategy 自身的初始化方法
+    init();
+
+    // 加载上下文指定的证券数据
     IniParser config;
     try {
         config.read(m_config_file);
@@ -86,8 +110,14 @@ void StrategyBase::start() {
     StockManager& sm = StockManager::instance();
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, m_context);
 
-    // 调用 strategy 自身的初始化方法
-    init();
+    // 启动行情接收代理
+    auto& agent = SpotAgent::instance();
+    agent.addPostProcess([this]() { this->on_bar(); });
+    startSpotAgent(true);
+
+    while (g_stratege_keep_running) {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
 }
 
 }  // namespace hku

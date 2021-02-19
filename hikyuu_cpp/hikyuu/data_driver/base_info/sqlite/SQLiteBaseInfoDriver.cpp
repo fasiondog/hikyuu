@@ -103,7 +103,7 @@ StockInfo SQLiteBaseInfoDriver::getStockInfo(string market, const string& code) 
         to_upper(market);
         auto con = m_pool->getConnect();
         string sql =
-          format("{} a.code='{}' and c.market='{}'", StockInfo::getSelectSQL(), code, market);
+          format("{} and a.code='{}' and c.market='{}'", StockInfo::getSelectSQL(), code, market);
         SQLStatementPtr st = con->getStatement(sql);
         st->exec();
         if (st->moveNext()) {
