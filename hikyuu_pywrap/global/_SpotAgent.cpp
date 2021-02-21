@@ -6,7 +6,7 @@
  */
 
 #include <boost/python.hpp>
-#include <hikyuu/agent/SpotAgent.h>
+#include <hikyuu/global/GlobalSpotAgent.h>
 
 using namespace boost::python;
 using namespace hku;

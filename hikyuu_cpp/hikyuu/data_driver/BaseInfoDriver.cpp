@@ -7,7 +7,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include "../StockManager.h"
-#include "../base/GlobalTaskGroup.h"
+#include "../global/GlobalTaskGroup.h"
 #include "BaseInfoDriver.h"
 
 namespace hku {

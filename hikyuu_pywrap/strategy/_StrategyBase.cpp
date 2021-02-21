@@ -21,8 +21,8 @@ public:
         this->get_override("init")();
     }
 
-    void on_bar() override {
-        this->get_override("on_bar")();
+    void on_spot() override {
+        this->get_override("on_spot")();
     }
 };
 
@@ -73,5 +73,5 @@ void export_Strategy() {
 
       .def("run", &StrategyBase::run)
       .def("init", pure_virtual(&StrategyBase::init))
-      .def("on_bar", pure_virtual(&StrategyBase::on_bar));
+      .def("on_spot", pure_virtual(&StrategyBase::on_spot));
 }

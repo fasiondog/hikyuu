@@ -10,8 +10,8 @@
 #include <thread>
 #include <functional>
 #include "spot_generated.h"
-#include "../DataType.h"
-#include "../utilities/thread/ThreadPool.h"
+#include "../../DataType.h"
+#include "../../utilities/thread/ThreadPool.h"
 
 namespace hku {
 
@@ -59,11 +59,7 @@ struct HKU_API SpotRecord {
  */
 class HKU_API SpotAgent {
 public:
-    /** 获取代理实例 */
-    static SpotAgent& instance();
-
-    /** 释放代理实例，用于全局退出时主动释放资源 */
-    static void release();
+    SpotAgent() = default;
 
     /** 析构函数 */
     virtual ~SpotAgent();
@@ -111,8 +107,7 @@ public:
     void clearPostProcessList();
 
 private:
-    static SpotAgent* ms_spotAgent;  // 全局单例
-    static const char* ms_pubUrl;    // 数据发送服务地址
+    static const char* ms_pubUrl;  // 数据发送服务地址
     static const char* ms_startTag;  // 批次数据接收起始标记，用于判断启动了新的批次数据接收
     static const char* ms_endTag;  // 批次数据接收接收标记，用于判断该批次数据更新结束
     static const char* ms_spotTopic;      // 向数据发送服务订阅的主题
@@ -121,7 +116,6 @@ private:
     static const int ms_spotTopicLength;  // 订阅主题标记长度
 
 private:
-    SpotAgent() = default;
     SpotAgent(const SpotAgent&) = delete;
     SpotAgent(SpotAgent&&) = delete;
     SpotAgent& operator=(const SpotAgent&) = delete;
@@ -145,18 +139,5 @@ private:
     list<std::function<void()>> m_postProcessList;  // 已注册的批次后处理函数列表
     vector<std::future<void>> m_process_task_list;
 };
-
-/**
- * 启动 Spot 数据接收代理，如果之前已经处于运行状态，将抛出异常
- * @param print 打印接收数据进展
- * @ingroup Agent
- */
-void HKU_API startSpotAgent(bool print = true);
-
-/**
- * 终止 Spot 数据接收代理
- * @ingroup Agent
- */
-void HKU_API stopSpotAgent();
 
 }  // namespace hku

@@ -38,7 +38,7 @@ void export_indicator_main();
 void export_instance_main();
 void export_trade_manage_main();
 void export_trade_sys_main();
-void export_agent_main();
+void export_global_main();
 
 void export_StrategeContext();
 void export_strategy_main();
@@ -126,7 +126,7 @@ BOOST_PYTHON_MODULE(core) {
 
     export_strategy_main();
 
-    export_agent_main();
+    export_global_main();
 
     export_io_redirect();
 

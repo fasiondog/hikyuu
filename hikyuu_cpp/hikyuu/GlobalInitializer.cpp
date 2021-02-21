@@ -18,9 +18,9 @@
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"
-#include "agent/SpotAgent.h"
-#include "base/GlobalTaskGroup.h"
-#include "base/schedule/scheduler.h"
+#include "global/GlobalTaskGroup.h"
+#include "global/GlobalSpotAgent.h"
+#include "global/schedule/scheduler.h"
 #include "debug.h"
 
 namespace hku {
@@ -53,13 +53,13 @@ void GlobalInitializer::init() {
 
     DataDriverFactory::init();
     StockManager::instance();
-    SpotAgent::instance();
+    auto* _ = getGlobalSpotAgent();
 }
 
 void GlobalInitializer::clean() {
     releaseGlobalTaskGroup();
     releaseScheduler();
-    SpotAgent::release();
+    releaseGlobalSpotAgent();
 
     StockManager::quit();
     DataDriverFactory::release();
