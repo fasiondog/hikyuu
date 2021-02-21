@@ -21,8 +21,20 @@ public:
         this->get_override("init")();
     }
 
-    void on_spot() override {
-        this->get_override("on_spot")();
+    void onTick() override {
+        if (override func = this->get_override("on_tick")) {
+            func();
+        } else {
+            this->StrategyBase::onTick();
+        }
+    }
+
+    void default_onTick() {
+        this->StrategyBase::onTick();
+    }
+
+    void onBar(const KQuery::KType& ktype) override {
+        this->get_override("on_bar")(ktype);
     }
 };
 
@@ -61,6 +73,7 @@ void export_Strategy() {
       .add_property("name",
                     make_function(strategy_get_name, return_value_policy<copy_const_reference>()),
                     strategy_set_name)
+      .add_property("tm", &StrategyBase::getTM, &StrategyBase::setTM, "账户管理")
       .add_property("start_datetime", get_start_datetime, set_start_datetime, "起始日期")
       .add_property(
         "stock_list",
@@ -73,5 +86,6 @@ void export_Strategy() {
 
       .def("run", &StrategyBase::run)
       .def("init", pure_virtual(&StrategyBase::init))
-      .def("on_spot", pure_virtual(&StrategyBase::on_spot));
+      .def("on_tick", &StrategyBase::onTick, &StrategyBaseWrap::default_onTick)
+      .def("on_bar", pure_virtual(&StrategyBase::onBar));
 }

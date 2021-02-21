@@ -6,12 +6,22 @@
  */
 
 #include <csignal>
+#include <unordered_set>
 #include "../utilities/os.h"
 #include "../utilities/IniParser.h"
-#include "../agent/SpotAgent.h"
+#include "../global/GlobalSpotAgent.h"
+#include "../global/schedule/scheduler.h"
 #include "StrategyBase.h"
 
 namespace hku {
+
+std::atomic_bool StrategyBase::ms_keep_running = true;
+
+void StrategyBase::sig_handler(int sig) {
+    if (sig == SIGINT) {
+        ms_keep_running = false;
+    }
+}
 
 StrategyBase::StrategyBase() : StrategyBase("Strategy") {}
 
@@ -28,14 +38,8 @@ StrategyBase::StrategyBase(const string& name) {
 StrategyBase::StrategyBase(const string& name, const string& config_file)
 : m_name(name), m_config_file(config_file) {}
 
-StrategyBase::~StrategyBase() {}
-
-static bool g_stratege_keep_running = true;
-
-static void sig_handler(int sig) {
-    if (sig == SIGINT) {
-        g_stratege_keep_running = false;
-    }
+StrategyBase::~StrategyBase() {
+    HKU_INFO("Quit Strategy {}", m_name);
 }
 
 void StrategyBase::run() {
@@ -111,12 +115,34 @@ void StrategyBase::run() {
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, m_context);
 
     // 启动行情接收代理
-    auto& agent = SpotAgent::instance();
-    agent.addPostProcess([this]() { this->on_bar(); });
+    auto& agent = *getGlobalSpotAgent();
+    agent.addPostProcess([this]() { this->onSpot(); });
     startSpotAgent(true);
 
-    while (g_stratege_keep_running) {
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+    _startEventLoop();
+}
+
+void StrategyBase::onSpot() {
+    event([this]() { this->onTick(); });
+
+    const auto& ktype_list = getKTypeList();
+    for (const auto& ktype : ktype_list) {
+        event([this, ktype]() { this->onBar(ktype); });
+    }
+}
+
+/*
+ * 在主线程中处理事件队列，避免 python GIL
+ */
+void StrategyBase::_startEventLoop() {
+    while (ms_keep_running) {
+        event_type task;
+        m_event_queue.wait_and_pop(task);
+        if (task.isNullTask()) {
+            ms_keep_running = false;
+        } else {
+            task();
+        }
     }
 }
 
