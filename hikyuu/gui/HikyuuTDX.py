@@ -717,14 +717,14 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
         config = self.getCurrentConfig()
-        dest_dir = config.get('hdf5', 'dir')
-        if not os.path.exists(dest_dir) or not os.path.isdir(dest_dir):
+        if config.getboolean('hdf5', 'enable') \
+            and (not os.path.exists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
             QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
             return
 
         if config.getboolean('tdx', 'enable') \
-            and (not os.path.exists(config['tdx']['dir']
-                 or os.path.isdir(config['tdx']['dir']))):
+            and (not os.path.exists(config['tdx']['dir'])
+                 or os.path.isdir(config['tdx']['dir'])):
             QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
             return
 

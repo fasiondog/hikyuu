@@ -22,6 +22,8 @@ const int SpotAgent::ms_spotTopicLength = strlen(SpotAgent::ms_spotTopic);
 const int SpotAgent::ms_startTagLength = strlen(SpotAgent::ms_startTag);
 const int SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
+Datetime SpotAgent::ms_start_rev_time;
+
 SpotAgent::~SpotAgent() {
     stop();
 }
@@ -161,6 +163,7 @@ void SpotAgent::work_thread() {
             switch (m_status) {
                 case WAITING:
                     if (memcmp(buf, ms_startTag, ms_startTagLength) == 0) {
+                        ms_start_rev_time = Datetime::now();
                         m_status = RECEIVING;
                     }
                     break;
@@ -174,7 +177,7 @@ void SpotAgent::work_thread() {
                         m_batch_count = 0;
                         // 执行后处理
                         for (auto& postProcess : m_postProcessList) {
-                            postProcess();
+                            postProcess(ms_start_rev_time);
                         }
                         m_process_task_list.clear();
                     } else {
@@ -202,7 +205,7 @@ void SpotAgent::addProcess(std::function<void(const SpotRecord&)> process) {
     m_processList.push_back(process);
 }
 
-void SpotAgent::addPostProcess(std::function<void()> func) {
+void SpotAgent::addPostProcess(std::function<void(Datetime)> func) {
     HKU_CHECK(m_stop, "SpotAgent is running, please stop agent first!");
     m_postProcessList.push_back(func);
 }

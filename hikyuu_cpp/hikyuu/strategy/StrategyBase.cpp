@@ -116,13 +116,13 @@ void StrategyBase::run() {
 
     // 启动行情接收代理
     auto& agent = *getGlobalSpotAgent();
-    agent.addPostProcess([this]() { this->onSpot(); });
+    agent.addPostProcess([this](Datetime revTime) { this->receivedSpot(revTime); });
     startSpotAgent(true);
 
     _startEventLoop();
 }
 
-void StrategyBase::onSpot() {
+void StrategyBase::receivedSpot(Datetime revTime) {
     event([this]() { this->onTick(); });
 
     const auto& ktype_list = getKTypeList();

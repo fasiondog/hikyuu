@@ -295,4 +295,13 @@ inline bool Stock::operator==(const Stock& stock) const {
 
 }  // namespace hku
 
+namespace std {
+template <>
+struct std::hash<hku::Stock> {
+    std::size_t operator()(hku::Stock const& stk) const noexcept {
+        return stk.id();  // or use boost::hash_combine
+    }
+};
+}  // namespace std
+
 #endif /* STOCK_H_ */

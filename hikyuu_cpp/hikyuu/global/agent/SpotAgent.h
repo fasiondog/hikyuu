@@ -88,11 +88,12 @@ public:
     void addProcess(std::function<void(const SpotRecord&)> process);
 
     /**
-     * 在接受某时刻全部批次的数据后，进行相应的后处理函数
+     * 在接受某时刻全部批次的数据后，进行相应的后处理函数,
+     * 传入的日期时间为接收到数据的时刻（非数据处理完毕的时间）
      * @note 仅能在停止状态时执行此操作，否则将抛出异常
      * @param func 后处理函数
      */
-    void addPostProcess(std::function<void()> func);
+    void addPostProcess(std::function<void(Datetime)> func);
 
     /**
      * 清除之前增加的所有处理函数
@@ -115,6 +116,8 @@ private:
     static const int ms_endTagLength;     // 批次数据接收结束标记长度
     static const int ms_spotTopicLength;  // 订阅主题标记长度
 
+    static Datetime ms_start_rev_time;  // 批次数据接收开始时间
+
 private:
     SpotAgent(const SpotAgent&) = delete;
     SpotAgent(SpotAgent&&) = delete;
@@ -136,7 +139,7 @@ private:
     std::thread m_receiveThread;  // 数据接收线程
     ThreadPool m_tg;              // 数据处理任务线程池
     list<std::function<void(const SpotRecord&)>> m_processList;  // 已注册的 spot 处理函数列表
-    list<std::function<void()>> m_postProcessList;  // 已注册的批次后处理函数列表
+    list<std::function<void(Datetime)>> m_postProcessList;  // 已注册的批次后处理函数列表
     vector<std::future<void>> m_process_task_list;
 };
 

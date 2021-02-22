@@ -81,11 +81,11 @@ public:
 
     void run();
 
-    void onSpot();
+    void receivedSpot(Datetime revTime);
 
-    virtual void init() = 0;
+    virtual void init() {}
     virtual void onTick() {}
-    virtual void onBar(const KQuery::KType& ktype) = 0;
+    virtual void onBar(const KQuery::KType& ktype){};
 
 private:
     string m_name;

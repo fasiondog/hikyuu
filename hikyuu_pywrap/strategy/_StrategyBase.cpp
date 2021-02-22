@@ -18,7 +18,15 @@ public:
     virtual ~StrategyBaseWrap() {}
 
     void init() override {
-        this->get_override("init")();
+        if (override func = this->get_override("init")) {
+            func();
+        } else {
+            this->StrategyBase::init();
+        }
+    }
+
+    void default_init() {
+        this->StrategyBase::init();
     }
 
     void onTick() override {
@@ -34,7 +42,15 @@ public:
     }
 
     void onBar(const KQuery::KType& ktype) override {
-        this->get_override("on_bar")(ktype);
+        if (override func = this->get_override("on_bar")) {
+            func(ktype);
+        } else {
+            this->StrategyBase::onBar(ktype);
+        }
+    }
+
+    void default_onBar(const KQuery::KType& ktype) {
+        this->StrategyBase::onBar(ktype);
     }
 };
 
@@ -85,7 +101,7 @@ void export_Strategy() {
         setKTypeList, "需要的K线类型")
 
       .def("run", &StrategyBase::run)
-      .def("init", pure_virtual(&StrategyBase::init))
+      .def("init", &StrategyBase::init, &StrategyBaseWrap::default_init)
       .def("on_tick", &StrategyBase::onTick, &StrategyBaseWrap::default_onTick)
-      .def("on_bar", pure_virtual(&StrategyBase::onBar));
+      .def("on_bar", &StrategyBase::onBar, &StrategyBaseWrap::default_onBar);
 }
