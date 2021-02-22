@@ -13,6 +13,7 @@
 #include "../utilities/Parameter.h"
 #include "../utilities/thread/FuncWrapper.h"
 #include "../utilities/thread/ThreadSafeQueue.h"
+#include "../global/GlobalSpotAgent.h"
 #include "../trade_sys/portfolio/Portfolio.h"
 
 namespace hku {
@@ -81,7 +82,8 @@ public:
 
     void run();
 
-    void receivedSpot(Datetime revTime);
+    void receivedSpot(const SpotRecord& spot);
+    void finishReceivedSpot(Datetime revTime);
 
     virtual void init() {}
     virtual void onTick() {}
@@ -92,6 +94,8 @@ private:
     string m_config_file;
     StrategyContext m_context;
     TMPtr m_tm;
+
+    std::unordered_map<Stock, SpotRecord> m_spot_map;
 
 private:
     static std::atomic_bool ms_keep_running;

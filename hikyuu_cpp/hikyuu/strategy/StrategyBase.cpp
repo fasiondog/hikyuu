@@ -9,7 +9,6 @@
 #include <unordered_set>
 #include "../utilities/os.h"
 #include "../utilities/IniParser.h"
-#include "../global/GlobalSpotAgent.h"
 #include "../global/schedule/scheduler.h"
 #include "StrategyBase.h"
 
@@ -116,13 +115,21 @@ void StrategyBase::run() {
 
     // 启动行情接收代理
     auto& agent = *getGlobalSpotAgent();
-    agent.addPostProcess([this](Datetime revTime) { this->receivedSpot(revTime); });
+    agent.addProcess([this](const SpotRecord& spot) { this->receivedSpot(spot); });
+    agent.addPostProcess([this](Datetime revTime) { this->finishReceivedSpot(revTime); });
     startSpotAgent(true);
 
     _startEventLoop();
 }
 
-void StrategyBase::receivedSpot(Datetime revTime) {
+void StrategyBase::receivedSpot(const SpotRecord& spot) {
+    Stock stk = getStock(format("{}{}", spot.market, spot.code));
+    if (!stk.isNull()) {
+        m_spot_map[stk] = spot;
+    }
+}
+
+void StrategyBase::finishReceivedSpot(Datetime revTime) {
     event([this]() { this->onTick(); });
 
     const auto& ktype_list = getKTypeList();
