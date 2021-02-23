@@ -95,6 +95,8 @@ private:
     StrategyContext m_context;
     TMPtr m_tm;
 
+    StockList m_stock_list;
+    std::unordered_map<KQuery::KType, Datetime> m_ref_last_time;
     std::unordered_map<Stock, SpotRecord> m_spot_map;
 
 private:

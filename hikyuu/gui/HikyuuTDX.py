@@ -776,6 +776,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
                 self.collect_spot_thread.terminate()
                 self.collect_spot_thread.wait()
+                self.collect_spot_thread = None
             self._is_collect_running = False
             self.logger.info("停止采集")
             self.collect_status_label.setText("已停止")
