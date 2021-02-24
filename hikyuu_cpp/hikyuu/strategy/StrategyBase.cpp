@@ -130,10 +130,11 @@ void StrategyBase::run() {
     if (m_stock_list.size() > 0) {
         Stock& ref_stk = m_stock_list[0];
         for (auto& ktype : ktype_list) {
-            size_t count = ref_stk.getCount(ktype);
+            // 由于异步初始化，此处不用通过先getCount再getKRecord的方式获取最后的KRecord
+            KRecordList klist = ref_stk.getKRecordList(KQueryByIndex(0, Null<int64_t>(), ktype));
+            size_t count = klist.size();
             if (count > 0) {
-                KRecord k = ref_stk.getKRecord(count - 1, ktype);
-                m_ref_last_time[ktype] = k.datetime;
+                m_ref_last_time[ktype] = klist[count - 1].datetime;
             } else {
                 m_ref_last_time[ktype] = Null<Datetime>();
             }
