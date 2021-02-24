@@ -124,7 +124,7 @@ public:
 
             // 清除已无效的 timer
             for (auto id : invalid_timers) {
-                removeTimer(id);
+                _removeTimer(id);
             }
 
             lock.unlock();
@@ -162,10 +162,11 @@ public:
      * @param delay 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
+     * @return timer id
      */
     template <typename F, typename... Args>
-    void addFunc(Datetime start_date, Datetime end_date, TimeDelta start_time, TimeDelta end_time,
-                 int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
+    int addFunc(Datetime start_date, Datetime end_date, TimeDelta start_time, TimeDelta end_time,
+                int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
         HKU_CHECK(!start_date.isNull(), "Invalid start_date!");
         HKU_CHECK(!end_date.isNull(), "Invalid end_date!");
         Datetime start = start_date.startOfDay();
@@ -191,15 +192,15 @@ public:
      * @param delay 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
-     * @return true 成功 | false 失败
+     * @return timer id
      */
     template <typename F, typename... Args>
-    void addDurationFunc(int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
+    int addDurationFunc(int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
         HKU_CHECK(repeat_num > 0, "Invalid repeat_num: {}, must > 0", repeat_num);
         HKU_CHECK(duration > TimeDelta(), "Invalid duration: {}, must > TimeDelta(0)!",
                   duration.repr());
-        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(), TimeDelta(), repeat_num, duration,
-                 std::forward<F>(f), std::forward<Args>(args)...);
+        return _addFunc(Datetime::min(), Datetime::max(), TimeDelta(), TimeDelta(), repeat_num,
+                        duration, std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     /**
@@ -209,12 +210,13 @@ public:
      * @param delay 延迟时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
+     * @return timer id
      */
     template <typename F, typename... Args>
-    void addDelayFunc(TimeDelta delay, F&& f, Args&&... args) {
+    int addDelayFunc(TimeDelta delay, F&& f, Args&&... args) {
         HKU_CHECK(delay > TimeDelta(), "Invalid delay: {}, must > TimeDelta(0)!", delay);
-        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(), TimeDelta(), 1, delay,
-                 std::forward<F>(f), std::forward<Args>(args)...);
+        return _addFunc(Datetime::min(), Datetime::max(), TimeDelta(), TimeDelta(), 1, delay,
+                        std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     /**
@@ -222,15 +224,16 @@ public:
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param time_point 指定的运行时刻（包含具体的日、时、分、秒...）
+     * @return timer id
      */
     template <typename F, typename... Args>
-    void addFuncAtTime(Datetime time_point, F&& f, Args&&... args) {
+    int addFuncAtTime(Datetime time_point, F&& f, Args&&... args) {
         Datetime now = Datetime::now();
         HKU_CHECK(time_point > now, "You want run at {}, but now is {}", time_point, now);
         Datetime point_date = time_point.startOfDay();
         TimeDelta point = time_point - point_date;
-        _addFunc(time_point.startOfDay(), Datetime::max(), TimeDelta(-1), point, 1, TimeDelta(),
-                 std::forward<F>(f), std::forward<Args>(args)...);
+        return _addFunc(time_point.startOfDay(), Datetime::max(), TimeDelta(-1), point, 1,
+                        TimeDelta(), std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     /**
@@ -240,10 +243,11 @@ public:
      * @param start_date 允许执行的开始日期
      * @param end_date 允许执行的结束日期
      * @param time 指定运行的日内时刻
+     * @return timer id
      */
     template <typename F, typename... Args>
-    void addFuncAtTimeEveryDay(Datetime start_date, Datetime end_date, TimeDelta time, F&& f,
-                               Args&&... args) {
+    int addFuncAtTimeEveryDay(Datetime start_date, Datetime end_date, TimeDelta time, F&& f,
+                              Args&&... args) {
         HKU_CHECK(!start_date.isNull() && !end_date.isNull(),
                   "Invalid start_date({}) or end_date({})!", start_date, end_date);
         HKU_CHECK(time >= TimeDelta() && time <= TimeDelta(0, 23, 59, 59, 999, 999),
@@ -251,9 +255,9 @@ public:
         Datetime start = start_date.startOfDay();
         Datetime end = end_date.startOfDay();
         HKU_CHECK(end >= start, "Invalid range of date! ({} - {})", start, end);
-        _addFunc(Datetime::min(), Datetime::max(), TimeDelta(-1), time,
-                 std::numeric_limits<int>::max(), TimeDelta(), std::forward<F>(f),
-                 std::forward<Args>(args)...);
+        return _addFunc(Datetime::min(), Datetime::max(), TimeDelta(-1), time,
+                        std::numeric_limits<int>::max(), TimeDelta(), std::forward<F>(f),
+                        std::forward<Args>(args)...);
     }
 
     /**
@@ -261,15 +265,28 @@ public:
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param time 指定运行的日内时刻
+     * @return timer id
      */
     template <typename F, typename... Args>
-    void addFuncAtTimeEveryDay(TimeDelta time, F&& f, Args&&... args) {
-        addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), time, std::forward<F>(f),
-                              std::forward<Args>(args)...);
+    int addFuncAtTimeEveryDay(TimeDelta time, F&& f, Args&&... args) {
+        return addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), time, std::forward<F>(f),
+                                     std::forward<Args>(args)...);
+    }
+
+    /**
+     * 移除定时任务
+     * @param timerid 定时器id
+     */
+    void removeTimer(int timerid) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        auto iter = m_timers.find(timerid);
+        if (iter != m_timers.end()) {
+            iter->second->m_repeat_num = 0;
+        }
     }
 
 private:
-    void removeTimer(int id) {
+    void _removeTimer(int id) {
         delete m_timers[id];
         m_timers.erase(id);
     }
@@ -308,7 +325,7 @@ private:
             }
 
             if (timer->m_repeat_num <= 0) {
-                removeTimer(s.m_timer_id);
+                _removeTimer(s.m_timer_id);
                 continue;
             }
 
@@ -317,7 +334,7 @@ private:
                                                                 : s.m_time_point + TimeDelta(1);
             if (timer->m_end_date != Datetime::max() &&
                 s.m_time_point > timer->m_end_date + timer->m_end_time) {
-                removeTimer(s.m_timer_id);
+                _removeTimer(s.m_timer_id);
                 continue;
             }
 
@@ -384,8 +401,8 @@ private:
     };
 
     template <typename F, typename... Args>
-    void _addFunc(Datetime start_date, Datetime end_date, TimeDelta start_time, TimeDelta end_time,
-                  int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
+    int _addFunc(Datetime start_date, Datetime end_date, TimeDelta start_time, TimeDelta end_time,
+                 int repeat_num, TimeDelta duration, F&& f, Args&&... args) {
         Datetime now = Datetime::now();
         Datetime today = now.startOfDay();
         HKU_CHECK(end_date >= today, "Invalid end_date {}, because today is {}", end_date, today);
@@ -453,6 +470,7 @@ private:
         m_queue.push(s);
         lock.unlock();
         m_cond.notify_all();
+        return id;
     }
 
 private:
