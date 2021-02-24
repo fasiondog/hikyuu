@@ -19,6 +19,7 @@ std::atomic_bool StrategyBase::ms_keep_running = true;
 void StrategyBase::sig_handler(int sig) {
     if (sig == SIGINT) {
         ms_keep_running = false;
+        exit(0);
     }
 }
 
@@ -147,6 +148,8 @@ void StrategyBase::run() {
     agent.addPostProcess([this](Datetime revTime) { this->finishReceivedSpot(revTime); });
     startSpotAgent(false);
 
+    _addTimer();
+
     _startEventLoop();
 }
 
@@ -172,6 +175,39 @@ void StrategyBase::finishReceivedSpot(Datetime revTime) {
                 event([this, ktype]() { this->onBar(ktype); });
             }
         }
+    }
+}
+
+void StrategyBase::_addTimer() {
+    std::unordered_set<string> market_set;
+    for (auto& stk : m_stock_list) {
+        market_set.insert(stk.market());
+    }
+
+    auto& sm = StockManager::instance();
+    TimeDelta openTime(0, 23, 59, 59, 999, 999), closeTime(0);
+    for (auto& market : market_set) {
+        auto market_info = sm.getMarketInfo(market);
+        if (market_info.openTime1() < market_info.closeTime1()) {
+            if (market_info.openTime1() < openTime) {
+                openTime = market_info.openTime1();
+            }
+            if (market_info.closeTime1() > closeTime) {
+                closeTime = market_info.closeTime1();
+            }
+        }
+        if (market_info.openTime2() < market_info.closeTime2()) {
+            if (market_info.openTime2() < openTime) {
+                openTime = market_info.openTime2();
+            }
+            if (market_info.closeTime2() > closeTime) {
+                closeTime = market_info.closeTime2();
+            }
+        }
+    }
+
+    if (openTime < closeTime) {
+        HKU_INFO("open: {}, close: {}", openTime, closeTime);
     }
 }
 

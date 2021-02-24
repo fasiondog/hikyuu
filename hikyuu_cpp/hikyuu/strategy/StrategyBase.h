@@ -100,6 +100,9 @@ private:
     std::unordered_map<Stock, SpotRecord> m_spot_map;
 
 private:
+    void _addTimer();
+
+private:
     static std::atomic_bool ms_keep_running;
     static void sig_handler(int sig);
 
