@@ -180,8 +180,8 @@ public:
                   start_time);
         HKU_CHECK(repeat_num > 0, "Invalid repeat_num: {}", repeat_num);
         HKU_CHECK(duration > TimeDelta(0), "Invalid duration: {}", duration.repr());
-        _addFunc(start, end, start_time, end_time, repeat_num, duration, std::forward<F>(f),
-                 std::forward<Args>(args)...);
+        return _addFunc(start, end, start_time, end_time, repeat_num, duration, std::forward<F>(f),
+                        std::forward<Args>(args)...);
     }
 
     /**
@@ -261,7 +261,7 @@ public:
     }
 
     /**
-     * 在指定时刻执行任务（只执行一次）, 添加失败时抛出异常
+     * 每日在指定时刻执行任务, 添加失败时抛出异常
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param time 指定运行的日内时刻

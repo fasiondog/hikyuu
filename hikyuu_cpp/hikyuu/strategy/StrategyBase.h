@@ -89,6 +89,10 @@ public:
     virtual void onTick() {}
     virtual void onBar(const KQuery::KType& ktype){};
 
+    virtual void onMarketOpen() {}
+    virtual void onMarketClose() {}
+    virtual void onClock(TimeDelta detla) {}
+
 private:
     string m_name;
     string m_config_file;
@@ -100,7 +104,11 @@ private:
     std::unordered_map<Stock, SpotRecord> m_spot_map;
 
 private:
+    void _initDefaultParam();
+
     void _addTimer();
+    void _addClockEvent(const string& enable, TimeDelta delta, TimeDelta openTime,
+                        TimeDelta closeTime);
 
 private:
     static std::atomic_bool ms_keep_running;

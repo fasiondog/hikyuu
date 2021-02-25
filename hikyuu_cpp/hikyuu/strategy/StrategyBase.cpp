@@ -33,13 +33,28 @@ StrategyBase::StrategyBase(const string& name) {
 #else
     m_config_file = format("{}/{}", home, ".hikyuu/hikyuu.ini");
 #endif
+    _initDefaultParam();
 }
 
 StrategyBase::StrategyBase(const string& name, const string& config_file)
-: m_name(name), m_config_file(config_file) {}
+: m_name(name), m_config_file(config_file) {
+    _initDefaultParam();
+}
 
 StrategyBase::~StrategyBase() {
     HKU_INFO("[Strategy {}] Quit Strategy!", m_name);
+}
+
+void StrategyBase::_initDefaultParam() {
+    setParam<bool>("enable_market_event", false);
+    setParam<bool>("enable_30_seconds_clock", false);
+    setParam<bool>("enable_1min_clock", false);
+    setParam<bool>("enable_3min_clock", false);
+    setParam<bool>("enable_5min_clock", false);
+    setParam<bool>("enable_10min_clock", false);
+    setParam<bool>("enable_15min_clock", false);
+    setParam<bool>("enable_30min_clock", false);
+    setParam<bool>("enable_60min_clock", false);
 }
 
 void StrategyBase::run() {
@@ -206,8 +221,34 @@ void StrategyBase::_addTimer() {
         }
     }
 
-    if (openTime < closeTime) {
-        HKU_INFO("open: {}, close: {}", openTime, closeTime);
+    HKU_ERROR_IF_RETURN(openTime >= closeTime, void(), "Invalid market openTime: {}, closeTime: {}",
+                        openTime, closeTime);
+
+    auto* scheduler = getScheduler();
+    if (getParam<bool>("enable_market_event")) {
+        scheduler->addFuncAtTimeEveryDay(
+          openTime, [this]() { this->event([this]() { this->onMarketOpen(); }); });
+        scheduler->addFuncAtTimeEveryDay(
+          closeTime, [this]() { this->event([this]() { this->onMarketClose(); }); });
+    }
+
+    _addClockEvent("enable_30_seconds_clock", Seconds(30), openTime, closeTime);
+    _addClockEvent("enable_1min_clock", Minutes(1), openTime, closeTime);
+    _addClockEvent("enable_3min_clock", Minutes(3), openTime, closeTime);
+    _addClockEvent("enable_5min_clock", Minutes(5), openTime, closeTime);
+    _addClockEvent("enable_10min_clock", Minutes(10), openTime, closeTime);
+    _addClockEvent("enable_15min_clock", Minutes(15), openTime, closeTime);
+    _addClockEvent("enable_30min_clock", Minutes(30), openTime, closeTime);
+    _addClockEvent("enable_60min_clock", Minutes(60), openTime, closeTime);
+}
+
+void StrategyBase::_addClockEvent(const string& enable, TimeDelta delta, TimeDelta openTime,
+                                  TimeDelta closeTime) {
+    auto* scheduler = getScheduler();
+    if (getParam<bool>(enable)) {
+        int repeat = static_cast<int>((closeTime - openTime) / delta);
+        scheduler->addFunc(Datetime::min(), Datetime::max(), openTime, closeTime, repeat, delta,
+                           [this, delta]() { [this, delta]() { this->onClock(delta); }; });
     }
 }
 

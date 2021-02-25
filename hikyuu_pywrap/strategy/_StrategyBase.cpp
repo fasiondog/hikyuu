@@ -52,6 +52,42 @@ public:
     void default_onBar(const KQuery::KType& ktype) {
         this->StrategyBase::onBar(ktype);
     }
+
+    void onMarketOpen() override {
+        if (override func = this->get_override("on_market_open")) {
+            func();
+        } else {
+            this->StrategyBase::onMarketOpen();
+        }
+    }
+
+    void default_onMarketOpen() {
+        this->StrategyBase::onMarketOpen();
+    }
+
+    void onMarketClose() override {
+        if (override func = this->get_override("on_market_close")) {
+            func();
+        } else {
+            this->StrategyBase::onMarketClose();
+        }
+    }
+
+    void default_onMarketClose() {
+        this->StrategyBase::onMarketClose();
+    }
+
+    void onClock(TimeDelta delta) override {
+        if (override func = this->get_override("on_clock")) {
+            func(delta);
+        } else {
+            this->StrategyBase::onClock(delta);
+        }
+    }
+
+    void default_onClock(TimeDelta delta) {
+        this->StrategyBase::onClock(delta);
+    }
 };
 
 const string& (StrategyBase::*strategy_get_name)() const = &StrategyBase::name;
@@ -103,5 +139,9 @@ void export_Strategy() {
       .def("run", &StrategyBase::run)
       .def("init", &StrategyBase::init, &StrategyBaseWrap::default_init)
       .def("on_tick", &StrategyBase::onTick, &StrategyBaseWrap::default_onTick)
-      .def("on_bar", &StrategyBase::onBar, &StrategyBaseWrap::default_onBar);
+      .def("on_bar", &StrategyBase::onBar, &StrategyBaseWrap::default_onBar)
+      .def("on_market_open", &StrategyBase::onMarketOpen, &StrategyBaseWrap::default_onMarketOpen)
+      .def("on_market_close", &StrategyBase::onMarketClose,
+           &StrategyBaseWrap::default_onMarketClose)
+      .def("on_clock", &StrategyBase::onClock, &StrategyBaseWrap::default_onClock);
 }
