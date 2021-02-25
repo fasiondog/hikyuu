@@ -65,38 +65,38 @@ class UseTdxImportToH5Thread(QThread):
         self.queue = Queue()
         self.tasks = []
         if self.config.getboolean('weight', 'enable', fallback=False):
-            self.tasks.append(ImportWeightToSqliteTask(self.queue, sqlite_file_name, dest_dir))
+            self.tasks.append(ImportWeightToSqliteTask(self.queue, self.config, dest_dir))
         if self.config.getboolean('ktype', 'day', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, sqlite_file_name, 'SH', 'DAY', self.quotations, src_dir, dest_dir
+                    self.queue, config, 'SH', 'DAY', self.quotations, src_dir, dest_dir
                 )
             )
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, sqlite_file_name, 'SZ', 'DAY', self.quotations, src_dir, dest_dir
+                    self.queue, config, 'SZ', 'DAY', self.quotations, src_dir, dest_dir
                 )
             )
         if self.config.getboolean('ktype', 'min5', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, sqlite_file_name, 'SH', '5MIN', self.quotations, src_dir, dest_dir
+                    self.queue, config, 'SH', '5MIN', self.quotations, src_dir, dest_dir
                 )
             )
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, sqlite_file_name, 'SZ', '5MIN', self.quotations, src_dir, dest_dir
+                    self.queue, config, 'SZ', '5MIN', self.quotations, src_dir, dest_dir
                 )
             )
         if self.config.getboolean('ktype', 'min', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, sqlite_file_name, 'SH', '1MIN', self.quotations, src_dir, dest_dir
+                    self.queue, config, 'SH', '1MIN', self.quotations, src_dir, dest_dir
                 )
             )
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, sqlite_file_name, 'SZ', '1MIN', self.quotations, src_dir, dest_dir
+                    self.queue, config, 'SZ', '1MIN', self.quotations, src_dir, dest_dir
                 )
             )
 
@@ -177,6 +177,3 @@ class UseTdxImportToH5Thread(QThread):
                 self.send_message(['IMPORT_KDATA', ktype, current_progress])
             else:
                 self.logger.error("Unknow task: {}".format(taskname))
-
-
-class_logger(UseTdxImportToH5Thread)

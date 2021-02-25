@@ -18,6 +18,7 @@ from mysql.connector.locales.eng import client_error  #此句仅为pyinstaller�
 from hikyuu.gui.data.MainWindow import *
 from hikyuu.gui.data.EscapetimeThread import EscapetimeThread
 from hikyuu.gui.data.UseTdxImportToH5Thread import UseTdxImportToH5Thread
+from hikyuu.gui.data.ImportTdxToH5Task import ImportTdxToH5Task
 from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 #from hikyuu.gui.data.CollectToMySQLThread import CollectToMySQLThread
 #from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
@@ -218,6 +219,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread, 
                 UsePytdxImportToH5Thread,
                 UseTdxImportToH5Thread,
+                ImportTdxToH5Task,
                 SchedImportThread
             ],
             logging.INFO
@@ -718,13 +720,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_start_import_pushButton_clicked(self):
         config = self.getCurrentConfig()
         if config.getboolean('hdf5', 'enable') \
-            and (not os.path.exists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
+            and (not os.path.lexists(config['hdf5']['dir']) or not os.path.isdir(config['hdf5']['dir'])):
             QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
             return
 
         if config.getboolean('tdx', 'enable') \
-            and (not os.path.exists(config['tdx']['dir'])
-                 or os.path.isdir(config['tdx']['dir'])):
+            and (not os.path.lexists(config['tdx']['dir'])
+                 or not os.path.isdir(config['tdx']['dir'])):
             QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
             return
 
