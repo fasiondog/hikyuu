@@ -4,7 +4,7 @@
 #include <hikyuu/hikyuu.h>
 #include <thread>
 #include <chrono>
-#include <hikyuu/agent/SpotAgent.h>
+#include <hikyuu/global/GlobalSpotAgent.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -15,6 +15,7 @@ using namespace hku;
 int main(int argc, char* argv[]) {
 #if defined(_WIN32)
     // Windows 下设置控制台程序输出代码页为 UTF8
+    auto old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
@@ -38,5 +39,7 @@ int main(int argc, char* argv[]) {
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+
+    SetConsoleOutputCP(old_cp);
     return 0;
 }
