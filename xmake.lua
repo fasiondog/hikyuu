@@ -4,7 +4,7 @@ set_xmakever("2.2.5")
 set_project("hikyuu")
 
 -- version
-set_version("1.1.7", {build="%Y%m%d%H%M"})
+set_version("1.1.8", {build="%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
 --if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
@@ -108,6 +108,7 @@ add_subdirs("./hikyuu_cpp/hikyuu")
 add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")
 add_subdirs("./hikyuu_cpp/demo")
+add_subdirs("./hikyuu_cpp/hikyuu_server")
 
 before_install("scripts.before_install")
 on_install("scripts.on_install")
