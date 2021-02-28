@@ -32,13 +32,14 @@ public:
     /**
      * 默认构造函数，创建和当前系统CPU数一致的线程数
      */
-    ThreadPool() : ThreadPool(std::thread::hardware_concurrency()) {}
+    ThreadPool() : ThreadPool(std::thread::hardware_concurrency(), true) {}
 
     /**
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
      */
-    explicit ThreadPool(size_t n) : m_done(false), m_worker_num(n) {
+    explicit ThreadPool(size_t n, bool util_empty = true)
+    : m_done(false), m_worker_num(n), m_runnging_util_empty(util_empty) {
         try {
             for (size_t i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
@@ -116,8 +117,10 @@ public:
      */
     void join() {
         // 指示各工作线程在未获取到工作任务时，停止运行
-        for (size_t i = 0; i < m_worker_num; i++) {
-            m_master_work_queue.push(std::move(FuncWrapper()));
+        if (m_runnging_util_empty) {
+            for (size_t i = 0; i < m_worker_num; i++) {
+                m_master_work_queue.push(std::move(FuncWrapper()));
+            }
         }
 
         // 等待线程结束
@@ -132,8 +135,9 @@ public:
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;  // 线程池全局需终止指示
-    size_t m_worker_num;      // 工作线程数量
+    std::atomic_bool m_done;     // 线程池全局需终止指示
+    size_t m_worker_num;         // 工作线程数量
+    bool m_runnging_util_empty;  // 运行直到队列空时停止
 
     ThreadSafeQueue<task_type> m_master_work_queue;  // 主线程任务队列
     std::vector<std::thread> m_threads;              // 工作线程

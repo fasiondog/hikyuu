@@ -13,6 +13,8 @@
 
 #include "http/HttpServer.h"
 
+#include "rest_api/hello.h"
+
 using namespace hku;
 
 int main(int argc, char* argv[]) {
@@ -23,6 +25,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     HttpServer server("http://*", 8080);
+    server.GET("hello", hello_handle);
     server.start();
 
     SetConsoleOutputCP(old_cp);
