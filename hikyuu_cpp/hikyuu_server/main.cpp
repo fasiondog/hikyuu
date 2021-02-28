@@ -25,9 +25,11 @@ int main(int argc, char* argv[]) {
 #endif
 
     HttpServer server("http://*", 8080);
-    server.GET("hello", hello_handle);
+    server.GET<HelloHandle>("/hello");
     server.start();
 
+#if defined(_WIN32)
     SetConsoleOutputCP(old_cp);
+#endif
     return 0;
 }

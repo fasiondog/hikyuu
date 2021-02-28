@@ -10,21 +10,33 @@
 
 namespace hku {
 
+#define HTTP_FATAL_CHECK(rv, msg)                                        \
+    {                                                                    \
+        if (rv != 0) {                                                   \
+            HKU_FATAL("[HTTP_FATAL] {} err: {}", msg, nng_strerror(rv)); \
+            http_exit();                                                 \
+        }                                                                \
+    }
+
 nng_http_server* HttpServer::ms_server = nullptr;
-ThreadPool HttpServer::ms_tg(1, false);
+ThreadPool HttpServer::ms_tg(2 * std::thread::hardware_concurrency(), false);
+
+void HttpServer::http_exit() {
+    HKU_INFO("waiting exit ...");
+    ms_tg.stop();
+    ms_tg.join();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    if (ms_server) {
+        nng_http_server_release(ms_server);
+        nng_fini();
+        ms_server = nullptr;
+    }
+    exit(0);
+}
 
 void HttpServer::signal_handler(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
-        if (ms_server) {
-            HKU_INFO("release server");
-            if (ms_server) {
-                nng_http_server_release(ms_server);
-                ms_server = nullptr;
-            }
-        }
-        ms_tg.stop();
-        ms_tg.join();
-        exit(0);
+        http_exit();
     }
 }
 
@@ -53,6 +65,13 @@ void HttpServer::start() {
 }
 
 void HttpServer::regHandle(const char* method, const char* path, void (*rest_handle)(nng_aio*)) {
+    try {
+        HKU_CHECK(strlen(path) > 1, "Invalid api path!");
+        HKU_CHECK(path[0] == '/', "The api path must start with '/', but current is '{}'", path[0]);
+    } catch (std::exception& e) {
+        HKU_FATAL(e.what());
+        http_exit();
+    }
     nng_url* url = nullptr;
     nng_http_handler* handler = nullptr;
     HTTP_FATAL_CHECK(nng_url_parse(&url, fmt::format("{}/{}", m_root_url, path).c_str()),

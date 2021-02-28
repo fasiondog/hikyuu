@@ -7,17 +7,18 @@
 
 #pragma once
 
-#include "../http/HttpTask.h"
+#include "../http/HttpHandle.h"
 
 namespace hku {
 
-class HelloTask : public HttpTask {
+class HelloHandle : public HttpHandle {
 public:
-    HelloTask(nng_aio *aio) : HttpTask(aio) {}
-};
+    HelloHandle(nng_aio *aio) : HttpHandle(aio) {}
 
-void hello_handle(nng_aio *aio) {
-    HKU_INFO("hello");
-}
+    virtual void run() override {
+        HTTP_NNG_CHECK(nng_http_res_copy_data(m_nng_res, "hello", 5),
+                       "Failed nng_http_res_copy_data");
+    }
+};
 
 }  // namespace hku
