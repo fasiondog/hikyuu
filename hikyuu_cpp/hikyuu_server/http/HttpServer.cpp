@@ -19,12 +19,9 @@ namespace hku {
     }
 
 nng_http_server* HttpServer::ms_server = nullptr;
-ThreadPool HttpServer::ms_tg(2 * std::thread::hardware_concurrency(), false);
 
 void HttpServer::http_exit() {
-    HKU_INFO("waiting exit ...");
-    ms_tg.stop();
-    ms_tg.join();
+    HKU_INFO("waiting exit server...");
     std::this_thread::sleep_for(std::chrono::seconds(1));
     if (ms_server) {
         nng_http_server_release(ms_server);
@@ -50,7 +47,6 @@ HttpServer::HttpServer(const char* host, uint16_t port) : m_host(host), m_port(p
 }
 
 HttpServer::~HttpServer() {
-    ms_tg.join();
     if (ms_server) {
         HKU_INFO("Quit Http server");
         nng_http_server_release(ms_server);
@@ -62,6 +58,9 @@ void HttpServer::start() {
     std::signal(SIGINT, &HttpServer::signal_handler);
     std::signal(SIGTERM, &HttpServer::signal_handler);
     HTTP_FATAL_CHECK(nng_http_server_start(ms_server), "Failed nng_http_server_start!");
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 }
 
 void HttpServer::regHandle(const char* method, const char* path, void (*rest_handle)(nng_aio*)) {

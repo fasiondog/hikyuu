@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
+    HKU_INFO("start server ... You can press Ctrl-C stop");
     HttpServer server("http://*", 8080);
     server.GET<HelloHandle>("/hello");
     server.start();
