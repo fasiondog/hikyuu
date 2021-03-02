@@ -18,7 +18,7 @@ pip 安装
 
 安装：pip install hikyuu
 
-版本升级：pip install hikyuu --upgrade
+版本升级：pip install hikyuu -U
 
 .. figure:: _static/20000-install.png
 
