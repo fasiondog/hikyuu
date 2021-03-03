@@ -16,7 +16,8 @@ public:
     HelloHandle(nng_aio *aio) : HttpHandle(aio) {}
 
     virtual void run() override {
-        HTTP_NNG_CHECK(nng_http_res_copy_data(m_nng_res, "pong", 4),
+        HKU_INFO("work: {}", std::this_thread::get_id());
+        HTTP_NNG_CHECK(nng_http_res_copy_data(m_nng_res, "hello", 5),
                        "Failed nng_http_res_copy_data");
     }
 };

@@ -1,7 +1,8 @@
+
 target("hikyuu_server")
     set_kind("binary")
     
-    add_packages("fmt", "spdlog", "flatbuffers", "libhv", "nng")
+    add_packages("fmt", "spdlog", "flatbuffers", "nng", "libhv")
     add_deps("hikyuu")
 
     add_includedirs("..")
@@ -55,5 +56,6 @@ target("hikyuu_server")
     
     -- add files
     add_files("./**.cpp")
+    --add_files("./main.cpp")
     
 target_end()
