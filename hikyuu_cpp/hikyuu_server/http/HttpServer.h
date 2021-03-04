@@ -9,6 +9,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <hikyuu/utilities/thread/MQThreadPool.h>
 #include <hikyuu/utilities/thread/ThreadPool.h>
 #include <hikyuu/utilities/thread/FuncWrapper.h>
 #include "HttpHandle.h"
@@ -16,6 +17,8 @@
 namespace hku {
 
 class HttpServer {
+    CLASS_LOGGER(HttpServer)
+
 public:
     HttpServer(const char *host, uint16_t port);
     virtual ~HttpServer();
@@ -24,26 +27,17 @@ public:
 
     template <typename Handle>
     void GET(const char *path) {
-        regHandle("GET", path, [](nng_aio *aio) {
-            Handle handle(aio);
-            handle();
-        });
+        regHandle("GET", path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });
     }
 
     template <typename Handle>
     void POST(const char *path) {
-        regHandle("POST", path, [](nng_aio *aio) {
-            Handle handle(aio);
-            handle();
-        });
+        regHandle("POST", path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });
     }
 
     template <typename Handle>
     void regHandle(const char *method, const char *path) {
-        regHandle(method, path, [](nng_aio *aio) {
-            Handle handle(aio);
-            handle();
-        });
+        regHandle(method, path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });
     }
 
 private:
@@ -60,6 +54,7 @@ private:
 
 private:
     static nng_http_server *ms_server;
+    static MQThreadPool ms_tg;
 };
 
 }  // namespace hku

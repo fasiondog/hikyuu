@@ -12,7 +12,7 @@
 namespace hku {
 
 HttpHandle::HttpHandle(nng_aio* aio) : m_http_aio(aio) {
-    HKU_CHECK(m_http_aio, "Error input *aio, is null!");
+    CLS_CHECK(m_http_aio, "Error input *aio, is null!");
 }
 
 void HttpHandle::operator()() {
@@ -30,12 +30,12 @@ void HttpHandle::operator()() {
 
     } catch (std::exception& e) {
         std::string errmsg(e.what());
-        HKU_ERROR(errmsg);
+        CLS_ERROR(errmsg);
         error(errmsg);
 
     } catch (...) {
         std::string errmsg("Unknown error!");
-        HKU_ERROR(errmsg);
+        CLS_ERROR(errmsg);
         error(errmsg);
     }
 }

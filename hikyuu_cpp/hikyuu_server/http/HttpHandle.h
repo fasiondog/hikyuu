@@ -8,26 +8,29 @@
 #pragma once
 
 #include <string>
-#include <hikyuu/Log.h>
 #include <nng/nng.h>
 #include <nng/supplemental/http/http.h>
+
+#include "../common/log.h"
 
 namespace hku {
 
 #define HTTP_NNG_CHECK(rv, msg)                                          \
     {                                                                    \
         if (rv != 0) {                                                   \
-            HKU_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \
+            CLS_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \
         }                                                                \
     }
 
 class HttpHandle {
+    CLASS_LOGGER(HttpHandle)
+
 public:
     HttpHandle() = delete;
     HttpHandle(nng_aio *aio);
 
     virtual void run() {
-        HKU_WARN("Not implemented HttpHandle run method!");
+        logger()->warn("Not implemented HttpHandle run method!");
     }
 
     nng_aio *get_http_aio() const {
