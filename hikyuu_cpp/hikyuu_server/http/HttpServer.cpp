@@ -29,7 +29,7 @@ void HttpServer::http_exit() {
         nng_fini();
         ms_server = nullptr;
     }
-    ms_tg.stop();
+    // ms_tg.stop();
     exit(0);
 }
 
@@ -61,9 +61,6 @@ void HttpServer::start() {
     std::signal(SIGINT, &HttpServer::signal_handler);
     std::signal(SIGTERM, &HttpServer::signal_handler);
     HTTP_FATAL_CHECK(nng_http_server_start(ms_server), "Failed nng_http_server_start!");
-    /*for (;;) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }*/
 }
 
 void HttpServer::regHandle(const char* method, const char* path, void (*rest_handle)(nng_aio*)) {

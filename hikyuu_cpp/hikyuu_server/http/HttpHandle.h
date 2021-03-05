@@ -15,7 +15,7 @@
 
 namespace hku {
 
-#define HTTP_NNG_CHECK(rv, msg)                                          \
+#define NNG_CHECK(rv, msg)                                               \
     {                                                                    \
         if (rv != 0) {                                                   \
             CLS_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \

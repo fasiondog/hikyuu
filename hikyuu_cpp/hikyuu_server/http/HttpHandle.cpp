@@ -11,15 +11,17 @@
 
 namespace hku {
 
-HttpHandle::HttpHandle(nng_aio* aio) : m_http_aio(aio) {
-    CLS_CHECK(m_http_aio, "Error input *aio, is null!");
-}
+HttpHandle::HttpHandle(nng_aio* aio) : m_http_aio(aio) {}
 
 void HttpHandle::operator()() {
-    int rv = -1;
-    void* data = nullptr;
+    CLS_FATAL_IF_RETURN(!m_http_aio, void(), "http aio is null!");
+    int rv = nng_http_res_alloc(&m_nng_res);
+    if (rv != 0) {
+        CLS_FATAL("Failed nng_http_res_alloc! {}", nng_strerror(rv));
+        return;
+    }
+
     try {
-        HTTP_NNG_CHECK(nng_http_res_alloc(&m_nng_res), "Failed nng_http_res_alloc!");
         m_nng_req = (nng_http_req*)nng_aio_get_input(m_http_aio, 0);
         m_nng_conn = (nng_http_conn*)nng_aio_get_input(m_http_aio, 2);
 
@@ -41,11 +43,33 @@ void HttpHandle::operator()() {
 }
 
 void HttpHandle::error(const std::string& errmsg) {
-    nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR);
-    nng_http_res_set_reason(m_nng_res, errmsg.c_str());
-    nng_http_res_copy_data(m_nng_res, errmsg.c_str(), errmsg.size());
-    nng_aio_set_output(m_http_aio, 0, m_nng_res);
-    nng_aio_finish(m_http_aio, 0);
+    try {
+        int errcode = NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR;
+        const char* info = "Internal server error!";
+        std::string html_template(
+          R"(<!DOCTYPE html>
+        <html><head><title>{} {}</title>
+        <style>"
+        body {{ font-family: Arial, sans serif; text-align: center }}
+        h1 {{ font-size: 36px; }}
+        span {{ background-color: gray; color: white; padding: 7px; border-radius: 5px }}
+        h2 {{ font-size: 24px; }}
+        p {{ font-size: 20px; }}
+        </style></head>
+        <body><p>&nbsp;</p>
+        <h1><span>{}</span></h1>
+        <h2>{}</h2>
+        <p>{}</p>
+        </body></html>)");
+        std::string html = fmt::format(html_template, errcode, info, errcode, info, errmsg);
+        nng_http_res_set_status(m_nng_res, errcode);
+        nng_http_res_set_reason(m_nng_res, errmsg.c_str());
+        nng_http_res_set_header(m_nng_res, "Content-Type", "text/html; charset=UTF-8");
+        nng_http_res_copy_data(m_nng_res, html.c_str(), html.size());
+        nng_aio_set_output(m_http_aio, 0, m_nng_res);
+        nng_aio_finish(m_http_aio, 0);
+    } catch (...) {
+    }
 }
 
 }  // namespace hku
