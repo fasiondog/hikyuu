@@ -72,4 +72,11 @@ void HttpHandle::error(const std::string& errmsg) {
     }
 }
 
+std::string HttpHandle::getRequestData() {
+    void* data = nullptr;
+    size_t len = 0;
+    nng_http_req_get_data(m_nng_req, &data, &len);
+    return data ? std::string((char*)data) : std::string();
+}
+
 }  // namespace hku

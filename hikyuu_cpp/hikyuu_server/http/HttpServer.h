@@ -36,6 +36,21 @@ public:
     }
 
     template <typename Handle>
+    void PUT(const char *path) {
+        regHandle("PUT", path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });
+    }
+
+    template <typename Handle>
+    void DEL(const char *path) {
+        regHandle("DELETE", path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });
+    }
+
+    template <typename Handle>
+    void PATCH(const char *path) {
+        regHandle("PATCH", path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });
+    }
+
+    template <typename Handle>
     void regHandle(const char *method, const char *path) {
         regHandle(method, path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });
     }

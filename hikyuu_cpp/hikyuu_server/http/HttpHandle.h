@@ -15,7 +15,14 @@
 
 namespace hku {
 
-#define NNG_CHECK(rv, msg)                                               \
+#define NNG_CHECK(rv)                                       \
+    {                                                       \
+        if (rv != 0) {                                      \
+            CLS_THROW("[HTTP_ERROR] {}", nng_strerror(rv)); \
+        }                                                   \
+    }
+
+#define NNG_CHECK_M(rv, msg)                                             \
     {                                                                    \
         if (rv != 0) {                                                   \
             CLS_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \
@@ -33,20 +40,18 @@ public:
         logger()->warn("Not implemented HttpHandle run method!");
     }
 
-    nng_aio *get_http_aio() const {
-        return m_http_aio;
+    void getRequestData(void **data, size_t *len) {
+        nng_http_req_get_data(m_nng_req, data, len);
     }
 
-    nng_http_res *get_nng_res() const {
-        return m_nng_res;
+    std::string getRequestData();
+
+    void setResponseStatus(uint16_t status) {
+        NNG_CHECK(nng_http_res_set_status(m_nng_res, status));
     }
 
-    nng_http_req *get_nng_req() const {
-        return m_nng_req;
-    }
-
-    nng_http_conn *get_nng_conn() const {
-        return m_nng_conn;
+    void setResponseData(const std::string &content) {
+        NNG_CHECK(nng_http_res_copy_data(m_nng_res, content.c_str(), content.size()));
     }
 
     void operator()();
