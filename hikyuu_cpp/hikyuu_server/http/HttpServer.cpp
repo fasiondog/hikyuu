@@ -8,6 +8,10 @@
 #include <csignal>
 #include "HttpServer.h"
 
+#if defined(_WIN32)
+#include <Windows.h>
+#endif
+
 namespace hku {
 
 #define HTTP_FATAL_CHECK(rv, msg)                                        \
@@ -21,9 +25,17 @@ namespace hku {
 nng_http_server* HttpServer::ms_server = nullptr;
 MQThreadPool HttpServer::ms_tg(std::thread::hardware_concurrency(), false);
 
+#if defined(_WIN32)
+static UINT g_old_cp;
+#endif
+
 void HttpServer::http_exit() {
     CLS_INFO("exit server");
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+#if defined(_WIN32)
+    SetConsoleOutputCP(g_old_cp);
+#endif
+
     if (ms_server) {
         nng_http_server_release(ms_server);
         nng_fini();
@@ -60,6 +72,13 @@ HttpServer::~HttpServer() {
 void HttpServer::start() {
     std::signal(SIGINT, &HttpServer::signal_handler);
     std::signal(SIGTERM, &HttpServer::signal_handler);
+
+#if defined(_WIN32)
+    // Windows 下设置控制台程序输出代码页为 UTF8
+    auto g_old_cp = GetConsoleOutputCP();
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+
     HTTP_FATAL_CHECK(nng_http_server_start(ms_server), "Failed nng_http_server_start!");
 }
 

@@ -96,8 +96,26 @@ public:
 
     std::string getReqData();
 
+    /**
+     * 请求的 ulr 中是否包含 query 参数
+     */
+    bool haveQueryParams();
+
+    typedef std::unordered_map<std::string, std::string> QueryParams;
+
+    /**
+     * 获取 query 参数
+     * @param query_params [out] 输出 query 参数
+     * @return true | false 获取或解析失败
+     */
+    bool getQueryParams(QueryParams &query_params);
+
     void setResStatus(uint16_t status) {
         NNG_CHECK(nng_http_res_set_status(m_nng_res, status));
+    }
+
+    void setResHeader(const char *key, const char *val) {
+        NNG_CHECK(nng_http_res_set_header(m_nng_res, key, val));
     }
 
     void setResData(const std::string_view &content) {

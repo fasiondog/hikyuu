@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "../http/HttpHandle.h"
+#include "HKUHandle.h"
 
 namespace hku {
 
-class LoginHandle : public HttpHandle {
+class LoginHandle : public HKUHandle {
 public:
     LoginHandle(nng_aio *aio) : HttpHandle(aio) {}
 

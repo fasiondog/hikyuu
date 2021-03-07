@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "url.h"
 #include "HttpHandle.h"
 
 namespace hku {
@@ -85,6 +86,57 @@ std::string HttpHandle::getReqData() {
     size_t len = 0;
     nng_http_req_get_data(m_nng_req, &data, &len);
     return data ? std::string((char*)data) : std::string();
+}
+
+bool HttpHandle::haveQueryParams() {
+    const char* url = nng_http_req_get_uri(m_nng_req);
+    return !url ? false : strchr(url, '?');
+}
+
+bool HttpHandle::getQueryParams(QueryParams& query_params) {
+    const char* url = nng_http_req_get_uri(m_nng_req);
+    CLS_IF_RETURN(!url, false);
+
+    const char* p = strchr(url, '?');
+    CLS_IF_RETURN(!p, false);
+
+    p = p + 1;
+
+    enum {
+        s_key,
+        s_value,
+    } state = s_key;
+
+    const char* key = p;
+    const char* value = NULL;
+    int key_len = 0;
+    int value_len = 0;
+    while (*p != '\0') {
+        if (*p == '&') {
+            if (key_len && value_len) {
+                std::string strkey = std::string(key, key_len);
+                std::string strvalue = std::string(value, value_len);
+                query_params[url_unescape(strkey.c_str())] = url_unescape(strvalue.c_str());
+                key_len = value_len = 0;
+            }
+            state = s_key;
+            key = p + 1;
+        } else if (*p == '=') {
+            state = s_value;
+            value = p + 1;
+        } else {
+            state == s_key ? ++key_len : ++value_len;
+        }
+        ++p;
+    }
+    if (key_len && value_len) {
+        std::string strkey = std::string(key, key_len);
+        std::string strvalue = std::string(value, value_len);
+        query_params[url_unescape(strkey.c_str())] = url_unescape(strvalue.c_str());
+        key_len = value_len = 0;
+    }
+
+    return query_params.size() != 0;
 }
 
 }  // namespace hku

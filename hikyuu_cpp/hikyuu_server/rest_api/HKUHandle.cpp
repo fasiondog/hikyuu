@@ -10,20 +10,28 @@
 
 namespace hku {
 
-enum hku_handle_errno {
+enum hku_rest_errno {
     HKU_HANDLE_INVALID_CONTENT = 1,
+    HKU_HANDLE_MISS_TOKEN = 2,
+    HKU_HANDLE_UNAUTHORIZED = 3,
 };
 
 static std::unordered_map<int, const char *> g_hku_handle_errmsg{
   // clang-format off
-  {HKU_HANDLE_INVALID_CONTENT, R"(Invalid Content-Type, Please use "application/json")"},
+  {HKU_HANDLE_INVALID_CONTENT, "Invalid Content-Type, Please use 'application/json'"},
+  {HKU_HANDLE_MISS_TOKEN, "Missing token"},
+  {HKU_HANDLE_UNAUTHORIZED, "Authentication failed"},
   // clang-format on
 };
 
 void HKUHandle::before_run() {
+    setResHeader("Content-Type", "application/json; charset=UTF-8");
+
     const char *content_type = getReqHeader("Content-Type");
     HANDLE_CHECK(content_type, HKU_HANDLE_INVALID_CONTENT);
-    // application/json
+
+    const char *token = getReqHeader("token");
+    HANDLE_CHECK(token, HKU_HANDLE_MISS_TOKEN);
 }
 
 void HKUHandle::error(int errcode) {
