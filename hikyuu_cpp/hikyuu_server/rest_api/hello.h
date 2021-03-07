@@ -7,16 +7,16 @@
 
 #pragma once
 
-#include "../http/HttpHandle.h"
+#include "HKUHandle.h"
 
 namespace hku {
 
-class HelloHandle : public HttpHandle {
+class HelloHandle : public HKUHandle {
 public:
-    HelloHandle(nng_aio *aio) : HttpHandle(aio) {}
+    HelloHandle(nng_aio *aio) : HKUHandle(aio) {}
 
     virtual void run() override {
-        setResponseData("hello");
+        setResData("hello");
     }
 };
 

@@ -25,24 +25,31 @@ void HttpHandle::operator()() {
         m_nng_req = (nng_http_req*)nng_aio_get_input(m_http_aio, 0);
         m_nng_conn = (nng_http_conn*)nng_aio_get_input(m_http_aio, 2);
 
+        before_run();
         run();
+        // after_run();
 
+        nng_aio_set_output(m_http_aio, 0, m_nng_res);
+        nng_aio_finish(m_http_aio, 0);
+
+    } catch (HttpHandleRunException& e) {
+        error(e.errcode());
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
     } catch (std::exception& e) {
         std::string errmsg(e.what());
         CLS_ERROR(errmsg);
-        error(errmsg);
+        unknown_error(errmsg);
 
     } catch (...) {
         std::string errmsg("Unknown error!");
         CLS_ERROR(errmsg);
-        error(errmsg);
+        unknown_error(errmsg);
     }
 }
 
-void HttpHandle::error(const std::string& errmsg) {
+void HttpHandle::unknown_error(const std::string& errmsg) {
     try {
         int errcode = NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR;
         const char* info = "Internal server error!";
@@ -69,10 +76,11 @@ void HttpHandle::error(const std::string& errmsg) {
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
     } catch (...) {
+        CLS_FATAL("unknown error in finished!");
     }
 }
 
-std::string HttpHandle::getRequestData() {
+std::string HttpHandle::getReqData() {
     void* data = nullptr;
     size_t len = 0;
     nng_http_req_get_data(m_nng_req, &data, &len);

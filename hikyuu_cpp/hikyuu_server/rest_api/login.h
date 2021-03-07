@@ -16,12 +16,12 @@ public:
     LoginHandle(nng_aio *aio) : HttpHandle(aio) {}
 
     virtual void run() override {
-        std::string content = getRequestData();
+        std::string content = getReqData();
         if (content.empty()) {
-            setResponseStatus(NNG_HTTP_STATUS_NO_CONTENT);
+            setResStatus(NNG_HTTP_STATUS_BAD_REQUEST);
             return;
         }
-        setResponseData(content);
+        setResData(content);
     }
 };
 

@@ -1,8 +1,8 @@
 
-target("hikyuu_server")
+target("hkuserver")
     set_kind("binary")
     
-    add_packages("fmt", "spdlog", "flatbuffers", "nng")
+    add_packages("fmt", "spdlog", "flatbuffers", "nng", "yyjson")
     add_deps("hikyuu")
 
     add_includedirs("..")
