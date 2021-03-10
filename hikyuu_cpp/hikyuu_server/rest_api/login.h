@@ -13,7 +13,7 @@ namespace hku {
 
 class LoginHandle : public HKUHandle {
 public:
-    LoginHandle(nng_aio *aio) : HttpHandle(aio) {}
+    LoginHandle(nng_aio *aio) : HKUHandle(aio) {}
 
     virtual void run() override {
         std::string content = getReqData();

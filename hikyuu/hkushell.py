@@ -33,13 +33,17 @@ def shell_cmd(func):
 
 
 class HKUShell(cmd.Cmd):
-    intro = """
-    \033[1;32;40m____ ____ ____ ____ ____ ____ 
-    ||H |||I |||K |||Y |||U |||U ||
-    ||__|||__|||__|||__|||__|||__||
-    |/__\|/__\|/__\|/__\|/__\|/__\|\033[0m
+    intro = """\033[1;32;40m
+    ooooo   ooooo ooooo oooo    oooo oooooo   oooo ooooo     ooo ooooo     ooo 
+    `888'   `888' `888' `888   .8P'   `888.   .8'  `888'     `8' `888'     `8' 
+     888     888   888   888  d8'      `888. .8'    888       8   888       8  
+     888ooooo888   888   88888[         `888.8'     888       8   888       8  
+     888     888   888   888`88b.        `888'      888       8   888       8  
+     888     888   888   888  `88b.       888       `88.    .8'   `88.    .8'  
+    o888o   o888o o888o o888o  o888o     o888o        `YbodP'       `YbodP'    
+    \033[0m
+    \033[33m\033[1m  Welcome to the hikyuu shell. Type help or ? to list commands.\033[0m
 
-    \033[33m\033[1mWelcome to the hikyuu shell.   Type help or ? to list commands.\033[0m
     """
     lineno = 1
     prompt = '\033[32;40mHKU [\033[0m\033[1;32;40m%s\033[0m\033[32;40m]:\033[0m ' % lineno
@@ -47,6 +51,7 @@ class HKUShell(cmd.Cmd):
 
     @shell_cmd
     def do_hello(self, arg):
+        'test'
         print(arg)
 
     def do_quit(self, arg):

@@ -23,7 +23,7 @@ namespace hku {
     }
 
 nng_http_server* HttpServer::ms_server = nullptr;
-MQThreadPool HttpServer::ms_tg(std::thread::hardware_concurrency(), false);
+MQStealThreadPool HttpServer::ms_tg(std::thread::hardware_concurrency(), false);
 
 #if defined(_WIN32)
 static UINT g_old_cp;
