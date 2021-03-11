@@ -18,7 +18,9 @@
 using namespace hku;
 
 int main(int argc, char* argv[]) {
-    HKU_INFO("start server ... You can press Ctrl-C stop");
+    init_server_logger();
+
+    LOG_INFO("start server ... You can press Ctrl-C stop");
 
     HttpServer server("http://*", 8080);
 

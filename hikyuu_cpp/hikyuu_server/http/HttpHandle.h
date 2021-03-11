@@ -44,7 +44,7 @@ private:
 #define NNG_CHECK(rv)                                       \
     {                                                       \
         if (rv != 0) {                                      \
-            CLS_THROW("[HTTP_ERROR] {}", nng_strerror(rv)); \
+            HKU_THROW("[HTTP_ERROR] {}", nng_strerror(rv)); \
         }                                                   \
     }
 
@@ -52,7 +52,7 @@ private:
 #define NNG_CHECK_M(rv, msg)                                             \
     {                                                                    \
         if (rv != 0) {                                                   \
-            CLS_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \
+            HKU_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \
         }                                                                \
     }
 

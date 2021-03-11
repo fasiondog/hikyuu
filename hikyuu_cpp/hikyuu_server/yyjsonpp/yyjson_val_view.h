@@ -9,6 +9,7 @@
 
 #include <string>
 #include <yyjson.h>
+#include "exception.h"
 
 namespace yyjson {
 
