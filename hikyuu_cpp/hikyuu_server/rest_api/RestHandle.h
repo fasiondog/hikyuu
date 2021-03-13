@@ -11,17 +11,12 @@
 
 namespace hku {
 
-class HKUHandle : public HttpHandle {
-    CLASS_LOGGER(HKUHandle)
+class RestHandle : public HttpHandle {
+    CLASS_LOGGER(RestHandle)
 
 public:
-    HKUHandle(nng_aio *aio) : HttpHandle(aio) {}
-
+    RestHandle(nng_aio *aio);
     virtual void before_run() override;
-
-    void error(int errcode) override;
-
-    virtual void private_error(int errcode) {}
 };
 
 }  // namespace hku

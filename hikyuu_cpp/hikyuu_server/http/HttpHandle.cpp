@@ -26,15 +26,21 @@ void HttpHandle::operator()() {
         m_nng_req = (nng_http_req*)nng_aio_get_input(m_http_aio, 0);
         m_nng_conn = (nng_http_conn*)nng_aio_get_input(m_http_aio, 2);
 
+        for (auto& filter : m_filters) {
+            filter(this);
+        }
+
         before_run();
         run();
-        // after_run();
 
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
-    } catch (HttpHandleRunException& e) {
-        error(e.errcode());
+    } catch (HttpHandleException& e) {
+        nng_http_res_set_status(m_nng_res, e.status());
+        nng_http_res_set_reason(m_nng_res, e.what());
+        CLS_WARN_IF(nng_http_res_copy_data(m_nng_res, e.what(), strlen(e.what())),
+                    "Failed nng_http_res_copy_data!");
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
@@ -73,7 +79,8 @@ void HttpHandle::unknown_error(const std::string& errmsg) {
         nng_http_res_set_status(m_nng_res, errcode);
         nng_http_res_set_reason(m_nng_res, errmsg.c_str());
         nng_http_res_set_header(m_nng_res, "Content-Type", "text/html; charset=UTF-8");
-        nng_http_res_copy_data(m_nng_res, html.c_str(), html.size());
+        CLS_WARN_IF(nng_http_res_copy_data(m_nng_res, html.c_str(), html.size()),
+                    "Failed nng_http_res_copy_data!");
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
     } catch (...) {

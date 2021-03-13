@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "HKUHandle.h"
+#include "RestHandle.h"
 
 namespace hku {
 
-class LoginHandle : public HKUHandle {
+class LoginHandle : public RestHandle {
 public:
-    LoginHandle(nng_aio *aio) : HKUHandle(aio) {}
+    LoginHandle(nng_aio *aio) : RestHandle(aio) {}
 
     virtual void run() override {
         std::string content = getReqData();

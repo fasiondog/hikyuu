@@ -36,7 +36,7 @@ inline void init_server_logger() {
 
         logger->set_level(spdlog::level::trace);
         logger->flush_on(spdlog::level::trace);
-        logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^SERVER-%L%$] - %v [%!]");
+        logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^SERVER-%L%$] - %v (%s:%#)");
         spdlog::set_default_logger(logger);
     });
 }
@@ -184,29 +184,29 @@ inline void init_server_logger() {
 //
 //--------------------------------------------------------------
 
-#define CLASS_LOGGER(cls)                                                                     \
-private:                                                                                      \
-    inline static std::shared_ptr<spdlog::async_logger> ms_##cls_logger;                      \
-                                                                                              \
-public:                                                                                       \
-    static std::shared_ptr<spdlog::async_logger> logger() {                                   \
-        static std::once_flag oc;                                                             \
-        std::call_once(oc, [&]() {                                                            \
-            auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();       \
-            stdout_sink->set_level(spdlog::level::trace);                                     \
-                                                                                              \
-            spdlog::init_thread_pool(8192, 1);                                                \
-            std::vector<spdlog::sink_ptr> sinks{stdout_sink};                                 \
-            ms_##cls_logger = std::make_shared<spdlog::async_logger>(                         \
-              #cls, sinks.begin(), sinks.end(), spdlog::thread_pool(),                        \
-              spdlog::async_overflow_policy::block);                                          \
-                                                                                              \
-            ms_##cls_logger->set_level(spdlog::level::trace);                                 \
-            ms_##cls_logger->flush_on(spdlog::level::trace);                                  \
-            ms_##cls_logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^" #cls "-%L%$] - %v [%!]"); \
-            spdlog::register_logger(ms_##cls_logger);                                         \
-        });                                                                                   \
-        return ms_##cls_logger;                                                               \
+#define CLASS_LOGGER(cls)                                                                        \
+private:                                                                                         \
+    inline static std::shared_ptr<spdlog::async_logger> ms_##cls_logger;                         \
+                                                                                                 \
+public:                                                                                          \
+    static std::shared_ptr<spdlog::async_logger> logger() {                                      \
+        static std::once_flag oc;                                                                \
+        std::call_once(oc, [&]() {                                                               \
+            auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();          \
+            stdout_sink->set_level(spdlog::level::trace);                                        \
+                                                                                                 \
+            spdlog::init_thread_pool(8192, 1);                                                   \
+            std::vector<spdlog::sink_ptr> sinks{stdout_sink};                                    \
+            ms_##cls_logger = std::make_shared<spdlog::async_logger>(                            \
+              #cls, sinks.begin(), sinks.end(), spdlog::thread_pool(),                           \
+              spdlog::async_overflow_policy::block);                                             \
+                                                                                                 \
+            ms_##cls_logger->set_level(spdlog::level::trace);                                    \
+            ms_##cls_logger->flush_on(spdlog::level::trace);                                     \
+            ms_##cls_logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^" #cls "-%L%$] - %v (%s:%#)"); \
+            spdlog::register_logger(ms_##cls_logger);                                            \
+        });                                                                                      \
+        return ms_##cls_logger;                                                                  \
     }
 
 #define CLS_TRACE(...) SPDLOG_LOGGER_TRACE(logger(), __VA_ARGS__)

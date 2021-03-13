@@ -9,6 +9,8 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
+#include <functional>
 #include <nng/nng.h>
 #include <nng/supplemental/http/http.h>
 
@@ -16,36 +18,63 @@
 
 namespace hku {
 
-/**
- * 处理异常
- */
-class HttpHandleRunException : public std::exception {
+#if !defined(__clang__) && !defined(__GNUC__)
+class HttpHandleException : public std::exception {
 public:
-    explicit HttpHandleRunException(int errcode) : std::exception(), m_errcode(errcode) {}
+    HttpHandleException() : std::exception("Unknown exception!") {}
+    HttpHandleException(int http_status, const std::string &msg)
+    : std::exception(msg.c_str()), m_http_status(http_status) {}
+    HttpHandleException(int http_status, const char *msg)
+    : std::exception(msg), m_http_status(http_status) {}
 
-    int errcode() const {
-        return m_errcode;
+    int status() const {
+        return m_http_status;
     }
 
 private:
-    int m_errcode = 0;
+    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
 };
 
-#define HANDLE_ERROR(errcode) throw HttpHandleRunException(errcode)
+#else
+// llvm 中的 std::exception 不接受参数
+class HttpHandleException : public std::exception {
+public:
+    HttpHandleException() : m_msg("Unknown exception!") {}
+    HttpHandleException(int http_status, const char *msg)
+    : m_msg(msg), m_http_status(http_status) {}
+    HttpHandleException(int http_status, const std::string &msg)
+    : m_msg(msg), m_http_status(http_status) {}
+    virtual ~HttpHandleException() noexcept {}
+    virtual const char *what() const noexcept {
+        return m_msg.c_str();
+    }
 
-#define HANDLE_CHECK(expr, errcode)                \
-    do {                                           \
-        if (!expr) {                               \
-            throw HttpHandleRunException(errcode); \
-        }                                          \
-    } while (0)
+    int status() const {
+        return m_http_status;
+    }
+
+protected:
+    std::string m_msg;
+    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
+};
+#endif /* #ifdef __clang__ */
+
+#define HANDLE_THROW(http_status, ...) \
+    { throw HttpHandleException(http_status, fmt::format(__VA_ARGS__)); }
+
+#define HANDLE_CHECK(expr, http_status, ...)                                  \
+    {                                                                         \
+        if (!expr) {                                                          \
+            throw HttpHandleException(http_status, fmt::format(__VA_ARGS__)); \
+        }                                                                     \
+    }
 
 // 仅内部使用
-#define NNG_CHECK(rv)                                       \
-    {                                                       \
-        if (rv != 0) {                                      \
-            HKU_THROW("[HTTP_ERROR] {}", nng_strerror(rv)); \
-        }                                                   \
+#define NNG_CHECK(rv)                                      \
+    {                                                      \
+        if (rv != 0) {                                     \
+            HKU_THROW("[NNG_ERROR] {}", nng_strerror(rv)); \
+        }                                                  \
     }
 
 // 仅内部使用
@@ -69,11 +98,8 @@ public:
     /** 响应处理 */
     virtual void run() = 0;
 
-    // virtual void after_run() {}
-
-    /** 统一处理响应错误 */
-    virtual void error(int errcode) {
-        unknown_error(fmt::format("error: {}", errcode));
+    void addFilter(std::function<void(HttpHandle *)> filter) {
+        m_filters.push_back(filter);
     }
 
     /**
@@ -133,6 +159,7 @@ protected:
     nng_http_res *m_nng_res{nullptr};
     nng_http_req *m_nng_req{nullptr};
     nng_http_conn *m_nng_conn{nullptr};
+    std::vector<std::function<void(HttpHandle *)>> m_filters;
 };
 
 }  // namespace hku

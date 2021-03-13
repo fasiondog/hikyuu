@@ -49,18 +49,6 @@ public:
         }
     }
 
-    void read_file(const char *path, yyjson_read_flag flg) {
-        if (m_doc) {
-            yyjson_doc_free(m_doc);
-        }
-
-        yyjson_read_err err;
-        m_doc = yyjson_read_file(path, flg, nullptr, &err);
-        if (!m_doc) {
-            YYJSON_THROW(fmt::format("{}", err.msg));
-        }
-    }
-
     val_view get_root() const {
         return val_view(yyjson_doc_get_root(m_doc));
     }
@@ -71,6 +59,17 @@ public:
 
     size_t get_val_count() const {
         return yyjson_doc_get_val_count(m_doc);
+    }
+
+public:
+    static doc read_file(const char *path, yyjson_read_flag flg) {
+        doc d;
+        yyjson_read_err err;
+        d.m_doc = yyjson_read_file(path, flg, nullptr, &err);
+        if (!d.m_doc) {
+            YYJSON_THROW(fmt::format("{}", err.msg));
+        }
+        return d;
     }
 
 private:

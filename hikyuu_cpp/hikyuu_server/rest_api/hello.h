@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "HKUHandle.h"
+#include "RestHandle.h"
 
 namespace hku {
 
-class HelloHandle : public HKUHandle {
+class HelloHandle : public RestHandle {
 public:
-    HelloHandle(nng_aio *aio) : HKUHandle(aio) {}
+    HelloHandle(nng_aio *aio) : RestHandle(aio) {}
 
     virtual void run() override {
         setResData("hello");
