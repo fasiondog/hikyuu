@@ -14,12 +14,16 @@ namespace yyjson {
 class doc {
 public:
     doc() = default;
-    doc(const char *dat, size_t len, yyjson_read_flag flg = 0) {
+    doc(const char *dat, size_t len,
+        yyjson_read_flag flg = YYJSON_READ_ALLOW_TRAILING_COMMAS | YYJSON_READ_ALLOW_INF_AND_NAN |
+                               YYJSON_READ_ALLOW_COMMENTS) {
         m_doc = yyjson_read(dat, len, flg);
         YYJSON_CHECK(m_doc, "Failed yyjson_read!");
     }
 
-    doc(const std::string &dat, yyjson_read_flag flg = 0) {
+    doc(const std::string &dat, yyjson_read_flag flg = YYJSON_READ_ALLOW_TRAILING_COMMAS |
+                                                       YYJSON_READ_ALLOW_INF_AND_NAN |
+                                                       YYJSON_READ_ALLOW_COMMENTS) {
         m_doc = yyjson_read(dat.c_str(), dat.size(), flg);
         YYJSON_CHECK(m_doc, "Failed yyjson_read!");
     }
