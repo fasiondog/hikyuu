@@ -18,13 +18,13 @@ namespace hku {
 class HttpError : public std::exception {
 public:
     HttpError() : std::exception("Unknown exception!") {}
-    HttpError(long http_status) : HttpError(http_status, "") {}
-    HttpError(long http_status, const std::string &msg)
+    HttpError(int http_status) : HttpError(http_status, "") {}
+    HttpError(int http_status, const std::string &msg)
     : std::exception(msg.c_str()), m_http_status(http_status) {}
-    HttpError(long http_status, const char *msg)
-    : std::exception(msg), m_http_status(http_status) {}
+    HttpError(int http_status, const char *msg) : std::exception(msg), m_http_status(http_status) {}
+    virtual ~HttpError() noexcept {}
 
-    long status() const noexcept {
+    int status() const noexcept {
         return m_http_status;
     }
 
@@ -33,7 +33,7 @@ public:
     }
 
 private:
-    long m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
+    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
 };
 
 #else
@@ -41,15 +41,15 @@ private:
 class HttpError : public std::exception {
 public:
     HttpError() : m_msg("Unknown exception!") {}
-    HttpError(long http_status) : HttpError(http_status, "") {}
-    HttpError(long http_status, const char *msg) : m_msg(msg), m_http_status(http_status) {}
-    HttpError(long http_status, const std::string &msg) : m_msg(msg), m_http_status(http_status) {}
+    HttpError(int http_status) : HttpError(http_status, "") {}
+    HttpError(int http_status, const char *msg) : m_msg(msg), m_http_status(http_status) {}
+    HttpError(int http_status, const std::string &msg) : m_msg(msg), m_http_status(http_status) {}
     virtual ~HttpError() noexcept {}
     virtual const char *what() const noexcept {
         return m_msg.c_str();
     }
 
-    long status() const noexcept {
+    int status() const noexcept {
         return m_http_status;
     }
 
@@ -59,7 +59,7 @@ public:
 
 protected:
     std::string m_msg;
-    long m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
+    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
 };
 #endif /* #ifdef __clang__ */
 

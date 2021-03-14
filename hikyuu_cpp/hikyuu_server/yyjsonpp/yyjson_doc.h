@@ -49,9 +49,24 @@ public:
         }
     }
 
+    std::string json(yyjson_write_flag flg = YYJSON_WRITE_NOFLAG);
+
     val_view get_root() const {
         return val_view(yyjson_doc_get_root(m_doc));
     }
+
+    val_view get_obj(const char *key) const {
+        return get_root().get_obj(key);
+    }
+
+    val_view operator[](const char *key) const {
+        return get_obj(key);
+    }
+
+    /* 0.2.0 版本尚不支持
+    val_view get_obj_by_path(const char *path) {
+        return val_view(yyjson_doc_get_pointer(m_doc, path));
+    }*/
 
     size_t get_read_size() const {
         return yyjson_doc_get_read_size(m_doc);

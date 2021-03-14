@@ -6,11 +6,6 @@
  */
 
 #include <hikyuu/hikyuu.h>
-
-#if defined(_WIN32)
-#include <Windows.h>
-#endif
-
 #include "http/HttpServer.h"
 #include "rest_api/hello.h"
 #include "rest_api/login.h"

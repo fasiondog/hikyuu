@@ -5,8 +5,6 @@
  *     Author: fasiondog
  */
 
-#pragma once
-
 #include "url.h"
 #include "HttpHandle.h"
 
@@ -38,8 +36,8 @@ void HttpHandle::operator()() {
 
     } catch (HttpError& e) {
         nng_http_res_set_status(m_nng_res, e.status());
-        nng_http_res_set_reason(m_nng_res, e.what());
-        CLS_WARN_IF(nng_http_res_copy_data(m_nng_res, e.what(), strlen(e.what())),
+        nng_http_res_set_reason(m_nng_res, e.msg().c_str());
+        CLS_WARN_IF(nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size()),
                     "Failed nng_http_res_copy_data!");
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);

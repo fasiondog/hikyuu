@@ -7,4 +7,11 @@
 
 #pragma once
 
-namespace hku {}  // namespace hku
+#include "../http/HttpHandle.h"
+#include "RestFilterError.h"
+
+namespace hku {
+
+void TokenAuthorizeFilter(HttpHandle *handle);
+
+}  // namespace hku

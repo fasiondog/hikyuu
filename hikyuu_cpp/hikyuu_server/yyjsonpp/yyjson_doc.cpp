@@ -7,4 +7,14 @@
 
 #include "yyjson_doc.h"
 
-namespace yyjson {}  // namespace yyjson
+namespace yyjson {
+
+std::string doc::json(yyjson_write_flag flg) {
+    char *cstr = yyjson_write(m_doc, flg, nullptr);
+    YYJSON_CHECK(cstr, "Failed yyjson_write");
+    std::string result(cstr);
+    free(cstr);
+    return result;
+}
+
+}  // namespace yyjson

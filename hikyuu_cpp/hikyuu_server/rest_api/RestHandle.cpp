@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 #include "RestHandle.h"
+#include "RestFilter.h"
 
 namespace hku {
 
@@ -25,15 +26,7 @@ static std::unordered_map<int, const char *> g_hku_handle_errmsg{
 };
 
 RestHandle::RestHandle(nng_aio *aio) : HttpHandle(aio) {
-    addFilter([](HttpHandle *handle) {
-        const char *content_type = handle->getReqHeader("Content-Type");
-        HANDLE_CHECK(content_type, NNG_HTTP_STATUS_BAD_REQUEST,
-                     R"({{"errcode": "{}", "msg": "{}"}})", HKU_HANDLE_INVALID_CONTENT,
-                     g_hku_handle_errmsg[HKU_HANDLE_INVALID_CONTENT]);
-
-        // const char *token = handle->getReqHeader("token");
-        // HANDLE_CHECK(token, HKU_HANDLE_MISS_TOKEN);
-    });
+    addFilter(TokenAuthorizeFilter);
 }
 
 void RestHandle::before_run() {
