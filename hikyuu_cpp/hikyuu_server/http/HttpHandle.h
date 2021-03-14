@@ -7,67 +7,14 @@
 
 #pragma once
 
-#include <string>
 #include <string_view>
 #include <vector>
 #include <functional>
-#include <nng/nng.h>
-#include <nng/supplemental/http/http.h>
 
+#include "HttpError.h"
 #include "../common/log.h"
 
 namespace hku {
-
-#if !defined(__clang__) && !defined(__GNUC__)
-class HttpHandleException : public std::exception {
-public:
-    HttpHandleException() : std::exception("Unknown exception!") {}
-    HttpHandleException(int http_status, const std::string &msg)
-    : std::exception(msg.c_str()), m_http_status(http_status) {}
-    HttpHandleException(int http_status, const char *msg)
-    : std::exception(msg), m_http_status(http_status) {}
-
-    int status() const {
-        return m_http_status;
-    }
-
-private:
-    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
-};
-
-#else
-// llvm 中的 std::exception 不接受参数
-class HttpHandleException : public std::exception {
-public:
-    HttpHandleException() : m_msg("Unknown exception!") {}
-    HttpHandleException(int http_status, const char *msg)
-    : m_msg(msg), m_http_status(http_status) {}
-    HttpHandleException(int http_status, const std::string &msg)
-    : m_msg(msg), m_http_status(http_status) {}
-    virtual ~HttpHandleException() noexcept {}
-    virtual const char *what() const noexcept {
-        return m_msg.c_str();
-    }
-
-    int status() const {
-        return m_http_status;
-    }
-
-protected:
-    std::string m_msg;
-    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
-};
-#endif /* #ifdef __clang__ */
-
-#define HANDLE_THROW(http_status, ...) \
-    { throw HttpHandleException(http_status, fmt::format(__VA_ARGS__)); }
-
-#define HANDLE_CHECK(expr, http_status, ...)                                  \
-    {                                                                         \
-        if (!expr) {                                                          \
-            throw HttpHandleException(http_status, fmt::format(__VA_ARGS__)); \
-        }                                                                     \
-    }
 
 // 仅内部使用
 #define NNG_CHECK(rv)                                      \

@@ -36,7 +36,7 @@ void HttpHandle::operator()() {
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
-    } catch (HttpHandleException& e) {
+    } catch (HttpError& e) {
         nng_http_res_set_status(m_nng_res, e.status());
         nng_http_res_set_reason(m_nng_res, e.what());
         CLS_WARN_IF(nng_http_res_copy_data(m_nng_res, e.what(), strlen(e.what())),
