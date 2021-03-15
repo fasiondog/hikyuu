@@ -13,19 +13,19 @@ namespace yyjson {
 
 class doc {
 public:
-    doc() = default;
+    doc() = delete;
+    doc(yyjson_doc *doc) : m_doc(doc) {}
+
     doc(const char *dat, size_t len,
         yyjson_read_flag flg = YYJSON_READ_ALLOW_TRAILING_COMMAS | YYJSON_READ_ALLOW_INF_AND_NAN |
                                YYJSON_READ_ALLOW_COMMENTS) {
         m_doc = yyjson_read(dat, len, flg);
-        YYJSON_CHECK(m_doc, "Failed yyjson_read!");
     }
 
     doc(const std::string &dat, yyjson_read_flag flg = YYJSON_READ_ALLOW_TRAILING_COMMAS |
                                                        YYJSON_READ_ALLOW_INF_AND_NAN |
                                                        YYJSON_READ_ALLOW_COMMENTS) {
         m_doc = yyjson_read(dat.c_str(), dat.size(), flg);
-        YYJSON_CHECK(m_doc, "Failed yyjson_read!");
     }
 
     doc(const doc &) = delete;
@@ -47,13 +47,27 @@ public:
         return *this;
     }
 
-    ~doc() {
+    virtual ~doc() {
         if (m_doc) {
             yyjson_doc_free(m_doc);
         }
     }
 
-    std::string json(yyjson_write_flag flg = YYJSON_WRITE_NOFLAG);
+    operator bool() const {
+        return m_doc != nullptr;
+    }
+
+    yyjson_doc *const ptr() const {
+        return m_doc;
+    }
+
+    std::string json(yyjson_write_flag flg = YYJSON_WRITE_NOFLAG) const {
+        char *cstr = yyjson_write(m_doc, flg, nullptr);
+        YYJSON_CHECK(cstr, "Failed yyjson_write");
+        std::string result(cstr);
+        free(cstr);
+        return result;
+    }
 
     val_view get_root() const {
         return val_view(yyjson_doc_get_root(m_doc));
@@ -82,13 +96,7 @@ public:
 
 public:
     static doc read_file(const char *path, yyjson_read_flag flg) {
-        doc d;
-        yyjson_read_err err;
-        d.m_doc = yyjson_read_file(path, flg, nullptr, &err);
-        if (!d.m_doc) {
-            YYJSON_THROW(fmt::format("{}", err.msg));
-        }
-        return d;
+        return doc(yyjson_read_file(path, flg, nullptr, nullptr));
     }
 
 private:

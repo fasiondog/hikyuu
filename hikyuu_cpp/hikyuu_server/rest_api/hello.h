@@ -9,6 +9,7 @@
 
 #include "RestHandle.h"
 #include "../yyjsonpp/yyjson_doc.h"
+#include "../yyjsonpp/yyjson_mut_doc.h"
 
 namespace hku {
 
@@ -29,6 +30,12 @@ public:
             for (auto i : y) {
                 CLS_INFO("{}", i);
             }*/
+
+            yyjson::mut_doc mut_doc(doc);
+            std::vector<bool> y{true, false, true};
+            auto z = mut_doc.mut_arr(y);
+            const char* strs[3] = {"Jan", "Feb", "Mar"};
+            auto zz = mut_doc.mut_arr(strs, 3);
 
             setResData("hello");
         } catch (std::exception& e) {

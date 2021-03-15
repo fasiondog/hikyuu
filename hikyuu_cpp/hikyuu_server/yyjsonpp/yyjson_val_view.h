@@ -82,6 +82,14 @@ class val_view {
 public:
     val_view(yyjson_val *val) : m_val(val) {}
 
+    yyjson_val *const ptr() const {
+        return m_val;
+    }
+
+    operator bool() const {
+        return m_val != nullptr;
+    }
+
     YY_VAL_IS(null)
     YY_VAL_IS(true)
     YY_VAL_IS(false)
