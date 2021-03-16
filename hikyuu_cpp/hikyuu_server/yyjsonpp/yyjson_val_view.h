@@ -104,6 +104,29 @@ public:
     YY_VAL_IS(obj)   // object
     YY_VAL_IS(ctn)   // array or object
 
+    /** Returns value's type. */
+    yyjson_type get_type() const {
+        return yyjson_get_type(m_val);
+    }
+
+    /** Returns value's subtype. */
+    yyjson_subtype get_subtype() const {
+        return yyjson_get_subtype(m_val);
+    }
+
+    /** Returns value's tag. */
+    uint8_t get_tag() const {
+        return yyjson_get_tag(m_val);
+    }
+
+    /**
+     * Returns type description, such as: "null", "string", "array", "object", "true", "false",
+     * "uint", "sint", "real", "unknown"
+     */
+    const char *get_type_desc() const {
+        return yyjson_get_type_desc(m_val);
+    }
+
     bool get_bool(bool fallback) const {
         return yyjson_is_bool(m_val) ? unsafe_yyjson_get_bool(m_val) : fallback;
     }
@@ -112,7 +135,7 @@ public:
         if (!yyjson_is_bool(m_val)) {
             YYJSON_THROW("This value type is {}, not bool!", get_type_desc());
         }
-        return yyjson_get_bool(m_val);
+        return unsafe_yyjson_get_bool(m_val);
     }
 
     uint64_t get_uint(uint64_t fallback) const {
@@ -155,12 +178,16 @@ public:
         return std::string(unsafe_yyjson_get_str(m_val));
     }
 
-    val_view get_obj(const char *key) const {
+    val_view get(const char *key) const {
         return val_view(yyjson_obj_get(m_val, key));
     }
 
     val_view operator[](const char *key) {
-        return get_obj(key);
+        return get(key);
+    }
+
+    val_view get_no_mapping() const {
+        return val_view(yyjson_obj_get(m_val, NULL));
     }
 
     /* 0.2.0 版本尚不支持
@@ -201,12 +228,9 @@ public:
         }
     }
 
-    size_t get_len() const {
-        return yyjson_get_len(m_val);
-    }
-
+    /** Returns the number of key-value pairs in this object, or 0 if input is not an object. */
     size_t size() const {
-        return yyjson_get_len(m_val);
+        return yyjson_obj_size(m_val);
     }
 
     bool equals_str(const char *str) const {
@@ -219,10 +243,6 @@ public:
 
     bool equals_strn(const char *str, size_t len) const {
         return yyjson_equals_strn(m_val, str, len);
-    }
-
-    const char *get_type_desc() const {
-        return yyjson_get_type_desc(m_val);
     }
 
 private:

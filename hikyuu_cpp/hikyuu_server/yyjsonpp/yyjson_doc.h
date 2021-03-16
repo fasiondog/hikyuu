@@ -73,12 +73,12 @@ public:
         return val_view(yyjson_doc_get_root(m_doc));
     }
 
-    val_view get_obj(const char *key) const {
-        return get_root().get_obj(key);
+    val_view get(const char *key) const {
+        return get_root().get(key);
     }
 
     val_view operator[](const char *key) const {
-        return get_obj(key);
+        return get(key);
     }
 
     /* 0.2.0 版本尚不支持
