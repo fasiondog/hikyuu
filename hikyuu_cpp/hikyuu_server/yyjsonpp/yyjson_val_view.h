@@ -70,17 +70,21 @@ private:
         return yyjson_is_##typ(m_val); \
     }
 
-#define YY_VAL_GET(rtyp, typ)                                                      \
-    rtyp get_##typ() const {                                                       \
-        if (!yyjson_is_##typ(m_val)) {                                             \
-            YYJSON_THROW("This value type is {}, not " #typ "!", get_type_desc()); \
-        }                                                                          \
-        return unsafe_yyjson_get_##typ(m_val);                                     \
+#define YY_VAL_GET(rtyp, typ)                                                  \
+    rtyp get_##typ() const {                                                   \
+        if (!yyjson_is_##typ(m_val)) {                                         \
+            YYJSON_THROW("This value type is {}, not " #typ "!", type_desc()); \
+        }                                                                      \
+        return unsafe_yyjson_get_##typ(m_val);                                 \
     }
 
 class val_view {
 public:
+    val_view() = default;
     val_view(yyjson_val *val) : m_val(val) {}
+    val_view(const val_view &) = default;
+    val_view &operator=(const val_view &) = default;
+    virtual ~val_view() = default;
 
     yyjson_val *const ptr() const {
         return m_val;
@@ -105,17 +109,17 @@ public:
     YY_VAL_IS(ctn)   // array or object
 
     /** Returns value's type. */
-    yyjson_type get_type() const {
+    yyjson_type type() const {
         return yyjson_get_type(m_val);
     }
 
     /** Returns value's subtype. */
-    yyjson_subtype get_subtype() const {
+    yyjson_subtype subtype() const {
         return yyjson_get_subtype(m_val);
     }
 
     /** Returns value's tag. */
-    uint8_t get_tag() const {
+    uint8_t tag() const {
         return yyjson_get_tag(m_val);
     }
 
@@ -123,57 +127,76 @@ public:
      * Returns type description, such as: "null", "string", "array", "object", "true", "false",
      * "uint", "sint", "real", "unknown"
      */
-    const char *get_type_desc() const {
+    const char *type_desc() const {
         return yyjson_get_type_desc(m_val);
     }
 
-    bool get_bool(bool fallback) const {
+    template <typename T>
+    T value() const {
+        YYJSON_THROW("Unsupport type!");
+    }
+
+    bool value(bool fallback) const {
         return yyjson_is_bool(m_val) ? unsafe_yyjson_get_bool(m_val) : fallback;
     }
 
-    bool get_bool() const {
+    template <>
+    bool value() const {
         if (!yyjson_is_bool(m_val)) {
-            YYJSON_THROW("This value type is {}, not bool!", get_type_desc());
+            YYJSON_THROW("This value type is {}, not bool!", type_desc());
         }
         return unsafe_yyjson_get_bool(m_val);
     }
 
-    uint64_t get_uint(uint64_t fallback) const {
+    uint64_t value(uint64_t fallback) const {
         return yyjson_is_int(m_val) ? unsafe_yyjson_get_uint(m_val) : fallback;
     }
 
-    uint64_t get_uint() const {
+    template <>
+    uint64_t value() const {
         if (!yyjson_is_int(m_val)) {
-            YYJSON_THROW("This vale type is {}, not uint!", get_type_desc());
+            YYJSON_THROW("This vale type is {}, not uint!", type_desc());
         }
         return unsafe_yyjson_get_uint(m_val);
     }
 
-    int64_t get_int(int64_t fallback) const {
+    int64_t value(int64_t fallback) const {
         return yyjson_is_int(m_val) ? unsafe_yyjson_get_sint(m_val) : fallback;
     }
 
-    int64_t get_int() const {
+    template <>
+    int64_t value() const {
         if (!yyjson_is_int(m_val)) {
-            YYJSON_THROW("This value type is {}, not int!", get_type_desc());
+            YYJSON_THROW("This value type is {}, not int!", type_desc());
         }
         return unsafe_yyjson_get_sint(m_val);
     }
 
-    double get_double(double fallback) const {
+    double value(double fallback) const {
         return yyjson_is_num(m_val) ? unsafe_yyjson_get_real(m_val) : fallback;
     }
 
-    double get_double() const {
+    template <>
+    double value() const {
         if (!yyjson_is_num(m_val)) {
-            YYJSON_THROW("This value type is {}, not double!", get_type_desc());
+            YYJSON_THROW("This value type is {}, not double!", type_desc());
         }
         return unsafe_yyjson_get_real(m_val);
     }
 
-    std::string get_str() const {
+    std::string value(const char *fallback) {
+        return yyjson_is_str(m_val) ? std::string(unsafe_yyjson_get_str(m_val))
+                                    : std::string(fallback);
+    }
+
+    std::string value(const std::string &fallback) {
+        return yyjson_is_str(m_val) ? std::string(unsafe_yyjson_get_str(m_val)) : fallback;
+    }
+
+    template <>
+    std::string value() const {
         if (!yyjson_is_str(m_val)) {
-            YYJSON_THROW("This value type is {}, not string!", get_type_desc());
+            YYJSON_THROW("This value type is {}, not string!", type_desc());
         }
         return std::string(unsafe_yyjson_get_str(m_val));
     }
@@ -182,7 +205,15 @@ public:
         return val_view(yyjson_obj_get(m_val, key));
     }
 
+    val_view get(const std::string &key) const {
+        return val_view(yyjson_obj_get(m_val, key.c_str()));
+    }
+
     val_view operator[](const char *key) {
+        return get(key);
+    }
+
+    val_view operator[](const std::string &key) {
         return get(key);
     }
 
@@ -246,7 +277,7 @@ public:
     }
 
 private:
-    yyjson_val *m_val;
+    yyjson_val *m_val{nullptr};
 };
 
 }  // namespace yyjson

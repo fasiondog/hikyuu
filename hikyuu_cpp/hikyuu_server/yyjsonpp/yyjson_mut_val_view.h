@@ -24,7 +24,12 @@ namespace yyjson {
 
 class mut_val_view {
 public:
-    mut_val_view(yyjson_mut_val *val) : m_val(val) {}
+    mut_val_view() = default;
+    mut_val_view(yyjson_mut_val *val, yyjson_mut_doc *doc) : m_val(val), m_doc(doc) {}
+    mut_val_view(const mut_val_view &) = default;
+    mut_val_view &operator=(const mut_val_view &) = default;
+
+    virtual ~mut_val_view() = default;
 
     yyjson_mut_val *ptr() {
         return m_val;
@@ -123,7 +128,7 @@ public:
     }
 
     mut_val_view get(const char *key) const {
-        return mut_val_view(yyjson_mut_obj_get(m_val, key));
+        return mut_val_view(yyjson_mut_obj_get(m_val, key), m_doc);
     }
 
     mut_val_view operator[](const char *key) {
@@ -131,7 +136,7 @@ public:
     }
 
     mut_val_view get_no_mapping() const {
-        return mut_val_view(yyjson_mut_obj_get(m_val, NULL));
+        return mut_val_view(yyjson_mut_obj_get(m_val, NULL), m_doc);
     }
 
     /** Returns the number of key-value pairs in this object, or 0 if input is not an object. */
@@ -164,7 +169,7 @@ public:
         size_t idx, max;
         yyjson_mut_val *val;
         yyjson_mut_arr_foreach(m_val, idx, max, val) {
-            func(mut_val_view(val));
+            func(mut_val_view(val, m_doc));
         }
     }
 
@@ -173,15 +178,15 @@ public:
     }
 
     mut_val_view arr_get(size_t idx) const {
-        return mut_val_view(yyjson_mut_arr_get(m_val, idx));
+        return mut_val_view(yyjson_mut_arr_get(m_val, idx), m_doc);
     }
 
     mut_val_view arr_get_first() const {
-        return mut_val_view(yyjson_mut_arr_get_first(m_val));
+        return mut_val_view(yyjson_mut_arr_get_first(m_val), m_doc);
     }
 
     mut_val_view arr_get_last() const {
-        return mut_val_view(yyjson_mut_arr_get_last(m_val));
+        return mut_val_view(yyjson_mut_arr_get_last(m_val), m_doc);
     }
 
     /**
@@ -207,7 +212,7 @@ public:
      * @note Note that his function takes a linear search time.
      */
     mut_val_view arr_replace(size_t idx, mut_val_view val) {
-        return mut_val_view(yyjson_mut_arr_replace(m_val, idx, val.ptr()));
+        return mut_val_view(yyjson_mut_arr_replace(m_val, idx, val.ptr()), m_doc);
     }
 
     /**
@@ -215,17 +220,17 @@ public:
      * @note Note that this function takes a linear search time.
      */
     mut_val_view arr_remove(size_t idx) {
-        return mut_val_view(yyjson_mut_arr_remove(m_val, idx));
+        return mut_val_view(yyjson_mut_arr_remove(m_val, idx), m_doc);
     }
 
     /** Returns and returns the first value in this array, returns NULL on error. */
     mut_val_view arr_remove_first() {
-        return mut_val_view(yyjson_mut_arr_remove_first(m_val));
+        return mut_val_view(yyjson_mut_arr_remove_first(m_val), m_doc);
     }
 
     /** Returns and returns the last value in this array, returns NULL on error. */
     mut_val_view arr_remove_last() {
-        return mut_val_view(yyjson_mut_arr_remove_last(m_val));
+        return mut_val_view(yyjson_mut_arr_remove_last(m_val), m_doc);
     }
 
     /**
@@ -241,12 +246,119 @@ public:
         return yyjson_mut_arr_clear(m_val);
     }
 
-    bool arr_add_val(mut_val_view val) {
+    bool arr_add(mut_val_view val) {
         return yyjson_mut_arr_add_val(m_val, val.ptr());
     }
 
+    bool arr_add(nullptr_t val) {
+        return yyjson_mut_arr_add_null(m_doc, m_val);
+    }
+
+    bool arr_add(bool val) {
+        return yyjson_mut_arr_add_bool(m_doc, m_val, val);
+    }
+
+    bool arr_add(uint64_t val) {
+        return yyjson_mut_arr_add_uint(m_doc, m_val, val);
+    }
+
+    bool arr_add(int64_t val) {
+        return yyjson_mut_arr_add_sint(m_doc, m_val, val);
+    }
+
+    bool arr_add(int val) {
+        return yyjson_mut_arr_add_int(m_doc, m_val, val);
+    }
+
+    bool arr_add(double val) {
+        return yyjson_mut_arr_add_real(m_doc, m_val, val);
+    }
+
+    bool arr_add(float val) {
+        return yyjson_mut_arr_add_real(m_doc, m_val, val);
+    }
+
+    bool arr_add(const char *val) {
+        return yyjson_mut_arr_add_strcpy(m_doc, m_val, val);
+    }
+
+    bool arr_add(const std::string &val) {
+        return yyjson_mut_arr_add_strcpy(m_doc, m_val, val.c_str());
+    }
+
+    /**
+     * Removes key-value pair from the object with given key.
+     * @note Note that this function takes a linear search time.
+     */
+    bool obj_remove(mut_val_view key) {
+        return yyjson_mut_obj_remove(m_val, key.ptr());
+    }
+
+    /**
+     * Removes all key-value pairs for the given key.
+     * Note that this function takes a linear search time.
+     */
+    bool obj_remove(const char *key) {
+        return yyjson_mut_obj_remove_str(m_val, key);
+    }
+
+    /** Removes all key-value pairs in this object. */
+    bool obj_clear() {
+        return yyjson_mut_obj_clear(m_val);
+    }
+
+    /**
+     * Adds a key-value pair at the end of the object. The key must be a string.
+     * This function allows duplicated key in one object.
+     */
+    bool obj_add(mut_val_view key, mut_val_view val) {
+        return yyjson_mut_obj_add(m_val, key.ptr(), val.ptr());
+    }
+
+    /**
+     * Adds a key-value pair to the object, The key must be a string.
+     * This function may remove all key-value pairs for the given key before add.
+     * @note Note that this function takes a linear search time.
+     */
+    bool obj_put(mut_val_view key, mut_val_view val) {
+        return yyjson_mut_obj_put(m_val, key.ptr(), val.ptr());
+    }
+
+    bool obj_add(const char *key, nullptr_t val) {
+        return yyjson_mut_obj_add_null(m_doc, m_val, key);
+    }
+
+    bool obj_add(const char *key, bool val) {
+        return yyjson_mut_obj_add_bool(m_doc, m_val, key, val);
+    }
+
+    bool obj_add(const char *key, uint64_t val) {
+        return yyjson_mut_obj_add_uint(m_doc, m_val, key, val);
+    }
+
+    bool obj_add(const char *key, int64_t val) {
+        return yyjson_mut_obj_add_sint(m_doc, m_val, key, val);
+    }
+
+    bool obj_add(const char *key, int val) {
+        return yyjson_mut_obj_add_int(m_doc, m_val, key, val);
+    }
+
+    bool obj_add(const char *key, double val) {
+        return yyjson_mut_obj_add_real(m_doc, m_val, key, val);
+    }
+
+    bool obj_add(const char *key, float val) {
+        return yyjson_mut_obj_add_real(m_doc, m_val, key, val);
+    }
+
+    bool obj_add(const char *key, const char *val) {
+        return yyjson_mut_obj_add_strcpy(m_doc, m_val, key, val);
+    }
+
 private:
-    yyjson_mut_val *m_val;
+    yyjson_mut_val *m_val{nullptr};
+    yyjson_mut_doc *m_doc{nullptr};
 };
 
 }  // namespace yyjson

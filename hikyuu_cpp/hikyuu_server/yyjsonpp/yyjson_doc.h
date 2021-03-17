@@ -77,7 +77,15 @@ public:
         return get_root().get(key);
     }
 
+    val_view get(const std::string &key) const {
+        return get_root().get(key);
+    }
+
     val_view operator[](const char *key) const {
+        return get(key);
+    }
+
+    val_view operator[](const std::string &key) const {
         return get(key);
     }
 

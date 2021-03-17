@@ -23,7 +23,7 @@ public:
             yyjson::doc doc(req);
             auto x = doc.get_root();
             for (auto iter = x.begin(); iter != x.end(); ++iter) {
-                CLS_INFO("{}", (*iter).get_int());
+                CLS_INFO("{}", (*iter).value<int64_t>());
             }
 
             /*std::vector<int64_t> y = x.to_vector_int64_t();
