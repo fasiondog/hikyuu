@@ -156,14 +156,14 @@ public:
         return yyjson_mut_equals_strn(m_val, str, len);
     }
 
-    typedef ArrIterator<mut_val_view> iterator;
+    /*typedef ArrIterator<mut_val_view> iterator;
     iterator begin() {
         return iterator(*this, 0);
     }
 
     iterator end() {
         return iterator(*this, arr_size());
-    }
+    }*/
 
     void for_each(std::function<void(mut_val_view)> func) const {
         size_t idx, max;

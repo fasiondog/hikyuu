@@ -39,6 +39,14 @@ protected:
 };
 #endif /* #ifdef __clang__ */
 
+class bad_cast : public exception {
+public:
+    bad_cast() : exception("Type conversion failed!") {}
+    bad_cast(const char* msg) : exception(msg) {}
+    bad_cast(const std::string& msg) : exception(msg) {}
+    virtual ~bad_cast() {}
+};
+
 #define YYJSON_CHECK(expr, ...)                                                                   \
     do {                                                                                          \
         if (!(expr)) {                                                                            \
