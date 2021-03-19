@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <type_traits>
 #include <string>
 #include <vector>
@@ -21,17 +22,23 @@ struct iterator_uni : public yyjson_arr_iter, yyjson_obj_iter {};
 template <class T>
 class ValIterator : public std::iterator<std::input_iterator_tag, T> {
 public:
-    ValIterator(T val) : m_val(val) {  //, m_idx(idx) {
-        if (!val) {
-            m_iter.idx = m_iter.max;
-            return;
-        }
+    ValIterator(T val, bool first) : m_val(val) {  //, m_idx(idx) {
         if (m_val.is_arr()) {
-            yyjson_arr_iter_init(m_val.ptr(), &((yyjson_arr_iter)m_iter));
+            yyjson_arr_iter_init(m_val.ptr(), &m_iter);
             m_is_arr = true;
+            if (first) {
+                m_val = yyjson_arr_iter_next(&m_iter);
+            } else {
+                m_iter.yyjson_arr_iter::idx = m_iter.yyjson_arr_iter::max;
+            }
         } else if (m_val.is_obj()) {
-            yyjson_obj_iter_init(m_val.ptr(), &((yyjson_obj_iter)m_iter));
+            yyjson_obj_iter_init(m_val.ptr(), &m_iter);
             m_is_arr = false;
+            if (first) {
+                m_val = yyjson_obj_iter_next(&m_iter);
+            } else {
+                m_iter.yyjson_obj_iter::idx = m_iter.yyjson_obj_iter::max;
+            }
         } else {
             YYJSON_THROW("This value is not array or object!");
         }
@@ -40,30 +47,41 @@ public:
     //赋值
     ValIterator &operator=(const ValIterator &iter) {
         m_iter = iter.m_iter;
-        m_val = m_val;
+        m_val = iter.m_val;
+        m_is_arr = iter.m_is_arr;
     }
 
     //不等于
     bool operator!=(const ValIterator &iter) {
-        return m_iter.idx != iter.m_iter.idx;
+        return m_is_arr ? m_iter.yyjson_arr_iter::idx != iter.m_iter.yyjson_arr_iter::idx
+                        : m_iter.yyjson_obj_iter::idx != iter.m_iter.yyjson_obj_iter::idx;
     }
 
     //等于
     bool operator==(const ValIterator &iter) {
-        return m_iter.idx == iter.m_iter.idx;
+        return m_is_arr ? m_iter.yyjson_arr_iter::idx == iter.m_iter.yyjson_arr_iter::idx
+                        : m_iter.yyjson_obj_iter::idx == iter.m_iter.yyjson_obj_iter::idx;
+        ;
     }
 
     //前缀自加
     ValIterator &operator++() {
-        // m_idx++;
-        m_val = T(yyjson_obj_iter_next(&m_iter));
+        if (m_is_arr) {
+            m_val = T(yyjson_arr_iter_next(&m_iter));
+        } else {
+            m_val = T(yyjson_obj_iter_next(&m_iter));
+        }
         return *this;
     }
 
     //后缀自加
     ValIterator operator++(int) {
         ValIterator tmp = *this;
-        m_val = T(yyjson_obj_iter_next(&m_iter));
+        if (m_is_arr) {
+            m_val = T(yyjson_arr_iter_next(&m_iter));
+        } else {
+            m_val = T(yyjson_obj_iter_next(&m_iter));
+        }
         return tmp;
     }
 
@@ -80,6 +98,76 @@ private:
     iterator_uni m_iter;
     T m_val;
     bool m_is_arr;
+};
+
+template <class T>
+class ArrIterator : public std::iterator<std::input_iterator_tag, T> {
+public:
+    ArrIterator(T val) : m_val(val) {
+        if (m_val && m_val.is_arr()) {
+            m_idx = 0;
+            m_max = unsafe_yyjson_get_len(m_val.ptr());
+            m_val = T(unsafe_yyjson_get_first(m_val.ptr()));
+        }
+    }
+
+    //赋值
+    ArrIterator &operator=(const ArrIterator &iter) {
+        m_val = iter.m_val;
+        m_idx = iter.m_idx;
+        m_max = iter.m_max;
+    }
+
+    //不等于
+    bool operator!=(const ArrIterator &iter) {
+        return m_val != iter.m_val;
+    }
+
+    //等于
+    bool operator==(const ArrIterator &iter) {
+        return m_val == iter.m_val;
+    }
+
+    //前缀自加
+    ArrIterator &operator++() {
+        if (m_val && m_idx < m_max) {
+            m_idx++;
+            if (m_idx < m_max) {
+                m_val = T(unsafe_yyjson_get_next(m_val.ptr()));
+            } else {
+                m_val = T();
+            }
+        }
+        return *this;
+    }
+
+    //后缀自加
+    ArrIterator operator++(int) {
+        ArrIterator tmp = *this;
+        if (m_val && m_idx < m_max) {
+            m_idx++;
+            if (m_idx < m_max) {
+                m_val = T(unsafe_yyjson_get_next(m_val.ptr()));
+            } else {
+                m_val = T();
+            }
+        }
+        return tmp;
+    }
+
+    //取值
+    T operator*() {
+        return m_val;
+    }
+
+    T *operator->() {
+        return &m_val;
+    }
+
+private:
+    T m_val;
+    size_t m_idx{0};
+    size_t m_max{0};
 };
 
 #define YY_TYPE_CHECK(typ, ...)                                                     \
@@ -118,6 +206,14 @@ public:
 
     operator bool() {
         return m_val != nullptr;
+    }
+
+    bool operator==(const val_view &other) {
+        return m_val == other.m_val;
+    }
+
+    bool operator!=(const val_view &other) {
+        return m_val != other.m_val;
     }
 
     YY_VAL_IS(null)
@@ -263,14 +359,17 @@ public:
         return val_view(yyjson_get_pointer(m_val, path));
     }*/
 
-    /*typedef ValIterator<val_view> iterator;
-    iterator begin() {
+    typedef ArrIterator<val_view> iterator;
+
+    iterator begin() const {
         return iterator(*this);
+        // return iterator(*this, true);
     }
 
-    iterator end() {
+    iterator end() const {
         return iterator(val_view());
-    }*/
+        // return iterator(*this, false);
+    }
 
     size_t arr_size() const {
         return yyjson_arr_size(m_val);
