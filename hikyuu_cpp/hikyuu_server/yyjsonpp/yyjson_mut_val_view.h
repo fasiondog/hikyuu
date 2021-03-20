@@ -17,6 +17,79 @@
 
 namespace yyjson {
 
+template <class T>
+class MutValArrIterator : public std::iterator<std::input_iterator_tag, T> {
+public:
+    MutValArrIterator(T val) {
+        if (val && val.is_arr()) {
+            m_idx = 0;
+            m_max = unsafe_yyjson_get_len(val.ptr());
+            if (m_max) {
+                m_cur.ptr((yyjson_mut_val *)val.ptr()->uni.ptr);
+                m_cur.ptr(m_cur.ptr()->next);
+            }
+        }
+    }
+
+    //赋值
+    MutValArrIterator &operator=(const MutValArrIterator &iter) {
+        m_idx = iter.m_idx;
+        m_max = iter.m_max;
+        m_cur = iter.m_cur;
+    }
+
+    //不等于
+    bool operator!=(const MutValArrIterator &iter) {
+        return m_cur != iter.m_cur;
+    }
+
+    //等于
+    bool operator==(const MutValArrIterator &iter) {
+        return m_cur == iter.m_cur;
+    }
+
+    //前缀自加
+    MutValArrIterator &operator++() {
+        if (m_idx < m_max) {
+            m_idx++;
+            if (m_idx < m_max) {
+                m_cur.ptr(m_cur.ptr()->next);
+            } else {
+                m_cur.ptr(nullptr);
+            }
+        }
+        return *this;
+    }
+
+    //后缀自加
+    MutValArrIterator operator++(int) {
+        MutValArrIterator tmp = *this;
+        if (m_idx < m_max) {
+            m_idx++;
+            if (m_idx < m_max) {
+                m_cur.ptr(m_cur.ptr()->next);
+            } else {
+                m_cur.ptr(nullptr);
+            }
+        }
+        return tmp;
+    }
+
+    //取值
+    T operator*() {
+        return m_cur;
+    }
+
+    T *operator->() {
+        return &m_cur;
+    }
+
+private:
+    size_t m_idx{0};
+    size_t m_max{0};
+    T m_cur;
+};
+
 #define YY_MUT_VAL_IS(typ)                 \
     bool is_##typ() const {                \
         return yyjson_mut_is_##typ(m_val); \
@@ -31,12 +104,24 @@ public:
 
     virtual ~mut_val_view() = default;
 
-    yyjson_mut_val *ptr() {
+    yyjson_mut_val *ptr() const {
         return m_val;
+    }
+
+    void ptr(yyjson_mut_val *val) {
+        m_val = val;
     }
 
     operator bool() const {
         return m_val != nullptr;
+    }
+
+    bool operator==(const mut_val_view &other) {
+        return m_val == other.m_val;
+    }
+
+    bool operator!=(const mut_val_view &other) {
+        return m_val != other.m_val;
     }
 
     YY_MUT_VAL_IS(null)
@@ -54,17 +139,17 @@ public:
     YY_MUT_VAL_IS(ctn)   // array or object
 
     /** Returns value's type. */
-    yyjson_type get_type() const {
+    yyjson_type type() const {
         return yyjson_mut_get_type(m_val);
     }
 
     /** Returns value's subtype. */
-    yyjson_subtype get_subtype() const {
+    yyjson_subtype subtype() const {
         return yyjson_mut_get_subtype(m_val);
     }
 
     /** Returns value's tag. */
-    uint8_t get_tag() const {
+    uint8_t tag() const {
         return yyjson_mut_get_tag(m_val);
     }
 
@@ -72,58 +157,96 @@ public:
      * Returns type description, such as: "null", "string", "array", "object", "true", "false",
      * "uint", "sint", "real", "unknown"
      */
-    const char *get_type_desc() const {
+    const char *type_desc() const {
         return yyjson_mut_get_type_desc(m_val);
     }
 
-    bool get_bool(bool fallback) const {
+    bool value(bool fallback) const {
         return yyjson_mut_is_bool(m_val) ? unsafe_yyjson_get_bool((yyjson_val *)m_val) : fallback;
     }
 
-    bool get_bool() const {
-        if (!yyjson_mut_is_bool(m_val)) {
-            YYJSON_THROW("This value type is {}, not bool!", get_type_desc());
-        }
-        return unsafe_yyjson_get_bool((yyjson_val *)m_val);
-    }
-
-    uint64_t get_uint(uint64_t fallback) const {
+    uint64_t value(uint64_t fallback) const {
         return yyjson_mut_is_int(m_val) ? unsafe_yyjson_get_uint((yyjson_val *)m_val) : fallback;
     }
 
-    uint64_t get_uint() const {
-        if (!yyjson_mut_is_int(m_val)) {
-            YYJSON_THROW("This vale type is {}, not uint!", get_type_desc());
-        }
-        return unsafe_yyjson_get_uint((yyjson_val *)m_val);
-    }
-
-    int64_t get_int(int64_t fallback) const {
+    int64_t value(int64_t fallback) const {
         return yyjson_mut_is_int(m_val) ? unsafe_yyjson_get_sint((yyjson_val *)m_val) : fallback;
     }
 
-    int64_t get_int() const {
-        if (!yyjson_mut_is_int(m_val)) {
-            YYJSON_THROW("This value type is {}, not int!", get_type_desc());
+    int value(int fallback) const {
+        int result = fallback;
+        if (yyjson_mut_is_int(m_val)) {
+            try {
+                result = static_cast<int>(unsafe_yyjson_get_sint((yyjson_val *)m_val));
+            } catch (...) {
+            }
         }
-        return unsafe_yyjson_get_sint((yyjson_val *)m_val);
+        return result;
     }
 
-    double get_double(double fallback) const {
+    double value(double fallback) const {
         return yyjson_mut_is_num(m_val) ? unsafe_yyjson_get_real((yyjson_val *)m_val) : fallback;
     }
 
-    double get_double() const {
-        if (!yyjson_mut_is_num(m_val)) {
-            YYJSON_THROW("This value type is {}, not double!", get_type_desc());
-        }
+    float value(float fallback) const {
+        return yyjson_mut_is_num(m_val) ? (float)unsafe_yyjson_get_real((yyjson_val *)m_val)
+                                        : fallback;
+    }
+
+    std::string value(const char *fallback) const {
+        return yyjson_mut_is_str(m_val) ? std::string(unsafe_yyjson_get_str((yyjson_val *)m_val))
+                                        : std::string(fallback);
+    }
+
+    std::string value(const std::string &fallback) const {
+        return yyjson_mut_is_str(m_val) ? std::string(unsafe_yyjson_get_str((yyjson_val *)m_val))
+                                        : fallback;
+    }
+
+    template <typename T>
+    T value() const {
+        YYJSON_THROW("Unsupport type!");
+    }
+
+    template <>
+    bool value() const {
+        YY_TYPE_CHECK(bool);
+        return unsafe_yyjson_get_bool((yyjson_val *)m_val);
+    }
+
+    template <>
+    uint64_t value() const {
+        YY_TYPE_CHECK(int);
+        return unsafe_yyjson_get_uint((yyjson_val *)m_val);
+    }
+
+    template <>
+    int64_t value() const {
+        YY_TYPE_CHECK(int);
+        return unsafe_yyjson_get_sint((yyjson_val *)m_val);
+    }
+
+    template <>
+    int value() const {
+        YY_TYPE_CHECK(int);
+        return static_cast<int>(unsafe_yyjson_get_sint((yyjson_val *)m_val));
+    }
+
+    template <>
+    double value() const {
+        YY_TYPE_CHECK(num);
         return unsafe_yyjson_get_real((yyjson_val *)m_val);
     }
 
-    std::string get_str() const {
-        if (!yyjson_mut_is_str(m_val)) {
-            YYJSON_THROW("This value type is {}, not string!", get_type_desc());
-        }
+    template <>
+    float value() const {
+        YY_TYPE_CHECK(num);
+        return static_cast<float>(unsafe_yyjson_get_real((yyjson_val *)m_val));
+    }
+
+    template <>
+    std::string value() const {
+        YY_TYPE_CHECK(str);
         return std::string(unsafe_yyjson_get_str((yyjson_val *)m_val));
     }
 
@@ -139,21 +262,42 @@ public:
         return mut_val_view(yyjson_mut_obj_get(m_val, NULL), m_doc);
     }
 
+#if YYJSON_VERSION_HEX > 0x000200
+    mut_val_view get_pointer(const char *pointer) const {
+        return mut_val_view(yyjson_mut_get_pointer(m_val, pointer));
+    }
+
+    mut_val_view get_pointer(const std::string &pointer) const {
+        return mut_val_view(yyjson_mut_get_pointer(m_val, pointer.c_str()));
+    }
+#endif
+
+    size_t arr_size() const {
+        return yyjson_mut_arr_size(m_val);
+    }
+
     /** Returns the number of key-value pairs in this object, or 0 if input is not an object. */
-    size_t size() const {
+    size_t obj_size() const {
         return yyjson_mut_obj_size(m_val);
     }
 
-    bool equals_str(const char *str) const {
-        return yyjson_mut_equals_str(m_val, str);
+    /** Returns the number of key-value pairs in the object , or the number of arr, else 0. */
+    size_t size() const {
+        if (is_arr()) {
+            return yyjson_mut_arr_size(m_val);
+        } else if (is_obj()) {
+            return yyjson_mut_obj_size(m_val);
+        } else {
+            return 0;
+        }
     }
 
-    bool equals_str(const std::string &str) const {
-        return equals_str(str.c_str());
+    MutValArrIterator<mut_val_view> arr_begin() {
+        return MutValArrIterator<mut_val_view>(*this);
     }
 
-    bool equals_strn(const char *str, size_t len) const {
-        return yyjson_mut_equals_strn(m_val, str, len);
+    MutValArrIterator<mut_val_view> arr_end() {
+        return MutValArrIterator<mut_val_view>(mut_val_view());
     }
 
     /*typedef ArrIterator<mut_val_view> iterator;
@@ -173,8 +317,16 @@ public:
         }
     }
 
-    size_t arr_size() const {
-        return yyjson_mut_arr_size(m_val);
+    void for_each(std::function<void(mut_val_view, mut_val_view)> func) {
+        size_t idx = 0, max = 0;
+        yyjson_mut_val *key = nullptr;
+        yyjson_mut_val *val = nullptr;
+        for (idx = 0, max = yyjson_mut_obj_size(m_val),
+            key = max ? ((yyjson_mut_val *)m_val->uni.ptr)->next->next : NULL,
+            val = key ? key->next : NULL;
+             idx < max; idx++, key = val->next, val = key->next) {
+            func(mut_val_view(key, m_doc), mut_val_view(val, m_doc));
+        }
     }
 
     mut_val_view arr_get(size_t idx) const {
@@ -360,5 +512,40 @@ private:
     yyjson_mut_val *m_val{nullptr};
     yyjson_mut_doc *m_doc{nullptr};
 };
+
+inline std::ostream &operator<<(std::ostream &os, mut_val_view val) {
+    if (val.is_bool()) {
+        if (val.value<bool>()) {
+            os << "true";
+        } else {
+            os << "false";
+        }
+    } else if (val.is_uint()) {
+        os << val.value<uint64_t>();
+    } else if (val.is_sint()) {
+        os << val.value<int64_t>();
+    } else if (val.is_real()) {
+        os << val.value<double>();
+    } else if (val.is_str()) {
+        os << "\"" << val.value<std::string>() << "\"";
+    } else if (val.is_null()) {
+        os << "null";
+    } else if (val.is_arr()) {
+        os << "[";
+        for (auto iter = val.arr_begin(); iter != val.arr_end(); ++iter) {
+            os << *iter << ", ";
+        }
+        os << "]";
+        /*} else if (val.is_obj()) {
+            os << "{";
+            for (auto iter = val.begin(); iter != val.end(); ++iter) {
+                os << iter->first << ": " << iter->second << ", ";
+            }
+            os << "}";*/
+    } else {
+        os << val.type_desc();
+    }
+    return os;
+}
 
 }  // namespace yyjson

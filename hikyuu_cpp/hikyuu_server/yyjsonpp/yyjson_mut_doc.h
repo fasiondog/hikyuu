@@ -76,6 +76,16 @@ public:
         yyjson_mut_doc_set_root(m_doc, val.ptr());
     }
 
+#if YYJSON_VERSION_HEX > 0x000200
+    mut_val_view get_pointer(const char* pointer) const {
+        return mut_val_view(yyjson_mut_doc_get_pointer(m_doc, pointer));
+    }
+
+    mut_val_view get_pointer(const std::string& pointer) const {
+        return mut_val_view(yyjson_mut_doc_get_pointer(m_doc, pointer.c_str()));
+    }
+#endif
+
     mut_val_view copy_val(val_view val) {
         return mut_val_view(yyjson_val_mut_copy(m_doc, val.ptr()), m_doc);
     }

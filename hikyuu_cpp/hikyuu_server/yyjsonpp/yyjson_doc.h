@@ -69,16 +69,16 @@ public:
         return result;
     }
 
-    val_view get_root() const {
+    val_view root() const {
         return val_view(yyjson_doc_get_root(m_doc));
     }
 
     val_view get(const char *key) const {
-        return get_root().get(key);
+        return root().get(key);
     }
 
     val_view get(const std::string &key) const {
-        return get_root().get(key);
+        return root().get(key);
     }
 
     val_view operator[](const char *key) const {
@@ -89,10 +89,15 @@ public:
         return get(key);
     }
 
-    /* 0.2.0 版本尚不支持
-    val_view get_obj_by_path(const char *path) {
-        return val_view(yyjson_doc_get_pointer(m_doc, path));
-    }*/
+#if YYJSON_VERSION_HEX > 0x000200
+    val_view get_pointer(const char *pointer) const {
+        return val_view(yyjson_doc_get_pointer(m_doc, pointer));
+    }
+
+    val_view get_pointer(const std::string &pointer) const {
+        return val_view(yyjson_doc_get_pointer(m_doc, pointer.c_str()));
+    }
+#endif
 
     size_t get_read_size() const {
         return yyjson_doc_get_read_size(m_doc);

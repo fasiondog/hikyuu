@@ -21,13 +21,15 @@ public:
         std::string req = getReqData();
         try {
             yyjson::doc doc(req);
-            auto x = doc.get_root();
+            yyjson::mut_doc mut_doc(doc);
+            auto x = mut_doc.root();
+            CLS_INFO("{}", x);
             CLS_INFO("{} {}", x.type_desc(), x.size());
             size_t count = 0;
-            for (auto iter = x.begin(); iter != x.end(); ++iter) {
+            for (auto iter = x.arr_begin(); iter != x.arr_end(); ++iter) {
                 CLS_INFO("count: {}", count++);
-                CLS_INFO("{}", iter->value<int64_t>());
-                // CLS_INFO("{}", iter->type_desc());
+                // CLS_INFO("{} {}", iter->first, iter->second);
+                CLS_INFO("{}", *iter);
             }
 
             /*std::vector<int64_t> y = x.to_vector_int64_t();
