@@ -7,21 +7,18 @@
 
 #pragma once
 
-#include "http/HttpHandle.h"
-#include "http/HttpFilter.h"
+#include "../../http/HttpHandle.h"
 
 namespace hku {
 
 class LoginHandle : public HttpHandle {
-    CLASS_LOGGER(LoginHandle)
-
-public:
-    LoginHandle(nng_aio *aio) : HttpHandle(aio) {}
+    HTTP_HANDLE_IMP(LoginHandle)
 
     virtual void run() override {
         json req = getReqJson();
         HTTP_VALID_CHECK(req.contains("user"), 2000, "Invalid login request! missing user");
-        setResData(req);
+        setResData(
+          R"({"hku_token":"7c98806c0711cf996d602890e0ab9119d9a86afe04296ba69a16f0d9d76be755"})");
     }
 };
 

@@ -8,17 +8,17 @@
 #pragma once
 
 #include "http/HttpService.h"
-#include "LoginHandle.h"
-#include "LogoutHandle.h"
+#include "StatusHandle.h"
+#include "LogLevelHandle.h"
 
 namespace hku {
 
-class LoginService : public HttpService {
-    HTTP_SERVICE_IMP(LoginService)
+class AssistService : public HttpService {
+    HTTP_SERVICE_IMP(AssistService)
 
     virtual void regHandle() override {
-        POST<LoginHandle>("login");
-        POST<LogoutHandle>("logout");
+        GET<StatusHandle>("status");
+        POST<LogLevelHandle>("log_level");
     }
 };
 

@@ -25,7 +25,9 @@ def shell_cmd(func):
             self = args[0]
             self.__class__.lineno += 1
             self.__class__.prompt = '\033[32;40mHKU [\033[0m\033[1;32;40m%s\033[0m\033[32;40m]:\033[0m ' % self.__class__.lineno
-            return func(*args, **kargs)
+            result = func(*args, **kargs)
+            print("")
+            return result
         except Exception as e:
             print(e)
 

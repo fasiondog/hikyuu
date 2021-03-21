@@ -147,4 +147,8 @@ protected:
     std::vector<std::function<void(HttpHandle *)>> m_filters;
 };
 
+#define HTTP_HANDLE_IMP(cls) \
+public:                      \
+    cls(nng_aio *aio) : HttpHandle(aio) {}
+
 }  // namespace hku

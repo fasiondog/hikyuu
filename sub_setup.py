@@ -136,6 +136,7 @@ setup(
         'requests',
         'qdarkstyle',
         'flatbuffers',
-        'pynng'
+        'pynng',
+        'requests'
     ],
 )

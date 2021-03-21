@@ -37,19 +37,19 @@ void HttpHandle::operator()() {
 
     } catch (HttpValidError& e) {
         CLS_TRACE("HttpValidError({}): {}", e.errcode(), e.what());
+        nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
         nng_http_res_set_status(m_nng_res, e.status());
         nng_http_res_set_reason(m_nng_res, e.msg().c_str());
-        CLS_ERROR_IF(nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size()),
-                     "Failed nng_http_res_copy_data!");
+        nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
     } catch (HttpException& e) {
         CLS_TRACE("HttpException: {}", e.what());
+        nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
         nng_http_res_set_status(m_nng_res, e.status());
         nng_http_res_set_reason(m_nng_res, e.msg().c_str());
-        CLS_ERROR_IF(nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size()),
-                     "Failed nng_http_res_copy_data!");
+        nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 

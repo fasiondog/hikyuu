@@ -7,15 +7,15 @@
 
 #pragma once
 
-#include "../../http/HttpHandle.h"
+#include "../RestHandle.h"
 
 namespace hku {
 
-class LogoutHandle : public HttpHandle {
-    HTTP_HANDLE_IMP(LogoutHandle)
+class StatusHandle : public RestHandle {
+    REST_HANDLE_IMP(StatusHandle)
 
     virtual void run() override {
-        setResData(R"({"result": true})");
+        setResData(R"({"status": "running"})");
     }
 };
 

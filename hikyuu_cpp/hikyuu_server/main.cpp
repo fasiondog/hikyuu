@@ -7,10 +7,12 @@
 
 #include <hikyuu/hikyuu.h>
 #include "http/HttpServer.h"
-#include "rest_api/hello.h"
 #include "service/login/LoginService.h"
+#include "service/assist/AssistService.h"
 
 using namespace hku;
+
+#define HKU_SERVICE_API(name) "/hku/" #name "/v1"
 
 int main(int argc, char* argv[]) {
     init_server_logger();
@@ -19,10 +21,11 @@ int main(int argc, char* argv[]) {
 
     HttpServer server("http://*", 520);
 
-    server.GET<HelloHandle>("/hello");
-
-    LoginService login;
+    LoginService login(HKU_SERVICE_API(login));
     login.bind(&server);
+
+    AssistService assist(HKU_SERVICE_API(assist));
+    assist.bind(&server);
 
     server.start();
     return 0;

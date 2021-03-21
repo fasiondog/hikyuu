@@ -22,11 +22,13 @@
 
 namespace hku {
 
+#define DEFAULT_LOGGER_LEVEL spdlog::level::trace
+
 inline void init_server_logger() {
     static std::once_flag oc;
     std::call_once(oc, [&]() {
         auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        stdout_sink->set_level(spdlog::level::trace);
+        stdout_sink->set_level(DEFAULT_LOGGER_LEVEL);
 
         spdlog::init_thread_pool(8192, 1);
         std::vector<spdlog::sink_ptr> sinks{stdout_sink};
@@ -34,11 +36,32 @@ inline void init_server_logger() {
                                                              spdlog::thread_pool(),
                                                              spdlog::async_overflow_policy::block);
 
-        logger->set_level(spdlog::level::trace);
-        logger->flush_on(spdlog::level::trace);
+        logger->set_level(DEFAULT_LOGGER_LEVEL);
+        logger->flush_on(DEFAULT_LOGGER_LEVEL);
         logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^SERVER-%L%$] - %v (%s:%#)");
         spdlog::set_default_logger(logger);
     });
+}
+
+inline void set_logger_level(int level) {
+    SPDLOG_INFO("set default logger level: {}", level);
+    spdlog::set_level((spdlog::level::level_enum)level);
+    spdlog::flush_on((spdlog::level::level_enum)level);
+}
+
+inline bool have_logger(const std::string& name) {
+    return spdlog::get(name) ? true : false;
+}
+
+inline void set_logger_level(const std::string& name, int level) {
+    auto logger = spdlog::get(name);
+    if (logger) {
+        SPDLOG_INFO("set {} logger level: {}", name, level);
+        spdlog::get(name)->set_level((spdlog::level::level_enum)level);
+        spdlog::get(name)->flush_on((spdlog::level::level_enum)level);
+    } else {
+        SPDLOG_INFO("Not exist {} logger", name);
+    }
 }
 
 #define LOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)
@@ -193,15 +216,15 @@ public:                                                                         
         static std::once_flag oc;                                                                \
         std::call_once(oc, [&]() {                                                               \
             auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();          \
-            stdout_sink->set_level(spdlog::level::trace);                                        \
+            stdout_sink->set_level(DEFAULT_LOGGER_LEVEL);                                        \
                                                                                                  \
             std::vector<spdlog::sink_ptr> sinks{stdout_sink};                                    \
             ms_##cls_logger = std::make_shared<spdlog::async_logger>(                            \
               #cls, sinks.begin(), sinks.end(), spdlog::thread_pool(),                           \
               spdlog::async_overflow_policy::block);                                             \
                                                                                                  \
-            ms_##cls_logger->set_level(spdlog::level::trace);                                    \
-            ms_##cls_logger->flush_on(spdlog::level::trace);                                     \
+            ms_##cls_logger->set_level(DEFAULT_LOGGER_LEVEL);                                    \
+            ms_##cls_logger->flush_on(DEFAULT_LOGGER_LEVEL);                                     \
             ms_##cls_logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^" #cls "-%L%$] - %v (%s:%#)"); \
             spdlog::register_logger(ms_##cls_logger);                                            \
         });                                                                                      \
