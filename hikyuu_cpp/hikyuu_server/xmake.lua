@@ -1,9 +1,7 @@
-add_requires("nngpp", {system=false})
-
 target("hkuserver")
     set_kind("binary")
     
-    add_packages("fmt", "spdlog", "flatbuffers", "nngpp", "nng", "yyjson")
+    add_packages("fmt", "spdlog", "flatbuffers", "nng", "yyjson")
     add_deps("hikyuu")
 
     add_includedirs("..")

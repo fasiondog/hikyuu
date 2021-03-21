@@ -15,14 +15,15 @@
 namespace hku {
 
 #if !defined(__clang__) && !defined(__GNUC__)
-class HttpError : public std::exception {
+class HttpException : public std::exception {
 public:
-    HttpError() : std::exception("Unknown exception!") {}
-    HttpError(int http_status) : HttpError(http_status, "") {}
-    HttpError(int http_status, const std::string &msg)
+    HttpException() : std::exception("Unknown exception!") {}
+    HttpException(int http_status) : HttpException(http_status, "") {}
+    HttpException(int http_status, const std::string &msg)
     : std::exception(msg.c_str()), m_http_status(http_status) {}
-    HttpError(int http_status, const char *msg) : std::exception(msg), m_http_status(http_status) {}
-    virtual ~HttpError() noexcept {}
+    HttpException(int http_status, const char *msg)
+    : std::exception(msg), m_http_status(http_status) {}
+    virtual ~HttpException() noexcept {}
 
     int status() const noexcept {
         return m_http_status;
@@ -38,13 +39,14 @@ private:
 
 #else
 // llvm 中的 std::exception 不接受参数
-class HttpError : public std::exception {
+class HttpException : public std::exception {
 public:
-    HttpError() : m_msg("Unknown exception!") {}
-    HttpError(int http_status) : HttpError(http_status, "") {}
-    HttpError(int http_status, const char *msg) : m_msg(msg), m_http_status(http_status) {}
-    HttpError(int http_status, const std::string &msg) : m_msg(msg), m_http_status(http_status) {}
-    virtual ~HttpError() noexcept {}
+    HttpException() : m_msg("Unknown exception!") {}
+    HttpException(int http_status) : HttpException(http_status, "") {}
+    HttpException(int http_status, const char *msg) : m_msg(msg), m_http_status(http_status) {}
+    HttpException(int http_status, const std::string &msg)
+    : m_msg(msg), m_http_status(http_status) {}
+    virtual ~HttpException() noexcept {}
     virtual const char *what() const noexcept {
         return m_msg.c_str();
     }
@@ -64,13 +66,13 @@ protected:
 #endif /* #ifdef __clang__ */
 
 #define HANDLE_THROW(http_status, ...) \
-    { throw HttpError(http_status, fmt::format(__VA_ARGS__)); }
+    { throw HttpException(http_status, fmt::format(__VA_ARGS__)); }
 
-#define HANDLE_CHECK(expr, http_status, ...)                        \
-    {                                                               \
-        if (!expr) {                                                \
-            throw HttpError(http_status, fmt::format(__VA_ARGS__)); \
-        }                                                           \
+#define HANDLE_CHECK(expr, http_status, ...)                            \
+    {                                                                   \
+        if (!expr) {                                                    \
+            throw HttpException(http_status, fmt::format(__VA_ARGS__)); \
+        }                                                               \
     }
 
 #define HANDLE_CHECK_THROW(expr, error) \

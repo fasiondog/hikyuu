@@ -17,6 +17,7 @@ void HttpHandle::operator()() {
     int rv = nng_http_res_alloc(&m_nng_res);
     if (rv != 0) {
         CLS_FATAL("Failed nng_http_res_alloc! {}", nng_strerror(rv));
+        nng_aio_finish(m_http_aio, 0);
         return;
     }
 
@@ -34,11 +35,21 @@ void HttpHandle::operator()() {
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
-    } catch (HttpError& e) {
+    } catch (HttpValidError& e) {
+        CLS_TRACE("HttpValidError({}): {}", e.errcode(), e.what());
         nng_http_res_set_status(m_nng_res, e.status());
         nng_http_res_set_reason(m_nng_res, e.msg().c_str());
-        CLS_WARN_IF(nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size()),
-                    "Failed nng_http_res_copy_data!");
+        CLS_ERROR_IF(nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size()),
+                     "Failed nng_http_res_copy_data!");
+        nng_aio_set_output(m_http_aio, 0, m_nng_res);
+        nng_aio_finish(m_http_aio, 0);
+
+    } catch (HttpException& e) {
+        CLS_TRACE("HttpException: {}", e.what());
+        nng_http_res_set_status(m_nng_res, e.status());
+        nng_http_res_set_reason(m_nng_res, e.msg().c_str());
+        CLS_ERROR_IF(nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size()),
+                     "Failed nng_http_res_copy_data!");
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
@@ -83,6 +94,7 @@ void HttpHandle::unknown_error(const std::string& errmsg) {
         nng_aio_finish(m_http_aio, 0);
     } catch (...) {
         CLS_FATAL("unknown error in finished!");
+        nng_aio_finish(m_http_aio, 0);
     }
 }
 

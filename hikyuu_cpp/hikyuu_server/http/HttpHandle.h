@@ -11,8 +11,12 @@
 #include <vector>
 #include <functional>
 
-#include "HttpError.h"
+#include "HttpValidError.h"
+#include "../common/json.hpp"
 #include "../common/log.h"
+
+using json = nlohmann::json;                  // 不保持插入排序
+using ordered_json = nlohmann::ordered_json;  // 保持插入排序
 
 namespace hku {
 
@@ -63,11 +67,31 @@ public:
         return head ? std::string(head) : std::string();
     }
 
+    /**
+     * 获取请求数据
+     * @param[out] data 请求中的数据起始地址，无数据时返回 NULL
+     * @param[out] len 请求中的数据长度
+     * @note 请求中无数据时, len返回的长度可能不为0
+     */
     void getReqData(void **data, size_t *len) {
         nng_http_req_get_data(m_nng_req, data, len);
     }
 
     std::string getReqData();
+
+    json getReqJson() {
+        void *data;
+        size_t len;
+        nng_http_req_get_data(m_nng_req, &data, &len);
+        HTTP_VALID_CHECK(data, INVALID_JSON_REQUEST, "Req data is empty!");
+        json result;
+        try {
+            result = json::parse((const char *)data);
+        } catch (json::exception &e) {
+            throw HttpValidError(INVALID_JSON_REQUEST, e.what());
+        }
+        return result;
+    }
 
     /**
      * 请求的 ulr 中是否包含 query 参数
@@ -91,8 +115,22 @@ public:
         NNG_CHECK(nng_http_res_set_header(m_nng_res, key, val));
     }
 
-    void setResData(const std::string_view &content) {
+    void setResData(const char *data) {
+        NNG_CHECK(nng_http_res_copy_data(m_nng_res, data, strlen(data)));
+    }
+
+    void setResData(const std::string &content) {
         NNG_CHECK(nng_http_res_copy_data(m_nng_res, content.data(), content.size()));
+    }
+
+    void setResData(const json &data) {
+        std::string x = data.dump();
+        setResData(x);
+    }
+
+    void setResData(const ordered_json &data) {
+        std::string x = data.dump();
+        setResData(x);
     }
 
     void operator()();

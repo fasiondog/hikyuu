@@ -8,7 +8,7 @@
 #include <hikyuu/hikyuu.h>
 #include "http/HttpServer.h"
 #include "rest_api/hello.h"
-#include "rest_api/login.h"
+#include "service/login/LoginService.h"
 
 using namespace hku;
 
@@ -20,7 +20,9 @@ int main(int argc, char* argv[]) {
     HttpServer server("http://*", 520);
 
     server.GET<HelloHandle>("/hello");
-    server.GET<LoginHandle>("/login");
+
+    LoginService login;
+    login.bind(&server);
 
     server.start();
     return 0;
