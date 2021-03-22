@@ -31,7 +31,9 @@ void HttpHandle::operator()() {
 
         before_run();
         run();
+        after_run();
 
+        // nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
@@ -107,7 +109,7 @@ std::string HttpHandle::getReqData() {
 
 bool HttpHandle::haveQueryParams() {
     const char* url = nng_http_req_get_uri(m_nng_req);
-    return !url ? false : strchr(url, '?');
+    return !url ? false : strchr(url, '?') != nullptr;
 }
 
 bool HttpHandle::getQueryParams(QueryParams& query_params) {

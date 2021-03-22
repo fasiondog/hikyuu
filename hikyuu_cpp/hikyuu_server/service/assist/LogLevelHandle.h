@@ -24,6 +24,7 @@ class LogLevelHandle : public RestHandle {
         if (!req.contains("logger")) {
             set_logger_level(level);
             setResData(R"({"result": true})");
+            return;
         }
 
         HTTP_VALID_CHECK(req["logger"].is_string(), HttpValidErrorCode::WRONG_PARAMETER_TYPE,
@@ -31,10 +32,10 @@ class LogLevelHandle : public RestHandle {
         std::string logger = req["logger"].get<std::string>();
         if (have_logger(logger)) {
             set_logger_level(logger, level);
+            setResData(R"({"result": true})");
         } else {
             setResData(fmt::format(
               R"({{"result":false, "errcode": 2000, "errmsg":"not exist logger {}"}})", logger));
-            return;
         }
     }
 };

@@ -15,6 +15,7 @@ class LogoutHandle : public HttpHandle {
     HTTP_HANDLE_IMP(LogoutHandle)
 
     virtual void run() override {
+        setResHeader("Content-Type", "application/json; charset=UTF-8");
         setResData(R"({"result": true})");
     }
 };

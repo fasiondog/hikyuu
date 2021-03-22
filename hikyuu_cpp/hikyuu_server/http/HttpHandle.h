@@ -49,6 +49,9 @@ public:
     /** 响应处理 */
     virtual void run() = 0;
 
+    /** 后处理 */
+    virtual void after_run() {}
+
     void addFilter(std::function<void(HttpHandle *)> filter) {
         m_filters.push_back(filter);
     }
