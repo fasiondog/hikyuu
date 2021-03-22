@@ -13,11 +13,6 @@ import cmd
 import functools
 
 
-def parse(arg):
-    'Convert a series of zero or more numbers to an argument tuple'
-    return tuple(map(int, arg.split()))
-
-
 def shell_cmd(func):
     @functools.wraps(func)
     def wrapcmd(*args, **kargs):
@@ -51,9 +46,32 @@ class HKUShell(cmd.Cmd):
     prompt = '\033[32;40mHKU [\033[0m\033[1;32;40m%s\033[0m\033[32;40m]:\033[0m ' % lineno
     file = None
 
+    @classmethod
+    def add_command(cls, func):
+        """
+        def func(self, args):
+            do something, don't return
+        """
+        @functools.wraps(func)
+        def wrapcmd(*args, **kargs):
+            try:
+                self = args[0]
+                self.__class__.lineno += 1
+                self.__class__.prompt = '\033[32;40mHKU [\033[0m\033[1;32;40m%s\033[0m\033[32;40m]:\033[0m ' % self.__class__.lineno
+                result = func(*args, **kargs)
+                print("")
+                return result
+            except Exception as e:
+                print(e)
+
+        if func.__name__ == "do_":
+            raise Exception("Invalid func name!")
+        name = func.__name__ if len(func.__name__) > 3 and func.__name__[:3] == "do_" else "do_%s" % func.__name__
+        setattr(cls, name, wrapcmd)
+
     @shell_cmd
     def do_hello(self, arg):
-        'test'
+        """You are welcome"""
         print(arg)
 
     def do_quit(self, arg):
@@ -82,9 +100,3 @@ class HKUShell(cmd.Cmd):
         if self.file:
             self.file.close()
             self.file = None
-
-
-if __name__ == "__main__":
-    import colorama
-    colorama.init(autoreset=True)
-    HKUShell().cmdloop()
