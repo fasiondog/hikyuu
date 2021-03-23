@@ -45,6 +45,13 @@ class HKUShell(cmd.Cmd):
     lineno = 1
     prompt = '\033[32;40mHKU [\033[0m\033[1;32;40m%s\033[0m\033[32;40m]:\033[0m ' % lineno
     file = None
+    server = None
+
+    def __del__(self):
+        if HKUShell.server is not None:
+            HKUShell.server.terminate()
+            HKUShell.server.wait()
+            HKUShell.server = None
 
     @classmethod
     def add_command(cls, func):
@@ -63,6 +70,7 @@ class HKUShell(cmd.Cmd):
                 return result
             except Exception as e:
                 print(e)
+                print("")
 
         if func.__name__ == "do_":
             raise Exception("Invalid func name!")
