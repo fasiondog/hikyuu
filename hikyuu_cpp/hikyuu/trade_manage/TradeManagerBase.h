@@ -15,6 +15,7 @@
 #include "LoanRecord.h"
 #include "TradeCostBase.h"
 #include "OrderBrokerBase.h"
+#include "crt/TC_Zero.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/nvp.hpp>
@@ -36,7 +37,13 @@ class HKU_API TradeManagerBase {
     PARAMETER_SUPPORT
 
 public:
-    TradeManagerBase();
+    TradeManagerBase() : TradeManagerBase("", TC_Zero()) {}
+
+    TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
+    : m_name(name), m_broker_last_datetime(Datetime::now()), m_costfunc(costFunc) {
+        setParam<int>("precision", 2);  //计算精度
+    }
+
     virtual ~TradeManagerBase() {}
 
     /** 账户名称 */
@@ -159,7 +166,16 @@ public:
         HKU_WARN("The subclass does not implement a reset method");
     }
 
-    shared_ptr<TradeManagerBase> clone();
+    /** 执行 clone 操作 */
+    shared_ptr<TradeManagerBase> clone() {
+        shared_ptr<TradeManagerBase> p = _clone();
+        HKU_CHECK(p, "Invalid ptr from _clone!");
+        p->m_params = m_params;
+        p->m_name = m_name;
+        p->m_broker_last_datetime = m_broker_last_datetime;
+        p->m_costfunc = m_costfunc;
+        return p;
+    }
 
     virtual shared_ptr<TradeManagerBase> _clone() {
         HKU_WARN("The subclass does not implement a reset method");
@@ -658,7 +674,18 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeManagerBase)
 typedef shared_ptr<TradeManagerBase> TradeManagerPtr;
 typedef shared_ptr<TradeManagerBase> TMPtr;
 
-HKU_API std::ostream& operator<<(std::ostream&, const TradeManagerBase&);
-HKU_API std::ostream& operator<<(std::ostream&, const TradeManagerPtr&);
+inline std::ostream& operator<<(std::ostream& os, const TradeManagerBase& tm) {
+    os << tm.str();
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
+    if (ptm) {
+        os << ptm->str();
+    } else {
+        os << "TradeManager(NULL)";
+    }
+    return os;
+}
 
 }  // namespace hku

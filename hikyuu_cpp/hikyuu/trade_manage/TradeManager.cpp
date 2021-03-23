@@ -77,7 +77,8 @@ string TradeManager::str() const {
 
 TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const TradeCostPtr& costfunc,
                            const string& name)
-: m_init_datetime(datetime),
+: TradeManagerBase(name, costfunc),
+  m_init_datetime(datetime),
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
   m_checkout_stock(0.0),
@@ -86,8 +87,6 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
     setParam<bool>("support_borrow_cash", false);   //是否自动融资
     setParam<bool>("support_borrow_stock", false);  //是否自动融券
     setParam<bool>("save_action", true);            //是否保存命令
-    m_name = name;
-    m_costfunc = costfunc;
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
