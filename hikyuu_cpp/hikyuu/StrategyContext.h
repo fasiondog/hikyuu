@@ -17,8 +17,10 @@ public:
     StrategyContext() {}
     StrategyContext(const StrategyContext&) = default;
 
-    StrategyContext(const vector<string>& stockCodeList) : m_stockCodeList(stockCodeList) {}
-    StrategyContext(vector<string>&& stockCodeList) : m_stockCodeList(std::move(stockCodeList)) {}
+    explicit StrategyContext(const vector<string>& stockCodeList)
+    : m_stockCodeList(stockCodeList) {}
+    explicit StrategyContext(vector<string>&& stockCodeList)
+    : m_stockCodeList(std::move(stockCodeList)) {}
 
     virtual ~StrategyContext() = default;
 

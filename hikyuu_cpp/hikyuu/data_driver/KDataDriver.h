@@ -140,7 +140,7 @@ public:
     typedef KDataDriver DriverType;
     typedef KDataDriverPtr DriverTypePtr;
 
-    KDataDriverConnect(const KDataDriverPtr& driver) : m_driver(driver) {}
+    explicit KDataDriverConnect(const KDataDriverPtr& driver) : m_driver(driver) {}
     ~KDataDriverConnect() = default;
 
     KDataDriverConnect(const KDataDriverConnect&) = delete;

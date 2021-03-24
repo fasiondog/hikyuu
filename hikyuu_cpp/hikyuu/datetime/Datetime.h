@@ -124,7 +124,7 @@ public:
      * 返回如YYYYMMDDhhmmss格式的数字，方便比较操作，
      * Null<Datetime>()对应的 number 为 Null<unsigned long long>
      */
-    unsigned long long number() const;
+    unsigned long long number() const noexcept;
 
     /**
      * 转化为字符串，供打印阅读，格式：

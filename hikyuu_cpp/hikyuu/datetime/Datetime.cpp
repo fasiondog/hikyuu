@@ -115,7 +115,7 @@ std::string Datetime::repr() const {
                        minute(), second(), millisecond(), microsecond());
 }
 
-unsigned long long Datetime::number() const {
+unsigned long long Datetime::number() const noexcept {
     HKU_IF_RETURN(m_data.date() == bd::date(bd::pos_infin), Null<unsigned long long>());
     return (unsigned long long)year() * 100000000 + (unsigned long long)month() * 1000000 +
            (unsigned long long)day() * 10000 + (unsigned long long)hour() * 100 +

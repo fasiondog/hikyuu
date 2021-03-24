@@ -64,7 +64,7 @@ Stock::Data::Data()
   m_precision(default_precision),
   m_minTradeNumber(default_minTradeNumber),
   m_maxTradeNumber(default_maxTradeNumber) {
-    auto& ktype_list = KQuery::getAllKType();
+    const auto& ktype_list = KQuery::getAllKType();
     for (auto& ktype : ktype_list) {
         pKData[ktype] = nullptr;
         pMutex[ktype] = nullptr;
@@ -96,7 +96,7 @@ Stock::Data::Data(const string& market, const string& code, const string& name, 
     to_upper(m_market);
     m_market_code = m_market + m_code;
 
-    auto& ktype_list = KQuery::getAllKType();
+    const auto& ktype_list = KQuery::getAllKType();
     for (auto& ktype : ktype_list) {
         pMutex[ktype] = new std::shared_mutex();
         pKData[ktype] = nullptr;

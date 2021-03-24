@@ -6,6 +6,8 @@
  */
 
 #pragma once
+
+#include <limits>
 #include "../../../utilities/db_connect/SQLStatementBase.h"
 #include "../../../utilities/db_connect/TableMacro.h"
 
@@ -15,7 +17,7 @@ class HolidayTable {
     TABLE_BIND1(Holiday, date)
 
 public:
-    HolidayTable() {}
+    HolidayTable() : date(Datetime().number()) {}
 
     Datetime datetime() const {
         HKU_CHECK(date <= 99999999, "Invalid holiday date: {}!", date);

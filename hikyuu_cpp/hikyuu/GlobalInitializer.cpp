@@ -53,7 +53,7 @@ void GlobalInitializer::init() {
 
     DataDriverFactory::init();
     StockManager::instance();
-    auto* _ = getGlobalSpotAgent();
+    getGlobalSpotAgent();
 }
 
 void GlobalInitializer::clean() {
