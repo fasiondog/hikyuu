@@ -58,13 +58,20 @@ void StrategyBase::_initDefaultParam() {
 }
 
 void StrategyBase::run() {
-    HKU_INFO("[Strategy {}] strategy is running! You can press Ctrl-C to terminte ...", m_name);
+    // 调用 strategy 自身的初始化方法
+    init();
+
+    StockManager& sm = StockManager::instance();
+
+    // 非独立进程方式运行 Stratege 或 重复执行，则直接返回
+    if (sm.thread_id() == std::this_thread::get_id()) {
+        return;
+    }
 
     // 注册 ctrl-c 终止信号
     std::signal(SIGINT, sig_handler);
 
-    // 调用 strategy 自身的初始化方法
-    init();
+    HKU_INFO("[Strategy {}] strategy is running! You can press Ctrl-C to terminte ...", m_name);
 
     // 加载上下文指定的证券数据
     IniParser config;
@@ -128,7 +135,6 @@ void StrategyBase::run() {
         }
     }
 
-    StockManager& sm = StockManager::instance();
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, m_context);
 
     const auto& stk_code_list = getStockCodeList();

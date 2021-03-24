@@ -72,4 +72,6 @@ D = Datetime
 K = None
 Q = Query
 
+sm = StockManager.instance()
+
 __version__ = get_version()

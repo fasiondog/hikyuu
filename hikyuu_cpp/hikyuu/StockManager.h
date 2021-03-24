@@ -9,6 +9,7 @@
 #define STOCKMANAGER_H_
 
 #include <mutex>
+#include <thread>
 #include "utilities/Parameter.h"
 #include "data_driver/DataDriverFactory.h"
 #include "Block.h"
@@ -174,6 +175,13 @@ public:
      */
     void removeTempCsvStock(const string& code);
 
+    /**
+     * 获取当前执行线程id，主要用于判断 Strategy 是以独立进程还是线程方式运行
+     */
+    std::thread::id thread_id() const {
+        return m_thread_id;
+    }
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -208,6 +216,7 @@ private:
 private:
     static StockManager* m_sm;
     bool m_initializing;
+    std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
     string m_tmpdir;
     string m_datadir;
     BaseInfoDriverPtr m_baseInfoDriver;

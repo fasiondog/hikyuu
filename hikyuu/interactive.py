@@ -110,10 +110,7 @@ for p in block_config:
 preload_param = Parameter()
 preload_config = ini.options('preload')
 for p in preload_config:
-    if p in (
-        'day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30',
-        'min60'
-    ):
+    if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60'):
         preload_param[p] = ini.getboolean('preload', p)
     else:
         preload_param[p] = ini.getint('preload', p)
@@ -124,7 +121,7 @@ for p in kdata_config:
     kdata_param[p] = ini.get('kdata', p)
 
 #set_log_level(LOG_LEVEL.INFO)
-sm = StockManager.instance()
+#sm = StockManager.instance()
 sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
 set_log_level(LOG_LEVEL.INFO)
 
@@ -239,8 +236,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
         q = Query(start, end)
         k = s.getKData(q)
         cond.set_context(k)
-        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k) > 0 and k[
-            -1].date == d[-1]:
+        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k) > 0 and k[-1].date == d[-1]:
             result.append(s)
             if print_out:
                 print(d[-1], s)
@@ -373,10 +369,7 @@ def realtime_update_from_sina_qq(source):
     #urls = []
     tmpstr = queryStr
     for stock in sm:
-        if stock.valid and stock.type in (
-            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
-            constant.STOCKTYPE_GEM
-        ):
+        if stock.valid and stock.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM):
             tmpstr += ("%s,") % (stock.market_code.lower())
             count = count + 1
             if count >= max_size:
@@ -455,10 +448,7 @@ def realtime_update_from_tushare():
         record.volume = float(df.ix[i, 'volume'])
         record.amount = float(df.ix[i, 'amount'])
 
-        if (
-            last_record.close != record.close or last_record.high != record.high
-            or last_record.low != record.low or last_record.open != record.open
-        ):
+        if (last_record.close != record.close or last_record.high != record.high or last_record.low != record.low or last_record.open != record.open):
             from datetime import date
             d = date.today()
             record.date = Datetime(d)
@@ -487,8 +477,7 @@ def realtime_update_wrap():
         from datetime import timedelta, datetime
         nonlocal pre_update_time
         now_update_time = datetime.now()
-        if (pre_update_time is
-            None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
+        if (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
             realtime_update_inner(source)
             pre_update_time = datetime.now()
             print("更新完毕！", pre_update_time)
