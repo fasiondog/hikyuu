@@ -369,8 +369,9 @@ inline Datetime Datetime::operator-(TimeDelta d) const {
 
 namespace std {
 template <>
-struct std::hash<hku::Datetime> {
-    std::size_t operator()(hku::Datetime const& d) const noexcept {
+class hash<hku::Datetime> {
+public:
+    size_t operator()(hku::Datetime const& d) const noexcept {
         return d.number();  // or use boost::hash_combine
     }
 };
