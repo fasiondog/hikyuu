@@ -5,6 +5,6 @@
  *     Author: fasiondog
  */
 
-#include "StrategyTradeManager.h"
+#include "AccountTradeManager.h"
 
 namespace hku {}  // namespace hku

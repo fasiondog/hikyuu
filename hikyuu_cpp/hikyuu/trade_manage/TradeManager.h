@@ -51,17 +51,6 @@ public:
     /** 复位，清空交易、持仓记录 */
     virtual void _reset() override;
 
-    /**
-     * 注册订单代理
-     * @param broker 订单代理实例
-     */
-    virtual void regBroker(const OrderBrokerPtr& broker) override;
-
-    /**
-     * 清空已注册的订单代理
-     */
-    virtual void clearBroker() override;
-
     virtual shared_ptr<TradeManagerBase> _clone() override;
 
     /**
@@ -437,7 +426,7 @@ private:
     position_map_type m_short_position;           //空头仓位记录
     PositionRecordList m_short_position_history;  //空头仓位历史记录
 
-    list<OrderBrokerPtr> m_broker_list;  //订单代理列表
+    // list<OrderBrokerPtr> m_broker_list;  //订单代理列表
     // Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
 
     list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易

@@ -152,14 +152,6 @@ TradeManagerPtr TradeManager::_clone() {
     return TradeManagerPtr(p);
 }
 
-void TradeManager::regBroker(const OrderBrokerPtr& broker) {
-    m_broker_list.push_back(broker);
-}
-
-void TradeManager::clearBroker() {
-    m_broker_list.clear();
-}
-
 double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock) {
     // TODO 获取保证金比率，默认固定取60%
     return 0.6;
