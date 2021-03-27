@@ -40,6 +40,7 @@ add_requires("fmt", {system=false, configs = {header_only = true, vs_runtime = "
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
 add_requires("nng", {system=false, configs = {vs_runtime="MD"}})
+add_requires("nlohmann_json", {system=false})
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 

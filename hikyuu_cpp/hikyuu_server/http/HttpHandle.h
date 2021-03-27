@@ -11,8 +11,9 @@
 #include <vector>
 #include <functional>
 
+#include <nlohmann/json.hpp>
+
 #include "HttpValidError.h"
-#include "../common/json.hpp"
 #include "../common/log.h"
 
 using json = nlohmann::json;                  // 不保持插入排序

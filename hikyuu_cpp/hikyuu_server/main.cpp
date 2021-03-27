@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
     LOG_INFO("start server ... You can press Ctrl-C stop");
 
-    HttpServer server("http://*", 520);
+    HttpServer server("http://*", 9001);
 
     LoginService login(HKU_SERVICE_API(login));
     login.bind(&server);

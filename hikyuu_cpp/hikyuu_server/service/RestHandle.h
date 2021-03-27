@@ -31,10 +31,10 @@ public:
         setResHeader("Content-Type", "application/json; charset=UTF-8");
     }
 
-    virtual void after_run() override {
+    /*virtual void after_run() override {
         // 强制关闭连接，即仅有短连接
         nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
-    }
+    }*/
 };
 
 #define REST_HANDLE_IMP(cls) \
