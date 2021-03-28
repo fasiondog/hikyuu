@@ -7,7 +7,7 @@
 
 #include <hikyuu/hikyuu.h>
 #include "http/HttpServer.h"
-#include "service/login/LoginService.h"
+#include "service/account/AccountService.h"
 #include "service/assist/AssistService.h"
 
 using namespace hku;
@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
     HttpServer server("http://*", 9001);
 
-    LoginService login(HKU_SERVICE_API(login));
+    AccountService login(HKU_SERVICE_API(account));
     login.bind(&server);
 
     AssistService assist(HKU_SERVICE_API(assist));

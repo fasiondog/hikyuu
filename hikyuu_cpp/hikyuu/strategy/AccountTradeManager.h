@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "httplib.h"
 #include "../trade_manage/TradeManagerBase.h"
 
 namespace hku {
@@ -14,7 +15,7 @@ namespace hku {
 class HKU_API AccountTradeManager : public TradeManagerBase {
 public:
     AccountTradeManager() = default;
-    AccountTradeManager(const string& name) : TradeManagerBase(name, TC_Zero()) {}
+    AccountTradeManager(const string& name, const string& pwd);
     virtual ~AccountTradeManager() = default;
 
     virtual void _reset() override {}
@@ -462,6 +463,19 @@ public:
     virtual void tocsv(const string& path) override {
         HKU_WARN("The subclass does not implement this method");
     }
+
+private:
+    string getToken();
+
+private:
+    std::unique_ptr<httplib::Client> m_client;
+    string m_user;
+    string m_password;
+    string m_token;
 };
+
+inline TMPtr crtAccountTM(const string& name, const string& pwd) {
+    return std::make_shared<AccountTradeManager>(name, pwd);
+}
 
 }  // namespace hku

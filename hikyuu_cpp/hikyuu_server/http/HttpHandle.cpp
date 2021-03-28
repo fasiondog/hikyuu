@@ -107,6 +107,21 @@ std::string HttpHandle::getReqData() {
     return data ? std::string((char*)data) : std::string();
 }
 
+json HttpHandle::getReqJson() {
+    void* data;
+    size_t len;
+    nng_http_req_get_data(m_nng_req, &data, &len);
+    HTTP_VALID_CHECK(data, INVALID_JSON_REQUEST, "Req data is empty!");
+    json result;
+    try {
+        result = json::parse((const char*)data);
+    } catch (json::exception& e) {
+        HKU_ERROR("Failed parse json: {}", (const char*)data);
+        throw HttpValidError(INVALID_JSON_REQUEST, e.what());
+    }
+    return result;
+}
+
 bool HttpHandle::haveQueryParams() {
     const char* url = nng_http_req_get_uri(m_nng_req);
     return !url ? false : strchr(url, '?') != nullptr;

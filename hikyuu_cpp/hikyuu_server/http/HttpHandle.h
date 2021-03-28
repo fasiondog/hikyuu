@@ -83,19 +83,7 @@ public:
 
     std::string getReqData();
 
-    json getReqJson() {
-        void *data;
-        size_t len;
-        nng_http_req_get_data(m_nng_req, &data, &len);
-        HTTP_VALID_CHECK(data, INVALID_JSON_REQUEST, "Req data is empty!");
-        json result;
-        try {
-            result = json::parse((const char *)data);
-        } catch (json::exception &e) {
-            throw HttpValidError(INVALID_JSON_REQUEST, e.what());
-        }
-        return result;
-    }
+    json getReqJson();
 
     /**
      * 请求的 ulr 中是否包含 query 参数
