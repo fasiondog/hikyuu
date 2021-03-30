@@ -32,7 +32,7 @@ target("core")
         set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
         --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
     end
-    add_packages("fmt", "spdlog", "flatbuffers")
+    add_packages("fmt", "spdlog", "flatbuffers", "cpp-httplib")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("core.pyd")

@@ -5,7 +5,7 @@ target("hikyuu")
         set_kind("shared")
     end
     
-    add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
+    add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
 
     add_includedirs("..")
 
