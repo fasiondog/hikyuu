@@ -90,5 +90,11 @@ You need to specify where the boost headers is via the BOOST_ROOT variable!]])
         assert(os.getenv("BOOST_LIB"), [[Missing environment variable: BOOST_LIB
 You need to specify where the boost library is via the BOOST_LIB variable!]])
     end)
+
+    after_build(function(target)
+        if is_plat("linux") then
+            os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        end        
+    end)
     
 target_end()

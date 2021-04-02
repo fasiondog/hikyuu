@@ -39,7 +39,7 @@ add_plugindirs("./xmake_plugins")
 add_requires("fmt", {system=false, configs = {header_only = true, vs_runtime = "MD"}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
-add_requires("nng", {system=false, configs = {vs_runtime="MD"}})
+add_requires("nng", {system=false, configs = {vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("nlohmann_json", {system=false})
 add_requires("cpp-httplib", {system=false})
 

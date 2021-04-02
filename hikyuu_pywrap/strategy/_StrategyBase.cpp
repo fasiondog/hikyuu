@@ -93,8 +93,8 @@ public:
 const string& (StrategyBase::*strategy_get_name)() const = &StrategyBase::name;
 void (StrategyBase::*strategy_set_name)(const string&) = &StrategyBase::name;
 
-Datetime (StrategyBase::*get_start_datetime)() const = &StrategyBase::startDatetime;
-void (StrategyBase::*set_start_datetime)(const Datetime&) = &StrategyBase::startDatetime;
+Datetime (StrategyBase::*get_strategy_start_datetime)() const = &StrategyBase::startDatetime;
+void (StrategyBase::*set_strategy_start_datetime)(const Datetime&) = &StrategyBase::startDatetime;
 
 void setStockList(StrategyBase* self, object seq) {
     vector<string> stk_list;
@@ -126,7 +126,8 @@ void export_Strategy() {
                     make_function(strategy_get_name, return_value_policy<copy_const_reference>()),
                     strategy_set_name)
       .add_property("tm", &StrategyBase::getTM, &StrategyBase::setTM, "账户管理")
-      .add_property("start_datetime", get_start_datetime, set_start_datetime, "起始日期")
+      .add_property("start_datetime", get_strategy_start_datetime, set_strategy_start_datetime,
+                    "起始日期")
       .add_property(
         "stock_list",
         make_function(&StrategyBase::getStockCodeList, return_value_policy<copy_const_reference>()),

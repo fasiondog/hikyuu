@@ -261,7 +261,7 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
             return false;
         }
     } catch (...) {
-        HKU_ERROR("Exception of some HDF5 operator!");
+        // HKU_ERROR("Exception of some HDF5 operator!");
         return false;
     }
 
@@ -283,8 +283,8 @@ size_t H5KDataDriver::getCount(const string& market, const string& code, KQuery:
         dataspace.close();
         dataset.close();
     } catch (...) {
-        HKU_WARN("Exception of some HDF5 operator! stock: {}{} {}", market, code,
-                 KQuery::getKTypeName(kType));
+        // HKU_WARN("Exception of some HDF5 operator! stock: {}{} {}", market, code,
+        //         KQuery::getKTypeName(kType));
         total = 0;
     }
 

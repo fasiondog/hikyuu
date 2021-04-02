@@ -39,7 +39,8 @@ target("unit-test")
 
     if is_plat("linux") or is_plat("macosx") then
         add_links("boost_unit_test_framework")
-        --add_links("boost_system")
+        add_links("boost_filesystem")
+        add_links("boost_serialization")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
@@ -84,7 +85,7 @@ target("small-test")
 
     if is_plat("linux") or is_plat("macosx") then
         add_links("boost_unit_test_framework")
-        --add_links("boost_system")
+        add_links("boost_filesystem")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
