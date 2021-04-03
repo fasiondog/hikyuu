@@ -27,10 +27,8 @@ jobs:
         ./b2 release link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time --with-filesystem --with-system --with-test; 
       
     - name: test
-      shell: cmd
       run: |
         set BOOST_ROOT=./boost_1_75_0
         set BOOST_LIB=./boost_1_75_0/stage/lib
-        xmake f --confirm=y --test=small
         xmake -b small-test
         xmake r small-test
