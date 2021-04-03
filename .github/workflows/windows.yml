@@ -20,20 +20,14 @@ jobs:
         Invoke-WebRequest "https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" -UseBasicParsing -OutFile ./boost_1_74_0.zip
         Expand-Archive ./boost_1_74_0.zip -DestinationPath .
         Copy-Item ./boost_1_74_0 ./hikyuu
-    - name: build_boost
+    - name: build
       shell: cmd
       run: |
-        cd ./hikyuu/boost_1_74_0
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-        call bootstrap.bat
-        cd ..
-    - name: build
-      run: |
-        python --version
         pip install click
         cd hikyuu
         python setup.py build
     - name: test
+      shell: cmd
       run: |
         cd hikyuu
         python setup.py test
