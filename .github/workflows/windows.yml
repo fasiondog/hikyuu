@@ -23,7 +23,9 @@ jobs:
     - name: build_boost
       shell: cmd
       run: |
+        dir
         cd hikyuu/boost_1_75_0
+        dir
         bootstrap.bat --with-python=python3
         b2 release link=static runtime-link=shared address-model=64 -j 4 --with-date_time --with-filesystem --with-system --with-test
         b2 release link=shared runtime-link=shared address-model=64 -j 4 --with-python --with-serialization
