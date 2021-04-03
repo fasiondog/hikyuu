@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-lastest]
     
     steps:
     - uses: xmake-io/github-action-setup-xmake@v1
@@ -24,7 +24,6 @@ jobs:
       shell: cmd
       run: |
         cd hikyuu/boost_1_75_0
-        dir
         bootstrap.bat --with-python=python3
         b2 release link=static runtime-link=shared address-model=64 -j 4 --with-date_time --with-filesystem --with-system --with-test
         b2 release link=shared runtime-link=shared address-model=64 -j 4 --with-python --with-serialization
@@ -32,9 +31,8 @@ jobs:
     - name: test
       shell: cmd
       run: |
-        cd hikyuu
-        set BOOST_ROOT=./boost_1_75_0
-        set BOOST_LIB=./boost_1_75_0/stage/lib
+        set BOOST_ROOT=D:\a\hikyuu\hikyuu\hikyuu\boost_1_75_0
+        set BOOST_LIB=D:\a\hikyuu\hikyuu\hikyuu\boost_1_75_0/stage/lib
         xmake f --confirm=y --test=small
-        xmake -bvD small-test
+        xmake -b small-test
         xmake r small-test
