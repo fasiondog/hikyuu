@@ -48,7 +48,7 @@ target("core")
         import("lib.detect.find_tool")
         if is_plat("windows") then
             -- detect installed python3
-            local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
             assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
 
             -- find python include and libs directory

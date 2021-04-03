@@ -17,17 +17,23 @@ jobs:
         git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
     - name: download_boost
       run: | 
-        Invoke-WebRequest "https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.zip" -UseBasicParsing -OutFile ./boost_1_74_0.zip
-        Expand-Archive ./boost_1_74_0.zip -DestinationPath .
-        Copy-Item ./boost_1_74_0 ./hikyuu
-    - name: build
+        Invoke-WebRequest "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.zip" -UseBasicParsing -OutFile ./boost_1_75_0.zip
+        Expand-Archive ./boost_1_75_0.zip -DestinationPath .
+        Copy-Item ./boost_1_75_0 ./hikyuu
+    - name: build_boost
       shell: cmd
       run: |
-        python3 -m pip install click
-        cd hikyuu
-        python3 setup.py build
+        cd hikyuu/boost_1_75_0
+        bootstrap.bat --with-python=python3
+        b2 release link=static runtime-link=shared address-model=64 -j 4 --with-date_time --with-filesystem --with-system --with-test
+        b2 release link=shared runtime-link=shared address-model=64 -j 4 --with-python --with-serialization
+      
     - name: test
       shell: cmd
       run: |
         cd hikyuu
-        python3 setup.py test
+        set BOOST_ROOT=./boost_1_75_0
+        set BOOST_LIB=./boost_1_75_0/stage/lib
+        xmake f --confirm=y --test=small
+        xmake -bvD small-test
+        xmake r small-test
