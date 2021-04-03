@@ -23,11 +23,11 @@ jobs:
     - name: build
       shell: cmd
       run: |
-        pip install click
+        python3 -m pip install click
         cd hikyuu
-        python setup.py build
+        python3 setup.py build
     - name: test
       shell: cmd
       run: |
         cd hikyuu
-        python setup.py test
+        python3 setup.py test
