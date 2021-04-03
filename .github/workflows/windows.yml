@@ -18,12 +18,11 @@ jobs:
     - name: download_boost
       run: | 
         Invoke-WebRequest "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.zip" -UseBasicParsing -OutFile ./boost_1_75_0.zip
-        Expand-Archive ./boost_1_75_0.zip -DestinationPath .
-        Copy-Item ./boost_1_75_0 ./hikyuu
+        Expand-Archive ./boost_1_75_0.zip -DestinationPath ./hikyuu
+        # Copy-Item ./boost_1_75_0 ./hikyuu
     - name: build_boost
       shell: cmd
       run: |
-        dir
         cd hikyuu/boost_1_75_0
         dir
         bootstrap.bat --with-python=python3
