@@ -32,8 +32,9 @@ jobs:
       shell: cmd
       run: |
         set BOOST_ROOT=D:\a\hikyuu\hikyuu\hikyuu\boost_1_75_0
-        set BOOST_LIB=D:\a\hikyuu\hikyuu\hikyuu\boost_1_75_0/stage/lib
+        set BOOST_LIB=D:\a\hikyuu\hikyuu\hikyuu\boost_1_75_0\stage\lib
         cd hikyuu
+        ls
         xmake f -y
         xmake -b small-test
         xmake r small-test

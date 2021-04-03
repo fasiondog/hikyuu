@@ -29,9 +29,9 @@ jobs:
     - name: test
       run: |
         sudo apt-get install -y libhdf5-dev libsqlite3-dev libmysqlclient-dev
-        set BOOST_ROOT=./boost_1_75_0
-        set BOOST_LIB=./boost_1_75_0/stage/lib
         cd ./hikyuu
+        export BOOST_ROOT=./boost_1_75_0
+        export BOOST_LIB=./boost_1_75_0/stage/lib
         xmake f -y
         xmake -b small-test
         xmake r small-test
