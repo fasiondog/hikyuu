@@ -21,6 +21,7 @@ jobs:
         wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
         tar -jxf boost_1_75_0.tar.bz2
         cd boost_1_75_0
+        ls
         ./bootstrap.sh --with-python=python3
         ./b2 release link=shared address-model=64 -j 4 --with-python --with-serialization; 
         ./b2 release link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time --with-filesystem --with-system --with-test; 
