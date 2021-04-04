@@ -36,6 +36,7 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
+add_requires("sqlite3", {configs = {shared=true, vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("fmt", {system=false, configs = {header_only = true, vs_runtime = "MD"}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
@@ -103,9 +104,6 @@ end
 
 add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
 
-if is_plat("windows") then
-    add_subdirs("./hikyuu_extern_libs/src/sqlite3")
-end
 add_subdirs("./hikyuu_cpp/hikyuu")
 add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")

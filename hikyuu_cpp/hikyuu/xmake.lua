@@ -6,6 +6,9 @@ target("hikyuu")
     end
     
     add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
+    if is_plat("windows") then 
+        add_packages("sqlite3")
+    end
 
     add_includedirs("..")
 
@@ -28,10 +31,7 @@ target("hikyuu")
     end
     
     if is_plat("windows") then 
-        add_defines("SQLITE_API=__declspec(dllimport)")
         add_defines("HKU_API=__declspec(dllexport)")
-        add_includedirs("../../hikyuu_extern_libs/src/sqlite3")
-        add_deps("sqlite3")
         if is_mode("release") then
             add_packages("hdf5")
         else
@@ -94,7 +94,30 @@ You need to specify where the boost library is via the BOOST_LIB variable!]])
     after_build(function(target)
         if is_plat("linux") then
             os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        end        
+        end
+
+        -- 不同平台的库后缀名
+        local lib_suffix = ".so"
+        if is_plat("windows") then 
+            lib_suffix = ".dll"
+        elseif is_plat("macosx") then
+            lib_suffix = ".dylib"
+        end
+
+        local libdir = get_config("buildir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch") .. "/lib"
+        -- 将依赖的库拷贝至build的输出目录
+        for libname, pkg in pairs(target:pkgs()) do
+            local pkg_path = pkg:get("includedirs")
+            if pkg_path == nil then 
+                pkg_path = pkg:get("sysincludedirs") -- xmake 2.3.9 改为了 sysincludedirs
+            end
+            if pkg_path and type(pkg_path) == "string" then
+                pkg_lib_dir = string.sub(pkg_path, 0, string.len(pkg_path)-7) .. "bin"
+                if pkg_lib_dir then
+                    os.trycp(pkg_lib_dir .. "/*" .. lib_suffix, libdir)
+                end
+            end
+        end
     end)
     
 target_end()

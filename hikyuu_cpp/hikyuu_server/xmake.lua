@@ -20,10 +20,7 @@ target("hkuserver")
     end
     
     if is_plat("windows") then 
-        add_defines("SQLITE_API=__declspec(dllimport)")
         add_defines("HKU_API=__declspec(dllimport)")
-        add_includedirs("../../hikyuu_extern_libs/src/sqlite3")
-        add_deps("sqlite3")
         add_packages("mysql")
     end
     
