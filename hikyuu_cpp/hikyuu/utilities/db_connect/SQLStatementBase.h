@@ -87,7 +87,7 @@ public:
     void bind(int idx, const T&, const Args&... rest);
 
     /** 获取执行INSERT时最后插入记录的 rowid，非线程安全 */
-    uint64_t getLastRowid() const;
+    uint64_t getLastRowid();
 
     /** 获取表格列数 */
     int getNumColumns() const;
@@ -116,9 +116,10 @@ public:
     //-------------------------------------------------------------------------
     // 子类接口
     //-------------------------------------------------------------------------
-    virtual bool sub_isValid() const = 0;  ///< 子类接口 @see isValid
-    virtual void sub_exec() = 0;           ///< 子类接口 @see exec
-    virtual bool sub_moveNext() = 0;       ///< 子类接口 @see moveNext
+    virtual bool sub_isValid() const = 0;     ///< 子类接口 @see isValid
+    virtual void sub_exec() = 0;              ///< 子类接口 @see exec
+    virtual bool sub_moveNext() = 0;          ///< 子类接口 @see moveNext
+    virtual uint64_t sub_getLastRowid() = 0;  ///< 子类接口 @see getLastRowid();
 
     virtual void sub_bindNull(int idx) = 0;                      ///< 子类接口 @see bind
     virtual void sub_bindInt(int idx, int64_t value) = 0;        ///< 子类接口 @see bind
@@ -138,14 +139,13 @@ private:
 protected:
     DBConnectBase* m_driver;  ///< 数据库连接
     string m_sql_string;      ///< 原始 SQL 语句
-    uint64_t m_last_rowid;    ///< INSERT时获取最后插入记录的rowid
 };
 
 /** @ingroup DBConnect */
 typedef shared_ptr<SQLStatementBase> SQLStatementPtr;
 
 inline SQLStatementBase ::SQLStatementBase(DBConnectBase* driver, const string& sql_statement)
-: m_driver(driver), m_sql_string(sql_statement), m_last_rowid(0) {
+: m_driver(driver), m_sql_string(sql_statement) {
     HKU_CHECK(driver, "driver is null!");
 }
 
@@ -195,8 +195,8 @@ inline void SQLStatementBase::bindBlob(int idx, const string& item) {
     sub_bindBlob(idx, item);
 }
 
-inline uint64_t SQLStatementBase::getLastRowid() const {
-    return m_last_rowid;
+inline uint64_t SQLStatementBase::getLastRowid() {
+    return sub_getLastRowid();
 }
 
 inline int SQLStatementBase::getNumColumns() const {

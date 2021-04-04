@@ -86,9 +86,11 @@ public:
      *       driver->save(a);
      *   }
      * @endcode
+     * @param item 待保持的记录
+     * @param autotrans 启动事务
      */
     template <typename T>
-    void save(T& item);
+    void save(T& item, bool autotrans = true);
 
     /**
      * 批量保存
@@ -194,15 +196,37 @@ inline int DBConnectBase::queryInt(const string& query) {
 //-------------------------------------------------------------------------
 
 template <typename T>
-void DBConnectBase::save(T& item) {
-    if (item.id() == 0) {
-        SQLStatementPtr st = getStatement(T::getInsertSQL());
-        item.save(st);
-        st->exec();
-    } else {
-        SQLStatementPtr st = getStatement(T::getUpdateSQL());
-        item.update(st);
-        st->exec();
+void DBConnectBase::save(T& item, bool autotrans) {
+    SQLStatementPtr st =
+      item.id() == 0 ? getStatement(T::getInsertSQL()) : getStatement(T::getUpdateSQL());
+    if (autotrans) {
+        transaction();
+    }
+
+    try {
+        if (item.id() == 0) {
+            item.save(st);
+            st->exec();
+            item.id(st->getLastRowid());
+        } else {
+            item.update(st);
+            st->exec();
+        }
+
+        if (autotrans) {
+            commit();
+        }
+    } catch (std::exception& e) {
+        if (autotrans) {
+            rollback();
+        }
+        HKU_THROW("failed save! sql: {}! {}", st->getSqlString(), e.what());
+
+    } catch (...) {
+        if (autotrans) {
+            rollback();
+        }
+        HKU_THROW("failed save! sql: {}! Unknown error!", st->getSqlString());
     }
 }
 
@@ -222,6 +246,7 @@ void DBConnectBase::batchSave(InputIterator first, InputIterator last, bool auto
         for (InputIterator iter = first; iter != last; ++iter) {
             iter->save(st);
             st->exec();
+            iter->id(st->getLastRowid());
         }
 
         if (autotrans) {

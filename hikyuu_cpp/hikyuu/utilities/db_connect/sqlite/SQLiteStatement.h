@@ -36,6 +36,7 @@ public:
     virtual bool sub_isValid() const override;
     virtual void sub_exec() override;
     virtual bool sub_moveNext() override;
+    virtual uint64_t sub_getLastRowid() override;
 
     virtual void sub_bindNull(int idx) override;
     virtual void sub_bindInt(int idx, int64_t value) override;
@@ -63,6 +64,10 @@ private:
 
 inline bool SQLiteStatement::sub_isValid() const {
     return m_stmt ? true : false;
+}
+
+inline uint64_t SQLiteStatement::sub_getLastRowid() {
+    return sqlite3_last_insert_rowid(m_db);
 }
 
 } /* namespace hku */

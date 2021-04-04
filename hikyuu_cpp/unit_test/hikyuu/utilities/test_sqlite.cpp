@@ -154,7 +154,7 @@ TEST_CASE("test_sqlite") {
         con->exec("drop table ttt");
     }
 
-    {
+    /*{
         con->exec(
           R"(CREATE TABLE "perf_test" (
                 "id"	INTEGER UNIQUE,
@@ -180,9 +180,9 @@ TEST_CASE("test_sqlite") {
             t_list.push_back(PerformancTest(std::to_string(i), i));
         }
         {
-            SPEND_TIME_MSG(batch, "insert mysql, total records: {}", total);
+            SPEND_TIME_MSG(batch, "insert sqlite, total records: {}", total);
             con->batchSave(t_list.begin(), t_list.end());
         }
         con->exec("drop table perf_test");
-    }
+    }*/
 }

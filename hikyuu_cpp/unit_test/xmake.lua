@@ -14,7 +14,7 @@ target("unit-test")
         set_default(false)
     end
 
-    add_packages("fmt", "spdlog", "doctest", "mysql")
+    add_packages("fmt", "spdlog", "doctest", "mysql", "sqlite3")
 
     add_includedirs("..")
 
@@ -59,7 +59,7 @@ target("small-test")
     if get_config("test") == "all" then
         set_default(false)
     end
-    add_packages("fmt", "spdlog", "doctest", "mysql")
+    add_packages("fmt", "spdlog", "doctest", "mysql", "sqlite3")
     add_includedirs("..")
 
     --add_defines("BOOST_TEST_DYN_LINK")
@@ -92,8 +92,4 @@ target("small-test")
     -- add files
     add_files("./hikyuu/hikyuu/**.cpp");
     add_files("./hikyuu/test_main.cpp")
-
-    add_packages("sqlite3")
-    add_files("./hikyuu/utilities/test_sqlite.cpp")
-    
 target_end()

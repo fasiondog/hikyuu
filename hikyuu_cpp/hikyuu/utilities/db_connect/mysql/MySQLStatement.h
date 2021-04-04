@@ -35,6 +35,7 @@ public:
     virtual bool sub_isValid() const override;
     virtual void sub_exec() override;
     virtual bool sub_moveNext() override;
+    virtual uint64_t sub_getLastRowid() override;
 
     virtual void sub_bindNull(int idx) override;
     virtual void sub_bindInt(int idx, int64_t value) override;
@@ -66,6 +67,10 @@ private:
     vector<char> m_result_is_null;
     vector<char> m_result_error;
 };
+
+inline uint64_t MySQLStatement::sub_getLastRowid() {
+    return mysql_stmt_insert_id(m_stmt);
+}
 
 }  // namespace hku
 
