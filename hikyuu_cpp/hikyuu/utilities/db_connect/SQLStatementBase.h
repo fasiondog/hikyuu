@@ -86,6 +86,9 @@ public:
     template <typename T, typename... Args>
     void bind(int idx, const T&, const Args&... rest);
 
+    /** 获取执行INSERT时最后插入记录的 rowid，非线程安全 */
+    uint64_t getLastRowid() const;
+
     /** 获取表格列数 */
     int getNumColumns() const;
 
@@ -135,13 +138,14 @@ private:
 protected:
     DBConnectBase* m_driver;  ///< 数据库连接
     string m_sql_string;      ///< 原始 SQL 语句
+    uint64_t m_last_rowid;    ///< INSERT时获取最后插入记录的rowid
 };
 
 /** @ingroup DBConnect */
 typedef shared_ptr<SQLStatementBase> SQLStatementPtr;
 
 inline SQLStatementBase ::SQLStatementBase(DBConnectBase* driver, const string& sql_statement)
-: m_driver(driver), m_sql_string(sql_statement) {
+: m_driver(driver), m_sql_string(sql_statement), m_last_rowid(0) {
     HKU_CHECK(driver, "driver is null!");
 }
 
@@ -189,6 +193,10 @@ inline void SQLStatementBase::bind(int idx, double item) {
 inline void SQLStatementBase::bindBlob(int idx, const string& item) {
     HKU_CHECK(isValid(), "Invalid statement!");
     sub_bindBlob(idx, item);
+}
+
+inline uint64_t SQLStatementBase::getLastRowid() const {
+    return m_last_rowid;
 }
 
 inline int SQLStatementBase::getNumColumns() const {

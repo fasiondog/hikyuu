@@ -88,7 +88,7 @@ public:
      * @endcode
      */
     template <typename T>
-    void save(const T& item);
+    void save(T& item);
 
     /**
      * 批量保存
@@ -194,7 +194,7 @@ inline int DBConnectBase::queryInt(const string& query) {
 //-------------------------------------------------------------------------
 
 template <typename T>
-void DBConnectBase::save(const T& item) {
+void DBConnectBase::save(T& item) {
     if (item.id() == 0) {
         SQLStatementPtr st = getStatement(T::getInsertSQL());
         item.save(st);
