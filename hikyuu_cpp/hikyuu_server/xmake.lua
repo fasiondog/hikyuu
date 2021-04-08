@@ -1,7 +1,7 @@
 target("hkuserver")
     set_kind("binary")
     
-    add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json")
+    add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "sqlite3")
     add_deps("hikyuu")
 
     add_includedirs("..")

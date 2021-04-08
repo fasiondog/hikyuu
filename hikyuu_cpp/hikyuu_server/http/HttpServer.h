@@ -24,6 +24,7 @@ public:
     virtual ~HttpServer();
 
     void start();
+    void stop();
 
     template <typename Handle>
     void GET(const char *path) {

@@ -31,17 +31,17 @@ static UINT g_old_cp;
 
 void HttpServer::http_exit() {
     CLS_INFO("exit server");
-
-#if defined(_WIN32)
-    SetConsoleOutputCP(g_old_cp);
-#endif
-
+    ms_tg.stop();
     if (ms_server) {
+        nng_http_server_stop(ms_server);
         nng_http_server_release(ms_server);
         nng_fini();
         ms_server = nullptr;
+#if defined(_WIN32)
+        SetConsoleOutputCP(g_old_cp);
+#endif
     }
-    // ms_tg.stop();
+
     exit(0);
 }
 
@@ -64,8 +64,13 @@ HttpServer::~HttpServer() {
     ms_tg.join();
     if (ms_server) {
         CLS_INFO("Quit Http server");
+        nng_http_server_stop(ms_server);
         nng_http_server_release(ms_server);
+        nng_fini();
         ms_server = nullptr;
+#if defined(_WIN32)
+        SetConsoleOutputCP(g_old_cp);
+#endif
     }
 }
 
@@ -73,13 +78,27 @@ void HttpServer::start() {
     std::signal(SIGINT, &HttpServer::signal_handler);
     std::signal(SIGTERM, &HttpServer::signal_handler);
 
+    HTTP_FATAL_CHECK(nng_http_server_start(ms_server), "Failed nng_http_server_start!");
+
 #if defined(_WIN32)
     // Windows 下设置控制台程序输出代码页为 UTF8
     auto g_old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
+}
 
-    HTTP_FATAL_CHECK(nng_http_server_start(ms_server), "Failed nng_http_server_start!");
+void HttpServer::stop() {
+    ms_tg.stop();
+    if (ms_server) {
+        CLS_INFO("Quit Http server");
+        nng_http_server_stop(ms_server);
+        nng_http_server_release(ms_server);
+        nng_fini();
+        ms_server = nullptr;
+#if defined(_WIN32)
+        SetConsoleOutputCP(g_old_cp);
+#endif
+    }
 }
 
 void HttpServer::regHandle(const char* method, const char* path, void (*rest_handle)(nng_aio*)) {

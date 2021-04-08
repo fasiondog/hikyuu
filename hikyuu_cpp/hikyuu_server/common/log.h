@@ -38,7 +38,8 @@ inline void init_server_logger() {
 
         logger->set_level(DEFAULT_LOGGER_LEVEL);
         logger->flush_on(DEFAULT_LOGGER_LEVEL);
-        logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^SERVER-%L%$] - %v (%s:%#)");
+        // logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^SERVER-%L%$] - %v (%s:%#)");
+        logger->set_pattern("%^%Y-%m-%d %H:%M:%S.%e [SERVER-%L] - %v (%s:%#)%$");
         spdlog::set_default_logger(logger);
     });
 }
@@ -225,7 +226,7 @@ public:                                                                         
                                                                                                  \
             ms_##cls_logger->set_level(DEFAULT_LOGGER_LEVEL);                                    \
             ms_##cls_logger->flush_on(DEFAULT_LOGGER_LEVEL);                                     \
-            ms_##cls_logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^" #cls "-%L%$] - %v (%s:%#)"); \
+            ms_##cls_logger->set_pattern("%^%Y-%m-%d %H:%M:%S.%e [" #cls "-%L] - %v (%s:%#)%$"); \
             spdlog::register_logger(ms_##cls_logger);                                            \
         });                                                                                      \
         return ms_##cls_logger;                                                                  \

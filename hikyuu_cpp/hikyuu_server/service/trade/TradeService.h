@@ -7,13 +7,22 @@
 
 #pragma once
 
+#include <hikyuu/utilities/IniParser.h>
 #include "http/HttpService.h"
 #include "WalletHandle.h"
 
 namespace hku {
 
 class TradeService : public HttpService {
-    HTTP_SERVICE_IMP(TradeService)
+    CLASS_LOGGER(TradeService)
+
+public:
+    TradeService() = delete;
+    TradeService(const char *url) : HttpService(url) {}
+    TradeService(const char *url, const std::string &config_file) : HttpService(url) {
+        IniParser ini;
+        ini.read(config_file);
+    }
 
     virtual void regHandle() override {
         GET<WalletHandle>("wallet");

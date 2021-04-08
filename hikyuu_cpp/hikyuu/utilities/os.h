@@ -12,7 +12,7 @@
 
 namespace hku {
 
-std::string getUserHome() {
+inline std::string getUserHome() {
     char const *home = getenv("HOME");
     if (home) {
         return std::string(home);
