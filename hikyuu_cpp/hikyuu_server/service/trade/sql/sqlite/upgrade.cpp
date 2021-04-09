@@ -1,14 +1,14 @@
 /*
  *  Copyright(C) 2021 hikyuu.org
  *
- *  Create on: 2021-04-08
+ *  Create on: 2021-04-10
  *     Author: fasiondog
  */
 
-#pragma once
+#include "sqlitedb.h"
 
 namespace hku {
 
-void init_trade_db();
+std::vector<std::string> g_sqlite_upgrade_db{};
 
 }  // namespace hku

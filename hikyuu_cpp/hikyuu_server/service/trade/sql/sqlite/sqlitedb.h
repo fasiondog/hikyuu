@@ -7,8 +7,12 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 namespace hku {
 
 extern const char *g_sqlite_create_db;
+extern std::vector<std::string> g_sqlite_upgrade_db;
 
-}
+}  // namespace hku

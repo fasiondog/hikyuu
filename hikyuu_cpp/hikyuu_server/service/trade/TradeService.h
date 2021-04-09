@@ -7,7 +7,10 @@
 
 #pragma once
 
-#include <hikyuu/utilities/IniParser.h>
+#include <memory>
+#include <hikyuu/utilities/ConnectPool.h>
+#include <hikyuu/utilities/db_connect/sqlite/SQLiteConnect.h>
+#include <hikyuu/utilities/db_connect/mysql/MySQLConnect.h>
 #include "http/HttpService.h"
 #include "WalletHandle.h"
 
@@ -18,15 +21,25 @@ class TradeService : public HttpService {
 
 public:
     TradeService() = delete;
-    TradeService(const char *url) : HttpService(url) {}
-    TradeService(const char *url, const std::string &config_file) : HttpService(url) {
-        IniParser ini;
-        ini.read(config_file);
-    }
+    TradeService(const char *url) = delete;
+
+    TradeService(const char *url, const std::string &config_file);
 
     virtual void regHandle() override {
         GET<WalletHandle>("wallet");
     }
+
+public:
+    DBConnectPtr getDBConnect();
+
+private:
+    static void initTradeServiceSqlite(const Parameter &param);
+    static void initTradeServiceMysql(const Parameter &param);
+    static void initTradeServiceDB(const Parameter &params);
+
+private:
+    static std::unique_ptr<ConnectPool<SQLiteConnect>> ms_sqlite_pool;
+    static std::unique_ptr<ConnectPool<MySQLConnect>> ms_mysql_pool;
 };
 
 }  // namespace hku

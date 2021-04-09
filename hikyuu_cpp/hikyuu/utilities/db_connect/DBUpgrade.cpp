@@ -21,8 +21,8 @@ void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
     // 如果模块版本表不存在，则创建该表
     if (!driver->tableExist("module_version")) {
         driver->exec(
-          "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` TEXT, "
-          "`version` INTEGER NOT NULL);");
+          "CREATE TABLE `module_version` (`id` INTEGER PRIMARY KEY AUTOINCREMENT,`module` TEXT NOT "
+          "NULL, `version` INTEGER NOT NULL);");
     }
 
     // 尝试获取模板数据库版本

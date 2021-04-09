@@ -2,9 +2,6 @@ import("core.project.config")
 
 function main(target)
     local targetname = target:name()
-    if targetname ~= "demo" and targetname ~= "unit-test" and targetname ~= "small-test" then
-        return
-    end
     
     if "demo" == targetname then
         local with_demo = config.get("with-demo")

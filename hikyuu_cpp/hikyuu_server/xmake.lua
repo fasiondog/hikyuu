@@ -4,6 +4,7 @@ target("hkuserver")
     add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "sqlite3")
     add_deps("hikyuu")
 
+    add_includedirs(".")
     add_includedirs("..")
 
     if is_plat("windows") then
