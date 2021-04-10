@@ -116,10 +116,17 @@ std::string Datetime::repr() const {
 }
 
 unsigned long long Datetime::number() const noexcept {
-    HKU_IF_RETURN(m_data.date() == bd::date(bd::pos_infin), Null<unsigned long long>());
-    return (unsigned long long)year() * 100000000 + (unsigned long long)month() * 1000000 +
-           (unsigned long long)day() * 10000 + (unsigned long long)hour() * 100 +
-           (unsigned long long)minute();
+    try {
+        HKU_IF_RETURN(m_data.date() == bd::date(bd::pos_infin), Null<unsigned long long>());
+        return (unsigned long long)year() * 100000000LL + (unsigned long long)month() * 1000000LL +
+               (unsigned long long)day() * 10000LL + (unsigned long long)hour() * 100LL +
+               (unsigned long long)minute();
+    } catch (std::exception& e) {
+        HKU_ERROR(e.what());
+        return Null<unsigned long long>();
+    } catch (...) {
+        return Null<unsigned long long>();
+    }
 }
 
 long Datetime::year() const {

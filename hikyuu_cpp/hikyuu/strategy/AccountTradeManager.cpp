@@ -54,8 +54,10 @@ static string getHttpClientErrorMsg(httplib::Error err) {
 }
 
 AccountTradeManager::AccountTradeManager(const string& name, const string& pwd)
-: TradeManagerBase(name, TC_Zero()), m_user(name), m_password(pwd) {
-    m_client = std::make_unique<httplib::Client>(HKU_SERVER_URL);
+: TradeManagerBase(name, TC_Zero()),
+  m_client(std::make_unique<httplib::Client>(HKU_SERVER_URL)),
+  m_user(name),
+  m_password(pwd) {
     trim(m_user);
     if (m_user.empty()) {
         HKU_ERROR("User name is empty.");

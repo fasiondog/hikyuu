@@ -113,6 +113,8 @@ public:
     OstreamRedirect(const OstreamRedirect &src) {
         do_stdout_ = src.do_stdout_;
         do_stderr_ = src.do_stderr_;
+        had_stdout_ = src.had_stdout_;
+        had_stderr_ = src.had_stderr_;
     }
 
     ~OstreamRedirect() {
