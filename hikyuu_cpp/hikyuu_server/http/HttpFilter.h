@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../http/HttpHandle.h"
-#include "../http/HttpValidError.h"
+#include "../http/HttpError.h"
 
 namespace hku {
 
@@ -16,12 +16,12 @@ inline void MissContentFilter(HttpHandle *handle) {
     void *data = nullptr;
     size_t len = 0;
     handle->getReqData(&data, &len);
-    HTTP_VALID_CHECK(data, HttpValidErrorCode::MISS_CONTENT, "Miss content!");
+    HTTP_VALID_CHECK(data, HttpErrorCode::MISS_CONTENT, "Miss content!");
 }
 
 inline void ApiTokenAuthorizeFilter(HttpHandle *handle) {
     const char *token = handle->getReqHeader("token");
-    HTTP_VALID_CHECK(token, HttpValidErrorCode::MISS_TOKEN, "Miss token!");
+    HTTP_VALID_CHECK(token, HttpErrorCode::MISS_TOKEN, "Miss token!");
 }
 
 }  // namespace hku

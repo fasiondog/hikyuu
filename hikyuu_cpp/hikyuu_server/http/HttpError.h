@@ -18,9 +18,9 @@
 namespace hku {
 
 /**
- * 公共过滤器错误码
+ * 公共错误码
  */
-enum HttpValidErrorCode {
+enum HttpErrorCode {
     MISS_CONTENT = HTTP_FILTER_ERROR_START,
     INVALID_JSON_REQUEST,  // 请求数据无法解析为JSON
     MISS_TOKEN,
@@ -30,20 +30,20 @@ enum HttpValidErrorCode {
     WRONG_PARAMETER_TYPE  // 参数类型错误（各个业务接口返回各个接口的参数）
 };
 
-#define HTTP_VALID_CHECK(expr, errcode, errmsg)    \
-    {                                              \
-        if (!(expr)) {                             \
-            throw HttpValidError(errcode, errmsg); \
-        }                                          \
+#define HTTP_VALID_CHECK(expr, errcode, errmsg) \
+    {                                           \
+        if (!(expr)) {                          \
+            throw HttpError(errcode, errmsg);   \
+        }                                       \
     }
 
-class HttpValidError : public HttpException {
+class HttpError : public HttpException {
 public:
-    HttpValidError() = delete;
-    HttpValidError(int errcode, const char* msg)
+    HttpError() = delete;
+    HttpError(int errcode, const char* msg)
     : HttpException(NNG_HTTP_STATUS_BAD_REQUEST, msg), m_errcode(errcode) {}
 
-    HttpValidError(int errcode, const std::string& msg)
+    HttpError(int errcode, const std::string& msg)
     : HttpException(NNG_HTTP_STATUS_BAD_REQUEST, msg), m_errcode(errcode) {}
 
     virtual std::string msg() const noexcept override {

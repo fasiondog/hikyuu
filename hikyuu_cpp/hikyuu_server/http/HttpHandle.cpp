@@ -37,8 +37,8 @@ void HttpHandle::operator()() {
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
-    } catch (HttpValidError& e) {
-        CLS_TRACE("HttpValidError({}): {}", e.errcode(), e.what());
+    } catch (HttpError& e) {
+        CLS_TRACE("HttpError({}): {}", e.errcode(), e.what());
         nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
         nng_http_res_set_status(m_nng_res, e.status());
         nng_http_res_set_reason(m_nng_res, e.msg().c_str());
@@ -117,7 +117,7 @@ json HttpHandle::getReqJson() {
         result = json::parse((const char*)data);
     } catch (json::exception& e) {
         HKU_ERROR("Failed parse json: {}", (const char*)data);
-        throw HttpValidError(INVALID_JSON_REQUEST, e.what());
+        throw HttpError(INVALID_JSON_REQUEST, e.what());
     }
     return result;
 }

@@ -13,7 +13,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "HttpValidError.h"
+#include "HttpError.h"
 #include "../common/log.h"
 
 using json = nlohmann::json;                  // 不保持插入排序

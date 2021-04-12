@@ -13,10 +13,10 @@ namespace hku {
 
 inline void AuthorizeFilter(HttpHandle *handle) {
     const char *token = handle->getReqHeader("hku_token");
-    HTTP_VALID_CHECK(token, HttpValidErrorCode::MISS_TOKEN, "Miss token!");
+    HTTP_VALID_CHECK(token, HttpErrorCode::MISS_TOKEN, "Miss token!");
     HTTP_VALID_CHECK(
       strcmp(token, "7c98806c0711cf996d602890e0ab9119d9a86afe04296ba69a16f0d9d76be755") == 0,
-      HttpValidErrorCode::UNAUTHORIZED, "Failed authorize!");
+      HttpErrorCode::UNAUTHORIZED, "Failed authorize!");
 }
 
 class RestHandle : public HttpHandle {

@@ -13,6 +13,7 @@
 #include <hikyuu/utilities/db_connect/mysql/MySQLConnect.h>
 #include "http/HttpService.h"
 #include "WalletHandle.h"
+#include "TradeAccountHandle.h"
 
 namespace hku {
 
@@ -27,6 +28,11 @@ public:
 
     virtual void regHandle() override {
         GET<WalletHandle>("wallet");
+
+        POST<AddTradeAccountHandle>("account");
+        GET<GetTradeAccountHandle>("account");
+        PUT<ModTradeAccountHandle>("account");
+        DEL<DelTradeAccountHandle>("account");
     }
 
 public:

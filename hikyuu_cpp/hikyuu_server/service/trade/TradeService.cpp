@@ -8,7 +8,7 @@
 #include <hikyuu/utilities/IniParser.h>
 #include <hikyuu/utilities/db_connect/DBUpgrade.h>
 #include "TradeService.h"
-#include "sql/sqlite/sqlitedb.h"
+#include "db/sqlite/sqlitedb.h"
 
 namespace hku {
 
