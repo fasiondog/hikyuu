@@ -36,7 +36,7 @@ public:
     }
 
 public:
-    DBConnectPtr getDBConnect();
+    static DBConnectPtr getDBConnect();
 
 private:
     static void initTradeServiceSqlite(const Parameter &param);

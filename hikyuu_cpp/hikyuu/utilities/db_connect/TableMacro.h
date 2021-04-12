@@ -10,6 +10,7 @@
 #ifndef HIKYUU_DB_CONNECT_TABLE_MACRO_H
 #define HIKYUU_DB_CONNECT_TABLE_MACRO_H
 
+#include <string>
 #include "DBConnectBase.h"
 #include "SQLStatementBase.h"
 
@@ -25,6 +26,9 @@ public:                                                            \
     }                                                              \
     void id(uint64_t val) {                                        \
         m_id = val;                                                \
+    }                                                              \
+    static std::string getTableName() {                            \
+        return #table;                                             \
     }                                                              \
     static const char* getInsertSQL() {                            \
         return "insert into `" #table "` (`" #f1 "`) values (?)";  \
@@ -56,6 +60,9 @@ public:                                                                        \
     void id(uint64_t val) {                                                    \
         m_id = val;                                                            \
     }                                                                          \
+    static std::string getTableName() {                                        \
+        return #table;                                                         \
+    }                                                                          \
     static const char* getInsertSQL() {                                        \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`) values (?,?)";  \
     }                                                                          \
@@ -86,6 +93,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                \
         m_id = val;                                                                        \
     }                                                                                      \
+    static std::string getTableName() {                                                    \
+        return #table;                                                                     \
+    }                                                                                      \
     static const char* getInsertSQL() {                                                    \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`) values (?,?,?)";  \
     }                                                                                      \
@@ -115,6 +125,9 @@ public:                                                                         
     }                                                                                   \
     void id(uint64_t val) {                                                             \
         m_id = val;                                                                     \
+    }                                                                                   \
+    static std::string getTableName() {                                                 \
+        return #table;                                                                  \
     }                                                                                   \
     static const char* getInsertSQL() {                                                 \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4          \
@@ -148,6 +161,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                       \
         m_id = val;                                                                               \
     }                                                                                             \
+    static std::string getTableName() {                                                           \
+        return #table;                                                                            \
+    }                                                                                             \
     static const char* getInsertSQL() {                                                           \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5          \
                "`) values (?,?,?,?,?)";                                                           \
@@ -179,6 +195,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -213,6 +232,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
     }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
+    }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
                "`,`" #f7 "`) values (?,?,?,?,?,?,?)";                                              \
@@ -245,6 +267,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -279,6 +304,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
     }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
+    }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
                "`,`" #f7 "`,`" #f8 "`,`" #f9 "`) values (?,?,?,?,?,?,?,?,?)";                      \
@@ -312,6 +340,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
     }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
+    }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
                "`,`" #f7 "`,`" #f8 "`,`" #f9 "`,`" #f10 "`) values (?,?,?,?,?,?,?,?,?,?)";         \
@@ -344,6 +375,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -380,6 +414,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
     }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
+    }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
                "`,`" #f7 "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12                      \
@@ -414,6 +451,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -451,6 +491,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
     }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
+    }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
                "`,`" #f7 "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13           \
@@ -487,6 +530,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
     }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
+    }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
                "`,`" #f7 "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13           \
@@ -522,6 +568,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -561,6 +610,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -602,6 +654,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -645,6 +700,9 @@ public:                                                                         
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
     }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
+    }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
                "`,`" #f7 "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13           \
@@ -686,6 +744,9 @@ public:                                                                         
     }                                                                                              \
     void id(uint64_t val) {                                                                        \
         m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \

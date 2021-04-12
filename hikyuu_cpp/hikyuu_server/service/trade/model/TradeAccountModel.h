@@ -8,7 +8,7 @@
 #pragma once
 
 #include <nlohmann/json.hpp>
-#include <hikyuu/utilities/db_connect/TableMacro.h>
+#include <hikyuu/utilities/db_connect/DBConnect.h>
 
 using nlohmann::json;
 
@@ -17,6 +17,18 @@ namespace hku {
 class TradeAccountModel {
     TABLE_BIND3(td_account, account, name, type)
 
+public:
+    static bool isExistName(DBConnectPtr con, const std::string& name) {
+        SQLStatementPtr st = con->getStatement(
+          fmt::format(R"(select count(id) from {} where name="{}")", getTableName(), name));
+        st->exec();
+        st->moveNext();
+        int result = 0;
+        st->getColumn(0, result);
+        return result != 0;
+    }
+
+public:
     std::string getAccount() const {
         return account;
     }
@@ -51,11 +63,10 @@ private:
 };
 
 inline void to_json(json& j, const TradeAccountModel& p) {
-    j = json{{"id", p.m_id}, {"account", p.account}, {"name", p.name}, {"type", p.type}};
+    j = json{{"account", p.account}, {"name", p.name}, {"type", p.type}};
 }
 
 inline void from_json(const json& j, TradeAccountModel& p) {
-    j.at("id").get_to(p.m_id);
     j.at("account").get_to(p.account);
     j.at("name").get_to(p.name);
     j.at("type").get_to(p.type);

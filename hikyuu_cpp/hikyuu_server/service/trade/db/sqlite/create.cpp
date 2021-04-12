@@ -14,12 +14,15 @@ const char *g_sqlite_create_db{
 CREATE TABLE "td_account" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"account"	TEXT NOT NULL UNIQUE,
-	"name"	TEXT NOT NULL,
+	"name"	TEXT NOT NULL UNIQUE,
 	"type"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE UNIQUE INDEX "ix_td_account_on_account" ON "td_account" (
 	"account"	ASC
+);
+CREATE UNIQUE INDEX "ix_td_account_on_name" ON "td_account" (
+	"name"	ASC
 );
 CREATE TABLE "td_funds" (
 	"id"	INTEGER NOT NULL UNIQUE,

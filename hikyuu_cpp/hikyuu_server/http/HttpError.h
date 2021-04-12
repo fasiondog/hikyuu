@@ -30,11 +30,11 @@ enum HttpErrorCode {
     WRONG_PARAMETER_TYPE  // 参数类型错误（各个业务接口返回各个接口的参数）
 };
 
-#define HTTP_VALID_CHECK(expr, errcode, errmsg) \
-    {                                           \
-        if (!(expr)) {                          \
-            throw HttpError(errcode, errmsg);   \
-        }                                       \
+#define HTTP_VALID_CHECK(expr, errcode, ...)                    \
+    {                                                           \
+        if (!(expr)) {                                          \
+            throw HttpError(errcode, fmt::format(__VA_ARGS__)); \
+        }                                                       \
     }
 
 class HttpError : public HttpException {

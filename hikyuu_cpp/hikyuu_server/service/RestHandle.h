@@ -8,6 +8,7 @@
 #pragma once
 
 #include "http/HttpHandle.h"
+#include "RestErrorCode.h"
 
 namespace hku {
 
