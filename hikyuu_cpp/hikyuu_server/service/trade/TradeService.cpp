@@ -15,6 +15,29 @@ namespace hku {
 std::unique_ptr<ConnectPool<SQLiteConnect>> TradeService::ms_sqlite_pool;
 std::unique_ptr<ConnectPool<MySQLConnect>> TradeService::ms_mysql_pool;
 
+TradeService::snowflake_t TradeService::ms_td_id_generator;
+TradeService::snowflake_t TradeService::ms_sta_id_generator;
+
+TradeService::TradeService(const char* url, const std::string& config_file) : HttpService(url) {
+    ms_td_id_generator.init(1, 1);
+    ms_sta_id_generator.init(1, 1);
+
+    if (ms_sqlite_pool || ms_mysql_pool) {
+        return;
+    }
+
+    IniParser ini;
+    ini.read(config_file);
+
+    Parameter param;
+    auto options = ini.getOptionList("database");
+    for (auto& option : *options) {
+        param.set<string>(option, ini.get("database", option));
+    }
+
+    initTradeServiceDB(param);
+}
+
 void TradeService::initTradeServiceSqlite(const Parameter& param) {
     Parameter sqlite_param;
     sqlite_param.set<string>("db", param.get<string>("db"));
@@ -55,21 +78,12 @@ DBConnectPtr TradeService::getDBConnect() {
                            : DBConnectPtr();
 }
 
-TradeService::TradeService(const char* url, const std::string& config_file) : HttpService(url) {
-    if (ms_sqlite_pool || ms_mysql_pool) {
-        return;
-    }
-
-    IniParser ini;
-    ini.read(config_file);
-
-    Parameter param;
-    auto options = ini.getOptionList("database");
-    for (auto& option : *options) {
-        param.set<string>(option, ini.get("database", option));
-    }
-
-    initTradeServiceDB(param);
+bool TradeService::isValidEumValue(const std::string& table, const std::string& field,
+                                   const std::string& val) {
+    int count = getDBConnect()->queryInt(fmt::format(
+      R"(select count(1) from td_enum where table_name="{}" and field_name="{}" and value="{}")",
+      table, field, val));
+    return count > 0;
 }
 
 }  // namespace hku

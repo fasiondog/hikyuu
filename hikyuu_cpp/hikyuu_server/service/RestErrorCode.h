@@ -9,6 +9,6 @@
 
 namespace hku {
 
-enum TradeErrorCode { TD_ACCOUNT_REPETITION = 20000 };
+enum TradeErrorCode { TD_ACCOUNT_REPETITION = 20000, TD_ACCOUNT_INVALD_TYPE };
 
 }

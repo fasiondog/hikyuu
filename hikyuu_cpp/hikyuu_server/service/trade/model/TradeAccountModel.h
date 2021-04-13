@@ -7,15 +7,12 @@
 
 #pragma once
 
-#include <nlohmann/json.hpp>
 #include <hikyuu/utilities/db_connect/DBConnect.h>
-
-using nlohmann::json;
 
 namespace hku {
 
 class TradeAccountModel {
-    TABLE_BIND3(td_account, account, name, type)
+    TABLE_BIND3(td_account, td_id, name, type)
 
 public:
     static bool isExistName(DBConnectPtr con, const std::string& name) {
@@ -29,12 +26,12 @@ public:
     }
 
 public:
-    std::string getAccount() const {
-        return account;
+    int64_t getTdId() const {
+        return td_id;
     }
 
-    void setAccount(const std::string& account) {
-        this->account = account;
+    void setTdId(int64_t id) {
+        td_id = id;
     }
 
     std::string getName() const {
@@ -53,23 +50,21 @@ public:
         this->type = type;
     }
 
-private:
-    string account;
-    string name;
-    string type;
+    string json() const {
+        return fmt::format(R"({{"td_id":"{}", "name":"{}", "type":"{}"}})", td_id, name, type);
+    }
 
-    friend void to_json(json& j, const TradeAccountModel& p);
-    friend void from_json(const json& j, TradeAccountModel& p);
+private:
+    int64_t td_id;  // 内部交易账户id
+    string name;    // 内部交易账户名称
+    string type;    // 内部交易账户类型：xq（雪球模拟账户）
 };
 
-inline void to_json(json& j, const TradeAccountModel& p) {
-    j = json{{"account", p.account}, {"name", p.name}, {"type", p.type}};
-}
-
-inline void from_json(const json& j, TradeAccountModel& p) {
-    j.at("account").get_to(p.account);
-    j.at("name").get_to(p.name);
-    j.at("type").get_to(p.type);
+inline std::ostream& operator<<(std::ostream& out, const TradeAccountModel& model) {
+    string strip(", ");
+    out << "(" << model.id() << strip << model.getTdId() << strip << model.getName() << strip
+        << model.getType() << ")";
+    return out;
 }
 
 }  // namespace hku

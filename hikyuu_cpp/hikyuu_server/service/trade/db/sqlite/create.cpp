@@ -13,16 +13,16 @@ const char *g_sqlite_create_db{
   R"(
 CREATE TABLE "td_account" (
 	"id"	INTEGER NOT NULL UNIQUE,
-	"account"	TEXT NOT NULL UNIQUE,
+	"td_id"	INTEGER NOT NULL UNIQUE,
 	"name"	TEXT NOT NULL UNIQUE,
 	"type"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-CREATE UNIQUE INDEX "ix_td_account_on_account" ON "td_account" (
-	"account"	ASC
+CREATE UNIQUE INDEX "ix_td_account_on_td_id" ON "td_account" (
+	"td_id"
 );
 CREATE UNIQUE INDEX "ix_td_account_on_name" ON "td_account" (
-	"name"	ASC
+	"name"
 );
 CREATE TABLE "td_funds" (
 	"id"	INTEGER NOT NULL UNIQUE,
@@ -33,14 +33,22 @@ CREATE TABLE "td_funds" (
 	"available"	REAL NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE INDEX "ix_td_funds_on_td_id" ON "td_funds" (
+	"td_id"
+);
 CREATE TABLE "td_enum" (
 	"id"	INTEGER NOT NULL UNIQUE,
-	"table"	TEXT NOT NULL,
-	"field"	TEXT NOT NULL,
-	"value"	INTEGER NOT NULL,
-	"string"	TEXT NOT NULL,
+	"table_name"	TEXT NOT NULL,
+	"field_name"	TEXT NOT NULL,
+	"value"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE INDEX "ix_td_enum_on_tabel_field" ON "td_enum" (
+	"table_name",
+	"field_name",
+	"value"
+);
+INSERT INTO "td_enum" ("id", "table_name", "field_name", "value") VALUES ('1', 'td_account', 'type', 'xq');
 CREATE TABLE "td_positions" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL,
@@ -58,6 +66,10 @@ CREATE TABLE "td_positions" (
 	"ref_profit"	REAL NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE INDEX "ix_td_positions_on_td_id_sta_id" ON "td_positions" (
+	"td_id",
+	"sta_id"
+);
 CREATE TABLE "td_orders" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL,
@@ -74,6 +86,13 @@ CREATE TABLE "td_orders" (
 	"status"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE INDEX "ix_td_orders_on_td_id_sta_id" ON "td_orders" (
+	"td_id",
+	"sta_id"
+);
+CREATE INDEX "ix_td_orders_on_datetime" ON "td_orders" (
+	"datetime" ASC
+);
 CREATE TABLE "td_fills" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL,
@@ -87,17 +106,24 @@ CREATE TABLE "td_fills" (
 	"order_seq"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE INDEX "ix_td_fills_on_td_id_sta_id" ON "td_fills" (
+	"td_id",
+	"sta_id"
+);
+CREATE INDEX "ix_td_fills_on_datetime" ON "td_fills" (
+	"datetime"	ASC
+);
 CREATE TABLE "td_sta_account" (
 	"id"	INTEGER NOT NULL UNIQUE,
+	"sta_id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL,
-	"account"	TEXT NOT NULL,
 	"name"	TEXT NOT NULL,
 	"path"	TEXT NOT NULL,
 	"status"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-CREATE UNIQUE INDEX "ix_td_sta_account_on_account" ON "td_sta_account" (
-	"account"	ASC
+CREATE UNIQUE INDEX "ix_td_sta_account_on_sta_id" ON "td_sta_account" (
+	"sta_id"	ASC
 );
 CREATE TABLE "td_sta_funds" (
 	"id"	INTEGER NOT NULL UNIQUE,
@@ -108,6 +134,9 @@ CREATE TABLE "td_sta_funds" (
 	"available"	REAL NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE INDEX "ix_td_sta_funds_on_sta_id" ON "td_sta_funds" (
+	"sta_id"
+);
 CREATE TABLE "td_account_xq" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL,
@@ -115,6 +144,9 @@ CREATE TABLE "td_account_xq" (
 	"portfolio_code"	TEXT NOT NULL,
 	"portfolio_market"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE INDEX "ix_td_account_xq_on_td_id" ON "td_account_xq" (
+	"td_id"	ASC
 );
 
 )"};

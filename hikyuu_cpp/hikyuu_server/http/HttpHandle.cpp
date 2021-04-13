@@ -111,7 +111,7 @@ json HttpHandle::getReqJson() {
     void* data;
     size_t len;
     nng_http_req_get_data(m_nng_req, &data, &len);
-    HTTP_VALID_CHECK(data, INVALID_JSON_REQUEST, "Req data is empty!");
+    HTTP_CHECK(data, INVALID_JSON_REQUEST, "Req data is empty!");
     json result;
     try {
         result = json::parse((const char*)data);

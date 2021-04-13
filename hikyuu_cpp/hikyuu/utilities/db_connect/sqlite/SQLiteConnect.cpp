@@ -92,7 +92,7 @@ bool SQLiteConnect::tableExist(const string& tablename) {
 }
 
 void SQLiteConnect::transaction() {
-    exec("BEGIN TRANSACTION");
+    exec("BEGIN IMMEDIATE");
 }
 
 void SQLiteConnect::commit() {
