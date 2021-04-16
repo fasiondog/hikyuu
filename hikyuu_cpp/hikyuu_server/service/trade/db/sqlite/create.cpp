@@ -86,12 +86,14 @@ CREATE TABLE "td_orders" (
 	"status"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-CREATE INDEX "ix_td_orders_on_td_id_sta_id" ON "td_orders" (
+CREATE INDEX "ix_td_orders_on_td_id_datetime" ON "td_orders" (
 	"td_id",
-	"sta_id"
+	"datetime" DESC
 );
-CREATE INDEX "ix_td_orders_on_datetime" ON "td_orders" (
-	"datetime" ASC
+CREATE INDEX "ix_td_orders_on_td_id_sta_id_datetime" ON "td_orders" (
+	"td_id",
+	"sta_id",
+	"datetime" DESC
 );
 CREATE TABLE "td_fills" (
 	"id"	INTEGER NOT NULL UNIQUE,
@@ -106,12 +108,14 @@ CREATE TABLE "td_fills" (
 	"order_seq"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
-CREATE INDEX "ix_td_fills_on_td_id_sta_id" ON "td_fills" (
+CREATE INDEX "ix_td_fills_on_td_id_datetime" ON "td_fills" (
 	"td_id",
-	"sta_id"
+	"datetime"	DESC
 );
-CREATE INDEX "ix_td_fills_on_datetime" ON "td_fills" (
-	"datetime"	ASC
+CREATE INDEX "ix_td_fills_on_td_id_sta_id_datetime" ON "td_fills" (
+	"td_id",
+	"sta_id",
+	"datetime" DESC
 );
 CREATE TABLE "td_sta_account" (
 	"id"	INTEGER NOT NULL UNIQUE,
