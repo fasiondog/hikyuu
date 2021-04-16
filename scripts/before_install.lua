@@ -2,7 +2,7 @@ import("core.platform.platform")
 import("core.base.option")
 
 function main(target)
-    if target:isphony() then
+    if target:is_phony() then
         return 
     end
     
