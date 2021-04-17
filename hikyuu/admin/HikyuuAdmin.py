@@ -28,29 +28,21 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QIcon
 import resource  # 引入资源文件
 
+from UiConfig import UiConfig
+
 
 class MyMainWindow(QMainWindow):
     def __init__(self, capture_output=True, use_dark_style=False):
         super().__init__()
         self.setObjectName("HikyuuAdminMainWindow")
         self.setWindowTitle("Hikyuu Admin")
-        self.resize(800, 600)
         self.setWindowIcon(QIcon(':/ico/hikyuu.ico'))
+        self.ui_config = UiConfig(self)
+        self.ui_config.setup()
 
     def closeEvent(self, event):
-        self.save_gui_config()
+        self.ui_config.save()
         event.accept()
-
-    def get_config_path(self):
-        return os.path.expanduser('~') + '/.hikyuu'
-
-    def load_config_path(self):
-        pass
-
-    def save_gui_config(self):
-        print("save config")
-        pass
-
 
 
 if __name__ == "__main__":
