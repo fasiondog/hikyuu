@@ -43,6 +43,8 @@ hku_data_files = []
 
 packages = [
     'hikyuu',
+    'hikyuu/admin',
+    'hikyuu/admin/language',
     'hikyuu/config',
     'hikyuu/config/block',
     'hikyuu/cpp',
@@ -89,7 +91,8 @@ setup(
         '': [
             '*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml',
             'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib',
-            'libboost_serialization*', 'libboost_python{}*'.format(py_version)
+            '*.qm', 'libboost_serialization*',
+            'libboost_python{}*'.format(py_version)
         ],
     },
     data_files=hku_data_files,
