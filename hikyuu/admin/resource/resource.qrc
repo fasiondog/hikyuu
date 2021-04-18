@@ -1,5 +1,10 @@
 <RCC>
   <qresource>
-    <file>ico/hikyuu.ico</file>
+    <file>logo/logo_16.png</file>
+    <file>logo/logo_32.png</file>
+    <file>logo/logo_48.png</file>
+    <file>logo/logo_64.png</file>
+    <file>logo/logo_128.png</file>
+    <file>logo/logo_256.png</file>
   </qresource>
 </RCC>

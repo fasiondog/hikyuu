@@ -22,32 +22,53 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import sys, logging, os
+import logging
+import sys
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction
-from PyQt5.QtGui import QIcon
-import resource  # 引入资源文件
-
+import resource  # 注意不要使用 IDE 自动优化 import, 以免被删除导致未导入资源文件
 from PyQt5.QtCore import QCoreApplication, QTranslator, QLocale
-translate = QCoreApplication.translate
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QMessageBox
 
 from UiConfig import UiConfig
+
+translate = QCoreApplication.translate
 
 
 class MyMainWindow(QMainWindow):
     def __init__(self, capture_output=True, use_dark_style=False):
         super().__init__()
+        appid = 'HikyuuAdmin'
+        QApplication.setApplicationName(appid)
+        QApplication.setOrganizationName("org.hikyuu")
+
+        # 国际化支持
         loc = QLocale()
         if loc.language() == QLocale.Chinese:
-            self.trans = QTranslator()  # 实例翻译者
+            self.trans = QTranslator()
             self.trans.load("language/zh_CN.qm")  # 读取qm语言包
             _app = QApplication.instance()  # 应用实例
             _app.installTranslator(self.trans)  # 将翻译者安装到实例中
 
+        # 设置程序图标资源
+        # 如未能正常显示图标，请检查 "import resource" 是否
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/logo/logo_16.png"))
+        icon.addPixmap(QPixmap(":/logo/logo_32.png"))
+        icon.addPixmap(QPixmap(":/logo/logo_48.png"))
+        icon.addPixmap(QPixmap(":/logo/logo_64.png"))
+        icon.addPixmap(QPixmap(":/logo/logo_128.png"))
+        icon.addPixmap(QPixmap(":/logo/logo_256.png"))
+        self.setWindowIcon(icon)
+        if sys.platform == 'win32':
+            # window下设置任务栏图片
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appid)
+
         self.ui_config = UiConfig()
         self.setObjectName("HikyuuAdminMainWindow")
-        self.setWindowTitle(translate("MyMainWindow", "Hikyuu Admin"))
-        self.setWindowIcon(QIcon(':/ico/hikyuu.ico'))
+        self.setWindowTitle(translate("MainWindow", "Hikyuu Admin"))
+
         if self.ui_config.getboolean('main_window', 'maximized', fallback=False):
             self.showMaximized()
         else:
@@ -66,19 +87,33 @@ class MyMainWindow(QMainWindow):
         event.accept()
 
     def initAction(self):
-        self.action_dict = dict(action_quit=QAction(translate('MyMainWindow', '&Quit'), self))
+        self.action_dict = dict(
+            action_quit=QAction(translate('MainWindow', '&Quit'), self),
+            action_about=QAction(translate('MainWindow', 'About'), self)
+        )
 
     def initMenuBar(self):
         self.menubar_dict = dict(
-            menu_file=self.menuBar().addMenu(translate("MyMainWindow", "&File(F)")),
-            menu_about=self.menuBar().addMenu(translate("MyMainWindow", "&Help(H)"))
+            menu_file=self.menuBar().addMenu(translate('MainWindow', "&File(F)")),
+            menu_help=self.menuBar().addMenu(translate('MainWindow', "&Help(H)"))
         )
 
     def initMenu(self):
-        self.menu_dict = dict(menu_quit=self.menubar_dict['menu_file'].addAction(self.action_dict['action_quit']))
+        self.menu_dict = dict(
+            menu_quit=self.menubar_dict['menu_file'].addAction(self.action_dict['action_quit']),
+            menu_about=self.menubar_dict['menu_help'].addAction(self.action_dict['action_about'])
+        )
 
     def initActionConnect(self):
         self.action_dict['action_quit'].triggered.connect(self.close)
+        self.action_dict['action_about'].triggered.connect(self.about)
+
+    def about(self):
+        msg = translate(
+            'MainWindow', "<p><b>Qt Main Window Example</b></p>"
+            "<p>This is a demonstration of the QMainWindow, QToolBar and "
+        )
+        QMessageBox.about(self, translate('MainWindow', 'About Hikyuu Quant Framework'), msg)
 
 
 if __name__ == "__main__":
