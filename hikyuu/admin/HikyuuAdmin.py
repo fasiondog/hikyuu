@@ -26,40 +26,38 @@ import logging
 import sys
 
 import resource  # 注意不要使用 IDE 自动优化 import, 以免被删除导致未导入资源文件
-from PyQt5.QtCore import QCoreApplication, QTranslator, QLocale
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QAction, QMessageBox, QStyleFactory, qApp)
+from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle
 
 from UiConfig import UiConfig
 
-translate = QCoreApplication.translate
+translate = QtCore.QCoreApplication.translate
 
 
-class MyMainWindow(QMainWindow):
+class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self, capture_output=True, use_dark_style=False):
         super().__init__()
         appid = 'HikyuuAdmin'
-        QApplication.setApplicationName(appid)
-        QApplication.setOrganizationName("org.hikyuu")
+        QtWidgets.QApplication.setApplicationName(appid)
+        QtWidgets.QApplication.setOrganizationName("org.hikyuu")
 
         # 国际化支持
-        loc = QLocale()
-        if loc.language() == QLocale.Chinese:
-            self.trans = QTranslator()
+        loc = QtCore.QLocale()
+        if loc.language() == QtCore.QLocale.Chinese:
+            self.trans = QtCore.QTranslator()
             self.trans.load("language/zh_CN.qm")  # 读取qm语言包
-            _app = QApplication.instance()  # 应用实例
+            _app = QtWidgets.QApplication.instance()  # 应用实例
             _app.installTranslator(self.trans)  # 将翻译者安装到实例中
 
         # 设置程序图标资源
         # 如未能正常显示图标，请检查 "import resource" 是否
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/logo/logo_16.png"))
-        icon.addPixmap(QPixmap(":/logo/logo_32.png"))
-        icon.addPixmap(QPixmap(":/logo/logo_48.png"))
-        icon.addPixmap(QPixmap(":/logo/logo_64.png"))
-        icon.addPixmap(QPixmap(":/logo/logo_128.png"))
-        icon.addPixmap(QPixmap(":/logo/logo_256.png"))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/logo/logo_16.png"))
+        icon.addPixmap(QtGui.QPixmap(":/logo/logo_32.png"))
+        icon.addPixmap(QtGui.QPixmap(":/logo/logo_48.png"))
+        icon.addPixmap(QtGui.QPixmap(":/logo/logo_64.png"))
+        icon.addPixmap(QtGui.QPixmap(":/logo/logo_128.png"))
+        icon.addPixmap(QtGui.QPixmap(":/logo/logo_256.png"))
         self.setWindowIcon(icon)
         if sys.platform == 'win32':
             # window下设置任务栏图片
@@ -75,18 +73,21 @@ class MyMainWindow(QMainWindow):
         else:
             self.resize(
                 self.ui_config.getint('main_window', 'width', fallback=800),
-                self.ui_config.getint('main_window', 'height', fallback=600)
+                self.ui_config.getint('main_window', 'height', fallback=500)
             )
 
         style = self.ui_config.get('main_window', 'style', fallback='normal_style')
         if style == 'dark_style':
-            qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
+            QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
 
-        self.statusBar().showMessage(translate('MainWindow', 'starting...'))
         self.initAction()
         self.initMenuBar()
         self.initMenu()
+        self.initToolBar()
         self.initActionConnect()
+        self.initMainTabWidget()
+        self.initDockWidgets()
+        self.statusBar().showMessage(translate('MainWindow', 'Running'))
 
     def closeEvent(self, event):
         self.ui_config.save(self)
@@ -94,11 +95,11 @@ class MyMainWindow(QMainWindow):
 
     def initAction(self):
         self.action_dict = dict(
-            action_quit=QAction(translate('MainWindow', '&Quit'), self),
-            action_view_normal_style=QAction(translate('MainWindow', 'Normal style'), self),
-            action_view_dark_style=QAction(translate('MainWindow', 'Dark style'), self),
-            action_about=QAction(translate('MainWindow', 'About'), self),
-            action_about_qt=QAction(translate('MainWindow', 'About Qt'), self),
+            action_quit=QtWidgets.QAction(translate('MainWindow', '&Quit'), self),
+            action_view_normal_style=QtWidgets.QAction(translate('MainWindow', 'Normal style'), self),
+            action_view_dark_style=QtWidgets.QAction(translate('MainWindow', 'Dark style'), self),
+            action_about=QtWidgets.QAction(translate('MainWindow', 'About'), self),
+            action_about_qt=QtWidgets.QAction(translate('MainWindow', 'About Qt'), self),
         )
         self.action_dict['action_quit'].setStatusTip(translate('MainWindow', 'Quit Application'))
         self.action_dict['action_about_qt'].setStatusTip(translate('MainWindow', "Show the Qt library's About box"))
@@ -124,12 +125,30 @@ class MyMainWindow(QMainWindow):
             menu_about_qt=self.menubar_dict['menu_help'].addAction(self.action_dict['action_about_qt']),
         )
 
+    def initToolBar(self):
+        if sys.platform == 'darwin':
+            self.setUnifiedTitleAndToolBarOnMac(true)
+
     def initActionConnect(self):
         self.action_dict['action_quit'].triggered.connect(self.close)
         self.action_dict['action_about'].triggered.connect(self.about)
-        self.action_dict['action_about_qt'].triggered.connect(QApplication.aboutQt)
+        self.action_dict['action_about_qt'].triggered.connect(QtWidgets.QApplication.aboutQt)
         self.action_dict['action_view_normal_style'].triggered.connect(self.changStyle)
         self.action_dict['action_view_dark_style'].triggered.connect(self.changStyle)
+
+    def initMainTabWidget(self):
+        self.main_tab = QtWidgets.QTabWidget(self)
+        self.setCentralWidget(self.main_tab)
+
+    def initDockWidgets(self):
+        self.server_view_dock = QtWidgets.QDockWidget('Server View', self)
+        self.server_view_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable)  # 禁止关闭
+        self.server_view_dock.setMinimumWidth(200)
+        title_bar = self.server_view_dock.titleBarWidget()
+        self.server_view_dock.setTitleBarWidget(QtWidgets.QWidget())
+        del title_bar
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.server_view_dock)
+
 
     def about(self):
         msg = translate(
@@ -144,18 +163,22 @@ class MyMainWindow(QMainWindow):
             "Now it only used in Chinese stock market)</p>"
             '<p>see more: <a href="https://hikyuu.org">https://hikyuu.org<a></p>'
         )
-        QMessageBox.about(self, translate('MainWindow', 'About Hikyuu Strategy Server Manager'), msg)
+        QtWidgets.QMessageBox.about(self, translate('MainWindow', 'About Hikyuu Strategy Server Manager'), msg)
 
     def changStyle(self):
-        qApp.setStyleSheet('')
+        QtWidgets.qApp.setStyleSheet('')
         style_name = self.sender().objectName()
         if style_name == 'dark_style':
-            qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
+            QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
         self.ui_config.set('main_window', 'style', style_name)
 
 
 def main_core():
-    app = QApplication(sys.argv)
+    # 自适应分辨率，防止字体显示不全
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+
+    app = QtWidgets.QApplication(sys.argv)
     use_dark_style = False  # 使用暗黑主题
     if use_dark_style:
         import qdarkstyle
