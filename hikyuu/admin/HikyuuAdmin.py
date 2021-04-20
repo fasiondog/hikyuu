@@ -25,11 +25,11 @@
 import logging
 import sys
 
-import resource  # 注意不要使用 IDE 自动优化 import, 以免被删除导致未导入资源文件
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle
 
 from UiConfig import UiConfig
+from admin.HkuSessionViewWidget import HkuSessionViewWidget
 
 translate = QtCore.QCoreApplication.translate
 
@@ -88,6 +88,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.initMainTabWidget()
         self.initDockWidgets()
         self.statusBar().showMessage(translate('MainWindow', 'Running'))
+        QtCore.QMetaObject.connectSlotsByName(self)
 
     def closeEvent(self, event):
         self.ui_config.save(self)
@@ -95,13 +96,17 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def initAction(self):
         self.action_dict = dict(
-            action_quit=QtWidgets.QAction(translate('MainWindow', '&Quit'), self),
+            action_file_session=QtWidgets.QAction(
+                QtGui.QIcon(":/icon/server.png"), translate("MainWindow", "&Session"), self
+            ),
+            action_file_quit=QtWidgets.QAction(QtGui.QIcon(":/icon/quit.png"), translate('MainWindow', '&Quit'), self),
             action_view_normal_style=QtWidgets.QAction(translate('MainWindow', 'Normal style'), self),
             action_view_dark_style=QtWidgets.QAction(translate('MainWindow', 'Dark style'), self),
             action_about=QtWidgets.QAction(translate('MainWindow', 'About'), self),
             action_about_qt=QtWidgets.QAction(translate('MainWindow', 'About Qt'), self),
         )
-        self.action_dict['action_quit'].setStatusTip(translate('MainWindow', 'Quit Application'))
+        self.action_dict['action_file_session'].setStatusTip(translate('MainWindow', 'Session Manager'))
+        self.action_dict['action_file_quit'].setStatusTip(translate('MainWindow', 'Quit Application'))
         self.action_dict['action_about_qt'].setStatusTip(translate('MainWindow', "Show the Qt library's About box"))
         self.action_dict['action_view_normal_style'].setObjectName('normal_style')
         self.action_dict['action_view_normal_style'].setStatusTip(translate('MainWindow', 'Switch to normal style'))
@@ -118,7 +123,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def initMenu(self):
         style_menu = self.menubar_dict['menu_view'].addMenu(translate('MainWindow', 'Skin style'))
         self.menu_dict = dict(
-            menu_quit=self.menubar_dict['menu_file'].addAction(self.action_dict['action_quit']),
+            menu_file_session=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_session']),
+            menu_file_quit=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_quit']),
             menu_view_normal_style=style_menu.addAction(self.action_dict['action_view_normal_style']),
             menu_view_dark_style=style_menu.addAction(self.action_dict['action_view_dark_style']),
             menu_about=self.menubar_dict['menu_help'].addAction(self.action_dict['action_about']),
@@ -126,11 +132,12 @@ class MyMainWindow(QtWidgets.QMainWindow):
         )
 
     def initToolBar(self):
-        if sys.platform == 'darwin':
-            self.setUnifiedTitleAndToolBarOnMac(true)
+        self.setUnifiedTitleAndToolBarOnMac(True)
+        file_toolbar = self.addToolBar('File')
+        file_toolbar.addAction(self.action_dict['action_file_quit'])
 
     def initActionConnect(self):
-        self.action_dict['action_quit'].triggered.connect(self.close)
+        self.action_dict['action_file_quit'].triggered.connect(self.close)
         self.action_dict['action_about'].triggered.connect(self.about)
         self.action_dict['action_about_qt'].triggered.connect(QtWidgets.QApplication.aboutQt)
         self.action_dict['action_view_normal_style'].triggered.connect(self.changStyle)
@@ -141,14 +148,13 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.main_tab)
 
     def initDockWidgets(self):
-        self.server_view_dock = QtWidgets.QDockWidget('Server View', self)
+        self.server_view_dock = HkuSessionViewWidget(self)
         self.server_view_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable)  # 禁止关闭
         self.server_view_dock.setMinimumWidth(200)
         title_bar = self.server_view_dock.titleBarWidget()
         self.server_view_dock.setTitleBarWidget(QtWidgets.QWidget())
         del title_bar
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.server_view_dock)
-
 
     def about(self):
         msg = translate(
