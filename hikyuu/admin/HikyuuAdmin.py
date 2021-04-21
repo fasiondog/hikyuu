@@ -29,9 +29,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle
 
 from UiConfig import UiConfig
-from admin.HkuSessionViewWidget import HkuSessionViewWidget
+from admin.widget.HkuSessionViewWidget import HkuSessionViewWidget
+from dialog import *
+from widget import *
 
-translate = QtCore.QCoreApplication.translate
+_translate = QtCore.QCoreApplication.translate
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -66,7 +68,12 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         self.ui_config = UiConfig()
         self.setObjectName("HikyuuAdminMainWindow")
-        self.setWindowTitle(translate("MainWindow", "Hikyuu Strategy Server Manager"))
+        self.setWindowTitle(_translate("MainWindow", "Hikyuu Strategy Server Manager"))
+
+        # 必须放在 resize 窗口大小之前
+        style = self.ui_config.get('main_window', 'style', fallback='normal_style')
+        if style == 'dark_style':
+            QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
 
         if self.ui_config.getboolean('main_window', 'maximized', fallback=False):
             self.showMaximized()
@@ -76,9 +83,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 self.ui_config.getint('main_window', 'height', fallback=500)
             )
 
-        style = self.ui_config.get('main_window', 'style', fallback='normal_style')
-        if style == 'dark_style':
-            QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
 
         self.initAction()
         self.initMenuBar()
@@ -87,7 +91,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.initActionConnect()
         self.initMainTabWidget()
         self.initDockWidgets()
-        self.statusBar().showMessage(translate('MainWindow', 'Running'))
+        self.statusBar().showMessage(_translate('MainWindow', 'Running'))
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def closeEvent(self, event):
@@ -97,31 +101,31 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def initAction(self):
         self.action_dict = dict(
             action_file_session=QtWidgets.QAction(
-                QtGui.QIcon(":/icon/server.png"), translate("MainWindow", "&Session"), self
+                QtGui.QIcon(":/icon/server.png"), _translate("MainWindow", "&Session"), self
             ),
-            action_file_quit=QtWidgets.QAction(QtGui.QIcon(":/icon/quit.png"), translate('MainWindow', '&Quit'), self),
-            action_view_normal_style=QtWidgets.QAction(translate('MainWindow', 'Normal style'), self),
-            action_view_dark_style=QtWidgets.QAction(translate('MainWindow', 'Dark style'), self),
-            action_about=QtWidgets.QAction(translate('MainWindow', 'About'), self),
-            action_about_qt=QtWidgets.QAction(translate('MainWindow', 'About Qt'), self),
+            action_file_quit=QtWidgets.QAction(QtGui.QIcon(":/icon/quit.png"), _translate('MainWindow', '&Quit'), self),
+            action_view_normal_style=QtWidgets.QAction(_translate('MainWindow', 'Normal style'), self),
+            action_view_dark_style=QtWidgets.QAction(_translate('MainWindow', 'Dark style'), self),
+            action_about=QtWidgets.QAction(_translate('MainWindow', 'About'), self),
+            action_about_qt=QtWidgets.QAction(_translate('MainWindow', 'About Qt'), self),
         )
-        self.action_dict['action_file_session'].setStatusTip(translate('MainWindow', 'Session Manager'))
-        self.action_dict['action_file_quit'].setStatusTip(translate('MainWindow', 'Quit Application'))
-        self.action_dict['action_about_qt'].setStatusTip(translate('MainWindow', "Show the Qt library's About box"))
+        self.action_dict['action_file_session'].setStatusTip(_translate('MainWindow', 'Session Manager'))
+        self.action_dict['action_file_quit'].setStatusTip(_translate('MainWindow', 'Quit Application'))
+        self.action_dict['action_about_qt'].setStatusTip(_translate('MainWindow', "Show the Qt library's About box"))
         self.action_dict['action_view_normal_style'].setObjectName('normal_style')
-        self.action_dict['action_view_normal_style'].setStatusTip(translate('MainWindow', 'Switch to normal style'))
+        self.action_dict['action_view_normal_style'].setStatusTip(_translate('MainWindow', 'Switch to normal style'))
         self.action_dict['action_view_dark_style'].setObjectName('dark_style')
-        self.action_dict['action_view_dark_style'].setStatusTip(translate('MainWindow', 'Switch to dark style'))
+        self.action_dict['action_view_dark_style'].setStatusTip(_translate('MainWindow', 'Switch to dark style'))
 
     def initMenuBar(self):
         self.menubar_dict = dict(
-            menu_file=self.menuBar().addMenu(translate('MainWindow', "&File(F)")),
-            menu_view=self.menuBar().addMenu(translate('MainWindow', "&View(V)")),
-            menu_help=self.menuBar().addMenu(translate('MainWindow', "&Help(H)"))
+            menu_file=self.menuBar().addMenu(_translate('MainWindow', "&File(F)")),
+            menu_view=self.menuBar().addMenu(_translate('MainWindow', "&View(V)")),
+            menu_help=self.menuBar().addMenu(_translate('MainWindow', "&Help(H)"))
         )
 
     def initMenu(self):
-        style_menu = self.menubar_dict['menu_view'].addMenu(translate('MainWindow', 'Skin style'))
+        style_menu = self.menubar_dict['menu_view'].addMenu(_translate('MainWindow', 'Skin style'))
         self.menu_dict = dict(
             menu_file_session=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_session']),
             menu_file_quit=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_quit']),
@@ -134,14 +138,16 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def initToolBar(self):
         self.setUnifiedTitleAndToolBarOnMac(True)
         file_toolbar = self.addToolBar('File')
+        file_toolbar.addAction(self.action_dict['action_file_session'])
         file_toolbar.addAction(self.action_dict['action_file_quit'])
 
     def initActionConnect(self):
+        self.action_dict['action_file_session'].triggered.connect(self.actionEditSession)
         self.action_dict['action_file_quit'].triggered.connect(self.close)
-        self.action_dict['action_about'].triggered.connect(self.about)
+        self.action_dict['action_about'].triggered.connect(self.actionAbout)
         self.action_dict['action_about_qt'].triggered.connect(QtWidgets.QApplication.aboutQt)
-        self.action_dict['action_view_normal_style'].triggered.connect(self.changStyle)
-        self.action_dict['action_view_dark_style'].triggered.connect(self.changStyle)
+        self.action_dict['action_view_normal_style'].triggered.connect(self.actionChangStyle)
+        self.action_dict['action_view_dark_style'].triggered.connect(self.actionChangStyle)
 
     def initMainTabWidget(self):
         self.main_tab = QtWidgets.QTabWidget(self)
@@ -156,8 +162,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         del title_bar
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.server_view_dock)
 
-    def about(self):
-        msg = translate(
+    def actionAbout(self):
+        msg = _translate(
             'MainWindow', "<p><b>Hikyuu Strategy Server Manager</b><p>"
             "<p>Hikyuu strategy server management is used to "
             "manage quant trading strategies based on hikyuu "
@@ -169,15 +175,20 @@ class MyMainWindow(QtWidgets.QMainWindow):
             "Now it only used in Chinese stock market)</p>"
             '<p>see more: <a href="https://hikyuu.org">https://hikyuu.org<a></p>'
         )
-        QtWidgets.QMessageBox.about(self, translate('MainWindow', 'About Hikyuu Strategy Server Manager'), msg)
+        QtWidgets.QMessageBox.about(self, _translate('MainWindow', 'About Hikyuu Strategy Server Manager'), msg)
 
-    def changStyle(self):
+    def actionChangStyle(self):
         QtWidgets.qApp.setStyleSheet('')
         style_name = self.sender().objectName()
         if style_name == 'dark_style':
             QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
         self.ui_config.set('main_window', 'style', style_name)
 
+    def actionEditSession(self):
+        edit_session_dialog = HkuEditSessionDialog()
+        if edit_session_dialog.exec():
+            print("ok")
+        edit_session_dialog.destroy()
 
 def main_core():
     # 自适应分辨率，防止字体显示不全
