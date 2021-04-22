@@ -24,14 +24,16 @@
 
 import logging
 import sys
+sys.path.append('.')
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle
 
 from UiConfig import UiConfig
-from admin.widget.HkuSessionViewWidget import HkuSessionViewWidget
+from widget.HkuSessionViewWidget import HkuSessionViewWidget
 from dialog import *
 from widget import *
+from data import *
 
 _translate = QtCore.QCoreApplication.translate
 
@@ -93,6 +95,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.initDockWidgets()
         self.statusBar().showMessage(_translate('MainWindow', 'Running'))
         QtCore.QMetaObject.connectSlotsByName(self)
+
+        self.db = LocalDatabase()
 
     def closeEvent(self, event):
         self.ui_config.save(self)
@@ -185,6 +189,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.ui_config.set('main_window', 'style', style_name)
 
     def actionEditSession(self):
+        item = self.server_view_dock.tree.currentItem()
+        print(item.text(0) if item else 'None')
         edit_session_dialog = HkuEditSessionDialog()
         if edit_session_dialog.exec():
             print("ok")
