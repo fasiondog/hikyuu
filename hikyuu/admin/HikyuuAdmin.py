@@ -24,6 +24,7 @@
 
 import logging
 import sys
+
 sys.path.append('.')
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -72,7 +73,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.setObjectName("HikyuuAdminMainWindow")
         self.setWindowTitle(_translate("MainWindow", "Hikyuu Strategy Server Manager"))
 
-        # 必须放在 resize 窗口大小之前
+        # 必须放在 resize 窗口大小之前, 不过启动时，暗黑模式最大化依然存在问题，暂无法解决
         style = self.ui_config.get('main_window', 'style', fallback='normal_style')
         if style == 'dark_style':
             QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
@@ -85,7 +86,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 self.ui_config.getint('main_window', 'height', fallback=500)
             )
 
-
         self.initAction()
         self.initMenuBar()
         self.initMenu()
@@ -97,6 +97,10 @@ class MyMainWindow(QtWidgets.QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
 
         self.db = LocalDatabase()
+
+    @property
+    def session(self):
+        return self.db.session
 
     def closeEvent(self, event):
         self.ui_config.save(self)
@@ -190,11 +194,16 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def actionEditSession(self):
         item = self.server_view_dock.tree.currentItem()
-        print(item.text(0) if item else 'None')
-        edit_session_dialog = HkuEditSessionDialog()
-        if edit_session_dialog.exec():
-            print("ok")
+        server_session = self.db.session.query(SessionModel).filter_by(name=item.text(0)
+                                                                       ).first() if item else None
+        if server_session is None:
+            server_session = SessionModel()
+        edit_session_dialog = HkuEditSessionDialog(self)
+        edit_session_dialog.setData(server_session)
+        if edit_session_dialog.exec() >= 0:
+            name = edit_session_dialog.name_lineEdit.text()
         edit_session_dialog.destroy()
+
 
 def main_core():
     # 自适应分辨率，防止字体显示不全
@@ -220,7 +229,7 @@ def main_core():
     if exit_code == 888:
         # 应用中使用 qApp.exit(888) 指示重启
         del main_win
-        del app  #必须，否则最终无法正常退出应用
+        del app  # 必须，否则最终无法正常退出应用
         main_core()
     else:
         sys.exit()

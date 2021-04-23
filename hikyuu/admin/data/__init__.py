@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from .model import *
+from .model import SessionModel
 from .LocalDatabase import LocalDatabase

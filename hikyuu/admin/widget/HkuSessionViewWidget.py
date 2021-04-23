@@ -33,8 +33,9 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
     def on_tree_customContextMenuRequested(self, pos):
         print("on_tree_customContextMenuRequested")
         item = self.tree.itemAt(pos)
-        print(item.parent)
-        self.server_menu.exec(QtGui.QCursor.pos())
+        if item:
+            print(item.parent)
+            self.server_menu.exec(QtGui.QCursor.pos())
 
     def addSession(self):
         pass
