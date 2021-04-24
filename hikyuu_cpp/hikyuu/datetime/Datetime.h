@@ -121,7 +121,7 @@ public:
     Datetime operator-(TimeDelta d) const;
 
     /**
-     * 返回如YYYYMMDDhhmmss格式的数字，方便比较操作，
+     * 返回如YYYYMMDDhhmm格式的数字，方便比较操作，
      * Null<Datetime>()对应的 number 为 Null<unsigned long long>
      */
     unsigned long long number() const noexcept;

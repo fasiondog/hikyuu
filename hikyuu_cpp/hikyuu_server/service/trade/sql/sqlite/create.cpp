@@ -9,7 +9,7 @@
 
 namespace hku {
 
-const char *g_sqlite_create_db{
+const char *g_sqlite_create_td_db{
   R"(
 CREATE TABLE "td_account" (
 	"id"	INTEGER NOT NULL UNIQUE,

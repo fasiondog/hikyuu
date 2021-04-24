@@ -9,6 +9,6 @@
 
 namespace hku {
 
-std::vector<std::string> g_sqlite_upgrade_db{};
+std::vector<std::string> g_sqlite_upgrade_td_db{};
 
 }  // namespace hku

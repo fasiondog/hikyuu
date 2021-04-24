@@ -8,15 +8,25 @@
 #pragma once
 
 #include "http/HttpService.h"
+#include "db/db.h"
+#include "sql/sqlite/sqlitedb.h"
+#include "UserHandle.h"
 #include "LoginHandle.h"
 #include "LogoutHandle.h"
 
 namespace hku {
 
 class UserService : public HttpService {
-    HTTP_SERVICE_IMP(UserService)
+public:
+    UserService(const char *url) : HttpService(url) {
+        auto con = DB::getConnect();
+        if (DB::isSQLite()) {
+            DBUpgrade(con, "usr", {}, 2, g_sqlite_create_usr_db);
+        }
+    }
 
     virtual void regHandle() override {
+        POST<SignupHandle>("signup");
         POST<LoginHandle>("login");
         POST<LogoutHandle>("logout");
     }

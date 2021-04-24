@@ -8,16 +8,15 @@
 #pragma once
 
 #include <hikyuu/utilities/IniParser.h>
-#include <hikyuu/utilities/db_connect/DBUpgrade.h>
 #include "../common/log.h"
 #include "db.h"
-#include "sqlite/sqlitedb.h"
 
 namespace hku {
 
 std::unique_ptr<ConnectPool<SQLiteConnect>> DB::ms_sqlite_pool;
 std::unique_ptr<ConnectPool<MySQLConnect>> DB::ms_mysql_pool;
 
+DB::snowflake_t DB::ms_user_id_generator;
 DB::snowflake_t DB::ms_td_id_generator;
 DB::snowflake_t DB::ms_sta_id_generator;
 
@@ -26,6 +25,7 @@ void DB::init(const std::string& config_file) {
         return;
     }
 
+    ms_user_id_generator.init(1, 1);
     ms_td_id_generator.init(1, 1);
     ms_sta_id_generator.init(1, 1);
 
@@ -47,8 +47,6 @@ void DB::initSqlite(const Parameter& param) {
     sqlite_param.set<int>("flags",
                           SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX);
     ms_sqlite_pool = std::make_unique<ConnectPool<SQLiteConnect>>(sqlite_param);
-    auto con = ms_sqlite_pool->getAndWait();
-    DBUpgrade(con, "td", {}, 2, g_sqlite_create_db);
 }
 
 void DB::initMysql(const Parameter& param) {

@@ -116,13 +116,11 @@ public:
     }
 
     void setResData(const json &data) {
-        std::string x = data.dump();
-        setResData(x);
+        setResData(data.dump());
     }
 
     void setResData(const ordered_json &data) {
-        std::string x = data.dump();
-        setResData(x);
+        setResData(data.dump());
     }
 
     void operator()();

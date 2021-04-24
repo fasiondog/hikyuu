@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <hikyuu/utilities/ConnectPool.h>
+#include <hikyuu/utilities/db_connect/DBConnect.h>
 #include <hikyuu/utilities/db_connect/sqlite/SQLiteConnect.h>
 #include <hikyuu/utilities/db_connect/mysql/MySQLConnect.h>
 #include "../common/snowflake.h"
@@ -23,6 +24,18 @@ public:
 
     static bool isValidEumValue(const std::string &table, const std::string &field,
                                 const std::string &val);
+
+    static bool isSQLite() {
+        return bool(ms_sqlite_pool);
+    }
+
+    static bool isMySQL() {
+        return bool(ms_mysql_pool);
+    }
+
+    static int64_t getNewUserId() {
+        return ms_user_id_generator.nextid();
+    }
 
     static int64_t getNewTdId() {
         return ms_td_id_generator.nextid();
@@ -42,6 +55,7 @@ private:
     static std::unique_ptr<ConnectPool<MySQLConnect>> ms_mysql_pool;
 
     using snowflake_t = snowflake<1618243200000L, std::mutex>;
+    static snowflake_t ms_user_id_generator;
     static snowflake_t ms_td_id_generator;
     static snowflake_t ms_sta_id_generator;
 };

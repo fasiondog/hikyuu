@@ -14,5 +14,6 @@
 #include "SQLStatementBase.h"
 #include "TransAction.h"
 #include "TableMacro.h"
+#include "DBUpgrade.h"
 
 #endif /* HIKYUU_DB_CONNECT_H */

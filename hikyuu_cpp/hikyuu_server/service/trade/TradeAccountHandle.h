@@ -13,13 +13,11 @@
 
 namespace hku {
 
-class TradeService;
-
 class AddTradeAccountHandle : public RestHandle {
     REST_HANDLE_IMP(AddTradeAccountHandle)
     virtual void run() override {
-        check_missing("name");
-        check_missing("type");
+        check_missing_param("name");
+        check_missing_param("type");
         TradeAccountModel account;
         std::string name = req["name"].get<std::string>();
         std::string td_type = req["type"].get<std::string>();

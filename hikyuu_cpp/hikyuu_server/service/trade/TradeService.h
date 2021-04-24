@@ -8,6 +8,7 @@
 #pragma once
 
 #include "http/HttpService.h"
+#include "sql/sqlite/sqlitedb.h"
 #include "WalletHandle.h"
 #include "TradeAccountHandle.h"
 
@@ -18,7 +19,12 @@ class TradeService : public HttpService {
 
 public:
     TradeService() = delete;
-    TradeService(const char* url) : HttpService(url) {}
+    TradeService(const char* url) : HttpService(url) {
+        auto con = DB::getConnect();
+        if (DB::isSQLite()) {
+            DBUpgrade(con, "td", {}, 2, g_sqlite_create_td_db);
+        }
+    }
 
     virtual void regHandle() override {
         GET<WalletHandle>("wallet");

@@ -9,6 +9,17 @@
 
 namespace hku {
 
-enum TradeErrorCode { TD_ACCOUNT_REPETITION = 20000, TD_ACCOUNT_INVALD_TYPE };
+enum RestErrorCode {
+    REST_INVALID_VALUE = 10000,
+};
 
-}
+enum UserErrorCode {
+    USER_NAME_REPETITION = 20000,
+};
+
+enum TradeErrorCode {
+    TD_ACCOUNT_REPETITION = 30000,
+    TD_ACCOUNT_INVALD_TYPE,
+};
+
+}  // namespace hku

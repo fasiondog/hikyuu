@@ -18,15 +18,16 @@ using namespace hku;
 
 int main(int argc, char* argv[]) {
     init_server_logger();
-    DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
 
     LOG_INFO("start server ... You can press Ctrl-C stop");
 
     HttpServer server("http://*", 9001);
 
     try {
-        UserService login(HKU_SERVICE_API(user));
-        login.bind(&server);
+        DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
+
+        UserService usr_service(HKU_SERVICE_API(user));
+        usr_service.bind(&server);
 
         AssistService assist(HKU_SERVICE_API(assist));
         assist.bind(&server);
