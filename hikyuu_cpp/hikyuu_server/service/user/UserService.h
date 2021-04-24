@@ -13,8 +13,8 @@
 
 namespace hku {
 
-class AccountService : public HttpService {
-    HTTP_SERVICE_IMP(AccountService)
+class UserService : public HttpService {
+    HTTP_SERVICE_IMP(UserService)
 
     virtual void regHandle() override {
         POST<LoginHandle>("login");

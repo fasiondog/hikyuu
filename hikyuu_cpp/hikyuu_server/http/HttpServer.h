@@ -23,8 +23,8 @@ public:
     HttpServer(const char *host, uint16_t port);
     virtual ~HttpServer();
 
-    void start();
-    void stop();
+    static void start();
+    static void stop();
 
     template <typename Handle>
     void GET(const char *path) {

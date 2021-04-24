@@ -7,17 +7,15 @@
 
 #pragma once
 
-#include "../../http/HttpHandle.h"
+#include "../RestHandle.h"
 
 namespace hku {
 
-class LoginHandle : public HttpHandle {
-    HTTP_HANDLE_IMP(LoginHandle)
+class LoginHandle : public RestHandle {
+    REST_HANDLE_IMP(LoginHandle)
 
     virtual void run() override {
-        json req = getReqJson();
-        HTTP_CHECK(req.contains("user"), HttpErrorCode::MISS_PARAMETER,
-                   "Invalid login request! missing user");
+        check_missing("user");
         setResHeader("Content-Type", "application/json; charset=UTF-8");
         setResData(
           R"({"hku_token":"7c98806c0711cf996d602890e0ab9119d9a86afe04296ba69a16f0d9d76be755"})");

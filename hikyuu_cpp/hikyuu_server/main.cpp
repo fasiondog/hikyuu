@@ -7,7 +7,7 @@
 
 #include <hikyuu/utilities/os.h>
 #include "http/HttpServer.h"
-#include "service/account/AccountService.h"
+#include "service/user/UserService.h"
 #include "service/assist/AssistService.h"
 #include "service/trade/TradeService.h"
 
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
     HttpServer server("http://*", 9001);
 
     try {
-        AccountService login(HKU_SERVICE_API(account));
+        UserService login(HKU_SERVICE_API(user));
         login.bind(&server);
 
         AssistService assist(HKU_SERVICE_API(assist));

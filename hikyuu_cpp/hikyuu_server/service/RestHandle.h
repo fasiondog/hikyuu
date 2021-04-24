@@ -30,12 +30,24 @@ public:
 
     virtual void before_run() override {
         setResHeader("Content-Type", "application/json; charset=UTF-8");
+        req = getReqJson();
     }
 
     /*virtual void after_run() override {
         // 强制关闭连接，即仅有短连接
         nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
     }*/
+
+protected:
+    void check_missing(const char *param) {
+        if (!req.contains(param)) {
+            throw HttpError(HttpErrorCode::MISS_PARAMETER,
+                            fmt::format(R"(Missing param "{}")", param));
+        }
+    }
+
+protected:
+    json req;  // 子类在 run 方法中，直接使用次req
 };
 
 #define REST_HANDLE_IMP(cls) \

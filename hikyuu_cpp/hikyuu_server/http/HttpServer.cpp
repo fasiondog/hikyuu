@@ -30,18 +30,7 @@ static UINT g_old_cp;
 #endif
 
 void HttpServer::http_exit() {
-    CLS_INFO("exit server");
-    ms_tg.stop();
-    if (ms_server) {
-        nng_http_server_stop(ms_server);
-        nng_http_server_release(ms_server);
-        nng_fini();
-        ms_server = nullptr;
-#if defined(_WIN32)
-        SetConsoleOutputCP(g_old_cp);
-#endif
-    }
-
+    stop();
     exit(0);
 }
 
@@ -60,19 +49,7 @@ HttpServer::HttpServer(const char* host, uint16_t port) : m_host(host), m_port(p
     nng_url_free(url);
 }
 
-HttpServer::~HttpServer() {
-    ms_tg.join();
-    if (ms_server) {
-        CLS_INFO("Quit Http server");
-        nng_http_server_stop(ms_server);
-        nng_http_server_release(ms_server);
-        nng_fini();
-        ms_server = nullptr;
-#if defined(_WIN32)
-        SetConsoleOutputCP(g_old_cp);
-#endif
-    }
-}
+HttpServer::~HttpServer() {}
 
 void HttpServer::start() {
     std::signal(SIGINT, &HttpServer::signal_handler);
@@ -85,6 +62,10 @@ void HttpServer::start() {
     auto g_old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
+
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
 }
 
 void HttpServer::stop() {

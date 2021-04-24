@@ -12,9 +12,8 @@
 namespace hku {
 
 void AddTradeAccountHandle::run() {
-    json req = getReqJson();
-    HTTP_CHECK(req.contains("name"), HttpErrorCode::MISS_PARAMETER, R"(Missing param "name")");
-    HTTP_CHECK(req.contains("type"), HttpErrorCode::MISS_PARAMETER, R"(Missing param "type")");
+    check_missing("name");
+    check_missing("type");
     TradeAccountModel account;
     std::string name = req["name"].get<std::string>();
     std::string td_type = req["type"].get<std::string>();
