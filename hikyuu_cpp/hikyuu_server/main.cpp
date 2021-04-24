@@ -7,6 +7,7 @@
 
 #include <hikyuu/utilities/os.h>
 #include "http/HttpServer.h"
+#include "db/db.h"
 #include "service/user/UserService.h"
 #include "service/assist/AssistService.h"
 #include "service/trade/TradeService.h"
@@ -17,6 +18,7 @@ using namespace hku;
 
 int main(int argc, char* argv[]) {
     init_server_logger();
+    DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
 
     LOG_INFO("start server ... You can press Ctrl-C stop");
 
@@ -29,8 +31,7 @@ int main(int argc, char* argv[]) {
         AssistService assist(HKU_SERVICE_API(assist));
         assist.bind(&server);
 
-        TradeService trade(HKU_SERVICE_API(trade),
-                           fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
+        TradeService trade(HKU_SERVICE_API(trade));
         trade.bind(&server);
 
         server.start();

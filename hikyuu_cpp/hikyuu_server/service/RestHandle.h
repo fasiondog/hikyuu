@@ -46,6 +46,14 @@ protected:
         }
     }
 
+    template <typename ModelTable>
+    void check_enum_field(const std::string &field, const std::string &value) {
+        if (!DB::isValidEumValue(ModelTable::getTableName(), field, value)) {
+            throw HttpError(TradeErrorCode::TD_ACCOUNT_INVALD_TYPE,
+                            fmt::format("Invalid trade account type: {}", value));
+        }
+    }
+
 protected:
     json req;  // 子类在 run 方法中，直接使用次req
 };

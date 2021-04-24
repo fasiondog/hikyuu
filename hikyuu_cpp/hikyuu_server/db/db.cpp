@@ -1,30 +1,33 @@
 /*
  *  Copyright(C) 2021 hikyuu.org
  *
- *  Create on: 2021-04-09
+ *  Create on: 2021-04-24
  *     Author: fasiondog
  */
 
+#pragma once
+
 #include <hikyuu/utilities/IniParser.h>
 #include <hikyuu/utilities/db_connect/DBUpgrade.h>
-#include "TradeService.h"
-#include "db/sqlite/sqlitedb.h"
+#include "../common/log.h"
+#include "db.h"
+#include "sqlite/sqlitedb.h"
 
 namespace hku {
 
-std::unique_ptr<ConnectPool<SQLiteConnect>> TradeService::ms_sqlite_pool;
-std::unique_ptr<ConnectPool<MySQLConnect>> TradeService::ms_mysql_pool;
+std::unique_ptr<ConnectPool<SQLiteConnect>> DB::ms_sqlite_pool;
+std::unique_ptr<ConnectPool<MySQLConnect>> DB::ms_mysql_pool;
 
-TradeService::snowflake_t TradeService::ms_td_id_generator;
-TradeService::snowflake_t TradeService::ms_sta_id_generator;
+DB::snowflake_t DB::ms_td_id_generator;
+DB::snowflake_t DB::ms_sta_id_generator;
 
-TradeService::TradeService(const char* url, const std::string& config_file) : HttpService(url) {
-    ms_td_id_generator.init(1, 1);
-    ms_sta_id_generator.init(1, 1);
-
+void DB::init(const std::string& config_file) {
     if (ms_sqlite_pool || ms_mysql_pool) {
         return;
     }
+
+    ms_td_id_generator.init(1, 1);
+    ms_sta_id_generator.init(1, 1);
 
     IniParser ini;
     ini.read(config_file);
@@ -35,10 +38,10 @@ TradeService::TradeService(const char* url, const std::string& config_file) : Ht
         param.set<string>(option, ini.get("database", option));
     }
 
-    initTradeServiceDB(param);
+    initDB(param);
 }
 
-void TradeService::initTradeServiceSqlite(const Parameter& param) {
+void DB::initSqlite(const Parameter& param) {
     Parameter sqlite_param;
     sqlite_param.set<string>("db", param.get<string>("db"));
     sqlite_param.set<int>("flags",
@@ -48,7 +51,7 @@ void TradeService::initTradeServiceSqlite(const Parameter& param) {
     DBUpgrade(con, "td", {}, 2, g_sqlite_create_db);
 }
 
-void TradeService::initTradeServiceMysql(const Parameter& param) {
+void DB::initMysql(const Parameter& param) {
     Parameter mysql_param;
     mysql_param.set<string>("host", param.get<string>("host"));
     mysql_param.set<string>("usr", param.get<string>("usr"));
@@ -58,29 +61,28 @@ void TradeService::initTradeServiceMysql(const Parameter& param) {
     ms_mysql_pool = std::make_unique<ConnectPool<MySQLConnect>>(mysql_param);
 }
 
-void TradeService::initTradeServiceDB(const Parameter& params) {
-    CLS_TRACE("Initialize trade service database");
+void DB::initDB(const Parameter& params) {
     string type = params.get<string>("type");
     if (type == "sqlite3") {
-        CLS_TRACE("use sqlite3");
-        initTradeServiceSqlite(params);
+        LOG_TRACE("use sqlite3 database");
+        initSqlite(params);
     } else if (type == "mysql") {
-        CLS_TRACE("use mysql");
-        initTradeServiceMysql(params);
+        LOG_TRACE("use mysql database");
+        initMysql(params);
     } else {
         throw std::invalid_argument(fmt::format("Invalid database type: {}", type));
     }
 }
 
-DBConnectPtr TradeService::getDBConnect() {
+DBConnectPtr DB::getConnect() {
     return ms_sqlite_pool  ? ms_sqlite_pool->getAndWait()
            : ms_mysql_pool ? ms_mysql_pool->getAndWait()
                            : DBConnectPtr();
 }
 
-bool TradeService::isValidEumValue(const std::string& table, const std::string& field,
-                                   const std::string& val) {
-    int count = getDBConnect()->queryInt(fmt::format(
+bool DB::isValidEumValue(const std::string& table, const std::string& field,
+                         const std::string& val) {
+    int count = getConnect()->queryInt(fmt::format(
       R"(select count(1) from td_enum where table_name="{}" and field_name="{}" and value="{}")",
       table, field, val));
     return count > 0;
