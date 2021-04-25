@@ -13,9 +13,16 @@
 namespace hku {
 
 class UserModel {
-    TABLE_BIND6(user, user_id, name, password, create_time, token, expire_time)
+    TABLE_BIND6(admin_user, user_id, name, password, start_time, end_time, status)
+
+    enum STATUS {
+        NORMAL = 1,
+        INVALID,
+    };
 
 public:
+    UserModel() : user_id(0), status(STATUS::NORMAL) {}
+
     int64_t getUserId() const {
         return user_id;
     }
@@ -40,29 +47,37 @@ public:
         this->password = password;
     }
 
-    Datetime getCreateTime() const {
-        return Datetime(create_time);
+    Datetime getStartTime() const {
+        return Datetime(start_time);
     }
 
-    void setCreateTime(Datetime time) {
-        create_time = time.number();
+    void setStartTime(Datetime time) {
+        start_time = time.number();
     }
 
-    std::string getToken() const {
-        return token;
+    Datetime getEndTime() const {
+        return Datetime(end_time);
     }
 
-    void setToken(std::string_view token) {
-        this->token = token;
+    void setEndTime(Datetime time) {
+        end_time = time.number();
+    }
+
+    int getStatus() const {
+        return status;
+    }
+
+    void setStatus(STATUS status) {
+        this->status = status;
     }
 
 private:
     int64_t user_id;       // 用户id
     std::string name;      // 用户名
     std::string password;  // 用户密码
-    uint64_t create_time;  // 用户创建时间
-    std::string token;
-    uint64_t expire_time;  // token 过期时间
+    uint64_t start_time;   // 用户创建时间，精确到分
+    uint64_t end_time;     // 用户失效时间，精确到分
+    int status;            // 用户状态
 };
 
 }  // namespace hku

@@ -21,7 +21,7 @@ public:
     UserService(const char *url) : HttpService(url) {
         auto con = DB::getConnect();
         if (DB::isSQLite()) {
-            DBUpgrade(con, "usr", {}, 2, g_sqlite_create_usr_db);
+            DBUpgrade(con, "admin", {}, 2, g_sqlite_create_usr_db);
         }
     }
 

@@ -40,7 +40,9 @@ CREATE TABLE "td_enum" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"table_name"	TEXT NOT NULL,
 	"field_name"	TEXT NOT NULL,
+	"value_type"	TEXT NOT NULL,
 	"value"	TEXT NOT NULL,
+	"desc"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE INDEX "ix_td_enum_on_tabel_field" ON "td_enum" (
@@ -48,7 +50,7 @@ CREATE INDEX "ix_td_enum_on_tabel_field" ON "td_enum" (
 	"field_name",
 	"value"
 );
-INSERT INTO "td_enum" ("id", "table_name", "field_name", "value") VALUES ('1', 'td_account', 'type', 'xq');
+INSERT INTO "td_enum" ("id", "table_name", "field_name", "value_type", "value", "desc") VALUES ('1', 'td_account', 'type', 'str', 'xq', '雪球');
 CREATE TABLE "td_positions" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL,

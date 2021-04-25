@@ -9,6 +9,7 @@
 
 #include "../RestHandle.h"
 #include "model/UserModel.h"
+#include "model/TokenModel.h"
 
 namespace hku {
 
@@ -20,8 +21,7 @@ class SignupHandle : public NoAuthRestHandle {
         UserModel user;
         user.setName(req["user"].get<string>());
         user.setPassword(req["password"].get<string>());
-        user.setCreateTime(Datetime::now());
-        user.setToken("7c98806c0711cf996d602890e0ab9119d9a86afe04296ba69a16f0d9d76be755");
+        user.setStartTime(Datetime::now());
         {
             auto con = DB::getConnect();
             TransAction trans(con);
