@@ -121,10 +121,17 @@ public:
     Datetime operator-(TimeDelta d) const;
 
     /**
-     * 返回如YYYYMMDDhhmm格式的数字，方便比较操作，
+     * 返回如YYYYMMDDhhmm格式的数字，方便比较操作
      * Null<Datetime>()对应的 number 为 Null<unsigned long long>
+     * @note 精度到分钟
      */
-    unsigned long long number() const noexcept;
+    uint64_t number() const noexcept;
+
+    /**
+     * 转化为 oracle datetime 方式的数字，后 7 个字节分别表示世纪、世纪中的年、月、日、时、分、秒
+     * @note 精度到秒
+     */
+    uint64_t hex() const noexcept;
 
     /**
      * 转化为字符串，供打印阅读，格式：

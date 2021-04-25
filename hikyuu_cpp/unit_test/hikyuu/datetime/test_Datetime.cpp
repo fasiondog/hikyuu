@@ -9,6 +9,7 @@
 
 #include <hikyuu/datetime/Datetime.h>
 #include <hikyuu/utilities/Null.h>
+#include <hikyuu/Log.h>
 
 using namespace hku;
 
@@ -120,6 +121,10 @@ TEST_CASE("test_Datetime") {
     long long y = x;
     Datetime m(y);
     CHECK(m == d);
+
+    /** @arg 兼容oracle datetime表示法 */
+    d = Datetime(2021, 4, 25, 23, 16, 27);
+    CHECK_EQ(d.hex(), 0x1415041917101bULL);
 
     /** @arg Null<Datetime>()转化为number */
     x = Null<unsigned long long>();

@@ -115,7 +115,7 @@ std::string Datetime::repr() const {
                        minute(), second(), millisecond(), microsecond());
 }
 
-unsigned long long Datetime::number() const noexcept {
+uint64_t Datetime::number() const noexcept {
     try {
         HKU_IF_RETURN(m_data.date() == bd::date(bd::pos_infin), Null<unsigned long long>());
         return (unsigned long long)year() * 100000000LL + (unsigned long long)month() * 1000000LL +
@@ -127,6 +127,20 @@ unsigned long long Datetime::number() const noexcept {
     } catch (...) {
         return Null<unsigned long long>();
     }
+}
+
+uint64_t Datetime::hex() const noexcept {
+    uint64_t ret = uint64_t(second());
+    ret |= (uint64_t(minute()) << 8);
+    ret |= (uint64_t(hour()) << 16);
+    ret |= (uint64_t(day()) << 24);
+    ret |= (uint64_t(month()) << 32);
+    uint64_t y = uint64_t(year());
+    uint64_t high_y = y / 100;
+    uint64_t low_y = y - high_y * 100;
+    ret |= (low_y << 40);
+    ret |= (high_y << 48);
+    return ret;
 }
 
 long Datetime::year() const {
