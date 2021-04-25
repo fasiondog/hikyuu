@@ -41,7 +41,9 @@ void export_Datetime() {
       .add_property("second", &Datetime::second, "秒")
       .add_property("millisecond", &Datetime::millisecond, "毫秒")
       .add_property("microsecond", &Datetime::microsecond, "微秒")
-      .add_property("number", &Datetime::number)
+      .add_property("number", &Datetime::number, "返回显示如 YYYYMMDDhhmm 的数字")
+      .add_property("hex", &Datetime::hex,
+                    "返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数")
 
       .def("is_null", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
 
@@ -85,6 +87,8 @@ void export_Datetime() {
       .staticmethod("now")
       .def("today", &Datetime::today, "\n获取当前的日期")
       .staticmethod("today")
+      .def("from_hex", &Datetime::from_hex, "\n兼容oracle用后7个字节表示的datetime")
+      .staticmethod("from_hex")
 
       .def(self == self)
       .def(self != self)
