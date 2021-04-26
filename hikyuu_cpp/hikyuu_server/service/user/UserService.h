@@ -11,8 +11,6 @@
 #include "db/db.h"
 #include "sql/sqlite/sqlitedb.h"
 #include "UserHandle.h"
-#include "LoginHandle.h"
-#include "LogoutHandle.h"
 
 namespace hku {
 

@@ -27,15 +27,15 @@ public:
     }
 
     Datetime getCreateTime() const {
-        return Datetime(create_time);
+        return Datetime::fromHex(create_time);
     }
 
-    void setCreatetime(Datetime time) {
+    void setCreateTime(Datetime time) {
         create_time = time.hex();
     }
 
     Datetime getExpireTime() const {
-        return Datetime(expire_time);
+        return Datetime::fromHex(expire_time);
     }
 
     void setExpireTime(Datetime time) {

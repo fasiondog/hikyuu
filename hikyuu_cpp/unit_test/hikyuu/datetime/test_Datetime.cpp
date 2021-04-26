@@ -125,7 +125,7 @@ TEST_CASE("test_Datetime") {
     /** @arg 兼容oracle datetime表示法 */
     d = Datetime(2021, 4, 25, 23, 16, 27);
     CHECK_EQ(d.hex(), 0x1415041917101bULL);
-    CHECK_EQ(d, Datetime::from_hex(d.hex()));
+    CHECK_EQ(d, Datetime::fromHex(d.hex()));
 
     /** @arg Null<Datetime>()转化为number */
     x = Null<unsigned long long>();

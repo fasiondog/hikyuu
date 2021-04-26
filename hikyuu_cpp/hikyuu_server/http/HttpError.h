@@ -23,11 +23,6 @@ namespace hku {
 enum HttpErrorCode {
     MISS_CONTENT = HTTP_FILTER_ERROR_START,
     INVALID_JSON_REQUEST,  // 请求数据无法解析为JSON
-    MISS_TOKEN,
-    UNAUTHORIZED,
-    MISS_PARAMETER,  // 缺失参数，参数不能为空 必填参数不能为空（各个业务接口返回各个接口的参数）
-    WRONG_PARAMETER,  // 参数值填写错误（各个业务接口返回各个接口的参数）
-    WRONG_PARAMETER_TYPE  // 参数类型错误（各个业务接口返回各个接口的参数）
 };
 
 #define HTTP_CHECK(expr, errcode, ...)                          \

@@ -87,8 +87,8 @@ void export_Datetime() {
       .staticmethod("now")
       .def("today", &Datetime::today, "\n获取当前的日期")
       .staticmethod("today")
-      .def("from_hex", &Datetime::from_hex, "\n兼容oracle用后7个字节表示的datetime")
-      .staticmethod("from_hex")
+      .def("from_hex", &Datetime::fromHex, "\n兼容oracle用后7个字节表示的datetime")
+      .staticmethod("fromHex")
 
       .def(self == self)
       .def(self != self)

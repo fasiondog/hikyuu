@@ -54,7 +54,7 @@ public:
      * 兼容oracle
      * datetime格式，除最高端的字节外，每个字节依次表示世纪、世纪年、月、日、时、分、秒
      */
-    static Datetime from_hex(uint64_t time);
+    static Datetime fromHex(uint64_t time);
 
 public:
     /** 默认构造函数，Null<Datetime> */
