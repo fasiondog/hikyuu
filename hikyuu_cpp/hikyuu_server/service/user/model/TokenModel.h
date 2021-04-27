@@ -13,10 +13,11 @@
 namespace hku {
 
 class TokenModel {
-    TABLE_BIND3(admin_token, token, create_time, expire_time)
+    TABLE_BIND1(admin_token, token)
 
 public:
-    TokenModel() : create_time(0), expire_time(0) {}
+    TokenModel() = default;
+    TokenModel(const std::string& tk) : token(tk) {}
 
     string getToken() const {
         return token;
@@ -26,26 +27,8 @@ public:
         this->token = token;
     }
 
-    Datetime getCreateTime() const {
-        return Datetime::fromHex(create_time);
-    }
-
-    void setCreateTime(Datetime time) {
-        create_time = time.hex();
-    }
-
-    Datetime getExpireTime() const {
-        return Datetime::fromHex(expire_time);
-    }
-
-    void setExpireTime(Datetime time) {
-        expire_time = time.hex();
-    }
-
 private:
     string token;
-    uint64_t create_time;  // 创建时间，精确到秒
-    uint64_t expire_time;  // 过期时间，精确到秒
 };
 
 }  // namespace hku

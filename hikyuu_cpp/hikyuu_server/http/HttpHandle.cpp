@@ -100,6 +100,15 @@ void HttpHandle::unknown_error(const std::string& errmsg) {
     }
 }
 
+std::string HttpHandle::getReqHeader(const std::string& name) {
+    std::string result;
+    const char* head = nng_http_req_get_header(m_nng_req, name.c_str());
+    if (head) {
+        result = std::string(head);
+    }
+    return result;
+}
+
 std::string HttpHandle::getReqData() {
     void* data = nullptr;
     size_t len = 0;
@@ -111,10 +120,11 @@ json HttpHandle::getReqJson() {
     void* data;
     size_t len;
     nng_http_req_get_data(m_nng_req, &data, &len);
-    HTTP_CHECK(data, INVALID_JSON_REQUEST, "Req data is empty!");
     json result;
     try {
-        result = json::parse((const char*)data);
+        if (data) {
+            result = json::parse((const char*)data);
+        }
     } catch (json::exception& e) {
         HKU_ERROR("Failed parse json: {}", (const char*)data);
         throw HttpError(INVALID_JSON_REQUEST, e.what());

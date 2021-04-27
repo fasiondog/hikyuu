@@ -42,9 +42,10 @@ INSERT INTO "admin_user" ("id", "user_id", "name", "password", "start_time", "en
 CREATE TABLE "admin_token" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"token"	TEXT NOT NULL,
-	"create_time"	INTEGER NOT NULL,
-	"expire_time"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE INDEX "ix_admin_token_on_token" ON "admin_token" (
+	"token"
 );
 )"};
 

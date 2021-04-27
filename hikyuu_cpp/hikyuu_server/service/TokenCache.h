@@ -7,10 +7,9 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <unordered_set>
 #include <mutex>
 #include <string>
-#include <hikyuu/datetime/Datetime.h>
 #include "db/db.h"
 
 namespace hku {
@@ -19,32 +18,24 @@ class TokenCache {
 public:
     TokenCache() = delete;
 
-    enum TOKEN_STATUS { INVALID = 0, VALID = 1, EXPIRED = 2 };
-
-    static void add(const std::string& token, Datetime expired) {
+    static void put(const std::string& token) {
         std::lock_guard<std::mutex> lock(ms_mutex);
-        ms_dict[token] = expired;
+        ms_dict.insert(token);
     }
 
-    static TOKEN_STATUS status(const std::string& token) {
+    static bool have(const std::string& token) {
         std::lock_guard<std::mutex> lock(ms_mutex);
-        auto iter = ms_dict.find(token);
-        if (iter == ms_dict.end()) {
-            return TOKEN_STATUS::INVALID;
-        }
-
-        return iter->second <= Datetime::now() ? TOKEN_STATUS::VALID : TOKEN_STATUS::EXPIRED;
+        return ms_dict.find(token) != ms_dict.end();
     }
 
-    static Datetime getExpireTime(const std::string& token) {
+    static void remove(const std::string& token) {
         std::lock_guard<std::mutex> lock(ms_mutex);
-        auto iter = ms_dict.find(token);
-        return iter != ms_dict.end() ? iter->second : Datetime();
+        ms_dict.erase(token);
     }
 
 private:
     static std::mutex ms_mutex;
-    static std::unordered_map<std::string, Datetime> ms_dict;
+    static std::unordered_set<std::string> ms_dict;
 };
 
 }  // namespace hku

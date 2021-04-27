@@ -15,7 +15,7 @@ class StatusHandle : public RestHandle {
     REST_HANDLE_IMP(StatusHandle)
 
     virtual void run() override {
-        setResData(R"({"status": "running"})");
+        res["status"] = "running";
     }
 };
 

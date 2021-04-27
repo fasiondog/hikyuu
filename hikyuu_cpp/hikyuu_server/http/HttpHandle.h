@@ -62,14 +62,7 @@ public:
      * @param name 头部信息名称
      * @return 如果获取不到将返回 NULL
      */
-    const char *getReqHeader(const char *name) {
-        return nng_http_req_get_header(m_nng_req, name);
-    }
-
-    std::string getReqHeader(const std::string &name) {
-        const char *head = nng_http_req_get_header(m_nng_req, name.c_str());
-        return head ? std::string(head) : std::string();
-    }
+    std::string getReqHeader(const std::string &name);
 
     /**
      * 获取请求数据

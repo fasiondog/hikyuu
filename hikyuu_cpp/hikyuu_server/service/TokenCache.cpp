@@ -10,6 +10,6 @@
 namespace hku {
 
 std::mutex TokenCache::ms_mutex;
-std::unordered_map<std::string, Datetime> TokenCache::ms_dict;
+std::unordered_set<std::string> TokenCache::ms_dict;
 
 }  // namespace hku

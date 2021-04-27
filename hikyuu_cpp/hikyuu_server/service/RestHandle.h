@@ -7,21 +7,13 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include "http/HttpHandle.h"
 #include "db/db.h"  // 这里统一引入
 #include "RestErrorCode.h"
-#include "TokenCache.h"
+#include "filter.h"
 
 namespace hku {
-
-inline void AuthorizeFilter(HttpHandle *handle) {
-    const char *token = handle->getReqHeader("hku_token");
-    HTTP_CHECK(token, RestErrorCode::MISS_TOKEN, "Miss token!");
-    auto status = TokenCache::status(token);
-    HTTP_CHECK(status == TokenCache::INVALID, RestErrorCode::UNAUTHORIZED, "Failed authorize!");
-    HTTP_CHECK(status == TokenCache::EXPIRED, RestErrorCode::AUTHORIZE_EXPIRED,
-               "Expired authentication!");
-}
 
 class NoAuthRestHandle : public HttpHandle {
     CLASS_LOGGER(NoAuthRestHandle)
@@ -71,18 +63,32 @@ public:
         addFilter(AuthorizeFilter);
     }
 
+    virtual void run() override {}
+
     virtual void after_run() override {
-        // 强制关闭连接，即仅有短连接
-        // nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
-        std::string token = getReqHeader("hku_token");
-        Datetime expire_time = TokenCache::getExpireTime(token);
-        Datetime now = Datetime::now();
-        if (expire_time - now < TimeDelta(3)) {
-            TokenCache::add(token, now + TimeDelta(30));
-            res["update_token"] = token;
+        if (!m_update_token.empty()) {
+            res["update_token"] = m_update_token;
         }
         setResData(res);
+        // 强制关闭连接，即仅有短连接
+        // nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
     }
+
+    void setCurrentUserId(uint64_t userid) {
+        m_user_id = userid;
+    }
+
+    uint64_t getCurrentUserId() const {
+        return m_user_id;
+    }
+
+    void setUpdateToken(const std::string &token) {
+        m_update_token = token;
+    }
+
+private:
+    uint64_t m_user_id;
+    std::string m_update_token;
 };
 
 #define NO_AUTH_REST_HANDLE_IMP(cls) \

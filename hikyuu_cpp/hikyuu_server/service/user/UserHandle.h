@@ -8,6 +8,7 @@
 #pragma once
 
 #include "common/uuid.h"
+#include "../TokenCache.h"
 #include "../RestHandle.h"
 #include "model/UserModel.h"
 #include "model/TokenModel.h"
@@ -36,13 +37,10 @@ class SignupHandle : public NoAuthRestHandle {
         }
 
         TokenModel token;
-        token.setToken(UUID());
-        Datetime now = Datetime::now();
-        token.setCreateTime(now);
-        token.setExpireTime(now + TimeDelta(30));
+        token.setToken(createToken(user.getUserId()));
         con->save(token);
 
-        TokenCache::add(token.getToken(), token.getExpireTime());
+        TokenCache::put(token.getToken());
         res["userid"] = user.getUserId();
         res["token"] = token.getToken();
         res["result"] = true;
