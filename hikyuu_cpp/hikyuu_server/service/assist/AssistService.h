@@ -18,7 +18,7 @@ class AssistService : public HttpService {
 
     virtual void regHandle() override {
         GET<StatusHandle>("status");
-        POST<LogLevelHandle>("log_level");
+        // POST<LogLevelHandle>("log_level");
     }
 };
 

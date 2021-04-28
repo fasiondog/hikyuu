@@ -21,6 +21,10 @@ std::string createToken(uint64_t user_id) {
     return base64_encode(fmt::format("{} {} {}", user_id, now, k), false);
 }
 
+struct TokenExpiredException : public hku::exception {
+    TokenExpiredException() : hku::exception("token is expired") {}
+};
+
 void AuthorizeFilter(HttpHandle *handle) {
     std::string token = handle->getReqHeader("hku_token");
     HTTP_CHECK(!token.empty(), RestErrorCode::MISS_TOKEN, "Miss token");
@@ -59,7 +63,7 @@ void AuthorizeFilter(HttpHandle *handle) {
                 con->exec(fmt::format(R"(delete from {} where token="{}")",
                                       TokenModel::getTableName(), token));
             }
-            throw std::logic_error(errmsg);
+            throw TokenExpiredException();
         }
 
         RestHandle *rest_handle = dynamic_cast<RestHandle *>(handle);
@@ -73,6 +77,9 @@ void AuthorizeFilter(HttpHandle *handle) {
             TokenCache::put(new_token);
             rest_handle->setUpdateToken(new_token);
         }
+
+    } catch (TokenExpiredException &e) {
+        throw e;
 
     } catch (std::exception) {
         throw HttpError(RestErrorCode::UNAUTHORIZED, errmsg);

@@ -14,6 +14,7 @@ namespace hku {
 
 std::string createToken(uint64_t user_id);
 
+// 鉴权
 void AuthorizeFilter(HttpHandle *handle);
 
 }  // namespace hku

@@ -13,11 +13,18 @@
 namespace hku {
 
 class TokenModel {
-    TABLE_BIND1(admin_token, token)
+    TABLE_BIND2(admin_token, user_id, token)
 
 public:
     TokenModel() = default;
-    TokenModel(const std::string& tk) : token(tk) {}
+
+    uint64_t getUserId() const {
+        return user_id;
+    }
+
+    void setUserId(uint64_t id) {
+        user_id = id;
+    }
 
     string getToken() const {
         return token;
@@ -28,6 +35,7 @@ public:
     }
 
 private:
+    uint64_t user_id;
     string token;
 };
 

@@ -10,6 +10,7 @@
 #include "http/HttpService.h"
 #include "db/db.h"
 #include "sql/sqlite/sqlitedb.h"
+#include "SignHandle.h"
 #include "UserHandle.h"
 
 namespace hku {
@@ -27,6 +28,9 @@ public:
         POST<SignupHandle>("signup");
         POST<LoginHandle>("login");
         POST<LogoutHandle>("logout");
+
+        POST<AddUserHandle>("user");
+        DEL<RemoveUserHandle>("user");
     }
 };
 

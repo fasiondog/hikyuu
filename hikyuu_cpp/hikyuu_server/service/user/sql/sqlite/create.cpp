@@ -41,11 +41,15 @@ CREATE INDEX "ix_admin_user_on_user_id" ON "admin_user" (
 INSERT INTO "admin_user" ("id", "user_id", "name", "password", "start_time", "end_time", "status") VALUES ('1', '4374148134604800', 'admin', 'admin', '202104250141', '999912312359', '1');
 CREATE TABLE "admin_token" (
 	"id"	INTEGER NOT NULL UNIQUE,
+	"user_id"	INTEGER NOT NULL UNIQUE,	
 	"token"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE INDEX "ix_admin_token_on_token" ON "admin_token" (
 	"token"
+);
+CREATE INDEX "ix_admin_token_on_userid" ON "admin_token" (
+	"user_id"
 );
 )"};
 

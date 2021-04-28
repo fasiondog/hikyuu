@@ -23,11 +23,11 @@ class UserModel {
 public:
     UserModel() : user_id(0), status(STATUS::NORMAL) {}
 
-    int64_t getUserId() const {
+    uint64_t getUserId() const {
         return user_id;
     }
 
-    void setUserId(int64_t id) {
+    void setUserId(uint64_t id) {
         user_id = id;
     }
 
@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    int64_t user_id;       // 用户id
+    uint64_t user_id;      // 用户id
     std::string name;      // 用户名
     std::string password;  // 用户密码
     uint64_t start_time;   // 用户创建时间，精确到分

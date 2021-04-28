@@ -15,10 +15,18 @@
 
 namespace hku {
 
-// 用户注册
-class SignupHandle : public NoAuthRestHandle {
-    NO_AUTH_REST_HANDLE_IMP(SignupHandle)
+/**
+ * 新增用户
+ */
+class AddUserHandle : public RestHandle {
+    REST_HANDLE_IMP(AddUserHandle)
     virtual void run() override {
+        auto con = DB::getConnect();
+        UserModel admin;
+        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                   "No operation permission");
+
         check_missing_param("user");
         check_missing_param("password");
         UserModel user;
@@ -26,7 +34,6 @@ class SignupHandle : public NoAuthRestHandle {
         user.setPassword(req["password"].get<string>());
         user.setStartTime(Datetime::now());
         user.setStatus(UserModel::STATUS::NORMAL);
-        auto con = DB::getConnect();
         {
             TransAction trans(con);
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
@@ -36,40 +43,35 @@ class SignupHandle : public NoAuthRestHandle {
             con->save(user, false);
         }
 
-        TokenModel token;
-        token.setToken(createToken(user.getUserId()));
-        con->save(token);
-
-        TokenCache::put(token.getToken());
-        res["userid"] = user.getUserId();
-        res["token"] = token.getToken();
         res["result"] = true;
+        res["userid"] = user.getUserId();
+        res["name"] = user.getName();
     }
 };
 
-// 用户登录
-class LoginHandle : public NoAuthRestHandle {
-    NO_AUTH_REST_HANDLE_IMP(LoginHandle)
-
+/**
+ * 删除用户
+ */
+class RemoveUserHandle : public RestHandle {
+    REST_HANDLE_IMP(RemoveUserHandle)
     virtual void run() override {
-        check_missing_param("user");
-        check_missing_param("password");
-        UserModel user;
         auto con = DB::getConnect();
-        con->load(user, fmt::format(R"(name="{}")", req["user"].get<std::string>()));
-        HTTP_CHECK(user.id() != 0, UserErrorCode::USER_NOT_EXIST, "User does not exist");
-        HTTP_CHECK(user.getPassword() == req["password"].get<std::string>(),
-                   UserErrorCode::USER_WRONG_PASSWORD, "Wrong password");
-    }
-};
+        UserModel admin;
+        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                   "No operation permission");
 
-// 退出登录
-class LogoutHandle : public HttpHandle {
-    HTTP_HANDLE_IMP(LogoutHandle)
+        check_missing_param("user");
+        {
+            UserModel user;
+            TransAction trans(con);
+            con->load(user, fmt::format(R"(name="{}")", req["user"].get<std::string>()));
+            if (user.id() != 0) {
+                con->remove(user, false);
+            }
+        }
 
-    virtual void run() override {
-        setResHeader("Content-Type", "application/json; charset=UTF-8");
-        setResData(R"({"result": true})");
+        res["result"] = true;
     }
 };
 

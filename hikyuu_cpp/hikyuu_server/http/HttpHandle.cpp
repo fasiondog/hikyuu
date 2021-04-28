@@ -55,6 +55,15 @@ void HttpHandle::operator()() {
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
+    } catch (nlohmann::json::exception& e) {
+        CLS_TRACE("HttpException: {}", e.what());
+        nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
+        std::string errmsg(fmt::format("Request param type error! {}", e.what()));
+        nng_http_res_set_reason(m_nng_res, errmsg.c_str());
+        nng_http_res_copy_data(m_nng_res, errmsg.c_str(), errmsg.size());
+        nng_aio_set_output(m_http_aio, 0, m_nng_res);
+        nng_aio_finish(m_http_aio, 0);
+
     } catch (std::exception& e) {
         std::string errmsg(e.what());
         CLS_ERROR(errmsg);
