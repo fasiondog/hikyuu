@@ -126,7 +126,7 @@ json HttpHandle::getReqJson() {
             result = json::parse((const char*)data);
         }
     } catch (json::exception& e) {
-        HKU_ERROR("Failed parse json: {}", (const char*)data);
+        LOG_ERROR("Failed parse json: {}", (const char*)data);
         throw HttpError(INVALID_JSON_REQUEST, e.what());
     }
     return result;

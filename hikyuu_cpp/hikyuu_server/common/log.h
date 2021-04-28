@@ -8,7 +8,8 @@
 #pragma once
 
 #include <iostream>
-#include <hikyuu/log.h>
+#include <hikyuu/config.h>
+#include <hikyuu/exception.h>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
@@ -20,9 +21,25 @@
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 
+#ifndef LOG_ACTIVE_LEVEL
+#define LOG_ACTIVE_LEVEL 0
+#endif
+
 namespace hku {
 
+#if LOG_ACTIVE_LEVEL <= 0
 #define DEFAULT_LOGGER_LEVEL spdlog::level::trace
+#elif LOG_ACTIVE_LEVEL <= 1
+#define DEFAULT_LOGGER_LEVEL spdlog::level::debug
+#elif LOG_ACTIVE_LEVEL <= 2
+#define DEFAULT_LOGGER_LEVEL spdlog::level::info
+#elif LOG_ACTIVE_LEVEL <= 2
+#define DEFAULT_LOGGER_LEVEL spdlog::level::warn
+#elif LOG_ACTIVE_LEVEL <= 3
+#define DEFAULT_LOGGER_LEVEL spdlog::level::error
+#elif LOG_ACTIVE_LEVEL <= 4
+#define DEFAULT_LOGGER_LEVEL spdlog::level::critical
+#endif
 
 inline void init_server_logger() {
     static std::once_flag oc;
@@ -65,12 +82,41 @@ inline void set_logger_level(const std::string& name, int level) {
     }
 }
 
+#if LOG_ACTIVE_LEVEL <= 0
 #define LOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)
+#else
+#define LOG_TRACE(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 1
 #define LOG_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
+#else
+#define LOG_DEBUG(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 2
 #define LOG_INFO(...) SPDLOG_INFO(__VA_ARGS__)
+#else
+#define LOG_INFO(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 3
 #define LOG_WARN(...) SPDLOG_WARN(__VA_ARGS__)
+#else
+#define LOG_WARN(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 4
 #define LOG_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
+#else
+#define LOG_ERROR(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 5
 #define LOG_FATAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#else
+#define LOG_FATAL(...)
+#endif
 
 /**
  * 满足指定条件时，打印 TRACE 信息
@@ -202,6 +248,91 @@ inline void set_logger_level(const std::string& name, int level) {
         return ret;                         \
     }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// clang/gcc 下使用 __PRETTY_FUNCTION__ 会包含函数参数，可以在编译时指定
+// #define HKU_FUNCTION __PRETTY_FUNCTION__
+//
+///////////////////////////////////////////////////////////////////////////////
+#ifndef HKU_FUNCTION
+#define HKU_FUNCTION __FUNCTION__
+#endif
+
+/**
+ * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
+ * @note 用于外部入参及结果检查
+ */
+#define LOG_CHECK(expr, ...)                                                                   \
+    do {                                                                                       \
+        if (!(expr)) {                                                                         \
+            throw hku::exception(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr,               \
+                                             fmt::format(__VA_ARGS__), __FUNCTION__, __FILE__, \
+                                             __LINE__));                                       \
+        }                                                                                      \
+    } while (0)
+
+/**
+ * 若表达式为 false，将抛出指定的异常, 并附带传入信息
+ * @note 用于外部入参及结果检查
+ */
+#define LOG_CHECK_THROW(expr, except, ...)                                                         \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            throw except(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, fmt::format(__VA_ARGS__), \
+                                     __FUNCTION__, __FILE__, __LINE__));                           \
+        }                                                                                          \
+    } while (0)
+
+#if HKU_DISABLE_ASSERT
+#define LOG_ASSERT(expr)
+#define LOG_ASSERT_M(expr, ...)
+
+#else /* #if HKU_DISABLE_ASSERT */
+
+/**
+ * 若表达式为 false，将抛出 hku::exception 异常
+ * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
+ */
+#define LOG_ASSERT(expr)                                                                  \
+    do {                                                                                  \
+        if (!(expr)) {                                                                    \
+            std::string err_msg(fmt::format("ASSERT({})", #expr));                        \
+            HKU_ERROR(err_msg);                                                           \
+            throw hku::exception(                                                         \
+              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__)); \
+        }                                                                                 \
+    } while (0)
+
+/**
+ * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
+ * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
+ */
+#define LOG_ASSERT_M(expr, ...)                                                                 \
+    do {                                                                                        \
+        if (!(expr)) {                                                                          \
+            std::string err_msg(fmt::format("ASSERT({}) {}", #expr, fmt::format(__VA_ARGS__))); \
+            HKU_ERROR(err_msg);                                                                 \
+            throw hku::exception(                                                               \
+              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__));       \
+        }                                                                                       \
+    } while (0)
+
+#endif /* #if HKU_DISABLE_ASSERT */
+
+/** 抛出 hku::exception 及传入信息 */
+#define LOG_THROW(...)                                                                           \
+    do {                                                                                         \
+        throw hku::exception(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
+                                         __FUNCTION__, __FILE__, __LINE__));                     \
+    } while (0)
+
+/** 抛出指定异常及传入信息 */
+#define LOG_THROW_EXCEPTION(except, ...)                                                 \
+    do {                                                                                 \
+        throw except(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
+                                 __FUNCTION__, __FILE__, __LINE__));                     \
+    } while (0)
+
 //--------------------------------------------------------------
 //
 // 类 logger 相关宏
@@ -232,12 +363,41 @@ public:                                                                         
         return ms_##cls_logger;                                                                  \
     }
 
+#if LOG_ACTIVE_LEVEL <= 0
 #define CLS_TRACE(...) SPDLOG_LOGGER_TRACE(logger(), __VA_ARGS__)
+#else
+#define CLS_TRACE(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 1
 #define CLS_DEBUG(...) SPDLOG_LOGGER_DEBUG(logger(), __VA_ARGS__)
+#else
+#define CLS_DEBUG(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 2
 #define CLS_INFO(...) SPDLOG_LOGGER_INFO(logger(), __VA_ARGS__)
+#else
+#define CLS_INFO(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 3
 #define CLS_WARN(...) SPDLOG_LOGGER_WARN(logger(), __VA_ARGS__)
+#else
+#define CLS_WARN(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 4
 #define CLS_ERROR(...) SPDLOG_LOGGER_ERROR(logger(), __VA_ARGS__)
+#else
+#define CLS_ERROR(...)
+#endif
+
+#if LOG_ACTIVE_LEVEL <= 5
 #define CLS_FATAL(...) SPDLOG_LOGGER_CRITICAL(logger(), __VA_ARGS__)
+#else
+#define CLS_FATAL(...)
+#endif
 
 /**
  * 满足指定条件时，打印 TRACE 信息
