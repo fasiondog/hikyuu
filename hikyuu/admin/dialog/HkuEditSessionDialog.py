@@ -3,18 +3,45 @@
 import sys
 sys.path.append("..")
 import resource
+import ServerApi
 
 import sqlalchemy
 from PyQt5 import QtWidgets, QtCore, QtGui
 from .Ui_HkuEditSessionDialog import Ui_HkuEditSessionDialog
 
+_translate = QtCore.QCoreApplication.translate
+
 
 class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
     def __init__(self, parent):
         super(HkuEditSessionDialog, self).__init__(parent)
-        self.setWindowIcon(QtGui.QIcon(":/icon/server.png"))
+        self.setWindowIcon(QtGui.QIcon(":/icon/server_16.png"))
         self.setupUi(self)
         self.session_model = None
+
+    @property
+    def name(self):
+        return self.name_lineEdit.text().strip()
+
+    @property
+    def host(self):
+        return self.host_lineEdit.text().strip()
+
+    @property
+    def port(self):
+        return self.port_spinBox.value()
+
+    @property
+    def user(self):
+        return self.user_lineEdit.text().strip()
+
+    @property
+    def password(self):
+        return self.password_lineEdit.text().strip()
+
+    @property
+    def remark(self):
+        return self.remark_textEdit.toPlainText()
 
     def setData(self, session_model):
         self.session_model = session_model
@@ -26,7 +53,6 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
         self.remark_textEdit.setText(session_model.remark)
 
     def accept(self):
-        _translate = QtCore.QCoreApplication.translate
         name = self.name_lineEdit.text().strip()
         if len(name) == 0:
             QtWidgets.QMessageBox.warning(
@@ -42,7 +68,6 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
         self.session_model.remark = self.remark_textEdit.toPlainText()
         session = self.parent().session
         try:
-            print(self.parent())
             session.add(self.session_model)
             session.commit()
         except sqlalchemy.exc.IntegrityError as e:
@@ -63,7 +88,25 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
 
     @QtCore.pyqtSlot()
     def on_test_pushButton_clicked(self):
-        print("jjjj")
+        try:
+            r = ServerApi.login(
+                "{}:{}".format(self.host_lineEdit.text().strip(), self.port_spinBox.value()), self.user_lineEdit.text(),
+                self.password_lineEdit.text()
+            )
+            if r.status_code == 200:
+                QtWidgets.QMessageBox.about(
+                    self, _translate("HkuEditSessionDialog", "success"),
+                    _translate("HkuEditSessionDialog", "Connect successfully!")
+                )
+            elif r.status_code == 400:
+                ret = r.json()
+                QtWidgets.QMessageBox.about(self, _translate("HkuEditSessionDialog", "Failed"), ret["errmsg"])
+        except Exception as e:
+            QtWidgets.QMessageBox.about(
+                self, _translate("HkuEditSessionDialog", "Failed"),
+                _translate("HkuEditSessionDialog", "Failed connect! Please check the host/ip and port\n%s") % e
+            )
+
 
     @QtCore.pyqtSlot()
     def on_remark_textEdit_textChanged(self):

@@ -109,7 +109,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def initAction(self):
         self.action_dict = dict(
             action_file_session=QtWidgets.QAction(
-                QtGui.QIcon(":/icon/server.png"), _translate("MainWindow", "&Session"), self
+                QtGui.QIcon(":/icon/server_32.png"), _translate("MainWindow", "&Session"), self
             ),
             action_file_quit=QtWidgets.QAction(QtGui.QIcon(":/icon/quit.png"), _translate('MainWindow', '&Quit'), self),
             action_view_normal_style=QtWidgets.QAction(_translate('MainWindow', 'Normal style'), self),

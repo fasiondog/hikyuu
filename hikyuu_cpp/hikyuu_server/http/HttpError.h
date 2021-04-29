@@ -42,7 +42,7 @@ public:
     : HttpException(NNG_HTTP_STATUS_BAD_REQUEST, msg), m_errcode(errcode) {}
 
     virtual std::string msg() const noexcept override {
-        return fmt::format(R"({{"errcode": {}, "errmsg": "{}"}})", m_errcode, what());
+        return fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"{}"}})", m_errcode, what());
     }
 
     int errcode() const noexcept {

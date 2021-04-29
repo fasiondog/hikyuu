@@ -7,6 +7,7 @@
     <file>logo/logo_128.png</file>
     <file>logo/logo_256.png</file>
     <file>icon/quit.png</file>
-    <file>icon/server.png</file>
+    <file>icon/server_16.png</file>
+    <file>icon/server_32.png</file>
   </qresource>
 </RCC>
