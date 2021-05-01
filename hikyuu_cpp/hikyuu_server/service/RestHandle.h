@@ -8,6 +8,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include "common/mo.h"
 #include "http/HttpHandle.h"
 #include "db/db.h"  // 这里统一引入
 #include "RestErrorCode.h"

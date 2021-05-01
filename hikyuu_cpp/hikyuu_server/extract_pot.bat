@@ -1,0 +1,1 @@
+xgettext -k_ -k"_LC:1c,2" -k"_LC:1c,2" -s -c --package-name=hikyuu -f po/POTFILES.in -o po/hikyuu.pot

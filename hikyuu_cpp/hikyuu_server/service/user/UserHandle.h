@@ -38,7 +38,7 @@ class AddUserHandle : public RestHandle {
             TransAction trans(con);
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
                                                   UserModel::getTableName(), user.getName()));
-            HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION, "Duplicate user name");
+            HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION, _("Duplicate user name"));
             user.setUserId(DB::getNewUserId());
             con->save(user, false);
         }

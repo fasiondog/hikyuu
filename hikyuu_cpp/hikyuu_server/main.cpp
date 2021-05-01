@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#include <locale>
 #include <hikyuu/utilities/os.h>
 #include "http/HttpServer.h"
 #include "db/db.h"
@@ -12,12 +13,24 @@
 #include "service/assist/AssistService.h"
 #include "service/trade/TradeService.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <Winnls.h>
+#pragma comment(lib, "Kernel32.lib")
+#endif
+
 using namespace hku;
 
 #define HKU_SERVICE_API(name) "/hku/" #name "/v1"
 
 int main(int argc, char* argv[]) {
     init_server_logger();
+
+#if defined(_WIN32) || defined(_WIN64)
+    LANGID lid = GetSystemDefaultLangID();
+    if (lid == 0x0804) {
+        mo_init("i8n/zh_CN.mo");
+    }
+#endif
 
     LOG_INFO("start server ... You can press Ctrl-C stop");
 
