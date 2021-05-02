@@ -431,13 +431,13 @@ inline void DBConnectBase::batchRemove(InputIterator first, InputIterator last, 
         if (autotrans) {
             rollback();
         }
-        HKU_THROW("failed batch delete! sql: {}! {}", st->getSqlString(), e.what());
+        HKU_THROW("failed batch delete! {}", e.what());
 
     } catch (...) {
         if (autotrans) {
             rollback();
         }
-        HKU_THROW("failed batch delete! sql: {}! Unknown error!", st->getSqlString());
+        HKU_THROW("failed batch delete! Unknown error!");
     }
 }
 
