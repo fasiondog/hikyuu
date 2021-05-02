@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#include <hikyuu/utilities/arithmetic.h>
 #include "url.h"
 #include "HttpHandle.h"
 
@@ -109,9 +110,9 @@ void HttpHandle::unknown_error(const std::string& errmsg) {
     }
 }
 
-std::string HttpHandle::getReqHeader(const std::string& name) {
+std::string HttpHandle::getReqHeader(const char* name) const {
     std::string result;
-    const char* head = nng_http_req_get_header(m_nng_req, name.c_str());
+    const char* head = nng_http_req_get_header(m_nng_req, name);
     if (head) {
         result = std::string(head);
     }
@@ -190,6 +191,18 @@ bool HttpHandle::getQueryParams(QueryParams& query_params) {
     }
 
     return query_params.size() != 0;
+}
+
+std::string HttpHandle::getLanguage() const {
+    std::string lang = getReqHeader("Accept-Language");
+    auto pos = lang.find_first_of(',');
+    if (pos != std::string::npos) {
+        lang = lang.substr(0, pos);
+    }
+    if (!lang.empty()) {
+        to_lower(lang);
+    }
+    return lang;
 }
 
 }  // namespace hku

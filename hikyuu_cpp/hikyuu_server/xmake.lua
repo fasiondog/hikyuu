@@ -56,7 +56,7 @@ target("hkuserver")
     --add_files("./main.cpp")
 
     after_build(function(target)
-        os.cp("$(projectdir)/hikyuu_cpp/hikyuu_server/i8n/", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/i8n")
+        os.cp("$(projectdir)/hikyuu_cpp/hikyuu_server/i8n/", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
     end)
     
 target_end()

@@ -7,18 +7,33 @@
 
 #pragma once
 
+#include <string_view>
+#include <unordered_map>
 #include "moFileReader.hpp"
 
-// 多国语言支持
-#define _(S) hku::g_moFR.Lookup(S)
-#define _L(S) hku::moFR.Lookup(S)
-#define _LC(ctx, str) hku::moFR.LookupWithContext(ctx, str)
+#if defined(_MSC_VER)
+// moFileReader.hpp 最后打开了4251告警，这里关闭
+#pragma warning(disable : 4251)
+#endif /* _MSC_VER */
 
 namespace hku {
 
-extern moFileLib::moFileReader g_moFR;
+class MOHelper {
+public:
+    static void init();
 
-// 初始化读取mo文件
-void mo_init(const char *filename);
+    static std::string translate(const std::string &lang, const char *id) {
+        auto iter = ms_dict.find(lang);
+        return iter != ms_dict.end() ? ms_dict[lang].Lookup(id) : std::string(id);
+    }
+
+    static std::string translate(const std::string &lang, const char *ctx, const char *id) {
+        auto iter = ms_dict.find(lang);
+        return iter != ms_dict.end() ? ms_dict[lang].LookupWithContext(ctx, id) : std::string(id);
+    }
+
+private:
+    static std::unordered_map<std::string, moFileLib::moFileReader> ms_dict;
+};
 
 }  // namespace hku

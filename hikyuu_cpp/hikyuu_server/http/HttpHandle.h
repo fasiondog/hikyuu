@@ -12,9 +12,9 @@
 #include <functional>
 
 #include <nlohmann/json.hpp>
-
 #include "HttpError.h"
-#include "../common/log.h"
+#include "common/mo.h"
+#include "common/log.h"
 
 using json = nlohmann::json;                  // 不保持插入排序
 using ordered_json = nlohmann::ordered_json;  // 保持插入排序
@@ -60,9 +60,18 @@ public:
     /**
      * 获取请求头部信息
      * @param name 头部信息名称
-     * @return 如果获取不到将返回 NULL
+     * @return 如果获取不到将返回""
      */
-    std::string getReqHeader(const std::string &name);
+    std::string getReqHeader(const char *name) const;
+
+    /**
+     * 获取请求头部信息
+     * @param name 头部信息名称
+     * @return 如果获取不到将返回""
+     */
+    std::string getReqHeader(const std::string &name) const {
+        return getReqHeader(name.c_str());
+    }
 
     /**
      * 获取请求数据
@@ -114,6 +123,29 @@ public:
 
     void setResData(const ordered_json &data) {
         setResData(data.dump());
+    }
+
+    /**
+     * 从 Accept-Language 获取第一个语言类型
+     * @note 非严格 html 协议，仅返回排在最前面的语言类型
+     */
+    std::string getLanguage() const;
+
+    /**
+     * 多语言翻译
+     * @param msgid 待翻译的字符串
+     */
+    std::string _tr(const char *msgid) const {
+        return MOHelper::translate(getLanguage(), msgid);
+    }
+
+    /**
+     * 多语言翻译
+     * @param ctx 翻译上下文
+     * @param msgid 待翻译的字符串
+     */
+    std::string _ctr(const char *ctx, const char *msgid) {
+        return MOHelper::translate(getLanguage(), ctx, msgid);
     }
 
     void operator()();

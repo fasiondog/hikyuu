@@ -59,7 +59,7 @@ void HttpServer::start() {
 
 #if defined(_WIN32)
     // Windows 下设置控制台程序输出代码页为 UTF8
-    auto g_old_cp = GetConsoleOutputCP();
+    g_old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
 

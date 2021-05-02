@@ -1,7 +1,7 @@
 /*
  *  Copyright(C) 2021 hikyuu.org
  *
- *  Create on: 2021-05-01
+ *  Create on: 2021-05-02
  *     Author: fasiondog
  */
 
@@ -9,10 +9,11 @@
 
 namespace hku {
 
-moFileLib::moFileReader g_moFR;
+std::unordered_map<std::string, moFileLib::moFileReader> MOHelper::ms_dict;
 
-void mo_init(const char *filename) {
-    g_moFR.ReadFile(filename);
+void MOHelper::init() {
+    ms_dict["zh_cn"] = moFileLib::moFileReader();
+    ms_dict["zh_cn"].ReadFile("i8n/zh_CN.mo");
 }
 
 }  // namespace hku

@@ -38,7 +38,8 @@ class AddUserHandle : public RestHandle {
             TransAction trans(con);
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
                                                   UserModel::getTableName(), user.getName()));
-            HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION, _("Duplicate user name"));
+            HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
+                       _ctr("user", "Duplicate user name"));
             user.setUserId(DB::getNewUserId());
             con->save(user, false);
         }
@@ -59,7 +60,7 @@ class RemoveUserHandle : public RestHandle {
         UserModel admin;
         con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
         HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
-                   "No operation permission");
+                   _ctr("user", "No operation permission"));
 
         check_missing_param("user");
         {

@@ -1,0 +1,52 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Hikyuu\n"
+"POT-Creation-Date: 2021-05-03 01:44+0800\n"
+"PO-Revision-Date: 2021-05-03 01:44+0800\n"
+"Last-Translator: \n"
+"Language-Team: hikyuu.org\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.3\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _tr;_ctr:1c,2\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: service/filter.cpp:30
+msgctxt "authorize"
+msgid "Miss token"
+msgstr "缺失令牌"
+
+#: service/filter.cpp:32
+msgctxt "authorize"
+msgid "Invalid token"
+msgstr "无效令牌"
+
+#: service/filter.cpp:66
+msgctxt "authorize"
+msgid "token is expired"
+msgstr "令牌过期"
+
+#: service/user/SignHandle.h:35 service/user/UserHandle.h:42
+msgctxt "user"
+msgid "Duplicate user name"
+msgstr "用户名重复"
+
+#: service/user/SignHandle.h:62
+msgctxt "user"
+msgid "User does not exist"
+msgstr "用户不存在"
+
+#: service/user/SignHandle.h:64
+msgctxt "user"
+msgid "Wrong password"
+msgstr "密码错误"
+
+#: service/user/UserHandle.h:63
+msgctxt "user"
+msgid "No operation permission"
+msgstr "没有操作权限"
