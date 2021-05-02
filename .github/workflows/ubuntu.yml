@@ -18,7 +18,7 @@ jobs:
     - name: build_boost
       run: | 
         cd ./hikyuu
-        wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
+        wget https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.bz2
         tar -jxf boost_1_75_0.tar.bz2
         cd boost_1_75_0
         ls
