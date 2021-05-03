@@ -86,6 +86,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 self.ui_config.getint('main_window', 'height', fallback=500)
             )
 
+        self.db = LocalDatabase()
+
         self.initAction()
         self.initMenuBar()
         self.initMenu()
@@ -96,7 +98,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(_translate('MainWindow', 'Running'))
         QtCore.QMetaObject.connectSlotsByName(self)
 
-        self.db = LocalDatabase()
 
     @property
     def session(self):
@@ -165,10 +166,14 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.server_view_dock = HkuSessionViewWidget(self)
         self.server_view_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable)  # 禁止关闭
         self.server_view_dock.setMinimumWidth(200)
+        # 消除 docker window 的顶部按钮
         title_bar = self.server_view_dock.titleBarWidget()
         self.server_view_dock.setTitleBarWidget(QtWidgets.QWidget())
         del title_bar
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.server_view_dock)
+        servers = self.db.session.query(SessionModel).order_by(SessionModel.name.asc()).all()
+        for server in servers:
+            self.server_view_dock.addSession({'name': server.name})
 
     def actionAbout(self):
         msg = _translate(
@@ -201,7 +206,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         edit_session_dialog = HkuEditSessionDialog(self)
         edit_session_dialog.setData(server_session)
         if edit_session_dialog.exec() >= 0:
-            name = edit_session_dialog.name_lineEdit.text()
+            session_data = edit_session_dialog.getData()
+            self.server_view_dock.addSession(session_data)
         edit_session_dialog.destroy()
 
 

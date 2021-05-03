@@ -52,6 +52,16 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
         self.password_lineEdit.setText(session_model.password)
         self.remark_textEdit.setText(session_model.remark)
 
+    def getData(self):
+        return {
+            'name': self.name,
+            'host': self.host,
+            'port': self.port,
+            'user': self.user,
+            'password': self.password,
+            'remark': self.remark
+        }
+
     def accept(self):
         name = self.name_lineEdit.text().strip()
         if len(name) == 0:
@@ -62,8 +72,9 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
             self.name_lineEdit.setFocus()
             return
         self.session_model.name = name
-        self.session_model.host = self.host_lineEdit.text().strip()
-        self.session_model.port = self.port_spinBox.value()
+        self.session_model.host = self.host
+        self.session_model.port = self.port
+        self.session_model.user = self.user
         self.session_model.password = self.password_lineEdit.text()
         self.session_model.remark = self.remark_textEdit.toPlainText()
         session = self.parent().session
@@ -89,10 +100,7 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
     @QtCore.pyqtSlot()
     def on_test_pushButton_clicked(self):
         try:
-            r = ServerApi.login(
-                "{}:{}".format(self.host_lineEdit.text().strip(), self.port_spinBox.value()), self.user_lineEdit.text(),
-                self.password_lineEdit.text()
-            )
+            r = ServerApi.login("{}:{}".format(self.host, self.port), self.user, self.password)
             if r.status_code == 200:
                 QtWidgets.QMessageBox.about(
                     self, _translate("HkuEditSessionDialog", "success"),
@@ -106,7 +114,6 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
                 self, _translate("HkuEditSessionDialog", "Failed"),
                 _translate("HkuEditSessionDialog", "Failed connect! Please check the host/ip and port\n%s") % e
             )
-
 
     @QtCore.pyqtSlot()
     def on_remark_textEdit_textChanged(self):
