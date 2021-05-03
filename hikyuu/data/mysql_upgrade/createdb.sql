@@ -85,8 +85,7 @@ COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ;
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (1,1,'000',2,'上证指数');
-INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (2,1,'600',1,'上证A股');
-INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (3,1,'601',1,'上证A股');
+INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (2,1,'60',1,'上证A股');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (4,1,'900',3,'上证B股');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (5,2,'00',1,'深证A股');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (6,2,'20',3,'深证B股');
@@ -98,7 +97,6 @@ INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VAL
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (12,1,'51',5,'上证ETF');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (13,1,'50',4,'上证基金');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (18,2,'300',8,'创业板');
-INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (19,1,'603',1,'上证A股');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (20,1,'519',4,'上证基金');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (21,1,'009',6,'国债');
 INSERT INTO `hku_base`.`CodeRuleType` (id,marketid,codepre,type,description) VALUES (22,1,'010',6,'国债');
