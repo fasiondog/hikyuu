@@ -98,7 +98,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(_translate('MainWindow', 'Running'))
         QtCore.QMetaObject.connectSlotsByName(self)
 
-
     @property
     def session(self):
         return self.db.session
@@ -109,16 +108,24 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def initAction(self):
         self.action_dict = dict(
-            action_file_session=QtWidgets.QAction(
-                QtGui.QIcon(":/icon/server_32.png"), _translate("MainWindow", "&Session"), self
+            action_new_file_session=QtWidgets.QAction(
+                QtGui.QIcon(":/icon/new_16.png"), _translate("MainWindow", "&New Session"), self
             ),
-            action_file_quit=QtWidgets.QAction(QtGui.QIcon(":/icon/quit.png"), _translate('MainWindow', '&Quit'), self),
+            action_edit_file_session=QtWidgets.QAction(
+                QtGui.QIcon(":/icon/edit_16.png"), _translate("MainWindow", "&Edit Session"), self
+            ),
+            action_del_file_session=QtWidgets.QAction(
+                QtGui.QIcon(":/icon/cancel_16.png"), _translate("MainWindow", "&Remove Session"), self
+            ),
+            action_file_quit=QtWidgets.QAction(
+                QtGui.QIcon(":/icon/quit_16.png"), _translate('MainWindow', '&Quit'), self
+            ),
             action_view_normal_style=QtWidgets.QAction(_translate('MainWindow', 'Normal style'), self),
             action_view_dark_style=QtWidgets.QAction(_translate('MainWindow', 'Dark style'), self),
             action_about=QtWidgets.QAction(_translate('MainWindow', 'About'), self),
             action_about_qt=QtWidgets.QAction(_translate('MainWindow', 'About Qt'), self),
         )
-        self.action_dict['action_file_session'].setStatusTip(_translate('MainWindow', 'Session Manager'))
+        self.action_dict['action_new_file_session'].setStatusTip(_translate('MainWindow', 'New Session'))
         self.action_dict['action_file_quit'].setStatusTip(_translate('MainWindow', 'Quit Application'))
         self.action_dict['action_about_qt'].setStatusTip(_translate('MainWindow', "Show the Qt library's About box"))
         self.action_dict['action_view_normal_style'].setObjectName('normal_style')
@@ -134,9 +141,14 @@ class MyMainWindow(QtWidgets.QMainWindow):
         )
 
     def initMenu(self):
+        file_session_menu = self.menubar_dict['menu_file'].addMenu(
+            QtGui.QIcon(":/icon/server_16.png"), _translate('MainWindows', '&Session Manager')
+        )
         style_menu = self.menubar_dict['menu_view'].addMenu(_translate('MainWindow', 'Skin style'))
         self.menu_dict = dict(
-            menu_file_session=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_session']),
+            menu_file_new_session=file_session_menu.addAction(self.action_dict['action_new_file_session']),
+            menu_file_edit_session=file_session_menu.addAction(self.action_dict['action_edit_file_session']),
+            menu_file_del_session=file_session_menu.addAction(self.action_dict['action_del_file_session']),
             menu_file_quit=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_quit']),
             menu_view_normal_style=style_menu.addAction(self.action_dict['action_view_normal_style']),
             menu_view_dark_style=style_menu.addAction(self.action_dict['action_view_dark_style']),
@@ -147,11 +159,15 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def initToolBar(self):
         self.setUnifiedTitleAndToolBarOnMac(True)
         file_toolbar = self.addToolBar('File')
-        file_toolbar.addAction(self.action_dict['action_file_session'])
+        file_toolbar.addAction(self.action_dict['action_new_file_session'])
+        file_toolbar.addAction(self.action_dict['action_edit_file_session'])
+        file_toolbar.addAction(self.action_dict['action_del_file_session'])
         file_toolbar.addAction(self.action_dict['action_file_quit'])
 
     def initActionConnect(self):
-        self.action_dict['action_file_session'].triggered.connect(self.actionEditSession)
+        self.action_dict['action_new_file_session'].triggered.connect(self.actionNewSession)
+        self.action_dict['action_edit_file_session'].triggered.connect(self.actionEditSession)
+        self.action_dict['action_del_file_session'].triggered.connect(self.actionDeleteSession)
         self.action_dict['action_file_quit'].triggered.connect(self.close)
         self.action_dict['action_about'].triggered.connect(self.actionAbout)
         self.action_dict['action_about_qt'].triggered.connect(QtWidgets.QApplication.aboutQt)
@@ -173,7 +189,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.server_view_dock)
         servers = self.db.session.query(SessionModel).order_by(SessionModel.name.asc()).all()
         for server in servers:
-            self.server_view_dock.addSession({'name': server.name})
+            self.server_view_dock.addSession(server)
 
     def actionAbout(self):
         msg = _translate(
@@ -197,18 +213,50 @@ class MyMainWindow(QtWidgets.QMainWindow):
             QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
         self.ui_config.set('main_window', 'style', style_name)
 
+    def actionNewSession(self):
+        server_session = SessionModel()
+        session_dialog = HkuEditSessionDialog(self)
+        session_dialog.setWindowTitle(_translate("MainWindow", "New Session"))
+        session_dialog.setData(server_session)
+        if session_dialog.exec() >= 0:
+            session_data = session_dialog.getData()
+            self.db.session.add(session_data)
+            self.server_view_dock.addSession(session_data)
+        session_dialog.destroy()
+
     def actionEditSession(self):
         item = self.server_view_dock.tree.currentItem()
-        server_session = self.db.session.query(SessionModel).filter_by(name=item.text(0)
-                                                                       ).first() if item else None
+        server_session = self.db.session.query(SessionModel).filter_by(name=item.text(0)).first() if item else None
         if server_session is None:
-            server_session = SessionModel()
+            QtWidgets.QMessageBox.about(
+                self, _translate("MainWindow", "info"), _translate("MainWindow", "Please select a session to execute")
+            )
+            return
         edit_session_dialog = HkuEditSessionDialog(self)
+        edit_session_dialog.setWindowTitle(_translate("MainWindow", "Edit Session"))
         edit_session_dialog.setData(server_session)
         if edit_session_dialog.exec() >= 0:
             session_data = edit_session_dialog.getData()
-            self.server_view_dock.addSession(session_data)
+            self.db.session.commit()
+            self.server_view_dock.modifySession(item, session_data)
         edit_session_dialog.destroy()
+
+    def actionDeleteSession(self):
+        item = self.server_view_dock.tree.currentItem()
+        data = item.data(0, QtCore.Qt.UserRole) if item is not None else None
+        if data is None:
+            QtWidgets.QMessageBox.about(
+                self, _translate("MainWindow", "info"), _translate("MainWindow", "Please select a session to execute")
+            )
+            return
+        ret = QtWidgets.QMessageBox.question(
+            self, "确认移除", "确认移除该会话？", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+        )
+        if ret == QtWidgets.QMessageBox.Yes:
+            root_index = self.server_view_dock.tree.indexOfTopLevelItem(item)
+            self.server_view_dock.tree.takeTopLevelItem(root_index )
+            self.db.session.delete(data)
+            self.db.session.commit()
 
 
 def main_core():

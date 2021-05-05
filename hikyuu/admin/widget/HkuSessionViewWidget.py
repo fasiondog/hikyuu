@@ -6,6 +6,8 @@ import resource
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
+_translate = QtCore.QCoreApplication.translate
+
 
 class HkuSessionViewWidget(QtWidgets.QDockWidget):
     def __init__(self, parent=None):
@@ -26,9 +28,10 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def initContextMenu(self):
-        _translate = QtCore.QCoreApplication.translate
         self.server_menu = QtWidgets.QMenu(self)
-        self.server_menu.addAction(self.parent().action_dict['action_file_session'])
+        self.server_menu.addAction(self.parent().action_dict['action_new_file_session'])
+        self.server_menu.addAction(self.parent().action_dict['action_edit_file_session'])
+        self.server_menu.addAction(self.parent().action_dict['action_del_file_session'])
         self.tree.customContextMenuRequested.connect(self.on_tree_customContextMenuRequested)
 
     def on_tree_customContextMenuRequested(self, pos):
@@ -38,16 +41,25 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
 
     def addSession(self, session):
         item = QtWidgets.QTreeWidgetItem(self.tree)
-        item.setText(0, session['name'])
+        item.setText(0, session.name)
         item.setIcon(0, self.icons[0])
-        if (session['name'] == "admin"):
+        item.setData(0, QtCore.Qt.UserRole, session)
+        if (session.name == "admin"):
             subitem = QtWidgets.QTreeWidgetItem(item)
-            subitem.setText(0, "users")
+            subitem.setText(0, _translate("HkuSessionViewWidget", "users"))
         else:
+            account = _translate("HkuSessionViewWidget", "account")
+            funds = _translate("HkuSessionViewWidget", "funds")
+            orders = _translate("HkuSessionViewWidget", "orders")
+            fillse = _translate("HkuSessionViewWidget", "fills")
+            positons = _translate("HkuSessionViewWidget", "positions")
             names = ['account', 'funds', 'orders']
 
+    def modifySession(self, item, session):
+        item.setText(0, session.name)
+        item.setData(0, QtCore.Qt.UserRole, session)
+
     def retranslateUi(self):
-        _translate = QtCore.QCoreApplication.translate
         self.tree.headerItem().setText(0, _translate("HkuSessionViewWidget", "name"))
         self.tree.headerItem().setText(1, _translate("HkuSessionViewWidget", "status"))
         __sortingEnabled = self.tree.isSortingEnabled()

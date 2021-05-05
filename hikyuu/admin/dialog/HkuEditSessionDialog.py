@@ -53,14 +53,13 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
         self.remark_textEdit.setText(session_model.remark)
 
     def getData(self):
-        return {
-            'name': self.name,
-            'host': self.host,
-            'port': self.port,
-            'user': self.user,
-            'password': self.password,
-            'remark': self.remark
-        }
+        self.session_model.name = self.name
+        self.session_model.host = self.host
+        self.session_model.port = self.port
+        self.session_model.user = self.user
+        self.session_model.password = self.password
+        self.session_model.remark = self.remark
+        return self.session_model
 
     def accept(self):
         name = self.name_lineEdit.text().strip()

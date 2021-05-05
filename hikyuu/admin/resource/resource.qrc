@@ -6,8 +6,11 @@
     <file>logo/logo_64.png</file>
     <file>logo/logo_128.png</file>
     <file>logo/logo_256.png</file>
-    <file>icon/quit.png</file>
+    <file>icon/quit_16.png</file>
     <file>icon/server_16.png</file>
     <file>icon/server_32.png</file>
+    <file>icon/new_16.png</file>
+    <file>icon/edit_16.png</file>
+    <file>icon/cancel_16.png</file>
   </qresource>
 </RCC>
