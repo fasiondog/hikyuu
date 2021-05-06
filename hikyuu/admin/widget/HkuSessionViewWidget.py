@@ -18,10 +18,10 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         #self.tree.header().setVisible(False)
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.icons = [QtGui.QIcon(':/icon/server_16.png')]  # 记录每一级别的图标
-        #item_0 = QtWidgets.QTreeWidgetItem(self.tree)
-        #item_0.setIcon(0, QtGui.QIcon(':/icon/server_16.png'))
-        #item_1 = QtWidgets.QTreeWidgetItem(item_0)
-        #item_0 = QtWidgets.QTreeWidgetItem(self.tree)
+
+        self.tree.setColumnCount(2)
+        self.tree.setColumnWidth(0, 150)
+        self.tree.setColumnWidth(1, 50)
 
         self.initContextMenu()
         self.retranslateUi()
@@ -50,10 +50,13 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         else:
             account = _translate("HkuSessionViewWidget", "account")
             funds = _translate("HkuSessionViewWidget", "funds")
-            orders = _translate("HkuSessionViewWidget", "orders")
-            fillse = _translate("HkuSessionViewWidget", "fills")
             positons = _translate("HkuSessionViewWidget", "positions")
-            names = ['account', 'funds', 'orders']
+            orders = _translate("HkuSessionViewWidget", "orders")
+            fills = _translate("HkuSessionViewWidget", "fills")
+            names = [account, funds, positons, orders, fills]
+            for name in names:
+                subitem = QtWidgets.QTreeWidgetItem(item)
+                subitem.setText(0, name)
 
     def modifySession(self, item, session):
         item.setText(0, session.name)

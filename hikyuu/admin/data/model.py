@@ -2,10 +2,11 @@
 
 import os
 from sqlalchemy import Column, Integer, String
-from .BaseModel import BaseModel
+from .LocalDatabase import get_local_db
 
+db = get_local_db()
 
-class SessionModel(BaseModel):
+class SessionModel(db.model):
     __tablename__ = 'session'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -31,3 +32,5 @@ class SessionModel(BaseModel):
 
     def __repr__(self):
         return '<{}>'.format(str(self))
+
+

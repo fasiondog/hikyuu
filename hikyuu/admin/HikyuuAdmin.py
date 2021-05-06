@@ -34,7 +34,7 @@ from UiConfig import UiConfig
 from widget.HkuSessionViewWidget import HkuSessionViewWidget
 from dialog import *
 from widget import *
-from data import *
+from data import (get_local_db, SessionModel)
 
 _translate = QtCore.QCoreApplication.translate
 
@@ -73,7 +73,19 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.setObjectName("HikyuuAdminMainWindow")
         self.setWindowTitle(_translate("MainWindow", "Hikyuu Strategy Server Manager"))
 
-        # 必须放在 resize 窗口大小之前, 不过启动时，暗黑模式最大化依然存在问题，暂无法解决
+        # 绑定本地数据库，辅助使用，尽量直接使用 Model 中的方法
+        self.db = get_local_db()
+
+        self.initAction()
+        self.initMenuBar()
+        self.initMenu()
+        self.initToolBar()
+        self.initActionConnect()
+        self.initMainTabWidget()
+        self.initDockWidgets()
+        self.statusBar().showMessage(_translate('MainWindow', 'Running'))
+
+        # 在窗口初始化完毕后，根据历史信息对窗口风格和大小进行重置
         style = self.ui_config.get('main_window', 'style', fallback='normal_style')
         if style == 'dark_style':
             QtWidgets.qApp.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
@@ -86,16 +98,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 self.ui_config.getint('main_window', 'height', fallback=500)
             )
 
-        self.db = LocalDatabase()
-
-        self.initAction()
-        self.initMenuBar()
-        self.initMenu()
-        self.initToolBar()
-        self.initActionConnect()
-        self.initMainTabWidget()
-        self.initDockWidgets()
-        self.statusBar().showMessage(_translate('MainWindow', 'Running'))
         QtCore.QMetaObject.connectSlotsByName(self)
 
     @property
@@ -142,7 +144,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def initMenu(self):
         file_session_menu = self.menubar_dict['menu_file'].addMenu(
-            QtGui.QIcon(":/icon/server_16.png"), _translate('MainWindows', '&Session Manager')
+            QtGui.QIcon(":/icon/server_16.png"), _translate('MainWindow', '&Session Manager')
         )
         style_menu = self.menubar_dict['menu_view'].addMenu(_translate('MainWindow', 'Skin style'))
         self.menu_dict = dict(
@@ -220,7 +222,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         session_dialog.setData(server_session)
         if session_dialog.exec() >= 0:
             session_data = session_dialog.getData()
-            self.db.session.add(session_data)
+            session_data.save()
             self.server_view_dock.addSession(session_data)
         session_dialog.destroy()
 
@@ -237,7 +239,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         edit_session_dialog.setData(server_session)
         if edit_session_dialog.exec() >= 0:
             session_data = edit_session_dialog.getData()
-            self.db.session.commit()
+            session_data.save()
             self.server_view_dock.modifySession(item, session_data)
         edit_session_dialog.destroy()
 
@@ -250,13 +252,14 @@ class MyMainWindow(QtWidgets.QMainWindow):
             )
             return
         ret = QtWidgets.QMessageBox.question(
-            self, "确认移除", "确认移除该会话？", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+            self, _translate("MainWindow", "Confirm removal"),
+            _translate("MainWindow", "Confirm to remove the session (%s)?") % item.text(0),
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
         )
         if ret == QtWidgets.QMessageBox.Yes:
             root_index = self.server_view_dock.tree.indexOfTopLevelItem(item)
-            self.server_view_dock.tree.takeTopLevelItem(root_index )
-            self.db.session.delete(data)
-            self.db.session.commit()
+            self.server_view_dock.tree.takeTopLevelItem(root_index)
+            data.delete()
 
 
 def main_core():
