@@ -20,5 +20,4 @@ def defaultRequestHeader():
     loc = QtCore.QLocale()
     if loc.language() == QtCore.QLocale.Chinese:
         header["Accept-Language"] = "zh_CN"
-    print(header)
     return header

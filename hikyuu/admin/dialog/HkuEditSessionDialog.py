@@ -8,6 +8,7 @@ import ServerApi
 import sqlalchemy
 from PyQt5 import QtWidgets, QtCore, QtGui
 from .Ui_HkuEditSessionDialog import Ui_HkuEditSessionDialog
+from .HkuWaitingDialog import HkuWaitingDialog
 
 _translate = QtCore.QCoreApplication.translate
 
@@ -117,8 +118,7 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
     @QtCore.pyqtSlot()
     def on_remark_textEdit_textChanged(self):
         text = self.remark_textEdit.toPlainText()
-        print(len(text))
-        max_length = 3
+        max_length = 256
         if len(text) > max_length:
             self.remark_textEdit.setText(text[:max_length])
             cursor = self.remark_textEdit.textCursor()

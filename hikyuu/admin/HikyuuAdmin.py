@@ -134,6 +134,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.action_dict['action_view_normal_style'].setStatusTip(_translate('MainWindow', 'Switch to normal style'))
         self.action_dict['action_view_dark_style'].setObjectName('dark_style')
         self.action_dict['action_view_dark_style'].setStatusTip(_translate('MainWindow', 'Switch to dark style'))
+        self.action_dict['action_edit_file_session'].setEnabled(False)
+        self.action_dict['action_del_file_session'].setEnabled(False)
 
     def initMenuBar(self):
         self.menubar_dict = dict(

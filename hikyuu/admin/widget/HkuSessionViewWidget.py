@@ -5,6 +5,7 @@ sys.path.append("..")
 import resource
 
 from PyQt5 import QtWidgets, QtCore, QtGui
+from .HkuCheckServerStatusThread import HkuCheckServerStatusThread
 
 _translate = QtCore.QCoreApplication.translate
 
@@ -25,6 +26,11 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
 
         self.initContextMenu()
         self.retranslateUi()
+
+        # 创建服务器状态检测线程
+        self.status_check_thread = HkuCheckServerStatusThread(self)
+        self.status_check_thread.start()
+
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def initContextMenu(self):
@@ -33,10 +39,20 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         self.server_menu.addAction(self.parent().action_dict['action_edit_file_session'])
         self.server_menu.addAction(self.parent().action_dict['action_del_file_session'])
         self.tree.customContextMenuRequested.connect(self.on_tree_customContextMenuRequested)
+        self.tree.itemClicked.connect(self.on_tree_itemClicked)
+
+    def on_tree_itemClicked(self, item, column):
+        data = item.data(0, QtCore.Qt.UserRole)
+        if data is None:
+            self.parent().action_dict['action_edit_file_session'].setEnabled(False)
+            self.parent().action_dict['action_del_file_session'].setEnabled(False)
+        else:
+            self.parent().action_dict['action_edit_file_session'].setEnabled(True)
+            self.parent().action_dict['action_del_file_session'].setEnabled(True)
 
     def on_tree_customContextMenuRequested(self, pos):
         item = self.tree.itemAt(pos)
-        if item:
+        if item is not None:
             self.server_menu.exec(QtGui.QCursor.pos())
 
     def addSession(self, session):
