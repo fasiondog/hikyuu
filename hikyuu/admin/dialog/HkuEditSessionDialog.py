@@ -101,13 +101,12 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
     def on_test_pushButton_clicked(self):
         try:
             r = ServerApi.login("{}:{}".format(self.host, self.port), self.user, self.password)
-            if r.status_code == 200:
+            if r["result"]:
                 QtWidgets.QMessageBox.about(
                     self, _translate("HkuEditSessionDialog", "success"),
                     _translate("HkuEditSessionDialog", "Connect successfully!")
                 )
-            elif r.status_code == 400:
-                ret = r.json()
+            else:
                 QtWidgets.QMessageBox.about(self, _translate("HkuEditSessionDialog", "Failed"), ret["errmsg"])
         except Exception as e:
             QtWidgets.QMessageBox.about(

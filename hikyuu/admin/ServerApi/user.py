@@ -2,12 +2,12 @@
 
 import requests
 from .config import getServerApiUrl, defaultRequestHeader
-
+from .restful import post
 
 def login(host: str, user: str, password: str):
     url = getServerApiUrl(host, "user", "login")
     headers = defaultRequestHeader()
-    return requests.post(url, headers=headers, json={"user": user, "password": password})
+    return post(url, headers=headers, json={"user": user, "password": password})
 
 
 if __name__ == "__main__":

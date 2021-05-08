@@ -69,6 +69,9 @@ void HttpServer::start() {
 }
 
 void HttpServer::stop() {
+#if defined(_WIN32)
+    SetConsoleOutputCP(g_old_cp);
+#endif
     ms_tg.stop();
     if (ms_server) {
         CLS_INFO("Quit Http server");
@@ -76,9 +79,6 @@ void HttpServer::stop() {
         nng_http_server_release(ms_server);
         nng_fini();
         ms_server = nullptr;
-#if defined(_WIN32)
-        SetConsoleOutputCP(g_old_cp);
-#endif
     }
 }
 

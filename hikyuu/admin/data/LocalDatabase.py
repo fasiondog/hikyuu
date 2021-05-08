@@ -13,13 +13,15 @@ class LocalDatabase:
         self._engine = sqlalchemy.create_engine(
             "sqlite:///%s?check_same_thread=false" % self._db_name, echo=True, future=True
         )
-        self.model.metadata.create_all(self._engine)
+        #self.model.metadata.create_all(self._engine)
         self._session = sqlalchemy.orm.sessionmaker(bind=self._engine)()
 
     @property
     def session(self):
         return self._session
 
+    def create_all(self):
+        self.model.metadata.create_all(self._engine)
 
 g_local_db = LocalDatabase()
 

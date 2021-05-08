@@ -15,7 +15,8 @@ class SessionModel(db.model):
     port = Column(Integer)
     user = Column(String(64))
     password = Column(String(64))
-    remark = Column(String(256))
+    remark = Column(String(1024))
+    token = Column(String(256))
 
     def __init__(self):
         self.name = ''

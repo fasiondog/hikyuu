@@ -4,6 +4,7 @@ import sys
 sys.path.append("..")
 from ServerApi import getServerStatus
 
+from concurrent import futures
 from PyQt5 import QtCore
 
 
@@ -23,7 +24,14 @@ class HkuCheckServerStatusThread(QtCore.QThread):
             except Exception as e:
                 print(e)
                 pass
-            self.sleep(60)
+            self.sleep(30)
 
     def _run(self):
-        print("run...")
+        items = [self.session_widget.tree.topLevelItem(i) for i in range(self.session_widget.tree.topLevelItemCount())]
+        sessions = [item.data(0, QtCore.Qt.UserRole) for item in items if item is not None]
+        params = [(session.host) for session in sessions]
+        #with futures.ThreadPoolExecutor() as executor:
+        #    res = executor.map(ping2, hosts, timeout=2)
+
+        for session in sessions:
+            print(session)

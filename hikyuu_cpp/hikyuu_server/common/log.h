@@ -36,7 +36,7 @@ namespace hku {
 #elif LOG_ACTIVE_LEVEL <= 2
 #define DEFAULT_LOGGER_LEVEL spdlog::level::warn
 #elif LOG_ACTIVE_LEVEL <= 3
-#define DEFAULT_LOGGER_LEVEL spdlog::level::error
+#define DEFAULT_LOGGER_LEVEL spdlog::level::err
 #elif LOG_ACTIVE_LEVEL <= 4
 #define DEFAULT_LOGGER_LEVEL spdlog::level::critical
 #endif
