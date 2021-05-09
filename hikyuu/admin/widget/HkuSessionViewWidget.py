@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
-sys.path.append("..")
 import resource
-
 from PyQt5 import QtWidgets, QtCore, QtGui
 from .HkuCheckServerStatusThread import HkuCheckServerStatusThread
 

@@ -2,12 +2,16 @@
 
 from PyQt5 import QtCore
 
-server_api_config = {"protocol": "http", "prefix": "hku", "version": "v1"}
+server_api_config = {
+    "protocol": "http",
+    "prefix": "hku",
+    "version": "v1",
+}
 
 
-def getServerApiUrl(host_url, service, api):
-    return "{}://{}/{}/{}/{}/{}".format(
-        server_api_config["protocol"], host_url, server_api_config["prefix"], service, server_api_config["version"], api
+def getServerApiUrl(host_url, port, service, api):
+    return "{}://{}:{}/{}/{}/{}/{}".format(
+        server_api_config["protocol"], host_url, port, server_api_config["prefix"], service, server_api_config["version"], api
     )
 
 

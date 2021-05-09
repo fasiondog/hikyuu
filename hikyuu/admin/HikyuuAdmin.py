@@ -24,8 +24,10 @@
 
 import logging
 import sys
+import os
 
-sys.path.append('.')
+# 将当前目录加入 sys.path 以便其下子模块可以互相引用
+sys.path.append(os.path.dirname(__file__))
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle
@@ -40,7 +42,7 @@ _translate = QtCore.QCoreApplication.translate
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
-    def __init__(self, capture_output=True, use_dark_style=False):
+    def __init__(self):
         super().__init__()
         appid = 'HikyuuAdmin'
         QtWidgets.QApplication.setApplicationName(appid)
@@ -50,7 +52,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         loc = QtCore.QLocale()
         if loc.language() == QtCore.QLocale.Chinese:
             self.trans = QtCore.QTranslator()
-            self.trans.load("language/zh_CN.qm")  # 读取qm语言包
+            self.trans.load("{}/language/zh_CN.qm".format(os.path.dirname(__file__)))  # 读取qm语言包
             _app = QtWidgets.QApplication.instance()  # 应用实例
             _app.installTranslator(self.trans)  # 将翻译者安装到实例中
 
@@ -265,24 +267,17 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
 
 def main_core():
+    FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
+    logging.basicConfig(format=FORMAT, level=logging.INFO, handlers=[
+        logging.StreamHandler(),
+    ])
+
     # 自适应分辨率，防止字体显示不全
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
 
     app = QtWidgets.QApplication(sys.argv)
-    use_dark_style = False  # 使用暗黑主题
-    if use_dark_style:
-        import qdarkstyle
-        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-    if (len(sys.argv) > 1 and sys.argv[1] == '0'):
-        FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
-        logging.basicConfig(format=FORMAT, level=logging.INFO, handlers=[
-            logging.StreamHandler(),
-        ])
-        main_win = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
-    else:
-        main_win = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
-
+    main_win = MyMainWindow()
     main_win.show()
     exit_code = app.exec()
     if exit_code == 888:

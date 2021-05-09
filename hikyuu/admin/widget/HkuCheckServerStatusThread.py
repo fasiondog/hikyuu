@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append("..")
-from ServerApi import getServerStatus
+#if ".." not in sys.path:
+#    sys.path.append("..")
 
-from concurrent import futures
+import ServerApi
+
 from PyQt5 import QtCore
 
 
@@ -29,9 +30,6 @@ class HkuCheckServerStatusThread(QtCore.QThread):
     def _run(self):
         items = [self.session_widget.tree.topLevelItem(i) for i in range(self.session_widget.tree.topLevelItemCount())]
         sessions = [item.data(0, QtCore.Qt.UserRole) for item in items if item is not None]
-        params = [(session.host) for session in sessions]
-        #with futures.ThreadPoolExecutor() as executor:
-        #    res = executor.map(ping2, hosts, timeout=2)
-
         for session in sessions:
-            print(session)
+            status = ServerApi.getServerStatus(session)
+            print(status)
