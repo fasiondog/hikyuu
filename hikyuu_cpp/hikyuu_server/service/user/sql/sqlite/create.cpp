@@ -25,6 +25,7 @@ CREATE INDEX "ix_admin_enum_on_table_name_field_name" ON "admin_enum" (
 	"field_name"
 );
 INSERT INTO "admin_enum" ("id", "table_name", "field_name", "value_type", "value", "desc") VALUES ('1', 'admin_user', 'status', 'int', '1', 'normal');
+INSERT INTO "admin_enum" ("id", "table_name", "field_name", "value_type", "value", "desc") VALUES ('2', 'admin_user', 'status', 'int', '99', 'deleted');
 CREATE TABLE "admin_user" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"user_id"	INTEGER NOT NULL UNIQUE,

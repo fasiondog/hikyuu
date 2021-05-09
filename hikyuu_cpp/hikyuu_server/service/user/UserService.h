@@ -31,6 +31,7 @@ public:
 
         POST<AddUserHandle>("user");
         DEL<RemoveUserHandle>("user");
+        GET<QueryUserHandle>("user");
     }
 };
 

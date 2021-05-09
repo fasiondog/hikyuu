@@ -16,8 +16,8 @@ class UserModel {
     TABLE_BIND6(admin_user, user_id, name, password, start_time, end_time, status)
 
     enum STATUS {
-        NORMAL = 1,
-        INVALID,
+        NORMAL = 1,    // 正常用户
+        DELETED = 99,  // 已删除用户，数据库不实际执行删除操作，仅做删除标记
     };
 
 public:
@@ -63,8 +63,8 @@ public:
         end_time = time.number();
     }
 
-    int getStatus() const {
-        return status;
+    STATUS getStatus() const {
+        return static_cast<STATUS>(status);
     }
 
     void setStatus(STATUS status) {

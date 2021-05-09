@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <vector>
 #include "common/uuid.h"
 #include "../TokenCache.h"
 #include "../RestHandle.h"
@@ -14,6 +15,12 @@
 #include "model/TokenModel.h"
 
 namespace hku {
+
+/***********************************
+ *
+ * 用户相关操作仅有 admin 有权限
+ *
+ **********************************/
 
 /**
  * 新增用户
@@ -39,7 +46,7 @@ class AddUserHandle : public RestHandle {
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
                                                   UserModel::getTableName(), user.getName()));
             HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
-                       _ctr("user", "Duplicate user name"));
+                       _ctr("user", "Unavailable user name"));
             user.setUserId(DB::getNewUserId());
             con->save(user, false);
         }
@@ -67,12 +74,39 @@ class RemoveUserHandle : public RestHandle {
             UserModel user;
             TransAction trans(con);
             con->load(user, fmt::format(R"(name="{}")", req["user"].get<std::string>()));
-            if (user.id() != 0) {
-                con->remove(user, false);
+            if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
+                user.setEndTime(Datetime::now());
+                user.setStatus(UserModel::DELETED);
+                con->save(user, false);
             }
         }
 
         res["result"] = true;
+    }
+};
+
+class QueryUserHandle : public RestHandle {
+    REST_HANDLE_IMP(QueryUserHandle)
+    virtual void run() override {
+        auto con = DB::getConnect();
+        UserModel admin;
+        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                   _ctr("user", "No operation permission"));
+
+        std::vector<UserModel> users;
+        con->batchLoad(users, fmt::format("status<>{}", UserModel::DELETED));
+        json jarray;
+        for (auto& user : users) {
+            json j;
+            j["userid"] = user.getUserId();
+            j["name"] = user.getName();
+            j["start_time"] = user.getStartTime().str();
+            jarray.push_back(j);
+        }
+        res["result"] = true;
+        res["data"] = jarray;
+        // res['data'] = jarray;
     }
 };
 

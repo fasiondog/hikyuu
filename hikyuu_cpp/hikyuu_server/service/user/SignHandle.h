@@ -32,7 +32,7 @@ class SignupHandle : public NoAuthRestHandle {
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
                                                   UserModel::getTableName(), user.getName()));
             HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
-                       _ctr("user", "Duplicate user name"));
+                       _ctr("user", "Unavailable user name"));
             user.setUserId(DB::getNewUserId());
             con->save(user, false);
         }
