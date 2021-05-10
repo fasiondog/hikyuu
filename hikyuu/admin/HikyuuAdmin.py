@@ -26,19 +26,23 @@ import logging
 import sys
 import os
 
+cur_dir = os.path.dirname(__file__)
+
 # 将当前目录加入 sys.path 以便其下子模块可以互相引用
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(cur_dir)
+
+# 将hikyuu目录加入 sys.path 以便直接引用 utils 包
+sys.path.append(os.path.split(cur_dir)[0])
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle
 
 from UiConfig import UiConfig
+from translate import _translate
 from widget.HkuSessionViewWidget import HkuSessionViewWidget
 from dialog import *
 from widget import *
 from data import (get_local_db, SessionModel)
-
-_translate = QtCore.QCoreApplication.translate
 
 
 class MyMainWindow(QtWidgets.QMainWindow):

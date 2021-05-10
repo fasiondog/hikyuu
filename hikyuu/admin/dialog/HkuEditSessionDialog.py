@@ -98,7 +98,7 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
     @QtCore.pyqtSlot()
     def on_test_pushButton_clicked(self):
         try:
-            r = ServerApi.login("{}:{}".format(self.host, self.port), self.user, self.password)
+            r = ServerApi.login(self.getData())
             if r["result"]:
                 QtWidgets.QMessageBox.about(
                     self, _translate("HkuEditSessionDialog", "success"),

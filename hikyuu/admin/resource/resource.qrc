@@ -12,5 +12,7 @@
     <file>icon/new_16.png</file>
     <file>icon/edit_16.png</file>
     <file>icon/cancel_16.png</file>
+    <file>icon/circular_green.png</file>
+    <file>icon/circular_yellow.png</file>
   </qresource>
 </RCC>

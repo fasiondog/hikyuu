@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import sys
-#if ".." not in sys.path:
-#    sys.path.append("..")
-
+import resource
 import ServerApi
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 
 
 class HkuCheckServerStatusThread(QtCore.QThread):
@@ -17,6 +14,10 @@ class HkuCheckServerStatusThread(QtCore.QThread):
         super(HkuCheckServerStatusThread, self).__init__()
         self.session_widget = session_widget
         self.working = True
+        self.icons = {
+            "running": QtGui.QIcon(":/icon/circular_green.png"),
+            "stop": QtGui.QIcon(":/icon/circular_yellow.png")
+        }
 
     def run(self) -> None:
         while self.working:
@@ -25,11 +26,12 @@ class HkuCheckServerStatusThread(QtCore.QThread):
             except Exception as e:
                 print(e)
                 pass
-            self.sleep(30)
+            self.sleep(5)
 
     def _run(self):
         items = [self.session_widget.tree.topLevelItem(i) for i in range(self.session_widget.tree.topLevelItemCount())]
-        sessions = [item.data(0, QtCore.Qt.UserRole) for item in items if item is not None]
-        for session in sessions:
-            status = ServerApi.getServerStatus(session)
-            print(status)
+        for item in items:
+            session = item.data(0, QtCore.Qt.UserRole)
+            status, msg = ServerApi.getServerStatus(session)
+            item.setText(1, msg)
+            item.setIcon(1, self.icons[status])

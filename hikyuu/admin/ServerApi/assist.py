@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+import logging
 
 import logging
 from .config import getServerApiUrl, defaultRequestHeader
 from .restful import get
+from .user import update_token
 
 from data import SessionModel
+from translate import _translate
 
 
 def getServerStatus(session: SessionModel):
@@ -13,11 +16,10 @@ def getServerStatus(session: SessionModel):
     headers["hku_token"] = session.token
     try:
         r = get(url, headers=headers)
+        update_token(r, session)
         if r["result"]:
-            status = "running"
+            return "running", _translate("ServerApi", "running")
         else:
-            logging.warning(r["errmsg"])
+            return "stop", _translate("ServerApi", "failed! {}").format(r["errmsg"])
     except Exception as e:
-        logging.error(e)
-        status = "connection failed"
-    return status
+        return "stop",  _translate("ServerApi", "failed connect!")
