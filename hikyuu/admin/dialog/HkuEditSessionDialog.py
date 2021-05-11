@@ -6,7 +6,7 @@ import ServerApi
 import sqlalchemy
 from PyQt5 import QtWidgets, QtCore, QtGui
 from .Ui_HkuEditSessionDialog import Ui_HkuEditSessionDialog
-from .HkuWaitingDialog import HkuWaitingDialog
+from data import SessionModel
 
 _translate = QtCore.QCoreApplication.translate
 
@@ -52,6 +52,8 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
         self.remark_textEdit.setText(session_model.remark)
 
     def getData(self):
+        if self.session_model is None:
+            self.session_model = SessionModel()
         self.session_model.name = self.name
         self.session_model.host = self.host
         self.session_model.port = self.port
@@ -98,14 +100,11 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
     @QtCore.pyqtSlot()
     def on_test_pushButton_clicked(self):
         try:
-            r = ServerApi.login(self.getData())
-            if r["result"]:
-                QtWidgets.QMessageBox.about(
-                    self, _translate("HkuEditSessionDialog", "success"),
-                    _translate("HkuEditSessionDialog", "Connect successfully!")
-                )
-            else:
-                QtWidgets.QMessageBox.about(self, _translate("HkuEditSessionDialog", "Failed"), ret["errmsg"])
+            ServerApi.login(self.getData())
+            QtWidgets.QMessageBox.about(
+                self, _translate("HkuEditSessionDialog", "success"),
+                _translate("HkuEditSessionDialog", "Connect successfully!")
+            )
         except Exception as e:
             QtWidgets.QMessageBox.about(
                 self, _translate("HkuEditSessionDialog", "Failed"),

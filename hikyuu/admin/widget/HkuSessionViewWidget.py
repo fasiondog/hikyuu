@@ -8,6 +8,8 @@ _translate = QtCore.QCoreApplication.translate
 
 
 class HkuSessionViewWidget(QtWidgets.QDockWidget):
+    status_changed = QtCore.pyqtSignal()
+
     def __init__(self, parent=None):
         super(HkuSessionViewWidget, self).__init__(parent)
         self.setObjectName("HKUServerViewWidget")

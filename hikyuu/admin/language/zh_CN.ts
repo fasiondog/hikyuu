@@ -77,7 +77,7 @@
         <location filename="../dialog/HkuEditSessionDialog.py" line="110"/>
         <source>Failed connect! Please check the host/ip and port
 %s</source>
-        <translation>连接失败！请检查主机/IP地址或端口号\n %s</translation>
+        <translation>连接失败！请检查主机/IP地址或端口号 %s</translation>
     </message>
 </context>
 <context>

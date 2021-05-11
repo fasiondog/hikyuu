@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, BigInteger
 from .LocalDatabase import get_local_db
 
 db = get_local_db()
@@ -17,6 +17,7 @@ class SessionModel(db.model):
     password = Column(String(64))
     remark = Column(String(1024))
     token = Column(String(256))
+    userid = Column(BigInteger)
 
     def __init__(self):
         self.name = ''
@@ -25,6 +26,7 @@ class SessionModel(db.model):
         self.user = ''
         self.password = ''
         self.remark = ''
+        self.userid = None
 
     def __str__(self):
         return 'SessionModel(id={}, name="{}", host="{}", port={}, user="{}", password="******")'.format(

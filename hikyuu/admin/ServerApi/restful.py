@@ -2,6 +2,8 @@
 
 import requests
 import functools
+from .config import getServerApiUrl, defaultRequestHeader
+from data import SessionModel
 
 
 class HttpStatusError(Exception):
@@ -63,3 +65,38 @@ def patch(url, data=None, **kwargs):
 @wrap_restful
 def put(url, data=None, **kwargs):
     return requests.put(url, data, **kwargs)
+
+
+class RestErrorCode:
+    INVALID_ENUM_VALUE = 10000
+    MISS_TOKEN = 10001
+    UNAUTHORIZED = 10002
+    AUTHORIZE_EXPIRED = 10003
+
+
+def login(session: SessionModel):
+    url = getServerApiUrl(session.host, session.port, "user", "login")
+    headers = defaultRequestHeader()
+    res = post(url, headers=headers, json={"user": session.user, "password": session.password})
+    session.token = res["token"]
+    session.userid = res["userid"]
+    return session
+
+
+def session_get(session: SessionModel, service, api,  params=None, **kwargs):
+    def inner_get(session: SessionModel, service, api,  params, **kwargs):
+        url = getServerApiUrl(session.host, session.port, service, api)
+        headers = defaultRequestHeader()
+        headers["hku_token"] = session.token
+        r = get(url, headers=headers, params=params, **kwargs)
+        if "update_token" in r:
+            session.token = r["update_token"]
+        return r
+    if not session.token:
+        session = login(session)
+    res = inner_get(session, service, api, params, **kwargs)
+    if not res["result"] and res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED:
+        session = login(session)
+        res = inner_get(session, service, api, params, **kwargs)
+    return res
+
