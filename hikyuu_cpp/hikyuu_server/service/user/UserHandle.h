@@ -51,7 +51,6 @@ class AddUserHandle : public RestHandle {
             con->save(user, false);
         }
 
-        res["result"] = true;
         res["userid"] = user.getUserId();
         res["name"] = user.getName();
     }
@@ -80,8 +79,6 @@ class RemoveUserHandle : public RestHandle {
                 con->save(user, false);
             }
         }
-
-        res["result"] = true;
     }
 };
 
@@ -104,9 +101,7 @@ class QueryUserHandle : public RestHandle {
             j["start_time"] = user.getStartTime().str();
             jarray.push_back(j);
         }
-        res["result"] = true;
         res["data"] = jarray;
-        // res['data'] = jarray;
     }
 };
 

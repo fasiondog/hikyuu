@@ -70,6 +70,7 @@ public:
         if (!m_update_token.empty()) {
             res["update_token"] = m_update_token;
         }
+        res["result"] = true;
         setResData(res);
         // 强制关闭连接，即仅有短连接
         // nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
