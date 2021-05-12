@@ -28,6 +28,9 @@ class SessionModel(db.model):
         self.remark = ''
         self.userid = None
 
+        # 非数据库属性
+        self.running = False
+
     def __str__(self):
         return 'SessionModel(id={}, name="{}", host="{}", port={}, user="{}", password="******")'.format(
             self.id, self.name, self.host, self.port, self.user

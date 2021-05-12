@@ -36,7 +36,7 @@ class HkuCheckServerStatusThread(QtCore.QThread):
             status, msg = ServerApi.getServerStatus(session)
             item.setText(1, msg)
             item.setIcon(1, self.icons[status])
-        if items:
             # 刷新 treewidget 显示界面
             self.session_widget.tree.viewport().update()
+        if items:
             self.first = False

@@ -92,11 +92,13 @@ def session_get(session: SessionModel, service, api,  params=None, **kwargs):
         if "update_token" in r:
             session.token = r["update_token"]
         return r
+    session.running = False
     if not session.token:
         session = login(session)
     res = inner_get(session, service, api, params, **kwargs)
     if not res["result"] and res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED:
         session = login(session)
         res = inner_get(session, service, api, params, **kwargs)
+    session.running = True if res["result"] else False
     return res
 

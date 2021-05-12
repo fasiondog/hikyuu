@@ -4,11 +4,15 @@ import resource
 from PyQt5 import QtWidgets, QtCore, QtGui
 from .HkuCheckServerStatusThread import HkuCheckServerStatusThread
 
-_translate = QtCore.QCoreApplication.translate
+from translate import _translate
+from data import SessionModel
 
 
 class HkuSessionViewWidget(QtWidgets.QDockWidget):
     status_changed = QtCore.pyqtSignal()
+
+    # 用户管理信号
+    user_manage_trigger = QtCore.pyqtSignal(SessionModel)
 
     def __init__(self, parent=None):
         super(HkuSessionViewWidget, self).__init__(parent)
@@ -34,6 +38,7 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
 
     def initContextMenu(self):
         self.server_menu = QtWidgets.QMenu(self)
+        self.server_menu.addAction(self.parent().action_dict['action_file_connect'])
         self.server_menu.addAction(self.parent().action_dict['action_new_file_session'])
         self.server_menu.addAction(self.parent().action_dict['action_edit_file_session'])
         self.server_menu.addAction(self.parent().action_dict['action_del_file_session'])
@@ -42,12 +47,21 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
 
     def on_tree_itemClicked(self, item, column):
         data = item.data(0, QtCore.Qt.UserRole)
-        if data is None:
-            self.parent().action_dict['action_edit_file_session'].setEnabled(False)
-            self.parent().action_dict['action_del_file_session'].setEnabled(False)
-        else:
+        if data is not None:
+            # 一级节点，使能会话编辑与移除菜单
             self.parent().action_dict['action_edit_file_session'].setEnabled(True)
             self.parent().action_dict['action_del_file_session'].setEnabled(True)
+            self.parent().action_dict['action_file_connect'].setEnabled(True)
+            return
+
+        # 屏蔽会话编辑与移除菜单
+        self.parent().action_dict['action_edit_file_session'].setEnabled(False)
+        self.parent().action_dict['action_del_file_session'].setEnabled(False)
+        self.parent().action_dict['action_file_connect'].setEnabled(False)
+
+        session = item.parent().data(0, QtCore.Qt.UserRole)
+        if session.name == "admin":
+            self.user_manage_trigger.emit(session)
 
     def on_tree_customContextMenuRequested(self, pos):
         item = self.tree.itemAt(pos)

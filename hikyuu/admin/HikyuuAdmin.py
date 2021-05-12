@@ -26,6 +26,8 @@ import logging
 import sys
 import os
 
+from PyQt5.QtWidgets import QVBoxLayout
+
 cur_dir = os.path.dirname(__file__)
 
 # 将当前目录加入 sys.path 以便其下子模块可以互相引用
@@ -43,6 +45,8 @@ from widget.HkuSessionViewWidget import HkuSessionViewWidget
 from dialog import *
 from widget import *
 from data import (get_local_db, SessionModel)
+
+import ServerApi
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -125,6 +129,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             action_del_file_session=QtWidgets.QAction(
                 QtGui.QIcon(":/icon/cancel_16.png"), _translate("MainWindow", "&Remove Session"), self
             ),
+            action_file_connect=QtWidgets.QAction(_translate('MainWindow', '&Connect Now')),
             action_file_quit=QtWidgets.QAction(
                 QtGui.QIcon(":/icon/quit_16.png"), _translate('MainWindow', '&Quit'), self
             ),
@@ -134,6 +139,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             action_about_qt=QtWidgets.QAction(_translate('MainWindow', 'About Qt'), self),
         )
         self.action_dict['action_new_file_session'].setStatusTip(_translate('MainWindow', 'New Session'))
+        self.action_dict['action_file_connect'].setStatusTip(_translate('MainWindow', 'Connect Now'))
         self.action_dict['action_file_quit'].setStatusTip(_translate('MainWindow', 'Quit Application'))
         self.action_dict['action_about_qt'].setStatusTip(_translate('MainWindow', "Show the Qt library's About box"))
         self.action_dict['action_view_normal_style'].setObjectName('normal_style')
@@ -159,6 +165,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             menu_file_new_session=file_session_menu.addAction(self.action_dict['action_new_file_session']),
             menu_file_edit_session=file_session_menu.addAction(self.action_dict['action_edit_file_session']),
             menu_file_del_session=file_session_menu.addAction(self.action_dict['action_del_file_session']),
+            menu_file_connect=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_connect']),
             menu_file_quit=self.menubar_dict['menu_file'].addAction(self.action_dict['action_file_quit']),
             menu_view_normal_style=style_menu.addAction(self.action_dict['action_view_normal_style']),
             menu_view_dark_style=style_menu.addAction(self.action_dict['action_view_dark_style']),
@@ -172,12 +179,14 @@ class MyMainWindow(QtWidgets.QMainWindow):
         file_toolbar.addAction(self.action_dict['action_new_file_session'])
         file_toolbar.addAction(self.action_dict['action_edit_file_session'])
         file_toolbar.addAction(self.action_dict['action_del_file_session'])
+        file_toolbar.addAction(self.action_dict['action_file_connect'])
         file_toolbar.addAction(self.action_dict['action_file_quit'])
 
     def initActionConnect(self):
         self.action_dict['action_new_file_session'].triggered.connect(self.actionNewSession)
         self.action_dict['action_edit_file_session'].triggered.connect(self.actionEditSession)
         self.action_dict['action_del_file_session'].triggered.connect(self.actionDeleteSession)
+        self.action_dict['action_file_connect'].triggered.connect(self.actionConnect)
         self.action_dict['action_file_quit'].triggered.connect(self.close)
         self.action_dict['action_about'].triggered.connect(self.actionAbout)
         self.action_dict['action_about_qt'].triggered.connect(QtWidgets.QApplication.aboutQt)
@@ -185,8 +194,15 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.action_dict['action_view_dark_style'].triggered.connect(self.actionChangStyle)
 
     def initMainTabWidget(self):
-        self.main_tab = QtWidgets.QTabWidget(self)
+        self.main_tab = QtWidgets.QTabWidget()
         self.setCentralWidget(self.main_tab)
+
+        # 设置为可关闭，并连接信号
+        self.main_tab.setTabsClosable(True)
+        self.main_tab.tabCloseRequested.connect(self.closeTab)
+
+        self.tab_title_user_manage = _translate("MainWindow", "User Manager")
+        self.tabs = {}
 
     def initDockWidgets(self):
         self.server_view_dock = HkuSessionViewWidget(self)
@@ -200,6 +216,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         servers = self.db.session.query(SessionModel).order_by(SessionModel.name.asc()).all()
         for server in servers:
             self.server_view_dock.addSession(server)
+        self.server_view_dock.user_manage_trigger.connect(self.openUserManageTab)
 
     def actionAbout(self):
         msg = _translate(
@@ -268,6 +285,52 @@ class MyMainWindow(QtWidgets.QMainWindow):
             root_index = self.server_view_dock.tree.indexOfTopLevelItem(item)
             self.server_view_dock.tree.takeTopLevelItem(root_index)
             data.delete()
+
+    def actionConnect(self):
+        item = self.server_view_dock.tree.currentItem()
+        session = item.data(0, QtCore.Qt.UserRole)
+        if session.running:
+            QtWidgets.QMessageBox.about(
+                self, _translate("MainWindow", "info"), _translate("MainWindow", "Connected")
+            )
+            return
+
+        status, msg = ServerApi.getServerStatus(session)
+        icons = {
+            "running": QtGui.QIcon(":/icon/circular_green.png"),
+            "stop": QtGui.QIcon(":/icon/circular_yellow.png")
+        }
+        item.setText(1, msg)
+        item.setIcon(1, icons[status])
+        self.server_view_dock.tree.viewport().update()
+        if session.running:
+            QtWidgets.QMessageBox.about(
+                self, _translate("MainWindow", "info"), _translate("MainWindow", "Connection successful")
+            )
+        else:
+            QtWidgets.QMessageBox.warning(
+                self, _translate("MainWindow", "info"), _translate("MainWindow", "connection failed")
+            )
+
+    def closeTab(self, index):
+        title = self.main_tab.tabText(index)
+        self.main_tab.removeTab(index)
+        self.tabs[title] = None
+
+    def openUserManageTab(self, session):
+        """用户管理"""
+        title = "{}({})".format(self.tab_title_user_manage, session.name)
+        if title not in self.tabs or self.tabs[title] is None:
+            tab = QtWidgets.QWidget()
+            layout = QtWidgets.QFormLayout(tab)
+            label = QtWidgets.QLabel(tab)
+            if session.running:
+                label.setText("已连接")
+            else:
+                label.setText("尚未连接")
+            layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, label)
+            self.main_tab.addTab(tab, title)
+            self.tabs[title] = tab
 
 
 def main_core():
