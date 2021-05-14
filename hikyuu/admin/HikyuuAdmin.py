@@ -290,16 +290,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
         item = self.server_view_dock.tree.currentItem()
         session = item.data(0, QtCore.Qt.UserRole)
         if session.running:
-            QtWidgets.QMessageBox.about(
-                self, _translate("MainWindow", "info"), _translate("MainWindow", "Connected")
-            )
+            QtWidgets.QMessageBox.about(self, _translate("MainWindow", "info"), _translate("MainWindow", "Connected"))
             return
 
         status, msg = ServerApi.getServerStatus(session)
-        icons = {
-            "running": QtGui.QIcon(":/icon/circular_green.png"),
-            "stop": QtGui.QIcon(":/icon/circular_yellow.png")
-        }
+        icons = {"running": QtGui.QIcon(":/icon/circular_green.png"), "stop": QtGui.QIcon(":/icon/circular_yellow.png")}
         item.setText(1, msg)
         item.setIcon(1, icons[status])
         self.server_view_dock.tree.viewport().update()
@@ -321,16 +316,15 @@ class MyMainWindow(QtWidgets.QMainWindow):
         """用户管理"""
         title = "{}({})".format(self.tab_title_user_manage, session.name)
         if title not in self.tabs or self.tabs[title] is None:
-            tab = QtWidgets.QWidget()
-            layout = QtWidgets.QFormLayout(tab)
-            label = QtWidgets.QLabel(tab)
-            if session.running:
-                label.setText("已连接")
+            if not session.running:
+                QtWidgets.QMessageBox.warning(
+                    self, _translate("MainWindow", "info"),
+                    _translate("MainWindow", "The server is disconnected. Please connect first!")
+                )
             else:
-                label.setText("尚未连接")
-            layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, label)
-            self.main_tab.addTab(tab, title)
-            self.tabs[title] = tab
+                tab = HkuUserManagerWidget(session, self.main_tab)
+                self.main_tab.addTab(tab, title)
+                self.tabs[title] = tab
 
 
 def main_core():
