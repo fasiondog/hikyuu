@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_UserManagerForm(object):
     def setupUi(self, UserManagerForm):
         UserManagerForm.setObjectName("UserManagerForm")
-        UserManagerForm.resize(642, 383)
+        UserManagerForm.resize(642, 400)
         self.formLayout = QtWidgets.QFormLayout(UserManagerForm)
         self.formLayout.setObjectName("formLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -40,7 +40,17 @@ class Ui_UserManagerForm(object):
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.users_tableView = QtWidgets.QTableView(UserManagerForm)
+        self.users_tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.users_tableView.setAlternatingRowColors(False)
+        self.users_tableView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.users_tableView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.users_tableView.setSortingEnabled(True)
         self.users_tableView.setObjectName("users_tableView")
+        self.users_tableView.horizontalHeader().setDefaultSectionSize(140)
+        self.users_tableView.horizontalHeader().setMinimumSectionSize(5)
+        self.users_tableView.horizontalHeader().setSortIndicatorShown(True)
+        self.users_tableView.horizontalHeader().setStretchLastSection(True)
+        self.users_tableView.verticalHeader().setVisible(False)
         self.verticalLayout.addWidget(self.users_tableView)
         self.formLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.verticalLayout)
 

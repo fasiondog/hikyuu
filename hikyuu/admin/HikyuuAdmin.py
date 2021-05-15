@@ -46,7 +46,7 @@ from dialog import *
 from widget import *
 from data import (get_local_db, SessionModel)
 
-import ServerApi
+import service
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -293,7 +293,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.about(self, _translate("MainWindow", "info"), _translate("MainWindow", "Connected"))
             return
 
-        status, msg = ServerApi.getServerStatus(session)
+        status, msg = service.getServerStatus(session)
         icons = {"running": QtGui.QIcon(":/icon/circular_green.png"), "stop": QtGui.QIcon(":/icon/circular_yellow.png")}
         item.setText(1, msg)
         item.setIcon(1, icons[status])
@@ -322,7 +322,21 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     _translate("MainWindow", "The server is disconnected. Please connect first!")
                 )
             else:
-                tab = HkuUserManagerWidget(session, self.main_tab)
+                try:
+                    data = RestDataTableModel(
+                        ['userid', 'name', 'start_time'], [
+                            _translate("UserManager", "userid"),
+                            _translate("UserManager", "name"),
+                            _translate("UserManager", "start_time")
+                        ], service.queryUsers(session)
+                    )
+                except Exception as e:
+                    logging.error(e)
+                    QtWidgets.QMessageBox.warning(
+                        self, _translate("MainWindow", "error"), "{}: {}".format(e.__class__.__name__, e)
+                    )
+                    return
+                tab = HkuUserManagerWidget(session, data, self.main_tab)
                 self.main_tab.addTab(tab, title)
                 self.tabs[title] = tab
 

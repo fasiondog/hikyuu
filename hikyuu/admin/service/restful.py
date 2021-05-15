@@ -2,7 +2,7 @@
 
 import requests
 import functools
-from .config import getServerApiUrl, defaultRequestHeader
+from .config import getserviceUrl, defaultRequestHeader
 from data import SessionModel
 
 
@@ -23,6 +23,16 @@ class HttpInternalServerError(HttpStatusError):
 
     def __str__(self):
         return "Http status 500: Internal Server Error"
+
+
+class RestfulError:
+    def __init__(self, res):
+        super(RestfulError, self).__init__()
+        self.errcode = res["errcode"]
+        self.errmsg = res["errmsg"]
+
+    def __str__(self):
+        return "errcode: {}, errmsg: {}".format(self.errcode, self.errmsg)
 
 
 def wrap_restful(func):
@@ -75,7 +85,7 @@ class RestErrorCode:
 
 
 def login(session: SessionModel):
-    url = getServerApiUrl(session.host, session.port, "user", "login")
+    url = getserviceUrl(session.host, session.port, "user", "login")
     headers = defaultRequestHeader()
     res = post(url, headers=headers, json={"user": session.user, "password": session.password})
     session.token = res["token"]
@@ -83,15 +93,16 @@ def login(session: SessionModel):
     return session
 
 
-def session_get(session: SessionModel, service, api,  params=None, **kwargs):
-    def inner_get(session: SessionModel, service, api,  params, **kwargs):
-        url = getServerApiUrl(session.host, session.port, service, api)
+def session_get(session: SessionModel, service, api, params=None, **kwargs):
+    def inner_get(session: SessionModel, service, api, params, **kwargs):
+        url = getserviceUrl(session.host, session.port, service, api)
         headers = defaultRequestHeader()
         headers["hku_token"] = session.token
         r = get(url, headers=headers, params=params, **kwargs)
         if "update_token" in r:
             session.token = r["update_token"]
         return r
+
     session.running = False
     if not session.token:
         session = login(session)
@@ -101,4 +112,3 @@ def session_get(session: SessionModel, service, api,  params=None, **kwargs):
         res = inner_get(session, service, api, params, **kwargs)
     session.running = True if res["result"] else False
     return res
-

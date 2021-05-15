@@ -262,19 +262,19 @@
     </message>
 </context>
 <context>
-    <name>ServerApi</name>
+    <name>service</name>
     <message>
-        <location filename="../ServerApi/assist.py" line="18"/>
+        <location filename="../service/assist.py" line="18"/>
         <source>running</source>
         <translation>运行中</translation>
     </message>
     <message>
-        <location filename="../ServerApi/assist.py" line="21"/>
+        <location filename="../service/assist.py" line="21"/>
         <source>failed! {}</source>
         <translation>失败！{}</translation>
     </message>
     <message>
-        <location filename="../ServerApi/assist.py" line="23"/>
+        <location filename="../service/assist.py" line="23"/>
         <source>failed connect!</source>
         <translation>连接失败！</translation>
     </message>

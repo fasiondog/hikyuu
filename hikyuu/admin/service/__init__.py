@@ -2,5 +2,5 @@
 
 from .restful import login
 from .assist import getServerStatus
+from .user import queryUsers
 
-__all__ = ['login', 'getServerStatus']

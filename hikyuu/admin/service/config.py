@@ -9,9 +9,10 @@ server_api_config = {
 }
 
 
-def getServerApiUrl(host_url, port, service, api):
+def getserviceUrl(host_url, port, service, api):
     return "{}://{}:{}/{}/{}/{}/{}".format(
-        server_api_config["protocol"], host_url, port, server_api_config["prefix"], service, server_api_config["version"], api
+        server_api_config["protocol"], host_url, port, server_api_config["prefix"], service,
+        server_api_config["version"], api
     )
 
 

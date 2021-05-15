@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import resource
-import ServerApi
+import service
 
 import sqlalchemy
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -100,7 +100,7 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
     @QtCore.pyqtSlot()
     def on_test_pushButton_clicked(self):
         try:
-            ServerApi.login(self.getData())
+            service.login(self.getData())
             QtWidgets.QMessageBox.about(
                 self, _translate("HkuEditSessionDialog", "success"),
                 _translate("HkuEditSessionDialog", "Connect successfully!")

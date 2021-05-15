@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import resource
-import ServerApi
+import service
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -33,7 +33,7 @@ class HkuCheckServerStatusThread(QtCore.QThread):
         items = [self.session_widget.tree.topLevelItem(i) for i in range(self.session_widget.tree.topLevelItemCount())]
         for item in items:
             session = item.data(0, QtCore.Qt.UserRole)
-            status, msg = ServerApi.getServerStatus(session)
+            status, msg = service.getServerStatus(session)
             item.setText(1, msg)
             item.setIcon(1, self.icons[status])
             # 刷新 treewidget 显示界面
