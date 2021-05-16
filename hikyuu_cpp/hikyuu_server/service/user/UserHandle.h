@@ -26,19 +26,34 @@ namespace hku {
  * 新增用户
  */
 class AddUserHandle : public RestHandle {
+public:
+    static const int MIN_NAME_LENGTH = 1;
+    static const int MAX_NAME_LENGTH = 128;
+    static const int MAX_PASSWORD_LENGTH = 512;
+
     REST_HANDLE_IMP(AddUserHandle)
     virtual void run() override {
         auto con = DB::getConnect();
         UserModel admin;
         con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
         HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
-                   "No operation permission");
+                   _ctr("user", "No operation permission"));
 
         check_missing_param("user");
         check_missing_param("password");
         UserModel user;
         user.setName(req["user"].get<string>());
+        size_t name_len = user.getName().size();
+        HTTP_CHECK(name_len >= MIN_NAME_LENGTH && name_len <= MAX_NAME_LENGTH,
+                   UserErrorCode::USER_INVALID_NAME,
+                   _ctr("user", "The user name must be 1 to 128 characters long"));
+
         user.setPassword(req["password"].get<string>());
+        size_t password_len = user.getPassword().size();
+        HTTP_CHECK(password_len <= MAX_PASSWORD_LENGTH, UserErrorCode::USER_INVALID_PASSWORD,
+                   fmt::format(_ctr("user", "The password must be less than {} characters"),
+                               MAX_PASSWORD_LENGTH));
+
         user.setStartTime(Datetime::now());
         user.setStatus(UserModel::STATUS::NORMAL);
         {
@@ -53,6 +68,7 @@ class AddUserHandle : public RestHandle {
 
         res["userid"] = user.getUserId();
         res["name"] = user.getName();
+        res["start_time"] = user.getStartTime().str();
     }
 };
 

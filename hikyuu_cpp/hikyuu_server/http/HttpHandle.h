@@ -43,6 +43,7 @@ class HttpHandle {
 public:
     HttpHandle() = delete;
     HttpHandle(nng_aio *aio);
+    virtual ~HttpHandle() {}
 
     /** 前处理 */
     virtual void before_run() {}

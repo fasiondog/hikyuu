@@ -40,6 +40,7 @@ void HttpHandle::operator()() {
 
     } catch (HttpError& e) {
         CLS_TRACE("HttpError({}): {}", e.errcode(), e.what());
+        CLS_TRACE("req data: {}", getReqData());
         nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
         nng_http_res_set_status(m_nng_res, e.status());
         nng_http_res_set_reason(m_nng_res, e.msg().c_str());
@@ -49,6 +50,7 @@ void HttpHandle::operator()() {
 
     } catch (HttpException& e) {
         CLS_TRACE("HttpException: {}", e.what());
+        CLS_TRACE("req data: {}", getReqData());
         nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
         nng_http_res_set_status(m_nng_res, e.status());
         nng_http_res_set_reason(m_nng_res, e.msg().c_str());
@@ -58,6 +60,7 @@ void HttpHandle::operator()() {
 
     } catch (nlohmann::json::exception& e) {
         CLS_TRACE("HttpException: {}", e.what());
+        CLS_TRACE("req data: {}", getReqData());
         nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
         std::string errmsg(fmt::format("Request param type error! {}", e.what()));
         nng_http_res_set_reason(m_nng_res, errmsg.c_str());
@@ -68,11 +71,13 @@ void HttpHandle::operator()() {
     } catch (std::exception& e) {
         std::string errmsg(e.what());
         CLS_ERROR(errmsg);
+        CLS_TRACE("req data: {}", getReqData());
         unknown_error(errmsg);
 
     } catch (...) {
         std::string errmsg("Unknown error!");
         CLS_ERROR(errmsg);
+        CLS_TRACE("req data: {}", getReqData());
         unknown_error(errmsg);
     }
 }

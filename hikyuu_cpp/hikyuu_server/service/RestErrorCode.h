@@ -23,7 +23,9 @@ enum UserErrorCode {
     USER_NAME_REPETITION = 20000,
     USER_NOT_EXIST,
     USER_WRONG_PASSWORD,
-    USER_NO_RIGHT,  // 无权限
+    USER_NO_RIGHT,          // 无权限
+    USER_INVALID_NAME,      // 用户名称非法
+    USER_INVALID_PASSWORD,  // 用户密码非法
 };
 
 enum TradeErrorCode {

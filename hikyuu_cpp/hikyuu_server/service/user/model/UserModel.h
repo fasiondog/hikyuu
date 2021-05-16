@@ -31,7 +31,7 @@ public:
         user_id = id;
     }
 
-    std::string getName() const {
+    const std::string& getName() const {
         return name;
     }
 
@@ -39,7 +39,7 @@ public:
         this->name = name;
     }
 
-    std::string getPassword() const {
+    const std::string& getPassword() const {
         return password;
     }
 

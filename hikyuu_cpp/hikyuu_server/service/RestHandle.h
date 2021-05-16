@@ -23,6 +23,8 @@ public:
         // addFilter(AuthorizeFilter);
     }
 
+    virtual ~NoAuthRestHandle() {}
+
     virtual void before_run() override {
         setResHeader("Content-Type", "application/json; charset=UTF-8");
         req = getReqJson();
@@ -63,6 +65,8 @@ public:
     RestHandle(nng_aio *aio) : NoAuthRestHandle(aio) {
         addFilter(AuthorizeFilter);
     }
+
+    virtual ~RestHandle() {}
 
     virtual void run() override {}
 
