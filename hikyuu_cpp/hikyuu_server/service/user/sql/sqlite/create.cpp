@@ -39,7 +39,7 @@ CREATE TABLE "admin_user" (
 CREATE INDEX "ix_admin_user_on_user_id" ON "admin_user" (
 	"user_id"
 );
-INSERT INTO "admin_user" ("id", "user_id", "name", "password", "start_time", "end_time", "status") VALUES ('1', '4374148134604800', 'admin', 'admin', '202104250141', '999912312359', '1');
+INSERT INTO "admin_user" ("id", "user_id", "name", "password", "start_time", "end_time", "status") VALUES ('1', '4374148134604800', 'admin', 'admin', '202104250141', '999912310000', '1');
 CREATE TABLE "admin_token" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"user_id"	INTEGER NOT NULL UNIQUE,	

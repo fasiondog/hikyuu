@@ -33,6 +33,7 @@ void releaseGlobalTaskGroup() {
     if (g_threadPool) {
         g_threadPool->stop();
         delete g_threadPool;
+        g_threadPool = nullptr;
     }
 }
 

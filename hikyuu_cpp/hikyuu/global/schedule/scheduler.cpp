@@ -23,6 +23,7 @@ void releaseScheduler() {
     HKU_TRACE("releaseScheduler");
     if (g_scheduler) {
         delete g_scheduler;
+        g_scheduler = nullptr;
     }
 }
 

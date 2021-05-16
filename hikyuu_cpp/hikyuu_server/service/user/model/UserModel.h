@@ -21,7 +21,7 @@ class UserModel {
     };
 
 public:
-    UserModel() : user_id(0), status(STATUS::NORMAL) {}
+    UserModel() : user_id(0), status(STATUS::NORMAL), end_time(Datetime::max().number()) {}
 
     uint64_t getUserId() const {
         return user_id;

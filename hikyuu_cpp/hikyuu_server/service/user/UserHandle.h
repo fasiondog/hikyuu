@@ -29,7 +29,7 @@ class AddUserHandle : public RestHandle {
 public:
     static const int MIN_NAME_LENGTH = 1;
     static const int MAX_NAME_LENGTH = 128;
-    static const int MAX_PASSWORD_LENGTH = 512;
+    static const int MAX_PASSWORD_LENGTH = 16;
 
     REST_HANDLE_IMP(AddUserHandle)
     virtual void run() override {
@@ -84,11 +84,11 @@ class RemoveUserHandle : public RestHandle {
         HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
                    _ctr("user", "No operation permission"));
 
-        check_missing_param("user");
+        check_missing_param("userid");
         {
             UserModel user;
             TransAction trans(con);
-            con->load(user, fmt::format(R"(name="{}")", req["user"].get<std::string>()));
+            con->load(user, fmt::format(R"(user_id="{}")", req["userid"].get<uint64_t>()));
             if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
                 user.setEndTime(Datetime::now());
                 user.setStatus(UserModel::DELETED);
@@ -108,7 +108,8 @@ class QueryUserHandle : public RestHandle {
                    _ctr("user", "No operation permission"));
 
         std::vector<UserModel> users;
-        con->batchLoad(users, fmt::format("status<>{}", UserModel::DELETED));
+        con->batchLoad(users,
+                       fmt::format("status<>{} order by start_time DESC", UserModel::DELETED));
         json jarray;
         for (auto& user : users) {
             json j;

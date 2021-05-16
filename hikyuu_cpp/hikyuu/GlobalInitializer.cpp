@@ -66,7 +66,7 @@ void GlobalInitializer::clean() {
     H5close();
 
 #if USE_SPDLOG_LOGGER
-    spdlog::shutdown();
+    spdlog::drop_all();
 #endif
 
 #ifdef MSVC_LEAKER_DETECT
