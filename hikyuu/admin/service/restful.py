@@ -25,14 +25,14 @@ class HttpInternalServerError(HttpStatusError):
         return "Http status 500: Internal Server Error"
 
 
-class RestfulError:
+class RestfulError(Exception):
     def __init__(self, res):
         super(RestfulError, self).__init__()
         self.errcode = res["errcode"]
         self.errmsg = res["errmsg"]
 
     def __str__(self):
-        return "errcode: {}, errmsg: {}".format(self.errcode, self.errmsg)
+        return self.errmsg
 
 
 def wrap_restful(func):
@@ -97,6 +97,7 @@ def check_res(res):
     if not res["result"]:
         raise RestfulError(res)
 
+
 def session_get(session: SessionModel, service, api, params=None, **kwargs):
     def inner_get(session: SessionModel, service, api, params, **kwargs):
         url = getserviceUrl(session.host, session.port, service, api)
@@ -111,7 +112,9 @@ def session_get(session: SessionModel, service, api, params=None, **kwargs):
     if not session.token:
         session = login(session)
     res = inner_get(session, service, api, params, **kwargs)
-    if not res["result"] and res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED:
+    if not res["result"] and (
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+    ):
         session = login(session)
         res = inner_get(session, service, api, params, **kwargs)
     session.running = True if res["result"] else False
@@ -121,7 +124,6 @@ def session_get(session: SessionModel, service, api, params=None, **kwargs):
 def session_post(session: SessionModel, service, api, data=None, json=None, **kwargs):
     def inner_func(session: SessionModel, service, api, data=None, json=None, **kwargs):
         url = getserviceUrl(session.host, session.port, service, api)
-        print(url)
         headers = defaultRequestHeader()
         headers["hku_token"] = session.token
         r = post(url, data, json, headers=headers, **kwargs)
@@ -133,8 +135,33 @@ def session_post(session: SessionModel, service, api, data=None, json=None, **kw
     if not session.token:
         session = login(session)
     res = inner_func(session, service, api, data, json, **kwargs)
-    if not res["result"] and res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED:
+    if not res["result"] and (
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+    ):
         session = login(session)
         res = inner_func(session, service, api, data, json, **kwargs)
+    session.running = True if res["result"] else False
+    return res
+
+
+def session_delete(session: SessionModel, service, api, json, **kwargs):
+    def inner_func(session: SessionModel, service, api, json, **kwargs):
+        url = getserviceUrl(session.host, session.port, service, api)
+        headers = defaultRequestHeader()
+        headers["hku_token"] = session.token
+        r = delete(url, json=json, headers=headers, **kwargs)
+        if "update_token" in r:
+            session.token = r["update_token"]
+        return r
+
+    session.running = False
+    if not session.token:
+        session = login(session)
+    res = inner_func(session, service, api, json, **kwargs)
+    if not res["result"] and (
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+    ):
+        session = login(session)
+        res = inner_func(session, service, api, json, **kwargs)
     session.running = True if res["result"] else False
     return res

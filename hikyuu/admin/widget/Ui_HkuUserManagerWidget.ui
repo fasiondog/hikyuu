@@ -26,13 +26,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="edit_user_pushButton">
-         <property name="text">
-          <string>Edit</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="remove_pushButton">
          <property name="text">
           <string>Remove</string>

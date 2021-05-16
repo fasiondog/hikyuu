@@ -24,9 +24,6 @@ class Ui_UserManagerForm(object):
         self.add_user_pushButton = QtWidgets.QPushButton(UserManagerForm)
         self.add_user_pushButton.setObjectName("add_user_pushButton")
         self.horizontalLayout.addWidget(self.add_user_pushButton)
-        self.edit_user_pushButton = QtWidgets.QPushButton(UserManagerForm)
-        self.edit_user_pushButton.setObjectName("edit_user_pushButton")
-        self.horizontalLayout.addWidget(self.edit_user_pushButton)
         self.remove_pushButton = QtWidgets.QPushButton(UserManagerForm)
         self.remove_pushButton.setObjectName("remove_pushButton")
         self.horizontalLayout.addWidget(self.remove_pushButton)
@@ -61,7 +58,6 @@ class Ui_UserManagerForm(object):
         _translate = QtCore.QCoreApplication.translate
         UserManagerForm.setWindowTitle(_translate("UserManagerForm", "Form"))
         self.add_user_pushButton.setText(_translate("UserManagerForm", "Add"))
-        self.edit_user_pushButton.setText(_translate("UserManagerForm", "Edit"))
         self.remove_pushButton.setText(_translate("UserManagerForm", "Remove"))
         self.reset_password_pushButton.setText(_translate("UserManagerForm", "Reset password"))
         self.refresh_pushButton.setText(_translate("UserManagerForm", "Refresh"))

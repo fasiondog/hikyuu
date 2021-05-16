@@ -37,6 +37,8 @@ class RestDataTableModel(QtCore.QAbstractTableModel):
             return None
         if orientation == QtCore.Qt.Horizontal:
             return self.rest_head_tr[section]
+        if orientation == QtCore.Qt.Vertical:
+            return section + 1
         return None
 
     def insertRows(self, row: int, count: int, parent: QtCore.QModelIndex) -> bool:

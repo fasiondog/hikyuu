@@ -45,7 +45,7 @@ from widget.HkuSessionViewWidget import HkuSessionViewWidget
 from dialog import *
 from widget import *
 from data import (get_local_db, SessionModel)
-from service import UserService, AssisService
+from service import AssisService
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -321,22 +321,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     _translate("MainWindow", "The server is disconnected. Please connect first!")
                 )
             else:
-                try:
-                    data = RestDataTableModel(
-                        ['userid', 'name', 'start_time'], [
-                            _translate("UserManage", "userid"),
-                            _translate("UserManage", "name"),
-                            _translate("UserManage", "start_time")
-                        ], UserService.query_users(session)
-                    )
-                    print(data)
-                except Exception as e:
-                    logging.error(e)
-                    QtWidgets.QMessageBox.warning(
-                        self, _translate("MainWindow", "error"), "{}: {}".format(e.__class__.__name__, e)
-                    )
-                    return
-                tab = HkuUserManagerWidget(session, data, self.main_tab)
+                tab = HkuUserManagerWidget(session, self.main_tab)
                 self.main_tab.addTab(tab, title)
                 self.tabs[title] = tab
 
