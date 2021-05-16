@@ -50,7 +50,7 @@ class Ui_UserManagerForm(object):
         self.users_tableView.horizontalHeader().setMinimumSectionSize(5)
         self.users_tableView.horizontalHeader().setSortIndicatorShown(True)
         self.users_tableView.horizontalHeader().setStretchLastSection(True)
-        self.users_tableView.verticalHeader().setVisible(False)
+        self.users_tableView.verticalHeader().setVisible(True)
         self.verticalLayout.addWidget(self.users_tableView)
         self.formLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.verticalLayout)
 

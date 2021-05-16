@@ -64,7 +64,7 @@ class RestDataTableModel(QtCore.QAbstractTableModel):
     def flags(self, index: QtCore.QModelIndex) -> QtCore.Qt.ItemFlags:
         if not index.isValid():
             return QtCore.Qt.ItemIsEnabled
-        return QtCore.Qt.ItemIsEditable
+        return super(self.__class__, self).flags(index) | QtCore.Qt.ItemIsEditable
 
     def getAllData(self):
         return self.rest_data

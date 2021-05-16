@@ -45,8 +45,7 @@ from widget.HkuSessionViewWidget import HkuSessionViewWidget
 from dialog import *
 from widget import *
 from data import (get_local_db, SessionModel)
-
-import service
+from service import UserService, AssisService
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -201,7 +200,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.main_tab.setTabsClosable(True)
         self.main_tab.tabCloseRequested.connect(self.closeTab)
 
-        self.tab_title_user_manage = _translate("MainWindow", "User Manager")
+        self.tab_title_user_manage = _translate("MainWindow", "User Manage")
         self.tabs = {}
 
     def initDockWidgets(self):
@@ -293,7 +292,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.about(self, _translate("MainWindow", "info"), _translate("MainWindow", "Connected"))
             return
 
-        status, msg = service.getServerStatus(session)
+        status, msg = AssisService.getServerStatus(session)
         icons = {"running": QtGui.QIcon(":/icon/circular_green.png"), "stop": QtGui.QIcon(":/icon/circular_yellow.png")}
         item.setText(1, msg)
         item.setIcon(1, icons[status])
@@ -325,11 +324,12 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 try:
                     data = RestDataTableModel(
                         ['userid', 'name', 'start_time'], [
-                            _translate("UserManager", "userid"),
-                            _translate("UserManager", "name"),
-                            _translate("UserManager", "start_time")
-                        ], service.queryUsers(session)
+                            _translate("UserManage", "userid"),
+                            _translate("UserManage", "name"),
+                            _translate("UserManage", "start_time")
+                        ], UserService.query_users(session)
                     )
+                    print(data)
                 except Exception as e:
                     logging.error(e)
                     QtWidgets.QMessageBox.warning(
