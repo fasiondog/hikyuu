@@ -165,3 +165,26 @@ def session_delete(session: SessionModel, service, api, json, **kwargs):
         res = inner_func(session, service, api, json, **kwargs)
     session.running = True if res["result"] else False
     return res
+
+
+def session_put(session: SessionModel, service, api, json, **kwargs):
+    def inner_func(session: SessionModel, service, api, json, **kwargs):
+        url = getserviceUrl(session.host, session.port, service, api)
+        headers = defaultRequestHeader()
+        headers["hku_token"] = session.token
+        r = put(url, json=json, headers=headers, **kwargs)
+        if "update_token" in r:
+            session.token = r["update_token"]
+        return r
+
+    session.running = False
+    if not session.token:
+        session = login(session)
+    res = inner_func(session, service, api, json, **kwargs)
+    if not res["result"] and (
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+    ):
+        session = login(session)
+        res = inner_func(session, service, api, json, **kwargs)
+    session.running = True if res["result"] else False
+    return res

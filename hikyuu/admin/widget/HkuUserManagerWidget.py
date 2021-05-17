@@ -79,8 +79,37 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
                 try:
                     userid_index = self.rest_data_model.index(index.row(), 0, QtCore.QModelIndex())
                     userid = self.rest_data_model.data(userid_index, QtCore.Qt.DisplayRole)
+                    name_index = self.rest_data_model.index(index.row(), 1, QtCore.QModelIndex())
+                    name = self.rest_data_model.data(name_index, QtCore.Qt.DisplayRole)
+                    r = QtWidgets.QMessageBox.information(
+                        self, _translate("UserManage", "Confirm"),
+                        _translate("UserManage", "Are you sure to remove the user ({})?").format(name),
+                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+                    )
+                    if r == QtWidgets.QMessageBox.No:
+                        return
                     r = UserService.remove_user(self.session, userid)
                 except Exception as e:
                     QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), str(e))
                     return
                 self.rest_data_model.removeRows(index.row(), 1, QtCore.QModelIndex())
+
+    @QtCore.pyqtSlot()
+    def on_reset_password_pushButton_clicked(self):
+        selected = self.users_tableView.selectionModel()
+        if selected:
+            indexes = selected.selectedRows()
+            for index in indexes:
+                try:
+                    userid_index = self.rest_data_model.index(index.row(), 0, QtCore.QModelIndex())
+                    userid = self.rest_data_model.data(userid_index, QtCore.Qt.DisplayRole)
+                    name_index = self.rest_data_model.index(index.row(), 1, QtCore.QModelIndex())
+                    name = self.rest_data_model.data(name_index, QtCore.Qt.DisplayRole)
+                    r = UserService.reset_password(self.session, userid)
+                    QtWidgets.QMessageBox.about(
+                        self, _translate("UserManage", "info"),
+                        _translate("UserManage", "The password of user ({}) had be reset to 123456").format(name)
+                    )
+                except Exception as e:
+                    QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), str(e))
+                    return

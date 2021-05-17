@@ -288,20 +288,12 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def actionConnect(self):
         item = self.server_view_dock.tree.currentItem()
         session = item.data(0, QtCore.Qt.UserRole)
-        if session.running:
-            QtWidgets.QMessageBox.about(self, _translate("MainWindow", "info"), _translate("MainWindow", "Connected"))
-            return
-
         status, msg = AssisService.getServerStatus(session)
         icons = {"running": QtGui.QIcon(":/icon/circular_green.png"), "stop": QtGui.QIcon(":/icon/circular_yellow.png")}
         item.setText(1, msg)
         item.setIcon(1, icons[status])
         self.server_view_dock.tree.viewport().update()
-        if session.running:
-            QtWidgets.QMessageBox.about(
-                self, _translate("MainWindow", "info"), _translate("MainWindow", "Connection successful")
-            )
-        else:
+        if not session.running:
             QtWidgets.QMessageBox.warning(
                 self, _translate("MainWindow", "info"), _translate("MainWindow", "connection failed")
             )
