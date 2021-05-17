@@ -122,4 +122,26 @@ class QueryUserHandle : public RestHandle {
     }
 };
 
+class ResetPasswordUserHandle : public RestHandle {
+    REST_HANDLE_IMP(ResetPasswordUserHandle)
+    virtual void run() override {
+        auto con = DB::getConnect();
+        UserModel admin;
+        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                   _ctr("user", "No operation permission"));
+
+        check_missing_param("userid");
+        {
+            UserModel user;
+            TransAction trans(con);
+            con->load(user, fmt::format(R"(user_id="{}")", req["userid"].get<uint64_t>()));
+            if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
+                user.setPassword("123456");
+                con->save(user, false);
+            }
+        }
+    }
+};
+
 }  // namespace hku

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2021-05-16 22:56+0800\n"
-"PO-Revision-Date: 2021-05-16 22:59+0800\n"
+"POT-Creation-Date: 2021-05-17 21:38+0800\n"
+"PO-Revision-Date: 2021-05-17 21:38+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh_CN\n"
@@ -47,7 +47,7 @@ msgid "Wrong password"
 msgstr "密码错误"
 
 #: service/user/UserHandle.h:40 service/user/UserHandle.h:85
-#: service/user/UserHandle.h:108
+#: service/user/UserHandle.h:108 service/user/UserHandle.h:132
 msgctxt "user"
 msgid "No operation permission"
 msgstr "没有操作权限"
