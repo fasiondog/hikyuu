@@ -14,9 +14,12 @@ class AssisService:
         try:
             r = session_get(session, "assist", "status")
             if r["result"]:
+                session.running = True
                 return "running", _translate("service", "running")
             else:
+                session.running = False
                 return "stop", _translate("service", "failed! {}").format(r["errmsg"])
         except Exception as e:
+            session.running = False
             logging.info("{}: {}".format(e.__class__.__name__, e))
             return "stop", _translate("service", "failed connect!")

@@ -214,6 +214,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.server_view_dock)
         servers = self.db.session.query(SessionModel).order_by(SessionModel.name.asc()).all()
         for server in servers:
+            server.running = False  # SQLalchemy query 出来的对象并没有添加非数据库外的属性，此处手工添加保护
             self.server_view_dock.addSession(server)
         self.server_view_dock.user_manage_trigger.connect(self.openUserManageTab)
 
@@ -287,16 +288,19 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def actionConnect(self):
         item = self.server_view_dock.tree.currentItem()
+        if item is None:
+            logging.error("Can't get currentItem.")
+            return
         session = item.data(0, QtCore.Qt.UserRole)
         status, msg = AssisService.getServerStatus(session)
-        icons = {"running": QtGui.QIcon(":/icon/circular_green.png"), "stop": QtGui.QIcon(":/icon/circular_yellow.png")}
-        item.setText(1, msg)
-        item.setIcon(1, icons[status])
-        self.server_view_dock.tree.viewport().update()
         if not session.running:
+            self.server_view_dock.set_gray(item)
             QtWidgets.QMessageBox.warning(
                 self, _translate("MainWindow", "info"), _translate("MainWindow", "connection failed")
             )
+        else:
+            self.server_view_dock.set_default(item)
+        self.server_view_dock.tree.viewport().update()
 
     def closeTab(self, index):
         title = self.main_tab.tabText(index)

@@ -12,10 +12,6 @@ class HkuCheckServerStatusThread(QtCore.QThread):
         self.session_widget = session_widget
         self.working = True
         self.first = True
-        self.icons = {
-            "running": QtGui.QIcon(":/icon/circular_green.png"),
-            "stop": QtGui.QIcon(":/icon/circular_yellow.png")
-        }
 
     def run(self) -> None:
         while self.working:
@@ -34,8 +30,10 @@ class HkuCheckServerStatusThread(QtCore.QThread):
         for item in items:
             session = item.data(0, QtCore.Qt.UserRole)
             status, msg = AssisService.getServerStatus(session)
-            item.setText(1, msg)
-            item.setIcon(1, self.icons[status])
+            if session.running:
+                self.session_widget.set_default(item)
+            else:
+                self.session_widget.set_gray(item)
             # 刷新 treewidget 显示界面
             self.session_widget.tree.viewport().update()
         if items:
