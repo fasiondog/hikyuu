@@ -820,6 +820,11 @@ if __name__ == "__main__":
     import urllib
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+    # 自适应分辨率，防止字体显示不全
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+
     app = QApplication(sys.argv)
     use_dark_style = False  # 使用暗黑主题
     if use_dark_style:
