@@ -144,8 +144,6 @@ setup(
         'requests',
         'qdarkstyle',
         'flatbuffers',
-        'pynng',
-        'requests',
-        'sqlalchemy'
+        'pynng'
     ],
 )

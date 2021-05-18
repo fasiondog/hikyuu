@@ -120,17 +120,19 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def initAction(self):
         self.action_dict = dict(
             action_new_file_session=QtWidgets.QAction(
-                QtGui.QIcon(":/icon/new_16.png"), _translate("MainWindow", "&New Session"), self
+                QtGui.QIcon(":/icon/new_32.png"), _translate("MainWindow", "&New Session"), self
             ),
             action_edit_file_session=QtWidgets.QAction(
-                QtGui.QIcon(":/icon/edit_16.png"), _translate("MainWindow", "&Edit Session"), self
+                QtGui.QIcon(":/icon/edit_32.png"), _translate("MainWindow", "&Edit Session"), self
             ),
             action_del_file_session=QtWidgets.QAction(
-                QtGui.QIcon(":/icon/cancel_16.png"), _translate("MainWindow", "&Remove Session"), self
+                QtGui.QIcon(":/icon/cancel_32.png"), _translate("MainWindow", "&Remove Session"), self
             ),
-            action_file_connect=QtWidgets.QAction(_translate('MainWindow', '&Connect Now')),
+            action_file_connect=QtWidgets.QAction(
+                QtGui.QIcon(":/icon/connect_32.png"), _translate('MainWindow', '&Connect Now')
+            ),
             action_file_quit=QtWidgets.QAction(
-                QtGui.QIcon(":/icon/quit_16.png"), _translate('MainWindow', '&Quit'), self
+                QtGui.QIcon(":/icon/quit_32.png"), _translate('MainWindow', '&Quit'), self
             ),
             action_view_normal_style=QtWidgets.QAction(_translate('MainWindow', 'Normal style'), self),
             action_view_dark_style=QtWidgets.QAction(_translate('MainWindow', 'Dark style'), self),
