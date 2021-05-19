@@ -21,27 +21,23 @@ std::string createToken(uint64_t user_id) {
     return base64_encode(fmt::format("{} {} {}", user_id, now, k), false);
 }
 
-struct TokenExpiredException : public hku::exception {
-    TokenExpiredException(const std::string &msg) : hku::exception(msg) {}
-};
-
 void AuthorizeFilter(HttpHandle *handle) {
     std::string token = handle->getReqHeader("hku_token");
-    REQ_CHECK(!token.empty(), AuthorizeErrorCode::MISS_TOKEN,
-              handle->_ctr("authorize", "Miss token"));
+    AUTHORIZE_CHECK(!token.empty(), AuthorizeErrorCode::MISS_TOKEN,
+                    handle->_ctr("authorize", "Miss token"));
 
     std::string errmsg = handle->_ctr("authorize", "Invalid token");
     if (!TokenCache::have(token)) {
         TokenModel token_record;
         DB::getConnect()->load(token_record, fmt::format(R"(token="{}")", token));
-        REQ_CHECK(token_record.id() != 0, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
+        AUTHORIZE_CHECK(token_record.id() != 0, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
         TokenCache::put(token);
     }
 
     try {
         std::string decode_token = base64_decode(token);
         auto pos = decode_token.find_first_of(" ");
-        REQ_CHECK(pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
+        AUTHORIZE_CHECK(pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
 
         auto userid_str = decode_token.substr(0, pos);
         uint64_t user_id = 0;
@@ -49,7 +45,7 @@ void AuthorizeFilter(HttpHandle *handle) {
 
         user_id = std::stoull(userid_str);
         auto d_pos = decode_token.find_last_of(" ");
-        REQ_CHECK(d_pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
+        AUTHORIZE_CHECK(d_pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
         create_time = Datetime(decode_token.substr(pos + 1, d_pos - pos));
 
         Datetime expired_time = create_time + TimeDelta(30);
@@ -64,7 +60,8 @@ void AuthorizeFilter(HttpHandle *handle) {
                 con->exec(fmt::format(R"(delete from {} where token="{}")",
                                       TokenModel::getTableName(), token));
             }
-            throw TokenExpiredException(handle->_ctr("authorize", "token is expired"));
+            throw HttpUnauthorizedError(AuthorizeErrorCode::FAILED_AUTHORIZED,
+                                        handle->_ctr("authorize", "token is expired"));
         }
 
         RestHandle *rest_handle = dynamic_cast<RestHandle *>(handle);
@@ -82,8 +79,9 @@ void AuthorizeFilter(HttpHandle *handle) {
     } catch (TokenExpiredException &e) {
         throw e;
 
-    } catch (std::exception) {
-        throw HttpBadRequestError(AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
+    } catch (std::exception &e) {
+        LOG_ERROR(e.what());
+        throw HttpUnauthorizedError(AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
     }
 }
 

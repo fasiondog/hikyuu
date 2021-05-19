@@ -91,29 +91,6 @@ protected:
         }                               \
     }
 
-/**
- * 公共错误码
- */
-enum AuthorizeErrorCode {
-    MISS_TOKEN = 10000,  // 缺失令牌
-    FAILED_AUTHORIZED,   // 鉴权失败
-    AUTHORIZE_EXPIRED,   // 鉴权过期
-};
-
-enum BadRequestErrorCode {
-    INVALID_JSON_REQUEST = 20001,  // 请求数据无法解析为JSON
-    MISS_PARAMETER,  // 缺失参数，参数不能为空 必填参数不能为空（各个业务接口返回各个接口的参数）
-    WRONG_PARAMETER,  // 参数值填写错误（各个业务接口返回各个接口的参数）
-    WRONG_PARAMETER_TYPE  // 参数类型错误（各个业务接口返回各个接口的参数）
-};
-
-#define REQ_CHECK(expr, errcode, ...)                                     \
-    {                                                                     \
-        if (!(expr)) {                                                    \
-            throw HttpBadRequestError(errcode, fmt::format(__VA_ARGS__)); \
-        }                                                                 \
-    }
-
 class HttpBadRequestError : public HttpError {
 public:
     HttpBadRequestError() = delete;
@@ -165,5 +142,35 @@ public:
 private:
     int m_errcode;
 };
+
+/**
+ * 公共错误码
+ */
+enum AuthorizeErrorCode {
+    MISS_TOKEN = 10000,  // 缺失令牌
+    FAILED_AUTHORIZED,   // 鉴权失败
+    AUTHORIZE_EXPIRED,   // 鉴权过期
+};
+
+enum BadRequestErrorCode {
+    INVALID_JSON_REQUEST = 20001,  // 请求数据无法解析为JSON
+    MISS_PARAMETER,  // 缺失参数，参数不能为空 必填参数不能为空（各个业务接口返回各个接口的参数）
+    WRONG_PARAMETER,  // 参数值填写错误（各个业务接口返回各个接口的参数）
+    WRONG_PARAMETER_TYPE  // 参数类型错误（各个业务接口返回各个接口的参数）
+};
+
+#define AUTHORIZE_CHECK(expr, errcode, ...)                                 \
+    {                                                                       \
+        if (!(expr)) {                                                      \
+            throw HttpUnauthorizedError(errcode, fmt::format(__VA_ARGS__)); \
+        }                                                                   \
+    }
+
+#define REQ_CHECK(expr, errcode, ...)                                     \
+    {                                                                     \
+        if (!(expr)) {                                                    \
+            throw HttpBadRequestError(errcode, fmt::format(__VA_ARGS__)); \
+        }                                                                 \
+    }
 
 }  // namespace hku
