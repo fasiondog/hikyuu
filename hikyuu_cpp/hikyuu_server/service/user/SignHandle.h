@@ -31,8 +31,8 @@ class SignupHandle : public NoAuthRestHandle {
             TransAction trans(con);
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
                                                   UserModel::getTableName(), user.getName()));
-            HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
-                       _ctr("user", "Unavailable user name"));
+            REQ_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
+                      _ctr("user", "Unavailable user name"));
             user.setUserId(DB::getNewUserId());
             con->save(user, false);
         }
@@ -58,10 +58,10 @@ class LoginHandle : public NoAuthRestHandle {
         UserModel user;
         auto con = DB::getConnect();
         con->load(user, fmt::format(R"(name="{}")", req["user"].get<std::string>()));
-        HTTP_CHECK(user.id() != 0, UserErrorCode::USER_NOT_EXIST,
-                   _ctr("user", "User does not exist"));
-        HTTP_CHECK(user.getPassword() == req["password"].get<std::string>(),
-                   UserErrorCode::USER_WRONG_PASSWORD, _ctr("user", "Wrong password"));
+        REQ_CHECK(user.id() != 0, UserErrorCode::USER_NOT_EXIST,
+                  _ctr("user", "User does not exist"));
+        REQ_CHECK(user.getPassword() == req["password"].get<std::string>(),
+                  UserErrorCode::USER_WRONG_PASSWORD, _ctr("user", "Wrong password"));
 
         TokenModel token;
         {

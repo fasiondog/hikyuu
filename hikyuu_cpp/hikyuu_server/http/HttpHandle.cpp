@@ -38,35 +38,17 @@ void HttpHandle::operator()() {
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
         nng_aio_finish(m_http_aio, 0);
 
-    } catch (HttpError& e) {
-        CLS_TRACE("HttpError({}): {}", e.errcode(), e.what());
-        CLS_TRACE("req data: {}", getReqData());
-        nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
-        nng_http_res_set_status(m_nng_res, e.status());
-        nng_http_res_set_reason(m_nng_res, e.msg().c_str());
-        nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
-        nng_aio_set_output(m_http_aio, 0, m_nng_res);
-        nng_aio_finish(m_http_aio, 0);
-
-    } catch (HttpException& e) {
-        CLS_TRACE("HttpException: {}", e.what());
-        CLS_TRACE("req data: {}", getReqData());
-        nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
-        nng_http_res_set_status(m_nng_res, e.status());
-        nng_http_res_set_reason(m_nng_res, e.msg().c_str());
-        nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
-        nng_aio_set_output(m_http_aio, 0, m_nng_res);
-        nng_aio_finish(m_http_aio, 0);
-
     } catch (nlohmann::json::exception& e) {
-        CLS_TRACE("HttpException: {}", e.what());
-        CLS_TRACE("req data: {}", getReqData());
-        nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
-        std::string errmsg(fmt::format("Request param type error! {}", e.what()));
-        nng_http_res_set_reason(m_nng_res, errmsg.c_str());
-        nng_http_res_copy_data(m_nng_res, errmsg.c_str(), errmsg.size());
-        nng_aio_set_output(m_http_aio, 0, m_nng_res);
-        nng_aio_finish(m_http_aio, 0);
+        processJsonError(e);
+
+    } catch (HttpUnauthorizedError& e) {
+        processHttpError<HttpUnauthorizedError>(e);
+
+    } catch (HttpBadRequestError& e) {
+        processHttpError<HttpBadRequestError>(e);
+
+    } catch (HttpError& e) {
+        processHttpError<HttpError>(e);
 
     } catch (std::exception& e) {
         std::string errmsg(e.what());
@@ -80,6 +62,19 @@ void HttpHandle::operator()() {
         CLS_TRACE("req data: {}", getReqData());
         unknown_error(errmsg);
     }
+}
+
+void HttpHandle::processJsonError(const nlohmann::json::exception& e) {
+    CLS_TRACE("HttpBadRequestError({}): {}", BadRequestErrorCode::INVALID_JSON_REQUEST, e.what());
+    CLS_TRACE("req data: {}", getReqData());
+    nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
+    nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_BAD_REQUEST);
+    std::string errmsg(fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"{}"}})",
+                                   BadRequestErrorCode::INVALID_JSON_REQUEST, e.what()));
+    nng_http_res_set_reason(m_nng_res, errmsg.c_str());
+    nng_http_res_copy_data(m_nng_res, errmsg.c_str(), errmsg.size());
+    nng_aio_set_output(m_http_aio, 0, m_nng_res);
+    nng_aio_finish(m_http_aio, 0);
 }
 
 void HttpHandle::unknown_error(const std::string& errmsg) {
@@ -142,7 +137,7 @@ json HttpHandle::getReqJson() {
         }
     } catch (json::exception& e) {
         LOG_ERROR("Failed parse json: {}", (const char*)data);
-        throw HttpError(INVALID_JSON_REQUEST, e.what());
+        throw HttpBadRequestError(BadRequestErrorCode::INVALID_JSON_REQUEST, e.what());
     }
     return result;
 }

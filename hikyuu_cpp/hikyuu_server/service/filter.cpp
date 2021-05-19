@@ -27,20 +27,21 @@ struct TokenExpiredException : public hku::exception {
 
 void AuthorizeFilter(HttpHandle *handle) {
     std::string token = handle->getReqHeader("hku_token");
-    HTTP_CHECK(!token.empty(), RestErrorCode::MISS_TOKEN, handle->_ctr("authorize", "Miss token"));
+    REQ_CHECK(!token.empty(), AuthorizeErrorCode::MISS_TOKEN,
+              handle->_ctr("authorize", "Miss token"));
 
     std::string errmsg = handle->_ctr("authorize", "Invalid token");
     if (!TokenCache::have(token)) {
         TokenModel token_record;
         DB::getConnect()->load(token_record, fmt::format(R"(token="{}")", token));
-        HTTP_CHECK(token_record.id() != 0, RestErrorCode::UNAUTHORIZED, errmsg);
+        REQ_CHECK(token_record.id() != 0, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
         TokenCache::put(token);
     }
 
     try {
         std::string decode_token = base64_decode(token);
         auto pos = decode_token.find_first_of(" ");
-        HTTP_CHECK(pos != std::string::npos, RestErrorCode::UNAUTHORIZED, errmsg);
+        REQ_CHECK(pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
 
         auto userid_str = decode_token.substr(0, pos);
         uint64_t user_id = 0;
@@ -48,7 +49,7 @@ void AuthorizeFilter(HttpHandle *handle) {
 
         user_id = std::stoull(userid_str);
         auto d_pos = decode_token.find_last_of(" ");
-        HTTP_CHECK(d_pos != std::string::npos, RestErrorCode::UNAUTHORIZED, errmsg);
+        REQ_CHECK(d_pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
         create_time = Datetime(decode_token.substr(pos + 1, d_pos - pos));
 
         Datetime expired_time = create_time + TimeDelta(30);
@@ -82,7 +83,7 @@ void AuthorizeFilter(HttpHandle *handle) {
         throw e;
 
     } catch (std::exception) {
-        throw HttpError(RestErrorCode::UNAUTHORIZED, errmsg);
+        throw HttpBadRequestError(AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
     }
 }
 

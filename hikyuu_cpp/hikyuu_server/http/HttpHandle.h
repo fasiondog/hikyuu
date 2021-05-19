@@ -155,6 +155,11 @@ private:
     // error未捕获的信息，统一返回500页面
     void unknown_error(const std::string &errmsg);
 
+    template <typename Error>
+    void processHttpError(const Error &e);
+
+    void processJsonError(const nlohmann::json::exception &e);
+
 protected:
     nng_aio *m_http_aio{nullptr};
     nng_http_res *m_nng_res{nullptr};
@@ -166,5 +171,29 @@ protected:
 #define HTTP_HANDLE_IMP(cls) \
 public:                      \
     cls(nng_aio *aio) : HttpHandle(aio) {}
+
+template <class Error>
+void HttpHandle::processHttpError(const Error &e) {
+    CLS_TRACE("{}({}): {}", Error::name(), e.errcode(), e.what());
+    CLS_TRACE("req data: {}", getReqData());
+    nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
+    nng_http_res_set_status(m_nng_res, e.status());
+    nng_http_res_set_reason(m_nng_res, e.msg().c_str());
+    nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
+    nng_aio_set_output(m_http_aio, 0, m_nng_res);
+    nng_aio_finish(m_http_aio, 0);
+}
+
+template <>
+inline void HttpHandle::processHttpError<HttpError>(const HttpError &e) {
+    CLS_TRACE("HttpError: {}", e.what());
+    CLS_TRACE("req data: {}", getReqData());
+    nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
+    nng_http_res_set_status(m_nng_res, e.status());
+    nng_http_res_set_reason(m_nng_res, e.msg().c_str());
+    nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
+    nng_aio_set_output(m_http_aio, 0, m_nng_res);
+    nng_aio_finish(m_http_aio, 0);
+}
 
 }  // namespace hku

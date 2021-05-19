@@ -40,16 +40,16 @@ public:
 protected:
     void check_missing_param(const char *param) {
         if (!req.contains(param)) {
-            throw HttpError(RestErrorCode::MISS_PARAMETER,
-                            fmt::format(R"(Missing param "{}")", param));
+            throw HttpBadRequestError(BadRequestErrorCode::MISS_PARAMETER,
+                                      fmt::format(R"(Missing param "{}")", param));
         }
     }
 
     template <typename ModelTable>
     void check_enum_field(const std::string &field, const std::string &value) {
         if (!DB::isValidEumValue(ModelTable::getTableName(), field, value)) {
-            throw HttpError(RestErrorCode::INVALID_VALUE,
-                            fmt::format("Invalid field({}) value: {}", field, value));
+            throw HttpBadRequestError(BadRequestErrorCode::WRONG_PARAMETER,
+                                      fmt::format("Invalid field({}) value: {}", field, value));
         }
     }
 

@@ -16,9 +16,9 @@ class LogLevelHandle : public RestHandle {
 
     virtual void run() override {
         json req = getReqJson();
-        HTTP_CHECK(req.contains("level"), RestErrorCode::MISS_PARAMETER, "Missing key: level");
-        HTTP_CHECK(req["level"].is_number_integer(), RestErrorCode::WRONG_PARAMETER_TYPE,
-                   "level type must be integer");
+        REQ_CHECK(req.contains("level"), BadRequestErrorCode::MISS_PARAMETER, "Missing key: level");
+        REQ_CHECK(req["level"].is_number_integer(), BadRequestErrorCode::WRONG_PARAMETER_TYPE,
+                  "level type must be integer");
         int level = req["level"].get<int>();
         if (!req.contains("logger")) {
             set_logger_level(level);
@@ -26,8 +26,8 @@ class LogLevelHandle : public RestHandle {
             return;
         }
 
-        HTTP_CHECK(req["logger"].is_string(), RestErrorCode::WRONG_PARAMETER_TYPE,
-                   "logger type must be string");
+        REQ_CHECK(req["logger"].is_string(), BadRequestErrorCode::WRONG_PARAMETER_TYPE,
+                  "logger type must be string");
         std::string logger = req["logger"].get<std::string>();
         if (have_logger(logger)) {
             set_logger_level(logger, level);

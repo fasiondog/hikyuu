@@ -36,23 +36,23 @@ public:
         auto con = DB::getConnect();
         UserModel admin;
         con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
-        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
-                   _ctr("user", "No operation permission"));
+        REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                  _ctr("user", "No operation permission"));
 
         check_missing_param("user");
         check_missing_param("password");
         UserModel user;
         user.setName(req["user"].get<string>());
         size_t name_len = user.getName().size();
-        HTTP_CHECK(name_len >= MIN_NAME_LENGTH && name_len <= MAX_NAME_LENGTH,
-                   UserErrorCode::USER_INVALID_NAME,
-                   _ctr("user", "The user name must be 1 to 128 characters long"));
+        REQ_CHECK(name_len >= MIN_NAME_LENGTH && name_len <= MAX_NAME_LENGTH,
+                  UserErrorCode::USER_INVALID_NAME,
+                  _ctr("user", "The user name must be 1 to 128 characters long"));
 
         user.setPassword(req["password"].get<string>());
         size_t password_len = user.getPassword().size();
-        HTTP_CHECK(password_len <= MAX_PASSWORD_LENGTH, UserErrorCode::USER_INVALID_PASSWORD,
-                   fmt::format(_ctr("user", "The password must be less than {} characters"),
-                               MAX_PASSWORD_LENGTH));
+        REQ_CHECK(password_len <= MAX_PASSWORD_LENGTH, UserErrorCode::USER_INVALID_PASSWORD,
+                  fmt::format(_ctr("user", "The password must be less than {} characters"),
+                              MAX_PASSWORD_LENGTH));
 
         user.setStartTime(Datetime::now());
         user.setStatus(UserModel::STATUS::NORMAL);
@@ -60,8 +60,8 @@ public:
             TransAction trans(con);
             int count = con->queryInt(fmt::format(R"(select count(id) from {} where name="{}")",
                                                   UserModel::getTableName(), user.getName()));
-            HTTP_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
-                       _ctr("user", "Unavailable user name"));
+            REQ_CHECK(count == 0, UserErrorCode::USER_NAME_REPETITION,
+                      _ctr("user", "Unavailable user name"));
             user.setUserId(DB::getNewUserId());
             con->save(user, false);
         }
@@ -81,8 +81,8 @@ class RemoveUserHandle : public RestHandle {
         auto con = DB::getConnect();
         UserModel admin;
         con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
-        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
-                   _ctr("user", "No operation permission"));
+        REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                  _ctr("user", "No operation permission"));
 
         check_missing_param("userid");
         {
@@ -104,8 +104,8 @@ class QueryUserHandle : public RestHandle {
         auto con = DB::getConnect();
         UserModel admin;
         con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
-        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
-                   _ctr("user", "No operation permission"));
+        REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                  _ctr("user", "No operation permission"));
 
         std::vector<UserModel> users;
         con->batchLoad(users,
@@ -128,8 +128,8 @@ class ResetPasswordUserHandle : public RestHandle {
         auto con = DB::getConnect();
         UserModel admin;
         con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
-        HTTP_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
-                   _ctr("user", "No operation permission"));
+        REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
+                  _ctr("user", "No operation permission"));
 
         check_missing_param("userid");
         {

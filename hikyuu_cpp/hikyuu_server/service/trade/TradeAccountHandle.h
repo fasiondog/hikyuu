@@ -28,8 +28,8 @@ class AddTradeAccountHandle : public RestHandle {
         auto con = DB::getConnect();
         {
             TransAction trans(con);
-            HTTP_CHECK(!TradeAccountModel::isExistName(con, name),
-                       TradeErrorCode::TD_ACCOUNT_REPETITION, "Name repetition");
+            REQ_CHECK(!TradeAccountModel::isExistName(con, name),
+                      TradeErrorCode::TD_ACCOUNT_REPETITION, "Name repetition");
             con->save(account, false);
         }
         setResData(account.json());
