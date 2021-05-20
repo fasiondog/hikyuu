@@ -60,7 +60,7 @@ void AuthorizeFilter(HttpHandle *handle) {
                 con->exec(fmt::format(R"(delete from {} where token="{}")",
                                       TokenModel::getTableName(), token));
             }
-            throw HttpUnauthorizedError(AuthorizeErrorCode::FAILED_AUTHORIZED,
+            throw HttpUnauthorizedError(AuthorizeErrorCode::AUTHORIZE_EXPIRED,
                                         handle->_ctr("authorize", "token is expired"));
         }
 
@@ -76,7 +76,7 @@ void AuthorizeFilter(HttpHandle *handle) {
             rest_handle->setUpdateToken(new_token);
         }
 
-    } catch (TokenExpiredException &e) {
+    } catch (HttpUnauthorizedError &e) {
         throw e;
 
     } catch (std::exception &e) {

@@ -40,7 +40,7 @@ def wrap_restful(func):
     def wrap_func(*args, **kwargs):
         try:
             r = func(*args, **kwargs)
-            if r.status_code in (200, 400):
+            if r.status_code in (200, 400, 401):
                 return r.json()
             elif r.status_code == 500:
                 raise HttpInternalServerError()
@@ -78,10 +78,9 @@ def put(url, data=None, **kwargs):
 
 
 class RestErrorCode:
-    INVALID_ENUM_VALUE = 10000
-    MISS_TOKEN = 10001
-    UNAUTHORIZED = 10002
-    AUTHORIZE_EXPIRED = 10003
+    MISS_TOKEN = 10000
+    FAILED_AUTHORIZED = 10001
+    AUTHORIZE_EXPIRED = 10002
 
 
 def login(session: SessionModel):
@@ -113,7 +112,7 @@ def session_get(session: SessionModel, service, api, params=None, **kwargs):
         session = login(session)
     res = inner_get(session, service, api, params, **kwargs)
     if not res["result"] and (
-        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.FAILED_AUTHORIZED
     ):
         session = login(session)
         res = inner_get(session, service, api, params, **kwargs)
@@ -136,7 +135,7 @@ def session_post(session: SessionModel, service, api, data=None, json=None, **kw
         session = login(session)
     res = inner_func(session, service, api, data, json, **kwargs)
     if not res["result"] and (
-        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.FAILED_AUTHORIZED
     ):
         session = login(session)
         res = inner_func(session, service, api, data, json, **kwargs)
@@ -159,7 +158,7 @@ def session_delete(session: SessionModel, service, api, json, **kwargs):
         session = login(session)
     res = inner_func(session, service, api, json, **kwargs)
     if not res["result"] and (
-        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.FAILED_AUTHORIZED
     ):
         session = login(session)
         res = inner_func(session, service, api, json, **kwargs)
@@ -182,7 +181,7 @@ def session_put(session: SessionModel, service, api, json, **kwargs):
         session = login(session)
     res = inner_func(session, service, api, json, **kwargs)
     if not res["result"] and (
-        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.UNAUTHORIZED
+        res['errcode'] == RestErrorCode.AUTHORIZE_EXPIRED or res['errcode'] == RestErrorCode.FAILED_AUTHORIZED
     ):
         session = login(session)
         res = inner_func(session, service, api, json, **kwargs)
