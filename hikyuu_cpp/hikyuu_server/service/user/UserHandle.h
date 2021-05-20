@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vector>
+#include <hikyuu/utilities/db_connect/DBCondition.h>
 #include "common/uuid.h"
 #include "../TokenCache.h"
 #include "../RestHandle.h"
@@ -106,6 +107,15 @@ class QueryUserHandle : public RestHandle {
         con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
         REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
                   _ctr("user", "No operation permission"));
+
+        DBCondition cond;
+        if (req.contains("userid")) {
+            cond = DBCondition("userid", req["userid"].get<uint16_t>());
+        }
+
+        if (req.contains("name")) {
+            cond = cond & DBCondition("name", req["name"].get<std::string>());
+        }
 
         std::vector<UserModel> users;
         con->batchLoad(users,
