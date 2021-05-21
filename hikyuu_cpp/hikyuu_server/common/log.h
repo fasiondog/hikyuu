@@ -47,12 +47,12 @@ inline void init_server_logger() {
         auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         stdout_sink->set_level(DEFAULT_LOGGER_LEVEL);
 
-        spdlog::init_thread_pool(8192, 1);
+        /*spdlog::init_thread_pool(8192, 1);
         std::vector<spdlog::sink_ptr> sinks{stdout_sink};
         auto logger = std::make_shared<spdlog::async_logger>("SERVER", sinks.begin(), sinks.end(),
                                                              spdlog::thread_pool(),
-                                                             spdlog::async_overflow_policy::block);
-
+                                                             spdlog::async_overflow_policy::block);*/
+        auto logger = std::make_shared<spdlog::logger>("SERVER", stdout_sink);
         logger->set_level(DEFAULT_LOGGER_LEVEL);
         logger->flush_on(DEFAULT_LOGGER_LEVEL);
         // logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^SERVER-%L%$] - %v (%s:%#)");
@@ -341,20 +341,15 @@ inline void set_logger_level(const std::string& name, int level) {
 
 #define CLASS_LOGGER(cls)                                                                        \
 private:                                                                                         \
-    inline static std::shared_ptr<spdlog::async_logger> ms_##cls_logger;                         \
+    inline static std::shared_ptr<spdlog::logger> ms_##cls_logger;                               \
                                                                                                  \
 public:                                                                                          \
-    static std::shared_ptr<spdlog::async_logger> logger() {                                      \
+    static std::shared_ptr<spdlog::logger> logger() {                                            \
         static std::once_flag oc;                                                                \
         std::call_once(oc, [&]() {                                                               \
             auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();          \
             stdout_sink->set_level(DEFAULT_LOGGER_LEVEL);                                        \
-                                                                                                 \
-            std::vector<spdlog::sink_ptr> sinks{stdout_sink};                                    \
-            ms_##cls_logger = std::make_shared<spdlog::async_logger>(                            \
-              #cls, sinks.begin(), sinks.end(), spdlog::thread_pool(),                           \
-              spdlog::async_overflow_policy::block);                                             \
-                                                                                                 \
+            ms_##cls_logger = std::make_shared<spdlog::logger>(#cls, stdout_sink);               \
             ms_##cls_logger->set_level(DEFAULT_LOGGER_LEVEL);                                    \
             ms_##cls_logger->flush_on(DEFAULT_LOGGER_LEVEL);                                     \
             ms_##cls_logger->set_pattern("%^%Y-%m-%d %H:%M:%S.%e [" #cls "-%L] - %v (%s:%#)%$"); \

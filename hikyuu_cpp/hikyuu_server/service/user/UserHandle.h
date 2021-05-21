@@ -110,16 +110,17 @@ class QueryUserHandle : public RestHandle {
 
         DBCondition cond;
         if (req.contains("userid")) {
-            cond = DBCondition("userid", req["userid"].get<uint16_t>());
+            cond = Field("userid") == req["userid"].get<uint16_t>();
         }
 
         if (req.contains("name")) {
-            cond = cond & DBCondition("name", req["name"].get<std::string>());
+            cond = cond & Field("name") == req["name"].get<std::string>();
         }
 
+        cond = (cond & Field("status") != UserModel::DELETED) + ASC("start_time");
+
         std::vector<UserModel> users;
-        con->batchLoad(users,
-                       fmt::format("status<>{} order by start_time DESC", UserModel::DELETED));
+        con->batchLoad(users, cond.str());
         json jarray;
         for (auto& user : users) {
             json j;
