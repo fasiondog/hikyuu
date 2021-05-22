@@ -9,9 +9,11 @@
 
 #include <string>
 #include <ostream>
+#include <sstream>
 #include <vector>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+#include "../../Log.h"
 
 #ifndef HKU_API
 #define HKU_API
@@ -70,16 +72,74 @@ struct Field {
     // in 和 not_in 不支持 字符串，一般不会用到 in ("stra", "strb") 的 SQL 操作
     template <typename T>
     DBCondition in(const std::vector<T>& vals) {
+        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
         return DBCondition(fmt::format("({} in ({}))", name, fmt::join(vals, ",")));
+    }
+
+    template <>
+    DBCondition in(const std::vector<std::string>& vals) {
+        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+        std::ostringstream out;
+        out << "(" << name << " in (";
+        size_t total = vals.size();
+        for (size_t i = 0; i < total - 1; i++) {
+            out << "\"" << vals[i] << "\",";
+        }
+        out << "\"" << vals[total - 1] << "\"))";
+        return DBCondition(out.str());
+    }
+
+    template <>
+    DBCondition in(const std::vector<const char*>& vals) {
+        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+        std::ostringstream out;
+        out << "(" << name << " in (";
+        size_t total = vals.size();
+        for (size_t i = 0; i < total - 1; i++) {
+            out << "\"" << vals[i] << "\",";
+        }
+        out << "\"" << vals[total - 1] << "\"))";
+        return DBCondition(out.str());
     }
 
     template <typename T>
     DBCondition not_in(const std::vector<T>& vals) {
+        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
         return DBCondition(fmt::format("({} not in ({}))", name, fmt::join(vals, ",")));
     }
 
+    template <>
+    DBCondition not_in(const std::vector<std::string>& vals) {
+        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+        std::ostringstream out;
+        out << "(" << name << " not in (";
+        size_t total = vals.size();
+        for (size_t i = 0; i < total - 1; i++) {
+            out << "\"" << vals[i] << "\",";
+        }
+        out << "\"" << vals[total - 1] << "\"))";
+        return DBCondition(out.str());
+    }
+
+    template <>
+    DBCondition not_in(const std::vector<const char*>& vals) {
+        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+        std::ostringstream out;
+        out << "(" << name << " not in (";
+        size_t total = vals.size();
+        for (size_t i = 0; i < total - 1; i++) {
+            out << "\"" << vals[i] << "\",";
+        }
+        out << "\"" << vals[total - 1] << "\"))";
+        return DBCondition(out.str());
+    }
+
     DBCondition like(const std::string& pattern) {
-        return DBCondition(fmt::format("({} like {})", name, pattern));
+        return DBCondition(fmt::format(R"(({} like "{}"))", name, pattern));
+    }
+
+    DBCondition like(const char* pattern) {
+        return DBCondition(fmt::format(R"(({} like "{}"))", name, pattern));
     }
 
     std::string name;
@@ -147,6 +207,36 @@ inline DBCondition operator>=(const Field& field, const std::string& val) {
 
 template <>
 inline DBCondition operator<=(const Field& field, const std::string& val) {
+    return DBCondition(fmt::format(R"(({}<="{}"))", field.name, val));
+}
+
+template <>
+inline DBCondition operator==(const Field& field, const char* val) {
+    return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
+}
+
+template <>
+inline DBCondition operator!=(const Field& field, const char* val) {
+    return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
+}
+
+template <>
+inline DBCondition operator>(const Field& field, const char* val) {
+    return DBCondition(fmt::format(R"(({}>"{}"))", field.name, val));
+}
+
+template <>
+inline DBCondition operator<(const Field& field, const char* val) {
+    return DBCondition(fmt::format(R"(({}<"{}"))", field.name, val));
+}
+
+template <>
+inline DBCondition operator>=(const Field& field, const char* val) {
+    return DBCondition(fmt::format(R"(({}>="{}"))", field.name, val));
+}
+
+template <>
+inline DBCondition operator<=(const Field& field, const char* val) {
     return DBCondition(fmt::format(R"(({}<="{}"))", field.name, val));
 }
 
