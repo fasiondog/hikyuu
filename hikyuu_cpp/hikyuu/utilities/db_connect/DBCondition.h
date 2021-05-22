@@ -76,31 +76,13 @@ struct Field {
         return DBCondition(fmt::format("({} in ({}))", name, fmt::join(vals, ",")));
     }
 
+    // linux下类成员函数模板特化必须放在类外实现
+    // 否则编译时会报：explicit specialization in non-namespace scope
     template <>
-    DBCondition in(const std::vector<std::string>& vals) {
-        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
-        std::ostringstream out;
-        out << "(" << name << " in (";
-        size_t total = vals.size();
-        for (size_t i = 0; i < total - 1; i++) {
-            out << "\"" << vals[i] << "\",";
-        }
-        out << "\"" << vals[total - 1] << "\"))";
-        return DBCondition(out.str());
-    }
+    DBCondition in(const std::vector<std::string>& vals);
 
     template <>
-    DBCondition in(const std::vector<const char*>& vals) {
-        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
-        std::ostringstream out;
-        out << "(" << name << " in (";
-        size_t total = vals.size();
-        for (size_t i = 0; i < total - 1; i++) {
-            out << "\"" << vals[i] << "\",";
-        }
-        out << "\"" << vals[total - 1] << "\"))";
-        return DBCondition(out.str());
-    }
+    DBCondition in(const std::vector<const char*>& vals);
 
     template <typename T>
     DBCondition not_in(const std::vector<T>& vals) {
@@ -109,30 +91,10 @@ struct Field {
     }
 
     template <>
-    DBCondition not_in(const std::vector<std::string>& vals) {
-        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
-        std::ostringstream out;
-        out << "(" << name << " not in (";
-        size_t total = vals.size();
-        for (size_t i = 0; i < total - 1; i++) {
-            out << "\"" << vals[i] << "\",";
-        }
-        out << "\"" << vals[total - 1] << "\"))";
-        return DBCondition(out.str());
-    }
+    DBCondition not_in(const std::vector<std::string>& vals);
 
     template <>
-    DBCondition not_in(const std::vector<const char*>& vals) {
-        HKU_CHECK(!vals.empty(), "input vals can't be empty!");
-        std::ostringstream out;
-        out << "(" << name << " not in (";
-        size_t total = vals.size();
-        for (size_t i = 0; i < total - 1; i++) {
-            out << "\"" << vals[i] << "\",";
-        }
-        out << "\"" << vals[total - 1] << "\"))";
-        return DBCondition(out.str());
-    }
+    DBCondition not_in(const std::vector<const char*>& vals);
 
     DBCondition like(const std::string& pattern) {
         return DBCondition(fmt::format(R"(({} like "{}"))", name, pattern));
@@ -144,6 +106,58 @@ struct Field {
 
     std::string name;
 };
+
+template <>
+DBCondition Field::in(const std::vector<std::string>& vals) {
+    HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+    std::ostringstream out;
+    out << "(" << name << " in (";
+    size_t total = vals.size();
+    for (size_t i = 0; i < total - 1; i++) {
+        out << "\"" << vals[i] << "\",";
+    }
+    out << "\"" << vals[total - 1] << "\"))";
+    return DBCondition(out.str());
+}
+
+template <>
+DBCondition Field::in(const std::vector<const char*>& vals) {
+    HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+    std::ostringstream out;
+    out << "(" << name << " in (";
+    size_t total = vals.size();
+    for (size_t i = 0; i < total - 1; i++) {
+        out << "\"" << vals[i] << "\",";
+    }
+    out << "\"" << vals[total - 1] << "\"))";
+    return DBCondition(out.str());
+}
+
+template <>
+DBCondition Field::not_in(const std::vector<std::string>& vals) {
+    HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+    std::ostringstream out;
+    out << "(" << name << " not in (";
+    size_t total = vals.size();
+    for (size_t i = 0; i < total - 1; i++) {
+        out << "\"" << vals[i] << "\",";
+    }
+    out << "\"" << vals[total - 1] << "\"))";
+    return DBCondition(out.str());
+}
+
+template <>
+DBCondition Field::not_in(const std::vector<const char*>& vals) {
+    HKU_CHECK(!vals.empty(), "input vals can't be empty!");
+    std::ostringstream out;
+    out << "(" << name << " not in (";
+    size_t total = vals.size();
+    for (size_t i = 0; i < total - 1; i++) {
+        out << "\"" << vals[i] << "\",";
+    }
+    out << "\"" << vals[total - 1] << "\"))";
+    return DBCondition(out.str());
+}
 
 inline std::ostream& operator<<(std::ostream& out, const DBCondition& d) {
     out << d.str();
