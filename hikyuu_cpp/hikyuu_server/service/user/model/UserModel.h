@@ -13,7 +13,7 @@
 namespace hku {
 
 class UserModel {
-    TABLE_BIND6(admin_user, user_id, name, password, start_time, end_time, status)
+    TABLE_BIND6(admin_user, userid, name, password, start_time, end_time, status)
 
     enum STATUS {
         NORMAL = 1,    // 正常用户
@@ -21,14 +21,14 @@ class UserModel {
     };
 
 public:
-    UserModel() : user_id(0), status(STATUS::NORMAL), end_time(Datetime::max().number()) {}
+    UserModel() : userid(0), status(STATUS::NORMAL), end_time(Datetime::max().number()) {}
 
     uint64_t getUserId() const {
-        return user_id;
+        return userid;
     }
 
     void setUserId(uint64_t id) {
-        user_id = id;
+        userid = id;
     }
 
     const std::string& getName() const {
@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    uint64_t user_id;      // 用户id
+    uint64_t userid;       // 用户id
     std::string name;      // 用户名
     std::string password;  // 用户密码
     uint64_t start_time;   // 用户创建时间，精确到分

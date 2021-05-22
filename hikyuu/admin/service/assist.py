@@ -22,4 +22,4 @@ class AssisService:
         except Exception as e:
             session.running = False
             logging.info("{}: {}".format(e.__class__.__name__, e))
-            return "stop", _translate("service", "failed connect!")
+            return "stop", str(e)

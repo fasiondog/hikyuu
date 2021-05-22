@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import logging
+import json
 from .restful import check_res, session_get, session_post, session_delete, session_put
 
 from data import SessionModel
@@ -8,8 +8,13 @@ from data import SessionModel
 
 class UserService:
     @staticmethod
-    def query_users(session: SessionModel):
-        r = session_get(session, "user", "user")
+    def query_users(session: SessionModel, userid: int=None, name: str=None):
+        data = {}
+        if userid:
+            data["userid"] = userid
+        if name:
+            data["name"] = name
+        r = session_get(session, "user", "user", params=data) if data else session_get(session, "user", "user")
         check_res(r)
         return r["data"]
 

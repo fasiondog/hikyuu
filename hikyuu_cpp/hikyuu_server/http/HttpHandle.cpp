@@ -26,6 +26,14 @@ void HttpHandle::operator()() {
         m_nng_req = (nng_http_req*)nng_aio_get_input(m_http_aio, 0);
         m_nng_conn = (nng_http_conn*)nng_aio_get_input(m_http_aio, 2);
 
+        const char* url = nng_http_req_get_uri(m_nng_req);
+        CLS_TRACE_IF(url, url);
+
+        char* data;
+        size_t len = 0;
+        getReqData((void**)&data, &len);
+        CLS_TRACE_IF(data, "{}", data);
+
         for (auto& filter : m_filters) {
             filter(this);
         }
@@ -53,20 +61,20 @@ void HttpHandle::operator()() {
     } catch (std::exception& e) {
         std::string errmsg(e.what());
         CLS_ERROR(errmsg);
-        CLS_TRACE("req data: {}", getReqData());
+        CLS_DEBUG("req data: {}", getReqData());
         unknown_error(errmsg);
 
     } catch (...) {
         std::string errmsg("Unknown error!");
         CLS_ERROR(errmsg);
-        CLS_TRACE("req data: {}", getReqData());
+        CLS_DEBUG("req data: {}", getReqData());
         unknown_error(errmsg);
     }
 }
 
 void HttpHandle::processJsonError(const nlohmann::json::exception& e) {
-    CLS_TRACE("HttpBadRequestError({}): {}", BadRequestErrorCode::INVALID_JSON_REQUEST, e.what());
-    CLS_TRACE("req data: {}", getReqData());
+    CLS_WARN("HttpBadRequestError({}): {}", BadRequestErrorCode::INVALID_JSON_REQUEST, e.what());
+    CLS_DEBUG("req data: {}", getReqData());
     nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
     nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_BAD_REQUEST);
     std::string errmsg(fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"{}"}})",

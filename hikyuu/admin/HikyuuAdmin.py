@@ -298,7 +298,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         if not session.running:
             self.server_view_dock.set_gray(item)
             QtWidgets.QMessageBox.warning(
-                self, _translate("MainWindow", "info"), _translate("MainWindow", "connection failed")
+                self, _translate("MainWindow", "info"),
+                "{}: {}".format(_translate("MainWindow", "connection failed"), msg)
             )
         else:
             self.server_view_dock.set_default(item)

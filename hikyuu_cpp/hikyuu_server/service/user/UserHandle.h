@@ -36,7 +36,7 @@ public:
     virtual void run() override {
         auto con = DB::getConnect();
         UserModel admin;
-        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        con->load(admin, fmt::format("userid={}", getCurrentUserId()));
         REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
                   _ctr("user", "No operation permission"));
 
@@ -81,7 +81,7 @@ class RemoveUserHandle : public RestHandle {
     virtual void run() override {
         auto con = DB::getConnect();
         UserModel admin;
-        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        con->load(admin, fmt::format("userid={}", getCurrentUserId()));
         REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
                   _ctr("user", "No operation permission"));
 
@@ -89,7 +89,7 @@ class RemoveUserHandle : public RestHandle {
         {
             UserModel user;
             TransAction trans(con);
-            con->load(user, fmt::format(R"(user_id="{}")", req["userid"].get<uint64_t>()));
+            con->load(user, fmt::format(R"(userid="{}")", req["userid"].get<uint64_t>()));
             if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
                 user.setEndTime(Datetime::now());
                 user.setStatus(UserModel::DELETED);
@@ -104,17 +104,22 @@ class QueryUserHandle : public RestHandle {
     virtual void run() override {
         auto con = DB::getConnect();
         UserModel admin;
-        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        con->load(admin, fmt::format("userid={}", getCurrentUserId()));
         REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
                   _ctr("user", "No operation permission"));
 
         DBCondition cond;
-        if (req.contains("userid")) {
-            cond = Field("userid") == req["userid"].get<uint16_t>();
-        }
+        QueryParams params;
+        if (getQueryParams(params)) {
+            auto iter = params.find("userid");
+            if (iter != params.end()) {
+                cond = Field("userid") == (uint64_t)std::stoll(iter->second);
+            }
 
-        if (req.contains("name")) {
-            cond = cond & Field("name") == req["name"].get<std::string>();
+            iter = params.find("name");
+            if (iter != params.end()) {
+                cond = cond & Field("name") == iter->second;
+            }
         }
 
         cond = (cond & Field("status") != UserModel::DELETED) + ASC("start_time");
@@ -138,7 +143,7 @@ class ResetPasswordUserHandle : public RestHandle {
     virtual void run() override {
         auto con = DB::getConnect();
         UserModel admin;
-        con->load(admin, fmt::format("user_id={}", getCurrentUserId()));
+        con->load(admin, fmt::format("userid={}", getCurrentUserId()));
         REQ_CHECK(admin.getName() == "admin", UserErrorCode::USER_NO_RIGHT,
                   _ctr("user", "No operation permission"));
 
@@ -146,7 +151,7 @@ class ResetPasswordUserHandle : public RestHandle {
         {
             UserModel user;
             TransAction trans(con);
-            con->load(user, fmt::format(R"(user_id="{}")", req["userid"].get<uint64_t>()));
+            con->load(user, fmt::format(R"(userid="{}")", req["userid"].get<uint64_t>()));
             if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
                 user.setPassword("123456");
                 con->save(user, false);

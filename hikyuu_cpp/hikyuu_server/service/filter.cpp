@@ -14,11 +14,11 @@
 
 namespace hku {
 
-std::string createToken(uint64_t user_id) {
+std::string createToken(uint64_t userid) {
     Datetime now = Datetime::now();
     srand((unsigned)now.minute());
     int k = rand() % 1000;
-    return base64_encode(fmt::format("{} {} {}", user_id, now, k), false);
+    return base64_encode(fmt::format("{} {} {}", userid, now, k), false);
 }
 
 void AuthorizeFilter(HttpHandle *handle) {
@@ -40,10 +40,10 @@ void AuthorizeFilter(HttpHandle *handle) {
         AUTHORIZE_CHECK(pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
 
         auto userid_str = decode_token.substr(0, pos);
-        uint64_t user_id = 0;
+        uint64_t userid = 0;
         Datetime create_time;
 
-        user_id = std::stoull(userid_str);
+        userid = std::stoull(userid_str);
         auto d_pos = decode_token.find_last_of(" ");
         AUTHORIZE_CHECK(d_pos != std::string::npos, AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
         create_time = Datetime(decode_token.substr(pos + 1, d_pos - pos));
@@ -65,10 +65,10 @@ void AuthorizeFilter(HttpHandle *handle) {
         }
 
         RestHandle *rest_handle = dynamic_cast<RestHandle *>(handle);
-        rest_handle->setCurrentUserId(user_id);
+        rest_handle->setCurrentUserId(userid);
 
         if (expired_time - now <= TimeDelta(3)) {
-            std::string new_token = createToken(user_id);
+            std::string new_token = createToken(userid);
             TokenModel token_record;
             token_record.setToken(new_token);
             DB::getConnect()->save(token_record);

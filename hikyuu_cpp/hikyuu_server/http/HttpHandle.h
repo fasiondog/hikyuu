@@ -174,8 +174,8 @@ public:                      \
 
 template <class Error>
 void HttpHandle::processHttpError(const Error &e) {
-    CLS_TRACE("{}({}): {}", Error::name(), e.errcode(), e.what());
-    CLS_TRACE("req data: {}", getReqData());
+    CLS_WARN("{}({}): {}", Error::name(), e.errcode(), e.what());
+    CLS_DEBUG("req data: {}", getReqData());
     nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
     nng_http_res_set_status(m_nng_res, e.status());
     nng_http_res_set_reason(m_nng_res, e.msg().c_str());
@@ -186,8 +186,8 @@ void HttpHandle::processHttpError(const Error &e) {
 
 template <>
 inline void HttpHandle::processHttpError<HttpError>(const HttpError &e) {
-    CLS_TRACE("HttpError: {}", e.what());
-    CLS_TRACE("req data: {}", getReqData());
+    CLS_WARN("HttpError: {}", e.what());
+    CLS_DEBUG("req data: {}", getReqData());
     nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
     nng_http_res_set_status(m_nng_res, e.status());
     nng_http_res_set_reason(m_nng_res, e.msg().c_str());

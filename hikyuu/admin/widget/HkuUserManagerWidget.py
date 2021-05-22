@@ -20,6 +20,12 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
     ):
         super(HkuUserManagerWidget, self).__init__(parent)
         self.session = session
+        self.head = ['userid', 'name', 'start_time']
+        self.head_tr = [
+            _translate("UserManage", "userid"),
+            _translate("UserManage", "name"),
+            _translate("UserManage", "start_time")
+        ]
         self.setupUi(self)
         self.remove_pushButton.setEnabled(False)
         self.reset_password_pushButton.setEnabled(False)
@@ -32,15 +38,31 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
             self.reset_password_pushButton.setEnabled(True)
 
     @QtCore.pyqtSlot()
+    def on_query_pushButton_clicked(self):
+        userid = self.userid_lineEdit.text()
+        if userid:
+            try:
+                userid = int(self.userid_lineEdit.text())
+            except:
+                self.rest_data_model = RestDataTableModel(self.head, self.head_tr, [])
+                self.users_tableView.setModel(self.rest_data_model)
+                return
+        name = self.name_lineEdit.text()
+        try:
+            data = RestDataTableModel(self.head, self.head_tr, UserService.query_users(self.session, userid, name))
+            self.rest_data_model = data
+            self.users_tableView.setModel(self.rest_data_model)
+        except Exception as e:
+            logging.error(e)
+            self.add_user_pushButton.setEnabled(False)
+            QtWidgets.QMessageBox.warning(
+                self, _translate("MainWindow", "error"), "{}: {}".format(e.__class__.__name__, e)
+            )
+
+    @QtCore.pyqtSlot()
     def on_refresh_pushButton_clicked(self):
         try:
-            data = RestDataTableModel(
-                ['userid', 'name', 'start_time'], [
-                    _translate("UserManage", "userid"),
-                    _translate("UserManage", "name"),
-                    _translate("UserManage", "start_time")
-                ], UserService.query_users(self.session)
-            )
+            data = RestDataTableModel(self.head, self.head_tr, UserService.query_users(self.session))
             self.rest_data_model = data
             self.users_tableView.setModel(self.rest_data_model)
             # self.users_tableView.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)

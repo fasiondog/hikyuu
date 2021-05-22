@@ -81,11 +81,11 @@ public:
     }
 
     void setCurrentUserId(uint64_t userid) {
-        m_user_id = userid;
+        m_userid = userid;
     }
 
     uint64_t getCurrentUserId() const {
-        return m_user_id;
+        return m_userid;
     }
 
     void setUpdateToken(const std::string &token) {
@@ -93,7 +93,7 @@ public:
     }
 
 private:
-    uint64_t m_user_id;
+    uint64_t m_userid;
     std::string m_update_token;
 };
 

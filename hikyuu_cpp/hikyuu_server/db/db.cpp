@@ -16,7 +16,7 @@ namespace hku {
 std::unique_ptr<ConnectPool<SQLiteConnect>> DB::ms_sqlite_pool;
 std::unique_ptr<ConnectPool<MySQLConnect>> DB::ms_mysql_pool;
 
-DB::snowflake_t DB::ms_user_id_generator;
+DB::snowflake_t DB::ms_userid_generator;
 DB::snowflake_t DB::ms_td_id_generator;
 DB::snowflake_t DB::ms_sta_id_generator;
 
@@ -25,7 +25,7 @@ void DB::init(const std::string& config_file) {
         return;
     }
 
-    ms_user_id_generator.init(1, 1);
+    ms_userid_generator.init(1, 1);
     ms_td_id_generator.init(1, 1);
     ms_sta_id_generator.init(1, 1);
 

@@ -87,8 +87,11 @@ def login(session: SessionModel):
     url = getserviceUrl(session.host, session.port, "user", "login")
     headers = defaultRequestHeader()
     res = post(url, headers=headers, json={"user": session.user, "password": session.password})
-    session.token = res["token"]
-    session.userid = res["userid"]
+    if res["result"]:
+        session.token = res["token"]
+        session.userid = res["userid"]
+    else:
+        raise RestfulError(res)
     return session
 
 

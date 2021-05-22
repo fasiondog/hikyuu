@@ -34,7 +34,7 @@ public:
     }
 
     static int64_t getNewUserId() {
-        return ms_user_id_generator.nextid();
+        return ms_userid_generator.nextid();
     }
 
     static int64_t getNewTdId() {
@@ -55,7 +55,7 @@ private:
     static std::unique_ptr<ConnectPool<MySQLConnect>> ms_mysql_pool;
 
     using snowflake_t = snowflake<1618243200000L, std::mutex>;
-    static snowflake_t ms_user_id_generator;
+    static snowflake_t ms_userid_generator;
     static snowflake_t ms_td_id_generator;
     static snowflake_t ms_sta_id_generator;
 };

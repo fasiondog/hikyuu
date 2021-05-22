@@ -65,7 +65,7 @@ class LoginHandle : public NoAuthRestHandle {
 
         TokenModel token;
         {
-            con->load(token, fmt::format(R"(user_id={})", user.getUserId()));
+            con->load(token, fmt::format(R"(userid={})", user.getUserId()));
             if (token.id() == 0) {
                 token.setUserId(user.getUserId());
             }
