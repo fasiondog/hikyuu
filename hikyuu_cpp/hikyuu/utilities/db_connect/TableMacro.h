@@ -40,11 +40,6 @@ public:                                                            \
     static const char* getSelectSQL() {                            \
         return "select `id`,`" #f1 "` from `" #table "`";          \
     }                                                              \
-    std::string getDeleteSQL() const {                             \
-        std::ostringstream buf;                                    \
-        buf << "delete from `" #table "` where id=" << id();       \
-        return buf.str();                                          \
-    }                                                              \
     void save(const SQLStatementPtr& st) const {                   \
         st->bind(0, f1);                                           \
     }                                                              \
@@ -78,11 +73,6 @@ public:                                                                        \
     static const char* getSelectSQL() {                                        \
         return "select `id`,`" #f1 "`,`" #f2 "` from `" #table "`";            \
     }                                                                          \
-    std::string getDeleteSQL() const {                                         \
-        std::ostringstream buf;                                                \
-        buf << "delete from `" #table "` where id=" << id();                   \
-        return buf.str();                                                      \
-    }                                                                          \
     void save(const SQLStatementPtr& st) const {                               \
         st->bind(0, f1, f2);                                                   \
     }                                                                          \
@@ -115,11 +105,6 @@ public:                                                                         
     }                                                                                      \
     static const char* getSelectSQL() {                                                    \
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "` from `" #table "`";              \
-    }                                                                                      \
-    std::string getDeleteSQL() const {                                                     \
-        std::ostringstream buf;                                                            \
-        buf << "delete from `" #table "` where id=" << id();                               \
-        return buf.str();                                                                  \
     }                                                                                      \
     void save(const SQLStatementPtr& st) const {                                           \
         st->bind(0, f1, f2, f3);                                                           \
@@ -156,11 +141,6 @@ public:                                                                         
     static const char* getSelectSQL() {                                                 \
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "` from `" #table "`"; \
     }                                                                                   \
-    std::string getDeleteSQL() const {                                                  \
-        std::ostringstream buf;                                                         \
-        buf << "delete from `" #table "` where id=" << id();                            \
-        return buf.str();                                                               \
-    }                                                                                   \
     void save(const SQLStatementPtr& st) const {                                        \
         st->bind(0, f1, f2, f3, f4);                                                    \
     }                                                                                   \
@@ -195,11 +175,6 @@ public:                                                                         
     }                                                                                             \
     static const char* getSelectSQL() {                                                           \
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "` from `" #table "`"; \
-    }                                                                                             \
-    std::string getDeleteSQL() const {                                                            \
-        std::ostringstream buf;                                                                   \
-        buf << "delete from `" #table "` where id=" << id();                                      \
-        return buf.str();                                                                         \
     }                                                                                             \
     void save(const SQLStatementPtr& st) const {                                                  \
         st->bind(0, f1, f2, f3, f4, f5);                                                          \
@@ -237,11 +212,6 @@ public:                                                                         
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6               \
                "` from `" #table "`";                                                              \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6);                                                       \
     }                                                                                              \
@@ -277,11 +247,6 @@ public:                                                                         
     static const char* getSelectSQL() {                                                            \
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "` from `" #table "`";                                                              \
-    }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
     }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7);                                                   \
@@ -319,11 +284,6 @@ public:                                                                         
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "` from `" #table "`";                                                    \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8);                                               \
     }                                                                                              \
@@ -360,11 +320,6 @@ public:                                                                         
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "`,`" #f9 "` from `" #table "`";                                          \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9);                                           \
     }                                                                                              \
@@ -400,11 +355,6 @@ public:                                                                         
     static const char* getSelectSQL() {                                                            \
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "` from `" #table "`";                               \
-    }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
     }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10);                                      \
@@ -444,11 +394,6 @@ public:                                                                         
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "` from `" #table "`";                    \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11);                                 \
     }                                                                                              \
@@ -486,11 +431,6 @@ public:                                                                         
     static const char* getSelectSQL() {                                                            \
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "` from `" #table "`";         \
-    }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
     }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12);                            \
@@ -531,11 +471,6 @@ public:                                                                         
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "` from `" #table   \
                "`";                                                                                \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13);                       \
     }                                                                                              \
@@ -574,11 +509,6 @@ public:                                                                         
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "`,`" #f14          \
                "` from `" #table "`";                                                              \
-    }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
     }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14);                  \
@@ -619,11 +549,6 @@ public:                                                                         
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "`,`" #f14          \
                "`,`" #f15 "` from `" #table "`";                                                   \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15);             \
     }                                                                                              \
@@ -663,11 +588,6 @@ public:                                                                         
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "`,`" #f14          \
                "`,`" #f15 "`,`" #f16 "` from `" #table "`";                                        \
-    }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
     }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16);        \
@@ -712,11 +632,6 @@ public:                                                                         
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "`,`" #f14          \
                "`,`" #f15 "`,`" #f16 "`,`" #f17 "` from `" #table "`";                             \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17);   \
     }                                                                                              \
@@ -760,11 +675,6 @@ public:                                                                         
         return "select `id`,`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 "`,`" #f7     \
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "`,`" #f14          \
                "`,`" #f15 "`,`" #f16 "`,`" #f17 "`,`" #f18 "` from `" #table "`";                  \
-    }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
     }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,    \
@@ -811,11 +721,6 @@ public:                                                                         
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "`,`" #f14          \
                "`,`" #f15 "`,`" #f16 "`,`" #f17 "`,`" #f18 "`,`" #f19 "` from `" #table "`";       \
     }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
-    }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,    \
                  f18, f19);                                                                        \
@@ -861,11 +766,6 @@ public:                                                                         
                "`,`" #f8 "`,`" #f9 "`,`" #f10 "`,`" #f11 "`,`" #f12 "`,`" #f13 "`,`" #f14          \
                "`,`" #f15 "`,`" #f16 "`,`" #f17 "`,`" #f18 "`,`" #f19 "`,`" #f20 "` from `" #table \
                "`";                                                                                \
-    }                                                                                              \
-    std::string getDeleteSQL() const {                                                             \
-        std::ostringstream buf;                                                                    \
-        buf << "delete from `" #table "` where id=" << id();                                       \
-        return buf.str();                                                                          \
     }                                                                                              \
     void save(const SQLStatementPtr& st) const {                                                   \
         st->bind(0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17,    \

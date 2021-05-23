@@ -33,9 +33,20 @@ struct DESC {
 
 class HKU_API DBCondition {
 public:
-    DBCondition() {}
+    DBCondition() = default;
+    DBCondition(const DBCondition&) = default;
+    DBCondition(DBCondition&& rv) : m_condition(std::move(rv.m_condition)) {}
 
-    DBCondition(const std::string& cond) : m_condition(cond) {}
+    explicit DBCondition(const char* cond) : m_condition(cond) {}
+    explicit DBCondition(const std::string& cond) : m_condition(cond) {}
+
+    DBCondition& operator=(const DBCondition&) = default;
+    DBCondition& operator=(DBCondition&& rv) {
+        if (this != &rv) {
+            m_condition = std::move(rv.m_condition);
+        }
+        return *this;
+    }
 
     DBCondition& operator&(const DBCondition& other);
     DBCondition& operator|(const DBCondition& other);
