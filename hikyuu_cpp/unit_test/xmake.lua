@@ -92,5 +92,4 @@ target("small-test")
     -- add files
     add_files("./hikyuu/hikyuu/**.cpp");
     add_files("./hikyuu/test_main.cpp")
-    add_files("./hikyuu/utilities/db_connect/test_DBCondition.cpp")
 target_end()

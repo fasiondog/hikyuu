@@ -206,41 +206,6 @@ inline DBCondition operator<=(const Field& field, T val) {
 }
 
 template <>
-inline DBCondition operator==(const Field& field, const std::string& val) {
-    return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
-}
-
-template <>
-inline DBCondition operator!=(const Field& field, const std::string& val) {
-    return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
-}
-
-template <>
-inline DBCondition operator>(const Field& field, const std::string& val) {
-    return DBCondition(fmt::format(R"(({}>"{}"))", field.name, val));
-}
-
-template <>
-inline DBCondition operator<(const Field& field, const std::string& val) {
-    return DBCondition(fmt::format(R"(({}<"{}"))", field.name, val));
-}
-
-template <>
-inline DBCondition operator>=(const Field& field, const std::string& val) {
-    return DBCondition(fmt::format(R"(({}>="{}"))", field.name, val));
-}
-
-template <>
-inline DBCondition operator<=(const Field& field, const std::string& val) {
-    return DBCondition(fmt::format(R"(({}<="{}"))", field.name, val));
-}
-
-template <>
-inline DBCondition operator==(const Field& field, const char* val) {
-    return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
-}
-
-template <>
 inline DBCondition operator!=(const Field& field, const char* val) {
     return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
 }
@@ -263,6 +228,34 @@ inline DBCondition operator>=(const Field& field, const char* val) {
 template <>
 inline DBCondition operator<=(const Field& field, const char* val) {
     return DBCondition(fmt::format(R"(({}<="{}"))", field.name, val));
+}
+
+inline DBCondition operator==(const Field& field, const std::string& val) {
+    return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
+}
+
+inline DBCondition operator!=(const Field& field, const std::string& val) {
+    return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
+}
+
+inline DBCondition operator>(const Field& field, const std::string& val) {
+    return DBCondition(fmt::format(R"(({}>"{}"))", field.name, val));
+}
+
+inline DBCondition operator<(const Field& field, const std::string& val) {
+    return DBCondition(fmt::format(R"(({}<"{}"))", field.name, val));
+}
+
+inline DBCondition operator>=(const Field& field, const std::string& val) {
+    return DBCondition(fmt::format(R"(({}>="{}"))", field.name, val));
+}
+
+inline DBCondition operator<=(const Field& field, const std::string& val) {
+    return DBCondition(fmt::format(R"(({}<="{}"))", field.name, val));
+}
+
+inline DBCondition operator==(const Field& field, const char* val) {
+    return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
 }
 
 }  // namespace hku

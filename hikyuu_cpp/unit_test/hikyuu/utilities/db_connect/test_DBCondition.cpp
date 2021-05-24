@@ -33,6 +33,26 @@ TEST_CASE("test_DBCondition") {
 
     CHECK_EQ(Field("name").like("*test").str(), R"((name like "*test"))");
 
+    d = Field("name") == std::string("test");
+    CHECK_EQ(d.str(), R"((name="test"))");
+
+    d = Field("name") != std::string("test");
+    CHECK_EQ(d.str(), R"((name<>"test"))");
+
+    d = Field("name") >= std::string("test");
+    CHECK_EQ(d.str(), R"((name>="test"))");
+
+    d = Field("name") <= std::string("test");
+    CHECK_EQ(d.str(), R"((name<="test"))");
+
+    d = Field("name") > std::string("test");
+    CHECK_EQ(d.str(), R"((name>"test"))");
+
+    d = Field("name") < std::string("test");
+    CHECK_EQ(d.str(), R"((name<"test"))");
+
+    CHECK_EQ(Field("name").like("*test").str(), R"((name like "*test"))");
+
     d = Field("name").in(std::vector<std::string>({"1", "2", "3"}));
     CHECK_EQ(d.str(), R"((name in ("1","2","3")))");
 
