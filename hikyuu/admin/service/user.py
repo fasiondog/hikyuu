@@ -16,7 +16,8 @@ class UserService:
             data["name"] = name
         r = session_get(session, "user", "user", params=data) if data else session_get(session, "user", "user")
         check_res(r)
-        return r["data"]
+        data = r["data"]
+        return data if data is not None else []
 
     @staticmethod
     def add_user(session: SessionModel, name: str, password: str):

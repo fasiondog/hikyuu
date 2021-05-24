@@ -166,6 +166,21 @@ protected:
     nng_http_req *m_nng_req{nullptr};
     nng_http_conn *m_nng_conn{nullptr};
     std::vector<std::function<void(HttpHandle *)>> m_filters;
+
+public:
+    static bool enableTrace() {
+        return ms_enable_trace;
+    }
+
+    static void enableTrace(bool enable) {
+        ms_enable_trace = enable;
+    }
+
+    void trace();
+
+private:
+    // 是否跟踪请求打印
+    inline static std::atomic_bool ms_enable_trace = false;
 };
 
 #define HTTP_HANDLE_IMP(cls) \
@@ -175,7 +190,6 @@ public:                      \
 template <class Error>
 void HttpHandle::processHttpError(const Error &e) {
     CLS_WARN("{}({}): {}", Error::name(), e.errcode(), e.what());
-    CLS_DEBUG("req data: {}", getReqData());
     nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
     nng_http_res_set_status(m_nng_res, e.status());
     nng_http_res_set_reason(m_nng_res, e.msg().c_str());
@@ -187,7 +201,6 @@ void HttpHandle::processHttpError(const Error &e) {
 template <>
 inline void HttpHandle::processHttpError<HttpError>(const HttpError &e) {
     CLS_WARN("HttpError: {}", e.what());
-    CLS_DEBUG("req data: {}", getReqData());
     nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
     nng_http_res_set_status(m_nng_res, e.status());
     nng_http_res_set_reason(m_nng_res, e.msg().c_str());

@@ -91,6 +91,12 @@ class RemoveUserHandle : public RestHandle {
             TransAction trans(con);
             con->load(user, fmt::format(R"(userid="{}")", req["userid"].get<uint64_t>()));
             if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
+                TokenModel tm;
+                con->load(tm, DBCondition(Field("userid") == user.getUserId()));
+                if (tm.id() != 0) {
+                    con->remove(tm, false);
+                    TokenCache::remove(tm.getToken());
+                }
                 user.setEndTime(Datetime::now());
                 user.setStatus(UserModel::DELETED);
                 con->save(user, false);

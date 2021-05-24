@@ -57,7 +57,8 @@ class LoginHandle : public NoAuthRestHandle {
         check_missing_param("password");
         UserModel user;
         auto con = DB::getConnect();
-        con->load(user, fmt::format(R"(name="{}")", req["user"].get<std::string>()));
+        con->load(user, DBCondition(Field("name") == std::string(req["user"].get<std::string>()) &
+                                    Field("status") != UserModel::DELETED));
         REQ_CHECK(user.id() != 0, UserErrorCode::USER_NOT_EXIST,
                   _ctr("user", "User does not exist"));
         REQ_CHECK(user.getPassword() == req["password"].get<std::string>(),

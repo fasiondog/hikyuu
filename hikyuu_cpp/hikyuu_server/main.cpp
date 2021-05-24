@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
     LOG_INFO("start server ... You can press Ctrl-C stop");
 
     HttpServer server("http://*", 9001);
+    HttpHandle::enableTrace(true);
 
     try {
         DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
