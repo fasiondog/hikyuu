@@ -37,6 +37,19 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
         if not self.reset_password_pushButton.isEnabled():
             self.reset_password_pushButton.setEnabled(True)
 
+    def keyPressEvent(self, event):
+        # ctrl-c 负责选中的单元格
+        if event.modifiers() == QtCore.Qt.ControlModifier and event.key() == QtCore.Qt.Key_C:
+            indexes = self.users_tableView.selectedIndexes()
+            for index in indexes:
+                QtWidgets.qApp.clipboard().setText(str(self.rest_data_model.data(index, QtCore.Qt.DisplayRole)))
+
+    @QtCore.pyqtSlot()
+    def on_reset_pushButton_clicked(self):
+        # 重置查询条件
+        self.userid_lineEdit.setText(None)
+        self.name_lineEdit.setText(None)
+
     @QtCore.pyqtSlot()
     def on_query_pushButton_clicked(self):
         userid = self.userid_lineEdit.text()
@@ -94,44 +107,42 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
 
     @QtCore.pyqtSlot()
     def on_remove_pushButton_clicked(self):
-        selected = self.users_tableView.selectionModel()
-        if selected:
-            indexes = selected.selectedRows()
-            for index in indexes:
-                try:
-                    userid_index = self.rest_data_model.index(index.row(), 0, QtCore.QModelIndex())
-                    userid = self.rest_data_model.data(userid_index, QtCore.Qt.DisplayRole)
-                    name_index = self.rest_data_model.index(index.row(), 1, QtCore.QModelIndex())
-                    name = self.rest_data_model.data(name_index, QtCore.Qt.DisplayRole)
-                    r = QtWidgets.QMessageBox.information(
-                        self, _translate("UserManage", "Confirm"),
-                        _translate("UserManage", "Are you sure to remove the user ({})?").format(name),
-                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
-                    )
-                    if r == QtWidgets.QMessageBox.No:
-                        return
-                    r = UserService.remove_user(self.session, userid)
-                except Exception as e:
-                    QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), str(e))
+        indexes = self.users_tableView.selectedIndexes()
+        for index in indexes:
+            row = self.rest_data_model.row(index)
+            if row is None:
+                continue
+            try:
+                userid, name = row["userid"], row["name"]
+                if name == "admin":
+                    raise Exception(_translate("UserManage", "The admin count can't to be deleted"))
+                r = QtWidgets.QMessageBox.information(
+                    self, _translate("UserManage", "Confirm"),
+                    _translate("UserManage", "Are you sure to remove the user ({})?").format(name),
+                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+                )
+                if r == QtWidgets.QMessageBox.No:
                     return
-                self.rest_data_model.removeRows(index.row(), 1, QtCore.QModelIndex())
+                r = UserService.remove_user(self.session, userid)
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), str(e))
+                return
+            self.rest_data_model.removeRows(index.row(), 1, QtCore.QModelIndex())
 
     @QtCore.pyqtSlot()
     def on_reset_password_pushButton_clicked(self):
-        selected = self.users_tableView.selectionModel()
-        if selected:
-            indexes = selected.selectedRows()
-            for index in indexes:
-                try:
-                    userid_index = self.rest_data_model.index(index.row(), 0, QtCore.QModelIndex())
-                    userid = self.rest_data_model.data(userid_index, QtCore.Qt.DisplayRole)
-                    name_index = self.rest_data_model.index(index.row(), 1, QtCore.QModelIndex())
-                    name = self.rest_data_model.data(name_index, QtCore.Qt.DisplayRole)
-                    r = UserService.reset_password(self.session, userid)
-                    QtWidgets.QMessageBox.about(
-                        self, _translate("UserManage", "info"),
-                        _translate("UserManage", "The password of user ({}) had be reset to 123456").format(name)
-                    )
-                except Exception as e:
-                    QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), str(e))
-                    return
+        indexes = self.users_tableView.selectedIndexes()
+        for index in indexes:
+            row = self.rest_data_model.row(index)
+            if row is None:
+                continue
+            try:
+                userid, name = row["userid"], row["name"]
+                r = UserService.reset_password(self.session, userid)
+                QtWidgets.QMessageBox.about(
+                    self, _translate("UserManage", "info"),
+                    _translate("UserManage", "The password of user ({}) had be reset to 123456").format(name)
+                )
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), str(e))
+                return

@@ -67,7 +67,7 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         for i in range(item.childCount()):
             self.set_default(item.child(i))
 
-    def on_tree_itemClicked(self, item, column):
+    def on_tree_itemClicked(self, item: QtWidgets.QTreeWidgetItem, column):
         data = item.data(0, QtCore.Qt.UserRole)
         if data is not None:
             # 一级节点，使能会话编辑与移除菜单
@@ -83,7 +83,13 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
 
         session = item.parent().data(0, QtCore.Qt.UserRole)
         if session.name == "admin":
-            self.user_manage_trigger.emit(session)
+            item_text = item.text(0)
+            if item_text == _translate("HkuSessionViewWidget", "person info"):
+                print(item.text(0))
+            elif item_text == _translate("HkuSessionViewWidget", "users manage"):
+                self.user_manage_trigger.emit(session)
+            else:
+                pass
 
     def on_tree_customContextMenuRequested(self, pos):
         item = self.tree.itemAt(pos)
@@ -97,14 +103,17 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         item.setData(0, QtCore.Qt.UserRole, session)
         if (session.name == "admin"):
             subitem = QtWidgets.QTreeWidgetItem(item)
-            subitem.setText(0, _translate("HkuSessionViewWidget", "users"))
+            subitem.setText(0, _translate("HkuSessionViewWidget", "person info"))
+            subitem = QtWidgets.QTreeWidgetItem(item)
+            subitem.setText(0, _translate("HkuSessionViewWidget", "users manage"))
         else:
+            info = _translate("HkuSessionViewWidget", "person info")
             account = _translate("HkuSessionViewWidget", "account")
             funds = _translate("HkuSessionViewWidget", "funds")
             positons = _translate("HkuSessionViewWidget", "positions")
             orders = _translate("HkuSessionViewWidget", "orders")
             fills = _translate("HkuSessionViewWidget", "fills")
-            names = [account, funds, positons, orders, fills]
+            names = [info, account, funds, positons, orders, fills]
             for name in names:
                 subitem = QtWidgets.QTreeWidgetItem(item)
                 subitem.setText(0, name)

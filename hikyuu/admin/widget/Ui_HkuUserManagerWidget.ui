@@ -118,6 +118,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="reset_pushButton">
+         <property name="text">
+          <string>Reset</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -151,7 +158,7 @@
         <enum>QAbstractItemView::SingleSelection</enum>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
+        <enum>QAbstractItemView::SelectItems</enum>
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>

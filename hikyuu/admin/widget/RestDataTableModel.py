@@ -32,6 +32,11 @@ class RestDataTableModel(QtCore.QAbstractTableModel):
             return record[self.rest_head[index.column()]]
         return None
 
+    def row(self, index: QtCore.QModelIndex):
+        if not index.isValid() or index.row() >= len(self.rest_data) or index.row() < 0:
+            return None
+        return self.rest_data[index.row()]
+
     def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: int):
         if role != QtCore.Qt.DisplayRole:
             return None
