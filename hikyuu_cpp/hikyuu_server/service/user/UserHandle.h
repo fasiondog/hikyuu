@@ -86,6 +86,9 @@ class RemoveUserHandle : public RestHandle {
                   _ctr("user", "No operation permission"));
 
         check_missing_param("userid");
+        uint64_t userid = req["userid"].get<uint64_t>();
+        REQ_CHECK(userid != admin.getUserId(), UserErrorCode::USER_TRY_DELETE_ADMIN,
+                  _ctr("user", "The admin account cannot be deleted"));
         {
             UserModel user;
             TransAction trans(con);

@@ -75,17 +75,25 @@ void HttpHandle::trace() {
         buf << "url: null" << std::endl;
     }
 
+    buf << "    method: ";
+    const char* method = nng_http_req_get_method(m_nng_req);
+    if (method) {
+        buf << method << std::endl;
+    } else {
+        buf << "unknonw" << std::endl;
+    }
+
     char* data;
     size_t len = 0;
     getReqData((void**)&data, &len);
-    buf << "    request: ";
+    buf << "    req: ";
     if (data) {
         buf << data << std::endl;
     } else {
         buf << "null" << std::endl;
     }
 
-    buf << "    response: ";
+    buf << "    res: ";
     nng_http_res_get_data(m_nng_res, (void**)&data, &len);
     if (data) {
         buf << data << std::endl;
