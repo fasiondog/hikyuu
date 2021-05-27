@@ -6,13 +6,20 @@ from .HkuCheckServerStatusThread import HkuCheckServerStatusThread
 
 from translate import _translate
 from data import SessionModel
+from .HkuPersonInfoWidget import HkuPersonInfoWidget
+from .HkuUserManagerWidget import HkuUserManagerWidget
 
 
 class HkuSessionViewWidget(QtWidgets.QDockWidget):
     status_changed = QtCore.pyqtSignal()
 
+    # 个人信息信号
+    person_info_trigger = QtCore.pyqtSignal(SessionModel, object)
+    open_tab_tigger = QtCore.pyqtSignal(SessionModel, object)
+
     # 用户管理信号
     user_manage_trigger = QtCore.pyqtSignal(SessionModel)
+
 
     def __init__(self, parent):
         super(HkuSessionViewWidget, self).__init__(parent)
@@ -85,9 +92,11 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         if session.name == "admin":
             item_text = item.text(0)
             if item_text == _translate("HkuSessionViewWidget", "person info"):
-                print(item.text(0))
+                #self.person_info_trigger.emit(session, HkuPersonInfoWidget)
+                self.open_tab_tigger.emit(session, HkuPersonInfoWidget)
             elif item_text == _translate("HkuSessionViewWidget", "users manage"):
-                self.user_manage_trigger.emit(session)
+                #self.user_manage_trigger.emit(session)
+                self.open_tab_tigger.emit(session, HkuUserManagerWidget)
             else:
                 pass
 

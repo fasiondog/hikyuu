@@ -11,23 +11,23 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(400, 300)
-        self.formLayout_2 = QtWidgets.QFormLayout(Form)
+class Ui_PersonInfoForm(object):
+    def setupUi(self, PersonInfoForm):
+        PersonInfoForm.setObjectName("PersonInfoForm")
+        PersonInfoForm.resize(400, 300)
+        self.formLayout_2 = QtWidgets.QFormLayout(PersonInfoForm)
         self.formLayout_2.setObjectName("formLayout_2")
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setObjectName("formLayout")
-        self.pushButton = QtWidgets.QPushButton(Form)
-        self.pushButton.setObjectName("pushButton")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.pushButton)
+        self.change_password_pushButton = QtWidgets.QPushButton(PersonInfoForm)
+        self.change_password_pushButton.setObjectName("change_password_pushButton")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.change_password_pushButton)
         self.formLayout_2.setLayout(0, QtWidgets.QFormLayout.LabelRole, self.formLayout)
 
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        self.retranslateUi(PersonInfoForm)
+        QtCore.QMetaObject.connectSlotsByName(PersonInfoForm)
 
-    def retranslateUi(self, Form):
+    def retranslateUi(self, PersonInfoForm):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.pushButton.setText(_translate("Form", "Change Password"))
+        PersonInfoForm.setWindowTitle(_translate("PersonInfoForm", "Form"))
+        self.change_password_pushButton.setText(_translate("PersonInfoForm", "Change Password"))

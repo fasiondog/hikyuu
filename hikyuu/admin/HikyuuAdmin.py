@@ -41,7 +41,6 @@ import qdarkstyle
 
 from UiConfig import UiConfig
 from translate import _translate
-from widget.HkuSessionViewWidget import HkuSessionViewWidget
 from dialog import *
 from widget import *
 from data import (get_local_db, SessionModel)
@@ -202,7 +201,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.main_tab.setTabsClosable(True)
         self.main_tab.tabCloseRequested.connect(self.closeTab)
 
-        self.tab_title_user_manage = _translate("MainWindow", "User Manage")
+        # 保存打开过的 tab，防止重复打开
         self.tabs = {}
 
     def initDockWidgets(self):
@@ -218,7 +217,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         for server in servers:
             server.running = False  # SQLalchemy query 出来的对象并没有添加非数据库外的属性，此处手工添加保护
             self.server_view_dock.addSession(server)
-        self.server_view_dock.user_manage_trigger.connect(self.openUserManageTab)
+        self.server_view_dock.open_tab_tigger.connect(self.openTab)
 
     def actionAbout(self):
         msg = _translate(
@@ -310,9 +309,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.main_tab.removeTab(index)
         self.tabs[title] = None
 
-    def openUserManageTab(self, session):
-        """用户管理"""
-        title = "{}({})".format(self.tab_title_user_manage, session.name)
+    def openTab(self, session, widget):
+        title = "{}({})".format(widget.title(), session.name)
         if title not in self.tabs or self.tabs[title] is None:
             if not session.running:
                 QtWidgets.QMessageBox.warning(
@@ -320,9 +318,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
                     _translate("MainWindow", "The server is disconnected. Please connect first!")
                 )
             else:
-                tab = HkuUserManagerWidget(session, self.main_tab)
+                tab = widget(session, self.main_tab)
                 self.main_tab.addTab(tab, title)
                 self.tabs[title] = tab
+        else:
+            self.main_tab.setCurrentWidget(self.tabs[title])
 
 
 def main_core():

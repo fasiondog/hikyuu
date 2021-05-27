@@ -13,6 +13,11 @@ from .RestDataTableModel import RestDataTableModel
 
 
 class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
+    @classmethod
+    def title(cls):
+        # 用类属性无法获取翻译字符串，只能用类方法或静态方法
+        return _translate("UserManage", "User Manage")
+
     def __init__(
         self,
         session: SessionModel,
