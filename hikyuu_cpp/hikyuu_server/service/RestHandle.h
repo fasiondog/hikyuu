@@ -8,6 +8,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <string_view>
 #include "http/HttpHandle.h"
 #include "db/db.h"  // 这里统一引入
 #include "RestErrorCode.h"
@@ -38,7 +39,7 @@ public:
     }
 
 protected:
-    void check_missing_param(const char *param) {
+    void check_missing_param(std::string_view param) {
         if (!req.contains(param)) {
             throw HttpBadRequestError(BadRequestErrorCode::MISS_PARAMETER,
                                       fmt::format(R"(Missing param "{}")", param));
@@ -88,7 +89,7 @@ public:
         return m_userid;
     }
 
-    void setUpdateToken(const std::string &token) {
+    void setUpdateToken(std::string_view token) {
         m_update_token = token;
     }
 
