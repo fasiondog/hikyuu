@@ -5,6 +5,7 @@ from PyQt5 import QtWidgets, QtCore
 from data import SessionModel
 from service import UserService
 from translate import _translate
+from dialog import HkuChangePasswordDialog
 from .Ui_HkuPersonInfoWidget import Ui_PersonInfoForm
 
 
@@ -20,4 +21,6 @@ class HkuPersonInfoWidget(QtWidgets.QWidget, Ui_PersonInfoForm):
 
     @QtCore.pyqtSlot()
     def on_change_password_pushButton_clicked(self):
-        print("clclcl")
+        dialog = HkuChangePasswordDialog(self.session, self)
+        if dialog.exec() > 0:
+            print("on_change_password_pushButton_clicked")

@@ -28,11 +28,11 @@ class HkuAddUserDialog(QtWidgets.QDialog, Ui_AddUserDialog):
 
     def accept(self):
         if not self.name:
-            QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), _translate("UserManage", "The user name cannot be empty."))
+            QtWidgets.QMessageBox.warning(
+                self, _translate("UserManage", "error"), _translate("UserManage", "The user name cannot be empty.")
+            )
             return
         self.done(1)
 
     def reject(self):
         self.done(-1)
-
-

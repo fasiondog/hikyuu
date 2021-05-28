@@ -75,8 +75,8 @@ class HkuEditSessionDialog(QtWidgets.QDialog, Ui_HkuEditSessionDialog):
         self.session_model.host = self.host
         self.session_model.port = self.port
         self.session_model.user = self.user
-        self.session_model.password = self.password_lineEdit.text()
-        self.session_model.remark = self.remark_textEdit.toPlainText()
+        self.session_model.password = self.password
+        self.session_model.remark = self.remark
         session = self.parent().session
         try:
             session.add(self.session_model)

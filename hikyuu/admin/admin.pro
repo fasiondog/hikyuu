@@ -8,5 +8,7 @@ SOURCES = HikyuuAdmin.py UiConfig.py \
           dialog/Ui_HkuEditSessionDialog.py \
           dialog/HkuAddUserDialog.py \
           dialog/Ui_HkuAddUserDialog.py \
+          dialog/HkuChangePasswordDialog.py \
+          dialog/Ui_HkuChangePasswordDialog.py \
           service/assist.py
 TRANSLATIONS = language/zh_CN.ts
