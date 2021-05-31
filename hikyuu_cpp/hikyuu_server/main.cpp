@@ -6,6 +6,7 @@
  */
 
 #include <locale>
+#include <csignal>
 #include <hikyuu/utilities/os.h>
 #include "http/HttpServer.h"
 #include "db/db.h"
@@ -17,6 +18,14 @@ using namespace hku;
 
 #define HKU_SERVICE_API(name) "/hku/" #name "/v1"
 
+void signal_handle(int signal) {
+    if (signal == SIGINT || signal == SIGTERM) {
+        LOG_INFO("Shutdown now ...");
+        HttpServer::stop();
+        exit(0);
+    }
+}
+
 int main(int argc, char* argv[]) {
     init_server_logger();
 
@@ -25,10 +34,19 @@ int main(int argc, char* argv[]) {
 
     LOG_INFO("start server ... You can press Ctrl-C stop");
 
+    std::signal(SIGINT, signal_handle);
+    std::signal(SIGTERM, signal_handle);
+
     HttpServer server("http://*", 9001);
-    HttpHandle::enableTrace(true);
+    HttpHandle::enableTrace(true, false);
 
     try {
+        // 设置 404 返回信息
+        server.set_error_msg(
+          NNG_HTTP_STATUS_NOT_FOUND,
+          fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"Not Found"}})",
+                      NNG_HTTP_STATUS_NOT_FOUND));
+
         DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
 
         UserService usr_service(HKU_SERVICE_API(user));

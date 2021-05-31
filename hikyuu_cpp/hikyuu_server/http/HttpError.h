@@ -18,59 +18,88 @@ namespace hku {
 #if !defined(__clang__) && !defined(__GNUC__)
 class HttpError : public std::exception {
 public:
-    HttpError() : std::exception("Unknown http error!") {}
-    HttpError(int http_status) : HttpError(http_status, "") {}
-    HttpError(int http_status, const std::string& msg)
-    : std::exception(msg.c_str()), m_http_status(http_status) {}
-    HttpError(int http_status, const char* msg) : std::exception(msg), m_http_status(http_status) {}
+    HttpError() : std::exception("Unknown http error!"), m_name("HttpError") {}
+    HttpError(const char* name) : std::exception("Unknown http error!"), m_name(name) {}
+
+    HttpError(const char* name, int http_status)
+    : HttpError(name, http_status, fmt::format("Http status {}", http_status)) {}
+
+    HttpError(const char* name, int http_status, const std::string& msg)
+    : std::exception(msg.c_str()),
+      m_name(name),
+      m_http_status(http_status),
+      m_errcode(http_status) {}
+
+    HttpError(const char* name, int http_status, const char* msg)
+    : std::exception(msg), m_name(name), m_http_status(http_status), m_errcode(http_status) {}
+
+    HttpError(const char* name, int http_status, int errcode, const std::string& msg)
+    : std::exception(msg.c_str()), m_name(name), m_http_status(http_status), m_errcode(errcode) {}
+
+    HttpError(const char* name, int http_status, int errcode, const char* msg)
+    : std::exception(msg), m_name(name), m_http_status(http_status), m_errcode(errcode) {}
+
     virtual ~HttpError() noexcept {}
 
-    static const char* name() noexcept {
-        static const char* str_name = "HttpError";
-        return str_name;
+    const std::string& name() const noexcept {
+        return m_name;
     }
 
     int status() const noexcept {
         return m_http_status;
     }
 
-    virtual std::string msg() const noexcept {
-        return std::string(what());
+    int errcode() const noexcept {
+        return m_errcode;
     }
 
 protected:
-    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
+    std::string m_name;
+    int m_http_status{NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR};
+    int m_errcode{NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR};
 };
 
 #else
 // llvm 中的 std::exception 不接受参数
 class HttpError : public std::exception {
 public:
-    HttpError() : m_msg("Unknown http error!") {}
-    HttpError(int http_status) : HttpError(http_status, "") {}
-    HttpError(int http_status, const char* msg) : m_msg(msg), m_http_status(http_status) {}
-    HttpError(int http_status, const std::string& msg) : m_msg(msg), m_http_status(http_status) {}
+    HttpError() : m_name("HttpErrot"), m_msg("Unknown http error!"){};
+    HttpError(const char* name) : m_name(name), m_msg("Unknown http error!") {}
+    HttpError(const char* name, int http_status)
+    : HttpError(name, http_status, fmt::format("Http status {}", http_status)) {}
+
+    HttpError(const char* name, int http_status, const char* msg)
+    : m_name(name), m_msg(msg), m_http_status(http_status), m_errcode(http_status) {}
+    HttpError(const char* name, int http_status, const std::string& msg)
+    : m_name(name), m_msg(msg), m_http_status(http_status), m_errcode(http_status) {}
+
+    HttpError(const char* name, int http_status, int errcode, const char* msg)
+    : m_name(name), m_msg(msg), m_http_status(http_status), m_errcode(errcode) {}
+    HttpError(const char* name, int http_status, int errcode, const std::string& msg)
+    : m_name(name), m_msg(msg), m_http_status(http_status), m_errcode(errcode) {}
+
     virtual ~HttpError() noexcept {}
     virtual const char* what() const noexcept {
         return m_msg.c_str();
     }
 
-    static const char* name() noexcept {
-        static const char* str_name = "HttpError";
-        return str_name;
+    const std::string& name() const noexcept {
+        return m_name;
     }
 
     int status() const noexcept {
         return m_http_status;
     }
 
-    virtual std::string msg() const noexcept {
-        return m_msg;
+    int errcode() const noexcept {
+        return m_errcode;
     }
 
 protected:
+    std::string m_name;
     std::string m_msg;
-    int m_http_status{NNG_HTTP_STATUS_BAD_REQUEST};
+    int m_http_status{NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR};
+    int m_errcode{NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR};
 };
 #endif /* #ifdef __clang__ */
 
@@ -93,54 +122,22 @@ protected:
 
 class HttpBadRequestError : public HttpError {
 public:
-    HttpBadRequestError() = delete;
+    HttpBadRequestError() : HttpError("HttpBadRequestError") {}
     HttpBadRequestError(int errcode, const char* msg)
-    : HttpError(NNG_HTTP_STATUS_BAD_REQUEST, msg), m_errcode(errcode) {}
+    : HttpError("HttpBadRequestError", NNG_HTTP_STATUS_BAD_REQUEST, errcode, msg) {}
 
     HttpBadRequestError(int errcode, const std::string& msg)
-    : HttpError(NNG_HTTP_STATUS_BAD_REQUEST, msg), m_errcode(errcode) {}
-
-    static const char* name() noexcept {
-        static const char* str_name = "HttpBadRequestError";
-        return str_name;
-    }
-
-    virtual std::string msg() const noexcept override {
-        return fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"{}"}})", m_errcode, what());
-    }
-
-    int errcode() const noexcept {
-        return m_errcode;
-    }
-
-private:
-    int m_errcode;
+    : HttpError("HttpBadRequestError", NNG_HTTP_STATUS_BAD_REQUEST, errcode, msg) {}
 };
 
 class HttpUnauthorizedError : public HttpError {
 public:
-    HttpUnauthorizedError() = delete;
+    HttpUnauthorizedError() : HttpError("HttpUnauthorizedError") {}
     HttpUnauthorizedError(int errcode, const char* msg)
-    : HttpError(NNG_HTTP_STATUS_UNAUTHORIZED, msg), m_errcode(errcode) {}
+    : HttpError("HttpUnauthorizedError", NNG_HTTP_STATUS_UNAUTHORIZED, errcode, msg) {}
 
     HttpUnauthorizedError(int errcode, const std::string& msg)
-    : HttpError(NNG_HTTP_STATUS_UNAUTHORIZED, msg), m_errcode(errcode) {}
-
-    static const char* name() noexcept {
-        static const char* str_name = "HttpUnauthorizedError";
-        return str_name;
-    }
-
-    virtual std::string msg() const noexcept override {
-        return fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"{}"}})", m_errcode, what());
-    }
-
-    int errcode() const noexcept {
-        return m_errcode;
-    }
-
-private:
-    int m_errcode;
+    : HttpError("HttpUnauthorizedError", NNG_HTTP_STATUS_UNAUTHORIZED, errcode, msg) {}
 };
 
 /**

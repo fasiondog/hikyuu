@@ -52,8 +52,8 @@ HttpServer::HttpServer(const char* host, uint16_t port) : m_host(host), m_port(p
 HttpServer::~HttpServer() {}
 
 void HttpServer::start() {
-    std::signal(SIGINT, &HttpServer::signal_handler);
-    std::signal(SIGTERM, &HttpServer::signal_handler);
+    // std::signal(SIGINT, &HttpServer::signal_handler);
+    // std::signal(SIGTERM, &HttpServer::signal_handler);
 
     HTTP_FATAL_CHECK(nng_http_server_start(ms_server), "Failed nng_http_server_start!");
 
@@ -80,6 +80,11 @@ void HttpServer::stop() {
         nng_fini();
         ms_server = nullptr;
     }
+}
+
+void HttpServer::set_error_msg(int16_t http_status, const std::string& body) {
+    HTTP_FATAL_CHECK(nng_http_server_set_error_page(ms_server, http_status, body.c_str()),
+                     "Failed nng_http_server_set_error_page");
 }
 
 void HttpServer::regHandle(const char* method, const char* path, void (*rest_handle)(nng_aio*)) {

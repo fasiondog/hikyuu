@@ -39,109 +39,89 @@ void HttpHandle::operator()() {
         nng_aio_finish(m_http_aio, 0);
 
     } catch (nlohmann::json::exception& e) {
-        processJsonError(e);
-
-    } catch (HttpUnauthorizedError& e) {
-        processHttpError<HttpUnauthorizedError>(e);
-
-    } catch (HttpBadRequestError& e) {
-        processHttpError<HttpBadRequestError>(e);
+        CLS_WARN("HttpBadRequestError({}): {}", INVALID_JSON_REQUEST, e.what());
+        processException(NNG_HTTP_STATUS_BAD_REQUEST, INVALID_JSON_REQUEST, e.what());
 
     } catch (HttpError& e) {
-        processHttpError<HttpError>(e);
+        CLS_WARN("{}({}): {}", e.name(), e.errcode(), e.what());
+        processException(e.status(), e.errcode(), e.what());
 
     } catch (std::exception& e) {
-        std::string errmsg(e.what());
-        CLS_ERROR(errmsg);
-        unknown_error(errmsg);
+        CLS_ERROR("HttpError({}): {}", NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, e.what());
+        processException(NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR,
+                         NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, e.what());
 
     } catch (...) {
-        std::string errmsg("Unknown error!");
-        CLS_ERROR(errmsg);
-        unknown_error(errmsg);
+        CLS_ERROR("HttpError({}): {}", NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, "Unknown error");
+        processException(NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR,
+                         NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, "Unknown error");
     }
 
-    if (enableTrace()) {
+    if (ms_enable_trace) {
         trace();
     }
 }
 
 void HttpHandle::trace() {
-    std::ostringstream buf;
-    const char* url = nng_http_req_get_uri(m_nng_req);
-    if (url) {
-        buf << url << std::endl;
-    } else {
-        buf << "url: null" << std::endl;
+    if (!ms_enable_only_traceid) {
+        CLS_TRACE("{}", getTraceInfo());
+        return;
     }
 
-    buf << "    method: ";
-    const char* method = nng_http_req_get_method(m_nng_req);
-    if (method) {
-        buf << method << std::endl;
+    std::string traceid = getReqHeader("traceid");
+    if (!traceid.empty()) {
+        CLS_TRACE("{}", getTraceInfo());
+    }
+}
+
+std::string HttpHandle::getTraceInfo() {
+    std::ostringstream out;
+    const char* url = nng_http_req_get_uri(m_nng_req);
+    if (url) {
+        out << url << std::endl;
+        out << "    url: " << url << std::endl;
     } else {
-        buf << "unknonw" << std::endl;
+        out << "url: null" << std::endl;
+        out << "    url: null" << std::endl;
+    }
+
+    std::string traceid = getReqHeader("traceid");
+    if (!traceid.empty()) {
+        out << "    traceid: " << traceid << std::endl;
     }
 
     char* data;
     size_t len = 0;
     getReqData((void**)&data, &len);
-    buf << "    req: ";
+    out << "    request: ";
     if (data) {
-        buf << data << std::endl;
+        out << data << std::endl;
     } else {
-        buf << "null" << std::endl;
+        out << "null" << std::endl;
     }
 
-    buf << "    res: ";
+    out << "    response: ";
     nng_http_res_get_data(m_nng_res, (void**)&data, &len);
     if (data) {
-        buf << data << std::endl;
+        out << data << std::endl;
     } else {
-        buf << "null" << std::endl;
+        out << "null" << std::endl;
     }
 
-    LOG_TRACE(buf.str());
+    return out.str();
 }
 
-void HttpHandle::processJsonError(const nlohmann::json::exception& e) {
-    CLS_WARN("HttpBadRequestError({}): {}", BadRequestErrorCode::INVALID_JSON_REQUEST, e.what());
-    nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
-    nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_BAD_REQUEST);
-    std::string errmsg(fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"{}"}})",
-                                   BadRequestErrorCode::INVALID_JSON_REQUEST, e.what()));
-    nng_http_res_set_reason(m_nng_res, errmsg.c_str());
-    nng_http_res_copy_data(m_nng_res, errmsg.c_str(), errmsg.size());
-    nng_aio_set_output(m_http_aio, 0, m_nng_res);
-    nng_aio_finish(m_http_aio, 0);
-}
-
-void HttpHandle::unknown_error(const std::string& errmsg) {
+void HttpHandle::processException(int http_status, int errcode, std::string_view err_msg) {
     try {
-        int errcode = NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR;
-        const char* info = "Internal server error!";
-        std::string html_template(
-          R"(<!DOCTYPE html>
-        <html><head><title>{} {}</title>
-        <style>"
-        body {{ font-family: Arial, sans serif; text-align: center }}
-        h1 {{ font-size: 36px; }}
-        span {{ background-color: gray; color: white; padding: 7px; border-radius: 5px }}
-        h2 {{ font-size: 24px; }}
-        p {{ font-size: 20px; }}
-        </style></head>
-        <body><p>&nbsp;</p>
-        <h1><span>{}</span></h1>
-        <h2>{}</h2>
-        <p>{}</p>
-        </body></html>)");
-        std::string html = fmt::format(html_template, errcode, info, errcode, info, errmsg);
-        nng_http_res_set_status(m_nng_res, errcode);
-        nng_http_res_set_reason(m_nng_res, errmsg.c_str());
-        nng_http_res_set_header(m_nng_res, "Content-Type", "text/html; charset=UTF-8");
-        CLS_WARN_IF(nng_http_res_copy_data(m_nng_res, html.c_str(), html.size()),
-                    "Failed nng_http_res_copy_data!");
+        nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
+        nng_http_res_set_status(m_nng_res, http_status);
+        nng_http_res_set_reason(m_nng_res, err_msg.data());
+        setResData(
+          fmt::format(R"({{"result":false,"errcode":{},"errmsg":"{}"}})", errcode, err_msg));
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
+        nng_aio_finish(m_http_aio, 0);
+    } catch (std::exception& e) {
+        CLS_ERROR(e.what());
         nng_aio_finish(m_http_aio, 0);
     } catch (...) {
         CLS_FATAL("unknown error in finished!");

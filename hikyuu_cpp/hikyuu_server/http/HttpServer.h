@@ -26,6 +26,13 @@ public:
     static void start();
     static void stop();
 
+    /**
+     * 设置 handle 无法捕获的错误返回信息，如 404
+     * @param http_status http状态码
+     * @param body 返回消息
+     */
+    static void set_error_msg(int16_t http_status, const std::string &body);
+
     template <typename Handle>
     void GET(const char *path) {
         regHandle("GET", path, [](nng_aio *aio) { ms_tg.submit(Handle(aio)); });

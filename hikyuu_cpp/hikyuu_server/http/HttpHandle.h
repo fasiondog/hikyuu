@@ -152,13 +152,7 @@ public:
     void operator()();
 
 private:
-    // error未捕获的信息，统一返回500页面
-    void unknown_error(const std::string &errmsg);
-
-    template <typename Error>
-    void processHttpError(const Error &e);
-
-    void processJsonError(const nlohmann::json::exception &e);
+    void processException(int http_status, int errcode, std::string_view err_msg);
 
 protected:
     nng_aio *m_http_aio{nullptr};
@@ -168,45 +162,23 @@ protected:
     std::vector<std::function<void(HttpHandle *)>> m_filters;
 
 public:
-    static bool enableTrace() {
-        return ms_enable_trace;
-    }
-
-    static void enableTrace(bool enable) {
+    static void enableTrace(bool enable, bool only_traceid = false) {
         ms_enable_trace = enable;
+        ms_enable_only_traceid = only_traceid;
     }
 
+protected:
     void trace();
+    std::string getTraceInfo();
 
 private:
     // 是否跟踪请求打印
     inline static std::atomic_bool ms_enable_trace = false;
+    inline static std::atomic_bool ms_enable_only_traceid = false;
 };
 
 #define HTTP_HANDLE_IMP(cls) \
 public:                      \
     cls(nng_aio *aio) : HttpHandle(aio) {}
-
-template <class Error>
-void HttpHandle::processHttpError(const Error &e) {
-    CLS_WARN("{}({}): {}", Error::name(), e.errcode(), e.what());
-    nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
-    nng_http_res_set_status(m_nng_res, e.status());
-    nng_http_res_set_reason(m_nng_res, e.msg().c_str());
-    nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
-    nng_aio_set_output(m_http_aio, 0, m_nng_res);
-    nng_aio_finish(m_http_aio, 0);
-}
-
-template <>
-inline void HttpHandle::processHttpError<HttpError>(const HttpError &e) {
-    CLS_WARN("HttpError: {}", e.what());
-    nng_http_res_set_header(m_nng_res, "Content-Type", "application/json; charset=UTF-8");
-    nng_http_res_set_status(m_nng_res, e.status());
-    nng_http_res_set_reason(m_nng_res, e.msg().c_str());
-    nng_http_res_copy_data(m_nng_res, e.msg().c_str(), e.msg().size());
-    nng_aio_set_output(m_http_aio, 0, m_nng_res);
-    nng_aio_finish(m_http_aio, 0);
-}
 
 }  // namespace hku
