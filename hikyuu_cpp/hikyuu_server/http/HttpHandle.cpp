@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#include <string_view>
 #include <hikyuu/utilities/arithmetic.h>
 #include "url.h"
 #include "HttpHandle.h"
@@ -95,7 +96,7 @@ std::string HttpHandle::getTraceInfo() {
     getReqData((void**)&data, &len);
     out << "    request: ";
     if (data) {
-        out << data << std::endl;
+        out << std::string_view(data, len) << std::endl;
     } else {
         out << "null" << std::endl;
     }
@@ -142,7 +143,7 @@ std::string HttpHandle::getReqData() {
     void* data = nullptr;
     size_t len = 0;
     nng_http_req_get_data(m_nng_req, &data, &len);
-    return data ? std::string((char*)data) : std::string();
+    return data ? std::string((char*)data, len) : std::string();
 }
 
 json HttpHandle::getReqJson() {
@@ -152,7 +153,7 @@ json HttpHandle::getReqJson() {
     json result;
     try {
         if (data) {
-            result = json::parse((const char*)data);
+            result = json::parse(std::string_view((char*)data, len));
         }
     } catch (json::exception& e) {
         LOG_ERROR("Failed parse json: {}", (const char*)data);
