@@ -157,6 +157,11 @@ for s in sm:
         blockg.add(s)
 zsbk_cyb = blockg
 
+blockstart = Block("START", "科创板")
+for s in sm:
+    if s.type == constant.STOCKTYPE_START:
+        blockstart.add(s)
+
 blockzxb = Block("A", "中小板")
 for s in blocksz:
     if s.code[:3] == "002":
@@ -201,6 +206,7 @@ set_global_context(sm['sh000001'], Query(-150))
 #
 # ==============================================================================
 from .draw import *
+
 use_draw_engine('matplotlib')
 
 # ==============================================================================
@@ -236,7 +242,8 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
         q = Query(start, end)
         k = s.get_kdata(q)
         cond.set_context(k)
-        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k) > 0 and k[-1].datetime == d[-1]:
+        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k
+                                                                                      ) > 0 and k[-1].datetime == d[-1]:
             result.append(s)
             if print_out:
                 print(d[-1], s)
@@ -369,7 +376,9 @@ def realtime_update_from_sina_qq(source):
     #urls = []
     tmpstr = queryStr
     for stock in sm:
-        if stock.valid and stock.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM):
+        if stock.valid and stock.type in (
+            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM
+        ):
             tmpstr += ("%s,") % (stock.market_code.lower())
             count = count + 1
             if count >= max_size:
@@ -448,7 +457,10 @@ def realtime_update_from_tushare():
         record.volume = float(df.ix[i, 'volume'])
         record.amount = float(df.ix[i, 'amount'])
 
-        if (last_record.close != record.close or last_record.high != record.high or last_record.low != record.low or last_record.open != record.open):
+        if (
+            last_record.close != record.close or last_record.high != record.high or last_record.low != record.low
+            or last_record.open != record.open
+        ):
             from datetime import date
             d = date.today()
             record.date = Datetime(d)
