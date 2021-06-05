@@ -109,7 +109,7 @@ public:
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
-            m_queues[i]->push_front(std::move(FuncWrapper()));
+            m_queues[i]->push_front(FuncWrapper());
         }
 
         m_cv.notify_all();  // 唤醒所有工作线程

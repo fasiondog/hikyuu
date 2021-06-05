@@ -57,8 +57,17 @@ target("hikyuu")
         add_links("iconv")
         add_includedirs("/usr/local/opt/hdf5/include")
         add_linkdirs("/usr/local/opt/hdf5/lib")
-        add_includedirs("/usr/local/opt/mysql-client/include")
-        add_linkdirs("/usr/local/opt/mysql-client/lib")
+        if os.exists("/usr/local/opt/mysql-client") then
+            add_includedirs("/usr/local/opt/mysql-client/include")
+            add_linkdirs("/usr/local/opt/mysql-client/lib")
+            add_rpathdirs("/usr/local/opt/mysql-client/lib")
+        end
+        if os.exists("/usr/local/mysql/lib") then
+            add_includedirs("/usr/local/include")
+            add_linkdirs("/usr/local/mysql/lib")
+            add_rpathdirs("/usr/local/mysql/lib")
+        end
+        add_links("mysqlclient")
     end
 
     if is_plat("windows") then 
@@ -71,7 +80,7 @@ target("hikyuu")
         add_links("hdf5")
         add_links("hdf5_hl")
         add_links("hdf5_cpp")
-        add_links("mysqlclient")
+        --add_links("mysqlclient")
         add_links("boost_date_time")
         add_links("boost_filesystem")
         add_links("boost_serialization")
@@ -89,6 +98,18 @@ You need to specify where the boost headers is via the BOOST_ROOT variable!]])
 
         assert(os.getenv("BOOST_LIB"), [[Missing environment variable: BOOST_LIB
 You need to specify where the boost library is via the BOOST_LIB variable!]])
+    end)
+
+    before_build(function(target)
+        if is_plat("macosx") then
+            if not os.exists("/usr/local/include/mysql") then
+                if os.exists("/usr/local/mysql/include") then
+                    os.run("ln -s /usr/local/mysql/include /usr/local/include/mysql")
+                else
+                    print("Not Found MySQL include dir!")
+                end
+            end
+        end    
     end)
 
     after_build(function(target)

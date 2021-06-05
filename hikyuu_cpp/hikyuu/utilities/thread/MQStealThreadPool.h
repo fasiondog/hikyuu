@@ -123,7 +123,7 @@ public:
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
-            m_queues[i]->push(std::move(FuncWrapper()));
+            m_queues[i]->push(FuncWrapper());
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -141,7 +141,7 @@ public:
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_runnging_util_empty) {
             for (size_t i = 0; i < m_worker_num; i++) {
-                m_queues[i]->push(std::move(FuncWrapper()));
+                m_queues[i]->push(FuncWrapper());
             }
         }
 
