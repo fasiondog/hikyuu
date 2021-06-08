@@ -46,6 +46,8 @@ add_requires("zlib", {system=false})
 
 if is_plat("linux") and linuxos.name() == "ubuntu" then
     add_requires("apt::libhdf5-dev", "apt::libmysqlclient-dev", "apt::libsqlite3-dev")
+elseif is_plat("macosx") then
+    add_requires("brew::hdf5")
 else
     add_requires("sqlite3", {configs = {shared=true, vs_runtime="MD", cxflags="-fPIC"}})
 end
