@@ -42,6 +42,7 @@ add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
 add_requires("nng", {system=false, configs = {vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("nlohmann_json", {system=false})
 add_requires("cpp-httplib", {system=false})
+add_requires("zlib", {system=false})
 
 if is_plat("linux") and linuxos.name() == "ubuntu" then
     add_requires("apt::libhdf5-dev", "apt::libmysqlclient-dev", "apt::libsqlite3-dev")

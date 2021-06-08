@@ -103,41 +103,41 @@ protected:
 };
 #endif /* #ifdef __clang__ */
 
-#define HANDLE_THROW(http_status, ...) \
-    { throw HttpError(http_status, fmt::format(__VA_ARGS__)); }
-
-#define HANDLE_CHECK(expr, http_status, ...)                        \
-    {                                                               \
-        if (!expr) {                                                \
-            throw HttpError(http_status, fmt::format(__VA_ARGS__)); \
-        }                                                           \
-    }
-
-#define HANDLE_CHECK_THROW(expr, error) \
-    {                                   \
-        if (!expr) {                    \
-            throw error;                \
-        }                               \
-    }
-
+/**
+ * Http 400: 请求参数错误
+ */
 class HttpBadRequestError : public HttpError {
 public:
     HttpBadRequestError() : HttpError("HttpBadRequestError") {}
     HttpBadRequestError(int errcode, const char* msg)
     : HttpError("HttpBadRequestError", NNG_HTTP_STATUS_BAD_REQUEST, errcode, msg) {}
-
     HttpBadRequestError(int errcode, const std::string& msg)
     : HttpError("HttpBadRequestError", NNG_HTTP_STATUS_BAD_REQUEST, errcode, msg) {}
 };
 
+/**
+ * Http 401: 当前请求需要用户验证
+ */
 class HttpUnauthorizedError : public HttpError {
 public:
     HttpUnauthorizedError() : HttpError("HttpUnauthorizedError") {}
     HttpUnauthorizedError(int errcode, const char* msg)
     : HttpError("HttpUnauthorizedError", NNG_HTTP_STATUS_UNAUTHORIZED, errcode, msg) {}
-
     HttpUnauthorizedError(int errcode, const std::string& msg)
     : HttpError("HttpUnauthorizedError", NNG_HTTP_STATUS_UNAUTHORIZED, errcode, msg) {}
+};
+
+class HttpNotAcceptableError : public HttpError {
+public:
+    enum NotAcceptableErrorCode {
+        UNSUPPORT_CONTENT_ENCODING = 4060001,  // 不支持的内容编码
+    };
+
+    HttpNotAcceptableError() : HttpError("HttpNotAcceptableError") {}
+    HttpNotAcceptableError(int errcode, const char* msg)
+    : HttpError("HttpNotAcceptableError", NNG_HTTP_STATUS_NOT_ACCEPTABLE, errcode, msg) {}
+    HttpNotAcceptableError(int errcode, const std::string& msg)
+    : HttpError("HttpNotAcceptableError", NNG_HTTP_STATUS_NOT_ACCEPTABLE, errcode, msg) {}
 };
 
 /**

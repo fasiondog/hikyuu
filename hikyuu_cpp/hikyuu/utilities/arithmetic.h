@@ -12,7 +12,9 @@
 #define HIKYUU_UTILITIES_ARITHMETIC_H
 
 #include <cctype>
+#include <vector>
 #include <string>
+#include <string_view>
 #include <algorithm>
 
 namespace hku {
@@ -43,6 +45,45 @@ inline void trim(std::string& s) {
 
     s.erase(0, s.find_first_not_of(" "));
     s.erase(s.find_last_not_of(" ") + 1);
+}
+
+/**
+ * 分割字符串
+ * @param str 待封的字符串
+ * @param c 分割符
+ */
+inline std::vector<std::string_view> split(const std::string& str, char c) {
+    std::vector<std::string_view> result;
+    std::string_view view(str);
+    size_t prepos = 0;
+    size_t pos = view.find_first_of(c);
+    while (pos != std::string::npos) {
+        result.emplace_back(view.substr(prepos, pos - prepos));
+        prepos = pos + 1;
+        pos = view.find_first_of(c, prepos);
+    }
+
+    result.emplace_back(view.substr(prepos));
+    return result;
+}
+
+/**
+ * 字符串分割
+ * @param view 待分割的 string_view
+ * @param c 分割符
+ */
+inline std::vector<std::string_view> split(const std::string_view& view, char c) {
+    std::vector<std::string_view> result;
+    size_t prepos = 0;
+    size_t pos = view.find_first_of(c);
+    while (pos != std::string::npos) {
+        result.emplace_back(view.substr(prepos, pos - prepos));
+        prepos = pos + 1;
+        pos = view.find_first_of(c, prepos);
+    }
+
+    result.emplace_back(view.substr(prepos));
+    return result;
 }
 
 /** @} */

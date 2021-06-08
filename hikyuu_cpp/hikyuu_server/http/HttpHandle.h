@@ -58,6 +58,9 @@ public:
         m_filters.push_back(filter);
     }
 
+    /** 获取请求的 url */
+    std::string getReqUrl() const;
+
     /**
      * 获取请求头部信息
      * @param name 头部信息名称
@@ -74,23 +77,13 @@ public:
         return getReqHeader(name.c_str());
     }
 
-    /**
-     * 获取请求数据
-     * @param[out] data 请求中的数据起始地址，无数据时返回 NULL
-     * @param[out] len 请求中的数据长度
-     * @note 请求中无数据时, len返回的长度可能不为0
-     */
-    void getReqData(void **data, size_t *len) {
-        nng_http_req_get_data(m_nng_req, data, len);
-    }
-
+    /** 根据 Content-Encoding 进行解码，返回解码后的请求数据 */
     std::string getReqData();
 
+    /** 返回请求的 json 数据，如无法解析为json，将抛出异常*/
     json getReqJson();
 
-    /**
-     * 请求的 ulr 中是否包含 query 参数
-     */
+    /** 判断请求的 ulr 中是否包含 query 参数 */
     bool haveQueryParams();
 
     typedef std::unordered_map<std::string, std::string> QueryParams;
@@ -125,6 +118,9 @@ public:
     void setResData(const ordered_json &data) {
         setResData(data.dump());
     }
+
+    /** 获取当前的相应数据 */
+    std::string getResData() const;
 
     /**
      * 从 Accept-Language 获取第一个语言类型

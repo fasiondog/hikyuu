@@ -7,6 +7,9 @@
 
 #include <string_view>
 #include <hikyuu/utilities/arithmetic.h>
+#include "gzip/compress.hpp"
+#include "gzip/decompress.hpp"
+#include "gzip/utils.hpp"
 #include "url.h"
 #include "HttpHandle.h"
 
@@ -77,37 +80,20 @@ void HttpHandle::trace() {
 
 std::string HttpHandle::getTraceInfo() {
     std::ostringstream out;
-    const char* url = nng_http_req_get_uri(m_nng_req);
-    if (url) {
-        out << url << std::endl;
-        out << "    url: " << url << std::endl;
-    } else {
-        out << "url: null" << std::endl;
-        out << "    url: null" << std::endl;
-    }
+    std::string url = getReqUrl();
+    out << url << std::endl;
+    out << "    url: " << url << std::endl;
 
     std::string traceid = getReqHeader("traceid");
     if (!traceid.empty()) {
         out << "    traceid: " << traceid << std::endl;
     }
 
-    char* data;
-    size_t len = 0;
-    getReqData((void**)&data, &len);
-    out << "    request: ";
-    if (data) {
-        out << std::string_view(data, len) << std::endl;
-    } else {
-        out << "null" << std::endl;
-    }
+    std::string body = getReqData();
+    out << "    request: " << body << std::endl;
 
-    out << "    response: ";
-    nng_http_res_get_data(m_nng_res, (void**)&data, &len);
-    if (data) {
-        out << data << std::endl;
-    } else {
-        out << "null" << std::endl;
-    }
+    body = getResData();
+    out << "    response: " << body << std::endl;
 
     return out.str();
 }
@@ -130,6 +116,15 @@ void HttpHandle::processException(int http_status, int errcode, std::string_view
     }
 }
 
+std::string HttpHandle::getReqUrl() const {
+    std::string result;
+    const char* url = nng_http_req_get_uri(m_nng_req);
+    if (url) {
+        result = std::string(url);
+    }
+    return result;
+}
+
 std::string HttpHandle::getReqHeader(const char* name) const {
     std::string result;
     const char* head = nng_http_req_get_header(m_nng_req, name);
@@ -140,23 +135,59 @@ std::string HttpHandle::getReqHeader(const char* name) const {
 }
 
 std::string HttpHandle::getReqData() {
+    std::string result;
     void* data = nullptr;
     size_t len = 0;
     nng_http_req_get_data(m_nng_req, &data, &len);
-    return data ? std::string((char*)data, len) : std::string();
+    if (!data || len == 0) {
+        return result;
+    }
+
+    std::string encoding = getReqHeader("Content-Encoding");
+    if (encoding.empty()) {
+        result = std::string((char*)data, len);
+
+    } else if (encoding == "gzip") {
+        gzip::Decompressor decomp;
+        decomp.decompress(result, (char*)data, len);
+
+    } else {
+        throw HttpNotAcceptableError(
+          HttpNotAcceptableError::UNSUPPORT_CONTENT_ENCODING,
+          fmt::format(_ctr("HttpHandle", "Unsupported Content-Encoding format: {}"), encoding));
+    }
+
+    return result;
+}
+
+std::string HttpHandle::getResData() const {
+    std::string result;
+    char* data = nullptr;
+    size_t len = 0;
+    nng_http_res_get_data(m_nng_res, (void**)&data, &len);
+    if (!data || len == 0) {
+        return result;
+    }
+
+    if (!gzip::is_compressed(data, len)) {
+        result = std::string(data, len);
+        return result;
+    }
+
+    gzip::Decompressor decomp;
+    decomp.decompress(result, data, len);
+    return result;
 }
 
 json HttpHandle::getReqJson() {
-    void* data;
-    size_t len;
-    nng_http_req_get_data(m_nng_req, &data, &len);
+    std::string data = getReqData();
     json result;
     try {
-        if (data) {
-            result = json::parse(std::string_view((char*)data, len));
+        if (!data.empty()) {
+            result = json::parse(data);
         }
     } catch (json::exception& e) {
-        LOG_ERROR("Failed parse json: {}", (const char*)data);
+        LOG_ERROR("Failed parse json: {}", data);
         throw HttpBadRequestError(BadRequestErrorCode::INVALID_JSON_REQUEST, e.what());
     }
     return result;
