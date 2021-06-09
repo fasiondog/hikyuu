@@ -9,6 +9,8 @@
 
 #include <stdlib.h>
 #include <string_view>
+#include <string>
+#include <vector>
 #include "http/HttpHandle.h"
 #include "db/db.h"  // 这里统一引入
 #include "RestErrorCode.h"
@@ -43,6 +45,12 @@ protected:
         if (!req.contains(param)) {
             throw HttpBadRequestError(BadRequestErrorCode::MISS_PARAMETER,
                                       fmt::format(R"(Missing param "{}")", param));
+        }
+    }
+
+    void check_missing_param(const std::vector<std::string> &params) {
+        for (auto &param : params) {
+            check_missing_param(param);
         }
     }
 

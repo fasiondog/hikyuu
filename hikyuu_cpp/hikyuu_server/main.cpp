@@ -32,8 +32,6 @@ int main(int argc, char* argv[]) {
     // 初始化多语言支持
     MOHelper::init();
 
-    LOG_INFO("start server ... You can press Ctrl-C stop");
-
     std::signal(SIGINT, signal_handle);
     std::signal(SIGTERM, signal_handle);
 
@@ -58,6 +56,7 @@ int main(int argc, char* argv[]) {
         TradeService trade(HKU_SERVICE_API(trade));
         trade.bind(&server);
 
+        LOG_INFO("start server ... You can press Ctrl-C stop");
         server.start();
 
     } catch (std::exception& e) {

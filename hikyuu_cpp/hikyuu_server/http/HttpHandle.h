@@ -103,12 +103,11 @@ public:
         NNG_CHECK(nng_http_res_set_header(m_nng_res, key, val));
     }
 
-    void setResData(const char *data) {
-        NNG_CHECK(nng_http_res_copy_data(m_nng_res, data, strlen(data)));
-    }
+    /** 设置响应数据，并根据 Content-encoding 进行 gzip 压缩 */
+    void setResData(const char *content);
 
     void setResData(const std::string &content) {
-        NNG_CHECK(nng_http_res_copy_data(m_nng_res, content.data(), content.size()));
+        setResData(content.c_str());
     }
 
     void setResData(const json &data) {

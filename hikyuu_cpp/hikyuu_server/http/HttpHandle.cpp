@@ -34,6 +34,12 @@ void HttpHandle::operator()() {
             filter(this);
         }
 
+        std::string encodings = getReqHeader("Accept-Encoding");
+        size_t pos = encodings.find("gzip");
+        if (pos != std::string::npos) {
+            setResHeader("Content-Encoding", "gzip");
+        }
+
         before_run();
         run();
         after_run();
@@ -242,6 +248,18 @@ bool HttpHandle::getQueryParams(QueryParams& query_params) {
     }
 
     return query_params.size() != 0;
+}
+
+void HttpHandle::setResData(const char* content) {
+    const char* encoding = nng_http_res_get_header(m_nng_res, "Content-Encoding");
+    if (!encoding) {
+        NNG_CHECK(nng_http_res_copy_data(m_nng_res, content, strlen(content)));
+    } else {
+        gzip::Compressor comp(Z_DEFAULT_COMPRESSION);
+        std::string output;
+        comp.compress(output, content, strlen(content));
+        NNG_CHECK(nng_http_res_copy_data(m_nng_res, output.c_str(), output.size()));
+    }
 }
 
 std::string HttpHandle::getLanguage() const {
