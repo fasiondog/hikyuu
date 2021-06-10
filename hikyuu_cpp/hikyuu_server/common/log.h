@@ -83,93 +83,93 @@ inline void set_logger_level(const std::string& name, int level) {
 }
 
 #if LOG_ACTIVE_LEVEL <= 0
-#define LOG_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)
+#define APP_TRACE(...) SPDLOG_TRACE(__VA_ARGS__)
 #else
-#define LOG_TRACE(...)
+#define APP_TRACE(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 1
-#define LOG_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
+#define APP_DEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
 #else
-#define LOG_DEBUG(...)
+#define APP_DEBUG(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 2
-#define LOG_INFO(...) SPDLOG_INFO(__VA_ARGS__)
+#define APP_INFO(...) SPDLOG_INFO(__VA_ARGS__)
 #else
-#define LOG_INFO(...)
+#define APP_INFO(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 3
-#define LOG_WARN(...) SPDLOG_WARN(__VA_ARGS__)
+#define APP_WARN(...) SPDLOG_WARN(__VA_ARGS__)
 #else
-#define LOG_WARN(...)
+#define APP_WARN(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 4
-#define LOG_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
+#define APP_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
 #else
-#define LOG_ERROR(...)
+#define APP_ERROR(...)
 #endif
 
 #if LOG_ACTIVE_LEVEL <= 5
-#define LOG_FATAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#define APP_FATAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
 #else
-#define LOG_FATAL(...)
+#define APP_FATAL(...)
 #endif
 
 /**
  * 满足指定条件时，打印 TRACE 信息
  * @param expr 指定条件
  */
-#define LOG_TRACE_IF(expr, ...) \
+#define APP_TRACE_IF(expr, ...) \
     if (expr) {                 \
-        LOG_TRACE(__VA_ARGS__); \
+        APP_TRACE(__VA_ARGS__); \
     }
 
 /**
  * 满足指定条件时，打印 DEBUG 信息, 并返回指定值
  * @param expr 指定条件
  */
-#define LOG_DEBUG_IF(expr, ...) \
+#define APP_DEBUG_IF(expr, ...) \
     if (expr) {                 \
-        LOG_DEBUG(__VA_ARGS__); \
+        APP_DEBUG(__VA_ARGS__); \
     }
 
 /**
  * 满足指定条件时，打印 INFO 信息, 并返回指定值
  * @param expr 指定条件
  */
-#define LOG_INFO_IF(expr, ...) \
+#define APP_INFO_IF(expr, ...) \
     if (expr) {                \
-        LOG_INFO(__VA_ARGS__); \
+        APP_INFO(__VA_ARGS__); \
     }
 
 /**
  * 满足指定条件时，打印 WARN 信息, 并返回指定值
  * @param expr 指定条件
  */
-#define LOG_WARN_IF(expr, ...) \
+#define APP_WARN_IF(expr, ...) \
     if (expr) {                \
-        LOG_WARN(__VA_ARGS__); \
+        APP_WARN(__VA_ARGS__); \
     }
 
 /**
  * 满足指定条件时，打印 ERROR 信息, 并返回指定值
  * @param expr 指定条件
  */
-#define LOG_ERROR_IF(expr, ...) \
+#define APP_ERROR_IF(expr, ...) \
     if (expr) {                 \
-        LOG_ERROR(__VA_ARGS__); \
+        APP_ERROR(__VA_ARGS__); \
     }
 
 /**
  * 满足指定条件时，打印 FATAL 信息, 并返回指定值
  * @param expr 指定条件
  */
-#define LOG_FATAL_IF(expr, ...) \
+#define APP_FATAL_IF(expr, ...) \
     if (expr) {                 \
-        LOG_FATAL(__VA_ARGS__); \
+        APP_FATAL(__VA_ARGS__); \
     }
 
 /**
@@ -187,9 +187,9 @@ inline void set_logger_level(const std::string& name, int level) {
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define LOG_TRACE_IF_RETURN(expr, ret, ...) \
+#define APP_TRACE_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
-        LOG_TRACE(__VA_ARGS__);             \
+        APP_TRACE(__VA_ARGS__);             \
         return ret;                         \
     }
 
@@ -198,9 +198,9 @@ inline void set_logger_level(const std::string& name, int level) {
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define LOG_DEBUG_IF_RETURN(expr, ret, ...) \
+#define APP_DEBUG_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
-        LOG_DEBUG(__VA_ARGS__);             \
+        APP_DEBUG(__VA_ARGS__);             \
         return ret;                         \
     }
 
@@ -209,9 +209,9 @@ inline void set_logger_level(const std::string& name, int level) {
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define LOG_INFO_IF_RETURN(expr, ret, ...) \
+#define APP_INFO_IF_RETURN(expr, ret, ...) \
     if (expr) {                            \
-        LOG_INFO(__VA_ARGS__);             \
+        APP_INFO(__VA_ARGS__);             \
         return ret;                        \
     }
 
@@ -220,9 +220,9 @@ inline void set_logger_level(const std::string& name, int level) {
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define LOG_WARN_IF_RETURN(expr, ret, ...) \
+#define APP_WARN_IF_RETURN(expr, ret, ...) \
     if (expr) {                            \
-        LOG_WARN(__VA_ARGS__);             \
+        APP_WARN(__VA_ARGS__);             \
         return ret;                        \
     }
 
@@ -231,9 +231,9 @@ inline void set_logger_level(const std::string& name, int level) {
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define LOG_ERROR_IF_RETURN(expr, ret, ...) \
+#define APP_ERROR_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
-        LOG_ERROR(__VA_ARGS__);             \
+        APP_ERROR(__VA_ARGS__);             \
         return ret;                         \
     }
 
@@ -242,9 +242,9 @@ inline void set_logger_level(const std::string& name, int level) {
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define LOG_FATAL_IF_RETURN(expr, ret, ...) \
+#define APP_FATAL_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
-        LOG_FATAL(__VA_ARGS__);             \
+        APP_FATAL(__VA_ARGS__);             \
         return ret;                         \
     }
 
@@ -262,7 +262,7 @@ inline void set_logger_level(const std::string& name, int level) {
  * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
  * @note 用于外部入参及结果检查
  */
-#define LOG_CHECK(expr, ...)                                                                   \
+#define APP_CHECK(expr, ...)                                                                   \
     do {                                                                                       \
         if (!(expr)) {                                                                         \
             throw hku::exception(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr,               \
@@ -275,7 +275,7 @@ inline void set_logger_level(const std::string& name, int level) {
  * 若表达式为 false，将抛出指定的异常, 并附带传入信息
  * @note 用于外部入参及结果检查
  */
-#define LOG_CHECK_THROW(expr, except, ...)                                                         \
+#define APP_CHECK_THROW(expr, except, ...)                                                         \
     do {                                                                                           \
         if (!(expr)) {                                                                             \
             throw except(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, fmt::format(__VA_ARGS__), \
@@ -320,14 +320,14 @@ inline void set_logger_level(const std::string& name, int level) {
 #endif /* #if HKU_DISABLE_ASSERT */
 
 /** 抛出 hku::exception 及传入信息 */
-#define LOG_THROW(...)                                                                           \
+#define APP_THROW(...)                                                                           \
     do {                                                                                         \
         throw hku::exception(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
                                          __FUNCTION__, __FILE__, __LINE__));                     \
     } while (0)
 
 /** 抛出指定异常及传入信息 */
-#define LOG_THROW_EXCEPTION(except, ...)                                                 \
+#define APP_THROW_EXCEPTION(except, ...)                                                 \
     do {                                                                                 \
         throw except(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
                                  __FUNCTION__, __FILE__, __LINE__));                     \

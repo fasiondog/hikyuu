@@ -62,10 +62,10 @@ void DB::initMysql(const Parameter& param) {
 void DB::initDB(const Parameter& params) {
     string type = params.get<string>("type");
     if (type == "sqlite3") {
-        LOG_TRACE("use sqlite3 database");
+        APP_TRACE("use sqlite3 database");
         initSqlite(params);
     } else if (type == "mysql") {
-        LOG_TRACE("use mysql database");
+        APP_TRACE("use mysql database");
         initMysql(params);
     } else {
         throw std::invalid_argument(fmt::format("Invalid database type: {}", type));

@@ -53,6 +53,8 @@ target("hkuserver")
     
     -- add files
     add_files("./**.cpp")
+    add_files("./**.c")
+    --add_files("./**.S")
     --add_files("./main.cpp")
 
     after_build(function(target)

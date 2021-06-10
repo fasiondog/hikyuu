@@ -25,7 +25,7 @@ namespace hku {
 #define NNG_CHECK(rv)                                      \
     {                                                      \
         if (rv != 0) {                                     \
-            LOG_THROW("[NNG_ERROR] {}", nng_strerror(rv)); \
+            APP_THROW("[NNG_ERROR] {}", nng_strerror(rv)); \
         }                                                  \
     }
 
@@ -33,7 +33,7 @@ namespace hku {
 #define NNG_CHECK_M(rv, msg)                                             \
     {                                                                    \
         if (rv != 0) {                                                   \
-            LOG_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \
+            APP_THROW("[HTTP_ERROR] {} err: {}", msg, nng_strerror(rv)); \
         }                                                                \
     }
 

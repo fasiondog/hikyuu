@@ -20,7 +20,7 @@ using namespace hku;
 
 void signal_handle(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
-        LOG_INFO("Shutdown now ...");
+        APP_INFO("Shutdown now ...");
         HttpServer::stop();
         exit(0);
     }
@@ -56,14 +56,14 @@ int main(int argc, char* argv[]) {
         TradeService trade(HKU_SERVICE_API(trade));
         trade.bind(&server);
 
-        LOG_INFO("start server ... You can press Ctrl-C stop");
+        APP_INFO("start server ... You can press Ctrl-C stop");
         server.start();
 
     } catch (std::exception& e) {
-        LOG_FATAL(e.what());
+        APP_FATAL(e.what());
         server.stop();
     } catch (...) {
-        LOG_FATAL("Unknow error!");
+        APP_FATAL("Unknow error!");
         server.stop();
     }
 

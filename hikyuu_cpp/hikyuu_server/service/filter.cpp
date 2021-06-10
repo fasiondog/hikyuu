@@ -80,7 +80,7 @@ void AuthorizeFilter(HttpHandle *handle) {
         throw e;
 
     } catch (std::exception &e) {
-        LOG_ERROR(e.what());
+        APP_ERROR(e.what());
         throw HttpUnauthorizedError(AuthorizeErrorCode::FAILED_AUTHORIZED, errmsg);
     }
 }

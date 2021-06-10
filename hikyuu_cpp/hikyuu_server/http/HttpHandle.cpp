@@ -193,7 +193,7 @@ json HttpHandle::getReqJson() {
             result = json::parse(data);
         }
     } catch (json::exception& e) {
-        LOG_ERROR("Failed parse json: {}", data);
+        APP_ERROR("Failed parse json: {}", data);
         throw HttpBadRequestError(BadRequestErrorCode::INVALID_JSON_REQUEST, e.what());
     }
     return result;

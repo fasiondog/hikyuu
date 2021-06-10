@@ -169,4 +169,12 @@ class ResetPasswordUserHandle : public RestHandle {
     }
 };
 
+class ChangePasswordUserHandle : public RestHandle {
+    REST_HANDLE_IMP(ChangePasswordUserHandle)
+    virtual void run() override {
+        check_missing_param({"old", "new", "confirm"});
+        uint64_t userid = getCurrentUserId();
+    }
+};
+
 }  // namespace hku
