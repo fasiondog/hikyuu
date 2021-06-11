@@ -61,8 +61,8 @@ class LoginHandle : public NoAuthRestHandle {
                                     Field("status") != UserModel::DELETED));
         REQ_CHECK(user.id() != 0, UserErrorCode::USER_NOT_EXIST,
                   _ctr("user", "User does not exist"));
-        REQ_CHECK(user.getPassword() == req["password"].get<std::string>(),
-                  UserErrorCode::USER_WRONG_PASSWORD, _ctr("user", "Wrong password"));
+        REQ_CHECK(user.checkPassword(req["password"].get<std::string>()),
+                  UserErrorCode::USER_INVALID_NAME_OR_PASSWORD, _ctr("user", "Wrong password"));
 
         TokenModel token;
         {

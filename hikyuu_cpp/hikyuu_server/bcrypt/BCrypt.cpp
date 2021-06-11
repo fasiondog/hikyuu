@@ -44,6 +44,7 @@ std::string BCrypt::gensalt(int rounds, const char *prefix) {
     return fmt::format("${}${}${}", prefix, rounds, output);
 }
 
+// password 最长只支持到72位
 std::string BCrypt::hashpw(const std::string &password, const std::string &salt) {
     std::string pwd;
     if (password.size() > 72) {
@@ -63,7 +64,7 @@ bool BCrypt::checkpw(const std::string &password, const std::string &hashed_pass
     if (ret.size() != hashed_password.size()) {
         return false;
     }
-    return timingsafe_bcmp(ret.c_str(), hashed_password.c_str(), hashed_password.size());
+    return 0 == timingsafe_bcmp(ret.c_str(), hashed_password.c_str(), hashed_password.size());
 }
 
 }  // namespace hku

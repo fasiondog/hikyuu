@@ -11,6 +11,7 @@ namespace hku {
 
 class BCrypt {
 public:
+    static std::string gensalt(int rounds = 12, const char *prefix = "2b");
     static std::string hashpw(const std::string &password, const std::string &salt);
     static bool checkpw(const std::string &password, const std::string &hashed_password);
 
@@ -21,8 +22,6 @@ private:
      * @param len 输出缓冲区长度
      */
     static void urandom(char *buf, int len);
-
-    static std::string gensalt(int rounds, const char *prefix);
 };
 
 }  // namespace hku

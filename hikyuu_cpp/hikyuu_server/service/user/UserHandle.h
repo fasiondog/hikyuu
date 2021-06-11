@@ -30,7 +30,7 @@ class AddUserHandle : public RestHandle {
 public:
     static const int MIN_NAME_LENGTH = 1;
     static const int MAX_NAME_LENGTH = 128;
-    static const int MAX_PASSWORD_LENGTH = 16;
+    static const int MAX_PASSWORD_LENGTH = 72;  // 目前 bcrypt 最长密码只支持到72位
 
     REST_HANDLE_IMP(AddUserHandle)
     virtual void run() override {
@@ -46,15 +46,16 @@ public:
         user.setName(req["user"].get<string>());
         size_t name_len = user.getName().size();
         REQ_CHECK(name_len >= MIN_NAME_LENGTH && name_len <= MAX_NAME_LENGTH,
-                  UserErrorCode::USER_INVALID_NAME,
+                  UserErrorCode::USER_INVALID_NAME_OR_PASSWORD,
                   _ctr("user", "The user name must be 1 to 128 characters long"));
 
-        user.setPassword(req["password"].get<string>());
-        size_t password_len = user.getPassword().size();
-        REQ_CHECK(password_len <= MAX_PASSWORD_LENGTH, UserErrorCode::USER_INVALID_PASSWORD,
+        std::string pwd = req["password"].get<string>();
+        size_t password_len = pwd.size();
+        REQ_CHECK(password_len <= MAX_PASSWORD_LENGTH, UserErrorCode::USER_INVALID_NAME_OR_PASSWORD,
                   fmt::format(_ctr("user", "The password must be less than {} characters"),
                               MAX_PASSWORD_LENGTH));
 
+        user.setPassword(req["password"].get<string>());
         user.setStartTime(Datetime::now());
         user.setStatus(UserModel::STATUS::NORMAL);
         {
@@ -174,6 +175,16 @@ class ChangePasswordUserHandle : public RestHandle {
     virtual void run() override {
         check_missing_param({"old", "new", "confirm"});
         uint64_t userid = getCurrentUserId();
+        UserModel user;
+        auto con = DB::getConnect();
+        con->load(user, Field("userid") == userid);
+        REQ_CHECK(user.checkPassword(req["old"].get<std::string>()),
+                  UserErrorCode::USER_INVALID_NAME_OR_PASSWORD, "old password error!");
+        std::string new_pwd = req["new"].get<std::string>();
+        REQ_CHECK(new_pwd == req["confirm"].get<std::string>(),
+                  UserErrorCode::USER_INVALID_NAME_OR_PASSWORD, "The two passwords are different!");
+        user.setPassword(new_pwd);
+        con->save(user);
     }
 };
 

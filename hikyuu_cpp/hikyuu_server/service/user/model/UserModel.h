@@ -9,6 +9,7 @@
 
 #include <string_view>
 #include <hikyuu/utilities/db_connect/TableMacro.h>
+#include "bcrypt/BCrypt.hpp"
 
 namespace hku {
 
@@ -44,7 +45,12 @@ public:
     }
 
     void setPassword(const std::string& password) {
-        this->password = password;
+        auto salt = BCrypt::gensalt(12, "2b");
+        this->password = BCrypt::hashpw(password, salt);
+    }
+
+    bool checkPassword(const std::string& password) {
+        return BCrypt::checkpw(password, this->password);
     }
 
     Datetime getStartTime() const {
