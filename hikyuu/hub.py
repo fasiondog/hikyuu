@@ -222,7 +222,7 @@ class HubManager(metaclass=SingletonType):
         try:
             git.Repo.clone_from(url, local_dir, branch=branch)
         except:
-            raise RuntimeError("请检查网络是否正常或链接地址({})是否正确!".format(url))
+            raise RuntimeError("需要安装git（https://git-scm.com/），或检查网络是否正常或链接地址({})是否正确!".format(url))
         print('下载完毕')
 
     @dbsession
