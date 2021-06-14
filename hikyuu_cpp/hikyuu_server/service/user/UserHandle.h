@@ -163,7 +163,8 @@ class ResetPasswordUserHandle : public RestHandle {
             TransAction trans(con);
             con->load(user, fmt::format(R"(userid="{}")", req["userid"].get<uint64_t>()));
             if (user.id() != 0 && user.getStatus() != UserModel::DELETED) {
-                user.setPassword("123456");
+                user.setPassword(
+                  "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92");  // 123456
                 con->save(user, false);
             }
         }

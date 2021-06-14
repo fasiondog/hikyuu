@@ -22,7 +22,7 @@ class NoAuthRestHandle : public HttpHandle {
     CLASS_LOGGER(NoAuthRestHandle)
 
 public:
-    NoAuthRestHandle(nng_aio *aio) : HttpHandle(aio) {
+    explicit NoAuthRestHandle(nng_aio *aio) : HttpHandle(aio) {
         // addFilter(AuthorizeFilter);
     }
 
@@ -36,7 +36,6 @@ public:
     virtual void after_run() override {
         // 强制关闭连接，即仅有短连接
         // nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
-        std::string lang = getLanguage();
         setResData(res);
     }
 
@@ -71,7 +70,7 @@ class RestHandle : public NoAuthRestHandle {
     CLASS_LOGGER(RestHandle)
 
 public:
-    RestHandle(nng_aio *aio) : NoAuthRestHandle(aio) {
+    explicit RestHandle(nng_aio *aio) : NoAuthRestHandle(aio) {
         addFilter(AuthorizeFilter);
     }
 
@@ -102,7 +101,7 @@ public:
     }
 
 private:
-    uint64_t m_userid;
+    uint64_t m_userid = 0;
     std::string m_update_token;
 };
 

@@ -321,6 +321,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 tab = widget(session, self.main_tab)
                 self.main_tab.addTab(tab, title)
                 self.tabs[title] = tab
+                self.main_tab.setCurrentWidget(tab)
         else:
             self.main_tab.setCurrentWidget(self.tabs[title])
 

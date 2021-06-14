@@ -34,6 +34,7 @@ public:
         GET<QueryUserHandle>("user");
 
         PUT<ResetPasswordUserHandle>("reset_password");
+        PUT<ChangePasswordUserHandle>("change_password");
     }
 };
 

@@ -19,7 +19,7 @@ namespace hku {
 class HttpError : public std::exception {
 public:
     HttpError() : std::exception("Unknown http error!"), m_name("HttpError") {}
-    HttpError(const char* name) : std::exception("Unknown http error!"), m_name(name) {}
+    explicit HttpError(const char* name) : std::exception("Unknown http error!"), m_name(name) {}
 
     HttpError(const char* name, int http_status)
     : HttpError(name, http_status, fmt::format("Http status {}", http_status)) {}
@@ -64,7 +64,7 @@ protected:
 class HttpError : public std::exception {
 public:
     HttpError() : m_name("HttpErrot"), m_msg("Unknown http error!"){};
-    HttpError(const char* name) : m_name(name), m_msg("Unknown http error!") {}
+    explicit HttpError(const char* name) : m_name(name), m_msg("Unknown http error!") {}
     HttpError(const char* name, int http_status)
     : HttpError(name, http_status, fmt::format("Http status {}", http_status)) {}
 

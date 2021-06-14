@@ -2,6 +2,7 @@
 
 import requests
 import functools
+import hashlib
 from .config import getserviceUrl, defaultRequestHeader
 from data import SessionModel
 
@@ -86,7 +87,10 @@ class RestErrorCode:
 def login(session: SessionModel):
     url = getserviceUrl(session.host, session.port, "user", "login")
     headers = defaultRequestHeader()
-    res = post(url, headers=headers, json={"user": session.user, "password": session.password})
+    sha = hashlib.sha256()
+    sha.update(bytes(session.password, encoding='utf8'))
+    pwd = sha.hexdigest()
+    res = post(url, headers=headers, json={"user": session.user, "password": pwd})
     if res["result"]:
         session.token = res["token"]
         session.userid = res["userid"]

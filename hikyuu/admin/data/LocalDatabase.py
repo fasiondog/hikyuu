@@ -38,11 +38,10 @@ def model_save(self):
 
 def model_delete(self):
     if self.id is not None:
-        g_local_db.delete(self)
-        g_local_db.commit()
-        self.id = None
+        g_local_db.session.delete(self)
+        g_local_db.session.commit()
 
 
 # 为 Model 增加 save 和 delete 方法
 LocalDatabase.model.save = model_save
-LocalDatabase.model.delete = model_save
+LocalDatabase.model.delete = model_delete

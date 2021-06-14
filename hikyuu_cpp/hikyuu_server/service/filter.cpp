@@ -76,8 +76,8 @@ void AuthorizeFilter(HttpHandle *handle) {
             rest_handle->setUpdateToken(new_token);
         }
 
-    } catch (HttpUnauthorizedError &e) {
-        throw e;
+    } catch (HttpUnauthorizedError) {
+        throw;
 
     } catch (std::exception &e) {
         APP_ERROR(e.what());
