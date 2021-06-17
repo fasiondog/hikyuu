@@ -99,6 +99,11 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
                 self.open_tab_tigger.emit(session, HkuUserManagerWidget)
             else:
                 pass
+        else:
+            item_text = item.text(0)
+            if item_text == _translate("HkuSessionViewWidget", "person info"):
+                self.open_tab_tigger.emit(session, HkuPersonInfoWidget)
+
 
     def on_tree_customContextMenuRequested(self, pos):
         item = self.tree.itemAt(pos)

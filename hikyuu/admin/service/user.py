@@ -27,7 +27,7 @@ class UserService:
 
     @staticmethod
     def add_user(session: SessionModel, name: str, password: str):
-        r = session_post(session, "user", "user", json={"user": name, "password": password})
+        r = session_post(session, "user", "user", json={"user": name, "password": calPassword(password)})
         check_res(r)
         return r
 
