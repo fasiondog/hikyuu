@@ -163,13 +163,12 @@ public:
     }
 
 protected:
-    void trace();
-    std::string getTraceInfo();
+    void printTraceInfo();
 
 private:
     // 是否跟踪请求打印
-    inline static std::atomic_bool ms_enable_trace = false;
-    inline static std::atomic_bool ms_enable_only_traceid = false;
+    inline static bool ms_enable_trace = false;
+    inline static bool ms_enable_only_traceid = false;
 };
 
 #define HTTP_HANDLE_IMP(cls) \

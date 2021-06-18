@@ -7,6 +7,7 @@
 
 #include <string_view>
 #include <hikyuu/utilities/arithmetic.h>
+#include <hikyuu/datetime/Datetime.h>
 #include "gzip/compress.hpp"
 #include "gzip/decompress.hpp"
 #include "gzip/utils.hpp"
@@ -46,7 +47,6 @@ void HttpHandle::operator()() {
 
         // nng_http_res_set_status(m_nng_res, NNG_HTTP_STATUS_OK);
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
-        nng_aio_finish(m_http_aio, 0);
 
     } catch (nlohmann::json::exception& e) {
         CLS_WARN("HttpBadRequestError({}): {}", INVALID_JSON_REQUEST, e.what());
@@ -68,40 +68,34 @@ void HttpHandle::operator()() {
     }
 
     if (ms_enable_trace) {
-        trace();
+        printTraceInfo();
     }
+
+    nng_aio_finish(m_http_aio, 0);
 }
 
-void HttpHandle::trace() {
-    if (!ms_enable_only_traceid) {
-        CLS_TRACE("{}", getTraceInfo());
+void HttpHandle::printTraceInfo() {
+    std::string url = getReqUrl();
+    std::string traceid = getReqHeader("traceid");
+    if (ms_enable_only_traceid && traceid.empty()) {
         return;
     }
-
-    std::string traceid = getReqHeader("traceid");
-    if (!traceid.empty()) {
-        CLS_TRACE("{}", getTraceInfo());
+    Datetime now = Datetime::now();
+    std::string str = fmt::format(
+      "{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:>02d}.{:<03d} [HttpHandle-T] - ", now.year(),
+      now.month(), now.day(), now.hour(), now.minute(), now.second(), now.millisecond());
+    if (traceid.empty()) {
+        CLS_TRACE(
+          "--------------------------------------------------\n{}+  url:{}\n{}+  request: "
+          "{}\n{}+  response: {}\n{}--------------------------------------------------",
+          str, url, str, getReqData(), str, getResData(), str);
+    } else {
+        CLS_TRACE(
+          "--------------------------------------------------\n{}+  url:{}\n{}+  traceid: {}\n{}+  "
+          "request: "
+          "{}\n{}+  response: {}\n{}--------------------------------------------------",
+          str, url, str, traceid, str, getReqData(), str, getResData(), str);
     }
-}
-
-std::string HttpHandle::getTraceInfo() {
-    std::ostringstream out;
-    std::string url = getReqUrl();
-    out << url << std::endl;
-    out << "    url: " << url << std::endl;
-
-    std::string traceid = getReqHeader("traceid");
-    if (!traceid.empty()) {
-        out << "    traceid: " << traceid << std::endl;
-    }
-
-    std::string body = getReqData();
-    out << "    request: " << body << std::endl;
-
-    body = getResData();
-    out << "    response: " << body << std::endl;
-
-    return out.str();
 }
 
 void HttpHandle::processException(int http_status, int errcode, std::string_view err_msg) {
@@ -112,13 +106,10 @@ void HttpHandle::processException(int http_status, int errcode, std::string_view
         setResData(
           fmt::format(R"({{"result":false,"errcode":{},"errmsg":"{}"}})", errcode, err_msg));
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
-        nng_aio_finish(m_http_aio, 0);
     } catch (std::exception& e) {
         CLS_ERROR(e.what());
-        nng_aio_finish(m_http_aio, 0);
     } catch (...) {
         CLS_FATAL("unknown error in finished!");
-        nng_aio_finish(m_http_aio, 0);
     }
 }
 
