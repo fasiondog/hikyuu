@@ -4,6 +4,7 @@ SOURCES = HikyuuAdmin.py UiConfig.py \
           widget/Ui_HkuUserManagerWidget.py \
           widget/HkuUserManagerWidget.py \
           widget/HkuPersonInfoWidget.py \
+          widget/Ui_HkuPersonInfoWidget.py \
           dialog/HkuEditSessionDialog.py \
           dialog/Ui_HkuEditSessionDialog.py \
           dialog/HkuAddUserDialog.py \

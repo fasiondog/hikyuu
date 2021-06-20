@@ -20,6 +20,29 @@
     </message>
 </context>
 <context>
+    <name>ChangePasswordDialog</name>
+    <message>
+        <location filename="../dialog/Ui_HkuChangePasswordDialog.py" line="58"/>
+        <source>Dialog</source>
+        <translation>对话框</translation>
+    </message>
+    <message>
+        <location filename="../dialog/Ui_HkuChangePasswordDialog.py" line="59"/>
+        <source>Old password</source>
+        <translation>旧密码</translation>
+    </message>
+    <message>
+        <location filename="../dialog/Ui_HkuChangePasswordDialog.py" line="60"/>
+        <source>New password</source>
+        <translation>新密码</translation>
+    </message>
+    <message>
+        <location filename="../dialog/Ui_HkuChangePasswordDialog.py" line="61"/>
+        <source>Repeat new password</source>
+        <translation>确认密码</translation>
+    </message>
+</context>
+<context>
     <name>HkuEditSessionDialog</name>
     <message>
         <location filename="../dialog/Ui_HkuEditSessionDialog.py" line="105"/>
@@ -101,44 +124,49 @@
 <context>
     <name>HkuSessionViewWidget</name>
     <message>
-        <location filename="../widget/HkuSessionViewWidget.py" line="136"/>
+        <location filename="../widget/HkuSessionViewWidget.py" line="141"/>
         <source>name</source>
         <translation>名称</translation>
     </message>
     <message>
         <location filename="../widget/HkuSessionViewWidget.py" line="120"/>
         <source>account</source>
-        <translation>交易账户</translation>
+        <translation type="obsolete">交易账户</translation>
     </message>
     <message>
-        <location filename="../widget/HkuSessionViewWidget.py" line="121"/>
+        <location filename="../widget/HkuSessionViewWidget.py" line="126"/>
         <source>funds</source>
         <translation>资金账户</translation>
     </message>
     <message>
-        <location filename="../widget/HkuSessionViewWidget.py" line="122"/>
+        <location filename="../widget/HkuSessionViewWidget.py" line="127"/>
         <source>positions</source>
         <translation>账户持仓</translation>
     </message>
     <message>
-        <location filename="../widget/HkuSessionViewWidget.py" line="123"/>
+        <location filename="../widget/HkuSessionViewWidget.py" line="128"/>
         <source>orders</source>
         <translation>订单</translation>
     </message>
     <message>
-        <location filename="../widget/HkuSessionViewWidget.py" line="124"/>
+        <location filename="../widget/HkuSessionViewWidget.py" line="129"/>
         <source>fills</source>
         <translation>委托单</translation>
     </message>
     <message>
-        <location filename="../widget/HkuSessionViewWidget.py" line="117"/>
+        <location filename="../widget/HkuSessionViewWidget.py" line="120"/>
         <source>users manage</source>
         <translation>用户管理</translation>
     </message>
     <message>
-        <location filename="../widget/HkuSessionViewWidget.py" line="119"/>
+        <location filename="../widget/HkuSessionViewWidget.py" line="124"/>
         <source>person info</source>
         <translation>个人信息</translation>
+    </message>
+    <message>
+        <location filename="../widget/HkuSessionViewWidget.py" line="125"/>
+        <source>Xueqiu account</source>
+        <translation>雪球模拟账户</translation>
     </message>
 </context>
 <context>
@@ -299,7 +327,7 @@
         <translation>请先连接服务器！</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="89"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="91"/>
         <source>error</source>
         <translation>错误</translation>
     </message>
@@ -307,25 +335,63 @@
 <context>
     <name>PersonInfo</name>
     <message>
-        <location filename="../widget/HkuPersonInfoWidget.py" line="13"/>
+        <location filename="../widget/HkuPersonInfoWidget.py" line="15"/>
         <source>Person Info</source>
         <translation>个人信息</translation>
+    </message>
+    <message>
+        <location filename="../dialog/HkuChangePasswordDialog.py" line="61"/>
+        <source>error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <location filename="../dialog/HkuChangePasswordDialog.py" line="35"/>
+        <source>Please input new password</source>
+        <translation>请输入新密码</translation>
+    </message>
+    <message>
+        <location filename="../dialog/HkuChangePasswordDialog.py" line="40"/>
+        <source>The old password does not match</source>
+        <translation>原密码错误</translation>
+    </message>
+    <message>
+        <location filename="../dialog/HkuChangePasswordDialog.py" line="45"/>
+        <source>The old and new passwords are the same</source>
+        <translation>输入的新旧密码相同</translation>
+    </message>
+    <message>
+        <location filename="../dialog/HkuChangePasswordDialog.py" line="51"/>
+        <source>The two passwords are different</source>
+        <translation>二次输入的密码不一致</translation>
+    </message>
+</context>
+<context>
+    <name>PersonInfoForm</name>
+    <message>
+        <location filename="../widget/Ui_HkuPersonInfoWidget.py" line="32"/>
+        <source>Form</source>
+        <translation>窗体</translation>
+    </message>
+    <message>
+        <location filename="../widget/Ui_HkuPersonInfoWidget.py" line="33"/>
+        <source>Change Password</source>
+        <translation>修改密码</translation>
     </message>
 </context>
 <context>
     <name>UserManage</name>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="28"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="30"/>
         <source>userid</source>
         <translation>用户id</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="29"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="31"/>
         <source>name</source>
         <translation>用户名</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="30"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="32"/>
         <source>start_time</source>
         <translation>创建时间</translation>
     </message>
@@ -335,22 +401,22 @@
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="122"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="124"/>
         <source>Confirm</source>
         <translation>确认</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="122"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="124"/>
         <source>Are you sure to remove the user ({})?</source>
         <translation>确认移除该用户（{}）？</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="145"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="147"/>
         <source>info</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="145"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="147"/>
         <source>The password of user ({}) had be reset to 123456</source>
         <translation>用户（{}）密码已被重置为 123456</translation>
     </message>
@@ -360,12 +426,12 @@
         <translation>用户名不能为空。</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="121"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="123"/>
         <source>The admin count can&apos;t to be deleted</source>
         <translation>admin 账号不可删除</translation>
     </message>
     <message>
-        <location filename="../widget/HkuUserManagerWidget.py" line="17"/>
+        <location filename="../widget/HkuUserManagerWidget.py" line="19"/>
         <source>User Manage</source>
         <translation>用户管理</translation>
     </message>

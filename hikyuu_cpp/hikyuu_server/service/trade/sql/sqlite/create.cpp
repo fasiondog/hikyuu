@@ -14,6 +14,7 @@ const char *g_sqlite_create_td_db{
 CREATE TABLE "td_account" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL UNIQUE,
+	"userid" INTEGER NOT NULL,
 	"name"	TEXT NOT NULL UNIQUE,
 	"type"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)

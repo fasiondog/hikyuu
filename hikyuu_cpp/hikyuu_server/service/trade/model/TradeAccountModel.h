@@ -12,7 +12,7 @@
 namespace hku {
 
 class TradeAccountModel {
-    TABLE_BIND3(td_account, td_id, name, type)
+    TABLE_BIND4(td_account, td_id, userid, name, type)
 
 public:
     static bool isExistName(DBConnectPtr con, const std::string& name) {
@@ -32,6 +32,14 @@ public:
 
     void setTdId(int64_t id) {
         td_id = id;
+    }
+
+    int64_t getUserId() const {
+        return userid;
+    }
+
+    void setUserId(int64_t id) {
+        userid = id;
     }
 
     std::string getName() const {
@@ -55,9 +63,10 @@ public:
     }
 
 private:
-    int64_t td_id;  // 内部交易账户id
-    string name;    // 内部交易账户名称
-    string type;    // 内部交易账户类型：xq（雪球模拟账户）
+    int64_t td_id;   // 内部交易账户id
+    int64_t userid;  // 用户id
+    string name;     // 内部交易账户名称
+    string type;     // 内部交易账户类型：xq（雪球模拟账户）
 };
 
 inline std::ostream& operator<<(std::ostream& out, const TradeAccountModel& model) {

@@ -11,6 +11,7 @@
 #include "sql/sqlite/sqlitedb.h"
 #include "WalletHandle.h"
 #include "TradeAccountHandle.h"
+#include "XueqiuAccountHandle.h"
 
 namespace hku {
 
@@ -27,8 +28,12 @@ public:
     }
 
     virtual void regHandle() override {
-        GET<WalletHandle>("wallet");
+        GET<QueryXueqiuAccountHandle>("xqaccount");
+        POST<AddXueqiuAccountHandle>("xqaccount");
+        DEL<RemoveXueqiuAccountHandle>("xqaccount");
+        PUT<ModifyXueqiuAccountHandle>("xqaccount");
 
+        GET<WalletHandle>("wallet");
         POST<AddTradeAccountHandle>("account");
         GET<GetTradeAccountHandle>("account");
         PUT<ModTradeAccountHandle>("account");

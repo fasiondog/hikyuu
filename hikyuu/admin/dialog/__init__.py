@@ -2,4 +2,4 @@
 
 from .HkuEditSessionDialog import HkuEditSessionDialog
 from .HkuAddUserDialog import HkuAddUserDialog
-from .HkuChangPasswodDialog import HkuChangePasswordDialog
+from .HkuChangePasswordDialog import HkuChangePasswordDialog

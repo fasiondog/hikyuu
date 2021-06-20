@@ -8,18 +8,14 @@ from translate import _translate
 from data import SessionModel
 from .HkuPersonInfoWidget import HkuPersonInfoWidget
 from .HkuUserManagerWidget import HkuUserManagerWidget
+from .HkuXueQiuAccountWidget import HkuXueqiuAccountWidget
 
 
 class HkuSessionViewWidget(QtWidgets.QDockWidget):
     status_changed = QtCore.pyqtSignal()
 
-    # 个人信息信号
-    person_info_trigger = QtCore.pyqtSignal(SessionModel, object)
+    # 打开功能 tab 信号， 参数 object 为指定的 Widget
     open_tab_tigger = QtCore.pyqtSignal(SessionModel, object)
-
-    # 用户管理信号
-    user_manage_trigger = QtCore.pyqtSignal(SessionModel)
-
 
     def __init__(self, parent):
         super(HkuSessionViewWidget, self).__init__(parent)
@@ -92,10 +88,8 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         if session.name == "admin":
             item_text = item.text(0)
             if item_text == _translate("HkuSessionViewWidget", "person info"):
-                #self.person_info_trigger.emit(session, HkuPersonInfoWidget)
                 self.open_tab_tigger.emit(session, HkuPersonInfoWidget)
             elif item_text == _translate("HkuSessionViewWidget", "users manage"):
-                #self.user_manage_trigger.emit(session)
                 self.open_tab_tigger.emit(session, HkuUserManagerWidget)
             else:
                 pass
@@ -103,6 +97,8 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
             item_text = item.text(0)
             if item_text == _translate("HkuSessionViewWidget", "person info"):
                 self.open_tab_tigger.emit(session, HkuPersonInfoWidget)
+            elif item_text == _translate("HkuSessionViewWidget", "Xueqiu account"):
+                self.open_tab_tigger.emit(session, HkuXueqiuAccountWidget)
 
 
     def on_tree_customContextMenuRequested(self, pos):
@@ -117,17 +113,17 @@ class HkuSessionViewWidget(QtWidgets.QDockWidget):
         item.setData(0, QtCore.Qt.UserRole, session)
         if (session.name == "admin"):
             subitem = QtWidgets.QTreeWidgetItem(item)
-            subitem.setText(0, _translate("HkuSessionViewWidget", "person info"))
-            subitem = QtWidgets.QTreeWidgetItem(item)
             subitem.setText(0, _translate("HkuSessionViewWidget", "users manage"))
+            subitem = QtWidgets.QTreeWidgetItem(item)
+            subitem.setText(0, _translate("HkuSessionViewWidget", "person info"))
         else:
             info = _translate("HkuSessionViewWidget", "person info")
-            account = _translate("HkuSessionViewWidget", "account")
+            xq_account = _translate("HkuSessionViewWidget", "Xueqiu account")
             funds = _translate("HkuSessionViewWidget", "funds")
             positons = _translate("HkuSessionViewWidget", "positions")
             orders = _translate("HkuSessionViewWidget", "orders")
             fills = _translate("HkuSessionViewWidget", "fills")
-            names = [info, account, funds, positons, orders, fills]
+            names = [xq_account, funds, positons, orders, fills, info]
             for name in names:
                 subitem = QtWidgets.QTreeWidgetItem(item)
                 subitem.setText(0, name)
