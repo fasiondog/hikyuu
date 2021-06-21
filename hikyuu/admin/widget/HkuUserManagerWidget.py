@@ -18,11 +18,7 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
         # 用类属性无法获取翻译字符串，只能用类方法或静态方法
         return _translate("UserManage", "User Manage")
 
-    def __init__(
-        self,
-        session: SessionModel,
-        parent=None,
-    ):
+    def __init__(self, session: SessionModel, parent=None):
         super(HkuUserManagerWidget, self).__init__(parent)
         self.session = session
         self.head = ['userid', 'name', 'start_time']
