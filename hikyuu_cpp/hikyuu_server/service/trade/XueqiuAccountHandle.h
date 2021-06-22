@@ -15,8 +15,8 @@
 
 namespace hku {
 
-class QueryXueqiuAccountHandle : public RestHandle {
-    REST_HANDLE_IMP(QueryXueqiuAccountHandle)
+class QueryAllXueqiuAccountHandle : public RestHandle {
+    REST_HANDLE_IMP(QueryAllXueqiuAccountHandle)
     virtual void run() override {
         auto xq_accounts = TradeDbBean::queryAllXueqiuAccount();
         json jarray;
@@ -30,6 +30,24 @@ class QueryXueqiuAccountHandle : public RestHandle {
             jarray.push_back(j);
         }
         res["data"] = jarray;
+    }
+};
+
+class QueryXueqiuAccountHandle : public RestHandle {
+    REST_HANDLE_IMP(QueryXueqiuAccountHandle)
+    virtual void run() override {
+        check_missing_param("td_id");
+        XueqiuAccountModel mo;
+        int64_t td_id = req["td_id"].get<int64_t>();
+        REQ_CHECK(TradeDbBean::queryXueqiuAccountsByTdId(td_id, mo),
+                  TradeErrorCode::TD_ACCOUNT_NOT_EXIST,
+                  fmt::format(_ctr("trade", "The trade account({}) not exist!"), td_id));
+
+        res["td_id"] = mo.getTdId();
+        res["name"] = mo.getName();
+        res["cookies"] = mo.getCookies();
+        res["portfolio_code"] = mo.getPortfolioCode();
+        res["portfolio_market"] = mo.getPortfolioMarket();
     }
 };
 

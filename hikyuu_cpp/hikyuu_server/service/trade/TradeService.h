@@ -28,6 +28,7 @@ public:
     }
 
     virtual void regHandle() override {
+        GET<QueryAllXueqiuAccountHandle>("xqaccounts");
         GET<QueryXueqiuAccountHandle>("xqaccount");
         POST<AddXueqiuAccountHandle>("xqaccount");
         DEL<RemoveXueqiuAccountHandle>("xqaccount");

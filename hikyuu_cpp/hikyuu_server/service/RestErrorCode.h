@@ -21,6 +21,7 @@ enum UserErrorCode {
 
 enum TradeErrorCode {
     TD_ACCOUNT_REPETITION = 31000,
+    TD_ACCOUNT_NOT_EXIST,
     TD_ACCOUNT_INVALD_TYPE,
 };
 

@@ -177,7 +177,7 @@ inline void set_logger_level(const std::string& name, int level) {
  * @param expr 指定条件
  * @param ret 返回值
  */
-#define LOG_IF_RETURN(expr, ret) \
+#define APP_IF_RETURN(expr, ret) \
     if (expr) {                  \
         return ret;              \
     }
