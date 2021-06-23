@@ -85,7 +85,7 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
             logging.error(e)
             self.add_user_pushButton.setEnabled(False)
             QtWidgets.QMessageBox.warning(
-                self, _translate("MainWindow", "error"), "{}: {}".format(e.__class__.__name__, e)
+                self, _translate("UserManage", "error"), "{}: {}".format(e.__class__.__name__, e)
             )
 
     @QtCore.pyqtSlot()
@@ -94,17 +94,13 @@ class HkuUserManagerWidget(QtWidgets.QWidget, Ui_UserManagerForm):
         if add_dialog.exec() > 0:
             try:
                 r = UserService.add_user(self.session, add_dialog.name, add_dialog.password)
-                user_info = (r["userid"], r["name"], r["start_time"])
+                info = (r["userid"], r["name"], r["start_time"])
                 self.rest_data_model.insertRows(0, 1, QtCore.QModelIndex())
-                index = self.rest_data_model.index(0, 0, QtCore.QModelIndex())
-                self.rest_data_model.setData(index, user_info[0], QtCore.Qt.EditRole)
-                index = self.rest_data_model.index(0, 1, QtCore.QModelIndex())
-                self.rest_data_model.setData(index, user_info[1], QtCore.Qt.EditRole)
-                index = self.rest_data_model.index(0, 2, QtCore.QModelIndex())
-                self.rest_data_model.setData(index, user_info[2], QtCore.Qt.EditRole)
+                for i in range(len(info)):
+                    index = self.rest_data_model.index(0, i, QtCore.QModelIndex())
+                    self.rest_data_model.setData(index, info[i], QtCore.Qt.EditRole)
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self, _translate("UserManage", "error"), str(e))
-                self.on_add_user_pushButton_clicked(add_dialog.name, add_dialog.password)
 
     @QtCore.pyqtSlot()
     def on_remove_pushButton_clicked(self):

@@ -19,11 +19,12 @@ class HttpStatusError(Exception):
 
 class HttpInternalServerError(HttpStatusError):
     """ http 500 """
-    def __init__(self):
+    def __init__(self, msg=None):
         super(HttpInternalServerError, self).__init__(500)
+        self.msg = msg
 
     def __str__(self):
-        return "Http status 500: Internal Server Error"
+        return "Http status 500: Internal Server Error! {}".format(self.msg)
 
 
 class RestfulError(Exception):
@@ -33,7 +34,7 @@ class RestfulError(Exception):
         self.errmsg = res["errmsg"]
 
     def __str__(self):
-        return self.errmsg
+        return "errcode: {}, errmsg: {}".format(self.errcode, self.errmsg)
 
 
 def wrap_restful(func):
@@ -44,7 +45,7 @@ def wrap_restful(func):
             if r.status_code in (200, 400, 401):
                 return r.json()
             elif r.status_code == 500:
-                raise HttpInternalServerError()
+                raise HttpInternalServerError(r.text)  # 这里json解析会失败
             else:
                 raise HttpStatusError(r.status_code)
         except Exception as e:

@@ -24,6 +24,9 @@ class Ui_HkuXueqiuAccountForm(object):
         self.add_pushButton = QtWidgets.QPushButton(HkuXueqiuAccountForm)
         self.add_pushButton.setObjectName("add_pushButton")
         self.horizontalLayout.addWidget(self.add_pushButton)
+        self.edit_pushButton = QtWidgets.QPushButton(HkuXueqiuAccountForm)
+        self.edit_pushButton.setObjectName("edit_pushButton")
+        self.horizontalLayout.addWidget(self.edit_pushButton)
         self.remove_pushButton = QtWidgets.QPushButton(HkuXueqiuAccountForm)
         self.remove_pushButton.setObjectName("remove_pushButton")
         self.horizontalLayout.addWidget(self.remove_pushButton)
@@ -39,7 +42,9 @@ class Ui_HkuXueqiuAccountForm(object):
         self.line.setObjectName("line")
         self.verticalLayout.addWidget(self.line)
         self.tableView = QtWidgets.QTableView(HkuXueqiuAccountForm)
+        self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.tableView.setObjectName("tableView")
+        self.tableView.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout.addWidget(self.tableView)
         self.formLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.verticalLayout)
 
@@ -50,5 +55,6 @@ class Ui_HkuXueqiuAccountForm(object):
         _translate = QtCore.QCoreApplication.translate
         HkuXueqiuAccountForm.setWindowTitle(_translate("HkuXueqiuAccountForm", "Form"))
         self.add_pushButton.setText(_translate("HkuXueqiuAccountForm", "Add"))
+        self.edit_pushButton.setText(_translate("HkuXueqiuAccountForm", "Edit"))
         self.remove_pushButton.setText(_translate("HkuXueqiuAccountForm", "Remove"))
         self.refresh_pushButton.setText(_translate("HkuXueqiuAccountForm", "Refresh"))

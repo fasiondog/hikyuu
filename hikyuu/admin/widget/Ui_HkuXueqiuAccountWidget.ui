@@ -26,6 +26,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="edit_pushButton">
+         <property name="text">
+          <string>Edit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="remove_pushButton">
          <property name="text">
           <string>Remove</string>
@@ -62,7 +69,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QTableView" name="tableView"/>
+      <widget class="QTableView" name="tableView">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+      </widget>
      </item>
     </layout>
    </item>

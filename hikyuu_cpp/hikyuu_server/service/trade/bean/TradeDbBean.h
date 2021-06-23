@@ -20,6 +20,10 @@ public:
         return DB::getConnect();
     }
 
+    static int64_t getNewTdId() {
+        return DB::getNewTdId();
+    }
+
     /** 查询所有雪球模拟账户信息 */
     static std::vector<XueqiuAccountModel> queryAllXueqiuAccount();
 

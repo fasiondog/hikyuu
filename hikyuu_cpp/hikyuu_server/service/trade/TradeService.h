@@ -9,8 +9,6 @@
 
 #include "http/HttpService.h"
 #include "sql/sqlite/sqlitedb.h"
-#include "WalletHandle.h"
-#include "TradeAccountHandle.h"
 #include "XueqiuAccountHandle.h"
 
 namespace hku {
@@ -33,12 +31,6 @@ public:
         POST<AddXueqiuAccountHandle>("xqaccount");
         DEL<RemoveXueqiuAccountHandle>("xqaccount");
         PUT<ModifyXueqiuAccountHandle>("xqaccount");
-
-        GET<WalletHandle>("wallet");
-        POST<AddTradeAccountHandle>("account");
-        GET<GetTradeAccountHandle>("account");
-        PUT<ModTradeAccountHandle>("account");
-        DEL<DelTradeAccountHandle>("account");
     }
 };
 

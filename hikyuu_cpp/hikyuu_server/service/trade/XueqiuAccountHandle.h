@@ -60,18 +60,24 @@ class AddXueqiuAccountHandle : public RestHandle {
         try {
             TransAction trans(con);
             TradeAccountModel td;
+            td.setTdId(TradeDbBean::getNewTdId());
+            td.setUserId(getCurrentUserId());
             td.setName(req["name"].get<std::string>());
             td.setType(XueqiuAccountModel::ACCOUNT_TYPE);
             con->save(td, false);
             APP_CHECK(td.id() != 0, "Insert TradeAccountModel error!");
 
             XueqiuAccountModel xq;
-            xq.setTdId(td.id());
+            xq.setTdId(td.getTdId());
             xq.setCookies(req["cookies"].get<std::string>());
             xq.setPortfolioCode(req["portfolio_code"].get<std::string>());
             xq.setPortfolioMarket(req["portfolio_market"].get<std::string>());
             con->save(xq, false);
-        } catch (...) {
+
+            res["td_id"] = xq.getTdId();
+
+        } catch (std::exception& e) {
+            CLS_ERROR(e.what());
             con->rollback();
             throw;
         }
@@ -90,7 +96,8 @@ class RemoveXueqiuAccountHandle : public RestHandle {
                                   XueqiuAccountModel::getTableName(), td_id));
             con->exec(fmt::format("delete from {} where td_id={}",
                                   TradeAccountModel::getTableName(), td_id));
-        } catch (...) {
+        } catch (std::exception& e) {
+            CLS_ERROR(e.what());
             con->rollback();
             throw;
         }
@@ -137,7 +144,8 @@ class ModifyXueqiuAccountHandle : public RestHandle {
                 con->exec(buf.str());
             }
 
-        } catch (...) {
+        } catch (std::exception& e) {
+            CLS_ERROR(e.what());
             con->rollback();
             throw;
         }

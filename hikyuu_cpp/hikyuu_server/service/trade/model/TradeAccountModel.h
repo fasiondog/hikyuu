@@ -15,17 +15,6 @@ class TradeAccountModel {
     TABLE_BIND4(td_account, td_id, userid, name, type)
 
 public:
-    static bool isExistName(DBConnectPtr con, const std::string& name) {
-        SQLStatementPtr st = con->getStatement(
-          fmt::format(R"(select count(id) from {} where name="{}")", getTableName(), name));
-        st->exec();
-        st->moveNext();
-        int result = 0;
-        st->getColumn(0, result);
-        return result != 0;
-    }
-
-public:
     int64_t getTdId() const {
         return td_id;
     }

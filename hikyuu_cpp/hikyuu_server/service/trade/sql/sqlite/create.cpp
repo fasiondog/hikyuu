@@ -15,14 +15,14 @@ CREATE TABLE "td_account" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL UNIQUE,
 	"userid" INTEGER NOT NULL,
-	"name"	TEXT NOT NULL UNIQUE,
+	"name"	TEXT NOT NULL,
 	"type"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE UNIQUE INDEX "ix_td_account_on_td_id" ON "td_account" (
 	"td_id"
 );
-CREATE UNIQUE INDEX "ix_td_account_on_name" ON "td_account" (
+CREATE INDEX "ix_td_account_on_name" ON "td_account" (
 	"name"
 );
 CREATE TABLE "td_funds" (
@@ -147,9 +147,9 @@ CREATE INDEX "ix_td_sta_funds_on_sta_id" ON "td_sta_funds" (
 CREATE TABLE "td_account_xq" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"td_id"	INTEGER NOT NULL,
-	"cookies"	TEXT NOT NULL,
-	"portfolio_code"	TEXT NOT NULL,
-	"portfolio_market"	TEXT NOT NULL,
+	"cookies"	TEXT,
+	"portfolio_code"	TEXT,
+	"portfolio_market"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 CREATE INDEX "ix_td_account_xq_on_td_id" ON "td_account_xq" (
