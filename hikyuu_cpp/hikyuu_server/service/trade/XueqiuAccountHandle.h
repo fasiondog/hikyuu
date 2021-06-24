@@ -113,8 +113,8 @@ class ModifyXueqiuAccountHandle : public RestHandle {
         try {
             TransAction trans(con);
             if (req.contains("name")) {
-                con->exec(fmt::format(R"(update {} set name="{}" where td_id={})",
-                                      TradeAccountModel::getTableName(), td_id));
+                con->exec(fmt::format(R"(update {} set name={} where td_id={})",
+                                      TradeAccountModel::getTableName(), req["name"], td_id));
             }
 
             std::ostringstream buf;

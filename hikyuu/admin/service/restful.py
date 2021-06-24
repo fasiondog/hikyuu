@@ -103,6 +103,7 @@ def login(session: SessionModel):
 def check_res(res):
     if not res["result"]:
         raise RestfulError(res)
+    return res
 
 
 def session_get(session: SessionModel, service, api, params=None, **kwargs):

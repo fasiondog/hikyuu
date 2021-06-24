@@ -21,13 +21,13 @@ class HkuXueqiuAccountWidget(QtWidgets.QWidget, Ui_HkuXueqiuAccountForm):
         super(HkuXueqiuAccountWidget, self).__init__(parent)
         self.session = session
         self.setupUi(self)
-        self.head = ['td_id', 'name', 'cookies', 'portfolio_code', 'portfolio_market']
+        self.head = ['td_id', 'name', 'portfolio_code', 'portfolio_market', 'cookies']
         self.head_tr = [
             _translate("trade", "td_id"),
             _translate("trade", "name"),
-            _translate("trade", "cookies"),
             _translate("trade", "portfolio_code"),
             _translate("trade", "portfolio_market"),
+            _translate("trade", "cookies"),
         ]
         self.edit_pushButton.setEnabled(False)
         self.remove_pushButton.setEnabled(False)
@@ -45,20 +45,74 @@ class HkuXueqiuAccountWidget(QtWidgets.QWidget, Ui_HkuXueqiuAccountForm):
             QtWidgets.QMessageBox.warning(self, _translate("trade", "error"), "{}: {}".format(e.__class__.__name__, e))
 
     @QtCore.pyqtSlot()
-    def on_add_pushButton_clicked(self, td_id=None):
-        dialog = HkuEditXueqiuAccountDialog(self.session, self, td_id)
+    def on_add_pushButton_clicked(self):
+        dialog = HkuEditXueqiuAccountDialog(self.session, self)
         if dialog.exec() > 0:
             try:
                 r = TradeService.add_xq_account(
                     self.session, dialog.name, dialog.cookies, dialog.portfolio_code, dialog.portfolio_market
                 )
-                info = (r["td_id"], dialog.name, dialog.cookies, dialog.portfolio_code, dialog.portfolio_market)
+                info = (
+                    r["td_id"],
+                    dialog.name,
+                    dialog.portfolio_code,
+                    dialog.portfolio_market,
+                    dialog.cookies,
+                )
                 self.rest_data_model.insertRows(0, 1, QtCore.QModelIndex())
                 for i in range(len(info)):
                     index = self.rest_data_model.index(0, i, QtCore.QModelIndex())
                     self.rest_data_model.setData(index, info[i], QtCore.Qt.EditRole)
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self, _translate("trade", "error"), str(e))
+
+    @QtCore.pyqtSlot()
+    def on_remove_pushButton_clicked(self):
+        indexes = self.tableView.selectedIndexes()
+        for index in indexes:
+            row = self.rest_data_model.row(index)
+            if row is None:
+                continue
+            try:
+                td_id, name = row["td_id"], row["name"]
+                r = QtWidgets.QMessageBox.information(
+                    self, _translate("trade", "Confirm"),
+                    _translate("trade", "Are you sure to remove the trade account ({})?").format(name),
+                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+                )
+                if r == QtWidgets.QMessageBox.No:
+                    return
+                r = TradeService.remove_xq_account(self.session, td_id)
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(self, _translate("trade", "error"), str(e))
+                return
+            self.rest_data_model.removeRows(index.row(), 1, QtCore.QModelIndex())
+
+    @QtCore.pyqtSlot()
+    def on_edit_pushButton_clicked(self):
+        indexes = self.tableView.selectedIndexes()
+        for index in indexes:
+            row = self.rest_data_model.row(index)
+            if row is None:
+                continue
+            try:
+                dialog = HkuEditXueqiuAccountDialog(self.session, self, row)
+                if dialog.exec() > 0:
+                    info = dict(
+                        td_id=int(dialog.td_id),
+                        name=dialog.name,
+                        cookies=dialog.cookies,
+                        portfolio_code=dialog.portfolio_code,
+                        portfolio_market=dialog.portfolio_market
+                    )
+                    TradeService.modify_xq_account(self.session, info)
+                    row["name"] = info["name"]
+                    row["cookies"] = info["cookies"]
+                    row["portfolio_code"] = info["portfolio_code"]
+                    row["portfolio_market"] = info["portfolio_market"]
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(self, _translate("trade", "error"), str(e))
+                return
 
     def on_tableView_clicked(self, index: QtCore.QModelIndex):
         if not self.remove_pushButton.isEnabled():

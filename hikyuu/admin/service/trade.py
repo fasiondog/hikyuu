@@ -12,24 +12,26 @@ class TradeService:
     @staticmethod
     def query_xq_accounts(session: SessionModel):
         """ 查询所有雪球账户信息 """
-        r = session_get(session, TradeService.name, "xqaccounts")
-        check_res(r)
+        r = check_res(session_get(session, TradeService.name, "xqaccounts"))
         data = r["data"]
         return data if data is not None else []
 
     @staticmethod
     def add_xq_account(session: SessionModel, name, cookies, portfolio_code, portfolio_market):
-        r = session_post(
-            session,
-            TradeService.name,
-            "xqaccount",
-            json=dict(name=name, cookies=cookies, portfolio_code=portfolio_code, portfolio_market=portfolio_market)
+        return check_res(
+            session_post(
+                session,
+                TradeService.name,
+                "xqaccount",
+                json=dict(name=name, cookies=cookies, portfolio_code=portfolio_code, portfolio_market=portfolio_market)
+            )
         )
-        check_res(r)
-        return r
 
     @staticmethod
     def remove_xq_account(session: SessionModel, td_id):
-        r = session_post(session, TradeService.name, "xqaccount", json=dict(td_id=td_id))
-        check_res(r)
-        return r
+        """ 删除指定账户id的账户信息 """
+        return check_res(session_delete(session, TradeService.name, "xqaccount", json=dict(td_id=td_id)))
+
+    @staticmethod
+    def modify_xq_account(session: SessionModel, account_info):
+        return check_res(session_put(session, TradeService.name, "xqaccount", json=account_info))

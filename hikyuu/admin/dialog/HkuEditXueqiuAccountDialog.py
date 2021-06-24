@@ -7,13 +7,17 @@ from data import SessionModel
 from translate import _translate
 
 class HkuEditXueqiuAccountDialog(QtWidgets.QDialog, Ui_XueqiuAccountDialog):
-    def __init__(self, session: SessionModel, parent, td_id=None):
+    def __init__(self, session: SessionModel, parent, account_info=None):
         super(HkuEditXueqiuAccountDialog, self).__init__(parent)
         self.session = session
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon(":/logo/logo_16.png"))
-        if td_id is not None:
-            self.td_id_lineEdit.setText(td_id)
+        if account_info is not None:
+            self.td_id_lineEdit.setText(str(account_info["td_id"]))
+            self.name_lineEdit.setText(account_info["name"])
+            self.portfolio_code_lineEdit.setText(account_info["portfolio_code"])
+            self.portfolio_market_lineEdit.setText(account_info["portfolio_market"])
+            self.cookies_textEdit.setText(account_info["cookies"])
 
     @property
     def td_id(self):
