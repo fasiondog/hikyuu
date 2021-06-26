@@ -33,7 +33,6 @@ public:
     /** 析构函数 */
     virtual ~SQLiteStatement();
 
-    virtual bool sub_isValid() const override;
     virtual void sub_exec() override;
     virtual bool sub_moveNext() override;
     virtual uint64_t sub_getLastRowid() override;
@@ -61,10 +60,6 @@ private:
     sqlite3* m_db;
     sqlite3_stmt* m_stmt;
 };
-
-inline bool SQLiteStatement::sub_isValid() const {
-    return m_stmt ? true : false;
-}
 
 inline uint64_t SQLiteStatement::sub_getLastRowid() {
     return sqlite3_last_insert_rowid(m_db);

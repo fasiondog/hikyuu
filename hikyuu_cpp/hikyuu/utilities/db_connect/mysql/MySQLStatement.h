@@ -32,7 +32,6 @@ public:
     MySQLStatement(DBConnectBase* driver, const string& sql_statement);
     virtual ~MySQLStatement();
 
-    virtual bool sub_isValid() const override;
     virtual void sub_exec() override;
     virtual bool sub_moveNext() override;
     virtual uint64_t sub_getLastRowid() override;

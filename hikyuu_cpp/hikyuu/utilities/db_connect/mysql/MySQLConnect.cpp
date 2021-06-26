@@ -34,12 +34,15 @@ MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mys
         HKU_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, "mysql_set_character_set error!");
     } catch (std::bad_alloc& e) {
         HKU_FATAL(e.what());
+        throw;
     } catch (std::exception& e) {
         HKU_FATAL(e.what());
         close();
+        throw;
     } catch (...) {
         HKU_FATAL_UNKNOWN;
         close();
+        throw;
     }
 }
 
@@ -64,21 +67,20 @@ bool MySQLConnect::ping() {
 }
 
 void MySQLConnect::exec(const string& sql_string) {
-    HKU_CHECK(m_mysql, "mysql connect is invalid!");
     int ret = mysql_query(m_mysql, sql_string.c_str());
     if (ret) {
         // 尝试重新连接
         if (ping()) {
             ret = mysql_query(m_mysql, sql_string.c_str());
         } else {
-            HKU_THROW("SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
-                      mysql_error(m_mysql));
+            MYSQL_THROW(ret, "SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
+                        mysql_error(m_mysql));
         }
     }
 
     if (ret) {
-        HKU_THROW("SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
-                  mysql_error(m_mysql));
+        MYSQL_THROW(ret, "SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
+                    mysql_error(m_mysql));
     }
 
     do {
@@ -89,26 +91,25 @@ void MySQLConnect::exec(const string& sql_string) {
             mysql_num_fields(result);
             mysql_free_result(result);
         } else {
-            if (mysql_field_count(m_mysql) == 0) {
+            ret = mysql_field_count(m_mysql);
+            if (ret == 0) {
 #if defined(_DEBUG) || defined(DEBUG)
                 auto num_rows = mysql_affected_rows(m_mysql);
                 HKU_TRACE("num_rows: {}", num_rows);
 #endif
             } else {
-                HKU_THROW("mysql_field_count error：{}! error code：{}, error msg: {}", sql_string,
-                          ret, mysql_error(m_mysql));
+                MYSQL_THROW(ret, "mysql_field_count error：{}! error code：{}, error msg: {}",
+                            sql_string, ret, mysql_error(m_mysql));
             }
         }
     } while (!mysql_next_result(m_mysql));
 }
 
 SQLStatementPtr MySQLConnect::getStatement(const string& sql_statement) {
-    HKU_CHECK(m_mysql, "mysql connect is invalid!");
     return make_shared<MySQLStatement>(this, sql_statement);
 }
 
 bool MySQLConnect::tableExist(const string& tablename) {
-    HKU_CHECK(m_mysql, "mysql connect is invalid!");
     bool result = false;
     try {
         SQLStatementPtr st = getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", tablename));

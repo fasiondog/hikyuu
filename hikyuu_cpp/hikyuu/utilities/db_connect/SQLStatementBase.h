@@ -50,9 +50,6 @@ public:
     /** 获取数据驱动 */
     DBConnectBase* getConnect() const;
 
-    /** 当前 SQL 表达式是否有效 */
-    bool isValid() const;
-
     /** 执行 SQL */
     void exec();
 
@@ -116,7 +113,6 @@ public:
     //-------------------------------------------------------------------------
     // 子类接口
     //-------------------------------------------------------------------------
-    virtual bool sub_isValid() const = 0;     ///< 子类接口 @see isValid
     virtual void sub_exec() = 0;              ///< 子类接口 @see exec
     virtual bool sub_moveNext() = 0;          ///< 子类接口 @see moveNext
     virtual uint64_t sub_getLastRowid() = 0;  ///< 子类接口 @see getLastRowid();
@@ -157,41 +153,31 @@ inline DBConnectBase* SQLStatementBase::getConnect() const {
     return m_driver;
 }
 
-inline bool SQLStatementBase::isValid() const {
-    return m_driver && sub_isValid() ? true : false;
-}
-
 inline void SQLStatementBase::bind(int idx, float item) {
     bind(idx, (double)item);
 }
 
 inline void SQLStatementBase::exec() {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_exec();
 }
 
 inline bool SQLStatementBase::moveNext() {
-    HKU_CHECK(isValid(), "Invalid statement!");
     return sub_moveNext();
 }
 
 inline void SQLStatementBase::bind(int idx) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_bindNull(idx);
 }
 
 inline void SQLStatementBase::bind(int idx, const string& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_bindText(idx, item);
 }
 
 inline void SQLStatementBase::bind(int idx, double item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_bindDouble(idx, item);
 }
 
 inline void SQLStatementBase::bindBlob(int idx, const string& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_bindBlob(idx, item);
 }
 
@@ -204,33 +190,28 @@ inline int SQLStatementBase::getNumColumns() const {
 }
 
 inline void SQLStatementBase::getColumn(int idx, double& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_getColumnAsDouble(idx, item);
 }
 
 inline void SQLStatementBase::getColumn(int idx, float& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     double temp;
     sub_getColumnAsDouble(idx, temp);
     item = (float)temp;
 }
 
 inline void SQLStatementBase::getColumn(int idx, string& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_getColumnAsText(idx, item);
 }
 
 template <typename T>
 typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::bind(
   int idx, const T& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     sub_bindInt(idx, item);
 }
 
 template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementBase::bind(
   int idx, const T& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     std::ostringstream sout;
     boost::archive::binary_oarchive oa(sout);
     oa << BOOST_SERIALIZATION_NVP(item);
@@ -240,7 +221,6 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementB
 template <typename T>
 typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
   int idx, T& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     int64_t temp;
     sub_getColumnAsInt64(idx, temp);
     item = (T)temp;
@@ -249,7 +229,6 @@ typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBa
 template <typename T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
   int idx, T& item) {
-    HKU_CHECK(isValid(), "Invalid statement!");
     string tmp;
     try {
         sub_getColumnAsBlob(idx, tmp);

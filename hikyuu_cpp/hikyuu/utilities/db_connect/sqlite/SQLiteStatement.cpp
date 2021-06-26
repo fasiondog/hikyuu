@@ -23,8 +23,8 @@ SQLiteStatement::SQLiteStatement(DBConnectBase* driver, const string& sql_statem
       sqlite3_prepare_v2(m_db, m_sql_string.c_str(), m_sql_string.size() + 1, &m_stmt, NULL);
     if (status != SQLITE_OK) {
         sqlite3_finalize(m_stmt);
-        HKU_THROW("Failed prepare sql statement: {}! error msg: {}", m_sql_string,
-                  sqlite3_errmsg(m_db));
+        SQLITE_THROW(status, "Failed prepare sql statement: {}! error msg: {}", m_sql_string,
+                     sqlite3_errmsg(m_db));
     }
 
     HKU_CHECK(m_stmt != 0, "Invalid SQL statement: {}", m_sql_string);
@@ -36,9 +36,10 @@ SQLiteStatement::~SQLiteStatement() {
 
 void SQLiteStatement::_reset() {
     if (m_needs_reset) {
-        if (sqlite3_reset(m_stmt) != SQLITE_OK) {
+        int status = sqlite3_reset(m_stmt);
+        if (status != SQLITE_OK) {
             m_step_status = SQLITE_DONE;
-            HKU_THROW(sqlite3_errmsg(m_db));
+            SQLITE_THROW(status, sqlite3_errmsg(m_db));
         }
         m_needs_reset = false;
         m_step_status = SQLITE_DONE;
@@ -51,7 +52,7 @@ void SQLiteStatement::sub_exec() {
     m_step_status = sqlite3_step(m_stmt);
     m_needs_reset = true;
     if (m_step_status != SQLITE_DONE && m_step_status != SQLITE_ROW) {
-        HKU_THROW(sqlite3_errmsg(m_db));
+        SQLITE_THROW(m_step_status, sqlite3_errmsg(m_db));
     }
 }
 
@@ -67,7 +68,7 @@ bool SQLiteStatement::sub_moveNext() {
             } else if (m_step_status == SQLITE_ROW) {
                 return true;
             } else {
-                HKU_THROW(sqlite3_errmsg(m_db));
+                SQLITE_THROW(m_step_status, sqlite3_errmsg(m_db));
             }
         }
     } else {
@@ -84,31 +85,31 @@ int SQLiteStatement::sub_getNumColumns() const {
 void SQLiteStatement::sub_bindNull(int idx) {
     _reset();
     int status = sqlite3_bind_null(m_stmt, idx + 1);
-    HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
+    SQLITE_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindInt(int idx, int64_t value) {
     _reset();
     int status = sqlite3_bind_int64(m_stmt, idx + 1, value);
-    HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
+    SQLITE_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindText(int idx, const string& item) {
     _reset();
     int status = sqlite3_bind_text(m_stmt, idx + 1, item.c_str(), -1, SQLITE_TRANSIENT);
-    HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
+    SQLITE_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindDouble(int idx, double item) {
     _reset();
     int status = sqlite3_bind_double(m_stmt, idx + 1, item);
-    HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
+    SQLITE_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_bindBlob(int idx, const string& item) {
     _reset();
     int status = sqlite3_bind_blob(m_stmt, idx + 1, item.data(), item.size(), SQLITE_TRANSIENT);
-    HKU_CHECK(status == SQLITE_OK, sqlite3_errmsg(m_db));
+    SQLITE_CHECK(status == SQLITE_OK, status, sqlite3_errmsg(m_db));
 }
 
 void SQLiteStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
