@@ -1,18 +1,8 @@
-option("test")
-    set_default("small")
-    set_values("small", "all")
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Complie with unit-test")
-option_end()
-
 add_requires("doctest")
 
 target("unit-test")
     set_kind("binary")
-    if get_config("test") == "small" then
-        set_default(false)
-    end
+    set_default(false)
 
     add_packages("fmt", "spdlog", "doctest", "mysql", "sqlite3")
 
@@ -56,9 +46,8 @@ target_end()
 
 target("small-test")
     set_kind("binary")
-    if get_config("test") == "all" then
-        set_default(false)
-    end
+    set_default(false)
+    
     add_packages("fmt", "spdlog", "doctest", "mysql", "sqlite3")
     add_includedirs("..")
 

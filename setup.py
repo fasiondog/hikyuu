@@ -203,9 +203,6 @@ def start_build(verbose=False, mode='release', worker_num=2):
         build_boost(mode)
         os.system("xmake f {} -c -y -m {}".format("-v -D" if verbose else "",
                                                   mode))
-    else:
-        os.system("xmake f {} -y -m {}".format("-v -D" if verbose else "",
-                                               mode))
 
     os.system("xmake -j {} -b {} hikyuu".format(worker_num,
                                                 "-v -D" if verbose else ""))
@@ -259,13 +256,11 @@ def test(all, compile, verbose, mode, case, j):
     if compile or current_compile_info != history_compile_info:
         start_build(verbose, mode)
     if all:
-        os.system("xmake f --test=all --mode={}".format(mode))
         os.system("xmake -j {} -b {} unit-test".format(
             j, "-v -D" if verbose else ""))
         os.system("xmake r unit-test {}".format('' if case ==
                                                 '' else '-tc {}'.format(case)))
     else:
-        os.system("xmake f --test=small --mode={}".format(mode))
         os.system("xmake -j {} -b {} small-test".format(
             j, "-v -D" if verbose else ""))
         os.system("xmake r small-test {}".format(
