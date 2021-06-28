@@ -86,17 +86,24 @@ void HttpHandle::printTraceInfo() {
       now.month(), now.day(), now.hour(), now.minute(), now.second(), now.millisecond());
     if (traceid.empty()) {
         CLS_TRACE(
-          "╔════════════════════════════════════════════════════════════\n{}║  url:{}\n{}║  "
-          "request: "
-          "{}\n{}║  response: {}\n{}╚════════════════════════════════════════",
-          str, url, str, getReqData(), str, getResData(), str);
+          "╔════════════════════════════════════════════════════════════\n"
+          "{}║  url: {}\n"
+          "{}║  method: {}\n"
+          "{}║  request: {}\n"
+          "{}║  response: {}\n"
+          "{}╚════════════════════════════════════════",
+          str, url, str, nng_http_req_get_method(m_nng_req), str, getReqData(), str, getResData(),
+          str);
     } else {
         CLS_TRACE(
-          "╔════════════════════════════════════════════════════════════\n{}║  url:{}\n{}║  "
-          "traceid: {}\n{}║  "
-          "request: "
-          "{}\n{}║  response: {}\n{}╚════════════════════════════════════════",
-          str, url, str, traceid, str, getReqData(), str, getResData(), str);
+          "╔════════════════════════════════════════════════════════════\n"
+          "{}║  url:{}\n"
+          "{}║  method: {}\n"
+          "{}║  traceid: {}\n"
+          "{}║  request: {}\n"
+          "{}║  response: {}\n{}╚════════════════════════════════════════",
+          str, url, str, nng_http_req_get_method(m_nng_req), str, traceid, str, getReqData(), str,
+          getResData(), str);
     }
 }
 
