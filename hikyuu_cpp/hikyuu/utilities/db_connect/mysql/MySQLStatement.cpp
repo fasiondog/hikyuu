@@ -26,8 +26,8 @@ MySQLStatement::MySQLStatement(DBConnectBase* driver, const string& sql_statemen
         std::string stmt_errorstr(mysql_stmt_error(m_stmt));
         mysql_stmt_close(m_stmt);
         m_stmt = nullptr;
-        MYSQL_THROW(ret, "Failed prepare sql statement: {}! error msg: {}!", sql_statement,
-                    stmt_errorstr);
+        SQL_THROW(ret, "Failed prepare sql statement: {}! error msg: {}!", sql_statement,
+                  stmt_errorstr);
     }
 
     auto param_count = mysql_stmt_param_count(m_stmt);
@@ -57,7 +57,7 @@ MySQLStatement::~MySQLStatement() {
 void MySQLStatement::_reset() {
     if (m_needs_reset) {
         int ret = mysql_stmt_reset(m_stmt);
-        MYSQL_CHECK(ret == 0, ret, "Failed reset statement! {}", mysql_stmt_error(m_stmt));
+        SQL_CHECK(ret == 0, ret, "Failed reset statement! {}", mysql_stmt_error(m_stmt));
         // m_param_bind.clear();
         // m_result_bind.clear();
         // m_param_buffer.clear();
@@ -73,10 +73,10 @@ void MySQLStatement::sub_exec() {
     int ret = 0;
     if (m_param_bind.size() > 0) {
         ret = mysql_stmt_bind_param(m_stmt, m_param_bind.data());
-        MYSQL_CHECK(ret == 0, ret, "Failed mysql_stmt_bind_param! {}", mysql_stmt_error(m_stmt));
+        SQL_CHECK(ret == 0, ret, "Failed mysql_stmt_bind_param! {}", mysql_stmt_error(m_stmt));
     }
     ret = mysql_stmt_execute(m_stmt);
-    MYSQL_CHECK(ret == 0, ret, "Failed mysql_stmt_execute: {}", mysql_stmt_error(m_stmt));
+    SQL_CHECK(ret == 0, ret, "Failed mysql_stmt_execute: {}", mysql_stmt_error(m_stmt));
 }
 
 void MySQLStatement::_bindResult() {
@@ -148,17 +148,17 @@ bool MySQLStatement::sub_moveNext() {
         m_has_bind_result = true;
 
         ret = mysql_stmt_bind_result(m_stmt, m_result_bind.data());
-        MYSQL_CHECK(ret == 0, ret, "Failed mysql_stmt_bind_result! {}", mysql_stmt_error(m_stmt));
+        SQL_CHECK(ret == 0, ret, "Failed mysql_stmt_bind_result! {}", mysql_stmt_error(m_stmt));
 
         ret = mysql_stmt_store_result(m_stmt);
-        MYSQL_CHECK(ret == 0, ret, "Failed mysql_stmt_store_result! {}", mysql_stmt_error(m_stmt));
+        SQL_CHECK(ret == 0, ret, "Failed mysql_stmt_store_result! {}", mysql_stmt_error(m_stmt));
     }
 
     ret = mysql_stmt_fetch(m_stmt);
     if (ret == 0) {
         return true;
     } else if (ret == 1) {
-        MYSQL_THROW(ret, "Error occurred in mysql_stmt_fetch! {}", mysql_stmt_error(m_stmt));
+        SQL_THROW(ret, "Error occurred in mysql_stmt_fetch! {}", mysql_stmt_error(m_stmt));
     }
     return false;
 }

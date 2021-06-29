@@ -73,14 +73,14 @@ void MySQLConnect::exec(const string& sql_string) {
         if (ping()) {
             ret = mysql_query(m_mysql, sql_string.c_str());
         } else {
-            MYSQL_THROW(ret, "SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
-                        mysql_error(m_mysql));
+            SQL_THROW(ret, "SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
+                      mysql_error(m_mysql));
         }
     }
 
     if (ret) {
-        MYSQL_THROW(ret, "SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
-                    mysql_error(m_mysql));
+        SQL_THROW(ret, "SQL error：{}! error code：{}, error msg: {}", sql_string, ret,
+                  mysql_error(m_mysql));
     }
 
     do {
@@ -98,8 +98,8 @@ void MySQLConnect::exec(const string& sql_string) {
                 HKU_TRACE("num_rows: {}", num_rows);
 #endif
             } else {
-                MYSQL_THROW(ret, "mysql_field_count error：{}! error code：{}, error msg: {}",
-                            sql_string, ret, mysql_error(m_mysql));
+                SQL_THROW(ret, "mysql_field_count error：{}! error code：{}, error msg: {}",
+                          sql_string, ret, mysql_error(m_mysql));
             }
         }
     } while (!mysql_next_result(m_mysql));

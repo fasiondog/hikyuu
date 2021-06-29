@@ -32,14 +32,14 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param), m_d
             flags = getParam<int>("flags");
         }
         int rc = sqlite3_open_v2(m_dbname.c_str(), &m_db, flags, NULL);
-        SQLITE_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
+        SQL_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
         sqlite3_busy_handler(m_db, sqlite_busy_call_back, (void*)m_db);
 
     } catch (std::out_of_range& e) {
         HKU_FATAL("Can't get database name! {}", e.what());
         close();
         throw;
-    } catch (SQLiteException& e) {
+    } catch (SQLException& e) {
         HKU_FATAL("Failed open database: {})! SQLite3 errcode: {}, errmsg: {}", m_dbname,
                   e.errcode(), e.what());
         close();
@@ -72,7 +72,7 @@ bool SQLiteConnect::ping() {
 
 void SQLiteConnect::exec(const string& sql_string) {
     int rc = sqlite3_exec(m_db, sql_string.c_str(), NULL, NULL, NULL);
-    SQLITE_CHECK(rc == SQLITE_OK, rc, "SQL error: {}! ({})", sqlite3_errmsg(m_db), sql_string);
+    SQL_CHECK(rc == SQLITE_OK, rc, "SQL error: {}! ({})", sqlite3_errmsg(m_db), sql_string);
 }
 
 SQLStatementPtr SQLiteConnect::getStatement(const string& sql_statement) {

@@ -13,7 +13,6 @@
 
 #include "../DBConnectBase.h"
 #include "MySQLStatement.h"
-#include "MySQLException.h"
 
 #if defined(_MSC_VER)
 #include <mysql.h>

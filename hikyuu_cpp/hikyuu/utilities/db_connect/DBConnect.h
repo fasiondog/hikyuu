@@ -11,6 +11,7 @@
 #define HIKYUU_DB_CONNECT_H
 
 #include "DBConnectBase.h"
+#include "SQLException.h"
 #include "DBCondition.h"
 #include "SQLStatementBase.h"
 #include "TransAction.h"

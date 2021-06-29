@@ -13,7 +13,6 @@
 #include <sqlite3.h>
 #include "../DBConnectBase.h"
 #include "SQLiteStatement.h"
-#include "SQLiteException.h"
 
 namespace hku {
 
