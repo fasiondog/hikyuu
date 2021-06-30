@@ -10,7 +10,6 @@
 #include <string>
 #include <unordered_set>
 #include <hikyuu/utilities/thread/MQStealThreadPool.h>
-#include <hikyuu/utilities/thread/ThreadPool.h>
 #include <hikyuu/utilities/thread/FuncWrapper.h>
 #include "HttpHandle.h"
 

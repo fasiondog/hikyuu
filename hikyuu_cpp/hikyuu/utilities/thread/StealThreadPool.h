@@ -113,11 +113,14 @@ public:
         }
 
         m_cv.notify_all();  // 唤醒所有工作线程
+
         for (size_t i = 0; i < m_worker_num; i++) {
             if (m_threads[i].joinable()) {
                 m_threads[i].join();
             }
         }
+
+        // printf("Quit StealThreadPool\n");
     }
 
     /**
@@ -127,9 +130,19 @@ public:
     void join() {
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_runnging_util_empty) {
-            for (size_t i = 0; i < m_worker_num; i++) {
-                m_master_work_queue.push(std::move(FuncWrapper()));
+            while (m_master_work_queue.size() != 0) {
+                std::this_thread::yield();
             }
+            for (size_t i = 0; i < m_worker_num; i++) {
+                while (m_queues.size() != 0) {
+                    std::this_thread::yield();
+                }
+            }
+            m_done = true;
+        }
+
+        for (size_t i = 0; i < m_worker_num; i++) {
+            m_master_work_queue.push(std::move(FuncWrapper()));
         }
 
         // 唤醒所有工作线程

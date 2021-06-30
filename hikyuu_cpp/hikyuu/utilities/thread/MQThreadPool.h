@@ -8,8 +8,6 @@
  */
 
 #pragma once
-#ifndef HIKYUU_UTILITIES_MQTHREAD_THREADPOOL_H
-#define HIKYUU_UTILITIES_MQTHREAD_THREADPOOL_H
 
 //#include <fmt/format.h>
 #include <future>
@@ -136,8 +134,15 @@ public:
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_runnging_util_empty) {
             for (size_t i = 0; i < m_worker_num; i++) {
-                m_queues[i]->push(std::move(FuncWrapper()));
+                while (m_queues[i]->size() != 0) {
+                    std::this_thread::yield();
+                }
             }
+            m_done = true;
+        }
+
+        for (size_t i = 0; i < m_worker_num; i++) {
+            m_queues[i]->push(std::move(FuncWrapper()));
         }
 
         // 等待线程结束
@@ -189,5 +194,3 @@ private:
 };  // namespace hku
 
 } /* namespace hku */
-
-#endif /* HIKYUU_UTILITIES_MQTHREAD_THREADPOOL_H */
