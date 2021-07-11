@@ -134,7 +134,7 @@ public:
                 std::this_thread::yield();
             }
             for (size_t i = 0; i < m_worker_num; i++) {
-                while (m_queues.size() != 0) {
+                while (m_queues[i]->size() != 0) {
                     std::this_thread::yield();
                 }
             }

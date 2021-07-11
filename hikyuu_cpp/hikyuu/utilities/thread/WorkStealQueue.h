@@ -52,6 +52,11 @@ public:
         return m_queue.empty();
     }
 
+    /** 队列大小，未加锁 */
+    size_t size() const {
+        return m_queue.size();
+    }
+
     /**
      * 尝试从队列头部弹出一条数数据
      * @param res 存储弹出的数据

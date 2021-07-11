@@ -26,23 +26,28 @@ MySQLConnect::MySQLConnect(const Parameter& param) : DBConnectBase(param), m_mys
         HKU_TRACE("MYSQL database: {}", database);
 
         my_bool reconnect = 1;
-        HKU_CHECK(mysql_options(m_mysql, MYSQL_OPT_RECONNECT, &reconnect) == 0,
-                  "Failed set reconnect options");
-        HKU_CHECK(mysql_real_connect(m_mysql, host.c_str(), usr.c_str(), pwd.c_str(),
+        SQL_CHECK(mysql_options(m_mysql, MYSQL_OPT_RECONNECT, &reconnect) == 0,
+                  mysql_errno(m_mysql), "Failed set reconnect options, {}", mysql_error(m_mysql));
+        SQL_CHECK(mysql_real_connect(m_mysql, host.c_str(), usr.c_str(), pwd.c_str(),
                                      database.c_str(), port, NULL, CLIENT_MULTI_STATEMENTS) != NULL,
-                  "Failed to connect to database! {}", mysql_error(m_mysql));
-        HKU_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, "mysql_set_character_set error!");
+                  mysql_errno(m_mysql), "Failed to connect to database! {}", mysql_error(m_mysql));
+        SQL_CHECK(mysql_set_character_set(m_mysql, "utf8") == 0, mysql_errno(m_mysql),
+                  "mysql_set_character_set error! {}", mysql_error(m_mysql));
+
     } catch (std::bad_alloc& e) {
-        HKU_FATAL(e.what());
+        HKU_THROW("Failed allocate MySQLConnect! {}", e.what());
+
+    } catch (hku::exception&) {
+        close();
         throw;
+
     } catch (std::exception& e) {
-        HKU_FATAL(e.what());
         close();
-        throw;
+        HKU_THROW("Failed create MySQLConnent instance! {}", e.what());
+
     } catch (...) {
-        HKU_FATAL_UNKNOWN;
         close();
-        throw;
+        HKU_THROW("Failed create MySQLConnect instance! Unknown error");
     }
 }
 
