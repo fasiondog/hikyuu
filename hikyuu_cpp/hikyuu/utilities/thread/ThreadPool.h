@@ -11,7 +11,7 @@
 #ifndef HIKYUU_UTILITIES_THREAD_THREADPOOL_H
 #define HIKYUU_UTILITIES_THREAD_THREADPOOL_H
 
-//#include <fmt/format.h>
+#include <cstdio>
 #include <future>
 #include <thread>
 #include <chrono>
@@ -41,9 +41,9 @@ public:
     explicit ThreadPool(size_t n, bool util_empty = true)
     : m_done(false), m_worker_num(n), m_runnging_util_empty(util_empty) {
         try {
-            for (size_t i = 0; i < m_worker_num; i++) {
-                // 创建工作线程及其任务队列
-                m_threads.push_back(std::thread(&ThreadPool::worker_thread, this));
+            for (int i = 0; i < m_worker_num; i++) {
+                m_threads_status.push_back(nullptr);
+                m_threads.push_back(std::thread(&ThreadPool::worker_thread, this, i));
             }
         } catch (...) {
             m_done = true;
@@ -77,6 +77,11 @@ public:
     /** 向线程池提交任务 */
     template <typename FunctionType>
     task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
+        if (m_thread_need_stop || m_done) {
+            printf("Warnning: You can't submit a task to the stopped ThreadPool!\n");
+            // throw std::logic_error("Can't submit a task to the stopped ThreadPool!");
+        }
+
         typedef typename std::result_of<FunctionType()>::type result_type;
         std::packaged_task<result_type()> task(f);
         task_handle<result_type> res(task.get_future());
@@ -101,6 +106,9 @@ public:
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
         for (size_t i = 0; i < m_worker_num; i++) {
+            if (m_threads_status[i]) {
+                m_threads_status[i]->store(true);
+            }
             m_master_work_queue.push(FuncWrapper());
         }
 
@@ -118,12 +126,15 @@ public:
     void join() {
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_runnging_util_empty) {
-            for (size_t i = 0; i < m_worker_num; i++) {
-                while (m_master_work_queue.size() != 0) {
-                    std::this_thread::yield();
-                }
+            while (m_master_work_queue.size() != 0) {
+                std::this_thread::yield();
             }
             m_done = true;
+            for (size_t i = 0; i < m_worker_num; i++) {
+                if (m_threads_status[i]) {
+                    m_threads_status[i]->store(true);
+                }
+            }
         }
 
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -146,15 +157,19 @@ private:
     size_t m_worker_num;         // 工作线程数量
     bool m_runnging_util_empty;  // 运行直到队列空时停止
 
-    ThreadSafeQueue<task_type> m_master_work_queue;  // 主线程任务队列
-    std::vector<std::thread> m_threads;              // 工作线程
+    std::vector<std::atomic_bool *> m_threads_status;  // 工作线程状态
+    ThreadSafeQueue<task_type> m_master_work_queue;    // 主线程任务队列
+    std::vector<std::thread> m_threads;                // 工作线程
 
     // 线程本地变量
-    inline static thread_local bool m_thread_need_stop = false;  // 线程停止运行指示
+    inline static thread_local std::atomic_bool m_thread_need_stop = false;  // 线程停止运行指示
+    inline static thread_local int m_index = -1;                             // 工作线程序号
 
-    void worker_thread() {
+    void worker_thread(int index) {
+        m_index = index;
+        m_threads_status[index] = &m_thread_need_stop;
         m_thread_need_stop = false;
-        while (!m_done && !m_thread_need_stop) {
+        while (!m_thread_need_stop && !m_done) {
             run_pending_task();
             std::this_thread::yield();
         }
