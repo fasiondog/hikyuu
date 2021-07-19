@@ -78,8 +78,7 @@ public:
     template <typename FunctionType>
     task_handle<typename std::result_of<FunctionType()>::type> submit(FunctionType f) {
         if (m_thread_need_stop || m_done) {
-            printf("Warnning: You can't submit a task to the stopped ThreadPool!\n");
-            // throw std::logic_error("Can't submit a task to the stopped ThreadPool!");
+            throw std::logic_error("Can't submit a task to the stopped ThreadPool!");
         }
 
         typedef typename std::result_of<FunctionType()>::type result_type;
@@ -102,6 +101,10 @@ public:
      * 等待各线程完成当前执行的任务后立即结束退出
      */
     void stop() {
+        if (m_done) {
+            return;
+        }
+
         m_done = true;
 
         // 同时加入结束任务指示，以便在dll退出时也能够终止
@@ -124,6 +127,10 @@ public:
      * @note 至此线程池能工作线程结束不可再使用
      */
     void join() {
+        if (m_done) {
+            return;
+        }
+
         // 指示各工作线程在未获取到工作任务时，停止运行
         if (m_runnging_util_empty) {
             while (m_master_work_queue.size() != 0) {

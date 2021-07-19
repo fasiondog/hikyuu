@@ -11,6 +11,7 @@
 #include <hikyuu/utilities/thread/StealThreadPool.h>
 #include <hikyuu/utilities/thread/ThreadPool.h>
 #include <hikyuu/utilities/thread/MQThreadPool.h>
+#include <hikyuu/utilities/thread/MQStealThreadPool.h>
 #include <hikyuu/utilities/SpendTimer.h>
 #include <hikyuu/Log.h>
 
@@ -57,6 +58,21 @@ TEST_CASE("test_StealThreadPool") {
     {
         SPEND_TIME(test_StealThreadPool);
         StealThreadPool tg(8);
+        HKU_INFO("worker_num: {}", tg.worker_num());
+        for (int i = 0; i < 10; i++) {
+            tg.submit([=]() {  // fmt::print("{}: ----------------------\n", i);
+                HKU_INFO("{}: ------------------- [{}]", i, std::this_thread::get_id());
+            });
+        }
+        tg.join();
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_MQStealThreadPool") {
+    {
+        SPEND_TIME(test_MQStealThreadPool);
+        MQStealThreadPool tg(8);
         HKU_INFO("worker_num: {}", tg.worker_num());
         for (int i = 0; i < 10; i++) {
             tg.submit([=]() {  // fmt::print("{}: ----------------------\n", i);
