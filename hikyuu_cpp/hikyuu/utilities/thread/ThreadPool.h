@@ -178,7 +178,7 @@ private:
         m_thread_need_stop = false;
         while (!m_thread_need_stop && !m_done) {
             run_pending_task();
-            std::this_thread::yield();
+            // std::this_thread::yield();
         }
         // fmt::print("thread ({}) finished!\n", std::this_thread::get_id());
     }

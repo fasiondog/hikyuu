@@ -212,17 +212,17 @@ private:
         task_type task;
         if (pop_task_from_local_queue(task)) {
             task();
-            std::this_thread::yield();
+            // std::this_thread::yield();
         } else if (pop_task_from_master_queue(task)) {
             if (!task.isNullTask()) {
                 task();
-                std::this_thread::yield();
+                // std::this_thread::yield();
             } else {
                 m_thread_need_stop = true;
             }
         } else if (pop_task_from_other_thread_queue(task)) {
             task();
-            std::this_thread::yield();
+            // std::this_thread::yield();
         } else {
             // std::this_thread::yield();
             std::unique_lock<std::mutex> lk(m_cv_mutex);

@@ -210,7 +210,7 @@ private:
             m_thread_need_stop = true;
         } else {
             task();
-            std::this_thread::yield();
+            // std::this_thread::yield();
         }
     }
 
