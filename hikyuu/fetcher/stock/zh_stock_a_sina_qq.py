@@ -16,9 +16,7 @@ from hikyuu.fetcher.proxy import request_with_proxy, request_with_local
 def parse_one_result_sina(resultstr):
     result = {}
     hku_check_ignore(resultstr, "Invalid input param!")
-    hku_check_ignore(
-        len(resultstr) > 3 and resultstr[:3] == 'var', "Invalid input param! {}".format(resultstr)
-    )
+    hku_check_ignore(len(resultstr) > 3 and resultstr[:3] == 'var', "Invalid input param! {}".format(resultstr))
 
     a = resultstr.split(',')
     result['market'] = a[0][11:13]
@@ -32,7 +30,7 @@ def parse_one_result_sina(resultstr):
     result['bid'] = float(a[6])  # 竞买价，即“买一”报价
     result['ask'] = float(a[7])  # 竞卖价，即“卖一”报价
     result['volumn'] = float(a[8]) / 100.0  # 成交的股票数，由于股票交易以一百股为基本单位，所以在使用时，通常把该值除以一百
-    result['amount'] = round(float(a[9]) / 1000.0, 2)  # 成交金额，单位为“元”，若要以“万元”为成交金额的单位，需要把该值除以一万
+    result['amount'] = round(float(a[9]) / 10000.0, 2)  # 成交金额，单位为“元”，若要以“万元”为成交金额的单位，需要把该值除以一万
     result['bid1_amount'] = float(a[10]) / 100.0  # “买一”申请4695股，即47手
     result['bid1'] = float(a[11])  # “买一”报价
     result['bid2_amount'] = float(a[12]) / 100.0
@@ -63,9 +61,7 @@ def parse_one_result_sina(resultstr):
 def parse_one_result_qq(resultstr):
     result = {}
     hku_check_ignore(resultstr, "Invalid input param!")
-    hku_check_ignore(
-        len(resultstr) > 3 and resultstr[:2] == 'v_', "Invalid input param! {}".format(resultstr)
-    )
+    hku_check_ignore(len(resultstr) > 3 and resultstr[:2] == 'v_', "Invalid input param! {}".format(resultstr))
 
     a = resultstr.split('~')
     result['market'] = a[0][2:4]
