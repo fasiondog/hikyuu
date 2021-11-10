@@ -286,6 +286,7 @@ def clear(with_boost):
     for r, _, f_list in os.walk('hikyuu'):
         for name in f_list:
             if (name != 'UnRAR.exe' and len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
+                   or (len(name) > 3 and name[-3:] == '.so')  \
                    or (len(name) > 8 and name[:9] == 'libboost_')  \
                    or (len(name) > 6 and name[-6:] == '.dylib'):
                 print('delete', r + '/' + name)

@@ -1,6 +1,33 @@
 版本发布说明
 ===============
 
+1.1.9
+-------------------------
+
+1. 补充科创板
+2. 完善基础设施，增加MQThreadPool、MQStealThreadPool，优化StealThreadPool
+3. 优化 DbConnect，增加DBCondition
+4. Datetime增加hex()返回兼容oracle的Datetime格式存储
+5. fixed 技术指标 RSI,KDJ 
+6. fixed select function
+7. fixed实时采集数据错误
+8. fixed createdb.sql 上证A股代码表前缀 
+9. 取消编译时指定的AVX指令集，防止不支持的CPU架构
+
+
+1.1.8
+-------------------------
+1. HikyuuTDX 切换mysql导入时错误提示目录不存在
+2. tdx本地导入修复，并支持导入MySQL
+
+
+1.1.7 
+-------------------------
+
+1. 更新examples/notebook相关示例
+2. fixed bugs
+
+
 1.1.6 - 2020年2月5日
 -------------------------
 
