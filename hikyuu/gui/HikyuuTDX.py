@@ -112,12 +112,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         day_max=current_config.getint('preload', 'day_max', fallback=100000),
                         week_max=current_config.getint('preload', 'week_max', fallback=100000),
                         month_max=current_config.getint('preload', 'month_max', fallback=100000),
-                        quarter_max=current_config.getint(
-                            'preload', 'quarter_max', fallback=100000
-                        ),
-                        halfyear_max=current_config.getint(
-                            'preload', 'halfyear_max', fallback=100000
-                        ),
+                        quarter_max=current_config.getint('preload', 'quarter_max', fallback=100000),
+                        halfyear_max=current_config.getint('preload', 'halfyear_max', fallback=100000),
                         year_max=current_config.getint('preload', 'year_max', fallback=100000),
                         min1_max=current_config.getint('preload', 'min_max', fallback=4096),
                         min5_max=current_config.getint('preload', 'min5_max', fallback=4096),
@@ -150,12 +146,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         day_max=current_config.getint('preload', 'day_max', fallback=100000),
                         week_max=current_config.getint('preload', 'week_max', fallback=100000),
                         month_max=current_config.getint('preload', 'month_max', fallback=100000),
-                        quarter_max=current_config.getint(
-                            'preload', 'quarter_max', fallback=100000
-                        ),
-                        halfyear_max=current_config.getint(
-                            'preload', 'halfyear_max', fallback=100000
-                        ),
+                        quarter_max=current_config.getint('preload', 'quarter_max', fallback=100000),
+                        halfyear_max=current_config.getint('preload', 'halfyear_max', fallback=100000),
                         year_max=current_config.getint('preload', 'year_max', fallback=100000),
                         min1_max=current_config.getint('preload', 'min_max', fallback=4096),
                         min5_max=current_config.getint('preload', 'min5_max', fallback=4096),
@@ -208,9 +200,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if self._stream is None:
             self._stream = EmittingStream(textWritten=self.normalOutputWritten)
         con = logging.StreamHandler(self._stream)
-        FORMAT = logging.Formatter(
-            '%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
-        )
+        FORMAT = logging.Formatter('%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]')
         con.setFormatter(FORMAT)
         add_class_logger_handler(
             con,
@@ -265,35 +255,21 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
 
         #初始化导入行情数据类型配置
-        self.import_stock_checkBox.setChecked(
-            import_config.getboolean('quotation', 'stock', fallback=True)
-        )
-        self.import_fund_checkBox.setChecked(
-            import_config.getboolean('quotation', 'fund', fallback=True)
-        )
-        self.import_future_checkBox.setChecked(
-            import_config.getboolean('quotation', 'future', fallback=False)
-        )
+        self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
+        self.import_fund_checkBox.setChecked(import_config.getboolean('quotation', 'fund', fallback=True))
+        self.import_future_checkBox.setChecked(import_config.getboolean('quotation', 'future', fallback=False))
 
         #初始化导入K线类型配置
         self.import_day_checkBox.setChecked(import_config.getboolean('ktype', 'day', fallback=True))
         self.import_min_checkBox.setChecked(import_config.getboolean('ktype', 'min', fallback=True))
-        self.import_min5_checkBox.setChecked(
-            import_config.getboolean('ktype', 'min5', fallback=True)
-        )
-        self.import_trans_checkBox.setChecked(
-            import_config.getboolean('ktype', 'trans', fallback=False)
-        )
-        self.import_time_checkBox.setChecked(
-            import_config.getboolean('ktype', 'time', fallback=False)
-        )
+        self.import_min5_checkBox.setChecked(import_config.getboolean('ktype', 'min5', fallback=True))
+        self.import_trans_checkBox.setChecked(import_config.getboolean('ktype', 'trans', fallback=False))
+        self.import_time_checkBox.setChecked(import_config.getboolean('ktype', 'time', fallback=False))
         #self.trans_max_days_spinBox.setValue(import_config.getint('ktype', 'trans_max_days', fallback=70))
         #self.time_max_days_spinBox.setValue(import_config.getint('ktype', 'time_max_days', fallback=70))
 
         #初始化权息与财务数据设置
-        self.import_weight_checkBox.setChecked(
-            import_config.getboolean('weight', 'enable', fallback=True)
-        )
+        self.import_weight_checkBox.setChecked(import_config.getboolean('weight', 'enable', fallback=True))
 
         #初始化通道信目录配置
         tdx_enable = import_config.getboolean('tdx', 'enable', fallback=False)
@@ -304,12 +280,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.tdx_dir_lineEdit.setText(tdx_dir)
 
         #初始化pytdx配置及显示
-        self.pytdx_radioButton.setChecked(
-            import_config.getboolean('pytdx', 'enable', fallback=True)
-        )
-        self.use_tdx_number_spinBox.setValue(
-            import_config.getint('pytdx', 'use_tdx_number', fallback=10)
-        )
+        self.pytdx_radioButton.setChecked(import_config.getboolean('pytdx', 'enable', fallback=True))
+        self.use_tdx_number_spinBox.setValue(import_config.getint('pytdx', 'use_tdx_number', fallback=10))
 
         self.on_tdx_or_pytdx_toggled()
 
@@ -317,9 +289,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         hdf5_enable = import_config.getboolean('hdf5', 'enable', fallback=True)
         self.enable_hdf55_radioButton.setChecked(hdf5_enable)
         hdf5_dir = import_config.get(
-            'hdf5',
-            'dir',
-            fallback="c:\stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock"
+            'hdf5', 'dir', fallback="c:\stock" if sys.platform == "win32" else os.path.expanduser('~') + "/stock"
         )
         self.hdf5_dir_lineEdit.setText(hdf5_dir)
         self.hdf5_dir_lineEdit.setEnabled(hdf5_enable)
@@ -329,9 +299,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if hdf5_enable:
             mysql_enable = False
         self.enable_mysql_radioButton.setChecked(mysql_enable)
-        self.mysql_tmpdir_lineEdit.setText(
-            import_config.get('mysql', 'tmpdir', fallback='c:\stock')
-        )
+        self.mysql_tmpdir_lineEdit.setText(import_config.get('mysql', 'tmpdir', fallback='c:\stock'))
         mysql_ip = import_config.get('mysql', 'host', fallback='127.0.0.1')
         self.mysql_ip_lineEdit.setText(mysql_ip)
         self.mysql_ip_lineEdit.setEnabled(mysql_enable)
@@ -358,93 +326,41 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         data_source = import_config.get('collect', 'source', fallback='sina')
         self.collect_source_comboBox.setCurrentIndex(0 if data_source == 'sina' else 1)
         self.collect_phase1_start_timeEdit.setTime(
-            datetime.time.fromisoformat(
-                import_config.get('collect', 'phase1_start', fallback='09:00')
-            )
+            datetime.time.fromisoformat(import_config.get('collect', 'phase1_start', fallback='09:00'))
         )
         self.collect_phase1_last_timeEdit.setTime(
-            datetime.time.fromisoformat(
-                import_config.get('collect', 'phase1_end', fallback='12:05')
-            )
+            datetime.time.fromisoformat(import_config.get('collect', 'phase1_end', fallback='12:05'))
         )
         self.collect_phase2_start_timeEdit.setTime(
-            datetime.time.fromisoformat(
-                import_config.get('collect', 'phase2_start', fallback='13:00')
-            )
+            datetime.time.fromisoformat(import_config.get('collect', 'phase2_start', fallback='13:00'))
         )
         self.collect_phase2_last_timeEdit.setTime(
-            datetime.time.fromisoformat(
-                import_config.get('collect', 'phase2_end', fallback='15:05')
-            )
+            datetime.time.fromisoformat(import_config.get('collect', 'phase2_end', fallback='15:05'))
         )
 
         # 预加载设置
-        self.preload_day_checkBox.setChecked(
-            import_config.getboolean('preload', 'day', fallback=True)
-        )
-        self.preload_week_checkBox.setChecked(
-            import_config.getboolean('preload', 'week', fallback=False)
-        )
-        self.preload_month_checkBox.setChecked(
-            import_config.getboolean('preload', 'month', fallback=False)
-        )
-        self.preload_quarter_checkBox.setChecked(
-            import_config.getboolean('preload', 'quarter', fallback=False)
-        )
-        self.preload_halfyear_checkBox.setChecked(
-            import_config.getboolean('preload', 'halfyear', fallback=False)
-        )
-        self.preload_year_checkBox.setChecked(
-            import_config.getboolean('preload', 'year', fallback=False)
-        )
-        self.preload_min1_checkBox.setChecked(
-            import_config.getboolean('preload', 'min', fallback=False)
-        )
-        self.preload_min5_checkBox.setChecked(
-            import_config.getboolean('preload', 'min5', fallback=False)
-        )
-        self.preload_min15_checkBox.setChecked(
-            import_config.getboolean('preload', 'min15', fallback=False)
-        )
-        self.preload_min30_checkBox.setChecked(
-            import_config.getboolean('preload', 'min30', fallback=False)
-        )
-        self.preload_min60_checkBox.setChecked(
-            import_config.getboolean('preload', 'min60', fallback=False)
-        )
-        self.preload_day_spinBox.setValue(
-            import_config.getint('preload', 'day_max', fallback=100000)
-        )
-        self.preload_week_spinBox.setValue(
-            import_config.getint('preload', 'week_max', fallback=100000)
-        )
-        self.preload_month_spinBox.setValue(
-            import_config.getint('preload', 'month_max', fallback=100000)
-        )
-        self.preload_quarter_spinBox.setValue(
-            import_config.getint('preload', 'quarter_max', fallback=100000)
-        )
-        self.preload_halfyear_spinBox.setValue(
-            import_config.getint('preload', 'halfyear_max', fallback=100000)
-        )
-        self.preload_year_spinBox.setValue(
-            import_config.getint('preload', 'year_max', fallback=100000)
-        )
-        self.preload_min1_spinBox.setValue(
-            import_config.getint('preload', 'min_max', fallback=5120)
-        )
-        self.preload_min5_spinBox.setValue(
-            import_config.getint('preload', 'min5_max', fallback=5120)
-        )
-        self.preload_min15_spinBox.setValue(
-            import_config.getint('preload', 'min15_max', fallback=5120)
-        )
-        self.preload_min30_spinBox.setValue(
-            import_config.getint('preload', 'min30_max', fallback=5120)
-        )
-        self.preload_min60_spinBox.setValue(
-            import_config.getint('preload', 'min60_max', fallback=5120)
-        )
+        self.preload_day_checkBox.setChecked(import_config.getboolean('preload', 'day', fallback=True))
+        self.preload_week_checkBox.setChecked(import_config.getboolean('preload', 'week', fallback=False))
+        self.preload_month_checkBox.setChecked(import_config.getboolean('preload', 'month', fallback=False))
+        self.preload_quarter_checkBox.setChecked(import_config.getboolean('preload', 'quarter', fallback=False))
+        self.preload_halfyear_checkBox.setChecked(import_config.getboolean('preload', 'halfyear', fallback=False))
+        self.preload_year_checkBox.setChecked(import_config.getboolean('preload', 'year', fallback=False))
+        self.preload_min1_checkBox.setChecked(import_config.getboolean('preload', 'min', fallback=False))
+        self.preload_min5_checkBox.setChecked(import_config.getboolean('preload', 'min5', fallback=False))
+        self.preload_min15_checkBox.setChecked(import_config.getboolean('preload', 'min15', fallback=False))
+        self.preload_min30_checkBox.setChecked(import_config.getboolean('preload', 'min30', fallback=False))
+        self.preload_min60_checkBox.setChecked(import_config.getboolean('preload', 'min60', fallback=False))
+        self.preload_day_spinBox.setValue(import_config.getint('preload', 'day_max', fallback=100000))
+        self.preload_week_spinBox.setValue(import_config.getint('preload', 'week_max', fallback=100000))
+        self.preload_month_spinBox.setValue(import_config.getint('preload', 'month_max', fallback=100000))
+        self.preload_quarter_spinBox.setValue(import_config.getint('preload', 'quarter_max', fallback=100000))
+        self.preload_halfyear_spinBox.setValue(import_config.getint('preload', 'halfyear_max', fallback=100000))
+        self.preload_year_spinBox.setValue(import_config.getint('preload', 'year_max', fallback=100000))
+        self.preload_min1_spinBox.setValue(import_config.getint('preload', 'min_max', fallback=5120))
+        self.preload_min5_spinBox.setValue(import_config.getint('preload', 'min5_max', fallback=5120))
+        self.preload_min15_spinBox.setValue(import_config.getint('preload', 'min15_max', fallback=5120))
+        self.preload_min30_spinBox.setValue(import_config.getint('preload', 'min30_max', fallback=5120))
+        self.preload_min60_spinBox.setValue(import_config.getint('preload', 'min60_max', fallback=5120))
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
@@ -468,10 +384,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         import_config['weight'] = {
             'enable': self.import_weight_checkBox.isChecked(),
         }
-        import_config['tdx'] = {
-            'enable': self.tdx_radioButton.isChecked(),
-            'dir': self.tdx_dir_lineEdit.text()
-        }
+        import_config['tdx'] = {'enable': self.tdx_radioButton.isChecked(), 'dir': self.tdx_dir_lineEdit.text()}
         import_config['pytdx'] = {
             'enable': self.pytdx_radioButton.isChecked(),
             'use_tdx_number': self.use_tdx_number_spinBox.value()
@@ -660,9 +573,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if msg_name == 'ESCAPE_TIME':
             self.escape_time = msg_task_name
             self.import_status_label.setText(
-                "耗时：{:>.2f} 秒 （{:>.2f}分钟） {}".format(
-                    self.escape_time, self.escape_time / 60, datetime.datetime.now()
-                )
+                "耗时：{:>.2f} 秒 （{:>.2f}分钟） {}".format(self.escape_time, self.escape_time / 60, datetime.datetime.now())
             )
 
         elif msg_name == 'HDF5_IMPORT':
@@ -687,9 +598,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 if ktype != 'FINISHED':
                     self.hdf5_import_progress_bar[ktype].setValue(progress)
                 else:
-                    self.import_detail_textEdit.append(
-                        '导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5])
-                    )
+                    self.import_detail_textEdit.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
 
             elif msg_task_name == 'IMPORT_TRANS':
                 ktype, progress = msg[2:4]
@@ -730,6 +639,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
             return
 
+        try:
+            self.saveConfig()
+        except Exception as e:
+            QMessageBox.about(self, "保存配置信息失败", str(e))
+            return
+
         self.import_running = True
         self.start_import_pushButton.setEnabled(False)
         self.reset_progress_bar()
@@ -762,6 +677,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.sched_import_thread = None
             self.sched_import_pushButton.setEnabled(True)
             self.start_import_pushButton.setEnabled(True)
+            return
+
+        try:
+            self.saveConfig()
+        except Exception as e:
+            QMessageBox.about(self, "保存配置信息错误", str(e))
             return
 
         self.start_import_pushButton.setEnabled(False)
@@ -832,11 +753,9 @@ if __name__ == "__main__":
         app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'
-        logging.basicConfig(
-            format=FORMAT, level=logging.INFO, handlers=[
-                logging.StreamHandler(),
-            ]
-        )
+        logging.basicConfig(format=FORMAT, level=logging.INFO, handlers=[
+            logging.StreamHandler(),
+        ])
         myWin = MyMainWindow(capture_output=False, use_dark_style=use_dark_style)
     else:
         myWin = MyMainWindow(capture_output=True, use_dark_style=use_dark_style)
