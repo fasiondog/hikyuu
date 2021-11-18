@@ -3,8 +3,8 @@
 from hikyuu.util.slice import list_getitem
 from hikyuu.cpp.core import SYS_Simple as cpp_SYS_Simple
 from hikyuu.cpp.core import (
-    System, SystemList, SystemWeight, SystemWeightList, ConditionBase, EnvironmentBase,
-    MoneyManagerBase, ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase
+    System, SystemList, SystemWeight, SystemWeightList, ConditionBase, EnvironmentBase, MoneyManagerBase,
+    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase
 )
 
 #------------------------------------------------------------------
@@ -52,11 +52,11 @@ def SYS_Simple(tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg
     且没有正确结果的时候，可能是未设置tm、sg、mm。进行回测时，使用 run 方法，如::
     
         #创建模拟交易账户进行回测，初始资金30万
-        my_tm = crtTM(initCash = 300000)
+        my_tm = crtTM(init_cash = 300000)
 
         #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越
         #慢线时买入，反之卖出）
-        my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
+        my_sg = SG_Flex(EMA(n=5), slow_n=10)
 
         #固定每次买入1000股
         my_mm = MM_FixedCount(1000)

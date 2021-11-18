@@ -242,7 +242,7 @@
 ::
 
     #创建模拟交易账户进行回测，初始资金30万
-    my_tm = crtTM(initCash = 300000)
+    my_tm = crtTM(init_cash = 300000)
 
     #可以同时注册多个订单代理，同时实现打印、发送邮件、实盘下单动作
     #TestOerderBroker是测试用订单代理对象，只打印
@@ -258,7 +258,7 @@
 
 ::
 
-    my_tm = crtTM(datetime=Datetime('2017-Jan-01 00:00:00'), initCash=100000, costFunc=TC_Zero(), name='SYS')
+    my_tm = crtTM(datetime=Datetime('2017-Jan-01 00:00:00'), init_cash=100000, costFunc=TC_Zero(), name='SYS')
     td = my_tm.buy(Datetime('2017-Jan-03 00:00:00'), sm['SZ000001'], 9.11, 100, 0, 0, 0, 8)
     td = my_tm.sell(Datetime('2017-Feb-21 00:00:00'),sm['SZ000001'], 9.6, 100, 0, 0, 0, 8)
     
@@ -292,7 +292,7 @@
 ::
 
     #创建模拟交易账户进行回测，初始资金30万
-    my_tm = crtTM(initCash = 300000)
+    my_tm = crtTM(init_cash = 300000)
 
     #注册实盘交易订单代理
     my_tm.regBroker(crtOB(TestOrderBroker())) #TestOerderBroker是测试用订单代理对象，只打印
