@@ -37,13 +37,16 @@ public:
      * @param n 指定的线程数
      */
     explicit MQStealThreadPool(size_t n, bool util_empty = true)
-    : m_done(false), m_init_finished(false), m_worker_num(n), m_runnging_util_empty(util_empty) {
+    : m_done(false), m_worker_num(n), m_runnging_util_empty(util_empty) {
         try {
+            // 先初始化相关资源，再启动线程
             for (int i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
                 m_threads_status.push_back(nullptr);
                 m_queues.push_back(
                   std::unique_ptr<MQStealQueue<task_type>>(new MQStealQueue<task_type>));
+            }
+            for (int i = 0; i < m_worker_num; i++) {
                 m_threads.push_back(std::thread(&MQStealThreadPool::worker_thread, this, i));
             }
         } catch (...) {
@@ -183,7 +186,6 @@ public:
 private:
     typedef FuncWrapper task_type;
     std::atomic_bool m_done;     // 线程池全局需终止指示
-    bool m_init_finished;        // 线程池是否初始化完毕
     size_t m_worker_num;         // 工作线程数量
     bool m_runnging_util_empty;  // 运行直到队列空时停止
 
@@ -237,11 +239,6 @@ private:
     }
 
     bool pop_task_from_other_thread_queue(task_type& task) {
-        // 线程池尚未初始化化完成时，其他任务队列可能尚未创建
-        // 此时不能从其他队列偷取任务
-        if (!m_init_finished) {
-            return false;
-        }
         for (size_t i = 0; i < m_worker_num; ++i) {
             size_t index = (m_index + i + 1) % m_worker_num;
             if (index != m_index && m_queues[index]->try_steal(task)) {

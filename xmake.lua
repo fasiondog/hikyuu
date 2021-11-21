@@ -3,6 +3,8 @@ set_xmakever("2.5.4")
 -- project
 set_project("hikyuu")
 
+add_rules("mode.debug", "mode.release")
+
 -- version
 set_version("1.1.9", {build="%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
@@ -71,19 +73,12 @@ if is_host("linux") then
     end
 end
 
-if is_mode("debug") then
-    set_symbols("debug")
-    set_optimize("none")
-end
-
 -- is release now
 if is_mode("release") then
     if is_plat("windows") then
         --Unix-like systems hidden symbols will cause the link dynamic libraries to failed!
         set_symbols("hidden") 
     end
-    set_optimize("fastest")
-    set_strip("all")
 end
 
 -- for the windows platform (msvc)

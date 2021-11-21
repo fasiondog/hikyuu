@@ -41,8 +41,11 @@ public:
     explicit ThreadPool(size_t n, bool util_empty = true)
     : m_done(false), m_worker_num(n), m_runnging_util_empty(util_empty) {
         try {
+            // 先初始化相关资源，再启动线程
             for (int i = 0; i < m_worker_num; i++) {
                 m_threads_status.push_back(nullptr);
+            }
+            for (int i = 0; i < m_worker_num; i++) {
                 m_threads.push_back(std::thread(&ThreadPool::worker_thread, this, i));
             }
         } catch (...) {
