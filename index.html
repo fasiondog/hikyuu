@@ -1,51 +1,58 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <title>Hikyuu - Quant Framework</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="keywords" content="hikyuu,quant,backtester,trade,量化交易,系统交易" /> 
-    <meta name="description" content="Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-    <script>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hikyuu - Quant Framework</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="keywords" content="hikyuu,quant,backtester,trade,量化交易,系统交易" />
+  <meta name="description" content="Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架" />
+  <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+  <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+  <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  <script>
     var _hmt = _hmt || [];
-    (function() {
+    (function () {
       var hm = document.createElement("script");
       hm.src = "https://hm.baidu.com/hm.js?633d3909696d49eed8b658de9c8a0ae5";
-      var s = document.getElementsByTagName("script")[0]; 
+      var s = document.getElementsByTagName("script")[0];
       s.parentNode.insertBefore(hm, s);
     })();
-    </script>
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Hikyuu - Quant Framework</h1>
-      <h2 class="project-tagline"></h2>
-      <a href="https://hikyuu.readthedocs.io" class="btn">安装与帮助</a>
-      <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True" class="btn">入门与示例</a>
-      <a href="https://hikyuu.org/video.html" class="btn">视频教程</a>
-    </section>
+  </script>
+</head>
 
-    <section class="main-content">
+<body>
+  <section class="page-header">
+    <h1 class="project-name">Hikyuu - Quant Framework</h1>
+    <h2 class="project-tagline"></h2>
+    <a href="https://hikyuu.readthedocs.io" class="btn">安装与帮助</a>
+    <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True"
+      class="btn">入门与示例</a>
+    <a href="https://hikyuu.org/video.html" class="btn">视频教程</a>
+  </section>
 
-<img alt="00000_title.png" src="images/00000-title3.png" width=250px/>
-<p>Hikyuu Quant Framework是基于C++/Python的高性能开源量化交易研究框架，用于策略分析及回测（目前用于国内证券市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。</p>
+  <section class="main-content">
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>祝贺 HIKYUU 入选 <a href="https://gitee.com/gvp">GITEE 最有价值开源项目 GVP</a></h3>
-<p><img alt="00000_title.png" src="images/gitee_GVP.jpg" width=800px/></p>
-<p>给作者加点油，每天扫扫红包，或者喝杯咖啡</p>
-<img src="images/juanzeng.jpg" width=800 height=350></p>
+    <img alt="00000_title.png" src="images/00000-title3.png" width=250px />
+    <p>Hikyuu Quant
+      Framework是基于C++/Python的高性能开源量化交易研究框架，用于策略分析及回测（目前用于国内证券市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
+    </p>
 
-<p>示例：</p>
+    <h3>
+      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
+          class="octicon octicon-link"></span></a>祝贺 HIKYUU 入选 <a href="https://gitee.com/gvp">GITEE 最有价值开源项目 GVP</a>
+    </h3>
+    <p><img alt="00000_title.png" src="images/gitee_GVP.jpg" width=800px /></p>
+    <p>给作者加点油，每天扫扫红包，或者喝杯咖啡</p>
+    <img src="images/juanzeng.jpg" width=800 height=350></p>
 
-<pre><code>#创建模拟交易账户进行回测，初始资金30万
-my_tm = crtTM(initCash = 300000)
+    <p>示例：</p>
+
+    <pre><code>#创建模拟交易账户进行回测，初始资金30万
+my_tm = crtTM(init_cash = 300000)
 
 #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越慢线时买入，反之卖出）
-my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
+my_sg = SG_Flex(EMA(n=5), slow_n=10)
 
 #固定每次买入1000股
 my_mm = MM_FixedCount(1000)
@@ -55,79 +62,104 @@ sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
 sys.run(sm['sz000001'], Query(-150))
 </code></pre>
 
-<img alt="10000-overview.png" src="images/10000-overview.png" style="width: 600px"/>
+    <img alt="10000-overview.png" src="images/10000-overview.png" style="width: 600px" />
 
-<p>更多示例参见：<a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True">https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True</a></p>
+    <p>更多示例参见：<a
+        href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True">https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True</a>
+    </p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>为什么选择 Hikyuu</h3>
+    <h3>
+      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
+          class="octicon octicon-link"></span></a>为什么选择 Hikyuu
+    </h3>
 
-<p><b>1、组合灵活，分类构建策略资产库</b> Hikyuu对系统化交易方法进行了良好的抽象，包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试。在进行策略探索时，可以更加专注于某一方面的策略性能与影响。其主要功能模块如下：</p>
-<img alt="主要功能模块示意图" src="images/10002-function-arc.png" style="width: 600px"/>
+    <p><b>1、组合灵活，分类构建策略资产库</b>
+      Hikyuu对系统化交易方法进行了良好的抽象，包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试。在进行策略探索时，可以更加专注于某一方面的策略性能与影响。其主要功能模块如下：
+    </p>
+    <img alt="主要功能模块示意图" src="images/10002-function-arc.png" style="width: 600px" />
 
-<p><b>2、性能保障，打造自己的专属应用</b> 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
-<ul>
-<li>C++核心库，提供了整体的策略框架，在保证性能的同时，已经考虑了对多线程和多核处理的支持，在未来追求更高运算速度提供便利。C++核心库，可以单独剥离使用，自行构建自己的客户端工具。</li>
-<li>Python库（hikyuu），提供了对C++库的包装，同时集成了talib库（如TA_SMA，对应talib.SMA），可以与numpy、pandas数据结构进行互相转换，为使用其他成熟的python数据分析工具提供了便利。</li>
-<li>hikyuu.interactive 交互式探索工具，提供了K线、指标、系统信号等的基本绘图功能，用于对量化策略的探索和回测。</li>
-</ul>
-</p>
+    <p><b>2、性能保障，打造自己的专属应用</b> 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
+    <ul>
+      <li>C++核心库，提供了整体的策略框架，在保证性能的同时，已经考虑了对多线程和多核处理的支持，在未来追求更高运算速度提供便利。C++核心库，可以单独剥离使用，自行构建自己的客户端工具。</li>
+      <li>
+        Python库（hikyuu），提供了对C++库的包装，同时集成了talib库（如TA_SMA，对应talib.SMA），可以与numpy、pandas数据结构进行互相转换，为使用其他成熟的python数据分析工具提供了便利。
+      </li>
+      <li>hikyuu.interactive 交互式探索工具，提供了K线、指标、系统信号等的基本绘图功能，用于对量化策略的探索和回测。</li>
+    </ul>
+    </p>
 
-<p><b>3、多范式支持，探索更便捷、自由 </b>同时支持面向对象和命令行编程范式。其中，命令行在进行策略探索时，更加简单、便捷、自由。</p>
-<p><b>4、安全、自由、隐私，搭建自己的专属云量化平台</b> 结合 Python + Jupyter 的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如 numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。</p>
-<p><b>5、数据存储方式可扩展</b> 目前支持本地HDF5格式、MySQL存储。默认使用HDF5，数据文件体积小、速度更快、备份更便利。截止至2017年4月21日，沪市日线数据文件149M、深市日线数据文件184M、5分钟线数据各不到2G。</p>
+    <p><b>3、多范式支持，探索更便捷、自由 </b>同时支持面向对象和命令行编程范式。其中，命令行在进行策略探索时，更加简单、便捷、自由。</p>
+    <p><b>4、安全、自由、隐私，搭建自己的专属云量化平台</b> 结合 Python + Jupyter
+      的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如
+      numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。</p>
+    <p><b>5、数据存储方式可扩展</b>
+      目前支持本地HDF5格式、MySQL存储。默认使用HDF5，数据文件体积小、速度更快、备份更便利。截止至2017年4月21日，沪市日线数据文件149M、深市日线数据文件184M、5分钟线数据各不到2G。</p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>浏览源码请访问</h3>
+    <h3>
+      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
+          class="octicon octicon-link"></span></a>浏览源码请访问
+    </h3>
 
-<p>码云地址（推荐）：<a href="https://gitee.com/fasiondog/hikyuu">https://gitee.com/fasiondog/hikyuu</a></p>
-<p>GitHub地址：<a href="https://github.com/fasiondog/hikyuu">https://github.com/fasiondog/hikyuu</a></p>
+    <p>码云地址（推荐）：<a href="https://gitee.com/fasiondog/hikyuu">https://gitee.com/fasiondog/hikyuu</a></p>
+    <p>GitHub地址：<a href="https://github.com/fasiondog/hikyuu">https://github.com/fasiondog/hikyuu</a></p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>想提供帮助？</h3>
+    <h3>
+      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
+          class="octicon octicon-link"></span></a>想提供帮助？
+    </h3>
 
-<p>Hikyuu非常需要社区提供帮助，具体包括：
-<ul>
-<li>测试：对Hikyuu项目中代码的测试和BUG反馈</li>
-<li>文档：包括代码注释、开发教程、学习经验等</li>
-<li>新功能：提供新的数据及财经数据接入、自动交易接口、上层应用开发等</li>
-<li>网站：对hikyuu.org的官方网站的外观设计和功能添加</li>
-</ul>
-<a href="https://gitee.com/fasiondog/hikyuu/issues">建议通过在码云上开issue的方式来贡献以上内容</a>
-</p>
+    <p>Hikyuu非常需要社区提供帮助，具体包括：
+    <ul>
+      <li>测试：对Hikyuu项目中代码的测试和BUG反馈</li>
+      <li>文档：包括代码注释、开发教程、学习经验等</li>
+      <li>新功能：提供新的数据及财经数据接入、自动交易接口、上层应用开发等</li>
+      <li>网站：对hikyuu.org的官方网站的外观设计和功能添加</li>
+    </ul>
+    <a href="https://gitee.com/fasiondog/hikyuu/issues">建议通过在码云上开issue的方式来贡献以上内容</a>
+    </p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>联系方式</h3>
+    <h3>
+      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
+          class="octicon octicon-link"></span></a>联系方式
+    </h3>
 
-<p>遇到了问题？想要更多了解Hikyuu？请使用以下方式联系：</p>
-<ul>
-<li>QQ交流群：114910869</li>
-<li>作者邮箱：fasiondog@sina.com</li>
-</ul>
+    <p>遇到了问题？想要更多了解Hikyuu？请使用以下方式联系：</p>
+    <ul>
+      <li>QQ交流群：114910869</li>
+      <li>作者邮箱：fasiondog@sina.com</li>
+    </ul>
 
-<p>QQ群扫码加入：</p>
-<img alt="QQ爱好者群扫码" src="images/10003-qq.png">
+    <p>QQ群扫码加入：</p>
+    <img alt="QQ爱好者群扫码" src="images/10003-qq.png">
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>项目捐赠</h3>
-<p>给作者加点油，请杯咖啡呗？<a href="./juanzheng.txt">捐赠列表</a></p>
-<p><img src="images/zhifu.jpg" width=250 height=400></p>
-<p><img src="images/weixin.png" width=250 height=300></p>
+    <h3>
+      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
+          class="octicon octicon-link"></span></a>项目捐赠
+    </h3>
+    <p>给作者加点油，请杯咖啡呗？<a href="./juanzheng.txt">捐赠列表</a></p>
+    <p><img src="images/zhifu.jpg" width=250 height=400></p>
+    <p><img src="images/weixin.png" width=250 height=300></p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h3>
+    <h3>
+      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
+          class="octicon octicon-link"></span></a>License
+    </h3>
 
-<a href="https://mit-license.org/">MIT协议</a>
+    <a href="https://mit-license.org/">MIT协议</a>
 
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://git.oschina.net/fasiondog/hikyuu">Hikyuu - Quant Framework</a> is maintained by <a href="https://git.oschina.net/fasiondog">fasiondog</a>.</span>
+    <footer class="site-footer">
+      <span class="site-footer-owner"><a href="https://git.oschina.net/fasiondog/hikyuu">Hikyuu - Quant Framework</a> is
+        maintained by <a href="https://git.oschina.net/fasiondog">fasiondog</a>.</span>
 
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
+      <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>
+        using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a
+          href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+    </footer>
 
-    </section>
+  </section>
 
-  
-  </body>
+
+</body>
+
 </html>
