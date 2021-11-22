@@ -203,6 +203,7 @@ private:
         while (!m_thread_need_stop && !m_done) {
             run_pending_task();
         }
+        m_threads_status[m_index] = nullptr;
         // fmt::print("thread ({}) finished!\n", std::this_thread::get_id());
     }
 

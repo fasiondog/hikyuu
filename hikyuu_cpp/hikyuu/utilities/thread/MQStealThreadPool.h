@@ -208,6 +208,7 @@ private:
             run_pending_task();
             std::this_thread::yield();
         }
+        m_threads_status[m_index] = nullptr;
         // fmt::print("thread ({}) finished!\n", std::this_thread::get_id());
     }
 
