@@ -529,6 +529,9 @@ inline void DBConnectBase::remove(const std::string& tablename, const std::strin
     std::string sql(fmt::format("delete from `{}` where {}", tablename, where));
     try {
         exec(sql);
+        if (autotrans) {
+            commit();
+        }
 
     } catch (hku::SQLException& e) {
         if (autotrans) {
