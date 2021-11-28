@@ -6,10 +6,11 @@ import shutil
 import logging
 import datetime
 from configparser import ConfigParser
+import PyQt5
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
-from PyQt5.QtGui import QIcon, QTextCursor
+from PyQt5.QtGui import QIcon, QTextCursor, QFont
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -747,6 +748,10 @@ if __name__ == "__main__":
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
 
     app = QApplication(sys.argv)
+    f = QFont('SimSun')
+    f.setPixelSize(12)
+    app.setFont(f)
+
     use_dark_style = False  # 使用暗黑主题
     if use_dark_style:
         import qdarkstyle
