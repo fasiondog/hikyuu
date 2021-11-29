@@ -70,22 +70,20 @@ void IHighLine::_calculate(const Indicator& ind) {
         if (pre_pos < j) {
             pre_pos = j;
             max = ind[j];
-        }
-        if (ind[i] >= max) {
-            max = ind[i];
-            pre_pos = i;
+            for (size_t j = pre_pos + 1; j <= i; j++) {
+                if (ind[j] > max) {
+                    max = ind[j];
+                    pre_pos = j;
+                }
+            }
+        } else {
+            if (ind[i] >= max) {
+                max = ind[i];
+                pre_pos = i;
+            }
         }
         _set(max, i);
     }
-
-    startPos = total - n;
-    max = ind[startPos];
-    for (size_t i = startPos; i < total; i++) {
-        if (ind[i] >= max) {
-            max = ind[i];
-        }
-    }
-    _set(max, total - 1);
 }
 
 Indicator HKU_API HHV(int n = 20) {
