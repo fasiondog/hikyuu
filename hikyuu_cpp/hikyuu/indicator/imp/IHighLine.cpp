@@ -71,7 +71,7 @@ void IHighLine::_calculate(const Indicator& ind) {
             pre_pos = j;
             max = ind[j];
             for (size_t j = pre_pos + 1; j <= i; j++) {
-                if (ind[j] > max) {
+                if (ind[j] >= max) {
                     max = ind[j];
                     pre_pos = j;
                 }

@@ -4,6 +4,9 @@ set_xmakever("2.5.4")
 set_project("hikyuu")
 
 add_rules("mode.debug", "mode.release")
+if not is_plat("windows") then 
+    add_rules("mode.coverage")
+end
 
 -- version
 set_version("1.1.9", {build="%Y%m%d%H%M"})
