@@ -31,6 +31,7 @@ target("unit-test")
         add_links("boost_unit_test_framework")
         add_links("boost_filesystem")
         add_links("boost_serialization")
+        add_links("sqlite3")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
