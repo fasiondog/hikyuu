@@ -99,6 +99,7 @@ def save_current_compile_info(compile_info):
 
 def build_boost(mode):
     """ 编译依赖的 boost 库 """
+    new_mode = 'release' if mode == 'release' else 'debug'
     current_boost_root, current_boost_lib = get_boost_envrionment()
     if current_boost_root == '' or current_boost_lib == '':
         print("Can't get boost environment!")
@@ -230,7 +231,7 @@ def cli():
 @click.option('-m',
               '--mode',
               default='release',
-              type=click.Choice(['release', 'debug']),
+              type=click.Choice(['release', 'debug', 'coverage', 'asan', 'tsan', 'msan', 'lsan']),
               help='编译模式')
 def build(verbose, mode, j):
     """ 执行编译 """
@@ -245,7 +246,7 @@ def build(verbose, mode, j):
 @click.option('-m',
               '--mode',
               default='release',
-              type=click.Choice(['release', 'debug']),
+              type=click.Choice(['release', 'debug', 'coverage', 'asan', 'msan', 'tsan', 'lsan']),
               help='编译模式')
 @click.option('-case', '--case', default='', help="执行指定的 TestCase")
 def test(all, compile, verbose, mode, case, j):

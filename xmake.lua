@@ -5,7 +5,7 @@ set_project("hikyuu")
 
 add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then 
-    add_rules("mode.coverage")
+    add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan")
 end
 
 -- version

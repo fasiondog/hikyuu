@@ -1,5 +1,5 @@
 target("hikyuu")
-    if is_mode("debug") then 
+    if is_mode("debug", "coverage", "asan", "msan", "tsan", "lsan") then 
         set_kind("static")
     else
         set_kind("shared")
