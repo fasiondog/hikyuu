@@ -31,6 +31,8 @@ public:
     size_t size() const;
     bool empty() const;
 
+    bool operator==(const KData&);
+
     DatetimeList getDatetimeList() const;
 
     /** 获取指定位置的KRecord，未作越界检查 */

@@ -57,6 +57,14 @@ void IndicatorImp::initContext() {
 }
 
 void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
+    KData kdata = getContext();
+    if (kdata.getStock() == stock || kdata.getQuery() == query) {
+        if (m_need_calculate) {
+            calculate();
+        }
+        return;
+    }
+
     m_need_calculate = true;
 
     //子节点设置上下文
@@ -68,16 +76,23 @@ void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
         m_three->setContext(stock, query);
 
     //如果上下文有变化则重设上下文
-    KData kdata = getContext();
-    if (kdata.getStock() != stock || kdata.getQuery() != query) {
-        setParam<KData>("kdata", stock.getKData(query));
-    }
+    setParam<KData>("kdata", stock.getKData(query));
 
     //启动重新计算
     calculate();
 }
 
 void IndicatorImp::setContext(const KData &k) {
+    KData old_k = getParam<KData>("kdata");
+
+    // 上下文没变化的情况下根据自身标识进行计算
+    if (old_k == k) {
+        if (m_need_calculate) {
+            calculate();
+        }
+        return;
+    }
+
     m_need_calculate = true;
 
     //子节点设置上下文
@@ -88,11 +103,8 @@ void IndicatorImp::setContext(const KData &k) {
     if (m_three)
         m_three->setContext(k);
 
-    //如果上下文有变化则重设上下文
-    KData old_k = getParam<KData>("kdata");
-    if (old_k.getStock() != k.getStock() || old_k.getQuery() != k.getQuery()) {
-        setParam<KData>("kdata", k);
-    }
+    //重设上下文
+    setParam<KData>("kdata", k);
 
     //启动重新计算
     calculate();

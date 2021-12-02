@@ -32,6 +32,11 @@ KData::KData(const Stock& stock, const KQuery& query) {
     }
 }
 
+bool KData::operator==(const KData& thr) {
+    return this == &thr || m_imp == thr.m_imp ||
+           (getStock() == thr.getStock() && getQuery() == thr.getQuery());
+}
+
 void KData::tocsv(const string& filename) {
     std::ofstream file(filename.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't open file! ({})", filename);
