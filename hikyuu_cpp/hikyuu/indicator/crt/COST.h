@@ -12,8 +12,6 @@
 #define INDICATOR_CRT_COST_H_
 
 #include "KDATA.h"
-#include "DMA.h"
-#include "HSL.h"
 
 namespace hku {
 
@@ -29,21 +27,8 @@ namespace hku {
  * @param x X%获利盘
  * @ingroup Indicator
  */
-Indicator COST(const KData& k, double x = 10.0);
-Indicator COST(double x = 10.0);
-
-inline Indicator COST(double x) {
-    Indicator ind = DMA(CLOSE() + (HIGH() - LOW()) * x / 100.0, HSL());
-    ind.name("COST");
-    ind.setParam<double>("x", x);
-    return ind;
-}
-
-inline Indicator COST(const KData& k, double x) {
-    Indicator ind = COST(x);
-    ind.setContext(k);
-    return ind;
-}
+Indicator HKU_API COST(const KData& k, double x = 10.0);
+Indicator HKU_API COST(double x = 10.0);
 
 }  // namespace hku
 #endif /* INDICATOR_CRT_COST_H_ */
