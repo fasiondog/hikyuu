@@ -27,12 +27,13 @@ import math
 import datetime
 from pytdx.hq import TDXParams
 
+from hikyuu.util.mylog import hku_error
+
 import mysql.connector
 
 from .common import MARKETID, STOCKTYPE, get_stktype_list
 from .common_mysql import (
-    create_database, get_marketid, get_codepre_list, get_stock_list, get_table, get_lastdatetime,
-    update_extern_data
+    create_database, get_marketid, get_codepre_list, get_stock_list, get_table, get_lastdatetime, update_extern_data
 )
 from .weight_to_mysql import qianlong_import_weight
 
@@ -76,15 +77,14 @@ def import_stock_name(connect, api, market, quotations=None):
 
     stktype_list = get_stktype_list(quotations)
     cur.execute(
-        "select stockid, code, name, valid from `hku_base`.`stock` where marketid={} and type in {}"
-        .format(marketid, stktype_list)
+        "select stockid, code, name, valid from `hku_base`.`stock` where marketid={} and type in {}".format(
+            marketid, stktype_list
+        )
     )
     a = cur.fetchall()
     oldStockDict = {}
     for oldstock in a:
-        oldstockid, oldcode, oldname, oldvalid = oldstock[0], oldstock[1], oldstock[2], int(
-            oldstock[3]
-        )
+        oldstockid, oldcode, oldname, oldvalid = oldstock[0], oldstock[1], oldstock[2], int(oldstock[3])
         oldStockDict[oldcode] = oldstockid
 
         # 新的代码表中无此股票，则置为无效
@@ -95,14 +95,10 @@ def import_stock_name(connect, api, market, quotations=None):
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode]:
                 cur.execute(
-                    "update `hku_base`.`stock` set name='%s' where stockid=%i" %
-                    (newStockDict[oldcode], oldstockid)
+                    "update `hku_base`.`stock` set name='%s' where stockid=%i" % (newStockDict[oldcode], oldstockid)
                 )
             if oldvalid == 0:
-                cur.execute(
-                    "update `hku_base`.`stock` set valid=1, endDate=99999999 where stockid=%i" %
-                    oldstockid
-                )
+                cur.execute("update `hku_base`.`stock` set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
 
     # 处理新出现的股票
     codepre_list = get_codepre_list(connect, marketid, quotations)
@@ -240,13 +236,13 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
                 try:
                     buf.append(
                         (
-                            bar_datetime, bar['open'], bar['high'], bar['low'], bar['close'],
-                            bar['amount'] * 0.001, bar['vol']
+                            bar_datetime, bar['open'], bar['high'], bar['low'], bar['close'], bar['amount'] * 0.001,
+                            bar['vol']
                             #bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)
                         )
                     )
-                except:
-                    print("Can't trans record:", bar)
+                except Exception as e:
+                    hku_error("Can't trans record({}), {}".format(bar, e))
                 last_datetime = bar_datetime
 
     if len(buf) > 0:
@@ -282,16 +278,7 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
     return len(buf)
 
 
-def import_data(
-    connect,
-    market,
-    ktype,
-    quotations,
-    api,
-    dest_dir,
-    startDate=199012190000,
-    progress=ProgressBar
-):
+def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199012190000, progress=ProgressBar):
     """导入通达信指定盘后数据路径中的K线数据。注：只导入基础信息数据库中存在的股票。
 
     :param connect   : sqlit3链接

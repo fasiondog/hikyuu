@@ -89,7 +89,7 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1):
     :param ret: 异常发生时返回值
     :param boolean trace: 打印异常堆栈信息
     :param func callback: 发生异常后的回调函数，入参同func
-    :param int retry: 发生异常后，重复尝试执行的次数
+    :param int retry: 尝试执行的次数
     """
     def hku_catch_wrap(func):
         @functools.wraps(func)
@@ -98,22 +98,16 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1):
                 try:
                     return func(*args, **kargs)
                 except HKUIngoreError:
-                    hku_logger.debug(
-                        "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
-                    )
+                    hku_logger.debug("{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__))
                 except Exception:
-                    hku_logger.error(
-                        "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
-                    )
+                    hku_logger.error("{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__))
                     if trace:
                         traceback.print_exc()
                     if callback and i == (retry - 1):
                         callback(*args, **kargs)
                 except:
                     hku_logger.error(
-                        "Unknown error! {} [{}.{}]".format(
-                            get_exception_info(), func.__module__, func.__name__
-                        )
+                        "Unknown error! {} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
                     )
                     if trace:
                         traceback.print_exc()

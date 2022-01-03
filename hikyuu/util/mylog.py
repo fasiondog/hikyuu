@@ -30,6 +30,10 @@ hku_logger_name = 'hikyuu'
 hku_logger = logging.getLogger(hku_logger_name)
 
 
+def get_default_logger():
+    return logging.getLogger(hku_logger_name)
+
+
 def class_logger(cls, enable=False):
     #logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
     logger = logging.getLogger("{}".format(cls.__name__))

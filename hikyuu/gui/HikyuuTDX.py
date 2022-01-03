@@ -27,7 +27,7 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 
 from hikyuu.data import hku_config_template
-from hikyuu.util.mylog import add_class_logger_handler, class_logger, hku_logger
+from hikyuu.util.mylog import add_class_logger_handler, class_logger, get_default_logger
 
 
 class EmittingStream(QObject):
@@ -215,7 +215,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             ],
             logging.INFO
         )
-        hku_logger.addHandler(con)
+        get_default_logger().addHandler(con)
+        get_default_logger().setLevel(logging.INFO)
 
     def initUI(self):
         self._is_sched_import_running = False
