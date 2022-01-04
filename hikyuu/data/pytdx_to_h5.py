@@ -28,7 +28,7 @@ import datetime
 import sqlite3
 from pytdx.hq import TDXParams
 
-from hikyuu.util.mylog import hku_error
+from hikyuu.util.mylog import hku_error, hku_info
 
 from .common import MARKETID, STOCKTYPE, get_stktype_list
 from .common_sqlite3 import (
@@ -434,6 +434,7 @@ def import_on_stock_time(connect, api, h5file, market, stock_record, max_days):
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
+    hku_info("{}{}".format(market, code))
     table = get_time_table(h5file, market, code)
     if table is None:
         hku_error("Can't get table({}{})!".format(market, code))
@@ -441,12 +442,17 @@ def import_on_stock_time(connect, api, h5file, market, stock_record, max_days):
 
     today = datetime.date.today()
     if table.nrows > 0:
-        last_datetime = int(table[-1]['datetime'] // 10000)
-        last_y = int(last_datetime // 10000)
-        last_m = int(last_datetime // 100 - last_y * 100)
-        last_d = int(last_datetime - (last_y * 10000 + last_m * 100))
-        last_date = datetime.date(last_y, last_m, last_d)
-        need_days = (today - last_date).days
+        try:
+            last_datetime = int(table[-1]['datetime'] // 10000)
+            last_y = int(last_datetime // 10000)
+            last_m = int(last_datetime // 100 - last_y * 100)
+            last_d = int(last_datetime - (last_y * 10000 + last_m * 100))
+            last_date = datetime.date(last_y, last_m, last_d)
+            need_days = (today - last_date).days
+        except Exception as e:
+            hku_error("Failed get last date from hdf5({}{}), remove this table! {}".format(market, code, e))
+            table.remove()
+            return 0
     else:
         need_days = max_days
 
