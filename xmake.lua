@@ -41,6 +41,18 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
+local hdf5_version = "1.10.4"
+local mysql_version = "8.0.21"
+if is_plat("windows") then
+    add_repositories("project-repo hikyuu_extern_libs")
+    if is_mode("release") then
+        add_requires("hdf5 " .. hdf5_version)
+    else
+        add_requires("hdf5_D " .. hdf5_version)
+    end
+    add_requires("mysql " .. mysql_version)
+end
+
 add_requires("fmt", {system=false, configs = {header_only = true, vs_runtime = "MD"}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
@@ -86,7 +98,6 @@ end
 
 -- for the windows platform (msvc)
 if is_plat("windows") then 
-    add_packagedirs("./hikyuu_extern_libs/pkg")
     -- add some defines only for windows
     add_defines("NOCRYPT", "NOGDI")
     add_cxflags("-EHsc", "/Zc:__cplusplus", "/utf-8")

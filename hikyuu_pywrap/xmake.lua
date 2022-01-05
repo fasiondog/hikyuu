@@ -110,8 +110,7 @@ target("core")
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
         if is_plat("windows") then
             os.cp(target:targetdir() .. '/core.pyd', dst_dir)
-            os.cp(target:targetdir() .. '/hikyuu.dll', dst_dir)
-            os.cp(target:targetdir() .. '/sqlite3.dll', dst_dir)
+            os.cp(target:targetdir() .. '/*.dll', dst_dir)
         elseif is_plat("macosx") then
             os.cp(target:targetdir() .. '/core.so', dst_dir)
             os.cp(target:targetdir() .. '/libhikyuu.dylib', dst_dir)
@@ -135,15 +134,6 @@ target("core")
         os.cp("$(env BOOST_LIB)/libboost_python3*.dylib", dst_dir)
         os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", dst_dir)
         os.cp("$(env BOOST_LIB)/libboost_system*.dylib", dst_dir)
-
-        if is_plat("windows") then
-            if is_mode("release") then
-                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
-            else
-                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5_D.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
-            end
-            os.cp("$(projectdir)/hikyuu_extern_libs/pkg/mysql.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
-        end
     end)
 
 
