@@ -35,17 +35,20 @@ from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
 #from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
+from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 
 
 class ImportWeightToSqliteTask:
-    def __init__(self, queue, config, dest_dir):
+    def __init__(self, log_queue, queue, config, dest_dir):
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.log_queue = log_queue
         self.queue = queue
         self.config = config
         self.dest_dir = dest_dir
         self.msg_name = 'IMPORT_WEIGHT'
 
     def __call__(self):
+        capture_multiprocess_all_logger(self.log_queue, get_default_logger().level)
         total_count = 0
         try:
             if self.config.getboolean('hdf5', 'enable', fallback=True):
@@ -116,8 +119,13 @@ class ImportWeightToSqliteTask:
 
             self.logger.info('正在导入权息数据')
             self.queue.put([self.msg_name, '正在导入权息数据...', 0, 0, 0])
-            total_count = pytdx_import_weight(api, connect, "SH")
-            total_count += pytdx_import_weight(api, connect, "SZ")
+            sh_total_count = pytdx_import_weight(api, connect, "SH")
+            self.logger.info("导入上证权息记录数: {}".format(sh_total_count))
+
+            sz_total_count = pytdx_import_weight(api, connect, "SZ")
+            self.logger.info("导入深证权息记录数: {}".format(sz_total_count))
+
+            total_count = sh_total_count + sz_total_count
             self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
             self.logger.info('导入权息数据完毕')
 

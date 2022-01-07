@@ -5,7 +5,9 @@ import sys
 import shutil
 import logging
 import datetime
+import multiprocessing
 from configparser import ConfigParser
+from logging.handlers import QueueListener
 import PyQt5
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
@@ -70,6 +72,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.hdf5_import_thread.stop()
         if self.escape_time_thread:
             self.escape_time_thread.stop()
+        self.mp_log_q_lisener.stop()
         event.accept()
 
     def getUserConfigDir(self):
@@ -200,23 +203,32 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         #普通日志输出控制台
         if self._stream is None:
             self._stream = EmittingStream(textWritten=self.normalOutputWritten)
-        con = logging.StreamHandler(self._stream)
+        self.log_handler = logging.StreamHandler(self._stream)
         FORMAT = logging.Formatter('%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]')
-        con.setFormatter(FORMAT)
-        add_class_logger_handler(
-            con,
-            [
-                MyMainWindow,
-                CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread, 
-                UsePytdxImportToH5Thread,
-                UseTdxImportToH5Thread,
-                ImportTdxToH5Task,
-                SchedImportThread
-            ],
-            logging.INFO
-        )
-        get_default_logger().addHandler(con)
-        get_default_logger().setLevel(logging.INFO)
+        self.log_handler.setFormatter(FORMAT)
+        for name in logging.Logger.manager.loggerDict.keys():
+            logger = logging.getLogger(name)
+            logger.addHandler(self.log_handler)
+            logger.setLevel(logging.DEBUG)
+        # add_class_logger_handler(
+        #     self.log_handler,
+        #     [
+        #         MyMainWindow,
+        #         CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread,
+        #         UsePytdxImportToH5Thread,
+        #         UseTdxImportToH5Thread,
+        #         ImportTdxToH5Task,
+        #         SchedImportThread
+        #     ],
+        #     logging.INFO
+        # )
+        # get_default_logger().addHandler(self.log_handler)
+        # get_default_logger().setLevel(logging.INFO)
+
+        # 多进程日志队列
+        self.mp_log_q = multiprocessing.Queue()
+        self.mp_log_q_lisener = QueueListener(self.mp_log_q, self.log_handler)
+        self.mp_log_q_lisener.start()
 
     def initUI(self):
         self._is_sched_import_running = False
@@ -228,7 +240,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 sys.stdout = self._stream
                 # python构建时丢失stderr通道，导致安装后的hikyuutdx执行时，
                 # logging总是报 'NoneType' object has no attribute 'write'
-                #sys.stderr = self._stream
+                if sys.stderr:
+                    sys.stderr = self._stream
         self.log_textEdit.document().setMaximumBlockCount(1000)
 
         current_dir = os.path.dirname(__file__)
@@ -657,7 +670,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if self.tdx_radioButton.isChecked():
             self.hdf5_import_thread = UseTdxImportToH5Thread(config)
         else:
-            self.hdf5_import_thread = UsePytdxImportToH5Thread(config)
+            self.hdf5_import_thread = UsePytdxImportToH5Thread(self, config)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()

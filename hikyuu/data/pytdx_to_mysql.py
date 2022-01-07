@@ -27,7 +27,7 @@ import math
 import datetime
 from pytdx.hq import TDXParams
 
-from hikyuu.util.mylog import hku_error
+from hikyuu.util.mylog import hku_error, hku_debug
 
 import mysql.connector
 
@@ -183,7 +183,7 @@ def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=1
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
-
+    hku_debug("{}{}".format(market, code))
     table = get_table(connect, market, code, ktype)
     last_datetime = get_lastdatetime(connect, table)
     if last_datetime is None:

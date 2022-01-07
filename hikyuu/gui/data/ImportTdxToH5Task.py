@@ -29,6 +29,7 @@ import mysql.connector
 from hikyuu.util.mylog import class_logger
 from hikyuu.data.tdx_to_h5 import tdx_import_data as h5_import_data
 from hikyuu.data.tdx_to_mysql import tdx_import_data as mysql_import_data
+from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 
 
 class ProgressBar:
@@ -36,16 +37,15 @@ class ProgressBar:
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put(
-            [self.src.task_name, self.src.market, self.src.ktype, (cur + 1) * 100 // total, 0]
-        )
+        self.src.queue.put([self.src.task_name, self.src.market, self.src.ktype, (cur + 1) * 100 // total, 0])
 
 
 class ImportTdxToH5Task:
-    def __init__(self, queue, config, market, ktype, quotations, src_dir, dest_dir):
+    def __init__(self, log_queue, queue, config, market, ktype, quotations, src_dir, dest_dir):
         super(self.__class__, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_KDATA'
+        self.log_queue = log_queue
         self.queue = queue
         self.config = config
         self.market = market.upper()
@@ -72,6 +72,7 @@ class ImportTdxToH5Task:
         pass
 
     def __call__(self):
+        capture_multiprocess_all_logger(self.log_queue, get_default_logger().levle)
         use_hdf = False
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
@@ -95,13 +96,10 @@ class ImportTdxToH5Task:
             progress = ProgressBar(self)
             if use_hdf:
                 count = import_data(
-                    connect, self.market, self.ktype, self.quotations, self.src_dir, self.dest_dir,
-                    progress
+                    connect, self.market, self.ktype, self.quotations, self.src_dir, self.dest_dir, progress
                 )
             else:
-                count = import_data(
-                    connect, self.market, self.ktype, self.quotations, self.src_dir, progress
-                )
+                count = import_data(connect, self.market, self.ktype, self.quotations, self.src_dir, progress)
 
         except Exception as e:
             self.logger.error(e)

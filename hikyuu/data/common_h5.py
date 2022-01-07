@@ -26,7 +26,7 @@ import datetime
 import tables as tb
 
 from hikyuu.util import hku_catch
-from hikyuu.util.mylog import hku_error
+from hikyuu.util.mylog import hku_error, hku_debug
 
 HDF5_COMPRESS_LEVEL = 9
 
@@ -241,6 +241,7 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
         return
 
     for index_type in index_list:
+        hku_debug("{} update {} index".format(tablename, index_type))
         try:
             index_table = h5file.get_node(groupDict[index_type], tablename)
         except:
@@ -311,6 +312,7 @@ def get_trans_table(h5file, market, code):
 
 def update_hdf5_trans_index(h5file, tablename):
     """更新分笔数据按日索引"""
+    hku_debug("{} update trans index".format(tablename))
     try:
         table = h5file.get_node("/data", tablename)
     except:

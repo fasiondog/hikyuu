@@ -174,3 +174,17 @@ def with_trace(level=logging.INFO):
         return wrapper
 
     return with_trace_wrap
+
+
+def capture_multiprocess_all_logger(queue, level):
+    """重设所有子进程中的 logger 输出指定的 queue，并重设level
+    
+    @param multiprocessing.Queue queue 指定的 mp Queue
+    @param level 日志输出等级
+    """
+    qh = logging.handlers.QueueHandler(queue)
+    level = get_default_logger().level
+    for name in logging.Logger.manager.loggerDict.keys():
+        logger = logging.getLogger(name)
+        logger.addHandler(qh)
+        logger.setLevel(level)

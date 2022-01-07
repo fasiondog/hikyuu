@@ -29,6 +29,7 @@ from pathlib import Path
 import mysql.connector
 
 from hikyuu.data.common import MARKETID, get_stktype_list
+from hikyuu.util import hku_debug
 
 
 def is_exist_db(connect):
@@ -82,9 +83,7 @@ def create_database(connect):
 
 def get_marketid(connect, market):
     cur = connect.cursor()
-    cur.execute(
-        "select marketid, market from `hku_base`.`market` where market='{}'".format(market.upper())
-    )
+    cur.execute("select marketid, market from `hku_base`.`market` where market='{}'".format(market.upper()))
     marketid = cur.fetchone()
     marketid = marketid[0]
     cur.close()
@@ -148,9 +147,7 @@ def get_table(connect, market, code, ktype):
     tablename = code.lower()
     cur.execute(
         "SELECT 1 FROM information_schema.tables "
-        "where table_schema='{schema}' and table_name='{name}'".format(
-            schema=schema, name=tablename
-        )
+        "where table_schema='{schema}' and table_name='{name}'".format(schema=schema, name=tablename)
     )
     a = cur.fetchone()
     if not a:
@@ -213,18 +210,12 @@ def update_extern_data(connect, market, code, data_type):
         m = olddate // 1000000 - y * 100
         start_m = startDict[m]
         end_m = endDict[m]
-        return (
-            y * 100000000 + start_m * 1000000 + 10000,
-            y * 100000000 + end_m * 1000000 + d_dict[end_m]
-        )
+        return (y * 100000000 + start_m * 1000000 + 10000, y * 100000000 + end_m * 1000000 + d_dict[end_m])
 
     def getHalfyearDate(olddate):
         y = olddate // 100000000
         m = olddate // 1000000 - y * 100
-        return (
-            y * 100000000 + (1010000 if m < 7 else 7010000),
-            y * 100000000 + (6300000 if m < 7 else 12310000)
-        )
+        return (y * 100000000 + (1010000 if m < 7 else 7010000), y * 100000000 + (6300000 if m < 7 else 12310000))
 
     def getYearDate(olddate):
         y = olddate // 100000000
@@ -363,6 +354,7 @@ def update_extern_data(connect, market, code, data_type):
         return
 
     for index_type in index_list:
+        hku_debug("{}{} update {} index".format(market, code, index_type))
         index_table = get_table(connect, market, code, index_type)
         index_last_date = get_lastdatetime(connect, index_table)
 
@@ -370,8 +362,7 @@ def update_extern_data(connect, market, code, data_type):
         cur = connect.cursor()
         if index_last_date is None:
             cur.execute(
-                'select date, open, high, low, close, amount, count from {} order by date asc '.
-                format(base_table)
+                'select date, open, high, low, close, amount, count from {} order by date asc '.format(base_table)
             )
         else:
             start_date, _ = getNewDate(index_type, index_last_date)
@@ -432,13 +423,9 @@ def update_extern_data(connect, market, code, data_type):
                 amount += base_record_list[i][5]
                 count += base_record_list[i][6]
             if last_end_date == index_last_date:
-                update_buffer.append(
-                    (open_price, high_price, low_price, close_price, amount, count, last_end_date)
-                )
+                update_buffer.append((open_price, high_price, low_price, close_price, amount, count, last_end_date))
             else:
-                insert_buffer.append(
-                    (last_end_date, open_price, high_price, low_price, close_price, amount, count)
-                )
+                insert_buffer.append((last_end_date, open_price, high_price, low_price, close_price, amount, count))
 
         if update_buffer:
             cur = connect.cursor()

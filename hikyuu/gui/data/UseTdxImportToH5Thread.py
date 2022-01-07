@@ -37,9 +37,10 @@ from hikyuu.util.mylog import class_logger
 class UseTdxImportToH5Thread(QThread):
     message = pyqtSignal(list)
 
-    def __init__(self, config):
+    def __init__(self, parent, config):
         super(self.__class__, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.parent = parent
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
 
@@ -65,38 +66,38 @@ class UseTdxImportToH5Thread(QThread):
         self.queue = Queue()
         self.tasks = []
         if self.config.getboolean('weight', 'enable', fallback=False):
-            self.tasks.append(ImportWeightToSqliteTask(self.queue, self.config, dest_dir))
+            self.tasks.append(ImportWeightToSqliteTask(self.parent.mp_log_q, self.queue, self.config, dest_dir))
         if self.config.getboolean('ktype', 'day', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, config, 'SH', 'DAY', self.quotations, src_dir, dest_dir
+                    self.parent.mp_log_q, self.queue, config, 'SH', 'DAY', self.quotations, src_dir, dest_dir
                 )
             )
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, config, 'SZ', 'DAY', self.quotations, src_dir, dest_dir
+                    self.parent.mp_log_q, self.queue, config, 'SZ', 'DAY', self.quotations, src_dir, dest_dir
                 )
             )
         if self.config.getboolean('ktype', 'min5', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, config, 'SH', '5MIN', self.quotations, src_dir, dest_dir
+                    self.parent.mp_log_q, self.queue, config, 'SH', '5MIN', self.quotations, src_dir, dest_dir
                 )
             )
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, config, 'SZ', '5MIN', self.quotations, src_dir, dest_dir
+                    self.parent.mp_log_q, self.queue, config, 'SZ', '5MIN', self.quotations, src_dir, dest_dir
                 )
             )
         if self.config.getboolean('ktype', 'min', fallback=False):
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, config, 'SH', '1MIN', self.quotations, src_dir, dest_dir
+                    self.parent.mp_log_q, self.queue, config, 'SH', '1MIN', self.quotations, src_dir, dest_dir
                 )
             )
             self.tasks.append(
                 ImportTdxToH5Task(
-                    self.queue, config, 'SZ', '1MIN', self.quotations, src_dir, dest_dir
+                    self.parent.mp_log_q, self.queue, config, 'SZ', '1MIN', self.quotations, src_dir, dest_dir
                 )
             )
 
@@ -119,18 +120,7 @@ class UseTdxImportToH5Thread(QThread):
     def _run(self):
         src_dir = self.config['tdx']['dir']
         dest_dir = self.config['hdf5']['dir']
-        hdf5_import_progress = {
-            'SH': {
-                'DAY': 0,
-                '1MIN': 0,
-                '5MIN': 0
-            },
-            'SZ': {
-                'DAY': 0,
-                '1MIN': 0,
-                '5MIN': 0
-            }
-        }
+        hdf5_import_progress = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0}, 'SZ': {'DAY': 0, '1MIN': 0, '5MIN': 0}}
 
         #正在导入代码表
         self.send_message(['START_IMPORT_CODE'])
@@ -138,12 +128,8 @@ class UseTdxImportToH5Thread(QThread):
         connect = sqlite3.connect(dest_dir + "/stock.db")
         create_database(connect)
 
-        tdx_import_stock_name_from_file(
-            connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', self.quotations
-        )
-        tdx_import_stock_name_from_file(
-            connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', self.quotations
-        )
+        tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', self.quotations)
+        tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', self.quotations)
 
         self.send_message(['FINISHED_IMPORT_CODE'])
 
@@ -171,9 +157,7 @@ class UseTdxImportToH5Thread(QThread):
                 self.send_message(['IMPORT_WEIGHT', market, total])
             elif taskname == 'IMPORT_KDATA':
                 hdf5_import_progress[market][ktype] = progress
-                current_progress = (
-                    hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]
-                ) // 2
+                current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
                 self.send_message(['IMPORT_KDATA', ktype, current_progress])
             else:
                 self.logger.error("Unknow task: {}".format(taskname))

@@ -28,7 +28,7 @@ import datetime
 import sqlite3
 from pytdx.hq import TDXParams
 
-from hikyuu.util.mylog import hku_error, hku_info
+from hikyuu.util.mylog import get_default_logger, hku_error, hku_debug
 
 from .common import MARKETID, STOCKTYPE, get_stktype_list
 from .common_sqlite3 import (
@@ -183,6 +183,7 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
 
+    hku_debug("{}{} {}".format(market, code, ktype))
     table = get_h5table(h5file, market, code)
     if table is None:
         hku_error("Can't get table({}{})".format(market, code))
@@ -336,6 +337,7 @@ def import_on_stock_trans(connect, api, h5file, market, stock_record, max_days):
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
+    hku_debug("{}{}".format(market, code))
     table = get_trans_table(h5file, market, code)
     if table is None:
         hku_error("Failed get_trans_table({}{})!".format(market, code))
@@ -434,7 +436,7 @@ def import_on_stock_time(connect, api, h5file, market, stock_record, max_days):
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
-    hku_info("{}{}".format(market, code))
+    hku_debug("{}{}".format(market, code))
     table = get_time_table(h5file, market, code)
     if table is None:
         hku_error("Can't get table({}{})!".format(market, code))
