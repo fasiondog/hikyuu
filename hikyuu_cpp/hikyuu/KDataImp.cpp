@@ -184,35 +184,25 @@ void KDataImp::_recoverForward() {
 
     size_t pre_pos = 0;
     for (; weightIter != weightList.end(); ++weightIter) {
+        //计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
+        if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
+             weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
+             weightIter->increasement() == 0.0))
+            continue;
+
         size_t i = pre_pos;
         while (i < total && m_buffer[i].datetime < weightIter->datetime()) {
             i++;
         }
         pre_pos = i;  //除权日
 
-        //计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
-        price_t change = 0.0;
-        bool flag = false;
-        if (weightIter != weightList.begin() &&
-            !(weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
-              weightIter->priceForSell() == 0.0))
-        //&& weightIter->bonus() == 0.0
-        //&& weightIter->increasement() == 0.0 ))
-        {
-            pre_weightIter = weightIter - 1;
-            if (pre_weightIter->freeCount() != 0.0) {
-                change = (weightIter->freeCount() - pre_weightIter->freeCount()) /
-                         pre_weightIter->freeCount();
-                flag = true;
-            }
-        }
-        if (!flag) {
-            change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                            weightIter->increasement());
-        }
-
+        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                weightIter->increasement());
         price_t denominator = 1.0 + change;  //分母 = (1+流通股份变动比例)
         price_t temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+
+        if (denominator == 1.0 && temp == 0.0)
+            continue;
 
         for (i = 0; i < pre_pos; ++i) {
             m_buffer[i].openPrice =
@@ -245,6 +235,12 @@ void KDataImp::_recoverBackward() {
 
     size_t pre_pos = total - 1;
     for (; weightIter != weightList.rend(); ++weightIter) {
+        //计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
+        if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
+             weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
+             weightIter->increasement() == 0.0))
+            continue;
+
         size_t i = pre_pos;
         while (i > 0 && m_buffer[i].datetime > weightIter->datetime()) {
             i--;
@@ -252,27 +248,13 @@ void KDataImp::_recoverBackward() {
         pre_pos = i;
 
         //流通股份变动比例
-        price_t change = 0.0;
-        bool flag = false;
-        pre_weightIter = weightIter + 1;
-        if (pre_weightIter != weightList.rend() && pre_weightIter->freeCount() != 0.0 &&
-            !(weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
-              weightIter->priceForSell() == 0.0))
-        //&&	weightIter->bonus() == 0.0
-        //&&	weightIter->increasement() == 0.0 ))
-        {
-            change =
-              (weightIter->freeCount() - pre_weightIter->freeCount()) / pre_weightIter->freeCount();
-            flag = true;
-        }
-        if (!flag) {
-            change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                            weightIter->increasement());
-        }
-
+        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                weightIter->increasement());
         price_t denominator = 1.0 + change;  //(1+流通股份变动比例)
         price_t temp = 0.1 * weightIter->bonus() - weightIter->priceForSell() * change;
-        ;
+
+        if (denominator == 1.0 && temp == 0.0)
+            continue;
 
         for (i = pre_pos; i < total; ++i) {
             m_buffer[i].openPrice =
@@ -311,6 +293,12 @@ void KDataImp::_recoverEqualForward() {
     StockWeightList::const_iterator pre_weightIter;
     size_t pre_pos = 0;
     for (; weightIter != weightList.end(); ++weightIter) {
+        //计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
+        if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
+             weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
+             weightIter->increasement() == 0.0))
+            continue;
+
         size_t i = pre_pos;
         while (i < total && m_buffer[i].datetime < weightIter->datetime()) {
             i++;
@@ -327,28 +315,13 @@ void KDataImp::_recoverEqualForward() {
         }
 
         //流通股份变动比例
-        price_t change = 0.0;
-        bool flag = false;
-        if (weightIter != weightList.begin() &&
-            !(weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
-              weightIter->priceForSell() == 0.0))
-        //&&	weightIter->bonus() == 0.0
-        //&&	weightIter->increasement() == 0.0 ))
-        {
-            pre_weightIter = weightIter - 1;
-            if (pre_weightIter->freeCount() != 0.0) {
-                change = (weightIter->freeCount() - pre_weightIter->freeCount()) /
-                         pre_weightIter->freeCount();
-                flag = true;
-            }
-        }
-        if (!flag) {
-            change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                            weightIter->increasement());
-        }
-
+        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                weightIter->increasement());
         price_t denominator = 1.0 + change;  //(1+流通股份变动比例)
         price_t temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
+
+        if (denominator == 0.0 || (denominator == 1.0 && temp == 0.0))
+            continue;
 
         price_t k = (closePrice + temp) / (denominator * closePrice);
 
@@ -393,27 +366,11 @@ void KDataImp::_recoverEqualBackward() {
         price_t closePrice = m_buffer[pre_pos - 1].closePrice;
 
         //流通股份变动比例
-        price_t change = 0.0;
-        bool flag = false;
-        pre_weightIter = weightIter + 1;
-        if (pre_weightIter != weightList.rend() && pre_weightIter->freeCount() != 0.0 &&
-            !(weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
-              weightIter->priceForSell() == 0.0))
-        //&&	weightIter->bonus() == 0.0
-        //&&	weightIter->increasement() == 0.0 ))
-        {
-            change =
-              (weightIter->freeCount() - pre_weightIter->freeCount()) / pre_weightIter->freeCount();
-            flag = true;
-        }
-        if (!flag) {
-            change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
-                            weightIter->increasement());
-        }
-
+        price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
+                                weightIter->increasement());
         price_t denominator = 1.0 + change;  //(1+流通股份变动比例)
         price_t temp = closePrice + weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
-        if (temp == 0.0) {
+        if (temp == 0.0 || denominator == 0.0) {
             continue;
         }
         price_t k = (denominator * closePrice) / temp;
