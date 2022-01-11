@@ -5,9 +5,6 @@
 
 -----------
 
-.. image:: https://travis-ci.org/fasiondog/hikyuu.svg?branch=master
-    :target: https://travis-ci.org/fasiondog/hikyuu
-    
 .. image:: https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg
     :target: https://github.com/fasiondog/hikyuu/actions
 

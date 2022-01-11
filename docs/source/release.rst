@@ -13,6 +13,7 @@
 7. HikyuuTdx 导入至 hdf5 时增加数据保护，遇到出错的表直接删除，下次可自动恢复导入
 8. 修复使用通达信的权息数据后复权失效的问题
 9. remove hikyuu_extern_libs submodule, windows下HDF5, mysql改用下载依赖包的方式
+10. 优化 HikyuuTDX GUI控制台日志，捕获子进程日志输出
 
 
 1.1.9
