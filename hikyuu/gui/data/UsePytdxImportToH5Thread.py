@@ -49,6 +49,7 @@ class UsePytdxImportToH5Thread(QThread):
     def __init__(self, parent, config):
         super(self.__class__, self).__init__()
         self.parent = parent
+        self.log_queue = parent.mp_log_q if parent is not None else None
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
 
@@ -79,7 +80,7 @@ class UsePytdxImportToH5Thread(QThread):
 
         self.tasks = []
         if self.config.getboolean('weight', 'enable', fallback=False):
-            self.tasks.append(ImportWeightToSqliteTask(self.parent.mp_log_q, self.queue, self.config, dest_dir))
+            self.tasks.append(ImportWeightToSqliteTask(self.log_queue, self.queue, self.config, dest_dir))
 
         #if self.config.getboolean('finance', 'enable', fallback=False):
         #    self.tasks.append(ImportHistoryFinanceTask(self.queue, dest_dir))
@@ -128,14 +129,14 @@ class UsePytdxImportToH5Thread(QThread):
             trans_max_days = (today - trans_start_date).days + 1
             self.tasks.append(
                 ImportPytdxTransToH5(
-                    self.parent.mp_log_q, self.queue, sqlite_file_name, 'SH', self.quotations, use_hosts[cur_host][0],
+                    self.log_queue, self.queue, sqlite_file_name, 'SH', self.quotations, use_hosts[cur_host][0],
                     use_hosts[cur_host][1], dest_dir, trans_max_days
                 )
             )
             cur_host += 1
             self.tasks.append(
                 ImportPytdxTransToH5(
-                    self.parent.mp_log_q, self.queue, sqlite_file_name, 'SZ', self.quotations, use_hosts[cur_host][0],
+                    self.log_queue, self.queue, sqlite_file_name, 'SZ', self.quotations, use_hosts[cur_host][0],
                     use_hosts[cur_host][1], dest_dir, trans_max_days
                 )
             )
@@ -145,16 +146,16 @@ class UsePytdxImportToH5Thread(QThread):
             start_date = datetime.datetime.strptime(config['ktype']['min_start_date'], '%Y-%m-%d').date()
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.parent.mp_log_q, self.queue, self.config, 'SH', '1MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
+                    self.log_queue, self.queue, self.config, 'SH', '1MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir,
                     start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.parent.mp_log_q, self.queue, self.config, 'SZ', '1MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
+                    self.log_queue, self.queue, self.config, 'SZ', '1MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir,
                     start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
                 )
             )
@@ -166,14 +167,14 @@ class UsePytdxImportToH5Thread(QThread):
             time_max_days = (today - time_start_date).days + 1
             self.tasks.append(
                 ImportPytdxTimeToH5(
-                    self.parent.mp_log_q, self.queue, sqlite_file_name, 'SH', self.quotations, use_hosts[cur_host][0],
+                    self.log_queue, self.queue, sqlite_file_name, 'SH', self.quotations, use_hosts[cur_host][0],
                     use_hosts[cur_host][1], dest_dir, time_max_days
                 )
             )
             cur_host += 1
             self.tasks.append(
                 ImportPytdxTimeToH5(
-                    self.parent.mp_log_q, self.queue, sqlite_file_name, 'SZ', self.quotations, use_hosts[cur_host][0],
+                    self.log_queue, self.queue, sqlite_file_name, 'SZ', self.quotations, use_hosts[cur_host][0],
                     use_hosts[cur_host][1], dest_dir, time_max_days
                 )
             )
@@ -183,16 +184,16 @@ class UsePytdxImportToH5Thread(QThread):
             start_date = datetime.datetime.strptime(config['ktype']['min5_start_date'], '%Y-%m-%d').date()
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.parent.mp_log_q, self.queue, self.config, 'SH', '5MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
+                    self.log_queue, self.queue, self.config, 'SH', '5MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir,
                     start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
                 )
             )
             cur_host += 1
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.parent.mp_log_q, self.queue, self.config, 'SZ', '5MIN', self.quotations,
-                    use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
+                    self.log_queue, self.queue, self.config, 'SZ', '5MIN', self.quotations, use_hosts[cur_host][0],
+                    use_hosts[cur_host][1], dest_dir,
                     start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
                 )
             )
@@ -202,7 +203,7 @@ class UsePytdxImportToH5Thread(QThread):
             start_date = datetime.datetime.strptime(config['ktype']['day_start_date'], '%Y-%m-%d').date()
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.parent.mp_log_q, self.queue, self.config, 'SH', 'DAY', self.quotations, use_hosts[cur_host][0],
+                    self.log_queue, self.queue, self.config, 'SH', 'DAY', self.quotations, use_hosts[cur_host][0],
                     use_hosts[cur_host][1], dest_dir,
                     start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
                 )
@@ -210,7 +211,7 @@ class UsePytdxImportToH5Thread(QThread):
             cur_host += 1
             self.tasks.append(
                 ImportPytdxToH5(
-                    self.parent.mp_log_q, self.queue, self.config, 'SZ', 'DAY', self.quotations, use_hosts[cur_host][0],
+                    self.log_queue, self.queue, self.config, 'SZ', 'DAY', self.quotations, use_hosts[cur_host][0],
                     use_hosts[cur_host][1], dest_dir,
                     start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
                 )

@@ -27,7 +27,7 @@ class HKUImportDataCMD:
         #读取保存的配置文件信息，如果不存在，则使用默认配置
         this_dir = self.getUserConfigDir()
         import_config = ConfigParser()
-        import_config.read(this_dir + '/importdata-gui.ini', encoding = 'utf-8')
+        import_config.read(this_dir + '/importdata-gui.ini', encoding='utf-8')
         return import_config
 
     def initThreads(self):
@@ -35,14 +35,16 @@ class HKUImportDataCMD:
         self.hdf5_import_thread = None
         self.mysql_import_thread = None
         self.import_running = False
-        self.progress = {'DAY': 0, '1MIN': 0, '5MIN': 0, 'TRANS':0, 'TIME':0}
-        self.info_type = {'DAY': '日线数据', '1MIN': '一分钟线', '5MIN': '五分钟线', 'TRANS':'历史分笔', 'TIME':'分时数据'}
+        self.progress = {'DAY': 0, '1MIN': 0, '5MIN': 0, 'TRANS': 0, 'TIME': 0}
+        self.info_type = {'DAY': '日线数据', '1MIN': '一分钟线', '5MIN': '五分钟线', 'TRANS': '历史分笔', 'TIME': '分时数据'}
         self.escape_time = 0.0
         self.details = []
 
     def print_progress(self, ktype, progress):
         if progress != self.progress[ktype]:
-            print('import progress: {}%  - {} - 已耗时 {:>.2f} 分钟'.format(progress, self.info_type[ktype], self.escape_time))
+            print(
+                'import progress: {}%  - {} - 已耗时 {:>.2f} 分钟'.format(progress, self.info_type[ktype], self.escape_time)
+            )
             self.progress[ktype] = progress
 
     def on_message_from_thread(self, msg):
@@ -53,7 +55,7 @@ class HKUImportDataCMD:
         msg_name, msg_task_name = msg[:2]
         if msg_name == 'ESCAPE_TIME':
             self.escape_time = msg_task_name / 60
-        
+
         elif msg_name == 'HDF5_IMPORT':
             if msg_task_name == 'INFO':
                 print(msg[2])
@@ -108,7 +110,6 @@ class HKUImportDataCMD:
                 else:
                     print('权息{}'.format(msg[2]))
 
-
     def start_import_data(self):
         config = self.getCurrentConfig()
         dest_dir = config.get('hdf5', 'dir')
@@ -130,9 +131,9 @@ class HKUImportDataCMD:
         QCoreApplication.processEvents()
 
         if config.getboolean('tdx', 'enable'):
-            self.hdf5_import_thread = UseTdxImportToH5Thread(config)
+            self.hdf5_import_thread = UseTdxImportToH5Thread(None, config)
         else:
-            self.hdf5_import_thread = UsePytdxImportToH5Thread(config)
+            self.hdf5_import_thread = UsePytdxImportToH5Thread(None, config)
 
         self.hdf5_import_thread.message.connect(self.on_message_from_thread)
         self.hdf5_import_thread.start()
@@ -150,5 +151,5 @@ def main():
     sys.exit(app.exec())
 
 
-if __name__ == '__main__':   
+if __name__ == '__main__':
     main()

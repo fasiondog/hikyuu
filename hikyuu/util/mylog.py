@@ -182,6 +182,8 @@ def capture_multiprocess_all_logger(queue, level):
     @param multiprocessing.Queue queue 指定的 mp Queue
     @param level 日志输出等级
     """
+    if queue is None:
+        return
     qh = logging.handlers.QueueHandler(queue)
     level = get_default_logger().level
     for name in logging.Logger.manager.loggerDict.keys():
