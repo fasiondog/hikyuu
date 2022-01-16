@@ -41,7 +41,7 @@ class UseTdxImportToH5Thread(QThread):
         super(self.__class__, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.parent = parent
-        self.log_queue = parent.mq_log_q if parent is not None else None
+        self.log_queue = parent.mp_log_q if parent is not None else None
         self.config = config
         self.msg_name = 'HDF5_IMPORT'
 

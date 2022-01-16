@@ -668,7 +668,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         QApplication.processEvents()
 
         if self.tdx_radioButton.isChecked():
-            self.hdf5_import_thread = UseTdxImportToH5Thread(config)
+            self.hdf5_import_thread = UseTdxImportToH5Thread(self, config)
         else:
             self.hdf5_import_thread = UsePytdxImportToH5Thread(self, config)
 
