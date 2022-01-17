@@ -54,7 +54,7 @@ def SYS_Simple(tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg
         #创建模拟交易账户进行回测，初始资金30万
         my_tm = crtTM(init_cash = 300000)
 
-        #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越
+        #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越
         #慢线时买入，反之卖出）
         my_sg = SG_Flex(EMA(n=5), slow_n=10)
 
