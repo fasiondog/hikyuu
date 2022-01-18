@@ -38,7 +38,7 @@ class UseTdxImportToH5Thread(QThread):
     message = pyqtSignal(list)
 
     def __init__(self, parent, config):
-        super(self.__class__, self).__init__()
+        super(UseTdxImportToH5Thread, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.parent = parent
         self.log_queue = parent.mp_log_q if parent is not None else None

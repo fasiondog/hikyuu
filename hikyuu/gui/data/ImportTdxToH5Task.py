@@ -42,7 +42,7 @@ class ProgressBar:
 
 class ImportTdxToH5Task:
     def __init__(self, log_queue, queue, config, market, ktype, quotations, src_dir, dest_dir):
-        super(self.__class__, self).__init__()
+        super(ImportTdxToH5Task, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_KDATA'
         self.log_queue = log_queue
