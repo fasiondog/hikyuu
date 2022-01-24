@@ -37,6 +37,11 @@ bool KData::operator==(const KData& thr) {
            (getStock() == thr.getStock() && getQuery() == thr.getQuery());
 }
 
+size_t KData::getPosInstock(Datetime datetime) const {
+    size_t pos = getPos(datetime);
+    return pos == Null<size_t>() ? Null<size_t>() : pos + startPos();
+}
+
 void KData::tocsv(const string& filename) {
     std::ofstream file(filename.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't open file! ({})", filename);

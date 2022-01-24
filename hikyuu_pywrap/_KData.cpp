@@ -61,6 +61,8 @@ void export_KData() {
 
       .def("_getPos", &KData::getPos)  // python中需要将Null的情况改写为None
 
+      .def("_getPosInStock", &KData::getPosInstock)
+
       .def("empty", &KData::empty, R"(empty(self)
 
     判断是否为空

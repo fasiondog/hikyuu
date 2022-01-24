@@ -51,8 +51,11 @@ public:
         return getKRecord(datetime);
     }
 
-    /** 按日期查询对应的索引位置  */
+    /** 按日期查询对应的索引位置，注：是 KData 中的位置，不是在 Stock 中原始K记录的位置 */
     size_t getPos(const Datetime& datetime) const;
+
+    /** 按日期获取在原始 K 线记录中的位置 */
+    size_t getPosInstock(Datetime datetime) const;
 
     /** 获取关联的KQuery */
     KQuery getQuery() const;
