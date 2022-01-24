@@ -55,7 +55,7 @@ public:
     size_t getPos(const Datetime& datetime) const;
 
     /** 按日期获取在原始 K 线记录中的位置 */
-    size_t getPosInstock(Datetime datetime) const;
+    size_t getPosInStock(Datetime datetime) const;
 
     /** 获取关联的KQuery */
     KQuery getQuery() const;

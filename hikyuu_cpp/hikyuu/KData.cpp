@@ -37,7 +37,7 @@ bool KData::operator==(const KData& thr) {
            (getStock() == thr.getStock() && getQuery() == thr.getQuery());
 }
 
-size_t KData::getPosInstock(Datetime datetime) const {
+size_t KData::getPosInStock(Datetime datetime) const {
     size_t pos = getPos(datetime);
     return pos == Null<size_t>() ? Null<size_t>() : pos + startPos();
 }
