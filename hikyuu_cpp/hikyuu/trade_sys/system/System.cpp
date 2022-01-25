@@ -128,6 +128,7 @@ void System::reset(bool with_tm, bool with_ev) {
         m_sp->reset();
 
     m_kdata = KData();
+    m_src_kdata = KData();
 
     //不能复位m_stock，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
     //一个sys实例绑定stock后，除非主动改变，否则不应该被reset
@@ -152,21 +153,29 @@ void System::setTO(const KData& kdata) {
     m_kdata = kdata;
     m_stock = kdata.getStock();
 
+    KQuery query = kdata.getQuery();
+    if (m_stock.isNull() || query.recoverType() == KQuery::NO_RECOVER) {
+        m_src_kdata = m_kdata;
+    } else {
+        KQuery no_recover_query = query;
+        no_recover_query.recoverType(KQuery::NO_RECOVER);
+        m_src_kdata = m_stock.getKData(no_recover_query);
+    }
+
     // sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg)
-        m_sg->setTO(kdata);
+        m_sg->setTO(kdata);  // 传入复权的 KData
     if (m_cn)
-        m_cn->setTO(kdata);
+        m_cn->setTO(kdata);  // 传入复权的 KData
     if (m_st)
-        m_st->setTO(kdata);
+        m_st->setTO(kdata);  // 传入复权的 KData
     if (m_tp)
-        m_tp->setTO(kdata);
+        m_tp->setTO(kdata);  // 传入复权的 KData
     if (m_pg)
-        m_pg->setTO(kdata);
+        m_pg->setTO(kdata);  // 传入原始未复权的 KData
     if (m_sp)
-        m_sp->setTO(kdata);
+        m_sp->setTO(kdata);  // 传入原始未复权的 KData
 
-    KQuery query = kdata.getQuery();
     if (m_ev)
         m_ev->setQuery(query);
     if (m_mm)
@@ -198,6 +207,7 @@ SystemPtr System::clone() {
     p->m_name = m_name;
     p->m_stock = m_stock;
     p->m_kdata = m_kdata;
+    p->m_src_kdata = m_src_kdata;
 
     p->m_pre_ev_valid = m_pre_ev_valid;
     p->m_pre_cn_valid = m_pre_cn_valid;
@@ -278,7 +288,7 @@ void System::run(const KQuery& query, bool reset) {
     size_t total = kdata.size();
     for (size_t i = 0; i < total; ++i) {
         if (kdata[i].datetime >= m_tm->initDatetime()) {
-            runMoment(kdata[i]);
+            runMoment(kdata[i], m_src_kdata[i]);
         }
     }
 }
@@ -295,23 +305,24 @@ void System::clearDelayRequest() {
     m_buyShortRequest.clear();
 }
 
-TradeRecord System::runMoment(const KRecord& record) {
+TradeRecord System::runMoment(const KRecord& record, const KRecord& src_record) {
     m_buy_days++;
     m_sell_short_days++;
-    return _runMoment(record);
+    return _runMoment(record, src_record);
 }
 
 TradeRecord System::runMoment(const Datetime& datetime) {
-    KRecord today = m_kdata.getKRecord(datetime);
-    if (today.isValid()) {
-        m_buy_days++;
-        m_sell_short_days++;
-        return _runMoment(today);
-    }
-    return TradeRecord();
+    size_t pos = m_kdata.getPos(datetime);
+    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+
+    KRecord today = m_kdata.getKRecord(pos);
+    KRecord src_today = m_src_kdata.getKRecord(pos);
+    m_buy_days++;
+    m_sell_short_days++;
+    return _runMoment(today, src_today);
 }
 
-TradeRecord System::_runMoment(const KRecord& today) {
+TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     if ((today.highPrice == today.lowPrice || today.closePrice > today.highPrice ||
          today.closePrice < today.lowPrice) &&
@@ -404,17 +415,20 @@ TradeRecord System::_runMoment(const KRecord& today) {
 
     //----------------------------------------------------------
     // 处理止损、止盈、目标信号
+    // 止损使用的是当前持仓的止损价，使用未复权的原始价
+    // 目标盈利使用未复权的原始价格
     //----------------------------------------------------------
 
     price_t current_price = today.closePrice;
+    price_t src_current_price = src_today.closePrice;  // 未复权的原始价格
 
     PositionRecord position = m_tm->getPosition(m_stock);
     if (position.number != 0) {
         TradeRecord tr;
-        if (current_price <= position.stoploss) {
+        if (src_current_price <= position.stoploss) {
             tr = _sell(today, PART_STOPLOSS);
             //} else if (current_price >= position.goalPrice) {
-        } else if (current_price >= _getGoalPrice(today.datetime, current_price)) {
+        } else if (src_current_price >= _getGoalPrice(today.datetime, src_current_price)) {
             tr = _sell(today, PART_PROFITGOAL);
         } else {
             price_t current_take_profile = _getTakeProfitPrice(today.datetime);

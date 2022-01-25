@@ -159,7 +159,7 @@ public:
     void run(const Stock& stock, const KQuery& query, bool reset = true);
 
     TradeRecord runMoment(const Datetime& datetime);
-    TradeRecord runMoment(const KRecord& record);
+    TradeRecord runMoment(const KRecord& record, const KRecord& src_record);
 
     //清除已有的交易请求，供Portfolio使用
     void clearDelayRequest();
@@ -221,7 +221,7 @@ public:
 
     TradeRecord _processRequest(const KRecord& today);
 
-    TradeRecord _runMoment(const KRecord& record);
+    TradeRecord _runMoment(const KRecord& record, const KRecord& src_record);
 
 protected:
     TradeManagerPtr m_tm;
@@ -237,6 +237,7 @@ protected:
     string m_name;
     Stock m_stock;
     KData m_kdata;
+    KData m_src_kdata;  // 未复权的原始 K 线数据
 
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
