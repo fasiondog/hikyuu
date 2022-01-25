@@ -163,6 +163,11 @@ public:
         return m_recoverType;
     }
 
+    /** 设置复权类型 */
+    void recoverType(RecoverType recoverType) {
+        m_recoverType = recoverType;
+    }
+
     /** 获取queryType名称，用于显示输出 */
     static string getQueryTypeName(QueryType);
 
