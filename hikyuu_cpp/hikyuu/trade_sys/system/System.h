@@ -157,6 +157,7 @@ public:
     //不指定stock的方式下run，需要事先通过setStock设定stock
     void run(const KQuery& query, bool reset = true);
     void run(const Stock& stock, const KQuery& query, bool reset = true);
+    void run(const KData& kdata, bool reset = true);
 
     TradeRecord runMoment(const Datetime& datetime);
     TradeRecord runMoment(const KRecord& record, const KRecord& src_record);
@@ -196,30 +197,33 @@ public:
     price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice);
     price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice);
 
-    TradeRecord _buy(const KRecord& today, Part from);
-    TradeRecord _buyNow(const KRecord& today, Part from);
-    TradeRecord _buyDelay(const KRecord& today);
-    void _submitBuyRequest(const KRecord& today, Part from);
+    price_t _getAdjustScale(const KRecord& today, const KRecord& src_today);
+    price_t _getAdjustScale(const KRecord& today, const KRecord& src_today, price_t price);
 
-    TradeRecord _sell(const KRecord& today, Part from);
-    TradeRecord _sellNow(const KRecord& today, Part from);
-    TradeRecord _sellDelay(const KRecord& today);
-    void _submitSellRequest(const KRecord& today, Part from);
+    TradeRecord _buy(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyDelay(const KRecord& today, const KRecord& src_today);
+    void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
+
+    TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellDelay(const KRecord& today, const KRecord& src_today);
+    void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from);
 
     // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
     TradeRecord _sellForce(const KRecord& today, double num, Part from);
 
-    TradeRecord _sellShort(const KRecord& today, Part from);
-    TradeRecord _sellShortNow(const KRecord& today, Part from);
-    TradeRecord _sellShortDelay(const KRecord& today);
-    void _submitSellShortRequest(const KRecord& today, Part from);
+    TradeRecord _sellShort(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellShortNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellShortDelay(const KRecord& today, const KRecord& src_today);
+    void _submitSellShortRequest(const KRecord& today, const KRecord& src_today, Part from);
 
-    TradeRecord _buyShort(const KRecord& today, Part from);
-    TradeRecord _buyShortNow(const KRecord& today, Part from);
-    TradeRecord _buyShortDelay(const KRecord& today);
-    void _submitBuyShortRequest(const KRecord& today, Part from);
+    TradeRecord _buyShort(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyShortNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyShortDelay(const KRecord& today, const KRecord& src_today);
+    void _submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from);
 
-    TradeRecord _processRequest(const KRecord& today);
+    TradeRecord _processRequest(const KRecord& today, const KRecord& src_today);
 
     TradeRecord _runMoment(const KRecord& record, const KRecord& src_record);
 
@@ -358,6 +362,10 @@ inline bool System::_environmentIsValid(const Datetime& datetime) {
 
 inline bool System::_conditionIsValid(const Datetime& datetime) {
     return m_cn ? m_cn->isValid(datetime) : true;
+}
+
+inline price_t System::_getAdjustScale(const KRecord& today, const KRecord& src_today) {
+    return src_today.closePrice / today.closePrice;
 }
 
 inline double System ::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk,

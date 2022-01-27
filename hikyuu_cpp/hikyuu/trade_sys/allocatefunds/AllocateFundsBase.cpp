@@ -137,8 +137,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
         const SYSPtr& sys = *iter;
         if (selected_sets.find(sys) == selected_sets.end()) {
-            KRecord record = sys->getTO().getKRecord(date);
-            TradeRecord tr = sys->_sell(record, PART_ALLOCATEFUNDS);
+            KData kdata = sys->getTO();
+            size_t pos = kdata.getPos(date);
+            KRecord record = kdata.getKRecord(date);
+            KRecord srcRecord = kdata.getStock().getKRecord(kdata.startPos() + pos);
+            TradeRecord tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
             if (!tr.isNull()) {
                 m_tm->addTradeRecord(tr);
             }
@@ -174,8 +177,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         } else if (selected_running_sets.find(iter->getSYS()) != selected_running_sets.end()) {
             // 超出最大允许运行数且属于正在运行的子系统，则尝试清仓并回收资金
             auto sys = iter->getSYS();
-            KRecord record = sys->getTO().getKRecord(date);
-            auto tr = sys->_sell(record, PART_ALLOCATEFUNDS);
+            KData kdata = sys->getTO();
+            size_t pos = kdata.getPos(date);
+            KRecord record = kdata.getKRecord(date);
+            KRecord srcRecord = kdata.getStock().getKRecord(kdata.startPos() + pos);
+            auto tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
             if (!tr.isNull()) {
                 m_tm->addTradeRecord(tr);
             }

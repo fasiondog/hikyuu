@@ -19,7 +19,8 @@ string (System::*sys_get_name)() const = &System::name;
 void (System::*sys_set_name)(const string&) = &System::name;
 
 void (System::*run_1)(const KQuery&, bool) = &System::run;
-void (System::*run_2)(const Stock&, const KQuery&, bool reset) = &System::run;
+void (System::*run_2)(const KData&, bool) = &System::run;
+void (System::*run_3)(const Stock&, const KQuery&, bool reset) = &System::run;
 
 void export_System() {
     def(
@@ -211,7 +212,8 @@ void export_System() {
 
         //.def("run", &System::run, run_overload(args("stock", "query", "reset")))
         .def("run", run_1, (arg("query"), arg("reset") = true))
-        .def("run", run_2, (arg("stock"), arg("query"), arg("reset") = true),
+        .def("run", run_2, (arg("kdata"), arg("reset") = true))
+        .def("run", run_3, (arg("stock"), arg("query"), arg("reset") = true),
              R"(run(self, stock, query[, reset=True])
   
     运行系统，执行回测
