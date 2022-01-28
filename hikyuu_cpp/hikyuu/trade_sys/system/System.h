@@ -186,8 +186,8 @@ public:
     double _getSellShortNumber(const Datetime&, price_t price, price_t risk, Part from);
     double _getBuyShortNumber(const Datetime&, price_t price, price_t risk, Part from);
 
-    price_t _getStoplossPrice(const Datetime& datetime, price_t price);
-    price_t _getShortStoplossPrice(const Datetime& datetime, price_t price);
+    price_t _getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
+    price_t _getShortStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
     price_t _getTakeProfitPrice(const Datetime& datetime);
 
@@ -196,9 +196,6 @@ public:
 
     price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice);
     price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice);
-
-    price_t _getAdjustScale(const KRecord& today, const KRecord& src_today);
-    price_t _getAdjustScale(const KRecord& today, const KRecord& src_today, price_t price);
 
     TradeRecord _buy(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);
@@ -211,7 +208,7 @@ public:
     void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from);
 
     // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
-    TradeRecord _sellForce(const KRecord& today, double num, Part from);
+    TradeRecord _sellForce(const KRecord& today, const KRecord& src_today, double num, Part from);
 
     TradeRecord _sellShort(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellShortNow(const KRecord& today, const KRecord& src_today, Part from);
@@ -364,10 +361,6 @@ inline bool System::_conditionIsValid(const Datetime& datetime) {
     return m_cn ? m_cn->isValid(datetime) : true;
 }
 
-inline price_t System::_getAdjustScale(const KRecord& today, const KRecord& src_today) {
-    return src_today.closePrice / today.closePrice;
-}
-
 inline double System ::_getBuyNumber(const Datetime& datetime, price_t price, price_t risk,
                                      Part from) {
     return m_mm ? m_mm->getBuyNumber(datetime, m_stock, price, risk, from) : 0;
@@ -394,14 +387,6 @@ inline price_t System ::_getRealBuyPrice(const Datetime& datetime, price_t planP
 
 inline price_t System ::_getRealSellPrice(const Datetime& datetime, price_t planPrice) {
     return m_sp ? m_sp->getRealSellPrice(datetime, planPrice) : planPrice;
-}
-
-inline price_t System ::_getStoplossPrice(const Datetime& datetime, price_t price) {
-    return m_st ? m_st->getPrice(datetime, price) : 0.0;
-}
-
-inline price_t System ::_getShortStoplossPrice(const Datetime& datetime, price_t price) {
-    return m_st ? m_st->getShortPrice(datetime, price) : 0.0;
 }
 
 inline price_t System ::_getTakeProfitPrice(const Datetime& datetime) {

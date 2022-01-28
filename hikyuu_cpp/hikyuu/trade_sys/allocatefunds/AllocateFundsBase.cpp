@@ -281,7 +281,10 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
                 // 计算并卖出部分股票以获取剩下需要返还的资金
                 Stock stock = sys->getStock();
-                KRecord k = sys->getTO().getKRecord(date);
+                KData kdata = sys->getTO();
+                size_t pos = kdata.getPos(date);
+                KRecord k = kdata.getKRecord(pos);
+                KRecord srcK = stock.getKRecord(kdata.startPos() + pos);
                 PositionRecord position = tm->getPosition(stock);
                 if (position.number > 0) {
                     TradeRecord tr;
@@ -290,14 +293,14 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                       size_t(need_sell_num / stock.minTradeNumber()) * stock.minTradeNumber();
                     if (position.number <= need_sell_num) {
                         // 如果当前持仓数小于等于需要卖出的数量，则全部卖出
-                        tr = sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
+                        tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
                     } else {
                         if (position.number - need_sell_num >= stock.minTradeNumber()) {
                             // 如果按需要卖出数量卖出后，可能剩余的数量大于等于最小交易数则按需要卖出的数量卖出
-                            tr = sys->_sellForce(k, need_sell_num, PART_ALLOCATEFUNDS);
+                            tr = sys->_sellForce(k, srcK, need_sell_num, PART_ALLOCATEFUNDS);
                         } else {
                             // 如果按需要卖出的数量卖出后，剩余的持仓数小于最小交易数量则全部卖出
-                            tr = sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
+                            tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
                         }
                     }
                     if (!tr.isNull()) {
