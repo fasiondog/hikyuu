@@ -84,36 +84,40 @@ def get_exception_info():
     return "{}: {}".format(info[0].__name__, info[1])
 
 
-def hku_catch(ret=None, trace=False, callback=None, retry=1):
+def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False):
     """捕获发生的异常, 包装方式: @hku_catch()
-    :param ret: 异常发生时返回值
+    :param ret: 异常发生时返回值, with_msg为True时，返回为 (ret, errmsg)
     :param boolean trace: 打印异常堆栈信息
     :param func callback: 发生异常后的回调函数，入参同func
     :param int retry: 尝试执行的次数
+    :param boolean with_msg: 是否返回异常错误信息, 为True时，函数返回为 (ret, errmsg)
     """
     def hku_catch_wrap(func):
         @functools.wraps(func)
         def wrappedFunc(*args, **kargs):
             for i in range(retry):
+                errmsg = ""
                 try:
-                    return func(*args, **kargs)
+                    val = func(*args, **kargs)
+                    return (val, errmsg) if with_msg else val
                 except HKUIngoreError:
-                    hku_logger.debug("{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__))
+                    errmsg = "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
+                    hku_logger.debug(errmsg)
                 except Exception:
-                    hku_logger.error("{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__))
+                    errmsg = "{} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
+                    hku_logger.error(errmsg)
                     if trace:
                         traceback.print_exc()
                     if callback and i == (retry - 1):
                         callback(*args, **kargs)
                 except:
-                    hku_logger.error(
-                        "Unknown error! {} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
-                    )
+                    errmsg = "Unknown error! {} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
+                    hku_logger.error(errmsg)
                     if trace:
                         traceback.print_exc()
                     if callback and i == (retry - 1):
                         callback(*args, **kargs)
-                return ret
+                return (ret, errmsg) if with_msg else ret
 
         return wrappedFunc
 
