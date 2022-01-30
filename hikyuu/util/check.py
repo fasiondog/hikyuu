@@ -45,11 +45,11 @@ def checkif(expression, message, excepion=None, **kwargs):
             raise excepion(message, **kwargs)
 
 
-def hku_check(exp, msg):
+def hku_check(exp, msg, *args, **kwargs):
     if not exp:
         st = traceback.extract_stack()[-2]
         check_exp = st._line.split(',')[0]
-        errmsg = "{}) {} [{}] [{}:{}]".format(check_exp, msg, st.name, st.filename, st.lineno)
+        errmsg = "{}) {} [{}] [{}:{}]".format(check_exp, msg.format(*args, **kwargs), st.name, st.filename, st.lineno)
         raise HKUCheckError(exp, errmsg)
 
 
@@ -70,12 +70,21 @@ def hku_check_throw(expression, message, excepion=None, **kwargs):
             raise excepion(errmsg, **kwargs)
 
 
-def hku_check_ignore(exp, msg=None):
+def hku_check_ignore(exp, *args, **kwargs):
     """可忽略的检查"""
     if not exp:
         st = traceback.extract_stack()[-2]
         check_exp = st._line.split(',')[0]
-        errmsg = "{}) {} [{}] [{}:{}]".format(check_exp, msg, st.name, st.filename, st.lineno)
+        msg = kwargs.pop("msg") if "msg" in kwargs else ''
+        if msg:
+            errmsg = "{}) {} [{}] [{}:{}]".format(
+                check_exp, msg.format(*args, **kwargs), st.name, st.filename, st.lineno
+            )
+        elif args:
+            msg = args[0]
+            errmsg = "{}) {} [{}] [{}:{}]".format(
+                check_exp, msg.format(*args[1:], **kwargs), st.name, st.filename, st.lineno
+            )
         raise HKUIngoreError(exp, errmsg)
 
 

@@ -46,70 +46,78 @@ def class_logger(cls, enable=False):
     cls.logger = logger
 
 
-def add_class_logger_handler(handler, class_list, level=logging.INFO):
+def add_class_logger_handler(class_list, level=logging.INFO, handler=None):
     """为指定的类增加日志 handler，并设定级别
 
-    :param handler: logging handler
     :param class_list: 类列表
     :param level: 日志级别
+    :param handler: logging handler
     """
     for cls in class_list:
         #logger = logging.getLogger("{}.{}".format(cls.__module__, cls.__name__))
         logger = logging.getLogger("{}".format(cls.__name__))
-        logger.addHandler(handler)
+        if handler:
+            logger.addHandler(handler)
         logger.setLevel(level)
 
 
-def hku_debug(msg, logger=None):
+def hku_debug(msg, *args, **kwargs):
     st = traceback.extract_stack()[-2]
+    logger = kwargs.pop("logger") if "logger" in kwargs else None
     if logger:
-        logger.debug("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        logger.debug("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.debug("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        hku_logger.debug("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
 hku_trace = hku_debug
 
 
-def hku_info(msg, logger=None):
+def hku_info(msg, *args, **kwargs):
     st = traceback.extract_stack()[-2]
-    if logger:
-        logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+    logger = kwargs.pop("logger") if "logger" in kwargs else None
+    if logger is not None:
+        logger.info("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        hku_logger.info("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
-def hku_warn(msg, logger=None):
+def hku_warn(msg, *args, **kwargs):
     st = traceback.extract_stack()[-2]
+    logger = kwargs.pop("logger") if "logger" in kwargs else None
     if logger:
-        logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        hku_logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
-def hku_error(msg, logger=None):
+def hku_error(msg, *args, **kwargs):
     st = traceback.extract_stack()[-2]
+    logger = kwargs.pop("logger") if "logger" in kwargs else None
     if logger:
-        logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        hku_logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
-def hku_fatal(msg, logger=None):
+def hku_fatal(msg, *args, **kwargs):
     st = traceback.extract_stack()[-2]
+    logger = kwargs.pop("logger") if "logger" in kwargs else None
     if logger:
-        logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
     else:
-        hku_logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+        hku_logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
 
 
-def hku_debug_if(exp, msg, logger=None, callback=None):
+def hku_debug_if(exp, msg, *args, **kwargs):
     if exp:
         st = traceback.extract_stack()[-2]
+        logger = kwargs.pop("logger") if "logger" in kwargs else None
+        callback = kwargs.pop("callback") if "callback" in kwargs else None
         if logger:
-            logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            logger.info("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            hku_logger.info("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
@@ -117,46 +125,54 @@ def hku_debug_if(exp, msg, logger=None, callback=None):
 hku_trace_if = hku_debug_if
 
 
-def hku_info_if(exp, msg, logger=None, callback=None):
+def hku_info_if(exp, msg, *args, **kwargs):
     if exp:
         st = traceback.extract_stack()[-2]
+        logger = kwargs.pop("logger") if "logger" in kwargs else None
+        callback = kwargs.pop("callback") if "callback" in kwargs else None
         if logger:
-            logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            logger.info("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.info("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            hku_logger.info("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
 
-def hku_warn_if(exp, msg, logger=None, callback=None):
+def hku_warn_if(exp, msg, *args, **kwargs):
     if exp:
         st = traceback.extract_stack()[-2]
+        logger = kwargs.pop("logger") if "logger" in kwargs else None
+        callback = kwargs.pop("callback") if "callback" in kwargs else None
         if logger:
-            logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.warning("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            hku_logger.warning("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
 
-def hku_error_if(exp, msg, logger=None, callback=None):
+def hku_error_if(exp, msg, *args, **kwargs):
     if exp:
         st = traceback.extract_stack()[-2]
+        logger = kwargs.pop("logger") if "logger" in kwargs else None
+        callback = kwargs.pop("callback") if "callback" in kwargs else None
         if logger:
-            logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.error("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            hku_logger.error("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
 
-def hku_fatal_if(exp, msg, logger=None, callback=None):
+def hku_fatal_if(exp, msg, *args, **kwargs):
     if exp:
         st = traceback.extract_stack()[-2]
+        logger = kwargs.pop("logger") if "logger" in kwargs else None
+        callback = kwargs.pop("callback") if "callback" in kwargs else None
         if logger:
-            logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         else:
-            hku_logger.critical("{} [{}] ({}:{})".format(msg, st.name, st.filename, st.lineno))
+            hku_logger.critical("{} [{}] ({}:{})".format(msg.format(*args, **kwargs), st.name, st.filename, st.lineno))
         if callback:
             callback()
 
@@ -176,17 +192,17 @@ def with_trace(level=logging.INFO):
     return with_trace_wrap
 
 
-def capture_multiprocess_all_logger(queue, level):
+def capture_multiprocess_all_logger(queue, level=None):
     """重设所有子进程中的 logger 输出指定的 queue，并重设level
     
     @param multiprocessing.Queue queue 指定的 mp Queue
-    @param level 日志输出等级
+    @param level 日志输出等级, None为保持原有等级
     """
     if queue is None:
         return
     qh = logging.handlers.QueueHandler(queue)
-    level = get_default_logger().level
     for name in logging.Logger.manager.loggerDict.keys():
         logger = logging.getLogger(name)
         logger.addHandler(qh)
-        logger.setLevel(level)
+        if level is not None:
+            logger.setLevel(level)

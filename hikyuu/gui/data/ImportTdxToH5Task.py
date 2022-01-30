@@ -72,7 +72,7 @@ class ImportTdxToH5Task:
         pass
 
     def __call__(self):
-        capture_multiprocess_all_logger(self.log_queue, get_default_logger().level)
+        capture_multiprocess_all_logger(self.log_queue)
         use_hdf = False
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])

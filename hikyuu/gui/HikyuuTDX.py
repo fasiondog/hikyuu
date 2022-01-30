@@ -206,24 +206,21 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.log_handler = logging.StreamHandler(self._stream)
         FORMAT = logging.Formatter('%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]')
         self.log_handler.setFormatter(FORMAT)
+        add_class_logger_handler(
+            [
+                MyMainWindow,
+                CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread,
+                UsePytdxImportToH5Thread,
+                UseTdxImportToH5Thread,
+                ImportTdxToH5Task,
+                SchedImportThread
+            ],
+            logging.INFO
+        )
         for name in logging.Logger.manager.loggerDict.keys():
             logger = logging.getLogger(name)
             logger.addHandler(self.log_handler)
             logger.setLevel(logging.DEBUG)
-        # add_class_logger_handler(
-        #     self.log_handler,
-        #     [
-        #         MyMainWindow,
-        #         CollectSpotThread,  #CollectToMySQLThread, CollectToMemThread,
-        #         UsePytdxImportToH5Thread,
-        #         UseTdxImportToH5Thread,
-        #         ImportTdxToH5Task,
-        #         SchedImportThread
-        #     ],
-        #     logging.INFO
-        # )
-        # get_default_logger().addHandler(self.log_handler)
-        # get_default_logger().setLevel(logging.INFO)
 
         # 多进程日志队列
         self.mp_log_q = multiprocessing.Queue()

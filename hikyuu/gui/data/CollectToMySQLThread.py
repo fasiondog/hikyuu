@@ -44,17 +44,13 @@ class CollectToMySQLThread(QThread):
         self._phase1_start_time = Datetime(
             datetime.datetime.combine(
                 datetime.date.today(),
-                datetime.time.fromisoformat(
-                    (config.get('collect', 'phase1_start', fallback='09:05'))
-                )
+                datetime.time.fromisoformat((config.get('collect', 'phase1_start', fallback='09:05')))
             )
         )
         self._phase1_end_time = Datetime(
             datetime.datetime.combine(
                 datetime.date.today(),
-                datetime.time.fromisoformat(
-                    (config.get('collect', 'phase1_end', fallback='09:05'))
-                )
+                datetime.time.fromisoformat((config.get('collect', 'phase1_end', fallback='09:05')))
             )
         )
         self._use_zhima_proxy = config.getboolean('collect', 'use_zhima_proxy', fallback=False)
@@ -68,7 +64,7 @@ class CollectToMySQLThread(QThread):
             self.cond.wakeAll()
             self.wait()
             if self._connect is not None:
-                hku_trace('关闭数据库连接', self.logger)
+                hku_trace('关闭数据库连接', logger=self.logger)
                 self._connect.close()
 
     def __del__(self):
@@ -78,7 +74,7 @@ class CollectToMySQLThread(QThread):
     def run(self):
         self.logger.info("{} 数据采集同步线程启动".format(self.market))
         stk_list = self.get_stock_list()
-        hku_warn_if(not stk_list, "从数据库中获取的股票列表为空！", self.logger)
+        hku_warn_if(not stk_list, "从数据库中获取的股票列表为空！", logger=self.logger)
         self.mutex.tryLock()
 
         end_delta = self._phase1_end_time - self._phase1_end_time.start_of_day()
@@ -95,14 +91,14 @@ class CollectToMySQLThread(QThread):
             delta = self._interval * ceil((start - self._phase1_start_time) / self._interval
                                           ) - (start - self._phase1_start_time)
 
-        hku_info('{} 下次采集时间：{}'.format(self.market, start + delta), self.logger)
+        hku_info('{} 下次采集时间：{}', self.market, start + delta, logger=self.logger)
         delta = int(delta.total_milliseconds())
         while self.working and not self.cond.wait(self.mutex, int(delta)):
             last_time = Datetime.today() + end_delta
             start = Datetime.now()
             if start >= last_time:
                 next_time = Datetime.today() + TimeDelta(1) + start_delta
-                hku_info('{} 明日采集时间：{}'.format(self.market, next_time), self.logger)
+                hku_info('{} 明日采集时间：{}', self.market, next_time, logger=self.logger)
                 delta = next_time - start
                 delta = int(delta.total_milliseconds())
                 continue
@@ -132,8 +128,8 @@ class CollectToMySQLThread(QThread):
         table = get_table(connect, self.market, record['code'], 'day')
         sql = 'replace into {} (date, open, high, low, close, amount, count) \
              values ({}, {}, {}, {}, {}, {}, {})'.format(
-            table, current_date, record['open'], record['high'], record['low'], record['close'],
-            record['amount'], record['volumn']
+            table, current_date, record['open'], record['high'], record['low'], record['close'], record['amount'],
+            record['volumn']
         )
         cur = connect.cursor()
         cur.execute(sql)

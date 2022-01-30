@@ -48,7 +48,7 @@ class ImportWeightToSqliteTask:
         self.msg_name = 'IMPORT_WEIGHT'
 
     def __call__(self):
-        capture_multiprocess_all_logger(self.log_queue, get_default_logger().level)
+        capture_multiprocess_all_logger(self.log_queue)
         total_count = 0
         try:
             if self.config.getboolean('hdf5', 'enable', fallback=True):

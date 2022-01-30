@@ -55,7 +55,7 @@ class ImportPytdxToH5:
         self.startDatetime = start_datetime
 
     def __call__(self):
-        capture_multiprocess_all_logger(self.log_queue, get_default_logger().level)
+        capture_multiprocess_all_logger(self.log_queue)
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
             connect = sqlite3.connect(sqlite_file, timeout=1800)

@@ -125,10 +125,7 @@ def print_spot_list(buf):
 
 @hku_catch()
 def parse_phase(phase):
-    return [
-        TimeDelta(hours=int(a[0]), minutes=int(a[1]))
-        for a in [x.split(':') for x in phase.split('-')]
-    ]
+    return [TimeDelta(hours=int(a[0]), minutes=int(a[1])) for a in [x.split(':') for x in phase.split('-')]]
 
 
 def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend):
@@ -165,33 +162,23 @@ def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend)
 
 def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     phase1_delta = parse_phase(phase1)
-    hku_error_if(
-        phase1_delta is None or len(phase1_delta) != 2,
-        "无效参数 phase1: {}".format(phase1),
-        callback=lambda: exit(1)
-    )
-    hku_error_if(
-        phase1_delta[0] > phase1_delta[1],
-        "无效参数 phase1: {}, 结束时间应大于等于起始时间".format(phase1),
-        callback=lambda: exit(1)
-    )
+    if phase1_delta is None or len(phase1_delta) != 2:
+        hku_error("无效参数 phase1: {}".format(phase1))
+        exit(1)
+    if phase1_delta[0] > phase1_delta[1]:
+        hku_error("无效参数 phase1: {}, 结束时间应大于等于起始时间".format(phase1))
+        exit(1)
 
     phase2_delta = parse_phase(phase2)
-    hku_error_if(
-        phase2_delta is None or len(phase2_delta) != 2,
-        "无效参数 phase2: {}".format(phase2),
-        callback=lambda: exit(1)
-    )
-    hku_error_if(
-        phase2_delta[0] > phase2_delta[1],
-        "无效参数 phase2: {}, 结束时间应大于等于起始时间".format(phase2),
-        callback=lambda: exit(1)
-    )
-    hku_error_if(
-        phase1_delta[1] > phase2_delta[0],
-        "无效参数 phase1: {}, phase2: {}, phase2 起始时间应大于等于 phase1 结束时间".format(phase1, phase2),
-        callback=lambda: exit(1)
-    )
+    if phase2_delta is None or len(phase2_delta) != 2:
+        hku_error("无效参数 phase2: {}".format(phase2))
+        exit(1)
+    if phase2_delta[0] > phase2_delta[1]:
+        hku_error("无效参数 phase2: {}, 结束时间应大于等于起始时间".format(phase2))
+        exit(1)
+    if phase1_delta[1] > phase2_delta[0]:
+        hku_error("无效参数 phase1: {}, phase2: {}, phase2 起始时间应大于等于 phase1 结束时间".format(phase1, phase2))
+        exit(1)
 
     hku_logger.info("采集时间段1：{}".format(phase1))
     hku_logger.info("采集时间段2：{}".format(phase2))
@@ -205,8 +192,8 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
     sm = StockManager.instance()
     stk_list = [
-        stk.market_code.lower() for stk in sm if stk.valid and stk.type in
-        (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM)
+        stk.market_code.lower() for stk in sm
+        if stk.valid and stk.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM)
     ]
 
     spot_topic = ':spot:'
@@ -234,11 +221,7 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
             start_time = Datetime.now()
             pub_sock.send("{}{}".format(spot_topic, '[start spot]').encode('utf-8'))
             records = get_spot_parallel(stk_list, source, use_proxy, batch_func)
-            hku_info(
-                "{}:{}:{} 采集数量: {}".format(
-                    start_time.hour, start_time.minute, start_time.second, len(records)
-                )
-            )
+            hku_info("{}:{}:{} 采集数量: {}".format(start_time.hour, start_time.minute, start_time.second, len(records)))
             pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
             time.sleep(delta.total_seconds())

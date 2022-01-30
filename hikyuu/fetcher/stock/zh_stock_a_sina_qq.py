@@ -16,7 +16,7 @@ from hikyuu.fetcher.proxy import request_with_proxy, request_with_local
 def parse_one_result_sina(resultstr):
     result = {}
     hku_check_ignore(resultstr, "Invalid input param!")
-    hku_check_ignore(len(resultstr) > 3 and resultstr[:3] == 'var', "Invalid input param! {}".format(resultstr))
+    hku_check_ignore(len(resultstr) > 3 and resultstr[:3] == 'var', "Invalid input param! {}", resultstr)
 
     a = resultstr.split(',')
     result['market'] = a[0][11:13]
@@ -61,7 +61,7 @@ def parse_one_result_sina(resultstr):
 def parse_one_result_qq(resultstr):
     result = {}
     hku_check_ignore(resultstr, "Invalid input param!")
-    hku_check_ignore(len(resultstr) > 3 and resultstr[:2] == 'v_', "Invalid input param! {}".format(resultstr))
+    hku_check_ignore(len(resultstr) > 3 and resultstr[:2] == 'v_', "Invalid input param! {}", resultstr)
 
     a = resultstr.split('~')
     result['market'] = a[0][2:4]

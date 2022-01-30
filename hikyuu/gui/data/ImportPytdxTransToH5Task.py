@@ -53,7 +53,7 @@ class ImportPytdxTransToH5:
         self.max_days = int(max_days)
 
     def __call__(self):
-        capture_multiprocess_all_logger(self.log_queue, get_default_logger().level)
+        capture_multiprocess_all_logger(self.log_queue)
         count = 0
         connect = sqlite3.connect(self.sqlitefile, timeout=1800)
         try:

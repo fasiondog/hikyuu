@@ -25,17 +25,13 @@ class CollectToMemThread(QThread):
         self._phase1_start_time = Datetime(
             datetime.datetime.combine(
                 datetime.date.today(),
-                datetime.time.fromisoformat(
-                    (config.get('collect', 'phase1_start', fallback='09:05'))
-                )
+                datetime.time.fromisoformat((config.get('collect', 'phase1_start', fallback='09:05')))
             )
         )
         self._phase1_end_time = Datetime(
             datetime.datetime.combine(
                 datetime.date.today(),
-                datetime.time.fromisoformat(
-                    (config.get('collect', 'phase1_end', fallback='09:05'))
-                )
+                datetime.time.fromisoformat((config.get('collect', 'phase1_end', fallback='09:05')))
             )
         )
         self._use_zhima_proxy = config.getboolean('collect', 'use_zhima_proxy', fallback=False)
@@ -60,7 +56,7 @@ class CollectToMemThread(QThread):
         hikyuu_init(self.hku_config_file, ignore_preload=True)
 
         stk_list = self.get_stock_list()
-        hku_warn_if(not stk_list, "从数据库中获取的股票列表为空！", self.logger)
+        hku_warn_if(not stk_list, "从数据库中获取的股票列表为空！", logger=self.logger)
         self.mutex.tryLock()
 
         end_delta = self._phase1_end_time - self._phase1_end_time.start_of_day()
@@ -77,14 +73,14 @@ class CollectToMemThread(QThread):
             delta = self._interval * ceil((start - self._phase1_start_time) / self._interval
                                           ) - (start - self._phase1_start_time)
 
-        hku_info('{} 下次采集时间：{}'.format(self.market, start + delta), self.logger)
+        hku_info('{} 下次采集时间：{}', self.market, start + delta, logger=self.logger)
         delta = int(delta.total_milliseconds())
         while self.working and not self.cond.wait(self.mutex, int(delta)):
             last_time = Datetime.today() + end_delta
             start = Datetime.now()
             if start >= last_time:
                 next_time = Datetime.today() + TimeDelta(1) + start_delta
-                hku_info('{} 明日采集时间：{}'.format(self.market, next_time), self.logger)
+                hku_info('{} 明日采集时间：{}', self.market, next_time, logger=self.logger)
                 delta = next_time - start
                 delta = int(delta.total_milliseconds())
                 continue
@@ -106,8 +102,8 @@ class CollectToMemThread(QThread):
         sm = StockManager.instance()
         return [
             stk.market_code.lower() for stk in sm
-            if stk.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM)
-            and stk.valid and stk.market.lower() == self.market.lower()
+            if stk.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX,
+                            constant.STOCKTYPE_GEM) and stk.valid and stk.market.lower() == self.market.lower()
         ]
 
     def record_is_valid(self, record):
