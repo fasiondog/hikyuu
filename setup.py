@@ -231,7 +231,10 @@ def cli():
 @click.option('-m',
               '--mode',
               default='release',
-              type=click.Choice(['release', 'debug', 'coverage', 'asan', 'tsan', 'msan', 'lsan']),
+              type=click.Choice([
+                  'release', 'debug', 'coverage', 'asan', 'tsan', 'msan',
+                  'lsan'
+              ]),
               help='编译模式')
 def build(verbose, mode, j):
     """ 执行编译 """
@@ -246,7 +249,10 @@ def build(verbose, mode, j):
 @click.option('-m',
               '--mode',
               default='release',
-              type=click.Choice(['release', 'debug', 'coverage', 'asan', 'msan', 'tsan', 'lsan']),
+              type=click.Choice([
+                  'release', 'debug', 'coverage', 'asan', 'msan', 'tsan',
+                  'lsan'
+              ]),
               help='编译模式')
 @click.option('-case', '--case', default='', help="执行指定的 TestCase")
 def test(all, compile, verbose, mode, case, j):
@@ -310,6 +316,8 @@ def uninstall():
         if dir == 'hikyuu' or (len(dir) > 6 and dir[:6] == 'Hikyuu'):
             print('delete', site_lib_dir + '/' + dir)
             shutil.rmtree(site_lib_dir + '/' + dir)
+    if os.path.exists("./hikyuu.egg-info"):
+        shutil.rmtree("./hikyuu.egg-info")
     print("Uninstall finished!")
 
 
