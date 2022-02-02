@@ -48,8 +48,10 @@ def get_boost_envrionment():
 def get_python_version():
     """获取当前 python版本"""
     py_version = platform.python_version_tuple()
-    py_version = int(py_version[0]) * 10 + int(py_version[1])
-    print('current python version:', int(py_version) * 0.1)
+    min_version = int(py_version[1])
+    main_version = int(py_version[0])
+    py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
+    print('current python version: {}.{}'.format(main_version, min_version))
     return py_version
 
 
