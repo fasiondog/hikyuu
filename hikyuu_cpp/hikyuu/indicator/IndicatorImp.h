@@ -1,5 +1,5 @@
 /*
- * ';.kmuhbvcdxIndicatorImp.h
+ * IndicatorImp.h
  *
  *  Created on: 2013-2-9
  *      Author: fasiondog
@@ -47,6 +47,7 @@ namespace hku {
 #define MAX_RESULT_NUM 6
 
 class HKU_API Indicator;
+class HKU_API IndParam;
 
 /**
  * 指标实现类，定义新指标时，应从此类继承
@@ -197,6 +198,7 @@ protected:
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
+    unordered_map<string, shared_ptr<IndParam>> m_ind_param;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

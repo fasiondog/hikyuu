@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include "Indicator.h"
+#include "IndParam.h"
 #include "../Stock.h"
 #include "../Log.h"
 
