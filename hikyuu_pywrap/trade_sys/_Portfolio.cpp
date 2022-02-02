@@ -119,6 +119,6 @@ void export_Portfolio() {
     创建一个多标的、单系统策略的投资组合
 
     :param TradeManager tm: 交易管理
-    :param System sys: 系统策略
-    :param SelectorBase se: 选择器)");
+    :param SelectorBase se: 交易对象选择算法
+    :param AllocateFundsBase af: 资金分配算法)");
 }
