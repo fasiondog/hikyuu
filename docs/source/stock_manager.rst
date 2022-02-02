@@ -295,19 +295,11 @@ StockManager/Block/Stock
     
         获取指定索引的K线数据记录，未作越界检查
         
-        :param int pos: 指定的索引位置
+        :param int pos | Datetime datetime: 指定的索引位置，或日期
         :param Query.KType ktype: K线数据类别
         :return: K线记录
         :rtype: KRecord
     
-    .. py:method:: get_krecord_by_datetime(self, datetime[, ktype=Query.DAY])
-    
-        根据数据类型（日线/周线等），获取指定时刻的KRecord
-        
-        :param Datetime datetime: 指定时刻
-        :param Query.KType ktype: K线数据类别
-        :return: K线记录
-        :rtype: KRecord
     
     .. py:method:: get_krecord_list(self, start, end, ktype)
     
