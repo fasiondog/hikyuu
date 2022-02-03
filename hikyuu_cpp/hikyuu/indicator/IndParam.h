@@ -11,6 +11,7 @@
 
 namespace hku {
 
+class HKU_API Indicator;
 class HKU_API IndicatorImp;
 
 /**
@@ -20,7 +21,14 @@ class HKU_API IndicatorImp;
 class HKU_API IndParam {
 public:
     IndParam();
-    IndParam(const IndicatorImpPtr& ind);
+    explicit IndParam(const IndicatorImpPtr& ind);
+    explicit IndParam(const Indicator& ind);
+
+    IndicatorImpPtr getImp() const {
+        return m_ind;
+    }
+
+    Indicator get() const;
 
 private:
     IndicatorImpPtr m_ind;

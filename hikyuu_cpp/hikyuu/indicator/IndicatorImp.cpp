@@ -53,6 +53,18 @@ IndicatorImp::IndicatorImp(const string &name, size_t result_num)
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 
+void IndicatorImp::setIndParam(const string &name, const Indicator &ind) {
+    m_ind_params[name] = ind.getImp();
+}
+
+void IndicatorImp::setIndParam(const string &name, const IndParam &ind) {
+    m_ind_params[name] = ind.getImp();
+}
+
+IndParam IndicatorImp::getIndParam(const string &name) const {
+    return IndParam(m_ind_params.at(name));
+}
+
 void IndicatorImp::initContext() {
     setParam<KData>("kdata", KData());
 }

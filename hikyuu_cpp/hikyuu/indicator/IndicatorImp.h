@@ -151,6 +151,14 @@ public:
 
     IndicatorImpPtr clone();
 
+    bool haveIndParam(const string& name) const noexcept {
+        return m_ind_params.find(name) != m_ind_params.end();
+    }
+
+    void setIndParam(const string& name, const Indicator& ind);
+    void setIndParam(const string& name, const IndParam& ind);
+    IndParam getIndParam(const string& name) const;
+
     // ===================
     //  子类接口
     // ===================
@@ -198,7 +206,7 @@ protected:
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
-    unordered_map<string, shared_ptr<IndParam>> m_ind_param;
+    unordered_map<string, IndicatorImpPtr> m_ind_params;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

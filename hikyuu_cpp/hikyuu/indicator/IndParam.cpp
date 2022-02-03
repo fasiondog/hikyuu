@@ -14,4 +14,10 @@ IndParam::IndParam() {}
 
 IndParam::IndParam(const IndicatorImpPtr& ind) : m_ind(ind){};
 
+IndParam::IndParam(const Indicator& ind) : m_ind(ind.getImp()){};
+
+Indicator IndParam::get() const {
+    return Indicator(m_ind);
+}
+
 }

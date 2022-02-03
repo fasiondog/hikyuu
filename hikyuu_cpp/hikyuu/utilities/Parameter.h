@@ -122,7 +122,7 @@ public:
 
     /** 是否存在指定名称的参数 */
     bool have(const string& name) const noexcept {
-        return m_params.count(name) == 0 ? false : true;
+        return m_params.find(name) != m_params.end();
     }
 
     /**
