@@ -158,6 +158,7 @@ public:
     void setIndParam(const string& name, const Indicator& ind);
     void setIndParam(const string& name, const IndParam& ind);
     IndParam getIndParam(const string& name) const;
+    const unordered_map<string, IndicatorImpPtr>& getIndParams() const;
 
     // ===================
     //  子类接口
@@ -350,6 +351,10 @@ inline bool IndicatorImp::isLeaf() const {
 
 inline KData IndicatorImp::getContext() const {
     return getParam<KData>("kdata");
+}
+
+inline const unordered_map<string, IndicatorImpPtr>& IndicatorImp::getIndParams() const {
+    return m_ind_params;
 }
 
 } /* namespace hku */

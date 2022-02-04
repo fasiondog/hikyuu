@@ -21,7 +21,12 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
     os << "Indicator{\n"
        << "  name: " << imp.name() << "\n  size: " << imp.size()
        << "\n  result sets: " << imp.getResultNumber() << "\n  params: " << imp.getParameter()
-       << "\n  formula: " << imp.formula() << "\n}";
+       << "\n  ind params: {";
+    const auto &ind_params = imp.getIndParams();
+    for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
+        os << iter->second->name() << ", ";
+    }
+    os << "}\n  formula: " << imp.formula() << "\n}";
     return os;
 }
 
@@ -54,11 +59,15 @@ IndicatorImp::IndicatorImp(const string &name, size_t result_num)
 }
 
 void IndicatorImp::setIndParam(const string &name, const Indicator &ind) {
-    m_ind_params[name] = ind.getImp();
+    IndicatorImpPtr imp = ind.getImp();
+    HKU_CHECK(imp, "Invalid input ind, no concrete implementation!");
+    m_ind_params[name] = imp;
 }
 
 void IndicatorImp::setIndParam(const string &name, const IndParam &ind) {
-    m_ind_params[name] = ind.getImp();
+    IndicatorImpPtr imp = ind.getImp();
+    HKU_CHECK(imp, "Invalid input ind, no concrete implementation!");
+    m_ind_params[name] = imp;
 }
 
 IndParam IndicatorImp::getIndParam(const string &name) const {
@@ -115,6 +124,11 @@ void IndicatorImp::setContext(const KData &k) {
         m_right->setContext(k);
     if (m_three)
         m_three->setContext(k);
+
+    // 对动态参数设置上下文
+    for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+        iter->second->setContext(k);
+    }
 
     //重设上下文
     setParam<KData>("kdata", k);
@@ -179,6 +193,10 @@ IndicatorImpPtr IndicatorImp::clone() {
     }
     if (m_three) {
         p->m_three = m_three->clone();
+    }
+
+    for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+        p->m_ind_params[iter->first] = iter->second->clone();
     }
     return p;
 }
@@ -444,6 +462,13 @@ bool IndicatorImp::needCalculate() {
         }
     }
 
+    for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+        m_need_calculate = iter->second->needCalculate();
+        if (m_need_calculate) {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -480,12 +505,16 @@ Indicator IndicatorImp::calculate() {
             _calculate(Indicator());
             break;
 
-        case OP:
+        case OP: {
             m_right->calculate();
+            Indicator tmp_ind(m_right);
+            for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+                iter->second->_calculate(tmp_ind);
+            }
             _readyBuffer(m_right->size(), m_result_num);
-            _calculate(Indicator(m_right));
+            _calculate(tmp_ind);
             setParam<KData>("kdata", m_right->getParam<KData>("kdata"));
-            break;
+        } break;
 
         case ADD:
             execute_add();
