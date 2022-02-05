@@ -74,6 +74,10 @@ IndParam IndicatorImp::getIndParam(const string &name) const {
     return IndParam(m_ind_params.at(name));
 }
 
+const IndicatorImpPtr IndicatorImp::getIndParamImp(const string &name) const {
+    return m_ind_params.at(name);
+}
+
 void IndicatorImp::initContext() {
     setParam<KData>("kdata", KData());
 }
@@ -502,17 +506,29 @@ Indicator IndicatorImp::calculate() {
 
     switch (m_optype) {
         case LEAF:
-            _calculate(Indicator());
+            if (m_ind_params.empty()) {
+                _calculate(Indicator());
+            } else {
+                _dyn_calculate(Indicator());
+            }
             break;
 
         case OP: {
             m_right->calculate();
             Indicator tmp_ind(m_right);
             for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
-                iter->second->_calculate(tmp_ind);
+                if (iter->second->m_ind_params.empty()) {
+                    iter->second->_calculate(tmp_ind);
+                } else {
+                    iter->second->_dyn_calculate(tmp_ind);
+                }
             }
             _readyBuffer(m_right->size(), m_result_num);
-            _calculate(tmp_ind);
+            if (m_ind_params.empty()) {
+                _calculate(tmp_ind);
+            } else {
+                _dyn_calculate(tmp_ind);
+            }
             setParam<KData>("kdata", m_right->getParam<KData>("kdata"));
         } break;
 

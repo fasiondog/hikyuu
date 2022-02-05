@@ -61,6 +61,27 @@ TEST_CASE("test_LLV") {
     CHECK_EQ(result[9], data[0]);
 }
 
+/** @par 检测点 */
+TEST_CASE("test_LLV_dyn") {
+    Indicator result;
+
+    PriceList a;
+    for (int i = 0; i < 10; ++i) {
+        a.push_back(i);
+    }
+
+    Indicator data = PRICELIST(a);
+
+    IndParam ind_param(PRICELIST(PriceList(10, 9)));
+    result = LLV(data, ind_param);
+    std::cout << result << std::endl;
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], data[0]);
+    CHECK_EQ(result[7], data[0]);
+    CHECK_EQ(result[8], data[0]);
+    CHECK_EQ(result[9], data[1]);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

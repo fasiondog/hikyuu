@@ -21,6 +21,7 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API LLV(int n = 20);
+Indicator HKU_API LLV(const IndParam& n);
 
 /**
  * N日内最低价, N=0则从第一个有效值开始。
@@ -29,6 +30,7 @@ Indicator HKU_API LLV(int n = 20);
  * @ingroup Indicator
  */
 Indicator HKU_API LLV(const Indicator& ind, int n = 20);
+Indicator HKU_API LLV(const Indicator& ind, const IndParam& n);
 
 }  // namespace hku
 

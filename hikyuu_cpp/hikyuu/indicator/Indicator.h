@@ -10,6 +10,7 @@
 #define INDICATOR_H_
 
 #include "IndicatorImp.h"
+#include "IndParam.h"
 
 namespace hku {
 

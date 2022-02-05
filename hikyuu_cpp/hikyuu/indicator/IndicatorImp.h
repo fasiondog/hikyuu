@@ -151,13 +151,11 @@ public:
 
     IndicatorImpPtr clone();
 
-    bool haveIndParam(const string& name) const noexcept {
-        return m_ind_params.find(name) != m_ind_params.end();
-    }
-
+    bool haveIndParam(const string& name) const;
     void setIndParam(const string& name, const Indicator& ind);
     void setIndParam(const string& name, const IndParam& ind);
     IndParam getIndParam(const string& name) const;
+    const IndicatorImpPtr getIndParamImp(const string& name) const;
     const unordered_map<string, IndicatorImpPtr>& getIndParams() const;
 
     // ===================
@@ -168,6 +166,8 @@ public:
     }
 
     virtual void _calculate(const Indicator&) {}
+
+    virtual void _dyn_calculate(const Indicator&) {}
 
     virtual IndicatorImpPtr _clone() {
         return make_shared<IndicatorImp>();
@@ -355,6 +355,10 @@ inline KData IndicatorImp::getContext() const {
 
 inline const unordered_map<string, IndicatorImpPtr>& IndicatorImp::getIndParams() const {
     return m_ind_params;
+}
+
+inline bool IndicatorImp::haveIndParam(const string& name) const {
+    return m_ind_params.find(name) != m_ind_params.end();
 }
 
 } /* namespace hku */
