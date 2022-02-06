@@ -157,6 +157,12 @@ public:
         return m_imp->getParam<ValueType>(name);
     }
 
+    bool haveIndParam(const string& name) const;
+    void setIndParam(const string& name, const Indicator& ind);
+    void setIndParam(const string& name, const IndParam& ind);
+    IndParam getIndParam(const string& name) const;
+    const IndicatorImpPtr getIndParamImp(const string& name) const;
+
     IndicatorImpPtr getImp() const {
         return m_imp;
     }
@@ -244,6 +250,30 @@ inline size_t Indicator::getPos(Datetime date) const {
 
 inline price_t Indicator::operator[](Datetime date) const {
     return getByDate(date);
+}
+
+inline bool Indicator::haveIndParam(const string& name) const {
+    return m_imp ? m_imp->haveIndParam(name) : false;
+}
+
+inline void Indicator::setIndParam(const string& name, const Indicator& ind) {
+    if (m_imp) {
+        m_imp->setIndParam(name, ind);
+    }
+}
+
+inline void Indicator::setIndParam(const string& name, const IndParam& ind) {
+    if (m_imp) {
+        m_imp->setIndParam(name, ind);
+    }
+}
+
+inline IndParam Indicator::getIndParam(const string& name) const {
+    return m_imp ? m_imp->getIndParam(name) : IndParam();
+}
+
+inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const {
+    return m_imp ? m_imp->getIndParamImp(name) : IndicatorImpPtr();
 }
 
 //--------------------------------------------------------------

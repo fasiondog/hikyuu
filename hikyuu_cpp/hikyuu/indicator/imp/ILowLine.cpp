@@ -104,6 +104,22 @@ std::vector<price_t> ILowLine::_get_one_step(const Indicator& data, size_t pos, 
         return ret;
     }
 
+    // size_t x = data.discard() + pos + 1;
+    // if (x >= step) {
+    //     size_t start = x - step;
+    //     for (size_t i = 0; i < step; i++) {
+    //         ret[i] = data.get(start + i, num);
+    //     }
+    // } else {
+    //     size_t invalid_len = step - x;
+    //     for (size_t i = 0; i < invalid_len; i++) {
+    //         ret[i] = 0.0;
+    //     }
+    //     for (size_t i = invalid_len; i < step; i++) {
+    //         ret[i] = data.get(x + i - step, num);
+    //     }
+    // }
+
     for (size_t i = 0; i < step; i++) {
         ret[i] = data.get(pos + 1 - step + i, num);
     }
@@ -114,33 +130,24 @@ std::vector<price_t> ILowLine::_get_one_step(const Indicator& data, size_t pos, 
 void ILowLine::_dyn_calculate(const Indicator& data) {
     SPEND_TIME(ILowLine__dyn_calculate);
     const auto& ind_param = getIndParamImp("n");
-    HKU_CHECK(ind_param->size() == data.size(),
-              "Ind param's length({}) not equal the length of data({})!", ind_param->size(),
-              data.size());
-    // ThreadPool tg;
+    HKU_CHECK(ind_param->size() == data.size(), "ind_param->size()={}, data.size()={}!",
+              ind_param->size(), data.size());
     auto tg = getGlobalTaskGroup();
     std::vector<std::future<price_t>> tasks;
     size_t total = data.size();
     for (size_t i = data.discard(); i < total; i++) {
         size_t step = size_t(ind_param->get(i));
-        // if (step == 0) {
-        //     _set(0.0, i, 0);
-        //     continue;
-        // }
         auto step_data = _get_one_step(data, i, 0, step);
-        // HKU_INFO("i: {}", i);
         tasks.push_back(tg->submit([=]() {
-            price_t min_val = step_data[0];
+            price_t min_val = step == 0 ? 0.0 : step_data[0];
             for (size_t i = 0; i < step; i++) {
                 if (step_data[i] < min_val) {
                     min_val = step_data[i];
                 }
             }
             return min_val;
-            //_set(min_val, i, 0);
         }));
     }
-    // tg.join();
     for (size_t i = data.discard(); i < total; i++) {
         _set(tasks[i - data.discard()].get(), i, 0);
     }

@@ -25,7 +25,8 @@ public:
     virtual void _dyn_calculate(const Indicator& data) override;
 
 private:
-    std::vector<price_t> _get_one_step(const Indicator& data, size_t pos, size_t num, size_t step);
+    static std::vector<price_t> _get_one_step(const Indicator& data, size_t pos, size_t num,
+                                              size_t step);
 };
 
 } /* namespace hku */

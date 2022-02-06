@@ -30,6 +30,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #endif /* HKU_SUPPORT_BINARY_ARCHIVE */
 
+#include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -224,6 +225,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
         ar& BOOST_SERIALIZATION_NVP(m_three);
+        ar& BOOST_SERIALIZATION_NVP(m_ind_params);
+
         size_t act_result_num = 0;
         for (size_t i = 0; i < m_result_num; i++) {
             if (m_pBuffer[i]) {
@@ -262,6 +265,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
         ar& BOOST_SERIALIZATION_NVP(m_three);
+        ar& BOOST_SERIALIZATION_NVP(m_ind_params);
+
         size_t act_result_num = 0;
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
