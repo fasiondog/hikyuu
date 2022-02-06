@@ -89,49 +89,12 @@ void ILowLine::_calculate(const Indicator& ind) {
     }
 }
 
-std::vector<price_t> ILowLine::_get_one_step(const Indicator& data, size_t pos, size_t num,
-                                             size_t step) {
-    std::vector<price_t> ret;
-    if (step == 0) {
-        return ret;
-    }
-
-    ret.resize(step);
-    if (pos < data.discard() + step) {
-        for (size_t i = 0; i < step; i++) {
-            ret[i] = 0.0;
-        }
-        return ret;
-    }
-
-    // size_t x = data.discard() + pos + 1;
-    // if (x >= step) {
-    //     size_t start = x - step;
-    //     for (size_t i = 0; i < step; i++) {
-    //         ret[i] = data.get(start + i, num);
-    //     }
-    // } else {
-    //     size_t invalid_len = step - x;
-    //     for (size_t i = 0; i < invalid_len; i++) {
-    //         ret[i] = 0.0;
-    //     }
-    //     for (size_t i = invalid_len; i < step; i++) {
-    //         ret[i] = data.get(x + i - step, num);
-    //     }
-    // }
-
-    for (size_t i = 0; i < step; i++) {
-        ret[i] = data.get(pos + 1 - step + i, num);
-    }
-
-    return ret;
-}
-
 void ILowLine::_dyn_calculate(const Indicator& data) {
     SPEND_TIME(ILowLine__dyn_calculate);
     const auto& ind_param = getIndParamImp("n");
     HKU_CHECK(ind_param->size() == data.size(), "ind_param->size()={}, data.size()={}!",
               ind_param->size(), data.size());
+    m_discard = data.discard();
     auto tg = getGlobalTaskGroup();
     std::vector<std::future<price_t>> tasks;
     size_t total = data.size();
@@ -139,8 +102,10 @@ void ILowLine::_dyn_calculate(const Indicator& data) {
         size_t step = size_t(ind_param->get(i));
         auto step_data = _get_one_step(data, i, 0, step);
         tasks.push_back(tg->submit([=]() {
-            price_t min_val = step == 0 ? 0.0 : step_data[0];
-            for (size_t i = 0; i < step; i++) {
+            size_t len = step_data.size();
+            HKU_IF_RETURN(len == 0, price_t(Null<price_t>()));
+            price_t min_val = step_data[0];
+            for (size_t i = 0; i < len; i++) {
                 if (step_data[i] < min_val) {
                     min_val = step_data[i];
                 }
@@ -171,6 +136,10 @@ Indicator HKU_API LLV(const Indicator& ind, int n = 20) {
 
 Indicator HKU_API LLV(const Indicator& ind, const IndParam& n) {
     return LLV(n)(ind);
+}
+
+Indicator HKU_API LLV(const Indicator& ind, const Indicator& n) {
+    return LLV(IndParam(n))(ind);
 }
 
 } /* namespace hku */

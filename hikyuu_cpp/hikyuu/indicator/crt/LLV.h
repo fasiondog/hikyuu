@@ -31,6 +31,7 @@ Indicator HKU_API LLV(const IndParam& n);
  */
 Indicator HKU_API LLV(const Indicator& ind, int n = 20);
 Indicator HKU_API LLV(const Indicator& ind, const IndParam& n);
+Indicator HKU_API LLV(const Indicator& ind, const Indicator& n);
 
 }  // namespace hku
 

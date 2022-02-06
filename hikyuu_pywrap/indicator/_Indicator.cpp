@@ -23,6 +23,9 @@ Indicator (Indicator::*ind_call_1)(const Indicator&) = &Indicator::operator();
 Indicator (Indicator::*ind_call_2)(const KData&) = &Indicator::operator();
 Indicator (Indicator::*ind_call_3)() = &Indicator::operator();
 
+void (Indicator::*setIndParam1)(const string&, const Indicator&) = &Indicator::setIndParam;
+void (Indicator::*setIndParam2)(const string&, const IndParam&) = &Indicator::setIndParam;
+
 void export_Indicator() {
     class_<Indicator>("Indicator", "技术指标", init<>())
       .def(init<IndicatorImpPtr>())
@@ -56,6 +59,25 @@ void export_Indicator() {
     :raises logic_error: Unsupported type! 不支持的参数类型)")
 
       .def("have_param", &Indicator::haveParam, "是否存在指定参数")
+
+      .def("support_ind_param", &Indicator::supportIndParam, "是否支持动态指标参数")
+      .def("have_ind_param", &Indicator::haveIndParam, "是否存在指定的动态指标参数")
+      .def("get_ind_param", &Indicator::getIndParam, R"(get_ind_param(self, name)
+    
+    获取指定的动态指标参数
+    
+    :param str name: 参数名称
+    :return: 动态指标参数
+    :rtype: IndParam
+    :raises out_of_range: 无此参数)")
+
+      .def("set_ind_param", setIndParam1)
+      .def("set_ind_param", setIndParam2, R"(set_param(self, name, ind)
+
+    设置动态指标参数
+
+    :param str name: 参数名称
+    :param Indicator|IndParam: 参数值（可为 Indicator 或 IndParam 实例）)")
 
       .def("empty", &Indicator::empty, "是否为空")
       .def("clone", &Indicator::clone, "克隆操作")

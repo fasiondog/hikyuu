@@ -43,6 +43,18 @@ public:
         this->IndicatorImp::_dyn_calculate(ind);
     }
 
+    bool supportIndParam() const {
+        if (override call = get_override("supportIndParam")) {
+            return call();
+        } else {
+            return IndicatorImp::supportIndParam();
+        }
+    }
+
+    bool default_supportIndParam() const {
+        return this->IndicatorImp::supportIndParam();
+    }
+
     bool check() {
         if (override call = get_override("check")) {
             return call();
@@ -106,6 +118,8 @@ void export_IndicatorImp() {
       .def("get_param", &IndicatorImp::getParam<boost::any>)
       .def("set_param", &IndicatorImp::setParam<object>)
       .def("have_ind_param", &IndicatorImp::haveIndParam)
+      .def("support_ind_param", &IndicatorImp::supportIndParam,
+           &IndicatorImpWrap::default_supportIndParam)
       .def("get_ind_param", &IndicatorImp::getIndParam)
       .def("set_ind_param", set_ind_param1)
       .def("set_ind_param", set_ind_param2)

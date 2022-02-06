@@ -170,6 +170,10 @@ public:
 
     virtual void _dyn_calculate(const Indicator&) {}
 
+    virtual bool supportIndParam() const {
+        return false;
+    }
+
     virtual IndicatorImpPtr _clone() {
         return make_shared<IndicatorImp>();
     }
@@ -210,6 +214,9 @@ protected:
     IndicatorImpPtr m_three;
     unordered_map<string, IndicatorImpPtr> m_ind_params;
 
+protected:
+    static std::vector<price_t> _get_one_step(const Indicator& data, size_t pos, size_t num,
+                                              size_t step);
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
@@ -317,6 +324,18 @@ public:                                                      \
     virtual void _calculate(const Indicator& data) override; \
     virtual IndicatorImpPtr _clone() override {              \
         return make_shared<classname>();                     \
+    }
+
+#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)               \
+public:                                                          \
+    virtual bool check() override;                               \
+    virtual void _calculate(const Indicator& data) override;     \
+    virtual void _dyn_calculate(const Indicator& data) override; \
+    virtual bool supportIndParam() const override {              \
+        return true;                                             \
+    }                                                            \
+    virtual IndicatorImpPtr _clone() override {                  \
+        return make_shared<classname>();                         \
     }
 
 #define INDICATOR_NEED_CONTEXT                    \

@@ -81,6 +81,9 @@ Indicator (*HHV_2)(const Indicator&, int) = HHV;
 
 Indicator (*LLV_1)(int) = LLV;
 Indicator (*LLV_2)(const Indicator&, int) = LLV;
+Indicator (*LLV_3)(const IndParam&) = LLV;
+Indicator (*LLV_4)(const Indicator&, const IndParam&) = LLV;
+Indicator (*LLV_5)(const Indicator&, const Indicator&) = LLV;
 
 Indicator (*VIGOR_1)(const KData&, int) = VIGOR;
 Indicator (*VIGOR_2)(int) = VIGOR;
@@ -510,12 +513,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("LLV", LLV_1, (arg("n") = 20));
+    def("LLV", LLV_3, (arg("n")));
+    def("LLV", LLV_4, (arg("data"), arg("n")));
+    def("LLV", LLV_5, (arg("data"), arg("n")));
     def("LLV", LLV_2, (arg("data"), arg("n") = 20), R"(LLV([data, n=20])
 
     N日内最低价，N=0则从第一个有效值开始。
 
     :param data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
     def("CVAL", CVAL_1, (arg("value") = 0.0, arg("discard") = 0));

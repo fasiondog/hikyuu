@@ -21,12 +21,16 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
     os << "Indicator{\n"
        << "  name: " << imp.name() << "\n  size: " << imp.size()
        << "\n  result sets: " << imp.getResultNumber() << "\n  params: " << imp.getParameter()
-       << "\n  ind params: {";
-    const auto &ind_params = imp.getIndParams();
-    for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
-        os << iter->second->name() << ", ";
+       << "\n  support indicator param: " << (imp.supportIndParam() ? "True" : "False");
+    if (imp.supportIndParam()) {
+        os << "\n  ind params: {";
+        const auto &ind_params = imp.getIndParams();
+        for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
+            os << iter->second->name() << ", ";
+        }
+        os << "}";
     }
-    os << "}\n  formula: " << imp.formula() << "\n}";
+    os << "\n  formula: " << imp.formula() << "\n}";
     return os;
 }
 
@@ -1218,6 +1222,30 @@ void IndicatorImp::execute_if() {
             }
         }
     }
+}
+
+std::vector<price_t> IndicatorImp::_get_one_step(const Indicator &data, size_t pos, size_t num,
+                                                 size_t step) {
+    HKU_ASSERT(pos >= data.discard());
+    std::vector<price_t> ret;
+    if (step == 0) {
+        return ret;
+    }
+
+    if (pos < data.discard() + step) {
+        size_t len = pos + 1 - data.discard();
+        ret.resize(len);
+        for (size_t i = data.discard(); i <= pos; i++) {
+            ret[i] = data.get(i, num);
+        }
+        return ret;
+    }
+
+    ret.resize(step);
+    for (size_t i = 0; i < step; i++) {
+        ret[i] = data.get(pos + 1 - step + i, num);
+    }
+    return ret;
 }
 
 } /* namespace hku */

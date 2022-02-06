@@ -16,17 +16,12 @@
 namespace hku {
 
 class ILowLine : public IndicatorImp {
-    INDICATOR_IMP(ILowLine)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(ILowLine)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     ILowLine();
     virtual ~ILowLine();
-    virtual void _dyn_calculate(const Indicator& data) override;
-
-private:
-    static std::vector<price_t> _get_one_step(const Indicator& data, size_t pos, size_t num,
-                                              size_t step);
 };
 
 } /* namespace hku */

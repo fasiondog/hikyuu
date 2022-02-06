@@ -15,6 +15,12 @@ Indicator
 
     .. py:attribute:: discard 需抛弃的点数
 
+    .. py:method:: have_param(self, name)
+
+        是否存在指定参数
+
+        :param str name: 参数名称
+
     .. py:method:: get_param(self, name)
 
         获取指定的参数
@@ -31,6 +37,30 @@ Indicator
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
+
+    .. py:method:: support_ind_param(self)
+
+        是否支持动态指标参数
+
+    .. py:method:: have_ind_param(self, name)
+
+        是否存在指定参数
+
+        :param str name: 参数名称
+
+    .. py:method:: get_ind_param(self, name)
+
+        获取指定的动态指标参数
+
+        :param str name: 参数名称
+        :rtype: IndParam
+
+    .. py::method:: set_ind_param(self, name, val)
+
+        设置动态指标参数
+
+        :param str name: 参数名称
+        :param Indicator|IndParam: 参数值（可为 Indicator 或 IndParam 实例）    
 
     .. py:method:: clone(self)
     

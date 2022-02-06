@@ -10,6 +10,11 @@
 
 namespace hku {
 
+HKU_API std::ostream& operator<<(std::ostream& os, const IndParam& ind) {
+    os << "IndParam: \n" << ind.m_ind;
+    return os;
+}
+
 IndParam::IndParam() {}
 
 IndParam::IndParam(const IndicatorImpPtr& ind) : m_ind(ind){};

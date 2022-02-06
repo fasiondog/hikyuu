@@ -19,6 +19,8 @@ class HKU_API IndicatorImp;
  * @ingroup Indicator
  */
 class HKU_API IndParam {
+    HKU_API friend std::ostream& operator<<(std::ostream&, const IndParam&);
+
 public:
     IndParam();
     explicit IndParam(const IndicatorImpPtr& ind);
