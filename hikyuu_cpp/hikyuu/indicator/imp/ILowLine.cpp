@@ -89,32 +89,32 @@ void ILowLine::_calculate(const Indicator& ind) {
     }
 }
 
-void ILowLine::_dyn_calculate(const Indicator& data) {
+void ILowLine::_dyn_calculate(const Indicator& ind) {
     SPEND_TIME(ILowLine__dyn_calculate);
     const auto& ind_param = getIndParamImp("n");
-    HKU_CHECK(ind_param->size() == data.size(), "ind_param->size()={}, data.size()={}!",
-              ind_param->size(), data.size());
-    m_discard = data.discard();
+    HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
+              ind_param->size(), ind.size());
+    m_discard = ind.discard();
     auto tg = getGlobalTaskGroup();
     std::vector<std::future<price_t>> tasks;
-    size_t total = data.size();
-    for (size_t i = data.discard(); i < total; i++) {
+    size_t total = ind.size();
+    for (size_t i = ind.discard(); i < total; i++) {
         size_t step = size_t(ind_param->get(i));
-        auto step_data = _get_one_step(data, i, 0, step);
+        size_t start = _get_step_start(ind, i, step);
+        price_t* data = ind.getImp()->data();
         tasks.push_back(tg->submit([=]() {
-            size_t len = step_data.size();
-            HKU_IF_RETURN(len == 0, price_t(Null<price_t>()));
-            price_t min_val = step_data[0];
-            for (size_t i = 0; i < len; i++) {
-                if (step_data[i] < min_val) {
-                    min_val = step_data[i];
+            HKU_IF_RETURN(start == Null<size_t>(), price_t(Null<size_t>()));
+            price_t min_val = data[start];
+            for (size_t pos = start + 1; pos <= i; pos++) {
+                if (data[pos] < min_val) {
+                    min_val = data[pos];
                 }
             }
             return min_val;
         }));
     }
-    for (size_t i = data.discard(); i < total; i++) {
-        _set(tasks[i - data.discard()].get(), i, 0);
+    for (size_t i = 0; i < tasks.size(); i++) {
+        _set(tasks[i].get(), i + m_discard, 0);
     }
 }
 

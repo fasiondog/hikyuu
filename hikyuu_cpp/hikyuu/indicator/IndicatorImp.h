@@ -159,6 +159,8 @@ public:
     const IndicatorImpPtr getIndParamImp(const string& name) const;
     const unordered_map<string, IndicatorImpPtr>& getIndParams() const;
 
+    price_t* data(size_t result_num = 0);
+
     // ===================
     //  子类接口
     // ===================
@@ -215,8 +217,8 @@ protected:
     unordered_map<string, IndicatorImpPtr> m_ind_params;
 
 protected:
-    static std::vector<price_t> _get_one_step(const Indicator& data, size_t pos, size_t num,
-                                              size_t step);
+    static size_t _get_step_start(const Indicator& data, size_t pos, size_t step);
+
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
@@ -326,16 +328,16 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)               \
-public:                                                          \
-    virtual bool check() override;                               \
-    virtual void _calculate(const Indicator& data) override;     \
-    virtual void _dyn_calculate(const Indicator& data) override; \
-    virtual bool supportIndParam() const override {              \
-        return true;                                             \
-    }                                                            \
-    virtual IndicatorImpPtr _clone() override {                  \
-        return make_shared<classname>();                         \
+#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)              \
+public:                                                         \
+    virtual bool check() override;                              \
+    virtual void _calculate(const Indicator& ind) override;     \
+    virtual void _dyn_calculate(const Indicator& ind) override; \
+    virtual bool supportIndParam() const override {             \
+        return true;                                            \
+    }                                                           \
+    virtual IndicatorImpPtr _clone() override {                 \
+        return make_shared<classname>();                        \
     }
 
 #define INDICATOR_NEED_CONTEXT                    \
@@ -383,6 +385,10 @@ inline const unordered_map<string, IndicatorImpPtr>& IndicatorImp::getIndParams(
 
 inline bool IndicatorImp::haveIndParam(const string& name) const {
     return m_ind_params.find(name) != m_ind_params.end();
+}
+
+inline price_t* IndicatorImp::data(size_t result_num) {
+    return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
 }
 
 } /* namespace hku */
