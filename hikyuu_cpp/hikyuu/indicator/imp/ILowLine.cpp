@@ -7,8 +7,6 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/utilities/thread/ThreadPool.h"
-#include "hikyuu/global/GlobalTaskGroup.h"
 #include "ILowLine.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -28,7 +26,6 @@ bool ILowLine::check() {
 }
 
 void ILowLine::_calculate(const Indicator& ind) {
-    SPEND_TIME(ILowLine__calculate);
     size_t total = ind.size();
     if (0 == total) {
         m_discard = 0;
@@ -90,31 +87,24 @@ void ILowLine::_calculate(const Indicator& ind) {
 }
 
 void ILowLine::_dyn_calculate(const Indicator& ind) {
-    SPEND_TIME(ILowLine__dyn_calculate);
     const auto& ind_param = getIndParamImp("n");
     HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
               ind_param->size(), ind.size());
     m_discard = ind.discard();
-    auto tg = getGlobalTaskGroup();
-    std::vector<std::future<price_t>> tasks;
     size_t total = ind.size();
     for (size_t i = ind.discard(); i < total; i++) {
         size_t step = size_t(ind_param->get(i));
         size_t start = _get_step_start(ind, i, step);
-        price_t* data = ind.getImp()->data();
-        tasks.push_back(tg->submit([=]() {
-            HKU_IF_RETURN(start == Null<size_t>(), price_t(Null<size_t>()));
-            price_t min_val = data[start];
-            for (size_t pos = start + 1; pos <= i; pos++) {
-                if (data[pos] < min_val) {
-                    min_val = data[pos];
-                }
+        if (start == Null<size_t>()) {
+            return;
+        }
+        price_t min_val = ind[start];
+        for (size_t pos = start + 1; pos <= i; pos++) {
+            if (ind[pos] < min_val) {
+                min_val = ind[pos];
             }
-            return min_val;
-        }));
-    }
-    for (size_t i = 0; i < tasks.size(); i++) {
-        _set(tasks[i].get(), i + m_discard, 0);
+        }
+        _set(min_val, i);
     }
 }
 

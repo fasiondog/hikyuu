@@ -75,7 +75,6 @@ TEST_CASE("test_LLV_dyn") {
 
     IndParam ind_param(PRICELIST(PriceList(10, 9)));
     result = LLV(data, ind_param);
-    std::cout << result << std::endl;
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], data[0]);
     CHECK_EQ(result[7], data[0]);
