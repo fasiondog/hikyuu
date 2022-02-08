@@ -1,31 +1,31 @@
 /*
- * SaftyLoss.cpp
+ * ISaftyLoss.cpp
  *
  *  Created on: 2013-4-12
  *      Author: fasiondog
  */
 
-#include "SaftyLoss.h"
+#include "ISaftyLoss.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::SaftyLoss)
+BOOST_CLASS_EXPORT(hku::ISaftyLoss)
 #endif
 
 namespace hku {
 
-SaftyLoss::SaftyLoss() : IndicatorImp("SAFTYLOSS", 1) {
+ISaftyLoss::ISaftyLoss() : IndicatorImp("SAFTYLOSS", 1) {
     setParam<int>("n1", 10);
     setParam<int>("n2", 3);
     setParam<double>("p", 2.0);
 }
 
-SaftyLoss::~SaftyLoss() {}
+ISaftyLoss::~ISaftyLoss() {}
 
-bool SaftyLoss::check() {
+bool ISaftyLoss::check() {
     return getParam<int>("n1") >= 2 && getParam<int>("n2") >= 1;
 }
 
-void SaftyLoss::_calculate(const Indicator& data) {
+void ISaftyLoss::_calculate(const Indicator& data) {
     size_t total = data.size();
     HKU_IF_RETURN(total == 0, void());
     _readyBuffer(total, 1);
@@ -72,7 +72,7 @@ void SaftyLoss::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API SAFTYLOSS(int n1, int n2, double p) {
-    IndicatorImpPtr result = make_shared<SaftyLoss>();
+    IndicatorImpPtr result = make_shared<ISaftyLoss>();
     result->setParam<int>("n1", n1);
     result->setParam<int>("n2", n2);
     result->setParam<double>("p", p);

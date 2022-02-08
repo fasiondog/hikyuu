@@ -1,27 +1,27 @@
 /*
- * Diff.cpp
+ * IDiff.cpp
  *
  *  Created on: 2013-4-18
  *      Author: fasiondog
  */
 
-#include "Diff.h"
+#include "IDiff.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::Diff)
+BOOST_CLASS_EXPORT(hku::IDiff)
 #endif
 
 namespace hku {
 
-Diff::Diff() : IndicatorImp("DIFF", 1) {}
+IDiff::IDiff() : IndicatorImp("DIFF", 1) {}
 
-Diff::~Diff() {}
+IDiff::~IDiff() {}
 
-bool Diff::check() {
+bool IDiff::check() {
     return true;
 }
 
-void Diff::_calculate(const Indicator& data) {
+void IDiff::_calculate(const Indicator& data) {
     size_t total = data.size();
 
     m_discard = data.discard() + 1;
@@ -36,7 +36,7 @@ void Diff::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API DIFF() {
-    return Indicator(make_shared<Diff>());
+    return Indicator(make_shared<IDiff>());
 }
 
 Indicator HKU_API DIFF(const Indicator& data) {

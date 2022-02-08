@@ -1,13 +1,11 @@
 /*
- * StdDeviation.h
+ * IStdev.h
  *
  *  Created on: 2013-4-18
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef STDDEVIATION_H_
-#define STDDEVIATION_H_
 
 #include "../Indicator.h"
 
@@ -20,14 +18,13 @@ namespace hku {
  *       link：均值参数联动标志，默认true
  *
  */
-class StdDeviation : public hku::IndicatorImp {
-    INDICATOR_IMP(StdDeviation)
+class IStdev : public hku::IndicatorImp {
+    INDICATOR_IMP(IStdev)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    StdDeviation();
-    virtual ~StdDeviation();
+    IStdev();
+    virtual ~IStdev();
 };
 
 } /* namespace hku */
-#endif /* STDDEVIATION_H_ */

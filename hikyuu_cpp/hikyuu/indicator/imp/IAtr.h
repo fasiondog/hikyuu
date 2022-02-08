@@ -1,5 +1,5 @@
 /*
- * Atr.h
+ * IAtr.h
  *
  *  Created on: 2016年5月4日
  *      Author: Administrator
@@ -13,13 +13,13 @@
 
 namespace hku {
 
-class Atr : public IndicatorImp {
-    INDICATOR_IMP(Atr)
+class IAtr : public IndicatorImp {
+    INDICATOR_IMP(IAtr)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    Atr();
-    virtual ~Atr();
+    IAtr();
+    virtual ~IAtr();
 };
 
 } /* namespace hku */

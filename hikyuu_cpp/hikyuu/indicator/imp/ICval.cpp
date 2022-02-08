@@ -5,31 +5,31 @@
  *      Author: Administrator
  */
 
-#include "ConstantValue.h"
+#include "ICval.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::ConstantValue)
+BOOST_CLASS_EXPORT(hku::ICval)
 #endif
 
 namespace hku {
 
-ConstantValue::ConstantValue() : IndicatorImp("CVAL", 1) {
+ICval::ICval() : IndicatorImp("CVAL", 1) {
     setParam<double>("value", 0.0);
     setParam<int>("discard", 0);
 }
 
-ConstantValue::ConstantValue(double value, size_t discard) : IndicatorImp("CVAL", 1) {
+ICval::ICval(double value, size_t discard) : IndicatorImp("CVAL", 1) {
     setParam<double>("value", value);
     setParam<int>("discard", discard);
 }
 
-ConstantValue::~ConstantValue() {}
+ICval::~ICval() {}
 
-bool ConstantValue::check() {
+bool ICval::check() {
     return getParam<int>("discard") < 0 ? false : true;
 }
 
-void ConstantValue::_calculate(const Indicator& data) {
+void ICval::_calculate(const Indicator& data) {
     double value = getParam<double>("value");
     int discard = getParam<int>("discard");
 
@@ -69,11 +69,11 @@ void ConstantValue::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API CVAL(double value, size_t discard) {
-    return make_shared<ConstantValue>(value, discard)->calculate();
+    return make_shared<ICval>(value, discard)->calculate();
 }
 
 Indicator HKU_API CVAL(const Indicator& ind, double value, int discard) {
-    IndicatorImpPtr p = make_shared<ConstantValue>();
+    IndicatorImpPtr p = make_shared<ICval>();
     p->setParam<double>("value", value);
     p->setParam<int>("discard", discard);
     return Indicator(p)(ind);

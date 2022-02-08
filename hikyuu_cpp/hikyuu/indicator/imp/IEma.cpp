@@ -1,29 +1,29 @@
 /*
- * Ema.cpp
+ * IEma.cpp
  *
  *  Created on: 2013-4-10
  *      Author: fasiondog
  */
 
-#include "Ema.h"
+#include "IEma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::Ema)
+BOOST_CLASS_EXPORT(hku::IEma)
 #endif
 
 namespace hku {
 
-Ema::Ema() : IndicatorImp("EMA", 1) {
+IEma::IEma() : IndicatorImp("IEma", 1) {
     setParam<int>("n", 22);
 }
 
-Ema::~Ema() {}
+IEma::~IEma() {}
 
-bool Ema::check() {
+bool IEma::check() {
     return getParam<int>("n") > 0;
 }
 
-void Ema::_calculate(const Indicator& indicator) {
+void IEma::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
     m_discard = indicator.discard();
     if (total <= m_discard) {
@@ -44,7 +44,7 @@ void Ema::_calculate(const Indicator& indicator) {
 }
 
 Indicator HKU_API EMA(int n) {
-    IndicatorImpPtr p = make_shared<Ema>();
+    IndicatorImpPtr p = make_shared<IEma>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }

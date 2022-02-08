@@ -490,7 +490,7 @@
     N日内最低价，N=0则从第一个有效值开始。
 
     :param data: 输入数据
-    :param int|Indicator|IndParam n: N日时间窗口
+    :param int|Indicator n: N日时间窗口
     :rtype: Indicator
 
 

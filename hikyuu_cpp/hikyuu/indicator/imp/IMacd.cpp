@@ -1,32 +1,32 @@
 /*
- * Macd.cpp
+ * IMacd.cpp
  *
  *  Created on: 2013-4-10
  *      Author: fasiondog
  */
 
-#include "Macd.h"
+#include "IMacd.h"
 #include "../crt/EMA.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::Macd)
+BOOST_CLASS_EXPORT(hku::IMacd)
 #endif
 
 namespace hku {
 
-Macd::Macd() : IndicatorImp("MACD", 3) {
+IMacd::IMacd() : IndicatorImp("MACD", 3) {
     setParam<int>("n1", 12);
     setParam<int>("n2", 26);
     setParam<int>("n3", 9);
 }
 
-Macd::~Macd() {}
+IMacd::~IMacd() {}
 
-bool Macd::check() {
+bool IMacd::check() {
     return getParam<int>("n1") > 0 && getParam<int>("n2") > 0 && getParam<int>("n3") > 0;
 }
 
-void Macd::_calculate(const Indicator& data) {
+void IMacd::_calculate(const Indicator& data) {
     size_t total = data.size();
     HKU_IF_RETURN(total == 0, void());
 
@@ -67,7 +67,7 @@ void Macd::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API MACD(int n1, int n2, int n3) {
-    IndicatorImpPtr p = make_shared<Macd>();
+    IndicatorImpPtr p = make_shared<IMacd>();
     p->setParam<int>("n1", n1);
     p->setParam<int>("n2", n2);
     p->setParam<int>("n3", n3);

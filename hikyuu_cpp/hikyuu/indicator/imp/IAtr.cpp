@@ -1,29 +1,29 @@
 /*
- * Atr.cpp
+ * IAtr.cpp
  *
  *  Created on: 2016年5月4日
  *      Author: Administrator
  */
 
-#include "Atr.h"
+#include "IAtr.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::Atr)
+BOOST_CLASS_EXPORT(hku::IAtr)
 #endif
 
 namespace hku {
 
-Atr::Atr() : IndicatorImp("ATR", 1) {
+IAtr::IAtr() : IndicatorImp("ATR", 1) {
     setParam<int>("n", 14);
 }
 
-Atr::~Atr() {}
+IAtr::~IAtr() {}
 
-bool Atr::check() {
+bool IAtr::check() {
     return getParam<int>("n") >= 1;
 }
 
-void Atr::_calculate(const Indicator& indicator) {
+void IAtr::_calculate(const Indicator& indicator) {
     size_t total = indicator.size();
     m_discard = indicator.discard();
     if (m_discard >= total) {
@@ -44,7 +44,7 @@ void Atr::_calculate(const Indicator& indicator) {
 }
 
 Indicator HKU_API ATR(int n) {
-    IndicatorImpPtr p = make_shared<Atr>();
+    IndicatorImpPtr p = make_shared<IAtr>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }

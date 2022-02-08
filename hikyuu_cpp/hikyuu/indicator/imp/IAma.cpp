@@ -1,32 +1,32 @@
 /*
- * Ama.cpp
+ * IAma.cpp
  *
  *  Created on: 2013-4-7
  *      Author: fasiondog
  */
 
 #include <cmath>
-#include "Ama.h"
+#include "IAma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::Ama)
+BOOST_CLASS_EXPORT(hku::IAma)
 #endif
 
 namespace hku {
 
-Ama::Ama() : IndicatorImp("AMA", 2) {
+IAma::IAma() : IndicatorImp("AMA", 2) {
     setParam<int>("n", 10);
     setParam<int>("fast_n", 2);
     setParam<int>("slow_n", 30);
 }
 
-Ama::~Ama() {}
+IAma::~IAma() {}
 
-bool Ama::check() {
+bool IAma::check() {
     return getParam<int>("n") >= 1 && getParam<int>("fast_n") >= 0 && getParam<int>("slow_n") >= 0;
 }
 
-void Ama::_calculate(const Indicator& data) {
+void IAma::_calculate(const Indicator& data) {
     size_t total = data.size();
     m_discard = data.discard();
     if (m_discard >= total) {
@@ -77,7 +77,7 @@ void Ama::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
-    IndicatorImpPtr p = make_shared<Ama>();
+    IndicatorImpPtr p = make_shared<IAma>();
     p->setParam<int>("n", n);
     p->setParam<int>("fast_n", fast_n);
     p->setParam<int>("slow_n", slow_n);

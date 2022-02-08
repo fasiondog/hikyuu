@@ -26,7 +26,7 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
         os << "\n  ind params: {";
         const auto &ind_params = imp.getIndParams();
         for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
-            os << iter->second->name() << ", ";
+            os << iter->first << ": " << iter->second->formula() << ", ";
         }
         os << "}";
     }

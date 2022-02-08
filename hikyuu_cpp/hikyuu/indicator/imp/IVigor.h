@@ -1,13 +1,13 @@
 /*
- * Vigor.h
+ * IVigor.h
  *
  *  Created on: 2013-4-12
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef VIGOR_H_
-#define VIGOR_H_
+#ifndef IVIGOR_H_
+#define IVIGOR_H_
 
 #include "../Indicator.h"
 
@@ -19,16 +19,16 @@ namespace hku {
  * 计算公式：（收盘价今－收盘价昨）＊成交量今
  * n: 用于EMA平滑的周期窗口，必须为大于0的整数
  */
-class Vigor : public IndicatorImp {
-    INDICATOR_IMP(Vigor)
+class IVigor : public IndicatorImp {
+    INDICATOR_IMP(IVigor)
     INDICATOR_NEED_CONTEXT
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    Vigor();
-    Vigor(int n);
-    virtual ~Vigor();
+    IVigor();
+    IVigor(int n);
+    virtual ~IVigor();
 };
 
 } /* namespace hku */
-#endif /* VIGOR_H_ */
+#endif /* IVIGOR_H_ */

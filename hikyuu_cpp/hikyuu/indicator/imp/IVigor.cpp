@@ -1,37 +1,37 @@
 /*
- * Vigor.cpp
+ * IVigor.cpp
  *
  *  Created on: 2013-4-12
  *      Author: fasiondog
  */
 
-#include "Vigor.h"
+#include "IVigor.h"
 #include "../crt/EMA.h"
 #include "../crt/PRICELIST.h"
 #include "../crt/KDATA.h"
 #include "../crt/REF.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::Vigor)
+BOOST_CLASS_EXPORT(hku::IVigor)
 #endif
 
 namespace hku {
 
-Vigor::Vigor() : IndicatorImp("VIGOR", 1) {
+IVigor::IVigor() : IndicatorImp("VIGOR", 1) {
     setParam<int>("n", 2);
 }
 
-Vigor::Vigor(int n) : IndicatorImp("VIGOR") {
+IVigor::IVigor(int n) : IndicatorImp("VIGOR") {
     setParam<int>("n", n);
 }
 
-Vigor::~Vigor() {}
+IVigor::~IVigor() {}
 
-bool Vigor::check() {
+bool IVigor::check() {
     return getParam<int>("n") >= 1;
 }
 
-void Vigor::_calculate(const Indicator& ind) {
+void IVigor::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
@@ -58,7 +58,7 @@ void Vigor::_calculate(const Indicator& ind) {
 }
 
 Indicator HKU_API VIGOR(int n) {
-    return make_shared<Vigor>(n)->calculate();
+    return make_shared<IVigor>(n)->calculate();
 }
 
 Indicator HKU_API VIGOR(const KData& k, int n) {

@@ -1,13 +1,11 @@
 /*
- * Ema.h
+ * IEma.h
  *
  *  Created on: 2013-4-10
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef EMA_H_
-#define EMA_H_
 
 #include "../Indicator.h"
 
@@ -18,14 +16,13 @@ namespace hku {
  * 参数： n: 计算均值的周期窗口，必须为大于0的整数
  * 抛弃数 = 0
  */
-class Ema : public IndicatorImp {
-    INDICATOR_IMP(Ema)
+class IEma : public IndicatorImp {
+    INDICATOR_IMP(IEma)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    Ema();
-    virtual ~Ema();
+    IEma();
+    virtual ~IEma();
 };
 
 } /* namespace hku */
-#endif /* EMA_H_ */

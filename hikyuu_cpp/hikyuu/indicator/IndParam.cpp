@@ -11,7 +11,7 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const IndParam& ind) {
-    os << "IndParam: \n" << ind.m_ind;
+    os << "IndParam: \n" << ind.m_ind->formula();
     return os;
 }
 

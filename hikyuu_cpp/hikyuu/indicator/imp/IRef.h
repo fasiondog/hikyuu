@@ -1,5 +1,5 @@
 /*
- * RightShift.h
+ * IRef.h
  *
  *  Created on: 2015年3月21日
  *      Author: fasiondog
@@ -19,13 +19,13 @@ namespace hku {
  * 用法：　REF(X，A)　引用A周期前的X值。
  * 例如：　REF(CLOSE，1)　表示上一周期的收盘价，在日线上就是昨收。
  */
-class RightShift : public IndicatorImp {
-    INDICATOR_IMP(RightShift)
+class IRef : public IndicatorImp {
+    INDICATOR_IMP(IRef)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    RightShift();
-    virtual ~RightShift();
+    IRef();
+    virtual ~IRef();
 };
 
 } /* namespace hku */

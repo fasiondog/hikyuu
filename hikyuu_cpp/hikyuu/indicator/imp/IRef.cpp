@@ -1,29 +1,29 @@
 /*
- * RightShift.cpp
+ * IRef.cpp
  *
  *  Created on: 2015年3月21日
  *      Author: fasiondog
  */
 
-#include "RightShift.h"
+#include "IRef.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::RightShift)
+BOOST_CLASS_EXPORT(hku::IRef)
 #endif
 
 namespace hku {
 
-RightShift::RightShift() : IndicatorImp("REF", 1) {
+IRef::IRef() : IndicatorImp("REF", 1) {
     setParam<int>("n", 1);
 }
 
-RightShift::~RightShift() {}
+IRef::~IRef() {}
 
-bool RightShift::check() {
+bool IRef::check() {
     return getParam<int>("n") >= 0;
 }
 
-void RightShift::_calculate(const Indicator& data) {
+void IRef::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
@@ -38,7 +38,7 @@ void RightShift::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API REF(int n) {
-    IndicatorImpPtr p = make_shared<RightShift>();
+    IndicatorImpPtr p = make_shared<IRef>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }

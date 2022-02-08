@@ -1,30 +1,30 @@
 /*
- * StdDeviation.cpp
+ * IStd.cpp
  *
  *  Created on: 2013-4-18
  *      Author: fasiondog
  */
 
-#include "StdDeviation.h"
+#include "IStdev.h"
 #include "../crt/MA.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::StdDeviation)
+BOOST_CLASS_EXPORT(hku::IStdev)
 #endif
 
 namespace hku {
 
-StdDeviation::StdDeviation() : IndicatorImp("STD", 1) {
+IStdev::IStdev() : IndicatorImp("STDEV", 1) {
     setParam<int>("n", 10);
 }
 
-StdDeviation::~StdDeviation() {}
+IStdev::~IStdev() {}
 
-bool StdDeviation::check() {
+bool IStdev::check() {
     return getParam<int>("n") >= 2;
 }
 
-void StdDeviation::_calculate(const Indicator& data) {
+void IStdev::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
@@ -47,7 +47,7 @@ void StdDeviation::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API STDEV(int n) {
-    IndicatorImpPtr p = make_shared<StdDeviation>();
+    IndicatorImpPtr p = make_shared<IStdev>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }

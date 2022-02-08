@@ -13,14 +13,14 @@
 
 namespace hku {
 
-class ConstantValue : public IndicatorImp {
-    INDICATOR_IMP(ConstantValue)
+class ICval : public IndicatorImp {
+    INDICATOR_IMP(ICval)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    ConstantValue();
-    ConstantValue(double value, size_t discard);
-    virtual ~ConstantValue();
+    ICval();
+    ICval(double value, size_t discard);
+    virtual ~ICval();
 };
 
 } /* namespace hku */

@@ -1,13 +1,13 @@
 /*
- * Diff.h
+ * IDiff.h
  *
  *  Created on: 2013-4-18
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef DIFF_H_
-#define DIFF_H_
+#ifndef IDIFF_H_
+#define IDIFF_H_
 
 #include "../Indicator.h"
 
@@ -16,14 +16,14 @@ namespace hku {
 /*
  * 差分指标，即 a[i] - a[i-1]
  */
-class Diff : public hku::IndicatorImp {
-    INDICATOR_IMP(Diff)
+class IDiff : public hku::IndicatorImp {
+    INDICATOR_IMP(IDiff)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    Diff();
-    virtual ~Diff();
+    IDiff();
+    virtual ~IDiff();
 };
 
 } /* namespace hku */
-#endif /* DIFF_H_ */
+#endif /* IDIFF_H_ */

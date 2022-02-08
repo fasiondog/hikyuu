@@ -73,8 +73,7 @@ TEST_CASE("test_LLV_dyn") {
 
     Indicator data = PRICELIST(a);
 
-    IndParam ind_param(PRICELIST(PriceList(10, 9)));
-    result = LLV(data, ind_param);
+    result = LLV(data, PRICELIST(PriceList(10, 9)));
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], data[0]);
     CHECK_EQ(result[7], data[0]);
@@ -126,7 +125,7 @@ TEST_CASE("test_LLV_dyn_export") {
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
     auto c = CLOSE(kdata);
-    Indicator x1 = LLV(c, IndParam(CVAL(c, 2)));
+    Indicator x1 = LLV(c, CVAL(c, 2));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
