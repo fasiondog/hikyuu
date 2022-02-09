@@ -10,6 +10,7 @@
 #include "IndParam.h"
 #include "../Stock.h"
 #include "../Log.h"
+#include "../global/GlobalTaskGroup.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
@@ -1231,13 +1232,40 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
               ind_param->size(), ind.size());
     m_discard = ind.discard();
     size_t total = ind.size();
-    for (size_t i = ind.discard(); i < total; i++) {
-        size_t step = size_t(ind_param->get(i));
-        if (0 == step) {
-            continue;
-        }
-        size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
-        _dyn_run_one_step(ind, start, i);
+    // for (size_t i = ind.discard(); i < total; i++) {
+    //     size_t step = size_t(ind_param->get(i));
+    //     if (0 == step) {
+    //         continue;
+    //     }
+    //     size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
+    //     _dyn_run_one_step(ind, start, i);
+    // }
+    HKU_IF_RETURN(0 == total, void());
+    auto tg = getGlobalTaskGroup();
+    std::vector<task_handle<void>> tasks;
+    size_t workerNum = tg->worker_num();
+    size_t x = total % workerNum;
+    x = x == 0 ? total / workerNum : total / workerNum + 1;
+    for (size_t group = 0; group < workerNum; group++) {
+        tasks.push_back(tg->submit([=]() {
+            size_t first = x * group;
+            size_t len = first + x;
+            if (len > total) {
+                len = total;
+            }
+            for (size_t i = x * group; i < len; i++) {
+                size_t step = size_t(ind_param->get(i));
+                if (step == 0) {
+                    continue;
+                }
+                size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
+                _dyn_run_one_step(ind, start, i);
+            }
+        }));
+    }
+
+    for (auto &task : tasks) {
+        task.get();
     }
 }
 
