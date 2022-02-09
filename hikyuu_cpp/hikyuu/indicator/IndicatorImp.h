@@ -13,6 +13,7 @@
 #include "../KData.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/util.h"
+#include "../utilities/thread/StealThreadPool.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #if HKU_SUPPORT_XML_ARCHIVE
@@ -216,6 +217,13 @@ protected:
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
     unordered_map<string, IndicatorImpPtr> m_ind_params;
+
+public:
+    static void initDynEngine();
+    static void releaseDynEngine();
+
+protected:
+    static StealThreadPool* ms_tg;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

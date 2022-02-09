@@ -21,6 +21,7 @@
 #include "global/GlobalTaskGroup.h"
 #include "global/GlobalSpotAgent.h"
 #include "global/schedule/scheduler.h"
+#include "indicator/IndicatorImp.h"
 #include "debug.h"
 
 namespace hku {
@@ -53,6 +54,7 @@ void GlobalInitializer::init() {
 
     DataDriverFactory::init();
     StockManager::instance();
+    IndicatorImp::initDynEngine();
     getGlobalSpotAgent();
 }
 
@@ -61,6 +63,7 @@ void GlobalInitializer::clean() {
     releaseScheduler();
     releaseGlobalSpotAgent();
 
+    IndicatorImp::releaseDynEngine();
     StockManager::quit();
     DataDriverFactory::release();
     H5close();

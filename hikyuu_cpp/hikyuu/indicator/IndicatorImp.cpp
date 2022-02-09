@@ -10,13 +10,37 @@
 #include "IndParam.h"
 #include "../Stock.h"
 #include "../Log.h"
-#include "../global/GlobalTaskGroup.h"
+#include "../GlobalInitializer.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
 #endif
 
 namespace hku {
+
+StealThreadPool *IndicatorImp::ms_tg = nullptr;
+
+void IndicatorImp::initDynEngine() {
+    auto cpu_num = std::thread::hardware_concurrency();
+    if (cpu_num > 32) {
+        cpu_num = 32;
+    } else if (cpu_num >= 4) {
+        cpu_num -= 2;
+    } else if (cpu_num > 1) {
+        cpu_num--;
+    }
+    ms_tg = new StealThreadPool(cpu_num);
+    HKU_CHECK(ms_tg, "Failed init indicator dynamic engine");
+}
+
+void IndicatorImp::releaseDynEngine() {
+    HKU_TRACE("releaseDynEngine");
+    if (ms_tg) {
+        ms_tg->stop();
+        delete ms_tg;
+        ms_tg = nullptr;
+    }
+}
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
     os << "Indicator{\n"
@@ -1232,28 +1256,35 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
               ind_param->size(), ind.size());
     m_discard = ind.discard();
     size_t total = ind.size();
-    // for (size_t i = ind.discard(); i < total; i++) {
-    //     size_t step = size_t(ind_param->get(i));
-    //     if (0 == step) {
-    //         continue;
-    //     }
-    //     size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
-    //     _dyn_run_one_step(ind, start, i);
-    // }
     HKU_IF_RETURN(0 == total, void());
-    auto tg = getGlobalTaskGroup();
-    std::vector<task_handle<void>> tasks;
-    size_t workerNum = tg->worker_num();
-    size_t x = total % workerNum;
-    x = x == 0 ? total / workerNum : total / workerNum + 1;
+    size_t workerNum = ms_tg->worker_num();
+    size_t circleLength = total / workerNum;
+    if (circleLength < workerNum * 10) {
+        for (size_t i = ind.discard(); i < total; i++) {
+            size_t step = size_t(ind_param->get(i));
+            if (0 == step) {
+                continue;
+            }
+            size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
+            _dyn_run_one_step(ind, start, i);
+        }
+        return;
+    }
+
+    size_t tailCount = total % workerNum;
+    circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
+    std::vector<std::future<void>> tasks;
     for (size_t group = 0; group < workerNum; group++) {
-        tasks.push_back(tg->submit([=]() {
-            size_t first = x * group;
-            size_t len = first + x;
+        tasks.push_back(ms_tg->submit([=, &ind, &ind_param]() {
+            size_t first = circleLength * group;
+            if (first >= total) {
+                return;
+            }
+            size_t len = first + circleLength;
             if (len > total) {
                 len = total;
             }
-            for (size_t i = x * group; i < len; i++) {
+            for (size_t i = circleLength * group; i < len; i++) {
                 size_t step = size_t(ind_param->get(i));
                 if (step == 0) {
                     continue;
