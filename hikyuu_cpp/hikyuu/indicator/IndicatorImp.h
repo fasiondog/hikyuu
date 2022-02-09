@@ -170,7 +170,7 @@ public:
 
     virtual void _calculate(const Indicator&) {}
 
-    virtual void _dyn_calculate(const Indicator&) {}
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {}
 
     virtual bool supportIndParam() const {
         return false;
@@ -202,6 +202,7 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
+    void _dyn_calculate(const Indicator&);
 
 protected:
     string m_name;
@@ -215,9 +216,6 @@ protected:
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
     unordered_map<string, IndicatorImpPtr> m_ind_params;
-
-protected:
-    static size_t _get_step_start(const Indicator& data, size_t pos, size_t step);
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -328,16 +326,16 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)              \
-public:                                                         \
-    virtual bool check() override;                              \
-    virtual void _calculate(const Indicator& ind) override;     \
-    virtual void _dyn_calculate(const Indicator& ind) override; \
-    virtual bool supportIndParam() const override {             \
-        return true;                                            \
-    }                                                           \
-    virtual IndicatorImpPtr _clone() override {                 \
-        return make_shared<classname>();                        \
+#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)                                              \
+public:                                                                                         \
+    virtual bool check() override;                                                              \
+    virtual void _calculate(const Indicator& ind) override;                                     \
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) override; \
+    virtual bool supportIndParam() const override {                                             \
+        return true;                                                                            \
+    }                                                                                           \
+    virtual IndicatorImpPtr _clone() override {                                                 \
+        return make_shared<classname>();                                                        \
     }
 
 #define INDICATOR_NEED_CONTEXT                    \

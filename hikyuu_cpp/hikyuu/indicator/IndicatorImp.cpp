@@ -1224,32 +1224,21 @@ void IndicatorImp::execute_if() {
     }
 }
 
-size_t IndicatorImp::_get_step_start(const Indicator &data, size_t pos, size_t step) {
-    HKU_IF_RETURN(0 == step || pos < data.discard(), Null<size_t>());
-    return pos < data.discard() + step ? data.discard() : pos + 1 - step;
+void IndicatorImp::_dyn_calculate(const Indicator &ind) {
+    SPEND_TIME(IndicatorImp__dyn_calculate);
+    const auto &ind_param = getIndParamImp("n");
+    HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
+              ind_param->size(), ind.size());
+    m_discard = ind.discard();
+    size_t total = ind.size();
+    for (size_t i = ind.discard(); i < total; i++) {
+        size_t step = size_t(ind_param->get(i));
+        if (0 == step) {
+            continue;
+        }
+        size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
+        _dyn_run_one_step(ind, start, i);
+    }
 }
-// std::vector<price_t> IndicatorImp::_get_one_step(const Indicator &data, size_t pos, size_t num,
-//                                                  size_t step) {
-//     HKU_ASSERT(pos >= data.discard());
-//     std::vector<price_t> ret;
-//     if (step == 0) {
-//         return ret;
-//     }
-
-//     if (pos < data.discard() + step) {
-//         size_t len = pos + 1 - data.discard();
-//         ret.resize(len);
-//         for (size_t i = data.discard(); i <= pos; i++) {
-//             ret[i] = data.get(i, num);
-//         }
-//         return ret;
-//     }
-
-//     ret.resize(step);
-//     for (size_t i = 0; i < step; i++) {
-//         ret[i] = data.get(pos + 1 - step + i, num);
-//     }
-//     return ret;
-// }
 
 } /* namespace hku */

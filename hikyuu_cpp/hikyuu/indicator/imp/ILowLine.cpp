@@ -86,26 +86,14 @@ void ILowLine::_calculate(const Indicator& ind) {
     }
 }
 
-void ILowLine::_dyn_calculate(const Indicator& ind) {
-    const auto& ind_param = getIndParamImp("n");
-    HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
-              ind_param->size(), ind.size());
-    m_discard = ind.discard();
-    size_t total = ind.size();
-    for (size_t i = ind.discard(); i < total; i++) {
-        size_t step = size_t(ind_param->get(i));
-        size_t start = _get_step_start(ind, i, step);
-        if (start == Null<size_t>()) {
-            return;
+void ILowLine::_dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+    price_t min_val = ind[start];
+    for (size_t i = start + 1; i <= curPos; i++) {
+        if (ind[i] < min_val) {
+            min_val = ind[i];
         }
-        price_t min_val = ind[start];
-        for (size_t pos = start + 1; pos <= i; pos++) {
-            if (ind[pos] < min_val) {
-                min_val = ind[pos];
-            }
-        }
-        _set(min_val, i);
     }
+    _set(min_val, curPos);
 }
 
 Indicator HKU_API LLV(int n = 20) {

@@ -31,16 +31,16 @@ public:
         this->IndicatorImp::_calculate(ind);
     }
 
-    void _dyn_calculate(const Indicator& ind) {
-        if (override call = get_override("_dyn_calculate")) {
+    void _dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+        if (override call = get_override("_dyn_run_one_step")) {
             call(ind);
         } else {
-            IndicatorImp::_dyn_calculate(ind);
+            IndicatorImp::_dyn_run_one_step(ind, start, curPos);
         }
     }
 
-    void default_dyn_calculate(const Indicator& ind) {
-        this->IndicatorImp::_dyn_calculate(ind);
+    void default_dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+        this->IndicatorImp::_dyn_run_one_step(ind, start, curPos);
     }
 
     bool supportIndParam() const {
@@ -132,8 +132,8 @@ void export_IndicatorImp() {
       .def("check", &IndicatorImp::check, &IndicatorImpWrap::default_check)
       .def("clone", &IndicatorImp::clone)
       .def("_calculate", &IndicatorImp::_calculate, &IndicatorImpWrap::default_calculate)
-      .def("_dyn_calculate", &IndicatorImp::_dyn_calculate,
-           &IndicatorImpWrap::default_dyn_calculate)
+      .def("_dyn_run_one_step", &IndicatorImp::_dyn_run_one_step,
+           &IndicatorImpWrap::default_dyn_run_one_step)
       .def("_clone", &IndicatorImp::_clone, &IndicatorImpWrap::default_clone)
       .def("isNeedContext", &IndicatorImp::isNeedContext, &IndicatorImpWrap::default_isNeedContext);
 
