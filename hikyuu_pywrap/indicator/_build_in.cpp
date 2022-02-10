@@ -302,6 +302,9 @@ Indicator (*ALIGN_4)(const Indicator&, const KData&) = ALIGN;
 Indicator (*DROPNA_1)() = DROPNA;
 Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
 
+Indicator (*AVEDEV_1)(const Indicator&, int) = AVEDEV;
+Indicator (*AVEDEV_2)(const Indicator&, const Indicator&) = AVEDEV;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -1105,12 +1108,13 @@ void export_Indicator_build_in() {
     :param Indicator a: 动态系数
     :rtype: Indicator)");
 
-    def("AVEDEV", AVEDEV, (arg("data"), arg("n") = 22), R"(AVEDEV(data[, n=22])
+    def("AVEDEV", AVEDEV_1, (arg("data"), arg("n") = 22));
+    def("AVEDEV", AVEDEV_2, (arg("data"), arg("n")), R"(AVEDEV(data[, n=22])
 
     平均绝对偏差，求X的N日平均绝对偏差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator n: 时间窗口
     :rtype: Indicator)");
 
     def("DEVSQ", DEVSQ_1, (arg("n") = 10));
