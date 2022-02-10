@@ -1264,9 +1264,6 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
         // HKU_INFO("single_thread");
         for (size_t i = ind.discard(); i < total; i++) {
             size_t step = size_t(ind_param->get(i));
-            if (0 == step) {
-                continue;
-            }
             size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
             _dyn_run_one_step(ind, start, i);
         }
@@ -1295,9 +1292,6 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
             }
             for (size_t i = circleLength * group; i < endPos; i++) {
                 size_t step = size_t(ind_param->get(i));
-                if (step == 0) {
-                    continue;
-                }
                 size_t start = i < ind.discard() + step ? ind.discard() : i + 1 - step;
                 _dyn_run_one_step(ind, start, i);
             }
