@@ -1250,16 +1250,18 @@ void IndicatorImp::execute_if() {
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
-    SPEND_TIME(IndicatorImp__dyn_calculate);
+    // SPEND_TIME(IndicatorImp__dyn_calculate);
     const auto &ind_param = getIndParamImp("n");
     HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
               ind_param->size(), ind.size());
     m_discard = ind.discard();
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total, void());
+
+    static const size_t minCircleLength = 400;
     size_t workerNum = ms_tg->worker_num();
-    size_t circleLength = total / workerNum;
-    if (circleLength < workerNum * 10) {
+    if (total < minCircleLength || workerNum == 1) {
+        // HKU_INFO("single_thread");
         for (size_t i = ind.discard(); i < total; i++) {
             size_t step = size_t(ind_param->get(i));
             if (0 == step) {
@@ -1271,15 +1273,22 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
         return;
     }
 
-    size_t tailCount = total % workerNum;
-    circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
+    // HKU_INFO("multi_thread");
+    size_t circleLength = minCircleLength;
+    if (minCircleLength * workerNum < total) {
+        circleLength = minCircleLength;
+    } else {
+        size_t tailCount = total % workerNum;
+        circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
+    }
+
     std::vector<std::future<void>> tasks;
     for (size_t group = 0; group < workerNum; group++) {
+        size_t first = circleLength * group;
+        if (first >= total) {
+            break;
+        }
         tasks.push_back(ms_tg->submit([=, &ind, &ind_param]() {
-            size_t first = circleLength * group;
-            if (first >= total) {
-                return;
-            }
             size_t len = first + circleLength;
             if (len > total) {
                 len = total;
