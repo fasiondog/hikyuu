@@ -274,7 +274,9 @@ Indicator (*TIMELINEVOL_1)() = TIMELINEVOL;
 Indicator (*TIMELINEVOL_2)(const KData&) = TIMELINEVOL;
 
 Indicator (*DEVSQ_1)(int) = DEVSQ;
-Indicator (*DEVSQ_2)(const Indicator&, int) = DEVSQ;
+Indicator (*DEVSQ_2)(const IndParam&) = DEVSQ;
+Indicator (*DEVSQ_3)(const Indicator&, const Indicator&) = DEVSQ;
+Indicator (*DEVSQ_4)(const Indicator&, int) = DEVSQ;
 
 Indicator (*ROC_1)(int) = ROC;
 Indicator (*ROC_2)(const Indicator&, int) = ROC;
@@ -1118,12 +1120,14 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("DEVSQ", DEVSQ_1, (arg("n") = 10));
-    def("DEVSQ", DEVSQ_2, (arg("data"), arg("n") = 10), R"(DEVSQ([data, n=10])
+    def("DEVSQ", DEVSQ_2, (arg("n")));
+    def("DEVSQ", DEVSQ_3, (arg("data"), arg("n")));
+    def("DEVSQ", DEVSQ_4, (arg("data"), arg("n") = 10), R"(DEVSQ([data, n=10])
 
     数据偏差平方和，求X的N日数据偏差平方和
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator n: 时间窗口
     :rtype: Indicator)");
 
     def("ROC", ROC_1, (arg("n") = 10));

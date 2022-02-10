@@ -141,6 +141,7 @@ TEST_CASE("test_MA_dyn") {
     Indicator expect = MA(c, 10);
     Indicator result = MA(c, CVAL(c, 10));
     CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < expect.size(); i++) {
         if (i >= result.discard()) {
             CHECK(!isnan(result[i]));
