@@ -267,13 +267,13 @@ def test(all, compile, verbose, mode, case, j):
     if all:
         os.system("xmake -j {} -b {} unit-test".format(
             j, "-v -D" if verbose else ""))
-        os.system("xmake r unit-test {}".format('' if case ==
-                                                '' else '-tc {}'.format(case)))
+        os.system("xmake r unit-test {}".format(
+            '' if case == '' else '--test-case={}'.format(case)))
     else:
         os.system("xmake -j {} -b {} small-test".format(
             j, "-v -D" if verbose else ""))
         os.system("xmake r small-test {}".format(
-            '' if case == '' else '-tc {}'.format(case)))
+            '' if case == '' else '--test-case={}'.format(case)))
 
 
 @click.command()

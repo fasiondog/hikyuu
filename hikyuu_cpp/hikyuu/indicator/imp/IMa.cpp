@@ -47,14 +47,32 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 }
 
+void IMa::_dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+    price_t sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += ind[i];
+    }
+    _set(sum / (curPos - start + 1), curPos);
+}
+
 Indicator HKU_API MA(int n) {
     IndicatorImpPtr p = make_shared<IMa>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
+Indicator HKU_API MA(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IMa>();
+    p->setIndParam("n", n);
+    return Indicator(p);
+}
+
 Indicator HKU_API MA(const Indicator& ind, int n) {
     return MA(n)(ind);
+}
+
+Indicator HKU_API MA(const Indicator& ind, const Indicator& n) {
+    return MA(IndParam(n))(ind);
 }
 
 } /* namespace hku */

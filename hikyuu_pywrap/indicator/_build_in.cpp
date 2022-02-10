@@ -49,7 +49,9 @@ Indicator (*DIFF_1)() = DIFF;
 Indicator (*DIFF_2)(const Indicator&) = DIFF;
 
 Indicator (*MA_1)(int) = MA;
-Indicator (*MA_2)(const Indicator&, int) = MA;
+Indicator (*MA_2)(const IndParam&) = MA;
+Indicator (*MA_3)(const Indicator&, int) = MA;
+Indicator (*MA_4)(const Indicator&, const Indicator&) = MA;
 
 Indicator (*SMA_1)(int, double) = SMA;
 Indicator (*SMA_2)(const Indicator&, int, double) = SMA;
@@ -392,12 +394,14 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("MA", MA_1, (arg("n") = 22));
-    def("MA", MA_2, (arg("data"), arg("n") = 22), R"(MA([data, n=22])
+    def("MA", MA_2, (arg("n")));
+    def("MA", MA_3, (arg("data"), arg("n")));
+    def("MA", MA_4, (arg("data"), arg("n") = 22), R"(MA([data, n=22])
 
     简单移动平均
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator n: 时间窗口
     :rtype: Indicator)");
 
     def("AMA", AMA_1, (arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));

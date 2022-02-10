@@ -14,7 +14,7 @@
 namespace hku {
 
 class IMa : public IndicatorImp {
-    INDICATOR_IMP(IMa)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(IMa)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

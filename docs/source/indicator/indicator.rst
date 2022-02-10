@@ -550,7 +550,7 @@
     简单移动平均
     
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator n: 时间窗口
     :rtype: Indicator
 
     
