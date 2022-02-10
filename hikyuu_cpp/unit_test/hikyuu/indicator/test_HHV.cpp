@@ -95,6 +95,16 @@ TEST_CASE("test_HHV_dyn") {
     for (size_t i = 0; i < expect.size(); i++) {
         CHECK_EQ(expect[i], result[i]);
     }
+
+    // Stock stock = StockManager::instance().getStock("sh000001");
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    // Indicator c = CLOSE(kdata);
+    // expect = HHV(c, 50);
+    // result = HHV(c, CVAL(c, 50));
+    // CHECK_EQ(expect.size(), result.size());
+    // for (size_t i = 0; i < expect.size(); i++) {
+    //     CHECK_EQ(expect[i], result[i]);
+    // }
 }
 
 //-----------------------------------------------------------------------------

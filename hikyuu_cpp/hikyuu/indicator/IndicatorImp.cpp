@@ -1275,7 +1275,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     // HKU_INFO("multi_thread");
     size_t circleLength = minCircleLength;
-    if (minCircleLength * workerNum < total) {
+    if (minCircleLength * workerNum >= total) {
         circleLength = minCircleLength;
     } else {
         size_t tailCount = total % workerNum;
@@ -1289,11 +1289,11 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
             break;
         }
         tasks.push_back(ms_tg->submit([=, &ind, &ind_param]() {
-            size_t len = first + circleLength;
-            if (len > total) {
-                len = total;
+            size_t endPos = first + circleLength;
+            if (endPos > total) {
+                endPos = total;
             }
-            for (size_t i = circleLength * group; i < len; i++) {
+            for (size_t i = circleLength * group; i < endPos; i++) {
                 size_t step = size_t(ind_param->get(i));
                 if (step == 0) {
                     continue;
