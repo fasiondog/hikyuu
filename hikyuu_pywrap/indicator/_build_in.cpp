@@ -77,7 +77,9 @@ Indicator (*STDP_1)(int) = STDP;
 Indicator (*STDP_2)(const Indicator&, int) = STDP;
 
 Indicator (*HHV_1)(int) = HHV;
-Indicator (*HHV_2)(const Indicator&, int) = HHV;
+Indicator (*HHV_2)(const IndParam&) = HHV;
+Indicator (*HHV_3)(const Indicator&, const Indicator&) = HHV;
+Indicator (*HHV_4)(const Indicator&, int) = HHV;
 
 Indicator (*LLV_1)(int) = LLV;
 Indicator (*LLV_2)(const Indicator&, int) = LLV;
@@ -503,12 +505,14 @@ void export_Indicator_build_in() {
     def("POS", POS, (arg("block"), arg("query"), arg("sg")));
 
     def("HHV", HHV_1, (arg("n") = 20));
-    def("HHV", HHV_2, (arg("data"), arg("n") = 20), R"(HHV([data, n=20])
+    def("HHV", HHV_2, (arg("n")));
+    def("HHV", HHV_3, (arg("data"), arg("n")));
+    def("HHV", HHV_4, (arg("data"), arg("n") = 20), R"(HHV([data, n=20])
 
     N日内最高价，N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator n: N日时间窗口
     :rtype: Indicator)");
 
     def("LLV", LLV_1, (arg("n") = 20));

@@ -19,6 +19,7 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API HHV(int n = 20);
+Indicator HKU_API HHV(const IndParam& n);
 
 /**
  * N日内最高价, N=0则从第一个有效值开始
@@ -27,6 +28,7 @@ Indicator HKU_API HHV(int n = 20);
  * @ingroup Indicator
  */
 Indicator HKU_API HHV(const Indicator& ind, int n = 20);
+Indicator HKU_API HHV(const Indicator& ind, const Indicator& n);
 
 }  // namespace hku
 

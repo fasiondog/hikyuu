@@ -86,14 +86,34 @@ void IHighLine::_calculate(const Indicator& ind) {
     }
 }
 
+void IHighLine::_dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+    price_t max_val = ind[start];
+    for (size_t i = start + 1; i <= curPos; i++) {
+        if (ind[i] > max_val) {
+            max_val = ind[i];
+        }
+    }
+    _set(max_val, curPos);
+}
+
 Indicator HKU_API HHV(int n = 20) {
     IndicatorImpPtr p = make_shared<IHighLine>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
+Indicator HKU_API HHV(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IHighLine>();
+    p->setIndParam("n", n);
+    return Indicator(p);
+}
+
 Indicator HKU_API HHV(const Indicator& ind, int n = 20) {
     return HHV(n)(ind);
+}
+
+Indicator HKU_API HHV(const Indicator& ind, const Indicator& n) {
+    return HHV(IndParam(n))(ind);
 }
 
 } /* namespace hku */

@@ -382,7 +382,7 @@
     N日内最高价，N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator n: N日时间窗口
     :rtype: Indicator
     
 

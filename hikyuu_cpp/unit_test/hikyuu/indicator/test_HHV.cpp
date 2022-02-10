@@ -81,6 +81,22 @@ TEST_CASE("test_HHV") {
     }
 }
 
+/** @par 检测点 */
+TEST_CASE("test_HHV_dyn") {
+    PriceList a;
+    for (int i = 0; i < 10; ++i) {
+        a.push_back(i);
+    }
+
+    Indicator data = PRICELIST(a);
+    Indicator expect = HHV(data, 3);
+    Indicator result = HHV(data, CVAL(data, 3));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(expect[i], result[i]);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
