@@ -1,4 +1,3 @@
-INSERT INTO `hku_base`.`CodeRuleType` (`id`,`marketid`,`codepre`,`type`,`description`) VALUES (34,2,'301',8,'创业板');
 INSERT INTO `hku_base`."Holiday" (`date`) VALUES (20220103);
 INSERT INTO `hku_base`."Holiday" (`date`) VALUES (20220131);
 INSERT INTO `hku_base`."Holiday" (`date`) VALUES (20220201);
