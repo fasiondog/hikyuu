@@ -68,12 +68,4 @@ Indicator HKU_API MA(const IndParam& n) {
     return Indicator(p);
 }
 
-Indicator HKU_API MA(const Indicator& ind, int n) {
-    return MA(n)(ind);
-}
-
-Indicator HKU_API MA(const Indicator& ind, const Indicator& n) {
-    return MA(IndParam(n))(ind);
-}
-
 } /* namespace hku */

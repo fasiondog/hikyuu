@@ -1,8 +1,8 @@
 /*
  * EVERY.h
- *  
+ *
  *  Copyright (c) 2019 hikyuu.org
- * 
+ *
  *  Created on: 2019-4-28
  *      Author: fasiondog
  */
@@ -25,12 +25,20 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API EVERY(int n = 20);
-Indicator EVERY(const Indicator& ind, int n = 20);
+Indicator HKU_API EVERY(const IndParam& n);
 
-inline Indicator EVERY(const Indicator& ind, int n) {
+inline Indicator EVERY(const Indicator& ind, int n = 20) {
     return EVERY(n)(ind);
 }
 
-} /* namespace */
+inline Indicator EVERY(const Indicator& ind, const IndParam& n) {
+    return EVERY(n)(ind);
+}
+
+inline Indicator EVERY(const Indicator& ind, const Indicator& n) {
+    return EVERY(IndParam(n))(ind);
+}
+
+}  // namespace hku
 
 #endif /* INDICATOR_CRT_EVERY_H_ */

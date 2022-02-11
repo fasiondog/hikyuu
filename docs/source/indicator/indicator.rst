@@ -269,7 +269,7 @@
     数据偏差平方和，求X的N日数据偏差平方和
 
     :param Indicator data: 输入数据
-    :param int|Indicator n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -331,7 +331,7 @@
     例如：EVERY(CLOSE>OPEN,10) 表示前10日内一直是阳线
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator
 
 
@@ -382,7 +382,7 @@
     N日内最高价，N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int|Indicator n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
     
 
@@ -490,7 +490,7 @@
     N日内最低价，N=0则从第一个有效值开始。
 
     :param data: 输入数据
-    :param int|Indicator n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
 
 
@@ -550,7 +550,7 @@
     简单移动平均
     
     :param Indicator data: 输入数据
-    :param int|Indicator n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
     

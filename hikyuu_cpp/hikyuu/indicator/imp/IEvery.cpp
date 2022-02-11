@@ -75,9 +75,27 @@ void IEvery::_calculate(const Indicator& ind) {
     _set(every, total - 1);
 }
 
+void IEvery::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = step == 0 ? ind.discard() : _get_step_start(curPos, step, ind.discard());
+    price_t every = 1.0;
+    for (size_t i = start; i <= curPos; i++) {
+        if (ind[i] == 0.0) {
+            every = 0.0;
+            break;
+        }
+    }
+    _set(every, curPos);
+}
+
 Indicator HKU_API EVERY(int n) {
     IndicatorImpPtr p = make_shared<IEvery>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API EVERY(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IEvery>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

@@ -1260,7 +1260,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     static const size_t minCircleLength = 400;
     size_t workerNum = ms_tg->worker_num();
-    if (total < minCircleLength || workerNum == 1) {
+    if (total < minCircleLength || isSerial() || workerNum == 1) {
         // HKU_INFO("single_thread");
         for (size_t i = ind.discard(); i < total; i++) {
             size_t step = size_t(ind_param->get(i));

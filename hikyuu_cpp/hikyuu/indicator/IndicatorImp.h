@@ -173,7 +173,13 @@ public:
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
+    /** 是否支持指标动态参数 */
     virtual bool supportIndParam() const {
+        return false;
+    }
+
+    /** 是否必须串行计算 */
+    virtual bool isSerial() const {
         return false;
     }
 

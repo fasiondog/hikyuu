@@ -109,12 +109,4 @@ Indicator HKU_API LLV(const IndParam& n) {
     return Indicator(p);
 }
 
-Indicator HKU_API LLV(const Indicator& ind, int n = 20) {
-    return LLV(n)(ind);
-}
-
-Indicator HKU_API LLV(const Indicator& ind, const Indicator& n) {
-    return LLV(IndParam(n))(ind);
-}
-
 } /* namespace hku */

@@ -29,8 +29,17 @@ Indicator HKU_API LLV(const IndParam& n);
  * @param n N日时间窗口
  * @ingroup Indicator
  */
-Indicator HKU_API LLV(const Indicator& ind, int n = 20);
-Indicator HKU_API LLV(const Indicator& ind, const Indicator& n);
+inline Indicator LLV(const Indicator& ind, int n = 20) {
+    return LLV(n)(ind);
+}
+
+inline Indicator LLV(const Indicator& ind, const IndParam& n) {
+    return LLV(n)(ind);
+}
+
+inline Indicator LLV(const Indicator& ind, const Indicator& n) {
+    return LLV(IndParam(n))(ind);
+}
 
 }  // namespace hku
 

@@ -50,8 +50,9 @@ Indicator (*DIFF_2)(const Indicator&) = DIFF;
 
 Indicator (*MA_1)(int) = MA;
 Indicator (*MA_2)(const IndParam&) = MA;
-Indicator (*MA_3)(const Indicator&, int) = MA;
+Indicator (*MA_3)(const Indicator&, const IndParam&) = MA;
 Indicator (*MA_4)(const Indicator&, const Indicator&) = MA;
+Indicator (*MA_5)(const Indicator&, int) = MA;
 
 Indicator (*SMA_1)(int, double) = SMA;
 Indicator (*SMA_2)(const Indicator&, int, double) = SMA;
@@ -81,12 +82,14 @@ Indicator (*STDP_2)(const Indicator&, int) = STDP;
 Indicator (*HHV_1)(int) = HHV;
 Indicator (*HHV_2)(const IndParam&) = HHV;
 Indicator (*HHV_3)(const Indicator&, const Indicator&) = HHV;
-Indicator (*HHV_4)(const Indicator&, int) = HHV;
+Indicator (*HHV_4)(const Indicator&, const IndParam&) = HHV;
+Indicator (*HHV_5)(const Indicator&, int) = HHV;
 
 Indicator (*LLV_1)(int) = LLV;
-Indicator (*LLV_2)(const Indicator&, int) = LLV;
-Indicator (*LLV_3)(const IndParam&) = LLV;
+Indicator (*LLV_2)(const IndParam&) = LLV;
+Indicator (*LLV_3)(const Indicator&, const IndParam&) = LLV;
 Indicator (*LLV_4)(const Indicator&, const Indicator&) = LLV;
+Indicator (*LLV_5)(const Indicator&, int) = LLV;
 
 Indicator (*VIGOR_1)(const KData&, int) = VIGOR;
 Indicator (*VIGOR_2)(int) = VIGOR;
@@ -193,7 +196,10 @@ Indicator (*EXIST_1)(int) = EXIST;
 Indicator (*EXIST_2)(const Indicator&, int) = EXIST;
 
 Indicator (*EVERY_1)(int) = EVERY;
-Indicator (*EVERY_2)(const Indicator&, int) = EVERY;
+Indicator (*EVERY_2)(const IndParam&) = EVERY;
+Indicator (*EVERY_3)(const Indicator&, const IndParam&) = EVERY;
+Indicator (*EVERY_4)(const Indicator&, const Indicator&) = EVERY;
+Indicator (*EVERY_5)(const Indicator&, int) = EVERY;
 
 Indicator (*LAST_1)(int, int) = LAST;
 Indicator (*LAST_2)(const Indicator&, int, int) = LAST;
@@ -276,7 +282,8 @@ Indicator (*TIMELINEVOL_2)(const KData&) = TIMELINEVOL;
 Indicator (*DEVSQ_1)(int) = DEVSQ;
 Indicator (*DEVSQ_2)(const IndParam&) = DEVSQ;
 Indicator (*DEVSQ_3)(const Indicator&, const Indicator&) = DEVSQ;
-Indicator (*DEVSQ_4)(const Indicator&, int) = DEVSQ;
+Indicator (*DEVSQ_4)(const Indicator&, const IndParam&) = DEVSQ;
+Indicator (*DEVSQ_5)(const Indicator&, int) = DEVSQ;
 
 Indicator (*ROC_1)(int) = ROC;
 Indicator (*ROC_2)(const Indicator&, int) = ROC;
@@ -401,12 +408,13 @@ void export_Indicator_build_in() {
     def("MA", MA_1, (arg("n") = 22));
     def("MA", MA_2, (arg("n")));
     def("MA", MA_3, (arg("data"), arg("n")));
-    def("MA", MA_4, (arg("data"), arg("n") = 22), R"(MA([data, n=22])
+    def("MA", MA_4, (arg("data"), arg("n")));
+    def("MA", MA_5, (arg("data"), arg("n") = 22), R"(MA([data, n=22])
 
     简单移动平均
 
     :param Indicator data: 输入数据
-    :param int|Indicator n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("AMA", AMA_1, (arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
@@ -516,23 +524,25 @@ void export_Indicator_build_in() {
     def("HHV", HHV_1, (arg("n") = 20));
     def("HHV", HHV_2, (arg("n")));
     def("HHV", HHV_3, (arg("data"), arg("n")));
-    def("HHV", HHV_4, (arg("data"), arg("n") = 20), R"(HHV([data, n=20])
+    def("HHV", HHV_4, (arg("data"), arg("n")));
+    def("HHV", HHV_5, (arg("data"), arg("n") = 20), R"(HHV([data, n=20])
 
     N日内最高价，N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int|Indicator n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
     def("LLV", LLV_1, (arg("n") = 20));
-    def("LLV", LLV_3, (arg("n")));
+    def("LLV", LLV_2, (arg("n")));
+    def("LLV", LLV_3, (arg("data"), arg("n")));
     def("LLV", LLV_4, (arg("data"), arg("n")));
-    def("LLV", LLV_2, (arg("data"), arg("n") = 20), R"(LLV([data, n=20])
+    def("LLV", LLV_5, (arg("data"), arg("n") = 20), R"(LLV([data, n=20])
 
     N日内最低价，N=0则从第一个有效值开始。
 
     :param data: 输入数据
-    :param int|Indicator n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
     def("CVAL", CVAL_1, (arg("value") = 0.0, arg("discard") = 0));
@@ -829,7 +839,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("EVERY", EVERY_1, (arg("n") = 20));
-    def("EVERY", EVERY_2, (arg("data"), arg("n") = 20), R"(EVERY([data, n=20])
+    def("EVERY", EVERY_2, (arg("n")));
+    def("EVERY", EVERY_3, (arg("data"), arg("n")));
+    def("EVERY", EVERY_4, (arg("data"), arg("n")));
+    def("EVERY", EVERY_5, (arg("data"), arg("n") = 20), R"(EVERY([data, n=20])
 
     一直存在
 
@@ -838,7 +851,7 @@ void export_Indicator_build_in() {
     例如：EVERY(CLOSE>OPEN,10) 表示前10日内一直是阳线
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
     def("LAST", LAST_1, (arg("m") = 10, arg("n") = 5));
@@ -1122,7 +1135,8 @@ void export_Indicator_build_in() {
     def("DEVSQ", DEVSQ_1, (arg("n") = 10));
     def("DEVSQ", DEVSQ_2, (arg("n")));
     def("DEVSQ", DEVSQ_3, (arg("data"), arg("n")));
-    def("DEVSQ", DEVSQ_4, (arg("data"), arg("n") = 10), R"(DEVSQ([data, n=10])
+    def("DEVSQ", DEVSQ_4, (arg("data"), arg("n")));
+    def("DEVSQ", DEVSQ_5, (arg("data"), arg("n") = 10), R"(DEVSQ([data, n=10])
 
     数据偏差平方和，求X的N日数据偏差平方和
 

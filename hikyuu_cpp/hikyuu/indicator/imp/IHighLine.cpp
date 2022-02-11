@@ -109,12 +109,4 @@ Indicator HKU_API HHV(const IndParam& n) {
     return Indicator(p);
 }
 
-Indicator HKU_API HHV(const Indicator& ind, int n = 20) {
-    return HHV(n)(ind);
-}
-
-Indicator HKU_API HHV(const Indicator& ind, const Indicator& n) {
-    return HHV(IndParam(n))(ind);
-}
-
 } /* namespace hku */

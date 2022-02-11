@@ -27,6 +27,10 @@ inline Indicator DEVSQ(const Indicator& data, int n = 10) {
     return DEVSQ(n)(data);
 }
 
+inline Indicator DEVSQ(const Indicator& data, const IndParam& n) {
+    return DEVSQ(n)(data);
+}
+
 inline Indicator DEVSQ(const Indicator& data, const Indicator& n) {
     return DEVSQ(IndParam(n))(data);
 }
