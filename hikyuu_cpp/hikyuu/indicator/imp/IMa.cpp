@@ -47,7 +47,8 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 }
 
-void IMa::_dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+void IMa::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
     price_t sum = 0.0;
     for (size_t i = start; i <= curPos; i++) {
         sum += ind[i];

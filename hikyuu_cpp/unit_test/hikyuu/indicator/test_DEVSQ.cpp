@@ -31,7 +31,6 @@ TEST_CASE("test_DEVSQ_dyn") {
     CHECK_EQ(expect.size(), result.size());
     for (size_t i = 0; i < expect.size(); i++) {
         if (i >= result.discard()) {
-            HKU_INFO("i: {}", i);
             CHECK(!isnan(result[i]));
         }
         CHECK_EQ(expect[i], doctest::Approx(result[i]));

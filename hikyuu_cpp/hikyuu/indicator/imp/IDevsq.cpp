@@ -43,19 +43,18 @@ void IDevsq::_calculate(const Indicator& data) {
     }
 }
 
-void IDevsq::_dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+void IDevsq::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
     price_t sum = 0.0;
     for (size_t i = start; i <= curPos; i++) {
         sum += ind[i];
     }
     price_t mean = sum / (curPos - start + 1);
-    HKU_INFO("sum: {}, mean: {}, step: {}", sum, mean, curPos - start + 1);
     sum = 0.0;
     for (size_t i = start; i <= curPos; i++) {
         sum += std::pow(ind[i] - mean, 2);
     }
     _set(sum, curPos);
-    HKU_INFO("pos: {}, sum: {}", curPos, sum);
 }
 
 Indicator HKU_API DEVSQ(int n) {

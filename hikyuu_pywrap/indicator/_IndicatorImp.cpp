@@ -31,16 +31,16 @@ public:
         this->IndicatorImp::_calculate(ind);
     }
 
-    void _dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
+    void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
         if (override call = get_override("_dyn_run_one_step")) {
             call(ind);
         } else {
-            IndicatorImp::_dyn_run_one_step(ind, start, curPos);
+            IndicatorImp::_dyn_run_one_step(ind, curPos, step);
         }
     }
 
-    void default_dyn_run_one_step(const Indicator& ind, size_t start, size_t curPos) {
-        this->IndicatorImp::_dyn_run_one_step(ind, start, curPos);
+    void default_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+        this->IndicatorImp::_dyn_run_one_step(ind, curPos, step);
     }
 
     bool supportIndParam() const {
