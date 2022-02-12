@@ -84,7 +84,9 @@ add_defines("BOOST_SERIALIZATION_DYN_LINK")
 if is_host("linux") then
     if is_arch("x86_64") then
         add_linkdirs("/usr/lib64")
-        add_linkdirs("/usr/lib/x86_64-linux-gnu")
+        if os.exists("/usr/lib/x86_64-linux-gnu") then
+          add_linkdirs("/usr/lib/x86_64-linux-gnu")
+        end
     end
 end
 
