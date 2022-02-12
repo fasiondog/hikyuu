@@ -319,7 +319,10 @@ Indicator (*ROCP_4)(const Indicator&, const Indicator&) = ROCP;
 Indicator (*ROCP_5)(const Indicator&, int) = ROCP;
 
 Indicator (*ROCR_1)(int) = ROCR;
-Indicator (*ROCR_2)(const Indicator&, int) = ROCR;
+Indicator (*ROCR_2)(const IndParam&) = ROCR;
+Indicator (*ROCR_3)(const Indicator&, const IndParam&) = ROCR;
+Indicator (*ROCR_4)(const Indicator&, const Indicator&) = ROCR;
+Indicator (*ROCR_5)(const Indicator&, int) = ROCR;
 
 Indicator (*ROCR100_1)(int) = ROCR100;
 Indicator (*ROCR100_2)(const Indicator&, int) = ROCR100;
@@ -1231,12 +1234,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("ROCR", ROCR_1, (arg("n") = 10));
-    def("ROCR", ROCR_2, (arg("data"), arg("n") = 10), R"(ROCR([data, n=10])
+    def("ROCR", ROCR_2, (arg("n")));
+    def("ROCR", ROCR_3, (arg("data"), arg("n")));
+    def("ROCR", ROCR_4, (arg("data"), arg("n")));
+    def("ROCR", ROCR_5, (arg("data"), arg("n") = 10), R"(ROCR([data, n=10])
 
     变动率指标: (price / prevPrice)
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator)");
 
     def("ROCR100", ROCR100_1, (arg("n") = 10));
