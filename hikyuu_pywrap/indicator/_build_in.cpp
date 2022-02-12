@@ -271,7 +271,10 @@ Indicator (*BARSCOUNT_1)() = BARSCOUNT;
 Indicator (*BARSCOUNT_2)(const Indicator&) = BARSCOUNT;
 
 Indicator (*BACKSET_1)(int) = BACKSET;
-Indicator (*BACKSET_2)(const Indicator&, int) = BACKSET;
+Indicator (*BACKSET_2)(const IndParam&) = BACKSET;
+Indicator (*BACKSET_3)(const Indicator&, const IndParam&) = BACKSET;
+Indicator (*BACKSET_4)(const Indicator&, const Indicator&) = BACKSET;
+Indicator (*BACKSET_5)(const Indicator&, int) = BACKSET;
 
 Indicator (*TIMELINE_1)() = TIMELINE;
 Indicator (*TIMELINE_2)(const KData&) = TIMELINE;
@@ -1081,8 +1084,11 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("BACKSET", BACKSET_1);
-    def("BACKSET", BACKSET_2, R"(BACKSET([data, n=2])
+    def("BACKSET", BACKSET_1, (arg("n") = 2));
+    def("BACKSET", BACKSET_2, (arg("n")));
+    def("BACKSET", BACKSET_3, (arg("data"), arg("n")));
+    def("BACKSET", BACKSET_4, (arg("data"), arg("n")));
+    def("BACKSET", BACKSET_5, (arg("data"), arg("n") = 2), R"(BACKSET([data, n=2])
 
     向前赋值将当前位置到若干周期前的数据设为1。
 
@@ -1091,7 +1097,7 @@ void export_Indicator_build_in() {
     例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
 
     :param Indicator data: 输入数据
-    :param int n: N周期
+    :param int|Indicator|IndParam n: N周期
     :rtype: Indicator)");
 
     def("TIMELINE", TIMELINE_1);

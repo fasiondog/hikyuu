@@ -25,10 +25,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API BACKSET(int n = 2);
-Indicator BACKSET(const Indicator& ind, int n = 2);
+Indicator HKU_API BACKSET(const IndParam& n);
 
-inline Indicator BACKSET(const Indicator& ind, int n) {
+inline Indicator BACKSET(const Indicator& ind, int n = 2) {
     return BACKSET(n)(ind);
+}
+
+inline Indicator BACKSET(const Indicator& ind, const IndParam& n) {
+    return BACKSET(n)(ind);
+}
+
+inline Indicator BACKSET(const Indicator& ind, const Indicator& n) {
+    return BACKSET(IndParam(n))(ind);
 }
 
 }  // namespace hku

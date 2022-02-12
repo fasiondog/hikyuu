@@ -113,7 +113,7 @@
     例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
 
     :param Indicator data: 输入数据
-    :param int n: N周期
+    :param int n|Indicator|IndParam: N周期
     :rtype: Indicator
 
 

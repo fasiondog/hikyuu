@@ -73,9 +73,28 @@ void IBackset::_calculate(const Indicator& ind) {
     }
 }
 
+void IBackset::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    if (ind[curPos] == 0.0) {
+        for (size_t i = start; i <= curPos; i++) {
+            _set(0.0, curPos);
+        }
+    } else {
+        for (size_t i = start; i <= curPos; i++) {
+            _set(1.0, curPos);
+        }
+    }
+}
+
 Indicator HKU_API BACKSET(int n) {
     IndicatorImpPtr p = make_shared<IBackset>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API BACKSET(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IBackset>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 
