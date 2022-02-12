@@ -196,7 +196,10 @@ Indicator (*INTPART_2)(const Indicator&) = INTPART;
 Indicator (*INTPART_3)(price_t) = INTPART;
 
 Indicator (*EXIST_1)(int) = EXIST;
-Indicator (*EXIST_2)(const Indicator&, int) = EXIST;
+Indicator (*EXIST_2)(const IndParam&) = EXIST;
+Indicator (*EXIST_3)(const Indicator&, const IndParam&) = EXIST;
+Indicator (*EXIST_4)(const Indicator&, const Indicator&) = EXIST;
+Indicator (*EXIST_5)(const Indicator&, int) = EXIST;
 
 Indicator (*EVERY_1)(int) = EVERY;
 Indicator (*EVERY_2)(const IndParam&) = EVERY;
@@ -844,12 +847,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("EXIST", EXIST_1, (arg("n") = 20));
-    def("EXIST", EXIST_2, (arg("data"), arg("n") = 20), R"(EXIST([data, n=20])
+    def("EXIST", EXIST_2, (arg("n")));
+    def("EXIST", EXIST_3, (arg("data"), arg("n")));
+    def("EXIST", EXIST_4, (arg("data"), arg("n")));
+    def("EXIST", EXIST_5, (arg("data"), arg("n") = 20), R"(EXIST([data, n=20])
 
     存在, EXIST(X,N) 表示条件X在N周期有存在
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
     def("EVERY", EVERY_1, (arg("n") = 20));

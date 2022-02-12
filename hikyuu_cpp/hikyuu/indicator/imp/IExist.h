@@ -19,12 +19,14 @@ namespace hku {
  * 存在, EXIST(X,N) 表示条件X在N周期有存在
  */
 class IExist : public IndicatorImp {
-    INDICATOR_IMP(IExist)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(IExist)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IExist();
     virtual ~IExist();
+
+    virtual void _after_dyn_calculate(const Indicator& ind) override;
 };
 
 } /* namespace hku */

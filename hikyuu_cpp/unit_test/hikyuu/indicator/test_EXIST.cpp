@@ -112,6 +112,36 @@ TEST_CASE("test_EXIST") {
     CHECK_EQ(result[9], 0);
 }
 
+/** @par 检测点 */
+TEST_CASE("test_EXIST_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator o = OPEN(kdata);
+    Indicator expect = EXIST(c > o, 3);
+    Indicator result = EXIST(c > o, CVAL(c, 3));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    expect = EXIST(c > o, 0);
+    result = EXIST(c > o, CVAL(c, 0));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
