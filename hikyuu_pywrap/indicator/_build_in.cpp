@@ -307,7 +307,10 @@ Indicator (*DEVSQ_4)(const Indicator&, const IndParam&) = DEVSQ;
 Indicator (*DEVSQ_5)(const Indicator&, int) = DEVSQ;
 
 Indicator (*ROC_1)(int) = ROC;
-Indicator (*ROC_2)(const Indicator&, int) = ROC;
+Indicator (*ROC_2)(const IndParam&) = ROC;
+Indicator (*ROC_3)(const Indicator&, const IndParam&) = ROC;
+Indicator (*ROC_4)(const Indicator&, const Indicator&) = ROC;
+Indicator (*ROC_5)(const Indicator&, int) = ROC;
 
 Indicator (*ROCP_1)(int) = ROCP;
 Indicator (*ROCP_2)(const Indicator&, int) = ROCP;
@@ -1201,7 +1204,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("ROC", ROC_1, (arg("n") = 10));
-    def("ROC", ROC_2, (arg("data"), arg("n") = 10), R"(ROC([data, n=10])
+    def("ROC", ROC_2, (arg("n")));
+    def("ROC", ROC_3, (arg("data"), arg("n")));
+    def("ROC", ROC_4, (arg("data"), arg("n")));
+    def("ROC", ROC_5, (arg("data"), arg("n") = 10), R"(ROC([data, n=10])
 
     变动率指标: ((price / prevPrice)-1)*100
 
