@@ -158,7 +158,10 @@ Indicator (*LOG_2)(price_t) = LOG;
 Indicator (*LOG_3)(const Indicator&) = LOG;
 
 Indicator (*HHVBARS_1)(int) = HHVBARS;
-Indicator (*HHVBARS_2)(const Indicator&, int) = HHVBARS;
+Indicator (*HHVBARS_2)(const IndParam&) = HHVBARS;
+Indicator (*HHVBARS_3)(const Indicator&, const IndParam&) = HHVBARS;
+Indicator (*HHVBARS_4)(const Indicator&, const Indicator&) = HHVBARS;
+Indicator (*HHVBARS_5)(const Indicator&, int) = HHVBARS;
 
 Indicator (*LLVBARS_1)(int) = LLVBARS;
 Indicator (*LLVBARS_2)(const Indicator&, int) = LLVBARS;
@@ -732,7 +735,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("HHVBARS", HHVBARS_1, (arg("n") = 20));
-    def("HHVBARS", HHVBARS_2, (arg("data"), arg("n") = 20), R"(HHVBARS([data, n=20])
+    def("HHVBARS", HHVBARS_2, (arg("n")));
+    def("HHVBARS", HHVBARS_3, (arg("data"), arg("n")));
+    def("HHVBARS", HHVBARS_4, (arg("data"), arg("n")));
+    def("HHVBARS", HHVBARS_5, (arg("data"), arg("n") = 20), R"(HHVBARS([data, n=20])
 
     上一高点位置 求上一高点到当前的周期数。
 
@@ -741,7 +747,7 @@ void export_Indicator_build_in() {
     例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
     def("LLVBARS", LLVBARS_1, (arg("n") = 20));

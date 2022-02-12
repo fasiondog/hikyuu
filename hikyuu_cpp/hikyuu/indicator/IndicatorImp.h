@@ -410,7 +410,7 @@ inline price_t* IndicatorImp::data(size_t result_num) {
 }
 
 inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {
-    return pos < discard + step ? discard : pos + 1 - step;
+    return step == 0 || pos < discard + step ? discard : pos + 1 - step;
 }
 
 } /* namespace hku */

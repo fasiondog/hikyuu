@@ -395,7 +395,7 @@
     例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
     
 .. py:function:: HIGH([data])
