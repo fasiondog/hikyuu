@@ -313,7 +313,10 @@ Indicator (*ROC_4)(const Indicator&, const Indicator&) = ROC;
 Indicator (*ROC_5)(const Indicator&, int) = ROC;
 
 Indicator (*ROCP_1)(int) = ROCP;
-Indicator (*ROCP_2)(const Indicator&, int) = ROCP;
+Indicator (*ROCP_2)(const IndParam&) = ROCP;
+Indicator (*ROCP_3)(const Indicator&, const IndParam&) = ROCP;
+Indicator (*ROCP_4)(const Indicator&, const Indicator&) = ROCP;
+Indicator (*ROCP_5)(const Indicator&, int) = ROCP;
 
 Indicator (*ROCR_1)(int) = ROCR;
 Indicator (*ROCR_2)(const Indicator&, int) = ROCR;
@@ -1216,7 +1219,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("ROCP", ROCP_1, (arg("n") = 10));
-    def("ROCP", ROCP_2, (arg("data"), arg("n") = 10), R"(ROCP([data, n=10])
+    def("ROCP", ROCP_2, (arg("n")));
+    def("ROCP", ROCP_3, (arg("data"), arg("n")));
+    def("ROCP", ROCP_4, (arg("data"), arg("n")));
+    def("ROCP", ROCP_5, (arg("data"), arg("n") = 10), R"(ROCP([data, n=10])
 
     变动率指标: (price - prevPrice) / prevPrice
 

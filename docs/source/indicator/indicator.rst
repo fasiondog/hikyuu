@@ -682,7 +682,7 @@
     变动率指标: (price - prevPrice) / prevPrice
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 

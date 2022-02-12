@@ -23,7 +23,7 @@ public:
     IRoc();
     virtual ~IRoc();
 
-    virtual void IRoc::_after_dyn_calculate(const Indicator& ind) override;
+    virtual void _after_dyn_calculate(const Indicator& ind) override;
 };
 
 } /* namespace hku */
