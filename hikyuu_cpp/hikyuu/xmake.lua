@@ -41,14 +41,18 @@ target("hikyuu")
     end
     
     if is_plat("linux") then
-        add_includedirs("/usr/include/hdf5")
-        add_includedirs("/usr/include/hdf5/serial")
+        if os.exists("/usr/include/hdf5") then
+          add_includedirs("/usr/include/hdf5")
+          add_includedirs("/usr/include/hdf5/serial")
+        end
         if is_arch("x86_64")  then
             if os.exists("/usr/lib64/mysql") then
                 add_linkdirs("/usr/lib64/mysql")
             end
-            add_linkdirs("/usr/lib/x86_64-linux-gnu")
-            add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
+            if os.exists("/usr/lib/x86_64-linux-gnu") then
+              add_linkdirs("/usr/lib/x86_64-linux-gnu")
+              add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
+            end
         end
     end
     
