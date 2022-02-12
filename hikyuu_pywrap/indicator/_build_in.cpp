@@ -109,7 +109,10 @@ Indicator (*IF_3)(const Indicator&, const Indicator&, price_t) = IF;
 Indicator (*IF_4)(const Indicator&, price_t, price_t) = IF;
 
 Indicator (*COUNT_1)(int) = COUNT;
-Indicator (*COUNT_2)(const Indicator&, int) = COUNT;
+Indicator (*COUNT_2)(const IndParam&) = COUNT;
+Indicator (*COUNT_3)(const Indicator&, const Indicator&) = COUNT;
+Indicator (*COUNT_4)(const Indicator&, const IndParam&) = COUNT;
+Indicator (*COUNT_5)(const Indicator&, int) = COUNT;
 
 Indicator (*SUM_1)(int) = SUM;
 Indicator (*SUM_2)(const Indicator&, int) = SUM;
@@ -601,7 +604,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("COUNT", COUNT_1, (arg("n") = 20));
-    def("COUNT", COUNT_2, (arg("data"), arg("n") = 20), R"(COUNT([data, n=20])
+    def("COUNT", COUNT_2, (arg("n")));
+    def("COUNT", COUNT_3, (arg("data"), arg("n")));
+    def("COUNT", COUNT_4, (arg("data"), arg("n")));
+    def("COUNT", COUNT_5, (arg("data"), arg("n") = 20), R"(COUNT([data, n=20])
 
     统计满足条件的周期数。
 
@@ -610,7 +616,7 @@ void export_Indicator_build_in() {
     例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
 
     :param Indicator data: 条件
-    :param int n: 周期
+    :param int|Indicator|IndParam n: 周期
     :rtype: Indicator)");
 
     def("SUM", SUM_1, (arg("n") = 20));

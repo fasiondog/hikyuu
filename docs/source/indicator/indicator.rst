@@ -230,7 +230,7 @@
     例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
     
     :param Indicator data: 条件
-    :param int n: 周期
+    :param int|Indicator|IndParam n: 周期
     :rtype: Indicator
 
 

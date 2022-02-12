@@ -10,6 +10,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/COUNT.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/REF.h>
 
 using namespace hku;
@@ -49,6 +50,34 @@ TEST_CASE("test_COUNT") {
     CHECK_EQ(x[5], 3);
     CHECK_EQ(x[6], 3);
     CHECK_EQ(x[7], 4);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_COUNT_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = COUNT(c, 10);
+    Indicator result = COUNT(c, CVAL(c, 10));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = COUNT(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------
