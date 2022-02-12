@@ -164,7 +164,10 @@ Indicator (*HHVBARS_4)(const Indicator&, const Indicator&) = HHVBARS;
 Indicator (*HHVBARS_5)(const Indicator&, int) = HHVBARS;
 
 Indicator (*LLVBARS_1)(int) = LLVBARS;
-Indicator (*LLVBARS_2)(const Indicator&, int) = LLVBARS;
+Indicator (*LLVBARS_2)(const IndParam&) = LLVBARS;
+Indicator (*LLVBARS_3)(const Indicator&, const IndParam&) = LLVBARS;
+Indicator (*LLVBARS_4)(const Indicator&, const Indicator&) = LLVBARS;
+Indicator (*LLVBARS_5)(const Indicator&, int) = LLVBARS;
 
 Indicator (*POW_1)(int) = POW;
 Indicator (*POW_2)(const Indicator&, int) = POW;
@@ -751,7 +754,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("LLVBARS", LLVBARS_1, (arg("n") = 20));
-    def("LLVBARS", LLVBARS_2, (arg("data"), arg("n") = 20), R"(LLVBARS([data, n=20])
+    def("LLVBARS", LLVBARS_2, (arg("n")));
+    def("LLVBARS", LLVBARS_3, (arg("data"), arg("n")));
+    def("LLVBARS", LLVBARS_4, (arg("data"), arg("n")));
+    def("LLVBARS", LLVBARS_5, (arg("data"), arg("n") = 20), R"(LLVBARS([data, n=20])
 
     上一低点位置 求上一低点到当前的周期数。
 
@@ -760,7 +766,7 @@ void export_Indicator_build_in() {
     例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
 
     :param data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
     def("POW", POW_1, (arg("n")));

@@ -503,7 +503,7 @@
     例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
     
     :param data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
 
 

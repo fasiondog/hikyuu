@@ -16,7 +16,7 @@
 namespace hku {
 
 class ILowLineBars : public IndicatorImp {
-    INDICATOR_IMP(ILowLineBars)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(ILowLineBars)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
