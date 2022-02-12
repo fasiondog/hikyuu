@@ -321,6 +321,10 @@ Indicator (*AVEDEV_1)(const Indicator&, int) = AVEDEV;
 Indicator (*AVEDEV_2)(const Indicator&, const IndParam&) = AVEDEV;
 Indicator (*AVEDEV_3)(const Indicator&, const Indicator&) = AVEDEV;
 
+Indicator (*DOWNNDAY_1)(const Indicator&, int) = DOWNNDAY;
+Indicator (*DOWNNDAY_2)(const Indicator&, const IndParam&) = DOWNNDAY;
+Indicator (*DOWNNDAY_3)(const Indicator&, const Indicator&) = DOWNNDAY;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -982,12 +986,14 @@ void export_Indicator_build_in() {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n") = 3), R"(DOWNNDAY(data[, n=3])
+    def("DOWNNDAY", DOWNNDAY_1, (arg("data"), arg("n") = 3));
+    def("DOWNNDAY", DOWNNDAY_2, (arg("data"), arg("n")));
+    def("DOWNNDAY", DOWNNDAY_3, (arg("data"), arg("n")), R"(DOWNNDAY(data[, n=3])
 
     连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("NDAY", NDAY, (arg("x"), arg("y"), arg("n") = 3), R"(NDAY(x, y[, n=3])
