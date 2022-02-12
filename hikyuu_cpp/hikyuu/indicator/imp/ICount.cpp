@@ -88,7 +88,6 @@ void ICount::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     } else {
         start = curPos + 1 - step;
     }
-
     price_t count = 0;
     for (size_t i = start; i <= curPos; i++) {
         if (ind[i] != 0.0) {

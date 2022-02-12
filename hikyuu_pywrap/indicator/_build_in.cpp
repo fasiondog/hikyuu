@@ -337,6 +337,10 @@ Indicator (*DOWNNDAY_1)(const Indicator&, int) = DOWNNDAY;
 Indicator (*DOWNNDAY_2)(const Indicator&, const IndParam&) = DOWNNDAY;
 Indicator (*DOWNNDAY_3)(const Indicator&, const Indicator&) = DOWNNDAY;
 
+Indicator (*NDAY_1)(const Indicator&, const Indicator&, int) = NDAY;
+Indicator (*NDAY_2)(const Indicator&, const Indicator&, const Indicator&) = NDAY;
+Indicator (*NDAY_3)(const Indicator&, const Indicator&, const IndParam&) = NDAY;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -1017,13 +1021,15 @@ void export_Indicator_build_in() {
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("NDAY", NDAY, (arg("x"), arg("y"), arg("n") = 3), R"(NDAY(x, y[, n=3])
+    def("NDAY", NDAY_1, (arg("x"), arg("y"), arg("n") = 3));
+    def("NDAY", NDAY_1, (arg("x"), arg("y"), arg("n")));
+    def("NDAY", NDAY_3, (arg("x"), arg("y"), arg("n")), R"(NDAY(x, y[, n=3])
 
     连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
 
     :param Indicator x:
     :param Indicator y:
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("CROSS", CROSS_1);
