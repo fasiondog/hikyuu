@@ -28,8 +28,10 @@ hku_author = "fasiondog"
 hku_author_email = "fasiondog@sina.com"
 
 hku_license = "MIT"
-hku_keywords = ("quant", "trade", "System Trading", "backtester", "量化",
-                "程序化交易", "量化交易", "系统交易")
+hku_keywords = [
+    "quant", "trade", "System Trading", "backtester", "量化", "程序化交易", "量化交易",
+    "系统交易"
+]
 hku_platforms = "Independant"
 hku_url = "http://hikyuu.org/"
 
@@ -41,19 +43,29 @@ hku_data_files = []
 
 packages = [
     'hikyuu',
+    'hikyuu/admin',
+    'hikyuu/admin/language',
     'hikyuu/config',
     'hikyuu/config/block',
     'hikyuu/cpp',
     'hikyuu/data',
     'hikyuu/data/mysql_upgrade',
     'hikyuu/data/sqlite_upgrade',
+    'hikyuu/data/sqlite_mem_sql',
     'hikyuu/data_driver',
     'hikyuu/examples',
+    'hikyuu/flat',
+    'hikyuu/fetcher',
+    'hikyuu/fetcher/proxy',
+    'hikyuu/fetcher/stock',
     'hikyuu/gui',
     'hikyuu/gui/data',
     'hikyuu/indicator',
     'hikyuu/draw',
     'hikyuu/draw/drawplot',
+    'hikyuu/shell',
+    'hikyuu/strategy',
+    'hikyuu/strategy/demo',
     #'hikyuu/test',
     'hikyuu/tools',
     'hikyuu/trade_manage',
@@ -79,7 +91,8 @@ setup(
         '': [
             '*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml',
             'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib',
-            'libboost_serialization*', 'libboost_python{}*'.format(py_version)
+            '*.qm', 'libboost_serialization*',
+            'libboost_python{}*'.format(py_version)
         ],
     },
     data_files=hku_data_files,
@@ -104,9 +117,9 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     entry_points={
         'gui_scripts': [
@@ -127,6 +140,10 @@ setup(
         'gitpython',
         'SQLAlchemy',
         'mysql-connector-python',
-        'pyperclip'
+        'pyperclip',
+        'requests',
+        'qdarkstyle',
+        'flatbuffers',
+        'pynng'
     ],
 )

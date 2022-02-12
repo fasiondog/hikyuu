@@ -33,19 +33,20 @@ import tables as tb
 
 from io import SEEK_END, SEEK_SET
 
-from .common import get_stktype_list, MARKETID
-from .common_sqlite3 import (create_database, get_marketid,
-                            get_codepre_list, update_last_date)
-from .common_h5 import (H5Record, H5Index,
-                       open_h5file, get_h5table,
-                       update_hdf5_extern_data)
-from .weight_to_sqlite import qianlong_import_weight
+from hikyuu.data.common import get_stktype_list, MARKETID
+from hikyuu.data.common_sqlite3 import (
+    create_database, get_marketid, get_codepre_list, update_last_date
+)
+from hikyuu.data.common_h5 import (
+    H5Record, H5Index, open_h5file, get_h5table, update_hdf5_extern_data
+)
+from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
     percent = '{:.0%}'.format(cur / total)
     sys.stdout.write('\r')
-    sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)),percent))
+    sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)), percent))
     sys.stdout.flush()
 
 
@@ -66,12 +67,15 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
         data = f.read(314)
         while data:
             a = struct.unpack('6s 17s 8s 283s', data)
-            stockcode = a[0].decode()
-            stockname = a[2].decode(encoding='gbk').encode('utf8')
-            pos = stockname.find(0x00)
-            if pos >= 0:
-                stockname = stockname[:pos]
-            newStockDict[stockcode] = stockname.decode(encoding='utf8').strip()
+            try:
+                stockcode = a[0].decode()
+                stockname = a[2].decode(encoding='gbk').encode('utf8')
+                pos = stockname.find(0x00)
+                if pos >= 0:
+                    stockname = stockname[:pos]
+                newStockDict[stockcode] = stockname.decode(encoding='utf8').strip()
+            except:
+                pass
             data = f.read(314)
 
     a = cur.execute("select marketid from market where market = '%s'" % market.upper())
@@ -79,12 +83,17 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
     marketid = marketid[0][0]
 
     stktype_list = get_stktype_list(quotations)
-    a = cur.execute("select stockid, code, name, valid from stock where marketid={} and type in {}"
-                    .format(marketid, stktype_list))
+    a = cur.execute(
+        "select stockid, code, name, valid from stock where marketid={} and type in {}".format(
+            marketid, stktype_list
+        )
+    )
     a = a.fetchall()
     oldStockDict = {}
     for oldstock in a:
-        oldstockid, oldcode, oldname, oldvalid = oldstock[0], oldstock[1], oldstock[2], int(oldstock[3])
+        oldstockid, oldcode, oldname, oldvalid = oldstock[0], oldstock[1], oldstock[2], int(
+            oldstock[3]
+        )
         oldStockDict[oldcode] = oldstockid
 
         # 新的代码表中无此股票，则置为无效
@@ -94,10 +103,14 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode]:
-                cur.execute("update stock set name='%s' where stockid=%i" %
-                            (newStockDict[oldcode], oldstockid))
+                cur.execute(
+                    "update stock set name='%s' where stockid=%i" %
+                    (newStockDict[oldcode], oldstockid)
+                )
             if oldvalid == 0:
-                cur.execute("update stock set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
+                cur.execute(
+                    "update stock set valid=1, endDate=99999999 where stockid=%i" % oldstockid
+                )
 
     # 处理新出现的股票
     codepre_list = get_codepre_list(connect, marketid, quotations)
@@ -137,11 +150,12 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
     if not os.path.exists(filename):
         return add_record_count
 
-    stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3],stock_record[4]
+    stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[
+        2], stock_record[3], stock_record[4]
 
     table = get_h5table(h5file, market, code)
     if table.nrows > 0:
-        lastdatetime = table[-1]['datetime']/10000
+        lastdatetime = table[-1]['datetime'] / 10000
     else:
         lastdatetime = None
 
@@ -180,8 +194,10 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
         #更新基础信息数据库中股票对应的起止日期及其有效标志
         #if valid == 0:
         cur = connect.cursor()
-        cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
-                    (table[0]['datetime'], 99999999, stockid))
+        cur.execute(
+            "update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
+            (table[0]['datetime'], 99999999, stockid)
+        )
         connect.commit()
         cur.close()
 
@@ -210,7 +226,8 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
     if not os.path.exists(filename):
         return add_record_count
 
-    stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3],stock_record[4]
+    stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[
+        2], stock_record[3], stock_record[4]
 
     table = get_h5table(h5file, market, code)
     if table.nrows > 0:
@@ -220,6 +237,7 @@ def tdx_import_min_data_from_file(connect, filename, h5file, market, stock_recor
 
     row = table.row
     with open(filename, 'rb') as src_file:
+
         def trans_date(yymm, hhmm):
             tmp_date = yymm >> 11
             remainder = yymm & 0x7ff
@@ -330,7 +348,9 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
 
     marketid = get_marketid(connect, market)
     stktype_list = get_stktype_list(quotations)
-    sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type in {}".format(marketid, stktype_list)
+    sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type in {}".format(
+        marketid, stktype_list
+    )
 
     cur = connect.cursor()
     a = cur.execute(sql)
@@ -343,7 +363,7 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
                 progress(i, total)
             continue
 
-        filename = src_dir + "\\" + market.lower() + stock[2]+ suffix
+        filename = src_dir + "\\" + market.lower() + stock[2] + suffix
         this_count = func_import_from_file(connect, filename, h5file, market, stock)
         add_record_count += this_count
         if this_count > 0:
@@ -360,52 +380,70 @@ def tdx_import_data(connect, market, ktype, quotations, src_dir, dest_dir, progr
 
 
 if __name__ == '__main__':
-    
+
     import time
     starttime = time.time()
-    
+
     src_dir = "D:\\TdxW_HuaTai"
     dest_dir = "c:\\stock"
-    quotations = ['stock', 'fund'] #通达信盘后数据没有债券
-    
+    quotations = ['stock', 'fund']  #通达信盘后数据没有债券
+
     connect = sqlite3.connect(dest_dir + "\\stock.db")
     create_database(connect)
 
     add_count = 0
 
     print("导入股票代码表")
-    add_count = tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', quotations)
-    add_count += tdx_import_stock_name_from_file(connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', quotations)
+    add_count = tdx_import_stock_name_from_file(
+        connect, src_dir + "\\T0002\\hq_cache\\shm.tnf", 'SH', quotations
+    )
+    add_count += tdx_import_stock_name_from_file(
+        connect, src_dir + "\\T0002\\hq_cache\\szm.tnf", 'SZ', quotations
+    )
     print("新增股票数：", add_count)
 
     print("\n导入上证日线数据")
-    add_count = tdx_import_data(connect, 'SH', 'DAY', quotations, src_dir + "\\vipdoc\\sh\\lday", dest_dir)
+    add_count = tdx_import_data(
+        connect, 'SH', 'DAY', quotations, src_dir + "\\vipdoc\\sh\\lday", dest_dir
+    )
     print("\n导入数量：", add_count)
 
     print("\n导入深证日线数据")
-    add_count = tdx_import_data(connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday", dest_dir)
+    add_count = tdx_import_data(
+        connect, 'SZ', 'DAY', quotations, src_dir + "\\vipdoc\\sz\\lday", dest_dir
+    )
     print("\n导入数量：", add_count)
 
     print("\n导入上证5分钟数据")
-    add_count = tdx_import_data(connect, 'SH', '5MIN', quotations, src_dir + "\\vipdoc\\sh\\fzline", dest_dir)
+    add_count = tdx_import_data(
+        connect, 'SH', '5MIN', quotations, src_dir + "\\vipdoc\\sh\\fzline", dest_dir
+    )
     print("\n导入数量：", add_count)
 
     print("\n导入深证5分钟数据")
-    add_count = tdx_import_data(connect, 'SZ', '5MIN', quotations, src_dir + "\\vipdoc\\sz\\fzline", dest_dir)
+    add_count = tdx_import_data(
+        connect, 'SZ', '5MIN', quotations, src_dir + "\\vipdoc\\sz\\fzline", dest_dir
+    )
     print("\n导入数量：", add_count)
 
     print("\n导入上证1分钟数据")
-    add_count = tdx_import_data(connect, 'SH', '1MIN', quotations, src_dir + "\\vipdoc\\sh\\minline", dest_dir)
+    add_count = tdx_import_data(
+        connect, 'SH', '1MIN', quotations, src_dir + "\\vipdoc\\sh\\minline", dest_dir
+    )
     print("\n导入数量：", add_count)
 
     print("\n导入深证1分钟数据")
-    add_count = tdx_import_data(connect, 'SZ', '1MIN', quotations, src_dir + "\\vipdoc\\sz\\minline", dest_dir)
+    add_count = tdx_import_data(
+        connect, 'SZ', '1MIN', quotations, src_dir + "\\vipdoc\\sz\\minline", dest_dir
+    )
     print("\n导入数量：", add_count)
 
     print("\n导入权息数据")
     print("正在下载权息数据...")
     import urllib.request
-    net_file = urllib.request.urlopen('http://www.qianlong.com.cn/download/history/weight.rar', timeout=60)
+    net_file = urllib.request.urlopen(
+        'http://www.qianlong.com.cn/download/history/weight.rar', timeout=60
+    )
     dest_filename = dest_dir + '/weight.rar'
     with open(dest_filename, 'wb') as file:
         file.write(net_file.read())
@@ -419,8 +457,8 @@ if __name__ == '__main__':
     print("导入数量：", add_count)
 
     connect.close()
-    
+
     endtime = time.time()
     print("\nTotal time:")
-    print("%.2fs" % (endtime-starttime))
-    print("%.2fm" % ((endtime-starttime)/60))
+    print("%.2fs" % (endtime - starttime))
+    print("%.2fm" % ((endtime - starttime) / 60))

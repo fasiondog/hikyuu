@@ -21,8 +21,7 @@ static int sqlite_busy_call_back(void* ptr, int count) {
     return 1;
 }
 
-SQLiteConnect::SQLiteConnect(const Parameter& param) noexcept
-: DBConnectBase(param), m_db(nullptr) {
+SQLiteConnect::SQLiteConnect(const Parameter& param) : DBConnectBase(param), m_db(nullptr) {
     try {
         m_dbname = getParam<string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
@@ -33,21 +32,26 @@ SQLiteConnect::SQLiteConnect(const Parameter& param) noexcept
             flags = getParam<int>("flags");
         }
         int rc = sqlite3_open_v2(m_dbname.c_str(), &m_db, flags, NULL);
-        HKU_CHECK(rc == SQLITE_OK, sqlite3_errmsg(m_db));
+        SQL_CHECK(rc == SQLITE_OK, rc, sqlite3_errmsg(m_db));
         sqlite3_busy_handler(m_db, sqlite_busy_call_back, (void*)m_db);
 
     } catch (std::out_of_range& e) {
         HKU_FATAL("Can't get database name! {}", e.what());
         close();
-    } catch (hku::exception& e) {
-        HKU_FATAL("Failed open database: {})! SQLite3 error: {}", m_dbname, e.what());
+        throw;
+    } catch (SQLException& e) {
+        HKU_FATAL("Failed open database: {})! SQLite3 errcode: {}, errmsg: {}", m_dbname,
+                  e.errcode(), e.what());
         close();
+        throw;
     } catch (std::exception& e) {
         HKU_FATAL("Failed initialize data driver({})! exception: {}", m_dbname, e.what());
         close();
+        throw;
     } catch (...) {
         HKU_FATAL("Failed open database({})! Unkown error!", m_dbname);
         close();
+        throw;
     }
 }
 
@@ -67,9 +71,8 @@ bool SQLiteConnect::ping() {
 }
 
 void SQLiteConnect::exec(const string& sql_string) {
-    HKU_CHECK(m_db, "database is not open! {}", m_dbname);
     int rc = sqlite3_exec(m_db, sql_string.c_str(), NULL, NULL, NULL);
-    HKU_CHECK(rc == SQLITE_OK, "SQL error: {}! ({})", sqlite3_errmsg(m_db), sql_string);
+    SQL_CHECK(rc == SQLITE_OK, rc, "SQL error: {}! ({})", sqlite3_errmsg(m_db), sql_string);
 }
 
 SQLStatementPtr SQLiteConnect::getStatement(const string& sql_statement) {
@@ -92,7 +95,7 @@ bool SQLiteConnect::tableExist(const string& tablename) {
 }
 
 void SQLiteConnect::transaction() {
-    exec("BEGIN TRANSACTION");
+    exec("BEGIN IMMEDIATE");
 }
 
 void SQLiteConnect::commit() {

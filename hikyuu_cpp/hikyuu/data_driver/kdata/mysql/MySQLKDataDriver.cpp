@@ -12,16 +12,16 @@
 
 namespace hku {
 
-MySQLKDataDriver::MySQLKDataDriver() : KDataDriver("mysql"), m_pool(nullptr) {}
+MySQLKDataDriver::MySQLKDataDriver() : KDataDriver("mysql"), m_connect(nullptr) {}
 
 MySQLKDataDriver::~MySQLKDataDriver() {
-    if (m_pool) {
-        delete m_pool;
+    if (m_connect) {
+        delete m_connect;
     }
 }
 
 bool MySQLKDataDriver::_init() {
-    HKU_ASSERT_M(m_pool == nullptr, "Maybe repeat initialization!");
+    HKU_ASSERT_M(m_connect == nullptr, "Maybe repeat initialization!");
     Parameter connect_param;
     connect_param.set<string>("db", "");  //数据库名称须在SQL语句中明确指定
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));
@@ -29,57 +29,16 @@ bool MySQLKDataDriver::_init() {
     connect_param.set<string>("pwd", getParamFromOther<string>(m_params, "pwd", ""));
     string port_str = getParamFromOther<string>(m_params, "port", "3306");
     unsigned int port = boost::lexical_cast<unsigned int>(port_str);
-    m_pool = new ConnectPool<MySQLConnect>(connect_param);
+    connect_param.set<int>("port", port);
+    m_connect = new MySQLConnect(connect_param);
     return true;
 }
 
 string MySQLKDataDriver ::_getTableName(const string& market, const string& code,
                                         KQuery::KType ktype) {
-    string table = fmt::format("`{}`_`{}`.`{}`", market, KQuery::getKTypeName(ktype), code);
+    string table = fmt::format("`{}_{}`.`{}`", market, KQuery::getKTypeName(ktype), code);
     to_lower(table);
-    return std::move(table);
-}
-
-void MySQLKDataDriver::loadKData(const string& market, const string& code, KQuery::KType kType,
-                                 size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
-        return;
-    };
-
-    if (start_ix >= end_ix) {
-        HKU_ERROR("start_ix({}) >= endix({})", start_ix, end_ix);
-        return;
-    }
-
-    auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return;
-    };
-
-    KRecordTable r(market, code, kType);
-    SQLStatementPtr st = con->getStatement(
-      fmt::format("{} order by date limit {}, {}", r.getSelectSQL(), start_ix, end_ix - start_ix));
-
-    st->exec();
-    while (st->moveNext()) {
-        KRecordTable record;
-        try {
-            record.load(st);
-            KRecord k;
-            k.datetime = record.date();
-            k.openPrice = record.open();
-            k.highPrice = record.high();
-            k.lowPrice = record.low();
-            k.closePrice = record.close();
-            k.transAmount = record.amount();
-            k.transCount = record.count();
-            out_buffer->push_back(k);
-        } catch (...) {
-            HKU_ERROR("Failed get record: {}", record.str());
-        }
-    }
+    return table;
 }
 
 KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string& code,
@@ -88,7 +47,8 @@ KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string&
     if (query.queryType() == KQuery::INDEX) {
         result = _getKRecordList(market, code, query.kType(), query.start(), query.end());
     } else {
-        HKU_INFO("Query by date are not supported!");
+        result =
+          _getKRecordList(market, code, query.kType(), query.startDatetime(), query.endDatetime());
     }
     return result;
 }
@@ -96,68 +56,80 @@ KRecordList MySQLKDataDriver::getKRecordList(const string& market, const string&
 KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string& code,
                                               KQuery::KType kType, size_t start_ix, size_t end_ix) {
     KRecordList result;
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
-        return result;
-    };
+    HKU_IF_RETURN(start_ix >= end_ix, result);
 
-    if (start_ix >= end_ix) {
-        HKU_ERROR("start_ix({}) >= endix({})", start_ix, end_ix);
-        return result;
-    }
+    try {
+        KRecordTable r(market, code, kType);
+        SQLStatementPtr st = m_connect->getStatement(fmt::format(
+          "{} order by date limit {}, {}", r.getSelectSQL(), start_ix, end_ix - start_ix));
 
-    auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return result;
-    };
-
-    KRecordTable r(market, code, kType);
-    SQLStatementPtr st = con->getStatement(
-      fmt::format("{} order by date limit {}, {}", r.getSelectSQL(), start_ix, end_ix - start_ix));
-
-    st->exec();
-    while (st->moveNext()) {
-        KRecordTable record;
-        try {
-            record.load(st);
-            KRecord k;
-            k.datetime = record.date();
-            k.openPrice = record.open();
-            k.highPrice = record.high();
-            k.lowPrice = record.low();
-            k.closePrice = record.close();
-            k.transAmount = record.amount();
-            k.transCount = record.count();
-            result.push_back(k);
-        } catch (...) {
-            HKU_ERROR("Failed get record: {}", record.str());
+        st->exec();
+        while (st->moveNext()) {
+            KRecordTable record;
+            try {
+                record.load(st);
+                KRecord k;
+                k.datetime = record.date();
+                k.openPrice = record.open();
+                k.highPrice = record.high();
+                k.lowPrice = record.low();
+                k.closePrice = record.close();
+                k.transAmount = record.amount();
+                k.transCount = record.count();
+                result.push_back(k);
+            } catch (...) {
+                HKU_ERROR("Failed get record: {}", record.str());
+            }
         }
+    } catch (...) {
+        // 表可能不存在
+    }
+    return result;
+}
+
+KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string& code,
+                                              KQuery::KType ktype, Datetime start_date,
+                                              Datetime end_date) {
+    KRecordList result;
+    HKU_IF_RETURN(start_date >= end_date, result);
+
+    try {
+        KRecordTable r(market, code, ktype);
+        SQLStatementPtr st = m_connect->getStatement(
+          fmt::format("{} where date >= {} and date < {} order by date", r.getSelectSQL(),
+                      start_date.number(), end_date.number()));
+        st->exec();
+        while (st->moveNext()) {
+            KRecordTable record;
+            try {
+                record.load(st);
+                KRecord k;
+                k.datetime = record.date();
+                k.openPrice = record.open();
+                k.highPrice = record.high();
+                k.lowPrice = record.low();
+                k.closePrice = record.close();
+                k.transAmount = record.amount();
+                k.transCount = record.count();
+                result.push_back(k);
+            } catch (...) {
+                HKU_ERROR("Failed get record: {}", record.str());
+            }
+        }
+    } catch (...) {
+        // 表可能不存在
     }
     return result;
 }
 
 size_t MySQLKDataDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
     size_t result = 0;
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
-        return result;
-    }
-
-    auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return result;
-    };
 
     try {
-        result =
-          con->queryInt(fmt::format("select count(1) from {}", _getTableName(market, code, kType)));
-    } catch (std::exception& e) {
-        HKU_ERROR(e.what());
-        result = 0;
+        result = m_connect->queryInt(
+          fmt::format("select count(1) from {}", _getTableName(market, code, kType)));
     } catch (...) {
-        HKU_ERROR("Unknow error!");
+        // 表可能不存在, 不打印异常信息
         result = 0;
     }
 
@@ -169,84 +141,25 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
                                            size_t& out_end) {
     out_start = 0;
     out_end = 0;
-    if (query.queryType() != KQuery::DATE) {
-        HKU_ERROR("queryType must be KQuery::DATE");
-        return false;
-    }
-
-    if (query.startDatetime() >= query.endDatetime() || query.startDatetime() > (Datetime::max)()) {
-        return false;
-    }
-
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
-        return false;
-    }
-
-    auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return false;
-    };
+    HKU_ERROR_IF_RETURN(query.queryType() != KQuery::DATE, false, "queryType must be KQuery::DATE");
+    HKU_IF_RETURN(
+      query.startDatetime() >= query.endDatetime() || query.startDatetime() > (Datetime::max)(),
+      false);
 
     string tablename = _getTableName(market, code, query.kType());
     try {
-        out_start = con->queryInt(fmt::format("select count(1) from {} where date<{}", tablename,
-                                              query.startDatetime().number()));
-        out_end = con->queryInt(fmt::format("select count(1) from {} where date<{}", tablename,
-                                            query.endDatetime().number()));
-    } catch (std::exception& e) {
-        HKU_ERROR(e.what());
-        out_start = 0;
-        out_end = 0;
-        return false;
+        out_start = m_connect->queryInt(fmt::format("select count(1) from {} where date<{}",
+                                                    tablename, query.startDatetime().number()));
+        out_end = m_connect->queryInt(fmt::format("select count(1) from {} where date<{}",
+                                                  tablename, query.endDatetime().number()));
     } catch (...) {
-        HKU_ERROR("Unknow error!");
+        // 表可能不存在, 不打印异常信息
         out_start = 0;
         out_end = 0;
         return false;
     }
 
     return true;
-}
-
-KRecord MySQLKDataDriver::getKRecord(const string& market, const string& code, size_t pos,
-                                     KQuery::KType kType) {
-    KRecord result;
-    if (!m_pool) {
-        HKU_ERROR("The connection pool is not initialized.");
-        return result;
-    }
-
-    auto con = m_pool->getConnect();
-    if (!con) {
-        HKU_ERROR("The acquisition connection failed.");
-        return result;
-    };
-
-    KRecordTable r(market, code, kType);
-    SQLStatementPtr st =
-      con->getStatement(fmt::format("{} order by date limit {}, 1", r.getSelectSQL(), pos));
-
-    st->exec();
-    if (st->moveNext()) {
-        KRecordTable record;
-        try {
-            record.load(st);
-            result.datetime = record.date();
-            result.openPrice = record.open();
-            result.highPrice = record.high();
-            result.lowPrice = record.low();
-            result.closePrice = record.close();
-            result.transAmount = record.amount();
-            result.transCount = record.count();
-        } catch (...) {
-            HKU_ERROR("Failed get record: {}", record.str());
-            result = KRecord();
-        }
-    }
-
-    return result;
 }
 
 } /* namespace hku */

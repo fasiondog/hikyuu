@@ -7,8 +7,10 @@
 #include <stdexcept>
 #include <algorithm>
 #include "Indicator.h"
+#include "IndParam.h"
 #include "../Stock.h"
 #include "../Log.h"
+#include "../GlobalInitializer.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
@@ -16,11 +18,44 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
+StealThreadPool *IndicatorImp::ms_tg = nullptr;
+
+void IndicatorImp::initDynEngine() {
+    auto cpu_num = std::thread::hardware_concurrency();
+    if (cpu_num > 32) {
+        cpu_num = 32;
+    } else if (cpu_num >= 4) {
+        cpu_num -= 2;
+    } else if (cpu_num > 1) {
+        cpu_num--;
+    }
+    ms_tg = new StealThreadPool(cpu_num);
+    HKU_CHECK(ms_tg, "Failed init indicator dynamic engine");
+}
+
+void IndicatorImp::releaseDynEngine() {
+    HKU_TRACE("releaseDynEngine");
+    if (ms_tg) {
+        ms_tg->stop();
+        delete ms_tg;
+        ms_tg = nullptr;
+    }
+}
+
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
     os << "Indicator{\n"
        << "  name: " << imp.name() << "\n  size: " << imp.size()
        << "\n  result sets: " << imp.getResultNumber() << "\n  params: " << imp.getParameter()
-       << "\n  formula: " << imp.formula() << "\n}";
+       << "\n  support indicator param: " << (imp.supportIndParam() ? "True" : "False");
+    if (imp.supportIndParam()) {
+        os << "\n  ind params: {";
+        const auto &ind_params = imp.getIndParams();
+        for (auto iter = ind_params.begin(); iter != ind_params.end(); ++iter) {
+            os << iter->first << ": " << iter->second->formula() << ", ";
+        }
+        os << "}";
+    }
+    os << "\n  formula: " << imp.formula() << "\n}";
     return os;
 }
 
@@ -52,11 +87,39 @@ IndicatorImp::IndicatorImp(const string &name, size_t result_num)
     m_result_num = result_num < MAX_RESULT_NUM ? result_num : MAX_RESULT_NUM;
 }
 
+void IndicatorImp::setIndParam(const string &name, const Indicator &ind) {
+    IndicatorImpPtr imp = ind.getImp();
+    HKU_CHECK(imp, "Invalid input ind, no concrete implementation!");
+    m_ind_params[name] = imp;
+}
+
+void IndicatorImp::setIndParam(const string &name, const IndParam &ind) {
+    IndicatorImpPtr imp = ind.getImp();
+    HKU_CHECK(imp, "Invalid input ind, no concrete implementation!");
+    m_ind_params[name] = imp;
+}
+
+IndParam IndicatorImp::getIndParam(const string &name) const {
+    return IndParam(m_ind_params.at(name));
+}
+
+const IndicatorImpPtr IndicatorImp::getIndParamImp(const string &name) const {
+    return m_ind_params.at(name);
+}
+
 void IndicatorImp::initContext() {
     setParam<KData>("kdata", KData());
 }
 
 void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
+    KData kdata = getContext();
+    if (kdata.getStock() == stock || kdata.getQuery() == query) {
+        if (m_need_calculate) {
+            calculate();
+        }
+        return;
+    }
+
     m_need_calculate = true;
 
     //子节点设置上下文
@@ -68,16 +131,23 @@ void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
         m_three->setContext(stock, query);
 
     //如果上下文有变化则重设上下文
-    KData kdata = getContext();
-    if (kdata.getStock() != stock || kdata.getQuery() != query) {
-        setParam<KData>("kdata", stock.getKData(query));
-    }
+    setParam<KData>("kdata", stock.getKData(query));
 
     //启动重新计算
     calculate();
 }
 
 void IndicatorImp::setContext(const KData &k) {
+    KData old_k = getParam<KData>("kdata");
+
+    // 上下文没变化的情况下根据自身标识进行计算
+    if (old_k == k) {
+        if (m_need_calculate) {
+            calculate();
+        }
+        return;
+    }
+
     m_need_calculate = true;
 
     //子节点设置上下文
@@ -88,31 +158,24 @@ void IndicatorImp::setContext(const KData &k) {
     if (m_three)
         m_three->setContext(k);
 
-    //如果上下文有变化则重设上下文
-    KData old_k = getParam<KData>("kdata");
-    if (old_k.getStock() != k.getStock() || old_k.getQuery() != k.getQuery()) {
-        setParam<KData>("kdata", k);
+    // 对动态参数设置上下文
+    for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+        iter->second->setContext(k);
     }
+
+    //重设上下文
+    setParam<KData>("kdata", k);
 
     //启动重新计算
     calculate();
 }
 
 void IndicatorImp::_readyBuffer(size_t len, size_t result_num) {
-    if (result_num > MAX_RESULT_NUM) {
-        throw(
-          std::invalid_argument("result_num oiverload MAX_RESULT_NUM! "
-                                "[IndicatorImp::_readyBuffer]" +
-                                name()));
-    }
-
-    if (result_num == 0) {
-        // HKU_TRACE("result_num is zeror! (" << name() << ") [IndicatorImp::_readyBuffer]")
-        return;
-    }
+    HKU_CHECK_THROW(result_num <= MAX_RESULT_NUM, std::invalid_argument,
+                    "result_num oiverload MAX_RESULT_NUM! {}", name());
+    HKU_IF_RETURN(result_num == 0, void());
 
     price_t null_price = Null<price_t>();
-
     for (size_t i = 0; i < result_num; ++i) {
         if (!m_pBuffer[i]) {
             m_pBuffer[i] = new PriceList(len, null_price);
@@ -164,6 +227,10 @@ IndicatorImpPtr IndicatorImp::clone() {
     if (m_three) {
         p->m_three = m_three->clone();
     }
+
+    for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+        p->m_ind_params[iter->first] = iter->second->clone();
+    }
     return p;
 }
 
@@ -195,18 +262,12 @@ string IndicatorImp::long_name() const {
 }
 
 PriceList IndicatorImp::getResultAsPriceList(size_t result_num) {
-    if (result_num >= m_result_num || m_pBuffer[result_num] == NULL) {
-        return PriceList();
-    }
-
+    HKU_IF_RETURN(result_num >= m_result_num || m_pBuffer[result_num] == NULL, PriceList());
     return (*m_pBuffer[result_num]);
 }
 
 IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
-    if (result_num >= m_result_num || m_pBuffer[result_num] == NULL) {
-        return IndicatorImpPtr();
-    }
-
+    HKU_IF_RETURN(result_num >= m_result_num || m_pBuffer[result_num] == NULL, IndicatorImpPtr());
     IndicatorImpPtr imp = make_shared<IndicatorImp>();
     size_t total = size();
     imp->_readyBuffer(total, 1);
@@ -219,33 +280,23 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 
 price_t IndicatorImp::get(size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos >= m_pBuffer[num]->size()) {
-        throw(std::out_of_range("Try to access value out of bounds! " + name() +
-                                " [IndicatorImp::get]"));
-        return Null<price_t>();
-    }
+    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
+                    "Try to access value ({}) out of bounds [0..{})! {}", pos,
+                    m_pBuffer[num]->size(), name());
 #endif
     return (*m_pBuffer[num])[pos];
 }
 
 void IndicatorImp::_set(price_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
-    if ((m_pBuffer[num] == NULL) || pos >= m_pBuffer[num]->size()) {
-        std::stringstream buf;
-        buf << "Try to access value out of bounds! (pos=" << pos << ") " << name()
-            << " [IndicatorImp::_set]";
-        throw(std::out_of_range(buf.str()));
-    }
-    (*m_pBuffer[num])[pos] = val;
-#else
-    (*m_pBuffer[num])[pos] = val;
+    HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
+                    "Try to access value out of bounds! (pos={}) {}", pos, name());
 #endif
+    (*m_pBuffer[num])[pos] = val;
 }
 
 DatetimeList IndicatorImp::getDatetimeList() const {
-    if (haveParam("align_date_list")) {
-        return getParam<DatetimeList>("align_date_list");
-    }
+    HKU_IF_RETURN(haveParam("align_date_list"), getParam<DatetimeList>("align_date_list"));
     return getContext().getDatetimeList();
 }
 
@@ -357,11 +408,7 @@ string IndicatorImp::formula() const {
 }
 
 void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
-    if (op == LEAF || op >= INVALID || !right) {
-        HKU_ERROR("Wrong used!");
-        return;
-    }
-
+    HKU_ERROR_IF_RETURN(op == LEAF || op >= INVALID || !right, void(), "Wrong used!");
     if (OP == op && !isLeaf()) {
         if (m_left) {
             if (m_left->isNeedContext()) {
@@ -414,11 +461,7 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
 }
 
 void IndicatorImp::add_if(IndicatorImpPtr cond, IndicatorImpPtr left, IndicatorImpPtr right) {
-    if (!cond || !left || !right) {
-        HKU_ERROR("Wrong used!");
-        return;
-    }
-
+    HKU_ERROR_IF_RETURN(!cond || !left || !right, void(), "Wrong used!");
     m_need_calculate = true;
     m_optype = IndicatorImp::OP_IF;
     m_three = cond->clone();
@@ -448,6 +491,13 @@ bool IndicatorImp::needCalculate() {
 
     if (m_three) {
         m_need_calculate = m_three->needCalculate();
+        if (m_need_calculate) {
+            return true;
+        }
+    }
+
+    for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+        m_need_calculate = iter->second->needCalculate();
         if (m_need_calculate) {
             return true;
         }
@@ -486,15 +536,31 @@ Indicator IndicatorImp::calculate() {
 
     switch (m_optype) {
         case LEAF:
-            _calculate(Indicator());
+            if (m_ind_params.empty()) {
+                _calculate(Indicator());
+            } else {
+                _dyn_calculate(Indicator());
+            }
             break;
 
-        case OP:
+        case OP: {
             m_right->calculate();
+            Indicator tmp_ind(m_right);
+            for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
+                if (iter->second->m_ind_params.empty()) {
+                    iter->second->_calculate(tmp_ind);
+                } else {
+                    iter->second->_dyn_calculate(tmp_ind);
+                }
+            }
             _readyBuffer(m_right->size(), m_result_num);
-            _calculate(Indicator(m_right));
+            if (m_ind_params.empty()) {
+                _calculate(tmp_ind);
+            } else {
+                _dyn_calculate(tmp_ind);
+            }
             setParam<KData>("kdata", m_right->getParam<KData>("kdata"));
-            break;
+        } break;
 
         case ADD:
             execute_add();
@@ -1182,6 +1248,61 @@ void IndicatorImp::execute_if() {
             }
         }
     }
+}
+
+void IndicatorImp::_dyn_calculate(const Indicator &ind) {
+    // SPEND_TIME(IndicatorImp__dyn_calculate);
+    const auto &ind_param = getIndParamImp("n");
+    HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
+              ind_param->size(), ind.size());
+    m_discard = ind.discard();
+    size_t total = ind.size();
+    HKU_IF_RETURN(0 == total || m_discard >= total, void());
+
+    static const size_t minCircleLength = 400;
+    size_t workerNum = ms_tg->worker_num();
+    if (total < minCircleLength || isSerial() || workerNum == 1) {
+        // HKU_INFO("single_thread");
+        for (size_t i = ind.discard(); i < total; i++) {
+            size_t step = size_t(ind_param->get(i));
+            _dyn_run_one_step(ind, i, step);
+        }
+        _after_dyn_calculate(ind);
+        return;
+    }
+
+    // HKU_INFO("multi_thread");
+    size_t circleLength = minCircleLength;
+    if (minCircleLength * workerNum >= total) {
+        circleLength = minCircleLength;
+    } else {
+        size_t tailCount = total % workerNum;
+        circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
+    }
+
+    std::vector<std::future<void>> tasks;
+    for (size_t group = 0; group < workerNum; group++) {
+        size_t first = circleLength * group;
+        if (first >= total) {
+            break;
+        }
+        tasks.push_back(ms_tg->submit([=, &ind, &ind_param]() {
+            size_t endPos = first + circleLength;
+            if (endPos > total) {
+                endPos = total;
+            }
+            for (size_t i = circleLength * group; i < endPos; i++) {
+                size_t step = size_t(ind_param->get(i));
+                _dyn_run_one_step(ind, i, step);
+            }
+        }));
+    }
+
+    for (auto &task : tasks) {
+        task.get();
+    }
+
+    _after_dyn_calculate(ind);
 }
 
 } /* namespace hku */

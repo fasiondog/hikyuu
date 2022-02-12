@@ -38,6 +38,10 @@ void export_indicator_main();
 void export_instance_main();
 void export_trade_manage_main();
 void export_trade_sys_main();
+void export_global_main();
+
+void export_StrategeContext();
+void export_strategy_main();
 
 KData Py_GetKData(const string& market_code, py::object start = py::long_(0),
                   py::object end = py::long_(Null<int64_t>()), KQuery::KType ktype = KQuery::DAY,
@@ -101,6 +105,7 @@ BOOST_PYTHON_MODULE(core) {
     export_MarketInfo();
     export_StockTypeInfo();
     export_StockWeight();
+    export_StrategeContext();
     export_StockManager();
     export_KQuery();
     export_KReord();
@@ -119,9 +124,15 @@ BOOST_PYTHON_MODULE(core) {
     export_trade_sys_main();
     export_trade_manage_main();  // must after export_trade_sys_main
 
+    export_strategy_main();
+
+    export_global_main();
+
     export_io_redirect();
 
-    py::def("hikyuu_init", hikyuu_init);
+    py::def("hikyuu_init", hikyuu_init,
+            (py::arg("filename"), py::arg("ignore_preload") = false,
+             py::arg("context") = StrategyContext({"all"})));
     py::def("get_version", getVersion, R"(getVersion()
     
     :return: hikyuu 当前版本
@@ -136,7 +147,6 @@ BOOST_PYTHON_MODULE(core) {
     :return: 对应的证券实例，如果实例不存在，则返回空实例，即Stock()，不抛出异常
     :rtype: Stock)");
 
-    int64_t null_int = Null<int64_t>();
     py::def(
       "get_kdata", Py_GetKData,
       (py::arg("market_code"), py::arg("start") = py::long_(0), py::arg("end") = py::object(),

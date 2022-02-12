@@ -5,13 +5,6 @@
  *      Author: fasiondog
  */
 
-/*
- * _MarketInfo.cpp
- *
- *  Created on: 2012-9-27
- *      Author: fasiondog
- */
-
 #include <boost/python.hpp>
 #include <hikyuu/serialization/StockWeight_serialization.h>
 #include "pickle_support.h"

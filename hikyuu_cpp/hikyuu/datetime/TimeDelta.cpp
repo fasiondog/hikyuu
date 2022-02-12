@@ -9,7 +9,7 @@
 
 #include <cstdint>
 #include "TimeDelta.h"
-#include "../utilities/exception.h"
+#include "../Log.h"
 #include "../utilities/util.h"
 
 namespace hku {

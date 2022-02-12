@@ -14,6 +14,7 @@
 #endif
 
 #include "config.h"
+#include "exception.h"
 
 // clang-format off
 #if USE_SPDLOG_LOGGER
@@ -42,6 +43,12 @@ namespace hku {
  * TRACE < DEBUG < INFO < WARN < ERROR < FATAL
  * @{
  */
+
+bool HKU_API isLogInMainThread();
+
+void HKU_API increaseIORedicrectToPythonCount();
+void HKU_API decreaseIORedicrectToPythonCount();
+int HKU_API getIORedirectToPythonCount();
 
 /**********************************************
  * Use SPDLOG for logging
@@ -72,24 +79,54 @@ void HKU_API set_log_level(LOG_LEVEL level);
 
 std::shared_ptr<spdlog::logger> HKU_API getHikyuuLogger();
 
-#define HKU_LOGGER_TRACE(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::trace, __VA_ARGS__)
-#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
-
-#define HKU_LOGGER_DEBUG(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::debug, __VA_ARGS__)
+/*#define HKU_TRACE(...) SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__)
 #define HKU_DEBUG(...) SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__)
-
-#define HKU_LOGGER_INFO(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::info, __VA_ARGS__)
 #define HKU_INFO(...) SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__)
-
-#define HKU_LOGGER_WARN(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::warn, __VA_ARGS__)
 #define HKU_WARN(...) SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__)
-
-#define HKU_LOGGER_ERROR(logger, ...) SPDLOG_LOGGER_CALL(logger, spdlog::level::err, __VA_ARGS__)
 #define HKU_ERROR(...) SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__)
+#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)*/
 
-#define HKU_LOGGER_FATAL(logger, ...) \
-    SPDLOG_LOGGER_CALL(logger, spdlog::level::critical, __VA_ARGS__)
-#define HKU_FATAL(...) SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__)
+#define HKU_TRACE(...)                                                  \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_TRACE(hku::getHikyuuLogger(), __VA_ARGS__);   \
+        }                                                               \
+    } while (0)
+
+#define HKU_DEBUG(...)                                                  \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_DEBUG(hku::getHikyuuLogger(), __VA_ARGS__);   \
+        }                                                               \
+    } while (0)
+
+#define HKU_INFO(...)                                                   \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_INFO(hku::getHikyuuLogger(), __VA_ARGS__);    \
+        }                                                               \
+    } while (0)
+
+#define HKU_WARN(...)                                                   \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_WARN(hku::getHikyuuLogger(), __VA_ARGS__);    \
+        }                                                               \
+    } while (0)
+
+#define HKU_ERROR(...)                                                  \
+    do {                                                                \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) { \
+            SPDLOG_LOGGER_ERROR(hku::getHikyuuLogger(), __VA_ARGS__);   \
+        }                                                               \
+    } while (0)
+
+#define HKU_FATAL(...)                                                   \
+    do {                                                                 \
+        if (isLogInMainThread() || getIORedirectToPythonCount() <= 0) {  \
+            SPDLOG_LOGGER_CRITICAL(hku::getHikyuuLogger(), __VA_ARGS__); \
+        }                                                                \
+    } while (0)
 
 #if HKU_USE_SPDLOG_ASYNC_LOGGER
 void initLogger();
@@ -164,6 +201,225 @@ std::string HKU_API getLocalTime();
 #endif
 
 #endif /* USE_SPDLOG_LOGGER */
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// clang/gcc 下使用 __PRETTY_FUNCTION__ 会包含函数参数，可以在编译时指定
+// #define HKU_FUNCTION __PRETTY_FUNCTION__
+//
+///////////////////////////////////////////////////////////////////////////////
+#ifndef HKU_FUNCTION
+#define HKU_FUNCTION __FUNCTION__
+#endif
+
+/**
+ * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
+ * @note 用于外部入参及结果检查
+ */
+#define HKU_CHECK(expr, ...)                                                                   \
+    do {                                                                                       \
+        if (!(expr)) {                                                                         \
+            throw hku::exception(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr,               \
+                                             fmt::format(__VA_ARGS__), __FUNCTION__, __FILE__, \
+                                             __LINE__));                                       \
+        }                                                                                      \
+    } while (0)
+
+/**
+ * 若表达式为 false，将抛出指定的异常, 并附带传入信息
+ * @note 用于外部入参及结果检查
+ */
+#define HKU_CHECK_THROW(expr, except, ...)                                                         \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            throw except(fmt::format("CHECK({}) {} [{}] ({}:{})", #expr, fmt::format(__VA_ARGS__), \
+                                     __FUNCTION__, __FILE__, __LINE__));                           \
+        }                                                                                          \
+    } while (0)
+
+#if HKU_DISABLE_ASSERT
+#define HKU_ASSERT(expr)
+#define HKU_ASSERT_M(expr, ...)
+
+#else /* #if HKU_DISABLE_ASSERT */
+
+/**
+ * 若表达式为 false，将抛出 hku::exception 异常
+ * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
+ */
+#define HKU_ASSERT(expr)                                                                  \
+    do {                                                                                  \
+        if (!(expr)) {                                                                    \
+            std::string err_msg(fmt::format("ASSERT({})", #expr));                        \
+            HKU_ERROR(err_msg);                                                           \
+            throw hku::exception(                                                         \
+              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__)); \
+        }                                                                                 \
+    } while (0)
+
+/**
+ * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
+ * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
+ */
+#define HKU_ASSERT_M(expr, ...)                                                                 \
+    do {                                                                                        \
+        if (!(expr)) {                                                                          \
+            std::string err_msg(fmt::format("ASSERT({}) {}", #expr, fmt::format(__VA_ARGS__))); \
+            HKU_ERROR(err_msg);                                                                 \
+            throw hku::exception(                                                               \
+              fmt::format("{} [{}] ({}:{})", err_msg, __FUNCTION__, __FILE__, __LINE__));       \
+        }                                                                                       \
+    } while (0)
+
+#endif /* #if HKU_DISABLE_ASSERT */
+
+/** 抛出 hku::exception 及传入信息 */
+#define HKU_THROW(...)                                                                           \
+    do {                                                                                         \
+        throw hku::exception(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
+                                         __FUNCTION__, __FILE__, __LINE__));                     \
+    } while (0)
+
+/** 抛出指定异常及传入信息 */
+#define HKU_THROW_EXCEPTION(except, ...)                                                 \
+    do {                                                                                 \
+        throw except(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
+                                 __FUNCTION__, __FILE__, __LINE__));                     \
+    } while (0)
+
+/**
+ * 满足指定条件时，打印 TRACE 信息
+ * @param expr 指定条件
+ */
+#define HKU_TRACE_IF(expr, ...) \
+    if (expr) {                 \
+        HKU_TRACE(__VA_ARGS__); \
+    }
+
+/**
+ * 满足指定条件时，打印 DEBUG 信息, 并返回指定值
+ * @param expr 指定条件
+ */
+#define HKU_DEBUG_IF(expr, ...) \
+    if (expr) {                 \
+        HKU_DEBUG(__VA_ARGS__); \
+    }
+
+/**
+ * 满足指定条件时，打印 INFO 信息, 并返回指定值
+ * @param expr 指定条件
+ */
+#define HKU_INFO_IF(expr, ...) \
+    if (expr) {                \
+        HKU_INFO(__VA_ARGS__); \
+    }
+
+/**
+ * 满足指定条件时，打印 WARN 信息, 并返回指定值
+ * @param expr 指定条件
+ */
+#define HKU_WARN_IF(expr, ...) \
+    if (expr) {                \
+        HKU_WARN(__VA_ARGS__); \
+    }
+
+/**
+ * 满足指定条件时，打印 ERROR 信息, 并返回指定值
+ * @param expr 指定条件
+ */
+#define HKU_ERROR_IF(expr, ...) \
+    if (expr) {                 \
+        HKU_ERROR(__VA_ARGS__); \
+    }
+
+/**
+ * 满足指定条件时，打印 FATAL 信息, 并返回指定值
+ * @param expr 指定条件
+ */
+#define HKU_FATAL_IF(expr, ...) \
+    if (expr) {                 \
+        HKU_FATAL(__VA_ARGS__); \
+    }
+
+/**
+ * 满足指定条件时，返回指定值
+ * @param expr 指定条件
+ * @param ret 返回值
+ */
+#define HKU_IF_RETURN(expr, ret) \
+    if (expr) {                  \
+        return ret;              \
+    }
+
+/**
+ * 满足指定条件时，打印 TRACE 信息, 并返回指定值
+ * @param expr 指定条件
+ * @param ret 返回值
+ */
+#define HKU_TRACE_IF_RETURN(expr, ret, ...) \
+    if (expr) {                             \
+        HKU_TRACE(__VA_ARGS__);             \
+        return ret;                         \
+    }
+
+/**
+ * 满足指定条件时，打印 DEBUG 信息, 并返回指定值
+ * @param expr 指定条件
+ * @param ret 返回值
+ */
+#define HKU_DEBUG_IF_RETURN(expr, ret, ...) \
+    if (expr) {                             \
+        HKU_DEBUG(__VA_ARGS__);             \
+        return ret;                         \
+    }
+
+/**
+ * 满足指定条件时，打印 INFO 信息, 并返回指定值
+ * @param expr 指定条件
+ * @param ret 返回值
+ */
+#define HKU_INFO_IF_RETURN(expr, ret, ...) \
+    if (expr) {                            \
+        HKU_INFO(__VA_ARGS__);             \
+        return ret;                        \
+    }
+
+/**
+ * 满足指定条件时，打印 WARN 信息, 并返回指定值
+ * @param expr 指定条件
+ * @param ret 返回值
+ */
+#define HKU_WARN_IF_RETURN(expr, ret, ...) \
+    if (expr) {                            \
+        HKU_WARN(__VA_ARGS__);             \
+        return ret;                        \
+    }
+
+/**
+ * 满足指定条件时，打印 ERROR 信息, 并返回指定值
+ * @param expr 指定条件
+ * @param ret 返回值
+ */
+#define HKU_ERROR_IF_RETURN(expr, ret, ...) \
+    if (expr) {                             \
+        HKU_ERROR(__VA_ARGS__);             \
+        return ret;                         \
+    }
+
+/**
+ * 满足指定条件时，打印 FATAL 信息, 并返回指定值
+ * @param expr 指定条件
+ * @param ret 返回值
+ */
+#define HKU_FATAL_IF_RETURN(expr, ret, ...) \
+    if (expr) {                             \
+        HKU_FATAL(__VA_ARGS__);             \
+        return ret;                         \
+    }
+
+extern std::string g_unknown_error_msg;
+#define HKU_ERROR_UNKNOWN HKU_ERROR(g_unknown_error_msg)
+#define HKU_FATAL_UNKNOWN HKU_ERROR(g_unknown_error_msg)
 
 /** @} */
 

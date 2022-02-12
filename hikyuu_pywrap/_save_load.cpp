@@ -19,13 +19,12 @@
 
 #include <hikyuu/serialization/all.h>
 
-
 #if HKU_SUPPORT_SERIALIZATION
 
 using namespace boost::python;
 using namespace hku;
 
-static map<size_t , string> g_support_class_dict;
+static map<size_t, string> g_support_class_dict;
 
 void registerSupportClass() {
     g_support_class_dict[typeid(PriceList).hash_code()] = "PriceList";
@@ -57,7 +56,7 @@ void registerSupportClass() {
     g_support_class_dict[typeid(TradeCostPtr).hash_code()] = "TradeCostPtr";
     g_support_class_dict[typeid(TradeRecord).hash_code()] = "TradeRecord";
     g_support_class_dict[typeid(TradeRecordList).hash_code()] = "TradeRecordList";
-    g_support_class_dict[typeid(TradeManager).hash_code()] = "TradeManager";
+    g_support_class_dict[typeid(TradeManagerPtr).hash_code()] = "TradeManagerBase";
 
     g_support_class_dict[typeid(TradeRequest).hash_code()] = "TradeRequest";
     g_support_class_dict[typeid(SystemPtr).hash_code()] = "SystemPtr";
@@ -71,7 +70,7 @@ void registerSupportClass() {
 }
 
 string supportClassName(const boost::any& arg) {
-    map<size_t , string>::const_iterator iter;
+    map<size_t, string>::const_iterator iter;
     iter = g_support_class_dict.find(arg.type().hash_code());
     if (iter != g_support_class_dict.end()) {
         return iter->second;
@@ -91,9 +90,9 @@ void xml_save(const T& arg, const string& filename) {
         string name(supportClassName(obj));
         oa << boost::serialization::make_nvp("type", name);
         oa << BOOST_SERIALIZATION_NVP(arg);
-    } catch (std::exception &e) {
+    } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
-    } catch(...) {
+    } catch (...) {
         std::cout << "Unknow error! [xml_save]" << std::endl;
     }
 }
@@ -114,13 +113,12 @@ void xml_load(T& arg, const string& filename) {
         } else {
             std::cout << "Unsupport type! [xml_load]" << std::endl;
         }
-    } catch (std::exception &e) {
+    } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
-    } catch(...) {
+    } catch (...) {
         std::cout << "Unknow error! [xml_load]" << std::endl;
     }
 }
-
 
 void export_save_load() {
     //初始化注册支持的类型
@@ -210,8 +208,8 @@ void export_save_load() {
     def("hku_save", xml_save<TradeRecordList>);
     def("hku_load", xml_load<TradeRecordList>);
 
-    def("hku_save", xml_save<TradeManager>);
-    def("hku_load", xml_load<TradeManager>);
+    def("hku_save", xml_save<TradeManagerPtr>);
+    def("hku_load", xml_load<TradeManagerPtr>);
 
     def("hku_save", xml_save<TradeRequest>);
     def("hku_load", xml_load<TradeRequest>);
@@ -243,8 +241,6 @@ void export_save_load() {
 
 #else /* HKU_SUPPORT_SERIALIZATION */
 
-void export_save_load() {
-
-}
+void export_save_load() {}
 
 #endif /* HKU_SUPPORT_SERIALIZATION */

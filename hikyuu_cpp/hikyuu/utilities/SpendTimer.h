@@ -133,6 +133,11 @@ public:
         std::cout << fmt::format("spend time: {:>7.3f} {} | {} ", spend, unit, m_msg) << std::endl;
     }
 
+public:
+    static bool isClosed() {
+        return m_closed;
+    }
+
 private:
     std::string m_msg;
     std::chrono::time_point<std::chrono::steady_clock> m_start_time;
@@ -166,7 +171,12 @@ public:
      * @param open 是否开启耗时统计
      */
     explicit SpendTimerGuad(bool open) : m_open(open) {
-        if (open) {
+        m_old_open = (!SpendTimer::isClosed());
+        if (m_open == m_old_open) {
+            return;
+        }
+
+        if (m_open) {
             open_spend_time();
         } else {
             close_spend_time();
@@ -175,6 +185,9 @@ public:
 
     /** 析构函数，退出当前指定状态，恢复原状态 */
     ~SpendTimerGuad() {
+        if (m_open == m_old_open) {
+            return;
+        }
         if (m_open) {
             close_spend_time();
         } else {
@@ -184,6 +197,7 @@ public:
 
 private:
     bool m_open;
+    bool m_old_open;
 };
 
 #endif /* HIKYUU_CLOSE_SPEND_TIME */

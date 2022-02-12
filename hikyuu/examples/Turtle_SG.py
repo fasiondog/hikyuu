@@ -7,41 +7,42 @@
 # History: 20160407, Added by fasiondog
 #===============================================================================
 
-from hikyuu.trade_sys.signal import SignalBase
-from hikyuu.indicator import HHV, LLV, CLOSE, REF
+from hikyuu import *
+
 
 class TurtleSignal(SignalBase):
-    def __init__(self, n = 20):
+    def __init__(self, n=20):
         super(TurtleSignal, self).__init__("TurtleSignal")
-        self.setParam("n", 20)
-        
+        self.set_param("n", 20)
+
     def _clone(self):
         return TurtleSignal()
 
     def _calculate(self):
-        n = self.getParam("n")
-        k = self.getTO()
+        n = self.get_param("n")
+        k = self.to
         c = CLOSE(k)
-        h = REF(HHV(c, n), 1) #前n日高点
-        L = REF(LLV(c, n), 1) #前n日低点
+        h = REF(HHV(c, n), 1)  #前n日高点
+        L = REF(LLV(c, n), 1)  #前n日低点
         for i in range(h.discard, len(k)):
             if (c[i] >= h[i]):
-                self._addBuySignal(k[i].datetime)
+                self._add_buy_signal(k[i].datetime)
             elif (c[i] <= L[i]):
-                self._addSellSignal(k[i].datetime)
+                self._add_sell_signal(k[i].datetime)
+
 
 if __name__ == "__main__":
     from examples_init import *
-    
+
     sg = TurtleSignal()
-    s = getStock("sh000001")
-    k = s.getKData(Query(-500))
-    
+    s = get_stock("sh000001")
+    k = s.get_kdata(Query(-500))
+
     #只有设置交易对象时，才会开始实际计算
-    sg.setTO(k)
+    sg.to = k
     dates = k.get_datetime_list()
     for d in dates:
-        if (sg.shouldBuy(d)):
+        if (sg.should_buy(d)):
             print("买入：%s" % d)
-        elif (sg.shouldSell(d)):
+        elif (sg.should_sell(d)):
             print("卖出: %s" % d)

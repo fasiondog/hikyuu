@@ -36,7 +36,7 @@ public:
      *            （具体可参考 SQLite 帮助）
      * </pre>
      */
-    explicit SQLiteConnect(const Parameter& param) noexcept;
+    explicit SQLiteConnect(const Parameter& param);
 
     /** 析构函数 */
     virtual ~SQLiteConnect();

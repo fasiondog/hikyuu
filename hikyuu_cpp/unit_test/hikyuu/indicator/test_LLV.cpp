@@ -11,6 +11,7 @@
 #include <hikyuu/indicator/crt/LLV.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 
 using namespace hku;
 
@@ -61,6 +62,33 @@ TEST_CASE("test_LLV") {
     CHECK_EQ(result[9], data[0]);
 }
 
+/** @par 检测点 */
+TEST_CASE("test_LLV_dyn") {
+    Indicator result;
+
+    PriceList a;
+    for (int i = 0; i < 10; ++i) {
+        a.push_back(i);
+    }
+
+    Indicator data = PRICELIST(a);
+
+    result = LLV(data, PRICELIST(PriceList(10, 9)));
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], data[0]);
+    CHECK_EQ(result[7], data[0]);
+    CHECK_EQ(result[8], data[0]);
+    CHECK_EQ(result[9], data[1]);
+
+    int n = 20;
+    Indicator expect = LLV(data, 3);
+    result = LLV(data, CVAL(data, 3));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.size(); i++) {
+        CHECK_EQ(expect[i], result[i]);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
@@ -75,6 +103,37 @@ TEST_CASE("test_LLV_export") {
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
     Indicator x1 = LLV(CLOSE(kdata), 2);
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(x1);
+    }
+
+    Indicator x2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(x2);
+    }
+
+    CHECK_EQ(x1.size(), x2.size());
+    CHECK_EQ(x1.discard(), x2.discard());
+    CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
+    for (size_t i = 0; i < x1.size(); ++i) {
+        CHECK_EQ(x1[i], doctest::Approx(x2[i]));
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_LLV_dyn_export") {
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/LLV.xml";
+
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-20));
+    auto c = CLOSE(kdata);
+    Indicator x1 = LLV(c, CVAL(c, 2));
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);

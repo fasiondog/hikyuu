@@ -48,12 +48,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import logging
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
-)
+from .util import *
 
 from .extend import *
 from .deprecated import *
@@ -61,5 +56,22 @@ from .indicator import *
 from .trade_manage import *
 from .trade_sys import *
 from .hub import *
+
+# ==============================================================================
+#
+# 设置关键类型简称
+#
+# ==============================================================================
+O = OPEN()
+C = CLOSE()
+H = HIGH()
+L = LOW()
+A = AMO()
+V = VOL()
+D = Datetime
+K = None
+Q = Query
+
+sm = StockManager.instance()
 
 __version__ = get_version()

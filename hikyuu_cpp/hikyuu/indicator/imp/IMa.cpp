@@ -20,13 +20,7 @@ IMa::IMa() : IndicatorImp("MA", 1) {
 IMa::~IMa() {}
 
 bool IMa::check() {
-    int n = getParam<int>("n");
-    if (n < 1) {
-        HKU_ERROR("Invalid param! (n >= 1) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 1;
 }
 
 void IMa::_calculate(const Indicator& indicator) {
@@ -53,14 +47,25 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 }
 
+void IMa::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += ind[i];
+    }
+    _set(sum / (curPos - start + 1), curPos);
+}
+
 Indicator HKU_API MA(int n) {
     IndicatorImpPtr p = make_shared<IMa>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API MA(const Indicator& ind, int n) {
-    return MA(n)(ind);
+Indicator HKU_API MA(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IMa>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */

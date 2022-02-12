@@ -22,13 +22,7 @@ IRocr100::IRocr100() : IndicatorImp("ROCR100", 1) {
 IRocr100::~IRocr100() {}
 
 bool IRocr100::check() {
-    int n = getParam<int>("n");
-    if (n < 1) {
-        HKU_ERROR("Invalid param[n] ! (n >= 1) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 1;
 }
 
 void IRocr100::_calculate(const Indicator& ind) {

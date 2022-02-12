@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu.data_driver
-.. highlightlang:: python
+.. highlight:: python
 
 自定义K线驱动
 ==============
@@ -21,7 +21,6 @@ K线数据驱动基类
     * :py:meth:`KDataDriver.isIndexFirst` - 【必须】指示该引擎是按位置索引查询方式更快还是按日期
     * :py:meth:`KDataDriver.getKRecordList` - 【必须】初始化子类私有变量
     * :py:meth:`KDataDriver.getCount` - 【必须】初始化子类私有变量
-    * :py:meth:`KDataDriver.getKRecord` - 【必须】初始化子类私有变量
     * :py:meth:`KDataDriver._getIndexRangeByDate` - 【必须】初始化子类私有变量
     
     .. py:attribute:: name 名称
@@ -57,15 +56,6 @@ K线数据驱动基类
         
         :param str market: 市场标识
         :param str code: 证券代码
-        :param Query.KType ktype: K线类型
-        
-    .. py:method:: getKRecord(self, market, code, pos, ktype)
-    
-        【重载接口】（必须）获取指定位置的K线记录
-        
-        :param str market: 市场标识
-        :param str code: 证券代码
-        :param int pos: 指定位置（大于等于0）
         :param Query.KType ktype: K线类型
         
     .. py:method:: _getIndexRangeByDate(self, market, code, query)

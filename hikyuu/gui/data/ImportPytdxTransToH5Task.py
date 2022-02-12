@@ -22,9 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
 import sqlite3
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_data, import_trans
+from hikyuu.util import capture_multiprocess_all_logger
+from hikyuu.util.mylog import get_default_logger
 
 
 class ProgressBar:
@@ -32,12 +35,14 @@ class ProgressBar:
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put([self.src.task_name, self.src.market, 'TRANS', (cur+1) * 100 // total, 0])
+        self.src.queue.put([self.src.task_name, self.src.market, 'TRANS', (cur + 1) * 100 // total, 0])
 
 
 class ImportPytdxTransToH5:
-    def __init__(self, queue, sqlitefile, market, quotations, ip, port, dest_dir, max_days):
+    def __init__(self, log_queue, queue, sqlitefile, market, quotations, ip, port, dest_dir, max_days):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_TRANS'
+        self.log_queue = log_queue
         self.queue = queue
         self.sqlitefile = sqlitefile
         self.market = market
@@ -47,19 +52,20 @@ class ImportPytdxTransToH5:
         self.dest_dir = dest_dir
         self.max_days = int(max_days)
 
-
     def __call__(self):
+        capture_multiprocess_all_logger(self.log_queue)
         count = 0
-        connect = sqlite3.connect(self.sqlitefile)
+        connect = sqlite3.connect(self.sqlitefile, timeout=1800)
         try:
-
             progress = ProgressBar(self)
             api = TdxHq_API()
             api.connect(self.ip, self.port)
-            count = import_trans(connect, self.market, self.quotations, api,
-                                 self.dest_dir, max_days=self.max_days, progress=progress)
+            count = import_trans(
+                connect, self.market, self.quotations, api, self.dest_dir, max_days=self.max_days, progress=progress
+            )
+            self.logger.info("导入 {} 分笔记录数: {}".format(self.market, count))
         except Exception as e:
-            print(e)
+            self.logger.error(e)
         finally:
             connect.commit()
             connect.close()

@@ -75,9 +75,46 @@ public:
         return ConnectPtr(p, m_closer);
     }
 
+    /**
+     * 等待并获取连接，如果超出将抛出异常
+     * @param timeout 超时时长（毫秒），如果等于或小于0，则表示不作超时限制
+     * @return 连接指针
+     */
+    ConnectPtr getAndWait(int timeout = 0) {
+        int sleep = 100;
+        int count = 0, max_count = timeout / sleep;
+        ConnectPtr result = getConnect();
+        while (!result) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+            result = getConnect();
+            if (timeout > 0) {
+                HKU_CHECK(count++ < max_count, "Can't get connect, timeout!");
+            }
+        }
+        return result;
+    }
+
     /** 当前活动的连接数 */
     size_t count() const {
         return m_count;
+    }
+
+    /** 当前空闲的资源数 */
+    size_t idleCount() const {
+        return m_connectList.size();
+    }
+
+    /** 释放当前所有的空闲资源 */
+    void releaseIdleConnect() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        while (!m_connectList.empty()) {
+            ConnectType *p = m_connectList.front();
+            m_connectList.pop();
+            m_count--;
+            if (p) {
+                delete p;
+            }
+        }
     }
 
 private:
@@ -89,7 +126,6 @@ private:
                 m_connectList.push(p);
             } else {
                 delete p;
-                p = nullptr;
                 m_count--;
             }
         } else {

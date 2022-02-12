@@ -51,9 +51,7 @@ def __new_Datetime_init__(self, *args, **kwargs):
         d = args[0]
         milliseconds = d.microsecond // 1000
         microseconds = d.microsecond - milliseconds * 1000
-        __old_Datetime_init__(
-            self, d.year, d.month, d.day, d.hour, d.minute, d.second, milliseconds, microseconds
-        )
+        __old_Datetime_init__(self, d.year, d.month, d.day, d.hour, d.minute, d.second, milliseconds, microseconds)
     elif isinstance(args[0], date):
         d = args[0]
         __old_Datetime_init__(self, d.year, d.month, d.day, 0, 0, 0, 0)
@@ -101,9 +99,7 @@ def Datetime_date(self):
 
 def Datetime_datetime(self):
     """转化生成 python 的 datetime"""
-    return datetime(
-        self.year, self.month, self.day, self.hour, self.minute, self.second, self.microsecond
-    )
+    return datetime(self.year, self.month, self.day, self.hour, self.minute, self.second, self.microsecond)
 
 
 Datetime.__init__ = __new_Datetime_init__
@@ -168,9 +164,7 @@ def __new_TimeDelta_add__(self, td):
 
 def __new_TimeDelta_sub__(self, td):
     """可减去TimeDelta, datetime.timedelta"""
-    return __old_TimeDelta_sub__(self, td) if isinstance(td, TimeDelta) else __old_TimeDelta_sub__(
-        self, TimeDelta(td)
-    )
+    return __old_TimeDelta_sub__(self, td) if isinstance(td, TimeDelta) else __old_TimeDelta_sub__(self, TimeDelta(td))
 
 
 def TimeDelta_timedelta(self):
@@ -207,10 +201,10 @@ def KData_getitem(kdata, i):
         return kdata.get(index)
 
     elif isinstance(i, Datetime):
-        return kdata.get_by_date(i)
+        return kdata.get_by_datetime(i)
 
     elif isinstance(i, str):
-        return kdata.get_by_date(Datetime(i))
+        return kdata.get_by_datetime(Datetime(i))
 
     elif isinstance(i, slice):
         return [kdata.get(x) for x in range(*i.indices(len(kdata)))]
@@ -235,9 +229,21 @@ def KData_getPos(kdata, datetime):
     return pos if pos != constant.null_size else None
 
 
+def KData_getPosInStock(kdata, datetime):
+    """
+    获取指定时间对应的原始K线中的索引位置
+
+    :param Datetime datetime: 指定的时间
+    :return: 对应的索引位置，如果不在数据范围内，则返回 None
+    """
+    pos = kdata._getPosInStock(datetime)
+    return pos if pos != constant.null_size else None
+
+
 KData.__getitem__ = KData_getitem
 KData.__iter__ = KData_iter
 KData.get_pos = KData_getPos
+KData.get_pos_in_stock = KData_getPosInStock
 
 # ------------------------------------------------------------------
 # 封装增强其他C++ vector类型的遍历、打印
@@ -346,11 +352,7 @@ try:
                 }
             )
         return np.array(
-            [
-                (k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume)
-                for k in kdata
-            ],
-            dtype=k_type
+            [(k.datetime.datetime(), k.open, k.high, k.low, k.close, k.amount, k.volume) for k in kdata], dtype=k_type
         )
 
     def KData_to_df(kdata):
@@ -384,12 +386,7 @@ try:
 
     def TimeLine_to_np(data):
         """转化为numpy结构数组"""
-        t_type = np.dtype(
-            {
-                'names': ['datetime', 'price', 'vol'],
-                'formats': ['datetime64[ms]', 'd', 'd']
-            }
-        )
+        t_type = np.dtype({'names': ['datetime', 'price', 'vol'], 'formats': ['datetime64[ms]', 'd', 'd']})
         return np.array([(t.date.datetime(), t.price, t.vol) for t in data], dtype=t_type)
 
     def TimeLine_to_df(kdata):
@@ -447,3 +444,17 @@ Parameter.__iter__ = Parameter_iter
 Parameter.keys = Parameter_keys
 Parameter.items = Parameter_items
 Parameter.to_dict = Parameter_to_dict
+
+# ------------------------------------------------------------------
+# 增强 StrategyContext
+# ------------------------------------------------------------------
+__old_StrategyContext_init__ = StrategyContext.__init__
+
+
+def __new_StrategyContext_init__(self, stock_code_list=None):
+    __old_StrategyContext_init__(self)
+    if stock_code_list is not None:
+        self.stock_list = stock_code_list
+
+
+StrategyContext.__init__ = __new_StrategyContext_init__

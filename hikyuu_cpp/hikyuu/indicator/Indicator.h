@@ -10,10 +10,11 @@
 #define INDICATOR_H_
 
 #include "IndicatorImp.h"
+#include "IndParam.h"
 
 namespace hku {
 
-#define IND_EQ_THRESHOLD 0.000001 ///<判断浮点数相等的阈值,两者差值小于此数
+#define IND_EQ_THRESHOLD 0.000001  ///<判断浮点数相等的阈值,两者差值小于此数
 
 /**
  * 指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp
@@ -37,7 +38,7 @@ namespace hku {
  * @ingroup Indicator
  */
 class HKU_API Indicator {
-    HKU_API friend std::ostream & operator<<(std::ostream &, const Indicator&);
+    HKU_API friend std::ostream& operator<<(std::ostream&, const Indicator&);
 
 public:
     Indicator() {}
@@ -49,7 +50,7 @@ public:
 
     /** 使用已有参数计算新值，返回全新的Indicator */
     Indicator operator()(const Indicator& ind);
-    
+
     /** 生成新的克隆，并使用参数 k 作为新实例的上下文 */
     Indicator operator()(const KData& k);
 
@@ -120,10 +121,10 @@ public:
     /** 获取指定日期相应的索引位置 */
     size_t getPos(Datetime) const;
 
-    /** 
-     * 以指标的方式获取指定的结果集 
+    /**
+     * 以指标的方式获取指定的结果集
      * @param num 指定的结果集
-     */    
+     */
     Indicator getResult(size_t num) const;
 
     /**
@@ -139,7 +140,7 @@ public:
 
     bool haveParam(const string& name) const {
         return m_imp ? m_imp->haveParam(name) : false;
-    } 
+    }
 
     template <typename ValueType>
     void setParam(const string& name, const ValueType& value) {
@@ -156,7 +157,16 @@ public:
         return m_imp->getParam<ValueType>(name);
     }
 
-    IndicatorImpPtr getImp() const { return m_imp; }
+    bool supportIndParam() const;
+    bool haveIndParam(const string& name) const;
+    void setIndParam(const string& name, const Indicator& ind);
+    void setIndParam(const string& name, const IndParam& ind);
+    IndParam getIndParam(const string& name) const;
+    const IndicatorImpPtr getIndParamImp(const string& name) const;
+
+    IndicatorImpPtr getImp() const {
+        return m_imp;
+    }
 
 protected:
     IndicatorImpPtr m_imp;
@@ -164,13 +174,12 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version) {
-        ar & BOOST_SERIALIZATION_NVP(m_imp);
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(m_imp);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
 
 inline string Indicator::name() const {
     return m_imp ? m_imp->name() : "IndicatorImp";
@@ -187,7 +196,7 @@ inline string Indicator::long_name() const {
 }
 
 inline size_t Indicator::discard() const {
-    return m_imp ? m_imp->discard() : 0 ;
+    return m_imp ? m_imp->discard() : 0;
 }
 
 inline void Indicator::setDiscard(size_t discard) {
@@ -244,6 +253,33 @@ inline price_t Indicator::operator[](Datetime date) const {
     return getByDate(date);
 }
 
+inline bool Indicator::haveIndParam(const string& name) const {
+    return m_imp ? m_imp->haveIndParam(name) : false;
+}
+
+inline void Indicator::setIndParam(const string& name, const Indicator& ind) {
+    if (m_imp) {
+        m_imp->setIndParam(name, ind);
+    }
+}
+
+inline void Indicator::setIndParam(const string& name, const IndParam& ind) {
+    if (m_imp) {
+        m_imp->setIndParam(name, ind);
+    }
+}
+
+inline IndParam Indicator::getIndParam(const string& name) const {
+    return m_imp ? m_imp->getIndParam(name) : IndParam();
+}
+
+inline const IndicatorImpPtr Indicator::getIndParamImp(const string& name) const {
+    return m_imp ? m_imp->getIndParamImp(name) : IndicatorImpPtr();
+}
+
+inline bool Indicator::supportIndParam() const {
+    return m_imp ? m_imp->supportIndParam() : false;
+}
 
 //--------------------------------------------------------------
 // 指标操作

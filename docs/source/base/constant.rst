@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu
-.. highlightlang:: python
+.. highlight:: python
 
 全局变量与常量定义
 ===================

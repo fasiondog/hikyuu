@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu.indicator
-.. highlightlang:: python
+.. highlight:: python
 
 TA-Lib 包装
 ============

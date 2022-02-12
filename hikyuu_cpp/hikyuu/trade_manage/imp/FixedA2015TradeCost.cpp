@@ -22,10 +22,7 @@ FixedA2015TradeCost::~FixedA2015TradeCost() {}
 CostRecord FixedA2015TradeCost::getBuyCost(const Datetime& datetime, const Stock& stock,
                                            price_t price, double num) const {
     CostRecord result;
-    if (stock.isNull()) {
-        HKU_WARN("Stock is Null!");
-        return result;
-    }
+    HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
 
     int precision = stock.precision();
     price_t value = price * num;
@@ -47,10 +44,7 @@ CostRecord FixedA2015TradeCost::getBuyCost(const Datetime& datetime, const Stock
 CostRecord FixedA2015TradeCost::getSellCost(const Datetime& datetime, const Stock& stock,
                                             price_t price, double num) const {
     CostRecord result;
-    if (stock.isNull()) {
-        HKU_WARN("Stock is NULL!");
-        return result;
-    }
+    HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
 
     int precision = stock.precision();
     price_t value = price * num;

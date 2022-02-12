@@ -10,6 +10,8 @@
 #ifndef HIKYUU_DB_CONNECT_TABLE_MACRO_H
 #define HIKYUU_DB_CONNECT_TABLE_MACRO_H
 
+#include <string>
+#include <sstream>
 #include "DBConnectBase.h"
 #include "SQLStatementBase.h"
 
@@ -17,11 +19,17 @@ namespace hku {
 
 #define TABLE_BIND1(table, f1)                                     \
 private:                                                           \
-    int64_t m_id = 0;                                              \
+    uint64_t m_id = 0;                                             \
                                                                    \
 public:                                                            \
-    int64_t id() const {                                           \
+    uint64_t id() const {                                          \
         return m_id;                                               \
+    }                                                              \
+    void id(uint64_t val) {                                        \
+        m_id = val;                                                \
+    }                                                              \
+    static std::string getTableName() {                            \
+        return #table;                                             \
     }                                                              \
     static const char* getInsertSQL() {                            \
         return "insert into `" #table "` (`" #f1 "`) values (?)";  \
@@ -44,11 +52,17 @@ public:                                                            \
 
 #define TABLE_BIND2(table, f1, f2)                                             \
 private:                                                                       \
-    int64_t m_id = 0;                                                          \
+    uint64_t m_id = 0;                                                         \
                                                                                \
 public:                                                                        \
-    int64_t id() const {                                                       \
+    uint64_t id() const {                                                      \
         return m_id;                                                           \
+    }                                                                          \
+    void id(uint64_t val) {                                                    \
+        m_id = val;                                                            \
+    }                                                                          \
+    static std::string getTableName() {                                        \
+        return #table;                                                         \
     }                                                                          \
     static const char* getInsertSQL() {                                        \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`) values (?,?)";  \
@@ -71,11 +85,17 @@ public:                                                                        \
 
 #define TABLE_BIND3(table, f1, f2, f3)                                                     \
 private:                                                                                   \
-    int64_t m_id = 0;                                                                      \
+    uint64_t m_id = 0;                                                                     \
                                                                                            \
 public:                                                                                    \
-    int64_t id() const {                                                                   \
+    uint64_t id() const {                                                                  \
         return m_id;                                                                       \
+    }                                                                                      \
+    void id(uint64_t val) {                                                                \
+        m_id = val;                                                                        \
+    }                                                                                      \
+    static std::string getTableName() {                                                    \
+        return #table;                                                                     \
     }                                                                                      \
     static const char* getInsertSQL() {                                                    \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`) values (?,?,?)";  \
@@ -98,11 +118,17 @@ public:                                                                         
 
 #define TABLE_BIND4(table, f1, f2, f3, f4)                                              \
 private:                                                                                \
-    int64_t m_id = 0;                                                                   \
+    uint64_t m_id = 0;                                                                  \
                                                                                         \
 public:                                                                                 \
-    int64_t id() const {                                                                \
+    uint64_t id() const {                                                               \
         return m_id;                                                                    \
+    }                                                                                   \
+    void id(uint64_t val) {                                                             \
+        m_id = val;                                                                     \
+    }                                                                                   \
+    static std::string getTableName() {                                                 \
+        return #table;                                                                  \
     }                                                                                   \
     static const char* getInsertSQL() {                                                 \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4          \
@@ -127,11 +153,17 @@ public:                                                                         
 
 #define TABLE_BIND5(table, f1, f2, f3, f4, f5)                                                    \
 private:                                                                                          \
-    int64_t m_id = 0;                                                                             \
+    uint64_t m_id = 0;                                                                            \
                                                                                                   \
 public:                                                                                           \
-    int64_t id() const {                                                                          \
+    uint64_t id() const {                                                                         \
         return m_id;                                                                              \
+    }                                                                                             \
+    void id(uint64_t val) {                                                                       \
+        m_id = val;                                                                               \
+    }                                                                                             \
+    static std::string getTableName() {                                                           \
+        return #table;                                                                            \
     }                                                                                             \
     static const char* getInsertSQL() {                                                           \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5          \
@@ -156,11 +188,17 @@ public:                                                                         
 
 #define TABLE_BIND6(table, f1, f2, f3, f4, f5, f6)                                                 \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -186,11 +224,17 @@ public:                                                                         
 
 #define TABLE_BIND7(table, f1, f2, f3, f4, f5, f6, f7)                                             \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -216,11 +260,17 @@ public:                                                                         
 
 #define TABLE_BIND8(table, f1, f2, f3, f4, f5, f6, f7, f8)                                         \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -246,11 +296,17 @@ public:                                                                         
 
 #define TABLE_BIND9(table, f1, f2, f3, f4, f5, f6, f7, f8, f9)                                     \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -276,11 +332,17 @@ public:                                                                         
 
 #define TABLE_BIND10(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10)                               \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -306,11 +368,17 @@ public:                                                                         
 
 #define TABLE_BIND11(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11)                          \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -338,11 +406,17 @@ public:                                                                         
 
 #define TABLE_BIND12(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12)                     \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -370,11 +444,17 @@ public:                                                                         
 
 #define TABLE_BIND13(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13)                \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -403,11 +483,17 @@ public:                                                                         
 
 #define TABLE_BIND14(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14)           \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -436,11 +522,17 @@ public:                                                                         
 
 #define TABLE_BIND15(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15)      \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -469,11 +561,17 @@ public:                                                                         
 
 #define TABLE_BIND16(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16) \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -505,11 +603,17 @@ public:                                                                         
 #define TABLE_BIND17(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, \
                      f17)                                                                          \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -543,11 +647,17 @@ public:                                                                         
 #define TABLE_BIND18(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, \
                      f17, f18)                                                                     \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -582,11 +692,17 @@ public:                                                                         
 #define TABLE_BIND19(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, \
                      f17, f18, f19)                                                                \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \
@@ -621,11 +737,17 @@ public:                                                                         
 #define TABLE_BIND20(table, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, \
                      f17, f18, f19, f20)                                                           \
 private:                                                                                           \
-    int64_t m_id = 0;                                                                              \
+    uint64_t m_id = 0;                                                                             \
                                                                                                    \
 public:                                                                                            \
-    int64_t id() const {                                                                           \
+    uint64_t id() const {                                                                          \
         return m_id;                                                                               \
+    }                                                                                              \
+    void id(uint64_t val) {                                                                        \
+        m_id = val;                                                                                \
+    }                                                                                              \
+    static std::string getTableName() {                                                            \
+        return #table;                                                                             \
     }                                                                                              \
     static const char* getInsertSQL() {                                                            \
         return "insert into `" #table "` (`" #f1 "`,`" #f2 "`,`" #f3 "`,`" #f4 "`,`" #f5 "`,`" #f6 \

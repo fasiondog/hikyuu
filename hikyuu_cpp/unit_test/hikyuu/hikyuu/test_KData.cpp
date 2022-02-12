@@ -1234,6 +1234,7 @@ TEST_CASE("test_getKData_recover") {
     kdata = stock.getKData(query);
     CHECK_EQ(kdata[2710],
              KRecord(Datetime(201106030000), 10.02, 10.14, 10.0, 10.09, 38726.1, 384820));
+    HKU_INFO("{}", kdata[2710]);
     CHECK_EQ(kdata[2709],
              KRecord(Datetime(201106020000), 10.34, 10.38, 9.93, 10.04, 103909.3, 780543.0));
     CHECK_EQ(kdata[2554],
@@ -1281,7 +1282,7 @@ TEST_CASE("test_getKData_recover") {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_getKRecordByDate") {
+TEST_CASE("test_getKRecord_By_Date") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KQuery query;
@@ -1289,328 +1290,328 @@ TEST_CASE("test_getKRecordByDate") {
     KRecord result;
 
     /** @arg kdata为空 */
-    result = kdata.getKRecordByDate(Datetime(200101010000));
+    result = kdata.getKRecord(Datetime(200101010000));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 日线*/
     query = KQuery(1, 10, KQuery::DAY);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(199911100000));
+    result = kdata.getKRecord(Datetime(199911100000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(199911130000));
+    result = kdata.getKRecord(Datetime(199911130000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(199911240000));
+    result = kdata.getKRecord(Datetime(199911240000));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 周线*/
     query = KQuery(1, 10, KQuery::WEEK);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(199911070000));
+    result = kdata.getKRecord(Datetime(199911070000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(199911080000));
+    result = kdata.getKRecord(Datetime(199911080000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(199101200000));
+    result = kdata.getKRecord(Datetime(199101200000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(199002190000));
+    result = kdata.getKRecord(Datetime(199002190000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(199002250000));
+    result = kdata.getKRecord(Datetime(199002250000));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 月线*/
     query = KQuery(1, 10, KQuery::MONTH);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(199012010000));
+    result = kdata.getKRecord(Datetime(199012010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(199012310000));
+    result = kdata.getKRecord(Datetime(199012310000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(199103020000));
+    result = kdata.getKRecord(Datetime(199103020000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(199109020000));
+    result = kdata.getKRecord(Datetime(199109020000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(199110010000));
+    result = kdata.getKRecord(Datetime(199110010000));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 季线*/
     query = KQuery(1, 10, KQuery::QUARTER);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(199909300000));
+    result = kdata.getKRecord(Datetime(199909300000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(199910010000));
+    result = kdata.getKRecord(Datetime(199910010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200012010000));
+    result = kdata.getKRecord(Datetime(200012010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200204010000));
+    result = kdata.getKRecord(Datetime(200204010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200205010000));
+    result = kdata.getKRecord(Datetime(200205010000));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 半年线*/
     query = KQuery(1, 10, KQuery::HALFYEAR);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(199906300000));
+    result = kdata.getKRecord(Datetime(199906300000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(199907010000));
+    result = kdata.getKRecord(Datetime(199907010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200209010000));
+    result = kdata.getKRecord(Datetime(200209010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200407010000));
+    result = kdata.getKRecord(Datetime(200407010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200408010000));
+    result = kdata.getKRecord(Datetime(200408010000));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 年线*/
     query = KQuery(1, 10, KQuery::YEAR);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(199801010000));
+    result = kdata.getKRecord(Datetime(199801010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(199901010000));
+    result = kdata.getKRecord(Datetime(199901010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200209010000));
+    result = kdata.getKRecord(Datetime(200209010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200901010000));
+    result = kdata.getKRecord(Datetime(200901010000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200901020000));
+    result = kdata.getKRecord(Datetime(200901020000));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 分钟线*/
     query = KQuery(1, 10, KQuery::MIN);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(200001030931));
+    result = kdata.getKRecord(Datetime(200001030931));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001040931));
+    result = kdata.getKRecord(Datetime(200001040931));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200001040941));
+    result = kdata.getKRecord(Datetime(200001040941));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001040942));
+    result = kdata.getKRecord(Datetime(200001040942));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 5分钟线*/
     query = KQuery(1, 10, KQuery::MIN5);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(200001030935));
+    result = kdata.getKRecord(Datetime(200001030935));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001040935));
+    result = kdata.getKRecord(Datetime(200001040935));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200001041011));
+    result = kdata.getKRecord(Datetime(200001041011));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200001041025));
+    result = kdata.getKRecord(Datetime(200001041025));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001041030));
+    result = kdata.getKRecord(Datetime(200001041030));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 15分钟线*/
     query = KQuery(1, 10, KQuery::MIN15);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(200001030945));
+    result = kdata.getKRecord(Datetime(200001030945));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001040945));
+    result = kdata.getKRecord(Datetime(200001040945));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200001041116));
+    result = kdata.getKRecord(Datetime(200001041116));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200001041345));
+    result = kdata.getKRecord(Datetime(200001041345));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001041400));
+    result = kdata.getKRecord(Datetime(200001041400));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 30分钟线*/
     query = KQuery(1, 10, KQuery::MIN30);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(200001031000));
+    result = kdata.getKRecord(Datetime(200001031000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001041000));
+    result = kdata.getKRecord(Datetime(200001041000));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200001041116));
+    result = kdata.getKRecord(Datetime(200001041116));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200001051100));
+    result = kdata.getKRecord(Datetime(200001051100));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001051100));
+    result = kdata.getKRecord(Datetime(200001051100));
     CHECK_EQ(result, Null<KRecord>());
 
     /** @arg 60分钟线*/
     query = KQuery(1, 10, KQuery::MIN60);
     kdata = stock.getKData(query);
-    result = kdata.getKRecordByDate(Datetime(200001031030));
+    result = kdata.getKRecord(Datetime(200001031030));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001041030));
+    result = kdata.getKRecord(Datetime(200001041030));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[0].datetime);
+    result = kdata.getKRecord(kdata[0].datetime);
     CHECK_EQ(result, kdata[0]);
 
-    result = kdata.getKRecordByDate(kdata[1].datetime);
+    result = kdata.getKRecord(kdata[1].datetime);
     CHECK_EQ(result, kdata[1]);
 
-    result = kdata.getKRecordByDate(Datetime(200001041116));
+    result = kdata.getKRecord(Datetime(200001041116));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(kdata[7].datetime);
+    result = kdata.getKRecord(kdata[7].datetime);
     CHECK_EQ(result, kdata[7]);
 
-    result = kdata.getKRecordByDate(kdata[8].datetime);
+    result = kdata.getKRecord(kdata[8].datetime);
     CHECK_EQ(result, kdata[8]);
 
-    result = kdata.getKRecordByDate(Datetime(200001061400));
+    result = kdata.getKRecord(Datetime(200001061400));
     CHECK_EQ(result, Null<KRecord>());
 
-    result = kdata.getKRecordByDate(Datetime(200001061400));
+    result = kdata.getKRecord(Datetime(200001061400));
     CHECK_EQ(result, Null<KRecord>());
 }
 

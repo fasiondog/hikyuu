@@ -1,6 +1,78 @@
 版本发布说明
 ===============
 
+1.2.0
+-------------------------
+
+1. HikyuuTdx 执行导入时自动保存配置，避免第一次使用 hikyuu 必须退出先退出 Hikyuutdx 的问题
+2. 增加创业板 301 开头股票代码
+3. 修复 window 显示缩放时 Hikyuutdx 显示不全的问题
+4. 修复 HHVLLV/LLVBARS/HHVBARS 计算错误
+5. 优化指标重设上下文时的计算，上下文未变化的情况下由指标本身计算标识判断是否重计算
+6. 修复分笔、分时数据转换 to_df 函数无效的问题
+7. HikyuuTdx 导入至 hdf5 时增加数据保护，遇到出错的表直接删除，下次可自动恢复导入
+8. 修复使用通达信的权息数据后复权失效的问题
+9. remove hikyuu_extern_libs submodule, windows下HDF5, mysql改用下载依赖包的方式
+10. 优化 HikyuuTDX GUI控制台日志，捕获子进程日志输出
+
+
+1.1.9
+-------------------------
+
+1. 补充科创板
+2. 完善基础设施，增加MQThreadPool、MQStealThreadPool，优化StealThreadPool
+3. 优化 DbConnect，增加DBCondition
+4. Datetime增加hex()返回兼容oracle的Datetime格式存储
+5. fixed 技术指标 RSI,KDJ 
+6. fixed select function
+7. fixed实时采集数据错误
+8. fixed createdb.sql 上证A股代码表前缀 
+9. 取消编译时指定的AVX指令集，防止不支持的CPU架构
+
+
+1.1.8
+-------------------------
+1. HikyuuTDX 切换mysql导入时错误提示目录不存在
+2. tdx本地导入修复，并支持导入MySQL
+
+
+1.1.7 
+-------------------------
+
+1. 更新examples/notebook相关示例
+2. fixed bugs
+
+
+1.1.6 - 2020年2月5日
+-------------------------
+
+1. 优化 hikyuu.interactive 启动加载速度
+2. 完善 HikyuuTDX 预加载设置参数，可根据机器内存大小自行设置需加载至内存的K线数据，加快 hikyuu 运行速度
+3. HikyuuTDX 支持定时行情采集，定时采集服务运行时，hikyuu.interactive 自动连接采集服务获取最新的 K 线数据
+4. HikyuuTDX 支持定时导入，避免每日手工导入数据的繁琐
+5. hikyuu.interactive 每日0:00定时重新加载内存数据，可24小时运行无需终止
+6. fixed 使用MySQL时无法按日期查询获取K线数据
+
+
+
+1.1.5 - 2020年11月9日
+-------------------------
+
+1. 导入工具修复权息信息导入
+2. 支持 MySQL 作为存储引擎（通过导入工具配置）
+3. 整改 python api 命名，类按大写驼峰，方法和函数统一为小写加下划线
+4. 增加 TimeDelta，方便日期时间计算，如：Datetime(202011090000) + TimeDelta(1)。python中可以使用 datetime.timedelta
+5. Portfolio（资产组合算法）、Allocatefunds（资金分配算法）、Selector（交易对象选择算法）可用
+6. 交易数量从整型改为float，方便支持数字币、外汇等 
+7. 增加策略算法仓库，欢迎大家提交PR贡献公共策略：https://gitee.com/fasiondog/hikyuu_hub
+
+    增加本地仓库：add_local_hub('dev', '/home/fasiondog/workspace/stockhouse')
+    更新参考：update_hub('default')
+    获取指定仓库的策略部件：st = get_part('default.st.fixed_percent')
+
+8. 其他BUG修复与优化
+
+
 1.1.3 - 2019年6月11日
 -------------------------
 
@@ -185,7 +257,7 @@
 ::
 
     #创建模拟交易账户进行回测，初始资金30万
-    my_tm = crtTM(initCash = 300000)
+    my_tm = crtTM(init_cash = 300000)
 
     #可以同时注册多个订单代理，同时实现打印、发送邮件、实盘下单动作
     #TestOerderBroker是测试用订单代理对象，只打印
@@ -201,7 +273,7 @@
 
 ::
 
-    my_tm = crtTM(datetime=Datetime('2017-Jan-01 00:00:00'), initCash=100000, costFunc=TC_Zero(), name='SYS')
+    my_tm = crtTM(datetime=Datetime('2017-Jan-01 00:00:00'), init_cash=100000, costFunc=TC_Zero(), name='SYS')
     td = my_tm.buy(Datetime('2017-Jan-03 00:00:00'), sm['SZ000001'], 9.11, 100, 0, 0, 0, 8)
     td = my_tm.sell(Datetime('2017-Feb-21 00:00:00'),sm['SZ000001'], 9.6, 100, 0, 0, 0, 8)
     
@@ -235,7 +307,7 @@
 ::
 
     #创建模拟交易账户进行回测，初始资金30万
-    my_tm = crtTM(initCash = 300000)
+    my_tm = crtTM(init_cash = 300000)
 
     #注册实盘交易订单代理
     my_tm.regBroker(crtOB(TestOrderBroker())) #TestOerderBroker是测试用订单代理对象，只打印
@@ -244,7 +316,7 @@
     #根据需要修改订单代理最后的时间戳，后续只有大于该时间戳时，订单代理才会实际发出订单指令
     my_tm.brokeLastDatetime=Datetime(201706010000)
 
-    #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越慢线时买入，反之卖出）
+    #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越慢线时买入，反之卖出）
     my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
 
     #固定每次买入1000股

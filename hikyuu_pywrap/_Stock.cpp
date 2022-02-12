@@ -16,12 +16,8 @@ using namespace hku;
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getIndex_overloads, getIndex, 1, 2)
 
-StockWeightList (Stock::*getWeight1)() const = &Stock::getWeight;
-StockWeightList (Stock::*getWeight2)(const Datetime&, const Datetime&) const = &Stock::getWeight;
-
-DatetimeList (Stock::*getDatetimeList1)(size_t, size_t,
-                                        KQuery::KType) const = &Stock::getDatetimeList;
-DatetimeList (Stock::*getDatetimeList2)(const KQuery&) const = &Stock::getDatetimeList;
+KRecord (Stock::*getKRecord1)(size_t pos, KQuery::KType kType) const = &Stock::getKRecord;
+KRecord (Stock::*getKRecord2)(const Datetime&, KQuery::KType kType) const = &Stock::getKRecord;
 
 void export_Stock() {
     class_<Stock>("Stock", "证券对象", init<>())
@@ -104,7 +100,7 @@ void export_Stock() {
     :return: 指定时刻的市值
     :rtype: float)")
 
-      .def("get_krecord", &Stock::getKRecord, (arg("pos"), arg("ktype") = KQuery::DAY),
+      .def("get_krecord", getKRecord1, (arg("pos"), arg("ktype") = KQuery::DAY),
            R"(get_krecord(self, pos[, ktype=Query.DAY])
 
     获取指定索引的K线数据记录，未作越界检查
@@ -114,9 +110,8 @@ void export_Stock() {
     :return: K线记录
     :rtype: KRecord)")
 
-      .def("get_krecord_by_datetime", &Stock::getKRecordByDate,
-           (arg("date"), arg("ktype") = KQuery::DAY),
-           R"(get_krecord_by_datetime(self, datetime[, ktype=Query.DAY])
+      .def("get_krecord", getKRecord2, (arg("date"), arg("ktype") = KQuery::DAY),
+           R"(get_krecord(self, datetime[, ktype=Query.DAY])
 
     根据数据类型（日线/周线等），获取指定时刻的KRecord
 
@@ -135,22 +130,12 @@ void export_Stock() {
     :return: K线记录列表
     :rtype: KRecordList)")
 
-      .def("get_datetime_list", getDatetimeList1)
-      .def("get_datetime_list", getDatetimeList2, R"(get_datetime_list(self, query)
+      .def("get_datetime_list", &Stock::getDatetimeList, R"(get_datetime_list(self, query)
 
     获取日期列表
 
     :param Query query: 查询条件
-    :rtype: DatetimeList
-
-get_date_list(self, start, end, ktype)
-
-    获取日期列表
-
-    :param int start: 起始位置
-    :param ind end: 结束位置
-    :param Query.KType ktype: K线类型
-    :rtype: DatetimeList )")
+    :rtype: DatetimeList)")
 
       .def("get_finance_info", &Stock::getFinanceInfo, R"(get_finance_info(self)
 
@@ -166,14 +151,17 @@ get_date_list(self, start, end, ktype)
     :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
     :rtype: PriceList)")
 
-      .def("realtime_update", &Stock::realtimeUpdate, R"(realtime_update(self, krecord)
+      .def("realtime_update", &Stock::realtimeUpdate, (arg("krecord"), arg("ktype") = KQuery::DAY),
+           R"(realtime_update(self, krecord)
 
-    （临时函数）只用于更新缓存中的日线数据
+    只用于更新缓存中的日线数据
 
-    :param KRecord krecord: 新增的实时K线记录)")
+    :param KRecord krecord: 新增的实时K线记录
+    :param KQuery.KType ktype: K 线类型)")
 
-      .def("get_weight", getWeight1)
-      .def("get_weight", getWeight2, R"(get_weight(self, [start, end])
+      .def("get_weight", &Stock::getWeight,
+           (arg("start") = Datetime::min(), arg("end") = Datetime()),
+           R"(get_weight(self, [start, end])
 
     获取指定时间段[start,end)内的权息信息。未指定起始、结束时刻时，获取全部权息记录。
 

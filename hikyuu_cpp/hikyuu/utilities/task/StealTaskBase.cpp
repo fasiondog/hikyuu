@@ -7,14 +7,13 @@
 
 #include <iostream>
 #include "../../Log.h"
-#include "../exception.h"
 #include "StealTaskBase.h"
 #include "StealTaskRunner.h"
 #include "StealTaskGroup.h"
 
 namespace hku {
 
-StealTaskBase::StealTaskBase() : m_done(false) {}
+StealTaskBase::StealTaskBase() : m_done(false), m_group(nullptr) {}
 
 StealTaskBase::~StealTaskBase() {}
 

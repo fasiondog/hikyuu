@@ -1,5 +1,5 @@
 .. currentmodule:: hikyuu.trade_manage
-.. highlightlang:: python
+.. highlight:: python
 
 基础数据结构
 ============

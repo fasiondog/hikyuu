@@ -25,7 +25,6 @@ class HKU_API StealTaskGroup {
 public:
     /**
      * 构造函数
-     * @param taskCount - 预计的任务总数
      * @param groupSize - 线程数量： 0表示自动选择同CPU数量的线程数
      * @return
      */

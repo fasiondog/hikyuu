@@ -29,7 +29,7 @@ namespace hku {
  */
 class TransAction {
 public:
-    TransAction(const DBConnectPtr& driver) : m_driver(driver) {
+    explicit TransAction(const DBConnectPtr& driver) : m_driver(driver) {
         m_driver->transaction();
     }
 

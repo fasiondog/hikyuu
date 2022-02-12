@@ -19,12 +19,6 @@ public:
     KDataImp(const Stock& stock, const KQuery& query);
     virtual ~KDataImp();
 
-    bool empty();
-
-    size_t size() const {
-        return m_end - m_start;
-    }
-
     KQuery getQuery() const {
         return m_query;
     }
@@ -33,18 +27,34 @@ public:
         return m_stock;
     }
 
+    KRecord getKRecord(size_t pos) const {
+        return m_buffer[pos];
+    }
+
+    bool empty() const {
+        return m_buffer.empty();
+    }
+
+    size_t size() {
+        return m_buffer.size();
+    }
+
     size_t startPos();
     size_t endPos();
     size_t lastPos();
 
-    virtual KRecord getKRecord(size_t pos);
+    size_t getPos(const Datetime& datetime);
 
-    virtual size_t getPos(const Datetime& datetime);
-
-protected:
+private:
     void _getPosInStock();
+    void _recoverForward();
+    void _recoverBackward();
+    void _recoverEqualForward();
+    void _recoverEqualBackward();
+    void _recoverForUpDay();
 
-protected:
+private:
+    KRecordList m_buffer;
     KQuery m_query;
     Stock m_stock;
     size_t m_start;

@@ -13,6 +13,7 @@
 #include "kdata/hdf5/H5KDataDriver.h"
 #include "kdata/mysql/MySQLKDataDriver.h"
 #include "kdata/tdx/TdxKDataDriver.h"
+#include "kdata/cvs/KDataTempCsvDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
@@ -20,7 +21,9 @@ namespace hku {
 
 map<string, BaseInfoDriverPtr>* DataDriverFactory::m_baseInfoDrivers{nullptr};
 map<string, BlockInfoDriverPtr>* DataDriverFactory::m_blockDrivers{nullptr};
-map<string, KDataDriverPtr>* DataDriverFactory::m_kdataDrivers{nullptr};
+map<string, KDataDriverPtr>* DataDriverFactory::m_kdataPrototypeDrivers{nullptr};
+
+map<string, KDataDriverConnectPoolPtr>* DataDriverFactory::m_kdataDriverPools{nullptr};
 
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
@@ -30,21 +33,31 @@ void DataDriverFactory::init() {
     m_blockDrivers = new map<string, BlockInfoDriverPtr>();
     DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
 
-    m_kdataDrivers = new map<string, KDataDriverPtr>();
+    m_kdataPrototypeDrivers = new map<string, KDataDriverPtr>();
+    m_kdataDriverPools = new map<string, KDataDriverConnectPoolPtr>();
+
     DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
+    DataDriverFactory::regKDataDriver(make_shared<KDataTempCsvDriver>());
 }
 
 void DataDriverFactory::release() {
     m_baseInfoDrivers->clear();
     delete m_baseInfoDrivers;
+    m_baseInfoDrivers = nullptr;
 
     m_blockDrivers->clear();
     delete m_blockDrivers;
+    m_blockDrivers = nullptr;
 
-    m_kdataDrivers->clear();
-    delete m_kdataDrivers;
+    m_kdataPrototypeDrivers->clear();
+    delete m_kdataPrototypeDrivers;
+    m_kdataPrototypeDrivers = nullptr;
+
+    m_kdataDriverPools->clear();
+    delete m_kdataDriverPools;
+    m_kdataDriverPools = nullptr;
 }
 
 void DataDriverFactory::regBaseInfoDriver(const BaseInfoDriverPtr& driver) {
@@ -103,23 +116,37 @@ BlockInfoDriverPtr DataDriverFactory::getBlockDriver(const Parameter& params) {
 void DataDriverFactory::regKDataDriver(const KDataDriverPtr& driver) {
     string new_type(driver->name());
     to_upper(new_type);
-    (*m_kdataDrivers)[new_type] = driver;
+    HKU_CHECK(m_kdataDriverPools->find(new_type) == m_kdataDriverPools->end(),
+              "Repeat regKDataDriver!");
+    (*m_kdataPrototypeDrivers)[new_type] = driver;
+    // 不在此创建连接池
+    //(*m_kdataDriverPools)[new_type] = make_shared<KDataDriverPool>();
 }
 
 void DataDriverFactory::removeKDataDriver(const string& name) {
     string new_name(name);
     to_upper(new_name);
-    m_kdataDrivers->erase(new_name);
+    m_kdataPrototypeDrivers->erase(new_name);
+    auto iter = m_kdataDriverPools->find(new_name);
+    if (iter != m_kdataDriverPools->end()) {
+        m_kdataDriverPools->erase(iter);
+    }
 }
 
-KDataDriverPtr DataDriverFactory::getKDataDriver(const Parameter& params) {
-    KDataDriverPtr result;
+KDataDriverConnectPoolPtr DataDriverFactory::getKDataDriverPool(const Parameter& params) {
+    KDataDriverConnectPoolPtr result;
     string name = params.get<string>("type");
     to_upper(name);
-    auto iter = m_kdataDrivers->find(name);
-    if (iter != m_kdataDrivers->end()) {
+    auto iter = m_kdataDriverPools->find(name);
+    if (iter != m_kdataDriverPools->end()) {
         result = iter->second;
-        result->init(params);
+    } else {
+        auto prototype_iter = m_kdataPrototypeDrivers->find(name);
+        HKU_CHECK(prototype_iter != m_kdataPrototypeDrivers->end(), "Unregistered driver：{}",
+                  name);
+        HKU_CHECK(prototype_iter->second->init(params), "Failed init driver: {}", name);
+        (*m_kdataDriverPools)[name] = make_shared<KDataDriverConnectPool>(prototype_iter->second);
+        result = (*m_kdataDriverPools)[name];
     }
     return result;
 }

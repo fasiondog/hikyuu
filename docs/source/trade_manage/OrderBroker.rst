@@ -1,5 +1,5 @@
 .. currentmodule:: hikyuu.trade_manage
-.. highlightlang:: python
+.. highlight:: python
 
 订单代理
 ============
@@ -15,7 +15,7 @@ Python中的订单代理包装
 由于通过从 :py:class:`OrderBrokerBase` 继承实现自定义的订单代理，需要实现 _buy、_sell 两个接口方法。由于在 Python 众多的软件包中，有些软件包已经实现了实盘交易的功能，如 Hikyuu 内建的来自 “睿瞳深邃” 的 `扯线木偶 <https://github.com/Raytone-D/puppet>`_  （感谢“睿瞳深邃”的共享）。这些软件包中的交易类一般都已经实现了 buy、sell 方法，如果从 OrderBrokerBase 继承实现订单代理类，代码显得冗长，使用不方便。所以，在 Python 中，实现了 :py:class:`OrderBrokerWrap` 类和 :py:func:`crtOB` 函数，可以快速包装具有 buy、sell 方法的类生成订单代理。代码示例如下::
 
     #创建模拟交易账户进行回测，初始资金30万
-    my_tm = crtTM(initCash = 300000)
+    my_tm = crtTM(init_cash = 300000)
 
     #注册实盘交易订单代理
     my_tm.regBroker(crtOB(TestOrderBroker())) #TestOerderBroker是测试用订单代理对象，只打印
@@ -25,7 +25,7 @@ Python中的订单代理包装
     #根据需要修改订单代理最后的时间戳，后续只有大于该时间戳时，订单代理才会实际发出订单指令
     my_tm.brokeLastDatetime=Datetime(201706010000)
 
-    #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越慢线时买入，反之卖出）
+    #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越慢线时买入，反之卖出）
     my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
 
     #固定每次买入1000股

@@ -6,6 +6,8 @@
  */
 
 #include <boost/algorithm/string.hpp>
+#include "../StockManager.h"
+#include "../global/GlobalTaskGroup.h"
 #include "BaseInfoDriver.h"
 
 namespace hku {
@@ -50,44 +52,23 @@ bool BaseInfoDriver::checkType() {
 }
 
 bool BaseInfoDriver::init(const Parameter& params) {
-    if (m_params == params)
-        return true;
-
+    HKU_IF_RETURN(m_params == params, true);
     m_params = params;
-    if (!checkType()) {
-        return false;
-    }
+    HKU_IF_RETURN(!checkType(), false);
+    HKU_INFO("Using {} BaseInfoDriver", name());
     return _init();
 }
 
-bool BaseInfoDriver::loadBaseInfo() {
-    if (!checkType()) {
-        return false;
-    }
-
-    HKU_INFO("Loading market information...");
-    if (!_loadMarketInfo()) {
-        HKU_FATAL("Can't load Market Information.");
-        return false;
-    }
-
-    HKU_INFO("Loading stock type information...");
-    if (!_loadStockTypeInfo()) {
-        HKU_FATAL("Can't load StockType Information.");
-        return false;
-    }
-
-    HKU_INFO("Loading stock information...");
-    if (!_loadStock()) {
-        HKU_FATAL("Can't load Stock");
-        return false;
-    }
-
-    return true;
+Parameter BaseInfoDriver::getFinanceInfo(const string& market, const string& code) {
+    HKU_INFO("The getFinanceInfo method has not been implemented! (BaseInfoDriver: {})", m_name);
+    return Parameter();
 }
 
-Parameter BaseInfoDriver ::getFinanceInfo(const string& market, const string& code) {
-    return Parameter();
+StockWeightList BaseInfoDriver::getStockWeightList(const string& market, const string& code,
+                                                   Datetime start, Datetime end) {
+    HKU_INFO("The getStockWeightList method has not been implemented! (BaseInfoDriver: {})",
+             m_name);
+    return StockWeightList();
 }
 
 } /* namespace hku */

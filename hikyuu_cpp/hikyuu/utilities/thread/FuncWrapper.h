@@ -33,7 +33,8 @@ public:
 
     /** 移动构造函数，实现对函数及函数对象等任务包装 */
     template <typename F>
-    FuncWrapper(F&& f) : impl(new impl_type<F>(std::move(f))) {}
+    FuncWrapper(F&& f)  // cppcheck-suppress noExplicitConstructor
+    : impl(new impl_type<F>(std::move(f))) {}
 
     /** 执行被包装的任务 */
     void operator()() {

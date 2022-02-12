@@ -1,0 +1,15 @@
+click
+matplotlib
+pandas>=0.17.1
+pytdx
+PyQt5
+tables
+bokeh
+gitpython
+SQLAlchemy
+mysql-connector-python
+pyperclip
+requests
+qdarkstyle
+flatbuffers
+pynng

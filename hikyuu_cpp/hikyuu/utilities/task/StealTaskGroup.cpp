@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include "../../Log.h"
-#include "../exception.h"
 #include "StealTaskGroup.h"
 
 namespace hku {
@@ -61,15 +60,9 @@ void StealTaskGroup::join() {
     }
 
     // 向主任务队列插入“停止”任务
-    std::vector<StealTaskPtr> stopTaskList;
     for (auto i = 0; i < m_runnerNum; i++) {
         auto stopTask = std::make_shared<StopTask>();
         m_master_queue->push(stopTask);
-    }
-
-    // 等待“停止”任务被执行
-    for (auto& task : stopTaskList) {
-        task->join();
     }
 
     m_done = true;

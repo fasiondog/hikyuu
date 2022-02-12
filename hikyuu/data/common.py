@@ -22,25 +22,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 class MARKET:
     SH = 'SH'
     SZ = 'SZ'
+
 
 class MARKETID:
     SH = 1
     SZ = 2
 
+
 class STOCKTYPE:
     BLOCK = 0  #板块
-    A     = 1  #A股
+    A = 1  #A股
     INDEX = 2  #指数
-    B     = 3  #B股
-    FUND  = 4  #基金（非ETF）
-    ETF   = 5  #ETF
-    ND    = 6  #国债
-    BOND  = 7  #其他债券
-    GEM   = 8  #创业板
-    BTC   = 9  #数字币
+    B = 3  #B股
+    FUND = 4  #基金（非ETF）
+    ETF = 5  #ETF
+    ND = 6  #国债
+    BOND = 7  #其他债券
+    GEM = 8  #创业板
+    START = 9  #科创板
+
 
 def get_stktype_list(quotations=None):
     """
@@ -57,7 +61,7 @@ def get_stktype_list(quotations=None):
     for quotation in quotations:
         new_quotation = quotation.lower()
         if new_quotation == 'stock':
-            result += [STOCKTYPE.A, STOCKTYPE.INDEX, STOCKTYPE.B, STOCKTYPE.GEM]
+            result += [STOCKTYPE.A, STOCKTYPE.INDEX, STOCKTYPE.B, STOCKTYPE.GEM, STOCKTYPE.START]
         elif new_quotation == 'fund':
             result += [STOCKTYPE.FUND, STOCKTYPE.ETF]
         elif new_quotation == 'bond':

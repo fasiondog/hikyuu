@@ -157,9 +157,10 @@ public:
     //不指定stock的方式下run，需要事先通过setStock设定stock
     void run(const KQuery& query, bool reset = true);
     void run(const Stock& stock, const KQuery& query, bool reset = true);
+    void run(const KData& kdata, bool reset = true);
 
     TradeRecord runMoment(const Datetime& datetime);
-    TradeRecord runMoment(const KRecord& record);
+    TradeRecord runMoment(const KRecord& record, const KRecord& src_record);
 
     //清除已有的交易请求，供Portfolio使用
     void clearDelayRequest();
@@ -185,8 +186,8 @@ public:
     double _getSellShortNumber(const Datetime&, price_t price, price_t risk, Part from);
     double _getBuyShortNumber(const Datetime&, price_t price, price_t risk, Part from);
 
-    price_t _getStoplossPrice(const Datetime& datetime, price_t price);
-    price_t _getShortStoplossPrice(const Datetime& datetime, price_t price);
+    price_t _getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
+    price_t _getShortStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
     price_t _getTakeProfitPrice(const Datetime& datetime);
 
@@ -196,32 +197,32 @@ public:
     price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice);
     price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice);
 
-    TradeRecord _buy(const KRecord& today, Part from);
-    TradeRecord _buyNow(const KRecord& today, Part from);
-    TradeRecord _buyDelay(const KRecord& today);
-    void _submitBuyRequest(const KRecord& today, Part from);
+    TradeRecord _buy(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyDelay(const KRecord& today, const KRecord& src_today);
+    void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
 
-    TradeRecord _sell(const KRecord& today, Part from);
-    TradeRecord _sellNow(const KRecord& today, Part from);
-    TradeRecord _sellDelay(const KRecord& today);
-    void _submitSellRequest(const KRecord& today, Part from);
+    TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellDelay(const KRecord& today, const KRecord& src_today);
+    void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from);
 
     // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
-    TradeRecord _sellForce(const KRecord& today, double num, Part from);
+    TradeRecord _sellForce(const KRecord& today, const KRecord& src_today, double num, Part from);
 
-    TradeRecord _sellShort(const KRecord& today, Part from);
-    TradeRecord _sellShortNow(const KRecord& today, Part from);
-    TradeRecord _sellShortDelay(const KRecord& today);
-    void _submitSellShortRequest(const KRecord& today, Part from);
+    TradeRecord _sellShort(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellShortNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sellShortDelay(const KRecord& today, const KRecord& src_today);
+    void _submitSellShortRequest(const KRecord& today, const KRecord& src_today, Part from);
 
-    TradeRecord _buyShort(const KRecord& today, Part from);
-    TradeRecord _buyShortNow(const KRecord& today, Part from);
-    TradeRecord _buyShortDelay(const KRecord& today);
-    void _submitBuyShortRequest(const KRecord& today, Part from);
+    TradeRecord _buyShort(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyShortNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyShortDelay(const KRecord& today, const KRecord& src_today);
+    void _submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from);
 
-    TradeRecord _processRequest(const KRecord& today);
+    TradeRecord _processRequest(const KRecord& today, const KRecord& src_today);
 
-    TradeRecord _runMoment(const KRecord& record);
+    TradeRecord _runMoment(const KRecord& record, const KRecord& src_record);
 
 protected:
     TradeManagerPtr m_tm;
@@ -237,6 +238,7 @@ protected:
     string m_name;
     Stock m_stock;
     KData m_kdata;
+    KData m_src_kdata;  // 未复权的原始 K 线数据
 
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
@@ -385,14 +387,6 @@ inline price_t System ::_getRealBuyPrice(const Datetime& datetime, price_t planP
 
 inline price_t System ::_getRealSellPrice(const Datetime& datetime, price_t planPrice) {
     return m_sp ? m_sp->getRealSellPrice(datetime, planPrice) : planPrice;
-}
-
-inline price_t System ::_getStoplossPrice(const Datetime& datetime, price_t price) {
-    return m_st ? m_st->getPrice(datetime, price) : 0.0;
-}
-
-inline price_t System ::_getShortStoplossPrice(const Datetime& datetime, price_t price) {
-    return m_st ? m_st->getShortPrice(datetime, price) : 0.0;
 }
 
 inline price_t System ::_getTakeProfitPrice(const Datetime& datetime) {

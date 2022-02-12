@@ -18,23 +18,6 @@ namespace hku {
 Indicator HKU_API TIMELINE();
 Indicator HKU_API TIMELINE(const KData&);
 
-Indicator TIMELINEVOL();
-Indicator TIMELINEVOL(const KData&);
-
-inline Indicator TIMELINEVOL() {
-    Indicator ind = TIMELINE();
-    ind.name("TIMELINEVOL");
-    ind.setParam<string>("part", "vol");
-    return ind;
-}
-
-inline Indicator TIMELINEVOL(const KData& k) {
-    Indicator ind = TIMELINE(k);
-    ind.name("TIMELINEVOL");
-    ind.setParam<string>("part", "vol");
-    return ind;
-}
-
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_TIMELINE_H_ */

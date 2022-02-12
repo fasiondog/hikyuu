@@ -22,13 +22,7 @@ IHighLine::IHighLine() : IndicatorImp("HHV", 1) {
 IHighLine::~IHighLine() {}
 
 bool IHighLine::check() {
-    int n = getParam<int>("n");
-    if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void IHighLine::_calculate(const Indicator& ind) {
@@ -76,22 +70,31 @@ void IHighLine::_calculate(const Indicator& ind) {
         if (pre_pos < j) {
             pre_pos = j;
             max = ind[j];
-        }
-        if (ind[i] >= max) {
-            max = ind[i];
-            pre_pos = i;
+            for (size_t j = pre_pos + 1; j <= i; j++) {
+                if (ind[j] >= max) {
+                    max = ind[j];
+                    pre_pos = j;
+                }
+            }
+        } else {
+            if (ind[i] >= max) {
+                max = ind[i];
+                pre_pos = i;
+            }
         }
         _set(max, i);
     }
+}
 
-    startPos = total - n;
-    max = ind[startPos];
-    for (size_t i = startPos; i < total; i++) {
-        if (ind[i] >= max) {
-            max = ind[i];
+void IHighLine::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t max_val = ind[start];
+    for (size_t i = start + 1; i <= curPos; i++) {
+        if (ind[i] > max_val) {
+            max_val = ind[i];
         }
     }
-    _set(max, total - 1);
+    _set(max_val, curPos);
 }
 
 Indicator HKU_API HHV(int n = 20) {
@@ -100,8 +103,10 @@ Indicator HKU_API HHV(int n = 20) {
     return Indicator(p);
 }
 
-Indicator HKU_API HHV(const Indicator& ind, int n = 20) {
-    return HHV(n)(ind);
+Indicator HKU_API HHV(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IHighLine>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */

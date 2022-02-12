@@ -22,18 +22,12 @@ IExist::IExist() : IndicatorImp("EXIST", 1) {
 IExist::~IExist() {}
 
 bool IExist::check() {
-    if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void IExist::_calculate(const Indicator& ind) {
     size_t total = ind.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     int n = getParam<int>("n");
     if (n == 0) {

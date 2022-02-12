@@ -28,6 +28,16 @@ const string KQuery::HOUR6("HOUR5");
 const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
+static vector<string> g_all_ktype{KQuery::MIN,     KQuery::MIN5,     KQuery::MIN15, KQuery::MIN30,
+               KQuery::MIN60,   KQuery::DAY,      KQuery::WEEK,  KQuery::MONTH,
+               KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::MIN3,
+               KQuery::HOUR2,   KQuery::HOUR4,    KQuery::HOUR6, KQuery::HOUR12};
+
+// 获取所有的 KType
+vector<string>& KQuery::getAllKType() {
+    return g_all_ktype;
+}
+
 KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverType)
 : m_start(start == Null<Datetime>() ? (int64_t)start.number()
                                     : (int64_t)(start.number() * 100 + start.second())),
@@ -40,20 +50,14 @@ KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverTyp
 }
 
 Datetime KQuery::startDatetime() const {
-    if (m_queryType != DATE || (uint64_t)m_start == Null<uint64_t>()) {
-        return Null<Datetime>();
-    }
-
+    HKU_IF_RETURN(m_queryType != DATE || (uint64_t)m_start == Null<uint64_t>(), Null<Datetime>());
     uint64_t number = (uint64_t)(m_start / 100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_start - number * 100);
 }
 
 Datetime KQuery::endDatetime() const {
-    if (m_queryType != DATE || (uint64_t)m_end == Null<uint64_t>()) {
-        return Null<Datetime>();
-    }
-
+    HKU_IF_RETURN(m_queryType != DATE || (uint64_t)m_end == Null<uint64_t>(), Null<Datetime>());
     uint64_t number = (uint64_t)(m_end / 100);
     Datetime d(number);
     return Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), m_end - number * 100);
@@ -71,107 +75,23 @@ string KQuery::getQueryTypeName(QueryType queryType) {
 }
 
 KQuery::QueryType KQuery::getQueryTypeEnum(const string& arg) {
-    QueryType result;
     string name(arg);
     to_upper(name);
-    if ("INDEX" == name) {
-        result = INDEX;
-    } else if ("DATE" == name) {
-        result = DATE;
-    } else {
-        result = INVALID;
-    }
-    return result;
+    HKU_IF_RETURN("INDEX" == name, INDEX);
+    HKU_IF_RETURN("DATE" == name, DATE);
+    return INVALID;
 }
 
 string KQuery::getKTypeName(KType dataType) {
     string result(dataType);
     to_upper(result);
     return result;
-    /*switch(dataType) {
-    case MIN:
-        return "MIN";
-    case MIN5:
-        return "MIN5";
-    case MIN15:
-        return "MIN15";
-    case MIN30:
-        return "MIN30";
-    case MIN60:
-        return "MIN60";
-    case DAY:
-        return "DAY";
-    case WEEK:
-        return "WEEK";
-    case MONTH:
-        return "MONTH";
-    case QUARTER:
-        return "QUARTER";
-    case HALFYEAR:
-        return "HALFYEAR";
-    case YEAR:
-        return "YEAR";
-
-    //BTC扩展
-    case MIN3:
-        return "MIN3";
-    case HOUR2:
-        return "HOUR2";
-    case HOUR4:
-        return "HOUR4";
-    case HOUR6:
-        return "HOUR6";
-    case HOUR12:
-        return "HOUR12";
-
-    default:
-        return "INVALID_DATA_TYPE";
-    }*/
 }
 
 KQuery::KType KQuery::getKTypeEnum(const string& arg) {
     string name(arg);
     to_upper(name);
     return name;
-    /* KType result;
-     if ("MIN" == name) {
-         result = MIN;
-     } else if ("MIN5" == name) {
-         result = MIN5;
-     } else if ("MIN15" == name) {
-         result = MIN15;
-     } else if ("MIN30" == name) {
-         result = MIN30;
-     } else if ("MIN60" == name) {
-         result = MIN60;
-     } else if ("DAY" == name) {
-         result = DAY;
-     } else if ("WEEK" == name) {
-         result = WEEK;
-     } else if ("MONTH" == name) {
-         result = MONTH;
-     } else if ("QUARTER" == name) {
-         result = QUARTER;
-     } else if ("HALFYEAR" == name) {
-         result = HALFYEAR;
-     } else if ("YEAR" == name) {
-         result = YEAR;
-
-     //BTC扩展
-     } else if ("MIN3" == name) {
-         result = MIN3;
-     } else if ("HOUR2" == name) {
-         result = HOUR2;
-     } else if ("HOUR4" == name) {
-         result = HOUR4;
-     } else if ("HOUR6" == name) {
-         result = HOUR6;
-     } else if ("HOUR12" == name) {
-         result = HOUR12;
-     } else {
-         result = INVALID_KTYPE;
-     }
-     return result;*/
 }
 
 string KQuery::getRecoverTypeName(RecoverType recoverType) {
@@ -192,23 +112,14 @@ string KQuery::getRecoverTypeName(RecoverType recoverType) {
 }
 
 KQuery::RecoverType KQuery::getRecoverTypeEnum(const string& arg) {
-    RecoverType result;
     string name(arg);
     to_upper(name);
-    if ("NO_RECOVER" == name) {
-        result = NO_RECOVER;
-    } else if ("FORWARD" == name) {
-        result = FORWARD;
-    } else if ("BACKWARD" == name) {
-        result = BACKWARD;
-    } else if ("EQUAL_FORWARD" == name) {
-        result = EQUAL_FORWARD;
-    } else if ("EQUAL_BACKWARD" == name) {
-        result = EQUAL_BACKWARD;
-    } else {
-        result = INVALID_RECOVER_TYPE;
-    }
-    return result;
+    HKU_IF_RETURN("NO_RECOVER" == name, NO_RECOVER);
+    HKU_IF_RETURN("FORWARD" == name, FORWARD);
+    HKU_IF_RETURN("BACKWARD" == name, BACKWARD);
+    HKU_IF_RETURN("EQUAL_FORWARD" == name, EQUAL_FORWARD);
+    HKU_IF_RETURN("EQUAL_BACKWARD" == name, EQUAL_BACKWARD);
+    return INVALID_RECOVER_TYPE;
 }
 
 HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query) {

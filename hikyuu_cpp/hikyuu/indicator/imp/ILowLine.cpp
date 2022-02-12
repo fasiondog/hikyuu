@@ -22,13 +22,7 @@ ILowLine::ILowLine() : IndicatorImp("LLV", 1) {
 ILowLine::~ILowLine() {}
 
 bool ILowLine::check() {
-    int n = getParam<int>("n");
-    if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return haveIndParam("n") || getParam<int>("n") >= 0;
 }
 
 void ILowLine::_calculate(const Indicator& ind) {
@@ -76,22 +70,31 @@ void ILowLine::_calculate(const Indicator& ind) {
         if (pre_pos < j) {
             pre_pos = j;
             min = ind[j];
-        }
-        if (ind[i] <= min) {
-            min = ind[i];
-            pre_pos = i;
+            for (size_t j = pre_pos + 1; j <= i; j++) {
+                if (ind[j] <= min) {
+                    min = ind[j];
+                    pre_pos = j;
+                }
+            }
+        } else {
+            if (ind[i] <= min) {
+                min = ind[i];
+                pre_pos = i;
+            }
         }
         _set(min, i);
     }
+}
 
-    startPos = total - n;
-    min = ind[startPos];
-    for (size_t i = startPos; i < total; i++) {
-        if (ind[i] <= min) {
-            min = ind[i];
+void ILowLine::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t min_val = ind[start];
+    for (size_t i = start + 1; i <= curPos; i++) {
+        if (ind[i] < min_val) {
+            min_val = ind[i];
         }
     }
-    _set(min, total - 1);
+    _set(min_val, curPos);
 }
 
 Indicator HKU_API LLV(int n = 20) {
@@ -100,8 +103,10 @@ Indicator HKU_API LLV(int n = 20) {
     return Indicator(p);
 }
 
-Indicator HKU_API LLV(const Indicator& ind, int n = 20) {
-    return LLV(n)(ind);
+Indicator HKU_API LLV(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<ILowLine>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */

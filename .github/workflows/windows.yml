@@ -1,0 +1,47 @@
+name: win-build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2019]
+    
+    steps:
+    - uses: xmake-io/github-action-setup-xmake@v1
+    - name: checkout
+      run: | 
+        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
+    - name: download_boost
+      run: | 
+        Invoke-WebRequest "https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.zip" -UseBasicParsing -OutFile ./boost_1_75_0.zip
+        Expand-Archive ./boost_1_75_0.zip -DestinationPath ./hikyuu
+        # Copy-Item ./boost_1_75_0 ./hikyuu
+   
+    - name: build_boost_b2
+      shell: cmd
+      run: |
+        cd hikyuu/boost_1_75_0
+        bootstrap.bat --with-python=python3
+
+    - name: build_boost
+      shell: cmd
+      run: |
+        cd hikyuu/boost_1_75_0
+        dir
+        .\b2 release link=static runtime-link=shared address-model=64 -j 4 --with-date_time --with-filesystem --with-system --with-test
+        .\b2 release link=shared runtime-link=shared address-model=64 -j 4 --with-python --with-serialization
+        dir .\stage\lib
+        
+    - name: test
+      shell: cmd
+      run: |
+        set BOOST_ROOT=D:\a\hikyuu\hikyuu\hikyuu\boost_1_75_0
+        set BOOST_LIB=D:\a\hikyuu\hikyuu\hikyuu\boost_1_75_0\stage\lib
+        cd hikyuu
+        xmake f -y
+        xmake -b small-test
+        xmake r small-test

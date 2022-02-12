@@ -22,23 +22,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import logging
 import sqlite3
+import mysql.connector
 
-from hikyuu.data.tdx_to_h5 import tdx_import_data
+from hikyuu.util.mylog import class_logger
+from hikyuu.data.tdx_to_h5 import tdx_import_data as h5_import_data
+from hikyuu.data.tdx_to_mysql import tdx_import_data as mysql_import_data
+from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
+
 
 class ProgressBar:
     def __init__(self, src):
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put([self.src.task_name, self.src.market, self.src.ktype, (cur+1) * 100 // total, 0])
+        self.src.queue.put([self.src.task_name, self.src.market, self.src.ktype, (cur + 1) * 100 // total, 0])
+
 
 class ImportTdxToH5Task:
-    def __init__(self, queue, sqlitefile, market, ktype, quotations, src_dir, dest_dir):
-        super(self.__class__, self).__init__()
+    def __init__(self, log_queue, queue, config, market, ktype, quotations, src_dir, dest_dir):
+        super(ImportTdxToH5Task, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.task_name = 'IMPORT_KDATA'
+        self.log_queue = log_queue
         self.queue = queue
-        self.sqlitefile = sqlitefile
+        self.config = config
         self.market = market.upper()
         self.ktype = ktype.upper()
         self.quotations = quotations
@@ -63,11 +72,35 @@ class ImportTdxToH5Task:
         pass
 
     def __call__(self):
+        capture_multiprocess_all_logger(self.log_queue)
+        use_hdf = False
+        if self.config.getboolean('hdf5', 'enable', fallback=True):
+            sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
+            connect = sqlite3.connect(sqlite_file, timeout=1800)
+            import_data = h5_import_data
+            self.logger.debug('use hdf5 import kdata')
+            use_hdf = True
+        else:
+            db_config = {
+                'user': self.config['mysql']['usr'],
+                'password': self.config['mysql']['pwd'],
+                'host': self.config['mysql']['host'],
+                'port': self.config['mysql']['port']
+            }
+            connect = mysql.connector.connect(**db_config)
+            import_data = mysql_import_data
+            self.logger.debug('use mysql import kdata')
+
         count = 0
         try:
-            connect = sqlite3.connect(self.sqlitefile)
             progress = ProgressBar(self)
-            count = tdx_import_data(connect, self.market, self.ktype, self.quotations, self.src_dir, self.dest_dir, progress)
+            if use_hdf:
+                count = import_data(
+                    connect, self.market, self.ktype, self.quotations, self.src_dir, self.dest_dir, progress
+                )
+            else:
+                count = import_data(connect, self.market, self.ktype, self.quotations, self.src_dir, progress)
+
         except Exception as e:
-            print(e)
+            self.logger.error(e)
         self.queue.put([self.task_name, self.market, self.ktype, None, count])

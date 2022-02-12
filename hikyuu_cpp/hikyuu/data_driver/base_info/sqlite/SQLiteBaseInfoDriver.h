@@ -23,13 +23,17 @@ public:
     virtual ~SQLiteBaseInfoDriver();
 
     virtual bool _init() override;
-    virtual bool _loadMarketInfo() override;
-    virtual bool _loadStockTypeInfo() override;
-    virtual bool _loadStock() override;
-    virtual Parameter getFinanceInfo(const string& market, const string& code) override;
+    virtual vector<MarketInfo> getAllMarketInfo() override;
+    virtual vector<StockTypeInfo> getAllStockTypeInfo() override;
 
-private:
-    StockWeightList _getStockWeightList(uint64_t stockid);
+    virtual Parameter getFinanceInfo(const string& market, const string& code) override;
+    virtual StockWeightList getStockWeightList(const string& market, const string& code,
+                                               Datetime start, Datetime end) override;
+    virtual MarketInfo getMarketInfo(const string& market) override;
+    virtual StockTypeInfo getStockTypeInfo(uint32_t type) override;
+    virtual StockInfo getStockInfo(string market, const string& code) override;
+    virtual vector<StockInfo> getAllStockInfo() override;
+    virtual std::unordered_set<Datetime> getAllHolidays() override;
 
 private:
     //股票基本信息数据库实例

@@ -19,7 +19,11 @@ from configparser import ConfigParser
 
 # 引入 git 前需设置环境变量，否则某些情况下会报错失败
 os.environ['GIT_PYTHON_REFRESH'] = 'quiet'
-import git
+try:
+    import git
+except Exception as e:
+    print(e)
+    print("You need install git! see: https://git-scm.com/downloads")
 
 from hikyuu.util.check import checkif
 from hikyuu.util.singleton import SingletonType
@@ -218,7 +222,7 @@ class HubManager(metaclass=SingletonType):
         try:
             git.Repo.clone_from(url, local_dir, branch=branch)
         except:
-            raise RuntimeError("请检查网络是否正常或链接地址({})是否正确!".format(url))
+            raise RuntimeError("需要安装git（https://git-scm.com/），或检查网络是否正常或链接地址({})是否正确!".format(url))
         print('下载完毕')
 
     @dbsession

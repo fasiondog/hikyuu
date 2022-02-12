@@ -33,13 +33,9 @@ void BoolSignal::_calculate() {
     Indicator kdata = KDATA_PART(m_kdata, kpart);
     Indicator buy = m_bool_buy(kdata);
     Indicator sell = m_bool_sell(kdata);
-    if (buy.size() != sell.size()) {
-        HKU_ERROR("buy.size() != sell.size()");
-        return;
-    }
+    HKU_ERROR_IF_RETURN(buy.size() != sell.size(), void(), "buy.size() != sell.size()");
 
     size_t discard = buy.discard() > sell.discard() ? buy.discard() : sell.discard();
-
     size_t total = buy.size();
     for (size_t i = discard; i < total; ++i) {
         if (buy[i] > 0.0)

@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu.trade_sys
-.. highlightlang:: python
+.. highlight:: python
 
 止损/止赢策略
 =============

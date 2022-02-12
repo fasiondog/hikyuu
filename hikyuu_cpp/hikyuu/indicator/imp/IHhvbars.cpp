@@ -22,11 +22,7 @@ IHhvbars::IHhvbars() : IndicatorImp("HHVBARS", 1) {
 IHhvbars::~IHhvbars() {}
 
 bool IHhvbars::check() {
-    if (getParam<int>("n") < 0) {
-        HKU_ERROR("Invalid param! (n>=0) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void IHhvbars::_calculate(const Indicator& ind) {
@@ -67,29 +63,26 @@ void IHhvbars::_calculate(const Indicator& ind) {
         _set(i - pre_pos, i);
     }
 
-    for (size_t i = start_pos; i < total - 1; i++) {
+    for (size_t i = start_pos; i < total; i++) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
             max = ind[j];
-        }
-        if (ind[i] >= max) {
-            max = ind[i];
-            pre_pos = i;
+            for (size_t j = pre_pos + 1; j <= i; j++) {
+                if (ind[j] >= max) {
+                    max = ind[j];
+                    pre_pos = j;
+                }
+            }
+
+        } else {
+            if (ind[i] >= max) {
+                max = ind[i];
+                pre_pos = i;
+            }
         }
         _set(i - pre_pos, i);
     }
-
-    start_pos = total - n;
-    max = ind[start_pos];
-    pre_pos = start_pos;
-    for (size_t i = start_pos; i < total; i++) {
-        if (ind[i] >= max) {
-            pre_pos = i;
-            max = ind[i];
-        }
-    }
-    _set(total - pre_pos - 1, total - 1);
 }
 
 Indicator HKU_API HHVBARS(int n) {

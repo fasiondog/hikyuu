@@ -259,7 +259,7 @@ int IniParser::getInt(const std::string& section, const std::string& option,
 
     std::string value_str = get(section, option, default_str);
     remain = 0;
-    result = std::stoi(value_str, &remain);
+    result = std::stoi(value_str, &remain);  // cppcheck-suppress redundantAssignment
     if (remain != value_str.size()) {
         throw(std::invalid_argument("This option cannot be converted to an integer! " + value_str));
     }
@@ -292,7 +292,7 @@ float IniParser::getFloat(const std::string& section, const std::string& option,
 
     std::string value_str = get(section, option, default_str);
     remain = 0;
-    result = std::stof(value_str, &remain);
+    result = std::stof(value_str, &remain);  // cppcheck-suppress redundantAssignment
     if (remain != value_str.size()) {
         throw(std::invalid_argument("This option cannot be converted to an float! " + value_str));
     }
@@ -325,7 +325,7 @@ double IniParser::getDouble(const std::string& section, const std::string& optio
 
     std::string value_str = get(section, option, default_str);
     remain = 0;
-    result = std::stod(value_str, &remain);
+    result = std::stod(value_str, &remain);  // cppcheck-suppress redundantAssignment
     if (remain != value_str.size()) {
         throw(std::invalid_argument("This option cannot be converted to an double! " + value_str));
     }

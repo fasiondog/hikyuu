@@ -23,7 +23,7 @@ public:
     enum QueryType {
         INDEX = 0,  ///<按索引方式查询
         DATE = 1,   ///<按日期方式查询
-        INVALID = 3
+        INVALID = 2
     };
 
     ///查询K线类型：日线/周线等
@@ -69,6 +69,9 @@ public:
     static const string HOUR12;
     // static const string INVALID_KTYPE;
 
+    /** 获取所有的 KType */
+    static vector<string>& getAllKType();
+
     /**
      * 复权类型
      * @note 日线以上，如周线/月线不支持复权
@@ -98,7 +101,8 @@ public:
      * @param recoverType 复权类型
      * @param queryType 默认按索引方式查询
      */
-    KQuery(int64_t start, int64_t end = Null<int64_t>(), KType dataType = DAY,
+    KQuery(int64_t start,  // cppcheck-suppress [noExplicitConstructor]
+           int64_t end = Null<int64_t>(), KType dataType = DAY,
            RecoverType recoverType = NO_RECOVER, QueryType queryType = INDEX)
     : m_start(start),
       m_end(end),
@@ -115,7 +119,8 @@ public:
      * @param ktype K线类型
      * @param recoverType 复权类型
      */
-    KQuery(Datetime start, Datetime end = Null<Datetime>(), KType ktype = DAY,
+    KQuery(Datetime start,  // cppcheck-suppress [noExplicitConstructor]
+           Datetime end = Null<Datetime>(), KType ktype = DAY,
            RecoverType recoverType = NO_RECOVER);
 
     /**
@@ -156,6 +161,11 @@ public:
     /** 获取复权类型 */
     RecoverType recoverType() const {
         return m_recoverType;
+    }
+
+    /** 设置复权类型 */
+    void recoverType(RecoverType recoverType) {
+        m_recoverType = recoverType;
     }
 
     /** 获取queryType名称，用于显示输出 */
@@ -236,18 +246,13 @@ bool operator==(const KQuery&, const KQuery&);
 bool operator!=(const KQuery&, const KQuery&);
 
 inline bool operator!=(const KQuery& q1, const KQuery& q2) {
-    if (q1.start() != q2.start() || q1.end() != q2.end() || q1.queryType() != q2.queryType() ||
-        q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType()) {
-        return true;
-    }
-    return false;
+    // cppcheck-suppress [mismatchingContainerExpression]
+    return q1.start() != q2.start() || q1.end() != q2.end() || q1.queryType() != q2.queryType() ||
+           q1.kType() != q2.kType() || q1.recoverType() != q2.recoverType();
 }
 
 inline bool operator==(const KQuery& q1, const KQuery& q2) {
-    if (q1 != q2) {
-        return false;
-    }
-    return true;
+    return !(q1 != q2);
 }
 
 /**

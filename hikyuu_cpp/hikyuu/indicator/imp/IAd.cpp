@@ -29,16 +29,13 @@ bool IAd::check() {
 }
 
 void IAd::_calculate(const Indicator& data) {
-    if (!isLeaf() && !data.empty()) {
-        HKU_WARN("The input is ignored because {} depends on the context!", m_name);
-    }
+    HKU_WARN_IF(!isLeaf() && !data.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
 
     m_discard = 0;
     KData k = getContext();
     size_t total = k.size();
-    if (total == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
 

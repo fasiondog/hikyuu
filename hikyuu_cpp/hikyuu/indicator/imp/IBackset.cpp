@@ -22,11 +22,7 @@ IBackset::IBackset() : IndicatorImp("BACKSET", 1) {
 IBackset::~IBackset() {}
 
 bool IBackset::check() {
-    if (getParam<int>("n") < 1) {
-        HKU_ERROR("Invalid param! (n>=1) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 1;
 }
 
 void IBackset::_calculate(const Indicator& ind) {

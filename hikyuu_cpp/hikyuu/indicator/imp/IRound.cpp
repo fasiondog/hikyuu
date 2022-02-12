@@ -23,11 +23,7 @@ IRound::IRound() : IndicatorImp("ROUND", 1) {
 IRound::~IRound() {}
 
 bool IRound::check() {
-    if (getParam<int>("ndigits") < 0) {
-        HKU_ERROR("Invalid param[ndigits] ! (n >= 0) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("ndigits") >= 0;
 }
 
 void IRound::_calculate(const Indicator& data) {

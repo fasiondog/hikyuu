@@ -1,11 +1,14 @@
 target("hikyuu")
-    if is_mode("debug") then 
+    if is_mode("debug", "coverage", "asan", "msan", "tsan", "lsan") then 
         set_kind("static")
     else
         set_kind("shared")
     end
     
-    add_packages("fmt", "spdlog")
+    add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
+    if is_plat("windows") then 
+        add_packages("sqlite3")
+    end
 
     add_includedirs("..")
 
@@ -28,10 +31,7 @@ target("hikyuu")
     end
     
     if is_plat("windows") then 
-        add_defines("SQLITE_API=__declspec(dllimport)")
         add_defines("HKU_API=__declspec(dllexport)")
-        add_includedirs("../../hikyuu_extern_libs/src/sqlite3")
-        add_deps("sqlite3")
         if is_mode("release") then
             add_packages("hdf5")
         else
@@ -44,7 +44,9 @@ target("hikyuu")
         add_includedirs("/usr/include/hdf5")
         add_includedirs("/usr/include/hdf5/serial")
         if is_arch("x86_64")  then
-            add_linkdirs("/usr/lib64/mysql")
+            if os.exists("/usr/lib64/mysql") then
+                add_linkdirs("/usr/lib64/mysql")
+            end
             add_linkdirs("/usr/lib/x86_64-linux-gnu")
             add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
         end
@@ -55,8 +57,22 @@ target("hikyuu")
         add_links("iconv")
         add_includedirs("/usr/local/opt/hdf5/include")
         add_linkdirs("/usr/local/opt/hdf5/lib")
-        add_includedirs("/usr/local/opt/mysql-client/include")
-        add_linkdirs("/usr/local/opt/mysql-client/lib")
+        if os.exists("/usr/local/opt/mysql-client") then
+            add_includedirs("/usr/local/opt/mysql-client/include")
+            add_linkdirs("/usr/local/opt/mysql-client/lib")
+            add_rpathdirs("/usr/local/opt/mysql-client/lib")
+        end
+        if os.exists("/usr/local/mysql/lib") then
+            add_includedirs("/usr/local/include")
+            add_linkdirs("/usr/local/mysql/lib")
+            add_rpathdirs("/usr/local/mysql/lib")
+        end
+        add_links("mysqlclient")
+    end
+
+    if is_plat("windows") then 
+        -- nng 静态链接需要的系统库
+        add_syslinks("ws2_32", "advapi32")
     end
 
     if is_plat("linux") or is_plat("macosx") then
@@ -82,6 +98,47 @@ You need to specify where the boost headers is via the BOOST_ROOT variable!]])
 
         assert(os.getenv("BOOST_LIB"), [[Missing environment variable: BOOST_LIB
 You need to specify where the boost library is via the BOOST_LIB variable!]])
+    end)
+
+    before_build(function(target)
+        if is_plat("macosx") then
+            if not os.exists("/usr/local/include/mysql") then
+                if os.exists("/usr/local/mysql/include") then
+                    os.run("ln -s /usr/local/mysql/include /usr/local/include/mysql")
+                else
+                    print("Not Found MySQL include dir!")
+                end
+            end
+        end    
+    end)
+
+    after_build(function(target)
+        if is_plat("linux") then
+            os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
+        end
+
+        -- 不同平台的库后缀名
+        local lib_suffix = ".so"
+        if is_plat("windows") then 
+            lib_suffix = ".dll"
+        elseif is_plat("macosx") then
+            lib_suffix = ".dylib"
+        end
+
+        local libdir = get_config("buildir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch") .. "/lib"
+        -- 将依赖的库拷贝至build的输出目录
+        for libname, pkg in pairs(target:pkgs()) do
+            local pkg_path = pkg:get("includedirs")
+            if pkg_path == nil then 
+                pkg_path = pkg:get("sysincludedirs") -- xmake 2.3.9 改为了 sysincludedirs
+            end
+            if pkg_path and type(pkg_path) == "string" then
+                pkg_lib_dir = string.sub(pkg_path, 0, string.len(pkg_path)-7) .. "bin"
+                if pkg_lib_dir then
+                    os.trycp(pkg_lib_dir .. "/*" .. lib_suffix, libdir)
+                end
+            end
+        end
     end)
     
 target_end()

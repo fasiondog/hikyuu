@@ -75,7 +75,7 @@ void SignalBase::reset() {
 DatetimeList SignalBase::getBuySignal() const {
     DatetimeList result;
     result.reserve(m_buySig.size());
-    std::set<Datetime>::const_iterator iter = m_buySig.begin();
+    std::unordered_set<Datetime>::const_iterator iter = m_buySig.begin();
     for (; iter != m_buySig.end(); ++iter) {
         result.push_back(*iter);
     }
@@ -85,7 +85,7 @@ DatetimeList SignalBase::getBuySignal() const {
 DatetimeList SignalBase::getSellSignal() const {
     DatetimeList result;
     result.reserve(m_sellSig.size());
-    std::set<Datetime>::const_iterator iter = m_sellSig.begin();
+    std::unordered_set<Datetime>::const_iterator iter = m_sellSig.begin();
     for (; iter != m_sellSig.end(); ++iter) {
         result.push_back(*iter);
     }
@@ -112,6 +112,18 @@ void SignalBase::_addSellSignal(const Datetime& datetime) {
             m_hold = false;
         }
     }
+}
+
+bool SignalBase::nextTimeShouldBuy() const {
+    size_t total = m_kdata.size();
+    HKU_IF_RETURN(total == 0, false);
+    return shouldBuy(m_kdata[total - 1].datetime);
+}
+
+bool SignalBase::nextTimeShouldSell() const {
+    size_t total = m_kdata.size();
+    HKU_IF_RETURN(total == 0, false);
+    return shouldSell(m_kdata[total - 1].datetime);
 }
 
 } /* namespace hku */

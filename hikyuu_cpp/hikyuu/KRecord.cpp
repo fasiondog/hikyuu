@@ -22,15 +22,12 @@ HKU_API std::ostream& operator<<(std::ostream& os, const KRecord& record) {
 }
 
 bool HKU_API operator==(const KRecord& d1, const KRecord& d2) {
-    if (d1.datetime == d2.datetime && (std::fabs(d1.openPrice - d2.openPrice) < 0.0001) &&
-        (std::fabs(d1.highPrice - d2.highPrice) < 0.0001) &&
-        (std::fabs(d1.lowPrice - d2.lowPrice) < 0.0001) &&
-        (std::fabs(d1.closePrice - d2.closePrice) < 0.0001) &&
-        (std::fabs(d1.transAmount - d2.transAmount) < 0.0001) &&
-        (std::fabs(d1.transCount - d2.transCount) < 0.0001)) {
-        return true;
-    }
-    return false;
+    return (d1.datetime == d2.datetime && (std::fabs(d1.openPrice - d2.openPrice) < 0.0001) &&
+            (std::fabs(d1.highPrice - d2.highPrice) < 0.0001) &&
+            (std::fabs(d1.lowPrice - d2.lowPrice) < 0.0001) &&
+            (std::fabs(d1.closePrice - d2.closePrice) < 0.0001) &&
+            (std::fabs(d1.transAmount - d2.transAmount) < 0.0001) &&
+            (std::fabs(d1.transCount - d2.transCount) < 0.0001));
 }
 
 }  // namespace hku

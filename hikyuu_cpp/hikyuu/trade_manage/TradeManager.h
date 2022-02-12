@@ -9,7 +9,7 @@
 #ifndef TRADEMANAGER_H_
 #define TRADEMANAGER_H_
 
-#include <boost/tuple/tuple.hpp>
+#include "TradeManagerBase.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/util.h"
 #include "TradeRecord.h"
@@ -29,7 +29,7 @@
 namespace hku {
 
 /**
- * 账户交易管理模块，管理帐户的交易记录及资金使用情况
+ * 回测模拟账户交易管理模块，管理帐户的交易记录及资金使用情况
  * @details
  * <pre>
  * 默认参数：
@@ -40,8 +40,8 @@ namespace hku {
  * </pre>
  * @ingroup TradeManagerClass
  */
-class HKU_API TradeManager {
-    PARAMETER_SUPPORT
+class HKU_API TradeManager : public TradeManagerBase {
+    // PARAMETER_SUPPORT
 
 public:
     TradeManager(const Datetime& datetime = Datetime(199001010000LL), price_t initcash = 100000.0,
@@ -49,91 +49,40 @@ public:
     virtual ~TradeManager();
 
     /** 复位，清空交易、持仓记录 */
-    void reset();
+    virtual void _reset() override;
 
-    /**
-     * 注册订单代理
-     * @param broker 订单代理实例
-     */
-    void regBroker(const OrderBrokerPtr& broker);
-
-    /**
-     * 清空已注册的订单代理
-     */
-    void clearBroker();
-
-    /** 从哪个时刻开始启动订单代理进行下单操作   */
-    Datetime getBrokerLastDatetime() const {
-        return m_broker_last_datetime;
-    }
-
-    /** 设置开始订单代理操作的时刻 */
-    void setBrokerLastDatetime(const Datetime& date) {
-        m_broker_last_datetime = date;
-    }
-
-    shared_ptr<TradeManager> clone();
+    virtual shared_ptr<TradeManagerBase> _clone() override;
 
     /**
      * 获取指定对象的保证金比率
      * @param datetime 日期
      * @param stock 指定对象
      */
-    double getMarginRate(const Datetime& datetime, const Stock& stock);
-
-    /** 账户名称 */
-    string name() const {
-        return m_name;
-    }
-
-    /** 设置账户名称 */
-    void name(const string& name) {
-        m_name = name;
-    }
+    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override;
 
     /** 初始资金 */
-    price_t initCash() const {
+    virtual price_t initCash() const override {
         return m_init_cash;
     }
 
     /** 账户建立日期 */
-    Datetime initDatetime() const {
+    virtual Datetime initDatetime() const override {
         return m_init_datetime;
     }
 
     /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
-    Datetime firstDatetime() const;
+    virtual Datetime firstDatetime() const override;
 
     /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
-    Datetime lastDatetime() const {
+    virtual Datetime lastDatetime() const override {
         return m_trade_list.empty() ? m_init_datetime : m_trade_list.back().datetime;
-    }
-
-    /** 红利/股息/送股再投资标志，即是否忽略权息信息 **/
-    bool reinvest() const {
-        return getParam<bool>("reinvest");
-    }
-
-    /** 交易精度 */
-    int precision() const {
-        return getParam<int>("precision");
-    }
-
-    /** 获取交易算法指针 */
-    TradeCostPtr costFunc() const {
-        return m_costfunc;
-    }
-
-    /** 设置交易算法指针 */
-    void costFunc(const TradeCostPtr& func) {
-        m_costfunc = func;
     }
 
     /**
      * 返回当前现金
      * @note 仅返回当前信息，不会根据权息进行调整
      */
-    price_t currentCash() const {
+    virtual price_t currentCash() const override {
         return m_cash;
     }
 
@@ -141,7 +90,7 @@ public:
      * 获取指定日期的现金
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
-    price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY);
+    virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override;
 
     /**
      * 当前是否持有指定的证券
@@ -149,7 +98,7 @@ public:
      * @param stock 指定证券
      * @return true 是 | false 否
      */
-    bool have(const Stock& stock) const {
+    virtual bool have(const Stock& stock) const override {
         return m_position.count(stock.id()) ? true : false;
     }
 
@@ -159,34 +108,34 @@ public:
      * @param stock 指定证券
      * @return true 是 | false 否
      */
-    bool haveShort(const Stock& stock) const {
+    virtual bool haveShort(const Stock& stock) const override {
         return m_short_position.count(stock.id()) ? true : false;
     }
 
     /** 当前持有的证券种类数量 */
-    size_t getStockNumber() const {
+    virtual size_t getStockNumber() const override {
         return m_position.size();
     }
 
     /** 当前空头持有的证券种类数量 */
-    size_t getShortStockNumber() const {
+    virtual size_t getShortStockNumber() const override {
         return m_short_position.size();
     }
 
     /** 获取指定时刻的某证券持有数量 */
-    double getHoldNumber(const Datetime& datetime, const Stock& stock);
+    virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) override;
 
     /** 获取指定时刻的空头某证券持有数量 */
-    double getShortHoldNumber(const Datetime& datetime, const Stock& stock);
+    virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) override;
 
     /** 获取指定时刻已借入的股票数量 */
-    double getDebtNumber(const Datetime& datetime, const Stock& stock);
+    virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) override;
 
     /** 获取指定时刻已借入的现金额 */
-    price_t getDebtCash(const Datetime& datetime);
+    virtual price_t getDebtCash(const Datetime& datetime) override;
 
     /** 获取全部交易记录 */
-    const TradeRecordList& getTradeList() const {
+    virtual TradeRecordList getTradeList() const override {
         return m_trade_list;
     }
 
@@ -196,107 +145,32 @@ public:
      * @param end 结束日期
      * @return 交易记录列表
      */
-    TradeRecordList getTradeList(const Datetime& start, const Datetime& end) const;
+    virtual TradeRecordList getTradeList(const Datetime& start, const Datetime& end) const override;
 
     /** 获取当前全部持仓记录 */
-    PositionRecordList getPositionList() const;
+    virtual PositionRecordList getPositionList() const override;
 
     /** 获取全部历史持仓记录，即已平仓记录 */
-    const PositionRecordList& getHistoryPositionList() const {
+    virtual PositionRecordList getHistoryPositionList() const override {
         return m_position_history;
     }
 
     /** 获取当前全部空头仓位记录 */
-    PositionRecordList getShortPositionList() const;
+    virtual PositionRecordList getShortPositionList() const override;
 
     /** 获取全部空头历史仓位记录 */
-    const PositionRecordList& getShortHistoryPositionList() const {
+    virtual PositionRecordList getShortHistoryPositionList() const override {
         return m_short_position_history;
     }
 
     /** 获取指定证券的当前持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    PositionRecord getPosition(const Stock&) const;
+    virtual PositionRecord getPosition(const Stock&) const override;
 
     /** 获取指定证券的当前空头仓位持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    PositionRecord getShortPosition(const Stock&) const;
+    virtual PositionRecord getShortPosition(const Stock&) const override;
 
     /** 获取当前借入的股票列表 */
-    BorrowRecordList getBorrowStockList() const;
-
-    /**
-     * 计算买入成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 买入价格
-     * @param num 买入数量
-     * @return CostRecord 交易成本记录
-     */
-    CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                          double num) const {
-        return m_costfunc ? m_costfunc->getBuyCost(datetime, stock, price, num) : CostRecord();
-    }
-
-    /**
-     * 计算卖出成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 卖出价格
-     * @param num 卖出数量
-     * @return CostRecord 交易成本记录
-     */
-    CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                           double num) const {
-        return m_costfunc ? m_costfunc->getSellCost(datetime, stock, price, num) : CostRecord();
-    }
-
-    /**
-     * 计算计入现金时的费用成本
-     * @param datetime 借入日期
-     * @param cash 现金额
-     */
-    CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) {
-        return m_costfunc ? m_costfunc->getBorrowCashCost(datetime, cash) : CostRecord();
-    }
-
-    /**
-     * 计算归还融资成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param cash 归还金额
-     */
-    CostRecord getReturnCashCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
-                                 price_t cash) {
-        return m_costfunc ? m_costfunc->getReturnCashCost(borrow_datetime, return_datetime, cash)
-                          : CostRecord();
-    }
-
-    /**
-     * 计算融劵借入成本
-     * @param datetime 融劵日期
-     * @param stock 借入的对象
-     * @param price 每股价格
-     * @param num 借入的数量
-     */
-    CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  double num) {
-        return m_costfunc ? m_costfunc->getBorrowStockCost(datetime, stock, price, num)
-                          : CostRecord();
-    }
-
-    /**
-     * 计算融劵归还成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param stock 归还的对象
-     * @param price 归还时每股价格
-     * @param num 归还的数量
-     */
-    CostRecord getReturnStockCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
-                                  const Stock& stock, price_t price, double num) {
-        return m_costfunc ? m_costfunc->getReturnStockCost(borrow_datetime, return_datetime, stock,
-                                                           price, num)
-                          : CostRecord();
-    }
+    virtual BorrowRecordList getBorrowStockList() const override;
 
     /**
      * 存入资金
@@ -304,7 +178,7 @@ public:
      * @param cash 存入的资金量
      * @return true | false
      */
-    bool checkin(const Datetime& datetime, price_t cash);
+    virtual bool checkin(const Datetime& datetime, price_t cash) override;
 
     /**
      * 取出资金
@@ -312,7 +186,7 @@ public:
      * @param cash 取出的资金量
      * @return true | false
      */
-    bool checkout(const Datetime& datetime, price_t cash);
+    virtual bool checkout(const Datetime& datetime, price_t cash) override;
 
     /**
      * 存入资产
@@ -322,7 +196,8 @@ public:
      * @param number 存入股票的数量
      * @return true | false
      */
-    bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
+    virtual bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
+                              double number) override;
 
     /**
      * 取出当前资产
@@ -333,7 +208,8 @@ public:
      * @return true | false
      * @note 应该不会被用到
      */
-    bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
+    virtual bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
+                               double number) override;
 
     /**
      * 买入操作
@@ -347,9 +223,9 @@ public:
      * @param from 记录是哪个系统部件发出的买入指示
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
-    TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice, double number,
-                    price_t stoploss = 0.0, price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                    SystemPart from = PART_INVALID);
+    virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                            double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
+                            price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
 
     /**
      * 卖出操作
@@ -363,9 +239,10 @@ public:
      * @param from 记录是哪个系统部件发出的卖出指示
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
-    TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                     double number = MAX_DOUBLE, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                     price_t planPrice = 0.0, SystemPart from = PART_INVALID);
+    virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                             double number = MAX_DOUBLE, price_t stoploss = 0.0,
+                             price_t goalPrice = 0.0, price_t planPrice = 0.0,
+                             SystemPart from = PART_INVALID) override;
 
     /**
      * 卖空
@@ -379,9 +256,9 @@ public:
      * @param from 记录是哪个系统部件发出的买入指示
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
-    TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                          double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                          price_t planPrice = 0.0, SystemPart from = PART_INVALID);
+    virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                                  double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
+                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
 
     /**
      * 卖空后回补
@@ -395,10 +272,10 @@ public:
      * @param from 记录是哪个系统部件发出的卖出指示
      * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
      */
-    TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                         double number = MAX_DOUBLE, price_t stoploss = 0.0,
-                         price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                         SystemPart from = PART_INVALID);
+    virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
+                                 double number = MAX_DOUBLE, price_t stoploss = 0.0,
+                                 price_t goalPrice = 0.0, price_t planPrice = 0.0,
+                                 SystemPart from = PART_INVALID) override;
 
     /**
      * 借入资金，从其他来源借取的资金，如融资
@@ -406,7 +283,7 @@ public:
      * @param cash 借入的现金
      * @return true | false
      */
-    bool borrowCash(const Datetime& datetime, price_t cash);
+    virtual bool borrowCash(const Datetime& datetime, price_t cash) override;
 
     /**
      * 归还资金
@@ -414,7 +291,7 @@ public:
      * @param cash 归还现金
      * @return true | false
      */
-    bool returnCash(const Datetime& datetime, price_t cash);
+    virtual bool returnCash(const Datetime& datetime, price_t cash) override;
 
     /**
      * 借入证券
@@ -424,7 +301,8 @@ public:
      * @param number 借入时数量
      * @return true | false
      */
-    bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
+    virtual bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
+                             double number) override;
 
     /**
      * 归还证券
@@ -434,14 +312,15 @@ public:
      * @param number 归还数量
      * @return true | false
      */
-    bool returnStock(const Datetime& datetime, const Stock& stock, price_t price, double number);
+    virtual bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
+                             double number) override;
 
     /**
      * 获取账户当前时刻的资产详情
      * @param ktype 日期的类型
      * @return 资产详情
      */
-    FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const;
+    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override;
 
     /**
      * 获取指定时刻的资产市值详情
@@ -450,7 +329,8 @@ public:
      * @return 资产详情
      * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
      */
-    FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY);
+    virtual FundsRecord getFunds(const Datetime& datetime,
+                                 KQuery::KType ktype = KQuery::DAY) override;
 
     /**
      * 获取资产净值曲线，含借入的资产
@@ -458,13 +338,14 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 资产净值列表
      */
-    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
+    virtual PriceList getFundsCurve(const DatetimeList& dates,
+                                    KQuery::KType ktype = KQuery::DAY) override;
 
     /**
      * 获取从账户建立日期到系统当前日期的资产净值曲线（按自然日），含借入的资产
      * @return 资产净值列表
      */
-    PriceList getFundsCurve();
+    virtual PriceList getFundsCurve() override;
 
     /**
      * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
@@ -472,13 +353,14 @@ public:
      * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
      * @return 收益曲线
      */
-    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
+    virtual PriceList getProfitCurve(const DatetimeList& dates,
+                                     KQuery::KType ktype = KQuery::DAY) override;
 
     /**
      * 获取获取从账户建立日期到系统当前日期的收益曲线，即扣除历次存入资金后的资产净值曲线
      * @return 收益曲线
      */
-    PriceList getProfitCurve();
+    virtual PriceList getProfitCurve() override;
 
     /**
      * 直接加入交易记录
@@ -486,16 +368,16 @@ public:
      * @param tr 待加入的交易记录
      * @return bool true 成功 | false 失败
      */
-    bool addTradeRecord(const TradeRecord& tr);
+    virtual bool addTradeRecord(const TradeRecord& tr) override;
 
     /** 字符串输出 */
-    string toString() const;
+    virtual string str() const override;
 
     /**
      * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
      * @param path 输出文件所在目录
      */
-    void tocsv(const string& path);
+    virtual void tocsv(const string& path) override;
 
 private:
     //根据权息信息，更新交易记录及持仓
@@ -521,10 +403,8 @@ private:
     bool _add_buy_short_tr(const TradeRecord&);
 
 private:
-    string m_name;             //账户名称
     Datetime m_init_datetime;  //账户建立日期
     price_t m_init_cash;       //初始资金
-    TradeCostPtr m_costfunc;   //成本算法
 
     price_t m_cash;            //当前现金
     price_t m_checkin_cash;    //累计存入资金，初始资金视为存入
@@ -546,8 +426,8 @@ private:
     position_map_type m_short_position;           //空头仓位记录
     PositionRecordList m_short_position_history;  //空头仓位历史记录
 
-    list<OrderBrokerPtr> m_broker_list;  //订单代理列表
-    Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
+    // list<OrderBrokerPtr> m_broker_list;  //订单代理列表
+    // Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
 
     list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易
 
@@ -559,11 +439,9 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        ar& BOOST_SERIALIZATION_NVP(m_name);
-        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(TradeManagerBase);
         ar& BOOST_SERIALIZATION_NVP(m_init_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_init_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_costfunc);
         ar& BOOST_SERIALIZATION_NVP(m_cash);
         ar& BOOST_SERIALIZATION_NVP(m_checkin_cash);
         ar& BOOST_SERIALIZATION_NVP(m_checkout_cash);
@@ -586,11 +464,9 @@ private:
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_NVP(m_name);
-        ar& BOOST_SERIALIZATION_NVP(m_params);
+        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(TradeManagerBase);
         ar& BOOST_SERIALIZATION_NVP(m_init_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_init_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_costfunc);
         ar& BOOST_SERIALIZATION_NVP(m_cash);
         ar& BOOST_SERIALIZATION_NVP(m_checkin_cash);
         ar& BOOST_SERIALIZATION_NVP(m_checkout_cash);
@@ -627,16 +503,6 @@ private:
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
-
-/**
- * 客户程序应使用此类型进行实际操作
- * @ingroup TradeManagerClass
- */
-typedef shared_ptr<TradeManager> TradeManagerPtr;
-typedef shared_ptr<TradeManager> TMPtr;
-
-HKU_API std::ostream& operator<<(std::ostream&, const TradeManager&);
-HKU_API std::ostream& operator<<(std::ostream&, const TradeManagerPtr&);
 
 } /* namespace hku */
 #endif /* TRADEMANAGER_H_ */

@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu
-.. highlightlang:: python
+.. highlight:: python
 
 基础数据类型
 ============
@@ -403,7 +403,14 @@ K线数据
         
         :param Datetime datetime: 指定的时间
         :return: 对应的索引位置，如果不在数据范围内，则返回 None    
-    
+
+    .. py:method:: get_pos_in_stock(datetime)
+
+        获取指定时间对应原始 K 线中的索引位置
+        
+        :param Datetime datetime: 指定的时间
+        :return: 对应的索引位置，如果不在数据范围内，则返回 None    
+
     .. py:method:: empty()
     
         判断是否为空

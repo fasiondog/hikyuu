@@ -17,64 +17,7 @@
 
 namespace hku {
 
-HKU_API std::ostream& operator<<(std::ostream& os, const TradeManager& tm) {
-    os << std::fixed;
-    os.precision(4);
-
-    FundsRecord funds = tm.getFunds();
-    string strip(",\n");
-    os << "TradeManager {\n"
-       << "  params: " << tm.getParameter() << strip << "  name: " << tm.name() << strip
-       << "  init_date: " << tm.initDatetime() << strip << "  init_cash: " << tm.initCash() << strip
-       << "  firstDatetime: " << tm.firstDatetime() << strip
-       << "  lastDatetime: " << tm.lastDatetime() << strip
-       << "  brokeLastDatetime: " << tm.getBrokerLastDatetime() << strip
-       << "  TradeCostFunc: " << tm.costFunc() << strip << "  current cash: " << tm.currentCash()
-       << strip << "  current market_value: " << funds.market_value << strip
-       << "  current short_market_value: " << funds.short_market_value << strip
-       << "  current base_cash: " << funds.base_cash << strip
-       << "  current base_asset: " << funds.base_asset << strip
-       << "  current borrow_cash: " << funds.borrow_cash << strip
-       << "  current borrow_asset: " << funds.borrow_asset << strip << "  Position: \n";
-
-    PositionRecordList position = tm.getPositionList();
-    PositionRecordList::const_iterator iter = position.begin();
-    for (; iter != position.end(); ++iter) {
-        os << "    " << iter->number << " " << iter->stock << "\n";
-    }
-
-    os << "  Short Position: \n";
-    position = tm.getShortPositionList();
-    iter = position.begin();
-    for (; iter != position.end(); ++iter) {
-        os << "    " << iter->number << " " << iter->stock << "\n";
-    }
-
-    os << "  Borrow Stock: \n";
-    BorrowRecordList borrow = tm.getBorrowStockList();
-    BorrowRecordList::const_iterator bor_iter = borrow.begin();
-    for (; bor_iter != borrow.end(); ++bor_iter) {
-        os << "    " << bor_iter->number << " " << bor_iter->value << " " << bor_iter->stock
-           << "\n";
-    }
-
-    os << "}";
-
-    os.unsetf(std::ostream::floatfield);
-    os.precision();
-    return os;
-}
-
-HKU_API std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
-    if (ptm) {
-        os << *ptm;
-    } else {
-        os << "TradeManager(NULL)";
-    }
-    return os;
-}
-
-string TradeManager::toString() const {
+string TradeManager::str() const {
     std::stringstream os;
     os << std::fixed;
     os.precision(2);
@@ -134,15 +77,13 @@ string TradeManager::toString() const {
 
 TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const TradeCostPtr& costfunc,
                            const string& name)
-: m_name(name),
+: TradeManagerBase(name, costfunc),
   m_init_datetime(datetime),
-  m_costfunc(costfunc),
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
   m_checkout_stock(0.0),
   m_borrow_cash(0.0) {
     setParam<bool>("reinvest", false);              //红利是否再投资
-    setParam<int>("precision", 2);                  //计算精度
     setParam<bool>("support_borrow_cash", false);   //是否自动融资
     setParam<bool>("support_borrow_stock", false);  //是否自动融券
     setParam<bool>("save_action", true);            //是否保存命令
@@ -158,7 +99,7 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
 
 TradeManager::~TradeManager() {}
 
-void TradeManager::reset() {
+void TradeManager::_reset() {
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
     m_checkout_cash = 0.0;
@@ -182,7 +123,7 @@ void TradeManager::reset() {
     _saveAction(m_trade_list.back());
 }
 
-TradeManagerPtr TradeManager::clone() {
+TradeManagerPtr TradeManager::_clone() {
     TradeManager* p = new TradeManager(m_init_datetime, m_init_cash, m_costfunc, m_name);
     p->m_params = m_params;
     p->m_name = m_name;
@@ -211,14 +152,6 @@ TradeManagerPtr TradeManager::clone() {
     return TradeManagerPtr(p);
 }
 
-void TradeManager::regBroker(const OrderBrokerPtr& broker) {
-    m_broker_list.push_back(broker);
-}
-
-void TradeManager::clearBroker() {
-    m_broker_list.clear();
-}
-
 double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock) {
     // TODO 获取保证金比率，默认固定取60%
     return 0.6;
@@ -238,9 +171,7 @@ Datetime TradeManager::firstDatetime() const {
 
 double TradeManager ::getHoldNumber(const Datetime& datetime, const Stock& stock) {
     //日期小于账户建立日期，返回0
-    if (datetime < m_init_datetime) {
-        return 0.0;
-    }
+    HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
     //根据权息信息调整持仓数量
     _update(datetime);
@@ -282,9 +213,7 @@ double TradeManager ::getHoldNumber(const Datetime& datetime, const Stock& stock
 
 double TradeManager ::getShortHoldNumber(const Datetime& datetime, const Stock& stock) {
     //日期小于账户建立日期，返回0
-    if (datetime < m_init_datetime) {
-        return 0;
-    }
+    HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
     //根据权息信息调整持仓数量
     _update(datetime);
@@ -323,9 +252,7 @@ double TradeManager ::getShortHoldNumber(const Datetime& datetime, const Stock& 
 }
 
 double TradeManager ::getDebtNumber(const Datetime& datetime, const Stock& stock) {
-    if (datetime < m_init_datetime) {
-        return 0;
-    }
+    HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
     //根据权息信息调整持仓数量
     _update(datetime);
@@ -357,16 +284,12 @@ double TradeManager ::getDebtNumber(const Datetime& datetime, const Stock& stock
 }
 
 price_t TradeManager::getDebtCash(const Datetime& datetime) {
-    if (datetime < m_init_datetime) {
-        return 0.0;
-    }
+    HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
     //根据权息信息调整持仓数量
     _update(datetime);
 
-    if (datetime >= lastDatetime()) {
-        return m_borrow_cash;
-    }
+    HKU_IF_RETURN(datetime >= lastDatetime(), m_borrow_cash);
 
     price_t debt_cash = 0.0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
@@ -386,14 +309,10 @@ price_t TradeManager::getDebtCash(const Datetime& datetime) {
 TradeRecordList TradeManager ::getTradeList(const Datetime& start_date,
                                             const Datetime& end_date) const {
     TradeRecordList result;
-    if (start_date >= end_date) {
-        return result;
-    }
+    HKU_IF_RETURN(start_date >= end_date, result);
 
     size_t total = m_trade_list.size();
-    if (total == 0) {
-        return result;
-    }
+    HKU_IF_RETURN(total == 0, result);
 
     TradeRecord temp_record;
     temp_record.datetime = start_date;
@@ -432,27 +351,17 @@ PositionRecordList TradeManager::getShortPositionList() const {
 }
 
 PositionRecord TradeManager::getPosition(const Stock& stock) const {
-    if (stock.isNull()) {
-        return PositionRecord();
-    }
+    HKU_IF_RETURN(stock.isNull(), PositionRecord());
     position_map_type::const_iterator iter;
     iter = m_position.find(stock.id());
-    if (iter == m_position.end()) {
-        return PositionRecord();
-    }
-    return iter->second;
+    return iter == m_position.end() ? PositionRecord() : iter->second;
 }
 
 PositionRecord TradeManager::getShortPosition(const Stock& stock) const {
-    if (stock.isNull()) {
-        return PositionRecord();
-    }
+    HKU_IF_RETURN(stock.isNull(), PositionRecord());
     position_map_type::const_iterator iter;
     iter = m_short_position.find(stock.id());
-    if (iter == m_short_position.end()) {
-        return PositionRecord();
-    }
-    return iter->second;
+    return iter == m_short_position.end() ? PositionRecord() : iter->second;
 }
 
 BorrowRecordList TradeManager::getBorrowStockList() const {
@@ -465,15 +374,9 @@ BorrowRecordList TradeManager::getBorrowStockList() const {
 }
 
 bool TradeManager::checkin(const Datetime& datetime, price_t cash) {
-    if (cash <= 0.0) {
-        HKU_ERROR("{} cash({:<.3f}) must be > 0! ", datetime, cash);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.3f}) must be > 0! ", datetime, cash);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -489,25 +392,18 @@ bool TradeManager::checkin(const Datetime& datetime, price_t cash) {
 }
 
 bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
-    if (cash <= 0.0) {
-        HKU_ERROR("{} cash({:<.4f}) must be > 0! ", datetime, cash);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0! ", datetime, cash);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
 
     //根据权息调整当前持仓情况
     _update(datetime);
 
     int precision = getParam<int>("precision");
     price_t out_cash = roundEx(cash, precision);
-    if (out_cash > m_cash) {
-        HKU_ERROR("{} cash({:<.4f}) must be <= current cash({:<.4f})!", datetime, cash, m_cash);
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(out_cash > m_cash, false,
+                        "{} cash({:<.4f}) must be <= current cash({:<.4f})!", datetime, cash,
+                        m_cash);
 
     m_cash = roundEx(m_cash - out_cash, precision);
     m_checkout_cash = roundEx(m_checkout_cash + out_cash, precision);
@@ -519,26 +415,13 @@ bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
 
 bool TradeManager ::checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
                                  double number) {
-    if (stock.isNull()) {
-        HKU_ERROR("{} Try checkin Null stock!", datetime);
-        return false;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} number is zero!", datetime, stock.market_code());
-        return false;
-    }
-
-    if (price <= 0) {
-        HKU_ERROR("{} {} price({:<.4f}) must be > 0!", datetime, stock.market_code(), price);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkin Null stock!", datetime);
+    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} number is zero!", datetime, stock.market_code());
+    HKU_ERROR_IF_RETURN(price <= 0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
+                        stock.market_code(), price);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -573,45 +456,27 @@ bool TradeManager ::checkinStock(const Datetime& datetime, const Stock& stock, p
 
 bool TradeManager ::checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
                                   double number) {
-    if (stock.isNull()) {
-        HKU_ERROR("{} Try checkout Null stock!", datetime);
-        return false;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} checkout number is zero!", datetime, stock.market_code());
-        return false;
-    }
-
-    if (price <= 0.0) {
-        HKU_ERROR("{} {} checkout price({:<.4f}) must be > 0.0! ", datetime, stock.market_code(),
-                  price);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkout Null stock!", datetime);
+    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} checkout number is zero!", datetime,
+                        stock.market_code());
+    HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} checkout price({:<.4f}) must be > 0.0! ",
+                        datetime, stock.market_code(), price);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
 
     //根据权息调整当前持仓情况
     _update(datetime);
 
     //当前是否有持仓
     position_map_type::iterator pos_iter = m_position.find(stock.id());
-    if (pos_iter == m_position.end()) {
-        HKU_ERROR("Try to checkout nonexistent stock!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), false, "Try to checkout nonexistent stock!");
 
     PositionRecord& pos = pos_iter->second;
     //取出数量超出了当前持仓数量
-    if (number > pos.number) {
-        HKU_ERROR("{} {} Try to checkout number({}) beyond position number({})!", datetime,
-                  stock.market_code(), number, pos.number);
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(number > pos.number, false,
+                        "{} {} Try to checkout number({}) beyond position number({})!", datetime,
+                        stock.market_code(), number, pos.number);
 
     int precision = getParam<int>("precision");
     pos.number -= number;
@@ -634,15 +499,9 @@ bool TradeManager ::checkoutStock(const Datetime& datetime, const Stock& stock, 
 }
 
 bool TradeManager::borrowCash(const Datetime& datetime, price_t cash) {
-    if (cash <= 0.0) {
-        HKU_ERROR("{} cash({:<.4f}) must be > 0!", datetime, cash);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0!", datetime, cash);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -659,26 +518,13 @@ bool TradeManager::borrowCash(const Datetime& datetime, price_t cash) {
 }
 
 bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
-    if (cash <= 0.0) {
-        HKU_ERROR("{} cash({:<.4f}) must be > 0! ", datetime, cash);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
-        return false;
-    }
-
-    if (m_loan_list.empty()) {
-        HKU_ERROR("{} not borrow any cash!", datetime);
-        return false;
-    }
-
-    if (datetime < m_loan_list.back().datetime) {
-        HKU_ERROR("{} must be >= the datetime({}) of last loan record!", datetime,
-                  m_loan_list.back().datetime);
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0! ", datetime, cash);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
+    HKU_ERROR_IF_RETURN(m_loan_list.empty(), false, "{} not borrow any cash!", datetime);
+    HKU_ERROR_IF_RETURN(datetime < m_loan_list.back().datetime, false,
+                        "{} must be >= the datetime({}) of last loan record!", datetime,
+                        m_loan_list.back().datetime);
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -707,17 +553,14 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
             break;
     }
 
-    if (return_cash != 0.0) {
-        //欲归还的钱多余实际欠款
-        HKU_ERROR("{} return cash must <= borrowed cash!", datetime);
-        return false;
-    }
+    //欲归还的钱多余实际欠款
+    HKU_ERROR_IF_RETURN(return_cash != 0.0, false, "{} return cash must <= borrowed cash!",
+                        datetime);
 
     price_t out_cash = roundEx(in_cash + cost.total, precision);
-    if (out_cash > m_cash) {
-        HKU_ERROR("{} cash({:<.4f}) must be <= current cash({:<.4f})!", datetime, cash, m_cash);
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(out_cash > m_cash, false,
+                        "{} cash({:<.4f}) must be <= current cash({:<.4f})!", datetime, cash,
+                        m_cash);
 
     return_cash = in_cash;
     do {
@@ -743,26 +586,14 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
 
 bool TradeManager ::borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
                                 double number) {
-    if (stock.isNull()) {
-        HKU_ERROR("{} Try checkin Null stock!", datetime);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return false;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} Try to borrow number is zero!", datetime, stock.market_code());
-        return false;
-    }
-
-    if (price <= 0.0) {
-        HKU_ERROR("{} {} price({:<.4f}) must be > 0!", datetime, stock.market_code(), price);
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkin Null stock!", datetime);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
+    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} Try to borrow number is zero!", datetime,
+                        stock.market_code());
+    HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
+                        stock.market_code(), price);
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -799,45 +630,31 @@ bool TradeManager ::borrowStock(const Datetime& datetime, const Stock& stock, pr
 
 bool TradeManager ::returnStock(const Datetime& datetime, const Stock& stock, price_t price,
                                 double number) {
-    if (stock.isNull()) {
-        HKU_ERROR("{} Try checkout Null stock!", datetime);
-        return false;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return false;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} return stock number is zero!", datetime, stock.market_code());
-        return false;
-    }
-
-    if (price <= 0.0) {
-        HKU_ERROR("{} {} price({:<.4f}) must be > 0!", datetime, stock.market_code(), price);
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkout Null stock!", datetime);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
+    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} return stock number is zero!", datetime,
+                        stock.market_code());
+    HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
+                        stock.market_code(), price);
 
     //根据权息调整当前持仓情况
     _update(datetime);
 
     //查询借入股票信息
     borrow_stock_map_type::iterator bor_iter = m_borrow_stock.find(stock.id());
-    if (bor_iter == m_borrow_stock.end()) {
-        //并未借入股票
-        HKU_ERROR("{} {} Try to return nonborrowed stock! ", datetime, stock.market_code());
-        return false;
-    }
+
+    //并未借入股票
+    HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), false,
+                        "{} {} Try to return nonborrowed stock! ", datetime, stock.market_code());
 
     BorrowRecord& bor = bor_iter->second;
-    if (number > bor.number) {
-        //欲归还的数量大于借入的数量
-        HKU_ERROR("{} {} Try to return number({}) > borrow number({})!", datetime,
-                  stock.market_code(), number, bor.number);
-        return false;
-    }
+
+    //欲归还的数量大于借入的数量
+    HKU_ERROR_IF_RETURN(number > bor.number, false,
+                        "{} {} Try to return number({}) > borrow number({})!", datetime,
+                        stock.market_code(), number, bor.number);
 
     //更新借入股票信息
     int precision = getParam<int>("precision");
@@ -905,38 +722,22 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     TradeRecord result;
     result.business = BUSINESS_INVALID;
 
-    if (stock.isNull()) {
-        HKU_ERROR("{} Stock is Null!", datetime);
-        return result;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return result;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} numer is zero!", datetime, stock.market_code());
-        return result;
-    }
-
-    if (number < stock.minTradeNumber()) {
-        HKU_ERROR("{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.minTradeNumber());
-        return result;
-    }
-
-    if (number > stock.maxTradeNumber()) {
-        HKU_ERROR("{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.maxTradeNumber());
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
+    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} numer is zero!", datetime, stock.market_code());
+    HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
+                        "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.minTradeNumber());
+    HKU_ERROR_IF_RETURN(number > stock.maxTradeNumber(), result,
+                        "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.maxTradeNumber());
 
 #if 0  //取消此处的检查，放松限制，另外也可以提高效率。另外，TM只负责交易管理，不许检查
     //检查当日是否存在日线数据，不存在则认为不可交易
     bd::date daydate = datetime.date();
-    KRecord krecord = stock.getKRecordByDate(daydate, KQuery::DAY);
+    KRecord krecord = stock.getKRecord(daydate, KQuery::DAY);
     if (krecord == Null<KRecord>()){
         HKU_ERROR(datetime << " " << stock.market_code()
                 <<" Non-trading day(" << daydate
@@ -979,11 +780,9 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         borrowCash(datetime, roundUp(money, precision));
     }
 
-    if (m_cash < roundEx(money + cost.total, precision)) {
-        HKU_WARN("{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
-                 stock.market_code(), roundEx(money + cost.total, precision), m_cash);
-        return result;
-    }
+    HKU_WARN_IF_RETURN(m_cash < roundEx(money + cost.total, precision), result,
+                       "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
+                       stock.market_code(), roundEx(money + cost.total, precision), m_cash);
 
     //更新现金
     m_cash = roundEx(m_cash - money - cost.total, precision);
@@ -1032,42 +831,26 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     HKU_CHECK(!std::isnan(number), "sell number should be a valid double!");
     TradeRecord result;
 
-    if (stock.isNull()) {
-        HKU_ERROR("{} Stock is Null!", datetime);
-        return result;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return result;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} number is zero!", datetime, stock.market_code());
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
+    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} number is zero!", datetime,
+                        stock.market_code());
 
     //对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
-    if (number < stock.minTradeNumber()) {
-        HKU_ERROR("{} {} Sell number({}) must be >= minTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.minTradeNumber());
-        return result;
-    }
-
-    if (number != MAX_DOUBLE && number > stock.maxTradeNumber()) {
-        HKU_ERROR("{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.maxTradeNumber());
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
+                        "{} {} Sell number({}) must be >= minTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.minTradeNumber());
+    HKU_ERROR_IF_RETURN(number != MAX_DOUBLE && number > stock.maxTradeNumber(), result,
+                        "{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.maxTradeNumber());
 
     //未持仓
     position_map_type::iterator pos_iter = m_position.find(stock.id());
-    if (pos_iter == m_position.end()) {
-        HKU_WARN("{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})", datetime,
-                 stock.market_code(), datetime, realPrice, number, from);
-        return result;
-    }
+    HKU_WARN_IF_RETURN(pos_iter == m_position.end(), result,
+                       "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})", datetime,
+                       stock.market_code(), datetime, realPrice, number, from);
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -1076,12 +859,11 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     //调整欲卖出的数量，如果卖出数量等于MAX_DOUBLE，则表示卖出全部
     double real_number = number == MAX_DOUBLE ? position.number : number;
-    if (position.number < real_number) {
-        //欲卖出的数量大于当前持仓的数量
-        HKU_ERROR("{} {} Try to sell number({}) > number of position({})!", datetime,
-                  stock.market_code(), real_number, position.number);
-        return result;
-    }
+
+    //欲卖出的数量大于当前持仓的数量
+    HKU_ERROR_IF_RETURN(position.number < real_number, result,
+                        "{} {} Try to sell number({}) > number of position({})!", datetime,
+                        stock.market_code(), real_number, position.number);
 
     CostRecord cost = getSellCost(datetime, stock, realPrice, real_number);
 
@@ -1136,39 +918,22 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     TradeRecord result;
     result.business = BUSINESS_INVALID;
 
-    if (stock.isNull()) {
-        HKU_ERROR("{} Stock is Null!", datetime);
-        return result;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return result;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} numer is zero! ", datetime, stock.market_code());
-        return result;
-    }
-
-    if (number < stock.minTradeNumber()) {
-        HKU_ERROR("{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.minTradeNumber());
-        return result;
-    }
-
-    if (number > stock.maxTradeNumber()) {
-        HKU_ERROR("{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.maxTradeNumber());
-        return result;
-    }
-
-    if (stoploss != 0.0 && stoploss < realPrice) {
-        HKU_ERROR("{} {} Sell short's stoploss({:<.4f}) must be > realPrice({:<.4f}) or = 0! ",
-                  datetime, stock.market_code(), stoploss, realPrice);
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
+    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} numer is zero! ", datetime,
+                        stock.market_code());
+    HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
+                        "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.minTradeNumber());
+    HKU_ERROR_IF_RETURN(number > stock.maxTradeNumber(), result,
+                        "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.maxTradeNumber());
+    HKU_ERROR_IF_RETURN(
+      stoploss != 0.0 && stoploss < realPrice, result,
+      "{} {} Sell short's stoploss({:<.4f}) must be > realPrice({:<.4f}) or = 0! ", datetime,
+      stock.market_code(), stoploss, realPrice);
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -1189,10 +954,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     //判断是否存在已借入的股票及其数量
     borrow_stock_map_type::const_iterator bor_iter;
     bor_iter = m_borrow_stock.find(stock.id());
-    if (bor_iter == m_borrow_stock.end()) {
-        HKU_ERROR("{} {} Non borrowed, can't sell short! ", datetime, stock.market_code());
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), result,
+                        "{} {} Non borrowed, can't sell short! ", datetime, stock.market_code());
 
     double total_borrow_num = bor_iter->second.number;
     double can_sell_num = 0;
@@ -1203,10 +966,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     } else {
         //借入的股票已经卖出过
-        if (pos_iter->second.number >= total_borrow_num) {
-            HKU_ERROR("{} {} Borrowed Stock had all selled!", datetime, stock.market_code());
-            return result;
-        }
+        HKU_ERROR_IF_RETURN(pos_iter->second.number >= total_borrow_num, result,
+                            "{} {} Borrowed Stock had all selled!", datetime, stock.market_code());
 
         //可以卖出的数量 = 借入的总数 - 已卖出的数量
         can_sell_num = total_borrow_num - pos_iter->second.number;
@@ -1256,41 +1017,23 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
                                    double number, price_t stoploss, price_t goalPrice,
                                    price_t planPrice, SystemPart from) {
     TradeRecord result;
-
-    if (stock.isNull()) {
-        HKU_ERROR("{} Stock is Null!", datetime);
-        return result;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} {} datetime must be >= lastDatetime({})!", datetime, stock.market_code(),
-                  lastDatetime());
-        return result;
-    }
-
-    if (number == 0) {
-        HKU_ERROR("{} {} number is zero!", datetime, stock.market_code());
-        return result;
-    }
-
-    if (number < stock.minTradeNumber()) {
-        HKU_ERROR("{} {} buyShort number({}) must be >= minTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.minTradeNumber());
-        return result;
-    }
-
-    if (number != MAX_DOUBLE && number > stock.maxTradeNumber()) {
-        HKU_ERROR("{} {} buyShort number({}) must be <= maxTradeNumber({})!", datetime,
-                  stock.market_code(), number, stock.maxTradeNumber());
-        return result;
-    }
+    HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
+                        "{} {} datetime must be >= lastDatetime({})!", datetime,
+                        stock.market_code(), lastDatetime());
+    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} number is zero!", datetime,
+                        stock.market_code());
+    HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
+                        "{} {} buyShort number({}) must be >= minTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.minTradeNumber());
+    HKU_ERROR_IF_RETURN(number != MAX_DOUBLE && number > stock.maxTradeNumber(), result,
+                        "{} {} buyShort number({}) must be <= maxTradeNumber({})!", datetime,
+                        stock.market_code(), number, stock.maxTradeNumber());
 
     //未持有空头仓位
     position_map_type::iterator pos_iter = m_short_position.find(stock.id());
-    if (pos_iter == m_short_position.end()) {
-        HKU_WARN("{} {} This stock was not sell never! ", datetime, stock.market_code());
-        return result;
-    }
+    HKU_WARN_IF_RETURN(pos_iter == m_short_position.end(), result,
+                       "{} {} This stock was not sell never! ", datetime, stock.market_code());
 
     //根据权息调整当前持仓情况
     _update(datetime);
@@ -1339,7 +1082,7 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     return funds.cash;
 }
 
-FundsRecord TradeManager ::getFunds(KQuery::KType inktype) const {
+FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
@@ -1377,14 +1120,12 @@ FundsRecord TradeManager ::getFunds(KQuery::KType inktype) const {
     return funds;
 }
 
-FundsRecord TradeManager ::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
+FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
     // datetime为Null时，直接返回当前账户中的现金和买入时占用的资金，以及累计存取资金
-    if (indatetime == Null<Datetime>() || indatetime == lastDatetime()) {
-        return getFunds(ktype);
-    }
+    HKU_IF_RETURN(indatetime == Null<Datetime>() || indatetime == lastDatetime(), getFunds(ktype));
 
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 11, 59);
     price_t market_value = 0.0;
@@ -1594,7 +1335,7 @@ FundsRecord TradeManager ::getFunds(const Datetime& indatetime, KQuery::KType kt
                 break;
 
             default:
-                HKU_WARN("{} {} Unknow business in m_trade_list!", datetime,
+                HKU_WARN("{} {} Unknown business in m_trade_list!", datetime,
                          iter->stock.market_code());
                 break;
         }
@@ -1683,14 +1424,10 @@ PriceList TradeManager::getProfitCurve() {
  *  历史记录： 1) 2009/12/22 added
  *****************************************************************************/
 void TradeManager::_update(const Datetime& datetime) {
-    if (!getParam<bool>("reinvest")) {
-        return;
-    }
-
-    if (datetime < lastDatetime()) {
-        HKU_ERROR("{} update datetime should be < lastDatetime({})!", datetime, lastDatetime());
-        return;
-    }
+    HKU_IF_RETURN(!getParam<bool>("reinvest"), void());
+    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), void(),
+                        "{} update datetime should be < lastDatetime({})!", datetime,
+                        lastDatetime());
 
     //权息信息查询日期范围
     Datetime start_date(lastDatetime().date() + bd::days(1));
@@ -1761,9 +1498,7 @@ void TradeManager::_update(const Datetime& datetime) {
 }
 
 void TradeManager::_saveAction(const TradeRecord& record) {
-    if (getParam<bool>("save_action") == false)
-        return;
-
+    HKU_IF_RETURN(getParam<bool>("save_action") == false, void());
     std::stringstream buf(std::stringstream::out);
     string my_tm("td = my_tm.");
     string sep(", ");
@@ -1833,10 +1568,7 @@ void TradeManager::tocsv(const string& path) {
 
     //导出交易记录
     std::ofstream file(filename1.c_str());
-    if (!file) {
-        HKU_ERROR("Can't create file {}!", filename1);
-        return;
-    }
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename1);
 
     file.setf(std::ios_base::fixed);
     file.precision(3);
@@ -1864,7 +1596,7 @@ void TradeManager::tocsv(const string& path) {
                  << record.cost.total << sep << record.stoploss << sep << record.cash << sep
                  << getSystemPartName(record.from) << sep;
             if (BUSINESS_BUY == record.business || BUSINESS_SELL == record.business) {
-                KRecord kdata = record.stock.getKRecordByDate(record.datetime, KQuery::DAY);
+                KRecord kdata = record.stock.getKRecord(record.datetime, KQuery::DAY);
                 if (kdata.isValid()) {
                     file << kdata.datetime << sep << kdata.openPrice << sep << kdata.highPrice
                          << sep << kdata.lowPrice << sep << kdata.closePrice << sep
@@ -1878,11 +1610,7 @@ void TradeManager::tocsv(const string& path) {
 
     //导出已平仓记录
     file.open(filename2.c_str());
-    if (!file) {
-        HKU_ERROR("Can't create file {}!", filename2);
-        return;
-    }
-
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename2);
     file << "#建仓日期,平仓日期,证券代码,证券名称,累计持仓数量,"
             "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险"
          << std::endl;
@@ -1899,11 +1627,7 @@ void TradeManager::tocsv(const string& path) {
 
     //导出未平仓记录
     file.open(filename3.c_str());
-    if (!file) {
-        HKU_ERROR("Can't create file {}!", filename3);
-        return;
-    }
-
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
     file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,累计持仓数量,"
             "累计花费资金,累计交易成本,已转化资金,累积风险,"
             "累计浮动盈亏,当前盈亏成本价"
@@ -1928,11 +1652,7 @@ void TradeManager::tocsv(const string& path) {
     //到处执行命令
     //导出已平仓记录
     file.open(filename4.c_str());
-    if (!file) {
-        HKU_ERROR("Can't create file {}!", filename4);
-        return;
-    }
-
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename4);
     list<string>::const_iterator action_iter = m_actions.begin();
     for (; action_iter != m_actions.end(); ++action_iter) {
         file << *action_iter << std::endl;
@@ -1941,14 +1661,9 @@ void TradeManager::tocsv(const string& path) {
 }
 
 bool TradeManager::addTradeRecord(const TradeRecord& tr) {
-    if (BUSINESS_INIT == tr.business) {
-        return _add_init_tr(tr);
-    }
-
-    if (tr.datetime < lastDatetime()) {
-        HKU_ERROR("tr.datetime must be >= lastDatetime({})!", lastDatetime());
-        return false;
-    }
+    HKU_IF_RETURN(BUSINESS_INIT == tr.business, _add_init_tr(tr));
+    HKU_ERROR_IF_RETURN(tr.datetime < lastDatetime(), false,
+                        "tr.datetime must be >= lastDatetime({})!", lastDatetime());
 
     switch (tr.business) {
         case BUSINESS_INIT:
@@ -2016,29 +1731,18 @@ bool TradeManager::_add_init_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
-    if (tr.stock.isNull()) {
-        HKU_ERROR("tr.stock is null!");
-        return false;
-    }
-
-    if (tr.number == 0) {
-        HKU_ERROR("tr.number is zero!");
-        return false;
-    }
-
-    if (tr.number < tr.stock.minTradeNumber() || tr.number > tr.stock.maxTradeNumber()) {
-        HKU_ERROR("tr.number out of range!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(tr.number == 0, false, "tr.number is zero!");
+    HKU_ERROR_IF_RETURN(
+      tr.number < tr.stock.minTradeNumber() || tr.number > tr.stock.maxTradeNumber(), false,
+      "tr.number out of range!");
 
     int precision = getParam<int>("precision");
     TradeRecord new_tr(tr);
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
 
-    if (m_cash < roundEx(money + tr.cost.total, precision)) {
-        HKU_WARN("Don't have enough money!");
-        return false;
-    }
+    HKU_WARN_IF_RETURN(m_cash < roundEx(money + tr.cost.total, precision), false,
+                       "Don't have enough money!");
 
     m_cash = roundEx(m_cash - money - tr.cost.total, precision);
     new_tr.cash = m_cash;
@@ -2070,30 +1774,17 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
-    if (tr.stock.isNull()) {
-        HKU_ERROR("tr.stock is Null!");
-        return false;
-    }
-
-    if (tr.number == 0) {
-        HKU_ERROR("tr.number is zero!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is Null!");
+    HKU_ERROR_IF_RETURN(tr.number == 0, false, "tr.number is zero!");
 
     //未持仓
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
-    if (pos_iter == m_position.end()) {
-        HKU_ERROR("No position!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), false, "No position!");
 
     PositionRecord& position = pos_iter->second;
 
-    if (position.number < tr.number) {
-        //欲卖出的数量大于当前持仓的数量
-        HKU_ERROR("Try sell number greater position!");
-        return false;
-    }
+    //欲卖出的数量大于当前持仓的数量
+    HKU_ERROR_IF_RETURN(position.number < tr.number, false, "Try sell number greater position!");
 
     int precision = getParam<int>("precision");
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
@@ -2127,10 +1818,7 @@ bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_gift_tr(const TradeRecord& tr) {
-    if (tr.stock.isNull()) {
-        HKU_ERROR("tr.stock is null!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
 
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
     if (pos_iter == m_position.end()) {
@@ -2149,21 +1837,11 @@ bool TradeManager::_add_gift_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_bonus_tr(const TradeRecord& tr) {
-    if (tr.stock.isNull()) {
-        HKU_ERROR("tr.stock is null!");
-        return false;
-    }
-
-    if (tr.realPrice <= 0.0) {
-        HKU_ERROR("tr.realPrice <= 0.0!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(tr.realPrice <= 0.0, false, "tr.realPrice <= 0.0!");
 
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
-    if (pos_iter == m_position.end()) {
-        HKU_ERROR("No position!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), false, "No position!");
 
     PositionRecord& position = pos_iter->second;
     position.sellMoney += tr.realPrice;
@@ -2176,11 +1854,7 @@ bool TradeManager::_add_bonus_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_checkin_tr(const TradeRecord& tr) {
-    if (tr.realPrice <= 0.0) {
-        HKU_ERROR("tr.realPrice <= 0.0!");
-        return false;
-    }
-
+    HKU_ERROR_IF_RETURN(tr.realPrice <= 0.0, false, "tr.realPrice <= 0.0!");
     int precision = getParam<int>("precision");
     price_t in_cash = roundEx(tr.realPrice, precision);
     m_cash = roundEx(m_cash + in_cash, precision);
@@ -2192,17 +1866,11 @@ bool TradeManager::_add_checkin_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_checkout_tr(const TradeRecord& tr) {
-    if (tr.realPrice <= 0.0) {
-        HKU_ERROR("tr.realPrice <= 0.0!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(tr.realPrice <= 0.0, false, "tr.realPrice <= 0.0!");
 
     int precision = getParam<int>("precision");
     price_t out_cash = roundEx(tr.realPrice, precision);
-    if (out_cash > m_cash) {
-        HKU_ERROR("Checkout money > current cash!");
-        return false;
-    }
+    HKU_ERROR_IF_RETURN(out_cash > m_cash, false, "Checkout money > current cash!");
 
     m_cash = roundEx(m_cash - out_cash, precision);
     m_checkout_cash = roundEx(m_checkout_cash + out_cash, precision);

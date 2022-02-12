@@ -20,12 +20,7 @@ ISum::ISum() : IndicatorImp("SUM", 1) {
 ISum::~ISum() {}
 
 bool ISum::check() {
-    int n = getParam<int>("n");
-    if (n < 0) {
-        HKU_ERROR("Invalid param[n] ! (n >= 0) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("n") >= 0;
 }
 
 void ISum::_calculate(const Indicator& ind) {

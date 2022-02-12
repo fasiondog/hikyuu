@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu
-.. highlightlang:: python
+.. highlight:: python
 
 杂项或辅助
 =============

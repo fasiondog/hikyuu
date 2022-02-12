@@ -1,16 +1,16 @@
 .. py:currentmodule:: hikyuu
-.. highlightlang:: python
+.. highlight:: python
 
 证券管理
 ========
 
 构建K线查询条件
 -----------------
-
+    
 .. py:class:: Query
 
-    对 Query 的简单包装，并简化定义相关常量，可视同为 :py:class:`Query`
-    
+    K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
+
     简化 :py:data:`Query.KType` 枚举值
     
     - Query.DAY - 日线类型
@@ -32,11 +32,6 @@
     - Query.BACKWARD        - 后向复权
     - Query.EQUAL_FORWARD   - 等比前向复权
     - Query.EQUAL_BACKWARD  - 等比后向复权
-
-    
-.. py:class:: Query
-
-    K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
 
     .. py:attribute:: start 
     
@@ -211,13 +206,21 @@ StockManager/Block/Stock
         :return: 日期列表
         :rtype: DatetimeList
         
+    .. py:method:: is_holiday(self, d)
+
+        判断日期是否为节假日
+
+        :param Datetime d: 待判定的日期
+
     .. py:method:: add_temp_csv_stock(self, code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
 
-        从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。        
+        从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。
+
+        添加的 stock 对应的 market 为 "TMP", 如需通过 sm 获取，需加入 tmp，如：sm['tmp0001']
         
         CSV文件第一行为标题，需含有 Datetime（或Date、日期）、OPEN（或开盘价）、HIGH（或最高价）、LOW（或最低价）、CLOSE（或收盘价）、AMOUNT（或成交金额）、VOLUME（或VOL、COUNT、成交量）。
         
-        :param str code: 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>
+        :param str code: 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>。
         :param str day_filename: 日线CSV文件名
         :param str min_filename: 分钟线CSV文件名
         :param float tick: 最小跳动量，默认0.01
@@ -294,19 +297,11 @@ StockManager/Block/Stock
     
         获取指定索引的K线数据记录，未作越界检查
         
-        :param int pos: 指定的索引位置
+        :param int pos | Datetime datetime: 指定的索引位置，或日期
         :param Query.KType ktype: K线数据类别
         :return: K线记录
         :rtype: KRecord
     
-    .. py:method:: get_krecord_by_datetime(self, datetime[, ktype=Query.DAY])
-    
-        根据数据类型（日线/周线等），获取指定时刻的KRecord
-        
-        :param Datetime datetime: 指定时刻
-        :param Query.KType ktype: K线数据类别
-        :return: K线记录
-        :rtype: KRecord
     
     .. py:method:: get_krecord_list(self, start, end, ktype)
     
@@ -325,7 +320,7 @@ StockManager/Block/Stock
         :param Query query: 查询条件
         :rtype: DatetimeList
 
-    .. py:method:: get_datetime_list(self, start, end, ktype)
+        get_datetime_list(self, start, end, ktype)
     
         获取日期列表
         
@@ -432,7 +427,7 @@ StockManager/Block/Stock
         :return: 是否成功加入
         :rtype: bool
         
-    .. py:method:: add(self, market_code)
+        add(self, market_code)
     
         根据"市场简称证券代码"加入指定的证券
         
@@ -448,7 +443,7 @@ StockManager/Block/Stock
         :return: 是否成功
         :rtype: bool
         
-    .. py:method:: remove(self, market_code)
+        remove(self, market_code)
     
         移除指定证券
         

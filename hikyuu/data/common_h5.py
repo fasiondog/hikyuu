@@ -25,23 +25,27 @@
 import datetime
 import tables as tb
 
+from hikyuu.util import hku_catch
+from hikyuu.util.mylog import hku_error, hku_debug
+
 HDF5_COMPRESS_LEVEL = 9
+
 
 class H5Record(tb.IsDescription):
     """HDF5基础K线数据格式（日线、分钟线、5分钟线"""
-    datetime = tb.UInt64Col()        #IGNORE:E1101
-    openPrice = tb.UInt32Col()       #IGNORE:E1101
-    highPrice = tb.UInt32Col()       #IGNORE:E1101
-    lowPrice = tb.UInt32Col()        #IGNORE:E1101
-    closePrice = tb.UInt32Col()      #IGNORE:E1101
-    transAmount = tb.UInt64Col()     #IGNORE:E1101
-    transCount = tb.UInt64Col()      #IGNORE:E1101
+    datetime = tb.UInt64Col()  #IGNORE:E1101
+    openPrice = tb.UInt32Col()  #IGNORE:E1101
+    highPrice = tb.UInt32Col()  #IGNORE:E1101
+    lowPrice = tb.UInt32Col()  #IGNORE:E1101
+    closePrice = tb.UInt32Col()  #IGNORE:E1101
+    transAmount = tb.UInt64Col()  #IGNORE:E1101
+    transCount = tb.UInt64Col()  #IGNORE:E1101
 
 
 class H5Index(tb.IsDescription):
     """HDF5扩展K线数据格式（周线、月线、季线、半年线、年线、15分钟线、30分钟线、60分钟线"""
-    datetime = tb.UInt64Col()        #IGNORE:E1101
-    start    = tb.UInt64Col()        #IGNORE:E1101
+    datetime = tb.UInt64Col()  #IGNORE:E1101
+    start = tb.UInt64Col()  #IGNORE:E1101
 
 
 class H5Transaction(tb.IsDescription):
@@ -69,12 +73,16 @@ class H5MinuteTime(tb.IsDescription):
 # K线数据
 #------------------------------------------------------------------------------
 
+
 def open_h5file(dest_dir, market, ktype):
     filename = "{}/{}_{}.h5".format(dest_dir, market.lower(), ktype.lower())
-    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
+    h5file = tb.open_file(
+        filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True)
+    )
     return h5file
 
 
+@hku_catch(None, trace=True)
 def get_h5table(h5file, market, code):
     try:
         group = h5file.get_node("/", "data")
@@ -228,10 +236,12 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
 
     try:
         table = h5file.get_node("/data", tablename)
-    except:
+    except Exception as e:
+        hku_error("{}".format(e))
         return
 
     for index_type in index_list:
+        hku_debug("{} update {} index".format(tablename, index_type))
         try:
             index_table = h5file.get_node(groupDict[index_type], tablename)
         except:
@@ -275,11 +285,16 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
 # 分笔数据
 #------------------------------------------------------------------------------
 
+
 def open_trans_file(dest_dir, market):
     filename = "{}/{}_trans.h5".format(dest_dir, market.lower())
-    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
+    h5file = tb.open_file(
+        filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True)
+    )
     return h5file
 
+
+@hku_catch(trace=True)
 def get_trans_table(h5file, market, code):
     try:
         group = h5file.get_node("/", "data")
@@ -297,6 +312,7 @@ def get_trans_table(h5file, market, code):
 
 def update_hdf5_trans_index(h5file, tablename):
     """更新分笔数据按日索引"""
+    hku_debug("{} update trans index".format(tablename))
     try:
         table = h5file.get_node("/data", tablename)
     except:
@@ -320,7 +336,7 @@ def update_hdf5_trans_index(h5file, tablename):
     index_row = index_table.row
     if index_total:
         index_last_date = int(index_table[-1]['datetime'])
-        last_date = int(table[-1]['datetime']//1000000 * 10000)
+        last_date = int(table[-1]['datetime'] // 1000000 * 10000)
         if index_last_date == last_date:
             return
         startix = int(index_table[-1]['start'])
@@ -345,14 +361,19 @@ def update_hdf5_trans_index(h5file, tablename):
         index += 1
     index_table.flush()
 
+
 #------------------------------------------------------------------------------
 # 分时数据
 #------------------------------------------------------------------------------
 def open_time_file(dest_dir, market):
     filename = "{}/{}_time.h5".format(dest_dir, market.lower())
-    h5file = tb.open_file(filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True))
+    h5file = tb.open_file(
+        filename, "a", filters=tb.Filters(complevel=HDF5_COMPRESS_LEVEL, complib='zlib', shuffle=True)
+    )
     return h5file
 
+
+@hku_catch(None, trace=True)
 def get_time_table(h5file, market, code):
     try:
         group = h5file.get_node("/", "data")

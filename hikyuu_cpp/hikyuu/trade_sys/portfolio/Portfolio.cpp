@@ -135,9 +135,7 @@ void Portfolio::runMoment(const Datetime& date) {
     HKU_CHECK(isReady(), "Not ready to run! Please perform readyForRun() first!");
 
     // 当前日期小于账户建立日期，直接忽略
-    if (date < m_shadow_tm->initDatetime()) {
-        return;
-    }
+    HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
 
     int precision = m_shadow_tm->getParam<int>("precision");
     SystemList cur_selected_list;        //当前选中系统列表
@@ -181,10 +179,7 @@ void Portfolio::runMoment(const Datetime& date) {
         if (cash > 0 && m_running_sys_set.find(sub_sys) == m_running_sys_set.end()) {
             m_running_sys_list.push_back(sub_sys);
             m_running_sys_set.insert(sub_sys);
-
-            if (m_all_sys_set.find(sub_sys) == m_all_sys_set.end()) {
-                m_all_sys_set.insert(sub_sys);
-            }
+            m_all_sys_set.insert(sub_sys);
         }
     }
 

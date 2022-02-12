@@ -1,7 +1,7 @@
 # 已废弃接口
 
 from .extend import *
-from .util.mylog import escapetime
+from .util.mylog import spend_time
 
 
 def deprecated_func(new_func, old_func_name, new_func_name):
@@ -111,6 +111,21 @@ def SL_FixedValue(*args, **kwargs):
 # 待废弃属性
 #
 #--------------------------------------------------------------------
+
+
+@deprecated_attr(
+    {
+        'getParam': 'get_param',
+        'setParam': 'set_param',
+        'haveParam': 'have_param',
+        '_allocateWeight': '_allocate_weight',
+    }
+)
+def AllocateFundsBase_getattr(self, name):
+    return getattr(self, name)
+
+
+AllocateFundsBase.__getattr__ = AllocateFundsBase_getattr
 
 
 @deprecated_attr({'size': '__len__', 'get': '__getitem__'})
@@ -469,7 +484,7 @@ SlippageBase.__getattr__ = SlippageBase_getattr
         'getCount': 'get_count',
         'getMarketValue': 'get_market_value',
         'getKRecord': 'get_krecord',
-        'getKRecordByDate': 'get_krecord_by_datetime',
+        'getKRecordByDate': 'get_krecord',
         'getKRecordList': 'get_krecord_list',
         'getDatetimeList': 'get_datetime_list',
         'getFinanceInfo': 'get_finance_info',

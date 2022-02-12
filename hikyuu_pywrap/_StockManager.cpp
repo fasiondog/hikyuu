@@ -22,8 +22,11 @@ void export_StockManager() {
            "获取StockManager单例实例")
       .staticmethod("instance")
 
-      .def("init", &StockManager::init,
-           R"(init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param)
+      .def(
+        "init", &StockManager::init,
+        (arg("base_info_param"), arg("block_param"), arg("kdata_param"), arg("preload_param"),
+         arg("hikyuu_param"), arg("context") = StrategyContext({"all"})),
+        R"(init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param, context)
               
     初始化函数，必须在程序入口调用
     
@@ -31,19 +34,25 @@ void export_StockManager() {
      param block_param 板块信息驱动参数
      param kdata_param K线数据驱动参数
      param preload_param 预加载参数
-     param hikyuu_param 其他参数)")
+     param hikyuu_param 其他参数
+     param StrategyContext context 策略上下文, 默认加载全部证券)")
+
+      .def("reload", &StockManager::reload, "重新加载所有证券数据")
 
       .def("tmpdir", &StockManager::tmpdir, R"(tmpdir(self) -> str
 
     获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定)")
 
       .def("get_base_info_parameter", &StockManager::getBaseInfoDriverParameter,
-           "获取当前基础信息驱动参数")
+           return_value_policy<copy_const_reference>(), "获取当前基础信息驱动参数")
       .def("get_block_parameter", &StockManager::getBlockDriverParameter,
-           "获取当前板块信息驱动参数")
-      .def("get_kdata_parameter", &StockManager::getKDataDriverParameter, "获取当前K线数据驱动参数")
-      .def("get_preload_parameter", &StockManager::getPreloadParameter, "获取当前预加载参数")
-      .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter, "获取当前其他参数")
+           return_value_policy<copy_const_reference>(), "获取当前板块信息驱动参数")
+      .def("get_kdata_parameter", &StockManager::getKDataDriverParameter,
+           return_value_policy<copy_const_reference>(), "获取当前K线数据驱动参数")
+      .def("get_preload_parameter", &StockManager::getPreloadParameter,
+           return_value_policy<copy_const_reference>(), "获取当前预加载参数")
+      .def("get_hikyuu_parameter", &StockManager::getHikyuuParameter,
+           return_value_policy<copy_const_reference>(), "获取当前其他参数")
 
       .def("get_market_list", &StockManager::getAllMarket, R"(get_market_list(self)
 
@@ -112,7 +121,9 @@ void export_StockManager() {
          arg("max_trade_num") = 1000000),
         R"(add_temp_csv_stock(code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
 
-    从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。        
+    从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。
+
+    添加的 stock 对应的 market 为 "TMP", 如需通过 sm 获取，需加入 tmp，如：sm['tmp0001']    
         
     CSV文件第一行为标题，需含有 Datetime（或Date、日期）、OPEN（或开盘价）、HIGH（或最高价）、LOW（或最低价）、CLOSE（或收盘价）、AMOUNT（或成交金额）、VOLUME（或VOL、COUNT、成交量）。
         
@@ -127,12 +138,18 @@ void export_StockManager() {
     :return: 加入的Stock
     :rtype: Stock)")
 
-      .def("removeTempCsvStock", &StockManager::removeTempCsvStock,
-           R"(removeTempCsvStock(self, code)
+      .def("remove_temp_csv_stock", &StockManager::removeTempCsvStock,
+           R"(remove_temp_csv_stock(self, code)
 
     移除增加的临时Stock
 
     :param str code: 创建时自定义的编码)")
+
+      .def("is_holiday", &StockManager::isHoliday, R"(is_holiday(self, d)
+
+    判断日期是否为节假日
+
+    :param Datetime d: 待判断的日期)")
 
       .def("__len__", &StockManager::size, "返回证券数量")
       .def("__getitem__", &StockManager::getStock, "同 get_stock")

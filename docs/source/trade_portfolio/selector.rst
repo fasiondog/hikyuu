@@ -1,5 +1,5 @@
 .. py:currentmodule:: hikyuu.trade_sys
-.. highlightlang:: python
+.. highlight:: python
 
 选择器策略
 =============
@@ -26,7 +26,7 @@
 
 自定义选择器策略接口：
 
-* :py:meth:`SelectorBase.getSelectedSystemList` - 【必须】获取指定时刻选择的系统实例列表
+* :py:meth:`SelectorBase.get_selected_system_list` - 【必须】获取指定时刻选择的系统实例列表
 * :py:meth:`SelectorBase._reset` - 【可选】重置私有属性
 * :py:meth:`SelectorBase._clone` - 【必须】克隆接口
 
@@ -45,7 +45,7 @@
         
         :param str name: 名称
         
-    .. py:method:: getParam(self, name)
+    .. py:method:: get_param(self, name)
 
         获取指定的参数
         
@@ -53,7 +53,7 @@
         :return: 参数值
         :raises out_of_range: 无此参数
         
-    .. py:method:: setParam(self, name, value)
+    .. py:method:: set_param(self, name, value)
     
         设置参数
         
@@ -62,14 +62,14 @@
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型  
 
-    .. py:method:: addStock(self, stock, sys)
+    .. py:method:: add_stock(self, stock, sys)
 
         加入初始标的及其对应的系统策略原型
         
         :param Stock stock: 加入的初始标的
         :param System sys: 系统策略原型
 
-    .. py:method:: addStockList(self, stk_list, sys)
+    .. py:method:: add_stock_list(self, stk_list, sys)
     
         加入初始标的列表及其系统策略原型
         
@@ -80,11 +80,7 @@
     
         清除已加入的系统策略实例
     
-    .. py:method:: getSelectedSystemList(self, datetime)
-    
-        获取指定时刻选取的系统实例
-    
-    .. py:method:: getSelectedSystemList(self, datetime)
+    .. py:method:: get_selected_system_list(self, datetime)
     
         【重载接口】获取指定时刻选取的系统实例
         

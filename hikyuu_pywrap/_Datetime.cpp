@@ -41,14 +41,16 @@ void export_Datetime() {
       .add_property("second", &Datetime::second, "秒")
       .add_property("millisecond", &Datetime::millisecond, "毫秒")
       .add_property("microsecond", &Datetime::microsecond, "微秒")
-      .add_property("number", &Datetime::number)
+      .add_property("number", &Datetime::number, "返回显示如 YYYYMMDDhhmm 的数字")
+      .add_property("hex", &Datetime::hex,
+                    "返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数")
 
       .def("is_null", &Datetime::isNull, "\n是否是Null值，等于 Datetime() 直接创建的对象")
 
-      .def("day__of_week", &Datetime::dayOfWeek, "\n返回是一周中的第几天，周日为0，周一为1")
+      .def("day_of_week", &Datetime::dayOfWeek, "\n返回是一周中的第几天，周日为0，周一为1")
       .def("day_of_year", &Datetime::dayOfYear, "\n返回一年中的第几天，1月1日为一年中的第1天")
       .def("start_of_day", &Datetime::startOfDay, "\n返回当天 0点0分0秒")
-      .def("end__of_day", &Datetime::endOfDay, "\n返回当日 23点59分59秒")
+      .def("end_of_day", &Datetime::endOfDay, "\n返回当日 23点59分59秒")
       .def("next_day", &Datetime::nextDay, "\n返回下一自然日")
       .def("next_week", &Datetime::nextWeek, "\n返回下周周一日期")
       .def("next_month", &Datetime::nextMonth, "\n返回下月首日日期")
@@ -85,6 +87,8 @@ void export_Datetime() {
       .staticmethod("now")
       .def("today", &Datetime::today, "\n获取当前的日期")
       .staticmethod("today")
+      .def("from_hex", &Datetime::fromHex, "\n兼容oracle用后7个字节表示的datetime")
+      .staticmethod("from_hex")
 
       .def(self == self)
       .def(self != self)

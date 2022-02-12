@@ -18,6 +18,10 @@
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
 #include "StockManager.h"
+#include "global/GlobalTaskGroup.h"
+#include "global/GlobalSpotAgent.h"
+#include "global/schedule/scheduler.h"
+#include "indicator/IndicatorImp.h"
 #include "debug.h"
 
 namespace hku {
@@ -42,17 +46,30 @@ void GlobalInitializer::init() {
     fmt::print("Initialize hikyuu_{} ...\n", getVersionWithBuild());
 
     initLogger();
+#if defined(_DEBUG) || defined(DEBUG)
+    set_log_level(TRACE);
+#else
+    set_log_level(INFO);
+#endif
+
     DataDriverFactory::init();
-    auto& sm = StockManager::instance();
+    StockManager::instance();
+    IndicatorImp::initDynEngine();
+    getGlobalSpotAgent();
 }
 
 void GlobalInitializer::clean() {
+    releaseGlobalTaskGroup();
+    releaseScheduler();
+    releaseGlobalSpotAgent();
+
+    IndicatorImp::releaseDynEngine();
     StockManager::quit();
     DataDriverFactory::release();
     H5close();
 
 #if USE_SPDLOG_LOGGER
-    spdlog::shutdown();
+    spdlog::drop_all();
 #endif
 
 #ifdef MSVC_LEAKER_DETECT

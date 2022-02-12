@@ -19,7 +19,7 @@ public:
     MoneyManagerWrap(const string& name) : MoneyManagerBase(name) {}
 
     void buyNotify(const TradeRecord& record) {
-        if (override buyNotify = this->get_override("buyNotify")) {
+        if (override buyNotify = this->get_override("buy_notify")) {
             buyNotify(record);
             return;
         }
@@ -31,7 +31,7 @@ public:
     }
 
     void sellNotify(const TradeRecord& record) {
-        if (override sellNotify = this->get_override("sellNotify")) {
+        if (override sellNotify = this->get_override("sell_notify")) {
             sellNotify(record);
             return;
         }
@@ -44,7 +44,7 @@ public:
 
     double _getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                           SystemPart from) {
-        if (override _getSellNumber = this->get_override("_getSellNumber")) {
+        if (override _getSellNumber = this->get_override("_get_sell_num")) {
             return _getSellNumber(datetime, stock, price, risk, from);
         }
         return MoneyManagerBase::_getSellNumber(datetime, stock, price, risk, from);
@@ -57,12 +57,12 @@ public:
 
     double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                          SystemPart from) {
-        return this->get_override("_getBuyNumber")(datetime, stock, price, risk, from);
+        return this->get_override("_get_buy_num")(datetime, stock, price, risk, from);
     }
 
     double _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                price_t risk, SystemPart from) {
-        if (override _getSellShortNumber = this->get_override("_getSellShortNumber")) {
+        if (override _getSellShortNumber = this->get_override("_get_sell_short_num")) {
             return _getSellShortNumber(datetime, stock, price, risk, from);
         }
         return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
@@ -75,7 +75,7 @@ public:
 
     double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                              price_t risk, SystemPart from) {
-        if (override _getBuyShortNumber = this->get_override("_getBuyShortNumber")) {
+        if (override _getBuyShortNumber = this->get_override("_get_buy_short_number")) {
             return _getBuyShortNumber(datetime, stock, price, risk, from);
         }
         return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk, from);
@@ -151,7 +151,7 @@ void export_MoneyManager() {
     :param value: 参数值
     :raises logic_error: Unsupported type! 不支持的参数类型)")
 
-      .def("haveParam", &MoneyManagerBase::haveParam, "是否存在指定参数")
+      .def("have_param", &MoneyManagerBase::haveParam, "是否存在指定参数")
 
       .def("reset", &MoneyManagerBase::reset, "复位操作")
       .def("clone", &MoneyManagerBase::clone, "克隆操作")

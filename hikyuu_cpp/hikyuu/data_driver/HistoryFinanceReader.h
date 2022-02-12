@@ -22,7 +22,7 @@ namespace hku {
 class HKU_API HistoryFinanceReader {
 public:
     HistoryFinanceReader() = delete;
-    HistoryFinanceReader(const string& dir);
+    explicit HistoryFinanceReader(const string& dir);
     virtual ~HistoryFinanceReader();
 
     PriceList getHistoryFinanceInfo(Datetime date, const string& market, const string& code);

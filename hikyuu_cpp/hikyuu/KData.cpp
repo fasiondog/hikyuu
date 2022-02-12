@@ -7,7 +7,7 @@
 
 #include "KData.h"
 #include "StockManager.h"
-#include "KDataBufferImp.h"
+#include "KDataImp.h"
 #include "indicator/crt/KDATA.h"
 #include <fstream>
 
@@ -27,29 +27,24 @@ string KData::toString() const {
 }
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    if (stock.isNull()) {
-        return;
-    }
-
-    m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
-    return;
-#if 0
-    if (stock.isBuffer(query.kType())
-            && query.recoverType() == KQuery::NO_RECOVER) {
-        //当Stock已缓存了该类型的K线数据，且不进行复权
+    if (!stock.isNull()) {
         m_imp = KDataImpPtr(new KDataImp(stock, query));
-    } else {
-        m_imp = KDataImpPtr(new KDataBufferImp(stock, query));
     }
-#endif
+}
+
+bool KData::operator==(const KData& thr) {
+    return this == &thr || m_imp == thr.m_imp ||
+           (getStock() == thr.getStock() && getQuery() == thr.getQuery());
+}
+
+size_t KData::getPosInStock(Datetime datetime) const {
+    size_t pos = getPos(datetime);
+    return pos == Null<size_t>() ? Null<size_t>() : pos + startPos();
 }
 
 void KData::tocsv(const string& filename) {
     std::ofstream file(filename.c_str());
-    if (!file) {
-        HKU_ERROR("Can't open file! ({})", filename);
-        return;
-    }
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't open file! ({})", filename);
 
     file << "date, open, high, low, close, amount, count" << std::endl;
     file.setf(std::ios_base::fixed);

@@ -32,7 +32,7 @@ target("core")
         set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
         --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
     end
-    add_packages("fmt", "spdlog")
+    add_packages("fmt", "spdlog", "flatbuffers", "cpp-httplib")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("core.pyd")
@@ -48,7 +48,7 @@ target("core")
         import("lib.detect.find_tool")
         if is_plat("windows") then
             -- detect installed python3
-            local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
             assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
 
             -- find python include and libs directory
@@ -64,8 +64,11 @@ target("core")
             target:add("linkdirs", libdir)
             local out, err = os.iorun("python3 --version")
             local ver = (out .. err):trim()
-            --local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
-            local python_lib = format("python%s.%s", string.sub(ver,8,8), string.sub(ver,10,10))
+            local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
+            local pyver = tonumber(format("%s.%s", string.sub(ver,8,8), string.sub(ver,10,10)))
+            if pyver >= 3.8 then
+                python_lib = format("python%s.%s", string.sub(ver,8,8), string.sub(ver,10,10))
+            end
             target:add("links", python_lib)
         end
 
@@ -107,7 +110,7 @@ target("core")
         local dst_dir = "$(projectdir)/hikyuu/cpp/"
         if is_plat("windows") then
             os.cp(target:targetdir() .. '/core.pyd', dst_dir)
-            os.cp(target:targetdir() .. '/hikyuu.dll', dst_dir)
+            os.cp(target:targetdir() .. '/*.dll', dst_dir)
         elseif is_plat("macosx") then
             os.cp(target:targetdir() .. '/core.so', dst_dir)
             os.cp(target:targetdir() .. '/libhikyuu.dylib', dst_dir)
@@ -131,15 +134,6 @@ target("core")
         os.cp("$(env BOOST_LIB)/libboost_python3*.dylib", dst_dir)
         os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", dst_dir)
         os.cp("$(env BOOST_LIB)/libboost_system*.dylib", dst_dir)
-
-        if is_plat("windows") then
-            if is_mode("release") then
-                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
-            else
-                os.cp("$(projectdir)/hikyuu_extern_libs/pkg/hdf5_D.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
-            end
-            os.cp("$(projectdir)/hikyuu_extern_libs/pkg/mysql.pkg/lib/$(mode)/$(plat)/$(arch)/*.dll", dst_dir)
-        end
     end)
 
 

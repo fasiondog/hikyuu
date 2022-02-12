@@ -21,10 +21,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API DEVSQ(int n = 10);
-Indicator DEVSQ(const Indicator& data, int n = 10);
+Indicator HKU_API DEVSQ(const IndParam& n);
 
-inline Indicator DEVSQ(const Indicator& data, int n) {
+inline Indicator DEVSQ(const Indicator& data, int n = 10) {
     return DEVSQ(n)(data);
+}
+
+inline Indicator DEVSQ(const Indicator& data, const IndParam& n) {
+    return DEVSQ(n)(data);
+}
+
+inline Indicator DEVSQ(const Indicator& data, const Indicator& n) {
+    return DEVSQ(IndParam(n))(data);
 }
 
 }  // namespace hku

@@ -8,11 +8,14 @@
 #ifndef STOCKMANAGER_H_
 #define STOCKMANAGER_H_
 
+#include <mutex>
+#include <thread>
 #include "utilities/Parameter.h"
 #include "data_driver/DataDriverFactory.h"
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
+#include "StrategyContext.h"
 
 namespace hku {
 
@@ -33,28 +36,44 @@ public:
 
     /**
      * 初始化函数，必须在程序入口调用
-     * @param baseInfoParam
-     * @param blockParam
-     * @param kdataParam
-     * @param preloadParam
-     * @param hikyuuParam
+     * @param baseInfoParam 基础信息驱动参数
+     * @param blockParam 板块驱动参数
+     * @param kdataParam K线驱动参数
+     * @param preloadParam 预加载参数
+     * @param hikyuuParam 其他参数
+     * @param context 策略上下文
      */
     void init(const Parameter& baseInfoParam, const Parameter& blockParam,
               const Parameter& kdataParam, const Parameter& preloadParam = default_preload_param(),
-              const Parameter& hikyuuParam = default_other_param());
+              const Parameter& hikyuuParam = default_other_param(),
+              const StrategyContext& context = StrategyContext({"all"}));
+
+    /** 重新加载 */
+    void reload();
 
     /** 主动退出并释放资源 */
     static void quit();
 
-    Parameter getBaseInfoDriverParameter() const;
-    Parameter getBlockDriverParameter() const;
-    Parameter getKDataDriverParameter() const;
-    Parameter getPreloadParameter() const;
-    Parameter getHikyuuParameter() const;
+    /** 获取基础信息驱动参数 */
+    const Parameter& getBaseInfoDriverParameter() const;
 
+    /** 获取板块驱动参数 */
+    const Parameter& getBlockDriverParameter() const;
+
+    /** 获取 K 线数据驱动参数 */
+    const Parameter& getKDataDriverParameter() const;
+
+    /** 获取预加载参数 */
+    const Parameter& getPreloadParameter() const;
+
+    /** 获取其他参数 */
+    const Parameter& getHikyuuParameter() const;
+
+    /** 获取策略上下文 */
+    const StrategyContext& getStrategyContext() const;
+
+    /** 获取基础信息驱动 */
     BaseInfoDriverPtr getBaseInfoDriver() const;
-
-    void setKDataDriver(const KDataDriverPtr&);
 
     /**
      * 获取用于保存零时变量等的临时目录，如为配置则为当前目录
@@ -120,25 +139,17 @@ public:
     DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
 
     /**
-     * 初始化时，添加Stock，仅供BaseInfoDriver子类使用
+     * 判断指定日期是否为节假日
+     * @param d 指定日期
+     */
+    bool isHoliday(const Datetime& d) const;
+
+    /**
+     * 添加Stock，仅供临时增加的特殊Stock使用
      * @param stock
      * @return true 成功 | false 失败
      */
-    bool loadStock(const Stock& stock);
-
-    /**
-     * 初始化时，添加市场信息
-     * @param marketInfo
-     * @return
-     */
-    bool loadMarketInfo(const MarketInfo& marketInfo);
-
-    /**
-     * 初始化时，添加证券类型信息
-     * @param stkTypeInfo
-     * @return
-     */
-    bool loadStockTypeInfo(const StockTypeInfo& stkTypeInfo);
+    bool addStock(const Stock& stock);
 
     /**
      * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试
@@ -164,6 +175,13 @@ public:
      */
     void removeTempCsvStock(const string& code);
 
+    /**
+     * 获取当前执行线程id，主要用于判断 Strategy 是以独立进程还是线程方式运行
+     */
+    std::thread::id thread_id() const {
+        return m_thread_id;
+    }
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -174,27 +192,56 @@ public:
     }
 
 private:
+    /* 设置K线驱动 */
+    void setKDataDriver(const KDataDriverConnectPoolPtr&);
+
+    /* 加载节假日信息 */
+    void loadAllHolidays();
+
+    /* 初始化时，添加市场信息 */
+    void loadAllMarketInfos();
+
+    /* 初始化时，添加证券类型信息 */
+    void loadAllStockTypeInfo();
+
+    /* 加载所有证券 */
+    void loadAllStocks();
+
+    /* 加载所有权息数据 */
+    void loadAllStockWeights();
+
+private:
     StockManager();
 
 private:
     static StockManager* m_sm;
+    bool m_initializing;
+    std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
     string m_tmpdir;
     string m_datadir;
+    BaseInfoDriverPtr m_baseInfoDriver;
     BlockInfoDriverPtr m_blockDriver;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
+    std::mutex* m_stockDict_mutex;
 
     typedef unordered_map<string, MarketInfo> MarketInfoMap;
-    MarketInfoMap m_marketInfoDict;
+    mutable MarketInfoMap m_marketInfoDict;
+    std::mutex* m_marketInfoDict_mutex;
 
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
-    StockTypeInfoMap m_stockTypeInfo;
+    mutable StockTypeInfoMap m_stockTypeInfo;
+    std::mutex* m_stockTypeInfo_mutex;
+
+    std::unordered_set<Datetime> m_holidays;  // 节假日
+    std::mutex* m_holidays_mutex;
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;
     Parameter m_kdataDriverParam;
     Parameter m_preloadParam;
     Parameter m_hikyuuParam;
+    StrategyContext m_context;
 };
 
 inline size_t StockManager::size() const {
@@ -205,28 +252,36 @@ inline Stock StockManager::operator[](const string& query) const {
     return getStock(query);
 }
 
-inline Parameter StockManager::getBaseInfoDriverParameter() const {
+inline bool StockManager::isHoliday(const Datetime& d) const {
+    return m_holidays.count(d);
+}
+
+inline const Parameter& StockManager::getBaseInfoDriverParameter() const {
     return m_baseInfoDriverParam;
 }
 
-inline Parameter StockManager::getBlockDriverParameter() const {
+inline const Parameter& StockManager::getBlockDriverParameter() const {
     return m_blockDriverParam;
 }
 
-inline Parameter StockManager::getKDataDriverParameter() const {
+inline const Parameter& StockManager::getKDataDriverParameter() const {
     return m_kdataDriverParam;
 }
 
-inline Parameter StockManager::getPreloadParameter() const {
+inline const Parameter& StockManager::getPreloadParameter() const {
     return m_preloadParam;
 }
 
-inline Parameter StockManager::getHikyuuParameter() const {
+inline const Parameter& StockManager::getHikyuuParameter() const {
     return m_hikyuuParam;
 }
 
+inline const StrategyContext& StockManager::getStrategyContext() const {
+    return m_context;
+}
+
 inline BaseInfoDriverPtr StockManager::getBaseInfoDriver() const {
-    return DataDriverFactory::getBaseInfoDriver(m_baseInfoDriverParam);
+    return m_baseInfoDriver;
 }
 
 }  // namespace hku

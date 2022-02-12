@@ -27,9 +27,8 @@ bool ILiuTongPan::check() {
 }
 
 void ILiuTongPan::_calculate(const Indicator& data) {
-    if (!isLeaf() && !data.empty()) {
-        HKU_WARN("The input is ignored because {} depends on the context!", m_name);
-    }
+    HKU_WARN_IF(!isLeaf() && !data.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
 
     KData k = getContext();
     size_t total = k.size();

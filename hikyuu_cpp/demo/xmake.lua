@@ -11,11 +11,12 @@ target("demo")
         set_default(false)
     end
     
-    add_packages("spdlog", "fmt")
+    add_packages("spdlog", "fmt", "flatbuffers")
     add_includedirs("..")
 
     if is_plat("windows") then
         add_cxflags("-wd4267")
+        add_cxflags("-wd4251")
     end
 
     if is_plat("windows") and is_mode("release") then

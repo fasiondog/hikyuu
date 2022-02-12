@@ -16,7 +16,7 @@
 namespace hku {
 
 class IDevsq : public hku::IndicatorImp {
-    INDICATOR_IMP(IDevsq)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(IDevsq)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

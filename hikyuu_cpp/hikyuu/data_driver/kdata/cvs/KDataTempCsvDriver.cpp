@@ -17,8 +17,10 @@ namespace hku {
 
 KDataTempCsvDriver::~KDataTempCsvDriver() {}
 
+KDataTempCsvDriver::KDataTempCsvDriver() : KDataTempCsvDriver("", "") {}
+
 KDataTempCsvDriver::KDataTempCsvDriver(const string& day_filename, const string& min_filename)
-: m_day_filename(day_filename), m_min_filename(min_filename) {
+: KDataDriver("TMPCSV"), m_day_filename(day_filename), m_min_filename(min_filename) {
     for (int i = 0; i < LAST; ++i) {
         m_column[i] = Null<size_t>();
     }
@@ -79,97 +81,8 @@ void KDataTempCsvDriver::_get_title_column(const string& line) {
     }
 }
 
-void KDataTempCsvDriver::loadKData(const string& market, const string& code, KQuery::KType kType,
-                                   size_t start_ix, size_t end_ix, KRecordListPtr out_buffer) {
-    string filename;
-    if (kType == KQuery::DAY) {
-        filename = m_day_filename;
-    } else if (kType == KQuery::MIN) {
-        filename = m_min_filename;
-    } else {
-        HKU_INFO("Only support DAY and MIN!");
-        return;
-    }
-
-    std::ifstream infile(filename.c_str());
-    if (!infile) {
-        HKU_ERROR("Can't open this file: {}", filename);
-        return;
-    }
-
-    string line;
-    if (!std::getline(infile, line)) {
-        infile.close();
-        return;
-    }
-
-    _get_title_column(line);
-
-    size_t line_no = 0;
-    while (std::getline(infile, line)) {
-        if (line_no++ < start_ix)
-            continue;
-
-        if (line_no >= end_ix)
-            break;
-
-        _get_token(line);
-        size_t token_count = m_token_buf.size();
-
-        KRecord record;
-        string action;
-        try {
-            action = "DATE";
-            if (token_count >= m_column[DATE])
-                record.datetime = Datetime(m_token_buf[m_column[DATE]]);
-
-            action = "OPEN";
-            if (token_count >= m_column[OPEN])
-                record.openPrice = boost::lexical_cast<price_t>(m_token_buf[m_column[OPEN]]);
-
-            action = "HIGH";
-            if (token_count >= m_column[HIGH])
-                record.highPrice = boost::lexical_cast<price_t>(m_token_buf[m_column[HIGH]]);
-
-            action = "LOW";
-            if (token_count >= m_column[LOW])
-                record.lowPrice = boost::lexical_cast<price_t>(m_token_buf[m_column[LOW]]);
-
-            action = "CLOSE";
-            if (token_count >= m_column[CLOSE])
-                record.closePrice = boost::lexical_cast<price_t>(m_token_buf[m_column[CLOSE]]);
-
-            action = "VOLUME";
-            if (token_count >= m_column[VOLUME])
-                record.transCount = boost::lexical_cast<price_t>(m_token_buf[m_column[VOLUME]]);
-
-            action = "AMOUNT";
-            if (token_count >= m_column[AMOUNT])
-                record.transAmount = boost::lexical_cast<price_t>(m_token_buf[m_column[AMOUNT]]);
-
-            out_buffer->push_back(record);
-
-        } catch (...) {
-            HKU_WARN("Invalid data in line {}! at trans {}", line_no, action);
-        }
-
-        line_no++;
-    }
-
-    infile.close();
-}
-
 size_t KDataTempCsvDriver::getCount(const string& market, const string& code, KQuery::KType kType) {
-    KRecordListPtr buffer(new KRecordList);
-    loadKData(market, code, kType, 0, Null<size_t>(), buffer);
-    return buffer->size();
-}
-
-KRecord KDataTempCsvDriver::getKRecord(const string& market, const string& code, size_t pos,
-                                       KQuery::KType kType) {
-    KRecordListPtr buffer(new KRecordList);
-    loadKData(market, code, kType, 0, Null<size_t>(), buffer);
-    return pos < buffer->size() ? (*buffer)[pos] : Null<KRecord>();
+    return getKRecordList(market, code, KQuery(0, Null<int64_t>(), kType)).size();
 }
 
 bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string& code,
@@ -180,20 +93,14 @@ bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string&
 
     Datetime start_date = query.startDatetime();
     Datetime end_date = query.endDatetime();
-    if (start_date >= end_date) {
-        return false;
-    }
+    HKU_IF_RETURN(start_date >= end_date, false);
 
-    KRecordListPtr buffer(new KRecordList);
-    loadKData(market, code, query.kType(), 0, Null<size_t>(), buffer);
-
-    size_t total = buffer->size();
-    if (total == 0) {
-        return false;
-    }
+    auto klist = getKRecordList(market, code, KQuery(0, Null<int64_t>(), query.kType()));
+    size_t total = klist.size();
+    HKU_IF_RETURN(total == 0, false);
 
     for (size_t i = total - 1; i == 0; --i) {
-        if ((*buffer)[i].datetime < end_date) {
+        if (klist[i].datetime < end_date) {
             out_end = i + 1;
             break;
         }
@@ -204,7 +111,7 @@ bool KDataTempCsvDriver::getIndexRangeByDate(const string& market, const string&
     }
 
     for (size_t i = out_end - 1; i == 0; --i) {
-        if ((*buffer)[i].datetime <= start_date) {
+        if (klist[i].datetime <= start_date) {
             out_start = i;
             break;
         }
@@ -246,11 +153,7 @@ KRecordList KDataTempCsvDriver::_getKRecordListByIndex(const string& market, con
     }
 
     std::ifstream infile(filename.c_str());
-    if (!infile) {
-        HKU_ERROR("Can't open this file: {}", filename);
-        return result;
-    }
-
+    HKU_ERROR_IF_RETURN(!infile, result, "Can't open this file: {}", filename);
     string line;
     if (!std::getline(infile, line)) {
         infile.close();

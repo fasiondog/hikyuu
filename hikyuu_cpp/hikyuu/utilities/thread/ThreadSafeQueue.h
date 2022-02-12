@@ -68,6 +68,11 @@ public:
         return m_queue.empty();
     }
 
+    // 队列大小，无锁
+    size_t size() const {
+        return m_queue.size();
+    }
+
 private:
     mutable std::mutex m_mutex;
     std::queue<T> m_queue;

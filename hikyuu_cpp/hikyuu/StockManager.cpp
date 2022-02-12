@@ -17,8 +17,10 @@
 
 #include "utilities/IniParser.h"
 #include "utilities/util.h"
+#include "utilities/thread/ThreadPool.h"
 #include "StockManager.h"
-#include "GlobalTaskGroup.h"
+#include "global/GlobalTaskGroup.h"
+#include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 #include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
 #include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
@@ -32,19 +34,24 @@ namespace hku {
 StockManager* StockManager::m_sm = nullptr;
 
 void StockManager::quit() {
-    releaseThreadPool();
     if (m_sm) {
         delete m_sm;
         m_sm = nullptr;
     }
 }
 
-StockManager::StockManager() {}
+StockManager::StockManager() : m_initializing(false) {
+    m_stockDict_mutex = new std::mutex;
+    m_marketInfoDict_mutex = new std::mutex;
+    m_stockTypeInfo_mutex = new std::mutex;
+    m_holidays_mutex = new std::mutex;
+}
+
 StockManager::~StockManager() {
-    auto tg = getGlobalTaskGroup();
-    if (tg && !tg->done()) {
-        releaseThreadPool();
-    }
+    delete m_stockDict_mutex;
+    delete m_marketInfoDict_mutex;
+    delete m_stockTypeInfo_mutex;
+    delete m_holidays_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
 }
 
@@ -68,6 +75,19 @@ Parameter default_preload_param() {
     param.set<bool>("min15", false);
     param.set<bool>("min30", false);
     param.set<bool>("min60", false);
+    param.set<bool>("ticks", false);
+    param.set<int>("day_max", 100000);
+    param.set<int>("week_max", 100000);
+    param.set<int>("month_max", 100000);
+    param.set<int>("quarter_max", 100000);
+    param.set<int>("halfyear_max", 100000);
+    param.set<int>("year_max", 100000);
+    param.set<int>("min_max", 5120);
+    param.set<int>("min5_max", 5120);
+    param.set<int>("min15_max", 5120);
+    param.set<int>("min30_max", 5120);
+    param.set<int>("min60_max", 5120);
+    param.set<int>("ticks_max", 5120);
     return param;
 }
 
@@ -80,30 +100,21 @@ Parameter default_other_param() {
 
 void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockParam,
                         const Parameter& kdataParam, const Parameter& preloadParam,
-                        const Parameter& hikyuuParam) {
+                        const Parameter& hikyuuParam, const StrategyContext& context) {
+    HKU_WARN_IF_RETURN(m_initializing, void(),
+                       "The last initialization has not finished. Please try again later!");
+    m_initializing = true;
+    m_thread_id = std::this_thread::get_id();
     m_baseInfoDriverParam = baseInfoParam;
     m_blockDriverParam = blockParam;
     m_kdataDriverParam = kdataParam;
     m_preloadParam = preloadParam;
     m_hikyuuParam = hikyuuParam;
+    m_context = context;
 
-    // 创建内部线程池
-    // 不能同过 GlobalInitializer 初始化全局线程池
-    // 原因是 std::thread 无法在 dllmain 中创建使用，会造成死锁
-    initThreadPool();
-
-    // 获取临时路径信息
-    try {
-        m_tmpdir = hikyuuParam.get<string>("tmpdir");
-    } catch (...) {
-        m_tmpdir = "";
-    }
-
-    try {
-        m_datadir = hikyuuParam.get<string>("datadir");
-    } catch (...) {
-        m_datadir = "";
-    }
+    // 获取路径信息
+    m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
+    m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
 
     m_stockDict.clear();
     m_marketInfoDict.clear();
@@ -112,9 +123,14 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     string funcname(" [StockManager::init]");
 
     //加载证券基本信息
-    BaseInfoDriverPtr base_info = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
-    HKU_CHECK(base_info, "Failed get base info driver!");
-    base_info->loadBaseInfo();
+    m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
+    HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
+
+    loadAllHolidays();
+    loadAllMarketInfos();
+    loadAllStockTypeInfo();
+    loadAllStocks();
+    loadAllStockWeights();
 
     //获取板块驱动
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
@@ -123,166 +139,161 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_INFO("Loading KData...");
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 
-    KDataDriverPtr kdata_driver = DataDriverFactory::getKDataDriver(m_kdataDriverParam);
-
-    setKDataDriver(kdata_driver);
+    setKDataDriver(DataDriverFactory::getKDataDriverPool(m_kdataDriverParam));
 
     // add special Market, for temp csv file
     m_marketInfoDict["TMP"] =
-      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>());
+      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
+                 TimeDelta(0), TimeDelta(0), TimeDelta(0), TimeDelta(0));
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     HKU_INFO("{:<.2f}s Loaded Data.", sec.count());
+    m_initializing = false;
 }
 
-void StockManager::setKDataDriver(const KDataDriverPtr& driver) {
-    if (!driver) {
-        HKU_ERROR("kdata driver is null!");
-        return;
+void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
+    HKU_ERROR_IF_RETURN(!driver, void(), "kdata driver is null!");
+
+    if (m_kdataDriverParam != driver->getPrototype()->getParameter()) {
+        m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
 
-    if (m_kdataDriverParam == driver->getParameter()) {
+    bool preload_day = m_preloadParam.tryGet<bool>("day", false);
+    HKU_INFO_IF(preload_day, "Preloading all day kdata to buffer!");
+
+    bool preload_week = m_preloadParam.tryGet<bool>("week", false);
+    HKU_INFO_IF(preload_week, "Preloading all week kdata to buffer!");
+
+    bool preload_month = m_preloadParam.tryGet<bool>("month", false);
+    HKU_INFO_IF(preload_month, "Preloading all month kdata to buffer!");
+
+    bool preload_quarter = m_preloadParam.tryGet<bool>("quarter", false);
+    HKU_INFO_IF(preload_quarter, "Preloading all quarter kdata to buffer!");
+
+    bool preload_halfyear = m_preloadParam.tryGet<bool>("halfyear", false);
+    HKU_INFO_IF(preload_halfyear, "Preloading all halfyear kdata to buffer!");
+
+    bool preload_year = m_preloadParam.tryGet<bool>("year", false);
+    HKU_INFO_IF(preload_year, "Preloading all year kdata to buffer!");
+
+    bool preload_min = m_preloadParam.tryGet<bool>("min", false);
+    HKU_INFO_IF(preload_min, "Preloading all 1 min kdata to buffer!");
+
+    bool preload_min5 = m_preloadParam.tryGet<bool>("min5", false);
+    HKU_INFO_IF(preload_min5, "Preloading all 5 min kdata to buffer!");
+
+    bool preload_min15 = m_preloadParam.tryGet<bool>("min15", false);
+    HKU_INFO_IF(preload_min15, "Preloading all 15 min kdata to buffer!");
+
+    bool preload_min30 = m_preloadParam.tryGet<bool>("min30", false);
+    HKU_INFO_IF(preload_min30, "Preloading all 30 min kdata to buffer!");
+
+    bool preload_min60 = m_preloadParam.tryGet<bool>("min60", false);
+    HKU_INFO_IF(preload_min60, "Preloading all 60 min kdata to buffer!");
+
+    if (!driver->getPrototype()->canParallelLoad()) {
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (iter->second.market() == "TMP")
+                continue;
+            iter->second.setKDataDriver(driver);
+            if (preload_day)
+                iter->second.loadKDataToBuffer(KQuery::DAY);
+            if (preload_week)
+                iter->second.loadKDataToBuffer(KQuery::WEEK);
+            if (preload_month)
+                iter->second.loadKDataToBuffer(KQuery::MONTH);
+            if (preload_quarter)
+                iter->second.loadKDataToBuffer(KQuery::QUARTER);
+            if (preload_halfyear)
+                iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
+            if (preload_year)
+                iter->second.loadKDataToBuffer(KQuery::YEAR);
+            if (preload_min)
+                iter->second.loadKDataToBuffer(KQuery::MIN);
+            if (preload_min5)
+                iter->second.loadKDataToBuffer(KQuery::MIN5);
+            if (preload_min15)
+                iter->second.loadKDataToBuffer(KQuery::MIN15);
+            if (preload_min30)
+                iter->second.loadKDataToBuffer(KQuery::MIN30);
+            if (preload_min60)
+                iter->second.loadKDataToBuffer(KQuery::MIN60);
+        }
+
     } else {
-        m_kdataDriverParam = driver->getParameter();
+        // 异步并行加载
+        auto& tg = *getGlobalTaskGroup();
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (iter->second.market() == "TMP")
+                continue;
+            iter->second.setKDataDriver(driver);
+            if (preload_day)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::DAY); });
+            if (preload_week)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::WEEK); });
+            if (preload_month)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MONTH); });
+            if (preload_quarter)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::QUARTER); });
+            if (preload_halfyear)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::HALFYEAR); });
+            if (preload_year)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::YEAR); });
+            if (preload_min)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN); });
+            if (preload_min5)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN5); });
+            if (preload_min15)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN15); });
+            if (preload_min30)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN30); });
+            if (preload_min60)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN60); });
+        }
     }
 
-    bool preload_day = false;
-    try {
-        preload_day = m_preloadParam.get<bool>("day");
-        if (preload_day)
-            HKU_INFO("Preloading all day kdata to buffer!");
-    } catch (...) {
-        preload_day = false;
+    initInnerTasek();
+}
+
+void StockManager::reload() {
+    loadAllHolidays();
+
+    loadAllMarketInfos();
+    loadAllStockTypeInfo();
+    loadAllStocks();
+    loadAllStockWeights();
+
+    HKU_INFO("start reload kdata to buffer");
+    std::vector<Stock> can_not_parallel_stk_list;  // 记录不支持并行加载的Stock
+    {
+        auto* tg = getGlobalTaskGroup();
+        std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            auto driver = iter->second.getKDataDirver();
+            if (!driver->getPrototype()->canParallelLoad()) {
+                can_not_parallel_stk_list.push_back(iter->second);
+                continue;
+            }
+
+            auto& ktype_list = KQuery::getAllKType();
+            for (auto& ktype : ktype_list) {
+                if (iter->second.isBuffer(ktype)) {
+                    tg->submit([=]() mutable {
+                        Stock& stk = iter->second;
+                        stk.loadKDataToBuffer(ktype);
+                    });
+                }
+            }
+        }
     }
 
-    bool preload_week = false;
-    try {
-        preload_week = m_preloadParam.get<bool>("week");
-        if (preload_week)
-            HKU_INFO("Preloading all week kdata to buffer!");
-    } catch (...) {
-        preload_week = false;
-    }
-
-    bool preload_month = false;
-    try {
-        preload_month = m_preloadParam.get<bool>("month");
-        if (preload_week)
-            HKU_INFO("Preloading all month kdata to buffer!");
-    } catch (...) {
-        preload_month = false;
-    }
-
-    bool preload_quarter = false;
-    try {
-        preload_quarter = m_preloadParam.get<bool>("quarter");
-        if (preload_quarter)
-            HKU_INFO("Preloading all quarter kdata to buffer!");
-    } catch (...) {
-        preload_quarter = false;
-    }
-
-    bool preload_halfyear = false;
-    try {
-        preload_halfyear = m_preloadParam.get<bool>("halfyear");
-        if (preload_halfyear)
-            HKU_INFO("Preloading all halfyear kdata to buffer!");
-    } catch (...) {
-        preload_halfyear = false;
-    }
-
-    bool preload_year = false;
-    try {
-        preload_year = m_preloadParam.get<bool>("year");
-        if (preload_year)
-            HKU_INFO("Preloading all year kdata to buffer!");
-    } catch (...) {
-        preload_year = false;
-    }
-
-    bool preload_min = false;
-    try {
-        preload_min = m_preloadParam.get<bool>("min");
-        if (preload_min)
-            HKU_INFO("Preloading all 1 min kdata to buffer!");
-    } catch (...) {
-        preload_min = false;
-    }
-
-    bool preload_min5 = false;
-    try {
-        preload_min5 = m_preloadParam.get<bool>("min5");
-        if (preload_min5)
-            HKU_INFO("Preloading all 5 min kdata to buffer!");
-    } catch (...) {
-        preload_min5 = false;
-    }
-
-    bool preload_min15 = false;
-    try {
-        preload_min15 = m_preloadParam.get<bool>("min15");
-        if (preload_min15)
-            HKU_INFO("Preloading all 15 min kdata to buffer!");
-    } catch (...) {
-        preload_min15 = false;
-    }
-
-    bool preload_min30 = false;
-    try {
-        preload_min30 = m_preloadParam.get<bool>("min30");
-        if (preload_min30)
-            HKU_INFO("Preloading all 30 min kdata to buffer!");
-    } catch (...) {
-        preload_min30 = false;
-    }
-
-    bool preload_min60 = false;
-    try {
-        preload_min60 = m_preloadParam.get<bool>("min60");
-        if (preload_min60)
-            HKU_INFO("Preloading all 60 min kdata to buffer!");
-    } catch (...) {
-        preload_min60 = false;
-    }
-
-    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-        if (iter->second.market() == "TMP")
-            continue;
-
-        iter->second.setKDataDriver(driver);
-
-        if (preload_day)
-            iter->second.loadKDataToBuffer(KQuery::DAY);
-
-        if (preload_week)
-            iter->second.loadKDataToBuffer(KQuery::WEEK);
-
-        if (preload_month)
-            iter->second.loadKDataToBuffer(KQuery::MONTH);
-
-        if (preload_quarter)
-            iter->second.loadKDataToBuffer(KQuery::QUARTER);
-
-        if (preload_halfyear)
-            iter->second.loadKDataToBuffer(KQuery::HALFYEAR);
-
-        if (preload_year)
-            iter->second.loadKDataToBuffer(KQuery::YEAR);
-
-        if (preload_min)
-            iter->second.loadKDataToBuffer(KQuery::MIN);
-
-        if (preload_min5)
-            iter->second.loadKDataToBuffer(KQuery::MIN5);
-
-        if (preload_min15)
-            iter->second.loadKDataToBuffer(KQuery::MIN15);
-
-        if (preload_min30)
-            iter->second.loadKDataToBuffer(KQuery::MIN30);
-
-        if (preload_min60)
-            iter->second.loadKDataToBuffer(KQuery::MIN60);
+    for (auto& stk : can_not_parallel_stk_list) {
+        auto& ktype_list = KQuery::getAllKType();
+        for (auto& ktype : ktype_list) {
+            if (stk.isBuffer(ktype)) {
+                stk.loadKDataToBuffer(ktype);
+            }
+        }
     }
 }
 
@@ -298,33 +309,47 @@ Stock StockManager::getStock(const string& querystr) const {
     Stock result;
     string query_str = querystr;
     to_upper(query_str);
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.find(query_str);
-    if (iter != m_stockDict.end()) {
-        return iter->second;
+    return (iter != m_stockDict.end()) ? iter->second : result;
+}
+
+MarketInfo StockManager::getMarketInfo(const string& market) const {
+    MarketInfo result;
+    string market_tmp = market;
+    to_upper(market_tmp);
+
+    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
+    auto iter = m_marketInfoDict.find(market_tmp);
+    if (iter != m_marketInfoDict.end()) {
+        result = iter->second;
+    } else {
+        result = m_baseInfoDriver->getMarketInfo(market_tmp);
+        if (result != Null<MarketInfo>()) {
+            m_marketInfoDict[market_tmp] = result;
+        }
     }
     return result;
 }
 
-MarketInfo StockManager::getMarketInfo(const string& market) const {
-    string market_tmp = market;
-    to_upper(market_tmp);
-    auto iter = m_marketInfoDict.find(market_tmp);
-    if (iter != m_marketInfoDict.end()) {
-        return iter->second;
-    }
-    return Null<MarketInfo>();
-}
-
 StockTypeInfo StockManager::getStockTypeInfo(uint32_t type) const {
+    StockTypeInfo result;
+    std::lock_guard<std::mutex> lock(*m_stockTypeInfo_mutex);
     auto iter = m_stockTypeInfo.find(type);
     if (iter != m_stockTypeInfo.end()) {
-        return iter->second;
+        result = iter->second;
+    } else {
+        result = m_baseInfoDriver->getStockTypeInfo(type);
+        if (result != Null<StockTypeInfo>()) {
+            m_stockTypeInfo[type] = result;
+        }
     }
-    return Null<StockTypeInfo>();
+    return result;
 }
 
 MarketList StockManager::getAllMarket() const {
     MarketList result;
+    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
     auto iter = m_marketInfoDict.begin();
     for (; iter != m_marketInfoDict.end(); ++iter) {
         result.push_back(iter->first);
@@ -345,13 +370,9 @@ BlockList StockManager::getBlockList() {
 }
 
 DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
-    Stock stock = getStock("SH000001");
-    size_t start_ix = 0, end_ix = 0;
-    DatetimeList result;
-    if (stock.getIndexRange(query, start_ix, end_ix)) {
-        result = stock.getDatetimeList(start_ix, end_ix, query.kType());
-    }
-    return result;
+    auto marketinfo = getMarketInfo(market);
+    return getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()))
+      .getDatetimeList(query);
 }
 
 Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,
@@ -362,17 +383,22 @@ Stock StockManager::addTempCsvStock(const string& code, const string& day_filena
     Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000),
                  Null<Datetime>(), tick, tickValue, precision, minTradeNumber, maxTradeNumber);
 
-    KDataTempCsvDriver* p = new KDataTempCsvDriver(day_filename, min_filename);
-    result.setKDataDriver(KDataDriverPtr(p));
-    result.loadKDataToBuffer(KQuery::DAY);
-    result.loadKDataToBuffer(KQuery::MIN);
-
-    if (!loadStock(result)) {
-        //加入失败，返回Null<Stock>
-        return Null<Stock>();
+    Parameter param;
+    param.set<string>("type", "TMPCSV");
+    auto driver_pool = DataDriverFactory::getKDataDriverPool(param);
+    auto driver = driver_pool->getPrototype();
+    KDataTempCsvDriver* p = dynamic_cast<KDataTempCsvDriver*>(driver.get());
+    p->setDayFileName(day_filename);
+    p->setMinFileName(min_filename);
+    result.setKDataDriver(driver_pool);
+    const auto& preload_param = getPreloadParameter();
+    if (preload_param.tryGet<bool>("day", true)) {
+        result.loadKDataToBuffer(KQuery::DAY);
     }
-
-    return result;
+    if (preload_param.tryGet<bool>("min", false)) {
+        result.loadKDataToBuffer(KQuery::MIN);
+    }
+    return addStock(result) ? result : Null<Stock>();
 }
 
 void StockManager::removeTempCsvStock(const string& code) {
@@ -384,38 +410,139 @@ void StockManager::removeTempCsvStock(const string& code) {
     }
 }
 
-bool StockManager::loadStock(const Stock& stock) {
+bool StockManager::addStock(const Stock& stock) {
     string market_code(stock.market_code());
     to_upper(market_code);
-    if (m_stockDict.find(market_code) != m_stockDict.end()) {
-        HKU_ERROR("The stock had exist! {}", market_code);
-        return false;
-    }
-
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    HKU_ERROR_IF_RETURN(m_stockDict.find(market_code) != m_stockDict.end(), false,
+                        "The stock had exist! {}", market_code);
     m_stockDict[market_code] = stock;
     return true;
 }
 
-bool StockManager::loadMarketInfo(const MarketInfo& marketInfo) {
-    string market = marketInfo.market();
-    to_upper(market);
-    if (m_marketInfoDict.find(market) != m_marketInfoDict.end()) {
-        HKU_ERROR("The marketInfo had exist! {}", market);
-        return false;
+void StockManager::loadAllStocks() {
+    HKU_INFO("Loading stock information...");
+    vector<StockInfo> stockInfos;
+    if (m_context.isAll()) {
+        stockInfos = m_baseInfoDriver->getAllStockInfo();
+    } else {
+        const vector<string>& context_stock_code_list = m_context.getStockCodeList();
+        auto all_market = getAllMarket();
+        for (auto stkcode : context_stock_code_list) {
+            to_upper(stkcode);
+            bool find = false;
+            for (auto& market : all_market) {
+                auto pos = stkcode.find(market);
+                if (pos != string::npos && market.size() <= stkcode.size()) {
+                    string stk_market = stkcode.substr(pos, market.size());
+                    string stk_code = stkcode.substr(market.size(), stkcode.size());
+                    stockInfos.push_back(m_baseInfoDriver->getStockInfo(stk_market, stk_code));
+                    find = true;
+                    break;
+                }
+            }
+            HKU_WARN_IF(!find, "Invalid stock code: {}", stkcode);
+        }
     }
 
-    m_marketInfoDict[market] = marketInfo;
-    return true;
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    for (auto& info : stockInfos) {
+        Datetime startDate, endDate;
+        try {
+            startDate = Datetime(info.startDate * 10000LL);
+        } catch (...) {
+            startDate = Null<Datetime>();
+        }
+        try {
+            endDate = Datetime(info.endDate * 10000LL);
+        } catch (...) {
+            endDate = Null<Datetime>();
+        }
+
+        string market_code = format("{}{}", info.market, info.code);
+        to_upper(market_code);
+        auto iter = m_stockDict.find(market_code);
+        if (iter == m_stockDict.end()) {
+            Stock stock(info.market, info.code, info.name, info.type, info.valid, startDate,
+                        endDate, info.tick, info.tickValue, info.precision, info.minTradeNumber,
+                        info.maxTradeNumber);
+            m_stockDict[market_code] = stock;
+
+        } else {
+            Stock& stock = iter->second;
+            if (!stock.m_data) {
+                stock.m_data = shared_ptr<Stock::Data>(
+                  new Stock::Data(info.market, info.code, info.name, info.type, info.valid,
+                                  startDate, endDate, info.tick, info.tickValue, info.precision,
+                                  info.minTradeNumber, info.maxTradeNumber));
+            } else {
+                stock.m_data->m_market = info.market;
+                stock.m_data->m_code = info.code;
+                stock.m_data->m_name = info.name;
+                stock.m_data->m_type = info.type;
+                stock.m_data->m_valid = info.valid;
+                stock.m_data->m_startDate = startDate;
+                stock.m_data->m_lastDate = endDate;
+                stock.m_data->m_tick = info.tick;
+                stock.m_data->m_tickValue = info.tickValue;
+                stock.m_data->m_precision = info.precision;
+                stock.m_data->m_minTradeNumber = info.minTradeNumber;
+                stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
+            }
+        }
+    }
 }
 
-bool StockManager::loadStockTypeInfo(const StockTypeInfo& stkTypeInfo) {
-    if (m_stockTypeInfo.find(stkTypeInfo.type()) != m_stockTypeInfo.end()) {
-        HKU_ERROR("The stockTypeInfo had exist! {}", stkTypeInfo.type());
-        return false;
+void StockManager::loadAllMarketInfos() {
+    HKU_INFO("Loading market information...");
+    auto marketInfos = m_baseInfoDriver->getAllMarketInfo();
+    std::lock_guard<std::mutex> lock(*m_marketInfoDict_mutex);
+    m_marketInfoDict.clear();
+    m_marketInfoDict.reserve(marketInfos.size());
+    for (auto& marketInfo : marketInfos) {
+        string market = marketInfo.market();
+        to_upper(market);
+        m_marketInfoDict[market] = marketInfo;
     }
+}
 
-    m_stockTypeInfo[stkTypeInfo.type()] = stkTypeInfo;
-    return true;
+void StockManager::loadAllStockTypeInfo() {
+    HKU_INFO("Loading stock type information...");
+    auto stkTypeInfos = m_baseInfoDriver->getAllStockTypeInfo();
+    std::lock_guard<std::mutex> lock(*m_stockTypeInfo_mutex);
+    m_stockTypeInfo.clear();
+    m_stockTypeInfo.reserve(stkTypeInfos.size());
+    for (auto& stkTypeInfo : stkTypeInfos) {
+        m_stockTypeInfo[stkTypeInfo.type()] = stkTypeInfo;
+    }
+}
+
+void StockManager::loadAllHolidays() {
+    auto holidays = m_baseInfoDriver->getAllHolidays();
+    std::lock_guard<std::mutex> lock(*m_holidays_mutex);
+    m_holidays = std::move(holidays);
+}
+
+void StockManager::loadAllStockWeights() {
+    HKU_INFO("Loading stock weight...");
+    ThreadPool tg;  // 这里不用全局的线程池，可以避免在初始化后立即reload导致过长的等待
+    std::vector<std::future<void>> task_list;
+    std::lock_guard<std::mutex> lock(*m_stockDict_mutex);
+    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+        task_list.push_back(tg.submit([=]() mutable {
+            Stock& stock = iter->second;
+            StockWeightList weightList = m_baseInfoDriver->getStockWeightList(
+              stock.market(), stock.code(), Datetime::min(), Null<Datetime>());
+            if (stock.m_data) {
+                std::lock_guard<std::mutex> lock(stock.m_data->m_weight_mutex);
+                stock.m_data->m_weightList.swap(weightList);
+            }
+        }));
+    }
+    // 权息信息如果不等待加载完毕，在数据加载期间进行计算可能导致复权错误，所以这里需要等待
+    for (auto& task : task_list) {
+        task.get();
+    }
 }
 
 }  // namespace hku

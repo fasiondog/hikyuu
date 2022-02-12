@@ -1,5 +1,5 @@
 /*
- * ';.kmuhbvcdxIndicatorImp.h
+ * IndicatorImp.h
  *
  *  Created on: 2013-2-9
  *      Author: fasiondog
@@ -13,6 +13,7 @@
 #include "../KData.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/util.h"
+#include "../utilities/thread/StealThreadPool.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #if HKU_SUPPORT_XML_ARCHIVE
@@ -30,6 +31,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #endif /* HKU_SUPPORT_BINARY_ARCHIVE */
 
+#include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -47,6 +49,7 @@ namespace hku {
 #define MAX_RESULT_NUM 6
 
 class HKU_API Indicator;
+class HKU_API IndParam;
 
 /**
  * 指标实现类，定义新指标时，应从此类继承
@@ -150,6 +153,15 @@ public:
 
     IndicatorImpPtr clone();
 
+    bool haveIndParam(const string& name) const;
+    void setIndParam(const string& name, const Indicator& ind);
+    void setIndParam(const string& name, const IndParam& ind);
+    IndParam getIndParam(const string& name) const;
+    const IndicatorImpPtr getIndParamImp(const string& name) const;
+    const unordered_map<string, IndicatorImpPtr>& getIndParams() const;
+
+    price_t* data(size_t result_num = 0);
+
     // ===================
     //  子类接口
     // ===================
@@ -158,6 +170,21 @@ public:
     }
 
     virtual void _calculate(const Indicator&) {}
+
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
+
+    /** 动态指标参数计算完毕后处理，主要用于修正 m_discard */
+    virtual void _after_dyn_calculate(const Indicator& ind) {}
+
+    /** 是否支持指标动态参数 */
+    virtual bool supportIndParam() const {
+        return false;
+    }
+
+    /** 是否必须串行计算 */
+    virtual bool isSerial() const {
+        return false;
+    }
 
     virtual IndicatorImpPtr _clone() {
         return make_shared<IndicatorImp>();
@@ -185,6 +212,10 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
+    void _dyn_calculate(const Indicator&);
+
+protected:
+    static size_t _get_step_start(size_t pos, size_t step, size_t discard);
 
 protected:
     string m_name;
@@ -197,6 +228,14 @@ protected:
     IndicatorImpPtr m_left;
     IndicatorImpPtr m_right;
     IndicatorImpPtr m_three;
+    unordered_map<string, IndicatorImpPtr> m_ind_params;
+
+public:
+    static void initDynEngine();
+    static void releaseDynEngine();
+
+protected:
+    static StealThreadPool* ms_tg;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -213,6 +252,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
         ar& BOOST_SERIALIZATION_NVP(m_three);
+        ar& BOOST_SERIALIZATION_NVP(m_ind_params);
+
         size_t act_result_num = 0;
         for (size_t i = 0; i < m_result_num; i++) {
             if (m_pBuffer[i]) {
@@ -251,6 +292,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_left);
         ar& BOOST_SERIALIZATION_NVP(m_right);
         ar& BOOST_SERIALIZATION_NVP(m_three);
+        ar& BOOST_SERIALIZATION_NVP(m_ind_params);
+
         size_t act_result_num = 0;
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
@@ -303,6 +346,18 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
+#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)                                             \
+public:                                                                                        \
+    virtual bool check() override;                                                             \
+    virtual void _calculate(const Indicator& ind) override;                                    \
+    virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override; \
+    virtual bool supportIndParam() const override {                                            \
+        return true;                                                                           \
+    }                                                                                          \
+    virtual IndicatorImpPtr _clone() override {                                                \
+        return make_shared<classname>();                                                       \
+    }
+
 #define INDICATOR_NEED_CONTEXT                    \
 public:                                           \
     virtual bool isNeedContext() const override { \
@@ -340,6 +395,22 @@ inline bool IndicatorImp::isLeaf() const {
 
 inline KData IndicatorImp::getContext() const {
     return getParam<KData>("kdata");
+}
+
+inline const unordered_map<string, IndicatorImpPtr>& IndicatorImp::getIndParams() const {
+    return m_ind_params;
+}
+
+inline bool IndicatorImp::haveIndParam(const string& name) const {
+    return m_ind_params.find(name) != m_ind_params.end();
+}
+
+inline price_t* IndicatorImp::data(size_t result_num) {
+    return m_pBuffer[result_num] ? m_pBuffer[result_num]->data() : nullptr;
+}
+
+inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {
+    return pos < discard + step ? discard : pos + 1 - step;
 }
 
 } /* namespace hku */

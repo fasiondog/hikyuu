@@ -9,12 +9,51 @@
 #ifndef BASEINFODRIVER_H_
 #define BASEINFODRIVER_H_
 
+#include <unordered_set>
 #include "../utilities/Parameter.h"
 #include "../MarketInfo.h"
 #include "../StockTypeInfo.h"
 #include "../Stock.h"
+#include "../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
+
+struct StockInfo {
+    StockInfo()
+    : type(Null<uint32_t>()),
+      valid(0),
+      startDate(0),
+      endDate(0),
+      precision(1),
+      tick(0.0),
+      tickValue(0.0),
+      minTradeNumber(0.0),
+      maxTradeNumber(0.0) {}
+
+    static const char* getSelectSQL() {
+        return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, b.tick, "
+               "b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from stock a, "
+               "StockTypeInfo b, market c where a.type = b.id and a.marketid = c.marketid";
+    }
+
+    void load(const SQLStatementPtr& st) {
+        st->getColumn(0, market, code, name, type, valid, startDate, endDate, tick, tickValue,
+                      precision, minTradeNumber, maxTradeNumber);
+    }
+
+    string market;
+    string code;
+    string name;
+    uint32_t type;
+    uint32_t valid;
+    uint64_t startDate;
+    uint64_t endDate;
+    uint32_t precision;
+    double tick;
+    double tickValue;
+    double minTradeNumber;
+    double maxTradeNumber;
+};
 
 /**
  * 基本信息数据获取驱动基类
@@ -45,10 +84,32 @@ public:
     bool init(const Parameter& params);
 
     /**
-     * 加载基础信息
+     * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
      * @return
      */
-    bool loadBaseInfo();
+    virtual bool _init() = 0;
+
+    /**
+     * 获取所有股票详情信息
+     */
+    virtual vector<StockInfo> getAllStockInfo() = 0;
+
+    /**
+     * 获取指定的证券信息
+     * @param market 市场简称
+     * @param code 证券代码
+     */
+    virtual StockInfo getStockInfo(string market, const string& code) = 0;
+
+    /**
+     * 获取指定日期范围内 [start, end) 的权限列表
+     * @param market 市场简称
+     * @param code 证券代码
+     * @param start 起始日期
+     * @param end 结束日期
+     */
+    virtual StockWeightList getStockWeightList(const string& market, const string& code,
+                                               Datetime start, Datetime end);
 
     /**
      * 获取当前财务信息
@@ -58,28 +119,33 @@ public:
     virtual Parameter getFinanceInfo(const string& market, const string& code);
 
     /**
-     * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
-     * @return
+     * 获取指定的MarketInfo
+     * @param market 市场简称
+     * @return 如未找到，则返回 Null<MarketInfo>()
      */
-    virtual bool _init() = 0;
+    virtual MarketInfo getMarketInfo(const string& market) = 0;
 
     /**
-     * 加载市场信息
-     * @return true 成功 | false 失败
+     * 获取全部市场信息
      */
-    virtual bool _loadMarketInfo() = 0;
+    virtual vector<MarketInfo> getAllMarketInfo() = 0;
 
     /**
-     * 加载证券类型信息
-     * @return true 成功 | false 失败
+     * 获取全部证券类型信息
      */
-    virtual bool _loadStockTypeInfo() = 0;
+    virtual vector<StockTypeInfo> getAllStockTypeInfo() = 0;
 
     /**
-     * 加载股票信息
-     * @return true 成功 | false 失败
+     * 获取相应的证券类型详细信息
+     * @param type 证券类型
+     * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
      */
-    virtual bool _loadStock() = 0;
+    virtual StockTypeInfo getStockTypeInfo(uint32_t type) = 0;
+
+    /**
+     * 获取所有节假日日期
+     */
+    virtual std::unordered_set<Datetime> getAllHolidays() = 0;
 
 private:
     bool checkType();

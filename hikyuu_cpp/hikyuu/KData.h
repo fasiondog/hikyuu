@@ -31,26 +31,31 @@ public:
     size_t size() const;
     bool empty() const;
 
+    bool operator==(const KData&);
+
     DatetimeList getDatetimeList() const;
 
     /** 获取指定位置的KRecord，未作越界检查 */
     KRecord getKRecord(size_t pos) const;
 
     /** 按日期查询KRecord */
-    KRecord getKRecordByDate(const Datetime& datetime) const;
+    KRecord getKRecord(Datetime datetime) const;
 
     /** 同getKRecord @see getKRecord */
     KRecord operator[](size_t pos) const {
         return getKRecord(pos);
     }
 
-    /** 同getKRecordByDate @see getKRecordByDate */
-    KRecord operator[](const Datetime& datetime) const {
-        return getKRecordByDate(datetime);
+    /** 同getKRecord @see getKRecord */
+    KRecord operator[](Datetime datetime) const {
+        return getKRecord(datetime);
     }
 
-    /** 按日期查询对应的索引位置  */
+    /** 按日期查询对应的索引位置，注：是 KData 中的位置，不是在 Stock 中原始K记录的位置 */
     size_t getPos(const Datetime& datetime) const;
+
+    /** 按日期获取在原始 K 线记录中的位置 */
+    size_t getPosInStock(Datetime datetime) const;
 
     /** 获取关联的KQuery */
     KQuery getQuery() const;
@@ -152,17 +157,19 @@ inline KData& KData::operator=(const KData& x) {
 }
 
 inline DatetimeList KData::getDatetimeList() const {
+    DatetimeList result;
     if (empty()) {
-        return DatetimeList();
+        return result;
     }
-    return getStock().getDatetimeList(startPos(), lastPos() + 1, getQuery().kType());
+    result = getStock().getDatetimeList(KQuery(startPos(), lastPos() + 1, getQuery().kType()));
+    return result;
 }
 
 inline KRecord KData::getKRecord(size_t pos) const {
     return m_imp->getKRecord(pos);  //如果为空，将抛出异常
 }
 
-inline KRecord KData::getKRecordByDate(const Datetime& datetime) const {
+inline KRecord KData::getKRecord(Datetime datetime) const {
     size_t pos = getPos(datetime);
     return pos != Null<size_t>() ? getKRecord(pos) : Null<KRecord>();
 }

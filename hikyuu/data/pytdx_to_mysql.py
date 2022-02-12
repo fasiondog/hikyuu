@@ -27,19 +27,21 @@ import math
 import datetime
 from pytdx.hq import TDXParams
 
+from hikyuu.util.mylog import hku_error, hku_debug
+
 import mysql.connector
 
 from .common import MARKETID, STOCKTYPE, get_stktype_list
-from .common_mysql import (create_database, get_marketid,
-                          get_codepre_list, get_stock_list,
-                          get_table, get_lastdatetime)
+from .common_mysql import (
+    create_database, get_marketid, get_codepre_list, get_stock_list, get_table, get_lastdatetime, update_extern_data
+)
 from .weight_to_mysql import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
     percent = '{:.0%}'.format(cur / total)
     sys.stdout.write('\r')
-    sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)),percent))
+    sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)), percent))
     sys.stdout.flush()
 
 
@@ -64,7 +66,7 @@ def import_stock_name(connect, api, market, quotations=None):
     pytdx_market = to_pytdx_market(market.upper())
     stk_count = api.get_security_count(pytdx_market)
 
-    for i in range(int(stk_count/1000)+1):
+    for i in range(int(stk_count / 1000) + 1):
         stock_list = api.get_security_list(pytdx_market, i * 1000)
         if stock_list is None:
             continue
@@ -74,8 +76,11 @@ def import_stock_name(connect, api, market, quotations=None):
     marketid = get_marketid(connect, market)
 
     stktype_list = get_stktype_list(quotations)
-    cur.execute("select stockid, code, name, valid from `hku_base`.`stock` where marketid={} and type in {}"
-                    .format(marketid, stktype_list))
+    cur.execute(
+        "select stockid, code, name, valid from `hku_base`.`stock` where marketid={} and type in {}".format(
+            marketid, stktype_list
+        )
+    )
     a = cur.fetchall()
     oldStockDict = {}
     for oldstock in a:
@@ -89,8 +94,9 @@ def import_stock_name(connect, api, market, quotations=None):
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode]:
-                cur.execute("update `hku_base`.`stock` set name='%s' where stockid=%i" %
-                            (newStockDict[oldcode], oldstockid))
+                cur.execute(
+                    "update `hku_base`.`stock` set name='%s' where stockid=%i" % (newStockDict[oldcode], oldstockid)
+                )
             if oldvalid == 0:
                 cur.execute("update `hku_base`.`stock` set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
 
@@ -134,6 +140,7 @@ def guess_day_n_step(last_datetime):
 
     return (n, step)
 
+
 def guess_1min_n_step(last_datetime):
     last_date = int(last_datetime // 10000)
     today = datetime.date.today()
@@ -150,6 +157,7 @@ def guess_1min_n_step(last_datetime):
         n = 99
 
     return (n, step)
+
 
 def guess_5min_n_step(last_datetime):
     last_date = int(last_datetime // 10000)
@@ -169,17 +177,17 @@ def guess_5min_n_step(last_datetime):
     return (n, step)
 
 
-def import_one_stock_data(connect, api, market, ktype, stock_record):
+def import_one_stock_data(connect, api, market, ktype, stock_record, startDate=199012191500):
     market = market.upper()
     pytdx_market = to_pytdx_market(market)
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
-
+    hku_debug("{}{}".format(market, code))
     table = get_table(connect, market, code, ktype)
     last_datetime = get_lastdatetime(connect, table)
     if last_datetime is None:
-        last_datetime = 199012191500
+        last_datetime = startDate
 
     today = datetime.date.today()
     if ktype == 'DAY':
@@ -225,9 +233,17 @@ def import_one_stock_data(connect, api, market, ktype, stock_record):
                     and bar['high'] >= bar['open'] >= bar['low'] > 0 \
                     and bar['high'] >= bar['close'] >= bar['low'] > 0 \
                     and bar['vol'] >= 0 and bar['amount'] >= 0:
-                buf.append((bar_datetime, bar['open'], bar['high'], bar['low'],
-                            bar['close'], bar['amount'] * 0.001,
-                            bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)))
+                try:
+                    buf.append(
+                        (
+                            bar_datetime, bar['open'], bar['high'], bar['low'], bar['close'], bar['amount'] * 0.001,
+                            bar['vol']
+                            #bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)
+                        )
+                    )
+                except Exception as e:
+                    hku_error("Can't trans record({}), {}".format(bar, e))
+                last_datetime = bar_datetime
 
     if len(buf) > 0:
         cur = connect.cursor()
@@ -262,7 +278,7 @@ def import_one_stock_data(connect, api, market, ktype, stock_record):
     return len(buf)
 
 
-def import_data(connect, market, ktype, quotations, api, progress=ProgressBar):
+def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199012190000, progress=ProgressBar):
     """导入通达信指定盘后数据路径中的K线数据。注：只导入基础信息数据库中存在的股票。
 
     :param connect   : sqlit3链接
@@ -286,15 +302,14 @@ def import_data(connect, market, ktype, quotations, api, progress=ProgressBar):
                 progress(i, total)
             continue
 
-        this_count = import_one_stock_data(connect, api, market, ktype, stock)
+        this_count = import_one_stock_data(connect, api, market, ktype, stock, startDate)
         add_record_count += this_count
-        """
         if this_count > 0:
             if ktype == 'DAY':
-                update_hdf5_extern_data(h5file, market.upper() + stock[2], 'DAY')
+                update_extern_data(connect, market.upper(), stock[2], 'DAY')
             elif ktype == '5MIN':
-                update_hdf5_extern_data(h5file, market.upper() + stock[2], '5MIN')
-        """
+                update_extern_data(connect, market.upper(), stock[2], '5MIN')
+
         if progress:
             progress(i, total)
 
@@ -332,7 +347,6 @@ if __name__ == '__main__':
     print("\n导入上证日线数据")
     add_count = import_data(connect, 'SH', 'DAY', quotations, api, progress=ProgressBar)
     print("\n导入数量：", add_count)
-
     """
     print("\n导入深证日线数据")
     add_count = import_data(connect, 'SZ', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
@@ -373,10 +387,9 @@ if __name__ == '__main__':
 
     #for i in range(10):
     #    x = api.get_history_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*2000, 2000, 20181112)
-        #x = api.get_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*800, 800)
+    #x = api.get_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*800, 800)
     #    if x is not None and len(x) > 0:
     #        print(i, len(x), x[0], x[-1])
-
 
     api.disconnect()
     connect.close()

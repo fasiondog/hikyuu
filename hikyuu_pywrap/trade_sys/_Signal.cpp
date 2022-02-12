@@ -96,6 +96,15 @@ void export_Signal() {
     :param Datetime datetime: 指定时刻
     :rtype: bool)")
 
+      .def("next_time_should_buy", &SignalBase::nextTimeShouldBuy,
+           R"(next_time_should_byu(self)
+
+    下一时刻是否可以买入，相当于最后时刻是否指示买入)")
+
+      .def("next_time_should_sell", &SignalBase::nextTimeShouldSell, R"(next_time_should_sell(self)
+      
+    下一时刻是否可以卖出，相当于最后时刻是否指示卖出)")
+
       .def("get_buy_signal", &SignalBase::getBuySignal, R"(get_buy_signal(self)
 
     获取所有买入指示日期列表

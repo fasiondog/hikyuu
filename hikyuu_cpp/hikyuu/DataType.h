@@ -21,7 +21,6 @@
 
 #include <stdio.h>
 #include <cstdint>
-#include <string_view>
 #include <iostream>
 #include <list>
 #include <cmath>
@@ -35,7 +34,6 @@
 #include "utilities/Null.h"
 #include "utilities/arithmetic.h"
 #include "utilities/SpendTimer.h"
-#include "utilities/exception.h"
 #include "utilities/util.h"
 
 #if defined(_MSC_VER)
@@ -95,11 +93,12 @@ using std::uint8_t;
 typedef double price_t;
 
 using std::string;
-using std::string_view;
 
 using std::enable_shared_from_this;
 using std::make_shared;
+using std::make_unique;
 using std::shared_ptr;
+using std::unique_ptr;
 
 using std::list;
 using std::map;

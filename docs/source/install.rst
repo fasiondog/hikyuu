@@ -6,7 +6,7 @@
 
 支持的操作系统：64位 Windows7及以上版本、Linux请使用源码自行编译安装。
 
-Python环境：>= Python3.5
+Python环境：>= Python3.8
 
 .. note:: 
 
@@ -18,7 +18,7 @@ pip 安装
 
 安装：pip install hikyuu
 
-版本升级：pip install hikyuu --upgrade
+版本升级：pip install hikyuu -U
 
 .. figure:: _static/20000-install.png
 

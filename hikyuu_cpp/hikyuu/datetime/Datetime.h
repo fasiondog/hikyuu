@@ -38,6 +38,25 @@ namespace bd = boost::gregorian;
  */
 class HKU_API Datetime {
 public:
+    /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
+    static Datetime min();
+
+    /** 返回所能表示的最大日期：9999-Dec-31 00:00:00 */
+    static Datetime max();
+
+    /** 返回本地计算机当前时刻 */
+    static Datetime now();
+
+    /** 返回本地计算机今日日期 */
+    static Datetime today();
+
+    /**
+     * 兼容oracle
+     * datetime格式，除最高端的字节外，每个字节依次表示世纪、世纪年、月、日、时、分、秒
+     */
+    static Datetime fromHex(uint64_t time);
+
+public:
     /** 默认构造函数，Null<Datetime> */
     Datetime();
 
@@ -121,10 +140,17 @@ public:
     Datetime operator-(TimeDelta d) const;
 
     /**
-     * 返回如YYYYMMDDhhmmss格式的数字，方便比较操作，
+     * 返回如YYYYMMDDhhmm格式的数字，方便比较操作
      * Null<Datetime>()对应的 number 为 Null<unsigned long long>
+     * @note 精度到分钟
      */
-    unsigned long long number() const;
+    uint64_t number() const noexcept;
+
+    /**
+     * 转化为 oracle datetime 方式的数字，后 7 个字节分别表示世纪、世纪中的年、月、日、时、分、秒
+     * @note 精度到秒
+     */
+    uint64_t hex() const noexcept;
 
     /**
      * 转化为字符串，供打印阅读，格式：
@@ -233,18 +259,6 @@ public:
 
     /** 上一年度起始日期 */
     Datetime preYear() const;
-
-    /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
-    static Datetime min();
-
-    /** 返回所能表示的最大日期：9999-Dec-31 00:00:00 */
-    static Datetime max();
-
-    /** 返回本地计算机当前时刻 */
-    static Datetime now();
-
-    /** 返回本地计算机今日日期 */
-    static Datetime today();
 
 private:
     bt::ptime m_data;
@@ -366,4 +380,15 @@ inline Datetime Datetime::operator-(TimeDelta d) const {
 }
 
 } /* namespace hku */
+
+namespace std {
+template <>
+class hash<hku::Datetime> {
+public:
+    size_t operator()(hku::Datetime const& d) const noexcept {
+        return d.number();  // or use boost::hash_combine
+    }
+};
+}  // namespace std
+
 #endif /* DATETIME_H_ */

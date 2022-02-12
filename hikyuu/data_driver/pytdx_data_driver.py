@@ -45,6 +45,9 @@ class PytdxKDataDriver(KDataDriver):
     def __init__(self):
         super(PytdxKDataDriver, self).__init__('pytdx')
 
+    def _clone(self):
+        return PytdxKDataDriver()
+
     def _init(self):
         """【重载接口】（可选）初始化子类私有变量"""
         self._max = {
@@ -60,10 +63,13 @@ class PytdxKDataDriver(KDataDriver):
             Query.MIN30: 25,
             Query.MIN60: 25
         }
-        return
+        return True
 
     def isIndexFirst(self):
         return True
+
+    def canParallelLoad(self):
+        return False
 
     def getKRecordList(self, market, code, query):
         """
@@ -74,6 +80,9 @@ class PytdxKDataDriver(KDataDriver):
         :param Query query: 查询条件
         :rtype: KRecordList
         """
+        if query.query_type == Query.DATE:
+            print("未实现按日期查询")
+            return KRecordList()
         start_ix = query.start
         end_ix = query.end
         if start_ix >= end_ix or start_ix < 0 or end_ix < 0:
@@ -119,7 +128,7 @@ class PytdxKDataDriver(KDataDriver):
         """
         print("getIndexRangeByDate")
 
-        if query.queryType != Query.DATE:
+        if query.query_type != Query.DATE:
             return (0, 0)
 
         start_datetime = query.startDatetime
@@ -269,15 +278,15 @@ class PytdxKDataDriver(KDataDriver):
 #DataDriverFactory.regKDataDriver(PytdxKDataDriver())
 
 #tdx_param = Parameter()
-#tdx_param.set('type', 'pytdx')
-#tdx_param.set('ip', '119.147.212.81')
-#tdx_param.set('port', 7709)
+#tdx_param['type'] = 'pytdx'
+#tdx_param['ip'] = '119.147.212.81'
+#tdx_param['port'] =  7709
 
-#base_param = sm.getBaseInfoDriverParameter()
-#block_param = sm.getBlockDriverParameter()
-#kdata_param = sm.getKDataDriverParameter()
-#preload_param = sm.getPreloadParameter()
-#hku_param = sm.getHikyuuParameter()
+#base_param = sm.get_base_info_parameter()
+#block_param = sm.get_block_parameter()
+#kdata_param = sm.get_kdata_parameter()
+#preload_param = sm.get_preload_parameter()
+#hku_param = sm.get_hikyuu_parameter()
 
 #切换K线数据驱动，重新初始化
 #sm.init(base_param, block_param, tdx_param, preload_param, hku_param)

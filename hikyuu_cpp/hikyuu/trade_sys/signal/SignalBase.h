@@ -9,7 +9,7 @@
 #ifndef SIGNALBASE_H_
 #define SIGNALBASE_H_
 
-#include <set>
+#include <unordered_set>
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
 #include "../../trade_manage/TradeManager.h"
@@ -17,7 +17,7 @@
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/set.hpp>
+#include <boost/serialization/unordered_set.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
 #endif
@@ -49,6 +49,16 @@ public:
      * @return true 可以卖出 | false 不可卖出
      */
     bool shouldSell(const Datetime& datetime) const;
+
+    /**
+     * 下一时刻是否可以买入，相当于最后时刻是否指示买入
+     */
+    bool nextTimeShouldBuy() const;
+
+    /**
+     * 下一时刻是否可以卖出，相当于最后时刻是否指示卖出
+     */
+    bool nextTimeShouldSell() const;
 
     /** 获取所有买入指示日期列表 */
     DatetimeList getBuySignal() const;
@@ -106,8 +116,8 @@ protected:
     string m_name;
     KData m_kdata;
     bool m_hold;
-    std::set<Datetime> m_buySig;
-    std::set<Datetime> m_sellSig;
+    std::unordered_set<Datetime> m_buySig;
+    std::unordered_set<Datetime> m_sellSig;
 
 //============================================
 // 序列化支持

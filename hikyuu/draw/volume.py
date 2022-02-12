@@ -31,7 +31,7 @@
 """
 绘制普通K线图 + 成交量（成交金额）
 """
-from hikyuu.util.mylog import escapetime
+from hikyuu.util.mylog import spend_time
 from hikyuu import Query
 from hikyuu.indicator import Indicator, IF, MA, CLOSE, VOL, CVAL, PRICELIST, SG_Cross
 from .drawplot import (

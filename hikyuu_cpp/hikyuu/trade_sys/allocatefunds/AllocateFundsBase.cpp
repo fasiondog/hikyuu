@@ -86,10 +86,7 @@ void AllocateFundsBase::setReservePercent(double percent) {
 void AllocateFundsBase ::adjustFunds(const Datetime& date, const SystemList& se_list,
                                      const std::list<SYSPtr>& running_list) {
     int max_num = getParam<int>("max_sys_num");
-    if (max_num <= 0) {
-        HKU_ERROR("param(max_sys_num) need > 0!");
-        return;
-    }
+    HKU_ERROR_IF_RETURN(max_num <= 0, void(), "param(max_sys_num) need > 0!");
 
     if (getParam<bool>("adjust_running_sys")) {
         _adjust_with_running(date, se_list, running_list);
@@ -111,7 +108,6 @@ price_t AllocateFundsBase::_getTotalFunds(const std::list<SYSPtr>& running_list)
     }
 
     // 加上当前总账户现金余额
-    int precision = m_shadow_tm->getParam<int>("precision");
     total_value =
       roundDown(total_value + m_shadow_tm->currentCash(), m_shadow_tm->getParam<int>("precision"));
     return total_value;
@@ -121,15 +117,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                                              const std::list<SYSPtr>& running_list) {
     // 计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
-    if (sw_list.size() == 0) {
-        return;
-    }
+    HKU_IF_RETURN(sw_list.size() == 0, void());
 
     // 如果运行中的系统数已大于等于允许的最大系统数，直接返回
     int max_num = getParam<int>("max_sys_num");
-    if (running_list.size() >= max_num) {
-        return;
-    }
+    HKU_IF_RETURN(running_list.size() >= max_num, void());
 
     //构建实际分配权重大于零的的系统集合
     std::set<SYSPtr> selected_sets;
@@ -145,8 +137,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
         const SYSPtr& sys = *iter;
         if (selected_sets.find(sys) == selected_sets.end()) {
-            KRecord record = sys->getTO().getKRecordByDate(date);
-            TradeRecord tr = sys->_sell(record, PART_ALLOCATEFUNDS);
+            KData kdata = sys->getTO();
+            size_t pos = kdata.getPos(date);
+            KRecord record = kdata.getKRecord(date);
+            KRecord srcRecord = kdata.getStock().getKRecord(kdata.startPos() + pos);
+            TradeRecord tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
             if (!tr.isNull()) {
                 m_tm->addTradeRecord(tr);
             }
@@ -182,8 +177,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         } else if (selected_running_sets.find(iter->getSYS()) != selected_running_sets.end()) {
             // 超出最大允许运行数且属于正在运行的子系统，则尝试清仓并回收资金
             auto sys = iter->getSYS();
-            KRecord record = sys->getTO().getKRecordByDate(date);
-            auto tr = sys->_sell(record, PART_ALLOCATEFUNDS);
+            KData kdata = sys->getTO();
+            size_t pos = kdata.getPos(date);
+            KRecord record = kdata.getKRecord(date);
+            KRecord srcRecord = kdata.getStock().getKRecord(kdata.startPos() + pos);
+            auto tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
             if (!tr.isNull()) {
                 m_tm->addTradeRecord(tr);
             }
@@ -283,7 +281,10 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
                 // 计算并卖出部分股票以获取剩下需要返还的资金
                 Stock stock = sys->getStock();
-                KRecord k = sys->getTO().getKRecordByDate(date);
+                KData kdata = sys->getTO();
+                size_t pos = kdata.getPos(date);
+                KRecord k = kdata.getKRecord(pos);
+                KRecord srcK = stock.getKRecord(kdata.startPos() + pos);
                 PositionRecord position = tm->getPosition(stock);
                 if (position.number > 0) {
                     TradeRecord tr;
@@ -292,14 +293,14 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                       size_t(need_sell_num / stock.minTradeNumber()) * stock.minTradeNumber();
                     if (position.number <= need_sell_num) {
                         // 如果当前持仓数小于等于需要卖出的数量，则全部卖出
-                        tr = sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
+                        tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
                     } else {
                         if (position.number - need_sell_num >= stock.minTradeNumber()) {
                             // 如果按需要卖出数量卖出后，可能剩余的数量大于等于最小交易数则按需要卖出的数量卖出
-                            tr = sys->_sellForce(k, need_sell_num, PART_ALLOCATEFUNDS);
+                            tr = sys->_sellForce(k, srcK, need_sell_num, PART_ALLOCATEFUNDS);
                         } else {
                             // 如果按需要卖出的数量卖出后，剩余的持仓数小于最小交易数量则全部卖出
-                            tr = sys->_sellForce(k, position.number, PART_ALLOCATEFUNDS);
+                            tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
                         }
                     }
                     if (!tr.isNull()) {
@@ -339,15 +340,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
 void AllocateFundsBase::_adjust_without_running(const Datetime& date, const SystemList& se_list,
                                                 const std::list<SYSPtr>& running_list) {
-    if (se_list.size() == 0) {
-        return;
-    }
+    HKU_IF_RETURN(se_list.size() == 0, void());
 
     //如果运行中的系统数已大于等于允许的最大系统数，直接返回
     int max_num = getParam<int>("max_sys_num");
-    if (running_list.size() >= max_num) {
-        return;
-    }
+    HKU_IF_RETURN(running_list.size() >= max_num, void());
 
     // 计算选中系统中当前正在运行中的子系统
     std::set<SYSPtr> hold_sets;
@@ -365,9 +362,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
 
     //获取计划分配的资产权重
     SystemWeightList sw_list = _allocateWeight(date, pure_se_list);
-    if (sw_list.size() == 0) {
-        return;
-    }
+    HKU_IF_RETURN(sw_list.size() == 0, void());
 
     //按权重升序排序（注意：无法保证等权重的相对顺序，即使用stable_sort也一样，后面要倒序遍历）
     std::sort(
@@ -396,9 +391,7 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     price_t reserve_funds = total_funds * m_reserve_percent;
 
     // 如果当前现金小于等于需保留的资产，则直接返回
-    if (m_shadow_tm->currentCash() <= reserve_funds) {
-        return;
-    }
+    HKU_IF_RETURN(m_shadow_tm->currentCash() <= reserve_funds, void());
 
     // 计算可用于分配的现金
     price_t can_allocate_cash = roundDown(m_shadow_tm->currentCash() - reserve_funds, precision);

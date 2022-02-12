@@ -23,39 +23,49 @@ IDevsq::IDevsq() : IndicatorImp("DEVSQ", 1) {
 IDevsq::~IDevsq() {}
 
 bool IDevsq::check() {
-    int n = getParam<int>("n");
-    if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 2;
 }
 
 void IDevsq::_calculate(const Indicator& data) {
     size_t total = data.size();
     int n = getParam<int>("n");
 
-    m_discard = data.discard() + n - 1;
-    if (m_discard >= total) {
-        m_discard = total;
-        return;
-    }
-
+    m_discard = data.discard();
     Indicator ma = MA(data, n);
     for (size_t i = discard(); i < total; ++i) {
         price_t mean = ma[i];
         price_t sum = 0.0;
-        for (size_t j = i + 1 - n; j <= i; ++j) {
+        size_t start = i < data.discard() + n ? data.discard() : i + 1 - n;
+        for (size_t j = start; j <= i; ++j) {
             sum += std::pow(data[j] - mean, 2);
         }
         _set(sum, i);
     }
 }
 
+void IDevsq::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += ind[i];
+    }
+    price_t mean = sum / (curPos - start + 1);
+    sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += std::pow(ind[i] - mean, 2);
+    }
+    _set(sum, curPos);
+}
+
 Indicator HKU_API DEVSQ(int n) {
     IndicatorImpPtr p = make_shared<IDevsq>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API DEVSQ(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IDevsq>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

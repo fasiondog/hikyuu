@@ -18,16 +18,8 @@ FixedPercentMoneyManager::~FixedPercentMoneyManager() {}
 double FixedPercentMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
                                                 price_t price, price_t risk, SystemPart from) {
     double p = getParam<double>("p");
-    if (p <= 0.0 || p > 1.0) {
-        HKU_ERROR("Error param (p = {:<.4f})", p);
-        return 0;
-    }
-
-    if (risk == 0.0) {
-        HKU_ERROR("risk is zero!");
-        return 0;
-    }
-
+    HKU_ERROR_IF_RETURN(p <= 0.0 || p > 1.0, 0.0, "Error param (p = {:<.4f})", p);
+    HKU_ERROR_IF_RETURN(risk == 0.0, 0.0, "risk is zero!");
     return m_tm->currentCash() * p / risk;
 }
 

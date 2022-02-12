@@ -56,7 +56,6 @@ import configparser
 from hikyuu import *
 
 #重定向C++ stdout/stderr输出至python
-#iodog = ostream_redirect()
 iodog = OstreamRedirect()
 iodog.open()
 
@@ -111,18 +110,23 @@ for p in block_config:
 preload_param = Parameter()
 preload_config = ini.options('preload')
 for p in preload_config:
-    # 注意：proload参数是布尔类型
-    preload_param[p] = ini.getboolean('preload', p)
+    if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60'):
+        preload_param[p] = ini.getboolean('preload', p)
+    else:
+        preload_param[p] = ini.getint('preload', p)
 
 kdata_param = Parameter()
 kdata_config = ini.options('kdata')
 for p in kdata_config:
     kdata_param[p] = ini.get('kdata', p)
 
-set_log_level(LOG_LEVEL.TRACE)
-sm = StockManager.instance()
+#set_log_level(LOG_LEVEL.INFO)
+#sm = StockManager.instance()
 sm.init(base_param, block_param, kdata_param, preload_param, hku_param)
-set_log_level(LOG_LEVEL.WARN)
+set_log_level(LOG_LEVEL.INFO)
+
+# 启动行情接收代理
+start_spot_agent()
 
 # ==============================================================================
 #
@@ -153,6 +157,11 @@ for s in sm:
         blockg.add(s)
 zsbk_cyb = blockg
 
+blockstart = Block("START", "科创板")
+for s in sm:
+    if s.type == constant.STOCKTYPE_START:
+        blockstart.add(s)
+
 blockzxb = Block("A", "中小板")
 for s in blocksz:
     if s.code[:3] == "002":
@@ -163,21 +172,6 @@ zsbk_sz50 = sm.get_block("指数板块", "上证50")
 zsbk_sz180 = sm.get_block("指数板块", "上证180")
 zsbk_hs300 = sm.get_block("指数板块", "沪深300")
 zsbk_zz100 = sm.get_block("指数板块", "沪深300")
-
-# ==============================================================================
-#
-# 设置关键类型简称
-#
-# ==============================================================================
-O = OPEN()
-C = CLOSE()
-H = HIGH()
-L = LOW()
-A = AMO()
-V = VOL()
-D = Datetime
-K = None
-Q = Query
 
 
 def set_global_context(stk, query):
@@ -212,6 +206,7 @@ set_global_context(sm['sh000001'], Query(-150))
 #
 # ==============================================================================
 from .draw import *
+
 use_draw_engine('matplotlib')
 
 # ==============================================================================
@@ -235,7 +230,7 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
     :rtype: 选中的股票列表
     """
     q = Query(start, end)
-    d = sm.getTradingCalendar(q, 'SH')
+    d = sm.get_trading_calendar(q, 'SH')
     if len(d) == 0:
         return
 
@@ -245,10 +240,10 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
             continue
 
         q = Query(start, end)
-        k = s.getKData(q)
+        k = s.get_kdata(q)
         cond.set_context(k)
-        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k) > 0 and k[
-            -1].date == d[-1]:
+        if len(cond) > 0 and cond[-1] != constant.null_price and cond[-1] > 0 and len(k
+                                                                                      ) > 0 and k[-1].datetime == d[-1]:
             result.append(s)
             if print_out:
                 print(d[-1], s)
@@ -274,7 +269,10 @@ def UpdateOneRealtimeRecord_from_sina(tmpstr):
             transamount = float(a[9])
             transcount = float(a[8])
 
-            d = Datetime(a[-3] + " 00")
+            try:
+                d = Datetime(a[-3])
+            except:
+                d = Datetime(a[-4])
             temp = (open, high, low, close)
             if 0 in temp:
                 return
@@ -375,12 +373,11 @@ def realtime_update_from_sina_qq(source):
         return
 
     count = 0
-    urls = []
+    #urls = []
     tmpstr = queryStr
     for stock in sm:
         if stock.valid and stock.type in (
-            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF,
-            constant.STOCKTYPE_GEM
+            constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_ETF, constant.STOCKTYPE_GEM
         ):
             tmpstr += ("%s,") % (stock.market_code.lower())
             count = count + 1
@@ -461,8 +458,8 @@ def realtime_update_from_tushare():
         record.amount = float(df.ix[i, 'amount'])
 
         if (
-            last_record.close != record.close or last_record.high != record.high
-            or last_record.low != record.low or last_record.open != record.open
+            last_record.close != record.close or last_record.high != record.high or last_record.low != record.low
+            or last_record.open != record.open
         ):
             from datetime import date
             d = date.today()
@@ -492,8 +489,7 @@ def realtime_update_wrap():
         from datetime import timedelta, datetime
         nonlocal pre_update_time
         now_update_time = datetime.now()
-        if (pre_update_time is
-            None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
+        if (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
             realtime_update_inner(source)
             pre_update_time = datetime.now()
             print("更新完毕！", pre_update_time)

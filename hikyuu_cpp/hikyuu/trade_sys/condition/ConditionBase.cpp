@@ -62,10 +62,7 @@ ConditionPtr ConditionBase::clone() {
 void ConditionBase::setTO(const KData& kdata) {
     reset();
     m_kdata = kdata;
-    if (!m_sg) {
-        HKU_WARN("m_sg is NULL!");
-        return;
-    }
+    HKU_WARN_IF_RETURN(!m_sg, void(), "m_sg is NULL!");
     if (!kdata.empty()) {
         _calculate();
     }
@@ -76,10 +73,7 @@ void ConditionBase::_addValid(const Datetime& datetime) {
 }
 
 bool ConditionBase::isValid(const Datetime& datetime) {
-    if (m_valid.count(datetime) != 0) {
-        return true;
-    }
-    return false;
+    return m_valid.count(datetime) != 0;
 }
 
 } /* namespace hku */

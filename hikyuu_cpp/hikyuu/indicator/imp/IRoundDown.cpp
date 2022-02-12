@@ -23,11 +23,7 @@ IRoundDown::IRoundDown() : IndicatorImp("ROUNDDOWN", 1) {
 IRoundDown::~IRoundDown() {}
 
 bool IRoundDown::check() {
-    if (getParam<int>("ndigits") < 0) {
-        HKU_ERROR("Invalid param[ndigits] ! (n >= 0) {}", m_params);
-        return false;
-    }
-    return true;
+    return getParam<int>("ndigits") >= 0;
 }
 
 void IRoundDown::_calculate(const Indicator& data) {

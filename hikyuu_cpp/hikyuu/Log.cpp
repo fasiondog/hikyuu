@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <thread>
 #include "config.h"
 #include "GlobalInitializer.h"
 #include "Log.h"
@@ -23,7 +24,28 @@
 
 namespace hku {
 
+static std::thread::id g_main_thread_id = std::this_thread::get_id();
+static int g_ioredirect_to_python_count = 0;
+
+bool isLogInMainThread() {
+    return std::this_thread::get_id() == g_main_thread_id;
+}
+
+int getIORedirectToPythonCount() {
+    return g_ioredirect_to_python_count;
+}
+
+void increaseIORedicrectToPythonCount() {
+    g_ioredirect_to_python_count++;
+}
+
+void decreaseIORedicrectToPythonCount() {
+    g_ioredirect_to_python_count--;
+}
+
 static LOG_LEVEL g_log_level = TRACE;
+
+std::string g_unknown_error_msg{"Unknown error!"};
 
 LOG_LEVEL get_log_level() {
     return g_log_level;
@@ -64,7 +86,9 @@ void initLogger() {
     auto logger = std::make_shared<spdlog::logger>("hikyuu", stdout_sink);
     logger->set_level(spdlog::level::trace);
     logger->flush_on(spdlog::level::trace);
-    logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!]");
+    // logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v [%!] (%@)");
+    // logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v (%@)");
+    logger->set_pattern("%Y-%m-%d %H:%M:%S.%e [%^HKU-%L%$] - %v (%s:%#)");
     spdlog::register_logger(logger);
 }
 

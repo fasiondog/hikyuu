@@ -12,6 +12,9 @@
 using namespace boost::python;
 using namespace hku;
 
+KQuery::RecoverType (KQuery::*get_recoverType)() const = &KQuery::recoverType;
+void (KQuery::*set_recoverType)(KQuery::RecoverType recoverType) = &KQuery::recoverType;
+
 void export_KQuery() {
     scope in_Query =
       class_<KQuery>("Query", "K线数据查询条件", init<>())
@@ -31,7 +34,8 @@ void export_KQuery() {
                       "结束日期，当按索引查询方式创建时无效，为 constant.null_datetime")
         .add_property("query_type", &KQuery::queryType, "查询方式 Query.QueryType")
         .add_property("ktype", &KQuery::kType, "查询的K线类型 Query.KType")
-        .add_property("recover_type", &KQuery::recoverType, "查询的复权类型 Query.RecoverType")
+        .add_property("recover_type", get_recoverType, set_recoverType,
+                      "查询的复权类型 Query.RecoverType")
 
 #if HKU_PYTHON_SUPPORT_PICKLE
         .def_pickle(normal_pickle_suite<KQuery>())

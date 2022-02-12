@@ -1,15 +1,21 @@
-set_xmakever("2.2.5")
+set_xmakever("2.5.4")
 
 -- project
 set_project("hikyuu")
 
--- version
-set_version("1.1.5", {build="%Y%m%d%H%M"})
-if is_mode("debug") then
-    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
-else 
-    set_configvar("LOG_ACTIVE_LEVEL", 2)  -- 激活的日志级别 
+add_rules("mode.debug", "mode.release")
+if not is_plat("windows") then 
+    add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan")
 end
+
+-- version
+set_version("1.2.1", {build="%Y%m%d%H%M"})
+set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
+--if is_mode("debug") then
+--    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
+--else 
+--    set_configvar("LOG_ACTIVE_LEVEL", 2)  -- 激活的日志级别 
+--end
 set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
@@ -35,8 +41,33 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
+local hdf5_version = "1.10.4"
+local mysql_version = "8.0.21"
+if is_plat("windows") then
+    add_repositories("project-repo hikyuu_extern_libs")
+    if is_mode("release") then
+        add_requires("hdf5 " .. hdf5_version)
+    else
+        add_requires("hdf5_D " .. hdf5_version)
+    end
+    add_requires("mysql " .. mysql_version)
+end
+
 add_requires("fmt", {system=false, configs = {header_only = true, vs_runtime = "MD"}})
-add_requires("spdlog", {configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
+add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
+add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
+add_requires("nng", {system=false, configs = {vs_runtime="MD", cxflags="-fPIC"}})
+add_requires("nlohmann_json", {system=false})
+add_requires("cpp-httplib", {system=false})
+add_requires("zlib", {system=false})
+
+if is_plat("linux") and linuxos.name() == "ubuntu" then
+    add_requires("apt::libhdf5-dev", "apt::libmysqlclient-dev", "apt::libsqlite3-dev")
+elseif is_plat("macosx") then
+    add_requires("brew::hdf5")
+else
+    add_requires("sqlite3", {configs = {shared=true, vs_runtime="MD", cxflags="-fPIC"}})
+end
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 
@@ -46,7 +77,9 @@ set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 add_includedirs("$(env BOOST_ROOT)")
 add_linkdirs("$(env BOOST_LIB)")
 
-add_defines("BOOST_ALL_DYN_LINK")
+-- modifed to use boost static library, except boost.python, serialization
+--add_defines("BOOST_ALL_DYN_LINK")
+add_defines("BOOST_SERIALIZATION_DYN_LINK")
 
 if is_host("linux") then
     if is_arch("x86_64") then
@@ -55,24 +88,16 @@ if is_host("linux") then
     end
 end
 
-if is_mode("debug") then
-    set_symbols("debug")
-    set_optimize("none")
-end
-
 -- is release now
 if is_mode("release") then
     if is_plat("windows") then
         --Unix-like systems hidden symbols will cause the link dynamic libraries to failed!
         set_symbols("hidden") 
     end
-    set_optimize("fastest")
-    set_strip("all")
 end
 
 -- for the windows platform (msvc)
 if is_plat("windows") then 
-    add_packagedirs("./hikyuu_extern_libs/pkg")
     -- add some defines only for windows
     add_defines("NOCRYPT", "NOGDI")
     add_cxflags("-EHsc", "/Zc:__cplusplus", "/utf-8")
@@ -94,15 +119,13 @@ if not is_plat("windows") then
     add_ldflags("-pthread")
 end
 
-add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
+--add_vectorexts("sse", "sse2", "sse3", "ssse3", "mmx", "avx")
 
-if is_plat("windows") then
-    add_subdirs("./hikyuu_extern_libs/src/sqlite3")
-end
 add_subdirs("./hikyuu_cpp/hikyuu")
 add_subdirs("./hikyuu_pywrap")
 add_subdirs("./hikyuu_cpp/unit_test")
 add_subdirs("./hikyuu_cpp/demo")
+add_subdirs("./hikyuu_cpp/hikyuu_server")
 
 before_install("scripts.before_install")
 on_install("scripts.on_install")

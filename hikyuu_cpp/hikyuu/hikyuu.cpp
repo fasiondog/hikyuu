@@ -9,6 +9,7 @@
 #define NOMINMAX
 #endif
 
+#include <set>
 #include <fmt/format.h>
 #include "utilities/IniParser.h"
 #include "hikyuu.h"
@@ -18,7 +19,8 @@ namespace hku {
 
 static Parameter g_hikyuu_context;
 
-void hikyuu_init(const string& config_file_name) {
+void hikyuu_init(const string& config_file_name, bool ignore_preload,
+                 const StrategyContext& context) {
     IniParser config;
     try {
         config.read(config_file_name);
@@ -62,12 +64,25 @@ void hikyuu_init(const string& config_file_name) {
     }
 
     option = config.getOptionList("preload");
+
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
-        preloadParam.set<bool>(*iter, config.getBool("preload", *iter));
+        try {
+            preloadParam.set<bool>(*iter,
+                                   ignore_preload ? false : config.getBool("preload", *iter));
+        } catch (...) {
+            if (!ignore_preload) {
+                // 获取预加载的最大数量
+                try {
+                    preloadParam.set<int>(*iter, config.getInt("preload", *iter));
+                } catch (...) {
+                    HKU_WARN("Invalid option: {}", *iter);
+                }
+            }
+        }
     }
 
     StockManager& sm = StockManager::instance();
-    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam);
+    sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, context);
 }
 
 string getVersion() {

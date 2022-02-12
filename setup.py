@@ -48,8 +48,10 @@ def get_boost_envrionment():
 def get_python_version():
     """获取当前 python版本"""
     py_version = platform.python_version_tuple()
-    py_version = int(py_version[0]) * 10 + int(py_version[1])
-    print('current python version:', int(py_version) * 0.1)
+    min_version = int(py_version[1])
+    main_version = int(py_version[0])
+    py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
+    print('current python version: {}.{}'.format(main_version, min_version))
     return py_version
 
 
@@ -99,6 +101,7 @@ def save_current_compile_info(compile_info):
 
 def build_boost(mode):
     """ 编译依赖的 boost 库 """
+    new_mode = 'release' if mode == 'release' else 'debug'
     current_boost_root, current_boost_lib = get_boost_envrionment()
     if current_boost_root == '' or current_boost_lib == '':
         print("Can't get boost environment!")
@@ -109,15 +112,26 @@ def build_boost(mode):
         if not os.path.exists('b2.exe'):
             os.system('bootstrap.bat')
         os.system(
+            'b2 {} link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
+            ' --with-filesystem --with-system --with-test'.format(mode))
+        os.system(
             'b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
-            ' --with-date_time --with-filesystem --with-system --with-test'
             ' --with-serialization'.format(mode))
+        #os.system(
+        #    'b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
+        #    ' --with-date_time --with-filesystem --with-system --with-test'
+        #    ' --with-serialization'.format(mode))
         os.chdir(current_dir)
     else:
         cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
-              './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization '\
-              '--with-date_time --with-filesystem --with-system --with-test; '\
+              './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization; '\
+              './b2 {mode} link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
+              '--with-filesystem --with-system --with-test; '\
               'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
+        # cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
+        #       './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization '\
+        #       '--with-date_time --with-filesystem --with-system --with-test; '\
+        #       'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
         os.system(cmd)
 
 
@@ -159,7 +173,7 @@ def clear_with_python_changed(mode):
 #------------------------------------------------------------------------------
 # 执行构建
 #------------------------------------------------------------------------------
-def start_build(verbose=False, mode='release'):
+def start_build(verbose=False, mode='release', worker_num=2):
     """ 执行编译 """
     global g_verbose
     g_verbose = verbose
@@ -190,13 +204,14 @@ def start_build(verbose=False, mode='release'):
         clear_with_python_changed(mode)
         print('\ncompile boost ...')
         build_boost(mode)
-        os.system("xmake f -c -y -m {}".format(mode))
-    else:
-        os.system("xmake f -y -m {}".format(mode))
+        os.system("xmake f {} -c -y -m {}".format("-v -D" if verbose else "",
+                                                  mode))
 
-    os.system("xmake -b {} hikyuu".format("-v -D" if verbose else ""))
+    os.system("xmake -j {} -b {} hikyuu".format(worker_num,
+                                                "-v -D" if verbose else ""))
     if mode == "release":
-        os.system("xmake -b {} core".format("-v -D" if verbose else ""))
+        os.system("xmake -j {} -b {} core".format(worker_num,
+                                                  "-v -D" if verbose else ""))
 
     # 保存当前的编译信息
     save_current_compile_info(current_compile_info)
@@ -214,27 +229,35 @@ def cli():
 
 @click.command()
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
+@click.option('-j', '--j', default=2, help="并行编译数量")
 @click.option('-m',
               '--mode',
               default='release',
-              type=click.Choice(['release', 'debug']),
+              type=click.Choice([
+                  'release', 'debug', 'coverage', 'asan', 'tsan', 'msan',
+                  'lsan'
+              ]),
               help='编译模式')
-def build(verbose, mode):
+def build(verbose, mode, j):
     """ 执行编译 """
-    start_build(verbose, mode)
+    start_build(verbose, mode, j)
 
 
 @click.command()
 @click.option('-all', "--all", is_flag=True, help="执行全部测试, 否则仅仅进行最小范围测试）")
 @click.option("-compile", "--compile", is_flag=True, help='强制重新编译')
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
+@click.option('-j', '--j', default=2, help="并行编译数量")
 @click.option('-m',
               '--mode',
               default='release',
-              type=click.Choice(['release', 'debug']),
+              type=click.Choice([
+                  'release', 'debug', 'coverage', 'asan', 'msan', 'tsan',
+                  'lsan'
+              ]),
               help='编译模式')
 @click.option('-case', '--case', default='', help="执行指定的 TestCase")
-def test(all, compile, verbose, mode, case):
+def test(all, compile, verbose, mode, case, j):
     """ 执行单元测试 """
     current_compile_info = get_current_compile_info()
     current_compile_info['mode'] = mode
@@ -242,15 +265,15 @@ def test(all, compile, verbose, mode, case):
     if compile or current_compile_info != history_compile_info:
         start_build(verbose, mode)
     if all:
-        os.system("xmake f --test=all --mode={}".format(mode))
-        os.system("xmake -b {} unit-test".format("-v -D" if verbose else ""))
-        os.system("xmake r unit-test {}".format('' if case ==
-                                                '' else '-tc {}'.format(case)))
+        os.system("xmake -j {} -b {} unit-test".format(
+            j, "-v -D" if verbose else ""))
+        os.system("xmake r unit-test {}".format(
+            '' if case == '' else '--test-case={}'.format(case)))
     else:
-        os.system("xmake f --test=small --mode={}".format(mode))
-        os.system("xmake -b {} small-test".format("-v -D" if verbose else ""))
+        os.system("xmake -j {} -b {} small-test".format(
+            j, "-v -D" if verbose else ""))
         os.system("xmake r small-test {}".format(
-            '' if case == '' else '-tc {}'.format(case)))
+            '' if case == '' else '--test-case={}'.format(case)))
 
 
 @click.command()
@@ -272,6 +295,7 @@ def clear(with_boost):
     for r, _, f_list in os.walk('hikyuu'):
         for name in f_list:
             if (name != 'UnRAR.exe' and len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
+                   or (len(name) > 3 and name[-3:] == '.so')  \
                    or (len(name) > 8 and name[:9] == 'libboost_')  \
                    or (len(name) > 6 and name[-6:] == '.dylib'):
                 print('delete', r + '/' + name)
@@ -294,6 +318,8 @@ def uninstall():
         if dir == 'hikyuu' or (len(dir) > 6 and dir[:6] == 'Hikyuu'):
             print('delete', site_lib_dir + '/' + dir)
             shutil.rmtree(site_lib_dir + '/' + dir)
+    if os.path.exists("./hikyuu.egg-info"):
+        shutil.rmtree("./hikyuu.egg-info")
     print("Uninstall finished!")
 
 

@@ -44,9 +44,7 @@ void SingleSignal2::_calculate() {
     Indicator dev = REF(STDEV(DIFF(ind), filter_n), 1);
 
     size_t start = dev.discard();
-    if (start < 3) {
-        return;
-    }
+    HKU_IF_RETURN(start < 3, void());
 
     Indicator buy = ind - REF(LLV(ind, filter_n), 1);
     Indicator sell = REF(HHV(ind, filter_n), 1) - ind;

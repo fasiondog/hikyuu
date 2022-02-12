@@ -22,9 +22,13 @@ namespace hku {
  * @param n 时间窗口
  * @ingroup Indicator
  */
-Indicator AVEDEV(const Indicator& ind, int n = 22);
+inline Indicator AVEDEV(const Indicator& ind, int n = 22) {
+    Indicator result = ABS(ind - MA(ind, n)) / n;
+    result.name("AVEDEV");
+    return result;
+}
 
-inline Indicator AVEDEV(const Indicator& ind, int n) {
+inline Indicator AVEDEV(const Indicator& ind, const Indicator& n) {
     Indicator result = ABS(ind - MA(ind, n)) / n;
     result.name("AVEDEV");
     return result;

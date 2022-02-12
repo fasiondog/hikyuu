@@ -9,6 +9,7 @@
 #ifndef NULL_H_
 #define NULL_H_
 
+#include "../config.h"
 #include <cstddef>
 #include <limits>
 #include <type_traits>
@@ -68,6 +69,20 @@ public:
         return (std::numeric_limits<long long>::max)();
     }
 };
+
+#if !defined(_MSC_VER) && !HKU_OS_OSX
+/**
+ * int64_t Null值
+ */
+template <>
+class Null<int64_t> {
+public:
+    Null() {}
+    operator int64_t() {
+        return (std::numeric_limits<int64_t>::max)();
+    }
+};
+#endif
 
 /**
  * 提供unsigned long long（无符号64位整型）的Null值

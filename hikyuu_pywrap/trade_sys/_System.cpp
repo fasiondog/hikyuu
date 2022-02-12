@@ -19,7 +19,8 @@ string (System::*sys_get_name)() const = &System::name;
 void (System::*sys_set_name)(const string&) = &System::name;
 
 void (System::*run_1)(const KQuery&, bool) = &System::run;
-void (System::*run_2)(const Stock&, const KQuery&, bool reset) = &System::run;
+void (System::*run_2)(const KData&, bool) = &System::run;
+void (System::*run_3)(const Stock&, const KQuery&, bool reset) = &System::run;
 
 void export_System() {
     def(
@@ -34,10 +35,10 @@ void export_System() {
   且没有正确结果的时候，可能是未设置tm、sg、mm。进行回测时，使用 run 方法，如::
     
         #创建模拟交易账户进行回测，初始资金30万
-        my_tm = crtTM(initCash = 300000)
+        my_tm = crtTM(init_cash = 300000)
 
-        #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越慢线时买入，反之卖出）
-        my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
+        #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越慢线时买入，反之卖出）
+        my_sg = SG_Flex(EMA(n=5), slow_n=10)
 
         #固定每次买入1000股
         my_mm = MM_FixedCount(1000)
@@ -117,7 +118,7 @@ void export_System() {
         "System",
         R"(系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
 
-系统是指针对针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
+系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
 公共参数：
 
@@ -211,7 +212,8 @@ void export_System() {
 
         //.def("run", &System::run, run_overload(args("stock", "query", "reset")))
         .def("run", run_1, (arg("query"), arg("reset") = true))
-        .def("run", run_2, (arg("stock"), arg("query"), arg("reset") = true),
+        .def("run", run_2, (arg("kdata"), arg("reset") = true))
+        .def("run", run_3, (arg("stock"), arg("query"), arg("reset") = true),
              R"(run(self, stock, query[, reset=True])
   
     运行系统，执行回测

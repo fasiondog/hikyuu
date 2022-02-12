@@ -27,15 +27,19 @@ public:
     virtual ~MySQLBaseInfoDriver();
 
     virtual bool _init() override;
-    virtual bool _loadMarketInfo() override;
-    virtual bool _loadStockTypeInfo() override;
-    virtual bool _loadStock() override;
+    virtual vector<StockInfo> getAllStockInfo() override;
+    virtual vector<MarketInfo> getAllMarketInfo() override;
+    virtual vector<StockTypeInfo> getAllStockTypeInfo() override;
+
+    virtual StockWeightList getStockWeightList(const string& market, const string& code,
+                                               Datetime start, Datetime end) override;
+    virtual MarketInfo getMarketInfo(const string& market) override;
+    virtual StockTypeInfo getStockTypeInfo(uint32_t type) override;
+    virtual StockInfo getStockInfo(string market, const string& code) override;
+    virtual std::unordered_set<Datetime> getAllHolidays() override;
 
 private:
-    StockWeightList _getStockWeightList(uint64_t);
-
-private:
-    ConnectPool<MySQLConnect> *m_pool;
+    ConnectPool<MySQLConnect>* m_pool;
 };
 
 } /* namespace hku */

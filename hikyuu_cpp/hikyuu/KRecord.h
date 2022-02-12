@@ -24,8 +24,8 @@ public:
     price_t highPrice;    ///<最高价
     price_t lowPrice;     ///<最低价
     price_t closePrice;   ///<最低价
-    price_t transAmount;  ///<成交金额
-    price_t transCount;   ///<成交量
+    price_t transAmount;  ///<成交金额（千元）
+    price_t transCount;   ///<成交量（手）
 
     KRecord()
     : datetime(Null<Datetime>()),
@@ -36,7 +36,7 @@ public:
       transAmount(0.0),
       transCount(0.0) {}
 
-    KRecord(const Datetime& indate)
+    explicit KRecord(const Datetime& indate)
     : datetime(indate),
       openPrice(0.0),
       highPrice(0.0),

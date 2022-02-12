@@ -23,13 +23,7 @@ IVarp::IVarp() : IndicatorImp("VARP", 1) {
 IVarp::~IVarp() {}
 
 bool IVarp::check() {
-    int n = getParam<int>("n");
-    if (n < 2) {
-        HKU_ERROR("Invalid param[n] ! (n >= 2) {}", m_params);
-        return false;
-    }
-
-    return true;
+    return getParam<int>("n") >= 2;
 }
 
 void IVarp::_calculate(const Indicator& data) {

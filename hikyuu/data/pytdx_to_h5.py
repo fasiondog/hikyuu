@@ -28,22 +28,23 @@ import datetime
 import sqlite3
 from pytdx.hq import TDXParams
 
+from hikyuu.util.mylog import get_default_logger, hku_error, hku_debug
+
 from .common import MARKETID, STOCKTYPE, get_stktype_list
-from .common_sqlite3 import (get_codepre_list, create_database,
-                            get_marketid, get_last_date,
-                            get_stock_list, update_last_date)
-from .common_h5 import (H5Record, H5Index,
-                       open_h5file, get_h5table,
-                       update_hdf5_extern_data,
-                       open_trans_file, get_trans_table, update_hdf5_trans_index,
-                       open_time_file, get_time_table)
+from .common_sqlite3 import (
+    get_codepre_list, create_database, get_marketid, get_last_date, get_stock_list, update_last_date
+)
+from .common_h5 import (
+    H5Record, H5Index, open_h5file, get_h5table, update_hdf5_extern_data, open_trans_file, get_trans_table,
+    update_hdf5_trans_index, open_time_file, get_time_table
+)
 from .weight_to_sqlite import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
     percent = '{:.0%}'.format(cur / total)
     sys.stdout.write('\r')
-    sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)),percent))
+    sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)), percent))
     sys.stdout.flush()
 
 
@@ -68,7 +69,7 @@ def import_stock_name(connect, api, market, quotations=None):
     pytdx_market = to_pytdx_market(market.upper())
     stk_count = api.get_security_count(pytdx_market)
 
-    for i in range(int(stk_count/1000)+1):
+    for i in range(int(stk_count / 1000) + 1):
         stock_list = api.get_security_list(pytdx_market, i * 1000)
         if stock_list is None:
             continue
@@ -78,8 +79,9 @@ def import_stock_name(connect, api, market, quotations=None):
     marketid = get_marketid(connect, market)
 
     stktype_list = get_stktype_list(quotations)
-    a = cur.execute("select stockid, code, name, valid from stock where marketid={} and type in {}"
-                    .format(marketid, stktype_list))
+    a = cur.execute(
+        "select stockid, code, name, valid from stock where marketid={} and type in {}".format(marketid, stktype_list)
+    )
     a = a.fetchall()
     oldStockDict = {}
     for oldstock in a:
@@ -93,8 +95,7 @@ def import_stock_name(connect, api, market, quotations=None):
         # 股票名称发生变化，更新股票名称;如果原无效，则置为有效
         if oldcode in newStockDict:
             if oldname != newStockDict[oldcode]:
-                cur.execute("update stock set name='%s' where stockid=%i" %
-                            (newStockDict[oldcode], oldstockid))
+                cur.execute("update stock set name='%s' where stockid=%i" % (newStockDict[oldcode], oldstockid))
             if oldvalid == 0:
                 cur.execute("update stock set valid=1, endDate=99999999 where stockid=%i" % oldstockid)
 
@@ -138,6 +139,7 @@ def guess_day_n_step(last_datetime):
 
     return (n, step)
 
+
 def guess_1min_n_step(last_datetime):
     last_date = int(last_datetime // 10000)
     today = datetime.date.today()
@@ -154,6 +156,7 @@ def guess_1min_n_step(last_datetime):
         n = 99
 
     return (n, step)
+
 
 def guess_5min_n_step(last_datetime):
     last_date = int(last_datetime // 10000)
@@ -180,7 +183,12 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
 
+    hku_debug("{}{} {}".format(market, code, ktype))
     table = get_h5table(h5file, market, code)
+    if table is None:
+        hku_error("Can't get table({}{})".format(market, code))
+        return 0
+
     last_datetime = table[-1]['datetime'] if table.nrows > 0 else startDate
 
     today = datetime.date.today()
@@ -222,22 +230,26 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
                 bar_datetime = (tmp.year * 10000 + tmp.month * 100 + tmp.day) * 10000
                 if ktype != 'DAY':
                     bar_datetime += bar['hour'] * 100 + bar['minute']
-            except:
+            except Exception as e:
+                hku_error("Failed translate datetime: {}! {}".format(bar, e))
                 continue
 
             if today_datetime >= bar_datetime > last_datetime \
                     and bar['high'] >= bar['open'] >= bar['low'] > 0 \
                     and bar['high'] >= bar['close'] >= bar['low'] > 0 \
                     and int(bar['vol']) != 0 and int(bar['amount']*0.001) != 0:
-                row['datetime'] = bar_datetime
-                row['openPrice'] = bar['open'] * 1000
-                row['highPrice'] = bar['high'] * 1000
-                row['lowPrice'] = bar['low'] * 1000
-                row['closePrice'] = bar['close'] * 1000
-                row['transAmount'] = int(bar['amount'] * 0.001)
-                row['transCount'] = bar['vol']
-                row.append()
-                add_record_count += 1
+                try:
+                    row['datetime'] = bar_datetime
+                    row['openPrice'] = bar['open'] * 1000
+                    row['highPrice'] = bar['high'] * 1000
+                    row['lowPrice'] = bar['low'] * 1000
+                    row['closePrice'] = bar['close'] * 1000
+                    row['transAmount'] = round(bar['amount'] * 0.001)
+                    row['transCount'] = round(bar['vol'])
+                    row.append()
+                    add_record_count += 1
+                except Exception as e:
+                    hku_error("Can't trans record: {}! {}".format(bar, e))
                 last_datetime = bar_datetime
 
     if add_record_count > 0:
@@ -248,8 +260,10 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
             # 更新基础信息数据库中股票对应的起止日期及其有效标志
             #if valid == 0:
             cur = connect.cursor()
-            cur.execute("update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
-                        (table[0]['datetime'] / 10000, 99999999, stockid))
+            cur.execute(
+                "update stock set valid=1, startdate=%i, enddate=%i where stockid=%i" %
+                (table[0]['datetime'] / 10000, 99999999, stockid)
+            )
             connect.commit()
             cur.close()
 
@@ -261,7 +275,6 @@ def import_one_stock_data(connect, api, h5file, market, ktype, stock_record, sta
     elif table.nrows == 0:
         #print(market, stock_record)
         table.remove()
-        pass
 
     #table.close()
     return add_record_count
@@ -310,7 +323,7 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
 def pytdx_get_day_trans(api, pymarket, code, date):
     buf = []
     for i in range(21):
-        x = api.get_history_transaction_data(pymarket, code, i*2000, 2000, date)
+        x = api.get_history_transaction_data(pymarket, code, i * 2000, 2000, date)
         #x = api.get_transaction_data(TDXParams.MARKET_SZ, '000001', (9-i)*800, 800)
         if not x:
             break
@@ -324,15 +337,25 @@ def import_on_stock_trans(connect, api, h5file, market, stock_record, max_days):
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
+    hku_debug("{}{}".format(market, code))
     table = get_trans_table(h5file, market, code)
+    if table is None:
+        hku_error("Failed get_trans_table({}{})!".format(market, code))
+        return 0
+
     today = datetime.date.today()
     if table.nrows > 0:
-        last_datetime = int(table[-1]['datetime']//1000000)
-        last_y = int(last_datetime // 10000)
-        last_m = int(last_datetime // 100 - last_y * 100)
-        last_d = int(last_datetime - (last_y * 10000 + last_m * 100))
-        last_date = datetime.date(last_y, last_m, last_d)
-        need_days = (today - last_date).days
+        try:
+            last_datetime = int(table[-1]['datetime'] // 1000000)
+            last_y = int(last_datetime // 10000)
+            last_m = int(last_datetime // 100 - last_y * 100)
+            last_d = int(last_datetime - (last_y * 10000 + last_m * 100))
+            last_date = datetime.date(last_y, last_m, last_d)
+            need_days = (today - last_date).days
+        except Exception as e:
+            hku_error("Failed get last date from hdf5({}{}), remove this table! {}".format(market, code, e))
+            table.remove()
+            return 0
     else:
         need_days = max_days
 
@@ -355,25 +378,28 @@ def import_on_stock_trans(connect, api, h5file, market, stock_record, max_days):
         pre_minute = 900
 
         for record in buf:
-            minute = int(record['time'][0:2])*100 + int(record['time'][3:])
-            if minute != pre_minute:
-                second = 0 if minute == 1500 else 2
-                pre_minute = minute
-            else:
-                second += 3
-            if second > 59:
-                continue
-            row['datetime'] = cur_date*1000000 + minute * 100 + second
-            row['price'] = int(record['price'] * 1000)
-            row['vol'] = record['vol']
-            row['buyorsell'] = record['buyorsell']
-            row.append()
-            add_record_count += 1
+            try:
+                minute = int(record['time'][0:2]) * 100 + int(record['time'][3:])
+                if minute != pre_minute:
+                    second = 0 if minute == 1500 else 2
+                    pre_minute = minute
+                else:
+                    second += 3
+                if second > 59:
+                    continue
+                row['datetime'] = cur_date * 1000000 + minute * 100 + second
+                row['price'] = int(record['price'] * 1000)
+                row['vol'] = record['vol']
+                row['buyorsell'] = record['buyorsell']
+                row.append()
+                add_record_count += 1
+            except Exception as e:
+                hku_error("Failed trans to record! {}", e)
 
     if add_record_count > 0:
         table.flush()
     elif table.nrows == 0:
-        table.remove
+        table.remove()
 
     return add_record_count
 
@@ -410,15 +436,25 @@ def import_on_stock_time(connect, api, h5file, market, stock_record, max_days):
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[2], stock_record[3], \
                                               stock_record[4]
+    hku_debug("{}{}".format(market, code))
     table = get_time_table(h5file, market, code)
+    if table is None:
+        hku_error("Can't get table({}{})!".format(market, code))
+        return 0
+
     today = datetime.date.today()
     if table.nrows > 0:
-        last_datetime = int(table[-1]['datetime']//10000)
-        last_y = int(last_datetime // 10000)
-        last_m = int(last_datetime // 100 - last_y * 100)
-        last_d = int(last_datetime - (last_y * 10000 + last_m * 100))
-        last_date = datetime.date(last_y, last_m, last_d)
-        need_days = (today - last_date).days
+        try:
+            last_datetime = int(table[-1]['datetime'] // 10000)
+            last_y = int(last_datetime // 10000)
+            last_m = int(last_datetime // 100 - last_y * 100)
+            last_d = int(last_datetime - (last_y * 10000 + last_m * 100))
+            last_date = datetime.date(last_y, last_m, last_d)
+            need_days = (today - last_date).days
+        except Exception as e:
+            hku_error("Failed get last date from hdf5({}{}), remove this table! {}".format(market, code, e))
+            table.remove()
+            return 0
     else:
         need_days = max_days
 
@@ -448,17 +484,20 @@ def import_on_stock_time(connect, api, h5file, market, stock_record, max_days):
                 time = 1300
             elif time == 1360:
                 time = 1400
-            row['datetime'] = this_date + time
-            row['price'] = int(record['price'] * 1000)
-            row['vol'] = record['vol']
-            row.append()
-            time += 1
-            add_record_count += 1
+            try:
+                row['datetime'] = this_date + time
+                row['price'] = int(record['price'] * 1000)
+                row['vol'] = record['vol']
+                row.append()
+                time += 1
+                add_record_count += 1
+            except Exception as e:
+                hku_error("Failed trans record {}! {}".format(record, e))
 
     if add_record_count > 0:
         table.flush()
     elif table.nrows == 0:
-        table.remove
+        table.remove()
 
     return add_record_count
 
@@ -505,7 +544,6 @@ if __name__ == '__main__':
     api.connect(tdx_server, tdx_port)
 
     add_count = 0
-
     """
     print("导入股票代码表")
     add_count = import_stock_name(connect, api, 'SH', quotations)

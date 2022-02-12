@@ -26,6 +26,8 @@ class HKU_API KDataDriver {
 public:
     KDataDriver();
 
+    KDataDriver(const Parameter& params);
+
     /**
      * 构造函数
      * @param name 驱动名称
@@ -38,6 +40,17 @@ public:
 
     /** 驱动初始化 */
     bool init(const Parameter&);
+
+    typedef shared_ptr<KDataDriver> KDataDriverPtr;
+    /**
+     * 克隆实现
+     */
+    KDataDriverPtr clone();
+
+    /**
+     * 子类克隆函数实现
+     */
+    virtual KDataDriverPtr _clone() = 0;
 
     /**
      * 子类初始化私有变量接口
@@ -53,16 +66,9 @@ public:
     virtual bool isIndexFirst() = 0;
 
     /**
-     * 将指定类型的K线数据加载至缓存
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param kType  K线类型
-     * @param start_ix 欲加载的起始位置
-     * @param end_ix 欲加载的结束位置，不包含自身
-     * @param out_buffer [out] 缓存指针
+     * 是否支持并行数据加载
      */
-    virtual void loadKData(const string& market, const string& code, KQuery::KType kType,
-                           size_t start_ix, size_t end_ix, KRecordListPtr out_buffer);
+    virtual bool canParallelLoad() = 0;
 
     /**
      * 获取指定类型的K线数据量
@@ -84,17 +90,6 @@ public:
      */
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end);
-
-    /**
-     * 获取指定的K线记录
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param pos    K线记录索引
-     * @param kType  K线类型
-     * @return
-     */
-    virtual KRecord getKRecord(const string& market, const string& code, size_t pos,
-                               KQuery::KType kType);
 
     /**
      * 获取 K 线数据
@@ -139,6 +134,60 @@ HKU_API std::ostream& operator<<(std::ostream&, const KDataDriverPtr&);
 inline const string& KDataDriver::name() const {
     return m_name;
 }
+
+class KDataDriverConnect {
+public:
+    typedef KDataDriver DriverType;
+    typedef KDataDriverPtr DriverTypePtr;
+
+    explicit KDataDriverConnect(const KDataDriverPtr& driver) : m_driver(driver) {}
+    ~KDataDriverConnect() = default;
+
+    KDataDriverConnect(const KDataDriverConnect&) = delete;
+    KDataDriverConnect(KDataDriverConnect&&) = delete;
+    KDataDriverConnect& operator=(const KDataDriverConnect&) = delete;
+    KDataDriverConnect& operator=(KDataDriverConnect&&) = delete;
+
+    explicit operator bool() const noexcept {
+        return m_driver.get() != nullptr;
+    }
+
+    const string& name() const {
+        return m_driver->name();
+    }
+
+    bool isIndexFirst() {
+        return m_driver->isIndexFirst();
+    }
+
+    bool canParallelLoad() {
+        return m_driver->canParallelLoad();
+    }
+
+    size_t getCount(const string& market, const string& code, KQuery::KType kType) {
+        return m_driver->getCount(market, code, kType);
+    }
+
+    bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
+                             size_t& out_start, size_t& out_end) {
+        return m_driver->getIndexRangeByDate(market, code, query, out_start, out_end);
+    }
+
+    KRecordList getKRecordList(const string& market, const string& code, const KQuery& query) {
+        return m_driver->getKRecordList(market, code, query);
+    }
+
+    TimeLineList getTimeLineList(const string& market, const string& code, const KQuery& query) {
+        return m_driver->getTimeLineList(market, code, query);
+    }
+
+    TransList getTransList(const string& market, const string& code, const KQuery& query) {
+        return m_driver->getTransList(market, code, query);
+    }
+
+private:
+    KDataDriverPtr m_driver;
+};
 
 }  // namespace hku
 

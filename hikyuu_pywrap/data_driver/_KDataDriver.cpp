@@ -17,6 +17,10 @@ public:
     KDataDriverWrap(const string& name) : KDataDriver(name) {}
     virtual ~KDataDriverWrap() {}
 
+    KDataDriverPtr _clone() {
+        return this->get_override("_clone")();
+    }
+
     bool _init() {
         if (override call = get_override("_init")) {
             return call();
@@ -31,6 +35,10 @@ public:
 
     bool isIndexFirst() {
         return this->get_override("isIndexFirst")();
+    }
+
+    bool canParallelLoad() {
+        return this->get_override("canParallelLoad")();
     }
 
     size_t getCount(const string& market, const string& code, KQuery::KType ktype) {
@@ -104,19 +112,6 @@ public:
                 query, out_start, out_end);
     }*/
 
-    KRecord getKRecord(const string& market, const string& code, size_t pos, KQuery::KType ktype) {
-        if (override call = get_override("getKRecord")) {
-            return call(market, code, pos, ktype);
-        } else {
-            return KDataDriver::getKRecord(market, code, pos, ktype);
-        }
-    }
-
-    KRecord default_getKRecord(const string& market, const string& code, size_t pos,
-                               KQuery::KType ktype) {
-        return this->KDataDriver::getKRecord(market, code, pos, ktype);
-    }
-
     KRecordList getKRecordList(const string& market, const string& code, const KQuery& query) {
         if (override call = get_override("getKRecordList")) {
             return call(market, code, query);
@@ -163,13 +158,15 @@ void export_KDataDriver() {
       .add_property("name",
                     make_function(&KDataDriver::name, return_value_policy<copy_const_reference>()))
       .def("getParam", &KDataDriver::getParam<boost::any>)
+      .def("clone", &KDataDriver::clone)
 
+      .def("_clone", pure_virtual(&KDataDriver::_clone))
       .def("_init", &KDataDriver::_init, &KDataDriverWrap::default_init)
       .def("isIndexFirst", pure_virtual(&KDataDriver::isIndexFirst))
+      .def("canParallelLoad", pure_virtual(&KDataDriver::canParallelLoad))
       .def("getCount", &KDataDriver::getCount, &KDataDriverWrap::default_getCount)
       //.def("getIndexRangeByDate", &KDataDriver::getIndexRangeByDate,
       //        &KDataDriverWrap::default_getIndexRangeByDate)
-      .def("getKRecord", &KDataDriver::getKRecord, &KDataDriverWrap::default_getKRecord)
       .def("_getIndexRangeByDate", &KDataDriverWrap::_getIndexRangeByDate,
            &KDataDriverWrap::default_getIndexRangeByDate)
       .def("getKRecordList", &KDataDriver::getKRecordList, &KDataDriverWrap::default_getKRecordList)

@@ -9,6 +9,7 @@
 #ifndef STOCK_H_
 #define STOCK_H_
 
+#include <shared_mutex>
 #include "StockWeight.h"
 #include "KQuery.h"
 #include "TimeLineRecord.h"
@@ -17,8 +18,13 @@
 namespace hku {
 
 class HKU_API StockManager;
-class KDataDriver;
-typedef shared_ptr<KDataDriver> KDataDriverPtr;
+class KDataDriverConnect;
+
+template <class DriverConnectT>
+class DriverConnectPool;
+
+typedef DriverConnectPool<KDataDriverConnect> KDataDriverConnectPool;
+typedef shared_ptr<KDataDriverConnectPool> KDataDriverConnectPoolPtr;
 class HKU_API KData;
 class HKU_API Parameter;
 
@@ -61,7 +67,10 @@ public:
     bool operator==(const Stock&) const;
     bool operator!=(const Stock&) const;
 
-    /** 获取内部id，一般用于作为map的键值使用，该id实质为m_data的内存地址 */
+    /**
+     * 获取内部id，一般用于作为map的键值使用，该id实际为m_data的内存地址
+     * @note 非数据库中的stockid
+     */
     uint64_t id() const;
 
     /** 获取所属市场简称，市场简称是市场的唯一标识 */
@@ -109,16 +118,14 @@ public:
     /** 获取最大交易量 */
     size_t maxTradeNumber() const;
 
-    /** 获取所有权息信息 */
-    StockWeightList getWeight() const;
-
     /**
      * 获取指定时间段[start,end)内的权息信息
      * @param start 起始日期
      * @param end 结束日期
      * @return 满足要求的权息信息列表指针
      */
-    StockWeightList getWeight(const Datetime& start, const Datetime& end = Null<Datetime>()) const;
+    StockWeightList getWeight(const Datetime& start = Datetime::min(),
+                              const Datetime& end = Null<Datetime>()) const;
 
     /** 获取不同类型K线数据量 */
     size_t getCount(KQuery::KType dataType = KQuery::DAY) const;
@@ -139,16 +146,17 @@ public:
     KRecord getKRecord(size_t pos, KQuery::KType dataType = KQuery::DAY) const;
 
     /** 根据数据类型（日线/周线等），获取指定日期的KRecord */
-    KRecord getKRecordByDate(const Datetime&, KQuery::KType ktype = KQuery::DAY) const;
+    KRecord getKRecord(const Datetime&, KQuery::KType ktype = KQuery::DAY) const;
 
     /** 获取K线数据 */
     KData getKData(const KQuery&) const;
 
-    /** 获取K线记录，一般不直接使用，用getKData替代 */
-    KRecordList getKRecordList(size_t start, size_t end, KQuery::KType) const;
-
-    /** 获取日期列表 */
-    DatetimeList getDatetimeList(size_t start, size_t end, KQuery::KType) const;
+    /**
+     * 根据查询条件获取 KRecordList，不建议在客户端直接使用
+     * @note 该方法不支持复权
+     * @param query 查询条件
+     */
+    KRecordList getKRecordList(const KQuery& query) const;
 
     /** 获取日期列表 */
     DatetimeList getDatetimeList(const KQuery& query) const;
@@ -170,14 +178,20 @@ public:
      */
     PriceList getHistoryFinanceInfo(const Datetime& date) const;
 
-    /** 设置权息信息 */
+    /** 设置权息信息, 仅供初始化时调用 */
     void setWeightList(const StockWeightList&);
 
-    /** 设置K线数据获取驱动 */
-    void setKDataDriver(const KDataDriverPtr& kdataDriver);
+    /**
+     * 判断是否在交易时间段内，忽略日期仅判断时分秒
+     * @param time 时间
+     */
+    bool isTransactionTime(Datetime time);
 
-    /** 获取K线数据获取驱动 */
-    KDataDriverPtr getKDataDriver() const;
+    /** 设置K线数据驱动 */
+    void setKDataDriver(const KDataDriverConnectPoolPtr& kdataDriver);
+
+    /** 获取K线驱动*/
+    KDataDriverConnectPoolPtr getKDataDirver() const;
 
     /**
      * 将K线数据做自身缓存
@@ -195,19 +209,25 @@ public:
     bool isNull() const;
 
     /** （临时函数）只用于更新缓存中的日线数据 **/
-    void realtimeUpdate(const KRecord&);
+    void realtimeUpdate(KRecord, KQuery::KType ktype = KQuery::DAY);
 
     /** 仅用于python的__str__ */
     string toString() const;
 
 private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
+
+    // 以下函数属于基础操作添加了读锁
+    size_t _getCountFromBuffer(KQuery::KType ktype) const;
+    KRecord _getKRecordFromBuffer(size_t pos, KQuery::KType ktype) const;
+    KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
+                                          KQuery::KType ktype) const;
     bool _getIndexRangeByDateFromBuffer(const KQuery&, size_t&, size_t&) const;
 
 private:
     struct HKU_API Data;
     shared_ptr<Data> m_data;
-    KDataDriverPtr m_kdataDriver;
+    KDataDriverConnectPoolPtr m_kdataDriver;
 };
 
 struct HKU_API Stock::Data {
@@ -221,6 +241,7 @@ struct HKU_API Stock::Data {
     Datetime m_lastDate;   //证券最后日期
 
     StockWeightList m_weightList;  //权息信息列表
+    std::mutex m_weight_mutex;
 
     price_t m_tick;
     price_t m_tickValue;
@@ -229,8 +250,8 @@ struct HKU_API Stock::Data {
     size_t m_minTradeNumber;
     size_t m_maxTradeNumber;
 
-    // KRecordListPtr pKData[KQuery::INVALID_KTYPE];
-    unordered_map<string, KRecordListPtr> pKData;
+    unordered_map<string, KRecordList*> pKData;
+    unordered_map<string, std::shared_mutex*> pMutex;
 
     Data();
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,
@@ -268,14 +289,20 @@ inline uint64_t Stock::id() const {
     return isNull() ? 0 : (int64_t)m_data.get();
 }
 
-inline StockWeightList Stock::getWeight() const {
-    return m_data ? m_data->m_weightList : StockWeightList();
-}
-
 inline bool Stock::operator==(const Stock& stock) const {
     return (*this != stock) ? false : true;
 }
 
 }  // namespace hku
+
+namespace std {
+template <>
+class hash<hku::Stock> {
+public:
+    size_t operator()(hku::Stock const& stk) const noexcept {
+        return stk.id();  // or use boost::hash_combine
+    }
+};
+}  // namespace std
 
 #endif /* STOCK_H_ */
