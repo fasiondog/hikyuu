@@ -38,11 +38,11 @@ TEST_CASE("test_EVERY") {
     /** @arg n=0 */
     result = EVERY(data, 0);
     CHECK_EQ(result.name(), "EVERY");
-    CHECK_EQ(result.discard(), data.size() - 1);
+    CHECK_EQ(result.discard(), data.discard());
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result[5], 0);
     for (int i = 0; i < 5; i++) {
-        CHECK_UNARY(std::isnan(result[i]));
+        CHECK_EQ(result[i], 0.0);
     }
 
     /** @arg n=1, total>1 */
@@ -112,6 +112,36 @@ TEST_CASE("test_EVERY") {
     CHECK_EQ(result[7], 0);
     CHECK_EQ(result[8], 1);
     CHECK_EQ(result[9], 1);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_EVERY_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator o = OPEN(kdata);
+    Indicator expect = EVERY(c > o, 3);
+    Indicator result = EVERY(c > o, CVAL(c, 3));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.discard(); i++) {
+        CHECK(isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    expect = EVERY(c > o, 0);
+    result = EVERY(c > o, CVAL(c, 0));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.discard(); i++) {
+        CHECK_UNARY(isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------

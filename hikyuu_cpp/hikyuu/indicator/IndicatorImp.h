@@ -173,6 +173,9 @@ public:
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
+    /** 动态指标参数计算完毕后处理，主要用于修正 m_discard */
+    virtual void _after_dyn_calculate(const Indicator& ind) {}
+
     /** 是否支持指标动态参数 */
     virtual bool supportIndParam() const {
         return false;

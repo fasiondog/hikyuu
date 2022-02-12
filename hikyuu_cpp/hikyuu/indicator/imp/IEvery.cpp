@@ -32,6 +32,18 @@ void IEvery::_calculate(const Indicator& ind) {
     int n = getParam<int>("n");
     if (0 == n) {
         n = total;
+        m_discard = ind.discard();
+        for (size_t i = m_discard; i < total; i++) {
+            price_t every = 1.0;
+            for (size_t j = m_discard; j <= i; j++) {
+                if (ind[j] == 0.0) {
+                    every = 0.0;
+                    break;
+                }
+            }
+            _set(every, i);
+        }
+        return;
     }
 
     m_discard = ind.discard() + n - 1;
@@ -76,7 +88,15 @@ void IEvery::_calculate(const Indicator& ind) {
 }
 
 void IEvery::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    size_t start = step == 0 ? ind.discard() : _get_step_start(curPos, step, ind.discard());
+    size_t start = 0;
+    if (0 == step) {
+        start = ind.discard();
+    } else if (curPos < ind.discard() + step - 1) {
+        return;
+    } else {
+        start = curPos + 1 - step;
+    }
+
     price_t every = 1.0;
     for (size_t i = start; i <= curPos; i++) {
         if (ind[i] == 0.0) {
@@ -85,6 +105,22 @@ void IEvery::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
         }
     }
     _set(every, curPos);
+}
+
+void IEvery::_after_dyn_calculate(const Indicator& ind) {
+    size_t total = ind.size();
+    HKU_IF_RETURN(m_discard == total, void());
+
+    size_t discard = m_discard;
+    for (size_t i = total - 1; i > discard; i--) {
+        if (std::isnan(get(i))) {
+            m_discard = i + 1;
+            break;
+        }
+    }
+    if (m_discard == discard && std::isnan(get(discard))) {
+        m_discard = discard + 1;
+    }
 }
 
 Indicator HKU_API EVERY(int n) {

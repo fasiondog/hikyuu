@@ -25,6 +25,8 @@ class IEvery : public IndicatorImp {
 public:
     IEvery();
     virtual ~IEvery();
+
+    virtual void _after_dyn_calculate(const Indicator& ind) override;
 };
 
 } /* namespace hku */

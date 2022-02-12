@@ -281,7 +281,8 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 price_t IndicatorImp::get(size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
     HKU_CHECK_THROW((m_pBuffer[num] != NULL) && pos < m_pBuffer[num]->size(), std::out_of_range,
-                    "Try to access value out of bounds! {}", name());
+                    "Try to access value ({}) out of bounds [0..{})! {}", pos,
+                    m_pBuffer[num]->size(), name());
 #endif
     return (*m_pBuffer[num])[pos];
 }
@@ -1256,7 +1257,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
               ind_param->size(), ind.size());
     m_discard = ind.discard();
     size_t total = ind.size();
-    HKU_IF_RETURN(0 == total, void());
+    HKU_IF_RETURN(0 == total || m_discard >= total, void());
 
     static const size_t minCircleLength = 400;
     size_t workerNum = ms_tg->worker_num();
@@ -1266,6 +1267,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
             size_t step = size_t(ind_param->get(i));
             _dyn_run_one_step(ind, i, step);
         }
+        _after_dyn_calculate(ind);
         return;
     }
 
@@ -1299,6 +1301,8 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     for (auto &task : tasks) {
         task.get();
     }
+
+    _after_dyn_calculate(ind);
 }
 
 } /* namespace hku */
