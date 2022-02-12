@@ -62,7 +62,7 @@ TEST_CASE("test_ROCR") {
     result = ROCR(data, 0);
     CHECK_EQ(data.discard(), result.discard());
     CHECK_EQ(data.size(), result.size());
-    CHECK_EQ(result[0], 0.0);
+    CHECK_EQ(result[0], 1.0);
     for (size_t i = 1; i < result.size(); i++) {
         CHECK_EQ(data[i] / data[0], result[i]);
     }
