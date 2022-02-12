@@ -635,7 +635,7 @@
     例如：POW(CLOSE,3)求得收盘价的3次方
     
     :param data: 输入数据
-    :param int n: 幂
+    :param int|Indicator|IndParam n: 幂
     :rtype: Indicator
 
 

@@ -170,8 +170,11 @@ Indicator (*LLVBARS_4)(const Indicator&, const Indicator&) = LLVBARS;
 Indicator (*LLVBARS_5)(const Indicator&, int) = LLVBARS;
 
 Indicator (*POW_1)(int) = POW;
-Indicator (*POW_2)(const Indicator&, int) = POW;
-Indicator (*POW_3)(price_t, int) = POW;
+Indicator (*POW_2)(const IndParam&) = POW;
+Indicator (*POW_3)(const Indicator&, int) = POW;
+Indicator (*POW_4)(const Indicator&, const IndParam&) = POW;
+Indicator (*POW_5)(const Indicator&, const Indicator&) = POW;
+Indicator (*POW_6)(price_t, int) = POW;
 
 Indicator (*SQRT_1)() = SQRT;
 Indicator (*SQRT_2)(const Indicator&) = SQRT;
@@ -774,8 +777,11 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("POW", POW_1, (arg("n")));
-    def("POW", POW_2, (arg("data"), arg("n")));
-    def("POW", POW_3), (arg("data"), arg("n"), R"(POW(data, n)
+    def("POW", POW_2, (arg("n")));
+    def("POW", POW_3, (arg("data"), arg("n")));
+    def("POW", POW_4, (arg("data"), arg("n")));
+    def("POW", POW_5, (arg("data"), arg("n")));
+    def("POW", POW_6), (arg("data"), arg("n"), R"(POW(data, n)
 
     乘幂
 
@@ -784,7 +790,7 @@ void export_Indicator_build_in() {
     例如：POW(CLOSE,3)求得收盘价的3次方
 
     :param data: 输入数据
-    :param int n: 幂
+    :param int|Indicator|IndParam n: 幂
     :rtype: Indicator)");
 
     def("SQRT", SQRT_1);

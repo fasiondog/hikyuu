@@ -39,9 +39,19 @@ void IPow::_calculate(const Indicator& data) {
     }
 }
 
+void IPow::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    _set(std::pow(ind[curPos], step), curPos);
+}
+
 Indicator HKU_API POW(int n) {
     IndicatorImpPtr p = make_shared<IPow>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API POW(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IPow>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

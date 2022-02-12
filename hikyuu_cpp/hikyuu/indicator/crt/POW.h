@@ -25,11 +25,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API POW(int n);
-Indicator POW(price_t, int n);
-Indicator POW(const Indicator& ind, int n);
+Indicator HKU_API POW(const IndParam& n);
 
 inline Indicator POW(const Indicator& ind, int n) {
     return POW(n)(ind);
+}
+
+inline Indicator POW(const Indicator& ind, const IndParam& n) {
+    return POW(n)(ind);
+}
+
+inline Indicator POW(const Indicator& ind, const Indicator& n) {
+    return POW(IndParam(n))(ind);
 }
 
 inline Indicator POW(price_t val, int n) {
