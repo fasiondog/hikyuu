@@ -361,7 +361,7 @@
     例如：FILTER(CLOSE>OPEN,5) 查找阳线，5 天内再次出现的阳线不被记录在内。
 
     :param Indicator data: 输入数据
-    :param int n: 过滤周期
+    :param int|Indicator|IndParam n: 过滤周期
     :rtype: Indicator
 
 

@@ -16,12 +16,16 @@
 namespace hku {
 
 class IFilter : public IndicatorImp {
-    INDICATOR_IMP(IFilter)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(IFilter)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IFilter();
     virtual ~IFilter();
+
+    virtual bool isSerial() const override {
+        return true;
+    }
 };
 
 } /* namespace hku */

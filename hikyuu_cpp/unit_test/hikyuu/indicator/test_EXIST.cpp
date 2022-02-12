@@ -36,11 +36,10 @@ TEST_CASE("test_EXIST") {
 
     /** @arg n=0 */
     result = EXIST(data, 0);
-    CHECK_EQ(result.discard(), data.size() - 1);
+    CHECK_EQ(result.discard(), data.discard());
     CHECK_EQ(result.size(), data.size());
-    CHECK_EQ(result[5], 1);
     for (int i = 0; i < data.discard(); ++i) {
-        CHECK_UNARY(std::isnan(result[i]));
+        CHECK_EQ(result[i], data[i]);
     }
 
     /** @arg n=1, total>1 */

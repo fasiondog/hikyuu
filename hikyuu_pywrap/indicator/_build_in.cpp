@@ -260,7 +260,10 @@ Indicator (*LONGCROSS_3)(price_t, const Indicator&, int) = LONGCROSS;
 Indicator (*LONGCROSS_4)(price_t, price_t, int) = LONGCROSS;
 
 Indicator (*FILTER_1)(int) = FILTER;
-Indicator (*FILTER_2)(const Indicator&, int) = FILTER;
+Indicator (*FILTER_2)(const IndParam&) = FILTER;
+Indicator (*FILTER_3)(const Indicator&, const IndParam&) = FILTER;
+Indicator (*FILTER_4)(const Indicator&, const Indicator&) = FILTER;
+Indicator (*FILTER_5)(const Indicator&, int) = FILTER;
 
 Indicator (*BARSSINCE_1)() = BARSSINCE;
 Indicator (*BARSSINCE_2)(const Indicator&) = BARSSINCE;
@@ -1039,7 +1042,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("FILTER", FILTER_1, (arg("n") = 5));
-    def("FILTER", FILTER_2, (arg("data"), arg("n") = 5), R"(FILTER([data, n=5])
+    def("FILTER", FILTER_2, (arg("n")));
+    def("FILTER", FILTER_3, (arg("data"), arg("n")));
+    def("FILTER", FILTER_4, (arg("data"), arg("n")));
+    def("FILTER", FILTER_5, (arg("data"), arg("n") = 5), R"(FILTER([data, n=5])
 
     信号过滤, 过滤连续出现的信号。
 
@@ -1048,7 +1054,7 @@ void export_Indicator_build_in() {
     例如：FILTER(CLOSE>OPEN,5) 查找阳线，5 天内再次出现的阳线不被记录在内。
 
     :param Indicator data: 输入数据
-    :param int n: 过滤周期
+    :param int|Indicaot|IndParam n: 过滤周期
     :rtype: Indicator)");
 
     def("BARSSINCE", BARSSINCE_1);
