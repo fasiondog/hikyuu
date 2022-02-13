@@ -46,14 +46,32 @@ void IStdev::_calculate(const Indicator& data) {
     }
 }
 
+void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step > 0 && curPos < ind.discard() + step - 1, void());
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += ind[i];
+    }
+    price_t mean = sum / step;
+    sum = 0.0;
+    size_t N = curPos - start;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += std::pow(ind[i] - mean, 2);
+    }
+    _set(std::sqrt(sum / N), curPos);
+}
+
 Indicator HKU_API STDEV(int n) {
     IndicatorImpPtr p = make_shared<IStdev>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API STDEV(const Indicator& data, int n) {
-    return STDEV(n)(data);
+Indicator HKU_API STDEV(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IStdev>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */

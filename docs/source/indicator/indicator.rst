@@ -800,7 +800,7 @@
     计算N周期内样本标准差
     
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator
 
 
@@ -809,7 +809,7 @@
     计算N周期内样本标准差
     
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
     
 

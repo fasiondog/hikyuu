@@ -74,7 +74,10 @@ Indicator (*SAFTYLOSS_2)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS
 // BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_2_overload, SAFTYLOSS, 1, 4);
 
 Indicator (*STDEV_1)(int) = STDEV;
-Indicator (*STDEV_2)(const Indicator&, int) = STDEV;
+Indicator (*STDEV_2)(const IndParam&) = STDEV;
+Indicator (*STDEV_3)(const Indicator&, const IndParam&) = STDEV;
+Indicator (*STDEV_4)(const Indicator&, const Indicator&) = STDEV;
+Indicator (*STDEV_5)(const Indicator&, int) = STDEV;
 
 Indicator (*STDP_1)(int) = STDP;
 Indicator (*STDP_2)(const Indicator&, int) = STDP;
@@ -544,12 +547,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("STDEV", STDEV_1, (arg("n") = 10));
-    def("STDEV", STDEV_2, (arg("data"), arg("n") = 10), R"(STDEV([data, n=10])
+    def("STDEV", STDEV_2, (arg("n")));
+    def("STDEV", STDEV_3, (arg("data"), arg("n")));
+    def("STDEV", STDEV_4, (arg("data"), arg("n")));
+    def("STDEV", STDEV_5, (arg("data"), arg("n") = 10), R"(STDEV([data, n=10])
 
     计算N周期内样本标准差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("STDP", STDP_1, (arg("n") = 10));
