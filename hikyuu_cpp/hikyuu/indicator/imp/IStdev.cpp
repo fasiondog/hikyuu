@@ -55,7 +55,7 @@ void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     }
     price_t mean = sum / step;
     sum = 0.0;
-    size_t N = curPos - start;
+    size_t N = step - 1;
     for (size_t i = start; i <= curPos; i++) {
         sum += std::pow(ind[i] - mean, 2);
     }

@@ -80,7 +80,10 @@ Indicator (*STDEV_4)(const Indicator&, const Indicator&) = STDEV;
 Indicator (*STDEV_5)(const Indicator&, int) = STDEV;
 
 Indicator (*STDP_1)(int) = STDP;
-Indicator (*STDP_2)(const Indicator&, int) = STDP;
+Indicator (*STDP_2)(const IndParam&) = STDP;
+Indicator (*STDP_3)(const Indicator&, const IndParam&) = STDP;
+Indicator (*STDP_4)(const Indicator&, const Indicator&) = STDP;
+Indicator (*STDP_5)(const Indicator&, int) = STDP;
 
 Indicator (*HHV_1)(int) = HHV;
 Indicator (*HHV_2)(const IndParam&) = HHV;
@@ -559,7 +562,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("STDP", STDP_1, (arg("n") = 10));
-    def("STDP", STDP_2, (arg("data"), arg("n") = 10), R"(STDP([data, n=10])
+    def("STDP", STDP_2, (arg("n")));
+    def("STDP", STDP_3, (arg("data"), arg("n")));
+    def("STDP", STDP_4, (arg("data"), arg("n")));
+    def("STDP", STDP_5, (arg("data"), arg("n") = 10), R"(STDP([data, n=10])
 
     总体标准差，STDP(X,N)为X的N日总体标准差
 
