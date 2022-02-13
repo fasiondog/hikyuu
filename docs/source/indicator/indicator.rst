@@ -827,7 +827,7 @@
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -873,7 +873,7 @@
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 

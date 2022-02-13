@@ -32,7 +32,7 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 
     int n = getParam<int>("n");
-    if (0 == n) {
+    if (n <= 0) {
         price_t sum = 0.0;
         for (size_t i = m_discard; i < total; i++) {
             sum += indicator[i];

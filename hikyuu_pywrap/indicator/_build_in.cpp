@@ -121,7 +121,10 @@ Indicator (*COUNT_4)(const Indicator&, const IndParam&) = COUNT;
 Indicator (*COUNT_5)(const Indicator&, int) = COUNT;
 
 Indicator (*SUM_1)(int) = SUM;
-Indicator (*SUM_2)(const Indicator&, int) = SUM;
+Indicator (*SUM_2)(const IndParam&) = SUM;
+Indicator (*SUM_3)(const Indicator&, const IndParam&) = SUM;
+Indicator (*SUM_4)(const Indicator&, const Indicator&) = SUM;
+Indicator (*SUM_5)(const Indicator&, int) = SUM;
 
 Indicator (*ABS_1)() = ABS;
 Indicator (*ABS_2)(price_t) = ABS;
@@ -357,6 +360,10 @@ Indicator (*AVEDEV_3)(const Indicator&, const Indicator&) = AVEDEV;
 Indicator (*DOWNNDAY_1)(const Indicator&, int) = DOWNNDAY;
 Indicator (*DOWNNDAY_2)(const Indicator&, const IndParam&) = DOWNNDAY;
 Indicator (*DOWNNDAY_3)(const Indicator&, const Indicator&) = DOWNNDAY;
+
+Indicator (*UPNDAY_1)(const Indicator&, int) = UPNDAY;
+Indicator (*UPNDAY_2)(const Indicator&, const IndParam&) = UPNDAY;
+Indicator (*UPNDAY_3)(const Indicator&, const Indicator&) = UPNDAY;
 
 Indicator (*NDAY_1)(const Indicator&, const Indicator&, int) = NDAY;
 Indicator (*NDAY_2)(const Indicator&, const Indicator&, const Indicator&) = NDAY;
@@ -667,12 +674,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("SUM", SUM_1, (arg("n") = 20));
-    def("SUM", SUM_2, (arg("data"), arg("n") = 20), R"(SUM([data, n=20])
+    def("SUM", SUM_2, (arg("n")));
+    def("SUM", SUM_3, (arg("data"), arg("n")));
+    def("SUM", SUM_4, (arg("data"), arg("n")));
+    def("SUM", SUM_5, (arg("data"), arg("n") = 20), R"(SUM([data, n=20])
 
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("ABS", ABS_1);
@@ -1033,12 +1043,14 @@ void export_Indicator_build_in() {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    def("UPNDAY", UPNDAY, (arg("data"), arg("n") = 3), R"(UPNDAY(data[, n=3])
+    def("UPNDAY", UPNDAY_1, (arg("data"), arg("n") = 3));
+    def("UPNDAY", UPNDAY_2, (arg("data"), arg("n")));
+    def("UPNDAY", UPNDAY_3, (arg("data"), arg("n")), R"(UPNDAY(data[, n=3])
 
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("DOWNNDAY", DOWNNDAY_1, (arg("data"), arg("n") = 3));

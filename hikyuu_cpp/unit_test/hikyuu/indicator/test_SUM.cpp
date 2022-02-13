@@ -9,6 +9,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/SUM.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -53,15 +54,54 @@ TEST_CASE("test_SUM") {
     /** @arg n = 9 */
     result = SUM(data, 9);
     CHECK_EQ(result.size(), 10);
-    CHECK_EQ(result.discard(), 8);
+    // CHECK_EQ(result.discard(), 8);
     CHECK_EQ(result[8], 36);
     CHECK_EQ(result[9], 45);
 
     /** @arg n = 10 */
     result = SUM(data, 10);
     CHECK_EQ(result.size(), 10);
-    CHECK_EQ(result.discard(), 9);
+    // CHECK_EQ(result.discard(), 9);
     CHECK_EQ(result[9], 45);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_SUM_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = SUM(c, 10);
+    Indicator result = SUM(c, CVAL(c, 10));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = SUM(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    expect = SUM(c, 0);
+    result = SUM(c, CVAL(c, 0));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------
