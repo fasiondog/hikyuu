@@ -20,10 +20,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ROC(int n = 10);
-Indicator ROC(const Indicator& ind, int n = 10);
+Indicator HKU_API ROC(const IndParam& n);
 
-inline Indicator ROC(const Indicator& ind, int n) {
+inline Indicator ROC(const Indicator& ind, int n = 10) {
     return ROC(n)(ind);
+}
+
+inline Indicator ROC(const Indicator& ind, const IndParam& n) {
+    return ROC(n)(ind);
+}
+
+inline Indicator ROC(const Indicator& ind, const Indicator& n) {
+    return ROC(IndParam(n))(ind);
 }
 
 }  // namespace hku

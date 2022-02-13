@@ -20,10 +20,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ROCP(int n = 10);
-Indicator ROCP(const Indicator& ind, int n = 10);
+Indicator HKU_API ROCP(const IndParam& n);
 
-inline Indicator ROCP(const Indicator& ind, int n) {
+inline Indicator ROCP(const Indicator& ind, int n = 10) {
     return ROCP(n)(ind);
+}
+
+inline Indicator ROCP(const Indicator& ind, const IndParam& n) {
+    return ROCP(n)(ind);
+}
+
+inline Indicator ROCP(const Indicator& ind, const Indicator& n) {
+    return ROCP(IndParam(n))(ind);
 }
 
 }  // namespace hku

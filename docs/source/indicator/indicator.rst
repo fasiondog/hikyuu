@@ -113,7 +113,7 @@
     例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
 
     :param Indicator data: 输入数据
-    :param int n: N周期
+    :param int n|Indicator|IndParam: N周期
     :rtype: Indicator
 
 
@@ -230,7 +230,7 @@
     例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
     
     :param Indicator data: 条件
-    :param int n: 周期
+    :param int|Indicator|IndParam n: 周期
     :rtype: Indicator
 
 
@@ -309,7 +309,7 @@
     连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
     
@@ -340,7 +340,7 @@
     存在, EXIST(X,N) 表示条件X在N周期有存在
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator
 
 
@@ -361,7 +361,7 @@
     例如：FILTER(CLOSE>OPEN,5) 查找阳线，5 天内再次出现的阳线不被记录在内。
 
     :param Indicator data: 输入数据
-    :param int n: 过滤周期
+    :param int|Indicator|IndParam n: 过滤周期
     :rtype: Indicator
 
 
@@ -395,7 +395,7 @@
     例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
     
 .. py:function:: HIGH([data])
@@ -503,7 +503,7 @@
     例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
     
     :param data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
 
 
@@ -635,7 +635,7 @@
     例如：POW(CLOSE,3)求得收盘价的3次方
     
     :param data: 输入数据
-    :param int n: 幂
+    :param int|Indicator|IndParam n: 幂
     :rtype: Indicator
 
 
@@ -673,7 +673,7 @@
     变动率指标: ((price / prevPrice)-1)*100
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -682,7 +682,7 @@
     变动率指标: (price - prevPrice) / prevPrice
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -691,7 +691,7 @@
     变动率指标: (price / prevPrice)
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 

@@ -40,7 +40,7 @@ TEST_CASE("test_FILTER") {
     /** @arg n=0 */
     result = FILTER(data, 0);
     CHECK_EQ(result.name(), "FILTER");
-    CHECK_EQ(result.discard(), data.size());
+    CHECK_EQ(result.discard(), data.discard());
     CHECK_EQ(result.size(), data.size());
 
     /** @arg n=1, total>1 */
@@ -132,6 +132,36 @@ TEST_CASE("test_FILTER") {
     CHECK_EQ(result[9], 0);
     CHECK_EQ(result[10], 1);
     CHECK_EQ(result[11], 0);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_FILTER_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator o = OPEN(kdata);
+    Indicator expect = FILTER(c > o, 3);
+    Indicator result = FILTER(c > o, CVAL(c, 3));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    expect = FILTER(c > o, 0);
+    result = FILTER(c > o, CVAL(c, 0));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < expect.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------

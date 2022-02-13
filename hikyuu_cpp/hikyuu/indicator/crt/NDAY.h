@@ -20,9 +20,19 @@ namespace hku {
  * 连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
  * @ingroup Indicator
  */
-Indicator NDAY(const Indicator& x, const Indicator& y, int n = 3);
+inline Indicator NDAY(const Indicator& x, const Indicator& y, int n = 3) {
+    Indicator result = EVERY(x > y, n);
+    result.name("NDAY");
+    return result;
+}
 
-inline Indicator NDAY(const Indicator& x, const Indicator& y, int n) {
+inline Indicator NDAY(const Indicator& x, const Indicator& y, const Indicator& n) {
+    Indicator result = EVERY(x > y, n);
+    result.name("NDAY");
+    return result;
+}
+
+inline Indicator NDAY(const Indicator& x, const Indicator& y, const IndParam& n) {
     Indicator result = EVERY(x > y, n);
     result.name("NDAY");
     return result;

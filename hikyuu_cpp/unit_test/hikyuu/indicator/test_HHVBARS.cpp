@@ -130,6 +130,45 @@ TEST_CASE("test_HHVBARS") {
     CHECK_EQ(result[9], 5);
 }
 
+/** @par 检测点 */
+TEST_CASE("test_HHVBARS_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = HHVBARS(c, 10);
+    Indicator result = HHVBARS(c, CVAL(c, 10));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = HHVBARS(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    expect = HHVBARS(c, 0);
+    result = HHVBARS(c, IndParam(CVAL(c, 0)));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

@@ -109,7 +109,10 @@ Indicator (*IF_3)(const Indicator&, const Indicator&, price_t) = IF;
 Indicator (*IF_4)(const Indicator&, price_t, price_t) = IF;
 
 Indicator (*COUNT_1)(int) = COUNT;
-Indicator (*COUNT_2)(const Indicator&, int) = COUNT;
+Indicator (*COUNT_2)(const IndParam&) = COUNT;
+Indicator (*COUNT_3)(const Indicator&, const Indicator&) = COUNT;
+Indicator (*COUNT_4)(const Indicator&, const IndParam&) = COUNT;
+Indicator (*COUNT_5)(const Indicator&, int) = COUNT;
 
 Indicator (*SUM_1)(int) = SUM;
 Indicator (*SUM_2)(const Indicator&, int) = SUM;
@@ -155,14 +158,23 @@ Indicator (*LOG_2)(price_t) = LOG;
 Indicator (*LOG_3)(const Indicator&) = LOG;
 
 Indicator (*HHVBARS_1)(int) = HHVBARS;
-Indicator (*HHVBARS_2)(const Indicator&, int) = HHVBARS;
+Indicator (*HHVBARS_2)(const IndParam&) = HHVBARS;
+Indicator (*HHVBARS_3)(const Indicator&, const IndParam&) = HHVBARS;
+Indicator (*HHVBARS_4)(const Indicator&, const Indicator&) = HHVBARS;
+Indicator (*HHVBARS_5)(const Indicator&, int) = HHVBARS;
 
 Indicator (*LLVBARS_1)(int) = LLVBARS;
-Indicator (*LLVBARS_2)(const Indicator&, int) = LLVBARS;
+Indicator (*LLVBARS_2)(const IndParam&) = LLVBARS;
+Indicator (*LLVBARS_3)(const Indicator&, const IndParam&) = LLVBARS;
+Indicator (*LLVBARS_4)(const Indicator&, const Indicator&) = LLVBARS;
+Indicator (*LLVBARS_5)(const Indicator&, int) = LLVBARS;
 
 Indicator (*POW_1)(int) = POW;
-Indicator (*POW_2)(const Indicator&, int) = POW;
-Indicator (*POW_3)(price_t, int) = POW;
+Indicator (*POW_2)(const IndParam&) = POW;
+Indicator (*POW_3)(const Indicator&, int) = POW;
+Indicator (*POW_4)(const Indicator&, const IndParam&) = POW;
+Indicator (*POW_5)(const Indicator&, const Indicator&) = POW;
+Indicator (*POW_6)(price_t, int) = POW;
 
 Indicator (*SQRT_1)() = SQRT;
 Indicator (*SQRT_2)(const Indicator&) = SQRT;
@@ -193,7 +205,10 @@ Indicator (*INTPART_2)(const Indicator&) = INTPART;
 Indicator (*INTPART_3)(price_t) = INTPART;
 
 Indicator (*EXIST_1)(int) = EXIST;
-Indicator (*EXIST_2)(const Indicator&, int) = EXIST;
+Indicator (*EXIST_2)(const IndParam&) = EXIST;
+Indicator (*EXIST_3)(const Indicator&, const IndParam&) = EXIST;
+Indicator (*EXIST_4)(const Indicator&, const Indicator&) = EXIST;
+Indicator (*EXIST_5)(const Indicator&, int) = EXIST;
 
 Indicator (*EVERY_1)(int) = EVERY;
 Indicator (*EVERY_2)(const IndParam&) = EVERY;
@@ -254,7 +269,10 @@ Indicator (*LONGCROSS_3)(price_t, const Indicator&, int) = LONGCROSS;
 Indicator (*LONGCROSS_4)(price_t, price_t, int) = LONGCROSS;
 
 Indicator (*FILTER_1)(int) = FILTER;
-Indicator (*FILTER_2)(const Indicator&, int) = FILTER;
+Indicator (*FILTER_2)(const IndParam&) = FILTER;
+Indicator (*FILTER_3)(const Indicator&, const IndParam&) = FILTER;
+Indicator (*FILTER_4)(const Indicator&, const Indicator&) = FILTER;
+Indicator (*FILTER_5)(const Indicator&, int) = FILTER;
 
 Indicator (*BARSSINCE_1)() = BARSSINCE;
 Indicator (*BARSSINCE_2)(const Indicator&) = BARSSINCE;
@@ -271,7 +289,10 @@ Indicator (*BARSCOUNT_1)() = BARSCOUNT;
 Indicator (*BARSCOUNT_2)(const Indicator&) = BARSCOUNT;
 
 Indicator (*BACKSET_1)(int) = BACKSET;
-Indicator (*BACKSET_2)(const Indicator&, int) = BACKSET;
+Indicator (*BACKSET_2)(const IndParam&) = BACKSET;
+Indicator (*BACKSET_3)(const Indicator&, const IndParam&) = BACKSET;
+Indicator (*BACKSET_4)(const Indicator&, const Indicator&) = BACKSET;
+Indicator (*BACKSET_5)(const Indicator&, int) = BACKSET;
 
 Indicator (*TIMELINE_1)() = TIMELINE;
 Indicator (*TIMELINE_2)(const KData&) = TIMELINE;
@@ -286,13 +307,22 @@ Indicator (*DEVSQ_4)(const Indicator&, const IndParam&) = DEVSQ;
 Indicator (*DEVSQ_5)(const Indicator&, int) = DEVSQ;
 
 Indicator (*ROC_1)(int) = ROC;
-Indicator (*ROC_2)(const Indicator&, int) = ROC;
+Indicator (*ROC_2)(const IndParam&) = ROC;
+Indicator (*ROC_3)(const Indicator&, const IndParam&) = ROC;
+Indicator (*ROC_4)(const Indicator&, const Indicator&) = ROC;
+Indicator (*ROC_5)(const Indicator&, int) = ROC;
 
 Indicator (*ROCP_1)(int) = ROCP;
-Indicator (*ROCP_2)(const Indicator&, int) = ROCP;
+Indicator (*ROCP_2)(const IndParam&) = ROCP;
+Indicator (*ROCP_3)(const Indicator&, const IndParam&) = ROCP;
+Indicator (*ROCP_4)(const Indicator&, const Indicator&) = ROCP;
+Indicator (*ROCP_5)(const Indicator&, int) = ROCP;
 
 Indicator (*ROCR_1)(int) = ROCR;
-Indicator (*ROCR_2)(const Indicator&, int) = ROCR;
+Indicator (*ROCR_2)(const IndParam&) = ROCR;
+Indicator (*ROCR_3)(const Indicator&, const IndParam&) = ROCR;
+Indicator (*ROCR_4)(const Indicator&, const Indicator&) = ROCR;
+Indicator (*ROCR_5)(const Indicator&, int) = ROCR;
 
 Indicator (*ROCR100_1)(int) = ROCR100;
 Indicator (*ROCR100_2)(const Indicator&, int) = ROCR100;
@@ -312,7 +342,16 @@ Indicator (*DROPNA_1)() = DROPNA;
 Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
 
 Indicator (*AVEDEV_1)(const Indicator&, int) = AVEDEV;
-Indicator (*AVEDEV_2)(const Indicator&, const Indicator&) = AVEDEV;
+Indicator (*AVEDEV_2)(const Indicator&, const IndParam&) = AVEDEV;
+Indicator (*AVEDEV_3)(const Indicator&, const Indicator&) = AVEDEV;
+
+Indicator (*DOWNNDAY_1)(const Indicator&, int) = DOWNNDAY;
+Indicator (*DOWNNDAY_2)(const Indicator&, const IndParam&) = DOWNNDAY;
+Indicator (*DOWNNDAY_3)(const Indicator&, const Indicator&) = DOWNNDAY;
+
+Indicator (*NDAY_1)(const Indicator&, const Indicator&, int) = NDAY;
+Indicator (*NDAY_2)(const Indicator&, const Indicator&, const Indicator&) = NDAY;
+Indicator (*NDAY_3)(const Indicator&, const Indicator&, const IndParam&) = NDAY;
 
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
@@ -597,7 +636,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("COUNT", COUNT_1, (arg("n") = 20));
-    def("COUNT", COUNT_2, (arg("data"), arg("n") = 20), R"(COUNT([data, n=20])
+    def("COUNT", COUNT_2, (arg("n")));
+    def("COUNT", COUNT_3, (arg("data"), arg("n")));
+    def("COUNT", COUNT_4, (arg("data"), arg("n")));
+    def("COUNT", COUNT_5, (arg("data"), arg("n") = 20), R"(COUNT([data, n=20])
 
     统计满足条件的周期数。
 
@@ -606,7 +648,7 @@ void export_Indicator_build_in() {
     例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
 
     :param Indicator data: 条件
-    :param int n: 周期
+    :param int|Indicator|IndParam n: 周期
     :rtype: Indicator)");
 
     def("SUM", SUM_1, (arg("n") = 20));
@@ -712,7 +754,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("HHVBARS", HHVBARS_1, (arg("n") = 20));
-    def("HHVBARS", HHVBARS_2, (arg("data"), arg("n") = 20), R"(HHVBARS([data, n=20])
+    def("HHVBARS", HHVBARS_2, (arg("n")));
+    def("HHVBARS", HHVBARS_3, (arg("data"), arg("n")));
+    def("HHVBARS", HHVBARS_4, (arg("data"), arg("n")));
+    def("HHVBARS", HHVBARS_5, (arg("data"), arg("n") = 20), R"(HHVBARS([data, n=20])
 
     上一高点位置 求上一高点到当前的周期数。
 
@@ -721,11 +766,14 @@ void export_Indicator_build_in() {
     例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
     def("LLVBARS", LLVBARS_1, (arg("n") = 20));
-    def("LLVBARS", LLVBARS_2, (arg("data"), arg("n") = 20), R"(LLVBARS([data, n=20])
+    def("LLVBARS", LLVBARS_2, (arg("n")));
+    def("LLVBARS", LLVBARS_3, (arg("data"), arg("n")));
+    def("LLVBARS", LLVBARS_4, (arg("data"), arg("n")));
+    def("LLVBARS", LLVBARS_5, (arg("data"), arg("n") = 20), R"(LLVBARS([data, n=20])
 
     上一低点位置 求上一低点到当前的周期数。
 
@@ -734,12 +782,15 @@ void export_Indicator_build_in() {
     例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
 
     :param data: 输入数据
-    :param int n: N日时间窗口
+    :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator)");
 
     def("POW", POW_1, (arg("n")));
-    def("POW", POW_2, (arg("data"), arg("n")));
-    def("POW", POW_3), (arg("data"), arg("n"), R"(POW(data, n)
+    def("POW", POW_2, (arg("n")));
+    def("POW", POW_3, (arg("data"), arg("n")));
+    def("POW", POW_4, (arg("data"), arg("n")));
+    def("POW", POW_5, (arg("data"), arg("n")));
+    def("POW", POW_6), (arg("data"), arg("n"), R"(POW(data, n)
 
     乘幂
 
@@ -748,7 +799,7 @@ void export_Indicator_build_in() {
     例如：POW(CLOSE,3)求得收盘价的3次方
 
     :param data: 输入数据
-    :param int n: 幂
+    :param int|Indicator|IndParam n: 幂
     :rtype: Indicator)");
 
     def("SQRT", SQRT_1);
@@ -830,12 +881,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("EXIST", EXIST_1, (arg("n") = 20));
-    def("EXIST", EXIST_2, (arg("data"), arg("n") = 20), R"(EXIST([data, n=20])
+    def("EXIST", EXIST_2, (arg("n")));
+    def("EXIST", EXIST_3, (arg("data"), arg("n")));
+    def("EXIST", EXIST_4, (arg("data"), arg("n")));
+    def("EXIST", EXIST_5, (arg("data"), arg("n") = 20), R"(EXIST([data, n=20])
 
     存在, EXIST(X,N) 表示条件X在N周期有存在
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
     def("EVERY", EVERY_1, (arg("n") = 20));
@@ -972,21 +1026,25 @@ void export_Indicator_build_in() {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    def("DOWNNDAY", DOWNNDAY, (arg("data"), arg("n") = 3), R"(DOWNNDAY(data[, n=3])
+    def("DOWNNDAY", DOWNNDAY_1, (arg("data"), arg("n") = 3));
+    def("DOWNNDAY", DOWNNDAY_2, (arg("data"), arg("n")));
+    def("DOWNNDAY", DOWNNDAY_3, (arg("data"), arg("n")), R"(DOWNNDAY(data[, n=3])
 
     连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
-    def("NDAY", NDAY, (arg("x"), arg("y"), arg("n") = 3), R"(NDAY(x, y[, n=3])
+    def("NDAY", NDAY_1, (arg("x"), arg("y"), arg("n") = 3));
+    def("NDAY", NDAY_1, (arg("x"), arg("y"), arg("n")));
+    def("NDAY", NDAY_3, (arg("x"), arg("y"), arg("n")), R"(NDAY(x, y[, n=3])
 
     连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
 
     :param Indicator x:
     :param Indicator y:
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("CROSS", CROSS_1);
@@ -1017,7 +1075,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("FILTER", FILTER_1, (arg("n") = 5));
-    def("FILTER", FILTER_2, (arg("data"), arg("n") = 5), R"(FILTER([data, n=5])
+    def("FILTER", FILTER_2, (arg("n")));
+    def("FILTER", FILTER_3, (arg("data"), arg("n")));
+    def("FILTER", FILTER_4, (arg("data"), arg("n")));
+    def("FILTER", FILTER_5, (arg("data"), arg("n") = 5), R"(FILTER([data, n=5])
 
     信号过滤, 过滤连续出现的信号。
 
@@ -1026,7 +1087,7 @@ void export_Indicator_build_in() {
     例如：FILTER(CLOSE>OPEN,5) 查找阳线，5 天内再次出现的阳线不被记录在内。
 
     :param Indicator data: 输入数据
-    :param int n: 过滤周期
+    :param int|Indicaot|IndParam n: 过滤周期
     :rtype: Indicator)");
 
     def("BARSSINCE", BARSSINCE_1);
@@ -1080,8 +1141,11 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("BACKSET", BACKSET_1);
-    def("BACKSET", BACKSET_2, R"(BACKSET([data, n=2])
+    def("BACKSET", BACKSET_1, (arg("n") = 2));
+    def("BACKSET", BACKSET_2, (arg("n")));
+    def("BACKSET", BACKSET_3, (arg("data"), arg("n")));
+    def("BACKSET", BACKSET_4, (arg("data"), arg("n")));
+    def("BACKSET", BACKSET_5, (arg("data"), arg("n") = 2), R"(BACKSET([data, n=2])
 
     向前赋值将当前位置到若干周期前的数据设为1。
 
@@ -1090,7 +1154,7 @@ void export_Indicator_build_in() {
     例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
 
     :param Indicator data: 输入数据
-    :param int n: N周期
+    :param int|Indicator|IndParam n: N周期
     :rtype: Indicator)");
 
     def("TIMELINE", TIMELINE_1);
@@ -1124,12 +1188,13 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("AVEDEV", AVEDEV_1, (arg("data"), arg("n") = 22));
-    def("AVEDEV", AVEDEV_2, (arg("data"), arg("n")), R"(AVEDEV(data[, n=22])
+    def("AVEDEV", AVEDEV_2, (arg("data"), arg("n")));
+    def("AVEDEV", AVEDEV_3, (arg("data"), arg("n")), R"(AVEDEV(data[, n=22])
 
     平均绝对偏差，求X的N日平均绝对偏差
 
     :param Indicator data: 输入数据
-    :param int|Indicator n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("DEVSQ", DEVSQ_1, (arg("n") = 10));
@@ -1145,7 +1210,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("ROC", ROC_1, (arg("n") = 10));
-    def("ROC", ROC_2, (arg("data"), arg("n") = 10), R"(ROC([data, n=10])
+    def("ROC", ROC_2, (arg("n")));
+    def("ROC", ROC_3, (arg("data"), arg("n")));
+    def("ROC", ROC_4, (arg("data"), arg("n")));
+    def("ROC", ROC_5, (arg("data"), arg("n") = 10), R"(ROC([data, n=10])
 
     变动率指标: ((price / prevPrice)-1)*100
 
@@ -1154,7 +1222,10 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("ROCP", ROCP_1, (arg("n") = 10));
-    def("ROCP", ROCP_2, (arg("data"), arg("n") = 10), R"(ROCP([data, n=10])
+    def("ROCP", ROCP_2, (arg("n")));
+    def("ROCP", ROCP_3, (arg("data"), arg("n")));
+    def("ROCP", ROCP_4, (arg("data"), arg("n")));
+    def("ROCP", ROCP_5, (arg("data"), arg("n") = 10), R"(ROCP([data, n=10])
 
     变动率指标: (price - prevPrice) / prevPrice
 
@@ -1163,12 +1234,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("ROCR", ROCR_1, (arg("n") = 10));
-    def("ROCR", ROCR_2, (arg("data"), arg("n") = 10), R"(ROCR([data, n=10])
+    def("ROCR", ROCR_2, (arg("n")));
+    def("ROCR", ROCR_3, (arg("data"), arg("n")));
+    def("ROCR", ROCR_4, (arg("data"), arg("n")));
+    def("ROCR", ROCR_5, (arg("data"), arg("n") = 10), R"(ROCR([data, n=10])
 
     变动率指标: (price / prevPrice)
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator)");
 
     def("ROCR100", ROCR100_1, (arg("n") = 10));

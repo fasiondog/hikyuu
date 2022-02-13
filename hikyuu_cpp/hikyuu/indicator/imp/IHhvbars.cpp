@@ -85,9 +85,28 @@ void IHhvbars::_calculate(const Indicator& ind) {
     }
 }
 
+void IHhvbars::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t maxVal = ind[start];
+    size_t maxPos = start;
+    for (size_t i = start + 1; i <= curPos; i++) {
+        if (ind[i] > maxVal) {
+            maxVal = ind[i];
+            maxPos = i;
+        }
+    }
+    _set(curPos - maxPos, curPos);
+}
+
 Indicator HKU_API HHVBARS(int n) {
     IndicatorImpPtr p = make_shared<IHhvbars>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API HHVBARS(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IHhvbars>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

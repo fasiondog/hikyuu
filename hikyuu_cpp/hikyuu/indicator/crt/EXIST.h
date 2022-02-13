@@ -25,10 +25,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API EXIST(int n = 20);
-Indicator EXIST(const Indicator& ind, int n = 20);
+Indicator HKU_API EXIST(const IndParam& n);
 
-inline Indicator EXIST(const Indicator& ind, int n) {
+inline Indicator EXIST(const Indicator& ind, int n = 20) {
     return EXIST(n)(ind);
+}
+
+inline Indicator EXIST(const Indicator& ind, const IndParam& n) {
+    return EXIST(n)(ind);
+}
+
+inline Indicator EXIST(const Indicator& ind, const Indicator& n) {
+    return EXIST(IndParam(n))(ind);
 }
 
 }  // namespace hku

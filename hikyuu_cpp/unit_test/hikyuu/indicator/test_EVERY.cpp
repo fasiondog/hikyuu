@@ -126,7 +126,7 @@ TEST_CASE("test_EVERY_dyn") {
     CHECK_EQ(expect.discard(), result.discard());
     CHECK_EQ(expect.size(), result.size());
     for (size_t i = 0; i < expect.discard(); i++) {
-        CHECK(isnan(result[i]));
+        CHECK_UNARY(std::isnan(result[i]));
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
@@ -137,7 +137,7 @@ TEST_CASE("test_EVERY_dyn") {
     CHECK_EQ(expect.discard(), result.discard());
     CHECK_EQ(expect.size(), result.size());
     for (size_t i = 0; i < expect.discard(); i++) {
-        CHECK_UNARY(isnan(result[i]));
+        CHECK_UNARY(std::isnan(result[i]));
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));

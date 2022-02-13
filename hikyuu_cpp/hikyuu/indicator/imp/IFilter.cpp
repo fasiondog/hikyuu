@@ -22,7 +22,7 @@ IFilter::IFilter() : IndicatorImp("FILTER", 1) {
 IFilter::~IFilter() {}
 
 bool IFilter::check() {
-    return getParam<int>("n") >= 1;
+    return getParam<int>("n") >= 0;
 }
 
 void IFilter::_calculate(const Indicator& ind) {
@@ -34,6 +34,13 @@ void IFilter::_calculate(const Indicator& ind) {
     }
 
     int n = getParam<int>("n");
+    if (0 == n) {
+        for (size_t i = m_discard; i < total; i++) {
+            _set(ind[i] != 0.0 ? 1.0 : 0.0, i);
+        }
+        return;
+    }
+
     size_t i = m_discard;
     while (i < total) {
         if (ind[i] == 0.0) {
@@ -53,9 +60,32 @@ void IFilter::_calculate(const Indicator& ind) {
     }
 }
 
+void IFilter::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    price_t val = get(curPos);
+    HKU_IF_RETURN(!std::isnan(val) && val == 0.0, void());
+    if (ind[curPos] == 0.0) {
+        _set(0.0, curPos);
+    } else {
+        _set(1.0, curPos);
+        size_t end = curPos + step + 1;
+        if (end > ind.size()) {
+            end = ind.size();
+        }
+        for (size_t i = curPos + 1; i < end; i++) {
+            _set(0.0, i);
+        }
+    }
+}
+
 Indicator HKU_API FILTER(int n) {
     IndicatorImpPtr p = make_shared<IFilter>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API FILTER(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IFilter>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

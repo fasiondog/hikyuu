@@ -16,7 +16,7 @@
 namespace hku {
 
 class IHhvbars : public IndicatorImp {
-    INDICATOR_IMP(IHhvbars)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(IHhvbars)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

@@ -84,9 +84,28 @@ void ILowLineBars::_calculate(const Indicator& ind) {
     }
 }
 
+void ILowLineBars::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t minVal = ind[start];
+    size_t minPos = start;
+    for (size_t i = start + 1; i <= curPos; i++) {
+        if (ind[i] < minVal) {
+            minVal = ind[i];
+            minPos = i;
+        }
+    }
+    _set(curPos - minPos, curPos);
+}
+
 Indicator HKU_API LLVBARS(int n) {
     IndicatorImpPtr p = make_shared<ILowLineBars>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API LLVBARS(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<ILowLineBars>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

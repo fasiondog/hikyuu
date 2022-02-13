@@ -20,7 +20,7 @@ IMa::IMa() : IndicatorImp("MA", 1) {
 IMa::~IMa() {}
 
 bool IMa::check() {
-    return getParam<int>("n") >= 1;
+    return getParam<int>("n") >= 0;
 }
 
 void IMa::_calculate(const Indicator& indicator) {
@@ -32,6 +32,15 @@ void IMa::_calculate(const Indicator& indicator) {
     }
 
     int n = getParam<int>("n");
+    if (0 == n) {
+        price_t sum = 0.0;
+        for (size_t i = m_discard; i < total; i++) {
+            sum += indicator[i];
+            _set(sum / (i - m_discard + 1), i);
+        }
+        return;
+    }
+
     size_t startPos = m_discard;
     price_t sum = 0.0;
     size_t count = 1;

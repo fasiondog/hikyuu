@@ -25,10 +25,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API HHVBARS(int n = 20);
-Indicator HHVBARS(const Indicator& ind, int n = 20);
+Indicator HKU_API HHVBARS(const IndParam& n);
 
-inline Indicator HHVBARS(const Indicator& ind, int n) {
+inline Indicator HHVBARS(const Indicator& ind, int n = 20) {
     return HHVBARS(n)(ind);
+}
+
+inline Indicator HHVBARS(const Indicator& ind, const IndParam& n) {
+    return HHVBARS(n)(ind);
+}
+
+inline Indicator HHVBARS(const Indicator& ind, const Indicator& n) {
+    return HHVBARS(IndParam(n))(ind);
 }
 
 }  // namespace hku

@@ -34,6 +34,12 @@ inline Indicator AVEDEV(const Indicator& ind, const Indicator& n) {
     return result;
 }
 
+inline Indicator AVEDEV(const Indicator& ind, const IndParam& n) {
+    Indicator result = ABS(ind - MA(ind, n)) / n.get();
+    result.name("AVEDEV");
+    return result;
+}
+
 }  // namespace hku
 
 #endif /* INDICATOR_CRT_AVEDEV_H_ */

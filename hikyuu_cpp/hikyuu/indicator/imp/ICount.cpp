@@ -79,14 +79,50 @@ void ICount::_calculate(const Indicator& data) {
     }
 }
 
+void ICount::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = 0;
+    if (0 == step) {
+        start = ind.discard();
+    } else if (curPos < ind.discard() + step - 1) {
+        return;
+    } else {
+        start = curPos + 1 - step;
+    }
+    price_t count = 0;
+    for (size_t i = start; i <= curPos; i++) {
+        if (ind[i] != 0.0) {
+            count++;
+        }
+    }
+    _set(count, curPos);
+}
+
+void ICount::_after_dyn_calculate(const Indicator& ind) {
+    size_t total = ind.size();
+    HKU_IF_RETURN(m_discard == total, void());
+
+    size_t discard = m_discard;
+    for (size_t i = total - 1; i > discard; i--) {
+        if (std::isnan(get(i))) {
+            m_discard = i + 1;
+            break;
+        }
+    }
+    if (m_discard == discard && std::isnan(get(discard))) {
+        m_discard = discard + 1;
+    }
+}
+
 Indicator HKU_API COUNT(int n) {
     IndicatorImpPtr p = make_shared<ICount>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API COUNT(const Indicator& ind, int n) {
-    return COUNT(n)(ind);
+Indicator HKU_API COUNT(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<ICount>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */

@@ -103,10 +103,32 @@ TEST_CASE("test_HHV_dyn") {
     expect = HHV(c, 50);
     result = HHV(c, CVAL(c, 50));
     CHECK_EQ(expect.size(), result.size());
-    for (size_t i = 0; i < expect.size(); i++) {
-        if (i >= result.discard()) {
-            CHECK(!isnan(result[i]));
-        }
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], result[i]);
+    }
+
+    result = HHV(c, IndParam(CVAL(c, 50)));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], result[i]);
+    }
+
+    expect = HHV(c, 0);
+    result = HHV(c, CVAL(c, 0));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], result[i]);
     }
 }

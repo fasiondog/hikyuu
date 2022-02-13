@@ -32,6 +32,18 @@ void IExist::_calculate(const Indicator& ind) {
     int n = getParam<int>("n");
     if (n == 0) {
         n = total;
+        m_discard = ind.discard();
+        for (size_t i = m_discard; i < total; i++) {
+            price_t exist = 0.0;
+            for (size_t j = m_discard; j <= i; j++) {
+                if (ind[j] != 0.0) {
+                    exist = 1.0;
+                    break;
+                }
+            }
+            _set(exist, i);
+        }
+        return;
     }
 
     m_discard = ind.discard() + n - 1;
@@ -75,9 +87,51 @@ void IExist::_calculate(const Indicator& ind) {
     _set(exist, total - 1);
 }
 
+void IExist::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = 0;
+    if (0 == step) {
+        start = ind.discard();
+    } else if (curPos < ind.discard() + step - 1) {
+        return;
+    } else {
+        start = curPos + 1 - step;
+    }
+
+    price_t exist = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        if (ind[i] != 0.0) {
+            exist = 1.0;
+            break;
+        }
+    }
+    _set(exist, curPos);
+}
+
+void IExist::_after_dyn_calculate(const Indicator& ind) {
+    size_t total = ind.size();
+    HKU_IF_RETURN(m_discard == total, void());
+
+    size_t discard = m_discard;
+    for (size_t i = total - 1; i > discard; i--) {
+        if (std::isnan(get(i))) {
+            m_discard = i + 1;
+            break;
+        }
+    }
+    if (m_discard == discard && std::isnan(get(discard))) {
+        m_discard = discard + 1;
+    }
+}
+
 Indicator HKU_API EXIST(int n) {
     IndicatorImpPtr p = make_shared<IExist>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API EXIST(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IExist>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

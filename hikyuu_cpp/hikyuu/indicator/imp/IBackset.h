@@ -16,12 +16,16 @@
 namespace hku {
 
 class IBackset : public IndicatorImp {
-    INDICATOR_IMP(IBackset)
+    INDICATOR_IMP_SUPPORT_IND_PARAM(IBackset)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IBackset();
     virtual ~IBackset();
+
+    virtual bool isSerial() const override {
+        return true;
+    }
 };
 
 } /* namespace hku */

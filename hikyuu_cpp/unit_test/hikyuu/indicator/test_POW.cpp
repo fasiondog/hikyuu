@@ -47,6 +47,34 @@ TEST_CASE("test_POW") {
     CHECK_EQ(result[0], std::pow(-11, 3));
 }
 
+/** @par 检测点 */
+TEST_CASE("test_POW_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = POW(c, 10);
+    Indicator result = POW(c, CVAL(c, 10));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = POW(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

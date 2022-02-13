@@ -11,6 +11,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/BACKSET.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -118,6 +119,34 @@ TEST_CASE("test_BACKSET") {
     CHECK_EQ(result[8], 1);
     CHECK_EQ(result[9], 1);
     CHECK_EQ(result[10], 1);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_BACKSET_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = BACKSET(c, 10);
+    Indicator result = BACKSET(c, CVAL(c, 10));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = BACKSET(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------
