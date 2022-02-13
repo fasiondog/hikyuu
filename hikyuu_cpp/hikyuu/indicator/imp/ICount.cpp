@@ -97,22 +97,6 @@ void ICount::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     _set(count, curPos);
 }
 
-void ICount::_after_dyn_calculate(const Indicator& ind) {
-    size_t total = ind.size();
-    HKU_IF_RETURN(m_discard == total, void());
-
-    size_t discard = m_discard;
-    for (size_t i = total - 1; i > discard; i--) {
-        if (std::isnan(get(i))) {
-            m_discard = i + 1;
-            break;
-        }
-    }
-    if (m_discard == discard && std::isnan(get(discard))) {
-        m_discard = discard + 1;
-    }
-}
-
 Indicator HKU_API COUNT(int n) {
     IndicatorImpPtr p = make_shared<ICount>();
     p->setParam<int>("n", n);

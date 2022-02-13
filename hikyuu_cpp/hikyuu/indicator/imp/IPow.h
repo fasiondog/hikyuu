@@ -19,7 +19,7 @@ namespace hku {
  * 乘幂
  */
 class IPow : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_IND_PARAM(IPow)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IPow)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

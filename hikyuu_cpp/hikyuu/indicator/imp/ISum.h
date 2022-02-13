@@ -14,7 +14,7 @@
 namespace hku {
 
 class ISum : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_IND_PARAM(ISum)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(ISum)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

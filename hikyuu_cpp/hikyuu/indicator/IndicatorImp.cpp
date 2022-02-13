@@ -1267,7 +1267,6 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
             size_t step = size_t(ind_param->get(i));
             _dyn_run_one_step(ind, i, step);
         }
-        _after_dyn_calculate(ind);
         return;
     }
 
@@ -1301,8 +1300,6 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     for (auto &task : tasks) {
         task.get();
     }
-
-    _after_dyn_calculate(ind);
 }
 
 } /* namespace hku */

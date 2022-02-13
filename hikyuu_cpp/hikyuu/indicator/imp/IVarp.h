@@ -19,7 +19,7 @@ namespace hku {
  * 估算总体样本方差
  */
 class IVarp : public hku::IndicatorImp {
-    INDICATOR_IMP_SUPPORT_IND_PARAM(IVarp)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IVarp)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
