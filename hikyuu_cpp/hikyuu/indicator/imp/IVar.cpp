@@ -48,9 +48,31 @@ void IVar::_calculate(const Indicator& data) {
     }
 }
 
+void IVar::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step > 0 && curPos < ind.discard() + step - 1, void());
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += ind[i];
+    }
+    price_t mean = sum / step;
+    sum = 0.0;
+    size_t N = step - 1;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += std::pow(ind[i] - mean, 2);
+    }
+    _set(sum / N, curPos);
+}
+
 Indicator HKU_API VAR(int n) {
     IndicatorImpPtr p = make_shared<IVar>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API VAR(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IVar>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

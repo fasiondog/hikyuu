@@ -882,7 +882,7 @@
     估算样本方差, VAR(X,N)为X的N日估算样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -891,7 +891,7 @@
     总体样本方差, VARP(X,N)为X的N日总体样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 

@@ -262,10 +262,16 @@ Indicator (*MOD_3)(price_t, const Indicator&) = MOD;
 Indicator (*MOD_4)(price_t, price_t) = MOD;
 
 Indicator (*VAR_1)(int) = VAR;
-Indicator (*VAR_2)(const Indicator&, int) = VAR;
+Indicator (*VAR_2)(const IndParam&) = VAR;
+Indicator (*VAR_3)(const Indicator&, const IndParam&) = VAR;
+Indicator (*VAR_4)(const Indicator&, const Indicator&) = VAR;
+Indicator (*VAR_5)(const Indicator&, int) = VAR;
 
 Indicator (*VARP_1)(int) = VARP;
-Indicator (*VARP_2)(const Indicator&, int) = VARP;
+Indicator (*VARP_2)(const IndParam&) = VARP;
+Indicator (*VARP_3)(const Indicator&, const IndParam&) = VARP;
+Indicator (*VARP_4)(const Indicator&, const Indicator&) = VARP;
+Indicator (*VARP_5)(const Indicator&, int) = VARP;
 
 Indicator (*CROSS_1)(const Indicator&, const Indicator&) = CROSS;
 Indicator (*CROSS_2)(const Indicator&, price_t) = CROSS;
@@ -1026,21 +1032,27 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("VAR", VAR_1, (arg("n") = 10));
-    def("VAR", VAR_2, (arg("data"), arg("n") = 10), R"(VAR([data, n=10])
+    def("VAR", VAR_2, (arg("n")));
+    def("VAR", VAR_3, (arg("data"), arg("n")));
+    def("VAR", VAR_4, (arg("data"), arg("n")));
+    def("VAR", VAR_5, (arg("data"), arg("n") = 10), R"(VAR([data, n=10])
 
     估算样本方差, VAR(X,N)为X的N日估算样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("VARP", VARP_1, (arg("n") = 10));
-    def("VARP", VARP_2, (arg("data"), arg("n") = 10), R"(VARP([data, n=10])
+    def("VARP", VARP_2, (arg("n")));
+    def("VARP", VARP_3, (arg("data"), arg("n")));
+    def("VARP", VARP_4, (arg("data"), arg("n")));
+    def("VARP", VARP_5, (arg("data"), arg("n") = 10), R"(VARP([data, n=10])
 
     总体样本方差, VARP(X,N)为X的N日总体样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator)");
 
     def("UPNDAY", UPNDAY_1, (arg("data"), arg("n") = 3));
