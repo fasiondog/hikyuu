@@ -298,7 +298,10 @@ Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
 Indicator (*BARSLAST_3)(price_t) = BARSLAST;
 
 Indicator (*SUMBARS_1)(double) = SUMBARS;
-Indicator (*SUMBARS_2)(const Indicator&, double) = SUMBARS;
+Indicator (*SUMBARS_2)(const IndParam&) = SUMBARS;
+Indicator (*SUMBARS_3)(const Indicator&, const IndParam&) = SUMBARS;
+Indicator (*SUMBARS_4)(const Indicator&, const Indicator&) = SUMBARS;
+Indicator (*SUMBARS_5)(const Indicator&, double) = SUMBARS;
 
 Indicator (*BARSCOUNT_1)() = BARSCOUNT;
 Indicator (*BARSCOUNT_2)(const Indicator&) = BARSCOUNT;
@@ -1155,8 +1158,11 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("SUMBARS", SUMBARS_1);
-    def("SUMBARS", SUMBARS_2, R"(SUMBARS([data,] a)
+    def("SUMBARS", SUMBARS_1, (arg("a")));
+    def("SUMBARS", SUMBARS_2, (arg("a")));
+    def("SUMBARS", SUMBARS_3, (arg("data"), arg("a")));
+    def("SUMBARS", SUMBARS_4, (arg("data"), arg("a")));
+    def("SUMBARS", SUMBARS_5, (arg("data"), arg("a")), R"(SUMBARS([data,] a)
 
     累加到指定周期数, 向前累加到指定值到现在的周期数
 
@@ -1165,7 +1171,7 @@ void export_Indicator_build_in() {
     例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
 
     :param Indicator data: 输入数据
-    :param float a: 指定累加和
+    :param float a|Indicator|IndParam: 指定累加和
     :rtype: Indicator)");
 
     def("BARSCOUNT", BARSCOUNT_1);

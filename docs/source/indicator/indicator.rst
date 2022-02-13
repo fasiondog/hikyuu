@@ -840,7 +840,7 @@
     例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
 
     :param Indicator data: 输入数据
-    :param float a: 指定累加和
+    :param float|Indicator|IndParam a: 指定累加和
     :rtype: Indicator
 
 

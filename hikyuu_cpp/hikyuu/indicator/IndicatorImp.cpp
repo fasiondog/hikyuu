@@ -1255,7 +1255,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     const auto &ind_param = getIndParamImp("n");
     HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
               ind_param->size(), ind.size());
-    m_discard = ind.discard();
+    m_discard = std::max(ind.discard(), ind_param->discard());
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total || m_discard >= total, void());
 
