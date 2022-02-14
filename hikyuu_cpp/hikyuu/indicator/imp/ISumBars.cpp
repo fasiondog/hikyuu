@@ -104,7 +104,7 @@ void ISumBars::_dyn_calculate(const Indicator& ind) {
         for (size_t j = i; j >= ind.discard(); j--) {
             sum += ind[j];
             if (sum >= a) {
-                n = price_t(j - i + 1);
+                n = price_t(j - i);
                 break;
             }
             if (j == ind.discard()) {
