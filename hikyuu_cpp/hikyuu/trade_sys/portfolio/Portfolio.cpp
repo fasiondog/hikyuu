@@ -27,15 +27,17 @@ HKU_API std::ostream& operator<<(std::ostream& os, const PortfolioPtr& pf) {
     return os;
 }
 
-Portfolio::Portfolio() : m_name("Portfolio"), m_is_ready(false) {}
+Portfolio::Portfolio() : m_name("Portfolio"), m_is_ready(false) {
+    setParam<bool>("trace", false);  // 打印跟踪
+}
 
-Portfolio::Portfolio(const string& name) : m_name(name), m_is_ready(false) {}
+Portfolio::Portfolio(const string& name) : m_name(name), m_is_ready(false) {
+    setParam<bool>("trace", false);
+}
 
 Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af)
 : m_name("Portfolio"), m_tm(tm), m_se(se), m_af(af), m_is_ready(false) {
-    if (m_tm) {
-        m_shadow_tm = m_tm->clone();
-    }
+    setParam<bool>("trace", false);
 }
 
 Portfolio::~Portfolio() {}
@@ -45,6 +47,7 @@ void Portfolio::reset() {
     m_running_sys_set.clear();
     m_running_sys_list.clear();
     m_all_sys_set.clear();
+    m_sys_map.clear();
     if (m_tm)
         m_tm->reset();
     if (m_shadow_tm)
@@ -63,6 +66,7 @@ PortfolioPtr Portfolio::clone() {
     p->m_running_sys_set = m_running_sys_set;
     p->m_running_sys_list = m_running_sys_list;
     p->m_all_sys_set = m_all_sys_set;
+    p->m_sys_map = m_sys_map;
     p->m_is_ready = m_is_ready;
     if (m_se)
         p->m_se = m_se->clone();
@@ -97,6 +101,7 @@ bool Portfolio::readyForRun() {
     reset();
 
     // 将影子账户指定给资产分配器
+    m_shadow_tm = m_tm->clone();
     m_af->setTM(m_tm);
     m_af->setShadowTM(m_shadow_tm);
 
@@ -104,20 +109,27 @@ bool Portfolio::readyForRun() {
     m_af->setQuery(m_query);
 
     // 获取所有备选子系统，为无关联账户的子系统分配子账号，对所有子系统做好启动准备
-    SystemList all_sys_list = m_se->getAllSystemList();
-    TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "TM_SUB");
-    auto sys_iter = all_sys_list.begin();
-    for (; sys_iter != all_sys_list.end(); ++sys_iter) {
-        SystemPtr& sys = *sys_iter;
+    SystemList all_pro_sys_list = m_se->getAllSystemList();  // 所有原型系统
 
-        // 如果子系统没有关联账户，则为其分配一个子账户
-        if (!sys->getTM()) {
-            sys->setTM(pro_tm->clone());
+    TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "TM_SUB");
+    auto sys_iter = all_pro_sys_list.begin();
+    for (; sys_iter != all_pro_sys_list.end(); ++sys_iter) {
+        SystemPtr& pro_sys = *sys_iter;
+        SystemPtr sys = pro_sys->clone();
+        m_sys_map[pro_sys] = sys;
+
+        // 如果原型子系统没有关联账户，则为其创建一个和总资金金额相同的账户，以便能够运行
+        if (!pro_sys->getTM()) {
+            pro_sys->setTM(m_tm->clone());
         }
 
-        if (sys->readyForRun()) {
+        // 为内部实际执行的系统创建初始资金为0的子账户
+        sys->setTM(pro_tm->clone());
+
+        if (sys->readyForRun() && pro_sys->readyForRun()) {
             KData k = sys->getStock().getKData(m_query);
             sys->setTO(k);
+            pro_sys->setTO(k);
 
             // 保存记录子系统
             m_all_sys_set.insert(sys);
@@ -132,10 +144,16 @@ bool Portfolio::readyForRun() {
 }
 
 void Portfolio::runMoment(const Datetime& date) {
-    HKU_CHECK(isReady(), "Not ready to run! Please perform readyForRun() first!");
+    // HKU_CHECK(isReady(), "Not ready to run! Please perform readyForRun() first!");
 
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
+
+    // 先让所有原型系统运行，以便产生信号
+    SystemList all_pro_sys_list = m_se->getAllSystemList();
+    for (auto& pro_sys : all_pro_sys_list) {
+        pro_sys->runMoment(date);
+    }
 
     int precision = m_shadow_tm->getParam<int>("precision");
     SystemList cur_selected_list;        //当前选中系统列表
@@ -143,11 +161,30 @@ void Portfolio::runMoment(const Datetime& date) {
     SystemList cur_allocated_list;       //当前分配了资金的系统
     SystemList cur_hold_sys_list;        //当前时刻有持仓的系统，每个时刻重新收集
 
+    if (getParam<bool>("trace")) {
+        HKU_INFO("========================================================================");
+        HKU_INFO("{}", date);
+    }
+
     // 从选股策略获取当前选中的系统列表
-    cur_selected_list = m_se->getSelectedSystemList(date);
+    auto pro_cur_selected_list = m_se->getSelectedSystemList(date);
+    for (auto& pro_sys : pro_cur_selected_list) {
+        cur_selected_list.push_back(m_sys_map[pro_sys]);
+        if (getParam<bool>("trace")) {
+            auto sys = m_sys_map[pro_sys];
+            HKU_INFO("select: {}, cash: {}", sys->getTO().getStock(), sys->getTM()->currentCash());
+        }
+    }
 
     // 资产分配算法调整各子系统资产分配
     m_af->adjustFunds(date, cur_selected_list, m_running_sys_list);
+
+    if (getParam<bool>("trace")) {
+        for (auto& sys : cur_selected_list) {
+            HKU_INFO("allocate --> select: {}, cash: {}", sys->getTO().getStock(),
+                     sys->getTM()->currentCash());
+        }
+    }
 
     // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
     SystemList will_remove_sys;
@@ -193,6 +230,7 @@ void Portfolio::runMoment(const Datetime& date) {
 }
 
 void Portfolio::run(const KQuery& query) {
+    SPEND_TIME(Portfolio_run);
     HKU_CHECK(readyForRun(),
               "readyForRun fails, check to see if a valid TradeManager, Selector, or "
               "AllocateFunds instance have been specified.");

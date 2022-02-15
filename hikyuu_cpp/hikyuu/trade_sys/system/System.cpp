@@ -127,10 +127,8 @@ void System::reset(bool with_tm, bool with_ev) {
     if (m_sp)
         m_sp->reset();
 
-    m_kdata = KData();
-    m_src_kdata = KData();
-
-    //不能复位m_stock，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
+    //不能复位m_stock / m_kdata/
+    //m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
     //一个sys实例绑定stock后，除非主动改变，否则不应该被reset
     // m_stock
 

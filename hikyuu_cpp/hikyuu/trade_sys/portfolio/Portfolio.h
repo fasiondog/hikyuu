@@ -143,8 +143,9 @@ protected:
     std::set<SYSPtr> m_running_sys_set;    // 当前仍在运行的子系统集合
     std::list<SYSPtr> m_running_sys_list;  // 当前仍在运行的子系统列表
     std::set<SYSPtr> m_all_sys_set;        // 记录所有运行过或运行中的子系统集合
-    KQuery m_query;                        // 关联的查询条件
-    bool m_is_ready;                       // 是否已做好运行准备
+    std::unordered_map<SYSPtr, SYSPtr> m_sys_map;  // 系统原型 -> 内部运行系统
+    KQuery m_query;                                // 关联的查询条件
+    bool m_is_ready;                               // 是否已做好运行准备
 
 //============================================
 // 序列化支持
