@@ -8,6 +8,7 @@
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/selector/build_in.h>
 #include "../_Parameter.h"
+#include "../pybind_utils.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
@@ -43,8 +44,14 @@ public:
 string (SelectorBase::*sb_get_name)() const = &SelectorBase::name;
 void (SelectorBase::*sb_set_name)(const string&) = &SelectorBase::name;
 
+SelectorPtr SE_Fixed(py::list stock_list, const SystemPtr& sys) {
+    StockList stk_list = python_list_to_vector<StockList>(stock_list);
+    return SE_Fixed(stk_list, sys);
+}
+
 SelectorPtr (*SE_Fixed_1)() = SE_Fixed;
-SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
+SelectorPtr (*SE_Fixed_2)(py::list stock_list, const SystemPtr& sys) = SE_Fixed;
+// SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
 
 void export_Selector() {
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())

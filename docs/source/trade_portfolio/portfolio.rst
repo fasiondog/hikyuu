@@ -6,13 +6,13 @@
 
 目前仅实现了多标的、相同策略的投资组合，还需完善，未来接口可能变化（包括选择器策略）！
 
-.. py:function:: PF_Simple([tm, sys, se])
+.. py:function:: PF_Simple([tm, af, se])
 
     创建一个多标的、单系统策略的投资组合
     
     :param TradeManager tm: 交易管理
-    :param System sys: 系统策略
     :param SelectorBase se: 选择器
+    :param AllocateFundsBase af: 资金分配算法
     
     
 投资组合类定义
