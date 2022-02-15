@@ -173,9 +173,6 @@ public:
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
-    /** 动态指标参数计算完毕后处理，主要用于修正 m_discard */
-    virtual void _after_dyn_calculate(const Indicator& ind) {}
-
     /** 是否支持指标动态参数 */
     virtual bool supportIndParam() const {
         return false;
@@ -193,6 +190,8 @@ public:
     virtual bool isNeedContext() const {
         return false;
     }
+
+    virtual void _dyn_calculate(const Indicator&);
 
 private:
     void initContext();
@@ -212,7 +211,6 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
-    void _dyn_calculate(const Indicator&);
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
@@ -346,7 +344,7 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)                                             \
+#define INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(classname)                                          \
 public:                                                                                        \
     virtual bool check() override;                                                             \
     virtual void _calculate(const Indicator& ind) override;                                    \

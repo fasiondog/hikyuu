@@ -104,6 +104,7 @@ bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
         }
 
         SYSPtr sys = protoSys->clone();
+        sys->setStock(*iter);
         m_sys_list.push_back(sys);
     }
 

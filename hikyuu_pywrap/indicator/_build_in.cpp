@@ -74,10 +74,16 @@ Indicator (*SAFTYLOSS_2)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS
 // BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_2_overload, SAFTYLOSS, 1, 4);
 
 Indicator (*STDEV_1)(int) = STDEV;
-Indicator (*STDEV_2)(const Indicator&, int) = STDEV;
+Indicator (*STDEV_2)(const IndParam&) = STDEV;
+Indicator (*STDEV_3)(const Indicator&, const IndParam&) = STDEV;
+Indicator (*STDEV_4)(const Indicator&, const Indicator&) = STDEV;
+Indicator (*STDEV_5)(const Indicator&, int) = STDEV;
 
 Indicator (*STDP_1)(int) = STDP;
-Indicator (*STDP_2)(const Indicator&, int) = STDP;
+Indicator (*STDP_2)(const IndParam&) = STDP;
+Indicator (*STDP_3)(const Indicator&, const IndParam&) = STDP;
+Indicator (*STDP_4)(const Indicator&, const Indicator&) = STDP;
+Indicator (*STDP_5)(const Indicator&, int) = STDP;
 
 Indicator (*HHV_1)(int) = HHV;
 Indicator (*HHV_2)(const IndParam&) = HHV;
@@ -115,7 +121,10 @@ Indicator (*COUNT_4)(const Indicator&, const IndParam&) = COUNT;
 Indicator (*COUNT_5)(const Indicator&, int) = COUNT;
 
 Indicator (*SUM_1)(int) = SUM;
-Indicator (*SUM_2)(const Indicator&, int) = SUM;
+Indicator (*SUM_2)(const IndParam&) = SUM;
+Indicator (*SUM_3)(const Indicator&, const IndParam&) = SUM;
+Indicator (*SUM_4)(const Indicator&, const Indicator&) = SUM;
+Indicator (*SUM_5)(const Indicator&, int) = SUM;
 
 Indicator (*ABS_1)() = ABS;
 Indicator (*ABS_2)(price_t) = ABS;
@@ -253,10 +262,16 @@ Indicator (*MOD_3)(price_t, const Indicator&) = MOD;
 Indicator (*MOD_4)(price_t, price_t) = MOD;
 
 Indicator (*VAR_1)(int) = VAR;
-Indicator (*VAR_2)(const Indicator&, int) = VAR;
+Indicator (*VAR_2)(const IndParam&) = VAR;
+Indicator (*VAR_3)(const Indicator&, const IndParam&) = VAR;
+Indicator (*VAR_4)(const Indicator&, const Indicator&) = VAR;
+Indicator (*VAR_5)(const Indicator&, int) = VAR;
 
 Indicator (*VARP_1)(int) = VARP;
-Indicator (*VARP_2)(const Indicator&, int) = VARP;
+Indicator (*VARP_2)(const IndParam&) = VARP;
+Indicator (*VARP_3)(const Indicator&, const IndParam&) = VARP;
+Indicator (*VARP_4)(const Indicator&, const Indicator&) = VARP;
+Indicator (*VARP_5)(const Indicator&, int) = VARP;
 
 Indicator (*CROSS_1)(const Indicator&, const Indicator&) = CROSS;
 Indicator (*CROSS_2)(const Indicator&, price_t) = CROSS;
@@ -283,7 +298,10 @@ Indicator (*BARSLAST_2)(const Indicator&) = BARSLAST;
 Indicator (*BARSLAST_3)(price_t) = BARSLAST;
 
 Indicator (*SUMBARS_1)(double) = SUMBARS;
-Indicator (*SUMBARS_2)(const Indicator&, double) = SUMBARS;
+Indicator (*SUMBARS_2)(const IndParam&) = SUMBARS;
+Indicator (*SUMBARS_3)(const Indicator&, const IndParam&) = SUMBARS;
+Indicator (*SUMBARS_4)(const Indicator&, const Indicator&) = SUMBARS;
+Indicator (*SUMBARS_5)(const Indicator&, double) = SUMBARS;
 
 Indicator (*BARSCOUNT_1)() = BARSCOUNT;
 Indicator (*BARSCOUNT_2)(const Indicator&) = BARSCOUNT;
@@ -325,7 +343,10 @@ Indicator (*ROCR_4)(const Indicator&, const Indicator&) = ROCR;
 Indicator (*ROCR_5)(const Indicator&, int) = ROCR;
 
 Indicator (*ROCR100_1)(int) = ROCR100;
-Indicator (*ROCR100_2)(const Indicator&, int) = ROCR100;
+Indicator (*ROCR100_2)(const IndParam&) = ROCR100;
+Indicator (*ROCR100_3)(const Indicator&, const IndParam&) = ROCR100;
+Indicator (*ROCR100_4)(const Indicator&, const Indicator&) = ROCR100;
+Indicator (*ROCR100_5)(const Indicator&, int) = ROCR100;
 
 Indicator (*AD_1)() = AD;
 Indicator (*AD_2)(const KData&) = AD;
@@ -348,6 +369,10 @@ Indicator (*AVEDEV_3)(const Indicator&, const Indicator&) = AVEDEV;
 Indicator (*DOWNNDAY_1)(const Indicator&, int) = DOWNNDAY;
 Indicator (*DOWNNDAY_2)(const Indicator&, const IndParam&) = DOWNNDAY;
 Indicator (*DOWNNDAY_3)(const Indicator&, const Indicator&) = DOWNNDAY;
+
+Indicator (*UPNDAY_1)(const Indicator&, int) = UPNDAY;
+Indicator (*UPNDAY_2)(const Indicator&, const IndParam&) = UPNDAY;
+Indicator (*UPNDAY_3)(const Indicator&, const Indicator&) = UPNDAY;
 
 Indicator (*NDAY_1)(const Indicator&, const Indicator&, int) = NDAY;
 Indicator (*NDAY_2)(const Indicator&, const Indicator&, const Indicator&) = NDAY;
@@ -541,16 +566,22 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("STDEV", STDEV_1, (arg("n") = 10));
-    def("STDEV", STDEV_2, (arg("data"), arg("n") = 10), R"(STDEV([data, n=10])
+    def("STDEV", STDEV_2, (arg("n")));
+    def("STDEV", STDEV_3, (arg("data"), arg("n")));
+    def("STDEV", STDEV_4, (arg("data"), arg("n")));
+    def("STDEV", STDEV_5, (arg("data"), arg("n") = 10), R"(STDEV([data, n=10])
 
     计算N周期内样本标准差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("STDP", STDP_1, (arg("n") = 10));
-    def("STDP", STDP_2, (arg("data"), arg("n") = 10), R"(STDP([data, n=10])
+    def("STDP", STDP_2, (arg("n")));
+    def("STDP", STDP_3, (arg("data"), arg("n")));
+    def("STDP", STDP_4, (arg("data"), arg("n")));
+    def("STDP", STDP_5, (arg("data"), arg("n") = 10), R"(STDP([data, n=10])
 
     总体标准差，STDP(X,N)为X的N日总体标准差
 
@@ -652,12 +683,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("SUM", SUM_1, (arg("n") = 20));
-    def("SUM", SUM_2, (arg("data"), arg("n") = 20), R"(SUM([data, n=20])
+    def("SUM", SUM_2, (arg("n")));
+    def("SUM", SUM_3, (arg("data"), arg("n")));
+    def("SUM", SUM_4, (arg("data"), arg("n")));
+    def("SUM", SUM_5, (arg("data"), arg("n") = 20), R"(SUM([data, n=20])
 
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("ABS", ABS_1);
@@ -1001,29 +1035,37 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("VAR", VAR_1, (arg("n") = 10));
-    def("VAR", VAR_2, (arg("data"), arg("n") = 10), R"(VAR([data, n=10])
+    def("VAR", VAR_2, (arg("n")));
+    def("VAR", VAR_3, (arg("data"), arg("n")));
+    def("VAR", VAR_4, (arg("data"), arg("n")));
+    def("VAR", VAR_5, (arg("data"), arg("n") = 10), R"(VAR([data, n=10])
 
     估算样本方差, VAR(X,N)为X的N日估算样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("VARP", VARP_1, (arg("n") = 10));
-    def("VARP", VARP_2, (arg("data"), arg("n") = 10), R"(VARP([data, n=10])
+    def("VARP", VARP_2, (arg("n")));
+    def("VARP", VARP_3, (arg("data"), arg("n")));
+    def("VARP", VARP_4, (arg("data"), arg("n")));
+    def("VARP", VARP_5, (arg("data"), arg("n") = 10), R"(VARP([data, n=10])
 
     总体样本方差, VARP(X,N)为X的N日总体样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator)");
 
-    def("UPNDAY", UPNDAY, (arg("data"), arg("n") = 3), R"(UPNDAY(data[, n=3])
+    def("UPNDAY", UPNDAY_1, (arg("data"), arg("n") = 3));
+    def("UPNDAY", UPNDAY_2, (arg("data"), arg("n")));
+    def("UPNDAY", UPNDAY_3, (arg("data"), arg("n")), R"(UPNDAY(data[, n=3])
 
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("DOWNNDAY", DOWNNDAY_1, (arg("data"), arg("n") = 3));
@@ -1116,8 +1158,11 @@ void export_Indicator_build_in() {
     :param Indicator data: 输入数据
     :rtype: Indicator)");
 
-    def("SUMBARS", SUMBARS_1);
-    def("SUMBARS", SUMBARS_2, R"(SUMBARS([data,] a)
+    def("SUMBARS", SUMBARS_1, (arg("a")));
+    def("SUMBARS", SUMBARS_2, (arg("a")));
+    def("SUMBARS", SUMBARS_3, (arg("data"), arg("a")));
+    def("SUMBARS", SUMBARS_4, (arg("data"), arg("a")));
+    def("SUMBARS", SUMBARS_5, (arg("data"), arg("a")), R"(SUMBARS([data,] a)
 
     累加到指定周期数, 向前累加到指定值到现在的周期数
 
@@ -1126,7 +1171,7 @@ void export_Indicator_build_in() {
     例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
 
     :param Indicator data: 输入数据
-    :param float a: 指定累加和
+    :param float a|Indicator|IndParam: 指定累加和
     :rtype: Indicator)");
 
     def("BARSCOUNT", BARSCOUNT_1);
@@ -1246,12 +1291,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("ROCR100", ROCR100_1, (arg("n") = 10));
-    def("ROCR100", ROCR100_2, (arg("data"), arg("n") = 10), R"(ROCR100([data, n=10])
+    def("ROCR100", ROCR100_2, (arg("n")));
+    def("ROCR100", ROCR100_3, (arg("data"), arg("n")));
+    def("ROCR100", ROCR100_4, (arg("data"), arg("n")));
+    def("ROCR100", ROCR100_5, (arg("data"), arg("n") = 10), R"(ROCR100([data, n=10])
 
     变动率指标: (price / prevPrice) * 100
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator)");
 
     def("AD", AD_1);

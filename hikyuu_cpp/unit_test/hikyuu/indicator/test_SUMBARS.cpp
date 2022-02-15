@@ -158,6 +158,45 @@ TEST_CASE("test_SUMBARS") {
     CHECK_UNARY(std::isnan(result[1]));
 }
 
+/** @par 检测点 */
+TEST_CASE("test_SUMBARS_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = SUMBARS(c, 10);
+    Indicator result = SUMBARS(c, CVAL(c, 10));
+    CHECK_EQ(expect.size(), result.size());
+    // CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = SUMBARS(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.size(), result.size());
+    // CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    expect = SUMBARS(c, 0);
+    result = SUMBARS(c, CVAL(c, 0));
+    CHECK_EQ(expect.size(), result.size());
+    // CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

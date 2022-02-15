@@ -16,7 +16,7 @@
 namespace hku {
 
 class IFilter : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_IND_PARAM(IFilter)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IFilter)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

@@ -12,6 +12,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/VARP.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
@@ -60,6 +61,34 @@ TEST_CASE("test_VARP") {
     CHECK_EQ(result.size(), expect.size());
     for (size_t i = result.discard(); i < expect.size(); ++i) {
         CHECK_EQ(result[i], expect[i]);
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_VARP_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = VARP(c, 10);
+    Indicator result = VARP(c, CVAL(c, 10));
+    // CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = VARP(c, IndParam(CVAL(c, 10)));
+    // CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 }
 

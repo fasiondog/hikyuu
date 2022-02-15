@@ -25,10 +25,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API SUMBARS(double a);
-Indicator SUMBARS(const Indicator& ind, double a);
+Indicator HKU_API SUMBARS(const IndParam& a);
 
 inline Indicator SUMBARS(const Indicator& ind, double a) {
     return SUMBARS(a)(ind);
+}
+
+inline Indicator SUMBARS(const Indicator& ind, const IndParam& a) {
+    return SUMBARS(a)(ind);
+}
+
+inline Indicator SUMBARS(const Indicator& ind, const Indicator& a) {
+    return SUMBARS(IndParam(a))(ind);
 }
 
 }  // namespace hku

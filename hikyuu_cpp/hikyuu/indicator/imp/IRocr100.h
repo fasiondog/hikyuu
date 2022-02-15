@@ -16,7 +16,7 @@
 namespace hku {
 
 class IRocr100 : public hku::IndicatorImp {
-    INDICATOR_IMP(IRocr100)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IRocr100)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

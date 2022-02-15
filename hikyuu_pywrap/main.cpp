@@ -130,6 +130,9 @@ BOOST_PYTHON_MODULE(core) {
 
     export_io_redirect();
 
+    py::def("close_spend_time", close_spend_time, "全局关闭 c++ 部分耗时打印");
+    py::def("open_spend_time", close_spend_time, "全局开启 c++ 部分耗时打印");
+
     py::def("hikyuu_init", hikyuu_init,
             (py::arg("filename"), py::arg("ignore_preload") = false,
              py::arg("context") = StrategyContext({"all"})));

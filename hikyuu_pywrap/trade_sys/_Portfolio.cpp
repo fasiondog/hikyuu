@@ -114,7 +114,7 @@ void export_Portfolio() {
 
     def("PF_Simple", PF_Simple,
         (arg("tm") = TradeManagerPtr(), arg("se") = SE_Fixed(), arg("af") = AF_EqualWeight()),
-        R"(PF_Simple([tm, sys, se])
+        R"(PF_Simple([tm, se, af])
 
     创建一个多标的、单系统策略的投资组合
 

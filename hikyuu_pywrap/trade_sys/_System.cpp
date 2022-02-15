@@ -22,6 +22,9 @@ void (System::*run_1)(const KQuery&, bool) = &System::run;
 void (System::*run_2)(const KData&, bool) = &System::run;
 void (System::*run_3)(const Stock&, const KQuery&, bool reset) = &System::run;
 
+TradeRecord (System::*runMoment_1)(const Datetime&) = &System::runMoment;
+TradeRecord (System::*runMoment_2)(const KRecord&, const KRecord&) = &System::runMoment;
+
 void export_System() {
     def(
       "SYS_Simple", SYS_Simple,
@@ -221,6 +224,10 @@ void export_System() {
     :param Stock stock: 交易的证券
     :param Query query: K线数据查询条件
     :param bool reset: 是否同时复位所有组件，尤其是tm实例)")
+
+        .def("run_moment", runMoment_1)
+        .def("run_moment", runMoment_2)
+        .def("ready", &System::readyForRun)
 
     /*.def("readyForRun", &System::readyForRun)
     .def("runMoment", run_monent_1)

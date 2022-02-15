@@ -47,9 +47,30 @@ void IStdp::_calculate(const Indicator& data) {
     }
 }
 
+void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step > 0 && curPos < ind.discard() + step - 1, void());
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += ind[i];
+    }
+    price_t mean = sum / step;
+    sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += std::pow(ind[i] - mean, 2);
+    }
+    _set(std::sqrt(sum / step), curPos);
+}
+
 Indicator HKU_API STDP(int n) {
     IndicatorImpPtr p = make_shared<IStdp>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API STDP(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IStdp>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

@@ -20,9 +20,19 @@ namespace hku {
  * 连涨周期, UPNDAY(CLOSE,M)表示连涨M个周期
  * @ingroup Indicator
  */
-Indicator UPNDAY(const Indicator& ind, int n = 3);
+inline Indicator UPNDAY(const Indicator& ind, int n = 3) {
+    Indicator result = EVERY(ind > REF(ind, 1), n);
+    result.name("UPDAY");
+    return result;
+}
 
-inline Indicator UPNDAY(const Indicator& ind, int n) {
+inline Indicator UPNDAY(const Indicator& ind, const IndParam& n) {
+    Indicator result = EVERY(ind > REF(ind, 1), n);
+    result.name("UPDAY");
+    return result;
+}
+
+inline Indicator UPNDAY(const Indicator& ind, const Indicator& n) {
     Indicator result = EVERY(ind > REF(ind, 1), n);
     result.name("UPDAY");
     return result;

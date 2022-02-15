@@ -16,14 +16,12 @@
 namespace hku {
 
 class IRoc : public hku::IndicatorImp {
-    INDICATOR_IMP_SUPPORT_IND_PARAM(IRoc)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IRoc)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     IRoc();
     virtual ~IRoc();
-
-    virtual void _after_dyn_calculate(const Indicator& ind) override;
 };
 
 } /* namespace hku */
