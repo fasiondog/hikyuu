@@ -230,7 +230,7 @@ void Portfolio::runMoment(const Datetime& date) {
 }
 
 void Portfolio::run(const KQuery& query) {
-    SPEND_TIME(Portfolio_run);
+    // SPEND_TIME(Portfolio_run);
     HKU_CHECK(readyForRun(),
               "readyForRun fails, check to see if a valid TradeManager, Selector, or "
               "AllocateFunds instance have been specified.");
