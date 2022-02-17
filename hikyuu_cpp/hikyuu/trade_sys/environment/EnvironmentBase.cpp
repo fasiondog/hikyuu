@@ -56,8 +56,9 @@ EnvironmentPtr EnvironmentBase::clone() {
 }
 
 void EnvironmentBase::setQuery(const KQuery& query) {
-    m_query = query;
-    _calculate();
+    if (m_query != query) {
+        _calculate();
+    }
 }
 
 void EnvironmentBase::_addValid(const Datetime& datetime) {
