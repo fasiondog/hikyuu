@@ -47,6 +47,8 @@ void Portfolio::reset() {
     m_running_sys_set.clear();
     m_running_sys_list.clear();
     m_sys_map.clear();
+    m_tmp_cur_selected_list.clear();
+    m_tmp_will_remove_sys.clear();
     if (m_tm)
         m_tm->reset();
     if (m_shadow_tm)
@@ -145,18 +147,16 @@ void Portfolio::runMoment(const Datetime& date) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
 
-    int precision = m_shadow_tm->getParam<int>("precision");
-    SystemList cur_selected_list;  //当前选中系统列表
-
     if (getParam<bool>("trace")) {
         HKU_INFO("========================================================================");
         HKU_INFO("{}", date);
     }
 
     // 从选股策略获取当前选中的系统列表
+    m_tmp_cur_selected_list.clear();
     auto pro_cur_selected_list = m_se->getSelectedSystemList(date);
     for (auto& pro_sys : pro_cur_selected_list) {
-        cur_selected_list.push_back(m_sys_map[pro_sys]);
+        m_tmp_cur_selected_list.push_back(m_sys_map[pro_sys]);
         if (getParam<bool>("trace")) {
             auto sys = m_sys_map[pro_sys];
             HKU_INFO("select: {}, cash: {}", sys->getTO().getStock(), sys->getTM()->currentCash());
@@ -164,10 +164,10 @@ void Portfolio::runMoment(const Datetime& date) {
     }
 
     // 资产分配算法调整各子系统资产分配
-    m_af->adjustFunds(date, cur_selected_list, m_running_sys_list);
+    m_af->adjustFunds(date, m_tmp_cur_selected_list, m_running_sys_list);
 
     if (getParam<bool>("trace")) {
-        for (auto& sys : cur_selected_list) {
+        for (auto& sys : m_tmp_cur_selected_list) {
             HKU_INFO("allocate --> select: {}, cash: {}", sys->getTO().getStock(),
                      sys->getTM()->currentCash());
         }
@@ -175,7 +175,8 @@ void Portfolio::runMoment(const Datetime& date) {
 
     // 由于系统的交易指令可能被延迟执行，需要保存并判断
     // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
-    SystemList will_remove_sys;
+    m_tmp_will_remove_sys.clear();
+    int precision = m_shadow_tm->getParam<int>("precision");
     for (auto& running_sys : m_running_sys_list) {
         Stock stock = running_sys->getStock();
         TMPtr sub_tm = running_sys->getTM();
@@ -188,18 +189,18 @@ void Portfolio::runMoment(const Datetime& date) {
                 sub_tm->checkout(date, cash);
                 m_shadow_tm->checkin(date, cash);
             }
-            will_remove_sys.push_back(running_sys);
+            m_tmp_will_remove_sys.push_back(running_sys);
         }
     }
 
     // 依据待移除列表将系统从运行中系统列表里删除
-    for (auto& sub_sys : will_remove_sys) {
+    for (auto& sub_sys : m_tmp_will_remove_sys) {
         m_running_sys_list.remove(sub_sys);
         m_running_sys_set.erase(sub_sys);
     }
 
     // 遍历本次选择的系统列表，如果存在分配资金且不在运行中列表内，则加入运行列表
-    for (auto& sub_sys : cur_selected_list) {
+    for (auto& sub_sys : m_tmp_cur_selected_list) {
         price_t cash = sub_sys->getTM()->currentCash();
         if (cash > 0 && m_running_sys_set.find(sub_sys) == m_running_sys_set.end()) {
             m_running_sys_list.push_back(sub_sys);
@@ -217,7 +218,6 @@ void Portfolio::runMoment(const Datetime& date) {
 }
 
 void Portfolio::run(const KQuery& query) {
-    // SPEND_TIME(Portfolio_run);
     HKU_CHECK(readyForRun(),
               "readyForRun fails, check to see if a valid TradeManager, Selector, or "
               "AllocateFunds instance have been specified.");

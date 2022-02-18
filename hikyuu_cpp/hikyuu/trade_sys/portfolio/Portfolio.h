@@ -146,6 +146,10 @@ protected:
     KQuery m_query;                                // 关联的查询条件
     bool m_is_ready;                               // 是否已做好运行准备
 
+    // 用于中间计算的临时数据
+    SystemList m_tmp_cur_selected_list;
+    SystemList m_tmp_will_remove_sys;
+
 //============================================
 // 序列化支持
 //============================================

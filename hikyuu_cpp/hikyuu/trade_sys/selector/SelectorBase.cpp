@@ -71,7 +71,6 @@ SelectorPtr SelectorBase::clone() {
 
     SystemList::const_iterator iter = m_sys_list.begin();
     for (; iter != m_sys_list.end(); ++iter) {
-        // TODO
         p->m_sys_list.push_back((*iter)->clone());
     }
 
@@ -79,15 +78,19 @@ SelectorPtr SelectorBase::clone() {
 }
 
 bool SelectorBase::addSystem(const SystemPtr& sys) {
-    HKU_WARN_IF_RETURN(!sys, false, "Try add null sys, will be discard!");
-    HKU_WARN_IF_RETURN(sys->getStock().isNull(), false, "sys has not bind stock!");
+    HKU_ERROR_IF_RETURN(!sys, false, "Try add null sys, will be discard!");
+    HKU_ERROR_IF_RETURN(sys->getStock().isNull(), false, "sys has not bind stock!");
+    HKU_ERROR_IF_RETURN(!sys->getMM(), false, "sys has not MoneyManager!");
+    HKU_ERROR_IF_RETURN(!sys->getSG(), false, "sys has not Siganl!");
     m_sys_list.push_back(sys);
     return true;
 }
 
 bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
-    HKU_WARN_IF_RETURN(stock.isNull(), false, "Try add Null stock, will be discard!");
-    HKU_WARN_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
+    HKU_ERROR_IF_RETURN(stock.isNull(), false, "Try add Null stock, will be discard!");
+    HKU_ERROR_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
+    HKU_ERROR_IF_RETURN(!protoSys->getMM(), false, "protoSys has not MoneyManager!");
+    HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Siganl!");
     SYSPtr sys = protoSys->clone();
     sys->setStock(stock);
     m_sys_list.push_back(sys);
@@ -95,7 +98,9 @@ bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
 }
 
 bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& protoSys) {
-    HKU_WARN_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
+    HKU_ERROR_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
+    HKU_ERROR_IF_RETURN(!protoSys->getMM(), false, "protoSys has not MoneyManager!");
+    HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Siganl!");
     StockList::const_iterator iter = stkList.begin();
     for (; iter != stkList.end(); ++iter) {
         if (iter->isNull()) {
