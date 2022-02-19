@@ -30,6 +30,7 @@ EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 EnvironmentBase::~EnvironmentBase() {}
 
 void EnvironmentBase::reset() {
+    m_query = Null<KQuery>();
     m_valid.clear();
     _reset();
 }
@@ -57,6 +58,9 @@ EnvironmentPtr EnvironmentBase::clone() {
 
 void EnvironmentBase::setQuery(const KQuery& query) {
     if (m_query != query) {
+        m_valid.clear();
+        _reset();
+        m_query = query;
         _calculate();
     }
 }

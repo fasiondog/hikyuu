@@ -184,8 +184,9 @@ SystemPtr System::clone() {
     SystemPtr p = make_shared<System>();
     if (m_tm)
         p->m_tm = m_tm->clone();
-    if (m_ev)
-        p->m_ev = m_ev->clone();
+    // ev 通常作为公共组件不进行克隆
+    // if (m_ev)
+    //     p->m_ev = m_ev->clone();
     if (m_mm)
         p->m_mm = m_mm->clone();
     if (m_cn)
