@@ -44,9 +44,10 @@ Portfolio::~Portfolio() {}
 
 void Portfolio::reset() {
     m_is_ready = false;
+    m_pro_sys_list.clear();
+    m_real_sys_list.clear();
     m_running_sys_set.clear();
     m_running_sys_list.clear();
-    m_sys_map.clear();
     m_tmp_cur_selected_list.clear();
     m_tmp_will_remove_sys.clear();
     if (m_tm)
@@ -64,9 +65,10 @@ PortfolioPtr Portfolio::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_query = m_query;
+    p->m_pro_sys_list = m_pro_sys_list;
+    p->m_real_sys_list = m_real_sys_list;
     p->m_running_sys_set = m_running_sys_set;
     p->m_running_sys_list = m_running_sys_list;
-    p->m_sys_map = m_sys_map;
     p->m_is_ready = m_is_ready;
     if (m_se)
         p->m_se = m_se->clone();
@@ -80,6 +82,7 @@ PortfolioPtr Portfolio::clone() {
 }
 
 bool Portfolio::readyForRun() {
+    SPEND_TIME(Portfolio_readyForRun);
     if (!m_se) {
         HKU_WARN("m_se is null!");
         m_is_ready = false;
@@ -108,16 +111,16 @@ bool Portfolio::readyForRun() {
     // 为资金分配器设置关联查询条件
     m_af->setQuery(m_query);
 
-    // 获取所有备选子系统，为无关联账户的子系统分配子账号，对所有子系统做好启动准备
-    SystemList all_pro_sys_list = m_se->getAllSystemList();  // 所有原型系统
+    // 从 se 获取原型系统列表
+    m_pro_sys_list = m_se->getProtoSystemList();
 
+    // 获取所有备选子系统，为无关联账户的子系统分配子账号，对所有子系统做好启动准备
     TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "TM_SUB");
-    auto sys_iter = all_pro_sys_list.begin();
-    size_t total = all_pro_sys_list.size();
+    size_t total = m_pro_sys_list.size();
     for (size_t i = 0; i < total; i++) {
-        SystemPtr& pro_sys = all_pro_sys_list[i];
+        SystemPtr& pro_sys = m_pro_sys_list[i];
         SystemPtr sys = pro_sys->clone();
-        m_sys_map[pro_sys] = sys;
+        m_real_sys_list.emplace_back(sys);
 
         // 如果原型子系统没有关联账户，则为其创建一个和总资金金额相同的账户，以便能够运行
         if (!pro_sys->getTM()) {
@@ -127,15 +130,19 @@ bool Portfolio::readyForRun() {
         // 为内部实际执行的系统创建初始资金为0的子账户
         sys->setTM(pro_tm->clone());
         sys->getTM()->name(fmt::format("TM_SUB{}", i));
+        sys->name(fmt::format("PF_Real_{}_{}", i, sys->name()));
 
         if (sys->readyForRun() && pro_sys->readyForRun()) {
             KData k = sys->getStock().getKData(m_query);
             sys->setTO(k);
             pro_sys->setTO(k);
         } else {
-            HKU_WARN("Exist invalid system, it could not ready for run!");
+            HKU_THROW("Exist invalid system, it could not ready for run!");
         }
     }
+
+    // 告知 se 当前实际运行的系统列表
+    m_se->calculate(m_real_sys_list, m_query);
 
     m_is_ready = true;
     return true;
@@ -153,19 +160,15 @@ void Portfolio::runMoment(const Datetime& date) {
     }
 
     // 从选股策略获取当前选中的系统列表
-    m_tmp_cur_selected_list.clear();
-    auto pro_cur_selected_list = m_se->getSelectedSystemList(date);
-    for (auto& pro_sys : pro_cur_selected_list) {
-        m_tmp_cur_selected_list.push_back(m_sys_map[pro_sys]);
-        if (getParam<bool>("trace")) {
-            auto sys = m_sys_map[pro_sys];
+    m_tmp_cur_selected_list = m_se->getSelectedSystemList(date);
+    if (getParam<bool>("trace")) {
+        for (auto& sys : m_tmp_cur_selected_list) {
             HKU_INFO("select: {}, cash: {}", sys->getTO().getStock(), sys->getTM()->currentCash());
         }
     }
 
     // 资产分配算法调整各子系统资产分配
     m_af->adjustFunds(date, m_tmp_cur_selected_list, m_running_sys_list);
-
     if (getParam<bool>("trace")) {
         for (auto& sys : m_tmp_cur_selected_list) {
             HKU_INFO("allocate --> select: {}, cash: {}", sys->getTO().getStock(),
@@ -240,8 +243,8 @@ FundsRecord Portfolio::getFunds(KQuery::KType ktype) const {
 
 FundsRecord Portfolio::getFunds(const Datetime& datetime, KQuery::KType ktype) {
     FundsRecord total_funds;
-    for (auto iter = m_sys_map.begin(); iter != m_sys_map.end(); ++iter) {
-        FundsRecord funds = iter->second->getTM()->getFunds(datetime, ktype);
+    for (auto& sub_sys : m_real_sys_list) {
+        FundsRecord funds = sub_sys->getTM()->getFunds(datetime, ktype);
         total_funds += funds;
     }
     total_funds.cash += m_shadow_tm->cash(datetime, ktype);
@@ -251,8 +254,8 @@ FundsRecord Portfolio::getFunds(const Datetime& datetime, KQuery::KType ktype) {
 PriceList Portfolio::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
-    for (auto iter = m_sys_map.begin(); iter != m_sys_map.end(); ++iter) {
-        auto curve = iter->second->getTM()->getFundsCurve(dates, ktype);
+    for (auto& sub_sys : m_real_sys_list) {
+        auto curve = sub_sys->getTM()->getFundsCurve(dates, ktype);
         for (auto i = 0; i < total; i++) {
             result[i] += curve[i];
         }
@@ -268,8 +271,8 @@ PriceList Portfolio::getFundsCurve() {
 PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
-    for (auto iter = m_sys_map.begin(); iter != m_sys_map.end(); ++iter) {
-        auto curve = iter->second->getTM()->getProfitCurve(dates, ktype);
+    for (auto& sub_sys : m_real_sys_list) {
+        auto curve = sub_sys->getTM()->getProfitCurve(dates, ktype);
         for (auto i = 0; i < total; i++) {
             result[i] += curve[i];
         }

@@ -39,6 +39,10 @@ public:
     SelectorPtr _clone() {
         return this->get_override("_clone")();
     }
+
+    void _calculate() {
+        this->get_override("_calculate")();
+    }
 };
 
 string (SelectorBase::*sb_get_name)() const = &SelectorBase::name;
@@ -68,6 +72,7 @@ void export_Selector() {
       .def("clone", &SelectorBase::clone)
       .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
       .def("_clone", pure_virtual(&SelectorBase::_clone))
+      .def("_calculate", pure_virtual(&SelectorBase::_calculate))
       .def("get_selected_system_list", pure_virtual(&SelectorBase::getSelectedSystemList))
       .def("add_stock", &SelectorBase::addStock)
       //.def("add_stock_list", &SelectorBase::addStockList)  // 在python中扩展

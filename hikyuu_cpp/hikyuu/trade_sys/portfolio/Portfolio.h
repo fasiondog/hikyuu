@@ -24,7 +24,7 @@ namespace hku {
  * 资产组合
  * @ingroup Portfolio
  */
-class HKU_API Portfolio {
+class HKU_API Portfolio : public enable_shared_from_this<Portfolio> {
     PARAMETER_SUPPORT
 
 public:
@@ -76,18 +76,18 @@ public:
         m_af = af;
     }
 
-    SystemList getAllSystem() const {
-        SystemList result;
-        for (auto iter = m_sys_map.begin(); iter != m_sys_map.end(); ++iter) {
-            result.push_back(iter->second);
-        }
-        return result;
-    }
-
     void reset();
 
     typedef shared_ptr<Portfolio> PortfolioPtr;
     PortfolioPtr clone();
+
+    const SystemList& getProtoSystemList() const {
+        return m_pro_sys_list;
+    }
+
+    const SystemList& getRealSystemList() const {
+        return m_real_sys_list;
+    }
 
     /**
      * 获取资产组合账户当前时刻的资产详情
@@ -140,11 +140,12 @@ protected:
     SEPtr m_se;
     AFPtr m_af;
 
-    std::set<SYSPtr> m_running_sys_set;            // 当前仍在运行的子系统集合
-    std::list<SYSPtr> m_running_sys_list;          // 当前仍在运行的子系统列表
-    std::unordered_map<SYSPtr, SYSPtr> m_sys_map;  // 系统原型 -> 内部运行系统
-    KQuery m_query;                                // 关联的查询条件
-    bool m_is_ready;                               // 是否已做好运行准备
+    SystemList m_pro_sys_list;
+    SystemList m_real_sys_list;
+    std::set<SYSPtr> m_running_sys_set;    // 当前仍在运行的子系统集合
+    std::list<SYSPtr> m_running_sys_list;  // 当前仍在运行的子系统列表
+    KQuery m_query;                        // 关联的查询条件
+    bool m_is_ready;                       // 是否已做好运行准备
 
     // 用于中间计算的临时数据
     SystemList m_tmp_cur_selected_list;

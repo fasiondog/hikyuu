@@ -14,8 +14,10 @@ FixedSelector::FixedSelector() : SelectorBase("SE_Fixed") {}
 FixedSelector::~FixedSelector() {}
 
 SystemList FixedSelector::getSelectedSystemList(Datetime date) {
-    return m_sys_list;
+    return m_real_sys_list;
 }
+
+void FixedSelector::_calculate() {}
 
 SelectorPtr HKU_API SE_Fixed() {
     return make_shared<FixedSelector>();

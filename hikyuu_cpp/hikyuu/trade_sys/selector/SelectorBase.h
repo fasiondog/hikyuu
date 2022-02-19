@@ -21,6 +21,8 @@
 
 namespace hku {
 
+class HKU_API Portfolio;
+
 /**
  * 交易对象选择模块
  * @ingroup Selector
@@ -60,13 +62,23 @@ public:
      */
     bool addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
-    /** 获取所有系统实例 */
-    SystemList getAllSystemList() const {
-        return m_sys_list;
+    SystemList getRealSystemList() const {
+        return m_real_sys_list;
     }
 
+    SystemList getProtoSystemList() const {
+        return m_pro_sys_list;
+    }
+
+    /**
+     * @brief 复位
+     * @note 复位不会清除已有的原型系统
+     */
     void reset();
 
+    /**
+     * 清除已有的系统原型
+     */
     void clear();
 
     typedef shared_ptr<SelectorBase> SelectorPtr;
@@ -80,11 +92,21 @@ public:
     /** 子类克隆接口 */
     virtual SelectorPtr _clone() = 0;
 
+    /** 子类计算接口 */
+    virtual void _calculate() = 0;
+
+private:
+    friend class HKU_API Portfolio;
+
+    /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
+    void calculate(const SystemList& sysList, const KQuery& query);
+
 protected:
     string m_name;
     int m_count;
     Datetime m_pre_date;
-    SystemList m_sys_list;
+    SystemList m_pro_sys_list;  // 原型系统列表
+    SystemList m_real_sys_list;  // PF组合中实际运行的系统，有PF执行时设定，顺序与原型列表一一对应
 
 //============================================
 // 序列化支持
@@ -98,7 +120,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_count);
         ar& BOOST_SERIALIZATION_NVP(m_pre_date);
-        ar& BOOST_SERIALIZATION_NVP(m_sys_list);
+        ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
     }
 
     template <class Archive>
@@ -107,7 +129,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_count);
         ar& BOOST_SERIALIZATION_NVP(m_pre_date);
-        ar& BOOST_SERIALIZATION_NVP(m_sys_list);
+        ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -143,12 +165,13 @@ private:                                                       \
 #define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define SELECTOR_IMP(classname)              \
-public:                                      \
-    virtual SelectorPtr _clone() override {  \
-        return SelectorPtr(new classname()); \
-    }                                        \
-    virtual SystemList getSelectedSystemList(Datetime date) override;
+#define SELECTOR_IMP(classname)                                       \
+public:                                                               \
+    virtual SelectorPtr _clone() override {                           \
+        return SelectorPtr(new classname());                          \
+    }                                                                 \
+    virtual SystemList getSelectedSystemList(Datetime date) override; \
+    virtual void _calculate() override;
 
 /**
  * 客户程序都应使用该指针类型

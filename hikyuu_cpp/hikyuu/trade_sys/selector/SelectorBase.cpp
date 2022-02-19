@@ -6,6 +6,7 @@
  */
 
 #include "SelectorBase.h"
+#include "../portfolio/Portfolio.h"
 
 namespace hku {
 
@@ -24,28 +25,36 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
     return os;
 }
 
-SelectorBase::SelectorBase() : m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {}
+SelectorBase::SelectorBase() : m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {
+    // 是否单独执行原型系统
+    setParam<bool>("run_proto_sys", false);
+}
 
 SelectorBase::SelectorBase(const string& name)
-: m_name(name), m_count(0), m_pre_date(Datetime::min()) {}
+: m_name(name), m_count(0), m_pre_date(Datetime::min()) {
+    // 是否单独执行原型系统
+    setParam<bool>("run_proto_sys", false);
+}
 
 SelectorBase::~SelectorBase() {}
 
 void SelectorBase::clear() {
     m_count = 0;
     m_pre_date = Datetime::min();
-    m_sys_list.clear();
+    m_pro_sys_list.clear();
+    m_real_sys_list.clear();
 }
 
 void SelectorBase::reset() {
-    SystemList::const_iterator iter = m_sys_list.begin();
-    for (; iter != m_sys_list.end(); ++iter) {
+    SystemList::const_iterator iter = m_pro_sys_list.begin();
+    for (; iter != m_pro_sys_list.end(); ++iter) {
+        // 复位账户但不复位ev
         (*iter)->reset(true, false);
     }
 
     m_count = 0;
     m_pre_date = Datetime::min();
-
+    m_real_sys_list.clear();
     _reset();
 }
 
@@ -64,17 +73,22 @@ SelectorPtr SelectorBase::clone() {
     }
 
     p->m_params = m_params;
-
     p->m_name = m_name;
     p->m_count = m_count;
     p->m_pre_date = m_pre_date;
-
-    SystemList::const_iterator iter = m_sys_list.begin();
-    for (; iter != m_sys_list.end(); ++iter) {
-        p->m_sys_list.push_back((*iter)->clone());
-    }
-
+    p->m_real_sys_list = m_real_sys_list;
+    p->m_pro_sys_list = m_pro_sys_list;
     return p;
+}
+
+void SelectorBase::calculate(const SystemList& sysList, const KQuery& query) {
+    m_real_sys_list = sysList;
+    if (getParam<bool>("run_proto_sys")) {
+        for (auto& sys : m_pro_sys_list) {
+            sys->run(query);
+        }
+    }
+    _calculate();
 }
 
 bool SelectorBase::addSystem(const SystemPtr& sys) {
@@ -82,7 +96,7 @@ bool SelectorBase::addSystem(const SystemPtr& sys) {
     HKU_ERROR_IF_RETURN(sys->getStock().isNull(), false, "sys has not bind stock!");
     HKU_ERROR_IF_RETURN(!sys->getMM(), false, "sys has not MoneyManager!");
     HKU_ERROR_IF_RETURN(!sys->getSG(), false, "sys has not Siganl!");
-    m_sys_list.push_back(sys);
+    m_pro_sys_list.emplace_back(sys);
     return true;
 }
 
@@ -92,8 +106,9 @@ bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     HKU_ERROR_IF_RETURN(!protoSys->getMM(), false, "protoSys has not MoneyManager!");
     HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Siganl!");
     SYSPtr sys = protoSys->clone();
+    sys->reset(true, false);
     sys->setStock(stock);
-    m_sys_list.push_back(sys);
+    m_pro_sys_list.emplace_back(sys);
     return true;
 }
 
@@ -101,6 +116,9 @@ bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
     HKU_ERROR_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
     HKU_ERROR_IF_RETURN(!protoSys->getMM(), false, "protoSys has not MoneyManager!");
     HKU_ERROR_IF_RETURN(!protoSys->getSG(), false, "protoSys has not Siganl!");
+    SYSPtr newProtoSys = protoSys->clone();
+    // 复位清除之前的数据，避免因原有数据过多导致下面循环时速度过慢
+    newProtoSys->reset(true, false);
     StockList::const_iterator iter = stkList.begin();
     for (; iter != stkList.end(); ++iter) {
         if (iter->isNull()) {
@@ -108,11 +126,10 @@ bool SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
             continue;
         }
 
-        SYSPtr sys = protoSys->clone();
+        SYSPtr sys = newProtoSys->clone();
         sys->setStock(*iter);
-        m_sys_list.push_back(sys);
+        m_pro_sys_list.emplace_back(sys);
     }
-
     return true;
 }
 
