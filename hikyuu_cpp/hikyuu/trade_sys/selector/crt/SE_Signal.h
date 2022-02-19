@@ -13,6 +13,6 @@ namespace hku {
 
 SEPtr HKU_API SE_Signal();
 
-SEPtr HKU_API SE_Fixed(const StockList& stock_list, const SystemPtr& sys);
+SEPtr HKU_API SE_Signal(const StockList& stock_list, const SystemPtr& sys);
 
 }

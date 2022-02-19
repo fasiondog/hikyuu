@@ -113,17 +113,41 @@ price_t AllocateFundsBase::_getTotalFunds(const std::list<SYSPtr>& running_list)
     return total_value;
 }
 
+bool AllocateFundsBase::_returnAssets(const SYSPtr& sys, const Datetime& date) {
+    KData kdata = sys->getTO();
+    size_t pos = kdata.getPos(date);
+    HKU_IF_RETURN(pos == Null<size_t>(), false);
+
+    KRecord record = kdata.getKRecord(pos);
+    Stock stock = kdata.getStock();
+    KRecord srcRecord = stock.getKRecord(kdata.startPos() + pos);
+
+    // 如果存在持仓则卖出
+    TMPtr tm = sys->getTM();
+    if (tm->have(stock)) {
+        TradeRecord tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
+        if (!tr.isNull()) {
+            m_tm->addTradeRecord(tr);
+        }
+    }
+
+    // 回收当前子账号资金至总账户
+    price_t cash = tm->currentCash();
+    if (cash > 0.0 && tm->checkout(date, cash)) {
+        m_shadow_tm->checkin(date, cash);
+    }
+
+    return true;
+}
+
+// 调整运行中子系统持仓
 void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemList& se_list,
                                              const std::list<SYSPtr>& running_list) {
     // 计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
 
-    // 如果运行中的系统数已大于等于允许的最大系统数，直接返回
-    int max_num = getParam<int>("max_sys_num");
-    HKU_IF_RETURN(running_list.size() >= max_num, void());
-
-    //构建实际分配权重大于零的的系统集合
+    //构建实际分配权重大于零的的系统集合，权重小于等于0的将被忽略
     std::set<SYSPtr> selected_sets;
     for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
         if (iter->getWeight() > 0) {
@@ -133,29 +157,14 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
     std::unordered_set<SYSPtr> selected_running_sets;
 
-    // 如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，如果账户有现金则同时回收现金
+    // 如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，并回收资产
     for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
         const SYSPtr& sys = *iter;
-        if (selected_sets.find(sys) == selected_sets.end()) {
-            KData kdata = sys->getTO();
-            size_t pos = kdata.getPos(date);
-            KRecord record = kdata.getKRecord(date);
-            KRecord srcRecord = kdata.getStock().getKRecord(kdata.startPos() + pos);
-            TradeRecord tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
-            if (!tr.isNull()) {
-                m_tm->addTradeRecord(tr);
-            }
-            TMPtr tm = sys->getTM();
-            price_t cash = tm->currentCash();
-            if (cash > 0) {
-                if (tm->checkout(date, cash)) {
-                    m_shadow_tm->checkin(date, cash);
-                } else {
-                    HKU_ERROR("Can't checkout from sub_tm!");
-                }
-            }
-        } else {
+        // 当前持仓的系统仍旧被选中，记入仍被选中的运行系统列表
+        if (selected_sets.find(sys) != selected_sets.end()) {
             selected_running_sets.insert(*iter);
+        } else {
+            _returnAssets(sys, date);
         }
     }
 
@@ -165,55 +174,45 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
       std::bind(std::less<double>(), std::bind(&SystemWeight::m_weight, std::placeholders::_1),
                 std::bind(&SystemWeight::m_weight, std::placeholders::_2)));
 
+    // 过滤掉超出允许范围的系统
     // 按权重从大到小遍历，构建不超过最大允许的运行子系统数的新权重列表（此时按从大到小顺序存放）
     // 同时，将超出最大允许的运行子系统数范围外的运行中子系统清仓回收资金
+    int max_num = getParam<int>("max_sys_num");
     std::list<SystemWeight> new_sw_list;  // 存放新的权重列表
     size_t count = 0;
     for (auto iter = sw_list.rbegin(); iter != sw_list.rend(); ++iter) {
+        // 小于最大允许运行数，直接保存至新的权重列表
         if (count < max_num) {
-            // 小于最大允许运行数，保存至新的权重列表
             new_sw_list.push_back(*iter);
-
-        } else if (selected_running_sets.find(iter->getSYS()) != selected_running_sets.end()) {
-            // 超出最大允许运行数且属于正在运行的子系统，则尝试清仓并回收资金
-            auto sys = iter->getSYS();
-            KData kdata = sys->getTO();
-            size_t pos = kdata.getPos(date);
-            KRecord record = kdata.getKRecord(date);
-            KRecord srcRecord = kdata.getStock().getKRecord(kdata.startPos() + pos);
-            auto tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
-            if (!tr.isNull()) {
-                m_tm->addTradeRecord(tr);
-            }
-            TMPtr tm = sys->getTM();
-            price_t cash = tm->currentCash();
-            if (cash > 0) {
-                if (tm->checkout(date, cash)) {
-                    m_shadow_tm->checkin(date, cash);
-                } else {
-                    HKU_ERROR("Can't checkout from sub_tm!");
-                }
-            }
+            count++;
+            continue;
         }
-        count++;
+
+        // 处理超出允许的最大系统数范围外的系统，尝试强制清仓，但不在放入权重列表（即后续不参与资金分配）
+        if (selected_running_sets.find(iter->getSYS()) != selected_running_sets.end()) {
+            _returnAssets(iter->getSYS(), date);
+        }
     }
+
+    // 账户资金精度
+    int precision = m_shadow_tm->getParam<int>("precision");
 
     //获取当前总账户资产净值，并计算每单位权重代表的资金
     price_t total_funds = _getTotalFunds(running_list);
 
     // 计算需保留的资产
-    price_t reserve_funds = total_funds * m_reserve_percent;
+    price_t reserve_funds = roundUp(total_funds * m_reserve_percent, precision);
 
     // 计算每单位权重资产
     double weight_unit = getParam<double>("weight_unit");
+    HKU_CHECK(weight_unit > 0, "Invalid weight_unit! {}", weight_unit);
     price_t per_weight_funds = total_funds * weight_unit;
 
-    // 账户资金精度
-    int precision = m_shadow_tm->getParam<int>("precision");
-
     // 计算可分配现金
-    price_t can_allocate_cash =
-      m_shadow_tm->currentCash() > reserve_funds ? m_shadow_tm->currentCash() - reserve_funds : 0;
+    price_t can_allocate_cash = roundDown(m_shadow_tm->currentCash() - reserve_funds, precision);
+    if (can_allocate_cash < 0.0) {
+        can_allocate_cash = 0.0;
+    }
 
     // 缓存需要进一步处理的系统及其待补充资金的列表
     std::list<std::pair<SYSPtr, price_t>> wait_list;
@@ -224,7 +223,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     // 3.如果当前资产大于期望分配的资产，则子账户是否有现金可以取出抵扣，否则卖掉部分股票
     for (auto iter = new_sw_list.begin(); iter != new_sw_list.end(); ++iter) {
         // 选中系统的分配权重已经小于等于0，则退出
-        if (iter->getWeight() <= 0) {
+        if (iter->getWeight() <= 0.0) {
             break;
         }
 
@@ -235,18 +234,17 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         price_t funds_value =
           funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
 
-        price_t will_funds_value =
-          roundDown((iter->getWeight() / weight_unit) * per_weight_funds, precision);
+        price_t will_funds_value = (iter->getWeight() / weight_unit) * per_weight_funds;
         if (funds_value == will_funds_value) {
             // 如果当前资产已经等于期望分配的资产，则忽略
             continue;
 
         } else if (funds_value < will_funds_value) {
             // 如果当前资产小于期望分配的资产，则补充现金
-            price_t will_cash = roundDown(will_funds_value - funds_value, precision);
+            price_t will_cash = roundUp(will_funds_value - funds_value, precision);
 
             // 如果当前可用于分配的资金大于期望的资金，则尝试从总账户中将现金补充进子账户中
-            if (will_cash <= can_allocate_cash) {
+            if (will_cash > 0.0 && will_cash <= can_allocate_cash) {
                 if (m_shadow_tm->checkout(date, will_cash)) {
                     tm->checkin(date, will_cash);
                     can_allocate_cash = roundDown(can_allocate_cash - will_cash, precision);
@@ -255,19 +253,24 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
             } else {
                 // 如果当前可用于分配的资金已经不足，则先全部转入子账户，并调整该系统实例权重。
                 // 同时，将该系统实例放入带重分配列表中，等有需要腾出仓位的系统卖出后，再重新分配补充现金
-                price_t reserve_cash = roundDown(will_cash - can_allocate_cash, precision);
-                if (m_shadow_tm->checkout(date, can_allocate_cash)) {
+                if (can_allocate_cash > 0.0 && m_shadow_tm->checkout(date, can_allocate_cash)) {
                     tm->checkin(date, can_allocate_cash);
-                    can_allocate_cash = 0;
+                    can_allocate_cash = 0.0;
                 }
 
                 // 缓存至等待列表，以便后续处理
-                wait_list.push_back(std::make_pair(sys, reserve_cash));
+                price_t reserve_cash = roundUp(will_cash - can_allocate_cash, precision);
+                if (reserve_cash > 0.0) {
+                    wait_list.push_back(std::make_pair(sys, reserve_cash));
+                }
             }
 
         } else {
             //如果当前资产大于期望分配的资产，则子账户是否有现金可以取出抵扣，否则卖掉部分股票
             price_t will_return_cash = roundDown(funds_value - will_funds_value, precision);
+            if (will_return_cash <= 0.0) {
+                continue;
+            }
             price_t sub_cash = tm->currentCash();
             if (sub_cash >= will_return_cash) {
                 if (tm->checkout(date, will_return_cash)) {
@@ -281,16 +284,17 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
                 // 计算并卖出部分股票以获取剩下需要返还的资金
                 Stock stock = sys->getStock();
-                KData kdata = sys->getTO();
-                size_t pos = kdata.getPos(date);
-                KRecord k = kdata.getKRecord(pos);
-                KRecord srcK = stock.getKRecord(kdata.startPos() + pos);
                 PositionRecord position = tm->getPosition(stock);
                 if (position.number > 0) {
+                    KData kdata = sys->getTO();
+                    size_t pos = kdata.getPos(date);
+                    if (pos == Null<size_t>()) {
+                        continue;
+                    }
+                    KRecord k = kdata.getKRecord(pos);
+                    KRecord srcK = stock.getKRecord(kdata.startPos() + pos);
                     TradeRecord tr;
                     double need_sell_num = need_cash / k.closePrice;
-                    need_sell_num =
-                      size_t(need_sell_num / stock.minTradeNumber()) * stock.minTradeNumber();
                     if (position.number <= need_sell_num) {
                         // 如果当前持仓数小于等于需要卖出的数量，则全部卖出
                         tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
@@ -306,13 +310,13 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                     if (!tr.isNull()) {
                         m_tm->addTradeRecord(tr);
                     }
-                }
 
-                // 卖出后，尝试将资金取出转移至总账户
-                sub_cash = tm->currentCash();
-                if (tm->checkout(date, sub_cash)) {
-                    m_shadow_tm->checkin(date, sub_cash);
-                    can_allocate_cash = roundDown(can_allocate_cash + sub_cash, precision);
+                    // 卖出后，尝试将资金取出转移至总账户
+                    sub_cash = tm->currentCash();
+                    if (sub_cash > 0 && tm->checkout(date, sub_cash)) {
+                        m_shadow_tm->checkin(date, sub_cash);
+                        can_allocate_cash = roundDown(can_allocate_cash + sub_cash, precision);
+                    }
                 }
             }
         }
@@ -322,7 +326,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     can_allocate_cash = m_shadow_tm->currentCash();
     for (auto iter = wait_list.begin(); iter != wait_list.end(); ++iter) {
         // 如果可分配的现金不足或选中系统的分配权重已经小于等于0，则退出
-        if (can_allocate_cash <= 0) {
+        if (can_allocate_cash <= 0.0) {
             break;
         }
 
@@ -331,9 +335,16 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         TMPtr tm = sys->getTM();
 
         price_t need_cash = iter->second;
-        if (m_shadow_tm->checkout(date, need_cash)) {
-            tm->checkin(date, need_cash);
-            can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
+        if (need_cash <= can_allocate_cash) {
+            if (m_shadow_tm->checkout(date, need_cash)) {
+                tm->checkin(date, need_cash);
+                can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
+            }
+        } else {
+            if (m_shadow_tm->checkout(date, can_allocate_cash)) {
+                tm->checkin(date, can_allocate_cash);
+                can_allocate_cash = 0.0;
+            }
         }
     }
 }

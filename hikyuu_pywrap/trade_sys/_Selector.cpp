@@ -48,14 +48,15 @@ public:
 string (SelectorBase::*sb_get_name)() const = &SelectorBase::name;
 void (SelectorBase::*sb_set_name)(const string&) = &SelectorBase::name;
 
-SelectorPtr SE_Fixed(py::list stock_list, const SystemPtr& sys) {
-    StockList stk_list = python_list_to_vector<StockList>(stock_list);
-    return SE_Fixed(stk_list, sys);
+SelectorPtr (*SE_Fixed_1)() = SE_Fixed;
+SelectorPtr py_SE_Fixed(py::list stock_list, const SystemPtr& sys) {
+    return SE_Fixed(python_list_to_vector<StockList>(stock_list), sys);
 }
 
-SelectorPtr (*SE_Fixed_1)() = SE_Fixed;
-SelectorPtr (*SE_Fixed_2)(py::list stock_list, const SystemPtr& sys) = SE_Fixed;
-// SelectorPtr (*SE_Fixed_2)(const StockList&, const SYSPtr&) = SE_Fixed;
+SEPtr (*SE_Signal_1)() = SE_Signal;
+SelectorPtr py_SE_Signal(py::list stock_list, const SystemPtr& sys) {
+    return SE_Signal(python_list_to_vector<StockList>(stock_list), sys);
+}
 
 void export_Selector() {
     class_<SelectorWrap, boost::noncopyable>("SelectorBase", init<>())
@@ -85,5 +86,8 @@ void export_Selector() {
     register_ptr_to_python<SelectorPtr>();
 
     def("SE_Fixed", SE_Fixed_1);
-    def("SE_Fixed", SE_Fixed_2);
+    def("SE_Fixed", py_SE_Fixed);
+
+    def("SE_Signal", SE_Signal_1);
+    def("SE_Signal", py_SE_Signal);
 }

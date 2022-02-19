@@ -132,13 +132,11 @@ bool Portfolio::readyForRun() {
         sys->getTM()->name(fmt::format("TM_SUB{}", i));
         sys->name(fmt::format("PF_Real_{}_{}", i, sys->name()));
 
-        if (sys->readyForRun() && pro_sys->readyForRun()) {
-            KData k = sys->getStock().getKData(m_query);
-            sys->setTO(k);
-            pro_sys->setTO(k);
-        } else {
-            HKU_THROW("Exist invalid system, it could not ready for run!");
-        }
+        HKU_CHECK(sys->readyForRun() && pro_sys->readyForRun(),
+                  "Exist invalid system, it could not ready for run!");
+        KData k = sys->getStock().getKData(m_query);
+        sys->setTO(k);
+        pro_sys->setTO(k);
     }
 
     // 告知 se 当前实际运行的系统列表
