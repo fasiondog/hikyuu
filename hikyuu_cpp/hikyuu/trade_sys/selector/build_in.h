@@ -10,5 +10,6 @@
 #define TRADE_SYS_SELECTOR_BUILD_IN_H_
 
 #include "crt/SE_Fixed.h"
+#include "crt/SE_Signal.h"
 
 #endif /* TRADE_SYS_SELECTOR_BUILD_IN_H_ */

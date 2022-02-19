@@ -73,7 +73,7 @@ Stock::Data::Data()
 
 Stock::Data::Data(const string& market, const string& code, const string& name, uint32_t type,
                   bool valid, const Datetime& startDate, const Datetime& lastDate, price_t tick,
-                  price_t tickValue, int precision, size_t minTradeNumber, size_t maxTradeNumber)
+                  price_t tickValue, int precision, double minTradeNumber, double maxTradeNumber)
 : m_market(market),
   m_code(code),
   m_name(name),
@@ -206,15 +206,15 @@ int Stock::precision() const {
     return m_data ? m_data->m_precision : default_precision;
 }
 
-size_t Stock::atom() const {
+double Stock::atom() const {
     return m_data ? m_data->m_minTradeNumber : default_minTradeNumber;
 }
 
-size_t Stock::minTradeNumber() const {
+double Stock::minTradeNumber() const {
     return m_data ? m_data->m_minTradeNumber : default_minTradeNumber;
 }
 
-size_t Stock::maxTradeNumber() const {
+double Stock::maxTradeNumber() const {
     return m_data ? m_data->m_maxTradeNumber : default_maxTradeNumber;
 }
 

@@ -184,8 +184,9 @@ SystemPtr System::clone() {
     SystemPtr p = make_shared<System>();
     if (m_tm)
         p->m_tm = m_tm->clone();
-    if (m_ev)
-        p->m_ev = m_ev->clone();
+    // ev 通常作为公共组件不进行克隆
+    // if (m_ev)
+    //     p->m_ev = m_ev->clone();
     if (m_mm)
         p->m_mm = m_mm->clone();
     if (m_cn)
@@ -270,7 +271,6 @@ bool System::readyForRun() {
 }
 
 void System::run(const KQuery& query, bool reset) {
-    SPEND_TIME(System_rum);
     HKU_ERROR_IF_RETURN(m_stock.isNull(), void(), "m_stock is NULL!");
 
     // reset必须在readyForRun之前，否则m_pre_cn_valid、m_pre_ev_valid将会被赋为错误的初值
