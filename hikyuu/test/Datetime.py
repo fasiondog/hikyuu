@@ -11,6 +11,7 @@ import unittest
 
 from test_init import *
 
+
 class DatetimeTest(unittest.TestCase):
     def test_Datetime(self):
         d = Datetime(201209272301)
@@ -33,17 +34,17 @@ class DatetimeTest(unittest.TestCase):
         self.assert_(d > Datetime(201209272259))
         self.assert_(not (d < Datetime(201209272301)))
         self.assert_(d < Datetime(201209272302))
-        
+
         d = Datetime(200101010159)
-        self.assertEqual(str(d), "2001-1-1 1:59:0")
+        self.assertEqual(str(d), "2001-01-01 01:59:00")
         self.assertEqual(d, Datetime("2001-Jan-01 01:59:00"))
-        
+
         self.assertEqual(Datetime(), constant.null_datetime)
-        
+
     def test_pickle(self):
         if not constant.pickle_support:
             return
-        
+
         import pickle as pl
         a = Datetime(201001010000)
         filename = sm.tmpdir() + "/Datetime.plk"
@@ -54,7 +55,7 @@ class DatetimeTest(unittest.TestCase):
         b = pl.load(fh)
         fh.close()
         self.assertEqual(a, b)
-        
- 
+
+
 def suite():
-    return unittest.TestLoader().loadTestsFromTestCase(DatetimeTest)       
+    return unittest.TestLoader().loadTestsFromTestCase(DatetimeTest)

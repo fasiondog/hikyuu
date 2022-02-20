@@ -11,51 +11,52 @@ from test_init import *
 import unittest
 from hikyuu import Parameter
 
+
 class ParameterTest(unittest.TestCase):
     def test_Parameter(self):
         p = Parameter()
-        self.assertEqual(p.have("n"), False)
-        self.assertEqual(p.have("b"), False)
-        self.assertEqual(p.have("d"), False)
-        self.assertEqual(p.have("s"), False)
-        p.set("n", 10)
-        p.set("b", True)
-        p.set("d", 10.01)
-        p.set("s", "string")
-        self.assertEqual(p.have("n"), True)
-        self.assertEqual(p.have("b"), True)
-        self.assertEqual(p.have("d"), True)
-        self.assertEqual(p.have("s"), True)
-        self.assertEqual(p.get("n"), 10)
-        self.assertEqual(p.get("b"), True)
-        self.assertEqual(p.get("d"), 10.01)
-        self.assertEqual(p.get("s"), "string")
-        
-        p.set("n", 20)
-        p.set("b", False)
-        p.set("d", 10.001)
-        p.set("s", "string2")
-        self.assertEqual(p.get("n"), 20)
-        self.assertEqual(p.get("b"), False)
-        self.assertEqual(p.get("d"), 10.001)
-        self.assertEqual(p.get("s"), "string2")
-        
-    def test_pickle(self):
-        if not constant.pickle_support:
-            return 
-        tmpdir = sm.tmpdir()
-        fh = open(tmpdir + "/Parameter.plk", "wb")
-        a = Parameter()
-        a.set("bool", True)
-        a.set("string", "This is Parameter")
-        import pickle as pl
-        pl.dump(a, fh)
-        fh.close()
-        fh = open(tmpdir + "/Parameter.plk", "rb")
-        b = pl.load(fh)
-        self.assertEqual(b.get("bool"), True)
-        self.assertEqual(b.get("string"), "This is Parameter")        
-        
-                 
+        self.assertEqual("n" in p, False)
+        self.assertEqual("b" in p, False)
+        self.assertEqual("d" in p, False)
+        self.assertEqual("s" in p, False)
+        p["n"] = 10
+        p["b"] = True
+        p["d"] = 10.01
+        p["s"] = "string"
+        self.assertEqual("n" in p, True)
+        self.assertEqual("b" in p, True)
+        self.assertEqual("d" in p, True)
+        self.assertEqual("s" in p, True)
+        self.assertEqual(p["n"], 10)
+        self.assertEqual(p["b"], True)
+        self.assertEqual(p["d"], 10.01)
+        self.assertEqual(p["s"], "string")
+
+        p["n"] = 20
+        p["b"] = False
+        p["d"] = 10.001
+        p["s"] = "string2"
+        self.assertEqual(p["n"], 20)
+        self.assertEqual(p["b"], False)
+        self.assertEqual(p["d"], 10.001)
+        self.assertEqual(p["s"], "string2")
+
+    # def test_pickle(self):
+    #     if not constant.pickle_support:
+    #         return
+    #     tmpdir = sm.tmpdir()
+    #     fh = open(tmpdir + "/Parameter.plk", "wb")
+    #     a = Parameter()
+    #     a["bool"] = True
+    #     a["string"] = "This is Parameter"
+    #     import pickle as pl
+    #     pl.dump(a, fh)
+    #     fh.close()
+    #     fh = open(tmpdir + "/Parameter.plk", "rb")
+    #     b = pl.load(fh)
+    #     self.assertEqual(b["bool"], True)
+    #     self.assertEqual(b["string"], "This is Parameter")
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(ParameterTest)

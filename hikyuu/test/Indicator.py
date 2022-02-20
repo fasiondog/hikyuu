@@ -10,25 +10,30 @@
 import unittest
 
 from test_init import *
-from hikyuu.indicator import *
 
 
 class AddIndicator(IndicatorImp):
     def __init__(self, indicator):
         super(AddIndicator, self).__init__("AddIndicator")
-        self._readyBuffer(indicator.size(), 1)
+        self._ready_buffer(len(indicator), 1)
+        self.set_discard(0)
         for i in range(len(indicator)):
             self._set(indicator[i] + 1, i)
 
-    def __call__(self, ind):
-        return AddIndicator(ind)
+    def _clone(self):
+        return AddIndicator(Indicator())
+
+    def _calculate(self, ind):
+        self.set_discard(0)
+        for i in range(len(ind)):
+            self._set(ind[i] + 1, i)
 
 
 class IndicatorTest(unittest.TestCase):
     def test_PRICELIST(self):
         a = toPriceList([0, 1, 2, 3])
         x = PRICELIST(a)
-        self.assertEqual(x.size(), 4)
+        self.assertEqual(len(x), 4)
         self.assertEqual(x.empty(), False)
         self.assertEqual(x.discard, 0)
         self.assertEqual(x[0], 0)
@@ -41,7 +46,7 @@ class IndicatorTest(unittest.TestCase):
         x = PRICELIST(a)
         m = Indicator(AddIndicator(x))
         self.assertEqual(m.name, "AddIndicator")
-        self.assertEqual(m.size(), 4)
+        self.assertEqual(len(m), 4)
         self.assertEqual(m.empty(), False)
         self.assert_(abs(m[0] - 1) < 0.0001)
         self.assert_(abs(m[1] - 2) < 0.0001)
@@ -50,15 +55,18 @@ class IndicatorTest(unittest.TestCase):
 
         b = toPriceList([1, 2, 3, 4])
         x = PRICELIST(b)
+        m.get_imp()._calculate(m)
         m = m(x)
-        self.assertEqual(m.size(), 4)
+        self.assertEqual(len(m), 4)
         self.assertEqual(m.empty(), False)
+        print("m[0]", m[0])
+        print("m[1]", m[1])
+        print("m[2]", m[2])
+        print("m[3]", m[3])
         self.assert_(abs(m[0] - 2) < 0.0001)
         self.assert_(abs(m[1] - 3) < 0.0001)
         self.assert_(abs(m[2] - 4) < 0.0001)
         self.assert_(abs(m[3] - 5) < 0.0001)
-        #print m.name
-        #print m
 
     def test_operator(self):
         a = toPriceList([0, 1, 2, 3])
@@ -84,7 +92,7 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 12)
 
         a = x2 / x1
-        self.assertEqual(a[0], constant.null_price)
+        self.assert_(isnan(a[0]))
         self.assertEqual(a[1], 2)
         self.assertEqual(a[2], 1.5)
         self.assertEqual(a[3], 4.0 / 3.0)
@@ -92,7 +100,7 @@ class IndicatorTest(unittest.TestCase):
     def test_IKDATA(self):
         s = sm['sh000001']
         q = Query(0, 10)
-        k = s.getKData(q)
+        k = s.get_kdata(q)
         o = OPEN(k)
         h = HIGH(k)
         l = LOW(k)
@@ -100,12 +108,12 @@ class IndicatorTest(unittest.TestCase):
         a = AMO(k)
         v = VOL(k)
 
-        self.assertEqual(o.size(), 10)
-        self.assertEqual(h.size(), 10)
-        self.assertEqual(l.size(), 10)
-        self.assertEqual(c.size(), 10)
-        self.assertEqual(a.size(), 10)
-        self.assertEqual(v.size(), 10)
+        self.assertEqual(len(o), 10)
+        self.assertEqual(len(h), 10)
+        self.assertEqual(len(l), 10)
+        self.assertEqual(len(c), 10)
+        self.assertEqual(len(a), 10)
+        self.assertEqual(len(v), 10)
 
         self.assertEqual(o.empty(), False)
         self.assertEqual(h.empty(), False)
@@ -132,7 +140,7 @@ class IndicatorTest(unittest.TestCase):
         a = toPriceList([0, 1, 2, 3])
         x = PRICELIST(a)
         m = MA(x, 2)
-        self.assertEqual(m.size(), 4)
+        self.assertEqual(len(m), 4)
         self.assertEqual(m.discard, 0)
         self.assert_(abs(m[0] - 0.0) < 0.0001)
         self.assert_(abs(m[1] - 0.5) < 0.0001)
