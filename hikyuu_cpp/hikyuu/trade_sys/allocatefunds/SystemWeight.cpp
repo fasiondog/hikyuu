@@ -31,10 +31,4 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemWeight& sw) {
     return os;
 }
 
-SystemWeight::SystemWeight() : m_weight(100) {}
-
-SystemWeight::SystemWeight(const SystemPtr& sys, price_t weight) : m_sys(sys), m_weight(weight) {}
-
-SystemWeight::~SystemWeight() {}
-
 } /* namespace hku */

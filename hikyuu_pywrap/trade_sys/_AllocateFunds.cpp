@@ -40,15 +40,19 @@ public:
     }
 };
 
-string (AllocateFundsBase::*af_get_name)() const = &AllocateFundsBase::name;
+const string& (AllocateFundsBase::*af_get_name)() const = &AllocateFundsBase::name;
 void (AllocateFundsBase::*af_set_name)(const string&) = &AllocateFundsBase::name;
 
 void export_AllocateFunds() {
-    class_<SystemWeight>("SystemWeight", init<>())
+    class_<SystemWeight>("SystemWeight",
+                         "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数", init<>())
       .def(init<const SystemPtr&, price_t>())
       .def(self_ns::str(self))
-      .def_readwrite("sys", &SystemWeight::m_sys)
-      .def_readwrite("weight", &SystemWeight::m_weight)
+      .add_property(
+        "sys", make_function(&SystemWeight::getSYS, return_value_policy<copy_const_reference>()),
+        &SystemWeight::setSYS, "对应的 System 实例")
+      .add_property("weight", &SystemWeight::getWeight, &SystemWeight::setWeight,
+                    "对应的权重系数，有效范围为 [0, 1]")
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<SystemWeight>())
 #endif
@@ -68,7 +72,8 @@ void export_AllocateFunds() {
       .def(init<const string&>())
       .def(self_ns::str(self))
       .def(self_ns::repr(self))
-      .add_property("name", af_get_name, af_set_name)
+      .add_property("name", make_function(af_get_name, return_value_policy<copy_const_reference>()),
+                    af_set_name, "算法组件名称")
       .def("get_param", &AllocateFundsBase::getParam<boost::any>)
       .def("set_param", &AllocateFundsBase::setParam<object>)
       .def("have_param", &AllocateFundsBase::haveParam)

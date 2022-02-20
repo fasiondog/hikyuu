@@ -20,10 +20,7 @@ SystemWeightList FixedWeightAllocateFunds ::_allocateWeight(const Datetime& date
     SystemWeightList result;
     double weight = getParam<double>("weight");
     for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        SystemWeight sw;
-        sw.setSYS(*iter);
-        sw.setWeight(weight);
-        result.push_back(sw);
+        result.emplace_back(*iter, weight);
     }
 
     return result;

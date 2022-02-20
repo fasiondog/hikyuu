@@ -42,7 +42,7 @@ public:
     virtual ~AllocateFundsBase();
 
     /** 获取算法名称 */
-    string name() const;
+    const string& name() const;
 
     /** 修改算法名称 */
     void name(const string& name);
@@ -203,7 +203,7 @@ typedef shared_ptr<AllocateFundsBase> AFPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const AFPtr&);
 
-inline string AllocateFundsBase::name() const {
+inline const string& AllocateFundsBase::name() const {
     return m_name;
 }
 
