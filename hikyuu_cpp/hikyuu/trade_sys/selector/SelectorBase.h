@@ -84,7 +84,8 @@ public:
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    virtual SystemList getSelectedSystemList(Datetime date) = 0;
+    virtual SystemList getSelectedOnOpen(Datetime date) = 0;
+    virtual SystemList getSelectedOnClose(Datetime date) = 0;
 
     /** 子类复位接口 */
     virtual void _reset() {}
@@ -165,12 +166,13 @@ private:                                                       \
 #define SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define SELECTOR_IMP(classname)                                       \
-public:                                                               \
-    virtual SelectorPtr _clone() override {                           \
-        return SelectorPtr(new classname());                          \
-    }                                                                 \
-    virtual SystemList getSelectedSystemList(Datetime date) override; \
+#define SELECTOR_IMP(classname)                                    \
+public:                                                            \
+    virtual SelectorPtr _clone() override {                        \
+        return SelectorPtr(new classname());                       \
+    }                                                              \
+    virtual SystemList getSelectedOnOpen(Datetime date) override;  \
+    virtual SystemList getSelectedOnClose(Datetime date) override; \
     virtual void _calculate() override;
 
 /**

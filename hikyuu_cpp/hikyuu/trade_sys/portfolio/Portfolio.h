@@ -133,6 +133,10 @@ public:
      */
     PriceList getProfitCurve();
 
+private:
+    void _runMomentOnOpen(const Datetime& datetime);
+    void _runMomentOnClose(const Datetime& datetime);
+
 protected:
     string m_name;
     TMPtr m_tm;
@@ -148,7 +152,8 @@ protected:
     bool m_is_ready;                       // 是否已做好运行准备
 
     // 用于中间计算的临时数据
-    SystemList m_tmp_cur_selected_list;
+    SystemList m_tmp_selected_list_on_open;
+    SystemList m_tmp_selected_list_on_close;
     SystemList m_tmp_will_remove_sys;
 
 //============================================

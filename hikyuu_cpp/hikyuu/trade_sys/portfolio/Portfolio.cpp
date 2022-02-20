@@ -48,7 +48,8 @@ void Portfolio::reset() {
     m_real_sys_list.clear();
     m_running_sys_set.clear();
     m_running_sys_list.clear();
-    m_tmp_cur_selected_list.clear();
+    m_tmp_selected_list_on_open.clear();
+    m_tmp_selected_list_on_close.clear();
     m_tmp_will_remove_sys.clear();
     if (m_tm)
         m_tm->reset();
@@ -82,7 +83,6 @@ PortfolioPtr Portfolio::clone() {
 }
 
 bool Portfolio::readyForRun() {
-    SPEND_TIME(Portfolio_readyForRun);
     if (!m_se) {
         HKU_WARN("m_se is null!");
         m_is_ready = false;
@@ -152,27 +152,17 @@ void Portfolio::runMoment(const Datetime& date) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
 
-    if (getParam<bool>("trace")) {
-        HKU_INFO("========================================================================");
-        HKU_INFO("{}", date);
-    }
+    _runMomentOnOpen(date);
+    _runMomentOnClose(date);
+}
 
+void Portfolio::_runMomentOnOpen(const Datetime& date) {
     // 从选股策略获取当前选中的系统列表
-    m_tmp_cur_selected_list = m_se->getSelectedSystemList(date);
-    if (getParam<bool>("trace")) {
-        for (auto& sys : m_tmp_cur_selected_list) {
-            HKU_INFO("select: {}, cash: {}", sys->getTO().getStock(), sys->getTM()->currentCash());
-        }
-    }
+    m_tmp_selected_list_on_open = m_se->getSelectedOnOpen(date);
 
-    // 资产分配算法调整各子系统资产分配
-    m_af->adjustFunds(date, m_tmp_cur_selected_list, m_running_sys_list);
-    if (getParam<bool>("trace")) {
-        for (auto& sys : m_tmp_cur_selected_list) {
-            HKU_INFO("allocate --> select: {}, cash: {}", sys->getTO().getStock(),
-                     sys->getTM()->currentCash());
-        }
-    }
+    // 资产分配算法调整各子系统资产分配，忽略上一周期收盘时选中的系统
+    m_af->adjustFunds(date, m_tmp_selected_list_on_open, m_running_sys_list,
+                      m_tmp_selected_list_on_close);
 
     // 由于系统的交易指令可能被延迟执行，需要保存并判断
     // 遍历当前运行中的子系统，如果已没有分配资金和持仓，则放入待移除列表
@@ -201,19 +191,63 @@ void Portfolio::runMoment(const Datetime& date) {
     }
 
     // 遍历本次选择的系统列表，如果存在分配资金且不在运行中列表内，则加入运行列表
-    for (auto& sub_sys : m_tmp_cur_selected_list) {
+    for (auto& sub_sys : m_tmp_selected_list_on_open) {
         price_t cash = sub_sys->getTM()->currentCash();
-        if (cash > 0 && m_running_sys_set.find(sub_sys) == m_running_sys_set.end()) {
+        if (cash > 0.0 && m_running_sys_set.find(sub_sys) == m_running_sys_set.end()) {
             m_running_sys_list.push_back(sub_sys);
             m_running_sys_set.insert(sub_sys);
         }
     }
 
-    // 执行所有运行中的系统
+    // 在开盘时执行所有运行中的非延迟交易系统系统
     for (auto& sub_sys : m_running_sys_list) {
-        auto tr = sub_sys->runMoment(date);
-        if (!tr.isNull()) {
-            m_tm->addTradeRecord(tr);
+        if (!sub_sys->getParam<bool>("delay")) {
+            auto tr = sub_sys->runMoment(date);
+            if (!tr.isNull()) {
+                m_tm->addTradeRecord(tr);
+            }
+        }
+    }
+}
+
+void Portfolio::_runMomentOnClose(const Datetime& date) {
+    // 从选股策略获取当前选中的系统列表
+    m_tmp_selected_list_on_close = m_se->getSelectedOnClose(date);
+
+    // 资产分配算法调整各子系统资产分配，忽略开盘时选中的系统
+    m_af->adjustFunds(date, m_tmp_selected_list_on_close, m_running_sys_list,
+                      m_tmp_selected_list_on_open);
+    if (getParam<bool>("trace") &&
+        (!m_tmp_selected_list_on_open.empty() || !m_tmp_selected_list_on_close.empty())) {
+        HKU_INFO("{} ===========================================================", date);
+        for (auto& sys : m_tmp_selected_list_on_open) {
+            HKU_INFO("select on open: {}, cash: {}", sys->getTO().getStock(),
+                     sys->getTM()->currentCash());
+        }
+        for (auto& sys : m_tmp_selected_list_on_close) {
+            HKU_INFO("select on close: {}, cash: {}", sys->getTO().getStock(),
+                     sys->getTM()->currentCash());
+        }
+    }
+
+    // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
+    for (auto& sys : m_tmp_selected_list_on_close) {
+        if (m_running_sys_set.find(sys) == m_running_sys_set.end()) {
+            TMPtr tm = sys->getTM();
+            if (tm->currentCash() > 0.0) {
+                m_running_sys_list.push_back(sys);
+                m_running_sys_set.insert(sys);
+            }
+        }
+    }
+
+    // 执行所有非延迟运行中系统
+    for (auto& sub_sys : m_running_sys_list) {
+        if (sub_sys->getParam<bool>("delay")) {
+            auto tr = sub_sys->runMoment(date);
+            if (!tr.isNull()) {
+                m_tm->addTradeRecord(tr);
+            }
         }
     }
 }

@@ -32,8 +32,12 @@ public:
         this->SelectorBase::_reset();
     }
 
-    SystemList getSelectedSystemList(Datetime date) {
-        return this->get_override("get_selected_system_list")(date);
+    SystemList getSelectedOnOpen(Datetime date) {
+        return this->get_override("get_selected_on_open")(date);
+    }
+
+    SystemList getSelectedOnClose(Datetime date) {
+        return this->get_override("get_selected_on_close")(date);
     }
 
     SelectorPtr _clone() {
@@ -74,7 +78,8 @@ void export_Selector() {
       .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset)
       .def("_clone", pure_virtual(&SelectorBase::_clone))
       .def("_calculate", pure_virtual(&SelectorBase::_calculate))
-      .def("get_selected_system_list", pure_virtual(&SelectorBase::getSelectedSystemList))
+      .def("get_selected_on_open", pure_virtual(&SelectorBase::getSelectedOnOpen))
+      .def("get_selected_on_close", pure_virtual(&SelectorBase::getSelectedOnClose))
       .def("add_stock", &SelectorBase::addStock)
       //.def("add_stock_list", &SelectorBase::addStockList)  // 在python中扩展
       .def("clear", &SelectorBase::clear)

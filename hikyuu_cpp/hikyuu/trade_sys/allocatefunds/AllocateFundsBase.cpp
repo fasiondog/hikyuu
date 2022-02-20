@@ -83,13 +83,14 @@ void AllocateFundsBase::setReservePercent(double percent) {
     m_reserve_percent = percent;
 }
 
-void AllocateFundsBase ::adjustFunds(const Datetime& date, const SystemList& se_list,
-                                     const std::list<SYSPtr>& running_list) {
+void AllocateFundsBase::adjustFunds(const Datetime& date, const SystemList& se_list,
+                                    const std::list<SYSPtr>& running_list,
+                                    const SystemList& ignore_list) {
     int max_num = getParam<int>("max_sys_num");
     HKU_ERROR_IF_RETURN(max_num <= 0, void(), "param(max_sys_num) need > 0!");
 
     if (getParam<bool>("adjust_running_sys")) {
-        _adjust_with_running(date, se_list, running_list);
+        _adjust_with_running(date, se_list, running_list, ignore_list);
     } else {
         _adjust_without_running(date, se_list, running_list);
     }
@@ -142,29 +143,37 @@ bool AllocateFundsBase::_returnAssets(const SYSPtr& sys, const Datetime& date) {
 
 // 调整运行中子系统持仓
 void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemList& se_list,
-                                             const std::list<SYSPtr>& running_list) {
+                                             const std::list<SYSPtr>& running_list,
+                                             const SystemList& ignore_list) {
     // 计算当前选中系统列表的权重
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
 
     //构建实际分配权重大于零的的系统集合，权重小于等于0的将被忽略
-    std::set<SYSPtr> selected_sets;
+    std::set<System*> selected_sets;
     for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
-        if (iter->getWeight() > 0) {
-            selected_sets.insert(iter->getSYS());
+        if (iter->getWeight() > 0.0) {
+            selected_sets.insert(iter->getSYS().get());
         }
     }
 
-    std::unordered_set<SYSPtr> selected_running_sets;
+    std::unordered_set<System*> ignore_sets;
+    for (auto& sys : ignore_list) {
+        ignore_sets.insert(sys.get());
+    }
 
-    // 如果当前持仓的系统不在实际的选中系统集合，则强制清仓卖出，并回收资产
-    for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
-        const SYSPtr& sys = *iter;
-        // 当前持仓的系统仍旧被选中，记入仍被选中的运行系统列表
-        if (selected_sets.find(sys) != selected_sets.end()) {
-            selected_running_sets.insert(*iter);
-        } else {
-            _returnAssets(sys, date);
+    std::unordered_set<System*> selected_running_sets;
+
+    // 如果当前运行的系统不在实际的选中系统集合且不在忽略列表中，则强制清仓卖出，并回收资产
+    for (auto& sys : running_list) {
+        // 不在忽略列表中
+        if (ignore_sets.find(sys.get()) == ignore_sets.end()) {
+            // 当前持仓的系统仍旧被选中，记入仍被选中的运行系统列表
+            if (selected_sets.find(sys.get()) != selected_sets.end()) {
+                selected_running_sets.insert(sys.get());
+            } else {
+                _returnAssets(sys, date);
+            }
         }
     }
 
@@ -181,6 +190,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     std::list<SystemWeight> new_sw_list;  // 存放新的权重列表
     size_t count = 0;
     for (auto iter = sw_list.rbegin(); iter != sw_list.rend(); ++iter) {
+        // 忽略小于等于零的权重
+        if (iter->getWeight() <= 0.0) {
+            break;
+        }
+
         // 小于最大允许运行数，直接保存至新的权重列表
         if (count < max_num) {
             new_sw_list.push_back(*iter);
@@ -189,7 +203,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         }
 
         // 处理超出允许的最大系统数范围外的系统，尝试强制清仓，但不在放入权重列表（即后续不参与资金分配）
-        if (selected_running_sets.find(iter->getSYS()) != selected_running_sets.end()) {
+        if (selected_running_sets.find(iter->getSYS().get()) != selected_running_sets.end()) {
             _returnAssets(iter->getSYS(), date);
         }
     }
@@ -227,8 +241,14 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
             break;
         }
 
+        auto& sys = iter->getSYS();
+
+        // 如果在忽略列表中，则跳过
+        if (ignore_sets.find(sys.get()) != ignore_sets.end()) {
+            continue;
+        }
+
         // 获取系统账户的当前资产市值
-        SYSPtr sys = iter->getSYS();
         TMPtr tm = sys->getTM();
         FundsRecord funds = tm->getFunds(m_query.kType());
         price_t funds_value =
@@ -294,7 +314,8 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                     KRecord k = kdata.getKRecord(pos);
                     KRecord srcK = stock.getKRecord(kdata.startPos() + pos);
                     TradeRecord tr;
-                    double need_sell_num = need_cash / k.closePrice;
+                    double need_sell_num = sys->getParam<bool>("delay") ? need_cash / k.closePrice
+                                                                        : need_cash / k.openPrice;
                     if (position.number <= need_sell_num) {
                         // 如果当前持仓数小于等于需要卖出的数量，则全部卖出
                         tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);

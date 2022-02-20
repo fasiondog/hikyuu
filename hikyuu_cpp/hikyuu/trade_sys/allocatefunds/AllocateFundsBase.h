@@ -52,10 +52,11 @@ public:
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
      * @param running_list 当前运行中的系统实例
+     * @param ignore_list 忽略不进行调仓的运行中系统
      * @return
      */
     void adjustFunds(const Datetime& date, const SystemList& se_list,
-                     const std::list<SYSPtr>& running_list);
+                     const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
 
     /** 获取交易账户 */
     TMPtr getTM();
@@ -107,7 +108,7 @@ public:
 private:
     /* 同时调整已运行中的子系统（已分配资金或已持仓） */
     void _adjust_with_running(const Datetime& date, const SystemList& se_list,
-                              const std::list<SYSPtr>& running_list);
+                              const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
 
     /* 不调整已在运行中的子系统 */
     void _adjust_without_running(const Datetime& date, const SystemList& se_list,
