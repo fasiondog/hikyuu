@@ -406,6 +406,9 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
 
     // 计算可用于分配的现金
     price_t can_allocate_cash = roundDown(m_shadow_tm->currentCash() - reserve_funds, precision);
+    if (can_allocate_cash <= 0.0) {
+        return;
+    }
 
     // 再次遍历选中子系统列表，并将剩余现金按权重比例转入子账户
     double weight_unit = getParam<double>("weight_unit");
@@ -413,9 +416,9 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     sw_iter = sw_list.rbegin();
     for (; sw_iter != end_iter; ++sw_iter) {
         // 该系统期望分配的资金
-        price_t will_cash = roundDown(per_cash * (sw_iter->getWeight() / weight_unit), precision);
-        if (will_cash <= std::abs(roundDown(0.0, precision))) {
-            break;
+        price_t will_cash = roundUp(per_cash * (sw_iter->getWeight() / weight_unit), precision);
+        if (will_cash <= 0.0) {
+            continue;
         }
 
         // 计算实际可分配的资金
@@ -426,6 +429,9 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
         if (m_shadow_tm->checkout(date, need_cash)) {
             sub_tm->checkin(date, need_cash);
             can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
+            if (can_allocate_cash <= 0.0) {
+                break;
+            }
         }
     }
 }
