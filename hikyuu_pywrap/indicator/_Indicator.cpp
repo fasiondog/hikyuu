@@ -166,7 +166,7 @@ set_context(self, stock, query)
 
     :rtype: KData)")
 
-      .def("getImp", &Indicator::getImp)
+      .def("get_imp", &Indicator::getImp)
       .def("__len__", &Indicator::size)
 
       .def("__call__", ind_call_1)
