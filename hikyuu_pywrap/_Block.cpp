@@ -7,10 +7,15 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/serialization/Block_serialization.h>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
+
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
 
 string (Block::*getCategory)() const = &Block::category;
 void (Block::*setCategory)(const string&) = &Block::category;
@@ -85,14 +90,8 @@ void export_Block() {
 #endif
       ;
 
-    BlockList::const_reference (BlockList::*BlockList_at)(BlockList::size_type) const =
-      &BlockList::at;
-    void (BlockList::*BlockList_append)(const BlockList::value_type& val) = &BlockList::push_back;
-    class_<BlockList>("BlockList", "C++ std::vector<Block>包装")
-      .def("__iter__", iterator<BlockList>())
-      .def("__len__", &BlockList::size)
-      .def("append", BlockList_append)
-      .def("get", BlockList_at, return_value_policy<copy_const_reference>())
+    class_<BlockList>("BlockList")
+      .def(vector_indexing_suite<BlockList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<BlockList>())
 #endif

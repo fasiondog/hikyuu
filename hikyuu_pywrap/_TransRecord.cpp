@@ -7,11 +7,16 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/serialization/TransRecord_serialization.h>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "pybind_utils.h"
 #include "pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
+
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
 
 void export_TransRecord() {
     class_<TransRecord>("TransRecord", init<>())
@@ -32,17 +37,8 @@ void export_TransRecord() {
       .value("SELL", TransRecord::SELL)
       .value("AUCTION", TransRecord::AUCTION);
 
-    TransList::const_reference (TransList::*TransList_at)(TransList::size_type) const =
-      &TransList::at;
-    void (TransList::*append)(const TransRecord&) = &TransList::push_back;
     class_<TransList>("TransList")
-      .def(self_ns::str(self))
-      .def(self_ns::repr(self))
-      .def("__iter__", iterator<TransList>())
-      .def("size", &TransList::size)
-      .def("__len__", &TransList::size)
-      .def("get", TransList_at, return_value_policy<copy_const_reference>())
-      .def("append", append)
+      .def(vector_indexing_suite<TransList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<TransList>())
 #endif
