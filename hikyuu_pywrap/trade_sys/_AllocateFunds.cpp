@@ -7,11 +7,16 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
+
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
 
 class AllocateFundsBaseWrap : public AllocateFundsBase, public wrapper<AllocateFundsBase> {
 public:
@@ -58,15 +63,17 @@ void export_AllocateFunds() {
 #endif
       ;
 
-    SystemWeightList::const_reference (SystemWeightList::*SystemWeightList_at)(
-      SystemWeightList::size_type) const = &SystemWeightList::at;
-    void (SystemWeightList::*append)(const SystemWeight&) = &SystemWeightList::push_back;
-    class_<SystemWeightList>("SystemWeightList")
-      .def("__iter__", iterator<SystemWeightList>())
-      .def("size", &SystemWeightList::size)
-      .def("__len__", &SystemWeightList::size)
-      .def("get", SystemWeightList_at, return_value_policy<copy_const_reference>())
-      .def("append", append);
+    class_<SystemWeightList>("SystemWeightList").def(vector_indexing_suite<SystemWeightList>());
+
+    // SystemWeightList::const_reference (SystemWeightList::*SystemWeightList_at)(
+    //   SystemWeightList::size_type) const = &SystemWeightList::at;
+    // void (SystemWeightList::*append)(const SystemWeight&) = &SystemWeightList::push_back;
+    // class_<SystemWeightList>("SystemWeightList")
+    //   .def("__iter__", iterator<SystemWeightList>())
+    //   .def("size", &SystemWeightList::size)
+    //   .def("__len__", &SystemWeightList::size)
+    //   .def("get", SystemWeightList_at, return_value_policy<copy_const_reference>())
+    //   .def("append", append);
 
     class_<AllocateFundsBaseWrap, boost::noncopyable>("AllocateFundsBase", init<>())
       .def(init<const string&>())

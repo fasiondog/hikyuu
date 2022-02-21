@@ -27,16 +27,24 @@ HKU_API std::ostream& operator<<(std::ostream& os, const PortfolioPtr& pf) {
     return os;
 }
 
-Portfolio::Portfolio() : m_name("Portfolio"), m_is_ready(false) {
+Portfolio::Portfolio()
+: m_name("Portfolio"), m_query(Null<KQuery>()), m_is_ready(false), m_need_calculate(true) {
     setParam<bool>("trace", false);  // 打印跟踪
 }
 
-Portfolio::Portfolio(const string& name) : m_name(name), m_is_ready(false) {
+Portfolio::Portfolio(const string& name)
+: m_name(name), m_query(Null<KQuery>()), m_is_ready(false), m_need_calculate(true) {
     setParam<bool>("trace", false);
 }
 
 Portfolio::Portfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af)
-: m_name("Portfolio"), m_tm(tm), m_se(se), m_af(af), m_is_ready(false) {
+: m_name("Portfolio"),
+  m_tm(tm),
+  m_se(se),
+  m_af(af),
+  m_query(Null<KQuery>()),
+  m_is_ready(false),
+  m_need_calculate(true) {
     setParam<bool>("trace", false);
 }
 
@@ -71,6 +79,7 @@ PortfolioPtr Portfolio::clone() {
     p->m_running_sys_set = m_running_sys_set;
     p->m_running_sys_list = m_running_sys_list;
     p->m_is_ready = m_is_ready;
+    p->m_need_calculate = m_need_calculate;
     if (m_se)
         p->m_se = m_se->clone();
     if (m_af)
@@ -252,7 +261,12 @@ void Portfolio::_runMomentOnClose(const Datetime& date) {
     }
 }
 
-void Portfolio::run(const KQuery& query) {
+void Portfolio::run(const KQuery& query, bool force) {
+    setQuery(query);
+    if (force) {
+        m_need_calculate = true;
+    }
+    HKU_IF_RETURN(!m_need_calculate, void());
     HKU_CHECK(readyForRun(),
               "readyForRun fails, check to see if a valid TradeManager, Selector, or "
               "AllocateFunds instance have been specified.");
@@ -261,6 +275,7 @@ void Portfolio::run(const KQuery& query) {
     for (auto& date : datelist) {
         runMoment(date);
     }
+    m_need_calculate = false;
 }
 
 FundsRecord Portfolio::getFunds(KQuery::KType ktype) const {

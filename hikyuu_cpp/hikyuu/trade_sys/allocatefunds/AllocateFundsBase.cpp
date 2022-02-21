@@ -197,7 +197,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
         // 小于最大允许运行数，直接保存至新的权重列表
         if (count < max_num) {
-            new_sw_list.push_back(*iter);
+            new_sw_list.emplace_back(std::move(*iter));
             count++;
             continue;
         }

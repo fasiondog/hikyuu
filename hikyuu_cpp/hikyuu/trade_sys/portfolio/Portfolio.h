@@ -45,11 +45,23 @@ public:
     }
 
     bool readyForRun();
-    void run(const KQuery& query);
+
+    /**
+     * @brief 运行资产组合
+     * @note
+     * 由于各个组件可能存在参数变化的情况，无法自动感知判断是否需要重新计算，此时需要手工指定强制计算
+     * @param query 查询条件
+     * @param force 是否强制重计算
+     */
+    void run(const KQuery& query, bool force = false);
+
     void runMoment(const Datetime& datetime);
 
     void setQuery(const KQuery& query) {
-        m_query = query;
+        if (m_query != query) {
+            m_query = query;
+            m_need_calculate = true;
+        }
     }
 
     KQuery getQuery() const {
@@ -67,13 +79,24 @@ public:
     }
 
     void setTM(const TMPtr& tm) {
-        m_tm = tm;
+        if (m_tm != tm) {
+            m_tm = tm;
+            m_need_calculate = true;
+        }
     }
+
     void setSE(const SEPtr& se) {
-        m_se = se;
+        if (m_se != se) {
+            m_se = se;
+            m_need_calculate = true;
+        }
     }
+
     void setAF(const AFPtr& af) {
-        m_af = af;
+        if (m_af != af) {
+            m_af = af;
+            m_need_calculate = true;
+        }
     }
 
     void reset();
@@ -150,6 +173,7 @@ protected:
     std::list<SYSPtr> m_running_sys_list;  // 当前仍在运行的子系统列表
     KQuery m_query;                        // 关联的查询条件
     bool m_is_ready;                       // 是否已做好运行准备
+    bool m_need_calculate;                 // 是否需要计算标志
 
     // 用于中间计算的临时数据
     SystemList m_tmp_selected_list_on_open;

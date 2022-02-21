@@ -14,6 +14,7 @@
 
 using namespace boost::python;
 using namespace hku;
+namespace py = boost::python;
 
 void (Portfolio::*pf_set_name)(const string&) = &Portfolio::name;
 const string& (Portfolio::*pf_get_name)() const = &Portfolio::name;
@@ -29,6 +30,14 @@ PriceList (Portfolio::*getPFFundsCurve_2)() = &Portfolio::getFundsCurve;
 PriceList (Portfolio::*getPFProfitCurve_1)(const DatetimeList&,
                                            KQuery::KType ktype) = &Portfolio::getProfitCurve;
 PriceList (Portfolio::*getPFProfitCurve_2)() = &Portfolio::getProfitCurve;
+
+py::list get_real_sys_list(const Portfolio& pf) {
+    return vector_to_py_list<SystemList>(pf.getRealSystemList());
+}
+
+py::list get_proto_sys_list(const Portfolio& pf) {
+    return vector_to_py_list<SystemList>(pf.getProtoSystemList());
+}
 
 void export_Portfolio() {
     class_<Portfolio>("Portfolio", R"(实现多标的、多策略的投资组合)", init<>())
@@ -53,11 +62,16 @@ void export_Portfolio() {
       //.def("readyForRun", &Portfolio::readyForRun)
       //.def("runMoment", &Portfolio::runMoment)
 
-      .def("run", &Portfolio::run, R"(run(self, query)
+      .def("run", &Portfolio::run, (arg("query"), arg("force") = false), R"(run(self, query)
     
-    运行投资组合策略
+    运行投资组合策略。在查询条件及各组件没有变化时，PF在第二次执行时，默认不会实际进行计算。
+    但由于各个组件的参数可能改变，此种情况无法自动判断是否需要重计算，可以手工指定进行强制计算。
         
-    :param Query query: 查询条件)")
+    :param Query query: 查询条件
+    :param bool force: 强制重新计算)")
+
+      .def("get_real_sys_list", get_real_sys_list, "获取实际运行的子账户系统列表")
+      .def("get_proto_sys_list", get_proto_sys_list, "获取原型系统列表")
 
       .def("get_funds", getPortfolioFunds_1, (arg("ktype") = KQuery::DAY))
       .def("get_funds", getPortfolioFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY),

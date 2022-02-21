@@ -35,6 +35,20 @@ public:
         m_weight = weight;
     }
 
+    SystemWeight(const SystemWeight&) = default;
+
+    SystemWeight(SystemWeight&& sw) : m_sys(std::move(sw.m_sys)), m_weight(sw.m_weight) {}
+
+    SystemWeight& operator=(const SystemWeight& other) = default;
+
+    SystemWeight& operator=(SystemWeight&& other) {
+        if (this != &other) {
+            m_sys = std::move(other.m_sys);
+            m_weight = other.m_weight;
+        }
+        return *this;
+    }
+
     /** 析构函数 */
     virtual ~SystemWeight() {}
 
@@ -90,6 +104,10 @@ private:
 typedef vector<SystemWeight> SystemWeightList;
 
 HKU_API std::ostream& operator<<(std::ostream&, const SystemWeight&);
+
+inline bool operator==(const SystemWeight& d1, const SystemWeight& d2) {
+    return d1.getSYS() == d2.getSYS() && d1.getWeight() == d2.getWeight();
+}
 
 } /* namespace hku */
 
