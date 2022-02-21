@@ -9,7 +9,7 @@
 #ifndef SIGNALBASE_H_
 #define SIGNALBASE_H_
 
-#include <unordered_set>
+#include <set>
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
 #include "../../trade_manage/TradeManager.h"
@@ -17,7 +17,7 @@
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/unordered_set.hpp>
+#include <boost/serialization/set.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 #include <boost/serialization/base_object.hpp>
 #endif
@@ -116,8 +116,10 @@ protected:
     string m_name;
     KData m_kdata;
     bool m_hold;
-    std::unordered_set<Datetime> m_buySig;
-    std::unordered_set<Datetime> m_sellSig;
+
+    // 用 set 保存，以便获取是能保持顺序
+    std::set<Datetime> m_buySig;
+    std::set<Datetime> m_sellSig;
 
 //============================================
 // 序列化支持
