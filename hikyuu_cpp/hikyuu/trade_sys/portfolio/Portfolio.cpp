@@ -181,7 +181,7 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
         Stock stock = running_sys->getStock();
         TMPtr sub_tm = running_sys->getTM();
         PositionRecord position = sub_tm->getPosition(date, stock);
-        price_t cash = sub_tm->currentCash();
+        price_t cash = sub_tm->cash(date, m_query.kType());
 
         // 已没有持仓且没有现金，则放入待移除列表
         if (position.number == 0 && cash <= precision) {
@@ -201,7 +201,7 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
 
     // 遍历本次选择的系统列表，如果存在分配资金且不在运行中列表内，则加入运行列表
     for (auto& sub_sys : m_tmp_selected_list_on_open) {
-        price_t cash = sub_sys->getTM()->currentCash();
+        price_t cash = sub_sys->getTM()->cash(date, m_query.kType());
         if (cash > 0.0 && m_running_sys_set.find(sub_sys) == m_running_sys_set.end()) {
             m_running_sys_list.push_back(sub_sys);
             m_running_sys_set.insert(sub_sys);
@@ -231,11 +231,11 @@ void Portfolio::_runMomentOnClose(const Datetime& date) {
         HKU_INFO("{} ===========================================================", date);
         for (auto& sys : m_tmp_selected_list_on_open) {
             HKU_INFO("select on open: {}, cash: {}", sys->getTO().getStock(),
-                     sys->getTM()->currentCash());
+                     sys->getTM()->cash(date, m_query.kType()));
         }
         for (auto& sys : m_tmp_selected_list_on_close) {
             HKU_INFO("select on close: {}, cash: {}", sys->getTO().getStock(),
-                     sys->getTM()->currentCash());
+                     sys->getTM()->cash(date, m_query.kType()));
         }
     }
 
@@ -243,7 +243,7 @@ void Portfolio::_runMomentOnClose(const Datetime& date) {
     for (auto& sys : m_tmp_selected_list_on_close) {
         if (m_running_sys_set.find(sys) == m_running_sys_set.end()) {
             TMPtr tm = sys->getTM();
-            if (tm->currentCash() > 0.0) {
+            if (tm->cash(date, m_query.kType()) > 0.0) {
                 m_running_sys_list.push_back(sys);
                 m_running_sys_set.insert(sys);
             }
@@ -278,16 +278,6 @@ void Portfolio::run(const KQuery& query, bool force) {
     m_need_calculate = false;
 }
 
-FundsRecord Portfolio::getFunds(KQuery::KType ktype) const {
-    FundsRecord total_funds;
-    for (auto& sub_sys : m_running_sys_list) {
-        FundsRecord funds = sub_sys->getTM()->getFunds(ktype);
-        total_funds += funds;
-    }
-    total_funds.cash += m_shadow_tm->currentCash();
-    return total_funds;
-}
-
 FundsRecord Portfolio::getFunds(const Datetime& datetime, KQuery::KType ktype) {
     FundsRecord total_funds;
     for (auto& sub_sys : m_real_sys_list) {
@@ -310,11 +300,6 @@ PriceList Portfolio::getFundsCurve(const DatetimeList& dates, KQuery::KType ktyp
     return result;
 }
 
-PriceList Portfolio::getFundsCurve() {
-    DatetimeList dates = getDateRange(m_shadow_tm->initDatetime(), Datetime::now());
-    return getFundsCurve(dates, KQuery::DAY);
-}
-
 PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
@@ -325,11 +310,6 @@ PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType kty
         }
     }
     return result;
-}
-
-PriceList Portfolio::getProfitCurve() {
-    DatetimeList dates = getDateRange(m_shadow_tm->initDatetime(), Datetime::now());
-    return getProfitCurve(dates, KQuery::DAY);
 }
 
 } /* namespace hku */

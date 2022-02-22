@@ -115,7 +115,7 @@ private:
                                  const std::list<SYSPtr>& running_list);
 
     /* 计算当前的资产总值 */
-    price_t _getTotalFunds(const std::list<SYSPtr>& running_list);
+    price_t _getTotalFunds(const Datetime& date, const std::list<SYSPtr>& running_list);
 
     /* 回收系统资产 */
     bool _returnAssets(const SYSPtr& sys, const Datetime& date);

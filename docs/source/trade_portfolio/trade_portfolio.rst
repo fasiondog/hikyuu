@@ -8,3 +8,4 @@
 
    portfolio
    selector
+   allcate_funds

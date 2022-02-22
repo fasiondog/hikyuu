@@ -19,18 +19,6 @@ namespace py = boost::python;
 void (Portfolio::*pf_set_name)(const string&) = &Portfolio::name;
 const string& (Portfolio::*pf_get_name)() const = &Portfolio::name;
 
-FundsRecord (Portfolio::*getPortfolioFunds_1)(KQuery::KType) const = &Portfolio::getFunds;
-FundsRecord (Portfolio::*getPortfolioFunds_2)(const Datetime&,
-                                              KQuery::KType) = &Portfolio::getFunds;
-
-PriceList (Portfolio::*getPFFundsCurve_1)(const DatetimeList&,
-                                          KQuery::KType) = &Portfolio::getFundsCurve;
-PriceList (Portfolio::*getPFFundsCurve_2)() = &Portfolio::getFundsCurve;
-
-PriceList (Portfolio::*getPFProfitCurve_1)(const DatetimeList&,
-                                           KQuery::KType ktype) = &Portfolio::getProfitCurve;
-PriceList (Portfolio::*getPFProfitCurve_2)() = &Portfolio::getProfitCurve;
-
 py::list get_real_sys_list(const Portfolio& pf) {
     return vector_to_py_list<SystemList>(pf.getRealSystemList());
 }
@@ -73,8 +61,7 @@ void export_Portfolio() {
       .def("get_real_sys_list", get_real_sys_list, "获取实际运行的子账户系统列表")
       .def("get_proto_sys_list", get_proto_sys_list, "获取原型系统列表")
 
-      .def("get_funds", getPortfolioFunds_1, (arg("ktype") = KQuery::DAY))
-      .def("get_funds", getPortfolioFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY),
+      .def("get_funds", &Portfolio::getFunds, (arg("datetime"), arg("ktype") = KQuery::DAY),
            R"(get_funds(self, [datetime, ktype = Query.DAY])
 
     获取指定时刻的资产市值详情
@@ -83,7 +70,7 @@ void export_Portfolio() {
     :param Query.KType ktype: K线类型
     :rtype: FundsRecord)")
 
-      .def("get_funds_curve", getPFFundsCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_funds_curve", &Portfolio::getFundsCurve, (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_funds_curve(self, dates[, ktype = Query.DAY])
 
     获取资产净值曲线
@@ -93,29 +80,14 @@ void export_Portfolio() {
     :return: 资产净值列表
     :rtype: PriceList)")
 
-      .def("get_funds_curve", getPFFundsCurve_2,
-           R"(get_funds_curve(self)
-
-    获取从账户建立日期到系统当前日期的资产净值曲线（按自然日）
-
-    :return: 资产净值列表
-    :rtype: PriceList)")
-
-      .def("get_profit_curve", getPFProfitCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_profit_curve", &Portfolio::getProfitCurve,
+           (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_profit_curve(self, dates[, ktype = Query.DAY])
 
     获取收益曲线，即扣除历次存入资金后的资产净值曲线
 
     :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
     :param Query.KType ktype: K线类型，必须与日期列表匹配
-    :return: 收益曲线
-    :rtype: PriceList)")
-
-      .def("get_profit_curve", getPFProfitCurve_2,
-           R"(get_profit_curve(self)
-
-    获取获取从账户建立日期到系统当前日期的收益曲线
-
     :return: 收益曲线
     :rtype: PriceList)")
 

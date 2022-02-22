@@ -778,7 +778,8 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} numer is zero!", datetime, stock.market_code());
+    HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} numer is zero!", datetime,
+                        stock.market_code());
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
@@ -887,7 +888,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} number is zero!", datetime,
+    HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
                         stock.market_code());
 
     //对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
@@ -1130,6 +1131,16 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 }
 
 price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
+    // 如果指定时间大于更新权息最后时间，则先更新权息
+    if (datetime > m_last_update_datetime) {
+        updateWithWeight(datetime);
+        return m_cash;
+    }
+
+    // 如果指定时间等于最后权息更新时间，则直接返回当前现金
+    HKU_IF_RETURN(datetime == m_last_update_datetime, m_cash);
+
+    // 指定时间小于最后权息更新时间，则通过计算指定时刻的资产获取资金余额
     FundsRecord funds = getFunds(datetime, ktype);
     return funds.cash;
 }

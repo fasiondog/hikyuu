@@ -96,7 +96,8 @@ void AllocateFundsBase::adjustFunds(const Datetime& date, const SystemList& se_l
     }
 }
 
-price_t AllocateFundsBase::_getTotalFunds(const std::list<SYSPtr>& running_list) {
+price_t AllocateFundsBase::_getTotalFunds(const Datetime& date,
+                                          const std::list<SYSPtr>& running_list) {
     price_t total_value = 0;
 
     // 计算运行中的子系统总资产净值
@@ -109,8 +110,9 @@ price_t AllocateFundsBase::_getTotalFunds(const std::list<SYSPtr>& running_list)
     }
 
     // 加上当前总账户现金余额
-    total_value =
-      roundDown(total_value + m_shadow_tm->currentCash(), m_shadow_tm->getParam<int>("precision"));
+    m_shadow_tm->updateWithWeight(date);
+    total_value = roundDown(total_value + m_shadow_tm->cash(date, m_query.kType()),
+                            m_shadow_tm->getParam<int>("precision"));
     return total_value;
 }
 
@@ -133,7 +135,7 @@ bool AllocateFundsBase::_returnAssets(const SYSPtr& sys, const Datetime& date) {
     }
 
     // 回收当前子账号资金至总账户
-    price_t cash = tm->currentCash();
+    price_t cash = tm->cash(date, kdata.getQuery().kType());
     if (cash > 0.0 && tm->checkout(date, cash)) {
         m_shadow_tm->checkin(date, cash);
     }
@@ -212,7 +214,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     int precision = m_shadow_tm->getParam<int>("precision");
 
     //获取当前总账户资产净值，并计算每单位权重代表的资金
-    price_t total_funds = _getTotalFunds(running_list);
+    price_t total_funds = _getTotalFunds(date, running_list);
 
     // 计算需保留的资产
     price_t reserve_funds = roundUp(total_funds * m_reserve_percent, precision);
@@ -223,7 +225,8 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     price_t per_weight_funds = total_funds * weight_unit;
 
     // 计算可分配现金
-    price_t can_allocate_cash = roundDown(m_shadow_tm->currentCash() - reserve_funds, precision);
+    price_t can_allocate_cash =
+      roundDown(m_shadow_tm->cash(date, m_query.kType()) - reserve_funds, precision);
     if (can_allocate_cash < 0.0) {
         can_allocate_cash = 0.0;
     }
@@ -250,6 +253,10 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
         // 获取系统账户的当前资产市值
         TMPtr tm = sys->getTM();
+
+        // 更新子账号权息数据
+        tm->updateWithWeight(date);
+
         FundsRecord funds = tm->getFunds(m_query.kType());
         price_t funds_value =
           funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
@@ -417,16 +424,17 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     int precision = m_shadow_tm->getParam<int>("precision");
 
     // 获取当前总资产市值
-    price_t total_funds = _getTotalFunds(running_list);
+    price_t total_funds = _getTotalFunds(date, running_list);
 
     // 计算需保留的资产
     price_t reserve_funds = total_funds * m_reserve_percent;
 
     // 如果当前现金小于等于需保留的资产，则直接返回
-    HKU_IF_RETURN(m_shadow_tm->currentCash() <= reserve_funds, void());
+    HKU_IF_RETURN(m_shadow_tm->cash(date, m_query.kType()) <= reserve_funds, void());
 
     // 计算可用于分配的现金
-    price_t can_allocate_cash = roundDown(m_shadow_tm->currentCash() - reserve_funds, precision);
+    price_t can_allocate_cash =
+      roundDown(m_shadow_tm->cash(date, m_query.kType()) - reserve_funds, precision);
     if (can_allocate_cash <= 0.0) {
         return;
     }

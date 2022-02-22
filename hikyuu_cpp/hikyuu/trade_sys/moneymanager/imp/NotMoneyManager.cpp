@@ -15,7 +15,7 @@ NotMoneyManager::~NotMoneyManager() {}
 
 double NotMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                        price_t risk, SystemPart from) {
-    return m_tm->currentCash() / price;
+    return m_tm->cash(datetime, m_query.kType()) / price;
 }
 
 MoneyManagerPtr HKU_API MM_Nothing() {

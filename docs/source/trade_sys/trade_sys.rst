@@ -14,4 +14,3 @@
    money_manager
    profitgoal
    slippage
-   allocate_funds
