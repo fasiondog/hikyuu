@@ -198,6 +198,15 @@ public:
     }
 
     /**
+     * 根据权息信息更新当前持仓与交易情况
+     * @note 必须按时间顺序调用
+     * @param datetime 当前时刻
+     */
+    virtual void updateWithWeight(const Datetime& datetime) {
+        HKU_WARN("The subclass does not implement a updateWithWeight method");
+    }
+
+    /**
      * 获取指定对象的保证金比率
      * @param datetime 日期
      * @param stock 指定对象
@@ -348,8 +357,12 @@ public:
         return PositionRecordList();
     }
 
-    /** 获取指定证券的当前持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getPosition(const Stock&) const {
+    /**
+     * 获取指定证券的持仓记录
+     * @param date 指定日期
+     * @param stock 指定的证券
+     */
+    virtual PositionRecord getPosition(const Datetime& date, const Stock&) {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }

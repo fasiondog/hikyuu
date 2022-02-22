@@ -19,7 +19,7 @@ void FixedPercentProfitGoal::_calculate() {}
 
 price_t FixedPercentProfitGoal::getGoal(const Datetime& datetime, price_t price) {
     Stock stock = getTO().getStock();
-    PositionRecord position = getTM()->getPosition(stock);
+    PositionRecord position = getTM()->getPosition(datetime, stock);
     return position.number != 0
              ? (position.buyMoney / position.number) * (1 + getParam<double>("p"))
              : price * (1 + getParam<double>("p"));

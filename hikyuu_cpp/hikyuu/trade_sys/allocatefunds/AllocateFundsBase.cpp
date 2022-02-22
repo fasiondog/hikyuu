@@ -304,7 +304,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
 
                 // 计算并卖出部分股票以获取剩下需要返还的资金
                 Stock stock = sys->getStock();
-                PositionRecord position = tm->getPosition(stock);
+                PositionRecord position = tm->getPosition(date, stock);
                 if (position.number > 0) {
                     KData kdata = sys->getTO();
                     size_t pos = kdata.getPos(date);

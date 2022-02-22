@@ -46,7 +46,7 @@ TEST_CASE("test_TradeManager_init") {
              TradeRecord(Null<Stock>(), Datetime(199901010000), BUSINESS_INIT, 100000.0, 100000.0,
                          0.0, 0, Null<CostRecord>(), 0.0, 100000.0, PART_INVALID));
     CHECK_EQ(tm->getPositionList().empty(), true);
-    CHECK_EQ(tm->getPosition(stock), Null<PositionRecord>());
+    CHECK_EQ(tm->getPosition(Datetime(199901010000), stock), Null<PositionRecord>());
 
     CHECK_EQ(tm->getShortPositionList().empty(), true);
     CHECK_EQ(tm->getShortPosition(stock), Null<PositionRecord>());
@@ -258,7 +258,6 @@ TEST_CASE("test_TradeManager_can_not_sell") {
 
     /** @arg 不忽略权息信息，对股票进行买卖操作，忽略买卖成本 */
     tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "SYS");
-    tm->setParam<bool>("reinvest", true);
     tm->buy(Datetime(199911170000), stock, 27.18, 1000, 0);
     CHECK_EQ(tm->cash(Datetime(199911170000)), 972820);
     tm->sell(Datetime(200605150000), stock, 10.2, 100);
@@ -436,7 +435,6 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     FundsRecord funds;
     TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
-    tm->setParam<bool>("reinvest", false);  //忽略权息
 
     Datetime cur_date, pre_date, next_date;
 
@@ -553,7 +551,6 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     FundsRecord funds;
     TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
-    tm->setParam<bool>("reinvest", false);  //忽略权息
     tm->setParam<bool>("support_borrow_cash", false);
     tm->setParam<bool>("support_borrow_stock", false);
 
@@ -711,510 +708,6 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     CHECK_EQ(funds, FundsRecord(99050, 0, 0, 100000, 0, 0, 0));
 }
 
-/** @par 检测点, 日线，忽略权息信息 */
-TEST_CASE("test_TradeManager_trade_no_rights_by_day") {
-    StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh600000");
-    Stock stock2 = sm.getStock("sz000001");
-
-    CostRecord cost;
-    TradeRecord trade;
-    FundsRecord funds;
-    TradeCostPtr tc = TC_TestStub();
-    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
-    tm->setParam<bool>("reinvest", false);  //忽略权息
-    tm->setParam<bool>("support_borrow_cash", false);
-    tm->setParam<bool>("support_borrow_stock", false);
-
-    /** @arg 19991117 27.18 stock 买入1000股 */
-    Datetime cur_date, pre_date, next_date;
-    cur_date = Datetime(199911170000);
-    pre_date = Datetime(199911160000);
-    next_date = Datetime(199911180000);
-    trade = tm->buy(cur_date, stock, 27.18, 1000, 27.0, 27.18, 27.18);
-    cost = tc->getBuyCost(cur_date, stock, 27.18, 1000);
-    CHECK_EQ(trade, TradeRecord(stock, cur_date, BUSINESS_BUY, 27.18, 27.18, 27.18, 1000, cost,
-                                27.0, 72810, PART_INVALID));
-    CHECK_EQ(tm->firstDatetime(), cur_date);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 72810), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->getStockNumber(), 1);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 0);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 1000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 1000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 0);
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(72810, 27180, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(72810, 27180, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(72810, 27020, 0, 100000, 0, 0, 0));
-
-    /** @arg 20000705 23.24 stock 买入1000股 */
-    cur_date = Datetime(200007050000);
-    pre_date = Datetime(200007040000);
-    next_date = Datetime(200007060000);
-    trade = tm->buy(cur_date, stock, 23.24, 1000, 23.11, 23.25, 23.23);
-    cost = tc->getBuyCost(cur_date, stock, 23.24, 1000);
-    CHECK_EQ(trade, TradeRecord(stock, cur_date, BUSINESS_BUY, 23.23, 23.24, 23.25, 1000, cost,
-                                23.11, 49560, PART_INVALID));
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 49560), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->getStockNumber(), 1);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 1000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 0);
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(49560, 46440, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(72810, 23250, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(49560, 46440, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(49560, 46160, 0, 100000, 0, 0, 0));
-
-    /** @arg 20000705 17.73 stock2 买入500股 */
-    cur_date = Datetime(200007050000);
-    pre_date = Datetime(200007040000);
-    next_date = Datetime(200007060000);
-    trade = tm->buy(cur_date, stock2, 17.73, 500, 17.56, 18.0, 17.70);
-    cost = tc->getBuyCost(cur_date, stock2, 17.73, 500);
-    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_BUY, 17.70, 17.73, 18.0, 500, cost,
-                                17.56, 40685, PART_INVALID));
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 40685), 0.001);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 2);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 1000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 0);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 500);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 500);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(72810, 23250, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(40685, 55275.0, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(40685, 55275.0, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(40685, 55020.0, 0, 100000, 0, 0, 0));
-
-    /** @arg 20000705 17.61 stock2 买入300股 */
-    cur_date = Datetime(200007050000);
-    pre_date = Datetime(200007040000);
-    next_date = Datetime(200007060000);
-    trade = tm->buy(cur_date, stock2, 17.61, 300, 17.50, 17.62, 17.60);
-    cost = tc->getBuyCost(cur_date, stock2, 17.61, 300);
-    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_BUY, 17.60, 17.61, 17.62, 300, cost,
-                                17.50, 35392, PART_INVALID));
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 35392), 0.001);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 2);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 1000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 0);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 800);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(72810, 23250, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(35392, 60576.0, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(35392, 60576.0, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(35392, 60336.0, 0, 100000, 0, 0, 0));
-
-    /** @arg 20000706 存入50000元现金 */
-    cur_date = Datetime(200007060000);
-    pre_date = Datetime(200007050000);
-    next_date = Datetime(200007070000);
-    CHECK_EQ(tm->checkin(cur_date, 50000), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 85392), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 2);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 800);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(35392, 60576.0, 0, 100000, 0, 0, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(85392, 60336.0, 0, 150000, 0, 0, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(85392, 60336.0, 0, 150000, 0, 0, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(85392, 60852.0, 0, 150000, 0, 0, 0));
-
-    /** @arg 20000707 取出20000元现金 */
-    cur_date = Datetime(200007070000);
-    pre_date = Datetime(200007060000);
-    next_date = Datetime(200007080000);
-    CHECK_EQ(tm->checkout(cur_date, 20000), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 65392), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 2);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 800);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(85392, 60336.0, 0, 150000, 0, 0, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(65392, 60852.0, 0, 130000, 0, 0, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(65392, 60852.0, 0, 130000, 0, 0, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(65392, 60852.0, 0, 130000, 0, 0, 0));
-
-    /** @arg 20000710 借入10000元现金 */
-    cur_date = Datetime(200007100000);
-    pre_date = Datetime(200007090000);
-    next_date = Datetime(200007110000);
-    CHECK_EQ(tm->borrowCash(cur_date, 10000), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 75362), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 2);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 800);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(65392, 60852.0, 0, 130000, 0, 0, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(75362, 60388.0, 0, 130000, 0, 10000, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(75362, 60388.0, 0, 130000, 0, 10000, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(75362, 61344.0, 0, 130000, 0, 10000, 0));
-    CHECK_EQ(tm->getDebtCash(pre_date), 0.0);
-    CHECK_EQ(tm->getDebtCash(cur_date), 10000.0);
-    CHECK_EQ(tm->getDebtCash(next_date), 10000.0);
-
-    /** @arg 20000711 归还5000元现金 */
-    cur_date = Datetime(200007110000);
-    pre_date = Datetime(200007100000);
-    next_date = Datetime(200007120000);
-    CHECK_EQ(tm->returnCash(cur_date, 5000), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 70322), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 2);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 800);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(75362, 60388.0, 0, 130000, 0, 10000, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(70322, 61344.0, 0, 130000, 0, 5000, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(70322, 61344.0, 0, 130000, 0, 5000, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(70322, 61768.0, 0, 130000, 0, 5000, 0));
-    CHECK_EQ(tm->getDebtCash(pre_date), 10000.0);
-    CHECK_EQ(tm->getDebtCash(cur_date), 5000.0);
-    CHECK_EQ(tm->getDebtCash(next_date), 5000.0);
-
-    /** @arg 20000712 存入sz000001,18.0, 200股 */
-    cur_date = Datetime(200007120000);
-    pre_date = Datetime(200007110000);
-    next_date = Datetime(200007130000);
-    CHECK_EQ(tm->checkinStock(cur_date, stock2, 18.0, 200), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 70322), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 2);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 1000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 1000);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(70322, 61344.0, 0, 130000, 0, 5000, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(70322, 65410.0, 0, 130000, 3600, 5000, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(70322, 65410.0, 0, 130000, 3600, 5000, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(70322, 64880.0, 0, 130000, 3600, 5000, 0));
-    CHECK_EQ(tm->getDebtCash(pre_date), 5000.0);
-    CHECK_EQ(tm->getDebtCash(cur_date), 5000.0);
-    CHECK_EQ(tm->getDebtCash(next_date), 5000.0);
-
-    /** @arg 20000712 存入sz000005,10.01, 1000股 */
-    Stock stock3 = sm.getStock("sz000005");
-    cur_date = Datetime(200007120000);
-    pre_date = Datetime(200007110000);
-    next_date = Datetime(200007130000);
-    CHECK_EQ(tm->checkinStock(cur_date, stock3, 10.01, 1000), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 70322), 0.001);
-    CHECK_EQ(tm->have(stock), true);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->have(stock3), true);
-    CHECK_EQ(tm->getStockNumber(), 3);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 800);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 1000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 1000);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock3), 0);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock3), 1000);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock3), 1000);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(70322, 61344.0, 0, 130000, 0, 5000, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(70322, 75450.0, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(70322, 75450.0, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(70322, 74830.0, 0, 130000, 13610, 5000, 0));
-    CHECK_EQ(tm->getDebtCash(pre_date), 5000.0);
-    CHECK_EQ(tm->getDebtCash(cur_date), 5000.0);
-    CHECK_EQ(tm->getDebtCash(next_date), 5000.0);
-
-    /** @arg 20000713 卖出全部持仓 */
-    cur_date = Datetime(200007130000);
-    pre_date = Datetime(200007120000);
-    next_date = Datetime(200007140000);
-    tm->sell(cur_date, stock, 23.44);
-    tm->sell(cur_date, stock2, 18);
-    tm->sell(cur_date, stock3, 9.95);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 145092), 0.001);
-    CHECK_EQ(tm->have(stock), false);
-    CHECK_EQ(tm->have(stock2), false);
-    CHECK_EQ(tm->have(stock3), false);
-    CHECK_EQ(tm->getStockNumber(), 0);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 0);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 0);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 1000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 0);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 0);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock3), 1000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock3), 0);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock3), 0);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(70322, 75450.0, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(145092, 0, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(Null<Datetime>());
-    CHECK_EQ(funds, FundsRecord(145092, 0, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(145092, 0, 0, 130000, 13610, 5000, 0));
-    CHECK_EQ(tm->getDebtCash(pre_date), 5000.0);
-    CHECK_EQ(tm->getDebtCash(cur_date), 5000.0);
-    CHECK_EQ(tm->getDebtCash(next_date), 5000.0);
-
-    /** @arg 20000713 18.2 stock2 买入300股 */
-    cur_date = Datetime(200007130000);
-    pre_date = Datetime(200007120000);
-    next_date = Datetime(200007140000);
-    trade = tm->buy(cur_date, stock2, 18.2, 300, 17.50, 19.62, 18.20);
-    cost = tc->getBuyCost(cur_date, stock2, 18.2, 300);
-    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_BUY, 18.2, 18.2, 19.62, 300, cost, 17.50,
-                                139622, PART_INVALID));
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_LT(std::fabs(tm->cash(cur_date) - 139622), 0.001);
-    CHECK_EQ(tm->have(stock), false);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->have(stock3), false);
-    CHECK_EQ(tm->getStockNumber(), 1);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock), 2000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock), 0);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock), 0);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 1000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock3), 1000);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock3), 0);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock3), 0);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(70322, 75450, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(139622, 5400, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(139622, 5400, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(139622, 5388.0, 0, 130000, 13610, 5000, 0));
-
-#if 0  // occur random memory error?
-    /** @arg 20000714 18.08 stock2 借入1000股 */
-    cur_date = Datetime(200007140000);
-    pre_date = Datetime(200007130000);
-    next_date = Datetime(200007150000);
-    CHECK_EQ(tm->borrowStock(cur_date, stock2, 18.08, 1000), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_EQ(std::fabs(tm->cash(cur_date) - 139572) < 0.001);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 1);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 300);
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(139622, 5400, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(139572, 5388, 0, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(139572, 5388, 0, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(139572, 5388, 0, 130000, 13610, 5000, 18080));
-    CHECK_EQ(tm->getDebtNumber(pre_date, stock2), 0);
-    CHECK_EQ(tm->getDebtNumber(cur_date, stock2), 1000);
-    CHECK_EQ(tm->getDebtNumber(next_date, stock2), 1000);
-
-
-    /** @arg 20000714 18.06 stock2 卖空1000股 */
-    cur_date = Datetime(200007140000);
-    pre_date = Datetime(200007130000);
-    next_date = Datetime(200007150000);
-    trade = tm->sellShort(cur_date, stock2, 18.06, 1000, 18.5, 17.00, 18.08);
-    cost = tm->getSellCost(cur_date, stock2, 18.06, 1000);
-    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_SELL_SHORT,
-            18.08, 18.06, 17, 1000, cost, 18.5, 157612, PART_INVALID));
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_EQ(std::fabs(tm->cash(cur_date) - 157612) < 0.001);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->haveShort(stock2), true);
-    CHECK_EQ(tm->getStockNumber(), 1);
-    CHECK_EQ(tm->getShortStockNumber(), 1);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 300);
-    CHECK_EQ(tm->getShortHoldNumber(pre_date, stock2), 0);
-    CHECK_EQ(tm->getShortHoldNumber(cur_date, stock2), 1000);
-    CHECK_EQ(tm->getShortHoldNumber(next_date, stock2), 1000);
-
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(139622, 5400, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(157612, 5388, 17960, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(157612, 5388, 17960, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(157612, 5388, 17960, 130000, 13610, 5000, 18080));
-    CHECK_EQ(tm->getDebtNumber(pre_date, stock2), 0);
-    CHECK_EQ(tm->getDebtNumber(cur_date, stock2), 1000);
-    CHECK_EQ(tm->getDebtNumber(next_date, stock2), 1000);
-
-
-    /** @arg 20000717 17.8 stock2 空头买回1000股 */
-    cur_date = Datetime(200007170000);
-    pre_date = Datetime(200007160000);
-    next_date = Datetime(200007180000);
-    trade = tm->buyShort(cur_date, stock2, 17.8, 1000);
-    cost = tm->getBuyCost(cur_date, stock2, 18.06, 1000);
-    CHECK_EQ(trade, TradeRecord(stock2, cur_date, BUSINESS_BUY_SHORT,
-            0, 17.8, 0, 1000, cost, 0, 139802, PART_INVALID));
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_EQ(std::fabs(tm->cash(cur_date) - 139802) < 0.001);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->haveShort(stock2), false);
-    CHECK_EQ(tm->getStockNumber(), 1);
-    CHECK_EQ(tm->getShortStockNumber(), 0);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 300);
-    CHECK_EQ(tm->getShortHoldNumber(pre_date, stock2), 1000);
-    CHECK_EQ(tm->getShortHoldNumber(cur_date, stock2), 0);
-    CHECK_EQ(tm->getShortHoldNumber(next_date, stock2), 0);
-
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(157612, 5388, 17960, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(139802, 5343, 0, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(139802, 5343, 0, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(139802, 5352, 0, 130000, 13610, 5000, 18080));
-    CHECK_EQ(tm->getDebtNumber(pre_date, stock2), 1000);
-    CHECK_EQ(tm->getDebtNumber(cur_date, stock2), 1000);
-    CHECK_EQ(tm->getDebtNumber(next_date, stock2), 1000);
-
-    /** @arg 20000717 18.08 归还stock2 1000股 */
-    cur_date = Datetime(200007170000);
-    pre_date = Datetime(200007160000);
-    next_date = Datetime(200007180000);
-    CHECK_EQ(tm->returnStock(cur_date, stock2, 18.08, 1000), true);
-    CHECK_EQ(tm->lastDatetime(), cur_date);
-    CHECK_EQ(std::fabs(tm->cash(cur_date) - 139742) < 0.001);
-    CHECK_EQ(tm->have(stock2), true);
-    CHECK_EQ(tm->haveShort(stock2), false);
-    CHECK_EQ(tm->getStockNumber(), 1);
-    CHECK_EQ(tm->getShortStockNumber(), 0);
-    CHECK_EQ(tm->getHoldNumber(pre_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(cur_date, stock2), 300);
-    CHECK_EQ(tm->getHoldNumber(next_date, stock2), 300);
-    CHECK_EQ(tm->getShortHoldNumber(pre_date, stock2), 1000);
-    CHECK_EQ(tm->getShortHoldNumber(cur_date, stock2), 0);
-    CHECK_EQ(tm->getShortHoldNumber(next_date, stock2), 0);
-
-    funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(157612, 5388, 17960, 130000, 13610, 5000, 18080));
-    funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(139742, 5343, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds();
-    CHECK_EQ(funds, FundsRecord(139742, 5343, 0, 130000, 13610, 5000, 0));
-    funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(139742, 5352, 0, 130000, 13610, 5000, 0));
-    CHECK_EQ(tm->getDebtNumber(pre_date, stock2), 1000);
-    CHECK_EQ(tm->getDebtNumber(cur_date, stock2), 0);
-    CHECK_EQ(tm->getDebtNumber(next_date, stock2), 0);
-#endif
-}
-
-/** @par 检测点, 自动融资、融券操作， 日线，忽略权息信息 */
-TEST_CASE("test_TradeManager_trade_financing_securities_lending_no_rights_by_day") {
-    StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh600000");
-    Stock stock2 = sm.getStock("sz000001");
-
-    CostRecord cost;
-    TradeRecord trade;
-    FundsRecord funds;
-    TradeCostPtr tc = TC_TestStub();
-    TradeManagerPtr tm = crtTM(Datetime(199901010000), 10000, tc);
-    tm->setParam<bool>("reinvest", false);  //忽略权息
-    tm->setParam<bool>("support_borrow_cash", true);
-    tm->setParam<bool>("support_borrow_stock", true);
-
-    Datetime cur_date, pre_date, next_date;
-
-    /** @arg 19991110 27.75 买入1000股 */
-    cur_date = Datetime(199911100000);
-    pre_date = Datetime(199911090000);
-    next_date = Datetime(199911110000);
-    trade = tm->buy(cur_date, stock, 27.75, 1000, 27.70, 28.0, 27.75);
-    cost = tm->getBuyCost(cur_date, stock, 27.75, 1000);
-}
-
 /** @par 检测点，测试 getTradeList */
 TEST_CASE("test_getTradeList") {
     StockManager& sm = StockManager::instance();
@@ -1223,7 +716,6 @@ TEST_CASE("test_getTradeList") {
     CostRecord cost;
 
     TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
-    tm->setParam<bool>("reinvest", true);
 
     tm->buy(Datetime(199305200000L), stk, 55.7, 100);
     tm->buy(Datetime(199305250000L), stk, 27.5, 100);
@@ -1299,7 +791,6 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
     CostRecord cost;
 
     TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
-    tm->setParam<bool>("reinvest", true);
 
     tm->buy(Datetime(199305200000L), stk, 55.7, 100);
     tm->buy(Datetime(199305250000L), stk, 27.5, 100);
@@ -1321,21 +812,18 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
 
     /** @arg 复制一个tm的交易记录至另一个tm */
     tm = crtTM(Datetime(199305010000), 100000);
-    tm->setParam<bool>("reinvest", true);
     tm->buy(Datetime(199305200000L), stk, 55.7, 100);
     tm->buy(Datetime(199305250000L), stk, 27.5, 100);
     tm->buy(Datetime(199407110000L), stk, 8.55, 200);
     tr_list = tm->getTradeList();
 
     TMPtr tm2 = crtTM(Datetime(199101010000), 100000, TC_Zero(), "TM2");
-    tm2->setParam<bool>("reinvest", false);
     CHECK_NE(tm->initDatetime(), tm2->initDatetime());
     for (auto iter = tr_list.begin(); iter != tr_list.end(); ++iter) {
         tm2->addTradeRecord(*iter);
     }
 
     CHECK_NE(tm2->name(), tm->name());
-    CHECK_NE(tm2->getParam<bool>("reinvest"), tm->getParam<bool>("reinvest"));
     CHECK_EQ(tm2->initDatetime(), tm->initDatetime());
     CHECK_EQ(tm2->lastDatetime(), tm->lastDatetime());
     CHECK_EQ(tm2->currentCash(), tm->currentCash());

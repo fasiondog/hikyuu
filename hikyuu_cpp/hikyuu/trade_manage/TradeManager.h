@@ -33,7 +33,6 @@ namespace hku {
  * @details
  * <pre>
  * 默认参数：
- * reinvest(bool): false 红利/股息/送股再投资标志，即是否忽略权息信息
  * precision(int): 2 计算精度
  * support_borrow_cash(bool): false 买入操作时是否自动融资
  * support_borrow_stock(bool): false 卖空时是否自动融劵
@@ -77,6 +76,13 @@ public:
     virtual Datetime lastDatetime() const override {
         return m_trade_list.empty() ? m_init_datetime : m_trade_list.back().datetime;
     }
+
+    /**
+     * 根据权息信息更新当前持仓与交易情况
+     * @note 必须按时间顺序调用
+     * @param datetime 当前时刻
+     */
+    virtual void updateWithWeight(const Datetime& datetime) override;
 
     /**
      * 返回当前现金
@@ -163,8 +169,12 @@ public:
         return m_short_position_history;
     }
 
-    /** 获取指定证券的当前持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getPosition(const Stock&) const override;
+    /**
+     * 获取指定证券的持仓记录
+     * @param date 指定日期
+     * @param stock 指定的证券
+     */
+    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) override;
 
     /** 获取指定证券的当前空头仓位持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
     virtual PositionRecord getShortPosition(const Stock&) const override;
@@ -380,9 +390,6 @@ public:
     virtual void tocsv(const string& path) override;
 
 private:
-    //根据权息信息，更新交易记录及持仓
-    void _update(const Datetime&);
-
     //以脚本的形式保存交易动作，便于修正和校准
     void _saveAction(const TradeRecord&);
 
@@ -403,8 +410,9 @@ private:
     bool _add_buy_short_tr(const TradeRecord&);
 
 private:
-    Datetime m_init_datetime;  //账户建立日期
-    price_t m_init_cash;       //初始资金
+    Datetime m_init_datetime;         // 账户建立日期
+    price_t m_init_cash;              // 初始资金
+    Datetime m_last_update_datetime;  // 最后一次根据权息调整持仓与交易记录的时刻
 
     price_t m_cash;            //当前现金
     price_t m_checkin_cash;    //累计存入资金，初始资金视为存入

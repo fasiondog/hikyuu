@@ -326,6 +326,12 @@ void export_TradeManager() {
 
     :param str path: 输出文件所在目录)")
 
+      .def("update_with_weight", &TradeManager::updateWithWeight, R"(update_with_weight(self, date)
+
+    根据权息信息更新当前持仓及交易记录，必须按时间顺序被调用
+
+    :param Datetime date: 当前时刻)")
+
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(name_init_pickle_suite<TradeManagerBase>())
 #endif

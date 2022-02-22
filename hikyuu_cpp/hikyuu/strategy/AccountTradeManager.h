@@ -177,7 +177,7 @@ public:
     }
 
     /** 获取指定证券的当前持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getPosition(const Stock&) const override {
+    virtual PositionRecord getPosition(const Datetime&, const Stock&) override {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }

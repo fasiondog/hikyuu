@@ -439,7 +439,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     price_t current_price = today.closePrice;
     price_t src_current_price = src_today.closePrice;  // 未复权的原始价格
 
-    PositionRecord position = m_tm->getPosition(m_stock);
+    PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
     if (position.number != 0) {
         TradeRecord tr;
         if (src_current_price <= position.stoploss) {
@@ -616,7 +616,7 @@ TradeRecord System::_sellForce(const KRecord& today, const KRecord& src_today, d
             m_sellRequest.count = 1;
         }
 
-        PositionRecord position = m_tm->getPosition(m_stock);
+        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
         m_sellRequest.from = from;
         m_sellRequest.datetime = today.datetime;
         m_sellRequest.stoploss = position.stoploss;
@@ -625,7 +625,7 @@ TradeRecord System::_sellForce(const KRecord& today, const KRecord& src_today, d
         return result;
 
     } else {
-        PositionRecord position = m_tm->getPosition(m_stock);
+        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
         price_t realPrice = _getRealSellPrice(today.datetime, src_today.closePrice);
         TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, num, position.stoploss,
                                         position.goalPrice, src_today.closePrice, from);

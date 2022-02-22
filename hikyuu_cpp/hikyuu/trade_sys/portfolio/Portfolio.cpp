@@ -180,7 +180,7 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
     for (auto& running_sys : m_running_sys_list) {
         Stock stock = running_sys->getStock();
         TMPtr sub_tm = running_sys->getTM();
-        PositionRecord position = sub_tm->getPosition(stock);
+        PositionRecord position = sub_tm->getPosition(date, stock);
         price_t cash = sub_tm->currentCash();
 
         // 已没有持仓且没有现金，则放入待移除列表
