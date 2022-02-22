@@ -559,16 +559,6 @@ public:
     }
 
     /**
-     * 获取账户当前时刻的资产详情
-     * @param ktype 日期的类型
-     * @return 资产详情
-     */
-    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const {
-        HKU_WARN("The subclass does not implement this method");
-        return FundsRecord();
-    }
-
-    /**
      * 获取指定时刻的资产市值详情
      * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
      * @param ktype 日期的类型
@@ -592,30 +582,12 @@ public:
     }
 
     /**
-     * 获取从账户建立日期到系统当前日期的资产净值曲线（按自然日），含借入的资产
-     * @return 资产净值列表
-     */
-    virtual PriceList getFundsCurve() {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
-    }
-
-    /**
      * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
      * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
      * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
      * @return 收益曲线
      */
     virtual PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
-    }
-
-    /**
-     * 获取获取从账户建立日期到系统当前日期的收益曲线，即扣除历次存入资金后的资产净值曲线
-     * @return 收益曲线
-     */
-    virtual PriceList getProfitCurve() {
         HKU_WARN("The subclass does not implement this method");
         return PriceList();
     }
@@ -632,7 +604,7 @@ public:
     }
 
     /** 字符串输出 */
-    virtual string str() const {
+    virtual string str() {
         HKU_WARN("The subclass does not implement this method");
         return string();
     }
@@ -691,12 +663,12 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeManagerBase)
 typedef shared_ptr<TradeManagerBase> TradeManagerPtr;
 typedef shared_ptr<TradeManagerBase> TMPtr;
 
-inline std::ostream& operator<<(std::ostream& os, const TradeManagerBase& tm) {
+inline std::ostream& operator<<(std::ostream& os, TradeManagerBase& tm) {
     os << tm.str();
     return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
+inline std::ostream& operator<<(std::ostream& os, TradeManagerPtr& ptm) {
     if (ptm) {
         os << ptm->str();
     } else {

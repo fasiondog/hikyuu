@@ -173,10 +173,11 @@
         :param Stock stock: 指定的证券
         :rtype: int
 
-    .. py:method:: get_position(self, stock)
+    .. py:method:: get_position(self, date, stock)
 
-        获取指定证券的当前持仓记录，如当前未持有该票，返回PositionRecord()
+        获取指定时间证券持仓记录，如当前未持有该票，返回PositionRecord()
         
+        :param Datetime date: 指定时间
         :param Stock stock: 指定的证券
         :rtype: PositionRecord
         
@@ -220,14 +221,7 @@
         :param float num:         卖出数量
         :rtype: CostRecord        
      
-    .. py:method:: get_funds(self[,ktype = Query.DAY])
-    
-        获取账户当前时刻的资产详情
-        
-        :param Query.KType ktype: K线类型
-        :rtype: FundsRecord
-        
-        get_funds(self, datetime, [ktype = Query.DAY])
+    .. py:method:: get_funds(self, datetime, [ktype = Query.DAY])
     
         获取指定时刻的资产市值详情
         

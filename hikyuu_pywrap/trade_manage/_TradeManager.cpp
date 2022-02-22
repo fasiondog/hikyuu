@@ -13,18 +13,6 @@
 using namespace boost::python;
 using namespace hku;
 
-FundsRecord (TradeManagerBase::*getFunds_1)(KQuery::KType) const = &TradeManagerBase::getFunds;
-FundsRecord (TradeManagerBase::*getFunds_2)(const Datetime&,
-                                            KQuery::KType) = &TradeManagerBase::getFunds;
-
-PriceList (TradeManagerBase::*getTMFundsCurve_1)(const DatetimeList&,
-                                                 KQuery::KType) = &TradeManagerBase::getFundsCurve;
-PriceList (TradeManagerBase::*getTMFundsCurve_2)() = &TradeManagerBase::getFundsCurve;
-
-PriceList (TradeManagerBase::*getTMProfitCurve_1)(const DatetimeList&, KQuery::KType ktype) =
-  &TradeManagerBase::getProfitCurve;
-PriceList (TradeManagerBase::*getTMProfitCurve_2)() = &TradeManagerBase::getProfitCurve;
-
 TradeCostPtr (TradeManagerBase::*get_costFunc)() const = &TradeManagerBase::costFunc;
 void (TradeManagerBase::*set_costFunc)(const TradeCostPtr&) = &TradeManagerBase::costFunc;
 
@@ -197,8 +185,7 @@ void export_TradeManager() {
     :param ktype: K线类型
     :rtype: float)")
 
-      .def("get_funds", getFunds_1, (arg("ktype") = KQuery::DAY))
-      .def("get_funds", getFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY),
+      .def("get_funds", &TradeManagerBase::getFunds, (arg("datetime"), arg("ktype") = KQuery::DAY),
            R"(get_funds(self, [datetime, ktype = Query.DAY])
 
     获取指定时刻的资产市值详情
@@ -207,9 +194,8 @@ void export_TradeManager() {
     :param Query.KType ktype: K线类型
     :rtype: FundsRecord)")
 
-      //.def("getFunds", getFunds_1, (arg("ktype") = KQuery::DAY))
-      //.def("getFunds", getFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY))
-      .def("get_funds_curve", getTMFundsCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_funds_curve", &TradeManagerBase::getFundsCurve,
+           (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_funds_curve(self, dates[, ktype = Query.DAY])
 
     获取资产净值曲线
@@ -219,29 +205,14 @@ void export_TradeManager() {
     :return: 资产净值列表
     :rtype: PriceList)")
 
-      .def("get_funds_curve", getTMFundsCurve_2,
-           R"(get_funds_curve(self)
-
-    获取从账户建立日期到系统当前日期的资产净值曲线（按自然日）
-
-    :return: 资产净值列表
-    :rtype: PriceList)")
-
-      .def("get_profit_curve", getTMProfitCurve_1, (arg("dates"), arg("ktype") = KQuery::DAY),
+      .def("get_profit_curve", &TradeManagerBase::getProfitCurve,
+           (arg("dates"), arg("ktype") = KQuery::DAY),
            R"(get_profit_curve(self, dates[, ktype = Query.DAY])
 
     获取收益曲线，即扣除历次存入资金后的资产净值曲线
 
     :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
     :param Query.KType ktype: K线类型，必须与日期列表匹配
-    :return: 收益曲线
-    :rtype: PriceList)")
-
-      .def("get_profit_curve", getTMProfitCurve_2,
-           R"(get_profit_curve(self)
-
-    获取获取从账户建立日期到系统当前日期的收益曲线，即扣除历次存入资金后的资产净值曲线
-
     :return: 收益曲线
     :rtype: PriceList)")
 

@@ -104,7 +104,7 @@ price_t AllocateFundsBase::_getTotalFunds(const Datetime& date,
     for (auto& sub_sys : running_list) {
         TMPtr sub_tm = sub_sys->getTM();
         KQuery sub_query = sub_sys->getTO().getQuery();
-        FundsRecord funds = sub_tm->getFunds(sub_query.kType());
+        FundsRecord funds = sub_tm->getFunds(date, sub_query.kType());
         total_value +=
           funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
     }
@@ -257,7 +257,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         // 更新子账号权息数据
         tm->updateWithWeight(date);
 
-        FundsRecord funds = tm->getFunds(m_query.kType());
+        FundsRecord funds = tm->getFunds(date, m_query.kType());
         price_t funds_value =
           funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
 
