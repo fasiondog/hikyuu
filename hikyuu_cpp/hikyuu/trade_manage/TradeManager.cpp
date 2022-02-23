@@ -17,12 +17,12 @@
 
 namespace hku {
 
-string TradeManager::str() {
+string TradeManager::str() const {
     std::stringstream os;
     os << std::fixed;
     os.precision(2);
 
-    FundsRecord funds = getFunds(Datetime::today(), KQuery::DAY);
+    FundsRecord funds = getFunds();
     string strip(",\n");
     os << "TradeManager {\n"
        << "  params: " << getParameter() << strip << "  name: " << name() << strip
@@ -1145,6 +1145,44 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     return funds.cash;
 }
 
+FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
+    FundsRecord funds;
+    int precision = getParam<int>("precision");
+
+    string ktype(inktype);
+    to_upper(ktype);
+
+    price_t price(0.0);
+    price_t value(0.0);  //当前市值
+    position_map_type::const_iterator iter = m_position.begin();
+    for (; iter != m_position.end(); ++iter) {
+        const PositionRecord& record = iter->second;
+        price = record.stock.getMarketValue(lastDatetime(), ktype);
+        value = roundEx((value + record.number * price * record.stock.unit()), precision);
+    }
+
+    price_t short_value = 0.0;  //当前空头仓位市值
+    iter = m_short_position.begin();
+    for (; iter != m_short_position.end(); ++iter) {
+        const PositionRecord& record = iter->second;
+        price = record.stock.getMarketValue(lastDatetime(), ktype);
+        short_value =
+          roundEx((short_value + record.number * price * record.stock.unit()), precision);
+    }
+    funds.cash = m_cash;
+    funds.market_value = value;
+    funds.short_market_value = short_value;
+    funds.base_cash = m_checkin_cash - m_checkout_cash;
+    funds.base_asset = m_checkin_stock - m_checkout_stock;
+    funds.borrow_cash = m_borrow_cash;
+    funds.borrow_asset = 0;
+    borrow_stock_map_type::const_iterator bor_iter = m_borrow_stock.begin();
+    for (; bor_iter != m_borrow_stock.end(); ++bor_iter) {
+        funds.borrow_asset += bor_iter->second.value;
+    }
+    return funds;
+}
+
 FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
     FundsRecord funds;
     int precision = getParam<int>("precision");
@@ -1680,6 +1718,8 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
     HKU_ERROR_IF_RETURN(tr.datetime < lastDatetime(), false,
                         "tr.datetime must be >= lastDatetime({})!", lastDatetime());
 
+    updateWithWeight(tr.datetime);
+
     switch (tr.business) {
         case BUSINESS_INIT:
             return false;
@@ -1691,10 +1731,10 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
             return _add_sell_tr(tr);
 
         case BUSINESS_GIFT:
-            return _add_gift_tr(tr);
+            return true;
 
         case BUSINESS_BONUS:
-            return _add_bonus_tr(tr);
+            return true;
 
         case BUSINESS_CHECKIN:
             return _add_checkin_tr(tr);
@@ -1829,42 +1869,6 @@ bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
 
     _saveAction(new_tr);
 
-    return true;
-}
-
-bool TradeManager::_add_gift_tr(const TradeRecord& tr) {
-    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
-
-    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
-    if (pos_iter == m_position.end()) {
-        HKU_ERROR("No position!");
-        return false;
-    }
-
-    PositionRecord& position = pos_iter->second;
-    position.number += tr.number;
-    position.totalNumber += tr.number;
-
-    TradeRecord new_tr(tr);
-    new_tr.cash = m_cash;
-    m_trade_list.push_back(new_tr);
-    return true;
-}
-
-bool TradeManager::_add_bonus_tr(const TradeRecord& tr) {
-    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
-    HKU_ERROR_IF_RETURN(tr.realPrice <= 0.0, false, "tr.realPrice <= 0.0!");
-
-    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
-    HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), false, "No position!");
-
-    PositionRecord& position = pos_iter->second;
-    position.sellMoney += tr.realPrice;
-    m_cash += tr.realPrice;
-
-    TradeRecord new_tr(tr);
-    new_tr.cash = m_cash;
-    m_trade_list.push_back(new_tr);
     return true;
 }
 

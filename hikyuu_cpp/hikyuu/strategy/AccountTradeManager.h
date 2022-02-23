@@ -423,7 +423,7 @@ public:
     }
 
     /** 字符串输出 */
-    virtual string str() override {
+    virtual string str() const override {
         HKU_WARN("The subclass does not implement this method");
         return string();
     }

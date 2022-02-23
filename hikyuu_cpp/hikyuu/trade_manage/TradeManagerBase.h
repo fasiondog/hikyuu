@@ -559,6 +559,16 @@ public:
     }
 
     /**
+     * 获取账户当前时刻的资产详情
+     * @param ktype 日期的类型
+     * @return 资产详情
+     */
+    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const {
+        HKU_WARN("The subclass does not implement this method");
+        return FundsRecord();
+    }
+
+    /**
      * 获取指定时刻的资产市值详情
      * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
      * @param ktype 日期的类型
@@ -604,7 +614,7 @@ public:
     }
 
     /** 字符串输出 */
-    virtual string str() {
+    virtual string str() const {
         HKU_WARN("The subclass does not implement this method");
         return string();
     }
@@ -663,12 +673,12 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeManagerBase)
 typedef shared_ptr<TradeManagerBase> TradeManagerPtr;
 typedef shared_ptr<TradeManagerBase> TMPtr;
 
-inline std::ostream& operator<<(std::ostream& os, TradeManagerBase& tm) {
+inline std::ostream& operator<<(std::ostream& os, const TradeManagerBase& tm) {
     os << tm.str();
     return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, TradeManagerPtr& ptm) {
+inline std::ostream& operator<<(std::ostream& os, const TradeManagerPtr& ptm) {
     if (ptm) {
         os << ptm->str();
     } else {

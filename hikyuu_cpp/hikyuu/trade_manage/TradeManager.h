@@ -326,6 +326,13 @@ public:
                              double number) override;
 
     /**
+     * 获取账户当前时刻的资产详情
+     * @param ktype 日期的类型
+     * @return 资产详情
+     */
+    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override;
+
+    /**
      * 获取指定时刻的资产市值详情
      * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
      * @param ktype 日期的类型
@@ -362,7 +369,7 @@ public:
     virtual bool addTradeRecord(const TradeRecord& tr) override;
 
     /** 字符串输出 */
-    virtual string str() override;
+    virtual string str() const override;
 
     /**
      * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
@@ -377,8 +384,6 @@ private:
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);
     bool _add_sell_tr(const TradeRecord&);
-    bool _add_gift_tr(const TradeRecord&);
-    bool _add_bonus_tr(const TradeRecord&);
     bool _add_checkin_tr(const TradeRecord&);
     bool _add_checkout_tr(const TradeRecord&);
     bool _add_checkin_stock_tr(const TradeRecord&);

@@ -36,18 +36,10 @@ public:
     }
 
     SystemWeight(const SystemWeight&) = default;
-
     SystemWeight(SystemWeight&& sw) : m_sys(std::move(sw.m_sys)), m_weight(sw.m_weight) {}
 
     SystemWeight& operator=(const SystemWeight& other) = default;
-
-    SystemWeight& operator=(SystemWeight&& other) {
-        if (this != &other) {
-            m_sys = std::move(other.m_sys);
-            m_weight = other.m_weight;
-        }
-        return *this;
-    }
+    SystemWeight& operator=(SystemWeight&& other);
 
     /** 析构函数 */
     virtual ~SystemWeight() {}

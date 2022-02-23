@@ -13,6 +13,10 @@
 using namespace boost::python;
 using namespace hku;
 
+FundsRecord (TradeManagerBase::*getFunds_1)(KQuery::KType) const = &TradeManagerBase::getFunds;
+FundsRecord (TradeManagerBase::*getFunds_2)(const Datetime&,
+                                            KQuery::KType) = &TradeManagerBase::getFunds;
+
 TradeCostPtr (TradeManagerBase::*get_costFunc)() const = &TradeManagerBase::costFunc;
 void (TradeManagerBase::*set_costFunc)(const TradeCostPtr&) = &TradeManagerBase::costFunc;
 
@@ -185,7 +189,8 @@ void export_TradeManager() {
     :param ktype: K线类型
     :rtype: float)")
 
-      .def("get_funds", &TradeManagerBase::getFunds, (arg("datetime"), arg("ktype") = KQuery::DAY),
+      .def("get_funds", getFunds_1, (arg("ktype")))
+      .def("get_funds", getFunds_2, (arg("datetime"), arg("ktype") = KQuery::DAY),
            R"(get_funds(self, [datetime, ktype = Query.DAY])
 
     获取指定时刻的资产市值详情
