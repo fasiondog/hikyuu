@@ -77,7 +77,8 @@ public:
     double getReservePercent();
 
     /**
-     * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为0
+     * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为参数 default_reserve_percent 的值
+     * @note 主要用分配算法动态控制不参与分配的资产比例
      * @param p 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
      */
     void setReservePercent(double p);
@@ -86,6 +87,7 @@ public:
     void reset();
 
     typedef shared_ptr<AllocateFundsBase> AFPtr;
+
     /** 克隆操作 */
     AFPtr clone();
 
@@ -121,14 +123,11 @@ private:
     bool _returnAssets(const SYSPtr& sys, const Datetime& date);
 
 private:
-    string m_name;
-    KQuery m_query;
-    int m_count;
-    Datetime m_pre_date;
-    TMPtr m_tm;
-    TMPtr m_shadow_tm;
-
-    double m_reserve_percent;  //保留资产比例，不参与资产分配
+    string m_name;      // 组件名称
+    KQuery m_query;     // 查询条件
+    TMPtr m_tm;         // 运行期由PF设定，PF的实际账户
+    TMPtr m_shadow_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
+    double m_reserve_percent;  // 保留资产比例，不参与资产分配
 
 //============================================
 // 序列化支持
@@ -141,8 +140,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_count);
-        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
@@ -152,8 +149,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_count);
-        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
     }

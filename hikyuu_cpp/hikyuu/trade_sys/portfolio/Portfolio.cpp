@@ -156,8 +156,6 @@ bool Portfolio::readyForRun() {
 }
 
 void Portfolio::runMoment(const Datetime& date) {
-    HKU_CHECK(isReady(), "Not ready to run! Please perform readyForRun() first!");
-
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
 
@@ -267,9 +265,9 @@ void Portfolio::run(const KQuery& query, bool force) {
         m_need_calculate = true;
     }
     HKU_IF_RETURN(!m_need_calculate, void());
-    HKU_CHECK(readyForRun(),
-              "readyForRun fails, check to see if a valid TradeManager, Selector, or "
-              "AllocateFunds instance have been specified.");
+    HKU_ERROR_IF_RETURN(!readyForRun(), void(),
+                        "readyForRun fails, check to see if a valid TradeManager, Selector, or "
+                        "AllocateFunds instance have been specified.");
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     for (auto& date : datelist) {

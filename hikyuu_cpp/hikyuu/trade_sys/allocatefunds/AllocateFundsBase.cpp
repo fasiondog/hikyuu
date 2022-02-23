@@ -26,28 +26,37 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AFPtr& af) {
     return os;
 }
 
-AllocateFundsBase::AllocateFundsBase()
-: m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()), m_reserve_percent(0) {
+AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase"), m_reserve_percent(0) {
     //是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
     setParam<bool>("adjust_running_sys", false);
-    setParam<int>("max_sys_num", 100000);     //最大系统实例数
-    setParam<double>("weight_unit", 0.0001);  //最小权重单位
+    setParam<int>("max_sys_num", 1000000);             // 允许运行的最大系统实例数
+    setParam<double>("weight_unit", 0.0001);           // 最小权重单位
+    setParam<double>("default_reserve_percent", 0.0);  // 默认保留不参与重分配的资产比例
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name)
-: m_name("AllocateMoneyBase"), m_count(0), m_pre_date(Datetime::min()), m_reserve_percent(0) {
+: m_name("AllocateMoneyBase"), m_reserve_percent(0) {
     setParam<bool>("adjust_running_sys", false);
-    setParam<int>("max_sys_num", 100000);     //最大系统实例数
-    setParam<double>("weight_unit", 0.0001);  //最小权重单位
+    setParam<int>("max_sys_num", 100000);              // 最大系统实例数
+    setParam<double>("weight_unit", 0.0001);           // 最小权重单位
+    setParam<double>("default_reserve_percent", 0.0);  // 默认保留不参与重分配的资产比例
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
 
 void AllocateFundsBase::reset() {
-    m_count = 0;
-    m_pre_date = Datetime::min();
-    m_reserve_percent = 0;
+    m_reserve_percent = getParam<double>("default_reserve_percent");
     _reset();
+
+    // 参数检查
+    HKU_ERROR_IF(getParam<int>("max_sys_num") <= 0, R"(AF param["max_sys_num"]({}) need > 0!)",
+                 getParam<int>("max_sys_num"));
+    HKU_ERROR_IF(
+      getParam<double>("default_reserve_percent") >= 1.0,
+      R"(AF param(default_reserve_percent)({}) >= 1.0, No asset adjustments will be made!)");
+    HKU_CHECK(getParam<double>("default_reserve_percent") >= 0.0,
+              R"(Invalid AF param["default_reserve_percent"] ({}))",
+              getParam<double>("default_reserve_percent"));
 }
 
 AFPtr AllocateFundsBase::clone() {
@@ -60,17 +69,17 @@ AFPtr AllocateFundsBase::clone() {
     }
 
     if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!");
+        HKU_WARN("Failed clone! Will use self-ptr!");
         return shared_from_this();
     }
 
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_query = m_query;
-    p->m_count = m_count;
-    p->m_pre_date = m_pre_date;
     p->m_reserve_percent = m_reserve_percent;
-    /*if (m_tm)
+
+    /* m_tm, m_shadow_tm 由 PF 运行时指定，不需要 clone
+    if (m_tm)
         p->m_tm = m_tm->clone();
     if (m_shadow_tm)
         p->m_shadow_tm = m_shadow_tm->clone();*/
@@ -78,7 +87,7 @@ AFPtr AllocateFundsBase::clone() {
 }
 
 void AllocateFundsBase::setReservePercent(double percent) {
-    HKU_CHECK_THROW(percent >= 0 && percent <= 1, std::out_of_range,
+    HKU_CHECK_THROW(percent >= 0.0 && percent <= 1.0, std::out_of_range,
                     "percent ({}) is out of range [0, 1]!");
     m_reserve_percent = percent;
 }
@@ -86,9 +95,6 @@ void AllocateFundsBase::setReservePercent(double percent) {
 void AllocateFundsBase::adjustFunds(const Datetime& date, const SystemList& se_list,
                                     const std::list<SYSPtr>& running_list,
                                     const SystemList& ignore_list) {
-    int max_num = getParam<int>("max_sys_num");
-    HKU_ERROR_IF_RETURN(max_num <= 0, void(), "param(max_sys_num) need > 0!");
-
     if (getParam<bool>("adjust_running_sys")) {
         _adjust_with_running(date, se_list, running_list, ignore_list);
     } else {
@@ -217,6 +223,9 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     price_t total_funds = _getTotalFunds(date, running_list);
 
     // 计算需保留的资产
+    HKU_ERROR_IF(m_reserve_percent < 0.0,
+                 "Invalid reserve_percent({}) in AF, Calculations that will cause errors!",
+                 m_reserve_percent);
     price_t reserve_funds = roundUp(total_funds * m_reserve_percent, precision);
 
     // 计算每单位权重资产
@@ -427,6 +436,9 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     price_t total_funds = _getTotalFunds(date, running_list);
 
     // 计算需保留的资产
+    HKU_ERROR_IF(m_reserve_percent < 0.0,
+                 "Invalid reserve_percent({}) in AF, Calculations that will cause errors!",
+                 m_reserve_percent);
     price_t reserve_funds = total_funds * m_reserve_percent;
 
     // 如果当前现金小于等于需保留的资产，则直接返回
