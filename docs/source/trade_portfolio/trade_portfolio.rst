@@ -8,4 +8,4 @@
 
    portfolio
    selector
-   allcate_funds
+   allocate_funds

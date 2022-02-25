@@ -65,30 +65,47 @@ void export_AllocateFunds() {
 
     class_<SystemWeightList>("SystemWeightList").def(vector_indexing_suite<SystemWeightList>());
 
-    // SystemWeightList::const_reference (SystemWeightList::*SystemWeightList_at)(
-    //   SystemWeightList::size_type) const = &SystemWeightList::at;
-    // void (SystemWeightList::*append)(const SystemWeight&) = &SystemWeightList::push_back;
-    // class_<SystemWeightList>("SystemWeightList")
-    //   .def("__iter__", iterator<SystemWeightList>())
-    //   .def("size", &SystemWeightList::size)
-    //   .def("__len__", &SystemWeightList::size)
-    //   .def("get", SystemWeightList_at, return_value_policy<copy_const_reference>())
-    //   .def("append", append);
+    class_<AllocateFundsBaseWrap, boost::noncopyable>("AllocateFundsBase",
+                                                      R"(资产分配算法基类, 子类接口：
 
-    class_<AllocateFundsBaseWrap, boost::noncopyable>("AllocateFundsBase", init<>())
+    - _allocateWeight : 【必须】子类资产分配调整实现
+    - _clone : 【必须】克隆接口
+    - _reset : 【可选】重载私有变量)",
+                                                      init<>())
+
       .def(init<const string&>())
       .def(self_ns::str(self))
       .def(self_ns::repr(self))
       .add_property("name", make_function(af_get_name, return_value_policy<copy_const_reference>()),
                     af_set_name, "算法组件名称")
-      .def("get_param", &AllocateFundsBase::getParam<boost::any>)
-      .def("set_param", &AllocateFundsBase::setParam<object>)
-      .def("have_param", &AllocateFundsBase::haveParam)
+      .add_property(
+        "query",
+        make_function(&AllocateFundsBase::getQuery, return_value_policy<copy_const_reference>()),
+        &AllocateFundsBase::setQuery, "设置或获取查询条件")
 
-      .def("reset", &AllocateFundsBase::reset)
-      .def("clone", &AllocateFundsBase::clone)
-      .def("_reset", &AllocateFundsBase::_reset, &AllocateFundsBaseWrap::default_reset)
-      .def("_clone", pure_virtual(&AllocateFundsBase::_clone))
+      .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
+
+    获取指定的参数
+
+    :param str name: 参数名称
+    :return: 参数值
+    :raises out_of_range: 无此参数)")
+
+      .def("set_param", &AllocateFundsBase::setParam<object>, R"(set_param(self, name, value)
+
+    设置参数
+
+    :param str name: 参数名称
+    :param value: 参数值
+    :raises logic_error: Unsupported type! 不支持的参数类型)")
+
+      .def("have_param", &AllocateFundsBase::haveParam, "是否存在指定参数")
+
+      .def("reset", &AllocateFundsBase::reset, "复位操作")
+      .def("clone", &AllocateFundsBase::clone, "克隆操作")
+      .def("_reset", &AllocateFundsBase::_reset, &AllocateFundsBaseWrap::default_reset,
+           "子类复位操作实现")
+      .def("_clone", pure_virtual(&AllocateFundsBase::_clone), "子类克隆操作实现接口")
       .def("_allocate_weight", pure_virtual(&AllocateFundsBase::_allocateWeight))
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(name_init_pickle_suite<AllocateFundsBase>())
@@ -97,6 +114,9 @@ void export_AllocateFunds() {
 
     register_ptr_to_python<AFPtr>();
 
-    def("AF_EqualWeight", AF_EqualWeight);
-    def("AF_FixedWeight", AF_FixedWeight);
+    def("AF_EqualWeight", AF_EqualWeight, R"(等权重资产分配，对选中的资产进行等比例分配)");
+
+    def("AF_FixedWeight", AF_FixedWeight, R"(固定比例资产分配
+
+    :param float weight:  指定的资产比例 [0, 1])");
 }

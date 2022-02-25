@@ -59,21 +59,23 @@ public:
                      const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
 
     /** 获取交易账户 */
-    TMPtr getTM();
+    const TMPtr& getTM() const;
 
-    /** 设定交易账户 */
+    /** 设定交易账户，由 PF 设定 */
     void setTM(const TMPtr&);
 
     /** 设置 Portfolio 的影子账户, 仅由 Portfolio 调用 */
     void setShadowTM(const TMPtr&);
 
-    /** 获取关联查询条件 */
-    KQuery getQuery();
+    const TMPtr& getShadowTM(const TMPtr&) const;
 
-    /** 设置查询条件 */
+    /** 获取关联查询条件 */
+    const KQuery& getQuery() const;
+
+    /** 设置查询条件， 由 PF 设定 */
     void setQuery(const KQuery& query);
 
-    /** 获取不参与资产分配的保留比例 */
+    /** 获取当前不参与资产分配的保留比例 */
     double getReservePercent();
 
     /**
@@ -207,7 +209,7 @@ inline void AllocateFundsBase::name(const string& name) {
     m_name = name;
 }
 
-inline TMPtr AllocateFundsBase::getTM() {
+inline const TMPtr& AllocateFundsBase::getTM() const {
     return m_tm;
 }
 
@@ -219,7 +221,11 @@ inline void AllocateFundsBase::setShadowTM(const TMPtr& tm) {
     m_shadow_tm = tm;
 }
 
-inline KQuery AllocateFundsBase::getQuery() {
+inline const TMPtr& AllocateFundsBase::getShadowTM(const TMPtr&) const {
+    return m_shadow_tm;
+}
+
+inline const KQuery& AllocateFundsBase::getQuery() const {
     return m_query;
 }
 

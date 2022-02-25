@@ -27,7 +27,7 @@ SystemWeightList FixedWeightAllocateFunds ::_allocateWeight(const Datetime& date
 }
 
 AFPtr HKU_API AF_FixedWeight(double weight) {
-    HKU_CHECK_THROW(weight > 0 && weight <= 1, std::out_of_range,
+    HKU_CHECK_THROW(weight > 0.0 && weight <= 1.0, std::out_of_range,
                     "input weigth ({}) is out of range [0, 1]!", weight);
     auto p = make_shared<FixedWeightAllocateFunds>();
     p->setParam<double>("weight", weight);

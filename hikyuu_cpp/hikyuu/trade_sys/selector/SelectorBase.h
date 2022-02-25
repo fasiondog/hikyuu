@@ -104,8 +104,6 @@ private:
 
 protected:
     string m_name;
-    int m_count;
-    Datetime m_pre_date;
     SystemList m_pro_sys_list;  // 原型系统列表
     SystemList m_real_sys_list;  // PF组合中实际运行的系统，有PF执行时设定，顺序与原型列表一一对应
 
@@ -119,8 +117,6 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_count);
-        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
     }
 
@@ -128,8 +124,6 @@ private:
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_count);
-        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
         ar& BOOST_SERIALIZATION_NVP(m_pro_sys_list);
     }
 
