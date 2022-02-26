@@ -68,6 +68,7 @@ bool py_se_add_stock_list(SelectorBase& se, py::list stock_list, const SystemPtr
 
 void export_Selector() {
     class_<SelectorWrap, boost::noncopyable>(
+      "SelectorBase",
       R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：
 
     - get_selected_on_open - 【必须】获取指定时刻开盘时选择的系统实例列表
