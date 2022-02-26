@@ -113,6 +113,9 @@ bool Portfolio::_readyForRun() {
         return false;
     }
 
+    // se算法和af算法不匹配时，给出告警
+    HKU_WARN_IF(!m_se->isMatchAF(m_af), "The current SE and AF do not match!");
+
     reset();
 
     // 将影子账户指定给资产分配器

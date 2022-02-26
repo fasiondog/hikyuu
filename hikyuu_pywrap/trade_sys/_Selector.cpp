@@ -32,6 +32,10 @@ public:
         this->SelectorBase::_reset();
     }
 
+    bool isMatchAF(const AFPtr& af) {
+        return this->get_override("is_match_af")(af);
+    }
+
     SystemList getSelectedOnOpen(Datetime date) {
         return this->get_override("get_selected_on_open")(date);
     }
@@ -132,6 +136,12 @@ void export_Selector() {
       .def("_reset", &SelectorBase::_reset, &SelectorWrap::default_reset, "子类复位操作实现")
       .def("_clone", pure_virtual(&SelectorBase::_clone), "子类克隆操作实现接口")
       .def("_calculate", pure_virtual(&SelectorBase::_calculate), "【重载接口】子类计算接口")
+
+      .def("is_match_af", pure_virtual(&SelectorBase::isMatchAF), R"(is_match_af(self)
+
+    【重载接口】判断是否和 AF 匹配
+
+    :param AllocateFundsBase af: 资产分配算法)")
 
       .def("get_selected_on_open", pure_virtual(&SelectorBase::getSelectedOnOpen),
            R"(get_selected_on_open(self, datetime)

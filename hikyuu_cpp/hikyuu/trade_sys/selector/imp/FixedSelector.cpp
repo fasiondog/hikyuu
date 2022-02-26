@@ -13,6 +13,10 @@ FixedSelector::FixedSelector() : SelectorBase("SE_Fixed") {}
 
 FixedSelector::~FixedSelector() {}
 
+bool FixedSelector::isMatchAF(const AFPtr& af) {
+    return true;
+}
+
 SystemList FixedSelector::getSelectedOnOpen(Datetime date) {
     SystemList result;
     for (auto& sys : m_real_sys_list) {

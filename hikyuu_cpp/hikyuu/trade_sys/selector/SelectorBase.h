@@ -10,6 +10,7 @@
 #define TRADE_SYS_SELECTOR_SELECTORBASE_H_
 
 #include "../system/System.h"
+#include "../allocatefunds/AllocateFundsBase.h"
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
 
@@ -107,6 +108,8 @@ public:
     /** 子类获取指定时刻收盘时选中的标的 */
     virtual SystemList getSelectedOnClose(Datetime date) = 0;
 
+    virtual bool isMatchAF(const AFPtr& af) = 0;
+
 private:
     friend class HKU_API Portfolio;
 
@@ -178,6 +181,7 @@ public:                                                            \
     }                                                              \
     virtual SystemList getSelectedOnOpen(Datetime date) override;  \
     virtual SystemList getSelectedOnClose(Datetime date) override; \
+    virtual bool isMatchAF(const AFPtr& af) override;              \
     virtual void _calculate() override;
 
 /**

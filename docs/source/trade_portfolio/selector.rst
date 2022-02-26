@@ -35,6 +35,7 @@
 
 自定义选择器策略接口：
 
+* :py:meth:`SelectorBase.is_match_af` - 【必须】判断是否和AF匹配
 * :py:meth:`SelectorBase.get_selected_on_open` - 【必须】获取指定时刻开盘时选择的系统实例列表
 * :py:meth:`SelectorBase.get_selected_on_close` - 【必须】获取指定时刻收盘时选择的系统实例列表
 * :py:meth:`SelectorBase._calculate` - 【必须】计算接口
@@ -102,7 +103,14 @@
     .. py:method:: clear(self)
     
         清除已加入的系统策略实例
-    
+
+    .. py:method:: is_match_af(self)
+
+        【重载接口】判断是否和 AF 匹配
+
+        :param AllocateFundsBase af: 资产分配算法
+
+
     .. py:method:: get_selected_on_open(self, datetime)
     
         【重载接口】获取指定时刻开盘时选取的系统实例
