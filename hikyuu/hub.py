@@ -419,21 +419,18 @@ class HubManager(metaclass=SingletonType):
             'name': name,
             'author': part_model.author,
             'version': part_model.version,
-            'hku_min_version': part_model.hku_min_version if 'hku_min_version' in part_model.__dict__ else None,
             'doc': part_model.doc,
         }
 
     def print_part_info(self, name):
         info = self.get_part_info(name)
-        print('+-----------------+------------------------------------------------')
-        print('| name            | ', info['name'])
-        print('+-----------------+------------------------------------------------')
-        print('| author          | ', info['author'])
-        print('+-----------------+------------------------------------------------')
-        print('| version         | ', info['version'])
-        print('+-----------------+------------------------------------------------')
-        print('| hku_min_version | ', info['hku_min_version'])
-        print('+-----------------+------------------------------------------------')
+        print('+---------+------------------------------------------------')
+        print('| name    | ', info['name'])
+        print('+---------+------------------------------------------------')
+        print('| author  | ', info['author'])
+        print('+---------+------------------------------------------------')
+        print('| version | ', info['version'])
+        print('+---------+------------------------------------------------')
         #print('\n')
         print(info['doc'])
         #print('\n')
