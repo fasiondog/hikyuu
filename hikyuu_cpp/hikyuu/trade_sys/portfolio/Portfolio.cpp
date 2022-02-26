@@ -91,7 +91,7 @@ PortfolioPtr Portfolio::clone() {
     return p;
 }
 
-bool Portfolio::readyForRun() {
+bool Portfolio::_readyForRun() {
     if (!m_se) {
         HKU_WARN("m_se is null!");
         m_is_ready = false;
@@ -155,7 +155,7 @@ bool Portfolio::readyForRun() {
     return true;
 }
 
-void Portfolio::runMoment(const Datetime& date) {
+void Portfolio::_runMoment(const Datetime& date) {
     // 当前日期小于账户建立日期，直接忽略
     HKU_IF_RETURN(date < m_shadow_tm->initDatetime(), void());
 
@@ -265,49 +265,15 @@ void Portfolio::run(const KQuery& query, bool force) {
         m_need_calculate = true;
     }
     HKU_IF_RETURN(!m_need_calculate, void());
-    HKU_ERROR_IF_RETURN(!readyForRun(), void(),
+    HKU_ERROR_IF_RETURN(!_readyForRun(), void(),
                         "readyForRun fails, check to see if a valid TradeManager, Selector, or "
                         "AllocateFunds instance have been specified.");
 
     DatetimeList datelist = StockManager::instance().getTradingCalendar(query);
     for (auto& date : datelist) {
-        runMoment(date);
+        _runMoment(date);
     }
     m_need_calculate = false;
-}
-
-FundsRecord Portfolio::getFunds(const Datetime& datetime, KQuery::KType ktype) {
-    FundsRecord total_funds;
-    for (auto& sub_sys : m_real_sys_list) {
-        FundsRecord funds = sub_sys->getTM()->getFunds(datetime, ktype);
-        total_funds += funds;
-    }
-    total_funds.cash += m_shadow_tm->cash(datetime, ktype);
-    return total_funds;
-}
-
-PriceList Portfolio::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
-    size_t total = dates.size();
-    PriceList result(total);
-    for (auto& sub_sys : m_real_sys_list) {
-        auto curve = sub_sys->getTM()->getFundsCurve(dates, ktype);
-        for (auto i = 0; i < total; i++) {
-            result[i] += curve[i];
-        }
-    }
-    return result;
-}
-
-PriceList Portfolio::getProfitCurve(const DatetimeList& dates, KQuery::KType ktype) {
-    size_t total = dates.size();
-    PriceList result(total);
-    for (auto& sub_sys : m_real_sys_list) {
-        auto curve = sub_sys->getTM()->getProfitCurve(dates, ktype);
-        for (auto i = 0; i < total; i++) {
-            result[i] += curve[i];
-        }
-    }
-    return result;
 }
 
 } /* namespace hku */

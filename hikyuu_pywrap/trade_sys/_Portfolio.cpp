@@ -19,14 +19,6 @@ namespace py = boost::python;
 void (Portfolio::*pf_set_name)(const string&) = &Portfolio::name;
 const string& (Portfolio::*pf_get_name)() const = &Portfolio::name;
 
-py::list get_real_sys_list(const Portfolio& pf) {
-    return vector_to_py_list<SystemList>(pf.getRealSystemList());
-}
-
-py::list get_proto_sys_list(const Portfolio& pf) {
-    return vector_to_py_list<SystemList>(pf.getProtoSystemList());
-}
-
 void export_Portfolio() {
     class_<Portfolio>("Portfolio", R"(实现多标的、多策略的投资组合)", init<>())
       .def(init<const string&>())
@@ -35,20 +27,44 @@ void export_Portfolio() {
       .def(self_ns::str(self))
       .def(self_ns::repr(self))
 
-      .def("get_param", &Portfolio::getParam<boost::any>)
-      .def("set_param", &Portfolio::setParam<object>)
-      .def("have_param", &Portfolio::haveParam)
-
       .add_property("name", make_function(pf_get_name, return_value_policy<copy_const_reference>()),
                     pf_set_name, "名称")
+      .add_property(
+        "query", make_function(&Portfolio::getQuery, return_value_policy<copy_const_reference>()),
+        &Portfolio::setQuery, "查询条件")
+
       .add_property("tm", &Portfolio::getTM, &Portfolio::setTM, "设置或获取交易管理对象")
       .add_property("se", &Portfolio::getSE, &Portfolio::setSE, "设置或获取交易对象选择算法")
+      .add_property("af", &Portfolio::getAF, &Portfolio::setAF, "设置或获取资产分配算法")
+      .add_property(
+        "proto_sys_list",
+        make_function(&Portfolio::getProtoSystemList, return_value_policy<copy_const_reference>()),
+        "获取原型系统列")
+      .add_property(
+        "real_sys_list",
+        make_function(&Portfolio::getRealSystemList, return_value_policy<copy_const_reference>()),
+        "由 PF 运行时设定的实际运行系统列表")
 
-      .def("reset", &Portfolio::reset)
-      .def("clone", &Portfolio::clone)
+      .def("get_param", &Portfolio::getParam<boost::any>, R"(get_param(self, name)
 
-      //.def("readyForRun", &Portfolio::readyForRun)
-      //.def("runMoment", &Portfolio::runMoment)
+    获取指定的参数
+
+    :param str name: 参数名称
+    :return: 参数值
+    :raises out_of_range: 无此参数)")
+
+      .def("set_param", &Portfolio::setParam<object>, R"(set_param(self, name, value)
+
+    设置参数
+
+    :param str name: 参数名称
+    :param value: 参数值
+    :raises logic_error: Unsupported type! 不支持的参数类型)")
+
+      .def("have_param", &Portfolio::haveParam, "是否存在指定参数")
+
+      .def("reset", &Portfolio::reset, "复位操作")
+      .def("clone", &Portfolio::clone, "克隆操作")
 
       .def("run", &Portfolio::run, (arg("query"), arg("force") = false), R"(run(self, query)
     
@@ -57,39 +73,6 @@ void export_Portfolio() {
         
     :param Query query: 查询条件
     :param bool force: 强制重新计算)")
-
-      .def("get_real_sys_list", get_real_sys_list, "获取实际运行的子账户系统列表")
-      .def("get_proto_sys_list", get_proto_sys_list, "获取原型系统列表")
-
-      .def("get_funds", &Portfolio::getFunds, (arg("datetime"), arg("ktype") = KQuery::DAY),
-           R"(get_funds(self, [datetime, ktype = Query.DAY])
-
-    获取指定时刻的资产市值详情
-
-    :param Datetime datetime:  指定时刻
-    :param Query.KType ktype: K线类型
-    :rtype: FundsRecord)")
-
-      .def("get_funds_curve", &Portfolio::getFundsCurve, (arg("dates"), arg("ktype") = KQuery::DAY),
-           R"(get_funds_curve(self, dates[, ktype = Query.DAY])
-
-    获取资产净值曲线
-
-    :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的资产净值曲线
-    :param Query.KType ktype: K线类型，必须与日期列表匹配
-    :return: 资产净值列表
-    :rtype: PriceList)")
-
-      .def("get_profit_curve", &Portfolio::getProfitCurve,
-           (arg("dates"), arg("ktype") = KQuery::DAY),
-           R"(get_profit_curve(self, dates[, ktype = Query.DAY])
-
-    获取收益曲线，即扣除历次存入资金后的资产净值曲线
-
-    :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
-    :param Query.KType ktype: K线类型，必须与日期列表匹配
-    :return: 收益曲线
-    :rtype: PriceList)")
 
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(name_init_pickle_suite<Portfolio>())

@@ -49,6 +49,10 @@
     选择器策略基类，实现标的、系统策略的评估和选取算法
     
     .. py:attribute:: name 名称
+
+    .. py:attribute:: proto_sys_list 原型系统列表
+
+    .. py:attribute:: real_sys_list 运行时的实际系统列表
     
     .. py:method:: __init__(self[, name="SelectorBase])
     
@@ -73,6 +77,14 @@
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型  
 
+    .. py:method:: reset(self)
+    
+        复位操作
+    
+    .. py:method:: clone(self)
+    
+        克隆操作        
+        
     .. py:method:: add_stock(self, stock, sys)
 
         加入初始标的及其对应的系统策略原型

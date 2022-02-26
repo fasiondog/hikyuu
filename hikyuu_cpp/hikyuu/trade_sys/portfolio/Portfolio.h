@@ -28,23 +28,31 @@ class HKU_API Portfolio : public enable_shared_from_this<Portfolio> {
     PARAMETER_SUPPORT
 
 public:
+    /** 默认构造函数 */
     Portfolio();
+
+    /**
+     * @brief 指定名称的构造函数
+     * @param name 名称
+     */
     Portfolio(const string& name);
+
+    /**
+     * @brief 构造函数
+     * @param tm 账户
+     * @param st 选择器
+     * @param af 资产分配算法
+     */
     Portfolio(const TradeManagerPtr& tm, const SelectorPtr& st, const AFPtr& af);
+
+    /** 析构函数 */
     virtual ~Portfolio();
 
-    const string& name() const {
-        return m_name;
-    }
-    void name(const string& name) {
-        m_name = name;
-    }
+    /** 组合名称 */
+    const string& name() const;
 
-    bool isReady() const {
-        return m_is_ready;
-    }
-
-    bool readyForRun();
+    /** 设置组合名称 */
+    void name(const string& name);
 
     /**
      * @brief 运行资产组合
@@ -55,89 +63,49 @@ public:
      */
     void run(const KQuery& query, bool force = false);
 
-    void runMoment(const Datetime& datetime);
+    /** 修改查询条件 */
+    void setQuery(const KQuery& query);
 
-    void setQuery(const KQuery& query) {
-        if (m_query != query) {
-            m_query = query;
-            m_need_calculate = true;
-        }
-    }
+    /** 获取查询条件 */
+    const KQuery& getQuery() const;
 
-    KQuery getQuery() const {
-        return m_query;
-    }
+    /** 获取账户 */
+    TMPtr getTM() const;
 
-    TMPtr getTM() {
-        return m_tm;
-    }
-    SEPtr getSE() {
-        return m_se;
-    }
-    AFPtr getAF() {
-        return m_af;
-    }
+    /** 设置账户 */
+    void setTM(const TMPtr& tm);
 
-    void setTM(const TMPtr& tm) {
-        if (m_tm != tm) {
-            m_tm = tm;
-            m_need_calculate = true;
-        }
-    }
+    /** 获取选择器 */
+    SEPtr getSE() const;
 
-    void setSE(const SEPtr& se) {
-        if (m_se != se) {
-            m_se = se;
-            m_need_calculate = true;
-        }
-    }
+    /** 设置选择器 */
+    void setSE(const SEPtr& se);
 
-    void setAF(const AFPtr& af) {
-        if (m_af != af) {
-            m_af = af;
-            m_need_calculate = true;
-        }
-    }
+    /** 获取资产分配算法 */
+    AFPtr getAF() const;
 
+    /** 设置资产分配算法 */
+    void setAF(const AFPtr& af);
+
+    /** 复位操作 */
     void reset();
 
     typedef shared_ptr<Portfolio> PortfolioPtr;
+
+    /** 克隆操作 */
     PortfolioPtr clone();
 
-    const SystemList& getProtoSystemList() const {
-        return m_pro_sys_list;
-    }
+    /** 获取所有原型系统列表，与 SE 同 */
+    const SystemList& getProtoSystemList() const;
 
-    const SystemList& getRealSystemList() const {
-        return m_real_sys_list;
-    }
-
-    /**
-     * 获取指定时刻的资产市值详情
-     * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
-     * @param ktype 日期的类型
-     * @return 资产详情
-     * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
-     */
-    FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY);
-
-    /**
-     * 获取资产净值曲线，含借入的资产
-     * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
-     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
-     * @return 资产净值列表
-     */
-    PriceList getFundsCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
-
-    /**
-     * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
-     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
-     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
-     * @return 收益曲线
-     */
-    PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY);
+    /** 获取所有实际运行的系统列表，与 SE 同 */
+    const SystemList& getRealSystemList() const;
 
 private:
+    /** 运行前准备 */
+    bool _readyForRun();
+
+    void _runMoment(const Datetime& datetime);
     void _runMomentOnOpen(const Datetime& datetime);
     void _runMomentOnClose(const Datetime& datetime);
 
@@ -198,6 +166,66 @@ typedef shared_ptr<Portfolio> PFPtr;
 
 HKU_API std::ostream& operator<<(std::ostream&, const Portfolio&);
 HKU_API std::ostream& operator<<(std::ostream&, const PortfolioPtr&);
+
+inline const string& Portfolio::name() const {
+    return m_name;
+}
+
+inline void Portfolio::name(const string& name) {
+    m_name = name;
+}
+
+inline void Portfolio::setQuery(const KQuery& query) {
+    if (m_query != query) {
+        m_query = query;
+        m_need_calculate = true;
+    }
+}
+
+inline const KQuery& Portfolio::getQuery() const {
+    return m_query;
+}
+
+inline TMPtr Portfolio::getTM() const {
+    return m_tm;
+}
+
+inline void Portfolio::setTM(const TMPtr& tm) {
+    if (m_tm != tm) {
+        m_tm = tm;
+        m_need_calculate = true;
+    }
+}
+
+inline SEPtr Portfolio::getSE() const {
+    return m_se;
+}
+
+inline void Portfolio::setSE(const SEPtr& se) {
+    if (m_se != se) {
+        m_se = se;
+        m_need_calculate = true;
+    }
+}
+
+inline AFPtr Portfolio::getAF() const {
+    return m_af;
+}
+
+inline void Portfolio::setAF(const AFPtr& af) {
+    if (m_af != af) {
+        m_af = af;
+        m_need_calculate = true;
+    }
+}
+
+inline const SystemList& Portfolio::getProtoSystemList() const {
+    return m_pro_sys_list;
+}
+
+inline const SystemList& Portfolio::getRealSystemList() const {
+    return m_real_sys_list;
+}
 
 } /* namespace hku */
 
