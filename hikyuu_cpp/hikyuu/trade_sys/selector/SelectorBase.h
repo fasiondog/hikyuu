@@ -31,19 +31,23 @@ class HKU_API SelectorBase : public enable_shared_from_this<SelectorBase> {
     PARAMETER_SUPPORT
 
 public:
+    /** 默认构造函数 */
     SelectorBase();
-    SelectorBase(const string& name);
-    virtual ~SelectorBase();
-
-    string name() const;
-    void name(const string& name);
 
     /**
-     * 加入备选的系统策略，该策略必须已经指定关联的stock
-     * @param sys 备选的系统策略
-     * @return 加入无效的sys或未系统未关联stock返回 false， 否则返回 true
+     * 构造函数，同时指定算法名称
+     * @param name 指定名称
      */
-    bool addSystem(const SystemPtr& sys);
+    SelectorBase(const string& name);
+
+    /** 析构函数 */
+    virtual ~SelectorBase();
+
+    /** 获取算法名称 */
+    const string& name() const;
+
+    /** 设置算法名称 */
+    void name(const string& name);
 
     /**
      * 添加备选股票及其交易策略原型
@@ -62,13 +66,17 @@ public:
      */
     bool addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
-    SystemList getRealSystemList() const {
-        return m_real_sys_list;
-    }
+    /**
+     * @brief 获取原型系统列表
+     * @return const SystemList&
+     */
+    const SystemList& getProtoSystemList() const;
 
-    SystemList getProtoSystemList() const {
-        return m_pro_sys_list;
-    }
+    /**
+     * @brief 获取由 PF 实际运行的系统列表
+     * @return const SystemList&
+     */
+    const SystemList& getRealSystemList() const;
 
     /**
      * @brief 复位
@@ -84,9 +92,6 @@ public:
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    virtual SystemList getSelectedOnOpen(Datetime date) = 0;
-    virtual SystemList getSelectedOnClose(Datetime date) = 0;
-
     /** 子类复位接口 */
     virtual void _reset() {}
 
@@ -95,6 +100,12 @@ public:
 
     /** 子类计算接口 */
     virtual void _calculate() = 0;
+
+    /** 子类获取指定时刻开盘时选中的标的 */
+    virtual SystemList getSelectedOnOpen(Datetime date) = 0;
+
+    /** 子类获取指定时刻收盘时选中的标的 */
+    virtual SystemList getSelectedOnClose(Datetime date) = 0;
 
 private:
     friend class HKU_API Portfolio;
@@ -179,12 +190,20 @@ typedef shared_ptr<SelectorBase> SEPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const SelectorBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const SelectorPtr&);
 
-inline string SelectorBase::name() const {
+inline const string& SelectorBase::name() const {
     return m_name;
 }
 
 inline void SelectorBase::name(const string& name) {
     m_name = name;
+}
+
+inline const SystemList& SelectorBase::getRealSystemList() const {
+    return m_real_sys_list;
+}
+
+inline const SystemList& SelectorBase::getProtoSystemList() const {
+    return m_pro_sys_list;
 }
 
 } /* namespace hku */

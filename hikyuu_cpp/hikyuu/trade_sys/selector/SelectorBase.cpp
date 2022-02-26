@@ -84,15 +84,6 @@ void SelectorBase::calculate(const SystemList& sysList, const KQuery& query) {
     _calculate();
 }
 
-bool SelectorBase::addSystem(const SystemPtr& sys) {
-    HKU_ERROR_IF_RETURN(!sys, false, "Try add null sys, will be discard!");
-    HKU_ERROR_IF_RETURN(sys->getStock().isNull(), false, "sys has not bind stock!");
-    HKU_ERROR_IF_RETURN(!sys->getMM(), false, "sys has not MoneyManager!");
-    HKU_ERROR_IF_RETURN(!sys->getSG(), false, "sys has not Siganl!");
-    m_pro_sys_list.emplace_back(sys);
-    return true;
-}
-
 bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "Try add Null stock, will be discard!");
     HKU_ERROR_IF_RETURN(!protoSys, false, "Try add Null protoSys, will be discard!");
