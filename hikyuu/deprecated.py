@@ -30,9 +30,7 @@ def deprecated_attr(name_dict):
                 else:
                     print(
                         #'Deprecated warning: the "{}.{}" will be deprecated, please use: "{}.{}"'.
-                        '警告: "{}.{}" 即将被废弃，请使用 "{}.{}" 代替'.format(
-                            clzname, name, clzname, name_dict[name]
-                        )
+                        '警告: "{}.{}" 即将被废弃，请使用 "{}.{}" 代替'.format(clzname, name, clzname, name_dict[name])
                     )
                 return func(self, name_dict[name])
             if name not in dir(self):
@@ -529,13 +527,11 @@ def StockManager_getattr(self, name):
 StockManager.__getattr__ = StockManager_getattr
 
 
-@deprecated_attr(
-    {
-        'tickValue': 'tick_value',
-        'minTradeNumber': 'min_trade_num',
-        'maxTradeNumber': 'max_trade_num',
-    }
-)
+@deprecated_attr({
+    'tickValue': 'tick_value',
+    'minTradeNumber': 'min_trade_num',
+    'maxTradeNumber': 'max_trade_num',
+})
 def StockTypeInfo_getattr(self, name):
     return getattr(self, name)
 

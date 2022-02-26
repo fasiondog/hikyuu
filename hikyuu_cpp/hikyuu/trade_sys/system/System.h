@@ -33,106 +33,116 @@ class HKU_API System {
     PARAMETER_SUPPORT
 
 public:
+    /** 默认构造函数 */
     System();
+
+    /** 指定系统名称的构造函数 */
     System(const string& name);
+
+    /**
+     * @brief 构造函数
+     *
+     * @param tm 指定账户
+     * @param mm 指定资金管理策略
+     * @param ev 指定市场环境判断策略
+     * @param cn 指定系统条件判断策略
+     * @param sg 指定信号指示器
+     * @param st 指定止损策略
+     * @param tp 指定止盈策略
+     * @param pg 指定目标盈利策略
+     * @param sp 指定移滑价差算法
+     * @param name 系统名称
+     */
     System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const EnvironmentPtr& ev,
            const ConditionPtr& cn, const SignalPtr& sg, const StoplossPtr& st,
            const StoplossPtr& tp, const ProfitGoalPtr& pg, const SlippagePtr& sp,
            const string& name);
+
+    /** 析构函数 */
     virtual ~System();
 
     typedef SystemPart Part;
 
     /** 获取名称 */
-    string name() const;
+    const string& name() const;
 
     /** 设置名称 */
     void name(const string& name);
 
-    KData getTO() const {
-        return m_kdata;
-    }
-    TradeManagerPtr getTM() const {
-        return m_tm;
-    }
-    MoneyManagerPtr getMM() const {
-        return m_mm;
-    }
-    EnvironmentPtr getEV() const {
-        return m_ev;
-    }
-    ConditionPtr getCN() const {
-        return m_cn;
-    }
-    SignalPtr getSG() const {
-        return m_sg;
-    }
-    StoplossPtr getST() const {
-        return m_st;
-    }
-    StoplossPtr getTP() const {
-        return m_tp;
-    }
-    ProfitGoalPtr getPG() const {
-        return m_pg;
-    }
-    SlippagePtr getSP() const {
-        return m_sp;
-    }
+    /** 获取交易对象 */
+    KData getTO() const;
 
-    void setTM(const TradeManagerPtr& tm) {
-        m_tm = tm;
-    }
-    void setMM(const MoneyManagerPtr& mm) {
-        m_mm = mm;
-    }
-    void setEV(const EnvironmentPtr& ev) {
-        m_ev = ev;
-    }
-    void setCN(const ConditionPtr& cn) {
-        m_cn = cn;
-    }
-    void setSG(const SignalPtr& sg) {
-        m_sg = sg;
-    }
-    void setST(const StoplossPtr& st) {
-        m_st = st;
-    }
-    void setTP(const StoplossPtr& tp) {
-        m_tp = tp;
-    }
-    void setPG(const ProfitGoalPtr& pg) {
-        m_pg = pg;
-    }
-    void setSP(const SlippagePtr& sp) {
-        m_sp = sp;
-    }
+    /** 获取管理账户 */
+    TradeManagerPtr getTM() const;
 
-    Stock getStock() const {
-        return m_stock;
-    }
-    void setStock(const Stock& stk) {
-        m_stock = stk;
-    }
+    /** 获取资金管理策略 */
+    MoneyManagerPtr getMM() const;
 
-    const TradeRecordList& getTradeRecordList() const {
-        return m_trade_list;
-    }
+    /** 获取市场环境判定策略 */
+    EnvironmentPtr getEV() const;
 
-    const TradeRequest& getBuyTradeRequest() const {
-        return m_buyRequest;
-    }
-    const TradeRequest& getSellTradeRequest() const {
-        return m_sellRequest;
-    }
+    /** 获取系统条件判定策略 */
+    ConditionPtr getCN() const;
 
-    const TradeRequest& getSellShortTradeRequest() const {
-        return m_sellShortRequest;
-    }
+    /** 获取信号指示器 */
+    SignalPtr getSG() const;
 
-    const TradeRequest& getBuyShortTradeRequest() const {
-        return m_buyShortRequest;
-    }
+    /** 获取止损策略 */
+    StoplossPtr getST() const;
+
+    /** 获取止盈策略 */
+    StoplossPtr getTP() const;
+
+    /** 获取盈利目标策略 */
+    ProfitGoalPtr getPG() const;
+
+    /** 获取移滑价差策略 */
+    SlippagePtr getSP() const;
+
+    /** 设定管理账户 */
+    void setTM(const TradeManagerPtr& tm);
+
+    /** 设定资金管理策略 */
+    void setMM(const MoneyManagerPtr& mm);
+
+    /** 设定市场环境判定策略 */
+    void setEV(const EnvironmentPtr& ev);
+
+    /** 设定系统条件判定策略 */
+    void setCN(const ConditionPtr& cn);
+
+    /** 设定信号指示器 */
+    void setSG(const SignalPtr& sg);
+
+    /** 设定止损策略 */
+    void setST(const StoplossPtr& st);
+
+    /** 设定止盈策略 */
+    void setTP(const StoplossPtr& tp);
+
+    /** 设定盈利目标策略 */
+    void setPG(const ProfitGoalPtr& pg);
+
+    /** 设定移滑价差算法 */
+    void setSP(const SlippagePtr& sp);
+
+    /** 获取交易的证券 */
+    Stock getStock() const;
+
+    /** 设定交易的证券 */
+    void setStock(const Stock& stk);
+
+    /** 获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录 */
+    const TradeRecordList& getTradeRecordList() const;
+
+    /** 获取买入请求，“delay”模式下查看下一时刻是否存在买入操作 */
+    const TradeRequest& getBuyTradeRequest() const;
+
+    /** 获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作 */
+    const TradeRequest& getSellTradeRequest() const;
+
+    const TradeRequest& getSellShortTradeRequest() const;
+    const TradeRequest& getBuyShortTradeRequest() const;
 
     /**
      * 复位
@@ -154,13 +164,34 @@ public:
      */
     void setTO(const KData& kdata);
 
-    //不指定stock的方式下run，需要事先通过setStock设定stock
+    /**
+     * @brief 不指定stock的方式下run，需要事先通过setStock设定stock
+     * @param query 查询条件
+     * @param reset 执行前是否先复位
+     */
     void run(const KQuery& query, bool reset = true);
+
+    /**
+     * @brief 运行系统策略
+     * @param stock 指定的证券
+     * @param query 指定查询条件
+     * @param reset 执行前是否复位
+     */
     void run(const Stock& stock, const KQuery& query, bool reset = true);
+
+    /**
+     * @brief 运行系统
+     * @param kdata 指定的交易对象
+     * @param reset 执行前是否复位
+     */
     void run(const KData& kdata, bool reset = true);
 
+    /**
+     * @brief 在指定的日期执行一步，仅由 PF 调用
+     * @param datetime 指定的日期
+     * @return TradeRecord
+     */
     TradeRecord runMoment(const Datetime& datetime);
-    TradeRecord runMoment(const KRecord& record, const KRecord& src_record);
 
     //清除已有的交易请求，供Portfolio使用
     void clearDelayRequest();
@@ -171,8 +202,15 @@ public:
     //运行前准备工作
     bool readyForRun();
 
-    bool _environmentIsValid(const Datetime& datetime);
+    TradeRecord sell(const KRecord& today, const KRecord& src_today, Part from) {
+        return _sell(today, src_today, from);
+    }
 
+    // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
+    TradeRecord sellForce(const KRecord& today, const KRecord& src_today, double num, Part from);
+
+private:
+    bool _environmentIsValid(const Datetime& datetime);
     bool _conditionIsValid(const Datetime& datetime);
 
     //通知所有需要接收实际买入交易记录的部件
@@ -206,9 +244,6 @@ public:
     TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellDelay(const KRecord& today, const KRecord& src_today);
     void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from);
-
-    // 强制卖出，用于资金分配管理器和资产组合指示系统进行强制卖出操作
-    TradeRecord _sellForce(const KRecord& today, const KRecord& src_today, double num, Part from);
 
     TradeRecord _sellShort(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellShortNow(const KRecord& today, const KRecord& src_today, Part from);
@@ -345,12 +380,116 @@ typedef vector<SystemPtr> SystemList;
 HKU_API std::ostream& operator<<(std::ostream& os, const System& sys);
 HKU_API std::ostream& operator<<(std::ostream& os, const SystemPtr& sys);
 
-inline string System::name() const {
+inline const string& System::name() const {
     return m_name;
 }
 
 inline void System::name(const string& name) {
     m_name = name;
+}
+
+inline KData System::getTO() const {
+    return m_kdata;
+}
+
+inline TradeManagerPtr System::getTM() const {
+    return m_tm;
+}
+
+inline MoneyManagerPtr System::getMM() const {
+    return m_mm;
+}
+
+inline EnvironmentPtr System::getEV() const {
+    return m_ev;
+}
+
+inline ConditionPtr System::getCN() const {
+    return m_cn;
+}
+
+inline SignalPtr System::getSG() const {
+    return m_sg;
+}
+
+inline StoplossPtr System::getST() const {
+    return m_st;
+}
+
+inline StoplossPtr System::getTP() const {
+    return m_tp;
+}
+
+inline ProfitGoalPtr System::getPG() const {
+    return m_pg;
+}
+
+inline SlippagePtr System::getSP() const {
+    return m_sp;
+}
+
+inline void System::setTM(const TradeManagerPtr& tm) {
+    m_tm = tm;
+}
+
+inline void System::setMM(const MoneyManagerPtr& mm) {
+    m_mm = mm;
+}
+
+inline void System::setEV(const EnvironmentPtr& ev) {
+    m_ev = ev;
+}
+
+inline void System::setCN(const ConditionPtr& cn) {
+    m_cn = cn;
+}
+
+inline void System::setSG(const SignalPtr& sg) {
+    m_sg = sg;
+}
+
+inline void System::setST(const StoplossPtr& st) {
+    m_st = st;
+}
+
+inline void System::setTP(const StoplossPtr& tp) {
+    m_tp = tp;
+}
+
+inline void System::setPG(const ProfitGoalPtr& pg) {
+    m_pg = pg;
+}
+
+inline void System::setSP(const SlippagePtr& sp) {
+    m_sp = sp;
+}
+
+inline Stock System::getStock() const {
+    return m_stock;
+}
+
+inline void System::setStock(const Stock& stk) {
+    m_stock = stk;
+}
+
+inline const TradeRecordList& System::getTradeRecordList() const {
+    return m_trade_list;
+}
+
+inline const TradeRequest& System::getBuyTradeRequest() const {
+    return m_buyRequest;
+}
+
+inline const TradeRequest& System::getSellTradeRequest() const {
+    return m_sellRequest;
+}
+
+inline const TradeRequest& System::getSellShortTradeRequest() const {
+    return m_sellShortRequest;
+}
+
+inline const TradeRequest& System::getBuyShortTradeRequest() const {
+    return m_buyShortRequest;
 }
 
 inline bool System::_environmentIsValid(const Datetime& datetime) {

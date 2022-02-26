@@ -246,17 +246,8 @@ KData.get_pos = KData_getPos
 KData.get_pos_in_stock = KData_getPosInStock
 
 # ------------------------------------------------------------------
-# 封装增强其他C++ vector类型的遍历、打印
+# 封装增强其他C++ vector打印
 # ------------------------------------------------------------------
-
-PriceList.__getitem__ = list_getitem
-StringList.__getitem__ = list_getitem
-DatetimeList.__getitem__ = list_getitem
-BlockList.__getitem__ = list_getitem
-KRecordList.__getitem__ = list_getitem
-TransList.__getitem__ = list_getitem
-TimeLineList.__getitem__ = list_getitem
-StockWeightList.__getitem__ = list_getitem
 
 PriceList.__str__ = lambda self: str(list(self))
 PriceList.__repr__ = lambda self: repr(list(self))

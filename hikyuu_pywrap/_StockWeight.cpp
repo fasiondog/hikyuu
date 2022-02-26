@@ -7,10 +7,15 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/serialization/StockWeight_serialization.h>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
+
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
 
 void export_StockWeight() {
     class_<StockWeight>("StockWeight", "权息记录", init<>())
@@ -33,12 +38,8 @@ void export_StockWeight() {
 #endif
       ;
 
-    StockWeightList::const_reference (StockWeightList::*weightList_at)(StockWeightList::size_type)
-      const = &StockWeightList::at;
-    class_<StockWeightList>("StockWeightList", "std::vector<StockWeight> 包装")
-      .def("__iter__", iterator<StockWeightList>())
-      .def("__len__", &StockWeightList::size)
-      .def("get", weightList_at, return_value_policy<copy_const_reference>())
+    class_<StockWeightList>("StockWeightList")
+      .def(vector_indexing_suite<StockWeightList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<StockWeightList>())
 #endif

@@ -13,8 +13,28 @@ FixedSelector::FixedSelector() : SelectorBase("SE_Fixed") {}
 
 FixedSelector::~FixedSelector() {}
 
-SystemList FixedSelector::getSelectedSystemList(Datetime date) {
-    return m_real_sys_list;
+bool FixedSelector::isMatchAF(const AFPtr& af) {
+    return true;
+}
+
+SystemList FixedSelector::getSelectedOnOpen(Datetime date) {
+    SystemList result;
+    for (auto& sys : m_real_sys_list) {
+        if (!sys->getParam<bool>("delay")) {
+            result.emplace_back(sys);
+        }
+    }
+    return result;
+}
+
+SystemList FixedSelector::getSelectedOnClose(Datetime date) {
+    SystemList result;
+    for (auto& sys : m_real_sys_list) {
+        if (sys->getParam<bool>("delay")) {
+            result.emplace_back(sys);
+        }
+    }
+    return result;
 }
 
 void FixedSelector::_calculate() {}

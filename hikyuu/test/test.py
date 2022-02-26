@@ -25,21 +25,21 @@ import Signal
 import Stoploss
 import ProfitGoal
 import Slippage
-
+import AllocateFunds
 
 if __name__ == "__main__":
-   
+
     suite = unittest.TestSuite()
     suite.addTest(Datetime.suite())
     suite.addTest(Parameter.suite())
-    
+
     suite.addTest(MarketInfo.suite())
     suite.addTest(StockTypeInfo.suite())
     suite.addTest(Stock.suite())
     suite.addTest(KData.suite())
     suite.addTest(Indicator.suite())
     suite.addTest(TradeCost.suite())
-    
+
     suite.addTest(Environment.suite())
     suite.addTest(Environment.suiteTestCrtEV())
     suite.addTest(Condition.suite())
@@ -54,6 +54,8 @@ if __name__ == "__main__":
     suite.addTest(ProfitGoal.suiteTestCrtPG())
     suite.addTest(Slippage.suite())
     suite.addTest(Slippage.suiteTestCrtSL())
-        
+
+    suite.addTest(AllocateFunds.suite())
+
     unittest.TextTestRunner(verbosity=2).run(suite)
     #unittest.main()

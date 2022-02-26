@@ -21,7 +21,7 @@ price_t FixedHoldDays::getGoal(const Datetime& datetime, price_t price) {
     HKU_WARN_IF_RETURN(getParam<int>("days") <= 0, 0.0, "param days <= 0! Are you sure?");
 
     Stock stk = m_kdata.getStock();
-    PositionRecord position = m_tm->getPosition(stk);
+    PositionRecord position = m_tm->getPosition(datetime, stk);
     Datetime take_date = position.takeDatetime;
 
     KQuery query = KQueryByDate(Datetime(take_date.date()), Datetime(datetime.date()), KQuery::DAY);

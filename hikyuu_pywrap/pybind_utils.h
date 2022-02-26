@@ -15,18 +15,12 @@
 namespace py = boost::python;
 
 template <class T>
-struct vector_to_python_list {
-    static PyObject* convert(T const& x) {
-        py::list pylist;
-        for (auto const& d : x) {
-            pylist.append(d);
-        }
-        return py::incref(pylist.ptr());
-    }
-};  // namespace boost::pythontemplate<classT>structvector_to_python_list
-
-#define VECTOR_TO_PYTHON_CONVERT(vectorname) \
-    py::to_python_converter<vectorname, vector_to_python_list<vectorname>, false>()
+py::list vector_to_py_list(const T& v) {
+    py::object get_iter = py::iterator<T>();
+    py::object iter = get_iter(v);
+    py::list l(iter);
+    return l;
+}
 
 template <class T>
 T python_list_to_vector(py::list pylist) {

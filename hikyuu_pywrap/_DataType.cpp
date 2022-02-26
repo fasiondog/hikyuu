@@ -11,6 +11,7 @@
 #include <hikyuu/serialization/Datetime_serialization.h>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "pybind_utils.h"
 #include "pickle_support.h"
 
@@ -31,46 +32,27 @@ bool (*isnan_func)(price_t) = std::isnan;
 bool (*isinf_func)(price_t) = std::isinf;
 #endif
 
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
+
 void export_DataType() {
-    DatetimeList::const_reference (DatetimeList::*datetimeList_at)(DatetimeList::size_type) const =
-      &DatetimeList::at;
-    void (DatetimeList::*datetimelist_append)(const DatetimeList::value_type& val) =
-      &DatetimeList::push_back;
-    class_<DatetimeList>("DatetimeList", "日期序列，对应C++中的std::vector<Datetime>")
-      .def("__iter__", iterator<DatetimeList>())
-      .def("size", &DatetimeList::size)
-      .def("__len__", &DatetimeList::size)
-      .def("append", datetimelist_append, "向列表末端加入元素")
-      .def("get", datetimeList_at, return_value_policy<copy_const_reference>())
+    class_<DatetimeList>("DatetimeList")
+      .def(vector_indexing_suite<DatetimeList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<DatetimeList>())
 #endif
       ;
 
-    PriceList::const_reference (PriceList::*PriceList_at)(PriceList::size_type) const =
-      &PriceList::at;
-    void (PriceList::*PriceList_append)(const PriceList::value_type& val) = &PriceList::push_back;
     class_<PriceList>("PriceList")
-      .def("__iter__", iterator<PriceList>())
-      .def("size", &PriceList::size)
-      .def("__len__", &PriceList::size)
-      .def("append", PriceList_append)
-      .def("get", PriceList_at, return_value_policy<copy_const_reference>())
+      .def(vector_indexing_suite<PriceList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<PriceList>())
 #endif
       ;
 
-    StringList::const_reference (StringList::*StringList_at)(StringList::size_type) const =
-      &StringList::at;
-    void (StringList::*StringList_append)(const StringList::value_type& val) =
-      &StringList::push_back;
     class_<StringList>("StringList")
-      .def("__iter__", iterator<StringList>())
-      .def("size", &StringList::size)
-      .def("__len__", &StringList::size)
-      .def("append", StringList_append)
-      .def("get", StringList_at, return_value_policy<copy_const_reference>())
+      .def(vector_indexing_suite<StringList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<StringList>())
 #endif

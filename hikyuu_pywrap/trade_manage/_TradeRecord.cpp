@@ -7,10 +7,15 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_manage/TradeRecord.h>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "../pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
+
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
 
 void export_TradeRecord() {
     enum_<BUSINESS>("BUSINESS")
@@ -64,13 +69,8 @@ void export_TradeRecord() {
 #endif
       ;
 
-    TradeRecordList::const_reference (TradeRecordList::*TradeRecordList_at)(
-      TradeRecordList::size_type) const = &TradeRecordList::at;
     class_<TradeRecordList>("TradeRecordList")
-      .def("__iter__", iterator<TradeRecordList>())
-      .def("size", &TradeRecordList::size)
-      .def("__len__", &TradeRecordList::size)
-      .def("get", TradeRecordList_at, return_value_policy<copy_const_reference>())
+      .def(vector_indexing_suite<TradeRecordList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<TradeRecordList>())
 #endif

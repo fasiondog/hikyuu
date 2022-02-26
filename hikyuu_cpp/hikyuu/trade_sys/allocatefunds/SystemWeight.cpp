@@ -31,10 +31,12 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SystemWeight& sw) {
     return os;
 }
 
-SystemWeight::SystemWeight() : m_weight(100) {}
-
-SystemWeight::SystemWeight(const SystemPtr& sys, price_t weight) : m_sys(sys), m_weight(weight) {}
-
-SystemWeight::~SystemWeight() {}
+SystemWeight& SystemWeight::operator=(SystemWeight&& other) {
+    if (this != &other) {
+        m_sys = std::move(other.m_sys);
+        m_weight = other.m_weight;
+    }
+    return *this;
+}
 
 } /* namespace hku */

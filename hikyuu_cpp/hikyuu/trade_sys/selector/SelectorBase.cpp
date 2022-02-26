@@ -25,13 +25,12 @@ HKU_API std::ostream& operator<<(std::ostream& os, const SelectorPtr& st) {
     return os;
 }
 
-SelectorBase::SelectorBase() : m_name("SelectorBase"), m_count(0), m_pre_date(Datetime::min()) {
+SelectorBase::SelectorBase() : m_name("SelectorBase") {
     // 是否单独执行原型系统
     setParam<bool>("run_proto_sys", false);
 }
 
-SelectorBase::SelectorBase(const string& name)
-: m_name(name), m_count(0), m_pre_date(Datetime::min()) {
+SelectorBase::SelectorBase(const string& name) : m_name(name) {
     // 是否单独执行原型系统
     setParam<bool>("run_proto_sys", false);
 }
@@ -39,8 +38,6 @@ SelectorBase::SelectorBase(const string& name)
 SelectorBase::~SelectorBase() {}
 
 void SelectorBase::clear() {
-    m_count = 0;
-    m_pre_date = Datetime::min();
     m_pro_sys_list.clear();
     m_real_sys_list.clear();
 }
@@ -52,8 +49,6 @@ void SelectorBase::reset() {
         (*iter)->reset(true, false);
     }
 
-    m_count = 0;
-    m_pre_date = Datetime::min();
     m_real_sys_list.clear();
     _reset();
 }
@@ -74,8 +69,6 @@ SelectorPtr SelectorBase::clone() {
 
     p->m_params = m_params;
     p->m_name = m_name;
-    p->m_count = m_count;
-    p->m_pre_date = m_pre_date;
     p->m_real_sys_list = m_real_sys_list;
     p->m_pro_sys_list = m_pro_sys_list;
     return p;
@@ -89,15 +82,6 @@ void SelectorBase::calculate(const SystemList& sysList, const KQuery& query) {
         }
     }
     _calculate();
-}
-
-bool SelectorBase::addSystem(const SystemPtr& sys) {
-    HKU_ERROR_IF_RETURN(!sys, false, "Try add null sys, will be discard!");
-    HKU_ERROR_IF_RETURN(sys->getStock().isNull(), false, "sys has not bind stock!");
-    HKU_ERROR_IF_RETURN(!sys->getMM(), false, "sys has not MoneyManager!");
-    HKU_ERROR_IF_RETURN(!sys->getSG(), false, "sys has not Siganl!");
-    m_pro_sys_list.emplace_back(sys);
-    return true;
 }
 
 bool SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {

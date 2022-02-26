@@ -13,9 +13,21 @@ SignalSelector::SignalSelector() : SelectorBase("SE_Sigal") {}
 
 SignalSelector::~SignalSelector() {}
 
-SystemList SignalSelector::getSelectedSystemList(Datetime date) {
-    auto iter = m_date_sys_dict.find(date);
-    return iter != m_date_sys_dict.end() ? iter->second : SystemList();
+bool SignalSelector::isMatchAF(const AFPtr& af) {
+    HKU_WARN_IF_RETURN(
+      af->getParam<bool>("adjust_running_sys"), false,
+      "AF will adjust running system funds, but this se is not suitable the case!");
+    return true;
+}
+
+SystemList SignalSelector::getSelectedOnOpen(Datetime date) {
+    auto iter = m_sys_dict_on_open.find(date);
+    return iter != m_sys_dict_on_open.end() ? iter->second : SystemList();
+}
+
+SystemList SignalSelector::getSelectedOnClose(Datetime date) {
+    auto iter = m_sys_dict_on_close.find(date);
+    return iter != m_sys_dict_on_close.end() ? iter->second : SystemList();
 }
 
 void SignalSelector::_calculate() {
@@ -24,12 +36,14 @@ void SignalSelector::_calculate() {
         auto& sys = m_real_sys_list[i];
         auto sg = sys->getSG();
         auto dates = sg->getBuySignal();
+        unordered_map<Datetime, SystemList>* date_dict;
+        date_dict = sys->getParam<bool>("delay") ? &m_sys_dict_on_close : &m_sys_dict_on_open;
         for (auto& date : dates) {
-            auto iter = m_date_sys_dict.find(date);
-            if (iter != m_date_sys_dict.end()) {
+            auto iter = date_dict->find(date);
+            if (iter != date_dict->end()) {
                 iter->second.emplace_back(sys);
             } else {
-                m_date_sys_dict[date] = {sys};
+                (*date_dict)[date] = {sys};
             }
         }
     }

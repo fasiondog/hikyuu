@@ -30,12 +30,12 @@ TEST_CASE("test_SE_Fixed") {
 
     /** @arg 试图加入一个不存在的stock */
     se->addStock(Stock(), sys);
-    SystemList result = se->getSelectedSystemList(Datetime(200001010000L));
+    SystemList result = se->getSelectedOnOpen(Datetime(200001010000L));
     CHECK_EQ(result.size(), 0);
 
     /** @arg 试图加入一个空的系统策略原型 */
     se->addStock(sm["sh600000"], SYSPtr());
-    result = se->getSelectedSystemList(Datetime(200001010000L));
+    result = se->getSelectedOnOpen(Datetime(200001010000L));
     CHECK_EQ(result.size(), 0);
 
     /** @arg 试图加入一个缺少MM的系统策略原型 */

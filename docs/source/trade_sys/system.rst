@@ -172,7 +172,7 @@
         
     .. py:method:: get_trade_record_list(self)
     
-        获取交易记录
+        获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录
         
         :rtype: TradeRecordList
         

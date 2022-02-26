@@ -7,10 +7,15 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_manage/PositionRecord.h>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "../pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
+
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
 
 void export_PositionRecord() {
     class_<PositionRecord>("PositionRecord", "持仓记录", init<>())
@@ -39,14 +44,9 @@ void export_PositionRecord() {
 #endif
       ;
 
-    PositionRecordList::const_reference (PositionRecordList::*PositionRecordList_at)(
-      PositionRecordList::size_type) const = &PositionRecordList::at;
     class_<PositionRecordList>("PositionRecordList",
                                "持仓记录列表，C++ std::vector<PositionRecord>包装")
-      .def("__iter__", iterator<PositionRecordList>())
-      .def("size", &PositionRecordList::size)
-      .def("__len__", &PositionRecordList::size)
-      .def("get", PositionRecordList_at, return_value_policy<copy_const_reference>())
+      .def(vector_indexing_suite<PositionRecordList>())
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(normal_pickle_suite<PositionRecordList>())
 #endif

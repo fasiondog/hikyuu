@@ -44,7 +44,7 @@ public:
     }
 
     bool supportIndParam() const {
-        if (override call = get_override("supportIndParam")) {
+        if (override call = get_override("support_ind_param")) {
             return call();
         } else {
             return IndicatorImp::supportIndParam();
@@ -135,7 +135,9 @@ void export_IndicatorImp() {
       .def("_dyn_run_one_step", &IndicatorImp::_dyn_run_one_step,
            &IndicatorImpWrap::default_dyn_run_one_step)
       .def("_clone", &IndicatorImp::_clone, &IndicatorImpWrap::default_clone)
-      .def("isNeedContext", &IndicatorImp::isNeedContext, &IndicatorImpWrap::default_isNeedContext);
+      .def("is_need_context", &IndicatorImp::isNeedContext,
+           &IndicatorImpWrap::default_isNeedContext)
+      .def("is_leaf", &IndicatorImp::isLeaf);
 
     register_ptr_to_python<IndicatorImpPtr>();
 }

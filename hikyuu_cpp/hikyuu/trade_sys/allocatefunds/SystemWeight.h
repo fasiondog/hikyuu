@@ -13,17 +13,58 @@
 
 namespace hku {
 
+/**
+ * 系统权重，权重有效范围为 [0.0, 1.0]
+ * @details 用于指定系统对应权重告知资产分配算法
+ * @ingroup AllocateFunds
+ */
 class HKU_API SystemWeight {
 public:
-    SystemWeight();
-    SystemWeight(const SystemPtr& sys, double weight);
-    virtual ~SystemWeight();
+    /** 默认构造函数，缺省权重为1.0 */
+    SystemWeight() : m_weight(1.0) {}
 
-    void setSYS(const SystemPtr& sys);
-    SystemPtr getSYS() const;
+    /**
+     * @brief Construct a new System Weight object
+     *
+     * @param sys 对应的系统
+     * @param weight 对应的权重，须在 [0.0, 1.0] 之间
+     */
+    SystemWeight(const SystemPtr& sys, double weight) : m_sys(sys), m_weight(1.0) {
+        HKU_CHECK_THROW(weight >= 0.0 && weight <= 1.0, std::out_of_range,
+                        "weigth ({}) is out of range [0, 1]!", weight);
+        m_weight = weight;
+    }
 
-    void setWeight(double weight);
-    double getWeight() const;
+    SystemWeight(const SystemWeight&) = default;
+    SystemWeight(SystemWeight&& sw) : m_sys(std::move(sw.m_sys)), m_weight(sw.m_weight) {}
+
+    SystemWeight& operator=(const SystemWeight& other) = default;
+    SystemWeight& operator=(SystemWeight&& other);
+
+    /** 析构函数 */
+    virtual ~SystemWeight() {}
+
+    /** 修改对应的系统 */
+    void setSYS(const SystemPtr& sys) {
+        m_sys = sys;
+    }
+
+    /** 获取对应的系统 */
+    const SystemPtr& getSYS() const {
+        return m_sys;
+    }
+
+    /** 设置权重值，须在[0,1]之间 */
+    void setWeight(double weight) {
+        HKU_CHECK_THROW(weight >= 0.0 && weight <= 1.0, std::out_of_range,
+                        "weigth ({}) is out of range [0, 1]!", weight);
+        m_weight = weight;
+    }
+
+    /** 获取权重值 */
+    double getWeight() const {
+        return m_weight;
+    }
 
 public:
     SystemPtr m_sys;
@@ -56,22 +97,8 @@ typedef vector<SystemWeight> SystemWeightList;
 
 HKU_API std::ostream& operator<<(std::ostream&, const SystemWeight&);
 
-inline void SystemWeight::setSYS(const SystemPtr& sys) {
-    m_sys = sys;
-}
-
-inline SystemPtr SystemWeight::getSYS() const {
-    return m_sys;
-}
-
-inline void SystemWeight::setWeight(double weight) {
-    HKU_CHECK_THROW(weight >= 0 && weight <= 1, std::out_of_range,
-                    "weigth ({}) is out of range [0, 1]!", weight);
-    m_weight = weight;
-}
-
-inline double SystemWeight::getWeight() const {
-    return m_weight;
+inline bool operator==(const SystemWeight& d1, const SystemWeight& d2) {
+    return d1.getSYS() == d2.getSYS() && d1.getWeight() == d2.getWeight();
 }
 
 } /* namespace hku */
