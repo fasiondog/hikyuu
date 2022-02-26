@@ -287,7 +287,7 @@ void System::run(const KQuery& query, bool reset) {
     size_t total = kdata.size();
     for (size_t i = 0; i < total; ++i) {
         if (kdata[i].datetime >= m_tm->initDatetime()) {
-            runMoment(kdata[i], m_src_kdata[i]);
+            _runMoment(kdata[i], m_src_kdata[i]);
         }
     }
 }
@@ -310,7 +310,7 @@ void System::run(const KData& kdata, bool reset) {
     size_t total = kdata.size();
     for (size_t i = 0; i < total; ++i) {
         if (kdata[i].datetime >= m_tm->initDatetime()) {
-            runMoment(kdata[i], m_src_kdata[i]);
+            _runMoment(kdata[i], m_src_kdata[i]);
         }
     }
 }
@@ -322,24 +322,18 @@ void System::clearDelayRequest() {
     m_buyShortRequest.clear();
 }
 
-TradeRecord System::runMoment(const KRecord& record, const KRecord& src_record) {
-    m_buy_days++;
-    m_sell_short_days++;
-    return _runMoment(record, src_record);
-}
-
 TradeRecord System::runMoment(const Datetime& datetime) {
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
-    m_buy_days++;
-    m_sell_short_days++;
     return _runMoment(today, src_today);
 }
 
 TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
+    m_buy_days++;
+    m_sell_short_days++;
     TradeRecord result;
     if ((today.highPrice == today.lowPrice || today.closePrice > today.highPrice ||
          today.closePrice < today.lowPrice) &&
@@ -596,8 +590,8 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
                     src_today.closePrice - m_buyRequest.stoploss, m_buyRequest.from);
 }
 
-TradeRecord System::_sellForce(const KRecord& today, const KRecord& src_today, double num,
-                               Part from) {
+TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, double num,
+                              Part from) {
     HKU_ASSERT_M(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO,
                  "Only Allocator or Portfolis can perform this operation!");
     TradeRecord result;

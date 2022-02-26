@@ -134,7 +134,7 @@ bool AllocateFundsBase::_returnAssets(const SYSPtr& sys, const Datetime& date) {
     // 如果存在持仓则卖出
     TMPtr tm = sys->getTM();
     if (tm->have(stock)) {
-        TradeRecord tr = sys->_sell(record, srcRecord, PART_ALLOCATEFUNDS);
+        TradeRecord tr = sys->sell(record, srcRecord, PART_ALLOCATEFUNDS);
         if (!tr.isNull()) {
             m_tm->addTradeRecord(tr);
         }
@@ -334,14 +334,14 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                                                                         : need_cash / k.openPrice;
                     if (position.number <= need_sell_num) {
                         // 如果当前持仓数小于等于需要卖出的数量，则全部卖出
-                        tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
+                        tr = sys->sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
                     } else {
                         if (position.number - need_sell_num >= stock.minTradeNumber()) {
                             // 如果按需要卖出数量卖出后，可能剩余的数量大于等于最小交易数则按需要卖出的数量卖出
-                            tr = sys->_sellForce(k, srcK, need_sell_num, PART_ALLOCATEFUNDS);
+                            tr = sys->sellForce(k, srcK, need_sell_num, PART_ALLOCATEFUNDS);
                         } else {
                             // 如果按需要卖出的数量卖出后，剩余的持仓数小于最小交易数量则全部卖出
-                            tr = sys->_sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
+                            tr = sys->sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);
                         }
                     }
                     if (!tr.isNull()) {
