@@ -13,7 +13,12 @@
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const Portfolio& pf) {
-    os << "Portfolio(" << pf.name() << ", " << pf.getParameter() << ")";
+    string strip(",\n");
+    string space("  ");
+    os << "Portfolio{\n"
+       << space << pf.name() << strip << space << pf.getParameter() << strip << space
+       << pf.getQuery() << strip << space << pf.getAF() << strip << space << pf.getSE() << strip
+       << space << (pf.getTM() ? pf.getTM()->str() : "TradeManager(NULL)") << strip << "}";
     return os;
 }
 
@@ -76,8 +81,6 @@ PortfolioPtr Portfolio::clone() {
     p->m_query = m_query;
     p->m_pro_sys_list = m_pro_sys_list;
     p->m_real_sys_list = m_real_sys_list;
-    p->m_running_sys_set = m_running_sys_set;
-    p->m_running_sys_list = m_running_sys_list;
     p->m_is_ready = m_is_ready;
     p->m_need_calculate = m_need_calculate;
     if (m_se)
@@ -161,6 +164,13 @@ void Portfolio::_runMoment(const Datetime& date) {
 
     _runMomentOnOpen(date);
     _runMomentOnClose(date);
+
+    // 释放掉临时数据占用的内存
+    m_running_sys_set = std::unordered_set<System*>();
+    m_running_sys_list = std::list<SYSPtr>();
+    m_tmp_selected_list_on_open = SystemList();
+    m_tmp_selected_list_on_close = SystemList();
+    m_tmp_will_remove_sys = SystemList();
 }
 
 void Portfolio::_runMomentOnOpen(const Datetime& date) {
@@ -194,15 +204,15 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
     // 依据待移除列表将系统从运行中系统列表里删除
     for (auto& sub_sys : m_tmp_will_remove_sys) {
         m_running_sys_list.remove(sub_sys);
-        m_running_sys_set.erase(sub_sys);
+        m_running_sys_set.erase(sub_sys.get());
     }
 
     // 遍历本次选择的系统列表，如果存在分配资金且不在运行中列表内，则加入运行列表
     for (auto& sub_sys : m_tmp_selected_list_on_open) {
         price_t cash = sub_sys->getTM()->cash(date, m_query.kType());
-        if (cash > 0.0 && m_running_sys_set.find(sub_sys) == m_running_sys_set.end()) {
+        if (cash > 0.0 && m_running_sys_set.find(sub_sys.get()) == m_running_sys_set.end()) {
             m_running_sys_list.push_back(sub_sys);
-            m_running_sys_set.insert(sub_sys);
+            m_running_sys_set.insert(sub_sys.get());
         }
     }
 
@@ -239,11 +249,11 @@ void Portfolio::_runMomentOnClose(const Datetime& date) {
 
     // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统，并执行
     for (auto& sys : m_tmp_selected_list_on_close) {
-        if (m_running_sys_set.find(sys) == m_running_sys_set.end()) {
+        if (m_running_sys_set.find(sys.get()) == m_running_sys_set.end()) {
             TMPtr tm = sys->getTM();
             if (tm->cash(date, m_query.kType()) > 0.0) {
                 m_running_sys_list.push_back(sys);
-                m_running_sys_set.insert(sys);
+                m_running_sys_set.insert(sys.get());
             }
         }
     }

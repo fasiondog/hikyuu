@@ -157,11 +157,11 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
 
-    //构建实际分配权重大于零的的系统集合，权重小于等于0的将被忽略
-    std::set<System*> selected_sets;
-    for (auto iter = sw_list.begin(); iter != sw_list.end(); ++iter) {
-        if (iter->getWeight() > 0.0) {
-            selected_sets.insert(iter->getSYS().get());
+    // 构建实际分配权重大于零的的系统集合，权重小于等于0的将被忽略
+    std::unordered_set<System*> selected_sets;
+    for (auto& sw : sw_list) {
+        if (sw.getWeight() > 0.0) {
+            selected_sets.insert(sw.getSYS().get());
         }
     }
 
@@ -395,16 +395,16 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date, const Syst
     HKU_IF_RETURN(running_list.size() >= max_num, void());
 
     // 计算选中系统中当前正在运行中的子系统
-    std::set<SYSPtr> hold_sets;
-    for (auto iter = running_list.begin(); iter != running_list.end(); ++iter) {
-        hold_sets.insert(*iter);
+    std::unordered_set<System*> hold_sets;
+    for (auto& sys : running_list) {
+        hold_sets.insert(sys.get());
     }
 
     // 计算不包含运行中系统的子系统列表
     SystemList pure_se_list;
-    for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        if (hold_sets.find(*iter) == hold_sets.end()) {
-            pure_se_list.push_back(*iter);
+    for (auto& sys : se_list) {
+        if (hold_sets.find(sys.get()) == hold_sets.end()) {
+            pure_se_list.push_back(sys);
         }
     }
 
