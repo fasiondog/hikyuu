@@ -160,6 +160,10 @@ void System::setTO(const KData& kdata) {
         m_src_kdata = m_stock.getKData(no_recover_query);
     }
 
+    HKU_WARN_IF(
+      query.recoverType() == KQuery::FORWARD || query.recoverType() == KQuery::EQUAL_FORWARD,
+      "You are using forward or equal_forward kdata, which is a future function!");
+
     // sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg)
         m_sg->setTO(kdata);  // 传入复权的 KData
