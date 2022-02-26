@@ -106,7 +106,15 @@ void export_AllocateFunds() {
       .def("_reset", &AllocateFundsBase::_reset, &AllocateFundsBaseWrap::default_reset,
            "子类复位操作实现")
       .def("_clone", pure_virtual(&AllocateFundsBase::_clone), "子类克隆操作实现接口")
-      .def("_allocate_weight", pure_virtual(&AllocateFundsBase::_allocateWeight))
+      .def("_allocate_weight", pure_virtual(&AllocateFundsBase::_allocateWeight),
+           (arg("date"), arg("se_list")), R"(_allocate_weight(self, date, se_list)
+
+        【重载接口】子类分配权重接口，获取实际分配资产的系统实例及其权重
+
+        :param Datetime date: 当前时间
+        :param SystemList se_list: 当前选中的系统列表
+        :return: 系统权重分配信息列表
+        :rtype: SystemWeightList)")
 #if HKU_PYTHON_SUPPORT_PICKLE
       .def_pickle(name_init_pickle_suite<AllocateFundsBase>())
 #endif
@@ -114,9 +122,13 @@ void export_AllocateFunds() {
 
     register_ptr_to_python<AFPtr>();
 
-    def("AF_EqualWeight", AF_EqualWeight, R"(等权重资产分配，对选中的资产进行等比例分配)");
+    def("AF_EqualWeight", AF_EqualWeight, R"(AF_EqualWeight()
+    
+    等权重资产分配，对选中的资产进行等比例分配)");
 
-    def("AF_FixedWeight", AF_FixedWeight, R"(固定比例资产分配
+    def("AF_FixedWeight", AF_FixedWeight, (arg("weight") = 0.1), R"(AF_FixedWeight(weight)
+    
+    固定比例资产分配
 
     :param float weight:  指定的资产比例 [0, 1])");
 }
