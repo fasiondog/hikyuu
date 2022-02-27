@@ -183,6 +183,10 @@ private:
                 type = "int";
                 int x = boost::any_cast<int>(arg);
                 value = boost::lexical_cast<string>(x);
+            } else if (arg.type() == typeid(int64_t)) {
+                type = "int64";
+                int64_t x = boost::any_cast<int64_t>(arg);
+                value = boost::lexical_cast<string>(x);
             } else if (arg.type() == typeid(double)) {
                 type = "double";
                 double x = boost::any_cast<double>(arg);
@@ -263,6 +267,8 @@ private:
                 m_params[record.name] = boost::lexical_cast<bool>(record.value);
             } else if (record.type == "int") {
                 m_params[record.name] = boost::lexical_cast<int>(record.value);
+            } else if (record.type == "int64") {
+                m_params[record.name] = boost::lexical_cast<int64_t>(record.value);
             } else if (record.type == "double") {
                 m_params[record.name] = boost::lexical_cast<double>(record.value);
             } else if (record.type == "string") {
@@ -360,9 +366,14 @@ void Parameter::set(const string& name, const ValueType& value) {
     }
 
     if (m_params[name].type() != typeid(ValueType)) {
-        throw std::logic_error("Mismatching type! need type " +
-                               string(m_params[name].type().name()) + " but value type is " +
-                               string(typeid(ValueType).name()));
+        if ((m_params[name].type() == typeid(int) || m_params[name].type() == typeid(int64_t)) &&
+            (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
+            // 忽略，允许设定
+        } else {
+            throw std::logic_error("Mismatching type! need type " +
+                                   string(m_params[name].type().name()) + " but value type is " +
+                                   string(typeid(ValueType).name()));
+        }
     }
 
     m_params[name] = value;

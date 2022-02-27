@@ -30,18 +30,22 @@ TEST_CASE("test_Parameter") {
 
     /** @arg 正常添加、读取、修改参数 */
     param.set<int>("n", 1);
+    param.set<int64_t>("n64", 21474836480ll);
     param.set<bool>("bool", true);
     param.set<double>("double", 10);
     param.set<string>("string", "test");
     CHECK(param.get<int>("n") == 1);
+    CHECK(param.get<int64_t>("n64") == 21474836480ll);
     CHECK(param.get<bool>("bool") == true);
     CHECK(param.get<double>("double") == 10.0);
     CHECK(param.get<string>("string") == "test");
     param.set<int>("n", 10);
+    param.set<int64_t>("n64", -21474836480ll);
     param.set<bool>("bool", false);
     param.set<double>("double", 10.01);
     param.set<string>("string", "test2");
     CHECK(param.get<int>("n") == 10);
+    CHECK(param.get<int64_t>("n64") == -21474836480ll);
     CHECK(param.get<bool>("bool") == false);
     CHECK(param.get<double>("double") == 10.01);
     CHECK(param.get<string>("string") == "test2");
