@@ -47,7 +47,7 @@ TEST_CASE("test_STDEV") {
     dev = STDEV(ind, 1);
     CHECK_EQ(dev.size(), 15);
     for (size_t i = 0; i < dev.size(); ++i) {
-        CHECK_EQ(dev[i], 0.0);
+        CHECK_UNARY(std::isnan(dev[i]));
     }
 
     /** @arg operator() */
