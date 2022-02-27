@@ -32,7 +32,7 @@ public:
 
     /**
      * 构造函数
-     * @param param 驱动原型，所有权将被转移至该 pool
+     * @param prototype 驱动原型，所有权将被转移至该 pool
      * @param maxConnect 允许的最大连接数，为 0 表示不限制
      * @param maxIdleConnect 运行的最大空闲连接数，等于 0 时表示立刻释放，默认为CPU数
      */
