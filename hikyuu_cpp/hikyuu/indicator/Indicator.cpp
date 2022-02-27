@@ -19,6 +19,8 @@ Indicator::Indicator(const IndicatorImpPtr& imp) : m_imp(imp) {}
 
 Indicator::Indicator(const Indicator& indicator) : m_imp(indicator.m_imp) {}
 
+Indicator::Indicator(Indicator&& ind) : m_imp(std::move(ind.m_imp)) {}
+
 Indicator::~Indicator() {}
 
 string Indicator::formula() const {
@@ -48,6 +50,12 @@ KData Indicator::getContext() const {
 Indicator& Indicator::operator=(const Indicator& indicator) {
     HKU_IF_RETURN(this == &indicator, *this);
     m_imp = indicator.m_imp;
+    return *this;
+}
+
+Indicator& Indicator::operator=(Indicator&& indicator) {
+    HKU_IF_RETURN(this == &indicator, *this);
+    m_imp = std::move(indicator.m_imp);
     return *this;
 }
 

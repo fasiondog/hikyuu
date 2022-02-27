@@ -190,7 +190,7 @@ public:
     /**
      * 从指定表中删除符合条件的数据指定条件删除
      * @param tablename 待删除数据的表名
-     * @param where 删除条件
+     * @param cond 删除条件
      * @param autotrans 启动事务
      */
     void remove(const std::string& tablename, const DBCondition& cond, bool autotrans = true);

@@ -23,10 +23,12 @@ class HKU_API KData {
 public:
     KData() {}
     KData(const KData&);
+    KData(KData&&);
     KData(const Stock& stock, const KQuery& query);
     virtual ~KData() {}
 
     KData& operator=(const KData&);
+    KData& operator=(KData&&);
 
     size_t size() const;
     bool empty() const;
@@ -149,10 +151,19 @@ KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end
 
 inline KData::KData(const KData& x) : m_imp(x.m_imp) {}
 
+inline KData::KData(KData&& x) : m_imp(std::move(x.m_imp)) {}
+
 inline KData& KData::operator=(const KData& x) {
     if (this == &x)
         return *this;
     m_imp = x.m_imp;
+    return *this;
+}
+
+inline KData& KData::operator=(KData&& x) {
+    if (this == &x)
+        return *this;
+    m_imp = std::move(x.m_imp);
     return *this;
 }
 

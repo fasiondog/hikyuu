@@ -115,7 +115,7 @@ void export_Selector() {
 
       .def("reset", &SelectorBase::reset, "复位操作")
       .def("clone", &SelectorBase::clone, "克隆操作")
-      .def("clear", &SelectorBase::clear)
+      .def("remove_all", &SelectorBase::removeAll, "清除所有已加入的原型系统")
 
       .def("add_stock", &SelectorBase::addStock, (arg("stock"), arg("sys")),
            R"(add_stock(self, stock, sys)

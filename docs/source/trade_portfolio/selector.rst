@@ -100,9 +100,9 @@
         :param StockList stk_list: 加入的初始标的列表
         :param System sys: 系统策略原型
     
-    .. py:method:: clear(self)
+    .. py:method:: remove_all(self)
     
-        清除已加入的系统策略实例
+        清除所有已加入的原型系统
 
     .. py:method:: is_match_af(self)
 

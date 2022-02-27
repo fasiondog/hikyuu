@@ -362,7 +362,7 @@ public:
      * @param date 指定日期
      * @param stock 指定的证券
      */
-    virtual PositionRecord getPosition(const Datetime& date, const Stock&) {
+    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }

@@ -37,6 +37,7 @@ public:
     /**
      * 构造函数，创建指定数量的线程
      * @param n 指定的线程数
+     * @param util_empty join时指示各工作线程在未获取到工作任务时，停止运行
      */
     explicit StealThreadPool(size_t n, bool util_empty = true)
     : m_done(false), m_runnging_util_empty(util_empty), m_worker_num(n) {

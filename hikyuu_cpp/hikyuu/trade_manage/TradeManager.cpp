@@ -362,8 +362,8 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
 
     //如果指定的日期大于等于最后交易日期，则直接取当前持仓记录
     if (datetime >= lastDatetime()) {
-        position_map_type::const_iterator pos_iter = m_short_position.find(stock.id());
-        if (pos_iter != m_short_position.end()) {
+        position_map_type::const_iterator pos_iter = m_position.find(stock.id());
+        if (pos_iter != m_position.end()) {
             result = pos_iter->second;
         }
         return result;

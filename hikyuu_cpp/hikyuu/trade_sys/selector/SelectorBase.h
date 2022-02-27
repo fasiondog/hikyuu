@@ -88,7 +88,7 @@ public:
     /**
      * 清除已有的系统原型
      */
-    void clear();
+    void removeAll();
 
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();

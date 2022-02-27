@@ -159,7 +159,7 @@ public:
      * @param start_time 允许运行的起始时间
      * @param end_time 允许运行的结束时间
      * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param delay 间隔时间，需大于 TimeDelta(0)
+     * @param duration 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
      * @return timer id
@@ -189,7 +189,7 @@ public:
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param delay 间隔时间，需大于 TimeDelta(0)
+     * @param duration 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
      * @return timer id
@@ -224,6 +224,8 @@ public:
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param time_point 指定的运行时刻（包含具体的日、时、分、秒...）
+     * @param f 待执行的延迟任务
+     * @param args 任务具体参数
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -243,6 +245,8 @@ public:
      * @param start_date 允许执行的开始日期
      * @param end_date 允许执行的结束日期
      * @param time 指定运行的日内时刻
+     * @param f 待执行的延迟任务
+     * @param args 任务具体参数
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -265,6 +269,8 @@ public:
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param time 指定运行的日内时刻
+     * @param f 待执行的延迟任务
+     * @param args 任务具体参数
      * @return timer id
      */
     template <typename F, typename... Args>
