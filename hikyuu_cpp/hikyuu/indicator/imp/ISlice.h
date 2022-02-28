@@ -11,14 +11,14 @@
 
 namespace hku {
 
-class IRange : public IndicatorImp {
-    INDICATOR_IMP(IRange)
+class ISlice : public IndicatorImp {
+    INDICATOR_IMP(ISlice)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    IRange();
-    IRange(const PriceList&, int64_t start, int64_t end);
-    virtual ~IRange();
+    ISlice();
+    ISlice(const PriceList&, int64_t start, int64_t end);
+    virtual ~ISlice();
 };
 
 }  // namespace hku

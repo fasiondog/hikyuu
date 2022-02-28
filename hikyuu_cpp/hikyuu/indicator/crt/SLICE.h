@@ -14,29 +14,29 @@ namespace hku {
 /**
  * 获取 PriceList 中指定范围 [start, end) 的数据
  * @param data 源数据
- * @param start 起始范围
- * @param end 终止范围（不包含本身）
+ * @param start 起始范围，可为负数
+ * @param end 终止范围（不包含本身），可为负数
  * @ingroup Indicator
  */
-Indicator HKU_API RANGE(const PriceList& data, int64_t start, int64_t end);
+Indicator HKU_API SLICE(const PriceList& data, int64_t start, int64_t end);
 
 /**
  * 获取某指标中指定范围的数据
  * @param ind 源数据
- * @param start 起始范围
- * @param end 终止范围（不包含本身）
+ * @param start 起始范围，可为负数
+ * @param end 终止范围（不包含本身），可为负数
  * @param result_index 源数据中指定的结果集
  * @ingroup Indicator
  */
-Indicator HKU_API RANGE(const Indicator& ind, int64_t start, int64_t end, int result_index = 0);
+Indicator HKU_API SLICE(const Indicator& ind, int64_t start, int64_t end, int result_index = 0);
 
 /**
  * 获取某指标中指定范围的数据
- * @param start 起始范围
- * @param end 终止范围（不包含本身）
+ * @param start 起始范围，可为负数
+ * @param end 终止范围（不包含本身），可为负数
  * @param result_index 源数据中指定的结果集
  * @ingroup Indicator
  */
-Indicator HKU_API RANGE(int64_t start, int64_t end, int result_index = 0);
+Indicator HKU_API SLICE(int64_t start, int64_t end, int result_index = 0);
 
 }  // namespace hku

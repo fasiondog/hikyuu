@@ -5,31 +5,31 @@
  *      Author: fasiondog
  */
 
-#include "IRange.h"
+#include "ISlice.h"
 
 namespace hku {
 
-IRange::IRange() : IndicatorImp("RANGE", 1) {
+ISlice::ISlice() : IndicatorImp("SLICE", 1) {
     setParam<int>("result_index", 0);
     setParam<PriceList>("data", PriceList());
     setParam<int64_t>("start", 0);
     setParam<int64_t>("end", Null<int64_t>());
 }
 
-IRange::IRange(const PriceList& data, int64_t start, int64_t end) : IndicatorImp("RANGE", 1) {
+ISlice::ISlice(const PriceList& data, int64_t start, int64_t end) : IndicatorImp("SLICE", 1) {
     setParam<int>("result_index", 0);
     setParam<PriceList>("data", data);
     setParam<int64_t>("start", start);
     setParam<int64_t>("end", end);
 }
 
-IRange::~IRange() {}
+ISlice::~ISlice() {}
 
-bool IRange::check() {
+bool ISlice::check() {
     return getParam<int>("result_index") >= 0;
 }
 
-void IRange::_calculate(const Indicator& data) {
+void ISlice::_calculate(const Indicator& data) {
     //如果在叶子节点，直接取自身的data参数
     if (isLeaf()) {
         m_discard = 0;
@@ -87,20 +87,20 @@ void IRange::_calculate(const Indicator& data) {
     m_discard = data.discard() <= size_t(startix) ? 0 : data.discard() - startix;
 }
 
-Indicator HKU_API RANGE(const PriceList& data, int64_t start, int64_t end) {
-    return make_shared<IRange>(data, start, end)->calculate();
+Indicator HKU_API SLICE(const PriceList& data, int64_t start, int64_t end) {
+    return make_shared<ISlice>(data, start, end)->calculate();
 }
 
-Indicator HKU_API RANGE(const Indicator& data, int64_t start, int64_t end, int result_index) {
-    IndicatorImpPtr p = make_shared<IRange>();
+Indicator HKU_API SLICE(const Indicator& data, int64_t start, int64_t end, int result_index) {
+    IndicatorImpPtr p = make_shared<ISlice>();
     p->setParam<int>("result_index", result_index);
     p->setParam<int64_t>("start", start);
     p->setParam<int64_t>("end", end);
     return Indicator(p)(data);
 }
 
-Indicator HKU_API RANGE(int64_t start, int64_t end, int result_index) {
-    IndicatorImpPtr p = make_shared<IRange>();
+Indicator HKU_API SLICE(int64_t start, int64_t end, int result_index) {
+    IndicatorImpPtr p = make_shared<ISlice>();
     p->setParam<int>("result_index", result_index);
     p->setParam<int64_t>("start", start);
     p->setParam<int64_t>("end", end);
