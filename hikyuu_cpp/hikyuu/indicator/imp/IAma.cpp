@@ -168,30 +168,6 @@ Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
     return Indicator(p);
 }
 
-Indicator HKU_API AMA(const IndParam& n, int fast_n, int slow_n) {
-    IndicatorImpPtr p = make_shared<IAma>();
-    p->setIndParam("n", n);
-    p->setParam<int>("fast_n", fast_n);
-    p->setParam<int>("slow_n", slow_n);
-    return Indicator(p);
-}
-
-Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, int slow_n) {
-    IndicatorImpPtr p = make_shared<IAma>();
-    p->setIndParam("n", n);
-    p->setIndParam("fast_n", fast_n);
-    p->setParam<int>("slow_n", slow_n);
-    return Indicator(p);
-}
-
-Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, const IndParam& slow_n) {
-    IndicatorImpPtr p = make_shared<IAma>();
-    p->setIndParam("n", n);
-    p->setIndParam("fast_n", fast_n);
-    p->setIndParam("slow_n", slow_n);
-    return Indicator(p);
-}
-
 Indicator HKU_API AMA(int n, const IndParam& fast_n, int slow_n) {
     IndicatorImpPtr p = make_shared<IAma>();
     p->setParam<int>("n", n);
@@ -212,6 +188,38 @@ Indicator HKU_API AMA(int n, int fast_n, const IndParam& slow_n) {
     IndicatorImpPtr p = make_shared<IAma>();
     p->setParam<int>("n", n);
     p->setParam<int>("fast_n", fast_n);
+    p->setIndParam("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(const IndParam& n, int fast_n, int slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setIndParam("n", n);
+    p->setParam<int>("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, int slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setIndParam("n", n);
+    p->setIndParam("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(const IndParam& n, int fast_n, const IndParam& slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setIndParam("n", n);
+    p->setParam<int>("fast_n", fast_n);
+    p->setIndParam("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, const IndParam& slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setIndParam("n", n);
+    p->setIndParam("fast_n", fast_n);
     p->setIndParam("slow_n", slow_n);
     return Indicator(p);
 }

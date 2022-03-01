@@ -40,7 +40,30 @@ Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
 Indicator (*AMA_1)(int, int, int) = AMA;
-Indicator (*AMA_2)(const Indicator&, int, int, int) = AMA;
+Indicator (*AMA_2)(int, const IndParam&, int) = AMA;
+Indicator (*AMA_3)(int, int, const IndParam&) = AMA;
+Indicator (*AMA_4)(int, const IndParam&, const IndParam&) = AMA;
+Indicator (*AMA_5)(const IndParam&, int, int) = AMA;
+Indicator (*AMA_6)(const IndParam&, const IndParam&, int) = AMA;
+Indicator (*AMA_7)(const IndParam&, int, const IndParam&) = AMA;
+Indicator (*AMA_8)(const IndParam&, const IndParam&, const IndParam&) = AMA;
+
+Indicator (*AMA_9)(const Indicator&, int, int, int) = AMA;
+Indicator (*AMA_10)(const Indicator&, int, const IndParam&, int) = AMA;
+Indicator (*AMA_11)(const Indicator&, int, int, const IndParam&) = AMA;
+Indicator (*AMA_12)(const Indicator&, int, const IndParam&, const IndParam&) = AMA;
+Indicator (*AMA_13)(const Indicator&, const IndParam&, int, int) = AMA;
+Indicator (*AMA_14)(const Indicator&, const IndParam&, const IndParam&, int) = AMA;
+Indicator (*AMA_15)(const Indicator&, const IndParam&, int, const IndParam&) = AMA;
+Indicator (*AMA_16)(const Indicator&, const IndParam&, const IndParam&, const IndParam&) = AMA;
+
+Indicator (*AMA_17)(const Indicator&, int, const Indicator&, int) = AMA;
+Indicator (*AMA_18)(const Indicator&, int, int, const Indicator&) = AMA;
+Indicator (*AMA_19)(const Indicator&, int, const Indicator&, const Indicator&) = AMA;
+Indicator (*AMA_20)(const Indicator&, const Indicator&, int, int) = AMA;
+Indicator (*AMA_21)(const Indicator&, const Indicator&, const Indicator&, int) = AMA;
+Indicator (*AMA_22)(const Indicator&, const Indicator&, int, const Indicator&) = AMA;
+Indicator (*AMA_23)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = AMA;
 
 Indicator (*ATR_1)(int) = ATR;
 Indicator (*ATR_2)(const Indicator&, int) = ATR;
@@ -482,7 +505,28 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("AMA", AMA_1, (arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
-    def("AMA", AMA_2, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30),
+    def("AMA", AMA_2, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_3, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_4, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_5, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_6, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_7, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_8, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_23, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_10, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_11, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_12, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_13, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_14, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_15, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_16, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_17, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_18, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_19, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_20, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_21, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_22, (arg("n"), arg("fast_n") = 2, arg("slow_n")));
+    def("AMA", AMA_9, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30),
         R"(AMA([data, n=10, fast_n=2, slow_n=30])
 
     佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
