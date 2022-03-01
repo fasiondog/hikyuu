@@ -6,6 +6,9 @@
  */
 
 #include <cmath>
+#include "../crt/AMA.h"
+#include "../crt/CVAL.h"
+#include "../crt/SLICE.h"
 #include "IAma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -76,6 +79,87 @@ void IAma::_calculate(const Indicator& data) {
     }
 }
 
+void IAma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_n, int slow_n) {
+    if (n < 1) {
+        n = 1;
+    }
+
+    if (fast_n < 0) {
+        fast_n = 0;
+    }
+
+    if (slow_n < 0) {
+        slow_n = 0;
+    }
+
+    Indicator slice = SLICE(ind, 0, curPos + 1);
+    Indicator ama = AMA(slice, n, fast_n, slow_n);
+    if (ama.size() > 0) {
+        _set(ama[ama.size() - 1], curPos);
+    }
+}
+
+void IAma::_dyn_calculate(const Indicator& ind) {
+    auto iter = m_ind_params.find("fast_n");
+    Indicator fast_n =
+      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("fast_n"));
+    iter = m_ind_params.find("slow_n");
+    Indicator slow_n =
+      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("slow_n"));
+    iter = m_ind_params.find("n");
+    Indicator n =
+      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("n"));
+
+    HKU_CHECK(fast_n.size() == ind.size(), "ind_param(fast_n).size()={}, ind.size()={}!",
+              fast_n.size(), ind.size());
+    HKU_CHECK(slow_n.size() == ind.size(), "ind_param(slow_n).size()={}, ind.size()={}!",
+              slow_n.size(), ind.size());
+
+    m_discard = std::max(ind.discard(), fast_n.discard());
+    m_discard = std::max(m_discard, slow_n.discard());
+    m_discard = std::max(m_discard, n.discard());
+    size_t total = ind.size();
+    HKU_IF_RETURN(0 == total || m_discard >= total, void());
+
+    static const size_t minCircleLength = 400;
+    size_t workerNum = ms_tg->worker_num();
+    if (total < minCircleLength || workerNum == 1) {
+        for (size_t i = ind.discard(); i < total; i++) {
+            _dyn_one_circle(ind, i, n[i], fast_n[i], slow_n[i]);
+        }
+        return;
+    }
+
+    size_t circleLength = minCircleLength;
+    if (minCircleLength * workerNum >= total) {
+        circleLength = minCircleLength;
+    } else {
+        size_t tailCount = total % workerNum;
+        circleLength = tailCount == 0 ? total / workerNum : total / workerNum + 1;
+    }
+
+    std::vector<std::future<void>> tasks;
+    for (size_t group = 0; group < workerNum; group++) {
+        size_t first = circleLength * group;
+        if (first >= total) {
+            break;
+        }
+        tasks.push_back(ms_tg->submit([=, &ind, &n, &fast_n, &slow_n]() {
+            size_t endPos = first + circleLength;
+            if (endPos > total) {
+                endPos = total;
+            }
+            for (size_t i = circleLength * group; i < endPos; i++) {
+                _dyn_one_circle(ind, i, n[i], fast_n[i], slow_n[i]);
+            }
+        }));
+    }
+
+    for (auto& task : tasks) {
+        task.get();
+    }
+}
+
 Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
     IndicatorImpPtr p = make_shared<IAma>();
     p->setParam<int>("n", n);
@@ -84,8 +168,52 @@ Indicator HKU_API AMA(int n, int fast_n, int slow_n) {
     return Indicator(p);
 }
 
-Indicator HKU_API AMA(const Indicator& ind, int n, int fast_n, int slow_n) {
-    return AMA(n, fast_n, slow_n)(ind);
+Indicator HKU_API AMA(const IndParam& n, int fast_n, int slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setIndParam("n", n);
+    p->setParam<int>("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, int slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setIndParam("n", n);
+    p->setIndParam("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, const IndParam& slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setIndParam("n", n);
+    p->setIndParam("fast_n", fast_n);
+    p->setIndParam("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(int n, const IndParam& fast_n, int slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setParam<int>("n", n);
+    p->setIndParam("fast_n", fast_n);
+    p->setParam<int>("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(int n, const IndParam& fast_n, const IndParam& slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setParam<int>("n", n);
+    p->setIndParam("fast_n", fast_n);
+    p->setIndParam("slow_n", slow_n);
+    return Indicator(p);
+}
+
+Indicator HKU_API AMA(int n, int fast_n, const IndParam& slow_n) {
+    IndicatorImpPtr p = make_shared<IAma>();
+    p->setParam<int>("n", n);
+    p->setParam<int>("fast_n", fast_n);
+    p->setIndParam("slow_n", slow_n);
+    return Indicator(p);
 }
 
 } /* namespace hku */

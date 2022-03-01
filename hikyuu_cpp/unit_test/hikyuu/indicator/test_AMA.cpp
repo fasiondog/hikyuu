@@ -83,6 +83,45 @@ TEST_CASE("test_AMA") {
     }
 }
 
+/** @par 检测点 */
+// TEST_CASE("test_AMA_dyn") {
+//     Stock stock = StockManager::instance().getStock("sh000001");
+//     KData kdata = stock.getKData(KQuery(-50));
+//     // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+//     Indicator c = CLOSE(kdata);
+//     Indicator expect = AMA(c, 10, 2, 30);
+//     Indicator result = EMA(c, CVAL(c, 10));
+//     CHECK_EQ(expect.size(), result.size());
+//     // CHECK_EQ(expect.discard(), result.discard());
+//     for (size_t i = 0; i < result.discard(); i++) {
+//         CHECK_UNARY(std::isnan(result[i]));
+//     }
+//     for (size_t i = expect.discard(); i < expect.size(); i++) {
+//         CHECK_EQ(expect[i], doctest::Approx(result[i]));
+//     }
+
+//     result = EMA(c, IndParam(CVAL(c, 10)));
+//     CHECK_EQ(expect.size(), result.size());
+//     // CHECK_EQ(expect.discard(), result.discard());
+//     for (size_t i = 0; i < result.discard(); i++) {
+//         CHECK_UNARY(std::isnan(result[i]));
+//     }
+//     for (size_t i = expect.discard(); i < expect.size(); i++) {
+//         CHECK_EQ(expect[i], doctest::Approx(result[i]));
+//     }
+
+//     expect = EMA(c, 0);
+//     result = EMA(c, CVAL(c, 0));
+//     CHECK_EQ(expect.size(), result.size());
+//     // CHECK_EQ(expect.discard(), result.discard());
+//     for (size_t i = 0; i < result.discard(); i++) {
+//         CHECK_UNARY(std::isnan(result[i]));
+//     }
+//     for (size_t i = expect.discard(); i < expect.size(); i++) {
+//         CHECK_EQ(expect[i], doctest::Approx(result[i]));
+//     }
+// }
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
