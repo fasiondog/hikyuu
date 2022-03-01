@@ -92,7 +92,10 @@ Indicator (*MACD_2)(const Indicator&, int, int, int) = MACD;
 // BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_2_overload, MACD, 1, 4);
 
 Indicator (*REF_1)(int) = REF;
-Indicator (*REF_2)(const Indicator&, int) = REF;
+Indicator (*REF_2)(const IndParam&) = REF;
+Indicator (*REF_3)(const Indicator&, const IndParam&) = REF;
+Indicator (*REF_4)(const Indicator&, const Indicator&) = REF;
+Indicator (*REF_5)(const Indicator&, int) = REF;
 
 Indicator (*SAFTYLOSS_1)(int n1, int n2, double p) = SAFTYLOSS;
 Indicator (*SAFTYLOSS_2)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS;
@@ -605,14 +608,17 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("REF", REF_1, (arg("n")));
-    def("REF", REF_2, (arg("data"), arg("n")), R"(REF([data, n])
+    def("REF", REF_2, (arg("n")));
+    def("REF", REF_3, (arg("data"), arg("n")));
+    def("REF", REF_4, (arg("data"), arg("n")));
+    def("REF", REF_5, (arg("data"), arg("n")), R"(REF([data, n])
 
     向前引用 （即右移），引用若干周期前的数据。
 
     用法：REF(X，A)　引用A周期前的X值。
 
     :param Indicator data: 输入数据
-    :param int n: 引用n周期前的值，即右移n位
+    :param int|Indicator|IndParam n: 引用n周期前的值，即右移n位
     :rtype: Indicator)");
 
     def("STDEV", STDEV_1, (arg("n") = 10));

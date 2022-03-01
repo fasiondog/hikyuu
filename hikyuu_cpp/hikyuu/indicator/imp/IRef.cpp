@@ -37,14 +37,22 @@ void IRef::_calculate(const Indicator& data) {
     }
 }
 
+void IRef::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    if (curPos >= step) {
+        _set(ind[curPos - step], curPos);
+    }
+}
+
 Indicator HKU_API REF(int n) {
     IndicatorImpPtr p = make_shared<IRef>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API REF(const Indicator& ind, int n) {
-    return REF(n)(ind);
+Indicator HKU_API REF(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IRef>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */
