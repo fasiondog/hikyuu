@@ -66,7 +66,10 @@ Indicator (*AMA_22)(const Indicator&, const Indicator&, int, const Indicator&) =
 Indicator (*AMA_23)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = AMA;
 
 Indicator (*ATR_1)(int) = ATR;
-Indicator (*ATR_2)(const Indicator&, int) = ATR;
+Indicator (*ATR_2)(const IndParam&) = ATR;
+Indicator (*ATR_3)(const Indicator&, const IndParam&) = ATR;
+Indicator (*ATR_4)(const Indicator&, const Indicator&) = ATR;
+Indicator (*ATR_5)(const Indicator&, int) = ATR;
 
 Indicator (*DIFF_1)() = DIFF;
 Indicator (*DIFF_2)(const Indicator&) = DIFF;
@@ -532,21 +535,24 @@ void export_Indicator_build_in() {
     佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 
     :param Indicator data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于2的整数
-    :param int fast_n: 对应快速周期N
-    :param int slow_n: 对应慢速EMA线的N值
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于2的整数
+    :param int|Indicator|IndParam fast_n: 对应快速周期N
+    :param int|Indicator|IndParam slow_n: 对应慢速EMA线的N值
     :rtype: Indicator
 
     * result(0): AMA
     * result(1): ER)");
 
     def("ATR", ATR_1, (arg("n") = 14));
-    def("ATR", ATR_2, (arg("data"), arg("n") = 14), R"(ATR([data, n=14])
+    def("ATR", ATR_2, (arg("n")));
+    def("ATR", ATR_3, (arg("data"), arg("n")));
+    def("ATR", ATR_4, (arg("data"), arg("n")));
+    def("ATR", ATR_5, (arg("data"), arg("n") = 14), R"(ATR([data, n=14])
 
     平均真实波幅(Average True Range)
 
     :param Indicator data 待计算的源数据
-    :param int n: 计算均值的周期窗口，必须为大于1的整数
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator)");
 
     def("MACD", MACD_1, (arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));

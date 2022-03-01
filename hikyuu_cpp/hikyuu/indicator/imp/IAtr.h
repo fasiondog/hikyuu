@@ -14,7 +14,7 @@
 namespace hku {
 
 class IAtr : public IndicatorImp {
-    INDICATOR_IMP(IAtr)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(IAtr)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

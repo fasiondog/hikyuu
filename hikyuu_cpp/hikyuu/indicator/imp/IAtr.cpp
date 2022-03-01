@@ -5,6 +5,8 @@
  *      Author: Administrator
  */
 
+#include "../crt/ATR.h"
+#include "../crt/SLICE.h"
 #include "IAtr.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -43,14 +45,25 @@ void IAtr::_calculate(const Indicator& indicator) {
     }
 }
 
+void IAtr::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step < 1, void());
+    Indicator slice = SLICE(ind, 0, curPos + 1);
+    Indicator atr = ATR(slice, step);
+    if (atr.size() > 0) {
+        _set(atr[atr.size() - 1], curPos);
+    }
+}
+
 Indicator HKU_API ATR(int n) {
     IndicatorImpPtr p = make_shared<IAtr>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API ATR(const Indicator& data, int n) {
-    return ATR(n)(data);
+Indicator HKU_API ATR(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IAtr>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */
