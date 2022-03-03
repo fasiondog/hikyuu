@@ -22,10 +22,6 @@ namespace hku {
  * </pre>
  * @ingroup Indicator
  */
-Indicator MAX(const Indicator&, const Indicator&);
-Indicator MAX(const Indicator&, price_t val);
-Indicator MAX(price_t val, const Indicator& ind);
-
 inline Indicator MAX(const Indicator& ind1, const Indicator& ind2) {
     Indicator result = IF(ind1 > ind2, ind1, ind2);
     result.name("MAX");

@@ -94,8 +94,8 @@ TEST_CASE("test_EMA_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 
-    expect = EMA(c, 0);
-    result = EMA(c, CVAL(c, 0));
+    expect = EMA(c, 2);
+    result = EMA(c, CVAL(c, 2));
     CHECK_EQ(expect.size(), result.size());
     // CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
