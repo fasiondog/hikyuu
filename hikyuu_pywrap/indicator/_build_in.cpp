@@ -65,7 +65,10 @@ Indicator (*SMA_1)(int, double) = SMA;
 Indicator (*SMA_2)(const Indicator&, int, double) = SMA;
 
 Indicator (*EMA_1)(int) = EMA;
-Indicator (*EMA_2)(const Indicator&, int) = EMA;
+Indicator (*EMA_2)(const IndParam&) = EMA;
+Indicator (*EMA_3)(const Indicator&, const IndParam&) = EMA;
+Indicator (*EMA_4)(const Indicator&, const Indicator&) = EMA;
+Indicator (*EMA_5)(const Indicator&, int) = EMA;
 
 Indicator (*MACD_1)(int, int, int) = MACD;
 Indicator (*MACD_2)(const Indicator&, int, int, int) = MACD;
@@ -388,6 +391,10 @@ Indicator (*NDAY_1)(const Indicator&, const Indicator&, int) = NDAY;
 Indicator (*NDAY_2)(const Indicator&, const Indicator&, const Indicator&) = NDAY;
 Indicator (*NDAY_3)(const Indicator&, const Indicator&, const IndParam&) = NDAY;
 
+Indicator (*SLICE_1)(const PriceList&, int64_t, int64_t) = SLICE;
+Indicator (*SLICE_2)(int64_t, int64_t, int) = SLICE;
+Indicator (*SLICE_3)(const Indicator&, int64_t, int64_t, int) = SLICE;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -471,12 +478,15 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("EMA", EMA_1, (arg("n") = 22));
-    def("EMA", EMA_2, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
+    def("EMA", EMA_2, (arg("n")));
+    def("EMA", EMA_4, (arg("data"), arg("n")));
+    def("EMA", EMA_5, (arg("data"), arg("n")));
+    def("EMA", EMA_3, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
 
     指数移动平均线(Exponential Moving Average)
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
     def("MA", MA_1, (arg("n") = 22));
@@ -1386,4 +1396,16 @@ void export_Indicator_build_in() {
     :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
     :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
     :rtype: Indicator)");
+
+    def("SLICE", SLICE_1, (arg("data"), arg("start"), arg("end")));
+    def("SLICE", SLICE_2, (arg("start"), arg("end"), arg("result_index") = 0));
+    def("SLICE", SLICE_3, (arg("data"), arg("start"), arg("end"), arg("result_index") = 0),
+        R"(SLICE(data, start, end, result_index=0)
+
+    获取某指标中指定范围 [start, end) 的数据，生成新的指标
+
+    :param Indicator|PriceList data: 输入数据
+    :param int start: 起始位置
+    :param int end: 终止位置（不包含本身）
+    :param int result_index: 原输入数据中的结果集)");
 }

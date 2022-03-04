@@ -91,14 +91,6 @@ Indicator HKU_API SLICE(const PriceList& data, int64_t start, int64_t end) {
     return make_shared<ISlice>(data, start, end)->calculate();
 }
 
-Indicator HKU_API SLICE(const Indicator& data, int64_t start, int64_t end, int result_index) {
-    IndicatorImpPtr p = make_shared<ISlice>();
-    p->setParam<int>("result_index", result_index);
-    p->setParam<int64_t>("start", start);
-    p->setParam<int64_t>("end", end);
-    return Indicator(p)(data);
-}
-
 Indicator HKU_API SLICE(int64_t start, int64_t end, int result_index) {
     IndicatorImpPtr p = make_shared<ISlice>();
     p->setParam<int>("result_index", result_index);

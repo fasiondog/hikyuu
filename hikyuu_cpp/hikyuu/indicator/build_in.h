@@ -76,6 +76,7 @@
 #include "crt/ROUNDUP.h"
 #include "crt/SAFTYLOSS.h"
 #include "crt/SIN.h"
+#include "crt/SLICE.h"
 #include "crt/SGN.h"
 #include "crt/SMA.h"
 #include "crt/SQRT.h"
