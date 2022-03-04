@@ -239,7 +239,16 @@ Indicator (*EVERY_4)(const Indicator&, const Indicator&) = EVERY;
 Indicator (*EVERY_5)(const Indicator&, int) = EVERY;
 
 Indicator (*LAST_1)(int, int) = LAST;
-Indicator (*LAST_2)(const Indicator&, int, int) = LAST;
+Indicator (*LAST_2)(int, const IndParam&) = LAST;
+Indicator (*LAST_3)(const IndParam&, int) = LAST;
+Indicator (*LAST_4)(const IndParam&, const IndParam&) = LAST;
+Indicator (*LAST_5)(const Indicator&, int, int) = LAST;
+Indicator (*LAST_6)(const Indicator&, int, const IndParam&) = LAST;
+Indicator (*LAST_7)(const Indicator&, const IndParam&, int) = LAST;
+Indicator (*LAST_8)(const Indicator&, const IndParam&, const IndParam&) = LAST;
+Indicator (*LAST_9)(const Indicator&, int, const Indicator&) = LAST;
+Indicator (*LAST_10)(const Indicator&, const Indicator&, int) = LAST;
+Indicator (*LAST_11)(const Indicator&, const Indicator&, const Indicator&) = LAST;
 
 Indicator (*SIN_1)() = SIN;
 Indicator (*SIN_2)(const Indicator&) = SIN;
@@ -972,7 +981,16 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("LAST", LAST_1, (arg("m") = 10, arg("n") = 5));
-    def("LAST", LAST_2, (arg("data"), arg("m") = 10, arg("n") = 5), R"(LAST([data, m=10, n=5])
+    def("LAST", LAST_2, (arg("m"), arg("n")));
+    def("LAST", LAST_3, (arg("m"), arg("n") = 5));
+    def("LAST", LAST_4, (arg("m"), arg("n")));
+    def("LAST", LAST_5, (arg("data"), arg("m") = 10, arg("n") = 5));
+    def("LAST", LAST_6, (arg("data"), arg("m"), arg("n")));
+    def("LAST", LAST_7, (arg("data"), arg("m"), arg("n") = 5));
+    def("LAST", LAST_8, (arg("data"), arg("m"), arg("n")));
+    def("LAST", LAST_9, (arg("data"), arg("m"), arg("n")));
+    def("LAST", LAST_10, (arg("data"), arg("m"), arg("n") = 5));
+    def("LAST", LAST_11, (arg("data"), arg("m"), arg("n")), R"(LAST([data, m=10, n=5])
 
     区间存在。
 
@@ -981,8 +999,8 @@ void export_Indicator_build_in() {
     例如：LAST(CLOSE>OPEN,10,5) 表示从前10日到前5日内一直阳线。
 
     :param data: 输入数据
-    :param int m: m周期
-    :param int n: n周期
+    :param int|Indicator|IndParam m: m周期
+    :param int|Indicator|IndParam n: n周期
     :rtype: Indicator)");
 
     def("SIN", SIN_1);

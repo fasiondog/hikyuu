@@ -1267,6 +1267,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
             size_t step = size_t(ind_param->get(i));
             _dyn_run_one_step(ind, i, step);
         }
+        _update_discard();
         return;
     }
 
@@ -1299,6 +1300,18 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     for (auto &task : tasks) {
         task.get();
+    }
+
+    _update_discard();
+}
+
+void IndicatorImp::_update_discard(size_t result_index) {
+    size_t total = size();
+    for (size_t i = m_discard; i < total; i++) {
+        if (!std::isnan(get(i, result_index))) {
+            break;
+        }
+        m_discard++;
     }
 }
 
