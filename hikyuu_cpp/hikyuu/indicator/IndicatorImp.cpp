@@ -1305,13 +1305,19 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     _update_discard();
 }
 
-void IndicatorImp::_update_discard(size_t result_index) {
+void IndicatorImp::_update_discard() {
     size_t total = size();
-    for (size_t i = m_discard; i < total; i++) {
-        if (!std::isnan(get(i, result_index))) {
-            break;
+    for (size_t result_index = 0; result_index < m_result_num; result_index++) {
+        size_t discard = m_discard;
+        for (size_t i = m_discard; i < total; i++) {
+            if (!std::isnan(get(i, result_index))) {
+                break;
+            }
+            discard++;
         }
-        m_discard++;
+        if (discard > m_discard) {
+            m_discard = discard;
+        }
     }
 }
 

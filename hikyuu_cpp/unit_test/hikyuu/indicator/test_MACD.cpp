@@ -10,6 +10,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MACD.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/EMA.h>
 
@@ -152,6 +153,36 @@ TEST_CASE("test_MACD") {
         CHECK_EQ(result.get(i, 0), expect.get(i, 0));
         CHECK_EQ(result.get(i, 1), expect.get(i, 1));
         CHECK_EQ(result.get(i, 2), expect.get(i, 2));
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_MACD_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-50));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = MACD(c, 12, 26, 9);
+    Indicator result = MACD(c, CVAL(c, 12), CVAL(c, 26), CVAL(c, 9));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
+        CHECK_EQ(expect.get(i, 2), doctest::Approx(result.get(i, 2)));
+    }
+
+    result = MACD(c, IndParam(CVAL(c, 12)), IndParam(CVAL(c, 26)), IndParam(CVAL(c, 9)));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
+        CHECK_EQ(expect.get(i, 2), doctest::Approx(result.get(i, 2)));
     }
 }
 

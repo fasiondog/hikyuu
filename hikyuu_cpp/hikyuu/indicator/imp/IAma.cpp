@@ -95,7 +95,9 @@ void IAma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_
     Indicator slice = SLICE(ind, 0, curPos + 1);
     Indicator ama = AMA(slice, n, fast_n, slow_n);
     if (ama.size() > 0) {
-        _set(ama[ama.size() - 1], curPos);
+        size_t index = ama.size() - 1;
+        _set(ama.get(index, 0), curPos, 0);
+        _set(ama.get(index, 1), curPos, 1);
     }
 }
 
@@ -127,6 +129,7 @@ void IAma::_dyn_calculate(const Indicator& ind) {
         for (size_t i = ind.discard(); i < total; i++) {
             _dyn_one_circle(ind, i, n[i], fast_n[i], slow_n[i]);
         }
+        _update_discard();
         return;
     }
 
@@ -158,6 +161,7 @@ void IAma::_dyn_calculate(const Indicator& ind) {
     for (auto& task : tasks) {
         task.get();
     }
+    _update_discard();
 }
 
 Indicator HKU_API AMA(int n, int fast_n, int slow_n) {

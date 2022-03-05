@@ -93,22 +93,22 @@ TEST_CASE("test_AMA_dyn") {
     Indicator expect = AMA(c, 10, 2, 30);
     Indicator result = AMA(c, CVAL(c, 10), CVAL(c, 2), CVAL(c, 30));
     CHECK_EQ(expect.size(), result.size());
-    // CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
-    for (size_t i = expect.discard(); i < expect.size(); i++) {
-        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
     }
 
     result = AMA(c, IndParam(CVAL(c, 10)), IndParam(CVAL(c, 2)), IndParam(CVAL(c, 30)));
     CHECK_EQ(expect.size(), result.size());
-    // CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
-    for (size_t i = expect.discard(); i < expect.size(); i++) {
-        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
     }
 }
 

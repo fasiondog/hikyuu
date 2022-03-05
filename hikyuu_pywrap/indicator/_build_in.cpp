@@ -71,9 +71,10 @@ Indicator (*EMA_4)(const Indicator&, const Indicator&) = EMA;
 Indicator (*EMA_5)(const Indicator&, int) = EMA;
 
 Indicator (*MACD_1)(int, int, int) = MACD;
-Indicator (*MACD_2)(const Indicator&, int, int, int) = MACD;
-// BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_1_overload, MACD, 0, 3);
-// BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_2_overload, MACD, 1, 4);
+Indicator (*MACD_2)(const IndParam&, const IndParam&, const IndParam&) = MACD;
+Indicator (*MACD_3)(const Indicator&, int, int, int) = MACD;
+Indicator (*MACD_4)(const Indicator&, const IndParam&, const IndParam&, const IndParam&) = MACD;
+Indicator (*MACD_5)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = MACD;
 
 Indicator (*REF_1)(int) = REF;
 Indicator (*REF_2)(const IndParam&) = REF;
@@ -545,15 +546,18 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("MACD", MACD_1, (arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
-    def("MACD", MACD_2, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9),
+    def("MACD", MACD_2, (arg("n1"), arg("n2"), arg("n3")));
+    def("MACD", MACD_3, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
+    def("MACD", MACD_4, (arg("data"), arg("n1"), arg("n2"), arg("n3")));
+    def("MACD", MACD_5, (arg("data"), arg("n1"), arg("n2"), arg("n3")),
         R"(MACD([data, n1=12, n2=26, n3=9])
 
     平滑异同移动平均线
 
     :param Indicator data: 输入数据
-    :param int n1: 短期EMA时间窗
-    :param int n2: 长期EMA时间窗
-    :param int n3: （短期EMA-长期EMA）EMA平滑时间窗
+    :param int|Indicator|IndParam n1: 短期EMA时间窗
+    :param int|Indicator|IndParam n2: 长期EMA时间窗
+    :param int|Indicator|IndParam n3: （短期EMA-长期EMA）EMA平滑时间窗
     :rtype: 具有三个结果集的 Indicator
 
     * result(0): MACD_BAR：MACD直柱，即MACD快线－MACD慢线
