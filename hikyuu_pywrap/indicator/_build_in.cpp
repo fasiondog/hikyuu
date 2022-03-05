@@ -301,9 +301,13 @@ Indicator (*CROSS_3)(price_t, const Indicator&) = CROSS;
 Indicator (*CROSS_4)(price_t, price_t) = CROSS;
 
 Indicator (*LONGCROSS_1)(const Indicator&, const Indicator&, int) = LONGCROSS;
-Indicator (*LONGCROSS_2)(const Indicator&, price_t, int) = LONGCROSS;
-Indicator (*LONGCROSS_3)(price_t, const Indicator&, int) = LONGCROSS;
-Indicator (*LONGCROSS_4)(price_t, price_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_2)(const Indicator&, const Indicator&, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_3)(const Indicator&, price_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_4)(const Indicator&, price_t, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_5)(price_t, const Indicator&, int) = LONGCROSS;
+Indicator (*LONGCROSS_6)(price_t, const Indicator&, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_7)(price_t, price_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_8)(price_t, price_t, const Indicator&) = LONGCROSS;
 
 Indicator (*FILTER_1)(int) = FILTER;
 Indicator (*FILTER_2)(const IndParam&) = FILTER;
@@ -1148,9 +1152,13 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("LONGCROSS", LONGCROSS_1, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n")));
     def("LONGCROSS", LONGCROSS_3, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n") = 3), R"(LONGCROSS(a, b[, n=3])
+    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n")));
+    def("LONGCROSS", LONGCROSS_5, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_6, (arg("a"), arg("b"), arg("n")));
+    def("LONGCROSS", LONGCROSS_7, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_8, (arg("a"), arg("b"), arg("n")), R"(LONGCROSS(a, b[, n=3])
 
     两条线维持一定周期后交叉
 
@@ -1160,7 +1168,7 @@ void export_Indicator_build_in() {
 
     :param Indicator a:
     :param Indicator b:
-    :param int n:
+    :param int|Indicator n:
     :rtype: Indicator)");
 
     def("FILTER", FILTER_1, (arg("n") = 5));
