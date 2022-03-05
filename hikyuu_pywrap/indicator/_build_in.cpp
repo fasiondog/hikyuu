@@ -62,7 +62,16 @@ Indicator (*MA_4)(const Indicator&, const Indicator&) = MA;
 Indicator (*MA_5)(const Indicator&, int) = MA;
 
 Indicator (*SMA_1)(int, double) = SMA;
-Indicator (*SMA_2)(const Indicator&, int, double) = SMA;
+Indicator (*SMA_2)(int, const IndParam&) = SMA;
+Indicator (*SMA_3)(const IndParam&, double) = SMA;
+Indicator (*SMA_4)(const IndParam&, const IndParam&) = SMA;
+Indicator (*SMA_5)(const Indicator&, int, double) = SMA;
+Indicator (*SMA_6)(const Indicator&, int, const IndParam&) = SMA;
+Indicator (*SMA_7)(const Indicator&, const IndParam&, double) = SMA;
+Indicator (*SMA_8)(const Indicator&, const IndParam&, const IndParam&) = SMA;
+Indicator (*SMA_9)(const Indicator&, int, const Indicator&) = SMA;
+Indicator (*SMA_10)(const Indicator&, const Indicator&, double) = SMA;
+Indicator (*SMA_11)(const Indicator&, const Indicator&, const Indicator&) = SMA;
 
 Indicator (*EMA_1)(int) = EMA;
 Indicator (*EMA_2)(const IndParam&) = EMA;
@@ -488,15 +497,24 @@ void export_Indicator_build_in() {
     def("PRICELIST", PRICELIST4, (arg("result_index") = 0));
 
     def("SMA", SMA_1, (arg("n") = 22, arg("m") = 2.0));
-    def("SMA", SMA_2, (arg("data"), arg("n") = 22, arg("m") = 2.0), R"(SMA([data, n=22, m=2])
+    def("SMA", SMA_2, (arg("n"), arg("m")));
+    def("SMA", SMA_3, (arg("n"), arg("m") = 2.0));
+    def("SMA", SMA_4, (arg("n"), arg("m")));
+    def("SMA", SMA_5, (arg("data"), arg("n") = 22, arg("m") = 2.0));
+    def("SMA", SMA_6, (arg("data"), arg("n"), arg("m")));
+    def("SMA", SMA_7, (arg("data"), arg("n"), arg("m") = 2.0));
+    def("SMA", SMA_8, (arg("data"), arg("n"), arg("m")));
+    def("SMA", SMA_9, (arg("data"), arg("n"), arg("m")));
+    def("SMA", SMA_10, (arg("data"), arg("n"), arg("m") = 2.0));
+    def("SMA", SMA_11, (arg("data"), arg("n"), arg("m")), R"(SMA([data, n=22, m=2])
 
     求移动平均
 
     用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
-    :param float m: 系数
+    :param int|Indicator|IndParam n: 时间窗口
+    :param float|Indicator|IndParam m: 系数
     :rtype: Indicator)");
 
     def("EMA", EMA_1, (arg("n") = 22));

@@ -22,6 +22,11 @@ class ISma : public IndicatorImp {
 public:
     ISma();
     virtual ~ISma();
+
+    virtual void _dyn_calculate(const Indicator&) override;
+
+private:
+    void _dyn_one_circle(const Indicator& ind, size_t curPos, int n, double m);
 };
 
 } /* namespace hku */
