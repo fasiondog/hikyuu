@@ -24,13 +24,14 @@ namespace hku {
  *         上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
  * </pre>
  * @note：返回结果中前（回溯周期宽度＋去最高值的宽度）个点是无效的
- * @param data 输入数据，单一输入
  * @param n1 计算平均噪音的回溯时间窗口，默认为10天
  * @param n2 对初步止损线去n2日内的最高值，默认为3
  * @param p 噪音系数，默认为2
  * @ingroup Indicator
  */
-Indicator HKU_API SAFTYLOSS(const Indicator& data, int n1 = 10, int n2 = 3, double p = 2.0);
+Indicator HKU_API SAFTYLOSS(int n1 = 10, int n2 = 3, double p = 2.0);
+Indicator HKU_API SAFTYLOSS(const IndParam& n1, const IndParam& n2, double p = 2.0);
+Indicator HKU_API SAFTYLOSS(const IndParam& n1, const IndParam& n2, const IndParam& p);
 
 /**
  * 亚历山大 艾尔德安全地带止损
@@ -43,12 +44,35 @@ Indicator HKU_API SAFTYLOSS(const Indicator& data, int n1 = 10, int n2 = 3, doub
  *         上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
  * </pre>
  * @note：返回结果中前（回溯周期宽度＋去最高值的宽度）个点是无效的
+ * @param data 输入数据，单一输入
  * @param n1 计算平均噪音的回溯时间窗口，默认为10天
  * @param n2 对初步止损线去n2日内的最高值，默认为3
  * @param p 噪音系数，默认为2
  * @ingroup Indicator
  */
-Indicator HKU_API SAFTYLOSS(int n1 = 10, int n2 = 3, double p = 2.0);
+inline Indicator SAFTYLOSS(const Indicator& data, int n1 = 10, int n2 = 3, double p = 2.0) {
+    return SAFTYLOSS(n1, n2, p)(data);
+}
+
+inline Indicator SAFTYLOSS(const Indicator& data, const IndParam& n1, const IndParam& n2,
+                           double p = 2.0) {
+    return SAFTYLOSS(n1, n2, p)(data);
+}
+
+inline Indicator SAFTYLOSS(const Indicator& data, const IndParam& n1, const IndParam& n2,
+                           const IndParam& p) {
+    return SAFTYLOSS(n1, n2, p)(data);
+}
+
+inline Indicator SAFTYLOSS(const Indicator& data, const Indicator& n1, const Indicator& n2,
+                           double p = 2.0) {
+    return SAFTYLOSS(IndParam(n1), IndParam(n2), p)(data);
+}
+
+inline Indicator SAFTYLOSS(const Indicator& data, const Indicator& n1, const Indicator& n2,
+                           const Indicator& p) {
+    return SAFTYLOSS(IndParam(n1), IndParam(n2), IndParam(p))(data);
+}
 
 }  // namespace hku
 

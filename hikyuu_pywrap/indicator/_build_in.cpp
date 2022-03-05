@@ -83,9 +83,17 @@ Indicator (*REF_4)(const Indicator&, const Indicator&) = REF;
 Indicator (*REF_5)(const Indicator&, int) = REF;
 
 Indicator (*SAFTYLOSS_1)(int n1, int n2, double p) = SAFTYLOSS;
-Indicator (*SAFTYLOSS_2)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS;
-// BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_1_overload, SAFTYLOSS, 0, 3);
-// BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_2_overload, SAFTYLOSS, 1, 4);
+Indicator (*SAFTYLOSS_2)(const IndParam& n1, const IndParam& n2, double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_3)(const IndParam& n1, const IndParam& n2, const IndParam& p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_4)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_5)(const Indicator&, const IndParam& n1, const IndParam& n2,
+                         double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_6)(const Indicator&, const IndParam& n1, const IndParam& n2,
+                         const IndParam& p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_7)(const Indicator&, const Indicator& n1, const Indicator& n2,
+                         double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_8)(const Indicator&, const Indicator& n1, const Indicator& n2,
+                         const Indicator& p) = SAFTYLOSS;
 
 Indicator (*STDEV_1)(int) = STDEV;
 Indicator (*STDEV_2)(const IndParam&) = STDEV;
@@ -576,7 +584,13 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0),
+    def("SAFTYLOSS", SAFTYLOSS_2, (arg("n1"), arg("n2"), arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_3, (arg("n1"), arg("n2"), arg("p")));
+    def("SAFTYLOSS", SAFTYLOSS_4, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_5, (arg("data"), arg("n1"), arg("n2"), arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_6, (arg("data"), arg("n1"), arg("n2"), arg("p")));
+    def("SAFTYLOSS", SAFTYLOSS_7, (arg("data"), arg("n1"), arg("n2"), arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_8, (arg("data"), arg("n1"), arg("n2"), arg("p")),
         R"(SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 
     亚历山大 艾尔德安全地带止损线，参见 [BOOK2]_
@@ -584,9 +598,9 @@ void export_Indicator_build_in() {
     计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
 
     :param Indicator data: 输入数据
-    :param int n1: 计算平均噪音的回溯时间窗口
-    :param int n2: 对初步止损线去n2日内的最高值
-    :param float p: 噪音系数
+    :param int|Indicator|IndParam n1: 计算平均噪音的回溯时间窗口
+    :param int|Indicator|IndParam n2: 对初步止损线去n2日内的最高值
+    :param float|Indicator|IndParam p: 噪音系数
     :rtype: Indicator)");
 
     def("DIFF", DIFF_1);
