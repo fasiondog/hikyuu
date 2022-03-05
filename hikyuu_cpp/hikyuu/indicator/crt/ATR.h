@@ -19,6 +19,7 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ATR(int n = 14);
+Indicator HKU_API ATR(const IndParam& n);
 
 /**
  * 平均真实波幅(Average True Range)
@@ -26,7 +27,17 @@ Indicator HKU_API ATR(int n = 14);
  * @param n 计算均值的周期窗口，必须为大于1的整数
  * @ingroup Indicator
  */
-Indicator HKU_API ATR(const Indicator& data, int n = 14);
+inline Indicator HKU_API ATR(const Indicator& data, int n = 14) {
+    return ATR(n)(data);
+}
+
+inline Indicator HKU_API ATR(const Indicator& data, const IndParam& n) {
+    return ATR(n)(data);
+}
+
+inline Indicator HKU_API ATR(const Indicator& data, const Indicator& n) {
+    return ATR(IndParam(n))(data);
+}
 
 }  // namespace hku
 

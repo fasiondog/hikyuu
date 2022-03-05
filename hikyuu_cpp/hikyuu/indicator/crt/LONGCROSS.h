@@ -26,26 +26,40 @@ namespace hku {
  * </pre>
  * @ingroup Indicator
  */
-Indicator LONGCROSS(const Indicator& x, const Indicator& y, int n = 3);
-Indicator LONGCROSS(const Indicator& x, price_t, int n = 3);
-Indicator LONGCROSS(price_t, const Indicator& y, int n = 3);
-Indicator LONGCROSS(price_t, price_t, int n = 3);
 
-inline Indicator LONGCROSS(const Indicator& x, const Indicator& y, int n) {
+inline Indicator LONGCROSS(const Indicator& x, const Indicator& y, int n = 3) {
     Indicator result = EVERY((REF(x, 1) < REF(y, 1)), n) & (x > y);
     result.name("LONGCROSS");
     return result;
 }
 
-inline Indicator LONGCROSS(const Indicator& x, price_t y, int n) {
+inline Indicator LONGCROSS(const Indicator& x, const Indicator& y, const Indicator& n) {
+    Indicator result = EVERY((REF(x, 1) < REF(y, 1)), n) & (x > y);
+    result.name("LONGCROSS");
+    return result;
+}
+
+inline Indicator LONGCROSS(const Indicator& x, price_t y, int n = 3) {
     return LONGCROSS(x, CVAL(x, y), n);
 }
 
-inline Indicator LONGCROSS(price_t x, const Indicator& y, int n) {
+inline Indicator LONGCROSS(const Indicator& x, price_t y, const Indicator& n) {
+    return LONGCROSS(x, CVAL(x, y), n);
+}
+
+inline Indicator LONGCROSS(price_t x, const Indicator& y, int n = 3) {
     return LONGCROSS(CVAL(y, x), y, n);
 }
 
-inline Indicator LONGCROSS(price_t x, price_t y, int n) {
+inline Indicator LONGCROSS(price_t x, const Indicator& y, const Indicator& n) {
+    return LONGCROSS(CVAL(y, x), y, n);
+}
+
+inline Indicator LONGCROSS(price_t x, price_t y, int n = 3) {
+    return LONGCROSS(CVAL(x), CVAL(y), n);
+}
+
+inline Indicator LONGCROSS(price_t x, price_t y, const Indicator& n) {
     return LONGCROSS(CVAL(x), CVAL(y), n);
 }
 

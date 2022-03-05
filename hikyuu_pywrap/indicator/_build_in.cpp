@@ -39,11 +39,18 @@ Indicator (*VOL3)() = VOL;
 Indicator (*KDATA_PART1)(const KData& kdata, const string& part) = KDATA_PART;
 Indicator (*KDATA_PART3)(const string& part) = KDATA_PART;
 
+// 太多选项选择的话，python中无法加载
 Indicator (*AMA_1)(int, int, int) = AMA;
-Indicator (*AMA_2)(const Indicator&, int, int, int) = AMA;
+Indicator (*AMA_2)(const IndParam&, const IndParam&, const IndParam&) = AMA;
+Indicator (*AMA_3)(const Indicator&, int, int, int) = AMA;
+Indicator (*AMA_4)(const Indicator&, const IndParam&, const IndParam&, const IndParam&) = AMA;
+Indicator (*AMA_5)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = AMA;
 
 Indicator (*ATR_1)(int) = ATR;
-Indicator (*ATR_2)(const Indicator&, int) = ATR;
+Indicator (*ATR_2)(const IndParam&) = ATR;
+Indicator (*ATR_3)(const Indicator&, const IndParam&) = ATR;
+Indicator (*ATR_4)(const Indicator&, const Indicator&) = ATR;
+Indicator (*ATR_5)(const Indicator&, int) = ATR;
 
 Indicator (*DIFF_1)() = DIFF;
 Indicator (*DIFF_2)(const Indicator&) = DIFF;
@@ -55,23 +62,47 @@ Indicator (*MA_4)(const Indicator&, const Indicator&) = MA;
 Indicator (*MA_5)(const Indicator&, int) = MA;
 
 Indicator (*SMA_1)(int, double) = SMA;
-Indicator (*SMA_2)(const Indicator&, int, double) = SMA;
+Indicator (*SMA_2)(int, const IndParam&) = SMA;
+Indicator (*SMA_3)(const IndParam&, double) = SMA;
+Indicator (*SMA_4)(const IndParam&, const IndParam&) = SMA;
+Indicator (*SMA_5)(const Indicator&, int, double) = SMA;
+Indicator (*SMA_6)(const Indicator&, int, const IndParam&) = SMA;
+Indicator (*SMA_7)(const Indicator&, const IndParam&, double) = SMA;
+Indicator (*SMA_8)(const Indicator&, const IndParam&, const IndParam&) = SMA;
+Indicator (*SMA_9)(const Indicator&, int, const Indicator&) = SMA;
+Indicator (*SMA_10)(const Indicator&, const Indicator&, double) = SMA;
+Indicator (*SMA_11)(const Indicator&, const Indicator&, const Indicator&) = SMA;
 
 Indicator (*EMA_1)(int) = EMA;
-Indicator (*EMA_2)(const Indicator&, int) = EMA;
+Indicator (*EMA_2)(const IndParam&) = EMA;
+Indicator (*EMA_3)(const Indicator&, const IndParam&) = EMA;
+Indicator (*EMA_4)(const Indicator&, const Indicator&) = EMA;
+Indicator (*EMA_5)(const Indicator&, int) = EMA;
 
 Indicator (*MACD_1)(int, int, int) = MACD;
-Indicator (*MACD_2)(const Indicator&, int, int, int) = MACD;
-// BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_1_overload, MACD, 0, 3);
-// BOOST_PYTHON_FUNCTION_OVERLOADS(MACD_2_overload, MACD, 1, 4);
+Indicator (*MACD_2)(const IndParam&, const IndParam&, const IndParam&) = MACD;
+Indicator (*MACD_3)(const Indicator&, int, int, int) = MACD;
+Indicator (*MACD_4)(const Indicator&, const IndParam&, const IndParam&, const IndParam&) = MACD;
+Indicator (*MACD_5)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = MACD;
 
 Indicator (*REF_1)(int) = REF;
-Indicator (*REF_2)(const Indicator&, int) = REF;
+Indicator (*REF_2)(const IndParam&) = REF;
+Indicator (*REF_3)(const Indicator&, const IndParam&) = REF;
+Indicator (*REF_4)(const Indicator&, const Indicator&) = REF;
+Indicator (*REF_5)(const Indicator&, int) = REF;
 
 Indicator (*SAFTYLOSS_1)(int n1, int n2, double p) = SAFTYLOSS;
-Indicator (*SAFTYLOSS_2)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS;
-// BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_1_overload, SAFTYLOSS, 0, 3);
-// BOOST_PYTHON_FUNCTION_OVERLOADS(SAFTYLOSS_2_overload, SAFTYLOSS, 1, 4);
+Indicator (*SAFTYLOSS_2)(const IndParam& n1, const IndParam& n2, double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_3)(const IndParam& n1, const IndParam& n2, const IndParam& p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_4)(const Indicator&, int n1, int n2, double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_5)(const Indicator&, const IndParam& n1, const IndParam& n2,
+                         double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_6)(const Indicator&, const IndParam& n1, const IndParam& n2,
+                         const IndParam& p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_7)(const Indicator&, const Indicator& n1, const Indicator& n2,
+                         double p) = SAFTYLOSS;
+Indicator (*SAFTYLOSS_8)(const Indicator&, const Indicator& n1, const Indicator& n2,
+                         const Indicator& p) = SAFTYLOSS;
 
 Indicator (*STDEV_1)(int) = STDEV;
 Indicator (*STDEV_2)(const IndParam&) = STDEV;
@@ -226,7 +257,16 @@ Indicator (*EVERY_4)(const Indicator&, const Indicator&) = EVERY;
 Indicator (*EVERY_5)(const Indicator&, int) = EVERY;
 
 Indicator (*LAST_1)(int, int) = LAST;
-Indicator (*LAST_2)(const Indicator&, int, int) = LAST;
+Indicator (*LAST_2)(int, const IndParam&) = LAST;
+Indicator (*LAST_3)(const IndParam&, int) = LAST;
+Indicator (*LAST_4)(const IndParam&, const IndParam&) = LAST;
+Indicator (*LAST_5)(const Indicator&, int, int) = LAST;
+Indicator (*LAST_6)(const Indicator&, int, const IndParam&) = LAST;
+Indicator (*LAST_7)(const Indicator&, const IndParam&, int) = LAST;
+Indicator (*LAST_8)(const Indicator&, const IndParam&, const IndParam&) = LAST;
+Indicator (*LAST_9)(const Indicator&, int, const Indicator&) = LAST;
+Indicator (*LAST_10)(const Indicator&, const Indicator&, int) = LAST;
+Indicator (*LAST_11)(const Indicator&, const Indicator&, const Indicator&) = LAST;
 
 Indicator (*SIN_1)() = SIN;
 Indicator (*SIN_2)(const Indicator&) = SIN;
@@ -279,9 +319,13 @@ Indicator (*CROSS_3)(price_t, const Indicator&) = CROSS;
 Indicator (*CROSS_4)(price_t, price_t) = CROSS;
 
 Indicator (*LONGCROSS_1)(const Indicator&, const Indicator&, int) = LONGCROSS;
-Indicator (*LONGCROSS_2)(const Indicator&, price_t, int) = LONGCROSS;
-Indicator (*LONGCROSS_3)(price_t, const Indicator&, int) = LONGCROSS;
-Indicator (*LONGCROSS_4)(price_t, price_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_2)(const Indicator&, const Indicator&, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_3)(const Indicator&, price_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_4)(const Indicator&, price_t, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_5)(price_t, const Indicator&, int) = LONGCROSS;
+Indicator (*LONGCROSS_6)(price_t, const Indicator&, const Indicator&) = LONGCROSS;
+Indicator (*LONGCROSS_7)(price_t, price_t, int) = LONGCROSS;
+Indicator (*LONGCROSS_8)(price_t, price_t, const Indicator&) = LONGCROSS;
 
 Indicator (*FILTER_1)(int) = FILTER;
 Indicator (*FILTER_2)(const IndParam&) = FILTER;
@@ -378,6 +422,10 @@ Indicator (*NDAY_1)(const Indicator&, const Indicator&, int) = NDAY;
 Indicator (*NDAY_2)(const Indicator&, const Indicator&, const Indicator&) = NDAY;
 Indicator (*NDAY_3)(const Indicator&, const Indicator&, const IndParam&) = NDAY;
 
+Indicator (*SLICE_1)(const PriceList&, int64_t, int64_t) = SLICE;
+Indicator (*SLICE_2)(int64_t, int64_t, int) = SLICE;
+Indicator (*SLICE_3)(const Indicator&, int64_t, int64_t, int) = SLICE;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -449,24 +497,36 @@ void export_Indicator_build_in() {
     def("PRICELIST", PRICELIST4, (arg("result_index") = 0));
 
     def("SMA", SMA_1, (arg("n") = 22, arg("m") = 2.0));
-    def("SMA", SMA_2, (arg("data"), arg("n") = 22, arg("m") = 2.0), R"(SMA([data, n=22, m=2])
+    def("SMA", SMA_2, (arg("n"), arg("m")));
+    def("SMA", SMA_3, (arg("n"), arg("m") = 2.0));
+    def("SMA", SMA_4, (arg("n"), arg("m")));
+    def("SMA", SMA_5, (arg("data"), arg("n") = 22, arg("m") = 2.0));
+    def("SMA", SMA_6, (arg("data"), arg("n"), arg("m")));
+    def("SMA", SMA_7, (arg("data"), arg("n"), arg("m") = 2.0));
+    def("SMA", SMA_8, (arg("data"), arg("n"), arg("m")));
+    def("SMA", SMA_9, (arg("data"), arg("n"), arg("m")));
+    def("SMA", SMA_10, (arg("data"), arg("n"), arg("m") = 2.0));
+    def("SMA", SMA_11, (arg("data"), arg("n"), arg("m")), R"(SMA([data, n=22, m=2])
 
     求移动平均
 
     用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
-    :param float m: 系数
+    :param int|Indicator|IndParam n: 时间窗口
+    :param float|Indicator|IndParam m: 系数
     :rtype: Indicator)");
 
     def("EMA", EMA_1, (arg("n") = 22));
-    def("EMA", EMA_2, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
+    def("EMA", EMA_2, (arg("n")));
+    def("EMA", EMA_4, (arg("data"), arg("n")));
+    def("EMA", EMA_5, (arg("data"), arg("n")));
+    def("EMA", EMA_3, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
 
     指数移动平均线(Exponential Moving Average)
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator)");
 
     def("MA", MA_1, (arg("n") = 22));
@@ -482,39 +542,48 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("AMA", AMA_1, (arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30));
-    def("AMA", AMA_2, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30),
+    def("AMA", AMA_2, (arg("n"), arg("fast_n"), arg("slow_n")));
+    def("AMA", AMA_4, (arg("n"), arg("fast_n"), arg("slow_n")));
+    def("AMA", AMA_5, (arg("n"), arg("fast_n"), arg("slow_n")));
+    def("AMA", AMA_3, (arg("data"), arg("n") = 10, arg("fast_n") = 2, arg("slow_n") = 30),
         R"(AMA([data, n=10, fast_n=2, slow_n=30])
 
     佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 
     :param Indicator data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于2的整数
-    :param int fast_n: 对应快速周期N
-    :param int slow_n: 对应慢速EMA线的N值
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于2的整数
+    :param int|Indicator|IndParam fast_n: 对应快速周期N
+    :param int|Indicator|IndParam slow_n: 对应慢速EMA线的N值
     :rtype: Indicator
 
     * result(0): AMA
     * result(1): ER)");
 
     def("ATR", ATR_1, (arg("n") = 14));
-    def("ATR", ATR_2, (arg("data"), arg("n") = 14), R"(ATR([data, n=14])
+    def("ATR", ATR_2, (arg("n")));
+    def("ATR", ATR_3, (arg("data"), arg("n")));
+    def("ATR", ATR_4, (arg("data"), arg("n")));
+    def("ATR", ATR_5, (arg("data"), arg("n") = 14), R"(ATR([data, n=14])
 
     平均真实波幅(Average True Range)
 
     :param Indicator data 待计算的源数据
-    :param int n: 计算均值的周期窗口，必须为大于1的整数
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator)");
 
     def("MACD", MACD_1, (arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
-    def("MACD", MACD_2, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9),
+    def("MACD", MACD_2, (arg("n1"), arg("n2"), arg("n3")));
+    def("MACD", MACD_3, (arg("data"), arg("n1") = 12, arg("n2") = 26, arg("n3") = 9));
+    def("MACD", MACD_4, (arg("data"), arg("n1"), arg("n2"), arg("n3")));
+    def("MACD", MACD_5, (arg("data"), arg("n1"), arg("n2"), arg("n3")),
         R"(MACD([data, n1=12, n2=26, n3=9])
 
     平滑异同移动平均线
 
     :param Indicator data: 输入数据
-    :param int n1: 短期EMA时间窗
-    :param int n2: 长期EMA时间窗
-    :param int n3: （短期EMA-长期EMA）EMA平滑时间窗
+    :param int|Indicator|IndParam n1: 短期EMA时间窗
+    :param int|Indicator|IndParam n2: 长期EMA时间窗
+    :param int|Indicator|IndParam n3: （短期EMA-长期EMA）EMA平滑时间窗
     :rtype: 具有三个结果集的 Indicator
 
     * result(0): MACD_BAR：MACD直柱，即MACD快线－MACD慢线
@@ -533,7 +602,13 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("SAFTYLOSS", SAFTYLOSS_1, (arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
-    def("SAFTYLOSS", SAFTYLOSS_2, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0),
+    def("SAFTYLOSS", SAFTYLOSS_2, (arg("n1"), arg("n2"), arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_3, (arg("n1"), arg("n2"), arg("p")));
+    def("SAFTYLOSS", SAFTYLOSS_4, (arg("data"), arg("n1") = 10, arg("n2") = 3, arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_5, (arg("data"), arg("n1"), arg("n2"), arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_6, (arg("data"), arg("n1"), arg("n2"), arg("p")));
+    def("SAFTYLOSS", SAFTYLOSS_7, (arg("data"), arg("n1"), arg("n2"), arg("p") = 2.0));
+    def("SAFTYLOSS", SAFTYLOSS_8, (arg("data"), arg("n1"), arg("n2"), arg("p")),
         R"(SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 
     亚历山大 艾尔德安全地带止损线，参见 [BOOK2]_
@@ -541,9 +616,9 @@ void export_Indicator_build_in() {
     计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
 
     :param Indicator data: 输入数据
-    :param int n1: 计算平均噪音的回溯时间窗口
-    :param int n2: 对初步止损线去n2日内的最高值
-    :param float p: 噪音系数
+    :param int|Indicator|IndParam n1: 计算平均噪音的回溯时间窗口
+    :param int|Indicator|IndParam n2: 对初步止损线去n2日内的最高值
+    :param float|Indicator|IndParam p: 噪音系数
     :rtype: Indicator)");
 
     def("DIFF", DIFF_1);
@@ -555,14 +630,17 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("REF", REF_1, (arg("n")));
-    def("REF", REF_2, (arg("data"), arg("n")), R"(REF([data, n])
+    def("REF", REF_2, (arg("n")));
+    def("REF", REF_3, (arg("data"), arg("n")));
+    def("REF", REF_4, (arg("data"), arg("n")));
+    def("REF", REF_5, (arg("data"), arg("n")), R"(REF([data, n])
 
     向前引用 （即右移），引用若干周期前的数据。
 
     用法：REF(X，A)　引用A周期前的X值。
 
     :param Indicator data: 输入数据
-    :param int n: 引用n周期前的值，即右移n位
+    :param int|Indicator|IndParam n: 引用n周期前的值，即右移n位
     :rtype: Indicator)");
 
     def("STDEV", STDEV_1, (arg("n") = 10));
@@ -943,7 +1021,16 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("LAST", LAST_1, (arg("m") = 10, arg("n") = 5));
-    def("LAST", LAST_2, (arg("data"), arg("m") = 10, arg("n") = 5), R"(LAST([data, m=10, n=5])
+    def("LAST", LAST_2, (arg("m"), arg("n")));
+    def("LAST", LAST_3, (arg("m"), arg("n") = 5));
+    def("LAST", LAST_4, (arg("m"), arg("n")));
+    def("LAST", LAST_5, (arg("data"), arg("m") = 10, arg("n") = 5));
+    def("LAST", LAST_6, (arg("data"), arg("m"), arg("n")));
+    def("LAST", LAST_7, (arg("data"), arg("m"), arg("n") = 5));
+    def("LAST", LAST_8, (arg("data"), arg("m"), arg("n")));
+    def("LAST", LAST_9, (arg("data"), arg("m"), arg("n")));
+    def("LAST", LAST_10, (arg("data"), arg("m"), arg("n") = 5));
+    def("LAST", LAST_11, (arg("data"), arg("m"), arg("n")), R"(LAST([data, m=10, n=5])
 
     区间存在。
 
@@ -952,8 +1039,8 @@ void export_Indicator_build_in() {
     例如：LAST(CLOSE>OPEN,10,5) 表示从前10日到前5日内一直阳线。
 
     :param data: 输入数据
-    :param int m: m周期
-    :param int n: n周期
+    :param int|Indicator|IndParam m: m周期
+    :param int|Indicator|IndParam n: n周期
     :rtype: Indicator)");
 
     def("SIN", SIN_1);
@@ -1101,9 +1188,13 @@ void export_Indicator_build_in() {
     :rtype: Indicator)");
 
     def("LONGCROSS", LONGCROSS_1, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_2, (arg("a"), arg("b"), arg("n")));
     def("LONGCROSS", LONGCROSS_3, (arg("a"), arg("b"), arg("n") = 3));
-    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n") = 3), R"(LONGCROSS(a, b[, n=3])
+    def("LONGCROSS", LONGCROSS_4, (arg("a"), arg("b"), arg("n")));
+    def("LONGCROSS", LONGCROSS_5, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_6, (arg("a"), arg("b"), arg("n")));
+    def("LONGCROSS", LONGCROSS_7, (arg("a"), arg("b"), arg("n") = 3));
+    def("LONGCROSS", LONGCROSS_8, (arg("a"), arg("b"), arg("n")), R"(LONGCROSS(a, b[, n=3])
 
     两条线维持一定周期后交叉
 
@@ -1113,7 +1204,7 @@ void export_Indicator_build_in() {
 
     :param Indicator a:
     :param Indicator b:
-    :param int n:
+    :param int|Indicator n:
     :rtype: Indicator)");
 
     def("FILTER", FILTER_1, (arg("n") = 5));
@@ -1367,4 +1458,16 @@ void export_Indicator_build_in() {
     :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
     :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
     :rtype: Indicator)");
+
+    def("SLICE", SLICE_1, (arg("data"), arg("start"), arg("end")));
+    def("SLICE", SLICE_2, (arg("start"), arg("end"), arg("result_index") = 0));
+    def("SLICE", SLICE_3, (arg("data"), arg("start"), arg("end"), arg("result_index") = 0),
+        R"(SLICE(data, start, end, result_index=0)
+
+    获取某指标中指定范围 [start, end) 的数据，生成新的指标
+
+    :param Indicator|PriceList data: 输入数据
+    :param int start: 起始位置
+    :param int end: 终止位置（不包含本身）
+    :param int result_index: 原输入数据中的结果集)");
 }

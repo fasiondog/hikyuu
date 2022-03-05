@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#include "../crt/SLICE.h"
+#include "../crt/EMA.h"
 #include "IEma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -43,14 +45,24 @@ void IEma::_calculate(const Indicator& indicator) {
     }
 }
 
+void IEma::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    Indicator slice = SLICE(ind, 0, curPos + 1);
+    Indicator ema = EMA(slice, step);
+    if (ema.size() > 0) {
+        _set(ema[ema.size() - 1], curPos);
+    }
+}
+
 Indicator HKU_API EMA(int n) {
     IndicatorImpPtr p = make_shared<IEma>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
-Indicator HKU_API EMA(const Indicator& data, int n) {
-    return EMA(n)(data);
+Indicator HKU_API EMA(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<IEma>();
+    p->setIndParam("n", n);
+    return Indicator(p);
 }
 
 } /* namespace hku */

@@ -318,7 +318,7 @@
     指数移动平均线(Exponential Moving Average)
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indciator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator
     
 
@@ -769,6 +769,16 @@
 
     :param Indicator data: 输入数据
     :rtype: Indicator
+
+
+.. py:function:: SLICE(data, start, end, result_index=0)
+
+    获取某指标中指定范围 [start, end) 的数据，生成新的指标
+
+    :param Indicator|PriceList data: 输入数据
+    :param int start: 起始位置
+    :param int end: 终止位置（不包含本身）
+    :param int result_index: 原输入数据中的结果集
 
 
 .. py:function:: SMA([data, n=22, m=2])

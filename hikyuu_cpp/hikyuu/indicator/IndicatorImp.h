@@ -215,6 +215,9 @@ private:
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
 
+    // 用于动态参数时，更新 discard
+    void _update_discard();
+
 protected:
     string m_name;
     size_t m_discard;
