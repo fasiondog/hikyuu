@@ -519,9 +519,9 @@ void export_Indicator_build_in() {
 
     def("EMA", EMA_1, (arg("n") = 22));
     def("EMA", EMA_2, (arg("n")));
+    def("EMA", EMA_3, (arg("data"), arg("n")));
     def("EMA", EMA_4, (arg("data"), arg("n")));
-    def("EMA", EMA_5, (arg("data"), arg("n")));
-    def("EMA", EMA_3, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
+    def("EMA", EMA_5, (arg("data"), arg("n") = 22), R"(EMA([data, n=22])
 
     指数移动平均线(Exponential Moving Average)
 
