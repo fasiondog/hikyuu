@@ -59,8 +59,11 @@ public:
     /** 按日期获取在原始 K 线记录中的位置 */
     size_t getPosInStock(Datetime datetime) const;
 
-    /** 获取关联的KQuery */
+    /** 获取关联的KQuery, 该 Query 已被同一调整为按索引方式的查询条件 */
     KQuery getQuery() const;
+
+    /** 获取原始查询条件 */
+    KQuery getRawQUery() const;
 
     /** 获取关联的Stock，如果没有关联返回Null<Stock> */
     Stock getStock() const;
@@ -74,6 +77,11 @@ public:
     /** 获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1 */
     size_t endPos() const;
 
+    /**
+     * 从当前结尾向后尝试从 Stock 扩展获取指定数量的 KRecord
+     * @param num 指定数量
+     * @return size_t 实际被扩展的记录数
+     */
     size_t expand(size_t num);
 
     /** 输出数据到指定的文件中 */
@@ -109,6 +117,7 @@ private:
 private:
     KRecordList m_buffer;
     KQuery m_query;
+    KQuery m_raw_query;
     Stock m_stock;
     size_t m_start;
     size_t m_end;
@@ -181,6 +190,10 @@ inline bool KData::empty() const {
 
 inline KQuery KData::getQuery() const {
     return m_query;
+}
+
+inline KQuery KData::getRawQUery() const {
+    return m_raw_query;
 }
 
 inline Stock KData::getStock() const {

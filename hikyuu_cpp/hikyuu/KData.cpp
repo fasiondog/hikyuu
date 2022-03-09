@@ -29,7 +29,7 @@ string KData::toString() const {
 }
 
 KData::KData(const Stock& stock, const KQuery& query)
-: m_query(query), m_stock(stock), m_start(0), m_end(0) {
+: m_query(query), m_raw_query(query), m_stock(stock), m_start(0), m_end(0) {
     if (m_stock.isNull()) {
         return;
     }
@@ -86,6 +86,7 @@ KData::KData(const Stock& stock, const KQuery& query)
 KData::KData(const KData& x)
 : m_buffer(x.m_buffer),
   m_query(x.m_query),
+  m_raw_query(x.m_raw_query),
   m_stock(x.m_stock),
   m_start(x.m_start),
   m_end(x.m_end) {}
@@ -93,6 +94,7 @@ KData::KData(const KData& x)
 KData::KData(KData&& x)
 : m_buffer(std::move(x.m_buffer)),
   m_query(x.m_query),
+  m_raw_query(x.m_raw_query),
   m_stock(std::move(x.m_stock)),
   m_start(x.m_start),
   m_end(x.m_end) {}
@@ -102,6 +104,7 @@ KData& KData::operator=(const KData& x) {
     m_buffer = x.m_buffer;
     m_stock = x.m_stock;
     m_query = x.m_query;
+    m_raw_query = x.m_raw_query;
     m_start = x.m_start;
     m_end = x.m_end;
     return *this;
@@ -112,6 +115,7 @@ KData& KData::operator=(KData&& x) {
     m_buffer = std::move(x.m_buffer);
     m_stock = std::move(x.m_stock);
     m_query = x.m_query;
+    m_raw_query = x.m_raw_query;
     m_start = x.m_start;
     m_end = x.m_end;
     return *this;
@@ -151,7 +155,39 @@ DatetimeList KData::getDatetimeList() const {
 }
 
 size_t KData::expand(size_t num) {
-    return num;
+    HKU_IF_RETURN(m_stock.isNull() || m_end >= m_stock.getCount(m_query.kType()), 0);
+    KQuery query;
+    if (m_raw_query.queryType() == KQuery::INDEX) {
+        query = KQueryByIndex(m_end, m_end + num, m_raw_query.kType(), m_raw_query.recoverType());
+    } else {
+        query = KQueryByDate(m_raw_query.endDatetime(), Datetime::max(), m_raw_query.kType(),
+                             m_raw_query.recoverType());
+        size_t start = 0, end = 0;
+        bool success = m_stock.getIndexRange(query, start, end);
+        HKU_IF_RETURN(!success, 0);
+        query = KQueryByIndex(start, start + num, m_raw_query.kType(), m_raw_query.recoverType());
+    }
+
+    KRecordList records = m_stock.getKRecordList(query);
+    HKU_IF_RETURN(records.empty(), 0);
+
+    size_t count = 0;
+    for (auto& record : records) {
+        m_buffer.emplace_back(record);
+        count++;
+    }
+    m_end += count;
+    m_query = KQueryByIndex(m_start, m_end, m_query.kType(), m_query.recoverType());
+    if (m_raw_query.queryType() == KQuery::DATE) {
+        if (size() > 0) {
+            m_raw_query = KQueryByDate(m_raw_query.startDatetime(),
+                                       m_buffer[size() - 1].datetime + TimeDelta(1),
+                                       m_raw_query.kType(), m_raw_query.recoverType());
+        }
+    } else {
+        m_raw_query = m_query;
+    }
+    return count;
 }
 
 void KData::_recoverForUpDay() {
