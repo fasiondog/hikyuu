@@ -9,7 +9,7 @@
 #ifndef KDATA_H_
 #define KDATA_H_
 
-#include "KDataImp.h"
+#include "Stock.h"
 
 namespace hku {
 
@@ -45,7 +45,7 @@ public:
 
     /** 同getKRecord @see getKRecord */
     KRecord operator[](size_t pos) const {
-        return getKRecord(pos);
+        return m_buffer[pos];
     }
 
     /** 同getKRecord @see getKRecord */
@@ -74,6 +74,8 @@ public:
     /** 获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1 */
     size_t endPos() const;
 
+    size_t expand(size_t num);
+
     /** 输出数据到指定的文件中 */
     void tocsv(const string& filename);
 
@@ -98,7 +100,18 @@ public:
     Indicator amo() const;
 
 private:
-    KDataImpPtr m_imp;
+    void _recoverForward();
+    void _recoverBackward();
+    void _recoverEqualForward();
+    void _recoverEqualBackward();
+    void _recoverForUpDay();
+
+private:
+    KRecordList m_buffer;
+    KQuery m_query;
+    Stock m_stock;
+    size_t m_start;
+    size_t m_end;
 };
 
 /**
@@ -149,35 +162,8 @@ KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end
                        KQuery::KType ktype = KQuery::DAY,
                        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
-inline KData::KData(const KData& x) : m_imp(x.m_imp) {}
-
-inline KData::KData(KData&& x) : m_imp(std::move(x.m_imp)) {}
-
-inline KData& KData::operator=(const KData& x) {
-    if (this == &x)
-        return *this;
-    m_imp = x.m_imp;
-    return *this;
-}
-
-inline KData& KData::operator=(KData&& x) {
-    if (this == &x)
-        return *this;
-    m_imp = std::move(x.m_imp);
-    return *this;
-}
-
-inline DatetimeList KData::getDatetimeList() const {
-    DatetimeList result;
-    if (empty()) {
-        return result;
-    }
-    result = getStock().getDatetimeList(KQuery(startPos(), lastPos() + 1, getQuery().kType()));
-    return result;
-}
-
 inline KRecord KData::getKRecord(size_t pos) const {
-    return m_imp->getKRecord(pos);  //如果为空，将抛出异常
+    return m_buffer[pos];
 }
 
 inline KRecord KData::getKRecord(Datetime datetime) const {
@@ -185,36 +171,32 @@ inline KRecord KData::getKRecord(Datetime datetime) const {
     return pos != Null<size_t>() ? getKRecord(pos) : Null<KRecord>();
 }
 
-inline size_t KData::getPos(const Datetime& datetime) const {
-    return m_imp ? m_imp->getPos(datetime) : Null<size_t>();
-}
-
 inline size_t KData::size() const {
-    return m_imp ? m_imp->size() : 0;
+    return m_buffer.size();
 }
 
 inline bool KData::empty() const {
-    return m_imp ? m_imp->empty() : true;
+    return m_buffer.empty();
 }
 
 inline KQuery KData::getQuery() const {
-    return m_imp ? m_imp->getQuery() : Null<KQuery>();
+    return m_query;
 }
 
 inline Stock KData::getStock() const {
-    return m_imp ? m_imp->getStock() : Null<Stock>();
+    return m_stock;
 }
 
 inline size_t KData::startPos() const {
-    return m_imp ? m_imp->startPos() : 0;
+    return m_start;
 }
 
 inline size_t KData::endPos() const {
-    return m_imp ? m_imp->endPos() : 0;
+    return m_end;
 }
 
 inline size_t KData::lastPos() const {
-    return m_imp ? m_imp->lastPos() : 0;
+    return m_end == 0 ? 0 : m_end - 1;
 }
 
 } /* namespace hku */
