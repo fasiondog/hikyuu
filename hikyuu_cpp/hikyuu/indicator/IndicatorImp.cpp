@@ -103,7 +103,7 @@ IndParam IndicatorImp::getIndParam(const string &name) const {
     return IndParam(m_ind_params.at(name));
 }
 
-const IndicatorImpPtr IndicatorImp::getIndParamImp(const string &name) const {
+const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
     return m_ind_params.at(name);
 }
 

@@ -157,7 +157,7 @@ public:
     void setIndParam(const string& name, const Indicator& ind);
     void setIndParam(const string& name, const IndParam& ind);
     IndParam getIndParam(const string& name) const;
-    const IndicatorImpPtr getIndParamImp(const string& name) const;
+    const IndicatorImpPtr& getIndParamImp(const string& name) const;
     const unordered_map<string, IndicatorImpPtr>& getIndParams() const;
 
     price_t* data(size_t result_num = 0);
