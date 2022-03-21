@@ -73,22 +73,14 @@ void SignalBase::reset() {
 }
 
 DatetimeList SignalBase::getBuySignal() const {
-    DatetimeList result;
-    result.reserve(m_buySig.size());
-    std::unordered_set<Datetime>::const_iterator iter = m_buySig.begin();
-    for (; iter != m_buySig.end(); ++iter) {
-        result.push_back(*iter);
-    }
+    DatetimeList result(m_buySig.size());
+    std::copy(m_buySig.begin(), m_buySig.end(), result.begin());
     return result;
 }
 
 DatetimeList SignalBase::getSellSignal() const {
-    DatetimeList result;
-    result.reserve(m_sellSig.size());
-    std::unordered_set<Datetime>::const_iterator iter = m_sellSig.begin();
-    for (; iter != m_sellSig.end(); ++iter) {
-        result.push_back(*iter);
-    }
+    DatetimeList result(m_sellSig.size());
+    std::copy(m_sellSig.begin(), m_sellSig.end(), result.begin());
     return result;
 }
 

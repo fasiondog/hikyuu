@@ -21,7 +21,7 @@ double WilliamsFixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, c
                                                      price_t price, price_t risk, SystemPart from) {
     price_t max_loss = getParam<price_t>("max_loss");
     HKU_WARN_IF_RETURN(max_loss <= 0.0, 0.0, "max_loss is zero!");
-    return m_tm->currentCash() * getParam<double>("p") / max_loss;
+    return m_tm->cash(datetime, m_query.kType()) * getParam<double>("p") / max_loss;
 }
 
 MoneyManagerPtr HKU_API MM_WilliamsFixedRisk(double p, price_t max_loss) {

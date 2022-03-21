@@ -198,6 +198,15 @@ public:
     }
 
     /**
+     * 根据权息信息更新当前持仓与交易情况
+     * @note 必须按时间顺序调用
+     * @param datetime 当前时刻
+     */
+    virtual void updateWithWeight(const Datetime& datetime) {
+        HKU_WARN("The subclass does not implement a updateWithWeight method");
+    }
+
+    /**
      * 获取指定对象的保证金比率
      * @param datetime 日期
      * @param stock 指定对象
@@ -348,8 +357,12 @@ public:
         return PositionRecordList();
     }
 
-    /** 获取指定证券的当前持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getPosition(const Stock&) const {
+    /**
+     * 获取指定证券的持仓记录
+     * @param date 指定日期
+     * @param stock 指定的证券
+     */
+    virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }
@@ -579,30 +592,12 @@ public:
     }
 
     /**
-     * 获取从账户建立日期到系统当前日期的资产净值曲线（按自然日），含借入的资产
-     * @return 资产净值列表
-     */
-    virtual PriceList getFundsCurve() {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
-    }
-
-    /**
      * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
      * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
      * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
      * @return 收益曲线
      */
     virtual PriceList getProfitCurve(const DatetimeList& dates, KQuery::KType ktype = KQuery::DAY) {
-        HKU_WARN("The subclass does not implement this method");
-        return PriceList();
-    }
-
-    /**
-     * 获取获取从账户建立日期到系统当前日期的收益曲线，即扣除历次存入资金后的资产净值曲线
-     * @return 收益曲线
-     */
-    virtual PriceList getProfitCurve() {
         HKU_WARN("The subclass does not implement this method");
         return PriceList();
     }

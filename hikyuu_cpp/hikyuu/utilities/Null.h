@@ -104,7 +104,7 @@ template <>
 class Null<size_t> {
 public:
     Null() {}
-    operator unsigned long long() {
+    operator size_t() {
         return (std::numeric_limits<size_t>::max)();
     }
 };

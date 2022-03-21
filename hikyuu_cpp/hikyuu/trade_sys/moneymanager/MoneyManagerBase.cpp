@@ -118,7 +118,7 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
 
     //在现金不足时，自动补充存入现金
     if (getParam<bool>("auto-checkin")) {
-        price_t cash = m_tm->currentCash();
+        price_t cash = m_tm->cash(datetime, m_query.kType());
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
         int precision = m_tm->precision();
         price_t money = roundUp(price * n * stock.unit() + cost.total, precision);
@@ -128,7 +128,7 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
     } else {
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
         price_t need_cash = n * price + cost.total;
-        price_t current_cash = m_tm->currentCash();
+        price_t current_cash = m_tm->cash(datetime, m_query.kType());
         while (n > min_trade && need_cash > current_cash) {
             n = n - min_trade;
             cost = m_tm->getBuyCost(datetime, stock, price, n);

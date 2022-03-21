@@ -7,20 +7,27 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/trade_sys/system/build_in.h>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "../_Parameter.h"
 #include "../pickle_support.h"
 
 using namespace boost::python;
 using namespace hku;
 
+#if defined(_MSC_VER)
+#pragma warning(disable : 4267)
+#endif
+
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(run_overload, run, 2, 3);
 
-string (System::*sys_get_name)() const = &System::name;
+const string& (System::*sys_get_name)() const = &System::name;
 void (System::*sys_set_name)(const string&) = &System::name;
 
 void (System::*run_1)(const KQuery&, bool) = &System::run;
 void (System::*run_2)(const KData&, bool) = &System::run;
 void (System::*run_3)(const Stock&, const KQuery&, bool reset) = &System::run;
+
+TradeRecord (System::*runMoment_1)(const Datetime&) = &System::runMoment;
 
 void export_System() {
     def(
@@ -103,15 +110,7 @@ void export_System() {
 #endif
       ;
 
-    SystemList::const_reference (SystemList::*SystemList_at)(SystemList::size_type) const =
-      &SystemList::at;
-    void (SystemList::*append)(const SystemPtr&) = &SystemList::push_back;
-    class_<SystemList>("SystemList")
-      .def("__iter__", iterator<SystemList>())
-      .def("size", &SystemList::size)
-      .def("__len__", &SystemList::size)
-      .def("get", SystemList_at, return_value_policy<copy_const_reference>())
-      .def("append", append);
+    class_<SystemList>("SystemList").def(vector_indexing_suite<SystemList>());
 
     scope in_System =
       class_<System>(
@@ -137,7 +136,9 @@ void export_System() {
         .def(self_ns::str(self))
         .def(self_ns::repr(self))
 
-        .add_property("name", sys_get_name, sys_set_name, "系统名称")
+        .add_property("name",
+                      make_function(sys_get_name, return_value_policy<copy_const_reference>()),
+                      sys_set_name, "系统名称")
         .add_property("tm", &System::getTM, &System::setTM, "关联的交易管理实例")
         .add_property("to", &System::getTO, &System::setTO, "交易对象 KData")
         .add_property("mm", &System::getMM, &System::setMM, "资金管理策略")
@@ -176,7 +177,7 @@ void export_System() {
         .def("get_trade_record_list", &System::getTradeRecordList,
              return_value_policy<copy_const_reference>(), R"(get_trade_record_list(self)
 
-    获取交易记录
+    获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录
 
     :rtype: TradeRecordList)")
 
@@ -222,23 +223,7 @@ void export_System() {
     :param Query query: K线数据查询条件
     :param bool reset: 是否同时复位所有组件，尤其是tm实例)")
 
-    /*.def("readyForRun", &System::readyForRun)
-    .def("runMoment", run_monent_1)
-    .def("runMoment", run_monent_2)
-    .def("_runMoment", &System::_runMoment)
-
-    .def("_environmentIsValid", &System::_environmentIsValid)
-    .def("_conditionIsValid", &System::_conditionIsValid)
-    .def("_buyNotifyAll", &System::_buyNotifyAll)
-    .def("_sellNotifyAll", &System::_sellNotifyAll)
-    .def("_buy", &System::_buy)
-    .def("_sell", &System::_sell)*/
-    //.def("_haveBuyRequest", &System::_haveBuyRequest)
-    //.def("_haveSellRequest", &System::_haveSellRequest)
-    //.def("_submitBuyRequest", &System::_submitBuyRequest)
-    //.def("_submitSellRequest", &System::_submitSellRequest)
-    //.def("_clearBuyRequest", &System::_clearBuyRequest)
-    //.def("_clearSellRequest", &System::_clearSellRequest)
+        .def("ready", &System::readyForRun)
 
 #if HKU_PYTHON_SUPPORT_PICKLE
         .def_pickle(name_init_pickle_suite<System>())

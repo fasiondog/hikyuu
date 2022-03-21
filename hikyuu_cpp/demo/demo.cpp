@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     //配置文件的位置自行修改
-    hikyuu_init("C:\\Users\\Administrator\\.hikyuu\\hikyuu.ini");
+    hikyuu_init("C:\\Users\\admin\\.hikyuu\\hikyuu.ini");
 
     StockManager& sm = StockManager::instance();
 
@@ -42,6 +42,6 @@ int main(int argc, char* argv[]) {
 
 #if defined(_WIN32)
     SetConsoleOutputCP(old_cp);
-#endif    
+#endif
     return 0;
 }

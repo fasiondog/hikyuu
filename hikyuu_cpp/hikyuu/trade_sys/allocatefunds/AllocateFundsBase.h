@@ -42,7 +42,7 @@ public:
     virtual ~AllocateFundsBase();
 
     /** 获取算法名称 */
-    string name() const;
+    const string& name() const;
 
     /** 修改算法名称 */
     void name(const string& name);
@@ -52,31 +52,35 @@ public:
      * @param date 指定日期
      * @param se_list 系统实例选择器选出的系统实例
      * @param running_list 当前运行中的系统实例
+     * @param ignore_list 忽略不进行调仓的运行中系统
      * @return
      */
     void adjustFunds(const Datetime& date, const SystemList& se_list,
-                     const std::list<SYSPtr>& running_list);
+                     const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
 
     /** 获取交易账户 */
-    TMPtr getTM();
+    const TMPtr& getTM() const;
 
-    /** 设定交易账户 */
+    /** 设定交易账户，由 PF 设定 */
     void setTM(const TMPtr&);
 
     /** 设置 Portfolio 的影子账户, 仅由 Portfolio 调用 */
     void setShadowTM(const TMPtr&);
 
-    /** 获取关联查询条件 */
-    KQuery getQuery();
+    const TMPtr& getShadowTM(const TMPtr&) const;
 
-    /** 设置查询条件 */
+    /** 获取关联查询条件 */
+    const KQuery& getQuery() const;
+
+    /** 设置查询条件， 由 PF 设定 */
     void setQuery(const KQuery& query);
 
-    /** 获取不参与资产分配的保留比例 */
+    /** 获取当前不参与资产分配的保留比例 */
     double getReservePercent();
 
     /**
-     * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为0
+     * 设置不参与资产分配的保留比例，该比例在执行reset时会被置为参数 default_reserve_percent 的值
+     * @note 主要用分配算法动态控制不参与分配的资产比例
      * @param p 取值范围[0,1]，小于0将被强制置为0， 大于1将被置为1
      */
     void setReservePercent(double p);
@@ -85,6 +89,7 @@ public:
     void reset();
 
     typedef shared_ptr<AllocateFundsBase> AFPtr;
+
     /** 克隆操作 */
     AFPtr clone();
 
@@ -107,24 +112,24 @@ public:
 private:
     /* 同时调整已运行中的子系统（已分配资金或已持仓） */
     void _adjust_with_running(const Datetime& date, const SystemList& se_list,
-                              const std::list<SYSPtr>& running_list);
+                              const std::list<SYSPtr>& running_list, const SystemList& ignore_list);
 
     /* 不调整已在运行中的子系统 */
     void _adjust_without_running(const Datetime& date, const SystemList& se_list,
                                  const std::list<SYSPtr>& running_list);
 
     /* 计算当前的资产总值 */
-    price_t _getTotalFunds(const std::list<SYSPtr>& running_list);
+    price_t _getTotalFunds(const Datetime& date, const std::list<SYSPtr>& running_list);
+
+    /* 回收系统资产 */
+    bool _returnAssets(const SYSPtr& sys, const Datetime& date);
 
 private:
-    string m_name;
-    KQuery m_query;
-    int m_count;
-    Datetime m_pre_date;
-    TMPtr m_tm;
-    TMPtr m_shadow_tm;
-
-    double m_reserve_percent;  //保留资产比例，不参与资产分配
+    string m_name;      // 组件名称
+    KQuery m_query;     // 查询条件
+    TMPtr m_tm;         // 运行期由PF设定，PF的实际账户
+    TMPtr m_shadow_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
+    double m_reserve_percent;  // 保留资产比例，不参与资产分配
 
 //============================================
 // 序列化支持
@@ -137,8 +142,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_count);
-        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
@@ -148,8 +151,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_query);
-        ar& BOOST_SERIALIZATION_NVP(m_count);
-        ar& BOOST_SERIALIZATION_NVP(m_pre_date);
         ar& BOOST_SERIALIZATION_NVP(m_reserve_percent);
         ar& BOOST_SERIALIZATION_NVP(m_tm);
     }
@@ -200,7 +201,7 @@ typedef shared_ptr<AllocateFundsBase> AFPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const AFPtr&);
 
-inline string AllocateFundsBase::name() const {
+inline const string& AllocateFundsBase::name() const {
     return m_name;
 }
 
@@ -208,7 +209,7 @@ inline void AllocateFundsBase::name(const string& name) {
     m_name = name;
 }
 
-inline TMPtr AllocateFundsBase::getTM() {
+inline const TMPtr& AllocateFundsBase::getTM() const {
     return m_tm;
 }
 
@@ -220,7 +221,11 @@ inline void AllocateFundsBase::setShadowTM(const TMPtr& tm) {
     m_shadow_tm = tm;
 }
 
-inline KQuery AllocateFundsBase::getQuery() {
+inline const TMPtr& AllocateFundsBase::getShadowTM(const TMPtr&) const {
+    return m_shadow_tm;
+}
+
+inline const KQuery& AllocateFundsBase::getQuery() const {
     return m_query;
 }
 

@@ -37,7 +37,7 @@ double FixedRatioMoneyManager ::_getBuyNumber(const Datetime& datetime, const St
     }
 
     price_t level = m_pre_cash + m_current_num * getParam<double>("delta");
-    price_t current_cash = m_tm->currentCash();
+    price_t current_cash = m_tm->cash(datetime, m_query.kType());
 
     if (current_cash > level) {
         m_current_num++;

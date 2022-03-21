@@ -20,7 +20,7 @@ double FixedPercentMoneyManager ::_getBuyNumber(const Datetime& datetime, const 
     double p = getParam<double>("p");
     HKU_ERROR_IF_RETURN(p <= 0.0 || p > 1.0, 0.0, "Error param (p = {:<.4f})", p);
     HKU_ERROR_IF_RETURN(risk == 0.0, 0.0, "risk is zero!");
-    return m_tm->currentCash() * p / risk;
+    return m_tm->cash(datetime, m_query.kType()) * p / risk;
 }
 
 MoneyManagerPtr HKU_API MM_FixedPercent(double p) {

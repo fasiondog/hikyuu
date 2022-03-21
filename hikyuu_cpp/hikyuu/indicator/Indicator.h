@@ -43,10 +43,12 @@ class HKU_API Indicator {
 public:
     Indicator() {}
     Indicator(const IndicatorImpPtr& imp);
-    Indicator(const Indicator&);
+    Indicator(const Indicator& ind);
+    Indicator(Indicator&& ind);
     virtual ~Indicator();
 
     Indicator& operator=(const Indicator&);
+    Indicator& operator=(Indicator&&);
 
     /** 使用已有参数计算新值，返回全新的Indicator */
     Indicator operator()(const Indicator& ind);

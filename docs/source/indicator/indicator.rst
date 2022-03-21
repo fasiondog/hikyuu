@@ -318,7 +318,7 @@
     指数移动平均线(Exponential Moving Average)
 
     :param data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indciator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
     :rtype: Indicator
     
 
@@ -700,7 +700,7 @@
     变动率指标: (price / prevPrice) * 100
 
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -771,6 +771,16 @@
     :rtype: Indicator
 
 
+.. py:function:: SLICE(data, start, end, result_index=0)
+
+    获取某指标中指定范围 [start, end) 的数据，生成新的指标
+
+    :param Indicator|PriceList data: 输入数据
+    :param int start: 起始位置
+    :param int end: 终止位置（不包含本身）
+    :param int result_index: 原输入数据中的结果集
+
+
 .. py:function:: SMA([data, n=22, m=2])
 
     求移动平均
@@ -800,7 +810,7 @@
     计算N周期内样本标准差
     
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator
 
 
@@ -809,7 +819,7 @@
     计算N周期内样本标准差
     
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
     
 
@@ -818,7 +828,7 @@
     总体标准差，STDP(X,N)为X的N日总体标准差
     
     :param data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -827,7 +837,7 @@
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -840,7 +850,7 @@
     例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
 
     :param Indicator data: 输入数据
-    :param float a: 指定累加和
+    :param float|Indicator|IndParam a: 指定累加和
     :rtype: Indicator
 
 
@@ -873,7 +883,7 @@
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -882,7 +892,7 @@
     估算样本方差, VAR(X,N)为X的N日估算样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
@@ -891,7 +901,7 @@
     总体样本方差, VARP(X,N)为X的N日总体样本方差
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 

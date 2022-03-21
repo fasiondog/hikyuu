@@ -9,6 +9,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/AMA.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -80,6 +81,34 @@ TEST_CASE("test_AMA") {
     for (size_t i = 0; i < expect.size(); ++i) {
         CHECK_EQ(result[i], expect[i]);
         CHECK_EQ(result.get(i, 1), expect.get(i, 1));
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_AMA_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-50));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = AMA(c, 10, 2, 30);
+    Indicator result = AMA(c, CVAL(c, 10), CVAL(c, 2), CVAL(c, 30));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
+    }
+
+    result = AMA(c, IndParam(CVAL(c, 10)), IndParam(CVAL(c, 2)), IndParam(CVAL(c, 30)));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
     }
 }
 

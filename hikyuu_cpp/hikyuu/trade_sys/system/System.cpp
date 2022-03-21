@@ -127,10 +127,8 @@ void System::reset(bool with_tm, bool with_ev) {
     if (m_sp)
         m_sp->reset();
 
-    m_kdata = KData();
-    m_src_kdata = KData();
-
-    //不能复位m_stock，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
+    //不能复位m_stock / m_kdata/
+    // m_src_kdata，后续Portfolio需要使用，从意义上讲，sys实例和stock是一一绑定的关系,
     //一个sys实例绑定stock后，除非主动改变，否则不应该被reset
     // m_stock
 
@@ -162,6 +160,10 @@ void System::setTO(const KData& kdata) {
         m_src_kdata = m_stock.getKData(no_recover_query);
     }
 
+    HKU_WARN_IF(
+      query.recoverType() == KQuery::FORWARD || query.recoverType() == KQuery::EQUAL_FORWARD,
+      "You are using forward or equal_forward kdata, which is a future function!");
+
     // sg->setTO必须在cn->setTO之前，cn会使用到sg，防止sg被计算两次
     if (m_sg)
         m_sg->setTO(kdata);  // 传入复权的 KData
@@ -186,8 +188,9 @@ SystemPtr System::clone() {
     SystemPtr p = make_shared<System>();
     if (m_tm)
         p->m_tm = m_tm->clone();
-    if (m_ev)
-        p->m_ev = m_ev->clone();
+    // ev 通常作为公共组件不进行克隆
+    // if (m_ev)
+    //     p->m_ev = m_ev->clone();
     if (m_mm)
         p->m_mm = m_mm->clone();
     if (m_cn)
@@ -288,7 +291,7 @@ void System::run(const KQuery& query, bool reset) {
     size_t total = kdata.size();
     for (size_t i = 0; i < total; ++i) {
         if (kdata[i].datetime >= m_tm->initDatetime()) {
-            runMoment(kdata[i], m_src_kdata[i]);
+            _runMoment(kdata[i], m_src_kdata[i]);
         }
     }
 }
@@ -311,7 +314,7 @@ void System::run(const KData& kdata, bool reset) {
     size_t total = kdata.size();
     for (size_t i = 0; i < total; ++i) {
         if (kdata[i].datetime >= m_tm->initDatetime()) {
-            runMoment(kdata[i], m_src_kdata[i]);
+            _runMoment(kdata[i], m_src_kdata[i]);
         }
     }
 }
@@ -323,24 +326,18 @@ void System::clearDelayRequest() {
     m_buyShortRequest.clear();
 }
 
-TradeRecord System::runMoment(const KRecord& record, const KRecord& src_record) {
-    m_buy_days++;
-    m_sell_short_days++;
-    return _runMoment(record, src_record);
-}
-
 TradeRecord System::runMoment(const Datetime& datetime) {
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
-    m_buy_days++;
-    m_sell_short_days++;
     return _runMoment(today, src_today);
 }
 
 TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
+    m_buy_days++;
+    m_sell_short_days++;
     TradeRecord result;
     if ((today.highPrice == today.lowPrice || today.closePrice > today.highPrice ||
          today.closePrice < today.lowPrice) &&
@@ -440,7 +437,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     price_t current_price = today.closePrice;
     price_t src_current_price = src_today.closePrice;  // 未复权的原始价格
 
-    PositionRecord position = m_tm->getPosition(m_stock);
+    PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
     if (position.number != 0) {
         TradeRecord tr;
         if (src_current_price <= position.stoploss) {
@@ -597,8 +594,8 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
                     src_today.closePrice - m_buyRequest.stoploss, m_buyRequest.from);
 }
 
-TradeRecord System::_sellForce(const KRecord& today, const KRecord& src_today, double num,
-                               Part from) {
+TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, double num,
+                              Part from) {
     HKU_ASSERT_M(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO,
                  "Only Allocator or Portfolis can perform this operation!");
     TradeRecord result;
@@ -617,7 +614,7 @@ TradeRecord System::_sellForce(const KRecord& today, const KRecord& src_today, d
             m_sellRequest.count = 1;
         }
 
-        PositionRecord position = m_tm->getPosition(m_stock);
+        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
         m_sellRequest.from = from;
         m_sellRequest.datetime = today.datetime;
         m_sellRequest.stoploss = position.stoploss;
@@ -626,7 +623,7 @@ TradeRecord System::_sellForce(const KRecord& today, const KRecord& src_today, d
         return result;
 
     } else {
-        PositionRecord position = m_tm->getPosition(m_stock);
+        PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
         price_t realPrice = _getRealSellPrice(today.datetime, src_today.closePrice);
         TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, num, position.stoploss,
                                         position.goalPrice, src_today.closePrice, from);

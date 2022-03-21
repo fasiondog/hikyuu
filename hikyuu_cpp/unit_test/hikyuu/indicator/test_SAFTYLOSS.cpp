@@ -9,6 +9,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/SAFTYLOSS.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 
 using namespace hku;
@@ -125,6 +126,32 @@ TEST_CASE("test_SAFTYLOSS") {
     CHECK_EQ(result.discard(), expect.discard());
     for (size_t i = result.discard(); i < expect.size(); ++i) {
         CHECK_EQ(result[i], expect[i]);
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_SAFTYLOSS_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-50));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = SAFTYLOSS(c, 10, 3, 2.0);
+    Indicator result = SAFTYLOSS(c, CVAL(c, 10), CVAL(c, 3), CVAL(c, 2.0));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+    }
+
+    result = SAFTYLOSS(c, IndParam(CVAL(c, 10)), IndParam(CVAL(c, 3)), IndParam(CVAL(c, 2.0)));
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
     }
 }
 

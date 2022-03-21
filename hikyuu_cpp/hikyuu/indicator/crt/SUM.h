@@ -19,6 +19,7 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API SUM(int n = 20);
+Indicator HKU_API SUM(const IndParam& n);
 
 /**
  * 求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
@@ -26,10 +27,16 @@ Indicator HKU_API SUM(int n = 20);
  * @param n N日时间窗口
  * @ingroup Indicator
  */
-Indicator SUM(const Indicator& ind, int n = 20);
-
-inline Indicator SUM(const Indicator& ind, int n) {
+inline Indicator SUM(const Indicator& ind, int n = 20) {
     return SUM(n)(ind);
+}
+
+inline Indicator SUM(const Indicator& ind, const IndParam& n) {
+    return SUM(n)(ind);
+}
+
+inline Indicator SUM(const Indicator& ind, const Indicator& n) {
+    return SUM(IndParam(n))(ind);
 }
 
 }  // namespace hku

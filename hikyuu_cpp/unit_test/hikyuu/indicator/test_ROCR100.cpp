@@ -11,6 +11,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ROCR100.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -52,6 +53,58 @@ TEST_CASE("test_ROCR100") {
     CHECK_EQ(result[2], 0);
     CHECK_EQ(result[3], 300);
     CHECK_EQ(result[4], 200);
+
+    // n = 0
+    for (int i = 0; i < 10; ++i) {
+        a[i] = i + 1;
+    }
+    data = PRICELIST(a);
+    result = ROCR100(data, 0);
+    CHECK_EQ(data.discard(), result.discard());
+    CHECK_EQ(data.size(), result.size());
+    CHECK_EQ(result[0], 100.0);
+    for (size_t i = 1; i < result.size(); i++) {
+        CHECK_EQ(data[i] / data[0] * 100.0, result[i]);
+    }
+}
+
+/** @par 检测点 */
+TEST_CASE("test_ROCR100_dyn") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-30));
+    // KData kdata = stock.getKData(KQuery(0, Null<size_t>(), KQuery::MIN));
+    Indicator c = CLOSE(kdata);
+    Indicator expect = ROCR100(c, 10);
+    Indicator result = ROCR100(c, CVAL(c, 10));
+    CHECK_EQ(expect.size(), result.size());
+    // CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    result = ROCR100(c, IndParam(CVAL(c, 10)));
+    CHECK_EQ(expect.size(), result.size());
+    // CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    expect = ROCR100(c, 0);
+    result = ROCR100(c, CVAL(c, 0));
+    CHECK_EQ(expect.size(), result.size());
+    // CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = expect.discard(); i < expect.size(); i++) {
+        CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------

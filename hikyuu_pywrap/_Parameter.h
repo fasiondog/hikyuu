@@ -31,7 +31,10 @@ struct AnyToPython {
             // return (*o).ptr();
 
         } else if (x.type() == typeid(int)) {
-            return Py_BuildValue("n", boost::any_cast<int>(x));
+            return Py_BuildValue("i", boost::any_cast<int>(x));
+
+        } else if (x.type() == typeid(int64_t)) {
+            return Py_BuildValue("L", boost::any_cast<int64_t>(x));
 
         } else if (x.type() == typeid(double)) {
             return Py_BuildValue("d", boost::any_cast<double>(x));
@@ -128,7 +131,14 @@ inline void Parameter::set<object>(const string& name, const object& o) {
 
         extract<int> x2(o);
         if (x2.check()) {
-            m_params[name] = x2();
+            int overflow;
+            long val = PyLong_AsLongAndOverflow(o.ptr(), &overflow);
+            if (overflow == 0) {
+                m_params[name] = x2();
+            } else {
+                int64_t long_val = PyLong_AsLongLong(o.ptr());
+                m_params[name] = long_val;
+            }
             return;
         }
 
@@ -205,6 +215,12 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
+        return;
+    }
+
+    if (m_params[name].type() == typeid(int64_t)) {
+        int64_t long_val = PyLong_AsLongLong(o.ptr());
+        m_params[name] = long_val;
         return;
     }
 

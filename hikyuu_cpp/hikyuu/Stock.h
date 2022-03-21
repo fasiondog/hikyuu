@@ -55,6 +55,7 @@ public:
     Stock();
 
     Stock(const Stock&);
+    Stock(Stock&&);
     Stock(const string& market, const string& code, const string& name);
 
     Stock(const string& market, const string& code, const string& name, uint32_t type, bool valid,
@@ -64,6 +65,7 @@ public:
           int precision, size_t minTradeNumber, size_t maxTradeNumber);
     virtual ~Stock();
     Stock& operator=(const Stock&);
+    Stock& operator=(Stock&&);
     bool operator==(const Stock&) const;
     bool operator!=(const Stock&) const;
 
@@ -110,13 +112,13 @@ public:
     int precision() const;
 
     /** 获取最小交易数量，同minTradeNumber */
-    size_t atom() const;
+    double atom() const;
 
     /** 获取最小交易数量 */
-    size_t minTradeNumber() const;
+    double minTradeNumber() const;
 
     /** 获取最大交易量 */
-    size_t maxTradeNumber() const;
+    double maxTradeNumber() const;
 
     /**
      * 获取指定时间段[start,end)内的权息信息
@@ -247,8 +249,8 @@ struct HKU_API Stock::Data {
     price_t m_tickValue;
     price_t m_unit;
     int m_precision;
-    size_t m_minTradeNumber;
-    size_t m_maxTradeNumber;
+    double m_minTradeNumber;
+    double m_maxTradeNumber;
 
     unordered_map<string, KRecordList*> pKData;
     unordered_map<string, std::shared_mutex*> pMutex;
@@ -256,7 +258,7 @@ struct HKU_API Stock::Data {
     Data();
     Data(const string& market, const string& code, const string& name, uint32_t type, bool valid,
          const Datetime& startDate, const Datetime& lastDate, price_t tick, price_t tickValue,
-         int precision, size_t minTradeNumber, size_t maxTradeNumber);
+         int precision, double minTradeNumber, double maxTradeNumber);
 
     virtual ~Data();
 };

@@ -31,6 +31,7 @@ from hikyuu.util.singleton import SingletonType
 from sqlalchemy import (create_engine, Sequence, Column, Integer, String, and_, UniqueConstraint)
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+
 Base = declarative_base()
 
 
@@ -174,9 +175,7 @@ class HubManager(metaclass=SingletonType):
         # 创建仓库数据库
         engine = create_engine("sqlite:///{}/.hikyuu/hub.db".format(usr_dir))
         Base.metadata.create_all(engine)
-        self._scoped_Session = scoped_session(
-            sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        )
+        self._scoped_Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
         self._session = None
 
     @dbsession
@@ -185,9 +184,8 @@ class HubManager(metaclass=SingletonType):
         usr_dir = os.path.expanduser('~')
 
         # 检查并建立远端仓库的本地缓存目录
-        self.remote_cache_dir = self._session.query(ConfigModel.value
-                                                    ).filter(ConfigModel.key == 'remote_cache_dir'
-                                                             ).first()
+        self.remote_cache_dir = self._session.query(ConfigModel.value).filter(ConfigModel.key == 'remote_cache_dir'
+                                                                              ).first()
         if self.remote_cache_dir is None:
             self.remote_cache_dir = "{}/.hikyuu/hub_cache".format(usr_dir)
             record = ConfigModel(key='remote_cache_dir', value=self.remote_cache_dir)
@@ -207,8 +205,7 @@ class HubManager(metaclass=SingletonType):
             sys.path.append(os.path.dirname(model.local))
 
         # 检查并下载 hikyuu 默认策略仓库, hikyuu_hub 避免导入时模块和 hikyuu 重名
-        hikyuu_hub_path = self._session.query(HubModel.local).filter(HubModel.name == 'default'
-                                                                     ).first()
+        hikyuu_hub_path = self._session.query(HubModel.local).filter(HubModel.name == 'default').first()
         if hikyuu_hub_path is None:
             self.add_remote_hub('default', 'https://gitee.com/fasiondog/hikyuu_hub.git', 'master')
 
@@ -236,18 +233,14 @@ class HubManager(metaclass=SingletonType):
         record = self._session.query(HubModel).filter(HubModel.name == name).first()
         checkif(record is not None, name, HubNameRepeatError)
 
-        record = self._session.query(HubModel).filter(
-            and_(HubModel.url == url, HubModel.branch == branch)
-        ).first()
+        record = self._session.query(HubModel).filter(and_(HubModel.url == url, HubModel.branch == branch)).first()
 
         # 下载远程仓库
         local_dir = "{}/{}".format(self.remote_cache_dir, name)
         self.download_remote_hub(local_dir, url, branch)
 
         # 导入仓库各部件策略信息
-        record = HubModel(
-            name=name, hub_type='remote', url=url, branch=branch, local_base=name, local=local_dir
-        )
+        record = HubModel(name=name, hub_type='remote', url=url, branch=branch, local_base=name, local=local_dir)
         self.import_part_to_db(record)
 
         # 更新仓库记录
@@ -332,9 +325,7 @@ class HubManager(metaclass=SingletonType):
         local_dir = hub_model.local
         if not os.path.lexists(local_dir):
             self.logger.warning(
-                'The {} hub path ("{}") is not exists! Ignored this hub!'.format(
-                    hub_model.name, hub_model.local
-                )
+                'The {} hub path ("{}") is not exists! Ignored this hub!'.format(hub_model.name, hub_model.local)
             )
             return
 
@@ -346,12 +337,9 @@ class HubManager(metaclass=SingletonType):
             try:
                 with os.scandir(path) as it:
                     for entry in it:
-                        if (not entry.name.startswith('.')
-                            ) and entry.is_dir() and (entry.name != "__pycache__"):
+                        if (not entry.name.startswith('.')) and entry.is_dir() and (entry.name != "__pycache__"):
                             # 计算实际的导入模块名
-                            module_name = '{}.part.{}.{}.part'.format(
-                                base_local, part, entry.name
-                            ) if part not in (
+                            module_name = '{}.part.{}.{}.part'.format(base_local, part, entry.name) if part not in (
                                 'prtflo', 'sys'
                             ) else '{}.{}.{}.part'.format(base_local, part, entry.name)
 
@@ -370,9 +358,7 @@ class HubManager(metaclass=SingletonType):
                                 self.logger.error('缺失 part 函数！("{}")'.format(entry.path))
                                 continue
 
-                            name = '{}.{}.{}'.format(
-                                hub_model.name, part, entry.name
-                            ) if part not in (
+                            name = '{}.{}.{}'.format(hub_model.name, part, entry.name) if part not in (
                                 'prtflo', 'sys'
                             ) else '{}.{}.{}'.format(hub_model.name, part, entry.name)
 
@@ -382,12 +368,9 @@ class HubManager(metaclass=SingletonType):
                                     part=part,
                                     name=name,
                                     module_name=module_name,
-                                    author=part_module.author.strip()
-                                    if 'author' in module_vars else 'None',
-                                    version=part_module.version.strip()
-                                    if 'version' in module_vars else 'None',
-                                    doc=part_module.part.__doc__.strip()
-                                    if part_module.part.__doc__ else "None"
+                                    author=part_module.author.strip() if 'author' in module_vars else 'None',
+                                    version=part_module.version.strip() if 'version' in module_vars else 'None',
+                                    doc=part_module.part.__doc__.strip() if part_module.part.__doc__ else "None"
                                 )
                                 self._session.add(part_model)
                             except Exception as e:
@@ -406,10 +389,9 @@ class HubManager(metaclass=SingletonType):
         """
         name_parts = name.split('.')
         checkif(
-            len(name_parts) < 2 or (
-                name_parts[-2]
-                not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys')
-            ), name, PartNameError
+            len(name_parts) < 2
+            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'prtflo', 'sys')), name,
+            PartNameError
         )
 
         # 未指定仓库名，则默认使用 'default' 仓库
@@ -422,6 +404,7 @@ class HubManager(metaclass=SingletonType):
             raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
         part = part_module.part(**kwargs)
         part.name = part_model.name
+        part.info = self.get_part_info(part.name)
         return part
 
     @dbsession
@@ -482,9 +465,8 @@ class HubManager(metaclass=SingletonType):
         elif part_type is None:
             results = self._session.query(PartModel.name).filter_by(hub_name=hub).all()
         else:
-            results = self._session.query(PartModel.name).filter(
-                and_(PartModel.hub_name == hub, PartModel.part == part_type)
-            ).all()
+            results = self._session.query(PartModel.name
+                                          ).filter(and_(PartModel.hub_name == hub, PartModel.part == part_type)).all()
         return [record[0] for record in results]
 
     @dbsession
@@ -608,8 +590,7 @@ __all__ = [
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
+        level=logging.INFO, format='%(asctime)-15s [%(levelname)s] - %(message)s [%(name)s::%(funcName)s]'
     )
     add_local_hub('dev', '/home/fasiondog/workspace/stockhouse')
     #update_hub('test1')

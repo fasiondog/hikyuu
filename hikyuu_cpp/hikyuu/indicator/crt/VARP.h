@@ -21,10 +21,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API VARP(int n = 10);
-Indicator VARP(const Indicator& data, int n = 10);
+Indicator HKU_API VARP(const IndParam& n);
 
-inline Indicator VARP(const Indicator& data, int n) {
+inline Indicator VARP(const Indicator& data, int n = 10) {
     return VARP(n)(data);
+}
+
+inline Indicator VARP(const Indicator& data, const IndParam& n) {
+    return VARP(n)(data);
+}
+
+inline Indicator VARP(const Indicator& data, const Indicator& n) {
+    return VARP(IndParam(n))(data);
 }
 
 }  // namespace hku

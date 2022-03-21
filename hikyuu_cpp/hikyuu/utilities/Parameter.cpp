@@ -22,6 +22,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
         os << iter->first;
         if (iter->second.type() == typeid(int)) {
             os << "(int): " << boost::any_cast<int>(iter->second) << strip;
+        } else if (iter->second.type() == typeid(int64_t)) {
+            os << "(int64): " << boost::any_cast<int64_t>(iter->second) << strip;
         } else if (iter->second.type() == typeid(bool)) {
             os << "(bool): " << boost::any_cast<bool>(iter->second) << strip;
         } else if (iter->second.type() == typeid(double)) {
@@ -68,11 +70,11 @@ Parameter& Parameter::operator=(const Parameter& p) {
 }
 
 bool Parameter::support(const boost::any& value) {
-    return value.type() == typeid(int) || value.type() == typeid(bool) ||
-           value.type() == typeid(double) || value.type() == typeid(string) ||
-           value.type() == typeid(Stock) || value.type() == typeid(KQuery) ||
-           value.type() == typeid(KData) || value.type() == typeid(PriceList) ||
-           value.type() == typeid(DatetimeList);
+    return value.type() == typeid(int) || value.type() == typeid(int64_t) ||
+           value.type() == typeid(bool) || value.type() == typeid(double) ||
+           value.type() == typeid(string) || value.type() == typeid(Stock) ||
+           value.type() == typeid(KQuery) || value.type() == typeid(KData) ||
+           value.type() == typeid(PriceList) || value.type() == typeid(DatetimeList);
 }
 
 string Parameter::type(const string& name) const {
@@ -80,6 +82,7 @@ string Parameter::type(const string& name) const {
     HKU_CHECK_THROW(iter != m_params.end(), std::out_of_range,
                     "out_of_range in Parameter::get : {}", name);
     HKU_IF_RETURN(iter->second.type() == typeid(int), "int");
+    HKU_IF_RETURN(iter->second.type() == typeid(int64_t), "int64");
     HKU_IF_RETURN(iter->second.type() == typeid(bool), "bool");
     HKU_IF_RETURN(iter->second.type() == typeid(double), "double");
     HKU_IF_RETURN(iter->second.type() == typeid(string), "string");
@@ -108,6 +111,8 @@ string Parameter::getNameValueList() const {
     for (; iter != m_params.end(); ++iter) {
         if (iter->second.type() == typeid(int)) {
             os << iter->first << equal << boost::any_cast<int>(iter->second);
+        } else if (iter->second.type() == typeid(int64_t)) {
+            os << iter->first << equal << boost::any_cast<int64_t>(iter->second);
         } else if (iter->second.type() == typeid(bool)) {
             os << iter->first << equal << boost::any_cast<bool>(iter->second);
         } else if (iter->second.type() == typeid(double)) {

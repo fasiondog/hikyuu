@@ -29,6 +29,11 @@ class IMacd : public IndicatorImp {
 public:
     IMacd();
     virtual ~IMacd();
+
+    virtual void _dyn_calculate(const Indicator&) override;
+
+private:
+    void _dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, int n3);
 };
 
 } /* namespace hku */

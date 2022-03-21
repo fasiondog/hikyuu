@@ -19,10 +19,18 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API STDP(int n = 10);
-Indicator STDP(const Indicator& data, int n = 10);
+Indicator HKU_API STDP(const IndParam& n);
 
-inline Indicator STDP(const Indicator& data, int n) {
+inline Indicator STDP(const Indicator& data, int n = 10) {
     return STDP(n)(data);
+}
+
+inline Indicator STDP(const Indicator& data, const IndParam& n) {
+    return STDP(n)(data);
+}
+
+inline Indicator STDP(const Indicator& data, const Indicator& n) {
+    return STDP(IndParam(n))(data);
 }
 
 }  // namespace hku

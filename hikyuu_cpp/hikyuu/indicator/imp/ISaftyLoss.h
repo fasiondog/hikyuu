@@ -32,6 +32,11 @@ class ISaftyLoss : public hku::IndicatorImp {
 public:
     ISaftyLoss();
     virtual ~ISaftyLoss();
+
+    virtual void _dyn_calculate(const Indicator&) override;
+
+private:
+    void _dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, double p);
 };
 
 } /* namespace hku */

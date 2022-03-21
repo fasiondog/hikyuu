@@ -27,6 +27,7 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API MACD(int n1 = 12, int n2 = 26, int n3 = 9);
+Indicator HKU_API MACD(const IndParam& n1, const IndParam& n2, const IndParam& n3);
 
 /**
  * MACD平滑异同移动平均线
@@ -42,7 +43,19 @@ Indicator HKU_API MACD(int n1 = 12, int n2 = 26, int n3 = 9);
  * </pre>
  * @ingroup Indicator
  */
-Indicator HKU_API MACD(const Indicator& data, int n1 = 12, int n2 = 26, int n3 = 9);
+inline Indicator MACD(const Indicator& data, int n1 = 12, int n2 = 26, int n3 = 9) {
+    return MACD(n1, n2, n3)(data);
+}
+
+inline Indicator MACD(const Indicator& data, const IndParam& n1, const IndParam& n2,
+                      const IndParam& n3) {
+    return MACD(n1, n2, n3)(data);
+}
+
+inline Indicator MACD(const Indicator& data, const Indicator& n1, const Indicator& n2,
+                      const Indicator& n3) {
+    return MACD(IndParam(n1), IndParam(n2), IndParam(n3))(data);
+}
 
 }  // namespace hku
 

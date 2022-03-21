@@ -26,6 +26,11 @@ class IAma : public IndicatorImp {
 public:
     IAma();
     virtual ~IAma();
+
+    virtual void _dyn_calculate(const Indicator&) override;
+
+private:
+    void _dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_n, int slow_n);
 };
 
 } /* namespace hku */

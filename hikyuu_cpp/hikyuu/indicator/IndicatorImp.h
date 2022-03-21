@@ -157,7 +157,7 @@ public:
     void setIndParam(const string& name, const Indicator& ind);
     void setIndParam(const string& name, const IndParam& ind);
     IndParam getIndParam(const string& name) const;
-    const IndicatorImpPtr getIndParamImp(const string& name) const;
+    const IndicatorImpPtr& getIndParamImp(const string& name) const;
     const unordered_map<string, IndicatorImpPtr>& getIndParams() const;
 
     price_t* data(size_t result_num = 0);
@@ -172,9 +172,6 @@ public:
     virtual void _calculate(const Indicator&) {}
 
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
-
-    /** 动态指标参数计算完毕后处理，主要用于修正 m_discard */
-    virtual void _after_dyn_calculate(const Indicator& ind) {}
 
     /** 是否支持指标动态参数 */
     virtual bool supportIndParam() const {
@@ -194,6 +191,8 @@ public:
         return false;
     }
 
+    virtual void _dyn_calculate(const Indicator&);
+
 private:
     void initContext();
     bool needCalculate();
@@ -212,10 +211,12 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
-    void _dyn_calculate(const Indicator&);
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
+
+    // 用于动态参数时，更新 discard
+    void _update_discard();
 
 protected:
     string m_name;
@@ -346,7 +347,7 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-#define INDICATOR_IMP_SUPPORT_IND_PARAM(classname)                                             \
+#define INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(classname)                                          \
 public:                                                                                        \
     virtual bool check() override;                                                             \
     virtual void _calculate(const Indicator& ind) override;                                    \

@@ -16,7 +16,7 @@
 namespace hku {
 
 class ILowLine : public IndicatorImp {
-    INDICATOR_IMP_SUPPORT_IND_PARAM(ILowLine)
+    INDICATOR_IMP_SUPPORT_DYNAMIC_STEP(ILowLine)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

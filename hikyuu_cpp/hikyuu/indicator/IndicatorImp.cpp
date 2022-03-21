@@ -103,7 +103,7 @@ IndParam IndicatorImp::getIndParam(const string &name) const {
     return IndParam(m_ind_params.at(name));
 }
 
-const IndicatorImpPtr IndicatorImp::getIndParamImp(const string &name) const {
+const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
     return m_ind_params.at(name);
 }
 
@@ -1255,7 +1255,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     const auto &ind_param = getIndParamImp("n");
     HKU_CHECK(ind_param->size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
               ind_param->size(), ind.size());
-    m_discard = ind.discard();
+    m_discard = std::max(ind.discard(), ind_param->discard());
     size_t total = ind.size();
     HKU_IF_RETURN(0 == total || m_discard >= total, void());
 
@@ -1267,7 +1267,7 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
             size_t step = size_t(ind_param->get(i));
             _dyn_run_one_step(ind, i, step);
         }
-        _after_dyn_calculate(ind);
+        _update_discard();
         return;
     }
 
@@ -1302,7 +1302,23 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
         task.get();
     }
 
-    _after_dyn_calculate(ind);
+    _update_discard();
+}
+
+void IndicatorImp::_update_discard() {
+    size_t total = size();
+    for (size_t result_index = 0; result_index < m_result_num; result_index++) {
+        size_t discard = m_discard;
+        for (size_t i = m_discard; i < total; i++) {
+            if (!std::isnan(get(i, result_index))) {
+                break;
+            }
+            discard++;
+        }
+        if (discard > m_discard) {
+            m_discard = discard;
+        }
+    }
 }
 
 } /* namespace hku */

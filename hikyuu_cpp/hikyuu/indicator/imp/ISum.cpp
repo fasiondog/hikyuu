@@ -25,12 +25,7 @@ bool ISum::check() {
 
 void ISum::_calculate(const Indicator& ind) {
     size_t total = ind.size();
-    if (0 == total) {
-        m_discard = 0;
-        return;
-    }
-
-    if (ind.discard() >= total) {
+    if (0 == total || ind.discard() >= total) {
         m_discard = total;
         return;
     }
@@ -46,34 +41,38 @@ void ISum::_calculate(const Indicator& ind) {
         return;
     }
 
-    m_discard = ind.discard() + n - 1;
-    if (m_discard >= total) {
-        m_discard = total;
-        return;
-    }
-
-    size_t startPos = ind.discard();
     price_t sum = 0.0;
-    size_t first_end = startPos + n >= total ? total : startPos + n;
-    for (size_t i = startPos; i < first_end; ++i) {
+    for (size_t i = m_discard; i < m_discard + n; i++) {
         sum += ind[i];
+        _set(sum, i);
     }
 
-    if (first_end >= 1) {
-        _set(sum, first_end - 1);
-    }
-
-    for (size_t i = first_end; i < total; ++i) {
-        sum = ind[i] + sum - ind[i - n];
+    for (size_t i = m_discard + n; i < total; i++) {
+        sum = sum - ind[i - n] + ind[i];
         _set(sum, i);
     }
 
     return;
 }
 
+void ISum::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    price_t sum = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        sum += ind[i];
+    }
+    _set(sum, curPos);
+}
+
 Indicator HKU_API SUM(int n) {
     IndicatorImpPtr p = make_shared<ISum>();
     p->setParam<int>("n", n);
+    return Indicator(p);
+}
+
+Indicator HKU_API SUM(const IndParam& n) {
+    IndicatorImpPtr p = make_shared<ISum>();
+    p->setIndParam("n", n);
     return Indicator(p);
 }
 

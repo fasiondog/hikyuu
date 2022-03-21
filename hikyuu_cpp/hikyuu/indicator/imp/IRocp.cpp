@@ -73,22 +73,6 @@ void IRocp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) 
     _set(ind[start] != 0.0 ? (ind[curPos] - ind[start]) / ind[start] : 0.0, curPos);
 }
 
-void IRocp::_after_dyn_calculate(const Indicator& ind) {
-    size_t total = ind.size();
-    HKU_IF_RETURN(m_discard == total, void());
-
-    size_t discard = m_discard;
-    for (size_t i = total - 1; i > discard; i--) {
-        if (std::isnan(get(i))) {
-            m_discard = i + 1;
-            break;
-        }
-    }
-    if (m_discard == discard && std::isnan(get(discard))) {
-        m_discard = discard + 1;
-    }
-}
-
 Indicator HKU_API ROCP(int n) {
     IndicatorImpPtr p = make_shared<IRocp>();
     p->setParam<int>("n", n);

@@ -14,15 +14,15 @@ from test_init import *
 
 class StockTypeInfoTest(unittest.TestCase):
     def test_stockType(self):
-        stockType = sm.getStockTypeInfo(1)
+        stockType = sm.get_stock_type_info(1)
         self.assertEqual(stockType.type, 1)
         self.assertEqual(stockType.description, u"A股")
         self.assertEqual(stockType.tick, 0.01)
-        self.assertEqual(stockType.tickValue, 0.01)
+        self.assertEqual(stockType.tick_value, 0.01)
         self.assertEqual(stockType.unit, 1.0)
         self.assertEqual(stockType.precision, 2)
-        self.assertEqual(stockType.minTradeNumber, 100)
-        self.assertEqual(stockType.maxTradeNumber, 1000000)
+        self.assertEqual(stockType.min_trade_num, 100)
+        self.assertEqual(stockType.max_trade_num, 1000000)
 
     def test_pickle(self):
         if not constant.pickle_support:
