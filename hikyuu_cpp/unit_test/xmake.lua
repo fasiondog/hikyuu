@@ -113,6 +113,7 @@ target("small-test")
     if is_plat("linux") or is_plat("macosx") then
         add_links("boost_unit_test_framework")
         add_links("boost_filesystem")
+        add_links("boost_atomic")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
