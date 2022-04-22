@@ -1191,7 +1191,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     // HKU_IF_RETURN(indatetime == Null<Datetime>() || indatetime == lastDatetime(),
     // getFunds(ktype));
 
-    Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 11, 59);
+    Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
     price_t short_market_value = 0.0;
     if (datetime > lastDatetime()) {
