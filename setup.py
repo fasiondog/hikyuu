@@ -126,7 +126,7 @@ def build_boost(mode):
         cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
               './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization; '\
               './b2 {mode} link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
-              '--with-filesystem --with-system --with-test --with_atomic; '\
+              '--with-filesystem --with-system --with-test --with-atomic; '\
               'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
         # cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
         #       './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization '\
