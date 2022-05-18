@@ -55,6 +55,8 @@ public:
 
     /** 启动调度, 可在停止后重新启动 */
     void start() {
+        std::priority_queue<IntervalS> new_queue;
+        m_queue.swap(new_queue);
         if (m_stop) {
             m_stop = false;
             if (!m_tg) {
@@ -348,7 +350,7 @@ private:
                 s.m_time_point > today + timer->m_end_time) {
                 s.m_time_point = today + timer->m_start_time + TimeDelta(1);
             }
-            HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
+            // HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
             m_queue.push(s);
         }
     }
