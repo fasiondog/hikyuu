@@ -22,9 +22,7 @@ target("hikyuu")
         add_cxflags("-wd4251")  --template dll export warning
         add_cxflags("-wd4267")
         add_cxflags("-wd4834")  --C++17 discarding return value of function with 'nodiscard' attribute
-        add_cxflags("-wd4996")
         add_cxflags("-wd4244")  --discable double to int
-        add_cxflags("-wd4566")
     else
         add_rpathdirs("$ORIGIN")
         add_cxflags("-Wno-sign-compare", "-Wno-missing-braces")

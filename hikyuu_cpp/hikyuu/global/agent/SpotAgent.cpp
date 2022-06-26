@@ -18,9 +18,9 @@ const char* SpotAgent::ms_pubUrl = "ipc:///tmp/hikyuu_real_pub.ipc";
 const char* SpotAgent::ms_startTag = ":spot:[start spot]";
 const char* SpotAgent::ms_endTag = ":spot:[end spot]";
 const char* SpotAgent::ms_spotTopic = ":spot:";
-const int SpotAgent::ms_spotTopicLength = strlen(SpotAgent::ms_spotTopic);
-const int SpotAgent::ms_startTagLength = strlen(SpotAgent::ms_startTag);
-const int SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
+const size_t SpotAgent::ms_spotTopicLength = strlen(SpotAgent::ms_spotTopic);
+const size_t SpotAgent::ms_startTagLength = strlen(SpotAgent::ms_startTag);
+const size_t SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
 Datetime SpotAgent::ms_start_rev_time;
 
@@ -111,6 +111,11 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     flatbuffers::Verifier verify(spot_list_buf, buf_len);
     HKU_CHECK(VerifySpotListBuffer(verify), "Invalid data!");
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#endif
+
     // 更新日线数据
     auto* spot_list = GetSpotList(spot_list_buf);
     auto* spots = spot_list->spot();
@@ -125,6 +130,10 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
             }
         }
     }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 }
 
 void SpotAgent::work_thread() {

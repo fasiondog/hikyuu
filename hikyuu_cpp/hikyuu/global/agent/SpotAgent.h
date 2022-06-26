@@ -111,10 +111,10 @@ private:
     static const char* ms_pubUrl;  // 数据发送服务地址
     static const char* ms_startTag;  // 批次数据接收起始标记，用于判断启动了新的批次数据接收
     static const char* ms_endTag;  // 批次数据接收接收标记，用于判断该批次数据更新结束
-    static const char* ms_spotTopic;      // 向数据发送服务订阅的主题
-    static const int ms_startTagLength;   // 批次数据接收起始标记长度
-    static const int ms_endTagLength;     // 批次数据接收结束标记长度
-    static const int ms_spotTopicLength;  // 订阅主题标记长度
+    static const char* ms_spotTopic;         // 向数据发送服务订阅的主题
+    static const size_t ms_startTagLength;   // 批次数据接收起始标记长度
+    static const size_t ms_endTagLength;     // 批次数据接收结束标记长度
+    static const size_t ms_spotTopicLength;  // 订阅主题标记长度
 
     static Datetime ms_start_rev_time;  // 批次数据接收开始时间
 
