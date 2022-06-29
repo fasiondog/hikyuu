@@ -18,12 +18,11 @@ Python中的订单代理包装
     my_tm = crtTM(init_cash = 300000)
 
     #注册实盘交易订单代理
-    my_tm.regBroker(crtOB(TestOrderBroker())) #TestOerderBroker是测试用订单代理对象，只打印
-    #my_tm.regBroker(crtOB(Puppet()))  #Puppet为内建的扯线木偶实盘下单对象
-    #my_tm.regBroker(crtOB(MailOrderBroker("smtp.sina.com", "yourmail@sina.com", "yourpwd", "receivermail@XXX.yy)))
+    my_tm.reg_broker(crtOB(TestOrderBroker())) #TestOerderBroker是测试用订单代理对象，只打印
+    #my_tm.reg_broker(crtOB(MailOrderBroker("smtp.sina.com", "yourmail@sina.com", "yourpwd", "receivermail@XXX.yy)))
 
     #根据需要修改订单代理最后的时间戳，后续只有大于该时间戳时，订单代理才会实际发出订单指令
-    my_tm.brokeLastDatetime=Datetime(201706010000)
+    my_tm.broke_last_datetime=Datetime(201706010000)
 
     #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越慢线时买入，反之卖出）
     my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)

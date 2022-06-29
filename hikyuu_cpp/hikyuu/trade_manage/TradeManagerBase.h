@@ -158,7 +158,6 @@ public:
 
     /** 复位，清空交易、持仓记录 */
     void reset() {
-        m_broker_last_datetime = Datetime::now();
         _reset();
     }
 
