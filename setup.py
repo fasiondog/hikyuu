@@ -343,10 +343,11 @@ def install():
 
 
 @click.command()
-def wheel():
+@click.option('-j', '--j', default=2, help="并行编译数量")
+def wheel(j):
     """ 生成 python 的 wheel 安装包 """
     # 尝试编译
-    start_build(False, 'release')
+    start_build(False, 'release', j)
 
     # 清理之前遗留的打包产物
     print("Clean up the before papackaging outputs ...")
