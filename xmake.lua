@@ -41,7 +41,7 @@ set_languages("cxx17", "C99")
 
 add_plugindirs("./xmake_plugins")
 
-local hdf5_version = "1.10.4"
+local hdf5_version = "1.12.2"
 local mysql_version = "8.0.21"
 if is_plat("windows") then
     add_repositories("project-repo hikyuu_extern_libs")
