@@ -31,7 +31,7 @@ public:
      * 构造函数，此时尚未启动运行，需调用 start 方法显示启动调度
      * @param work_num 定时任务执行线程池线程数量
      */
-    TimerManager(size_t work_num = std::thread::hardware_concurrency())
+    explicit TimerManager(size_t work_num = std::thread::hardware_concurrency())
     : m_current_timer_id(-1), m_stop(true), m_work_num(work_num) {}
 
     /** 析构函数 */
