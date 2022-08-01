@@ -9,7 +9,10 @@ class LocalDatabase:
     model = declarative_base()
 
     def __init__(self):
-        self._db_name = "%s/.hikyuu/admin/hkuadmin.db" % os.path.expanduser('~')
+        path = "%s/.hikyuu/admin" % os.path.expanduser('~')
+        if not os.path.lexists(path):
+            os.makedirs(path)
+        self._db_name = f"{path}/hkuadmin.db"
         self._engine = sqlalchemy.create_engine(
             "sqlite:///%s?check_same_thread=false" % self._db_name, echo=True, future=True
         )
