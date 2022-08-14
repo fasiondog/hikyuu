@@ -37,6 +37,7 @@ from pytdx.hq import TdxHq_API
 from hikyuu.data.common_pytdx import search_best_tdx
 
 from hikyuu.data.common_sqlite3 import create_database as sqlite_create_database
+from hikyuu.data.pytdx_to_h5 import import_index_name as sqlite_import_index_name
 from hikyuu.data.pytdx_to_h5 import import_stock_name as sqlite_import_stock_name
 from hikyuu.data.common_mysql import create_database as mysql_create_database
 from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
@@ -241,6 +242,7 @@ class UsePytdxImportToH5Thread(QThread):
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             connect = sqlite3.connect("{}/stock.db".format(self.config['hdf5']['dir']))
             create_database = sqlite_create_database
+            import_index_name = sqlite_import_index_name
             import_stock_name = sqlite_import_stock_name
         else:
             db_config = {
@@ -258,6 +260,7 @@ class UsePytdxImportToH5Thread(QThread):
         pytdx_api = TdxHq_API()
         pytdx_api.connect(self.hosts[0][2], self.hosts[0][3])
 
+        count = import_index_name(connect)
         count = import_stock_name(connect, pytdx_api, 'SH', self.quotations)
         if count > 0:
             self.logger.info("上证新增股票数: {}".format(count))

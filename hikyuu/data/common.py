@@ -22,15 +22,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import akshare as ak
+
 
 class MARKET:
     SH = 'SH'
     SZ = 'SZ'
+    BJ = 'BJ'
 
 
 class MARKETID:
     SH = 1
     SZ = 2
+    BJ = 3
 
 
 class STOCKTYPE:
@@ -70,3 +74,38 @@ def get_stktype_list(quotations=None):
             print('Unknow quotation: {}'.format(quotation))
 
     return tuple(result)
+
+
+def get_stk_code_name_list(market: str) -> list:
+    """
+    获取指定证券交易所股票代码与名称列表
+    :return: 代码名称对组成的列表：[{'code': 'code1': 'name': 'name1'}, ...]
+    """
+    # 获取深圳股票代码表
+    if market == MARKET.SZ:
+        df = ak.stock_info_sz_name_code()
+        df.rename(columns={'A股代码': 'code', 'A股简称': 'name'}, inplace=True)
+        return df[['code', 'name']].to_dict(orient='records')
+
+    # 获取上证股票代码表
+    if market == MARKET.SH:
+        df = ak.stock_info_sh_name_code()
+        df.rename(columns={'证券代码': 'code', '证券简称': 'name'}, inplace=True)
+        return df[['code', 'name']].to_dict(orient='records')
+
+    # 获取北京股票代码表
+    if market == MARKET.BJ:
+        df = ak.stock_info_bj_name_code()
+        df.rename(columns={'证券代码': 'code', '证券简称': 'name'}, inplace=True)
+        return df[['code', 'name']].to_dict(orient='records')
+
+
+def get_index_code_name_list() -> list:
+    """
+    获取所有股票指数代码名称列表
+    从新浪获取，多次频繁调用会被封禁IP，需10分钟后再试
+    
+    :return: [{'market_code': 'SHxxx'}, ...]
+    """
+    df = ak.stock_zh_index_spot()
+    return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]

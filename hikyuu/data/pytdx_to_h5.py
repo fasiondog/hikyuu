@@ -30,15 +30,15 @@ from pytdx.hq import TDXParams
 
 from hikyuu.util.mylog import get_default_logger, hku_error, hku_debug
 
-from .common import MARKETID, STOCKTYPE, get_stktype_list
-from .common_sqlite3 import (
+from hikyuu.data.common import *
+from hikyuu.data.common_sqlite3 import (
     get_codepre_list, create_database, get_marketid, get_last_date, get_stock_list, update_last_date
 )
-from .common_h5 import (
+from hikyuu.data.common_h5 import (
     H5Record, H5Index, open_h5file, get_h5table, update_hdf5_extern_data, open_trans_file, get_trans_table,
     update_hdf5_trans_index, open_time_file, get_time_table
 )
-from .weight_to_sqlite import qianlong_import_weight
+from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 
 
 def ProgressBar(cur, total):
@@ -52,6 +52,43 @@ def to_pytdx_market(market):
     """转换为pytdx的market"""
     pytdx_market = {'SH': TDXParams.MARKET_SH, 'SZ': TDXParams.MARKET_SZ}
     return pytdx_market[market.upper()]
+
+
+def import_index_name(connect):
+    """
+    导入所有指数代码表
+
+    :param connect: sqlite3实例
+    :return: 指数个数
+    """
+    index_list = get_index_code_name_list()
+
+    cur = connect.cursor()
+    a = cur.execute("select stockid, marketid, code from stock where type={}".format(STOCKTYPE.INDEX))
+    a = a.fetchall()
+    oldStockDict = {}
+    for oldstock in a:
+        oldstockid = oldstock[0]
+        oldcode = "{}{}".format(MARKET.SH if oldstock[1] == MARKETID.SH else MARKET.SZ, oldstock[2])
+        oldStockDict[oldcode] = oldstockid
+
+    today = datetime.date.today()
+    today = today.year * 10000 + today.month * 100 + today.day
+    for index in index_list:
+        if index['market_code'] in oldStockDict:
+            cur.execute(
+                "update stock set valid=1, name='%s' where stockid=%i" %
+                (index['name'], oldStockDict[index['market_code']])
+            )
+        else:
+            marketid = MARKETID.SH if index['market_code'][:2] == MARKET.SH else MARKETID.SZ
+            sql = "insert into Stock(marketid, code, name, type, valid, startDate, endDate) \
+                           values (%s, '%s', '%s', %s, %s, %s, %s)" \
+                          % (marketid, index['market_code'][2:], index['name'], STOCKTYPE.INDEX, 1, today, 99999999)
+            cur.execute(sql)
+    connect.commit()
+    cur.close()
+    return len(index_list)
 
 
 def import_stock_name(connect, api, market, quotations=None):
@@ -79,6 +116,9 @@ def import_stock_name(connect, api, market, quotations=None):
     marketid = get_marketid(connect, market)
 
     stktype_list = get_stktype_list(quotations)
+    stktype_list = list(stktype_list)
+    stktype_list.remove(STOCKTYPE.INDEX)  # 移除指数类型
+    stktype_list = tuple(stktype_list)
     a = cur.execute(
         "select stockid, code, name, valid from stock where marketid={} and type in {}".format(marketid, stktype_list)
     )
@@ -531,7 +571,7 @@ if __name__ == '__main__':
     import time
     starttime = time.time()
 
-    dest_dir = "c:\\stock"
+    dest_dir = "d:\\stock"
     tdx_server = '119.147.212.81'
     tdx_port = 7709
     quotations = ['stock', 'fund']
@@ -545,11 +585,15 @@ if __name__ == '__main__':
 
     add_count = 0
     """
+    print("导入指数代码表")
+    add_count = import_index_name(connect)
+    print("指数个数：", add_count)
+    """
     print("导入股票代码表")
     add_count = import_stock_name(connect, api, 'SH', quotations)
-    add_count += import_stock_name(connect, api, 'SZ', quotations)
+    #add_count += import_stock_name(connect, api, 'SZ', quotations)
     print("新增股票数：", add_count)
-
+    """
     print("\n导入上证日线数据")
     add_count = import_data(connect, 'SH', 'DAY', quotations, api, dest_dir, progress=ProgressBar)
     print("\n导入数量：", add_count)
