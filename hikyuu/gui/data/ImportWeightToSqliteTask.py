@@ -30,6 +30,7 @@ import urllib.request
 import mysql.connector
 
 from pytdx.hq import TdxHq_API
+from hikyuu.data.common import MARKET, g_market_list
 from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
@@ -119,13 +120,13 @@ class ImportWeightToSqliteTask:
 
             self.logger.info('正在导入权息数据')
             self.queue.put([self.msg_name, '正在导入权息数据...', 0, 0, 0])
-            sh_total_count = pytdx_import_weight(api, connect, "SH")
-            self.logger.info("导入上证权息记录数: {}".format(sh_total_count))
 
-            sz_total_count = pytdx_import_weight(api, connect, "SZ")
-            self.logger.info("导入深证权息记录数: {}".format(sz_total_count))
+            total_count = 0
+            for market in g_market_list:
+                count = pytdx_import_weight(api, connect, market)
+                self.logger.info("导入 {} 权息记录数: {}".format(market, count))
+                total_count += count
 
-            total_count = sh_total_count + sz_total_count
             self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
             self.logger.info('导入权息数据完毕')
 

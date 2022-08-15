@@ -23,12 +23,7 @@
 # SOFTWARE.
 
 from pytdx.hq import TDXParams
-
-
-def to_pytdx_market(market):
-    """转换为pytdx的market"""
-    pytdx_market = {'SH': TDXParams.MARKET_SH, 'SZ': TDXParams.MARKET_SZ}
-    return pytdx_market[market.upper()]
+from .common_pytdx import to_pytdx_market
 
 
 def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
@@ -103,12 +98,9 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                     records[date] = [
                         stockid,
                         date,
-                        int(10000 * xdxr['songzhuangu'])
-                        if xdxr['songzhuangu'] is not None else 0,  #countAsGift
-                        int(10000 *
-                            xdxr['peigu']) if xdxr['peigu'] is not None else 0,  #countForSell
-                        int(1000 *
-                            xdxr['peigujia']) if xdxr['peigujia'] is not None else 0,  #priceForSell
+                        int(10000 * xdxr['songzhuangu']) if xdxr['songzhuangu'] is not None else 0,  #countAsGift
+                        int(10000 * xdxr['peigu']) if xdxr['peigu'] is not None else 0,  #countForSell
+                        int(1000 * xdxr['peigujia']) if xdxr['peigujia'] is not None else 0,  #priceForSell
                         int(1000 * xdxr['fenhong']) if xdxr['fenhong'] is not None else 0,  #bonus
                         0,  #countOfIncreasement, pytdx 不区分送股和转增股，统一记在送股
                         round(xdxr['houzongguben'])
@@ -135,11 +127,7 @@ def pytdx_import_weight_to_sqlite(pytdx_api, connect, market):
                     last_free_count = round(xdxr['panhouliutong'])
             except Exception as e:
                 print(e)
-                print(
-                    "{} {}{} xdxr: {} last_db_weigth:{}".format(
-                        stockid, market, code, xdxr, new_last_db_weight
-                    )
-                )
+                print("{} {}{} xdxr: {} last_db_weigth:{}".format(stockid, market, code, xdxr, new_last_db_weight))
                 raise e
 
         if update_last_db_weight:

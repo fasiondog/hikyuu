@@ -32,6 +32,7 @@ from hikyuu.util.mylog import hku_error, hku_debug
 import mysql.connector
 
 from .common import MARKETID, STOCKTYPE, get_stktype_list
+from .common_pytdx import to_pytdx_market
 from .common_mysql import (
     create_database, get_marketid, get_codepre_list, get_stock_list, get_table, get_lastdatetime, update_extern_data
 )
@@ -43,12 +44,6 @@ def ProgressBar(cur, total):
     sys.stdout.write('\r')
     sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)), percent))
     sys.stdout.flush()
-
-
-def to_pytdx_market(market):
-    """转换为pytdx的market"""
-    pytdx_market = {'SH': TDXParams.MARKET_SH, 'SZ': TDXParams.MARKET_SZ}
-    return pytdx_market[market.upper()]
 
 
 def import_stock_name(connect, api, market, quotations=None):

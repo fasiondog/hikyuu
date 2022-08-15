@@ -22,6 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import requests
+import re
 import akshare as ak
 
 
@@ -29,6 +31,9 @@ class MARKET:
     SH = 'SH'
     SZ = 'SZ'
     BJ = 'BJ'
+
+
+g_market_list = [MARKET.SH, MARKET.SZ, MARKET.BJ]
 
 
 class MARKETID:
@@ -109,3 +114,12 @@ def get_index_code_name_list() -> list:
     """
     df = ak.stock_zh_index_spot()
     return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
+
+
+def get_new_holidays():
+    """获取新的交易所休假日历"""
+    res = requests.get('https://www.tdx.com.cn/url/holiday/')
+    res.encoding = res.apparent_encoding
+    ret = re.findall(r'<textarea id="data" style="display:none;">([\s\w\d\W]+)</textarea>', res.text, re.M)[0].strip()
+    day = [d.split('|')[:4] for d in ret.split('\n')]
+    return [v[0] for v in day if v[2] == '中国']

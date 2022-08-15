@@ -31,6 +31,7 @@ from pytdx.hq import TDXParams
 from hikyuu.util.mylog import get_default_logger, hku_error, hku_debug
 
 from hikyuu.data.common import *
+from hikyuu.data.common_pytdx import to_pytdx_market
 from hikyuu.data.common_sqlite3 import (
     get_codepre_list, create_database, get_marketid, get_last_date, get_stock_list, update_last_date
 )
@@ -46,12 +47,6 @@ def ProgressBar(cur, total):
     sys.stdout.write('\r')
     sys.stdout.write("[%-50s] %s" % ('=' * int(math.floor(cur * 50 / total)), percent))
     sys.stdout.flush()
-
-
-def to_pytdx_market(market):
-    """转换为pytdx的market"""
-    pytdx_market = {'SH': TDXParams.MARKET_SH, 'SZ': TDXParams.MARKET_SZ}
-    return pytdx_market[market.upper()]
 
 
 def import_index_name(connect):
@@ -103,15 +98,18 @@ def import_stock_name(connect, api, market, quotations=None):
     cur = connect.cursor()
 
     newStockDict = {}
-    pytdx_market = to_pytdx_market(market.upper())
-    stk_count = api.get_security_count(pytdx_market)
+    # pytdx_market = to_pytdx_market(market.upper())
+    # stk_count = api.get_security_count(pytdx_market)
 
-    for i in range(int(stk_count / 1000) + 1):
-        stock_list = api.get_security_list(pytdx_market, i * 1000)
-        if stock_list is None:
-            continue
-        for stock in stock_list:
-            newStockDict[stock['code']] = stock['name']
+    # for i in range(int(stk_count / 1000) + 1):
+    #     stock_list = api.get_security_list(pytdx_market, i * 1000)
+    #     if stock_list is None:
+    #         continue
+    #     for stock in stock_list:
+    #         newStockDict[stock['code']] = stock['name']
+    stk_list = get_stk_code_name_list(market)
+    for stock in stk_list:
+        newStockDict[stock['code']] = stock['name']
 
     marketid = get_marketid(connect, market)
 

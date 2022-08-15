@@ -79,6 +79,11 @@ sh_time = {dir}/sh_time.h5
 sz_time = {dir}/sz_time.h5
 sh_trans = {dir}/sh_trans.h5
 sz_trans = {dir}/sz_trans.h5
+bj_day = {dir}/bj_day.h5
+bj_min = {dir}/bj_1min.h5
+bj_min5 = {dir}/bj_5min.h5
+bj_time = {dir}/bj_time.h5
+bj_trans = {dir}/bj_trans.h5
 """
 
 mysql_template = """
