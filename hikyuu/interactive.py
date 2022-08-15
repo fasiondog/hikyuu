@@ -151,6 +151,12 @@ for s in blocka:
         blocksz.add(s)
 zsbk_sz = blocksz
 
+blockbj = Block("A", "BJ")
+for s in blocka:
+    if s.market == "BJ":
+        blockbj.add(s)
+zsbk_sz = blockbj
+
 blockg = Block("G", "创业板")
 for s in sm:
     if s.type == constant.STOCKTYPE_GEM:
