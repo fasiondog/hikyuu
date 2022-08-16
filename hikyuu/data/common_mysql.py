@@ -28,7 +28,7 @@ from pathlib import Path
 
 import mysql.connector
 
-from hikyuu.data.common import MARKETID, get_stktype_list
+from hikyuu.data.common import get_stktype_list, get_new_holidays
 from hikyuu.util import hku_debug
 
 
@@ -114,6 +114,19 @@ def get_stock_list(connect, market, quotations):
     connect.commit()
     cur.close()
     return a
+
+
+def import_new_holidays(connect):
+    """导入新的交易所休假日历"""
+    cur = connect.cursor()
+    a = cur.execute("select date from holiday order by date desc limit 1").fetchall()
+    last_date = a[0][0] if a else 19901219
+    holidays = get_new_holidays()
+    new_holidays = [(int(v), ) for v in holidays if int(v) > last_date]
+    if new_holidays:
+        cur.executemany("insert into holiday (date) values (%s)", new_holidays)
+        connect.commit()
+        cur.close()
 
 
 def get_table(connect, market, code, ktype):

@@ -31,7 +31,7 @@ from hikyuu.util.mylog import hku_error, hku_debug
 
 import mysql.connector
 
-from .common import MARKETID, STOCKTYPE, get_stktype_list
+from .common import *
 from .common_pytdx import to_pytdx_market
 from .common_mysql import (
     create_database, get_marketid, get_codepre_list, get_stock_list, get_table, get_lastdatetime, update_extern_data
@@ -46,6 +46,43 @@ def ProgressBar(cur, total):
     sys.stdout.flush()
 
 
+def import_index_name(connect):
+    """
+    导入所有指数代码表
+
+    :param connect: sqlite3实例
+    :return: 指数个数
+    """
+    index_list = get_index_code_name_list()
+
+    cur = connect.cursor()
+    a = cur.execute("select stockid, marketid, code from `hku_base`.`stock` where type={}".format(STOCKTYPE.INDEX))
+    a = a.fetchall()
+    oldStockDict = {}
+    for oldstock in a:
+        oldstockid = oldstock[0]
+        oldcode = "{}{}".format(MARKET.SH if oldstock[1] == MARKETID.SH else MARKET.SZ, oldstock[2])
+        oldStockDict[oldcode] = oldstockid
+
+    today = datetime.date.today()
+    today = today.year * 10000 + today.month * 100 + today.day
+    for index in index_list:
+        if index['market_code'] in oldStockDict:
+            cur.execute(
+                "update stock set valid=1, name='%s' where stockid=%i" %
+                (index['name'], oldStockDict[index['market_code']])
+            )
+        else:
+            marketid = MARKETID.SH if index['market_code'][:2] == MARKET.SH else MARKETID.SZ
+            sql = "insert into `hku_base`.`Stock` (marketid, code, name, type, valid, startDate, endDate) \
+                           values (%s, '%s', '%s', %s, %s, %s, %s)" \
+                          % (marketid, index['market_code'][2:], index['name'], STOCKTYPE.INDEX, 1, today, 99999999)
+            cur.execute(sql)
+    connect.commit()
+    cur.close()
+    return len(index_list)
+
+
 def import_stock_name(connect, api, market, quotations=None):
     """更新每只股票的名称、当前是否有效性、起始日期及结束日期
         如果导入的代码表中不存在对应的代码，则认为该股已失效
@@ -58,19 +95,16 @@ def import_stock_name(connect, api, market, quotations=None):
     cur = connect.cursor()
 
     newStockDict = {}
-    pytdx_market = to_pytdx_market(market.upper())
-    stk_count = api.get_security_count(pytdx_market)
-
-    for i in range(int(stk_count / 1000) + 1):
-        stock_list = api.get_security_list(pytdx_market, i * 1000)
-        if stock_list is None:
-            continue
-        for stock in stock_list:
-            newStockDict[stock['code']] = stock['name']
+    stk_list = get_stk_code_name_list(market)
+    for stock in stk_list:
+        newStockDict[stock['code']] = stock['name']
 
     marketid = get_marketid(connect, market)
 
     stktype_list = get_stktype_list(quotations)
+    stktype_list = list(stktype_list)
+    stktype_list.remove(STOCKTYPE.INDEX)  # 移除指数类型
+    stktype_list = tuple(stktype_list)
     cur.execute(
         "select stockid, code, name, valid from `hku_base`.`stock` where marketid={} and type in {}".format(
             marketid, stktype_list
