@@ -41,7 +41,7 @@ template <>
 class Null<int> {
 public:
     Null() {}
-    operator int() {
+    operator int() const {
         return (std::numeric_limits<int>::max)();
     }
 };
@@ -53,7 +53,7 @@ template <>
 class Null<unsigned int> {
 public:
     Null() {}
-    operator unsigned int() {
+    operator unsigned int() const {
         return (std::numeric_limits<unsigned int>::max)();
     }
 };
@@ -65,7 +65,7 @@ template <>
 class Null<long long> {
 public:
     Null() {}
-    operator long long() {
+    operator long long() const {
         return (std::numeric_limits<long long>::max)();
     }
 };
@@ -91,7 +91,7 @@ template <>
 class Null<unsigned long long> {
 public:
     Null() {}
-    operator unsigned long long() {
+    operator unsigned long long() const {
         return (std::numeric_limits<unsigned long long>::max)();
     }
 };
@@ -104,7 +104,7 @@ template <>
 class Null<size_t> {
 public:
     Null() {}
-    operator size_t() {
+    operator size_t() const {
         return (std::numeric_limits<size_t>::max)();
     }
 };
@@ -117,7 +117,7 @@ template <>
 class Null<double> {
 public:
     Null() {}
-    operator double() {
+    operator double() const {
         return (std::numeric_limits<double>::quiet_NaN)();
         // return (std::numeric_limits<double>::max)();
     }

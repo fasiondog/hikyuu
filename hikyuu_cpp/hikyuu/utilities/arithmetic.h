@@ -25,19 +25,16 @@ namespace hku {
  */
 
 /** 转小写字符串 */
-void to_lower(std::string& s);
 inline void to_lower(std::string& s) {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
 }
 
 /** 转大写字符串 */
-void to_upper(std::string& s);
 inline void to_upper(std::string& s) {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
 }
 
 /** 删除字符串两端空格 */
-void trim(std::string& s);
 inline void trim(std::string& s) {
     if (s.empty()) {
         return;
@@ -68,9 +65,11 @@ inline std::vector<std::string_view> split(const std::string& str, char c) {
 }
 
 /**
- * 字符串分割
- * @param view 待分割的 string_view
- * @param c 分割符
+ * 分割字符串
+ * @param str 待分割的string_view
+ * @param c 分割字符
+ * @return string_view 组成的 vector
+ * @note 注意返回结果的生命周期应小于输入的字符串相同！
  */
 inline std::vector<std::string_view> split(const std::string_view& view, char c) {
     std::vector<std::string_view> result;
