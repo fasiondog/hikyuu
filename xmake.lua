@@ -55,6 +55,7 @@ end
 
 add_requires("fmt 8.1.1", {system=false, configs = {header_only = true, vs_runtime = "MD"}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
+add_requireconfs("spdlog.fmt", {override = true, version = "8.1.1"})
 add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
 add_requires("nng", {system=false, configs = {vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("nlohmann_json", {system=false})
