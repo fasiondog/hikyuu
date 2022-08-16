@@ -41,7 +41,7 @@ hq_hosts = [
 
 def to_pytdx_market(market):
     """转换为pytdx的market"""
-    pytdx_market = {'SH': 0, 'SZ': 1, 'BJ': 2}
+    pytdx_market = {'SZ': 0, 'SH': 1, 'BJ': 2}
     return pytdx_market[market.upper()]
 
 
