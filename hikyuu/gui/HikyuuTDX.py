@@ -335,8 +335,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.collect_sample_spinBox.setValue(interval_time)
         use_zhima_proxy = import_config.getboolean('collect', 'use_zhima_proxy', fallback=False)
         self.collect_use_zhima_checkBox.setChecked(use_zhima_proxy)
-        data_source = import_config.get('collect', 'source', fallback='sina')
-        self.collect_source_comboBox.setCurrentIndex(0 if data_source == 'sina' else 1)
+        # data_source = import_config.get('collect', 'source', fallback='qq')
+        self.collect_source_comboBox.setCurrentIndex(0)
         self.collect_phase1_start_timeEdit.setTime(
             datetime.time.fromisoformat(import_config.get('collect', 'phase1_start', fallback='09:00'))
         )

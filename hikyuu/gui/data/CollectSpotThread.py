@@ -26,17 +26,18 @@ class CollectSpotThread(QThread):
         self._phase2_start_time = config.get('collect', 'phase2_start', fallback='13:00')
         self._phase2_end_time = config.get('collect', 'phase2_end', fallback='15:05')
         self._use_zhima_proxy = config.getboolean('collect', 'use_zhima_proxy', fallback=False)
-        self._source = config.get('collect', 'source', fallback='sina')
+        self._source = config.get('collect', 'source', fallback='qq')
 
     def __del__(self):
         hku_info("Quit CollectSpotThread")
 
     @hku_catch()
     def run(self):
+        self.logger.info("current data source: {}".format(self._source))
         collect(
             self._use_zhima_proxy, self._source, self._interval,
-            '{}-{}'.format(self._phase1_start_time, self._phase1_end_time),
-            '{}-{}'.format(self._phase2_start_time, self._phase2_end_time), True
+            '{}-{}'.format(self._phase1_start_time,
+                           self._phase1_end_time), '{}-{}'.format(self._phase2_start_time, self._phase2_end_time), True
         )
 
 

@@ -129,7 +129,7 @@ def request_data(querystr, parse_one_result, use_proxy=False):
     return result
 
 
-def get_spot(stocklist, source='sina', use_proxy=False, batch_func=None):
+def get_spot(stocklist, source='qq', use_proxy=False, batch_func=None):
     """获取实时数据，获取失败时，抛出异常
 
     :param list stocklist: 股票名称列表，股票名称示例：sh000001, sz000001
@@ -141,6 +141,7 @@ def get_spot(stocklist, source='sina', use_proxy=False, batch_func=None):
         queryStr = "http://hq.sinajs.cn/list="
         max_size = 140
         parse_one_result = parse_one_result_sina
+        hku_error("新浪接口已不再支持！")
     else:
         queryStr = "http://qt.gtimg.cn/q="
         max_size = 60
