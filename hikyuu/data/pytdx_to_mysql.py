@@ -56,8 +56,8 @@ def import_index_name(connect):
     index_list = get_index_code_name_list()
 
     cur = connect.cursor()
-    a = cur.execute("select stockid, marketid, code from `hku_base`.`stock` where type={}".format(STOCKTYPE.INDEX))
-    a = a.fetchall()
+    cur.execute("select stockid, marketid, code from `hku_base`.`stock` where type={}".format(STOCKTYPE.INDEX))
+    a = cur.fetchall()
     oldStockDict = {}
     for oldstock in a:
         oldstockid = oldstock[0]
@@ -69,7 +69,7 @@ def import_index_name(connect):
     for index in index_list:
         if index['market_code'] in oldStockDict:
             cur.execute(
-                "update stock set valid=1, name='%s' where stockid=%i" %
+                "update `hku_base`.`stock` set valid=1, name='%s' where stockid=%i" %
                 (index['name'], oldStockDict[index['market_code']])
             )
         else:

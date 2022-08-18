@@ -119,12 +119,13 @@ def get_stock_list(connect, market, quotations):
 def import_new_holidays(connect):
     """导入新的交易所休假日历"""
     cur = connect.cursor()
-    a = cur.execute("select date from holiday order by date desc limit 1").fetchall()
+    cur.execute("select date from `hku_base`.`holiday` order by date desc limit 1")
+    a = cur.fetchall()
     last_date = a[0][0] if a else 19901219
     holidays = get_new_holidays()
     new_holidays = [(int(v), ) for v in holidays if int(v) > last_date]
     if new_holidays:
-        cur.executemany("insert into holiday (date) values (%s)", new_holidays)
+        cur.executemany("insert into `hku_base`.`holiday` (date) values (%s)", new_holidays)
         connect.commit()
         cur.close()
 

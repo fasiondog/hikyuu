@@ -130,17 +130,20 @@ class UsePytdxImportToH5Thread(QThread):
 
         # 以下按数据量从大到小依次使用速度从高到低的TDX服务器
         if self.config.getboolean('ktype', 'trans', fallback=False):
-            today = datetime.date.today()
-            trans_start_date = datetime.datetime.strptime(config['ktype']['trans_start_date'], '%Y-%m-%d').date()
-            trans_max_days = (today - trans_start_date).days + 1
-            for market in g_market_list:
-                self.tasks.append(
-                    ImportPytdxTransToH5(
-                        self.log_queue, self.queue, sqlite_file_name, market, self.quotations, use_hosts[cur_host][0],
-                        use_hosts[cur_host][1], dest_dir, trans_max_days
+            if self.config.getboolean('hdf5', 'enable', fallback=True):
+                today = datetime.date.today()
+                trans_start_date = datetime.datetime.strptime(config['ktype']['trans_start_date'], '%Y-%m-%d').date()
+                trans_max_days = (today - trans_start_date).days + 1
+                for market in g_market_list:
+                    self.tasks.append(
+                        ImportPytdxTransToH5(
+                            self.log_queue, self.queue, sqlite_file_name, market, self.quotations,
+                            use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir, trans_max_days
+                        )
                     )
-                )
-                cur_host += 1
+                    cur_host += 1
+            else:
+                self.logger.warn("mysql 尚不支持分笔数据导入！")
 
         if self.config.getboolean('ktype', 'min', fallback=False):
             start_date = datetime.datetime.strptime(config['ktype']['min_start_date'], '%Y-%m-%d').date()
@@ -155,17 +158,20 @@ class UsePytdxImportToH5Thread(QThread):
                 cur_host += 1
 
         if self.config.getboolean('ktype', 'time', fallback=False):
-            today = datetime.date.today()
-            time_start_date = datetime.datetime.strptime(config['ktype']['time_start_date'], '%Y-%m-%d').date()
-            time_max_days = (today - time_start_date).days + 1
-            for market in g_market_list:
-                self.tasks.append(
-                    ImportPytdxTimeToH5(
-                        self.log_queue, self.queue, sqlite_file_name, market, self.quotations, use_hosts[cur_host][0],
-                        use_hosts[cur_host][1], dest_dir, time_max_days
+            if self.config.getboolean('hdf5', 'enable', fallback=True):
+                today = datetime.date.today()
+                time_start_date = datetime.datetime.strptime(config['ktype']['time_start_date'], '%Y-%m-%d').date()
+                time_max_days = (today - time_start_date).days + 1
+                for market in g_market_list:
+                    self.tasks.append(
+                        ImportPytdxTimeToH5(
+                            self.log_queue, self.queue, sqlite_file_name, market, self.quotations,
+                            use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir, time_max_days
+                        )
                     )
-                )
-                cur_host += 1
+                    cur_host += 1
+            else:
+                self.logger.warn("mysql 尚不支持分时数据导入！")
 
         if self.config.getboolean('ktype', 'min5', fallback=False):
             start_date = datetime.datetime.strptime(config['ktype']['min5_start_date'], '%Y-%m-%d').date()
