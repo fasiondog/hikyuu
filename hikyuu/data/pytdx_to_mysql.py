@@ -97,7 +97,7 @@ def import_stock_name(connect, api, market, quotations=None):
     newStockDict = {}
     stk_list = get_stk_code_name_list(market)
     for stock in stk_list:
-        newStockDict[stock['code']] = stock['name']
+        newStockDict[str(stock['code'])] = stock['name']
 
     marketid = get_marketid(connect, market)
 
