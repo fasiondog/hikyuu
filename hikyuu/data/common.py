@@ -105,7 +105,7 @@ def get_stk_code_name_list(market: str) -> list:
         ind_list = ["主板A股", "主板B股", "科创板"]
         df = None
         for ind in ind_list:
-            tmp_df = ak.stock_info_sh_name_code()
+            tmp_df = ak.stock_info_sh_name_code(ind)
             tmp_df.rename(columns={'证券代码': 'code', '证券简称': 'name'}, inplace=True)
             df = pd.concat([df, tmp_df]) if df is not None else tmp_df
         hku_info("获取上海证券交易所股票数量: {}", len(df) if df is not None else 0)
@@ -129,6 +129,16 @@ def get_index_code_name_list() -> list:
     """
     df = ak.stock_zh_index_spot()
     return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
+
+
+def get_fund_code_name_list():
+    """
+    获取基金代码名称列表 (来源: sina)
+    """
+    ind_list = "封闭式基金", "ETF基金", "LOF基金"
+    df = None
+    for ind in ind_list:
+        df = ak.fund_etf_category_sina(ind)
 
 
 @hku_catch(ret=[], trace=True)
