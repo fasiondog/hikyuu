@@ -26,6 +26,7 @@ import requests
 import re
 import akshare as ak
 import pandas as pd
+import datetime
 from hikyuu.util import *
 
 
@@ -131,14 +132,36 @@ def get_index_code_name_list() -> list:
     return [{'market_code': df.loc[i]['代码'].upper(), 'name': df.loc[i]['名称']} for i in range(len(df))]
 
 
-def get_fund_code_name_list():
+g_fund_code_name_list = {}
+for market in g_market_list:
+    g_fund_code_name_list[market] = []
+g_last_get_fund_code_name_list_date = datetime.date(1990, 12, 9)
+
+
+@hku_catch(ret=[], trace=True)
+def get_fund_code_name_list(market: str) -> list:
     """
     获取基金代码名称列表 (来源: sina)
     """
+    # 保证一天只获取一次基金股票代码表，防止对 sina 的频繁访问
+    global g_last_get_fund_code_name_list_date
+    now = datetime.date.today()
+    if now <= g_last_get_fund_code_name_list_date:
+        return g_fund_code_name_list[market]
+
     ind_list = "封闭式基金", "ETF基金", "LOF基金"
-    df = None
     for ind in ind_list:
         df = ak.fund_etf_category_sina(ind)
+        for i in range(len(df)):
+            loc = df.loc[i]
+            try:
+                code, name = str(loc['代码']), str(loc['名称'])
+                g_fund_code_name_list[code[:2].upper()].append(dict(code=code[2:], name=name))
+            except Exception as e:
+                hku_error("{}! {}", str(e), loc)
+    hku_info("获取基金列表数量: {}", len(g_fund_code_name_list[market]))
+    g_last_get_fund_code_name_list_date = now
+    return g_fund_code_name_list[market]
 
 
 @hku_catch(ret=[], trace=True)

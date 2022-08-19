@@ -99,6 +99,8 @@ def import_stock_name(connect, api, market, quotations=None):
 
     newStockDict = {}
     stk_list = get_stk_code_name_list(market)
+    if not quotations or 'fund' in [v.lower() for v in quotations]:
+        stk_list.extend(get_fund_code_name_list(market))
     for stock in stk_list:
         newStockDict[str(stock['code'])] = stock['name']
 
