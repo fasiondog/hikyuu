@@ -37,11 +37,13 @@ from pytdx.hq import TdxHq_API
 from hikyuu.data.common_pytdx import search_best_tdx
 
 from hikyuu.data.common import *
-from hikyuu.data.common_sqlite3 import import_new_holidays
+from hikyuu.data.common_sqlite3 import import_new_holidays as sqlite_import_new_holidays
 from hikyuu.data.common_sqlite3 import create_database as sqlite_create_database
 from hikyuu.data.pytdx_to_h5 import import_index_name as sqlite_import_index_name
 from hikyuu.data.pytdx_to_h5 import import_stock_name as sqlite_import_stock_name
 from hikyuu.data.common_mysql import create_database as mysql_create_database
+from hikyuu.data.common_mysql import import_new_holidays as mysql_import_new_holidays
+from hikyuu.data.pytdx_to_mysql import import_index_name as mysql_import_index_name
 from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
 from hikyuu.util.mylog import class_logger
 
@@ -128,17 +130,20 @@ class UsePytdxImportToH5Thread(QThread):
 
         # 以下按数据量从大到小依次使用速度从高到低的TDX服务器
         if self.config.getboolean('ktype', 'trans', fallback=False):
-            today = datetime.date.today()
-            trans_start_date = datetime.datetime.strptime(config['ktype']['trans_start_date'], '%Y-%m-%d').date()
-            trans_max_days = (today - trans_start_date).days + 1
-            for market in g_market_list:
-                self.tasks.append(
-                    ImportPytdxTransToH5(
-                        self.log_queue, self.queue, sqlite_file_name, market, self.quotations, use_hosts[cur_host][0],
-                        use_hosts[cur_host][1], dest_dir, trans_max_days
+            if self.config.getboolean('hdf5', 'enable', fallback=True):
+                today = datetime.date.today()
+                trans_start_date = datetime.datetime.strptime(config['ktype']['trans_start_date'], '%Y-%m-%d').date()
+                trans_max_days = (today - trans_start_date).days + 1
+                for market in g_market_list:
+                    self.tasks.append(
+                        ImportPytdxTransToH5(
+                            self.log_queue, self.queue, sqlite_file_name, market, self.quotations,
+                            use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir, trans_max_days
+                        )
                     )
-                )
-                cur_host += 1
+                    cur_host += 1
+            else:
+                self.logger.warn("mysql 尚不支持分笔数据导入！")
 
         if self.config.getboolean('ktype', 'min', fallback=False):
             start_date = datetime.datetime.strptime(config['ktype']['min_start_date'], '%Y-%m-%d').date()
@@ -153,17 +158,20 @@ class UsePytdxImportToH5Thread(QThread):
                 cur_host += 1
 
         if self.config.getboolean('ktype', 'time', fallback=False):
-            today = datetime.date.today()
-            time_start_date = datetime.datetime.strptime(config['ktype']['time_start_date'], '%Y-%m-%d').date()
-            time_max_days = (today - time_start_date).days + 1
-            for market in g_market_list:
-                self.tasks.append(
-                    ImportPytdxTimeToH5(
-                        self.log_queue, self.queue, sqlite_file_name, market, self.quotations, use_hosts[cur_host][0],
-                        use_hosts[cur_host][1], dest_dir, time_max_days
+            if self.config.getboolean('hdf5', 'enable', fallback=True):
+                today = datetime.date.today()
+                time_start_date = datetime.datetime.strptime(config['ktype']['time_start_date'], '%Y-%m-%d').date()
+                time_max_days = (today - time_start_date).days + 1
+                for market in g_market_list:
+                    self.tasks.append(
+                        ImportPytdxTimeToH5(
+                            self.log_queue, self.queue, sqlite_file_name, market, self.quotations,
+                            use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir, time_max_days
+                        )
                     )
-                )
-                cur_host += 1
+                    cur_host += 1
+            else:
+                self.logger.warn("mysql 尚不支持分时数据导入！")
 
         if self.config.getboolean('ktype', 'min5', fallback=False):
             start_date = datetime.datetime.strptime(config['ktype']['min5_start_date'], '%Y-%m-%d').date()
@@ -216,6 +224,7 @@ class UsePytdxImportToH5Thread(QThread):
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             connect = sqlite3.connect("{}/stock.db".format(self.config['hdf5']['dir']))
             create_database = sqlite_create_database
+            import_new_holidays = sqlite_import_new_holidays
             import_index_name = sqlite_import_index_name
             import_stock_name = sqlite_import_stock_name
         else:
@@ -227,6 +236,8 @@ class UsePytdxImportToH5Thread(QThread):
             }
             connect = mysql.connector.connect(**db_config)
             create_database = mysql_create_database
+            import_new_holidays = mysql_import_new_holidays
+            import_index_name = mysql_import_index_name
             import_stock_name = mysql_import_stock_name
 
         create_database(connect)

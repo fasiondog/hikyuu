@@ -192,8 +192,8 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
     sm = StockManager.instance()
     stk_list = [
-        stk.market_code.lower() for stk in sm
-        if stk.valid and stk.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM)
+        stk.market_code.lower() for stk in sm if stk.valid and stk.type in
+        (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM, constant.STOCKTYPE_START)
     ]
 
     spot_topic = ':spot:'

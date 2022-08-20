@@ -98,18 +98,11 @@ def import_stock_name(connect, api, market, quotations=None):
     cur = connect.cursor()
 
     newStockDict = {}
-    # pytdx_market = to_pytdx_market(market.upper())
-    # stk_count = api.get_security_count(pytdx_market)
-
-    # for i in range(int(stk_count / 1000) + 1):
-    #     stock_list = api.get_security_list(pytdx_market, i * 1000)
-    #     if stock_list is None:
-    #         continue
-    #     for stock in stock_list:
-    #         newStockDict[stock['code']] = stock['name']
     stk_list = get_stk_code_name_list(market)
+    if not quotations or 'fund' in [v.lower() for v in quotations]:
+        stk_list.extend(get_fund_code_name_list(market))
     for stock in stk_list:
-        newStockDict[stock['code']] = stock['name']
+        newStockDict[str(stock['code'])] = stock['name']
 
     marketid = get_marketid(connect, market)
 
