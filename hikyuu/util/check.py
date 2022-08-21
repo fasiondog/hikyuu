@@ -93,13 +93,14 @@ def get_exception_info():
     return "{}: {}".format(info[0].__name__, info[1])
 
 
-def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False):
+def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_raise=False):
     """捕获发生的异常, 包装方式: @hku_catch()
-    :param ret: 异常发生时返回值, with_msg为True时，返回为 (ret, errmsg)
+    :param ret: 异常发生时返回值, with_msg为True时, 返回为 (ret, errmsg)
     :param boolean trace: 打印异常堆栈信息
-    :param func callback: 发生异常后的回调函数，入参同func
+    :param func callback: 发生异常后的回调函数, 入参同func
     :param int retry: 尝试执行的次数
-    :param boolean with_msg: 是否返回异常错误信息, 为True时，函数返回为 (ret, errmsg)
+    :param boolean with_msg: 是否返回异常错误信息, 为True时, 函数返回为 (ret, errmsg)
+    :param boolean re_raise: 是否将错误信息以异常的方式重新抛出
     """
     def hku_catch_wrap(func):
         @functools.wraps(func)
@@ -124,8 +125,11 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False):
                     hku_logger.error(errmsg)
                     if trace:
                         traceback.print_exc()
-                    if callback and i == (retry - 1):
-                        callback(*args, **kargs)
+                    if i == (retry - 1):
+                        if callback:
+                            callback(*args, **kargs)
+                        if re_raise:
+                            raise Exception(errmsg)
                 return (ret, errmsg) if with_msg else ret
 
         return wrappedFunc
