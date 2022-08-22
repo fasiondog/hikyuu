@@ -12,6 +12,7 @@ except Exception as e:
     exit(-1)
 
 from hikyuu.fetcher.stock.zh_stock_a_huatai import parse_one_result_huatai
+from hikyuu.gui.spot_server import release_nng_sender, start_send_spot, end_send_spot, send_spot
 
 
 # ************************************用户登录************************************
@@ -36,13 +37,16 @@ class insightmarketservice(market_service):
     def onSubscribe_StockType_MD_TICK(self, mdStock):
         # print(mdStock)
         result = parse_one_result_huatai(mdStock)
-        print("{}{}".format(result['market'], result['code']))
+        # print("{}{}".format(result['market'], result['code']))
+        start_send_spot()
+        send_spot([result])
+        end_send_spot()
         # pass
 
     # 处理订阅的指数Tick数据，mdIndex格式为json格式
     # 订阅的证券类型为ESecurityType.IndexType
     def onSubscribe_IndexType_MD_TICK(self, mdIndex):
-        #print(mdIndex)
+        print(mdIndex)
         pass
 
     # 处理订阅的债券Tick数据，mdBond格式为json格式
@@ -495,8 +499,12 @@ if __name__ == "__main__":
 
     config(False, False, False)
 
-    # 订阅部分接口调用
-    subscribe_by_type()
+    try:
+        # 订阅部分接口调用
+        subscribe_by_type()
+    except KeyboardInterrupt:
+        pass
 
     # 退出释放资源
+    release_nng_sender()
     fini()
