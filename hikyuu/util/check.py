@@ -118,15 +118,18 @@ def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_
                     hku_logger.error(errmsg)
                     if trace:
                         traceback.print_exc()
-                    if callback and i == (retry - 1):
-                        callback(*args, **kargs)
+                    if i == (retry - 1):
+                        if callback is not None:
+                            callback(*args, **kargs)
+                        if re_raise:
+                            raise Exception(errmsg)
                 except:
                     errmsg = "Unknown error! {} [{}.{}]".format(get_exception_info(), func.__module__, func.__name__)
                     hku_logger.error(errmsg)
                     if trace:
                         traceback.print_exc()
                     if i == (retry - 1):
-                        if callback:
+                        if callback is not None:
                             callback(*args, **kargs)
                         if re_raise:
                             raise Exception(errmsg)
