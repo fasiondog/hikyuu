@@ -27,6 +27,7 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 #from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
+from hikyuu.gui.spot_server import release_nng_sender
 
 from hikyuu.data import hku_config_template
 from hikyuu.util.mylog import add_class_logger_handler, class_logger, get_default_logger
@@ -62,9 +63,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         if self.sched_import_thread is not None and self.sched_import_thread.isRunning():
             self.sched_import_thread.terminate()
+            self.collect_spot_thread.wait()
 
         if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
+            release_nng_sender()
             self.collect_spot_thread.terminate()
+            self.collect_spot_thread.wait()
 
         self.saveConfig()
 
@@ -709,6 +713,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_collect_start_pushButton_clicked(self):
         if self._is_collect_running:
             if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
+                release_nng_sender()
                 self.collect_spot_thread.terminate()
                 self.collect_spot_thread.wait()
                 self.collect_spot_thread = None

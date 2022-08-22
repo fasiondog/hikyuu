@@ -11,7 +11,7 @@ from PyQt5.QtCore import QThread, QWaitCondition, QMutex
 from hikyuu import Datetime, TimeDelta, hikyuu_init, StockManager, constant
 from hikyuu.util import *
 from hikyuu.fetcher.stock.zh_stock_a_sina_qq import get_spot, get_spot_parallel
-from hikyuu.gui.spot_server import collect
+from hikyuu.gui.spot_server import collect, release_nng_sender
 
 
 class CollectSpotThread(QThread):
@@ -29,9 +29,10 @@ class CollectSpotThread(QThread):
         self._source = config.get('collect', 'source', fallback='qq')
 
     def __del__(self):
+        release_nng_sender()
         hku_info("Quit CollectSpotThread")
 
-    @hku_catch()
+    @hku_catch(trace=True)
     def run(self):
         self.logger.info("current data source: {}".format(self._source))
         collect(
