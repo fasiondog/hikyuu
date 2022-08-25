@@ -25,6 +25,7 @@
 import logging
 import sqlite3
 import datetime
+import pprint
 import mysql.connector
 from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -110,6 +111,8 @@ class UsePytdxImportToH5Thread(QThread):
             self.logger.warn('无法连接通达信行情服务器！请检查网络设置！')
             self.send_message(['INFO', '无法连接通达信行情服务器！请检查网络设置！'])
             return
+
+        hku_info("best hosts: \n{}".format(pprint.pformat(self.hosts)), logger=self.logger)
 
         if task_count == 0:
             return
