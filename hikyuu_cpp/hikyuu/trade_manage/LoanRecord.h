@@ -11,6 +11,7 @@
 
 #include "../DataType.h"
 #include "../config.h"
+#include "CostRecord.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/nvp.hpp>
@@ -26,11 +27,16 @@ namespace hku {
  */
 class HKU_API LoanRecord {
 public:
-    LoanRecord() : datetime(Null<Datetime>()), value(0.0) {}
-    LoanRecord(const Datetime& datetime, price_t value) : datetime(datetime), value(value) {}
+    LoanRecord() : datetime(Null<Datetime>()), value(0.0), rate(0.0) {}
+    LoanRecord(const Datetime& datetime, price_t value)
+    : datetime(datetime), value(value), rate(0.0) {}
+    LoanRecord(const Datetime& datetime, price_t value, double rate, CostRecord cost)
+    : datetime(datetime), value(value), rate(rate), cost(cost) {}
 
-    Datetime datetime;
-    price_t value;
+    Datetime datetime;  ///< 借入日期
+    price_t value;      ///< 借入金额
+    double rate;        ///< 借入时的保证金比例
+    CostRecord cost;    ///< 借入成本
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

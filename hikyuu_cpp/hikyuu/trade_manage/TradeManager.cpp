@@ -776,8 +776,8 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} numer is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(number <= 0.0, result, "{} {} Invalid buy numer: {}!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
@@ -807,36 +807,55 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     }
 #endif
 
-    //根据权息调整当前持仓情况
+    // 根据权息调整当前持仓情况
     updateWithWeight(datetime);
 
+    int precision = getParam<int>("precision");
+
+    // 计算买入成本
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
-    //实际交易需要的现金＝交易数量＊实际交易价格＋交易总成本
-    int precision = getParam<int>("precision");
-    // price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
-    price_t money = roundEx(realPrice * number * stock.unit(), precision);
+    // 计算交易需要的现金（不含成本）
+    price_t money = realPrice * number * stock.unit();
+    price_t total_need_money = money + cost.total;
 
-    if (getParam<bool>("support_borrow_cash")) {
-        //获取要求的本金额
-        CostRecord bor_cost = getBorrowCashCost(datetime, money);
-        double rate = getMarginRate(datetime, stock);
-        price_t x = roundEx(m_cash / rate + cost.total + bor_cost.total, precision);
-        if (x < money) {
-            //能够获得的融资不够，自动追加本金
-            checkin(datetime, roundUp(money - x, precision));
+    // 如果当前买入需要的总金额大于当前账户现金且支持借入资金（相当于买空），计算需要借入的资金并执行借入操作
+    if (total_need_money > m_cash && getParam<bool>("support_borrow_cash")) {
+        // 设：
+        //   买入需要的钱(不含买入成本)：money
+        //   买入成本: cost
+        //   当前账户现金: cash
+        //   借入资金: X
+        //   需要的保证金: X * rate
+        //   借入资金需要的成本: bor_cost
+        // 则有:
+        //   money + cost <= cash + X - X * rate - bor_cost
+        //   ==> (money + cost + bor_cost - cash) / (1 - rate) <= X
+        CostRecord bor_cost = getBorrowCashCost(datetime, money);  //借入成本
+        double rate = getMarginRate(datetime, stock);              // 保证金比例
+        HKU_ERROR_IF_RETURN(rate < 0 || rate >= 1.0, result, "Invalid margin rate: {}", rate);
+
+        // 需借入资金
+        price_t x = roundUp(total_need_money + bor_cost.total - m_cash) / (1.0 - rate);
+
+        price_t checkin_money = roundUp(x - bor_cost.total, precision);
+        if (checkin_money + bor_cost.total > x) {
+            x = roundUp(checkin_money + bor_cost.total, precision);
         }
 
-        //融资，借入资金
-        borrowCash(datetime, roundUp(money, precision));
+        m_borrow_cash += x;
+        m_cash = m_cash + checkin_money;
+        m_loan_list.push_back(LoanRecord(datetime, x, rate, bor_cost));
+        m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_BORROW_CASH, x, x, 0.0,
+                                           0, bor_cost, 0.0, m_cash, PART_INVALID));
     }
 
-    HKU_WARN_IF_RETURN(m_cash < roundEx(money + cost.total, precision), result,
+    HKU_WARN_IF_RETURN(m_cash < total_need_money, result,
                        "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
-                       stock.market_code(), roundEx(money + cost.total, precision), m_cash);
+                       stock.market_code(), total_need_money, m_cash);
 
     //更新现金
-    m_cash = roundEx(m_cash - money - cost.total, precision);
+    m_cash = roundEx(m_cash - total_need_money, precision);
 
     //加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
