@@ -120,8 +120,6 @@ void export_TradeManager() {
         :param Stock stock: 指定的证券
         :rtype: int)")
 
-      //.def("getShortHoldNumber", &TradeManager::getShortHoldNumber)
-
       .def("get_trade_list", _getTradeList_1)
       .def("get_trade_list", _getTradeList_2, R"(get_trade_list(self[, start, end])
 
@@ -279,10 +277,6 @@ void export_TradeManager() {
     :param float plan_price:  原计划卖出价格
     :param SystemPart part:   交易指示来源
     :rtype: TradeRecord)")
-      // sell_overload(args("datetime", "stock", "realPrice", "num", "stoploss", "goalPrice",
-      //                   "planPrice", "part")))
-      //.def("buyShort", &TradeManager::buyShort, buyShort_overload())
-      //.def("sellShort", &TradeManager::sellShort, sellShort_overload())
 
       .def("add_trade_record", &TradeManagerBase::addTradeRecord, R"(add_trade_record(self, tr)
 

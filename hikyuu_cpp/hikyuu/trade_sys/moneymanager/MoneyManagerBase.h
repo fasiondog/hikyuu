@@ -108,17 +108,6 @@ public:
                               price_t risk, SystemPart from);
 
     /**
-     * 获取指定交易对象空头回补的买入数量
-     * @param datetime 交易日期
-     * @param stock 交易对象
-     * @param price 交易价格
-     * @param from 信号来源
-     * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
-     */
-    double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                             price_t risk, SystemPart from);
-
-    /**
      * 获取指定交易对象可买入的数量
      * @param datetime 交易日期
      * @param stock 交易对象
@@ -137,9 +126,6 @@ public:
 
     virtual double _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                        price_t risk, SystemPart from);
-
-    virtual double _getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                      price_t risk, SystemPart from);
 
     /** 子类复位接口 */
     virtual void _reset() {}

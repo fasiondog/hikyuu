@@ -151,17 +151,6 @@ double MoneyManagerBase ::getSellShortNumber(const Datetime& datetime, const Sto
     return _getSellShortNumber(datetime, stock, price, risk, from);
 }
 
-double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stock& stock,
-                                            price_t price, price_t risk, SystemPart from) {
-    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
-    return _getBuyShortNumber(datetime, stock, price, risk, from);
-}
-
 double MoneyManagerBase::_getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                         price_t risk, SystemPart from) {
     //默认卖出全部
@@ -170,11 +159,6 @@ double MoneyManagerBase::_getSellNumber(const Datetime& datetime, const Stock& s
 
 double MoneyManagerBase::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
                                              price_t price, price_t risk, SystemPart from) {
-    return 0;
-}
-
-double MoneyManagerBase::_getBuyShortNumber(const Datetime& datetime, const Stock& stock,
-                                            price_t price, price_t risk, SystemPart from) {
     return 0;
 }
 

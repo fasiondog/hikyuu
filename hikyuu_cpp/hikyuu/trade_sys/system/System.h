@@ -142,7 +142,6 @@ public:
     const TradeRequest& getSellTradeRequest() const;
 
     const TradeRequest& getSellShortTradeRequest() const;
-    const TradeRequest& getBuyShortTradeRequest() const;
 
     /**
      * 复位
@@ -222,7 +221,6 @@ private:
     double _getBuyNumber(const Datetime&, price_t price, price_t risk, Part from);
     double _getSellNumber(const Datetime&, price_t price, price_t risk, Part from);
     double _getSellShortNumber(const Datetime&, price_t price, price_t risk, Part from);
-    double _getBuyShortNumber(const Datetime&, price_t price, price_t risk, Part from);
 
     price_t _getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
     price_t _getShortStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
@@ -249,11 +247,6 @@ private:
     TradeRecord _sellShortNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellShortDelay(const KRecord& today, const KRecord& src_today);
     void _submitSellShortRequest(const KRecord& today, const KRecord& src_today, Part from);
-
-    TradeRecord _buyShort(const KRecord& today, const KRecord& src_today, Part from);
-    TradeRecord _buyShortNow(const KRecord& today, const KRecord& src_today, Part from);
-    TradeRecord _buyShortDelay(const KRecord& today, const KRecord& src_today);
-    void _submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from);
 
     TradeRecord _processRequest(const KRecord& today, const KRecord& src_today);
 
@@ -287,7 +280,6 @@ protected:
     TradeRequest m_buyRequest;
     TradeRequest m_sellRequest;
     TradeRequest m_sellShortRequest;
-    TradeRequest m_buyShortRequest;
 
 private:
     void initParam();  //初始化参数及其默认值
@@ -328,7 +320,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
         ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
         ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
     }
 
     template <class Archive>
@@ -362,7 +353,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
         ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
         ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -488,10 +478,6 @@ inline const TradeRequest& System::getSellShortTradeRequest() const {
     return m_sellShortRequest;
 }
 
-inline const TradeRequest& System::getBuyShortTradeRequest() const {
-    return m_buyShortRequest;
-}
-
 inline bool System::_environmentIsValid(const Datetime& datetime) {
     return m_ev ? m_ev->isValid(datetime) : true;
 }
@@ -513,11 +499,6 @@ inline double System ::_getSellNumber(const Datetime& datetime, price_t price, p
 inline double System ::_getSellShortNumber(const Datetime& datetime, price_t price, price_t risk,
                                            Part from) {
     return m_mm ? m_mm->getSellShortNumber(datetime, m_stock, price, risk, from) : 0;
-}
-
-inline double System ::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk,
-                                          Part from) {
-    return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk, from) : 0;
 }
 
 inline price_t System ::_getRealBuyPrice(const Datetime& datetime, price_t planPrice) {

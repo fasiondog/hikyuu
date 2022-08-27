@@ -73,19 +73,6 @@ public:
         return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
     }
 
-    double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                             price_t risk, SystemPart from) {
-        if (override _getBuyShortNumber = this->get_override("_get_buy_short_number")) {
-            return _getBuyShortNumber(datetime, stock, price, risk, from);
-        }
-        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk, from);
-    }
-
-    double default_getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                     price_t risk, SystemPart from) {
-        return MoneyManagerBase::_getBuyShortNumber(datetime, stock, price, risk, from);
-    }
-
     void _reset() {
         if (override func = get_override("_reset")) {
             func();
@@ -222,13 +209,6 @@ void export_MoneyManager() {
     :param System.Part part_from: 来源系统组件
     :return: 可卖出数量
     :rtype: float)")
-
-      /*.def("getSellShortNumber", &MoneyManagerBase::getSellShortNumber)
-      .def("getBuyShortNumber", &MoneyManagerBase::getBuyShortNumber)
-      .def("_getSellShortNumber", &MoneyManagerBase::_getSellShortNumber,
-           &MoneyManagerWrap::default_getSellShortNumber)
-      .def("_getBuyShortNumber", &MoneyManagerBase::_getBuyShortNumber,
-           &MoneyManagerWrap::default_getBuyShortNumber)*/
 
       .def("_reset", &MoneyManagerBase::_reset, &MoneyManagerWrap::default_reset,
            R"(【重载接口】子类复位接口，复位内部私有变量)")

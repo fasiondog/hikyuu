@@ -123,9 +123,6 @@ public:
     /** 获取指定时刻的某证券持有数量 */
     virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) override;
 
-    /** 获取指定时刻的空头某证券持有数量 */
-    virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) override;
-
     /** 获取指定时刻已借入的股票数量 */
     virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) override;
 
@@ -263,23 +260,6 @@ public:
                                   price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
 
     /**
-     * 卖空后回补
-     * @param datetime 买入时间
-     * @param stock 买入的证券
-     * @param realPrice 实际买入价格
-     * @param number 卖出数量，如果是 MAX_DOUBLE, 表示全部卖出
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划买入价格
-     * @param from 记录是哪个系统部件发出的卖出指示
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
-     */
-    virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                                 double number = MAX_DOUBLE, price_t stoploss = 0.0,
-                                 price_t goalPrice = 0.0, price_t planPrice = 0.0,
-                                 SystemPart from = PART_INVALID) override;
-
-    /**
      * 借入资金，从其他来源借取的资金，如融资
      * @param datetime 借入时间
      * @param cash 借入的现金
@@ -385,7 +365,6 @@ private:
     bool _add_borrow_stock_tr(const TradeRecord&);
     bool _add_return_stock_tr(const TradeRecord&);
     bool _add_sell_short_tr(const TradeRecord&);
-    bool _add_buy_short_tr(const TradeRecord&);
 
 private:
     Datetime m_init_datetime;         // 账户建立日期

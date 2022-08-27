@@ -195,11 +195,6 @@ void export_System() {
 
     :rtype: TradeRequest)")
 
-        /*.def("getSellShortTradeRequest", &System::getSellShortTradeRequest,
-             return_value_policy<copy_const_reference>())
-        .def("getBuyShortTradeRequest", &System::getBuyShortTradeRequest,
-             return_value_policy<copy_const_reference>())*/
-
         .def("reset", &System::reset, R"(reset(self, with_tm, with_ev)
 
     复位操作。TM、EV是和具体系统无关的策略组件，可以在不同的系统中进行共享，复位将引起系统运行时被重新清空并计算。尤其是在共享TM时需要注意！
