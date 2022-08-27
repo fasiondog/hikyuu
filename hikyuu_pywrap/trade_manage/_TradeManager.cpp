@@ -110,8 +110,6 @@ void export_TradeManager() {
 
     :rtype: int)")
 
-      //.def("getShortStockNumber", &TradeManager::getShortStockNumber)
-
       .def("get_hold_num", &TradeManagerBase::getHoldNumber, R"(get_hold_num(self, datetime, stock)
 
         获取指定时刻指定证券的持有数量

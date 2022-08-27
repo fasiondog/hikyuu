@@ -105,11 +105,6 @@ public:
         return m_position.size();
     }
 
-    /** 当前空头持有的证券种类数量 */
-    virtual size_t getShortStockNumber() const override {
-        return m_short_position.size();
-    }
-
     /** 获取指定时刻的某证券持有数量 */
     virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) override;
 
