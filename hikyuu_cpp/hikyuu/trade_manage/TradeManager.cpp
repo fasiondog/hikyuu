@@ -108,7 +108,6 @@ void TradeManager::_reset() {
     m_checkout_stock = 0.0;
     m_borrow_cash = 0.0;
 
-    m_loan_list.clear();
     m_borrow_stock.clear();
 
     m_trade_list.clear();
@@ -139,7 +138,6 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_checkin_stock = m_checkin_stock;
     p->m_checkout_stock = m_checkout_stock;
     p->m_borrow_cash = m_borrow_cash;
-    p->m_loan_list = m_loan_list;
     p->m_borrow_stock = m_borrow_stock;
     p->m_trade_list = m_trade_list;
     p->m_position = m_position;
@@ -150,11 +148,6 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_actions = m_actions;
 
     return TradeManagerPtr(p);
-}
-
-double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock) {
-    // TODO 获取保证金比率，默认固定取60%
-    return 0.6;
 }
 
 Datetime TradeManager::firstDatetime() const {
@@ -556,14 +549,10 @@ bool TradeManager::borrowCash(const Datetime& datetime, price_t cash) {
     //根据权息调整当前持仓情况
     updateWithWeight(datetime);
 
-    int precision = getParam<int>("precision");
-    price_t in_cash = roundEx(cash, precision);
-    CostRecord cost = getBorrowCashCost(datetime, cash);
-    m_cash = roundEx(m_cash + in_cash - cost.total, precision);
-    m_borrow_cash = roundEx(m_borrow_cash + in_cash, precision);
-    m_loan_list.push_back(LoanRecord(datetime, in_cash));
-    m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_BORROW_CASH, in_cash,
-                                       in_cash, 0.0, 0, cost, 0.0, m_cash, PART_INVALID));
+    m_cash += cash;
+    m_borrow_cash += cash;
+    m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_BORROW_CASH, cash, cash,
+                                       0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID));
     return true;
 }
 
@@ -571,66 +560,17 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
     HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0! ", datetime, cash);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
-    HKU_ERROR_IF_RETURN(m_loan_list.empty(), false, "{} not borrow any cash!", datetime);
-    HKU_ERROR_IF_RETURN(datetime < m_loan_list.back().datetime, false,
-                        "{} must be >= the datetime({}) of last loan record!", datetime,
-                        m_loan_list.back().datetime);
+    HKU_ERROR_IF_RETURN(cash > m_borrow_cash, false,
+                        "{} return cash ({}) must <= borrow cash ({})!", datetime, cash,
+                        m_borrow_cash);
 
     //根据权息调整当前持仓情况
     updateWithWeight(datetime);
 
-    int precision = getParam<int>("precision");
-
-    CostRecord cost, cur_cost;
-    price_t in_cash = roundEx(cash, precision);
-    price_t return_cash = in_cash;
-    list<LoanRecord>::iterator iter = m_loan_list.begin();
-    for (; iter != m_loan_list.end(); ++iter) {
-        if (return_cash <= iter->value) {
-            cur_cost = getReturnCashCost(iter->datetime, datetime, return_cash);
-            return_cash = 0.0;
-        } else {  // return_cash > loan.value
-            cur_cost = getReturnCashCost(iter->datetime, datetime, iter->value);
-            return_cash = roundEx(return_cash - iter->value, precision);
-        }
-
-        cost.commission = roundEx(cost.commission + cur_cost.commission, precision);
-        cost.stamptax = roundEx(cost.stamptax + cur_cost.stamptax, precision);
-        cost.transferfee = roundEx(cost.transferfee + cur_cost.transferfee, precision);
-        cost.others = roundEx(cost.others + cur_cost.others, precision);
-        cost.total = roundEx(cost.total + cur_cost.total, precision);
-        if (return_cash == 0.0)
-            break;
-    }
-
-    //欲归还的钱多余实际欠款
-    HKU_ERROR_IF_RETURN(return_cash != 0.0, false, "{} return cash must <= borrowed cash!",
-                        datetime);
-
-    price_t out_cash = roundEx(in_cash + cost.total, precision);
-    HKU_ERROR_IF_RETURN(out_cash > m_cash, false,
-                        "{} cash({:<.4f}) must be <= current cash({:<.4f})!", datetime, cash,
-                        m_cash);
-
-    return_cash = in_cash;
-    do {
-        iter = m_loan_list.begin();
-        if (return_cash == iter->value) {
-            m_loan_list.pop_front();
-            break;
-        } else if (return_cash < iter->value) {
-            iter->value = roundEx(iter->value - return_cash, precision);
-            break;
-        } else {  // return_cash > iter->value
-            return_cash = roundEx(return_cash - iter->value, precision);
-            m_loan_list.pop_front();
-        }
-    } while (!m_loan_list.empty());
-
-    m_cash = roundEx(m_cash - out_cash, precision);
-    m_borrow_cash = roundEx(m_borrow_cash - in_cash, precision);
-    m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_RETURN_CASH, in_cash,
-                                       in_cash, 0.0, 0, cost, 0.0, m_cash, PART_INVALID));
+    m_cash = m_cash - cash;
+    m_borrow_cash = m_borrow_cash - cash;
+    m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_RETURN_CASH, cash, cash,
+                                       0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID));
     return true;
 }
 
@@ -826,28 +766,11 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         //   买入成本: cost
         //   当前账户现金: cash
         //   借入资金: X
-        //   需要的保证金: X * rate
-        //   借入资金需要的成本: bor_cost
         // 则有:
-        //   money + cost <= cash + X - X * rate - bor_cost
-        //   ==> (money + cost + bor_cost - cash) / (1 - rate) <= X
-        CostRecord bor_cost = getBorrowCashCost(datetime, money);  //借入成本
-        double rate = getMarginRate(datetime, stock);              // 保证金比例
-        HKU_ERROR_IF_RETURN(rate < 0 || rate >= 1.0, result, "Invalid margin rate: {}", rate);
-
+        //   money + cost <= cash + X
+        //   ==> (money + cost - cash) <= X
         // 需借入资金
-        price_t x = roundUp(total_need_money + bor_cost.total - m_cash) / (1.0 - rate);
-
-        price_t checkin_money = roundUp(x - bor_cost.total, precision);
-        if (checkin_money + bor_cost.total > x) {
-            x = roundUp(checkin_money + bor_cost.total, precision);
-        }
-
-        m_borrow_cash += x;
-        m_cash = m_cash + checkin_money;
-        m_loan_list.push_back(LoanRecord(datetime, x, rate, bor_cost));
-        m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_BORROW_CASH, x, x, 0.0,
-                                           0, bor_cost, 0.0, m_cash, PART_INVALID));
+        borrowCash(datetime, roundUp(total_need_money - m_cash, precision));
     }
 
     HKU_WARN_IF_RETURN(m_cash < total_need_money, result,
@@ -1013,7 +936,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     if (getParam<bool>("support_borrow_stock")) {
         CostRecord cost = getSellCost(datetime, stock, realPrice, number);
         price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
-        price_t x = roundEx(m_cash / getMarginRate(datetime, stock), precision);
+        price_t x = roundEx(m_cash, precision);
         if (x < money) {
             checkin(datetime, roundEx(money - x, precision));
         }
@@ -1169,8 +1092,8 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     string ktype(inktype);
     to_upper(ktype);
 
-    price_t price(0.0);
-    price_t value(0.0);  //当前市值
+    price_t price = 0.0;
+    price_t value = 0.0;  //当前市值
     position_map_type::const_iterator iter = m_position.begin();
     for (; iter != m_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
@@ -1178,21 +1101,11 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
         value = roundEx((value + record.number * price * record.stock.unit()), precision);
     }
 
-    price_t short_value = 0.0;  //当前空头仓位市值
-    iter = m_short_position.begin();
-    for (; iter != m_short_position.end(); ++iter) {
-        const PositionRecord& record = iter->second;
-        price = record.stock.getMarketValue(lastDatetime(), ktype);
-        short_value =
-          roundEx((short_value + record.number * price * record.stock.unit()), precision);
-    }
     funds.cash = m_cash;
     funds.market_value = value;
-    funds.short_market_value = short_value;
     funds.base_cash = m_checkin_cash - m_checkout_cash;
     funds.base_asset = m_checkin_stock - m_checkout_stock;
     funds.borrow_cash = m_borrow_cash;
-    funds.borrow_asset = 0;
     borrow_stock_map_type::const_iterator bor_iter = m_borrow_stock.begin();
     for (; bor_iter != m_borrow_stock.end(); ++bor_iter) {
         funds.borrow_asset += bor_iter->second.value;
@@ -1223,21 +1136,11 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
               market_value + price * iter->second.number * iter->second.stock.unit(), precision);
         }
 
-        iter = m_short_position.begin();
-        for (; iter != m_short_position.end(); ++iter) {
-            price_t price = iter->second.stock.getMarketValue(datetime, ktype);
-            short_market_value =
-              roundEx(short_market_value + price * iter->second.number * iter->second.stock.unit(),
-                      precision);
-        }
-
         funds.cash = m_cash;
         funds.market_value = market_value;
-        funds.short_market_value = short_market_value;
         funds.base_cash = m_checkin_cash - m_checkout_cash;
         funds.base_asset = m_checkin_stock - m_checkout_stock;
         funds.borrow_cash = m_borrow_cash;
-        funds.borrow_asset = 0;
         borrow_stock_map_type::iterator bor_iter = m_borrow_stock.begin();
         for (; bor_iter != m_borrow_stock.end(); ++bor_iter) {
             funds.borrow_asset += bor_iter->second.value;
@@ -1296,25 +1199,6 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                     stock_iter->second.number -= iter->number;
                 } else {
                     HKU_WARN("{} {} Sell error in m_trade_list!", datetime,
-                             iter->stock.market_code());
-                }
-                break;
-
-            case BUSINESS_SELL_SHORT:
-                short_stock_iter = short_stock_map.find(iter->stock.id());
-                if (short_stock_iter != short_stock_map.end()) {
-                    short_stock_iter->second.number += iter->number;
-                } else {
-                    short_stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
-                }
-                break;
-
-            case BUSINESS_BUY_SHORT:
-                short_stock_iter = short_stock_map.find(iter->stock.id());
-                if (short_stock_iter != short_stock_map.end()) {
-                    short_stock_iter->second.number -= iter->number;
-                } else {
-                    HKU_WARN("{} {} BuyShort Error in m_trade_list!", datetime,
                              iter->stock.market_code());
                 }
                 break;
@@ -1434,21 +1318,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
           roundEx(market_value + price * number * stock_iter->second.stock.unit(), precision);
     }
 
-    short_stock_iter = short_stock_map.begin();
-    for (; short_stock_iter != short_stock_map.end(); ++short_stock_iter) {
-        const size_t& number = short_stock_iter->second.number;
-        if (number == 0) {
-            continue;
-        }
-
-        price_t price = short_stock_iter->second.stock.getMarketValue(datetime, ktype);
-        short_market_value =
-          roundEx(short_market_value + price * number * stock_iter->second.stock.unit(), precision);
-    }
-
     funds.cash = cash;
     funds.market_value = market_value;
-    funds.short_market_value = short_market_value;
     funds.base_cash = checkin_cash - checkout_cash;
     funds.base_asset = checkin_stock - checkout_stock;
     return funds;

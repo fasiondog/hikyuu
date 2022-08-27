@@ -24,16 +24,6 @@ public:
         return std::make_shared<AccountTradeManager>();
     }
 
-    /**
-     * 获取指定对象的保证金比率
-     * @param datetime 日期
-     * @param stock 指定对象
-     */
-    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override {
-        HKU_WARN("The subclass does not implement a getMarginRate method");
-        return 0.0;
-    }
-
     /** 初始资金 */
     virtual price_t initCash() const override {
         HKU_WARN("The subclass does not implement this method");
@@ -388,7 +378,7 @@ public:
     }
 
     /**
-     * 获取资产净值曲线，含借入的资产
+     * 获取净资产净值曲线，不含借入的资产
      * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 资产净值列表

@@ -16,7 +16,6 @@
 #include "PositionRecord.h"
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
-#include "LoanRecord.h"
 #include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
 
@@ -51,13 +50,6 @@ public:
     virtual void _reset() override;
 
     virtual shared_ptr<TradeManagerBase> _clone() override;
-
-    /**
-     * 获取指定对象的保证金比率
-     * @param datetime 日期
-     * @param stock 指定对象
-     */
-    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override;
 
     /** 初始资金 */
     virtual price_t initCash() const override {
@@ -343,7 +335,7 @@ public:
                                  KQuery::KType ktype = KQuery::DAY) override;
 
     /**
-     * 获取资产净值曲线，含借入的资产
+     * 获取净资产净值曲线，不含借入的资产
      * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 资产净值列表
@@ -401,13 +393,11 @@ private:
     Datetime m_last_update_datetime;  // 最后一次根据权息调整持仓与交易记录的时刻
 
     price_t m_cash;            //当前现金
-    price_t m_checkin_cash;    //累计存入资金，初始资金视为存入
-    price_t m_checkout_cash;   //累计取出资金
+    price_t m_checkin_cash;    //累计存入自有资金，初始资金视为存入
+    price_t m_checkout_cash;   //累计取出自有资金
     price_t m_checkin_stock;   //累计存入股票价值
     price_t m_checkout_stock;  //累计取出股票价值
     price_t m_borrow_cash;     //当前借入资金，负债
-
-    list<LoanRecord> m_loan_list;  //当前融资情况
 
     typedef map<uint64_t, BorrowRecord> borrow_stock_map_type;
     borrow_stock_map_type m_borrow_stock;  //当前借入的股票及其数量
@@ -442,7 +432,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_checkin_stock);
         ar& BOOST_SERIALIZATION_NVP(m_checkout_stock);
         ar& BOOST_SERIALIZATION_NVP(m_borrow_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_loan_list);
         namespace bs = boost::serialization;
         BorrowRecordList borrow = getBorrowStockList();
         ar& bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);
@@ -467,7 +456,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_checkin_stock);
         ar& BOOST_SERIALIZATION_NVP(m_checkout_stock);
         ar& BOOST_SERIALIZATION_NVP(m_borrow_cash);
-        ar& BOOST_SERIALIZATION_NVP(m_loan_list);
         namespace bs = boost::serialization;
         BorrowRecordList borrow;
         ar& bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);

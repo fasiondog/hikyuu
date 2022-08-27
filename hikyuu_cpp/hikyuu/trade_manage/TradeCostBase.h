@@ -65,26 +65,6 @@ public:
                                    double num) const = 0;
 
     /**
-     * 计算借入现金花费的成本
-     * @param datetime 借入日期
-     * @param cash 借入的资金
-     */
-    virtual CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) const {
-        return CostRecord();
-    }
-
-    /**
-     * 计算归还融资成本
-     * @param borrow_datetime 资金借入日期
-     * @param return_datetime 归还日期
-     * @param cash 归还金额
-     */
-    virtual CostRecord getReturnCashCost(const Datetime& borrow_datetime,
-                                         const Datetime& return_datetime, price_t cash) const {
-        return CostRecord();
-    }
-
-    /**
      * 计算融劵借入成本
      * @param datetime 融劵日期
      * @param stock 借入的对象

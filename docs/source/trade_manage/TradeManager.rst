@@ -231,7 +231,7 @@
         
     .. py:method:: get_funds_curve(self, dates[, ktype = Query.DAY])
     
-        获取资产净值曲线
+        获取净资产净值曲线
         
         :param DatetimeList dates: 日期列表，根据该日期列表获取其对应的资产净值曲线
         :param Query.KType ktype: K线类型，必须与日期列表匹配

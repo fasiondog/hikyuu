@@ -31,16 +31,6 @@ public:
         return CostRecord(0, 0, 0, 20, 20);
     }
 
-    virtual CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) const override {
-        return CostRecord(0, 0, 0, 30, 30);
-    }
-
-    virtual CostRecord getReturnCashCost(const Datetime& borrow_datetime,
-                                         const Datetime& return_datetime,
-                                         price_t cash) const override {
-        return CostRecord(0, 0, 0, 40, 40);
-    }
-
     virtual CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock,
                                           price_t price, double num) const override {
         return CostRecord(0, 0, 0, 50, 50);

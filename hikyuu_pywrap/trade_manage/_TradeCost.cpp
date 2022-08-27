@@ -31,30 +31,6 @@ public:
         return this->get_override("_clone")();
     }
 
-    CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) const {
-        if (override getBorrowCashCost = get_override("getBorrowCashCost")) {
-            return getBorrowCashCost(datetime, cash);
-        }
-        return TradeCostBase::getBorrowCashCost(datetime, cash);
-    }
-
-    CostRecord default_getBorrowCashCost(const Datetime& datetime, price_t cash) const {
-        return this->TradeCostBase::getBorrowCashCost(datetime, cash);
-    }
-
-    CostRecord getReturnCashCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
-                                 price_t cash) const {
-        if (override getReturnCashCost = get_override("getReturnCashCost")) {
-            return getReturnCashCost(borrow_datetime, return_datetime, cash);
-        }
-        return TradeCostBase::getReturnCashCost(borrow_datetime, return_datetime, cash);
-    }
-
-    CostRecord default_getReturnCashCost(const Datetime& borrow_datetime,
-                                         const Datetime& return_datetime, price_t cash) const {
-        return this->TradeCostBase::getReturnCashCost(borrow_datetime, return_datetime, cash);
-    }
-
     CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock, price_t price,
                                   double num) const {
         if (override getBorrowStockCost = get_override("getBorrowStockCost")) {
@@ -144,12 +120,6 @@ void export_TradeCost() {
         :param int num: 卖出数量
         :return: 交易成本记录
         :rtype: CostRecord)")
-
-      //.def("getBorrowCashCost", &TradeCostBase::getBorrowCashCost,
-      //     &TradeCostWrap::default_getBorrowCashCost)
-
-      //.def("getReturnCashCost", &TradeCostBase::getReturnCashCost,
-      //     &TradeCostWrap::default_getReturnCashCost)
 
       //.def("getBorrowStockCost", &TradeCostBase::getBorrowStockCost,
       //&TradeCostWrap::default_getBorrowStockCost) .def("getReturnStockCost",

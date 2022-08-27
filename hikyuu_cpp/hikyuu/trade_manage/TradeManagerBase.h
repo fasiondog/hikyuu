@@ -12,7 +12,6 @@
 #include "PositionRecord.h"
 #include "BorrowRecord.h"
 #include "FundsRecord.h"
-#include "LoanRecord.h"
 #include "TradeCostBase.h"
 #include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
@@ -95,27 +94,6 @@ public:
     CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
                            double num) const {
         return m_costfunc ? m_costfunc->getSellCost(datetime, stock, price, num) : CostRecord();
-    }
-
-    /**
-     * 计算计入现金时的费用成本
-     * @param datetime 借入日期
-     * @param cash 现金额
-     */
-    CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) {
-        return m_costfunc ? m_costfunc->getBorrowCashCost(datetime, cash) : CostRecord();
-    }
-
-    /**
-     * 计算归还融资成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param cash 归还金额
-     */
-    CostRecord getReturnCashCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
-                                 price_t cash) {
-        return m_costfunc ? m_costfunc->getReturnCashCost(borrow_datetime, return_datetime, cash)
-                          : CostRecord();
     }
 
     /**
@@ -203,16 +181,6 @@ public:
      */
     virtual void updateWithWeight(const Datetime& datetime) {
         HKU_WARN("The subclass does not implement a updateWithWeight method");
-    }
-
-    /**
-     * 获取指定对象的保证金比率
-     * @param datetime 日期
-     * @param stock 指定对象
-     */
-    virtual double getMarginRate(const Datetime& datetime, const Stock& stock) {
-        HKU_WARN("The subclass does not implement a getMarginRate method");
-        return 0.0;
     }
 
     /** 初始资金 */
@@ -580,7 +548,7 @@ public:
     }
 
     /**
-     * 获取资产净值曲线，含借入的资产
+     * 获取净资产净值曲线，不含借入的资产
      * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
      * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
      * @return 资产净值列表

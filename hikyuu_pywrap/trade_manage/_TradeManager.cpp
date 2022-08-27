@@ -97,8 +97,6 @@ void export_TradeManager() {
 
     清空所有已注册订单代理)")
 
-      //.def("getMarginRate", &TradeManager::getMarginRate)
-
       .def("have", &TradeManagerBase::have, R"(have(self, stock)
 
     当前是否持有指定的证券
@@ -175,8 +173,6 @@ void export_TradeManager() {
     :param float num:         卖出数量
     :rtype: CostRecord)")
 
-      //.def("getBorrowCashCost", &TradeManager::getBorrowCashCost)
-      //.def("getReturnCashCost", &TradeManager::getReturnCashCost)
       //.def("getBorrowStockCost", &TradeManager::getBorrowStockCost)
       //.def("getReturnStockCost", &TradeManager::getReturnStockCost)
 
