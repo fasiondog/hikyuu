@@ -131,26 +131,8 @@ public:
         return PositionRecordList();
     }
 
-    /** 获取当前全部空头仓位记录 */
-    virtual PositionRecordList getShortPositionList() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return PositionRecordList();
-    }
-
-    /** 获取全部空头历史仓位记录 */
-    virtual PositionRecordList getShortHistoryPositionList() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return PositionRecordList();
-    }
-
     /** 获取指定证券的当前持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
     virtual PositionRecord getPosition(const Datetime&, const Stock&) override {
-        HKU_WARN("The subclass does not implement this method");
-        return PositionRecord();
-    }
-
-    /** 获取指定证券的当前空头仓位持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getShortPosition(const Stock&) const override {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }

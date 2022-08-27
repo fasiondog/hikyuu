@@ -47,9 +47,6 @@ TEST_CASE("test_TradeManager_init") {
                          0.0, 0, Null<CostRecord>(), 0.0, 100000.0, PART_INVALID));
     CHECK_EQ(tm->getPositionList().empty(), true);
     CHECK_EQ(tm->getPosition(Datetime(199901010000), stock), Null<PositionRecord>());
-
-    CHECK_EQ(tm->getShortPositionList().empty(), true);
-    CHECK_EQ(tm->getShortPosition(stock), Null<PositionRecord>());
 }
 
 /** @par 检测点 */

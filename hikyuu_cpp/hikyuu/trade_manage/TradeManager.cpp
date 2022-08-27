@@ -53,13 +53,6 @@ string TradeManager::str() const {
            << 100 * bonus / m_init_cash << "%\n";
     }
 
-    os << "  Short Position: \n";
-    position = getShortPositionList();
-    iter = position.begin();
-    for (; iter != position.end(); ++iter) {
-        os << "    " << iter->number << " " << iter->stock.toString() << "\n";
-    }
-
     os << "  Borrow Stock: \n";
     BorrowRecordList borrow = getBorrowStockList();
     BorrowRecordList::const_iterator bor_iter = borrow.begin();
@@ -294,15 +287,6 @@ PositionRecordList TradeManager::getPositionList() const {
     return result;
 }
 
-PositionRecordList TradeManager::getShortPositionList() const {
-    PositionRecordList result;
-    position_map_type::const_iterator iter = m_short_position.begin();
-    for (; iter != m_short_position.end(); ++iter) {
-        result.push_back(iter->second);
-    }
-    return result;
-}
-
 PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& stock) {
     PositionRecord result;
     HKU_IF_RETURN(stock.isNull(), result);
@@ -358,13 +342,6 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
                 stock);
     result.number = number;
     return result;
-}
-
-PositionRecord TradeManager::getShortPosition(const Stock& stock) const {
-    HKU_IF_RETURN(stock.isNull(), PositionRecord());
-    position_map_type::const_iterator iter;
-    iter = m_short_position.find(stock.id());
-    return iter == m_short_position.end() ? PositionRecord() : iter->second;
 }
 
 BorrowRecordList TradeManager::getBorrowStockList() const {

@@ -135,23 +135,12 @@ public:
         return m_position_history;
     }
 
-    /** 获取当前全部空头仓位记录 */
-    virtual PositionRecordList getShortPositionList() const override;
-
-    /** 获取全部空头历史仓位记录 */
-    virtual PositionRecordList getShortHistoryPositionList() const override {
-        return m_short_position_history;
-    }
-
     /**
      * 获取指定证券的持仓记录
      * @param date 指定日期
      * @param stock 指定的证券
      */
     virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) override;
-
-    /** 获取指定证券的当前空头仓位持仓记录，如当前未持有该票，返回Null<PositionRecord>() */
-    virtual PositionRecord getShortPosition(const Stock&) const override;
 
     /** 获取当前借入的股票列表 */
     virtual BorrowRecordList getBorrowStockList() const override;
@@ -402,9 +391,6 @@ private:
         PositionRecordList position = getPositionList();
         ar& bs::make_nvp<PositionRecordList>("m_position", position);
         ar& BOOST_SERIALIZATION_NVP(m_position_history);
-        position = getShortPositionList();
-        ar& bs::make_nvp<PositionRecordList>("m_short_position", position);
-        ar& BOOST_SERIALIZATION_NVP(m_short_position_history);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
@@ -434,14 +420,6 @@ private:
             m_position[iter->stock.id()] = *iter;
         }
         ar& BOOST_SERIALIZATION_NVP(m_position_history);
-
-        position.clear();
-        ar& bs::make_nvp<PositionRecordList>("m_short_position", position);
-        iter = position.begin();
-        for (; iter != position.end(); ++iter) {
-            m_short_position[iter->stock.id()] = *iter;
-        }
-        ar& BOOST_SERIALIZATION_NVP(m_short_position_history);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
