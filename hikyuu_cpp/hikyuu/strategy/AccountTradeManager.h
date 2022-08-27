@@ -96,7 +96,7 @@ public:
     }
 
     /** 获取指定时刻已借入的现金额 */
-    virtual price_t getDebtCash(const Datetime& datetime) override {
+    virtual price_t getBorrowCash(const Datetime& datetime) override {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }

@@ -329,7 +329,7 @@ TEST_CASE("test_TradeManager_can_not_returnCash") {
     CHECK_EQ(tm->borrowCash(Datetime(200001020000), 0.01), true);
 
     /** @arg 试图归还的金额，大于当前的欠款额 */
-    CHECK_EQ(tm->getDebtCash(Datetime(200001030000)), 50000);
+    CHECK_EQ(tm->getBorrowCash(Datetime(200001030000)), 50000);
     CHECK_EQ(tm->returnCash(Datetime(200001030000), 50000.01), false);
     CHECK_EQ(tm->returnCash(Datetime(200001030000), 50000), true);
 
@@ -337,7 +337,7 @@ TEST_CASE("test_TradeManager_can_not_returnCash") {
     tm->borrowCash(Datetime(200001040000), 50000);
     tm->checkout(Datetime(200001040000), 120000);
     CHECK_EQ(tm->currentCash(), 30000);
-    CHECK_EQ(tm->getDebtCash(Datetime(200001040000)), 50000);
+    CHECK_EQ(tm->getBorrowCash(Datetime(200001040000)), 50000);
     CHECK_EQ(tm->returnCash(Datetime(200001040000), 50000.01), false);
 }
 

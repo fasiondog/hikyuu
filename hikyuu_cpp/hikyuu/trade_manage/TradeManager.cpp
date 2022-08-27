@@ -236,7 +236,7 @@ double TradeManager::getDebtNumber(const Datetime& datetime, const Stock& stock)
     return debt_n;
 }
 
-price_t TradeManager::getDebtCash(const Datetime& datetime) {
+price_t TradeManager::getBorrowCash(const Datetime& datetime) {
     HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
     //根据权息信息调整持仓数量
