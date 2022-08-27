@@ -100,16 +100,6 @@ public:
         return m_position.count(stock.id()) ? true : false;
     }
 
-    /**
-     * 当前空头仓位是否持有指定的证券
-     * @note 这里未使用日期参数，必须保证是按日期顺序执行
-     * @param stock 指定证券
-     * @return true 是 | false 否
-     */
-    virtual bool haveShort(const Stock& stock) const override {
-        return m_short_position.count(stock.id()) ? true : false;
-    }
-
     /** 当前持有的证券种类数量 */
     virtual size_t getStockNumber() const override {
         return m_position.size();

@@ -412,7 +412,6 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
     //如果有买入信号
     if (m_sg->shouldBuy(today.datetime)) {
         TradeRecord tr = _buy(today, src_today, PART_SIGNAL);
-        // if (m_tm->haveShort(m_stock)) _sellShort(today);
         return tr.isNull() ? result : tr;
     }
 
