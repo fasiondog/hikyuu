@@ -457,31 +457,31 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     next_date = Datetime(199911180000);
     CHECK_EQ(tm->borrowCash(cur_date, 5000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
 
     cur_date = Datetime(199911180000);
     pre_date = Datetime(199911170000);
     next_date = Datetime(199911190000);
     CHECK_EQ(tm->returnCash(cur_date, 3000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(102000, 0, 0, 100000, 0, 2000, 0));
+    CHECK_EQ(funds, FundsRecord(102000, 0, 100000, 0, 2000, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(102000, 0, 0, 100000, 0, 2000, 0));
+    CHECK_EQ(funds, FundsRecord(102000, 0, 100000, 0, 2000, 0));
 
     CHECK_EQ(tm->returnCash(cur_date, 2000.01), false);
     CHECK_EQ(tm->returnCash(cur_date, 2000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
 
     /** @arg 分两次借入5000元，一次归还 */
     cur_date = Datetime(199911190000);
@@ -490,20 +490,20 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     CHECK_EQ(tm->borrowCash(cur_date, 3000), true);
     CHECK_EQ(tm->borrowCash(cur_date, 2000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
 
     CHECK_EQ(tm->returnCash(cur_date, 5000.01), false);
     CHECK_EQ(tm->returnCash(cur_date, 5000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
 
     /** @arg 分两次借入5000元，跨记录两次归还 */
     tm->reset();
@@ -513,28 +513,28 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     CHECK_EQ(tm->borrowCash(cur_date, 3000), true);
     CHECK_EQ(tm->borrowCash(cur_date, 2000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(105000, 0, 0, 100000, 0, 5000, 0));
+    CHECK_EQ(funds, FundsRecord(105000, 0, 100000, 0, 5000, 0));
 
     CHECK_EQ(tm->returnCash(cur_date, 4000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(101000, 0, 0, 100000, 0, 1000, 0));
+    CHECK_EQ(funds, FundsRecord(101000, 0, 100000, 0, 1000, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(101000, 0, 0, 100000, 0, 1000, 0));
+    CHECK_EQ(funds, FundsRecord(101000, 0, 100000, 0, 1000, 0));
 
     CHECK_EQ(tm->returnCash(cur_date, 1000.01), false);
     CHECK_EQ(tm->returnCash(cur_date, 1000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
 }
 
 /** @par 检测点, 多次借入、归还股票 */
@@ -559,30 +559,30 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     next_date = Datetime(199911180000);
     CHECK_EQ(tm->borrowStock(cur_date, stock, 27.18, 1000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 27180, 0, 100000, 0, 0, 27180));
+    CHECK_EQ(funds, FundsRecord(100000, 27180, 100000, 0, 0, 27180));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 27020, 0, 100000, 0, 0, 27180));
+    CHECK_EQ(funds, FundsRecord(100000, 27020, 100000, 0, 0, 27180));
 
     cur_date = Datetime(199911180000);
     pre_date = Datetime(199911170000);
     next_date = Datetime(199911190000);
     CHECK_EQ(tm->returnStock(cur_date, stock, 27.1, 800), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 27180, 0, 100000, 0, 0, 27180));
+    CHECK_EQ(funds, FundsRecord(100000, 27180, 100000, 0, 0, 27180));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 5404, 0, 100000, 0, 0, 5436));
+    CHECK_EQ(funds, FundsRecord(100000, 5404, 100000, 0, 0, 5436));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 5376, 0, 100000, 0, 0, 5436));
+    CHECK_EQ(funds, FundsRecord(100000, 5376, 100000, 0, 0, 5436));
 
     CHECK_EQ(tm->returnStock(cur_date, stock, 26.8, 200), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 27180, 0, 100000, 0, 0, 27180));
+    CHECK_EQ(funds, FundsRecord(100000, 27180, 100000, 0, 0, 27180));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
 
     /** @arg 19991123 分两次买入共1000股，一次性归还 */
     cur_date = Datetime(199911230000);
@@ -591,22 +591,22 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     CHECK_EQ(tm->borrowStock(cur_date, stock, 26.21, 200), true);
     CHECK_EQ(tm->borrowStock(cur_date, stock, 26.43, 800), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 26450, 0, 100000, 0, 0, 26386));
+    CHECK_EQ(funds, FundsRecord(100000, 26450, 100000, 0, 0, 26386));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 26430, 0, 100000, 0, 0, 26386));
+    CHECK_EQ(funds, FundsRecord(100000, 26430, 100000, 0, 0, 26386));
 
     cur_date = Datetime(199911240000);
     pre_date = Datetime(199911230000);
     next_date = Datetime(199911250000);
     CHECK_EQ(tm->returnStock(cur_date, stock, 26.20, 1000), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 26450, 0, 100000, 0, 0, 26386));
+    CHECK_EQ(funds, FundsRecord(100000, 26450, 100000, 0, 0, 26386));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
 
     /** @arg 19991123 分两次买入1000股，跨记录两次归还 */
     cur_date = Datetime(199911300000);
@@ -615,30 +615,30 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     CHECK_EQ(tm->borrowStock(cur_date, stock, 26.28, 200), true);
     CHECK_EQ(tm->borrowStock(cur_date, stock, 26.42, 800), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 26400, 0, 100000, 0, 0, 26392));
+    CHECK_EQ(funds, FundsRecord(100000, 26400, 100000, 0, 0, 26392));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 26600, 0, 100000, 0, 0, 26392));
+    CHECK_EQ(funds, FundsRecord(100000, 26600, 100000, 0, 0, 26392));
 
     cur_date = Datetime(199912010000);
     pre_date = Datetime(199911300000);
     next_date = Datetime(199912020000);
     CHECK_EQ(tm->returnStock(cur_date, stock, 26.30, 500), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 26400, 0, 100000, 0, 0, 26392));
+    CHECK_EQ(funds, FundsRecord(100000, 26400, 100000, 0, 0, 26392));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 13300, 0, 100000, 0, 0, 13210));
+    CHECK_EQ(funds, FundsRecord(100000, 13300, 100000, 0, 0, 13210));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 13130, 0, 100000, 0, 0, 13210));
+    CHECK_EQ(funds, FundsRecord(100000, 13130, 100000, 0, 0, 13210));
 
     CHECK_EQ(tm->returnStock(cur_date, stock, 26.30, 500), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 26400, 0, 100000, 0, 0, 26392));
+    CHECK_EQ(funds, FundsRecord(100000, 26400, 100000, 0, 0, 26392));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
 
     /** @arg 19991207 分两次买入1000股，不跨记录，三次归还 */
     cur_date = Datetime(199912070000);
@@ -647,38 +647,64 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     CHECK_EQ(tm->borrowStock(cur_date, stock, 25.8, 600), true);
     CHECK_EQ(tm->borrowStock(cur_date, stock, 25.83, 400), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 25600, 0, 100000, 0, 0, 25812));
+    CHECK_EQ(funds, FundsRecord(100000, 25600, 100000, 0, 0, 25812));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 25530, 0, 100000, 0, 0, 25812));
+    CHECK_EQ(funds, FundsRecord(100000, 25530, 100000, 0, 0, 25812));
 
     cur_date = Datetime(199912080000);
     pre_date = Datetime(199912070000);
     next_date = Datetime(199912090000);
     CHECK_EQ(tm->returnStock(cur_date, stock, 25.50, 200), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 25600, 0, 100000, 0, 0, 25812));
+    CHECK_EQ(funds, FundsRecord(100000, 25600, 100000, 0, 0, 25812));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 20424, 0, 100000, 0, 0, 20652));
+    CHECK_EQ(funds, FundsRecord(100000, 20424, 100000, 0, 0, 20652));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 20288, 0, 100000, 0, 0, 20652));
+    CHECK_EQ(funds, FundsRecord(100000, 20288, 100000, 0, 0, 20652));
 
     CHECK_EQ(tm->returnStock(cur_date, stock, 25.50, 400), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 25600, 0, 100000, 0, 0, 25812));
+    CHECK_EQ(funds, FundsRecord(100000, 25600, 100000, 0, 0, 25812));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 10212, 0, 100000, 0, 0, 10332));
+    CHECK_EQ(funds, FundsRecord(100000, 10212, 100000, 0, 0, 10332));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 10144, 0, 100000, 0, 0, 10332));
+    CHECK_EQ(funds, FundsRecord(100000, 10144, 100000, 0, 0, 10332));
 
     CHECK_EQ(tm->returnStock(cur_date, stock, 25.50, 400), true);
     funds = tm->getFunds(pre_date);
-    CHECK_EQ(funds, FundsRecord(100000, 25600, 0, 100000, 0, 0, 25812));
+    CHECK_EQ(funds, FundsRecord(100000, 25600, 100000, 0, 0, 25812));
     funds = tm->getFunds(cur_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
     funds = tm->getFunds(next_date);
-    CHECK_EQ(funds, FundsRecord(100000, 0, 0, 100000, 0, 0, 0));
+    CHECK_EQ(funds, FundsRecord(100000, 0, 100000, 0, 0, 0));
+}
+
+/** @par 检测点，测试自动归还现金与股票 */
+TEST_CASE("test_auto_return_cash_or_stock") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 0.0);
+    tm->setParam<bool>("support_borrow_cash", true);
+    tm->setParam<bool>("support_borrow_stock", true);
+
+    auto cur_date = Datetime(199911170000);
+    auto pre_date = Datetime(199911160000);
+    auto next_date = Datetime(199911180000);
+
+    auto record = tm->buy(Datetime(199911160000), stk, 21.18, 100);
+    auto fund = tm->getFunds();
+
+    record = tm->sell(Datetime(199911170000), stk, 21.40, 100);
+    fund = tm->getFunds();
+    CHECK(fund == FundsRecord(22.0000, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+    record = tm->sell(Datetime(199911180000), stk, 21.80, 100);
+    record = tm->buy(Datetime(199911180000), stk, 21.40, 100);
+    fund = tm->getFunds();
+    CHECK(fund == FundsRecord(62.0000, 0.0, 0.0, 0.0, 0.0, 0.0));
 }
 
 /** @par 检测点，测试 getTradeList */

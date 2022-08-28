@@ -25,16 +25,15 @@ namespace hku {
 class HKU_API FundsRecord {
 public:
     FundsRecord();
-    FundsRecord(price_t cash, price_t market_value, price_t short_market_value, price_t base_cash,
-                price_t base_asset, price_t borrow_cash, price_t borrow_asset);
+    FundsRecord(price_t cash, price_t market_value, price_t base_cash, price_t base_asset,
+                price_t borrow_cash, price_t borrow_asset);
 
-    price_t cash;               /**< 当前账户现金 */
-    price_t market_value;       /**< 当前持仓市值 */
-    price_t short_market_value; /**< 当前空头仓位市值 */
-    price_t base_cash;          /**< 当前投入本金principal */
-    price_t base_asset;         /**< 当前投入的自有资产价值 */
-    price_t borrow_cash;        /**< 当前借入的资金，即负债 */
-    price_t borrow_asset;       /**< 当前借入证券资产价值 */
+    price_t cash;         /**< 当前账户现金 */
+    price_t market_value; /**< 当前持仓市值 */
+    price_t base_cash;    /**< 当前投入本金principal */
+    price_t base_asset;   /**< 当前投入的自有资产价值 */
+    price_t borrow_cash;  /**< 当前借入的资金，即负债 */
+    price_t borrow_asset; /**< 当前借入证券资产价值 */
 
     //当前总资产(含负债) = 现金 + 市值
     //         = cash + market_value
@@ -58,7 +57,6 @@ private:
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(cash);
         ar& BOOST_SERIALIZATION_NVP(market_value);
-        ar& BOOST_SERIALIZATION_NVP(short_market_value);
         ar& BOOST_SERIALIZATION_NVP(base_cash);
         ar& BOOST_SERIALIZATION_NVP(base_asset);
         ar& BOOST_SERIALIZATION_NVP(borrow_cash);

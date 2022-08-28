@@ -111,8 +111,7 @@ price_t AllocateFundsBase::_getTotalFunds(const Datetime& date,
         TMPtr sub_tm = sub_sys->getTM();
         KQuery sub_query = sub_sys->getTO().getQuery();
         FundsRecord funds = sub_tm->getFunds(date, sub_query.kType());
-        total_value +=
-          funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
+        total_value += funds.cash + funds.market_value;
     }
 
     // 加上当前总账户现金余额
@@ -267,8 +266,7 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
         tm->updateWithWeight(date);
 
         FundsRecord funds = tm->getFunds(date, m_query.kType());
-        price_t funds_value =
-          funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
+        price_t funds_value = funds.cash + funds.market_value;
 
         price_t will_funds_value = (iter->getWeight() / weight_unit) * per_weight_funds;
         if (funds_value == will_funds_value) {

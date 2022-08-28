@@ -188,7 +188,6 @@ TEST_CASE("test_FundsRecord_export") {
     FundsRecord funds1;
     funds1.cash = 1.0;
     funds1.market_value = 2.0;
-    funds1.short_market_value = 2.5;
     funds1.base_cash = 3.0;
     funds1.base_asset = 4.0;
     funds1.borrow_cash = 5.0;

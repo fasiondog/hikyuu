@@ -119,13 +119,12 @@
 
 由TradeManager::getFunds返回
 
-.. py:class:: FundsRecord([cash, market_value, short_market_value, base_cash, base_asset, borrow_cash, borrow_asset])
+.. py:class:: FundsRecord([cash, market_value, base_cash, base_asset, borrow_cash, borrow_asset])
 
     当前资产情况记录，由 :py:meth:`TradeManager.getFunds` 返回
     
     .. py:attribute:: cash               当前现金（float）
     .. py:attribute:: market_value       当前多头市值（float）
-    .. py:attribute:: short_market_value 当前空头仓位市值（float）
     .. py:attribute:: base_cash          当前投入本金（float）
     .. py:attribute:: base_asset         当前投入的资产价值（float）
     .. py:attribute:: borrow_cash        当前借入的资金（float），即负债

@@ -19,8 +19,6 @@ void export_FundsRecord() {
 
       .def_readwrite("cash", &FundsRecord::cash, "当前现金（float）")
       .def_readwrite("market_value", &FundsRecord::market_value, "当前多头市值（float）")
-      .def_readwrite("short_market_value", &FundsRecord::short_market_value,
-                     "当前空头仓位市值（float）")
       .def_readwrite("base_cash", &FundsRecord::base_cash, "当前投入本金（float）")
       .def_readwrite("base_asset", &FundsRecord::base_asset, "当前投入的资产价值（float）")
       .def_readwrite("borrow_cash", &FundsRecord::borrow_cash, "当前借入的资金（float），即负债")
