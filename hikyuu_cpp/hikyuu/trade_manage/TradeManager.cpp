@@ -863,107 +863,6 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     return result;
 }
 
-TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                                    double number, price_t stoploss, price_t goalPrice,
-                                    price_t planPrice, SystemPart from) {
-    TradeRecord result;
-    result.business = BUSINESS_INVALID;
-
-    HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
-    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
-                        "{} {} datetime must be >= lastDatetime({})!", datetime,
-                        stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} numer is zero! ", datetime,
-                        stock.market_code());
-    HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
-                        "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
-                        stock.market_code(), number, stock.minTradeNumber());
-    HKU_ERROR_IF_RETURN(number > stock.maxTradeNumber(), result,
-                        "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
-                        stock.market_code(), number, stock.maxTradeNumber());
-    HKU_ERROR_IF_RETURN(
-      stoploss != 0.0 && stoploss < realPrice, result,
-      "{} {} Sell short's stoploss({:<.4f}) must be > realPrice({:<.4f}) or = 0! ", datetime,
-      stock.market_code(), stoploss, realPrice);
-
-    //根据权息调整当前持仓情况
-    updateWithWeight(datetime);
-
-    int precision = getParam<int>("precision");
-
-    if (getParam<bool>("support_borrow_stock")) {
-        CostRecord cost = getSellCost(datetime, stock, realPrice, number);
-        price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
-        price_t x = roundEx(m_cash, precision);
-        if (x < money) {
-            checkin(datetime, roundEx(money - x, precision));
-        }
-
-        borrowStock(datetime, stock, realPrice, number);
-    }
-
-    //判断是否存在已借入的股票及其数量
-    borrow_stock_map_type::const_iterator bor_iter;
-    bor_iter = m_borrow_stock.find(stock.id());
-    HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), result,
-                        "{} {} Non borrowed, can't sell short! ", datetime, stock.market_code());
-
-    double total_borrow_num = bor_iter->second.number;
-    double can_sell_num = 0;
-    position_map_type::iterator pos_iter = m_short_position.find(stock.id());
-    if (pos_iter == m_short_position.end()) {
-        //借入的股票并未卖出过
-        can_sell_num = total_borrow_num;
-
-    } else {
-        //借入的股票已经卖出过
-        HKU_ERROR_IF_RETURN(pos_iter->second.number >= total_borrow_num, result,
-                            "{} {} Borrowed Stock had all selled!", datetime, stock.market_code());
-
-        //可以卖出的数量 = 借入的总数 - 已卖出的数量
-        can_sell_num = total_borrow_num - pos_iter->second.number;
-    }
-
-    //如果计划卖出的数量大于可卖出的数量，则已可每卖出的数量卖出
-    double sell_num = number;
-    if (number > can_sell_num) {
-        sell_num = can_sell_num;
-    }
-
-    CostRecord cost = getSellCost(datetime, stock, realPrice, sell_num);
-
-    price_t money = roundEx(realPrice * sell_num * stock.unit() - cost.total, precision);
-
-    //更新现金
-    m_cash = roundEx(m_cash + money, precision);
-
-    //加入交易记录
-    result = TradeRecord(stock, datetime, BUSINESS_SELL_SHORT, planPrice, realPrice, goalPrice,
-                         sell_num, cost, stoploss, m_cash, from);
-    m_trade_list.push_back(result);
-
-    //更新当前空头持仓记录
-    price_t risk = roundEx((stoploss - realPrice) * sell_num * stock.unit(), precision);
-
-    if (pos_iter == m_short_position.end()) {
-        m_short_position[stock.id()] =
-          PositionRecord(stock, datetime, Null<Datetime>(), sell_num, stoploss, goalPrice, sell_num,
-                         cost.total, cost.total, risk, money);
-    } else {
-        PositionRecord& position = pos_iter->second;
-        position.number += sell_num;
-        position.stoploss = stoploss;
-        position.goalPrice = goalPrice;
-        position.totalNumber += sell_num;
-        position.buyMoney = roundEx(position.buyMoney + cost.total);
-        position.totalCost = roundEx(cost.total + position.totalCost, precision);
-        position.totalRisk = roundEx(position.totalRisk + risk, precision);
-        position.sellMoney = roundEx(position.sellMoney + money, precision);
-    }
-
-    return result;
-}
-
 price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     // 如果指定时间大于更新权息最后时间，则先更新权息
     if (datetime > m_last_update_datetime) {
@@ -1505,9 +1404,6 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
         case BUSINESS_RETURN_STOCK:
             return _add_return_stock_tr(tr);
 
-        case BUSINESS_SELL_SHORT:
-            return _add_sell_short_tr(tr);
-
         case BUSINESS_INVALID:
         default:
             HKU_ERROR("tr.business is invalid({})!", tr.business);
@@ -1663,10 +1559,6 @@ bool TradeManager::_add_borrow_stock_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_return_stock_tr(const TradeRecord& tr) {
-    return false;
-}
-
-bool TradeManager::_add_sell_short_tr(const TradeRecord& tr) {
     return false;
 }
 

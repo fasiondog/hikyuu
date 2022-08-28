@@ -60,19 +60,6 @@ public:
         return this->get_override("_get_buy_num")(datetime, stock, price, risk, from);
     }
 
-    double _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                               price_t risk, SystemPart from) {
-        if (override _getSellShortNumber = this->get_override("_get_sell_short_num")) {
-            return _getSellShortNumber(datetime, stock, price, risk, from);
-        }
-        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
-    }
-
-    double default_getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
-                                      price_t risk, SystemPart from) {
-        return MoneyManagerBase::_getSellShortNumber(datetime, stock, price, risk, from);
-    }
-
     void _reset() {
         if (override func = get_override("_reset")) {
             func();

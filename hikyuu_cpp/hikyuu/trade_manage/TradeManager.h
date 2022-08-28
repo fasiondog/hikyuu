@@ -218,22 +218,6 @@ public:
                              SystemPart from = PART_INVALID) override;
 
     /**
-     * 卖空
-     * @param datetime 卖空时间
-     * @param stock 卖空的证券
-     * @param realPrice 实际卖空价格
-     * @param number 卖出数量
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划卖空价格
-     * @param from 记录是哪个系统部件发出的买入指示
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
-     */
-    virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
-                                  double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
-                                  price_t planPrice = 0.0, SystemPart from = PART_INVALID) override;
-
-    /**
      * 借入资金，从其他来源借取的资金，如融资
      * @param datetime 借入时间
      * @param cash 借入的现金
@@ -338,7 +322,6 @@ private:
     bool _add_return_cash_tr(const TradeRecord&);
     bool _add_borrow_stock_tr(const TradeRecord&);
     bool _add_return_stock_tr(const TradeRecord&);
-    bool _add_sell_short_tr(const TradeRecord&);
 
 private:
     Datetime m_init_datetime;         // 账户建立日期

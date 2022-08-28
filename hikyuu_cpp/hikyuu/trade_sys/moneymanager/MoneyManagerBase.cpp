@@ -140,26 +140,10 @@ double MoneyManagerBase ::getBuyNumber(const Datetime& datetime, const Stock& st
     return n;
 }
 
-double MoneyManagerBase ::getSellShortNumber(const Datetime& datetime, const Stock& stock,
-                                             price_t price, price_t risk, SystemPart from) {
-    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk <= 0.0, 0.0,
-                        "risk is zero! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
-    return _getSellShortNumber(datetime, stock, price, risk, from);
-}
-
 double MoneyManagerBase::_getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                         price_t risk, SystemPart from) {
     //默认卖出全部
     return MAX_DOUBLE;
-}
-
-double MoneyManagerBase::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
-                                             price_t price, price_t risk, SystemPart from) {
-    return 0;
 }
 
 } /* namespace hku */
