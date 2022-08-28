@@ -479,6 +479,7 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
 }
 
 bool TradeManager::borrowCash(const Datetime& datetime, price_t cash) {
+    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_cash"), false, "Not support borrow cash!");
     HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0!", datetime, cash);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
@@ -494,6 +495,7 @@ bool TradeManager::borrowCash(const Datetime& datetime, price_t cash) {
 }
 
 bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
+    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_cash"), false, "Not support borrow cash!");
     HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0! ", datetime, cash);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
@@ -513,6 +515,8 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
 
 bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
                                double number) {
+    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_stock"), false,
+                        "Not support borrow stock!");
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkin Null stock!", datetime);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
@@ -565,6 +569,8 @@ bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, pri
 
 bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, double price,
                                double number) {
+    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_stock"), false,
+                        "Not support borrow stock!");
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkout Null stock!", datetime);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
@@ -769,7 +775,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
                         stock.market_code());
 
-    //对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
+    // 对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Sell number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
@@ -777,14 +783,28 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
                         "{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
 
-    //未持仓
-    position_map_type::iterator pos_iter = m_position.find(stock.id());
-    HKU_WARN_IF_RETURN(pos_iter == m_position.end(), result,
-                       "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})", datetime,
-                       stock.market_code(), datetime, realPrice, number, from);
-
-    //根据权息调整当前持仓情况
+    // 根据权息调整当前持仓情况
     updateWithWeight(datetime);
+
+    // 获取当前持仓
+    position_map_type::iterator pos_iter = m_position.find(stock.id());
+    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_stock") && pos_iter == m_position.end(),
+                        result, "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})",
+                        datetime, stock.market_code(), datetime, realPrice, number, from);
+
+    double current_position_num = 0.0;
+    if (getParam<bool>("support_borrow_stock")) {
+        current_position_num = pos_iter == m_position.end() ? 0.0 : pos_iter->second.number;
+        if (current_position_num < number) {
+            HKU_ERROR_IF_RETURN(
+              !borrowStock(datetime, stock, realPrice, number - current_position_num), result,
+              "Failed borrow stock");
+        }
+    }
+
+    if (pos_iter == m_position.end()) {
+        pos_iter = m_position.find(stock.id());
+    }
 
     PositionRecord& position = pos_iter->second;
 

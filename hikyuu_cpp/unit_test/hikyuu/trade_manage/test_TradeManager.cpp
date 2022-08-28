@@ -300,6 +300,7 @@ TEST_CASE("test_TradeManager_can_not_checkout") {
 /** @par 检测点 */
 TEST_CASE("test_TradeManager_can_not_borrowCash") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
+    tm->setParam<bool>("support_borrow_cash", true);
 
     /** @arg 试图存入的金额 <= 0 */
     CHECK_EQ(tm->borrowCash(Datetime(199901020000), 0), false);
@@ -315,7 +316,12 @@ TEST_CASE("test_TradeManager_can_not_borrowCash") {
 TEST_CASE("test_TradeManager_can_not_returnCash") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
+    // tm 不支持借入现金
+    tm->setParam<bool>("support_borrow_cash", false);
+    CHECK_EQ(tm->returnCash(Datetime(200001010000), 200), false);
+
     /** @arg 试图在最后交易日期前操作 */
+    tm->setParam<bool>("support_borrow_cash", true);
     tm->borrowCash(Datetime(200001020000), 50000);
     CHECK_EQ(tm->returnCash(Datetime(200001010000), 200), false);
 
@@ -407,6 +413,12 @@ TEST_CASE("test_TradeManager_can_not_returnStock") {
     Stock stock = sm.getStock("sh600000");
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
+    // tm 不支持借入股票
+    tm->setParam<bool>("support_borrow_stock", false);
+    CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10, 100), false);
+
+    // 正常借入股票
+    tm->setParam<bool>("support_borrow_stock", true);
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10, 100), true);
 
     /** @arg 试图归还的stock is null */
@@ -433,9 +445,13 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
 
-    Datetime cur_date, pre_date, next_date;
+    // tm 不支持借入现金
+    tm->setParam<bool>("support_borrow_cash", false);
+    CHECK_EQ(tm->borrowCash(Datetime(199911170000), 5000), false);
 
     /** @arg 19991117 借入5000, 分2次归还 */
+    Datetime cur_date, pre_date, next_date;
+    tm->setParam<bool>("support_borrow_cash", true);
     cur_date = Datetime(199911170000);
     pre_date = Datetime(199911160000);
     next_date = Datetime(199911180000);
@@ -532,8 +548,8 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     FundsRecord funds;
     TradeCostPtr tc = TC_TestStub();
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, tc);
-    tm->setParam<bool>("support_borrow_cash", false);
-    tm->setParam<bool>("support_borrow_stock", false);
+    tm->setParam<bool>("support_borrow_cash", true);
+    tm->setParam<bool>("support_borrow_stock", true);
 
     Datetime cur_date, pre_date, next_date;
 
