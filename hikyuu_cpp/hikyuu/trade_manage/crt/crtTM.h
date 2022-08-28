@@ -24,9 +24,11 @@ namespace hku {
  * @param name 账户名称，默认“SYS”
  * @see TradeManager
  */
-TradeManagerPtr HKU_API crtTM(const Datetime& datetime = Datetime(199001010000LL),
-                              price_t initcash = 100000.0, const TradeCostPtr& costfunc = TC_Zero(),
-                              const string& name = "SYS");
+inline TradeManagerPtr crtTM(const Datetime& datetime = Datetime(199001010000LL),
+                             price_t initcash = 100000.0, const TradeCostPtr& costfunc = TC_Zero(),
+                             const string& name = "SYS") {
+    return TradeManagerPtr(new TradeManager(datetime, initcash, costfunc, name));
+}
 
 }  // namespace hku
 
