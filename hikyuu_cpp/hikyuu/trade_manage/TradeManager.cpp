@@ -517,57 +517,71 @@ bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} Try to borrow number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(number <= 0.0, false, "{} {} Try to borrow number {:<.4f} < 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
     //根据权息调整当前持仓情况
     updateWithWeight(datetime);
 
-    //加入当前持仓
-    int precision = getParam<int>("precision");
-    price_t market_value = roundEx(price * number * stock.unit(), precision);
-    CostRecord cost = getBorrowStockCost(datetime, stock, price, number);
+    // 当前借入股票总价值
+    price_t market_value = price * number * stock.unit();
 
-    //更新现金，扣除借入时花费的成本
-    m_cash = roundEx(m_cash - cost.total, precision);
-
-    //加入交易记录
-    m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_BORROW_STOCK, price, price, 0.0,
-                                       number, cost, 0.0, m_cash, PART_INVALID));
-
-    //更新当前借入股票信息
+    // 更新当前借入股票信息
     borrow_stock_map_type::iterator iter = m_borrow_stock.find(stock.id());
     if (iter == m_borrow_stock.end()) {
         BorrowRecord record(stock, number, market_value);
-        BorrowRecord::Data data(datetime, price, number);
-        record.record_list.push_back(data);
-        m_borrow_stock[stock.id()] = record;
+        record.record_list.emplace_back(datetime, price, number);
+        m_borrow_stock[stock.id()] = std::move(record);
     } else {
         // iter->second.stock = stock;
         iter->second.number += number;
-        iter->second.value = roundEx(iter->second.value + market_value, precision);
-        BorrowRecord::Data data(datetime, price, number);
-        iter->second.record_list.push_back(data);
+        iter->second.value = iter->second.value + market_value;
+        iter->second.record_list.emplace_back(datetime, price, number);
     }
 
+    // 更新当前持仓记录
+    position_map_type::iterator pos_iter = m_position.find(stock.id());
+    if (pos_iter == m_position.end()) {
+        m_position[stock.id()] = PositionRecord(stock, datetime, Null<Datetime>(), number, 0.0, 0.0,
+                                                number, market_value, 0.0, 0.0, 0.0);
+    } else {
+        PositionRecord& pos = pos_iter->second;
+        pos.number += number;
+        // pos.stoploss 不变
+        pos.totalNumber += number;
+        pos.buyMoney = pos.buyMoney + market_value;
+        // pos.totalCost 不变
+        // pos.totalRisk 不变
+        // pos.sellMoney 不变
+    }
+
+    //加入交易记录
+    m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_BORROW_STOCK, price, price, 0.0,
+                                       number, CostRecord(), 0.0, m_cash, PART_INVALID));
     return true;
 }
 
-bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, price_t price,
+bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, double price,
                                double number) {
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkout Null stock!", datetime);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} return stock number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(number <= 0.0, false, "{} {} return stock number {:<.4f} < 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
     //根据权息调整当前持仓情况
     updateWithWeight(datetime);
+
+    // 检查当前仓位中是否存在足够可供归还的股票
+    position_map_type::iterator pos_iter = m_position.find(stock.id());
+    HKU_ERROR_IF_RETURN(pos_iter == m_position.end() || pos_iter->second.number < number, false,
+                        "{} {} Current position not have the stock or less number!", datetime,
+                        stock.market_code());
 
     //查询借入股票信息
     borrow_stock_map_type::iterator bor_iter = m_borrow_stock.find(stock.id());
@@ -584,61 +598,48 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
                         stock.market_code(), number, bor.number);
 
     //更新借入股票信息
-    int precision = getParam<int>("precision");
-    CostRecord cost, cur_cost;
-    price_t market_value = 0.0;
+    price_t return_value = 0.0;  // 被归还股票的总价值
     double remain_num = number;
     list<BorrowRecord::Data>::iterator iter = bor.record_list.begin();
-    for (; iter != bor.record_list.end(); ++iter) {
-        if (remain_num <= iter->number) {
-            cur_cost = getReturnStockCost(iter->datetime, datetime, stock, price, number);
-            market_value =
-              roundEx(market_value + iter->price * remain_num * stock.unit(), precision);
-            remain_num = 0;
-        } else {  // number > iter->number
-            cur_cost = getReturnStockCost(iter->datetime, datetime, stock, price, number);
-            market_value =
-              roundEx(market_value + iter->price * iter->number * stock.unit(), precision);
-            remain_num -= iter->number;
-        }
-
-        cost.commission = roundEx(cost.commission + cur_cost.commission, precision);
-        cost.stamptax = roundEx(cost.stamptax + cur_cost.stamptax, precision);
-        cost.transferfee = roundEx(cost.transferfee + cur_cost.transferfee, precision);
-        cost.others = roundEx(cost.others + cur_cost.others, precision);
-        cost.total = roundEx(cost.total + cur_cost.total, precision);
-        if (remain_num == 0)
-            break;
-    }
-
-    bor.number -= number;
-    bor.value = roundEx(bor.value - market_value, precision);
-
-    remain_num = number;
     do {
         iter = bor.record_list.begin();
         if (remain_num == iter->number) {
+            return_value += remain_num * iter->price;
             bor.record_list.pop_front();
             break;
         } else if (remain_num < iter->number) {
             iter->number -= remain_num;
+            return_value += remain_num * iter->price;
             break;
         } else {  // remain_num > iter->number
             remain_num -= iter->number;
+            return_value += iter->number * iter->price;
             bor.record_list.pop_front();
         }
     } while (!bor.record_list.empty());
 
     if (bor.record_list.empty()) {
         m_borrow_stock.erase(bor_iter);
+    } else {
+        bor.value -= return_value;
+        bor.number -= number;
     }
 
-    //更新现金，扣除归还时花费的成本
-    m_cash = roundEx(m_cash - cost.total, precision);
-
     //更新交易记录
-    m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_RETURN_STOCK, price, price, 0.0,
-                                       number, cost, 0.0, m_cash, PART_INVALID));
+    price_t return_price = return_value / number;
+    m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_RETURN_STOCK, return_price,
+                                       return_price, 0.0, number, CostRecord(), 0.0, m_cash,
+                                       PART_INVALID));
+
+    // 更新当前持仓记录
+    PositionRecord& pos = pos_iter->second;
+    pos.number -= number;
+    // pos.stoploss 不变
+    pos.totalNumber -= number;
+    pos.buyMoney -= return_value;
+    // pos.totalCost 不变
+    // pos.totalRisk 不变
+    // pos.sellMoney 不变
 
     return true;
 }
@@ -1037,11 +1038,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     price_t checkin_stock = 0.0;
     price_t checkout_stock = 0.0;
     map<uint64_t, Stock_Number> stock_map;
-    map<uint64_t, Stock_Number> short_stock_map;
     map<uint64_t, Stock_Number>::iterator stock_iter;
-    map<uint64_t, Stock_Number>::iterator short_stock_iter;
-    map<uint64_t, BorrowRecord> bor_stock_map;
-    map<uint64_t, BorrowRecord>::iterator bor_stock_iter;
 
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {
@@ -1119,57 +1116,24 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 break;
 
             case BUSINESS_BORROW_STOCK:
-                funds.borrow_asset =
-                  roundEx(funds.borrow_asset + iter->realPrice * iter->number * iter->stock.unit(),
-                          precision);
-                bor_stock_iter = bor_stock_map.find(iter->stock.id());
-                if (bor_stock_iter == bor_stock_map.end()) {
-                    BorrowRecord bor;
-                    BorrowRecord::Data data(iter->datetime, iter->realPrice, iter->number);
-                    bor.record_list.push_back(data);
-                    bor_stock_map[iter->stock.id()] = bor;
+                funds.borrow_asset += iter->realPrice * iter->number * iter->stock.unit();
+                stock_iter = stock_map.find(iter->stock.id());
+                if (stock_iter != stock_map.end()) {
+                    stock_iter->second.number += iter->number;
                 } else {
-                    BorrowRecord::Data data(iter->datetime, iter->realPrice, iter->number);
-                    bor_stock_iter->second.record_list.push_back(data);
+                    stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
                 }
                 break;
 
             case BUSINESS_RETURN_STOCK:
-                bor_stock_iter = bor_stock_map.find(iter->stock.id());
-                if (bor_stock_iter == bor_stock_map.end()) {
-                    HKU_WARN("{} {} Error return stock in m_trade_list!", iter->datetime,
-                             iter->stock.market_code());
-
+                funds.borrow_asset -= iter->realPrice * iter->number * iter->stock.unit();
+                stock_iter = stock_map.find(iter->stock.id());
+                if (stock_iter != stock_map.end()) {
+                    stock_iter->second.number -= iter->number;
                 } else {
-                    BorrowRecord& bor = bor_stock_iter->second;
-                    size_t remain_num = iter->number;
-                    do {
-                        list<BorrowRecord::Data>::iterator bor_iter = bor.record_list.begin();
-                        if (remain_num == bor_iter->number) {
-                            funds.borrow_asset -=
-                              roundEx(bor_iter->price * remain_num * iter->stock.unit(), precision);
-                            bor.record_list.pop_front();
-                            break;
-
-                        } else if (remain_num < bor_iter->number) {
-                            funds.borrow_asset -=
-                              roundEx(bor_iter->price * remain_num * iter->stock.unit(), precision);
-                            bor_iter->number -= remain_num;
-                            break;
-
-                        } else {  // remain_num > bor_iter->number
-                            funds.borrow_asset -= roundEx(
-                              bor_iter->price * bor_iter->number * iter->stock.unit(), precision);
-                            remain_num -= bor_iter->number;
-                            bor.record_list.pop_front();
-                        }
-                    } while (!bor.record_list.empty());
-
-                    if (bor.record_list.empty()) {
-                        bor_stock_map.erase(bor_stock_iter);
-                    }
+                    HKU_WARN("{} {} Sell error in m_trade_list!", datetime,
+                             iter->stock.market_code());
                 }
-
                 break;
 
             default:

@@ -28,6 +28,12 @@ public:
     BorrowRecord();
     BorrowRecord(const Stock&, double number, price_t value);
 
+    BorrowRecord(const BorrowRecord& other);
+    BorrowRecord(BorrowRecord&& other);
+
+    BorrowRecord& operator=(const BorrowRecord& other);
+    BorrowRecord& operator=(BorrowRecord&& other);
+
     Stock stock;
     double number;  //借入总数量
     price_t value;  //借入总价值
