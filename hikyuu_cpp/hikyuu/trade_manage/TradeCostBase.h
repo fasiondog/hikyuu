@@ -64,32 +64,6 @@ public:
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
                                    double num) const = 0;
 
-    /**
-     * 计算融劵借入成本
-     * @param datetime 融劵日期
-     * @param stock 借入的对象
-     * @param price 每股价格
-     * @param num 借入的数量
-     */
-    virtual CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock,
-                                          price_t price, double num) const {
-        return CostRecord();
-    }
-
-    /**
-     * 计算融劵归还成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param stock 归还的对象
-     * @param price 归还时每股价格
-     * @param num 归还的数量
-     */
-    virtual CostRecord getReturnStockCost(const Datetime& borrow_datetime,
-                                          const Datetime& return_datetime, const Stock& stock,
-                                          price_t price, double num) const {
-        return CostRecord();
-    }
-
     /** 继承子类必须实现私有变量的克隆接口 */
     virtual TradeCostPtr _clone() = 0;
 

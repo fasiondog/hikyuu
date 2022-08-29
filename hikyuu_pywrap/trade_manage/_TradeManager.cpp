@@ -169,9 +169,6 @@ void export_TradeManager() {
     :param float num:         卖出数量
     :rtype: CostRecord)")
 
-      //.def("getBorrowStockCost", &TradeManager::getBorrowStockCost)
-      //.def("getReturnStockCost", &TradeManager::getReturnStockCost)
-
       .def("cash", &TradeManagerBase::cash, (arg("datetime"), arg("ktype") = KQuery::DAY),
            R"(cash(self, datetime[, ktype=Query.KType.DAY])
 

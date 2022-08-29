@@ -30,35 +30,6 @@ public:
     TradeCostPtr _clone() {
         return this->get_override("_clone")();
     }
-
-    CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  double num) const {
-        if (override getBorrowStockCost = get_override("getBorrowStockCost")) {
-            return getBorrowStockCost(datetime, stock, price, num);
-        }
-        return TradeCostBase::getBorrowStockCost(datetime, stock, price, num);
-    }
-
-    CostRecord default_getBorrowStockCost(const Datetime& datetime, const Stock& stock,
-                                          price_t price, double num) const {
-        return this->TradeCostBase::getBorrowStockCost(datetime, stock, price, num);
-    }
-
-    CostRecord getReturnStockCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
-                                  const Stock& stock, price_t price, double num) const {
-        if (override getReturnStockCost = get_override("getReturnStockCost")) {
-            return getReturnStockCost(borrow_datetime, return_datetime, stock, price, num);
-        }
-        return TradeCostBase::getReturnStockCost(borrow_datetime, return_datetime, stock, price,
-                                                 num);
-    }
-
-    CostRecord default_getReturnStockCost(const Datetime& borrow_datetime,
-                                          const Datetime& return_datetime, const Stock& stock,
-                                          price_t price, double num) const {
-        return this->TradeCostBase::getReturnStockCost(borrow_datetime, return_datetime, stock,
-                                                       price, num);
-    }
 };
 
 void export_TradeCost() {
@@ -120,10 +91,6 @@ void export_TradeCost() {
         :param int num: 卖出数量
         :return: 交易成本记录
         :rtype: CostRecord)")
-
-      //.def("getBorrowStockCost", &TradeCostBase::getBorrowStockCost,
-      //&TradeCostWrap::default_getBorrowStockCost) .def("getReturnStockCost",
-      //&TradeCostBase::getReturnStockCost, &TradeCostWrap::default_getReturnStockCost)
 
       .def("_clone", pure_virtual(&TradeCostBase::_clone), "【重载接口】子类克隆接口")
 

@@ -96,34 +96,6 @@ public:
         return m_costfunc ? m_costfunc->getSellCost(datetime, stock, price, num) : CostRecord();
     }
 
-    /**
-     * 计算融劵借入成本
-     * @param datetime 融劵日期
-     * @param stock 借入的对象
-     * @param price 每股价格
-     * @param num 借入的数量
-     */
-    CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                  double num) {
-        return m_costfunc ? m_costfunc->getBorrowStockCost(datetime, stock, price, num)
-                          : CostRecord();
-    }
-
-    /**
-     * 计算融劵归还成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param stock 归还的对象
-     * @param price 归还时每股价格
-     * @param num 归还的数量
-     */
-    CostRecord getReturnStockCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
-                                  const Stock& stock, price_t price, double num) {
-        return m_costfunc ? m_costfunc->getReturnStockCost(borrow_datetime, return_datetime, stock,
-                                                           price, num)
-                          : CostRecord();
-    }
-
     /** 从哪个时刻开始启动订单代理进行下单操作   */
     Datetime getBrokerLastDatetime() const {
         return m_broker_last_datetime;

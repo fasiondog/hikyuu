@@ -1247,6 +1247,28 @@ void TradeManager::_saveAction(const TradeRecord& record) {
                 << record.planPrice << sep << record.from << ")";
             break;
 
+        case BUSINESS_BORROW_CASH:
+            buf << my_tm << "borrowCash(Datetime('" << record.datetime.str() << "'), "
+                << record.realPrice << ")";
+            break;
+
+        case BUSINESS_RETURN_CASH:
+            buf << my_tm << "returnCash(Datetime('" << record.datetime.str() << "'), "
+                << record.realPrice << ")";
+            break;
+
+        case BUSINESS_BORROW_STOCK:
+            buf << my_tm << "borrowStock(Datetime('" << record.datetime.str() << "'), "
+                << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
+                << record.number << ")";
+            break;
+
+        case BUSINESS_RETURN_STOCK:
+            buf << my_tm << "returnStock(Datetime('" << record.datetime.str() << "'), "
+                << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
+                << record.number << ")";
+            break;
+
         default:
             break;
     }
