@@ -34,7 +34,8 @@ public:
     virtual ~TradeCostBase();
 
     typedef shared_ptr<TradeCostBase> TradeCostPtr;
-    /** 克隆操作   */
+
+    /** 克隆操作 */
     TradeCostPtr clone();
 
     /** 获取名称 */

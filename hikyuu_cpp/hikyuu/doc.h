@@ -65,6 +65,10 @@
  * @details 交易成本算法，如A股成本计算（印花税/佣金等）
  * @ingroup TradeManager
  *
+ * @defgroup TradeMargin TradeMaigin 保证金比率算法
+ * 获取指定交易标的要求的保证金比例
+ * @ingroup TradeManager
+ *
  * @defgroup TradeManagerClass TradeManager 交易管理类
  * 交易管理可理解为一个模拟账户进行模拟交易。一般使用 crtTM 创建交易管理实例。
  * @ingroup TradeManager

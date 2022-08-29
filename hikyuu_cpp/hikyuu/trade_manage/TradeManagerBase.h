@@ -96,6 +96,14 @@ public:
         return m_costfunc ? m_costfunc->getSellCost(datetime, stock, price, num) : CostRecord();
     }
 
+    /**
+     * @brief 获取保证金比例
+     * @return double
+     */
+    double getMarginRatio() const {
+        return 0.0;
+    }
+
     /** 从哪个时刻开始启动订单代理进行下单操作   */
     Datetime getBrokerLastDatetime() const {
         return m_broker_last_datetime;
@@ -193,6 +201,17 @@ public:
      * @note 如果不带日期参数，无法根据权息信息调整持仓
      */
     virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
+        HKU_WARN("The subclass does not implement this method");
+        return 0.0;
+    }
+
+    /**
+     * @brief 获取指定日期的可用现金
+     * @param datetime 指定日期
+     * @param ktype K线类型
+     * @return price_t
+     */
+    virtual price_t getAvailabeCash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
