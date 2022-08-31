@@ -68,8 +68,8 @@ string TradeManager::str() const {
 }
 
 TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const TradeCostPtr& costfunc,
-                           const string& name)
-: TradeManagerBase(name, costfunc),
+                           const MarginRatioPtr& mrfunc, const string& name)
+: TradeManagerBase(name, costfunc, mrfunc),
   m_init_datetime(datetime),
   m_last_update_datetime(datetime),
   m_checkout_cash(0.0),
@@ -114,7 +114,7 @@ void TradeManager::_reset() {
 }
 
 TradeManagerPtr TradeManager::_clone() {
-    TradeManager* p = new TradeManager(m_init_datetime, m_init_cash, m_costfunc, m_name);
+    TradeManager* p = new TradeManager(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc, m_name);
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_init_datetime = m_init_datetime;

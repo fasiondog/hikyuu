@@ -130,7 +130,8 @@ bool Portfolio::_readyForRun() {
     m_pro_sys_list = m_se->getProtoSystemList();
 
     // 获取所有备选子系统，为无关联账户的子系统分配子账号，对所有子系统做好启动准备
-    TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "TM_SUB");
+    TMPtr pro_tm =
+      crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), m_tm->marginRatioFunc(), "TM_SUB");
     size_t total = m_pro_sys_list.size();
     for (size_t i = 0; i < total; i++) {
         SystemPtr& pro_sys = m_pro_sys_list[i];

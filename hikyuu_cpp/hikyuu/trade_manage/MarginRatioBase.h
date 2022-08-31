@@ -41,6 +41,13 @@ public:
         return m_name;
     }
 
+    /**
+     * @brief 获取指定标的的保证金比例
+     * @param datetime 指定日期
+     * @param stk 指定标的
+     */
+    virtual double getMarginRatio(Datetime datetime, const Stock& stk) const = 0;
+
     /** 继承子类必须实现私有变量的克隆接口 */
     virtual MarginRatioPtr _clone() = 0;
 
@@ -95,6 +102,7 @@ private:                                                          \
  * @ingroup TradeMargin
  */
 typedef shared_ptr<MarginRatioBase> MarginRatioPtr;
+typedef shared_ptr<MarginRatioBase> MRPtr;
 
 HKU_API std::ostream& operator<<(std::ostream&, const MarginRatioBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const MarginRatioPtr&);

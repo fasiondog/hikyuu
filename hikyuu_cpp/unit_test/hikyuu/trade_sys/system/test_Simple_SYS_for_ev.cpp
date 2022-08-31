@@ -42,7 +42,7 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
 
     //构建系统部件
-    TMPtr tm = crtTM(init_date, init_cash, costfunc, "TEST_TM");
+    TMPtr tm = crtTM(init_date, init_cash, costfunc, MR_Fixed(0.0), "TEST_TM");
     SGPtr sg = SG_Cross(MA(5), MA(10), "CLOSE");
     MMPtr mm = MM_FixedCount(100);
     STPtr st = ST_FixedPercent(0.01);
@@ -260,7 +260,9 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_LT(std::fabs(tr_list[3].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[3].from, PART_ENVIRONMENT);
 
-    /** @arg 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、不触发建仓），但未指定其他策略组件，非延迟操作 */
+    /** @arg
+     * 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、不触发建仓），但未指定其他策略组件，非延迟操作
+     */
     sys = SYS_Simple();
     sys->setParam<bool>("delay", false);
     sys->setParam<bool>("ev_open_position", false);
@@ -302,7 +304,9 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_LT(std::fabs(tr_list[2].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[2].from, PART_SIGNAL);
 
-    /** @arg 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、触发建仓），但未指定其他策略组件，非延迟操作 */
+    /** @arg
+     * 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、触发建仓），但未指定其他策略组件，非延迟操作
+     */
     sys = SYS_Simple();
     sys->setParam<bool>("delay", false);
     sys->setParam<bool>("ev_open_position", true);

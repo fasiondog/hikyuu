@@ -54,7 +54,7 @@ static string getHttpClientErrorMsg(httplib::Error err) {
 }
 
 AccountTradeManager::AccountTradeManager(const string& name, const string& pwd)
-: TradeManagerBase(name, TC_Zero()),
+: TradeManagerBase(name, TC_Zero(), MR_Fixed(0.0)),
   m_client(std::make_unique<httplib::Client>(HKU_SERVER_URL)),
   m_user(name),
   m_password(pwd) {

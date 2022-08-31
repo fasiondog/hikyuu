@@ -28,8 +28,8 @@ TEST_CASE("test_TradeManager_init") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
-    TradeManagerPtr tm =
-      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000,
+                               TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), MR_Fixed(0.0), "TEST");
 
     CHECK_EQ(tm->name(), "TEST");
     CHECK_EQ(tm->initCash(), 100000.0);
@@ -54,8 +54,8 @@ TEST_CASE("test_TradeManager_getBuyCost") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
-    TradeManagerPtr tm =
-      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000,
+                               TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), MR_Fixed(0.0), "TEST");
 
     /** @arg 调用CostFunc是否正常 */
     result = tm->getBuyCost(Datetime(200101010000), stock, 10.0, 1000);
@@ -95,35 +95,35 @@ TEST_CASE("test_TradeManager_can_not_buy") {
     TradeRecordList trade_list;
 
     /** @arg 账户初始余额为0，未进行过交易，忽略权息信息 */
-    tm = crtTM(Datetime(199901010000), 0, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 0, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911180000), stock, 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 账户初始余额为100000，试图对Null<Stock>进行操作 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911180000), Null<Stock>(), 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
     CHECK_EQ(tm->cash(Datetime(199911180000)), 100000);
 
     /** @arg 试图在初始建仓日之前买入 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199001010000), stock, 26.36, 100, 0, 26.36, 26.36);
     CHECK_EQ(result, Null<TradeRecord>());
 
 #if 0  //取消了该限制
     /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但指定日期该证券不能进行交易，如非交易日 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911130000), stock, 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格超出当日最高价 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
 #endif
 
     /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格等于当日最高价 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0, 27.18, 27.18);
     cost = tm->getBuyCost(Datetime(199911170000), stock, 27.18, 100);
     trade = TradeRecord(stock, Datetime(199911170000), BUSINESS_BUY, 27.18, 27.18, 27.18, 100, cost,
@@ -136,38 +136,38 @@ TEST_CASE("test_TradeManager_can_not_buy") {
 
 #if 0
     /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格低于当日最低价 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 26.36, 100, 0, 26.36, 26.36);
     CHECK_EQ(result, Null<TradeRecord>());
 #endif
 
     /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格等于当日最低价 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911160000), stock, 26.48, 100, 0, 26.48, 26.48);
     cost = tm->getBuyCost(Datetime(199911160000), stock, 26.48, 100);
     CHECK_EQ(result, TradeRecord(stock, Datetime(199911160000), BUSINESS_BUY, 26.48, 26.48, 26.48,
                                  100, cost, 0.0, 100000 - cost.total - 26.48 * 100, PART_INVALID));
 
     /** @arg 试图在最后一笔交易时间之前进行交易 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 26.48, 100, 0, 26.48, 26.48);
     CHECK_UNARY(!(result == Null<TradeRecord>()));
     result = tm->buy(Datetime(199911160000), stock, 26.48, 100, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 试图买入数量为0的股票 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 26.48, 0, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 买入数量小于该股票的最小交易量 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result =
       tm->buy(Datetime(199911170000), stock, 26.48, stock.minTradeNumber() - 1, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 买入数量大于该股票的最大交易量 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result =
       tm->buy(Datetime(199911170000), stock, 26.48, stock.maxTradeNumber() - 1, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
@@ -185,58 +185,58 @@ TEST_CASE("test_TradeManager_can_not_sell") {
     TradeRecordList trade_list;
 
     /** @arg 账户初始余额为0，未进行过交易，忽略权息信息 */
-    tm = crtTM(Datetime(199901010000), 0, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 0, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->sell(Datetime(199911180000), stock, 27.2, 100);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 账户初始余额为100000，试图对Null<Stock>进行操作 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->sell(Datetime(199911180000), Null<Stock>(), 27.2, 100);
     CHECK_EQ(result, Null<TradeRecord>());
     CHECK_EQ(tm->cash(Datetime(199911180000)), 100000);
 
     /** @arg 试图在最后一个交易日之前卖出 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199801010000), stock, 26.36, 100);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 卖出的数量等于0 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, 0);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 卖出的数量小于最小交易数量 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, stock.minTradeNumber() - 1);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 卖出的数量大于最大交易数量 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, stock.maxTradeNumber() + 1);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 卖出未持仓的股票 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->sell(Datetime(199901020000), stock, 26.36, 100);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 卖出的数量大于当前持仓数量 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, 101);
     CHECK_EQ(result, Null<TradeRecord>());
 
     /** @arg 忽略权息信息，将买入股票全部卖出 */
-    tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
+    tm = crtTM(Datetime(199901010000), 100000, costfunc, MR_Fixed(0.0), "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0, 27.18, 27.18);
     cost = tm->getBuyCost(Datetime(199911170000), stock, 27.18, 100);
     CHECK_EQ(result, TradeRecord(stock, Datetime(199911170000), BUSINESS_BUY, 27.18, 27.18, 27.18,
@@ -254,7 +254,7 @@ TEST_CASE("test_TradeManager_can_not_sell") {
     CHECK_EQ(tm->cash(Datetime(199911180000)), 99903.36);
 
     /** @arg 不忽略权息信息，对股票进行买卖操作，忽略买卖成本 */
-    tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "SYS");
+    tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), MR_Fixed(0.0), "SYS");
     tm->buy(Datetime(199911170000), stock, 27.18, 1000, 0);
     CHECK_EQ(tm->cash(Datetime(199911170000)), 972820);
     tm->sell(Datetime(200605150000), stock, 10.2, 100);
@@ -816,7 +816,7 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
     tm->buy(Datetime(199407110000L), stk, 8.55, 200);
     tr_list = tm->getTradeList();
 
-    TMPtr tm2 = crtTM(Datetime(199101010000), 100000, TC_Zero(), "TM2");
+    TMPtr tm2 = crtTM(Datetime(199101010000), 100000, TC_Zero(), MR_Fixed(0.0), "TM2");
     CHECK_NE(tm->initDatetime(), tm2->initDatetime());
     for (auto iter = tr_list.begin(); iter != tr_list.end(); ++iter) {
         tm2->addTradeRecord(*iter);

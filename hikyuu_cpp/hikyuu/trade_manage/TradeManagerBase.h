@@ -15,6 +15,7 @@
 #include "TradeCostBase.h"
 #include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
+#include "crt/MR_Fixed.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/nvp.hpp>
@@ -36,10 +37,13 @@ class HKU_API TradeManagerBase {
     PARAMETER_SUPPORT
 
 public:
-    TradeManagerBase() : TradeManagerBase("", TC_Zero()) {}
+    TradeManagerBase() : TradeManagerBase("", TC_Zero(), MR_Fixed(0.0)) {}
 
-    TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
-    : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
+    TradeManagerBase(const string& name, const TradeCostPtr& costFunc, const MarginRatioPtr& mrFunc)
+    : m_name(name),
+      m_costfunc(costFunc),
+      m_mrfunc(mrFunc),
+      m_broker_last_datetime(Datetime::now()) {
         setParam<int>("precision", 2);  //计算精度
     }
 
@@ -68,6 +72,16 @@ public:
     /** 设置交易成本算法指针 */
     void costFunc(const TradeCostPtr& func) {
         m_costfunc = func;
+    }
+
+    /** 设置保证金比例算法 */
+    MarginRatioPtr marginRatioFunc() const {
+        return m_mrfunc;
+    }
+
+    /** 获取保证金比例算法 */
+    void marginRatioFunc(const MarginRatioPtr& func) {
+        m_mrfunc = func;
     }
 
     /**
@@ -100,8 +114,8 @@ public:
      * @brief 获取保证金比例
      * @return double
      */
-    double getMarginRatio() const {
-        return 0.0;
+    double getMarginRatio(const Datetime& datetime, const Stock& stk) const {
+        return m_mrfunc ? m_mrfunc->getMarginRatio(datetime, stk) : 0.0;
     }
 
     /** 从哪个时刻开始启动订单代理进行下单操作   */
@@ -508,6 +522,7 @@ public:
 protected:
     string m_name;            // 账户名称
     TradeCostPtr m_costfunc;  // 成本算法
+    MarginRatioPtr m_mrfunc;  // 保证金比例算法
 
     Datetime m_broker_last_datetime;  // 订单代理最近一次执行操作的时刻,当前启动运行时间
     list<OrderBrokerPtr> m_broker_list;  // 订单代理列表
@@ -523,6 +538,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        ar& BOOST_SERIALIZATION_NVP(m_mrfunc);
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
     }
@@ -532,6 +548,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_costfunc);
+        ar& BOOST_SERIALIZATION_NVP(m_mrfunc);
         ar& BOOST_SERIALIZATION_NVP(m_broker_last_datetime);
         ar& BOOST_SERIALIZATION_NVP(m_broker_list);
     }

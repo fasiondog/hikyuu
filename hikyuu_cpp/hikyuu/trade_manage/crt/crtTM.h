@@ -21,13 +21,14 @@ namespace hku {
  * @param datetime 账户建立日期, 默认1990-1-1
  * @param initcash 初始现金，默认100000
  * @param costfunc 交易成本算法,默认零成本算法
+ * @param mrfunc 保证金比例算法，默认比例 0
  * @param name 账户名称，默认“SYS”
  * @see TradeManager
  */
 inline TradeManagerPtr crtTM(const Datetime& datetime = Datetime(199001010000LL),
                              price_t initcash = 100000.0, const TradeCostPtr& costfunc = TC_Zero(),
-                             const string& name = "SYS") {
-    return TradeManagerPtr(new TradeManager(datetime, initcash, costfunc, name));
+                             const MRPtr& mrfunc = MR_Fixed(0.0), const string& name = "SYS") {
+    return TradeManagerPtr(new TradeManager(datetime, initcash, costfunc, mrfunc, name));
 }
 
 }  // namespace hku
