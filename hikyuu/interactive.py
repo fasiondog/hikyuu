@@ -94,6 +94,7 @@ ini = configparser.ConfigParser()
 ini.read(config_file)
 hku_param = Parameter()
 hku_param["tmpdir"] = ini.get('hikyuu', 'tmpdir')
+hku_param["datadir"] = ini.get('hikyuu', 'datadir')
 if ini.has_option('hikyuu', 'logger'):
     hku_param["logger"] = ini['hikyuu']['logger']
 

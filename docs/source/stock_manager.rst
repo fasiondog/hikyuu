@@ -145,6 +145,10 @@ StockManager/Block/Stock
     .. py:method:: tmpdir(self)
     
         获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定
+
+    .. py:method:: datadir(self)
+
+        获取财务数据目录
     
     .. py:method:: get_market_list(self)
     
