@@ -30,7 +30,8 @@ from hikyuu.util import *
 
 
 class ImportHistoryFinanceTask:
-    def __init__(self, queue, dest_dir):
+    def __init__(self, log_queue, queue, dest_dir):
+        self.log_queue = log_queue
         self.queue = queue
         self.dest_dir = dest_dir + '/downloads/finance'
         if not os.path.lexists(self.dest_dir):
@@ -75,9 +76,10 @@ class ImportHistoryFinanceTask:
         with open(dest_file_name, 'wb') as f:
             f.write(data)
         shutil.unpack_archive(dest_file_name, extract_dir=self.dest_dir)
-        hku_info(f"Download file: {filename}")
+        hku_info(f"Download finance file: {filename}")
 
     def __call__(self):
+        capture_multiprocess_all_logger(self.log_queue)
         self.connect()
         data_list = self.get_list_info()
         total_count = len(data_list)

@@ -637,9 +637,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 #elif msg[2] == '导入通达信财务信息完毕!':
                 #    self.import_detail_textEdit.append('导入通达信财务记录数：{}'.format(msg[3]))
 
-            #elif msg_task_name == 'IMPORT_FINANCE':
-            #    if msg[2] != 'FINISHED':
-            #        self.finance_progressBar.setValue(msg[2])
+            elif msg_task_name == 'IMPORT_FINANCE':
+                # self.finance_progressBar.setValue(msg[2])
+                self.logger.info(f"财务数据下载: {msg[2]}%")
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
