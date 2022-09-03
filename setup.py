@@ -276,9 +276,7 @@ def test(all, compile, verbose, mode, case, j):
             '' if case == '' else '--test-case={}'.format(case)))
 
 
-@click.command()
-@click.option("-with_boost", "--with_boost", is_flag=True, help='清除相应的BOOST库')
-def clear(with_boost):
+def clear_build(with_boost):
     """ 清除当前编译设置及结果 """
     if os.path.lexists('.xmake'):
         print('delete .xmake')
@@ -300,8 +298,18 @@ def clear(with_boost):
                    or (len(name) > 6 and name[-6:] == '.dylib'):
                 print('delete', r + '/' + name)
                 os.remove(os.path.join(r, name))
+    if with_boost:
+        _, boost_lib_dir = get_boost_envrionment()
+        if os.path.lexists(boost_lib_dir):
+            shutil.rmtree(boost_lib_dir)
     print('clear finished!')
     os.system("xmake clean")
+
+
+@click.command()
+@click.option("-with_boost", "--with_boost", is_flag=True, help='清除相应的BOOST库')
+def clear(with_boost):
+    clear_build(with_boost)
 
 
 @click.command()
@@ -346,25 +354,11 @@ def install():
 @click.option('-j', '--j', default=2, help="并行编译数量")
 def wheel(j):
     """ 生成 python 的 wheel 安装包 """
+    # 清理之前遗留的打包产物
+    clear_build(with_boost=True)
+
     # 尝试编译
     start_build(False, 'release', j)
-
-    # 清理之前遗留的打包产物
-    print("Clean up the before papackaging outputs ...")
-    py_version = get_python_version()
-    if os.path.lexists('Hikyuu.egg-info'):
-        shutil.rmtree('Hikyuu.egg-info')
-    if os.path.lexists('build/lib'):
-        shutil.rmtree('build/lib')
-    if os.path.lexists('build'):
-        for bdist in os.listdir('build'):
-            if len(bdist) >= 5 and bdist[:5] == 'bdist' and os.path.lexists(
-                    bdist):
-                shutil.rmtree(bdist)
-    for x in os.listdir('hikyuu'):
-        if x[:12] == 'boost_python':
-            if x[12:14] != str(py_version):
-                os.remove('hikyuu/{}'.format(x))
 
     # 构建打包命令
     print("start pacakaging bdist_wheel ...")
@@ -385,6 +379,8 @@ def wheel(j):
     else:
         print("*********尚未实现该平台的支持*******")
         return
+
+    py_version = get_python_version()
     if current_plat == 'win32':
         cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
             py_version, plat)
