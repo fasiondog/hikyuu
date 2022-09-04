@@ -25,22 +25,23 @@ class HKU_API PositionRecord {
 public:
     PositionRecord() = default;
     PositionRecord(const Stock& stock, const Datetime& takeDatetime, const Datetime& cleanDatetime,
-                   double number, price_t stoploss, price_t goalPrice, price_t buyMoney,
-                   price_t totalCost, price_t totalRisk, price_t sellMoney);
+                   double number, price_t stoploss, price_t goalPrice, double totalNumber,
+                   price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney);
 
     /** 仅用于python的__str__ */
     string toString() const;
 
     void addTradeRecord(const TradeRecord& tr);
 
-    Stock stock;              ///< 交易对象
-    Datetime takeDatetime;    ///< 初次建仓日期
-    Datetime cleanDatetime;   ///< 平仓日期，当前持仓记录中为Null<Datetime>()
-    double number = 0.0;      ///< 当前持仓数量
-    price_t stoploss = 0.0;   ///< 当前止损价
-    price_t goalPrice = 0.0;  ///< 当前的目标价格
-    price_t buyMoney = 0.0;   ///< 累计买入资金
-    price_t totalCost = 0.0;  ///< 累计交易总成本
+    Stock stock;               ///< 交易对象
+    Datetime takeDatetime;     ///< 初次建仓日期
+    Datetime cleanDatetime;    ///< 平仓日期，当前持仓记录中为Null<Datetime>()
+    double number = 0.0;       ///< 当前持仓数量
+    price_t stoploss = 0.0;    ///< 当前止损价
+    price_t goalPrice = 0.0;   ///< 当前的目标价格
+    double totalNumber = 0.0;  ///< 累计持仓数量
+    price_t buyMoney = 0.0;    ///< 累计买入资金
+    price_t totalCost = 0.0;   ///< 累计交易总成本
     price_t totalRisk = 0.0;  ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     price_t sellMoney = 0.0;  ///< 累计卖出资金
 
@@ -65,6 +66,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(goalPrice);
+        ar& BOOST_SERIALIZATION_NVP(totalNumber);
         ar& BOOST_SERIALIZATION_NVP(buyMoney);
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);
@@ -83,6 +85,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(goalPrice);
+        ar& BOOST_SERIALIZATION_NVP(totalNumber);
         ar& BOOST_SERIALIZATION_NVP(buyMoney);
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);
@@ -100,7 +103,10 @@ typedef vector<PositionRecord> PositionRecordList;
  * 输出持仓记录信息
  * @ingroup TradeManagerClass
  */
-HKU_API std::ostream& operator<<(std::ostream&, const PositionRecord&);
+inline std::ostream& operator<<(std::ostream& os, const PositionRecord& pos) {
+    os << pos.toString();
+    return os;
+}
 
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2);
 

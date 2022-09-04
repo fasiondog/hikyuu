@@ -71,6 +71,7 @@ TEST_CASE("test_TradeRecord_export") {
     record1.number = 1000;
     record1.stoploss = 9.77;
     record1.cash = 99998.1;
+    record1.margin_ratio = 0.1;
     record1.from = PART_SIGNAL;
     {
         std::ofstream ofs(filename);
@@ -103,6 +104,7 @@ TEST_CASE("test_PositionRecord_export") {
     record1.number = 1000;
     record1.stoploss = 10.11;
     record1.goalPrice = 11.13;
+    record1.totalNumber = 2000;
     record1.buyMoney = 22000;
     record1.totalCost = 23.1;
     record1.totalRisk = 9.77;

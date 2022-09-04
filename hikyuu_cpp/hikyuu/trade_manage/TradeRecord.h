@@ -23,16 +23,14 @@ namespace hku {
  * @ingroup TradeManagerClass
  */
 enum BUSINESS {
-    BUSINESS_INIT = 0,           /**< 建立初始账户 */
-    BUSINESS_BUY = 1,            /**< 买入 */
-    BUSINESS_SELL = 2,           /**< 卖出 */
-    BUSINESS_GIFT = 3,           /**< 送股 */
-    BUSINESS_BONUS = 4,          /**< 分红 */
-    BUSINESS_CHECKIN = 5,        /**< 存入现金 */
-    BUSINESS_CHECKOUT = 6,       /**< 取出现金 */
-    BUSINESS_CHECKIN_STOCK = 7,  /**< 存入股票资产 */
-    BUSINESS_CHECKOUT_STOCK = 8, /**< 取出股票资产 */
-    BUSINESS_INVALID = 13        /**< 无效类型 */
+    BUSINESS_INIT = 0,     /**< 建立初始账户 */
+    BUSINESS_BUY = 1,      /**< 买入 */
+    BUSINESS_SELL = 2,     /**< 卖出 */
+    BUSINESS_GIFT = 3,     /**< 送股 */
+    BUSINESS_BONUS = 4,    /**< 分红 */
+    BUSINESS_CHECKIN = 5,  /**< 存入现金 */
+    BUSINESS_CHECKOUT = 6, /**< 取出现金 */
+    BUSINESS_INVALID = 13  /**< 无效类型 */
 };
 
 /**
@@ -52,27 +50,28 @@ BUSINESS HKU_API getBusinessEnum(const string&);
  */
 class HKU_API TradeRecord {
 public:
-    TradeRecord();
+    TradeRecord() = default;
     TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business, price_t planPrice,
                 price_t realPrice, price_t goalPrice, double number, const CostRecord& cost,
-                price_t stoploss, price_t cash, SystemPart from);
+                price_t stoploss, price_t cash, double margin_ratio, SystemPart from);
 
     /** 仅用于python的__str__ */
     string toString() const;
 
     bool isNull() const;
 
-    Stock stock;        ///< 交易对象
-    Datetime datetime;  ///< 交易日期
-    BUSINESS business;  ///< 业务类型
-    price_t planPrice;  ///< 计划交易价格
-    price_t realPrice;  ///< 实际交易价格
-    price_t goalPrice;  ///< 目标价位，如果为0表示未限定目标
-    double number;      ///< 成交数量
-    CostRecord cost;    ///< 交易成本
-    price_t stoploss;   ///< 止损价
-    price_t cash;       ///< 现金余额
-    SystemPart from;  ///< 辅助记录交易系统部件，区别是哪个部件发出的指示，Null<int>()表示无效
+    Stock stock;                           ///< 交易对象
+    Datetime datetime;                     ///< 交易日期
+    BUSINESS business = BUSINESS_INVALID;  ///< 业务类型
+    price_t planPrice = 0.0;               ///< 计划交易价格
+    price_t realPrice = 0.0;               ///< 实际交易价格
+    price_t goalPrice = 0.0;               ///< 目标价位，如果为0表示未限定目标
+    double number = 0.0;                   ///< 成交数量
+    CostRecord cost;                       ///< 交易成本
+    price_t stoploss = 0.0;                ///< 止损价
+    price_t cash = 0.0;                    ///< 现金余额
+    double margin_ratio = 1.0;             ///< 保证金比例
+    SystemPart from = PART_INVALID;  ///< 辅助记录交易系统部件，区别是哪个部件发出的指示
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -92,6 +91,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
+        ar& BOOST_SERIALIZATION_NVP(margin_ratio);
         string part_name(getSystemPartName(from));
         ar& bs::make_nvp<string>("from", part_name);
     }
@@ -113,6 +113,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
+        ar& BOOST_SERIALIZATION_NVP(margin_ratio);
         string part_name;
         ar& bs::make_nvp<string>("from", part_name);
         from = getSystemPartEnum(part_name);
@@ -131,7 +132,10 @@ typedef vector<TradeRecord> TradeRecordList;
  * 输出TradeRecord信息
  * @ingroup TradeManagerClass
  */
-HKU_API std::ostream& operator<<(std::ostream&, const TradeRecord&);
+inline std::ostream& operator<<(std::ostream& os, const TradeRecord& tr) {
+    os << tr.toString();
+    return os;
+}
 
 bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2);
 

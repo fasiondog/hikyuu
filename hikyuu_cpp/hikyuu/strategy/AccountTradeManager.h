@@ -148,35 +148,6 @@ public:
     }
 
     /**
-     * 存入资产
-     * @param datetime 存入日期
-     * @param stock 待存入的股票
-     * @param price 存入股票的每股价格
-     * @param number 存入股票的数量
-     * @return true | false
-     */
-    virtual bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
-                              double number) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
-    }
-
-    /**
-     * 取出当前资产
-     * @param datetime 取出日期
-     * @param stock 待取出的股票
-     * @param price 取出的每股价格
-     * @param number 取出的数量
-     * @return true | false
-     * @note 应该不会被用到
-     */
-    virtual bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
-                               double number) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
-    }
-
-    /**
      * 买入操作
      * @param datetime 买入时间
      * @param stock 买入的证券

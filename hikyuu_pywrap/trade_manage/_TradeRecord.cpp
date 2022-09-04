@@ -26,8 +26,6 @@ void export_TradeRecord() {
       .value("BONUS", BUSINESS_BONUS)
       .value("CHECKIN", BUSINESS_CHECKIN)
       .value("CHECKOUT", BUSINESS_CHECKOUT)
-      .value("CHECKIN_STOCK", BUSINESS_CHECKIN_STOCK)
-      .value("CHECKOUT_STOCK", BUSINESS_CHECKOUT_STOCK)
       .value("INVALID", BUSINESS_INVALID);
 
     def("get_business_name", getBusinessName, R"(get_business_name(business)
@@ -38,7 +36,7 @@ void export_TradeRecord() {
 
     class_<TradeRecord>("TradeRecord", "交易记录", init<>())
       .def(init<const Stock&, const Datetime&, BUSINESS, price_t, price_t, price_t, double,
-                const CostRecord&, price_t, price_t, SystemPart>())
+                const CostRecord&, price_t, price_t, double, SystemPart>())
 
       .def("__str__", &TradeRecord::toString)
       .def("__repr__", &TradeRecord::toString)
@@ -56,6 +54,7 @@ void export_TradeRecord() {
       .def_readwrite("cost", &TradeRecord::cost, "交易成本")
       .def_readwrite("stoploss", &TradeRecord::stoploss, "止损价（float）")
       .def_readwrite("cash", &TradeRecord::cash, "现金余额（float）")
+      .def_readwrite("margin_ratio", &TradeRecord::margin_ratio, "保证金比例")
       .def_readwrite("part", &TradeRecord::from,
                      "交易指示来源，区别是交易系统哪个部件发出的指示，参见： "
                      ":py:class:`System.Part`")  // python中不能用from关键字

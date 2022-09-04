@@ -226,9 +226,6 @@ void export_TradeManager() {
     :param float cash: 取出的资金量
     :rtype: TradeRecord)")
 
-      //.def("checkinStock", &TradeManager::checkinStock)
-      //.def("checkoutStock", &TradeManager::checkoutStock)
-
       .def(
         "buy", &TradeManagerBase::buy,
         (arg("datetime"), arg("stock"), arg("real_price"), arg("num"), arg("stoploss") = 0.0,

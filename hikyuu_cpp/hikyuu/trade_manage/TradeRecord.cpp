@@ -27,10 +27,6 @@ string HKU_API getBusinessName(BUSINESS business) {
             return "CHECKIN";
         case BUSINESS_CHECKOUT:
             return "CHECKOUT";
-        case BUSINESS_CHECKIN_STOCK:
-            return "CHECKIN_STOCK";
-        case BUSINESS_CHECKOUT_STOCK:
-            return "CHECKOUT_STOCK";
         default:
             return "UNKNOWN";
     }
@@ -54,29 +50,16 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
         business = BUSINESS_CHECKIN;
     } else if (business_name == "CHECKOUT") {
         business = BUSINESS_CHECKOUT;
-    } else if (business_name == "CHECKIN_STOCK") {
-        return BUSINESS_CHECKIN_STOCK;
-    } else if (business_name == "CHECKOUT_STOCK") {
-        return BUSINESS_CHECKOUT_STOCK;
     } else {
         business = BUSINESS_INVALID;
     }
     return business;
 }
 
-TradeRecord::TradeRecord()
-: business(BUSINESS_INVALID),
-  planPrice(0.0),
-  realPrice(0.0),
-  goalPrice(0.0),
-  number(0.0),
-  stoploss(0.0),
-  cash(0.0),
-  from(PART_INVALID) {}
-
 TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business,
                          price_t planPrice, price_t realPrice, price_t goalPrice, double number,
-                         const CostRecord& cost, price_t stoploss, price_t cash, SystemPart from)
+                         const CostRecord& cost, price_t stoploss, price_t cash,
+                         double margin_ratio, SystemPart from)
 : stock(stock),
   datetime(datetime),
   business(business),
@@ -87,38 +70,8 @@ TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS 
   cost(cost),
   stoploss(stoploss),
   cash(cash),
+  margin_ratio(margin_ratio),
   from(from) {}
-
-HKU_API std::ostream& operator<<(std::ostream& os, const TradeRecord& record) {
-    Stock stock = record.stock;
-    string market_code(""), name("");
-    if (!stock.isNull()) {
-        market_code = stock.market_code();
-        name = stock.name();
-    }
-
-    string strip(", ");
-    os << std::fixed;
-    os.precision(4);
-    os << "Trade(" << record.datetime << strip << market_code << strip << name << strip
-       << getBusinessName(record.business) << strip << record.planPrice << strip
-       << record.realPrice;
-
-    if (std::isnan(record.goalPrice)) {
-        os << strip << "NULL";
-    } else {
-        os << strip << record.goalPrice;
-    }
-
-    os << strip << record.number << strip << record.cost.commission << strip << record.cost.stamptax
-       << strip << record.cost.transferfee << strip << record.cost.others << strip
-       << record.cost.total << strip << record.stoploss << strip << record.cash << strip
-       << getSystemPartName(record.from) << ")";
-
-    os.unsetf(std::ostream::floatfield);
-    os.precision();
-    return os;
-}
 
 string TradeRecord::toString() const {
     string market_code(""), name("");
@@ -143,7 +96,8 @@ string TradeRecord::toString() const {
 
     os << strip << goalPrice << strip << number << strip << cost.commission << strip
        << cost.stamptax << strip << cost.transferfee << strip << cost.others << strip << cost.total
-       << strip << stoploss << strip << cash << strip << getSystemPartName(from) << ")";
+       << strip << stoploss << strip << cash << strip << margin_ratio << strip
+       << getSystemPartName(from) << ")";
 
     os.unsetf(std::ostream::floatfield);
     os.precision();
