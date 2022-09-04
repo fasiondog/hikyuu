@@ -9,8 +9,7 @@
 #ifndef POSITIONRECORD_H_
 #define POSITIONRECORD_H_
 
-#include "../StockManager.h"
-#include "../serialization/Stock_serialization.h"
+#include "TradeRecord.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/split_member.hpp>
@@ -24,25 +23,30 @@ namespace hku {
  */
 class HKU_API PositionRecord {
 public:
-    PositionRecord();
+    PositionRecord() = default;
     PositionRecord(const Stock& stock, const Datetime& takeDatetime, const Datetime& cleanDatetime,
-                   double number, price_t stoploss, price_t goalPrice, double totalNumber,
-                   price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney);
+                   double number, price_t stoploss, price_t goalPrice, price_t buyMoney,
+                   price_t totalCost, price_t totalRisk, price_t sellMoney);
 
     /** 仅用于python的__str__ */
     string toString() const;
 
-    Stock stock;             ///< 交易对象
-    Datetime takeDatetime;   ///< 初次建仓日期
-    Datetime cleanDatetime;  ///< 平仓日期，当前持仓记录中为Null<Datetime>()
-    double number;           ///< 当前持仓数量
-    price_t stoploss;        ///< 当前止损价
-    price_t goalPrice;       ///< 当前的目标价格
-    double totalNumber;      ///< 累计持仓数量
-    price_t buyMoney;        ///< 累计买入资金
-    price_t totalCost;       ///< 累计交易总成本
-    price_t totalRisk;  ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
-    price_t sellMoney;  ///< 累计卖出资金
+    void addTradeRecord(const TradeRecord& tr);
+
+    Stock stock;              ///< 交易对象
+    Datetime takeDatetime;    ///< 初次建仓日期
+    Datetime cleanDatetime;   ///< 平仓日期，当前持仓记录中为Null<Datetime>()
+    double number = 0.0;      ///< 当前持仓数量
+    price_t stoploss = 0.0;   ///< 当前止损价
+    price_t goalPrice = 0.0;  ///< 当前的目标价格
+    price_t buyMoney = 0.0;   ///< 累计买入资金
+    price_t totalCost = 0.0;  ///< 累计交易总成本
+    price_t totalRisk = 0.0;  ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
+    price_t sellMoney = 0.0;  ///< 累计卖出资金
+
+private:
+    bool m_isShort = false;           // 是否空头仓位
+    std::list<TradeRecord> m_trList;  // 记录对应买卖交易记录
 
 //===================
 //序列化支持
@@ -61,7 +65,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(goalPrice);
-        ar& BOOST_SERIALIZATION_NVP(totalNumber);
         ar& BOOST_SERIALIZATION_NVP(buyMoney);
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);
@@ -80,7 +83,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(number);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(goalPrice);
-        ar& BOOST_SERIALIZATION_NVP(totalNumber);
         ar& BOOST_SERIALIZATION_NVP(buyMoney);
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);

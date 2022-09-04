@@ -28,10 +28,6 @@ void export_TradeRecord() {
       .value("CHECKOUT", BUSINESS_CHECKOUT)
       .value("CHECKIN_STOCK", BUSINESS_CHECKIN_STOCK)
       .value("CHECKOUT_STOCK", BUSINESS_CHECKOUT_STOCK)
-      .value("BORROW_CASH", BUSINESS_BORROW_CASH)
-      .value("RETURN_CASH", BUSINESS_RETURN_CASH)
-      .value("BORROW_STOCK", BUSINESS_BORROW_STOCK)
-      .value("RETURN_STOCK", BUSINESS_RETURN_STOCK)
       .value("INVALID", BUSINESS_INVALID);
 
     def("get_business_name", getBusinessName, R"(get_business_name(business)

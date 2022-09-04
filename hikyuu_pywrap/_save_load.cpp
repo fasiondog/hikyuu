@@ -48,7 +48,6 @@ void registerSupportClass() {
     g_support_class_dict[typeid(Parameter).hash_code()] = "Parameter";
     g_support_class_dict[typeid(Indicator).hash_code()] = "Indicator";
 
-    g_support_class_dict[typeid(BorrowRecord).hash_code()] = "BorrowRecord";
     g_support_class_dict[typeid(CostRecord).hash_code()] = "CostRecord";
     g_support_class_dict[typeid(FundsRecord).hash_code()] = "FundsRecord";
     g_support_class_dict[typeid(PositionRecord).hash_code()] = "PositionRecord";
@@ -183,9 +182,6 @@ void export_save_load() {
 
     def("hku_save", xml_save<Indicator>);
     def("hku_load", xml_load<Indicator>);
-
-    def("hku_save", xml_save<BorrowRecord>);
-    def("hku_load", xml_load<BorrowRecord>);
 
     def("hku_save", xml_save<CostRecord>);
     def("hku_load", xml_load<CostRecord>);

@@ -15,7 +15,6 @@ void export_build_in();
 void export_PositionRecord();
 void export_TradeRecord();
 void export_FundsRecord();
-void export_BorrowRecord();
 void export_TradeManager();
 void export_Performance();
 void export_OrderBroker();
@@ -26,7 +25,6 @@ void export_trade_manage_main() {
     export_TradeCost();
     export_TradeRecord();
     export_FundsRecord();
-    export_BorrowRecord();
     export_OrderBroker();
     export_TradeManager();
     export_Performance();

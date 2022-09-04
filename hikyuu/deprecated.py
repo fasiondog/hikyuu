@@ -362,7 +362,6 @@ Portfolio.__getattr__ = Portfolio_getattr
         'takeDatetime': 'take_datetime',
         'cleanDatetime': 'clean_datetime',
         'goalPrice': 'goal_price',
-        'totalNumber': 'total_number',
         'buyMoney': 'buy_money',
         'totalCost': 'total_cost',
         'totalRisk': 'total_risk',

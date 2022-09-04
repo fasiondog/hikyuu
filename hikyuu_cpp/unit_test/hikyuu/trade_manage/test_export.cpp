@@ -103,7 +103,6 @@ TEST_CASE("test_PositionRecord_export") {
     record1.number = 1000;
     record1.stoploss = 10.11;
     record1.goalPrice = 11.13;
-    record1.totalNumber = 2000;
     record1.buyMoney = 22000;
     record1.totalCost = 23.1;
     record1.totalRisk = 9.77;
@@ -206,35 +205,6 @@ TEST_CASE("test_FundsRecord_export") {
     }
 
     CHECK_EQ(funds1, funds2);
-}
-
-/** @par 检测点 */
-TEST_CASE("test_BorrowRecord_export") {
-    StockManager& sm = StockManager::instance();
-    string filename(sm.tmpdir());
-    filename += "/BorrowRecord.xml";
-
-    Stock stock = sm.getStock("sh000001");
-    BorrowRecord bor1;
-    bor1.stock = stock;
-    bor1.number = 2000;
-    bor1.value = 22000;
-    {
-        std::ofstream ofs(filename);
-        boost::archive::xml_oarchive oa(ofs);
-        oa << BOOST_SERIALIZATION_NVP(bor1);
-    }
-
-    BorrowRecord bor2;
-    {
-        std::ifstream ifs(filename);
-        boost::archive::xml_iarchive ia(ifs);
-        ia >> BOOST_SERIALIZATION_NVP(bor2);
-    }
-
-    CHECK_EQ(bor1.stock, bor2.stock);
-    CHECK_EQ(bor1.number, bor2.number);
-    CHECK_EQ(bor1.value, bor2.value);
 }
 
 /** @} */

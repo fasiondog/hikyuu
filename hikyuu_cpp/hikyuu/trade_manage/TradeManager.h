@@ -14,7 +14,6 @@
 #include "../utilities/util.h"
 #include "TradeRecord.h"
 #include "PositionRecord.h"
-#include "BorrowRecord.h"
 #include "FundsRecord.h"
 #include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
@@ -109,12 +108,6 @@ public:
     /** 获取指定时刻的某证券持有数量 */
     virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) override;
 
-    /** 获取指定时刻已借入的股票数量 */
-    virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) override;
-
-    /** 获取指定时刻已借入的现金额 */
-    virtual price_t getBorrowCash(const Datetime& datetime) override;
-
     /** 获取全部交易记录 */
     virtual TradeRecordList getTradeList() const override {
         return m_trade_list;
@@ -142,9 +135,6 @@ public:
      * @param stock 指定的证券
      */
     virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) override;
-
-    /** 获取当前借入的股票列表 */
-    virtual BorrowRecordList getBorrowStockList() const override;
 
     /**
      * 存入资金
@@ -219,44 +209,6 @@ public:
                              SystemPart from = PART_INVALID) override;
 
     /**
-     * 借入资金，从其他来源借取的资金，如融资
-     * @param datetime 借入时间
-     * @param cash 借入的现金
-     * @return true | false
-     */
-    virtual bool borrowCash(const Datetime& datetime, price_t cash) override;
-
-    /**
-     * 归还资金
-     * @param datetime 归还日期
-     * @param cash 归还现金
-     * @return true | false
-     */
-    virtual bool returnCash(const Datetime& datetime, price_t cash) override;
-
-    /**
-     * 借入证券
-     * @param datetime 借入时间
-     * @param stock 借入的stock
-     * @param price 借入时单股价格
-     * @param number 借入时数量
-     * @return true | false
-     */
-    virtual bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) override;
-
-    /**
-     * 归还证券
-     * @param datetime 归还时间
-     * @param stock 归还的stock
-     * @param price 归还时单股价格
-     * @param number 归还数量
-     * @return true | false
-     */
-    virtual bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) override;
-
-    /**
      * 获取账户当前时刻的资产详情
      * @param ktype 日期的类型
      * @return 资产详情
@@ -319,10 +271,6 @@ private:
     bool _add_checkout_tr(const TradeRecord&);
     bool _add_checkin_stock_tr(const TradeRecord&);
     bool _add_checkout_stock_tr(const TradeRecord&);
-    bool _add_borrow_cash_tr(const TradeRecord&);
-    bool _add_return_cash_tr(const TradeRecord&);
-    bool _add_borrow_stock_tr(const TradeRecord&);
-    bool _add_return_stock_tr(const TradeRecord&);
 
 private:
     Datetime m_init_datetime;         // 账户建立日期
@@ -335,21 +283,12 @@ private:
     price_t m_checkout_cash;   //累计取出自有资金
     price_t m_checkin_stock;   //累计存入股票价值
     price_t m_checkout_stock;  //累计取出股票价值
-    price_t m_borrow_cash;     //当前借入资金，负债
-
-    typedef map<uint64_t, BorrowRecord> borrow_stock_map_type;
-    borrow_stock_map_type m_borrow_stock;  //当前借入的股票及其数量
 
     TradeRecordList m_trade_list;  //交易记录
 
     typedef map<uint64_t, PositionRecord> position_map_type;
     position_map_type m_position;  //当前持仓交易对象的持仓记录 ["sh000001"-> ]
-    PositionRecordList m_position_history;        //持仓历史记录
-    position_map_type m_short_position;           //空头仓位记录
-    PositionRecordList m_short_position_history;  //空头仓位历史记录
-
-    // list<OrderBrokerPtr> m_broker_list;  //订单代理列表
-    // Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
+    PositionRecordList m_position_history;  //持仓历史记录
 
     list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易
 
@@ -369,10 +308,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_checkout_cash);
         ar& BOOST_SERIALIZATION_NVP(m_checkin_stock);
         ar& BOOST_SERIALIZATION_NVP(m_checkout_stock);
-        ar& BOOST_SERIALIZATION_NVP(m_borrow_cash);
         namespace bs = boost::serialization;
-        BorrowRecordList borrow = getBorrowStockList();
-        ar& bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);
         PositionRecordList position = getPositionList();
         ar& bs::make_nvp<PositionRecordList>("m_position", position);
         ar& BOOST_SERIALIZATION_NVP(m_position_history);
@@ -390,14 +326,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_checkout_cash);
         ar& BOOST_SERIALIZATION_NVP(m_checkin_stock);
         ar& BOOST_SERIALIZATION_NVP(m_checkout_stock);
-        ar& BOOST_SERIALIZATION_NVP(m_borrow_cash);
         namespace bs = boost::serialization;
-        BorrowRecordList borrow;
-        ar& bs::make_nvp<BorrowRecordList>("m_borrow_stock", borrow);
-        BorrowRecordList::const_iterator bor_iter = borrow.begin();
-        for (; bor_iter != borrow.end(); ++bor_iter) {
-            m_borrow_stock[bor_iter->stock.id()] = *bor_iter;
-        }
         PositionRecordList position;
         ar& bs::make_nvp<PositionRecordList>("m_position", position);
         PositionRecordList::const_iterator iter = position.begin();

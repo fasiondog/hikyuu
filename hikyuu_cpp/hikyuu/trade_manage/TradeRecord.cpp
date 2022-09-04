@@ -31,14 +31,6 @@ string HKU_API getBusinessName(BUSINESS business) {
             return "CHECKIN_STOCK";
         case BUSINESS_CHECKOUT_STOCK:
             return "CHECKOUT_STOCK";
-        case BUSINESS_BORROW_CASH:
-            return "BORROW_CASH";
-        case BUSINESS_RETURN_CASH:
-            return "RETURN_CASH";
-        case BUSINESS_BORROW_STOCK:
-            return "BORROW_STOCK";
-        case BUSINESS_RETURN_STOCK:
-            return "RETURN_STOCK";
         default:
             return "UNKNOWN";
     }
@@ -66,14 +58,6 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
         return BUSINESS_CHECKIN_STOCK;
     } else if (business_name == "CHECKOUT_STOCK") {
         return BUSINESS_CHECKOUT_STOCK;
-    } else if (business_name == "BORROW_CASH") {
-        return BUSINESS_BORROW_CASH;
-    } else if (business_name == "RETURN_CASH") {
-        return BUSINESS_RETURN_CASH;
-    } else if (business_name == "BORROW_STOCK") {
-        return BUSINESS_BORROW_STOCK;
-    } else if (business_name == "RETURN_STOCK") {
-        return BUSINESS_RETURN_STOCK;
     } else {
         business = BUSINESS_INVALID;
     }

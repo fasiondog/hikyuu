@@ -32,10 +32,6 @@ enum BUSINESS {
     BUSINESS_CHECKOUT = 6,       /**< 取出现金 */
     BUSINESS_CHECKIN_STOCK = 7,  /**< 存入股票资产 */
     BUSINESS_CHECKOUT_STOCK = 8, /**< 取出股票资产 */
-    BUSINESS_BORROW_CASH = 9,    /**< 借入资金 */
-    BUSINESS_RETURN_CASH = 10,   /**< 归还资金 */
-    BUSINESS_BORROW_STOCK = 11,  /**< 借入股票资产 */
-    BUSINESS_RETURN_STOCK = 12,  /**< 归还股票资产 */
     BUSINESS_INVALID = 13        /**< 无效类型 */
 };
 

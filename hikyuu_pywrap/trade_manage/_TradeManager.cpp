@@ -228,10 +228,6 @@ void export_TradeManager() {
 
       //.def("checkinStock", &TradeManager::checkinStock)
       //.def("checkoutStock", &TradeManager::checkoutStock)
-      //.def("borrowCash", &TradeManager::borrowCash)
-      //.def("returnCash", &TradeManager::returnCash)
-      //.def("borrowStock", &TradeManager::borrowStock)
-      //.def("returnStock", &TradeManager::returnStock)
 
       .def(
         "buy", &TradeManagerBase::buy,

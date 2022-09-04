@@ -31,9 +31,7 @@ string TradeManager::str() const {
        << strip << "  TradeCostFunc: " << costFunc() << strip << "  current cash: " << currentCash()
        << strip << "  current market_value: " << funds.market_value << strip
        << "  current base_cash: " << funds.base_cash << strip
-       << "  current base_asset: " << funds.base_asset << strip
-       << "  current borrow_cash: " << funds.borrow_cash << strip
-       << "  current borrow_asset: " << funds.borrow_asset << strip << "  Position: \n";
+       << "  current base_asset: " << funds.base_asset << strip << "  Position: \n";
 
     StockManager& sm = StockManager::instance();
     KQuery query(-1);
@@ -52,14 +50,6 @@ string TradeManager::str() const {
            << 100 * bonus / m_init_cash << "%\n";
     }
 
-    os << "  Borrow Stock: \n";
-    BorrowRecordList borrow = getBorrowStockList();
-    BorrowRecordList::const_iterator bor_iter = borrow.begin();
-    for (; bor_iter != borrow.end(); ++bor_iter) {
-        os << "    " << bor_iter->number << " " << bor_iter->value << " "
-           << bor_iter->stock.toString() << "\n";
-    }
-
     os << "}";
 
     os.unsetf(std::ostream::floatfield);
@@ -72,13 +62,15 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
 : TradeManagerBase(name, costfunc, mrfunc),
   m_init_datetime(datetime),
   m_last_update_datetime(datetime),
+  m_frozen_cash(0.0),
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
-  m_checkout_stock(0.0),
-  m_borrow_cash(0.0) {
-    setParam<bool>("support_borrow_cash", false);   //是否自动融资
-    setParam<bool>("support_borrow_stock", false);  //是否自动融券
-    setParam<bool>("save_action", true);            //是否保存命令
+  m_checkout_stock(0.0) {
+    setParam<bool>("support_borrow_cash", false);   // 是否自动融资
+    setParam<bool>("support_borrow_stock", false);  // 是否自动融券
+    setParam<bool>("support_short", false);         // 是否支持做空
+    setParam<bool>("auto_checkin", false);  // 可用资金不足时，是否自动存入资金
+    setParam<bool>("save_action", true);    // 是否保存命令
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -94,13 +86,11 @@ TradeManager::~TradeManager() {}
 void TradeManager::_reset() {
     m_last_update_datetime = m_init_datetime;
     m_cash = m_init_cash;
+    m_frozen_cash = 0.0;
     m_checkin_cash = m_init_cash;
     m_checkout_cash = 0.0;
     m_checkin_stock = 0.0;
     m_checkout_stock = 0.0;
-    m_borrow_cash = 0.0;
-
-    m_borrow_stock.clear();
 
     m_trade_list.clear();
     m_trade_list.push_back(TradeRecord(Null<Stock>(), m_init_datetime, BUSINESS_INIT, m_init_cash,
@@ -125,12 +115,11 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_costfunc = m_costfunc;
 
     p->m_cash = m_cash;
+    p->m_frozen_cash = m_frozen_cash;
     p->m_checkin_cash = m_checkin_cash;
     p->m_checkout_cash = m_checkout_cash;
     p->m_checkin_stock = m_checkin_stock;
     p->m_checkout_stock = m_checkout_stock;
-    p->m_borrow_cash = m_borrow_cash;
-    p->m_borrow_stock = m_borrow_stock;
     p->m_trade_list = m_trade_list;
     p->m_position = m_position;
     p->m_position_history = m_position_history;
@@ -194,61 +183,6 @@ double TradeManager::getHoldNumber(const Datetime& datetime, const Stock& stock)
         }
     }
     return number;
-}
-
-double TradeManager::getDebtNumber(const Datetime& datetime, const Stock& stock) {
-    HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
-
-    //根据权息信息调整持仓数量
-    updateWithWeight(datetime);
-
-    if (datetime >= lastDatetime()) {
-        borrow_stock_map_type::const_iterator bor_iter;
-        bor_iter = m_borrow_stock.find(stock.id());
-        if (bor_iter != m_borrow_stock.end()) {
-            return bor_iter->second.number;
-        }
-        return 0;
-    }
-
-    double debt_n = 0;
-    TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for (; iter != m_trade_list.end(); ++iter) {
-        if (iter->datetime > datetime) {
-            break;
-        }
-        if (iter->stock == stock) {
-            if (iter->business == BUSINESS_BORROW_STOCK) {
-                debt_n += iter->number;
-            } else if (iter->business == BUSINESS_RETURN_STOCK) {
-                debt_n -= iter->number;
-            }
-        }
-    }
-    return debt_n;
-}
-
-price_t TradeManager::getBorrowCash(const Datetime& datetime) {
-    HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
-
-    //根据权息信息调整持仓数量
-    updateWithWeight(datetime);
-
-    HKU_IF_RETURN(datetime >= lastDatetime(), m_borrow_cash);
-
-    price_t debt_cash = 0.0;
-    TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for (; iter != m_trade_list.end(); ++iter) {
-        if (iter->datetime > datetime) {
-            break;
-        }
-        if (iter->business == BUSINESS_BORROW_CASH) {
-            debt_cash += iter->realPrice;
-        } else if (iter->business == BUSINESS_RETURN_CASH) {
-            debt_cash -= iter->realPrice;
-        }
-    }
-    return debt_cash;
 }
 
 TradeRecordList TradeManager::getTradeList(const Datetime& start_date,
@@ -343,15 +277,6 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
     return result;
 }
 
-BorrowRecordList TradeManager::getBorrowStockList() const {
-    BorrowRecordList result;
-    borrow_stock_map_type::const_iterator iter = m_borrow_stock.begin();
-    for (; iter != m_borrow_stock.end(); ++iter) {
-        result.push_back(iter->second);
-    }
-    return result;
-}
-
 bool TradeManager::checkin(const Datetime& datetime, price_t cash) {
     HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.3f}) must be > 0! ", datetime, cash);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
@@ -411,12 +336,11 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     if (pos_iter == m_position.end()) {
         m_position[stock.id()] = PositionRecord(stock, datetime, Null<Datetime>(), number, 0.0, 0.0,
-                                                number, market_value, 0.0, 0.0, 0.0);
+                                                market_value, 0.0, 0.0, 0.0);
     } else {
         PositionRecord& pos = pos_iter->second;
         pos.number += number;
         // pos.stoploss 不变
-        pos.totalNumber += number;
         pos.buyMoney = roundEx(pos.buyMoney + market_value, precision);
         // pos.totalCost 不变
         // pos.totalRisk 不变
@@ -477,186 +401,6 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
     return true;
 }
 
-bool TradeManager::borrowCash(const Datetime& datetime, price_t cash) {
-    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_cash"), false, "Not support borrow cash!");
-    HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0!", datetime, cash);
-    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
-                        "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
-
-    //根据权息调整当前持仓情况
-    updateWithWeight(datetime);
-
-    int precision = getParam<int>("precision");
-    m_cash = roundEx(m_cash + cash, precision);
-    m_borrow_cash = roundEx(m_borrow_cash + cash, precision);
-    m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_BORROW_CASH, cash, cash,
-                                       0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID));
-    return true;
-}
-
-bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
-    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_cash"), false, "Not support borrow cash!");
-    HKU_ERROR_IF_RETURN(cash <= 0.0, false, "{} cash({:<.4f}) must be > 0! ", datetime, cash);
-    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
-                        "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
-    HKU_ERROR_IF_RETURN(cash > m_borrow_cash, false,
-                        "{} return cash ({}) must <= borrow cash ({})!", datetime, cash,
-                        m_borrow_cash);
-
-    //根据权息调整当前持仓情况
-    updateWithWeight(datetime);
-
-    int precision = getParam<int>("precision");
-    m_cash = roundEx(m_cash - cash, precision);
-    m_borrow_cash = roundEx(m_borrow_cash - cash, precision);
-    m_trade_list.push_back(TradeRecord(Null<Stock>(), datetime, BUSINESS_RETURN_CASH, cash, cash,
-                                       0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID));
-    return true;
-}
-
-bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
-                               double number) {
-    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_stock"), false,
-                        "Not support borrow stock!");
-    HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkin Null stock!", datetime);
-    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
-                        "{} {} datetime must be >= lastDatetime({})!", datetime,
-                        stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number <= 0.0, false, "{} {} Try to borrow number {:<.4f} < 0!", datetime,
-                        stock.market_code(), number);
-    HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
-                        stock.market_code(), price);
-
-    //根据权息调整当前持仓情况
-    updateWithWeight(datetime);
-
-    // 当前借入股票总价值
-    int precision = getParam<int>("precision");
-    price_t market_value = roundEx(price * number * stock.unit(), precision);
-
-    // 更新当前借入股票信息
-    borrow_stock_map_type::iterator iter = m_borrow_stock.find(stock.id());
-    if (iter == m_borrow_stock.end()) {
-        BorrowRecord record(stock, number, market_value);
-        record.record_list.emplace_back(datetime, price, number);
-        m_borrow_stock[stock.id()] = std::move(record);
-    } else {
-        // iter->second.stock = stock;
-        iter->second.number += number;
-        iter->second.value = iter->second.value + market_value;
-        iter->second.record_list.emplace_back(datetime, price, number);
-    }
-
-    // 更新当前持仓记录
-    position_map_type::iterator pos_iter = m_position.find(stock.id());
-    if (pos_iter == m_position.end()) {
-        m_position[stock.id()] = PositionRecord(stock, datetime, Null<Datetime>(), number, 0.0, 0.0,
-                                                number, market_value, 0.0, 0.0, 0.0);
-    } else {
-        PositionRecord& pos = pos_iter->second;
-        pos.number += number;
-        // pos.stoploss 不变
-        pos.totalNumber += number;
-        pos.buyMoney = roundEx(pos.buyMoney + market_value, precision);
-        // pos.totalCost 不变
-        // pos.totalRisk 不变
-        // pos.sellMoney 不变
-    }
-
-    //加入交易记录
-    m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_BORROW_STOCK, price, price, 0.0,
-                                       number, CostRecord(), 0.0, m_cash, PART_INVALID));
-    return true;
-}
-
-bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, double price,
-                               double number) {
-    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_stock"), false,
-                        "Not support borrow stock!");
-    HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkout Null stock!", datetime);
-    HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
-                        "{} {} datetime must be >= lastDatetime({})!", datetime,
-                        stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number <= 0.0, false, "{} {} return stock number {:<.4f} < 0!", datetime,
-                        stock.market_code(), number);
-    HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
-                        stock.market_code(), price);
-
-    //根据权息调整当前持仓情况
-    updateWithWeight(datetime);
-
-    // 检查当前仓位中是否存在足够可供归还的股票
-    position_map_type::iterator pos_iter = m_position.find(stock.id());
-    HKU_ERROR_IF_RETURN(pos_iter == m_position.end() || pos_iter->second.number < number, false,
-                        "{} {} Current position not have the stock or less number!", datetime,
-                        stock.market_code());
-
-    //查询借入股票信息
-    borrow_stock_map_type::iterator bor_iter = m_borrow_stock.find(stock.id());
-
-    //并未借入股票
-    HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), false,
-                        "{} {} Try to return nonborrowed stock! ", datetime, stock.market_code());
-
-    BorrowRecord& bor = bor_iter->second;
-
-    //欲归还的数量大于借入的数量
-    HKU_ERROR_IF_RETURN(number > bor.number, false,
-                        "{} {} Try to return number({}) > borrow number({})!", datetime,
-                        stock.market_code(), number, bor.number);
-
-    //更新借入股票信息
-    int precision = getParam<int>("precision");
-    price_t return_value = 0.0;  // 被归还股票的总价值
-    double remain_num = number;
-    list<BorrowRecord::Data>::iterator iter = bor.record_list.begin();
-    do {
-        iter = bor.record_list.begin();
-        if (remain_num == iter->number) {
-            return_value += remain_num * iter->price;
-            bor.record_list.pop_front();
-            break;
-        } else if (remain_num < iter->number) {
-            iter->number -= remain_num;
-            return_value += remain_num * iter->price;
-            break;
-        } else {  // remain_num > iter->number
-            remain_num -= iter->number;
-            return_value += iter->number * iter->price;
-            bor.record_list.pop_front();
-        }
-    } while (!bor.record_list.empty());
-
-    if (bor.record_list.empty()) {
-        m_borrow_stock.erase(bor_iter);
-    } else {
-        bor.value -= return_value;
-        bor.number -= number;
-    }
-
-    //更新交易记录
-    price_t return_price = return_value / number;
-    m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_RETURN_STOCK, return_price,
-                                       return_price, 0.0, number, CostRecord(), 0.0, m_cash,
-                                       PART_INVALID));
-
-    // 更新当前持仓记录
-    PositionRecord& pos = pos_iter->second;
-    pos.number -= number;
-    if (pos.number == 0.0) {
-        m_position.erase(stock.id());
-    } else {
-        // pos.stoploss 不变
-        pos.totalNumber -= number;
-        pos.buyMoney = roundEx(pos.buyMoney - return_value, precision);
-        // pos.totalCost 不变
-        // pos.totalRisk 不变
-        // pos.sellMoney 不变
-    }
-
-    return true;
-}
-
 TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                               double number, price_t stoploss, price_t goalPrice, price_t planPrice,
                               SystemPart from) {
@@ -701,35 +445,27 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     // 根据权息调整当前持仓情况
     updateWithWeight(datetime);
 
+    // 获取精度、买入成本、保证金比例
     int precision = getParam<int>("precision");
-
-    // 计算买入成本
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
+    double margin_ratio = getMarginRatio(datetime, stock);
 
-    // 计算交易需要的现金（不含成本）
-    price_t money = realPrice * number * stock.unit();
-    price_t total_need_money = money + cost.total;
+    // 计算交易需要的资金（不含成本）
+    price_t money = roundEx(realPrice * number * stock.unit(), precision);
+    price_t frozen_margin = roundEx(money * margin_ratio, precision);
+    price_t total_need_money = frozen_margin + cost.total;
 
-    // 如果当前买入需要的总金额大于当前账户现金且支持借入资金（相当于买空），计算需要借入的资金并执行借入操作
-    if (total_need_money > m_cash && getParam<bool>("support_borrow_cash")) {
-        // 设：
-        //   买入需要的钱(不含买入成本)：money
-        //   买入成本: cost
-        //   当前账户现金: cash
-        //   借入资金: X
-        // 则有:
-        //   money + cost <= cash + X
-        //   ==> (money + cost - cash) <= X
-        // 需借入资金
-        borrowCash(datetime, total_need_money - m_cash);
+    // 如果当前买入需要的总金额大于当前可用现金
+    if (total_need_money > m_cash) {
+        HKU_WARN_IF_RETURN(!getParam<bool>("auto_checkin"), result,
+                           "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
+                           stock.market_code(), total_need_money, m_cash);
+        checkin(datetime, roundUp(total_need_money - m_cash, precision));
     }
-
-    HKU_WARN_IF_RETURN(m_cash < total_need_money, result,
-                       "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
-                       stock.market_code(), total_need_money, m_cash);
 
     //更新现金
     m_cash = roundEx(m_cash - total_need_money, precision);
+    m_frozen_cash += frozen_margin;
 
     //加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
@@ -740,14 +476,13 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     if (pos_iter == m_position.end()) {
         m_position[stock.id()] = PositionRecord(
-          stock, datetime, Null<Datetime>(), number, stoploss, goalPrice, number, money, cost.total,
+          stock, datetime, Null<Datetime>(), number, stoploss, goalPrice, money, cost.total,
           roundEx((realPrice - stoploss) * number * stock.unit(), precision), 0.0);
     } else {
         PositionRecord& position = pos_iter->second;
         position.number += number;
         position.stoploss = stoploss;
         position.goalPrice = goalPrice;
-        position.totalNumber += number;
         position.buyMoney = roundEx(money + position.buyMoney, precision);
         position.totalCost = roundEx(cost.total + position.totalCost, precision);
         position.totalRisk =
@@ -765,16 +500,6 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     }
 
     _saveAction(result);
-
-    // 归还借入的股票
-    if (getParam<bool>("support_borrow_stock")) {
-        borrow_stock_map_type::iterator iter = m_borrow_stock.find(stock.id());
-        if (iter != m_borrow_stock.end()) {
-            double return_num = iter->second.number >= number ? number : iter->second.number;
-            returnStock(datetime, stock, realPrice, return_num);
-        }
-    }
-
     return result;
 }
 
@@ -809,15 +534,6 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
                         datetime, stock.market_code(), datetime, realPrice, number, from);
 
     double current_position_num = 0.0;
-    if (getParam<bool>("support_borrow_stock")) {
-        current_position_num = pos_iter == m_position.end() ? 0.0 : pos_iter->second.number;
-        if (current_position_num < number) {
-            HKU_ERROR_IF_RETURN(
-              !borrowStock(datetime, stock, realPrice, number - current_position_num), result,
-              "Failed borrow stock");
-        }
-    }
-
     if (pos_iter == m_position.end()) {
         pos_iter = m_position.find(stock.id());
     }
@@ -871,11 +587,6 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     _saveAction(result);
 
-    //如果存在借款，则归还
-    if (getParam<bool>("support_borrow_cash") && m_borrow_cash > 0.0 && m_cash > 0.0) {
-        returnCash(datetime, m_borrow_cash < m_cash ? m_borrow_cash : m_cash);
-    }
-
     return result;
 }
 
@@ -914,11 +625,6 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     funds.market_value = value;
     funds.base_cash = m_checkin_cash - m_checkout_cash;
     funds.base_asset = m_checkin_stock - m_checkout_stock;
-    funds.borrow_cash = m_borrow_cash;
-    borrow_stock_map_type::const_iterator bor_iter = m_borrow_stock.begin();
-    for (; bor_iter != m_borrow_stock.end(); ++bor_iter) {
-        funds.borrow_asset += bor_iter->second.value;
-    }
     return funds;
 }
 
@@ -948,12 +654,6 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         funds.market_value = market_value;
         funds.base_cash = m_checkin_cash - m_checkout_cash;
         funds.base_asset = m_checkin_stock - m_checkout_stock;
-        funds.borrow_cash = m_borrow_cash;
-        borrow_stock_map_type::iterator bor_iter = m_borrow_stock.begin();
-        for (; bor_iter != m_borrow_stock.end(); ++bor_iter) {
-            funds.borrow_asset += bor_iter->second.value;
-        }
-
         return funds;
     }  // if datetime >= lastDatetime()
 
@@ -1039,35 +739,6 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 }
                 checkout_stock = roundEx(
                   checkout_stock + iter->realPrice * iter->number * iter->stock.unit(), precision);
-                break;
-
-            case BUSINESS_BORROW_CASH:
-                funds.borrow_cash += iter->realPrice;
-                break;
-
-            case BUSINESS_RETURN_CASH:
-                funds.borrow_cash -= iter->realPrice;
-                break;
-
-            case BUSINESS_BORROW_STOCK:
-                funds.borrow_asset += iter->realPrice * iter->number * iter->stock.unit();
-                stock_iter = stock_map.find(iter->stock.id());
-                if (stock_iter != stock_map.end()) {
-                    stock_iter->second.number += iter->number;
-                } else {
-                    stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
-                }
-                break;
-
-            case BUSINESS_RETURN_STOCK:
-                funds.borrow_asset -= iter->realPrice * iter->number * iter->stock.unit();
-                stock_iter = stock_map.find(iter->stock.id());
-                if (stock_iter != stock_map.end()) {
-                    stock_iter->second.number -= iter->number;
-                } else {
-                    HKU_WARN("{} {} Sell error in m_trade_list!", datetime,
-                             iter->stock.market_code());
-                }
                 break;
 
             default:
@@ -1180,7 +851,6 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
               (position.number / 10.0) * (weight_iter->countAsGift() + weight_iter->increasement());
             if (addcount != 0.0) {
                 position.number += addcount;
-                position.totalNumber += addcount;
                 TradeRecord record(stock, weight_iter->datetime(), BUSINESS_GIFT, 0.0, 0.0, 0.0,
                                    addcount, CostRecord(), 0.0, m_cash, PART_INVALID);
                 new_trade_buffer.push_back(record);
@@ -1245,28 +915,6 @@ void TradeManager::_saveAction(const TradeRecord& record) {
                 << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
                 << record.number << sep << record.stoploss << sep << record.goalPrice << sep
                 << record.planPrice << sep << record.from << ")";
-            break;
-
-        case BUSINESS_BORROW_CASH:
-            buf << my_tm << "borrowCash(Datetime('" << record.datetime.str() << "'), "
-                << record.realPrice << ")";
-            break;
-
-        case BUSINESS_RETURN_CASH:
-            buf << my_tm << "returnCash(Datetime('" << record.datetime.str() << "'), "
-                << record.realPrice << ")";
-            break;
-
-        case BUSINESS_BORROW_STOCK:
-            buf << my_tm << "borrowStock(Datetime('" << record.datetime.str() << "'), "
-                << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
-                << record.number << ")";
-            break;
-
-        case BUSINESS_RETURN_STOCK:
-            buf << my_tm << "returnStock(Datetime('" << record.datetime.str() << "'), "
-                << "sm['" << record.stock.market_code() << "'], " << record.realPrice << sep
-                << record.number << ")";
             break;
 
         default:
@@ -1352,17 +1000,17 @@ void TradeManager::tocsv(const string& path) {
     for (; history_iter != m_position_history.end(); ++history_iter) {
         const PositionRecord& record = *history_iter;
         file << record.takeDatetime << sep << record.cleanDatetime << sep
-             << record.stock.market_code() << sep << record.stock.name() << sep
-             << record.totalNumber << sep << record.buyMoney << sep << record.totalCost << sep
-             << record.sellMoney << sep << record.sellMoney - record.totalCost - record.buyMoney
-             << sep << record.totalRisk << std::endl;
+             << record.stock.market_code() << sep << record.stock.name() << sep << record.buyMoney
+             << sep << record.totalCost << sep << record.sellMoney << sep
+             << record.sellMoney - record.totalCost - record.buyMoney << sep << record.totalRisk
+             << std::endl;
     }
     file.close();
 
     //导出未平仓记录
     file.open(filename3.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
-    file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,累计持仓数量,"
+    file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,"
             "累计花费资金,累计交易成本,已转化资金,累积风险,"
             "累计浮动盈亏,当前盈亏成本价"
          << std::endl;
@@ -1371,8 +1019,8 @@ void TradeManager::tocsv(const string& path) {
         const PositionRecord& record = position_iter->second;
         file << record.takeDatetime << sep << record.cleanDatetime << sep
              << record.stock.market_code() << sep << record.stock.name() << sep << record.number
-             << sep << record.totalNumber << sep << record.buyMoney << sep << record.totalCost
-             << sep << record.sellMoney << sep << record.totalRisk << sep;
+             << sep << record.buyMoney << sep << record.totalCost << sep << record.sellMoney << sep
+             << record.totalRisk << sep;
         size_t pos = record.stock.getCount(KQuery::DAY);
         if (pos != 0) {
             KRecord krecord = record.stock.getKRecord(pos - 1, KQuery::DAY);
@@ -1429,18 +1077,6 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
         case BUSINESS_CHECKOUT_STOCK:
             return _add_checkout_stock_tr(tr);
 
-        case BUSINESS_BORROW_CASH:
-            return _add_borrow_cash_tr(tr);
-
-        case BUSINESS_RETURN_CASH:
-            return _add_return_cash_tr(tr);
-
-        case BUSINESS_BORROW_STOCK:
-            return _add_borrow_stock_tr(tr);
-
-        case BUSINESS_RETURN_STOCK:
-            return _add_return_stock_tr(tr);
-
         case BUSINESS_INVALID:
         default:
             HKU_ERROR("tr.business is invalid({})!", tr.business);
@@ -1482,15 +1118,14 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
     if (pos_iter == m_position.end()) {
         m_position[tr.stock.id()] = PositionRecord(
-          tr.stock, tr.datetime, Null<Datetime>(), tr.number, tr.stoploss, tr.goalPrice, tr.number,
-          money, tr.cost.total,
+          tr.stock, tr.datetime, Null<Datetime>(), tr.number, tr.stoploss, tr.goalPrice, money,
+          tr.cost.total,
           roundEx((tr.realPrice - tr.stoploss) * tr.number * tr.stock.unit(), precision), 0.0);
     } else {
         PositionRecord& position = pos_iter->second;
         position.number += tr.number;
         position.stoploss = tr.stoploss;
         position.goalPrice = tr.goalPrice;
-        position.totalNumber += tr.number;
         position.buyMoney = roundEx(money + position.buyMoney, precision);
         position.totalCost = roundEx(tr.cost.total + position.totalCost, precision);
         position.totalRisk =
@@ -1580,22 +1215,6 @@ bool TradeManager::_add_checkin_stock_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_checkout_stock_tr(const TradeRecord& tr) {
-    return false;
-}
-
-bool TradeManager::_add_borrow_cash_tr(const TradeRecord& tr) {
-    return false;
-}
-
-bool TradeManager::_add_return_cash_tr(const TradeRecord& tr) {
-    return false;
-}
-
-bool TradeManager::_add_borrow_stock_tr(const TradeRecord& tr) {
-    return false;
-}
-
-bool TradeManager::_add_return_stock_tr(const TradeRecord& tr) {
     return false;
 }
 

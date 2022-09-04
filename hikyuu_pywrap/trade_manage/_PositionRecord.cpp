@@ -32,7 +32,6 @@ void export_PositionRecord() {
       .def_readwrite("number", &PositionRecord::number, "当前持仓数量（float）")
       .def_readwrite("stoploss", &PositionRecord::stoploss, "当前止损价（float）")
       .def_readwrite("goal_price", &PositionRecord::goalPrice, "当前的目标价格（float）")
-      .def_readwrite("total_number", &PositionRecord::totalNumber, "累计持仓数量（float）")
       .def_readwrite("buy_money", &PositionRecord::buyMoney, "累计买入资金（float）")
       .def_readwrite("total_cost", &PositionRecord::totalCost, "累计交易总成本（float）")
       .def_readwrite("total_risk", &PositionRecord::totalRisk,

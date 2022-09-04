@@ -89,18 +89,6 @@ public:
         return 0.0;
     }
 
-    /** 获取指定时刻已借入的股票数量 */
-    virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) override {
-        HKU_WARN("The subclass does not implement this method");
-        return 0.0;
-    }
-
-    /** 获取指定时刻已借入的现金额 */
-    virtual price_t getBorrowCash(const Datetime& datetime) override {
-        HKU_WARN("The subclass does not implement this method");
-        return 0.0;
-    }
-
     /** 获取全部交易记录 */
     virtual TradeRecordList getTradeList() const override {
         HKU_WARN("The subclass does not implement this method");
@@ -135,12 +123,6 @@ public:
     virtual PositionRecord getPosition(const Datetime&, const Stock&) override {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
-    }
-
-    /** 获取当前借入的股票列表 */
-    virtual BorrowRecordList getBorrowStockList() const override {
-        HKU_WARN("The subclass does not implement this method");
-        return BorrowRecordList();
     }
 
     /**
@@ -231,56 +213,6 @@ public:
                              SystemPart from = PART_INVALID) override {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecord();
-    }
-
-    /**
-     * 借入资金，从其他来源借取的资金，如融资
-     * @param datetime 借入时间
-     * @param cash 借入的现金
-     * @return true | false
-     */
-    virtual bool borrowCash(const Datetime& datetime, price_t cash) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
-    }
-
-    /**
-     * 归还资金
-     * @param datetime 归还日期
-     * @param cash 归还现金
-     * @return true | false
-     */
-    virtual bool returnCash(const Datetime& datetime, price_t cash) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
-    }
-
-    /**
-     * 借入证券
-     * @param datetime 借入时间
-     * @param stock 借入的stock
-     * @param price 借入时单股价格
-     * @param number 借入时数量
-     * @return true | false
-     */
-    virtual bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
-    }
-
-    /**
-     * 归还证券
-     * @param datetime 归还时间
-     * @param stock 归还的stock
-     * @param price 归还时单股价格
-     * @param number 归还数量
-     * @return true | false
-     */
-    virtual bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
-                             double number) override {
-        HKU_WARN("The subclass does not implement this method");
-        return false;
     }
 
     /**
