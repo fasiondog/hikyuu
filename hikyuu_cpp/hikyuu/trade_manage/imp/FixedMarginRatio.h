@@ -13,7 +13,7 @@ namespace hku {
 
 class HKU_API FixedMarginRatio : public MarginRatioBase {
 public:
-    FixedMarginRatio() : FixedMarginRatio(0.0) {}
+    FixedMarginRatio() : FixedMarginRatio(1.0) {}
     FixedMarginRatio(double ratio);
     virtual ~FixedMarginRatio();
 

@@ -27,7 +27,7 @@ namespace hku {
  */
 inline TradeManagerPtr crtTM(const Datetime& datetime = Datetime(199001010000LL),
                              price_t initcash = 100000.0, const TradeCostPtr& costfunc = TC_Zero(),
-                             const MRPtr& mrfunc = MR_Fixed(0.0), const string& name = "SYS") {
+                             const MRPtr& mrfunc = MR_Fixed(1.0), const string& name = "SYS") {
     return TradeManagerPtr(new TradeManager(datetime, initcash, costfunc, mrfunc, name));
 }
 

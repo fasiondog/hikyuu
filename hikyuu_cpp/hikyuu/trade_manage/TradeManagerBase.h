@@ -37,7 +37,7 @@ class HKU_API TradeManagerBase {
     PARAMETER_SUPPORT
 
 public:
-    TradeManagerBase() : TradeManagerBase("", TC_Zero(), MR_Fixed(0.0)) {}
+    TradeManagerBase() : TradeManagerBase("", TC_Zero(), MR_Fixed(1.0)) {}
 
     TradeManagerBase(const string& name, const TradeCostPtr& costFunc, const MarginRatioPtr& mrFunc)
     : m_name(name),

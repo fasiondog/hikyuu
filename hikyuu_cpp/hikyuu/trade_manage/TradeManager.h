@@ -44,7 +44,7 @@ class HKU_API TradeManager : public TradeManagerBase {
 public:
     TradeManager(const Datetime& datetime = Datetime(199001010000LL), price_t initcash = 100000.0,
                  const TradeCostPtr& costfunc = TC_Zero(),
-                 const MarginRatioPtr& mrfunc = MR_Fixed(0.0), const string& name = "SYS");
+                 const MarginRatioPtr& mrfunc = MR_Fixed(1.0), const string& name = "SYS");
     virtual ~TradeManager();
 
     /** 复位，清空交易、持仓记录 */
@@ -330,6 +330,7 @@ private:
     Datetime m_last_update_datetime;  // 最后一次根据权息调整持仓与交易记录的时刻
 
     price_t m_cash;            //当前现金
+    price_t m_frozen_cash;     //冻结资金（冻结保证金）
     price_t m_checkin_cash;    //累计存入自有资金，初始资金视为存入
     price_t m_checkout_cash;   //累计取出自有资金
     price_t m_checkin_stock;   //累计存入股票价值
