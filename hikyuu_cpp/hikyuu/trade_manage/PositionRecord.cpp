@@ -37,6 +37,14 @@ void PositionRecord::addTradeRecord(const TradeRecord& tr) {
     number += tr.number;
     stoploss = tr.stoploss;
     goalPrice = tr.goalPrice;
+    totalNumber += tr.number;
+    buyMoney = roundEx(tr.realPrice * tr.number * stock.unit() * tr.margin_ratio + buyMoney,
+                       stock.precision());
+    totalCost = roundEx(tr.cost.total + totalCost, stock.precision());
+    totalRisk =
+      roundEx(totalRisk + (tr.realPrice - tr.stoploss) * number * stock.unit(), stock.precision());
+    sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit() * tr.margin_ratio,
+                        stock.precision());
 }
 
 string PositionRecord::toString() const {
