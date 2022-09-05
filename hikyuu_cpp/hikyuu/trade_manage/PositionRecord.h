@@ -17,6 +17,15 @@
 
 namespace hku {
 
+// struct DealRecord {
+//     Stock stock;
+//     Datetime datetime;
+//     BUSINESS business;
+//     price_t price;
+//     double number;
+//     double margin_ratio;
+// }
+
 /**
  * 持仓记录
  * @ingroup TradeManagerClass
@@ -31,7 +40,8 @@ public:
     /** 仅用于python的__str__ */
     string toString() const;
 
-    void addTradeRecord(const TradeRecord& tr);
+    /** 根据交易记录更新仓位信息 */
+    void update(const TradeRecord& tr);
 
     Stock stock;               ///< 交易对象
     Datetime takeDatetime;     ///< 初次建仓日期
@@ -45,9 +55,7 @@ public:
     price_t totalRisk = 0.0;  ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     price_t sellMoney = 0.0;  ///< 累计卖出资金
 
-private:
-    bool m_isShort = false;           // 是否空头仓位
-    std::list<TradeRecord> m_trList;  // 记录对应买卖交易记录
+    // std::list<DealRecord> contracts;
 
 //===================
 //序列化支持

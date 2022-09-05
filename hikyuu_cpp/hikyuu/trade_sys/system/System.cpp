@@ -99,12 +99,6 @@ void System::initParam() {
 
     //是否使用系统有效性条件进行初始建仓
     setParam<bool>("cn_open_position", false);
-
-    //在现金不足时，是否支持借入现金，融资
-    setParam<bool>("support_borrow_cash", false);
-
-    //在没有持仓时，是否支持借入证券，融券
-    setParam<bool>("support_borrow_stock", false);
 }
 
 void System::reset(bool with_tm, bool with_ev) {
@@ -263,9 +257,6 @@ bool System::readyForRun() {
         m_st->setTM(m_tm);
     if (m_tp)
         m_tp->setTM(m_tm);
-
-    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
-    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
 
     return true;
 }

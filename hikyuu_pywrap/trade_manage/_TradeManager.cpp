@@ -38,8 +38,6 @@ void export_TradeManager() {
 
     - reinvest=False (bool) : 红利是否再投资
     - precision=2 (int) : 价格计算精度
-    - support_borrow_cash=False (bool) : 是否自动融资
-    - support_borrow_stock=False (bool) : 是否自动融券
     - save_action=True (bool) : 是否保存Python命令序列)",
       // init<const Datetime&, price_t, const TradeCostPtr&, const string&>())
       init<>())

@@ -62,15 +62,12 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
 : TradeManagerBase(name, costfunc, mrfunc),
   m_init_datetime(datetime),
   m_last_update_datetime(datetime),
-  m_frozen_cash(0.0),
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
   m_checkout_stock(0.0) {
-    setParam<bool>("support_borrow_cash", false);   // 是否自动融资
-    setParam<bool>("support_borrow_stock", false);  // 是否自动融券
-    setParam<bool>("support_short", false);         // 是否支持做空
-    setParam<bool>("auto_checkin", false);  // 可用资金不足时，是否自动存入资金
-    setParam<bool>("save_action", true);    // 是否保存命令
+    setParam<bool>("support_short", false);  // 是否支持做空
+    setParam<bool>("auto_checkin", false);   // 可用资金不足时，是否自动存入资金
+    setParam<bool>("save_action", true);     // 是否保存命令
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -86,7 +83,6 @@ TradeManager::~TradeManager() {}
 void TradeManager::_reset() {
     m_last_update_datetime = m_init_datetime;
     m_cash = m_init_cash;
-    m_frozen_cash = 0.0;
     m_checkin_cash = m_init_cash;
     m_checkout_cash = 0.0;
     m_checkin_stock = 0.0;
@@ -114,7 +110,6 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_costfunc = m_costfunc;
 
     p->m_cash = m_cash;
-    p->m_frozen_cash = m_frozen_cash;
     p->m_checkin_cash = m_checkin_cash;
     p->m_checkout_cash = m_checkout_cash;
     p->m_checkin_stock = m_checkin_stock;
@@ -364,8 +359,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     // 计算交易需要的资金（不含成本）
     price_t money = roundEx(realPrice * number * stock.unit(), precision);
-    price_t frozen_margin = roundEx(money * margin_ratio, precision);
-    price_t total_need_money = frozen_margin + cost.total;
+    price_t total_need_money = roundEx(money * margin_ratio + cost.total, precision);
 
     // 如果当前买入需要的总金额大于当前可用现金
     if (total_need_money > m_cash) {
@@ -377,7 +371,6 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     //更新现金
     m_cash = roundEx(m_cash - total_need_money, precision);
-    m_frozen_cash += frozen_margin;
 
     //加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
@@ -392,14 +385,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
           roundEx((realPrice - stoploss) * number * stock.unit(), precision), 0.0);
     } else {
         PositionRecord& position = pos_iter->second;
-        position.number += number;
-        position.stoploss = stoploss;
-        position.goalPrice = goalPrice;
-        position.totalNumber += number;
-        position.buyMoney = roundEx(money + position.buyMoney, precision);
-        position.totalCost = roundEx(cost.total + position.totalCost, precision);
-        position.totalRisk =
-          roundEx(position.totalRisk + (realPrice - stoploss) * number * stock.unit(), precision);
+        position.update(result);
     }
 
     if (result.datetime > m_broker_last_datetime) {
@@ -442,14 +428,8 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     // 获取当前持仓
     position_map_type::iterator pos_iter = m_position.find(stock.id());
-    HKU_ERROR_IF_RETURN(!getParam<bool>("support_borrow_stock") && pos_iter == m_position.end(),
-                        result, "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})",
-                        datetime, stock.market_code(), datetime, realPrice, number, from);
-
-    double current_position_num = 0.0;
-    if (pos_iter == m_position.end()) {
-        pos_iter = m_position.find(stock.id());
-    }
+    HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), result,
+                        "{} {} This stock was not bought never!", datetime, stock.market_code());
 
     PositionRecord& position = pos_iter->second;
 
@@ -461,13 +441,12 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
                         "{} {} Try to sell number({}) > number of position({})!", datetime,
                         stock.market_code(), real_number, position.number);
 
-    CostRecord cost = getSellCost(datetime, stock, realPrice, real_number);
-
     int precision = getParam<int>("precision");
-    price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
+    CostRecord cost = getSellCost(datetime, stock, realPrice, real_number);
+    double margin_ratio = getMarginRatio(datetime, stock);
 
     //更新现金余额
-    m_cash = roundEx(m_cash + money - cost.total, precision);
+    m_cash = roundEx(m_cash + realPrice * real_number * stock.unit() - cost.total, precision);
 
     //更新交易记录
     result = TradeRecord(stock, datetime, BUSINESS_SELL, planPrice, realPrice, goalPrice,
@@ -475,15 +454,8 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     m_trade_list.push_back(result);
 
     //更新当前持仓情况
-    position.number -= real_number;
-    position.stoploss = stoploss;
-    position.goalPrice = goalPrice;
-    // position.buyMoney = position.buyMoney;
-    position.totalCost = roundEx(position.totalCost + cost.total, precision);
-    position.sellMoney = roundEx(position.sellMoney + money, precision);
-
-    if (position.number == 0) {
-        position.cleanDatetime = datetime;
+    position.update(result);
+    if (position.number == 0.0) {
         m_position_history.push_back(position);
         //删除当前持仓
         m_position.erase(stock.id());
@@ -499,7 +471,6 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     }
 
     _saveAction(result);
-
     return result;
 }
 

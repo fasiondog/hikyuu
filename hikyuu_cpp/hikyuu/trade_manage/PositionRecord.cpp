@@ -26,25 +26,39 @@ PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
   totalRisk(totalRisk),
   sellMoney(sellMoney) {}
 
-void PositionRecord::addTradeRecord(const TradeRecord& tr) {
-    HKU_ASSERT(tr.number != 0.0 && !tr.stock.isNull());
-    if (m_trList.empty()) {
+void PositionRecord::update(const TradeRecord& tr) {
+    if (stock.isNull()) {
         stock = tr.stock;
         takeDatetime = tr.datetime;
     }
-    m_isShort = m_trList.empty() && BUSINESS_SELL == tr.business ? true : false;
-    takeDatetime = tr.datetime;
-    number += tr.number;
-    stoploss = tr.stoploss;
-    goalPrice = tr.goalPrice;
-    totalNumber += tr.number;
-    buyMoney = roundEx(tr.realPrice * tr.number * stock.unit() * tr.margin_ratio + buyMoney,
-                       stock.precision());
-    totalCost = roundEx(tr.cost.total + totalCost, stock.precision());
-    totalRisk =
-      roundEx(totalRisk + (tr.realPrice - tr.stoploss) * number * stock.unit(), stock.precision());
-    sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit() * tr.margin_ratio,
-                        stock.precision());
+    switch (tr.business) {
+        case BUSINESS_BUY:
+            number += tr.number;
+            stoploss = tr.stoploss;
+            goalPrice = tr.goalPrice;
+            totalNumber += tr.number;
+            buyMoney =
+              roundEx(tr.realPrice * tr.number * stock.unit() + buyMoney, stock.precision());
+            totalCost = roundEx(tr.cost.total + totalCost, stock.precision());
+            totalRisk = roundEx(totalRisk + (tr.realPrice - tr.stoploss) * number * stock.unit(),
+                                stock.precision());
+            break;
+
+        case BUSINESS_SELL:
+            number -= tr.number;
+            if (number == 0.0) {
+                cleanDatetime = tr.datetime;
+            }
+            stoploss = tr.stoploss;
+            goalPrice = tr.goalPrice;
+            totalCost = roundEx(tr.cost.total + totalCost, stock.precision());
+            sellMoney =
+              roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
+            break;
+        default:
+            HKU_ERROR("The business({}) should not appear here!", getBusinessName(tr.business));
+            break;
+    }
 }
 
 string PositionRecord::toString() const {

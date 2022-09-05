@@ -32,8 +32,6 @@ namespace hku {
  * <pre>
  * 默认参数：
  * precision(int): 2 计算精度
- * support_borrow_cash(bool): false 买入操作时是否自动融资
- * support_borrow_stock(bool): false 卖空时是否自动融劵
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -255,7 +253,6 @@ private:
     Datetime m_last_update_datetime;  // 最后一次根据权息调整持仓与交易记录的时刻
 
     price_t m_cash;            //当前现金
-    price_t m_frozen_cash;     //冻结资金（冻结保证金）
     price_t m_checkin_cash;    //累计存入自有资金，初始资金视为存入
     price_t m_checkout_cash;   //累计取出自有资金
     price_t m_checkin_stock;   //累计存入股票价值
