@@ -10,6 +10,38 @@
 
 namespace hku {
 
+PositionRecord::PositionRecord(PositionRecord&& rv) {
+    stock = rv.stock;
+    takeDatetime = rv.takeDatetime;
+    cleanDatetime = rv.cleanDatetime;
+    number = rv.number;
+    stoploss = rv.stoploss;
+    goalPrice = rv.goalPrice;
+    totalNumber = rv.totalNumber;
+    buyMoney = rv.buyMoney;
+    totalCost = rv.totalCost;
+    totalRisk = rv.totalRisk;
+    sellMoney = rv.sellMoney;
+    contracts = std::move(rv.contracts);
+}
+
+PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
+    HKU_IF_RETURN(this == &rv, *this);
+    stock = rv.stock;
+    takeDatetime = rv.takeDatetime;
+    cleanDatetime = rv.cleanDatetime;
+    number = rv.number;
+    stoploss = rv.stoploss;
+    goalPrice = rv.goalPrice;
+    totalNumber = rv.totalNumber;
+    buyMoney = rv.buyMoney;
+    totalCost = rv.totalCost;
+    totalRisk = rv.totalRisk;
+    sellMoney = rv.sellMoney;
+    contracts = std::move(rv.contracts);
+    return *this;
+}
+
 PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
                                const Datetime& cleanDatetime, double number, price_t stoploss,
                                price_t goalPrice, double totalNumber, price_t totalMoney,
@@ -58,6 +90,16 @@ void PositionRecord::update(const TradeRecord& tr) {
         default:
             HKU_ERROR("The business({}) should not appear here!", getBusinessName(tr.business));
             break;
+    }
+}
+
+void PositionRecord::updateMargin(Datetime datetime) {
+    double profit = 0.0;
+    for (auto& contract : contracts) {
+        auto k = stock.getKRecord(datetime);
+        profit += (k.closePrice - contract.price) * number * stock.unit();
+        if (contract.profit < 0.0) {
+        }
     }
 }
 

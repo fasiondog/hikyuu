@@ -13,15 +13,17 @@ namespace hku {
 
 class HKU_API FixedMarginRatio : public MarginRatioBase {
 public:
-    FixedMarginRatio() : FixedMarginRatio(1.0) {}
-    FixedMarginRatio(double ratio);
+    FixedMarginRatio() : FixedMarginRatio(1.0, 1.0) {}
+    FixedMarginRatio(double initRatio, double maintainRatio)
+    : FixedMarginRatio(MarginRecord(initRatio, maintainRatio)) {}
+    FixedMarginRatio(const MarginRecord& mr);
     virtual ~FixedMarginRatio();
 
-    virtual double getMarginRatio(Datetime datetime, const Stock& stk) const override;
+    virtual MarginRecord getMarginRatio(Datetime datetime, const Stock& stk) const override;
     virtual MarginRatioPtr _clone() override;
 
 private:
-    double m_ratio;
+    MarginRecord m_margin;
 
 //============================================
 // 序列化支持
@@ -31,7 +33,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(MarginRatioBase);
-        ar& BOOST_SERIALIZATION_NVP(m_ratio);
+        ar& BOOST_SERIALIZATION_NVP(m_margin);
     }
 #endif
 };

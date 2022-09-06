@@ -42,7 +42,7 @@ TEST_CASE("test_SYS_Simple_for_base") {
     KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
 
     //构建系统部件
-    TMPtr tm = crtTM(init_date, init_cash, costfunc, MR_Fixed(1.0), "TEST_TM");
+    TMPtr tm = crtTM(init_date, init_cash, costfunc, MRPtr(), "TEST_TM");
     SGPtr sg = SG_Cross(MA(5), MA(10), "CLOSE");
     MMPtr mm = MM_FixedCount(100);
     SYSPtr sys;

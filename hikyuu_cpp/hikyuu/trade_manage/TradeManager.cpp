@@ -65,9 +65,9 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
   m_checkout_stock(0.0) {
-    setParam<bool>("support_short", false);  // 是否支持做空
-    setParam<bool>("auto_checkin", false);   // 可用资金不足时，是否自动存入资金
-    setParam<bool>("save_action", true);     // 是否保存命令
+    setParam<bool>("support_margin", false);  // 是否支持做空
+    setParam<bool>("auto_checkin", false);    // 可用资金不足时，是否自动存入资金
+    setParam<bool>("save_action", true);      // 是否保存命令
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -355,11 +355,11 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     // 获取精度、买入成本、保证金比例
     int precision = getParam<int>("precision");
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
-    double margin_ratio = getMarginRatio(datetime, stock);
+    MarginRecord margin = getMarginRatio(datetime, stock);
 
     // 计算交易需要的资金（不含成本）
     price_t money = roundEx(realPrice * number * stock.unit(), precision);
-    price_t total_need_money = roundEx(money * margin_ratio + cost.total, precision);
+    price_t total_need_money = roundEx(money * margin.initRatio + cost.total, precision);
 
     // 如果当前买入需要的总金额大于当前可用现金
     if (total_need_money > m_cash) {
@@ -374,7 +374,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     //加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
-                         cost, stoploss, m_cash, margin_ratio, from);
+                         cost, stoploss, m_cash, margin.initRatio, from);
     m_trade_list.push_back(result);
 
     //更新当前持仓记录
@@ -443,7 +443,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     int precision = getParam<int>("precision");
     CostRecord cost = getSellCost(datetime, stock, realPrice, real_number);
-    double margin_ratio = getMarginRatio(datetime, stock);
+    auto margin = getMarginRatio(datetime, stock);
 
     //更新现金余额
     m_cash = roundEx(m_cash + realPrice * real_number * stock.unit() - cost.total, precision);
@@ -734,6 +734,18 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
 
     for (size_t i = 0; i < total; ++i) {
         m_trade_list.push_back(new_trade_buffer[i]);
+    }
+
+    if (getParam<bool>("support_margin")) {
+        position_iter = m_position.begin();
+        for (; position_iter != m_position.end(); ++position_iter) {
+            Stock& stock = position_iter->second.stock;
+            for (const auto& contract : position_iter->second.contracts) {
+                auto k = stock.getKRecord(datetime);
+                if (contract.price < k.closePrice) {
+                                }
+            }
+        }
     }
 
     m_last_update_datetime = datetime;

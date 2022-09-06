@@ -17,6 +17,7 @@
 #define NOMINMAX
 #endif
 
+#include "config.h"
 #include <boost/config.hpp>
 
 #include <stdio.h>

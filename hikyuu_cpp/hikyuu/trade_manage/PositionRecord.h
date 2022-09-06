@@ -10,21 +10,39 @@
 #define POSITIONRECORD_H_
 
 #include "TradeRecord.h"
+#include "MarginRecord.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/split_member.hpp>
+#include <boost/serialization/list.hpp>
 #endif
 
 namespace hku {
 
-// struct DealRecord {
-//     Stock stock;
-//     Datetime datetime;
-//     BUSINESS business;
-//     price_t price;
-//     double number;
-//     double margin_ratio;
-// }
+struct ContractRecord {
+    Datetime datetime;    // 交易日期
+    BUSINESS business;    // 业务类型
+    price_t price;        // 成交价格
+    double number;        // 成交数量
+    price_t takeupMoney;  // 占用持仓保证金
+    price_t profit;       // 浮动盈亏
+    MarginRecord margin;  // 保证金比例
+
+#if HKU_SUPPORT_SERIALIZATION
+private:
+    friend class boost::serialization::access;
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(datetime);
+        ar& BOOST_SERIALIZATION_NVP(business);
+        ar& BOOST_SERIALIZATION_NVP(price);
+        ar& BOOST_SERIALIZATION_NVP(number);
+        ar& BOOST_SERIALIZATION_NVP(takeupMoney);
+        ar& BOOST_SERIALIZATION_NVP(profit);
+        ar& BOOST_SERIALIZATION_NVP(margin);
+    }
+#endif /* HKU_SUPPORT_SERIALIZATION */
+};
 
 /**
  * 持仓记录
@@ -33,6 +51,11 @@ namespace hku {
 class HKU_API PositionRecord {
 public:
     PositionRecord() = default;
+    PositionRecord(const PositionRecord&) = default;
+    PositionRecord(PositionRecord&& rv);
+    PositionRecord& operator=(const PositionRecord&) = default;
+    PositionRecord& operator=(PositionRecord&& rv);
+
     PositionRecord(const Stock& stock, const Datetime& takeDatetime, const Datetime& cleanDatetime,
                    double number, price_t stoploss, price_t goalPrice, double totalNumber,
                    price_t buyMoney, price_t totalCost, price_t totalRisk, price_t sellMoney);
@@ -42,6 +65,8 @@ public:
 
     /** 根据交易记录更新仓位信息 */
     void update(const TradeRecord& tr);
+
+    void updateMargin(Datetime datetime);
 
     Stock stock;               ///< 交易对象
     Datetime takeDatetime;     ///< 初次建仓日期
@@ -55,7 +80,7 @@ public:
     price_t totalRisk = 0.0;  ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     price_t sellMoney = 0.0;  ///< 累计卖出资金
 
-    // std::list<DealRecord> contracts;
+    std::list<ContractRecord> contracts;
 
 //===================
 //序列化支持
@@ -79,6 +104,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
+        ar& BOOST_SERIALIZATION_NVP(contracts);
     }
 
     template <class Archive>
@@ -98,6 +124,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(totalCost);
         ar& BOOST_SERIALIZATION_NVP(totalRisk);
         ar& BOOST_SERIALIZATION_NVP(sellMoney);
+        ar& BOOST_SERIALIZATION_NVP(contracts);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

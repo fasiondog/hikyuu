@@ -41,7 +41,7 @@ class HKU_API TradeManager : public TradeManagerBase {
 public:
     TradeManager(const Datetime& datetime = Datetime(199001010000LL), price_t initcash = 100000.0,
                  const TradeCostPtr& costfunc = TC_Zero(),
-                 const MarginRatioPtr& mrfunc = MR_Fixed(1.0), const string& name = "SYS");
+                 const MarginRatioPtr& mrfunc = MarginRatioPtr(), const string& name = "SYS");
     virtual ~TradeManager();
 
     /** 复位，清空交易、持仓记录 */

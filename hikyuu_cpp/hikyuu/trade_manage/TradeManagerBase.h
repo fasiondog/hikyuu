@@ -36,7 +36,7 @@ class HKU_API TradeManagerBase {
     PARAMETER_SUPPORT
 
 public:
-    TradeManagerBase() : TradeManagerBase("", TC_Zero(), MR_Fixed(1.0)) {}
+    TradeManagerBase() : TradeManagerBase("", TC_Zero(), MarginRatioPtr()) {}
 
     TradeManagerBase(const string& name, const TradeCostPtr& costFunc, const MarginRatioPtr& mrFunc)
     : m_name(name),
@@ -111,10 +111,10 @@ public:
 
     /**
      * @brief 获取保证金比例
-     * @return double
+     * @return MarginRecord
      */
-    double getMarginRatio(const Datetime& datetime, const Stock& stk) const {
-        return m_mrfunc ? m_mrfunc->getMarginRatio(datetime, stk) : 0.0;
+    MarginRecord getMarginRatio(const Datetime& datetime, const Stock& stk) const {
+        return m_mrfunc ? m_mrfunc->getMarginRatio(datetime, stk) : MarginRecord(1.0, 1.0);
     }
 
     /** 从哪个时刻开始启动订单代理进行下单操作   */

@@ -30,21 +30,24 @@ TEST_CASE("test_MR_Fixed") {
     Datetime d(200001010000);
 
     /** @arg ratio 小于 0 */
-    CHECK_THROWS(MR_Fixed(-0.1));
+    CHECK_THROWS(MR_Fixed(-0.1, 1.0));
+    CHECK_THROWS(MR_Fixed(1.0, -0.1));
 
     /** @arg ratio 等于 0 */
-    CHECK_THROWS(MR_Fixed(0.0));
+    CHECK_THROWS(MR_Fixed(0.0, 1.0));
+    CHECK_THROWS(MR_Fixed(1.0, 0.0));
 
     /** @arg ratio 等于 1.1 */
-    CHECK_THROWS(MR_Fixed(1.1));
+    CHECK_THROWS(MR_Fixed(1.1, 1.0));
+    CHECK_THROWS(MR_Fixed(1.0, 1.1));
 
     /** @arg ratio 等于 1.0 */
-    auto mr = MR_Fixed(1.0);
-    CHECK_EQ(mr->getMarginRatio(d, stk), 1.0);
+    auto mr = MR_Fixed(1.0, 1.0);
+    CHECK_EQ(mr->getMarginRatio(d, stk), MarginRecord(1.0, 1.0));
 
     /** @arg ratio 等于 0.6 */
-    mr = MR_Fixed(0.6);
-    CHECK_EQ(mr->getMarginRatio(d, stk), 0.6);
+    mr = MR_Fixed(0.6, 0.6);
+    CHECK_EQ(mr->getMarginRatio(d, stk), MarginRecord(0.6, 0.6));
 }
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -56,7 +59,7 @@ TEST_CASE("test_MR_Fixed_export") {
     string filename(sm.tmpdir());
     filename += "/MR_Fixed.xml";
 
-    auto func1 = MR_Fixed(0.6);
+    auto func1 = MR_Fixed(0.6, 0.75);
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
