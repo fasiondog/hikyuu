@@ -46,6 +46,7 @@ def ProgressBar(cur, total):
     sys.stdout.flush()
 
 
+@hku_catch(ret=0, trace=True)
 def import_index_name(connect):
     """
     导入所有指数代码表
@@ -54,6 +55,8 @@ def import_index_name(connect):
     :return: 指数个数
     """
     index_list = get_index_code_name_list()
+    if not index_list:
+        return 0
 
     cur = connect.cursor()
     cur.execute("select stockid, marketid, code from `hku_base`.`stock` where type={}".format(STOCKTYPE.INDEX))
@@ -83,6 +86,7 @@ def import_index_name(connect):
     return len(index_list)
 
 
+@hku_catch(ret=0, trace=True)
 def import_stock_name(connect, api, market, quotations=None):
     """更新每只股票的名称、当前是否有效性、起始日期及结束日期
         如果导入的代码表中不存在对应的代码，则认为该股已失效
@@ -98,7 +102,8 @@ def import_stock_name(connect, api, market, quotations=None):
     stk_list = get_stk_code_name_list(market)
     if not stk_list:
         hku_error("获取 {} 股票代码表失败", market)
-        return
+        return 0
+
     if not quotations or 'fund' in [v.lower() for v in quotations]:
         stk_list.extend(get_fund_code_name_list(market))
     for stock in stk_list:
