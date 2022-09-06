@@ -208,6 +208,7 @@ class UsePytdxImportToH5Thread(QThread):
             self.logger.info('导入完毕')
             self.send_message(['THREAD', 'FINISHED'])
 
+    @hku_catch(trace=True, re_raise=True)
     def _run(self):
         hdf5_import_progress = {}
         trans_progress = {}
