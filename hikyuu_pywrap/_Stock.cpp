@@ -120,6 +120,16 @@ void export_Stock() {
     :return: K线记录
     :rtype: KRecord)")
 
+      .def("get_pos", getPos, (arg("date"), arg("ktype") = KQuery::DAY),
+           R"(get_krecord(self, date[, ktype=Query.DAY])
+
+    根据数据类型（日线/周线等），获取指定日期对应的索引
+
+    :param Datetime date: 指定时间
+    :param Query.KType ktype: K线数据类别
+    :return: 索引位置，constant.null_size 为无效值
+    :rtype: int)")
+
       .def("get_krecord_list", &Stock::getKRecordList, R"(get_krecord_list(self, start, end, ktype)
 
     获取K线记录 [start, end)，一般不直接使用.

@@ -306,6 +306,14 @@ StockManager/Block/Stock
         :return: K线记录
         :rtype: KRecord
     
+    .. py:method:: get_pos(self, date[, ktype=Query.DAY])
+    
+        根据数据类型（日线/周线等），获取指定日期对应的索引
+        
+        :param Datetime datetime: 指定日期
+        :param Query.KType ktype: K线数据类别
+        :return: 对应的索引位置，constant.null_size 为无效值
+        :rtype: int
     
     .. py:method:: get_krecord_list(self, start, end, ktype)
     

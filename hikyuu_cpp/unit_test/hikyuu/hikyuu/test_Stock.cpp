@@ -1135,6 +1135,18 @@ TEST_CASE("test_Stock_getIndexRange") {
 }
 
 /** @par 检测点 */
+TEST_CASE("test_Stock_getPos") {
+    Stock stock = getStock("sh000001");
+    size_t pos = 0;
+
+    CHECK_EQ(stock.getPos(Datetime(199012100000)), Null<size_t>());
+    CHECK_EQ(stock.getPos(Datetime(199012190000)), 0);
+    CHECK_EQ(stock.getPos(Datetime(199101030000)), 10);
+    CHECK_EQ(stock.getPos(Datetime(201112060000)), stock.getCount() - 1);
+    CHECK_EQ(stock.getPos(Datetime(201112070000)), Null<size_t>());
+}
+
+/** @par 检测点 */
 TEST_CASE("test_Stock_getKRecordList") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");

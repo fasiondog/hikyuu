@@ -574,6 +574,14 @@ KRecord Stock::getKRecord(const Datetime& datetime, KQuery::KType ktype) const {
     return klist.size() > 0 ? klist[0] : Null<KRecord>();
 }
 
+size_t Stock::getPos(const Datetime& datetime, KQuery::KType ktype) const {
+    HKU_IF_RETURN(isNull(), Null<size_t>());
+    KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
+    auto driver = m_kdataDriver->getConnect();
+    size_t startix = 0, endix = 0;
+    return getIndexRange(query, startix, endix) ? startix : Null<size_t>();
+}
+
 KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                              KQuery::KType ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));

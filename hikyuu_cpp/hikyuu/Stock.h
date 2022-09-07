@@ -150,6 +150,9 @@ public:
     /** 根据数据类型（日线/周线等），获取指定日期的KRecord */
     KRecord getKRecord(const Datetime&, KQuery::KType ktype = KQuery::DAY) const;
 
+    /** 根据数据类型（日线/周线等），获取指定日期的索引位置 */
+    size_t getPos(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) const;
+
     /** 获取K线数据 */
     KData getKData(const KQuery&) const;
 
