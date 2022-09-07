@@ -336,6 +336,8 @@ def import_data(connect, market, ktype, quotations, api, dest_dir, startDate=199
     h5file = open_h5file(dest_dir, market, ktype)
 
     stock_list = get_stock_list(connect, market, quotations)
+    if not stock_list:
+        return 0
 
     total = len(stock_list)
     for i, stock in enumerate(stock_list):
