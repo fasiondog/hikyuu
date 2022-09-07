@@ -66,7 +66,7 @@ public:
     /** 根据交易记录更新仓位信息 */
     void update(const TradeRecord& tr);
 
-    void updateMargin(Datetime datetime);
+    std::tuple<price_t, price_t> getProfit(Datetime datetime);
 
     Stock stock;               ///< 交易对象
     Datetime takeDatetime;     ///< 初次建仓日期

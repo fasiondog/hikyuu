@@ -736,17 +736,17 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
 
-    if (getParam<bool>("support_margin")) {
-        position_iter = m_position.begin();
-        for (; position_iter != m_position.end(); ++position_iter) {
-            Stock& stock = position_iter->second.stock;
-            for (const auto& contract : position_iter->second.contracts) {
-                auto k = stock.getKRecord(datetime);
-                if (contract.price < k.closePrice) {
-                                }
-            }
-        }
-    }
+    // if (getParam<bool>("support_margin")) {
+    //     position_iter = m_position.begin();
+    //     for (; position_iter != m_position.end(); ++position_iter) {
+    //         Stock& stock = position_iter->second.stock;
+    //         for (const auto& contract : position_iter->second.contracts) {
+    //             auto k = stock.getKRecord(datetime);
+    //             if (contract.price < k.closePrice) {
+    //             }
+    //         }
+    //     }
+    // }
 
     m_last_update_datetime = datetime;
 }

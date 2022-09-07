@@ -93,14 +93,28 @@ void PositionRecord::update(const TradeRecord& tr) {
     }
 }
 
-void PositionRecord::updateMargin(Datetime datetime) {
-    double profit = 0.0;
-    for (auto& contract : contracts) {
-        auto k = stock.getKRecord(datetime);
-        profit += (k.closePrice - contract.price) * number * stock.unit();
-        if (contract.profit < 0.0) {
+std::tuple<price_t, price_t> PositionRecord::getProfit(Datetime datetime) {
+    price_t profit = 0.0;  // 浮动盈亏
+    price_t margin = 0.0;  // 维持保证金
+
+    size_t pos = stock.getPos(datetime);
+    if (pos != 0 && pos != Null<size_t>()) {
+        for (auto& contract : contracts) {
+            auto k = stock.getKRecord(pos - 1);
+            contract.profit = (k.closePrice - contract.price) * number * stock.unit();
+            profit += contract.profit;
+            margin += k.closePrice * number * stock.unit() * contract.margin.initRatio *
+                      contract.margin.maintainRatio;
+        }
+    } else {
+        for (auto& contract : contracts) {
+            profit += contract.profit;
+            margin += contract.price * contract.number * stock.unit() * contract.margin.initRatio *
+                      contract.margin.maintainRatio;
         }
     }
+
+    return std::make_tuple(profit, margin);
 }
 
 string PositionRecord::toString() const {
