@@ -37,6 +37,7 @@ class ImportHistoryFinanceTask:
         if not os.path.lexists(self.dest_dir):
             os.makedirs(self.dest_dir)
         self.task_name = 'IMPORT_FINANCE'
+        self.total_count = 0
 
     def connect(self):
         self.api = TdxHq_API()
@@ -78,25 +79,29 @@ class ImportHistoryFinanceTask:
         shutil.unpack_archive(dest_file_name, extract_dir=self.dest_dir)
         hku_info(f"Download finance file: {filename}")
 
+    @hku_catch(trace=True, callback=lambda self: self.queue.put([self.task_name, None, None, None, self.total_count]))
     def __call__(self):
         capture_multiprocess_all_logger(self.log_queue)
         self.connect()
         data_list = self.get_list_info()
-        total_count = len(data_list)
+        self.total_count = len(data_list)
         count = 0
         for item in data_list:
-            dest_file = '{}/{}'.format(self.dest_dir, item['filename'])
-            if not os.path.exists(dest_file):
-                self.download_file(item)
-            else:
-                old_md5 = ''
-                with open(dest_file, 'rb') as f:
-                    old_md5 = hashlib.md5(f.read()).hexdigest()
-                if old_md5 != item['hash']:
+            try:
+                dest_file = '{}/{}'.format(self.dest_dir, item['filename'])
+                if not os.path.exists(dest_file):
                     self.download_file(item)
-            count += 1
-            self.queue.put([self.task_name, None, None, int(100 * count / total_count), total_count])
-        self.queue.put([self.task_name, None, None, None, total_count])
+                else:
+                    old_md5 = ''
+                    with open(dest_file, 'rb') as f:
+                        old_md5 = hashlib.md5(f.read()).hexdigest()
+                    if old_md5 != item['hash']:
+                        self.download_file(item)
+                count += 1
+                self.queue.put([self.task_name, None, None, int(100 * count / self.total_count), self.total_count])
+            except Exception as e:
+                hku_error(str(e))
+        self.queue.put([self.task_name, None, None, None, self.total_count])
 
 
 if __name__ == "__main__":
