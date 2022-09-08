@@ -58,7 +58,7 @@ PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
   totalRisk(totalRisk),
   sellMoney(sellMoney) {}
 
-void PositionRecord::update(const TradeRecord& tr) {
+void PositionRecord::addTradeRecord(const TradeRecord& tr, const MarginRecord& margin) {
     if (stock.isNull()) {
         stock = tr.stock;
         takeDatetime = tr.datetime;
@@ -91,12 +91,13 @@ void PositionRecord::update(const TradeRecord& tr) {
             HKU_ERROR("The business({}) should not appear here!", getBusinessName(tr.business));
             break;
     }
+
+    contracts.emplace_back(tr.datetime, tr.business, tr.realPrice, tr.number, 0.0, margin);
 }
 
 std::tuple<price_t, price_t> PositionRecord::getProfit(Datetime datetime) {
     price_t profit = 0.0;  // 浮动盈亏
     price_t margin = 0.0;  // 维持保证金
-
     size_t pos = stock.getPos(datetime);
     if (pos != 0 && pos != Null<size_t>()) {
         for (auto& contract : contracts) {
@@ -113,7 +114,6 @@ std::tuple<price_t, price_t> PositionRecord::getProfit(Datetime datetime) {
                       contract.margin.maintainRatio;
         }
     }
-
     return std::make_tuple(profit, margin);
 }
 

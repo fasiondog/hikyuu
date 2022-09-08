@@ -23,14 +23,15 @@ namespace hku {
  * @ingroup TradeManagerClass
  */
 enum BUSINESS {
-    BUSINESS_INIT = 0,     /**< 建立初始账户 */
-    BUSINESS_BUY = 1,      /**< 买入 */
-    BUSINESS_SELL = 2,     /**< 卖出 */
-    BUSINESS_GIFT = 3,     /**< 送股 */
-    BUSINESS_BONUS = 4,    /**< 分红 */
-    BUSINESS_CHECKIN = 5,  /**< 存入现金 */
-    BUSINESS_CHECKOUT = 6, /**< 取出现金 */
-    BUSINESS_INVALID = 13  /**< 无效类型 */
+    BUSINESS_INIT = 0,            /**< 建立初始账户 */
+    BUSINESS_BUY = 1,             /**< 买入 */
+    BUSINESS_SELL = 2,            /**< 卖出 */
+    BUSINESS_GIFT = 3,            /**< 送股 */
+    BUSINESS_BONUS = 4,           /**< 分红 */
+    BUSINESS_CHECKIN = 5,         /**< 存入现金 */
+    BUSINESS_CHECKOUT = 6,        /**< 取出现金 */
+    BUSINESS_MARGIN_CLOSEOUT = 7, /**< 交易所强平 */
+    BUSINESS_INVALID = 8          /**< 无效类型 */
 };
 
 /**

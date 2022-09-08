@@ -20,11 +20,20 @@
 namespace hku {
 
 struct ContractRecord {
+    ContractRecord() = default;
+    ContractRecord(const Datetime& datetime, BUSINESS business, price_t price, double number,
+                   price_t profit, const MarginRecord& margin)
+    : datetime(datetime),
+      business(business),
+      price(price),
+      number(number),
+      profit(profit),
+      margin(margin) {}
+
     Datetime datetime;    // 交易日期
     BUSINESS business;    // 业务类型
     price_t price;        // 成交价格
     double number;        // 成交数量
-    price_t takeupMoney;  // 占用持仓保证金
     price_t profit;       // 浮动盈亏
     MarginRecord margin;  // 保证金比例
 
@@ -37,7 +46,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(business);
         ar& BOOST_SERIALIZATION_NVP(price);
         ar& BOOST_SERIALIZATION_NVP(number);
-        ar& BOOST_SERIALIZATION_NVP(takeupMoney);
         ar& BOOST_SERIALIZATION_NVP(profit);
         ar& BOOST_SERIALIZATION_NVP(margin);
     }
@@ -64,8 +72,9 @@ public:
     string toString() const;
 
     /** 根据交易记录更新仓位信息 */
-    void update(const TradeRecord& tr);
+    void addTradeRecord(const TradeRecord& tr, const MarginRecord& margin);
 
+    /** 获取指定日期时的浮动盈亏和维持保证金 */
     std::tuple<price_t, price_t> getProfit(Datetime datetime);
 
     Stock stock;               ///< 交易对象
