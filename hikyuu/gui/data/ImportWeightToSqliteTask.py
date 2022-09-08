@@ -75,45 +75,6 @@ class ImportWeightToSqliteTask:
             return
 
         try:
-            """
-            download_dir = self.dest_dir + "/downloads"
-            if not os.path.lexists(download_dir):
-                os.makedirs(download_dir)
-
-            self.queue.put([self.msg_name, '正在下载钱龙权息信息...', 0, 0, 0])
-            net_file = urllib.request.urlopen(
-                'http://www.qianlong.com.cn/download/history/weight.rar', timeout=60
-            )
-            buffer = net_file.read()
-
-            self.queue.put([self.msg_name, '钱龙权息信息下载完成，正在校验是否存在更新...', 0, 0, 0])
-            new_md5 = hashlib.md5(buffer).hexdigest()
-
-            dest_filename = download_dir + '/weight.rar'
-            old_md5 = None
-            if os.path.exists(dest_filename):
-                with open(dest_filename, 'rb') as oldfile:
-                    old_md5 = hashlib.md5(oldfile.read()).hexdigest()
-
-            #如果没变化不需要解压导入
-            if new_md5 != old_md5:
-                with open(dest_filename, 'wb') as file:
-                    file.write(buffer)
-
-                self.queue.put([self.msg_name, '正在解压钱龙权息信息...', 0, 0, 0])
-                x = os.system('unrar x -o+ -inul {} {}'.format(dest_filename, download_dir))
-                if x != 0:
-                    raise Exception("无法找到unrar命令！")
-
-                self.queue.put([self.msg_name, '正在导入钱龙权息数据...', 0, 0, 0])
-                total_count = qianlong_import_weight(connect, download_dir + '/weight', 'SH')
-                total_count += qianlong_import_weight(connect, download_dir + '/weight', 'SZ')
-                self.queue.put([self.msg_name, '导入钱龙权息数据完毕!', 0, 0, total_count])
-
-            else:
-                self.queue.put([self.msg_name, '钱龙权息数据无变化', 0, 0, 0])
-            """
-
             hosts = search_best_tdx()
             api = TdxHq_API()
             api.connect(hosts[0][2], hosts[0][3])
@@ -129,14 +90,6 @@ class ImportWeightToSqliteTask:
 
             self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
             self.logger.info('导入权息数据完毕')
-
-            #self.queue.put([self.msg_name, '下载通达信财务信息(上证)...', 0, 0, 0])
-            #x = pytdx_import_finance(connect, api, "SH")
-
-            #self.queue.put([self.msg_name, '下载通达信财务信息(深证)...', 0, 0, 0])
-            #x += pytdx_import_finance(connect, api, "SZ")
-            #self.queue.put([self.msg_name, '导入通达信财务信息完毕!', 0, 0, x])
-
             api.disconnect()
 
         except Exception as e:

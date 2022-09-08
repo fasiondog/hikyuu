@@ -53,6 +53,7 @@ class ImportPytdxTransToH5:
         self.dest_dir = dest_dir
         self.max_days = int(max_days)
 
+    @hku_catch(trace=True, callback=lambda self: self.queue.put([self.task_name, self.market, 'TRANS', None, 0]))
     def __call__(self):
         capture_multiprocess_all_logger(self.log_queue)
         count = 0

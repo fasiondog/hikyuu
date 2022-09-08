@@ -56,6 +56,7 @@ class ImportPytdxToH5:
         self.dest_dir = dest_dir
         self.startDatetime = start_datetime
 
+    @hku_catch(trace=True, callback=lambda self: self.queue.put([self.task_name, self.market, self.ktype, None, 0]))
     def __call__(self):
         capture_multiprocess_all_logger(self.log_queue)
         if self.config.getboolean('hdf5', 'enable', fallback=True):
