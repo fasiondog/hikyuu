@@ -120,7 +120,7 @@ void export_Stock() {
     :return: K线记录
     :rtype: KRecord)")
 
-      .def("get_pos", getPos, (arg("date"), arg("ktype") = KQuery::DAY),
+      .def("get_pos", &Stock::getPos, (arg("date"), arg("ktype") = KQuery::DAY),
            R"(get_krecord(self, date[, ktype=Query.DAY])
 
     根据数据类型（日线/周线等），获取指定日期对应的索引
