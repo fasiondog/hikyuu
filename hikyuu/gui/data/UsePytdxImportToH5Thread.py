@@ -26,6 +26,7 @@ import logging
 import sqlite3
 import datetime
 import mysql.connector
+import queue
 from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
 from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
@@ -267,45 +268,64 @@ class UsePytdxImportToH5Thread(QThread):
         finished_count = len(self.tasks)
         market_count = len(g_market_list)
         while finished_count > 0:
-            message = self.queue.get()
-            taskname, market, ktype, progress, total = message
-            if progress is None:
-                finished_count -= 1
-                if taskname in ('IMPORT_KDATA', 'IMPORT_TRANS', 'IMPORT_TIME'):
-                    self.send_message([taskname, 'FINISHED', market, ktype, total])
-                else:
-                    self.send_message([taskname, 'FINISHED'])
-                continue
+            try:
+                message = self.queue.get(timeout=10)
+                taskname, market, ktype, progress, total = message
+                if progress is None:
+                    finished_count -= 1
+                    if taskname in ('IMPORT_KDATA', 'IMPORT_TRANS', 'IMPORT_TIME'):
+                        self.send_message([taskname, 'FINISHED', market, ktype, total])
+                    else:
+                        self.send_message([taskname, 'FINISHED'])
+                    continue
 
-            if taskname == 'IMPORT_WEIGHT':
-                if market == 'INFO':
-                    self.send_message(['INFO', ktype])
-                self.send_message([taskname, market, total])
-            elif taskname == 'IMPORT_FINANCE':
-                self.send_message([taskname, progress])
-            elif taskname == 'IMPORT_KDATA':
-                hdf5_import_progress[market][ktype] = progress
-                current_progress = 0
-                for market in g_market_list:
-                    current_progress += hdf5_import_progress[market][ktype]
-                current_progress = current_progress // market_count
-                self.send_message([taskname, ktype, current_progress])
-            elif taskname == 'IMPORT_TRANS':
-                trans_progress[market] = progress
-                current_progress = 0
-                for market in g_market_list:
-                    current_progress += trans_progress[market]
-                current_progress = current_progress // market_count
-                self.send_message([taskname, ktype, current_progress])
-            elif taskname == 'IMPORT_TIME':
-                time_progress[market] = progress
-                current_progress = 0
-                for market in g_market_list:
-                    current_progress += time_progress[market]
-                current_progress = current_progress // market_count
-                self.send_message([taskname, ktype, current_progress])
-            else:
-                self.logger.error("Unknow task: {}".format(taskname))
+                if taskname == 'IMPORT_WEIGHT':
+                    if market == 'INFO':
+                        self.send_message(['INFO', ktype])
+                    self.send_message([taskname, market, total])
+                elif taskname == 'IMPORT_FINANCE':
+                    self.send_message([taskname, progress])
+                elif taskname == 'IMPORT_KDATA':
+                    hdf5_import_progress[market][ktype] = progress
+                    current_progress = 0
+                    for market in g_market_list:
+                        current_progress += hdf5_import_progress[market][ktype]
+                    current_progress = current_progress // market_count
+                    self.send_message([taskname, ktype, current_progress])
+                elif taskname == 'IMPORT_TRANS':
+                    trans_progress[market] = progress
+                    current_progress = 0
+                    for market in g_market_list:
+                        current_progress += trans_progress[market]
+                    current_progress = current_progress // market_count
+                    self.send_message([taskname, ktype, current_progress])
+                elif taskname == 'IMPORT_TIME':
+                    time_progress[market] = progress
+                    current_progress = 0
+                    for market in g_market_list:
+                        current_progress += time_progress[market]
+                    current_progress = current_progress // market_count
+                    self.send_message([taskname, ktype, current_progress])
+                else:
+                    self.logger.error("Unknow task: {}".format(taskname))
+            except queue.Empty:
+                if finished_count > 0:
+                    ok = False
+                    for p in self.process_list:
+                        if p.is_alive():
+                            ok = True
+                            break
+                    if not ok:
+                        for task in self.tasks:
+                            if task.status == "running":
+                                self.logger.error(
+                                    f"All process is finished, but task ({task.__class__.__name__}) is running!"
+                                )
+                        finished_count = 0
+                        raise Exception("All process is finished, but some tasks are running!")
+
+            except Exception as e:
+                self.logger.error(str(e))
 
 
 class_logger(UsePytdxImportToH5Thread)

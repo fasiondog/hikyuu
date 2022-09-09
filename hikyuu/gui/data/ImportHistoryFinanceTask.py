@@ -38,6 +38,7 @@ class ImportHistoryFinanceTask:
             os.makedirs(self.dest_dir)
         self.task_name = 'IMPORT_FINANCE'
         self.total_count = 0
+        self.status = "no run"
 
     def connect(self):
         self.api = TdxHq_API()
@@ -79,8 +80,9 @@ class ImportHistoryFinanceTask:
         shutil.unpack_archive(dest_file_name, extract_dir=self.dest_dir)
         hku_info(f"Download finance file: {filename}")
 
-    @hku_catch(trace=True, callback=lambda self: self.queue.put([self.task_name, None, None, None, self.total_count]))
+    @hku_catch(trace=True)
     def __call__(self):
+        self.status = "running"
         capture_multiprocess_all_logger(self.log_queue)
         self.connect()
         data_list = self.get_list_info()
@@ -102,6 +104,7 @@ class ImportHistoryFinanceTask:
             except Exception as e:
                 hku_error(str(e))
         self.queue.put([self.task_name, None, None, None, self.total_count])
+        self.status = "finished"
 
 
 if __name__ == "__main__":

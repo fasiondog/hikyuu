@@ -55,9 +55,11 @@ class ImportPytdxToH5:
         self.port = port
         self.dest_dir = dest_dir
         self.startDatetime = start_datetime
+        self.status = "no run"
 
-    @hku_catch(trace=True, callback=lambda self: self.queue.put([self.task_name, self.market, self.ktype, None, 0]))
+    @hku_catch(trace=True)
     def __call__(self):
+        self.status = "running"
         capture_multiprocess_all_logger(self.log_queue)
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
@@ -92,3 +94,4 @@ class ImportPytdxToH5:
             connect.close()
 
         self.queue.put([self.task_name, self.market, self.ktype, None, count])
+        self.status = "finished"

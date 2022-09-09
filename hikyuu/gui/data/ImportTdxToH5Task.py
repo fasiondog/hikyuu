@@ -25,6 +25,7 @@
 import logging
 import sqlite3
 import mysql.connector
+from hikyuu.util.check import hku_catch
 
 from hikyuu.util.mylog import class_logger
 from hikyuu.data.tdx_to_h5 import tdx_import_data as h5_import_data
@@ -66,12 +67,15 @@ class ImportTdxToH5Task:
             elif self.ktype == '5MIN':
                 self.src_dir = src_dir + "/vipdoc/sz/fzline"
         self.dest_dir = dest_dir
+        self.status = "no run"
 
     def __del__(self):
         #print(self.__class__.__name__, self.market, self.ktype, "__del__")
         pass
 
+    @hku_catch(trace=True)
     def __call__(self):
+        self.status = "no run"
         capture_multiprocess_all_logger(self.log_queue)
         use_hdf = False
         if self.config.getboolean('hdf5', 'enable', fallback=True):
@@ -104,3 +108,4 @@ class ImportTdxToH5Task:
         except Exception as e:
             self.logger.error(e)
         self.queue.put([self.task_name, self.market, self.ktype, None, count])
+        self.status = "finished"

@@ -37,6 +37,7 @@ from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
 #from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
+from hikyuu.util.check import hku_catch
 
 
 class ImportWeightToSqliteTask:
@@ -47,8 +48,11 @@ class ImportWeightToSqliteTask:
         self.config = config
         self.dest_dir = dest_dir
         self.msg_name = 'IMPORT_WEIGHT'
+        self.status = "no run"
 
+    @hku_catch(trace=True)
     def __call__(self):
+        self.status = "running"
         capture_multiprocess_all_logger(self.log_queue)
         total_count = 0
         try:
@@ -72,6 +76,7 @@ class ImportWeightToSqliteTask:
             #self.queue.put([self.msg_name, str(e), -1, 0, total_count])
             self.queue.put([self.msg_name, 'INFO', str(e), 0, 0])
             self.queue.put([self.msg_name, '', 0, None, total_count])
+            self.status = "failure"
             return
 
         try:
@@ -101,3 +106,4 @@ class ImportWeightToSqliteTask:
             connect.close()
 
         self.queue.put([self.msg_name, '', 0, None, total_count])
+        self.status = "finished"

@@ -52,9 +52,11 @@ class ImportPytdxTimeToH5:
         self.port = port
         self.dest_dir = dest_dir
         self.max_days = int(max_days)
+        self.status = "no run"
 
-    @hku_catch(trace=True, callback=lambda self: self.queue.put([self.task_name, self.market, 'TIME', None, 0]))
+    @hku_catch(trace=True)
     def __call__(self):
+        self.status = "running"
         capture_multiprocess_all_logger(self.log_queue)
         count = 0
         connect = sqlite3.connect(self.sqlitefile, timeout=1800)
@@ -73,3 +75,4 @@ class ImportPytdxTimeToH5:
             connect.close()
 
         self.queue.put([self.task_name, self.market, 'TIME', None, count])
+        self.status = "finished"
