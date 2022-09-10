@@ -318,13 +318,12 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0.0 || (!getParam<bool>("support_margin") && number <= 0.0),
-                        result, "{} {} Invalid buy numer: {}!", datetime, stock.market_code(),
-                        number);
-    HKU_ERROR_IF_RETURN(std::fabs(number) < stock.minTradeNumber(), result,
+    HKU_ERROR_IF_RETURN(number <= 0.0, result, "{} {} Invalid buy numer: {}!", datetime,
+                        stock.market_code(), number);
+    HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
-    HKU_ERROR_IF_RETURN(std::fabs(number) > stock.maxTradeNumber(), result,
+    HKU_ERROR_IF_RETURN(number != MAX_DOUBLE && number > stock.maxTradeNumber(), result,
                         "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
 
@@ -387,6 +386,11 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     } else {
         PositionRecord& position = pos_iter->second;
         position.addTradeRecord(result, margin);
+        if (position.number == 0.0) {
+            m_position_history.push_back(position);
+            //删除当前持仓
+            m_position.erase(stock.id());
+        }
     }
 
     if (result.datetime > m_broker_last_datetime) {
@@ -413,7 +417,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
+    HKU_ERROR_IF_RETURN(number <= 0.0, result, "{} {} number is zero!", datetime,
                         stock.market_code());
 
     // 对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
@@ -737,29 +741,6 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
 
-    if (getParam<bool>("support_margin")) {
-        price_t total_profit = 0.0;
-        price_t total_maintain_margin = 0.0;
-        for (; position_iter != m_position.end(); ++position_iter) {
-            auto [profit, margin] = position_iter->second.getProfit(datetime);
-            total_profit += profit;
-            total_maintain_margin += margin;
-        }
-
-        bool will_margin_closeout = false;
-        if (total_profit < 0.0 && m_cash < total_maintain_margin) {
-            if (getParam<bool>("auto_checkin")) {
-                checkin(datetime, roundEx(total_maintain_margin - m_cash, precision));
-            } else {
-                will_margin_closeout = true;
-            }
-        }
-
-        if (will_margin_closeout) {
-            // 执行强平操作
-        }
-    }
-
     m_last_update_datetime = datetime;
 }
 
@@ -996,8 +977,8 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
     if (pos_iter == m_position.end()) {
         m_position[tr.stock.id()] = PositionRecord(
-          tr.stock, tr.datetime, Null<Datetime>(), tr.number, tr.stoploss, tr.goalPrice, tr.number,
-          money, tr.cost.total,
+          tr.stock, tr.datetime, Null<Datetime>(), tr.number, tr.realPrice, tr.stoploss,
+          tr.goalPrice, tr.number, money, tr.cost.total,
           roundEx((tr.realPrice - tr.stoploss) * tr.number * tr.stock.unit(), precision), 0.0);
     } else {
         PositionRecord& position = pos_iter->second;
