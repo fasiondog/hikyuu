@@ -29,52 +29,32 @@ PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
   sellMoney(sellMoney) {}
 
 void PositionRecord::addTradeRecord(const TradeRecord& tr, const MarginRecord& margin) {
+    HKU_ASSERT(tr.business == BUSINESS_BUY || tr.business == BUSINESS_SELL);
     if (stock.isNull()) {
         stock = tr.stock;
         takeDatetime = tr.datetime;
     }
-    switch (tr.business) {
-        case BUSINESS_BUY: {
-            double new_number = number + tr.number;
-            if (new_number == 0.0) {
-                cleanDatetime = tr.datetime;
-            } else {
-                avgPrice = std::fabs((tr.realPrice * tr.number + avgPrice * number) / new_number);
-                number = new_number;
-                stoploss = tr.stoploss;
-                goalPrice = tr.goalPrice;
-                totalNumber += tr.number;
-                buyMoney =
-                  roundEx(tr.realPrice * tr.number * stock.unit() * tr.margin_ratio + buyMoney,
-                          stock.precision());
-                totalCost = roundEx(tr.cost.total + totalCost, stock.precision());
-                totalRisk =
-                  roundEx(totalRisk + (tr.realPrice - tr.stoploss) * number * stock.unit(),
-                          stock.precision());
-            }
-        } break;
 
-        case BUSINESS_SELL: {
-            double new_number = number - tr.number;
-            if (new_number == 0.0) {
-                cleanDatetime = tr.datetime;
-            } else {
-                avgPrice = std::fabs((tr.realPrice * tr.number - avgPrice * number) / new_number);
-            }
-            number = new_number;
-            stoploss = tr.stoploss;
-            goalPrice = tr.goalPrice;
-            totalCost = roundEx(tr.cost.total + totalCost, stock.precision());
-            totalRisk = roundEx(totalRisk + (tr.realPrice - tr.stoploss) * number * stock.unit(),
-                                stock.precision());
-            sellMoney =
-              roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
+    double tr_num = (tr.business == BUSINESS_BUY) ? tr.number : -tr.number;
+    double new_number = number + tr_num;
+    if (new_number == 0.0) {
+        cleanDatetime = tr.datetime;
+    }
 
-        } break;
+    avgPrice = std::fabs((tr.realPrice * tr_num + avgPrice * number) / new_number);
+    number = new_number;
+    stoploss = tr.stoploss;
+    goalPrice = tr.goalPrice;
+    totalCost = roundEx(tr.cost.total + totalCost, stock.precision());
+    totalRisk =
+      roundEx(totalRisk + (tr.realPrice - tr.stoploss) * number * stock.unit(), stock.precision());
 
-        default:
-            HKU_ERROR("The business({}) should not appear here!", getBusinessName(tr.business));
-            break;
+    if (tr.business == BUSINESS_BUY) {
+        totalNumber += tr.number;
+        buyMoney = roundEx(tr.realPrice * tr.number * stock.unit() * tr.margin_ratio + buyMoney,
+                           stock.precision());
+    } else {
+        sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
     }
 }
 

@@ -38,7 +38,12 @@ public:
     void addTradeRecord(const TradeRecord& tr, const MarginRecord& margin);
 
     /** 获取指定日期时的浮动盈亏和维持保证金 */
-    std::tuple<price_t, price_t> getProfit(Datetime datetime);
+    // std::tuple<price_t, price_t> getProfit(Datetime datetime);
+
+    /** 是否为空头仓位 */
+    bool isShort() const {
+        return number < 0.0;
+    }
 
     Stock stock;               ///< 交易对象
     Datetime takeDatetime;     ///< 初次建仓日期
