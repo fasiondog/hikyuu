@@ -28,6 +28,42 @@ PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
   totalRisk(totalRisk),
   sellMoney(sellMoney) {}
 
+PositionRecord::PositionRecord(PositionRecord&& rv)
+: stock(rv.stock),
+  takeDatetime(rv.takeDatetime),
+  cleanDatetime(rv.cleanDatetime),
+  number(rv.number),
+  avgPrice(rv.avgPrice),
+  stoploss(rv.stoploss),
+  goalPrice(rv.goalPrice),
+  totalNumber(rv.totalNumber),
+  buyMoney(rv.buyMoney),
+  totalCost(rv.totalCost),
+  totalRisk(rv.totalRisk),
+  sellMoney(rv.sellMoney),
+  contracts(std::move(rv.contracts)) {
+    rv.stock = Null<Stock>();
+}
+
+PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
+    HKU_IF_RETURN(this == &rv, *this);
+    stock = rv.stock;
+    takeDatetime = rv.takeDatetime;
+    cleanDatetime = rv.cleanDatetime;
+    number = rv.number;
+    avgPrice = rv.avgPrice;
+    stoploss = rv.stoploss;
+    goalPrice = rv.goalPrice;
+    totalNumber = rv.totalNumber;
+    buyMoney = rv.buyMoney;
+    totalCost = rv.totalCost;
+    totalRisk = rv.totalRisk;
+    sellMoney = rv.sellMoney;
+    contracts = std::move(rv.contracts);
+    rv.stock = Null<Stock>();
+    return *this;
+}
+
 void PositionRecord::addTradeRecord(const TradeRecord& tr, const MarginRecord& margin) {
     HKU_ASSERT(tr.business == BUSINESS_BUY || tr.business == BUSINESS_SELL);
     if (stock.isNull()) {
@@ -37,7 +73,11 @@ void PositionRecord::addTradeRecord(const TradeRecord& tr, const MarginRecord& m
 
     double tr_num = (tr.business == BUSINESS_BUY) ? tr.number : -tr.number;
     double new_number = number + tr_num;
-    if (new_number == 0.0) {
+    if (new_number < 0.0) {
+        HKU_ERROR("The position number not match!");
+        return;
+
+    } else if (new_number == 0.0) {
         cleanDatetime = tr.datetime;
     }
 
