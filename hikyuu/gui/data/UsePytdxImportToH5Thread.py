@@ -320,12 +320,11 @@ class UsePytdxImportToH5Thread(QThread):
                             break
                     if not ok:
                         for task in self.tasks:
-                            if task.status == "running":
-                                self.logger.error(
-                                    f"All process is finished, but task ({task.__class__.__name__}) is running!"
-                                )
+                            self.logger.info(f"task ({task.__class__.__name__}) status: {task.status}!")
+                        for p in self.process_list:
+                            self.logger.info(f"Process exit code: {p.exitcode}")
                         finished_count = 0
-                        raise Exception("All process is finished, but some tasks are running!")
+                        self.logger.error("All process is finished, but some tasks are running!")
 
             except Exception as e:
                 self.logger.error(str(e))
