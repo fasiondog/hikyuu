@@ -71,7 +71,7 @@ TEST_CASE("test_TradeRecord_export") {
     record1.number = 1000;
     record1.stoploss = 9.77;
     record1.cash = 99998.1;
-    record1.margin_ratio = 0.1;
+    record1.marginRatio = 0.1;
     record1.from = PART_SIGNAL;
     {
         std::ofstream ofs(filename);

@@ -54,7 +54,7 @@ public:
     TradeRecord() = default;
     TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business, price_t planPrice,
                 price_t realPrice, price_t goalPrice, double number, const CostRecord& cost,
-                price_t stoploss, price_t cash, double margin_ratio, SystemPart from);
+                price_t stoploss, price_t cash, double marginRatio, SystemPart from);
 
     /** 仅用于python的__str__ */
     string toString() const;
@@ -71,7 +71,7 @@ public:
     CostRecord cost;                       ///< 交易成本
     price_t stoploss = 0.0;                ///< 止损价
     price_t cash = 0.0;                    ///< 现金余额
-    double margin_ratio = 1.0;             ///< 保证金比例
+    double marginRatio = 1.0;              ///< 保证金比例
     SystemPart from = PART_INVALID;  ///< 辅助记录交易系统部件，区别是哪个部件发出的指示
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -92,7 +92,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
-        ar& BOOST_SERIALIZATION_NVP(margin_ratio);
+        ar& BOOST_SERIALIZATION_NVP(marginRatio);
         string part_name(getSystemPartName(from));
         ar& bs::make_nvp<string>("from", part_name);
     }
@@ -114,7 +114,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(cost);
         ar& BOOST_SERIALIZATION_NVP(stoploss);
         ar& BOOST_SERIALIZATION_NVP(cash);
-        ar& BOOST_SERIALIZATION_NVP(margin_ratio);
+        ar& BOOST_SERIALIZATION_NVP(marginRatio);
         string part_name;
         ar& bs::make_nvp<string>("from", part_name);
         from = getSystemPartEnum(part_name);

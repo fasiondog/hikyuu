@@ -66,7 +66,6 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
   m_checkin_stock(0.0),
   m_checkout_stock(0.0) {
     setParam<bool>("enable_short", false);  // 是否支持做空
-    setParam<bool>("auto_checkin", false);  // 可用资金不足时，是否自动存入资金
     setParam<bool>("save_action", true);    // 是否保存命令
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
@@ -354,40 +353,35 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     // 账户资金精度及保证金比例
     int precision = getParam<int>("precision");
-    MarginRecord margin = getMarginRatio(datetime, stock);
+    double marginRatio = getMarginRatio(datetime, stock);
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
     // 买入资产价值
     price_t value = realPrice * number * stock.unit();
 
     // 计算买入当前资产需要的资金
-    price_t total_need_money = roundEx(value * margin.initRatio + cost.total, precision);
-
-    // 检查当前现金是否充足，如果可自动补充资金则补充资金，否则直接返回
-    if (total_need_money > m_cash) {
-        HKU_WARN_IF_RETURN(!getParam<bool>("auto_checkin"), result,
-                           "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
-                           stock.market_code(), total_need_money, m_cash);
-        checkin(datetime, roundUp(total_need_money - m_cash, precision));
-    }
+    price_t total_need_money = roundEx(value * marginRatio + cost.total, precision);
+    HKU_WARN_IF_RETURN(total_need_money > m_cash, result,
+                       "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
+                       stock.market_code(), total_need_money, m_cash);
 
     // 更新现金
     m_cash = roundEx(m_cash - total_need_money, precision);
 
     // 加入交易记录
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
-                         cost, stoploss, m_cash, margin.initRatio, from);
+                         cost, stoploss, m_cash, marginRatio, from);
     m_trade_list.push_back(result);
 
     //更新当前持仓记录
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     if (pos_iter == m_position.end()) {
         PositionRecord position;
-        position.addTradeRecord(result, margin);
+        position.addTradeRecord(result);
         m_position[stock.id()] = std::move(position);
     } else {
         PositionRecord& position = pos_iter->second;
-        position.addTradeRecord(result, margin);
+        position.addTradeRecord(result);
         if (position.number == 0.0) {
             m_position_history.push_back(std::move(position));
             m_position.erase(stock.id());
@@ -434,9 +428,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     // 获取当前持仓
     position_map_type::iterator pos_iter = m_position.find(stock.id());
-
-    // 如果不支持做空且当前没有仓位，则直接返回
-    HKU_ERROR_IF_RETURN(!getParam<bool>("enable_short") && pos_iter == m_position.end(), result,
+    HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), result,
                         "{} {} This stock was not bought never!", datetime, stock.market_code());
 
     PositionRecord& position = pos_iter->second;
@@ -465,7 +457,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     m_trade_list.push_back(result);
 
     //更新当前持仓情况
-    position.addTradeRecord(result, margin);
+    position.addTradeRecord(result);
     if (position.number == 0.0) {
         m_position_history.push_back(position);
         //删除当前持仓
@@ -745,6 +737,14 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
 
     for (size_t i = 0; i < total; ++i) {
         m_trade_list.push_back(new_trade_buffer[i]);
+    }
+
+    if (getParam<bool>("enable_short")) {
+        position_iter = m_position.begin();
+        for (; position_iter != m_position.end(); ++position_iter) {
+            auto& position = position_iter->second;
+            auto k = position.stock.getKRecord(datetime.startOfDay(), KQuery::DAY);
+        }
     }
 
     m_last_update_datetime = datetime;

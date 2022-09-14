@@ -54,7 +54,7 @@ void export_TradeRecord() {
       .def_readwrite("cost", &TradeRecord::cost, "交易成本")
       .def_readwrite("stoploss", &TradeRecord::stoploss, "止损价（float）")
       .def_readwrite("cash", &TradeRecord::cash, "现金余额（float）")
-      .def_readwrite("margin_ratio", &TradeRecord::margin_ratio, "保证金比例")
+      .def_readwrite("margin_ratio", &TradeRecord::marginRatio, "保证金比例")
       .def_readwrite("part", &TradeRecord::from,
                      "交易指示来源，区别是交易系统哪个部件发出的指示，参见： "
                      ":py:class:`System.Part`")  // python中不能用from关键字

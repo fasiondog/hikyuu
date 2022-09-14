@@ -58,8 +58,8 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
 
 TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS business,
                          price_t planPrice, price_t realPrice, price_t goalPrice, double number,
-                         const CostRecord& cost, price_t stoploss, price_t cash,
-                         double margin_ratio, SystemPart from)
+                         const CostRecord& cost, price_t stoploss, price_t cash, double marginRatio,
+                         SystemPart from)
 : stock(stock),
   datetime(datetime),
   business(business),
@@ -70,7 +70,7 @@ TradeRecord::TradeRecord(const Stock& stock, const Datetime& datetime, BUSINESS 
   cost(cost),
   stoploss(stoploss),
   cash(cash),
-  margin_ratio(margin_ratio),
+  marginRatio(marginRatio),
   from(from) {}
 
 string TradeRecord::toString() const {
@@ -96,7 +96,7 @@ string TradeRecord::toString() const {
 
     os << strip << goalPrice << strip << number << strip << cost.commission << strip
        << cost.stamptax << strip << cost.transferfee << strip << cost.others << strip << cost.total
-       << strip << stoploss << strip << cash << strip << margin_ratio << strip
+       << strip << stoploss << strip << cash << strip << marginRatio << strip
        << getSystemPartName(from) << ")";
 
     os.unsetf(std::ostream::floatfield);

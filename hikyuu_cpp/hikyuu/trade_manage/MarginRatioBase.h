@@ -10,7 +10,6 @@
 #include "hikyuu/Stock.h"
 #include "hikyuu/utilities/util.h"
 #include "hikyuu/utilities/Parameter.h"
-#include "MarginRecord.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>
@@ -47,7 +46,7 @@ public:
      * @param datetime 指定日期
      * @param stk 指定标的
      */
-    virtual MarginRecord getMarginRatio(Datetime datetime, const Stock& stk) const = 0;
+    virtual double getMarginRatio(Datetime datetime, const Stock& stk) const = 0;
 
     /** 继承子类必须实现私有变量的克隆接口 */
     virtual MarginRatioPtr _clone() = 0;

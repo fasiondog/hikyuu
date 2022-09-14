@@ -64,7 +64,7 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
     return *this;
 }
 
-void PositionRecord::addTradeRecord(const TradeRecord& tr, const MarginRecord& margin) {
+void PositionRecord::addTradeRecord(const TradeRecord& tr) {
     HKU_ASSERT(tr.business == BUSINESS_BUY || tr.business == BUSINESS_SELL);
     if (stock.isNull()) {
         stock = tr.stock;
@@ -91,10 +91,30 @@ void PositionRecord::addTradeRecord(const TradeRecord& tr, const MarginRecord& m
 
     if (tr.business == BUSINESS_BUY) {
         totalNumber += tr.number;
-        buyMoney = roundEx(tr.realPrice * tr.number * stock.unit() * tr.margin_ratio + buyMoney,
+        buyMoney = roundEx(tr.realPrice * tr.number * stock.unit() * tr.marginRatio + buyMoney,
                            stock.precision());
     } else {
         sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
+    }
+
+    if (tr.business == BUSINESS_BUY) {
+        contracts.emplace_back(tr.datetime, tr.realPrice, tr.number, tr.marginRatio);
+    } else {
+        // auto iter = contracts.begin();
+        // double remove_num = 0.0;
+        // std::list<ContractRecord>::iterator last_remove_iter;
+        // for (; iter != contracts.end(); ++iter) {
+        //     if (remove_num == tr.number) {
+        //         last_remove_iter = iter + 1;
+        //         break;
+        //     } else if (remove_num > tr.number) {
+        //         last_remove_iter = iter - 1;
+        //         last_remove_iter->number = remove_nume - tr.number;
+        //         last_remove_iter++;
+        //         break;
+        //     }
+        //     remove_num += iter->number;
+        // }
     }
 }
 
