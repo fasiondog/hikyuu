@@ -23,10 +23,10 @@ struct ContractRecord {
     ContractRecord(const Datetime& datetime, price_t price, double number, double marginRatio)
     : datetime(datetime), price(price), number(number), marginRatio(marginRatio) {}
 
-    Datetime datetime;   // 交易日期
-    price_t price;       // 成交价格
-    double number;       // 成交数量
-    double marginRatio;  // 保证金比例
+    Datetime datetime;    // 交易日期
+    price_t price;        // 成交价格
+    double number;        // 成交数量
+    price_t marginRatio;  // 保证金比例
 
 private:
 #if HKU_SUPPORT_SERIALIZATION
@@ -62,8 +62,8 @@ public:
     /** 仅用于python的__str__ */
     string toString() const;
 
-    /** 根据交易记录更新仓位信息 */
-    void addTradeRecord(const TradeRecord& tr);
+    /** 根据交易记录更新仓位信息，卖出时返回需返还资金（占用保证金+盈利） */
+    price_t addTradeRecord(const TradeRecord& tr);
 
     Stock stock;               ///< 交易对象
     Datetime takeDatetime;     ///< 初次建仓日期

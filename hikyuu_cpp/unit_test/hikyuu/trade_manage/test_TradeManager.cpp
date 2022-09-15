@@ -84,6 +84,19 @@ TEST_CASE("test_TradeManager_getSellCost") {
 }
 
 /** @par 检测点 */
+TEST_CASE("test_TradeManager_getMarginRatio") {
+    Stock stock = getStock("sh600004");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_Zero());
+
+    // 默认未指定获取保证金算法
+    CHECK_EQ(tm->getMarginRatio(Datetime(200001020000), stock), 1.0);
+
+    // 指定保证金算法
+    tm->marginRatioFunc(MR_Fixed(0.02));
+    CHECK_EQ(tm->getMarginRatio(Datetime(200001020000), stock), 0.02);
+}
+
+/** @par 检测点 */
 TEST_CASE("test_TradeManager_can_not_buy") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -299,8 +312,56 @@ TEST_CASE("test_TradeManager_can_not_checkout") {
     CHECK_EQ(tm->checkout(Datetime(200001030000), 100000), true);
 }
 
+/** @par 检测点，正常买卖 */
+TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
+    Stock stk = getStock("sz000001");
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+    TradeRecord tr;
+    CostRecord cost;
+
+    // 买入两次后，一次全买
+    tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
+    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 55.8, 0.0, 100, cost,
+                             0.0, 94420.00, 1.0, PART_INVALID));
+    CHECK_EQ(tm->currentCash(), 94420.0);
+
+    tr = tm->buy(Datetime(199305200000L), stk, 56.1, 200);
+    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 56.1, 0.0, 200, cost,
+                             0.0, 83200.00, 1.0, PART_INVALID));
+    CHECK_EQ(tm->currentCash(), 83200.00);
+
+    tr = tm->sell(Datetime(199305210000L), stk, 55.15, 300);
+    CHECK_EQ(tm->currentCash(), 99745.00);
+    CHECK(tm->getPositionList().empty());
+    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305210000L), BUSINESS_SELL, 0.0, 55.15, 0.0, 300,
+                             cost, 0.0, 99745.00, 1.0, PART_INVALID));
+
+    // 第一次买入100，第二次买入200，第三次卖出200
+    tm = crtTM(Datetime(199305010000), 100000);
+    tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
+    tr = tm->buy(Datetime(199305200000L), stk, 56.1, 200);
+    tr = tm->sell(Datetime(199305210000L), stk, 55.15, 200);
+    CHECK_EQ(tm->currentCash(), 94230.00);
+    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305210000L), BUSINESS_SELL, 0.0, 55.15, 0.0, 200,
+                             cost, 0.0, 94230.00, 1.0, PART_INVALID));
+    auto positionList = tm->getPositionList();
+    CHECK_EQ(positionList.size(), 1);
+    const auto& position = positionList[0];
+    CHECK_EQ(position.number, 100.0);
+    CHECK_EQ(position.totalNumber, 300.0);
+    CHECK_EQ(position.contracts.size(), 1);
+    const auto& contract = position.contracts.front();
+    CHECK_EQ(contract.datetime, Datetime(199305200000L));
+    CHECK_EQ(contract.number, 100);
+    CHECK_EQ(contract.price, 56.1);
+    CHECK_EQ(contract.marginRatio, 1.0);
+    // HKU_INFO("{}", tr);
+    // HKU_INFO("{}", stk.getKRecord(Datetime(199305240000L)));
+    // HKU_INFO("{}", stk.getKRecord(Datetime(199305250000L)));
+}
+
 /** @par 检测点，测试 getTradeList */
-TEST_CASE("test_getTradeList") {
+TEST_CASE("test_TradeManager_getTradeList") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("sz000001");
 

@@ -64,8 +64,9 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
     return *this;
 }
 
-void PositionRecord::addTradeRecord(const TradeRecord& tr) {
+price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
     HKU_ASSERT(tr.business == BUSINESS_BUY || tr.business == BUSINESS_SELL);
+    price_t return_cash = 0.0;
     if (stock.isNull()) {
         stock = tr.stock;
         takeDatetime = tr.datetime;
@@ -75,7 +76,7 @@ void PositionRecord::addTradeRecord(const TradeRecord& tr) {
     double new_number = number + tr_num;
     if (new_number < 0.0) {
         HKU_ERROR("The position number not match!");
-        return;
+        return 0.0;
 
     } else if (new_number == 0.0) {
         cleanDatetime = tr.datetime;
@@ -93,29 +94,34 @@ void PositionRecord::addTradeRecord(const TradeRecord& tr) {
         totalNumber += tr.number;
         buyMoney = roundEx(tr.realPrice * tr.number * stock.unit() * tr.marginRatio + buyMoney,
                            stock.precision());
-    } else {
-        sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
-    }
-
-    if (tr.business == BUSINESS_BUY) {
         contracts.emplace_back(tr.datetime, tr.realPrice, tr.number, tr.marginRatio);
     } else {
-        // auto iter = contracts.begin();
-        // double remove_num = 0.0;
-        // std::list<ContractRecord>::iterator last_remove_iter;
-        // for (; iter != contracts.end(); ++iter) {
-        //     if (remove_num == tr.number) {
-        //         last_remove_iter = iter + 1;
-        //         break;
-        //     } else if (remove_num > tr.number) {
-        //         last_remove_iter = iter - 1;
-        //         last_remove_iter->number = remove_nume - tr.number;
-        //         last_remove_iter++;
-        //         break;
-        //     }
-        //     remove_num += iter->number;
-        // }
+        sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
+        price_t frozen_cash = 0.0;
+        price_t remove_value = 0.0;
+        double remove_num = 0.0;
+        auto iter = contracts.begin();
+        for (; iter != contracts.end(); ++iter) {
+            remove_num += iter->number;
+            if (remove_num == tr.number) {
+                price_t value = iter->price * iter->number * stock.unit();
+                remove_value += value;
+                frozen_cash += value * iter->marginRatio;
+                ++iter;
+                break;
+            } else if (remove_num > tr.number) {
+                double sub_num = remove_num - tr.number;
+                iter->number = sub_num;
+                price_t value = sub_num * iter->price * stock.unit();
+                remove_value += value;
+                frozen_cash += value * iter->marginRatio;
+                break;
+            }
+        }
+        return_cash = frozen_cash + tr.number * tr.realPrice * stock.unit() - remove_value;
+        contracts.erase(contracts.begin(), iter);
     }
+    return return_cash;
 }
 
 string PositionRecord::toString() const {

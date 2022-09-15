@@ -445,24 +445,22 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     CostRecord cost = getSellCost(datetime, stock, realPrice, real_number);
     auto margin = getMarginRatio(datetime, stock);
 
-    // 当前卖出资产价值
-    // price_t value = realPrice * real_number * stcok.unit();
-
-    //更新现金余额
-    m_cash = roundEx(m_cash + realPrice * real_number * stock.unit() - cost.total, precision);
-
-    //更新交易记录
+    // 更新当前持仓情况，并计算卖出后获利
     result = TradeRecord(stock, datetime, BUSINESS_SELL, planPrice, realPrice, goalPrice,
                          real_number, cost, stoploss, m_cash, 1.0, from);
-    m_trade_list.push_back(result);
-
-    //更新当前持仓情况
-    position.addTradeRecord(result);
+    price_t profit = position.addTradeRecord(result);
     if (position.number == 0.0) {
         m_position_history.push_back(position);
         //删除当前持仓
         m_position.erase(stock.id());
     }
+
+    //更新现金余额
+    m_cash = roundEx(m_cash + profit - cost.total, precision);
+
+    //更新交易记录
+    result.cash = m_cash;
+    m_trade_list.push_back(result);
 
     if (result.datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
