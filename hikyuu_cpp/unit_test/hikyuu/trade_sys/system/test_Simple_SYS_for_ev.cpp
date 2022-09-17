@@ -60,7 +60,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
 
     /** @arg 指定了TM、SG、MM、ST、TP、EV（不触发建仓），但未指定其他策略组件，非延迟操作 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", false);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -104,7 +105,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
 
     /** @arg 指定了TM、SG、MM、ST、TP、EV（触发建仓），但未指定其他策略组件，非延迟操作 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", true);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -161,7 +163,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
 
     /** @arg 指定了TM、SG、MM、ST、TP、EV（不触发建仓），但未指定其他策略组件，延迟操作 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", true);
+    sys->setParam<bool>("buy_delay", true);
+    sys->setParam<bool>("sell_delay", true);
     sys->setParam<bool>("ev_open_position", false);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -205,7 +208,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
 
     /** @arg 指定了TM、SG、MM、ST、TP、EV（触发建仓），但未指定其他策略组件，延迟操作 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", true);
+    sys->setParam<bool>("buy_delay", true);
+    sys->setParam<bool>("sell_delay", true);
     sys->setParam<bool>("ev_open_position", true);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -264,7 +268,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
      * 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、不触发建仓），但未指定其他策略组件，非延迟操作
      */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", false);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -308,7 +313,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
      * 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、触发建仓），但未指定其他策略组件，非延迟操作
      */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", true);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -350,7 +356,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
 
     /** @arg 指定了TM、SG、MM、EV（触发建仓），EV的有效起始日期刚好是买入信号日期 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", true);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());

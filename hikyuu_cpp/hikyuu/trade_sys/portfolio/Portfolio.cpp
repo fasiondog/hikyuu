@@ -222,7 +222,7 @@ void Portfolio::_runMomentOnOpen(const Datetime& date) {
 
     // 在开盘时执行所有运行中的非延迟交易系统系统
     for (auto& sub_sys : m_running_sys_list) {
-        if (!sub_sys->getParam<bool>("delay")) {
+        if (!sub_sys->getParam<bool>("buy_delay")) {
             auto tr = sub_sys->runMoment(date);
             if (!tr.isNull()) {
                 m_tm->addTradeRecord(tr);
@@ -264,7 +264,7 @@ void Portfolio::_runMomentOnClose(const Datetime& date) {
 
     // 执行所有非延迟运行中系统
     for (auto& sub_sys : m_running_sys_list) {
-        if (sub_sys->getParam<bool>("delay")) {
+        if (sub_sys->getParam<bool>("buy_delay")) {
             auto tr = sub_sys->runMoment(date);
             if (!tr.isNull()) {
                 m_tm->addTradeRecord(tr);

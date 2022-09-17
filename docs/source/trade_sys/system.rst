@@ -8,7 +8,8 @@
 
 公共参数：
 
-    * **delay=True** *(bool)* : 是否延迟到下一个bar开盘时进行交易
+    * **buy_delay=True** *(bool)* : 买入操作是否延迟到下一个bar开盘时进行交易
+    * **sell_delay=True** *(bool)* : 卖出操作是否延迟到下一个bar开盘时进行交易
     * **delay_use_current_price=True** *(bool)* : 延迟操作的情况下，是使用当前交易时bar的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     * **max_delay_count=3** *(int)* : 连续延迟交易请求的限制次数，应大于等于0，0表示只允许延迟1次
     * **tp_monotonic=True** *(bool)* : 止赢单调递增
