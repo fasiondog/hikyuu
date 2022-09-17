@@ -753,8 +753,6 @@ void System::_submitSellRequest(const KRecord& today, const KRecord& src_today, 
 TradeRecord System::_processRequest(const KRecord& today, const KRecord& src_today) {
     HKU_IF_RETURN(m_buyRequest.valid, _buyDelay(today, src_today));
     HKU_IF_RETURN(m_sellRequest.valid, _sellDelay(today, src_today));
-    HKU_IF_RETURN(m_sellShortRequest.valid, _sellShortDelay(today, src_today));
-    HKU_IF_RETURN(m_buyShortRequest.valid, _buyShortDelay(today, src_today));
     return TradeRecord();
 }
 
