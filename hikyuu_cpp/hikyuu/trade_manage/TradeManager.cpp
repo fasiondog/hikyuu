@@ -635,8 +635,7 @@ PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType k
     int precision = getParam<int>("precision");
     for (size_t i = 0; i < total; ++i) {
         FundsRecord funds = getFunds(dates[i], ktype);
-        result[i] = roundEx(
-          funds.cash + funds.market_value - funds.borrow_cash - funds.borrow_asset, precision);
+        result[i] = roundEx(funds.cash + funds.market_value, precision);
     }
     return result;
 }
@@ -655,9 +654,8 @@ PriceList TradeManager::getProfitCurve(const DatetimeList& dates, KQuery::KType 
     int precision = getParam<int>("precision");
     for (; i < total; ++i) {
         FundsRecord funds = getFunds(dates[i], ktype);
-        result[i] = roundEx(funds.cash + funds.market_value - funds.borrow_cash -
-                              funds.borrow_asset - funds.base_cash - funds.base_asset,
-                            precision);
+        result[i] =
+          roundEx(funds.cash + funds.market_value - funds.base_cash - funds.base_asset, precision);
     }
 
     return result;

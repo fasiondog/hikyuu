@@ -15,8 +15,6 @@ Performance::Performance() {
     m_name_list.push_back("帐户初始金额");
     m_name_list.push_back("累计投入本金");
     m_name_list.push_back("累计投入资产");
-    m_name_list.push_back("累计借入现金");
-    m_name_list.push_back("累计借入资产");
     m_name_list.push_back("累计红利");
     m_name_list.push_back("现金余额");
     m_name_list.push_back("未平仓头寸净值");
@@ -130,11 +128,8 @@ void Performance ::statistics(const TradeManagerPtr& tm, const Datetime& datetim
     m_result["现金余额"] = funds.cash;
     m_result["累计投入本金"] = funds.base_cash;
     m_result["累计投入资产"] = funds.base_asset;
-    m_result["累计借入现金"] = funds.borrow_cash;
-    m_result["累计借入资产"] = funds.borrow_asset;
     m_result["未平仓头寸净值"] = funds.market_value;
-    m_result["当前总资产"] =
-      funds.cash + funds.market_value - funds.borrow_cash - funds.borrow_asset;
+    m_result["当前总资产"] = funds.cash + funds.market_value;
     price_t total_money = funds.base_cash + funds.base_asset;
 
     const TradeRecordList& trade_list = tm->getTradeList();

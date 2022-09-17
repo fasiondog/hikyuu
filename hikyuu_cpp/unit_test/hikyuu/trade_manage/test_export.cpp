@@ -191,8 +191,6 @@ TEST_CASE("test_FundsRecord_export") {
     funds1.market_value = 2.0;
     funds1.base_cash = 3.0;
     funds1.base_asset = 4.0;
-    funds1.borrow_cash = 5.0;
-    funds1.borrow_asset = 6.0;
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
