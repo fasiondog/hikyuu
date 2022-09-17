@@ -64,6 +64,23 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
     return *this;
 }
 
+price_t PositionRecord::getProfitOfPreDay(Datetime datetime) {
+    auto closeTime = StockManager::instance().getMarketInfo(stock.market()).closeTime2();
+    Datetime preDay = (datetime - Days(1)).startOfDay() + closeTime;
+    KQuery query(preDay, datetime, KQuery::DAY);
+    size_t startix = 0, endix = 0;
+    price_t profit = 0.0;
+    if (stock.getIndexRange(query, startix, endix)) {
+        price_t closePrice = stock.getKRecord(startix).closePrice;
+        for (const auto& contract : contracts) {
+            if (contract.datetime <= preDay) {
+                profit += (closePrice - contract.price) * number * stock.unit();
+            }
+        }
+    }
+    return profit;
+}
+
 price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
     HKU_ASSERT(tr.business == BUSINESS_BUY || tr.business == BUSINESS_SELL);
     price_t return_cash = 0.0;

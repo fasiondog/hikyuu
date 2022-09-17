@@ -28,9 +28,9 @@ public:
     FundsRecord(price_t cash, price_t market_value, price_t base_cash, price_t base_asset);
 
     price_t cash;         /**< 当前账户现金 */
-    price_t market_value; /**< 当前持仓市值 */
+    price_t market_value; /**< 当前持仓市值, 对于合约交易，则为占用保证金+盈利 */
     price_t base_cash;    /**< 当前投入本金principal */
-    price_t base_asset;   /**< 当前投入的自有资产价值 */
+    price_t base_asset; /**< 当前投入的自有资产价值 */
 
     //当前总资产 = 现金 + 市值
     //         = cash + market_value

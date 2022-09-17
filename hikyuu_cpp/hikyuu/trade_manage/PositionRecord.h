@@ -65,6 +65,12 @@ public:
     /** 根据交易记录更新仓位信息，卖出时返回需返还资金（占用保证金+盈利） */
     price_t addTradeRecord(const TradeRecord& tr);
 
+    /**
+     * 计算指定时刻前一交易日结算的盈利
+     * @note 按日结算
+     */
+    price_t getProfitOfPreDay(Datetime datetime);
+
     Stock stock;               ///< 交易对象
     Datetime takeDatetime;     ///< 初次建仓日期
     Datetime cleanDatetime;    ///< 平仓日期，当前持仓记录中为Null<Datetime>()

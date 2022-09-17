@@ -65,8 +65,8 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
   m_checkout_stock(0.0) {
-    setParam<bool>("enable_short", false);  // 是否支持做空
-    setParam<bool>("save_action", true);    // 是否保存命令
+    setParam<bool>("enable_contract", false);  // 是否合约交易
+    setParam<bool>("save_action", true);       // 是否保存命令
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -735,12 +735,14 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
 
-    if (getParam<bool>("enable_short")) {
+    if (getParam<bool>("enable_contract")) {
+        // 将前一交易日浮盈转入可用资金
         position_iter = m_position.begin();
+        price_t profit = 0.0;
         for (; position_iter != m_position.end(); ++position_iter) {
-            auto& position = position_iter->second;
-            auto k = position.stock.getKRecord(datetime.startOfDay(), KQuery::DAY);
+            profit += position_iter->second.getProfitOfPreDay(datetime);
         }
+        m_cash = roundEx(m_cash + profit, precision);
     }
 
     m_last_update_datetime = datetime;
