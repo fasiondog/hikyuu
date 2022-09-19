@@ -353,7 +353,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     // 账户资金精度及保证金比例
     int precision = getParam<int>("precision");
-    double marginRatio = getMarginRatio(datetime, stock);
+    auto marginRatio = getMarginRatio(datetime, stock);
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
     // 买入资产价值
@@ -748,6 +748,23 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     m_last_update_datetime = datetime;
 }
 
+void TradeManager::_updateSettleByDay(const Datetime& datetime) {
+    HKU_IF_RETURN(m_contracts.empty(), void());
+
+    auto iter = m_contracts.begin();
+
+    // 假定同一账户操作的开闭市时间相同，从第一个证券获取闭市时间
+    if (m_market_close_time == Null<TimeDelta>()) {
+        m_market_close_time =
+          StockManager::instance().getMarketInfo(iter->stock.market()).closeTime2();
+    }
+
+    price_t profit = 0.0;
+    price_t need_maintain_money = 0.0;
+    for (; iter != m_contracts.end(); ++iter) {
+    }
+}
+
 void TradeManager::_saveAction(const TradeRecord& record) {
     HKU_IF_RETURN(getParam<bool>("save_action") == false, void());
     std::stringstream buf(std::stringstream::out);
@@ -980,10 +997,9 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     //更新当前持仓记录
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
     if (pos_iter == m_position.end()) {
-        m_position[tr.stock.id()] = PositionRecord(
-          tr.stock, tr.datetime, Null<Datetime>(), tr.number, tr.realPrice, tr.stoploss,
-          tr.goalPrice, tr.number, money, tr.cost.total,
-          roundEx((tr.realPrice - tr.stoploss) * tr.number * tr.stock.unit(), precision), 0.0);
+        PositionRecord position;
+        position.addTradeRecord(tr);
+        m_position[tr.stock.id()] = position;
     } else {
         PositionRecord& position = pos_iter->second;
         position.number += tr.number;

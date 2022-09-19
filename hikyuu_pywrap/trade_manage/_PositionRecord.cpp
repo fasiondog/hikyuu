@@ -19,9 +19,6 @@ using namespace hku;
 
 void export_PositionRecord() {
     class_<PositionRecord>("PositionRecord", "持仓记录", init<>())
-      .def(init<const Stock&, const Datetime&, const Datetime&, double, price_t, price_t, price_t,
-                double, price_t, price_t, price_t, price_t>())
-
       .def("__str__", &PositionRecord::toString)
       .def("__repr__", &PositionRecord::toString)
 

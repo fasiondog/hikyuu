@@ -15,6 +15,7 @@
 #include "TradeRecord.h"
 #include "PositionRecord.h"
 #include "FundsRecord.h"
+#include "ContractRecord.h"
 #include "OrderBrokerBase.h"
 #include "crt/TC_Zero.h"
 
@@ -239,6 +240,9 @@ private:
     //以脚本的形式保存交易动作，便于修正和校准
     void _saveAction(const TradeRecord&);
 
+    // 更新当前时刻前一结算日权益
+    void _updateSettleByDay(const Datetime& datetime);
+
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);
     bool _add_sell_tr(const TradeRecord&);
@@ -264,6 +268,10 @@ private:
     position_map_type m_position;  //当前持仓交易对象的持仓记录 ["sh000001"-> ]
     PositionRecordList m_position_history;  //持仓历史记录
 
+    TimeDelta m_market_close_time;       // 缓存市场闭市时间
+    list<ContractRecord> m_contracts;    // 记录当前持仓的合约
+    map<Datetime, FundsRecord> m_funds;  // 记录每日结算资产
+
     list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易
 
 //==================================================
@@ -287,6 +295,7 @@ private:
         ar& bs::make_nvp<PositionRecordList>("m_position", position);
         ar& BOOST_SERIALIZATION_NVP(m_position_history);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar& BOOST_SERIALIZATION_NVP(m_contracts);
         ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
 
@@ -309,6 +318,7 @@ private:
         }
         ar& BOOST_SERIALIZATION_NVP(m_position_history);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
+        ar& BOOST_SERIALIZATION_NVP(m_contracts);
         ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
 

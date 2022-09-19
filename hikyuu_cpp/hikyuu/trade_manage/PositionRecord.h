@@ -10,6 +10,7 @@
 #define POSITIONRECORD_H_
 
 #include "TradeRecord.h"
+#include "ContractRecord.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/split_member.hpp>
@@ -17,30 +18,6 @@
 #endif
 
 namespace hku {
-
-struct ContractRecord {
-    ContractRecord() = default;
-    ContractRecord(const Datetime& datetime, price_t price, double number, double marginRatio)
-    : datetime(datetime), price(price), number(number), marginRatio(marginRatio) {}
-
-    Datetime datetime;    // 交易日期
-    price_t price;        // 成交价格
-    double number;        // 成交数量
-    price_t marginRatio;  // 保证金比例
-
-private:
-#if HKU_SUPPORT_SERIALIZATION
-private:
-    friend class boost::serialization::access;
-    template <class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_NVP(datetime);
-        ar& BOOST_SERIALIZATION_NVP(price);
-        ar& BOOST_SERIALIZATION_NVP(number);
-        ar& BOOST_SERIALIZATION_NVP(marginRatio);
-    }
-#endif
-};
 
 /**
  * 持仓记录
@@ -51,10 +28,6 @@ public:
     PositionRecord() = default;
     PositionRecord(const PositionRecord&) = default;
     PositionRecord(PositionRecord&& rv);
-    PositionRecord(const Stock& stock, const Datetime& takeDatetime, const Datetime& cleanDatetime,
-                   double number, price_t avgPrice, price_t stoploss, price_t goalPrice,
-                   double totalNumber, price_t buyMoney, price_t totalCost, price_t totalRisk,
-                   price_t sellMoney);
 
     PositionRecord& operator=(const PositionRecord&) = default;
     PositionRecord& operator=(PositionRecord&& rv);
@@ -66,7 +39,7 @@ public:
     price_t addTradeRecord(const TradeRecord& tr);
 
     /**
-     * 计算指定时刻前一交易日结算的盈利
+     * 计算指定时刻前一交易日结算的持仓盈利
      * @note 按日结算
      */
     price_t getProfitOfPreDay(Datetime datetime);
@@ -83,6 +56,7 @@ public:
     price_t totalCost = 0.0;   ///< 累计交易总成本
     price_t totalRisk = 0.0;  ///< 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
     price_t sellMoney = 0.0;  ///< 累计卖出资金
+    // Datetime preSettleDate;   ///< 上一次结算日期
 
     bool isShort = false;
     std::list<ContractRecord> contracts;

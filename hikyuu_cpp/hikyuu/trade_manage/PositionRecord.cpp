@@ -10,24 +10,6 @@
 
 namespace hku {
 
-PositionRecord::PositionRecord(const Stock& stock, const Datetime& takeDatetime,
-                               const Datetime& cleanDatetime, double number, price_t avgPrice,
-                               price_t stoploss, price_t goalPrice, double totalNumber,
-                               price_t totalMoney, price_t totalCost, price_t totalRisk,
-                               price_t sellMoney)
-: stock(stock),
-  takeDatetime(takeDatetime),
-  cleanDatetime(cleanDatetime),
-  number(number),
-  avgPrice(avgPrice),
-  stoploss(stoploss),
-  goalPrice(goalPrice),
-  totalNumber(totalNumber),
-  buyMoney(totalMoney),
-  totalCost(totalCost),
-  totalRisk(totalRisk),
-  sellMoney(sellMoney) {}
-
 PositionRecord::PositionRecord(PositionRecord&& rv)
 : stock(rv.stock),
   takeDatetime(rv.takeDatetime),
@@ -111,7 +93,7 @@ price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
         totalNumber += tr.number;
         buyMoney = roundEx(tr.realPrice * tr.number * stock.unit() * tr.marginRatio + buyMoney,
                            stock.precision());
-        contracts.emplace_back(tr.datetime, tr.realPrice, tr.number, tr.marginRatio);
+        contracts.emplace_back(stock, tr.datetime, tr.realPrice, tr.number, tr.marginRatio);
     } else {
         sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
         price_t frozen_cash = 0.0;
