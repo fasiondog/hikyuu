@@ -15,7 +15,6 @@ PositionRecord::PositionRecord(PositionRecord&& rv)
   takeDatetime(rv.takeDatetime),
   cleanDatetime(rv.cleanDatetime),
   number(rv.number),
-  avgPrice(rv.avgPrice),
   stoploss(rv.stoploss),
   goalPrice(rv.goalPrice),
   totalNumber(rv.totalNumber),
@@ -23,6 +22,9 @@ PositionRecord::PositionRecord(PositionRecord&& rv)
   totalCost(rv.totalCost),
   totalRisk(rv.totalRisk),
   sellMoney(rv.sellMoney),
+  lastSettleDatetime(rv.lastSettleDatetime),
+  lastSettleProfit(rv.lastSettleProfit),
+  lastSettleClosePrice(rv.lastSettleClosePrice),
   contracts(std::move(rv.contracts)) {
     rv.stock = Null<Stock>();
 }
@@ -33,7 +35,6 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
     takeDatetime = rv.takeDatetime;
     cleanDatetime = rv.cleanDatetime;
     number = rv.number;
-    avgPrice = rv.avgPrice;
     stoploss = rv.stoploss;
     goalPrice = rv.goalPrice;
     totalNumber = rv.totalNumber;
@@ -41,6 +42,9 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
     totalCost = rv.totalCost;
     totalRisk = rv.totalRisk;
     sellMoney = rv.sellMoney;
+    lastSettleDatetime = rv.lastSettleDatetime;
+    lastSettleProfit = rv.lastSettleProfit;
+    lastSettleClosePrice = rv.lastSettleClosePrice;
     contracts = std::move(rv.contracts);
     rv.stock = Null<Stock>();
     return *this;
@@ -69,6 +73,7 @@ price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
     if (stock.isNull()) {
         stock = tr.stock;
         takeDatetime = tr.datetime;
+        lastSettleDatetime = takeDatetime;
     }
 
     double tr_num = (tr.business == BUSINESS_BUY) ? tr.number : -tr.number;
@@ -81,7 +86,6 @@ price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
         cleanDatetime = tr.datetime;
     }
 
-    avgPrice = std::fabs((tr.realPrice * tr_num + avgPrice * number) / new_number);
     number = new_number;
     stoploss = tr.stoploss;
     goalPrice = tr.goalPrice;
@@ -139,9 +143,9 @@ string PositionRecord::toString() const {
     os << std::fixed;
     os.precision(precision);
     os << "Position(" << market << strip << code << strip << name << strip << takeDatetime << strip
-       << cleanDatetime << strip << number << strip << avgPrice << strip << stoploss << strip
-       << goalPrice << strip << totalNumber << strip << buyMoney << strip << totalCost << strip
-       << totalRisk << strip << sellMoney << ")";
+       << cleanDatetime << strip << number << strip << stoploss << strip << goalPrice << strip
+       << totalNumber << strip << buyMoney << strip << totalCost << strip << totalRisk << strip
+       << sellMoney << ")";
     os.unsetf(std::ostream::floatfield);
     os.precision();
     return os.str();
@@ -150,8 +154,7 @@ string PositionRecord::toString() const {
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
     return d1.stock == d2.stock && d1.takeDatetime == d2.takeDatetime &&
            d1.cleanDatetime == d2.cleanDatetime && fabs(d1.number - d2.number) < 0.00001 &&
-           fabs(d1.avgPrice - d2.avgPrice) < 0.0001 && fabs(d1.stoploss - d2.stoploss) < 0.0001 &&
-           fabs(d1.goalPrice - d2.goalPrice) < 0.0001 &&
+           fabs(d1.stoploss - d2.stoploss) < 0.0001 && fabs(d1.goalPrice - d2.goalPrice) < 0.0001 &&
            fabs(d1.totalNumber - d2.totalNumber) < 0.00001 &&
            fabs(d1.buyMoney - d2.buyMoney) < 0.0001 && fabs(d1.totalCost - d2.totalCost) < 0.0001 &&
            fabs(d1.sellMoney - d2.sellMoney) < 0.0001;

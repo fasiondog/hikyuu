@@ -736,33 +736,42 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     }
 
     if (getParam<bool>("enable_contract")) {
-        // 将前一交易日浮盈转入可用资金
-        position_iter = m_position.begin();
-        price_t profit = 0.0;
-        for (; position_iter != m_position.end(); ++position_iter) {
-            profit += position_iter->second.getProfitOfPreDay(datetime);
-        }
-        m_cash = roundEx(m_cash + profit, precision);
+        // 合约交易结算
+        _updateSettleByDay(datetime);
     }
 
     m_last_update_datetime = datetime;
 }
 
 void TradeManager::_updateSettleByDay(const Datetime& datetime) {
-    HKU_IF_RETURN(m_contracts.empty(), void());
+    HKU_IF_RETURN(m_position.empty(), void());
 
-    auto iter = m_contracts.begin();
+    auto iter = m_position.begin();
 
-    // 假定同一账户操作的开闭市时间相同，从第一个证券获取闭市时间
-    if (m_market_close_time == Null<TimeDelta>()) {
-        m_market_close_time =
-          StockManager::instance().getMarketInfo(iter->stock.market()).closeTime2();
-    }
-
-    price_t profit = 0.0;
+    price_t totalProfit = 0.0;
     price_t need_maintain_money = 0.0;
-    for (; iter != m_contracts.end(); ++iter) {
+    for (; iter != m_position.end(); ++iter) {
+        PositionRecord& position = iter->second;
+        Stock& stock = position.stock;
+
+        // 查找上一次结算日期后到当前时刻前的最后一个交易日K线记录
+        KQuery query(position.lastSettleDatetime + Minutes(1), datetime, KQuery::DAY);
+        size_t startix = 0, endix = 0;
+        if (stock.getIndexRange(query, startix, endix)) {
+            KRecord k = stock.getKRecord(endix - 1);
+            price_t diffPrice = k.closePrice - position.lastSettleClosePrice;
+            price_t profit = 0.0;
+            for (const auto& contract : position.contracts) {
+                profit += diffPrice * contract.number * stock.unit();
+            }
+            totalProfit += profit;
+            position.lastSettleDatetime = k.datetime;
+            position.lastSettleClosePrice = k.closePrice;
+            position.lastSettleProfit = profit;
+        }
     }
+
+    m_cash += roundEx(m_cash + totalProfit, getParam<int>("precision"));
 }
 
 void TradeManager::_saveAction(const TradeRecord& record) {

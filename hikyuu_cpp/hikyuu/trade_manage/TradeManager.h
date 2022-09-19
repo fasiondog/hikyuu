@@ -268,10 +268,6 @@ private:
     position_map_type m_position;  //当前持仓交易对象的持仓记录 ["sh000001"-> ]
     PositionRecordList m_position_history;  //持仓历史记录
 
-    TimeDelta m_market_close_time;       // 缓存市场闭市时间
-    list<ContractRecord> m_contracts;    // 记录当前持仓的合约
-    map<Datetime, FundsRecord> m_funds;  // 记录每日结算资产
-
     list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易
 
 //==================================================
@@ -295,7 +291,6 @@ private:
         ar& bs::make_nvp<PositionRecordList>("m_position", position);
         ar& BOOST_SERIALIZATION_NVP(m_position_history);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
-        ar& BOOST_SERIALIZATION_NVP(m_contracts);
         ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
 
@@ -318,7 +313,6 @@ private:
         }
         ar& BOOST_SERIALIZATION_NVP(m_position_history);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
-        ar& BOOST_SERIALIZATION_NVP(m_contracts);
         ar& BOOST_SERIALIZATION_NVP(m_actions);
     }
 

@@ -27,7 +27,6 @@ void export_PositionRecord() {
       .def_readwrite("clean_datetime", &PositionRecord::cleanDatetime,
                      "平仓日期，当前持仓记录中为 constant.null_datetime")
       .def_readwrite("number", &PositionRecord::number, "当前持仓数量（float）")
-      .def_readwrite("avg_price", &PositionRecord::avgPrice, "平均买入/卖出价格(float)")
       .def_readwrite("stoploss", &PositionRecord::stoploss, "当前止损价（float）")
       .def_readwrite("goal_price", &PositionRecord::goalPrice, "当前的目标价格（float）")
       .def_readwrite("total_number", &PositionRecord::totalNumber, "累计持仓数量（float）")
