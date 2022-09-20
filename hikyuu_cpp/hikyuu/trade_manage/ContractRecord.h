@@ -20,14 +20,16 @@ struct ContractRecord {
     ContractRecord() = default;
     ContractRecord(const Stock& stk, const Datetime& datetime, price_t price, double number,
                    double marginRatio)
-    : stock(stk), datetime(datetime), price(price), number(number), marginRatio(marginRatio) {}
+    : stock(stk), datetime(datetime), price(price), number(number), marginRatio(marginRatio) {
+        frozenCash = price * number * stock.unit() * marginRatio;
+    }
 
     Stock stock;
-    Datetime datetime;   // 交易日期
-    price_t price;       // 成交价格
-    double number;       // 成交数量
-    double marginRatio;  // 保证金比例
-    price_t profit;      // 上次结算时盈亏
+    Datetime datetime;         // 交易日期
+    price_t price = 0.0;       // 成交价格
+    double number = 0.0;       // 成交数量
+    price_t frozenCash = 0.0;  // 占用保证金
+    double marginRatio = 0.0;  // 上次结算时的保证金比例
 
 private:
 #if HKU_SUPPORT_SERIALIZATION
@@ -38,6 +40,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(datetime);
         ar& BOOST_SERIALIZATION_NVP(price);
         ar& BOOST_SERIALIZATION_NVP(number);
+        ar& BOOST_SERIALIZATION_NVP(frozenCash);
         ar& BOOST_SERIALIZATION_NVP(marginRatio);
     }
 #endif

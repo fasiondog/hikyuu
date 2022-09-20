@@ -50,21 +50,28 @@ PositionRecord& PositionRecord::operator=(PositionRecord&& rv) {
     return *this;
 }
 
-price_t PositionRecord::getProfitOfPreDay(Datetime datetime) {
-    auto closeTime = StockManager::instance().getMarketInfo(stock.market()).closeTime2();
-    Datetime preDay = (datetime - Days(1)).startOfDay() + closeTime;
-    KQuery query(preDay, datetime, KQuery::DAY);
-    size_t startix = 0, endix = 0;
+price_t PositionRecord::settleProfitOfPreDay(Datetime datetime, double marginRatio) {
+    // 查找上一次结算日期后到当前时刻前的最后一个交易日K线记录
     price_t profit = 0.0;
+    price_t addMarginCash = 0.0;  // 因保证金比例变化导致需要补缴的保证金
+    KQuery query(lastSettleDatetime + Minutes(1), datetime, KQuery::DAY);
+    size_t startix = 0, endix = 0;
     if (stock.getIndexRange(query, startix, endix)) {
-        price_t closePrice = stock.getKRecord(startix).closePrice;
-        for (const auto& contract : contracts) {
-            if (contract.datetime <= preDay) {
-                profit += (closePrice - contract.price) * number * stock.unit();
+        KRecord k = stock.getKRecord(endix - 1);
+        for (auto& contract : contracts) {
+            if (marginRatio != contract.marginRatio) {
+                price_t currentNeed = contract.price * contract.number * stock.unit() * marginRatio;
+                addMarginCash += currentNeed - contract.frozenCash;
+                contract.frozenCash = currentNeed;
+                contract.marginRatio = marginRatio;
             }
+            profit += (k.closePrice - lastSettleClosePrice) * contract.number * stock.unit();
         }
+        lastSettleDatetime = k.datetime;
+        lastSettleClosePrice = k.closePrice;
+        lastSettleProfit = profit;
     }
-    return profit;
+    return profit - addMarginCash;
 }
 
 price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
@@ -74,6 +81,7 @@ price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
         stock = tr.stock;
         takeDatetime = tr.datetime;
         lastSettleDatetime = takeDatetime;
+        lastSettleClosePrice = tr.realPrice;
     }
 
     double tr_num = (tr.business == BUSINESS_BUY) ? tr.number : -tr.number;
@@ -109,7 +117,7 @@ price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
             if (remove_num == tr.number) {
                 price_t value = iter->price * iter->number * stock.unit();
                 remove_value += value;
-                frozen_cash += value * iter->marginRatio;
+                frozen_cash += iter->frozenCash;
                 ++iter;
                 break;
             } else if (remove_num > tr.number) {

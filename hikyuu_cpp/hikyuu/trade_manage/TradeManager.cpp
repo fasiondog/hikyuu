@@ -747,30 +747,13 @@ void TradeManager::_updateSettleByDay(const Datetime& datetime) {
     HKU_IF_RETURN(m_position.empty(), void());
 
     auto iter = m_position.begin();
-
+    auto marginRatio = getMarginRatio(datetime, iter->second.stock);
     price_t totalProfit = 0.0;
-    price_t need_maintain_money = 0.0;
     for (; iter != m_position.end(); ++iter) {
-        PositionRecord& position = iter->second;
-        Stock& stock = position.stock;
-
-        // 查找上一次结算日期后到当前时刻前的最后一个交易日K线记录
-        KQuery query(position.lastSettleDatetime + Minutes(1), datetime, KQuery::DAY);
-        size_t startix = 0, endix = 0;
-        if (stock.getIndexRange(query, startix, endix)) {
-            KRecord k = stock.getKRecord(endix - 1);
-            price_t diffPrice = k.closePrice - position.lastSettleClosePrice;
-            price_t profit = 0.0;
-            for (const auto& contract : position.contracts) {
-                profit += diffPrice * contract.number * stock.unit();
-            }
-            totalProfit += profit;
-            position.lastSettleDatetime = k.datetime;
-            position.lastSettleClosePrice = k.closePrice;
-            position.lastSettleProfit = profit;
-        }
+        totalProfit += iter->second.settleProfitOfPreDay(datetime, marginRatio);
     }
 
+    // 将结算盈亏移入可用现金
     m_cash += roundEx(m_cash + totalProfit, getParam<int>("precision"));
 }
 

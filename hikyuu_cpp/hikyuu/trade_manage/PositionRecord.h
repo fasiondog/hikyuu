@@ -11,6 +11,7 @@
 
 #include "TradeRecord.h"
 #include "ContractRecord.h"
+#include "MarginRatioBase.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/split_member.hpp>
@@ -35,14 +36,13 @@ public:
     /** 仅用于python的__str__ */
     string toString() const;
 
-    /** 根据交易记录更新仓位信息，卖出时返回需返还资金（占用保证金+盈利） */
+    /** 根据交易记录更新仓位信息，卖出时返回需返还资金（占用保证金+平仓盈利） */
     price_t addTradeRecord(const TradeRecord& tr);
 
     /**
-     * 计算指定时刻前一交易日结算的持仓盈利
-     * @note 按日结算
+     * 计算指定时刻前一交易日结算需扣除的可用资金（持仓盈利-需补充的保证金），同时更新占用的保证金
      */
-    price_t getProfitOfPreDay(Datetime datetime);
+    price_t settleProfitOfPreDay(Datetime datetime, double marginRatio);
 
     Stock stock;               ///< 交易对象
     Datetime takeDatetime;     ///< 初次建仓日期
