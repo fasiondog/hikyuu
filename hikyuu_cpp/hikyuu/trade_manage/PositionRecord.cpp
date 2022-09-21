@@ -74,6 +74,14 @@ price_t PositionRecord::settleProfitOfPreDay(Datetime datetime, double marginRat
     return profit - addMarginCash;
 }
 
+price_t PositionRecord::calculateCloseProfit(price_t closePrice) const {
+    price_t profit = 0.0;
+    for (const auto& contract : contracts) {
+        profit += (closePrice - contract.price) * contract.number * stock.unit();
+    }
+    return profit;
+}
+
 price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
     HKU_ASSERT(tr.business == BUSINESS_BUY || tr.business == BUSINESS_SELL);
     price_t return_cash = 0.0;
@@ -107,7 +115,6 @@ price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
                            stock.precision());
         contracts.emplace_back(stock, tr.datetime, tr.realPrice, tr.number, tr.marginRatio);
     } else {
-        sellMoney = roundEx(sellMoney + tr.realPrice * tr.number * stock.unit(), stock.precision());
         price_t frozen_cash = 0.0;
         price_t remove_value = 0.0;
         double remove_num = 0.0;
@@ -129,6 +136,7 @@ price_t PositionRecord::addTradeRecord(const TradeRecord& tr) {
                 break;
             }
         }
+        sellMoney = roundEx(sellMoney + frozen_cash, stock.precision());
         return_cash = frozen_cash + tr.number * tr.realPrice * stock.unit() - remove_value;
         contracts.erase(contracts.begin(), iter);
     }

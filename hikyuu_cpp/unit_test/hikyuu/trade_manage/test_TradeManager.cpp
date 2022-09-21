@@ -319,7 +319,7 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     TradeRecord tr;
     CostRecord cost;
 
-    // 买入两次后，一次全买
+    /** @arg 买入两次后，一次全买 */
     tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
     CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 55.8, 0.0, 100, cost,
                              0.0, 94420.00, 1.0, PART_INVALID));
@@ -336,7 +336,7 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     CHECK_EQ(tr, TradeRecord(stk, Datetime(199305210000L), BUSINESS_SELL, 0.0, 55.15, 0.0, 300,
                              cost, 0.0, 99745.00, 1.0, PART_INVALID));
 
-    // 第一次买入100，第二次买入200，第三次卖出200
+    /** @arg 第一次买入100，第二次买入200，第三次卖出200 */
     tm = crtTM(Datetime(199305010000), 100000);
     tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
     tr = tm->buy(Datetime(199305200000L), stk, 56.1, 200);
@@ -355,9 +355,34 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     CHECK_EQ(contract.number, 100);
     CHECK_EQ(contract.price, 56.1);
     CHECK_EQ(contract.marginRatio, 1.0);
-    // HKU_INFO("{}", tr);
-    // HKU_INFO("{}", stk.getKRecord(Datetime(199305240000L)));
-    // HKU_INFO("{}", stk.getKRecord(Datetime(199305250000L)));
+}
+
+/** @par 检测点，正常买卖 */
+TEST_CASE("test_TradeManager_normal_buy_and_sell_with_margin") {
+    Stock stk = getStock("sz000001");
+
+    // 创建使用合约交易的账户
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 1000, TC_Zero(), MR_Fixed(0.1));
+    tm->setParam<bool>("use_contract", true);
+
+    TradeRecord tr;
+    CostRecord cost;
+
+    //
+    tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
+    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 55.8, 0.0, 100, cost,
+                             0.0, 442.00, 0.1, PART_INVALID));
+    CHECK_EQ(tm->currentCash(), 442.0);
+
+    HKU_INFO("{}", tm->getFunds(KQuery::DAY));
+    // CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 55.8, 0.0, 100,
+    // cost,
+    //                          0.0, 94420.00, 1.0, PART_INVALID));
+    HKU_INFO("{}", stk.getKRecord(stk.getCount() - 1));
+    HKU_INFO("{}", tr);
+    HKU_INFO("{}", stk.getKRecord(Datetime(199305240000L)));
+    HKU_INFO("{}", stk.getKRecord(Datetime(199305250000L)));
+    HKU_INFO("{}", tm);
 }
 
 /** @par 检测点，测试 getTradeList */

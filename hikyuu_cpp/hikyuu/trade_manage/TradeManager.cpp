@@ -28,7 +28,8 @@ string TradeManager::str() const {
        << "  params: " << getParameter() << strip << "  name: " << name() << strip
        << "  init_date: " << initDatetime() << strip << "  init_cash: " << initCash() << strip
        << "  firstDatetime: " << firstDatetime() << strip << "  lastDatetime: " << lastDatetime()
-       << strip << "  TradeCostFunc: " << costFunc() << strip << "  current cash: " << currentCash()
+       << strip << "  TradeCostFunc: " << costFunc() << strip
+       << "  MarginRatioFunc: " << marginRatioFunc() << strip << "  current cash: " << currentCash()
        << strip << "  current market_value: " << funds.market_value << strip
        << "  current base_cash: " << funds.base_cash << strip
        << "  current base_asset: " << funds.base_asset << strip << "  Position: \n";
@@ -41,7 +42,7 @@ string TradeManager::str() const {
         price_t invest = iter->buyMoney - iter->sellMoney + iter->totalCost;
         KData k = iter->stock.getKData(query);
         price_t cur_val = k[0].closePrice * iter->number;
-        price_t bonus = cur_val - invest;
+        price_t bonus = iter->calculateCloseProfit(k[0].closePrice);
         DatetimeList date_list =
           sm.getTradingCalendar(KQueryByDate(Datetime(iter->takeDatetime.date())));
         os << "    " << iter->stock.market_code() << " " << iter->stock.name() << " "
@@ -65,8 +66,8 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
   m_checkout_cash(0.0),
   m_checkin_stock(0.0),
   m_checkout_stock(0.0) {
-    setParam<bool>("enable_contract", false);  // 是否合约交易
-    setParam<bool>("save_action", true);       // 是否保存命令
+    setParam<bool>("use_contract", false);  // 是否合约交易
+    setParam<bool>("save_action", true);    // 是否保存命令
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -490,12 +491,9 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     return funds.cash;
 }
 
-FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
+FundsRecord TradeManager::getFunds(KQuery::KType ktype) const {
     FundsRecord funds;
     int precision = getParam<int>("precision");
-
-    string ktype(inktype);
-    to_upper(ktype);
 
     price_t price = 0.0;
     price_t value = 0.0;  //当前市值
@@ -517,30 +515,13 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
-    // // datetime为Null时，直接返回当前账户中的现金和买入时占用的资金，以及累计存取资金
-    // HKU_IF_RETURN(indatetime == Null<Datetime>() || indatetime == lastDatetime(),
-    // getFunds(ktype));
-
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
     if (datetime > lastDatetime()) {
         //根据权息数据调整持仓
         updateWithWeight(datetime);
-
-        //查询日期大于等于最后交易日期时，直接计算当前持仓证券的市值
-        position_map_type::const_iterator iter = m_position.begin();
-        for (; iter != m_position.end(); ++iter) {
-            price_t price = iter->second.stock.getMarketValue(datetime, ktype);
-            market_value = roundEx(
-              market_value + price * iter->second.number * iter->second.stock.unit(), precision);
-        }
-
-        funds.cash = m_cash;
-        funds.market_value = market_value;
-        funds.base_cash = m_checkin_cash - m_checkout_cash;
-        funds.base_asset = m_checkin_stock - m_checkout_stock;
-        return funds;
-    }  // if datetime >= lastDatetime()
+        return getFunds(ktype);
+    }
 
     //当查询日期小于最后交易日期时，遍历交易记录，计算当日的市值和现金
     price_t cash = m_init_cash;
@@ -735,7 +716,7 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
 
-    if (getParam<bool>("enable_contract")) {
+    if (getParam<bool>("use_contract")) {
         // 合约交易结算
         _updateSettleByDay(datetime);
     }

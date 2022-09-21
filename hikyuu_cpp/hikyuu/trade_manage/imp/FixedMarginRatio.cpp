@@ -10,6 +10,7 @@
 namespace hku {
 
 FixedMarginRatio::FixedMarginRatio(double ratio) : MarginRatioBase("MR_Fixed"), m_margin(ratio) {
+    setParam<double>("ratio", ratio);
     HKU_CHECK(ratio > 0.0 && ratio <= 1.0, "Invalid ratio: {}", ratio);
 }
 
