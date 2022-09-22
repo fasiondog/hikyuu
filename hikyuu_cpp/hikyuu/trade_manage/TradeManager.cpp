@@ -30,8 +30,13 @@ string TradeManager::str() const {
        << "  firstDatetime: " << firstDatetime() << strip << "  lastDatetime: " << lastDatetime()
        << strip << "  TradeCostFunc: " << costFunc() << strip
        << "  MarginRatioFunc: " << marginRatioFunc() << strip << "  current cash: " << currentCash()
-       << strip << "  current market_value: " << funds.market_value << strip
-       << "  current base_cash: " << funds.base_cash << strip
+       << strip;
+    if (getParam<bool>("use_contract")) {
+        os << "  current frozen cash: " << funds.market_value << strip;
+    } else {
+        os << "  current market_value: " << funds.market_value << strip;
+    }
+    os << "  current base_cash: " << funds.base_cash << strip
        << "  current base_asset: " << funds.base_asset << strip << "  Position: \n";
 
     StockManager& sm = StockManager::instance();
@@ -492,29 +497,29 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
 }
 
 FundsRecord TradeManager::getFunds(KQuery::KType ktype) const {
-    FundsRecord funds;
-    int precision = getParam<int>("precision");
-
-    price_t price = 0.0;
     price_t value = 0.0;  //当前市值
     position_map_type::const_iterator iter = m_position.begin();
-    for (; iter != m_position.end(); ++iter) {
-        const PositionRecord& record = iter->second;
-        price = record.stock.getMarketValue(lastDatetime(), ktype);
-        value = roundEx((value + record.number * price * record.stock.unit()), precision);
+    if (!getParam<bool>("use_contract")) {
+        for (; iter != m_position.end(); ++iter) {
+            const PositionRecord& record = iter->second;
+            price_t price = record.stock.getMarketValue(lastDatetime(), ktype);
+            value += record.number * price * record.stock.unit();
+        }
+    } else {
+        for (; iter != m_position.end(); ++iter) {
+            value += iter->second.buyMoney;
+        }
     }
 
+    FundsRecord funds;
     funds.cash = m_cash;
-    funds.market_value = value;
+    funds.market_value = roundEx(value, getParam<int>("precision"));
     funds.base_cash = m_checkin_cash - m_checkout_cash;
     funds.base_asset = m_checkin_stock - m_checkout_stock;
     return funds;
 }
 
 FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
-    FundsRecord funds;
-    int precision = getParam<int>("precision");
-
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
     if (datetime > lastDatetime()) {
@@ -599,14 +604,20 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         }
 
         price_t price = stock_iter->second.stock.getMarketValue(datetime, ktype);
-        market_value =
-          roundEx(market_value + price * number * stock_iter->second.stock.unit(), precision);
+        market_value = roundEx(market_value + price * number * stock_iter->second.stock.unit(),
+                               getParam<int>("precision"));
     }
 
+    FundsRecord funds;
     funds.cash = cash;
     funds.market_value = market_value;
     funds.base_cash = checkin_cash - checkout_cash;
     funds.base_asset = checkin_stock - checkout_stock;
+    return funds;
+}
+
+FundsRecord TradeManager::_getFundsByContract(const Datetime& indatetime, KQuery::KType ktype) {
+    FundsRecord funds;
     return funds;
 }
 
@@ -642,13 +653,23 @@ PriceList TradeManager::getProfitCurve(const DatetimeList& dates, KQuery::KType 
     return result;
 }
 
+void TradeManager::updateWithWeight(const Datetime& datetime) {
+    HKU_IF_RETURN(datetime <= m_last_update_datetime, void());
+    if (getParam<bool>("use_contract")) {
+        _updateSettleByDay(datetime);
+    } else {
+        _updateWithWeight(datetime);
+    }
+    m_last_update_datetime = datetime;
+}
+
 /******************************************************************************
  *  每次执行交易操作时，先根据权息信息调整持有仓位及现金记录
  *  采用滞后更新的策略，即只在需要获取当前持仓情况及卖出时更新当前的持仓及资产情况
  *  输入参数： 本次操作的日期
  *  历史记录： 1) 2009/12/22 added
  *****************************************************************************/
-void TradeManager::updateWithWeight(const Datetime& datetime) {
+void TradeManager::_updateWithWeight(const Datetime& datetime) {
     HKU_IF_RETURN(datetime <= m_last_update_datetime, void());
 
     //权息信息查询日期范围
@@ -715,13 +736,6 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     for (size_t i = 0; i < total; ++i) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
-
-    if (getParam<bool>("use_contract")) {
-        // 合约交易结算
-        _updateSettleByDay(datetime);
-    }
-
-    m_last_update_datetime = datetime;
 }
 
 void TradeManager::_updateSettleByDay(const Datetime& datetime) {

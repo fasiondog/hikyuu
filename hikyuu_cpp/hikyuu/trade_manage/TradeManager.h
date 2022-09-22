@@ -240,8 +240,13 @@ private:
     //以脚本的形式保存交易动作，便于修正和校准
     void _saveAction(const TradeRecord&);
 
-    // 更新当前时刻前一结算日权益
+    // 更新股票权息信息
+    void _updateWithWeight(const Datetime& datetime);
+
+    // 合约类交易结算，更新当前时刻前一结算日权益
     void _updateSettleByDay(const Datetime& datetime);
+
+    FundsRecord _getFundsByContract(const Datetime& indatetime, KQuery::KType ktype);
 
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);

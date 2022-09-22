@@ -70,6 +70,7 @@ price_t PositionRecord::settleProfitOfPreDay(Datetime datetime, double marginRat
         lastSettleDatetime = k.datetime;
         lastSettleClosePrice = k.closePrice;
         lastSettleProfit = profit;
+        buyMoney += addMarginCash;
     }
     return profit - addMarginCash;
 }
