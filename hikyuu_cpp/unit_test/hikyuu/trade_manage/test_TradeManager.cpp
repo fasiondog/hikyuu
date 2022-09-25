@@ -312,20 +312,49 @@ TEST_CASE("test_TradeManager_can_not_checkout") {
     CHECK_EQ(tm->checkout(Datetime(200001030000), 100000), true);
 }
 
-/** @par 检测点，正常买卖 */
+/** @par 检测点 */
 TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     Stock stk = getStock("sz000001");
-    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+    TradeManagerPtr tm = crtTM(Datetime(199305010000LL), 100000);
     TradeRecord tr;
     CostRecord cost;
 
+    /** @arg 检测初始建立的 TradeManager, 针对所有接口 */
+    CHECK_EQ(tm->initDatetime(), Datetime(199305010000LL));
+    CHECK_EQ(tm->firstDatetime(), Datetime());
+    CHECK_EQ(tm->lastDatetime(), tm->initDatetime());
+    CHECK_EQ(tm->currentCash(), 100000.0);
+    CHECK_EQ(tm->cash(Datetime(199305010000LL), KQuery::DAY), tm->currentCash());
+    CHECK_EQ(tm->cash(Datetime(199305100000LL), KQuery::DAY), tm->currentCash());
+    CHECK_EQ(tm->cash(Datetime(199305010000LL), KQuery::MIN), tm->currentCash());
+    CHECK_EQ(tm->cash(Datetime(199305100000LL), KQuery::MIN), tm->currentCash());
+    CHECK_EQ(tm->cash(Datetime(199305010000LL), KQuery::WEEK), tm->currentCash());
+    CHECK_EQ(tm->cash(Datetime(199305100000LL), KQuery::WEEK), tm->currentCash());
+    CHECK_UNARY(!tm->have(stk));
+    CHECK_EQ(tm->getStockNumber(), 0);
+    CHECK_EQ(tm->getHoldNumber(Datetime(199305100000LL), stk), 0);
+    auto tr_list = tm->getTradeList();
+    CHECK_EQ(tr_list.size(), 1);
+    CHECK_EQ(tr_list[0],
+             TradeRecord(Null<Stock>(), Datetime(199305010000LL), BUSINESS_INIT, 100000., 100000.,
+                         0., 0., cost, 0., 100000., 1.0, SystemPart::PART_INVALID));
+    auto position_list = tm->getPositionList();
+    CHECK_EQ(position_list.size(), 0);
+    auto history_position_list = tm->getHistoryPositionList();
+    CHECK_EQ(history_position_list.size(), 0);
+    auto position = tm->getPosition(Datetime(199305020000LL), stk);
+    CHECK_EQ(position, Null<PositionRecord>());
+    CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(100000., 0., 100000.0, 0.));
+    CHECK_EQ(tm->getFunds(KQuery::MIN), FundsRecord(100000., 0., 100000.0, 0.));
+    CHECK_EQ(tm->getFunds(KQuery::WEEK), FundsRecord(100000., 0., 100000.0, 0.));
+
     /** @arg 买入两次后，一次全买 */
     tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
-    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 55.8, 0.0, 100, cost,
+    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000LL), BUSINESS_BUY, 0.0, 55.8, 0.0, 100, cost,
                              0.0, 94420.00, 1.0, PART_INVALID));
     CHECK_EQ(tm->currentCash(), 94420.0);
 
-    tr = tm->buy(Datetime(199305200000L), stk, 56.1, 200);
+    tr = tm->buy(Datetime(199305200000LL), stk, 56.1, 200);
     CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 56.1, 0.0, 200, cost,
                              0.0, 83200.00, 1.0, PART_INVALID));
     CHECK_EQ(tm->currentCash(), 83200.00);
@@ -346,7 +375,7 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
                              cost, 0.0, 94230.00, 1.0, PART_INVALID));
     auto positionList = tm->getPositionList();
     CHECK_EQ(positionList.size(), 1);
-    const auto& position = positionList[0];
+    position = positionList[0];
     CHECK_EQ(position.number, 100.0);
     CHECK_EQ(position.totalNumber, 300.0);
     CHECK_EQ(position.contracts.size(), 1);
@@ -355,6 +384,8 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     CHECK_EQ(contract.number, 100);
     CHECK_EQ(contract.price, 56.1);
     CHECK_EQ(contract.marginRatio, 1.0);
+
+    HKU_INFO("{}", tm);
 }
 
 /** @par 检测点，正常买卖 */
@@ -374,15 +405,12 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_with_margin") {
                              0.0, 442.00, 0.1, PART_INVALID));
     CHECK_EQ(tm->currentCash(), 442.0);
 
-    HKU_INFO("{}", tm->getFunds(KQuery::DAY));
-    // CHECK_EQ(tr, TradeRecord(stk, Datetime(199305200000L), BUSINESS_BUY, 0.0, 55.8, 0.0, 100,
-    // cost,
-    //                          0.0, 94420.00, 1.0, PART_INVALID));
-    HKU_INFO("{}", stk.getKRecord(stk.getCount() - 1));
-    HKU_INFO("{}", tr);
-    HKU_INFO("{}", stk.getKRecord(Datetime(199305240000L)));
-    HKU_INFO("{}", stk.getKRecord(Datetime(199305250000L)));
-    HKU_INFO("{}", tm);
+    // HKU_INFO("{}", tm->getFunds(KQuery::DAY));
+    // HKU_INFO("{}", stk.getKRecord(stk.getCount() - 1));
+    // HKU_INFO("{}", tr);
+    // HKU_INFO("{}", stk.getKRecord(Datetime(199305240000L)));
+    // HKU_INFO("{}", stk.getKRecord(Datetime(199305250000L)));
+    // HKU_INFO("{}", tm);
 }
 
 /** @par 检测点，测试 getTradeList */

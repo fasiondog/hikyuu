@@ -528,97 +528,139 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         return getFunds(ktype);
     }
 
-    //当查询日期小于最后交易日期时，遍历交易记录，计算当日的市值和现金
-    price_t cash = m_init_cash;
-    struct Stock_Number {
-        Stock_Number() : number(0) {}
-        Stock_Number(const Stock& stock, size_t number) : stock(stock), number(number) {}
+    return _getFundsByContract(indatetime, ktype);
 
-        Stock stock;
-        size_t number;
-    };
+    // //当查询日期小于最后交易日期时，遍历交易记录，计算当日的市值和现金
+    // price_t cash = m_init_cash;
+    // struct Stock_Number {
+    //     Stock_Number() : number(0) {}
+    //     Stock_Number(const Stock& stock, size_t number) : stock(stock), number(number) {}
 
-    price_t checkin_cash = 0.0;
-    price_t checkout_cash = 0.0;
-    price_t checkin_stock = 0.0;
-    price_t checkout_stock = 0.0;
-    map<uint64_t, Stock_Number> stock_map;
-    map<uint64_t, Stock_Number>::iterator stock_iter;
+    //     Stock stock;
+    //     size_t number;
+    // };
 
-    TradeRecordList::const_iterator iter = m_trade_list.begin();
-    for (; iter != m_trade_list.end(); ++iter) {
-        if (iter->datetime > datetime) {
-            //如果交易记录的日期大于指定的日期则跳出循环，处理完毕
+    // price_t checkin_cash = 0.0;
+    // price_t checkout_cash = 0.0;
+    // price_t checkin_stock = 0.0;
+    // price_t checkout_stock = 0.0;
+    // map<uint64_t, Stock_Number> stock_map;
+    // map<uint64_t, Stock_Number>::iterator stock_iter;
+
+    // TradeRecordList::const_iterator iter = m_trade_list.begin();
+    // for (; iter != m_trade_list.end(); ++iter) {
+    //     if (iter->datetime > datetime) {
+    //         //如果交易记录的日期大于指定的日期则跳出循环，处理完毕
+    //         break;
+    //     }
+
+    //     cash = iter->cash;
+    //     switch (iter->business) {
+    //         case BUSINESS_INIT:
+    //             checkin_cash += iter->realPrice;
+    //             break;
+
+    //         case BUSINESS_BUY:
+    //         case BUSINESS_GIFT:
+    //             stock_iter = stock_map.find(iter->stock.id());
+    //             if (stock_iter != stock_map.end()) {
+    //                 stock_iter->second.number += iter->number;
+    //             } else {
+    //                 stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
+    //             }
+    //             break;
+
+    //         case BUSINESS_SELL:
+    //             stock_iter = stock_map.find(iter->stock.id());
+    //             if (stock_iter != stock_map.end()) {
+    //                 stock_iter->second.number -= iter->number;
+    //             } else {
+    //                 HKU_WARN("{} {} Sell error in m_trade_list!", datetime,
+    //                          iter->stock.market_code());
+    //             }
+    //             break;
+
+    //         case BUSINESS_BONUS:
+    //             break;
+
+    //         case BUSINESS_CHECKIN:
+    //             checkin_cash += iter->realPrice;
+    //             break;
+
+    //         case BUSINESS_CHECKOUT:
+    //             checkout_cash += iter->realPrice;
+    //             break;
+
+    //         default:
+    //             HKU_WARN("{} {} Unknown business in m_trade_list!", datetime,
+    //                      iter->stock.market_code());
+    //             break;
+    //     }
+    // }
+
+    // stock_iter = stock_map.begin();
+    // for (; stock_iter != stock_map.end(); ++stock_iter) {
+    //     const size_t& number = stock_iter->second.number;
+    //     if (number == 0) {
+    //         continue;
+    //     }
+
+    //     price_t price = stock_iter->second.stock.getMarketValue(datetime, ktype);
+    //     market_value = roundEx(market_value + price * number * stock_iter->second.stock.unit(),
+    //                            getParam<int>("precision"));
+    // }
+
+    // FundsRecord funds;
+    // funds.cash = cash;
+    // funds.market_value = market_value;
+    // funds.base_cash = checkin_cash - checkout_cash;
+    // funds.base_asset = checkin_stock - checkout_stock;
+    // return funds;
+}
+
+FundsRecord TradeManager::_getFundsByContract(const Datetime& datetime, KQuery::KType ktype) {
+    std::unique_ptr<TradeManager> tm(
+      new TradeManager(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc));
+    for (const auto& tr : m_trade_list) {
+        if (tr.datetime > datetime)
             break;
-        }
 
-        cash = iter->cash;
-        switch (iter->business) {
-            case BUSINESS_INIT:
-                checkin_cash += iter->realPrice;
-                break;
-
+        switch (tr.business) {
             case BUSINESS_BUY:
-            case BUSINESS_GIFT:
-                stock_iter = stock_map.find(iter->stock.id());
-                if (stock_iter != stock_map.end()) {
-                    stock_iter->second.number += iter->number;
-                } else {
-                    stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
-                }
+                tm->buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
+                        tr.planPrice, tr.from);
                 break;
 
             case BUSINESS_SELL:
-                stock_iter = stock_map.find(iter->stock.id());
-                if (stock_iter != stock_map.end()) {
-                    stock_iter->second.number -= iter->number;
-                } else {
-                    HKU_WARN("{} {} Sell error in m_trade_list!", datetime,
-                             iter->stock.market_code());
-                }
-                break;
-
-            case BUSINESS_BONUS:
+                tm->sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
+                         tr.planPrice, tr.from);
                 break;
 
             case BUSINESS_CHECKIN:
-                checkin_cash += iter->realPrice;
+                tm->checkin(tr.datetime, tr.realPrice);
                 break;
 
             case BUSINESS_CHECKOUT:
-                checkout_cash += iter->realPrice;
+                tm->checkout(tr.datetime, tr.realPrice);
                 break;
 
+            case BUSINESS_INIT:
+            case BUSINESS_GIFT:
+            case BUSINESS_BONUS:
+            case BUSINESS_INVALID:
             default:
-                HKU_WARN("{} {} Unknown business in m_trade_list!", datetime,
-                         iter->stock.market_code());
                 break;
         }
+
+        // if (BUSINESS_BUY == tr.business) {
+        //     tm->buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
+        //             tr.planPrice, tr.from);
+        // } else if (BUSINESS_SELL == tr.business) {
+        //     tm->sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
+        //              tr.planPrice, tr.from);
+        // }
     }
-
-    stock_iter = stock_map.begin();
-    for (; stock_iter != stock_map.end(); ++stock_iter) {
-        const size_t& number = stock_iter->second.number;
-        if (number == 0) {
-            continue;
-        }
-
-        price_t price = stock_iter->second.stock.getMarketValue(datetime, ktype);
-        market_value = roundEx(market_value + price * number * stock_iter->second.stock.unit(),
-                               getParam<int>("precision"));
-    }
-
-    FundsRecord funds;
-    funds.cash = cash;
-    funds.market_value = market_value;
-    funds.base_cash = checkin_cash - checkout_cash;
-    funds.base_asset = checkin_stock - checkout_stock;
-    return funds;
-}
-
-FundsRecord TradeManager::_getFundsByContract(const Datetime& indatetime, KQuery::KType ktype) {
-    FundsRecord funds;
-    return funds;
+    return tm->getFunds(ktype);
 }
 
 PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {

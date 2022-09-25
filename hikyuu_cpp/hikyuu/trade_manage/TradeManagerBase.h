@@ -218,17 +218,6 @@ public:
     }
 
     /**
-     * @brief 获取指定日期的可用现金
-     * @param datetime 指定日期
-     * @param ktype K线类型
-     * @return price_t
-     */
-    virtual price_t getAvailabeCash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
-        HKU_WARN("The subclass does not implement this method");
-        return 0.0;
-    }
-
-    /**
      * 当前是否持有指定的证券
      * @note 这里未使用日期参数，必须保证是按日期顺序执行
      * @param stock 指定证券

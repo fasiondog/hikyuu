@@ -246,7 +246,7 @@ private:
     // 合约类交易结算，更新当前时刻前一结算日权益
     void _updateSettleByDay(const Datetime& datetime);
 
-    FundsRecord _getFundsByContract(const Datetime& indatetime, KQuery::KType ktype);
+    FundsRecord _getFundsByContract(const Datetime& datetime, KQuery::KType ktype);
 
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);
