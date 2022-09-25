@@ -520,6 +520,9 @@ FundsRecord TradeManager::getFunds(KQuery::KType ktype) const {
 }
 
 FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
+    HKU_IF_RETURN(indatetime == Null<Datetime>(), getFunds(ktype));
+    HKU_IF_RETURN(indatetime < initDatetime(), FundsRecord());
+
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
     if (datetime > lastDatetime()) {

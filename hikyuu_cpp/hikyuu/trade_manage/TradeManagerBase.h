@@ -352,7 +352,7 @@ public:
 
     /**
      * 获取指定时刻的资产市值详情
-     * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
+     * @param datetime 指定日期
      * @param ktype 日期的类型
      * @return 资产详情
      * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同

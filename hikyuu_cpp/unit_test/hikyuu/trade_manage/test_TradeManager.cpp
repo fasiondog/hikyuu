@@ -313,7 +313,7 @@ TEST_CASE("test_TradeManager_can_not_checkout") {
 }
 
 /** @par 检测点 */
-TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
+TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin_by_day") {
     Stock stk = getStock("sz000001");
     TradeManagerPtr tm = crtTM(Datetime(199305010000LL), 100000);
     TradeRecord tr;
@@ -325,11 +325,7 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     CHECK_EQ(tm->lastDatetime(), tm->initDatetime());
     CHECK_EQ(tm->currentCash(), 100000.0);
     CHECK_EQ(tm->cash(Datetime(199305010000LL), KQuery::DAY), tm->currentCash());
-    CHECK_EQ(tm->cash(Datetime(199305100000LL), KQuery::DAY), tm->currentCash());
-    CHECK_EQ(tm->cash(Datetime(199305010000LL), KQuery::MIN), tm->currentCash());
-    CHECK_EQ(tm->cash(Datetime(199305100000LL), KQuery::MIN), tm->currentCash());
-    CHECK_EQ(tm->cash(Datetime(199305010000LL), KQuery::WEEK), tm->currentCash());
-    CHECK_EQ(tm->cash(Datetime(199305100000LL), KQuery::WEEK), tm->currentCash());
+    CHECK_EQ(tm->cash(Datetime(199305010000LL), KQuery::DAY), tm->currentCash());
     CHECK_UNARY(!tm->have(stk));
     CHECK_EQ(tm->getStockNumber(), 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199305100000LL), stk), 0);
@@ -345,8 +341,23 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     auto position = tm->getPosition(Datetime(199305020000LL), stk);
     CHECK_EQ(position, Null<PositionRecord>());
     CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(100000., 0., 100000.0, 0.));
-    CHECK_EQ(tm->getFunds(KQuery::MIN), FundsRecord(100000., 0., 100000.0, 0.));
-    CHECK_EQ(tm->getFunds(KQuery::WEEK), FundsRecord(100000., 0., 100000.0, 0.));
+    CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(KQuery::DAY));
+    CHECK_EQ(tm->getFunds(Datetime(199304300000LL), KQuery::DAY), FundsRecord(0., 0., 0., 0.));
+    CHECK_EQ(tm->getFunds(Datetime(199305010900LL), KQuery::DAY),
+             FundsRecord(100000., 0., 100000.0, 0.));
+    CHECK_EQ(tm->getFunds(Datetime(199305100000LL), KQuery::DAY),
+             FundsRecord(100000., 0., 100000.0, 0.));
+    auto date_list = getDateRange(Datetime(199304300000LL), Datetime(199305030000LL));
+    auto funds_curve = tm->getFundsCurve(date_list, KQuery::DAY);
+    CHECK_EQ(funds_curve.size(), 3);
+    CHECK_EQ(funds_curve[0], 0.);
+    CHECK_EQ(funds_curve[1], 100000.);
+    CHECK_EQ(funds_curve[2], 100000.);
+    auto profit_curve = tm->getProfitCurve(date_list, KQuery::DAY);
+    CHECK_EQ(profit_curve.size(), 3);
+    CHECK_EQ(profit_curve[0], 0.);
+    CHECK_EQ(profit_curve[1], 0.);
+    CHECK_EQ(profit_curve[2], 0.);
 
     /** @arg 买入两次后，一次全买 */
     tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
@@ -384,6 +395,13 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin") {
     CHECK_EQ(contract.number, 100);
     CHECK_EQ(contract.price, 56.1);
     CHECK_EQ(contract.marginRatio, 1.0);
+
+    /** @arg 5月26日卖出剩余股票，中间经历权息变化, 检测 tm 所有接口正确性 */
+    tr = tm->sell(Datetime(199305260000LL), stk, 28.1, 100.);
+    CHECK_EQ(tr, TradeRecord(stk, Datetime(199305260000LL), BUSINESS_SELL, 0., 28.1, 0., 100., cost,
+                             0., 102680., 1., PART_INVALID));
+    HKU_INFO("{}", tr);
+    HKU_INFO("{}", stk.getKRecord(Datetime(199305260000LL)));
 
     HKU_INFO("{}", tm);
 }
