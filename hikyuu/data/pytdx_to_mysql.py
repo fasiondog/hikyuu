@@ -77,7 +77,7 @@ def import_index_name(connect):
             )
         else:
             marketid = MARKETID.SH if index['market_code'][:2] == MARKET.SH else MARKETID.SZ
-            sql = "insert into `hku_base`.`Stock` (marketid, code, name, type, valid, startDate, endDate) \
+            sql = "insert into `hku_base`.`stock` (marketid, code, name, type, valid, startDate, endDate) \
                            values (%s, '%s', '%s', %s, %s, %s, %s)" \
                           % (marketid, index['market_code'][2:], index['name'], STOCKTYPE.INDEX, 1, today, 99999999)
             cur.execute(sql)
@@ -152,7 +152,7 @@ def import_stock_name(connect, api, market, quotations=None):
                 if code[:length] == codepre[0]:
                     count += 1
                     #print(market, code, newStockDict[code], codepre)
-                    sql = "insert into `hku_base`.`Stock` (marketid, code, name, type, valid, startDate, endDate) \
+                    sql = "insert into `hku_base`.`stock` (marketid, code, name, type, valid, startDate, endDate) \
                            values (%s, '%s', '%s', %s, %s, %s, %s)" \
                           % (marketid, code, newStockDict[code], codepre[1], 1, today, 99999999)
                     cur.execute(sql)

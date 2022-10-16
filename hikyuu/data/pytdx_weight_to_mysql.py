@@ -30,13 +30,13 @@ from .common_pytdx import to_pytdx_market
 def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
     """导入钱龙格式的权息数据"""
     cur = connect.cursor()
-    cur.execute("select marketid from `hku_base`.`Market` where market='%s'" % market)
+    cur.execute("select marketid from `hku_base`.`market` where market='%s'" % market)
     marketid = [id[0] for id in cur.fetchall()]
     marketid = marketid[0]
     pytdx_market = to_pytdx_market(market)
 
     total_count = 0
-    cur.execute("select stockid, code from `hku_base`.`Stock` where marketid=%s" % (marketid))
+    cur.execute("select stockid, code from `hku_base`.`stock` where marketid=%s" % (marketid))
     stockid_list = [x for x in cur.fetchall()]
     cur.close()
 
@@ -135,7 +135,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
             cur = connect.cursor()
             x = new_last_db_weight
             cur.execute(
-                "UPDATE `hku_base`.`StkWeight` SET countAsGift=%s, countForSell=%s, priceForSell=%s, \
+                "UPDATE `hku_base`.`stkweight` SET countAsGift=%s, countForSell=%s, priceForSell=%s, \
                     bonus=%s, totalCount=%s, freeCount=%s \
                     where id=%s" % (x[3], x[4], x[5], x[6], x[8], x[9], x[0])
             )
@@ -145,7 +145,7 @@ def pytdx_import_weight_to_mysql(pytdx_api, connect, market):
         if records:
             cur = connect.cursor()
             cur.executemany(
-                "INSERT INTO `hku_base`.`StkWeight` (stockid, date, countAsGift, \
+                "INSERT INTO `hku_base`.`stkweight` (stockid, date, countAsGift, \
                              countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
                              VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", [x for x in records.values()]
             )
