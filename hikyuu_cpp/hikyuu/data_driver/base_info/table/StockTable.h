@@ -21,19 +21,19 @@ public:
 
 public:
     static const char* getInsertSQL() {
-        return "insert into `Stock` "
+        return "insert into `stock` "
                "(`marketid`, `code`, `name`, `type`, `valid`, `startDate`, `endDate`) "
                "values (?,?,?,?,?,?,?)";
     }
 
     static const char* getUpdateSQL() {
-        return "update `Stock` set `marketid`=?, `code`=?, `name`=?, `type`=?, "
+        return "update `stock` set `marketid`=?, `code`=?, `name`=?, `type`=?, "
                "`valid`=?, `startDate`=?, `endDate`=?, `lastDate`=? where `stockid`=?";
     }
 
     static const char* getSelectSQL() {
         return "select `stockid`,`marketid`, `code`, `name`, `type`, `valid`, "
-               "`startDate`, `endDate` from `Stock`";
+               "`startDate`, `endDate` from `stock`";
     }
 
     void save(const SQLStatementPtr& st) const {

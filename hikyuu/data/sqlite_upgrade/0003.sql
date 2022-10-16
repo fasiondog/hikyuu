@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 alter table StockTypeInfo rename to StockTypeInfoOld;
-CREATE TABLE `StockTypeInfo` (
+CREATE TABLE `stocktypeinfo` (
 	`tickValue`	NUMERIC,
 	`precision`	INTEGER,
 	`id`	INTEGER,

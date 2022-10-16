@@ -62,7 +62,7 @@ def qianlong_import_weight(connect, src_dir, market):
             sourcefile.close()
 
     if records:
-        cur.executemany("INSERT INTO `hku_base`.`StkWeight` (stockid, date, countAsGift, \
+        cur.executemany("INSERT INTO `hku_base`.`stkweight` (stockid, date, countAsGift, \
                          countForSell, priceForSell, bonus, countOfIncreasement, totalCount, freeCount) \
                          VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                         records)
