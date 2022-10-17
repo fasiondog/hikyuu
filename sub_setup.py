@@ -2,7 +2,18 @@
 #-*- coding:utf-8 -*-
 
 import platform
-from setuptools import setup, find_packages
+try:
+    from setuptools import find_packages, setup
+except ImportError:
+    from distutils.core import find_packages, setup
+
+
+def parse_requirements(filename):
+    line_iter = (line.strip() for line in open(filename))
+    return [line for line in line_iter if line and not line.startswith('#')]
+
+
+requirements = parse_requirements('requirements.txt')
 
 hku_version = ''
 with open('xmake.lua', 'r', encoding='utf-8') as f:
@@ -129,21 +140,5 @@ setup(
             'importdata=hikyuu.gui.importdata:main',
         ]
     },
-    install_requires=[
-        'matplotlib',
-        'pandas>=0.17.1',
-        #'tushare>=0.8.2',
-        'pytdx',
-        'PyQt5',
-        'tables',
-        'bokeh',
-        'gitpython',
-        'SQLAlchemy',
-        'mysql-connector-python',
-        'pyperclip',
-        'requests',
-        'qdarkstyle',
-        'flatbuffers',
-        'pynng'
-    ],
+    install_requires=requirements,
 )

@@ -13,3 +13,4 @@ requests
 qdarkstyle
 flatbuffers
 pynng
+akshare

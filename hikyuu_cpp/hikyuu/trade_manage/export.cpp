@@ -31,6 +31,7 @@
 #include "imp/FixedATradeCost.h"
 #include "imp/ZeroTradeCost.h"
 #include "imp/FixedA2015TradeCost.h"
+#include "imp/FixedA2017TradeCost.h"
 
 BOOST_CLASS_EXPORT(hku::TradeManager)
 BOOST_CLASS_EXPORT(hku::TradeManagerBase)
@@ -38,5 +39,6 @@ BOOST_CLASS_EXPORT(hku::TradeCostStub)
 BOOST_CLASS_EXPORT(hku::FixedATradeCost)
 BOOST_CLASS_EXPORT(hku::ZeroTradeCost)
 BOOST_CLASS_EXPORT(hku::FixedA2015TradeCost)
+BOOST_CLASS_EXPORT(hku::FixedA2017TradeCost)
 
 #endif /* HKU_SUPPORT_SERIALIZATION */

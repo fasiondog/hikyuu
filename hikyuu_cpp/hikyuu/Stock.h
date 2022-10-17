@@ -210,7 +210,7 @@ public:
     /** 是否为Null */
     bool isNull() const;
 
-    /** （临时函数）只用于更新缓存中的日线数据 **/
+    /** （临时函数）只用于更新缓存中的K线数据 **/
     void realtimeUpdate(KRecord, KQuery::KType ktype = KQuery::DAY);
 
     /** 仅用于python的__str__ */

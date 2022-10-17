@@ -31,23 +31,12 @@ public:
      * 构造函数，此时尚未启动运行，需调用 start 方法显示启动调度
      * @param work_num 定时任务执行线程池线程数量
      */
-    TimerManager(size_t work_num = std::thread::hardware_concurrency())
+    TimerManager(size_t work_num = 1)
     : m_current_timer_id(-1), m_stop(true), m_work_num(work_num) {}
 
     /** 析构函数 */
     ~TimerManager() {
-        if (!m_stop) {
-            IntervalS s;
-            s.m_time_point = Datetime::min();
-            std::unique_lock<std::mutex> lock(m_mutex);
-            m_queue.push(s);
-            lock.unlock();
-            m_cond.notify_all();
-            if (m_detect_thread.joinable()) {
-                m_detect_thread.join();
-            }
-        }
-
+        stop();
         for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
             delete iter->second;
         }
@@ -55,6 +44,8 @@ public:
 
     /** 启动调度, 可在停止后重新启动 */
     void start() {
+        std::priority_queue<IntervalS> new_queue;
+        m_queue.swap(new_queue);
         if (m_stop) {
             m_stop = false;
             if (!m_tg) {
@@ -159,7 +150,7 @@ public:
      * @param start_time 允许运行的起始时间
      * @param end_time 允许运行的结束时间
      * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param duration 间隔时间，需大于 TimeDelta(0)
+     * @param delay 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
      * @return timer id
@@ -189,7 +180,7 @@ public:
      * @tparam F 任务类型
      * @tparam Args 任务参数
      * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param duration 间隔时间，需大于 TimeDelta(0)
+     * @param delay 间隔时间，需大于 TimeDelta(0)
      * @param f 待执行的延迟任务
      * @param args 任务具体参数
      * @return timer id
@@ -348,7 +339,7 @@ private:
                 s.m_time_point > today + timer->m_end_time) {
                 s.m_time_point = today + timer->m_start_time + TimeDelta(1);
             }
-            HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
+            // HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
             m_queue.push(s);
         }
     }
@@ -472,7 +463,7 @@ private:
 
         m_timers[id] = timer;
         s.m_timer_id = id;
-        HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
+        // HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
         m_queue.push(s);
         lock.unlock();
         m_cond.notify_all();

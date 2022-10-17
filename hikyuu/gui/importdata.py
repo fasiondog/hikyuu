@@ -110,6 +110,9 @@ class HKUImportDataCMD:
                 else:
                     print('权息{}'.format(msg[2]))
 
+            elif msg_task_name == 'IMPORT_FINANCE':
+                print("财务数据下载: {}%".format(msg[2]))
+
     def start_import_data(self):
         config = self.getCurrentConfig()
         dest_dir = config.get('hdf5', 'dir')

@@ -955,7 +955,8 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
             uint64_t number = pBuf[i].datetime / 100;
             uint64_t second = pBuf[i].datetime - number * 100;
             Datetime d(number);
-            record.datetime = Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), second);
+            record.datetime =
+              Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), (long)second);
             record.price = price_t(pBuf[i].price) * 0.001;
             record.vol = price_t(pBuf[i].vol);
             record.direct = TransRecord::DIRECT(pBuf[i].buyorsell);
@@ -1102,7 +1103,8 @@ TransList H5KDataDriver::_getTransList(const string& market, const string& code,
             uint64_t number = pBuf[i].datetime / 100;
             uint64_t second = pBuf[i].datetime - number * 100;
             Datetime d(number);
-            record.datetime = Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), second);
+            record.datetime =
+              Datetime(d.year(), d.month(), d.day(), d.hour(), d.minute(), (long)second);
             record.price = price_t(pBuf[i].price) * 0.001;
             record.vol = price_t(pBuf[i].vol);
             record.direct = TransRecord::DIRECT(pBuf[i].buyorsell);

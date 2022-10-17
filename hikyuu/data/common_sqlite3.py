@@ -26,7 +26,7 @@ import os
 import sqlite3
 from pathlib import Path
 
-from .common import MARKETID, get_stktype_list
+from .common import MARKETID, get_stktype_list, get_new_holidays
 
 
 def is_exist_db(connect):
@@ -125,3 +125,16 @@ def get_stock_list(connect, market, quotations):
     connect.commit()
     cur.close()
     return a
+
+
+def import_new_holidays(connect):
+    """导入新的交易所休假日历"""
+    cur = connect.cursor()
+    a = cur.execute("select date from holiday order by date desc limit 1").fetchall()
+    last_date = a[0][0] if a else 19901219
+    holidays = get_new_holidays()
+    new_holidays = [(int(v), ) for v in holidays if int(v) > last_date]
+    if new_holidays:
+        cur.executemany("insert into holiday (date) values (?)", new_holidays)
+        connect.commit()
+        cur.close()

@@ -28,7 +28,7 @@ import mysql.connector
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_data as h5_import_data
 from hikyuu.data.pytdx_to_mysql import import_data as mysql_import_data
-from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
+from hikyuu.util import *
 
 
 class ProgressBar:
@@ -36,7 +36,9 @@ class ProgressBar:
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put([self.src.task_name, self.src.market, self.src.ktype, (cur + 1) * 100 // total, 0])
+        progress = (cur + 1) * 100 // total
+        # hku_info(f"{self.src.market} {self.src.ktype} 数据: {progress}%")
+        self.src.queue.put([self.src.task_name, self.src.market, self.src.ktype, progress, 0])
 
 
 class ImportPytdxToH5:
@@ -53,8 +55,11 @@ class ImportPytdxToH5:
         self.port = port
         self.dest_dir = dest_dir
         self.startDatetime = start_datetime
+        self.status = "no run"
 
+    @hku_catch(trace=True)
     def __call__(self):
+        self.status = "running"
         capture_multiprocess_all_logger(self.log_queue)
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             sqlite_file = "{}/stock.db".format(self.config['hdf5']['dir'])
@@ -89,3 +94,4 @@ class ImportPytdxToH5:
             connect.close()
 
         self.queue.put([self.task_name, self.market, self.ktype, None, count])
+        self.status = "finished"

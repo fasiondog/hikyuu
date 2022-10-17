@@ -12,6 +12,11 @@
 
 namespace hku {
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
 inline std::string getUserHome() {
     char const *home = getenv("HOME");
     if (home) {
@@ -31,5 +36,9 @@ inline std::string getUserHome() {
 
     return "";
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 }  // namespace hku

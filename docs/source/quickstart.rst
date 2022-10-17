@@ -146,7 +146,7 @@ matplotlib显示图形时中文字体乱码的问题
 
     #font.sans-serif     : DejaVu Sans, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
 
-注释去掉，在冒号后面添加 SimHei，可以正常显示中文标签。
+注释去掉，在冒号后面添加 SimHei（如果使用 Ubuntu，可以使用 “Noto Sans CJK JP”），可以正常显示中文标签。
 
 再把下面一行的注释去掉，把冒号后面改成False可以正常显示正负号。
 
@@ -154,7 +154,7 @@ matplotlib显示图形时中文字体乱码的问题
 
     #axes.unicode_minus  : True
     
-2. 删除 “.matplotlib” 目录下的字体缓存文件 “fontList.py3k.cache”
+2. 删除 “.matplotlib” 目录下的字体缓存文件 “fontList.py3k.cache”。（Ubuntu 下，该位置为用户目录 .cache/matplotlib，删除该目录下所有文件）
 
 3. 检查 “c:\\windows\\fons” 目录下，是否存在 simhei.ttf 文件，如果没有可从网上搜索下载或加入Hikyuu QQ群下载字体文件，将该字体文件拷贝至 “c:\\windows\\fons” 目录下。
 

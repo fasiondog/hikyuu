@@ -31,7 +31,7 @@ from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
 
 from hikyuu.data.common_sqlite3 import create_database
 from hikyuu.data.tdx_to_h5 import tdx_import_stock_name_from_file
-from hikyuu.util.mylog import class_logger
+from hikyuu.util import *
 
 
 class UseTdxImportToH5Thread(QThread):
@@ -106,6 +106,7 @@ class UseTdxImportToH5Thread(QThread):
         else:
             self.send_message(['THREAD', 'FINISHED'])
 
+    @hku_catch(trace=True, re_raise=True)
     def _run(self):
         src_dir = self.config['tdx']['dir']
         dest_dir = self.config['hdf5']['dir']

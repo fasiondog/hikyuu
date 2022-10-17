@@ -118,8 +118,6 @@ void TradeManager::_reset() {
 
     m_position.clear();
     m_position_history.clear();
-    // m_broker_list
-    // m_broker_last_datetime = Datetime::now();
     m_actions.clear();
     _saveAction(m_trade_list.back());
 }
@@ -867,7 +865,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             Datetime realtime =
-              (*broker_iter)->buy(datetime, stock.market(), stock.code(), planPrice, number);
+              (*broker_iter)->buy(datetime, stock.market(), stock.code(), realPrice, number);
             if (realtime != Null<Datetime>())
                 m_broker_last_datetime = realtime;
         }
@@ -955,7 +953,7 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
             Datetime realtime =
-              (*broker_iter)->sell(datetime, stock.market(), stock.code(), planPrice, number);
+              (*broker_iter)->sell(datetime, stock.market(), stock.code(), realPrice, real_number);
             m_broker_last_datetime = realtime;
         }
     }
@@ -1191,7 +1189,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     // HKU_IF_RETURN(indatetime == Null<Datetime>() || indatetime == lastDatetime(),
     // getFunds(ktype));
 
-    Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 11, 59);
+    Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
     price_t short_market_value = 0.0;
     if (datetime > lastDatetime()) {

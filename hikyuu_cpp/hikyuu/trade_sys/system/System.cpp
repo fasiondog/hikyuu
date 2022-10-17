@@ -83,7 +83,8 @@ void System::initParam() {
     setParam<int>("max_delay_count", 3);
 
     //是否延迟到下一个bar开盘时进行交易
-    setParam<bool>("delay", true);  //非延迟操作取当前Bar的收盘价操作；延迟取下一BAR开盘价
+    setParam<bool>("buy_delay", true);  //非延迟操作取当前Bar的收盘价操作；延迟取下一BAR开盘价
+    setParam<bool>("sell_delay", true);
 
     //延迟操作的情况下，是使用当前的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     setParam<bool>("delay_use_current_price", true);
@@ -467,7 +468,7 @@ TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
 
 TradeRecord System::_buy(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
-    if (getParam<bool>("delay")) {
+    if (getParam<bool>("buy_delay")) {
         _submitBuyRequest(today, src_today, from);
         return result;
     } else {
@@ -599,7 +600,7 @@ TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, do
     HKU_ASSERT_M(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO,
                  "Only Allocator or Portfolis can perform this operation!");
     TradeRecord result;
-    if (getParam<bool>("delay")) {
+    if (getParam<bool>("sell_delay")) {
         if (m_sellRequest.valid) {
             if (m_sellRequest.count > getParam<int>("max_delay_count")) {
                 //超出最大延迟次数，清除买入请求
@@ -635,7 +636,7 @@ TradeRecord System::sellForce(const KRecord& today, const KRecord& src_today, do
 
 TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part from) {
     TradeRecord result;
-    if (getParam<bool>("delay")) {
+    if (getParam<bool>("sell_delay")) {
         _submitSellRequest(today, src_today, from);
         return result;
     } else {
@@ -771,7 +772,7 @@ TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Pa
     if (getParam<bool>("support_borrow_stock") == false)
         return result;
 
-    if (getParam<bool>("delay")) {
+    if (getParam<bool>("buy_delay")) {
         _submitBuyShortRequest(today, src_today, from);
         return result;
     } else {
@@ -915,7 +916,7 @@ TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, P
     if (getParam<bool>("support_borrow_stock") == false)
         return result;
 
-    if (getParam<bool>("delay")) {
+    if (getParam<bool>("sell_delay")) {
         _submitSellShortRequest(today, src_today, from);
         return result;
     } else {

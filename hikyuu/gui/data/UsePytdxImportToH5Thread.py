@@ -26,6 +26,7 @@ import logging
 import sqlite3
 import datetime
 import mysql.connector
+import queue
 from multiprocessing import Queue, Process
 from PyQt5.QtCore import QThread, pyqtSignal
 from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
@@ -36,9 +37,14 @@ from hikyuu.gui.data.ImportHistoryFinanceTask import ImportHistoryFinanceTask
 from pytdx.hq import TdxHq_API
 from hikyuu.data.common_pytdx import search_best_tdx
 
+from hikyuu.data.common import *
+from hikyuu.data.common_sqlite3 import import_new_holidays as sqlite_import_new_holidays
 from hikyuu.data.common_sqlite3 import create_database as sqlite_create_database
+from hikyuu.data.pytdx_to_h5 import import_index_name as sqlite_import_index_name
 from hikyuu.data.pytdx_to_h5 import import_stock_name as sqlite_import_stock_name
 from hikyuu.data.common_mysql import create_database as mysql_create_database
+from hikyuu.data.common_mysql import import_new_holidays as mysql_import_new_holidays
+from hikyuu.data.pytdx_to_mysql import import_index_name as mysql_import_index_name
 from hikyuu.data.pytdx_to_mysql import import_stock_name as mysql_import_stock_name
 from hikyuu.util.mylog import class_logger
 
@@ -82,20 +88,21 @@ class UsePytdxImportToH5Thread(QThread):
         if self.config.getboolean('weight', 'enable', fallback=False):
             self.tasks.append(ImportWeightToSqliteTask(self.log_queue, self.queue, self.config, dest_dir))
 
-        #if self.config.getboolean('finance', 'enable', fallback=False):
-        #    self.tasks.append(ImportHistoryFinanceTask(self.queue, dest_dir))
+        if self.config.getboolean('finance', 'enable', fallback=True):
+            self.tasks.append(ImportHistoryFinanceTask(self.log_queue, self.queue, dest_dir))
 
         task_count = 0
+        market_count = len(g_market_list)
         if self.config.getboolean('ktype', 'day', fallback=False):
-            task_count += 2
+            task_count += market_count
         if self.config.getboolean('ktype', 'min5', fallback=False):
-            task_count += 2
+            task_count += market_count
         if self.config.getboolean('ktype', 'min', fallback=False):
-            task_count += 2
+            task_count += market_count
         if self.config.getboolean('ktype', 'trans', fallback=False):
-            task_count += 2
+            task_count += market_count
         if self.config.getboolean('ktype', 'time', fallback=False):
-            task_count += 2
+            task_count += market_count
 
         self.logger.info('搜索通达信服务器')
         self.send_message(['INFO', '搜索通达信服务器'])
@@ -124,99 +131,72 @@ class UsePytdxImportToH5Thread(QThread):
 
         # 以下按数据量从大到小依次使用速度从高到低的TDX服务器
         if self.config.getboolean('ktype', 'trans', fallback=False):
-            today = datetime.date.today()
-            trans_start_date = datetime.datetime.strptime(config['ktype']['trans_start_date'], '%Y-%m-%d').date()
-            trans_max_days = (today - trans_start_date).days + 1
-            self.tasks.append(
-                ImportPytdxTransToH5(
-                    self.log_queue, self.queue, sqlite_file_name, 'SH', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir, trans_max_days
-                )
-            )
-            cur_host += 1
-            self.tasks.append(
-                ImportPytdxTransToH5(
-                    self.log_queue, self.queue, sqlite_file_name, 'SZ', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir, trans_max_days
-                )
-            )
-            cur_host += 1
+            if self.config.getboolean('hdf5', 'enable', fallback=True):
+                today = datetime.date.today()
+                trans_start_date = datetime.datetime.strptime(config['ktype']['trans_start_date'], '%Y-%m-%d').date()
+                trans_max_days = (today - trans_start_date).days + 1
+                for market in g_market_list:
+                    self.tasks.append(
+                        ImportPytdxTransToH5(
+                            self.log_queue, self.queue, sqlite_file_name, market, self.quotations,
+                            use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir, trans_max_days
+                        )
+                    )
+                    cur_host += 1
+            else:
+                self.logger.warn("mysql 尚不支持分笔数据导入！")
 
         if self.config.getboolean('ktype', 'min', fallback=False):
             start_date = datetime.datetime.strptime(config['ktype']['min_start_date'], '%Y-%m-%d').date()
-            self.tasks.append(
-                ImportPytdxToH5(
-                    self.log_queue, self.queue, self.config, 'SH', '1MIN', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
+            for market in g_market_list:
+                self.tasks.append(
+                    ImportPytdxToH5(
+                        self.log_queue, self.queue, self.config, market, '1MIN', self.quotations,
+                        use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
+                        start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
+                    )
                 )
-            )
-            cur_host += 1
-            self.tasks.append(
-                ImportPytdxToH5(
-                    self.log_queue, self.queue, self.config, 'SZ', '1MIN', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
-                )
-            )
-            cur_host += 1
+                cur_host += 1
 
         if self.config.getboolean('ktype', 'time', fallback=False):
-            today = datetime.date.today()
-            time_start_date = datetime.datetime.strptime(config['ktype']['time_start_date'], '%Y-%m-%d').date()
-            time_max_days = (today - time_start_date).days + 1
-            self.tasks.append(
-                ImportPytdxTimeToH5(
-                    self.log_queue, self.queue, sqlite_file_name, 'SH', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir, time_max_days
-                )
-            )
-            cur_host += 1
-            self.tasks.append(
-                ImportPytdxTimeToH5(
-                    self.log_queue, self.queue, sqlite_file_name, 'SZ', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir, time_max_days
-                )
-            )
-            cur_host += 1
+            if self.config.getboolean('hdf5', 'enable', fallback=True):
+                today = datetime.date.today()
+                time_start_date = datetime.datetime.strptime(config['ktype']['time_start_date'], '%Y-%m-%d').date()
+                time_max_days = (today - time_start_date).days + 1
+                for market in g_market_list:
+                    self.tasks.append(
+                        ImportPytdxTimeToH5(
+                            self.log_queue, self.queue, sqlite_file_name, market, self.quotations,
+                            use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir, time_max_days
+                        )
+                    )
+                    cur_host += 1
+            else:
+                self.logger.warn("mysql 尚不支持分时数据导入！")
 
         if self.config.getboolean('ktype', 'min5', fallback=False):
             start_date = datetime.datetime.strptime(config['ktype']['min5_start_date'], '%Y-%m-%d').date()
-            self.tasks.append(
-                ImportPytdxToH5(
-                    self.log_queue, self.queue, self.config, 'SH', '5MIN', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
+            for market in g_market_list:
+                self.tasks.append(
+                    ImportPytdxToH5(
+                        self.log_queue, self.queue, self.config, market, '5MIN', self.quotations,
+                        use_hosts[cur_host][0], use_hosts[cur_host][1], dest_dir,
+                        start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
+                    )
                 )
-            )
-            cur_host += 1
-            self.tasks.append(
-                ImportPytdxToH5(
-                    self.log_queue, self.queue, self.config, 'SZ', '5MIN', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
-                )
-            )
-            cur_host += 1
+                cur_host += 1
 
         if self.config.getboolean('ktype', 'day', fallback=False):
             start_date = datetime.datetime.strptime(config['ktype']['day_start_date'], '%Y-%m-%d').date()
-            self.tasks.append(
-                ImportPytdxToH5(
-                    self.log_queue, self.queue, self.config, 'SH', 'DAY', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
+            for market in g_market_list:
+                self.tasks.append(
+                    ImportPytdxToH5(
+                        self.log_queue, self.queue, self.config, market, 'DAY', self.quotations, use_hosts[cur_host][0],
+                        use_hosts[cur_host][1], dest_dir,
+                        start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
+                    )
                 )
-            )
-            cur_host += 1
-            self.tasks.append(
-                ImportPytdxToH5(
-                    self.log_queue, self.queue, self.config, 'SZ', 'DAY', self.quotations, use_hosts[cur_host][0],
-                    use_hosts[cur_host][1], dest_dir,
-                    start_date.year * 100000000 + start_date.month * 1000000 + start_date.day * 10000
-                )
-            )
-            cur_host += 1
+                cur_host += 1
 
     def run(self):
         try:
@@ -229,10 +209,15 @@ class UsePytdxImportToH5Thread(QThread):
             self.logger.info('导入完毕')
             self.send_message(['THREAD', 'FINISHED'])
 
+    @hku_catch(trace=True, re_raise=True)
     def _run(self):
-        hdf5_import_progress = {'SH': {'DAY': 0, '1MIN': 0, '5MIN': 0}, 'SZ': {'DAY': 0, '1MIN': 0, '5MIN': 0}}
-        trans_progress = {'SH': 0, 'SZ': 0}
-        time_progress = {'SH': 0, 'SZ': 0}
+        hdf5_import_progress = {}
+        trans_progress = {}
+        time_progress = {}
+        for market in g_market_list:
+            hdf5_import_progress[market] = {'DAY': 0, '1MIN': 0, '5MIN': 0}
+            trans_progress[market] = 0
+            time_progress[market] = 0
 
         #正在导入代码表
         self.logger.info('导入股票代码表')
@@ -241,6 +226,8 @@ class UsePytdxImportToH5Thread(QThread):
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             connect = sqlite3.connect("{}/stock.db".format(self.config['hdf5']['dir']))
             create_database = sqlite_create_database
+            import_new_holidays = sqlite_import_new_holidays
+            import_index_name = sqlite_import_index_name
             import_stock_name = sqlite_import_stock_name
         else:
             db_config = {
@@ -251,6 +238,8 @@ class UsePytdxImportToH5Thread(QThread):
             }
             connect = mysql.connector.connect(**db_config)
             create_database = mysql_create_database
+            import_new_holidays = mysql_import_new_holidays
+            import_index_name = mysql_import_index_name
             import_stock_name = mysql_import_stock_name
 
         create_database(connect)
@@ -258,14 +247,17 @@ class UsePytdxImportToH5Thread(QThread):
         pytdx_api = TdxHq_API()
         pytdx_api.connect(self.hosts[0][2], self.hosts[0][3])
 
-        count = import_stock_name(connect, pytdx_api, 'SH', self.quotations)
-        if count > 0:
-            self.logger.info("上证新增股票数: {}".format(count))
-            self.send_message(['INFO', '上证新增股票数：%s' % count])
-        count = import_stock_name(connect, pytdx_api, 'SZ', self.quotations)
-        if count > 0:
-            self.logger.info("深证新增股票数: {}".format(count))
-            self.send_message(['INFO', '深证新增股票数：%s' % count])
+        self.logger.info("导入交易所休假日历")
+        import_new_holidays(connect)
+
+        count = import_index_name(connect)
+        self.logger.info("指数数量: {}".format(count))
+
+        for market in g_market_list:
+            count = import_stock_name(connect, pytdx_api, market, self.quotations)
+            if count > 0:
+                self.logger.info("{} 新增股票数: {}".format(market, count))
+                self.send_message(['INFO', '{} 新增股票数：{}'.format(market, count)])
 
         self.process_list.clear()
         for task in self.tasks:
@@ -274,37 +266,65 @@ class UsePytdxImportToH5Thread(QThread):
             p.start()
 
         finished_count = len(self.tasks)
+        market_count = len(g_market_list)
         while finished_count > 0:
-            message = self.queue.get()
-            taskname, market, ktype, progress, total = message
-            if progress is None:
-                finished_count -= 1
-                if taskname in ('IMPORT_KDATA', 'IMPORT_TRANS', 'IMPORT_TIME'):
-                    self.send_message([taskname, 'FINISHED', market, ktype, total])
-                else:
-                    self.send_message([taskname, 'FINISHED'])
-                continue
+            try:
+                message = self.queue.get(timeout=10)
+                taskname, market, ktype, progress, total = message
+                if progress is None:
+                    finished_count -= 1
+                    if taskname in ('IMPORT_KDATA', 'IMPORT_TRANS', 'IMPORT_TIME'):
+                        self.send_message([taskname, 'FINISHED', market, ktype, total])
+                    else:
+                        self.send_message([taskname, 'FINISHED'])
+                    continue
 
-            if taskname == 'IMPORT_WEIGHT':
-                if market == 'INFO':
-                    self.send_message(['INFO', ktype])
-                self.send_message([taskname, market, total])
-            elif taskname == 'IMPORT_FINANCE':
-                self.send_message([taskname, progress])
-            elif taskname == 'IMPORT_KDATA':
-                hdf5_import_progress[market][ktype] = progress
-                current_progress = (hdf5_import_progress['SH'][ktype] + hdf5_import_progress['SZ'][ktype]) // 2
-                self.send_message([taskname, ktype, current_progress])
-            elif taskname == 'IMPORT_TRANS':
-                trans_progress[market] = progress
-                current_progress = (trans_progress['SH'] + trans_progress['SZ']) // 2
-                self.send_message([taskname, ktype, current_progress])
-            elif taskname == 'IMPORT_TIME':
-                time_progress[market] = progress
-                current_progress = (time_progress['SH'] + time_progress['SZ']) // 2
-                self.send_message([taskname, ktype, current_progress])
-            else:
-                self.logger.error("Unknow task: {}".format(taskname))
+                if taskname == 'IMPORT_WEIGHT':
+                    if market == 'INFO':
+                        self.send_message(['INFO', ktype])
+                    self.send_message([taskname, market, total])
+                elif taskname == 'IMPORT_FINANCE':
+                    self.send_message([taskname, progress])
+                elif taskname == 'IMPORT_KDATA':
+                    hdf5_import_progress[market][ktype] = progress
+                    current_progress = 0
+                    for market in g_market_list:
+                        current_progress += hdf5_import_progress[market][ktype]
+                    current_progress = current_progress // market_count
+                    self.send_message([taskname, ktype, current_progress])
+                elif taskname == 'IMPORT_TRANS':
+                    trans_progress[market] = progress
+                    current_progress = 0
+                    for market in g_market_list:
+                        current_progress += trans_progress[market]
+                    current_progress = current_progress // market_count
+                    self.send_message([taskname, ktype, current_progress])
+                elif taskname == 'IMPORT_TIME':
+                    time_progress[market] = progress
+                    current_progress = 0
+                    for market in g_market_list:
+                        current_progress += time_progress[market]
+                    current_progress = current_progress // market_count
+                    self.send_message([taskname, ktype, current_progress])
+                else:
+                    self.logger.error("Unknow task: {}".format(taskname))
+            except queue.Empty:
+                if finished_count > 0:
+                    ok = False
+                    for p in self.process_list:
+                        if p.is_alive():
+                            ok = True
+                            break
+                    if not ok:
+                        for task in self.tasks:
+                            self.logger.info(f"task ({task.__class__.__name__}) status: {task.status}!")
+                        for p in self.process_list:
+                            self.logger.info(f"Process exit code: {p.exitcode}")
+                        finished_count = 0
+                        self.logger.error("All process is finished, but some tasks are running!")
+
+            except Exception as e:
+                self.logger.error(str(e))
 
 
 class_logger(UsePytdxImportToH5Thread)

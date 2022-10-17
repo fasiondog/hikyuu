@@ -76,7 +76,8 @@ TEST_CASE("test_SYS_Simple_for_base") {
 
     /** @arg 指定了TM、SG、MM，但未指定其他策略组件，非延迟操作 */
     sys = SYS_Simple();
-    sys->setParam("delay", false);
+    sys->setParam("buy_delay", false);
+    sys->setParam("sell_delay", false);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());
@@ -128,7 +129,8 @@ TEST_CASE("test_SYS_Simple_for_base") {
 
     /** @arg 指定了TM、SG、MM，但未指定其他策略组件，延迟操作 */
     sys = SYS_Simple();
-    sys->setParam("delay", true);
+    sys->setParam("buy_delay", true);
+    sys->setParam("sell_delay", true);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
     sys->setMM(mm->clone());

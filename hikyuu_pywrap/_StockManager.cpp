@@ -43,6 +43,10 @@ void export_StockManager() {
 
     获取用于保存零时变量等的临时目录，如未配置则为当前目录 由m_config中的“tmpdir”指定)")
 
+      .def("datadir", &StockManager::datadir, R"(datadir(self) -> str
+
+    获取财务数据存放路径)")
+
       .def("get_base_info_parameter", &StockManager::getBaseInfoDriverParameter,
            return_value_policy<copy_const_reference>(), "获取当前基础信息驱动参数")
       .def("get_block_parameter", &StockManager::getBlockDriverParameter,

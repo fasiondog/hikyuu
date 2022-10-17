@@ -330,8 +330,9 @@ void AllocateFundsBase::_adjust_with_running(const Datetime& date, const SystemL
                     KRecord k = kdata.getKRecord(pos);
                     KRecord srcK = stock.getKRecord(kdata.startPos() + pos);
                     TradeRecord tr;
-                    double need_sell_num = sys->getParam<bool>("delay") ? need_cash / k.closePrice
-                                                                        : need_cash / k.openPrice;
+                    double need_sell_num = sys->getParam<bool>("sell_delay")
+                                             ? need_cash / k.closePrice
+                                             : need_cash / k.openPrice;
                     if (position.number <= need_sell_num) {
                         // 如果当前持仓数小于等于需要卖出的数量，则全部卖出
                         tr = sys->sellForce(k, srcK, position.number, PART_ALLOCATEFUNDS);

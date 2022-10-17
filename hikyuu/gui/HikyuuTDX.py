@@ -27,6 +27,7 @@ from hikyuu.gui.data.UsePytdxImportToH5Thread import UsePytdxImportToH5Thread
 #from hikyuu.gui.data.CollectToMemThread import CollectToMemThread
 from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
+from hikyuu.gui.spot_server import release_nng_sender
 
 from hikyuu.data import hku_config_template
 from hikyuu.util.mylog import add_class_logger_handler, class_logger, get_default_logger
@@ -62,9 +63,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         if self.sched_import_thread is not None and self.sched_import_thread.isRunning():
             self.sched_import_thread.terminate()
+            self.collect_spot_thread.wait()
 
         if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
+            release_nng_sender()
             self.collect_spot_thread.terminate()
+            self.collect_spot_thread.wait()
 
         self.saveConfig()
 
@@ -335,8 +339,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.collect_sample_spinBox.setValue(interval_time)
         use_zhima_proxy = import_config.getboolean('collect', 'use_zhima_proxy', fallback=False)
         self.collect_use_zhima_checkBox.setChecked(use_zhima_proxy)
-        data_source = import_config.get('collect', 'source', fallback='sina')
-        self.collect_source_comboBox.setCurrentIndex(0 if data_source == 'sina' else 1)
+        # data_source = import_config.get('collect', 'source', fallback='qq')
+        self.collect_source_comboBox.setCurrentIndex(0)
         self.collect_phase1_start_timeEdit.setTime(
             datetime.time.fromisoformat(import_config.get('collect', 'phase1_start', fallback='09:00'))
         )
@@ -633,9 +637,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 #elif msg[2] == '导入通达信财务信息完毕!':
                 #    self.import_detail_textEdit.append('导入通达信财务记录数：{}'.format(msg[3]))
 
-            #elif msg_task_name == 'IMPORT_FINANCE':
-            #    if msg[2] != 'FINISHED':
-            #        self.finance_progressBar.setValue(msg[2])
+            elif msg_task_name == 'IMPORT_FINANCE':
+                # self.finance_progressBar.setValue(msg[2])
+                self.logger.info(f"财务数据下载: {msg[2]}%")
 
     @pyqtSlot()
     def on_start_import_pushButton_clicked(self):
@@ -709,6 +713,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_collect_start_pushButton_clicked(self):
         if self._is_collect_running:
             if self.collect_spot_thread is not None and self.collect_spot_thread.isRunning():
+                release_nng_sender()
                 self.collect_spot_thread.terminate()
                 self.collect_spot_thread.wait()
                 self.collect_spot_thread = None

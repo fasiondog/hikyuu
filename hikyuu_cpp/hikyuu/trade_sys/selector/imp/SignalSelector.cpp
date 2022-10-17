@@ -37,7 +37,7 @@ void SignalSelector::_calculate() {
         auto sg = sys->getSG();
         auto dates = sg->getBuySignal();
         unordered_map<Datetime, SystemList>* date_dict;
-        date_dict = sys->getParam<bool>("delay") ? &m_sys_dict_on_close : &m_sys_dict_on_open;
+        date_dict = sys->getParam<bool>("buy_delay") ? &m_sys_dict_on_close : &m_sys_dict_on_open;
         for (auto& date : dates) {
             auto iter = date_dict->find(date);
             if (iter != date_dict->end()) {

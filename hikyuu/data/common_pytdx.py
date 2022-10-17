@@ -27,6 +27,24 @@ from concurrent import futures
 from pytdx.hq import TdxHq_API
 from pytdx.config.hosts import hq_hosts
 
+hq_hosts = [
+    ('上海双线主站1', '47.103.48.45', 7709),
+    ('上海双线主站2', '47.103.86.229', 7709),
+    ('上海双线主站3', '47.103.88.146', 7709),
+    ('深圳双线主站1', '120.79.60.82', 7709),
+    ('深圳双线主站2', '47.112.129.66', 7709),
+    ('北京双线主站1', '39.98.234.173', 7709),
+    ('北京双线主站2', '39.98.198.249', 7709),
+    ('北京双线主站3', '39.100.68.59', 7709),
+]
+
+
+def to_pytdx_market(market):
+    """转换为pytdx的market"""
+    pytdx_market = {'SZ': 0, 'SH': 1, 'BJ': 2}
+    return pytdx_market[market.upper()]
+
+
 def ping(ip, port=7709, multithread=False):
     api = TdxHq_API(multithread=multithread)
     success = False

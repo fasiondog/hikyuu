@@ -20,7 +20,7 @@ bool FixedSelector::isMatchAF(const AFPtr& af) {
 SystemList FixedSelector::getSelectedOnOpen(Datetime date) {
     SystemList result;
     for (auto& sys : m_real_sys_list) {
-        if (!sys->getParam<bool>("delay")) {
+        if (!sys->getParam<bool>("buy_delay")) {
             result.emplace_back(sys);
         }
     }
@@ -30,7 +30,7 @@ SystemList FixedSelector::getSelectedOnOpen(Datetime date) {
 SystemList FixedSelector::getSelectedOnClose(Datetime date) {
     SystemList result;
     for (auto& sys : m_real_sys_list) {
-        if (sys->getParam<bool>("delay")) {
+        if (sys->getParam<bool>("buy_delay")) {
             result.emplace_back(sys);
         }
     }

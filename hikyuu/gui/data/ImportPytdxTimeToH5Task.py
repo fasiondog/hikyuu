@@ -26,8 +26,7 @@ import logging
 import sqlite3
 from pytdx.hq import TdxHq_API
 from hikyuu.data.pytdx_to_h5 import import_time
-from hikyuu.util import capture_multiprocess_all_logger
-from hikyuu.util.mylog import get_default_logger
+from hikyuu.util import *
 
 
 class ProgressBar:
@@ -35,7 +34,9 @@ class ProgressBar:
         self.src = src
 
     def __call__(self, cur, total):
-        self.src.queue.put([self.src.task_name, self.src.market, 'TIME', (cur + 1) * 100 // total, 0])
+        progress = (cur + 1) * 100 // total if total > 0 else 100
+        # hku_info(f"{self.src.market} 分时数据: {progress}%")
+        self.src.queue.put([self.src.task_name, self.src.market, 'TIME', progress, 0])
 
 
 class ImportPytdxTimeToH5:
@@ -51,8 +52,11 @@ class ImportPytdxTimeToH5:
         self.port = port
         self.dest_dir = dest_dir
         self.max_days = int(max_days)
+        self.status = "no run"
 
+    @hku_catch(trace=True)
     def __call__(self):
+        self.status = "running"
         capture_multiprocess_all_logger(self.log_queue)
         count = 0
         connect = sqlite3.connect(self.sqlitefile, timeout=1800)
@@ -71,3 +75,4 @@ class ImportPytdxTimeToH5:
             connect.close()
 
         self.queue.put([self.task_name, self.market, 'TIME', None, count])
+        self.status = "finished"

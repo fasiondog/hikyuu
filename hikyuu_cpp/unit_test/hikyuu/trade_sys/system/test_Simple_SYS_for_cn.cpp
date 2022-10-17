@@ -64,7 +64,8 @@ TEST_CASE("test_SYS_Simple_for_cn") {
 
     /** @arg 指定了TM、SG、MM、ST、TP、EV、CN，CN有效日期和EV重合 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", true);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -122,7 +123,8 @@ TEST_CASE("test_SYS_Simple_for_cn") {
 
     /** @arg 指定了TM、SG、MM、ST、TP、EV、CN，CN的有效日期范围完全覆盖并大于EV的范围 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", true);
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
@@ -180,7 +182,8 @@ TEST_CASE("test_SYS_Simple_for_cn") {
 
     /** @arg 指定了TM、SG、MM、EV、CN（不触发建仓），CN的有效日期范围在EV的范围之内 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", true);
     sys->setParam<bool>("cn_open_position", false);
     sys->setTM(tm->clone());
@@ -237,7 +240,8 @@ TEST_CASE("test_SYS_Simple_for_cn") {
 
     /** @arg 指定了TM、SG、MM、EV、CN（触发建仓），CN的有效日期范围在EV的范围之内 */
     sys = SYS_Simple();
-    sys->setParam<bool>("delay", false);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
     sys->setParam<bool>("ev_open_position", true);
     sys->setParam<bool>("cn_open_position", true);
     sys->setTM(tm->clone());

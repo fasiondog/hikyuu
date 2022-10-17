@@ -60,21 +60,21 @@ public:
 
 public:
     static const char* getInsertSQL() {
-        return "insert into `StockTypeInfo` "
+        return "insert into `stocktypeinfo` "
                "(`id`, `type`, `precision`, `tick`, `tickValue`, "
                "`minTradeNumber`, `maxTradeNumber`, `description`) "
                "values (?,?,?,?,?,?,?,?)";
     }
 
     static const char* getUpdateSQL() {
-        return "update `StockTypeInfo` set `type`=?, `precision`=?, `tick`=?, "
+        return "update `stocktypeinfo` set `type`=?, `precision`=?, `tick`=?, "
                "`tickValue`=?, `minTradeNumber`=?, `maxTradeNumber`=?"
                "`description`=? where `id`=?";
     }
 
     static const char* getSelectSQL() {
         return "select `id`,`type`,`precision`, `tick`, `tickValue`, "
-               "`minTradeNumber`, `maxTradeNumber`, `description` from `StockTypeInfo`";
+               "`minTradeNumber`, `maxTradeNumber`, `description` from `stocktypeinfo`";
     }
 
     void save(const SQLStatementPtr& st) const {

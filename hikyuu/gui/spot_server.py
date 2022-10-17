@@ -13,6 +13,7 @@ import time
 import flatbuffers
 import pynng
 import click
+import threading
 
 import hikyuu.flat as fb
 
@@ -72,7 +73,11 @@ def create_fb_spot(records):
     fb.SpotListStartSpotVector(builder, total)
     for spot in spot_list:
         builder.PrependUOffsetTRelative(spot)
-    inv = builder.EndVector(total)
+
+    if flatbuffers.__version__ >= '2.0':
+        inv = builder.EndVector()
+    else:
+        inv = builder.EndVector(total)
 
     fb.SpotListStart(builder)
     fb.SpotListAddSpot(builder, inv)
@@ -160,6 +165,48 @@ def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend)
     return delta
 
 
+# 多线程时锁住申请
+g_nng_sender_lock = threading.Lock()
+g_nng_sender = None
+g_spot_topic = ':spot:'
+
+
+def get_nng_sender():
+    global g_nng_sender
+    g_nng_sender_lock.acquire()
+    if g_nng_sender is None:
+        address = "ipc:///tmp/hikyuu_real_pub.ipc"
+        g_nng_sender = pynng.Pub0()
+        g_nng_sender.listen(address)
+    g_nng_sender_lock.release()
+    return g_nng_sender
+
+
+def release_nng_sender():
+    global g_nng_sender
+    g_nng_sender_lock.acquire()
+    if g_nng_sender is not None:
+        g_nng_sender.close()
+    g_nng_sender = None
+    g_nng_sender_lock.release()
+    hku_info("release pynng socket")
+
+
+def start_send_spot():
+    get_nng_sender().send("{}{}".format(g_spot_topic, '[start spot]').encode('utf-8'))
+
+
+def end_send_spot():
+    get_nng_sender().send('{}{}'.format(g_spot_topic, '[end spot]').encode('utf-8'))
+
+
+def send_spot(records):
+    spot = bytearray(g_spot_topic.encode('utf-8'))
+    buf = create_fb_spot(records)
+    spot.extend(buf)
+    get_nng_sender().send(bytes(spot))
+
+
 def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     phase1_delta = parse_phase(phase1)
     if phase1_delta is None or len(phase1_delta) != 2:
@@ -192,25 +239,23 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
     sm = StockManager.instance()
     stk_list = [
-        stk.market_code.lower() for stk in sm
-        if stk.valid and stk.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM)
+        stk.market_code.lower() for stk in sm if stk.valid and stk.type in
+        (constant.STOCKTYPE_A, constant.STOCKTYPE_INDEX, constant.STOCKTYPE_GEM, constant.STOCKTYPE_START)
     ]
 
     spot_topic = ':spot:'
 
-    def batch_func(records):
-        spot = bytearray(spot_topic.encode('utf-8'))
-        buf = create_fb_spot(records)
-        spot.extend(buf)
-        pub_sock.send(bytes(spot))
+    # def batch_func(records):
+    #     spot = bytearray(spot_topic.encode('utf-8'))
+    #     buf = create_fb_spot(records)
+    #     spot.extend(buf)
+    #     get_nng_sender().send(bytes(spot))
 
-    address = "ipc:///tmp/hikyuu_real_pub.ipc"
-    pub_sock = pynng.Pub0()
-    pub_sock.listen(address)
+    #pub_sock = get_nng_sender()
 
     today = Datetime.today()
-    phase1_time = [today + x for x in phase1_delta]
-    phase2_time = [today + x for x in phase2_delta]
+    #phase1_time = [today + x for x in phase1_delta]
+    #phase2_time = [today + x for x in phase2_delta]
     start_time = Datetime.now()
     delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
     next_time = start_time + delta
@@ -219,15 +264,21 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     while True:
         try:
             start_time = Datetime.now()
-            pub_sock.send("{}{}".format(spot_topic, '[start spot]').encode('utf-8'))
-            records = get_spot_parallel(stk_list, source, use_proxy, batch_func)
+            #pub_sock.send("{}{}".format(spot_topic, '[start spot]').encode('utf-8'))
+            start_send_spot()
+            records = get_spot_parallel(stk_list, source, use_proxy, send_spot)
             hku_info("{}:{}:{} 采集数量: {}".format(start_time.hour, start_time.minute, start_time.second, len(records)))
-            pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
+            #pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
+            end_send_spot()
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
             time.sleep(delta.total_seconds())
+        except KeyboardInterrupt:
+            print("Ctrl-C 终止")
+            break
         except Exception as e:
             hku_error(e)
             time.sleep(10)
+    release_nng_sender()
 
 
 @click.command()
