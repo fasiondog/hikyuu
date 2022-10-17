@@ -7,6 +7,7 @@ package("hdf5")
     if is_plat("windows") then
         add_urls("https://github.com/fasiondog/hikyuu/releases/download/1.1.9/hdf5-$(version)-win-x64.zip",
             "https://gitee.com/fasiondog/hikyuu/releases/download/1.1.9/hdf5-$(version)-win-x64.zip")
+        add_versions("1.12.2", "388d455c917b153f3410e8ca0c857ee37a575d859a70ecb6e16d4fb43b1d201c")
         add_versions("1.10.4", "253b23baada1d9c86cb4424595eba366b6844c384a5e0aafebf0893a1148f25f")
     end
 
