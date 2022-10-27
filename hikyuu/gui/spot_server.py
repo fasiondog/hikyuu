@@ -283,10 +283,10 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
 @click.command()
 @click.option('-use_proxy', '--use_proxy', is_flag=True, help='是否使用代理，须自行申请芝麻http代理并加入ip白名单')
-@click.option('-source', '--source', default='sina', type=click.Choice(['sina', 'qq']), help='数据来源')
+@click.option('-source', '--source', default='qq', type=click.Choice(['sina', 'qq']), help='数据来源')
 @click.option('-seconds', '--seconds', default=10)
-@click.option('-phase1', '--phase1', default='9:00-9:00')
-@click.option('-phase2', '--phase2', default='13:00-13:000')
+@click.option('-phase1', '--phase1', default='9:00-12:00')
+@click.option('-phase2', '--phase2', default='13:00-15:00')
 @click.option('-ignore_weekend', '--ignore_weekend', is_flag=True)
 def run(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend)
