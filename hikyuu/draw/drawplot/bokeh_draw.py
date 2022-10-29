@@ -8,26 +8,28 @@ from hikyuu import *
 from .common import get_draw_title
 
 from bokeh.plotting import Figure, figure, ColumnDataSource
-from bokeh.models import DatetimeTickFormatter,HoverTool, Title, Label
+from bokeh.models import DatetimeTickFormatter, HoverTool, Title, Label
 from bokeh.layouts import column
 from bokeh.io import output_notebook, output_file, show
 
 
 def trans_color(color):
     """将 matplotlib 常用的 color 转换为对应的 bokeh color，如果无法转换则返回原值"""
-    color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue', 'y': 'yellow', 
-                  'm': 'mediumorchid'}
+    color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue', 'y': 'yellow', 'm': 'mediumorchid'}
     return color_dict[color] if color in color_dict else color
 
 
 def ax_set_xlim(self, *args, **kwargs):
     pass
 
+
 def ax_set_ylim(self, *args, **kwargs):
     pass
 
+
 def ax_fill_between(self, *args, **kwargs):
     pass
+
 
 Figure.set_xlim = ax_set_xlim
 Figure.set_ylim = ax_set_ylim
@@ -37,6 +39,7 @@ g_use_in_notbook = False
 g_figure = None
 g_axes = None
 g_use_in_notbook = False
+
 
 def use_bokeh_in_notebook(in_notebook=False):
     global g_use_in_notbook
@@ -64,7 +67,7 @@ def show_gcf():
     show(gcf())
 
 
-def create_one_axes_figure(figsize=(800,450)):
+def create_one_axes_figure(figsize=(800, 450)):
     """生成一个仅含有1个坐标轴的figure，并返回其坐标轴对象
     
     :param figsize: (宽, 高)
@@ -77,7 +80,7 @@ def create_one_axes_figure(figsize=(800,450)):
     return g_axes
 
 
-def create_two_axes_figure(figsize=(800,450)):
+def create_two_axes_figure(figsize=(800, 450)):
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
     
     :param figsize: (宽, 高)
@@ -92,7 +95,7 @@ def create_two_axes_figure(figsize=(800,450)):
     return ax1, ax2
 
 
-def create_three_axes_figure(figsize=(800,450)):
+def create_three_axes_figure(figsize=(800, 450)):
     """生成一个含有2个坐标轴的figure，并返回坐标轴列表
     
     :param figsize: (宽, 高)
@@ -148,38 +151,53 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
         axes = create_figure() if new or gca() is None else gca()
 
     k = kdata
-    inc_k = [r for r in k if r.close >  r.open]
+    inc_k = [r for r in k if r.close > r.open]
     dec_k = [r for r in k if r.close <= r.open]
-    
-    inc_source = ColumnDataSource(dict(datetime=[r.datetime.datetime() for r in inc_k],
-                                      open=[r.open for r in inc_k],
-                                      high=[r.high for r in inc_k],
-                                      low=[r.low for r in inc_k],
-                                      close=[r.close for r in inc_k],
-                                      amount=[r.amount for r in inc_k],
-                                      volume=[r.volume for r in inc_k]))
-    dec_source = ColumnDataSource(dict(datetime=[r.datetime.datetime() for r in dec_k],
-                                      open=[r.open for r in dec_k],
-                                      high=[r.high for r in dec_k],
-                                      low=[r.low for r in dec_k],
-                                      close=[r.close for r in dec_k],
-                                      amount=[r.amount for r in dec_k],
-                                      volume=[r.volume for r in dec_k]))
-    
-    w = 12*60*60*1000
+
+    inc_source = ColumnDataSource(
+        dict(
+            datetime=[r.datetime.datetime() for r in inc_k],
+            open=[r.open for r in inc_k],
+            high=[r.high for r in inc_k],
+            low=[r.low for r in inc_k],
+            close=[r.close for r in inc_k],
+            amount=[r.amount for r in inc_k],
+            volume=[r.volume for r in inc_k]
+        )
+    )
+    dec_source = ColumnDataSource(
+        dict(
+            datetime=[r.datetime.datetime() for r in dec_k],
+            open=[r.open for r in dec_k],
+            high=[r.high for r in dec_k],
+            low=[r.low for r in dec_k],
+            close=[r.close for r in dec_k],
+            amount=[r.amount for r in dec_k],
+            volume=[r.volume for r in dec_k]
+        )
+    )
+
+    w = 12 * 60 * 60 * 1000
     colorup = trans_color(colorup)
     colordown = trans_color(colordown)
     axes.segment(x0='datetime', y0='high', x1='datetime', y1='low', color=colorup, source=inc_source)
     axes.segment(x0='datetime', y0='high', x1='datetime', y1='low', color=colordown, source=dec_source)
-    axes.vbar(x='datetime', width=w, top='close', bottom='open', fill_color="white", 
-              line_color=colorup, source=inc_source)
-    axes.vbar(x='datetime', width=w, top='open', bottom='close', fill_color="green", 
-              line_color=colordown, source=dec_source)
-    axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('日期', get_date_format(k)), 
-                                       ("开盘价", "@open{0.0000}"), ("最高价", "@high{0.0000}"), 
-                                       ("最低价", "@low{0.0000}"),("收盘价", "@close{0.0000}"),
-                                      ("成交金额", "@amount{0.0000}"), ("成交量", "@volume{0.0000}")],
-                     formatters = { "datetime": "datetime"}))
+    axes.vbar(
+        x='datetime', width=w, top='close', bottom='open', fill_color="white", line_color=colorup, source=inc_source
+    )
+    axes.vbar(
+        x='datetime', width=w, top='open', bottom='close', fill_color="green", line_color=colordown, source=dec_source
+    )
+    axes.add_tools(
+        HoverTool(
+            tooltips=[
+                ("index", "$index"), ('日期', get_date_format(k)), ("开盘价", "@open{0.0000}"), ("最高价", "@high{0.0000}"),
+                ("最低价", "@low{0.0000}"), ("收盘价", "@close{0.0000}"), ("成交金额", "@amount{0.0000}"),
+                ("成交量", "@volume{0.0000}")
+            ],
+            formatters={"@datetime": "datetime"}
+        )
+    )
 
     axes.xaxis[0].formatter = DatetimeTickFormatter()
     axes.title.text = k.get_stock().name
@@ -189,19 +207,20 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     last_record = kdata[-1]
     color = colorup if last_record.close > kdata[-2].close else colordown
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime, last_record.open, last_record.high, last_record.low,
-        last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
+        last_record.datetime, last_record.open, last_record.high, last_record.low, last_record.close, 100 *
+        (last_record.close - kdata[-2].close) / kdata[-2].close
     )
-    
+
     label = Label(
         x=axes.plot_width * 0.01,
         y=axes.plot_height * 0.82,
-        x_units='screen', y_units='screen',
+        x_units='screen',
+        y_units='screen',
         text=text,
         render_mode='css',
         text_font_size='14px',
         text_color=color,
-        background_fill_color='white', 
+        background_fill_color='white',
         background_fill_alpha=0.5
     )
     axes.add_layout(label)
@@ -276,28 +295,32 @@ def iplot(
         x_value = [r.datetime() for r in kref.get_datetime_list()]
         source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
         if legend_on:
-            axes.line(x='datetime', y='value', legend_label=label, line_width=width, 
-                      line_color=line_color, source=source)
+            axes.line(
+                x='datetime', y='value', legend_label=label, line_width=width, line_color=line_color, source=source
+            )
             axes.legend.location = "top_left"
         else:
-            axes.line(x='datetime', y='value', line_width=width, line_color=line_color, 
-                      source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
-                                 ('日期', get_date_format(kref)), ("值", "@value{0.0000}")],
-                     formatters = { "datetime": "datetime"}))
+            axes.line(x='datetime', y='value', line_width=width, line_color=line_color, source=source)
+        axes.add_tools(
+            HoverTool(
+                tooltips=[
+                    ("index", "$index"), ('指标', indicator.name), ('日期', get_date_format(kref)), ("值", "@value{0.0000}")
+                ],
+                formatters={"@datetime": "datetime"}
+            )
+        )
         axes.xaxis[0].formatter = DatetimeTickFormatter()
     else:
         x_value = list(range(len(indicator)))
         source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
         if legend_on:
-            axes.line(x='datetime', y='value', legend_label=label, line_width=width, 
-                      line_color=line_color, source=source)
+            axes.line(
+                x='datetime', y='value', legend_label=label, line_width=width, line_color=line_color, source=source
+            )
             axes.legend.location = "top_left"
         else:
-            axes.line(x='datetime', y='value', line_width=width, line_color=line_color, 
-                      source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
-                                 ("值", "@value{0.0000}")]))
+            axes.line(x='datetime', y='value', line_width=width, line_color=line_color, source=source)
+        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name), ("值", "@value{0.0000}")]))
 
     if zero_on:
         axes.line(x=x_value, y=[0 for i in range(len(indicator))], line_color='black')
@@ -306,12 +329,13 @@ def iplot(
         label = Label(
             x=int(axes.plot_width * 0.01),
             y=int(axes.plot_height * 0.88),
-            x_units='screen', y_units='screen',
+            x_units='screen',
+            y_units='screen',
             text=label,
             render_mode='css',
             text_font_size='14px',
             text_color=trans_color(text_color),
-            background_fill_color='white', 
+            background_fill_color='white',
             background_fill_alpha=0.5
         )
         axes.add_layout(label)
@@ -367,44 +391,45 @@ def ibar(
 
     py_indicator = [None if x == constant.null_price else x for x in indicator]
     if kref:
-        width = 12*60*60*1000
+        width = 12 * 60 * 60 * 1000
         x_value = [r.datetime() for r in kref.get_datetime_list()]
         source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
         if legend_on:
-            axes.vbar(x='datetime', top='value', legend_label=label, width=width, 
-                      color=line_color, source=source)
+            axes.vbar(x='datetime', top='value', legend_label=label, width=width, color=line_color, source=source)
             axes.legend.location = "top_left"
         else:
-            axes.vbar(x='datetime', top='value', width=width, color=line_color, 
-                      source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
-                                 ('日期', get_date_format(kref)), ("值", "@value{0.0000}")],
-                     formatters = { "datetime": "datetime"}))
+            axes.vbar(x='datetime', top='value', width=width, color=line_color, source=source)
+        axes.add_tools(
+            HoverTool(
+                tooltips=[
+                    ("index", "$index"), ('指标', indicator.name), ('日期', get_date_format(kref)), ("值", "@value{0.0000}")
+                ],
+                formatters={"@datetime": "datetime"}
+            )
+        )
         axes.xaxis[0].formatter = DatetimeTickFormatter()
     else:
         width = 0.5
         x_value = list(range(len(indicator)))
         source = ColumnDataSource(dict(datetime=x_value, value=py_indicator))
         if legend_on:
-            axes.vbar(x='datetime', top='value', legend_label=label, width=width, 
-                      color=line_color, source=source)
+            axes.vbar(x='datetime', top='value', legend_label=label, width=width, color=line_color, source=source)
             axes.legend.location = "top_left"
         else:
-            axes.vbar(x='datetime', top='value', width=width, color=line_color, 
-                      source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name),
-                                 ("值", "@value{0.0000}")]))
+            axes.vbar(x='datetime', top='value', width=width, color=line_color, source=source)
+        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name), ("值", "@value{0.0000}")]))
 
     if text_on:
         label = Label(
             x=int(axes.plot_width * 0.01),
             y=int(axes.plot_height * 0.88),
-            x_units='screen', y_units='screen',
+            x_units='screen',
+            y_units='screen',
             text=label,
             render_mode='css',
             text_font_size='14px',
             text_color=trans_color(text_color),
-            background_fill_color='white', 
+            background_fill_color='white',
             background_fill_alpha=0.5
         )
         axes.add_layout(label)
@@ -425,17 +450,16 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
-    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
-        n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
-    )
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1])
     label = Label(
         x=int(axes.plot_width * 0.01),
         y=int(axes.plot_height * 0.88),
-        x_units='screen', y_units='screen',
+        x_units='screen',
+        y_units='screen',
         text=text,
         render_mode='css',
         text_font_size='14px',
-        background_fill_color='white', 
+        background_fill_color='white',
         background_fill_alpha=0.5
     )
     axes.add_layout(label)
@@ -464,17 +488,16 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
-    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
-        n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
-    )
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1])
     label = Label(
         x=int(axes.plot_width * 0.01),
         y=int(axes.plot_height * 0.88),
-        x_units='screen', y_units='screen',
+        x_units='screen',
+        y_units='screen',
         text=text,
         render_mode='css',
         text_font_size='14px',
-        background_fill_color='white', 
+        background_fill_color='white',
         background_fill_alpha=0.5
     )
     axes.add_layout(label)
@@ -484,7 +507,7 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     x1 = IF((ref < pre_ref) & (bmacd < pre_bmacd), bmacd, 0)
     x2 = IF((ref > pre_ref) & (bmacd > pre_bmacd), bmacd, 0)
     x3 = IF(NOT((ref < pre_ref) & (bmacd < pre_bmacd)) & NOT((ref > pre_ref) & (bmacd > pre_bmacd)), bmacd, 0)
-    
+
     x1.bar(axes=axes, kref=kdata, color='#BFBFBF')
     x2.bar(axes=axes, kref=kdata, color='red')
     x3.bar(axes=axes, kref=kdata, color='green')
@@ -527,18 +550,17 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         krecord = kdata[pos]
         x = krecord.datetime.datetime().timestamp() * 1000
         if pos > 0:
-            x = x - (krecord.datetime - kdata[pos-1].datetime).ticks * 0.001 / 2
+            x = x - (krecord.datetime - kdata[pos - 1].datetime).ticks * 0.001 / 2
         buy_y.append(krecord.low - height * 0.05)
         label = Label(
             x=x,
             y=krecord.low - height * 0.1,
             text='B',
             text_font_size='14px',
-            text_color='red', 
+            text_color='red',
         )
         axes.add_layout(label)
-    axes.triangle(x=[d.datetime() for d in buy_dates], y=buy_y, 
-                  fill_color='red', line_color='red', size=10)
+    axes.triangle(x=[d.datetime() for d in buy_dates], y=buy_y, fill_color='red', line_color='red', size=10)
 
     sell_dates = sg.get_sell_signal()
     sell_y = []
@@ -549,17 +571,18 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
         krecord = kdata[pos]
         x = krecord.datetime.datetime().timestamp() * 1000
         if pos > 0:
-            x = x - (krecord.datetime - kdata[pos-1].datetime).ticks * 0.001 / 2
+            x = x - (krecord.datetime - kdata[pos - 1].datetime).ticks * 0.001 / 2
         sell_y.append(krecord.high + height * 0.05)
         label = Label(
             x=x,
             y=krecord.high + height * 0.08,
             text='S',
             text_font_size='14px',
-            text_color='blue', 
+            text_color='blue',
         )
         axes.add_layout(label)
-    axes.inverted_triangle(x=[d.datetime() for d in sell_dates], y=sell_y, 
-                  fill_color='blue', line_color='blue', size=10)
+    axes.inverted_triangle(
+        x=[d.datetime() for d in sell_dates], y=sell_y, fill_color='blue', line_color='blue', size=10
+    )
 
     return gcf()
