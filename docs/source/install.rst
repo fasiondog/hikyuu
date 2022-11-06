@@ -23,6 +23,10 @@ pip 安装
 .. figure:: _static/20000-install.png
 
 .. note::
+
+    第一次使用，请详细阅读 :ref:`quickstart` 。
+
+.. note::
     
     由于依赖的 talib 包，无法在 Windows 下通过 pip 安装，请从 `<https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib/>`_ 上下载相应的 wheel 包，手工安装。
     
