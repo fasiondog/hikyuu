@@ -1,8 +1,8 @@
+.. py:currentmodule:: hikyuu.trade_sys
+.. highlight:: python
+
 投资组合
 ========
-
-.. py:module:: hikyuu.trade_sys
-    
 
 .. toctree::
 
