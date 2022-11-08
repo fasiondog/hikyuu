@@ -39,19 +39,21 @@ target("hikyuu")
     end
     
     if is_plat("linux") then
-        if os.exists("/usr/include/hdf5") then
-          add_includedirs("/usr/include/hdf5")
-          add_includedirs("/usr/include/hdf5/serial")
-        end
+        add_packages("hdf5")
         if is_arch("x86_64")  then
             if os.exists("/usr/lib64/mysql") then
                 add_linkdirs("/usr/lib64/mysql")
             end
             if os.exists("/usr/lib/x86_64-linux-gnu") then
               add_linkdirs("/usr/lib/x86_64-linux-gnu")
-              add_linkdirs("/usr/lib/x86_64-linux-gnu/hdf5/serial")
             end
         end
+        add_links("sqlite3")
+        add_links("mysqlclient")
+        add_links("boost_date_time")
+        add_links("boost_filesystem")
+        add_links("boost_serialization")
+        add_links("boost_system")
     end
     
     if is_plat("macosx") then
@@ -70,25 +72,18 @@ target("hikyuu")
             add_rpathdirs("/usr/local/mysql/lib")
         end
         add_links("mysqlclient")
+        add_links("sqlite3")
+        add_links("boost_date_time")
+        add_links("boost_filesystem")
+        add_links("boost_serialization")
+        add_links("boost_system")
     end
 
     if is_plat("windows") then 
         -- nng 静态链接需要的系统库
         add_syslinks("ws2_32", "advapi32")
     end
-
-    if is_plat("linux") or is_plat("macosx") then
-        add_links("sqlite3")
-        add_links("hdf5")
-        add_links("hdf5_hl")
-        add_links("hdf5_cpp")
-        add_links("mysqlclient")
-        add_links("boost_date_time")
-        add_links("boost_filesystem")
-        add_links("boost_serialization")
-        add_links("boost_system")
-    end
-    
+   
     -- add files
     add_files("./**.cpp")
     
@@ -130,15 +125,12 @@ You need to specify where the boost library is via the BOOST_LIB variable!]])
         local libdir = get_config("buildir") .. "/" .. get_config("mode") .. "/" .. get_config("plat") .. "/" .. get_config("arch") .. "/lib"
         -- 将依赖的库拷贝至build的输出目录
         for libname, pkg in pairs(target:pkgs()) do
-            local pkg_path = pkg:get("includedirs")
-            if pkg_path == nil then 
-                pkg_path = pkg:get("sysincludedirs") -- xmake 2.3.9 改为了 sysincludedirs
-            end
-            if pkg_path and type(pkg_path) == "string" then
-                pkg_lib_dir = string.sub(pkg_path, 0, string.len(pkg_path)-7) .. "bin"
-                if pkg_lib_dir then
-                    os.trycp(pkg_lib_dir .. "/*" .. lib_suffix, libdir)
-                end
+            local pkg_path = pkg:installdir()
+            if pkg_path ~= nil then
+                print("copy dependents: " .. pkg_path)
+                os.trycp(pkg_path .. "/bin/*" .. lib_suffix, libdir)
+                os.trycp(pkg_path .. "/lib/*" .. lib_suffix, libdir)
+                os.trycp(pkg_path .. "/lib/*.so.*", libdir)
             end
         end
     end)

@@ -102,7 +102,7 @@ setup(
         '': [
             '*.rst', '*.pyd', '*.ini', '*.sql', '*.properties', '*.xml',
             'LICENSE.txt', '*.dll', '*.exe', '*.ico', '*.so', '*.dylib',
-            '*.qm', 'libboost_serialization*',
+            '*.so.*', '*.qm', 'libboost_serialization*',
             'libboost_python{}*'.format(py_version)
         ],
     },
