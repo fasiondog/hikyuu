@@ -115,8 +115,8 @@ target("core")
             os.cp(target:targetdir() .. '/core.so', dst_dir)
             os.cp(target:targetdir() .. '/libhikyuu.dylib', dst_dir)
         else
-            os.cp(target:targetdir() .. '/core.so', dst_dir)
-            os.cp(target:targetdir() .. '/libhikyuu.so', dst_dir)
+            os.trycp(target:targetdir() .. '/*.so', dst_dir)
+            os.trycp(target:targetdir() .. '/*.so.*', dst_dir)
         end
 
         os.cp("$(env BOOST_LIB)/boost_date_time*.dll", dst_dir)
