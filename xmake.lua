@@ -40,7 +40,10 @@ end
 set_languages("cxx17", "C99")
 
 local hdf5_version = "1.12.2"
-local mysql_version = "8.0.21"
+local mysql_version = "8.0.31"
+if is_plat("windows") then
+    mysql_version = "8.0.21"
+end
 
 add_repositories("project-repo hikyuu_extern_libs")
 if is_plat("windows") then
@@ -53,6 +56,7 @@ if is_plat("windows") then
     add_requires("mysql " .. mysql_version)
 elseif is_plat("linux") then
     add_requires("hdf5 " .. hdf5_version)
+    add_requires("mysql " .. mysql_version)
 end
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
@@ -65,7 +69,7 @@ add_requires("cpp-httplib", {system=false})
 add_requires("zlib", {system=false})
 
 if is_plat("linux") and linuxos.name() == "ubuntu" then
-    add_requires("apt::libmysqlclient-dev", "apt::libsqlite3-dev")
+    add_requires("apt::libsqlite3-dev")
 elseif is_plat("macosx") then
     add_requires("brew::hdf5")
 else
