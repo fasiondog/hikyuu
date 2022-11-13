@@ -13,6 +13,8 @@
 *.dll
 *.lib
 *.so
+*.so.*
+*.so.*.*
 *.dylib
 .metadata
 .settings
