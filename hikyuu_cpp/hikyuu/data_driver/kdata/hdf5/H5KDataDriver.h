@@ -30,7 +30,7 @@ public:
     }
 
     virtual bool canParallelLoad() override {
-#if defined(H5_HAVE_WIN_THREADS)
+#if defined(H5_HAVE_THREADSAFE)
         return true;
 #else
         HKU_WARN("Current hdf5 library is not thread-safe!");

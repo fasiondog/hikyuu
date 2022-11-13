@@ -76,6 +76,13 @@ Linux下需安装依赖的开发软件包：hdf-dev、mysqlclient。如 Ubuntu �
 .. code-block:: shell
     
     sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev    
+
+6、转 Visual Studio 工程
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Windows 下，习惯用 msvc 调试的，可以使用  xmake project -k vsxmake -m "debug,release" 命令生成 VS 工程。命令执行后，会在当前目录下生成如 vsxmake2022 的子目录，VS工程位于其内。
+
+在 VS 内，可以将 demo 设为启动工程，进行调试。
     
 
 编译与安装

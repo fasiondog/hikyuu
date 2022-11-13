@@ -13,6 +13,8 @@
 *.dll
 *.lib
 *.so
+*.so.*
+*.so.*.*
 *.dylib
 .metadata
 .settings
@@ -63,3 +65,12 @@ vs2015
 cover_report
 cover*.info
 *.gcno
+vsxmake*
+hikyuu/cpp/libhku_hdf5_cpp.so.200
+hikyuu/cpp/libhku_hdf5_cpp.so.200.2.0
+hikyuu/cpp/libhku_hdf5_hl_cpp.so.200
+hikyuu/cpp/libhku_hdf5_hl_cpp.so.200.1.0
+hikyuu/cpp/libhku_hdf5_hl.so.200
+hikyuu/cpp/libhku_hdf5_hl.so.200.1.0
+hikyuu/cpp/libhku_hdf5.so.200
+hikyuu/cpp/libhku_hdf5.so.200.2.0
