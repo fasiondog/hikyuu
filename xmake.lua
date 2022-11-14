@@ -55,8 +55,8 @@ if is_plat("windows") then
     end
     add_requires("mysql " .. mysql_version)
 elseif is_plat("linux") then
-    add_requires("hdf5 " .. hdf5_version)
-    add_requires("mysql " .. mysql_version)
+    add_requires("hdf5 " .. hdf5_version, {system = false})
+    add_requires("mysql " .. mysql_version, {system = false})
 elseif is_plat("macosx") then
     add_requires("brew::hdf5") 
 end
@@ -82,17 +82,6 @@ add_linkdirs("$(env BOOST_LIB)")
 -- modifed to use boost static library, except boost.python, serialization
 --add_defines("BOOST_ALL_DYN_LINK")
 add_defines("BOOST_SERIALIZATION_DYN_LINK")
-
-if is_host("linux") then
-    if is_arch("x86_64") then
-        if os.exists("/usr/lib64") then
-            add_linkdirs("/usr/lib64")
-        end
-        if os.exists("/usr/lib/x86_64-linux-gnu") then
-          add_linkdirs("/usr/lib/x86_64-linux-gnu")
-        end
-    end
-end
 
 -- is release now
 if is_mode("release") then

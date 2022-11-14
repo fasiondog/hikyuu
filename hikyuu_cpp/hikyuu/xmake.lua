@@ -40,11 +40,6 @@ target("hikyuu")
     
     if is_plat("linux") then
         add_packages("hdf5", "mysql")
-        if is_arch("x86_64")  then
-            if os.exists("/usr/lib/x86_64-linux-gnu") then
-              add_linkdirs("/usr/lib/x86_64-linux-gnu")
-            end
-        end
         add_links("boost_date_time")
         add_links("boost_filesystem")
         add_links("boost_serialization")
