@@ -6,7 +6,7 @@ target("hikyuu")
     end
     
     add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
-    if is_plat("windows") then 
+    if is_plat("windows", "linux") then 
         add_packages("sqlite3")
     end
 
@@ -45,7 +45,6 @@ target("hikyuu")
               add_linkdirs("/usr/lib/x86_64-linux-gnu")
             end
         end
-        add_links("sqlite3")
         add_links("boost_date_time")
         add_links("boost_filesystem")
         add_links("boost_serialization")
