@@ -10,7 +10,7 @@ package("mysql")
     elseif is_plat("linux") then
         add_urls("https://github.com/fasiondog/hikyuu/releases/download/1.1.9/mysql-$(version)-linux-x86_64.zip",
                  "https://gitee.com/fasiondog/hikyuu/releases/download/1.1.9/mysql-$(version)-linux-x86_64.zip")
-        add_versions("8.0.31", "d739f5ddeaf1b4674a6863a965e4e85f2d038b5c0699a5bfbf2338d267b31658")
+        add_versions("8.0.31", "1775a94f4a59cfb03593e6e70891de33a0cc8713573afdfc9ca0482415a8ecd3")
     end
 
     on_install("windows", "linux", function (package)
