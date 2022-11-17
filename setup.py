@@ -123,7 +123,8 @@ def build_boost(mode):
         #    ' --with-serialization'.format(mode))
         os.chdir(current_dir)
     else:
-        cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
+        # 新版的 boost 配置 project-cofig.jam 中的 python 版本无效，必须在当前 python 下重新编译 b2
+        cmd = 'cd {boost} ; ./bootstrap.sh; '\
               './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization; '\
               './b2 {mode} link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
               '--with-filesystem --with-system --with-test --with-atomic; '\
