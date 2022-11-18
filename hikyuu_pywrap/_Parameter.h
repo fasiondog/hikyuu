@@ -132,7 +132,14 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         extract<int> x2(o);
         if (x2.check()) {
             int overflow;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
             long val = PyLong_AsLongAndOverflow(o.ptr(), &overflow);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif            
             if (overflow == 0) {
                 m_params[name] = x2();
             } else {

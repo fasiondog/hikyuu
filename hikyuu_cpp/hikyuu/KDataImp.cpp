@@ -180,7 +180,6 @@ void KDataImp::_recoverForward() {
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_iterator weightIter = weightList.begin();
-    StockWeightList::const_iterator pre_weightIter = weightIter;
 
     size_t pre_pos = 0;
     for (; weightIter != weightList.end(); ++weightIter) {
