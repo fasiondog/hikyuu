@@ -75,6 +75,7 @@ Parameter default_preload_param() {
     param.set<bool>("min15", false);
     param.set<bool>("min30", false);
     param.set<bool>("min60", false);
+    param.set<bool>("min120", false);
     param.set<bool>("ticks", false);
     param.set<int>("day_max", 100000);
     param.set<int>("week_max", 100000);
@@ -87,6 +88,7 @@ Parameter default_preload_param() {
     param.set<int>("min15_max", 5120);
     param.set<int>("min30_max", 5120);
     param.set<int>("min60_max", 5120);
+    param.set<int>("min120_max", 5120);
     param.set<int>("ticks_max", 5120);
     return param;
 }
@@ -191,6 +193,9 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
     bool preload_min60 = m_preloadParam.tryGet<bool>("min60", false);
     HKU_INFO_IF(preload_min60, "Preloading all 60 min kdata to buffer!");
 
+    bool preload_min120 = m_preloadParam.tryGet<bool>("min120", false);
+    HKU_INFO_IF(preload_min120, "Preloading all 120 min kdata to buffer!");
+
     if (!driver->getPrototype()->canParallelLoad()) {
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             if (iter->second.market() == "TMP")
@@ -218,6 +223,8 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
                 iter->second.loadKDataToBuffer(KQuery::MIN30);
             if (preload_min60)
                 iter->second.loadKDataToBuffer(KQuery::MIN60);
+            if (preload_min120)
+                iter->second.loadKDataToBuffer(KQuery::MIN120);
         }
 
     } else {
@@ -249,6 +256,8 @@ void StockManager::setKDataDriver(const KDataDriverConnectPoolPtr& driver) {
                 tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN30); });
             if (preload_min60)
                 tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN60); });
+            if (preload_min120)
+                tg.submit([=]() mutable { iter->second.loadKDataToBuffer(KQuery::MIN120); });
         }
     }
 

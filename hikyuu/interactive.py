@@ -111,7 +111,7 @@ for p in block_config:
 preload_param = Parameter()
 preload_config = ini.options('preload')
 for p in preload_config:
-    if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60'):
+    if p in ('day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5', 'min15', 'min30', 'min60', 'min120'):
         preload_param[p] = ini.getboolean('preload', p)
     else:
         preload_param[p] = ini.getint('preload', p)
