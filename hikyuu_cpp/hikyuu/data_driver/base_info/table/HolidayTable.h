@@ -14,7 +14,7 @@
 namespace hku {
 
 class HolidayTable {
-    TABLE_BIND1(Holiday, date)
+    TABLE_BIND1(holiday, date)
 
 public:
     HolidayTable() : date(Datetime().number()) {}

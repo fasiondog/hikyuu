@@ -77,21 +77,21 @@ private:
 
 public:
     static const char* getInsertSQL() {
-        return "insert into `Market` "
+        return "insert into `market` "
                "(`marketid`, `market`, `name`, `description`, `code`, `lastDate`,"
                " `openTime1`, `closeTime1`, `openTime2`, `closeTime2`) "
                "values (?,?,?,?,?,?,?,?,?,?)";
     }
 
     static const char* getUpdateSQL() {
-        return "update `Market` set `market`=?, `name`=?, `description`=?, "
+        return "update `market` set `market`=?, `name`=?, `description`=?, "
                "`code`=?, `lastDate`=?, `openTime1`=?, `closeTime1`=?, "
                "`openTime2=`=?, `closeTime2`=? where `marketid`=?";
     }
 
     static const char* getSelectSQL() {
         return "select `marketid`,`market`,`name`, `description`, `code`, `lastDate`, "
-               "`openTime1`, `closeTime1`, `openTime2`, `closeTime2` from `Market`";
+               "`openTime1`, `closeTime1`, `openTime2`, `closeTime2` from `market`";
     }
 
     void save(const SQLStatementPtr& st) const {

@@ -89,6 +89,7 @@ bj_trans = {dir}/bj_trans.h5
 mysql_template = """
 [hikyuu]
 tmpdir = {dir}
+datadir = {dir}
 
 [block]
 type  = qianlong

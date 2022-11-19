@@ -16,7 +16,7 @@
 namespace hku {
 
 class StockWeightTable {
-    TABLE_BIND9(stkWeight, stockid, date, countAsGift, countForSell, priceForSell, bonus,
+    TABLE_BIND9(stkweight, stockid, date, countAsGift, countForSell, priceForSell, bonus,
                 countOfIncreasement, totalCount, freeCount)
 
 public:

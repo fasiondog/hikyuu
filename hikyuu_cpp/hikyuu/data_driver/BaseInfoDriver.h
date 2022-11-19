@@ -33,7 +33,7 @@ struct StockInfo {
     static const char* getSelectSQL() {
         return "select c.market, a.code, a.name, a.type, a.valid, a.startDate, a.endDate, b.tick, "
                "b.tickValue, b.precision, b.minTradeNumber, b.maxTradeNumber from stock a, "
-               "StockTypeInfo b, market c where a.type = b.id and a.marketid = c.marketid";
+               "stocktypeinfo b, market c where a.type = b.id and a.marketid = c.marketid";
     }
 
     void load(const SQLStatementPtr& st) {
