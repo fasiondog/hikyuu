@@ -5,9 +5,7 @@
  *      Author: fasiondog
  */
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/lambda/lambda.hpp>
+#include <functional>
 #include "StockManager.h"
 #include "KDataImp.h"
 
@@ -98,10 +96,10 @@ size_t KDataImp::getPos(const Datetime& datetime) {
     KRecordList::const_iterator iter;
     KRecord comp_record;
     comp_record.datetime = datetime;
-    boost::function<bool(const KRecord&, const KRecord&)> f =
-      boost::bind(&KRecord::datetime, _1) < boost::bind(&KRecord::datetime, _2);
-
-    iter = lower_bound(m_buffer.begin(), m_buffer.end(), comp_record, f);
+    iter = lower_bound(
+      m_buffer.begin(), m_buffer.end(), comp_record,
+      std::bind(std::less<Datetime>(), std::bind(&KRecord::datetime, std::placeholders::_1),
+                std::bind(&KRecord::datetime, std::placeholders::_2)));
     if (iter == m_buffer.end() || iter->datetime != datetime) {
         return Null<size_t>();
     }
@@ -180,7 +178,6 @@ void KDataImp::_recoverForward() {
     Datetime end_date(m_buffer.back().datetime.date() + bd::days(1));
     StockWeightList weightList = m_stock.getWeight(start_date, end_date);
     StockWeightList::const_iterator weightIter = weightList.begin();
-    StockWeightList::const_iterator pre_weightIter = weightIter;
 
     size_t pre_pos = 0;
     for (; weightIter != weightList.end(); ++weightIter) {

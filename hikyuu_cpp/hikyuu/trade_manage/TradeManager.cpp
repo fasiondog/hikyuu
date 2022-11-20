@@ -7,7 +7,7 @@
 
 #include <fstream>
 #include <sstream>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include "TradeManager.h"
@@ -194,14 +194,14 @@ TradeRecordList TradeManager::getTradeList(const Datetime& start_date,
     temp_record.datetime = start_date;
     auto low =
       lower_bound(m_trade_list.begin(), m_trade_list.end(), temp_record,
-                  boost::bind(std::less<Datetime>(), boost::bind(&TradeRecord::datetime, _1),
-                              boost::bind(&TradeRecord::datetime, _2)));
+                  std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                              std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     temp_record.datetime = end_date;
     auto high =
       lower_bound(m_trade_list.begin(), m_trade_list.end(), temp_record,
-                  boost::bind(std::less<Datetime>(), boost::bind(&TradeRecord::datetime, _1),
-                              boost::bind(&TradeRecord::datetime, _2)));
+                  std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                              std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     result.insert(result.end(), low, high);
 
@@ -765,8 +765,8 @@ void TradeManager::_updateWithWeight(const Datetime& datetime) {
     }     /* for position */
 
     std::sort(new_trade_buffer.begin(), new_trade_buffer.end(),
-              boost::bind(std::less<Datetime>(), boost::bind(&TradeRecord::datetime, _1),
-                          boost::bind(&TradeRecord::datetime, _2)));
+              std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                          std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     size_t total = new_trade_buffer.size();
     for (size_t i = 0; i < total; ++i) {

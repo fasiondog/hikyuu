@@ -5,7 +5,6 @@
  *      Author: fasiondog
  */
 
-#include <boost/bind.hpp>
 #include "../../trade_manage/crt/crtTM.h"
 
 #include "Portfolio.h"
