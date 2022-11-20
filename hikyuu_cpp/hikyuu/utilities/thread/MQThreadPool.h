@@ -48,7 +48,8 @@ public:
                   std::unique_ptr<ThreadSafeQueue<task_type>>(new ThreadSafeQueue<task_type>));
             }
             for (size_t i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&MQThreadPool::worker_thread, this, i));
+                m_threads.push_back(
+                  std::thread(&MQThreadPool::worker_thread, this, static_cast<int>(i)));
             }
         } catch (...) {
             m_done = true;

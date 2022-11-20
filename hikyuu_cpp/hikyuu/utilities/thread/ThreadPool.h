@@ -47,7 +47,8 @@ public:
                 m_threads_status.push_back(nullptr);
             }
             for (size_t i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&ThreadPool::worker_thread, this, i));
+                m_threads.push_back(
+                  std::thread(&ThreadPool::worker_thread, this, static_cast<int>(i)));
             }
         } catch (...) {
             m_done = true;

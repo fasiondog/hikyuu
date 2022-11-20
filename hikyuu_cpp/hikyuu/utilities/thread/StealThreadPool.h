@@ -49,7 +49,8 @@ public:
                 m_queues.push_back(std::unique_ptr<WorkStealQueue>(new WorkStealQueue));
             }
             for (size_t i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&StealThreadPool::worker_thread, this, i));
+                m_threads.push_back(
+                  std::thread(&StealThreadPool::worker_thread, this, static_cast<int>(i)));
             }
         } catch (...) {
             m_done = true;
