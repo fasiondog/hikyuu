@@ -22,7 +22,7 @@ string TradeManager::str() const {
     os << std::fixed;
     os.precision(2);
 
-    FundsRecord funds = getFunds();
+    FundsRecord funds = _getFunds();
     string strip(",\n");
     os << "TradeManager {\n"
        << "  params: " << getParameter() << strip << "  name: " << name() << strip
@@ -192,16 +192,16 @@ TradeRecordList TradeManager::getTradeList(const Datetime& start_date,
 
     TradeRecord temp_record;
     temp_record.datetime = start_date;
-    auto low =
-      lower_bound(m_trade_list.begin(), m_trade_list.end(), temp_record,
-                  std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
-                              std::bind(&TradeRecord::datetime, std::placeholders::_2)));
+    auto low = lower_bound(
+      m_trade_list.begin(), m_trade_list.end(), temp_record,
+      std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     temp_record.datetime = end_date;
-    auto high =
-      lower_bound(m_trade_list.begin(), m_trade_list.end(), temp_record,
-                  std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
-                              std::bind(&TradeRecord::datetime, std::placeholders::_2)));
+    auto high = lower_bound(
+      m_trade_list.begin(), m_trade_list.end(), temp_record,
+      std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     result.insert(result.end(), low, high);
 
@@ -496,7 +496,7 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     return funds.cash;
 }
 
-FundsRecord TradeManager::getFunds(KQuery::KType ktype) const {
+FundsRecord TradeManager::_getFunds(KQuery::KType ktype) const {
     price_t value = 0.0;  //当前市值
     position_map_type::const_iterator iter = m_position.begin();
     if (!getParam<bool>("use_contract")) {
@@ -520,7 +520,7 @@ FundsRecord TradeManager::getFunds(KQuery::KType ktype) const {
 }
 
 FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
-    HKU_IF_RETURN(indatetime == Null<Datetime>(), getFunds(ktype));
+    HKU_IF_RETURN(indatetime == Null<Datetime>(), _getFunds(ktype));
     HKU_IF_RETURN(indatetime < initDatetime(), FundsRecord());
 
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
@@ -528,7 +528,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     if (datetime > lastDatetime()) {
         //根据权息数据调整持仓
         updateWithWeight(datetime);
-        return getFunds(ktype);
+        return _getFunds(ktype);
     }
 
     return _getFundsByContract(indatetime, ktype);
@@ -663,7 +663,7 @@ FundsRecord TradeManager::_getFundsByContract(const Datetime& datetime, KQuery::
         //              tr.planPrice, tr.from);
         // }
     }
-    return tm->getFunds(ktype);
+    return tm->_getFunds(ktype);
 }
 
 PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
@@ -764,9 +764,10 @@ void TradeManager::_updateWithWeight(const Datetime& datetime) {
         } /* for weight */
     }     /* for position */
 
-    std::sort(new_trade_buffer.begin(), new_trade_buffer.end(),
-              std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
-                          std::bind(&TradeRecord::datetime, std::placeholders::_2)));
+    std::sort(
+      new_trade_buffer.begin(), new_trade_buffer.end(),
+      std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     size_t total = new_trade_buffer.size();
     for (size_t i = 0; i < total; ++i) {

@@ -185,16 +185,8 @@ public:
                              SystemPart from = PART_INVALID) override;
 
     /**
-     * 获取账户当前时刻的资产详情
-     * @note 由于没有日期，此时计算的市值其实为买入时的市值
-     * @param ktype 日期的类型
-     * @return 资产详情
-     */
-    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override;
-
-    /**
      * 获取指定时刻的资产市值详情
-     * @param datetime 指定日期，等于Null<Datetime>()时，与getFunds(KType)同
+     * @param datetime 指定日期，等于Null<Datetime>()时，为最后交易时刻的市值
      * @param ktype 日期的类型
      * @return 资产详情
      */
@@ -245,6 +237,9 @@ private:
 
     // 合约类交易结算，更新当前时刻前一结算日权益
     void _updateSettleByDay(const Datetime& datetime);
+
+    // 获取账户最后交易时刻的资产详情
+    FundsRecord _getFunds(KQuery::KType ktype = KQuery::DAY) const;
 
     FundsRecord _getFundsByContract(const Datetime& datetime, KQuery::KType ktype);
 

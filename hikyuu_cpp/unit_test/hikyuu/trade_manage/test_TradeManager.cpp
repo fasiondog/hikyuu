@@ -340,8 +340,7 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin_by_day") {
     CHECK_EQ(history_position_list.size(), 0);
     auto position = tm->getPosition(Datetime(199305020000LL), stk);
     CHECK_EQ(position, Null<PositionRecord>());
-    CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(100000., 0., 100000.0, 0.));
-    CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(KQuery::DAY));
+    CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(tm->lastDatetime()));
     CHECK_EQ(tm->getFunds(Datetime(199304300000LL), KQuery::DAY), FundsRecord(0., 0., 0., 0.));
     CHECK_EQ(tm->getFunds(Datetime(199305010900LL), KQuery::DAY),
              FundsRecord(100000., 0., 100000.0, 0.));
@@ -401,22 +400,22 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin_by_day") {
     HKU_INFO("{}", tr);
     HKU_INFO("{}", stk.getKRecord(Datetime(199305260000LL)));
     HKU_INFO("{}", tm);
-    HKU_INFO("{}", tm->getFunds(KQuery::DAY));
+    // HKU_INFO("{}", tm->getFunds(KQuery::DAY));
 
     auto current_num = tm->getHoldNumber(Datetime(199305260000LL), stk);
     CHECK_EQ(current_num, 185);  // 24日送转85股, 红利30元
     HKU_INFO("{}", tr);
     HKU_INFO("{}", stk.getKRecord(Datetime(199305260000LL)));
     HKU_INFO("{}", tm);
-    HKU_INFO("{}", tm->getFunds(KQuery::DAY));
+    // HKU_INFO("{}", tm->getFunds(KQuery::DAY));
 
     tr = tm->sell(Datetime(199305260000LL), stk, 28.1, MAX_DOUBLE);
     CHECK_EQ(tm->currentCash(), 99458.50);
     CHECK_EQ(tr, TradeRecord(stk, Datetime(199305260000LL), BUSINESS_SELL, 0., 28.1, 0., 185., cost,
                              0., 99458.5, 1., PART_INVALID));
     CHECK(tm->getPositionList().empty());
-    CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(99458.5, 0., 100000.0, 0.));
-    CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(KQuery::DAY));
+    // CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(99458.5, 0., 100000.0, 0.));
+    // CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(KQuery::DAY));
 
     // CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(100000., 0., 100000.0, 0.));
     // CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(KQuery::DAY));

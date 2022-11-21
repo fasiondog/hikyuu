@@ -341,21 +341,11 @@ public:
     }
 
     /**
-     * 获取账户当前时刻的资产详情
-     * @param ktype 日期的类型
-     * @return 资产详情
-     */
-    virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const {
-        HKU_WARN("The subclass does not implement this method");
-        return FundsRecord();
-    }
-
-    /**
      * 获取指定时刻的资产市值详情
      * @param datetime 指定日期
      * @param ktype 日期的类型
      * @return 资产详情
-     * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
+     * @note 当datetime等于Null<Datetime>()时，为最后交易时刻的市值
      */
     virtual FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
         HKU_WARN("The subclass does not implement this method");
