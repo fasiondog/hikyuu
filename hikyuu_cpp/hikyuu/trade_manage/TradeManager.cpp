@@ -316,16 +316,16 @@ TradeRecordList TradeManager::getTradeList(const Datetime& start_date,
 
     TradeRecord temp_record;
     temp_record.datetime = start_date;
-    auto low =
-      lower_bound(m_trade_list.begin(), m_trade_list.end(), temp_record,
-                  std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
-                              std::bind(&TradeRecord::datetime, std::placeholders::_2)));
+    auto low = lower_bound(
+      m_trade_list.begin(), m_trade_list.end(), temp_record,
+      std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     temp_record.datetime = end_date;
-    auto high =
-      lower_bound(m_trade_list.begin(), m_trade_list.end(), temp_record,
-                  std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
-                              std::bind(&TradeRecord::datetime, std::placeholders::_2)));
+    auto high = lower_bound(
+      m_trade_list.begin(), m_trade_list.end(), temp_record,
+      std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     result.insert(result.end(), low, high);
 
@@ -863,11 +863,13 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     if (result.datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            Datetime realtime =
+            realtime =
               (*broker_iter)->buy(datetime, stock.market(), stock.code(), realPrice, number);
-            if (realtime != Null<Datetime>())
+            if (realtime != nulltime && realtime > m_broker_last_datetime) {
                 m_broker_last_datetime = realtime;
+            }
         }
     }
 
@@ -951,10 +953,13 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     if (result.datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            Datetime realtime =
+            realtime =
               (*broker_iter)->sell(datetime, stock.market(), stock.code(), realPrice, real_number);
-            m_broker_last_datetime = realtime;
+            if (realtime != nulltime && realtime > m_broker_last_datetime) {
+                m_broker_last_datetime = realtime;
+            }
         }
     }
 
@@ -1527,9 +1532,10 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         } /* for weight */
     }     /* for position */
 
-    std::sort(new_trade_buffer.begin(), new_trade_buffer.end(),
-              std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
-                          std::bind(&TradeRecord::datetime, std::placeholders::_2)));
+    std::sort(
+      new_trade_buffer.begin(), new_trade_buffer.end(),
+      std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
+                std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     size_t total = new_trade_buffer.size();
     for (size_t i = 0; i < total; ++i) {
