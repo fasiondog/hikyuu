@@ -13,6 +13,7 @@
 #include "TradeManager.h"
 #include "../trade_sys/system/SystemPart.h"
 #include "../utilities/util.h"
+#include "../utilities/thread/StealThreadPool.h"
 #include "../KData.h"
 
 namespace hku {
@@ -530,7 +531,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
 
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
-    if (datetime > lastDatetime()) {
+    if (datetime >= lastDatetime()) {
         //根据权息数据调整持仓
         updateWithWeight(datetime);
         return _getFunds(ktype);
@@ -659,14 +660,6 @@ FundsRecord TradeManager::_getFundsByContract(const Datetime& datetime, KQuery::
             default:
                 break;
         }
-
-        // if (BUSINESS_BUY == tr.business) {
-        //     tm->buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
-        //             tr.planPrice, tr.from);
-        // } else if (BUSINESS_SELL == tr.business) {
-        //     tm->sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
-        //              tr.planPrice, tr.from);
-        // }
     }
     return tm->_getFunds(ktype);
 }
@@ -674,11 +667,31 @@ FundsRecord TradeManager::_getFundsByContract(const Datetime& datetime, KQuery::
 PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
     size_t total = dates.size();
     PriceList result(total);
+    HKU_IF_RETURN(total == 0, result);
+
     int precision = getParam<int>("precision");
-    for (size_t i = 0; i < total; ++i) {
-        FundsRecord funds = getFunds(dates[i], ktype);
+    // for (size_t i = 0; i < total; ++i) {
+    //     FundsRecord funds = getFunds(dates[i], ktype);
+    //     result[i] = roundEx(funds.cash + funds.market_value, precision);
+    // }
+
+    StealThreadPool tg(std::thread::hardware_concurrency(), true);
+    std::vector<std::future<FundsRecord>> tasks(total);
+    Datetime date;
+    for (size_t i = total - 1; i > 0; i--) {
+        date = dates[i];
+        tasks[i] = tg.submit([=]() { return getFunds(date, ktype); });
+    }
+    date = dates[0];
+    tasks[0] = tg.submit([=]() { return getFunds(date, ktype); });
+
+    FundsRecord funds;
+    for (size_t i = 0; i < total; i++) {
+        funds = tasks[i].get();
         result[i] = roundEx(funds.cash + funds.market_value, precision);
     }
+    tg.join();
+
     return result;
 }
 
