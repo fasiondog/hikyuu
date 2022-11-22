@@ -396,11 +396,13 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     if (result.datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            Datetime realtime =
+            realtime =
               (*broker_iter)->buy(datetime, stock.market(), stock.code(), realPrice, number);
-            if (realtime != Null<Datetime>())
+            if (realtime != nulltime && realtime > m_broker_last_datetime) {
                 m_broker_last_datetime = realtime;
+            }
         }
     }
 
@@ -470,10 +472,13 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     if (result.datetime > m_broker_last_datetime) {
         list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
+        Datetime realtime, nulltime;
         for (; broker_iter != m_broker_list.end(); ++broker_iter) {
-            Datetime realtime =
+            realtime =
               (*broker_iter)->sell(datetime, stock.market(), stock.code(), realPrice, real_number);
-            m_broker_last_datetime = realtime;
+            if (realtime != nulltime && realtime > m_broker_last_datetime) {
+                m_broker_last_datetime = realtime;
+            }
         }
     }
 
