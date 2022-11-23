@@ -537,7 +537,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         return _getFunds(ktype);
     }
 
-    return _getFundsByContract(indatetime, ktype);
+    return _getFundsByDatetime(indatetime, ktype);
 
     // //当查询日期小于最后交易日期时，遍历交易记录，计算当日的市值和现金
     // price_t cash = m_init_cash;
@@ -627,30 +627,29 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     // return funds;
 }
 
-FundsRecord TradeManager::_getFundsByContract(const Datetime& datetime, KQuery::KType ktype) {
-    std::unique_ptr<TradeManager> tm(
-      new TradeManager(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc));
+FundsRecord TradeManager::_getFundsByDatetime(const Datetime& datetime, KQuery::KType ktype) {
+    TradeManager tm(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc);
     for (const auto& tr : m_trade_list) {
         if (tr.datetime > datetime)
             break;
 
         switch (tr.business) {
             case BUSINESS_BUY:
-                tm->buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
-                        tr.planPrice, tr.from);
+                tm.buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
+                       tr.planPrice, tr.from);
                 break;
 
             case BUSINESS_SELL:
-                tm->sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
-                         tr.planPrice, tr.from);
+                tm.sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss, tr.goalPrice,
+                        tr.planPrice, tr.from);
                 break;
 
             case BUSINESS_CHECKIN:
-                tm->checkin(tr.datetime, tr.realPrice);
+                tm.checkin(tr.datetime, tr.realPrice);
                 break;
 
             case BUSINESS_CHECKOUT:
-                tm->checkout(tr.datetime, tr.realPrice);
+                tm.checkout(tr.datetime, tr.realPrice);
                 break;
 
             case BUSINESS_INIT:
@@ -661,7 +660,7 @@ FundsRecord TradeManager::_getFundsByContract(const Datetime& datetime, KQuery::
                 break;
         }
     }
-    return tm->_getFunds(ktype);
+    return tm._getFunds(ktype);
 }
 
 PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
@@ -673,6 +672,19 @@ PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType k
     // for (size_t i = 0; i < total; ++i) {
     //     FundsRecord funds = getFunds(dates[i], ktype);
     //     result[i] = roundEx(funds.cash + funds.market_value, precision);
+    // }
+
+    // TradeManager tm(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc);
+    // tm.setParam<int>("precision", precision);
+
+    // size_t tr_total = m_trade_list.size();
+    // size_t pos = 0;
+    // for (const auto& date : dates) {
+    //     if (date < m_trade_list[pos].datetime) {
+    //         for (const auto& position : tm.m_position) {
+    //             position.second.stock.getMarketValue(date, ktype);
+    //         }
+    //     }
     // }
 
     StealThreadPool tg(std::thread::hardware_concurrency(), true);

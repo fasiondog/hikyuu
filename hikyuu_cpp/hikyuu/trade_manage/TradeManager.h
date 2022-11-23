@@ -241,7 +241,7 @@ private:
     // 获取账户最后交易时刻的资产详情
     FundsRecord _getFunds(KQuery::KType ktype = KQuery::DAY) const;
 
-    FundsRecord _getFundsByContract(const Datetime& datetime, KQuery::KType ktype);
+    FundsRecord _getFundsByDatetime(const Datetime& datetime, KQuery::KType ktype);
 
     bool _add_init_tr(const TradeRecord&);
     bool _add_buy_tr(const TradeRecord&);

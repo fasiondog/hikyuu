@@ -379,7 +379,9 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin_by_day") {
     tm = crtTM(Datetime(199305010000), 100000);
     tr = tm->buy(Datetime(199305200000L), stk, 55.8, 100);
     tr = tm->buy(Datetime(199305200000L), stk, 56.1, 200);
+    CHECK_EQ(tm->getFunds(Datetime(199305200000L)), FundsRecord(83200.0, 16710.0, 100000., 0.));
     tr = tm->sell(Datetime(199305210000L), stk, 55.15, 200);
+    CHECK_EQ(tm->getFunds(Datetime(199305200000L)), FundsRecord(83200.0, 16710.0, 100000., 0.));
     CHECK_EQ(tm->currentCash(), 94230.00);
     CHECK_EQ(tr, TradeRecord(stk, Datetime(199305210000L), BUSINESS_SELL, 0.0, 55.15, 0.0, 200,
                              cost, 0.0, 94230.00, 1.0, PART_INVALID));
@@ -394,48 +396,25 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin_by_day") {
     CHECK_EQ(contract.number, 100);
     CHECK_EQ(contract.price, 56.1);
     CHECK_EQ(contract.marginRatio, 1.0);
+    CHECK_EQ(tm->getFunds(Datetime(199305200000L)), FundsRecord(83200.0, 16710.0, 100000., 0.));
+    CHECK_EQ(tm->getFunds(Datetime(199305210000L)), FundsRecord(94230.0, 5440.0, 100000., 0.));
 
     /** @arg 5月26日卖出剩余股票，中间经历权息变化, 检测 tm 所有接口正确性 */
-
-    HKU_INFO("{}", tr);
-    HKU_INFO("{}", stk.getKRecord(Datetime(199305260000LL)));
-    HKU_INFO("{}", tm);
-    // HKU_INFO("{}", tm->getFunds(KQuery::DAY));
-
     auto current_num = tm->getHoldNumber(Datetime(199305260000LL), stk);
     CHECK_EQ(current_num, 185);  // 24日送转85股, 红利30元
-    HKU_INFO("{}", tr);
-    HKU_INFO("{}", stk.getKRecord(Datetime(199305260000LL)));
-    HKU_INFO("{}", tm);
-    // HKU_INFO("{}", tm->getFunds(KQuery::DAY));
-
+    CHECK_EQ(tm->getFunds(Datetime(199305260000ULL)), FundsRecord(94260., 4995.0, 100000., 0.));
     tr = tm->sell(Datetime(199305260000LL), stk, 28.1, MAX_DOUBLE);
+
     CHECK_EQ(tm->currentCash(), 99458.50);
     CHECK_EQ(tr, TradeRecord(stk, Datetime(199305260000LL), BUSINESS_SELL, 0., 28.1, 0., 185., cost,
                              0., 99458.5, 1., PART_INVALID));
     CHECK(tm->getPositionList().empty());
-    // CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(99458.5, 0., 100000.0, 0.));
-    // CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(KQuery::DAY));
-
-    // CHECK_EQ(tm->getFunds(KQuery::DAY), FundsRecord(100000., 0., 100000.0, 0.));
-    // CHECK_EQ(tm->getFunds(Null<Datetime>(), KQuery::DAY), tm->getFunds(KQuery::DAY));
     CHECK_EQ(tm->getFunds(Datetime(199304300000LL), KQuery::DAY), FundsRecord(0., 0., 0., 0.));
     CHECK_EQ(tm->getFunds(Datetime(199305010900LL), KQuery::DAY),
              FundsRecord(100000., 0., 100000.0, 0.));
     CHECK_EQ(tm->getFunds(Datetime(199305100000LL), KQuery::DAY),
              FundsRecord(100000., 0., 100000.0, 0.));
-
-    // date_list = getDateRange(Datetime(199304300000LL), Datetime(199305030000LL));
-    // funds_curve = tm->getFundsCurve(date_list, KQuery::DAY);
-    // CHECK_EQ(funds_curve.size(), 3);
-    // CHECK_EQ(funds_curve[0], 0.);
-    // CHECK_EQ(funds_curve[1], 100000.);
-    // CHECK_EQ(funds_curve[2], 100000.);
-    // profit_curve = tm->getProfitCurve(date_list, KQuery::DAY);
-    // CHECK_EQ(profit_curve.size(), 3);
-    // CHECK_EQ(profit_curve[0], 0.);
-    // CHECK_EQ(profit_curve[1], 0.);
-    // CHECK_EQ(profit_curve[2], 0.);
+    CHECK_EQ(tm->getFunds(Datetime(199305260000ULL)), FundsRecord(99458.5, 0., 100000., 0.));
 }
 
 /** @par 检测点，正常买卖 */
