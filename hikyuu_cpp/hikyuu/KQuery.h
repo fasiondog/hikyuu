@@ -56,6 +56,7 @@ public:
     static const string MIN15;
     static const string MIN30;
     static const string MIN60;
+    static const string MIN120;
     static const string DAY;
     static const string WEEK;
     static const string MONTH;
