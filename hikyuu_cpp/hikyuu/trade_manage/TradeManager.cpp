@@ -664,45 +664,86 @@ FundsRecord TradeManager::_getFundsByDatetime(const Datetime& datetime, KQuery::
 }
 
 PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
-    size_t total = dates.size();
-    PriceList result(total);
-    HKU_IF_RETURN(total == 0, result);
+    size_t d_total = dates.size();
+    PriceList result(d_total);
+    HKU_IF_RETURN(d_total == 0 || dates[d_total - 1] < m_init_datetime, result);
 
-    int precision = getParam<int>("precision");
+    // int precision = getParam<int>("precision");
     // for (size_t i = 0; i < total; ++i) {
     //     FundsRecord funds = getFunds(dates[i], ktype);
     //     result[i] = roundEx(funds.cash + funds.market_value, precision);
     // }
 
-    // TradeManager tm(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc);
-    // tm.setParam<int>("precision", precision);
-
-    // size_t tr_total = m_trade_list.size();
-    // size_t pos = 0;
-    // for (const auto& date : dates) {
-    //     if (date < m_trade_list[pos].datetime) {
-    //         for (const auto& position : tm.m_position) {
-    //             position.second.stock.getMarketValue(date, ktype);
-    //         }
-    //     }
-    // }
-
-    StealThreadPool tg(std::thread::hardware_concurrency(), true);
-    std::vector<std::future<FundsRecord>> tasks(total);
-    Datetime date;
-    for (size_t i = total - 1; i > 0; i--) {
-        date = dates[i];
-        tasks[i] = tg.submit([=]() { return getFunds(date, ktype); });
+    size_t tr_total = m_trade_list.size();
+    if (tr_total == 0) {
+        for (auto& val : result) {
+            val = m_cash;
+        }
+        return result;
     }
-    date = dates[0];
-    tasks[0] = tg.submit([=]() { return getFunds(date, ktype); });
 
-    FundsRecord funds;
-    for (size_t i = 0; i < total; i++) {
-        funds = tasks[i].get();
-        result[i] = roundEx(funds.cash + funds.market_value, precision);
+    int precision = getParam<int>("precision");
+    TradeManager tm(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc);
+    tm.setParam<int>("precision", precision);
+
+    size_t d_pos = 0;
+    size_t tr_pos = 0;
+    while (tr_pos < tr_total) {
+        const auto& tr = m_trade_list[tr_pos];
+        for (size_t d = d_pos; d < d_total; d++) {
+            if (dates[d] < tr.datetime) {
+                FundsRecord funds = tm.getFunds(dates[d], ktype);
+                result[d] = roundEx(funds.cash + funds.market_value, precision);
+            } else {
+                d_pos = d;
+                break;
+            }
+        }
+
+        while (tr_pos < tr_total) {
+            if ((tr_pos != tr_total - 1 &&
+                 m_trade_list[tr_pos].datetime == m_trade_list[tr_pos + 1].datetime) ||
+                (tr_pos == tr_total - 1 &&
+                 m_trade_list[tr_pos].datetime == m_trade_list[tr_pos - 1].datetime)) {
+                switch (tr.business) {
+                    case BUSINESS_BUY:
+                        tm.buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss,
+                               tr.goalPrice, tr.planPrice, tr.from);
+                        break;
+
+                    case BUSINESS_SELL:
+                        tm.sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss,
+                                tr.goalPrice, tr.planPrice, tr.from);
+                        break;
+
+                    case BUSINESS_CHECKIN:
+                        tm.checkin(tr.datetime, tr.realPrice);
+                        break;
+
+                    case BUSINESS_CHECKOUT:
+                        tm.checkout(tr.datetime, tr.realPrice);
+                        break;
+
+                    case BUSINESS_INIT:
+                    case BUSINESS_GIFT:
+                    case BUSINESS_BONUS:
+                    case BUSINESS_INVALID:
+                    default:
+                        break;
+                }
+                tr_pos++;
+            } else {
+                break;
+            }
+        }
+
+        tr_pos++;
     }
-    tg.join();
+
+    for (size_t d = d_pos; d < d_total; d++) {
+        FundsRecord funds = tm.getFunds(dates[d], ktype);
+        result[d] = roundEx(funds.cash + funds.market_value, precision);
+    }
 
     return result;
 }
