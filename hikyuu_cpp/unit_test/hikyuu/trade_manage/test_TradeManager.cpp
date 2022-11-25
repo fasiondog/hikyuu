@@ -442,6 +442,49 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_with_margin") {
     // HKU_INFO("{}", tm);
 }
 
+/** @par 检测点，测试 getFundsCurve*/
+TEST_CASE("test_TradeManager_getFundsCurve") {
+    auto stk = getStock("sz000001");
+    auto tm = crtTM(Datetime(200001070000ULL), 100000);
+    PriceList result;
+    DatetimeList dates;
+    Datetime init_date, end_date, date;
+    TimeDelta delta;
+
+    /** @arg 预置条件：分两天买入两笔 */
+    tm->buy(Datetime(200001101045ULL), stk, 19.95, 100);
+    tm->buy(Datetime(200001261400ULL), stk, 17.57, 100);
+
+    /** @arg 预置条件：当天连续买入3笔 */
+    tm->buy(Datetime(200705291400ULL), stk, 29.0, 100);
+    tm->buy(Datetime(200705291405ULL), stk, 28.92, 100);
+    tm->buy(Datetime(200705291410ULL), stk, 28.99, 100);
+
+    /** @arg 预置条件：跨除权除息后，同天分两笔卖出，隔两天后卖出剩余全部*/
+    tm->sell(Datetime(200706250935ULL), stk, 36.01, 100);
+    tm->sell(Datetime(200706250940ULL), stk, 35.3, 100);
+    tm->sell(Datetime(200706271355ULL), stk, 31.68, MAX_DOUBLE);
+
+    /** @arg 获取5分钟线资产曲线，指定日期范围小于账户建立日期 */
+    dates.clear();
+    init_date = Datetime(199912010900ULL);
+    end_date = Datetime(199912011505ULL);
+    delta = Minutes(5);
+    date = init_date;
+    do {
+        dates.push_back(date);
+        date = date + delta;
+    } while (date < end_date);
+    CHECK_EQ(dates.size(), 73);
+    CHECK_EQ(dates[0], Datetime(199912010900ULL));
+    CHECK_EQ(dates[72], Datetime(199912011500ULL));
+    result = tm->getFundsCurve(dates, KQuery::MIN5);
+    CHECK_EQ(result.size(), 73);
+    for (const auto& v : result) {
+        CHECK_EQ(v, 0.0);
+    }
+}
+
 /** @par 检测点，测试 getTradeList */
 TEST_CASE("test_TradeManager_getTradeList") {
     StockManager& sm = StockManager::instance();
