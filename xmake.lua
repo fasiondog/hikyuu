@@ -81,7 +81,9 @@ add_linkdirs("$(env BOOST_LIB)")
 
 -- modifed to use boost static library, except boost.python, serialization
 --add_defines("BOOST_ALL_DYN_LINK")
-add_defines("BOOST_SERIALIZATION_DYN_LINK")
+if is_mode("release") then
+    add_defines("BOOST_SERIALIZATION_DYN_LINK")
+end
 
 -- is release now
 if is_mode("release") then

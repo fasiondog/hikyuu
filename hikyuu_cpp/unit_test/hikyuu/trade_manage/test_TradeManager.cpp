@@ -465,7 +465,7 @@ TEST_CASE("test_TradeManager_getFundsCurve") {
     tm->sell(Datetime(200706250940ULL), stk, 35.3, 100);
     tm->sell(Datetime(200706271355ULL), stk, 31.68, MAX_DOUBLE);
 
-    /** @arg 获取5分钟线资产曲线，指定日期范围小于账户建立日期 */
+    /** @arg 5分钟线资产曲线，指定日期范围小于账户建立日期 */
     dates.clear();
     init_date = Datetime(199912010900ULL);
     end_date = Datetime(199912011505ULL);
@@ -483,6 +483,30 @@ TEST_CASE("test_TradeManager_getFundsCurve") {
     for (const auto& v : result) {
         CHECK_EQ(v, 0.0);
     }
+
+    /** @arg 5分钟线资产曲线，指定日期范围仅覆盖部分交易 */
+    init_date = Datetime(200001060935ULL);
+    end_date = Datetime(200705291410ULL);
+    auto query = KQueryByDate(init_date, end_date, KQuery::MIN5);
+    dates = stk.getDatetimeList(query);
+    result = tm->getFundsCurve(dates, KQuery::MIN5);
+    CHECK_EQ(dates.size(), result.size());
+    CHECK_EQ(dates[0], Datetime(200001060935ULL));
+    auto tm_init_date = tm->initDatetime();
+    for (size_t i = 0, len = dates.size(); i < len; i++) {
+        if (dates[i] < tm_init_date) {
+            CHECK_EQ(result[i], 0.0);
+        } else if (dates[i].startOfDay() == tm_init_date) {
+            CHECK_EQ(result[i], 100000.0);
+        } else if (dates[i] == Datetime(200001101045ULL)) {
+            // CHECK_EQ(result[i], 100005.0);
+        } else if (dates[i] == Datetime(200001101050ULL)) {
+            // CHECK_EQ(result[i], 99996.0);
+        }
+    }
+    CHECK_EQ(result[0], 0.0);
+    HKU_INFO("dates size: {}", dates.size());
+    HKU_INFO("result size: {}", result.size());
 }
 
 /** @par 检测点，测试 getTradeList */

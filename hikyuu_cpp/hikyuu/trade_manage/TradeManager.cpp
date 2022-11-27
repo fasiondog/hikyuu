@@ -664,6 +664,7 @@ FundsRecord TradeManager::_getFundsByDatetime(const Datetime& datetime, KQuery::
 }
 
 PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
+    SPEND_TIME(TradeManager_getFundsCurve);
     size_t d_total = dates.size();
     PriceList result(d_total);
     HKU_IF_RETURN(d_total == 0 || dates[d_total - 1] < m_init_datetime, result);
