@@ -386,7 +386,7 @@ string TdxKDataDriver::_getFileName(const string& market, const string& code, KQ
     if (ktype == KQuery::MIN) {
         filename = m_dirname + "\\" + market + "\\minline\\" + market + code + ".lc1";
     } else if (ktype == KQuery::MIN5 || ktype == KQuery::MIN15 || ktype == KQuery::MIN30 ||
-               ktype == KQuery::MIN60) {
+               ktype == KQuery::MIN60 || ktype == KQuery::HOUR2) {
         filename = m_dirname + "\\" + market + "\\fzline\\" + market + code + ".lc5";
     } else if (ktype == KQuery::DAY || ktype == KQuery::WEEK || ktype == KQuery::MONTH ||
                ktype == KQuery::QUARTER || ktype == KQuery::HALFYEAR || ktype == KQuery::YEAR) {
