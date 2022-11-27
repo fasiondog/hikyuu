@@ -145,7 +145,14 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
         else:
             newdate = olddate // 10000 * 10000 + 1500
         return newdate
+    def getHour2Date(olddate):
+        mint = olddate - olddate // 10000 * 10000
+        if mint <= 1130:
+            newdate = olddate // 10000 * 10000 + 1130
+        else:
+            newdate = olddate // 10000 * 10000 + 1500
 
+        return newdate
     def getMin15Date(olddate):
         mint = olddate - olddate // 10000 * 10000
         if mint <= 945:
@@ -219,13 +226,15 @@ def update_hdf5_extern_data(h5file, tablename, data_type):
             return getMin30Date(olddate)
         elif index_type == 'min60':
             return getMin60Date(olddate)
+        elif index_type == 'hour2':
+            return getHour2Date(olddate)
         else:
             return None
 
     if data_type == 'DAY':
         index_list = ('week', 'month', 'quarter', 'halfyear', 'year')
     else:
-        index_list = ('min15', 'min30', 'min60')
+        index_list = ('min15', 'min30', 'min60', 'hour2')
 
     groupDict = {}
     for index_type in index_list:
