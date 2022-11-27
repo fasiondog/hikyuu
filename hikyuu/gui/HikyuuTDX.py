@@ -117,7 +117,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min15=current_config.getboolean('preload', 'min15', fallback=False),
                         min30=current_config.getboolean('preload', 'min30', fallback=False),
                         min60=current_config.getboolean('preload', 'min60', fallback=False),
-                        min120=current_config.getboolean('preload', 'min120', fallback=False),
+                        hour2=current_config.getboolean('preload', 'hour2', fallback=False),
                         day_max=current_config.getint('preload', 'day_max', fallback=100000),
                         week_max=current_config.getint('preload', 'week_max', fallback=100000),
                         month_max=current_config.getint('preload', 'month_max', fallback=100000),
@@ -129,7 +129,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min15_max=current_config.getint('preload', 'min15_max', fallback=4096),
                         min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
                         min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
-                        min120_max=current_config.getint('preload', 'min120_max', fallback=4096),
+                        hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
                     )
                 )
 
@@ -154,7 +154,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min15=current_config.getboolean('preload', 'min15', fallback=False),
                         min30=current_config.getboolean('preload', 'min30', fallback=False),
                         min60=current_config.getboolean('preload', 'min60', fallback=False),
-                        min120=current_config.getboolean('preload', 'min120', fallback=False),
+                        hour2=current_config.getboolean('preload', 'hour2', fallback=False),
                         day_max=current_config.getint('preload', 'day_max', fallback=100000),
                         week_max=current_config.getint('preload', 'week_max', fallback=100000),
                         month_max=current_config.getint('preload', 'month_max', fallback=100000),
@@ -166,7 +166,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                         min15_max=current_config.getint('preload', 'min15_max', fallback=4096),
                         min30_max=current_config.getint('preload', 'min30_max', fallback=4096),
                         min60_max=current_config.getint('preload', 'min60_max', fallback=4096),
-                        min120_max=current_config.getint('preload', 'min120_max', fallback=4096),
+                        hour2_max=current_config.getint('preload', 'hour2_max', fallback=4096),
                     )
                 )
 
@@ -371,7 +371,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.preload_min15_checkBox.setChecked(import_config.getboolean('preload', 'min15', fallback=False))
         self.preload_min30_checkBox.setChecked(import_config.getboolean('preload', 'min30', fallback=False))
         self.preload_min60_checkBox.setChecked(import_config.getboolean('preload', 'min60', fallback=False))
-        self.preload_min120_checkBox.setChecked(import_config.getboolean('preload', 'min120', fallback=False))
+        self.preload_hour2_checkBox.setChecked(import_config.getboolean('preload', 'hour2', fallback=False))
         self.preload_day_spinBox.setValue(import_config.getint('preload', 'day_max', fallback=100000))
         self.preload_week_spinBox.setValue(import_config.getint('preload', 'week_max', fallback=100000))
         self.preload_month_spinBox.setValue(import_config.getint('preload', 'month_max', fallback=100000))
@@ -383,7 +383,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.preload_min15_spinBox.setValue(import_config.getint('preload', 'min15_max', fallback=5120))
         self.preload_min30_spinBox.setValue(import_config.getint('preload', 'min30_max', fallback=5120))
         self.preload_min60_spinBox.setValue(import_config.getint('preload', 'min60_max', fallback=5120))
-        self.preload_min120_spinBox.setValue(import_config.getint('preload', 'min120_max', fallback=5120))
+        self.preload_hour2_spinBox.setValue(import_config.getint('preload', 'hour2_max', fallback=5120))
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
@@ -448,7 +448,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'min15': self.preload_min15_checkBox.isChecked(),
             'min30': self.preload_min30_checkBox.isChecked(),
             'min60': self.preload_min60_checkBox.isChecked(),
-            'min120': self.preload_min120_checkBox.isChecked(),
+            'hour2': self.preload_hour2_checkBox.isChecked(),
             'day_max': self.preload_day_spinBox.value(),
             'week_max': self.preload_week_spinBox.value(),
             'month_max': self.preload_month_spinBox.value(),
@@ -460,7 +460,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             'min15_max': self.preload_min15_spinBox.value(),
             'min30_max': self.preload_min30_spinBox.value(),
             'min60_max': self.preload_min60_spinBox.value(),
-            'min120_max': self.preload_min120_spinBox.value(),
+            'hour2_max': self.preload_hour2_spinBox.value(),
         }
         return import_config
 

@@ -15,7 +15,6 @@ const string KQuery::MIN5("MIN5");
 const string KQuery::MIN15("MIN15");
 const string KQuery::MIN30("MIN30");
 const string KQuery::MIN60("MIN60");
-const string KQuery::MIN120("MIN120");
 const string KQuery::DAY("DAY");
 const string KQuery::WEEK("WEEK");
 const string KQuery::MONTH("MONTH");
@@ -30,7 +29,7 @@ const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
 static vector<string> g_all_ktype{KQuery::MIN,     KQuery::MIN5,     KQuery::MIN15, KQuery::MIN30,
-               KQuery::MIN60,   KQuery::MIN120,   KQuery::DAY,      KQuery::WEEK,  KQuery::MONTH,
+               KQuery::MIN60,   KQuery::DAY,      KQuery::WEEK,  KQuery::MONTH,
                KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::MIN3,
                KQuery::HOUR2,   KQuery::HOUR4,    KQuery::HOUR6, KQuery::HOUR12};
 

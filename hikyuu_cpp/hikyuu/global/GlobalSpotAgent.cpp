@@ -132,8 +132,6 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
         gap = TimeDelta(0, 0, 30);
     } else if (KQuery::MIN60 == ktype) {
         gap = TimeDelta(0, 0, 60);
-    } else if (KQuery::MIN120 == ktype) {
-        gap = TimeDelta(0, 0, 120);
     } else if (KQuery::MIN3 == ktype) {
         gap = TimeDelta(0, 0, 3);
     } else if (KQuery::HOUR2 == ktype) {
@@ -212,9 +210,6 @@ void HKU_API startSpotAgent(bool print) {
 
     if (preloadParam.tryGet<bool>("min60", false)) {
         agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN60));
-    }
-    if (preloadParam.tryGet<bool>("min120", false)) {
-        agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN120));
     }
     if (preloadParam.tryGet<bool>("min3", false)) {
         agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN3));

@@ -55,7 +55,7 @@ void StrategyBase::_initDefaultParam() {
     setParam<bool>("enable_15min_clock", false);
     setParam<bool>("enable_30min_clock", false);
     setParam<bool>("enable_60min_clock", false);
-    setParam<bool>("enable_120min_clock", false);
+    setParam<bool>("enable_2hour_clock", false);
 }
 
 void StrategyBase::run() {
@@ -247,7 +247,7 @@ void StrategyBase::_addTimer() {
     _addClockEvent("enable_15min_clock", Minutes(15), openTime, closeTime);
     _addClockEvent("enable_30min_clock", Minutes(30), openTime, closeTime);
     _addClockEvent("enable_60min_clock", Minutes(60), openTime, closeTime);
-    _addClockEvent("enable_120min_clock", Minutes(120), openTime, closeTime);
+    _addClockEvent("enable_2hour_clock", Hours(2), openTime, closeTime);
 }
 
 void StrategyBase::_addClockEvent(const string& enable, TimeDelta delta, TimeDelta openTime,

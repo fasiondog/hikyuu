@@ -125,7 +125,7 @@ bool H5KDataDriver::_init() {
                 m_h5file_map[market + "_MIN15"] = h5file;
                 m_h5file_map[market + "_MIN30"] = h5file;
                 m_h5file_map[market + "_MIN60"] = h5file;
-                m_h5file_map[market + "_MIN120"] = h5file;
+                m_h5file_map[market + "_HOUR2"] = h5file;
 
             } else if (ktype == "TIME") {
                 filename = getParam<string>(*iter);
@@ -234,9 +234,9 @@ bool H5KDataDriver::_getH5FileAndGroup(const string& market, const string& code,
         } else if (kType == KQuery::MIN60) {
             CHECK_GROUP_EXISTS_RET(out_file, "min60", false);
             out_group = out_file->openGroup("min60");
-        } else if (kType == KQuery::MIN120) {
-            CHECK_GROUP_EXISTS_RET(out_file, "min120", false);
-            out_group = out_file->openGroup("min120");
+        } else if (kType == KQuery::HOUR2) {
+            CHECK_GROUP_EXISTS_RET(out_file, "hour2", false);
+            out_group = out_file->openGroup("hour2");
         } else if (kType == KQuery::DAY) {
             CHECK_GROUP_EXISTS_RET(out_file, "data", false);
             out_group = out_file->openGroup("data");
@@ -435,7 +435,7 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
     assert(KQuery::WEEK == query.kType() || KQuery::MONTH == query.kType() ||
            KQuery::QUARTER == query.kType() || KQuery::HALFYEAR == query.kType() ||
            KQuery::YEAR == query.kType() || KQuery::MIN15 == query.kType() ||
-           KQuery::MIN30 == query.kType() || KQuery::MIN60 == query.kType() || || KQuery::MIN120 == query.kType());
+           KQuery::MIN30 == query.kType() || KQuery::MIN60 == query.kType() || || KQuery::HOUR2 == query.kType());
     out_start = 0;
     out_end = 0;
     HKU_IF_RETURN(query.startDatetime() >= query.endDatetime(), false);
