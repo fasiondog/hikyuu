@@ -435,7 +435,7 @@ bool H5KDataDriver::_getOtherIndexRangeByDate(const string& market, const string
     assert(KQuery::WEEK == query.kType() || KQuery::MONTH == query.kType() ||
            KQuery::QUARTER == query.kType() || KQuery::HALFYEAR == query.kType() ||
            KQuery::YEAR == query.kType() || KQuery::MIN15 == query.kType() ||
-           KQuery::MIN30 == query.kType() || KQuery::MIN60 == query.kType() || || KQuery::HOUR2 == query.kType());
+           KQuery::MIN30 == query.kType() || KQuery::MIN60 == query.kType() ||  KQuery::HOUR2 == query.kType());
     out_start = 0;
     out_end = 0;
     HKU_IF_RETURN(query.startDatetime() >= query.endDatetime(), false);
