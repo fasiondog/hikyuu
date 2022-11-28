@@ -12,6 +12,7 @@
 #include "TradeManagerBase.h"
 #include "../utilities/Parameter.h"
 #include "../utilities/util.h"
+#include "../utilities/LRUCache11.h"
 #include "TradeRecord.h"
 #include "PositionRecord.h"
 #include "FundsRecord.h"
