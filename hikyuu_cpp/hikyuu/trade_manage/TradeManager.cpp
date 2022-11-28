@@ -23,7 +23,7 @@ string TradeManager::str() const {
     os << std::fixed;
     os.precision(2);
 
-    FundsRecord funds = _getFunds();
+    FundsRecord funds = _getFunds(lastDatetime());
     string strip(",\n");
     os << "TradeManager {\n"
        << "  params: " << getParameter() << strip << "  name: " << name() << strip
@@ -502,13 +502,14 @@ price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
     return funds.cash;
 }
 
-FundsRecord TradeManager::_getFunds(KQuery::KType ktype) const {
+FundsRecord TradeManager::_getFunds(Datetime date, KQuery::KType ktype) const {
+    HKU_ASSERT(date >= lastDatetime());
     price_t value = 0.0;  //当前市值
     position_map_type::const_iterator iter = m_position.begin();
     if (!getParam<bool>("use_contract")) {
         for (; iter != m_position.end(); ++iter) {
             const PositionRecord& record = iter->second;
-            price_t price = record.stock.getMarketValue(lastDatetime(), ktype);
+            price_t price = record.stock.getMarketValue(date, ktype);
             value += record.number * price * record.stock.unit();
         }
     } else {
@@ -526,7 +527,7 @@ FundsRecord TradeManager::_getFunds(KQuery::KType ktype) const {
 }
 
 FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
-    HKU_IF_RETURN(indatetime == Null<Datetime>(), _getFunds(ktype));
+    HKU_IF_RETURN(indatetime == Null<Datetime>(), _getFunds(lastDatetime(), ktype));
     HKU_IF_RETURN(indatetime < initDatetime(), FundsRecord());
 
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
@@ -534,7 +535,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     if (datetime >= lastDatetime()) {
         //根据权息数据调整持仓
         updateWithWeight(datetime);
-        return _getFunds(ktype);
+        return _getFunds(indatetime, ktype);
     }
 
     return _getFundsByDatetime(indatetime, ktype);
@@ -660,7 +661,7 @@ FundsRecord TradeManager::_getFundsByDatetime(const Datetime& datetime, KQuery::
                 break;
         }
     }
-    return tm._getFunds(ktype);
+    return tm._getFunds(datetime, ktype);
 }
 
 PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType ktype) {
@@ -669,82 +670,82 @@ PriceList TradeManager::getFundsCurve(const DatetimeList& dates, KQuery::KType k
     PriceList result(d_total);
     HKU_IF_RETURN(d_total == 0 || dates[d_total - 1] < m_init_datetime, result);
 
-    // int precision = getParam<int>("precision");
-    // for (size_t i = 0; i < total; ++i) {
-    //     FundsRecord funds = getFunds(dates[i], ktype);
-    //     result[i] = roundEx(funds.cash + funds.market_value, precision);
+    int precision = getParam<int>("precision");
+    for (size_t i = 0; i < d_total; ++i) {
+        FundsRecord funds = getFunds(dates[i], ktype);
+        result[i] = roundEx(funds.cash + funds.market_value, precision);
+    }
+
+    // size_t tr_total = m_trade_list.size();
+    // if (tr_total == 0) {
+    //     for (auto& val : result) {
+    //         val = m_cash;
+    //     }
+    //     return result;
     // }
 
-    size_t tr_total = m_trade_list.size();
-    if (tr_total == 0) {
-        for (auto& val : result) {
-            val = m_cash;
-        }
-        return result;
-    }
+    // int precision = getParam<int>("precision");
+    // TradeManager tm(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc);
+    // tm.setParam<int>("precision", precision);
 
-    int precision = getParam<int>("precision");
-    TradeManager tm(m_init_datetime, m_init_cash, m_costfunc, m_mrfunc);
-    tm.setParam<int>("precision", precision);
+    // size_t d_pos = 0;
+    // size_t tr_pos = 0;
+    // while (tr_pos < tr_total) {
+    //     const auto& tr = m_trade_list[tr_pos];
+    //     for (size_t d = d_pos; d < d_total; d++) {
+    //         if (dates[d] < tr.datetime) {
+    //             FundsRecord funds = tm.getFunds(dates[d], ktype);
+    //             result[d] = roundEx(funds.cash + funds.market_value, precision);
+    //         } else {
+    //             d_pos = d;
+    //             break;
+    //         }
+    //     }
 
-    size_t d_pos = 0;
-    size_t tr_pos = 0;
-    while (tr_pos < tr_total) {
-        const auto& tr = m_trade_list[tr_pos];
-        for (size_t d = d_pos; d < d_total; d++) {
-            if (dates[d] < tr.datetime) {
-                FundsRecord funds = tm.getFunds(dates[d], ktype);
-                result[d] = roundEx(funds.cash + funds.market_value, precision);
-            } else {
-                d_pos = d;
-                break;
-            }
-        }
+    //     while (tr_pos < tr_total) {
+    //         if ((tr_pos != tr_total - 1 &&
+    //              m_trade_list[tr_pos].datetime == m_trade_list[tr_pos + 1].datetime) ||
+    //             (tr_pos == tr_total - 1 &&
+    //              m_trade_list[tr_pos].datetime == m_trade_list[tr_pos - 1].datetime)) {
+    //             switch (tr.business) {
+    //                 case BUSINESS_BUY:
+    //                     tm.buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss,
+    //                            tr.goalPrice, tr.planPrice, tr.from);
+    //                     break;
 
-        while (tr_pos < tr_total) {
-            if ((tr_pos != tr_total - 1 &&
-                 m_trade_list[tr_pos].datetime == m_trade_list[tr_pos + 1].datetime) ||
-                (tr_pos == tr_total - 1 &&
-                 m_trade_list[tr_pos].datetime == m_trade_list[tr_pos - 1].datetime)) {
-                switch (tr.business) {
-                    case BUSINESS_BUY:
-                        tm.buy(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss,
-                               tr.goalPrice, tr.planPrice, tr.from);
-                        break;
+    //                 case BUSINESS_SELL:
+    //                     tm.sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss,
+    //                             tr.goalPrice, tr.planPrice, tr.from);
+    //                     break;
 
-                    case BUSINESS_SELL:
-                        tm.sell(tr.datetime, tr.stock, tr.realPrice, tr.number, tr.stoploss,
-                                tr.goalPrice, tr.planPrice, tr.from);
-                        break;
+    //                 case BUSINESS_CHECKIN:
+    //                     tm.checkin(tr.datetime, tr.realPrice);
+    //                     break;
 
-                    case BUSINESS_CHECKIN:
-                        tm.checkin(tr.datetime, tr.realPrice);
-                        break;
+    //                 case BUSINESS_CHECKOUT:
+    //                     tm.checkout(tr.datetime, tr.realPrice);
+    //                     break;
 
-                    case BUSINESS_CHECKOUT:
-                        tm.checkout(tr.datetime, tr.realPrice);
-                        break;
+    //                 case BUSINESS_INIT:
+    //                 case BUSINESS_GIFT:
+    //                 case BUSINESS_BONUS:
+    //                 case BUSINESS_INVALID:
+    //                 default:
+    //                     break;
+    //             }
+    //             tr_pos++;
+    //         } else {
+    //             break;
+    //         }
+    //     }
 
-                    case BUSINESS_INIT:
-                    case BUSINESS_GIFT:
-                    case BUSINESS_BONUS:
-                    case BUSINESS_INVALID:
-                    default:
-                        break;
-                }
-                tr_pos++;
-            } else {
-                break;
-            }
-        }
+    //     tr_pos++;
+    // }
 
-        tr_pos++;
-    }
-
-    for (size_t d = d_pos; d < d_total; d++) {
-        FundsRecord funds = tm.getFunds(dates[d], ktype);
-        result[d] = roundEx(funds.cash + funds.market_value, precision);
-    }
+    // for (size_t d = d_pos; d < d_total; d++) {
+    //     FundsRecord funds = tm.getFunds(dates[d], ktype);
+    //     result[d] = roundEx(funds.cash + funds.market_value, precision);
+    // }
 
     return result;
 }

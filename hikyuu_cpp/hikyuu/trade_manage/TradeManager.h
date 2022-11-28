@@ -239,7 +239,7 @@ private:
     void _updateSettleByDay(const Datetime& datetime);
 
     // 获取账户最后交易时刻的资产详情
-    FundsRecord _getFunds(KQuery::KType ktype = KQuery::DAY) const;
+    FundsRecord _getFunds(Datetime date, KQuery::KType ktype = KQuery::DAY) const;
 
     FundsRecord _getFundsByDatetime(const Datetime& datetime, KQuery::KType ktype);
 
