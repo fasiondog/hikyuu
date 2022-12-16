@@ -27,8 +27,9 @@ def request_with_proxy(url):
             result = requests.get(url, proxies=proxies, timeout=5).text
             #hku_info("use proxy: {}".format(proxies['http']))
             return result
-        except:
-            new = True
+        except Exception as e:
+            if i == 6:
+                new = True
             time.sleep(2)
     raise Exception("无法通过代理访问！")
 
