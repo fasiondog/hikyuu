@@ -271,7 +271,11 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
             #pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             end_send_spot()
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
-            time.sleep(delta.total_seconds())
+            hku_info("sleep {}'s".format(delta.total_seconds()))
+            if delta.total_seconds() > 0:
+                time.sleep(delta.total_seconds())
+            else:
+                pass
         except KeyboardInterrupt:
             print("Ctrl-C 终止")
             break
