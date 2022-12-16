@@ -8,6 +8,7 @@
 import requests
 import json
 import datetime
+import time
 from hikyuu.util import hku_warn, hku_info, hku_check
 
 from .zhima import get_proxy
@@ -23,11 +24,12 @@ def request_with_proxy(url):
             proxy = get_proxy(new)
             hku_check(proxy, "Failed get proxy!")
             proxies = {'http': 'http://{}'.format(proxy)}
-            result = requests.get(url, proxies=proxies).text
+            result = requests.get(url, proxies=proxies, timeout=5).text
             #hku_info("use proxy: {}".format(proxies['http']))
             return result
         except:
             new = True
+            time.sleep(2)
     raise Exception("无法通过代理访问！")
 
 
