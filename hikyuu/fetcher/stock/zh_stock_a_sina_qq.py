@@ -205,7 +205,7 @@ def get_spot_parallel(stocklist, source='sina', use_proxy=False, batch_func=None
         return batch_result
 
     with futures.ThreadPoolExecutor() as executor:
-        res = executor.map(request_inner, batchs, timeout=2)
+        res = executor.map(request_inner, batchs, timeout=10)
 
     result = []
     for batch_result in res:
