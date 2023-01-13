@@ -155,8 +155,8 @@ def next_delta(start_time, interval, phase1_delta, phase2_delta, ignore_weekend)
     elif maybe_time in (phase1_start, phase1_end, phase2_start, phase2_end):
         # 如果下一次时间刚好等于时间周期的起止点，则直接返回预计的时间间隔
         delta = interval_delta
-    elif start_time < phase1_start and phase1_start < maybe_time < phase1_end:
-        # 如果本次的时间小于周期1的起始时间且预计下一次的时间在phase1内，则取phase1起始时间计算
+    elif start_time < phase1_start:
+        # 如果本次的时间小于周期1的起始时间，则取phase1起始时间计算
         delta = phase1_start - start_time
     elif phase1_end < maybe_time < phase2_start:
         delta = phase2_start - start_time
@@ -271,7 +271,11 @@ def collect(use_proxy, source, seconds, phase1, phase2, ignore_weekend):
             #pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             end_send_spot()
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
-            time.sleep(delta.total_seconds())
+            hku_info("sleep {}'s".format(delta.total_seconds()))
+            if delta.total_seconds() > 0:
+                time.sleep(delta.total_seconds())
+            else:
+                pass
         except KeyboardInterrupt:
             print("Ctrl-C 终止")
             break

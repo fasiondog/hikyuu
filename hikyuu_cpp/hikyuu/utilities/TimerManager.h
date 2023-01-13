@@ -32,7 +32,7 @@ public:
      * @param work_num 定时任务执行线程池线程数量
      */
     TimerManager(size_t work_num = 1)
-    : m_current_timer_id(-1), m_stop(true), m_work_num(work_num) {}
+    : m_stop(true), m_current_timer_id(-1), m_work_num(work_num) {}
 
     /** 析构函数 */
     ~TimerManager() {

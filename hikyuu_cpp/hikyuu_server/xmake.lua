@@ -26,12 +26,7 @@ target("hkuserver")
     end
     
     if is_plat("linux") then
-        if is_arch("x86_64")  then
-            if os.exists("/usr/lib64/mysql") then
-                add_linkdirs("/usr/lib64/mysql")
-            end
-            add_linkdirs("/usr/lib/x86_64-linux-gnu")
-        end
+        add_packages("mysql")
     end
     
     if is_plat("macosx") then

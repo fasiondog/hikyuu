@@ -41,14 +41,15 @@ public:
     : m_done(false), m_worker_num(n), m_runnging_util_empty(util_empty) {
         try {
             // 先初始化相关资源，再启动线程
-            for (int i = 0; i < m_worker_num; i++) {
+            for (size_t i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
                 m_threads_status.push_back(nullptr);
                 m_queues.push_back(
                   std::unique_ptr<ThreadSafeQueue<task_type>>(new ThreadSafeQueue<task_type>));
             }
-            for (int i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&MQThreadPool::worker_thread, this, i));
+            for (size_t i = 0; i < m_worker_num; i++) {
+                m_threads.push_back(
+                  std::thread(&MQThreadPool::worker_thread, this, static_cast<int>(i)));
             }
         } catch (...) {
             m_done = true;

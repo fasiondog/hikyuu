@@ -211,7 +211,6 @@ void HKU_API startSpotAgent(bool print) {
     if (preloadParam.tryGet<bool>("min60", false)) {
         agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN60));
     }
-
     if (preloadParam.tryGet<bool>("min3", false)) {
         agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN3));
     }

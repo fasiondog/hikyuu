@@ -28,8 +28,8 @@
 
 自定义移滑价差接口：
 
-* :py:meth:`SlippageBase.getRealBuyPrice` - 【必须】计算实际买入价格
-* :py:meth:`SlippageBase.getRealSellPrice` - 【必须】计算实际卖出价格
+* :py:meth:`SlippageBase.get_real_buy_price` - 【必须】计算实际买入价格
+* :py:meth:`SlippageBase.get_real_sell_price` - 【必须】计算实际卖出价格
 * :py:meth:`SlippageBase._calculate` - 【必须】子类计算接口
 * :py:meth:`SlippageBase._clone` - 【必须】克隆接口
 * :py:meth:`SlippageBase._reset` - 【可选】重载私有变量

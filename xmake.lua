@@ -9,7 +9,7 @@ if not is_plat("windows") then
 end
 
 -- version
-set_version("1.2.5", {build="%Y%m%d%H%M"})
+set_version("1.2.7", {build="%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
 --if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别 
@@ -40,7 +40,10 @@ end
 set_languages("cxx17", "C99")
 
 local hdf5_version = "1.12.2"
-local mysql_version = "8.0.21"
+local mysql_version = "8.0.31"
+if is_plat("windows") then
+    mysql_version = "8.0.21"
+end
 
 add_repositories("project-repo hikyuu_extern_libs")
 if is_plat("windows") then
@@ -52,25 +55,21 @@ if is_plat("windows") then
     end
     add_requires("mysql " .. mysql_version)
 elseif is_plat("linux") then
-    add_requires("hdf5 " .. hdf5_version)
+    add_requires("hdf5 " .. hdf5_version, {system = false})
+    add_requires("mysql " .. mysql_version, {system = false})
+elseif is_plat("macosx") then
+    add_requires("brew::hdf5") 
 end
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_requireconfs("spdlog.fmt", {override = true, version = "8.1.1", configs = {header_only = true}})
+add_requires("sqlite3", {system=false, configs = {shared=true, vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
 add_requires("nng", {system=false, configs = {vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("nlohmann_json", {system=false})
 add_requires("cpp-httplib", {system=false})
 add_requires("zlib", {system=false})
-
-if is_plat("linux") and linuxos.name() == "ubuntu" then
-    add_requires("apt::libmysqlclient-dev", "apt::libsqlite3-dev")
-elseif is_plat("macosx") then
-    add_requires("brew::hdf5")
-else
-    add_requires("sqlite3", {configs = {shared=true, vs_runtime="MD", cxflags="-fPIC"}})
-end
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 
@@ -83,15 +82,6 @@ add_linkdirs("$(env BOOST_LIB)")
 -- modifed to use boost static library, except boost.python, serialization
 --add_defines("BOOST_ALL_DYN_LINK")
 add_defines("BOOST_SERIALIZATION_DYN_LINK")
-
-if is_host("linux") then
-    if is_arch("x86_64") then
-        add_linkdirs("/usr/lib64")
-        if os.exists("/usr/lib/x86_64-linux-gnu") then
-          add_linkdirs("/usr/lib/x86_64-linux-gnu")
-        end
-    end
-end
 
 -- is release now
 if is_mode("release") then

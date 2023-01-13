@@ -43,13 +43,14 @@ public:
     : m_done(false), m_runnging_util_empty(util_empty), m_worker_num(n) {
         try {
             // 先初始化相关资源，再启动线程
-            for (int i = 0; i < m_worker_num; i++) {
+            for (size_t i = 0; i < m_worker_num; i++) {
                 // 创建工作线程及其任务队列
                 m_threads_status.push_back(nullptr);
                 m_queues.push_back(std::unique_ptr<WorkStealQueue>(new WorkStealQueue));
             }
-            for (int i = 0; i < m_worker_num; i++) {
-                m_threads.push_back(std::thread(&StealThreadPool::worker_thread, this, i));
+            for (size_t i = 0; i < m_worker_num; i++) {
+                m_threads.push_back(
+                  std::thread(&StealThreadPool::worker_thread, this, static_cast<int>(i)));
             }
         } catch (...) {
             m_done = true;
@@ -244,7 +245,7 @@ private:
     bool pop_task_from_other_thread_queue(task_type& task) {
         for (size_t i = 0; i < m_worker_num; ++i) {
             size_t index = (m_index + i + 1) % m_worker_num;
-            if (index != m_index && m_queues[index]->try_steal(task)) {
+            if (int(index) != m_index && m_queues[index]->try_steal(task)) {
                 return true;
             }
         }

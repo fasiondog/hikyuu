@@ -69,7 +69,7 @@ Datetime::Datetime(unsigned long long datetime) {
         m_data = bt::ptime(d, bt::time_duration((unsigned short)hh, (unsigned short)mm, 0));
     } else {
         HKU_THROW_EXCEPTION(std::out_of_range,
-                            "Only suport YYYYMMDDhhmm or YYYYMMDD, but current param is {}",
+                            "Only support YYYYMMDDhhmm or YYYYMMDD, but current param is {}",
                             datetime);
     }
 }

@@ -299,6 +299,10 @@ void Stock::loadKDataToBuffer(KQuery::KType inkType) {
     int start = total <= max_num ? 0 : total - max_num;
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
+        // 需要对是否已缓存进行二次判定，防止加锁之前已被缓存
+        if (m_data->pKData.find(kType) != m_data->pKData.end() && m_data->pKData[kType]) {
+            return;
+        }
         KRecordList* ptr_klist = new KRecordList;
         m_data->pKData[kType] = ptr_klist;
         (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code,
@@ -585,7 +589,8 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                        end_ix, total);
     size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
     result.resize(length);
-    std::memcpy(&(result.front()), &((*m_data->pKData[ktype])[start_ix]), sizeof(KRecord) * length);
+    std::memcpy((void*)&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
+                sizeof(KRecord) * length);
     return result;
 }
 
@@ -713,6 +718,11 @@ void Stock::realtimeUpdate(KRecord record, KQuery::KType inktype) {
 
     // 加写锁
     std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+
+    // 需要对是否已缓存进行二次判定，防止加锁之前缓存被释放
+    if (m_data->pKData.find(ktype) == m_data->pKData.end() || !m_data->pKData[ktype]) {
+        return;
+    }
 
     if (m_data->pKData[ktype]->empty()) {
         m_data->pKData[ktype]->push_back(record);

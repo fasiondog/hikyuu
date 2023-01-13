@@ -12,7 +12,7 @@ package("hdf5")
     elseif is_plat("linux") then
         add_urls("https://github.com/fasiondog/hikyuu/releases/download/1.1.9/hdf5-$(version)-linux-x64.zip",
             "https://gitee.com/fasiondog/hikyuu/releases/download/1.1.9/hdf5-$(version)-linux-x64.zip")
-        add_versions("1.12.2", "8a6b571168481fba273e1f0c7838d417f38222b5d93250388d2ddff5ff7f2611")
+        add_versions("1.12.2", "e0f4357ea7bfa0132c3edba9b517635736191f920ce7a3aeef5e89dbe5b2dd27")
     end
 
     on_load("windows", "linux", function (package)
