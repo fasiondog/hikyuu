@@ -37,7 +37,7 @@ else
 end
 
 -- set language: C99, c++ standard
-set_languages("cxx17", "C99")
+set_languages("cxx17", "c99")
 
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
