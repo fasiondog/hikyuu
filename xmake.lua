@@ -65,7 +65,7 @@ end
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_requireconfs("spdlog.fmt", {override = true, version = "8.1.1", configs = {header_only = true}})
 add_requires("sqlite3", {system=false, configs = {shared=true, vs_runtime="MD", cxflags="-fPIC"}})
-add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
+add_requires("flatbuffers 2.0.0", {system=false, configs = {vs_runtime="MD"}})
 add_requires("nng", {system=false, configs = {vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("nlohmann_json", {system=false})
 add_requires("cpp-httplib", {system=false})
