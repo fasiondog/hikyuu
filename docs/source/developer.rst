@@ -75,7 +75,9 @@ Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令�
 
 .. code-block:: shell
     
-    sudo apt-get install -y libsqlite3-dev    
+    sudo apt-get install -y libsqlite3-dev   
+
+MacOsx 下需要使用 brew 安装 sqlite3, hdf5, mysqlclient 的开发包（具体包名请自行查询）。 
 
 6、转 Visual Studio 工程
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
