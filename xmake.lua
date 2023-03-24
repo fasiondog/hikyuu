@@ -41,7 +41,7 @@ set_languages("cxx17", "c99")
 
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
-if is_plat("windows") then
+if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*"))then
     mysql_version = "8.0.21"
 end
 
@@ -60,6 +60,7 @@ elseif is_plat("linux") then
 elseif is_plat("macosx") then
     add_requires("brew::hdf5") 
 end
+add_requires("boost", {system=false, configs = {data_time=true, filesystem=true, serialization=true, system=true, python=true, pyver=310}})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
