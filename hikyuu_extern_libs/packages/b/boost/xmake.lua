@@ -123,9 +123,6 @@ package("boost")
         if package:is_plat("windows") then
             package:add("defines", "BOOST_ALL_NO_LIB")
         end
-        if package:config("python") then
-            package:add("deps", "python 3.10.x")
-        end
     end)
 
     on_install("macosx", "linux", "windows", "bsd", "mingw", "cross", function (package)

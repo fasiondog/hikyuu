@@ -60,7 +60,7 @@ elseif is_plat("linux") then
 elseif is_plat("macosx") then
     add_requires("brew::hdf5") 
 end
-add_requires("boost", {system=false, configs = {data_time=true, filesystem=true, serialization=true, system=true, python=true, pyver=310}})
+add_requires("boost", {system=false, configs = {shared=true, data_time=true, filesystem=true, serialization=true, system=true, python=true, pyver=310}})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
