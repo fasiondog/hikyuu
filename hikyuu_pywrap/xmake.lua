@@ -32,7 +32,7 @@ target("core")
         set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
         --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
     end
-    add_packages("fmt", "spdlog", "flatbuffers", "cpp-httplib")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "cpp-httplib")
     add_deps("hikyuu")
     if is_plat("windows") then
         set_filename("core.pyd")
@@ -63,11 +63,11 @@ target("core")
             local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
             target:add("linkdirs", libdir)
             local out, err = os.iorun("python3 --version")
-            local ver = (out .. err):trim()
-            local python_lib = format("python%s.%sm", string.sub(ver,8,8), string.sub(ver,10,10))
-            local pyver = tonumber(format("%s.%s", string.sub(ver,8,8), string.sub(ver,10,10)))
+            local ver = (out .. err):trim():match("%d+.%d+")
+            local python_lib = format("python%sm", ver)
+            local pyver = tonumber(ver)
             if pyver >= 3.8 then
-                python_lib = format("python%s.%s", string.sub(ver,8,8), string.sub(ver,10,10))
+                python_lib = format("python%s", ver)
             end
             target:add("links", python_lib)
         end
@@ -77,21 +77,9 @@ target("core")
         assert(pydir, "python3-config not found!")
         target:add("cxflags", pydir)
 
-        -- get suffix configure for link libboost_pythonX.so
-        local suffix = get_config("boost-python-suffix")
-        if suffix == nil then
-            raise("You need to config --boost-python-suffix specify libboost_python suffix")
-        end
-
-        suffix = string.upper(suffix)
-        if suffix == "3X" then
-            local out, err = os.iorun("python3 --version")
-            local ver = (out .. err):trim()
-            local boost_python_lib = "boost_python"..string.sub(ver,8,8)..string.sub(ver,10,10)
-            target:add("links", boost_python_lib)
-        else
-            target:add("links", "boost_python"..suffix)
-        end    
+        local out, err = os.iorun("python3 --version")
+        local ver = (out .. err):trim():match("%d+.%d+"):gsub("%p+", "")
+        target:add("links", "boost_python"..ver.."-mt")
     end)
 
     after_build(function(target)
@@ -124,11 +112,11 @@ target("core")
         os.cp("$(env BOOST_LIB)/boost_python3*.dll", dst_dir)
         os.cp("$(env BOOST_LIB)/boost_serialization*.dll", dst_dir)
         os.cp("$(env BOOST_LIB)/boost_system*.dll", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_system*.so.*", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/libboost_system*.so.*", dst_dir)
         os.cp("$(env BOOST_LIB)/libboost_date_time*.dylib", dst_dir)
         os.cp("$(env BOOST_LIB)/libboost_filesystem*.dylib", dst_dir)
         os.cp("$(env BOOST_LIB)/libboost_python3*.dylib", dst_dir)

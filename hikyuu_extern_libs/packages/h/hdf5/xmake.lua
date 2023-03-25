@@ -18,11 +18,11 @@ package("hdf5")
         add_versions("1.12.2", "d73a880d9dfede0d5db1e30555fa251ca82efa437a0d93b46f5e64e87e71fc63")
     end
 
-    on_load("windows", "linux", function (package)
+    on_load("windows", "linux", "cross", function (package)
         package:add("defines", "H5_BUILT_AS_DYNAMIC_LIB")
     end)
 
-    on_install("windows", "linux", function (package)
+    on_install("windows", "linux", "cross", function (package)
         os.cp("include", package:installdir())
         os.cp("lib", package:installdir())
         if package:is_plat("windows") then

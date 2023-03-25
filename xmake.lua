@@ -54,13 +54,13 @@ if is_plat("windows") then
         add_requires("hdf5_D " .. hdf5_version)
     end
     add_requires("mysql " .. mysql_version)
-elseif is_plat("linux") then
+elseif is_plat("linux", "cross") then
     add_requires("hdf5 " .. hdf5_version, {system = false})
     add_requires("mysql " .. mysql_version, {system = false})
 elseif is_plat("macosx") then
     add_requires("brew::hdf5") 
 end
-add_requires("boost", {system=false, configs = {shared=true, data_time=true, filesystem=true, serialization=true, system=true, python=true, pyver=310}})
+add_requires("boost", {system=false, configs = {data_time=true, filesystem=true, serialization=true, system=true, python=true, pyver=39}})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
@@ -77,12 +77,12 @@ add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
-add_includedirs("$(env BOOST_ROOT)")
-add_linkdirs("$(env BOOST_LIB)")
+-- add_includedirs("$(env BOOST_ROOT)")
+-- add_linkdirs("$(env BOOST_LIB)")
 
 -- modifed to use boost static library, except boost.python, serialization
 --add_defines("BOOST_ALL_DYN_LINK")
-add_defines("BOOST_SERIALIZATION_DYN_LINK")
+-- add_defines("BOOST_SERIALIZATION_DYN_LINK")
 
 -- is release now
 if is_mode("release") then
