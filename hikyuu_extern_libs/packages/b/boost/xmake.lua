@@ -37,7 +37,8 @@ package("boost")
         add_syslinks("pthread", "dl")
     end
 
-    add_configs("pyver", {description = "python version xy",  default = "3.10.6"})
+    add_configs("python_version", {description = "python version x.y",  default = "3.10"})
+    add_configs("use_system_python", {description = "use system enviroment python",  default = true})
     local libnames = {"fiber",
                       "coroutine",
                       "context",
@@ -84,6 +85,10 @@ package("boost")
             else
                 linkname = "boost_" .. libname
             end
+            if libname == "python" then
+                local pyver = package:config("python_version"):gsub("%p+", "")
+                linkname = linkname .. pyver
+            end
             if package:config("multi") then
                 linkname = linkname .. "-mt"
             end
@@ -119,6 +124,9 @@ package("boost")
         if package:is_plat("windows") then
             package:add("defines", "BOOST_ALL_NO_LIB")
         end
+        if not package:config("use_system_python") and package:config("python") then
+            package:add("deps", "python 3.10.x")
+        end
     end)
 
     on_install("macosx", "linux", "windows", "bsd", "mingw", "cross", function (package)
@@ -141,6 +149,7 @@ package("boost")
         {
             "--prefix=" .. package:installdir(),
             "--libdir=" .. package:installdir("lib"),
+            "--without-icu"
         }
         if package:config("python") then
             table.insert(bootstrap_argv, "--with-python=python3")

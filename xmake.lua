@@ -60,15 +60,25 @@ elseif is_plat("linux", "cross") then
 elseif is_plat("macosx") then
     add_requires("brew::hdf5") 
 end
+
+option("pyver")
+    set_default("3.10")
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Use python version xy")
+option_end()
+
 add_requires("boost", {system=false, 
     configs = {
+        shared=true,
         vs_runtime="MD", 
         data_time=true, 
         filesystem=true, 
         serialization=true, 
         system=true, 
         python=true, 
-        pyver=39}})
+        use_system_python=true,
+        python_version=get_config("pyver")}})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
@@ -89,9 +99,9 @@ set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 -- add_linkdirs("$(env BOOST_LIB)")
 
 -- modifed to use boost static library, except boost.python, serialization
---add_defines("BOOST_ALL_DYN_LINK")
+add_defines("BOOST_ALL_DYN_LINK")
 -- add_defines("BOOST_SERIALIZATION_DYN_LINK")
-add_defines("BOOST_PYTHON_STATIC_LIB")
+-- add_defines("BOOST_PYTHON_STATIC_LIB")
 
 -- is release now
 if is_mode("release") then

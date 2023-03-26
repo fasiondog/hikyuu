@@ -1,13 +1,3 @@
-option("boost-python-suffix")
-    set_default("3X")
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Set suffix of libboost_python. ",
-                    "Boost.python 1.67 later use 3x like libboost_python35, ",
-                    "but older is libboost_python3",
-                    "    - 3X autocheck for 35, 36, 37, 3x")
-option_end()
-
 add_includedirs("../hikyuu_cpp")
 
 -- Can't use static boost.python lib, the function that using 'arg' will load failed!
@@ -45,45 +35,40 @@ target("core")
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 
     on_load(function(target)
+        -- detect installed python3
         import("lib.detect.find_tool")
+        local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+        assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
+        local pyver = python.version:match("%d+.%d+"):gsub("%p+", "")
         if is_plat("windows") then
-            -- detect installed python3
-            local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
-            assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
-
             -- find python include and libs directory
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            local pydir = os.iorun(python.program .. " -c \"import sys; print(sys.executable)\"")
+            -- local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
             pydir = path.directory(pydir)
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
-
-            local out, err = os.iorun("python --version")
-            local ver = (out .. err):trim():match("%d+.%d+"):gsub("%p+", "")
-            target:add("links", "libboost_python"..ver.."-mt")            
+            target:add("links", "boost_python"..pyver.."-mt")            
             return
-        end
-
-        if is_plat("macosx") then
-            local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
-            target:add("linkdirs", libdir)
-            local out, err = os.iorun("python3 --version")
-            local ver = (out .. err):trim():match("%d+.%d+")
-            local python_lib = format("python%sm", ver)
-            local pyver = tonumber(ver)
-            if pyver >= 3.8 then
-                python_lib = format("python%s", ver)
+        else
+            if is_plat("macosx") then
+                local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
+                target:add("linkdirs", libdir)
+                local out, err = os.iorun("python3 --version")
+                local ver = (out .. err):trim():match("%d+.%d+")
+                local python_lib = format("python%sm", ver)
+                local pyver = tonumber(ver)
+                if pyver >= 3.8 then
+                    python_lib = format("python%s", ver)
+                end
+                target:add("links", python_lib)
             end
-            target:add("links", python_lib)
+
+            -- get python include directory.
+            local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
+            assert(pydir, "python3-config not found!")
+            target:add("cxflags", pydir)
+            target:add("links", "boost_python"..pyver.."-mt")
         end
-
-        -- get python include directory.
-        local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
-        assert(pydir, "python3-config not found!")
-        target:add("cxflags", pydir)
-
-        local out, err = os.iorun("python3 --version")
-        local ver = (out .. err):trim():match("%d+.%d+"):gsub("%p+", "")
-        target:add("links", "boost_python"..ver.."-mt")
     end)
 
     after_build(function(target)
@@ -110,22 +95,6 @@ target("core")
             os.trycp(target:targetdir() .. '/*.so', dst_dir)
             os.trycp(target:targetdir() .. '/*.so.*', dst_dir)
         end
-
-        -- os.cp("$(env BOOST_LIB)/boost_date_time*.dll", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/boost_filesystem*.dll", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/boost_python3*.dll", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/boost_serialization*.dll", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/boost_system*.dll", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/libboost_serialization*.so.*", dst_dir)
-        -- os.cp("$(env BOOST_LIB)/libboost_system*.so.*", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_date_time*.dylib", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_filesystem*.dylib", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_python3*.dylib", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_serialization*.dylib", dst_dir)
-        os.cp("$(env BOOST_LIB)/libboost_system*.dylib", dst_dir)
     end)
 
 
