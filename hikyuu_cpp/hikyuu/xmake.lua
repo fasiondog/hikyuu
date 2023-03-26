@@ -69,23 +69,10 @@ target("hikyuu")
         add_links("boost_system")
     end
 
-    if is_plat("windows") then 
-        -- nng 静态链接需要的系统库
-        add_syslinks("ws2_32", "advapi32")
-    end
-   
     -- add files
     add_files("./**.cpp")
     
     add_headerfiles("../(hikyuu/**.h)|**doc.h")
-
---     on_load(function(target)
---         assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_ROOT
--- You need to specify where the boost headers is via the BOOST_ROOT variable!]])
-
---         assert(os.getenv("BOOST_LIB"), [[Missing environment variable: BOOST_LIB
--- You need to specify where the boost library is via the BOOST_LIB variable!]])
---     end)
 
     before_build(function(target)
         if is_plat("macosx") then

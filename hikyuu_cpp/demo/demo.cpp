@@ -20,8 +20,8 @@ int main(int argc, char* argv[]) {
 #endif
 
     // 配置文件的位置自行修改
-    //  hikyuu_init("C:\\Users\\admin\\.hikyuu\\hikyuu.ini");
-    hikyuu_init("/home/fasiondog/.hikyuu/hikyuu.ini");
+    hikyuu_init("C:\\Users\\admin\\.hikyuu\\hikyuu.ini");
+    // hikyuu_init("/home/fasiondog/.hikyuu/hikyuu.ini");
 
     StockManager& sm = StockManager::instance();
 

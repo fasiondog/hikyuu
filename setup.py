@@ -20,31 +20,6 @@ def check_xmake():
     return False if xmake != 0 else True
 
 
-def get_boost_envrionment():
-    """ 
-    获取 BOOST 环境变量设置
-        @return (current_boost_root, current_boost_lib)
-    """
-    current_dir = os.getcwd()
-    current_boost_root = ''
-    current_boost_lib = ''
-    if 'BOOST_ROOT' in os.environ:
-        current_boost_root = os.environ['BOOST_ROOT']
-        if 'BOOST_LIB' in os.environ:
-            current_boost_lib = os.environ['BOOST_LIB']
-        else:
-            current_boost_lib = current_boost_root + '/stage/lib'
-            os.environ['BOOST_LIB'] = current_boost_lib
-    else:
-        for dir in os.listdir():
-            if len(dir) >= 5 and dir[:5] == 'boost' and os.path.isdir(dir):
-                current_boost_root = current_dir + '/' + dir
-                current_boost_lib = current_dir + '/' + dir + '/stage/lib'
-                os.environ['BOOST_ROOT'] = current_boost_root
-                os.environ['BOOST_LIB'] = current_boost_lib
-    return (current_boost_root, current_boost_lib)
-
-
 def get_python_version():
     """获取当前 python版本"""
     py_version = platform.python_version_tuple()
@@ -64,14 +39,11 @@ def get_current_compile_info():
         current_arch = 'x86_64' if current_bits == 64 else 'i386'
 
     py_version = get_python_version()
-    current_boost_root, current_boost_lib = get_boost_envrionment()
     current_compile_info = {
         'plat': sys.platform,
         'arch': current_arch,
         'mode': '',
         'py_version': py_version,
-        'boost_root': current_boost_root,
-        'boost_lib': current_boost_lib
     }
     return current_compile_info
 
@@ -87,8 +59,6 @@ def get_history_compile_info():
             'arch': '',
             'mode': '',
             'py_version': 0,
-            'boost_root': '',
-            'boost_lib': ''
         }
     return result
 
@@ -97,43 +67,6 @@ def save_current_compile_info(compile_info):
     """保持当前编译信息"""
     with open('compile_info', 'w') as f:
         json.dump(compile_info, f)
-
-
-def build_boost(mode):
-    """ 编译依赖的 boost 库 """
-    new_mode = 'release' if mode == 'release' else 'debug'
-    current_boost_root, current_boost_lib = get_boost_envrionment()
-    if current_boost_root == '' or current_boost_lib == '':
-        print("Can't get boost environment!")
-        return
-    current_dir = os.getcwd()
-    if sys.platform == 'win32':
-        os.chdir(current_boost_root)
-        if not os.path.exists('b2.exe'):
-            os.system('bootstrap.bat')
-        os.system(
-            'b2 {} link=static runtime-link=shared address-model=64 -j 4 --with-date_time'
-            ' --with-filesystem --with-system --with-test'.format(mode))
-        os.system(
-            'b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
-            ' --with-serialization'.format(mode))
-        #os.system(
-        #    'b2 {} link=shared runtime-link=shared address-model=64 -j 4 --with-python'
-        #    ' --with-date_time --with-filesystem --with-system --with-test'
-        #    ' --with-serialization'.format(mode))
-        os.chdir(current_dir)
-    else:
-        # 新版的 boost 配置 project-cofig.jam 中的 python 版本无效，必须在当前 python 下重新编译 b2
-        cmd = 'cd {boost} ; ./bootstrap.sh; '\
-              './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization; '\
-              './b2 {mode} link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time '\
-              '--with-filesystem --with-system --with-test --with-atomic; '\
-              'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
-        # cmd = 'cd {boost} ; if [ ! -f "b2" ]; then ./bootstrap.sh ; fi; '\
-        #       './b2 {mode} link=shared address-model=64 -j 4 --with-python --with-serialization '\
-        #       '--with-date_time --with-filesystem --with-system --with-test; '\
-        #       'cd {current}'.format(boost=current_boost_root, mode=mode, current=current_dir)
-        os.system(cmd)
 
 
 def clear_with_python_changed(mode):
@@ -166,9 +99,6 @@ def clear_with_python_changed(mode):
         exit(0)
     if os.path.lexists(build_pywrap_dir):
         shutil.rmtree(build_pywrap_dir)
-    current_boost_root, _ = get_boost_envrionment()
-    if os.path.lexists('{}/bin.v2/libs/python'.format(current_boost_root)):
-        shutil.rmtree('{}/bin.v2/libs/python'.format(current_boost_root))
 
 
 #------------------------------------------------------------------------------
@@ -190,21 +120,11 @@ def start_build(verbose=False, mode='release', worker_num=2):
         print("Python version must >= 3.1 !")
         return
 
-    current_boost_root = current_compile_info['boost_root']
-    current_boost_lib = current_compile_info['boost_lib']
-    if current_boost_root == '' or current_boost_lib == '':
-        print("Please configure BOOST")
-        exit(0)
-    print('BOOST_ROOT:', current_boost_root)
-    print('BOOST_LIB:', current_boost_lib)
-
     #如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
     history_compile_info = get_history_compile_info()
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
-        print('\ncompile boost ...')
-        build_boost(mode)
         os.system("xmake f {} -c -y -m {}".format("-v -D" if verbose else "",
                                                   mode))
 
@@ -277,7 +197,7 @@ def test(all, compile, verbose, mode, case, j):
             '' if case == '' else '--test-case={}'.format(case)))
 
 
-def clear_build(with_boost):
+def clear_build():
     """ 清除当前编译设置及结果 """
     if os.path.lexists('.xmake'):
         print('delete .xmake')
@@ -291,26 +211,13 @@ def clear_build(with_boost):
     if os.path.exists('compile_info'):
         print('delete compile_info')
         os.remove('compile_info')
-    for r, _, f_list in os.walk('hikyuu'):
-        for name in f_list:
-            if (name != 'UnRAR.exe' and len(name) > 4 and name[-4:] in ('.dll','.exe','.pyd')) \
-                   or (len(name) > 3 and name[-3:] == '.so')  \
-                   or (len(name) > 8 and name[:9] == 'libboost_')  \
-                   or (len(name) > 6 and name[-6:] == '.dylib'):
-                print('delete', r + '/' + name)
-                os.remove(os.path.join(r, name))
-    if with_boost:
-        _, boost_lib_dir = get_boost_envrionment()
-        if os.path.lexists(boost_lib_dir):
-            shutil.rmtree(boost_lib_dir)
     print('clear finished!')
     os.system("xmake clean")
 
 
 @click.command()
-@click.option("-with_boost", "--with_boost", is_flag=True, help='清除相应的BOOST库')
-def clear(with_boost):
-    clear_build(with_boost)
+def clear():
+    clear_build()
 
 
 @click.command()
@@ -356,7 +263,7 @@ def install():
 def wheel(j):
     """ 生成 python 的 wheel 安装包 """
     # 清理之前遗留的打包产物
-    clear_build(with_boost=True)
+    clear_build()
 
     # 尝试编译
     start_build(False, 'release', j)

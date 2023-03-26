@@ -56,6 +56,10 @@ target("core")
             pydir = path.directory(pydir)
             target:add("includedirs", pydir .. "/include")
             target:add("linkdirs", pydir .. "/libs")
+
+            local out, err = os.iorun("python --version")
+            local ver = (out .. err):trim():match("%d+.%d+"):gsub("%p+", "")
+            target:add("links", "libboost_python"..ver.."-mt")            
             return
         end
 
@@ -107,11 +111,11 @@ target("core")
             os.trycp(target:targetdir() .. '/*.so.*', dst_dir)
         end
 
-        os.cp("$(env BOOST_LIB)/boost_date_time*.dll", dst_dir)
-        os.cp("$(env BOOST_LIB)/boost_filesystem*.dll", dst_dir)
-        os.cp("$(env BOOST_LIB)/boost_python3*.dll", dst_dir)
-        os.cp("$(env BOOST_LIB)/boost_serialization*.dll", dst_dir)
-        os.cp("$(env BOOST_LIB)/boost_system*.dll", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/boost_date_time*.dll", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/boost_filesystem*.dll", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/boost_python3*.dll", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/boost_serialization*.dll", dst_dir)
+        -- os.cp("$(env BOOST_LIB)/boost_system*.dll", dst_dir)
         -- os.cp("$(env BOOST_LIB)/libboost_date_time*.so.*", dst_dir)
         -- os.cp("$(env BOOST_LIB)/libboost_filesystem*.so.*", dst_dir)
         -- os.cp("$(env BOOST_LIB)/libboost_python3*.so.*", dst_dir)

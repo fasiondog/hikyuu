@@ -60,7 +60,15 @@ elseif is_plat("linux", "cross") then
 elseif is_plat("macosx") then
     add_requires("brew::hdf5") 
 end
-add_requires("boost", {system=false, configs = {data_time=true, filesystem=true, serialization=true, system=true, python=true, pyver=39}})
+add_requires("boost", {system=false, 
+    configs = {
+        vs_runtime="MD", 
+        data_time=true, 
+        filesystem=true, 
+        serialization=true, 
+        system=true, 
+        python=true, 
+        pyver=39}})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
@@ -83,6 +91,7 @@ set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 -- modifed to use boost static library, except boost.python, serialization
 --add_defines("BOOST_ALL_DYN_LINK")
 -- add_defines("BOOST_SERIALIZATION_DYN_LINK")
+add_defines("BOOST_PYTHON_STATIC_LIB")
 
 -- is release now
 if is_mode("release") then

@@ -40,7 +40,7 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
-    add_packages("fmt", "spdlog", "doctest", "mysql", "sqlite3")
+    add_packages("boost", "fmt", "spdlog", "doctest", "mysql", "sqlite3")
 
     add_includedirs("..")
 
@@ -64,9 +64,9 @@ target("unit-test")
     add_deps("hikyuu")
 
     if is_plat("linux") or is_plat("macosx") then
-        add_links("boost_unit_test_framework")
-        add_links("boost_filesystem")
-        add_links("boost_serialization")
+        -- add_links("boost_unit_test_framework")
+        -- add_links("boost_filesystem")
+        -- add_links("boost_serialization")
         add_links("sqlite3")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
@@ -86,7 +86,7 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_packages("fmt", "spdlog", "doctest", "mysql", "sqlite3")
+    add_packages("boost", "fmt", "spdlog", "doctest", "mysql", "sqlite3")
     add_includedirs("..")
 
     --add_defines("BOOST_TEST_DYN_LINK")
@@ -111,9 +111,9 @@ target("small-test")
     add_deps("hikyuu")
 
     if is_plat("linux") or is_plat("macosx") then
-        add_links("boost_unit_test_framework")
-        add_links("boost_filesystem")
-        add_links("boost_atomic")
+        -- add_links("boost_unit_test_framework")
+        -- add_links("boost_filesystem")
+        -- add_links("boost_atomic")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 
