@@ -77,7 +77,6 @@ add_requires("boost", {system=false,
         serialization=true, 
         system=true, 
         python=true, 
-        use_system_python=true,
         python_version=get_config("pyver")}})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})

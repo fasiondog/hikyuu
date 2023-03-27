@@ -38,7 +38,6 @@ package("boost")
     end
 
     add_configs("python_version", {description = "python version x.y",  default = "3.10"})
-    add_configs("use_system_python", {description = "use system enviroment python",  default = true})
     local libnames = {"fiber",
                       "coroutine",
                       "context",
@@ -86,8 +85,7 @@ package("boost")
                 linkname = "boost_" .. libname
             end
             if libname == "python" then
-                local pyver = package:config("python_version"):gsub("%p+", "")
-                linkname = linkname .. pyver
+                linkname = linkname .. package:config("python_version")
             end
             if package:config("multi") then
                 linkname = linkname .. "-mt"
@@ -124,8 +122,8 @@ package("boost")
         if package:is_plat("windows") then
             package:add("defines", "BOOST_ALL_NO_LIB")
         end
-        if not package:config("use_system_python") and package:config("python") then
-            package:add("deps", "python 3.10.x")
+        if package:config("python") then
+           package:add("deps", "python " .. package:config("python_version") .. ".x")
         end
     end)
 
