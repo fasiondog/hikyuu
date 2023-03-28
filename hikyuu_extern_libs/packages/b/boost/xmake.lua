@@ -38,6 +38,7 @@ package("boost")
     end
 
     add_configs("python_version", {description = "python version x.y",  default = "3.10"})
+    add_configs("use_system_python", {description = "Use current environment python, will ignore option pyver! (Invalid on cross)",  default = false, type = "boolean"})
     local libnames = {"fiber",
                       "coroutine",
                       "context",
@@ -77,6 +78,11 @@ package("boost")
     end
 
     on_load(function (package)
+        function get_system_python_versin()
+            import("lib.detect.find_tool")
+            local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            return python.version:match("%d+.%d+")
+        end
         function get_linkname(package, libname)
             local linkname
             if package:is_plat("windows") then
@@ -85,7 +91,11 @@ package("boost")
                 linkname = "boost_" .. libname
             end
             if libname == "python" then
-                linkname = linkname .. package:config("python_version")
+                if (not package:is_cross()) and package:config("use_system_pythone") then
+                    linkname = linkname .. get_system_python_versin()
+                else
+                    linkname = linkname .. package:config("python_version")
+                end
             end
             if package:config("multi") then
                 linkname = linkname .. "-mt"
@@ -122,8 +132,19 @@ package("boost")
         if package:is_plat("windows") then
             package:add("defines", "BOOST_ALL_NO_LIB")
         end
-        if not package:is_plat("linux") and package:config("python") then
-           package:add("deps", "python " .. package:config("python_version") .. ".x")
+
+        -- linux 下当前环境如果安装了 anaconda，这里依赖 python 会导致被连接到 anaconda 的 libstdc++
+        -- 造成单元测试链接失败（包括 xmake 的 on_test 失败），强制在当前环境下不依赖 python，由程序自己链接
+        if package:config("python") then
+            if package:is_cross() then
+                package:add("deps", "python " .. package:config("python_version") .. ".x")
+            elseif (not package:config("use_system_python")) then
+                local sys_pyver = get_system_python_versin()
+                local pyver = package:config("python_version")
+                if sys_pyver ~= pyver then
+                    package:add("deps", "python " .. package:config("python_version") .. ".x")
+                end
+            end
         end
     end)
 

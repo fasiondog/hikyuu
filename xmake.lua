@@ -39,6 +39,7 @@ end
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
 
+local boost_version = "1.81.0"
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*"))then
@@ -61,23 +62,19 @@ elseif is_plat("macosx") then
     add_requires("brew::hdf5") 
 end
 
-option("pyver")
-    set_default("3.10")
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Use python version xy")
-option_end()
 
-add_requires("boost", {system=false, 
+add_requires("boost " .. boost_version, {system=false, 
     configs = {
-        shared=true,
+        shared=is_plat("windows") and true or false,
         vs_runtime="MD", 
         data_time=true, 
         filesystem=true, 
         serialization=true, 
         system=true, 
         python=true, 
-        python_version=get_config("pyver")}})
+        python_version = get_config("pyver"),
+        use_system_python = get_config("use_system_python"),
+    }})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
@@ -94,13 +91,10 @@ add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
--- add_includedirs("$(env BOOST_ROOT)")
--- add_linkdirs("$(env BOOST_LIB)")
-
 -- modifed to use boost static library, except boost.python, serialization
-add_defines("BOOST_ALL_DYN_LINK")
--- add_defines("BOOST_SERIALIZATION_DYN_LINK")
--- add_defines("BOOST_PYTHON_STATIC_LIB")
+if is_plat("windows") then
+    add_defines("BOOST_ALL_DYN_LINK")
+end
 
 -- is release now
 if is_mode("release") then

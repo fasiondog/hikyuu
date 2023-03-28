@@ -40,10 +40,6 @@ target("hikyuu")
     
     if is_plat("linux", "cross") then
         add_packages("hdf5", "mysql")
-        -- add_links("boost_date_time")
-        -- add_links("boost_filesystem")
-        -- add_links("boost_serialization")
-        -- add_links("boost_system")
     end
     
     if is_plat("macosx") then
@@ -63,10 +59,6 @@ target("hikyuu")
         end
         add_links("mysqlclient")
         add_links("sqlite3")
-        add_links("boost_date_time")
-        add_links("boost_filesystem")
-        add_links("boost_serialization")
-        add_links("boost_system")
     end
 
     -- add files
@@ -87,10 +79,6 @@ target("hikyuu")
     end)
 
     after_build(function(target)
-        -- if is_plat("linux") then
-        --     os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        -- end
-
         -- 不同平台的库后缀名
         local lib_suffix = ".so"
         if is_plat("windows") then 
