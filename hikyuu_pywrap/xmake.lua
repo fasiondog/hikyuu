@@ -39,7 +39,7 @@ target("core")
         import("lib.detect.find_tool")
         local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
         assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
-        local pyver = python.version:match("%d+.%d+"):gsub("%p+", "")
+        local pyver = python.version:match("%d+.%d+")
         if pyver == get_config("pyver") or is_plat("cross") then
             if is_plat("windows") then
                 -- find python include and libs directory
@@ -48,27 +48,21 @@ target("core")
                 pydir = path.directory(pydir)
                 target:add("includedirs", pydir .. "/include")
                 target:add("linkdirs", pydir .. "/libs")
-                target:add("links", "boost_python"..pyver.."-mt")            
+                target:add("links", "boost_python"..pyvergsub("%p+", "").."-mt")            
                 return
             else
                 if is_plat("macosx") then
                     local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
                     target:add("linkdirs", libdir)
-                    local out, err = os.iorun("python3 --version")
-                    local ver = (out .. err):trim():match("%d+.%d+")
-                    local python_lib = format("python%sm", ver)
-                    local pyver = tonumber(ver)
-                    if pyver >= 3.8 then
-                        python_lib = format("python%s", ver)
-                    end
-                    target:add("links", python_lib)
+                    target:add("links", "python" .. pyver)
                 end
 
                 -- get python include directory.
                 local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
                 assert(pydir, "python3-config not found!")
+                print(pydir)
                 target:add("cxflags", pydir)
-                target:add("links", "boost_python"..pyver.."-mt")
+                target:add("links", "boost_python"..pyver:gsub("%p+", "").."-mt")
             end
         end
     end)

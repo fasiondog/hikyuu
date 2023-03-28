@@ -122,7 +122,7 @@ package("boost")
         if package:is_plat("windows") then
             package:add("defines", "BOOST_ALL_NO_LIB")
         end
-        if package:config("python") then
+        if not package:is_plat("linux") and package:config("python") then
            package:add("deps", "python " .. package:config("python_version") .. ".x")
         end
     end)
