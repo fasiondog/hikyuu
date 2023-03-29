@@ -47,6 +47,7 @@ target("hikyuu")
         add_links("iconv")
         add_includedirs("/usr/local/opt/hdf5/include")
         add_linkdirs("/usr/local/opt/hdf5/lib")
+        add_links("hdf5", "hdf5_cpp")
         if os.exists("/usr/local/opt/mysql-client") then
             add_includedirs("/usr/local/opt/mysql-client/include")
             add_linkdirs("/usr/local/opt/mysql-client/lib")

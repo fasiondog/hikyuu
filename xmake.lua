@@ -59,7 +59,7 @@ elseif is_plat("linux", "cross") then
     add_requires("hdf5 " .. hdf5_version, {system = false})
     add_requires("mysql " .. mysql_version, {system = false})
 elseif is_plat("macosx") then
-    add_requires("brew::hdf5") 
+    add_requires("brew::hdf5")
 end
 
 
