@@ -207,7 +207,8 @@ package("boost")
         end
         if package:is_arch("aarch64", "arm+.*") then
             table.insert(argv, "architecture=arm")
-        elseif package:is_arch(".+64.*") then
+        end
+        if package:is_arch(".+64.*") then
             table.insert(argv, "address-model=64")
         else
             table.insert(argv, "address-model=32")
