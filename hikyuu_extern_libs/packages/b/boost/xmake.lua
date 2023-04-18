@@ -91,12 +91,12 @@ package("boost")
                 linkname = "boost_" .. libname
             end
             if libname == "python" then
-                if (not package:is_cross()) and package:config("use_system_pythone") then
-                    linkname = linkname .. get_system_python_versin()
+                if package:is_cross() or (not package:config("use_system_python")) then
+                    linkname = linkname .. package:config("python_version"):gsub("%p+", "")
                 else
-                    linkname = linkname .. package:config("python_version")
+                    linkname = linkname .. get_system_python_versin():gsub("%p+", "")
                 end
-            end
+            end            
             if package:config("multi") then
                 linkname = linkname .. "-mt"
             end
@@ -125,6 +125,9 @@ package("boost")
                     package:add("links", get_linkname(package, lib))
                 end
             else
+                print("*************************")
+                print(get_linkname(package, libname))
+                print("*************************")
                 package:add("links", get_linkname(package, libname))
             end
         end
@@ -136,15 +139,25 @@ package("boost")
         -- linux 下当前环境如果安装了 anaconda，这里依赖 python 会导致被连接到 anaconda 的 libstdc++
         -- 造成单元测试链接失败（包括 xmake 的 on_test 失败），强制在当前环境下不依赖 python，由程序自己链接
         if package:config("python") then
-            if package:is_cross() then
-                package:add("deps", "python " .. package:config("python_version") .. ".x")
-            elseif (not package:config("use_system_python")) then
-                local sys_pyver = get_system_python_versin()
-                local pyver = package:config("python_version")
-                if sys_pyver ~= pyver then
-                    package:add("deps", "python " .. package:config("python_version") .. ".x")
-                end
+            if not package:config("shared") then
+                print(package:config("shared"))
+                package:add("defines", "BOOST_PYTHON_STATIC_LIB")
             end
+            if package:is_cross() or (not package:config("use_system_python")) then
+                package:add("deps", "python " .. package:config("python_version") .. ".x")
+            else
+                package:add("deps", "python " .. get_system_python_versin() .. ".x")
+            end
+
+            -- if package:is_cross() then
+            --     package:add("deps", "python " .. package:config("python_version") .. ".x")
+            -- elseif (not package:config("use_system_python")) then
+            --     local sys_pyver = get_system_python_versin()
+            --     local pyver = package:config("python_version")
+            --     if sys_pyver ~= pyver then
+            --         package:add("deps", "python " .. package:config("python_version") .. ".x")
+            --     end
+            -- end
         end
     end)
 

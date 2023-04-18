@@ -44,35 +44,35 @@ target("core")
 
     add_rpathdirs("$ORIGIN", "$ORIGIN/lib", "$ORIGIN/../lib")
 
-    on_load(function(target)
-        -- detect installed python3
-        import("lib.detect.find_tool")
-        local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
-        assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
-        local pyver = python.version:match("%d+.%d+")
-        if (get_config("use_system_python") or pyver == get_config("pyver")) and not is_plat("cross") then
-            if is_plat("windows") then
-                local pydir = os.iorun(python.program .. " -c \"import sys; print(sys.executable)\"")
-                pydir = path.directory(pydir)
-                target:add("includedirs", pydir .. "/include")
-                target:add("linkdirs", pydir .. "/libs")
-                target:add("links", "boost_python"..pyvergsub("%p+", "").."-mt")            
-                return
-            else
-                if is_plat("macosx") then
-                    local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
-                    target:add("linkdirs", libdir)
-                    target:add("links", "python" .. pyver)
-                end
+    -- on_load(function(target)
+    --     -- detect installed python3
+    --     import("lib.detect.find_tool")
+    --     local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+    --     assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
+    --     local pyver = python.version:match("%d+.%d+")
+    --     if (get_config("use_system_python") or pyver == get_config("pyver")) and not is_plat("cross") then
+    --         if is_plat("windows") then
+    --             local pydir = os.iorun(python.program .. " -c \"import sys; print(sys.executable)\"")
+    --             pydir = path.directory(pydir)
+    --             target:add("includedirs", pydir .. "/include")
+    --             target:add("linkdirs", pydir .. "/libs")
+    --             target:add("links", "boost_python"..pyvergsub("%p+", "").."-mt")            
+    --             return
+    --         else
+    --             if is_plat("macosx") then
+    --                 local libdir = os.iorun("python3-config --prefix"):trim() .. "/lib"
+    --                 target:add("linkdirs", libdir)
+    --                 target:add("links", "python" .. pyver)
+    --             end
 
-                -- get python include directory.
-                local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
-                assert(pydir, "python3-config not found!")
-                target:add("cxflags", pydir)
-                target:add("links", "boost_python"..pyver:gsub("%p+", "").."-mt")
-            end
-        end
-    end)
+    --             -- get python include directory.
+    --             local pydir = try { function () return os.iorun("python3-config --includes"):trim() end }
+    --             assert(pydir, "python3-config not found!")
+    --             target:add("cxflags", pydir)
+    --             target:add("links", "boost_python"..pyver:gsub("%p+", "").."-mt")
+    --         end
+    --     end
+    -- end)
 
     after_build(function(target)
         if is_plat("macosx") then
