@@ -10,6 +10,7 @@ package("boost")
     add_urls("https://github.com/xmake-mirror/boost/releases/download/boost-$(version).tar.bz2", {version = function (version)
             return version .. "/boost_" .. (version:gsub("%.", "_"))
         end})
+    add_versions("1.82.0", "a6e1ab9b0860e6a2881dd7b21fe9f737a095e5f33a3a874afc6a345228597ee6")
     add_versions("1.81.0", "71feeed900fbccca04a3b4f2f84a7c217186f28a940ed8b7ed4725986baf99fa")
     add_versions("1.80.0", "1e19565d82e43bc59209a168f5ac899d3ba471d55c7610c677d4ccf2c9c500c0")
     add_versions("1.79.0", "475d589d51a7f8b3ba2ba4eda022b170e562ca3b760ee922c146b6c65856ef39")
@@ -37,7 +38,7 @@ package("boost")
         add_syslinks("pthread", "dl")
     end
 
-    add_configs("python_version", {description = "python version x.y",  default = "3.10"})
+    add_configs("pyver", {description = "python version x.y",  default = "3.10"})
     add_configs("use_system_python", {description = "Use current environment python, will ignore option pyver! (Invalid on cross)",  default = false, type = "boolean"})
     local libnames = {"fiber",
                       "coroutine",
@@ -78,10 +79,14 @@ package("boost")
     end
 
     on_load(function (package)
-        function get_system_python_versin()
-            import("lib.detect.find_tool")
-            local python = assert(find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
-            return python.version:match("%d+.%d+")
+        function get_python_version(package)
+            -- python version: x.y
+            local pyver = package:config("pyver")
+            if pyver == "" or pyver == nil then
+                local python = assert(package:find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+                pyver = python.version:match("%d+.%d+")
+            end
+            return pyver
         end
         function get_linkname(package, libname)
             local linkname
@@ -91,11 +96,7 @@ package("boost")
                 linkname = "boost_" .. libname
             end
             if libname == "python" then
-                if package:is_cross() or (not package:config("use_system_python")) then
-                    linkname = linkname .. package:config("python_version"):gsub("%p+", "")
-                else
-                    linkname = linkname .. get_system_python_versin():gsub("%p+", "")
-                end
+                linkname = linkname .. get_python_version(package):gsub("%p+", "")
             end            
             if package:config("multi") then
                 linkname = linkname .. "-mt"
@@ -125,9 +126,6 @@ package("boost")
                     package:add("links", get_linkname(package, lib))
                 end
             else
-                print("*************************")
-                print(get_linkname(package, libname))
-                print("*************************")
                 package:add("links", get_linkname(package, libname))
             end
         end
@@ -136,28 +134,15 @@ package("boost")
             package:add("defines", "BOOST_ALL_NO_LIB")
         end
 
-        -- linux 下当前环境如果安装了 anaconda，这里依赖 python 会导致被连接到 anaconda 的 libstdc++
-        -- 造成单元测试链接失败（包括 xmake 的 on_test 失败），强制在当前环境下不依赖 python，由程序自己链接
         if package:config("python") then
             if not package:config("shared") then
                 print(package:config("shared"))
                 package:add("defines", "BOOST_PYTHON_STATIC_LIB")
             end
-            if package:is_cross() or (not package:config("use_system_python")) then
-                package:add("deps", "python " .. package:config("python_version") .. ".x")
-            else
-                package:add("deps", "python " .. get_system_python_versin() .. ".x")
-            end
-
-            -- if package:is_cross() then
-            --     package:add("deps", "python " .. package:config("python_version") .. ".x")
-            -- elseif (not package:config("use_system_python")) then
-            --     local sys_pyver = get_system_python_versin()
-            --     local pyver = package:config("python_version")
-            --     if sys_pyver ~= pyver then
-            --         package:add("deps", "python " .. package:config("python_version") .. ".x")
-            --     end
-            -- end
+            -- 不添加对 python 的依赖，否则会链接 libpythonx.y.so，导致在 anaconda 下报 not found 错误
+            -- 也暂时无法只添加 python 的头文件，package:add("includedirs") 会将 package 的  installdir
+            -- 加在路径前，导致编译失败
+            -- 需自行在项目中添加 python 的头文件路径
         end
     end)
 

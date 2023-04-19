@@ -39,7 +39,7 @@ end
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
 
-local boost_version = "1.81.0"
+local boost_version = "1.82.0"
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*"))then
@@ -71,8 +71,7 @@ add_requires("boost " .. boost_version, {system=false,
         serialization=true, 
         system=true, 
         python=true, 
-        python_version = get_config("pyver"),
-        use_system_python = get_config("use_system_python"),
+        pyver = get_config("pyver"),
     }})
 
 add_requireconfs("boost.python", {override = true, configs = {shared = true}})
