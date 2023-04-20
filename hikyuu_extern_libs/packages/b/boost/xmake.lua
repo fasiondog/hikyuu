@@ -38,8 +38,7 @@ package("boost")
         add_syslinks("pthread", "dl")
     end
 
-    add_configs("pyver", {description = "python version x.y",  default = "3.10"})
-    add_configs("use_system_python", {description = "Use current environment python, will ignore option pyver! (Invalid on cross)",  default = false, type = "boolean"})
+    add_configs("pyver", {description = "python version x.y, etc. 3.10",  default = ""})
     local libnames = {"fiber",
                       "coroutine",
                       "context",
@@ -80,10 +79,13 @@ package("boost")
 
     on_load(function (package)
         function get_python_version(package)
-            -- python version: x.y
             local pyver = package:config("pyver")
-            if pyver == "" or pyver == nil then
-                local python = assert(package:find_tool("python3", {version = true}), "python not found, please install it first! note: python version must > 3.0")
+            if pyver == "" then
+                local python = package:find_tool("python3", {version = true})
+                if not python then
+                    python = package:find_tool("python", {version = true})
+                end
+                assert(python, "Python not found, please install it first, or set config 'pyver'!")
                 pyver = python.version:match("%d+.%d+")
             end
             return pyver
@@ -126,6 +128,7 @@ package("boost")
                     package:add("links", get_linkname(package, lib))
                 end
             else
+                print(get_linkname(package, libname))
                 package:add("links", get_linkname(package, libname))
             end
         end
@@ -139,10 +142,7 @@ package("boost")
                 print(package:config("shared"))
                 package:add("defines", "BOOST_PYTHON_STATIC_LIB")
             end
-            -- 不添加对 python 的依赖，否则会链接 libpythonx.y.so，导致在 anaconda 下报 not found 错误
-            -- 也暂时无法只添加 python 的头文件，package:add("includedirs") 会将 package 的  installdir
-            -- 加在路径前，导致编译失败
-            -- 需自行在项目中添加 python 的头文件路径
+            package:add("deps", "python " .. get_python_version(package) .. ".x", {configs = {headeronly=true}})
         end
     end)
 
@@ -168,9 +168,9 @@ package("boost")
             "--libdir=" .. package:installdir("lib"),
             "--without-icu"
         }
-        if package:config("python") then
-            table.insert(bootstrap_argv, "--with-python=python3")
-        end
+        -- if package:config("python") then
+        --     table.insert(bootstrap_argv, "--with-python=python3")
+        -- end
         if package:is_plat("windows") then
             import("core.tool.toolchain")
             local runenvs = toolchain.load("msvc"):runenvs()

@@ -74,7 +74,6 @@ add_requires("boost " .. boost_version, {system=false,
         pyver = get_config("pyver"),
     }})
 
-add_requireconfs("boost.python", {override = true, configs = {shared = true}})
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
@@ -92,10 +91,9 @@ set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
 -- modifed to use boost static library, except boost.python, serialization
--- if is_plat("windows") then
---     add_defines("BOOST_ALL_DYN_LINK")
--- end
-add_defines("BOOST_ALL_DYN_LINK")
+if is_plat("windows") then
+    add_defines("BOOST_ALL_DYN_LINK")
+end
 
 -- is release now
 if is_mode("release") then
