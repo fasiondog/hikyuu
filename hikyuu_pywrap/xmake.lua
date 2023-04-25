@@ -1,5 +1,5 @@
 option("pyver")
-    set_default("")
+    set_default("3.9")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Use python version xy")

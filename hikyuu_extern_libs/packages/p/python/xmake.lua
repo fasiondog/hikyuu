@@ -24,10 +24,10 @@ package("python")
             add_versions("3.9.10", "4cee67e2a529fe363e34f0da57f8e5c3fc036913dc838b17389b2319ead0927e")
             add_versions("3.9.13", "6774fdd872fc55b028becc81b7d79bdcb96c5e0eb1483cfcd38224b921c94d7d")
             add_versions("3.10.6", "8cbc234939a679687da44c3bbc6d6ce375ea4b84c4fa8dbc1bf5befc43254b58")
+            add_versions("3.11.0", "c8faf060580012764f7708d26772f8543b1293dbd71a8addc28425be19a5bfd0")
         end
     else
-        set_urls("https://www.python.org/ftp/python/$(version)/Python-$(version).tgz",
-                 "https://github.com/xmake-mirror/cpython/releases/download/v$(version)/Python-$(version).tgz")
+        add_urls("https://www.python.org/ftp/python/$(version)/Python-$(version).tgz")
         add_versions("2.7.18", "da3080e3b488f648a3d7a4560ddee895284c3380b11d6de75edb986526b9a814")
         add_versions("3.7.9", "39b018bc7d8a165e59aa827d9ae45c45901739b0bbb13721e4f973f3521c166a")
         add_versions("3.8.10", "b37ac74d2cbad2590e7cd0dd2b3826c29afe89a734090a87bf8c03c45066cb65")
@@ -88,7 +88,7 @@ package("python")
         package:addenv("PATH", "Scripts")
 
         if package:config("headeronly") then
-            package:add("links", "")
+            package:set("links", "")
         end
     end)
 

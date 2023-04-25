@@ -67,14 +67,12 @@ function _find_library(package, opt)
     if libpath and includepath then
         local result = {
             version = version,
-            -- links = libpath.link,
-            -- linkdirs = libpath.linkdir,
             includedirs = includepath
         }
         if not package:config("headeronly") then
             result.links = libpath.link
             result.linkdirs = libpath.linkdir
-        end
+        end        
         return result
     end
 end
