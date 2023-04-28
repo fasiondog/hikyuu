@@ -39,7 +39,7 @@ end
 -- set language: C99, c++ standard
 set_languages("cxx17", "c99")
 
-local boost_version = "1.82.0"
+local boost_version = "1.81.0"
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*"))then
