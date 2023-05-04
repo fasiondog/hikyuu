@@ -25,8 +25,9 @@ def get_python_version():
     py_version = platform.python_version_tuple()
     min_version = int(py_version[1])
     main_version = int(py_version[0])
-    py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
-    print('current python version: {}.{}'.format(main_version, min_version))
+    #py_version = main_version * 10 + min_version if min_version < 10 else main_version * 100 + min_version
+    py_version = f"{main_version}.{min_version}"
+    print(f'current python version: {py_version}')
     return py_version
 
 
@@ -116,17 +117,16 @@ def start_build(verbose=False, mode='release', worker_num=2):
     current_compile_info['mode'] = mode
 
     py_version = current_compile_info['py_version']
-    if py_version != 0 and py_version < 31:
-        print("Python version must >= 3.1 !")
-        return
 
     #如果 python版本或者编译模式发生变化，则编译依赖的 boost 库（boost.python)
     history_compile_info = get_history_compile_info()
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
-        os.system("xmake f {} -c -y -m {}".format("-v -D" if verbose else "",
-                                                  mode))
+        cmd = "xmake f {} -c -y -m {} --pyver={}".format(
+            "-v -D" if verbose else "", mode, py_version)
+        print(cmd)
+        os.system(cmd)
 
     os.system("xmake -j {} -b {} hikyuu".format(worker_num,
                                                 "-v -D" if verbose else ""))
@@ -228,8 +228,8 @@ def uninstall():
     else:
         usr_dir = os.path.expanduser('~')
         py_version = get_python_version()
-        site_lib_dir = '{}/.local/lib/python{:>.1f}/site-packages'.format(
-            usr_dir, py_version * 0.1)
+        site_lib_dir = '{}/.local/lib/python{}/site-packages'.format(
+            usr_dir, py_version)
     for dir in os.listdir(site_lib_dir):
         if dir == 'hikyuu' or (len(dir) > 6 and dir[:6] == 'Hikyuu'):
             print('delete', site_lib_dir + '/' + dir)
@@ -247,9 +247,8 @@ def install():
         install_dir = sys.base_prefix + "\\Lib\\site-packages\\hikyuu"
     else:
         usr_dir = os.path.expanduser('~')
-        install_dir = '{}/.local/lib/python{:>.1f}/site-packages/hikyuu'.format(
-            usr_dir,
-            get_python_version() * 0.1)
+        install_dir = '{}/.local/lib/python{}/site-packages/hikyuu'.format(
+            usr_dir, get_python_version())
         try:
             shutil.rmtree(install_dir)
         except:
@@ -289,14 +288,15 @@ def wheel(j):
         return
 
     py_version = get_python_version()
+    main_ver, min_ver = py_version.split()
     if current_plat == 'win32':
-        cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
-            py_version, plat)
+        cmd = 'python sub_setup.py bdist_wheel --python-tag cp{} -p {}{}'.format(
+            main_ver, min_ver, plat)
         print(cmd)
         os.system(cmd)
     else:
-        cmd = 'python3 sub_setup.py bdist_wheel --python-tag cp{} -p {}'.format(
-            py_version, plat)
+        cmd = 'python3 sub_setup.py bdist_wheel --python-tag cp{} -p {}{}'.format(
+            main_ver, min_ver, plat)
         print(cmd)
         os.system(cmd)
 
