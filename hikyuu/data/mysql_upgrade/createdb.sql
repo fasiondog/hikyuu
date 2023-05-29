@@ -12,8 +12,8 @@ CREATE TABLE `hku_base`.`market` (
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ;
-INSERT INTO `hku_base`.`market` (marketid,market,name,description,code,lastDate) VALUES (1,'SH','上海证劵交易所','上海市场','000001',19901219);
-INSERT INTO `hku_base`.`market` (marketid,market,name,description,code,lastDate) VALUES (2,'SZ','深圳证劵交易所','深圳市场','399001',19901219);
+INSERT INTO `hku_base`.`market` (marketid,market,name,description,code,lastDate) VALUES (1,'SH','上海证券交易所','上海市场','000001',19901219);
+INSERT INTO `hku_base`.`market` (marketid,market,name,description,code,lastDate) VALUES (2,'SZ','深圳证券交易所','深圳市场','399001',19901219);
 
 
 CREATE TABLE `hku_base`.`stkweight` (
