@@ -99,7 +99,7 @@ private:
 
 /**
  * 输出市场信息，如：
- * MarketInfo(SH, 上海证劵交易所, 上海市场, 000001, 2011-Dec-06 00:00:00)
+ * MarketInfo(SH, 上海证券交易所, 上海市场, 000001, 2011-Dec-06 00:00:00)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator<<(std::ostream&, const MarketInfo&);
