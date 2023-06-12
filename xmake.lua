@@ -37,11 +37,12 @@ else
 end
 
 -- set language: C99, c++ standard
-set_languages("cxx17", "C99")
+set_languages("cxx17", "c99")
 
+local boost_version = "1.81.0"
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
-if is_plat("windows") then
+if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*"))then
     mysql_version = "8.0.21"
 end
 
@@ -54,18 +55,31 @@ if is_plat("windows") then
         add_requires("hdf5_D " .. hdf5_version)
     end
     add_requires("mysql " .. mysql_version)
-elseif is_plat("linux") then
+elseif is_plat("linux", "cross") then
     add_requires("hdf5 " .. hdf5_version, {system = false})
     add_requires("mysql " .. mysql_version, {system = false})
 elseif is_plat("macosx") then
-    add_requires("brew::hdf5") 
+    add_requires("brew::hdf5")
 end
+
+add_requires("boost " .. boost_version, {system=false, 
+    configs = {
+        shared=is_plat("windows") and true or false,
+        vs_runtime="MD", 
+        data_time=true, 
+        filesystem=true, 
+        serialization=true, 
+        system=true, 
+        python=true, 
+        pyver = get_config("pyver"),
+    }})
+
 
 -- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
 add_requires("spdlog", {system=false, configs = {header_only = true, fmt_external=true, vs_runtime = "MD"}})
 add_requireconfs("spdlog.fmt", {override = true, version = "8.1.1", configs = {header_only = true}})
 add_requires("sqlite3", {system=false, configs = {shared=true, vs_runtime="MD", cxflags="-fPIC"}})
-add_requires("flatbuffers", {system=false, configs = {vs_runtime="MD"}})
+add_requires("flatbuffers 2.0.0", {system=false, configs = {vs_runtime="MD"}})
 add_requires("nng", {system=false, configs = {vs_runtime="MD", cxflags="-fPIC"}})
 add_requires("nlohmann_json", {system=false})
 add_requires("cpp-httplib", {system=false})
@@ -76,12 +90,10 @@ add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER")  -- 禁用 spdlog 默认 logger
 set_objectdir("$(buildir)/$(mode)/$(plat)/$(arch)/.objs")
 set_targetdir("$(buildir)/$(mode)/$(plat)/$(arch)/lib")
 
-add_includedirs("$(env BOOST_ROOT)")
-add_linkdirs("$(env BOOST_LIB)")
-
 -- modifed to use boost static library, except boost.python, serialization
---add_defines("BOOST_ALL_DYN_LINK")
-add_defines("BOOST_SERIALIZATION_DYN_LINK")
+if is_plat("windows") then
+    add_defines("BOOST_ALL_DYN_LINK")
+end
 
 -- is release now
 if is_mode("release") then

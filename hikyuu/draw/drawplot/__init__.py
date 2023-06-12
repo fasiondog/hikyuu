@@ -57,7 +57,6 @@ from .bokeh_draw import ax_draw_macd as bk_ax_draw_macd
 from .bokeh_draw import ax_draw_macd2 as bk_ax_draw_macd2
 from .bokeh_draw import sgplot as bk_sgplot
 
-
 g_draw_engine = 'matplotlib'
 
 
@@ -249,6 +248,13 @@ def ax_set_locator_formatter(axes, dates, typ):
 use_draw_engine('matplotlib')
 
 __all__ = [
-    'use_draw_engine', 'get_current_draw_engine', 'create_figure', 'gcf', 'show_gcf', 'gca',
-    'ax_draw_macd', 'ax_draw_macd2'
+    'use_draw_engine',
+    'get_current_draw_engine',
+    'create_figure',
+    'gcf',
+    'show_gcf',
+    'gca',
+    'ax_draw_macd',
+    'ax_draw_macd2',
+    'use_bokeh_in_notebook',
 ]

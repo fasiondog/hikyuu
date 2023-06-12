@@ -145,6 +145,7 @@ def get_table(connect, market, code, ktype):
         '15min': 'min15',
         '30min': 'min30',
         '60min': 'min60',
+        'hour2': 'hour2',
         'min1': 'min',
         'min5': 'min5',
         'min15': 'min15',

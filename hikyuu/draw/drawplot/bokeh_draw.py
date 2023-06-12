@@ -7,7 +7,7 @@
 from hikyuu import *
 from .common import get_draw_title
 
-from bokeh.plotting import Figure, figure, ColumnDataSource
+from bokeh.plotting import figure, ColumnDataSource
 from bokeh.models import DatetimeTickFormatter, HoverTool, Title, Label
 from bokeh.layouts import column
 from bokeh.io import output_notebook, output_file, show
@@ -30,10 +30,6 @@ def ax_set_ylim(self, *args, **kwargs):
 def ax_fill_between(self, *args, **kwargs):
     pass
 
-
-Figure.set_xlim = ax_set_xlim
-Figure.set_ylim = ax_set_ylim
-Figure.fill_between = ax_fill_between
 
 g_use_in_notbook = False
 g_figure = None
@@ -212,8 +208,8 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     )
 
     label = Label(
-        x=axes.plot_width * 0.01,
-        y=axes.plot_height * 0.82,
+        x=axes.width * 0.01,
+        y=axes.height * 0.82,
         x_units='screen',
         y_units='screen',
         text=text,

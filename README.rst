@@ -76,3 +76,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 - **安全、自由、隐私，搭建自己的专属云量化平台** 结合 Python + Jupyter 的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如 numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。
  
 - **数据存储方式可扩展** 目前支持本地HDF5格式、MySQL存储。默认使用HDF5，数据文件体积小、速度更快、备份更便利。截止至2017年4月21日，沪市日线数据文件149M、深市日线数据文件184M、5分钟线数据各不到2G。
+
+.. image:: https://api.star-history.com/svg?repos=fasiondog/hikyuu&type=Date
+    :target: https://star-history.com/#fasiondog/hikyuu&Date
+    :alt: Star History Chart

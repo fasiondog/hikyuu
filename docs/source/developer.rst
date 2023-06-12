@@ -71,11 +71,13 @@ Linux、macOSX 执行以下指令安装：
 5、Linux下安装依赖软件包
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Linux下需安装依赖的开发软件包：hdf-dev、mysqlclient。如 Ubuntu 下，执行以下命令：
+Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令：
 
 .. code-block:: shell
     
-    sudo apt-get install -y libhdf5-dev libhdf5-serial-dev libmysqlclient-dev    
+    sudo apt-get install -y libsqlite3-dev   
+
+MacOsx 下需要使用 brew 安装 sqlite3, hdf5, mysqlclient 的开发包（具体包名请自行查询）。 
 
 6、转 Visual Studio 工程
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

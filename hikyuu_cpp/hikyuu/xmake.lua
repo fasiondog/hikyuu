@@ -5,8 +5,8 @@ target("hikyuu")
         set_kind("shared")
     end
     
-    add_packages("fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
-    if is_plat("windows", "linux") then 
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
+    if is_plat("windows", "linux", "cross") then 
         add_packages("sqlite3")
     end
 
@@ -38,12 +38,8 @@ target("hikyuu")
         add_packages("mysql")
     end
     
-    if is_plat("linux") then
+    if is_plat("linux", "cross") then
         add_packages("hdf5", "mysql")
-        add_links("boost_date_time")
-        add_links("boost_filesystem")
-        add_links("boost_serialization")
-        add_links("boost_system")
     end
     
     if is_plat("macosx") then
@@ -51,6 +47,7 @@ target("hikyuu")
         add_links("iconv")
         add_includedirs("/usr/local/opt/hdf5/include")
         add_linkdirs("/usr/local/opt/hdf5/lib")
+        add_links("hdf5", "hdf5_cpp")
         if os.exists("/usr/local/opt/mysql-client") then
             add_includedirs("/usr/local/opt/mysql-client/include")
             add_linkdirs("/usr/local/opt/mysql-client/lib")
@@ -63,29 +60,12 @@ target("hikyuu")
         end
         add_links("mysqlclient")
         add_links("sqlite3")
-        add_links("boost_date_time")
-        add_links("boost_filesystem")
-        add_links("boost_serialization")
-        add_links("boost_system")
     end
 
-    if is_plat("windows") then 
-        -- nng 静态链接需要的系统库
-        add_syslinks("ws2_32", "advapi32")
-    end
-   
     -- add files
     add_files("./**.cpp")
     
     add_headerfiles("../(hikyuu/**.h)|**doc.h")
-
-    on_load(function(target)
-        assert(os.getenv("BOOST_ROOT"), [[Missing environment variable: BOOST_ROOT
-You need to specify where the boost headers is via the BOOST_ROOT variable!]])
-
-        assert(os.getenv("BOOST_LIB"), [[Missing environment variable: BOOST_LIB
-You need to specify where the boost library is via the BOOST_LIB variable!]])
-    end)
 
     before_build(function(target)
         if is_plat("macosx") then
@@ -100,10 +80,6 @@ You need to specify where the boost library is via the BOOST_LIB variable!]])
     end)
 
     after_build(function(target)
-        if is_plat("linux") then
-            os.cp("$(env BOOST_LIB)/libboost_*.so.*", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")
-        end
-
         -- 不同平台的库后缀名
         local lib_suffix = ".so"
         if is_plat("windows") then 
