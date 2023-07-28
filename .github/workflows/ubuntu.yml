@@ -15,23 +15,11 @@ jobs:
     - name: checkout
       run: | 
         git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-    - name: build_boost
-      run: | 
-        cd ./hikyuu
-        wget https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.bz2
-        tar -jxf boost_1_75_0.tar.bz2
-        cd boost_1_75_0
-        ls
-        ./bootstrap.sh --with-python=python3
-        ./b2 release link=shared address-model=64 -j 4 --with-python --with-serialization; 
-        ./b2 release link=static address-model=64 cxxflags=-fPIC -j 4 --with-date_time --with-filesystem --with-system --with-test --with-atomic; 
       
-    - name: test
+    - name: build
       run: |
         sudo apt-get install -y libsqlite3-dev
         cd ./hikyuu
-        export BOOST_ROOT=./boost_1_75_0
-        export BOOST_LIB=./boost_1_75_0/stage/lib
         xmake f -y
         xmake -b small-test
         xmake r small-test
