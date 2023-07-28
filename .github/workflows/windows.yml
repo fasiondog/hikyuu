@@ -11,8 +11,6 @@ jobs:
         os: [windows-2019, windows-2022]
         arch: [x64, arm64]
 
-    runs-on: ${{ matrix.os }}
-
     concurrency:
         group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-${{ matrix.os }}-${{ matrix.arch }}
         cancel-in-progress: true    
