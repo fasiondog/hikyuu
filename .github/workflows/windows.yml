@@ -15,11 +15,6 @@ jobs:
     - name: checkout
       run: | 
         git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-    - name: download_boost
-      run: | 
-        Invoke-WebRequest "https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.zip" -UseBasicParsing -OutFile ./boost_1_75_0.zip
-        Expand-Archive ./boost_1_75_0.zip -DestinationPath ./hikyuu
-        # Copy-Item ./boost_1_75_0 ./hikyuu
    
     - name: build
       shell: cmd
