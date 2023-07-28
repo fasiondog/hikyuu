@@ -61,4 +61,10 @@ typedef vector<LoanRecord> LoanRecordList;
 HKU_API std::ostream& operator<<(std::ostream&, const LoanRecord&);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::LoanRecord> : ostream_formatter {};
+#endif
+
 #endif /* LOANRECORD_H_ */

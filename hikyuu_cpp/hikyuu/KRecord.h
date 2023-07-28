@@ -19,13 +19,13 @@ namespace hku {
  */
 class KRecord {
 public:
-    Datetime datetime;    ///<日期，格式：YYYYMMDDHHMM 如：200901010930
-    price_t openPrice;    ///<开盘价
-    price_t highPrice;    ///<最高价
-    price_t lowPrice;     ///<最低价
-    price_t closePrice;   ///<最低价
-    price_t transAmount;  ///<成交金额（千元）
-    price_t transCount;   ///<成交量（手）
+    Datetime datetime;    ///< 日期，格式：YYYYMMDDHHMM 如：200901010930
+    price_t openPrice;    ///< 开盘价
+    price_t highPrice;    ///< 最高价
+    price_t lowPrice;     ///< 最低价
+    price_t closePrice;   ///< 最低价
+    price_t transAmount;  ///< 成交金额（千元）
+    price_t transCount;   ///< 成交量（手）
 
     KRecord()
     : datetime(Null<Datetime>()),
@@ -79,4 +79,10 @@ HKU_API std::ostream& operator<<(std::ostream&, const KRecord&);
 bool HKU_API operator==(const KRecord& d1, const KRecord& d2);
 
 }  // namespace hku
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::KRecord> : ostream_formatter {};
+#endif
+
 #endif /* KRECORD_H_ */

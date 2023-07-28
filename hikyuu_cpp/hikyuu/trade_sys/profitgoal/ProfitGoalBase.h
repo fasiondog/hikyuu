@@ -186,4 +186,13 @@ inline void ProfitGoalBase::reset() {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::ProfitGoalBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::ProfitGoalPtr> : ostream_formatter {};
+#endif
+
 #endif /* PROFITGOAL_H_ */

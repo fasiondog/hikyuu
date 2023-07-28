@@ -49,7 +49,7 @@ void HttpHandle::operator()() {
         nng_aio_set_output(m_http_aio, 0, m_nng_res);
 
     } catch (nlohmann::json::exception& e) {
-        CLS_WARN("HttpBadRequestError({}): {}", INVALID_JSON_REQUEST, e.what());
+        CLS_WARN("HttpBadRequestError({}): {}", int(INVALID_JSON_REQUEST), e.what());
         processException(NNG_HTTP_STATUS_BAD_REQUEST, INVALID_JSON_REQUEST, e.what());
 
     } catch (HttpError& e) {
@@ -57,12 +57,12 @@ void HttpHandle::operator()() {
         processException(e.status(), e.errcode(), e.what());
 
     } catch (std::exception& e) {
-        CLS_ERROR("HttpError({}): {}", NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, e.what());
+        CLS_ERROR("HttpError({}): {}", int(NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR), e.what());
         processException(NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR,
                          NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, e.what());
 
     } catch (...) {
-        CLS_ERROR("HttpError({}): {}", NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, "Unknown error");
+        CLS_ERROR("HttpError({}): {}", int(NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR), "Unknown error");
         processException(NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR,
                          NNG_HTTP_STATUS_INTERNAL_SERVER_ERROR, "Unknown error");
     }
@@ -81,9 +81,15 @@ void HttpHandle::printTraceInfo() {
         return;
     }
     Datetime now = Datetime::now();
+#if FMT_VERSION >= 90000
+    std::string str = fmt::format(
+      "{:>4d}-{:0>2d}-{:0>2d} {:0>2d}:{:0>2d}:{:0>2d}.{:0<3d} [HttpHandle-T] - ", now.year(),
+      now.month(), now.day(), now.hour(), now.minute(), now.second(), now.millisecond());
+#else
     std::string str = fmt::format(
       "{:>4d}-{:>02d}-{:>02d} {:>02d}:{:>02d}:{:>02d}.{:<03d} [HttpHandle-T] - ", now.year(),
       now.month(), now.day(), now.hour(), now.minute(), now.second(), now.millisecond());
+#endif
     if (traceid.empty()) {
         CLS_TRACE(
           "╔════════════════════════════════════════════════════════════\n"

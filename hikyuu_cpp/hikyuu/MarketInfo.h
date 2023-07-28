@@ -124,4 +124,9 @@ inline bool operator!=(const MarketInfo& m1, const MarketInfo& m2) {
 
 }  // namespace hku
 
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::MarketInfo> : ostream_formatter {};
+#endif
+
 #endif /* MARKETINFO_H_ */

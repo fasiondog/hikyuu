@@ -9,9 +9,9 @@
 #ifndef SYSTEMBASE_H_
 #define SYSTEMBASE_H_
 
-//#include "../../KData.h"
-//#include "../../utilities/Parameter.h"
-//#include "../../trade_manage/TradeManager.h"
+// #include "../../KData.h"
+// #include "../../utilities/Parameter.h"
+// #include "../../trade_manage/TradeManager.h"
 #include "../environment/EnvironmentBase.h"
 #include "../condition/ConditionBase.h"
 #include "../moneymanager/MoneyManagerBase.h"
@@ -193,13 +193,13 @@ public:
      */
     TradeRecord runMoment(const Datetime& datetime);
 
-    //清除已有的交易请求，供Portfolio使用
+    // 清除已有的交易请求，供Portfolio使用
     void clearDelayRequest();
 
-    //当前是否存在延迟的操作请求，供Portfolio
+    // 当前是否存在延迟的操作请求，供Portfolio
     bool haveDelayRequest() const;
 
-    //运行前准备工作
+    // 运行前准备工作
     bool readyForRun();
 
     TradeRecord sell(const KRecord& today, const KRecord& src_today, Part from) {
@@ -213,10 +213,10 @@ private:
     bool _environmentIsValid(const Datetime& datetime);
     bool _conditionIsValid(const Datetime& datetime);
 
-    //通知所有需要接收实际买入交易记录的部件
+    // 通知所有需要接收实际买入交易记录的部件
     void _buyNotifyAll(const TradeRecord&);
 
-    //通知所有需要接收实际卖出交易记录的部件
+    // 通知所有需要接收实际卖出交易记录的部件
     void _sellNotifyAll(const TradeRecord&);
 
     double _getBuyNumber(const Datetime&, price_t price, price_t risk, Part from);
@@ -278,11 +278,11 @@ protected:
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
-    int m_buy_days;         //每一次买入清零，计算一次加1，即买入后的天数
-    int m_sell_short_days;  //每一次卖空清零
-    TradeRecordList m_trade_list;   //保存实际执行的交易记录
-    price_t m_lastTakeProfit;       //上一次多头止损价，用于保证止赢价单调递增
-    price_t m_lastShortTakeProfit;  //上一次空头止赢价
+    int m_buy_days;         // 每一次买入清零，计算一次加1，即买入后的天数
+    int m_sell_short_days;  // 每一次卖空清零
+    TradeRecordList m_trade_list;   // 保存实际执行的交易记录
+    price_t m_lastTakeProfit;       // 上一次多头止损价，用于保证止赢价单调递增
+    price_t m_lastShortTakeProfit;  // 上一次空头止赢价
 
     TradeRequest m_buyRequest;
     TradeRequest m_sellRequest;
@@ -290,7 +290,7 @@ protected:
     TradeRequest m_buyShortRequest;
 
 private:
-    void initParam();  //初始化参数及其默认值
+    void initParam();  // 初始化参数及其默认值
 
 //============================================
 // 序列化支持
@@ -541,4 +541,13 @@ inline price_t System ::_getShortGoalPrice(const Datetime& datetime, price_t pri
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::System> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::SystemPtr> : ostream_formatter {};
+#endif
+
 #endif /* SYSTEMBASE_H_ */

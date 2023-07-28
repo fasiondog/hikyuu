@@ -22,7 +22,7 @@ class UserModel {
     };
 
 public:
-    UserModel() : userid(0), status(STATUS::NORMAL), end_time(Datetime::max().number()) {}
+    UserModel() : userid(0), end_time(Datetime::max().number()), status(STATUS::NORMAL) {}
 
     uint64_t getUserId() const {
         return userid;

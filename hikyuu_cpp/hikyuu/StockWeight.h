@@ -69,14 +69,14 @@ public:
     }
 
 private:
-    Datetime m_datetime;     //权息日期
-    price_t m_countAsGift;   //每10股送X股
-    price_t m_countForSell;  //每10股配X股
-    price_t m_priceForSell;  //配股价
-    price_t m_bonus;         //每10股红利
-    price_t m_increasement;  //每10股转增X股
-    price_t m_totalCount;    //总股本（万股）
-    price_t m_freeCount;     //流通股（万股）
+    Datetime m_datetime;     // 权息日期
+    price_t m_countAsGift;   // 每10股送X股
+    price_t m_countForSell;  // 每10股配X股
+    price_t m_priceForSell;  // 配股价
+    price_t m_bonus;         // 每10股红利
+    price_t m_increasement;  // 每10股转增X股
+    price_t m_totalCount;    // 总股本（万股）
+    price_t m_freeCount;     // 流通股（万股）
 };
 
 /** @ingroup StockManage */
@@ -133,4 +133,10 @@ inline bool operator<=(const StockWeight& m1, const StockWeight& m2) {
 
 /** @} */
 }  // namespace hku
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::StockWeight> : ostream_formatter {};
+#endif
+
 #endif /* STOCKWEIGHT_H_ */

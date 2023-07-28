@@ -168,4 +168,13 @@ inline void SlippageBase::reset() {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::SlippageBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::SlippagePtr> : ostream_formatter {};
+#endif
+
 #endif /* SLIPPAGEBASE_H_ */

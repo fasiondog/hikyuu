@@ -212,4 +212,12 @@ inline const SystemList& SelectorBase::getProtoSystemList() const {
 
 } /* namespace hku */
 
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::SelectorBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::SelectorPtr> : ostream_formatter {};
+#endif
+
 #endif /* TRADE_SYS_SELECTOR_SELECTORBASE_H_ */

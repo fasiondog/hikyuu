@@ -177,7 +177,7 @@ inline DatetimeList KData::getDatetimeList() const {
 }
 
 inline KRecord KData::getKRecord(size_t pos) const {
-    return m_imp->getKRecord(pos);  //如果为空，将抛出异常
+    return m_imp->getKRecord(pos);  // 如果为空，将抛出异常
 }
 
 inline KRecord KData::getKRecord(Datetime datetime) const {
@@ -218,4 +218,10 @@ inline size_t KData::lastPos() const {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::KData> : ostream_formatter {};
+#endif
+
 #endif /* KDATA_H_ */

@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
         server.set_error_msg(
           NNG_HTTP_STATUS_NOT_FOUND,
           fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"Not Found"}})",
-                      NNG_HTTP_STATUS_NOT_FOUND));
+                      int(NNG_HTTP_STATUS_NOT_FOUND)));
 
         DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
 

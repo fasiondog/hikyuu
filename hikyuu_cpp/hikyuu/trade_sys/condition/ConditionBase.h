@@ -199,4 +199,13 @@ inline TradeManagerPtr ConditionBase::getTM() const {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::ConditionBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::ConditionPtr> : ostream_formatter {};
+#endif
+
 #endif /* CONDITIONBASE_H_ */
