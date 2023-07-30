@@ -1,0 +1,24 @@
+name: ubuntu-build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    
+    steps:
+    - uses: xmake-io/github-action-setup-xmake@v1
+    - name: checkout
+      run: | 
+        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
+      
+    - name: build
+      run: |
+        sudo apt-get install -y libsqlite3-dev
+        cd ./hikyuu
+        xmake f -y
+        xmake -b core

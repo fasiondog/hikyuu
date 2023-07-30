@@ -86,6 +86,7 @@ add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-f
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false})
 add_requires("zlib", {system = false})
+add_requires("python", {configs = {pyver = get_config("pyver")}})
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
