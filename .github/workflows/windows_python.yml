@@ -12,7 +12,7 @@ jobs:
         arch: [x64] #, arm64]
 
     concurrency:
-        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-${{ matrix.os }}-${{ matrix.arch }}
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-python-${{ matrix.os }}-${{ matrix.arch }}
         cancel-in-progress: true    
     
     steps:

@@ -12,7 +12,7 @@ jobs:
         cross: [aarch64-linux-musl]
 
     concurrency:
-        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Cross-Musl-${{ matrix.cross }}
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Cross-Musl-python-${{ matrix.cross }}
         cancel-in-progress: true
     
     steps:
