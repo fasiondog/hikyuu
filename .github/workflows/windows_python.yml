@@ -1,4 +1,4 @@
-name: win-build
+name: win-python-build
 
 on: [push, pull_request]
 

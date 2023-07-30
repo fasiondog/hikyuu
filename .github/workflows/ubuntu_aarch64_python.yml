@@ -1,4 +1,4 @@
-name: ubuntu-aarch64-build
+name: ubuntu-python-aarch64-build
 
 on: [push, pull_request]
 

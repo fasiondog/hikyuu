@@ -1,4 +1,4 @@
-name: ubuntu-build
+name: ubuntu-python-build
 
 on: [push, pull_request]
 
