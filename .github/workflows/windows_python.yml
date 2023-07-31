@@ -26,4 +26,4 @@ jobs:
       run: |
         cd hikyuu
         xmake f -y
-        xmake -b core
+        xmake -bvD core
