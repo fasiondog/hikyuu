@@ -25,5 +25,5 @@ jobs:
       shell: cmd
       run: |
         cd hikyuu
-        xmake f -y
+        xmake f -y --pyver=3.7
         xmake -bvD core
