@@ -156,7 +156,7 @@ blockbj = Block("A", "BJ")
 for s in blocka:
     if s.market == "BJ":
         blockbj.add(s)
-zsbk_sz = blockbj
+zsbk_bj = blockbj
 
 blockg = Block("G", "创业板")
 for s in sm:
