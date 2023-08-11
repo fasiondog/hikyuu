@@ -10,7 +10,7 @@ package("mysql")
     elseif is_plat("linux") and is_arch("x86_64") then
         add_urls("https://github.com/fasiondog/hikyuu_extern_libs/releases/download/1.0.0/mysql-$(version)-linux-x86_64.zip",
                  "https://gitee.com/fasiondog/hikyuu_extern_libs/releases/download/1.0.0/mysql-$(version)-linux-x86_64.zip")
-        add_versions("8.0.31", "1775a94f4a59cfb03593e6e70891de33a0cc8713573afdfc9ca0482415a8ecd3")
+        add_versions("8.0.31", "07268a4b02174dfb8ee30642cd6fd81a0115ed87560a51a42e7123eed0be5ad1")
     elseif is_plat("linux", "cross") and is_arch("aarch64", "arm64.*") then
         add_urls("https://github.com/fasiondog/hikyuu_extern_libs/releases/download/1.0.0/mysql-$(version)-linux-aarch64.zip",
                  "https://gitee.com/fasiondog/hikyuu_extern_libs/releases/download/1.0.0/mysql-$(version)-linux-aarch64.zip")
