@@ -12,9 +12,10 @@ target("core")
         --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
     end
 
-    add_packages("python", "boost", "fmt", "spdlog", "flatbuffers", "cpp-httplib")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "cpp-httplib")
     add_deps("hikyuu")
     if is_plat("windows") then
+        add_packages("python")
         set_filename("core.pyd")
         add_cxflags("-wd4251")
     else 

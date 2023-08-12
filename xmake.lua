@@ -52,6 +52,7 @@ if is_plat("windows") then
     add_requires("hdf5_D " .. hdf5_version)
   end
   add_requires("mysql " .. mysql_version)
+  add_requires("python", {configs = {pyver = get_config("pyver")}})
 elseif is_plat("linux", "cross") then
   add_requires("hdf5 " .. hdf5_version, { system = false })
   -- add_requires("mysql" , {system = true})
@@ -64,12 +65,10 @@ add_requires("boost " .. boost_version, {
   system = false,
   configs = {
     shared = is_plat("windows") and true or false,
-    -- shared = ( is_plat("windows") and true or false ) or ( is_plat("linux") and true or false ),
-    -- vs_runtime = if is_plat("windows") then "MD" else "" end,
     data_time = true,
     filesystem = true,
     serialization = true,
-    -- system = false,
+    system = false,
     system = true,
     python = true,
     pyver = get_config("pyver"),
@@ -85,7 +84,6 @@ add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-f
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false})
 add_requires("zlib", {system = false})
-add_requires("python", {configs = {pyver = get_config("pyver")}})
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 
