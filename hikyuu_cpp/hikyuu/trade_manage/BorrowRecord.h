@@ -29,17 +29,17 @@ public:
     BorrowRecord(const Stock&, double number, price_t value);
 
     Stock stock;
-    double number;  //借入总数量
-    price_t value;  //借入总价值
+    double number;  // 借入总数量
+    price_t value;  // 借入总价值
 
     struct Data {
         Data() : datetime(Null<Datetime>()), price(0.0), number(0) {}
         Data(const Datetime& datetime, price_t price, double number)
         : datetime(datetime), price(price), number(number) {}
 
-        Datetime datetime;  //借入时间
-        price_t price;      //借入时的单价
-        double number;      //借入数量
+        Datetime datetime;  // 借入时间
+        price_t price;      // 借入时的单价
+        double number;      // 借入数量
 
 #if HKU_SUPPORT_SERIALIZATION
     private:
@@ -65,9 +65,9 @@ public:
 #endif
     };
 
-    list<Data> record_list;  //当前的借入记录
+    list<Data> record_list;  // 当前的借入记录
 
-//序列化支持
+// 序列化支持
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
@@ -86,4 +86,10 @@ typedef vector<BorrowRecord> BorrowRecordList;
 HKU_API std::ostream& operator<<(std::ostream&, const BorrowRecord&);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::BorrowRecord> : ostream_formatter {};
+#endif
+
 #endif /* BORROWRECORD_H_ */

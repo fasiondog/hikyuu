@@ -116,9 +116,9 @@ protected:
     SEPtr m_se;
     AFPtr m_af;
 
-    KQuery m_query;         // 关联的查询条件
-    bool m_is_ready;        // 是否已做好运行准备
-    bool m_need_calculate;  // 是否需要计算标志
+    KQuery m_query;              // 关联的查询条件
+    bool m_is_ready;             // 是否已做好运行准备
+    bool m_need_calculate;       // 是否需要计算标志
 
     SystemList m_pro_sys_list;   // 所有原型系统列表，来自 SE
     SystemList m_real_sys_list;  // 所有实际运行的子系统列表
@@ -237,5 +237,13 @@ inline const SystemList& Portfolio::getRealSystemList() const {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::Portfolio> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::PortfolioPtr> : ostream_formatter {};
+#endif
 
 #endif /* TRADE_SYS_PORTFOLIO_PORTFOLIO_H_ */

@@ -225,4 +225,13 @@ HKU_API std::ostream& operator<<(std::ostream&, const MoneyManagerBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const MoneyManagerPtr&);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::MoneyManagerBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::MoneyManagerPtr> : ostream_formatter {};
+#endif
+
 #endif /* MONEYMANAGERBASE_H_ */

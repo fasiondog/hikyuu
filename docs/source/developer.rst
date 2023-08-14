@@ -51,24 +51,7 @@ Linux、macOSX 执行以下指令安装：
     git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1    
 
 
-4、下载 Boost 源码
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1. 下载 Boost 源码 `<http://www.boost.org>`_ 
-2. 将下载的 boost 源码包解压至上一步中克隆的 hikyuu目录下，如下图所示：
-
-.. figure:: _static/dev-002.jpg
-    
-.. note::
-
-    以下版本的 boost 无法顺利编译，请注意注意不要使用：
-    
-    - Windows：1.67
-    - linux、macOS：1.68
-
-3.  如果使用 Anaconda 的 python，需手工修改 boost 根目录下的 project-config.jam 文件, 找到 “using python” 所在行，手工添加python的版本、可执行文件、include目录，如：using python : 3.7 : "/Users/ljh/opt/anaconda3/bin/python3.7" : /Users/ljh/opt/anaconda3/include/python3.7m ;
-    
-5、Linux下安装依赖软件包
+4、Linux下安装依赖软件包
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令：
@@ -79,7 +62,7 @@ Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令�
 
 MacOsx 下需要使用 brew 安装 sqlite3, hdf5, mysqlclient 的开发包（具体包名请自行查询）。 
 
-6、转 Visual Studio 工程
+5、转 Visual Studio 工程
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Windows 下，习惯用 msvc 调试的，可以使用  xmake project -k vsxmake -m "debug,release" 命令生成 VS 工程。命令执行后，会在当前目录下生成如 vsxmake2022 的子目录，VS工程位于其内。

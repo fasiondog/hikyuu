@@ -134,7 +134,7 @@ void MySQLStatement::_bindResult() {
             auto& buf = m_result_buffer.back();
             m_result_bind[idx].buffer = boost::any_cast<short>(&buf);
         } else {
-            HKU_THROW("Unsupport field type: {}, field name: {}", field->type, field->name);
+            HKU_THROW("Unsupport field type: {}, field name: {}", int(field->type), field->name);
         }
 
         idx++;

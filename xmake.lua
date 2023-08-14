@@ -8,7 +8,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.2.7", { build = "%Y%m%d%H%M" })
+set_version("1.2.8", {build = "%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0) -- 激活的日志级别
 -- if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别
@@ -52,6 +52,7 @@ if is_plat("windows") then
     add_requires("hdf5_D " .. hdf5_version)
   end
   add_requires("mysql " .. mysql_version)
+  add_requires("python", {configs = {pyver = get_config("pyver")}})
 elseif is_plat("linux", "cross") then
   add_requires("hdf5 " .. hdf5_version, { system = false })
   -- add_requires("mysql" , {system = true})
@@ -64,27 +65,25 @@ add_requires("boost " .. boost_version, {
   system = false,
   configs = {
     shared = is_plat("windows") and true or false,
-    -- shared = ( is_plat("windows") and true or false ) or ( is_plat("linux") and true or false ),
-    -- vs_runtime = if is_plat("windows") then "MD" else "" end,
     data_time = true,
     filesystem = true,
     serialization = true,
-    -- system = false,
+    system = false,
     system = true,
     python = true,
     pyver = get_config("pyver"),
   },
 })
 
--- add_requires("fmt 8.1.1", {system=false, configs = {header_only = true}})
-add_requires("spdlog", { system = false, configs = { header_only = true, fmt_external = true, vs_runtime = "MD" } })
-add_requireconfs("spdlog.fmt", { override = true, version = "8.1.1", configs = { header_only = true } })
-add_requires("sqlite3", { system = false, configs = { shared = true, vs_runtime = "MD", cxflags = "-fPIC" } })
-add_requires("flatbuffers 2.0.0", { system = false, configs = { vs_runtime = "MD" } })
-add_requires("nng", { system = false, configs = { vs_runtime = "MD", cxflags = "-fPIC" } })
-add_requires("nlohmann_json", { system = false })
-add_requires("cpp-httplib", { system = false })
-add_requires("zlib", { system = false })
+add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
+-- add_requireconfs("spdlog.fmt", {override = true, version = "8.1.1", configs = {header_only = true}})
+add_requireconfs("spdlog.fmt", {override = true, configs = {header_only = true}})
+add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = "MD", cxflags = "-fPIC"}})
+add_requires("flatbuffers 2.0.0", {system = false, configs = {vs_runtime = "MD"}})
+add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
+add_requires("nlohmann_json", {system = false})
+add_requires("cpp-httplib", {system = false})
+add_requires("zlib", {system = false})
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
 

@@ -142,4 +142,10 @@ HKU_API std::ostream& operator<<(std::ostream&, const TradeRecord&);
 bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::TradeRecord> : ostream_formatter {};
+#endif
+
 #endif /* TRADERECORD_H_ */

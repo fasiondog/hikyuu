@@ -25,8 +25,12 @@ public:
     virtual ~TestTask() = default;
 
     virtual void run() {
-        HKU_INFO("{}: ------------------- [{}]", m_i, std::this_thread::get_id());
+#if FMT_VERSION >= 90000
+        HKU_INFO("{}: ------------------- [{}]", m_i, fmt::streamed(std::this_thread::get_id()));
         // fmt::print("{}: ----------------------\n", m_i);
+#else
+        HKU_INFO("{}: ------------------- [{}]", m_i, std::this_thread::get_id());
+#endif
     }
 
 private:
@@ -41,8 +45,12 @@ TEST_CASE("test_TaskGroup") {
             SPEND_TIME(test_TaskGroup);
             TaskGroup tg(8);
             HKU_INFO("worker_num: {}", tg.size());
-            HKU_INFO("main thread: {}", std::this_thread::get_id());
 
+#if FMT_VERSION >= 90000
+            HKU_INFO("main thread: {}", fmt::streamed(std::this_thread::get_id()));
+#else
+            HKU_INFO("main thread: {}", std::this_thread::get_id());
+#endif
             for (int i = 0; i < 10; i++) {
                 task_list.push_back(tg.addTask(std::make_shared<TestTask>(i)));
                 // CHECK(!task_list[i]->done());

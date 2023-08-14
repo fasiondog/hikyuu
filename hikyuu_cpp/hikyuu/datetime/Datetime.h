@@ -16,6 +16,7 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include <fmt/ostream.h>
 #include "TimeDelta.h"
 
 #if defined(_MSC_VER)
@@ -390,5 +391,19 @@ public:
     }
 };
 }  // namespace std
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::Datetime> {
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        return ctx.end();
+    }
+
+    template <typename FormatContext>
+    auto format(const hku::Datetime& d, FormatContext& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "{}", d.str());
+    }
+};
+#endif
 
 #endif /* DATETIME_H_ */

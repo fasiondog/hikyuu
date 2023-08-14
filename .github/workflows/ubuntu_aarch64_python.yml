@@ -1,4 +1,4 @@
-name: win-build
+name: ubuntu-python-aarch64-build
 
 on: [push, pull_request]
 
@@ -8,23 +8,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, windows-2022]
-        arch: [x64] #, arm64]
+        os: [ubuntu-latest]
+        cross: [aarch64-linux-musl]
 
     concurrency:
-        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-${{ matrix.os }}-${{ matrix.arch }}
-        cancel-in-progress: true    
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Cross-Musl-python-${{ matrix.cross }}
+        cancel-in-progress: true
     
     steps:
     - uses: xmake-io/github-action-setup-xmake@v1
     - name: checkout
       run: | 
         git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-   
+      
     - name: build
-      shell: cmd
       run: |
-        cd hikyuu
+        sudo apt-get install -y libsqlite3-dev
+        cd ./hikyuu
         xmake f -y
-        xmake -b small-test
-        xmake r small-test
+        xmake -b core

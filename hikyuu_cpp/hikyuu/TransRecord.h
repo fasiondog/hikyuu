@@ -25,10 +25,10 @@ public:
         AUCTION = 2 /**< 集合竞价 */
     };
 
-    Datetime datetime;  //时间
-    price_t price;      //成交均价
-    price_t vol;        //成交量
-    DIRECT direct;      //买卖盘性质：1--sell 0--buy 2--集合竞价
+    Datetime datetime;  // 时间
+    price_t price;      // 成交均价
+    price_t vol;        // 成交量
+    DIRECT direct;      // 买卖盘性质：1--sell 0--buy 2--集合竞价
 
     TransRecord();
     TransRecord(const Datetime& datetime, price_t price, price_t vol, DIRECT);
@@ -70,5 +70,10 @@ HKU_API std::ostream& operator<<(std::ostream& os, const TransList&);
 bool HKU_API operator==(const TransRecord& d1, const TransRecord& d2);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::TransRecord> : ostream_formatter {};
+#endif
 
 #endif /* TRANSRECORD_H_ */

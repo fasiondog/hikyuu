@@ -63,4 +63,9 @@ bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord& d2);
 
 } /* namespace hku */
 
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::TimeLineRecord> : ostream_formatter {};
+#endif
+
 #endif /* TIMELINERECORD_H_ */

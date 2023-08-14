@@ -10,7 +10,7 @@
 #define STOPLOSSBASE_H_
 
 #include "../../KData.h"
-//#include "../../utilities/Parameter.h"
+// #include "../../utilities/Parameter.h"
 #include "../../trade_manage/TradeManager.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -196,4 +196,13 @@ inline void StoplossBase::reset() {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::StoplossBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::StoplossPtr> : ostream_formatter {};
+#endif
+
 #endif /* STOPLOSSBASE_H_ */

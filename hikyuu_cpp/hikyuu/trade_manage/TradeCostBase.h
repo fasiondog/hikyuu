@@ -169,4 +169,13 @@ HKU_API std::ostream& operator<<(std::ostream&, const TradeCostBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const TradeCostPtr&);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::TradeCostBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::TradeCostPtr> : ostream_formatter {};
+#endif
+
 #endif /* TRADECOSTBASE_H_ */

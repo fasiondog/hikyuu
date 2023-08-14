@@ -39,9 +39,9 @@
 #include <boost/serialization/base_object.hpp>
 
 // linux 下，PriceList_serialization 始终无法特化（及时拷贝到本文件内也一样），取消引用
-//#if HKU_SUPPORT_XML_ARCHIVE || HKU_SUPPORT_TEXT_ARCHIVE
-//#include "../serialization/PriceList_serialization.h"
-//#endif
+// #if HKU_SUPPORT_XML_ARCHIVE || HKU_SUPPORT_TEXT_ARCHIVE
+// #include "../serialization/PriceList_serialization.h"
+// #endif
 #endif /* HKU_SUPPORT_SERIALIZATION */
 
 namespace hku {
@@ -60,22 +60,22 @@ class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
 
 public:
     enum OPType {
-        LEAF,   ///<叶子节点
+        LEAF,   ///< 叶子节点
         OP,     /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
-        ADD,    ///<加
-        SUB,    ///<减
-        MUL,    ///<乘
-        DIV,    ///<除
-        MOD,    ///<取模
-        EQ,     ///<等于
-        GT,     ///<大于
-        LT,     ///<小于
-        NE,     ///<不等于
-        GE,     ///<大于等于
-        LE,     ///<小于等于
-        AND,    ///<与
-        OR,     ///<或
-        WEAVE,  ///<特殊的，需要两个指标作为参数的指标
+        ADD,    ///< 加
+        SUB,    ///< 减
+        MUL,    ///< 乘
+        DIV,    ///< 除
+        MOD,    ///< 取模
+        EQ,     ///< 等于
+        GT,     ///< 大于
+        LT,     ///< 小于
+        NE,     ///< 不等于
+        GE,     ///< 大于等于
+        LE,     ///< 小于等于
+        AND,    ///< 与
+        OR,     ///< 或
+        WEAVE,  ///< 特殊的，需要两个指标作为参数的指标
         OP_IF,  /// if操作
         INVALID
     };
@@ -415,5 +415,10 @@ inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t disc
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::IndicatorImp> : ostream_formatter {};
+#endif
 
 #endif /* INDICATORIMP_H_ */
