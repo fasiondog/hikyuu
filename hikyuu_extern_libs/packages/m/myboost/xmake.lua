@@ -67,7 +67,6 @@ package("myboost")
     end)    
 
     on_install("macosx", "linux", "windows", "bsd", "mingw", "cross", function (package)
-        package:add("deps", "python " .. package:config("pyver") .. ".x")
         import("core.base.option")
 
         -- get toolchain
