@@ -15,7 +15,6 @@ target("core")
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "cpp-httplib")
     add_deps("hikyuu")
     if is_plat("windows") then
-        add_packages("python")
         set_filename("core.pyd")
         add_cxflags("-wd4251")
     else 
