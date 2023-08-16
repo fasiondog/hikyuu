@@ -78,6 +78,8 @@ target("unit-test")
 
     -- add files
     add_files("**.cpp")
+    -- add_files("./hikyuu/trade_manage/test_TradeManager.cpp");
+    -- add_files("./hikyuu/test_main.cpp")
     
     after_run(coverage_report)
 target_end()
