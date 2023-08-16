@@ -116,4 +116,12 @@ inline void OrderBrokerBase::name(const string& name) {
 
 } /* namespace hku */
 
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::OrderBrokerBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::OrderBrokerPtr> : ostream_formatter {};
+#endif
+
 #endif /* TRADE_MANAGE_ORDERBROKERBASE_H_ */

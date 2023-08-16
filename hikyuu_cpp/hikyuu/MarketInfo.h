@@ -99,7 +99,7 @@ private:
 
 /**
  * 输出市场信息，如：
- * MarketInfo(SH, 上海证劵交易所, 上海市场, 000001, 2011-Dec-06 00:00:00)
+ * MarketInfo(SH, 上海证券交易所, 上海市场, 000001, 2011-Dec-06 00:00:00)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator<<(std::ostream&, const MarketInfo&);
@@ -123,5 +123,10 @@ inline bool operator!=(const MarketInfo& m1, const MarketInfo& m2) {
 }
 
 }  // namespace hku
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::MarketInfo> : ostream_formatter {};
+#endif
 
 #endif /* MARKETINFO_H_ */

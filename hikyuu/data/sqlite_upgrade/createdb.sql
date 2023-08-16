@@ -25,8 +25,8 @@ INSERT INTO `stocktypeinfo` (tickValue,precision,id,type,description,tick,minTra
 INSERT INTO `stocktypeinfo` (tickValue,precision,id,type,description,tick,minTradeNumber,maxTradeNumber) VALUES (0.01,2,8,8,'创业板',0.01,100,1000000);
 CREATE TABLE Stock (stockid INTEGER PRIMARY KEY, marketid INTEGER, code VARCHAR(20), name VARCHAR(60), type INTEGER, valid INTEGER, startDate INTEGER, endDate INTEGER);
 CREATE TABLE Market (marketid INTEGER PRIMARY KEY, market VARCHAR(10), name VARCHAR(60), description VARCHAR(100), code VARCHAR(20), lastDate INTEGER);
-INSERT INTO `Market` (marketid,market,name,description,code,lastDate) VALUES (1,'SH','上海证劵交易所','上海市场','000001',19901219);
-INSERT INTO `Market` (marketid,market,name,description,code,lastDate) VALUES (2,'SZ','深圳证劵交易所','深圳市场','399001',19901219);
+INSERT INTO `Market` (marketid,market,name,description,code,lastDate) VALUES (1,'SH','上海证券交易所','上海市场','000001',19901219);
+INSERT INTO `Market` (marketid,market,name,description,code,lastDate) VALUES (2,'SZ','深圳证券交易所','深圳市场','399001',19901219);
 
 CREATE TABLE CodeRuleType (id INTEGER PRIMARY KEY, marketid INTEGER, codepre VARCHAR(20), type INTEGER, description VARCHAR(100));
 INSERT INTO `coderuletype` (id,marketid,codepre,type,description) VALUES (1,1,'000',2,'上证指数');

@@ -1,4 +1,4 @@
-name: win-build
+name: win-python-build
 
 on: [push, pull_request]
 
@@ -12,7 +12,7 @@ jobs:
         arch: [x64] #, arm64]
 
     concurrency:
-        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-${{ matrix.os }}-${{ matrix.arch }}
+        group: ${{ github.ref }}-${{ github.base_ref }}-${{ github.head_ref }}-Windows-python-${{ matrix.os }}-${{ matrix.arch }}
         cancel-in-progress: true    
     
     steps:
@@ -25,6 +25,5 @@ jobs:
       shell: cmd
       run: |
         cd hikyuu
-        xmake f -y
-        xmake -b small-test
-        xmake r small-test
+        xmake f -y --pyver=3.11
+        xmake -bvD core

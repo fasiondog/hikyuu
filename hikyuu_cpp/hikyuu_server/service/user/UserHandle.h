@@ -128,11 +128,11 @@ class QueryUserHandle : public RestHandle {
 
             iter = params.find("name");
             if (iter != params.end()) {
-                cond = cond & Field("name") == iter->second;
+                cond = cond & (Field("name") == iter->second);
             }
         }
 
-        cond = (cond & Field("status") != UserModel::DELETED) + ASC("start_time");
+        cond = (cond & (Field("status") != UserModel::DELETED)) + ASC("start_time");
 
         std::vector<UserModel> users;
         con->batchLoad(users, cond.str());

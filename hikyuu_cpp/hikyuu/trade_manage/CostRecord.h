@@ -62,4 +62,10 @@ HKU_API std::ostream& operator<<(std::ostream& os, const CostRecord&);
 bool HKU_API operator==(const CostRecord& d1, const CostRecord& d2);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::CostRecord> : ostream_formatter {};
+#endif
+
 #endif /* COSTRECORD_H_ */

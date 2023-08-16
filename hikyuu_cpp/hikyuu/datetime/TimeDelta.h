@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #ifndef HKU_API
@@ -133,8 +134,13 @@ public:
 
     /** 转换为字符串，格式：-1 days hh:mm:ss.000000) */
     std::string str() const {
+#if FMT_VERSION >= 90000
+        return fmt::format("{} days, {:0>2d}:{:0>2d}:{:<2.6f}", days(), hours(), minutes(),
+                           seconds() + double(milliseconds() * 1000 + microseconds()) * 0.000001);
+#else
         return fmt::format("{} days, {:>02d}:{:>02d}:{:<2.6f}", days(), hours(), minutes(),
                            seconds() + double(milliseconds() * 1000 + microseconds()) * 0.000001);
+#endif
     }
 
     /** 转换为字符串，格式为：TimeDelta(days,hours,mins,secs,millisecs,microsecs) */
@@ -308,5 +314,19 @@ inline TimeDelta Microseconds(int64_t microsecs) {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::TimeDelta> {
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        return ctx.end();
+    }
+
+    template <typename FormatContext>
+    auto format(const hku::TimeDelta& d, FormatContext& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "{}", d.str());
+    }
+};
+#endif
 
 #endif /* HIKYUU_DATETIME_TIMEDELTA_H */

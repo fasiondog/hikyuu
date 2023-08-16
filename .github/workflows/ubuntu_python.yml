@@ -1,4 +1,4 @@
-name: ubuntu-build
+name: ubuntu-python-build
 
 on: [push, pull_request]
 
@@ -21,5 +21,4 @@ jobs:
         sudo apt-get install -y libsqlite3-dev
         cd ./hikyuu
         xmake f -y
-        xmake -b small-test
-        xmake r small-test
+        xmake -b core

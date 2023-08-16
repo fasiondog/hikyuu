@@ -19,14 +19,14 @@ namespace hku {
  */
 class HKU_API KQuery {
 public:
-    ///查询方式：索引或日期
+    /// 查询方式：索引或日期
     enum QueryType {
-        INDEX = 0,  ///<按索引方式查询
-        DATE = 1,   ///<按日期方式查询
+        INDEX = 0,  ///< 按索引方式查询
+        DATE = 1,   ///< 按日期方式查询
         INVALID = 2
     };
 
-    ///查询K线类型：日线/周线等
+    /// 查询K线类型：日线/周线等
     /*enum KType {
         //notes: 如添加新类型，请注意按大小顺序添加，否则可能出错
         MIN      = 0,  ///<1分钟线
@@ -77,11 +77,11 @@ public:
      * @note 日线以上，如周线/月线不支持复权
      */
     enum RecoverType {
-        NO_RECOVER = 0,      ///<不复权
-        FORWARD = 1,         ///<前向复权
-        BACKWARD = 2,        ///<后向复权
-        EQUAL_FORWARD = 3,   ///<等比前向复权
-        EQUAL_BACKWARD = 4,  ///<等比后向复权
+        NO_RECOVER = 0,      ///< 不复权
+        FORWARD = 1,         ///< 前向复权
+        BACKWARD = 2,        ///< 后向复权
+        EQUAL_FORWARD = 3,   ///< 等比前向复权
+        EQUAL_BACKWARD = 4,  ///< 等比后向复权
         INVALID_RECOVER_TYPE = 5
     };
 
@@ -271,5 +271,10 @@ public:
 };
 
 }  // namespace hku
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::KQuery> : ostream_formatter {};
+#endif
 
 #endif /* KQUERY_H_ */

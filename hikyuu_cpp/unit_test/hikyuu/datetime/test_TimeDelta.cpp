@@ -29,33 +29,33 @@ namespace bd = boost::gregorian;
 /** @par 检测点 */
 TEST_CASE("test_TimeDelta") {
     /** @arg days  超出限定值 */
-    CHECK_THROWS_AS(TimeDelta(99999999LL + 1), hku::exception);
-    CHECK_THROWS_AS(TimeDelta(-99999999LL - 1), hku::exception);
+    CHECK_THROWS(TimeDelta(99999999LL + 1));
+    CHECK_THROWS(TimeDelta(-99999999LL - 1));
 
 #if !HKU_DISABLE_ASSERT
     /** @arg hours 超出限定值 */
-    CHECK_THROWS_AS(TimeDelta(0, 100001), hku::exception);
-    CHECK_THROWS_AS(TimeDelta(0, -100001), hku::exception);
+    CHECK_THROWS(TimeDelta(0, 100001));
+    CHECK_THROWS(TimeDelta(0, -100001));
 
     /** @arg minutes 超出限定值 */
-    CHECK_THROWS_AS(TimeDelta(0, 0, 100001), hku::exception);
-    CHECK_THROWS_AS(TimeDelta(0, 0, -100001), hku::exception);
+    CHECK_THROWS(TimeDelta(0, 0, 100001));
+    CHECK_THROWS(TimeDelta(0, 0, -100001));
 
     /** @arg seconds 超出限定值 */
-    CHECK_THROWS_AS(TimeDelta(0, 0, 0, 8640000), hku::exception);
-    CHECK_THROWS_AS(TimeDelta(0, 0, 0, -8640000), hku::exception);
+    CHECK_THROWS(TimeDelta(0, 0, 0, 8640000));
+    CHECK_THROWS(TimeDelta(0, 0, 0, -8640000));
 
     /** @arg milliseconds 超出限定值 */
-    CHECK_THROWS_AS(TimeDelta(0, 0, 0, 0, 8640000000000), hku::exception);
-    CHECK_THROWS_AS(TimeDelta(0, 0, 0, 0, -8640000000000), hku::exception);
+    CHECK_THROWS(TimeDelta(0, 0, 0, 0, 8640000000000));
+    CHECK_THROWS(TimeDelta(0, 0, 0, 0, -8640000000000));
 
     /** @arg microseconds 超出限定值 */
-    CHECK_THROWS_AS(TimeDelta(0, 0, 0, 0, 0, 8640000000000), hku::exception);
-    CHECK_THROWS_AS(TimeDelta(0, 0, 0, 0, 0, -8640000000000), hku::exception);
+    CHECK_THROWS(TimeDelta(0, 0, 0, 0, 0, 8640000000000));
+    CHECK_THROWS(TimeDelta(0, 0, 0, 0, 0, -8640000000000));
 #endif
 
     /** @arg microseconds总值超出限定值 */
-    CHECK_THROWS_AS(TimeDelta(99999999LL, 23, 59, 60, 999, 999), hku::exception);
+    CHECK_THROWS(TimeDelta(99999999LL, 23, 59, 60, 999, 999));
 
     /** @arg 正常初始化，时分秒毫秒微秒都在各自的进制范围内 */
     TimeDelta td(7, 10, 20, 3, 5, 7);
@@ -298,7 +298,7 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(td == TimeDelta(2));
 
     /** @arg 除以 0 */
-    CHECK_THROWS_AS(TimeDelta(1) / 0, hku::exception);
+    CHECK_THROWS(TimeDelta(1) / 0);
 
     /** @arg 正常除法 */
     CHECK(TimeDelta(2) / 2 == TimeDelta(1));
@@ -307,16 +307,16 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(Microseconds(2) / 3 == Microseconds(1));
 
     /** @arg 地板除 */
-    CHECK_THROWS_AS(TimeDelta(1).floorDiv(0), hku::exception);
+    CHECK_THROWS(TimeDelta(1).floorDiv(0));
     CHECK(TimeDelta(2).floorDiv(2) == TimeDelta(1));
     CHECK(Microseconds(1).floorDiv(3) == TimeDelta(0));
     CHECK(Microseconds(2).floorDiv(3) == TimeDelta(0));
 
     /** @arg 除以 zero TimeDelta */
-    CHECK_THROWS_AS(TimeDelta(1) / TimeDelta(), hku::exception);
+    CHECK_THROWS(TimeDelta(1) / TimeDelta());
 
     /** @arg 对零时长取余 */
-    CHECK_THROWS_AS(TimeDelta(1) % TimeDelta(), hku::exception);
+    CHECK_THROWS(TimeDelta(1) % TimeDelta());
 
     /** @arg 取余 */
     CHECK(TimeDelta(3) % TimeDelta(2) == TimeDelta(1));

@@ -14,7 +14,7 @@
 
 namespace hku {
 
-#define IND_EQ_THRESHOLD 0.000001  ///<判断浮点数相等的阈值,两者差值小于此数
+#define IND_EQ_THRESHOLD 0.000001  ///< 判断浮点数相等的阈值,两者差值小于此数
 
 /**
  * 指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp
@@ -366,4 +366,10 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b);
 Indicator HKU_API IF(const Indicator& x, price_t a, price_t b);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::Indicator> : ostream_formatter {};
+#endif
+
 #endif /* INDICATOR_H_ */

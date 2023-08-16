@@ -239,4 +239,12 @@ inline double AllocateFundsBase::getReservePercent() {
 
 } /* namespace hku */
 
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::AllocateFundsBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::AFPtr> : ostream_formatter {};
+#endif
+
 #endif /* TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_ */

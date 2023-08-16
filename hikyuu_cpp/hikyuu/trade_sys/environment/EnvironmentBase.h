@@ -171,4 +171,13 @@ HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentPtr&);
 HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentBase&);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::EnvironmentBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::EnvironmentPtr> : ostream_formatter {};
+#endif
+
 #endif /* ENVIRONMENT_H_ */

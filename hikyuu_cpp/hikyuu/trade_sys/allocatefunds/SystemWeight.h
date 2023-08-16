@@ -103,4 +103,9 @@ inline bool operator==(const SystemWeight& d1, const SystemWeight& d2) {
 
 } /* namespace hku */
 
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::SystemWeight> : ostream_formatter {};
+#endif
+
 #endif /* TRADE_SYS_ALLOCATEFUNDS_SYSTEMWEIGHT_H_ */

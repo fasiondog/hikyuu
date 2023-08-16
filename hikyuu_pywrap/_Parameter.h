@@ -139,7 +139,7 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             long val = PyLong_AsLongAndOverflow(o.ptr(), &overflow);
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
-#endif            
+#endif
             if (overflow == 0) {
                 m_params[name] = x2();
             } else {
@@ -201,7 +201,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
         }
 
         throw std::logic_error("Unsuport Type! " + name);
-        return;
     }
 
     string mismatch("Mismatch Type! " + name);
@@ -212,7 +211,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
-        return;
     }
 
     if (m_params[name].type() == typeid(int)) {
@@ -222,7 +220,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
-        return;
     }
 
     if (m_params[name].type() == typeid(int64_t)) {
@@ -238,7 +235,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
-        return;
     }
 
     if (m_params[name].type() == typeid(string)) {
@@ -248,7 +244,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
-        return;
     }
 
     if (m_params[name].type() == typeid(Stock)) {
@@ -258,7 +253,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
-        return;
     }
 
     if (m_params[name].type() == typeid(KQuery)) {
@@ -268,7 +262,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
-        return;
     }
 
     if (m_params[name].type() == typeid(KData)) {
@@ -278,7 +271,6 @@ inline void Parameter::set<object>(const string& name, const object& o) {
             return;
         }
         throw std::logic_error(mismatch);
-        return;
     }
 
     if (m_params[name].type() == typeid(PriceList)) {

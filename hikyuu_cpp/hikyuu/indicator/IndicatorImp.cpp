@@ -122,7 +122,7 @@ void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
 
     m_need_calculate = true;
 
-    //子节点设置上下文
+    // 子节点设置上下文
     if (m_left)
         m_left->setContext(stock, query);
     if (m_right)
@@ -130,10 +130,10 @@ void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
     if (m_three)
         m_three->setContext(stock, query);
 
-    //如果上下文有变化则重设上下文
+    // 如果上下文有变化则重设上下文
     setParam<KData>("kdata", stock.getKData(query));
 
-    //启动重新计算
+    // 启动重新计算
     calculate();
 }
 
@@ -150,7 +150,7 @@ void IndicatorImp::setContext(const KData &k) {
 
     m_need_calculate = true;
 
-    //子节点设置上下文
+    // 子节点设置上下文
     if (m_left)
         m_left->setContext(k);
     if (m_right)
@@ -163,10 +163,10 @@ void IndicatorImp::setContext(const KData &k) {
         iter->second->setContext(k);
     }
 
-    //重设上下文
+    // 重设上下文
     setParam<KData>("kdata", k);
 
-    //启动重新计算
+    // 启动重新计算
     calculate();
 }
 
@@ -236,7 +236,7 @@ IndicatorImpPtr IndicatorImp::clone() {
 
 IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
     HKU_INFO("This indicator not support operator()! {}", *this);
-    //保证对齐
+    // 保证对齐
     IndicatorImpPtr result = make_shared<IndicatorImp>();
     size_t total = ind.size();
     result->_readyBuffer(total, m_result_num);
@@ -400,7 +400,7 @@ string IndicatorImp::formula() const {
             break;
 
         default:
-            HKU_ERROR("Wrong optype! {}", m_optype);
+            HKU_ERROR("Wrong optype! {}", int(m_optype));
             break;
     }
 
@@ -474,7 +474,7 @@ bool IndicatorImp::needCalculate() {
         return true;
     }
 
-    //子节点设置上下文
+    // 子节点设置上下文
     if (m_left) {
         m_need_calculate = m_left->needCalculate();
         if (m_need_calculate) {
@@ -623,11 +623,11 @@ Indicator IndicatorImp::calculate() {
             break;
 
         default:
-            HKU_ERROR("Unkown Indicator::OPType! {}", m_optype);
+            HKU_ERROR("Unkown Indicator::OPType! {}", int(m_optype));
             break;
     }
 
-    //使用原型方式时，不加此判断无法立刻重新计算
+    // 使用原型方式时，不加此判断无法立刻重新计算
     if (size() != 0) {
         m_need_calculate = false;
     }

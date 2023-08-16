@@ -220,4 +220,13 @@ inline bool SignalBase::shouldSell(const Datetime& datetime) const {
 }
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::SignalBase> : ostream_formatter {};
+
+template <>
+struct fmt::formatter<hku::SignalPtr> : ostream_formatter {};
+#endif
+
 #endif /* SIGNALBASE_H_ */

@@ -63,7 +63,7 @@ struct HKU_API PositionRecord {
     price_t calculateCloseProfit(price_t closePrice) const;
 
 //===================
-//序列化支持
+// 序列化支持
 //===================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -132,4 +132,10 @@ inline std::ostream& operator<<(std::ostream& os, const PositionRecord& pos) {
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::PositionRecord> : ostream_formatter {};
+#endif
+
 #endif /* POSITIONRECORD_H_ */

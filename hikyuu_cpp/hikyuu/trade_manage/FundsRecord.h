@@ -32,17 +32,17 @@ public:
     price_t base_cash;    /**< 当前投入本金principal */
     price_t base_asset; /**< 当前投入的自有资产价值 */
 
-    //当前总资产 = 现金 + 市值
-    //         = cash + market_value
-    //当前投入本值资产 = 投入本金 + 投入资产价值
-    //               = base_cash + base_asset
-    //当前收益 = 当前总资产 - 当前投入本值资产
+    // 当前总资产 = 现金 + 市值
+    //          = cash + market_value
+    // 当前投入本值资产 = 投入本金 + 投入资产价值
+    //                = base_cash + base_asset
+    // 当前收益 = 当前总资产 - 当前投入本值资产
 
     FundsRecord operator+(const FundsRecord other);
 
     FundsRecord& operator+=(const FundsRecord other);
 
-    //序列化支持
+    // 序列化支持
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
@@ -65,4 +65,10 @@ HKU_API std::ostream& operator<<(std::ostream&, const FundsRecord&);
 bool HKU_API operator==(const FundsRecord& d1, const FundsRecord& d2);
 
 } /* namespace hku */
+
+#if FMT_VERSION >= 90000
+template <>
+struct fmt::formatter<hku::FundsRecord> : ostream_formatter {};
+#endif
+
 #endif /* FUNDSRECORD_H_ */

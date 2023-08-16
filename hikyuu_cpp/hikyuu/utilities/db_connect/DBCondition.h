@@ -139,32 +139,44 @@ inline std::ostream& operator<<(std::ostream& out, const DBCondition& d) {
 
 template <typename T>
 inline DBCondition operator==(const Field& field, T val) {
-    return DBCondition(fmt::format("({}={})", field.name, val));
+    std::ostringstream out;
+    out << "(" << field.name << "=" << val << ")";
+    return DBCondition(out.str());
 }
 
 template <typename T>
 inline DBCondition operator!=(const Field& field, T val) {
-    return DBCondition(fmt::format("({}<>{})", field.name, val));
+    std::ostringstream out;
+    out << "(" << field.name << "<>" << val << ")";
+    return DBCondition(out.str());
 }
 
 template <typename T>
 inline DBCondition operator>(const Field& field, T val) {
-    return DBCondition(fmt::format("({}>{})", field.name, val));
+    std::ostringstream out;
+    out << "(" << field.name << ">" << val << ")";
+    return DBCondition(out.str());
 }
 
 template <typename T>
 inline DBCondition operator>=(const Field& field, T val) {
-    return DBCondition(fmt::format("({}>={})", field.name, val));
+    std::ostringstream out;
+    out << "(" << field.name << ">=" << val << ")";
+    return DBCondition(out.str());
 }
 
 template <typename T>
 inline DBCondition operator<(const Field& field, T val) {
-    return DBCondition(fmt::format("({}<{})", field.name, val));
+    std::ostringstream out;
+    out << "(" << field.name << "<" << val << ")";
+    return DBCondition(out.str());
 }
 
 template <typename T>
 inline DBCondition operator<=(const Field& field, T val) {
-    return DBCondition(fmt::format("({}<={})", field.name, val));
+    std::ostringstream out;
+    out << "(" << field.name << "<=" << val << ")";
+    return DBCondition(out.str());
 }
 
 template <>

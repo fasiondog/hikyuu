@@ -72,7 +72,7 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     CHECK_NE(marketInfo, Null<MarketInfo>());
     CHECK_EQ(marketInfo.market(), "SH");
     CHECK_EQ(marketInfo.code(), "000001");
-    CHECK_EQ(marketInfo.name(), "上海证劵交易所");
+    CHECK_EQ(marketInfo.name(), "上海证券交易所");
     CHECK_EQ(marketInfo.description(), "上海市场");
     CHECK_EQ(marketInfo.lastDate(), Datetime(201112060000L));
     CHECK_EQ(marketInfo.openTime1(), TimeDelta(0, 9, 30));

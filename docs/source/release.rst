@@ -1,6 +1,23 @@
 版本发布说明
 =======================
 
+1.2.8 - 2023年8月16日
+-------------------------
+
+1. fixed 多broker时m_broker_last_datetime更新
+2. support Query.HOUR2
+3. 优化 Stock 缓存修改增加二次保护
+4. fix time delta when start_time < phase1_start
+5. add timeout for proxy requests.get
+6. 重复用一个代理ip,当超时6次换ip
+7. 解决delta.total_seconds()出现负值的情况
+8. update executor.map timeout
+9. fixed for bokeh3
+10. fixed flatbuffers version
+11. 升级 fmt
+12. fix "zsbk_sz = blockbj"  to "zsbk_bj = blockbj"
+13. 优化编译工程
+
 1.2.7 - 2022年11月21日
 -------------------------
 
