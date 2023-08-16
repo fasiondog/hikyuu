@@ -41,6 +41,7 @@ set_languages("cxx17", "c99")
 local boost_version = "1.81.0"
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
+local fmt_version = "10.0.0"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then mysql_version = "8.0.21" end
 
 add_repositories("project-repo hikyuu_extern_libs")
@@ -52,7 +53,6 @@ if is_plat("windows") then
     add_requires("hdf5_D " .. hdf5_version)
   end
   add_requires("mysql " .. mysql_version)
-  add_requires("python", {configs = {pyver = get_config("pyver")}})
 elseif is_plat("linux", "cross") then
   add_requires("hdf5 " .. hdf5_version, { system = false })
   -- add_requires("mysql" , {system = true})
@@ -61,23 +61,25 @@ elseif is_plat("macosx") then
   add_requires("brew::hdf5")
 end
 
-add_requires("boost " .. boost_version, {
+add_requires("myboost " .. boost_version, {
   system = false,
+  alias = "boost",
   configs = {
     shared = is_plat("windows") and true or false,
     data_time = true,
     filesystem = true,
     serialization = true,
     system = false,
-    system = true,
     python = true,
     pyver = get_config("pyver"),
   },
 })
+if is_plat("windows") then
+  add_requireconfs("myboost.python", {override = true, system=false})
+end
 
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
--- add_requireconfs("spdlog.fmt", {override = true, version = "8.1.1", configs = {header_only = true}})
-add_requireconfs("spdlog.fmt", {override = true, configs = {header_only = true}})
+add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
 add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = "MD", cxflags = "-fPIC"}})
 add_requires("flatbuffers 2.0.0", {system = false, configs = {vs_runtime = "MD"}})
 add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
