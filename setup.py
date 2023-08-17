@@ -184,7 +184,7 @@ def test(all, compile, verbose, mode, case, j):
     current_compile_info['mode'] = mode
     history_compile_info = get_history_compile_info()
     if compile or current_compile_info != history_compile_info:
-        start_build(verbose, mode)
+        start_build(verbose, mode, j)
     if all:
         os.system("xmake -j {} -b {} unit-test".format(
             j, "-v -D" if verbose else ""))
