@@ -26,4 +26,4 @@ jobs:
       run: |
         cd hikyuu
         xmake f -y --pyver=3.11
-        xmake -bvD core
+        xmake -b core
