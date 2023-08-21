@@ -403,9 +403,6 @@ TEST_CASE("test_TradeManager_normal_buy_and_sell_no_margin_by_day") {
     auto current_num = tm->getHoldNumber(Datetime(199305260000LL), stk);
     CHECK_EQ(current_num, 185);  // 24日送转85股, 红利30元
     auto k = stk.getKRecord(Datetime(199305260000LL));
-    std::cout << tm << std::endl;
-    std::cout << k << std::endl;
-    std::cout << tm->getFunds(Datetime(199305260000ULL)) << std::endl;
     CHECK_EQ(tm->getFunds(Datetime(199305260000ULL)), FundsRecord(94260., 5180.0, 100000., 0.));
     tr = tm->sell(Datetime(199305260000LL), stk, 28.1, MAX_DOUBLE);
 
