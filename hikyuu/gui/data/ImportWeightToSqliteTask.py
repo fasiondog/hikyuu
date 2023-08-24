@@ -37,7 +37,7 @@ from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
 #from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
-from hikyuu.util.check import hku_catch
+from hikyuu.util.check import hku_catch, hku_check
 
 
 class ImportWeightToSqliteTask:
@@ -82,7 +82,7 @@ class ImportWeightToSqliteTask:
         try:
             hosts = search_best_tdx()
             api = TdxHq_API()
-            api.connect(hosts[0][2], hosts[0][3])
+            hku_check(api.connect(hosts[0][2], hosts[0][3]), "failed connect pytdx {}:{}!", hosts[0][2], hosts[0][3])
 
             self.logger.info('正在导入权息数据')
             self.queue.put([self.msg_name, '正在导入权息数据...', 0, 0, 0])

@@ -81,7 +81,7 @@ class ImportPytdxToH5:
         try:
             progress = ProgressBar(self)
             api = TdxHq_API()
-            api.connect(self.ip, self.port)
+            hku_check(api.connect(self.ip, self.port), "failed connect pytdx: {}:{}", self.ip, self.port)
             count = import_data(
                 connect, self.market, self.ktype, self.quotations, api, self.dest_dir, self.startDatetime, progress
             )

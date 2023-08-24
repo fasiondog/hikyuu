@@ -42,7 +42,7 @@ class ImportHistoryFinanceTask:
 
     def connect(self):
         self.api = TdxHq_API()
-        self.api.connect('120.76.152.87', 7709)
+        hku_check(self.api.connect('120.76.152.87', 7709), "failed connect pytdx!")
 
     def get_list_info(self):
         result = []
