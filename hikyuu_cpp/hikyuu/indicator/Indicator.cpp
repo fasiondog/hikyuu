@@ -275,7 +275,7 @@ HKU_API Indicator operator|(price_t val, const Indicator& ind) {
 Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2) {
     HKU_ERROR_IF_RETURN(!ind1.getImp() || !ind2.getImp(), Indicator(),
                         "ind1 or ind2 is Null Indicator!");
-    IndicatorImpPtr p = make_shared<IndicatorImp>();
+    IndicatorImpPtr p = make_shared<IndicatorImp>("WEAVE");
     p->add(IndicatorImp::WEAVE, ind1.getImp(), ind2.getImp());
     return p->calculate();
 }

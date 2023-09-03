@@ -392,7 +392,8 @@ string IndicatorImp::formula() const {
             break;
 
         case WEAVE:
-            buf << "WEAVE(" << m_left->formula() << ", " << m_right->formula() << ")";
+            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
+            break;
 
         case OP_IF:
             buf << "IF(" << m_three->formula() << ", " << m_left->formula() << ", "
