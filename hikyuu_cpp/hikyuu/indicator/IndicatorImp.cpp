@@ -400,6 +400,10 @@ string IndicatorImp::formula() const {
                 << m_right->formula() << ")";
             break;
 
+        case CORR:
+            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
+            break;
+
         default:
             HKU_ERROR("Wrong optype! {}", int(m_optype));
             break;
@@ -621,6 +625,10 @@ Indicator IndicatorImp::calculate() {
 
         case OP_IF:
             execute_if();
+            break;
+
+        case CORR:
+            execute_corr();
             break;
 
         default:
@@ -1249,6 +1257,55 @@ void IndicatorImp::execute_if() {
             }
         }
     }
+}
+
+void IndicatorImp::execute_corr() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    size_t result_number = minp->getResultNumber() + maxp->getResultNumber();
+    _readyBuffer(total, result_number);
+    setDiscard(discard);
+    // if (m_left->size() >= m_right->size()) {
+    //     size_t num = m_left->getResultNumber();
+    //     for (size_t r = 0; r < num; ++r) {
+    //         for (size_t i = discard; i < total; ++i) {
+    //             _set(m_left->get(i, r), i, r);
+    //         }
+    //     }
+    //     for (size_t r = num; r < result_number; r++) {
+    //         for (size_t i = discard; i < total; i++) {
+    //             _set(m_right->get(i - diff, r - num), i, r);
+    //         }
+    //     }
+    // } else {
+    //     size_t num = m_left->getResultNumber();
+    //     for (size_t r = 0; r < num; ++r) {
+    //         for (size_t i = discard; i < total; ++i) {
+    //             _set(m_left->get(i - diff, r), i, r);
+    //         }
+    //     }
+    //     for (size_t r = num; r < result_number; r++) {
+    //         for (size_t i = discard; i < total; i++) {
+    //             _set(m_right->get(i, r - num), i, r);
+    //         }
+    //     }
+    // }
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {

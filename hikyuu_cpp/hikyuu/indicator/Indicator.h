@@ -365,6 +365,14 @@ Indicator HKU_API IF(const Indicator& x, price_t a, const Indicator& b);
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b);
 Indicator HKU_API IF(const Indicator& x, price_t a, price_t b);
 
+/**
+ * 计算相关系数
+ * @param ind1 指标1
+ * @param ind2 指标2
+ * @ingroup Indicator
+ */
+Indicator HKU_API CORR(const Indicator& ind1, const Indicator& ind2, int n);
+
 } /* namespace hku */
 
 #if FMT_VERSION >= 90000
