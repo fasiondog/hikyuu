@@ -1,4 +1,4 @@
-set_xmakever("2.5.4")
+set_xmakever("2.8.2")
 -- Last Modified: 2023-08-08 11:28:13
 
 -- project
@@ -132,11 +132,11 @@ if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) 
   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
 end
 
-add_subdirs("./hikyuu_cpp/hikyuu")
-add_subdirs("./hikyuu_pywrap")
-add_subdirs("./hikyuu_cpp/unit_test")
-add_subdirs("./hikyuu_cpp/demo")
-add_subdirs("./hikyuu_cpp/hikyuu_server")
+includes("./hikyuu_cpp/hikyuu")
+includes("./hikyuu_pywrap")
+includes("./hikyuu_cpp/unit_test")
+includes("./hikyuu_cpp/demo")
+includes("./hikyuu_cpp/hikyuu_server")
 
 before_install("scripts.before_install")
 on_install("scripts.on_install")
