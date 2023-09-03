@@ -39,9 +39,9 @@ TEST_CASE("test_VAR") {
     CHECK_EQ(dev.name(), "VAR");
     CHECK_EQ(dev.size(), 15);
 
-    vector<price_t> expected{0., 0.55,    1.,      1.666667, 2.5,     2.16667, 3.90476, 3.35714,
+    vector<price_t> expected{0., 0.5,     1.,      1.666667, 2.5,     2.16667, 3.90476, 3.35714,
                              6., 8.54444, 9.87778, 8.01111,  10.6778, 13.3444, 16.0111};
-    for (size_t i = 9; i < dev.size(); i++) {
+    for (size_t i = 0; i < dev.size(); i++) {
         CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.001));
     }
 
