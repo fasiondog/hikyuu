@@ -14,6 +14,7 @@
 #include <hikyuu/indicator/crt/VARP.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/MA.h>
 
 using namespace hku;
 
@@ -38,13 +39,12 @@ TEST_CASE("test_VARP") {
     Indicator dev = VARP(ind, 10);
     CHECK_EQ(dev.name(), "VARP");
     CHECK_EQ(dev.size(), 15);
-    CHECK_UNARY(std::isnan(dev[8]));
-    CHECK_LT(std::fabs(dev[9] - 7.69), 0.01);
-    CHECK_LT(std::fabs(dev[10] - 8.89), 0.01);
-    CHECK_LT(std::fabs(dev[11] - 7.21), 0.01);
-    CHECK_LT(std::fabs(dev[12] - 9.61), 0.01);
-    CHECK_LT(std::fabs(dev[13] - 12.01), 0.01);
-    CHECK_LT(std::fabs(dev[14] - 14.41), 0.01);
+
+    vector<price_t> expected{0.,      0.25, 0.666667, 1.25, 2.0,  1.80556, 3.34694, 2.9375,
+                             5.33333, 7.69, 8.89,     7.21, 9.61, 12.01,   14.41};
+    for (size_t i = 0; i < dev.size(); i++) {
+        CHECK_EQ(expected[i], doctest::Approx(dev[i]).epsilon(0.001));
+    }
 
     /** @arg n = 1时 */
     dev = VARP(ind, 1);
