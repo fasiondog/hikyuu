@@ -728,6 +728,15 @@ void export_Indicator_build_in() {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
+    def("CORR", CORR, R"(CORR(ind1, ind2, n)
+
+    计算 ind1 和 ind2 的相关系数
+
+    :param Indicator ind1: 指标1
+    :param Indicator ind2: 指标2
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
+    :rtype: Indicator)");
+
     def("IF", IF_1);
     def("IF", IF_2);
     def("IF", IF_3);

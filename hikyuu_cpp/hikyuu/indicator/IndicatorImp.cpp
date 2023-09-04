@@ -1278,34 +1278,49 @@ void IndicatorImp::execute_corr() {
         discard = maxp->discard();
     }
 
-    size_t result_number = minp->getResultNumber() + maxp->getResultNumber();
-    _readyBuffer(total, result_number);
+    _readyBuffer(total, 1);
+
+    int n = getParam<int>("n");
+    if (n < 2 || discard + 2 > total) {
+        setDiscard(total);
+        return;
+    }
+
     setDiscard(discard);
-    // if (m_left->size() >= m_right->size()) {
-    //     size_t num = m_left->getResultNumber();
-    //     for (size_t r = 0; r < num; ++r) {
-    //         for (size_t i = discard; i < total; ++i) {
-    //             _set(m_left->get(i, r), i, r);
-    //         }
-    //     }
-    //     for (size_t r = num; r < result_number; r++) {
-    //         for (size_t i = discard; i < total; i++) {
-    //             _set(m_right->get(i - diff, r - num), i, r);
-    //         }
-    //     }
-    // } else {
-    //     size_t num = m_left->getResultNumber();
-    //     for (size_t r = 0; r < num; ++r) {
-    //         for (size_t i = discard; i < total; ++i) {
-    //             _set(m_left->get(i - diff, r), i, r);
-    //         }
-    //     }
-    //     for (size_t r = num; r < result_number; r++) {
-    //         for (size_t i = discard; i < total; i++) {
-    //             _set(m_right->get(i, r - num), i, r);
-    //         }
-    //     }
-    // }
+
+    price_t null_price = Null<price_t>();
+    vector<price_t> prebufx(total, null_price);
+    vector<price_t> prebufy(total, null_price);
+    price_t kx = maxp->get(discard);
+    price_t ky = minp->get(discard);
+    price_t ex = 0.0, ey = 0.0, exy = 0.0;
+    prebufx[discard] = 0.0;
+    prebufy[discard] = 0.0;
+
+    for (size_t i = discard, nobs = 0; i < total; ++i) {
+        price_t ix = maxp->get(i) - kx;
+        price_t iy = minp->get(i) - ky;
+        price_t preix = prebufx[i - nobs];
+        price_t preiy = prebufy[i - nobs];
+        HKU_INFO_IF(i % 100 == 0, "{}: ix: {}, iy: {}, preix: {}, preiy: {}", i, ix, iy, preix,
+                    preiy);
+        if (!std::isnan(preix) && !std::isnan(preiy) && !std::isnan(ix) && !std::isnan(iy)) {
+            if (nobs < n) {
+                nobs++;
+                ex += ix;
+                ey += iy;
+                exy += ix * iy;
+                _set((exy - ex * ey / nobs) / nobs, i);
+            } else {
+                ex += ix - preix;
+                ey += iy - preiy;
+                exy += (ix - kx) * (iy - ky);
+                _set((exy - ex * ey / n) / n, i);
+            }
+            prebufx[i] = ix;
+            prebufy[i] = iy;
+        }
+    }
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
