@@ -44,7 +44,7 @@ void IndicatorImp::releaseDynEngine() {
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
     os << "Indicator{\n"
-       << "  name: " << imp.name() << "\n  size: " << imp.size()
+       << "  name: " << imp.name() << "\n  size: " << imp.size() << "\n  discard: " << imp.discard()
        << "\n  result sets: " << imp.getResultNumber() << "\n  params: " << imp.getParameter()
        << "\n  support indicator param: " << (imp.supportIndParam() ? "True" : "False");
     if (imp.supportIndParam()) {
@@ -253,8 +253,8 @@ void IndicatorImp::setDiscard(size_t discard) {
                 _set(null_price, j, i);
             }
         }
-        m_discard = tmp_discard;
     }
+    m_discard = tmp_discard;
 }
 
 string IndicatorImp::long_name() const {

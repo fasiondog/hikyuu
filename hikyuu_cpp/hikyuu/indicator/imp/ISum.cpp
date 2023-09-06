@@ -41,6 +41,7 @@ void ISum::_calculate(const Indicator& ind) {
         return;
     }
 
+    m_discard = ind.discard();
     price_t sum = 0.0;
     for (size_t i = m_discard; i < m_discard + n; i++) {
         sum += ind[i];
