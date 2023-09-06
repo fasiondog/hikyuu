@@ -42,6 +42,7 @@ local boost_version = "1.81.0"
 local hdf5_version = "1.12.2"
 local mysql_version = "8.0.31"
 local fmt_version = "10.0.0"
+local flatbuffers_version = "2.0.0"
 if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then mysql_version = "8.0.21" end
 
 add_repositories("project-repo hikyuu_extern_libs")
@@ -81,7 +82,7 @@ end
 add_requires("spdlog", {system = false, configs = {header_only = true, fmt_external = true, vs_runtime = "MD"}})
 add_requireconfs("spdlog.fmt", {override = true, version = fmt_version, configs = {header_only = true}})
 add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = "MD", cxflags = "-fPIC"}})
-add_requires("flatbuffers 2.0.0", {system = false, configs = {vs_runtime = "MD"}})
+add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs = {vs_runtime = "MD"}})
 add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("cpp-httplib", {system = false})
