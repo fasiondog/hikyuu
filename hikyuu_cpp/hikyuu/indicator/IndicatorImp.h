@@ -77,6 +77,7 @@ public:
         OR,     ///< 或
         WEAVE,  ///< 特殊的，需要两个指标作为参数的指标
         OP_IF,  /// if操作
+        CORR,   ///< 相关系数，需要两个指标作为参数
         INVALID
     };
 
@@ -211,6 +212,7 @@ private:
     void execute_or();
     void execute_weave();
     void execute_if();
+    void execute_corr();
 
 protected:
     static size_t _get_step_start(size_t pos, size_t step, size_t discard);
