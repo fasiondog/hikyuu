@@ -730,7 +730,7 @@ void export_Indicator_build_in() {
 
     def("CORR", CORR, R"(CORR(ind1, ind2, n)
 
-    计算 ind1 和 ind2 的相关系数
+    计算 ind1 和 ind2 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2

@@ -366,7 +366,7 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, price_t b);
 Indicator HKU_API IF(const Indicator& x, price_t a, price_t b);
 
 /**
- * 计算相关系数
+ * 计算样本相关系数与协方差。返回的结果集中，第一个为相关系数，第二个为协方差
  * @param ind1 指标1
  * @param ind2 指标2
  * @ingroup Indicator
