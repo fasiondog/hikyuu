@@ -1278,7 +1278,9 @@ void IndicatorImp::execute_corr() {
         discard = maxp->discard();
     }
 
-    _readyBuffer(total, 1);
+    // 结果 0 存放相关系数结果
+    // 结果 1 存放协方差（COV）结果
+    _readyBuffer(total, 2);
 
     int n = getParam<int>("n");
     if (n < 2 || discard + 2 > total) {
@@ -1286,22 +1288,30 @@ void IndicatorImp::execute_corr() {
         return;
     }
 
-    setDiscard(discard);
-
     price_t null_price = Null<price_t>();
     vector<price_t> prebufx(total, null_price);
     vector<price_t> prebufy(total, null_price);
+    vector<price_t> prepowx(total, null_price);
+    vector<price_t> prepowy(total, null_price);
+    vector<price_t> prepowxy(total, null_price);
     price_t kx = maxp->get(discard);
     price_t ky = minp->get(discard);
-    price_t ex = 0.0, ey = 0.0, exy = 0.0;
+    price_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
+    price_t ex2 = 0.0, ey2 = 0.0, exy2 = 0.0;
     prebufx[discard] = 0.0;
     prebufy[discard] = 0.0;
+    prepowx[discard] = 0.0;
+    prepowy[discard] = 0.0;
+    prepowxy[discard] = 0.0;
 
     for (size_t i = discard, nobs = 0; i < total; ++i) {
         price_t ix = maxp->get(i) - kx;
         price_t iy = minp->get(i) - ky;
         price_t preix = prebufx[i - nobs];
         price_t preiy = prebufy[i - nobs];
+        price_t prepowix = prepowx[i - nobs];
+        price_t prepowiy = prepowy[i - nobs];
+        price_t prepowixy = prepowxy[i - nobs];
         HKU_INFO_IF(i % 100 == 0, "{}: ix: {}, iy: {}, preix: {}, preiy: {}", i, ix, iy, preix,
                     preiy);
         if (!std::isnan(preix) && !std::isnan(preiy) && !std::isnan(ix) && !std::isnan(iy)) {
@@ -1310,17 +1320,35 @@ void IndicatorImp::execute_corr() {
                 ex += ix;
                 ey += iy;
                 exy += ix * iy;
-                _set((exy - ex * ey / nobs) / nobs, i);
+                ex2 += std::pow(ix, 2);
+                ey2 += std::pow(iy, 2);
+                varx = nobs == 1 ? 0. : (ex2 - std::pow(ex, 2) / nobs) / (nobs - 1);
+                vary = nobs == 1 ? 0. : (ey2 - std::pow(ey, 2) / nobs) / (nobs - 1);
+                cov = nobs == 1 ? 0. : (exy - ex * ey / nobs) / (nobs - 1);
+                _set(cov / std::sqrt(varx * vary), i, 0);
+                _set(cov, i, 1);
             } else {
                 ex += ix - preix;
                 ey += iy - preiy;
-                exy += (ix - kx) * (iy - ky);
-                _set((exy - ex * ey / n) / n, i);
+                ex2 = ex2 - prepowix + std::pow(ix, 2);
+                ey2 = ey2 - prepowiy + std::pow(iy, 2);
+                exy = exy + ix * iy - prepowixy;
+                varx = (ex2 - std::pow(ex, 2) / n) / (n - 1);
+                vary = (ey2 - std::pow(ey, 2) / n) / (n - 1);
+                cov = (exy - ex * ey / n) / (n - 1);
+                _set(cov / std::sqrt(varx * vary), i, 0);
+                _set(cov, i, 1);
             }
             prebufx[i] = ix;
             prebufy[i] = iy;
+            prepowx[i] = ex2;
+            prepowy[i] = ey2;
+            prepowxy[i] = exy2;
         }
     }
+
+    // 修正 discard
+    setDiscard(++discard);
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
