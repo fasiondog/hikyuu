@@ -18,8 +18,7 @@ class TestStrategy(StrategyBase):
     def on_bar(self, ktype):
         print("on bar {}".format(ktype))
         print("{}".format(len(StockManager.instance())))
-        sm = StockManager.instance()
-        for s in sm:
+        for s in self.sm:
             print(s)
 
 

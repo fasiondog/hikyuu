@@ -36,6 +36,10 @@ public:
         m_name = name;
     }
 
+    StockManager& getSM() {
+        return StockManager::instance();
+    }
+
     TMPtr getTM() const {
         return m_tm;
     }
