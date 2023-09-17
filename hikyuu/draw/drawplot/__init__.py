@@ -31,6 +31,7 @@
 
 from hikyuu.cpp.core import KData, Indicator, SignalBase, ConditionBase, System
 
+import matplotlib
 from matplotlib.pylab import gca as mpl_gca
 from matplotlib.pylab import gcf as mpl_gcf
 from .matplotlib_draw import create_figure as mpl_create_figure
@@ -56,6 +57,9 @@ from .bokeh_draw import ibar as bk_ibar
 from .bokeh_draw import ax_draw_macd as bk_ax_draw_macd
 from .bokeh_draw import ax_draw_macd2 as bk_ax_draw_macd2
 from .bokeh_draw import sgplot as bk_sgplot
+from .bokeh_draw import use_bokeh_in_notebook
+
+from .common import in_interactive_session, in_ipython_frontend
 
 g_draw_engine = 'matplotlib'
 
@@ -80,8 +84,8 @@ def use_draw_engine(engine='matplotlib'):
 
 
 def use_draw_with_bokeh():
-    from bokeh.io import output_notebook
-    output_notebook()
+    if in_ipython_frontend():
+        use_bokeh_in_notebook(True)
     set_current_draw_engine('bokeh')
 
     KData.plot = bk_kplot
@@ -95,6 +99,9 @@ def use_draw_with_bokeh():
 
 def use_draw_with_matplotlib():
     set_current_draw_engine('matplotlib')
+
+    if in_interactive_session():
+        matplotlib.rcParams['interactive'] = True
 
     KData.plot = mpl_kplot
     KData.kplot = mpl_kplot
