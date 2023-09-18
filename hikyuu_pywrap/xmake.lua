@@ -21,7 +21,7 @@ target("core")
         set_filename("core.so")
     end
 
-    if is_plat("windows") then
+    if is_plat("windows") and is_mode("release") then
         add_defines("HKU_API=__declspec(dllimport)")
         add_cxflags("-wd4566")
     end

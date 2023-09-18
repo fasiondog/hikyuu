@@ -123,3 +123,8 @@ target("small-test")
 
     after_run(coverage_report)
 target_end()
+
+target("prepare-test")
+    set_kind("phony")
+    set_default(false)
+target_end()
