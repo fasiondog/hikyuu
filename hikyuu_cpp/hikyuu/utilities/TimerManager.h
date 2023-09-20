@@ -332,9 +332,6 @@ private:
 
             // 计算下一次执行的时间点
             Datetime today = now.startOfDay();
-            s.m_time_point = timer->m_start_time >= TimeDelta() ? s.m_time_point + timer->m_duration
-                                                                : s.m_time_point + TimeDelta(1);
-
             if (timer->m_start_time >= TimeDelta()) {
                 // 非指定时刻执行的定时器
                 s.m_time_point = s.m_time_point + timer->m_duration;
