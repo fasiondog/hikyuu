@@ -53,19 +53,23 @@ TEST_CASE("test_TimerManager") {
       tm.addFuncAtTimeEveryDay(Datetime(), Datetime::max(), TimeDelta(0, 1), hello_test),
       hku::exception);
 
-    /*
+#if 0
+    Datetime now = Datetime::now();
+    TimeDelta time = now - now.startOfDay();
     tm.addDelayFunc(Microseconds(30), []() { HKU_INFO("1 test delay *************************"); });
     tm.addDelayFunc(Seconds(2), []() { HKU_INFO("2 test delay *************************"); });
     tm.addDurationFunc(3, Milliseconds(500),
                        []() { HKU_INFO("3 test delay *************************"); });
-    tm.addFuncAtTime(Datetime(202101112305),
+    tm.addFuncAtTime(now + Seconds(1),
                      []() { HKU_INFO("addFuncAtTime test delay *************************"); });
-    tm.addFuncAtTimeEveryDay(Datetime::today(), Datetime::max(), TimeDelta(0, 23, 17), []() {
-        HKU_INFO("addFuncAtTimeEveryDay test delay *************************");
+    tm.addFuncAtTimeEveryDay(Datetime::today(), Datetime::max(), time + Seconds(30), []() {
+        HKU_INFO("addFuncAtTimeEveryDay test delay 1 *************************");
     });
-    tm.addFuncAtTime(Datetime::today(), Datetime::max(), Datetime(202101122300),
-                     []() { HKU_INFO("addFuncAtTime test delay *************************"); });
-    std::this_thread::sleep_for(std::chrono::seconds(60));*/
+    tm.addFuncAtTimeEveryDay(time + Seconds(45), []() {
+        HKU_INFO("addFuncAtTimeEveryDay test delay 2 *************************");
+    });
+    std::this_thread::sleep_for(std::chrono::seconds(60));
+#endif
 }
 
 /** @} */
