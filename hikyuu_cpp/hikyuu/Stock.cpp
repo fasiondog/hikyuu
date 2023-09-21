@@ -665,7 +665,8 @@ TransList Stock::getTransList(const KQuery& query) const {
 
 Parameter Stock::getFinanceInfo() const {
     Parameter result;
-    HKU_IF_RETURN(type() != STOCKTYPE_A, result);
+    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
+              result);
 
     BaseInfoDriverPtr driver = StockManager::instance().getBaseInfoDriver();
     if (driver) {
@@ -677,7 +678,8 @@ Parameter Stock::getFinanceInfo() const {
 
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     PriceList result;
-    HKU_IF_RETURN(type() != STOCKTYPE_A, result);
+    HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
+              result);
     const StockManager& sm = StockManager::instance();
     HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
     result = rd.getHistoryFinanceInfo(date, market(), code());
