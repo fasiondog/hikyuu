@@ -35,7 +35,7 @@ from hikyuu.data.common_pytdx import search_best_tdx
 from hikyuu.data.weight_to_sqlite import qianlong_import_weight
 from hikyuu.data.pytdx_weight_to_sqlite import pytdx_import_weight_to_sqlite
 from hikyuu.data.pytdx_weight_to_mysql import pytdx_import_weight_to_mysql
-#from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
+from hikyuu.data.pytdx_finance_to_sqlite import pytdx_import_finance
 from hikyuu.util import capture_multiprocess_all_logger, get_default_logger
 from hikyuu.util.check import hku_catch, hku_check
 
@@ -95,6 +95,17 @@ class ImportWeightToSqliteTask:
 
             self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, total_count])
             self.logger.info('导入权息数据完毕')
+
+            self.queue.put([self.msg_name, '下载通达信财务信息(上证)...', 0, 0, 0])
+            x = pytdx_import_finance(connect, api, "SH")
+
+            self.queue.put([self.msg_name, '下载通达信财务信息(深证)...', 0, 0, 0])
+            x += pytdx_import_finance(connect, api, "SZ")
+
+            self.queue.put([self.msg_name, '下载通达信财务信息(北证)...', 0, 0, 0])
+            x += pytdx_import_finance(connect, api, "BJ")
+            self.queue.put([self.msg_name, '导入通达信财务信息完毕!', 0, 0, x])
+
             api.disconnect()
 
         except Exception as e:

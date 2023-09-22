@@ -643,8 +643,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 self.hdf5_weight_label.setText(msg[2])
                 if msg[2] == '导入权息数据完毕!':
                     self.import_detail_textEdit.append('导入权息记录数：{}'.format(msg[3]))
-                #elif msg[2] == '导入通达信财务信息完毕!':
-                #    self.import_detail_textEdit.append('导入通达信财务记录数：{}'.format(msg[3]))
+                elif msg[2] == '导入通达信财务信息完毕!':
+                    self.import_detail_textEdit.append('导入通达信财务记录数：{}'.format(msg[3]))
 
             elif msg_task_name == 'IMPORT_FINANCE':
                 # self.finance_progressBar.setValue(msg[2])
