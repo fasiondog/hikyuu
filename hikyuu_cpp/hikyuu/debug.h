@@ -9,7 +9,7 @@
 
 #pragma once
 
-#if defined(_MSC_VER) && (defined(_DEBUG) || defined(DEBUG))
+#if defined(_MSC_VER) && (defined(_DEBUG) || defined(DEBUG)) && defined(ENABLE_LEAK_DETECT)
 #ifndef MSVC_LEAKER_DETECT
 #define MSVC_LEAKER_DETECT
 #endif
