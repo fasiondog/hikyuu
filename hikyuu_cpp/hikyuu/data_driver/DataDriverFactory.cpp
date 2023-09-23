@@ -14,6 +14,7 @@
 #include "kdata/mysql/MySQLKDataDriver.h"
 #include "kdata/tdx/TdxKDataDriver.h"
 #include "kdata/cvs/KDataTempCsvDriver.h"
+#include "kdata/sqlite/SQLiteKDataDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
@@ -40,6 +41,7 @@ void DataDriverFactory::init() {
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<KDataTempCsvDriver>());
+    DataDriverFactory::regKDataDriver(make_shared<SQLiteKDataDriver>());
 }
 
 void DataDriverFactory::release() {

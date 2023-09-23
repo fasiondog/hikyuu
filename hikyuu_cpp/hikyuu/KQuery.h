@@ -72,6 +72,8 @@ public:
     /** 获取所有的 KType */
     static vector<string>& getAllKType();
 
+    static int32_t getKTypeInMin(KType);
+
     /**
      * 复权类型
      * @note 日线以上，如周线/月线不支持复权
