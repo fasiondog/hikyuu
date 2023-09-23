@@ -16,6 +16,7 @@
 #include <string>
 #include <string_view>
 #include <algorithm>
+#include "../Log.h"
 
 namespace hku {
 
@@ -95,9 +96,9 @@ inline std::vector<std::string_view> split(const std::string_view& view, char c)
 template <class T>
 std::vector<std::vector<size_t>> combinateIndex(const std::vector<T>& inputs) {
     size_t total = inputs.size();
-    // HKU_CHECK(total <= 15, "The length of inputs exceeds the maximum limit!");
-    std::vector<std::vector<size_t>> result;
+    HKU_CHECK(total <= 15, "The length of inputs exceeds the maximum limit!");
 
+    std::vector<std::vector<size_t>> result;
     std::vector<size_t> current;
     for (size_t i = 0; i < total; i++) {
         for (size_t j = 0, len = result.size(); j < len; j++) {

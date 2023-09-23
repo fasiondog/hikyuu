@@ -16,10 +16,11 @@ namespace py = boost::python;
 
 template <class T>
 py::list vector_to_py_list(const T& v) {
-    py::object get_iter = py::iterator<T>();
-    py::object iter = get_iter(v);
-    py::list l(iter);
-    return l;
+    py::list ret;
+    for (size_t i = 0, total = v.size(); i < total; i++) {
+        ret.append(v[i]);
+    }
+    return ret;
 }
 
 template <class T>

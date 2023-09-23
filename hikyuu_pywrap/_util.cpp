@@ -7,9 +7,30 @@
 
 #include <boost/python.hpp>
 #include <hikyuu/utilities/util.h>
+#include <hikyuu/utilities/arithmetic.h>
+#include <hikyuu/Log.h>
+#include "pybind_utils.h"
 
 using namespace boost::python;
 using namespace hku;
+
+namespace py = boost::python;
+
+static py::list combinate_index(object seq) {
+    size_t total = len(seq);
+    std::vector<size_t> index_list(total);
+    for (size_t i = 0; i < total; ++i) {
+        index_list[i] = i;
+    }
+
+    py::list result;
+    std::vector<std::vector<size_t>> comb = combinateIndex(index_list);
+    for (size_t i = 0, count = comb.size(); i < count; i++) {
+        py::list tmp = vector_to_py_list<std::vector<size_t>>(comb[i]);
+        result.append(tmp);
+    }
+    return result;
+}
 
 void export_util() {
     def("roundEx", roundEx, (arg("number"), arg("ndigits") = 0),
@@ -37,4 +58,13 @@ void export_util() {
     :param float number  待处理数据
     :param int ndigits 保留小数位数
     :rtype: float)");
+
+    def("combinate_index", combinate_index, R"(combinate_index(seq)
+
+    获取序列组合的下标索引, 输入序列的长度最大不超过15，否则抛出异常
+
+    :param seq: 可迭代的 python 对象
+    :rtype: list
+
+    )");
 }
