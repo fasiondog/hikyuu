@@ -42,8 +42,8 @@ bool SQLiteKDataDriver::_init() {
     // read param from config
     StringList keys = m_params.getNameList();
     string db_filename;
-    ifConvert = tryGetParam<bool>("convert", false);
-    HKU_DEBUG("SQLiteKDataDriver: ifConvert set to {}", ifConvert);
+    m_ifConvert = tryGetParam<bool>("convert", false);
+    HKU_DEBUG("SQLiteKDataDriver: m_ifConvert set to {}", m_ifConvert);
 
     for (auto iter = keys.begin(); iter != keys.end(); ++iter) {
         size_t pos = iter->find("_");
@@ -63,7 +63,7 @@ bool SQLiteKDataDriver::_init() {
 
             if (ktype == KQuery::getKTypeName(KQuery::DAY)) {
                 m_sqlite_connection_map[exchange + "_DAY"] = conn;
-                if (ifConvert) {
+                if (m_ifConvert) {
                     m_sqlite_connection_map[exchange + "_WEEK"] = conn;
                     m_sqlite_connection_map[exchange + "_MONTH"] = conn;
                     m_sqlite_connection_map[exchange + "_QUARTER"] = conn;
@@ -74,7 +74,7 @@ bool SQLiteKDataDriver::_init() {
                 m_sqlite_connection_map[exchange + "_MIN"] = conn;
             } else if (ktype == KQuery::getKTypeName(KQuery::MIN5)) {
                 m_sqlite_connection_map[exchange + "_MIN5"] = conn;
-                if (ifConvert) {
+                if (m_ifConvert) {
                     m_sqlite_connection_map[exchange + "_MIN15"] = conn;
                     m_sqlite_connection_map[exchange + "_MIN30"] = conn;
                     m_sqlite_connection_map[exchange + "_MIN60"] = conn;
@@ -119,7 +119,7 @@ KRecordList SQLiteKDataDriver::getKRecordList(const string& market, const string
     }
     if (isBaseKType(ktype))
         return result;
-    if (!ifConvert)
+    if (!m_ifConvert)
         HKU_ERROR("KData: unsupported ktype {}", ktype);
     KQuery::KType base_ktype = getBaseKType(ktype);
     return convertToNewInterval(result, base_ktype, ktype);
@@ -214,7 +214,7 @@ size_t SQLiteKDataDriver::getCount(const string& market, const string& code, KQu
 
     if (isBaseKType(kType))
         return result;
-    if (!ifConvert)
+    if (!m_ifConvert)
         HKU_ERROR("KData: unsupported ktype {}", kType);
     auto old_intervals_per_new_candle =
       KQuery::getKTypeInMin(kType) / KQuery::getKTypeInMin(getBaseKType(kType));
@@ -250,7 +250,6 @@ bool SQLiteKDataDriver::getIndexRangeByDate(const string& market, const string& 
     return true;
 }
 
-// TODO
 KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
                                                     KQuery::KType from_ktype,
                                                     KQuery::KType to_ktype) {
@@ -261,7 +260,7 @@ KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
         return result;
 
     int32_t target = 0;
-    for (int32_t x = 0; x < candles.size(); ++x) {
+    for (size_t x = 0, total = candles.size(); x < total; ++x) {
         if (candles[x].openPrice != 0 && candles[x].highPrice != 0 && candles[x].lowPrice != 0 &&
             candles[x].closePrice != 0) {
             if (result[target].datetime.isNull())  // check for default value
@@ -279,7 +278,7 @@ KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
         }
 
         if ((x + 1) % old_intervals_per_new_candle == 0) {
-            if ((candles.size() - x - 1) < old_intervals_per_new_candle)
+            if ((total - x) < old_intervals_per_new_candle + 1)
                 break;
             target++;
         }

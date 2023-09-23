@@ -52,7 +52,7 @@ private:
 
 private:
     unordered_map<string, SQLiteConnectPtr> m_sqlite_connection_map;  // key: exchange+code
-    bool ifConvert = false;
+    bool m_ifConvert = false;
 };
 
 } /* namespace hku */

@@ -68,6 +68,8 @@ def get_draw_title(kdata):
         s1 = u' （15分钟线）'
     elif query.ktype == Query.MIN30:
         s1 = u' （30分钟线）'
+    elif query.ktype == Query.MIN60:
+        s1 = u' （60分钟线）'
     elif query.ktype == Query.HOUR2:
         s1 = u' （2小时线）'
     elif query.ktype == Query.HOUR4:
