@@ -8,12 +8,35 @@ import datetime
 import numpy as np
 import matplotlib
 from pylab import Rectangle, gca, figure, ylabel, axes, draw
+from matplotlib import rcParams
 from matplotlib.lines import Line2D, TICKLEFT, TICKRIGHT
 from matplotlib.ticker import FuncFormatter, FixedLocator
 
 from hikyuu import *
 
-from .common import get_draw_title
+from .common import get_draw_title, in_interactive_session
+
+
+def set_mpl_params():
+    '''设置交互及中文环境参数'''
+    if in_interactive_session():
+        rcParams['interactive'] = True
+
+    rcParams['font.family'] = 'sans-serif'
+    rcParams['axes.unicode_minus'] = False
+
+    expected_fonts = ['Microsoft YaHei', 'SimSun', 'SimHei', 'Noto Sans CJK JP']
+    current_fonts = matplotlib.rcParams['font.sans-serif']
+    for font in expected_fonts:
+        if font in current_fonts:
+            return
+
+    all_fonts = [f.name for f in matplotlib.font_manager.FontManager().ttflist]
+    for font in expected_fonts:
+        if font in all_fonts:
+            current_fonts.insert(0, font)
+            break
+    matplotlib.rcParams['font.sans-serif'] = current_fonts
 
 
 def create_one_axes_figure(figsize=(10, 6)):
@@ -122,15 +145,10 @@ def getDayLocatorAndFormatter(dates):
     """获取显示日线时使用的Major Locator和Major Formatter"""
     sep = len(dates) / 8
     loc = [
-        (
-            i, str(d) if
-            (i !=
-             (len(dates) - 1)) and (i % sep != 0) else "{}-{}-{}".format(d.year, d.month, d.day)
-        ) for i, d in enumerate(dates)
+        (i, str(d) if (i != (len(dates) - 1)) and (i % sep != 0) else "{}-{}-{}".format(d.year, d.month, d.day))
+        for i, d in enumerate(dates)
     ]
-    fixed_loc = [
-        i for i in range(len(dates)) if (i == (len(dates) - 1)) or (i != 0 and i % sep == 0)
-    ]
+    fixed_loc = [i for i in range(len(dates)) if (i == (len(dates) - 1)) or (i != 0 and i % sep == 0)]
 
     month_loc = FixedLocator(fixed_loc)
     month_fm = FuncFormatter(StockFuncFormatter(dict(loc)))
@@ -141,10 +159,8 @@ def getMinLocatorAndFormatter(dates):
     """获取显示分钟线时使用的Major Locator和Major Formatter"""
     sep = len(dates) / 5
     loc = [
-        (
-            i, str(d)
-            if i % sep != 0 else "{}-{}-{} {}:{}".format(d.year, d.month, d.day, d.hour, d.minute)
-        ) for i, d in enumerate(dates)
+        (i, str(d) if i % sep != 0 else "{}-{}-{} {}:{}".format(d.year, d.month, d.day, d.hour, d.minute))
+        for i, d in enumerate(dates)
     ]
     fixed_loc = [i for i in range(len(dates)) if i != 0 and i % sep == 0]
 
@@ -220,35 +236,15 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
             color = colorup
             lower = open
             height = close - open
-            rect = Rectangle(
-                xy=(i - OFFSET, lower),
-                width=width,
-                height=height,
-                facecolor=rfcolor,
-                edgecolor=color
-            )
+            rect = Rectangle(xy=(i - OFFSET, lower), width=width, height=height, facecolor=rfcolor, edgecolor=color)
         else:
             color = colordown
             lower = close
             height = open - close
-            rect = Rectangle(
-                xy=(i - OFFSET, lower),
-                width=width,
-                height=height,
-                facecolor=color,
-                edgecolor=color
-            )
+            rect = Rectangle(xy=(i - OFFSET, lower), width=width, height=height, facecolor=color, edgecolor=color)
 
-        vline1 = Line2D(
-            xdata=(i, i), ydata=(low, lower), color=color, linewidth=0.5, antialiased=True
-        )
-        vline2 = Line2D(
-            xdata=(i, i),
-            ydata=(lower + height, high),
-            color=color,
-            linewidth=0.5,
-            antialiased=True
-        )
+        vline1 = Line2D(xdata=(i, i), ydata=(low, lower), color=color, linewidth=0.5, antialiased=True)
+        vline2 = Line2D(xdata=(i, i), ydata=(lower + height, high), color=color, linewidth=0.5, antialiased=True)
         rect.set_alpha(alpha)
 
         axes.add_line(vline1)
@@ -260,17 +256,11 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
-        last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close,
+        100 * (last_record.close - kdata[-2].close) / kdata[-2].close
     )
     axes.text(
-        0.99,
-        0.97,
-        text,
-        horizontalalignment='right',
-        verticalalignment='top',
-        transform=axes.transAxes,
-        color=color
+        0.99, 0.97, text, horizontalalignment='right', verticalalignment='top', transform=axes.transAxes, color=color
     )
 
     axes.autoscale_view()
@@ -303,20 +293,10 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
 
         vline = Line2D(xdata=(t, t), ydata=(low, high), color=color, antialiased=False)
         oline = Line2D(
-            xdata=(t, t),
-            ydata=(open, open),
-            color=color,
-            antialiased=False,
-            marker=TICKLEFT,
-            markersize=ticksize
+            xdata=(t, t), ydata=(open, open), color=color, antialiased=False, marker=TICKLEFT, markersize=ticksize
         )
         cline = Line2D(
-            xdata=(t, t),
-            ydata=(close, close),
-            color=color,
-            antialiased=False,
-            markersize=ticksize,
-            marker=TICKRIGHT
+            xdata=(t, t), ydata=(close, close), color=color, antialiased=False, markersize=ticksize, marker=TICKRIGHT
         )
 
         axes.add_line(vline)
@@ -328,17 +308,10 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
     text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f' % (
-        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
-        last_record.close
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close
     )
     axes.text(
-        0.99,
-        0.97,
-        text,
-        horizontalalignment='right',
-        verticalalignment='top',
-        transform=axes.transAxes,
-        color=color
+        0.99, 0.97, text, horizontalalignment='right', verticalalignment='top', transform=axes.transAxes, color=color
     )
 
     axes.autoscale_view()
@@ -512,17 +485,8 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
-    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
-        n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
-    )
-    axes.text(
-        0.01,
-        0.97,
-        text,
-        horizontalalignment='left',
-        verticalalignment='top',
-        transform=axes.transAxes
-    )
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1])
+    axes.text(0.01, 0.97, text, horizontalalignment='left', verticalalignment='top', transform=axes.transAxes)
     total = len(kdata)
     x = [i - 0.2 for i in range(total)]
     x1 = [x[i] for i, d in enumerate(bmacd) if d > 0]
@@ -558,17 +522,8 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
-    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (
-        n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1]
-    )
-    axes.text(
-        0.01,
-        0.97,
-        text,
-        horizontalalignment='left',
-        verticalalignment='top',
-        transform=axes.transAxes
-    )
+    text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1])
+    axes.text(0.01, 0.97, text, horizontalalignment='left', verticalalignment='top', transform=axes.transAxes)
     total = len(kdata)
     x = [i - 0.2 for i in range(0, total)]
     y = bmacd

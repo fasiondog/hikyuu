@@ -65,6 +65,7 @@ end
 add_requires("myboost " .. boost_version, {
   system = false,
   alias = "boost",
+  debug = is_mode("debug"),
   configs = {
     shared = is_plat("windows") and true or false,
     data_time = true,

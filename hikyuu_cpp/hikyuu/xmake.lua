@@ -30,8 +30,8 @@ else
 end
 
 if is_plat("windows") then
-    add_defines("HKU_API=__declspec(dllexport)")
     if is_mode("release") then
+        add_defines("HKU_API=__declspec(dllexport)")
         add_packages("hdf5")
     else
         add_packages("hdf5_D")
