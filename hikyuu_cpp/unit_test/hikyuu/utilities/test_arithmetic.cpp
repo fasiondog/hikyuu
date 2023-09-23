@@ -7,29 +7,29 @@
 
 #include "doctest/doctest.h"
 
-#include <hikyuu/analysis/SignalCombinationAnalysis.h>
+#include <hikyuu/utilities/arithmetic.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_hikyuu_analyses test_hikyuu_signalCombinationAnalysis
- * @ingroup test_hikyuu_analysis_suite
+ * @defgroup test_hikyuu_arithmetic test_hikyuu_arithmetic
+ * @ingroup test_hikyuu_arithmetic_suite
  * @{
  */
 
 /** @par 检测点 */
-TEST_CASE("test_generateCombinationsIndex") {
+TEST_CASE("test_combinateIndex") {
     std::vector<float> nums;
     std::vector<std::vector<size_t>> result;
     std::vector<std::vector<size_t>> expect;
 
     /** @arg 输入序列长度为0 */
-    result = generateCombinationsIndex(nums);
+    result = combinateIndex(nums);
     CHECK_UNARY(result.empty());
 
     /** @arg 输入序列长度为1 */
     nums.push_back(0.1f);
-    result = generateCombinationsIndex(nums);
+    result = combinateIndex(nums);
     expect = {{0}};
     CHECK_EQ(result.size(), expect.size());
     for (size_t i = 0, total = result.size(); i < total; i++) {
@@ -41,7 +41,7 @@ TEST_CASE("test_generateCombinationsIndex") {
 
     /** @arg 输入序列长度为2 */
     nums.push_back(0.2f);
-    result = generateCombinationsIndex(nums);
+    result = combinateIndex(nums);
     expect = {{0}, {0, 1}, {1}};
     CHECK_EQ(result.size(), expect.size());
     for (size_t i = 0, total = result.size(); i < total; i++) {
@@ -53,7 +53,7 @@ TEST_CASE("test_generateCombinationsIndex") {
 
     /** @arg 输入序列长度为3 */
     nums.push_back(0.3f);
-    result = generateCombinationsIndex(nums);
+    result = combinateIndex(nums);
     expect = {{0}, {0, 1}, {1}, {0, 2}, {0, 1, 2}, {1, 2}, {2}};
     CHECK_EQ(result.size(), expect.size());
     for (size_t i = 0, total = result.size(); i < total; i++) {
@@ -65,7 +65,7 @@ TEST_CASE("test_generateCombinationsIndex") {
 
     /** @arg 输入序列长度为4 */
     nums.push_back(0.4f);
-    result = generateCombinationsIndex(nums);
+    result = combinateIndex(nums);
     expect = {{0},       {0, 1}, {1},       {0, 2},       {0, 1, 2}, {1, 2}, {2}, {0, 3},
               {0, 1, 3}, {1, 3}, {0, 2, 3}, {0, 1, 2, 3}, {1, 2, 3}, {2, 3}, {3}};
     CHECK_EQ(result.size(), expect.size());
@@ -75,14 +75,6 @@ TEST_CASE("test_generateCombinationsIndex") {
             CHECK_EQ(result[i][j], expect[i][j]);
         }
     }
-}
-
-/** @par 检测点 */
-TEST_CASE("test_signalCombinationAnalysis") {
-    std::vector<SGPtr> sgs;  //(1, SGPtr());
-    SYSPtr sys;
-    TMPtr tm;
-    signalCombinationAnaysis(sgs, sys, tm);
 }
 
 /** @} */
