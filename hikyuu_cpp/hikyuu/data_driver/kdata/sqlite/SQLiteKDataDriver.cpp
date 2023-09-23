@@ -119,8 +119,7 @@ KRecordList SQLiteKDataDriver::getKRecordList(const string& market, const string
     }
     if (isBaseKType(ktype))
         return result;
-    if (!m_ifConvert)
-        HKU_ERROR("KData: unsupported ktype {}", ktype);
+    HKU_ERROR_IF_RETURN(!m_ifConvert, KRecordList(), "KData: unsupported ktype {}", ktype);
     KQuery::KType base_ktype = getBaseKType(ktype);
     return convertToNewInterval(result, base_ktype, ktype);
 }
@@ -214,8 +213,7 @@ size_t SQLiteKDataDriver::getCount(const string& market, const string& code, KQu
 
     if (isBaseKType(kType))
         return result;
-    if (!m_ifConvert)
-        HKU_ERROR("KData: unsupported ktype {}", kType);
+    HKU_ERROR_IF_RETURN(!m_ifConvert, 0, "KData: unsupported ktype {}", kType);
     auto old_intervals_per_new_candle =
       KQuery::getKTypeInMin(kType) / KQuery::getKTypeInMin(getBaseKType(kType));
     return result / old_intervals_per_new_candle;
@@ -263,7 +261,7 @@ KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
     for (size_t x = 0, total = candles.size(); x < total; ++x) {
         if (candles[x].openPrice != 0 && candles[x].highPrice != 0 && candles[x].lowPrice != 0 &&
             candles[x].closePrice != 0) {
-            if (result[target].datetime.isNull())  // check for default value
+            if (result[target].datetime.isNull())
                 result[target].datetime = candles[x].datetime;
             if (result[target].openPrice == 0)
                 result[target].openPrice = candles[x].openPrice;
