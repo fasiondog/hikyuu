@@ -119,6 +119,9 @@ for p in preload_config:
 kdata_param = Parameter()
 kdata_config = ini.options('kdata')
 for p in kdata_config:
+    if p == "convert":
+        kdata_param[p] = ini.getboolean('kdata', p)
+        continue
     kdata_param[p] = ini.get('kdata', p)
 
 #set_log_level(LOG_LEVEL.INFO)

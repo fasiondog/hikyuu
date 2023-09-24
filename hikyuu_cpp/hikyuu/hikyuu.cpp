@@ -60,6 +60,10 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
 
     option = config.getOptionList("kdata");
     for (auto iter = option->begin(); iter != option->end(); ++iter) {
+        if (*iter == "convert") {
+            kdataParam.set<bool>(*iter, config.getBool("kdata", *iter));
+            continue;
+        }
         kdataParam.set<string>(*iter, config.get("kdata", *iter));
     }
 

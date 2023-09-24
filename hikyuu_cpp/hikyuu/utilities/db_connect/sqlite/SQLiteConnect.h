@@ -59,6 +59,8 @@ private:
     sqlite3* m_db;
 };
 
+typedef shared_ptr<SQLiteConnect> SQLiteConnectPtr;
+
 }  // namespace hku
 
 #endif /* HIYUU_DB_MANAGER_SQLITE_SQLITECONNECT_H */

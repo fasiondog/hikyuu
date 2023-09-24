@@ -60,6 +60,8 @@ def get_draw_title(kdata):
         s1 = u' （年线）'
     elif query.ktype == Query.MIN:
         s1 = u' （1分钟线）'
+    elif query.ktype == Query.MIN3:
+        s1 = u' （3分钟线）'
     elif query.ktype == Query.MIN5:
         s1 = u' （5分钟线）'
     elif query.ktype == Query.MIN15:
@@ -68,13 +70,21 @@ def get_draw_title(kdata):
         s1 = u' （30分钟线）'
     elif query.ktype == Query.MIN60:
         s1 = u' （60分钟线）'
+    elif query.ktype == Query.HOUR2:
+        s1 = u' （2小时线）'
+    elif query.ktype == Query.HOUR4:
+        s1 = u' （4小时线）'
+    elif query.ktype == Query.HOUR6:
+        s1 = u' （6小时线）'
+    elif query.ktype == Query.HOUR12:
+        s1 = u' （12小时线）'
 
     name = stock.name
 
     if stock.code == "":
         stitle = "Block(%s) %s" % (stock.id, name) + s1
     else:
-        stitle = stock.market + stock.code + ' ' + name + s1
+        stitle = stock.market + "/" + stock.code + ' ' + name + s1
 
     return stitle
 
