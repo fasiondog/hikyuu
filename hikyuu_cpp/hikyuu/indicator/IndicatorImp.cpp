@@ -344,7 +344,7 @@ string IndicatorImp::formula() const {
             break;
 
         case SUB:
-            buf << m_left->formula() << " + " << m_right->formula();
+            buf << m_left->formula() << " - " << m_right->formula();
             break;
 
         case MUL:
@@ -454,6 +454,27 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                     m_right->m_right = right->clone();
                 } else {
                     m_right->add(OP, left, right);
+                }
+            }
+        }
+        if (m_three) {
+            if (m_three->isNeedContext()) {
+                if (m_three->isLeaf()) {
+                    m_need_calculate = true;
+                    m_three = right->clone();
+                } else {
+                    HKU_WARN(
+                      "Context-dependent indicator can only be at the leaf node!"
+                      "parent node: {}, try add node: {}",
+                      name(), right->name());
+                }
+            } else {
+                if (m_three->isLeaf()) {
+                    m_three->m_need_calculate = true;
+                    m_three->m_optype = op;
+                    m_three->m_right = right->clone();
+                } else {
+                    m_three->add(OP, left, right);
                 }
             }
         }

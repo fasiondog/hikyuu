@@ -426,6 +426,8 @@ Indicator (*SLICE_1)(const PriceList&, int64_t, int64_t) = SLICE;
 Indicator (*SLICE_2)(int64_t, int64_t, int) = SLICE;
 Indicator (*SLICE_3)(const Indicator&, int64_t, int64_t, int) = SLICE;
 
+Indicator (*RSI_1)(int) = RSI;
+
 void export_Indicator_build_in() {
     def("KDATA", KDATA1);
     def("KDATA", KDATA3, R"(KDATA([data])
@@ -1479,4 +1481,13 @@ void export_Indicator_build_in() {
     :param int start: 起始位置
     :param int end: 终止位置（不包含本身）
     :param int result_index: 原输入数据中的结果集)");
+
+    def("RSI", RSI_1, (arg("n") = 14), R"(RSI([data, n=14])
+
+    相对强弱指数
+
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator)");
+
 }
