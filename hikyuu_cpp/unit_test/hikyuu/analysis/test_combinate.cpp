@@ -7,13 +7,13 @@
 
 #include "doctest/doctest.h"
 
-#include <hikyuu/utilities/arithmetic.h>
+#include <hikyuu/analysis/combinate.h>
 
 using namespace hku;
 
 /**
- * @defgroup test_hikyuu_arithmetic test_hikyuu_arithmetic
- * @ingroup test_hikyuu_arithmetic_suite
+ * @defgroup test_hikyuu_combinate test_hikyuu_combinate
+ * @ingroup test_hikyuu_combinate_suite
  * @{
  */
 
