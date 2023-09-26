@@ -113,7 +113,7 @@ void IndicatorImp::initContext() {
 
 void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
     KData kdata = getContext();
-    if (kdata.getStock() == stock || kdata.getQuery() == query) {
+    if (kdata.getStock() == stock && kdata.getQuery() == query) {
         if (m_need_calculate) {
             calculate();
         }
