@@ -24,6 +24,7 @@ if is_plat("windows") then
     add_cxflags("-wd4267")
     add_cxflags("-wd4834") -- C++17 discarding return value of function with 'nodiscard' attribute
     add_cxflags("-wd4244") -- discable double to int
+    add_syslinks("bcrypt")
 else
     add_rpathdirs("$ORIGIN")
     add_cxflags("-Wno-sign-compare", "-Wno-missing-braces")
