@@ -10,7 +10,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include "hikyuu/utilities/osdef.h"
 #include "hikyuu/Log.h"
-#include "environment.h"
+#include "sysinfo.h"
 
 namespace hku {
 

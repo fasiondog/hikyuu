@@ -128,11 +128,12 @@ def start_build(verbose=False, mode='release', worker_num=2):
         print(cmd)
         os.system(cmd)
 
-    os.system("xmake -j {} -b {} hikyuu".format(worker_num,
-                                                "-v -D" if verbose else ""))
     if mode == "release":
         os.system("xmake -j {} -b {} core".format(worker_num,
                                                   "-v -D" if verbose else ""))
+    else:
+        os.system("xmake -j {} -b {} hikyuu".format(
+            worker_num, "-v -D" if verbose else ""))
 
     # 保存当前的编译信息
     save_current_compile_info(current_compile_info)

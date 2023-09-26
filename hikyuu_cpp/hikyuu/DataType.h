@@ -25,11 +25,13 @@
 #include <list>
 #include <cmath>
 #include <memory>
-//#include <vector>
+// #include <vector>
 #include <map>
 #include <unordered_map>
 
 #include "Log.h"
+#include "utilities/osdef.h"
+#include "utilities/cppdef.h"
 #include "datetime/Datetime.h"
 #include "utilities/Null.h"
 #include "utilities/arithmetic.h"

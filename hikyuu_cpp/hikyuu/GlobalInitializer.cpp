@@ -22,7 +22,7 @@
 #include "global/GlobalSpotAgent.h"
 #include "global/schedule/scheduler.h"
 #include "indicator/IndicatorImp.h"
-#include "global/environment.h"
+#include "global/sysinfo.h"
 #include "debug.h"
 
 namespace hku {
