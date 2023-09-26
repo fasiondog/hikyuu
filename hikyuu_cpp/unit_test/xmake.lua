@@ -24,14 +24,14 @@ function coverage_report(target)
         os.run("lcov --remove cover-total.info '*/usr/include/*' \
                 '*/usr/lib/*' '*/usr/lib64/*' '*/usr/local/include/*' '*/usr/local/lib/*' '*/usr/local/lib64/*' \
                 '*/test/*' '*/.xmake*' '*/boost/*' '*/ffmpeg/*' \
-                '*/cpp/yihua/ocr_module/clipper.*' -o cover-final.info")
+                -o cover-final.info")
         
         -- 生成的html及相关文件的目录名称，--legend 简单的统计信息说明
         os.exec("genhtml -o cover_report --legend --title 'yhsdk'  --prefix=" .. os.projectdir() .. " cover-final.info")
 
         -- 生成 sonar 可读取报告
         if is_plat("linux") then
-            os.run("gcovr -r . -e cpp/test -e 'cpp/yihua/ocr_module/clipper.*' --xml -o coverage.xml")
+            os.run("gcovr -r . -e cpp/test --xml -o coverage.xml")
         end
     end
 end
@@ -45,11 +45,7 @@ target("unit-test")
     add_includedirs("..")
 
     if is_plat("windows") then
-        add_cxflags("-wd4267")
-        add_cxflags("-wd4251")
-        add_cxflags("-wd4244")
-        add_cxflags("-wd4805")
-        add_cxflags("-wd4566")
+        add_cxflags("-wd4267", "-wd4996", "-wd4251", "-wd4244", "-wd4805", "-wd4566")
     else
         add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")
         add_cxflags("-Wno-sign-compare")
