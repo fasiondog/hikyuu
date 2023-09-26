@@ -26,7 +26,7 @@ void StrategyBase::sig_handler(int sig) {
 StrategyBase::StrategyBase() : StrategyBase("Strategy") {}
 
 StrategyBase::StrategyBase(const string& name) {
-    string home = getUserHome();
+    string home = getUserDir();
     HKU_ERROR_IF(home == "", "Failed get user home path!");
 #if HKU_OS_WINOWS
     m_config_file = format("{}\\{}", home, ".hikyuu\\hikyuu.ini");

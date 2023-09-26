@@ -89,27 +89,4 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
     sm.init(baseParam, blockParam, kdataParam, preloadParam, hkuParam, context);
 }
 
-string getVersion() {
-    return HKU_VERSION;
-}
-
-std::string HKU_API getVersionWithBuild() {
-#if defined(_DEBUG) || defined(DEBUG)
-    string mode("debug");
-#else
-    string mode("release");
-#endif
-#if defined(__arm__)
-    return fmt::format("{}_{}_arm_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#elif defined(__aarch64__)
-    return fmt::format("{}_{}_aarch64_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#elif defined(__x86_64__) || defined(_WIN64)
-    return fmt::format("{}_{}_x64_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#elif defined(__i386__) || defined(_WIN32)
-    return fmt::format("{}_{}_i386_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#else
-    return fmt::format("{}_{}_unknow_arch_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#endif
-}
-
 }  // namespace hku

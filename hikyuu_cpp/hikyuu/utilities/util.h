@@ -36,6 +36,19 @@ std::string HKU_API gb_to_utf8(const std::string& szinput);
 #define GBToUTF8 gb_to_utf8
 
 /**
+ * 用于处理路径文件名，兼容windows中文平台
+ * HKU_PATH 适用于 std::string
+ * HKU_CPATH 适用于 char *
+ */
+#if defined(_MSC_VER)
+#define HKU_PATH(s) UTF8ToGB(s)
+#define HKU_CPATH(s) UTF8ToGB(s)
+#else
+#define HKU_PATH(s) (s)
+#define HKU_CPATH(s) (s)
+#endif
+
+/**
  * 四舍五入，ROUND_HALF_EVEN 银行家舍入法
  * @param number  待四舍五入的数据
  * @param ndigits 保留小数位数
