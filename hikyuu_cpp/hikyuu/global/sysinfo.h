@@ -8,7 +8,6 @@
 #pragma once
 
 #include <string>
-#include "hikyuu/version.h"
 
 #ifndef HKU_API
 #define HKU_API
@@ -27,6 +26,7 @@ std::string HKU_API getVersion();
  */
 std::string HKU_API getVersionWithBuild();
 
-void sendProbeInfo();
+/** 发送反馈信息 */
+void sendFeedback();
 
 }  // namespace hku

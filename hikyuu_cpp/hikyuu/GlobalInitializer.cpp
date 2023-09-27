@@ -53,6 +53,7 @@ void GlobalInitializer::init() {
     set_log_level(INFO);
 #endif
 
+    sendFeedback();
     DataDriverFactory::init();
     StockManager::instance();
     IndicatorImp::initDynEngine();

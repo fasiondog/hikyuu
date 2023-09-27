@@ -5,12 +5,18 @@
  *      Author: fasiondog
  */
 
+#include <stdio.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
-#include "hikyuu/utilities/osdef.h"
-#include "hikyuu/Log.h"
+#include <httplib.h>
+#include <nlohmann/json.hpp>
+#include "hikyuu/version.h"
+#include "hikyuu/DataType.h"
+#include "hikyuu/utilities/os.h"
 #include "sysinfo.h"
+
+using json = nlohmann::json;
 
 namespace hku {
 
@@ -37,11 +43,51 @@ std::string HKU_API getVersionWithBuild() {
 #endif
 }
 
-static std::string generatorUUID() {
-    boost::uuids::uuid uid = boost::uuids::random_generator()();
-    return boost::uuids::to_string(uid);
+static bool readUUID(boost::uuids::uuid& out) {
+    std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
+    FILE* fp = fopen(filename.c_str(), "rb");
+    HKU_IF_RETURN(!fp, false);
+
+    bool ret = true;
+    if (16 != fread(out.data, 16, 1, fp)) {
+        ret = false;
+    }
+
+    fclose(fp);
+    return ret;
 }
 
-void sendProbeInfo() {}
+static void saveUUID(const boost::uuids::uuid& uid) {
+    std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
+    FILE* fp = fopen(filename.c_str(), "wb");
+    HKU_IF_RETURN(!fp, void());
+
+    fwrite(uid.data, 16, 1, fp);
+    fclose(fp);
+}
+
+void sendFeedback() {
+    std::thread t([] {
+        try {
+            boost::uuids::uuid uid;
+            if (!readUUID(uid)) {
+                uid = boost::uuids::random_generator()();
+                saveUUID(uid);
+            }
+
+            json req;
+            req["uid"] = boost::uuids::to_string(uid);
+
+            httplib::Client cli("http://127.0.0.1:9200");
+            cli.set_connection_timeout(0, 300000);  // 300 milliseconds
+            cli.set_read_timeout(5, 0);             // 5 seconds
+            cli.set_write_timeout(5, 0);            // 5 seconds
+            cli.Post("/feedback", req.dump(), "application/json");
+        } catch (...) {
+            // do nothing
+        }
+    });
+    t.detach();
+}
 
 }  // namespace hku
