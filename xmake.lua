@@ -86,7 +86,7 @@ add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = 
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs = {vs_runtime = "MD"}})
 add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
-add_requires("cpp-httplib", {system = false})
+add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger

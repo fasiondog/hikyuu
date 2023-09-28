@@ -49,7 +49,7 @@ static bool readUUID(boost::uuids::uuid& out) {
     HKU_IF_RETURN(!fp, false);
 
     bool ret = true;
-    if (16 != fread(out.data, 16, 1, fp)) {
+    if (16 != fread(out.data, 1, 16, fp)) {
         ret = false;
     }
 
@@ -78,11 +78,13 @@ void sendFeedback() {
             json req;
             req["uid"] = boost::uuids::to_string(uid);
 
-            httplib::Client cli("http://127.0.0.1:9200");
-            cli.set_connection_timeout(0, 300000);  // 300 milliseconds
-            cli.set_read_timeout(5, 0);             // 5 seconds
-            cli.set_write_timeout(5, 0);            // 5 seconds
+            httplib::SSLClient cli("hikyuu.cpolar.cn");
+            cli.set_compress(true);
+            cli.set_connection_timeout(0, 3000000);  // 3 seconds
+            cli.set_read_timeout(5, 0);              // 5 seconds
+            cli.set_write_timeout(5, 0);             // 5 seconds
             cli.Post("/feedback", req.dump(), "application/json");
+            HKU_INFO("success feedback");
         } catch (...) {
             // do nothing
         }
