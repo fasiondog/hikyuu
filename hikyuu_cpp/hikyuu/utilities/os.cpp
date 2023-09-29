@@ -264,6 +264,42 @@ uint64_t HKU_API getDiskFreeSpace(const char* path) {
 #endif
 }
 
+std::string HKU_API getPlatform() {
+    std::string ret;
+#if HKU_OS_WINDOWS
+    ret = "windows";
+#elif HKU_OS_LINUX
+    ret = "linux";
+#elif HKU_OS_ANDROID:
+    ret = "android";
+#elif HKU_OS_OSX
+    ret = "macosx";
+#elif TARGET_OS_SIMULATOR:
+    ret = "iphoneos_simulator";
+#elif HKU_OS_IOS
+    ret = "iphoneos";
+#else
+    ret = "unknown";
+#endif
+    return ret;
+}
+
+std::string HKU_API getCpuArch() {
+    std::string ret;
+#if HKU_ARCH_ARM
+    ret = "arm";
+#elif HKU_ARCH_ARM64
+    ret = "arm64";
+#elif HKU_ARCH_X86
+    ret = "x86";
+#elif HKU_ARCH_X64
+    ret = "x64";
+#else
+    ret = "unknown";
+#endif
+    return ret;
+}
+
 }  // namespace hku
 
 #ifdef _MSC_VER

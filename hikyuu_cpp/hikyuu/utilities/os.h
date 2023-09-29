@@ -85,4 +85,10 @@ bool HKU_API isColorTerminal() noexcept;
  */
 uint64_t HKU_API getDiskFreeSpace(const char* path);
 
+/** 获取当前系统名称 */
+std::string HKU_API getPlatform();
+
+/** 获取当前CPU架构名称 */
+std::string HKU_API getCpuArch();
+
 }  // namespace hku

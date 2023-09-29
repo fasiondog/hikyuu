@@ -26,20 +26,11 @@ std::string getVersion() {
 
 std::string HKU_API getVersionWithBuild() {
 #if defined(_DEBUG) || defined(DEBUG)
-    std::string mode("debug");
+    return fmt::format("{}_{}_debug_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
+                       getCpuArch());
 #else
-    std::string mode("release");
-#endif
-#if HKU_ARCH_ARM
-    return fmt::format("{}_{}_arm_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#elif HKU_ARCH_ARM64
-    return fmt::format("{}_{}_aarch64_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#elif HKU_ARCH_X64
-    return fmt::format("{}_{}_x64_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#elif HKU_ARCH_X86
-    return fmt::format("{}_{}_i386_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
-#else
-    return fmt::format("{}_{}_unknow_arch_{}", HKU_VERSION, HKU_VERSION_BUILD, mode);
+    return fmt::format("{}_{}_release_{}_{}", HKU_VERSION, HKU_VERSION_BUILD, getPlatform(),
+                       getCpuArch());
 #endif
 }
 
@@ -77,6 +68,11 @@ void sendFeedback() {
 
             json req;
             req["uid"] = boost::uuids::to_string(uid);
+            req["name"] = "hikyuu";
+            req["version"] = HKU_VERSION;
+            req["build"] = fmt::format("{}", HKU_VERSION_BUILD);
+            req["platform"] = getPlatform();
+            req["arch"] = getCpuArch();
 
             httplib::SSLClient cli("hikyuu.cpolar.cn");
             cli.set_compress(true);
@@ -84,7 +80,7 @@ void sendFeedback() {
             cli.set_read_timeout(5, 0);              // 5 seconds
             cli.set_write_timeout(5, 0);             // 5 seconds
             cli.Post("/feedback", req.dump(), "application/json");
-            HKU_INFO("success feedback");
+
         } catch (...) {
             // do nothing
         }
