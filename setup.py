@@ -105,7 +105,7 @@ def clear_with_python_changed(mode):
 #------------------------------------------------------------------------------
 # 执行构建
 #------------------------------------------------------------------------------
-def start_build(verbose=False, mode='release', worker_num=2):
+def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
     """ 执行编译 """
     global g_verbose
     g_verbose = verbose
@@ -123,8 +123,8 @@ def start_build(verbose=False, mode='release', worker_num=2):
     if py_version != history_compile_info[
             'py_version'] or history_compile_info['mode'] != mode:
         clear_with_python_changed(mode)
-        cmd = "xmake f {} -c -y -m {} --pyver={}".format(
-            "-v -D" if verbose else "", mode, py_version)
+        cmd = "xmake f {} -c -y -m {} --pyver={} --feedback={}".format(
+            "-v -D" if verbose else "", mode, py_version, feedback)
         print(cmd)
         os.system(cmd)
 
@@ -151,6 +151,11 @@ def cli():
 
 @click.command()
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
+@click.option('-feedback',
+              '--feedback',
+              default=True,
+              type=bool,
+              help='允许发送反馈信息')
 @click.option('-j', '--j', default=2, help="并行编译数量")
 @click.option('-m',
               '--mode',
@@ -160,14 +165,19 @@ def cli():
                   'lsan'
               ]),
               help='编译模式')
-def build(verbose, mode, j):
+def build(verbose, mode, feedback, j):
     """ 执行编译 """
-    start_build(verbose, mode, j)
+    start_build(verbose, mode, feedback, j)
 
 
 @click.command()
 @click.option('-all', "--all", is_flag=True, help="执行全部测试, 否则仅仅进行最小范围测试）")
 @click.option("-compile", "--compile", is_flag=True, help='强制重新编译')
+@click.option('-feedback',
+              '--feedback',
+              default=True,
+              type=bool,
+              help='允许发送反馈信息')
 @click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
 @click.option('-j', '--j', default=2, help="并行编译数量")
 @click.option('-m',
@@ -179,13 +189,13 @@ def build(verbose, mode, j):
               ]),
               help='编译模式')
 @click.option('-case', '--case', default='', help="执行指定的 TestCase")
-def test(all, compile, verbose, mode, case, j):
+def test(all, compile, verbose, mode, case, feedback, j):
     """ 执行单元测试 """
     current_compile_info = get_current_compile_info()
     current_compile_info['mode'] = mode
     history_compile_info = get_history_compile_info()
     if compile or current_compile_info != history_compile_info:
-        start_build(verbose, mode, j)
+        start_build(verbose, mode, feedback, j)
     if all:
         os.system("xmake -j {} -b {} unit-test".format(
             j, "-v -D" if verbose else ""))
