@@ -87,16 +87,11 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 遇到了问题？想要更多了解Hikyuu？请使用以下方式联系：
 --------------------------------------------------
 
-
-- QQ交流群：114910869
-- 微信群：Hikyuu量化交易群
 - 作者邮箱：fasiondog@sina.com
-- QQ群扫码加入：
+- QQ交流群：114910869, 或扫码加入：
 
     .. figure:: http://fasiondog.gitee.io/hikyuu/images/10003-qq.png
 
 - 加入微信群（请注明“加入hikyuu”）：
 
     .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_group.jpg
-        :width: 250px
-        :height: 300px
