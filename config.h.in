@@ -31,6 +31,9 @@
 // 关闭 HKU_ASSERT
 #define HKU_DISABLE_ASSERT ${HKU_DISABLE_ASSERT}
 
+// 启用MSVC内存泄漏检查
+${define ENABLE_LEAK_DETECT}
+
 // clang-format on
 
 #endif /* HIKYUU_CONFIG_H_ */

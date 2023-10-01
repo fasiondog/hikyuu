@@ -10,6 +10,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/CVAL.h>
+#include <hikyuu/indicator/crt/REF.h>
 
 using namespace hku;
 
@@ -34,6 +35,17 @@ TEST_CASE("test_IF") {
         } else {
             CHECK_EQ(x[i], 0);
         }
+    }
+
+    /** @arg 测试调用operator()(const Indicator&) */
+    x = IF(REF(0) > REF(1), 1, 0);
+    c = CLOSE(kdata);
+    x = x(c);
+    for (int i = 0; i < x.size(); i++) {
+        if (i == 0)
+            CHECK(std::isnan(x[i]));
+        else
+            CHECK_EQ(x[i], c[i] > c[i-1] ? 1 : 0);
     }
 
     /** @arg 参数其中之一为数字 */

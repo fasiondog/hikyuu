@@ -35,6 +35,7 @@ set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 set_configvar("HKU_DISABLE_ASSERT", 0)
+set_configvar("ENABLE_LEAK_DETECT", true)
 
 -- set warning all as error
 if is_plat("windows") then

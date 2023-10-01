@@ -16,7 +16,7 @@ BoolSignal::BoolSignal() : SignalBase("SG_Bool") {
 
 BoolSignal::BoolSignal(const Indicator& buy, const Indicator& sell, const string& kpart)
 : SignalBase("SG_Bool"), m_bool_buy(buy), m_bool_sell(sell) {
-    setParam<string>("kpart", "CLOSE");
+    setParam<string>("kpart", kpart);
 }
 
 BoolSignal::~BoolSignal() {}
