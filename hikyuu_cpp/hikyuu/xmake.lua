@@ -1,10 +1,3 @@
-option("feedback")
-    set_default(true)
-    set_showmenu(true)
-    set_category("hikyuu")
-    set_description("Enable send feedback.")
-    add_defines("HKU_SEND_FEEDBACK")
-option_end()
 
 target("hikyuu")
     if is_mode("debug", "coverage", "asan", "msan", "tsan", "lsan") then

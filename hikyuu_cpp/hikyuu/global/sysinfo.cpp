@@ -68,7 +68,7 @@ void sendFeedback() {
 
             json req;
             req["uid"] = boost::uuids::to_string(uid);
-            req["name"] = "hikyuu";
+            req["part"] = "hikyuu";
             req["version"] = HKU_VERSION;
             req["build"] = fmt::format("{}", HKU_VERSION_BUILD);
             req["platform"] = getPlatform();

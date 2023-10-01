@@ -1,5 +1,13 @@
 set_xmakever("2.8.2")
--- Last Modified: 2023-08-08 11:28:13
+
+option("feedback")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable send feedback.")
+    add_defines("HKU_SEND_FEEDBACK")
+option_end()
+
 
 -- project
 set_project("hikyuu")
