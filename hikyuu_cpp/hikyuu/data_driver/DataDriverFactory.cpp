@@ -8,11 +8,18 @@
 #include "../GlobalInitializer.h"
 #include <boost/algorithm/string.hpp>
 #include "base_info/sqlite/SQLiteBaseInfoDriver.h"
-#include "base_info/mysql/MySQLBaseInfoDriver.h"
 #include "block_info/qianlong/QLBlockInfoDriver.h"
 #include "kdata/hdf5/H5KDataDriver.h"
+
+#ifdef HKU_ENABLE_MYSQL_KDATA
+#include "base_info/mysql/MySQLBaseInfoDriver.h"
 #include "kdata/mysql/MySQLKDataDriver.h"
+#endif
+
+#ifdef HKU_ENABLE_TDX_KDATA
 #include "kdata/tdx/TdxKDataDriver.h"
+#endif
+
 #include "kdata/cvs/KDataTempCsvDriver.h"
 #include "kdata/sqlite/SQLiteKDataDriver.h"
 #include "DataDriverFactory.h"
@@ -29,7 +36,10 @@ map<string, KDataDriverConnectPoolPtr>* DataDriverFactory::m_kdataDriverPools{nu
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
     DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
+
+#ifdef HKU_ENABLE_MYSQL_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
+#endif
 
     m_blockDrivers = new map<string, BlockInfoDriverPtr>();
     DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
@@ -37,9 +47,16 @@ void DataDriverFactory::init() {
     m_kdataPrototypeDrivers = new map<string, KDataDriverPtr>();
     m_kdataDriverPools = new map<string, KDataDriverConnectPoolPtr>();
 
+#ifdef HKU_ENABLE_TDX_KDATA
     DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
+#endif
+
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
+
+#ifdef HKU_ENABLE_MYSQL_KDATA
     DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
+#endif
+
     DataDriverFactory::regKDataDriver(make_shared<KDataTempCsvDriver>());
     DataDriverFactory::regKDataDriver(make_shared<SQLiteKDataDriver>());
 }
