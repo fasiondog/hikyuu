@@ -47,7 +47,7 @@ def KDJ(kdata=None, n=9, m1=3, m2=3):
     return k, d, j
 
 
-def RSI(kdata=None, N1=6, N2=12, N3=24):
+def RSI_PY(kdata=None, N1=6, N2=12, N3=24):
     """相对强弱指标
 
         :param KData kdata: 关联的K线数据

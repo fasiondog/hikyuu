@@ -222,4 +222,12 @@ void export_Signal() {
     :param int slow_n: 慢线EMA周期
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器)");
+
+    def ("SG_Band", SG_Band, (arg("ind"), arg("lower"), arg("upper"), arg("kpart") = "CLOSE"),
+      R"(SG_Band(ind, lower, upper[, kpart = 'CLOSE'])
+    指标区间指示器, 当指标超过上轨时，买入；
+    当指标低于下轨时，卖出。::
+
+        SG_Band(OP(MA(n=10)), 100, 200)
+      )");
 }
