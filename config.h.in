@@ -32,7 +32,7 @@
 #define HKU_DISABLE_ASSERT ${HKU_DISABLE_ASSERT}
 
 // 启用MSVC内存泄漏检查
-${define ENABLE_LEAK_DETECT}
+#define ENABLE_MSVC_LEAK_DETECT ${ENABLE_MSVC_LEAK_DETECT}
 
 // clang-format on
 
