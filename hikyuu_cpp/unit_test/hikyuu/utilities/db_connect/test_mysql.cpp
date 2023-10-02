@@ -7,7 +7,9 @@
 
 #include "doctest/doctest.h"
 
-#ifdef HKU_ENABLE_MYSQL_KDATA
+#include <hikyuu/config.h>
+
+#if HKU_ENABLE_MYSQL_KDATA
 
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/ConnectPool.h>

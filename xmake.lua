@@ -5,7 +5,6 @@ option("hdf5")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable hdf5 kdata engine.")
-    add_defines("HKU_ENABLE_HDF5_KDATA")
 option_end()
 
 option("mysql")
@@ -13,7 +12,6 @@ option("mysql")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable mysql kdata engine.")
-    add_defines("HKU_ENABLE_MYSQL_KDATA")
     if is_plat("macosx") then
         if os.exists("/usr/local/opt/mysql-client/lib") then
             add_includedirs("/usr/local/opt/mysql-client/include/mysql")
@@ -43,7 +41,6 @@ option("sqlite")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable sqlite kdata engine.")
-    add_defines("HKU_ENABLE_SQLITE_KDATA")
 option_end()
 
 option("tdx")
@@ -51,7 +48,6 @@ option("tdx")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable tdx kdata engine.")
-    add_defines("HKU_ENABLE_TDX_KDATA")
 option_end()
 
 option("feedback")
@@ -59,7 +55,6 @@ option("feedback")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable send feedback.")
-    add_defines("HKU_ENABLE_SEND_FEEDBACK")
 option_end()
 
 
@@ -90,6 +85,12 @@ set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 set_configvar("HKU_DISABLE_ASSERT", 0)
 set_configvar("ENABLE_MSVC_LEAK_DETECT", 0)
+set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
+
+set_configvar("HKU_ENABLE_HDF5_KDATA", get_config("hdf5") and 1 or 0)
+set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
+set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
+set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 -- set warning all as error
 if is_plat("windows") then
@@ -112,24 +113,29 @@ end
 
 add_repositories("project-repo hikyuu_extern_libs")
 if is_plat("windows") then
-    -- add_repositories("project-repo hikyuu_extern_libs")
-    if is_mode("release") then
-        add_requires("hdf5 " .. hdf5_version)
-    else
-        add_requires("hdf5_D " .. hdf5_version)
+    if get_config("hdf5") then
+        if is_mode("release") then
+            add_requires("hdf5 " .. hdf5_version)
+        else
+            add_requires("hdf5_D " .. hdf5_version)
+        end
     end
     if get_config("mysql") then
         add_requires("mysql " .. mysql_version)
     end
 
 elseif is_plat("linux", "cross") then
-    add_requires("hdf5 " .. hdf5_version, { system = false })
+    if get_config("hdf5") then
+        add_requires("hdf5 " .. hdf5_version, { system = false })
+    end
     if get_config("mysql") then
         add_requires("mysql " .. mysql_version, { system = false })
     end
   
 elseif is_plat("macosx") then
-    add_requires("brew::hdf5")
+    if get_config("hdf5") then
+        add_requires("brew::hdf5")
+    end
     if get_config("mysql") then
         add_requires("brew::mysql-client")
     end

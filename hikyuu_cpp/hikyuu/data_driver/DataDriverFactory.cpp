@@ -12,24 +12,24 @@
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
 
-#if defined(HKU_ENABLE_SQLITE_KDATA) || defined(HKU_ENABLE_HDF5_KDATA)
+#if HKU_ENABLE_SQLITE_KDATA || HKU_ENABLE_HDF5_KDATA
 #include "base_info/sqlite/SQLiteBaseInfoDriver.h"
 #endif
 
-#ifdef HKU_ENABLE_HDF5_KDATA
+#if HKU_ENABLE_HDF5_KDATA
 #include "kdata/hdf5/H5KDataDriver.h"
 #endif
 
-#ifdef HKU_ENABLE_MYSQL_KDATA
+#if HKU_ENABLE_MYSQL_KDATA
 #include "base_info/mysql/MySQLBaseInfoDriver.h"
 #include "kdata/mysql/MySQLKDataDriver.h"
 #endif
 
-#ifdef HKU_ENABLE_TDX_KDATA
+#if HKU_ENABLE_TDX_KDATA
 #include "kdata/tdx/TdxKDataDriver.h"
 #endif
 
-#ifdef HKU_ENABLE_SQLITE_KDATA
+#if HKU_ENABLE_SQLITE_KDATA
 #include "kdata/sqlite/SQLiteKDataDriver.h"
 #endif
 
@@ -44,11 +44,11 @@ map<string, KDataDriverConnectPoolPtr>* DataDriverFactory::m_kdataDriverPools{nu
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
 
-#if defined(HKU_ENABLE_SQLITE_KDATA) || defined(HKU_ENABLE_HDF5_KDATA)
+#if HKU_ENABLE_SQLITE_KDATA || HKU_ENABLE_HDF5_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
 #endif
 
-#ifdef HKU_ENABLE_MYSQL_KDATA
+#if HKU_ENABLE_MYSQL_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
 #endif
 
@@ -60,19 +60,19 @@ void DataDriverFactory::init() {
 
     DataDriverFactory::regKDataDriver(make_shared<KDataTempCsvDriver>());
 
-#ifdef HKU_ENABLE_TDX_KDATA
+#if HKU_ENABLE_TDX_KDATA
     DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
 #endif
 
-#ifdef HKU_ENABLE_HDF5_KDATA
+#if HKU_ENABLE_HDF5_KDATA
     DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
 #endif
 
-#ifdef HKU_ENABLE_MYSQL_KDATA
+#if HKU_ENABLE_MYSQL_KDATA
     DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
 #endif
 
-#ifdef HKU_ENABLE_SQLITE_KDATA
+#if HKU_ENABLE_SQLITE_KDATA
     DataDriverFactory::regKDataDriver(make_shared<SQLiteKDataDriver>());
 #endif
 }
