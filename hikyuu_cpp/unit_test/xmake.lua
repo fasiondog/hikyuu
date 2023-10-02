@@ -40,7 +40,7 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
-    add_options("mysql")
+    add_options("hdf5", "mysql")
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then
@@ -88,7 +88,7 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_options("mysql")
+    add_options("hdf5", "mysql")
 
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
     if get_config("mysql") then

@@ -6,7 +6,7 @@ target("hikyuu")
         set_kind("shared")
     end
 
-    add_options("mysql", "tdx", "feedback")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
     if is_plat("windows", "linux", "cross") then
@@ -68,14 +68,20 @@ target("hikyuu")
     -- add files
     add_files("./**.cpp|data_driver/**.cpp|utilities/db_connect/mysql/*.cpp")
     add_files("./data_driver/*.cpp")
-    add_files("./data_driver/base_info/sqlite/**.cpp")
+    if get_config("hdf5") or get_config("sqlite") then
+        add_files("./data_driver/base_info/sqlite/**.cpp")
+    end
     if get_config("mysql") then
         add_files("./data_driver/base_info/mysql/**.cpp")
     end
     add_files("./data_driver/block_info/**.cpp")
     add_files("./data_driver/kdata/cvs/**.cpp")
-    add_files("./data_driver/kdata/sqlite/**.cpp")
-    add_files("./data_driver/kdata/hdf5/**.cpp")
+    if get_config("sqlite") then
+        add_files("./data_driver/kdata/sqlite/**.cpp")
+    end
+    if get_config("hdf5") then
+        add_files("./data_driver/kdata/hdf5/**.cpp")
+    end
     if get_config("mysql") then
         add_files("./data_driver/kdata/mysql/**.cpp")
     end
