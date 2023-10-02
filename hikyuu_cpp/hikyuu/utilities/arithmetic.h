@@ -24,6 +24,71 @@ namespace hku {
  * @{
  */
 
+#if defined(_MSC_VER)
+std::string HKU_API utf8_to_gb(const char* szinput);
+std::string HKU_API utf8_to_gb(const std::string& szinput);
+std::string HKU_API gb_to_utf8(const char* szinput);
+std::string HKU_API gb_to_utf8(const std::string& szinput);
+#else
+std::string HKU_API utf8_to_gb(const std::string& szinput);
+std::string HKU_API gb_to_utf8(const std::string& szinput);
+#endif
+
+#define UTF8ToGB hku::utf8_to_gb
+#define GBToUTF8 hku::gb_to_utf8
+
+/**
+ * Windows平台下用于将字符串由UTF8转换为GB2312编码（仅用于打印，如需用于路径，请使用 HKU_PATH），
+ * Linux平台下不做任何事
+ * @note 目前 Visual Studio 2019 已修正 UTF8 问题，大部分情况下无需使用，HKU_STR/HKU_CSTR，
+ *       但windows的路径和文件名仍旧是GB，需要进行转换处理。
+ */
+#if defined(_MSC_VER) && _MSC_VER < 1928  // 1928 (Visual Studio 2019)
+// 将utf8编码的字符串转换为GB2312编码
+#define YH_STR(s) UTF8ToGB(s)
+#define YH_CSTR(s) UTF8ToGB(s)
+#else
+#define YH_STR(s) (s)
+#define YH_CSTR(s) (s)
+#endif
+
+/**
+ * 用于处理路径文件名，兼容windows中文平台
+ * HKU_PATH 适用于 std::string
+ * HKU_CPATH 适用于 char *
+ */
+#if defined(_MSC_VER)
+#define HKU_PATH(s) UTF8ToGB(s)
+#define HKU_CPATH(s) UTF8ToGB(s)
+#else
+#define HKU_PATH(s) (s)
+#define HKU_CPATH(s) (s)
+#endif
+
+/**
+ * 四舍五入，ROUND_HALF_EVEN 银行家舍入法
+ * @param number  待四舍五入的数据
+ * @param ndigits 保留小数位数
+ * @return 处理过的数据
+ */
+double HKU_API roundEx(double number, int ndigits = 0);
+
+/**
+ * 向上截取，如10.1截取后为11
+ * @param number  待处理数据
+ * @param ndigits 保留小数位数
+ * @return 处理过的数据
+ */
+double HKU_API roundUp(double number, int ndigits = 0);
+
+/**
+ * 向下截取，如10.1截取后为10
+ * @param number  待处理数据
+ * @param ndigits 保留小数位数
+ * @return 处理过的数据
+ */
+double HKU_API roundDown(double number, int ndigits = 0);
+
 /** 转小写字符串 */
 inline void to_lower(std::string& s) {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
@@ -110,6 +175,87 @@ inline std::vector<std::string_view> split(const std::string_view& str,
         result.emplace_back(str.substr(prepos));
     }
     return result;
+}
+
+/**
+ * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
+ * @param in_byte 输入的 byte 数组
+ * @param in_len byte 数组长度
+ */
+inline std::string byteToHexStr(const char* bytes, size_t in_len) {
+    std::string hexstr;
+    const unsigned char* in_byte = (const unsigned char*)bytes;
+    if (in_byte == nullptr) {
+        return hexstr;
+    }
+
+    char* buf = new char[2 * in_len + 1];
+    size_t buf_ix = 0;
+
+    for (size_t i = 0; i < in_len; ++i) {
+        unsigned char high = in_byte[i] >> 4;
+        unsigned char low = in_byte[i] & 0x0F;
+
+        buf[buf_ix++] = high <= 9 ? high + 0x30 : high + 87;
+        buf[buf_ix++] = low <= 9 ? low + 0x30 : low + 87;
+    }
+
+    buf[buf_ix++] = '\0';
+    hexstr = std::string(buf);
+    delete[] buf;
+    return hexstr;
+}
+
+/**
+ * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
+ * @param in_byte std::string 格式的输入
+ */
+inline std::string byteToHexStr(const std::string& bytes) {
+    return byteToHexStr(bytes.c_str(), bytes.size());
+}
+
+/**
+ * byte 转 16 进制字符串, 如 "abcd" 转换为 "0x61 0x62 0x63 0x64"
+ * @param in_byte 输入的 byte 数组
+ * @param in_len byte 数组长度
+ */
+inline std::string byteToHexStrForPrint(const char* bytes, size_t in_len) {
+    std::string hexstr;
+    const unsigned char* in_byte = (const unsigned char*)bytes;
+    if (in_byte == nullptr) {
+        return hexstr;
+    }
+
+    char* buf = new char[5 * in_len + 1];
+    size_t buf_ix = 0;
+
+    for (size_t i = 0; i < in_len; ++i) {
+        buf[buf_ix++] = '0';
+        buf[buf_ix++] = 'x';
+        unsigned char high = in_byte[i] >> 4;
+        unsigned char low = in_byte[i] & 0x0F;
+
+        buf[buf_ix++] = high <= 9 ? high + 0x30 : high + 87;
+        buf[buf_ix++] = low <= 9 ? low + 0x30 : low + 87;
+        buf[buf_ix++] = ' ';
+    }
+
+    if (buf_ix == 0) {
+        buf[buf_ix] = '\0';
+    } else {
+        buf[--buf_ix] = '\0';
+    }
+    hexstr = std::string(buf);
+    delete[] buf;
+    return hexstr;
+}
+
+/**
+ * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
+ * @param in_byte 输入的 byte 数组
+ */
+inline std::string byteToHexStrForPrint(const std::string& bytes) {
+    return byteToHexStrForPrint(bytes.c_str(), bytes.size());
 }
 
 /** @} */

@@ -9,7 +9,6 @@
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
 #include "data_driver/HistoryFinanceReader.h"
-#include "utilities/util.h"
 #include "KData.h"
 
 namespace hku {
@@ -362,7 +361,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
         KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
         size_t out_start, out_end;
         if (getIndexRange(query, out_start, out_end)) {
-            //找到的是>=datetime的记录
+            // 找到的是>=datetime的记录
             KRecord k = getKRecord(out_start, ktype);
             if (k.datetime == datetime) {
                 return k.closePrice;
@@ -390,7 +389,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType inktype) c
         }
     }
 
-    //没有找到，则取最后一条记录
+    // 没有找到，则取最后一条记录
     price_t price = 0.0;
     size_t total = getCount(ktype);
     if (total > 0) {
@@ -666,7 +665,7 @@ TransList Stock::getTransList(const KQuery& query) const {
 Parameter Stock::getFinanceInfo() const {
     Parameter result;
     HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
-              result);
+                  result);
 
     BaseInfoDriverPtr driver = StockManager::instance().getBaseInfoDriver();
     if (driver) {
@@ -679,7 +678,7 @@ Parameter Stock::getFinanceInfo() const {
 PriceList Stock::getHistoryFinanceInfo(const Datetime& date) const {
     PriceList result;
     HKU_IF_RETURN(type() != STOCKTYPE_A && type() != STOCKTYPE_GEM && type() != STOCKTYPE_START,
-              result);
+                  result);
     const StockManager& sm = StockManager::instance();
     HistoryFinanceReader rd(sm.datadir() + "/downloads/finance");
     result = rd.getHistoryFinanceInfo(date, market(), code());

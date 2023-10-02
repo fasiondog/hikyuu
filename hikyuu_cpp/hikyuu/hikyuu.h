@@ -12,7 +12,6 @@
 #include "KData.h"
 #include "Stock.h"
 #include "StockManager.h"
-#include "utilities/util.h"
 #include "utilities/Parameter.h"
 
 namespace hku {

@@ -16,7 +16,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "utilities/IniParser.h"
-#include "utilities/util.h"
 #include "utilities/thread/ThreadPool.h"
 #include "StockManager.h"
 #include "global/GlobalTaskGroup.h"

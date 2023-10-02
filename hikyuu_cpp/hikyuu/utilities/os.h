@@ -14,6 +14,7 @@
 
 #include <string>
 #include "Null.h"
+#include "arithmetic.h"
 
 #ifndef HKU_API
 #define HKU_API

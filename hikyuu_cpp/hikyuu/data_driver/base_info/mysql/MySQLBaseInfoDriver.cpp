@@ -9,7 +9,6 @@
 #include <boost/algorithm/string.hpp>
 #include "MySQLBaseInfoDriver.h"
 
-#include "../../../utilities/util.h"
 #include "../../../StockManager.h"
 #include "../../../Log.h"
 #include "../table/MarketInfoTable.h"

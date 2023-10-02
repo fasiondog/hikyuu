@@ -7,7 +7,6 @@
  *      Author: fasiondog
  */
 
-#include "../../utilities/util.h"
 #include "IRound.h"
 
 #if HKU_SUPPORT_SERIALIZATION

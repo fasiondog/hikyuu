@@ -12,7 +12,6 @@
 #include <set>
 #include "../../KQuery.h"
 #include "../../utilities/Parameter.h"
-#include "../../utilities/util.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/shared_ptr.hpp>

@@ -12,7 +12,6 @@
 #include <algorithm>
 #include "TradeManager.h"
 #include "../trade_sys/system/SystemPart.h"
-#include "../utilities/util.h"
 #include "../KData.h"
 
 namespace hku {
