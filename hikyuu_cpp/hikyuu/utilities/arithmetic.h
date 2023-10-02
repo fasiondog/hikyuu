@@ -17,6 +17,10 @@
 #include <string_view>
 #include <algorithm>
 
+#ifndef HKU_API
+#define HKU_API
+#endif
+
 namespace hku {
 
 /**
