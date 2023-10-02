@@ -34,6 +34,21 @@
 // 启用MSVC内存泄漏检查
 #define ENABLE_MSVC_LEAK_DETECT ${ENABLE_MSVC_LEAK_DETECT}
 
+// 启用发送用户使用信息
+#define HKU_ENABLE_SEND_FEEDBACK ${HKU_ENABLE_SEND_FEEDBACK}
+
+// 启用 hdf5 K线数据引擎
+#define HKU_ENABLE_HDF5_KDATA ${HKU_ENABLE_HDF5_KDATA}
+
+// 启用 MySQL K线数据引擎
+#define HKU_ENABLE_MYSQL_KDATA ${HKU_ENABLE_MYSQL_KDATA}
+
+// 启用 SQLite K线数据引擎
+#define HKU_ENABLE_SQLITE_KDATA ${HKU_ENABLE_SQLITE_KDATA}
+
+// 启用通达信本地 K线数据引擎
+#define HKU_ENABLE_TDX_KDATA ${HKU_ENABLE_TDX_KDATA}
+
 // clang-format on
 
 #endif /* HIKYUU_CONFIG_H_ */

@@ -8,7 +8,8 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
-#if !defined(HKU_ENABLE_HDF5_KDATA)
+#include <hikyuu/config.h>
+#if !HKU_ENABLE_HDF5_KDATA
 #error test program only for hdf5 engine! You must config --hdf5=y
 #endif
 

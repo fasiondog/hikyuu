@@ -37,9 +37,13 @@ target("hikyuu")
     if is_plat("windows") then
         if is_mode("release") then
             add_defines("HKU_API=__declspec(dllexport)")
-            add_packages("hdf5")
-        else
-            add_packages("hdf5_D")
+        end
+        if get_config("hdf5") then
+            if is_mode("release") then
+                add_packages("hdf5")
+            else
+                add_packages("hdf5_D")
+            end
         end
         if get_config("mysql") then
             add_packages("mysql")
@@ -47,20 +51,24 @@ target("hikyuu")
     end
 
     if is_plat("linux", "cross") then
-        add_packages("hdf5")
+        if get_config("hdf5") then
+            add_packages("hdf5")
+        end
         if get_config("mysql") then
             add_packages("mysql")
         end
     end
 
     if is_plat("macosx") then
-        -- add_linkdirs("/usr/local/opt/libiconv/lib")
-        add_packages("mysqlclient")
-        add_links("iconv")
-        add_includedirs("/usr/local/opt/hdf5/include")
-        add_linkdirs("/usr/local/opt/hdf5/lib")
-        add_links("hdf5", "hdf5_cpp")
-        add_links("sqlite3")
+        add_links("iconv", "sqlite3")
+        if get_config("mysql") then
+            add_packages("mysqlclient")
+        end
+        if get_config("hdf5") then
+            add_includedirs("/usr/local/opt/hdf5/include")
+            add_linkdirs("/usr/local/opt/hdf5/lib")
+            add_links("hdf5", "hdf5_cpp")
+        end
     end
 
     add_headerfiles("../(hikyuu/**.h)|**doc.h")
