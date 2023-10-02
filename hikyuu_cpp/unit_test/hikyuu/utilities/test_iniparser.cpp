@@ -9,11 +9,10 @@
 #include <cfloat>
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 #include <exception>
+#include <hikyuu/utilities/os.h>
 #include <hikyuu/utilities/IniParser.h>
 
-using namespace std::filesystem;
 using namespace hku;
 using namespace std;
 
@@ -83,7 +82,7 @@ TEST_CASE("test_IniParser_read") {
 
     /** @arg 其他正常情况，在其他成员函数如：get、hasSection、hasOption中测试 */
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /**
@@ -105,7 +104,7 @@ TEST_CASE("test_IniParser_hasSection") {
     /** @arg 不存在指定section */
     CHECK_UNARY(!ini_parser.hasSection("test2"));
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /**
@@ -133,7 +132,7 @@ TEST_CASE("test_IniParser_hasOption") {
     /** @arg 不存在指定的section */
     CHECK_UNARY(!ini_parser.hasOption("section2", "key1"));
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @par 检测点 */
@@ -156,7 +155,7 @@ TEST_CASE("test_IniParser_getSectionList") {
     CHECK_EQ(output->size(), 2);
     CHECK_EQ((*iter++), "section1");
     CHECK_EQ((*iter), "section2");
-    remove(test_filename);
+    removeFile(test_filename);
 
     /** @arg 不存在任何sction的情况 */
     testini.open(test_filename, ofstream::trunc);
@@ -165,7 +164,7 @@ TEST_CASE("test_IniParser_getSectionList") {
     ini_parser.read(test_filename);
     output = ini_parser.getSectionList();
     CHECK_UNARY(output->empty());
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @par 检测点 */
@@ -200,7 +199,7 @@ TEST_CASE("test_IniParser_getOptionList") {
     CHECK_EQ((*iter++), "key1");
     CHECK_EQ((*iter), "key2");
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @par 检测点 */
@@ -237,7 +236,7 @@ TEST_CASE("test_IniParser_get") {
     /** @arg 不存在指定的section，但指定了缺省值 */
     CHECK_THROWS_AS(ini_parser.get("section3", "key1", "value1"), std::invalid_argument);
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @par 检测点 */
@@ -286,7 +285,7 @@ TEST_CASE("test_IniParser_getInt") {
     /** @arg 不存在指定的section，但指定了有效缺省值 */
     CHECK_THROWS_AS(ini_parser.getInt("section3", "key1", "1"), std::invalid_argument);
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @par 检测点 */
@@ -350,7 +349,7 @@ TEST_CASE("test_IniParser_getFloat") {
     CHECK_THROWS_AS(ini_parser.getFloat("section1", "key2", "3.41e+38"), std::invalid_argument);
 #endif
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @par 检测点 */
@@ -400,7 +399,7 @@ TEST_CASE("test_IniParser_getDouble") {
     /** @arg 不存在指定的section，但指定了有效缺省值 */
     CHECK_THROWS_AS(ini_parser.getDouble("section3", "key1", "1"), std::invalid_argument);
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @par 检测点 */
@@ -507,7 +506,7 @@ TEST_CASE("test_IniParser_getBool") {
     /** @arg 不存在指定的section，但指定了有效缺省值 */
     CHECK_THROWS_AS(ini_parser.getBool("section3", "key1", "1"), std::invalid_argument);
 
-    remove(test_filename);
+    removeFile(test_filename);
 }
 
 /** @}*/

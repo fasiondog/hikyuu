@@ -60,7 +60,9 @@ inline std::vector<std::string_view> split(const std::string& str, char c) {
         pos = view.find_first_of(c, prepos);
     }
 
-    result.emplace_back(view.substr(prepos));
+    if (prepos < str.size() - 1) {
+        result.emplace_back(str.substr(prepos));
+    }
     return result;
 }
 
@@ -81,7 +83,32 @@ inline std::vector<std::string_view> split(const std::string_view& view, char c)
         pos = view.find_first_of(c, prepos);
     }
 
-    result.emplace_back(view.substr(prepos));
+    if (prepos < view.size() - 1) {
+        result.emplace_back(view.substr(prepos));
+    }
+    return result;
+}
+
+inline std::vector<std::string_view> split(const std::string_view& str,
+                                           const std::string& split_str) {
+    std::vector<std::string_view> result;
+    size_t split_str_len = split_str.size();
+    if (split_str_len == 0) {
+        result.emplace_back(str);
+        return result;
+    }
+
+    size_t prepos = 0;
+    size_t pos = str.find(split_str);
+    while (pos != std::string::npos) {
+        result.emplace_back(str.substr(prepos, pos - prepos));
+        prepos = pos + split_str_len;
+        pos = str.find(split_str, prepos);
+    }
+
+    if (prepos < str.size() - 1) {
+        result.emplace_back(str.substr(prepos));
+    }
     return result;
 }
 
