@@ -29,10 +29,6 @@ jobs:
         wget https://github.com/xmake-mirror/musl.cc/releases/download/20210202/${{ matrix.cross }}-cross.linux.tgz
         tar -xvf ${{ matrix.cross }}-cross.linux.tgz
 
-    - name: checkout
-      run: | 
-        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-        
     - name: build
       run: |
         xmake f -p cross -a aarch64 --sdk=`pwd`/${{ matrix.cross }}-cross -y
