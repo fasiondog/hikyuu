@@ -35,5 +35,5 @@ jobs:
     - name: build
       run: |
         cd ./hikyuu
-        xmake f -p cross --toolchain=muslcc --sdk=`pwd`/${{ matrix.cross }}-cross -y
+        xmake f -p cross -a aarch64 --toolchain=muslcc --sdk=`pwd`/${{ matrix.cross }}-cross -y
         xmake -b small-test
