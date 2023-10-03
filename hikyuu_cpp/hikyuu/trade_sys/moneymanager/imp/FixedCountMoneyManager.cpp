@@ -20,6 +20,11 @@ double FixedCountMoneyManager ::_getBuyNumber(const Datetime& datetime, const St
     return getParam<double>("n");
 }
 
+double FixedCountMoneyManager::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
+                                                   price_t price, price_t risk, SystemPart from) {
+    return getParam<double>("n");
+}
+
 MoneyManagerPtr HKU_API MM_FixedCount(double n) {
     FixedCountMoneyManager* p = new FixedCountMoneyManager();
     p->setParam<double>("n", n);
