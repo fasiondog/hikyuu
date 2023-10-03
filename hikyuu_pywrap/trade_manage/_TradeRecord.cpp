@@ -22,6 +22,8 @@ void export_TradeRecord() {
       .value("INIT", BUSINESS_INIT)
       .value("BUY", BUSINESS_BUY)
       .value("SELL", BUSINESS_SELL)
+      .value("BUY_SHORT", BUSINESS_BUY_SHORT)
+      .value("SELL_SHORT", BUSINESS_SELL_SHORT)
       .value("GIFT", BUSINESS_GIFT)
       .value("BONUS", BUSINESS_BONUS)
       .value("CHECKIN", BUSINESS_CHECKIN)
