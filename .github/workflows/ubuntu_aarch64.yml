@@ -31,5 +31,5 @@ jobs:
 
     - name: build
       run: |
-        xmake f -p cross -a aarch64 --sdk=`pwd`/${{ matrix.cross }}-cross -y
+        xmake f -p cross -a aarch64 --sdk=`pwd`/${{ matrix.cross }}-cross --pyver=3.10 -y
         xmake -b core
