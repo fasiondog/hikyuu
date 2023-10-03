@@ -32,4 +32,4 @@ jobs:
     - name: build
       run: |
         xmake f -p cross -a aarch64 --sdk=`pwd`/${{ matrix.cross }}-cross -y
-        xmake -b small-test
+        xmake -b core
