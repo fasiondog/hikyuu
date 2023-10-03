@@ -35,4 +35,5 @@ Indicator RSI(int n = 14) {
 
 }  // namespace hku
 
-#endif /* INDICATOR_CRT_ABS_H_ */
+#endif /* INDICATOR_CRT_RSI_H_ */
+
