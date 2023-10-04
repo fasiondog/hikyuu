@@ -6,6 +6,11 @@ from datetime import *
 from .cpp.core import *
 from .util.slice import list_getitem
 
+try:
+    from .cpp.core_pro import *
+except:
+    pass
+
 # ------------------------------------------------------------------
 # 常量定义，各种C++中Null值
 # ------------------------------------------------------------------

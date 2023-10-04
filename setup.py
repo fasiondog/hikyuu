@@ -129,11 +129,15 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2):
         os.system(cmd)
 
     if mode == "release":
-        os.system("xmake -j {} -b {} core".format(worker_num,
-                                                  "-v -D" if verbose else ""))
+        cmd = "xmake -j {} -b {} core".format(worker_num,
+                                              "-v -D" if verbose else "")
+        print(cmd)
+        os.system(cmd)
     else:
-        os.system("xmake -j {} -b {} hikyuu".format(
-            worker_num, "-v -D" if verbose else ""))
+        cmd = "xmake -j {} -b {} hikyuu".format(worker_num,
+                                                "-v -D" if verbose else "")
+        print(cmd)
+        os.system(cmd)
 
     # 保存当前的编译信息
     save_current_compile_info(current_compile_info)
@@ -222,6 +226,10 @@ def clear_build():
     if os.path.exists('compile_info'):
         print('delete compile_info')
         os.remove('compile_info')
+    lib_files = os.listdir('hikyuu/cpp')
+    for file in lib_files:
+        if file not in ("__init__.py", "__pycache__"):
+            os.remove(f'hikyuu/cpp/{file}')
     print('clear finished!')
     os.system("xmake clean")
 
@@ -270,13 +278,18 @@ def install():
 
 @click.command()
 @click.option('-j', '--j', default=2, help="并行编译数量")
-def wheel(j):
+@click.option('-feedback',
+              '--feedback',
+              default=True,
+              type=bool,
+              help='允许发送反馈信息')
+def wheel(feedback, j):
     """ 生成 python 的 wheel 安装包 """
     # 清理之前遗留的打包产物
     clear_build()
 
     # 尝试编译
-    start_build(False, 'release', j)
+    start_build(False, 'release', feedback, j)
 
     # 构建打包命令
     print("start pacakaging bdist_wheel ...")
