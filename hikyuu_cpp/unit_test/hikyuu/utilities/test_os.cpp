@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Yihua
+ *  Copyright (c) hikyuu.org
  *
  *  Created on: 2020-8-4
  *      Author: fasiondog

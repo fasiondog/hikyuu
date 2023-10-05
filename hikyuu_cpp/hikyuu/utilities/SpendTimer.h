@@ -41,8 +41,8 @@ namespace hku {
 /**
  * @ingroup Utilities
  * @addtogroup SpendTimer Spend timer 耗时统计
- * @details 辅助统计代码块执行时间相关的工具宏，编译时可通过指定宏 YIHUA_CLOSE_SPEND_TIME=1
- * 进行关闭，或 YIHUA_CLOSE_SPEND_TIME=0 开启耗时统计
+ * @details 辅助统计代码块执行时间相关的工具宏，编译时可通过指定宏 HIKYUU_CLOSE_SPEND_TIME=1
+ * 进行关闭，或 HIKYUU_CLOSE_SPEND_TIME=0 开启耗时统计
  * @code
  *     {
  *        SPEND_TIME(test, "run test");

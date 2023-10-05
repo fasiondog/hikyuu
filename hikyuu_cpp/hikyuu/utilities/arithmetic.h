@@ -49,11 +49,11 @@ std::string HKU_API gb_to_utf8(const std::string& szinput);
  */
 #if defined(_MSC_VER) && _MSC_VER < 1928  // 1928 (Visual Studio 2019)
 // 将utf8编码的字符串转换为GB2312编码
-#define YH_STR(s) UTF8ToGB(s)
-#define YH_CSTR(s) UTF8ToGB(s)
+#define HKU_STR(s) UTF8ToGB(s)
+#define HKU_CSTR(s) UTF8ToGB(s)
 #else
-#define YH_STR(s) (s)
-#define YH_CSTR(s) (s)
+#define HKU_STR(s) (s)
+#define HKU_CSTR(s) (s)
 #endif
 
 /**
