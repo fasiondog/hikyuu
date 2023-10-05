@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <fmt/format.h>
+#include <nng/nng.h>
 
 #include "config.h"
 #if HKU_ENABLE_HDF5_KDATA
@@ -76,6 +77,8 @@ void GlobalInitializer::clean() {
     IndicatorImp::releaseDynEngine();
     StockManager::quit();
     DataDriverFactory::release();
+
+    nng_closeall();
 
 #if HKU_ENABLE_HDF5_KDATA
     H5close();
