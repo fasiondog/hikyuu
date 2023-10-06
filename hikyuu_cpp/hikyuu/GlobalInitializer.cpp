@@ -59,7 +59,7 @@ void GlobalInitializer::init() {
     set_log_level(INFO);
 #endif
 
-#if HKU_ENABLE_SEND_FEEDBACK && HKU_OS_WINDOWS
+#if HKU_ENABLE_SEND_FEEDBACK
     sendFeedback();
 #endif
 

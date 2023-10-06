@@ -27,7 +27,7 @@ function coverage_report(target)
                 -o cover-final.info")
         
         -- 生成的html及相关文件的目录名称，--legend 简单的统计信息说明
-        os.exec("genhtml -o cover_report --legend --title 'yhsdk'  --prefix=" .. os.projectdir() .. " cover-final.info")
+        os.exec("genhtml -o cover_report --legend --title 'hikyuu'  --prefix=" .. os.projectdir() .. " cover-final.info")
 
         -- 生成 sonar 可读取报告
         if is_plat("linux") then

@@ -14,6 +14,7 @@
 #include "hikyuu/version.h"
 #include "hikyuu/DataType.h"
 #include "hikyuu/utilities/os.h"
+#include "node/NodeClient.h"
 #include "sysinfo.h"
 
 using json = nlohmann::json;
@@ -66,26 +67,33 @@ void sendFeedback() {
                 saveUUID(uid);
             }
 
-            json req;
+            NodeClient client("tcp://1.tcp.cpolar.cn:20981");
+            client.dial();
+
+            json req, res;
+            req["cmd"] = 2;
+            client.post(req, res);
+            std::string host = res["host"].get<std::string>();
+            uint64_t port = res["port"].get<uint64_t>();
+            client.close();
+
+            client.setServerAddr(fmt::format("tcp://{}:{}", host, port));
+            client.dial();
+            req["cmd"] = 1;
             req["uid"] = boost::uuids::to_string(uid);
             req["part"] = "hikyuu";
             req["version"] = HKU_VERSION;
             req["build"] = fmt::format("{}", HKU_VERSION_BUILD);
             req["platform"] = getPlatform();
             req["arch"] = getCpuArch();
-
-            httplib::SSLClient cli("hikyuu.cpolar.cn");
-            cli.set_compress(true);
-            cli.set_connection_timeout(0, 3000000);  // 3 seconds
-            cli.set_read_timeout(5, 0);              // 5 seconds
-            cli.set_write_timeout(5, 0);             // 5 seconds
-            cli.Post("/feedback", req.dump(), "application/json");
+            client.post(req, res);
 
         } catch (...) {
             // do nothing
         }
     });
     t.detach();
+    // t.join();
 }
 
 }  // namespace hku
