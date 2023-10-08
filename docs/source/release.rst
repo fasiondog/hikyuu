@@ -1,6 +1,38 @@
 版本发布说明
 =======================
 
+1.2.9 - 2023年10月9日
+-------------------------
+
+1. 稳定性与兼容性
+    - 修复了 setup.py 更新编译模式时的问题，确保并行编译参数能够正常生效
+    - 对 HikyuuTdx 数据下载进行了优化，增加了超时处理，以防止网络连接问题导致进度停滞
+    - 增加了对 pytdx 连接失败的检测，以便记录相关日志
+
+2. 算法优化
+    - 优化了 VAR 和 STDP 算法，现在使用移位算法，提升了计算效率
+    - 修复了 weave formula 中缺少 break 的问题，避免了在打印时出现崩溃
+    - 增加了相关系数指标 CORR
+    - 修复了 SUM 中缺少 discard 设置的问题
+    - 修复了 setDiscard 在 discard 小于 size 时未对 m_discard 进行赋值的问题
+
+3. 功能增强
+    - 新增 pyechart 绘图支持
+    - 在 ipython/notebook 模式下，自动设定 matplotlib 绘图为交互模式，并改善了 bokeh 绘图效果
+    - StrategyBase 现在可以直接获取 StockManager 实例
+    - 自动设置 matplotlib 的中文字体
+    - 增加了 TimerManager 对系统时间发生变化的保护
+    - SQLite kdata driver 新增了支持转换时间间隔的功能
+
+4. 其他修复和改进
+    - 修复 getFinanceInfo 和 getHistoryFinanceInfo 的问题，只对 STOCKTYPE_A 生效
+    - 修复 IndicatorImp::setContext 方法中判断逻辑的问题，确保在遍历过程中 Context 能够正确修改
+    - 增加一下常用了跨平台函数
+    - 添加了反馈信息发送功能
+    - 优化了编译选项，对于部分用户直接使用 xmake 进行编译控制
+    - 修复了 split 函数的缺陷，并新增了 byteToHexStr 系列 byte 转字符串函数
+
+
 1.2.8 - 2023年8月16日
 -------------------------
 
