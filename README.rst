@@ -13,7 +13,7 @@
     :alt: GitHub
 
 
-Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（仅受限于数据，如有数据也可用于期货等）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
+Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架，用于策略分析及回测（目前主要用于国内A股市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
 
 详细文档： `<https://hikyuu.org/>`_
 
@@ -22,7 +22,7 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 祝贺 HIKYUU 入选 GITEE 最有价值开源项目 GVP
 -----------------------------------------------
 
-.. image:: http://fasiondog.gitee.io/hikyuu/images/gitee_GVP.jpg
+.. image:: http://fasiondog.gitee.io/hikyuu/images/gitee_GVP.png
     :target: https://gitee.com/gvp
     :alt: Gitee
     
@@ -65,6 +65,8 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 
 - **性能保障，打造自己的专属应用** 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
 
+    - 百万级别 K 线数据，2~3秒内完成 A 股全市场回测
+
     - C++核心库，提供了整体的策略框架，在保证性能的同时，已经考虑了对多线程和多核处理的支持，在未来追求更高运算速度提供便利。C++核心库，可以单独剥离使用，自行构建自己的客户端工具。
 
     - Python库（hikyuu），提供了对C++库的包装，同时集成了talib库（如TA_SMA，对应talib.SMA），可以与numpy、pandas数据结构进行互相转换，为使用其他成熟的python数据分析工具提供了便利。
@@ -80,3 +82,16 @@ Hikyuu Quant Framework是一款基于C++/Python的开源量化交易研究框架
 .. image:: https://api.star-history.com/svg?repos=fasiondog/hikyuu&type=Date
     :target: https://star-history.com/#fasiondog/hikyuu&Date
     :alt: Star History Chart
+
+
+遇到了问题？想要更多了解Hikyuu？请使用以下方式联系：
+--------------------------------------------------
+
+- 作者邮箱：fasiondog@sina.com
+- QQ交流群：114910869, 或扫码加入：
+
+    .. figure:: http://fasiondog.gitee.io/hikyuu/images/10003-qq.png
+
+- 加入微信群（请注明“加入hikyuu”）：
+
+    .. figure:: http://fasiondog.gitee.io/hikyuu/images/weixin_group.jpg

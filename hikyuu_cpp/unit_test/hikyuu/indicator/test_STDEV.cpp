@@ -35,13 +35,13 @@ TEST_CASE("test_STDEV") {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 10);
     CHECK_EQ(dev.size(), 15);
-    CHECK_UNARY(std::isnan(dev[8]));
-    CHECK_LT(std::fabs(dev[9] - 2.923088), 0.000001);
-    CHECK_LT(std::fabs(dev[10] - 3.142893), 0.000001);
-    CHECK_LT(std::fabs(dev[11] - 2.830390), 0.000001);
-    CHECK_LT(std::fabs(dev[12] - 3.267686), 0.000001);
-    CHECK_LT(std::fabs(dev[13] - 3.653004), 0.000001);
-    CHECK_LT(std::fabs(dev[14] - 4.001388), 0.000001);
+
+    vector<price_t> expected{0,       0.707107, 1,       1.29099, 1.58114,
+                             1.47196, 1.97605,  1.83225, 2.44949, 2.92309,
+                             3.14289, 2.83039,  3.26769, 3.653,   4.00139};
+    for (size_t i = 0; i < dev.size(); i++) {
+        CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.0001));
+    }
 
     /** @arg n = 1时 */
     dev = STDEV(ind, 1);

@@ -6,7 +6,7 @@
  */
 
 #include <boost/python.hpp>
-#include <hikyuu/utilities/util.h>
+#include <hikyuu/utilities/arithmetic.h>
 
 using namespace boost::python;
 using namespace hku;

@@ -11,7 +11,6 @@
 
 #include <set>
 #include "../../utilities/Parameter.h"
-#include "../../utilities/util.h"
 #include "../../KData.h"
 #include "../../trade_manage/TradeManager.h"
 #include "../signal/SignalBase.h"

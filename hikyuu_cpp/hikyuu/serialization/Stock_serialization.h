@@ -11,7 +11,6 @@
 
 #include "../config.h"
 #include "../Stock.h"
-#include "../utilities/util.h"
 
 //===========================================================================
 // 以下为Stock的序列化，目前仅实现了在StockManager中管理的Stock的序列化

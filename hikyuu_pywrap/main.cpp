@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <boost/python.hpp>
 #include <hikyuu/hikyuu.h>
+#include <hikyuu/global/sysinfo.h>
 
 namespace py = boost::python;
 using namespace hku;

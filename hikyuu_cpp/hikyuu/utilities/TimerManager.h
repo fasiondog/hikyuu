@@ -309,6 +309,10 @@ private:
             }
 
             m_queue.pop();
+
+            // 重新获取当前时间
+            now = Datetime::now();
+
             auto timer_iter = m_timers.find(s.m_timer_id);
             if (timer_iter == m_timers.end()) {
                 continue;
@@ -326,20 +330,35 @@ private:
                 continue;
             }
 
+            // 计算下一次执行的时间点
             Datetime today = now.startOfDay();
-            s.m_time_point = timer->m_start_time >= TimeDelta() ? s.m_time_point + timer->m_duration
-                                                                : s.m_time_point + TimeDelta(1);
+            if (timer->m_start_time >= TimeDelta()) {
+                // 非指定时刻执行的定时器
+                s.m_time_point = s.m_time_point + timer->m_duration;
+                if (s.m_time_point < now) {
+                    // 系统时间发生向前调整
+                    s.m_time_point = now;
+                }
+
+                // 如果限定了当日可执行的时间段，且下一执行时刻超出了当日的限定时间
+                if (timer->m_start_time != timer->m_end_time &&
+                    s.m_time_point > today + timer->m_end_time) {
+                    s.m_time_point = today + timer->m_start_time + TimeDelta(1);
+                }
+
+            } else {
+                // 指定了每日运行时刻的定时器
+                s.m_time_point =
+                  s.m_time_point + (today - s.m_time_point.startOfDay() + TimeDelta(1));
+            }
+
             if (timer->m_end_date != Datetime::max() &&
                 s.m_time_point > timer->m_end_date + timer->m_end_time) {
                 _removeTimer(s.m_timer_id);
                 continue;
             }
 
-            if (timer->m_start_time >= TimeDelta() && timer->m_start_time != timer->m_end_time &&
-                s.m_time_point > today + timer->m_end_time) {
-                s.m_time_point = today + timer->m_start_time + TimeDelta(1);
-            }
-            // HKU_TRACE("s.m_time_point: {}", s.m_time_point.repr());
+            // 将下一运行时间推入队列
             m_queue.push(s);
         }
     }

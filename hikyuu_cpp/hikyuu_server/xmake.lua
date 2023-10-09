@@ -21,7 +21,9 @@ target("hkuserver")
     end
     
     if is_plat("windows") then 
-        add_defines("HKU_API=__declspec(dllimport)")
+        if is_mode("release") then
+            add_defines("HKU_API=__declspec(dllimport)")
+        end
         add_packages("mysql")
     end
     

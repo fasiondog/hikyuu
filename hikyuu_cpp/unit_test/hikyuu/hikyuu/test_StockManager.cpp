@@ -8,7 +8,6 @@
 #include "doctest/doctest.h"
 #include <boost/filesystem.hpp>
 #include <hikyuu/StockManager.h>
-#include <hikyuu/utilities/util.h>
 #include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/Log.h>
 

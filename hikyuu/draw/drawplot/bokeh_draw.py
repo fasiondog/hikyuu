@@ -5,7 +5,7 @@
 """
 
 from hikyuu import *
-from .common import get_draw_title
+from .common import in_ipython_frontend
 
 from bokeh.plotting import figure, ColumnDataSource
 from bokeh.models import DatetimeTickFormatter, HoverTool, Title, Label

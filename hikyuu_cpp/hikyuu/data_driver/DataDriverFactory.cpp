@@ -7,15 +7,31 @@
 
 #include "../GlobalInitializer.h"
 #include <boost/algorithm/string.hpp>
-#include "base_info/sqlite/SQLiteBaseInfoDriver.h"
-#include "base_info/mysql/MySQLBaseInfoDriver.h"
 #include "block_info/qianlong/QLBlockInfoDriver.h"
-#include "kdata/hdf5/H5KDataDriver.h"
-#include "kdata/mysql/MySQLKDataDriver.h"
-#include "kdata/tdx/TdxKDataDriver.h"
 #include "kdata/cvs/KDataTempCsvDriver.h"
 #include "DataDriverFactory.h"
 #include "KDataDriver.h"
+
+#if HKU_ENABLE_SQLITE_KDATA || HKU_ENABLE_HDF5_KDATA
+#include "base_info/sqlite/SQLiteBaseInfoDriver.h"
+#endif
+
+#if HKU_ENABLE_HDF5_KDATA
+#include "kdata/hdf5/H5KDataDriver.h"
+#endif
+
+#if HKU_ENABLE_MYSQL_KDATA
+#include "base_info/mysql/MySQLBaseInfoDriver.h"
+#include "kdata/mysql/MySQLKDataDriver.h"
+#endif
+
+#if HKU_ENABLE_TDX_KDATA
+#include "kdata/tdx/TdxKDataDriver.h"
+#endif
+
+#if HKU_ENABLE_SQLITE_KDATA
+#include "kdata/sqlite/SQLiteKDataDriver.h"
+#endif
 
 namespace hku {
 
@@ -27,8 +43,14 @@ map<string, KDataDriverConnectPoolPtr>* DataDriverFactory::m_kdataDriverPools{nu
 
 void DataDriverFactory::init() {
     m_baseInfoDrivers = new map<string, BaseInfoDriverPtr>();
+
+#if HKU_ENABLE_SQLITE_KDATA || HKU_ENABLE_HDF5_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<SQLiteBaseInfoDriver>());
+#endif
+
+#if HKU_ENABLE_MYSQL_KDATA
     DataDriverFactory::regBaseInfoDriver(make_shared<MySQLBaseInfoDriver>());
+#endif
 
     m_blockDrivers = new map<string, BlockInfoDriverPtr>();
     DataDriverFactory::regBlockDriver(make_shared<QLBlockInfoDriver>());
@@ -36,10 +58,23 @@ void DataDriverFactory::init() {
     m_kdataPrototypeDrivers = new map<string, KDataDriverPtr>();
     m_kdataDriverPools = new map<string, KDataDriverConnectPoolPtr>();
 
-    DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
-    DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
-    DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
     DataDriverFactory::regKDataDriver(make_shared<KDataTempCsvDriver>());
+
+#if HKU_ENABLE_TDX_KDATA
+    DataDriverFactory::regKDataDriver(make_shared<TdxKDataDriver>());
+#endif
+
+#if HKU_ENABLE_HDF5_KDATA
+    DataDriverFactory::regKDataDriver(make_shared<H5KDataDriver>());
+#endif
+
+#if HKU_ENABLE_MYSQL_KDATA
+    DataDriverFactory::regKDataDriver(make_shared<MySQLKDataDriver>());
+#endif
+
+#if HKU_ENABLE_SQLITE_KDATA
+    DataDriverFactory::regKDataDriver(make_shared<SQLiteKDataDriver>());
+#endif
 }
 
 void DataDriverFactory::release() {

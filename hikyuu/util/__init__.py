@@ -11,9 +11,11 @@
 
 from .mylog import *
 from .check import *
+from .timeout import *
 
 __all__ = [
     'spend_time',
+    'timeout',
     'hku_logger',
     'class_logger',
     'add_class_logger_handler',

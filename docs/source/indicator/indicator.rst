@@ -200,6 +200,16 @@
     :rtype: Indicator
    
 
+.. py::function:: CORR(ind1, ind2, n)
+
+    计算 ind1 和 ind2 的样本相关系数与协方差。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+
+    :param Indicator ind1: 指标1
+    :param Indicator ind2: 指标2
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
+    :rtype: Indicator    
+
+
 .. py:function:: COS([data])
 
     余弦值

@@ -36,13 +36,12 @@ TEST_CASE("test_STDP") {
     Indicator dev = STDP(ind, 10);
     CHECK_EQ(dev.name(), "STDP");
     CHECK_EQ(dev.size(), 15);
-    CHECK_UNARY(std::isnan(dev[8]));
-    CHECK_LT(std::fabs(dev[9] - 2.77308), 0.00001);
-    CHECK_LT(std::fabs(dev[10] - 2.98161), 0.00001);
-    CHECK_LT(std::fabs(dev[11] - 2.68514), 0.00001);
-    CHECK_LT(std::fabs(dev[12] - 3.1), 0.00001);
-    CHECK_LT(std::fabs(dev[13] - 3.46554), 0.00001);
-    CHECK_LT(std::fabs(dev[14] - 3.79605), 0.00001);
+
+    vector<price_t> expected{0,      0.5,     0.816497, 1.11803, 1.41421, 1.34371, 1.82946, 1.71391,
+                             2.3094, 2.77308, 2.98161,  2.68514, 3.1,     3.46554, 3.79605};
+    for (size_t i = 0; i < dev.size(); i++) {
+        CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.0001));
+    }
 
     /** @arg n = 1时 */
     dev = STDP(ind, 1);

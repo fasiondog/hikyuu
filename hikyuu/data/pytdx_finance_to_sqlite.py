@@ -31,7 +31,7 @@ def pytdx_import_finance(db_connect, pytdx_connect, market):
     marketid = get_marketid(db_connect, market)
     sql = "select stockid, marketid, code, valid, type from stock where marketid={} and type = {} and valid=1"\
         .format(marketid, STOCKTYPE.A)
-    
+
     cur = db_connect.cursor()
     all_list = cur.execute(sql).fetchall()
     db_connect.commit()
@@ -41,7 +41,11 @@ def pytdx_import_finance(db_connect, pytdx_connect, market):
         x = pytdx_connect.get_finance_info(1 if stk[1] == MARKETID.SH else 0, stk[2])
         #print(stk[2])
         if x is not None and x['code'] == stk[2]:
-            cur.execute("select updated_date from stkfinance where stockid={} and updated_date={}".format(stk[0], x['updated_date']))
+            cur.execute(
+                "select updated_date from stkfinance where stockid={} and updated_date={}".format(
+                    stk[0], x['updated_date']
+                )
+            )
             a = cur.fetchall()
             a = [x[0] for x in a]
             if a:
@@ -49,47 +53,22 @@ def pytdx_import_finance(db_connect, pytdx_connect, market):
                 continue
             #else:
             #    print(market, stk[2])
-            records.append((stk[0],
-                            x['updated_date'],
-                            x['ipo_date'],
-                            x['province'],
-                            x['industry'],
-                            x['zongguben'],
-                            x['liutongguben'],
-                            x['guojiagu'],
-                            x['faqirenfarengu'],
-                            x['farengu'],
-                            x['bgu'],
-                            x['hgu'],
-                            x['zhigonggu'],
-                            x['zongzichan'],
-                            x['liudongzichan'],
-                            x['gudingzichan'],
-                            x['wuxingzichan'],
-                            x['gudongrenshu'],
-                            x['liudongfuzhai'],
-                            x['changqifuzhai'],
-                            x['zibengongjijin'],
-                            x['jingzichan'],
-                            x['zhuyingshouru'],
-                            x['zhuyinglirun'],
-                            x['yingshouzhangkuan'],
-                            x['yingyelirun'],
-                            x['touzishouyu'],
-                            x['jingyingxianjinliu'],
-                            x['zongxianjinliu'],
-                            x['cunhuo'],
-                            x['lirunzonghe'],
-                            x['shuihoulirun'],
-                            x['jinglirun'],
-                            x['weifenpeilirun'],
-                            x['meigujingzichan'],
-                            x['baoliu2'] 
-                            ))
+            records.append(
+                (
+                    stk[0], x['updated_date'], x['ipo_date'], x['province'], x['industry'], x['zongguben'],
+                    x['liutongguben'], x['guojiagu'], x['faqirenfarengu'], x['farengu'], x['bgu'], x['hgu'],
+                    x['zhigonggu'], x['zongzichan'], x['liudongzichan'], x['gudingzichan'], x['wuxingzichan'],
+                    x['gudongrenshu'], x['liudongfuzhai'], x['changqifuzhai'], x['zibengongjijin'], x['jingzichan'],
+                    x['zhuyingshouru'], x['zhuyinglirun'], x['yingshouzhangkuan'], x['yingyelirun'], x['touzishouyu'],
+                    x['jingyingxianjinliu'], x['zongxianjinliu'], x['cunhuo'], x['lirunzonghe'], x['shuihoulirun'],
+                    x['jinglirun'], x['weifenpeilirun'], x['meigujingzichan'], x['baoliu2']
+                )
+            )
             pass
-        
+
     if records:
-        cur.executemany("INSERT INTO stkfinance(stockid, \
+        cur.executemany(
+            "INSERT INTO stkfinance(stockid, \
                                                 updated_date, \
                                                 ipo_date, \
                                                 province, \
@@ -128,8 +107,8 @@ def pytdx_import_finance(db_connect, pytdx_connect, market):
                         VALUES (?,?,?,?,?,?,?,?,?,?, \
                                 ?,?,?,?,?,?,?,?,?,?, \
                                 ?,?,?,?,?,?,?,?,?,?, \
-                                ?,?,?,?,?,?)",
-                        records)
+                                ?,?,?,?,?,?)", records
+        )
         db_connect.commit()
 
     cur.close()
@@ -143,8 +122,8 @@ if __name__ == '__main__':
 
     starttime = time.time()
 
-    dest_dir = "c:\\stock"
-    tdx_server = '119.147.212.81'
+    dest_dir = "d:\\stock"
+    tdx_server = '120.76.152.87'  #'119.147.212.81'
     tdx_port = 7709
 
     connect = sqlite3.connect(dest_dir + "\\stock.db")
@@ -155,6 +134,12 @@ if __name__ == '__main__':
     api.connect(tdx_server, tdx_port)
 
     x = pytdx_import_finance(connect, api, "SZ")
+    print(x)
+
+    x = pytdx_import_finance(connect, api, "SH")
+    print(x)
+
+    x = pytdx_import_finance(connect, api, "BJ")
     print(x)
 
     api.disconnect()

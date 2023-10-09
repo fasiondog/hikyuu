@@ -8,7 +8,7 @@ function main(target)
     if not with_demo then raise("You need to config first: xmake f --with-demo=y") end
   end
 
-  if "unit-test" == targetname or "small-test" == targetname then
+  if "unit-test" == targetname or "small-test" == targetname or "prepare-test" == targetname then
     print("copying test_data ...")
     os.rm("$(buildir)/$(mode)/$(plat)/$(arch)/lib/test_data")
     os.cp("$(projectdir)/test_data", "$(buildir)/$(mode)/$(plat)/$(arch)/lib/")

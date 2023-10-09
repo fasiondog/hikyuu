@@ -44,7 +44,7 @@ void IndicatorImp::releaseDynEngine() {
 
 HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImp &imp) {
     os << "Indicator{\n"
-       << "  name: " << imp.name() << "\n  size: " << imp.size()
+       << "  name: " << imp.name() << "\n  size: " << imp.size() << "\n  discard: " << imp.discard()
        << "\n  result sets: " << imp.getResultNumber() << "\n  params: " << imp.getParameter()
        << "\n  support indicator param: " << (imp.supportIndParam() ? "True" : "False");
     if (imp.supportIndParam()) {
@@ -113,7 +113,7 @@ void IndicatorImp::initContext() {
 
 void IndicatorImp::setContext(const Stock &stock, const KQuery &query) {
     KData kdata = getContext();
-    if (kdata.getStock() == stock || kdata.getQuery() == query) {
+    if (kdata.getStock() == stock && kdata.getQuery() == query) {
         if (m_need_calculate) {
             calculate();
         }
@@ -253,8 +253,8 @@ void IndicatorImp::setDiscard(size_t discard) {
                 _set(null_price, j, i);
             }
         }
-        m_discard = tmp_discard;
     }
+    m_discard = tmp_discard;
 }
 
 string IndicatorImp::long_name() const {
@@ -344,7 +344,7 @@ string IndicatorImp::formula() const {
             break;
 
         case SUB:
-            buf << m_left->formula() << " + " << m_right->formula();
+            buf << m_left->formula() << " - " << m_right->formula();
             break;
 
         case MUL:
@@ -392,11 +392,16 @@ string IndicatorImp::formula() const {
             break;
 
         case WEAVE:
-            buf << "WEAVE(" << m_left->formula() << ", " << m_right->formula() << ")";
+            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
+            break;
 
         case OP_IF:
             buf << "IF(" << m_three->formula() << ", " << m_left->formula() << ", "
                 << m_right->formula() << ")";
+            break;
+
+        case CORR:
+            buf << m_name << "(" << m_left->formula() << ", " << m_right->formula() << ")";
             break;
 
         default:
@@ -449,6 +454,27 @@ void IndicatorImp::add(OPType op, IndicatorImpPtr left, IndicatorImpPtr right) {
                     m_right->m_right = right->clone();
                 } else {
                     m_right->add(OP, left, right);
+                }
+            }
+        }
+        if (m_three) {
+            if (m_three->isNeedContext()) {
+                if (m_three->isLeaf()) {
+                    m_need_calculate = true;
+                    m_three = right->clone();
+                } else {
+                    HKU_WARN(
+                      "Context-dependent indicator can only be at the leaf node!"
+                      "parent node: {}, try add node: {}",
+                      name(), right->name());
+                }
+            } else {
+                if (m_three->isLeaf()) {
+                    m_three->m_need_calculate = true;
+                    m_three->m_optype = op;
+                    m_three->m_right = right->clone();
+                } else {
+                    m_three->add(OP, left, right);
                 }
             }
         }
@@ -620,6 +646,10 @@ Indicator IndicatorImp::calculate() {
 
         case OP_IF:
             execute_if();
+            break;
+
+        case CORR:
+            execute_corr();
             break;
 
         default:
@@ -1248,6 +1278,98 @@ void IndicatorImp::execute_if() {
             }
         }
     }
+}
+
+void IndicatorImp::execute_corr() {
+    m_right->calculate();
+    m_left->calculate();
+
+    IndicatorImp *maxp, *minp;
+    if (m_right->size() > m_left->size()) {
+        maxp = m_right.get();
+        minp = m_left.get();
+    } else {
+        maxp = m_left.get();
+        minp = m_right.get();
+    }
+
+    size_t total = maxp->size();
+    size_t discard = maxp->size() - minp->size() + minp->discard();
+    if (discard < maxp->discard()) {
+        discard = maxp->discard();
+    }
+
+    // 结果 0 存放相关系数结果
+    // 结果 1 存放协方差（COV）结果
+    _readyBuffer(total, 2);
+
+    int n = getParam<int>("n");
+    if (n < 2 || discard + 2 > total) {
+        setDiscard(total);
+        return;
+    }
+
+    price_t null_price = Null<price_t>();
+    vector<price_t> prebufx(total, null_price);
+    vector<price_t> prebufy(total, null_price);
+    vector<price_t> prepowx(total, null_price);
+    vector<price_t> prepowy(total, null_price);
+    vector<price_t> prepowxy(total, null_price);
+    price_t kx = maxp->get(discard);
+    price_t ky = minp->get(discard);
+    price_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
+    price_t ex2 = 0.0, ey2 = 0.0, exy2 = 0.0;
+    prebufx[discard] = 0.0;
+    prebufy[discard] = 0.0;
+    prepowx[discard] = 0.0;
+    prepowy[discard] = 0.0;
+    prepowxy[discard] = 0.0;
+
+    for (size_t i = discard, nobs = 0; i < total; ++i) {
+        price_t ix = maxp->get(i) - kx;
+        price_t iy = minp->get(i) - ky;
+        price_t preix = prebufx[i - nobs];
+        price_t preiy = prebufy[i - nobs];
+        price_t prepowix = prepowx[i - nobs];
+        price_t prepowiy = prepowy[i - nobs];
+        price_t prepowixy = prepowxy[i - nobs];
+        HKU_INFO_IF(i % 100 == 0, "{}: ix: {}, iy: {}, preix: {}, preiy: {}", i, ix, iy, preix,
+                    preiy);
+        if (!std::isnan(preix) && !std::isnan(preiy) && !std::isnan(ix) && !std::isnan(iy)) {
+            if (nobs < n) {
+                nobs++;
+                ex += ix;
+                ey += iy;
+                exy += ix * iy;
+                ex2 += std::pow(ix, 2);
+                ey2 += std::pow(iy, 2);
+                varx = nobs == 1 ? 0. : (ex2 - std::pow(ex, 2) / nobs) / (nobs - 1);
+                vary = nobs == 1 ? 0. : (ey2 - std::pow(ey, 2) / nobs) / (nobs - 1);
+                cov = nobs == 1 ? 0. : (exy - ex * ey / nobs) / (nobs - 1);
+                _set(cov / std::sqrt(varx * vary), i, 0);
+                _set(cov, i, 1);
+            } else {
+                ex += ix - preix;
+                ey += iy - preiy;
+                ex2 = ex2 - prepowix + std::pow(ix, 2);
+                ey2 = ey2 - prepowiy + std::pow(iy, 2);
+                exy = exy + ix * iy - prepowixy;
+                varx = (ex2 - std::pow(ex, 2) / n) / (n - 1);
+                vary = (ey2 - std::pow(ey, 2) / n) / (n - 1);
+                cov = (exy - ex * ey / n) / (n - 1);
+                _set(cov / std::sqrt(varx * vary), i, 0);
+                _set(cov, i, 1);
+            }
+            prebufx[i] = ix;
+            prebufy[i] = iy;
+            prepowx[i] = ex2;
+            prepowy[i] = ey2;
+            prepowxy[i] = exy2;
+        }
+    }
+
+    // 修正 discard
+    setDiscard(++discard);
 }
 
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {

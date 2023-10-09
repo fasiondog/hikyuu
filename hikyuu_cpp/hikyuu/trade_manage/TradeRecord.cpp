@@ -7,7 +7,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include "TradeRecord.h"
-#include "../utilities/util.h"
 
 namespace hku {
 

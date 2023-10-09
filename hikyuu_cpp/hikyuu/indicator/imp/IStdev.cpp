@@ -26,40 +26,54 @@ bool IStdev::check() {
 
 void IStdev::_calculate(const Indicator& data) {
     size_t total = data.size();
-    int n = getParam<int>("n");
-
-    m_discard = data.discard() + n - 1;
+    m_discard = data.discard();
     if (m_discard >= total) {
         m_discard = total;
         return;
     }
 
-    Indicator ma = MA(data, n);
-    size_t N = n - 1;
-    for (size_t i = discard(); i < total; ++i) {
-        price_t mean = ma[i];
-        price_t sum = 0.0;
-        for (size_t j = i + 1 - n; j <= i; ++j) {
-            sum += std::pow(data[j] - mean, 2);
-        }
-        _set(std::sqrt(sum / N), i);
+    int n = getParam<int>("n");
+
+    vector<price_t> pow_buf(data.size());
+    price_t ex = 0.0, ex2 = 0.0;
+    size_t num = 0;
+    size_t start_pos = m_discard;
+    size_t first_end = start_pos + n >= total ? total : start_pos + n;
+    price_t k = data[start_pos];
+    for (size_t i = start_pos; i < first_end; i++) {
+        num++;
+        price_t d = data[i] - k;
+        ex += d;
+        price_t d_pow = std::pow(d, 2);
+        pow_buf[i] = d_pow;
+        ex2 += d_pow;
+        _set(num == 1 ? 0. : std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1)), i);
+    }
+
+    for (size_t i = first_end; i < total; i++) {
+        ex -= data[i - n] - k;
+        ex2 -= pow_buf[i - n];
+        price_t d = data[i] - k;
+        ex += d;
+        price_t d_pow = std::pow(d, 2);
+        pow_buf[i] = d_pow;
+        ex2 += d_pow;
+        _set(std::sqrt((ex2 - std::pow(ex, 2) / n) / (n - 1)), i);
     }
 }
 
 void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    HKU_IF_RETURN(step > 0 && curPos < ind.discard() + step - 1, void());
     size_t start = _get_step_start(curPos, step, ind.discard());
-    price_t sum = 0.0;
+    size_t num = 0;
+    price_t ex = 0.0, ex2 = 0.0;
+    price_t k = ind[start];
     for (size_t i = start; i <= curPos; i++) {
-        sum += ind[i];
+        num++;
+        price_t d = ind[i] - k;
+        ex += d;
+        ex2 += std::pow(d, 2);
     }
-    price_t mean = sum / step;
-    sum = 0.0;
-    size_t N = step - 1;
-    for (size_t i = start; i <= curPos; i++) {
-        sum += std::pow(ind[i] - mean, 2);
-    }
-    _set(std::sqrt(sum / N), curPos);
+    _set(num <= 1 ? 0.0 : std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1)), curPos);
 }
 
 Indicator HKU_API STDEV(int n) {

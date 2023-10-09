@@ -60,6 +60,8 @@ def get_draw_title(kdata):
         s1 = u' （年线）'
     elif query.ktype == Query.MIN:
         s1 = u' （1分钟线）'
+    elif query.ktype == Query.MIN3:
+        s1 = u' （3分钟线）'
     elif query.ktype == Query.MIN5:
         s1 = u' （5分钟线）'
     elif query.ktype == Query.MIN15:
@@ -68,12 +70,61 @@ def get_draw_title(kdata):
         s1 = u' （30分钟线）'
     elif query.ktype == Query.MIN60:
         s1 = u' （60分钟线）'
+    elif query.ktype == Query.HOUR2:
+        s1 = u' （2小时线）'
+    elif query.ktype == Query.HOUR4:
+        s1 = u' （4小时线）'
+    elif query.ktype == Query.HOUR6:
+        s1 = u' （6小时线）'
+    elif query.ktype == Query.HOUR12:
+        s1 = u' （12小时线）'
 
     name = stock.name
 
     if stock.code == "":
         stitle = "Block(%s) %s" % (stock.id, name) + s1
     else:
-        stitle = stock.market + stock.code + ' ' + name + s1
+        stitle = stock.market + "/" + stock.code + ' ' + name + s1
 
     return stitle
+
+
+def in_interactive_session() -> bool:
+    """
+    Check if we're running in an interactive shell.
+
+    Returns
+    -------
+    bool
+        True if running under python/ipython interactive shell.
+    """
+    def check_main():
+        try:
+            import __main__ as main
+        except ModuleNotFoundError:
+            return False
+        return not hasattr(main, "__file__")
+
+    try:
+        # error: Name '__IPYTHON__' is not defined
+        return __IPYTHON__ or check_main()  # type: ignore[name-defined]
+    except NameError:
+        return check_main()
+
+
+def in_ipython_frontend() -> bool:
+    """
+    Check if we're inside an IPython zmq frontend.
+
+    Returns
+    -------
+    bool
+    """
+    try:
+        # error: Name 'get_ipython' is not defined
+        ip = get_ipython()  # type: ignore[name-defined]
+        return "zmq" in str(type(ip)).lower()
+    except NameError:
+        pass
+
+    return False

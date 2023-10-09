@@ -24,7 +24,7 @@ const string KQuery::YEAR("YEAR");
 const string KQuery::MIN3("MIN3");
 const string KQuery::HOUR2("HOUR2");
 const string KQuery::HOUR4("HOUR4");
-const string KQuery::HOUR6("HOUR5");
+const string KQuery::HOUR6("HOUR6");
 const string KQuery::HOUR12("HOUR12");
 // const string KQuery::INVALID_KTYPE("Z");
 
@@ -33,9 +33,34 @@ static vector<string> g_all_ktype{KQuery::MIN,     KQuery::MIN5,     KQuery::MIN
                KQuery::QUARTER, KQuery::HALFYEAR, KQuery::YEAR,  KQuery::MIN3,
                KQuery::HOUR2,   KQuery::HOUR4,    KQuery::HOUR6, KQuery::HOUR12};
 
+static const unordered_map<string, int32_t> g_ktype2min{
+    {KQuery::MIN, 1},
+    {KQuery::MIN3, 3},
+
+    {KQuery::MIN5, 5},
+    {KQuery::MIN15, 15},
+    {KQuery::MIN30, 30},
+    {KQuery::MIN60, 60},
+    {KQuery::HOUR2, 60 * 2},
+    {KQuery::HOUR4, 60 * 4},
+    {KQuery::HOUR6, 60 * 6},
+    {KQuery::HOUR12, 60 * 12},
+
+    {KQuery::DAY, 60 * 24},
+    {KQuery::WEEK, 60 * 24 * 7},
+    {KQuery::MONTH, 60 * 24 * 30},
+    {KQuery::QUARTER, 60 * 24 * 30 * 3},
+    {KQuery::HALFYEAR, 60 * 24 * 30 * 6},
+    {KQuery::YEAR, 60 * 24 * 365},
+};
+
 // 获取所有的 KType
 vector<string>& KQuery::getAllKType() {
     return g_all_ktype;
+}
+
+int32_t KQuery::getKTypeInMin(KType ktype) {
+    return g_ktype2min.at(ktype);
 }
 
 KQuery::KQuery(Datetime start, Datetime end, KType ktype, RecoverType recoverType)

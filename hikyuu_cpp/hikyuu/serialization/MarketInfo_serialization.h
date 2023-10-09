@@ -11,7 +11,6 @@
 
 #include "../config.h"
 #include "../MarketInfo.h"
-#include "../utilities/util.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 #include <boost/serialization/nvp.hpp>

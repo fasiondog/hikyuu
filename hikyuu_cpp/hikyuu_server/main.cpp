@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
           fmt::format(R"({{"result": false,"errcode":{}, "errmsg":"Not Found"}})",
                       int(NNG_HTTP_STATUS_NOT_FOUND)));
 
-        DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserHome()));
+        DB::init(fmt::format("{}/.hikyuu/trade.ini", getUserDir()));
 
         UserService usr_service(HKU_SERVICE_API(user));
         usr_service.bind(&server);

@@ -728,6 +728,15 @@ void export_Indicator_build_in() {
     :param Indicator ind2: 指标2
     :rtype: Indicator)");
 
+    def("CORR", CORR, R"(CORR(ind1, ind2, n)
+
+    计算 ind1 和 ind2 的相关系数。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+
+    :param Indicator ind1: 指标1
+    :param Indicator ind2: 指标2
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数
+    :rtype: Indicator)");
+
     def("IF", IF_1);
     def("IF", IF_2);
     def("IF", IF_3);
@@ -1470,4 +1479,12 @@ void export_Indicator_build_in() {
     :param int start: 起始位置
     :param int end: 终止位置（不包含本身）
     :param int result_index: 原输入数据中的结果集)");
+
+    def("RSI", RSI, (arg("n") = 14), R"(RSI([data, n=14])
+
+    相对强弱指数
+
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator)");
 }

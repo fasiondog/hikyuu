@@ -6,7 +6,6 @@
  */
 
 #include "MarketInfo.h"
-#include "utilities/util.h"
 
 namespace hku {
 

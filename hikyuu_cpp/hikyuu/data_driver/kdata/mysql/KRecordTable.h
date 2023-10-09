@@ -88,6 +88,12 @@ public:
           m_db_name, m_code);
     }
 
+    string getSelectSQLNoDB() {
+        return fmt::format(
+          "select `date`,`open`,`high`, `low`, `close`, `amount`, `count` from `{}`",
+          m_code);
+    }
+
     void save(const SQLStatementPtr& st) const {
         st->bind(0, m_date, m_open, m_high, m_low, m_close, m_amount, m_count);
     }

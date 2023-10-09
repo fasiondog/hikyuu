@@ -12,8 +12,8 @@ target("core")
         --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
     end
 
-    add_packages("boost", "fmt", "spdlog", "flatbuffers", "cpp-httplib")
     add_deps("hikyuu")
+    add_packages("boost", "fmt", "spdlog", "flatbuffers", "cpp-httplib")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("-wd4251")
@@ -21,7 +21,7 @@ target("core")
         set_filename("core.so")
     end
 
-    if is_plat("windows") then
+    if is_plat("windows") and is_mode("release") then
         add_defines("HKU_API=__declspec(dllimport)")
         add_cxflags("-wd4566")
     end

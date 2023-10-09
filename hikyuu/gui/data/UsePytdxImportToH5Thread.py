@@ -245,7 +245,10 @@ class UsePytdxImportToH5Thread(QThread):
         create_database(connect)
 
         pytdx_api = TdxHq_API()
-        pytdx_api.connect(self.hosts[0][2], self.hosts[0][3])
+        hku_check(
+            pytdx_api.connect(self.hosts[0][2], self.hosts[0][3]), "failed connect pytdx {}:{}", self.hosts[0][2],
+            self.hosts[0][3]
+        )
 
         self.logger.info("导入交易所休假日历")
         import_new_holidays(connect)

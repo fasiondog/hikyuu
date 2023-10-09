@@ -125,6 +125,9 @@ void export_Strategy() {
       .add_property("name",
                     make_function(strategy_get_name, return_value_policy<copy_const_reference>()),
                     strategy_set_name)
+      .add_property(
+        "sm", make_function(&StrategyBase::getSM, return_value_policy<reference_existing_object>()),
+        "获取 StockManager 实例")
       .add_property("tm", &StrategyBase::getTM, &StrategyBase::setTM, "账户管理")
       .add_property("start_datetime", get_strategy_start_datetime, set_strategy_start_datetime,
                     "起始日期")

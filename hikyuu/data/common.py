@@ -85,6 +85,7 @@ def get_stktype_list(quotations=None):
 
 
 @hku_catch(ret=[], trace=True)
+@timeout(120)
 def get_stk_code_name_list(market: str) -> list:
     """
     获取指定证券交易所股票代码与名称列表
@@ -121,6 +122,7 @@ def get_stk_code_name_list(market: str) -> list:
 
 
 @hku_catch(ret=[], trace=True)
+@timeout(120)
 def get_index_code_name_list() -> list:
     """
     获取所有股票指数代码名称列表
@@ -139,6 +141,7 @@ g_last_get_fund_code_name_list_date = datetime.date(1990, 12, 9)
 
 
 @hku_catch(ret=[], trace=True)
+@timeout(60)
 def get_fund_code_name_list(market: str) -> list:
     """
     获取基金代码名称列表 (来源: sina)
@@ -167,7 +170,7 @@ def get_fund_code_name_list(market: str) -> list:
 @hku_catch(ret=[], trace=True)
 def get_new_holidays():
     """获取新的交易所休假日历"""
-    res = requests.get('https://www.tdx.com.cn/url/holiday/')
+    res = requests.get('https://www.tdx.com.cn/url/holiday/', timeout=60)
     res.encoding = res.apparent_encoding
     ret = re.findall(r'<textarea id="data" style="display:none;">([\s\w\d\W]+)</textarea>', res.text, re.M)[0].strip()
     day = [d.split('|')[:4] for d in ret.split('\n')]

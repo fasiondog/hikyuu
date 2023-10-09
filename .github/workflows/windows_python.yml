@@ -1,6 +1,12 @@
-name: win2022-python-build
+name: win-python-build
 
-on: [push, pull_request]
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -8,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022]
+        os: [windows-2019, windows-2022]
         arch: [x64] #, arm64]
 
     concurrency:
@@ -25,5 +31,5 @@ jobs:
       shell: cmd
       run: |
         cd hikyuu
-        xmake f -y --pyver=3.9
-        xmake -bvD core
+        xmake f -y --pyver=3.11
+        xmake -b core

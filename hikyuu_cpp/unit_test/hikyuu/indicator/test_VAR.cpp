@@ -38,13 +38,12 @@ TEST_CASE("test_VAR") {
     Indicator dev = VAR(ind, 10);
     CHECK_EQ(dev.name(), "VAR");
     CHECK_EQ(dev.size(), 15);
-    CHECK_UNARY(std::isnan(dev[8]));
-    CHECK_LT(std::fabs(dev[9] - 8.54444), 0.00001);
-    CHECK_LT(std::fabs(dev[10] - 9.87778), 0.00001);
-    CHECK_LT(std::fabs(dev[11] - 8.01111), 0.00001);
-    CHECK_LT(std::fabs(dev[12] - 10.6778), 0.0001);
-    CHECK_LT(std::fabs(dev[13] - 13.3444), 0.0001);
-    CHECK_LT(std::fabs(dev[14] - 16.0111), 0.0001);
+
+    vector<price_t> expected{0., 0.5,     1.,      1.666667, 2.5,     2.16667, 3.90476, 3.35714,
+                             6., 8.54444, 9.87778, 8.01111,  10.6778, 13.3444, 16.0111};
+    for (size_t i = 0; i < dev.size(); i++) {
+        CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.001));
+    }
 
     /** @arg n = 1时 */
     dev = VAR(ind, 1);
