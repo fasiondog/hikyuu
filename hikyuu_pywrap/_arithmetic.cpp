@@ -6,7 +6,9 @@
  */
 
 #include <boost/python.hpp>
+#include <hikyuu/analysis/combinate.h>
 #include <hikyuu/utilities/arithmetic.h>
+#include "pybind_utils.h"
 
 using namespace boost::python;
 using namespace hku;
