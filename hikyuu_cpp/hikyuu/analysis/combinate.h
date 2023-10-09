@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <vector>
+#include "hikyuu/indicator/Indicator.h"
 #include "../Log.h"
 
 namespace hku {
@@ -41,4 +41,6 @@ std::vector<std::vector<size_t>> combinateIndex(const std::vector<T>& inputs) {
     return result;
 }
 
-}
+std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs);
+
+}  // namespace hku

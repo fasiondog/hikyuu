@@ -16,6 +16,7 @@ using namespace hku;
 void export_DataType();
 void export_Constant();
 void export_util();
+void export_analysis();
 void export_log();
 void export_Datetime();
 void export_TimeDelta();
@@ -100,6 +101,7 @@ BOOST_PYTHON_MODULE(core) {
     export_DataType();
     export_Constant();
     export_util();
+    export_analysis();
     export_log();
     export_Datetime();
     export_TimeDelta();
