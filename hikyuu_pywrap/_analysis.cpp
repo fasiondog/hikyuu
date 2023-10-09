@@ -30,6 +30,17 @@ static py::list combinate_index(object seq) {
     return result;
 }
 
+static py::list combinate_indicator(object seq, int n) {
+    size_t total = len(seq);
+    std::vector<Indicator> inds(total);
+    for (size_t i = 0; i < total; ++i) {
+        inds[i] = py::extract<Indicator>(seq[i])();
+    }
+
+    auto comb = combinateIndicator(inds, n);
+    return vector_to_py_list(comb);
+}
+
 void export_analysis() {
     def("combinate_index", combinate_index, R"(combinate_index(seq)
 
@@ -40,5 +51,5 @@ void export_analysis() {
 
     )");
 
-    def("combinate_ind", combinate_ind);
+    def("combinate_ind", combinate_indicator);
 }

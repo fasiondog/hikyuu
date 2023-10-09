@@ -10,14 +10,14 @@
 
 namespace hku {
 
-std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs) {
-    std::vector<Indicator> ret(inputs.size());
+std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs, int n) {
+    std::vector<Indicator> ret;
     auto indexs = combinateIndex(inputs);
     for (size_t i = 0, len = indexs.size(); i < len; i++) {
         size_t count = indexs[i].size();
-        Indicator tmp = EXIST(inputs[indexs[i][0]]);
+        Indicator tmp = EXIST(inputs[indexs[i][0]], n);
         for (size_t j = 0; j < count; j++) {
-            tmp = tmp & EXIST(inputs[indexs[i][j]]);
+            tmp = tmp & EXIST(inputs[indexs[i][j]], n);
         }
         ret.emplace_back(tmp);
     }
