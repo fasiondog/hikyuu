@@ -12,7 +12,6 @@
 #include "../config.h"
 #include "../KData.h"
 #include "../utilities/Parameter.h"
-#include "../utilities/util.h"
 #include "../utilities/thread/StealThreadPool.h"
 
 #if HKU_SUPPORT_SERIALIZATION

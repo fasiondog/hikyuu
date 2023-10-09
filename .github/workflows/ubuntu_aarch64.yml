@@ -22,15 +22,14 @@ jobs:
         cancel-in-progress: true
     
     steps:
+    - uses: actions/checkout@v1
     - uses: xmake-io/github-action-setup-xmake@v1
-    - name: checkout
-      run: | 
-        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-      
+    - name: Installation musl
+      run: |
+        wget https://github.com/xmake-mirror/musl.cc/releases/download/20210202/${{ matrix.cross }}-cross.linux.tgz
+        tar -xvf ${{ matrix.cross }}-cross.linux.tgz
+
     - name: build
       run: |
-        sudo apt-get install -y libsqlite3-dev
-        cd ./hikyuu
-        xmake f -y
-        xmake -b small-test
-        xmake r small-test
+        xmake f -p cross -a aarch64 --sdk=`pwd`/${{ matrix.cross }}-cross -y
+        xmake -b hikyuu

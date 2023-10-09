@@ -1,5 +1,62 @@
 set_xmakever("2.8.2")
--- Last Modified: 2023-08-08 11:28:13
+
+option("hdf5")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable hdf5 kdata engine.")
+option_end()
+
+option("mysql")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable mysql kdata engine.")
+    if is_plat("macosx") then
+        if os.exists("/usr/local/opt/mysql-client/lib") then
+            add_includedirs("/usr/local/opt/mysql-client/include/mysql")
+            add_includedirs("/usr/local/opt/mysql-client/include")
+            add_linkdirs("/usr/local/opt/mysql-client/lib")
+            add_rpathdirs("/usr/local/opt/mysql-client/lib")
+        end
+        if os.exists("/usr/local/mysql/lib") then
+            add_linkdirs("/usr/local/mysql/lib")
+            add_rpathdirs("/usr/local/mysql/lib")
+        end
+        if not os.exists("/usr/local/include/mysql") then
+            if os.exists("/usr/local/mysql/include") then
+                os.run("ln -s /usr/local/mysql/include /usr/local/include/mysql")
+            else
+                print("Not Found MySQL include dir!")
+            end
+        end
+        add_links("mysqlclient")
+    elseif is_plat("windows") then
+        add_defines("NOMINMAX")
+    end        
+option_end()
+
+option("sqlite")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable sqlite kdata engine.")
+option_end()
+
+option("tdx")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable tdx kdata engine.")
+option_end()
+
+option("feedback")
+    set_default(true)
+    set_showmenu(true)
+    set_category("hikyuu")
+    set_description("Enable send feedback.")
+option_end()
+
 
 -- project
 set_project("hikyuu")
@@ -8,7 +65,7 @@ add_rules("mode.debug", "mode.release")
 if not is_plat("windows") then add_rules("mode.coverage", "mode.asan", "mode.msan", "mode.tsan", "mode.lsan") end
 
 -- version
-set_version("1.2.8", {build = "%Y%m%d%H%M"})
+set_version("1.2.9", {build = "%Y%m%d%H%M"})
 set_configvar("LOG_ACTIVE_LEVEL", 0) -- 激活的日志级别
 -- if is_mode("debug") then
 --    set_configvar("LOG_ACTIVE_LEVEL", 0)  -- 激活的日志级别
@@ -19,20 +76,27 @@ set_configvar("USE_SPDLOG_LOGGER", 1) -- 是否使用spdlog作为日志输出
 set_configvar("USE_SPDLOG_ASYNC_LOGGER", 0) -- 使用异步的spdlog
 set_configvar("CHECK_ACCESS_BOUND", 1)
 if is_plat("macosx") then
-  set_configvar("SUPPORT_SERIALIZATION", 0)
+    set_configvar("SUPPORT_SERIALIZATION", 0)
 else
-  set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
+    set_configvar("SUPPORT_SERIALIZATION", is_mode("release") and 1 or 0)
 end
 set_configvar("SUPPORT_TEXT_ARCHIVE", 0)
 set_configvar("SUPPORT_XML_ARCHIVE", 1)
 set_configvar("SUPPORT_BINARY_ARCHIVE", 1)
 set_configvar("HKU_DISABLE_ASSERT", 0)
+set_configvar("ENABLE_MSVC_LEAK_DETECT", 0)
+set_configvar("HKU_ENABLE_SEND_FEEDBACK", get_config("feedback") and 1 or 0)
+
+set_configvar("HKU_ENABLE_HDF5_KDATA", get_config("hdf5") and 1 or 0)
+set_configvar("HKU_ENABLE_MYSQL_KDATA", get_config("mysql") and 1 or 0)
+set_configvar("HKU_ENABLE_SQLITE_KDATA", get_config("sqlite") and 1 or 0)
+set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 
 -- set warning all as error
 if is_plat("windows") then
-  set_warnings("all", "error")
+   set_warnings("all", "error")
 else
-  set_warnings("all")
+    set_warnings("all")
 end
 
 -- set language: C99, c++ standard
@@ -40,26 +104,41 @@ set_languages("cxx17", "c99")
 
 local boost_version = "1.81.0"
 local hdf5_version = "1.12.2"
-local mysql_version = "8.0.31"
 local fmt_version = "10.0.0"
 local flatbuffers_version = "2.0.0"
-if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then mysql_version = "8.0.21" end
+local mysql_version = "8.0.31"
+if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
+    mysql_version = "8.0.21" 
+end
 
 add_repositories("project-repo hikyuu_extern_libs")
 if is_plat("windows") then
-  -- add_repositories("project-repo hikyuu_extern_libs")
-  if is_mode("release") then
-    add_requires("hdf5 " .. hdf5_version)
-  else
-    add_requires("hdf5_D " .. hdf5_version)
-  end
-  add_requires("mysql " .. mysql_version)
+    if get_config("hdf5") then
+        if is_mode("release") then
+            add_requires("hdf5 " .. hdf5_version)
+        else
+            add_requires("hdf5_D " .. hdf5_version)
+        end
+    end
+    if get_config("mysql") then
+        add_requires("mysql " .. mysql_version)
+    end
+
 elseif is_plat("linux", "cross") then
-  add_requires("hdf5 " .. hdf5_version, { system = false })
-  -- add_requires("mysql" , {system = true})
-  add_requires("mysql " .. mysql_version, { system = false })
+    if get_config("hdf5") then
+        add_requires("hdf5 " .. hdf5_version, { system = false })
+    end
+    if get_config("mysql") then
+        add_requires("mysql " .. mysql_version, { system = false })
+    end
+  
 elseif is_plat("macosx") then
-  add_requires("brew::hdf5")
+    if get_config("hdf5") then
+        add_requires("brew::hdf5")
+    end
+    if get_config("mysql") then
+        add_requires("brew::mysql-client")
+    end
 end
 
 add_requires("myboost " .. boost_version, {
@@ -86,7 +165,7 @@ add_requires("sqlite3", {system = false, configs = {shared = true, vs_runtime = 
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs = {vs_runtime = "MD"}})
 add_requires("nng", {system = false, configs = {vs_runtime = "MD", cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
-add_requires("cpp-httplib", {system = false})
+add_requires("cpp-httplib", {system = false, configs = {zlib = true, ssl = true}})
 add_requires("zlib", {system = false})
 
 add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger

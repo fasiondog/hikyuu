@@ -1479,4 +1479,12 @@ void export_Indicator_build_in() {
     :param int start: 起始位置
     :param int end: 终止位置（不包含本身）
     :param int result_index: 原输入数据中的结果集)");
+
+    def("RSI", RSI, (arg("n") = 14), R"(RSI([data, n=14])
+
+    相对强弱指数
+
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator)");
 }

@@ -8,6 +8,11 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
+#include <hikyuu/config.h>
+#if !HKU_ENABLE_HDF5_KDATA
+#error test program only for hdf5 engine! You must config --hdf5=y
+#endif
+
 #if __GNUC__ <= 8 || __clang_major__ <= 6
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;

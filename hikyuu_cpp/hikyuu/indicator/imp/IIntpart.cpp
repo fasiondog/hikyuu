@@ -7,7 +7,6 @@
  *      Author: fasiondog
  */
 
-#include "../../utilities/util.h"
 #include "IIntpart.h"
 
 #if HKU_SUPPORT_SERIALIZATION

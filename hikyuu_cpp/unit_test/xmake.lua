@@ -24,14 +24,14 @@ function coverage_report(target)
         os.run("lcov --remove cover-total.info '*/usr/include/*' \
                 '*/usr/lib/*' '*/usr/lib64/*' '*/usr/local/include/*' '*/usr/local/lib/*' '*/usr/local/lib64/*' \
                 '*/test/*' '*/.xmake*' '*/boost/*' '*/ffmpeg/*' \
-                '*/cpp/yihua/ocr_module/clipper.*' -o cover-final.info")
+                -o cover-final.info")
         
         -- 生成的html及相关文件的目录名称，--legend 简单的统计信息说明
-        os.exec("genhtml -o cover_report --legend --title 'yhsdk'  --prefix=" .. os.projectdir() .. " cover-final.info")
+        os.exec("genhtml -o cover_report --legend --title 'hikyuu'  --prefix=" .. os.projectdir() .. " cover-final.info")
 
         -- 生成 sonar 可读取报告
         if is_plat("linux") then
-            os.run("gcovr -r . -e cpp/test -e 'cpp/yihua/ocr_module/clipper.*' --xml -o coverage.xml")
+            os.run("gcovr -r . -e cpp/test --xml -o coverage.xml")
         end
     end
 end
@@ -40,16 +40,21 @@ target("unit-test")
     set_kind("binary")
     set_default(false)
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "mysql", "sqlite3")
+    add_options("hdf5", "mysql")
+
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
+    if get_config("mysql") then
+        if is_plat("macosx") then
+            add_packages("mysqlclient")
+        else
+            add_packages("mysql")
+        end
+    end
 
     add_includedirs("..")
 
     if is_plat("windows") then
-        add_cxflags("-wd4267")
-        add_cxflags("-wd4251")
-        add_cxflags("-wd4244")
-        add_cxflags("-wd4805")
-        add_cxflags("-wd4566")
+        add_cxflags("-wd4267", "-wd4996", "-wd4251", "-wd4244", "-wd4805", "-wd4566")
     else
         add_cxflags("-Wno-unused-variable",  "-Wno-missing-braces")
         add_cxflags("-Wno-sign-compare")
@@ -64,9 +69,6 @@ target("unit-test")
     add_deps("hikyuu")
 
     if is_plat("linux") or is_plat("macosx") then
-        -- add_links("boost_unit_test_framework")
-        -- add_links("boost_filesystem")
-        -- add_links("boost_serialization")
         add_links("sqlite3")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
@@ -86,10 +88,18 @@ target("small-test")
     set_kind("binary")
     set_default(false)
     
-    add_packages("boost", "fmt", "spdlog", "doctest", "mysql", "sqlite3")
-    add_includedirs("..")
+    add_options("hdf5", "mysql")
 
-    --add_defines("BOOST_TEST_DYN_LINK")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3")
+    if get_config("mysql") then
+        if is_plat("macosx") then
+            add_packages("mysqlclient")
+        else
+            add_packages("mysql")
+        end
+    end
+
+    add_includedirs("..")
 
     if is_plat("windows") then
         add_cxflags("-wd4267")
@@ -111,9 +121,6 @@ target("small-test")
     add_deps("hikyuu")
 
     if is_plat("linux") or is_plat("macosx") then
-        -- add_links("boost_unit_test_framework")
-        -- add_links("boost_filesystem")
-        -- add_links("boost_atomic")
         add_shflags("-Wl,-rpath=$ORIGIN", "-Wl,-rpath=$ORIGIN/../lib")
     end
 

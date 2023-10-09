@@ -9,8 +9,8 @@
 
 #include <cstdint>
 #include "TimeDelta.h"
+#include "../utilities/arithmetic.h"
 #include "../Log.h"
-#include "../utilities/util.h"
 
 namespace hku {
 

@@ -4,7 +4,7 @@
  *  Copyright (c) 2019, hiyuu.org
  *
  *  Created on: 2019-7-11
- *      Author: linjinhai
+ *      Author: fasiondog
  */
 
 #include "SQLiteStatement.h"

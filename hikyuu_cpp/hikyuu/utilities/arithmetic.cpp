@@ -5,7 +5,7 @@
  *      Author: fasiondog
  */
 #include <cmath>
-#include "util.h"
+#include "arithmetic.h"
 
 #if defined(_MSC_VER)
 #include <windows.h>
@@ -18,7 +18,7 @@
 namespace hku {
 
 double HKU_API roundEx(double number, int ndigits) {
-    //切换至：ROUND_HALF_EVEN 银行家舍入法
+    // 切换至：ROUND_HALF_EVEN 银行家舍入法
     double pow1, pow2, y, z;
     double x = number;
     if (ndigits >= 0) {

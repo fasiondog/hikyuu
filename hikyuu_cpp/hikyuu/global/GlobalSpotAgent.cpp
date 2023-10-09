@@ -7,7 +7,6 @@
 
 #include "../GlobalInitializer.h"
 #include "GlobalSpotAgent.h"
-#include "../utilities/util.h"
 #include "../StockManager.h"
 
 namespace hku {

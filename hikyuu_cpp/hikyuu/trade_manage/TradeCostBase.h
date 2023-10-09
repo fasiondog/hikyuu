@@ -10,7 +10,6 @@
 #define TRADECOSTBASE_H_
 
 #include "../Stock.h"
-#include "../utilities/util.h"
 #include "../utilities/Parameter.h"
 #include "CostRecord.h"
 

@@ -6,7 +6,6 @@
  */
 
 #include "StockTypeInfo.h"
-#include "utilities/util.h"
 
 namespace hku {
 

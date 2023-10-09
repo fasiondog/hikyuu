@@ -12,8 +12,14 @@
 #endif
 
 #include <iostream>
-#include <H5public.h>
 #include <fmt/format.h>
+#include <nng/nng.h>
+
+#include "config.h"
+#if HKU_ENABLE_HDF5_KDATA
+#include <H5public.h>
+#endif
+
 #include "Log.h"
 #include "hikyuu.h"
 #include "GlobalInitializer.h"
@@ -22,6 +28,7 @@
 #include "global/GlobalSpotAgent.h"
 #include "global/schedule/scheduler.h"
 #include "indicator/IndicatorImp.h"
+#include "global/sysinfo.h"
 #include "debug.h"
 
 namespace hku {
@@ -52,6 +59,10 @@ void GlobalInitializer::init() {
     set_log_level(INFO);
 #endif
 
+#if HKU_ENABLE_SEND_FEEDBACK
+    sendFeedback();
+#endif
+
     DataDriverFactory::init();
     StockManager::instance();
     IndicatorImp::initDynEngine();
@@ -66,7 +77,12 @@ void GlobalInitializer::clean() {
     IndicatorImp::releaseDynEngine();
     StockManager::quit();
     DataDriverFactory::release();
+
+    nng_closeall();
+
+#if HKU_ENABLE_HDF5_KDATA
     H5close();
+#endif
 
 #if USE_SPDLOG_LOGGER
     spdlog::drop_all();

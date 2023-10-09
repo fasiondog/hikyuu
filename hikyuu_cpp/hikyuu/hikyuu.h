@@ -12,7 +12,6 @@
 #include "KData.h"
 #include "Stock.h"
 #include "StockManager.h"
-#include "utilities/util.h"
 #include "utilities/Parameter.h"
 
 namespace hku {
@@ -31,17 +30,6 @@ namespace hku {
  */
 void HKU_API hikyuu_init(const string& config_file_name, bool ignore_preload = false,
                          const StrategyContext& context = StrategyContext({"all"}));
-
-/**
- * 获取Hikyuu当前版本号
- * @return 版本号
- */
-string HKU_API getVersion();
-
-/**
- * 获取详细版本号，包含构建时间
- */
-std::string HKU_API getVersionWithBuild();
 
 /** @} */
 

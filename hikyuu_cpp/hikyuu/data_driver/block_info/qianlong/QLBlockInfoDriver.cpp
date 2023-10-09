@@ -7,7 +7,6 @@
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
-#include "../../../utilities/util.h"
 #include "QLBlockInfoDriver.h"
 
 namespace hku {
@@ -41,12 +40,12 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
     while (std::getline(inifile, line_str)) {
         boost::trim(line_str);
 
-        //空行或注释行，跳过
+        // 空行或注释行，跳过
         if (line_str.empty() || line_str.at(0) == ';') {
             continue;
         }
 
-        //检查第一个出现的注释符，并将其及其之后的字符清除
+        // 检查第一个出现的注释符，并将其及其之后的字符清除
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
@@ -56,7 +55,7 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
         // section行
         if (line_str.at(0) == '[') {
             if (is_find) {
-                break;  //跳出循环
+                break;  // 跳出循环
             }
             size_t len = line_str.size();
             if (line_str[len - 1] != ']') {
@@ -118,11 +117,11 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     while (std::getline(inifile, line_str)) {
         boost::trim(line_str);
 
-        //空行或注释行，跳过
+        // 空行或注释行，跳过
         if (line_str.empty() || line_str.at(0) == ';')
             continue;
 
-        //检查第一个出现的注释符，并将其及其之后的字符清除
+        // 检查第一个出现的注释符，并将其及其之后的字符清除
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
@@ -145,7 +144,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
 
         } else {
             if (section.empty())
-                break;  //缺少section定义，后续无须处理，直接跳出循环
+                break;  // 缺少section定义，后续无须处理，直接跳出循环
 
             pos = line_str.find(',');
             if (pos == std::string::npos || pos == line_str.size() - 1)

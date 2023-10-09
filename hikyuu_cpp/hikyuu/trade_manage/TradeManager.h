@@ -11,7 +11,6 @@
 
 #include "TradeManagerBase.h"
 #include "../utilities/Parameter.h"
-#include "../utilities/util.h"
 #include "TradeRecord.h"
 #include "PositionRecord.h"
 #include "BorrowRecord.h"
@@ -378,7 +377,7 @@ public:
     virtual void tocsv(const string& path) override;
 
 private:
-    //以脚本的形式保存交易动作，便于修正和校准
+    // 以脚本的形式保存交易动作，便于修正和校准
     void _saveAction(const TradeRecord&);
 
     bool _add_init_tr(const TradeRecord&);
@@ -400,30 +399,30 @@ private:
     price_t m_init_cash;              // 初始资金
     Datetime m_last_update_datetime;  // 最后一次根据权息调整持仓与交易记录的时刻
 
-    price_t m_cash;            //当前现金
-    price_t m_checkin_cash;    //累计存入资金，初始资金视为存入
-    price_t m_checkout_cash;   //累计取出资金
-    price_t m_checkin_stock;   //累计存入股票价值
-    price_t m_checkout_stock;  //累计取出股票价值
-    price_t m_borrow_cash;     //当前借入资金，负债
+    price_t m_cash;            // 当前现金
+    price_t m_checkin_cash;    // 累计存入资金，初始资金视为存入
+    price_t m_checkout_cash;   // 累计取出资金
+    price_t m_checkin_stock;   // 累计存入股票价值
+    price_t m_checkout_stock;  // 累计取出股票价值
+    price_t m_borrow_cash;     // 当前借入资金，负债
 
-    list<LoanRecord> m_loan_list;  //当前融资情况
+    list<LoanRecord> m_loan_list;  // 当前融资情况
 
     typedef map<uint64_t, BorrowRecord> borrow_stock_map_type;
-    borrow_stock_map_type m_borrow_stock;  //当前借入的股票及其数量
+    borrow_stock_map_type m_borrow_stock;  // 当前借入的股票及其数量
 
-    TradeRecordList m_trade_list;  //交易记录
+    TradeRecordList m_trade_list;  // 交易记录
 
     typedef map<uint64_t, PositionRecord> position_map_type;
-    position_map_type m_position;  //当前持仓交易对象的持仓记录 ["sh000001"-> ]
-    PositionRecordList m_position_history;        //持仓历史记录
-    position_map_type m_short_position;           //空头仓位记录
-    PositionRecordList m_short_position_history;  //空头仓位历史记录
+    position_map_type m_position;  // 当前持仓交易对象的持仓记录 ["sh000001"-> ]
+    PositionRecordList m_position_history;        // 持仓历史记录
+    position_map_type m_short_position;           // 空头仓位记录
+    PositionRecordList m_short_position_history;  // 空头仓位历史记录
 
     // list<OrderBrokerPtr> m_broker_list;  //订单代理列表
     // Datetime m_broker_last_datetime;     //订单代理最近一次执行操作的时刻
 
-    list<string> m_actions;  //记录交易动作，便于修改或校准实盘时的交易
+    list<string> m_actions;  // 记录交易动作，便于修改或校准实盘时的交易
 
 //==================================================
 // 支持序列化

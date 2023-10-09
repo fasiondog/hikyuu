@@ -6,8 +6,12 @@
  */
 
 #include "doctest/doctest.h"
-#include <hikyuu/StockManager.h>
 
+#include <hikyuu/config.h>
+
+#if HKU_ENABLE_MYSQL_KDATA
+
+#include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/ConnectPool.h>
 #include <hikyuu/utilities/db_connect/DBConnect.h>
 #include <hikyuu/utilities/db_connect/mysql/MySQLConnect.h>
@@ -180,3 +184,5 @@ TEST_CASE("test_mysql") {
     con->exec("drop database if exists test;");
 }
 #endif
+
+#endif  // HKU_ENABLE_MYSQL_KDATA

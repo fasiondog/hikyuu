@@ -16,18 +16,11 @@
 #include <boost/algorithm/string.hpp>
 
 #include "utilities/IniParser.h"
-#include "utilities/util.h"
 #include "utilities/thread/ThreadPool.h"
 #include "StockManager.h"
 #include "global/GlobalTaskGroup.h"
 #include "global/schedule/inner_tasks.h"
 #include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
-#include "data_driver/base_info/sqlite/SQLiteBaseInfoDriver.h"
-#include "data_driver/base_info/mysql/MySQLBaseInfoDriver.h"
-#include "data_driver/block_info/qianlong/QLBlockInfoDriver.h"
-#include "data_driver/kdata/hdf5/H5KDataDriver.h"
-#include "data_driver/kdata/tdx/TdxKDataDriver.h"
-#include "data_driver/kdata/mysql/MySQLKDataDriver.h"
 
 namespace hku {
 
@@ -124,7 +117,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     string funcname(" [StockManager::init]");
 
-    //加载证券基本信息
+    // 加载证券基本信息
     m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
     HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
 
@@ -134,10 +127,10 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     loadAllStocks();
     loadAllStockWeights();
 
-    //获取板块驱动
+    // 获取板块驱动
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
 
-    //获取K线数据驱动并预加载指定的数据
+    // 获取K线数据驱动并预加载指定的数据
     HKU_INFO("Loading KData...");
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
 

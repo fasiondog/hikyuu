@@ -65,7 +65,6 @@ void HKU_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
     HKU_TRACE("current {} database version: {}", module_name, version);
 
     if (version >= to_version) {
-        // YH_TRACE("current version greater the upgrade version, ignored!");
         return;
     }
 
