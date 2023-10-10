@@ -30,7 +30,7 @@ jobs:
       env:
         cache-name: cache-windows-modules
       with:
-        path: ~/.xmake
+        path: /Users/%USERNAME/.xmake
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
