@@ -18,7 +18,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4      
-    - uses: xmake-io/github-action-setup-xmake@v1
 
     - name: Cache packages
       id: cache-xmake-ubuntu
@@ -32,6 +31,11 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
+
+    - uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: branch@master
+        actions-cache-folder: '.xmake-cache'
 
     - name: configure
       run: |
