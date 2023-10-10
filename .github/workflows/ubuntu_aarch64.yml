@@ -22,14 +22,31 @@ jobs:
         cancel-in-progress: true
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
+
+    - name: Cache xmake aarch64 packages
+      id: cache-xmake-ubuntu-aarch64
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-ubuntu-aarch64-modules
+      with:
+        path: ~/.xmake
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - uses: xmake-io/github-action-setup-xmake@v1
     - name: Installation musl
       run: |
         wget https://github.com/xmake-mirror/musl.cc/releases/download/20210202/${{ matrix.cross }}-cross.linux.tgz
         tar -xvf ${{ matrix.cross }}-cross.linux.tgz
 
-    - name: build
+    - name: configure
       run: |
         xmake f -p cross -a aarch64 --sdk=`pwd`/${{ matrix.cross }}-cross -y
+
+    - name: build
+      run: |
         xmake -b hikyuu
