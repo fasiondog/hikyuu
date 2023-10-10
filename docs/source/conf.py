@@ -108,7 +108,7 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'classic'
+html_theme = 'sphinx_rtd_theme'
 #可选：alabaster, sphinx_rtd_theme, classic, sphinxdoc, scrolls, agogo, traditional, nature, haiku, pyramid, bizstyle
 #http://www.sphinx-doc.org/en/stable/theming.html#using-a-theme
 
