@@ -42,7 +42,7 @@ jobs:
         xmake-version: branch@master
         actions-cache-folder: '.xmake-cache'
 
-    - name: build
+    - name: configure
       shell: cmd
       run: |
         xmake f --feedback=n -y
