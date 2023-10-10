@@ -31,6 +31,6 @@ jobs:
       shell: cmd
       run: |
         cd hikyuu
-        xmake f -y
+        xmake f --feedback=n -y
         xmake -b small-test
         xmake r small-test
