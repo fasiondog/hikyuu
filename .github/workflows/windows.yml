@@ -22,15 +22,37 @@ jobs:
         cancel-in-progress: true    
     
     steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache windows packages
+      id: cache-xmake-windows
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-windows-modules
+      with:
+        path: /Users/%USERNAME/.xmake
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - uses: xmake-io/github-action-setup-xmake@v1
-    - name: checkout
-      run: | 
-        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-   
+      with:
+        xmake-version: branch@master
+        actions-cache-folder: '.xmake-cache'
+
+    - name: configure
+      shell: cmd
+      run: |
+        xmake f --feedback=n -y
+
     - name: build
       shell: cmd
       run: |
-        cd hikyuu
-        xmake f -y
         xmake -b small-test
+
+    - name: test
+      shell: cmd
+      run: |
         xmake r small-test

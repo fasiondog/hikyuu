@@ -17,15 +17,35 @@ jobs:
         os: [ubuntu-latest]
     
     steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache packages
+      id: cache-xmake-ubuntu
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.xmake
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - uses: xmake-io/github-action-setup-xmake@v1
-    - name: checkout
-      run: | 
-        git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1
-      
+      with:
+        xmake-version: branch@master
+        actions-cache-folder: '.xmake-cache'
+
+    - name: config
+      run: |
+        xmake f --feedback=n -y
+
     - name: build
       run: |
-        sudo apt-get install -y libsqlite3-dev
-        cd ./hikyuu
-        xmake f -y
         xmake -b small-test
+  
+    - name: test
+      run: |
         xmake r small-test
+  

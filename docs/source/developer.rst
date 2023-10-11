@@ -25,20 +25,9 @@ C++测试工程参考：`<http://fasiondog.cn/hikyuu/test_doc/index.html>`_
 2、安装构建工具 xmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-xmake >= 2.2.2，网址：`<https://github.com/xmake-io/xmake>`_
+xmake >= 2.8.2，网址：`<https://github.com/xmake-io/xmake>`_
 
-Windows下，从 xmake github 页面中的“release”进入，直接下载相应的 exe 安装包安装即可：
-
-.. figure:: _static/dev-001.jpg
-
-
-Linux、macOSX 执行以下指令安装：
-
-.. code-block:: shell
-
-    git clone --branch=dev https://github.com/tboox/xmake.git tboox/xmake --depth 1
-    cd ./tboox/xmake
-    ./scripts/get.sh __local__
+参见：https://xmake.io/#/zh-cn/guide/installation `<https://xmake.io/#/zh-cn/guide/installation>`
 
 
 3、克隆 Hikyuu 源码
@@ -48,7 +37,7 @@ Linux、macOSX 执行以下指令安装：
 
 .. code-block:: shell
 
-    git clone https://github.com/fasiondog/hikyuu.git --recursive --depth 1    
+    git clone https://github.com/fasiondog/hikyuu.git --recursive
 
 
 4、Linux下安装依赖软件包

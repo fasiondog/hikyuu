@@ -112,7 +112,7 @@ void export_TradeManager() {
 
     :rtype: int)")
 
-      //.def("getShortStockNumber", &TradeManager::getShortStockNumber)
+      .def("get_short_stock_num", &TradeManagerBase::getShortStockNumber)
 
       .def("get_hold_num", &TradeManagerBase::getHoldNumber, R"(get_hold_num(self, datetime, stock)
 
@@ -122,7 +122,7 @@ void export_TradeManager() {
         :param Stock stock: 指定的证券
         :rtype: int)")
 
-      //.def("getShortHoldNumber", &TradeManager::getShortHoldNumber)
+      .def("get_short_hold_num", &TradeManagerBase::getShortHoldNumber)
 
       .def("get_trade_list", _getTradeList_1)
       .def("get_trade_list", _getTradeList_2, R"(get_trade_list(self[, start, end])
@@ -175,10 +175,10 @@ void export_TradeManager() {
     :param float num:         卖出数量
     :rtype: CostRecord)")
 
-      //.def("getBorrowCashCost", &TradeManager::getBorrowCashCost)
-      //.def("getReturnCashCost", &TradeManager::getReturnCashCost)
-      //.def("getBorrowStockCost", &TradeManager::getBorrowStockCost)
-      //.def("getReturnStockCost", &TradeManager::getReturnStockCost)
+      .def("get_borrow_cash_cost", &TradeManagerBase::getBorrowCashCost)
+      .def("get_return_cash_cost", &TradeManagerBase::getReturnCashCost)
+      .def("get_borrow_stock_cost", &TradeManagerBase::getBorrowStockCost)
+      .def("get_return_stock_cost", &TradeManagerBase::getReturnStockCost)
 
       .def("cash", &TradeManagerBase::cash, (arg("datetime"), arg("ktype") = KQuery::DAY),
            R"(cash(self, datetime[, ktype=Query.KType.DAY])
@@ -237,12 +237,12 @@ void export_TradeManager() {
     :param float cash: 取出的资金量
     :rtype: TradeRecord)")
 
-      //.def("checkinStock", &TradeManager::checkinStock)
-      //.def("checkoutStock", &TradeManager::checkoutStock)
-      //.def("borrowCash", &TradeManager::borrowCash)
-      //.def("returnCash", &TradeManager::returnCash)
-      //.def("borrowStock", &TradeManager::borrowStock)
-      //.def("returnStock", &TradeManager::returnStock)
+      .def("checkin_stock", &TradeManagerBase::checkinStock)
+      .def("checkout_stock", &TradeManagerBase::checkoutStock)
+      .def("borrow_cash", &TradeManagerBase::borrowCash)
+      .def("return_cash", &TradeManagerBase::returnCash)
+      .def("borrow_stock", &TradeManagerBase::borrowStock)
+      .def("return_stock", &TradeManagerBase::returnStock)
 
       .def(
         "buy", &TradeManagerBase::buy,
@@ -262,9 +262,6 @@ void export_TradeManager() {
     :param SystemPart part:   交易指示来源
     :rtype: TradeRecord)")
 
-      // buy_overload(args("datetime", "stock", "realPrice",
-      //"num", "stoploss", "goalPrice", "planPrice","part")))
-
       .def(
         "sell", &TradeManagerBase::sell,
         (arg("datetime"), arg("stock"), arg("real_price"), arg("num") = MAX_DOUBLE,
@@ -283,10 +280,9 @@ void export_TradeManager() {
     :param float plan_price:  原计划卖出价格
     :param SystemPart part:   交易指示来源
     :rtype: TradeRecord)")
-      // sell_overload(args("datetime", "stock", "realPrice", "num", "stoploss", "goalPrice",
-      //                   "planPrice", "part")))
-      //.def("buyShort", &TradeManager::buyShort, buyShort_overload())
-      //.def("sellShort", &TradeManager::sellShort, sellShort_overload())
+
+      .def("buy_short", &TradeManagerBase::buyShort)
+      .def("sell_short", &TradeManagerBase::sellShort)
 
       .def("add_trade_record", &TradeManagerBase::addTradeRecord, R"(add_trade_record(self, tr)
 
