@@ -19,12 +19,10 @@ namespace hku {
  * 当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。
  * @param fast 快线
  * @param slow 慢线
- * @param kpart KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_CrossGold(const Indicator& fast, const Indicator& slow,
-                               const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_CrossGold(const Indicator& fast, const Indicator& slow);
 
 } /* namespace hku */
 

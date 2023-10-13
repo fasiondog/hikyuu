@@ -10,14 +10,10 @@
 
 namespace hku {
 
-CrossSignal::CrossSignal() : SignalBase("SG_Cross") {
-    setParam<string>("kpart", "CLOSE");
-}
+CrossSignal::CrossSignal() : SignalBase("SG_Cross") {}
 
-CrossSignal::CrossSignal(const Indicator& fast, const Indicator& slow, const string& kpart)
-: SignalBase("SG_Cross"), m_fast(fast), m_slow(slow) {
-    setParam<string>("kpart", kpart);
-}
+CrossSignal::CrossSignal(const Indicator& fast, const Indicator& slow)
+: SignalBase("SG_Cross"), m_fast(fast), m_slow(slow) {}
 
 CrossSignal::~CrossSignal() {}
 
@@ -29,10 +25,8 @@ SignalPtr CrossSignal::_clone() {
 }
 
 void CrossSignal::_calculate() {
-    string kpart = getParam<string>("kpart");
-    Indicator kdata = KDATA_PART(m_kdata, kpart);
-    Indicator fast = m_fast(kdata);
-    Indicator slow = m_slow(kdata);
+    Indicator fast = m_fast(m_kdata);
+    Indicator slow = m_slow(m_kdata);
     HKU_ERROR_IF_RETURN(fast.size() != slow.size(), void(), "fast.size() != slow.size()");
 
     size_t discard = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
@@ -46,8 +40,8 @@ void CrossSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Cross(const Indicator& fast, const Indicator& slow, const string& kpart) {
-    return SignalPtr(new CrossSignal(fast, slow, kpart));
+SignalPtr HKU_API SG_Cross(const Indicator& fast, const Indicator& slow) {
+    return SignalPtr(new CrossSignal(fast, slow));
 }
 
 } /* namespace hku */

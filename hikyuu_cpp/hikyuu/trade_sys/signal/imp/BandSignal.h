@@ -17,7 +17,7 @@ namespace hku {
 class BandSignal : public SignalBase {
 public:
     BandSignal();
-    BandSignal(const Indicator& sig, price_t lower, price_t upper, const string& kpart); 
+    BandSignal(const Indicator& sig, price_t lower, price_t upper);
     virtual ~BandSignal();
 
     virtual SignalPtr _clone() override;

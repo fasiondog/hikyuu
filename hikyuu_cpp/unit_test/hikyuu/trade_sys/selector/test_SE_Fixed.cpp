@@ -11,6 +11,7 @@
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
 
 using namespace hku;
@@ -39,7 +40,7 @@ TEST_CASE("test_SE_Fixed") {
     CHECK_EQ(result.size(), 0);
 
     /** @arg 试图加入一个缺少MM的系统策略原型 */
-    SGPtr sg = SG_Cross(MA(5), MA(10), "CLOSE");
+    SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
     MMPtr mm = MM_FixedCount(100);
     CHECK_UNARY(!se->addStock(sm["sh600000"], sys));
 

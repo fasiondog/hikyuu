@@ -25,7 +25,7 @@ Python中的订单代理包装
     my_tm.broke_last_datetime=Datetime(201706010000)
 
     #创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线，快线向上穿越慢线时买入，反之卖出）
-    my_sg = SG_Flex(OP(EMA(n=5)), slow_n=10)
+    my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
 
     #固定每次买入1000股
     my_mm = MM_FixedCount(1000)

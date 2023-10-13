@@ -15,6 +15,7 @@
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_sys/stoploss/crt/ST_FixedPercent.h>
 #include <hikyuu/trade_sys/stoploss/crt/ST_Indicator.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 
 using namespace hku;
 
@@ -31,22 +32,22 @@ TEST_CASE("test_SYS_Simple_for_tp") {
 
     StockManager& sm = StockManager::instance();
 
-    //初始参数
-    Datetime init_date(199001010000LL);   //账户初始日期
-    price_t init_cash = 100000;           //账户初始金额
-    TradeCostPtr costfunc = TC_Zero();    //零成本函数
-    Stock stk = sm["sh600000"];           //选定标的
-    Datetime start_date(199911100000LL);  //测试起始日期
-    Datetime end_date(200002250000LL);    //测试结束日期
+    // 初始参数
+    Datetime init_date(199001010000LL);   // 账户初始日期
+    price_t init_cash = 100000;           // 账户初始金额
+    TradeCostPtr costfunc = TC_Zero();    // 零成本函数
+    Stock stk = sm["sh600000"];           // 选定标的
+    Datetime start_date(199911100000LL);  // 测试起始日期
+    Datetime end_date(200002250000LL);    // 测试结束日期
 
     KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
 
-    //构建系统部件
+    // 构建系统部件
     TMPtr tm = crtTM(init_date, init_cash, costfunc, "TEST_TM");
-    SGPtr sg = SG_Cross(MA(5), MA(10), "CLOSE");
+    SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
     MMPtr mm = MM_FixedCount(100);
     STPtr st = ST_FixedPercent(0.01);
-    TPPtr tp = ST_Indicator(MA(5), "CLOSE");
+    TPPtr tp = ST_Indicator(MA(CLOSE(), 5));
     SYSPtr sys;
 
     /** @arg 指定了TM、SG、MM、ST、TP，但未指定其他策略组件，非延迟操作 */

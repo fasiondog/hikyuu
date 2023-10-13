@@ -13,8 +13,7 @@
 
 namespace hku {
 
-SignalPtr HKU_API SG_Band(const Indicator& sig, price_t lower, price_t upper,
-                          const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Band(const Indicator& sig, price_t lower, price_t upper);
 
 } /* namespace hku */
 
