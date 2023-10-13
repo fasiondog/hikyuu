@@ -18,12 +18,10 @@ namespace hku {
  * 布尔信号指示器
  * @param buy 买入指示（结果Indicator中相应位置>0则代表买入）
  * @param sell 卖出指示（结果Indicator中相应位置>0则代表卖出）
- * @param kpart KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
  * @return 信号指示器
  * @ingroup Signal
  */
-SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell,
-                          const string& kpart = "CLOSE");
+SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell);
 
 } /* namespace hku */
 

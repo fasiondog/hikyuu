@@ -143,14 +143,13 @@ void export_Signal() {
 
     register_ptr_to_python<SignalPtr>();
 
-    def("SG_Bool", SG_Bool, (arg("buy"), arg("sell"), arg("kpart") = "CLOSE"),
-        R"(SG_Bool(buy, sell[, kpart='CLOSE'])
+    def("SG_Bool", SG_Bool, (arg("buy"), arg("sell")),
+        R"(SG_Bool(buy, sell)
 
     布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
 
     :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
     :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
-    :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器)");
 
     def("SG_Single", SG_Single,
@@ -223,8 +222,8 @@ void export_Signal() {
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :return: 信号指示器)");
 
-    def ("SG_Band", SG_Band, (arg("ind"), arg("lower"), arg("upper"), arg("kpart") = "CLOSE"),
-      R"(SG_Band(ind, lower, upper[, kpart = 'CLOSE'])
+    def("SG_Band", SG_Band, (arg("ind"), arg("lower"), arg("upper"), arg("kpart") = "CLOSE"),
+        R"(SG_Band(ind, lower, upper[, kpart = 'CLOSE'])
     指标区间指示器, 当指标超过上轨时，买入；
     当指标低于下轨时，卖出。::
 

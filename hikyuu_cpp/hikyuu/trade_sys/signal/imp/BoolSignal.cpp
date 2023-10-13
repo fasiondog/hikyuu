@@ -10,14 +10,10 @@
 
 namespace hku {
 
-BoolSignal::BoolSignal() : SignalBase("SG_Bool") {
-    setParam<string>("kpart", "CLOSE");
-}
+BoolSignal::BoolSignal() : SignalBase("SG_Bool") {}
 
-BoolSignal::BoolSignal(const Indicator& buy, const Indicator& sell, const string& kpart)
-: SignalBase("SG_Bool"), m_bool_buy(buy), m_bool_sell(sell) {
-    setParam<string>("kpart", kpart);
-}
+BoolSignal::BoolSignal(const Indicator& buy, const Indicator& sell)
+: SignalBase("SG_Bool"), m_bool_buy(buy), m_bool_sell(sell) {}
 
 BoolSignal::~BoolSignal() {}
 
@@ -29,10 +25,8 @@ SignalPtr BoolSignal::_clone() {
 }
 
 void BoolSignal::_calculate() {
-    string kpart = getParam<string>("kpart");
-    Indicator kdata = KDATA_PART(m_kdata, kpart);
-    Indicator buy = m_bool_buy(kdata);
-    Indicator sell = m_bool_sell(kdata);
+    Indicator buy = m_bool_buy(m_kdata);
+    Indicator sell = m_bool_sell(m_kdata);
     HKU_ERROR_IF_RETURN(buy.size() != sell.size(), void(), "buy.size() != sell.size()");
 
     size_t discard = buy.discard() > sell.discard() ? buy.discard() : sell.discard();
@@ -45,9 +39,8 @@ void BoolSignal::_calculate() {
     }
 }
 
-SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell,
-                          const string& kpart = "CLOSE") {
-    return SignalPtr(new BoolSignal(buy, sell, kpart));
+SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell) {
+    return SignalPtr(new BoolSignal(buy, sell));
 }
 
 } /* namespace hku */
