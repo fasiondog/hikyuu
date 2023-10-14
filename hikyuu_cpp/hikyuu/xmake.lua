@@ -6,7 +6,7 @@ target("hikyuu")
         set_kind("shared")
     end
 
-    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback")
+    add_options("hdf5", "mysql", "sqlite", "tdx", "feedback", "stackstrace")
 
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "nng", "nlohmann_json", "cpp-httplib")
     if is_plat("windows", "linux", "cross") then
